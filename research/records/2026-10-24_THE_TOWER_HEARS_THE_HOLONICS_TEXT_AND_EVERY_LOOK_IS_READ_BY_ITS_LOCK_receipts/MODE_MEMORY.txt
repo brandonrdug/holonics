@@ -1,0 +1,19 @@
+cells 215099; every mode: keeps 0.495 (median), turns 1.436 rad
+U's readers
+   mode 4: keeps 0.163, turns 1.832 rad (rank 43 of 64), pump 0.208
+   mode 15: keeps 0.106, turns 2.437 rad (rank 55 of 64), pump 0.309
+   mode 2: keeps 0.470, turns 0.388 rad (rank 12 of 64), pump 0.256
+   mode 6: keeps 0.268, turns 2.796 rad (rank 61 of 64), pump 0.083
+   mode 14: keeps 0.563, turns 1.981 rad (rank 46 of 64), pump 0.330
+the carriers B to U
+   mode 41: keeps 0.796, turns 0.658 rad (rank 18 of 64), pump 0.201
+   mode 56: keeps 0.649, turns 0.670 rad (rank 19 of 64), pump 0.200
+   mode 48: keeps 0.577, turns 0.309 rad (rank 10 of 64), pump 0.067
+the placement found by U's demand
+   mode 16: keeps 0.569, turns 0.018 rad (rank 0 of 64), pump 0.421
+the antinodes B to U
+   mode 47: keeps 0.692, turns 2.844 rad (rank 62 of 64), pump 0.202
+   mode 38: keeps 0.490, turns 2.723 rad (rank 60 of 64), pump 0.444
+   mode 55: keeps 0.397, turns 2.933 rad (rank 63 of 64), pump 0.485
+   mode 7: keeps 0.341, turns 2.509 rad (rank 56 of 64), pump 0.333
+MEASURE exit=0 wall_s=9.9 peak_rss_kib=943656

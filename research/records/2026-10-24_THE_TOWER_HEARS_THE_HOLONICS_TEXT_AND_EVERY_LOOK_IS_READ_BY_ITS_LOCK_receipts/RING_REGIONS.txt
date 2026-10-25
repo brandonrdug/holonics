@@ -1,0 +1,8 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 27.6 s
+label cells: B pushes 8986, U reads 8986
+pushed at every digit arrival, read at every cell: the outside form's share 0.0441; the founded form's 0.1678 (circular 0.0853), holds chi_1(c0) at B 0.019, held out units at B 52 of 495 (23.4 s)
+pushed at every digit arrival, read at the sums' U cells: the outside form's share 0.1520; the founded form's 1.0763 (circular 0.5493), holds chi_1(c0) at B 0.777, held out units at B 293 of 495 (23.5 s)
+pushed at the sums' B cells, read at every cell: the outside form's share 0.0645; the founded form's 0.0816 (circular 0.0442), holds chi_1(c0) at B 0.732, held out units at B 296 of 495 (12.8 s)
+pushed at the sums' B cells, read at the sums' U cells: the outside form's share 1.6777; the founded form's 1.7161 (circular 0.8718), holds chi_1(c0) at B 0.945, held out units at B 443 of 495 (13.1 s)
+done in 68.0 s
+MEASURE exit=0 wall_s=68.2 peak_rss_kib=3821088

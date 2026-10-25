@@ -1,0 +1,6 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 27.8 s
+label cells: B pushes 8986, U reads 8986
+read after every line's = (84951 cells, of them sums' U cells 8986 of 8986): the founded form's share 0.1893, holds chi_1(c0) at B 0.029, held out units at B 52 of 495 (1.1 s)
+read after = on the sums' lines (31337 cells, of them sums' U cells 8986 of 8986): the founded form's share 0.4010, holds chi_1(c0) at B 0.748, held out units at B 273 of 495 (0.4 s)
+done in 48.8 s
+MEASURE exit=0 wall_s=49.0 peak_rss_kib=2920784

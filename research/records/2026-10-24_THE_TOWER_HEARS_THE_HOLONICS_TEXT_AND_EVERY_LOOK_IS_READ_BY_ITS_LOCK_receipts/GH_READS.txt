@@ -1,0 +1,37 @@
+# The mode covector reads (level 0's G_h) and every cell's reads, situated8, state hcont2/STATE.0, eight training parts each from rest.
+# The mode covectors at the digit arrivals: situated8 complete-language read-tower-input-covectors STATE <sha> modes/block{c}.txt <sha> char/block{c}.digits <sha> 128 0
+# The mode covectors at the sums' U cells: the same with char/block{c}.usum128
+# Every cell's moves: situated8 complete-language read-tower-modes STATE <sha> modes/block{c}.txt <sha> char/block{c}.all <sha> full (to int32 rows: cell, class, then per mode Re/Im lambda and beta on 2^-30)
+# Every cell's input covectors: situated8 complete-language read-tower-input-covectors STATE <sha> modes/block{c}.txt <sha> char/block{c}.all <sha> 128 (to int32 rows: cell, class, 64 coordinates on 2^-24)
+block0 dmode 18453 cells MEASURE exit=0 wall_s=14.9 peak_rss_kib=24072 sha256 65515032b898f423
+block1 dmode 18504 cells MEASURE exit=0 wall_s=15.4 peak_rss_kib=23916 sha256 038fc7872b4fb2e3
+block2 dmode 18558 cells MEASURE exit=0 wall_s=15.5 peak_rss_kib=23708 sha256 dd112a3711cd90b0
+block3 dmode 18460 cells MEASURE exit=0 wall_s=15.1 peak_rss_kib=24104 sha256 276630615590e1a9
+block4 dmode 18478 cells MEASURE exit=0 wall_s=15.6 peak_rss_kib=24044 sha256 77644862cfdbcd81
+block5 dmode 18366 cells MEASURE exit=0 wall_s=15.3 peak_rss_kib=23716 sha256 76ea40d655ee9beb
+block6 dmode 18415 cells MEASURE exit=0 wall_s=16.0 peak_rss_kib=23800 sha256 c9ef50690e2a0374
+block7 dmode 18541 cells MEASURE exit=0 wall_s=16.0 peak_rss_kib=23888 sha256 75e7e16966653e2b
+block0 umode 1144 cells MEASURE exit=0 wall_s=15.6 peak_rss_kib=23824 sha256 42ff002388b9737f
+block1 umode 1098 cells MEASURE exit=0 wall_s=15.8 peak_rss_kib=23632 sha256 695fa18d35d1675c
+block2 umode 1095 cells MEASURE exit=0 wall_s=15.4 peak_rss_kib=23572 sha256 b0a49ad7f0d8bf09
+block3 umode 1145 cells MEASURE exit=0 wall_s=15.4 peak_rss_kib=23740 sha256 048efa7bb9f8e4bd
+block4 umode 1105 cells MEASURE exit=0 wall_s=14.9 peak_rss_kib=23740 sha256 c94920146cd72fd2
+block5 umode 1138 cells MEASURE exit=0 wall_s=15.2 peak_rss_kib=23844 sha256 5e6419d25e44eec3
+block6 umode 1166 cells MEASURE exit=0 wall_s=15.0 peak_rss_kib=23696 sha256 6996e8849988b1f6
+block7 umode 1095 cells MEASURE exit=0 wall_s=14.8 peak_rss_kib=23700 sha256 2c14c4d329975648
+block0 moves: moves rows 26869 width 258 MEASURE exit=0 wall_s=17.3 peak_rss_kib=415820  cov: cov rows 26869 width 66 MEASURE exit=0 wall_s=17.3 peak_rss_kib=130108 
+block1 moves: moves rows 26919 width 258 MEASURE exit=0 wall_s=17.3 peak_rss_kib=416380  cov: cov rows 26919 width 66 MEASURE exit=0 wall_s=17.1 peak_rss_kib=130008 
+block2 moves: moves rows 26972 width 258 MEASURE exit=0 wall_s=17.2 peak_rss_kib=417412  cov: cov rows 26972 width 66 MEASURE exit=0 wall_s=17.0 peak_rss_kib=130292 
+block3 moves: moves rows 26875 width 258 MEASURE exit=0 wall_s=17.1 peak_rss_kib=415632  cov: cov rows 26875 width 66 MEASURE exit=0 wall_s=16.3 peak_rss_kib=129644 
+block4 moves: moves rows 26895 width 258 MEASURE exit=0 wall_s=16.9 peak_rss_kib=415820  cov: cov rows 26895 width 66 MEASURE exit=0 wall_s=16.4 peak_rss_kib=130340 
+block5 moves: moves rows 26785 width 258 MEASURE exit=0 wall_s=17.0 peak_rss_kib=414428  cov: cov rows 26785 width 66 MEASURE exit=0 wall_s=16.7 peak_rss_kib=129916 
+block6 moves: moves rows 26829 width 258 MEASURE exit=0 wall_s=17.6 peak_rss_kib=415304  cov: cov rows 26829 width 66 MEASURE exit=0 wall_s=17.4 peak_rss_kib=129736 
+block7 moves: moves rows 26955 width 258 MEASURE exit=0 wall_s=17.3 peak_rss_kib=416828  cov: cov rows 26955 width 66 MEASURE exit=0 wall_s=17.5 peak_rss_kib=129684 
+block0 allmoves.i32 sha256 7f5c497d7df9bf86 allcov.i32 sha256 728bf9d4e4c204e6
+block1 allmoves.i32 sha256 decbaf8ef2279235 allcov.i32 sha256 180012822f6d2f24
+block2 allmoves.i32 sha256 8fd7dece7a0f24f4 allcov.i32 sha256 e430f4cee37e7aa5
+block3 allmoves.i32 sha256 020f49cea9a7c3c5 allcov.i32 sha256 7ebb45a66f87e885
+block4 allmoves.i32 sha256 87696cacf7de302b allcov.i32 sha256 f8a612657a21256a
+block5 allmoves.i32 sha256 19c59367ec5a103d allcov.i32 sha256 fee10c3d41dc9016
+block6 allmoves.i32 sha256 f5c2b837de2689fd allcov.i32 sha256 9a02e14411d36aa0
+block7 allmoves.i32 sha256 6dea655aeaa9fa88 allcov.i32 sha256 200200671fbeac29

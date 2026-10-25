@@ -2135,8 +2135,9 @@ and a pool (the unit, `χ₁` to `χ₅`), 384 pairs, ranked by the leading shar
   reads the units at `B` in **471 of 495** held-out sums. The acceptance's bar is 370.
 
 **What it says** [agent-inferred]:
-- The founding finds the units crossing at `B` with no label and no start, once each candidate form
-  is scored by the demand that reaches it through its own placement. Placement belongs to the
+- Within the label region and with the ring's characters as its pools, the founding finds the
+  units crossing at `B` with no label on the form and no start, once each candidate form is scored
+  by the demand that reaches it through its own placement (the `U` cells come from the true sums). Placement belongs to the
   form: a value placed in a node mode reaches `U` alike for every distance, and `U`'s demand reaches
   it whole.
 - The pool law's eigenproblem finds what every climb missed. The climbs failed on the landscape,
@@ -2166,6 +2167,146 @@ Then the acceptance is read on the machine's founded forms.
   peak 1.36 GiB).
 - The founding over every placement was projected at about 90 s (deadline 150 s) and took 66.8 s
   (0.74; peak 805 MiB).
+
+## The demand at the modes, and the reader the crossing lacks
+
+The decided build needed the machine's own demand at a placement mode. The reverse already has it.
+
+**The reading** (code). `Tower::reverse_joined` carries every later face's demand back through each
+mode's own moves. On the way it holds `G_h`, the covector of each level's modes after a cell's
+push. A value placed in a mode at the cell changes the code by `Re(conj(G_h) δh)` to first order.
+- The reverse now keeps `G_h` when asked.
+- `read_input_covectors` hands it beside the input covector (`InputCovector::modes`, level by
+  level and mode by mode, on the covector's grain `2^(−24)`).
+- `read-tower-input-covectors` prints one level's when given a level.
+
+Nothing else changes: the duplex's reverses ask for none.
+
+**Founded against the modes' own demand, the crossing is not found at `B`**
+(`FOUND_BY_MODES_AT_B.py`; exterior, with the machine's moments). The pool law founds each pool's
+leading form with `G` (level 0's 128 mode coordinates) in place of the input covector `y`.
+
+| region | demand | pool | leading share | its form holds `χ₁(c₀)` at `B` | held out, units at `B` |
+|---|---|---|---|---|---|
+| the sums' `B` cells | `G` | the unit | 0.862 | 0.000 | 46 |
+| the sums' `B` cells | `G` | `χ₁` | 0.673 (two channels 1.014) | 0.000 | 46 |
+| the sums' `B` cells | `y` | `χ₁` | 0.583 | 0.000 | 40 |
+| every digit arrival | `G` | `χ₁` | 0.204 | 0.005 | 41 |
+| every digit arrival | `y` | `χ₁` | 0.194 | 0.010 | 41 |
+
+The other pools read 29 to 80 in every region. The modes' demand at `B` is large, but it is not the
+units'.
+
+**Where the units' demand goes** (`CROSSING_DEMAND.py`, `MODE_MEMORY.py`). The exact crossing
+`χ₁(c₀)` is scored by its two channels' share (at most 2):
+- At `U` it takes 1.77 of every mode's covector and 1.86 of the input covector. One mode alone
+  takes at most 0.52, and the modes that take most are 4, 15, 2, 6 and 14 (0.52 to 0.42). Mode 41
+  takes 0.08 and mode 16 0.16; the median mode takes 0.15.
+- At `B` it takes 1.10 of every mode's covector but only 0.39 of the input covector. One mode alone
+  takes at most 0.14 (median 0.05). The demand reaches `B` through the modes, spread over all of
+  them.
+- The modes that read the units at `U` are mostly short and turning. Modes 4, 15 and 6 keep 0.11 to
+  0.27 of their value per cell and turn 1.8 to 2.8 rad; 2 and 14 keep about half.
+- The modes that carry a value from `B` to `U` alike for both result lengths keep more and turn
+  less: 41, 56 and 48 keep 0.58 to 0.80 and turn 0.31 to 0.67 rad. Mode 16, where the founding by
+  `U`'s demand placed the crossing, keeps 0.57 and turns 0.02 rad.
+- The antinodes the third result digit crosses (47, 38, 55, 7) turn 2.5 to 2.9 rad a cell, nearly a
+  half-turn. One more digit flips them.
+
+So the nodes that carry the crossing and the modes that read it at `U` are different modes. A value
+placed in a node reaches `U` alike for both result lengths and finds almost no reader there. A value placed in a reader at
+`B` fades over the two or three cells to `U` and is turned by the result's length.
+
+**A placed form founded with its reader** (`FOUND_RING.py`). The situated form
+`c_t = (aᵀs_t)β_(d_t)` is pushed into a ring that rides one mode's own moves:
+- `r_t = λ_(m,t) r_(t−1) + β_(m,t) conj(r_(t−1)) + c_t`.
+- The ring is read at every cell through a lift into the input, `x⁰_t += P(Re r_t, Im r_t)`.
+- With no memory this is the machine's present situated lift.
+- The pool law founds `a` with no start, against the input covector at every reading cell.
+
+The region is no label: every digit arrival of the eight training parts pushes, and every cell reads.
+Fourteen foundings (`χ₁` and the unit, each in modes 41, 16, 56, 48, 15 and 4 and with no memory)
+find no crossing:
+- the `χ₁` forms hold at most 0.09 of `χ₁(c₀)` at `B` and read 51 to 68 of 495;
+- the unit's forms read 34 to 44.
+
+**Which side loses it** (`RING_REGIONS.py`; mode 41, pool `χ₁`):
+
+| pushed at | read at | the outside form's share | the founded form's share | holds `χ₁(c₀)` at `B` | held out, units at `B` |
+|---|---|---|---|---|---|
+| every digit arrival | every cell | 0.044 | 0.168 | 0.019 | 52 |
+| every digit arrival | the sums' `U` cells | 0.152 | 1.076 | 0.777 | 293 |
+| the sums' `B` cells | every cell | 0.065 | 0.082 | 0.732 | 296 |
+| the sums' `B` cells | the sums' `U` cells | 1.678 | 1.716 | 0.945 | 443 |
+
+Situating either side gives about 0.75 and 295. Situating both gives 443, and situating neither gives
+52. Read over the whole text, the crossing is diluted: the outside form takes 0.044 there.
+
+**Reading regions with no label** (`RING_TENSION_READ.py`, `RING_AFTER_RELATION.py`; pushed at every
+digit arrival):
+- **Where the tension stands out** (the leverage `y Y⁻¹ yᵀ`, top 2 to 20 percent of cells). These
+  regions hold 20 to 162 of the 8,986 `U` cells, and the founded forms read 48 to 58.
+- **After every line's `=`** (84,951 cells, all `U` cells among them). The founded form holds 0.029
+  and reads 52.
+- **After `=` on the sums' lines only** (31,337 cells). The operation here is a label, so this is a
+  ceiling. The form holds 0.748 and reads 273.
+
+**The operation at `B`** (`OP_TURN_AT_B.py`). The outside form reads the state at `B` along one
+direction, fitted on the sums' first operand. On each operation's own `B` cells, a straight-line
+read of the form's two channels, refitted there, recovers `χ₁(a₀)`:
+- after `+`, 0.966 (8,986 cells);
+- after `−`, 0.014 (4,517);
+- after `*`, 0.114 (8,941).
+
+A straight-line read in two real channels cannot tell a strand from its reflection, so `a₀`'s units
+are not merely turned after `−`: they are absent from the form's direction. The operator changes
+what the state carries along it where the second operand arrives. Whether the state carries `a₀`
+elsewhere after `−` was not read. So after `=` on every line, differences and products share the
+reading cells with a form that cannot read them.
+
+**What it says** [agent-inferred]:
+- `G_h` is the right demand for a placed value, but founding on it alone does not tie the crossing at
+  `B`. The units' demand reaches `B` spread over the modes. The nodes that carry the crossing have
+  no reader at `U`, and a value placed in the readers fades and turns before it arrives.
+- A placed form is therefore founded together with its reader. The ring does this. It finds the
+  crossing when its push or its read is situated where the crossing lives, and not when both span
+  the text.
+- The regions the machine has without labels fail in two ways. The tension's loudest cells are not
+  the `U` cells. After `=`, the operation decides what the state carries along the form's direction
+  at `B`. The knot at `B` slips until the operation crosses it.
+
+The acceptance is not met by the machine's founded forms. The exterior 471 of 495 stays exterior.
+
+**Decided next** [agent-inferred]: the ring's push and read are each crossed with the operation the
+state carries.
+1. Measure first, as regions read from the state: the push gated by the operator's strand at the
+   arriving digit, and the read gated by the relation's arrival with the same strand.
+2. If the ceiling from those regions reaches the bar, build them as the ring's own gates: pair
+   contacts of the ring with the operator strand, the pools staying the ring's characters.
+
+**The runs.**
+- The mode covector reads were projected at 20 to 30 s a part (deadline 90 s, four at a time).
+  - At the digit arrivals they took 14.9 to 16.0 s (peak 24 MiB).
+  - At the sums' `U` cells they took 14.8 to 15.8 s.
+- Every cell's moves and input covectors were projected at 30 to 90 s a part with the filter
+  (deadline 180 s, two parts at a time). They took 16.3 to 17.6 s (peak 416 MiB for the moves).
+- The eight exterior analyses ran under deadlines set from the earlier foundings' measured times
+  (60 to 360 s). No projection was written down before they launched, and that is recorded here as
+  missing:
+
+| analysis | deadline | wall time | peak |
+|---|---|---|---|
+| `FOUND_BY_MODES_AT_B.py` | 240 s | 67.3 s | 1.79 GiB |
+| `CROSSING_DEMAND.py` | 120 s | 8.8 s | 137 MiB |
+| `FOUND_RING.py` (14 foundings) | 360 s | 221.2 s | 2.96 GiB |
+| `RING_REGIONS.py` | 240 s | 68.2 s | 3.64 GiB |
+| `RING_TENSION_READ.py` | 240 s | 50.6 s | 2.79 GiB |
+| `RING_AFTER_RELATION.py` | 240 s | 49.0 s | 2.79 GiB |
+| `OP_TURN_AT_B.py` | 120 s | 33.1 s | 949 MiB |
+| `MODE_MEMORY.py` | 60 s | 9.9 s | 922 MiB |
+
+The code change passes the gate (`tools/gate.sh`, every step; its first run stopped when the disk
+filled and was rerun after stale build caches were removed) and the tower's 36 tests.
 
 ## The recorded failures this step could repeat
 
@@ -2292,6 +2433,13 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - The crossing placed where it carries: `MK_PATHS.py`, the mode reads' receipt lines `BU_MODES.txt`
   (the reads stay outside the repository), `CARRY_B_TO_U.{py,txt}`, `FOUND_AT_B_BY_U.{py,txt}`,
   `FOUND_POOL_AT_B.{py,txt}`, `FOUND_PLACE_AT_B.{py,txt}`.
+- The demand at the modes: `GH_READS.txt` (the mode covector reads' and every cell's reads'
+  receipt lines and commands; the reads stay outside the repository),
+  `FOUND_BY_MODES_AT_B.{py,txt}`, `CROSSING_DEMAND.{py,txt}`, `MODE_MEMORY.{py,txt}`,
+  `FOUND_RING.{py,txt}`, `RING_REGIONS.{py,txt}`, `RING_TENSION_READ.{py,txt}`,
+  `RING_AFTER_RELATION.{py,txt}` and `OP_TURN_AT_B.{py,txt}` (run from the run directory;
+  `RING_REGIONS.py` takes `FOUND_RING.py` as its argument, the region reads take both, and
+  `OP_TURN_AT_B.py` takes `REGION_SHARE.py`).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -2309,4 +2457,5 @@ install and its writing use `install1` (`522b9cfa…`). The pair forms in the le
 circuit readings use `circuit1` (`604a10c8…`), and the mode readings `modes1` (`25db693e…`). The situated pool uses `situated1` (`a27cf8df…`, the energy foundings), `situated3`
 (`6b4b79b5…`, the code-weighted), `situated4` (`6a20bb33…`, the covector reads), `situated5`
 (`0cdf49dd…`, the warm start, the sixteen forms and their reads), `situated6` (`fa381fdc…`, the
-resume) and `situated7` (`25f4309f…`, the complex forms, their reads and the modes at the sums' cells).
+resume), `situated7` (`25f4309f…`, the complex forms, their reads and the modes at the sums' cells)
+and `situated8` (`1abd5ebb…`, the mode covectors and every cell's reads).

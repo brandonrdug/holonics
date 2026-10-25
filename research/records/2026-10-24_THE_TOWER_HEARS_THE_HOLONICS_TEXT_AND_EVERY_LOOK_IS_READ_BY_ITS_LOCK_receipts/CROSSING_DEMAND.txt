@@ -1,0 +1,7 @@
+U cells 8986 (units 0..9: 880 to 921 each); B cells 8986; read in 8.4 s
+at U: chi_1(c0) against every mode's covector 1.7730; against the input covector 1.8629; one mode's alone, the five largest: 4 0.5202, 15 0.5150, 2 0.4635, 6 0.4632, 14 0.4248; modes 16 0.1553, 41 0.0798; median 0.1523
+   the demand's energy by mode, the five largest: 54 0.052, 50 0.050, 58 0.038, 63 0.038, 41 0.038; modes 16 0.0085, 41 0.0376
+at B: chi_1(c0) against every mode's covector 1.0999; against the input covector 0.3859; one mode's alone, the five largest: 55 0.1418, 63 0.1397, 47 0.1317, 33 0.1309, 25 0.1301; modes 16 0.0375, 41 0.0931; median 0.0509
+   the demand's energy by mode, the five largest: 25 0.095, 55 0.084, 63 0.081, 30 0.048, 51 0.046; modes 16 0.0028, 41 0.0275
+done in 8.6 s
+MEASURE exit=0 wall_s=8.8 peak_rss_kib=140280

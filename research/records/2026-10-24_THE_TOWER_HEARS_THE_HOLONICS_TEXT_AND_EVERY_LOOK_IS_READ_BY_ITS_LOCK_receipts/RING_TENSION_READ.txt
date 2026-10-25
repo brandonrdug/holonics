@@ -1,0 +1,8 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 28.0 s
+label cells: B pushes 8986, U reads 8986
+read at the top 2% by tension (4302 cells, of them sums' U cells 20 of 8986; arriving classes = 1087, 1 504, 2 430, 3 355, 5 314): the founded form's share 0.8518, holds chi_1(c0) at B 0.012, held out units at B 53 of 495 (0.1 s)
+read at the top 5% by tension (10755 cells, of them sums' U cells 26 of 8986; arriving classes = 2468, 1 1162, 2 1033, 3 853, 5 788): the founded form's share 0.6697, holds chi_1(c0) at B 0.008, held out units at B 53 of 495 (0.1 s)
+read at the top 10% by tension (21510 cells, of them sums' U cells 39 of 8986; arriving classes = 4433, 1 2367, 2 1899, 3 1610, 5 1568): the founded form's share 0.5395, holds chi_1(c0) at B 0.011, held out units at B 58 of 495 (0.3 s)
+read at the top 20% by tension (43020 cells, of them sums' U cells 162 of 8986; arriving classes = 7410, 1 4424, 2 3394, 5 3049, 3 3041): the founded form's share 0.4040, holds chi_1(c0) at B 0.008, held out units at B 48 of 495 (0.6 s)
+done in 50.4 s
+MEASURE exit=0 wall_s=50.6 peak_rss_kib=2920580

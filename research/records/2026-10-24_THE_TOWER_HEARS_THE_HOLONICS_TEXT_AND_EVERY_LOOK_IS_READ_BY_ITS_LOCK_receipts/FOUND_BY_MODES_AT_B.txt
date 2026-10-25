@@ -1,0 +1,36 @@
+training digit arrivals 147775, sums' B cells 8986; mode covector width 128, input covector width 64; read in 32.9 s
+held-out sums' B cells 495
+the sums' B cells, against the modes' covector G:
+   the unit: leading single-channel share 0.8621 (second 0.8384); its form's two channels 0.8621; holds chi_1(c0) at B 0.000; held out, units at B 46 of 495; placed in mode 40 0.32, mode 53 0.07, mode 35 0.05
+   chi_1: leading single-channel share 0.6731 (second 0.6264); its form's two channels 1.0143; holds chi_1(c0) at B 0.000; held out, units at B 46 of 495; placed in mode 16 0.48, mode 15 0.05, mode 53 0.04
+   chi_2: leading single-channel share 0.4446 (second 0.3466); its form's two channels 0.6813; holds chi_1(c0) at B 0.000; held out, units at B 80 of 495; placed in mode 16 0.24, mode 10 0.08, mode 17 0.05
+   chi_3: leading single-channel share 0.3165 (second 0.2705); its form's two channels 0.5157; holds chi_1(c0) at B 0.000; held out, units at B 44 of 495; placed in mode 16 0.38, mode 5 0.11, mode 35 0.08
+   chi_4: leading single-channel share 0.3476 (second 0.2920); its form's two channels 0.5042; holds chi_1(c0) at B 0.000; held out, units at B 34 of 495; placed in mode 48 0.11, mode 35 0.11, mode 29 0.10
+   chi_5: leading single-channel share 0.3709 (second 0.2298); its form's two channels 0.5227; holds chi_1(c0) at B 0.000; held out, units at B 34 of 495; placed in mode 16 0.61, mode 48 0.06, mode 20 0.03
+   (0.8 s)
+the sums' B cells, against the input covector y:
+   the unit: leading single-channel share 0.8288 (second 0.5995); its form's two channels 0.8288; holds chi_1(c0) at B 0.000; held out, units at B 51 of 495
+   chi_1: leading single-channel share 0.5828 (second 0.4012); its form's two channels 0.7888; holds chi_1(c0) at B 0.000; held out, units at B 40 of 495
+   chi_2: leading single-channel share 0.3307 (second 0.2601); its form's two channels 0.4652; holds chi_1(c0) at B 0.000; held out, units at B 36 of 495
+   chi_3: leading single-channel share 0.2380 (second 0.1923); its form's two channels 0.3418; holds chi_1(c0) at B 0.000; held out, units at B 43 of 495
+   chi_4: leading single-channel share 0.2141 (second 0.1759); its form's two channels 0.2718; holds chi_1(c0) at B 0.000; held out, units at B 29 of 495
+   chi_5: leading single-channel share 0.1981 (second 0.1235); its form's two channels 0.2389; holds chi_1(c0) at B 0.000; held out, units at B 34 of 495
+   (0.6 s)
+every digit arrival, against the modes' covector G:
+   the unit: leading single-channel share 0.5025 (second 0.4279); its form's two channels 0.5025; holds chi_1(c0) at B 0.000; held out, units at B 52 of 495; placed in mode 48 0.16, mode 4 0.13, mode 11 0.09
+   chi_1: leading single-channel share 0.2043 (second 0.1566); its form's two channels 0.3152; holds chi_1(c0) at B 0.005; held out, units at B 41 of 495; placed in mode 48 0.19, mode 10 0.07, mode 16 0.05
+   chi_2: leading single-channel share 0.0786 (second 0.0686); its form's two channels 0.0835; holds chi_1(c0) at B 0.000; held out, units at B 43 of 495; placed in mode 16 0.26, mode 15 0.13, mode 48 0.10
+   chi_3: leading single-channel share 0.0781 (second 0.0320); its form's two channels 0.0815; holds chi_1(c0) at B 0.000; held out, units at B 49 of 495; placed in mode 16 0.17, mode 15 0.15, mode 48 0.14
+   chi_4: leading single-channel share 0.0862 (second 0.0525); its form's two channels 0.0878; holds chi_1(c0) at B 0.000; held out, units at B 43 of 495; placed in mode 15 0.19, mode 48 0.12, mode 16 0.12
+   chi_5: leading single-channel share 0.0646 (second 0.0272); its form's two channels 0.0728; holds chi_1(c0) at B 0.000; held out, units at B 53 of 495; placed in mode 16 0.52, mode 56 0.05, mode 3 0.04
+   (18.3 s)
+every digit arrival, against the input covector y:
+   the unit: leading single-channel share 0.4072 (second 0.3175); its form's two channels 0.4072; holds chi_1(c0) at B 0.000; held out, units at B 36 of 495
+   chi_1: leading single-channel share 0.1938 (second 0.1384); its form's two channels 0.2701; holds chi_1(c0) at B 0.010; held out, units at B 41 of 495
+   chi_2: leading single-channel share 0.0834 (second 0.0654); its form's two channels 0.1174; holds chi_1(c0) at B 0.000; held out, units at B 32 of 495
+   chi_3: leading single-channel share 0.0539 (second 0.0430); its form's two channels 0.0761; holds chi_1(c0) at B 0.000; held out, units at B 46 of 495
+   chi_4: leading single-channel share 0.0596 (second 0.0384); its form's two channels 0.0690; holds chi_1(c0) at B 0.000; held out, units at B 57 of 495
+   chi_5: leading single-channel share 0.0439 (second 0.0233); its form's two channels 0.0546; holds chi_1(c0) at B 0.000; held out, units at B 56 of 495
+   (10.7 s)
+done in 67.0 s
+MEASURE exit=0 wall_s=67.3 peak_rss_kib=1877164

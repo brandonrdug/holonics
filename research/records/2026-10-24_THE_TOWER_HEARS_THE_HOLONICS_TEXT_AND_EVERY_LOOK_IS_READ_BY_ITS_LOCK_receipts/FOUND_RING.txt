@@ -1,0 +1,17 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 27.8 s
+   chi1 placed in mode 41: circular share 0.0853, exact two channels 0.1678; holds chi_1(c0) at B 0.019; held out, units at B 52 of 495 (19.5 s)
+   chi1 placed in mode 16: circular share 0.0475, exact two channels 0.0964; holds chi_1(c0) at B 0.014; held out, units at B 51 of 495 (14.2 s)
+   chi1 placed in mode 56: circular share 0.1193, exact two channels 0.2326; holds chi_1(c0) at B 0.039; held out, units at B 68 of 495 (11.1 s)
+   chi1 placed in mode 48: circular share 0.1170, exact two channels 0.2300; holds chi_1(c0) at B 0.090; held out, units at B 58 of 495 (11.7 s)
+   chi1 placed in mode 15: circular share 0.1206, exact two channels 0.2361; holds chi_1(c0) at B 0.048; held out, units at B 64 of 495 (13.9 s)
+   chi1 placed in mode 4: circular share 0.1174, exact two channels 0.2293; holds chi_1(c0) at B 0.044; held out, units at B 65 of 495 (13.3 s)
+   chi1 placed in no memory: circular share 0.1169, exact two channels 0.2293; holds chi_1(c0) at B 0.003; held out, units at B 54 of 495 (11.9 s)
+   unit placed in mode 41: circular share 0.3148, exact two channels 0.3701; holds chi_1(c0) at B 0.000; held out, units at B 39 of 495 (14.1 s)
+   unit placed in mode 16: circular share 0.3443, exact two channels 0.3927; holds chi_1(c0) at B 0.000; held out, units at B 44 of 495 (13.6 s)
+   unit placed in mode 56: circular share 0.3102, exact two channels 0.5281; holds chi_1(c0) at B 0.000; held out, units at B 34 of 495 (12.5 s)
+   unit placed in mode 48: circular share 0.3522, exact two channels 0.4008; holds chi_1(c0) at B 0.000; held out, units at B 38 of 495 (13.8 s)
+   unit placed in mode 15: circular share 0.3541, exact two channels 0.4230; holds chi_1(c0) at B 0.000; held out, units at B 42 of 495 (14.3 s)
+   unit placed in mode 4: circular share 0.3537, exact two channels 0.5872; holds chi_1(c0) at B 0.000; held out, units at B 42 of 495 (14.8 s)
+   unit placed in no memory: circular share 0.3489, exact two channels 0.3489; holds chi_1(c0) at B 0.000; held out, units at B 37 of 495 (10.5 s)
+done in 220.9 s
+MEASURE exit=0 wall_s=221.2 peak_rss_kib=3104124
