@@ -1,0 +1,271 @@
+{
+ "A_reread_same_moments": true,
+ "A_tension_held_constitution": [
+  "96",
+  "96"
+ ],
+ "B_staircase": {
+  "N": 32,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [
+     {
+      "face": "x1x2",
+      "degree": 2,
+      "drop": "32",
+      "tension_before": "96",
+      "tension_after": "64",
+      "saving_bits": 9.359,
+      "charge_bits": 5.085
+     }
+    ],
+    "tension": "64"
+   },
+   {
+    "lap": 2,
+    "pool": 7,
+    "founded": [
+     {
+      "face": "x1x2x3",
+      "degree": 3,
+      "drop": "32",
+      "tension_before": "64",
+      "tension_after": "32",
+      "saving_bits": 16.0,
+      "charge_bits": 5.307
+     }
+    ],
+    "tension": "32"
+   },
+   {
+    "lap": 3,
+    "pool": 7,
+    "founded": [],
+    "tension": "32"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x1x2",
+   "x1x2x3"
+  ],
+  "floor": "32"
+ },
+ "C_parity_laps": {
+  "N": 32,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [],
+    "tension": "64"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4"
+  ],
+  "floor": "32"
+ },
+ "C_parity_direct_triples": {
+  "N": 32,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 4,
+    "founded": [
+     {
+      "face": "x1x2x3",
+      "degree": 3,
+      "drop": "32",
+      "tension_before": "64",
+      "tension_after": "32",
+      "saving_bits": 16.0,
+      "charge_bits": 4.5
+     }
+    ],
+    "tension": "32"
+   },
+   {
+    "lap": 2,
+    "pool": 3,
+    "founded": [],
+    "tension": "32"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x1x2x3"
+  ],
+  "floor": "32"
+ },
+ "D_weak_short": {
+  "N": 32,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [],
+    "tension": "66"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4"
+  ],
+  "floor": "32"
+ },
+ "D_weak_least_multiplicity": 10,
+ "D_weak_at_least": {
+  "N": 320,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [
+     {
+      "face": "x1x2",
+      "degree": 2,
+      "drop": "20",
+      "tension_before": "660",
+      "tension_after": "640",
+      "saving_bits": 7.103,
+      "charge_bits": 6.746
+     }
+    ],
+    "tension": "640"
+   },
+   {
+    "lap": 2,
+    "pool": 7,
+    "founded": [
+     {
+      "face": "x1x2x3",
+      "degree": 3,
+      "drop": "320",
+      "tension_before": "640",
+      "tension_after": "320",
+      "saving_bits": 160.0,
+      "charge_bits": 6.968
+     }
+    ],
+    "tension": "320"
+   },
+   {
+    "lap": 3,
+    "pool": 7,
+    "founded": [],
+    "tension": "320"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x1x2",
+   "x1x2x3"
+  ],
+  "floor": "320"
+ },
+ "D_weak_one_less": {
+  "N": 288,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [],
+    "tension": "594"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4"
+  ],
+  "floor": "288"
+ },
+ "E_doubling": {
+  "N": 32,
+  "laps": [
+   {
+    "lap": 1,
+    "pool": 6,
+    "founded": [
+     {
+      "face": "x1x2",
+      "degree": 2,
+      "drop": "32",
+      "tension_before": "128",
+      "tension_after": "96",
+      "saving_bits": 6.641,
+      "charge_bits": 5.085
+     },
+     {
+      "face": "x3x4",
+      "degree": 2,
+      "drop": "32",
+      "tension_before": "96",
+      "tension_after": "64",
+      "saving_bits": 9.359,
+      "charge_bits": 5.085
+     }
+    ],
+    "tension": "64"
+   },
+   {
+    "lap": 2,
+    "pool": 9,
+    "founded": [
+     {
+      "face": "x1x2x3x4",
+      "degree": 4,
+      "drop": "32",
+      "tension_before": "64",
+      "tension_after": "32",
+      "saving_bits": 16.0,
+      "charge_bits": 5.67
+     }
+    ],
+    "tension": "32"
+   },
+   {
+    "lap": 3,
+    "pool": 8,
+    "founded": [],
+    "tension": "32"
+   }
+  ],
+  "faces": [
+   "1",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x1x2",
+   "x3x4",
+   "x1x2x3x4"
+  ],
+  "floor": "32"
+ },
+ "fail": []
+}
