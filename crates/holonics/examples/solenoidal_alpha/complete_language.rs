@@ -19,6 +19,8 @@ mod tower_train;
 mod tower_situated;
 #[path = "complete_language/tower_ring.rs"]
 mod tower_ring;
+#[path = "complete_language/tower_classes.rs"]
+mod tower_classes;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
@@ -813,6 +815,9 @@ pub(super) fn run_with_execution(
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
         Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
+        Some("train-gated-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args),
+        Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
+        Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
         Some("join-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::join_tower_ring(args),
         Some("read-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_at(args),
