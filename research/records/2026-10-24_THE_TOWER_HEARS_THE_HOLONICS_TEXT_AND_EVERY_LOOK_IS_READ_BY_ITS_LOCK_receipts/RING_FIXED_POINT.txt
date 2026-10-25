@@ -1,0 +1,145 @@
+== found14: the one-bit rule, stopped on evidence (the first start past its 180 s share of the 900 s deadline); every round line
+RING_PASS cells=216131 marked=9018 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=34263
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=46608
+RING_ROUND rank=0 start=unit round=0 circular_permille=395 saved_millinats=- another=true elapsed_ms=50045
+RING_ROUND rank=0 start=unit round=1 circular_permille=454 saved_millinats=262237 another=true elapsed_ms=53360
+RING_ROUND rank=0 start=unit round=2 circular_permille=477 saved_millinats=107026 another=true elapsed_ms=56665
+RING_ROUND rank=0 start=unit round=3 circular_permille=492 saved_millinats=67208 another=true elapsed_ms=60144
+RING_ROUND rank=0 start=unit round=4 circular_permille=503 saved_millinats=47548 another=true elapsed_ms=63290
+RING_ROUND rank=0 start=unit round=5 circular_permille=511 saved_millinats=36709 another=true elapsed_ms=66430
+RING_ROUND rank=0 start=unit round=6 circular_permille=518 saved_millinats=30440 another=true elapsed_ms=69540
+RING_ROUND rank=0 start=unit round=7 circular_permille=523 saved_millinats=26018 another=true elapsed_ms=72666
+RING_ROUND rank=0 start=unit round=8 circular_permille=528 saved_millinats=22428 another=true elapsed_ms=75719
+RING_ROUND rank=0 start=unit round=9 circular_permille=533 saved_millinats=19566 another=true elapsed_ms=78780
+RING_ROUND rank=0 start=unit round=10 circular_permille=536 saved_millinats=16659 another=true elapsed_ms=82187
+RING_ROUND rank=0 start=unit round=11 circular_permille=540 saved_millinats=14236 another=true elapsed_ms=85262
+RING_ROUND rank=0 start=unit round=12 circular_permille=542 saved_millinats=12158 another=true elapsed_ms=88788
+RING_ROUND rank=0 start=unit round=13 circular_permille=545 saved_millinats=10420 another=true elapsed_ms=92121
+RING_ROUND rank=0 start=unit round=14 circular_permille=547 saved_millinats=8835 another=true elapsed_ms=95300
+RING_ROUND rank=0 start=unit round=15 circular_permille=548 saved_millinats=7633 another=true elapsed_ms=98463
+RING_ROUND rank=0 start=unit round=16 circular_permille=550 saved_millinats=6828 another=true elapsed_ms=101492
+RING_ROUND rank=0 start=unit round=17 circular_permille=551 saved_millinats=5938 another=true elapsed_ms=104749
+RING_ROUND rank=0 start=unit round=18 circular_permille=552 saved_millinats=5419 another=true elapsed_ms=107869
+RING_ROUND rank=0 start=unit round=19 circular_permille=553 saved_millinats=4889 another=true elapsed_ms=111052
+RING_ROUND rank=0 start=unit round=20 circular_permille=554 saved_millinats=4507 another=true elapsed_ms=114569
+RING_ROUND rank=0 start=unit round=21 circular_permille=555 saved_millinats=4223 another=true elapsed_ms=117754
+RING_ROUND rank=0 start=unit round=22 circular_permille=556 saved_millinats=3778 another=true elapsed_ms=121027
+RING_ROUND rank=0 start=unit round=23 circular_permille=557 saved_millinats=3762 another=true elapsed_ms=124195
+RING_ROUND rank=0 start=unit round=24 circular_permille=558 saved_millinats=3358 another=true elapsed_ms=127429
+RING_ROUND rank=0 start=unit round=25 circular_permille=558 saved_millinats=3290 another=true elapsed_ms=130772
+RING_ROUND rank=0 start=unit round=26 circular_permille=559 saved_millinats=3118 another=true elapsed_ms=133883
+RING_ROUND rank=0 start=unit round=27 circular_permille=560 saved_millinats=3072 another=true elapsed_ms=137004
+RING_ROUND rank=0 start=unit round=28 circular_permille=560 saved_millinats=2786 another=true elapsed_ms=140299
+RING_ROUND rank=0 start=unit round=29 circular_permille=561 saved_millinats=2837 another=true elapsed_ms=143572
+RING_ROUND rank=0 start=unit round=30 circular_permille=562 saved_millinats=2670 another=true elapsed_ms=146682
+RING_ROUND rank=0 start=unit round=31 circular_permille=562 saved_millinats=2665 another=true elapsed_ms=149829
+RING_ROUND rank=0 start=unit round=32 circular_permille=563 saved_millinats=2558 another=true elapsed_ms=153141
+RING_ROUND rank=0 start=unit round=33 circular_permille=563 saved_millinats=2462 another=true elapsed_ms=156192
+RING_ROUND rank=0 start=unit round=34 circular_permille=564 saved_millinats=2425 another=true elapsed_ms=159237
+RING_ROUND rank=0 start=unit round=35 circular_permille=564 saved_millinats=2458 another=true elapsed_ms=162387
+RING_ROUND rank=0 start=unit round=36 circular_permille=565 saved_millinats=2323 another=true elapsed_ms=165665
+RING_ROUND rank=0 start=unit round=37 circular_permille=565 saved_millinats=2240 another=true elapsed_ms=168749
+RING_ROUND rank=0 start=unit round=38 circular_permille=566 saved_millinats=2319 another=true elapsed_ms=171789
+RING_ROUND rank=0 start=unit round=39 circular_permille=566 saved_millinats=2195 another=true elapsed_ms=175301
+RING_ROUND rank=0 start=unit round=40 circular_permille=567 saved_millinats=2275 another=true elapsed_ms=178580
+RING_ROUND rank=0 start=unit round=41 circular_permille=567 saved_millinats=2134 another=true elapsed_ms=181831
+RING_ROUND rank=0 start=unit round=42 circular_permille=568 saved_millinats=2125 another=true elapsed_ms=184913
+RING_ROUND rank=0 start=unit round=43 circular_permille=568 saved_millinats=2190 another=true elapsed_ms=188226
+RING_ROUND rank=0 start=unit round=44 circular_permille=569 saved_millinats=2031 another=true elapsed_ms=191269
+RING_ROUND rank=0 start=unit round=45 circular_permille=569 saved_millinats=2068 another=true elapsed_ms=194486
+RING_ROUND rank=0 start=unit round=46 circular_permille=570 saved_millinats=1973 another=true elapsed_ms=197689
+RING_ROUND rank=0 start=unit round=47 circular_permille=570 saved_millinats=2006 another=true elapsed_ms=200848
+RING_ROUND rank=0 start=unit round=48 circular_permille=571 saved_millinats=2007 another=true elapsed_ms=203900
+RING_ROUND rank=0 start=unit round=49 circular_permille=571 saved_millinats=1911 another=true elapsed_ms=207100
+RING_ROUND rank=0 start=unit round=50 circular_permille=571 saved_millinats=1923 another=true elapsed_ms=210191
+RING_ROUND rank=0 start=unit round=51 circular_permille=572 saved_millinats=1819 another=true elapsed_ms=213095
+RING_ROUND rank=0 start=unit round=52 circular_permille=572 saved_millinats=1865 another=true elapsed_ms=216351
+RING_ROUND rank=0 start=unit round=53 circular_permille=573 saved_millinats=1751 another=true elapsed_ms=219645
+RING_ROUND rank=0 start=unit round=54 circular_permille=573 saved_millinats=1773 another=true elapsed_ms=222831
+RING_ROUND rank=0 start=unit round=55 circular_permille=573 saved_millinats=1706 another=true elapsed_ms=225785
+RING_ROUND rank=0 start=unit round=56 circular_permille=574 saved_millinats=1704 another=true elapsed_ms=228844
+RING_ROUND rank=0 start=unit round=57 circular_permille=574 saved_millinats=1623 another=true elapsed_ms=232145
+RING_ROUND rank=0 start=unit round=58 circular_permille=575 saved_millinats=1629 another=true elapsed_ms=235565
+RING_ROUND rank=0 start=unit round=59 circular_permille=575 saved_millinats=1617 another=true elapsed_ms=238544
+RING_ROUND rank=0 start=unit round=60 circular_permille=575 saved_millinats=1479 another=true elapsed_ms=241563
+RING_ROUND rank=0 start=unit round=61 circular_permille=576 saved_millinats=1570 another=true elapsed_ms=244743
+RING_ROUND rank=0 start=unit round=62 circular_permille=576 saved_millinats=1497 another=true elapsed_ms=247772
+RING_ROUND rank=0 start=unit round=63 circular_permille=576 saved_millinats=1477 another=true elapsed_ms=250920
+RING_ROUND rank=0 start=unit round=64 circular_permille=577 saved_millinats=1499 another=true elapsed_ms=253920
+RING_ROUND rank=0 start=unit round=65 circular_permille=577 saved_millinats=1274 another=true elapsed_ms=257193
+== found15: the precision rule (ring15)
+RING_PASS cells=216131 marked=9018 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=36661
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=49252
+RING_ROUND rank=0 start=unit round=0 circular_permille=395 saved_millinats=- another=true elapsed_ms=52350
+RING_ROUND rank=0 start=unit round=1 circular_permille=454 saved_millinats=262237 another=true elapsed_ms=55792
+RING_ROUND rank=0 start=unit round=2 circular_permille=477 saved_millinats=107026 another=false elapsed_ms=58961
+RING_START rank=0 start=unit exact_share_permille=632 elapsed_ms=61293
+RING_ROUND rank=0 start=coupling_mode_1 round=0 circular_permille=215 saved_millinats=- another=true elapsed_ms=64677
+RING_ROUND rank=0 start=coupling_mode_1 round=1 circular_permille=472 saved_millinats=1158429 another=true elapsed_ms=68194
+RING_ROUND rank=0 start=coupling_mode_1 round=2 circular_permille=557 saved_millinats=384090 another=true elapsed_ms=71686
+RING_ROUND rank=0 start=coupling_mode_1 round=3 circular_permille=598 saved_millinats=183694 another=false elapsed_ms=74905
+RING_START rank=0 start=coupling_mode_1 exact_share_permille=643 elapsed_ms=77339
+RING_ROUND rank=0 start=coupling_mode_2 round=0 circular_permille=321 saved_millinats=- another=true elapsed_ms=80601
+RING_ROUND rank=0 start=coupling_mode_2 round=1 circular_permille=351 saved_millinats=139277 another=false elapsed_ms=83672
+RING_START rank=0 start=coupling_mode_2 exact_share_permille=496 elapsed_ms=85882
+RING_ROUND rank=0 start=coupling_mode_3 round=0 circular_permille=439 saved_millinats=- another=true elapsed_ms=89391
+RING_ROUND rank=0 start=coupling_mode_3 round=1 circular_permille=590 saved_millinats=682541 another=true elapsed_ms=92651
+RING_ROUND rank=0 start=coupling_mode_3 round=2 circular_permille=814 saved_millinats=1007547 another=true elapsed_ms=96315
+RING_ROUND rank=0 start=coupling_mode_3 round=3 circular_permille=831 saved_millinats=77139 another=false elapsed_ms=100184
+RING_START rank=0 start=coupling_mode_3 exact_share_permille=1650 elapsed_ms=102803
+RING_ROUND rank=0 start=coupling_mode_4 round=0 circular_permille=378 saved_millinats=- another=true elapsed_ms=106034
+RING_ROUND rank=0 start=coupling_mode_4 round=1 circular_permille=493 saved_millinats=520404 another=true elapsed_ms=109445
+RING_ROUND rank=0 start=coupling_mode_4 round=2 circular_permille=768 saved_millinats=1240379 another=true elapsed_ms=112663
+RING_ROUND rank=0 start=coupling_mode_4 round=3 circular_permille=816 saved_millinats=214111 another=true elapsed_ms=116109
+RING_ROUND rank=0 start=coupling_mode_4 round=4 circular_permille=826 saved_millinats=47144 another=false elapsed_ms=119564
+RING_START rank=0 start=coupling_mode_4 exact_share_permille=1640 elapsed_ms=121937
+RING_RANK rank=0 channels=2 marked_cells=9018 exact_share_permille=1650 push_shift=80 read_shift=13 elapsed_ms=121939
+RING_WRITTEN forms=1 sha256=4473afa0a6d54ec471418c0f0b3c7e8cc3b0a62fa895bbff2fcfe4a3d1c56dd9 elapsed_ms=121942
+MEASURE exit=0 wall_s=122.1 peak_rss_kib=660368
+== join, readout founding, the lap and the foil's lap
+RING_JOIN level=0 mode=41 ranks=1 material=232579 sha256=4ecce96bf3d70c84d09a0887f10fe4becb2701a2a86183a959b5b31bc8b8de3d elapsed_ms=260
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=48620
+RING_READOUT cells=216130 channels=130 kappa_on_2^-16=725984 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=506414826195 evaluations=36 largest=8405700 moment_sections=211 moments_ms=42926 sha256=ac35b203d8a540b7cc9d537a3e962379a804713e60a2f5f29da678cec9caf02e read_ms=69228 solve_ms=13730 elapsed_ms=165295
+MEASURE exit=0 wall_s=165.4 peak_rss_kib=1350944
+RING_HELD_PASS hold=all-but-readouts sections=211 deposits=211 cells=216064 code_before_on_2^-20=496249661220 code_after_on_2^-20=491943978068 sha256=baa0bb61c0b17c07cb40096280fe9ea4f5f671672a1aeadfaeded11294bf64dc elapsed_ms=110327
+MEASURE exit=0 wall_s=110.4 peak_rss_kib=195464
+RING_HELD_PASS hold=all-but-readouts sections=211 deposits=211 cells=216064 code_before_on_2^-20=502819650229 code_after_on_2^-20=500757375708 sha256=bedeb446e1fb4d6697fc56200e7713db8304508205ddf75186db5b5af569f47e elapsed_ms=106106
+MEASURE exit=0 wall_s=106.2 peak_rss_kib=177448
+== reads
+ring/founded15.state: units right 245 of 495, 2.259 bits a digit; whole held-out text 2.437 bits a byte
+ring/at15_founded15.B.txt outside read of the sum's units at B: 390 of 495
+B units by nearest mean direction: 390 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.975
+B each units class's resultant: 0.92 0.92 0.97 0.90 0.92 0.85 0.92 0.97 0.90 0.97
+B each units class's mean angle (degrees): 217 175 141 101 65 24 352 315 287 253
+U units by nearest mean direction: 346 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.968
+U each units class's resultant: 0.86 0.90 0.98 0.80 0.89 0.89 0.93 0.96 0.89 0.95
+U each units class's mean angle (degrees): 44 95 119 153 191 241 278 300 324 354
+B: a turn for A's digit plus a turn for B's leaves |degrees| median 6.4, largest 33.8
+B: A's digits' turns from digit 0 (degrees): 0 319 281 242 207 179 139 103 73 37
+B: B's digits' turns from digit 0 (degrees): 0 323 288 251 216 182 147 108 79 40
+ring/lap15.state: units right 244 of 495, 2.071 bits a digit; whole held-out text 2.518 bits a byte
+ring/at15_lap15.B.txt outside read of the sum's units at B: 390 of 495
+B units by nearest mean direction: 390 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.975
+B each units class's resultant: 0.92 0.92 0.97 0.90 0.92 0.85 0.92 0.97 0.90 0.97
+B each units class's mean angle (degrees): 217 175 141 101 65 24 352 315 287 253
+U units by nearest mean direction: 346 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.968
+U each units class's resultant: 0.86 0.90 0.98 0.80 0.89 0.89 0.93 0.96 0.89 0.95
+U each units class's mean angle (degrees): 44 95 119 153 191 241 278 300 324 354
+B: a turn for A's digit plus a turn for B's leaves |degrees| median 6.4, largest 33.8
+B: A's digits' turns from digit 0 (degrees): 0 319 281 242 207 179 139 103 73 37
+B: B's digits' turns from digit 0 (degrees): 0 323 288 251 216 182 147 108 79 40
+ring/foil15.state: units right 40 of 495, 3.397 bits a digit; whole held-out text 2.458 bits a byte
+ring/at15_base.U.txt: TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478062 ring_ranks=0 elapsed_ms=3716 MEASURE exit=0 wall_s=3.7 peak_rss_kib=22836 
+ring/at15_base.dev.txt: TOWER_AT cells=48030 top_is_next=23489 code_on_2^-20=123288095201 ring_ranks=0 elapsed_ms=14481 MEASURE exit=0 wall_s=14.5 peak_rss_kib=22792 
+ring/at15_foil15.B.txt: TOWER_AT cells=1253 top_is_next=1175 code_on_2^-20=433071814 ring_ranks=0 elapsed_ms=3493 MEASURE exit=0 wall_s=3.5 peak_rss_kib=22772 
+ring/at15_foil15.U.txt: TOWER_AT cells=495 top_is_next=40 code_on_2^-20=1763006055 ring_ranks=0 elapsed_ms=3504 MEASURE exit=0 wall_s=3.5 peak_rss_kib=22508 
+ring/at15_foil15.dev.txt: TOWER_AT cells=48030 top_is_next=23455 code_on_2^-20=123772901347 ring_ranks=0 elapsed_ms=14058 MEASURE exit=0 wall_s=14.1 peak_rss_kib=22632 
+ring/at15_founded15.B.txt: TOWER_AT cells=1253 top_is_next=1153 code_on_2^-20=524862738 ring_ranks=1 elapsed_ms=3978 MEASURE exit=0 wall_s=4.0 peak_rss_kib=24296 
+ring/at15_founded15.E.txt: TOWER_AT cells=495 top_is_next=383 code_on_2^-20=385172247 ring_ranks=1 elapsed_ms=3852 MEASURE exit=0 wall_s=3.9 peak_rss_kib=23456 
+ring/at15_founded15.H.txt: TOWER_AT cells=239 top_is_next=167 code_on_2^-20=248990897 ring_ranks=1 elapsed_ms=3809 MEASURE exit=0 wall_s=3.8 peak_rss_kib=24852 
+ring/at15_founded15.U.txt: TOWER_AT cells=495 top_is_next=245 code_on_2^-20=1172549841 ring_ranks=1 elapsed_ms=3741 MEASURE exit=0 wall_s=3.8 peak_rss_kib=24664 
+ring/at15_founded15.dev.txt: TOWER_AT cells=48030 top_is_next=23659 code_on_2^-20=122746690168 ring_ranks=1 elapsed_ms=14828 MEASURE exit=0 wall_s=14.8 peak_rss_kib=24920 
+ring/at15_founded15.trainU.txt: TOWER_AT cells=9018 top_is_next=4698 code_on_2^-20=20794755794 ring_ranks=1 elapsed_ms=67480 MEASURE exit=0 wall_s=67.5 peak_rss_kib=24820 
+ring/at15_lap15.B.txt: TOWER_AT cells=1253 top_is_next=1166 code_on_2^-20=439544740 ring_ranks=1 elapsed_ms=3748 MEASURE exit=0 wall_s=3.8 peak_rss_kib=24592 
+ring/at15_lap15.U.txt: TOWER_AT cells=495 top_is_next=244 code_on_2^-20=1075037482 ring_ranks=1 elapsed_ms=3799 MEASURE exit=0 wall_s=3.8 peak_rss_kib=24556 
+ring/at15_lap15.dev.txt: TOWER_AT cells=48030 top_is_next=23186 code_on_2^-20=126826473998 ring_ranks=1 elapsed_ms=14870 MEASURE exit=0 wall_s=14.9 peak_rss_kib=24412 

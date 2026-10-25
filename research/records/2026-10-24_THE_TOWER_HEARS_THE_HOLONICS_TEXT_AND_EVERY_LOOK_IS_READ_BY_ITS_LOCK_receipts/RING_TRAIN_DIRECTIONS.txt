@@ -1,0 +1,2 @@
+training class resultants: 0.88 0.89 0.90 0.88 0.86 0.90 0.93 0.95 0.94 0.92
+held-out units by the training means: 358 of 495; 1+1 1 of 2; 1+2 30 of 50; 2+1 6 of 44; 2+2 321 of 399

@@ -2837,6 +2837,105 @@ learner, with chosen families held (their step zero, their moments still moving)
 2. The founding alternates its factors to its own fixed point: a round that saves less than one
    bit over the marked cells closes it, and no round count is chosen.
 
+## The founding stops at its own precision, and the readout and the carriage are what the units miss
+
+The last loop decided two things: a lap deposits only the bridge, the readouts, with the same lap
+on the tower without the ring as the foil; and the founding alternates its factors to its own fixed
+point, closing at the first round that saves less than one bit over the marked cells. The
+acceptance is unchanged: after one pass the tower's own top guess at `U` is the held-out sum's units
+in at least 370 of 495, and its code there is below the foil's.
+
+**The one-bit rule ran into the alternation's tail.** On the unit start the alternation ran 65
+rounds in 257 s (3.0 to 3.5 s a round) and was stopped on evidence when that first start passed
+its 180 s share of the 900 s deadline: the run is incomplete and wrote no form. Its share rose
+395, 454, 477, 492 and 503 per mille in the first rounds, then 573 at round 55 and 577 at round
+65. The first rounds saved 262, 107, 67 and 48 nats over the 9,018 marked cells; round 55 saved
+1.7 and round 65 1.3, about two bits a round, falling by about 2% a round (`RING_FIXED_POINT.txt`).
+
+**The precision rule** [agent-inferred] (`round_pays` in the example's `tower_ring.rs`). A round
+pays when it moves the factors by more than the error the marked cells leave them: when its saving
+reaches half a nat for each free parameter it re-states. A step that refits one factor exactly
+saves `½ δᵀHδ`, `δ` its move and `H` the code's curvature in that factor, and the factor's
+estimation error has `E[eᵀHe]` at least its count of free parameters. A round saving less moves
+the factors by less than one standard error each, a difference no receiver of these cells
+resolves. Each factor's scale is a gauge (the ring is read as a ratio to its own power), so the
+round re-states `(2·128 − 1) + (2·15 − 1) + 128 = 412` free parameters and pays at 206 nats, 45.7
+per mille of share over the 9,018 cells. Since the share is at most one, at most
+`(1 − share₀)·N/412` rounds pay on any start, so the founding's time is bounded before it is
+launched.
+
+| start | rounds | circular share at the last round | exact share | three authored rounds |
+|---|---|---|---|---|
+| the unit | 3 | 0.477 | 0.632 | 0.632 |
+| `K` mode 1 | 4 | 0.598 | 0.643 | 0.624 |
+| `K` mode 2 | 2 | 0.351 | 0.496 | 0.519 |
+| `K` mode 3 (kept) | 4 | **0.831** | **1.650** | 1.634 |
+| `K` mode 4 | 5 | 0.826 | 1.640 | 1.590 |
+
+The founding took 122 s against a projection of 343 s. On the unit start the rule closes at round
+2, where round 1 saved 262 nats and round 2 saved 107. On the kept start it runs one round past
+the authored three, whose second and third rounds saved 683 and 1,008 nats.
+
+| from the precision-founded ring | right at `U` (of 495) | bits a digit at `U` | held-out text, bits a byte | the ring's outside read at `B` / `U` |
+|---|---|---|---|---|
+| the base tower, no ring, no lap | 48 | 3.488 | 2.448 | - |
+| founded, before any lap | 245 | 2.259 | 2.437 | 390 / 346 |
+| **one lap, the readouts only** | **244** | **2.071** | 2.518 | 390 / 346 |
+| the foil: the same lap without the ring | 40 | 3.397 | 2.458 | - |
+| the three-round ring (the last loop), founded | 257 | 2.229 | 2.436 | 379 / 339 |
+
+**The acceptance is not met.** Its second clause holds: after the lap the tower's code at the
+held-out units is 2.071 bits a digit, against the foil's 3.397. Its first does not: 244 of 495
+against 370. The lap leaves the ring as founded (the outside reads do not move) and lowers the
+training block's code from 2.190 to 2.171 bits a byte, against the foil's 2.219 to 2.210. On the
+held-out text both laps code worse than before them (the block is arithmetic, the held-out text
+mixed), the ring's tower by 0.081 bits a byte and the foil by 0.010.
+
+**Two losses, each measured.**
+- *The readout reads less than the ring carries.* The ring's own class directions, taken at the
+  training text's 9,018 units cells and read at the held-out units by the nearest of them, give 358
+  of 495; the tower's own top guess gives 244 (`RING_TRAIN_DIRECTIONS.txt`). On the sums of two
+  two-digit operands, 321 against 220 of 399 (`RING_OWN_BY_OPERANDS.txt`). This read is honest: the
+  directions are the training text's, and the 346 of the outside read beside it takes each held-out
+  cell's class means from the other held-out cells.
+- *The ring carries the units only when the second operand has two digits.* By the operands'
+  lengths, read outside (`RING_CARRIAGE.txt`):
+
+  | operands | sums | read at `B` | read at `U` |
+  |---|---|---|---|
+  | two digits and two | 399 | 355 | 311 |
+  | one digit and two | 50 | 38 | 27 |
+  | two digits and one | 44 | **6** | **3** |
+
+  The three-round ring reads the same split (347, 36 and 7 at `B`). Where the push opens
+  (`RING_PUSH_ROLES.txt`, `|aᵀŝ|·|gᵀ(ŝ, 2^16)|` by the arriving byte's role): at `+` after a
+  two-digit first operand (the largest), at the second operand's units digit (0.46 to 0.59 of it), and at
+  `=` (0.32 to 0.66); at the first operand's digits 0.02 to 0.03. The mode the ring rides turns at
+  every byte (`RING_MODE_TURNS.txt`): each digit by 28° to 78°, rising with the digit, at `|λ|`
+  0.68 to 0.92; `+` by −25° at 0.44; `=` nearly erases it (0.04, its pump 0.84). So the ring takes
+  the first operand at `+`, and before the second operand's units digit arrives a tens digit, when
+  there is one, has turned it [inferred from the two reads]. The founding fits the frame of the
+  399 sums whose second operand has two digits, and reads the 44 whose second operand has one at
+  chance.
+
+**What it says** [agent-inferred]:
+- The founding is now bounded by its own precision and gains little over the three authored rounds
+  (1.650 against 1.634, 390 against 379 at `B`). More founding of this form will not reach 370:
+  the form's honest ceiling at `U` is 358.
+- The largest loss is the readout's, 114 sums: the ring carries the units, and the tower's guess
+  does not read them.
+- The rest is the carriage's: a sum's units are a right-aligned relation, known at the crossings
+  `+` and `=`, and the ring reads them on the byte's clock, so the number of digits between the
+  crossings sets the frame.
+
+**Decided next** [agent-inferred]:
+1. The readout first: split the tower's logits at the held-out units into the part through the
+   ring and the rest, and read whether the ring's part alone picks the units. If it does and the
+   sum does not, the rest overrides it, and the contact must carry the ring where it reads; if it
+   does not, the ring's coefficients are fitted to the cells where the ring carries no units.
+2. Then the carriage: a ring whose frame does not depend on how many digits fall between the
+   crossings.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2865,7 +2964,10 @@ learner, with chosen families held (their step zero, their moments still moving)
   refusal (three founded factors bounded together past 128 bits) was answered by a changed law,
   each factor released at its own bound before the product, not by a wider carrier. The ring's
   whole-text passes ran 1.6 times past the projection's rate and were stopped on that evidence; the
-  step moved to a smaller partition (the arithmetic block), not a larger deadline.
+  step moved to a smaller partition (the arithmetic block), not a larger deadline. The founding run
+  to a one-bit fixed point was stopped on evidence when its first start passed its share of the
+  deadline; it was answered by a changed law, the precision rule, under which the founding's rounds
+  are bounded before launch, not by a larger deadline.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
@@ -3010,6 +3112,14 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
 - The push's factors and the held passes: `RING_FACTORS_AND_HOLDS.txt` (the join, the founding, the
   passes and the reads of each loop) and `RING_PHASE_PAIRS.{py,txt}` (the ring's turn at `B` and `U`
   by the operands' units, before and after the pass holding what the ring reads).
+- The founding to its precision: `RING_FIXED_POINT.txt` (the one-bit founding's every round to its
+  stop, the precision founding, the join, the readout's founding, the lap, the foil's lap and every
+  read), `RING_CARRIAGE.{py,txt}` (the ring's units read outside by the operands' and the result's
+  lengths), `RING_PUSH_ROLES.{py,txt}` (where the push's state factors open, by role),
+  `RING_MODE_TURNS.{py,txt}` (the move of the mode the ring rides, by arriving byte),
+  `RING_TRAIN_DIRECTIONS.{py,txt}` (the held-out units read by the training text's class
+  directions) and `RING_OWN_BY_OPERANDS.{py,txt}` (the tower's own guess at the held-out units by
+  the operands' lengths).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3036,4 +3146,6 @@ uses `cells8` (`e69cbdb0…`, the every-cell reads), `ring9` (`8813e43b…`, the
 moments at zero, its pass and the moves) and `ring10` (`8cdc8135…`, the founding with its moments,
 its pass, the swapped readouts and the reads at `U` and `B`). The push's factors use `ring11`
 (`6f1d433f…`, the factors as material, their founding and pass), `ring12` (`0e8600ae…`, the held
-passes) and `ring13` (`9f7edb09…`, the pass holding what the ring reads).
+passes), `ring13` (`9f7edb09…`, the pass holding what the ring reads), `ring14` (`7d21f6f4…`, the one-bit
+founding, stopped) and `ring15` (`1854df21…`, the precision founding, its join, readout, laps and
+reads, and the modes and training reads).
