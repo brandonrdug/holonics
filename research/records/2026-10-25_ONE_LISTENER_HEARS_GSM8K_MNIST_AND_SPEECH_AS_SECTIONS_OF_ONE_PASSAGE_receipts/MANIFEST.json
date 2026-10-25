@@ -1,0 +1,189 @@
+{
+ "config": {
+  "gsm8k": {
+   "train_jsonl": "gsm8k/train.jsonl",
+   "partition": "gsm8k/partition.json",
+   "train": 1000,
+   "dev": 100
+  },
+  "mnist": {
+   "images": "mnist/train-images-idx3-ubyte",
+   "labels": "mnist/train-labels-idx1-ubyte",
+   "train_from": 0,
+   "train": 3000,
+   "dev_from": 50000,
+   "dev": 500
+  },
+  "librispeech": {
+   "root": "librispeech/LibriSpeech/dev-clean",
+   "rate": 16000,
+   "max_seconds": 8,
+   "train_seconds": 90,
+   "dev_speakers": 2,
+   "dev_seconds": 16
+  },
+  "prompts": {
+   "text": 3,
+   "label": 20,
+   "sound": 2
+  }
+ },
+ "config_sha256": "844a1b00bd3c6042ca449dd8403b11c2b21fa269713de755ba7ce6367d856f45",
+ "inputs": {
+  "gsm8k_train_jsonl": "17f347dc51477c50d4efb83959dbb7c56297aba886e5544ee2aaed3024813465",
+  "gsm8k_partition": "a355c4c7528a2c29d9bc34ebd543f23c92fe8a8e54eb11b28bd4dcc5ac2780c1",
+  "mnist_images": "ba891046e6505d7aadcbbe25680a0738ad16aec93bde7f9b65e87a2fc25776db",
+  "mnist_labels": "65a50cbbf4e906d70832878ad85ccda5333a97f0f4c3dd2ef09a8a9eef7101c5"
+ },
+ "sound_decoder": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+ "sound_held_out_speakers": [
+  "8297",
+  "8842"
+ ],
+ "counts": {
+  "train": {
+   "text": {
+    "sections": 1000,
+    "classes": 518633
+   },
+   "digit": {
+    "sections": 3000,
+    "classes": 516933
+   },
+   "sound": {
+    "sections": 22,
+    "classes": 354790
+   }
+  },
+  "dev": {
+   "text": {
+    "sections": 100,
+    "classes": 53556
+   },
+   "digit": {
+    "sections": 500,
+    "classes": 84205
+   },
+   "sound": {
+    "sections": 4,
+    "classes": 82275
+   }
+  }
+ },
+ "written": {
+  "train.classes": {
+   "bytes": 2780712,
+   "sha256": "d5788852204d1b791583d031e41376bfd98a6250a7391ea145d2c9feda501bd0"
+  },
+  "text.train.classes": {
+   "bytes": 1037266,
+   "sha256": "3c8c8f15ecb878ffef7c2ca542c4381eed27b0e86ff119964cda7b283afbe594"
+  },
+  "digit.train.classes": {
+   "bytes": 1033866,
+   "sha256": "5fe8876902553213ced570703e438edf070230f6b7acb0b4ac5707dc04f1f8d7"
+  },
+  "sound.train.classes": {
+   "bytes": 709580,
+   "sha256": "0d54ed1326cb2c844223d80feab3b4ed5209636cf6120ae25ec8d6a4eef768b9"
+  },
+  "dev.classes": {
+   "bytes": 440072,
+   "sha256": "a55de830a21947b8d2d376d54461662e43608d49ba63adc87fc67324180b65d9"
+  },
+  "dev.roles": {
+   "bytes": 220036,
+   "sha256": "2a992549c8a431e3686b026f2512d305714b090184647055412ac32b9d0947af"
+  },
+  "dev.marks": {
+   "bytes": 220036,
+   "sha256": "c3798c00a2aa6be7b602c3bae19bde3b94ce424d6bff8b8d303fc4a8c0838bca"
+  },
+  "text.dev.classes": {
+   "bytes": 107112,
+   "sha256": "bf8749918639dcd93e75a9d832791223633c94412b3dfe6bffa1c57edca96330"
+  },
+  "text.dev.roles": {
+   "bytes": 53556,
+   "sha256": "3603e9ce7a72c5675f04b924d2e023927fb6c1e157003f7175ffcb34ee958c89"
+  },
+  "text.dev.marks": {
+   "bytes": 53556,
+   "sha256": "4c59caac233f2022881738e787a83d8824e91bd3554f17101489771f521d1d0f"
+  },
+  "digit.dev.classes": {
+   "bytes": 168410,
+   "sha256": "895494be58ef494276e5848df6b3e0692f4d205b6d2518403f40690dd33b2471"
+  },
+  "digit.dev.roles": {
+   "bytes": 84205,
+   "sha256": "7c8c513d5d5961f49fefc3233247bcae58d08a96992b09ba6aa959485b72af0f"
+  },
+  "digit.dev.marks": {
+   "bytes": 84205,
+   "sha256": "c1fed6e7cf9bc9676fea48ec33358c7e68c915258d24d32426f33a75a1ac1fef"
+  },
+  "sound.dev.classes": {
+   "bytes": 164550,
+   "sha256": "237da2a7e2d45d6e59e767dc21b326a7edc9687138bbc113010ac487f5a462fe"
+  },
+  "sound.dev.roles": {
+   "bytes": 82275,
+   "sha256": "6569690eebf709b967bcd229542d34e6ad74b0612bbb4cb25b6031001c8dd70f"
+  },
+  "sound.dev.marks": {
+   "bytes": 82275,
+   "sha256": "f7200e7e547b5d1f5c4634b9688423ca93e1ae81a126547670c9e4db920dc9aa"
+  },
+  "prompts.text.classes": {
+   "bytes": 1472,
+   "sha256": "5116025d037fc41f67bdb7d20b46468ef0f55c500980caba16a144e13136c435"
+  },
+  "prompts.label.classes": {
+   "bytes": 6528,
+   "sha256": "e7ed928ac6bf50335fc0ad3022d3e5762322bdada7f23278d8aa53ec3bbc425a"
+  },
+  "prompts.digit.classes": {
+   "bytes": 40,
+   "sha256": "46f84cc3a319bd1d35daf1fba333aad951f6b3a2552b3008e000541f5142b2c2"
+  },
+  "prompts.transcript.classes": {
+   "bytes": 95320,
+   "sha256": "61d382e6e461df2a1bb29ccafccf51d1333c2d469ba2634a2bf668c228ea1d9d"
+  },
+  "prompts.speech.classes": {
+   "bytes": 350,
+   "sha256": "e517687f2d052c624bc4309ed2ef91a6aff5feddf6d431ec72eac077b74d7919"
+  }
+ },
+ "sound_train_utterances": [
+  "84-121123-0000",
+  "84-121123-0001",
+  "84-121123-0003",
+  "84-121123-0004",
+  "84-121123-0006",
+  "84-121123-0007",
+  "84-121123-0008",
+  "84-121123-0009",
+  "84-121123-0010",
+  "84-121123-0011",
+  "84-121123-0012",
+  "84-121123-0013",
+  "84-121123-0014",
+  "84-121123-0015",
+  "84-121123-0018",
+  "84-121123-0019",
+  "84-121123-0020",
+  "84-121123-0021",
+  "84-121123-0022",
+  "84-121123-0023",
+  "84-121123-0025",
+  "84-121123-0027"
+ ],
+ "sound_dev_utterances": [
+  "8297-275154-0003",
+  "8297-275154-0004",
+  "8297-275154-0005",
+  "8297-275154-0007"
+ ]
+}

@@ -1,0 +1,59 @@
+# one1a: the four towers launched together (threads 8/5/5/5 on the host's 4 cores)
+## one.stopped
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=1357 train_bytes=1390356 dev_bytes=220036
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.349 deposits=32 halvings=8 elapsed_ms=15857
+MEASURE exit=-15 wall_s=16.6 peak_rss_kib=125280
+## text
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=506 train_bytes=518633 dev_bytes=53556
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.913 deposits=32 halvings=8 elapsed_ms=19549
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.584 deposits=64 halvings=8 elapsed_ms=32432
+TOWER_SECTION pass=0 section=256 bits_a_byte=2.981 deposits=256 halvings=8 elapsed_ms=111835
+TOWER_PASS pass=0 train_bits_a_byte=3.138 dev_bits_a_byte=2.794 dev_regions gsm8k=2.794 strokes=0.000 cycles=0.000 words=0.000 deposits=506/506 pass_ms=204194 elapsed_ms=204218
+MEASURE exit=0 wall_s=204.5 peak_rss_kib=136896
+## digit
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=504 train_bytes=516933 dev_bytes=84205
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.151 deposits=32 halvings=11 elapsed_ms=20813
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.329 deposits=64 halvings=13 elapsed_ms=34249
+TOWER_SECTION pass=0 section=256 bits_a_byte=3.047 deposits=256 halvings=13 elapsed_ms=113670
+TOWER_PASS pass=0 train_bits_a_byte=3.107 dev_bits_a_byte=3.070 dev_regions gsm8k=0.000 strokes=3.082 cycles=0.000 words=2.034 deposits=504/504 pass_ms=205275 elapsed_ms=205332
+MEASURE exit=0 wall_s=205.5 peak_rss_kib=136788
+## sound
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=346 train_bytes=354790 dev_bytes=82275
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.421 deposits=32 halvings=4 elapsed_ms=19692
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.765 deposits=64 halvings=4 elapsed_ms=32895
+TOWER_SECTION pass=0 section=256 bits_a_byte=2.618 deposits=256 halvings=8 elapsed_ms=114511
+TOWER_PASS pass=0 train_bits_a_byte=2.761 dev_bits_a_byte=2.914 dev_regions gsm8k=0.000 strokes=0.000 cycles=2.907 words=5.150 deposits=346/346 pass_ms=160564 elapsed_ms=160578
+MEASURE exit=0 wall_s=160.8 peak_rss_kib=130184
+# one1c: the composed tower alone (4 threads)
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=1357 train_bytes=1390356 dev_bytes=220036
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.349 deposits=32 halvings=8 elapsed_ms=6171
+TOWER_SECTION pass=0 section=256 bits_a_byte=3.240 deposits=256 halvings=8 elapsed_ms=48044
+TOWER_SECTION pass=0 section=512 bits_a_byte=3.125 deposits=512 halvings=8 elapsed_ms=94304
+TOWER_SECTION pass=0 section=1024 bits_a_byte=2.880 deposits=1024 halvings=8 elapsed_ms=186060
+TOWER_PASS pass=0 train_bits_a_byte=3.106 dev_bits_a_byte=3.183 dev_regions gsm8k=2.875 strokes=3.139 cycles=3.431 words=3.093 deposits=1357/1357 pass_ms=258560 elapsed_ms=258573
+MEASURE exit=0 wall_s=258.8 peak_rss_kib=150184
+# one2a: three more passes, one tower at a time (4 threads), from each first pass's state
+## one
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=1357 train_bytes=1390356 dev_bytes=220036
+TOWER_PASS pass=0 train_bits_a_byte=2.834 dev_bits_a_byte=3.101 dev_regions gsm8k=2.795 strokes=3.123 cycles=3.283 words=2.866 deposits=1357/1357 pass_ms=256445 elapsed_ms=256514
+TOWER_PASS pass=1 train_bits_a_byte=2.782 dev_bits_a_byte=3.023 dev_regions gsm8k=2.717 strokes=3.093 cycles=3.155 words=2.730 deposits=1357/1357 pass_ms=257630 elapsed_ms=514144
+TOWER_PASS pass=2 train_bits_a_byte=2.747 dev_bits_a_byte=3.053 dev_regions gsm8k=2.677 strokes=3.093 cycles=3.263 words=2.713 deposits=1357/1357 pass_ms=261000 elapsed_ms=775145
+MEASURE exit=0 wall_s=775.3 peak_rss_kib=163252
+## text
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=506 train_bytes=518633 dev_bytes=53556
+TOWER_PASS pass=0 train_bits_a_byte=2.667 dev_bits_a_byte=2.660 dev_regions gsm8k=2.660 strokes=0.000 cycles=0.000 words=0.000 deposits=506/506 pass_ms=90999 elapsed_ms=91066
+TOWER_PASS pass=1 train_bits_a_byte=2.551 dev_bits_a_byte=2.594 dev_regions gsm8k=2.594 strokes=0.000 cycles=0.000 words=0.000 deposits=506/506 pass_ms=93636 elapsed_ms=184703
+TOWER_PASS pass=2 train_bits_a_byte=2.483 dev_bits_a_byte=2.572 dev_regions gsm8k=2.572 strokes=0.000 cycles=0.000 words=0.000 deposits=506/506 pass_ms=93911 elapsed_ms=278615
+MEASURE exit=0 wall_s=278.9 peak_rss_kib=149640
+## digit
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=504 train_bytes=516933 dev_bytes=84205
+TOWER_PASS pass=0 train_bits_a_byte=2.900 dev_bits_a_byte=3.014 dev_regions gsm8k=0.000 strokes=3.026 cycles=0.000 words=2.013 deposits=504/504 pass_ms=95651 elapsed_ms=95726
+TOWER_PASS pass=1 train_bits_a_byte=2.855 dev_bits_a_byte=2.993 dev_regions gsm8k=0.000 strokes=3.004 cycles=0.000 words=2.077 deposits=504/504 pass_ms=98810 elapsed_ms=194537
+TOWER_PASS pass=2 train_bits_a_byte=2.829 dev_bits_a_byte=2.984 dev_regions gsm8k=0.000 strokes=2.996 cycles=0.000 words=2.018 deposits=504/504 pass_ms=96254 elapsed_ms=290792
+MEASURE exit=0 wall_s=291.0 peak_rss_kib=140332
+## sound
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=346 train_bytes=354790 dev_bytes=82275
+TOWER_PASS pass=0 train_bits_a_byte=2.418 dev_bits_a_byte=2.825 dev_regions gsm8k=0.000 strokes=0.000 cycles=2.821 words=4.052 deposits=346/346 pass_ms=65942 elapsed_ms=66035
+TOWER_PASS pass=1 train_bits_a_byte=2.366 dev_bits_a_byte=2.852 dev_regions gsm8k=0.000 strokes=0.000 cycles=2.848 words=3.982 deposits=346/346 pass_ms=65351 elapsed_ms=131387
+TOWER_PASS pass=2 train_bits_a_byte=2.340 dev_bits_a_byte=2.820 dev_regions gsm8k=0.000 strokes=0.000 cycles=2.816 words=3.964 deposits=346/346 pass_ms=67623 elapsed_ms=199010
+MEASURE exit=0 wall_s=199.2 peak_rss_kib=138652

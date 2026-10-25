@@ -17,6 +17,20 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 25: one listener hears GSM8K, MNIST and speech (host).** The arithmetic line stops at the
+tens, and the three general tracks return as sections of one passage over 257 classes: GSM8K
+questions and answers as octets, MNIST digits as pen strokes with their labels, LibriSpeech as
+half-cycles with their transcripts. One gated tower hears all three, and a tower of the same
+declaration hears each medium alone. After four passes the listener codes every medium above its
+sibling (GSM8K 2.689 against 2.572, MNIST 3.084 against 2.984, speech 3.270 against 2.820 bits a
+class). The siblings code MNIST and speech below conditional xz (3.684, 3.219) and GSM8K above it
+(2.147). Held-out labels are named at chance (52 of 500). GSM8K answers have the answer's lines,
+markup and closing line, with wrong numbers. The speech tower writes a transcript-like line where
+an utterance ends. The next failure is the link every track needs, a target read from its source.
+The
+[record](research/records/2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE.md)
+holds the measurements and receipts.
+
 **October 23: the copy contact carries the question's pieces into the answer (host).** The units'
 tower's face is read in base-four cells and joined at each cell to the passage tree's news and its
 node lock, with weights that open at zero and take the Newton step. On the 747 held-out problems
