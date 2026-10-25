@@ -53,7 +53,7 @@
 use super::tower_situated::{div_round, lcm, permille};
 use super::tower_train::{count, pair_hats, positive, release_big, solve_scaled, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::{Tower, TowerError, TowerLearner, MOVE_BITS};
+use holonics::hnn::tower::{ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, FACE_BITS, MOVE_BITS};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use rayon::prelude::*;
@@ -100,19 +100,11 @@ enum Factor {
     G,
 }
 
-/// A ring form: complex `a` over the carried face, complex `b` over the arriving class's `x̂`, real
-/// `g` over `x = (ŝ, 2^16)`, each held as wide as its founded direction needs inside the 64-bit word
-/// ([`leading_real`], [`pool_factor`]), with each factor's release at its bound and the shifts its
-/// push and read are carried by.
-#[derive(Clone)]
-struct Ring {
-    a: [Vec<i64>; 2],
-    b: [Vec<i64>; 2],
-    g: Vec<i64>,
-    release: [u32; 3],
-    push_shift: u32,
-    read_shift: u32,
-}
+/// A ring form ([`RingRank`], the library's owner): complex `a` over the carried face, complex `b`
+/// over the arriving class's `x̂`, real `g` over `x = (ŝ, 2^16)`, each held as wide as its founded
+/// direction needs inside the 64-bit word ([`leading_real`], [`pool_factor`]), with each factor's
+/// release at its bound and the shifts its push and read are carried by.
+type Ring = RingRank;
 
 /// What the passage holds once, read in the scale pass: per coordinate of `x` the largest
 /// magnitude over the counted cells, the largest covector entry, and the placement mode's largest
@@ -406,29 +398,19 @@ fn pass(p: &Passage, ranks: &[Ring], step: Option<(Factor, &Ring)>) -> Result<Pa
                 let i = stream.open + at;
                 let s = &stream.faces[at * dims..(at + 1) * dims];
                 let hat = &p.hats[class];
-                let [lr, li, br, bi] = stream.moves[at].map(|x| x as i128);
-                let carry = |re: i128, im: i128| -> (i128, i128) { (release((lr + br) * re + (bi - li) * im, MOVE_BITS), release((li + bi) * re + (lr - br) * im, MOVE_BITS)) };
-                // Each factor's value released to below 2^40 at its bound.
-                let values = |ring: &Ring| -> ((i128, i128), (i128, i128), i128) {
-                    let [ra, rb, rg] = ring.release;
-                    let alpha = (release(dot(&ring.a[0], s), ra), release(dot(&ring.a[1], s), ra));
-                    let beta = (release(dot(&ring.b[0], hat), rb), release(dot(&ring.b[1], hat), rb));
-                    let gamma = release(dot(&ring.g[..dims], s) + ring.g[dims] as i128 * (1 << 16), rg);
-                    (alpha, beta, gamma)
-                };
+                let m = stream.moves[at].map(|x| x as i128);
                 let mut c = Vec::with_capacity(channels);
                 for (h, ring) in held.iter_mut().zip(ranks) {
-                    let (alpha, beta, gamma) = values(ring);
-                    let ab = cmul(alpha, beta);
-                    let v = (release(ab.0 * gamma, ring.push_shift), release(ab.1 * gamma, ring.push_shift));
-                    let carried = carry(h.0, h.1);
+                    let (alpha, gamma) = ring.state_factors(s);
+                    let v = ring.push(alpha, ring.pool(hat), gamma)?;
+                    let carried = ring_carry(m, *h);
                     *h = (carried.0 + v.0, carried.1 + v.1);
                     c.push(release(h.0, ring.read_shift));
                     c.push(release(h.1, ring.read_shift));
                 }
                 let mut phi: [Vec<i64>; 2] = [vec![0; k], vec![0; k]];
                 if let Some((factor, ring)) = step {
-                    let (alpha, beta, gamma) = values(ring);
+                    let ((alpha, gamma), beta) = (ring.state_factors(s), ring.pool(hat));
                     // σ, the held factors' product, and the column coordinates z it multiplies.
                     let (sigma, z): ((i128, i128), Vec<i128>) = match factor {
                         Factor::A => (cmul(beta, (gamma, 0)), s.iter().map(|&v| v as i128).collect()),
@@ -440,7 +422,7 @@ fn pass(p: &Passage, ranks: &[Ring], step: Option<(Factor, &Ring)>) -> Result<Pa
                         // A complex factor's real part, then its imaginary part (i σ z).
                         let (zj, turned) = if factor == Factor::G { (z[j], false) } else { (z[j % half], j >= half) };
                         let v = if turned { (-sigma.1 * zj, sigma.0 * zj) } else { (sigma.0 * zj, sigma.1 * zj) };
-                        let carried = carry(cols[0][j], cols[1][j]);
+                        let carried = ring_carry(m, (cols[0][j], cols[1][j]));
                         cols[0][j] = carried.0 + release(v.0, ring.push_shift);
                         cols[1][j] = carried.1 + release(v.1, ring.push_shift);
                         phi[0][j] = narrow(release(cols[0][j], ring.read_shift))?;
@@ -1042,6 +1024,133 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     drop(file);
     let written = std::fs::read(&args[14])?;
     println!("RING_WRITTEN forms={} sha256={} elapsed_ms={}", founded.len(), sha256(&written)?, started.elapsed().as_millis());
+    Ok(())
+}
+
+/// The value of a forms line's `key=…` word.
+fn field<'a>(line: &'a str, key: &str) -> Result<&'a str> {
+    line.split(' ').find_map(|w| w.strip_prefix(key).and_then(|r| r.strip_prefix('='))).ok_or_else(|| format!("a forms line lacks {key}=").into())
+}
+
+/// A forms line's comma-separated integers under `key`.
+fn integers<T: std::str::FromStr>(line: &str, key: &str) -> Result<Vec<T>> {
+    field(line, key)?.split(',').map(|v| v.parse::<T>().map_err(|_| format!("a forms line's {key} is not integers").into())).collect()
+}
+
+/// The ranks a founding wrote ([`found_tower_ring`]'s `SITUATED`, `FORM` and `RING` lines): the
+/// tower they were founded on (its state's SHA-256), the level and mode they ride, and each rank.
+fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, usize, Vec<RingRank>)> {
+    let lines: Vec<&str> = text.lines().collect();
+    let head = lines.first().filter(|l| l.starts_with("SITUATED ")).ok_or("a ring's forms open with their SITUATED line")?;
+    let (level, mode): (usize, usize) = (field(head, "level")?.parse()?, field(head, "mode")?.parse()?);
+    if field(head, "dims")?.parse::<usize>()? != dims || field(head, "width")?.parse::<usize>()? != width {
+        return Err("the forms were founded on a tower of another extent".into());
+    }
+    if lines.len() < 3 || lines.len() % 2 != 1 {
+        return Err("a ring's forms hold a FORM and a RING line a rank".into());
+    }
+    let mut ranks = Vec::new();
+    for (r, pair) in lines[1..].chunks(2).enumerate() {
+        if !pair[0].starts_with(&format!("FORM {r} ")) || !pair[1].starts_with(&format!("RING {r} mode={mode} ")) {
+            return Err(format!("rank {r}'s FORM and RING lines are not in order").into());
+        }
+        let release: Vec<u32> = integers(pair[1], "release")?;
+        ranks.push(RingRank {
+            a: [integers(pair[0], "a")?, integers(pair[0], "ai")?],
+            b: [integers(pair[0], "b")?, integers(pair[0], "bi")?],
+            g: integers(pair[1], "g")?,
+            release: release.try_into().map_err(|_| "a ring's release is three shifts")?,
+            push_shift: field(pair[1], "push_shift")?.parse()?,
+            read_shift: field(pair[1], "read_shift")?.parse()?,
+        });
+    }
+    Ok((field(head, "state_sha256")?.to_string(), level, mode, ranks))
+}
+
+/// [agent-inferred, October 25] `join-tower-ring STATE STATE_SHA FORMS FORMS_SHA OUT`: join the
+/// ring ranks `FORMS` founded on the tower `STATE` (`found-tower-ring`'s output, refused when
+/// founded on another tower) as the tower's resident ring face
+/// ([`holonics::hnn::tower::RingFace`]), its readout at zero, and write the learner create-new to
+/// `OUT`. Each rank's face is its read as a ratio to its own power, so nothing is fitted to a
+/// passage; the joined tower codes every passage as the tower alone until its readout learns
+/// (`a_ring_faced_tower_opens_on_itself`).
+pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("join-tower-ring STATE STATE_SHA FORMS FORMS_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let forms = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    if std::path::Path::new(&args[5]).exists() {
+        return Err("OUT exists: the joined learner is written create-new".into());
+    }
+    let d = learner.tower.declaration.clone();
+    let (founded_on, level, mode, ranks) = read_forms(std::str::from_utf8(&forms)?, 2 * d.modes, d.width)?;
+    if founded_on != args[2] {
+        return Err("the forms were founded on another tower: the moves they ride and the encoding their pools read are this one's only".into());
+    }
+    let n = ranks.len();
+    let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| learner.tower.encoding(u).to_vec()).collect();
+    let mut out = learner;
+    out.join_ring_face(RingFace::new(&d, level, mode, ranks, opening).map_err(|e| e.to_string())?).map_err(|e| e.to_string())?;
+    let written = out.to_text();
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[5])?, written.as_bytes())?;
+    println!(
+        "RING_JOIN level={level} mode={mode} ranks={n} material={} sha256={} elapsed_ms={}",
+        out.tower.theta.len(),
+        sha256(written.as_bytes())?,
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// [agent-inferred, October 25] `read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA`: the
+/// tower's own guess at the cells `CELLS` names (ascending cell indices, whitespace-separated; cell
+/// `i` has heard `TEXT[..=i]` and codes `TEXT[i + 1]`), `TEXT` read as one passage from rest. Each
+/// named cell prints `AT i next top code`: the class that arrives, the class the face gives the
+/// largest mass (the smaller class on a tie) and the code of the arriving class on `2^(−20)` bits;
+/// with a ring face joined, also `FORMS i next ρ…`, the ring's face as the readout reads it (the
+/// probe's situated format). A reading beside the code: the tower is not moved.
+pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let named: Vec<usize> = std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?.split_whitespace().map(|w| w.parse::<usize>()).collect::<std::result::Result<_, _>>()?;
+    if named.windows(2).any(|w| w[0] >= w[1]) || named.last().is_some_and(|&i| i + 1 >= text.len()) {
+        return Err("CELLS names ascending cells of TEXT, each coding a class that arrives".into());
+    }
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let tower = &learner.tower;
+    let mut at = named.iter().peekable();
+    let (mut right, mut code) = (0usize, 0i64);
+    let read_to = named.last().map_or(0, |&i| i + 2);
+    tower
+        .read_ring(&mut tower.rest(), &classes[..read_to], |i, face, ring| {
+            if at.peek() != Some(&&i) {
+                return Ok(());
+            }
+            at.next();
+            let next = classes[i + 1];
+            let top = (0..face.masses.len()).max_by_key(|&c| (face.masses[c], std::cmp::Reverse(c))).expect("a nonempty alphabet");
+            let c = face.code(next);
+            right += (top == next) as usize;
+            code += c;
+            println!("AT {i} {next} {top} {c}");
+            if let Some((_, rho)) = ring {
+                println!("FORMS {i} {next} {}", rho.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+            }
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+    println!(
+        "TOWER_AT cells={} top_is_next={right} code_on_2^-20={code} ring_ranks={} elapsed_ms={}",
+        named.len(),
+        tower.ring_face().map_or(0, |f| f.ranks()),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 
