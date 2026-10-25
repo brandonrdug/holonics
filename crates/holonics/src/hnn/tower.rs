@@ -541,6 +541,26 @@ pub struct RingFace {
     /// The founded factors on the material's grain, rank by rank `(a₀, a₁, b₀, b₁, g)`, until the
     /// join carries them into the material ([`Tower::join_ring_face`]); empty after it.
     founded: Vec<i32>,
+    /// The founded pair moves ([`RingFace::move_at`]), `(prev, cur, [Re λ, Im λ, Re β, Im β])` on
+    /// `2^(−30)`, strictly ascending by pair; empty when the ring rides its mode at every cell.
+    moves: Vec<(usize, usize, [i64; 4])>,
+    /// The characters the readout reads each rank's turn through ([`RingFace::with_harmonics`]):
+    /// `1` reads the turn `ρ` alone.
+    harmonics: usize,
+}
+
+/// [agent-inferred, October 25] `|λ| + |β| < 1` on the moves' grain, decided exactly: with
+/// `U = 2^30`, `L = |λ|²` and `B = |β|²`, it holds iff `B < U²` and `|λ| < U − |β|`, that is
+/// `2U|β| < U² + B − L` with the right side positive, squared: `4U²B < (U² + B − L)²`.
+fn passive(m: [i64; 4]) -> bool {
+    let u2 = num_bigint::BigInt::from(1u8) << (2 * MOVE_BITS);
+    let sq = |a: i64, b: i64| num_bigint::BigInt::from(a) * a + num_bigint::BigInt::from(b) * b;
+    let (l, b) = (sq(m[0], m[1]), sq(m[2], m[3]));
+    if b >= u2 {
+        return false;
+    }
+    let right = &u2 + &b - l;
+    right > num_bigint::BigInt::from(0) && u2 * b * 4 < &right * &right
 }
 
 /// One rank's factors in the material: `a` (two parts over `2N`), `b` (two over `d + 1`) and `g`
@@ -555,7 +575,11 @@ impl RingFace {
     /// (`A × d`), each rank's factors carried onto the material's grain ([`factor_on_material`]).
     /// Refused unless every rank has `a` over `2N` coordinates, `b` over `d + 1` and `g` over
     /// `2N + 1`.
-    pub fn new(declaration: &TowerDeclaration, level: usize, mode: usize, ranks: Vec<RingRank>, opening: Vec<i32>) -> Result<Self> {
+    ///
+    /// `moves` are the founded pair moves ([`RingFace::move_at`]), strictly ascending by pair, each
+    /// over a class or the start (`prev ≤ A`) and a class (`cur < A`), and each passive,
+    /// `|λ| + |β| < 1`: a boosting move leaves the ring without a bound, so it is refused.
+    pub fn new(declaration: &TowerDeclaration, level: usize, mode: usize, ranks: Vec<RingRank>, opening: Vec<i32>, moves: Vec<(usize, usize, [i64; 4])>) -> Result<Self> {
         let d = declaration;
         let (dims, w) = (2 * d.modes, d.width);
         if level >= d.levels || mode >= d.modes || ranks.is_empty() || opening.len() != d.alphabet * w {
@@ -563,6 +587,12 @@ impl RingFace {
         }
         if ranks.iter().any(|r| r.a.iter().any(|a| a.len() != dims) || r.b.iter().any(|b| b.len() != w + 1) || r.g.len() != dims + 1) {
             return refuse("a ring rank needs a over the level's carried face, b over the class's face and g over the carried face and its unit");
+        }
+        if moves.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || moves.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1)) {
+            return refuse("a ring's pair moves are over a class or the start and a class, strictly ascending");
+        }
+        if moves.iter().any(|&(_, _, m)| !passive(m)) {
+            return refuse("a ring's pair move that boosts (|λ| + |β| ≥ 1) leaves the ring without a bound");
         }
         let mut shifts = Vec::with_capacity(ranks.len());
         let mut founded = Vec::with_capacity(ranks.len() * rank_material(d));
@@ -573,7 +603,52 @@ impl RingFace {
             founded.extend(a.into_iter().chain(b).chain(g));
             shifts.push(([ra, rb, rg], rank.push_shift, rank.read_shift));
         }
-        Ok(Self { level, mode, shifts, opening, founded })
+        Ok(Self { level, mode, shifts, opening, founded, moves, harmonics: 1 })
+    }
+
+    /// [agent-inferred, October 25] **The readout reads the turn through its characters**: each
+    /// rank's face `ρ = |ρ| e^(iφ)` is read with its harmonics `q_h = |ρ| e^(ihφ)`, `h = 1..H`. A
+    /// ring closed on a key of modulus `n` carries a class as a residue of `Z/n`, its turn
+    /// `φ = 2πk/n`; the functions on `Z/n` are spanned by its characters `e^(ihφ)`, `|h| ≤ n/2`,
+    /// and the conjugate harmonics are the same channels read through `W`'s imaginary columns, so
+    /// `H = ⌊n/2⌋` lets the linear readout place every residue's class apart. One character reads
+    /// the residue only through `cos(φ − φ_c)`, which separates neighbouring residues by
+    /// `1 − cos(2π/n)` of the face; the record `2026-10-24_THE_TOWER_HEARS…`, "The closure founds
+    /// the carriage", measures that ceiling. Refused at `H = 0`; and only before the face is joined
+    /// (the readout's extent follows it).
+    pub fn with_harmonics(mut self, harmonics: usize) -> Result<Self> {
+        if harmonics == 0 || self.founded.is_empty() {
+            return refuse("a ring face reads one or more harmonics, set before it is joined");
+        }
+        self.harmonics = harmonics;
+        Ok(self)
+    }
+
+    /// The characters the readout reads each rank's turn through ([`RingFace::with_harmonics`]).
+    pub fn harmonics(&self) -> usize {
+        self.harmonics
+    }
+
+    /// [agent-inferred, October 25] **The move the ring makes** when `cur` arrives after `prev`
+    /// (the seam, the start `A` at rest): its founded pair move, or the mode's move `m` where the
+    /// founding did not meet the pair. A pair move is keyed by the seam because a relation that is
+    /// known only at a crossing reads the byte before it: a sum's units are the product of the
+    /// operands' units turns, and an operand's units digit is the seam at the next crossing (the
+    /// record `2026-10-24_THE_TOWER_HEARS…`, "The readout founded to its precision, and the lap that
+    /// undoes it"). The pair moves are held with the face: founded to their precision on a passage,
+    /// a lap over that passage founds nothing in them, so their covector is not deposited.
+    pub fn move_at(&self, prev: usize, cur: usize, m: [i128; 4]) -> [i128; 4] {
+        self.pair_move(prev, cur).unwrap_or(m)
+    }
+
+    /// The founded pair move at `(prev, cur)`, when the founding met the pair.
+    fn pair_move(&self, prev: usize, cur: usize) -> Option<[i128; 4]> {
+        self.moves.binary_search_by_key(&(prev, cur), |&(p, c, _)| (p, c)).ok().map(|i| self.moves[i].2.map(i128::from))
+    }
+
+    /// The founded pair moves ([`RingFace::move_at`]).
+    pub fn pair_moves(&self) -> &[(usize, usize, [i64; 4])] {
+        &self.moves
     }
 
     /// Each rank's factors read from the material `factors` (this face's family, rank by rank),
@@ -607,7 +682,7 @@ impl RingFace {
         pools
     }
 
-    /// The count of ranks `R` (the readout reads [`RingFace::channels`], `(d + 1)·2R`).
+    /// The count of ranks `R` (the readout reads [`RingFace::channels`], `(d + 1)·2RH`).
     pub fn ranks(&self) -> usize {
         self.shifts.len()
     }
@@ -618,9 +693,9 @@ impl RingFace {
     }
 
     /// The readout's channels over a tower of width `w`: the top face's ratio and its unit
-    /// (`w + 1`) by the ring's `2R`.
+    /// (`w + 1`) by the ring's `2R` turns, each with its `H` harmonics.
     pub fn channels(&self, width: usize) -> usize {
-        (width + 1) * 2 * self.shifts.len()
+        (width + 1) * 2 * self.shifts.len() * self.harmonics
     }
 
     /// The ring's pair read with the top face, `φ = x̂ ⊗ ρ` released to `2^(−16)` (row `j` of `x̂`
@@ -758,27 +833,37 @@ impl RingFace {
         Ok((d_face, d_moves, d_factors))
     }
 
-    /// Each rank's read as a ratio to its own power, on `2^(−16)`, with each rank's scale.
+    /// Each rank's read as a ratio to its own power, on `2^(−16)`, then its harmonics
+    /// ([`RingFace::with_harmonics`]), rank by rank `ρ, q_2, …, q_H`, with each rank's scale.
     fn face(&self, read: &[i64]) -> Result<(Vec<i32>, Vec<i128>)> {
-        let mut face = Vec::with_capacity(read.len());
+        let mut face = Vec::with_capacity(read.len() * self.harmonics);
         let mut scales = Vec::with_capacity(self.shifts.len());
         for q in read.chunks(2) {
             let (rho, scale) = ratio_to_power(q)?;
-            face.extend(rho);
+            face.extend(harmonics_of(&rho, self.harmonics)?);
             scales.push(scale);
         }
         Ok((face, scales))
     }
 
-    /// The face as text: its placement and each rank's shifts, then `E₀`. Its factors are the
-    /// material's, written with it.
+    /// The face as text: its placement and each rank's shifts, then `E₀`, then its pair moves when
+    /// it has them (`ring-moves N prev,cur,Re λ,Im λ,Re β,Im β …`). Its factors are the material's,
+    /// written with it.
     fn to_text(&self) -> String {
         let join = |xs: &mut dyn Iterator<Item = String>| xs.collect::<Vec<_>>().join(" ");
         let shifts = join(&mut self.shifts.iter().map(|([ra, rb, rg], push, read)| format!("{ra},{rb},{rg},{push},{read}")));
-        format!("ring-face {} {} {} {shifts}\n{}\n", self.level, self.mode, self.shifts.len(), join(&mut self.opening.iter().map(|v| v.to_string())))
+        let mut s = format!("ring-face {} {} {} {shifts}\n{}\n", self.level, self.mode, self.shifts.len(), join(&mut self.opening.iter().map(|v| v.to_string())));
+        if !self.moves.is_empty() {
+            let moves = join(&mut self.moves.iter().map(|(p, c, m)| format!("{p},{c},{},{},{},{}", m[0], m[1], m[2], m[3])));
+            s.push_str(&format!("ring-moves {} {moves}\n", self.moves.len()));
+        }
+        if self.harmonics > 1 {
+            s.push_str(&format!("ring-harmonics {}\n", self.harmonics));
+        }
+        s
     }
 
-    fn from_text(head: &str, opening: &str, declaration: &TowerDeclaration) -> Result<Self> {
+    fn from_text(head: &str, opening: &str, moves: Option<&str>, harmonics: Option<&str>, declaration: &TowerDeclaration) -> Result<Self> {
         let bad = TowerError::Refused("not a ring face's text");
         let words: Vec<&str> = head.split(' ').collect();
         if words.len() < 4 || words[0] != "ring-face" {
@@ -802,7 +887,33 @@ impl RingFace {
             }
             shifts.push(([s[0], s[1], s[2]], s[3], s[4]));
         }
-        Ok(Self { level, mode, shifts, opening, founded: Vec::new() })
+        let moves: Vec<(usize, usize, [i64; 4])> = match moves {
+            None => Vec::new(),
+            Some(line) => {
+                let words: Vec<&str> = line.split(' ').collect();
+                if words.len() < 2 || words[0] != "ring-moves" || words[1].parse::<usize>().ok() != Some(words.len() - 2) {
+                    return Err(bad);
+                }
+                let mut moves = Vec::with_capacity(words.len() - 2);
+                for word in &words[2..] {
+                    let v: Vec<i64> = word.split(',').map(|x| x.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
+                    if v.len() != 6 || v[0] < 0 || v[1] < 0 {
+                        return Err(bad);
+                    }
+                    moves.push((v[0] as usize, v[1] as usize, [v[2], v[3], v[4], v[5]]));
+                }
+                moves
+            }
+        };
+        if moves.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || moves.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1)) || moves.iter().any(|&(_, _, m)| !passive(m)) {
+            return Err(bad);
+        }
+        let harmonics = match harmonics.map(|line| line.strip_prefix("ring-harmonics ").and_then(|h| h.parse::<usize>().ok())) {
+            None => 1,
+            Some(Some(h)) if h > 1 => h,
+            Some(_) => return Err(bad),
+        };
+        Ok(Self { level, mode, shifts, opening, founded: Vec::new(), moves, harmonics })
     }
 }
 
@@ -864,7 +975,7 @@ struct Layout {
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -922,7 +1033,7 @@ impl Layout {
         let readout = take(a * w, MATERIAL_BITS);
         let readout_bias = take(a, FACE_BITS);
         let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
-        let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
+        let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks * ring_harmonics, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
         Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, len: at, families }
     }
 }
@@ -1511,6 +1622,49 @@ fn ratio_adjoint(read: &[i32], scale: i128, cov: &[i64]) -> Result<Vec<i64>> {
     collect_exact(read.iter().zip(cov).map(|(&a, &b)| fit64(div_nearest((b as i128 - release(mean * a as i128, 2 * FACE_BITS)) << FACE_BITS, scale))))
 }
 
+/// [agent-inferred, October 25] A rank's face `ρ` (two parts on `2^(−16)`) with its harmonics,
+/// `q_1 = ρ` and `q_h = q_(h−1) ρ / |ρ|`, each rounded to the face's grain: `q_h = |ρ| e^(ihφ)`
+/// ([`RingFace::with_harmonics`]). A face at zero carries zero harmonics.
+fn harmonics_of(rho: &[i32], harmonics: usize) -> Result<Vec<i32>> {
+    let (re, im) = (rho[0] as i128, rho[1] as i128);
+    let modulus = ((re * re + im * im) as u128).isqrt() as i128;
+    let mut q = Vec::with_capacity(2 * harmonics);
+    q.extend_from_slice(&rho[..2]);
+    let (mut x, mut y) = (re, im);
+    for _ in 1..harmonics {
+        if modulus == 0 {
+            q.extend([0, 0]);
+            continue;
+        }
+        (x, y) = (div_nearest(x * re - y * im, modulus), div_nearest(x * im + y * re, modulus));
+        q.push(fit32(x, "a ring's harmonic outgrew its 32-bit carrier")?);
+        q.push(fit32(y, "a ring's harmonic outgrew its 32-bit carrier")?);
+    }
+    Ok(q)
+}
+
+/// The adjoint of [`harmonics_of`] to the face `ρ`, on the face's tangent: with
+/// `t = Σ_(h≥2) h (∂q_h,im q_h,re − ∂q_h,re q_h,im)` the covector on the turn `φ`,
+/// `∂ρ = ∂q_1 + t (−ρ_im, ρ_re) / |ρ|²`. The harmonics' radial part is dropped: `ρ` is a ratio to
+/// its own power, whose adjoint ([`ratio_adjoint`]) returns no radial covector.
+fn harmonics_adjoint(face: &[i32], cov: &[i64]) -> Result<[i64; 2]> {
+    let (re, im) = (face[0] as i128, face[1] as i128);
+    let n2 = re * re + im * im;
+    let mut d = [cov[0], cov[1]];
+    if n2 == 0 || face.len() <= 2 {
+        return Ok(d);
+    }
+    let wide = || TowerError::Refused("a ring's harmonic covector outgrew its 128-bit carrier");
+    let mut t = 0i128;
+    for (h, (q, g)) in face.chunks_exact(2).zip(cov.chunks_exact(2)).enumerate().skip(1) {
+        let turn = (g[1] as i128 * q[0] as i128).checked_sub(g[0] as i128 * q[1] as i128).and_then(|v| v.checked_mul(h as i128 + 1)).ok_or_else(wide)?;
+        t = t.checked_add(turn).ok_or_else(wide)?;
+    }
+    d[0] = fit64(d[0] as i128 + div_nearest(t.checked_mul(-im).ok_or_else(wide)?, n2))?;
+    d[1] = fit64(d[1] as i128 + div_nearest(t.checked_mul(re).ok_or_else(wide)?, n2))?;
+    Ok(d)
+}
+
 /// `|λ|` on `2^(−30)` and `γ = √(1 − |λ|²)` on `2^(−30)`.
 fn modulus_and_gamma(re: i128, im: i128) -> (i128, i128) {
     let n = re * re + im * im;
@@ -1539,7 +1693,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0);
+        let layout = Layout::new(&d, 0, 0, 0);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -1717,6 +1871,7 @@ impl Tower {
         // The pair face read at (the class before, the class arriving), lifted into the encoding:
         // `x⁰ = E(u) + P c(p)`, on 2^(−40) released to the face's 2^(−16).
         let pair = self.pair.as_ref().map(|face| face.at(state.previous, u));
+        let seam = state.previous;
         state.previous = u;
         if let Some(c) = pair {
             let k = c.len();
@@ -1863,14 +2018,15 @@ impl Tower {
             affine(&t[lv.ret..lv.ret + w * f], r[5], f, &conduct, Some(&t[lv.ret_bias..lv.ret_bias + w]), MATERIAL_BITS, MATERIAL_BITS, &mut ret)?;
             let next: Vec<i32> = collect_exact(x.iter().zip(&ret).map(|(a, b)| fit32(*a as i128 + *b as i128, "the residual stream outgrew its 32-bit carrier")))?;
             let state_copy = modes.clone();
-            // The ring rides its mode's move at this cell, pushed from the face it carried before.
+            // The ring rides its mode's move at this cell (its founded pair move where it has one),
+            // pushed from the face it carried before.
             if let (Some(face), Some(s)) = (&self.ring, &ring_face_before) {
                 let m = face.mode;
                 let (lam, beta) = match gate.get(m) {
                     Some(g) => ((g.lam.0 as i128, g.lam.1 as i128), (g.beta.0 as i128, g.beta.1 as i128)),
                     None => ((t[lv.move_re + m] as i128, t[lv.move_im + m] as i128), (0, 0)),
                 };
-                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &mut state.ring, s, u, [lam.0, lam.1, beta.0, beta.1])?;
+                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &mut state.ring, s, u, face.move_at(seam, u, [lam.0, lam.1, beta.0, beta.1]))?;
                 let (rho, scales) = face.face(&read)?;
                 ring_face = Some(rho);
                 ring_scale = Some(scales);
@@ -2005,7 +2161,7 @@ impl Tower {
         // `ρ`'s, which is carried to the ring at its level and to the factors that pushed it.
         let mut ring_cov: Vec<Vec<i64>> = Vec::new();
         if let Some(face) = &self.ring {
-            let r2 = 2 * face.ranks();
+            let (r2, h2) = (2 * face.ranks() * face.harmonics(), 2 * face.harmonics());
             let (k, rr) = (face.channels(w), self.layout.ring_readout);
             let reads: Vec<&[i32]> = cells.iter().filter_map(|cell| cell.ring_pair.as_deref()).collect();
             if reads.len() != cells_n {
@@ -2032,9 +2188,10 @@ impl Tower {
                     }
                 }
                 let d_rho: Vec<i64> = collect_exact(d_rho.into_iter().map(|v| fit64(release(v, FACE_BITS))))?;
-                let mut read = Vec::with_capacity(r2);
+                let mut read = Vec::with_capacity(2 * face.ranks());
                 for (r, &scale) in scales.iter().enumerate() {
-                    read.extend(ratio_adjoint(&rho[2 * r..2 * r + 2], scale, &d_rho[2 * r..2 * r + 2])?);
+                    let (q, dq) = (&rho[h2 * r..h2 * (r + 1)], &d_rho[h2 * r..h2 * (r + 1)]);
+                    read.extend(ratio_adjoint(&q[..2], scale, &harmonics_adjoint(q, dq)?)?);
                 }
                 ring_cov.push(read);
                 for (v, e) in top.iter_mut().zip(ratio_adjoint(hat, *top_scale, &d_hat)?) {
@@ -2123,13 +2280,15 @@ impl Tower {
                 }
                 let m = face.mode;
                 let faces: Vec<Vec<i64>> = collect_exact((0..cells_n).map(|i| carried_face(std::slice::from_ref(if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state }))))?;
-                let moves: Vec<[i128; 4]> = cells
+                let seams: Vec<usize> = (0..cells_n).map(|i| if i == 0 { opening.previous } else { classes[i - 1] }).collect();
+                let mode_moves: Vec<[i128; 4]> = cells
                     .iter()
                     .map(|cell| match cell.levels[l].gate.get(m) {
                         Some(gm) => [gm.lam.0 as i128, gm.lam.1 as i128, gm.beta.0 as i128, gm.beta.1 as i128],
                         None => [t[lv.move_re + m] as i128, t[lv.move_im + m] as i128, 0, 0],
                     })
                     .collect();
+                let moves: Vec<[i128; 4]> = (0..cells_n).map(|i| face.move_at(seams[i], classes[i], mode_moves[i])).collect();
                 let after: Vec<&[(i128, i128)]> = cells.iter().filter_map(|cell| cell.ring_after.as_deref()).collect();
                 if after.len() != cells_n || opening.ring.len() != face.ranks() {
                     return refuse("a ring carried at every cell of a ring-faced tower");
@@ -2145,7 +2304,9 @@ impl Tower {
                         *slot = (fit64(slot.0 as i128 + d_face[i][2 * j] as i128)?, fit64(slot.1 as i128 + d_face[i][2 * j + 1] as i128)?);
                     }
                 }
-                ring_moves = d_moves;
+                // Where the ring rode a founded pair move, the mode carried no ring: its covector of
+                // that move stays with the held pair move.
+                ring_moves = d_moves.into_iter().enumerate().map(|(i, dm)| if face.pair_move(seams[i], classes[i]).is_some() { [0; 4] } else { dm }).collect();
                 ring_mode = m;
             }
             let level = |i: usize| &cells[i].levels[l];
@@ -2587,7 +2748,8 @@ impl Tower {
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
-    /// three more with a pair face and two more with a ring face.
+    /// three more with a pair face and two more with a ring face (one more with its pair moves and
+    /// one more with its harmonics).
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -2595,6 +2757,12 @@ impl Tower {
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-face ")) {
             n += 2;
+            if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-moves ")) {
+                n += 1;
+            }
+            if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-harmonics ")) {
+                n += 1;
+            }
         }
         n
     }
@@ -2643,10 +2811,15 @@ impl Tower {
             None => None,
         };
         let ring = match lines.next_if(|l| l.starts_with("ring-face ")) {
-            Some(head) => Some(RingFace::from_text(head, lines.next().unwrap_or(""), &declaration)?),
+            Some(head) => {
+                let opening = lines.next().unwrap_or("");
+                let moves = lines.next_if(|l| l.starts_with("ring-moves "));
+                let harmonics = lines.next_if(|l| l.starts_with("ring-harmonics "));
+                Some(RingFace::from_text(head, opening, moves, harmonics, &declaration)?)
+            }
             None => None,
         };
-        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks));
+        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
@@ -2668,7 +2841,7 @@ impl Tower {
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0);
+        let layout = Layout::new(d, face.forms(), 0, 0);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -2692,7 +2865,7 @@ impl Tower {
             return refuse("a tower takes one ring face");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks());
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -4040,13 +4213,19 @@ mod tests {
     fn tiny_ring_face(tower: &Tower) -> RingFace {
         let d = &tower.declaration;
         let opening = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
-        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening).expect("a ring face")
+        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, Vec::new()).expect("a ring face")
     }
 
     /// The tiny tower with its ring face joined and its readout opened away from zero.
     fn tiny_ring_faced(tower: Tower) -> Tower {
+        tiny_harmonic_faced(tower, 1)
+    }
+
+    /// The tiny tower with its ring face joined, read through `harmonics` characters of its turn,
+    /// and its readout opened away from zero.
+    fn tiny_harmonic_faced(tower: Tower, harmonics: usize) -> Tower {
         let mut tower = tower;
-        let face = tiny_ring_face(&tower);
+        let face = tiny_ring_face(&tower).with_harmonics(harmonics).expect("harmonics");
         tower.join_ring_face(face).expect("joined");
         let k = keys(16384);
         let rr = tower.layout.ring_readout;
@@ -4207,6 +4386,100 @@ mod tests {
             .expect("read");
         assert_eq!(read, expected);
         assert!(expected.iter().any(|m| m[1] != 0), "the fixture's ring turns off the real axis");
+    }
+
+    /// The tiny ring face with founded pair moves at the passage's pairs `(0, 2)`, `(2, 1)`, `(1, 3)`,
+    /// `(3, 0)` and the start's `(A, 0)`, each passive and each different.
+    fn tiny_pair_moved_face(tower: &Tower) -> RingFace {
+        let d = &tower.declaration;
+        let opening = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let moves = vec![
+            (0, 2, [644_245_094, 322_122_547, 107_374_182, -53_687_091]),
+            (1, 3, [-214_748_365, 751_619_277, 0, 0]),
+            (2, 1, [858_993_459, -107_374_182, -161_061_274, 53_687_091]),
+            (3, 0, [0, -966_367_642, 32_212_255, 0]),
+            (d.alphabet, 0, [536_870_912, 0, 0, 0]),
+        ];
+        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, moves).expect("a ring face")
+    }
+
+    /// A ring face with founded pair moves rides them where the passage meets their pair and its
+    /// mode elsewhere, and restores exactly from its text; a boosting pair move is refused.
+    #[test]
+    fn a_ring_rides_its_pair_moves_and_restores_them() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let rings = |face: RingFace| -> (Tower, Vec<[i64; 2]>) {
+            let mut joined = tower.clone();
+            joined.join_ring_face(face).expect("joined");
+            let mut read = Vec::new();
+            joined
+                .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
+                    let r = ring.expect("read").0;
+                    read.push([r[0], r[1]]);
+                    Ok(())
+                })
+                .expect("read");
+            (joined, read)
+        };
+        let (_, plain) = rings(tiny_ring_face(&tower));
+        let (moved, read) = rings(tiny_pair_moved_face(&tower));
+        assert_eq!(read[0], plain[0], "the first cell turns the ring at rest");
+        assert_ne!(read, plain, "the pair moves steer the ring");
+        assert_eq!(Tower::from_text(&moved.to_text()).expect("restored"), moved);
+        let d = &tower.declaration;
+        let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let boost = vec![(0, 2, [966_367_642, 0, 161_061_274, 0])];
+        assert!(RingFace::new(d, 0, 1, vec![tiny_ring_rank(&tower)], opening, boost).is_err());
+    }
+
+    /// Where the ring rides a held pair move, the mode carries no ring, and every family's covector
+    /// still carries its path.
+    #[test]
+    fn the_pair_moved_ring_faces_covector_matches_the_code_difference() {
+        let mut tower = tiny_ring_faced(tiny_declared(2, true, true, true, ContactLaw::Pair));
+        let face = tiny_pair_moved_face(&tower);
+        tower.ring.as_mut().expect("joined").moves = face.moves;
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tower, true, &classes, 9);
+    }
+
+    /// A turn's harmonics are its powers on the face's grain: a quarter turn read through four
+    /// characters returns `i, −1, −i`, and the half-turn and its conjugate land on the real axis.
+    #[test]
+    fn a_turns_harmonics_are_its_powers() {
+        let unit = 1i32 << FACE_BITS;
+        assert_eq!(harmonics_of(&[0, unit], 4).expect("harmonics"), vec![0, unit, -unit, 0, 0, -unit, unit, 0]);
+        assert_eq!(harmonics_of(&[-unit, 0], 3).expect("harmonics"), vec![-unit, 0, unit, 0, -unit, 0]);
+        assert_eq!(harmonics_of(&[0, 0], 3).expect("harmonics"), vec![0; 6]);
+        // An eighth turn, `46341 ≈ 2^16/√2`: `q_h = |ρ| e^(ihπ/4)` to within eight grains.
+        let q = harmonics_of(&[46341, 46341], 8).expect("harmonics");
+        let (c, u) = (46341, unit);
+        let expected = [(c, c), (0, u), (-c, c), (-u, 0), (-c, -c), (0, -u), (c, -c), (u, 0)];
+        for (h, (z, e)) in q.chunks_exact(2).zip(expected).enumerate() {
+            assert!((z[0] - e.0).abs() < 8 && (z[1] - e.1).abs() < 8, "harmonic {} is {z:?}", h + 1);
+        }
+        let face = tiny_ring_face(&tiny_declared(2, true, false, false, ContactLaw::Pair));
+        assert!(face.clone().with_harmonics(0).is_err());
+        assert_eq!(face.with_harmonics(5).expect("harmonics").harmonics(), 5);
+    }
+
+    /// Read through its turn's harmonics, the ring face's covector still matches the code
+    /// difference: the readout's, and the state's and move's through the turn's tangent.
+    #[test]
+    fn the_harmonic_ring_faces_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_harmonic_faced(tiny_declared(2, true, false, false, ContactLaw::Pair), 3), true, &PASSAGE, 10);
+    }
+
+    /// A ring face read through its harmonics restores exactly from its text, and refuses a
+    /// harmonic count below two in it.
+    #[test]
+    fn a_harmonic_ring_faced_tower_restores_exactly() {
+        let tower = tiny_harmonic_faced(tiny_declared(2, true, false, false, ContactLaw::Pair), 4);
+        let text = tower.to_text();
+        assert!(text.contains("ring-harmonics 4\n"));
+        assert_eq!(Tower::from_text(&text).expect("restored"), tower);
+        assert!(Tower::from_text(&text.replace("ring-harmonics 4\n", "ring-harmonics 1\n")).is_err());
+        assert_eq!(tower.ring_face().expect("joined").channels(tower.declaration.width), (tower.declaration.width + 1) * 2 * 4);
     }
 
     /// A ring-faced tower and its learner restore exactly from their text.

@@ -1,0 +1,25 @@
+ring/at21_founded.U.txt cells 495 harmonics 1
+  0: 63 cells, mean turn 23.0 degrees, resultant 0.997
+  1: 41 cells, mean turn 46.3 degrees, resultant 0.996
+  2: 39 cells, mean turn 67.9 degrees, resultant 0.997
+  3: 41 cells, mean turn 91.3 degrees, resultant 0.996
+  4: 51 cells, mean turn 116.2 degrees, resultant 0.996
+  5: 45 cells, mean turn 144.4 degrees, resultant 0.980
+  6: 56 cells, mean turn 191.1 degrees, resultant 0.920
+  7: 51 cells, mean turn 277.3 degrees, resultant 0.950
+  8: 52 cells, mean turn 328.9 degrees, resultant 0.985
+  9: 56 cells, mean turn 0.7 degrees, resultant 0.996
+  leave one out, 1 harmonic(s): 465 of 495
+ring/at22_founded.U.txt cells 495 harmonics 5
+  0: 63 cells, mean turn 23.0 degrees, resultant 0.997
+  1: 41 cells, mean turn 46.3 degrees, resultant 0.996
+  2: 39 cells, mean turn 67.9 degrees, resultant 0.997
+  3: 41 cells, mean turn 91.3 degrees, resultant 0.996
+  4: 51 cells, mean turn 116.2 degrees, resultant 0.996
+  5: 45 cells, mean turn 144.4 degrees, resultant 0.980
+  6: 56 cells, mean turn 191.1 degrees, resultant 0.920
+  7: 51 cells, mean turn 277.3 degrees, resultant 0.950
+  8: 52 cells, mean turn 328.9 degrees, resultant 0.985
+  9: 56 cells, mean turn 0.7 degrees, resultant 0.996
+  leave one out, 1 harmonic(s): 465 of 495
+  leave one out, 5 harmonic(s): 467 of 495

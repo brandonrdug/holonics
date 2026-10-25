@@ -16,3 +16,15 @@ lap16 (one lap depositing the readouts)
   2+1: 44 sums; whole 6, ring's part 5, rest 2; 3.669 bits a digit; ring's margin median -1.38 bits
   2+2: 399 sums; whole 221, ring's part 206, rest 34; 1.772 bits a digit; ring's margin median 0.05 bits
   all: 495 sums; whole 247, ring's part 221, rest 41; 2.003 bits a digit; ring's margin median -0.22 bits
+founded21 (the ring keyed by loop closure, its readout founded by Newton rounds at one cosine)
+  1+1: 2 sums; whole 1, ring's part 0, rest 0; 2.236 bits a digit; ring's margin median -1.03 bits
+  1+2: 50 sums; whole 30, ring's part 15, rest 5; 2.239 bits a digit; ring's margin median -0.85 bits
+  2+1: 44 sums; whole 26, ring's part 11, rest 3; 2.144 bits a digit; ring's margin median -1.05 bits
+  2+2: 399 sums; whole 280, ring's part 169, rest 40; 1.782 bits a digit; ring's margin median -0.23 bits
+  all: 495 sums; whole 337, ring's part 195, rest 48; 1.862 bits a digit; ring's margin median -0.40 bits
+founded22 (the same ring, its readout founded by Newton rounds at five harmonics of the key)
+  1+1: 2 sums; whole 2, ring's part 2, rest 0; 1.264 bits a digit; ring's margin median 1.33 bits
+  1+2: 50 sums; whole 42, ring's part 35, rest 5; 1.157 bits a digit; ring's margin median 1.21 bits
+  2+1: 44 sums; whole 41, ring's part 34, rest 3; 1.032 bits a digit; ring's margin median 1.65 bits
+  2+2: 399 sums; whole 390, ring's part 366, rest 40; 0.508 bits a digit; ring's margin median 2.90 bits
+  all: 495 sums; whole 475, ring's part 437, rest 48; 0.623 bits a digit; ring's margin median 2.70 bits

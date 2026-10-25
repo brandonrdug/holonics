@@ -1,0 +1,130 @@
+# The key by loop closure. ring19: integer elimination in i128 (refused); ring20: widened to BigInt (two of fifteen origins past the 300 s deadline, stopped); ring21: one exact maximal minor read modulo primes, the rank certified, and the ring founded under the key, joined, read outside at the held-out units by RING_CARRIAGE.py, its readout founded by Newton rounds (one cosine) and the tower's own read at U (split), B and the held-out text.
+## found19
+alpha error: a closure row would leave 128 bits
+MEASURE exit=1 wall_s=48.9 peak_rss_kib=512204
+## found20 (stopped at its deadline)
+RING_CLOSURE origin=#10 rows=9018 unique=9011 columns=149 rank=145 carrier=i128 pivots=110 torsion=2:1,5:1,11:1 key_modulus=10 elapsed_ms=4453
+RING_CLOSURE origin=3 rows=9018 unique=7475 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=8335
+RING_CLOSURE origin=7 rows=9018 unique=7489 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=8940
+RING_CLOSURE origin=8 rows=9018 unique=7496 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=17919
+RING_CLOSURE origin=9 rows=9018 unique=7486 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=25849
+RING_CLOSURE origin== rows=9018 unique=199 columns=29 rank=29 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=25865
+RING_CLOSURE origin=+ rows=9018 unique=9018 columns=129 rank=127 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=27180
+RING_CLOSURE origin=5 rows=9018 unique=7473 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=34468
+RING_CLOSURE origin=4 rows=9018 unique=7469 columns=195 rank=191 carrier=BigInt pivots= torsion= key_modulus=none elapsed_ms=38779
+RING_CLOSURE origin=2 rows=9018 unique=7477 columns=195 rank=191 carrier=i128 pivots= torsion= key_modulus=none elapsed_ms=46669
+RING_CLOSURE origin=1 rows=9018 unique=4152 columns=195 rank=191 carrier=BigInt pivots= torsion= key_modulus=none elapsed_ms=69268
+RING_CLOSURE origin=0 rows=9018 unique=7517 columns=194 rank=188 carrier=BigInt pivots= torsion= key_modulus=none elapsed_ms=116198
+RING_CLOSURE origin=6 rows=9016 unique=7480 columns=195 rank=191 carrier=BigInt pivots= torsion= key_modulus=none elapsed_ms=151610
+MEASURE exit=deadline wall_s=300.1 peak_rss_kib=883620
+## found21
+RING_CLOSURE origin=7 rows=9018 unique=7489 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=377
+RING_CLOSURE origin=3 rows=9018 unique=7475 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=426
+RING_CLOSURE origin=5 rows=9018 unique=7473 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=457
+RING_CLOSURE origin=#10 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=10 elapsed_ms=622
+RING_CLOSURE origin=4 rows=9018 unique=7469 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=709
+RING_CLOSURE origin=8 rows=9018 unique=7496 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=722
+RING_CLOSURE origin== rows=9018 unique=199 columns=29 rank=29 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=740
+RING_CLOSURE origin=9 rows=9018 unique=7486 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1048
+RING_CLOSURE origin=1 rows=9018 unique=4152 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1295
+RING_CLOSURE origin=0 rows=9018 unique=7517 columns=194 rank=188 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1441
+RING_CLOSURE origin=2 rows=9018 unique=7477 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1551
+RING_CLOSURE origin=+ rows=9018 unique=9018 columns=129 rank=127 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1558
+RING_CLOSURE origin=- rows=9016 unique=9016 columns=200 rank=194 minor_bits=74 candidates=2,5,157 torsion= key_modulus=none elapsed_ms=4034
+RING_CLOSURE origin=6 rows=9016 unique=7480 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=4041
+RING_CLOSURE origin=* rows=9018 unique=9018 columns=200 rank=194 minor_bits=112 candidates=2,3,17,59 torsion= key_modulus=none elapsed_ms=4662
+RING_CLOSURES origins=15 elapsed_ms=4662
+RING_KEY origin=#10 modulus=10 failures=0 residues=0:2,1:3,2:4,3:5,4:6,5:7,6:8,7:9,8:0,9:1 turns=0+:1,0=:1,1+:2,1=:2,2+:3,2=:3,3+:4,3=:4,4+:5,4=:5,5+:6,5=:6,6+:7,6=:7,7+:8,7=:8,8+:9,8=:9
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=43415
+RING_PASS cells=216131 marked=9018 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=43415
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=57968
+RING_STEP rank=0 start=unit/closure step=0 factor=A circular_permille=847 pass_ms=1834 elapsed_ms=59808
+RING_STEP rank=0 start=unit/closure step=1 factor=B circular_permille=867 pass_ms=453 elapsed_ms=60266
+RING_STEP rank=0 start=unit/closure step=2 factor=G circular_permille=902 pass_ms=1165 elapsed_ms=61432
+RING_ROUND rank=0 start=unit/closure round=0 circular_permille=902 saved_millinats=- another=true elapsed_ms=61432
+RING_STEP rank=0 start=unit/closure step=3 factor=A circular_permille=911 pass_ms=1832 elapsed_ms=63265
+RING_STEP rank=0 start=unit/closure step=4 factor=B circular_permille=912 pass_ms=629 elapsed_ms=63898
+RING_STEP rank=0 start=unit/closure step=5 factor=G circular_permille=915 pass_ms=954 elapsed_ms=64853
+RING_ROUND rank=0 start=unit/closure round=1 circular_permille=915 saved_millinats=60366 another=false elapsed_ms=64856
+RING_STEP rank=0 start=unit/closure step=6 factor=A circular_permille=917 pass_ms=1846 elapsed_ms=66703
+RING_START rank=0 start=unit/closure exact_share_permille=1834 elapsed_ms=67162
+RING_STEP rank=0 start=coupling_mode_1/closure step=0 factor=A circular_permille=812 pass_ms=1771 elapsed_ms=68935
+RING_STEP rank=0 start=coupling_mode_1/closure step=1 factor=B circular_permille=853 pass_ms=598 elapsed_ms=69538
+RING_STEP rank=0 start=coupling_mode_1/closure step=2 factor=G circular_permille=865 pass_ms=854 elapsed_ms=70393
+RING_ROUND rank=0 start=coupling_mode_1/closure round=0 circular_permille=865 saved_millinats=- another=true elapsed_ms=70393
+RING_STEP rank=0 start=coupling_mode_1/closure step=3 factor=A circular_permille=896 pass_ms=1693 elapsed_ms=72088
+RING_STEP rank=0 start=coupling_mode_1/closure step=4 factor=B circular_permille=899 pass_ms=588 elapsed_ms=72680
+RING_STEP rank=0 start=coupling_mode_1/closure step=5 factor=G circular_permille=901 pass_ms=1147 elapsed_ms=73829
+RING_ROUND rank=0 start=coupling_mode_1/closure round=1 circular_permille=901 saved_millinats=163148 another=false elapsed_ms=73832
+RING_STEP rank=0 start=coupling_mode_1/closure step=6 factor=A circular_permille=902 pass_ms=1932 elapsed_ms=75766
+RING_START rank=0 start=coupling_mode_1/closure exact_share_permille=1805 elapsed_ms=76175
+RING_STEP rank=0 start=coupling_mode_2/closure step=0 factor=A circular_permille=405 pass_ms=2121 elapsed_ms=78300
+RING_STEP rank=0 start=coupling_mode_2/closure step=1 factor=B circular_permille=880 pass_ms=571 elapsed_ms=78874
+RING_STEP rank=0 start=coupling_mode_2/closure step=2 factor=G circular_permille=894 pass_ms=852 elapsed_ms=79727
+RING_ROUND rank=0 start=coupling_mode_2/closure round=0 circular_permille=894 saved_millinats=- another=true elapsed_ms=79727
+RING_STEP rank=0 start=coupling_mode_2/closure step=3 factor=A circular_permille=901 pass_ms=1662 elapsed_ms=81391
+RING_STEP rank=0 start=coupling_mode_2/closure step=4 factor=B circular_permille=902 pass_ms=443 elapsed_ms=81836
+RING_STEP rank=0 start=coupling_mode_2/closure step=5 factor=G circular_permille=903 pass_ms=954 elapsed_ms=82791
+RING_ROUND rank=0 start=coupling_mode_2/closure round=1 circular_permille=903 saved_millinats=42176 another=false elapsed_ms=82795
+RING_STEP rank=0 start=coupling_mode_2/closure step=6 factor=A circular_permille=904 pass_ms=1678 elapsed_ms=84475
+RING_START rank=0 start=coupling_mode_2/closure exact_share_permille=1808 elapsed_ms=84889
+RING_STEP rank=0 start=coupling_mode_3/closure step=0 factor=A circular_permille=322 pass_ms=1820 elapsed_ms=86713
+RING_STEP rank=0 start=coupling_mode_3/closure step=1 factor=B circular_permille=450 pass_ms=701 elapsed_ms=87419
+RING_STEP rank=0 start=coupling_mode_3/closure step=2 factor=G circular_permille=815 pass_ms=1039 elapsed_ms=88460
+RING_ROUND rank=0 start=coupling_mode_3/closure round=0 circular_permille=815 saved_millinats=- another=true elapsed_ms=88460
+RING_STEP rank=0 start=coupling_mode_3/closure step=3 factor=A circular_permille=881 pass_ms=1892 elapsed_ms=90354
+RING_STEP rank=0 start=coupling_mode_3/closure step=4 factor=B circular_permille=897 pass_ms=517 elapsed_ms=90874
+RING_STEP rank=0 start=coupling_mode_3/closure step=5 factor=G circular_permille=904 pass_ms=1111 elapsed_ms=91988
+RING_ROUND rank=0 start=coupling_mode_3/closure round=1 circular_permille=904 saved_millinats=404381 another=true elapsed_ms=91992
+RING_STEP rank=0 start=coupling_mode_3/closure step=6 factor=A circular_permille=909 pass_ms=2061 elapsed_ms=94054
+RING_STEP rank=0 start=coupling_mode_3/closure step=7 factor=B circular_permille=911 pass_ms=599 elapsed_ms=94657
+RING_STEP rank=0 start=coupling_mode_3/closure step=8 factor=G circular_permille=913 pass_ms=1202 elapsed_ms=95861
+RING_ROUND rank=0 start=coupling_mode_3/closure round=2 circular_permille=913 saved_millinats=39723 another=false elapsed_ms=95865
+RING_STEP rank=0 start=coupling_mode_3/closure step=9 factor=A circular_permille=915 pass_ms=2018 elapsed_ms=97885
+RING_START rank=0 start=coupling_mode_3/closure exact_share_permille=1830 elapsed_ms=98323
+RING_STEP rank=0 start=coupling_mode_4/closure step=0 factor=A circular_permille=862 pass_ms=1864 elapsed_ms=100189
+RING_STEP rank=0 start=coupling_mode_4/closure step=1 factor=B circular_permille=878 pass_ms=549 elapsed_ms=100743
+RING_STEP rank=0 start=coupling_mode_4/closure step=2 factor=G circular_permille=890 pass_ms=1064 elapsed_ms=101807
+RING_ROUND rank=0 start=coupling_mode_4/closure round=0 circular_permille=890 saved_millinats=- another=true elapsed_ms=101808
+RING_STEP rank=0 start=coupling_mode_4/closure step=3 factor=A circular_permille=900 pass_ms=1780 elapsed_ms=103589
+RING_STEP rank=0 start=coupling_mode_4/closure step=4 factor=B circular_permille=902 pass_ms=548 elapsed_ms=104142
+RING_STEP rank=0 start=coupling_mode_4/closure step=5 factor=G circular_permille=903 pass_ms=1016 elapsed_ms=105160
+RING_ROUND rank=0 start=coupling_mode_4/closure round=1 circular_permille=903 saved_millinats=58649 another=false elapsed_ms=105163
+RING_STEP rank=0 start=coupling_mode_4/closure step=6 factor=A circular_permille=905 pass_ms=1899 elapsed_ms=107063
+RING_START rank=0 start=coupling_mode_4/closure exact_share_permille=1810 elapsed_ms=107509
+RING_STEP rank=0 start=origin/closure step=0 factor=A circular_permille=891 pass_ms=1720 elapsed_ms=109232
+RING_STEP rank=0 start=origin/closure step=1 factor=B circular_permille=894 pass_ms=512 elapsed_ms=109747
+RING_STEP rank=0 start=origin/closure step=2 factor=G circular_permille=896 pass_ms=1050 elapsed_ms=110798
+RING_ROUND rank=0 start=origin/closure round=0 circular_permille=896 saved_millinats=- another=true elapsed_ms=110798
+RING_STEP rank=0 start=origin/closure step=3 factor=A circular_permille=898 pass_ms=2185 elapsed_ms=112984
+RING_STEP rank=0 start=origin/closure step=4 factor=B circular_permille=898 pass_ms=655 elapsed_ms=113643
+RING_STEP rank=0 start=origin/closure step=5 factor=G circular_permille=899 pass_ms=1002 elapsed_ms=114646
+RING_ROUND rank=0 start=origin/closure round=1 circular_permille=899 saved_millinats=15531 another=false elapsed_ms=114649
+RING_STEP rank=0 start=origin/closure step=6 factor=A circular_permille=900 pass_ms=1701 elapsed_ms=116353
+RING_START rank=0 start=origin/closure exact_share_permille=1800 elapsed_ms=116735
+RING_RANK rank=0 channels=2 marked_cells=9018 exact_share_permille=1834 push_shift=80 read_shift=6 elapsed_ms=116737
+RING_WRITTEN forms=1 sha256=9a42126e2de188782afc61be7df7ef8e2099ef7b1e8b6ef1af55a81b4df5dcd6 elapsed_ms=116741
+MEASURE exit=0 wall_s=116.9 peak_rss_kib=946208
+RING_JOIN level=0 mode=41 ranks=1 pair_moves=203 key_modulus=10 material=232579 sha256=ff5c8b4d61500162db315ccbc65d081c9561cd989bc7097055fbc07f16928118 elapsed_ms=275
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=48848
+results of 2 digits (256 sums): B 21, E 253, U 242 of 256
+results of 3 digits (239 sums): B 25, E 235, H 238, U 227 of 239
+operands of 1 and 1 digits: 2 sums
+operands of 1 and 2 digits (50 sums): B 4, U 44
+operands of 2 and 1 digits (44 sums): B 4, U 38
+operands of 2 and 2 digits (399 sums): B 54, U 387
+RING_READOUT_ROUND round=0 kappa_on_2^-16=8260249 direction_lift=33 code_on_2^-20=499408231063 line_code=499408338705 saved_millinats=12579558 another=true round_ms=30978 elapsed_ms=104764
+RING_READOUT_ROUND round=1 kappa_on_2^-16=1503122 direction_lift=36 code_on_2^-20=496160059785 line_code=496160046924 saved_millinats=2147160 another=true round_ms=32708 elapsed_ms=137480
+RING_READOUT_ROUND round=2 kappa_on_2^-16=686687 direction_lift=37 code_on_2^-20=495789676455 line_code=495789669217 saved_millinats=244837 another=false round_ms=33946 elapsed_ms=171432
+RING_READOUT cells=216130 channels=130 arriving_classes=15 free=1820 rounds=3 kappas_on_2^-16=8260249,1503122,686687 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=495789676455 evaluations=114 largest=65294524 moment_sections=211 moments_ms=47694 sha256=7ed20c38a660f9be23926d36597230361f7bd1541ed5e29fe33e493e1d9e1629 read_ms=73660 elapsed_ms=219461
+MEASURE exit=0 wall_s=219.5 peak_rss_kib=724328
+at21_founded.U
+TOWER_SPLIT cells=495 ring_top_is_next=195 rest_top_is_next=48 ring_not_whole=29 whole_not_ring=171
+TOWER_AT cells=495 top_is_next=337 code_on_2^-20=966346851 ring_ranks=1 elapsed_ms=7543
+MEASURE exit=0 wall_s=7.6 peak_rss_kib=25220
+at21_founded.B
+TOWER_AT cells=1253 top_is_next=1156 code_on_2^-20=479927329 ring_ranks=1 elapsed_ms=3928
+MEASURE exit=0 wall_s=3.9 peak_rss_kib=25124
+at21_founded.dev
+TOWER_AT cells=48030 top_is_next=21132 code_on_2^-20=149812754879 ring_ranks=1 elapsed_ms=15516
+MEASURE exit=0 wall_s=15.6 peak_rss_kib=25092
