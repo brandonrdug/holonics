@@ -3089,7 +3089,12 @@ pub(super) fn read_tower_pair_leverage(args: &[String]) -> Result<()> {
 }
 
 pub(super) fn region_line(regions: &[(i64, usize); 4]) -> String {
-    REGIONS
+    named_region_line(&REGIONS, regions)
+}
+
+/// The regions' codes under their names.
+pub(super) fn named_region_line(names: &[&str; 4], regions: &[(i64, usize); 4]) -> String {
+    names
         .iter()
         .zip(regions)
         .map(|(name, &(code, n))| format!("{name}={}", per(code, n.max(1))))
@@ -3164,6 +3169,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         dev_lengths: vec![1; dev.len()],
         dev_roles: roles,
         alphabet: 256,
+        regions: REGIONS,
     };
     fit(&args[7..], reading, gated, turned, pumped, credit, contact, looking)
 }
@@ -3197,24 +3203,25 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={}",
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
-    let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len() };
+    let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS };
     fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, None)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
-/// decodes to, and the held-out classes' regions.
-struct Reading {
-    train: Vec<usize>,
-    train_lengths: Vec<u32>,
-    dev: Vec<usize>,
-    dev_lengths: Vec<u32>,
-    dev_roles: Vec<u8>,
-    alphabet: usize,
+/// decodes to, the held-out classes' regions and the regions' names.
+pub(super) struct Reading {
+    pub(super) train: Vec<usize>,
+    pub(super) train_lengths: Vec<u32>,
+    pub(super) dev: Vec<usize>,
+    pub(super) dev_lengths: Vec<u32>,
+    pub(super) dev_roles: Vec<u8>,
+    pub(super) alphabet: usize,
+    pub(super) regions: [&'static str; 4],
 }
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, looking: Option<&Looking>) -> Result<()> {
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, looking: Option<&Looking>) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3389,7 +3396,7 @@ fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: boo
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
             "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={}",
-            pass, per(code, bytes), per(dev_code, dev_coded), region_line(&regions), deposits, sections_run,
+            pass, per(code, bytes), per(dev_code, dev_coded), named_region_line(&reading.regions, &regions), deposits, sections_run,
             pass_started.elapsed().as_millis(), started.elapsed().as_millis()
         );
     }
