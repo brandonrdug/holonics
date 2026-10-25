@@ -11,7 +11,10 @@ Status:
   the minors' gcd and the rank falls, checked in bases 3 to 10 and 12, and §6 likewise in bases 3 to 8
   and 10 (correction, October 25, from the integration thread's review);
 - §8's reading (the missing move is a reflection) and §9's consequence for the tens and hundreds
-  are [agent-inferred].
+  are [agent-inferred];
+- §10 (differences, added the same day) is checked exactly by `closure_differences.py`. Its derivation
+  is proved-derived for keys linear in the digit values and assumes no shared move. Its consequence for
+  the founding is [agent-inferred].
 
 The tower founded the units' carriage by loop closure: from the newline origin, the closure system
 of 9,018 sum lines has 149 pair columns, rank 145, one maximal minor `det M = 110 = 2·5·11`, torsion
@@ -171,6 +174,55 @@ only rotate.
 - The other road is the reflection of §8: a ring whose pair moves may reflect carries the alternating
   sum at every length. It is not built, and its closure is not linear over the whole menu.
 
+## 10. Differences: the torsion is 2b, and the minuend's length is its cause
+
+Added the same day for the tower's next loop, the differences; read by `closure_differences.py`.
+
+The same newline closure over every written difference `a-b=c` with `b ≤ a < 100` (5,050 lines) has
+149 columns, rank 136, minors' gcd `20 = 2b` and torsion ℤ/20. In every base tried the minors' gcd is
+`2b`:
+
+| base | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 12 |
+|---|---|---|---|---|---|---|---|---|---|
+| minors' gcd | 6 | 8 | 10 | 12 | 14 | 16 | 18 | 20 | 24 |
+
+A key reads the result only through `V(c) = θ(=, c₁) − ψ(c₀)`, the result's only columns. Over ℚ every
+kernel vector gives every result the same `V`: the closure tells no difference apart. Modulo 2 and 5
+it tells `c mod 2` and `c mod 5`, and modulo 11 nothing; casting out elevens does not carry over. The
+key modulo 20, `θ(x, y) = −10x` on digit pairs, `θ(x, −) = −x`, `θ(x, =) = x`, `θ(=, y) = 10y`,
+`ψ(d) = −d` and every other move 0, closes every true line to 0 and every false line `c′ = c + δ`
+(`c′ < 100`, `0 < |δ| ≤ 30`) to `δ mod 20`. It has order 20, so the torsion is the cyclic ℤ/20 and it
+carries `c mod 20`: the units and the tens' parity. Its two-part is ℤ/4, which a key built from the
+torsion primes alone reads only as ℤ/2; such a key finds modulus 10.
+
+Why. In §5's gauge (closure `s(a − b − c)`, `ψ(d) = s d`), let each separator keep its own moves:
+`u` after the newline, `u⁻` after `−`, `u′` after `=`, `z` before `−`, `z⁼` before `=`, and
+`θ(x, y) = v x + w y` on digit pairs. No shared move is assumed.
+- a one-place minuend: `u + z ≡ s`; a two-place one: `u + v ≡ s b` and `w + z ≡ s`; hence `w ≡ u`;
+- a one-place subtrahend: `u⁻ + z⁼ ≡ −s`; a two-place one: `u⁻ + v ≡ −s b` and `w + z⁼ ≡ −s`;
+  hence `w ≡ u⁻`;
+- a result: `u′ ≡ −s b`, and no conflict, since a difference never has more places than its minuend.
+
+Then `v ≡ s b − w ≡ −s b − w`, so `2 s b ≡ 0`. The one digit-pair move has to count the minuend's tens
+with `+s b` and the subtrahend's with `−s b`. This is §5's conflict on ring `b − 1`, moved from `=` to
+`−`, and §8's missing move again: the hand flipped at `−`.
+
+The conflict needs the one-place forms that tie `u` and `u⁻` to `w`. With `b ≤ a`, the 55 lines whose
+minuend has one place tie it. On the 4,995 lines whose minuend has two places, the closure has no
+torsion and tells all 100 results apart over ℚ. It holds the exact difference as an integer key:
+`θ(newline, y) = −20y`, `θ(x, y) = 10x`, `θ(x, −) = −x`, `θ(−, y) = 0`, `θ(x, =) = x`,
+`θ(=, y) = 10y`, `ψ(d) = −d`, with closure `c − a + b`. That closure is 0 on every true line and `δ` on
+every false line. It misses 54 of the 55 one-place-minuend lines (all but `0-0=0`). Split by the
+result's length instead, `c < 10` keeps ℤ/20, because it holds the one-place minuends, and `c ≥ 10`
+has none.
+
+What it means for the founding [agent-inferred]. For sums, the face that splits the menu is the
+result's length, which is the one bit the closure leaves (§3, §4). For differences it is the
+minuend's length, which the line already shows at `−`, before the answer. A differences ring founded
+on a menu split by the minuend's length reads the whole difference from the rational kernel, tens
+included, with no bit left over. Over the mixed menu, a founding that reads only the torsion finds the
+units, and the tens' parity at most.
+
 The recorded failures this could repeat: an authored routine standing in for learning (no key here is
 given to the machine; the closed forms read what the closure located, and the length split uses a
 face the machine places itself); text run on its codec's grain as the exception (the law is stated
@@ -186,10 +238,14 @@ Lean (#410), added to the box "The closure key's torsion (#405)":
 - on `ℤ/(b + 1)` a digit word read leading first is a word of half-turns, `b n + d = d − n`, whose
   value is the alternating digit sum (Mathlib `Nat.ofDigits_neg_one`, beside
   `Mathematics/RadixWindowReceiver.cheap_faces` and `Geometry/Navigation`'s odd word);
-- the `b = 10` key of §2 closes a line iff `11 ∣ c − a − b` (decidable on the finite line set).
+- the `b = 10` key of §2 closes a line iff `11 ∣ c − a − b` (decidable on the finite line set);
+- the newline closure of written differences with `b ≤ a < b²` admits a key linear in the digit values
+  modulo `m` exactly when `m ∣ 2b`, and over ℚ on the lines whose minuend has two places, where the
+  §10 key's closure is `c − a + b` (decidable on the finite line set).
 
 ## Receipts
 
 [`2026-10-25_THE_NEWLINE_CLOSURE_receipts/`](2026-10-25_THE_NEWLINE_CLOSURE_receipts/):
 `closure_torsion.py` (integers and residues only: echelons modulo primes, Bareiss determinants, the
-integer kernel checked on every row), its output `closure_torsion.txt`, and `RUN.md`.
+integer kernel checked on every row), its output `closure_torsion.txt`; `closure_differences.py`
+(§10, importing the same exact reading), its output `closure_differences.txt`; and `RUN.md`.
