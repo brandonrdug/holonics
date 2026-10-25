@@ -1,0 +1,26 @@
+# ring16: the split of the guess on the precision-founded ring (founded15), the readout founded
+# to its own precision by exact Newton rounds on the joined ring (joined15), one lap that
+# deposits only the readouts, and the reads at the held-out units U, at B and on the whole held-out text.
+d9711a49c4e041cb2cbd290b8c7951eff3dc715ee997ae07d82359bafd1640db  .local/bin/ring16
+TOWER_SPLIT cells=495 ring_top_is_next=335 rest_top_is_next=48 ring_not_whole=133 whole_not_ring=43
+TOWER_AT cells=495 top_is_next=245 code_on_2^-20=1172549841 ring_ranks=1 elapsed_ms=7816
+MEASURE exit=0 wall_s=7.9 peak_rss_kib=24500
+RING_READOUT_ROUND round=0 kappa_on_2^-16=2405904 direction_lift=35 code_on_2^-20=504166009625 line_code=504166008958 saved_millinats=9434492 another=true round_ms=33253 elapsed_ms=106035
+RING_READOUT_ROUND round=1 kappa_on_2^-16=667860 direction_lift=37 code_on_2^-20=502782428208 line_code=502782414946 saved_millinats=914598 another=true round_ms=34246 elapsed_ms=140288
+RING_READOUT_ROUND round=2 kappa_on_2^-16=370141 direction_lift=38 code_on_2^-20=502583687023 line_code=502583678101 saved_millinats=131375 another=false round_ms=34272 elapsed_ms=174564
+RING_READOUT cells=216130 channels=130 arriving_classes=15 free=1820 rounds=3 kappas_on_2^-16=2405904,667860,370141 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=502583687023 evaluations=110 largest=28934333 moment_sections=211 moments_ms=41218 sha256=1bdb7b839a518c4eb4cdb24866d7a9866b8354d3024e52efa0a0a9bc10ce7c68 read_ms=72642 elapsed_ms=216035
+MEASURE exit=0 wall_s=216.1 peak_rss_kib=720456
+RING_HELD_PASS hold=all-but-readouts sections=211 deposits=211 cells=216064 code_before_on_2^-20=495230709833 code_after_on_2^-20=490927386580 sha256=1dc0b44a7965779e643dba76095ab83970f0ab54317750e5e25e7b5f8b94d221 elapsed_ms=79378
+MEASURE exit=0 wall_s=79.4 peak_rss_kib=169740
+ring/founded16.state: units right 308 of 495, 1.977 bits a digit; whole held-out text 2.580 bits a byte
+ring/at16_founded16.U.txt:TOWER_SPLIT cells=495 ring_top_is_next=223 rest_top_is_next=48 ring_not_whole=42 whole_not_ring=127
+ring/at16_founded16.U.txt:MEASURE exit=0 wall_s=8.4 peak_rss_kib=23184
+ring/at16_founded16.B.txt:MEASURE exit=0 wall_s=3.8 peak_rss_kib=24252
+ring/at16_founded16.dev.txt:MEASURE exit=0 wall_s=16.4 peak_rss_kib=24248
+ring/at16_founded16.B.txt outside read of the sum's units at B: 390 of 495
+ring/lap16.state: units right 247 of 495, 2.003 bits a digit; whole held-out text 2.668 bits a byte
+ring/at16_lap16.U.txt:TOWER_SPLIT cells=495 ring_top_is_next=221 rest_top_is_next=41 ring_not_whole=23 whole_not_ring=49
+ring/at16_lap16.U.txt:MEASURE exit=0 wall_s=8.4 peak_rss_kib=24308
+ring/at16_lap16.B.txt:MEASURE exit=0 wall_s=4.3 peak_rss_kib=24612
+ring/at16_lap16.dev.txt:MEASURE exit=0 wall_s=18.0 peak_rss_kib=24376
+ring/at16_lap16.B.txt outside read of the sum's units at B: 390 of 495

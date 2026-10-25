@@ -53,7 +53,7 @@
 use super::tower_situated::{div_round, lcm, permille};
 use super::tower_train::{count, pair_hats, positive, release_big, solve_scaled, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::{ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, FACE_BITS, MOVE_BITS};
+use holonics::hnn::tower::{ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, MOVE_BITS};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use rayon::prelude::*;
@@ -1154,16 +1154,23 @@ pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [agent-inferred, October 25] `read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA`: the
-/// tower's own guess at the cells `CELLS` names (ascending cell indices, whitespace-separated; cell
-/// `i` has heard `TEXT[..=i]` and codes `TEXT[i + 1]`), `TEXT` read as one passage from rest. Each
-/// named cell prints `AT i next top code`: the class that arrives, the class the face gives the
-/// largest mass (the smaller class on a tie) and the code of the arriving class on `2^(−20)` bits;
-/// with a ring face joined, also `FORMS i next ρ…`, the ring's face as the readout reads it (the
-/// probe's situated format). A reading beside the code: the tower is not moved.
+/// [agent-inferred, October 25] `read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA
+/// [split]`: the tower's own guess at the cells `CELLS` names (ascending cell indices,
+/// whitespace-separated; cell `i` has heard `TEXT[..=i]` and codes `TEXT[i + 1]`), `TEXT` read as
+/// one passage from rest. Each named cell prints `AT i next top code`: the class that arrives, the
+/// class the face gives the largest mass (the smaller class on a tie) and the code of the arriving
+/// class on `2^(−20)` bits; with a ring face joined, also `FORMS i next ρ…`, the ring's face as the
+/// readout reads it (the probe's situated format). With `split` (a ring-faced tower), the guess is
+/// split into the ring's part, `W φ` with `φ` the ring's pair read with the top face
+/// ([`RingFace::pair_read`]), and the rest, the same tower with its ring's readout at zero read
+/// again: each named cell prints `SPLIT i next top ring_top rest_top ring_rank rest_rank top_rank
+/// ring_margin`, the ranks the arriving class's place below the classes each part (and the whole
+/// face) puts above it, and the margin the ring's part gives the arriving class over the largest
+/// other, on `2^(−16)` of a bit. A reading beside the code: the tower is not moved.
 pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
-    if args.len() != 7 {
-        return Err("read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA".into());
+    let split = args.len() == 8 && args[7] == "split";
+    if args.len() != 7 && !split {
+        return Err("read-tower-at STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA [split]".into());
     }
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -1177,8 +1184,20 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
     let mut at = named.iter().peekable();
     let (mut right, mut code) = (0usize, 0i64);
     let read_to = named.last().map_or(0, |&i| i + 2);
+    let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+    let readout: Option<(usize, &[i32])> = match (split, tower.ring_face(), tower.ring_family()) {
+        (false, _, _) => None,
+        (true, Some(face), Some(family)) => {
+            let k = face.channels(w);
+            Some((k, &tower.theta[family.start..family.start + a * k]))
+        }
+        _ => return Err("split needs a ring-faced tower".into()),
+    };
+    // Below the arriving class: how many classes a part puts above it.
+    let rank = |values: &[i128], next: usize| values.iter().filter(|&&v| v > values[next]).count();
+    let mut parts: Vec<(usize, usize, usize, usize, usize, usize, i128)> = Vec::new();
     tower
-        .read_ring(&mut tower.rest(), &classes[..read_to], |i, _, face, ring| {
+        .read_ring(&mut tower.rest(), &classes[..read_to], |i, top_face, face, ring| {
             if at.peek() != Some(&&i) {
                 return Ok(());
             }
@@ -1191,10 +1210,45 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
             println!("AT {i} {next} {top} {c}");
             if let Some((_, rho)) = ring {
                 println!("FORMS {i} {next} {}", rho.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+                if let Some((k, readout)) = readout {
+                    let (phi, _, _) = RingFace::pair_read(top_face, rho)?;
+                    let part: Vec<i128> = (0..a).map(|c| release(readout[c * k..(c + 1) * k].iter().zip(&phi).map(|(&x, &y)| x as i128 * y as i128).sum(), 24)).collect();
+                    let ring_top = (0..a).max_by_key(|&c| (part[c], std::cmp::Reverse(c))).expect("a nonempty alphabet");
+                    let other = (0..a).filter(|&c| c != next).map(|c| part[c]).max().unwrap_or(0);
+                    let masses: Vec<i128> = face.masses.iter().map(|&m| m as i128).collect();
+                    parts.push((i, next, top, ring_top, rank(&part, next), rank(&masses, next), part[next] - other));
+                }
             }
             Ok(())
         })
         .map_err(|e| e.to_string())?;
+    if let Some((k, _)) = readout {
+        // The rest: the same tower with its ring's readout at zero, read again.
+        let mut rest = tower.clone();
+        rest.open_ring_readout(&vec![0; a * k]).map_err(|e| e.to_string())?;
+        let mut tops = Vec::with_capacity(parts.len());
+        let mut at = named.iter().peekable();
+        rest.read_ring(&mut rest.rest(), &classes[..read_to], |i, _, face, _| {
+            if at.peek() != Some(&&i) {
+                return Ok(());
+            }
+            at.next();
+            let masses: Vec<i128> = face.masses.iter().map(|&m| m as i128).collect();
+            let top = (0..a).max_by_key(|&c| (masses[c], std::cmp::Reverse(c))).expect("a nonempty alphabet");
+            tops.push((top, rank(&masses, classes[i + 1])));
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+        let (mut ring_right, mut rest_right, mut ring_only, mut whole_only) = (0usize, 0usize, 0usize, 0usize);
+        for (&(i, next, top, ring_top, ring_rank, top_rank, margin), &(rest_top, rest_rank)) in parts.iter().zip(&tops) {
+            println!("SPLIT {i} {next} {top} {ring_top} {rest_top} {ring_rank} {rest_rank} {top_rank} {margin}");
+            ring_right += (ring_top == next) as usize;
+            rest_right += (rest_top == next) as usize;
+            ring_only += (ring_top == next && top != next) as usize;
+            whole_only += (ring_top != next && top == next) as usize;
+        }
+        println!("TOWER_SPLIT cells={} ring_top_is_next={ring_right} rest_top_is_next={rest_right} ring_not_whole={ring_only} whole_not_ring={whole_only}", parts.len());
+    }
     println!(
         "TOWER_AT cells={} top_is_next={right} code_on_2^-20={code} ring_ranks={} elapsed_ms={}",
         named.len(),
@@ -1204,24 +1258,38 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [agent-inferred, October 25] **The ring's readout founded on the passage it is joined on**
-/// (`found-ring-readout`). The joined tower, its ring's readout at zero, reads TEXT once from rest,
-/// and at every cell the ring's pair read with the top face, `φ_t = x̂_t ⊗ ρ_t`
-/// ([`RingFace::pair_read`]), meets the comparison's covector `y_t = p_t − q_t` (on `2^(−24)`, the
-/// learner's). The readout's direction is the bridge's own solution, the exact least squares
-/// `Q D = −M` with `Q = Σ φφᵀ` and `M = Σ φ yᵀ`: the readout whose face best returns the descent the
-/// passage demands. Its scale is the one along that direction under which the passage codes
-/// least: doubled from the direction's grain while the code falls, then narrowed by golden section
-/// to `2^(−8)` of the bracket, each code read from the face's masses carried through the
-/// direction's exponential (a founding's reading at the masses' grain; the joined tower's own read
-/// measures the result). The ring's moments, its readout's and its factors', are then opened on
-/// the same passage, partitioned as a training pass reads it (`STREAMS` streams of `SECTION` cells
-/// a section), at its sections' own covector statistics ([`TowerLearner::open_moments`]): a founded
-/// family opened with zero moments is undone by its first steps. The learner, its readout opened there
+/// [agent-inferred, October 25] **The ring's readout founded on the passage it is joined on, to
+/// its own precision** (`found-ring-readout`). The joined tower, its ring's readout at zero, reads
+/// TEXT once from rest, and at every cell the ring's pair read with the top face,
+/// `φ_t = x̂_t ⊗ ρ_t` ([`RingFace::pair_read`]), is kept beside the face's masses. The readout `W`
+/// is then founded in rounds. A round starts from the readout `W` the last one left: each cell's
+/// face is the tower's carried through the ring's part `o_t = W φ_t` (released as the tower's
+/// step releases it, on `2^(−16)` of a bit), with `p_t` its masses as a ratio to their total and
+/// `q_t` the arriving class. For each class `c` that arrives in the passage, the round's direction
+/// for its row is the Newton step of the passage's code in that row, `H_c d_c = −m_c` with
+/// `H_c = Σ_t p_tc (1 − p_tc) φ_t φ_tᵀ` (the code's curvature in the row, on `2^(−24)`) and
+/// `m_c = Σ_t φ_t (p_tc − q_tc)` (its covector), solved exactly on a copy released to a common
+/// grain (directions only). The rows' directions, on one scale, are moved together by the scale
+/// under which the passage codes least: doubled from the direction's grain while the code falls,
+/// then narrowed by golden section to `2^(−8)` of the bracket, each code read from the face's
+/// masses carried through the offsets' exponential (a founding's reading at the masses' grain; the
+/// joined tower's own read measures the result). A round is followed by another while it pays:
+/// while its saving, read exactly at the readout it leaves, reaches half a nat for each free
+/// parameter the readout re-states, `k (C − 1)` for `k` channels and `C` arriving classes (the
+/// precision rule of [`round_pays`]; a class that never arrives keeps its row at zero, and the
+/// first round always runs). This replaces one least-squares direction at `W = 0` (`Q D = −M`,
+/// `Q = Σ φφᵀ`), whose best scale was eleven times its own, so the code's curvature along it was
+/// a small share of `Q`'s, and which read 244 of the 358 held-out units the ring's own
+/// training-text directions read (the tower record, "The founding stops at its own precision").
+/// The ring's moments, its readout's and its factors', are then opened on the same passage,
+/// partitioned as a training pass reads it (`STREAMS` streams of `SECTION` cells a section), at
+/// its sections' own covector statistics ([`TowerLearner::open_moments`]): a founded family opened
+/// with zero moments is undone by its first steps. The learner, its readout opened there
 /// ([`Tower::open_ring_readout`]), is written to OUT (created, never overwritten).
 pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     use holonics::hnn::keyed_modes::Exponential;
     use holonics::hnn::tower::TowerFace;
+    use holonics::ratio::Rat;
     if args.len() != 8 {
         return Err("found-ring-readout STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION OUT".into());
     }
@@ -1239,6 +1307,9 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     let tower = &learner.tower;
     let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
     let k = tower.ring_face().map(|f| f.channels(w)).ok_or("found-ring-readout needs a ring-faced tower")?;
+    if tower.ring_family().is_some_and(|family| tower.theta[family.start..family.start + a * k].iter().any(|&v| v != 0)) {
+        return Err("found-ring-readout founds the readout of a joined ring, at zero".into());
+    }
     let cells = classes.len().saturating_sub(1);
     let (mut nexts, mut phis, mut masses) = (Vec::with_capacity(cells), Vec::with_capacity(cells * k), Vec::with_capacity(cells * a));
     let mut code_before = 0i64;
@@ -1256,142 +1327,229 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
         .map_err(|e| e.to_string())?;
     let read_ms = started.elapsed().as_millis();
     let n = nexts.len();
-    let add = |mut x: Vec<i128>, y: Vec<i128>| {
-        x.iter_mut().zip(y).for_each(|(a, b)| *a += b);
-        x
-    };
-    // Q = Σ φφᵀ (upper triangle) and M = Σ φ yᵀ: |φ| < 2^21 and |y| ≤ 2^24 keep both inside
-    // 128 bits over fewer than 2^40 cells.
-    let q = (0..n)
-        .into_par_iter()
-        .fold(
-            || vec![0i128; k * k],
-            |mut q, t| {
-                let phi = &phis[t * k..(t + 1) * k];
-                for i in 0..k {
-                    let pi = phi[i] as i128;
-                    if pi != 0 {
-                        for j in i..k {
-                            q[i * k + j] += pi * phi[j] as i128;
-                        }
-                    }
-                }
-                q
-            },
-        )
-        .reduce(|| vec![0i128; k * k], add);
-    let m = (0..n)
-        .into_par_iter()
-        .fold(
-            || vec![0i128; k * a],
-            |mut m, t| {
-                let (phi, ms) = (&phis[t * k..(t + 1) * k], &masses[t * a..(t + 1) * a]);
-                let total: u128 = ms.iter().map(|&v| v as u128).sum();
-                for (c, &mass) in ms.iter().enumerate() {
-                    let p = (((mass as u128) << 24) + total / 2) / total;
-                    let y = p as i128 - if c == nexts[t] { 1 << 24 } else { 0 };
-                    if y != 0 {
-                        for (i, &x) in phi.iter().enumerate() {
-                            m[i * a + c] += x as i128 * y;
-                        }
-                    }
-                }
-                m
-            },
-        )
-        .reduce(|| vec![0i128; k * a], add);
     if phis.iter().any(|v| v.unsigned_abs() >= 1 << 21) {
         return Err("a ring's pair read past 2^21 of its grain: the moments' reach is owed".into());
     }
-    let h: Vec<Vec<BigInt>> = (0..k).map(|i| (0..k).map(|j| BigInt::from(q[i.min(j) * k + i.max(j)])).collect()).collect();
-    let r: Vec<Vec<BigInt>> = (0..k).map(|i| (0..a).map(|c| BigInt::from(m[i * a + c])).collect()).collect();
-    let (det, y) = solve_scaled(&h, &r, false)?;
-    let solve_ms = started.elapsed().as_millis() - read_ms;
-    // The direction D = −Q⁺M, row c of the readout over the channels, released to 2^20 at its widest.
-    let sign = if det < BigInt::zero() { BigInt::from(1) } else { BigInt::from(-1) };
-    let direction: Vec<BigInt> = (0..a).flat_map(|c| (0..k).map(|i| &sign * &y[i][c]).collect::<Vec<_>>()).collect();
-    let direction: Vec<i64> = release_big(&direction, 20);
-    // Each cell's face moved by the direction at unit scale, on 2^(−16) of a bit.
-    let moved: Vec<i64> = (0..n)
-        .into_par_iter()
-        .flat_map_iter(|t| {
-            let phi = &phis[t * k..(t + 1) * k];
-            let direction = &direction;
-            (0..a).map(move |c| release(direction[c * k..(c + 1) * k].iter().zip(phi).map(|(&d, &x)| d as i128 * x as i128).sum(), 24) as i64)
-        })
-        .collect();
-    drop(phis);
+    let mut arrives = vec![false; a];
+    nexts.iter().for_each(|&c| arrives[c] = true);
+    let reached: Vec<usize> = (0..a).filter(|&c| arrives[c]).collect();
+    let r = reached.len();
+    let free = k * (r - 1);
+    let ln_two = holonics::ratio::algebraic::ln_enclosure(&Rat::from_integer(BigInt::from(2))).map_err(|e| format!("ln 2's enclosure: {e:?}"))?;
     let exponential = Exponential::new(16);
-    // The passage's code with the readout at κ·D, κ on 2^(−16).
-    let code = |kappa: i64| -> i64 {
-        (0..n)
-            .into_par_iter()
-            .map(|t| {
-                let offs: Vec<i128> = moved[t * a..(t + 1) * a].iter().map(|&v| release(kappa as i128 * v as i128, 16)).collect();
-                let top = *offs.iter().max().expect("a nonempty alphabet");
-                let ms: Vec<u128> = masses[t * a..(t + 1) * a].iter().zip(&offs).map(|(&mass, &o)| ((mass as u128 * exponential.below_one(o - top)) >> 62).max(1)).collect();
-                let total = ms.iter().sum();
-                TowerFace { masses: ms, total }.code(nexts[t])
-            })
-            .sum()
+    // The face at cell t with the ring's part `o` (one offset an arriving class, on 2^(−16) of a
+    // bit; every other class's part is zero).
+    let face_of = |t: usize, o: &[i64]| -> TowerFace {
+        let largest = o.iter().copied().max().unwrap_or(0);
+        let top = if r < a { largest.max(0) } else { largest };
+        let base = &masses[t * a..(t + 1) * a];
+        let rest = exponential.below_one(-(top as i128));
+        let mut ms: Vec<u128> = base.iter().map(|&mass| ((mass as u128 * rest) >> 62).max(1)).collect();
+        for (j, &c) in reached.iter().enumerate() {
+            ms[c] = ((base[c] as u128 * exponential.below_one((o[j] - top) as i128)) >> 62).max(1);
+        }
+        let total = ms.iter().sum();
+        TowerFace { masses: ms, total }
     };
-    let mut evaluations = 1usize;
-    let at_zero = code(0);
-    let (mut best, mut best_code) = (0i64, at_zero);
-    let mut kappa = 1i64;
+    // Each cell's ring part at the readout `wr` (the arriving classes' rows, `r · k`).
+    let offsets = |wr: &[i64]| -> Vec<i64> {
+        let mut out = vec![0i64; n * r];
+        out.par_chunks_mut(r).enumerate().for_each(|(t, o)| {
+            let phi = &phis[t * k..(t + 1) * k];
+            for (j, slot) in o.iter_mut().enumerate() {
+                *slot = release(wr[j * k..(j + 1) * k].iter().zip(phi).map(|(&x, &y)| x as i128 * y as i128).sum(), 24) as i64;
+            }
+        });
+        out
+    };
+    let code_at = |offs: &[i64]| -> i64 { (0..n).into_par_iter().map(|t| face_of(t, &offs[t * r..(t + 1) * r]).code(nexts[t])).sum() };
+    let mut wr = vec![0i64; r * k];
+    let mut offs = vec![0i64; n * r];
+    let mut current = code_at(&offs);
+    let at_zero = current;
+    let (mut round, mut evaluations) = (0usize, 1usize);
+    let mut kappas: Vec<i64> = Vec::new();
+    // Half a nat a free parameter, on 2^(−20) of a nat.
+    let half_free = Rat::from_integer(BigInt::from(free) << 19u32);
     loop {
-        let c = code(kappa);
-        evaluations += 1;
-        if c >= best_code && best > 0 {
+        let round_started = std::time::Instant::now();
+        // The masses as a ratio to their total, on 2^(−24), at every cell for every arriving class.
+        let probs: Vec<i64> = (0..n)
+            .into_par_iter()
+            .flat_map_iter(|t| {
+                let face = face_of(t, &offs[t * r..(t + 1) * r]);
+                reached.iter().map(|&c| (((face.masses[c] << 24) + face.total / 2) / face.total) as i64).collect::<Vec<_>>()
+            })
+            .collect();
+        // Each arriving class's curvature and covector: |φ| < 2^21 and p(1 − p) ≤ 2^22 keep every
+        // term below 2^64, and the sums inside 128 bits over fewer than 2^60 cells.
+        let blocks: Vec<(Vec<i128>, Vec<i128>)> = (0..r)
+            .into_par_iter()
+            .map(|j| {
+                let c = reached[j];
+                let (mut h, mut m) = (vec![0i128; k * k], vec![0i128; k]);
+                for t in 0..n {
+                    let p = probs[t * r + j] as i128;
+                    let y = p - if nexts[t] == c { 1 << 24 } else { 0 };
+                    let curvature = (p * ((1 << 24) - p) + (1 << 23)) >> 24;
+                    if y == 0 && curvature == 0 {
+                        continue;
+                    }
+                    let phi = &phis[t * k..(t + 1) * k];
+                    for i in 0..k {
+                        let x = phi[i] as i128;
+                        if x == 0 {
+                            continue;
+                        }
+                        m[i] += x * y;
+                        if curvature != 0 {
+                            let xc = x * curvature;
+                            for l in i..k {
+                                h[i * k + l] += xc * phi[l] as i128;
+                            }
+                        }
+                    }
+                }
+                (h, m)
+            })
+            .collect();
+        // Each row's Newton direction on a copy released so its curvature's largest entry is
+        // below 2^40, the covector by the same shift: `D_c · H_c⁻¹ m_c` and `D_c`.
+        let solved: Vec<(BigInt, Vec<BigInt>)> = blocks
+            .par_iter()
+            .map(|(h, m)| {
+                let largest = h.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+                let shift = (128 - largest.leading_zeros()).saturating_sub(40);
+                let hh: Vec<Vec<BigInt>> = (0..k).map(|i| (0..k).map(|l| BigInt::from(release(h[i.min(l) * k + i.max(l)], shift))).collect()).collect();
+                let rr: Vec<Vec<BigInt>> = m.iter().map(|&v| vec![BigInt::from(release(v, shift))]).collect();
+                let (det, y) = solve_scaled(&hh, &rr, false).map_err(|e| e.to_string())?;
+                Ok((det, y.into_iter().map(|row| row.into_iter().next().unwrap_or_default()).collect()))
+            })
+            .collect::<std::result::Result<_, String>>()?;
+        // One scale for every row: the largest entry of the direction near 2^20.
+        let widest = solved.iter().filter(|(det, y)| !det.is_zero() && y.iter().any(|v| !v.is_zero())).map(|(det, y)| y.iter().map(|v| v.bits()).max().unwrap_or(0) as i64 - det.bits() as i64).max();
+        let Some(widest) = widest else {
+            if round == 0 {
+                return Err("the passage's code has no direction in the ring's readout".into());
+            }
+            break;
+        };
+        let lift = 20 - widest;
+        let direction: Vec<i64> = solved
+            .iter()
+            .flat_map(|(det, y)| {
+                y.iter()
+                    .map(|v| {
+                        if det.is_zero() {
+                            return 0;
+                        }
+                        let (num, den) = if lift >= 0 { (-(v << lift as u32), det.clone()) } else { (-v.clone(), det << (-lift) as u32) };
+                        let (num, den) = if den < BigInt::zero() { (-num, -den) } else { (num, den) };
+                        i64::try_from(div_round(&num, &den)).unwrap_or(0)
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        // Each cell's ring part moved by the direction at unit scale, on 2^(−16) of a bit.
+        let moved = offsets(&direction);
+        let code = |kappa: i64| -> i64 {
+            (0..n)
+                .into_par_iter()
+                .map(|t| {
+                    let o: Vec<i64> = (0..r).map(|j| offs[t * r + j] + release(kappa as i128 * moved[t * r + j] as i128, 16) as i64).collect();
+                    face_of(t, &o).code(nexts[t])
+                })
+                .sum()
+        };
+        let (mut best, mut best_code) = (0i64, current);
+        let mut kappa = 1i64;
+        loop {
+            let c = code(kappa);
+            evaluations += 1;
+            if c >= best_code && best > 0 {
+                break;
+            }
+            if c < best_code {
+                (best, best_code) = (kappa, c);
+            }
+            if kappa >= 1 << 40 {
+                return Err("the passage's code fell along the direction past 2^24 of its unit scale".into());
+            }
+            kappa *= 2;
+        }
+        if best == 0 {
+            if round == 0 {
+                return Err("the passage's code did not fall along the founded direction".into());
+            }
+            println!("RING_READOUT_ROUND round={round} kappa_on_2^-16=0 another=false round_ms={} elapsed_ms={}", round_started.elapsed().as_millis(), started.elapsed().as_millis());
             break;
         }
-        if c < best_code {
-            (best, best_code) = (kappa, c);
+        // Golden section on [best/2, 2·best] to 2^(−8) of the bracket.
+        let (mut lo, mut hi) = (best / 2, 2 * best);
+        let width = (hi - lo) >> 8;
+        let golden = |lo: i64, hi: i64| -> (i64, i64) {
+            let span = (hi - lo) as i128;
+            let cut = (span * 381966 + 500000) / 1000000; // 1 − 1/φ to 2^(−20)
+            (lo + cut as i64, hi - cut as i64)
+        };
+        let (mut x1, mut x2) = golden(lo, hi);
+        let (mut c1, mut c2) = (code(x1), code(x2));
+        evaluations += 2;
+        while hi - lo > width.max(1) && x1 < x2 {
+            if c1 <= c2 {
+                hi = x2;
+                (x2, c2) = (x1, c1);
+                x1 = golden(lo, hi).0;
+                c1 = code(x1);
+            } else {
+                lo = x1;
+                (x1, c1) = (x2, c2);
+                x2 = golden(lo, hi).1;
+                c2 = code(x2);
+            }
+            evaluations += 1;
         }
-        if kappa >= 1 << 40 {
-            return Err("the passage's code fell along the direction past 2^24 of its unit scale".into());
+        for (x, c) in [(x1, c1), (x2, c2)] {
+            if c < best_code {
+                (best, best_code) = (x, c);
+            }
         }
-        kappa *= 2;
-    }
-    if best == 0 {
-        return Err("the passage's code did not fall along the founded direction".into());
-    }
-    // Golden section on [best/2, 2·best] to 2^(−8) of the bracket.
-    let (mut lo, mut hi) = (best / 2, 2 * best);
-    let width = (hi - lo) >> 8;
-    let golden = |lo: i64, hi: i64| -> (i64, i64) {
-        let span = (hi - lo) as i128;
-        let cut = (span * 381966 + 500000) / 1000000; // 1 − 1/φ to 2^(−20)
-        (lo + cut as i64, hi - cut as i64)
-    };
-    let (mut x1, mut x2) = golden(lo, hi);
-    let (mut c1, mut c2) = (code(x1), code(x2));
-    evaluations += 2;
-    while hi - lo > width.max(1) && x1 < x2 {
-        if c1 <= c2 {
-            hi = x2;
-            (x2, c2) = (x1, c1);
-            x1 = golden(lo, hi).0;
-            c1 = code(x1);
-        } else {
-            lo = x1;
-            (x1, c1) = (x2, c2);
-            x2 = golden(lo, hi).1;
-            c2 = code(x2);
-        }
+        // The readout the round leaves, and its code read exactly there.
+        let moved_readout: Vec<i64> = wr.iter().zip(&direction).map(|(&v, &d)| v + release(best as i128 * d as i128, 16) as i64).collect();
+        let moved_offsets = offsets(&moved_readout);
+        let left = code_at(&moved_offsets);
         evaluations += 1;
-    }
-    for (x, c) in [(x1, c1), (x2, c2)] {
-        if c < best_code {
-            (best, best_code) = (x, c);
+        let saved = current - left;
+        // The saving in nats on 2^(−20): the code's bits times ln 2's enclosure's lower end.
+        let saved_nats = Rat::from_integer(BigInt::from(saved)) * ln_two.lower.clone();
+        let millinats = (&saved_nats * Rat::new(BigInt::from(1000), BigInt::from(1u64 << 20))).round().to_integer().to_string();
+        let pays = saved > 0 && saved_nats >= half_free;
+        println!(
+            "RING_READOUT_ROUND round={round} kappa_on_2^-16={best} direction_lift={lift} code_on_2^-20={left} line_code={best_code} saved_millinats={millinats} another={pays} round_ms={} elapsed_ms={}",
+            round_started.elapsed().as_millis(),
+            started.elapsed().as_millis()
+        );
+        if saved <= 0 {
+            if round == 0 {
+                return Err("the founded readout, released, did not lower the passage's code".into());
+            }
+            break;
+        }
+        (wr, offs, current) = (moved_readout, moved_offsets, left);
+        kappas.push(best);
+        round += 1;
+        if !pays {
+            break;
         }
     }
-    let readout: Vec<i32> = direction
-        .iter()
-        .map(|&d| i32::try_from(release(best as i128 * d as i128, 16)).map_err(|_| "a founded readout entry outgrew its 32-bit carrier".to_string()))
-        .collect::<std::result::Result<_, _>>()?;
+    drop((masses, phis, offs));
+    let mut readout = vec![0i32; a * k];
+    for (j, &c) in reached.iter().enumerate() {
+        for i in 0..k {
+            readout[c * k + i] = i32::try_from(wr[j * k + i]).map_err(|_| "a founded readout entry outgrew its 32-bit carrier".to_string())?;
+        }
+    }
     learner.tower.open_ring_readout(&readout).map_err(|e| e.to_string())?;
-    drop((masses, moved));
     // The moments on the training pass's partition: section k of stream s reads
     // `[s·chunk + k·section, s·chunk + (k + 1)·section]`.
     let moments_started = std::time::Instant::now();
@@ -1406,7 +1564,8 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     let written = learner.to_text();
     std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[7])?, written.as_bytes())?;
     println!(
-        "RING_READOUT cells={n} channels={k} kappa_on_2^-16={best} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={best_code} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} solve_ms={solve_ms} elapsed_ms={}",
+        "RING_READOUT cells={n} channels={k} arriving_classes={r} free={free} rounds={round} kappas_on_2^-16={} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={current} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} elapsed_ms={}",
+        kappas.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
         readout.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0),
         sha256(written.as_bytes())?,
         started.elapsed().as_millis()
