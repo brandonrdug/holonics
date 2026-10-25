@@ -1,0 +1,26 @@
+== ring/base_at_U.txt
+TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478062 ring_ranks=0 elapsed_ms=3704
+MEASURE exit=0 wall_s=3.7 peak_rss_kib=22216
+== ring/joined_at_U.txt
+TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478062 ring_ranks=1 elapsed_ms=3659
+MEASURE exit=0 wall_s=3.7 peak_rss_kib=22652
+== ring/joined7_at_U.txt
+TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478062 ring_ranks=1 elapsed_ms=3726
+MEASURE exit=0 wall_s=3.7 peak_rss_kib=22564
+== ringtrain2.at_U.txt
+TOWER_AT cells=495 top_is_next=69 code_on_2^-20=1713798310 ring_ranks=1 elapsed_ms=3493
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=22460
+== ringfoil2.at_U.txt
+TOWER_AT cells=495 top_is_next=72 code_on_2^-20=1695741631 ring_ranks=0 elapsed_ms=3444
+MEASURE exit=0 wall_s=3.5 peak_rss_kib=22244
+== ringtrain3.at_U.txt
+TOWER_AT cells=495 top_is_next=60 code_on_2^-20=1722043245 ring_ranks=1 elapsed_ms=3776
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=22360
+== ring/diag_foil_at_U.txt
+TOWER_AT cells=495 top_is_next=72 code_on_2^-20=1695741631 ring_ranks=1 elapsed_ms=3649
+== the ring's outside read at U, nearest mean direction leaving each cell out (scratch loo.py over the FORMS lines)
+ring/joined_at_U.txt leave-one-out 340 of 495 concentration {'0': 0.86, '1': 0.9, '2': 0.97, '3': 0.81, '4': 0.91, '5': 0.91, '6': 0.95, '7': 0.97, '8': 0.88, '9': 0.94}
+ring/joined7_at_U.txt leave-one-out 339 of 495 concentration {'0': 0.85, '1': 0.9, '2': 0.97, '3': 0.81, '4': 0.91, '5': 0.91, '6': 0.95, '7': 0.97, '8': 0.88, '9': 0.94}
+ringtrain2.at_U.txt leave-one-out 68 of 495 concentration {'0': 0.4, '1': 0.34, '2': 0.15, '3': 0.07, '4': 0.17, '5': 0.25, '6': 0.3, '7': 0.15, '8': 0.37, '9': 0.19}
+ringtrain3.at_U.txt leave-one-out 46 of 495 concentration {'0': 0.15, '1': 0.27, '2': 0.27, '3': 0.12, '4': 0.2, '5': 0.17, '6': 0.23, '7': 0.16, '8': 0.12, '9': 0.09}
+ring/diag_foil_at_U.txt leave-one-out 69 of 495 concentration {'0': 0.23, '1': 0.2, '2': 0.17, '3': 0.27, '4': 0.23, '5': 0.15, '6': 0.2, '7': 0.09, '8': 0.22, '9': 0.02}

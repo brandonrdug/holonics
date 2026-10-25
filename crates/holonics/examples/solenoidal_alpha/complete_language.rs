@@ -814,6 +814,8 @@ pub(super) fn run_with_execution(
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
         Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
+        Some("join-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::join_tower_ring(args),
+        Some("read-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_at(args),
         Some("read-tower-situated-moments") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated_moments(args),
         Some("read-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated(args),
         Some("read-tower-input-covectors") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_input_covectors(args),

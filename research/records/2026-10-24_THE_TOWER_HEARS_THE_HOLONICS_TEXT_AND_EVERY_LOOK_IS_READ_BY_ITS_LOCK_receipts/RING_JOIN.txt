@@ -1,0 +1,4 @@
+RING_JOIN level=0 mode=41 ranks=1 cells=1789104 streams=8 largest_read=851357 face_shifts=4 codes_unlike_alone=0 material=199296 sha256=069ae4bb298d0a9472bc78d4cf787e740db0ac2bddcea820aab44351b159969b elapsed_ms=269219
+MEASURE exit=0 wall_s=269.3 peak_rss_kib=75500
+RING_JOIN level=0 mode=41 ranks=1 material=199296 sha256=b185e6d8c3759be9e0831a2991e9961b648d8f0ad8e9f2eb1a94a2d2d02fab2d elapsed_ms=194
+MEASURE exit=0 wall_s=0.2 peak_rss_kib=43928
