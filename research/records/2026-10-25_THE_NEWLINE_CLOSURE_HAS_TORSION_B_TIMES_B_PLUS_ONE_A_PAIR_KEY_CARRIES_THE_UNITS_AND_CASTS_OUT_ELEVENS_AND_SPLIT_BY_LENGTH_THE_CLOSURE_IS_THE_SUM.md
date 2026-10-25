@@ -6,8 +6,10 @@
 [a near miss is a draw from the faces it kept](2026-10-23_A_NEAR_MISS_IS_A_DRAW_FROM_THE_FACES_IT_KEPT_AND_THE_BASES_CHEAP_RINGS_CLOSE_THE_REST.md).
 Status:
 - §§1–4, 6 and 7 are checked exactly by the receipt (integers and residues only);
-- §5 is proved-derived for keys linear in the digit values, and that no other prime is torsion is
-  checked in bases 3 to 10 and 12;
+- §5 is proved-derived for keys linear in the digit values with §4's shared moves
+  (`θ(newline, y) = θ(+, y)`, `θ(x, +) = θ(x, =)`); for every key, which primes are torsion rests on
+  the minors' gcd and the rank falls, checked in bases 3 to 10 and 12, and §6 likewise in bases 3 to 8
+  and 10 (correction, October 25, from the integration thread's review);
 - §8's reading (the missing move is a reflection) and §9's consequence for the tens and hundreds
   are [agent-inferred].
 
@@ -84,7 +86,9 @@ the torsion.
 ## 5. Why b(b + 1)
 
 Take a key linear in the digit values, as in §4, with `ψ(d) = s d` and `s` a unit modulo `p`, on
-operands below `b²`. Reading each line shape:
+operands below `b²`. It shares §4's moves: one `u` after the newline and after `+`, one `z` before
+`+` and before `=`. A general key gives each pair its own move; for those the receipt's minors' gcd
+and rank falls decide, and they find the same primes. Reading each line shape:
 - a one-place operand `d`: `(u + z) d ≡ s d`, so `u + z ≡ s`;
 - a two-place operand `d₁d₀`: `(u + v) d₁ + (w + z) d₀ ≡ s(b d₁ + d₀)`, so `u + v ≡ s b` and
   `w + z ≡ s`, hence `w ≡ u`;
@@ -177,7 +181,8 @@ for any base and any written operation's line shape, not for decimal sums); bits
 
 Lean (#410), added to the box "The closure key's torsion (#405)":
 - the newline closure of written sums with operands below `b²` admits a key linear in the digit values
-  modulo `p` exactly when `p ∣ b(b + 1)`, and with operands below `b³` exactly when `p ∣ 2b`;
+  with §4's shared moves modulo `p` exactly when `p ∣ b(b + 1)`, and with operands below `b³` exactly
+  when `p ∣ 2b`; and for a general pair key the torsion primes are the same (the receipt's check);
 - on `ℤ/(b + 1)` a digit word read leading first is a word of half-turns, `b n + d = d − n`, whose
   value is the alternating digit sum (Mathlib `Nat.ofDigits_neg_one`, beside
   `Mathematics/RadixWindowReceiver.cheap_faces` and `Geometry/Navigation`'s odd word);
