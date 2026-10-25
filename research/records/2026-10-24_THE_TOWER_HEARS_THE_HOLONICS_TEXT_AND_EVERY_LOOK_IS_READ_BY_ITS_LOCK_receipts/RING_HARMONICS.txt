@@ -1,0 +1,18 @@
+# The readout at every harmonic of the key (ring22): ring21's forms joined again (the join reads key_modulus=10 and sets five harmonics), the readout founded by Newton rounds with the curvature within each harmonic's channels, and the tower's own read at U (split), B and the held-out text.
+RING_JOIN level=0 mode=41 ranks=1 pair_moves=203 key_modulus=10 harmonics=5 material=365699 sha256=e9c2de64df1b1b0ce3a5e122c201e02a3d5b5fa540b8b181e8c39add57e44e1c elapsed_ms=316
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=65292
+RING_READOUT_ROUND round=0 kappa_on_2^-16=3251291 direction_lift=33 code_on_2^-20=489770924891 line_code=489771058731 saved_millinats=18950171 another=true round_ms=137068 elapsed_ms=219309
+RING_READOUT_ROUND round=1 kappa_on_2^-16=828630 direction_lift=35 code_on_2^-20=481295582505 line_code=481295598929 saved_millinats=5602512 another=true round_ms=138436 elapsed_ms=357755
+RING_READOUT_ROUND round=2 kappa_on_2^-16=608803 direction_lift=35 code_on_2^-20=478652459701 line_code=478652437922 saved_millinats=1747201 another=false round_ms=134051 elapsed_ms=491813
+RING_READOUT cells=216130 channels=650 arriving_classes=15 free=9100 rounds=3 kappas_on_2^-16=3251291,828630,608803 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=478652459701 evaluations=113 largest=40537383 moment_sections=211 moments_ms=52976 sha256=7e9fac7b453ac8d3e78b26f0905a222cf2f23f36426436bb8e99ad0f8588059a read_ms=81999 elapsed_ms=545229
+MEASURE exit=0 wall_s=545.3 peak_rss_kib=1178436
+at22_founded.U
+TOWER_SPLIT cells=495 ring_top_is_next=437 rest_top_is_next=48 ring_not_whole=1 whole_not_ring=39
+TOWER_AT cells=495 top_is_next=475 code_on_2^-20=323384698 ring_ranks=1 elapsed_ms=8515
+MEASURE exit=0 wall_s=8.6 peak_rss_kib=32400
+at22_founded.B
+TOWER_AT cells=1253 top_is_next=1158 code_on_2^-20=463050622 ring_ranks=1 elapsed_ms=4350
+MEASURE exit=0 wall_s=4.4 peak_rss_kib=32544
+at22_founded.dev
+TOWER_AT cells=48030 top_is_next=21620 code_on_2^-20=149463422678 ring_ranks=1 elapsed_ms=17454
+MEASURE exit=0 wall_s=17.5 peak_rss_kib=32448

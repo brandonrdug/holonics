@@ -3,6 +3,9 @@
 Refs #405 #404. Follows [the digit terrain](2026-10-23_ON_A_TERRAIN_OF_INTERACTING_DIGITS_THE_TOWER_COMPUTES_WHAT_IT_NEVER_MET_WHERE_IT_KNOWS_THE_LEVEL.md#every-look-read-by-its-lock-and-the-turn-to-the-holonics-text)
 and the mathematics thread's [one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md)
 and its record on cycles (PR #426). Status: [measurement; agent-inferred, October 24], on the host.
+October 25: the units step's fixed acceptance is met, the tower's own guess right at 475 of 495
+held-out sums' units at 0.623 bits a digit against the foil's 40 and 3.397, with the carriage key
+located by loop closure ([the last section](#the-machine-locates-the-carriage-key-by-loop-closure)).
 
 ## The failure this step works on
 
@@ -2986,7 +2989,7 @@ two digits and one, 5, 6 and 6 of 44.
   (283 to 221), while the lap lowers the block's code from 2.186 to 2.167 bits a byte at its own
   read. A lap's section steps descend the same code the rounds solved to their precision, and every
   step past that precision moves the readout by the passage's noise. This is the lap law the
-  mathematics thread derived (a lap over the text the last pass founded on founds nothing),
+  mathematics thread derived (a lap that founds nothing adds nothing; a stepped deposit past an exact founding is noise),
   measured on the readout: here the lap does worse than nothing.
 - The held-out text codes worse after the founding (2.437 to 2.580): every class's readout row is
   founded on the arithmetic block alone, and the held-out text is mixed. A reading beside the
@@ -3014,6 +3017,142 @@ two digits and one, 5, 6 and 6 of 44.
    hold at digits must be founded, not authored. Its acceptance reading: the outside read's split
    by the operands' lengths (355, 38 and 6 at `B`) levels, then the tower's own guess at `U`
    reaches 370.
+
+## The machine locates the carriage key by loop closure
+
+The last loop decided the carriage: the ring's move keyed by the pair of the seam and the arriving
+byte, founded, not authored. The acceptance is unchanged.
+
+**The pair move, built** (`RingFace::move_at`). A ring face carries one move for each (seam,
+arriving class) pair met in the passage, each a complex multiplier on `2^(−30)`; a pair never met
+takes the move of the mode it rides. The face, its text form and its restore carry the table, and
+its tests read the covector of every pair against the exact code difference.
+
+**Founding it by steps never left its start.** Three tries founded the 203 met pairs' moves by
+steps along their covector from the unit move: a fixed step, a step by an octave line search, and
+the same from the ring's rest. Each kept its start:
+
+| founding | exact share | held out, units right by the outside read at `U` (of 495) |
+|---|---|---|
+| fixed step from the unit | 0.630 | 40 |
+| octave line from the unit and from the rest | 0.685 | 48 |
+| octave line, the steps kept | 0.686 | 36 |
+
+A move's covector at the unit start carries no sign of the turn it needs: a sum's units turn is
+reached only when both operands' crossings turn together, and one pair's step alone changes the
+code by less than its noise.
+
+**The ceiling.** A diagnostic held table (authored; read as a ceiling, never as a founding):
+newline rests the ring, a digit holds it at `15/16`, `+` and `=` turn it by the seam digit's tenth
+of a turn. Founded under it, the ring's exact share is 1.876 and the outside read carries the units
+at `E` (the equals sign) in all 495 sums and at `U` in 415. The carriage the units need is a pair
+move. The question is how the machine locates it.
+
+**The key by loop closure** [agent-inferred] (`found_closure` in `tower_ring.rs`). This is the
+Bombe's reading: the menu of contacts is the passage's crossings, and the key is the turn each pair
+gives, located by closing loops. Choose an origin byte; between two arrivals of the origin the
+ring's turn is the sum of the turns of the pairs met, `N_t θ` with `N_t` the count of each pair on
+loop `t`. A loop closes when that sum is the turn at which the arriving classes stand, `ψ(C_t)`,
+modulo the key's modulus `n`. The rows `N_t θ ≡ ψ(C_t) (mod n)` are integer. A modulus `n` exists
+only where the system has torsion: `p` divides `n` only if the rank over the integers modulo `p`
+falls below the rank over the rationals, which happens exactly when `p` divides every maximal
+minor. So the founding reads, for each origin:
+
+1. the rank over the rationals, from an echelon modulo one prime below `2^31`, certified: one
+   maximal minor `M` is taken at the echelon's pivots, its determinant and the kernel vectors of
+   Cramer's rule are read exactly by the Chinese remainder theorem past twice Hadamard's bound, and
+   every row is checked against that kernel;
+2. the torsion candidates, the primes below `2^19` that divide `det M`, each tested by an echelon
+   modulo that prime (stopping at the rational rank: a prime is torsion when the rank falls);
+3. the key: the kernel modulo each torsion prime, combined over the torsion primes' subsets, and
+   the first combination whose `ψ` is injective on the arriving classes.
+
+Integer elimination failed twice first. In `i128` a closure row would leave 128 bits; widened to
+`BigInt`, the Hermite form grew and thirteen origins took 152 s, two unfinished at the 300 s
+deadline. The deadline was not raised; the law changed to one minor read modulo primes.
+
+| origin | rows (distinct) | pair columns | rank | `det M` | torsion | key |
+|---|---|---|---|---|---|---|
+| newline | 9,018 (9,011) | 149 | 145 | `110 = 2·5·11` | 2, 5, 11 | modulus 10 |
+| `-` | 9,016 | 200 | 194 | 74 bits, readable 2, 5, 157 | none | none |
+| `*` | 9,018 | 200 | 194 | 112 bits, readable 2, 3, 17, 59 | none | none |
+| `+` | 9,018 | 129 | 127 | 1 | none | none |
+| the ten digits, `=` | 199 to 7,517 | 29 to 195 | 29 to 191 | 1 | none | none |
+
+All fifteen origins close in 4.7 s, against more than 300 s before. One origin keys the passage:
+the newline, modulo 10, with `ψ(d) = d + 2` for the units digit `d` of the line's sum, the move at
+`(d, +)` and at `(d, =)` turning by `d + 1` tenths, every other pair holding, and every row exact
+(0 failures). The `+ 1` on each crossing and the `+ 2` in `ψ` are the gauge: the two crossings add
+`(a₀ + 1) + (b₀ + 1) = a₀ + b₀ + 2`. The torsion primes' products are tried in ascending order;
+modulo 2 or 5 alone ten arriving classes cannot be told apart, and 10 is the first modulus that
+tells them all. Eleven is torsion as well and is never needed. No digit, no base and no sum was named to
+the founding: the key is located from the passage's arrivals.
+
+**The ring under the closure key.** The ring's push and readout are founded under the located
+moves (`found-tower-ring … pair-moves`, 117 s). Its exact share is 1.834 from the unit start,
+against the ceiling's 1.876. Its outside read carries the held-out units at `U` in 469 of 495
+(the ceiling's 415): 242 of 256 two-digit sums and 227 of 239 three-digit ones; at `E`, 253 and
+235. By the operands' lengths: one digit and two, 44 of 50; two and one, 38 of 44; two and two, 387
+of 399. The carriage is located.
+
+**The readout reads only its first turn.** Founded to its precision as the last loop's readout was
+(three Newton rounds saving 12,580, 2,147 and 245 nats against 910), the tower's own guess at `U`
+is right in 337 of 495 at 1.862 bits a digit (the last loop's 308 and 1.977; the foil 40 and
+3.397). The ring's part alone picks 195, the rest 48. Most errors are a neighbouring digit (1 for 2
+in 12 sums, 0 for 1 in 17, 9 for 8 in 11). The units' turns stand apart but compressed on the
+circle (`RING_PHASE_CENTROIDS.txt`): the digits 9, 0, 1, …, 8 at mean turns of 1, 23, 46, 68, 91,
+116, 144, 191, 277 and 329 degrees, each class's resultant 0.92 to 0.997. The readout `W (x̂ ⊗ ρ)`
+reads the turn through one cosine, whose peak is wide against classes 23 degrees apart. A
+nearest-centroid read of the same turns (leave one out) reads 465: the turns separate the digits;
+the readout's one cosine does not. The held-out text reads 2.975 bits a byte after the
+founding (2.580 the last loop), its readout rows founded on the arithmetic block alone.
+
+**The readout at every harmonic of the key** [agent-inferred] (`RingFace::with_harmonics`). A
+function of a turn that stands on `n` residues is spanned by the turn's harmonics `1, …, ⌊n/2⌋`
+and a constant: a discrete Fourier series on `ℤ/n`. So a ring keyed modulo `n` is read at
+`H = ⌊n/2⌋` harmonics, `q_1 = ρ` and `q_h = q_(h−1) ρ / ‖ρ‖` rounded to the face's grain (each the
+turn taken `h` times, at the face's length), and the readout reads `x̂ ⊗ (q_1, …, q_H)`. The join
+reads the key's modulus from the founded forms (`key_modulus=10`, so `H = 5`, 650 channels in place
+of 130); nothing names the harmonics but the key. The reverse carries each harmonic's covector back
+to the first, `∂ρ += t (−ρ_im, ρ_re)/‖ρ‖²` with `t = Σ_(h≥2) h (G_im q_re − G_re q_im)` before the
+ratio's own adjoint: a harmonic moves only the turn. The readout's founding takes the code's
+curvature within each harmonic's channels, five blocks of 130 for each class: two harmonics'
+cross block averages toward zero over a turn that runs round the circle, as the classes' cross
+blocks are dropped, and a block-diagonal curvature is positive, so its step descends and the
+exact code's line fixes its scale.
+
+Three rounds saved 18,950, 5,603 and 1,747 nats against the 4,550 that 650 · 14 free parameters
+ask; the founding read the block at 2.288 bits a byte before, 2.188 under the one-cosine readout
+and 2.112 under the harmonics, in 545 s against a projection of 1,020 s (deadline 1,080 s).
+
+| ring21's ring, readout founded by Newton rounds | whole right at `U` (of 495) | ring's part alone | rest alone | ring's margin, median | bits a digit at `U` | held-out text, bits a byte |
+|---|---|---|---|---|---|---|
+| one cosine (130 channels) | 337 | 195 | 48 | −0.40 bits | 1.862 | 2.975 |
+| **five harmonics (650 channels)** | **475** | 437 | 48 | 2.70 bits | **0.623** | 2.968 |
+| the foil: the same pass without the ring | 40 | - | - | - | 3.397 | 2.458 |
+
+**The acceptance is met**: after one training pass (the survey, the ring's founding by loop
+closure and the readout's founding, each to its precision), the tower's own top guess at `U` is the
+held-out sum's units in 475 of 495 (bar 370), and its code there is 0.623 bits a digit against the
+foil's 3.397. By the operands' lengths (`RING_SPLIT.txt`): two digits and two, 390 of 399; one and
+two, 42 of 50; two and one, 41 of 44; one and one, 2 of 2. Fifteen of the twenty misses are one
+digit off (nine above, six below), eight of them on sums whose first operand has one digit.
+
+**What it says** [agent-inferred]:
+- The carriage was located by the machine: the key modulo 10 is the closure system's own torsion,
+  read from the passage's crossings. The readout was what kept it from the guess, and the key also
+  sets the readout's width: `⌊n/2⌋` harmonics read every function of the turn.
+- The tower's guess passes the outside centroid read of the same turns (475 against 465 at one
+  harmonic and 467 at five): the top face tells the readout where the turn is news.
+- The held-out text codes worse than the foil (2.968 against 2.458 bits a byte). The readout's
+  rows are founded on the arithmetic block alone, so at prose cells the ring's turn enters the
+  logits with weights no prose cell set. A reading beside the acceptance, and the next loop's
+  subject.
+
+**Decided next** [agent-inferred]: found the readout on the mixed training passage (the Holonics
+text with its arithmetic), so that its rows are set where the ring's turn is news and where it is
+not. Its acceptance: the held-out text codes no worse than the foil's 2.458 bits a byte while the
+held-out units stay at or above 370 of 495.
 
 ## The recorded failures this step could repeat
 
@@ -3046,7 +3185,10 @@ two digits and one, 5, 6 and 6 of 44.
   step moved to a smaller partition (the arithmetic block), not a larger deadline. The founding run
   to a one-bit fixed point was stopped on evidence when its first start passed its share of the
   deadline; it was answered by a changed law, the precision rule, under which the founding's rounds
-  are bounded before launch, not by a larger deadline.
+  are bounded before launch, not by a larger deadline. The closure founding's integer elimination
+  was refused in `i128` and ran two origins past its deadline in `BigInt`; it was answered by a
+  changed law, one exact minor read modulo primes with the rank certified, not by a wider carrier
+  or a larger deadline.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
@@ -3064,6 +3206,9 @@ two digits and one, 5, 6 and 6 of 44.
 - **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
   receiver of the machine's own kind, and no list of relation tokens. It chooses only where the
   exterior reading looks. Nothing in the tower reads it.
+  The carriage's ceiling table is authored and read only as a ceiling; the move the learner keeps
+  is located by loop closure, its modulus the closure system's own torsion, and the readout's
+  harmonics are set by that modulus. No digit, base or sum is named to either founding.
 
 ## Receipts
 
@@ -3205,6 +3350,13 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   ring, the Newton rounds, the lap and every read) and `RING_SPLIT.{py,txt}` (the whole guess, the
   ring's part and the rest at the held-out units, by the operands' lengths; run from the run
   directory on the reads' `SPLIT` lines, which stay outside the repository).
+- The carriage key by loop closure: `RING_PAIR_MOVES.txt` (the three step foundings of the pair
+  move and the ceiling, each joined and read outside at the held-out units, the ceiling's table by
+  `RING_CEILING.py`), `RING_CLOSURE.txt` (the refused and stopped eliminations, the closure
+  founding's every origin, its key, the ring founded under it and every read),
+  `RING_HARMONICS.txt` (the join at five harmonics, the readout's rounds and every read) and
+  `RING_PHASE_CENTROIDS.{py,txt}` (the units' turns at `U` and their leave-one-out centroid
+  reads); the splits are appended to `RING_SPLIT.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3234,4 +3386,8 @@ its pass, the swapped readouts and the reads at `U` and `B`). The push's factors
 passes), `ring13` (`9f7edb09…`, the pass holding what the ring reads), `ring14` (`7d21f6f4…`, the one-bit
 founding, stopped) `ring15` (`1854df21…`, the precision founding, its join, readout, laps and
 reads, and the modes and training reads) and `ring16` (`d9711a49…`, the split, the readout's Newton
-rounds, its lap and reads).
+rounds, its lap and reads). The carriage uses `ring17` (`38c856bc…`, the fixed step), `ring18`
+(`63813946…`, the octave lines and the ceiling), `ring19` (`6e703b2f…`, refused), `ring20`
+(`9122131d…`, stopped), `ring21` (`bd8fba28…`, the closure founding, the ring under its key, the
+readout at one cosine and every read) and `ring22` (`6f0bbab7…`, the readout at five harmonics and
+its reads).
