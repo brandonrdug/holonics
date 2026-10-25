@@ -11,10 +11,12 @@ more than its first markers, hands over where to look; the exchange is communica
                         before their `=`
   sum-units TEXT OUT    on each line of the shape `digits+digits=digits`, the cell that codes the
                         result's units (it has heard the byte before them; `tower_modes.py`'s U)
+  sum-tens TEXT OUT     on each such line whose result has two places or more, the cell that codes
+                        the result's tens (it has heard the byte before them)
 
 OUT is written create-new.
 
-usage: python3 -I landmarks.py after-sum|sum-units TEXT OUT
+usage: python3 -I landmarks.py after-sum|sum-units|sum-tens TEXT OUT
 """
 import re
 import sys
@@ -41,11 +43,21 @@ def sum_units(text):
     return marks
 
 
+def sum_tens(text):
+    marks, start = bytearray(len(text)), 0
+    for line in text.split(b"\n"):
+        if SUM.match(line) and len(line) - line.index(b"=") - 1 >= 2:
+            marks[start + len(line) - 3] = 1
+        start += len(line) + 1
+    return marks
+
+
 def main():
-    if len(sys.argv) != 4 or sys.argv[1] not in ("after-sum", "sum-units"):
+    kinds = {"after-sum": after_sum, "sum-units": sum_units, "sum-tens": sum_tens}
+    if len(sys.argv) != 4 or sys.argv[1] not in kinds:
         raise SystemExit(__doc__.rsplit("usage: ", 1)[1])
     text = open(sys.argv[2], "rb").read()
-    marks = after_sum(text) if sys.argv[1] == "after-sum" else sum_units(text)
+    marks = kinds[sys.argv[1]](text)
     with open(sys.argv[3], "xb") as f:
         f.write(bytes(marks))
     print(f"{sys.argv[1]}: {sum(marks)} of {len(text)} cells marked")

@@ -1290,9 +1290,12 @@ struct Closure {
 /// the kernel mod `p` ([`echelon_mod`], one vector per free column) is read for the vector whose
 /// `ψ` takes the most values (a ring's turn names a class only where `ψ` separates them); the
 /// torsion primes' keys are joined by the Chinese remainder theorem over the subsets of primes in
-/// ascending product, and the first whose `ψ` is injective over the arriving classes is the key:
-/// its modulus the smallest the closure admits that separates every class. No modulus is
-/// proposed: the moduli are the closure's own torsion.
+/// descending product, and the first whose `ψ` is injective over the arriving classes is the key:
+/// the whole torsion where it separates every class. No modulus is proposed: the moduli are the
+/// closure's own torsion. The key once took the smallest separating modulus; at the sums' units
+/// that kept 10 of the torsion `110 = 2·5·11` and dropped the eleven, which reads the alternating
+/// digit sum and with the units fixes the sum modulo 110 (the newline closure record, §§2–3), so
+/// the key now keeps every torsion prime the closure located [agent-inferred, October 25].
 fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
     let found = closure_rows(p, origin);
     let mut slots: Vec<usize> = found.iter().flat_map(|(n, _)| n.iter().map(|&(q, _)| q)).collect();
@@ -1353,14 +1356,14 @@ fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
             keys.push((q, x));
         }
     }
-    // The subsets of the torsion primes in ascending product; the first injective joined key.
+    // The subsets of the torsion primes in descending product; the first injective joined key.
     let mut subsets: Vec<(i128, Vec<usize>)> = (1u32..1 << keys.len().min(16))
         .map(|bitset| {
             let members: Vec<usize> = (0..keys.len()).filter(|&j| bitset >> j & 1 == 1).collect();
             (members.iter().map(|&j| keys[j].0).product(), members)
         })
         .collect();
-    subsets.sort();
+    subsets.sort_by(|x, y| y.cmp(x));
     for (n, members) in subsets {
         // CRT: x ≡ x_j (mod q_j) for each member.
         let mut joined = vec![0i128; columns];
@@ -1834,42 +1837,109 @@ fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, u
     Ok((field(head, "state_sha256")?.to_string(), level, mode, ranks, pair_moves, key_modulus))
 }
 
-/// [agent-inferred, October 25] `join-tower-ring STATE STATE_SHA FORMS FORMS_SHA OUT`: join the
-/// ring ranks `FORMS` founded on the tower `STATE` (`found-tower-ring`'s output, refused when
-/// founded on another tower) as the tower's resident ring face
-/// ([`holonics::hnn::tower::RingFace`]), its readout at zero, and write the learner create-new to
-/// `OUT`. Each rank's face is its read as a ratio to its own power, so nothing is fitted to a
-/// passage; the joined tower codes every passage as the tower alone until its readout learns
-/// (`a_ring_faced_tower_opens_on_itself`). A ring whose moves a closure of modulus `n` founded is
-/// read through `⌊n/2⌋` harmonics of its turn ([`RingFace::with_harmonics`]): the key's characters,
-/// which place its residues apart.
+/// [agent-inferred, October 25] `join-tower-ring STATE STATE_SHA FORMS FORMS_SHA [FORMS FORMS_SHA
+/// …] OUT`: join the ring ranks each `FORMS` founded on the tower `STATE` (`found-tower-ring`'s
+/// output, refused when founded on another tower or on another level or mode than the first) as
+/// the tower's resident ring face ([`holonics::hnn::tower::RingFace`]), its readout at zero, and
+/// write the learner create-new to `OUT`. Each rank keeps the pair moves its own closure founded,
+/// so rings closed on different keys ride side by side on the one mode. Each rank's face is its
+/// read as a ratio to its own power, so nothing is fitted to a passage; the joined tower codes
+/// every passage as the tower alone until its readout learns (`a_ring_faced_tower_opens_on_itself`).
+/// A ring whose moves a closure of modulus `n` founded is read through `⌊n/2⌋` harmonics of its
+/// turn ([`RingFace::with_harmonics`]): the key's characters, which place its residues apart; the
+/// face reads every rank through the most any of its keys asks, or through `harmonics=H`, the
+/// characters a founded turn resolves when its spread blurs the higher ones (declared by the run,
+/// with its reading). With `readout=LEARNER,SHA` the readout of a ring-faced learner joined on the
+/// same tower, whose ranks are the leading ranks here (the same forms, moves and harmonics), stands
+/// in their channels: a ring joined beside one whose readout is already founded
+/// (`found-ring-readout … held=R`).
 pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
-    if args.len() != 6 {
-        return Err("join-tower-ring STATE STATE_SHA FORMS FORMS_SHA OUT".into());
+    let usage = "join-tower-ring STATE STATE_SHA FORMS FORMS_SHA [FORMS FORMS_SHA …] OUT [harmonics=H] [readout=LEARNER,SHA]";
+    let at = args.iter().position(|a| a.starts_with("harmonics=") || a.starts_with("readout=")).unwrap_or(args.len());
+    let (args, options) = args.split_at(at);
+    if args.len() < 6 || args.len() % 2 != 0 {
+        return Err(usage.into());
+    }
+    let (mut harmonics_set, mut readout_from): (Option<usize>, Option<(&str, &str)>) = (None, None);
+    for o in options {
+        if let Some(h) = o.strip_prefix("harmonics=") {
+            harmonics_set = Some(h.parse()?);
+        } else if let Some(r) = o.strip_prefix("readout=") {
+            readout_from = Some(r.split_once(',').ok_or(usage)?);
+        } else {
+            return Err(usage.into());
+        }
     }
     let started = std::time::Instant::now();
+    let out_path = &args[args.len() - 1];
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    let forms = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    if std::path::Path::new(&args[5]).exists() {
+    if std::path::Path::new(out_path).exists() {
         return Err("OUT exists: the joined learner is written create-new".into());
     }
     let d = learner.tower.declaration.clone();
-    let (founded_on, level, mode, ranks, pair_moves, key_modulus) = read_forms(std::str::from_utf8(&forms)?, 2 * d.modes, d.width)?;
-    if founded_on != args[2] {
-        return Err("the forms were founded on another tower: the moves they ride and the encoding their pools read are this one's only".into());
+    let mut placement: Option<(usize, usize)> = None;
+    let (mut ranks, mut tables, mut keys) = (Vec::new(), Vec::new(), Vec::new());
+    for pair in args[3..args.len() - 1].chunks(2) {
+        let forms = pinned_read(&pair[0], &pair[1], READ_BUDGET as usize)?;
+        let (founded_on, level, mode, founded, pair_moves, key_modulus) = read_forms(std::str::from_utf8(&forms)?, 2 * d.modes, d.width)?;
+        if founded_on != args[2] {
+            return Err("the forms were founded on another tower: the moves they ride and the encoding their pools read are this one's only".into());
+        }
+        if placement.is_some_and(|p| p != (level, mode)) {
+            return Err("the rings ride one level's mode: forms founded on another placement".into());
+        }
+        placement = Some((level, mode));
+        tables.extend(std::iter::repeat_n(pair_moves, founded.len()));
+        ranks.extend(founded);
+        keys.push(key_modulus);
     }
+    let (level, mode) = placement.ok_or("no forms")?;
     let n = ranks.len();
     let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| learner.tower.encoding(u).to_vec()).collect();
     let mut out = learner;
-    let n_moves = pair_moves.len();
-    let harmonics = key_modulus.map_or(1, |n| (n / 2).max(1));
-    let face = RingFace::new(&d, level, mode, ranks, opening, pair_moves).and_then(|f| f.with_harmonics(harmonics)).map_err(|e| e.to_string())?;
+    let moves: Vec<usize> = tables.iter().map(Vec::len).collect();
+    let harmonics = harmonics_set.unwrap_or_else(|| keys.iter().map(|k| k.map_or(1, |n| (n / 2).max(1))).max().unwrap_or(1));
+    let face = RingFace::new(&d, level, mode, ranks, opening, tables).and_then(|f| f.with_harmonics(harmonics)).map_err(|e| e.to_string())?;
     out.join_ring_face(face).map_err(|e| e.to_string())?;
+    let mut carried = 0usize;
+    if let Some((path, sha)) = readout_from {
+        let source = TowerLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+        let (st, nt) = (&source.tower, &out.tower);
+        let refused = "readout=: a learner whose ring face is this one's leading ranks, joined on the same tower";
+        let (sf, nf) = (st.ring_face().ok_or(refused)?, nt.ring_face().ok_or(refused)?);
+        let (sr, nr) = (st.ring_family().ok_or(refused)?, nt.ring_family().ok_or(refused)?);
+        let (sfac, nfac) = (st.ring_factor_family().ok_or(refused)?, nt.ring_factor_family().ok_or(refused)?);
+        let r0 = sf.ranks();
+        let same = st.declaration == nt.declaration
+            && sr.start == nr.start
+            && st.theta[..sr.start] == nt.theta[..nr.start]
+            && r0 < nf.ranks()
+            && sf.placement() == nf.placement()
+            && sf.harmonics() == nf.harmonics()
+            && sf.pair_moves() == &nf.pair_moves()[..r0]
+            && st.theta[sfac.clone()] == nt.theta[nfac.start..nfac.start + sfac.len()];
+        if !same {
+            return Err(refused.into());
+        }
+        let (ks, kn) = (sf.channels(d.width), nf.channels(d.width));
+        let (cs, cn) = (ks / (d.width + 1), kn / (d.width + 1));
+        let mut readout = vec![0i32; d.alphabet * kn];
+        for u in 0..d.alphabet {
+            for x in 0..=d.width {
+                let from = sr.start + u * ks + x * cs;
+                readout[u * kn + x * cn..u * kn + x * cn + cs].copy_from_slice(&st.theta[from..from + cs]);
+            }
+        }
+        carried = r0;
+        out.tower.open_ring_readout(&readout).map_err(|e| e.to_string())?;
+    }
     let written = out.to_text();
-    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[5])?, written.as_bytes())?;
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(out_path)?, written.as_bytes())?;
+    let join = |v: Vec<String>| v.join(",");
     println!(
-        "RING_JOIN level={level} mode={mode} ranks={n} pair_moves={n_moves} key_modulus={} harmonics={harmonics} material={} sha256={} elapsed_ms={}",
-        key_modulus.map_or("none".to_string(), |n| n.to_string()),
+        "RING_JOIN level={level} mode={mode} ranks={n} pair_moves={} key_moduli={} harmonics={harmonics} readout_carried_ranks={carried} material={} sha256={} elapsed_ms={}",
+        join(moves.iter().map(usize::to_string).collect()),
+        join(keys.iter().map(|k| k.map_or("none".to_string(), |n| n.to_string())).collect()),
         out.tower.theta.len(),
         sha256(written.as_bytes())?,
         started.elapsed().as_millis()
@@ -2027,12 +2097,19 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
 /// its sections' own covector statistics ([`TowerLearner::open_moments`]): a founded family opened
 /// with zero moments is undone by its first steps. The learner, its readout opened there
 /// ([`Tower::open_ring_readout`]), is written to OUT (created, never overwritten).
+/// With `held=R` the leading `R` ranks' readout stands as the tower holds it and only the later
+/// ranks' channels are founded (a ring joined beside one already founded).
 pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     use holonics::hnn::keyed_modes::Exponential;
     use holonics::hnn::tower::TowerFace;
     use holonics::ratio::Rat;
-    if args.len() != 8 {
-        return Err("found-ring-readout STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION OUT".into());
+    let held: usize = match args.get(8).map(|a| a.strip_prefix("held=")) {
+        None => 0,
+        Some(Some(h)) if args.len() == 9 => h.parse()?,
+        _ => return Err("found-ring-readout STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION OUT [held=R]".into()),
+    };
+    if args.len() != 8 && args.len() != 9 {
+        return Err("found-ring-readout STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION OUT [held=R]".into());
     }
     let started = std::time::Instant::now();
     let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -2048,22 +2125,56 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     let tower = &learner.tower;
     let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
     let face = tower.ring_face().ok_or("found-ring-readout needs a ring-faced tower")?;
-    let k = face.channels(w);
-    // The channels by the harmonic they read: column `j` of `ρ` (rank by rank `2H` parts) reads
-    // harmonic `(j mod 2H) / 2`.
+    let k_all = face.channels(w);
     let (ring_cols, h2) = (2 * face.ranks() * face.harmonics(), 2 * face.harmonics());
-    let harmonic_blocks: Vec<Vec<usize>> = (0..face.harmonics()).map(|h| (0..k).filter(|&i| (i % ring_cols) % h2 / 2 == h).collect()).collect();
-    if tower.ring_family().is_some_and(|family| tower.theta[family.start..family.start + a * k].iter().any(|&v| v != 0)) {
-        return Err("found-ring-readout founds the readout of a joined ring, at zero".into());
+    // [agent-inferred, October 25] With `held=R` the leading `R` ranks' readout is held as the
+    // tower holds it (founded on this passage already, to its precision) and only the later
+    // ranks' channels are founded, from the face the held part already moves: a coordinate step
+    // on the blocks that are not yet founded. Founding the held rank again would move it little.
+    // Holding it drops the curvature between the ranks' channels, as between two harmonics, so
+    // each harmonic's block keeps one rank's width: with two ranks, a quarter of the curvature and
+    // an eighth of the solves of founding both, when a ring joins one already founded.
+    if held >= face.ranks() {
+        return Err("held=R holds fewer ranks than the face has: one rank at least is founded".into());
+    }
+    let founded_ch: Vec<usize> = (0..k_all).filter(|&c| c % ring_cols >= held * h2).collect();
+    let k = founded_ch.len();
+    // The founded channels by the harmonic they read: column `j` of `ρ` (rank by rank `2H` parts)
+    // reads harmonic `(j mod 2H) / 2`.
+    let harmonic_blocks: Vec<Vec<usize>> = (0..face.harmonics()).map(|h| (0..k).filter(|&i| (founded_ch[i] % ring_cols) % h2 / 2 == h).collect()).collect();
+    let family = tower.ring_family().ok_or("found-ring-readout needs a ring-faced tower")?;
+    let holding: Vec<i32> = tower.theta[family.start..family.start + a * k_all].to_vec();
+    if (0..a).any(|u| founded_ch.iter().any(|&c| holding[u * k_all + c] != 0)) {
+        return Err("found-ring-readout founds the readout of a joined ring, at zero (a held rank's may stand)".into());
     }
     let cells = classes.len().saturating_sub(1);
-    let (mut nexts, mut phis, mut masses) = (Vec::with_capacity(cells), Vec::with_capacity(cells * k), Vec::with_capacity(cells * a));
+    // Each cell keeps its pair read's two factors, the top face's ratio with its unit (`w + 1`) and
+    // the ring's read (`ring_cols`), and its channels are their products, read where they are used:
+    // `φ_t[x · ring_cols + j] = ⌊x̂_t[x] ρ_t[j]⌉ 2^(−FACE_BITS)`, [`RingFace::pair_read`]'s law, checked
+    // against it at every cell as the passage is read. Kept whole, `φ` is `k` words a cell, and at a
+    // key's every harmonic (`k = 65 · 2 · 55` at modulus 110) the passage's `φ` would outgrow the
+    // host; its factors are `w + 1 + ring_cols` [agent-inferred, October 25].
+    let xs = w + 1;
+    let channel_of = |i: usize| (i / ring_cols, i % ring_cols);
+    let (mut nexts, mut hats, mut rhos, mut masses) = (Vec::with_capacity(cells), Vec::with_capacity(cells * xs), Vec::with_capacity(cells * ring_cols), Vec::with_capacity(cells * a));
     let mut code_before = 0i64;
     tower
         .read_ring(&mut tower.rest(), &classes, |i, top, face, ring| {
             let (_, rho) = ring.ok_or(TowerError::Refused("a ring read at every cell of a ring-faced tower"))?;
-            let (phi, _, _) = RingFace::pair_read(top, rho)?;
-            phis.extend(phi);
+            let (phi, hat, _) = RingFace::pair_read(top, rho)?;
+            if phi.iter().any(|v| v.unsigned_abs() >= 1 << 21) {
+                return Err(TowerError::Refused("a ring's pair read past 2^21 of its grain: the moments' reach is owed"));
+            }
+            let unit = 1i32 << FACE_BITS;
+            let x_of = |x: usize| if x < hat.len() { hat[x] } else { unit };
+            if hat.len() + 1 != xs || rho.len() != ring_cols || (0..k_all).any(|c| {
+                let (x, j) = channel_of(c);
+                release(x_of(x) as i128 * rho[j] as i128, FACE_BITS) != phi[c] as i128
+            }) {
+                return Err(TowerError::Refused("a pair read that its factors do not give"));
+            }
+            hats.extend(hat.iter().copied().chain(std::iter::once(unit)));
+            rhos.extend_from_slice(rho);
             // A face's masses are on 2^(−62) below its largest, so each fits 64 bits.
             masses.extend(face.masses.iter().map(|&m| m as u64));
             nexts.push(classes[i + 1]);
@@ -2073,9 +2184,11 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
         .map_err(|e| e.to_string())?;
     let read_ms = started.elapsed().as_millis();
     let n = nexts.len();
-    if phis.iter().any(|v| v.unsigned_abs() >= 1 << 21) {
-        return Err("a ring's pair read past 2^21 of its grain: the moments' reach is owed".into());
-    }
+    // Cell `t`'s founded channel `c`.
+    let phi_at = |t: usize, c: usize| -> i128 {
+        let (x, j) = channel_of(founded_ch[c]);
+        release(hats[t * xs + x] as i128 * rhos[t * ring_cols + j] as i128, FACE_BITS)
+    };
     let mut arrives = vec![false; a];
     nexts.iter().for_each(|&c| arrives[c] = true);
     let reached: Vec<usize> = (0..a).filter(|&c| arrives[c]).collect();
@@ -2100,12 +2213,17 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     // Each cell's ring part at the readout `wr` (the arriving classes' rows, `r · k`).
     let offsets = |wr: &[i64]| -> Vec<i64> {
         let mut out = vec![0i64; n * r];
-        out.par_chunks_mut(r).enumerate().for_each(|(t, o)| {
-            let phi = &phis[t * k..(t + 1) * k];
-            for (j, slot) in o.iter_mut().enumerate() {
-                *slot = release(wr[j * k..(j + 1) * k].iter().zip(phi).map(|(&x, &y)| x as i128 * y as i128).sum(), 24) as i64;
-            }
-        });
+        out.par_chunks_mut(r).enumerate().for_each_init(
+            || vec![0i128; k],
+            |phi, (t, o)| {
+                for (c, v) in phi.iter_mut().enumerate() {
+                    *v = phi_at(t, c);
+                }
+                for (j, slot) in o.iter_mut().enumerate() {
+                    *slot = release(wr[j * k..(j + 1) * k].iter().zip(phi.iter()).map(|(&x, &y)| x as i128 * y).sum(), 24) as i64;
+                }
+            },
+        );
         out
     };
     let code_at = |offs: &[i64]| -> i64 { (0..n).into_par_iter().map(|t| face_of(t, &offs[t * r..(t + 1) * r]).code(nexts[t])).sum() };
@@ -2156,32 +2274,52 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
                 let channels = &harmonic_blocks[b];
                 let kb = channels.len();
                 let (mut h, mut m) = (vec![0i128; kb * kb], vec![0i128; kb]);
-                let mut x = vec![0i128; kb];
+                // [agent-inferred, October 25] A curvature term is below 2^52 (|φ| < 2^21 and the
+                // curvature on its grain at most 2^10) and a covector term below 2^45 (|y| ≤ 2^24),
+                // so 2^11 cells' terms sum inside 64 bits. The sums are carried 64 bits wide and
+                // cross into 128 every 2^11 live cells: a carrier as wide as its terms need, and
+                // the same integers, since the sum is exact in any grouping. At 128 bits throughout
+                // the four media's curvature took 1,087 s a round.
+                const CROSSING: usize = 1 << 11;
+                let (mut h64, mut m64) = (vec![0i64; kb * kb], vec![0i64; kb]);
+                let cross = |h: &mut [i128], m: &mut [i128], h64: &mut [i64], m64: &mut [i64]| {
+                    for (wide, part) in h.iter_mut().zip(h64.iter_mut()).chain(m.iter_mut().zip(m64.iter_mut())) {
+                        *wide += *part as i128;
+                        *part = 0;
+                    }
+                };
+                let mut x = vec![0i64; kb];
+                let mut pending = 0usize;
                 for t in 0..n {
-                    let p = probs[t * r + j] as i128;
+                    let p = probs[t * r + j];
                     let y = p - if nexts[t] == c { 1 << 24 } else { 0 };
-                    let curvature = (p * ((1 << 24) - p) + (1 << 35)) >> 36;
+                    let curvature = ((p as i128 * ((1i128 << 24) - p as i128) + (1 << 35)) >> 36) as i64;
                     if y == 0 && curvature == 0 {
                         continue;
                     }
-                    let phi = &phis[t * k..(t + 1) * k];
                     for (slot, &i) in x.iter_mut().zip(channels) {
-                        *slot = phi[i] as i128;
+                        *slot = phi_at(t, i) as i64;
                     }
                     for i in 0..kb {
                         let xi = x[i];
                         if xi == 0 {
                             continue;
                         }
-                        m[i] += xi * y;
+                        m64[i] += xi * y;
                         if curvature != 0 {
                             let xc = xi * curvature;
-                            for l in i..kb {
-                                h[i * kb + l] += xc * x[l];
+                            for (slot, &xl) in h64[i * kb + i..(i + 1) * kb].iter_mut().zip(&x[i..]) {
+                                *slot += xc * xl;
                             }
                         }
                     }
+                    pending += 1;
+                    if pending == CROSSING {
+                        cross(&mut h, &mut m, &mut h64, &mut m64);
+                        pending = 0;
+                    }
                 }
+                cross(&mut h, &mut m, &mut h64, &mut m64);
                 ((j, b), h, m)
             })
             .collect();
@@ -2202,6 +2340,24 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
             })
             .collect::<std::result::Result<_, String>>()?;
         println!("RING_READOUT_PHASE round={round} phase=solve elapsed_ms={}", started.elapsed().as_millis());
+        // What each harmonic's Newton step would save, summed over the rows: the quadratic model's
+        // `½ gᵀ H⁻¹ g` of the code is `2^(−37) mᵀ H⁻¹ m` nats (`g = m 2^(−64)` bits a readout unit,
+        // the code's curvature `ln 2 · H · 2^(−92)`), on its own block. A reading of where the
+        // passage's code lies on the ring's harmonics, before the trust and the line; nothing
+        // chooses by it [agent-inferred, October 25].
+        let mut predicted = vec![BigInt::zero(); harmonic_blocks.len()];
+        for ((id, _, m), (_, det, y)) in blocks.iter().zip(&solved) {
+            if det.is_zero() {
+                continue;
+            }
+            let num: BigInt = m.iter().zip(y).map(|(&mi, yi)| BigInt::from(mi) * yi).sum();
+            let (num, den) = if det.is_negative() { (-num, -det.clone()) } else { (num, det.clone()) };
+            predicted[id.1] += div_round(&(num * 1000), &(den << 37u32));
+        }
+        println!(
+            "RING_READOUT_HARMONICS round={round} predicted_millinats={}",
+            predicted.iter().enumerate().map(|(h, v)| format!("{}:{v}", h + 1)).collect::<Vec<_>>().join(",")
+        );
         // Each row on its own scale [agent-inferred, October 25]. One lift for every row let the
         // widest row (a class rare in the passage, its curvature thin where its covector is not)
         // set the scale, and every other row's direction rounded to zero. Row `j`'s direction is
@@ -2220,10 +2376,10 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
             }
             break;
         }
+        // A lift is bounded by the widths the solve already holds (`|ℓ_j| ≤ 20 + bits(y) + bits(det)`),
+        // and how far a row's step can lie from the others' grain is refused where it would leave its
+        // carrier: the lifted entry's 64 bits and the scale's 128 below.
         let lifts: Vec<i64> = widest.iter().map(|w| w.map_or(0, |w| 20 - w)).collect();
-        if lifts.iter().any(|l| l.abs() > 100) {
-            return Err("a row's direction lies past 2^100 of the others' grain".into());
-        }
         let mut lifted = vec![0i64; r * k];
         for ((j, b), det, y) in &solved {
             if det.is_zero() {
@@ -2400,11 +2556,11 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
             break;
         }
     }
-    drop((masses, phis, offs));
-    let mut readout = vec![0i32; a * k];
+    drop((masses, hats, rhos, offs));
+    let mut readout = holding;
     for (j, &c) in reached.iter().enumerate() {
-        for i in 0..k {
-            readout[c * k + i] = i32::try_from(wr[j * k + i]).map_err(|_| "a founded readout entry outgrew its 32-bit carrier".to_string())?;
+        for (i, &ch) in founded_ch.iter().enumerate() {
+            readout[c * k_all + ch] = i32::try_from(wr[j * k + i]).map_err(|_| "a founded readout entry outgrew its 32-bit carrier".to_string())?;
         }
     }
     learner.tower.open_ring_readout(&readout).map_err(|e| e.to_string())?;
@@ -2422,7 +2578,7 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     let written = learner.to_text();
     std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[7])?, written.as_bytes())?;
     println!(
-        "RING_READOUT cells={n} channels={k} arriving_classes={r} free={free} rounds={round} kappas_on_2^-16={} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={current} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} elapsed_ms={}",
+        "RING_READOUT cells={n} channels={k} held_ranks={held} arriving_classes={r} free={free} rounds={round} kappas_on_2^-16={} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={current} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} elapsed_ms={}",
         kappas.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(","),
         readout.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0),
         sha256(written.as_bytes())?,
