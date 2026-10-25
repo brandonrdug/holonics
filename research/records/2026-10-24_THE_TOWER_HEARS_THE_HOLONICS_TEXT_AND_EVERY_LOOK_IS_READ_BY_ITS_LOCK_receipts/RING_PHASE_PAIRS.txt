@@ -1,0 +1,20 @@
+== ring/at11_ring_founded11_state
+B units by nearest mean direction: 379 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.972
+B each units class's resultant: 0.93 0.87 0.96 0.91 0.92 0.87 0.89 0.97 0.89 0.96
+B each units class's mean angle (degrees): 216 175 138 97 61 21 351 314 285 252
+U units by nearest mean direction: 339 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.968
+U each units class's resultant: 0.85 0.90 0.97 0.81 0.91 0.91 0.95 0.97 0.88 0.94
+U each units class's mean angle (degrees): 45 95 121 158 194 244 279 301 325 354
+B: a turn for A's digit plus a turn for B's leaves |degrees| median 5.8, largest 32.8
+B: A's digits' turns from digit 0 (degrees): 0 318 282 242 207 179 140 101 73 39
+B: B's digits' turns from digit 0 (degrees): 0 319 285 251 216 179 140 105 80 42
+== ring/at13_ring-reads
+B units by nearest mean direction: 313 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.960
+B each units class's resultant: 0.86 0.89 0.96 0.83 0.95 0.91 0.85 0.84 0.82 0.89
+B each units class's mean angle (degrees): 210 166 141 99 72 34 5 318 283 244
+U units by nearest mean direction: 281 of 495 | median resultant within a pair of operands' units (3 or more sums): 0.949
+U each units class's resultant: 0.81 0.90 0.97 0.86 0.89 0.78 0.75 0.86 0.79 0.85
+U each units class's mean angle (degrees): 60 104 119 152 181 224 262 300 326 7
+B: a turn for A's digit plus a turn for B's leaves |degrees| median 7.0, largest 39.9
+B: A's digits' turns from digit 0 (degrees): 0 314 292 248 214 166 127 97 73 43
+B: B's digits' turns from digit 0 (degrees): 0 325 290 261 219 177 141 107 75 39

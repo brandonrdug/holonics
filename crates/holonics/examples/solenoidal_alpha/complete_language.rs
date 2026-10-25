@@ -818,6 +818,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_at(args),
         Some("read-tower-cells") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_cells(args),
         Some("found-ring-readout") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_ring_readout(args),
+        Some("pass-ring-held") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::pass_ring_held(args),
         Some("read-tower-situated-moments") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated_moments(args),
         Some("read-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated(args),
         Some("read-tower-input-covectors") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_input_covectors(args),

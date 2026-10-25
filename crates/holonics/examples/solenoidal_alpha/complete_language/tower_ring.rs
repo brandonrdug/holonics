@@ -1164,10 +1164,10 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
 /// least: doubled from the direction's grain while the code falls, then narrowed by golden section
 /// to `2^(−8)` of the bracket, each code read from the face's masses carried through the
 /// direction's exponential (a founding's reading at the masses' grain; the joined tower's own read
-/// measures the result). The readout's moments are then opened on the same passage, partitioned
-/// as a training pass reads it (`STREAMS` streams of `SECTION` cells a section), at its sections'
-/// own covector statistics ([`TowerLearner::open_moments`]): a founded family opened with zero
-/// moments is undone by its first steps. The learner, its readout opened there
+/// measures the result). The ring's moments, its readout's and its factors', are then opened on
+/// the same passage, partitioned as a training pass reads it (`STREAMS` streams of `SECTION` cells
+/// a section), at its sections' own covector statistics ([`TowerLearner::open_moments`]): a founded
+/// family opened with zero moments is undone by its first steps. The learner, its readout opened there
 /// ([`Tower::open_ring_readout`]), is written to OUT (created, never overwritten).
 pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     use holonics::hnn::keyed_modes::Exponential;
@@ -1349,7 +1349,7 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     let sections: Vec<Vec<&[usize]>> = (0..(chunk - 1) / section)
         .map(|k| (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect())
         .collect();
-    let family = learner.tower.ring_readout_family().ok_or("a ring-faced tower has a readout")?;
+    let family = learner.tower.ring_family().ok_or("a ring-faced tower has a ring")?;
     let mut states: Vec<_> = (0..streams).map(|_| learner.tower.rest()).collect();
     let read_sections = learner.open_moments(family.clone(), &mut states, &sections).map_err(|e| e.to_string())?;
     let moments_ms = moments_started.elapsed().as_millis();
@@ -1358,6 +1358,77 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
     println!(
         "RING_READOUT cells={n} channels={k} kappa_on_2^-16={best} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={best_code} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} solve_ms={solve_ms} elapsed_ms={}",
         readout.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0),
+        sha256(written.as_bytes())?,
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// [agent-inferred, October 25] **One pass with a declared hold** (`pass-ring-held STATE
+/// STATE_SHA TRAIN TRAIN_SHA STREAMS SECTION HOLD OUT`), a foil that separates which families'
+/// steps carry the pass's change: the learner reads TRAIN once on the training pass's partition
+/// (`STREAMS` streams of `SECTION` cells a section from rest, the streams carried), certifying
+/// each section as a training pass does, with `HOLD` declaring what does not deposit:
+/// `all-but-readouts` deposits only the tower's readout and bias and the ring's readout `W`;
+/// `ring-readout` deposits everything but `W`; `ring-reads` holds the material the ring's push reads
+/// ([`Tower::ring_read_families`]) and deposits the rest. The learner is written to OUT (created, never
+/// overwritten); the code before and after each section are summed into the pass's receipt.
+pub(super) fn pass_ring_held(args: &[String]) -> Result<()> {
+    if args.len() != 9 {
+        return Err("pass-ring-held STATE STATE_SHA TRAIN TRAIN_SHA STREAMS SECTION HOLD OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let (streams, section): (usize, usize) = (args[5].parse()?, args[6].parse()?);
+    if streams == 0 || section == 0 || text.len() < streams * (section + 1) {
+        return Err("the passage must hold one section a stream".into());
+    }
+    if std::path::Path::new(&args[8]).exists() {
+        return Err("OUT exists: the learner is written create-new".into());
+    }
+    let tower = &learner.tower;
+    let ring = tower.ring_family().ok_or("pass-ring-held needs a ring-faced tower")?;
+    let factors = tower.ring_factor_family().ok_or("pass-ring-held needs a ring-faced tower")?;
+    let w = ring.start..factors.start;
+    let readout = tower.readout_family();
+    let len = tower.theta.len();
+    learner.held = match args[7].as_str() {
+        "all-but-readouts" => {
+            let mut moving = [readout, w];
+            moving.sort_by_key(|r| r.start);
+            let mut held = Vec::new();
+            let mut at = 0;
+            for m in moving {
+                held.push(at..m.start);
+                at = m.end;
+            }
+            held.push(at..len);
+            held
+        }
+        "ring-readout" => vec![w],
+        "ring-reads" => tower.ring_read_families(),
+        _ => return Err("HOLD is all-but-readouts, ring-readout or ring-reads".into()),
+    };
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let chunk = classes.len() / streams;
+    let mut states: Vec<_> = (0..streams).map(|_| learner.tower.rest()).collect();
+    let (mut before, mut after, mut deposits, mut cells) = (0i64, 0i64, 0usize, 0usize);
+    let sections = (chunk - 1) / section;
+    for k in 0..sections {
+        let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect();
+        let receipt = learner.section(&mut states, &parts).map_err(|e| e.to_string())?;
+        before += receipt.code_before;
+        after += receipt.code_after;
+        deposits += receipt.deposited as usize;
+        cells += receipt.cells;
+    }
+    learner.held = Vec::new();
+    let written = learner.to_text();
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?, written.as_bytes())?;
+    println!(
+        "RING_HELD_PASS hold={} sections={sections} deposits={deposits} cells={cells} code_before_on_2^-20={before} code_after_on_2^-20={after} sha256={} elapsed_ms={}",
+        args[7],
         sha256(written.as_bytes())?,
         started.elapsed().as_millis()
     );

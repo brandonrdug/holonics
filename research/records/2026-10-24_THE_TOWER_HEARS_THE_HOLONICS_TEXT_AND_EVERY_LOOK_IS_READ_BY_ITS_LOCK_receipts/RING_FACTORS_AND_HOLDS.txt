@@ -1,0 +1,41 @@
+# ring11: the factors joined as material, the readout founded with the whole ring's moments, one block pass, reads
+RING_JOIN level=0 mode=41 ranks=1 material=232579 sha256=8ed721b4d22bf42ec9856e797bd749310619ca604517581ac5ac7d5a0f295599 elapsed_ms=244
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=48508
+RING_READOUT cells=216130 channels=130 kappa_on_2^-16=849322 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=506756477621 evaluations=37 largest=7482693 moment_sections=211 moments_ms=41456 sha256=3d3fa029b31d54e05cdf6509e2d50513c13351685960295607823fba53b1f656 read_ms=70052 solve_ms=13377 elapsed_ms=161063
+MEASURE exit=0 wall_s=161.1 peak_rss_kib=1292360
+TOWER_PASS pass=0 train_bits_a_byte=2.252 dev_bits_a_byte=3.057 dev_regions Q=3.843 P=3.170 N=3.028 M=2.186 deposits=211/211 pass_ms=73721 elapsed_ms=73817
+TOWER_DONE state_bytes=8062329 state_sha256=9610278ea86d518d91792997d6c5c8c7944f8fe29dd106ad1f39d5f83f23913a elapsed_ms=73972
+MEASURE exit=0 wall_s=74.1 peak_rss_kib=161592
+ring/founded11.state: units right 257 of 495, 2.229 bits a digit; whole held-out text 2.436 bits a byte
+ring/at11_ring_founded11_state.U.txt:MEASURE exit=0 wall_s=3.8 peak_rss_kib=24460
+ring/at11_ring_founded11_state.B.txt:MEASURE exit=0 wall_s=4.0 peak_rss_kib=23404
+ring/at11_ring_founded11_state.dev.txt:MEASURE exit=0 wall_s=15.9 peak_rss_kib=24344
+ring/at11_ring_founded11_state.B.txt outside read of the sum's units at B: 379 of 495
+ringtrain11/STATE.0: units right 55 of 495, 3.293 bits a digit; whole held-out text 3.033 bits a byte
+ring/at11_ringtrain11_STATE_0.U.txt:MEASURE exit=0 wall_s=4.2 peak_rss_kib=24368
+ring/at11_ringtrain11_STATE_0.B.txt:MEASURE exit=0 wall_s=3.9 peak_rss_kib=24384
+ring/at11_ringtrain11_STATE_0.dev.txt:MEASURE exit=0 wall_s=15.8 peak_rss_kib=24464
+ring/at11_ringtrain11_STATE_0.B.txt outside read of the sum's units at B: 62 of 495
+# ring12: two held passes from ring/founded11.state, run together, then reads
+RING_HELD_PASS hold=all-but-readouts sections=211 deposits=211 cells=216064 code_before_on_2^-20=496244596705 code_after_on_2^-20=491950588124 sha256=acbf5db2643040b8756f3f7a2aa1cf8dfa592b7ababa8fb620a804f4e328e25d elapsed_ms=111966
+MEASURE exit=0 wall_s=112.0 peak_rss_kib=193300
+RING_HELD_PASS hold=ring-readout sections=211 deposits=211 cells=216064 code_before_on_2^-20=508136898409 code_after_on_2^-20=498767099266 sha256=7d976bd68a53ce1713c994d1a5213a25557aba65e66c521b611539f6a3dd2782 elapsed_ms=111775
+MEASURE exit=0 wall_s=111.8 peak_rss_kib=196060
+all-but-readouts: units right 253 of 495, 2.039 bits a digit; whole held-out text 2.512 bits a byte
+ring/at12_all-but-readouts.U.txt:MEASURE exit=0 wall_s=3.7 peak_rss_kib=24416
+ring/at12_all-but-readouts.B.txt:MEASURE exit=0 wall_s=3.9 peak_rss_kib=24480
+ring/at12_all-but-readouts.dev.txt:MEASURE exit=0 wall_s=15.4 peak_rss_kib=24324
+ring/at12_all-but-readouts.B.txt outside read of the sum's units at B: 379 of 495
+ring-readout: units right 75 of 495, 3.277 bits a digit; whole held-out text 2.860 bits a byte
+ring/at12_ring-readout.U.txt:MEASURE exit=0 wall_s=3.7 peak_rss_kib=24160
+ring/at12_ring-readout.B.txt:MEASURE exit=0 wall_s=3.8 peak_rss_kib=24296
+ring/at12_ring-readout.dev.txt:MEASURE exit=0 wall_s=14.9 peak_rss_kib=24244
+ring/at12_ring-readout.B.txt outside read of the sum's units at B: 51 of 495
+# ring13: one held pass (what the ring reads), then reads
+RING_HELD_PASS hold=ring-reads sections=211 deposits=211 cells=216064 code_before_on_2^-20=494295124379 code_after_on_2^-20=483840205122 sha256=01e33c84640191b635655acb0d97a7ba39966e81586f12c3def930d886afbefe elapsed_ms=70670
+MEASURE exit=0 wall_s=70.7 peak_rss_kib=159784
+ring-reads: units right 258 of 495, 1.729 bits a digit; whole held-out text 2.712 bits a byte
+ring/at13_ring-reads.U.txt:MEASURE exit=0 wall_s=3.9 peak_rss_kib=24692
+ring/at13_ring-reads.B.txt:MEASURE exit=0 wall_s=4.1 peak_rss_kib=24644
+ring/at13_ring-reads.dev.txt:MEASURE exit=0 wall_s=16.3 peak_rss_kib=24600
+ring/at13_ring-reads.B.txt outside read of the sum's units at B: 313 of 495
