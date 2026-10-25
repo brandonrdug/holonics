@@ -1,0 +1,39 @@
+# RING_READOUT_LAW.py on the every-cell reads (read-tower-cells, binary cells8) of the ring-joined tower (joined7) and of the foil after its block pass with the same forms joined (diag_foil_joined)
+== joined7
+cells train=216130 held=11997 at U=495 classes=15+rest
+gate at held U: mean 0.582, elsewhere 0.018
+tower alone: right 48/495, bits a digit at U 3.488, held bits a byte 2.300
+bias         right  55/495  bits/digit at U 3.394  held bits/byte 2.276  train bits/byte 2.261  (21 s)
+ring         right  96/495  bits/digit at U 3.223  held bits/byte 2.271  train bits/byte 2.256  (29 s)
+top          right  71/495  bits/digit at U 3.357  held bits/byte 2.207  train bits/byte 2.191  (39 s)
+top+ring     right 115/495  bits/digit at U 3.164  held bits/byte 2.203  train bits/byte 2.187  (41 s)
+gate(x)ring  right 281/495  bits/digit at U 2.094  held bits/byte 2.230  train bits/byte 2.219  (38 s)
+top(x)ring   right 309/495  bits/digit at U 1.916  held bits/byte 2.156  train bits/byte 2.134  (83 s)
+== foil
+cells train=216130 held=11997 at U=495 classes=15+rest
+gate at held U: mean 0.705, elsewhere 0.014
+tower alone: right 72/495, bits a digit at U 3.267, held bits a byte 2.162
+bias         right  74/495  bits/digit at U 3.258  held bits/byte 2.155  train bits/byte 2.145  (19 s)
+ring         right  77/495  bits/digit at U 3.251  held bits/byte 2.155  train bits/byte 2.145  (27 s)
+top          right  73/495  bits/digit at U 3.219  held bits/byte 2.117  train bits/byte 2.107  (37 s)
+top+ring     right  75/495  bits/digit at U 3.213  held bits/byte 2.117  train bits/byte 2.106  (38 s)
+gate(x)ring  right  89/495  bits/digit at U 3.227  held bits/byte 2.154  train bits/byte 2.143  (37 s)
+top(x)ring   right  80/495  bits/digit at U 3.165  held bits/byte 2.122  train bits/byte 2.097  (85 s)
+# RING_READOUT_CLOSED.py on joined7's reads
+least squares x 1: right  74/495 bits/digit at U 3.325 held bits/byte 2.278
+least squares x 2: right 100/495 bits/digit at U 3.173 held bits/byte 2.258
+least squares x 4: right 169/495 bits/digit at U 2.901 held bits/byte 2.228
+least squares x 8: right 243/495 bits/digit at U 2.475 held bits/byte 2.208
+least squares x16: right 257/495 bits/digit at U 1.983 held bits/byte 2.289
+least squares x32: right 239/495 bits/digit at U 1.757 held bits/byte 2.712
+newton per class: right 190/495 bits/digit at U 2.529 held bits/byte 2.350 (8 s)
+fitted 1500: right 292/495 bits/digit at U 1.916 held bits/byte 2.157 (293 s)
+# the every-cell reads (read-tower-cells, cells8): joined7 train, joined7 held, foil train, foil held
+TOWER_CELLS cells=216130 width=64 ring_channels=2 alphabet=256 elapsed_ms=65771
+MEASURE exit=0 wall_s=65.8 peak_rss_kib=22768
+TOWER_CELLS cells=11997 width=64 ring_channels=2 alphabet=256 elapsed_ms=3786
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=22516
+TOWER_CELLS cells=216130 width=64 ring_channels=2 alphabet=256 elapsed_ms=68354
+MEASURE exit=0 wall_s=68.4 peak_rss_kib=22472
+TOWER_CELLS cells=11997 width=64 ring_channels=2 alphabet=256 elapsed_ms=3835
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=22436

@@ -1128,7 +1128,7 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
     let (mut right, mut code) = (0usize, 0i64);
     let read_to = named.last().map_or(0, |&i| i + 2);
     tower
-        .read_ring(&mut tower.rest(), &classes[..read_to], |i, face, ring| {
+        .read_ring(&mut tower.rest(), &classes[..read_to], |i, _, face, ring| {
             if at.peek() != Some(&&i) {
                 return Ok(());
             }
@@ -1151,6 +1151,267 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
         tower.ring_face().map_or(0, |f| f.ranks()),
         started.elapsed().as_millis()
     );
+    Ok(())
+}
+
+/// [agent-inferred, October 25] **The ring's readout founded on the passage it is joined on**
+/// (`found-ring-readout`). The joined tower, its ring's readout at zero, reads TEXT once from rest,
+/// and at every cell the ring's pair read with the top face, `φ_t = x̂_t ⊗ ρ_t`
+/// ([`RingFace::pair_read`]), meets the comparison's covector `y_t = p_t − q_t` (on `2^(−24)`, the
+/// learner's). The readout's direction is the bridge's own solution, the exact least squares
+/// `Q D = −M` with `Q = Σ φφᵀ` and `M = Σ φ yᵀ`: the readout whose face best returns the descent the
+/// passage demands. Its scale is the one along that direction under which the passage codes
+/// least: doubled from the direction's grain while the code falls, then narrowed by golden section
+/// to `2^(−8)` of the bracket, each code read from the face's masses carried through the
+/// direction's exponential (a founding's reading at the masses' grain; the joined tower's own read
+/// measures the result). The readout's moments are then opened on the same passage, partitioned
+/// as a training pass reads it (`STREAMS` streams of `SECTION` cells a section), at its sections'
+/// own covector statistics ([`TowerLearner::open_moments`]): a founded family opened with zero
+/// moments is undone by its first steps. The learner, its readout opened there
+/// ([`Tower::open_ring_readout`]), is written to OUT (created, never overwritten).
+pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
+    use holonics::hnn::keyed_modes::Exponential;
+    use holonics::hnn::tower::TowerFace;
+    if args.len() != 8 {
+        return Err("found-ring-readout STATE STATE_SHA TEXT TEXT_SHA STREAMS SECTION OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let (streams, section): (usize, usize) = (args[5].parse()?, args[6].parse()?);
+    if streams == 0 || section == 0 || text.len() < streams * (section + 1) {
+        return Err("the passage must hold one section a stream".into());
+    }
+    if std::path::Path::new(&args[7]).exists() {
+        return Err("OUT exists: the founded learner is written create-new".into());
+    }
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let tower = &learner.tower;
+    let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+    let k = tower.ring_face().map(|f| f.channels(w)).ok_or("found-ring-readout needs a ring-faced tower")?;
+    let cells = classes.len().saturating_sub(1);
+    let (mut nexts, mut phis, mut masses) = (Vec::with_capacity(cells), Vec::with_capacity(cells * k), Vec::with_capacity(cells * a));
+    let mut code_before = 0i64;
+    tower
+        .read_ring(&mut tower.rest(), &classes, |i, top, face, ring| {
+            let (_, rho) = ring.ok_or(TowerError::Refused("a ring read at every cell of a ring-faced tower"))?;
+            let (phi, _, _) = RingFace::pair_read(top, rho)?;
+            phis.extend(phi);
+            // A face's masses are on 2^(−62) below its largest, so each fits 64 bits.
+            masses.extend(face.masses.iter().map(|&m| m as u64));
+            nexts.push(classes[i + 1]);
+            code_before += face.code(classes[i + 1]);
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+    let read_ms = started.elapsed().as_millis();
+    let n = nexts.len();
+    let add = |mut x: Vec<i128>, y: Vec<i128>| {
+        x.iter_mut().zip(y).for_each(|(a, b)| *a += b);
+        x
+    };
+    // Q = Σ φφᵀ (upper triangle) and M = Σ φ yᵀ: |φ| < 2^21 and |y| ≤ 2^24 keep both inside
+    // 128 bits over fewer than 2^40 cells.
+    let q = (0..n)
+        .into_par_iter()
+        .fold(
+            || vec![0i128; k * k],
+            |mut q, t| {
+                let phi = &phis[t * k..(t + 1) * k];
+                for i in 0..k {
+                    let pi = phi[i] as i128;
+                    if pi != 0 {
+                        for j in i..k {
+                            q[i * k + j] += pi * phi[j] as i128;
+                        }
+                    }
+                }
+                q
+            },
+        )
+        .reduce(|| vec![0i128; k * k], add);
+    let m = (0..n)
+        .into_par_iter()
+        .fold(
+            || vec![0i128; k * a],
+            |mut m, t| {
+                let (phi, ms) = (&phis[t * k..(t + 1) * k], &masses[t * a..(t + 1) * a]);
+                let total: u128 = ms.iter().map(|&v| v as u128).sum();
+                for (c, &mass) in ms.iter().enumerate() {
+                    let p = (((mass as u128) << 24) + total / 2) / total;
+                    let y = p as i128 - if c == nexts[t] { 1 << 24 } else { 0 };
+                    if y != 0 {
+                        for (i, &x) in phi.iter().enumerate() {
+                            m[i * a + c] += x as i128 * y;
+                        }
+                    }
+                }
+                m
+            },
+        )
+        .reduce(|| vec![0i128; k * a], add);
+    if phis.iter().any(|v| v.unsigned_abs() >= 1 << 21) {
+        return Err("a ring's pair read past 2^21 of its grain: the moments' reach is owed".into());
+    }
+    let h: Vec<Vec<BigInt>> = (0..k).map(|i| (0..k).map(|j| BigInt::from(q[i.min(j) * k + i.max(j)])).collect()).collect();
+    let r: Vec<Vec<BigInt>> = (0..k).map(|i| (0..a).map(|c| BigInt::from(m[i * a + c])).collect()).collect();
+    let (det, y) = solve_scaled(&h, &r, false)?;
+    let solve_ms = started.elapsed().as_millis() - read_ms;
+    // The direction D = −Q⁺M, row c of the readout over the channels, released to 2^20 at its widest.
+    let sign = if det < BigInt::zero() { BigInt::from(1) } else { BigInt::from(-1) };
+    let direction: Vec<BigInt> = (0..a).flat_map(|c| (0..k).map(|i| &sign * &y[i][c]).collect::<Vec<_>>()).collect();
+    let direction: Vec<i64> = release_big(&direction, 20);
+    // Each cell's face moved by the direction at unit scale, on 2^(−16) of a bit.
+    let moved: Vec<i64> = (0..n)
+        .into_par_iter()
+        .flat_map_iter(|t| {
+            let phi = &phis[t * k..(t + 1) * k];
+            let direction = &direction;
+            (0..a).map(move |c| release(direction[c * k..(c + 1) * k].iter().zip(phi).map(|(&d, &x)| d as i128 * x as i128).sum(), 24) as i64)
+        })
+        .collect();
+    drop(phis);
+    let exponential = Exponential::new(16);
+    // The passage's code with the readout at κ·D, κ on 2^(−16).
+    let code = |kappa: i64| -> i64 {
+        (0..n)
+            .into_par_iter()
+            .map(|t| {
+                let offs: Vec<i128> = moved[t * a..(t + 1) * a].iter().map(|&v| release(kappa as i128 * v as i128, 16)).collect();
+                let top = *offs.iter().max().expect("a nonempty alphabet");
+                let ms: Vec<u128> = masses[t * a..(t + 1) * a].iter().zip(&offs).map(|(&mass, &o)| ((mass as u128 * exponential.below_one(o - top)) >> 62).max(1)).collect();
+                let total = ms.iter().sum();
+                TowerFace { masses: ms, total }.code(nexts[t])
+            })
+            .sum()
+    };
+    let mut evaluations = 1usize;
+    let at_zero = code(0);
+    let (mut best, mut best_code) = (0i64, at_zero);
+    let mut kappa = 1i64;
+    loop {
+        let c = code(kappa);
+        evaluations += 1;
+        if c >= best_code && best > 0 {
+            break;
+        }
+        if c < best_code {
+            (best, best_code) = (kappa, c);
+        }
+        if kappa >= 1 << 40 {
+            return Err("the passage's code fell along the direction past 2^24 of its unit scale".into());
+        }
+        kappa *= 2;
+    }
+    if best == 0 {
+        return Err("the passage's code did not fall along the founded direction".into());
+    }
+    // Golden section on [best/2, 2·best] to 2^(−8) of the bracket.
+    let (mut lo, mut hi) = (best / 2, 2 * best);
+    let width = (hi - lo) >> 8;
+    let golden = |lo: i64, hi: i64| -> (i64, i64) {
+        let span = (hi - lo) as i128;
+        let cut = (span * 381966 + 500000) / 1000000; // 1 − 1/φ to 2^(−20)
+        (lo + cut as i64, hi - cut as i64)
+    };
+    let (mut x1, mut x2) = golden(lo, hi);
+    let (mut c1, mut c2) = (code(x1), code(x2));
+    evaluations += 2;
+    while hi - lo > width.max(1) && x1 < x2 {
+        if c1 <= c2 {
+            hi = x2;
+            (x2, c2) = (x1, c1);
+            x1 = golden(lo, hi).0;
+            c1 = code(x1);
+        } else {
+            lo = x1;
+            (x1, c1) = (x2, c2);
+            x2 = golden(lo, hi).1;
+            c2 = code(x2);
+        }
+        evaluations += 1;
+    }
+    for (x, c) in [(x1, c1), (x2, c2)] {
+        if c < best_code {
+            (best, best_code) = (x, c);
+        }
+    }
+    let readout: Vec<i32> = direction
+        .iter()
+        .map(|&d| i32::try_from(release(best as i128 * d as i128, 16)).map_err(|_| "a founded readout entry outgrew its 32-bit carrier".to_string()))
+        .collect::<std::result::Result<_, _>>()?;
+    learner.tower.open_ring_readout(&readout).map_err(|e| e.to_string())?;
+    drop((masses, moved));
+    // The moments on the training pass's partition: section k of stream s reads
+    // `[s·chunk + k·section, s·chunk + (k + 1)·section]`.
+    let moments_started = std::time::Instant::now();
+    let chunk = classes.len() / streams;
+    let sections: Vec<Vec<&[usize]>> = (0..(chunk - 1) / section)
+        .map(|k| (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect())
+        .collect();
+    let family = learner.tower.ring_readout_family().ok_or("a ring-faced tower has a readout")?;
+    let mut states: Vec<_> = (0..streams).map(|_| learner.tower.rest()).collect();
+    let read_sections = learner.open_moments(family.clone(), &mut states, &sections).map_err(|e| e.to_string())?;
+    let moments_ms = moments_started.elapsed().as_millis();
+    let written = learner.to_text();
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[7])?, written.as_bytes())?;
+    println!(
+        "RING_READOUT cells={n} channels={k} kappa_on_2^-16={best} code_before_on_2^-20={code_before} code_at_zero={at_zero} code_founded={best_code} evaluations={evaluations} largest={} moment_sections={read_sections} moments_ms={moments_ms} sha256={} read_ms={read_ms} solve_ms={solve_ms} elapsed_ms={}",
+        readout.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0),
+        sha256(written.as_bytes())?,
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// [agent-inferred, October 25] **Every cell's reading** (an exterior read for choosing the ring's
+/// readout law): the frozen tower reads TEXT from rest, and each cell's record goes to OUT (created,
+/// never overwritten), little-endian: the class that arrives next (`u32`), the top face the readout
+/// reads (`width` × `i32`, on `2^(−16)`), the ring's face `ρ` (`2R` × `i32`, zero without a ring)
+/// and every class's share of the face's masses (`alphabet` × `u32`, on `2^(−32)`, floored).
+/// Nothing in it enters the tower.
+pub(super) fn read_tower_cells(args: &[String]) -> Result<()> {
+    use std::io::Write;
+    if args.len() != 6 {
+        return Err("read-tower-cells STATE STATE_SHA TEXT TEXT_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
+    let tower = &learner.tower;
+    let ranks = tower.ring_face().map_or(0, |f| f.ranks());
+    let file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[5])?;
+    let mut out = std::io::BufWriter::new(file);
+    let mut failed: Option<std::io::Error> = None;
+    let mut cells = 0usize;
+    tower
+        .read_ring(&mut tower.rest(), &classes, |i, top, face, ring| {
+            let mut record = Vec::with_capacity(4 * (1 + top.len() + 2 * ranks + face.masses.len()));
+            record.extend((classes[i + 1] as u32).to_le_bytes());
+            top.iter().for_each(|v| record.extend(v.to_le_bytes()));
+            match ring {
+                Some((_, rho)) => rho.iter().for_each(|v| record.extend(v.to_le_bytes())),
+                None => (0..2 * ranks).for_each(|_| record.extend(0i32.to_le_bytes())),
+            }
+            for &m in &face.masses {
+                let share = ((m << 32) / face.total).min(u32::MAX as u128) as u32;
+                record.extend(share.to_le_bytes());
+            }
+            if failed.is_none() {
+                if let Err(e) = out.write_all(&record) {
+                    failed = Some(e);
+                }
+            }
+            cells += 1;
+            Ok(())
+        })
+        .map_err(|e| e.to_string())?;
+    if let Some(e) = failed {
+        return Err(e.into());
+    }
+    out.flush()?;
+    println!("TOWER_CELLS cells={cells} width={} ring_channels={} alphabet={} elapsed_ms={}", tower.declaration.width, 2 * ranks, tower.declaration.alphabet, started.elapsed().as_millis());
     Ok(())
 }
 

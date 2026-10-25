@@ -1,0 +1,63 @@
+# ring9: join, founding at the join (moments at zero), reads, one block pass, read at the units
+RING_JOIN level=0 mode=41 ranks=1 material=232064 sha256=b212907839de4e1294ce8653c151495495057809b8106e3c4738578a8133dc3e elapsed_ms=233
+MEASURE exit=0 wall_s=0.3 peak_rss_kib=47904
+RING_READOUT cells=216130 channels=130 kappa_on_2^-16=849322 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=506756463992 evaluations=37 largest=7482758 sha256=631e525aeeb3206fb09beb6ada48645a35c85bd5dcc61daafc376ae1fbf8457d read_ms=68569 solve_ms=13154 elapsed_ms=118336
+MEASURE exit=0 wall_s=118.5 peak_rss_kib=1195080
+TOWER_AT cells=495 top_is_next=257 code_on_2^-20=1156798030 ring_ranks=1 elapsed_ms=3692
+MEASURE exit=0 wall_s=3.7 peak_rss_kib=23784
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.443 deposits=32 halvings=4 elapsed_ms=10069
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.288 deposits=64 halvings=6 elapsed_ms=19926
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.247 deposits=96 halvings=6 elapsed_ms=29295
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.231 deposits=128 halvings=6 elapsed_ms=38871
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.206 deposits=160 halvings=6 elapsed_ms=48119
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.201 deposits=192 halvings=7 elapsed_ms=57526
+TOWER_SECTION pass=0 section=211 bits_a_byte=2.183 deposits=211 halvings=8 elapsed_ms=63451
+TOWER_PASS pass=0 train_bits_a_byte=2.262 dev_bits_a_byte=3.172 dev_regions Q=4.027 P=3.331 N=3.123 M=2.206 deposits=211/211 pass_ms=67115 elapsed_ms=67209
+TOWER_DONE state_bytes=8038784 state_sha256=0482177cc5c8decd021d93375a20542ce038fc3d47b0468aa7087d96b39f4a9a elapsed_ms=67370
+MEASURE exit=0 wall_s=67.4 peak_rss_kib=152976
+TOWER_AT cells=495 top_is_next=52 code_on_2^-20=1740752044 ring_ranks=1 elapsed_ms=3713
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=23908
+# ring10: join, founding at the join with the readout's moments opened on the block's 211 sections, one block pass
+RING_JOIN level=0 mode=41 ranks=1 material=232064 sha256=b212907839de4e1294ce8653c151495495057809b8106e3c4738578a8133dc3e elapsed_ms=206
+MEASURE exit=0 wall_s=0.2 peak_rss_kib=48080
+RING_READOUT cells=216130 channels=130 kappa_on_2^-16=849322 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=506756463992 evaluations=37 largest=7482758 moment_sections=211 moments_ms=37901 sha256=4d08aab88b5741ab1f906e082a8f42ecb2c8b1a4ce3edb3ae8cd8531b5c0ce1b read_ms=66615 solve_ms=12651 elapsed_ms=153486
+MEASURE exit=0 wall_s=153.5 peak_rss_kib=1207172
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.414 deposits=32 halvings=2 elapsed_ms=9947
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.277 deposits=64 halvings=2 elapsed_ms=19418
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.243 deposits=96 halvings=2 elapsed_ms=28803
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.216 deposits=128 halvings=2 elapsed_ms=38695
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.211 deposits=160 halvings=2 elapsed_ms=48755
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.201 deposits=192 halvings=3 elapsed_ms=59106
+TOWER_SECTION pass=0 section=211 bits_a_byte=2.182 deposits=211 halvings=3 elapsed_ms=65035
+TOWER_PASS pass=0 train_bits_a_byte=2.253 dev_bits_a_byte=2.879 dev_regions Q=3.578 P=2.915 N=2.807 M=2.215 deposits=211/211 pass_ms=68863 elapsed_ms=68945
+TOWER_DONE state_bytes=8049087 state_sha256=2849d6965348f2340a3c96ab7859458fafcc111e3e7c7bf133e244ca683daced elapsed_ms=69123
+MEASURE exit=0 wall_s=69.2 peak_rss_kib=160700
+# reads at the 495 held-out units cells (U) and of the whole held-out text (48,030 cells): founded10, ringtrain10
+TOWER_AT cells=495 top_is_next=257 code_on_2^-20=1156798030 ring_ranks=1 elapsed_ms=3920
+MEASURE exit=0 wall_s=3.9 peak_rss_kib=24564
+TOWER_AT cells=48030 top_is_next=23712 code_on_2^-20=122708136863 ring_ranks=1 elapsed_ms=15261
+MEASURE exit=0 wall_s=15.3 peak_rss_kib=24368
+TOWER_AT cells=495 top_is_next=65 code_on_2^-20=1702153978 ring_ranks=1 elapsed_ms=3775
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=24180
+TOWER_AT cells=48030 top_is_next=21008 code_on_2^-20=143290705711 ring_ranks=1 elapsed_ms=15179
+MEASURE exit=0 wall_s=15.2 peak_rss_kib=24116
+# the whole held-out text: joined9, founded9, ringtrain9, the foil ringfoil2 (ring9)
+TOWER_AT cells=48030 top_is_next=23489 code_on_2^-20=123288095201 ring_ranks=1 elapsed_ms=15344
+MEASURE exit=0 wall_s=15.4 peak_rss_kib=23716
+TOWER_AT cells=48030 top_is_next=23712 code_on_2^-20=122708136863 ring_ranks=1 elapsed_ms=15654
+MEASURE exit=0 wall_s=15.7 peak_rss_kib=23604
+TOWER_AT cells=48030 top_is_next=19866 code_on_2^-20=158612590846 ring_ranks=1 elapsed_ms=15241
+MEASURE exit=0 wall_s=15.3 peak_rss_kib=23916
+TOWER_AT cells=48030 top_is_next=22177 code_on_2^-20=135478112176 ring_ranks=0 elapsed_ms=14105
+MEASURE exit=0 wall_s=14.1 peak_rss_kib=22084
+# the readout swapped (ring10): the passed tower with the founded readout, the founded tower with the passed readout; units cells then the whole held-out text (RING_SWAP_READOUT.py)
+readout entries moved by the founding 20905 span 200084 230114
+readout rms founded 349912 passed 1303073 on 2^-24
+TOWER_AT cells=495 top_is_next=60 code_on_2^-20=1708397890 ring_ranks=1 elapsed_ms=3573
+MEASURE exit=0 wall_s=3.6 peak_rss_kib=24228
+TOWER_AT cells=48030 top_is_next=21234 code_on_2^-20=140475712988 ring_ranks=1 elapsed_ms=15111
+MEASURE exit=0 wall_s=15.1 peak_rss_kib=24172
+TOWER_AT cells=495 top_is_next=157 code_on_2^-20=1315294706 ring_ranks=1 elapsed_ms=3842
+MEASURE exit=0 wall_s=3.9 peak_rss_kib=24444
+TOWER_AT cells=48030 top_is_next=22961 code_on_2^-20=127359985299 ring_ranks=1 elapsed_ms=15449
+MEASURE exit=0 wall_s=15.5 peak_rss_kib=24560

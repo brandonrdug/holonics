@@ -457,16 +457,18 @@ pub fn ring_carry(m: [i128; 4], (re, im): (i128, i128)) -> (i128, i128) {
 
 /// [definition; agent-inferred, October 25] **The resident ring face**: founded ring ranks
 /// ([`RingRank`]) riding mode `mode` of level `level`, carried by every stream beside its modes
-/// ([`TowerState::ring`]) and read by the tower's face through its own readout,
+/// ([`TowerState::ring`]) and read by the tower's face through its pair contact with the top face,
 ///
 /// ```text
 /// q_t = (Re r_t, Im r_t) released by read_shift
 /// ρ_t = 2^16 q_t / ‖q_t‖_rms                       (each rank's read as a ratio to its own power)
-/// z_t += V ρ_t
+/// x̂_t = (2^16 x_t / ‖x_t‖_rms, 2^16)               (the top face the readout reads, and its unit)
+/// z_t += W (x̂_t ⊗ ρ_t)
 /// ```
 ///
-/// `V` (`A × 2R`) is learned by the section's covector from zero, so a joined tower opens on the
-/// tower it was joined to. The ring's factors are founded and held, as the pair face's forms are:
+/// `W` (`A × (d + 1)·2R`) opens at zero, so a joined tower opens on the tower it was joined to,
+/// and is then founded on the passage it is joined on ([`Tower::open_ring_readout`]) and moved by
+/// the section's covector. The ring's factors are founded and held, as the pair face's forms are:
 /// a new founding is how they change. The tower's own material is not held behind it: the ring
 /// reads the level's carried face and rides the mode's move, so the covector its face returns
 /// reaches both ([`RingFace::reverse`]), and the tower learns to carry what its ring reads. It is
@@ -481,6 +483,14 @@ pub fn ring_carry(m: [i128; 4], (re, im): (i128, i128)) -> (i128, i128) {
 /// and does not swell it ([`ratio_adjoint`]). A face fitted to the passage's largest read left the
 /// readout reading a sum's units at `2^(−9)` of its reach, and one pass over the arithmetic made
 /// the tower worse beside the ring than without it (69 against 72 of 495 at the units held out).
+///
+/// The readout is a pair contact because a ring's phase is news at one cell of a line and not at
+/// the others: after a sum's second operand the ring holds the units' turn through `=` and the
+/// result's other digits, and only the top face knows which cell codes the units. Read on the
+/// joined tower with the tower held, a readout of `ρ` alone reads the held-out sums' units in 96 of
+/// 495 and one through `x̂ ⊗ ρ` in about 300 (record `2026-10-24_THE_TOWER_HEARS…`, "The ring's
+/// readout is a pair contact with the top face").
+///
 /// `b` is read over the encoding the
 /// ring was founded on, `E₀`, held with it: each class's pool is generated from `b` and `E₀` when
 /// the face is read back (a navigator's resident face, never a stored table).
@@ -517,7 +527,7 @@ impl RingFace {
         Ok(Self { level, mode, ranks, opening, pools })
     }
 
-    /// The count of ranks `R` (the readout reads `2R` channels).
+    /// The count of ranks `R` (the readout reads [`RingFace::channels`], `(d + 1)·2R`).
     pub fn ranks(&self) -> usize {
         self.ranks.len()
     }
@@ -525,6 +535,27 @@ impl RingFace {
     /// The level and the mode the ring rides.
     pub fn placement(&self) -> (usize, usize) {
         (self.level, self.mode)
+    }
+
+    /// The readout's channels over a tower of width `w`: the top face's ratio and its unit
+    /// (`w + 1`) by the ring's `2R`.
+    pub fn channels(&self, width: usize) -> usize {
+        (width + 1) * 2 * self.ranks.len()
+    }
+
+    /// The ring's pair read with the top face, `φ = x̂ ⊗ ρ` released to `2^(−16)` (row `j` of `x̂`
+    /// by column `k` of `ρ`), with `x̂ = (top / ‖top‖_rms, 1)` on `2^(−16)`. Returns `φ`, the top's
+    /// ratio (without its unit) and its scale.
+    pub fn pair_read(top: &[i32], rho: &[i32]) -> Result<(Vec<i32>, Vec<i32>, i128)> {
+        let wide: Vec<i64> = top.iter().map(|&v| v as i64).collect();
+        let (hat, scale) = ratio_to_power(&wide)?;
+        let mut phi = Vec::with_capacity((hat.len() + 1) * rho.len());
+        for x in hat.iter().map(|&v| v as i128).chain(std::iter::once(1i128 << FACE_BITS)) {
+            for &r in rho {
+                phi.push(fit32(release(x * r as i128, FACE_BITS), "a ring's pair read outgrew its 32-bit carrier")?);
+            }
+        }
+        Ok((phi, hat, scale))
     }
 
     /// One cell: each rank's ring carried by the mode's move `m` and pushed from the carried face
@@ -704,7 +735,7 @@ struct Layout {
     /// families without a pair face.
     pair_readout: usize,
     pair_encoding: usize,
-    /// The ring face's readout `V` (`A × 2R`), an empty family without a ring face.
+    /// The ring face's readout `W` (`A × (d + 1)·2R`), an empty family without a ring face.
     ring_readout: usize,
     len: usize,
     /// `(start, length, the family's grain)`, in order.
@@ -1211,6 +1242,10 @@ struct Cell {
     ring_read: Option<Vec<i64>>,
     /// Each rank's ring after the cell, for the reverse.
     ring_after: Option<Vec<(i128, i128)>>,
+    /// The ring's pair read with the top face, `φ = x̂ ⊗ ρ`, what its readout reads.
+    ring_pair: Option<Vec<i32>>,
+    /// The top face's ratio `x̂` (without its unit) and its scale, for the reverse.
+    top_hat: Option<(Vec<i32>, i128)>,
     face: TowerFace,
 }
 
@@ -1233,7 +1268,7 @@ struct Reaches {
     readout: u64,
     /// The pair face's readout `V` and lift `P` (zero without a pair face).
     pair: [u64; 2],
-    /// The ring face's readout `V` (zero without a ring face).
+    /// The ring face's readout `W` (zero without a ring face).
     ring: u64,
     /// Each level's `γ_k = √(1 − |λ_k|²)` on `2^(−30)`.
     gammas: Vec<Vec<i128>>,
@@ -1526,7 +1561,7 @@ impl Tower {
         };
         let ring = self.ring.as_ref().map_or(0, |face| {
             let rr = self.layout.ring_readout;
-            reach(&t[rr..rr + d.alphabet * 2 * face.ranks()])
+            reach(&t[rr..rr + d.alphabet * face.channels(d.width)])
         });
         Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, gammas, gates, ladder, half_turn }
     }
@@ -1727,20 +1762,25 @@ impl Tower {
                 *zv = fit64(*zv as i128 + *r as i128)?;
             }
         }
-        // The ring face read by its own readout: `z += V ρ`, released to 2^(−16).
+        // The ring read through its pair contact with the top face: `z += W (x̂ ⊗ ρ)`, released
+        // to 2^(−16).
+        let (mut ring_pair, mut top_hat) = (None, None);
         if let Some(rho) = &ring_face {
-            let k = rho.len();
+            let (phi, hat, scale) = RingFace::pair_read(&x, rho)?;
+            let k = phi.len();
             let rr = self.layout.ring_readout;
             let mut read = vec![0i64; a];
-            affine(&t[rr..rr + a * k], reaches.ring, k, rho, None, 0, MATERIAL_BITS, &mut read)?;
+            affine(&t[rr..rr + a * k], reaches.ring, k, &phi, None, 0, MATERIAL_BITS, &mut read)?;
             for (zv, r) in z.iter_mut().zip(&read) {
                 *zv = fit64(*zv as i128 + *r as i128)?;
             }
+            ring_pair = Some(phi);
+            top_hat = Some((hat, scale));
         }
         let zmax = *z.iter().max().expect("a nonempty alphabet");
         let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
         let total = masses.iter().sum();
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, face: TowerFace { masses, total } })
     }
 
     /// The face of the next class after `u` arrives, and the state moved.
@@ -1826,16 +1866,48 @@ impl Tower {
             let pr = self.layout.pair_readout;
             outer_sum(&mut g[pr..pr + a * forms], forms, &dzs, &pairs)?;
         }
-        // The ring face's readout takes the face's covector against the ring read there; its
-        // factors are held (a founded resident face), and the covector it returns to the state and
-        // the move it rode is carried at its level.
+        // The ring's pair contact with the top face takes the face's covector against `x̂ ⊗ ρ`.
+        // Its covector returns to the top through `x̂`'s ratio, and to each rank's read through
+        // `ρ`'s, which is carried to the ring at its level. The ring's factors are held (a founded
+        // resident face).
+        let mut ring_cov: Vec<Vec<i64>> = Vec::new();
         if let Some(face) = &self.ring {
-            let rings: Vec<&[i32]> = cells.iter().filter_map(|cell| cell.ring.as_deref()).collect();
-            if rings.len() != cells_n {
+            let r2 = 2 * face.ranks();
+            let (k, rr) = (face.channels(w), self.layout.ring_readout);
+            let reads: Vec<&[i32]> = cells.iter().filter_map(|cell| cell.ring_pair.as_deref()).collect();
+            if reads.len() != cells_n {
                 return refuse("a ring read at every cell of a ring-faced tower");
             }
-            let (k, rr) = (2 * face.ranks(), self.layout.ring_readout);
-            outer_sum(&mut g[rr..rr + a * k], k, &dzs, &rings)?;
+            outer_sum(&mut g[rr..rr + a * k], k, &dzs, &reads)?;
+            ring_cov.reserve(cells_n);
+            for (top, (dz, cell)) in dx.iter_mut().zip(dzs.iter().zip(cells)) {
+                let mut back = vec![0i64; k];
+                transposed(&t[rr..rr + a * k], reaches.ring, k, dz, MATERIAL_BITS, &mut back)?;
+                let missing = || TowerError::Refused("a ring read at every cell of a ring-faced tower");
+                let (rho, scales) = cell.ring.as_deref().zip(cell.ring_scale.as_deref()).ok_or_else(missing)?;
+                let (hat, top_scale) = cell.top_hat.as_ref().ok_or_else(missing)?;
+                // ∂ρ_k = Σ_j ∂φ_jk x̂_j and ∂x̂_j = Σ_k ∂φ_jk ρ_k, each released by the face's grain.
+                let mut d_rho = vec![0i128; r2];
+                let mut d_hat = Vec::with_capacity(w);
+                for (j, row) in back.chunks_exact(r2).enumerate() {
+                    let xj = hat.get(j).map_or(1i128 << FACE_BITS, |&v| v as i128);
+                    for (slot, &b) in d_rho.iter_mut().zip(row) {
+                        *slot += b as i128 * xj;
+                    }
+                    if j < w {
+                        d_hat.push(fit64(release(row.iter().zip(rho).map(|(&b, &r)| b as i128 * r as i128).sum(), FACE_BITS))?);
+                    }
+                }
+                let d_rho: Vec<i64> = collect_exact(d_rho.into_iter().map(|v| fit64(release(v, FACE_BITS))))?;
+                let mut read = Vec::with_capacity(r2);
+                for (r, &scale) in scales.iter().enumerate() {
+                    read.extend(ratio_adjoint(&rho[2 * r..2 * r + 2], scale, &d_rho[2 * r..2 * r + 2])?);
+                }
+                ring_cov.push(read);
+                for (v, e) in top.iter_mut().zip(ratio_adjoint(hat, *top_scale, &d_hat)?) {
+                    *v = fit64(*v as i128 + e as i128)?;
+                }
+            }
         }
         if let Some(joined) = joined {
             if joined.len() != cells_n {
@@ -1917,19 +1989,6 @@ impl Tower {
                     return refuse("a credited opening under a ring face: the opening state's covector through the ring is owed");
                 }
                 let m = face.mode;
-                let (k, rr) = (2 * face.ranks(), self.layout.ring_readout);
-                let mut g_rho = Vec::with_capacity(cells_n);
-                // `Vᵀ dz` is the covector of the face; the ratio carries it back to each rank's read.
-                for (dz, cell) in dzs.iter().zip(cells) {
-                    let mut back = vec![0i64; k];
-                    transposed(&t[rr..rr + a * k], reaches.ring, k, dz, MATERIAL_BITS, &mut back)?;
-                    let (rho, scales) = cell.ring.as_deref().zip(cell.ring_scale.as_deref()).ok_or(TowerError::Refused("a ring read at every cell of a ring-faced tower"))?;
-                    let mut read = Vec::with_capacity(k);
-                    for (r, &scale) in scales.iter().enumerate() {
-                        read.extend(ratio_adjoint(&rho[2 * r..2 * r + 2], scale, &back[2 * r..2 * r + 2])?);
-                    }
-                    g_rho.push(read);
-                }
                 let faces: Vec<Vec<i64>> = collect_exact((0..cells_n).map(|i| carried_face(std::slice::from_ref(if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state }))))?;
                 let moves: Vec<[i128; 4]> = cells
                     .iter()
@@ -1942,7 +2001,7 @@ impl Tower {
                 if after.len() != cells_n || opening.ring.len() != face.ranks() {
                     return refuse("a ring carried at every cell of a ring-faced tower");
                 }
-                let (d_face, d_moves) = face.reverse(&opening.ring, &after, &faces, &classes[..cells_n], &moves, &g_rho)?;
+                let (d_face, d_moves) = face.reverse(&opening.ring, &after, &faces, &classes[..cells_n], &moves, &ring_cov)?;
                 // ŝ_t is the state after cell t − 1; the opening's state is not material.
                 for i in 1..cells_n {
                     for (j, slot) in read_cov[i - 1].iter_mut().enumerate() {
@@ -2453,7 +2512,7 @@ impl Tower {
             }
             None => None,
         };
-        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, |face| 2 * face.ranks()));
+        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, |face| face.channels(declaration.width)));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
@@ -2487,16 +2546,17 @@ impl Tower {
         self.pair.as_ref()
     }
 
-    /// [agent-inferred, October 25] **The ring face joined to the tower**: its readout `V` is
+    /// [agent-inferred, October 25] **The ring face joined to the tower**: its readout `W` is
     /// appended to the material at zero, so the joined tower reads every passage exactly as the
-    /// tower did (the ring is carried, and read with no weight), and the section's covector moves
-    /// `V` from there. A stream rested before the join carries no ring: rest it again. Refused when
-    /// a ring face is already joined.
+    /// tower did (the ring is carried, and read with no weight); its founding opens `W` on the
+    /// passage ([`Tower::open_ring_readout`]) and the section's covector moves it from there. A
+    /// stream rested before the join carries no ring: rest it again. Refused when a ring face is
+    /// already joined.
     pub fn join_ring_face(&mut self, face: RingFace) -> Result<()> {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), 2 * face.ranks());
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.channels(self.declaration.width));
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.ring = Some(face);
@@ -2506,6 +2566,29 @@ impl Tower {
     /// The resident ring face, when one is joined.
     pub fn ring_face(&self) -> Option<&RingFace> {
         self.ring.as_ref()
+    }
+
+    /// [agent-inferred, October 25] **The ring's readout opened at its founding**: `W` (`A` rows
+    /// of the face's channels, on the material's `2^(−24)`) replaces the readout, so the ring
+    /// carries code from the first cell and its covector reaches the tower from the first section
+    /// (a readout at zero returns none, and one pass of the tower's own learning dephased the ring
+    /// before its readout could read it). Refused without a ring face or at another shape.
+    pub fn open_ring_readout(&mut self, readout: &[i32]) -> Result<()> {
+        let k = self.ring.as_ref().map_or(0, |face| face.channels(self.declaration.width));
+        if k == 0 || readout.len() != self.declaration.alphabet * k {
+            return refuse("a ring readout needs a ring face and one row of its channels a class");
+        }
+        let rr = self.layout.ring_readout;
+        self.theta[rr..rr + readout.len()].copy_from_slice(readout);
+        Ok(())
+    }
+
+    /// Where the ring's readout `W` lies in the material (none without a ring face), for the
+    /// moments its founding opens ([`TowerLearner::open_moments`]).
+    pub fn ring_readout_family(&self) -> Option<std::ops::Range<usize>> {
+        let k = self.ring.as_ref()?.channels(self.declaration.width);
+        let rr = self.layout.ring_readout;
+        Some(rr..rr + self.declaration.alphabet * k)
     }
 }
 
@@ -2759,6 +2842,67 @@ impl TowerLearner {
         }
     }
 
+    /// [definition; agent-inferred, October 25] **A founded family's moments, opened on the passage
+    /// it was founded on.** The moments are the covector's running statistics, and a family opened
+    /// with them at zero inside an opened learner claims a covector free of noise: the normalized
+    /// step `m/√v` then moves every entry at two to four times the rate on the first sections,
+    /// whatever its covector's sign carries, and a founded readout is undone before its moments
+    /// learn its noise (measured: the ring's founded readout, 257 of 495 held-out units at the
+    /// join, read 52 after one block pass, the held-out text 3.149 bits a byte against the foil's
+    /// 2.690). The family's moments are therefore opened at the passage's own section statistics:
+    /// each section of `sections` (one slice a stream, as a training section reads them) is read
+    /// forward and back from the streams' carried states, without a deposit, and the family's
+    /// entries take `first = Σ g / n` and `second = Σ g² / n` over its `n` sections, on the
+    /// deposit's grain. Every other moment is left as carried. Returns `n`.
+    pub fn open_moments(&mut self, family: std::ops::Range<usize>, states: &mut [TowerState], sections: &[Vec<&[usize]>]) -> Result<usize> {
+        if family.end > self.tower.theta.len() || family.is_empty() || sections.is_empty() {
+            return refuse("moments open on a family of the material over at least one section");
+        }
+        let (mut sum, mut squares) = (vec![0i128; family.len()], vec![0i128; family.len()]);
+        for classes in sections {
+            if classes.len() != states.len() || classes.iter().any(|c| c.len() < 2) {
+                return refuse("a section needs one carried state and two classes a stream");
+            }
+            let tower = &self.tower;
+            let reaches = tower.reaches();
+            let opening: Vec<TowerState> = states.to_vec();
+            let forwards: Vec<(Vec<Cell>, TowerState)> = opening
+                .par_iter()
+                .zip(classes.par_iter())
+                .map(|(open, c)| {
+                    let mut s = open.clone();
+                    let cells = tower.forward(&mut s, c, &reaches)?;
+                    Ok((cells, s))
+                })
+                .collect::<Result<_>>()?;
+            let gradients: Vec<Vec<i128>> = opening
+                .par_iter()
+                .zip(forwards.par_iter())
+                .zip(classes.par_iter())
+                .map(|((open, (cells, _)), c)| tower.reverse(open, cells, c, None))
+                .collect::<Result<_>>()?;
+            let mut g = vec![0i128; tower.theta.len()];
+            for gs in &gradients {
+                for (a, b) in g.iter_mut().zip(gs) {
+                    *a += *b;
+                }
+            }
+            tower.to_step_grain(&mut g);
+            tower.to_move_chart(&mut g);
+            for ((s, q), &v) in sum.iter_mut().zip(squares.iter_mut()).zip(&g[family.clone()]) {
+                *s += v;
+                *q = v.checked_mul(v).and_then(|v2| q.checked_add(v2)).ok_or(TowerError::Refused("a covector's squares outgrew their 128-bit carrier"))?;
+            }
+            tower.carry_credit(states, forwards, &opening, &reaches)?;
+        }
+        let n = sections.len() as i128;
+        for (i, k) in family.enumerate() {
+            self.first[k] = div_nearest(sum[i], n);
+            self.second[k] = div_nearest(squares[i], n);
+        }
+        Ok(sections.len())
+    }
+
     /// The learner as text: the tower, then the moments.
     pub fn to_text(&self) -> String {
         let mut s = self.tower.to_text();
@@ -2953,15 +3097,15 @@ impl Tower {
     }
 
     /// [agent-inferred, October 25] **The ring reading**: the frozen tower reads `classes` from the
-    /// state, and each cell's index, face (the masses of the class that arrives next) and, with a
-    /// ring face joined, the ring's read (each rank's `(Re, Im)` released by its `read_shift`) and
-    /// its face `ρ_t` (what the readout reads) are handed to `each`. A reading beside the code: the
-    /// tower is not moved.
-    pub fn read_ring(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &TowerFace, Option<(&[i64], &[i32])>) -> Result<()>) -> Result<()> {
+    /// state, and each cell's index, top face (what the readout reads), face (the masses of the
+    /// class that arrives next) and, with a ring face joined, the ring's read (each rank's
+    /// `(Re, Im)` released by its `read_shift`) and its face `ρ_t` (what the ring's readout reads)
+    /// are handed to `each`. A reading beside the code: the tower is not moved.
+    pub fn read_ring(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &[i32], &TowerFace, Option<(&[i64], &[i32])>) -> Result<()>) -> Result<()> {
         let reaches = self.reaches();
         for i in 0..classes.len().saturating_sub(1) {
             let cell = self.step(state, classes[i], &reaches)?;
-            each(i, &cell.face, cell.ring_read.as_deref().zip(cell.ring.as_deref()))?;
+            each(i, &cell.top, &cell.face, cell.ring_read.as_deref().zip(cell.ring.as_deref()))?;
         }
         Ok(())
     }
@@ -3709,10 +3853,61 @@ mod tests {
         tower.join_ring_face(face).expect("joined");
         let k = keys(16384);
         let rr = tower.layout.ring_readout;
-        for (j, v) in tower.theta[rr..rr + 2 * tower.declaration.alphabet].iter_mut().enumerate() {
+        let channels = tower.ring_face().expect("joined").channels(tower.declaration.width);
+        for (j, v) in tower.theta[rr..rr + channels * tower.declaration.alphabet].iter_mut().enumerate() {
             *v = (i32::from_be_bytes([k[4 * j + 9000], k[4 * j + 9001], k[4 * j + 9002], k[4 * j + 9003]]) >> 8) / 4;
         }
         tower
+    }
+
+    /// A founded family's moments open at its passage's section statistics: over one section they
+    /// are that section's covector and its square on the deposit's grain, over two the mean
+    /// covector and mean square (`second ≥ first²`); every other moment is left as carried, nothing
+    /// deposits, and the streams end where a frozen read of the passage leaves them.
+    #[test]
+    fn a_founded_familys_moments_open_on_its_passage() {
+        let tower = tiny_ring_faced(tiny_declared(2, true, true, true, ContactLaw::Pair));
+        let a: Vec<usize> = (0..25).map(|i| PASSAGE[i % 13]).collect();
+        let b: Vec<usize> = (0..25).map(|i| PASSAGE[(5 * i + 3) % 13]).collect();
+        let sections: Vec<Vec<&[usize]>> = (0..2).map(|k| vec![&a[12 * k..12 * k + 13], &b[12 * k..12 * k + 13]]).collect();
+        let family = tower.ring_readout_family().expect("a ring-faced tower");
+        // One section: the covector itself.
+        let mut learner = TowerLearner::new(tower.clone(), 6);
+        let mut states = vec![tower.rest(); 2];
+        assert_eq!(learner.open_moments(family.clone(), &mut states, &sections[..1]).expect("opened"), 1);
+        let reaches = tower.reaches();
+        let mut g = vec![0i128; tower.theta.len()];
+        for c in &sections[0] {
+            let mut s = tower.rest();
+            let cells = tower.forward(&mut s, c, &reaches).expect("forward");
+            for (x, y) in g.iter_mut().zip(tower.reverse(&tower.rest(), &cells, c, None).expect("reverse")) {
+                *x += y;
+            }
+        }
+        tower.to_step_grain(&mut g);
+        tower.to_move_chart(&mut g);
+        assert!(family.clone().any(|i| g[i] != 0));
+        for i in family.clone() {
+            assert_eq!((learner.first[i], learner.second[i]), (g[i], g[i] * g[i]));
+        }
+        // Two sections: the means, the rest carried, the material and the streams as a frozen read.
+        let mut learner = TowerLearner::new(tower.clone(), 6);
+        let mut states = vec![tower.rest(); 2];
+        assert_eq!(learner.open_moments(family.clone(), &mut states, &sections).expect("opened"), 2);
+        assert_eq!(learner.tower, tower);
+        for i in 0..tower.theta.len() {
+            if family.contains(&i) {
+                assert!(learner.second[i] + 1 >= learner.first[i] * learner.first[i], "entry {i}");
+            } else {
+                assert_eq!((learner.first[i], learner.second[i]), (0, 0));
+            }
+        }
+        for (state, passage) in states.iter().zip([&a, &b]) {
+            let mut read = tower.rest();
+            tower.read_cells(&mut read, passage).expect("read");
+            assert_eq!(state.modes, read.modes);
+            assert_eq!(state.ring, read.ring);
+        }
     }
 
     /// A ring face opens with its readout at zero, so the joined tower codes every passage exactly
@@ -3731,7 +3926,7 @@ mod tests {
         assert!(t.ring.iter().all(|&(re, im)| re != 0 || im != 0), "{:?}", t.ring);
         let mut largest = 0u64;
         joined
-            .read_ring(&mut joined.rest(), &PASSAGE, |_, _, ring| {
+            .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
                 let (read, rho) = ring.expect("read");
                 let size = read.iter().fold(0, |m: u64, v| m.max(v.unsigned_abs()));
                 largest = largest.max(size);
@@ -3773,7 +3968,7 @@ mod tests {
             .expect("read");
         let mut read = Vec::new();
         joined
-            .read_ring(&mut joined.rest(), &PASSAGE, |_, _, ring| {
+            .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
                 let r = ring.expect("read").0;
                 read.push([r[0], r[1]]);
                 Ok(())
