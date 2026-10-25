@@ -460,6 +460,24 @@ Its earlier charts are particular moves, each kept with its owner:
   ([receiver atlas](RECEIVER_HOLARCHY.md#the-reflection-algebra-shared-by-seam-and-swing)). A fold is
   that map applied to one side of a crease (§6).
 
+[definition; agent-inferred] **The hand.** A reflection is a move whose square is the identity and
+which reverses orientation; a turn keeps it, and two reflections compose into a turn by twice the
+angle between their mirrors. The half-turn, harmonic conjugation, junction scattering, the pump's
+reflected stiffness (§5), the helical code's dyad `U` and the Enigma reflector are this one move read
+in different charts. On the annulus `w = log z = u + iθ` it has three faces, any two composing to the
+third: `θ ↦ −θ` (`z ↦ z̄`: subtraction on a residue circle, conjugation, Hodge's `H^{p,q} ↔ H^{q,p}`),
+`u ↦ −u` (`z ↦ 1/z̄`: `x ↦ 1/x` on the scale circle; in the s-plane its mirror is the critical line)
+and `w ↦ −w` (`z ↦ 1/z`: the sphere's change of chart; `ξ(s) = ξ(1 − s)`; negation on the Tate curve
+`ℂ*/q^ℤ`). A ring carries its **hand**, the parity of the reflections it has met since its last
+restart: a reflector reverses it, a restart returns the starting hand, and every reading declares the
+hand it is made in (the hand in force or the starting hand). A complex multiplier only turns, so a
+ring of multipliers alone has no hand. The placement decides the reading: on the newline closure, `−`
+reflecting reads every difference exactly where one hand reads `c mod 20`, and `−` reflecting with `=`
+restarting reads `c mod 110` for sums and differences together where one hand reads parity
+([record §11](../research/records/2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md#11-with-the-hand-reversible-a-reflection-at--reads-every-difference-and-with-a-restart-at--one-key-reads-sums-and-differences)).
+A sign read on a multiplicative group is a quadratic character, so the hand alone does not reach
+products.
+
 Rebasing the observation, receiver and navigators through a half-turn preserves every possible future
 face, and in a normed chart it carries a declared tolerance exactly (`Geometry/SwingPotential`); a
 coordinate rebase is not a physical intervention.
