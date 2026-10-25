@@ -3602,6 +3602,45 @@ tens of both with one key, as it closed their units, and the ring founded there 
 differences' tens as the 110 ring carries the sums'. The acceptance stays: at least 201 of 268
 differences and 370 of 495 sums whole and right, the held-out text at or under 2.458 bits a byte.
 
+## The tens with the hand: the key located at the units, the ring read at the tens
+
+The last section's acceptance stays: at least 201 of 268 held-out differences and 370 of 495 sums
+whole and right, the held-out text at or under 2.458 bits a byte.
+
+**The tens close on nothing, with the hand or without it.** The closure at the differences' tens
+(`diff-tens`, 3,691 marks) and at the sums' and differences' tens together (`sum-diff-tens`, 12,657
+marks), each searched for its reflector as above, keys on nothing: every origin, every reflector,
+no torsion and no exact key (225 closures in 37.2 s and in 59.0 s; `RING_TENS_HAND.txt`). This is
+the sums' tens' own result (two sections above) carried to the differences: a tens digit is not
+fixed by the digits before it alone, since the units' carry, or borrow, enters.
+
+**The key's torsion holds the tens.** The joint key located at the units reads, at the tens cell,
+the whole result modulo 110. Its turns at `=` are `θ(=, d) = −10d` and its residues
+`ψ(c₀) = c₀ + 102`, so a ring pushed at the newline alone and turned by the key holds
+`c₀ + 102 + 10c₁ = c + 102` where the result's first digit arrives: for a result below 110, the
+tens and the units both, in sums and differences alike. What reads it is a ring founded where it
+is read. The founded joint ring was chosen by the share it gives where its key closes, the units,
+and kept the start whose turn is crowded at the tens (the last section).
+
+**The build** [agent-inferred]. The founding takes a second landmark, `pair-moves-at KEY_MARKS`:
+the closure is solved at the cells it marks (the units of sums and differences), and the ring is
+founded, its start kept by its share, at the cells the first marks (their tens). With both
+landmarks the same, the key is ring35s's to the byte.
+
+**What it founded.** With both landmarks the units, the key line is ring35s's to the byte (stopped at
+the key, 98.3 s against 104 s projected). With the key at the units and the founding at the tens
+(12,657 marks), the newline origin's ring keeps 772 per mille of the tens marks' exact share,
+against 622 to 699 for the other starts (198.5 s against 197 s projected; `RING_TENS_HAND.txt`,
+forms `c365c22d…`).
+
+**Where the arithmetic line stops** [agent-inferred]. The ring is not joined or read. Brandon asked
+(October 25) that arithmetic stop being the road while GSM8K, MNIST and LibriSpeech wait, and the
+section above measured the cost of the last ring: every other medium of the held-out text coded
+worse (prose 3.018 to 3.135 bits a byte) while arithmetic moved 2.056 to 2.038. The hand, the
+closure and the key located at its own landmark are the library's and the example's; they are read
+again where a GSM8K answer's arithmetic is the failure in front of the line, as one section of what
+the tower hears.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3836,6 +3875,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   holds it whole, and each operation's wrong lines by where they go wrong).
 - The differences: `RING_DIFF.txt` (the closure at the differences' units and its ring, the join,
   the readout's founding, its reads, and the closure at the differences' tens).
+- The tens with the hand: `RING_TENS_HAND.txt` (the closures at the differences' tens and at the sums' and
+  differences' tens, none keyed; the key located at the units, founded at the units and at the tens).
 - The reflection: `RING_REFLECT.txt` (every keyed closure with the hand on the differences' units,
   the sums' units and both, their summaries and kept keys, the joint ring's founding, the join, its
   readout's founding, every read and the writing) and `RING_RANK_CENTROIDS.{py,txt}` (each ring
