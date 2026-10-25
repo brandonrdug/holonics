@@ -1,0 +1,9 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 28.4 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+after = on every line: 84951 cells (the sums' U cells among them 8986)
+rank 0: share (circular) 0.1257; its push gate carries the second operand of a sum 0.015, difference 0.008, product 0.157; holds chi_1(c0) at B 0.018, held out units at B 78 of 495 (114 s)
+rank 1: share (circular) 0.1293; its push gate carries the second operand of a sum 0.497, difference 0.036, product 0.024; holds chi_1(c0) at B 0.640, held out units at B 258 of 495 (190 s)
+rank 2: share (circular) 0.1099; its push gate carries the second operand of a sum 0.000, difference 0.040, product 0.000; holds chi_1(c0) at B 0.032, held out units at B 55 of 495 (257 s)
+done in 257.7 s
+MEASURE exit=0 wall_s=258.0 peak_rss_kib=4540484

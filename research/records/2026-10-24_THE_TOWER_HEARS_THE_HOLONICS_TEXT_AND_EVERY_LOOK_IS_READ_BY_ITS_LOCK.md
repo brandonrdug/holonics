@@ -2402,6 +2402,45 @@ rank's own, and the build is the machine's ranked founding with gated rings.
 - `BLIND_PUSH.py` ran past its projection (rounds took 16 to 19 s against 15). It stayed inside its
   deadline and is reported complete.
 
+## Plural ranks find the sum's operand, and a received landmark is communication
+
+**Ranked, the founding separates the operations itself** (`PLURAL_RANKS.py`). The region is after
+`=` on every line, which names no operation. Each rank is a ring form in mode 41 with pool `χ₁` and
+its own push gate, founded blind (three rounds from a unit gate). The tension is deflated by each
+rank's two channels before the next.
+
+| rank | share (circular) | its push gate carries a second operand of a sum / difference / product | holds `χ₁(c₀)` at `B` | held out, units at `B` |
+|---|---|---|---|---|
+| 0 | 0.126 | 0.015 / 0.008 / **0.157** | 0.018 | 78 |
+| 1 | 0.129 | **0.497** / 0.036 / 0.024 | 0.640 | 258 |
+| 2 | 0.110 | 0.000 / 0.040 / 0.000 | 0.032 | 55 |
+
+The first rank leans to products. The second finds the sum's operand with no label anywhere, and its
+form holds the crossing at 0.64. Its read still stands on every line's result, so it reads 258.
+With the read on the sums' results, the same blind gate reads 393 (`BLIND_GATE.py`).
+
+**The lens** (Brandon, October 25). A label that marks where to look is a landmark, like the ones
+navigator paths converge on. A machine that later knows more than whoever marked its text can hand
+markers back, and nobody in that exchange cheats: it is communication.
+- What separates communication from catered machinery [agent-inferred]: a landmark says where to
+  look, never what to find. Nothing in the 385 or 393 was handed the units: the machine's own pool
+  law found the form, and the held-out read at `B` uses no marker.
+- These landmarks are the text's own `+` and `=`, and the state already carries them (0.992 on a
+  straight line).
+- A landmark enters as received material at the exterior boundary, a marker stream beside the text.
+  It is never a parser inside the machine.
+
+**Decided next** [agent-inferred]: build the machine's situated founding with three parts.
+1. Ring forms that ride a placement mode's own moves.
+2. A push gate founded blind as the ring's pair contact with the state.
+3. The reading cells weighted by a received landmark stream.
+
+The acceptance is then read on the machine's founded forms, with the landmark named in the claim.
+The fixed bar and its cell `B` do not move.
+
+**The run.** `PLURAL_RANKS.py` was projected at about 270 s (deadline 500 s) and took 258.0 s (0.96;
+peak 4.33 GiB).
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2538,6 +2577,7 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   the repository), `RING_OP_REGIONS.{py,txt}`, `OP_GATE.{py,txt}`, `BLIND_GATE.{py,txt}`,
   `BLIND_PUSH.{py,txt}` and `GATED_PUSH_FREE_READ.{py,txt}` (run from the run directory; each takes
   the scripts it loads as its arguments, as its docstring names them).
+- The plural ranks: `PLURAL_RANKS.{py,txt}` (run the same way).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

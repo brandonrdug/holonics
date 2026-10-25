@@ -151,3 +151,4 @@ the soft operation gates	-	OP_GATE.py	about 120	300	-	93.5	0.78	3512876	complete
 the gates founded blind	-	BLIND_GATE.py	about 330	600	-	236.2	0.72	4500152	complete
 the push gate founded blind, operation-free reads	-	BLIND_PUSH.py	about 220	400	-	277.9	1.26	4533912	complete; past its projection, inside its deadline
 the gated push with operation-free reads	-	GATED_PUSH_FREE_READ.py	about 75	180	-	67.9	0.91	4715340	complete
+the plural gated ranks, operation-free read	-	PLURAL_RANKS.py	about 270	500	-	258.0	0.96	4540484	complete
