@@ -50,10 +50,10 @@
 //! The founding's directions are searched on released copies; every share is read exactly from the
 //! moments of the carried ring.
 
-use super::tower_situated::{div_round, lcm, permille};
+use super::tower_situated::{div_round, gcd, lcm, permille};
 use super::tower_train::{count, pair_hats, positive, release_big, solve_scaled, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::{ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, FACE_BITS, MOVE_BITS};
+use holonics::hnn::tower::{hand_after, ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, FACE_BITS, MOVE_BITS};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
@@ -151,6 +151,9 @@ struct Passage<'a> {
     /// Every pair `(seam, class)` a ring meets over the passage, ascending: the keys of a founded
     /// table of pair moves ([`RingFace::move_at`]).
     pairs: Vec<(usize, usize)>,
+    /// The class whose arrival restarts the rings' hand, when the closure located one
+    /// ([`RingFace::with_restarts`]).
+    restart: Option<usize>,
 }
 
 /// A table of pair moves over [`Passage::pairs`], `[Re λ, Im λ, Re β, Im β]` on `2^(−30)`.
@@ -417,7 +420,9 @@ fn step_blocks(m: &PassMoments, fit: &RankFit) -> (Vec<Vec<BigInt>>, Vec<Vec<Big
 /// The pass: over the streams as the frozen tower read them once (each after the first opening one
 /// section early, from rest, and counting none of that section's cells), it carries every founded
 /// rank's ring and, when a step is given, the ring of each of its columns, and keeps the moments of
-/// the marked cells.
+/// the marked cells. The rings share the moves, so one hand a stream ([`hand_after`]) reads them all
+/// in their own hand, `(Re h, ±Im h)`, as the library reads a ring, and the passage's restarting
+/// class re-bases them all into it ([`RingFace::with_restarts`]).
 fn pass(p: &Passage, table: Option<&Table>, ranks: &[Ring], step: Option<(Factor, &Ring)>) -> Result<PassMoments> {
     let (dims, width) = (p.dims, p.width);
     let k = match step.map(|s| s.0) {
@@ -436,12 +441,14 @@ fn pass(p: &Passage, table: Option<&Table>, ranks: &[Ring], step: Option<(Factor
             // Each founded rank's ring and each column's, as (re, im) on the ring's grain.
             let mut held: Vec<(i128, i128)> = vec![(0, 0); ranks.len()];
             let mut cols: [Vec<i128>; 2] = [vec![0; k], vec![0; k]];
-            let mut marked = 0;
+            let (mut marked, mut hand) = (0, false);
             for (at, &class) in stream.classes.iter().enumerate() {
                 let i = stream.open + at;
                 let s = &stream.faces[at * dims..(at + 1) * dims];
                 let hat = &p.hats[class];
                 let m = move_of(stream, at, table);
+                hand = hand_after(m, hand);
+                let own = if hand { -1 } else { 1 };
                 let mut c = Vec::with_capacity(channels);
                 for (h, ring) in held.iter_mut().zip(ranks) {
                     let (alpha, gamma) = ring.state_factors(s);
@@ -449,7 +456,7 @@ fn pass(p: &Passage, table: Option<&Table>, ranks: &[Ring], step: Option<(Factor
                     let carried = ring_carry(m, *h);
                     *h = (carried.0 + v.0, carried.1 + v.1);
                     c.push(release(h.0, ring.read_shift));
-                    c.push(release(h.1, ring.read_shift));
+                    c.push(own * release(h.1, ring.read_shift));
                 }
                 let mut phi: [Vec<i64>; 2] = [vec![0; k], vec![0; k]];
                 if let Some((factor, ring)) = step {
@@ -469,8 +476,13 @@ fn pass(p: &Passage, table: Option<&Table>, ranks: &[Ring], step: Option<(Factor
                         cols[0][j] = carried.0 + release(v.0, ring.push_shift);
                         cols[1][j] = carried.1 + release(v.1, ring.push_shift);
                         phi[0][j] = narrow(release(cols[0][j], ring.read_shift))?;
-                        phi[1][j] = narrow(release(cols[1][j], ring.read_shift))?;
+                        phi[1][j] = narrow(own * release(cols[1][j], ring.read_shift))?;
                     }
+                }
+                if hand && p.restart == Some(class) {
+                    held.iter_mut().for_each(|h| h.1 = -h.1);
+                    cols[1].iter_mut().for_each(|y| *y = -*y);
+                    hand = false;
                 }
                 if i < stream.start || p.marks[i] == 0 {
                     continue;
@@ -1006,31 +1018,55 @@ fn pair_table(p: &mut Passage) -> Result<(Table, usize)> {
 /// `n`-th root of unity) holds at a marked cell `t` the turn `N_t θ`, `N_t` the count of each pair
 /// met since the origin's last arrival in the cell's stream (the pair ending at the origin is not
 /// counted: its move restarts the ring). The ring names the class arriving after `t` when a key
-/// `(θ, ψ)` closes every loop, `N_t θ ≡ ψ(C_t) (mod n)`. Returns the rows `(N_t, C_t)`, one per
-/// marked counted cell that an origin arrival precedes in its stream.
-fn closure_rows(p: &Passage, origin: usize) -> Vec<(Vec<(usize, i64)>, usize)> {
-    p.streams
+/// `(θ, ψ)` closes every loop, `N_t θ ≡ ψ(C_t) (mod n)`.
+///
+/// [agent-inferred, October 25] With a reflector `r`, each pair ending at `r` reflects the ring,
+/// `φ ↦ θ_q − φ` ([`closure_table`]), and the ring is read in its own hand `σ = ±1`, reversed by
+/// each reflection since the origin's arrival ([`hand_after`]). Read in its hand, a turn and a
+/// reflection alike add `σ_k θ_(q_k)`, `σ_k` the hand after cell `k`'s move (a reflection read in
+/// the reversed hand: `−(θ − φ) = σφ + σ'θ`, `σ' = −σ`), so `N_t` counts each pair with the hand in
+/// force where it is met. A restarting class `e` restores the hand after its own pair is counted
+/// ([`RingFace::with_restarts`]), so the pairs after it count forward. No reflector or restart is
+/// named to the closure: [`found_closure`] tries none and each class. Returns the rows
+/// `(N_t, C_t)`, one per marked counted cell that an origin arrival precedes in its stream, each
+/// count that cancels to zero left out, the count of reflections met after an origin, and whether
+/// a restart met a reversed hand.
+#[allow(clippy::type_complexity)]
+fn closure_rows(p: &Passage, origin: usize, reflector: Option<usize>, restart: Option<usize>) -> (Vec<(Vec<(usize, i64)>, usize)>, usize, bool) {
+    let read: Vec<(Vec<(Vec<(usize, i64)>, usize)>, usize, bool)> = p
+        .streams
         .par_iter()
-        .flat_map_iter(|stream| {
+        .map(|stream| {
             let mut rows = Vec::new();
-            let mut count: Option<std::collections::BTreeMap<usize, i64>> = None;
+            let (mut count, mut hand, mut met, mut restored): (Option<std::collections::BTreeMap<usize, i64>>, i64, usize, bool) = (None, 1, 0, false);
             for (at, &class) in stream.classes.iter().enumerate() {
                 let i = stream.open + at;
                 if class == origin {
                     count = Some(Default::default());
+                    hand = 1;
                 } else if let Some(c) = count.as_mut() {
-                    *c.entry(stream.slots[at]).or_insert(0) += 1;
+                    if Some(class) == reflector {
+                        hand = -hand;
+                        met += 1;
+                    }
+                    *c.entry(stream.slots[at]).or_insert(0) += hand;
+                    if hand < 0 && Some(class) == restart {
+                        hand = 1;
+                        restored = true;
+                    }
                 }
                 if i < stream.start || p.marks[i] == 0 || i + 1 >= p.text.len() {
                     continue;
                 }
                 if let Some(c) = &count {
-                    rows.push((c.iter().map(|(&q, &v)| (q, v)).collect(), p.text[i + 1]));
+                    rows.push((c.iter().filter(|&(_, &v)| v != 0).map(|(&q, &v)| (q, v)).collect(), p.text[i + 1]));
                 }
             }
-            rows
+            (rows, met, restored)
         })
-        .collect()
+        .collect();
+    let (met, restored) = (read.iter().map(|r| r.1).sum(), read.iter().any(|r| r.2));
+    (read.into_iter().flat_map(|r| r.0).collect(), met, restored)
 }
 
 /// `a^e mod p` for `p < 2^31` (so a product of two residues stays in 64 bits).
@@ -1092,9 +1128,15 @@ struct Echelon {
 }
 
 /// [agent-inferred, October 25] **The reduced row echelon of integer rows modulo a prime**
-/// `p < 2^31`, built one row at a time against the basis so far (each basis row is zero at the
-/// pivots before it, so one pass in order reduces an arriving row), stopping when the rank reaches
-/// `stop`; then each basis row is cleared at the later pivots.
+/// `p < 2^31`, built one row at a time against the basis so far, stopping when the rank reaches
+/// `stop`. The basis is kept reduced (each row one at its pivot and zero at every other pivot), so an
+/// arriving row is reduced by the basis rows at its own nonzero entries in the pivot columns alone:
+/// a closure row counts the pairs of one loop, so it meets a few pivots where a basis kept only in
+/// echelon form is met at nearly all of them once the row fills in. The reduced row is the one
+/// vector of `row + span(basis)` that is zero at every pivot, so the pivots, the rows kept and the
+/// echelon are those of reducing against the echelon basis in order (the form this replaced; on the
+/// sums' and differences' units together one closure's echelons took about 18 core-seconds,
+/// `ring/found34sd.txt`).
 fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
     let wide = p as i128;
     let mut basis: Vec<(usize, Vec<u64>)> = Vec::new();
@@ -1104,32 +1146,27 @@ fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
             break;
         }
         let mut r: Vec<u64> = row.iter().map(|&x| x.rem_euclid(wide) as u64).collect();
-        for (c, b) in &basis {
-            let f = r[*c];
-            if f != 0 {
-                let g = p - f;
-                for (x, &y) in r.iter_mut().zip(b) {
-                    *x = (*x + g * y) % p;
-                }
+        let met: Vec<(usize, u64)> = basis.iter().enumerate().filter_map(|(k, (c, _))| (r[*c] != 0).then_some((k, r[*c]))).collect();
+        for (k, f) in met {
+            let g = p - f;
+            for (x, &y) in r.iter_mut().zip(&basis[k].1) {
+                *x = (*x + g * y) % p;
             }
         }
         let Some(c) = r.iter().position(|&x| x != 0) else { continue };
         let inv = inv_mod(r[c], p);
         r.iter_mut().for_each(|x| *x = *x * inv % p);
-        basis.push((c, r));
-        sources.push(i);
-    }
-    for k in (0..basis.len()).rev() {
-        for j in k + 1..basis.len() {
-            let f = basis[k].1[basis[j].0];
+        for (_, b) in basis.iter_mut() {
+            let f = b[c];
             if f != 0 {
                 let g = p - f;
-                let (head, tail) = basis.split_at_mut(j);
-                for (x, &y) in head[k].1.iter_mut().zip(&tail[0].1) {
+                for (x, &y) in b.iter_mut().zip(&r) {
                     *x = (*x + g * y) % p;
                 }
             }
         }
+        basis.push((c, r));
+        sources.push(i);
     }
     let mut order: Vec<usize> = (0..basis.len()).collect();
     order.sort_by_key(|&k| basis[k].0);
@@ -1174,10 +1211,11 @@ fn cramer_mod(m: &[Vec<i128>], v: &[Vec<i128>], q: u64) -> Option<(u64, Vec<Vec<
 /// `∏_(i∈I) ‖A[i, J ∪ F]‖`, which bounds every minor these are. When every row of the system
 /// annihilates every such vector, the rank over the rationals is no more than the rank modulo the
 /// prime, so equal to it; else a row the prime lost is independent, and the next prime is read.
-/// Returns the rank and `det M`. No elimination over the integers is made: its entries grew past
+/// Returns the rank, `det M` and the certified kernel over the rationals, one integer vector a free
+/// column (`det M` there, `M⁻¹`'s solution at the pivots, scaled by `det M`). No elimination over the integers is made: its entries grew past
 /// 128 bits in `ring/found19.txt` and past the founding's deadline in `BigInt` in
 /// `ring/found20.txt`, while the minor's entries stay the rows' own.
-fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt) {
+fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt, Vec<Vec<BigInt>>) {
     let columns = rows.first().map_or(0, Vec::len);
     for p in wide_primes() {
         let e = echelon_mod(rows, p, columns);
@@ -1230,7 +1268,7 @@ fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt) {
             .collect();
         let certified = rows.par_iter().all(|row| kernel.iter().all(|k| row.iter().zip(k).filter(|(a, _)| **a != 0).map(|(&a, x)| x * BigInt::from(a)).sum::<BigInt>().is_zero()));
         if certified {
-            return (r, det);
+            return (r, det, kernel);
         }
     }
     unreachable!("a prime past the bound reads the rank over the rationals")
@@ -1263,13 +1301,16 @@ fn readable_primes(x: &BigInt) -> Vec<i128> {
     out
 }
 
-/// What one origin's closure system admits: its sizes, its rank over the rationals, the size of
-/// its certified minor and that minor's readable primes (the candidate moduli), the primes at
-/// which its rank falls (each with the fall) and, when a key reads the arriving classes injectively,
-/// the key: its modulus `n`, `θ` per pair slot and `ψ` per class, with the count of rows it fails
-/// (zero: a key is exact by construction, and the count is its receipt).
+/// What one origin's closure system admits, under its reflector: its sizes, its rank over the
+/// rationals, the size of its certified minor and that minor's readable primes (the candidate
+/// moduli), the primes at which its rank falls (each with the fall) and, when a key reads the
+/// arriving classes injectively, the key.
 struct Closure {
     origin: usize,
+    reflector: Option<usize>,
+    /// The reflections met after an origin, over the passage.
+    reflections: usize,
+    restart: Option<usize>,
     rows: usize,
     unique: usize,
     columns: usize,
@@ -1277,7 +1318,27 @@ struct Closure {
     minor_bits: u64,
     candidates: Vec<i128>,
     torsion: Vec<(i128, usize)>,
-    key: Option<(i128, Vec<(usize, i128)>, Vec<(usize, i128)>, usize)>,
+    key: Option<Key>,
+}
+
+/// A closure's key: its modulus `n`, `θ` per pair slot and `ψ` per class, whether it closes the
+/// loops over the integers (`exact`, a vector of the rational kernel) or modulo its torsion, and the
+/// count of rows it fails (zero: a key is exact by construction, and the count is its receipt).
+struct Key {
+    modulus: i128,
+    theta: Vec<(usize, i128)>,
+    psi: Vec<(usize, i128)>,
+    failures: usize,
+    exact: bool,
+}
+
+impl Key {
+    /// The order the keys are kept in: one that closes the loops over the integers before one that
+    /// closes them modulo its torsion; of the exact, the smaller modulus (the same loops closed on
+    /// wider turns); of the torsion keys, the larger (more of the closure's torsion carried).
+    fn order(&self) -> (bool, i128) {
+        (!self.exact, if self.exact { self.modulus } else { -self.modulus })
+    }
 }
 
 /// [agent-inferred, October 25] **The key an origin's loops close on.** The rows ([`closure_rows`])
@@ -1296,8 +1357,19 @@ struct Closure {
 /// that kept 10 of the torsion `110 = 2·5·11` and dropped the eleven, which reads the alternating
 /// digit sum and with the units fixes the sum modulo 110 (the newline closure record, §§2–3), so
 /// the key now keeps every torsion prime the closure located [agent-inferred, October 25].
-fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
-    let found = closure_rows(p, origin);
+///
+/// [agent-inferred, October 25] Before the torsion, the rational kernel is read: a kernel vector
+/// (divided by its entries' divisor) whose `ψ` is injective closes every loop over the integers,
+/// `N_t θ = ψ(C_t)`, so modulo any `n` past its `ψ`'s span; its key is taken modulo
+/// `n = max ψ − min ψ + 1`, the least that keeps the classes apart, when that is readable (below
+/// `2^(FACE_BITS + 3)`, [`readable_primes`]). An exact key is kept before a torsion key. Returns
+/// `None` when the reflector never arrives after the origin (its rows are the reflector-free rows),
+/// or the restart never meets a reversed hand (its rows are the reflection's alone).
+fn closure_key(p: &Passage, origin: usize, reflector: Option<usize>, restart: Option<usize>) -> Result<Option<Closure>> {
+    let (found, reflections, restored) = closure_rows(p, origin, reflector, restart);
+    if (reflector.is_some() && reflections == 0) || (restart.is_some() && !restored) {
+        return Ok(None);
+    }
     let mut slots: Vec<usize> = found.iter().flat_map(|(n, _)| n.iter().map(|&(q, _)| q)).collect();
     slots.sort_unstable();
     slots.dedup();
@@ -1319,11 +1391,11 @@ fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
     let mut unique = dense.clone();
     unique.sort_unstable();
     unique.dedup();
-    let mut out = Closure { origin, rows: found.len(), unique: unique.len(), columns, rank: 0, minor_bits: 0, candidates: Vec::new(), torsion: Vec::new(), key: None };
+    let mut out = Closure { origin, reflector, reflections, restart, rows: found.len(), unique: unique.len(), columns, rank: 0, minor_bits: 0, candidates: Vec::new(), torsion: Vec::new(), key: None };
     if found.is_empty() {
-        return Ok(out);
+        return Ok(Some(out));
     }
-    let (rank, minor) = rational_rank(&unique);
+    let (rank, minor, kernel) = rational_rank(&unique);
     out.rank = rank;
     out.minor_bits = minor.bits();
     out.candidates = readable_primes(&minor.abs());
@@ -1356,6 +1428,39 @@ fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
             keys.push((q, x));
         }
     }
+    let fails = |x: &[i128], n: i128| dense.iter().filter(|row| row.iter().zip(x).map(|(&a, &b)| a * b).sum::<i128>().rem_euclid(n) != 0).count();
+    let key_of = |x: &[i128], n: i128, exact: bool| Key {
+        modulus: n,
+        theta: slots.iter().zip(x).map(|(&q, &t)| (q, t)).collect(),
+        psi: classes.iter().zip(&x[s..]).map(|(&c, &v)| (c, v)).collect(),
+        failures: fails(x, n),
+        exact,
+    };
+    // The rational kernel's vectors whose ψ is injective: the least readable span.
+    let readable = BigInt::from(1i128 << (FACE_BITS + 3));
+    let exact = kernel
+        .iter()
+        .filter_map(|k| {
+            let divisor = k.iter().fold(BigInt::zero(), |g, x| gcd(&g, x));
+            if divisor.is_zero() {
+                return None;
+            }
+            let k: Vec<BigInt> = k.iter().map(|x| x / &divisor).collect();
+            let mut psi = k[s..].to_vec();
+            psi.sort_unstable();
+            psi.dedup();
+            let span = psi.last()? - psi.first()? + 1;
+            (psi.len() == classes.len() && span < readable).then(|| {
+                let n = i128::try_from(&span).expect("a readable span");
+                let bn = BigInt::from(n);
+                let x: Vec<i128> = k.iter().map(|v| i128::try_from(((v % &bn) + &bn) % &bn).expect("a residue below its modulus")).collect();
+                (n, x)
+            })
+        })
+        .min_by_key(|(n, _)| *n);
+    if let Some((n, x)) = exact {
+        out.key = Some(key_of(&x, n, true));
+    }
     // The subsets of the torsion primes in descending product; the first injective joined key.
     let mut subsets: Vec<(i128, Vec<usize>)> = (1u32..1 << keys.len().min(16))
         .map(|bitset| {
@@ -1381,12 +1486,13 @@ fn closure_key(p: &Passage, origin: usize) -> Result<Closure> {
         psi.sort_unstable();
         psi.dedup();
         if psi.len() == classes.len() {
-            let failures = dense.iter().filter(|row| row.iter().zip(&joined).map(|(&a, &b)| a * b).sum::<i128>().rem_euclid(n) != 0).count();
-            out.key = Some((n, slots.iter().zip(&joined).map(|(&q, &t)| (q, t)).collect(), classes.iter().zip(&joined[s..]).map(|(&c, &v)| (c, v)).collect(), failures));
+            if out.key.is_none() {
+                out.key = Some(key_of(&joined, n, false));
+            }
             break;
         }
     }
-    Ok(out)
+    Ok(Some(out))
 }
 
 /// [agent-inferred, October 25] **The unit turn `ω = e^(2πi/n)` on `2^(−62)`**, a face of its
@@ -1450,8 +1556,10 @@ fn unit_turn(n: i128) -> (i128, i128) {
 /// by `ω^(θ_q)` at the placement mode's own memory, `λ_q = ρ_q ω^(θ_q)` with `ρ_q = |λ̄_q|` the
 /// modulus of the mode's mean move at the pair ([`pair_table`]), each part rounded toward zero (so
 /// `|λ_q| ≤ ρ_q < 1`) and no `β`; the pairs ending at the origin restart the ring (zero move). The
-/// turns are `ω^k` by Gaussian products on `2^(−62)`.
-fn closure_table(p: &Passage, mode: &Table, origin: usize, n: i128, theta: &[(usize, i128)]) -> Result<Table> {
+/// turns are `ω^k` by Gaussian products on `2^(−62)`. A pair ending at the reflector reflects the
+/// ring, `λ = 0` and `β_q = ρ_q ω^(θ_q)`: `h ↦ β h̄`, the dyad of the newline closure record's §8
+/// [agent-inferred, October 25].
+fn closure_table(p: &Passage, mode: &Table, origin: usize, reflector: Option<usize>, n: i128, theta: &[(usize, i128)]) -> Result<Table> {
     let (c, s) = unit_turn(n);
     let mut powers = vec![(1i128 << 62, 0i128)];
     for _ in 1..n {
@@ -1471,7 +1579,8 @@ fn closure_table(p: &Passage, mode: &Table, origin: usize, n: i128, theta: &[(us
         let rho = i128::try_from((BigInt::from(m[0]) * m[0] + BigInt::from(m[1]) * m[1]).sqrt())?;
         let turn = theta.binary_search_by_key(&q, |&(slot, _)| slot).map_or(0, |j| theta[j].1.rem_euclid(n));
         let (re, im) = powers[turn as usize];
-        let moved = [rho * re / (1i128 << 62), rho * im / (1i128 << 62), 0, 0].map(|v| v as i64);
+        let (re, im) = (rho * re / (1i128 << 62), rho * im / (1i128 << 62));
+        let moved = if Some(cur) == reflector { [0, 0, re, im] } else { [re, im, 0, 0] }.map(|v| v as i64);
         if !passive(moved) {
             return Err("a closure move that boosts".into());
         }
@@ -1481,55 +1590,103 @@ fn closure_table(p: &Passage, mode: &Table, origin: usize, n: i128, theta: &[(us
 }
 
 /// [agent-inferred, October 25] **The pair moves founded by exact loop closure.** Every class that
-/// arrives over the passage is tried as the origin ([`closure_key`], in parallel); each prints a
-/// `RING_CLOSURE` line (its rows, unique rows, columns, rank over the rationals, its certified
-/// minor's bits and readable primes, and the primes where the rank falls). Of the origins with a key, the one whose loops cover the
-/// most marked cells is kept (a key over fewer loops separates fewer arrivals, and an origin seen
-/// before only a few marked cells closes them on a small modulus trivially), then the smaller
-/// modulus, then the origin's class; its key prints as `RING_KEY` (the modulus, each class's residue,
-/// and the turns of the pairs it moves) and its table ([`closure_table`]) is the ring's. Returns
-/// the origin, the modulus and the table, or `None` when no origin's loops close on a key that
-/// separates the arriving classes.
-fn found_closure(p: &Passage, mode: &Table) -> Result<Option<(usize, i128, Table)>> {
+/// arrives over the passage is tried as the origin, with no reflector, with each other class as
+/// the reflector, and with each reflector and each third class as the hand's restart
+/// ([`closure_rows`], [`closure_key`], in parallel); each that the reflector and the restart meet
+/// prints a `RING_CLOSURE` line (its rows, unique rows, columns, rank over the rationals, its
+/// certified minor's bits and readable primes, the primes where the rank falls, and its key). Of
+/// those with a key, the one whose loops cover the most marked cells is kept (a key over fewer
+/// loops separates fewer arrivals, and an origin seen before only a few marked cells closes them on
+/// a small modulus trivially), then the better key ([`Key::order`]: exact before torsion, then
+/// its modulus), then no reflector before one and no restart before one (each enters only where it
+/// closes more), then the fewer reflections met (of two reflectors that close alike, a gauge, the
+/// one that reverses fewer loops), then the classes. Its key prints as `RING_KEY` (the reflector,
+/// the restart, the modulus, each class's residue, and the turns of the pairs it moves) and its
+/// table ([`closure_table`]) is the ring's. Returns the origin, the modulus, the table and the
+/// restart, or `None` when no origin's loops close on a key that separates the arriving classes.
+/// The torsion key across origins once took the smaller modulus; it now takes the larger, as each
+/// closure's own key does.
+///
+/// [agent-inferred, October 25] **A restart refines a reflection that closes.** A restart only
+/// restores a hand a reflection reversed, so it is sought only beside a reflector whose closure
+/// already keys: the origins and reflectors are solved first (15 + 210 closures on the arithmetic
+/// block), then each keyed reflector with each third class as its restart. A restart that would
+/// key a reflection which closes on nothing is not sought. All 2,955 closures at once on the sums'
+/// and differences' units together ran at 1.4 a second and were stopped at 210
+/// (`ring/found32sd.txt`), and solving the origins one row count at a time saved nothing, as nearly
+/// every origin precedes every mark (`ring/found33sd.txt`).
+#[allow(clippy::type_complexity)]
+fn found_closure(p: &Passage, mode: &Table) -> Result<Option<(usize, i128, Table, Option<usize>)>> {
     let mut origins: Vec<usize> = p.streams.iter().flat_map(|s| s.classes.iter().copied()).collect();
     origins.sort_unstable();
     origins.dedup();
     let started = std::time::Instant::now();
     let show = |c: usize| if (33..127).contains(&c) { (c as u8 as char).to_string() } else { format!("#{c}") };
-    // Each origin's line as its closure completes (a pivot past 64 bits by its width).
-    let closures: Vec<Closure> = origins
-        .par_iter()
-        .map(|&o| {
-            let c = closure_key(p, o).map_err(|e| e.to_string())?;
-            println!(
-                "RING_CLOSURE origin={} rows={} unique={} columns={} rank={} minor_bits={} candidates={} torsion={} key_modulus={} elapsed_ms={}",
-                show(c.origin),
-                c.rows,
-                c.unique,
-                c.columns,
-                c.rank,
-                c.minor_bits,
-                c.candidates.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(","),
-                c.torsion.iter().map(|(q, t)| format!("{q}:{t}")).collect::<Vec<_>>().join(","),
-                c.key.as_ref().map_or("none".to_string(), |k| k.0.to_string()),
-                started.elapsed().as_millis()
-            );
-            Ok(c)
-        })
-        .collect::<std::result::Result<_, String>>()?;
-    println!("RING_CLOSURES origins={} elapsed_ms={}", closures.len(), started.elapsed().as_millis());
-    let Some(kept) = closures.iter().filter(|c| c.key.is_some()).min_by_key(|c| (std::cmp::Reverse(c.rows), c.key.as_ref().map(|k| k.0), c.origin)) else {
+    let others = |not: &[usize]| origins.iter().copied().filter(|c| !not.contains(c)).collect::<Vec<_>>();
+    let reflected = |r: Option<usize>| r.map_or("none".to_string(), show);
+    let (mut closures, mut tried_count): (Vec<Closure>, usize) = (Vec::new(), 0);
+    let mut tried: Vec<(usize, Option<usize>, Option<usize>)> = origins.iter().flat_map(|&o| std::iter::once((o, None, None)).chain(others(&[o]).into_iter().map(move |r| (o, Some(r), None)))).collect();
+    while !tried.is_empty() {
+        tried_count += tried.len();
+        // Each line as its closure completes (a pivot past 64 bits by its width), one for each
+        // tried closure, so the run's progress is read from its lines.
+        let solved: Vec<Closure> = tried
+            .par_iter()
+            .map(|&(o, r, e)| {
+                let c = closure_key(p, o, r, e).map_err(|e| e.to_string())?;
+                match &c {
+                    None => println!("RING_UNMET origin={} reflector={} restart={} elapsed_ms={}", show(o), reflected(r), reflected(e), started.elapsed().as_millis()),
+                    Some(c) => println!(
+                        "RING_CLOSURE origin={} reflector={} restart={} reflections={} rows={} unique={} columns={} rank={} minor_bits={} candidates={} torsion={} key_modulus={} exact={} elapsed_ms={}",
+                        show(c.origin),
+                        reflected(c.reflector),
+                        reflected(c.restart),
+                        c.reflections,
+                        c.rows,
+                        c.unique,
+                        c.columns,
+                        c.rank,
+                        c.minor_bits,
+                        c.candidates.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(","),
+                        c.torsion.iter().map(|(q, t)| format!("{q}:{t}")).collect::<Vec<_>>().join(","),
+                        c.key.as_ref().map_or("none".to_string(), |k| k.modulus.to_string()),
+                        c.key.as_ref().is_some_and(|k| k.exact),
+                        started.elapsed().as_millis()
+                    ),
+                }
+                Ok(c)
+            })
+            .collect::<std::result::Result<Vec<Option<Closure>>, String>>()?
+            .into_iter()
+            .flatten()
+            .collect();
+        // The restarts beside each reflection that keys, once.
+        tried = solved
+            .iter()
+            .filter(|c| c.key.is_some() && c.restart.is_none())
+            .filter_map(|c| c.reflector.map(|r| (c.origin, r)))
+            .flat_map(|(o, r)| others(&[o, r]).into_iter().map(move |e| (o, Some(r), Some(e))))
+            .collect();
+        closures.extend(solved);
+    }
+    println!("RING_CLOSURES origins={} tried={tried_count} met={} keyed={} elapsed_ms={}", origins.len(), closures.len(), closures.iter().filter(|c| c.key.is_some()).count(), started.elapsed().as_millis());
+    let Some(kept) = closures.iter().filter(|c| c.key.is_some()).min_by_key(|c| (std::cmp::Reverse(c.rows), c.key.as_ref().map(Key::order), c.reflector.is_some(), c.restart.is_some(), c.reflections, c.origin, c.reflector, c.restart)) else {
         return Ok(None);
     };
-    let (n, theta, psi, failures) = kept.key.as_ref().expect("a kept key");
-    let pairs: Vec<String> = theta.iter().filter(|(_, t)| t.rem_euclid(*n) != 0).map(|&(q, t)| format!("{}{}:{}", show(p.pairs[q].0), show(p.pairs[q].1), t.rem_euclid(*n))).collect();
+    let key = kept.key.as_ref().expect("a kept key");
+    let n = key.modulus;
+    let pairs: Vec<String> = key.theta.iter().filter(|(_, t)| t.rem_euclid(n) != 0).map(|&(q, t)| format!("{}{}:{}", show(p.pairs[q].0), show(p.pairs[q].1), t.rem_euclid(n))).collect();
     println!(
-        "RING_KEY origin={} modulus={n} failures={failures} residues={} turns={}",
+        "RING_KEY origin={} reflector={} restart={} modulus={n} exact={} failures={} residues={} turns={}",
         show(kept.origin),
-        psi.iter().map(|&(c, v)| format!("{}:{v}", show(c))).collect::<Vec<_>>().join(","),
+        reflected(kept.reflector),
+        reflected(kept.restart),
+        key.exact,
+        key.failures,
+        key.psi.iter().map(|&(c, v)| format!("{}:{v}", show(c))).collect::<Vec<_>>().join(","),
         pairs.join(",")
     );
-    Ok(Some((kept.origin, *n, closure_table(p, mode, kept.origin, *n, theta)?)))
+    Ok(Some((kept.origin, n, closure_table(p, mode, kept.origin, kept.reflector, n, &key.theta)?, kept.restart)))
 }
 
 /// The unit ring: `a` zero, `b` and `g` their unit coordinates.
@@ -1619,6 +1776,7 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
         present: Vec::new(),
         streams: Vec::new(),
         pairs: Vec::new(),
+        restart: None,
     };
     let (sc, coupling, streams) = survey(&p)?;
     p.present = (0..coupling.n.len()).filter(|&u| coupling.n[u] > 0).collect();
@@ -1631,10 +1789,11 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     let opening_table: Option<Table> = if moves {
         let (mut table, varying) = pair_table(&mut p)?;
         if !held {
-            let (origin, n, closed) = found_closure(&p, &table)?.ok_or("no origin's loops close on a key that separates the arriving classes")?;
+            let (origin, n, closed, restart) = found_closure(&p, &table)?.ok_or("no origin's loops close on a key that separates the arriving classes")?;
             origin_start = Some(origin);
             key_modulus = Some(n);
             table = closed;
+            p.restart = restart;
         } else {
             // A held table (`prev cur Re λ Im λ Re β Im β` a line): its pairs the passage meets take its
             // moves, every other pair rests; nothing in it is founded.
@@ -1747,7 +1906,7 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
         std::io::Write::write_all(&mut file, format!("RING {rank} mode={mode} release={} push_shift={push_shift} read_shift={read_shift} g={}\n", join(&ring.release.map(i64::from)), join(&ring.g)).as_bytes())?;
         if let Some(t) = &table {
             let entries: Vec<String> = p.pairs.iter().zip(t).map(|(&(prev, cur), m)| format!("{prev}:{cur}:{}:{}:{}:{}", m[0], m[1], m[2], m[3])).collect();
-            let key = key_modulus.map_or(String::new(), |n| format!(" key_modulus={n}"));
+            let key = key_modulus.map_or(String::new(), |n| format!(" key_modulus={n}")) + &p.restart.map_or(String::new(), |e| format!(" restart={e}"));
             std::io::Write::write_all(&mut file, format!("MOVES {rank} n={}{key} moves={}\n", entries.len(), entries.join(",")).as_bytes())?;
         }
         file.sync_data()?;
@@ -1779,7 +1938,7 @@ fn integers<T: std::str::FromStr>(line: &str, key: &str) -> Result<Vec<T>> {
 /// An arriving class's row and the harmonic its channels read ([`found_ring_readout`]).
 type BlockId = (usize, usize);
 
-/// A ring's pair moves (`MOVES r n=N [key_modulus=n] moves=prev:cur:Re λ:Im λ:Re β:Im β,…`).
+/// A ring's pair moves (`MOVES r n=N [key_modulus=n] [restart=e] moves=prev:cur:Re λ:Im λ:Re β:Im β,…`).
 type PairMoves = Vec<(usize, usize, [i64; 4])>;
 
 /// The ranks a founding wrote ([`found_tower_ring`]'s `SITUATED`, `FORM` and `RING` lines, and a
@@ -1787,10 +1946,10 @@ type PairMoves = Vec<(usize, usize, [i64; 4])>;
 /// state's SHA-256), the level and mode they ride, each rank, the pair moves and the modulus of
 /// the key that closed them, when a closure founded them.
 #[allow(clippy::type_complexity)]
-fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, usize, Vec<RingRank>, PairMoves, Option<usize>)> {
+fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, usize, Vec<RingRank>, PairMoves, Option<usize>, Option<usize>)> {
     let mut lines: Vec<&str> = text.lines().collect();
     let mut pair_moves: PairMoves = Vec::new();
-    let mut key_modulus: Option<usize> = None;
+    let (mut key_modulus, mut restart): (Option<usize>, Option<usize>) = (None, None);
     if let Some(at) = lines.iter().position(|l| l.starts_with("MOVES ")) {
         let line = lines.remove(at);
         if at != 3 || lines.iter().any(|l| l.starts_with("MOVES ")) || !line.starts_with("MOVES 0 ") {
@@ -1799,6 +1958,9 @@ fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, u
         let n: usize = field(line, "n")?.parse()?;
         if line.split(' ').any(|w| w.starts_with("key_modulus=")) {
             key_modulus = Some(field(line, "key_modulus")?.parse()?);
+        }
+        if line.split(' ').any(|w| w.starts_with("restart=")) {
+            restart = Some(field(line, "restart")?.parse()?);
         }
         for entry in field(line, "moves")?.split(',') {
             let v: Vec<i64> = entry.split(':').map(|x| x.parse::<i64>()).collect::<std::result::Result<_, _>>()?;
@@ -1834,7 +1996,7 @@ fn read_forms(text: &str, dims: usize, width: usize) -> Result<(String, usize, u
             read_shift: field(pair[1], "read_shift")?.parse()?,
         });
     }
-    Ok((field(head, "state_sha256")?.to_string(), level, mode, ranks, pair_moves, key_modulus))
+    Ok((field(head, "state_sha256")?.to_string(), level, mode, ranks, pair_moves, key_modulus, restart))
 }
 
 /// [agent-inferred, October 25] `join-tower-ring STATE STATE_SHA FORMS FORMS_SHA [FORMS FORMS_SHA
@@ -1878,10 +2040,10 @@ pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
     }
     let d = learner.tower.declaration.clone();
     let mut placement: Option<(usize, usize)> = None;
-    let (mut ranks, mut tables, mut keys) = (Vec::new(), Vec::new(), Vec::new());
+    let (mut ranks, mut tables, mut keys, mut restarts) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
     for pair in args[3..args.len() - 1].chunks(2) {
         let forms = pinned_read(&pair[0], &pair[1], READ_BUDGET as usize)?;
-        let (founded_on, level, mode, founded, pair_moves, key_modulus) = read_forms(std::str::from_utf8(&forms)?, 2 * d.modes, d.width)?;
+        let (founded_on, level, mode, founded, pair_moves, key_modulus, restart) = read_forms(std::str::from_utf8(&forms)?, 2 * d.modes, d.width)?;
         if founded_on != args[2] {
             return Err("the forms were founded on another tower: the moves they ride and the encoding their pools read are this one's only".into());
         }
@@ -1890,6 +2052,7 @@ pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
         }
         placement = Some((level, mode));
         tables.extend(std::iter::repeat_n(pair_moves, founded.len()));
+        restarts.extend(std::iter::repeat_n(restart, founded.len()));
         ranks.extend(founded);
         keys.push(key_modulus);
     }
@@ -1899,7 +2062,7 @@ pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
     let mut out = learner;
     let moves: Vec<usize> = tables.iter().map(Vec::len).collect();
     let harmonics = harmonics_set.unwrap_or_else(|| keys.iter().map(|k| k.map_or(1, |n| (n / 2).max(1))).max().unwrap_or(1));
-    let face = RingFace::new(&d, level, mode, ranks, opening, tables).and_then(|f| f.with_harmonics(harmonics)).map_err(|e| e.to_string())?;
+    let face = RingFace::new(&d, level, mode, ranks, opening, tables).and_then(|f| f.with_harmonics(harmonics)).and_then(|f| f.with_restarts(restarts)).map_err(|e| e.to_string())?;
     out.join_ring_face(face).map_err(|e| e.to_string())?;
     let mut carried = 0usize;
     if let Some((path, sha)) = readout_from {
@@ -1917,6 +2080,7 @@ pub(super) fn join_tower_ring(args: &[String]) -> Result<()> {
             && sf.placement() == nf.placement()
             && sf.harmonics() == nf.harmonics()
             && sf.pair_moves() == &nf.pair_moves()[..r0]
+            && sf.restarts() == &nf.restarts()[..r0]
             && st.theta[sfac.clone()] == nt.theta[nfac.start..nfac.start + sfac.len()];
         if !same {
             return Err(refused.into());
@@ -2757,7 +2921,8 @@ mod tests {
     #[test]
     fn the_closures_torsion_is_the_primes_its_minors_share() {
         let rows: Vec<Vec<i128>> = vec![vec![2, 0], vec![0, 5], vec![4, 10], vec![2, 5]];
-        let (rank, det) = rational_rank(&rows);
+        let (rank, det, kernel) = rational_rank(&rows);
+        assert!(kernel.is_empty(), "a system of full column rank has no kernel");
         assert_eq!(rank, 2);
         assert_eq!(det.abs(), BigInt::from(10));
         assert_eq!(readable_primes(&det.abs()), vec![2, 5]);
@@ -2767,6 +2932,80 @@ mod tests {
         assert_eq!(echelon_mod(&rows, 3, rank).pivots.len(), 2);
         // A system with no torsion: a unit minor.
         let free: Vec<Vec<i128>> = vec![vec![1, 1], vec![1, 2], vec![2, 3]];
-        assert_eq!(rational_rank(&free), (2, BigInt::from(1)));
+        let (rank, det, _) = rational_rank(&free);
+        assert_eq!((rank, det), (2, BigInt::from(1)));
+        // A system with a kernel: `(1, 1, −2)` closes both rows over the integers.
+        let (rank, det, kernel) = rational_rank(&[vec![1i128, 1, -2], vec![2, 0, -2]]);
+        assert_eq!(rank, 2);
+        assert_eq!(kernel.len(), 1);
+        let k = &kernel[0];
+        assert!(!det.is_zero() && k.iter().all(|x| *x == k[0]), "{k:?}");
+    }
+
+    /// The echelon kept reduced as rows arrive is the echelon of reducing each row against the
+    /// echelon basis in order and clearing the later pivots after: the same rows kept, pivots and
+    /// reduced rows, on sparse rows of small counts as a closure's are, at every stop.
+    #[test]
+    fn the_reduced_echelon_is_the_echelon_reduced_after() {
+        fn in_order(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
+            let wide = p as i128;
+            let mut basis: Vec<(usize, Vec<u64>)> = Vec::new();
+            let mut sources = Vec::new();
+            for (i, row) in rows.iter().enumerate() {
+                if basis.len() == stop {
+                    break;
+                }
+                let mut r: Vec<u64> = row.iter().map(|&x| x.rem_euclid(wide) as u64).collect();
+                for (c, b) in &basis {
+                    let f = r[*c];
+                    if f != 0 {
+                        for (x, &y) in r.iter_mut().zip(b) {
+                            *x = (*x + (p - f) * y) % p;
+                        }
+                    }
+                }
+                let Some(c) = r.iter().position(|&x| x != 0) else { continue };
+                let inv = inv_mod(r[c], p);
+                r.iter_mut().for_each(|x| *x = *x * inv % p);
+                basis.push((c, r));
+                sources.push(i);
+            }
+            for k in (0..basis.len()).rev() {
+                for j in k + 1..basis.len() {
+                    let f = basis[k].1[basis[j].0];
+                    if f != 0 {
+                        let (head, tail) = basis.split_at_mut(j);
+                        for (x, &y) in head[k].1.iter_mut().zip(&tail[0].1) {
+                            *x = (*x + (p - f) * y) % p;
+                        }
+                    }
+                }
+            }
+            let mut order: Vec<usize> = (0..basis.len()).collect();
+            order.sort_by_key(|&k| basis[k].0);
+            Echelon { pivots: order.iter().map(|&k| basis[k].0).collect(), sources: order.iter().map(|&k| sources[k]).collect(), rows: order.into_iter().map(|k| std::mem::take(&mut basis[k].1)).collect() }
+        }
+        // Sparse rows of small signed counts, some repeated and some dependent, from a fixed walk.
+        let (n, columns) = (60, 23);
+        let mut state = 0x9e37_79b9u64;
+        let mut rows: Vec<Vec<i128>> = (0..n)
+            .map(|_| {
+                (0..columns)
+                    .map(|_| {
+                        state = state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1_442_695_040_888_963_407);
+                        let v = (state >> 33) % 13;
+                        if v < 9 { 0 } else { v as i128 - 11 }
+                    })
+                    .collect()
+            })
+            .collect();
+        rows.push(rows[3].iter().zip(&rows[7]).map(|(a, b)| 2 * a - b).collect());
+        rows.push(rows[5].clone());
+        for p in [2u64, 3, 5, 7, 11, 2_147_483_647] {
+            for stop in [1, 5, 12, columns] {
+                let (a, b) = (echelon_mod(&rows, p, stop), in_order(&rows, p, stop));
+                assert_eq!((&a.pivots, &a.sources, &a.rows), (&b.pivots, &b.sources, &b.rows), "modulo {p}, stop {stop}");
+            }
+        }
     }
 }

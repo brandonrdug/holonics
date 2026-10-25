@@ -282,7 +282,7 @@ pub(super) fn lcm(ns: impl Iterator<Item = i128>) -> BigInt {
     })
 }
 
-fn gcd(a: &BigInt, b: &BigInt) -> BigInt {
+pub(super) fn gcd(a: &BigInt, b: &BigInt) -> BigInt {
     let (mut a, mut b) = (a.abs(), b.abs());
     while !b.is_zero() {
         let r = &a % &b;

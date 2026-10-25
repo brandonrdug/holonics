@@ -3507,6 +3507,101 @@ the differences should not need a mechanism of their own.
   stays: at least 201 of 268 differences and 370 of 495 sums whole and right, the held-out text at or
   under 2.458 bits a byte.
 
+## `−` is `+` reversed: the ring's hand reflects and restarts, and the closure locates where
+
+Brandon's lens (October 25): the mechanism behind the landmarks `+` and `−` is one mechanism with a
+polarity; `−` is `+`'s cycle reversed, as in algebra, so the differences need no mechanism of their
+own. The last section decided the build; this one is its loop.
+
+**The hand** [agent-inferred]. A ring move `h ↦ λh + βh̄` keeps the ring's hand where its
+determinant `|λ|² − |β|²` is positive, reverses it where negative (a reflection: `λ = 0`, or `β`
+outweighing `λ`), and restarts it where zero (a collapse, the origin's zero move), `hand_after`.
+Each rank is read in its own hand, `(Re h, ±Im h)`, and its covector carries the hand back. A rank
+may also restart its hand at a class (`RingFace::with_restarts`): where that class arrives on a
+reversed hand, the ring is re-based into the hand it reads, `h ↦ (Re h, −Im h)`, its read there
+unchanged. A reflection between restarts then reverses exactly the turns met between them, which
+is the mathematics thread's composition of two reflections into a turn
+([its §11](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md#11-with-the-hand-reversible-a-reflection-at--reads-every-difference-and-with-a-restart-at--one-key-reads-sums-and-differences)).
+The library's tests check the hand against a replica of the read, the covector against the code
+difference with reflections and with restarts at every class, and the face's text.
+
+**The closure locates the reflector and the restart.** Each origin is solved with no reflector and
+with each other class as the reflector; each closure row counts every pair with the hand in force
+where it is met. A restart is then sought beside each reflector whose closure keys, with each third
+class. A key that closes the loops over the integers (a vector of the rational kernel whose
+`ψ` tells the arriving classes apart) is kept before a torsion key. No reflector or restart is
+named to it.
+
+**What the search cost, and the echelon kept reduced.** Solving every origin with every reflector
+and every restart at once (2,955 closures on the sums' and differences' units) ran at 1.4 closures a
+second against the 4.2 projected and was stopped at 210 (`ring/found32sd.txt`, 188 s). Solving the
+origins one row count at a time saved nothing, as nearly every origin precedes every mark; all three
+runs reached their deadlines (360, 150 and 200 s). Seeking the restart only beside a reflector that
+closes (225 closures, then a restart beside each keyed reflector) was stopped on its rate: 79, 174
+and 129 closure lines in the first minute against the 84, 225 and 222 projected. The cost was the
+echelon over a prime: each arriving row was reduced by every basis row in turn and the basis
+back-substituted once at the end. It is now kept reduced as rows arrive: a row is reduced only by the
+basis rows at its own nonzero pivot entries, and a new pivot column is cleared from the basis when
+it enters. The echelon is the same, since the reduced row is the one vector of its coset that
+vanishes at every pivot (the library's test compares it with the in-order reduction over six primes
+and four stops). The closures then ran at 6.7 a second on the differences' units (277 in 41.6 s),
+5.6 on the sums' and 3.8 on both (251 in 65.8 s), within their projections.
+
+**What the closure located.**
+- On the differences' units alone (4,548 marks), `−` reflecting closes the loops **exactly**: the
+  key is a vector of the rational kernel, with no torsion, `ψ(c₀) = 9 − c₀`, the turns
+  `θ(d, −) = d + 1` and `θ(d, =) = 9 − d` (`ring/found35d.txt`). Without the reflector the same marks
+  close only modulo 10, the `2b` conflict of the last section. No restart improves it.
+- On the sums' units alone (9,018 marks), no reflector is needed: the newline origin keys modulo
+  `2·5·11 = 110`, the units ring's own key (`ring/found35u.txt`).
+- On both together (13,566 marks), the closure with no reflector has torsion `2:1` and no key, and
+  `+` or `−` reflecting alone keys modulo 10. **`−` reflecting with `=` restarting** keys modulo
+  `2·5·11 = 110` with no failure, and it is the only choice of the 251 that does: `+` reflecting with
+  `=` restarting keys modulo 10 (`ring/found35sd.txt`, `RING_REFLECT.txt`). Its turns: a sum's
+  operand units `θ(d, +) = θ(d, =) = 11(d + 1)`, a difference's minuend units
+  `θ(d, −) = 99 − 11d`, the newline's `#10d` turns `82 − 10d`, `θ(+, d) = 108 − 10d` and
+  `θ(−, d) = 90 − 10d`, all modulo 110.
+
+So the machine, told nothing of either sign, found `−` to be `+` with the hand reversed from `−` to
+`=`, and one key reads both. This is the mathematics thread's §11 table, located rather than named.
+The prediction of the last section was half right: one of `+` and `−` reflects, but which one is
+not a gauge once the hand is restored at `=` (`+` reflecting with `=` restarting keys modulo 10
+only), and the shared key does not stop at the units in the arithmetic: modulo `110` it holds the
+result's elevens beside its units. Whether the ring founded there carries them to the tens is the
+writing's question.
+
+**The writing.** The ring founded at the kept key (203.4 s against 346 s projected, its exact share
+1.006) was joined as a fourth rank beside the units ring, the 110 ring at the sums' tens and the
+differences' units ring, at five harmonics each with their readouts carried. Its readout, founded on
+the arithmetic block with the other three held, took one round saving 4,461 nats against the 4,550
+its 9,100 free parameters ask (277.4 s against 486 s).
+
+**The acceptance fails.** The tower writes **144 of the 268** held-out differences whole and right
+(129 before the joint ring), 74 of the 143 it never met; the sums hold at 422 of 495 (424), and the
+held-out text codes 2.414 bits a byte (2.338), under its bound but worse in every medium except
+arithmetic: prose 3.135 (3.018), Lean 2.390 (2.278), Rust 2.093 (1.998), arithmetic 2.038 (2.056)
+(`WRITTEN_SUMS.txt`, every line in `LINES_founded33_arithmetic.tsv`). Of the 124 wrong differences,
+63 are wrong in the tens alone (68 before), 17 in the units alone (16), 19 in both (27) and 25 in
+the length (28). At the differences' own tens cells the tower is right at 133 of 223 (112 before) at
+1.34 bits a digit (1.57), and the joint ring's part of the guess names 2 of them. The sums lost
+since the two rings wrote 445 are wrong in the units: 35 in the units alone, against 16 then.
+
+**Why the tens stay** [an exterior reading]. The joint ring's first-harmonic turn at the
+differences' tens is ordered by the tens, from 157° at 1 to 269° at 9, but crowded into 112° of the
+circle with resultants 0.65 to 0.90, and a leave-one-out nearest-centroid read from its five
+harmonics names 48 of the 223 (`RING_RANK_CENTROIDS.{py,txt}`). The ring was founded at the units
+marks: its key reads the result's units where they arrive, and what it holds of the tens is what the
+units' loop leaves on the circle a cell earlier, not a turn located at the tens. The sums' tens are
+carried by a ring founded at their own tens marks (the 110 ring), and the differences' tens closed on
+nothing in the last section, when the ring had no hand.
+
+**Decided next** [agent-inferred]. The closure at the tens, with the hand: the sums' and the
+differences' tens together (`sum-diff-tens`) and the differences' alone (`diff-tens`), each searched
+for its reflector and restart as here. The prediction: `−` reflecting with `=` restarting closes the
+tens of both with one key, as it closed their units, and the ring founded there carries the
+differences' tens as the 110 ring carries the sums'. The acceptance stays: at least 201 of 268
+differences and 370 of 495 sums whole and right, the held-out text at or under 2.458 bits a byte.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3546,7 +3641,9 @@ the differences should not need a mechanism of their own.
   was answered by a shorter prefix, not a larger deadline. The whole held-out read at the 110
   ring's 55 characters stopped at its deadline and is reported incomplete; the ring is read at five
   characters, a changed declared read with its own reason, and the 55-character figure was not
-  re-read under a longer deadline.
+  re-read under a longer deadline. The closure's search with the hand was stopped three times on
+  its rate or reached its deadline; each was answered by a changed law (the restart sought only
+  beside a reflection that closes, then the echelon kept reduced), never by a larger deadline.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
@@ -3573,7 +3670,8 @@ the differences should not need a mechanism of their own.
   harmonics are set by that modulus, or declared by a run beside the outside reading of what the
   founded turn resolves. No digit, base or sum is named to either founding. The tens landmark says
   where a sum's tens are coded and hands no value; the closure at it, which found no key, was not
-  answered by naming one.
+  answered by naming one. No reflector or restart is named to the closure either: the reflection is
+  the ring move's own hand, and which class reflects and which restores is located by the loops.
 
 ## Receipts
 
@@ -3738,6 +3836,12 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   holds it whole, and each operation's wrong lines by where they go wrong).
 - The differences: `RING_DIFF.txt` (the closure at the differences' units and its ring, the join,
   the readout's founding, its reads, and the closure at the differences' tens).
+- The reflection: `RING_REFLECT.txt` (every keyed closure with the hand on the differences' units,
+  the sums' units and both, their summaries and kept keys, the joint ring's founding, the join, its
+  readout's founding, every read and the writing) and `RING_RANK_CENTROIDS.{py,txt}` (each ring
+  rank's turn by class at the held-out differences' tens and units, and its leave-one-out
+  centroid read); the written lines are `LINES_founded33_arithmetic.tsv`, counted in
+  `WRITTEN_SUMS.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3777,4 +3881,8 @@ row on its own scale, and the context checks) and `ring26` (`7c510f7d…`, the N
 units, its founding and reads). The tens use `ring27` (`8a69dee5…`, the closure at the tens, the
 ring under the whole key, its readout at 55 harmonics and reads), `ring28` (`ea85d668…`, the
 regressions, the two rings, their foundings and reads) and `ring29` (`e4417b54…`, the sums carried
-64 bits wide, the block check, the founding that meets the acceptance and its reads).
+64 bits wide, the block check, the founding that meets the acceptance and its reads). The
+reflection uses `ring32` (`0f8aeac3…`, the whole search, stopped), `ring33` (`69def066…`, the
+search by row count, at its deadlines), `ring34` (`7d17d3cb…`, the restarts beside the keyed
+reflectors, stopped) and `ring35` (`4a76318b…`, the reduced echelon: the three closures, the joint
+ring's founding, the join, its readout, its reads and the writing).

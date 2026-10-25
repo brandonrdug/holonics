@@ -1,0 +1,145 @@
+# − is + reversed: receipt lines of the closures with the ring's hand (binary ring35; every keyed closure, the summary, the kept key and the founding)
+## ring35a d: the differences' units alone (landmarks.py diff-units, 4,548 marks)
+RING_CLOSURE origin=#10 reflector=* restart=0 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39033
+RING_CLOSURE origin=#10 reflector=* restart=1 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39346
+RING_CLOSURE origin=#10 reflector=* restart=2 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39610
+RING_CLOSURE origin=#10 reflector=* restart=3 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39853
+RING_CLOSURE origin=#10 reflector=* restart=4 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40054
+RING_CLOSURE origin=#10 reflector=* restart=5 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40318
+RING_CLOSURE origin=#10 reflector=* restart=6 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40569
+RING_CLOSURE origin=#10 reflector=* restart=7 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40876
+RING_CLOSURE origin=#10 reflector=* restart=8 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41171
+RING_CLOSURE origin=#10 reflector=* restart=9 reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40849
+RING_CLOSURE origin=#10 reflector=* restart== reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41093
+RING_CLOSURE origin=#10 reflector=* restart=none reflections=9005 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=506
+RING_CLOSURE origin=#10 reflector=+ restart=0 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39039
+RING_CLOSURE origin=#10 reflector=+ restart=1 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39284
+RING_CLOSURE origin=#10 reflector=+ restart=2 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39522
+RING_CLOSURE origin=#10 reflector=+ restart=3 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39774
+RING_CLOSURE origin=#10 reflector=+ restart=4 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39046
+RING_CLOSURE origin=#10 reflector=+ restart=5 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39306
+RING_CLOSURE origin=#10 reflector=+ restart=6 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39555
+RING_CLOSURE origin=#10 reflector=+ restart=7 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39805
+RING_CLOSURE origin=#10 reflector=+ restart=8 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40086
+RING_CLOSURE origin=#10 reflector=+ restart=9 reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40336
+RING_CLOSURE origin=#10 reflector=+ restart== reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40590
+RING_CLOSURE origin=#10 reflector=+ restart=none reflections=9027 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=762
+RING_CLOSURE origin=#10 reflector=- restart=0 reflections=4556 rows=4548 unique=4541 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=39043
+RING_CLOSURE origin=#10 reflector=- restart== reflections=4556 rows=4548 unique=4541 columns=148 rank=134 minor_bits=1 candidates= torsion= key_modulus=10 exact=true elapsed_ms=41392
+RING_CLOSURE origin=#10 reflector=- restart=none reflections=4556 rows=4548 unique=4541 columns=148 rank=134 minor_bits=1 candidates= torsion= key_modulus=10 exact=true elapsed_ms=967
+RING_CLOSURE origin=#10 reflector== restart=0 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40159
+RING_CLOSURE origin=#10 reflector== restart=1 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40408
+RING_CLOSURE origin=#10 reflector== restart=2 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40650
+RING_CLOSURE origin=#10 reflector== restart=3 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=40898
+RING_CLOSURE origin=#10 reflector== restart=4 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41151
+RING_CLOSURE origin=#10 reflector== restart=5 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41405
+RING_CLOSURE origin=#10 reflector== restart=6 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41343
+RING_CLOSURE origin=#10 reflector== restart=7 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41533
+RING_CLOSURE origin=#10 reflector== restart=8 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41445
+RING_CLOSURE origin=#10 reflector== restart=9 reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=41567
+RING_CLOSURE origin=#10 reflector== restart=none reflections=22587 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=3374
+RING_CLOSURE origin=#10 reflector=none restart=none reflections=0 rows=4548 unique=4548 columns=148 rank=135 minor_bits=8 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=259
+closures with no key: 229
+origins unmet: 9
+RING_CLOSURES origins=15 tried=277 met=268 keyed=39 elapsed_ms=41568
+RING_KEY origin=#10 reflector=- restart=none modulus=10 exact=true failures=0 residues=0:9,1:8,2:7,3:6,4:5,5:4,6:3,7:2,8:1,9:0 turns=#101:9,#102:9,#103:9,#104:9,#105:9,#106:9,#107:9,#108:9,#109:9,0-:1,0=:9,1-:2,1=:8,2-:3,2=:7,3-:4,3=:6,4-:5,4=:5,5-:6,5=:4,6-:7,6=:3,7-:8,7=:2,8-:9,8=:1
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=77264
+MEASURE exit=-15 wall_s=78.0 peak_rss_kib=403468
+## ring35a u: the sums' units alone (landmarks.py sum-units, 9,018 marks)
+RING_CLOSURE origin=#10 reflector=* restart=0 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=45846
+RING_CLOSURE origin=#10 reflector=* restart=1 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46187
+RING_CLOSURE origin=#10 reflector=* restart=2 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46530
+RING_CLOSURE origin=#10 reflector=* restart=3 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46867
+RING_CLOSURE origin=#10 reflector=* restart=4 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=47237
+RING_CLOSURE origin=#10 reflector=* restart=5 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=47633
+RING_CLOSURE origin=#10 reflector=* restart=6 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=47996
+RING_CLOSURE origin=#10 reflector=* restart=7 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48357
+RING_CLOSURE origin=#10 reflector=* restart=8 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48791
+RING_CLOSURE origin=#10 reflector=* restart=9 reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=49141
+RING_CLOSURE origin=#10 reflector=* restart== reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=49461
+RING_CLOSURE origin=#10 reflector=* restart=none reflections=9005 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=783
+RING_CLOSURE origin=#10 reflector=+ restart=0 reflections=9027 rows=9018 unique=9018 columns=149 rank=145 minor_bits=6 candidates=2,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=46921
+RING_CLOSURE origin=#10 reflector=+ restart== reflections=9027 rows=9018 unique=9018 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=49484
+RING_CLOSURE origin=#10 reflector=+ restart=none reflections=9027 rows=9018 unique=9018 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=1190
+RING_CLOSURE origin=#10 reflector=- restart=0 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=45874
+RING_CLOSURE origin=#10 reflector=- restart=1 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46209
+RING_CLOSURE origin=#10 reflector=- restart=2 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46551
+RING_CLOSURE origin=#10 reflector=- restart=3 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46889
+RING_CLOSURE origin=#10 reflector=- restart=4 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=47271
+RING_CLOSURE origin=#10 reflector=- restart=5 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=47718
+RING_CLOSURE origin=#10 reflector=- restart=6 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48065
+RING_CLOSURE origin=#10 reflector=- restart=7 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48377
+RING_CLOSURE origin=#10 reflector=- restart=8 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48739
+RING_CLOSURE origin=#10 reflector=- restart=9 reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48461
+RING_CLOSURE origin=#10 reflector=- restart== reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=48802
+RING_CLOSURE origin=#10 reflector=- restart=none reflections=4556 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=1541
+RING_CLOSURE origin=#10 reflector== restart=0 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=45876
+RING_CLOSURE origin=#10 reflector== restart=1 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=46226
+RING_CLOSURE origin=#10 reflector== restart=2 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=46568
+RING_CLOSURE origin=#10 reflector== restart=3 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=45847
+RING_CLOSURE origin=#10 reflector== restart=4 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=46198
+RING_CLOSURE origin=#10 reflector== restart=5 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=46545
+RING_CLOSURE origin=#10 reflector== restart=6 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=46885
+RING_CLOSURE origin=#10 reflector== restart=7 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=47250
+RING_CLOSURE origin=#10 reflector== restart=8 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=47616
+RING_CLOSURE origin=#10 reflector== restart=9 reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=47981
+RING_CLOSURE origin=#10 reflector== restart=none reflections=22587 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,3,5 torsion=2:1,3:1,5:1 key_modulus=30 exact=false elapsed_ms=5188
+RING_CLOSURE origin=#10 reflector=none restart=none reflections=0 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=433
+closures with no key: 229
+origins unmet: 9
+RING_CLOSURES origins=15 tried=277 met=268 keyed=39 elapsed_ms=49484
+RING_KEY origin=#10 reflector=none restart=none modulus=110 exact=false failures=0 residues=0:102,1:103,2:104,3:105,4:106,5:107,6:108,7:109,8:0,9:1 turns=#100:100,#101:90,#102:80,#103:70,#104:60,#105:50,#106:40,#107:30,#108:20,#109:10,+0:90,+1:80,+2:70,+3:60,+4:50,+5:40,+6:30,+7:20,+8:10,0+:11,0=:11,1+:22,10:20,11:10,13:100,14:90,15:80,16:70,17:60,18:50,19:40,1=:22,2+:33,20:40,21:30,22:20,23:10,25:100,26:90,27:80,28:70,29:60,2=:33,3+:44,30:60,31:50,32:40,33:30,34:20,35:10,37:100,38:90,39:80,3=:44,4+:55,40:80,41:70,42:60,43:50,44:40,45:30,46:20,47:10,49:100,4=:55,5+:66,50:100,51:90,52:80,53:70,54:60,55:50,56:40,57:30,58:20,59:10,5=:66,6+:77,60:10,62:100,63:90,64:80,65:70,66:60,67:50,68:40,69:30,6=:77,7+:88,70:30,71:20,72:10,74:100,75:90,76:80,77:70,78:60,79:50,7=:88,8+:99,80:50,81:40,82:30,83:20,84:10,86:100,87:90,88:80,89:70,8=:99,90:70,91:60,92:50,93:40,94:30,95:20,96:10,98:100,99:90,=1:100,=2:90,=3:80,=4:70,=5:60,=6:50,=7:40,=8:30,=9:20
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=84483
+MEASURE exit=-15 wall_s=85.1 peak_rss_kib=541652
+## ring35s: the sums' and the differences' units together (landmarks.py sum-diff-units, 13,566 marks), and the ring founded at the kept key
+RING_CLOSURE origin=#10 reflector=+ restart=0 reflections=9027 rows=13566 unique=13566 columns=169 rank=165 minor_bits=7 candidates=2,5 torsion=2:2,5:1 key_modulus=10 exact=false elapsed_ms=62950
+RING_CLOSURE origin=#10 reflector=+ restart== reflections=9027 rows=13566 unique=13566 columns=169 rank=164 minor_bits=7 candidates=2,3,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=64907
+RING_CLOSURE origin=#10 reflector=+ restart=none reflections=9027 rows=13566 unique=13566 columns=169 rank=164 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=2167
+RING_CLOSURE origin=#10 reflector=- restart=0 reflections=4556 rows=13566 unique=13552 columns=169 rank=165 minor_bits=9 candidates=2,3,5 torsion=2:2,5:1 key_modulus=10 exact=false elapsed_ms=63032
+RING_CLOSURE origin=#10 reflector=- restart== reflections=4556 rows=13566 unique=13552 columns=169 rank=164 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 exact=false elapsed_ms=65722
+RING_CLOSURE origin=#10 reflector=- restart=none reflections=4556 rows=13566 unique=13552 columns=169 rank=164 minor_bits=8 candidates=2,5 torsion=2:1,5:1 key_modulus=10 exact=false elapsed_ms=2695
+closures with no key: 241
+origins unmet: 4
+RING_CLOSURES origins=15 tried=251 met=247 keyed=6 elapsed_ms=65800
+RING_KEY origin=#10 reflector=- restart== modulus=110 exact=false failures=0 residues=0:102,1:103,2:104,3:105,4:106,5:107,6:108,7:109,8:0,9:1 turns=#100:82,#101:72,#102:62,#103:52,#104:42,#105:32,#106:22,#107:12,#108:2,#109:102,+0:108,+1:98,+2:88,+3:78,+4:68,+5:58,+6:48,+7:38,+8:28,+9:18,-0:90,-1:80,-2:70,-3:60,-4:50,-5:40,-6:30,-7:20,-8:10,0+:11,0-:99,0=:11,1+:22,1-:88,10:20,11:10,13:100,14:90,15:80,16:70,17:60,18:50,19:40,1=:22,2+:33,2-:77,20:40,21:30,22:20,23:10,25:100,26:90,27:80,28:70,29:60,2=:33,3+:44,3-:66,30:60,31:50,32:40,33:30,34:20,35:10,37:100,38:90,39:80,3=:44,4+:55,4-:55,40:80,41:70,42:60,43:50,44:40,45:30,46:20,47:10,49:100,4=:55,5+:66,5-:44,50:100,51:90,52:80,53:70,54:60,55:50,56:40,57:30,58:20,59:10,5=:66,6+:77,6-:33,60:10,62:100,63:90,64:80,65:70,66:60,67:50,68:40,69:30,6=:77,7+:88,7-:22,70:30,71:20,72:10,74:100,75:90,76:80,77:70,78:60,79:50,7=:88,8+:99,8-:11,80:50,81:40,82:30,83:20,84:10,86:100,87:90,88:80,89:70,8=:99,90:70,91:60,92:50,93:40,94:30,95:20,96:10,98:100,99:90,=1:100,=2:90,=3:80,=4:70,=5:60,=6:50,=7:40,=8:30,=9:20
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=102026
+RING_RANK rank=0 channels=2 marked_cells=13566 exact_share_permille=1006 push_shift=80 read_shift=6 elapsed_ms=203205
+RING_WRITTEN forms=1 sha256=770d501e318f243f7aeef84d7f7fc4980238df5a33280680fbbe6140d9290a20 elapsed_ms=203209
+MEASURE exit=0 wall_s=203.4 peak_rss_kib=1085456
+## the join: the units ring, the 110 ring at the sums' tens and the differences' units ring with their founded readouts carried (ring/founded31.state), and the joint ring beside them
+RING_JOIN level=0 mode=41 ranks=4 pair_moves=203,203,203,203 key_moduli=10,110,10,110 harmonics=5 readout_carried_ranks=3 material=866444 sha256=c32b19ef9ae8f48d53ffea5122d46747f03286c5e6304de05969393468b49f44 elapsed_ms=836
+MEASURE exit=0 wall_s=0.9 peak_rss_kib=123652
+## ring35b: the joint ring's readout founded on the arithmetic block, the three other readouts held
+RING_READOUT_CURVATURE round=0 live_pairs=1862393 pairs=3241950 released_ppm=212 elapsed_ms=120063
+RING_READOUT_PHASE round=0 phase=curvature blocks=75 elapsed_ms=136934
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=188138
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:4973104,2:3587810,3:2385712,4:1864795,5:1570166
+RING_READOUT_ROUND round=0 kappa_on_2^-16=294344 capped_rows=15 newton_reach_bits=5 code_on_2^-20=451116658908 line_code=451116666212 saved_millinats=4460626 another=false round_ms=74224 elapsed_ms=194127
+RING_READOUT cells=216130 channels=650 held_ranks=3 arriving_classes=15 free=9100 rounds=1 kappas_on_2^-16=294344 code_before_on_2^-20=457864584124 code_at_zero=457864584124 code_founded=451116658908 evaluations=20 largest=16639850 moment_sections=211 moments_ms=82489 sha256=f2dc5a9a173a4bafd61137042003a9cf0478f4c6020ac35e75f97421f9f35bc6 read_ms=119789 elapsed_ms=277310
+MEASURE exit=0 wall_s=277.4 peak_rss_kib=747160
+## reads of the founded learner (sha256 f2dc5a9a…): the sums' tens (T) and units (U) split, the held-out text, and the differences' tens (T-) and units (U-) split, beside the same reads of ring/founded31.state
+at33.T: TOWER_SPLIT cells=495 ring_top_is_next=83 rest_top_is_next=311 ring_not_whole=0 whole_not_ring=377
+at33.T: TOWER_AT cells=495 top_is_next=460 code_on_2^-20=168480190 ring_ranks=4 elapsed_ms=12196
+at33.T: MEASURE exit=0 wall_s=12.2 peak_rss_kib=62160
+at33.U: TOWER_SPLIT cells=495 ring_top_is_next=346 rest_top_is_next=48 ring_not_whole=1 whole_not_ring=109
+at33.U: TOWER_AT cells=495 top_is_next=454 code_on_2^-20=429220408 ring_ranks=4 elapsed_ms=12165
+at33.U: MEASURE exit=0 wall_s=12.2 peak_rss_kib=61040
+at33.dev: TOWER_AT cells=48030 top_is_next=24190 code_on_2^-20=121592366923 ring_ranks=4 elapsed_ms=24936
+at33.dev: MEASURE exit=0 wall_s=24.9 peak_rss_kib=62404
+founded33.T-: TOWER_SPLIT cells=223 ring_top_is_next=2 rest_top_is_next=111 ring_not_whole=0 whole_not_ring=131
+founded33.T-: TOWER_AT cells=223 top_is_next=133 code_on_2^-20=312728008 ring_ranks=4 elapsed_ms=12584
+founded33.T-: MEASURE exit=0 wall_s=12.6 peak_rss_kib=62224
+founded33.U-: TOWER_SPLIT cells=268 ring_top_is_next=115 rest_top_is_next=31 ring_not_whole=9 whole_not_ring=112
+founded33.U-: TOWER_AT cells=268 top_is_next=218 code_on_2^-20=355510001 ring_ranks=4 elapsed_ms=12397
+founded33.U-: MEASURE exit=0 wall_s=12.4 peak_rss_kib=62296
+founded31.T-: TOWER_SPLIT cells=223 ring_top_is_next=0 rest_top_is_next=111 ring_not_whole=0 whole_not_ring=112
+founded31.T-: TOWER_AT cells=223 top_is_next=112 code_on_2^-20=367498060 ring_ranks=3 elapsed_ms=11299
+founded31.T-: MEASURE exit=0 wall_s=11.3 peak_rss_kib=53076
+founded31.U-: TOWER_SPLIT cells=268 ring_top_is_next=131 rest_top_is_next=31 ring_not_whole=11 whole_not_ring=99
+founded31.U-: TOWER_AT cells=268 top_is_next=219 code_on_2^-20=357349363 ring_ranks=3 elapsed_ms=11370
+founded31.U-: MEASURE exit=0 wall_s=11.4 peak_rss_kib=53140
+ring/at33.dev.txt prose=3.135 lean=2.390 rust=2.093 arithmetic=2.038 whole=2.414
+ring/at31.dev.txt prose=3.018 lean=2.278 rust=1.998 arithmetic=2.056 whole=2.338
+## the tower writes the held-out arithmetic lines itself (read-lines-stream, 64 agreeing draws)
+write_founded33: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=83832c13f678d07c1fbfaf890c85ce8d46f446849d3f456b3aa7a0d523c4e1a5 elapsed_ms=21731
+write_founded33: MEASURE exit=0 wall_s=21.8 peak_rss_kib=62388

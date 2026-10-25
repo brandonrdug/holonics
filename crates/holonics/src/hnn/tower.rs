@@ -480,6 +480,24 @@ fn ring_carry_adjoint(m: [i128; 4], (gx, gy): (i128, i128)) -> (i128, i128) {
     (release((lr + br) * gx + (li + bi) * gy, MOVE_BITS), release((bi - li) * gx + (lr - br) * gy, MOVE_BITS))
 }
 
+/// [agent-inferred, October 25] **The ring's hand after a move**: the orientation of the moves
+/// composed since the ring's last restart. A move `h ↦ λh + βh̄` is the real map of determinant
+/// `|λ|² − |β|²`: where that is positive it keeps the hand, where negative it reverses it (a
+/// reflection, the dyad `U` of the mathematics thread's
+/// [newline closure record](../../../../research/records/2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md),
+/// §8), and where it is zero the move collapses the ring onto a line or the origin, so the
+/// composite has no orientation and the ring restarts in the given hand. The ring is read in its
+/// own hand, `(Re h, ±Im h)` ([`RingFace::advance`]): a turn met after a reflection is then read
+/// turning the other way, as `a − b` is `a + b` with the second operand's turn reversed.
+pub fn hand_after(m: [i128; 4], hand: bool) -> bool {
+    let [lr, li, br, bi] = m;
+    match (lr * lr + li * li).cmp(&(br * br + bi * bi)) {
+        std::cmp::Ordering::Greater => hand,
+        std::cmp::Ordering::Less => !hand,
+        std::cmp::Ordering::Equal => false,
+    }
+}
+
 /// The ring carried by one move `h ↦ λ h + β h̄`, `m = [Re λ, Im λ, Re β, Im β]` on `2^(−30)`.
 pub fn ring_carry(m: [i128; 4], (re, im): (i128, i128)) -> (i128, i128) {
     let [lr, li, br, bi] = m;
@@ -549,6 +567,8 @@ pub struct RingFace {
     /// The characters the readout reads each rank's turn through ([`RingFace::with_harmonics`]):
     /// `1` reads the turn `ρ` alone.
     harmonics: usize,
+    /// Each rank's restarting class ([`RingFace::with_restarts`]), when it has one.
+    restarts: Vec<Option<usize>>,
 }
 
 /// [agent-inferred, October 25] `|λ| + |β| < 1` on the moves' grain, decided exactly: with
@@ -610,7 +630,8 @@ impl RingFace {
             founded.extend(a.into_iter().chain(b).chain(g));
             shifts.push(([ra, rb, rg], rank.push_shift, rank.read_shift));
         }
-        Ok(Self { level, mode, shifts, opening, founded, moves, harmonics: 1 })
+        let restarts = vec![None; shifts.len()];
+        Ok(Self { level, mode, shifts, opening, founded, moves, harmonics: 1, restarts })
     }
 
     /// [agent-inferred, October 25] **The readout reads the turn through its characters**: each
@@ -634,6 +655,31 @@ impl RingFace {
     /// The characters the readout reads each rank's turn through ([`RingFace::with_harmonics`]).
     pub fn harmonics(&self) -> usize {
         self.harmonics
+    }
+
+    /// [agent-inferred, October 25] **The hand's restart**: at each arrival of rank `r`'s class
+    /// `restarts[r]`, after its move, the ring is re-based into the hand it reads,
+    /// `h ↦ (Re h, o Im h)` and `o ↦ +` ([`hand_after`]). Its read at that cell is unchanged (it is
+    /// that read); a turn met afterwards counts with the restored hand. A reflection reverses the
+    /// hand and a restart restores it only where it is reversed, so a reflection between restarts
+    /// reverses exactly the turns met between them: `a − b = c` read with `−` reflecting and `=`
+    /// restarting turns the subtrahend's pairs back and the result's forward, as `a + b = c` turns
+    /// them all forward (the mathematics thread's scratch reading, October 25: on sums and
+    /// differences together the closure then has torsion `2·5·11`, where a reflection alone leaves
+    /// `2·5`). A collapsing move restarts the ring with its hand; this restarts only the hand.
+    /// Refused unless one class or none a rank; a class outside the alphabet never arrives, and
+    /// the join and the text refuse one.
+    pub fn with_restarts(mut self, restarts: Vec<Option<usize>>) -> Result<Self> {
+        if restarts.len() != self.shifts.len() {
+            return refuse("a ring's restarts are one class or none a rank");
+        }
+        self.restarts = restarts;
+        Ok(self)
+    }
+
+    /// Each rank's restarting class ([`RingFace::with_restarts`]).
+    pub fn restarts(&self) -> &[Option<usize>] {
+        &self.restarts
     }
 
     /// [agent-inferred, October 25] **The move the ring makes** when `cur` arrives after `prev`
@@ -728,18 +774,27 @@ impl RingFace {
 
     /// One cell: each rank's ring carried by its move `m[r]` (its pair move or the mode's) and
     /// pushed from the carried face `s` and the arriving class `u`, with the factors `ranks` and
-    /// their pools `pools` read from the material ([`Reaches`]); returns each rank's read
-    /// `(Re, Im)` released by its `read_shift` (the founding's reading).
-    fn advance(ranks: &[RingRank], pools: &[(i128, i128)], ring: &mut [(i128, i128)], s: &[i64], u: usize, m: &[[i128; 4]]) -> Result<Vec<i64>> {
+    /// their pools `pools` read from the material ([`Reaches`]); each rank's hand follows its move
+    /// ([`hand_after`]), and a rank whose restarting class `u` is re-based into the hand it reads
+    /// ([`RingFace::with_restarts`]). Returns each rank's read in its own hand, `(Re h, ±Im h)`,
+    /// released by its `read_shift` (the founding's reading).
+    #[allow(clippy::too_many_arguments)]
+    fn advance(ranks: &[RingRank], pools: &[(i128, i128)], restarts: &[Option<usize>], ring: &mut [(i128, i128)], hands: &mut [bool], s: &[i64], u: usize, m: &[[i128; 4]]) -> Result<Vec<i64>> {
         let k = ranks.len();
         let mut read = Vec::with_capacity(2 * k);
-        for (r, (h, rank)) in ring.iter_mut().zip(ranks).enumerate() {
+        for (r, ((h, o), rank)) in ring.iter_mut().zip(hands.iter_mut()).zip(ranks).enumerate() {
             let (alpha, gamma) = rank.state_factors(s);
             let v = rank.push(alpha, pools[u * k + r], gamma)?;
             let carried = ring_carry(m[r], *h);
             *h = (carried.0 + v.0, carried.1 + v.1);
+            *o = hand_after(m[r], *o);
+            let im = fit64(release(h.1, rank.read_shift))?;
             read.push(fit64(release(h.0, rank.read_shift))?);
-            read.push(fit64(release(h.1, rank.read_shift))?);
+            read.push(if *o { -im } else { im });
+            if *o && restarts[r] == Some(u) {
+                *h = (h.0, -h.1);
+                *o = false;
+            }
         }
         Ok(read)
     }
@@ -749,12 +804,16 @@ impl RingFace {
     /// rode, and the factors `a`, `b` and `g` that pushed it (`ranks`, read from the material, with
     /// their pools); the encoding `E₀` the pools read is held. `ring[t]` is each rank's ring after
     /// cell `t` and `opening` before the first; `faces[t]` is `ŝ_t`; `moves[t]` each rank's move
-    /// (its pair move or the mode's); `g_rho[t]` the covector of each rank's read `q_t` (`Vᵀ dz` carried back
+    /// (its pair move or the mode's); `hands` each rank's hand before the first cell, each later
+    /// hand following the moves ([`hand_after`]) and the restarts ([`RingFace::with_restarts`]: a
+    /// restart's re-basing `(x, y) ↦ (x, o y)` carries the covector after it back the same way);
+    /// `g_rho[t]` the covector of each rank's read `q_t`, read in
+    /// the rank's own hand `o_t` (`Vᵀ dz` carried back
     /// through the ratio by [`ratio_adjoint`], on the face's convention: `2^40` per unit of the
     /// read's grain). Per rank, with `σ = read_shift` and `P = push_shift`,
     ///
     /// ```text
-    /// G_t = g_ρ(t) + Mᵀ_(t+1) G_(t+1)                        (2^(40+σ) per unit of r)
+    /// G_t = (g_ρx(t), o_t g_ρy(t)) + Mᵀ_(t+1) G_(t+1)        (2^(40+σ) per unit of r; o_t = ±1)
     /// ∂ŝ_t = Re(conj(G_t) ∂v_t/∂ŝ_t) 2^(−σ)                  (the modes' convention, per unit of ŝ)
     /// ∂(λ_t, β_t) = (x gx + y gy, x gy − y gx, x gx − y gy, x gy + y gx) 2^(8−σ)   at r_(t−1) = (x, y)
     /// e_t = conj(G_t) β_t γ_t 2^(−P−σ),  h_t = conj(G_t) α_t γ_t 2^(−P−σ),  f_t = Re(conj(G_t) α_t β_t) 2^(−P−σ)
@@ -773,6 +832,7 @@ impl RingFace {
         ranks: &[RingRank],
         pools: &[(i128, i128)],
         opening: &[(i128, i128)],
+        hands: &[bool],
         ring: &[&[(i128, i128)]],
         faces: &[Vec<i64>],
         classes: &[usize],
@@ -796,10 +856,25 @@ impl RingFace {
             let to_moves = |x: i128, y: i128| -> Result<i128> { if sigma >= 8 { wide_release(x, y, sigma - 8) } else { x.checked_mul(y).and_then(|p| p.checked_mul(1 << (8 - sigma))).ok_or_else(wide) } };
             let [ra, rb, rg] = rank.release;
             let (mut da, mut db, mut dg) = ([vec![0i128; dims], vec![0i128; dims]], [vec![0i128; width + 1], vec![0i128; width + 1]], vec![0i128; dims + 1]);
+            // The hand after each cell's move, from the opening's: the read is (Re h, o_t Im h); a
+            // restart then re-bases a reversed ring, (x, y) ↦ (x, −y), and restores the hand.
+            let own: Vec<(bool, bool)> = moves
+                .iter()
+                .zip(classes)
+                .scan(hands[r], |o, (m, &u)| {
+                    let read = hand_after(m[r], *o);
+                    let rebased = read && self.restarts[r] == Some(u);
+                    *o = read && !rebased;
+                    Some((read, rebased))
+                })
+                .collect();
             let mut g = (0i128, 0i128);
             for t in (0..n).rev() {
                 let back = if t + 1 < n { ring_carry_adjoint(moves[t + 1][r], g) } else { (0, 0) };
-                g = (g_rho[t][2 * r] as i128 + back.0, g_rho[t][2 * r + 1] as i128 + back.1);
+                let back = if own[t].1 { (back.0, -back.1) } else { back };
+                let own_t = own[t].0;
+                let gy = g_rho[t][2 * r + 1] as i128;
+                g = (g_rho[t][2 * r] as i128 + back.0, if own_t { -gy } else { gy } + back.1);
                 let (gx, gy) = g;
                 let (x, y) = if t == 0 { opening[r] } else { ring[t - 1][r] };
                 let terms = [(x, gx, y, gy, 1), (x, gy, y, gx, -1), (x, gx, y, gy, -1), (x, gy, y, gx, 1)];
@@ -862,7 +937,8 @@ impl RingFace {
 
     /// The face as text: its placement and each rank's shifts, then `E₀`, then, when any rank has
     /// pair moves, one line a rank (`ring-moves N prev,cur,Re λ,Im λ,Re β,Im β …`, `N = 0` for a
-    /// rank riding its mode). Its factors are the material's, written with it.
+    /// rank riding its mode), `ring-harmonics H` past one character and `ring-restarts c|- …` when a
+    /// rank restarts its hand. Its factors are the material's, written with it.
     fn to_text(&self) -> String {
         let join = |xs: &mut dyn Iterator<Item = String>| xs.collect::<Vec<_>>().join(" ");
         let shifts = join(&mut self.shifts.iter().map(|([ra, rb, rg], push, read)| format!("{ra},{rb},{rg},{push},{read}")));
@@ -876,10 +952,13 @@ impl RingFace {
         if self.harmonics > 1 {
             s.push_str(&format!("ring-harmonics {}\n", self.harmonics));
         }
+        if self.restarts.iter().any(Option::is_some) {
+            s.push_str(&format!("ring-restarts {}\n", join(&mut self.restarts.iter().map(|c| c.map_or("-".to_string(), |c| c.to_string())))));
+        }
         s
     }
 
-    fn from_text(head: &str, opening: &str, moves: &[&str], harmonics: Option<&str>, declaration: &TowerDeclaration) -> Result<Self> {
+    fn from_text(head: &str, opening: &str, moves: &[&str], harmonics: Option<&str>, restarts: Option<&str>, declaration: &TowerDeclaration) -> Result<Self> {
         let bad = TowerError::Refused("not a ring face's text");
         let words: Vec<&str> = head.split(' ').collect();
         if words.len() < 4 || words[0] != "ring-face" {
@@ -929,7 +1008,17 @@ impl RingFace {
             Some(Some(h)) if h > 1 => h,
             Some(_) => return Err(bad),
         };
-        Ok(Self { level, mode, shifts, opening, founded: Vec::new(), moves, harmonics })
+        let restarts_line = restarts.is_some();
+        let restarts: Vec<Option<usize>> = match restarts.map(|line| line.strip_prefix("ring-restarts ")) {
+            None => vec![None; k],
+            Some(Some(words)) => words.split(' ').map(|w| if w == "-" { Ok(None) } else { w.parse::<usize>().ok().filter(|&c| c < d.alphabet).map(Some).ok_or(bad.clone()) }).collect::<Result<_>>()?,
+            Some(None) => return Err(bad),
+        };
+        // A written restarts line names a restart (the text is canonical).
+        if restarts.len() != k || (restarts_line && restarts.iter().all(Option::is_none)) {
+            return Err(bad);
+        }
+        Ok(Self { level, mode, shifts, opening, founded: Vec::new(), moves, harmonics, restarts })
     }
 }
 
@@ -1082,6 +1171,9 @@ pub struct TowerState {
     pub credit: Option<Vec<LevelCredit>>,
     /// Each ring rank's carried value `r` on its push's grain (empty without a ring face).
     pub ring: Vec<(i128, i128)>,
+    /// Each ring rank's hand ([`hand_after`]): `true` where the moves since its last restart
+    /// reversed it, the ring then read as `(Re r, −Im r)`.
+    pub hands: Vec<bool>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -1773,6 +1865,7 @@ impl Tower {
             previous: self.declaration.alphabet,
             credit: None,
             ring: vec![(0, 0); self.ring.as_ref().map_or(0, RingFace::ranks)],
+            hands: vec![false; self.ring.as_ref().map_or(0, RingFace::ranks)],
         }
     }
 
@@ -2042,7 +2135,7 @@ impl Tower {
                     Some(g) => ((g.lam.0 as i128, g.lam.1 as i128), (g.beta.0 as i128, g.beta.1 as i128)),
                     None => ((t[lv.move_re + m] as i128, t[lv.move_im + m] as i128), (0, 0)),
                 };
-                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &mut state.ring, s, u, &face.moves_at(seam, u, [lam.0, lam.1, beta.0, beta.1]))?;
+                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &face.restarts, &mut state.ring, &mut state.hands, s, u, &face.moves_at(seam, u, [lam.0, lam.1, beta.0, beta.1]))?;
                 let (rho, scales) = face.face(&read)?;
                 ring_face = Some(rho);
                 ring_scale = Some(scales);
@@ -2306,10 +2399,10 @@ impl Tower {
                     .collect();
                 let moves: Vec<Vec<[i128; 4]>> = (0..cells_n).map(|i| face.moves_at(seams[i], classes[i], mode_moves[i])).collect();
                 let after: Vec<&[(i128, i128)]> = cells.iter().filter_map(|cell| cell.ring_after.as_deref()).collect();
-                if after.len() != cells_n || opening.ring.len() != face.ranks() {
+                if after.len() != cells_n || opening.ring.len() != face.ranks() || opening.hands.len() != face.ranks() {
                     return refuse("a ring carried at every cell of a ring-faced tower");
                 }
-                let (d_face, d_moves, d_factors) = face.reverse(&reaches.ring_ranks, &reaches.ring_pools, &opening.ring, &after, &faces, &classes[..cells_n], &moves, &ring_cov)?;
+                let (d_face, d_moves, d_factors) = face.reverse(&reaches.ring_ranks, &reaches.ring_pools, &opening.ring, &opening.hands, &after, &faces, &classes[..cells_n], &moves, &ring_cov)?;
                 let rf = self.layout.ring_factors;
                 for (slot, v) in g[rf..rf + d_factors.len()].iter_mut().zip(d_factors) {
                     *slot += v;
@@ -2776,7 +2869,7 @@ impl Tower {
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
     /// three more with a pair face and two more with a ring face (one more a rank with its pair
-    /// moves and one more with its harmonics).
+    /// moves, one more with its harmonics and one more with its restarts).
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -2788,6 +2881,9 @@ impl Tower {
                 n += 1;
             }
             if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-harmonics ")) {
+                n += 1;
+            }
+            if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-restarts ")) {
                 n += 1;
             }
         }
@@ -2845,7 +2941,8 @@ impl Tower {
                     moves.push(line);
                 }
                 let harmonics = lines.next_if(|l| l.starts_with("ring-harmonics "));
-                Some(RingFace::from_text(head, opening, &moves, harmonics, &declaration)?)
+                let restarts = lines.next_if(|l| l.starts_with("ring-restarts "));
+                Some(RingFace::from_text(head, opening, &moves, harmonics, restarts, &declaration)?)
             }
             None => None,
         };
@@ -2898,6 +2995,9 @@ impl Tower {
         let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
+        }
+        if face.restarts.iter().flatten().any(|&c| c >= self.declaration.alphabet) {
+            return refuse("a ring's restarting class arrives from the alphabet");
         }
         self.theta.resize(layout.len, 0);
         let rf = layout.ring_factors;
@@ -4441,6 +4541,171 @@ mod tests {
             (d.alphabet, 0, [536_870_912, 0, 0, 0]),
         ];
         RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, vec![moves]).expect("a ring face")
+    }
+
+    /// The tiny ring face with founded pair moves that reflect the ring at `(0, 2)` (`|β| > |λ|`)
+    /// and `(2, 0)` (`λ = 0`), turn it at `(1, 3)` and `(3, 1)`, and restart it at `(3, 0)`: on the
+    /// passage its hand reverses, returns at the restart and reverses again.
+    fn tiny_reflected_face(tower: &Tower) -> RingFace {
+        let d = &tower.declaration;
+        let opening = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let moves = vec![
+            (0, 2, [107_374_182, 0, 644_245_094, 322_122_547]),
+            (1, 3, [-214_748_365, 751_619_277, 0, 0]),
+            (2, 0, [0, 0, -429_496_730, 751_619_277]),
+            (3, 0, [0, 0, 0, 0]),
+            (3, 1, [751_619_277, 214_748_365, 0, 0]),
+        ];
+        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, vec![moves]).expect("a ring face")
+    }
+
+    /// A ring that meets a reflection reads in its own hand: `(Re h, −Im h)` from a reflection to
+    /// the next reflection or restart, `(Re h, Im h)` elsewhere, the ring itself carried by the
+    /// moves as before; the face restores exactly from its text.
+    #[test]
+    fn a_reflected_ring_reads_in_its_own_hand() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let face = tiny_reflected_face(&tower);
+        let (d, rank) = (&tower.declaration, tiny_ring_rank(&tower));
+        let (dims, mv) = (2 * d.modes, 4);
+        let mut joined = tower.clone();
+        joined.join_ring_face(face.clone()).expect("joined");
+        let (mut h, mut hand, mut prev) = ((0i128, 0i128), false, d.alphabet);
+        let (mut expected, mut hands) = (Vec::new(), Vec::new());
+        tower
+            .read_input_covectors(&mut tower.rest(), &PASSAGE, 5, |cell| {
+                let s = &cell.carried[..dims];
+                let mode = [cell.moves[mv], cell.moves[mv + 1], cell.moves[mv + 2], cell.moves[mv + 3]].map(i128::from);
+                let m = face.move_at(0, prev, cell.class, mode);
+                let mut hat: Vec<i64> = tower.encoding(cell.class).iter().map(|&e| e as i64).collect();
+                hat.push(1 << FACE_BITS);
+                let (alpha, gamma) = rank.state_factors(s);
+                let v = rank.push(alpha, rank.pool(&hat), gamma)?;
+                let carried = ring_carry(m, h);
+                h = (carried.0 + v.0, carried.1 + v.1);
+                hand = hand_after(m, hand);
+                expected.push([h.0 as i64, (if hand { -h.1 } else { h.1 }) as i64]);
+                hands.push(hand);
+                prev = cell.class;
+                Ok(())
+            })
+            .expect("read");
+        let mut read = Vec::new();
+        joined
+            .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
+                let r = ring.expect("read").0;
+                read.push([r[0], r[1]]);
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(read, expected);
+        assert!(hands.contains(&true) && hands.contains(&false), "the passage reverses the hand and restores it: {hands:?}");
+        assert!(expected.iter().zip(&hands).any(|(e, &o)| o && e[1] != 0), "a reversed hand is read off the real axis");
+        assert_eq!(Tower::from_text(&joined.to_text()).expect("restored"), joined);
+    }
+
+    /// A move keeps the hand where its determinant `|λ|² − |β|²` is positive, reverses it where
+    /// negative, and restarts the ring in the given hand where it is zero.
+    #[test]
+    fn a_moves_determinant_keeps_reverses_or_restarts_the_hand() {
+        let turn = [751_619_277, 214_748_365, 0, 0];
+        let reflection = [0, 0, -429_496_730, 751_619_277];
+        let leaning = [107_374_182, 0, 644_245_094, 322_122_547];
+        for hand in [false, true] {
+            assert_eq!(hand_after(turn, hand), hand);
+            assert_eq!(hand_after(reflection, hand), !hand);
+            assert_eq!(hand_after(leaning, hand), !hand);
+            assert!(!hand_after([0; 4], hand));
+            assert!(!hand_after([3, 4, 0, 5], hand), "|λ| = |β|: the move collapses the ring onto a line");
+        }
+    }
+
+    /// Where the ring rides reflecting pair moves and reads in its own hand, every family's
+    /// covector still carries its path.
+    #[test]
+    fn the_reflected_ring_faces_covector_matches_the_code_difference() {
+        let mut tower = tiny_ring_faced(tiny_declared(2, true, true, true, ContactLaw::Pair));
+        let face = tiny_reflected_face(&tower);
+        tower.ring.as_mut().expect("joined").moves = face.moves;
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tower, true, &classes, 9);
+    }
+
+    /// A ring restarted at a class re-bases into the hand it reads wherever that class arrives on
+    /// a reversed hand: its read there is unchanged, and the turns after it count with the restored
+    /// hand. Every class of the passage is tried as the restart, at least one restart is met, the
+    /// face restores exactly from its text, and a restart outside the alphabet is refused by the
+    /// join and by the text.
+    #[test]
+    fn a_restarted_ring_rebases_into_the_hand_it_reads() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let (d, rank) = (&tower.declaration, tiny_ring_rank(&tower));
+        let (dims, mv) = (2 * d.modes, 4);
+        let mut met = 0;
+        for restart in 0..d.alphabet {
+            let face = tiny_reflected_face(&tower).with_restarts(vec![Some(restart)]).expect("restarts");
+            let mut joined = tower.clone();
+            joined.join_ring_face(face.clone()).expect("joined");
+            let (mut h, mut hand, mut prev) = ((0i128, 0i128), false, d.alphabet);
+            let mut expected = Vec::new();
+            tower
+                .read_input_covectors(&mut tower.rest(), &PASSAGE, 5, |cell| {
+                    let s = &cell.carried[..dims];
+                    let mode = [cell.moves[mv], cell.moves[mv + 1], cell.moves[mv + 2], cell.moves[mv + 3]].map(i128::from);
+                    let m = face.move_at(0, prev, cell.class, mode);
+                    let mut hat: Vec<i64> = tower.encoding(cell.class).iter().map(|&e| e as i64).collect();
+                    hat.push(1 << FACE_BITS);
+                    let (alpha, gamma) = rank.state_factors(s);
+                    let v = rank.push(alpha, rank.pool(&hat), gamma)?;
+                    let carried = ring_carry(m, h);
+                    h = (carried.0 + v.0, carried.1 + v.1);
+                    hand = hand_after(m, hand);
+                    expected.push([h.0 as i64, (if hand { -h.1 } else { h.1 }) as i64]);
+                    if hand && cell.class == restart {
+                        h = (h.0, -h.1);
+                        hand = false;
+                        met += 1;
+                    }
+                    prev = cell.class;
+                    Ok(())
+                })
+                .expect("read");
+            let mut read = Vec::new();
+            joined
+                .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
+                    let r = ring.expect("read").0;
+                    read.push([r[0], r[1]]);
+                    Ok(())
+                })
+                .expect("read");
+            assert_eq!(read, expected, "restart at {restart}");
+            assert_eq!(Tower::from_text(&joined.to_text()).expect("restored"), joined);
+        }
+        assert!(met > 0, "the passage meets a restart on a reversed hand");
+        let outside = tiny_reflected_face(&tower).with_restarts(vec![Some(d.alphabet)]).expect("restarts");
+        assert!(tower.clone().join_ring_face(outside).is_err());
+        let mut joined = tower.clone();
+        joined.join_ring_face(tiny_reflected_face(&tower).with_restarts(vec![Some(1)]).expect("restarts")).expect("joined");
+        let text = joined.to_text();
+        assert!(text.contains("ring-restarts 1\n"));
+        assert!(Tower::from_text(&text.replace("ring-restarts 1\n", &format!("ring-restarts {}\n", d.alphabet))).is_err());
+        assert!(Tower::from_text(&text.replace("ring-restarts 1\n", "ring-restarts -\n")).is_err(), "a written line names a restart");
+        assert!(tiny_reflected_face(&tower).with_restarts(Vec::new()).is_err());
+    }
+
+    /// Where the ring reflects and restarts its hand, every family's covector still carries its
+    /// path: the covector arriving from the future is read in the restarted hand.
+    #[test]
+    fn the_restarted_ring_faces_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        for restart in 0..4 {
+            let mut tower = tiny_ring_faced(tiny_declared(2, true, true, true, ContactLaw::Pair));
+            let face = tiny_reflected_face(&tower);
+            let ring = tower.ring.as_mut().expect("joined");
+            ring.moves = face.moves;
+            ring.restarts = vec![Some(restart)];
+            the_covector_of_tower_matches_the_code_difference(tower, true, &classes, 9);
+        }
     }
 
     /// A ring face with founded pair moves rides them where the passage meets their pair and its
