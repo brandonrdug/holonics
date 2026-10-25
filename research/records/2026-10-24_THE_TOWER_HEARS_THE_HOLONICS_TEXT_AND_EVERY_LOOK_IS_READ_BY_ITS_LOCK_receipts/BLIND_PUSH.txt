@@ -1,0 +1,32 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 27.6 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+after = on every line: 84951 cells (the sums' U cells among them 8986)
+the push gate blind, read after = on every line
+   round 0, the form: share (circular) 0.0974; push gate carries the second operand of a sum 0.000, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.029, held out units at B 52 of 495 (62 s)
+   round 0, the push gate: share (circular) 0.1118; push gate carries the second operand of a sum 0.010, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.029, held out units at B 52 of 495 (65 s)
+   round 1, the form: share (circular) 0.1201; push gate carries the second operand of a sum 0.010, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.014, held out units at B 59 of 495 (78 s)
+   round 1, the push gate: share (circular) 0.1228; push gate carries the second operand of a sum 0.013, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.014, held out units at B 59 of 495 (81 s)
+   round 2, the form: share (circular) 0.1244; push gate carries the second operand of a sum 0.013, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.018, held out units at B 70 of 495 (97 s)
+   round 2, the push gate: share (circular) 0.1252; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.018, held out units at B 70 of 495 (100 s)
+   round 3, the form: share (circular) 0.1257; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.018, held out units at B 78 of 495 (115 s)
+   round 3, the push gate: share (circular) 0.1261; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.018, held out units at B 78 of 495 (119 s)
+   round 4, the form: share (circular) 0.1264; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.017, held out units at B 74 of 495 (134 s)
+   round 4, the push gate: share (circular) 0.1265; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.017, held out units at B 74 of 495 (137 s)
+   round 5, the form: share (circular) 0.1267; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.017, held out units at B 69 of 495 (153 s)
+   round 5, the push gate: share (circular) 0.1268; push gate carries the second operand of a sum 0.015, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.017, held out units at B 69 of 495 (156 s)
+the push gate blind, read at every cell
+   round 0, the form: share (circular) 0.0853; push gate carries the second operand of a sum 0.000, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.019, held out units at B 52 of 495 (172 s)
+   round 0, the push gate: share (circular) 0.0965; push gate carries the second operand of a sum 0.012, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.019, held out units at B 52 of 495 (175 s)
+   round 1, the form: share (circular) 0.1009; push gate carries the second operand of a sum 0.012, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.011, held out units at B 55 of 495 (191 s)
+   round 1, the push gate: share (circular) 0.1024; push gate carries the second operand of a sum 0.010, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.011, held out units at B 55 of 495 (195 s)
+   round 2, the form: share (circular) 0.1035; push gate carries the second operand of a sum 0.010, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.007, held out units at B 52 of 495 (211 s)
+   round 2, the push gate: share (circular) 0.1042; push gate carries the second operand of a sum 0.007, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.007, held out units at B 52 of 495 (215 s)
+   round 3, the form: share (circular) 0.1046; push gate carries the second operand of a sum 0.007, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.007, held out units at B 55 of 495 (231 s)
+   round 3, the push gate: share (circular) 0.1049; push gate carries the second operand of a sum 0.004, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.007, held out units at B 55 of 495 (236 s)
+   round 4, the form: share (circular) 0.1051; push gate carries the second operand of a sum 0.004, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.006, held out units at B 50 of 495 (251 s)
+   round 4, the push gate: share (circular) 0.1053; push gate carries the second operand of a sum 0.003, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.006, held out units at B 50 of 495 (255 s)
+   round 5, the form: share (circular) 0.1054; push gate carries the second operand of a sum 0.003, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.006, held out units at B 51 of 495 (273 s)
+   round 5, the push gate: share (circular) 0.1056; push gate carries the second operand of a sum 0.002, read gate carries after = on a sum's line 1.000; holds chi_1(c0) at B 0.006, held out units at B 51 of 495 (278 s)
+done in 277.7 s
+MEASURE exit=0 wall_s=277.9 peak_rss_kib=4533912

@@ -2289,7 +2289,7 @@ state carries.
   - At the digit arrivals they took 14.9 to 16.0 s (peak 24 MiB).
   - At the sums' `U` cells they took 14.8 to 15.8 s.
 - Every cell's moves and input covectors were projected at 30 to 90 s a part with the filter
-  (deadline 180 s, two parts at a time). They took 16.3 to 17.6 s (peak 416 MiB for the moves).
+  (deadline 180 s, two parts at a time). They took 16.3 to 17.6 s (peak 408 MiB for the moves).
 - The eight exterior analyses ran under deadlines set from the earlier foundings' measured times
   (60 to 360 s). No projection was written down before they launched, and that is recorded here as
   missing:
@@ -2307,6 +2307,100 @@ state carries.
 
 The code change passes the gate (`tools/gate.sh`, every step; its first run stopped when the disk
 filled and was rerun after stale build caches were removed) and the tower's 36 tests.
+
+## The operation crosses the reader
+
+The last section left the knot at `B` slipping until the operation crosses it. Here the operation is
+crossed in, first by label and then by the state's own reads. Everything is exterior, computed
+outside the machine with its moments.
+
+**By label, the ring passes the bar** (`RING_OP_REGIONS.py`; ring in mode 41, pool `χ₁`). The
+regions are bounded by an operator's arrival and a relation's arrival on the lines whose last
+operator before `=` is `+`:
+
+| pushed at | read at | holds `χ₁(c₀)` at `B` | held out, units at `B` |
+|---|---|---|---|
+| a sum's second operand (17,073 cells, every sum's `B` among them) | after `=` on a sum's line (31,337) | 0.844 | **385** |
+| a sum's second operand | the sums' `U` cells | 0.865 | 424 |
+| every digit on a sum's line (34,137) | after `=` on a sum's line | 0.824 | 359 |
+
+For comparison: pushed at every digit arrival and read after `=` on a sum's line, 273.
+
+**The state carries the operation on a straight line** (`OP_GATE.py`). Level 0's state before the
+move was read at every cell (`read-tower-modes`, 128 coordinates). Its straight-line read with a
+constant was fitted to each label:
+- "a sum's second operand" at the digit arrivals: R² 0.992 (mean 0.993 inside, 0.001 outside);
+- "after `=` on a sum's line" at every cell: R² 0.824 (0.850 inside, 0.026 outside).
+
+With these fitted reads as soft gates (the ring's push weighted by the push gate's value or its
+square, its reading cells by the read gate's), the ring form reads 359 to 392:
+- with the push gate and the label read, 388 and 392;
+- with both gates, 359 to 372.
+
+These gates are fitted to labels, so they are a ceiling for a strand the state carries, not a
+founding.
+
+**Founded blind, the push gate finds the operation only where the sum's result is read**
+(`BLIND_GATE.py`, `BLIND_PUSH.py`). Each gate is a pair contact of the ring with the state's
+straight-line read `x = (state, 1)`:
+- the push gate `g`: the ring is pushed with `(aᵀs)β_d(gᵀx)`;
+- the read gate `h`: the form read at a cell is `(hᵀx)r`, against the input covector at every cell.
+
+The form, then each gate, is founded in turn by the pool law from unit gates. How much of each
+label the founded gate carries is read outside:
+
+| founded blind | read at | the push gate carries a sum's second operand | held out, units at `B`, by round |
+|---|---|---|---|
+| the push gate | after `=` on a sum's line (label) | 0.34, 0.46, 0.51, 0.55 | 273, 371, 391, **393** |
+| the read gate (push on the label) | its own gate | — (the read gate carries 0.02 to 0.05) | 247, 218, 200, 186 |
+| both gates | their own gates | 0.00 to 0.02 | 52, 66, 74, 69 |
+| the push gate | after `=` on every line | 0.01 to 0.02 | 52 to 78 over six rounds |
+| the push gate | every cell | 0.00 to 0.01 | 50 to 55 over six rounds |
+
+**The push gate alone is not enough, and the crossing is not the loudest thing an operation-free
+region holds** (`GATED_PUSH_FREE_READ.py`). The push is gated by the label, and the form is founded
+in regions that name no operation:
+- read after `=` on every line, it holds 0.759 and reads 321;
+- read at every cell, 0.605 and 247.
+
+The label regions' form scores a circular share of 0.112 after `=` on every line, and 0.045 at
+every cell. The blind founding found 0.127 and 0.106 there. In those regions something louder
+leads, and the founding selects it.
+
+**What it says** [agent-inferred]:
+- The knot at `B` ties when the operation crosses both its ends. The push must carry the operation
+  (321 without it on the read side, 385 with it), and so must the read.
+- The operation is already a strand of the state. A straight line reads "a sum's second operand"
+  almost exactly (0.99), and the pool law finds that strand blind as a pair contact of the push,
+  once the read stands on the sums' results (393).
+- The read gate is not found blind, and an operation-free read does not select the crossing. The
+  sum's crossing is one of several crossings, one for each operation, and on all lines together
+  another form is louder. A single leading form cannot be the sum's; the founding must keep plural
+  forms.
+
+The acceptance is not met by the machine's founded forms. The blind push gate's 393 stands on a
+labelled read region.
+
+**Decided next** [agent-inferred]: found plural ranks in an operation-free region, each a ring form
+with its own blind push gate, deflating the tension by each founded lift. Then read whether one rank
+holds the sum's crossing and its push gate the sum's operand. If one does, the read side is the
+rank's own, and the build is the machine's ranked founding with gated rings.
+
+**The runs.** The projection was written in each analysis before it launched:
+
+| run | projection | deadline | wall time | ratio | peak |
+|---|---|---|---|---|---|
+| `RING_OP_REGIONS.py` | about 90 s | 180 s | 54.8 s | 0.61 | 2.82 GiB |
+| the state reads (`read-tower-modes full`, eight parts, two at a time) | 15 to 25 s a part | 180 s each | 11.5 to 12.4 s a part | 0.46 to 0.83 | 193 MiB |
+| `OP_GATE.py` | about 120 s | 300 s | 93.5 s | 0.78 | 3.35 GiB |
+| `BLIND_GATE.py` | about 330 s | 600 s | 236.2 s | 0.72 | 4.29 GiB |
+| `BLIND_PUSH.py` | about 220 s | 400 s | 277.9 s | 1.26 | 4.32 GiB |
+| `GATED_PUSH_FREE_READ.py` | about 75 s | 180 s | 67.9 s | 0.91 | 4.50 GiB |
+
+- The first state reads failed in their filter: a state on `2^(−24)` passes 32 bits. They were rerun with
+  the rows kept as 64-bit integers, under the same deadline.
+- `BLIND_PUSH.py` ran past its projection (rounds took 16 to 19 s against 15). It stayed inside its
+  deadline and is reported complete.
 
 ## The recorded failures this step could repeat
 
@@ -2440,6 +2534,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_AFTER_RELATION.{py,txt}` and `OP_TURN_AT_B.{py,txt}` (run from the run directory;
   `RING_REGIONS.py` takes `FOUND_RING.py` as its argument, the region reads take both, and
   `OP_TURN_AT_B.py` takes `REGION_SHARE.py`).
+- The operation crossing: `STATE_READS.txt` (the state reads' receipt lines; the reads stay outside
+  the repository), `RING_OP_REGIONS.{py,txt}`, `OP_GATE.{py,txt}`, `BLIND_GATE.{py,txt}`,
+  `BLIND_PUSH.{py,txt}` and `GATED_PUSH_FREE_READ.{py,txt}` (run from the run directory; each takes
+  the scripts it loads as its arguments, as its docstring names them).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -2458,4 +2556,4 @@ circuit readings use `circuit1` (`604a10c8…`), and the mode readings `modes1` 
 (`6b4b79b5…`, the code-weighted), `situated4` (`6a20bb33…`, the covector reads), `situated5`
 (`0cdf49dd…`, the warm start, the sixteen forms and their reads), `situated6` (`fa381fdc…`, the
 resume), `situated7` (`25f4309f…`, the complex forms, their reads and the modes at the sums' cells)
-and `situated8` (`1abd5ebb…`, the mode covectors and every cell's reads).
+and `situated8` (`1abd5ebb…`, the mode covectors, every cell's reads and the state reads).

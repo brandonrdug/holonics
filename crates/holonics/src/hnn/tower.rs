@@ -2941,7 +2941,8 @@ mod tests {
     /// The input covectors are the reverse's: summed class by class over a section they are the
     /// encoding's covector, each cell's carried face is the state its class meets, and the reading
     /// moves the state as the forward does; read in shorter sections, each section's sum is its
-    /// own reverse's, and the sections continue the one passage.
+    /// own reverse's, and the sections continue the one passage. Beside each cell's covector the
+    /// reverse hands its covector to every level's modes, one `(re, im)` per mode.
     #[test]
     fn the_input_covectors_sum_to_the_encodings_covector() {
         let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
@@ -2968,12 +2969,14 @@ mod tests {
                 }
                 start += part.len() - 1;
             }
-            let (mut summed, mut count) = (vec![0i128; a * w], 0);
+            let (mut summed, mut count, mut moved) = (vec![0i128; a * w], 0, false);
             let mut read = tower.rest();
             tower
                 .read_input_covectors(&mut read, &classes, section, |cell| {
                     assert_eq!(cell.class, classes[count]);
                     assert_eq!(cell.carried, &carried_face(&states[count].modes).expect("face")[..]);
+                    assert_eq!(cell.modes.len(), 2 * states[count].modes.iter().map(Vec::len).sum::<usize>());
+                    moved |= cell.modes.iter().any(|&v| v != 0);
                     for (slot, &v) in summed[cell.class * w..(cell.class + 1) * w].iter_mut().zip(cell.covector) {
                         *slot += v as i128;
                     }
@@ -2983,6 +2986,7 @@ mod tests {
                 .expect("read");
             assert_eq!(count, classes.len() - 1);
             assert!(summed.iter().any(|&v| v != 0));
+            assert!(moved);
             assert_eq!(summed, expected);
             assert_eq!(read, state);
         }

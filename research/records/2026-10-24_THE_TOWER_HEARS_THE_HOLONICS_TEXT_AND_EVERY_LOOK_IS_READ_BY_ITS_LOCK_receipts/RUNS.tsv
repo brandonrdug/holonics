@@ -144,3 +144,10 @@ the ring read where the tension stands out	-	RING_TENSION_READ.py	not written	24
 the ring read after the relation	-	RING_AFTER_RELATION.py	not written	240	-	49.0	-	2920784	complete
 the operation at B	-	OP_TURN_AT_B.py	not written	120	-	33.1	-	971668	complete
 each mode's memory and turn	-	MODE_MEMORY.py	not written	60	-	9.9	-	943656	complete
+the ring in operation-crossed label regions	-	RING_OP_REGIONS.py	about 90	180	-	54.8	0.61	2960944	complete
+the state at every cell (int32 rows)	situated8	read-tower-modes full, eight parts, two at a time	15 to 25 a part	180	-	11.5 to 12.4 a part	-	224880	failed in the filter: a value past 32 bits
+the state at every cell	situated8	read-tower-modes full, eight parts, two at a time, int64 rows	15 to 25 a part	180	-	11.5 to 12.4 a part	0.46 to 0.83	197716	complete
+the soft operation gates	-	OP_GATE.py	about 120	300	-	93.5	0.78	3512876	complete
+the gates founded blind	-	BLIND_GATE.py	about 330	600	-	236.2	0.72	4500152	complete
+the push gate founded blind, operation-free reads	-	BLIND_PUSH.py	about 220	400	-	277.9	1.26	4533912	complete; past its projection, inside its deadline
+the gated push with operation-free reads	-	GATED_PUSH_FREE_READ.py	about 75	180	-	67.9	0.91	4715340	complete
