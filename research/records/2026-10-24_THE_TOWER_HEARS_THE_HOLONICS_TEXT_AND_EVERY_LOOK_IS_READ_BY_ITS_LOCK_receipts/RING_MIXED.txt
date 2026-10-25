@@ -1,0 +1,94 @@
+# The readout founded on the four media: every founding's and read's log lines (the reads stay outside the repository).
+
+## ring23: the control, the readout founded on the arithmetic block at the curvature grain 2^-12 (readout23b)
+RING_READOUT_CURVATURE round=0 live_pairs=2057555 pairs=3241950 released_ppm=189 elapsed_ms=80554
+RING_READOUT_ROUND round=0 kappa_on_2^-16=3079242 direction_lift=21 code_on_2^-20=490220236669 line_code=490220314087 saved_millinats=18653159 another=true round_ms=115191 elapsed_ms=195612
+RING_READOUT_CURVATURE round=1 live_pairs=1994957 pairs=3241950 released_ppm=186 elapsed_ms=195841
+RING_READOUT_ROUND round=1 kappa_on_2^-16=916283 direction_lift=23 code_on_2^-20=481257143896 line_code=481257163541 saved_millinats=5924933 another=true round_ms=125453 elapsed_ms=321075
+RING_READOUT_CURVATURE round=2 live_pairs=1905823 pairs=3241950 released_ppm=196 elapsed_ms=321319
+RING_READOUT_ROUND round=2 kappa_on_2^-16=576255 direction_lift=23 code_on_2^-20=478576654436 line_code=478576659629 saved_millinats=1771902 another=false round_ms=115863 elapsed_ms=436944
+RING_READOUT cells=216130 channels=650 arriving_classes=15 free=9100 rounds=3 kappas_on_2^-16=3079242,916283,576255 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=478576654436 evaluations=112 largest=42492097 moment_sections=211 moments_ms=58066 sha256=… read_ms=80121 elapsed_ms=495404
+MEASURE exit=0 wall_s=495.5 peak_rss_kib=1166832
+
+## ring23: the development read of the four-media passage, stopped at its deadline on purpose (devread23m)
+RING_READOUT_CURVATURE round=0 live_pairs=25416494 pairs=143815392 released_ppm=2090 elapsed_ms=351777
+MEASURE exit=deadline wall_s=400.8 peak_rss_kib=5124364
+
+## ring24: the readout founded on the four media (readout24m)
+RING_READOUT_CURVATURE round=0 live_pairs=25416494 pairs=143815392 released_ppm=2090 elapsed_ms=358493
+RING_READOUT_PHASE round=0 phase=curvature blocks=840 elapsed_ms=1154732
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=1757171
+RING_READOUT_ROUND round=0 kappa_on_2^-16=398448 direction_lift=-21 code_on_2^-20=2057082645198 line_code=2057082645212 saved_millinats=281 another=false round_ms=1549038 elapsed_ms=1897487
+RING_READOUT cells=856044 channels=650 arriving_classes=168 free=108550 rounds=1 kappas_on_2^-16=398448 code_before_on_2^-20=2057083070164 code_at_zero=2057083070164 code_founded=2057082645198 evaluations=36 largest=5643016 moment_sections=835 moments_ms=207452 sha256=c9222e55cb64ddf8eda8da9a780b415adce04529b4e6c42a1085b713f461aa5a read_ms=345531 elapsed_ms=2106051
+MEASURE exit=0 wall_s=2106.1 peak_rss_kib=7878644
+
+## ring25: the readout founded on the four media (readout25m)
+RING_READOUT_CURVATURE round=0 live_pairs=25416494 pairs=143815392 released_ppm=2090 elapsed_ms=343561
+RING_READOUT_PHASE round=0 phase=curvature blocks=840 elapsed_ms=1222493
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=1822197
+RING_READOUT_ROUND round=0 kappa_on_2^-16=599967 capped_rows=1 newton_reach_bits=22 code_on_2^-20=2057082567634 line_code=2057082569611 saved_millinats=332 another=false round_ms=1597971 elapsed_ms=1936688
+RING_READOUT cells=856044 channels=650 arriving_classes=168 free=108550 rounds=1 kappas_on_2^-16=599967 code_before_on_2^-20=2057083070164 code_at_zero=2057083070164 code_founded=2057082567634 evaluations=21 largest=5910036 moment_sections=835 moments_ms=227477 sha256=5508f0b161e790d49355abd3dc5a1dec794bc893f95eff9cb88b03051a075f33 read_ms=335602 elapsed_ms=2165461
+MEASURE exit=0 wall_s=2165.6 peak_rss_kib=8755736
+
+## ring26: the readout founded on the four media (readout26m)
+RING_READOUT_CURVATURE round=0 live_pairs=25416494 pairs=143815392 released_ppm=2090 elapsed_ms=352502
+RING_READOUT_PHASE round=0 phase=curvature blocks=840 elapsed_ms=1205581
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=1819272
+RING_READOUT_ROUND round=0 kappa_on_2^-16=341079 capped_rows=168 newton_reach_bits=50 code_on_2^-20=1941493118435 line_code=1941493129454 saved_millinats=76409196 another=true round_ms=1633620 elapsed_ms=1981359
+RING_READOUT_CURVATURE round=1 live_pairs=25107242 pairs=143815392 released_ppm=2056 elapsed_ms=1989488
+RING_READOUT_PHASE round=1 phase=curvature blocks=840 elapsed_ms=2833542
+RING_READOUT_PHASE round=1 phase=solve elapsed_ms=3470263
+RING_READOUT_ROUND round=1 kappa_on_2^-16=209888 capped_rows=168 newton_reach_bits=49 code_on_2^-20=1895786696285 line_code=1895786677308 saved_millinats=30213621 another=false round_ms=1658833 elapsed_ms=3640402
+RING_READOUT cells=856044 channels=650 arriving_classes=168 free=108550 rounds=2 kappas_on_2^-16=341079,209888 code_before_on_2^-20=2057083070164 code_at_zero=2057083070164 code_founded=1895786696285 evaluations=39 largest=10083237 moment_sections=835 moments_ms=225282 sha256=24f5a893fdc94d1c19168cd3480a00a98fc8b1fe46ab5245c8f712e7ad6d1a1b read_ms=344574 elapsed_ms=3866658
+MEASURE exit=0 wall_s=3866.8 peak_rss_kib=10025360
+
+## the context checks: ring22's readout read at the held-out units behind the passage's text before its arithmetic
+### all 639,914 bytes (ctx25, stopped at its deadline)
+MEASURE exit=deadline wall_s=300.0 peak_rss_kib=30148
+the last cell read: 651890
+### the last 100,000 bytes (ctx26)
+TOWER_SPLIT cells=495 ring_top_is_next=437 rest_top_is_next=48 ring_not_whole=1 whole_not_ring=39
+TOWER_AT cells=495 top_is_next=475 code_on_2^-20=323451797 ring_ranks=1 elapsed_ms=81838
+MEASURE exit=0 wall_s=81.9 peak_rss_kib=30412
+
+## the reads of at23_block at U (split), B and the whole held-out text
+U: TOWER_SPLIT cells=495 ring_top_is_next=435 rest_top_is_next=48 ring_not_whole=1 whole_not_ring=41
+U: TOWER_AT cells=495 top_is_next=475 code_on_2^-20=321542762 ring_ranks=1 elapsed_ms=9970
+U: MEASURE exit=0 wall_s=10.0 peak_rss_kib=32424
+B: TOWER_AT cells=1253 top_is_next=1158 code_on_2^-20=463186033 ring_ranks=1 elapsed_ms=4762
+B: MEASURE exit=0 wall_s=4.8 peak_rss_kib=32472
+dev: TOWER_AT cells=48030 top_is_next=21520 code_on_2^-20=153212405386 ring_ranks=1 elapsed_ms=18996
+dev: MEASURE exit=0 wall_s=19.0 peak_rss_kib=32704
+
+## the reads of at24_mixed at U (split), B and the whole held-out text
+U: TOWER_SPLIT cells=495 ring_top_is_next=0 rest_top_is_next=48 ring_not_whole=0 whole_not_ring=48
+U: TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478334 ring_ranks=1 elapsed_ms=8972
+U: MEASURE exit=0 wall_s=9.0 peak_rss_kib=33428
+B: TOWER_AT cells=1253 top_is_next=1155 code_on_2^-20=527674186 ring_ranks=1 elapsed_ms=4408
+B: MEASURE exit=0 wall_s=4.5 peak_rss_kib=33264
+dev: TOWER_AT cells=48030 top_is_next=23489 code_on_2^-20=123288118181 ring_ranks=1 elapsed_ms=17749
+dev: MEASURE exit=0 wall_s=17.8 peak_rss_kib=33204
+
+## the reads of at25_mixed at U (split), B and the whole held-out text
+U: TOWER_SPLIT cells=495 ring_top_is_next=0 rest_top_is_next=48 ring_not_whole=0 whole_not_ring=48
+U: TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478371 ring_ranks=1 elapsed_ms=9234
+U: MEASURE exit=0 wall_s=9.3 peak_rss_kib=33248
+B: TOWER_AT cells=1253 top_is_next=1155 code_on_2^-20=527674186 ring_ranks=1 elapsed_ms=4703
+B: MEASURE exit=0 wall_s=4.7 peak_rss_kib=33212
+dev: TOWER_AT cells=48030 top_is_next=23489 code_on_2^-20=123288120681 ring_ranks=1 elapsed_ms=18615
+dev: MEASURE exit=0 wall_s=18.7 peak_rss_kib=33208
+
+## the reads of at26_mixed at U (split), B and the whole held-out text
+U: TOWER_SPLIT cells=495 ring_top_is_next=305 rest_top_is_next=48 ring_not_whole=2 whole_not_ring=166
+U: TOWER_AT cells=495 top_is_next=469 code_on_2^-20=497757258 ring_ranks=1 elapsed_ms=9155
+U: MEASURE exit=0 wall_s=9.2 peak_rss_kib=35876
+B: TOWER_AT cells=1253 top_is_next=1153 code_on_2^-20=499114623 ring_ranks=1 elapsed_ms=4719
+B: MEASURE exit=0 wall_s=4.7 peak_rss_kib=35760
+dev: TOWER_AT cells=48030 top_is_next=24540 code_on_2^-20=117612140105 ring_ranks=1 elapsed_ms=19345
+dev: MEASURE exit=0 wall_s=19.4 peak_rss_kib=35696
+
+## the held-out text by medium (DEV_BY_MEDIUM.py htext2/dev.roles READ...)
+ring/at22_joined.dev.txt prose=3.067 lean=2.364 rust=2.067 arithmetic=2.294 whole=2.448
+ring/at23_block.dev.txt prose=4.109 lean=3.169 rust=2.754 arithmetic=2.136 whole=3.042
+ring/at26_mixed.dev.txt prose=2.969 lean=2.242 rust=1.968 arithmetic=2.162 whole=2.335
+ring/at15_foil15.dev.txt prose=3.111 lean=2.400 rust=2.108 arithmetic=2.211 whole=2.458

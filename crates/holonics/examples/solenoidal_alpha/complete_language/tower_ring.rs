@@ -55,7 +55,7 @@ use super::tower_train::{count, pair_hats, positive, release_big, solve_scaled, 
 use super::*;
 use holonics::hnn::tower::{ring_carry, RingFace, RingRank, Tower, TowerError, TowerLearner, FACE_BITS, MOVE_BITS};
 use num_bigint::BigInt;
-use num_traits::{Signed, ToPrimitive, Zero};
+use num_traits::{One, Signed, ToPrimitive, Zero};
 use rayon::prelude::*;
 
 /// The largest magnitude a ring read, a channel or a covector entry may have: each product is
@@ -1990,16 +1990,29 @@ pub(super) fn read_tower_at(args: &[String]) -> Result<()> {
 /// step releases it, on `2^(−16)` of a bit), with `p_t` its masses as a ratio to their total and
 /// `q_t` the arriving class. For each class `c` that arrives in the passage, the round's direction
 /// for its row is the Newton step of the passage's code in that row, `H_c d_c = −m_c` with
-/// `H_c = Σ_t p_tc (1 − p_tc) φ_t φ_tᵀ` (the code's curvature in the row, on `2^(−24)`) and
-/// `m_c = Σ_t φ_t (p_tc − q_tc)` (its covector), solved exactly on a copy released to a common
-/// grain (directions only). A ring read through its harmonics ([`RingFace::with_harmonics`])
+/// `H_c = Σ_t p_tc (1 − p_tc) φ_t φ_tᵀ` (the code's curvature in the row) and
+/// `m_c = Σ_t φ_t (p_tc − q_tc)` (its covector, `p` on `2^(−24)`), solved exactly on a copy
+/// released to a common grain (directions only). The curvature only points the direction (the
+/// exact code's line fixes the step and reads its saving), so its weight `p(1 − p)` is carried on
+/// `2^(−12)`: a pair (cell, class) below `2^(−13)` adds no curvature, and the share of the whole
+/// curvature so released is reported each round. On a passage of several media most pairs are of
+/// classes a cell does not expect, and the curvature's cost is its live pairs' [agent-inferred,
+/// October 25]. A ring read through its harmonics ([`RingFace::with_harmonics`])
 /// takes the curvature within each harmonic's channels: the cross blocks between two harmonics of
 /// a turn that runs over the circle average toward zero, as the classes' cross blocks through the
 /// normalization are dropped, and a block-diagonal curvature is positive, so its step is a descent
 /// direction whose scale the exact code's line then fixes [agent-inferred, October 25]; it is
-/// `H` blocks of `k/H` channels in place of one of `k`. The rows' directions, on one scale, are moved together by the scale
-/// under which the passage codes least: doubled from the direction's grain while the code falls,
-/// then narrowed by golden section to `2^(−8)` of the bracket, each code read from the face's
+/// `H` blocks of `k/H` channels in place of one of `k`. Each row's direction is on its own scale:
+/// its Newton step, `d_c · 2^28 / ln 2` in readout units (the logit is `w·φ·2^(−40)` bits, the
+/// code's curvature in it `ln 2 · p(1 − p)`, and the solve's curvature and covector are on `2^(−12)`
+/// and `2^(−24)`; without that factor the step fell `2^28.5` short and the four-media founding
+/// saved a third of a nat), unless that moves some cell's offset by more than one bit, and then scaled to
+/// one bit, which keeps the code's curvature along the step within a factor four of the one solved
+/// with (the log-sum's self-concordance; one scale for every row let a rare class's thin
+/// curvature round every other row's direction to zero) [agent-inferred, October 25]. The rows'
+/// steps are moved together by the scale under which the passage codes least: from the trusted
+/// step, doubled while the code falls or halved until it falls, then narrowed by golden section
+/// to `2^(−8)` of the bracket, each code read from the face's
 /// masses carried through the offsets' exponential (a founding's reading at the masses' grain; the
 /// joined tower's own read measures the result). A round is followed by another while it pays:
 /// while its saving, read exactly at the readout it leaves, reaches half a nat for each free
@@ -2115,8 +2128,25 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
             })
             .collect();
         // Each arriving class's curvature and covector, the curvature within each harmonic's
-        // channels: |φ| < 2^21 and p(1 − p) ≤ 2^22 keep every term below 2^64, and the sums inside
-        // 128 bits over fewer than 2^60 cells.
+        // channels: |φ| < 2^21 and p(1 − p) ≤ 2^10 on its grain keep every term below 2^52, and the
+        // sums inside 128 bits over fewer than 2^60 cells. First the pairs (cell, class) whose
+        // curvature is live at its grain, and the curvature released below it (on 2^(−48)), read
+        // before the curvature is accumulated, so a round's cost is known before it is spent.
+        let tally = probs.par_iter().fold(|| [0u128; 3], |mut acc, &p| {
+            let exact = (p as i128 * ((1i128 << 24) - p as i128)) as u128;
+            let live = (exact + (1 << 35)) >> 36 != 0;
+            acc[0] += u128::from(live);
+            acc[1] += if live { 0 } else { exact };
+            acc[2] += exact;
+            acc
+        }).reduce(|| [0u128; 3], |a, b| [a[0] + b[0], a[1] + b[1], a[2] + b[2]]);
+        println!(
+            "RING_READOUT_CURVATURE round={round} live_pairs={} pairs={} released_ppm={} elapsed_ms={}",
+            tally[0],
+            n * r,
+            (tally[1] * 1_000_000 + tally[2] / 2) / tally[2].max(1),
+            started.elapsed().as_millis()
+        );
         let blocks: Vec<(BlockId, Vec<i128>, Vec<i128>)> = (0..r)
             .flat_map(|j| (0..harmonic_blocks.len()).map(move |b| (j, b)))
             .collect::<Vec<_>>()
@@ -2130,7 +2160,7 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
                 for t in 0..n {
                     let p = probs[t * r + j] as i128;
                     let y = p - if nexts[t] == c { 1 << 24 } else { 0 };
-                    let curvature = (p * ((1 << 24) - p) + (1 << 23)) >> 24;
+                    let curvature = (p * ((1 << 24) - p) + (1 << 35)) >> 36;
                     if y == 0 && curvature == 0 {
                         continue;
                     }
@@ -2155,6 +2185,8 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
                 ((j, b), h, m)
             })
             .collect();
+        // Each phase of the round is reported as it ends, so a long round is read as it runs.
+        println!("RING_READOUT_PHASE round={round} phase=curvature blocks={} elapsed_ms={}", blocks.len(), started.elapsed().as_millis());
         // Each row's Newton direction in each harmonic on a copy released so its curvature's
         // largest entry is below 2^40, the covector by the same shift: `D · H⁻¹ m` and `D`.
         let solved: Vec<(BlockId, BigInt, Vec<BigInt>)> = blocks
@@ -2169,28 +2201,99 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
                 Ok((*id, det, y.into_iter().map(|row| row.into_iter().next().unwrap_or_default()).collect()))
             })
             .collect::<std::result::Result<_, String>>()?;
-        // One scale for every row: the largest entry of the direction near 2^20.
-        let widest = solved.iter().filter(|(_, det, y)| !det.is_zero() && y.iter().any(|v| !v.is_zero())).map(|(_, det, y)| y.iter().map(|v| v.bits()).max().unwrap_or(0) as i64 - det.bits() as i64).max();
-        let Some(widest) = widest else {
+        println!("RING_READOUT_PHASE round={round} phase=solve elapsed_ms={}", started.elapsed().as_millis());
+        // Each row on its own scale [agent-inferred, October 25]. One lift for every row let the
+        // widest row (a class rare in the passage, its curvature thin where its covector is not)
+        // set the scale, and every other row's direction rounded to zero. Row `j`'s direction is
+        // lifted so its widest entry is near 2^20, `D_j = 2^(ℓ_j) d_j`.
+        let mut widest = vec![None::<i64>; r];
+        for ((j, _), det, y) in &solved {
+            if det.is_zero() || y.iter().all(|v| v.is_zero()) {
+                continue;
+            }
+            let wide = y.iter().map(|v| v.bits()).max().unwrap_or(0) as i64 - det.bits() as i64;
+            widest[*j] = Some(widest[*j].map_or(wide, |w: i64| w.max(wide)));
+        }
+        if widest.iter().all(Option::is_none) {
             if round == 0 {
                 return Err("the passage's code has no direction in the ring's readout".into());
             }
             break;
-        };
-        let lift = 20 - widest;
-        let mut direction = vec![0i64; r * k];
+        }
+        let lifts: Vec<i64> = widest.iter().map(|w| w.map_or(0, |w| 20 - w)).collect();
+        if lifts.iter().any(|l| l.abs() > 100) {
+            return Err("a row's direction lies past 2^100 of the others' grain".into());
+        }
+        let mut lifted = vec![0i64; r * k];
         for ((j, b), det, y) in &solved {
             if det.is_zero() {
                 continue;
             }
+            let lift = lifts[*j];
             for (&i, v) in harmonic_blocks[*b].iter().zip(y) {
                 let (num, den) = if lift >= 0 { (-(v << lift as u32), det.clone()) } else { (-v.clone(), det << (-lift) as u32) };
                 let (num, den) = if den < BigInt::zero() { (-num, -den) } else { (num, den) };
-                direction[j * k + i] = i64::try_from(div_round(&num, &den)).unwrap_or(0);
+                lifted[j * k + i] = i64::try_from(div_round(&num, &den)).map_err(|_| "a lifted direction entry outgrew 64 bits".to_string())?;
             }
         }
-        // Each cell's ring part moved by the direction at unit scale, on 2^(−16) of a bit.
-        let moved = offsets(&direction);
+        // The trust of a step [agent-inferred, October 25]. The code's curvature at a cell is the
+        // variance of the moved offsets under the face's shares, and a step that moves no offset
+        // by more than `s` bits changes every share by a factor within `2^(±2s)`, so the curvature
+        // anywhere along it stays within `4^s` of the one the direction was solved with (the
+        // log-sum's self-concordance in its largest offset). Each row takes its Newton step unless
+        // that moves some cell's offset by more than one bit; then its step is scaled to move that
+        // offset by one bit.
+        //
+        // The Newton step's units. A cell's offset is `(w·φ)·2^(−24)` on `2^(−16)` of a bit, so its
+        // logit is `w·φ·2^(−40)` bits; the code in bits has gradient `p − q` and curvature
+        // `ln 2 · (diag p − p pᵀ)` in those logits. The solve used curvature on `2^(−12)` and the
+        // covector on `2^(−24)`, so its solution `d_j = −H⁻¹m` (lifted above to `D_j = 2^(ℓ_j) d_j`) is
+        // the Newton step on `2^(−28)·ln 2` of a readout unit: the step is `d_j · 2^28 / ln 2`. Row
+        // `j`'s scale on its lifted direction is `ν_j = 2^(28 − ℓ_j) / ln 2`, or `2^16 / reach_j` when
+        // `ν_j · reach_j` passes one bit, with `reach_j` the largest offset the lifted direction
+        // moves (on `2^(−16)` of a bit). The scale is carried on `2^(−40)`.
+        let unit_moved = offsets(&lifted);
+        let reach: Vec<i128> = (0..r).into_par_iter().map(|j| (0..n).map(|t| (unit_moved[t * r + j] as i128).abs()).max().unwrap_or(0)).collect();
+        let one_bit = Rat::from_integer(BigInt::from(1u64 << 16));
+        let pow2 = |e: i64| -> Rat { if e >= 0 { Rat::from_integer(BigInt::one() << e as u32) } else { Rat::new(BigInt::one(), BigInt::one() << (-e) as u32) } };
+        let mut scales = vec![0i128; r];
+        let (mut capped, mut reach_bits) = (0usize, i64::MIN);
+        for j in 0..r {
+            if reach[j] == 0 {
+                continue;
+            }
+            let newton = pow2(28 - lifts[j]) / ln_two.lower.clone();
+            let newton_reach = &newton * Rat::from_integer(BigInt::from(reach[j]));
+            // The Newton step's largest offset, in bits (to the nearest power of two below).
+            let whole = newton_reach.to_integer();
+            let bits = if whole.is_zero() { -(newton_reach.recip().to_integer().bits() as i64) - 16 } else { whole.bits() as i64 - 1 - 16 };
+            reach_bits = reach_bits.max(bits);
+            let scale = if newton_reach > one_bit {
+                capped += 1;
+                Rat::new(BigInt::from(1u64 << 16), BigInt::from(reach[j]))
+            } else {
+                newton
+            };
+            scales[j] = i128::try_from((scale * pow2(40)).round().to_integer()).map_err(|_| "a row's step scale outgrew 128 bits".to_string())?;
+        }
+        if reach_bits == i64::MIN {
+            reach_bits = 0;
+        }
+        let rdiv = |x: i128| -> i128 { (x + (1i128 << 39)) >> 40 };
+        let mut direction = vec![0i64; r * k];
+        for (j, &s) in scales.iter().enumerate() {
+            for i in 0..k {
+                let x = (lifted[j * k + i] as i128).checked_mul(s).ok_or("a scaled direction entry outgrew 128 bits")?;
+                direction[j * k + i] = i64::try_from(rdiv(x)).map_err(|_| "a scaled direction entry outgrew 64 bits".to_string())?;
+            }
+        }
+        // Each cell's ring part moved by the trusted step, on 2^(−16) of a bit.
+        let moved: Vec<i64> = unit_moved
+            .par_iter()
+            .enumerate()
+            .map(|(i, &v)| (v as i128).checked_mul(scales[i % r]).and_then(|x| i64::try_from(rdiv(x)).ok()))
+            .collect::<Option<_>>()
+            .ok_or("a moved offset outgrew 64 bits")?;
         let code = |kappa: i64| -> i64 {
             (0..n)
                 .into_par_iter()
@@ -2200,21 +2303,37 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
                 })
                 .sum()
         };
+        // The line from the trusted step (`kappa` on 2^(−16) of it): doubled while the code falls,
+        // or halved until it falls.
         let (mut best, mut best_code) = (0i64, current);
-        let mut kappa = 1i64;
-        loop {
-            let c = code(kappa);
-            evaluations += 1;
-            if c >= best_code && best > 0 {
-                break;
-            }
-            if c < best_code {
+        let trusted = code(1 << 16);
+        evaluations += 1;
+        if trusted < current {
+            (best, best_code) = (1 << 16, trusted);
+            let mut kappa = 1i64 << 17;
+            loop {
+                if kappa > 1 << 40 {
+                    return Err("the passage's code fell along the trusted step past 2^24 of it".into());
+                }
+                let c = code(kappa);
+                evaluations += 1;
+                if c >= best_code {
+                    break;
+                }
                 (best, best_code) = (kappa, c);
+                kappa *= 2;
             }
-            if kappa >= 1 << 40 {
-                return Err("the passage's code fell along the direction past 2^24 of its unit scale".into());
+        } else {
+            let mut kappa = 1i64 << 15;
+            while kappa >= 1 {
+                let c = code(kappa);
+                evaluations += 1;
+                if c < best_code {
+                    (best, best_code) = (kappa, c);
+                    break;
+                }
+                kappa /= 2;
             }
-            kappa *= 2;
         }
         if best == 0 {
             if round == 0 {
@@ -2264,7 +2383,7 @@ pub(super) fn found_ring_readout(args: &[String]) -> Result<()> {
         let millinats = (&saved_nats * Rat::new(BigInt::from(1000), BigInt::from(1u64 << 20))).round().to_integer().to_string();
         let pays = saved > 0 && saved_nats >= half_free;
         println!(
-            "RING_READOUT_ROUND round={round} kappa_on_2^-16={best} direction_lift={lift} code_on_2^-20={left} line_code={best_code} saved_millinats={millinats} another={pays} round_ms={} elapsed_ms={}",
+            "RING_READOUT_ROUND round={round} kappa_on_2^-16={best} capped_rows={capped} newton_reach_bits={reach_bits} code_on_2^-20={left} line_code={best_code} saved_millinats={millinats} another={pays} round_ms={} elapsed_ms={}",
             round_started.elapsed().as_millis(),
             started.elapsed().as_millis()
         );

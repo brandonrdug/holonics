@@ -28,3 +28,15 @@ founded22 (the same ring, its readout founded by Newton rounds at five harmonics
   2+1: 44 sums; whole 41, ring's part 34, rest 3; 1.032 bits a digit; ring's margin median 1.65 bits
   2+2: 399 sums; whole 390, ring's part 366, rest 40; 0.508 bits a digit; ring's margin median 2.90 bits
   all: 495 sums; whole 475, ring's part 437, rest 48; 0.623 bits a digit; ring's margin median 2.70 bits
+founded23b (the control: founded22's readout founding on the arithmetic block at the curvature grain 2^-12)
+  1+1: 2 sums; whole 2, ring's part 2, rest 0; 1.249 bits a digit; ring's margin median 1.55 bits
+  1+2: 50 sums; whole 42, ring's part 34, rest 5; 1.152 bits a digit; ring's margin median 1.28 bits
+  2+1: 44 sums; whole 41, ring's part 34, rest 3; 1.028 bits a digit; ring's margin median 1.65 bits
+  2+2: 399 sums; whole 390, ring's part 365, rest 40; 0.505 bits a digit; ring's margin median 2.78 bits
+  all: 495 sums; whole 475, ring's part 435, rest 48; 0.619 bits a digit; ring's margin median 2.60 bits
+founded26m (the readout founded on the four media, each row's Newton step in readout units under a one-bit trust)
+  1+1: 2 sums; whole 1, ring's part 1, rest 0; 2.150 bits a digit; ring's margin median 0.70 bits
+  1+2: 50 sums; whole 44, ring's part 16, rest 5; 1.438 bits a digit; ring's margin median -0.72 bits
+  2+1: 44 sums; whole 39, ring's part 14, rest 3; 1.487 bits a digit; ring's margin median -0.31 bits
+  2+2: 399 sums; whole 385, ring's part 274, rest 40; 0.835 bits a digit; ring's margin median 0.59 bits
+  all: 495 sums; whole 469, ring's part 305, rest 48; 0.959 bits a digit; ring's margin median 0.42 bits
