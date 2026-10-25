@@ -3193,9 +3193,10 @@ past one bit (the widest by `2^50` bits), so each row takes the step that moves 
 by one bit, where the log-sum's self-concordance keeps the curvature within a factor of four, and
 the line scales them together.
 
-The founding ran two rounds: the first at 5.2 bits saved 76,409 nats, the second at 3.2 bits saved
-30,214, below the 54,275 that the 108,550 free parameters ask, and it stopped. It took 3,867 s
-against a projection of 7,374 s (deadline 7,400 s), at a peak of 10.0 GB.
+The founding ran two rounds. The line took the first at 5.2 times its trusted step
+(`κ = 341,079/2^16`), which saved 76,409 nats, and the second at 3.2 times it (`209,888/2^16`), which
+saved 30,214, below the 54,275 that the 108,550 free parameters ask, so it stopped. It took 3,867 s
+against a projection of 7,374 s (deadline 7,400 s), at a peak of 9.6 GiB.
 
 | the readout founded on | whole right at `U` (of 495) | ring's part alone | rest alone | ring's margin, median | bits a digit at `U` | held-out text, bits a byte | prose | Lean | Rust | arithmetic |
 |---|---|---|---|---|---|---|---|---|---|---|
