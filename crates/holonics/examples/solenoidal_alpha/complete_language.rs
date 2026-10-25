@@ -817,6 +817,7 @@ pub(super) fn run_with_execution(
         Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
         Some("train-gated-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args),
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
+        Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
         Some("join-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::join_tower_ring(args),

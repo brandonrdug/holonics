@@ -1,0 +1,72 @@
+The state at the label: read-tower-classes-at (mark 1, a label read after its image; 8 parts, each from rest) on the towers after four passes (STATE.2 of tower_digit_4 and tower_one_4), probed by tools/listener/probe.py.
+
+## Reads (deadline from 0.068 ms a class on 4 threads; measured)
+first reading (top face only), binary sha256 5fab7bdb0e796621063122a454221ae1d6729f038ae59f9e39381ef89441f50b:
+  digit_train: CLASSES_AT mark=label cells=1500 width=64 elapsed_ms=21298 | MEASURE exit=0 wall_s=21.3 peak_rss_kib=17988
+  digit_dev: CLASSES_AT mark=label cells=500 width=64 elapsed_ms=3686 | MEASURE exit=0 wall_s=3.7 peak_rss_kib=17480
+  one_train: CLASSES_AT mark=label cells=1500 width=64 elapsed_ms=62288 | MEASURE exit=0 wall_s=62.3 peak_rss_kib=26152
+  one_dev: CLASSES_AT mark=label cells=500 width=64 elapsed_ms=9848 | MEASURE exit=0 wall_s=9.9 peak_rss_kib=17416
+second reading (top face and carried modes), binary sha256 1c8c15296cc0a41ab3dc421d1f4f9b4f55c79052002436e00bb28fe12476637d:
+  digit_train: CLASSES_AT mark=label cells=1500 width=64 levels=2 modes=64 elapsed_ms=31915 | MEASURE exit=0 wall_s=32.0 peak_rss_kib=24800
+  digit_dev: CLASSES_AT mark=label cells=500 width=64 levels=2 modes=64 elapsed_ms=5190 | MEASURE exit=0 wall_s=5.2 peak_rss_kib=17488
+  one_train: CLASSES_AT mark=label cells=1500 width=64 levels=2 modes=64 elapsed_ms=89445 | MEASURE exit=0 wall_s=89.5 peak_rss_kib=33400
+  one_dev: CLASSES_AT mark=label cells=500 width=64 levels=2 modes=64 elapsed_ms=13940 | MEASURE exit=0 wall_s=13.9 peak_rss_kib=17136
+  deadlines 35, 15, 95, 15 s; projected/measured for the passage's training read 95 / 89.5 s (the second reading advances class by class)
+
+## Cells read (sha256)
+  atm_digit_train.bin 8f5abb38c6d70f3e86094cfcf36a17bf2cb4561345b3791825f15a049464779a
+  atm_digit_dev.bin 5610a7c102901ef3db8e3984d2a97f87babd24f51366166ec20e95dc75fc10d4
+  atm_one_train.bin 94dc6e369b0440261ac7a6a1a01ea6e9d34f4f47032dce6ec3d8b353d3643a32
+  atm_one_dev.bin 1f366776b1b2889d6d9df5fe7e45e23444c1f864e5da6143a36b7d66cb8f5601
+
+## Digit sibling: probe.py faces atm_digit_train.bin atm_digit_dev.bin 64 2 64
+== top_face
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 307 of 1500
+nearest_mean held_out 99 of 500
+nearest_mean_scaled train 325 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 103 of 500 (coordinates 64 of 64)
+pooled_covariance train 450 of 1500
+pooled_covariance held_out 76 of 500
+== carried_modes
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 456 of 1500
+nearest_mean held_out 103 of 500
+nearest_mean_scaled train 448 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 111 of 500 (coordinates 256 of 256)
+== mode_energies
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 340 of 1500
+nearest_mean held_out 102 of 500
+nearest_mean_scaled train 479 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 108 of 500 (coordinates 128 of 128)
+
+## One listener: probe.py faces atm_one_train.bin atm_one_dev.bin 64 2 64
+== top_face
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 243 of 1500
+nearest_mean held_out 71 of 500
+nearest_mean_scaled train 241 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 72 of 500 (coordinates 64 of 64)
+pooled_covariance train 426 of 1500
+pooled_covariance held_out 68 of 500
+== carried_modes
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 371 of 1500
+nearest_mean held_out 97 of 500
+nearest_mean_scaled train 388 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 92 of 500 (coordinates 256 of 256)
+== mode_energies
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 295 of 1500
+nearest_mean held_out 105 of 500
+nearest_mean_scaled train 385 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 103 of 500 (coordinates 128 of 128)
+
+## The chart drawn back (foil): probe.py chart one1m/digit
+cells train=1500 held_out=500 labels=0123456789 held_out_by_label=[53, 54, 41, 53, 46, 44, 51, 52, 54, 52] chance=50 majority=54
+nearest_mean train 1137 of 1500
+nearest_mean held_out 377 of 500
+nearest_mean_scaled train 1126 of 1500 (coordinates 46 of 49)
+nearest_mean_scaled held_out 383 of 500 (coordinates 46 of 49)
+pooled_covariance refused: singular

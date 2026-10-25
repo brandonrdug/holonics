@@ -27,7 +27,10 @@ class). The siblings code MNIST and speech below conditional xz (3.684, 3.219) a
 (2.147). Held-out labels are named at chance (52 of 500). GSM8K answers have the answer's lines,
 markup and closing line, with wrong numbers. The speech tower writes a transcript-like line where
 an utterance ends. The next failure is the link every track needs, a target read from its source.
-The
+At the label the state keeps little of the image: exact exterior probes on the top face and the
+carried modes name at most 111 (sibling) and 105 (listener) of 500 held-out labels, where the same
+probe names 383 from the stroke chart itself. The next loop is a section's memory to its end
+letter. The
 [record](research/records/2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE.md)
 holds the measurements and receipts.
 
