@@ -758,8 +758,9 @@ fn shifts(p: &Passage, sc: &Scale, ring: &Ring, step: Option<Factor>) -> Result<
 
 /// One step: the pass with the step's columns, and the leading canonical direction of its demand,
 /// deflated by the founded ranks, against its loudness. Returns the founded parameters (as
-/// [`leading_real`] gives them) and the step's circular share in thousandths (on released copies).
-fn found_step(p: &Passage, sc: &Scale, ranks: &[Ring], ring: &Ring, factor: Factor) -> Result<(Vec<i64>, String, u64)> {
+/// [`leading_real`] gives them) and the step's circular share as an exact ratio (on released
+/// copies).
+fn found_step(p: &Passage, sc: &Scale, ranks: &[Ring], ring: &Ring, factor: Factor) -> Result<(Vec<i64>, (BigInt, BigInt), u64)> {
     let started = std::time::Instant::now();
     let (release, push_shift, read_shift) = shifts(p, sc, ring, Some(factor))?;
     let held = Ring { release, push_shift, read_shift, ..ring.clone() };
@@ -790,8 +791,36 @@ fn found_step(p: &Passage, sc: &Scale, ranks: &[Ring], ring: &Ring, factor: Fact
     let qt: BigInt = (0..m.k).map(|i| BigInt::from(theta[i]) * q[i].iter().zip(theta).map(|(x, &t)| x * t).sum::<BigInt>()).sum();
     let num: BigInt = (0..2).map(|f| (0..w).map(|r| &xt[f * w + r] * (0..w).map(|r2| &yinv[r][r2] * &xt[f * w + r2]).sum::<BigInt>()).sum::<BigInt>()).sum();
     // Y' = fit.y / (L·D): (Y')⁻¹ = L·D·fit.y⁻¹ = L·D·yinv/dy.
-    let share = permille(&(num * &fit.y_scale), &(qt * dy));
-    Ok((theta.clone(), share, started.elapsed().as_millis() as u64))
+    Ok((theta.clone(), (num * &fit.y_scale, qt * dy), started.elapsed().as_millis() as u64))
+}
+
+/// [agent-inferred, October 25] **A round of the founding's alternation pays** when it moves the
+/// form by more than the error the marked cells leave it: its saving reaches half a nat for each
+/// free parameter it re-states. The share counts twice the nats a marked cell saves, so a round
+/// gaining `Δ` saves `N Δ / 2` nats over the `N` marked cells; a step that refits one factor exactly
+/// saves `½ δᵀHδ`, `δ` its move and `H` the code's curvature in that factor, and the factor's own
+/// estimation error has `E[eᵀHe]` at least its count of free parameters, so a round saving less than
+/// half that count moves the factors by less than one standard error each, a difference no
+/// receiver of these cells resolves. `free` is the round's free parameters, each factor's entries
+/// less its scale (a gauge: the ring is read as a ratio to its own power): `(2·dims − 1) +
+/// (2·present − 1) + dims`. The first round always runs, and a round that loses share never pays.
+/// A paying round gains at least `free/N` of share and the share is at most one, so at most
+/// `(1 − share₀)·N/free` rounds pay. This replaces a one-bit rule, under which the unit start's
+/// alternation ran 65 rounds and 257 s, still saving about two bits a round, in a slow tail that
+/// moved the form inside its own error (`ring/found14.txt`), and before it an authored count of
+/// three rounds. Returns the decision and the round's saving in thousandths of a nat, a reading.
+fn round_pays(marked: usize, free: usize, last: Option<&(BigInt, BigInt)>, share: &(BigInt, BigInt)) -> (bool, String) {
+    use holonics::ratio::Rat;
+    let Some(last) = last else {
+        return (true, "-".into());
+    };
+    if share.1.is_zero() || last.1.is_zero() {
+        return (false, "0".into());
+    }
+    let gain = Rat::new(share.0.clone(), share.1.clone()) - Rat::new(last.0.clone(), last.1.clone());
+    let saved = gain * Rat::new(BigInt::from(marked), BigInt::from(2));
+    let millinats = (&saved * Rat::from_integer(BigInt::from(1000))).round().to_integer().to_string();
+    (saved >= Rat::new(BigInt::from(free), BigInt::from(2)), millinats)
 }
 
 /// `Q⁻¹` on a released copy, rows on a common scale (directions only): Gauss–Jordan on
@@ -909,19 +938,22 @@ fn join(v: &[i64]) -> String {
 }
 
 /// `found-tower-ring STATE STATE_SHA TEXT TEXT_SHA MARKS MARKS_SHA STREAMS SECTION LEVEL MODE
-/// RANKS STARTS ROUNDS OUT`: found `RANKS` ring forms riding mode `MODE` of level `LEVEL`, read at
-/// the cells `MARKS` marks (one byte per byte of `TEXT`, nonzero where the reading looks). Each rank
-/// is founded from the unit pool and from each of the classes' coupling's `STARTS` leading modes
-/// ([`coupling_starts`]), each with the unit gate, in `ROUNDS` rounds of `a`, `b`, `g` and a closing
-/// `a`, and keeps the start whose form gives the larger exact share of the founded ranks' channels
+/// RANKS STARTS OUT`: found `RANKS` ring forms riding mode `MODE` of level `LEVEL`, read at the
+/// cells `MARKS` marks (one byte per byte of `TEXT`, nonzero where the reading looks). Each rank is
+/// founded from the unit pool and from each of the classes' coupling's `STARTS` leading modes
+/// ([`coupling_starts`]), each with the unit gate, in rounds of `a`, `b`, `g` to the alternation's
+/// own fixed point and a closing `a` ([`round_pays`]: a round is followed by another while it moves
+/// the form by more than the marked cells' own error, half a nat a free parameter; no round count
+/// is chosen), and keeps the start whose
+/// form gives the larger exact share of the founded ranks' channels
 /// (found-tower-situated's law: search from more than one start, keep the larger). Each kept form
 /// is written to `OUT` (create-new) as it is founded: a `FORM` line (`c = (aᵀŝ)(bᵀx̂)`, read by
 /// `read-tower-situated`) and a `RING` line (its gate, mode and shifts). Each step prints its
 /// circular share on released copies; each start and each rank the exact share of the ranks'
 /// channels in thousandths (twice the nats a marked cell saves).
 pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
-    if args.len() != 15 {
-        return Err("found-tower-ring STATE STATE_SHA TEXT TEXT_SHA MARKS MARKS_SHA STREAMS SECTION LEVEL MODE RANKS STARTS ROUNDS OUT".into());
+    if args.len() != 14 {
+        return Err("found-tower-ring STATE STATE_SHA TEXT TEXT_SHA MARKS MARKS_SHA STREAMS SECTION LEVEL MODE RANKS STARTS OUT".into());
     }
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -930,14 +962,14 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     let marks = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let (streams, section) = (positive(&args[7])?, positive(&args[8])?);
     let (level, mode) = (count(&args[9])?, count(&args[10])?);
-    let (ranks, starts, rounds) = (positive(&args[11])?, count(&args[12])?, count(&args[13])?);
+    let (ranks, starts) = (positive(&args[11])?, count(&args[12])?);
     if level >= tower.declaration.levels || mode >= tower.declaration.modes {
         return Err("LEVEL or MODE names no level or mode of the tower".into());
     }
     if marks.len() != text.len() || text.is_empty() {
         return Err("MARKS holds one byte per byte of TEXT".into());
     }
-    if std::path::Path::new(&args[14]).exists() {
+    if std::path::Path::new(&args[13]).exists() {
         return Err("OUT exists: the forms are written create-new".into());
     }
     let chunk = text.len().div_ceil(streams);
@@ -972,10 +1004,11 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     );
     let pools = coupling_starts(&p, &coupling, starts)?;
     println!("RING_STARTS coupling_modes={} classes={} elapsed_ms={}", pools.len(), coupling.n.iter().filter(|&&n| n > 0).count(), started.elapsed().as_millis());
-    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[14])?;
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[13])?;
     std::io::Write::write_all(&mut file, format!("SITUATED level={level} dims={} width={} state_sha256={} text_sha256={} marks_sha256={} mode={mode}\n", p.dims, p.width, args[2], args[4], args[6]).as_bytes())?;
     let mut founded: Vec<Ring> = Vec::new();
-    let order: Vec<Factor> = (0..rounds).flat_map(|_| [Factor::A, Factor::B, Factor::G]).chain([Factor::A]).collect();
+    let marked = p.marks.iter().filter(|&&m| m != 0).count();
+    let free = (2 * p.dims - 1) + (2 * p.present.len() - 1) + p.dims;
     for rank in 0..ranks {
         let unit = unit_ring(&p);
         let candidates: Vec<(String, Ring)> = std::iter::once(("unit".to_string(), unit.clone()))
@@ -983,15 +1016,32 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
             .collect();
         let mut kept: Option<(BigInt, BigInt, Ring, PassMoments)> = None;
         for (name, mut ring) in candidates {
-            for (n, &factor) in order.iter().enumerate() {
-                let (theta, share, ms) = found_step(&p, &sc, &founded, &ring, factor)?;
+            let (mut step, mut last): (usize, Option<(BigInt, BigInt)>) = (0, None);
+            let found = |factor: Factor, ring: &mut Ring, step: &mut usize| -> Result<(BigInt, BigInt)> {
+                let (theta, s, ms) = found_step(&p, &sc, &founded, ring, factor)?;
                 match factor {
                     Factor::A => ring.a = [theta[..p.dims].to_vec(), theta[p.dims..].to_vec()],
                     Factor::B => ring.b = pool_factor(&p, [&theta[..p.present.len()], &theta[p.present.len()..]])?,
                     Factor::G => ring.g = theta,
                 }
-                println!("RING_STEP rank={rank} start={name} step={n} factor={factor:?} circular_permille={share} pass_ms={ms} elapsed_ms={}", started.elapsed().as_millis());
+                println!("RING_STEP rank={rank} start={name} step={step} factor={factor:?} circular_permille={} pass_ms={ms} elapsed_ms={}", permille(&s.0, &s.1), started.elapsed().as_millis());
+                *step += 1;
+                Ok(s)
+            };
+            for round in 0usize.. {
+                let mut share = (BigInt::zero(), BigInt::from(1));
+                for factor in [Factor::A, Factor::B, Factor::G] {
+                    share = found(factor, &mut ring, &mut step)?;
+                }
+                let (pays, saved) = round_pays(marked, free, last.as_ref(), &share);
+                println!("RING_ROUND rank={rank} start={name} round={round} circular_permille={} saved_millinats={saved} another={pays} elapsed_ms={}", permille(&share.0, &share.1), started.elapsed().as_millis());
+                last = Some(share);
+                if !pays {
+                    break;
+                }
             }
+            // The closing `a`: the form the push reads, once more after the last round.
+            found(Factor::A, &mut ring, &mut step)?;
             let (release, push_shift, read_shift) = shifts(&p, &sc, &ring, None)?;
             ring.release = release;
             ring.push_shift = push_shift;
@@ -1022,7 +1072,7 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
         );
     }
     drop(file);
-    let written = std::fs::read(&args[14])?;
+    let written = std::fs::read(&args[13])?;
     println!("RING_WRITTEN forms={} sha256={} elapsed_ms={}", founded.len(), sha256(&written)?, started.elapsed().as_millis());
     Ok(())
 }
@@ -1388,14 +1438,16 @@ pub(super) fn pass_ring_held(args: &[String]) -> Result<()> {
         return Err("OUT exists: the learner is written create-new".into());
     }
     let tower = &learner.tower;
-    let ring = tower.ring_family().ok_or("pass-ring-held needs a ring-faced tower")?;
-    let factors = tower.ring_factor_family().ok_or("pass-ring-held needs a ring-faced tower")?;
-    let w = ring.start..factors.start;
+    // A tower without a ring (the foil) holds everything but its own readout.
+    let w = match (tower.ring_family(), tower.ring_factor_family()) {
+        (Some(ring), Some(factors)) => Some(ring.start..factors.start),
+        _ => None,
+    };
     let readout = tower.readout_family();
     let len = tower.theta.len();
     learner.held = match args[7].as_str() {
         "all-but-readouts" => {
-            let mut moving = [readout, w];
+            let mut moving: Vec<std::ops::Range<usize>> = std::iter::once(readout).chain(w).collect();
             moving.sort_by_key(|r| r.start);
             let mut held = Vec::new();
             let mut at = 0;
@@ -1406,8 +1458,11 @@ pub(super) fn pass_ring_held(args: &[String]) -> Result<()> {
             held.push(at..len);
             held
         }
-        "ring-readout" => vec![w],
-        "ring-reads" => tower.ring_read_families(),
+        "ring-readout" => vec![w.ok_or("ring-readout needs a ring-faced tower")?],
+        "ring-reads" => {
+            w.as_ref().ok_or("ring-reads needs a ring-faced tower")?;
+            tower.ring_read_families()
+        }
         _ => return Err("HOLD is all-but-readouts, ring-readout or ring-reads".into()),
     };
     let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();

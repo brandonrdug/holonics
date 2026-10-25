@@ -1,0 +1,14 @@
+== founded11 (three authored rounds; ring11): B, E, H, U
+results of 2 digits (256 sums): B 176, E 172, U 163 of 256
+results of 3 digits (239 sums): B 219, E 217, H 212, U 192 of 239
+operands of 1 and 1 digits: 2 sums
+operands of 1 and 2 digits (50 sums): B 36, U 26
+operands of 2 and 1 digits (44 sums): B 7, U 8
+operands of 2 and 2 digits (399 sums): B 347, U 309
+== founded15 (the precision rule; ring15): B, E, H, U
+results of 2 digits (256 sums): B 186, E 180, U 157 of 256
+results of 3 digits (239 sums): B 221, E 219, H 216, U 195 of 239
+operands of 1 and 1 digits: 2 sums
+operands of 1 and 2 digits (50 sums): B 38, U 27
+operands of 2 and 1 digits (44 sums): B 6, U 3
+operands of 2 and 2 digits (399 sums): B 355, U 311
