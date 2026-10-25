@@ -1152,14 +1152,17 @@ pub(super) fn read_tower_situated(args: &[String]) -> Result<()> {
 }
 
 /// [agent-inferred, October 24] `read-tower-input-covectors STATE STATE_SHA TEXT TEXT_SHA CELLS
-/// CELLS_SHA SECTION`: the frozen tower reads `TEXT` as one passage from rest, in sections of
-/// `SECTION` cells as the learner reads it, and at each named cell prints the covector its reverse
-/// sends to the cell's input, `FORMS i class y₁ … y_w` (on the covector's `2^(−24)`): the tension
-/// of the section's later faces carried back to where the class arrived. A reading beside the
-/// code: whether a later face's error reaches an earlier cell at all.
+/// CELLS_SHA SECTION [LEVEL]`: the frozen tower reads `TEXT` as one passage from rest, in sections
+/// of `SECTION` cells as the learner reads it, and at each named cell prints the covector its
+/// reverse sends to the cell's input, `FORMS i class y₁ … y_w` (on the covector's `2^(−24)`): the
+/// tension of the section's later faces carried back to where the class arrived. With `LEVEL` it
+/// prints instead the covector of that level's modes after the cell's push, each mode's `(re, im)`
+/// on the same grain: the tension a value placed in the mode there meets, carried back through the
+/// mode's own moves. A reading beside the code: whether a later face's error reaches an earlier
+/// cell at all, and through which mode.
 pub(super) fn read_tower_input_covectors(args: &[String]) -> Result<()> {
-    if args.len() != 8 {
-        return Err("read-tower-input-covectors STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA SECTION".into());
+    if args.len() != 8 && args.len() != 9 {
+        return Err("read-tower-input-covectors STATE STATE_SHA TEXT TEXT_SHA CELLS CELLS_SHA SECTION [LEVEL]".into());
     }
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
@@ -1167,6 +1170,11 @@ pub(super) fn read_tower_input_covectors(args: &[String]) -> Result<()> {
     let classes: Vec<usize> = text.iter().map(|&b| b as usize).collect();
     let cells: Vec<usize> = std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?.split_whitespace().map(count).collect::<Result<_>>()?;
     let section = positive(&args[7])?;
+    let level = args.get(8).map(|l| count(l)).transpose()?;
+    if level.is_some_and(|l| l >= tower.declaration.levels) {
+        return Err("LEVEL names no level of the tower".into());
+    }
+    let dims = 2 * tower.declaration.modes;
     let Some(&last) = cells.last() else {
         return Err("CELLS names no cell".into());
     };
@@ -1185,7 +1193,8 @@ pub(super) fn read_tower_input_covectors(args: &[String]) -> Result<()> {
             }
             next += 1;
             let mut line = format!("FORMS {i} {}", cell.class);
-            for y in cell.covector {
+            let printed = level.map_or(cell.covector, |l| &cell.modes[l * dims..(l + 1) * dims]);
+            for y in printed {
                 let _ = write!(line, " {y}");
             }
             println!("{line}");

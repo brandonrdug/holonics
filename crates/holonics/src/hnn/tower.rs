@@ -668,12 +668,16 @@ pub struct CircuitCell {
 /// input `x⁰` from every face after it in its section, on the encoding's covector grain `2^(−24)`.
 /// The covector is the tension of the later faces carried back to where the class arrived: the
 /// effective tension a lift of the input meets, which the encoding's own covector sums class by
-/// class.
+/// class. `modes` is the covector the same reverse sends to every level's modes after the cell's
+/// push, `G_h`, level by level and mode by mode `(re, im)`, on the covector's grain `2^(−24)`: the
+/// tension of every later face carried back through each mode's own moves, which a value placed in
+/// that mode at the cell meets (`δL = Re(conj(G_h) δh)`).
 #[derive(Clone, Copy, Debug)]
 pub struct InputCovector<'a> {
     pub class: usize,
     pub carried: &'a [i64],
     pub covector: &'a [i64],
+    pub modes: &'a [i64],
 }
 
 /// The carried state as one face: level by level, each mode's `(re, im)` released from the
@@ -1410,7 +1414,7 @@ impl Tower {
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
     fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<Vec<i128>> {
-        self.reverse_joined(opening, cells, classes, None, compared).map(|(g, _)| g)
+        self.reverse_joined(opening, cells, classes, None, compared, None).map(|(g, _)| g)
     }
 
     /// The reverse scan with a covector reaching each cell's top from outside the tower (the
@@ -1421,7 +1425,9 @@ impl Tower {
     /// covector, while the covectors of the places after it still return through the state it
     /// moved; a place compared with another class than the one read there is the tower's own
     /// release read against the truth where the two part. Beside the families' covector it returns
-    /// each cell's input covector `δx⁰` (what the encoding's covector sums), on `2^(−24)`.
+    /// each cell's input covector `δx⁰` (what the encoding's covector sums), on `2^(−24)`, and, when
+    /// `modes` is given, keeps there every level's mode covectors `G_h` cell by cell
+    /// (`modes[level][cell][mode]`, the covector of the modes after the cell's push).
     fn reverse_joined(
         &self,
         opening: &TowerState,
@@ -1429,6 +1435,7 @@ impl Tower {
         classes: &[usize],
         joined: Option<&[Vec<i64>]>,
         compared: Option<&[Option<usize>]>,
+        mut modes: Option<&mut Vec<Vec<Vec<(i64, i64)>>>>,
     ) -> Result<(Vec<i128>, Vec<Vec<i64>>)> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
@@ -1443,6 +1450,9 @@ impl Tower {
         let mut dzs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
+        if let Some(out) = modes.as_deref_mut() {
+            *out = vec![Vec::new(); d.levels];
+        }
         if compared.is_some_and(|m| m.len() != classes.len()) {
             return refuse("a comparison for each class of the section");
         }
@@ -1739,6 +1749,9 @@ impl Tower {
                         through_gamma[k] += real(credit.around[k]);
                     }
                 }
+            }
+            if let Some(out) = modes.as_deref_mut() {
+                out[l] = std::mem::take(&mut gh_all);
             }
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
             outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs)?;
@@ -2552,10 +2565,12 @@ impl Tower {
             let part = &classes[start..(start + section + 1).min(classes.len())];
             let opening = state.clone();
             let cells = self.forward(state, part, &reaches)?;
-            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None)?;
+            let mut placed = Vec::new();
+            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed))?;
             let mut carried = carried_face(&opening.modes)?;
             for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
-                each(InputCovector { class: part[i], carried: &carried, covector })?;
+                let modes: Vec<i64> = placed.iter().flat_map(|level| level[i].iter().flat_map(|&(re, im)| [re, im])).collect();
+                each(InputCovector { class: part[i], carried: &carried, covector, modes: &modes })?;
                 let after: Vec<Vec<(i64, i64)>> = cell.levels.iter().map(|lc| lc.state.clone()).collect();
                 carried = carried_face(&after)?;
             }

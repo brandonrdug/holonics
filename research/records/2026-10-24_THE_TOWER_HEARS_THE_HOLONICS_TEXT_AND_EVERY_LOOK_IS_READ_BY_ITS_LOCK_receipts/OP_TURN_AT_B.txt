@@ -1,0 +1,6 @@
+training digit arrivals 147775; second operands' units (B) 22444, of them sums 8986; read in 24.9 s
+held-out digit arrivals 8239, sums' B cells 495
++: B cells 8986; the state read holds chi_1(a0) 0.966, its conjugate 0.966; mean of read times conj chi_1(a0): |28001.605| at -0 degrees
+-: B cells 4517; the state read holds chi_1(a0) 0.014, its conjugate 0.014; mean of read times conj chi_1(a0): |2300.474| at 40 degrees
+*: B cells 8941; the state read holds chi_1(a0) 0.114, its conjugate 0.114; mean of read times conj chi_1(a0): |14876.676| at 9 degrees
+MEASURE exit=0 wall_s=33.1 peak_rss_kib=971668

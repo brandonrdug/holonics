@@ -132,3 +132,15 @@ the carry from B to U	-	CARRY_B_TO_U.py	about 40	90	-	16.3	0.41	123980	complete
 the scoring at B by U's demand	-	FOUND_AT_B_BY_U.py, mode 41, 300 steps	about 75	120	-	79.1	1.05	824164	complete; the blind climbs stopped at 300 steps
 the pool founding at B in mode 41	-	FOUND_POOL_AT_B.py	about 70	120	-	47.1	0.67	1425052	complete
 the founding over every placement	-	FOUND_PLACE_AT_B.py	about 90	150	-	66.8	0.74	824416	complete
+the mode covectors at the digit arrivals	situated8	read-tower-input-covectors LEVEL 0, eight parts, four at a time	20 to 30 a part	90	-	14.9 to 16.0 a part	0.50 to 0.80	24104	complete
+the mode covectors at the sums' U cells	situated8	read-tower-input-covectors LEVEL 0, eight parts, four at a time	20 to 30 a part	90	-	14.8 to 15.8 a part	0.49 to 0.79	23844	complete
+every cell's moves	situated8	read-tower-modes full, eight parts, two at a time with the covectors	30 to 90 a part	180	-	16.9 to 17.6 a part	0.19 to 0.59	417412	complete
+every cell's input covectors	situated8	read-tower-input-covectors, eight parts, two at a time with the moves	30 to 90 a part	180	-	16.3 to 17.5 a part	0.18 to 0.58	130340	complete
+the founding against the modes' demand	-	FOUND_BY_MODES_AT_B.py	not written	240	-	67.3	-	1877164	complete
+where the units' demand goes	-	CROSSING_DEMAND.py	not written	120	-	8.8	-	140280	complete
+the ring foundings, no label	-	FOUND_RING.py, modes 41,16,56,48,15,4 and none, pools chi1 and unit	not written	360	-	221.2	-	3104124	complete
+the ring's push and read regions	-	RING_REGIONS.py	not written	240	-	68.2	-	3821088	complete
+the ring read where the tension stands out	-	RING_TENSION_READ.py	not written	240	-	50.6	-	2920580	complete
+the ring read after the relation	-	RING_AFTER_RELATION.py	not written	240	-	49.0	-	2920784	complete
+the operation at B	-	OP_TURN_AT_B.py	not written	120	-	33.1	-	971668	complete
+each mode's memory and turn	-	MODE_MEMORY.py	not written	60	-	9.9	-	943656	complete
