@@ -4,6 +4,8 @@ ring/write_founded26m: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=
 ring/write_founded26m: MEASURE exit=0 wall_s=15.7 peak_rss_kib=35588
 ring/write_founded31: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=cf5af945d3709c003ab59408901b679be2e95e978f3b1d0077d228d053d7240d elapsed_ms=21770
 ring/write_founded31: MEASURE exit=0 wall_s=21.8 peak_rss_kib=53144
+ring/write_founded33: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=83832c13f678d07c1fbfaf890c85ce8d46f446849d3f456b3aa7a0d523c4e1a5 elapsed_ms=21731
+ring/write_founded33: MEASURE exit=0 wall_s=21.8 peak_rss_kib=62388
 ring/write_founded30/LINES.tsv
   1+1: 2 lines; whole right 1, length right 2, last two digits right 1
   1+2: 50 lines; whole right 40, length right 50, last two digits right 40
@@ -46,3 +48,17 @@ ring/write_founded31/LINES.tsv
   * all: 490 lines; whole right 7, length right 440, last two digits right 27
   * wrong: the length 50, the tens alone 111, the units alone 31, both 271
   * never met in training: 3 of 236 right; met: 4 of 254
+ring/write_founded33/LINES.tsv
+  1+1: 2 lines; whole right 1, length right 2, last two digits right 1
+  1+2: 50 lines; whole right 32, length right 50, last two digits right 32
+  2+1: 44 lines; whole right 25, length right 42, last two digits right 25
+  2+2: 399 lines; whole right 364, length right 399, last two digits right 364
+  + all: 495 lines; whole right 422, length right 493, last two digits right 422
+  + wrong: the length 2, the tens alone 22, the units alone 35, both 14
+  + never met in training: 211 of 248 right; met: 211 of 247
+  - all: 268 lines; whole right 144, length right 243, last two digits right 144
+  - wrong: the length 25, the tens alone 63, the units alone 17, both 19
+  - never met in training: 74 of 143 right; met: 70 of 125
+  * all: 490 lines; whole right 15, length right 464, last two digits right 35
+  * wrong: the length 26, the tens alone 129, the units alone 32, both 268
+  * never met in training: 7 of 236 right; met: 8 of 254

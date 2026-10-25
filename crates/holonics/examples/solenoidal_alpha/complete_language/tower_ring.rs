@@ -1128,9 +1128,15 @@ struct Echelon {
 }
 
 /// [agent-inferred, October 25] **The reduced row echelon of integer rows modulo a prime**
-/// `p < 2^31`, built one row at a time against the basis so far (each basis row is zero at the
-/// pivots before it, so one pass in order reduces an arriving row), stopping when the rank reaches
-/// `stop`; then each basis row is cleared at the later pivots.
+/// `p < 2^31`, built one row at a time against the basis so far, stopping when the rank reaches
+/// `stop`. The basis is kept reduced (each row one at its pivot and zero at every other pivot), so an
+/// arriving row is reduced by the basis rows at its own nonzero entries in the pivot columns alone:
+/// a closure row counts the pairs of one loop, so it meets a few pivots where a basis kept only in
+/// echelon form is met at nearly all of them once the row fills in. The reduced row is the one
+/// vector of `row + span(basis)` that is zero at every pivot, so the pivots, the rows kept and the
+/// echelon are those of reducing against the echelon basis in order (the form this replaced; on the
+/// sums' and differences' units together one closure's echelons took about 18 core-seconds,
+/// `ring/found34sd.txt`).
 fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
     let wide = p as i128;
     let mut basis: Vec<(usize, Vec<u64>)> = Vec::new();
@@ -1140,32 +1146,27 @@ fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
             break;
         }
         let mut r: Vec<u64> = row.iter().map(|&x| x.rem_euclid(wide) as u64).collect();
-        for (c, b) in &basis {
-            let f = r[*c];
-            if f != 0 {
-                let g = p - f;
-                for (x, &y) in r.iter_mut().zip(b) {
-                    *x = (*x + g * y) % p;
-                }
+        let met: Vec<(usize, u64)> = basis.iter().enumerate().filter_map(|(k, (c, _))| (r[*c] != 0).then_some((k, r[*c]))).collect();
+        for (k, f) in met {
+            let g = p - f;
+            for (x, &y) in r.iter_mut().zip(&basis[k].1) {
+                *x = (*x + g * y) % p;
             }
         }
         let Some(c) = r.iter().position(|&x| x != 0) else { continue };
         let inv = inv_mod(r[c], p);
         r.iter_mut().for_each(|x| *x = *x * inv % p);
-        basis.push((c, r));
-        sources.push(i);
-    }
-    for k in (0..basis.len()).rev() {
-        for j in k + 1..basis.len() {
-            let f = basis[k].1[basis[j].0];
+        for (_, b) in basis.iter_mut() {
+            let f = b[c];
             if f != 0 {
                 let g = p - f;
-                let (head, tail) = basis.split_at_mut(j);
-                for (x, &y) in head[k].1.iter_mut().zip(&tail[0].1) {
+                for (x, &y) in b.iter_mut().zip(&r) {
                     *x = (*x + g * y) % p;
                 }
             }
         }
+        basis.push((c, r));
+        sources.push(i);
     }
     let mut order: Vec<usize> = (0..basis.len()).collect();
     order.sort_by_key(|&k| basis[k].0);
@@ -1605,6 +1606,15 @@ fn closure_table(p: &Passage, mode: &Table, origin: usize, reflector: Option<usi
 /// restart, or `None` when no origin's loops close on a key that separates the arriving classes.
 /// The torsion key across origins once took the smaller modulus; it now takes the larger, as each
 /// closure's own key does.
+///
+/// [agent-inferred, October 25] **A restart refines a reflection that closes.** A restart only
+/// restores a hand a reflection reversed, so it is sought only beside a reflector whose closure
+/// already keys: the origins and reflectors are solved first (15 + 210 closures on the arithmetic
+/// block), then each keyed reflector with each third class as its restart. A restart that would
+/// key a reflection which closes on nothing is not sought. All 2,955 closures at once on the sums'
+/// and differences' units together ran at 1.4 a second and were stopped at 210
+/// (`ring/found32sd.txt`), and solving the origins one row count at a time saved nothing, as nearly
+/// every origin precedes every mark (`ring/found33sd.txt`).
 #[allow(clippy::type_complexity)]
 fn found_closure(p: &Passage, mode: &Table) -> Result<Option<(usize, i128, Table, Option<usize>)>> {
     let mut origins: Vec<usize> = p.streams.iter().flat_map(|s| s.classes.iter().copied()).collect();
@@ -1613,48 +1623,53 @@ fn found_closure(p: &Passage, mode: &Table) -> Result<Option<(usize, i128, Table
     let started = std::time::Instant::now();
     let show = |c: usize| if (33..127).contains(&c) { (c as u8 as char).to_string() } else { format!("#{c}") };
     let others = |not: &[usize]| origins.iter().copied().filter(|c| !not.contains(c)).collect::<Vec<_>>();
-    let mut tried: Vec<(usize, Option<usize>, Option<usize>)> = Vec::new();
-    for &o in &origins {
-        tried.push((o, None, None));
-        for r in others(&[o]) {
-            tried.push((o, Some(r), None));
-            tried.extend(others(&[o, r]).into_iter().map(|e| (o, Some(r), Some(e))));
-        }
-    }
     let reflected = |r: Option<usize>| r.map_or("none".to_string(), show);
-    // Each line as its closure completes (a pivot past 64 bits by its width), one for each tried
-    // closure, so the run's progress is read from its lines.
-    let closures: Vec<Closure> = tried
-        .par_iter()
-        .map(|&(o, r, e)| {
-            let c = closure_key(p, o, r, e).map_err(|e| e.to_string())?;
-            match &c {
-                None => println!("RING_UNMET origin={} reflector={} restart={} elapsed_ms={}", show(o), reflected(r), reflected(e), started.elapsed().as_millis()),
-                Some(c) => println!(
-                    "RING_CLOSURE origin={} reflector={} restart={} reflections={} rows={} unique={} columns={} rank={} minor_bits={} candidates={} torsion={} key_modulus={} exact={} elapsed_ms={}",
-                    show(c.origin),
-                    reflected(c.reflector),
-                    reflected(c.restart),
-                    c.reflections,
-                    c.rows,
-                    c.unique,
-                    c.columns,
-                    c.rank,
-                    c.minor_bits,
-                    c.candidates.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(","),
-                    c.torsion.iter().map(|(q, t)| format!("{q}:{t}")).collect::<Vec<_>>().join(","),
-                    c.key.as_ref().map_or("none".to_string(), |k| k.modulus.to_string()),
-                    c.key.as_ref().is_some_and(|k| k.exact),
-                    started.elapsed().as_millis()
-                ),
-            }
-            Ok(c)
-        })
-        .collect::<std::result::Result<Vec<Option<Closure>>, String>>()?
-        .into_iter()
-        .flatten()
-        .collect();
-    println!("RING_CLOSURES origins={} tried={} met={} keyed={} elapsed_ms={}", origins.len(), tried.len(), closures.len(), closures.iter().filter(|c| c.key.is_some()).count(), started.elapsed().as_millis());
+    let (mut closures, mut tried_count): (Vec<Closure>, usize) = (Vec::new(), 0);
+    let mut tried: Vec<(usize, Option<usize>, Option<usize>)> = origins.iter().flat_map(|&o| std::iter::once((o, None, None)).chain(others(&[o]).into_iter().map(move |r| (o, Some(r), None)))).collect();
+    while !tried.is_empty() {
+        tried_count += tried.len();
+        // Each line as its closure completes (a pivot past 64 bits by its width), one for each
+        // tried closure, so the run's progress is read from its lines.
+        let solved: Vec<Closure> = tried
+            .par_iter()
+            .map(|&(o, r, e)| {
+                let c = closure_key(p, o, r, e).map_err(|e| e.to_string())?;
+                match &c {
+                    None => println!("RING_UNMET origin={} reflector={} restart={} elapsed_ms={}", show(o), reflected(r), reflected(e), started.elapsed().as_millis()),
+                    Some(c) => println!(
+                        "RING_CLOSURE origin={} reflector={} restart={} reflections={} rows={} unique={} columns={} rank={} minor_bits={} candidates={} torsion={} key_modulus={} exact={} elapsed_ms={}",
+                        show(c.origin),
+                        reflected(c.reflector),
+                        reflected(c.restart),
+                        c.reflections,
+                        c.rows,
+                        c.unique,
+                        c.columns,
+                        c.rank,
+                        c.minor_bits,
+                        c.candidates.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(","),
+                        c.torsion.iter().map(|(q, t)| format!("{q}:{t}")).collect::<Vec<_>>().join(","),
+                        c.key.as_ref().map_or("none".to_string(), |k| k.modulus.to_string()),
+                        c.key.as_ref().is_some_and(|k| k.exact),
+                        started.elapsed().as_millis()
+                    ),
+                }
+                Ok(c)
+            })
+            .collect::<std::result::Result<Vec<Option<Closure>>, String>>()?
+            .into_iter()
+            .flatten()
+            .collect();
+        // The restarts beside each reflection that keys, once.
+        tried = solved
+            .iter()
+            .filter(|c| c.key.is_some() && c.restart.is_none())
+            .filter_map(|c| c.reflector.map(|r| (c.origin, r)))
+            .flat_map(|(o, r)| others(&[o, r]).into_iter().map(move |e| (o, Some(r), Some(e))))
+            .collect();
+        closures.extend(solved);
+    }
+    println!("RING_CLOSURES origins={} tried={tried_count} met={} keyed={} elapsed_ms={}", origins.len(), closures.len(), closures.iter().filter(|c| c.key.is_some()).count(), started.elapsed().as_millis());
     let Some(kept) = closures.iter().filter(|c| c.key.is_some()).min_by_key(|c| (std::cmp::Reverse(c.rows), c.key.as_ref().map(Key::order), c.reflector.is_some(), c.restart.is_some(), c.reflections, c.origin, c.reflector, c.restart)) else {
         return Ok(None);
     };
@@ -2925,5 +2940,72 @@ mod tests {
         assert_eq!(kernel.len(), 1);
         let k = &kernel[0];
         assert!(!det.is_zero() && k.iter().all(|x| *x == k[0]), "{k:?}");
+    }
+
+    /// The echelon kept reduced as rows arrive is the echelon of reducing each row against the
+    /// echelon basis in order and clearing the later pivots after: the same rows kept, pivots and
+    /// reduced rows, on sparse rows of small counts as a closure's are, at every stop.
+    #[test]
+    fn the_reduced_echelon_is_the_echelon_reduced_after() {
+        fn in_order(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
+            let wide = p as i128;
+            let mut basis: Vec<(usize, Vec<u64>)> = Vec::new();
+            let mut sources = Vec::new();
+            for (i, row) in rows.iter().enumerate() {
+                if basis.len() == stop {
+                    break;
+                }
+                let mut r: Vec<u64> = row.iter().map(|&x| x.rem_euclid(wide) as u64).collect();
+                for (c, b) in &basis {
+                    let f = r[*c];
+                    if f != 0 {
+                        for (x, &y) in r.iter_mut().zip(b) {
+                            *x = (*x + (p - f) * y) % p;
+                        }
+                    }
+                }
+                let Some(c) = r.iter().position(|&x| x != 0) else { continue };
+                let inv = inv_mod(r[c], p);
+                r.iter_mut().for_each(|x| *x = *x * inv % p);
+                basis.push((c, r));
+                sources.push(i);
+            }
+            for k in (0..basis.len()).rev() {
+                for j in k + 1..basis.len() {
+                    let f = basis[k].1[basis[j].0];
+                    if f != 0 {
+                        let (head, tail) = basis.split_at_mut(j);
+                        for (x, &y) in head[k].1.iter_mut().zip(&tail[0].1) {
+                            *x = (*x + (p - f) * y) % p;
+                        }
+                    }
+                }
+            }
+            let mut order: Vec<usize> = (0..basis.len()).collect();
+            order.sort_by_key(|&k| basis[k].0);
+            Echelon { pivots: order.iter().map(|&k| basis[k].0).collect(), sources: order.iter().map(|&k| sources[k]).collect(), rows: order.into_iter().map(|k| std::mem::take(&mut basis[k].1)).collect() }
+        }
+        // Sparse rows of small signed counts, some repeated and some dependent, from a fixed walk.
+        let (n, columns) = (60, 23);
+        let mut state = 0x9e37_79b9u64;
+        let mut rows: Vec<Vec<i128>> = (0..n)
+            .map(|_| {
+                (0..columns)
+                    .map(|_| {
+                        state = state.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1_442_695_040_888_963_407);
+                        let v = (state >> 33) % 13;
+                        if v < 9 { 0 } else { v as i128 - 11 }
+                    })
+                    .collect()
+            })
+            .collect();
+        rows.push(rows[3].iter().zip(&rows[7]).map(|(a, b)| 2 * a - b).collect());
+        rows.push(rows[5].clone());
+        for p in [2u64, 3, 5, 7, 11, 2_147_483_647] {
+            for stop in [1, 5, 12, columns] {
+                let (a, b) = (echelon_mod(&rows, p, stop), in_order(&rows, p, stop));
+                assert_eq!((&a.pivots, &a.sources, &a.rows), (&b.pivots, &b.sources, &b.rows), "modulo {p}, stop {stop}");
+            }
+        }
     }
 }
