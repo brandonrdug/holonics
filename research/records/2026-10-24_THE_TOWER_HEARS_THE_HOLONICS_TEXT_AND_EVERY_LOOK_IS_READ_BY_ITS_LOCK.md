@@ -3397,7 +3397,7 @@ two, 45 of 50; two and one, 41 of 44; one and one, 2 of 2. The units: 389 of 399
   of the units against 305, and the whole 473 against 469.
 - Founded on the arithmetic alone, the new rank pays the arithmetic (2.162 to 2.114 bits a byte)
   and costs each other medium a little (prose 2.969 to 2.986, Lean 2.242 to 2.254, Rust 1.968 to
-  1.981); the whole held-out text is the same to the thousandth. The new rows never met the turn at
+  1.981); the whole held-out text is one thousandth lower (2.335 to 2.334). The new rows never met the turn at
   prose, Lean or Rust cells.
 
 **Decided next** [agent-inferred]: the tower writes the sums itself. Every reading so far names a
@@ -3675,8 +3675,8 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   splits are appended to `RING_SPLIT.txt`.
 - The written sums: `LINES_founded30_arithmetic.tsv` and `LINES_founded26m_arithmetic.tsv` (every
   held-out arithmetic line's head, true rest, written rest and codes) and `WRITTEN_SUMS.txt` (their
-  receipt lines and counts, from `WRITTEN_SUMS.py`, read apart by whether the training text holds
-  the line).
+  receipt lines and counts, from `WRITTEN_SUMS.py … --train modes/block.txt ring/mixed.txt`, which
+  reads each line apart by whether a training file holds it whole).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
