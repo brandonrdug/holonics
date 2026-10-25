@@ -1,0 +1,18 @@
+founded15 (the precision-founded ring and its readout founded by one solve)
+  1+1: 2 sums; whole 0, ring's part 0, rest 0; 3.011 bits a digit; ring's margin median -0.12 bits
+  1+2: 50 sums; whole 22, ring's part 26, rest 5; 2.473 bits a digit; ring's margin median 0.01 bits
+  2+1: 44 sums; whole 5, ring's part 8, rest 3; 3.562 bits a digit; ring's margin median -0.54 bits
+  2+2: 399 sums; whole 218, ring's part 301, rest 40; 2.085 bits a digit; ring's margin median 0.19 bits
+  all: 495 sums; whole 245, ring's part 335, rest 48; 2.259 bits a digit; ring's margin median 0.14 bits
+founded16 (the readout founded by Newton rounds)
+  1+1: 2 sums; whole 0, ring's part 0, rest 0; 2.777 bits a digit; ring's margin median -2.02 bits
+  1+2: 50 sums; whole 19, ring's part 13, rest 5; 2.230 bits a digit; ring's margin median -0.53 bits
+  2+1: 44 sums; whole 6, ring's part 3, rest 3; 3.617 bits a digit; ring's margin median -1.01 bits
+  2+2: 399 sums; whole 283, ring's part 207, rest 40; 1.760 bits a digit; ring's margin median 0.02 bits
+  all: 495 sums; whole 308, ring's part 223, rest 48; 1.977 bits a digit; ring's margin median -0.07 bits
+lap16 (one lap depositing the readouts)
+  1+1: 2 sums; whole 0, ring's part 0, rest 0; 3.315 bits a digit; ring's margin median -0.71 bits
+  1+2: 50 sums; whole 20, ring's part 10, rest 5; 2.322 bits a digit; ring's margin median -0.83 bits
+  2+1: 44 sums; whole 6, ring's part 5, rest 2; 3.669 bits a digit; ring's margin median -1.38 bits
+  2+2: 399 sums; whole 221, ring's part 206, rest 34; 1.772 bits a digit; ring's margin median 0.05 bits
+  all: 495 sums; whole 247, ring's part 221, rest 41; 2.003 bits a digit; ring's margin median -0.22 bits

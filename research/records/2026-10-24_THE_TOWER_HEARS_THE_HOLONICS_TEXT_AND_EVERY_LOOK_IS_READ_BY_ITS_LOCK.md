@@ -2936,6 +2936,85 @@ mixed), the ring's tower by 0.081 bits a byte and the foil by 0.010.
 2. Then the carriage: a ring whose frame does not depend on how many digits fall between the
    crossings.
 
+## The readout founded to its precision, and the lap that undoes it
+
+The last loop decided to split the tower's guess at the held-out units into the ring's part and the
+rest. The acceptance is unchanged: after one training pass the tower's own top guess at `U` is the
+held-out sum's units in at least 370 of 495, and its code there is below the foil's (3.397 bits a
+digit).
+
+**The split.** `read-tower-at … split` reads the ring's part of the logits, `W φ` with `φ` the ring's
+pair read with the top face, and then the same tower with its ring's readout at zero (the rest). On
+the precision-founded ring with its readout founded by the last loop's one solve, the ring's part
+alone picks the units in 335 of 495, the rest in 48, the whole in 245. The ring's part is right where
+the whole is wrong at 133 sums and the reverse at 43; its median margin at the arriving class is 0.14
+bits. The ring carries the units into the logits and the rest overrides it.
+
+**The founding to the code's own curvature** [agent-inferred] (`found_ring_readout`). The one solve
+`Q D = −M` takes the code's curvature as `Q = Σ φφᵀ`, flat in the masses, so the readout it founds
+votes beside the rest instead of adding to it. The readout is now founded in rounds on the exact
+code. Each round, for each class `c` that arrives, solves `H_c D_c = −m_c` with
+`H_c = Σ p_c(1 − p_c) φφᵀ` and `m_c = Σ φ (p_c − q_c)` over the passage's cells, the masses `p`
+read with the current readout (the classes couple only through the normalization, whose cross
+blocks the round drops). Each block is solved exactly on a copy released so its largest entry is
+below `2^40`, the right side released by the same shift; the direction takes one common lift, the
+step `κ` is the passage's least code on a doubling then golden-section line, and the readout moves
+by `κD` released to its grain, its code read again exactly. A round pays when it saves half a nat
+for each free parameter it re-states (the ring's precision rule): `130 · (15 − 1) = 1820`, since
+the normalization's gauge leaves one arriving class's rows free and the classes that never arrive
+keep their rows at zero. Three rounds ran, saving 9,434, 915 and 131 nats against 910; the
+founding read the block at 2.288 bits a byte before and 2.218 after, in 216 s against a projection
+of 535 s.
+
+| | whole right at `U` (of 495) | ring's part alone | rest alone | bits a digit at `U` | held-out text, bits a byte |
+|---|---|---|---|---|---|
+| founded by one solve (the last loop) | 245 | 335 | 48 | 2.259 | 2.437 |
+| **founded by Newton rounds** | **308** | 223 | 48 | **1.977** | 2.580 |
+| then one lap depositing the readouts | 247 | 221 | 41 | 2.003 | 2.668 |
+| the foil: the same lap without the ring | 40 | - | - | 3.397 | 2.458 |
+
+By the operands' lengths (`RING_SPLIT.txt`), the whole guess reads, from one solve to the rounds
+to the lap: two digits and two, 218, 283 and 221 of 399; one digit and two, 22, 19 and 20 of 50;
+two digits and one, 5, 6 and 6 of 44.
+
+**What it says** [agent-inferred]:
+- Founded on the code's own curvature, the ring's readout stops voting against the rest and adds to
+  it: its part alone reads fewer units (223) and the sum reads more (308). The second clause of the
+  acceptance holds (1.977 bits a digit against the foil's 3.397); the first does not (308 against
+  370).
+- The lap undoes the founding: 308 to 247, nearly all of it on the sums of two two-digit operands
+  (283 to 221), while the lap lowers the block's code from 2.186 to 2.167 bits a byte at its own
+  read. A lap's section steps descend the same code the rounds solved to their precision, and every
+  step past that precision moves the readout by the passage's noise. This is the lap law the
+  mathematics thread derived (a lap over the text the last pass founded on founds nothing),
+  measured on the readout: here the lap does worse than nothing.
+- The held-out text codes worse after the founding (2.437 to 2.580): every class's readout row is
+  founded on the arithmetic block alone, and the held-out text is mixed. A reading beside the
+  acceptance, which is at the held-out sums.
+- The rest of the gap is the carriage's. The whole reads 283 of the 399 sums of two two-digit
+  operands, where the ring's own class directions from the training text read 321, and 25 of the 94
+  sums whose operands differ in length. Every sum of two two-digit operands right, with the rest as
+  it is, would make 424; the present ring form's outside read at `U` is 358 at most (the last loop).
+  370 needs the ring to carry the units whatever the operands' lengths.
+
+**Decided next** [agent-inferred]:
+1. The training pass is the founding: the survey, the ring's founding and the readout's founding,
+   each to its own precision. No lap over the same text follows a founding to precision (the lap
+   law; measured here, 308 to 247). A later pass deposits on text the founding has not met.
+2. The carriage: the ring's move is founded from the same covector as its push, keyed by the pair
+   of the seam (the byte before the arriving one) and the arriving byte, the helical pair contact's
+   address, in place of the turns of the mode it rides. Why this form: a sum's units are the
+   product of the operands' units turns, `e^(2πi a₀/10) · e^(2πi b₀/10)`, and the ring makes a
+   product only through its move. An operand's units digit is the seam at the next crossing (`+`
+   or `=`), known only when the crossing arrives, so the move at a crossing must turn by the seam,
+   and the move at a digit must hold, whatever the digit. A move keyed by the arriving byte alone
+   cannot hold at a tens digit and turn at a units digit (both are digits), and a state factor
+   times a class factor cannot hold at every digit for every state and still turn at the crossing;
+   a move keyed by the pair can. It reads any medium's byte pairs and names no arithmetic; the
+   hold at digits must be founded, not authored. Its acceptance reading: the outside read's split
+   by the operands' lengths (355, 38 and 6 at `B`) levels, then the tower's own guess at `U`
+   reaches 370.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2974,7 +3053,9 @@ mixed), the ring's tower by 0.081 bits a byte and the foil by 0.010.
   with the tower. The founded readout carried code and still did not keep the frame. Depositing
   the push's factors did not keep it either: the cause is the tower's own deposit under the ring,
   located by holding families one at a time, and a lap now deposits the bridge and leaves the
-  founded constitution as it was founded.
+  founded constitution as it was founded. The readout founded to its precision then went into a lap and the lap
+  undid it (308 to 247); the lap after a founding to precision is retired by the lap law, not
+  answered by another hold.
 - **An uncertified deposition step.** A founded family joined with its moments at zero moved at two
   to four times the rate on its first sections. Its moments now open on its founding passage, read
   without a deposit, and every step stays the certified one.
@@ -3120,6 +3201,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_TRAIN_DIRECTIONS.{py,txt}` (the held-out units read by the training text's class
   directions) and `RING_OWN_BY_OPERANDS.{py,txt}` (the tower's own guess at the held-out units by
   the operands' lengths).
+- The readout founded to its precision: `RING_READOUT_ROUNDS.txt` (the split on the last loop's
+  ring, the Newton rounds, the lap and every read) and `RING_SPLIT.{py,txt}` (the whole guess, the
+  ring's part and the rest at the held-out units, by the operands' lengths; run from the run
+  directory on the reads' `SPLIT` lines, which stay outside the repository).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3147,5 +3232,6 @@ moments at zero, its pass and the moves) and `ring10` (`8cdc8135…`, the foundi
 its pass, the swapped readouts and the reads at `U` and `B`). The push's factors use `ring11`
 (`6f1d433f…`, the factors as material, their founding and pass), `ring12` (`0e8600ae…`, the held
 passes), `ring13` (`9f7edb09…`, the pass holding what the ring reads), `ring14` (`7d21f6f4…`, the one-bit
-founding, stopped) and `ring15` (`1854df21…`, the precision founding, its join, readout, laps and
-reads, and the modes and training reads).
+founding, stopped) `ring15` (`1854df21…`, the precision founding, its join, readout, laps and
+reads, and the modes and training reads) and `ring16` (`d9711a49…`, the split, the readout's Newton
+rounds, its lap and reads).
