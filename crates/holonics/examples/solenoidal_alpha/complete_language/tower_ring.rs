@@ -1725,7 +1725,11 @@ fn join(v: &[i64]) -> String {
 /// pair of the seam and the arriving class ([`RingFace::move_at`]), by exact loop closure
 /// ([`found_closure`]): the origin, the modulus and every pair's turn are the closure's own, exact,
 /// so they add no free parameter; the ring is then founded under that table from every start and
-/// from the origin start (the push at the origin's arrival alone). With `pair-moves-held TABLE
+/// from the origin start (the push at the origin's arrival alone). With `pair-moves-at KEY_MARKS
+/// KEY_MARKS_SHA` the closure is solved at the cells `KEY_MARKS` marks and the ring founded at those
+/// `MARKS` marks: a key closes on the classes that arrive where it is located (a result's units),
+/// and what its torsion holds beyond them is read elsewhere (modulo `110` the whole result, read
+/// where its first digit arrives), where no key closes. With `pair-moves-held TABLE
 /// TABLE_SHA` the table is read instead (`prev cur Re λ Im λ Re β Im β` a line; a ceiling reading,
 /// never a founding). The table is written as a `MOVES` line after its rank (one rank: the moves
 /// are the face's).
@@ -1738,9 +1742,10 @@ fn join(v: &[i64]) -> String {
 /// whole.
 pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     let held = args.len() == 17 && args[14] == "pair-moves-held";
-    let moves = held || (args.len() == 15 && args[14] == "pair-moves");
+    let keyed_at = args.len() == 17 && args[14] == "pair-moves-at";
+    let moves = held || keyed_at || (args.len() == 15 && args[14] == "pair-moves");
     if args.len() != 14 && !moves {
-        return Err("found-tower-ring STATE STATE_SHA TEXT TEXT_SHA MARKS MARKS_SHA STREAMS SECTION LEVEL MODE RANKS STARTS OUT [pair-moves | pair-moves-held TABLE TABLE_SHA]".into());
+        return Err("found-tower-ring STATE STATE_SHA TEXT TEXT_SHA MARKS MARKS_SHA STREAMS SECTION LEVEL MODE RANKS STARTS OUT [pair-moves | pair-moves-at KEY_MARKS KEY_MARKS_SHA | pair-moves-held TABLE TABLE_SHA]".into());
     }
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -1755,6 +1760,10 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     }
     if marks.len() != text.len() || text.is_empty() {
         return Err("MARKS holds one byte per byte of TEXT".into());
+    }
+    let key_marks = if keyed_at { Some(pinned_read(&args[15], &args[16], READ_BUDGET as usize)?) } else { None };
+    if key_marks.as_ref().is_some_and(|k| k.len() != text.len()) {
+        return Err("KEY_MARKS holds one byte per byte of TEXT".into());
     }
     if std::path::Path::new(&args[13]).exists() {
         return Err("OUT exists: the forms are written create-new".into());
@@ -1789,7 +1798,13 @@ pub(super) fn found_tower_ring(args: &[String]) -> Result<()> {
     let opening_table: Option<Table> = if moves {
         let (mut table, varying) = pair_table(&mut p)?;
         if !held {
-            let (origin, n, closed, restart) = found_closure(&p, &table)?.ok_or("no origin's loops close on a key that separates the arriving classes")?;
+            // The closure reads the cells the key is located at; the founding, the cells it is read at.
+            let own = key_marks.map(|k| std::mem::replace(&mut p.marks, k));
+            let solved = found_closure(&p, &table);
+            if let Some(own) = own {
+                p.marks = own;
+            }
+            let (origin, n, closed, restart) = solved?.ok_or("no origin's loops close on a key that separates the arriving classes")?;
             origin_start = Some(origin);
             key_modulus = Some(n);
             table = closed;

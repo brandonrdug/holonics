@@ -1,0 +1,26 @@
+# The closure at the tens with the hand (binary ring35), and the key located at the units with the
+# ring founded at the tens (binary ring36, pair-moves-at). Lines as the runs printed them.
+== found36dt
+RING_CLOSURES origins=15 tried=225 met=225 keyed=0 elapsed_ms=37192
+alpha error: no origin's loops close on a key that separates the arriving classes
+MEASURE exit=1 wall_s=72.1 peak_rss_kib=384876
+== found36sdt
+RING_CLOSURES origins=15 tried=225 met=225 keyed=0 elapsed_ms=58956
+alpha error: no origin's loops close on a key that separates the arriving classes
+MEASURE exit=1 wall_s=92.7 peak_rss_kib=708964
+== found37same
+RING_CLOSURES origins=15 tried=251 met=247 keyed=6 elapsed_ms=63620
+RING_KEY origin=#10 reflector=- restart== modulus=110 exact=false failures=0 residues=0:102,1:103,2:104,3:105,4:106,5:107,6:108,7:109,8:0,9:1 turns=#100:82,#101:72,#102:62,#103:52,#104:42,#105:32,#106:22,#107:12,#108:2,#109:102,+0:108,+1:98,+2:88,+3:78,+4:68,+5:58,+6:48,+7:38,+8:28,+9:18,-0:90,-1:80,-2:70,-3:60,-4:50,-5:40,-6:30,-7:20,-8:10,0+:11,0-:99,0=:11,1+:22,1-:88,10:20,11:10,13:100,14:90,15:80,16:70,17:60,18:50,19:40,1=:22,2+:33,2-:77,20:40,21:30,22:20,23:10,25:100,26:90,27:80,28:70,29:60,2=:33,3+:44,3-:66,30:60,31:50,32:40,33:30,34:20,35:10,37:100,38:90,39:80,3=:44,4+:55,4-:55,40:80,41:70,42:60,43:50,44:40,45:30,46:20,47:10,49:100,4=:55,5+:66,5-:44,50:100,51:90,52:80,53:70,54:60,55:50,56:40,57:30,58:20,59:10,5=:66,6+:77,6-:33,60:10,62:100,63:90,64:80,65:70,66:60,67:50,68:40,69:30,6=:77,7+:88,7-:22,70:30,71:20,72:10,74:100,75:90,76:80,77:70,78:60,79:50,7=:88,8+:99,8-:11,80:50,81:40,82:30,83:20,84:10,86:100,87:90,88:80,89:70,8=:99,90:70,91:60,92:50,93:40,94:30,95:20,96:10,98:100,99:90,=1:100,=2:90,=3:80,=4:70,=5:60,=6:50,=7:40,=8:30,=9:20
+MEASURE exit=-15 wall_s=98.3 peak_rss_kib=734148
+== found37sdt
+RING_CLOSURES origins=15 tried=251 met=247 keyed=6 elapsed_ms=62726
+RING_KEY origin=#10 reflector=- restart== modulus=110 exact=false failures=0 residues=0:102,1:103,2:104,3:105,4:106,5:107,6:108,7:109,8:0,9:1 turns=#100:82,#101:72,#102:62,#103:52,#104:42,#105:32,#106:22,#107:12,#108:2,#109:102,+0:108,+1:98,+2:88,+3:78,+4:68,+5:58,+6:48,+7:38,+8:28,+9:18,-0:90,-1:80,-2:70,-3:60,-4:50,-5:40,-6:30,-7:20,-8:10,0+:11,0-:99,0=:11,1+:22,1-:88,10:20,11:10,13:100,14:90,15:80,16:70,17:60,18:50,19:40,1=:22,2+:33,2-:77,20:40,21:30,22:20,23:10,25:100,26:90,27:80,28:70,29:60,2=:33,3+:44,3-:66,30:60,31:50,32:40,33:30,34:20,35:10,37:100,38:90,39:80,3=:44,4+:55,4-:55,40:80,41:70,42:60,43:50,44:40,45:30,46:20,47:10,49:100,4=:55,5+:66,5-:44,50:100,51:90,52:80,53:70,54:60,55:50,56:40,57:30,58:20,59:10,5=:66,6+:77,6-:33,60:10,62:100,63:90,64:80,65:70,66:60,67:50,68:40,69:30,6=:77,7+:88,7-:22,70:30,71:20,72:10,74:100,75:90,76:80,77:70,78:60,79:50,7=:88,8+:99,8-:11,80:50,81:40,82:30,83:20,84:10,86:100,87:90,88:80,89:70,8=:99,90:70,91:60,92:50,93:40,94:30,95:20,96:10,98:100,99:90,=1:100,=2:90,=3:80,=4:70,=5:60,=6:50,=7:40,=8:30,=9:20
+RING_START rank=0 start=unit/closure exact_share_permille=658 elapsed_ms=122394
+RING_START rank=0 start=coupling_mode_1/closure exact_share_permille=663 elapsed_ms=134947
+RING_START rank=0 start=coupling_mode_2/closure exact_share_permille=622 elapsed_ms=151072
+RING_START rank=0 start=coupling_mode_3/closure exact_share_permille=623 elapsed_ms=163871
+RING_START rank=0 start=coupling_mode_4/closure exact_share_permille=699 elapsed_ms=176615
+RING_START rank=0 start=origin/closure exact_share_permille=772 elapsed_ms=198397
+RING_RANK rank=0 channels=2 marked_cells=12657 exact_share_permille=772 push_shift=80 read_shift=6 elapsed_ms=198399
+RING_WRITTEN forms=1 sha256=c365c22d698b690d90cd7f3d9bf209d21da13c200a639e6b5a6f8bb749876618 elapsed_ms=198402
+MEASURE exit=0 wall_s=198.5 peak_rss_kib=997736
