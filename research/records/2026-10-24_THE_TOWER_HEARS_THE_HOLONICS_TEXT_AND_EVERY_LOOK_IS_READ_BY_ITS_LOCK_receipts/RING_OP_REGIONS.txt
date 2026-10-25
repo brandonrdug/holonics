@@ -1,0 +1,10 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 28.4 s
+label cells: B pushes 8986, U reads 8986
+push cells: the second operand's digits on the sums' lines 17073 (B cells among them 8986 of 8986), every digit on the sums' lines 34137; read cells: after = on the sums' lines 31337 (U cells among them 8986 of 8986)
+   columns for the second operand's digits in 14.7 s
+pushed at the second operand's digits, read after = on the sums' lines: the founded form's share 0.5635 (circular 0.2979), holds chi_1(c0) at B 0.844, held out units at B 385 of 495 (0.4 s)
+pushed at the second operand's digits, read the sums' U cells: the founded form's share 1.5571 (circular 0.7896), holds chi_1(c0) at B 0.865, held out units at B 424 of 495 (0.1 s)
+   columns for every digit on the sums' lines in 6.6 s
+pushed at every digit on the sums' lines, read after = on the sums' lines: the founded form's share 0.5191 (circular 0.2730), holds chi_1(c0) at B 0.824, held out units at B 359 of 495 (0.5 s)
+done in 54.6 s
+MEASURE exit=0 wall_s=54.8 peak_rss_kib=2960944

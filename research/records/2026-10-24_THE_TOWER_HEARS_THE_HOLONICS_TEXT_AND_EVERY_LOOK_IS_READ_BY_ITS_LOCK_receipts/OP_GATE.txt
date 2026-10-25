@@ -1,0 +1,18 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 28.5 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+push gate (digit arrivals, second operand of a sum): R^2 0.992; mean in region 0.993, out 0.001, at the sums' B cells 0.988
+read gate (every cell, after = on a sum's line): R^2 0.824; mean in region 0.850, out 0.026, at the sums' U cells 0.884
+   columns for the label (second operand of a sum) in 12.1 s
+pushed by the label (second operand of a sum), read by the read gate: the founded form's share 0.4652 (circular 0.2494), holds chi_1(c0) at B 0.820, held out units at B 369 of 495 (4.5 s)
+pushed by the label (second operand of a sum), read by the read gate squared: the founded form's share 0.5645 (circular 0.3002), holds chi_1(c0) at B 0.821, held out units at B 363 of 495 (3.2 s)
+   columns for the push gate in 3.7 s
+pushed by the push gate, read by the label (after = on a sum's line): the founded form's share 0.5584 (circular 0.2950), holds chi_1(c0) at B 0.840, held out units at B 388 of 495 (5.6 s)
+pushed by the push gate, read by the read gate: the founded form's share 0.4600 (circular 0.2463), holds chi_1(c0) at B 0.815, held out units at B 359 of 495 (4.0 s)
+pushed by the push gate, read by the read gate squared: the founded form's share 0.5609 (circular 0.2981), holds chi_1(c0) at B 0.814, held out units at B 359 of 495 (2.5 s)
+   columns for the push gate squared in 5.3 s
+pushed by the push gate squared, read by the label (after = on a sum's line): the founded form's share 0.5604 (circular 0.2963), holds chi_1(c0) at B 0.841, held out units at B 392 of 495 (3.7 s)
+pushed by the push gate squared, read by the read gate: the founded form's share 0.4629 (circular 0.2483), holds chi_1(c0) at B 0.817, held out units at B 372 of 495 (2.9 s)
+pushed by the push gate squared, read by the read gate squared: the founded form's share 0.5606 (circular 0.2984), holds chi_1(c0) at B 0.815, held out units at B 366 of 495 (2.7 s)
+done in 93.3 s
+MEASURE exit=0 wall_s=93.5 peak_rss_kib=3512876

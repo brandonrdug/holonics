@@ -1,0 +1,19 @@
+# Level 0's state before the move at every cell of the eight training parts, situated8, state hcont2/STATE.0, each part from rest:
+# situated8 complete-language read-tower-modes STATE <sha> modes/block{c}.txt <sha> char/block{c}.all <sha> full, compacted to int64 rows (cell, class, then per mode the state before the move, re and im on 2^-24).
+# The first run kept int32 rows and failed in its filter at every part (a value past 32 bits); this is the rerun.
+block0 state: state rows 26869 width 130 (int64) MEASURE exit=0 wall_s=12.4 peak_rss_kib=196872 
+block1 state: state rows 26919 width 130 (int64) MEASURE exit=0 wall_s=12.2 peak_rss_kib=197296 
+block2 state: state rows 26972 width 130 (int64) MEASURE exit=0 wall_s=11.6 peak_rss_kib=197716 
+block3 state: state rows 26875 width 130 (int64) MEASURE exit=0 wall_s=11.6 peak_rss_kib=197176 
+block4 state: state rows 26895 width 130 (int64) MEASURE exit=0 wall_s=12.1 peak_rss_kib=197200 
+block5 state: state rows 26785 width 130 (int64) MEASURE exit=0 wall_s=11.9 peak_rss_kib=196484 
+block6 state: state rows 26829 width 130 (int64) MEASURE exit=0 wall_s=11.5 peak_rss_kib=196736 
+block7 state: state rows 26955 width 130 (int64) MEASURE exit=0 wall_s=11.6 peak_rss_kib=197412 
+block0 allstate.i64 sha256 05005c23847e111f
+block1 allstate.i64 sha256 08242a1302f2ca5d
+block2 allstate.i64 sha256 0276e41c55cee8dc
+block3 allstate.i64 sha256 1abd0aa8bc22843c
+block4 allstate.i64 sha256 1f089debc7903f9e
+block5 allstate.i64 sha256 324a2a27301caeb5
+block6 allstate.i64 sha256 f8ef79f171d8878b
+block7 allstate.i64 sha256 afdfa85975c75ff7
