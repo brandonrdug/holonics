@@ -3085,8 +3085,11 @@ the newline, modulo 10, with `ψ(d) = d + 2` for the units digit `d` of the line
 (0 failures). The `+ 1` on each crossing and the `+ 2` in `ψ` are the gauge: the two crossings add
 `(a₀ + 1) + (b₀ + 1) = a₀ + b₀ + 2`. The torsion primes' products are tried in ascending order;
 modulo 2 or 5 alone ten arriving classes cannot be told apart, and 10 is the first modulus that
-tells them all. Eleven is torsion as well and is never needed. No digit, no base and no sum was named to
-the founding: the key is located from the passage's arrivals.
+tells them all. Eleven is torsion as well, and its part is not spare: modulo 11 each line's loop closes on
+the operands' and the sum's alternating digit sums, `a + b − c ≡ 0` (casting out elevens), so the
+two parts together fix the sum modulo 110; the units key alone is what tells the arriving units
+apart. No digit, no base and no sum was named to the founding: the key is located from the
+passage's arrivals.
 
 **The ring under the closure key.** The ring's push and readout are founded under the located
 moves (`found-tower-ring … pair-moves`, 117 s). Its exact share is 1.834 from the unit start,
@@ -3154,6 +3157,82 @@ text with its arithmetic), so that its rows are set where the ring's turn is new
 not. Its acceptance: the held-out text codes no worse than the foil's 2.458 bits a byte while the
 held-out units stay at or above 370 of 495.
 
+## The readout founded on the four media
+
+The last loop decided the passage: found the readout on the mixed training text, 856,045 bytes of
+the Holonics text in prose, Lean and Rust with the arithmetic block after it (from byte 639,914),
+so that its rows are set where the ring's turn is news and where it is not. The acceptance was
+fixed before the run: the held-out text codes no worse than the foil's 2.458 bits a byte while the
+tower's own guess at the held-out units stays at or above 370 of 495.
+
+**The curvature on its grain.** Over 168 arriving classes the founding's curvature has
+143,815,392 (cell, class) pairs. It is now carried on `2^(−12)` of `p(1 − p)`: a pair whose
+curvature falls below `2^(−13)` adds none, and the round prints the pairs that stay live and the
+curvature released before it accumulates (25,416,494 live; 2,090 parts in a million released).
+The control, the same founding on the arithmetic block at this grain, reads the held-out units in
+475 of 495 at 0.619 bits a digit (0.623 at the full grain), and the held-out text at 3.042.
+
+**Two foundings that did not move.** On the four media the founding saved 0.281 nats with one
+scale for every row and 0.332 with each row on its own scale under a one-bit trust; both left the
+tower at its base reading (48 of 495, the held-out text 2.448). A check placed the cause: the
+arithmetic-only readout read behind the passage's last 100,000 bytes of text, before the held-out
+sums, still reads 475 of 495, as from rest. The prose before the sums does not hide the ring's
+turn. (The first launch of that check, with all 639,914 bytes before the sums, stopped at its
+deadline, 651,890 of 651,912 bytes read; the prefix was shortened, not the deadline raised.)
+
+**The cause: the Newton step's units** [agent-inferred, October 25]. A cell's offset is
+`(w·φ)·2^(−24)` on `2^(−16)` of a bit, so its logit is `w·φ·2^(−40)` bits, and the code in bits has
+gradient `p − q` and curvature `ln 2 · (diag p − p pᵀ)` in it. The solve takes the curvature on
+`2^(−12)` and the covector on `2^(−24)`, so its solution `d_j = −H⁻¹m` is the Newton step on
+`2^(−28) · ln 2` of a readout unit: the step is `d_j · 2^28 / ln 2`. Both foundings took `d_j`
+itself, `2^28.5` short. On the arithmetic block one lift and one line served every row, and they
+absorbed the factor; on the four media the rows' steps part by many octaves, and the one
+row whose short step already moved an offset past a bit (its step reached `2^22` bits) set the
+line for all. With the factor, every one of the 168 rows' Newton steps moves some cell's offset
+past one bit (the widest by `2^50` bits), so each row takes the step that moves its largest offset
+by one bit, where the log-sum's self-concordance keeps the curvature within a factor of four, and
+the line scales them together.
+
+The founding ran two rounds: the first at 5.2 bits saved 76,409 nats, the second at 3.2 bits saved
+30,214, below the 54,275 that the 108,550 free parameters ask, and it stopped. It took 3,867 s
+against a projection of 7,374 s (deadline 7,400 s), at a peak of 10.0 GB.
+
+| the readout founded on | whole right at `U` (of 495) | ring's part alone | rest alone | ring's margin, median | bits a digit at `U` | held-out text, bits a byte | prose | Lean | Rust | arithmetic |
+|---|---|---|---|---|---|---|---|---|---|---|
+| nothing (the ring joined, its readout at zero) | 48 | - | 48 | - | 3.488 | 2.448 | 3.067 | 2.364 | 2.067 | 2.294 |
+| the arithmetic block (the control, at `2^(−12)`) | 475 | 435 | 48 | 2.60 bits | 0.619 | 3.042 | 4.109 | 3.169 | 2.754 | 2.136 |
+| **the four media** | **469** | 305 | 48 | 0.42 bits | 0.959 | **2.335** | 2.969 | 2.242 | 1.968 | 2.162 |
+| the foil: the same lap without the ring | 40 | - | - | - | 3.397 | 2.458 | 3.111 | 2.400 | 2.108 | 2.211 |
+
+**The acceptance is met**: founded on the four media, the tower's own guess at the held-out units
+is right in 469 of 495 (bar 370), and the held-out text codes 2.335 bits a byte against the foil's
+2.458. By the operands' lengths (`RING_SPLIT.txt`): two digits and two, 385 of 399; one and two,
+44 of 50; two and one, 39 of 44; one and one, 1 of 2.
+
+**What it says** [agent-inferred]:
+- Founded where the turn is not news as well as where it is, the readout keeps the units (469
+  against 475) and stops costing the text: every medium of the held-out text codes below both the
+  ring at zero and the foil, prose by 0.10 bits a byte, Lean by 0.12, Rust by 0.10 and arithmetic
+  by 0.13 against the ring at zero. The rows founded at prose, Lean and Rust cells use the turn
+  there. What the turn carries at those cells is not yet read.
+- The units moved from the ring's part to the whole: alone, the ring's part names 305 (435 in the
+  control) and its median margin falls from 2.60 to 0.42 bits. The digit classes' rows now weigh
+  the turn against what the text's classes ask of the same channels, and the top face carries the
+  rest.
+- Nothing in the founding names a medium: the four media are one passage, and the split by medium
+  is an exterior read of the held-out text.
+
+**Decided next** [agent-inferred]: the tens. The closure the machine solved has torsion
+`110 = 2·5·11`, and its key took the first modulus that tells the arriving units apart, 10. The
+eleven part is the alternating digit sum (casting out elevens); read beside the units it fixes the
+sum modulo 110, and the result's length, which the tower already places, fixes the rest (the
+mathematics thread's
+[newline closure record](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md),
+§3 and §9). The next loop founds a second ring under the closure's eleven key beside the units
+ring, joins both and founds the readout on the four media. Its acceptance: the tower's own guess
+at the held-out sums' tens right in at least 370 of 495, the units staying at or above 370, and
+the held-out text no worse than the foil's 2.458 bits a byte.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3188,7 +3267,8 @@ held-out units stay at or above 370 of 495.
   are bounded before launch, not by a larger deadline. The closure founding's integer elimination
   was refused in `i128` and ran two origins past its deadline in `BigInt`; it was answered by a
   changed law, one exact minor read modulo primes with the rank certified, not by a wider carrier
-  or a larger deadline.
+  or a larger deadline. The context check behind the four media's text stopped at its deadline; it
+  was answered by a shorter prefix, not a larger deadline.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
@@ -3357,6 +3437,10 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_HARMONICS.txt` (the join at five harmonics, the readout's rounds and every read) and
   `RING_PHASE_CENTROIDS.{py,txt}` (the units' turns at `U` and their leave-one-out centroid
   reads); the splits are appended to `RING_SPLIT.txt`.
+- The readout founded on the four media: `RING_MIXED.txt` (the control's founding, the development
+  read, the three foundings on the four media, the context checks and every read's receipt lines;
+  the reads stay outside the repository) and `DEV_BY_MEDIUM.py` (the held-out text's code by medium,
+  run from the run directory); the splits are appended to `RING_SPLIT.txt`.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3390,4 +3474,7 @@ rounds, its lap and reads). The carriage uses `ring17` (`38c856bc…`, the fixed
 (`63813946…`, the octave lines and the ceiling), `ring19` (`6e703b2f…`, refused), `ring20`
 (`9122131d…`, stopped), `ring21` (`bd8fba28…`, the closure founding, the ring under its key, the
 readout at one cosine and every read) and `ring22` (`6f0bbab7…`, the readout at five harmonics and
-its reads).
+its reads). The four media use `ring23` (`4a89dc6d…`, the curvature on its grain: the control and
+the development read), `ring24` (`2b3fe76c…`, one scale for every row), `ring25` (`179dbef4…`, each
+row on its own scale, and the context checks) and `ring26` (`7c510f7d…`, the Newton step in readout
+units, its founding and reads).
