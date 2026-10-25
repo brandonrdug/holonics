@@ -36,7 +36,10 @@ through the same constitution gives the same `(H, B, T)` to the bit. So:
   this lap's moments are taken over a different face, and its pool (§2) holds candidates the last
   lap could not form.
 
-**The tower's passes so far are bridge-only laps.** The pair tower on eight times the text
+**The tower's passes so far are laps that found nothing.** A tower pass is not a strict reread: it
+also re-encodes the carried state at the learning rate (the tower record, "The ring's readout is a
+pair contact with the top face"). So it moves the material along its covector as well as the
+bridge, without founding, and the tension stays where it was. The pair tower on eight times the text
 ([the tower record](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK.md),
 "Eight times the text", "One more pass", "The second pass"), in bits a byte:
 
@@ -56,7 +59,10 @@ through the same constitution gives the same `(H, B, T)` to the bit. So:
   form on the frozen tower took 0.058 bits a byte off the held-out code.
 
 This is the law's prediction for laps without founding [agent-inferred]: they converge on the
-bridge, and the remainder and the writing stay put.
+bridge, and the remainder and the writing stay put. The re-encoding has a second cost, which the
+ring met: a face founded in one frame is read through factors held in that frame, and a pass that
+re-encodes the state dephases it (the tower record, same section: 257 of 495 at the held-out units
+before one pass, 65 after).
 
 ## 2. A lap's pool comes from the faces the last lap founded
 
@@ -166,6 +172,8 @@ Each lap rereads the training text at the held constitution, founds from the poo
 present faces (including every face founded on an earlier lap) under the charge of §2, and then
 deposits. The laps stop at the first lap that founds nothing. Each lap reports:
 - every founding, with its face, its degree, and its predicted drop and saving against its charge;
+- every earlier founding's drop retested at this lap's constitution, against its charge (a founding
+  that falls under its charge has been dephased by the deposit, as the ring was);
 - training and held-out bits a byte per medium, and `tr S` per medium;
 - the writing at each prompt, whole.
 
@@ -176,7 +184,8 @@ It passes when:
    met by the pair forms' second pass);
 3. a face founded on a lap after the first is a product involving an earlier lap's founding and
    passes its charge (the composition climbs past two bytes);
-4. the laps stop on their own, at the fixed point.
+4. the laps stop on their own, at the fixed point;
+5. no earlier founding falls under its charge when it is retested on a later lap.
 
 The recorded failures this could repeat: bits read as progress (the acceptance reads held-out bits
 only against a foil lap, and shows the writing beside them); a refusal answered with a larger
