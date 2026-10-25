@@ -216,6 +216,13 @@ every false line. It misses 54 of the 55 one-place-minuend lines (all but `0-0=0
 result's length instead, `c < 10` keeps ℤ/20, because it holds the one-place minuends, and `c ≥ 10`
 has none.
 
+The split shows in the pair counts. A row's digit-digit pairs number `(places of a − 1) + (places of
+b − 1)`: the pair into `c₀` is excluded, and a result never has more places than its minuend. So,
+with `b ≤ a`, the one-place-minuend rows are exactly the rows with no digit-digit pair (0, 1 and 2 such
+pairs for the shapes `x−y`, `xx−y` and `xx−yy`; a count identity of the line shape). In the passage, `−` is
+entered from the digit the newline entered, `(newline, x)(x, −)`, rather than from a digit a digit
+entered, `(y, x)(x, −)`. The line shows this at `−`, before `=`.
+
 What it means for the founding [agent-inferred]. For sums, the face that splits the menu is the
 result's length, which is the one bit the closure leaves (§3, §4). For differences it is the
 minuend's length, which the line already shows at `−`, before the answer. A differences ring founded
