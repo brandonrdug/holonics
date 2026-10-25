@@ -1,0 +1,15 @@
+RING_PASS cells=26998 marked=1146 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=4687
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=15936
+RING_STEP rank=0 start=unit step=0 factor=A circular_permille=489 pass_ms=4781 elapsed_ms=20719
+RING_START rank=0 start=unit exact_share_permille=919 elapsed_ms=25268
+RING_STEP rank=0 start=coupling_mode_1 step=0 factor=A circular_permille=503 pass_ms=4720 elapsed_ms=29990
+RING_START rank=0 start=coupling_mode_1 exact_share_permille=791 elapsed_ms=34313
+RING_STEP rank=0 start=coupling_mode_2 step=0 factor=A circular_permille=603 pass_ms=4649 elapsed_ms=38963
+RING_START rank=0 start=coupling_mode_2 exact_share_permille=910 elapsed_ms=43184
+RING_STEP rank=0 start=coupling_mode_3 step=0 factor=A circular_permille=487 pass_ms=4872 elapsed_ms=48058
+RING_START rank=0 start=coupling_mode_3 exact_share_permille=686 elapsed_ms=52751
+RING_STEP rank=0 start=coupling_mode_4 step=0 factor=A circular_permille=493 pass_ms=6121 elapsed_ms=58874
+RING_START rank=0 start=coupling_mode_4 exact_share_permille=786 elapsed_ms=66973
+RING_RANK rank=0 channels=2 marked_cells=1146 exact_share_permille=919 push_shift=33 read_shift=13 elapsed_ms=66975
+RING_WRITTEN forms=1 sha256=0636bd7b7ccacfdc8bf81553b17ef36b28933aab7708c31c0ae12e3087df7cf0 elapsed_ms=66981
+MEASURE exit=0 wall_s=67.1 peak_rss_kib=399872

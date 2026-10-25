@@ -262,7 +262,7 @@ fn read_moments(tower: &Tower, text: &[usize], streams: usize, section: usize, l
 }
 
 /// `x / d` rounded to nearest, `d > 0`.
-fn div_round(x: &BigInt, d: &BigInt) -> BigInt {
+pub(super) fn div_round(x: &BigInt, d: &BigInt) -> BigInt {
     let twice: BigInt = x * 2;
     let span: BigInt = d * 2;
     if x.is_negative() {
@@ -274,7 +274,7 @@ fn div_round(x: &BigInt, d: &BigInt) -> BigInt {
 }
 
 /// The least common multiple of the class counts.
-fn lcm(ns: impl Iterator<Item = i128>) -> BigInt {
+pub(super) fn lcm(ns: impl Iterator<Item = i128>) -> BigInt {
     ns.fold(BigInt::from(1), |l, n| {
         let n = BigInt::from(n);
         let g = gcd(&l, &n);
@@ -552,7 +552,7 @@ fn held_share(held: &Read, held_reads: &Reads, train: &Read, trained: &Fit) -> (
     (numerator, &nh * &nh * dy * dy * det * det * &held.l)
 }
 
-fn permille(num: &BigInt, den: &BigInt) -> String {
+pub(super) fn permille(num: &BigInt, den: &BigInt) -> String {
     if den.is_zero() {
         return "0".into();
     }

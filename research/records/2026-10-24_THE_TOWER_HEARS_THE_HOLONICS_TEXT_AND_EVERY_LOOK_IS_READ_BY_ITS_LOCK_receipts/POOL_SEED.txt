@@ -1,0 +1,21 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 28.4 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+every cell's state on the pool's grain; classes present 15
+K over 15 classes (0xa, *, +, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, =): leading eigenvalues 2.3419, 1.3930, 0.9584, 0.6232, 0.5769, 0.4288
+   mode 1: pool on the digits 0.000, over the characters k=0..9 0.93 0.01 0.01 0.02 0.00 0.00 0.00 0.02 0.01 0.01
+   mode 2: pool on the digits 0.094, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   mode 3: pool on the digits 0.999, over the characters k=0..9 0.00 0.44 0.05 0.01 0.00 0.00 0.00 0.01 0.05 0.44
+   mode 4: pool on the digits 0.003, over the characters k=0..9 0.62 0.18 0.01 0.00 0.01 0.00 0.01 0.00 0.01 0.18
+the start (modes 1 + i 2): pool on the digits 0.047, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   round 0, the form: share (circular) 0.2726; pool on the digits 0.047, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.000, held out units at B 43 of 495 (63 s)
+   round 0, the pool: share (circular) 0.2755; pool on the digits 0.040, over the characters k=0..9 0.91 0.01 0.02 0.00 0.00 0.00 0.01 0.00 0.01 0.04; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.000, held out units at B 49 of 495 (65 s)
+   round 0, the push gate: share (circular) 0.4735; pool on the digits 0.040, over the characters k=0..9 0.91 0.01 0.02 0.00 0.00 0.00 0.01 0.00 0.01 0.04; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.000, held out units at B 49 of 495 (71 s)
+   round 1, the form: share (circular) 0.5066; pool on the digits 0.040, over the characters k=0..9 0.91 0.01 0.02 0.00 0.00 0.00 0.01 0.00 0.01 0.04; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.000, held out units at B 52 of 495 (84 s)
+   round 1, the pool: share (circular) 0.5137; pool on the digits 0.008, over the characters k=0..9 0.83 0.04 0.01 0.01 0.01 0.00 0.00 0.00 0.02 0.08; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.001, held out units at B 42 of 495 (86 s)
+   round 1, the push gate: share (circular) 0.5336; pool on the digits 0.008, over the characters k=0..9 0.83 0.04 0.01 0.01 0.01 0.00 0.00 0.00 0.02 0.08; gate carries the second operand of a sum 0.001; holds chi_1(c0) at B 0.001, held out units at B 42 of 495 (91 s)
+   round 2, the form: share (circular) 0.5410; pool on the digits 0.008, over the characters k=0..9 0.83 0.04 0.01 0.01 0.01 0.00 0.00 0.00 0.02 0.08; gate carries the second operand of a sum 0.001; holds chi_1(c0) at B 0.000, held out units at B 48 of 495 (107 s)
+   round 2, the pool: share (circular) 0.5447; pool on the digits 0.002, over the characters k=0..9 0.63 0.11 0.01 0.02 0.02 0.01 0.00 0.03 0.02 0.15; gate carries the second operand of a sum 0.001; holds chi_1(c0) at B 0.001, held out units at B 52 of 495 (109 s)
+   round 2, the push gate: share (circular) 0.5529; pool on the digits 0.002, over the characters k=0..9 0.63 0.11 0.01 0.02 0.02 0.01 0.00 0.03 0.02 0.15; gate carries the second operand of a sum 0.000; holds chi_1(c0) at B 0.001, held out units at B 52 of 495 (114 s)
+done in 113.8 s
+MEASURE exit=0 wall_s=114.1 peak_rss_kib=4723608

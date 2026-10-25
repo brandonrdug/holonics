@@ -671,13 +671,16 @@ pub struct CircuitCell {
 /// class. `modes` is the covector the same reverse sends to every level's modes after the cell's
 /// push, `G_h`, level by level and mode by mode `(re, im)`, on the covector's grain `2^(−24)`: the
 /// tension of every later face carried back through each mode's own moves, which a value placed in
-/// that mode at the cell meets (`δL = Re(conj(G_h) δh)`).
+/// that mode at the cell meets (`δL = Re(conj(G_h) δh)`). `moves` is each mode's move at the cell,
+/// `h ↦ λ_t h + β_t h̄`, level by level and mode by mode `(Re λ, Im λ, Re β, Im β)` on `2^(−30)`, as
+/// [`Tower::read_circuit`] reads them: a carrier riding a mode's own moves is carried by them.
 #[derive(Clone, Copy, Debug)]
 pub struct InputCovector<'a> {
     pub class: usize,
     pub carried: &'a [i64],
     pub covector: &'a [i64],
     pub modes: &'a [i64],
+    pub moves: &'a [i64],
 }
 
 /// The carried state as one face: level by level, each mode's `(re, im)` released from the
@@ -2560,6 +2563,7 @@ impl Tower {
             return refuse("a section of at least one cell");
         }
         let reaches = self.reaches();
+        let t = &self.theta;
         let mut start = 0;
         while start + 1 < classes.len() {
             let part = &classes[start..(start + section + 1).min(classes.len())];
@@ -2570,7 +2574,19 @@ impl Tower {
             let mut carried = carried_face(&opening.modes)?;
             for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
                 let modes: Vec<i64> = placed.iter().flat_map(|level| level[i].iter().flat_map(|&(re, im)| [re, im])).collect();
-                each(InputCovector { class: part[i], carried: &carried, covector, modes: &modes })?;
+                let moves: Vec<i64> = cell
+                    .levels
+                    .iter()
+                    .zip(&self.layout.levels)
+                    .flat_map(|(lc, lv)| {
+                        (0..self.declaration.modes).flat_map(move |k| {
+                            let lam = lc.gate.get(k).map_or((i64::from(t[lv.move_re + k]), i64::from(t[lv.move_im + k])), |m| m.lam);
+                            let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
+                            [lam.0, lam.1, beta.0, beta.1]
+                        })
+                    })
+                    .collect();
+                each(InputCovector { class: part[i], carried: &carried, covector, modes: &modes, moves: &moves })?;
                 let after: Vec<Vec<(i64, i64)>> = cell.levels.iter().map(|lc| lc.state.clone()).collect();
                 carried = carried_face(&after)?;
             }
@@ -2955,6 +2971,13 @@ mod tests {
             tower.step(&mut state, u, &reaches).expect("step");
             states.push(state.clone());
         }
+        let mut circuit = Vec::new();
+        tower
+            .read_circuit(&mut tower.rest(), &classes, |_, cell| {
+                circuit.push(cell);
+                Ok(())
+            })
+            .expect("circuit");
         for section in [classes.len() - 1, 5, 1] {
             let mut expected = vec![0i128; a * w];
             let mut open = tower.rest();
@@ -2976,6 +2999,8 @@ mod tests {
                     assert_eq!(cell.class, classes[count]);
                     assert_eq!(cell.carried, &carried_face(&states[count].modes).expect("face")[..]);
                     assert_eq!(cell.modes.len(), 2 * states[count].modes.iter().map(Vec::len).sum::<usize>());
+                    let circuit: Vec<i64> = circuit[count].levels.iter().flat_map(|l| l.modes.iter().flat_map(|m| [m.lam.0, m.lam.1, m.beta.0, m.beta.1])).collect();
+                    assert_eq!(cell.moves, &circuit[..]);
                     moved |= cell.modes.iter().any(|&v| v != 0);
                     for (slot, &v) in summed[cell.class * w..(cell.class + 1) * w].iter_mut().zip(cell.covector) {
                         *slot += v as i128;

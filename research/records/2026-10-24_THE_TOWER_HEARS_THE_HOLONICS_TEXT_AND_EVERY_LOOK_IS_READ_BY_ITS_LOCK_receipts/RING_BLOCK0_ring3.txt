@@ -1,0 +1,14 @@
+RING_PASS cells=26998 marked=1146 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=4771
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=16598
+RING_STEP rank=0 start=unit step=0 factor=A circular_permille=140 pass_ms=4966 elapsed_ms=21566
+RING_STEP rank=0 start=unit step=1 factor=B circular_permille=230 pass_ms=4762 elapsed_ms=26331
+RING_STEP rank=0 start=unit step=2 factor=G circular_permille=568 pass_ms=4659 elapsed_ms=30991
+RING_STEP rank=0 start=unit step=3 factor=A circular_permille=677 pass_ms=4807 elapsed_ms=35800
+RING_STEP rank=0 start=unit step=4 factor=B circular_permille=685 pass_ms=4384 elapsed_ms=40187
+RING_STEP rank=0 start=unit step=5 factor=G circular_permille=704 pass_ms=4399 elapsed_ms=44587
+RING_STEP rank=0 start=unit step=6 factor=A circular_permille=722 pass_ms=4654 elapsed_ms=49243
+RING_STEP rank=0 start=unit step=7 factor=B circular_permille=726 pass_ms=4211 elapsed_ms=53458
+RING_STEP rank=0 start=unit step=8 factor=G circular_permille=735 pass_ms=4785 elapsed_ms=58243
+RING_STEP rank=0 start=unit step=9 factor=A circular_permille=742 pass_ms=5226 elapsed_ms=63471
+alpha error: a ring's push and memory would leave 128 bits
+MEASURE exit=1 wall_s=63.6 peak_rss_kib=399816

@@ -17,6 +17,8 @@ mod modes_train;
 mod tower_train;
 #[path = "complete_language/tower_situated.rs"]
 mod tower_situated;
+#[path = "complete_language/tower_ring.rs"]
+mod tower_ring;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
@@ -811,6 +813,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
         Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
+        Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
         Some("read-tower-situated-moments") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated_moments(args),
         Some("read-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_situated(args),
         Some("read-tower-input-covectors") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::read_tower_input_covectors(args),
