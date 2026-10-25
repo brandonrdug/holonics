@@ -8,15 +8,19 @@ ring/write_founded30/LINES.tsv
   2+1: 44 lines; whole right 37, length right 42, last two digits right 37
   2+2: 399 lines; whole right 367, length right 399, last two digits right 367
   + all: 495 lines; whole right 445, length right 493, last two digits right 445
+  + never met in training: 219 of 248 right; met: 226 of 247
   - all: 268 lines; whole right 17, length right 228, last two digits right 17
+  - never met in training: 10 of 143 right; met: 7 of 125
   * all: 490 lines; whole right 6, length right 436, last two digits right 26
+  * never met in training: 2 of 236 right; met: 4 of 254
 ring/write_founded26m/LINES.tsv
   1+1: 2 lines; whole right 1, length right 2, last two digits right 1
   1+2: 50 lines; whole right 25, length right 49, last two digits right 25
   2+1: 44 lines; whole right 17, length right 41, last two digits right 17
   2+2: 399 lines; whole right 261, length right 383, last two digits right 261
   + all: 495 lines; whole right 304, length right 475, last two digits right 304
+  + never met in training: 153 of 248 right; met: 151 of 247
   - all: 268 lines; whole right 15, length right 225, last two digits right 15
+  - never met in training: 8 of 143 right; met: 7 of 125
   * all: 490 lines; whole right 7, length right 437, last two digits right 31
-founded30 sums whose line the training text (the arithmetic block and the four media) holds: 226 of 247 written right; never met: 219 of 248
-founded26m sums whose line the training text (the arithmetic block and the four media) holds: 151 of 247 written right; never met: 153 of 248
+  * never met in training: 3 of 236 right; met: 4 of 254
