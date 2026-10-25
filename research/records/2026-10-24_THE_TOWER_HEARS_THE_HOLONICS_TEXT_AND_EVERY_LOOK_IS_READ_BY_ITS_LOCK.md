@@ -10,6 +10,9 @@ October 25, later: the tens step's fixed acceptance is met, the tower's own gues
 495 held-out sums' tens and 473 of their units, the held-out text 2.334 bits a byte against the
 foil's 2.458 ([the tens](#the-tens-under-the-closures-whole-torsion)). The tower then writes 445 of the 495 held-out
 sums itself, whole and right, 219 of the 248 it never met ([the writing](#the-tower-writes-the-sums-itself)).
+The differences by a ring of their own: 129 of 268 written right, the acceptance (201) not met; the
+tens are what no key carries, and the move the closure lacks is the reflection
+([the differences](#the-differences-by-a-ring-of-their-own-and-the-reflection-they-lack)).
 
 ## The failure this step works on
 
@@ -3449,6 +3452,61 @@ the arithmetic block with both rings' readouts held. Its acceptance: the tower w
 of the 268 held-out differences whole and right (three in four, as for the sums), the sums staying
 at or above 370 written right, and the held-out text at or under 2.458 bits a byte.
 
+## The differences by a ring of their own, and the reflection they lack
+
+The loop's acceptance was fixed before the run: the tower writes at least 201 of the 268 held-out
+differences whole and right, the sums staying at or above 370, and the held-out text at or under
+2.458 bits a byte.
+
+**The ring.** A landmark at the cell before each difference's units (`tools/landmarks.py`, kind
+`diff-units`: 4,548 marks on the arithmetic block) gives the newline origin a closure with torsion
+`2:1, 5:1` and the key modulus 10 (`RING_DIFF.txt`). The key reads the minuend's units at `−` and
+the subtrahend's at `=` with opposite turns: `θ(d, −) = d + 1`, `θ(d, =) = 9 − d`, every pair out of
+the newline 2, and `ψ(c₀) = c₀ + 2`, so the turn at the mark is `a₀ − b₀ + 2`. The ring founded there
+(100.6 s against 146.5 s projected) was joined beside the units ring and the 110 ring at five
+harmonics each, and its readout founded on the arithmetic block with both other readouts held (two
+rounds saving 7,447 and 1,965 nats against the 4,550 its 9,100 free parameters ask; 364.2 s against
+535 s projected).
+
+**The acceptance fails.** The tower writes **129 of the 268** held-out differences whole and right
+(17 before the ring), 65 of the 143 it never met; the sums fall to 424 of 495 (from 445), the held-out
+text codes 2.338 bits a byte (`WRITTEN_SUMS.txt`, every line in `LINES_founded31_arithmetic.tsv`).
+Of the 139 wrong differences, 68 are wrong in the tens alone, 16 in the units alone, 27 in both and 28
+in the length: the units ring of the differences carries their units, and nothing carries their
+tens. A landmark at the cell before each difference's tens (kind `diff-tens`, 3,691 marks) closes on
+nothing: no origin's closure has a key that separates the tens (40.0 s, refused).
+
+**What the closure lacks** [agent-inferred, joined to the mathematics thread's derivation]. The
+mathematics thread's newline closure of written differences
+([§10](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md#10-differences-the-torsion-is-2b-and-the-minuends-length-is-its-cause))
+has torsion ℤ/20: the one digit-pair move has to count the minuend's tens with `+b` and the
+subtrahend's with `−b`, so `2b ≡ 0`. Its two-part is ℤ/4, which a key built from the torsion primes
+alone reads as ℤ/2, as this ring's key did (10). The conflict is the hand: a pair key adds a fixed
+turn a pair, a rotation, and never reverses the hand, while the subtrahend is read with the hand
+reversed (§8 there: the move the closure lacks is the reflection, the dyad `U` of the helical code,
+on the ring `z ↦ ωᵈ z̄`). Brandon's lens, October 25, says the same from the other side: `−` is not
+another kind of thing beside `+`; it is `+`'s cycle with its polarity reversed, as in algebra, so
+the differences should not need a mechanism of their own.
+
+**Decided next** [agent-inferred]. The ring's pair moves may reflect, and the machine locates where.
+- A ring move is already `h ↦ λh + βh̄`: a rotation where `β = 0`, a reflection where `λ = 0`. Each
+  rank carries its hand, the parity of the reflections since its last restart, and is read in its own
+  hand, `(Re h, ±Im h)`. A turn met after a reflection then counts with the reversed hand, so a
+  closure row counts each pair with the hand in force where it is met.
+- The closure is solved with no reflector and with each class the rows meet as the reflector, and
+  keeps a key that closes the loops exactly (its rational kernel) before one that closes them modulo
+  its torsion, and a larger modulus before a smaller. No reflector is named to it.
+- What this predicts, to be read off the closure: on the differences' units alone, `−` as the
+  reflector removes the `2b` conflict, so the closure is exact and holds the whole difference. On the
+  sums' and the differences' units together, exactly one of `+` and `−` reflects (which one is a
+  gauge), and the one ring keys the units of both; the result still enters with one hand against
+  the left side in a sum and the other in a difference, so the shared key stops at the units.
+- The acceptance of the first loop: the closure, given the sums' and differences' units together and
+  no reflector, locates `+` or `−` as the reflector with a key that separates every arriving class;
+  given the differences' units alone, it closes exactly with `−` or `+`. The writing's acceptance
+  stays: at least 201 of 268 differences and 370 of 495 sums whole and right, the held-out text at or
+  under 2.458 bits a byte.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3673,10 +3731,13 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_TENS_CENTROIDS.txt` (the 110 ring's turn at the held-out tens and units, by class, and the
   centroid reads over counts of characters, from `RING_PHASE_CENTROIDS.py … harmonics=…`); the
   splits are appended to `RING_SPLIT.txt`.
-- The written sums: `LINES_founded30_arithmetic.tsv` and `LINES_founded26m_arithmetic.tsv` (every
-  held-out arithmetic line's head, true rest, written rest and codes) and `WRITTEN_SUMS.txt` (their
-  receipt lines and counts, from `WRITTEN_SUMS.py … --train modes/block.txt ring/mixed.txt`, which
-  reads each line apart by whether a training file holds it whole).
+- The written sums: `LINES_founded30_arithmetic.tsv`, `LINES_founded26m_arithmetic.tsv` and
+  `LINES_founded31_arithmetic.tsv` (every held-out arithmetic line's head, true rest, written rest
+  and codes) and `WRITTEN_SUMS.txt` (their receipt lines and counts, from `WRITTEN_SUMS.py …
+  --train modes/block.txt ring/mixed.txt`, which reads each line apart by whether a training file
+  holds it whole, and each operation's wrong lines by where they go wrong).
+- The differences: `RING_DIFF.txt` (the closure at the differences' units and its ring, the join,
+  the readout's founding, its reads, and the closure at the differences' tens).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 

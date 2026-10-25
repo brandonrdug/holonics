@@ -13,15 +13,20 @@ more than its first markers, hands over where to look; the exchange is communica
                         result's units (it has heard the byte before them; `tower_modes.py`'s U)
   sum-tens TEXT OUT     on each such line whose result has two places or more, the cell that codes
                         the result's tens (it has heard the byte before them)
+  diff-units, diff-tens, product-units, product-tens TEXT OUT
+                        the same cells on the lines of the shape `digits-digits=digits` or
+                        `digits*digits=digits`
+  sum-diff-units, sum-diff-tens TEXT OUT
+                        the same cells on the sums' lines and the differences' lines together
 
 OUT is written create-new.
 
-usage: python3 -I landmarks.py after-sum|sum-units|sum-tens TEXT OUT
+usage: python3 -I landmarks.py after-sum|{sum,diff,product,sum-diff}-{units,tens} TEXT OUT
 """
 import re
 import sys
 
-SUM = re.compile(rb"^\d+\+\d+=\d+$")
+SHAPES = {"sum": rb"\+", "diff": rb"-", "product": rb"\*"}
 
 
 def after_sum(text):
@@ -34,26 +39,26 @@ def after_sum(text):
     return marks
 
 
-def sum_units(text):
-    marks, start = bytearray(len(text)), 0
-    for line in text.split(b"\n"):
-        if SUM.match(line):
-            marks[start + len(line) - 2] = 1
-        start += len(line) + 1
-    return marks
+def place(ops, places):
+    """The cell before the result's place `places` from the right (1 the units, 2 the tens), on
+    each line of the shape `digits OP digits=digits`, `OP` one of `ops`, whose result has that
+    many places."""
+    shape = re.compile(rb"^\d+(?:" + b"|".join(SHAPES[op] for op in ops) + rb")\d+=\d+$")
 
-
-def sum_tens(text):
-    marks, start = bytearray(len(text)), 0
-    for line in text.split(b"\n"):
-        if SUM.match(line) and len(line) - line.index(b"=") - 1 >= 2:
-            marks[start + len(line) - 3] = 1
-        start += len(line) + 1
-    return marks
+    def marks_of(text):
+        marks, start = bytearray(len(text)), 0
+        for line in text.split(b"\n"):
+            if shape.match(line) and len(line) - line.index(b"=") - 1 >= places:
+                marks[start + len(line) - 1 - places] = 1
+            start += len(line) + 1
+        return marks
+    return marks_of
 
 
 def main():
-    kinds = {"after-sum": after_sum, "sum-units": sum_units, "sum-tens": sum_tens}
+    kinds = {"after-sum": after_sum}
+    for name, ops in [(op, [op]) for op in SHAPES] + [("sum-diff", ["sum", "diff"])]:
+        kinds[f"{name}-units"], kinds[f"{name}-tens"] = place(ops, 1), place(ops, 2)
     if len(sys.argv) != 4 or sys.argv[1] not in kinds:
         raise SystemExit(__doc__.rsplit("usage: ", 1)[1])
     text = open(sys.argv[2], "rb").read()
