@@ -2632,6 +2632,9 @@ in both forms. The whole held-out text codes 0.045 bits a byte lower with the ri
   `1073275308` on `2^(−30)`, about 2,300 cells to fall by `e`), so a small change in the move's turn
   accumulates over the cells it carries. With `V` at zero the ring carries no code, so nothing in
   the pass protects what it reads, and it is lost before its readout learns to read it.
+  [Corrected in "The ring's readout is a pair contact with the top face": `1073275308` is the
+  ungated move; the gate makes mode 41's move at the units cells `|λ_t| ≈ 0.853`, about 7 cells,
+  and its turn drifts 0.2 to 0.6 of the line's width a pass. The ring is lost at its push.]
 
 **What it says** [agent-inferred]: a founded form held on a learning tower is a cause carried into
 a new consumer without its frame. The founding located the ring in the frame of one tower; the
@@ -2642,6 +2645,106 @@ the tower's material is.
 
 **The runs** are in `RUNS.tsv`. The join with the fitted face read the training text once (269.3 s
 against 277 s projected); the ratio face needs no fitting, and its join takes 0.2 s.
+
+## The ring's readout is a pair contact with the top face
+
+The loop after the dephasing carries the ring with the tower in two parts: its readout founded at
+the join, so that the ring carries code from the first cell and its covector reaches what the ring
+reads, then one block pass. The acceptance is unchanged: after one training pass, the tower's own
+top guess at `U` is the units digit in at least 370 of 495, and its code there is below the same
+pass without the ring (the foil: 72 of 495, 3.267 bits a digit).
+
+**The readout's law, chosen by reading.** With the joined tower held, every cell of the block (the
+training text's last 216,131 bytes) and of the held-out arithmetic was read once (`read-tower-cells`:
+the class that follows, the top face, the ring's face `ρ` and every class's share), and readouts of
+each kind were fitted outside the machine on the block and read on the held-out text
+(`RING_READOUT_LAW.py`, an exterior float read; the machine reads none of it):
+
+| readout added to the tower's face | right at `U` (of 495) | bits a digit at `U` | held-out arithmetic, bits a byte |
+|---|---|---|---|
+| none (the tower alone) | 48 | 3.488 | 2.300 |
+| a bias | 55 | 3.394 | 2.276 |
+| the ring alone, `V ρ` | 96 | 3.223 | 2.271 |
+| the top face alone | 71 | 3.357 | 2.207 |
+| top face and ring, side by side | 115 | 3.164 | 2.203 |
+| a received landmark's gate times the ring | 281 | 2.094 | 2.230 |
+| **the top face times the ring, `W (x̂ ⊗ ρ)`** | **309** | **1.916** | **2.156** |
+
+A ring's phase is news at one cell of a line and not at the others. After a sum's second operand
+the ring holds the units' turn through `=` and the result's other digits, and a readout of `ρ`
+alone must read every cell alike. A landmark gate (a least-squares read of where the training
+text's units are, 0.58 on average at the held-out units against 0.018 elsewhere) placed it at 281,
+and the top face, which knows which cell codes the units, places it better than the landmark. So
+the readout is a pair contact with the top face [definition; agent-inferred]:
+
+```text
+x̂_t = (2^16 x_t / ‖x_t‖_rms, 2^16)
+z_t += W (x̂_t ⊗ ρ_t)                  W: A × (d + 1)·2R, on the material's 2^(−24)
+```
+
+with `(d + 1)·2R = 130` channels at width 64 and one rank. Its covector reaches `W`, the ring's
+face (and through it the carried face and the move the ring rode) and the top face, each through
+its ratio ([`RingFace`](../../crates/holonics/src/hnn/tower.rs)); the covector tests read the
+code's difference with `W` keyed away from zero. On the foil after its pass, with the same forms
+joined, the same readout reads 80: the pass had already taken the ring's units away.
+
+**The founding at the join** [definition; agent-inferred] (`found-ring-readout`). The bridge's own
+solution gives the readout's direction, the exact least squares `Q D = −M` with `Q = Σ φφᵀ`,
+`M = Σ φ yᵀ`, `φ_t = x̂_t ⊗ ρ_t` and `y_t = p_t − q_t` over the joined tower's read of the block
+from rest, and the passage's code gives its scale, doubled while the code falls and then narrowed
+by golden section. Read outside first, the least squares direction alone read 74 at `U`, and its
+multiples by 2, 4, 8, 16 and 32 read 100, 169, 243, 257 and 239 (`RING_READOUT_CLOSED.py`); one
+Newton step per class read 190, and the fitted optimum 292 to 309. In the machine the scale came to
+`849322` on `2^(−16)` (about 13 of the direction's units) in 37 code reads, and the block's code
+fell from 2.288 to 2.236 bits a byte.
+
+| the tower's own top guess | right at `U` (of 495) | bits a digit at `U` | the whole held-out text, bits a byte |
+|---|---|---|---|
+| joined, readout at zero | 48 | 3.488 | 2.448 |
+| **founded at the join, before any pass** | **257** | **2.229** | **2.436** |
+| the foil after one block pass | 72 | 3.267 | 2.690 |
+| founded, then one block pass, moments at zero | 52 | 3.354 | 3.149 |
+| founded with its moments, then one block pass | 65 | 3.279 | 2.845 |
+
+Before any pass, the tower's own guess at the held-out units is 257 of 495, more than three times
+the foil's after its pass, and its code there is 1.04 bits a digit below the foil's. It is the machine's own read:
+the forms were founded at a received landmark and the readout on the training passage, and the
+held-out text was read only to measure it. **The acceptance is not met**: it asks for that after a
+pass, and the pass takes it away.
+
+**The moments** [definition; agent-inferred] ([`TowerLearner::open_moments`]). The first pass ran
+with the readout's moments at zero inside a learner whose other moments were opened, so its first
+steps moved every entry of `W` at two to four times the rate whatever its covector carried, and the
+held-out text read 3.149 bits a byte. A founded family's moments are now opened at its passage's own section
+statistics: each of the block's 211 sections is read forward and back from the streams' states,
+without a deposit, and the family takes the mean covector and the mean square (37.9 s). This
+repaired part of the text (2.845) and not the units (65).
+
+**Where the pass loses it, located.**
+- *Not the readout.* The pass moves `W` far (its root mean square from `349912` to `1303073` on
+  `2^(−24)`), but swapping `W` between the founded and the passed learners
+  (`RING_SWAP_READOUT.py`) puts the loss in the tower: the passed tower with the founded readout
+  reads 60 at `U` (2.789 bits a byte on the held-out text), and the founded tower with the passed
+  readout reads 157 (2.529).
+- *Not the move's turn.* At the held-out units the gate holds mode 41's move at `|λ_t| ≈ 0.853`
+  (a line 0.147 wide, about 7 cells), not at the ungated `1073275308` on `2^(−30)` the last section
+  counted. Over one pass mode 41's turn there moved 0.2 of its line's width in the foil and 0.6 with
+  the founded readout (its moments at zero), and the median mode 0.09 in both (`RING_MOVE_DRIFT.py`).
+- *The push.* Read by nearest mean direction with each cell left out, the ring's own face reads the
+  sum's units at `U` in 339 of 495 before the pass and 45 after, and at the second operand's cell
+  `B`, where the push lands, in 379 before and 64 after (`RING_OUTSIDE_AT_U.py`, `RING_AT_B.py`).
+  The ten digits' mean turns at `U` go from one turn round the circle (45° to 355°) to a cluster.
+  The push is `v = (aᵀŝ)(bᵀx̂)(gᵀ(ŝ, 2^16))`: `b` reads the arriving class over the encoding the
+  ring was founded on, held, and `a` and `g` read the level's carried face `ŝ`, which the pass
+  re-encodes. The first operand's turn is carried by `ŝ` in the frame of the tower the ring was
+  founded on, and `a` still reads that frame.
+
+**What it says** [agent-inferred]: the readout now carries code and its covector reaches `ŝ`, and
+that is not enough to keep `ŝ`'s frame: the tower's own learning re-encodes the state everywhere
+else at the rate, and the ring's demand is one term of that covector. The cause carried
+unrepaired is now located at the push's factors: they are held in the frame of one tower while
+the learner moves it. The next loop deposits `a`, `b` and `g` from the covector that reaches them,
+with their moments opened on the founding passage, so the push follows the state it reads.
 
 ## The recorded failures this step could repeat
 
@@ -2675,7 +2778,11 @@ against 277 s projected); the ratio face needs no fitting, and its join takes 0.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
-  with the tower.
+  with the tower. The founded readout carried code and still did not keep the frame: the push's
+  held factors are the cause, located at `B`, and the loop after deposits them.
+- **An uncertified deposition step.** A founded family joined with its moments at zero moved at two
+  to four times the rate on its first sections. Its moments now open on its founding passage, read
+  without a deposit, and every step stays the certified one.
 - **An index of contexts counted as learning.** The pair face is carried at every pair. Which pairs
   the training text met is read only outside the machine, to split the held-out reading.
 - **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
@@ -2801,6 +2908,12 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `RING_FOIL_BLOCK.txt` and `RING_PASS_BLOCK_RATIO.txt` (the block passes), and `RING_AT_U.txt` (each
   tower's read at the held-out units: the receipt lines and the counts; the reads stay outside the
   repository).
+- The ring's founded readout: `RING_READOUT_LAW.{py,txt}` and `RING_READOUT_CLOSED.py` (the exterior
+  reads that chose the readout's law and its founding, with the every-cell reads' receipt lines;
+  the reads stay outside the repository), `RING_FOUNDED_READOUT.txt` (the joins, foundings, passes
+  and reads, and the swapped readouts by `RING_SWAP_READOUT.py`) and `RING_DEPHASING.txt` (every
+  mode's move by `RING_MOVE_DRIFT.py`, and the ring's own read of the units at `U` and `B` by
+  `RING_OUTSIDE_AT_U.py` and `RING_AT_B.py`).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -2822,4 +2935,7 @@ resume), `situated7` (`25f4309f…`, the complex forms, their reads and the mode
 and `situated8` (`1abd5ebb…`, the mode covectors, every cell's reads and the state reads). The ring
 founding uses `ring1` to `ring5` (its development builds, in order) and `ring5` (`c2801523…`) for the
 founding on the training text and the acceptance reads. The ring inside the learner uses `ring6`
-(`9b4954f6…`, the fitted face) and `ring7` (`128f340b…`, the face as a ratio).
+(`9b4954f6…`, the fitted face) and `ring7` (`128f340b…`, the face as a ratio). The founded readout
+uses `cells8` (`e69cbdb0…`, the every-cell reads), `ring9` (`8813e43b…`, the founding with its
+moments at zero, its pass and the moves) and `ring10` (`8cdc8135…`, the founding with its moments,
+its pass, the swapped readouts and the reads at `U` and `B`).
