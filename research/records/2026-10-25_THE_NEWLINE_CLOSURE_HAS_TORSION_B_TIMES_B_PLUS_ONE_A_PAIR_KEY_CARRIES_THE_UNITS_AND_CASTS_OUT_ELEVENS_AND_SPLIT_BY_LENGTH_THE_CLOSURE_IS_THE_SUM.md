@@ -14,7 +14,10 @@ Status:
   are [agent-inferred];
 - §10 (differences, added the same day) is checked exactly by `closure_differences.py`. Its derivation
   is proved-derived for keys linear in the digit values and assumes no shared move. Its consequence for
-  the founding is [agent-inferred].
+  the founding is [agent-inferred];
+- §11 (the reversible hand, added the same day) is checked exactly by `closure_reflection.py`. Its
+  derivations are for keys linear in the digit values. Its reading as an inverse chart transition, and
+  the ties beyond the ring, are [agent-inferred].
 
 The tower founded the units' carriage by loop closure: from the newline origin, the closure system
 of 9,018 sum lines has 149 pair columns, rank 145, one maximal minor `det M = 110 = 2·5·11`, torsion
@@ -223,6 +226,67 @@ pairs for the shapes `x−y`, `xx−y` and `xx−yy`; a count identity of the li
 entered from the digit the newline entered, `(newline, x)(x, −)`, rather than from a digit a digit
 entered, `(y, x)(x, −)`. The line shows this at `−`, before `=`.
 
+## 11. With the hand reversible, a reflection at − reads every difference, and with a restart at = one key reads sums and differences
+
+Added the same day for the tower's next loop, in which the ring's moves may reflect and the closure
+locates where (the tower record, PR #467). Read by `closure_reflection.py`.
+
+Each pair is counted with the hand in force at its seam:
+- a reflector byte reverses the hand where it is met as a seam;
+- a restart byte returns the hand to the line's starting hand;
+- the end class `c₀` is read either in the starting hand or in the hand in force.
+
+The rows are §1's, with each count signed by its hand.
+
+| menu | hand | torsion | results told apart |
+|---|---|---|---|
+| differences | no reflector | ℤ/20 | over ℚ, none (§10) |
+| differences | `−` reflects | none | over ℚ, all 100 |
+| differences | `−` reflects, `=` restarts | none | over ℚ, all 100 |
+| differences | `=` reflects | 2, 5 | over ℚ, none |
+| sums, operands below `b²` | `=` reflects | minors' gcd `b(b − 1)` in bases 3 to 10 (90 in base 10) | |
+| sums and differences (15,050 lines) | no reflector | 2 | |
+| sums and differences | `−` reflects, `c₀` in the starting hand | 2, 5 | `c mod 5` in both families |
+| sums and differences | `−` reflects, `c₀` in the hand in force | 2 | |
+| sums and differences | `−` reflects, `=` restarts | 2, 5, 11 | `c mod 5` and `c mod 11` in both families |
+
+Why, for keys linear in the digit values (in §5's and §10's gauge; the torsion rows are measured for
+every key):
+- **Differences.** With `−` reflecting, the subtrahend's pairs count with `−θ`, so the one digit-pair
+  move needs `+s b` for the tens of both operands. §10's `2 s b ≡ 0` is gone, and nothing else
+  conflicts.
+- **Sums with `=` reflecting.** The result enters with the operands' hand, and the place weight that
+  agrees with it is `+1`, which is ring `b − 1`. §5's `s b (b + 1) ≡ 0` becomes `s b (b − 1) ≡ 0`.
+  This measures §8's sentence: on ring `b − 1` the closure needs the hand flipped at `=`.
+- **One menu, no reflector.** The pair `(y, =)` is shared. It takes the addend's units with `+s` and
+  the subtrahend's with `−s`, so `2 s ≡ 0`.
+- **One reflection at `−`.** The operands now agree. The result's pair `(=, y)` is read in the reversed
+  hand in a difference and in the starting hand in a sum, so `2 s b ≡ 0`. With §5's `s b (b + 1)`, a
+  key modulo `m` needs `m ∣ b·gcd(2, b + 1)`, which is 10 in base 10: the units. If `c₀` is read in
+  the hand in force too, the shared `ψ` is read `+` in sums and `−` in differences, and `2 s ≡ 0`.
+- **A reflection at `−` and a restart at `=`.** Two reflections compose into a turn (the parametron's
+  "two pumped reflections compose into a turn by their relative phase"). The subtrahend is read in the
+  reversed hand, and everything from `=` on in the starting hand. A difference is then read exactly as
+  a sum is, and only §5's `s b (b + 1)` is left: `c mod 110` for both families, with the result's
+  length the remaining bit, as in §3.
+
+What it means [agent-inferred]:
+- Brandon's lens (October 25) is that `−` is `+`'s cycle with its polarity reversed, and that the
+  reversal is an inverse chart transition. On the ring's circle the reflection `z ↦ z̄` is the
+  inversion `z ↦ 1/z`, so reversing the hand is passing to the inverse chart, and the restart at `=`
+  is the transition back.
+- Among the hands read here, the closure separates them without being told: with `=` restarting, `−`
+  reflecting gives 110 where no reflector gives 2.
+- The same antilinear involution appears as:
+  - Hodge's conjugate symmetry `H^{p,q} ↔ H^{q,p}`;
+  - the completed zeta's reflection `s ↦ 1 − s̄`, whose fixed line is `Re s = 1/2`;
+  - negation `P ↦ −P` on an elliptic curve;
+  - the Enigma reflector (`key.enigma-reading`);
+  - the helical code's dyad `U`.
+
+  Each of these is standard. That they are one object of this machinery is a reading, not derived
+  here.
+
 What it means for the founding [agent-inferred]. For sums, the face that splits the menu is the
 result's length, which is the one bit the closure leaves (§3, §4). For differences it is the
 minuend's length, which the line already shows at `−`, before the answer. A differences ring founded
@@ -248,11 +312,15 @@ Lean (#410), added to the box "The closure key's torsion (#405)":
 - the `b = 10` key of §2 closes a line iff `11 ∣ c − a − b` (decidable on the finite line set);
 - the newline closure of written differences with `b ≤ a < b²` admits a key linear in the digit values
   modulo `m` exactly when `m ∣ 2b`, and over ℚ on the lines whose minuend has two places, where the
-  §10 key's closure is `c − a + b` (decidable on the finite line set).
+  §10 key's closure is `c − a + b` (decidable on the finite line set);
+- with the hand reversible (§11): sums with `=` reflecting admit a linear key modulo `m` exactly when
+  `m ∣ b(b − 1)`; and on sums and differences with `−` reflecting and `=` restarting, exactly when
+  `m ∣ b(b + 1)`, the key reading `c mod b(b + 1)` in both families.
 
 ## Receipts
 
 [`2026-10-25_THE_NEWLINE_CLOSURE_receipts/`](2026-10-25_THE_NEWLINE_CLOSURE_receipts/):
 `closure_torsion.py` (integers and residues only: echelons modulo primes, Bareiss determinants, the
 integer kernel checked on every row), its output `closure_torsion.txt`; `closure_differences.py`
-(§10, importing the same exact reading), its output `closure_differences.txt`; and `RUN.md`.
+(§10, importing the same exact reading), its output `closure_differences.txt`;
+`closure_reflection.py` (§11, the same), its output `closure_reflection.txt`; and `RUN.md`.
