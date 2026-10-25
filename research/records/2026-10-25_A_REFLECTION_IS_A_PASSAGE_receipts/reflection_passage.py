@@ -152,7 +152,7 @@ def part_d(beta, bounces=40):
 
 
 def part_e():
-    ok = True
+    ok, delay0 = True, None
     for x in (F(0), F(1, 2), F(1), F(3), F(-2, 7)):
         g = complex_rat_div((-1, x), (1, x))  # (i x - 1)/(i x + 1) as (re, im)
         if g[0] ** 2 + g[1] ** 2 != 1:
@@ -163,7 +163,9 @@ def part_e():
         ld = (a[0] - b[0], a[1] - b[1])
         if ld != (F(0), F(-2) / (1 + x * x)):
             ok = False
-    return {"|Gamma| = 1 and Gamma^-1 dGamma/dx = -2i/(1+x^2)": ok, "delay at x = 0, units L/Z0": "2"}
+        if x == 0:
+            delay0 = -ld[1]  # the size of the pure turn rate at x = 0
+    return {"|Gamma| = 1 and Gamma^-1 dGamma/dx = -2i/(1+x^2)": ok, "delay at x = 0, units L/Z0": str(delay0)}
 
 
 def complex_rat_div(a, b):
