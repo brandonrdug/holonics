@@ -2746,6 +2746,97 @@ unrepaired is now located at the push's factors: they are held in the frame of o
 the learner moves it. The next loop deposits `a`, `b` and `g` from the covector that reaches them,
 with their moments opened on the founding passage, so the push follows the state it reads.
 
+## The push's factors learn with the tower, and the deposit under the ring moves its frame
+
+The last loop located the loss at the push: its factors `a`, `b` and `g` were held in the frame of
+the tower the ring was founded on, while the pass re-encodes the state they read. This loop deposits
+them. The acceptance is unchanged: after one training pass, the tower's own top guess at `U` is the
+units digit in at least 370 of 495, and its code there is below the same pass without the ring (the
+foil: 72 of 495, 3.267 bits a digit).
+
+**The factors as material** [definition; agent-inferred] ([`RingFace`](../../crates/holonics/src/hnn/tower.rs),
+`factor_on_material`). Each founded factor joins the learned material scaled by `2^k`, so that its
+root mean square lies in `[2^24, 2^25)`, the material's unit, and its release moves by the same
+`k`. A rank is read as a ratio to its own power, so a factor's scale is a gauge, and on the
+material's grain the learner's step moves a factor by the same share of its own power as any other
+entry. The founded ring's factors sat far apart (`a` near `2^16`, `b` near `2^60.3`, `g` near
+`2^17.4`); on the material their releases are 11, 6 and 10 (from 3, 42 and 3), and the joined tower
+reads every held-out cell as before (257 of 495 at `U`). The factors' covectors, from the push
+`v = (aᵀŝ)(bᵀx̂)(gᵀ(ŝ, 2^16))` and the covector `G` the ring's face returns:
+
+```text
+e = conj(G) β γ / 2^(P+σ)     h = conj(G) α γ / 2^(P+σ)     f = Re(conj(G) α β) / 2^(P+σ)
+∂a₀ = Σ Re(e) ŝ    ∂a₁ = −Σ Im(e) ŝ    ∂b₀ = Σ Re(h) x̂    ∂b₁ = −Σ Im(h) x̂    ∂g = Σ f (ŝ, 2^16)
+```
+
+with `α = aᵀŝ`, `β = bᵀx̂`, `γ = gᵀ(ŝ, 2^16)`, `P` the push's release and `σ` the face's, each sum
+carried to the material's covector grain. The covector tests read the code's difference for the
+readout and the factors of both ring-faced towers, and the founded family's moments now open over
+the whole ring, readout and factors, on the founding passage.
+
+| one block pass from the founded learner | right at `U` (of 495) | bits a digit at `U` | held-out text, bits a byte | the ring's outside read at `B` |
+|---|---|---|---|---|
+| founded, before any pass | 257 | 2.229 | 2.436 | 379 |
+| the foil, no ring | 72 | 3.267 | 2.690 | - |
+| factors held (the last loop) | 65 | 3.279 | 2.845 | 64 |
+| **factors learning** | **55** | **3.293** | **3.033** | **62** |
+
+**The acceptance is not met.** The factors' covector reaches them and does not keep the push in
+the state's frame: the ring's read at `B` falls from 379 to 62, as it did with the factors held.
+
+**Which deposit moves the frame, located** (`pass-ring-held`). The same pass from the same founded
+learner, with chosen families held (their step zero, their moments still moving):
+
+| hold | right at `U` | bits a digit at `U` | held-out text | read at `B` | training block, bits a byte as read |
+|---|---|---|---|---|---|
+| nothing (factors learning, above) | 55 | 3.293 | 3.033 | 62 | 2.252 |
+| everything but the readouts | **253** | **2.039** | **2.512** | **379** | **2.190** |
+| the ring's readout `W` only | 75 | 3.277 | 2.860 | 51 | 2.243 |
+| what the ring reads (its factors deposit) | **258** | **1.729** | 2.712 | 313 | 2.182 |
+
+- *Not `W`.* Holding the ring's readout leaves the loss as it was (75, read at `B` 51).
+- *The tower's own deposit.* With only the readouts depositing, the ring keeps its read at `B`
+  (379), the tower's guess at `U` holds (253 of 495) and its code there falls 0.19 bits a digit
+  below the founded tower's, the held-out text codes 0.18 bits a byte below the foil's, and the
+  block itself codes lower as it is read (2.190 against the full pass's 2.252).
+- *What the ring reads.* Holding exactly the material the ring's level is carried by (the
+  encoding, the pair lift, the levels below and the ring level's moves, pushes, gates, turns and
+  pumps; `Tower::ring_read_families`) and letting the rest deposit (the levels above, the readouts,
+  `W` and the factors), the level carries every passage as before: the test reads its modes equal
+  after a section, and the ring different only through its factors. The tower's guess at `U` keeps
+  258 of 495, and its code there falls to 1.729 bits a digit, 1.54 below the foil's.
+- *The factors loosen the ring's digits.* Read outside, the ring's turn at `B` is a near-exact
+  adder of two digit turns: each pair of operands' units sits at one angle (median resultant 0.972),
+  the founded digits step 25° to 42° round the circle (36° is a tenth of a turn), and a turn for
+  each operand's digit, added, leaves 5.8° (median) of each pair's angle unexplained
+  (`RING_PHASE_PAIRS.py`). After the pass with the factors depositing, the steps run 22° to 48°,
+  7.0° is unexplained, and the outside read falls to 313 at `B` and from 339 to 281 at `U`, while
+  the code at `U` falls. The factors' covector serves the readout's code at every cell, not the
+  turn each digit makes.
+
+**What it says** [agent-inferred]:
+- The cause is the tower's own deposit under the ring. Held, the ring's frame stays, and the
+  acceptance's second clause is met: the tower's code at the held-out units is below the foil's,
+  1.729 and 2.039 bits a digit against 3.267. The first clause is not: 258 and 253 of 495 against
+  370.
+- Depositing only the readouts, the bridge in the lap law's word, codes the held-out text best of
+  every pass: 2.512 bits a byte, against the foil's 2.690, the full pass's 3.033 and 2.712 with the
+  ring's reads held. This is the lap law's reading of a lap that founds nothing
+  ([the lap record](2026-10-25_A_LAP_OVER_THE_SAME_TEXT_FOUNDS_ONLY_WHAT_THE_LAST_LAP_MADE_REACHABLE_SO_LEARNING_CLIMBS_STAIRCASES_AND_STEPS_AT_EACH_FOUNDING.md),
+  §1): it should move the bridge, and re-encoding the state costs held-out code and dephases what
+  was founded.
+- The 370 is not reachable by any pass of this ring. Its own outside read at `U` is 339 before any
+  pass, and the exterior readout reads at most 309 of it. The ring must carry more.
+- The founding stopped short. Its alternation ran an authored three rounds, and its share was still
+  climbing at the third: on the kept start the steps read 363, 384, 439, 467, 531, 590, 742, 793,
+  814 and 825 per mille, each round gaining more than the last (`RING_FOUND.txt`).
+
+**Decided next** [agent-inferred]:
+1. A lap's deposit is the bridge: the readouts move, and the founded constitution stays until a
+   founding changes it. The acceptance's foil becomes the same lap on the tower without the ring.
+2. The founding alternates its factors to its own fixed point: a round that saves less than one
+   bit over the marked cells closes it, and no round count is chosen.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2778,8 +2869,10 @@ with their moments opened on the founding passage, so the push follows the state
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
-  with the tower. The founded readout carried code and still did not keep the frame: the push's
-  held factors are the cause, located at `B`, and the loop after deposits them.
+  with the tower. The founded readout carried code and still did not keep the frame. Depositing
+  the push's factors did not keep it either: the cause is the tower's own deposit under the ring,
+  located by holding families one at a time, and a lap now deposits the bridge and leaves the
+  founded constitution as it was founded.
 - **An uncertified deposition step.** A founded family joined with its moments at zero moved at two
   to four times the rate on its first sections. Its moments now open on its founding passage, read
   without a deposit, and every step stays the certified one.
@@ -2914,6 +3007,9 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   and reads, and the swapped readouts by `RING_SWAP_READOUT.py`) and `RING_DEPHASING.txt` (every
   mode's move by `RING_MOVE_DRIFT.py`, and the ring's own read of the units at `U` and `B` by
   `RING_OUTSIDE_AT_U.py` and `RING_AT_B.py`).
+- The push's factors and the held passes: `RING_FACTORS_AND_HOLDS.txt` (the join, the founding, the
+  passes and the reads of each loop) and `RING_PHASE_PAIRS.{py,txt}` (the ring's turn at `B` and `U`
+  by the operands' units, before and after the pass holding what the ring reads).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -2938,4 +3034,6 @@ founding on the training text and the acceptance reads. The ring inside the lear
 (`9b4954f6…`, the fitted face) and `ring7` (`128f340b…`, the face as a ratio). The founded readout
 uses `cells8` (`e69cbdb0…`, the every-cell reads), `ring9` (`8813e43b…`, the founding with its
 moments at zero, its pass and the moves) and `ring10` (`8cdc8135…`, the founding with its moments,
-its pass, the swapped readouts and the reads at `U` and `B`).
+its pass, the swapped readouts and the reads at `U` and `B`). The push's factors use `ring11`
+(`6f1d433f…`, the factors as material, their founding and pass), `ring12` (`0e8600ae…`, the held
+passes) and `ring13` (`9f7edb09…`, the pass holding what the ring reads).
