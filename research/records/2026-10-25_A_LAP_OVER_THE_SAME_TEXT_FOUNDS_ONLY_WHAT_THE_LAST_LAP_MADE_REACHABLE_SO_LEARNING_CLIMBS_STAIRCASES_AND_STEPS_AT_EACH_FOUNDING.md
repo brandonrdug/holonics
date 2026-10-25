@@ -147,10 +147,13 @@ from what this lap founded.
 - The second lap's pool holds the products of those forms with the faces beside them (the byte
   before, the tower's top state). By §2 that reaches three and four bytes, and further where the
   tower's own state carries the passage (the situated pool `top ⊗ x̂`).
-- The out-of-sample count model over contexts up to six bytes carried 29.93‰ of the tension (the
-  effective-tension record, §7). If text's conjunctions are staircases, about three founding laps
-  should reach that horizon, and the forms of each lap should hold on held-out text as the pair
-  forms did.
+- On the training text, the order-3 count prediction, a conjunction of the last three bytes read
+  from the Witten–Bell model over contexts up to six bytes, removed 29.93‰ of the tension, against
+  7.18‰ for the linear faces of the same three bytes (the effective-tension record, "The floor
+  split"). If text's conjunctions are staircases, the second founding lap should reach that
+  order-3 horizon, and the forms of each lap should hold on held-out text as the pair forms did.
+  The Witten–Bell model's out-of-sample lead on held-out text (its Brier, in the same record) is
+  the further horizon a third lap would reach toward.
 - If a lap finds nothing to found while the count model still beats the tower, the missing contrast
   is not a staircase from the present faces, and the next subject is the pool's navigators, not
   more passes.
