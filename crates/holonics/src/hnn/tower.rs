@@ -541,9 +541,11 @@ pub struct RingFace {
     /// The founded factors on the material's grain, rank by rank `(a₀, a₁, b₀, b₁, g)`, until the
     /// join carries them into the material ([`Tower::join_ring_face`]); empty after it.
     founded: Vec<i32>,
-    /// The founded pair moves ([`RingFace::move_at`]), `(prev, cur, [Re λ, Im λ, Re β, Im β])` on
-    /// `2^(−30)`, strictly ascending by pair; empty when the ring rides its mode at every cell.
-    moves: Vec<(usize, usize, [i64; 4])>,
+    /// Each rank's founded pair moves ([`RingFace::move_at`]), `(prev, cur, [Re λ, Im λ, Re β,
+    /// Im β])` on `2^(−30)`, strictly ascending by pair; a rank's table is empty when it rides its
+    /// mode at every cell. Ranks closed on different keys ride different tables beside one
+    /// another on the one mode.
+    moves: Vec<Vec<(usize, usize, [i64; 4])>>,
     /// The characters the readout reads each rank's turn through ([`RingFace::with_harmonics`]):
     /// `1` reads the turn `ρ` alone.
     harmonics: usize,
@@ -576,10 +578,11 @@ impl RingFace {
     /// Refused unless every rank has `a` over `2N` coordinates, `b` over `d + 1` and `g` over
     /// `2N + 1`.
     ///
-    /// `moves` are the founded pair moves ([`RingFace::move_at`]), strictly ascending by pair, each
-    /// over a class or the start (`prev ≤ A`) and a class (`cur < A`), and each passive,
-    /// `|λ| + |β| < 1`: a boosting move leaves the ring without a bound, so it is refused.
-    pub fn new(declaration: &TowerDeclaration, level: usize, mode: usize, ranks: Vec<RingRank>, opening: Vec<i32>, moves: Vec<(usize, usize, [i64; 4])>) -> Result<Self> {
+    /// `moves` are each rank's founded pair moves ([`RingFace::move_at`]), one table a rank (or
+    /// none, every rank riding its mode), each strictly ascending by pair, each move over a class
+    /// or the start (`prev ≤ A`) and a class (`cur < A`), and each passive, `|λ| + |β| < 1`: a
+    /// boosting move leaves the ring without a bound, so it is refused.
+    pub fn new(declaration: &TowerDeclaration, level: usize, mode: usize, ranks: Vec<RingRank>, opening: Vec<i32>, moves: Vec<Vec<(usize, usize, [i64; 4])>>) -> Result<Self> {
         let d = declaration;
         let (dims, w) = (2 * d.modes, d.width);
         if level >= d.levels || mode >= d.modes || ranks.is_empty() || opening.len() != d.alphabet * w {
@@ -588,10 +591,14 @@ impl RingFace {
         if ranks.iter().any(|r| r.a.iter().any(|a| a.len() != dims) || r.b.iter().any(|b| b.len() != w + 1) || r.g.len() != dims + 1) {
             return refuse("a ring rank needs a over the level's carried face, b over the class's face and g over the carried face and its unit");
         }
-        if moves.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || moves.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1)) {
+        let moves = if moves.is_empty() { vec![Vec::new(); ranks.len()] } else { moves };
+        if moves.len() != ranks.len() {
+            return refuse("a ring's pair moves are one table a rank");
+        }
+        if moves.iter().any(|t| t.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || t.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1))) {
             return refuse("a ring's pair moves are over a class or the start and a class, strictly ascending");
         }
-        if moves.iter().any(|&(_, _, m)| !passive(m)) {
+        if moves.iter().flatten().any(|&(_, _, m)| !passive(m)) {
             return refuse("a ring's pair move that boosts (|λ| + |β| ≥ 1) leaves the ring without a bound");
         }
         let mut shifts = Vec::with_capacity(ranks.len());
@@ -637,17 +644,23 @@ impl RingFace {
     /// record `2026-10-24_THE_TOWER_HEARS…`, "The readout founded to its precision, and the lap that
     /// undoes it"). The pair moves are held with the face: founded to their precision on a passage,
     /// a lap over that passage founds nothing in them, so their covector is not deposited.
-    pub fn move_at(&self, prev: usize, cur: usize, m: [i128; 4]) -> [i128; 4] {
-        self.pair_move(prev, cur).unwrap_or(m)
+    pub fn move_at(&self, rank: usize, prev: usize, cur: usize, m: [i128; 4]) -> [i128; 4] {
+        self.pair_move(rank, prev, cur).unwrap_or(m)
     }
 
-    /// The founded pair move at `(prev, cur)`, when the founding met the pair.
-    fn pair_move(&self, prev: usize, cur: usize) -> Option<[i128; 4]> {
-        self.moves.binary_search_by_key(&(prev, cur), |&(p, c, _)| (p, c)).ok().map(|i| self.moves[i].2.map(i128::from))
+    /// Each rank's move at the cell ([`RingFace::move_at`]).
+    pub fn moves_at(&self, prev: usize, cur: usize, m: [i128; 4]) -> Vec<[i128; 4]> {
+        (0..self.moves.len()).map(|r| self.move_at(r, prev, cur, m)).collect()
     }
 
-    /// The founded pair moves ([`RingFace::move_at`]).
-    pub fn pair_moves(&self) -> &[(usize, usize, [i64; 4])] {
+    /// Rank `rank`'s founded pair move at `(prev, cur)`, when its founding met the pair.
+    fn pair_move(&self, rank: usize, prev: usize, cur: usize) -> Option<[i128; 4]> {
+        let table = &self.moves[rank];
+        table.binary_search_by_key(&(prev, cur), |&(p, c, _)| (p, c)).ok().map(|i| table[i].2.map(i128::from))
+    }
+
+    /// Each rank's founded pair moves ([`RingFace::move_at`]).
+    pub fn pair_moves(&self) -> &[Vec<(usize, usize, [i64; 4])>] {
         &self.moves
     }
 
@@ -713,17 +726,17 @@ impl RingFace {
         Ok((phi, hat, scale))
     }
 
-    /// One cell: each rank's ring carried by the mode's move `m` and pushed from the carried face
-    /// `s` and the arriving class `u`, with the factors `ranks` and their pools `pools` read from
-    /// the material ([`Reaches`]); returns each rank's read `(Re, Im)` released by its
-    /// `read_shift` (the founding's reading).
-    fn advance(ranks: &[RingRank], pools: &[(i128, i128)], ring: &mut [(i128, i128)], s: &[i64], u: usize, m: [i128; 4]) -> Result<Vec<i64>> {
+    /// One cell: each rank's ring carried by its move `m[r]` (its pair move or the mode's) and
+    /// pushed from the carried face `s` and the arriving class `u`, with the factors `ranks` and
+    /// their pools `pools` read from the material ([`Reaches`]); returns each rank's read
+    /// `(Re, Im)` released by its `read_shift` (the founding's reading).
+    fn advance(ranks: &[RingRank], pools: &[(i128, i128)], ring: &mut [(i128, i128)], s: &[i64], u: usize, m: &[[i128; 4]]) -> Result<Vec<i64>> {
         let k = ranks.len();
         let mut read = Vec::with_capacity(2 * k);
         for (r, (h, rank)) in ring.iter_mut().zip(ranks).enumerate() {
             let (alpha, gamma) = rank.state_factors(s);
             let v = rank.push(alpha, pools[u * k + r], gamma)?;
-            let carried = ring_carry(m, *h);
+            let carried = ring_carry(m[r], *h);
             *h = (carried.0 + v.0, carried.1 + v.1);
             read.push(fit64(release(h.0, rank.read_shift))?);
             read.push(fit64(release(h.1, rank.read_shift))?);
@@ -732,11 +745,11 @@ impl RingFace {
     }
 
     /// [agent-inferred, October 25] **The ring's reverse** over a section: the covector its face
-    /// returns reaches the carried face `ŝ_t` it was pushed from, the placement mode's move
-    /// `(λ_t, β_t)` it rode, and the factors `a`, `b` and `g` that pushed it (`ranks`, read from the
-    /// material, with their pools); the encoding `E₀` the pools read is held. `ring[t]` is each
-    /// rank's ring after cell `t` and `opening` before the first; `faces[t]` is `ŝ_t`; `moves[t]`
-    /// the mode's move; `g_rho[t]` the covector of each rank's read `q_t` (`Vᵀ dz` carried back
+    /// returns reaches the carried face `ŝ_t` it was pushed from, the move `(λ_t, β_t)` each rank
+    /// rode, and the factors `a`, `b` and `g` that pushed it (`ranks`, read from the material, with
+    /// their pools); the encoding `E₀` the pools read is held. `ring[t]` is each rank's ring after
+    /// cell `t` and `opening` before the first; `faces[t]` is `ŝ_t`; `moves[t]` each rank's move
+    /// (its pair move or the mode's); `g_rho[t]` the covector of each rank's read `q_t` (`Vᵀ dz` carried back
     /// through the ratio by [`ratio_adjoint`], on the face's convention: `2^40` per unit of the
     /// read's grain). Per rank, with `σ = read_shift` and `P = push_shift`,
     ///
@@ -751,8 +764,9 @@ impl RingFace {
     /// the moves on the modes' own convention for their moves' covectors (`h_(t−1)` on `2^(−24)`
     /// against a covector per unit of the face's `2^(−16)`), and each factor's sum taken whole and
     /// then carried to the material's convention, `2^40` per unit of its grain `2^(−24)`, by
-    /// `2^(24 − release)`. Returns `∂ŝ_t` and `∂(λ_t, β_t)` per cell and the factors' covector in
-    /// the material's order (rank by rank `a₀, a₁, b₀, b₁, g`).
+    /// `2^(24 − release)`. Returns `∂ŝ_t` per cell, each rank's `∂(λ_t, β_t)` per cell (cell `t`'s
+    /// rank `r` at `t·R + r`) and the factors' covector in the material's order (rank by rank
+    /// `a₀, a₁, b₀, b₁, g`).
     #[allow(clippy::type_complexity, clippy::too_many_arguments)]
     fn reverse(
         &self,
@@ -762,7 +776,7 @@ impl RingFace {
         ring: &[&[(i128, i128)]],
         faces: &[Vec<i64>],
         classes: &[usize],
-        moves: &[[i128; 4]],
+        moves: &[Vec<[i128; 4]>],
         g_rho: &[Vec<i64>],
     ) -> Result<(Vec<Vec<i64>>, Vec<[i128; 4]>, Vec<i128>)> {
         let (k, n) = (ranks.len(), faces.len());
@@ -775,7 +789,7 @@ impl RingFace {
             Ok(())
         };
         let mut d_face = vec![vec![0i128; dims]; n];
-        let mut d_moves = vec![[0i128; 4]; n];
+        let mut d_moves = vec![[0i128; 4]; n * k];
         let mut d_factors = Vec::with_capacity(k * (3 * dims + 2 * (width + 1) + 1));
         for (r, rank) in ranks.iter().enumerate() {
             let sigma = rank.read_shift;
@@ -784,12 +798,12 @@ impl RingFace {
             let (mut da, mut db, mut dg) = ([vec![0i128; dims], vec![0i128; dims]], [vec![0i128; width + 1], vec![0i128; width + 1]], vec![0i128; dims + 1]);
             let mut g = (0i128, 0i128);
             for t in (0..n).rev() {
-                let back = if t + 1 < n { ring_carry_adjoint(moves[t + 1], g) } else { (0, 0) };
+                let back = if t + 1 < n { ring_carry_adjoint(moves[t + 1][r], g) } else { (0, 0) };
                 g = (g_rho[t][2 * r] as i128 + back.0, g_rho[t][2 * r + 1] as i128 + back.1);
                 let (gx, gy) = g;
                 let (x, y) = if t == 0 { opening[r] } else { ring[t - 1][r] };
                 let terms = [(x, gx, y, gy, 1), (x, gy, y, gx, -1), (x, gx, y, gy, -1), (x, gy, y, gx, 1)];
-                for (slot, (p, q, u, v, sign)) in d_moves[t].iter_mut().zip(terms) {
+                for (slot, (p, q, u, v, sign)) in d_moves[t * k + r].iter_mut().zip(terms) {
                     *slot = slot.checked_add(to_moves(p, q)?.checked_add(sign * to_moves(u, v)?).ok_or_else(wide)?).ok_or_else(wide)?;
                 }
                 // conj(G) β and conj(G) α, then their products with γ and α, released by the push and σ.
@@ -846,16 +860,18 @@ impl RingFace {
         Ok((face, scales))
     }
 
-    /// The face as text: its placement and each rank's shifts, then `E₀`, then its pair moves when
-    /// it has them (`ring-moves N prev,cur,Re λ,Im λ,Re β,Im β …`). Its factors are the material's,
-    /// written with it.
+    /// The face as text: its placement and each rank's shifts, then `E₀`, then, when any rank has
+    /// pair moves, one line a rank (`ring-moves N prev,cur,Re λ,Im λ,Re β,Im β …`, `N = 0` for a
+    /// rank riding its mode). Its factors are the material's, written with it.
     fn to_text(&self) -> String {
         let join = |xs: &mut dyn Iterator<Item = String>| xs.collect::<Vec<_>>().join(" ");
         let shifts = join(&mut self.shifts.iter().map(|([ra, rb, rg], push, read)| format!("{ra},{rb},{rg},{push},{read}")));
         let mut s = format!("ring-face {} {} {} {shifts}\n{}\n", self.level, self.mode, self.shifts.len(), join(&mut self.opening.iter().map(|v| v.to_string())));
-        if !self.moves.is_empty() {
-            let moves = join(&mut self.moves.iter().map(|(p, c, m)| format!("{p},{c},{},{},{},{}", m[0], m[1], m[2], m[3])));
-            s.push_str(&format!("ring-moves {} {moves}\n", self.moves.len()));
+        if self.moves.iter().any(|t| !t.is_empty()) {
+            for table in &self.moves {
+                let moves = join(&mut std::iter::once(format!("ring-moves {}", table.len())).chain(table.iter().map(|(p, c, m)| format!("{p},{c},{},{},{},{}", m[0], m[1], m[2], m[3]))));
+                s.push_str(&format!("{moves}\n"));
+            }
         }
         if self.harmonics > 1 {
             s.push_str(&format!("ring-harmonics {}\n", self.harmonics));
@@ -863,7 +879,7 @@ impl RingFace {
         s
     }
 
-    fn from_text(head: &str, opening: &str, moves: Option<&str>, harmonics: Option<&str>, declaration: &TowerDeclaration) -> Result<Self> {
+    fn from_text(head: &str, opening: &str, moves: &[&str], harmonics: Option<&str>, declaration: &TowerDeclaration) -> Result<Self> {
         let bad = TowerError::Refused("not a ring face's text");
         let words: Vec<&str> = head.split(' ').collect();
         if words.len() < 4 || words[0] != "ring-face" {
@@ -887,25 +903,25 @@ impl RingFace {
             }
             shifts.push(([s[0], s[1], s[2]], s[3], s[4]));
         }
-        let moves: Vec<(usize, usize, [i64; 4])> = match moves {
-            None => Vec::new(),
-            Some(line) => {
-                let words: Vec<&str> = line.split(' ').collect();
-                if words.len() < 2 || words[0] != "ring-moves" || words[1].parse::<usize>().ok() != Some(words.len() - 2) {
+        if !moves.is_empty() && moves.len() != k {
+            return Err(bad);
+        }
+        let mut tables: Vec<Vec<(usize, usize, [i64; 4])>> = vec![Vec::new(); k];
+        for (line, table) in moves.iter().zip(tables.iter_mut()) {
+            let words: Vec<&str> = line.split(' ').collect();
+            if words.len() < 2 || words[0] != "ring-moves" || words[1].parse::<usize>().ok() != Some(words.len() - 2) {
+                return Err(bad);
+            }
+            for word in &words[2..] {
+                let v: Vec<i64> = word.split(',').map(|x| x.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
+                if v.len() != 6 || v[0] < 0 || v[1] < 0 {
                     return Err(bad);
                 }
-                let mut moves = Vec::with_capacity(words.len() - 2);
-                for word in &words[2..] {
-                    let v: Vec<i64> = word.split(',').map(|x| x.parse().map_err(|_| bad.clone())).collect::<Result<_>>()?;
-                    if v.len() != 6 || v[0] < 0 || v[1] < 0 {
-                        return Err(bad);
-                    }
-                    moves.push((v[0] as usize, v[1] as usize, [v[2], v[3], v[4], v[5]]));
-                }
-                moves
+                table.push((v[0] as usize, v[1] as usize, [v[2], v[3], v[4], v[5]]));
             }
-        };
-        if moves.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || moves.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1)) || moves.iter().any(|&(_, _, m)| !passive(m)) {
+        }
+        let moves = tables;
+        if moves.iter().any(|t| t.iter().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || t.windows(2).any(|w| (w[0].0, w[0].1) >= (w[1].0, w[1].1)) || t.iter().any(|&(_, _, m)| !passive(m))) {
             return Err(bad);
         }
         let harmonics = match harmonics.map(|line| line.strip_prefix("ring-harmonics ").and_then(|h| h.parse::<usize>().ok())) {
@@ -2026,7 +2042,7 @@ impl Tower {
                     Some(g) => ((g.lam.0 as i128, g.lam.1 as i128), (g.beta.0 as i128, g.beta.1 as i128)),
                     None => ((t[lv.move_re + m] as i128, t[lv.move_im + m] as i128), (0, 0)),
                 };
-                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &mut state.ring, s, u, face.move_at(seam, u, [lam.0, lam.1, beta.0, beta.1]))?;
+                let read = RingFace::advance(&reaches.ring_ranks, &reaches.ring_pools, &mut state.ring, s, u, &face.moves_at(seam, u, [lam.0, lam.1, beta.0, beta.1]))?;
                 let (rho, scales) = face.face(&read)?;
                 ring_face = Some(rho);
                 ring_scale = Some(scales);
@@ -2288,7 +2304,7 @@ impl Tower {
                         None => [t[lv.move_re + m] as i128, t[lv.move_im + m] as i128, 0, 0],
                     })
                     .collect();
-                let moves: Vec<[i128; 4]> = (0..cells_n).map(|i| face.move_at(seams[i], classes[i], mode_moves[i])).collect();
+                let moves: Vec<Vec<[i128; 4]>> = (0..cells_n).map(|i| face.moves_at(seams[i], classes[i], mode_moves[i])).collect();
                 let after: Vec<&[(i128, i128)]> = cells.iter().filter_map(|cell| cell.ring_after.as_deref()).collect();
                 if after.len() != cells_n || opening.ring.len() != face.ranks() {
                     return refuse("a ring carried at every cell of a ring-faced tower");
@@ -2304,9 +2320,20 @@ impl Tower {
                         *slot = (fit64(slot.0 as i128 + d_face[i][2 * j] as i128)?, fit64(slot.1 as i128 + d_face[i][2 * j + 1] as i128)?);
                     }
                 }
-                // Where the ring rode a founded pair move, the mode carried no ring: its covector of
-                // that move stays with the held pair move.
-                ring_moves = d_moves.into_iter().enumerate().map(|(i, dm)| if face.pair_move(seams[i], classes[i]).is_some() { [0; 4] } else { dm }).collect();
+                // Where a rank rode a founded pair move, the mode carried no ring of it: its covector
+                // of that move stays with the held pair move. The mode's move takes the rest.
+                let k = face.ranks();
+                ring_moves = (0..cells_n)
+                    .map(|i| {
+                        let mut dm = [0i128; 4];
+                        for r in (0..k).filter(|&r| face.pair_move(r, seams[i], classes[i]).is_none()) {
+                            for (slot, v) in dm.iter_mut().zip(d_moves[i * k + r]) {
+                                *slot += v;
+                            }
+                        }
+                        dm
+                    })
+                    .collect();
                 ring_mode = m;
             }
             let level = |i: usize| &cells[i].levels[l];
@@ -2748,8 +2775,8 @@ impl Tower {
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
-    /// three more with a pair face and two more with a ring face (one more with its pair moves and
-    /// one more with its harmonics).
+    /// three more with a pair face and two more with a ring face (one more a rank with its pair
+    /// moves and one more with its harmonics).
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -2757,7 +2784,7 @@ impl Tower {
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-face ")) {
             n += 2;
-            if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-moves ")) {
+            while text.lines().nth(n).is_some_and(|l| l.starts_with("ring-moves ")) {
                 n += 1;
             }
             if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-harmonics ")) {
@@ -2813,9 +2840,12 @@ impl Tower {
         let ring = match lines.next_if(|l| l.starts_with("ring-face ")) {
             Some(head) => {
                 let opening = lines.next().unwrap_or("");
-                let moves = lines.next_if(|l| l.starts_with("ring-moves "));
+                let mut moves = Vec::new();
+                while let Some(line) = lines.next_if(|l| l.starts_with("ring-moves ")) {
+                    moves.push(line);
+                }
                 let harmonics = lines.next_if(|l| l.starts_with("ring-harmonics "));
-                Some(RingFace::from_text(head, opening, moves, harmonics, &declaration)?)
+                Some(RingFace::from_text(head, opening, &moves, harmonics, &declaration)?)
             }
             None => None,
         };
@@ -4203,11 +4233,16 @@ mod tests {
     /// steeply, and the keys first read (from `5000`) passed within `1/173` of the loudest and bent
     /// the code over the covector test's steps.
     fn tiny_ring_rank(tower: &Tower) -> RingRank {
+        tiny_ring_rank_at(tower, 7000)
+    }
+
+    /// A rank whose factors are read from the keys at `at`.
+    fn tiny_ring_rank_at(tower: &Tower, at: usize) -> RingRank {
         let d = &tower.declaration;
         let (dims, hat) = (2 * d.modes, d.width + 1);
         let k = keys(16384);
-        let w = |at: usize, n: usize| -> Vec<i64> { (0..n).map(|j| k[at + j] as i64 - 128).collect() };
-        RingRank { a: [w(7000, dims), w(7100, dims)], b: [w(7200, hat), w(7300, hat)], g: w(7400, dims + 1), release: [8, 8, 8], push_shift: 24, read_shift: 0 }
+        let w = |from: usize, n: usize| -> Vec<i64> { (0..n).map(|j| k[at + from + j] as i64 - 128).collect() };
+        RingRank { a: [w(0, dims), w(100, dims)], b: [w(200, hat), w(300, hat)], g: w(400, dims + 1), release: [8, 8, 8], push_shift: 24, read_shift: 0 }
     }
 
     fn tiny_ring_face(tower: &Tower) -> RingFace {
@@ -4224,8 +4259,13 @@ mod tests {
     /// The tiny tower with its ring face joined, read through `harmonics` characters of its turn,
     /// and its readout opened away from zero.
     fn tiny_harmonic_faced(tower: Tower, harmonics: usize) -> Tower {
-        let mut tower = tower;
         let face = tiny_ring_face(&tower).with_harmonics(harmonics).expect("harmonics");
+        tiny_faced_with(tower, face)
+    }
+
+    /// The tiny tower with `face` joined and its readout opened away from zero.
+    fn tiny_faced_with(tower: Tower, face: RingFace) -> Tower {
+        let mut tower = tower;
         tower.join_ring_face(face).expect("joined");
         let k = keys(16384);
         let rr = tower.layout.ring_readout;
@@ -4400,7 +4440,7 @@ mod tests {
             (3, 0, [0, -966_367_642, 32_212_255, 0]),
             (d.alphabet, 0, [536_870_912, 0, 0, 0]),
         ];
-        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, moves).expect("a ring face")
+        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower)], opening, vec![moves]).expect("a ring face")
     }
 
     /// A ring face with founded pair moves rides them where the passage meets their pair and its
@@ -4429,7 +4469,59 @@ mod tests {
         let d = &tower.declaration;
         let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
         let boost = vec![(0, 2, [966_367_642, 0, 161_061_274, 0])];
-        assert!(RingFace::new(d, 0, 1, vec![tiny_ring_rank(&tower)], opening, boost).is_err());
+        assert!(RingFace::new(d, 0, 1, vec![tiny_ring_rank(&tower)], opening, vec![boost]).is_err());
+    }
+
+    /// The tiny tower's face of two ranks: the first rides the pair moves of
+    /// [`tiny_pair_moved_face`], the second its mode at every cell.
+    fn tiny_two_ring_face(tower: &Tower) -> RingFace {
+        let d = &tower.declaration;
+        let opening = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let moves = tiny_pair_moved_face(tower).pair_moves()[0].clone();
+        RingFace::new(d, 0, 1, vec![tiny_ring_rank(tower), tiny_ring_rank_at(tower, 7500)], opening, vec![moves, Vec::new()]).expect("a ring face")
+    }
+
+    /// Two rings closed on different keys ride side by side on one mode: each rank rides its own
+    /// table (the first its pair moves, the second its mode), reads as it would alone, and the face
+    /// restores both tables from its text; a face of two ranks with one table is refused.
+    #[test]
+    fn two_rings_ride_their_own_moves_side_by_side() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let reads = |face: RingFace| -> (Tower, Vec<Vec<i64>>) {
+            let mut joined = tower.clone();
+            joined.join_ring_face(face).expect("joined");
+            let mut read = Vec::new();
+            joined
+                .read_ring(&mut joined.rest(), &PASSAGE, |_, _, _, ring| {
+                    read.push(ring.expect("read").0.to_vec());
+                    Ok(())
+                })
+                .expect("read");
+            (joined, read)
+        };
+        let (two, both) = reads(tiny_two_ring_face(&tower));
+        let (_, moved) = reads(tiny_pair_moved_face(&tower));
+        let d = &tower.declaration;
+        let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| tower.encoding(u).to_vec()).collect();
+        let second = RingFace::new(d, 0, 1, vec![tiny_ring_rank_at(&tower, 7500)], opening.clone(), Vec::new()).expect("a ring face");
+        let (_, plain) = reads(second);
+        for ((b, m), p) in both.iter().zip(&moved).zip(&plain) {
+            assert_eq!(&b[..2], &m[..], "the first rank rides its pair moves as it would alone");
+            assert_eq!(&b[2..], &p[..], "the second rank rides its mode as it would alone");
+        }
+        assert_eq!(Tower::from_text(&two.to_text()).expect("restored"), two);
+        let one_table = vec![tiny_pair_moved_face(&tower).pair_moves()[0].clone()];
+        assert!(RingFace::new(d, 0, 1, vec![tiny_ring_rank(&tower), tiny_ring_rank_at(&tower, 7500)], opening, one_table).is_err());
+    }
+
+    /// Where one rank rides a held pair move and another its mode, the mode's move takes only the
+    /// second's covector, and every family's covector still carries its path.
+    #[test]
+    fn the_two_ring_faces_covector_matches_the_code_difference() {
+        let tower = tiny_declared(2, true, true, true, ContactLaw::Pair);
+        let face = tiny_two_ring_face(&tower);
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tiny_faced_with(tower, face), true, &classes, 9);
     }
 
     /// Where the ring rides a held pair move, the mode carries no ring, and every family's covector

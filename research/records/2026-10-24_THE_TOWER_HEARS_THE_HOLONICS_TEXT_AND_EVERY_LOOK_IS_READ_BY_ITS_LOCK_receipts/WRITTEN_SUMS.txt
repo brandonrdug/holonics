@@ -1,0 +1,22 @@
+ring/write_founded30: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=b3898992a98147128184446ce0c187a8b7dbdb65b58f1b4c2c561a4edad6edb1 elapsed_ms=18688
+ring/write_founded30: MEASURE exit=0 wall_s=18.7 peak_rss_kib=44068
+ring/write_founded26m: LINES_READ lines=1253 written=1253 agree=64 lines_sha256=76b39fa91ebc4446beb1ab86ca1c2c4226419cac29f0626f7c7eb74dae707dae elapsed_ms=15639
+ring/write_founded26m: MEASURE exit=0 wall_s=15.7 peak_rss_kib=35588
+ring/write_founded30/LINES.tsv
+  1+1: 2 lines; whole right 1, length right 2, last two digits right 1
+  1+2: 50 lines; whole right 40, length right 50, last two digits right 40
+  2+1: 44 lines; whole right 37, length right 42, last two digits right 37
+  2+2: 399 lines; whole right 367, length right 399, last two digits right 367
+  + all: 495 lines; whole right 445, length right 493, last two digits right 445
+  - all: 268 lines; whole right 17, length right 228, last two digits right 17
+  * all: 490 lines; whole right 6, length right 436, last two digits right 26
+ring/write_founded26m/LINES.tsv
+  1+1: 2 lines; whole right 1, length right 2, last two digits right 1
+  1+2: 50 lines; whole right 25, length right 49, last two digits right 25
+  2+1: 44 lines; whole right 17, length right 41, last two digits right 17
+  2+2: 399 lines; whole right 261, length right 383, last two digits right 261
+  + all: 495 lines; whole right 304, length right 475, last two digits right 304
+  - all: 268 lines; whole right 15, length right 225, last two digits right 15
+  * all: 490 lines; whole right 7, length right 437, last two digits right 31
+founded30 sums whose line the training text (the arithmetic block and the four media) holds: 226 of 247 written right; never met: 219 of 248
+founded26m sums whose line the training text (the arithmetic block and the four media) holds: 151 of 247 written right; never met: 153 of 248

@@ -5,7 +5,11 @@ and the mathematics thread's [one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_
 and its record on cycles (PR #426). Status: [measurement; agent-inferred, October 24], on the host.
 October 25: the units step's fixed acceptance is met, the tower's own guess right at 475 of 495
 held-out sums' units at 0.623 bits a digit against the foil's 40 and 3.397, with the carriage key
-located by loop closure ([the last section](#the-machine-locates-the-carriage-key-by-loop-closure)).
+located by loop closure ([the section](#the-machine-locates-the-carriage-key-by-loop-closure)).
+October 25, later: the tens step's fixed acceptance is met, the tower's own guess right at 463 of
+495 held-out sums' tens and 473 of their units, the held-out text 2.334 bits a byte against the
+foil's 2.458 ([the tens](#the-tens-under-the-closures-whole-torsion)). The tower then writes 445 of the 495 held-out
+sums itself, whole and right, 219 of the 248 it never met ([the writing](#the-tower-writes-the-sums-itself)).
 
 ## The failure this step works on
 
@@ -3193,9 +3197,10 @@ past one bit (the widest by `2^50` bits), so each row takes the step that moves 
 by one bit, where the log-sum's self-concordance keeps the curvature within a factor of four, and
 the line scales them together.
 
-The founding ran two rounds: the first at 5.2 bits saved 76,409 nats, the second at 3.2 bits saved
-30,214, below the 54,275 that the 108,550 free parameters ask, and it stopped. It took 3,867 s
-against a projection of 7,374 s (deadline 7,400 s), at a peak of 10.0 GB.
+The founding ran two rounds. The line took the first at 5.2 times its trusted step
+(`κ = 341,079/2^16`), which saved 76,409 nats, and the second at 3.2 times it (`209,888/2^16`), which
+saved 30,214, below the 54,275 that the 108,550 free parameters ask, so it stopped. It took 3,867 s
+against a projection of 7,374 s (deadline 7,400 s), at a peak of 9.6 GiB.
 
 | the readout founded on | whole right at `U` (of 495) | ring's part alone | rest alone | ring's margin, median | bits a digit at `U` | held-out text, bits a byte | prose | Lean | Rust | arithmetic |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -3233,6 +3238,217 @@ ring, joins both and founds the readout on the four media. Its acceptance: the t
 at the held-out sums' tens right in at least 370 of 495, the units staying at or above 370, and
 the held-out text no worse than the foil's 2.458 bits a byte.
 
+## The tens, under the closure's whole torsion
+
+The last loop decided the tens: the closure the machine solved at the sums' units has torsion
+`110 = 2·5·11`, and its key kept the first modulus that tells the arriving units apart, 10. The
+acceptance was fixed before the run: the tower's own guess at the held-out sums' tens right in at
+least 370 of 495, the units staying at or above 370, and the held-out text no worse than the foil's
+2.458 bits a byte.
+
+**The tens' own landmark closes on nothing.** A landmark at the cell before each sum's tens digit
+(`tools/landmarks.py`, kind `sum-tens`: 8,966 marks on the arithmetic block, 495 held-out cells)
+gives every origin's loops a closure without torsion (the newline origin's minor is 1): no key
+there separates the tens. This is expected: the tens are not read from the digits that arrive
+before them alone, since the units' carry enters, and a modulus exists only where the closure has
+torsion.
+
+**The key keeps the whole torsion** [agent-inferred, October 25]. The key once took the smallest
+modulus that separates every arriving class. At the sums' units that kept 10 and dropped the eleven,
+which reads the alternating digit sum: the units key gives the sum modulo 10, the eleven key modulo
+11, together modulo 110, and the result's length, which the tower already places, fixes the rest
+for operands of at most two places (the mathematics thread's
+[newline closure record](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md),
+§§2–3). The key now joins the torsion primes' keys over their subsets in descending product and
+takes the first that separates the arriving classes: the whole torsion where it does. Founded again
+at the units landmark, the newline origin closes with torsion `2:1, 5:1, 11:1` and the key modulus
+110 (146.5 s). Its kept start (the origin's) has exact share 0.865 at the units cells, read on the
+turn's first character as the founding reads it, against 1.834 under the key modulo 10: one
+character of the 110 turn carries less of the units than one of the 10 turn.
+
+**The whole turn, read at every character.** Joined at `⌊110/2⌋ = 55` harmonics with its readout
+at zero, the tower codes as the tower alone: its own guess at the held-out tens is right in 311 of
+495, at the units in 48. Read outside (`RING_TENS_CENTROIDS.txt`), the turn at the tens cells holds
+the tens classes in order around it on its first character, from 35.9 degrees for a tens of 0 to
+342.5 for 8, with the 9s at 28.2 beside the 0s (the sums in the nineties lie beside those from 100
+to 109, the only sums here whose tens are 0), each class's resultant 0.76 to 0.99. At
+the units cells, after the tens are written, it holds the units classes 1.9 degrees apart (76.0 to
+93.5 degrees), each resultant 0.996 to 0.998: their spread is wider than their parting. By the
+nearest class centroid with each cell left out, the tens are named in 146 of 495 on the first
+character, 172, 252 and 323 on the first two, three and four, 320 to 324 on four to eleven, 340 at
+best on 22 and 318 on all 55; the units in 130 to 142 on every count.
+
+The readout founded on the arithmetic block at all 55 harmonics has 7,150 channels and 100,100
+free parameters over 15 arriving classes. Its one round saved 15,424 nats, below the 50,050 its
+free parameters ask, and the founding stopped (1,873 s against a projection of 3,400 s; deadline
+3,600 s). The tower's own guess at the held-out tens is right in **428 of 495** at 0.597 bits a
+digit (the turn's part alone 266, the rest 311); at the units it falls to **156** (the units ring
+founded alone on the same block reads 475). The whole held-out text was not read: at 55 harmonics
+the read ran past its 60 s deadline, a deadline set from the five-harmonic reads without a
+projection of its own, and the figure is reported incomplete.
+
+**Where the passage's code lies on the characters.** Before its trust and line, the round's Newton
+model predicted each harmonic's saving (`½ gᵀH⁻¹g` on the harmonic's own block, summed over the
+rows): 222,948 nats in all, 14 times what the round saved. The first five characters hold 44,930
+of it, the first eleven 92,222, and the multiples of eleven stand above their neighbours (9,069 at
+the 11th against 7,433 and 6,771 beside it; 5,757 at the 22nd; 3,273 at the 33rd; 2,225 at the
+44th). On an exact 110 turn the eleventh character, `e^(2πi·11x/110) = e^(2πi x/10)`, reads `x`
+modulo 10 alone, the units ring's first character; the predicted savings lean there, but the
+founded turn read outside does not part the units on any count of characters [agent-inferred].
+
+**What the founded turn resolves** [agent-inferred]. The turn the tower carries is founded, not
+exact. At the tens its first four characters carry what the centroid read names (323 of 495), and
+the next seven add nothing (320 to 324); the founding spread its free parameters over all 55 alike
+and paid for them with curvature the passage could not fill. So the 110 ring is read at five
+characters, declared by the run (`join-tower-ring … harmonics=5`) with this reading beside it; the
+key's own count, `⌊n/2⌋`, stays the join's default.
+
+**Two rings side by side.** At five characters the 110 turn does not carry the units, and the
+units ring's readout, founded on the four media, does. So the two rings ride the one placement mode
+side by side: the units ring under its key modulo 10 and the 110 ring under the whole torsion, each
+at five characters. A ring's pair moves are now one table a rank (`RingFace::new` takes a table for
+each rank; `RingFace::moves_at` gives each rank's move at a pair, and the reverse sums a rank's
+covector into the pair's mode move only where that rank rides the mode). Two regressions hold: the
+units ring joined alone writes the learner byte for byte as before (sha256 `e9c2de64…`), and the
+units ring's four-media learner reads the held-out units line for line as before. Joined, the two
+rings carry 532,614 words of material against 365,699 with the units ring alone.
+
+The units ring's readout is already founded on the four media to its precision. Founding both
+rings' channels on that passage would widen each harmonic's block to both ranks' channels: four
+times the curvature and eight times the solves of the last founding, whose two rounds took 3,867 s.
+So the join carries the founded readout (`readout=LEARNER,SHA`, refused unless that learner's ring
+is this one's leading rank on the same tower, with its moves and harmonics) and the founding holds
+it (`found-ring-readout … held=1`): a coordinate step on the new rank's channels from the face the
+held rank already moves, the curvature between the ranks dropped as between two harmonics. The
+carriage is exact: the joined learner reads the held-out units as the units ring's learner did, 469
+of 495 at the same code to the unit.
+
+**At five characters, on the arithmetic block.** With the units ring held at zero, the 110 ring's
+readout founded on the block (650 channels, 9,100 free, two rounds saving 10,202 and 2,176 nats
+against 4,550; 398 s against a projection of 767 s) reads the held-out tens in **442 of 495** at
+0.374 bits a digit, against 428 at 0.597 with all 55 characters (the turn's part alone 260, the
+rest 311). The units fall to 124 (the units ring's readout is at zero here), and the held-out text
+codes 2.439 bits a byte against the tower alone's 2.448. The first five characters' predicted
+savings in round 0 equal ring27's to the nat: holding a rank at zero leaves the new rank's blocks
+as they were.
+
+**The four media, first launch: stopped on evidence.** The two rings joined with the units ring's
+four-media readout carried (sha256 `62c52122…`) and the 110 ring's readout founded on the four-media
+passage, the units ring's held. The projection took the largest measured units, scaled by the
+block's two-rank ratios: the read 419 s, a round 1,749 s, at most three rounds under the precision
+rule, the moments 258 s; 5,924 s, deadline 6,000 s, and a stop if no round-0 line stood by 2,200 s.
+The read took 396.9 s. Round 0's curvature took 1,086.6 s against ring26's 853.1 s for the same
+channels and classes (1.27 times, where the block's held round had run 1.05 times ring23's) and
+its solves 629.4 s, so the round passed its share before its line and the run stopped at 2,200 s.
+It is reported incomplete. The projection's error is the block-to-passage ratio, which held for the
+read and not for the curvature. Its Newton model's predictions on the four media are no reading
+[agent-inferred]: thin rows' released curvature is not positive there, and the model returns
+values of either sign past `10^12` nats; the one-bit trust bounds those rows' steps.
+
+**The repair: the sums as wide as their terms** [agent-inferred, October 25]. A curvature term is
+below `2^52` (`|φ| < 2^21`, the curvature on its grain at most `2^10`) and a covector term below
+`2^45`, yet every sum was carried 128 bits wide from its first term. The sums are now carried 64 bits
+wide and cross into 128 every `2^11` live cells: the precision law's dynamic width, a carrier as wide
+as its terms need, widened at a declared crossing. Integer addition is exact in any grouping, so the
+founded readout is the same integers.
+
+Founded again on the arithmetic block with the units ring held, the 64-bit sums write the same
+learner to the bit (sha256 `c8a7c103…`, both rounds' codes and steps alike). Its rounds take 79.9
+and 82.5 s against 121.2 and 120.7: the curvature 17.9 and 19.5 s against 65.3 and 63.1 (0.27 and
+0.31 of it), while the solves, now the larger part, take 55.3 and 56.6 s (49.7 and 51.7 before).
+
+**The four-media founding, larger than its question** [agent-inferred, October 25]. Under the 64-bit
+sums the four-media founding projected at 4,369 s: the read 398 s, at most three rounds of 1,230 s
+(the curvature 336 s, the solves 700 s, the line 193 s), the moments 280 s, over 168 arriving
+classes and 24.9 million live pairs against the block's 15 and 2.0 million. Nothing the acceptance
+asks needs that founding. The tens are coded only on the arithmetic; the units ring's
+readout is already founded on the four media and carried; and the whole held-out text is read
+whichever passage founds the new rank. So the 110 ring's readout is founded on the arithmetic
+block with the units ring's four-media readout carried and held (`ring/joined28m.state`,
+`held=1`), and the four-media founding was not launched.
+
+**The acceptance is met.** Founded on the block (650 channels, 9,100 free; two rounds saving 7,689
+and 1,545 nats against 4,550; 408.0 s against a projection of 649 s, run beside the code checks),
+the tower's own guess at the held-out sums' tens is right in **463 of 495** at 0.304 bits a digit,
+at their units in **473 of 495** at 0.781 (469 before the tens were founded), and the held-out text
+codes **2.334 bits a byte** against the foil's 2.458. Its first launch ran both rounds and failed to
+write its state on a full disk (old debug builds had filled the session's disk); launched again
+under the same deadline once they were cleared, its rounds' codes and savings are the first
+launch's to the unit.
+
+| the readouts | tens right (of 495) | bits a digit at `T` | units right (of 495) | bits a digit at `U` | held-out text, bits a byte | prose | Lean | Rust | arithmetic |
+|---|---|---|---|---|---|---|---|---|---|
+| the units ring alone, founded on the four media | - | - | 469 | 0.959 | 2.335 | 2.969 | 2.242 | 1.968 | 2.162 |
+| both rings, the 110 ring's founded on the block, the units ring's at zero | 442 | 0.374 | 124 | 2.844 | 2.439 | 3.082 | 2.375 | 2.077 | 2.223 |
+| **both rings, the 110 ring's founded on the block, the units ring's four-media readout held** | **463** | 0.304 | **473** | 0.781 | **2.334** | 2.986 | 2.254 | 1.981 | 2.114 |
+| the foil: the same lap without the ring | - | - | 40 | 3.397 | 2.458 | 3.111 | 2.400 | 2.108 | 2.211 |
+
+By the operands' lengths (`RING_SPLIT.txt`), the tens: two digits and two, 375 of 399; one and
+two, 45 of 50; two and one, 41 of 44; one and one, 2 of 2. The units: 389 of 399, 44 of 50, 39 of
+44, 1 of 2.
+
+**What it says** [agent-inferred]:
+- The tens are named by the whole face, not by the rings' part alone. Both rings' readouts
+  together name 74 of the tens (260 with the units ring's readout at zero), their median margin
+  falls from 0.13 to −1.53 bits, and the rest alone names 311; the whole names 463. At the tens
+  cells the units ring's readout, founded where the units are coded, pulls the rings' part toward
+  its own classes, and the 110 ring's rows, founded against that carried face, move the whole.
+- The units gain from the 110 turn read beside the key-10 turn: the rings' part alone names 360
+  of the units against 305, and the whole 473 against 469.
+- Founded on the arithmetic alone, the new rank pays the arithmetic (2.162 to 2.114 bits a byte)
+  and costs each other medium a little (prose 2.969 to 2.986, Lean 2.242 to 2.254, Rust 1.968 to
+  1.981); the whole held-out text is the same to the thousandth. The new rows never met the turn at
+  prose, Lean or Rust cells.
+
+**Decided next** [agent-inferred]: the tower writes the sums itself. Every reading so far names a
+digit with the true characters before it; a written sum feeds the tower its own characters, so a
+wrong length or tens is carried into the units. The next loop releases each held-out sum from its
+line's prompt, character by character from the tower's own guess, and shows the written sums whole.
+Its acceptance: the whole written sum right in at least 370 of 495, with the held-out text at or
+under the foil's 2.458 bits a byte.
+
+## The tower writes the sums itself
+
+The loop's acceptance was fixed before the run: written by the tower itself from each held-out
+sum's prompt, the whole sum right in at least 370 of 495, with the held-out text at or under the
+foil's 2.458 bits a byte.
+
+Each held-out arithmetic line opens on the state the true earlier lines left; at its `=` a fork
+releases the rest class by class, each class fed back as the next one read, at 64 agreeing draws
+(the face `m^64 / Σ m^64`, near the top class), until it releases a line end or the true length and
+five more (`read-lines-stream`; 18.7 s for the 1,253 lines, against a projection of about 15 s and a
+deadline of 60 s). The learner is the one that met the tens acceptance (both rings, sha256
+`b3ff0e58…`), so the held-out text is its 2.334 bits a byte.
+
+**The acceptance is met.** The tower writes **445 of the 495** held-out sums whole and right, their
+length right in 493 (`WRITTEN_SUMS.txt`; every written line in `LINES_founded30_arithmetic.tsv`).
+The tower before the tens ring joined, on the same keys, writes 304 (`LINES_founded26m_arithmetic.tsv`).
+
+| the learner | sums written whole and right (of 495) | never met in training (of 248) | met in training (of 247) | length right | two digits and two (of 399) | one and two (of 50) | two and one (of 44) |
+|---|---|---|---|---|---|---|---|
+| both rings, the tens readout founded on the block | **445** | **219** | 226 | 493 | 367 | 40 | 37 |
+| the units ring alone | 304 | 153 | 151 | 475 | 261 | 25 | 17 |
+
+**Seen material, read apart.** The held-out file is never training text, yet 247 of its 495 sum
+lines also stand whole in the training passage (the arithmetic block or the four media): two-digit
+operands give only so many sums. Read apart, the tower writes 219 of the 248 it never met right and
+226 of the 247 it met. It computes the sums it never met almost as often as those it did, and the
+acceptance holds on the never-met lines alone at the same rate (219 of 248 is 437 of 495 at that
+rate) [agent-inferred]. The reads at `T` and `U` above count both kinds alike.
+
+**Where the writing goes wrong** [agent-inferred]. Of the 50 wrong sums, 26 carry out of the units
+(of 223 that do) and 24 do not (of 272): the wrong ones are not the carries. Twenty are wrong in the
+tens alone, 16 in the units alone, 12 in both and 2 in the length. Differences (17 of 268 right) and
+products (6 of 490) are written as before: the rings are founded where sums are coded, and nothing
+in the machine has met a landmark at a difference or a product.
+
+**Decided next** [agent-inferred]: the differences, by the same machine. A landmark at the cell
+before each difference's units (received material from each line's shape, handing no value), the
+closure founded there by loop closure, its ring joined beside the two, and its readout founded on
+the arithmetic block with both rings' readouts held. Its acceptance: the tower writes at least 201
+of the 268 held-out differences whole and right (three in four, as for the sums), the sums staying
+at or above 370 written right, and the held-out text at or under 2.458 bits a byte.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -3241,7 +3457,8 @@ the held-out text no worse than the foil's 2.458 bits a byte.
 - **Bits read as progress.** The held-out code stands beside the writing, and the success reading
   is the lock. The block's join is read the same way: its code is shown beside its
   writing, which does not change in kind.
-- **Seen material graded as unseen.** Held-out files are never training files. The join's weight is
+- **Seen material graded as unseen.** Held-out files are never training files. Held-out sum lines
+  that also stand whole in the training passage are read apart from those it never met. The join's weight is
   chosen on the training text alone, and the held-out text is read at every weight. The lock splits met
   and unmet lines, and no held-out text line is met verbatim.
 - **Catered machinery.** Nothing in the tower names a medium. The media are an exterior partition of
@@ -3268,7 +3485,10 @@ the held-out text no worse than the foil's 2.458 bits a byte.
   was refused in `i128` and ran two origins past its deadline in `BigInt`; it was answered by a
   changed law, one exact minor read modulo primes with the rank certified, not by a wider carrier
   or a larger deadline. The context check behind the four media's text stopped at its deadline; it
-  was answered by a shorter prefix, not a larger deadline.
+  was answered by a shorter prefix, not a larger deadline. The whole held-out read at the 110
+  ring's 55 characters stopped at its deadline and is reported incomplete; the ring is read at five
+  characters, a changed declared read with its own reason, and the 55-character figure was not
+  re-read under a longer deadline.
 - **A located cause carried unrepaired into a new consumer.** The founded ring entered the learner
   with its factors held in the frame of the tower it was founded on, and one pass of the tower's own
   learning dephased it. This is recorded as the step's failure, and the next loop carries the ring
@@ -3281,6 +3501,10 @@ the held-out text no worse than the foil's 2.458 bits a byte.
 - **An uncertified deposition step.** A founded family joined with its moments at zero moved at two
   to four times the rate on its first sections. Its moments now open on its founding passage, read
   without a deposit, and every step stays the certified one.
+- **A run larger than its question.** The second four-media founding projected at 4,369 s, and
+  nothing the acceptance asked needed it: founded on the arithmetic block with the units ring's
+  four-media readout carried, the run that met the acceptance took 408 s. A run is sized by what
+  its acceptance reads, not by the passage the last founding used.
 - **An index of contexts counted as learning.** The pair face is carried at every pair. Which pairs
   the training text met is read only outside the machine, to split the held-out reading.
 - **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
@@ -3288,7 +3512,10 @@ the held-out text no worse than the foil's 2.458 bits a byte.
   exterior reading looks. Nothing in the tower reads it.
   The carriage's ceiling table is authored and read only as a ceiling; the move the learner keeps
   is located by loop closure, its modulus the closure system's own torsion, and the readout's
-  harmonics are set by that modulus. No digit, base or sum is named to either founding.
+  harmonics are set by that modulus, or declared by a run beside the outside reading of what the
+  founded turn resolves. No digit, base or sum is named to either founding. The tens landmark says
+  where a sum's tens are coded and hands no value; the closure at it, which found no key, was not
+  answered by naming one.
 
 ## Receipts
 
@@ -3441,6 +3668,15 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   read, the three foundings on the four media, the context checks and every read's receipt lines;
   the reads stay outside the repository) and `DEV_BY_MEDIUM.py` (the held-out text's code by medium,
   run from the run directory); the splits are appended to `RING_SPLIT.txt`.
+- The tens: `RING_TENS.txt` (the closure at the tens, the ring under the whole key, both joins,
+  the regressions, every founding's rounds and every read's receipt lines) and
+  `RING_TENS_CENTROIDS.txt` (the 110 ring's turn at the held-out tens and units, by class, and the
+  centroid reads over counts of characters, from `RING_PHASE_CENTROIDS.py … harmonics=…`); the
+  splits are appended to `RING_SPLIT.txt`.
+- The written sums: `LINES_founded30_arithmetic.tsv` and `LINES_founded26m_arithmetic.tsv` (every
+  held-out arithmetic line's head, true rest, written rest and codes) and `WRITTEN_SUMS.txt` (their
+  receipt lines and counts, from `WRITTEN_SUMS.py`, read apart by whether the training text holds
+  the line).
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -3477,4 +3713,7 @@ readout at one cosine and every read) and `ring22` (`6f0bbab7…`, the readout a
 its reads). The four media use `ring23` (`4a89dc6d…`, the curvature on its grain: the control and
 the development read), `ring24` (`2b3fe76c…`, one scale for every row), `ring25` (`179dbef4…`, each
 row on its own scale, and the context checks) and `ring26` (`7c510f7d…`, the Newton step in readout
-units, its founding and reads).
+units, its founding and reads). The tens use `ring27` (`8a69dee5…`, the closure at the tens, the
+ring under the whole key, its readout at 55 harmonics and reads), `ring28` (`ea85d668…`, the
+regressions, the two rings, their foundings and reads) and `ring29` (`e4417b54…`, the sums carried
+64 bits wide, the block check, the founding that meets the acceptance and its reads).

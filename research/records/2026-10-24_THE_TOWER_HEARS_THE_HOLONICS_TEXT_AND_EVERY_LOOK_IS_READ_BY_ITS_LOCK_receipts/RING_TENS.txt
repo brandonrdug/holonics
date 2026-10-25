@@ -1,0 +1,275 @@
+# The tens under the closure's whole torsion: receipt lines (binaries ring27 and ring28; the reads stay outside the repository)
+## ring27: the closure at the cell before each sum's tens (landmarks.py sum-tens on modes/block.txt, 8,966 marks)
+RING_CLOSURE origin=#10 rows=8966 unique=8959 columns=141 rank=128 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=359
+RING_CLOSURE origin=3 rows=8966 unique=7376 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=546
+RING_CLOSURE origin=1 rows=8966 unique=3440 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=617
+RING_CLOSURE origin=4 rows=8966 unique=7344 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1024
+RING_CLOSURE origin=2 rows=8966 unique=7385 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1097
+RING_CLOSURE origin=+ rows=8966 unique=1078 columns=121 rank=110 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1223
+RING_CLOSURE origin=5 rows=8966 unique=7378 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1668
+RING_CLOSURE origin=0 rows=8966 unique=8075 columns=194 rank=179 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1914
+RING_CLOSURE origin=6 rows=8964 unique=7370 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2232
+RING_CLOSURE origin=7 rows=8966 unique=7364 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2383
+RING_CLOSURE origin=9 rows=8966 unique=7387 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2736
+RING_CLOSURE origin== rows=8966 unique=19 columns=11 rank=11 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2744
+RING_CLOSURE origin=8 rows=8966 unique=7391 columns=195 rank=182 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2804
+RING_CLOSURE origin=- rows=8964 unique=8964 columns=200 rank=185 minor_bits=54 candidates=193,257 torsion= key_modulus=none elapsed_ms=2990
+RING_CLOSURE origin=* rows=8966 unique=8966 columns=200 rank=185 minor_bits=90 candidates=347,252691 torsion= key_modulus=none elapsed_ms=3234
+RING_CLOSURES origins=15 elapsed_ms=3234
+alpha error: no origin's loops close on a key that separates the arriving classes
+MEASURE exit=1 wall_s=41.3 peak_rss_kib=516112
+## ring27: the ring founded at the sums' units with the key keeping the whole torsion
+RING_CLOSURE origin=1 rows=9018 unique=4152 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=320
+RING_CLOSURE origin=#10 rows=9018 unique=9011 columns=149 rank=145 minor_bits=7 candidates=2,5,11 torsion=2:1,5:1,11:1 key_modulus=110 elapsed_ms=550
+RING_CLOSURE origin=3 rows=9018 unique=7475 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=555
+RING_CLOSURE origin=2 rows=9018 unique=7477 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=771
+RING_CLOSURE origin=4 rows=9018 unique=7469 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=899
+RING_CLOSURE origin=7 rows=9018 unique=7489 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1146
+RING_CLOSURE origin=5 rows=9018 unique=7473 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1246
+RING_CLOSURE origin=8 rows=9018 unique=7496 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1426
+RING_CLOSURE origin=6 rows=9016 unique=7480 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1578
+RING_CLOSURE origin== rows=9018 unique=199 columns=29 rank=29 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1592
+RING_CLOSURE origin=+ rows=9018 unique=9018 columns=129 rank=127 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1739
+RING_CLOSURE origin=9 rows=9018 unique=7486 columns=195 rank=191 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=1831
+RING_CLOSURE origin=0 rows=9018 unique=7517 columns=194 rank=188 minor_bits=1 candidates= torsion= key_modulus=none elapsed_ms=2201
+RING_CLOSURE origin=- rows=9016 unique=9016 columns=200 rank=194 minor_bits=74 candidates=2,5,157 torsion= key_modulus=none elapsed_ms=3554
+RING_CLOSURE origin=* rows=9018 unique=9018 columns=200 rank=194 minor_bits=112 candidates=2,3,17,59 torsion= key_modulus=none elapsed_ms=4668
+RING_CLOSURES origins=15 elapsed_ms=4668
+RING_KEY origin=#10 modulus=110 failures=0 residues=0:102,1:103,2:104,3:105,4:106,5:107,6:108,7:109,8:0,9:1 turns=#100:100,#101:90,#102:80,#103:70,#104:60,#105:50,#106:40,#107:30,#108:20,#109:10,+0:90,+1:80,+2:70,+3:60,+4:50,+5:40,+6:30,+7:20,+8:10,0+:11,0=:11,1+:22,10:20,11:10,13:100,14:90,15:80,16:70,17:60,18:50,19:40,1=:22,2+:33,20:40,21:30,22:20,23:10,25:100,26:90,27:80,28:70,29:60,2=:33,3+:44,30:60,31:50,32:40,33:30,34:20,35:10,37:100,38:90,39:80,3=:44,4+:55,40:80,41:70,42:60,43:50,44:40,45:30,46:20,47:10,49:100,4=:55,5+:66,50:100,51:90,52:80,53:70,54:60,55:50,56:40,57:30,58:20,59:10,5=:66,6+:77,60:10,62:100,63:90,64:80,65:70,66:60,67:50,68:40,69:30,6=:77,7+:88,70:30,71:20,72:10,74:100,75:90,76:80,77:70,78:60,79:50,7=:88,8+:99,80:50,81:40,82:30,83:20,84:10,86:100,87:90,88:80,89:70,8=:99,90:70,91:60,92:50,93:40,94:30,95:20,96:10,98:100,99:90,=1:100,=2:90,=3:80,=4:70,=5:60,=6:50,=7:40,=8:30,=9:20
+RING_PAIRS pairs=203 varying=0 rho_on_2^-30=1012303528 elapsed_ms=41387
+RING_PASS cells=216131 marked=9018 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=41387
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=53970
+RING_STEP rank=0 start=unit/closure step=0 factor=A circular_permille=281 pass_ms=1796 elapsed_ms=55774
+RING_STEP rank=0 start=unit/closure step=1 factor=B circular_permille=377 pass_ms=506 elapsed_ms=56285
+RING_STEP rank=0 start=unit/closure step=2 factor=G circular_permille=458 pass_ms=1116 elapsed_ms=57402
+RING_ROUND rank=0 start=unit/closure round=0 circular_permille=458 saved_millinats=- another=true elapsed_ms=57402
+RING_STEP rank=0 start=unit/closure step=3 factor=A circular_permille=586 pass_ms=1670 elapsed_ms=59073
+RING_STEP rank=0 start=unit/closure step=4 factor=B circular_permille=599 pass_ms=490 elapsed_ms=59567
+RING_STEP rank=0 start=unit/closure step=5 factor=G circular_permille=614 pass_ms=775 elapsed_ms=60344
+RING_ROUND rank=0 start=unit/closure round=1 circular_permille=614 saved_millinats=704994 another=true elapsed_ms=60346
+RING_STEP rank=0 start=unit/closure step=6 factor=A circular_permille=624 pass_ms=1742 elapsed_ms=62090
+RING_STEP rank=0 start=unit/closure step=7 factor=B circular_permille=630 pass_ms=561 elapsed_ms=62655
+RING_STEP rank=0 start=unit/closure step=8 factor=G circular_permille=640 pass_ms=907 elapsed_ms=63563
+RING_ROUND rank=0 start=unit/closure round=2 circular_permille=640 saved_millinats=115479 another=false elapsed_ms=63565
+RING_STEP rank=0 start=unit/closure step=9 factor=A circular_permille=646 pass_ms=1625 elapsed_ms=65191
+RING_START rank=0 start=unit/closure exact_share_permille=827 elapsed_ms=65619
+RING_STEP rank=0 start=coupling_mode_1/closure step=0 factor=A circular_permille=235 pass_ms=1886 elapsed_ms=67507
+RING_STEP rank=0 start=coupling_mode_1/closure step=1 factor=B circular_permille=264 pass_ms=548 elapsed_ms=68059
+RING_STEP rank=0 start=coupling_mode_1/closure step=2 factor=G circular_permille=279 pass_ms=862 elapsed_ms=68922
+RING_ROUND rank=0 start=coupling_mode_1/closure round=0 circular_permille=279 saved_millinats=- another=true elapsed_ms=68922
+RING_STEP rank=0 start=coupling_mode_1/closure step=3 factor=A circular_permille=417 pass_ms=1993 elapsed_ms=70917
+RING_STEP rank=0 start=coupling_mode_1/closure step=4 factor=B circular_permille=470 pass_ms=708 elapsed_ms=71629
+RING_STEP rank=0 start=coupling_mode_1/closure step=5 factor=G circular_permille=501 pass_ms=945 elapsed_ms=72575
+RING_ROUND rank=0 start=coupling_mode_1/closure round=1 circular_permille=501 saved_millinats=997906 another=true elapsed_ms=72577
+RING_STEP rank=0 start=coupling_mode_1/closure step=6 factor=A circular_permille=536 pass_ms=1920 elapsed_ms=74498
+RING_STEP rank=0 start=coupling_mode_1/closure step=7 factor=B circular_permille=561 pass_ms=556 elapsed_ms=75058
+RING_STEP rank=0 start=coupling_mode_1/closure step=8 factor=G circular_permille=590 pass_ms=963 elapsed_ms=76023
+RING_ROUND rank=0 start=coupling_mode_1/closure round=2 circular_permille=590 saved_millinats=402911 another=true elapsed_ms=76025
+RING_STEP rank=0 start=coupling_mode_1/closure step=9 factor=A circular_permille=615 pass_ms=1724 elapsed_ms=77750
+RING_STEP rank=0 start=coupling_mode_1/closure step=10 factor=B circular_permille=634 pass_ms=495 elapsed_ms=78249
+RING_STEP rank=0 start=coupling_mode_1/closure step=11 factor=G circular_permille=652 pass_ms=921 elapsed_ms=79171
+RING_ROUND rank=0 start=coupling_mode_1/closure round=3 circular_permille=652 saved_millinats=276996 another=true elapsed_ms=79174
+RING_STEP rank=0 start=coupling_mode_1/closure step=12 factor=A circular_permille=664 pass_ms=2137 elapsed_ms=81312
+RING_STEP rank=0 start=coupling_mode_1/closure step=13 factor=B circular_permille=674 pass_ms=577 elapsed_ms=81892
+RING_STEP rank=0 start=coupling_mode_1/closure step=14 factor=G circular_permille=682 pass_ms=930 elapsed_ms=82822
+RING_ROUND rank=0 start=coupling_mode_1/closure round=4 circular_permille=682 saved_millinats=139026 another=false elapsed_ms=82825
+RING_STEP rank=0 start=coupling_mode_1/closure step=15 factor=A circular_permille=689 pass_ms=1722 elapsed_ms=84548
+RING_START rank=0 start=coupling_mode_1/closure exact_share_permille=862 elapsed_ms=84981
+RING_STEP rank=0 start=coupling_mode_2/closure step=0 factor=A circular_permille=241 pass_ms=1851 elapsed_ms=86838
+RING_STEP rank=0 start=coupling_mode_2/closure step=1 factor=B circular_permille=263 pass_ms=564 elapsed_ms=87405
+RING_STEP rank=0 start=coupling_mode_2/closure step=2 factor=G circular_permille=301 pass_ms=976 elapsed_ms=88382
+RING_ROUND rank=0 start=coupling_mode_2/closure round=0 circular_permille=301 saved_millinats=- another=true elapsed_ms=88383
+RING_STEP rank=0 start=coupling_mode_2/closure step=3 factor=A circular_permille=453 pass_ms=1809 elapsed_ms=90193
+RING_STEP rank=0 start=coupling_mode_2/closure step=4 factor=B circular_permille=500 pass_ms=448 elapsed_ms=90645
+RING_STEP rank=0 start=coupling_mode_2/closure step=5 factor=G circular_permille=536 pass_ms=897 elapsed_ms=91543
+RING_ROUND rank=0 start=coupling_mode_2/closure round=1 circular_permille=536 saved_millinats=1061554 another=true elapsed_ms=91546
+RING_STEP rank=0 start=coupling_mode_2/closure step=6 factor=A circular_permille=568 pass_ms=1757 elapsed_ms=93304
+RING_STEP rank=0 start=coupling_mode_2/closure step=7 factor=B circular_permille=586 pass_ms=557 elapsed_ms=93865
+RING_STEP rank=0 start=coupling_mode_2/closure step=8 factor=G circular_permille=596 pass_ms=872 elapsed_ms=94739
+RING_ROUND rank=0 start=coupling_mode_2/closure round=2 circular_permille=596 saved_millinats=269051 another=true elapsed_ms=94741
+RING_STEP rank=0 start=coupling_mode_2/closure step=9 factor=A circular_permille=607 pass_ms=1677 elapsed_ms=96420
+RING_STEP rank=0 start=coupling_mode_2/closure step=10 factor=B circular_permille=617 pass_ms=543 elapsed_ms=96968
+RING_STEP rank=0 start=coupling_mode_2/closure step=11 factor=G circular_permille=622 pass_ms=960 elapsed_ms=97929
+RING_ROUND rank=0 start=coupling_mode_2/closure round=3 circular_permille=622 saved_millinats=117988 another=false elapsed_ms=97933
+RING_STEP rank=0 start=coupling_mode_2/closure step=12 factor=A circular_permille=629 pass_ms=1842 elapsed_ms=99777
+RING_START rank=0 start=coupling_mode_2/closure exact_share_permille=835 elapsed_ms=100141
+RING_STEP rank=0 start=coupling_mode_3/closure step=0 factor=A circular_permille=177 pass_ms=2065 elapsed_ms=102210
+RING_STEP rank=0 start=coupling_mode_3/closure step=1 factor=B circular_permille=219 pass_ms=592 elapsed_ms=102806
+RING_STEP rank=0 start=coupling_mode_3/closure step=2 factor=G circular_permille=272 pass_ms=887 elapsed_ms=103695
+RING_ROUND rank=0 start=coupling_mode_3/closure round=0 circular_permille=272 saved_millinats=- another=true elapsed_ms=103695
+RING_STEP rank=0 start=coupling_mode_3/closure step=3 factor=A circular_permille=333 pass_ms=1766 elapsed_ms=105462
+RING_STEP rank=0 start=coupling_mode_3/closure step=4 factor=B circular_permille=368 pass_ms=505 elapsed_ms=105971
+RING_STEP rank=0 start=coupling_mode_3/closure step=5 factor=G circular_permille=391 pass_ms=1058 elapsed_ms=107030
+RING_ROUND rank=0 start=coupling_mode_3/closure round=1 circular_permille=391 saved_millinats=536669 another=true elapsed_ms=107033
+RING_STEP rank=0 start=coupling_mode_3/closure step=6 factor=A circular_permille=419 pass_ms=1803 elapsed_ms=108837
+RING_STEP rank=0 start=coupling_mode_3/closure step=7 factor=B circular_permille=437 pass_ms=480 elapsed_ms=109320
+RING_STEP rank=0 start=coupling_mode_3/closure step=8 factor=G circular_permille=454 pass_ms=917 elapsed_ms=110239
+RING_ROUND rank=0 start=coupling_mode_3/closure round=2 circular_permille=454 saved_millinats=284683 another=true elapsed_ms=110242
+RING_STEP rank=0 start=coupling_mode_3/closure step=9 factor=A circular_permille=469 pass_ms=2122 elapsed_ms=112366
+RING_STEP rank=0 start=coupling_mode_3/closure step=10 factor=B circular_permille=482 pass_ms=586 elapsed_ms=112955
+RING_STEP rank=0 start=coupling_mode_3/closure step=11 factor=G circular_permille=496 pass_ms=1058 elapsed_ms=114014
+RING_ROUND rank=0 start=coupling_mode_3/closure round=3 circular_permille=496 saved_millinats=187302 another=false elapsed_ms=114017
+RING_STEP rank=0 start=coupling_mode_3/closure step=12 factor=A circular_permille=507 pass_ms=2087 elapsed_ms=116106
+RING_START rank=0 start=coupling_mode_3/closure exact_share_permille=718 elapsed_ms=116596
+RING_STEP rank=0 start=coupling_mode_4/closure step=0 factor=A circular_permille=300 pass_ms=2043 elapsed_ms=118641
+RING_STEP rank=0 start=coupling_mode_4/closure step=1 factor=B circular_permille=369 pass_ms=605 elapsed_ms=119250
+RING_STEP rank=0 start=coupling_mode_4/closure step=2 factor=G circular_permille=446 pass_ms=978 elapsed_ms=120230
+RING_ROUND rank=0 start=coupling_mode_4/closure round=0 circular_permille=446 saved_millinats=- another=true elapsed_ms=120230
+RING_STEP rank=0 start=coupling_mode_4/closure step=3 factor=A circular_permille=508 pass_ms=2068 elapsed_ms=122299
+RING_STEP rank=0 start=coupling_mode_4/closure step=4 factor=B circular_permille=536 pass_ms=563 elapsed_ms=122866
+RING_STEP rank=0 start=coupling_mode_4/closure step=5 factor=G circular_permille=558 pass_ms=1032 elapsed_ms=123905
+RING_ROUND rank=0 start=coupling_mode_4/closure round=1 circular_permille=558 saved_millinats=506250 another=true elapsed_ms=123907
+RING_STEP rank=0 start=coupling_mode_4/closure step=6 factor=A circular_permille=592 pass_ms=1929 elapsed_ms=125838
+RING_STEP rank=0 start=coupling_mode_4/closure step=7 factor=B circular_permille=608 pass_ms=512 elapsed_ms=126355
+RING_STEP rank=0 start=coupling_mode_4/closure step=8 factor=G circular_permille=623 pass_ms=1170 elapsed_ms=127526
+RING_ROUND rank=0 start=coupling_mode_4/closure round=2 circular_permille=623 saved_millinats=290356 another=true elapsed_ms=127529
+RING_STEP rank=0 start=coupling_mode_4/closure step=9 factor=A circular_permille=641 pass_ms=2397 elapsed_ms=129927
+RING_STEP rank=0 start=coupling_mode_4/closure step=10 factor=B circular_permille=649 pass_ms=540 elapsed_ms=130471
+RING_STEP rank=0 start=coupling_mode_4/closure step=11 factor=G circular_permille=658 pass_ms=840 elapsed_ms=131312
+RING_ROUND rank=0 start=coupling_mode_4/closure round=3 circular_permille=658 saved_millinats=160770 another=false elapsed_ms=131314
+RING_STEP rank=0 start=coupling_mode_4/closure step=12 factor=A circular_permille=668 pass_ms=1756 elapsed_ms=133072
+RING_START rank=0 start=coupling_mode_4/closure exact_share_permille=839 elapsed_ms=133519
+RING_STEP rank=0 start=origin/closure step=0 factor=A circular_permille=368 pass_ms=1673 elapsed_ms=135194
+RING_STEP rank=0 start=origin/closure step=1 factor=B circular_permille=419 pass_ms=546 elapsed_ms=135744
+RING_STEP rank=0 start=origin/closure step=2 factor=G circular_permille=454 pass_ms=1154 elapsed_ms=136900
+RING_ROUND rank=0 start=origin/closure round=0 circular_permille=454 saved_millinats=- another=true elapsed_ms=136900
+RING_STEP rank=0 start=origin/closure step=3 factor=A circular_permille=512 pass_ms=2039 elapsed_ms=138941
+RING_STEP rank=0 start=origin/closure step=4 factor=B circular_permille=544 pass_ms=572 elapsed_ms=139517
+RING_STEP rank=0 start=origin/closure step=5 factor=G circular_permille=557 pass_ms=1088 elapsed_ms=140606
+RING_ROUND rank=0 start=origin/closure round=1 circular_permille=557 saved_millinats=463319 another=true elapsed_ms=140608
+RING_STEP rank=0 start=origin/closure step=6 factor=A circular_permille=567 pass_ms=2016 elapsed_ms=142625
+RING_STEP rank=0 start=origin/closure step=7 factor=B circular_permille=577 pass_ms=509 elapsed_ms=143137
+RING_STEP rank=0 start=origin/closure step=8 factor=G circular_permille=585 pass_ms=996 elapsed_ms=144134
+RING_ROUND rank=0 start=origin/closure round=2 circular_permille=585 saved_millinats=126850 another=false elapsed_ms=144137
+RING_STEP rank=0 start=origin/closure step=9 factor=A circular_permille=592 pass_ms=1698 elapsed_ms=145838
+RING_START rank=0 start=origin/closure exact_share_permille=865 elapsed_ms=146342
+RING_RANK rank=0 channels=2 marked_cells=9018 exact_share_permille=865 push_shift=80 read_shift=6 elapsed_ms=146344
+RING_WRITTEN forms=1 sha256=446be32757645ed238ec35e2e45cd1383564524a321c60208d149c6bf3a35b92 elapsed_ms=146348
+MEASURE exit=0 wall_s=146.5 peak_rss_kib=853164
+## ring27: joined at 55 harmonics, the readout at zero; read at the held-out tens (T) and units (U)
+RING_JOIN level=0 mode=41 ranks=1 pair_moves=203 key_modulus=110 harmonics=55 material=2029699 sha256=a0e46e5c61fb871b270a57b67d241bf0fd6f94a0deaf7c278c79d1d6ecf2d337 elapsed_ms=1360
+MEASURE exit=0 wall_s=1.4 peak_rss_kib=248004
+ring/at27j.T+.txt: TOWER_AT cells=495 top_is_next=311 code_on_2^-20=631149197 ring_ranks=1 elapsed_ms=14453
+ring/at27j.T+.txt: MEASURE exit=0 wall_s=14.5 peak_rss_kib=103076
+ring/at27j.U+.txt: TOWER_AT cells=495 top_is_next=48 code_on_2^-20=1810478062 ring_ranks=1 elapsed_ms=12780
+ring/at27j.U+.txt: MEASURE exit=0 wall_s=12.8 peak_rss_kib=104476
+## ring27: the readout founded on the arithmetic block at 55 harmonics
+RING_READOUT_CURVATURE round=0 live_pairs=2057555 pairs=3241950 released_ppm=189 elapsed_ms=283276
+RING_READOUT_PHASE round=0 phase=curvature blocks=825 elapsed_ms=1067537
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=1674301
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:8967518,2:8031315,3:8570110,4:9603012,5:9758022,6:8933805,7:7612829,8:7158757,9:7084747,10:7432879,11:9068576,12:6770695,13:5805491,14:5361946,15:5165377,16:5028792,17:4747472,18:4509400,19:4192371,20:4200646,21:4697349,22:5756853,23:4184689,24:3498186,25:3110640,26:2966654,27:2810150,28:2763475,29:2711825,30:2508121,31:2508445,32:2711629,33:3273001,34:2653209,35:2333597,36:2067158,37:2058252,38:2078258,39:2120011,40:2034737,41:1994832,42:2045537,43:2111841,44:2224780,45:2023268,46:1830837,47:1750482,48:1625079,49:1572913,50:1588795,51:1559373,52:1504414,53:1435943,54:1403191,55:1426544
+RING_READOUT_ROUND round=0 kappa_on_2^-16=373626 capped_rows=15 newton_reach_bits=8 code_on_2^-20=495104971912 line_code=495104922414 saved_millinats=15424170 another=false round_ms=1424079 elapsed_ms=1707190
+RING_READOUT cells=216130 channels=7150 arriving_classes=15 free=100100 rounds=1 kappas_on_2^-16=373626 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=495104971912 evaluations=20 largest=2314855 moment_sections=211 moments_ms=164157 sha256=77db03bd4f827a3eed2e083cba932269a7d85f0a813fc15f5af1d1158a25d1f3 read_ms=282997 elapsed_ms=1873014
+MEASURE exit=0 wall_s=1873.1 peak_rss_kib=1107388
+## ring27: reads of the founded readout (the whole held-out read stopped at its deadline)
+ring/at27_block.T.txt: TOWER_SPLIT cells=495 ring_top_is_next=266 rest_top_is_next=311 ring_not_whole=32 whole_not_ring=194
+ring/at27_block.T.txt: TOWER_AT cells=495 top_is_next=428 code_on_2^-20=309834571 ring_ranks=1 elapsed_ms=30373
+ring/at27_block.T.txt: MEASURE exit=0 wall_s=30.4 peak_rss_kib=128248
+ring/at27_block.U.txt: TOWER_SPLIT cells=495 ring_top_is_next=178 rest_top_is_next=48 ring_not_whole=54 whole_not_ring=32
+ring/at27_block.U.txt: TOWER_AT cells=495 top_is_next=156 code_on_2^-20=1274576116 ring_ranks=1 elapsed_ms=29204
+ring/at27_block.U.txt: MEASURE exit=0 wall_s=29.3 peak_rss_kib=128048
+ring/at27_block.B.txt: TOWER_AT cells=1253 top_is_next=1158 code_on_2^-20=511000822 ring_ranks=1 elapsed_ms=14259
+ring/at27_block.B.txt: MEASURE exit=0 wall_s=14.3 peak_rss_kib=128056
+ring/at27_block.dev.txt: MEASURE exit=deadline wall_s=60.0 peak_rss_kib=128100
+## ring28: build
+ring28 sha256 ea85d668e332e14e970bf4c784cb0b7993ba73bb48d1382a606546cf92012218
+MEASURE exit=0 wall_s=390.9 peak_rss_kib=2725516
+## ring28: regressions: the units ring joined alone; its four-media learner read at U
+RING_JOIN level=0 mode=41 ranks=1 pair_moves=203 key_moduli=10 harmonics=5 readout_carried_ranks=0 material=365699 sha256=e9c2de64df1b1b0ce3a5e122c201e02a3d5b5fa540b8b181e8c39add57e44e1c elapsed_ms=379
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=65604
+joined28r e9c2de64df1b1b0ce3a5e122c201e02a3d5b5fa540b8b181e8c39add57e44e1c against joined22 e9c2de64df1b1b0ce3a5e122c201e02a3d5b5fa540b8b181e8c39add57e44e1c
+founded26m at U: identical
+ring/at28r.U.txt: TOWER_SPLIT cells=495 ring_top_is_next=305 rest_top_is_next=48 ring_not_whole=2 whole_not_ring=166
+ring/at28r.U.txt: TOWER_AT cells=495 top_is_next=469 code_on_2^-20=497757258 ring_ranks=1 elapsed_ms=10009
+ring/at28r.U.txt: MEASURE exit=0 wall_s=10.0 peak_rss_kib=35608
+## ring28: the two rings joined at five harmonics, the readout at zero
+RING_JOIN level=0 mode=41 ranks=2 pair_moves=203,203 key_moduli=10,110 harmonics=5 readout_carried_ranks=0 material=532614 sha256=77fadd46b53257968c9e6ad1993d31d888493de07185324dff7d9f2bffdda382 elapsed_ms=377
+MEASURE exit=0 wall_s=0.4 peak_rss_kib=85380
+## ring28: the 110 ring's readout founded on the arithmetic block, the units ring's held
+RING_READOUT_CURVATURE round=0 live_pairs=2057555 pairs=3241950 released_ppm=189 elapsed_ms=95996
+RING_READOUT_PHASE round=0 phase=curvature blocks=75 elapsed_ms=161323
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=211042
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:8967518,2:8031315,3:8570110,4:9603012,5:9758022
+RING_READOUT_ROUND round=0 kappa_on_2^-16=290859 capped_rows=15 newton_reach_bits=7 code_on_2^-20=503005499590 line_code=503005518505 saved_millinats=10201632 another=true round_ms=121189 elapsed_ms=217052
+RING_READOUT_CURVATURE round=1 live_pairs=2028288 pairs=3241950 released_ppm=168 elapsed_ms=217264
+RING_READOUT_PHASE round=1 phase=curvature blocks=75 elapsed_ms=280352
+RING_READOUT_PHASE round=1 phase=solve elapsed_ms=332023
+RING_READOUT_HARMONICS round=1 predicted_millinats=1:2512610,2:1917974,3:1869166,4:1933241,5:2101456
+RING_READOUT_ROUND round=1 kappa_on_2^-16=101836 capped_rows=15 newton_reach_bits=6 code_on_2^-20=499713342128 line_code=499713344692 saved_millinats=2176237 another=false round_ms=120683 elapsed_ms=337745
+RING_READOUT cells=216130 channels=650 held_ranks=1 arriving_classes=15 free=9100 rounds=2 kappas_on_2^-16=290859,101836 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=499713342128 evaluations=38 largest=11052712 moment_sections=211 moments_ms=60083 sha256=c8a7c10360ba8e5195bef3dc818aa3c7d0f3c8b3120b890f975d07544db5ba21 read_ms=95773 elapsed_ms=398257
+MEASURE exit=0 wall_s=398.3 peak_rss_kib=747388
+## ring28: reads of the block readout
+ring/at28_block.T.txt: TOWER_SPLIT cells=495 ring_top_is_next=260 rest_top_is_next=311 ring_not_whole=11 whole_not_ring=193
+ring/at28_block.T.txt: TOWER_AT cells=495 top_is_next=442 code_on_2^-20=194105699 ring_ranks=2 elapsed_ms=10052
+ring/at28_block.T.txt: MEASURE exit=0 wall_s=10.1 peak_rss_kib=43456
+ring/at28_block.U.txt: TOWER_SPLIT cells=495 ring_top_is_next=117 rest_top_is_next=48 ring_not_whole=52 whole_not_ring=59
+ring/at28_block.U.txt: TOWER_AT cells=495 top_is_next=124 code_on_2^-20=1476188784 ring_ranks=2 elapsed_ms=10215
+ring/at28_block.U.txt: MEASURE exit=0 wall_s=10.3 peak_rss_kib=43332
+ring/at28_block.B.txt: TOWER_AT cells=1253 top_is_next=1153 code_on_2^-20=514056372 ring_ranks=2 elapsed_ms=4976
+ring/at28_block.B.txt: MEASURE exit=0 wall_s=5.0 peak_rss_kib=43440
+ring/at28_block.dev.txt: TOWER_AT cells=48030 top_is_next=23675 code_on_2^-20=122856246266 ring_ranks=2 elapsed_ms=19567
+ring/at28_block.dev.txt: MEASURE exit=0 wall_s=19.6 peak_rss_kib=43660
+ring/at28_block.dev.txt prose=3.082 lean=2.375 rust=2.077 arithmetic=2.223 whole=2.439
+## ring28: the two rings joined with the units ring's four-media readout carried, and its read at U
+join-tower-ring hcont2/STATE.0 ring/found21.forms ring/found27.forms ring/joined28m.state harmonics=5 readout=ring/founded26m.state
+RING_JOIN level=0 mode=41 ranks=2 pair_moves=203,203 key_moduli=10,110 harmonics=5 readout_carried_ranks=1 material=532614 sha256=62c52122671ffaa67e5b962c744b47f69bdf3be8125a6a5f4a3a388a27f90f0f elapsed_ms=678
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=83960
+ring/at28m0.U.txt: TOWER_SPLIT cells=495 ring_top_is_next=305 rest_top_is_next=48 ring_not_whole=2 whole_not_ring=166
+ring/at28m0.U.txt: TOWER_AT cells=495 top_is_next=469 code_on_2^-20=497757258 ring_ranks=2 elapsed_ms=10439
+ring/at28m0.U.txt: MEASURE exit=0 wall_s=10.5 peak_rss_kib=39612
+## ring28: the 110 ring's readout founded on the four media, the units ring's held: stopped on evidence
+found-ring-readout ring/joined28m.state ring/mixed.txt 8 128 ring/founded28m.state held=1 (deadline 6,000 s; stop if no round-0 line by 2,200 s)
+RING_READOUT_CURVATURE round=0 live_pairs=24854461 pairs=143815392 released_ppm=1986 elapsed_ms=396869
+RING_READOUT_PHASE round=0 phase=curvature blocks=840 elapsed_ms=1483425
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=2112867
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:8386350964278812,2:-143198605856769,3:7746526567050271,4:-1328616049765956,5:462431446201862
+no round-0 line by 2,200 s: stopping on evidence (the process was stopped; no MEASURE line; its resident set read 3,455,940 KiB at 1,497 s)
+## ring29: the example built with the readout's sums carried 64 bits wide, crossing into 128 every 2^11 live cells
+cargo build --release --example solenoidal_alpha (CARGO_INCREMENTAL=0)
+MEASURE exit=0 wall_s=292.1 peak_rss_kib=1937584
+e4417b546a2a702a9cafaeb5595cf36e882aaba997794cdb5117214b8f045011  ring29
+## ring29: ring28b's block founding again, under the 64-bit sums (it must write the same learner)
+found-ring-readout ring/joined28.state modes/block.txt 8 128 ring/founded29b.state held=1
+RING_READOUT_CURVATURE round=0 live_pairs=2057555 pairs=3241950 released_ppm=189 elapsed_ms=96403
+RING_READOUT_PHASE round=0 phase=curvature blocks=75 elapsed_ms=114277
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=169625
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:8967518,2:8031315,3:8570110,4:9603012,5:9758022
+RING_READOUT_ROUND round=0 kappa_on_2^-16=290859 capped_rows=15 newton_reach_bits=7 code_on_2^-20=503005499590 line_code=503005518505 saved_millinats=10201632 another=true round_ms=79850 elapsed_ms=176106
+RING_READOUT_CURVATURE round=1 live_pairs=2028288 pairs=3241950 released_ppm=168 elapsed_ms=176420
+RING_READOUT_PHASE round=1 phase=curvature blocks=75 elapsed_ms=195923
+RING_READOUT_PHASE round=1 phase=solve elapsed_ms=252479
+RING_READOUT_HARMONICS round=1 predicted_millinats=1:2512610,2:1917974,3:1869166,4:1933241,5:2101456
+RING_READOUT_ROUND round=1 kappa_on_2^-16=101836 capped_rows=15 newton_reach_bits=6 code_on_2^-20=499713342128 line_code=499713344692 saved_millinats=2176237 another=false round_ms=82536 elapsed_ms=258652
+RING_READOUT cells=216130 channels=650 held_ranks=1 arriving_classes=15 free=9100 rounds=2 kappas_on_2^-16=290859,101836 code_before_on_2^-20=518438277082 code_at_zero=518438277082 code_founded=499713342128 evaluations=38 largest=11052712 moment_sections=211 moments_ms=65278 sha256=c8a7c10360ba8e5195bef3dc818aa3c7d0f3c8b3120b890f975d07544db5ba21 read_ms=96163 elapsed_ms=324372
+MEASURE exit=0 wall_s=324.4 peak_rss_kib=751016
+founded29b c8a7c10360ba8e5195bef3dc818aa3c7d0f3c8b3120b890f975d07544db5ba21 against founded28b c8a7c10360ba8e5195bef3dc818aa3c7d0f3c8b3120b890f975d07544db5ba21
+## ring30: the 110 ring's readout founded on the arithmetic block, the units ring's four-media readout carried and held (the four-media founding not launched)
+found-ring-readout ring/joined28m.state modes/block.txt 8 128 ring/founded30.state held=1 (deadline 700 s; stop if no round-0 line by 360 s)
+first launch: both rounds ran as below, then the state's write failed on a full disk
+alpha error: No space left on device (os error 28)
+MEASURE exit=1 wall_s=402.4 peak_rss_kib=743032
+second launch, the same deadline, after old debug builds were cleared:
+RING_READOUT_CURVATURE round=0 live_pairs=2030888 pairs=3241950 released_ppm=190 elapsed_ms=97616
+RING_READOUT_PHASE round=0 phase=curvature blocks=75 elapsed_ms=129938
+RING_READOUT_PHASE round=0 phase=solve elapsed_ms=204381
+RING_READOUT_HARMONICS round=0 predicted_millinats=1:6571532,2:5645217,3:5832755,4:6467336,5:6425711
+RING_READOUT_ROUND round=0 kappa_on_2^-16=280512 capped_rows=15 newton_reach_bits=7 code_on_2^-20=474440318514 line_code=474440313226 saved_millinats=7688817 another=true round_ms=115037 elapsed_ms=212426
+RING_READOUT_CURVATURE round=1 live_pairs=2000735 pairs=3241950 released_ppm=176 elapsed_ms=212735
+RING_READOUT_PHASE round=1 phase=curvature blocks=75 elapsed_ms=234375
+RING_READOUT_PHASE round=1 phase=solve elapsed_ms=317781
+RING_READOUT_HARMONICS round=1 predicted_millinats=1:1606775,2:1192430,3:1076358,4:1048215,5:1059505
+RING_READOUT_ROUND round=1 kappa_on_2^-16=122906 capped_rows=15 newton_reach_bits=6 code_on_2^-20=472103618824 line_code=472103619198 saved_millinats=1544644 another=false round_ms=115165 elapsed_ms=327602
+RING_READOUT cells=216130 channels=650 held_ranks=1 arriving_classes=15 free=9100 rounds=2 kappas_on_2^-16=280512,122906 code_before_on_2^-20=486071772279 code_at_zero=486071772279 code_founded=472103618824 evaluations=38 largest=10457519 moment_sections=211 moments_ms=79863 sha256=b3ff0e58d56dc85714872b11ab76539bc173d7043fb6263cfcebc01b7809fe71 read_ms=97166 elapsed_ms=407967
+MEASURE exit=0 wall_s=408.0 peak_rss_kib=751044
+## ring30: reads at T and U (split), B and the whole held-out text
+ring/at30.T.txt: TOWER_SPLIT cells=495 ring_top_is_next=74 rest_top_is_next=311 ring_not_whole=0 whole_not_ring=389
+ring/at30.T.txt: TOWER_AT cells=495 top_is_next=463 code_on_2^-20=157790652 ring_ranks=2 elapsed_ms=10204
+ring/at30.T.txt: MEASURE exit=0 wall_s=10.2 peak_rss_kib=44036
+ring/at30.U.txt: TOWER_SPLIT cells=495 ring_top_is_next=360 rest_top_is_next=48 ring_not_whole=1 whole_not_ring=114
+ring/at30.U.txt: TOWER_AT cells=495 top_is_next=473 code_on_2^-20=405307811 ring_ranks=2 elapsed_ms=9991
+ring/at30.U.txt: MEASURE exit=0 wall_s=10.0 peak_rss_kib=44136
+ring/at30.B.txt: TOWER_AT cells=1253 top_is_next=1156 code_on_2^-20=488320415 ring_ranks=2 elapsed_ms=4806
+ring/at30.B.txt: MEASURE exit=0 wall_s=4.8 peak_rss_kib=42876
+ring/at30.dev.txt: TOWER_AT cells=48030 top_is_next=24608 code_on_2^-20=117538965598 ring_ranks=2 elapsed_ms=20511
+ring/at30.dev.txt: MEASURE exit=0 wall_s=20.5 peak_rss_kib=43952
+ring/at30.dev.txt prose=2.986 lean=2.254 rust=1.981 arithmetic=2.114 whole=2.334

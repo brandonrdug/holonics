@@ -1,0 +1,48 @@
+ring/at27j.T+.txt cells 495 harmonics 55
+  0: 43 cells, mean turn 35.9 degrees, resultant 0.985
+  1: 53 cells, mean turn 76.3 degrees, resultant 0.895
+  2: 44 cells, mean turn 115.1 degrees, resultant 0.828
+  3: 40 cells, mean turn 143.5 degrees, resultant 0.801
+  4: 43 cells, mean turn 166.2 degrees, resultant 0.788
+  5: 49 cells, mean turn 221.4 degrees, resultant 0.764
+  6: 50 cells, mean turn 267.2 degrees, resultant 0.832
+  7: 57 cells, mean turn 305.8 degrees, resultant 0.881
+  8: 60 cells, mean turn 342.5 degrees, resultant 0.886
+  9: 56 cells, mean turn 28.2 degrees, resultant 0.963
+  leave one out, 1 harmonic(s): 146 of 495
+  leave one out, 2 harmonic(s): 172 of 495
+  leave one out, 3 harmonic(s): 252 of 495
+  leave one out, 4 harmonic(s): 323 of 495
+  leave one out, 5 harmonic(s): 322 of 495
+  leave one out, 6 harmonic(s): 323 of 495
+  leave one out, 8 harmonic(s): 320 of 495
+  leave one out, 11 harmonic(s): 324 of 495
+  leave one out, 16 harmonic(s): 337 of 495
+  leave one out, 22 harmonic(s): 340 of 495
+  leave one out, 33 harmonic(s): 337 of 495
+  leave one out, 44 harmonic(s): 331 of 495
+  leave one out, 55 harmonic(s): 318 of 495
+ring/at27j.U+.txt cells 495 harmonics 55
+  0: 63 cells, mean turn 76.0 degrees, resultant 0.996
+  1: 41 cells, mean turn 78.6 degrees, resultant 0.997
+  2: 39 cells, mean turn 80.4 degrees, resultant 0.996
+  3: 41 cells, mean turn 82.4 degrees, resultant 0.996
+  4: 51 cells, mean turn 83.6 degrees, resultant 0.997
+  5: 45 cells, mean turn 86.0 degrees, resultant 0.997
+  6: 56 cells, mean turn 88.3 degrees, resultant 0.997
+  7: 51 cells, mean turn 89.9 degrees, resultant 0.996
+  8: 52 cells, mean turn 92.6 degrees, resultant 0.998
+  9: 56 cells, mean turn 93.5 degrees, resultant 0.997
+  leave one out, 1 harmonic(s): 139 of 495
+  leave one out, 2 harmonic(s): 140 of 495
+  leave one out, 3 harmonic(s): 141 of 495
+  leave one out, 4 harmonic(s): 141 of 495
+  leave one out, 5 harmonic(s): 139 of 495
+  leave one out, 6 harmonic(s): 139 of 495
+  leave one out, 8 harmonic(s): 139 of 495
+  leave one out, 11 harmonic(s): 142 of 495
+  leave one out, 16 harmonic(s): 132 of 495
+  leave one out, 22 harmonic(s): 130 of 495
+  leave one out, 33 harmonic(s): 111 of 495
+  leave one out, 44 harmonic(s): 130 of 495
+  leave one out, 55 harmonic(s): 134 of 495

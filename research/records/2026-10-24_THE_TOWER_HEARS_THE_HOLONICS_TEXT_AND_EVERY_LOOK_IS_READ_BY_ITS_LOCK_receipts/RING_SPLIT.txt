@@ -40,3 +40,40 @@ founded26m (the readout founded on the four media, each row's Newton step in rea
   2+1: 44 sums; whole 39, ring's part 14, rest 3; 1.487 bits a digit; ring's margin median -0.31 bits
   2+2: 399 sums; whole 385, ring's part 274, rest 40; 0.835 bits a digit; ring's margin median 0.59 bits
   all: 495 sums; whole 469, ring's part 305, rest 48; 0.959 bits a digit; ring's margin median 0.42 bits
+founded27 at the held-out tens (the 110 ring, its readout founded on the arithmetic block at 55 harmonics)
+  1+1: 2 sums; whole 2, ring's part 0, rest 2; 0.921 bits a digit; ring's margin median -0.12 bits
+  1+2: 50 sums; whole 39, ring's part 33, rest 27; 0.771 bits a digit; ring's margin median 0.28 bits
+  2+1: 44 sums; whole 40, ring's part 30, rest 20; 0.809 bits a digit; ring's margin median 0.36 bits
+  2+2: 399 sums; whole 347, ring's part 203, rest 262; 0.550 bits a digit; ring's margin median 0.03 bits
+  all: 495 sums; whole 428, ring's part 266, rest 311; 0.597 bits a digit; ring's margin median 0.09 bits
+founded27 at the held-out units
+  1+1: 2 sums; whole 0, ring's part 0, rest 0; 3.456 bits a digit; ring's margin median -0.84 bits
+  1+2: 50 sums; whole 14, ring's part 12, rest 5; 2.690 bits a digit; ring's margin median -0.94 bits
+  2+1: 44 sums; whole 14, ring's part 18, rest 3; 2.532 bits a digit; ring's margin median -0.21 bits
+  2+2: 399 sums; whole 128, ring's part 148, rest 40; 2.413 bits a digit; ring's margin median -0.45 bits
+  all: 495 sums; whole 156, ring's part 178, rest 48; 2.456 bits a digit; ring's margin median -0.50 bits
+founded28b at the held-out tens (the 110 ring beside the units ring, its readout founded on the block at five harmonics, the units ring's held at zero)
+  1+1: 2 sums; whole 2, ring's part 0, rest 2; 0.982 bits a digit; ring's margin median -0.21 bits
+  1+2: 50 sums; whole 43, ring's part 30, rest 27; 0.401 bits a digit; ring's margin median 0.39 bits
+  2+1: 44 sums; whole 40, ring's part 31, rest 20; 0.415 bits a digit; ring's margin median 0.67 bits
+  2+2: 399 sums; whole 357, ring's part 199, rest 262; 0.363 bits a digit; ring's margin median -0.00 bits
+  all: 495 sums; whole 442, ring's part 260, rest 311; 0.374 bits a digit; ring's margin median 0.13 bits
+founded28b at the held-out units
+  1+1: 2 sums; whole 0, ring's part 0, rest 0; 3.306 bits a digit; ring's margin median -1.19 bits
+  1+2: 50 sums; whole 9, ring's part 7, rest 5; 2.919 bits a digit; ring's margin median -0.81 bits
+  2+1: 44 sums; whole 13, ring's part 12, rest 3; 2.959 bits a digit; ring's margin median -0.37 bits
+  2+2: 399 sums; whole 102, ring's part 98, rest 40; 2.820 bits a digit; ring's margin median -0.59 bits
+  all: 495 sums; whole 124, ring's part 117, rest 48; 2.844 bits a digit; ring's margin median -0.62 bits
+
+founded30 at the held-out tens (the 110 ring beside the units ring, its readout founded on the block at five harmonics, the units ring's four-media readout held)
+  1+1: 2 sums; whole 2, ring's part 0, rest 2; 0.729 bits a digit; ring's margin median -1.53 bits
+  1+2: 50 sums; whole 45, ring's part 8, rest 27; 0.341 bits a digit; ring's margin median -1.30 bits
+  2+1: 44 sums; whole 41, ring's part 9, rest 20; 0.369 bits a digit; ring's margin median -0.74 bits
+  2+2: 399 sums; whole 375, ring's part 57, rest 262; 0.290 bits a digit; ring's margin median -1.61 bits
+  all: 495 sums; whole 463, ring's part 74, rest 311; 0.304 bits a digit; ring's margin median -1.53 bits
+founded30 at the held-out units
+  1+1: 2 sums; whole 1, ring's part 1, rest 0; 2.050 bits a digit; ring's margin median 0.23 bits
+  1+2: 50 sums; whole 44, ring's part 20, rest 5; 1.250 bits a digit; ring's margin median -0.37 bits
+  2+1: 44 sums; whole 39, ring's part 25, rest 3; 1.259 bits a digit; ring's margin median 0.14 bits
+  2+2: 399 sums; whole 389, ring's part 314, rest 40; 0.663 bits a digit; ring's margin median 0.85 bits
+  all: 495 sums; whole 473, ring's part 360, rest 48; 0.781 bits a digit; ring's margin median 0.65 bits
