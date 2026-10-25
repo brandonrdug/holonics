@@ -460,9 +460,18 @@ Its earlier charts are particular moves, each kept with its owner:
   ([receiver atlas](RECEIVER_HOLARCHY.md#the-reflection-algebra-shared-by-seam-and-swing)). A fold is
   that map applied to one side of a crease (§6).
 
-[definition; agent-inferred] **The hand.** A reflection is a move whose square is the identity and
-which reverses orientation; a turn keeps it, and two reflections compose into a turn by twice the
-angle between their mirrors. The half-turn, harmonic conjugation, junction scattering, the pump's
+[definition; agent-inferred] **The hand.** A reflection is a passage: a wave approaches a boundary
+where the constitution changes, turns there and returns along the other light direction, later; back
+in space and forward in time, never into the past cone. The boundary's `Γ = (Z − Z₀)/(Z + Z₀)` decides
+the share that returns and the phase of the turn (a half turn at a hard wall, a quarter turn at a
+smooth turning point), whose derivatives are the return's delay and its sideways shift; a grip moving
+relative to the receiver returns the wave stretched, `(u, v) ↦ (v/k², k²u)` on the light cone (a
+moving grip boosts), and two mirrors compose to `boost_((k₁/k₂)²)`
+([record](../research/records/2026-10-25_A_REFLECTION_IS_A_PASSAGE_THE_INVOLUTION_IS_ITS_ENDPOINT_A_MOVING_MIRROR_STRETCHES_THE_RETURN_AND_TWO_MIRRORS_MAKE_A_BOOST.md)).
+The involution, a move whose square is the identity and which reverses orientation, is the passage's
+endpoint when the grip is at rest in the receiver's frame and the wall is hard and lossless; a turn
+keeps the orientation, and two such reflections compose into a turn by twice the angle between their
+mirrors. The ± hand below is that static face. The half-turn, harmonic conjugation, junction scattering, the pump's
 reflected stiffness (§5), the helical code's dyad `U` and the Enigma reflector are this one move read
 in different charts. On the annulus `w = log z = u + iθ` it has three faces, any two composing to the
 third: `θ ↦ −θ` (`z ↦ z̄`: subtraction on a residue circle, conjugation, Hodge's `H^{p,q} ↔ H^{q,p}`),
@@ -471,7 +480,9 @@ and `w ↦ −w` (`z ↦ 1/z`: the sphere's change of chart; `ξ(s) = ξ(1 − s
 `ℂ*/q^ℤ`). A ring carries its **hand**, the parity of the reflections it has met since its last
 restart: a reflector reverses it, a restart returns the starting hand, and every reading declares the
 hand it is made in (the hand in force or the starting hand). A complex multiplier only turns, so a
-ring of multipliers alone has no hand. The placement decides the reading: on the newline closure, `−`
+ring of multipliers alone has no hand. Written digits are a static, lossless terrain and their hand is
+a sign; a ring whose walls are partial, reactive or moving carries `Γ` and `k`, of which the sign is
+the hard-wall face. The placement decides the reading: on the newline closure, `−`
 reflecting reads every difference exactly where one hand reads `c mod 20`, and `−` reflecting with `=`
 restarting reads `c mod 110` for sums and differences together where one hand reads parity
 ([record §11](../research/records/2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md#11-with-the-hand-reversible-a-reflection-at--reads-every-difference-and-with-a-restart-at--one-key-reads-sums-and-differences)).
