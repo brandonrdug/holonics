@@ -1,0 +1,9 @@
+A elapsed_ms=39 {'involution': True, 'uv kept': True, 'pairing kept': True, 'worldline fixed': True, 'future cone kept': True, 'null axes swapped': True, 'radar t2 = k^2 t1': True}
+B elapsed_ms=40 {'stretch 1/k^2 = (1-beta)/(1+beta)': True, 'ratios': [('2', '1/4'), ('3', '1/9'), ('3/2', '4/9'), ('5/4', '16/25'), ('7/3', '9/49'), ('1/2', '4')]}
+C elapsed_ms=59 {'two Lorentzian mirrors = boost (k1/k2)^2': True, 'two Euclidean reflections = turn': True}
+D elapsed_ms=60 {'beta': '1/3', 'w L constant': True, 'L ratios': ['2'], 'expected ratio': '2', 'invariant': '9/2', 'first L': '3/2', 'last L = first L * ratio^(bounces - 1)': True}
+D elapsed_ms=61 {'beta': '1/7', 'w L constant': True, 'L ratios': ['4/3'], 'expected ratio': '4/3', 'invariant': '7/2', 'first L': '7/6', 'last L = first L * ratio^(bounces - 1)': True}
+D elapsed_ms=64 {'beta': '2/5', 'w L constant': True, 'L ratios': ['7/3'], 'expected ratio': '7/3', 'invariant': '5', 'first L': '5/3', 'last L = first L * ratio^(bounces - 1)': True}
+D elapsed_ms=65 {'beta': '-1/3', 'w L constant': True, 'L ratios': ['1/2'], 'expected ratio': '1/2', 'invariant': '9/4', 'first L': '3/4', 'last L = first L * ratio^(bounces - 1)': True}
+E elapsed_ms=65 {'|Gamma| = 1 and Gamma^-1 dGamma/dx = -2i/(1+x^2)': True, 'delay at x = 0, units L/Z0': '2'}
+fail elapsed_ms=65 []
