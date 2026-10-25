@@ -22,9 +22,10 @@ The media are interleaved so that each keeps its share along the passage: the ne
 taken from the medium furthest behind its share, so every stream the tower cuts holds all three.
 
 Written: `train.classes`, `dev.classes` and per medium `{text,digit,sound}.{train,dev}.classes`
-(the siblings); `dev.roles` (one byte a class: 0 GSM8K, 1 stroke, 2 half-cycles, 3 the numerals and
-transcripts paired with an image or sound); `dev.marks` (one byte a class, for `read-tower-classes`:
-1 a held-out label numeral read after its image, 2 a GSM8K answer, 3 a GSM8K question, 4 a
+(the siblings), each with its `.roles` (one byte a class: 0 GSM8K, 1 stroke, 2 half-cycles, 3 the
+numerals and transcripts paired with an image or sound) and `.marks` (one byte a class, for
+`read-tower-classes` and `read-tower-classes-at`:
+1 a label numeral read after its image, 2 a GSM8K answer, 3 a GSM8K question, 4 a
 transcript read after its sound, 5 a stroke, 6 a half-cycle octet, 7 an end letter, 8 a numeral or
 transcript heard before its image or sound); the prompts (`prompts.*.classes`), and
 `MANIFEST.json` with every input's and output's SHA-256.
@@ -168,15 +169,13 @@ def main(argv):
     for side, media in (("train", media_train), ("dev", media_dev)):
         classes, roles, marks = flat(interleave(media))
         write(f"{side}.classes", classes_bytes(classes))
-        if side == "dev":
-            write("dev.roles", bytes(roles))
-            write("dev.marks", bytes(marks))
+        write(f"{side}.roles", bytes(roles))
+        write(f"{side}.marks", bytes(marks))
         for m, secs in media.items():
             c, r, k = flat(secs)
             write(f"{m}.{side}.classes", classes_bytes(c))
-            if side == "dev":
-                write(f"{m}.dev.roles", bytes(r))
-                write(f"{m}.dev.marks", bytes(k))
+            write(f"{m}.{side}.roles", bytes(r))
+            write(f"{m}.{side}.marks", bytes(k))
     # Prompts: each a source passage and its end letter; the tower writes until its end letter.
     prompts = {
         "text": [s[0][: s[0].index(END) + 1] for s in text_dev[: cfg["prompts"]["text"]]],

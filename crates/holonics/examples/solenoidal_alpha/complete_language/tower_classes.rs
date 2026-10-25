@@ -81,6 +81,9 @@ pub(super) fn read(args: &[String]) -> Result<()> {
     if marks.len() != classes.len() || marks.iter().any(|&m| m as usize >= MARK_NAMES.len()) {
         return Err("the mark file does not name one mark for each class".into());
     }
+    if classes.is_empty() {
+        return Err("an empty passage has nothing to read".into());
+    }
     let streams = positive(&args[7])?;
     let chunk = classes.len().div_ceil(streams);
     let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
@@ -138,6 +141,74 @@ pub(super) fn read(args: &[String]) -> Result<()> {
         println!("CLASSES_LABELS reads={} named_right={} confusion(arrived:named 0..9,other) {}", labels.len(), labels.iter().filter(|(a, t)| a == t).count(), rows.join(" "));
     }
     println!("CLASSES_READ_DONE cells={} elapsed_ms={}", classes.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// `read-tower-classes-at STATE STATE_SHA CLASSES CLASSES_SHA MARKS MARKS_SHA MARK STREAMS OUT`: the
+/// cells of the class passage at which a class of mark `MARK` arrives, each read as `read-tower-classes`
+/// reads it (the passage cut into `STREAMS` parts, each from rest), written to OUT (created, never
+/// overwritten) in passage order, little-endian: the class that arrives (`u32`), the top face the
+/// readout reads there (`width` × `i32`, on `2^(−16)`), then every level's carried modes after the
+/// cell's step (`levels` × `modes` × (re, im) `i64`, the state's own grain). An exterior reading of
+/// what the frozen tower's state holds where a landmark marks; nothing in it enters the tower.
+pub(super) fn read_at(args: &[String]) -> Result<()> {
+    if args.len() != 10 {
+        return Err("read-tower-classes-at STATE STATE_SHA CLASSES CLASSES_SHA MARKS MARKS_SHA MARK STREAMS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
+    let marks = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    if marks.len() != classes.len() || marks.iter().any(|&m| m as usize >= MARK_NAMES.len()) {
+        return Err("the mark file does not name one mark for each class".into());
+    }
+    if classes.is_empty() {
+        return Err("an empty passage has nothing to read".into());
+    }
+    let mark: u8 = args[7].parse()?;
+    if mark as usize >= MARK_NAMES.len() {
+        return Err("MARK names no mark".into());
+    }
+    let streams = positive(&args[8])?;
+    let out = Path::new(&args[9]);
+    if out.exists() {
+        return Err("OUT exists: the cells are written create-new".into());
+    }
+    let chunk = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
+    let parts: Vec<(Vec<u8>, usize)> = starts
+        .par_iter()
+        .map(|&start| {
+            let part = &classes[start..(start + chunk).min(classes.len())];
+            let (mut records, mut cells, mut state) = (Vec::new(), 0usize, tower.rest());
+            for i in 0..part.len().saturating_sub(1) {
+                if marks[start + i + 1] != mark {
+                    tower.advance(&mut state, part[i]).map_err(|e| e.to_string())?;
+                    continue;
+                }
+                // The one step at a marked cell, read through the ring reading for its top face.
+                tower
+                    .read_ring(&mut state, &part[i..i + 2], |_, top, _, _| {
+                        records.extend((part[i + 1] as u32).to_le_bytes());
+                        top.iter().for_each(|v| records.extend(v.to_le_bytes()));
+                        Ok(())
+                    })
+                    .map_err(|e| e.to_string())?;
+                state.modes.iter().flatten().for_each(|&(re, im)| {
+                    records.extend(re.to_le_bytes());
+                    records.extend(im.to_le_bytes());
+                });
+                cells += 1;
+            }
+            Ok((records, cells))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let cells: usize = parts.iter().map(|p| p.1).sum();
+    let written: Vec<u8> = parts.into_iter().flat_map(|p| p.0).collect();
+    write_new(out, &written)?;
+    let d = &tower.declaration;
+    println!("CLASSES_AT mark={} cells={cells} width={} levels={} modes={} elapsed_ms={}", MARK_NAMES[mark as usize], d.width, d.levels, d.modes, started.elapsed().as_millis());
     Ok(())
 }
 

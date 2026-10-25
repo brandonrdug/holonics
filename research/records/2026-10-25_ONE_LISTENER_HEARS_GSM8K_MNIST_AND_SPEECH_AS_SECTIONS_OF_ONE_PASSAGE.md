@@ -76,7 +76,7 @@ compressed with and without the held-out file after it (`BASELINES.txt`).
 | Held-out medium | Listener, 1 pass | Sibling, 1 pass | Listener, 4 passes | Sibling, 4 passes | xz | bzip2 |
 |---|---|---|---|---|---|---|
 | GSM8K | 2.884 | 2.795 | 2.689 | 2.572 | 2.147 | 2.238 |
-| MNIST | 3.105 | 3.069 | 3.084 | 2.984 | 3.684 | 3.684 |
+| MNIST | 3.129 | 3.069 | 3.084 | 2.984 | 3.684 | 3.684 |
 | Speech | 3.442 | 2.915 | 3.270 | 2.820 | 3.219 | 3.429 |
 
 - **No transfer at equal width.** The listener codes every medium above its sibling. After four
@@ -117,16 +117,45 @@ The three tracks need the same link: a target read from its source (an answer fr
 a label from its image, a transcript from its utterance). The listener hears each medium's form,
 and below xz on two of the three. The link is absent where it can be read most cleanly: the
 label is 0.6% of the digits' classes, and the face at it is not better than a uniform numeral.
-Whether the state at the label still carries the image is the next loop's question. A readout
-founded at the label cells (the landmark says where to look, never what to find,
-`hnn.tower-ring-founding`) answers it. If held-out images are named above chance, the state
-carries the picture and the deposits do not reach the label. If they are not, the state does not
-carry it over the image's 168 classes.
+
+## The state at the label
+
+Whether the state at the label still carries the image decides where the link breaks.
+`read-tower-classes-at` reads the frozen tower over a passage as `read-tower-classes` does and
+writes, at every cell where a label arrives after its image, the top face the readout reads (64
+integers on `2^(−16)`) and every level's carried modes (2 × 64 complex). There are 1,500 such
+training cells (every other image of `0..2999`) and the 500 held-out. `tools/listener/probe.py`
+fits exact exterior probes on the training cells (no floats; nothing returns to the tower) and
+names the held-out labels. The foil is the same probe on the stroke chart itself, drawn back to its
+raster and pooled to 7 × 7. Held-out labels named, of 500 (chance 50, the commonest label 54):
+
+| Read at the label | Digit sibling | Listener |
+|---|---|---|
+| The tower's own face (its largest class) | 52 | 38 |
+| Top face, nearest class mean | 99 | 71 |
+| Top face, each coordinate scaled by its within-label scatter | 103 | 72 |
+| Top face, pooled covariance | 76 | 68 |
+| Carried modes, nearest class mean / scaled | 103 / 111 | 97 / 92 |
+| The modes' energies (blind to phase), nearest class mean / scaled | 102 / 108 | 105 / 103 |
+| Foil: the stroke chart drawn back, nearest class mean / scaled | 377 / 383 | 377 / 383 |
+
+- **The state keeps little of the picture.** At best the sibling's state names 111 held-out
+  labels and the listener's 105, about twice chance, where the same probe names 383 from the chart
+  both towers heard. The image's roughly 168 classes do not survive to its end letter.
+- **The readout loses a little, the state most.** The sibling's top face shows almost what its
+  state keeps (103 against 111); the listener's face shows less (72 against 105).
+- So a readout founded at the label cannot name the digit: what it would read is not there. The
+  next loop is a section's memory, on all three media at once, since an answer needs its question
+  and a transcript its utterance in the same way. The existing route is a ring founded at section
+  arrivals, whose state is the phase-carried moment of its drive (`hnn.ring-moment-keys`,
+  `hnn.tower-ring-founding`), read at the end letter by this probe beside the chart's 383.
 
 ## The recorded failures this step could repeat
 
 - **A task's routine standing in for learning.** The charts are boundary codecs and the renderer
-  is an exterior reading; nothing computes a label, an answer or a transcript.
+  is an exterior reading; nothing computes a label, an answer or a transcript. The probe is
+  fitted outside the tower and never handed to it: it measures what the state holds, and no
+  label it names is counted as the machine's.
 - **Text as the exception.** Text, image (a pen's strokes: a motor chart) and sound enter as the
   same object, sections of one class passage, and the route has no modality branch.
 - **Seen material graded as unseen.** The held-out images are disjoint from the training range,
@@ -142,8 +171,9 @@ carry it over the image's 168 classes.
 `2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE_receipts/`:
 `RUNS.txt` (every training run's passes and measure lines), `READS.txt` (held-out reads by mark,
 label confusions), `RELEASES.txt` (each release's prompt length and code, its length and whether
-it ended), `BASELINES.txt` (conditional xz and bzip2, PNG and FLAC context), `MANIFEST.json` (the
-composition's configuration, inputs and written files with their SHA-256).
+it ended), `BASELINES.txt` (conditional xz and bzip2, PNG and FLAC context), `PROBE.txt` (the reads
+at the label with their times and digests, and every probe's training and held-out counts),
+`MANIFEST.json` (the composition's configuration, inputs and written files with their SHA-256).
 
 Times (projection → measured):
 
@@ -155,3 +185,6 @@ Times (projection → measured):
 - Three more passes one tower at a time: composed 786 → 775.3 s, GSM8K 279 → 278.9 s, MNIST
   293 → 291.0 s, speech 213 → 199.2 s. Peak resident set 163,252 KiB.
 - Reads took 3.4 to 5.7 s each and releases at most 14.2 s.
+- The reads at the label, projected from 0.068 ms a class on 4 threads (deadlines 35, 15, 95 and
+  15 s), took 21.3, 3.7, 62.3 and 9.9 s for the top face, and 32.0, 5.2, 89.5 and 13.9 s with the
+  modes (class by class). The passage's training read came to 89.5 of its 95 s (0.94).
