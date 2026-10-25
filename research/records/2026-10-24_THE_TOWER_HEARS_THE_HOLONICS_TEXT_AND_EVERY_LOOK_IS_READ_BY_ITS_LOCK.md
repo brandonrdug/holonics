@@ -2399,7 +2399,7 @@ rank's own, and the build is the machine's ranked founding with gated rings.
 
 - The first state reads failed in their filter: a state on `2^(−24)` passes 32 bits. They were rerun with
   the rows kept as 64-bit integers, under the same deadline.
-- `BLIND_PUSH.py` ran past its projection (rounds took 16 to 19 s against 15). It stayed inside its
+- `BLIND_PUSH.py` ran past its projection (its first run's rounds took 16 to 19 s and its second's, read at every cell, 19 to 23 s, against 15). It stayed inside its
   deadline and is reported complete.
 
 ## Plural ranks find the sum's operand, and a received landmark is communication
@@ -2441,6 +2441,132 @@ The fixed bar and its cell `B` do not move.
 **The run.** `PLURAL_RANKS.py` was projected at about 270 s (deadline 500 s) and took 258.0 s (0.96;
 peak 4.33 GiB).
 
+## The machine founds the units' ring at a received landmark
+
+The last section handed the ring its pool, the character `χ₁` of the arriving digit: a table of the
+digits' values. Here the pool is founded blind over every arriving class, first outside the machine
+and then by the machine itself.
+
+**From the unit, the blind pool stays on the digits' common push** (`BLIND_POOL.py`,
+`PLURAL_POOL.py`). The form `a`, the pool `b` over every arriving class and the push gate `g` are
+founded in turn from the unit pool (every class alike), read after `=` on a sum's line. The pool's
+power over the characters of the digits' ring (an exterior read; the founding never sees a digit's
+value) sits at `k=0`, 0.98 to 1.00, at every round and in every rank, and the held-out units at `B`
+read 40 to 52 (three ranks: 49, 34, 37). The unit is a fixed point of the alternation, as it was for
+the form before the ring start.
+
+**The classes' coupling has the digits' ring as a mode** (`POOL_SEED.py`, `POOL_SEEDS.py`). After
+the common read `W̄ = S⁻¹Σ_u M_u`, each class keeps the tension it moves beyond what the state says
+for every class alike, `M̃_u = M_u − S_u W̄`, and two classes couple by how alike those are,
+`K_uv = tr(S⁻¹ M̃_u Y⁻¹ M̃_vᵀ)/√(n_u n_v)`, read over every arriving class with no digit named. Its
+third mode sits on the digits (0.999) and on the ring's first character and its mirror, `χ₁` and
+`χ₉`, at 0.44 each. Its other leading modes sit on the line's marks (newline, the operations, `=`).
+Each mode as a pool start, three rounds, read after `=` on a sum's line:
+
+| start | share (circular) | the pool's power on the digits | held out, units at `B` |
+|---|---|---|---|
+| the unit | 0.399 | 0.663 | 49 |
+| `K` mode 1 | 0.476 | 0.020 | 49 |
+| `K` mode 2 | 0.567 | 0.004 | 44 |
+| `K` mode 3 | 0.274 | 0.988 (`χ₁` 0.70) | 116 |
+| `K` mode 4 | 0.407 | 0.013 | 51 |
+
+From mode 3 the founding stays on the digits and turns towards `χ₁`. Its share is the smallest, so
+the pool law (keep the larger share) would not keep it.
+
+**The digits' ring is a basin, and the landmark's breadth decides who leads** (`POOL_REACH.py`).
+- *Longer*: from mode 3 for eight rounds, read after `=`, the pool turns to `χ₁` (0.55, 0.64, 0.70,
+  0.76, 0.83, 0.90, 0.95, 0.97), the gate comes to carry a sum's second operand (0.32), and the
+  held-out units climb 112, 96, 115, 125, 130, 163, 215, 266 and close at 296, still rising. Its
+  share closes at 0.324, below the line-mark forms' 0.40 to 0.57.
+- *At the units cell*: the landmark after `=` marks about four cells a line, and the result's units
+  are news at one of them. Marked at the sums' units cell alone (the cell that codes the result's
+  units; the landmark marks where, never what), three rounds:
+
+| start | share (circular) | pool | its gate carries a sum's second operand | held out, units at `B` |
+|---|---|---|---|---|
+| the unit | 0.486 | `k=0` 1.00 | 0.003 | 42 |
+| `K` mode 2 | 0.378 | `k=0` 0.96 | 0.103 | 53 |
+| `K` mode 3 | **0.827** | `χ₉` 0.99 | 0.351 | **391** |
+
+At the units cell the digits' ring is the loudest form the cell holds, so the pool law keeps it and
+it reads 391. `χ₉` is `χ₁`'s mirror, the same ring turned the other way, and the probe reads both.
+After `=` the line's marks were louder only because that landmark marks the line's end as well.
+
+**The machine's founding** (`found-tower-ring`, [`tower_ring.rs`](../../crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs)).
+The machine now does what the exterior reads did:
+- **The ring** rides placement mode 41's own moves. The tower's reverse now returns each mode's move
+  at every cell beside the input covector (`InputCovector::moves`).
+- **The push** is `(aᵀŝ)(bᵀx̂)(gᵀx)`. The pool `b` is founded over the present classes and returned
+  as its least-norm factor over `x̂`.
+- **The starts** are the unit and the classes' coupling `K`'s four leading modes, all computed in the
+  machine. Each start is founded for three rounds of `a`, `b`, `g` and a closing `a`, and the start
+  whose form gives the larger exact share is kept.
+- **The reading cells** are where a received landmark stream marks (`tools/landmarks.py sum-units`:
+  one byte per byte of the text, set at each `digits+digits=digits` line's units cell).
+
+The build met three repairs, each found by a development read on one block (27k cells, 1,146 marked):
+- The exact inverse of the step's 256-column Gram took 95 s of a 99 s step. The search now inverts a
+  released copy, scaled so the Gram's diagonal has one width, with the inverse's identity held at
+  the Gram's own width. On `[Q | I]` the first release of a row kept almost none of the inverse's
+  digits, and the first step's share fell to 140 thousandths. With the identity at the Gram's width
+  it is 528, which is what the exact inverse gives.
+- Three founded factors, each bounded over the passage, left 128 bits. Each factor's value is now
+  released to below `2^40` at its own bound before the product, so the push is formed exactly
+  whatever widths the founding gives the factors. A founded direction is kept as wide as it needs
+  inside the 64-bit word, not released to `2^15` after its balancing.
+- The tower was read again for every pass (4.7 s of a 4.8 s step). The survey now keeps one reading
+  of each stream, and a pass carries the rings over it (0.3 to 1.2 s on one block, 0.5 to 6.4 s on
+  the whole text).
+
+**The founding on the training text** (216,131 cells, 9,018 sums' units cells marked, two ranks, 380 s):
+
+| rank | start | circular share at its last step | exact share, all ranks' channels |
+|---|---|---|---|
+| 0 | the unit | 0.485 | 0.632 |
+| 0 | `K` mode 1 | 0.581 | 0.624 |
+| 0 | `K` mode 2 | 0.375 | 0.519 |
+| 0 | `K` mode 3 (kept) | **0.825** | **1.634** |
+| 0 | `K` mode 4 | 0.803 | 1.590 |
+| 1 | the unit | 0.435 | 2.149 |
+| 1 | `K` mode 1 (kept) | 0.630 | **2.303** |
+| 1 | `K` mode 2 | 0.617 | 2.302 |
+| 1 | `K` mode 3 | 0.317 | 2.068 |
+| 1 | `K` mode 4 | 0.608 | 2.261 |
+
+The exact share counts both faces of each rank as channels, so two ranks can reach 4. The machine's
+pool law keeps the digits'-ring start, as the exterior founding did (0.825 against 0.827).
+
+**The acceptance passes** (`read-tower-situated` at every sum's `B` cell of the training text and of
+the held-out text, then `tools/tower_modes.py probe --ops +`). The fixed bar was at least 370 of the
+495 held-out sums' units read at `B`, the cell where the second operand's units arrive.
+
+| founded forms | held out, units at `B` (commonest 63) | the first operand's units (62) | the second's (57) |
+|---|---|---|---|
+| rank 0, the digits' ring | **391** | 52 | 53 |
+| ranks 0 and 1 | **390** | 65 | 86 |
+
+The claim, with its landmark named: **the machine's own founding, reading where a received landmark
+marks the sums' units cells of the training text, founds a form whose instant value at `B` reads a
+held-out sum's units in 391 of 495.** The landmark marks where to look on the training text alone.
+The held-out text carries no marker, and its read at `B` is a cell the landmark never marks: the
+form there has not heard the result, and reads it from the operands it carries. No value of the
+text enters the founding: the landmark is placed from each line's shape (`digits+digits=digits`),
+and the founding meets the arriving digit only through the tower's own encoding. The pool was
+founded over every arriving class from the classes' own coupling, and the unit start, the line-mark
+starts and the digits' ring were weighed by the same pool law. The second rank adds nothing to the units (390): its pool sits on the line's marks.
+
+**What it says** [agent-inferred]:
+- The step's acceptance is met by the machine, not by an exterior fit. The exterior founding at the
+  same landmark read 391 too.
+- The landmark's grain decided the founding more than the law did. After `=` the line's end is news
+  at three of four marked cells, and the pool law kept the line-mark forms that carry it. At the
+  units cell, the units are the news, and the same law keeps the digits' ring.
+
+**The runs.** Each development read and the founding are in `RUNS.tsv`. The founding was projected
+at about 1,150 s (the largest pass measured on one block, 1.245 s, times the 8.01 times as many
+cells) with a 1,300 s deadline. It took 380.1 s (0.33), peak 646 MiB.
+
 ## The recorded failures this step could repeat
 
 - **Text run on its codec's grain as the exception.** This is the failure this step exposed: a
@@ -2454,7 +2580,8 @@ peak 4.33 GiB).
   and unmet lines, and no held-out text line is met verbatim.
 - **Catered machinery.** Nothing in the tower names a medium. The media are an exterior partition of
   the held-out text, and the moment byte was a declared exterior choice, which this step retires as
-  the moment.
+  the moment. The ring founding's landmark is received material placed from each line's shape: it says
+  where a sum's units are coded, hands no value, and marks nothing on the held-out text.
 - **A refusal answered with a larger limit.** The plain run stopped at its bound. It was continued
   under the largest measured pass, its own measurement, and reported here as stopped. The pair
   tower's foil stopped at its bound too. It is read at the state it reached and not continued.
@@ -2464,7 +2591,9 @@ peak 4.33 GiB).
   its first block, 1.001 of a bound that took the largest measured block alone. It was relaunched
   with a changed declared read, not a raised one: the projection takes every block measured before
   the launch (the stopped launch's among them), their largest plus their largest spread, as the stop
-  rule's measured spread asks. The stop is reported here, and its log kept.
+  rule's measured spread asks. The stop is reported here, and its log kept. The ring founding's
+  refusal (three founded factors bounded together past 128 bits) was answered by a changed law,
+  each factor released at its own bound before the product, not by a wider carrier.
 - **An index of contexts counted as learning.** The pair face is carried at every pair. Which pairs
   the training text met is read only outside the machine, to split the held-out reading.
 - **An authored routine standing in for learning.** The located moment is the passage tree's lock, a
@@ -2578,6 +2707,13 @@ In [the receipts](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS
   `BLIND_PUSH.{py,txt}` and `GATED_PUSH_FREE_READ.{py,txt}` (run from the run directory; each takes
   the scripts it loads as its arguments, as its docstring names them).
 - The plural ranks: `PLURAL_RANKS.{py,txt}` (run the same way).
+- The blind pool and its starts: `BLIND_POOL.{py,txt}`, `PLURAL_POOL.{py,txt}`, `POOL_SEED.{py,txt}`,
+  `POOL_SEEDS.{py,txt}`, and `POOL_REACH.py` with `POOL_REACH_long.txt` and `POOL_REACH_U.txt` (run
+  the same way, each taking the scripts its docstring names).
+- The machine's ring founding: the development reads on one block `RING_BLOCK0_ring{1,2,3,4,5}.txt`,
+  the founding on the training text `RING_FOUND.txt` and its forms `RING_FORMS.txt`, and the
+  acceptance `RING_ACCEPT.txt` (the reads' receipt lines and the probes; the reads stay outside the
+  repository). The landmarks are `tools/landmarks.py sum-units` over each text.
 - `READS.txt`: every read's and writing's receipt lines (moments located, looks spent and settled,
   SHA-256 of `LOOKS.tsv` and `LINES.tsv`, wall time, peak).
 
@@ -2596,4 +2732,6 @@ circuit readings use `circuit1` (`604a10c8…`), and the mode readings `modes1` 
 (`6b4b79b5…`, the code-weighted), `situated4` (`6a20bb33…`, the covector reads), `situated5`
 (`0cdf49dd…`, the warm start, the sixteen forms and their reads), `situated6` (`fa381fdc…`, the
 resume), `situated7` (`25f4309f…`, the complex forms, their reads and the modes at the sums' cells)
-and `situated8` (`1abd5ebb…`, the mode covectors, every cell's reads and the state reads).
+and `situated8` (`1abd5ebb…`, the mode covectors, every cell's reads and the state reads). The ring
+founding uses `ring1` to `ring5` (its development builds, in order) and `ring5` (`c2801523…`) for the
+founding on the training text and the acceptance reads.

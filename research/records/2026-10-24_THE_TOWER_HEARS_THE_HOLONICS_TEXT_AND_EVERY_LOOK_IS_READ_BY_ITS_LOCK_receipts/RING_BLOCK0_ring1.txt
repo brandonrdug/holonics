@@ -1,0 +1,5 @@
+RING_PASS cells=26998 marked=1146 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=4478
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=15618
+RING_STEP rank=0 start=unit step=0 factor=A circular_permille=528 pass_ms=95082 elapsed_ms=110702
+RING_START rank=0 start=unit exact_share_permille=898 elapsed_ms=114871
+MEASURE exit=deadline wall_s=180.1 peak_rss_kib=570120

@@ -1,0 +1,60 @@
+RING_PASS cells=26998 marked=1146 streams=4 section=128 level=0 mode=41 rho_on_2^-30=1073275308 largest_state=10669037 largest_covector=874451759 read_ms=4969
+RING_STARTS coupling_modes=4 classes=15 elapsed_ms=16952
+RING_STEP rank=0 start=unit step=0 factor=A circular_permille=528 pass_ms=1083 elapsed_ms=18037
+RING_STEP rank=0 start=unit step=1 factor=B circular_permille=536 pass_ms=334 elapsed_ms=18374
+RING_STEP rank=0 start=unit step=2 factor=G circular_permille=565 pass_ms=466 elapsed_ms=18841
+RING_STEP rank=0 start=unit step=3 factor=A circular_permille=595 pass_ms=867 elapsed_ms=19710
+RING_STEP rank=0 start=unit step=4 factor=B circular_permille=601 pass_ms=449 elapsed_ms=20166
+RING_STEP rank=0 start=unit step=5 factor=G circular_permille=613 pass_ms=592 elapsed_ms=20759
+RING_STEP rank=0 start=unit step=6 factor=A circular_permille=624 pass_ms=938 elapsed_ms=21698
+RING_STEP rank=0 start=unit step=7 factor=B circular_permille=628 pass_ms=332 elapsed_ms=22033
+RING_STEP rank=0 start=unit step=8 factor=G circular_permille=635 pass_ms=460 elapsed_ms=22494
+RING_STEP rank=0 start=unit step=9 factor=A circular_permille=642 pass_ms=761 elapsed_ms=23256
+RING_START rank=0 start=unit exact_share_permille=960 elapsed_ms=23605
+RING_STEP rank=0 start=coupling_mode_1 step=0 factor=A circular_permille=504 pass_ms=1245 elapsed_ms=24853
+RING_STEP rank=0 start=coupling_mode_1 step=1 factor=B circular_permille=515 pass_ms=341 elapsed_ms=25197
+RING_STEP rank=0 start=coupling_mode_1 step=2 factor=G circular_permille=754 pass_ms=511 elapsed_ms=25709
+RING_STEP rank=0 start=coupling_mode_1 step=3 factor=A circular_permille=832 pass_ms=1096 elapsed_ms=26807
+RING_STEP rank=0 start=coupling_mode_1 step=4 factor=B circular_permille=836 pass_ms=416 elapsed_ms=27226
+RING_STEP rank=0 start=coupling_mode_1 step=5 factor=G circular_permille=851 pass_ms=499 elapsed_ms=27726
+RING_STEP rank=0 start=coupling_mode_1 step=6 factor=A circular_permille=805 pass_ms=817 elapsed_ms=28545
+RING_STEP rank=0 start=coupling_mode_1 step=7 factor=B circular_permille=811 pass_ms=417 elapsed_ms=28966
+RING_STEP rank=0 start=coupling_mode_1 step=8 factor=G circular_permille=836 pass_ms=543 elapsed_ms=29510
+RING_STEP rank=0 start=coupling_mode_1 step=9 factor=A circular_permille=850 pass_ms=1018 elapsed_ms=30530
+RING_START rank=0 start=coupling_mode_1 exact_share_permille=1046 elapsed_ms=30856
+RING_STEP rank=0 start=coupling_mode_2 step=0 factor=A circular_permille=603 pass_ms=990 elapsed_ms=31847
+RING_STEP rank=0 start=coupling_mode_2 step=1 factor=B circular_permille=612 pass_ms=300 elapsed_ms=32150
+RING_STEP rank=0 start=coupling_mode_2 step=2 factor=G circular_permille=763 pass_ms=389 elapsed_ms=32541
+RING_STEP rank=0 start=coupling_mode_2 step=3 factor=A circular_permille=817 pass_ms=933 elapsed_ms=33476
+RING_STEP rank=0 start=coupling_mode_2 step=4 factor=B circular_permille=820 pass_ms=356 elapsed_ms=33835
+RING_STEP rank=0 start=coupling_mode_2 step=5 factor=G circular_permille=835 pass_ms=468 elapsed_ms=34305
+RING_STEP rank=0 start=coupling_mode_2 step=6 factor=A circular_permille=844 pass_ms=977 elapsed_ms=35283
+RING_STEP rank=0 start=coupling_mode_2 step=7 factor=B circular_permille=845 pass_ms=444 elapsed_ms=35733
+RING_STEP rank=0 start=coupling_mode_2 step=8 factor=G circular_permille=852 pass_ms=537 elapsed_ms=36271
+RING_STEP rank=0 start=coupling_mode_2 step=9 factor=A circular_permille=861 pass_ms=1047 elapsed_ms=37321
+RING_START rank=0 start=coupling_mode_2 exact_share_permille=995 elapsed_ms=37676
+RING_STEP rank=0 start=coupling_mode_3 step=0 factor=A circular_permille=503 pass_ms=871 elapsed_ms=38548
+RING_STEP rank=0 start=coupling_mode_3 step=1 factor=B circular_permille=517 pass_ms=426 elapsed_ms=38977
+RING_STEP rank=0 start=coupling_mode_3 step=2 factor=G circular_permille=560 pass_ms=454 elapsed_ms=39433
+RING_STEP rank=0 start=coupling_mode_3 step=3 factor=A circular_permille=588 pass_ms=860 elapsed_ms=40294
+RING_STEP rank=0 start=coupling_mode_3 step=4 factor=B circular_permille=594 pass_ms=378 elapsed_ms=40676
+RING_STEP rank=0 start=coupling_mode_3 step=5 factor=G circular_permille=606 pass_ms=442 elapsed_ms=41119
+RING_STEP rank=0 start=coupling_mode_3 step=6 factor=A circular_permille=615 pass_ms=768 elapsed_ms=41889
+RING_STEP rank=0 start=coupling_mode_3 step=7 factor=B circular_permille=618 pass_ms=375 elapsed_ms=42268
+RING_STEP rank=0 start=coupling_mode_3 step=8 factor=G circular_permille=626 pass_ms=438 elapsed_ms=42707
+RING_STEP rank=0 start=coupling_mode_3 step=9 factor=A circular_permille=633 pass_ms=778 elapsed_ms=43487
+RING_START rank=0 start=coupling_mode_3 exact_share_permille=905 elapsed_ms=43840
+RING_STEP rank=0 start=coupling_mode_4 step=0 factor=A circular_permille=495 pass_ms=1140 elapsed_ms=44982
+RING_STEP rank=0 start=coupling_mode_4 step=1 factor=B circular_permille=527 pass_ms=430 elapsed_ms=45417
+RING_STEP rank=0 start=coupling_mode_4 step=2 factor=G circular_permille=649 pass_ms=516 elapsed_ms=45934
+RING_STEP rank=0 start=coupling_mode_4 step=3 factor=A circular_permille=701 pass_ms=873 elapsed_ms=46808
+RING_STEP rank=0 start=coupling_mode_4 step=4 factor=B circular_permille=708 pass_ms=329 elapsed_ms=47141
+RING_STEP rank=0 start=coupling_mode_4 step=5 factor=G circular_permille=724 pass_ms=474 elapsed_ms=47616
+RING_STEP rank=0 start=coupling_mode_4 step=6 factor=A circular_permille=736 pass_ms=776 elapsed_ms=48394
+RING_STEP rank=0 start=coupling_mode_4 step=7 factor=B circular_permille=740 pass_ms=355 elapsed_ms=48752
+RING_STEP rank=0 start=coupling_mode_4 step=8 factor=G circular_permille=747 pass_ms=440 elapsed_ms=49193
+RING_STEP rank=0 start=coupling_mode_4 step=9 factor=A circular_permille=754 pass_ms=817 elapsed_ms=50012
+RING_START rank=0 start=coupling_mode_4 exact_share_permille=991 elapsed_ms=50357
+RING_RANK rank=0 channels=2 marked_cells=1146 exact_share_permille=1046 push_shift=80 read_shift=13 elapsed_ms=50358
+RING_WRITTEN forms=1 sha256=b2373ecf5a31f8df63958bf334447d36c42fa0886d6d912167785f333cce3d88 elapsed_ms=50361
+MEASURE exit=0 wall_s=50.4 peak_rss_kib=429204

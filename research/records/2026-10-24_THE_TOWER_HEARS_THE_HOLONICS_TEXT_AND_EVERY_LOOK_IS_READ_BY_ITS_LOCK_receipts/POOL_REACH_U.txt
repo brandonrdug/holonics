@@ -1,0 +1,17 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 31.6 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+every cell's state on the pool's grain; classes present 15
+K over 15 classes (0xa, *, +, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, =): leading eigenvalues 2.3419, 1.3930, 0.9584, 0.6232, 0.5769, 0.4288
+   mode 1: pool on the digits 0.000, over the characters k=0..9 0.93 0.01 0.01 0.02 0.00 0.00 0.00 0.02 0.01 0.01
+   mode 2: pool on the digits 0.094, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   mode 3: pool on the digits 0.999, over the characters k=0..9 0.00 0.44 0.05 0.01 0.00 0.00 0.00 0.01 0.05 0.44
+   mode 4: pool on the digits 0.003, over the characters k=0..9 0.62 0.18 0.01 0.00 0.01 0.00 0.01 0.00 0.01 0.18
+from the unit, read at the sums' U cells: pool on the digits 0.667, over the characters k=0..9 1.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+   from the unit, read at the sums' U cells, closing: share (circular) 0.4856; pool on the digits 0.704, over the characters k=0..9 1.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00; gate carries the second operand of a sum 0.003; holds chi_1(c0) at B 0.000, held out units at B 42 of 495 (156 s)
+from K's mode 2, read at the sums' U cells: pool on the digits 0.094, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   from K's mode 2, read at the sums' U cells, closing: share (circular) 0.3777; pool on the digits 0.100, over the characters k=0..9 0.96 0.01 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.02; gate carries the second operand of a sum 0.103; holds chi_1(c0) at B 0.000, held out units at B 53 of 495 (248 s)
+from K's mode 3, read at the sums' U cells: pool on the digits 0.999, over the characters k=0..9 0.00 0.44 0.05 0.01 0.00 0.00 0.00 0.01 0.05 0.44
+   from K's mode 3, read at the sums' U cells, closing: share (circular) 0.8271; pool on the digits 0.997, over the characters k=0..9 0.00 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.99; gate carries the second operand of a sum 0.351; holds chi_1(c0) at B 0.000, held out units at B 391 of 495 (333 s)
+done in 333.1 s
+MEASURE exit=0 wall_s=333.3 peak_rss_kib=4714948

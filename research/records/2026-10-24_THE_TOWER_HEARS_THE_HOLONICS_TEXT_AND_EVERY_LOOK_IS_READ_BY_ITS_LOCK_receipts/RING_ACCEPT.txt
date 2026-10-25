@@ -1,0 +1,27 @@
+The acceptance: read-tower-situated at each B cell (tools/tower_modes.py cells TEXT B), then tools/tower_modes.py probe --ops + TRAIN:READ -- HELD:READ.
+The landmarks: tools/landmarks.py sum-units over the training text (9018 cells marked) and over block 0 (1146).
+708a011d6b5cef5f8d1919cebfee72e6581c07ca23682ecea41bff7542b77152  modes/block.txt 216131 bytes
+f81192e2b455238d0d8bccbacc7fed5f77008c19c8a185749fa38b2671c1b73e  htext2/dev_arithmetic.txt 11998 bytes
+4bf091900e957b65a784bc0948e94d8471b89749756b9b9484d512894b7d200e  ring/block.units 216131 bytes
+261c6e0643a5f2ffc9330561ba583ff349e1cec87d161796920c8314f7af13fc  ring/block0.units 26998 bytes
+8269e5ee5be47ad7748447e95f5b0ff970deb3e292c5a57c3032c0fee9f801f0  ring/block.B.cells 146275 bytes
+8d7ed8fcdf1e635f94b259faebff804f525956420fae124eeee5851083d6aa0b  ring/dev.B.cells 6355 bytes
+009327339f94e1c175bdc42855f5c44c8fd78aab8469095568bfac27612226f1  ring/full_units.forms 10541 bytes
+92e6ef6c91f396731d2e1aa0d16a6c2d30306f5f76ab6440aff659c2f8c1d336  ring/full_units_r0.forms 5388 bytes
+4239e9071ee802ff2a6cab5a5a7f398f8e2a36ac61b4780877d97d39ea21c76a  ring/dev4_block0.forms 5394 bytes
+read full_units_r0_train.txt: 22551 cells, sha256 c3fe4ef1c37e04972b87c6a4b90717ce233fed5ec2c48061fdd00954367238b3 (FORMS lines), MEASURE exit=0 wall_s=66.5 peak_rss_kib=22192
+read full_units_r0_dev.txt: 1253 cells, sha256 51c54248a8e9a771a120dca39fcb49f55d3001467e6450a04facc9cf58fea5ba (FORMS lines), MEASURE exit=0 wall_s=3.8 peak_rss_kib=22132
+read full_units_train.txt: 22551 cells, sha256 451486b088c30e1087e1fbe484a49d664f6fe2c0aa325f83fb3a24e84a4759bd (FORMS lines), MEASURE exit=0 wall_s=65.8 peak_rss_kib=22016
+read full_units_dev.txt: 1253 cells, sha256 02778227c1a750c2309f133ed1a5e1fdb1f02efda0cf05983b71f6371fce799e (FORMS lines), MEASURE exit=0 wall_s=3.6 peak_rss_kib=22256
+read dev4_read_train.txt: 22551 cells, sha256 cb27b53529d25abd9263905a3b766c6de50dd4d0cd3e43097ac1895d78e490f9 (FORMS lines), MEASURE exit=0 wall_s=67.1 peak_rss_kib=22296
+read dev4_read_dev.txt: 1253 cells, sha256 493a380d0832f21e311994c01ce7c81213a282a237955870c625cdceb2133972 (FORMS lines), MEASURE exit=0 wall_s=3.7 peak_rss_kib=22160
+
+== forms ring/full_units_r0.forms
+probe: coordinates released by 2^14 (a state's to 2^-10 of its unit), ridge 1
++/B forms train=9018 dim=3 a0=52/495 (commonest 62) b0=53/495 (commonest 57) c0=391/495 (commonest 63)
+== forms ring/full_units.forms
+probe: coordinates released by 2^14 (a state's to 2^-10 of its unit), ridge 1
++/B forms train=9018 dim=5 a0=65/495 (commonest 62) b0=86/495 (commonest 57) c0=390/495 (commonest 63)
+== forms ring/dev4_block0.forms (one block's founding, ring4)
+probe: coordinates released by 2^14 (a state's to 2^-10 of its unit), ridge 1
++/B forms train=9018 dim=3 a0=53/495 (commonest 62) b0=67/495 (commonest 57) c0=51/495 (commonest 63)

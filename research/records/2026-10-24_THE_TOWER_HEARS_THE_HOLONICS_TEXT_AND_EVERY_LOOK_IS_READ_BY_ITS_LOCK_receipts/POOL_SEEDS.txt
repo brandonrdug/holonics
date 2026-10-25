@@ -1,0 +1,21 @@
+cells 215099, digit arrivals 147775, sums' B cells 8986; read in 30.4 s
+label cells: B pushes 8986, U reads 8986
+states (215099, 128); at the digit arrivals the state before the move against the situated pool's state: correlation 1.0000
+every cell's state on the pool's grain; classes present 15
+K over 15 classes (0xa, *, +, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, =): leading eigenvalues 2.3419, 1.3930, 0.9584, 0.6232, 0.5769, 0.4288
+   mode 1: pool on the digits 0.000, over the characters k=0..9 0.93 0.01 0.01 0.02 0.00 0.00 0.00 0.02 0.01 0.01
+   mode 2: pool on the digits 0.094, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   mode 3: pool on the digits 0.999, over the characters k=0..9 0.00 0.44 0.05 0.01 0.00 0.00 0.00 0.01 0.05 0.44
+   mode 4: pool on the digits 0.003, over the characters k=0..9 0.62 0.18 0.01 0.00 0.01 0.00 0.01 0.00 0.01 0.18
+from the unit: pool on the digits 0.667, over the characters k=0..9 1.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+   from the unit, closing: share (circular) 0.3989; pool on the digits 0.663, over the characters k=0..9 0.99 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00; gate carries the second operand of a sum 0.075; holds chi_1(c0) at B 0.000, held out units at B 49 of 495 (132 s)
+from K's mode 1: pool on the digits 0.000, over the characters k=0..9 0.93 0.01 0.01 0.02 0.00 0.00 0.00 0.02 0.01 0.01
+   from K's mode 1, closing: share (circular) 0.4759; pool on the digits 0.020, over the characters k=0..9 0.69 0.00 0.04 0.04 0.04 0.02 0.02 0.01 0.00 0.13; gate carries the second operand of a sum 0.017; holds chi_1(c0) at B 0.000, held out units at B 49 of 495 (210 s)
+from K's mode 2: pool on the digits 0.094, over the characters k=0..9 0.97 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.01
+   from K's mode 2, closing: share (circular) 0.5666; pool on the digits 0.004, over the characters k=0..9 0.59 0.13 0.00 0.03 0.04 0.01 0.00 0.04 0.02 0.14; gate carries the second operand of a sum 0.012; holds chi_1(c0) at B 0.001, held out units at B 44 of 495 (282 s)
+from K's mode 3: pool on the digits 0.999, over the characters k=0..9 0.00 0.44 0.05 0.01 0.00 0.00 0.00 0.01 0.05 0.44
+   from K's mode 3, closing: share (circular) 0.2741; pool on the digits 0.988, over the characters k=0..9 0.01 0.70 0.04 0.01 0.01 0.01 0.01 0.01 0.03 0.17; gate carries the second operand of a sum 0.147; holds chi_1(c0) at B 0.292, held out units at B 116 of 495 (364 s)
+from K's mode 4: pool on the digits 0.003, over the characters k=0..9 0.62 0.18 0.01 0.00 0.01 0.00 0.01 0.00 0.01 0.18
+   from K's mode 4, closing: share (circular) 0.4066; pool on the digits 0.013, over the characters k=0..9 0.82 0.00 0.03 0.00 0.01 0.02 0.00 0.00 0.02 0.09; gate carries the second operand of a sum 0.014; holds chi_1(c0) at B 0.000, held out units at B 51 of 495 (443 s)
+done in 442.7 s
+MEASURE exit=0 wall_s=442.9 peak_rss_kib=4737208
