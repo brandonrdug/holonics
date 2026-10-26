@@ -37,11 +37,13 @@ noncomputable def timeBoundary (r : ℝ) (A : ℂ) : ℂ :=
 
 /-- [proved-standard; formal-checked] The in-phase part is kept. -/
 theorem timeBoundary_re (r : ℝ) (A : ℂ) : (timeBoundary r A).re = A.re := by
-  simp [timeBoundary] <;> ring
+  simp [timeBoundary]
+  ring
 
 /-- [proved-standard; formal-checked] The quadrature part is scaled by `r`. -/
 theorem timeBoundary_im (r : ℝ) (A : ℂ) : (timeBoundary r A).im = r * A.im := by
-  simp [timeBoundary] <;> ring
+  simp [timeBoundary]
+  ring
 
 /-- [proved-standard; formal-checked] `α² − β² = r`. -/
 theorem alpha_sq_sub_beta_sq (r : ℝ) : ((1 + r) / 2) ^ 2 - ((1 - r) / 2) ^ 2 = r := by
@@ -65,10 +67,15 @@ theorem timeBoundary_nonexpansive {r : ℝ} (h0 : 0 ≤ r) (h1 : r ≤ 1) (A : �
 /-- [proved-standard; formal-checked] **Conjugation is time reversal:** the step commutes with it. -/
 theorem timeBoundary_conj (r : ℝ) (A : ℂ) :
     timeBoundary r (conj A) = conj (timeBoundary r A) := by
-  apply Complex.ext <;> simp [timeBoundary] <;> ring
+  apply Complex.ext
+  · simp only [timeBoundary_re, conj_re]
+  · simp only [timeBoundary_im, conj_im]
+    ring
 
 /-- [proved-standard; formal-checked] **The time mirror is `r = 0`:** only `Re A` is kept. -/
 theorem timeBoundary_zero (A : ℂ) : timeBoundary 0 A = (A.re : ℂ) := by
-  apply Complex.ext <;> simp [timeBoundary] <;> ring
+  apply Complex.ext
+  · simp [timeBoundary_re]
+  · simp [timeBoundary_im]
 
 end Holonics.Physics.TimeBoundary
