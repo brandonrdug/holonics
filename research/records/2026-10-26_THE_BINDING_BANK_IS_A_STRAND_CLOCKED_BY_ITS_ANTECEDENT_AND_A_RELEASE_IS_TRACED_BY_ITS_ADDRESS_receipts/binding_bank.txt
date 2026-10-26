@@ -1,0 +1,25 @@
+A  rung-box kernel K(d) = sum_{n<16} zeta_32^(n d)
+   K(0) = 16; zero at all 15 other grid differences; nonzero (= 2/(1 - zeta^d)) at all 16 off-grid differences
+   [part_a: 7 ms]
+B  16 bindings on the grid (keys a = 0, 2, ..., 30)
+   additive: every key reads its value exactly; rebinding key 0 reads old + new (superposed); the other 15 unchanged
+   delta   : every key reads its value exactly; rebinding key 0 reads the new value (overwrite); the other 15 unchanged
+   [part_b: 178 ms]
+C  an off-grid key leaks into a grid read
+   read at grid key a after writing v at a = 3: 16 (1 - zeta^(a-3)) vhat = 2 v exactly (a = 0, 2, 4, 8); the leak vanishes only when the turn locks on the grid
+   [part_c: 2 ms]
+D  recurrent = chunked (delta write, gate g, decay rho), on every partition
+   12 cells, keys on and off the grid, two repeated keys, dyadic g and rho: reads identical for partitions (12), (4,4,4), (5,7), (1 x 12), (3,9)
+   e.g. read at cell 5 (query 3): (-368135253480312045/144115188075855872)z^0 + (54757529701469595/576460752303423488)z^1 + ...
+   [part_d: 857 ms]
+E  antecedent clocking expresses in-context copying (reach only: keys hand-set here)
+   second pass of a six-class word: the read names the next class exactly at all 5 cells
+   '1 2 1 3', read at '1': additive names 2 and 3 together (plural); delta names 3 (the newer)
+   [part_e: 136 ms]
+F  the MQAR terrain (fixed before any run)
+   passage 0: 7 115 47 126 51 76 62 90 50 125 38 105 29 88 41 103 54 114 15 120 36 84 39 104 53 98 35 97 58 106 43 109 50 125 53 98 36 84 54 114 62 90 39 104 41 103 29 88 35 97 7 115 51 76 58 106 15 120 47 126 43 109 38 105
+   held-out passages 1,000,000..1,000,999 (64 cells each, answers at the 16 odd cells of the second half): sha256 67212eb0005aebb84d441a32b00567fac94b7d1a825836d7b847dfed1ae2f0d3
+   key 0 is bound to 63 different value classes across the held-out set (the largest share 10 of 244)
+   no held-out passage equals any of the first 1,000 training passages
+   [part_f: 170 ms]
+all checks hold
