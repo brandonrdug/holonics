@@ -64,11 +64,11 @@ def Binv : Matrix (Fin 2) (Fin 2) ℤ := !![2, -1; -1, 1]
 
 /-- [proved-standard; formal-checked] **The braid relation** `T L T = L T L`. -/
 theorem braid : T * L * T = L * T * L := by
-  simp [T, L, Matrix.mul_fin_two]
+  simp [T, L]
 
 /-- [proved-standard; formal-checked] **The quarter turn** `T L T = [[0,1],[−1,0]]`. -/
 theorem quarter_turn : T * L * T = !![0, 1; -1, 0] := by
-  simp [T, L, Matrix.mul_fin_two]
+  simp [T, L]
 
 /-- [proved-standard; formal-checked] The quarter turn squares to `−1`. -/
 theorem quarter_turn_sq : (T * L * T) * (T * L * T) = -1 := by
@@ -78,7 +78,7 @@ theorem quarter_turn_sq : (T * L * T) * (T * L * T) = -1 := by
 
 /-- [proved-standard; formal-checked] `T L = [[0,1],[−1,1]]`. -/
 theorem turn_eq : T * L = !![0, 1; -1, 1] := by
-  simp [T, L, Matrix.mul_fin_two]
+  simp [T, L]
 
 /-- [proved-standard; formal-checked] `T L` has trace `1`. -/
 theorem trace_turn : (T * L).trace = 1 := by
@@ -106,11 +106,11 @@ theorem orderOf_turn : orderOf (T * L) = 6 := by
 /-- [proved-standard; formal-checked] `L L⁻¹ = 1`. -/
 theorem L_mul_Linv : L * Linv = 1 := by
   rw [Matrix.one_fin_two]
-  simp [L, Linv, Matrix.mul_fin_two]
+  simp [L, Linv]
 
 /-- [proved-standard; formal-checked] **The cat map is `T L⁻¹`.** -/
 theorem cat_eq : T * Linv = A := by
-  simp [T, Linv, A, Matrix.mul_fin_two]
+  simp [T, Linv, A]
 
 /-- [proved-standard; formal-checked] The cat map has trace `3`: a boost. -/
 theorem trace_cat : A.trace = 3 := by
@@ -144,14 +144,13 @@ theorem cat_pow (k : ℕ) :
     ext i j
     fin_cases i <;> fin_cases j
     all_goals (try simp)
-    all_goals (try push_cast)
     all_goals ring
 
 /-- [proved-standard; formal-checked] For a `2 × 2` matrix, `det(M − 1) = det M − tr M + 1`. -/
 theorem det_sub_one_fin_two (M : Matrix (Fin 2) (Fin 2) ℤ) :
     (M - 1).det = M.det - M.trace + 1 := by
   rw [Matrix.det_fin_two, Matrix.det_fin_two, Matrix.trace_fin_two]
-  simp [Matrix.sub_apply, Matrix.one_apply]
+  simp [Matrix.sub_apply]
   ring
 
 /-- [proved-standard; formal-checked] **`det(A^(k+1) − 1) = 2 − L_(2k+2)`** with
@@ -183,16 +182,16 @@ theorem cat_counts :
 /-- [proved-standard; formal-checked] `A A⁻¹ = 1` and `B B⁻¹ = 1`. -/
 theorem A_mul_Ainv : A * Ainv = 1 := by
   rw [Matrix.one_fin_two]
-  simp [A, Ainv, Matrix.mul_fin_two]
+  simp [A, Ainv]
 
 theorem B_mul_Binv : B * Binv = 1 := by
   rw [Matrix.one_fin_two]
-  simp [B, Binv, Matrix.mul_fin_two]
+  simp [B, Binv]
 
 /-- [proved-standard; formal-checked] **Two boosts compose into a shear:**
 `A B A⁻¹ B⁻¹ = [[−7,6],[−6,5]]`. -/
 theorem boost_commutator : A * B * Ainv * Binv = !![-7, 6; -6, 5] := by
-  simp [A, B, Ainv, Binv, Matrix.mul_fin_two]
+  simp [A, B, Ainv, Binv]
 
 /-- [proved-standard; formal-checked] The commutator has trace `−2`: a shear. -/
 theorem trace_boost_commutator : (A * B * Ainv * Binv).trace = -2 := by

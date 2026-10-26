@@ -55,6 +55,7 @@ def fourier (ψ : AddChar (ZMod n) R) (f : ZMod n → R) : ZMod n → R :=
 def fourierBar (ψ : AddChar (ZMod n) R) (f : ZMod n → R) : ZMod n → R :=
   fun j => ∑ k, ψ (-(j * k)) * f k
 
+omit [NeZero n] [CommRing R] in
 theorem shift_unshift (f : ZMod n → R) : shift (unshift f) = f := by
   funext j
   simp [shift, unshift]
@@ -77,6 +78,7 @@ theorem fourier_clock (ψ : AddChar (ZMod n) R) (f : ZMod n → R) :
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [← mul_assoc, ← AddChar.map_add_eq_mul, add_mul, one_mul]
 
+omit [NeZero n] in
 /-- [proved-standard; formal-checked] **`Z X = ω X Z` with `ω = ψ(1)`.** -/
 theorem clock_shift (ψ : AddChar (ZMod n) R) (f : ZMod n → R) :
     clock ψ (shift f) = fun j => ψ 1 * shift (clock ψ f) j := by
@@ -120,6 +122,7 @@ theorem fourier_shift_iterate (ψ : AddChar (ZMod n) R) (s : ℕ) (f : ZMod n �
   | succ s ih =>
     rw [Function.iterate_succ_apply', Function.iterate_succ_apply', fourier_shift, ih]
 
+omit [NeZero n] in
 /-- [proved-standard; formal-checked] `(Zˢ f)(j) = ψ(j)ˢ f(j)`. -/
 theorem clock_iterate (ψ : AddChar (ZMod n) R) (s : ℕ) (f : ZMod n → R) :
     (clock ψ)^[s] f = fun j => ψ j ^ s * f j := by

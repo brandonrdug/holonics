@@ -117,7 +117,6 @@ theorem flipY_mulVec (x y : ℝ) : flipY *ᵥ ![x, y] = ![x, -y] := by
 `(g_x, −g_y)`:** `⟨g, flipY v⟩ = ⟨flipY g, v⟩`. -/
 theorem flipY_adjoint (g v : Fin 2 → ℝ) : g ⬝ᵥ (flipY *ᵥ v) = (flipY *ᵥ g) ⬝ᵥ v := by
   simp [flipY, Matrix.mulVec, dotProduct, Fin.sum_univ_two]
-  ring
 
 /-- [proved-standard; formal-checked] The re-basing reverses the orientation. -/
 theorem det_flipY : flipY.det = -1 := by
@@ -127,7 +126,7 @@ theorem det_flipY : flipY.det = -1 := by
 /-- [definition] Rust's `hand_after`: `true` is a reversed hand. A move of positive determinant
 keeps the hand, one of negative determinant flips it, and a singular move restarts the ring
 unreversed. -/
-def handAfter (l b : ℂ) (hand : Bool) : Bool :=
+noncomputable def handAfter (l b : ℂ) (hand : Bool) : Bool :=
   if normSq b < normSq l then hand else if normSq l < normSq b then !hand else false
 
 /-- [definition] The sign `o` of a hand: `−1` reversed, `1` not. -/

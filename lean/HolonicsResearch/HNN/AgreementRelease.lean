@@ -36,6 +36,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι] {F : Type*} [Field F]
 /-- [definition] The mass of a word of `k` independent draws from the face `p`. -/
 def wordMass (p : ι → F) {k : ℕ} (c : Fin k → ι) : F := ∏ m, p (c m)
 
+omit [DecidableEq ι] in
 /-- [proved-standard; formal-checked] **The words carry the face's total to the `k`-th power.** -/
 theorem word_mass_total (p : ι → F) (k : ℕ) :
     ∑ c : Fin k → ι, wordMass p c = (∑ i, p i) ^ k := by

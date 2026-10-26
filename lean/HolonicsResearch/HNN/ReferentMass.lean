@@ -63,6 +63,7 @@ theorem running_mean (w y : ℕ → K)
     field_simp
     ring
 
+omit [CharZero K] in
 /-- [proved-standard; formal-checked] **The pull of a dense region:** after the step with share
 `1/(M + 1)`, the region's offset from the return is `M/(M + 1)` of its offset before. -/
 theorem pull_toward_region (w y M : K) (hM : M + 1 ≠ 0) :
