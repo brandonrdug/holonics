@@ -37,7 +37,13 @@ case: the heard text's own reading of a proper name, with no list of names.
   own margin, the margin less the first unit's raise and plus the rival's. Then which clocks hold
   the first unit and the rival, the rivals' pieces where the rival carries more (UNITS is the founding
   list, `founded-units-v1`), and, for every file after the first, the mean change of each part over
-  the answers the file before gave the largest mass, split by whether this file keeps it.
+  the answers the file before gave the largest mass, split by whether this file keeps it. Then the
+  face at the opening of every named answer, whatever it opens with: the clock holding the
+  question's first unit (a held class whose piece the problem opens with), the mass the face gives
+  that unit beside how often the answer opens with it, in all and by bands of the mass, with the
+  face's own standard deviation of the count, `√Σ p(1 − p)`; how often the unit carries the largest
+  mass where the answer opens otherwise; the mean code of the answer's actual first unit; and what
+  the answers open with otherwise.
 - `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
   cell set beside the arrival the clock holds there (the cell after the last cell whose bytes are
   the clock's class): where the cell's bytes repeat the held arrival's, and elsewhere by how many
@@ -193,6 +199,7 @@ def pieces_of(path):
 
 
 def copies(heard, text, pieces, paths):
+    every = [(start, opening) for start, opening, _, _ in named(heard, text)]
     asked = [opening for _, opening, _, opens in named(heard, text) if opens]
     grain, raise_grain = 1 << 20, 1 << 16
     before = None
@@ -201,19 +208,19 @@ def copies(heard, text, pieces, paths):
         for line in open(path):
             k = line.rstrip("\n").split("\t")
             place, unit, code, rank, rival, rival_code = (int(x) for x in k[:6])
-            clocks = [(int(h), None if r == "-" else int(r)) for h, r in zip(k[6::2], k[7::2])]
+            clocks = [(int(h), None if r == "-" else int(r), None if c == "-" else int(c)) for h, r, c in zip(k[6::3], k[7::3], k[8::3])]
             rows[place] = (unit, code, rank, rival, rival_code, clocks)
         parts = {}
         for p in asked:
             if p not in rows:
                 continue
             unit, code, rank, rival, rival_code, clocks = rows[p]
-            on_unit = sum(r for h, r in clocks if h == unit and r is not None) / raise_grain
-            on_rival = sum(r for h, r in clocks if h == rival and r is not None) / raise_grain
+            on_unit = sum(r for h, r, _ in clocks if h == unit and r is not None) / raise_grain
+            on_rival = sum(r for h, r, _ in clocks if h == rival and r is not None) / raise_grain
             margin = (rival_code - code) / grain
             parts[p] = (rank == 0, margin, on_unit, on_rival, margin - on_unit + on_rival,
-                        tuple(c for c, (h, _) in enumerate(clocks) if h == unit),
-                        tuple(c for c, (h, _) in enumerate(clocks) if h == rival), rival)
+                        tuple(c for c, (h, _, _) in enumerate(clocks) if h == unit),
+                        tuple(c for c, (h, _, _) in enumerate(clocks) if h == rival), rival)
         n = len(parts)
         first = {p for p, v in parts.items() if v[0]}
         mean = lambda i, ps: sum(parts[p][i] for p in ps) / len(ps) if ps else float("nan")
@@ -233,7 +240,49 @@ def copies(heard, text, pieces, paths):
                     change = lambda i: sum(parts[p][i] - before[0][p][i] for p in ps) / len(ps)
                     print(f"  beside the file before, over the {len(ps)} it {kind}: margin {change(1):+.3f} = readout {change(4):+.3f}"
                           f" + raise on the first unit {change(2):+.3f} − raise on the rival {change(3):+.3f}")
-        before = (parts, first)
+        calibration(text, pieces, rows, every, before[2] if before else None)
+        before = (parts, first, rows)
+
+
+def calibration(text, pieces, rows, every, before_rows):
+    """The face at every named answer's opening: the question's first unit's mass beside how often
+    the answer opens with it."""
+    grain = 1 << 20
+    read, unheld = [], 0
+    for start, opening in every:
+        if opening not in rows:
+            continue
+        unit, code, rank, rival, _, clocks = rows[opening]
+        # The longest held piece the problem opens with, so a clock holding one letter of it does not stand in.
+        held = max(((h, c) for h, _, c in clocks if c is not None and text.startswith(pieces[h], start)), key=lambda hc: len(pieces[hc[0]]), default=None)
+        if held is None:
+            unheld += 1
+            continue
+        h, c = held
+        read.append((2.0 ** (-c / grain), unit == h, rank > 0 and rival == h, code / grain, unit, opening))
+    n = len(read)
+    if not n:
+        return
+    predicted = sum(p for p, *_ in read)
+    spread = sum(p * (1 - p) for p, *_ in read) ** 0.5
+    opened = sum(o for _, o, *_ in read)
+    print(f"  every named answer's opening: {n} read, {unheld} with no clock holding the question's first unit")
+    print(f"    the face's mass on the question's first unit sums to {predicted:.1f} (its own deviation {spread:.1f}); the answer opens with it in {opened}")
+    bands = ((0, .1), (.1, .2), (.2, .3), (.3, .4), (.4, .5), (.5, .7), (.7, 1.01))
+    rows_out = []
+    for lo, hi in bands:
+        b = [r for r in read if lo <= r[0] < hi]
+        if b:
+            rows_out.append(f"[{lo:.1f},{min(hi, 1):.1f}) {len(b)}: mass {sum(r[0] for r in b) / len(b):.3f}, opens {sum(r[1] for r in b) / len(b):.3f}")
+    print("    by the mass: " + "; ".join(rows_out))
+    print(f"    the unit carries the largest mass where the answer opens otherwise in {sum(r[2] for r in read)}")
+    print(f"    the answer's first unit's mean code {sum(r[3] for r in read) / n:.3f} bits")
+    other = collections.Counter(pieces[r[4]] for r in read if not r[1])
+    print("    the answers opening otherwise open with: " + ", ".join(f"{piece!r} {m}" for piece, m in other.most_common(8)))
+    if before_rows is not None:
+        common = [r for r in read if r[5] in before_rows]
+        change = sum(r[3] - before_rows[r[5]][1] / grain for r in common) / len(common) if common else float("nan")
+        print(f"    beside the file before: the first unit's mean code changes by {change:+.3f} bits over the {len(common)} read in both")
 
 
 def cells_of(path):

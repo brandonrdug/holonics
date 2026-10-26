@@ -29,7 +29,7 @@
 //!   twin's by more than `log₂` of the pool.
 //! - `read-tower-clock-cells STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS REQUESTS
 //!   REQUESTS_SHA OUT` prints each clock's copy and writes, at the reads an observer requests, the
-//!   coded class's strongest rival on the face and each clock's held class and raise
+//!   coded class's strongest rival on the face and each clock's held class, its raise and its code
 //!   (`Tower::read_clocks`).
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
@@ -251,13 +251,14 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
 /// each from rest). Each clock's copy is printed (`TOWER_CLOCK_COPY`): its class, its bias `b_A` on
 /// `2^(−16)`, its row's square `‖r_A‖²` on `2^(−48)` and its reach `max |r_A|` on `2^(−24)`. `OUT`
 /// (create-new) holds one line for each read requested, tab-separated: `p class code rank rival
-/// rival_code`, then `held raise` for each clock in founding order. `p` is the place in `TEXT` of the
+/// rival_code`, then `held raise held_code` for each clock in founding order. `p` is the place in `TEXT` of the
 /// coded class's first byte, `class` that class and `code` and `rank` its code and rank on the face,
 /// `rival` the other class carrying the largest mass (on a tie the lowest) and `rival_code` its code,
 /// codes on `2^(−20)` bits (the face's mass is `2^z`, so `rival_code − code` is, to the face's
 /// grain, the logits' margin `z_class − z_rival` in bits); `held` is
-/// the class the clock holds (the alphabet where it holds nothing, its raise then `-`) and `raise`
-/// its copy's `⟨r_A, x⟩ + b_A` on the logit's `2^(−16)`. `REQUESTS` holds one read a line, its first
+/// the class the clock holds (the alphabet where it holds nothing, its raise and code then `-`),
+/// `raise` its copy's `⟨r_A, x⟩ + b_A` on the logit's `2^(−16)` and `held_code` the held class's
+/// code on the face, whether or not it arrives next. `REQUESTS` holds one read a line, its first
 /// tab-separated field `p` (the `requests` output of `tools/listener/bank_trace.py` serves); a
 /// request whose place no cell codes (a chunk's first class) is counted as skipped. A reading beside
 /// the code: nothing here enters the machine.
@@ -315,7 +316,10 @@ pub(super) fn read_clock_cells(args: &[String]) -> Result<()> {
                         let rival = (0..face.masses.len()).filter(|&c| c != next).fold(usize::from(next == 0), |best, c| if face.masses[c] > face.masses[best] { c } else { best });
                         let mut line = format!("{place}\t{next}\t{}\t{}\t{rival}\t{}", face.code(next), face.rank(next), face.code(rival));
                         for (&h, r) in held.iter().zip(raises) {
-                            line.push_str(&format!("\t{h}\t{}", r.map_or("-".to_string(), |v| v.to_string())));
+                            match r {
+                                Some(v) => line.push_str(&format!("\t{h}\t{v}\t{}", face.code(h))),
+                                None => line.push_str(&format!("\t{h}\t-\t-")),
+                            }
                         }
                         lines.push(line);
                     }
