@@ -105,6 +105,64 @@ pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// `read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [unjoined] [UNITS UNITS_SHA]`: the
+/// held-out read (`held_out`'s partition, each chunk from rest) written cell by cell to `OUT`
+/// (create-new): one line per coded class, the place in `DEV` of its first byte, its code on
+/// `2^(−20)` bits, and its bytes. A unit tower reads `DEV` in the founded `UNITS`; `unjoined` sets the
+/// bank's join `O` to zero first, as `read-tower-held` does. A reading beside the code, for an observer
+/// to set each class's code beside what it knows of it (the runs the text shares with the heard text,
+/// whether an answer's unit was in its question); nothing here enters the machine.
+pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
+    let usage = "read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [unjoined] [UNITS UNITS_SHA]";
+    let mut rest = args.get(7..).ok_or(usage)?;
+    let unjoined = rest.first().map(String::as_str) == Some("unjoined");
+    if unjoined {
+        rest = &rest[1..];
+    }
+    let units = match rest {
+        [] => None,
+        [path, sha] => Some(Units::from_text(std::str::from_utf8(&pinned_read(path, sha, READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?),
+        _ => return Err(usage.into()),
+    };
+    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if unjoined {
+        let join = learner.tower.bank_join().ok_or("an unjoined read needs a bank")?;
+        learner.tower.theta[join].iter_mut().for_each(|t| *t = 0);
+    }
+    let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let streams = positive(&args[5])?;
+    let (classes, lengths): (Vec<usize>, Vec<usize>) = match &units {
+        None => (dev.iter().map(|&b| b as usize).collect(), vec![1; dev.len()]),
+        Some(units) => units.parse(&dev).map_err(|e| e.to_string())?.into_iter().map(|u| (u as usize, units.piece(u as usize).len())).unzip(),
+    };
+    let mut places = Vec::with_capacity(lengths.len());
+    lengths.iter().fold(0usize, |at, &n| {
+        places.push(at);
+        at + n
+    });
+    let chunk = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
+    let parts: Vec<Vec<i64>> = starts
+        .par_iter()
+        .map(|&start| {
+            let mut state = learner.tower.rest();
+            learner.tower.read_cells(&mut state, &classes[start..(start + chunk).min(classes.len())]).map_err(|e| e.to_string())
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut written = String::new();
+    for (&start, codes) in starts.iter().zip(&parts) {
+        for (i, code) in codes.iter().enumerate() {
+            written.push_str(&format!("{}\t{code}\t{}\n", places[start + i + 1], lengths[start + i + 1]));
+        }
+    }
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[6])?, written.as_bytes())?;
+    println!(
+        "TOWER_HELD_CELLS unjoined={unjoined} units={} streams={streams} cells={} grain_bits={READ_BITS} out={}",
+        units.as_ref().map_or(0, Units::len), parts.iter().map(Vec::len).sum::<usize>(), args[6]
+    );
+    Ok(())
+}
+
 /// [agent-inferred, October 23] The modes' faces over a text, read through a frozen tower in the
 /// held-out read's streams (`held_out`): per level and mode, `max |h|` and `Σ |h|²` over the cells;
 /// per level and region of `roles` (the region of the class the state predicts next), the cells'

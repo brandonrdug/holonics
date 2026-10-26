@@ -811,6 +811,7 @@ pub(super) fn run_with_execution(
         Some("read-lines-located") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Again, true),
         Some("read-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair(args),
         Some("read-tower-held") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_held(args),
+        Some("read-tower-held-cells") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_held_cells(args),
         Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),
         Some("read-tower-circuit") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_circuit(args),
         Some("read-tower-modes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_modes(args),
