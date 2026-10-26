@@ -1,0 +1,241 @@
+# The cloud host's runs, every line each run printed about its time and its reads (TOWER_SECTION lines omitted: WATCH prints one line every 32 sections).
+
+## The units founded on the Holonics training text (found.log)
+projection: unmeasured, GSM8K's 3.5 MB founded in 2.9 s; deadline 120 s
+UNITS_FOUNDED units=1271 founded=1015 refused=68738 undecided=0 priced=69753 symbols=1789116->815454 order_one_bits_a_byte=4.059->2.959 description_bits_a_byte=0.011 complete_bits_a_byte=2.970 elapsed_ms=2990
+UNITS_STATE units_bytes=7675 units_sha256=4f4a2b3a4f198441db82610a81846b38a7149d8f9db2ac6f675f81e1ed01eb43
+RUN_RECEIPT exit=0 wall_ms=3010 peak_rss_kib=75096 user_ms=2915
+
+## Timing reads on the first 180,000 bytes of the training text's prose (time_t.log, time_foil.log, times2.log)
+### time_t: 256 contacts from scratch
+projection: unmeasured, planned at 1-3 min; deadline 180 s
+TOWER_PASS pass=0 train_bits_a_byte=3.483 dev_bits_a_byte=4.848 dev_regions Q=3.527 P=3.826 N=3.895 M=8.147 deposits=77/77 pass_ms=31972 elapsed_ms=31984
+TOWER_DONE state_bytes=9510530 state_sha256=c7fa8a567c3aaea25f56bfa74f260848af4ff59fd49ecba71cb710842c0a4a49 elapsed_ms=32186
+RUN_RECEIPT exit=0 wall_ms=32269 peak_rss_kib=185872 user_ms=96512
+### time_foil: one bankless pass from pass 3
+projection: 77 sections x 419 ms (pass 3's largest window) + 2.4 s = 34.7 s; deadline 60 s
+TOWER_PASS pass=0 train_bits_a_byte=2.259 dev_bits_a_byte=2.599 dev_regions Q=2.887 P=2.462 N=2.238 M=2.809 deposits=77/77 pass_ms=31132 elapsed_ms=31296
+TOWER_DONE state_bytes=9342538 state_sha256=ce1a92311f81338d396d9a73b88ddb9347a5373eddaac3edf0834c39843e6984 elapsed_ms=31532
+RUN_RECEIPT exit=0 wall_ms=31649 peak_rss_kib=193468 user_ms=96978
+### the bank joined on pass 3, then time_bank (banked from bank3.state) and time_c1024 (1,024 contacts from scratch)
+TOWER_BANK_JOINED bank 0 64 8 8 material=284541 state_sha256=113507d7dd974a76040e427e1009dc79f1553377d1345d9e2fef4170e368d7cc
+timing read, banked from bank3.state: unmeasured on this tower, planned at 1-3 min; deadline 180 s
+TOWER_PASS pass=0 train_bits_a_byte=2.283 dev_bits_a_byte=2.639 dev_regions Q=2.902 P=2.498 N=2.288 M=2.866 deposits=77/77 pass_ms=62947 elapsed_ms=63067
+TOWER_DONE state_bytes=10014504 state_sha256=5b1d98716ace569ee98fbfc1fd898fb620ecd931b24eb589292d77bdd4d75b9b elapsed_ms=63307
+RUN_RECEIPT exit=0 wall_ms=63425 peak_rss_kib=336368 user_ms=199686
+timing read, bankless 1,024 contacts from scratch: unmeasured, planned at 1-3 min; deadline 180 s
+TOWER_PASS pass=0 train_bits_a_byte=3.901 dev_bits_a_byte=5.241 dev_regions Q=3.917 P=4.109 N=4.141 M=8.799 deposits=77/77 pass_ms=42489 elapsed_ms=42508
+TOWER_DONE state_bytes=16732013 state_sha256=1c0462323296cb5128ce482a23105f90e3de4fe35467d197cb8871a42464042e elapsed_ms=42872
+RUN_RECEIPT exit=0 wall_ms=43015 peak_rss_kib=297924 user_ms=125350
+
+## Passes 1-3 on the whole training text (passes.log)
+projection: 797 sections x 415 ms (the timing read's largest window) + 2.4 s held-out read = 333 s; deadline 335 s; stop when the mean section passes 415 ms
+WATCH section=32 window_ms=403.9 mean_ms=403.9 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=64 window_ms=389.0 mean_ms=396.5 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=96 window_ms=383.2 mean_ms=392.0 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=128 window_ms=387.9 mean_ms=391.0 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=160 window_ms=358.7 mean_ms=384.5 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=192 window_ms=381.8 mean_ms=384.1 worst_window_ms=403.9 bound_ms=415.0
+WATCH section=224 window_ms=411.9 mean_ms=388.1 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=256 window_ms=398.2 mean_ms=389.3 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=288 window_ms=400.3 mean_ms=390.5 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=320 window_ms=404.7 mean_ms=392.0 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=352 window_ms=376.4 mean_ms=390.6 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=384 window_ms=396.3 mean_ms=391.0 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=416 window_ms=380.4 mean_ms=390.2 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=448 window_ms=409.7 mean_ms=391.6 worst_window_ms=411.9 bound_ms=415.0
+WATCH section=480 window_ms=413.2 mean_ms=393.0 worst_window_ms=413.2 bound_ms=415.0
+WATCH section=512 window_ms=392.1 mean_ms=393.0 worst_window_ms=413.2 bound_ms=415.0
+WATCH section=544 window_ms=388.3 mean_ms=392.7 worst_window_ms=413.2 bound_ms=415.0
+WATCH section=576 window_ms=376.3 mean_ms=391.8 worst_window_ms=413.2 bound_ms=415.0
+WATCH section=608 window_ms=389.6 mean_ms=391.7 worst_window_ms=413.2 bound_ms=415.0
+WATCH section=640 window_ms=417.2 mean_ms=393.0 worst_window_ms=417.2 bound_ms=415.0
+WATCH section=672 window_ms=408.6 mean_ms=393.7 worst_window_ms=417.2 bound_ms=415.0
+WATCH section=704 window_ms=408.1 mean_ms=394.4 worst_window_ms=417.2 bound_ms=415.0
+WATCH section=736 window_ms=384.7 mean_ms=393.9 worst_window_ms=417.2 bound_ms=415.0
+WATCH section=768 window_ms=406.8 mean_ms=394.5 worst_window_ms=417.2 bound_ms=415.0
+WATCH section=796 window_ms=366.0 mean_ms=393.5 worst_window_ms=417.2 bound_ms=415.0
+TOWER_PASS pass=0 train_bits_a_byte=2.598 dev_bits_a_byte=2.587 dev_regions Q=3.172 P=2.518 N=2.264 M=2.394 deposits=796/796 pass_ms=315674 elapsed_ms=315684
+TOWER_DONE state_bytes=9615558 state_sha256=fc63f1c5849c733099ea99681185d1c412394a010f48779bb53e4bc077464b10 elapsed_ms=315858
+RUN_RECEIPT exit=0 wall_ms=316658 peak_rss_kib=215104 user_ms=960491
+projection: 797 sections x 415 ms (the timing read's largest window) + 2.4 s held-out read = 333 s; deadline 335 s; stop when the mean section passes 415 ms
+WATCH section=32 window_ms=353.4 mean_ms=353.4 worst_window_ms=353.4 bound_ms=415.0
+WATCH section=64 window_ms=341.7 mean_ms=347.5 worst_window_ms=353.4 bound_ms=415.0
+WATCH section=96 window_ms=360.8 mean_ms=351.9 worst_window_ms=360.8 bound_ms=415.0
+WATCH section=128 window_ms=378.5 mean_ms=358.6 worst_window_ms=378.5 bound_ms=415.0
+WATCH section=160 window_ms=386.7 mean_ms=364.2 worst_window_ms=386.7 bound_ms=415.0
+WATCH section=192 window_ms=414.9 mean_ms=372.6 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=224 window_ms=387.3 mean_ms=374.7 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=256 window_ms=357.8 mean_ms=372.6 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=288 window_ms=405.4 mean_ms=376.3 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=320 window_ms=376.9 mean_ms=376.3 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=352 window_ms=387.0 mean_ms=377.3 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=384 window_ms=402.8 mean_ms=379.4 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=416 window_ms=390.3 mean_ms=380.3 worst_window_ms=414.9 bound_ms=415.0
+WATCH section=448 window_ms=420.1 mean_ms=383.1 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=480 window_ms=372.0 mean_ms=382.4 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=512 window_ms=359.1 mean_ms=380.9 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=544 window_ms=353.6 mean_ms=379.3 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=576 window_ms=375.3 mean_ms=379.1 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=608 window_ms=376.4 mean_ms=378.9 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=640 window_ms=371.2 mean_ms=378.6 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=672 window_ms=372.2 mean_ms=378.3 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=704 window_ms=359.6 mean_ms=377.4 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=736 window_ms=338.3 mean_ms=375.7 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=768 window_ms=367.2 mean_ms=375.4 worst_window_ms=420.1 bound_ms=415.0
+WATCH section=796 window_ms=357.4 mean_ms=374.7 worst_window_ms=420.1 bound_ms=415.0
+TOWER_PASS pass=0 train_bits_a_byte=2.212 dev_bits_a_byte=2.500 dev_regions Q=3.094 P=2.423 N=2.164 M=2.317 deposits=796/796 pass_ms=300872 elapsed_ms=300997
+TOWER_DONE state_bytes=9385054 state_sha256=83401851d39af36c779816fc4a2b3b49d0000f63020eddd3ee5a0b622c1c8321 elapsed_ms=301170
+RUN_RECEIPT exit=0 wall_ms=301683 peak_rss_kib=223772 user_ms=921022
+projection: 797 sections x 415 ms (the timing read's largest window) + 2.4 s held-out read = 333 s; deadline 335 s; stop when the mean section passes 415 ms
+WATCH section=32 window_ms=384.0 mean_ms=384.0 worst_window_ms=384.0 bound_ms=415.0
+WATCH section=64 window_ms=363.5 mean_ms=373.8 worst_window_ms=384.0 bound_ms=415.0
+WATCH section=96 window_ms=391.4 mean_ms=379.6 worst_window_ms=391.4 bound_ms=415.0
+WATCH section=128 window_ms=401.6 mean_ms=385.1 worst_window_ms=401.6 bound_ms=415.0
+WATCH section=160 window_ms=391.2 mean_ms=386.3 worst_window_ms=401.6 bound_ms=415.0
+WATCH section=192 window_ms=369.6 mean_ms=383.5 worst_window_ms=401.6 bound_ms=415.0
+WATCH section=224 window_ms=368.2 mean_ms=381.4 worst_window_ms=401.6 bound_ms=415.0
+WATCH section=256 window_ms=347.8 mean_ms=377.2 worst_window_ms=401.6 bound_ms=415.0
+WATCH section=288 window_ms=418.9 mean_ms=381.8 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=320 window_ms=346.8 mean_ms=378.3 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=352 window_ms=353.5 mean_ms=376.1 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=384 window_ms=368.2 mean_ms=375.4 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=416 window_ms=377.5 mean_ms=375.6 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=448 window_ms=391.8 mean_ms=376.7 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=480 window_ms=363.2 mean_ms=375.8 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=512 window_ms=412.2 mean_ms=378.1 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=544 window_ms=380.9 mean_ms=378.3 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=576 window_ms=381.3 mean_ms=378.4 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=608 window_ms=397.5 mean_ms=379.4 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=640 window_ms=382.5 mean_ms=379.6 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=672 window_ms=409.8 mean_ms=381.0 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=704 window_ms=396.7 mean_ms=381.7 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=736 window_ms=394.0 mean_ms=382.3 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=768 window_ms=400.0 mean_ms=383.0 worst_window_ms=418.9 bound_ms=415.0
+WATCH section=796 window_ms=387.1 mean_ms=383.2 worst_window_ms=418.9 bound_ms=415.0
+TOWER_PASS pass=0 train_bits_a_byte=2.122 dev_bits_a_byte=2.436 dev_regions Q=3.041 P=2.343 N=2.101 M=2.259 deposits=796/796 pass_ms=307451 elapsed_ms=307572
+TOWER_DONE state_bytes=9266938 state_sha256=9a26fdfcc9afe7978df700b6abae758e3e914662fbc910d32623e2058b5d6c04 elapsed_ms=307767
+RUN_RECEIPT exit=0 wall_ms=308311 peak_rss_kib=242008 user_ms=934574
+
+## Prose-only passes 1-3, bankless (prose_a) and banked (prose_b), interleaved (prose_passes.log)
+prose_a1 projection: 258 sections (the held-out prose's 0.480 units a byte over 524,316 bytes, 246 sections, plus 5%) x 418.9 ms (pass 3's largest window) + 2.4 s = 110.5 s; deadline 111 s; stop when the mean section passes 418.9 ms
+WATCH section=32 window_ms=359.8 mean_ms=359.8 worst_window_ms=359.8 bound_ms=418.9
+WATCH section=64 window_ms=393.5 mean_ms=376.7 worst_window_ms=393.5 bound_ms=418.9
+WATCH section=96 window_ms=471.4 mean_ms=408.2 worst_window_ms=471.4 bound_ms=418.9
+WATCH section=128 window_ms=403.1 mean_ms=406.9 worst_window_ms=471.4 bound_ms=418.9
+WATCH section=160 window_ms=385.7 mean_ms=402.7 worst_window_ms=471.4 bound_ms=418.9
+WATCH section=192 window_ms=361.5 mean_ms=395.8 worst_window_ms=471.4 bound_ms=418.9
+WATCH section=222 window_ms=361.0 mean_ms=391.1 worst_window_ms=471.4 bound_ms=418.9
+TOWER_PASS pass=0 train_bits_a_byte=2.191 dev_bits_a_byte=2.622 dev_regions Q=2.879 P=2.438 N=2.208 M=2.961 deposits=222/222 pass_ms=89351 elapsed_ms=89461
+TOWER_DONE state_bytes=9322058 state_sha256=a53bc062eba76d48d7b98b149b82b4b44c0300c395f560c7ac64d604f3744019 elapsed_ms=89674
+RUN_RECEIPT exit=0 wall_ms=89949 peak_rss_kib=237856 user_ms=261774
+prose_b1 projection: 258 sections x 817 ms (the banked timing read's largest window) + 5 s = 215.8 s; deadline 216 s; stop when the mean section passes 817 ms
+WATCH section=32 window_ms=717.5 mean_ms=717.5 worst_window_ms=717.5 bound_ms=817.0
+WATCH section=64 window_ms=691.6 mean_ms=704.5 worst_window_ms=717.5 bound_ms=817.0
+WATCH section=96 window_ms=715.1 mean_ms=708.1 worst_window_ms=717.5 bound_ms=817.0
+WATCH section=128 window_ms=704.8 mean_ms=707.2 worst_window_ms=717.5 bound_ms=817.0
+WATCH section=160 window_ms=701.1 mean_ms=706.0 worst_window_ms=717.5 bound_ms=817.0
+WATCH section=192 window_ms=736.8 mean_ms=711.1 worst_window_ms=736.8 bound_ms=817.0
+WATCH section=222 window_ms=757.6 mean_ms=717.4 worst_window_ms=757.6 bound_ms=817.0
+TOWER_PASS pass=0 train_bits_a_byte=2.207 dev_bits_a_byte=2.608 dev_regions Q=2.867 P=2.426 N=2.199 M=2.940 deposits=222/222 pass_ms=163571 elapsed_ms=163717
+TOWER_DONE state_bytes=9910832 state_sha256=3d3ea11bc0802e91f794bdfa2285b5ba7375d5862f62c8dc9e2dca5351218d1d elapsed_ms=163918
+RUN_RECEIPT exit=0 wall_ms=164186 peak_rss_kib=325332 user_ms=531554
+prose_a2 projection: 258 sections (the held-out prose's 0.480 units a byte over 524,316 bytes, 246 sections, plus 5%) x 418.9 ms (pass 3's largest window) + 2.4 s = 110.5 s; deadline 111 s; stop when the mean section passes 418.9 ms
+WATCH section=32 window_ms=389.1 mean_ms=389.1 worst_window_ms=389.1 bound_ms=418.9
+WATCH section=64 window_ms=378.0 mean_ms=383.5 worst_window_ms=389.1 bound_ms=418.9
+WATCH section=96 window_ms=391.7 mean_ms=386.3 worst_window_ms=391.7 bound_ms=418.9
+WATCH section=128 window_ms=378.3 mean_ms=384.3 worst_window_ms=391.7 bound_ms=418.9
+WATCH section=160 window_ms=392.9 mean_ms=386.0 worst_window_ms=392.9 bound_ms=418.9
+WATCH section=192 window_ms=368.9 mean_ms=383.2 worst_window_ms=392.9 bound_ms=418.9
+WATCH section=222 window_ms=385.2 mean_ms=383.4 worst_window_ms=392.9 bound_ms=418.9
+TOWER_PASS pass=0 train_bits_a_byte=2.099 dev_bits_a_byte=2.743 dev_regions Q=2.880 P=2.509 N=2.318 M=3.265 deposits=222/222 pass_ms=87436 elapsed_ms=87583
+TOWER_DONE state_bytes=9258471 state_sha256=8f5a0fad42142782364435f841f2309acbe4697ba6d738dcf44b7c8d7f29b5cb elapsed_ms=87847
+RUN_RECEIPT exit=0 wall_ms=88087 peak_rss_kib=215112 user_ms=269226
+prose_b2 projection: 258 sections x 817 ms (the banked timing read's largest window) + 5 s = 215.8 s; deadline 216 s; stop when the mean section passes 817 ms
+WATCH section=32 window_ms=742.8 mean_ms=742.8 worst_window_ms=742.8 bound_ms=817.0
+WATCH section=64 window_ms=739.3 mean_ms=741.0 worst_window_ms=742.8 bound_ms=817.0
+WATCH section=96 window_ms=836.2 mean_ms=772.8 worst_window_ms=836.2 bound_ms=817.0
+WATCH section=128 window_ms=795.1 mean_ms=778.3 worst_window_ms=836.2 bound_ms=817.0
+WATCH section=160 window_ms=774.8 mean_ms=777.6 worst_window_ms=836.2 bound_ms=817.0
+WATCH section=192 window_ms=775.9 mean_ms=777.3 worst_window_ms=836.2 bound_ms=817.0
+WATCH section=222 window_ms=794.2 mean_ms=779.6 worst_window_ms=836.2 bound_ms=817.0
+TOWER_PASS pass=0 train_bits_a_byte=2.090 dev_bits_a_byte=2.741 dev_regions Q=2.849 P=2.474 N=2.291 M=3.349 deposits=222/222 pass_ms=177361 elapsed_ms=177467
+TOWER_DONE state_bytes=9871304 state_sha256=a5968686e9f39b9a04b95575f289baaae1fbdb9925813e2f0280d877d823e2ac elapsed_ms=177705
+RUN_RECEIPT exit=0 wall_ms=177993 peak_rss_kib=325056 user_ms=570680
+prose_a3 projection: 258 sections (the held-out prose's 0.480 units a byte over 524,316 bytes, 246 sections, plus 5%) x 418.9 ms (pass 3's largest window) + 2.4 s = 110.5 s; deadline 111 s; stop when the mean section passes 418.9 ms
+WATCH section=32 window_ms=401.8 mean_ms=401.8 worst_window_ms=401.8 bound_ms=418.9
+WATCH section=64 window_ms=366.3 mean_ms=384.0 worst_window_ms=401.8 bound_ms=418.9
+WATCH section=96 window_ms=407.4 mean_ms=391.8 worst_window_ms=407.4 bound_ms=418.9
+WATCH section=128 window_ms=366.5 mean_ms=385.5 worst_window_ms=407.4 bound_ms=418.9
+WATCH section=160 window_ms=376.3 mean_ms=383.7 worst_window_ms=407.4 bound_ms=418.9
+WATCH section=192 window_ms=368.6 mean_ms=381.1 worst_window_ms=407.4 bound_ms=418.9
+WATCH section=222 window_ms=388.1 mean_ms=382.1 worst_window_ms=407.4 bound_ms=418.9
+TOWER_PASS pass=0 train_bits_a_byte=2.054 dev_bits_a_byte=2.936 dev_regions Q=2.881 P=2.577 N=2.409 M=3.877 deposits=222/222 pass_ms=87678 elapsed_ms=87839
+TOWER_DONE state_bytes=9332074 state_sha256=31f5d75aca50497a8469d965910d3af48ce3fded1b8a763ecafaa614928ffa71 elapsed_ms=88078
+RUN_RECEIPT exit=0 wall_ms=88351 peak_rss_kib=207712 user_ms=267292
+prose_b3 projection: 258 sections x 817 ms (the banked timing read's largest window) + 5 s = 215.8 s; deadline 216 s; stop when the mean section passes 817 ms
+WATCH section=32 window_ms=736.3 mean_ms=736.3 worst_window_ms=736.3 bound_ms=817.0
+WATCH section=64 window_ms=768.6 mean_ms=752.4 worst_window_ms=768.6 bound_ms=817.0
+WATCH section=96 window_ms=779.8 mean_ms=761.6 worst_window_ms=779.8 bound_ms=817.0
+WATCH section=128 window_ms=755.9 mean_ms=760.2 worst_window_ms=779.8 bound_ms=817.0
+WATCH section=160 window_ms=726.0 mean_ms=753.3 worst_window_ms=779.8 bound_ms=817.0
+WATCH section=192 window_ms=735.3 mean_ms=750.3 worst_window_ms=779.8 bound_ms=817.0
+WATCH section=222 window_ms=731.4 mean_ms=747.8 worst_window_ms=779.8 bound_ms=817.0
+TOWER_PASS pass=0 train_bits_a_byte=2.040 dev_bits_a_byte=2.929 dev_regions Q=2.834 P=2.515 N=2.353 M=4.014 deposits=222/222 pass_ms=170295 elapsed_ms=170445
+TOWER_DONE state_bytes=9768476 state_sha256=cf6ba0bd386cda8fef5b11b2b3e6f9d68ca5494c3a305bca22deccd49c0da7b8 elapsed_ms=170665
+RUN_RECEIPT exit=0 wall_ms=170980 peak_rss_kib=331460 user_ms=548721
+
+## Banked prose-only passes 4-7 (prose_more.log)
+prose_b4 projection: 222 sections x 836.2 ms (the largest banked window of prose_b1-b3) + 4.3 s (their held-out read) = 189.9 s; deadline 190 s; stop when the mean section passes 836.2 ms
+WATCH section=32 window_ms=810.6 mean_ms=810.6 worst_window_ms=810.6 bound_ms=836.2
+WATCH section=64 window_ms=814.4 mean_ms=812.5 worst_window_ms=814.4 bound_ms=836.2
+WATCH section=96 window_ms=784.8 mean_ms=803.3 worst_window_ms=814.4 bound_ms=836.2
+WATCH section=128 window_ms=800.2 mean_ms=802.5 worst_window_ms=814.4 bound_ms=836.2
+WATCH section=160 window_ms=764.4 mean_ms=794.9 worst_window_ms=814.4 bound_ms=836.2
+WATCH section=192 window_ms=814.0 mean_ms=798.1 worst_window_ms=814.4 bound_ms=836.2
+WATCH section=222 window_ms=826.6 mean_ms=801.9 worst_window_ms=826.6 bound_ms=836.2
+TOWER_PASS pass=0 train_bits_a_byte=2.006 dev_bits_a_byte=3.057 dev_regions Q=2.838 P=2.555 N=2.438 M=4.397 deposits=222/222 pass_ms=182697 elapsed_ms=182840
+TOWER_DONE state_bytes=9939534 state_sha256=8e58a944ec4cafc9c16901b24622b282226b065338e092b55bdffaa7e25eb2b8 elapsed_ms=183100
+RUN_RECEIPT exit=0 wall_ms=183431 peak_rss_kib=413680 user_ms=584892
+prose_b5 projection: 222 sections x 836.2 ms (the largest banked window of prose_b1-b3) + 4.3 s (their held-out read) = 189.9 s; deadline 190 s; stop when the mean section passes 836.2 ms
+WATCH section=32 window_ms=813.4 mean_ms=813.4 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=64 window_ms=744.2 mean_ms=778.8 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=96 window_ms=761.2 mean_ms=772.9 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=128 window_ms=768.9 mean_ms=771.9 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=160 window_ms=774.3 mean_ms=772.4 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=192 window_ms=723.4 mean_ms=764.2 worst_window_ms=813.4 bound_ms=836.2
+WATCH section=222 window_ms=776.3 mean_ms=765.9 worst_window_ms=813.4 bound_ms=836.2
+TOWER_PASS pass=0 train_bits_a_byte=1.976 dev_bits_a_byte=3.186 dev_regions Q=2.837 P=2.596 N=2.513 M=4.801 deposits=222/222 pass_ms=174502 elapsed_ms=174626
+TOWER_DONE state_bytes=9919721 state_sha256=d2d123555ebfd1243f8360b2442d107555277b835e0a3844ec0223c8cae3ed70 elapsed_ms=174922
+RUN_RECEIPT exit=0 wall_ms=175244 peak_rss_kib=333072 user_ms=560527
+prose_b6 projection: 222 sections x 836.2 ms (the largest banked window of prose_b1-b3) + 4.3 s (their held-out read) = 189.9 s; deadline 190 s; stop when the mean section passes 836.2 ms
+WATCH section=32 window_ms=780.7 mean_ms=780.7 worst_window_ms=780.7 bound_ms=836.2
+WATCH section=64 window_ms=785.3 mean_ms=783.0 worst_window_ms=785.3 bound_ms=836.2
+WATCH section=96 window_ms=774.6 mean_ms=780.2 worst_window_ms=785.3 bound_ms=836.2
+WATCH section=128 window_ms=815.9 mean_ms=789.1 worst_window_ms=815.9 bound_ms=836.2
+WATCH section=160 window_ms=754.7 mean_ms=782.2 worst_window_ms=815.9 bound_ms=836.2
+WATCH section=192 window_ms=746.1 mean_ms=776.2 worst_window_ms=815.9 bound_ms=836.2
+WATCH section=222 window_ms=808.7 mean_ms=780.6 worst_window_ms=815.9 bound_ms=836.2
+TOWER_PASS pass=0 train_bits_a_byte=1.953 dev_bits_a_byte=3.472 dev_regions Q=2.844 P=2.652 N=2.575 M=5.818 deposits=222/222 pass_ms=177568 elapsed_ms=177702
+TOWER_DONE state_bytes=9888711 state_sha256=45fb31cb6a40cd53873abb361ff1aa02499f3eb6640793cffe81862c7385f5c4 elapsed_ms=177915
+RUN_RECEIPT exit=0 wall_ms=178177 peak_rss_kib=332580 user_ms=569055
+prose_b7 projection: 222 sections x 836.2 ms (the largest banked window of prose_b1-b3) + 4.3 s (their held-out read) = 189.9 s; deadline 190 s; stop when the mean section passes 836.2 ms
+WATCH section=32 window_ms=759.2 mean_ms=759.2 worst_window_ms=759.2 bound_ms=836.2
+WATCH section=64 window_ms=782.0 mean_ms=770.6 worst_window_ms=782.0 bound_ms=836.2
+WATCH section=96 window_ms=755.0 mean_ms=765.4 worst_window_ms=782.0 bound_ms=836.2
+WATCH section=128 window_ms=732.9 mean_ms=757.3 worst_window_ms=782.0 bound_ms=836.2
+WATCH section=160 window_ms=777.1 mean_ms=761.2 worst_window_ms=782.0 bound_ms=836.2
+WATCH section=192 window_ms=785.9 mean_ms=765.4 worst_window_ms=785.9 bound_ms=836.2
+WATCH section=222 window_ms=760.3 mean_ms=764.7 worst_window_ms=785.9 bound_ms=836.2
+TOWER_PASS pass=0 train_bits_a_byte=1.932 dev_bits_a_byte=3.484 dev_regions Q=2.838 P=2.687 N=2.662 M=5.753 deposits=222/222 pass_ms=173988 elapsed_ms=174124
+TOWER_DONE state_bytes=9742253 state_sha256=7e4719bc7956acdd2691d9cdf8ca3cc60256169e53de6ae3fb1f5de4ff2ec51c elapsed_ms=174396
+RUN_RECEIPT exit=0 wall_ms=174670 peak_rss_kib=332928 user_ms=555034
+
+## The last TOWER_SECTION line of each timing read (the certificate's step halvings over the pass)
+### time_t.log
+TOWER_SECTION pass=0 section=77 bits_a_byte=2.852 deposits=77 halvings=8 elapsed_ms=29569
+### time_foil.log
+TOWER_SECTION pass=0 section=77 bits_a_byte=2.154 deposits=77 halvings=0 elapsed_ms=28718
+### times2.log (time_bank, then time_c1024)
+TOWER_SECTION pass=0 section=77 bits_a_byte=2.161 deposits=77 halvings=0 elapsed_ms=58529
+TOWER_SECTION pass=0 section=77 bits_a_byte=3.420 deposits=77 halvings=18 elapsed_ms=39596
