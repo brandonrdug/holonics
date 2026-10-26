@@ -206,8 +206,7 @@ theorem gradient_split (δx δy : ℝ) :
     modulatedCarrier (directPart ux uy vx vy) (reflectedPart ux uy vx vy) ⟨δx, δy⟩ =
       ⟨ux * δx + uy * δy, vx * δx + vy * δy⟩ := by
   apply Complex.ext <;>
-    simp [modulatedCarrier, directPart, reflectedPart, Complex.mul_re, Complex.mul_im,
-      Complex.star_def] <;>
+    simp [modulatedCarrier, directPart, reflectedPart, Complex.mul_re, Complex.mul_im] <;>
     ring
 
 /-- [proved-standard; formal-checked] **Its determinant** is `|a|² − |b|² = u_x v_y − u_y v_x`,

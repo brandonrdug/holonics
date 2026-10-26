@@ -88,7 +88,6 @@ theorem neg_log_mixture_mirror (hβ : 0 < β) (he : 0 < e) (hk : 0 < k) :
     have hβ1' : β + 1 ≠ 0 := by linarith
     unfold mixture step
     field_simp
-    ring
   rw [hq, log_div (mul_pos he hs).ne' hβ1.ne', log_mul he0 hs.ne']
   ring
 

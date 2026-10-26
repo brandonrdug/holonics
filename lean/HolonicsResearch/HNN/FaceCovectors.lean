@@ -121,7 +121,7 @@ theorem tiltedCode_second_deriv [Nonempty ι] (hp : ∀ v, 0 < p v) (hp1 : ∑ v
     Finset.sum_pos (fun v _ => exp_pos _) Finset.univ_nonempty
   have h := (hasDerivAt_const (x := (1 : ℝ)) (c := -log (p u))).fun_add (hN.fun_div hZ hZpos.ne')
   rw [hderiv]
-  convert h using 1
+  refine h.congr_deriv ?_
   have hs : ∀ v, exp (1 * log (p v)) = p v := fun v => by rw [one_mul, exp_log (hp v)]
   have hsq : ∑ v, p v * log (p v) * log (p v) = ∑ v, p v * log (p v) ^ 2 :=
     Finset.sum_congr rfl fun v _ => by ring
