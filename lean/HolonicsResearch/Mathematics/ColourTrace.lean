@@ -2,6 +2,7 @@ import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
 import Mathlib.RingTheory.RootsOfUnity.Complex
 import Mathlib.NumberTheory.ArithmeticFunction.Moebius
 import Mathlib.Tactic
+import HolonicsResearch.Mathematics.PrimeSimplex
 
 /-!
 # The trace of a primitive colour is `μ(n)`
@@ -30,7 +31,13 @@ file proves the trace half of #410's (n).
    generates the layer below, and `∑_(i<p) ω^(j(1 + i·p^k))` is `p·ω^j` when `p ∣ j` and `0`
    otherwise.
 
-With these, #410's (n) is discharged: the norm half is `Mathematics/OrbitEnergy`.
+7. **The colours of every order up to `N` compress to the Mertens function**
+   (`sum_traces_eq_mertens`): `∑_(n ≤ N) Tr ζ_n = M(N)`, the reduced Euler characteristic of the
+   prime simplex up to sign (`Mathematics/PrimeSimplex`). The colourless shadow of all the orbits
+   at once is the sum of their polarities.
+
+With these, #410's (n) is discharged: the norm half, with its product form, is
+`Mathematics/OrbitEnergy`.
 
 Consumers: the atlas rows `colour.trace-compression` and `colour.colour-tower`.
 -/
@@ -165,5 +172,12 @@ theorem layer_trace {R : Type*} [CommRing R] [IsDomain R] {ω : R} {p k : ℕ} (
   · have hprim : IsPrimitiveRoot ((ω ^ p ^ k) ^ j) p :=
       hη.pow_of_coprime j ((Nat.Prime.coprime_iff_not_dvd hp).mpr hdvd).symm
     rw [hprim.geom_sum_eq_zero hp.one_lt, mul_zero]
+
+/-- [proved-standard; formal-checked] **The traces of the colours of every order up to `N` add to
+the Mertens function:** `∑_(0 < n ≤ N) ∑_(ζ primitive of order n) ζ = M(N)`. -/
+theorem sum_traces_eq_mertens (N : ℕ) :
+    ∑ n ∈ Ioc 0 N, ∑ ζ ∈ primitiveRoots n ℂ, ζ = (PrimeSimplex.mertens N : ℂ) := by
+  rw [PrimeSimplex.mertens, Int.cast_sum]
+  exact Finset.sum_congr rfl fun n hn => trace_primitive_colour (Finset.mem_Ioc.mp hn).1
 
 end Holonics.Mathematics.ColourTrace
