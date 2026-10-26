@@ -1,0 +1,83 @@
+== A. The terrain: 6726 training problems, 4523 named, 1551 opening words, 1534 person names
+opening words dropped as not names (capital explained by the sentence start): If 75, How 8, Amber 6, Uncle 5, Ginger 4, Since 4, Iris 3, Heather 3, Fern 2, Merry 2, Happy 2, Rhea 1, Super 1, Sunny 1, Gumball 1, Autumn 1, Archer 1
+person names by problems opened: John 210, James 130, Tom 65, Mr 57, Mark 53, Mary 44, Jack 38, Tim 33, Bob 32, Mrs 26, Jason 26, Janet 25, Tony 25
+John opens 210 training problems; their pronouns: only he/him/his 181, only she/her 2, both 6, none 21
+sheeted names 1259 of 1534; their problems with one sheet: agreeing 3379, against 44
+training problems mentioning John anywhere: 249
+problems opened by a sheeted person name: 4087
+mentions resolved to the opener per problem (k: problems): 1: 175, 2: 277, 3: 379, 4: 445, 5: 478, 6: 443, 7: 393, 8: 345, 9: 279, 10: 257, 11: 179, 12: 112, 13: 82, 14: 50, 15: 63, 16: 34, 17: 28, 18: 13, 19: 15, 20: 16, 21: 7, 22: 8, 23: 4, 24: 1, 25: 1, 26: 1, 28: 2
+mass, summed: 27715 mentions; laps (k-1) identified with pronouns 23628, by the name's letters alone 7081
+share of the laps that pass through a pronoun: 16547/23628 (0.700)
+mean mass per problem: 27715/4087 (6.781)
+the answer re-mentions the opener: by name 2398, by pronoun only 971, neither 718
+answers whose every mention resolves to the opener 2779, some elsewhere 741, no mention 567
+answers whose first mention resolves to the opener: 3129/3520 (0.889)
+(name, next word) pairs: 7693 distinct over 11895 mentions; 5590 occur once
+after John in his 210 problems: 100 distinct next words over 325 mentions; most: has 42, buys 31, s 29, is 18, decides 16, have 8, and 8, runs 6
+training problems with volunt-: 7; opened by a name: 6 (Brenda, Hadley, James, Janet, Mr, Nick)
+elapsed_ms 1059
+
+== B. The held-out question and its reference answer
+question mentions: John->John he->John
+reference answer mentions: He->John he->John
+mass of John over the problem 4; laps 3 identified, 0 by the letters J-o-h-n alone
+
+== C. The samples (answer = text before the first blank line), against the reference answer
+columns: samples | with a person mention | first mention resolves to John | every mention resolves to John | founds another referent | any she-sheet pronoun | names John | mentions on John (pooled)
+reference answer | 1 | 1 | 1 | 1 | 0 | 0 | 0 | 2 of 2
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA4, as written | 16 | 11 | 5 | 4 | 7 | 5 | 0 | 13 of 29
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA4, framed | 16 | 12 | 10 | 6 | 6 | 4 | 0 | 19 of 28
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | foil4, as written | 16 | 6 | 3 | 2 | 4 | 1 | 0 | 4 of 8
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA5, as written | 16 | 9 | 4 | 2 | 7 | 3 | 0 | 7 of 18
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA5, framed | 16 | 13 | 9 | 4 | 9 | 5 | 1 | 25 of 39
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | foil5, as written | 16 | 9 | 4 | 4 | 5 | 1 | 0 | 4 of 12
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA6, as written | 16 | 7 | 3 | 2 | 5 | 3 | 0 | 9 of 18
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA6, framed | 16 | 9 | 5 | 4 | 5 | 2 | 0 | 9 of 16
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | foil6, as written | 16 | 10 | 1 | 1 | 9 | 4 | 0 | 3 of 13
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA7, as written | 16 | 12 | 4 | 3 | 9 | 3 | 0 | 15 of 28
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | bankA7, framed | 16 | 11 | 5 | 3 | 8 | 2 | 0 | 8 of 20
+THE_BANK_COMPLETES_A/SAMPLES_PC_PASSES.md | foil7, as written | 16 | 9 | 3 | 1 | 8 | 4 | 0 | 4 of 17
+THE_BANK_LOWERS_EVERY/SAMPLES_FRAMING.md | The bank with the antecedent key, the question as written | 16 | 9 | 8 | 2 | 7 | 5 | 0 | 15 of 27
+THE_BANK_LOWERS_EVERY/SAMPLES_FRAMING.md | The bank with the antecedent key, the question after the separator (a blank line | 16 | 11 | 7 | 3 | 8 | 4 | 0 | 20 of 33
+THE_BANK_LOWERS_EVERY/SAMPLES_FRAMING.md | The bankless pass-3 tower, the question after the separator (the framing's contr | 16 | 11 | 2 | 2 | 9 | 4 | 0 | 2 of 14
+THE_BANK_LOWERS_EVERY/SAMPLES_FRAMING.md | The bank whose key also reads the arrival, the question as written | 16 | 11 | 9 | 5 | 6 | 3 | 1 | 17 of 27
+THE_BANK_LOWERS_EVERY/SAMPLES_FRAMING.md | The bank whose key also reads the arrival, the question after the separator | 16 | 13 | 8 | 5 | 8 | 3 | 0 | 14 of 30
+THE_BANK_LOWERS_EVERY/SAMPLES_JOHN.md | The banked tower (pass 3 + bank at level 0 + one pass) | 16 | 8 | 4 | 3 | 5 | 2 | 0 | 8 of 17
+THE_BANK_LOWERS_EVERY/SAMPLES_JOHN.md | The bankless foil (pass 3 + one pass) | 16 | 6 | 3 | 2 | 4 | 1 | 0 | 4 of 8
+THE_POOL_CHOOSES_THE/SAMPLES.md | The founded clock, framed prompt | 16 | 10 | 9 | 9 | 1 | 1 | 0 | 53 of 55
+THE_POOL_CHOOSES_THE/SAMPLES.md | The twin, framed prompt | 16 | 9 | 6 | 5 | 4 | 3 | 0 | 7 of 17
+THE_POOL_CHOOSES_THE/SAMPLES.md | The founded clock, prompt as written | 16 | 7 | 5 | 4 | 3 | 1 | 0 | 5 of 10
+THE_POOL_FOUNDS_THE/SAMPLES.md |  | 16 | 9 | 7 | 7 | 2 | 1 | 0 | 24 of 28
+THE_SECOND_LAP_FOUNDS/SAMPLES.md |  | 16 | 14 | 12 | 8 | 6 | 4 | 8 | 31 of 38
+THE_THIRD_LAP_FOUNDS/SAMPLES.md |  | 16 | 12 | 9 | 9 | 3 | 3 | 3 | 26 of 31
+ALL | 400 | 248 | 145 | 100 | 148 | 72 | 13 | 346 of 581
+he-sheet share of pronouns: 87/109 (0.798); referent changes per mention: 232/581 (0.399); referents founded: 189 over 400 samples
+per sample with a mention: first mention on John 145/248 (0.585); every mention on John 25/62 (0.403)
+distinct named persons founded across all samples: 54; most: Michael 21, Tom 9, Mr 8, Mark 6, Saturday 6, James 4, Tim 3, Carly 3, Ann 3, Sue 3, Jill 2, Josh 2, Bob 2, Ben 2, Jan 2
+samples naming John anywhere in the 400 bytes: 19
+
+== D. Carry of the question's words: training problems containing the word | samples whose answer contains it | samples containing it anywhere (of 400) | in the reference answer
+volunteers | 2 | 0 | 0 | yes
+volunteer | 3 | 0 | 0 | no
+shelter | 13 | 0 | 1 | no
+john | 249 | 13 | 19 | no
+month | 293 | 14 | 23 | no
+year | 325 | 23 | 37 | yes
+time | 501 | 41 | 62 | no
+hours | 641 | 124 | 165 | yes
+twice | 834 | 17 | 55 | no
+at | 1315 | 15 | 43 | no
+per | 1330 | 68 | 122 | no
+does | 1593 | 8 | 51 | no
+he | 2250 | 160 | 241 | yes
+for | 2939 | 76 | 174 | yes
+many | 3861 | 40 | 132 | no
+a | 4521 | 90 | 220 | yes
+how | 5819 | 34 | 149 | no
+volunt- (stem) | 7 | 0 | 0 | yes
+
+== E. Held out: 747 problems, 421 named; answer words 26709, of which 18790 occur in their own question; problems with such a word 747
+John's answer: He volunteers a year he volunteers for hours
+elapsed_ms 319
+
+all 20 checks hold
