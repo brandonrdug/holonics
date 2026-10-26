@@ -579,7 +579,7 @@ ring can write right; a wider ring is the face law's (`10^w − 1` for the next 
 products' capture (the index chart, where a product of numerals is a sum of turns) waits on a
 passing acceptance.
 
-**Built** (October 26, before its run): `holonics::hnn::tower::Navigator` and its join, with the
+**Built** (October 26, before its run; retired after it, §8): `holonics::hnn::tower::Navigator` and its join, with the
 locator in `tower_rotor` (laws `captured` and `numeral`). Its tests read the claims above: the fold
 from rest through units of one byte and of several closes every sum and difference of a synthetic
 menu and is one character off where the result is one more; the locator returns `+` at one, `-` and
@@ -591,28 +591,90 @@ level's moves, or of the second level's read, crosses a contact's kink, so 17 of
 could be read there (each one read matched); through pair contacts, the contact the run's towers
 use, every family is read. The Lean statement of the fold is owed in #410.
 
-## 8. The recorded failures these loops could repeat
+## 8. What the capture loop measured, and why it is retired
+
+[measurement] The runs are in [CAPTURE_RUN.md](2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_A_TURN_IS_TWO_REFLECTIONS_AND_THE_BASE_TURNS_COLLAPSES_OR_REFLECTS_EACH_RING_receipts/CAPTURE_RUN.md). The foundings printed what §7 expected:
+modulus 9999 at width 4, `+` at hand 1, `-` and `=` at 9998, `*` and `/` refused (no single
+line); `PRN` founded with no hand. After three passes the held-out code is 1.779 bits a byte for
+`PRC` and 1.761 for `PRN`. The equals read feeds each held-out problem's true solution through a
+calculation's `=` and writes one draw from the face `m^64/Σ m^64` (the face on which 64 independent
+draws would agree, so one draw near the face's largest mass): it measures the value written at an
+equals after the true text before it, not a problem solved. Of the 2,448 held-out calculations:
+
+| tower | right | never met right (of 876) | `+` (of 470) | `-` (of 388) | `*` (of 897) | `/` (of 343) |
+|---|---|---|---|---|---|---|
+| `PRT` | 240 | 24 | 26 | 28 | 124 | 46 |
+| `PRN` | 253 | 21 | 21 | 25 | 150 | 42 |
+| `PRC` | 359 | 37 | 79 | 71 | 139 | 37 |
+
+On never-met calculations `PRC` alone is right on 29 and `PRN` alone on 13 (8 both); against
+`PRT`, 28 and 15 (9 both). `PRC`'s right writes fall with the result's length: 138 of 485 one-digit
+results, 183 of 1,252 two-digit, 38 of 508 three-digit, none of 139 four-digit and none of 64
+longer (`PRN`: 110, 96, 45, 2, 0). Among `PRC`'s wrong never-met answers the result's residue is
+shared modulo 9 by 94 of 787 against a foil's 91 of 781, and modulo 11 by 68 against 60; 98% of
+them are values the training text writes after an equals. The level probe at the equals reads the
+result's residue modulo 9 and 11 in 155 and 110 of 841 held places for `PRC` and 157 and 97 for
+`PRN` (foils 97 and 79; 110 and 78).
+
+[project-postulate] **The navigator is retired.** GPT-6's audit (October 26) read the fold for what
+it is: `R_j` stepped by `10^j d`, folded into `K` with a sign at an operator and cleared elsewhere,
+is column addition modulo 9999 written by hand. Its hands were located, but the operation they key,
+a sum of place values carried as a residue, was authored, so at the equals the tower was handed the
+result's residue before it wrote. That is guard 17 ([THE_MACHINE](../../docs/THE_MACHINE.md), no
+catered machinery: a calculator standing in for learning), and §9's former claim that the capture
+was not an authored routine was wrong. `Navigator`, its join, the `captured` and `numeral` laws,
+their tests, the atlas row and the #410 box for the fold are removed. `PRC`'s 37 of 876 is excluded
+as evidence of learning; `PRN`, the exact numeral faces with nothing captured, goes with it.
+
+[measurement] **What the run still says, read as a diagnostic of the release.** Handed the result's
+residue, the release writes sums and differences right three times as often, yet its right writes
+fall with length to none of 139 four-digit results, and its wrong answers carry the residue no more
+often than a foil. The residue reaches a write only where it completes a value the tower has
+heard. So the release by size (which face to read at each place of a written result) is a blocker
+on its own, whatever supplies the residue: §7's decision (1), read through an authored capture.
+
+[agent-inferred] **The rotor's menu names the operators.** `loops_of` in `tower_rotor` builds the
+turn locator's menu by reading `<<`, `>>`, `=`, the ASCII digits and `+` and `-` by name, and
+orients each loop as first plus second is third. The rotor's turns are therefore located from
+calculation landmarks whose operators the locator was told. §§5–6 hold for the towers' descent,
+which is told nothing, but not for the locator's menu, which the next loop replaces.
+
+[agent-inferred] **The next loop: the capture learned, and the release by size.** Each part is a
+move the machine already has, with nothing written that computes a result:
+- (a) the locator reads every whole numeral triple with one byte between the first two numerals
+  and one between the second and third, the bytes' coefficient lines unknown beside the turns, and
+  searches them jointly (the Bombe's joint closure), so `+`, `-` and `=` get hands only by closing;
+- (b) the capture is a located per-unit move handing one ring's state to a held ring, of the
+  rotor's own kind (`T P^σ`, monomial and unitary), with no fold written;
+- (c) the two rings combine through the pair contact `W(x̄⊗y)`: on the rings a product of phases
+  is a sum of residues and the conjugate gives the difference, so descent on `W` learns the hand
+  that `K + R` handed the navigator;
+- (d) with `q = 10^w − 1`, face `j`'s phase `frac(10^j S/q)` has as its first decimal place the
+  `(j+1)`th digit of `S` padded to `w` places, so a digit is the tenth of the circle its phase
+  falls in, and the size is the count of leading faces in the first tenth. The readout has to learn
+  which face to read at each place it writes: that is the release by size.
+
+The acceptance is unchanged: never-met calculations right at the equals above the 8-gram's 34 of
+876, by the paired line, with right writes by result length beside it.
+
+## 9. The recorded failures these loops could repeat
 
 - **An authored routine standing in for learning.** The rings, the foil and the bar are exterior
-  reads; nothing enters the machine but the text. The towers find their angles by their own
-  descent; no digit, operator or ring is named to them.
-- **An authored routine standing in for learning (the capture).** The navigator's law is the
-  helical code's face over epochs, and every key it uses is located from the text's calculations:
-  the turns by §5's closure, the hands by this loop's. No byte is named, the navigator never
-  writes (the tower's readout writes from what it reads), and `PRN` shows what the capture adds
-  over the exact numeral alone.
+  reads. The towers find their angles by their own descent; no digit, operator or ring is named to
+  them. The rotor's turn locator is told the calculation markup and `+` and `-` (§8); the next loop
+  locates the hands without naming them.
+- **An authored routine standing in for learning (the capture): repeated.** The navigator's fold
+  was column addition written by hand, and locating its hands did not make the sum learned. The
+  check that missed it read "every key is located" as "nothing is authored", while the operation
+  the keys keyed was the task's solution routine. It is retired (§8), and its 37 of 876 counts for
+  nothing.
 - **Store or copy machinery standing in for learning.** The pumped mode and the pair contact keep
   no context, slot or key; a numeral's address is its phase on the rings.
-- **A store in the capture.** `K` is one phase on a ring, the face of the epoch's folded strands,
-  overwritten at every restart; it keys nothing and is looked up by nothing.
 - **Seen material graded as unseen.** The acceptance counts only the never-heard calculations.
 - **Text run on its codec's grain as the exception.** The pumped mode and the pair contact are
   modality-free (the tower reads classes of a declared alphabet). The rings are the arithmetic face
   of a law that reads any periodic structure: a beat in audio, a stride in motion, a period in an
   image row.
-- **Text run on its codec's grain (the capture).** A fold is an epoch boundary with a located
-  hand: it reads any strand whose loops close with signed characters, a meter's accents or a
-  stride's phases as well as a sum.
 - **Bits read as progress.** The held-out code is a condition beside the acceptance, never the
   claim.
 - **A refusal answered with a larger limit.** The deadlines are fixed above from measured rates.
