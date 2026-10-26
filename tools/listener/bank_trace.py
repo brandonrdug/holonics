@@ -5,6 +5,7 @@
     python3 -I tools/listener/bank_trace.py share HEARD TEXT TRACE
     python3 -I tools/listener/bank_trace.py role HEARD TEXT CELLS [CELLS ...]
     python3 -I tools/listener/bank_trace.py copies HEARD TEXT UNITS COPIES [COPIES ...]
+    python3 -I tools/listener/bank_trace.py change HEARD TEXT UNITS BEFORE AFTER
 
 An exterior observer's reads; nothing here enters the machine. TEXT is GSM8K problems separated by a
 blank line, each a question line and its answer. A problem is named when its question's first word
@@ -44,6 +45,12 @@ case: the heard text's own reading of a proper name, with no list of names.
   face's own standard deviation of the count, `√Σ p(1 − p)`; how often the unit carries the largest
   mass where the answer opens otherwise; the mean code of the answer's actual first unit; and what
   the answers open with otherwise.
+- `change`: for two COPIES files over the same TEXT (a state's, then the state one pass later), at
+  every named answer's opening where a clock holds the question's first unit in both (the held
+  class whose piece the problem opens with, the longest): the summed change of the face's log-mass
+  on that unit, `Σ Δ log₂ p̂`, in bits, the measured counterpart of what
+  `read-tower-clock-covectors` reads to first order; and each clock's mean change of raise where it
+  holds a class in both.
 - `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
   cell set beside the arrival the clock holds there (the cell after the last cell whose bytes are
   the clock's class): where the cell's bytes repeat the held arrival's, and elsewhere by how many
@@ -285,6 +292,45 @@ def calibration(text, pieces, rows, every, before_rows):
         print(f"    beside the file before: the first unit's mean code changes by {change:+.3f} bits over the {len(common)} read in both")
 
 
+def change(heard, text, pieces, before, after):
+    every = [(start, opening) for start, opening, _, _ in named(heard, text)]
+
+    def rows_of(path):
+        rows = {}
+        for line in open(path):
+            k = line.rstrip("\n").split("\t")
+            clocks = [(int(h), None if r == "-" else int(r), None if c == "-" else int(c)) for h, r, c in zip(k[6::3], k[7::3], k[8::3])]
+            rows[int(k[0])] = clocks
+        return rows
+
+    def name_code(clocks, start):
+        held = [(h, c) for h, _, c in clocks if c is not None and text.startswith(pieces[h], start)]
+        return max(held, key=lambda hc: len(pieces[hc[0]]))[1] if held else None
+
+    rb, ra = rows_of(before), rows_of(after)
+    grain, raise_grain = 1 << 20, 1 << 16
+    total, n, unheld = 0, 0, 0
+    raises = collections.defaultdict(lambda: [0, 0])
+    for start, opening in every:
+        if opening not in rb or opening not in ra:
+            continue
+        cb, ca = name_code(rb[opening], start), name_code(ra[opening], start)
+        if cb is None or ca is None:
+            unheld += 1
+        else:
+            n += 1
+            total += cb - ca
+        for c, ((_, b, _), (_, a, _)) in enumerate(zip(rb[opening], ra[opening])):
+            if b is not None and a is not None:
+                raises[c][0] += a - b
+                raises[c][1] += 1
+    print(f"{before} then {after}: at every named answer's opening, {n} read in both, {unheld} with no clock holding the question's first unit in one")
+    print(f"  the log-mass of the question's first unit changes by {total / grain:+.3f} bits in all ({total / grain / n if n else float('nan'):+.4f} an opening)")
+    for c in sorted(raises):
+        d, m = raises[c]
+        print(f"  clock {c}: the raise changes by {d / raise_grain / m:+.3f} bits an opening over the {m} it holds a class at in both")
+
+
 def cells_of(path):
     cells = {}
     for line in open(path):
@@ -346,6 +392,8 @@ def main():
         role(read(args[0]), read(args[1]), args[2:])
     elif command == "copies" and len(args) >= 4:
         copies(read(args[0]), read(args[1]), pieces_of(args[2]), args[3:])
+    elif command == "change" and len(args) == 5:
+        change(read(args[0]), read(args[1]), pieces_of(args[2]), args[3], args[4])
     elif command == "held" and len(args) in (3, 4):
         reset = class_bytes(args[3]) if len(args) == 4 else b"\n\n"
         held(read(args[0]), args[1], args[2], reset)

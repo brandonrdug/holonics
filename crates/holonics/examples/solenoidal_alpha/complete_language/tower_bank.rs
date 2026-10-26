@@ -31,6 +31,10 @@
 //!   REQUESTS_SHA OUT` prints each clock's copy and writes, at the reads an observer requests, the
 //!   coded class's strongest rival on the face and each clock's held class, its raise and its code
 //!   (`Tower::read_clocks`).
+//! - `read-tower-clock-covectors STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION
+//!   REQUESTS REQUESTS_SHA` reads, in the training pass's partition, each place's covector on the
+//!   copies and the readout, and what the learner's step along it does to the name's mass at the
+//!   answers' openings ([`read_clock_covectors`]).
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
 //! 64 classes and the marks are its 16 answers, so the held-out reading is acceptance §3.4's count of
@@ -42,6 +46,8 @@ use holonics::hnn::tower::bank::BankDeclaration;
 use holonics::hnn::tower::clock::{ClockDrop, ClockPool};
 use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TurnLadder, COVECTOR_BITS};
 use holonics::hnn::units::Units;
+use num_bigint::BigInt;
+use num_traits::{Signed, Zero};
 use rayon::prelude::*;
 use std::time::Instant;
 
@@ -309,7 +315,7 @@ pub(super) fn read_clock_cells(args: &[String]) -> Result<()> {
             let part = &classes[start..(start + chunk).min(classes.len())];
             let mut lines = Vec::new();
             tower
-                .read_clocks(&mut state, part, |i, face, held, raises| {
+                .read_clocks(&mut state, part, |i, face, held, raises, _| {
                     let place = places[start + i + 1];
                     if wanted.contains(&place) {
                         let next = part[i + 1];
@@ -342,6 +348,294 @@ pub(super) fn read_clock_cells(args: &[String]) -> Result<()> {
         wanted.len(),
         wanted.len() - read,
         args[10],
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// The places a named problem's cells fall in: its question, the answer's opening, the rest of its
+/// answer, and every other cell of the passage.
+const PLACES: [&str; 4] = ["question", "opening", "answer", "elsewhere"];
+
+/// One stream's sums for [`read_clock_covectors`]: each group's (place by whether the name
+/// arrives) cells and covector on the copies (`clocks · (d + 1)`) and on the readout (`A · d + A`),
+/// and, at the openings, the covector toward the name with the openings' own faces.
+struct PlaceSums {
+    cells: [u64; 8],
+    copy: Vec<Vec<i128>>,
+    readout: Vec<Vec<i128>>,
+    toward_copy: Vec<i128>,
+    toward_readout: Vec<i128>,
+    open: Vec<i128>,
+    openings: u64,
+    unheld: u64,
+    name_mass: i128,
+}
+
+impl PlaceSums {
+    fn new(copies: usize, readout: usize) -> Self {
+        Self {
+            cells: [0; 8],
+            copy: vec![vec![0; copies]; 8],
+            readout: vec![vec![0; readout]; 8],
+            toward_copy: vec![0; copies],
+            toward_readout: vec![0; readout],
+            open: vec![0; copies],
+            openings: 0,
+            unheld: 0,
+            name_mass: 0,
+        }
+    }
+
+    fn absorb(&mut self, other: PlaceSums) {
+        let add = |a: &mut [i128], b: &[i128]| a.iter_mut().zip(b).for_each(|(x, y)| *x += y);
+        for g in 0..8 {
+            self.cells[g] += other.cells[g];
+            add(&mut self.copy[g], &other.copy[g]);
+            add(&mut self.readout[g], &other.readout[g]);
+        }
+        add(&mut self.toward_copy, &other.toward_copy);
+        add(&mut self.toward_readout, &other.toward_readout);
+        add(&mut self.open, &other.open);
+        self.openings += other.openings;
+        self.unheld += other.unheld;
+        self.name_mass += other.name_mass;
+    }
+}
+
+/// The readout's covector at one cell, `δz ⊗ (x, 1)`, added to `sums` (rows `A · d`, then the
+/// biases); the classes the face gives no mass at the covector's grain add nothing.
+fn add_readout(sums: &mut [i128], dz: &[i64], x: &[i32]) {
+    let (a, w) = (dz.len(), x.len());
+    for (k, &v) in dz.iter().enumerate().filter(|(_, v)| **v != 0) {
+        let row = &mut sums[k * w..(k + 1) * w];
+        for (s, &xj) in row.iter_mut().zip(x) {
+            *s += (v * xj as i64) as i128;
+        }
+        sums[a * w + k] += v as i128;
+    }
+}
+
+/// `v` on `2^(−bits)` as a decimal with `places` places, rounded to the nearest.
+fn fixed(v: &BigInt, bits: u32, places: u32) -> String {
+    let scale = BigInt::from(10u32).pow(places);
+    let half = BigInt::from(1u8) << bits >> 1u32;
+    let m = (v.abs() * &scale + half) >> bits;
+    let (whole, frac) = (&m / &scale, &m % &scale);
+    let sign = if v.is_negative() && !m.is_zero() { "-" } else { "+" };
+    format!("{sign}{whole}.{frac:0>width$}", width = places as usize)
+}
+
+/// `Σ a_i b_i`, each side on its own grain, exactly.
+fn dot(a: &[i128], b: &[i128]) -> BigInt {
+    a.iter().zip(b).map(|(x, y)| BigInt::from(*x) * y).sum()
+}
+
+/// [agent-inferred, October 26; record
+/// `2026-10-26_THE_PASS_MOVES_THE_NAMES_MASS_AWAY_FROM_HOW_OFTEN_THE_ANSWER_OPENS_WITH_IT_SO_EACH_PLACES_PULL_IS_READ_THROUGH_THE_STEP.md`
+/// §3] **Each place's pull on the name at the answers' openings, read through the learner's step.**
+/// The frozen learner reads `TEXT` in the training pass's partition (`STREAMS` streams from rest,
+/// `(chunk − 1) / SECTION` sections of `SECTION` cells, as `found-tower-clock` reads it). Each
+/// request `p f` of `REQUESTS` (the `requests` output of `tools/listener/bank_trace.py`) names a
+/// problem from its first byte `f` to the byte after its blank line, its answer's opening `p`, and
+/// its name `n`, the class at `f`. A cell falls in its problem's question, opening or answer, or
+/// elsewhere, and in each by whether the class that arrives next is the name (elsewhere: a class a
+/// clock holds). Over each group the readout's covector `G = Σ δz ⊗ (x, 1)` is summed on the
+/// clocks' copies (`δz[held]`) and on the readout and its bias, and at every opening where a clock
+/// holds the name the covector toward the name `Y = Σ_o δz_o^(n) ⊗ (x_o, 1)`. The pass's change of
+/// `F = Σ_o log₂ p̂_o(n_o)`, to first order and under the learner's second moments, is
+/// `⟨Y, step(G)⟩` (`TowerLearner::step_for`): each group's share, on the copies (each clock's) and
+/// on the readout (the rows of the classes that name a problem and the rest). Beside it the plain
+/// share `⟨Y, G⟩` in the material's own units, in parts a thousand of the total's size, and the
+/// change of each clock's raise, `−⟨X, step(G)⟩` over the openings' `X = Σ_o (x_o, 1)`, a mean an
+/// opening. The lower levels are not read: a change of the top face `x` is outside this reading.
+/// A reading beside the code: nothing enters the machine and the learner is not moved.
+pub(super) fn read_clock_covectors(args: &[String]) -> Result<()> {
+    let usage = "read-tower-clock-covectors STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION REQUESTS REQUESTS_SHA";
+    if args.len() != 11 {
+        return Err(usage.into());
+    }
+    let started = Instant::now();
+    let learner = learner_of(&args[1], &args[2])?;
+    let tower = &learner.tower;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let (streams, section) = (positive(&args[7])?, positive(&args[8])?);
+    let requests: Vec<(usize, usize)> = std::str::from_utf8(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?)?
+        .lines()
+        .map(|l| {
+            let mut k = l.split('\t').map(|v| v.parse::<usize>());
+            match (k.next(), k.next()) {
+                (Some(Ok(p)), Some(Ok(f))) => Ok((p, f)),
+                _ => Err("a request is `p f`, tab-separated"),
+            }
+        })
+        .collect::<std::result::Result<_, _>>()?;
+    let (alphabet, width) = (tower.declaration.alphabet, tower.declaration.width);
+    if units.len() != alphabet {
+        return Err("the units are not the tower's alphabet".into());
+    }
+    let (clock, join) = tower.clock().zip(tower.clock_join()).ok_or("a copies' reading needs a clock")?;
+    let clocks = clock.classes.len();
+    let readout = tower.readout_family();
+    let (classes, lengths): (Vec<usize>, Vec<usize>) = units.parse(&text).map_err(|e| e.to_string())?.into_iter().map(|u| (u as usize, units.piece(u as usize).len())).unzip();
+    let mut places = Vec::with_capacity(lengths.len());
+    lengths.iter().fold(0usize, |at, &n| {
+        places.push(at);
+        at + n
+    });
+    // The problems: `(f, p, e, n)`, the first byte, the opening, the byte after the blank line, the
+    // name. A request whose bytes no class begins at is not placed.
+    let mut problems = Vec::with_capacity(requests.len());
+    for &(p, f) in &requests {
+        match (places.binary_search(&f), places.binary_search(&p)) {
+            (Ok(i), Ok(_)) if f < p => {
+                let e = text[p..].windows(2).position(|w| w == b"\n\n").map_or(text.len(), |k| p + k + 2);
+                problems.push((f, p, e, classes[i]));
+            }
+            _ => {}
+        }
+    }
+    problems.sort_unstable();
+    let named: std::collections::HashSet<usize> = problems.iter().map(|&(.., n)| n).collect();
+    let place_of = |q: usize| -> (usize, Option<usize>) {
+        let k = problems.partition_point(|&(f, ..)| f < q);
+        match k.checked_sub(1).map(|k| problems[k]) {
+            Some((_, p, e, n)) if q < e => (if q < p { 0 } else if q == p { 1 } else { 2 }, Some(n)),
+            _ => (3, None),
+        }
+    };
+    // The training pass's partition: `chunk` classes a stream, `(chunk − 1) / section` sections.
+    let chunk = classes.len() / streams;
+    if chunk < section + 1 {
+        return Err("the text must hold one section a stream".into());
+    }
+    let read = (chunk - 1) / section * section + 1;
+    let copies = clocks * (width + 1);
+    let parts: Vec<PlaceSums> = (0..streams)
+        .into_par_iter()
+        .map(|s| {
+            let mut sums = PlaceSums::new(copies, readout.len());
+            let part = &classes[s * chunk..s * chunk + read];
+            tower
+                .read_clocks(&mut tower.rest(), part, |i, face, held, _, top| {
+                    let next = part[i + 1];
+                    let (place, name) = place_of(places[s * chunk + i + 1]);
+                    let arrives = name.map_or(held.contains(&next), |n| next == n);
+                    let g = place * 2 + usize::from(arrives);
+                    let dz = face.covector(next);
+                    sums.cells[g] += 1;
+                    for (c, &h) in held.iter().enumerate().filter(|(_, h)| **h < alphabet) {
+                        let row = &mut sums.copy[g][c * (width + 1)..(c + 1) * (width + 1)];
+                        for (v, &xj) in row.iter_mut().zip(top) {
+                            *v += (dz[h] * xj as i64) as i128;
+                        }
+                        row[width] += dz[h] as i128;
+                    }
+                    add_readout(&mut sums.readout[g], &dz, top);
+                    if let (1, Some(n)) = (place, name) {
+                        if !held.contains(&n) {
+                            sums.unheld += 1;
+                            return Ok(());
+                        }
+                        let dn = face.covector(n);
+                        sums.openings += 1;
+                        sums.name_mass += dn[n] as i128 + (1i128 << COVECTOR_BITS);
+                        for (c, &h) in held.iter().enumerate().filter(|(_, h)| **h < alphabet) {
+                            let at = c * (width + 1);
+                            for (j, &xj) in top.iter().enumerate() {
+                                sums.toward_copy[at + j] += (dn[h] * xj as i64) as i128;
+                                sums.open[at + j] += xj as i128;
+                            }
+                            sums.toward_copy[at + width] += dn[h] as i128;
+                            sums.open[at + width] += 1;
+                        }
+                        add_readout(&mut sums.toward_readout, &dn, top);
+                    }
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(sums)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let read_ms = started.elapsed().as_millis();
+    let mut sums = PlaceSums::new(copies, readout.len());
+    for part in parts {
+        sums.absorb(part);
+    }
+    println!(
+        "TOWER_CLOCK_COVECTOR_OPENINGS requests={} placed={} read={} unheld={} name_mass={}",
+        requests.len(),
+        problems.len(),
+        sums.openings,
+        sums.unheld,
+        fixed(&BigInt::from(sums.name_mass), COVECTOR_BITS, 1)
+    );
+    // The groups, then their whole; each read through the step of its own summed covector.
+    let mut groups: Vec<(String, usize, Vec<i128>, Vec<i128>)> = (0..8).map(|g| (format!("place={} arrives={}", PLACES[g / 2], g % 2), g, sums.copy[g].clone(), sums.readout[g].clone())).collect();
+    let whole = |v: &[Vec<i128>]| (0..v[0].len()).map(|i| v.iter().map(|g| g[i]).sum()).collect::<Vec<i128>>();
+    groups.push(("place=all arrives=-".to_string(), 8, whole(&sums.copy), whole(&sums.readout)));
+    let (a, w) = (alphabet, width);
+    // The plain shares: `⟨Y, G⟩` in the material's own units, a row's on `2^(−80)` and a bias's
+    // raised from `2^(−48)`.
+    let plain = |y: &[i128], g: &[i128], bias: &dyn Fn(usize) -> bool| -> BigInt {
+        y.iter()
+            .zip(g)
+            .enumerate()
+            .map(|(i, (u, v))| {
+                let p = BigInt::from(*u) * v;
+                if bias(i) { p << 32u32 } else { p }
+            })
+            .sum()
+    };
+    let copy_bias = |i: usize| i % (w + 1) == w;
+    let readout_bias = |i: usize| i >= a * w;
+    let plain_total = plain(&sums.toward_copy, &groups[8].2, &copy_bias) + plain(&sums.toward_readout, &groups[8].3, &readout_bias);
+    let per_thousand = |v: &BigInt| if plain_total.is_zero() { BigInt::zero() } else { (v * 1000) / plain_total.abs() };
+    for (label, g, copy, ro) in &groups {
+        let cells = if *g < 8 { sums.cells[*g] } else { sums.cells.iter().sum() };
+        let step_copy = learner.step_for(join.start, copy).map_err(|e| e.to_string())?;
+        let step_ro = learner.step_for(readout.start, ro).map_err(|e| e.to_string())?;
+        // The readout's share on `2^(−64)`: a row's step on `2^(−24)` against `Y` on `2^(−40)`, a
+        // bias's step on `2^(−16)` against `Σ δz` on `2^(−24)`, raised by 24.
+        let (mut names, mut others) = (BigInt::zero(), BigInt::zero());
+        for k in 0..a {
+            let v = dot(&step_ro[k * w..(k + 1) * w], &sums.toward_readout[k * w..(k + 1) * w]) + ((BigInt::from(step_ro[a * w + k]) * sums.toward_readout[a * w + k]) << 24u32);
+            if named.contains(&k) { names += v } else { others += v }
+        }
+        let mut line = format!(
+            "TOWER_CLOCK_COVECTOR {label} cells={cells} readout_name={} readout_names={} readout_others={} readout_plain_ppt={}",
+            fixed(&(&names + &others), 64, 3),
+            fixed(&names, 64, 3),
+            fixed(&others, 64, 3),
+            per_thousand(&plain(&sums.toward_readout, ro, &readout_bias))
+        );
+        for c in 0..clocks {
+            let r = c * (w + 1)..(c + 1) * (w + 1);
+            let (sc, y, x) = (&step_copy[r.clone()], &sums.toward_copy[r.clone()], &sums.open[r.clone()]);
+            let name = dot(&sc[..w], &y[..w]) + ((BigInt::from(sc[w]) * y[w]) << 24u32);
+            let held = sums.open[r.start + w];
+            let raise = -(dot(&sc[..w], &x[..w]) + ((BigInt::from(sc[w]) * x[w]) << 24u32));
+            let mean = if held == 0 { BigInt::zero() } else { raise / held };
+            line.push_str(&format!(
+                " clock={c}:dz={},raise={},name={},plain_ppt={}",
+                fixed(&BigInt::from(copy[r.start + w]), COVECTOR_BITS, 1),
+                fixed(&mean, 40, 3),
+                fixed(&name, 64, 3),
+                per_thousand(&plain(y, &copy[r.clone()], &|i| i == w))
+            ));
+        }
+        println!("{line}");
+        if *g == 8 {
+            for (c, &class) in clock.classes.iter().enumerate() {
+                println!("TOWER_CLOCK_COVECTOR_STEP clock={c} class={class} bias={} bias_change={}", tower.theta[join.start + c * (w + 1) + w], -step_copy[c * (w + 1) + w]);
+            }
+            println!("TOWER_CLOCK_COVECTOR_PLAIN total_sign={}", if plain_total.is_negative() { "-" } else { "+" });
+        }
+    }
+    println!(
+        "TOWER_CLOCK_COVECTORS clocks={clocks} streams={streams} section={section} cells={} read_ms={read_ms} elapsed_ms={}",
+        sums.cells.iter().sum::<u64>(),
         started.elapsed().as_millis()
     );
     Ok(())
