@@ -137,3 +137,12 @@ The card was shared with a desktop client's 535 MiB throughout; it was not idle.
 - *A design thought in the programming language*: the kernels carry the tower's own objects (the
   modes' turns and their carry through the contacts) at the host's grains; the layouts are the
   hardware law's report, not the law.
+
+## Verification
+
+`verification.txt` in the receipts. Gate 1 (`tools/gate.sh`) passes, 22 of 22. The tower's own
+tests pass (56). The GPU suite: the integration tests pass (7, `tower_pass` among them); the library
+tests leave 14 of the observed-epoch port's lockstep tests (`hnn::port_tests`) failing, and the same
+14 fail at `origin/main` `5c1b56629` before this step (a state's bits 1,760 against 1,758, and a
+`receiver-ingress-ticks` line the card's save holds and the reference's does not). They are not
+this step's and are left to the port's owner (#76).
