@@ -5,11 +5,14 @@ key (`README.md`). Record:
 research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_THE_MARKUP_IS_WRITTEN_AT_ITS_EQUALS.md
 
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN DIR [DIR ...]
+    python3 -I tools/gsm8k/written_rules.py HELD TRAIN pair DIR_A DIR_B
 
 HELD is the held-out text and TRAIN the training text, each a run of problems separated by a blank
 line (a question line, then its answer lines). Each DIR holds `FREE.tsv` and `MARKS.tsv` as
 `read-unit-tower-written` or `ngram_release.py` writes them; the word `reference` reads the
-held-out answers themselves. One line is printed per DIR.
+held-out answers themselves. One line is printed per DIR. With `pair`, a `PAIRED` line follows the
+two DIRs' lines: on met and on never-met calculations, how many only A writes right at the equals,
+how many only B, and how many both, so two releases are compared calculation by calculation.
 
 The rules, fixed before any release was read:
 
@@ -146,6 +149,7 @@ def mark_reads(problems, marks, train):
         raise SystemExit("MARKS.tsv does not hold the held-out calculations in the reader's order")
     seen = {"met": [0, 0], "never": [0, 0]}
     by_op = Counter()
+    each = []
     for (i, j, expression), row in zip(expected, marks):
         release = unescape(row[3])
         answer = problems[i][1].decode("utf-8", "replace")
@@ -159,22 +163,28 @@ def mark_reads(problems, marks, train):
         good = v is not None and w is not None and v == w
         seen[kind][0] += 1
         seen[kind][1] += good
+        each.append((kind, good))
         op = re.fullmatch(r"\d*\.?\d+([+\-*/])\d*\.?\d+", e.replace(" ", ""))
         if op:
             by_op[op.group(1), "n"] += 1
             by_op[op.group(1), "right"] += good
-    return seen, by_op
+    return seen, by_op, each
 
 
 def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
+    pair = sys.argv[3] == "pair"
+    dirs = sys.argv[4:] if pair else sys.argv[3:]
+    if pair and (len(dirs) != 2 or "reference" in dirs):
+        raise SystemExit("pair reads two release directories")
+    goods = []
     held, train = (open(p, "rb").read() for p in sys.argv[1:3])
     problems = problems_of(held)
     train_text = train.decode("utf-8", "replace")
     counts = Counter(w for w in WORD.findall(train_text.lower()) if len(w) >= 4)
     common = {w for w, _ in counts.most_common(100)}
-    for d in sys.argv[3:]:
+    for d in dirs:
         if d == "reference":
             answers = [a for _, a in problems]
             marks = None
@@ -190,7 +200,8 @@ def main():
             f"b_free_right={right} c_first_calculations={firsts} c_from_question={from_question}"
         )
         if marks is not None:
-            seen, by_op = mark_reads(problems, marks, train_text)
+            seen, by_op, each = mark_reads(problems, marks, train_text)
+            goods.append(each)
             n, r = seen["met"][0] + seen["never"][0], seen["met"][1] + seen["never"][1]
             ops = " ".join(f"{op}={by_op[op, 'right']}/{by_op[op, 'n']}" for op in "+-*/")
             line += (
@@ -198,6 +209,14 @@ def main():
                 f"never_met={seen['never'][1]}/{seen['never'][0]} binary {ops}"
             )
         print(line)
+    if pair:
+        counts = Counter((kind, a, b) for (kind, a), (_, b) in zip(*goods))
+        print(
+            "PAIRED " + " ".join(
+                f"{kind}_only_a={counts[kind, True, False]} {kind}_only_b={counts[kind, False, True]} "
+                f"{kind}_both={counts[kind, True, True]}" for kind in ("met", "never")
+            )
+        )
 
 
 if __name__ == "__main__":
