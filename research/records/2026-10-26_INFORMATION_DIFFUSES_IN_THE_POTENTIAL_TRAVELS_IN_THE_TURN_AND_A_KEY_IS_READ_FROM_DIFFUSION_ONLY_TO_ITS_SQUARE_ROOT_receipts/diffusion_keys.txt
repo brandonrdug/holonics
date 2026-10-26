@@ -1,0 +1,35 @@
+A  the twisted cycle: Z_k connection on C_n, one edge carrying the turn c
+  n= 2 N= 8: lambda_min = 2 - zeta^-1 - zeta^1 (a=-1); labelling energy |1-omega|^2 = 2; |sum z^j|^2 = exact element of Q(zeta_8); brute force over 4^2: least violations 1, optimal labellings 8
+     reading: lambda_min = 0.585786, n^2 lambda_min = 2.3431 (-> (2 pi c/k)^2 = 2.4674), violated fraction 1/n = 0.5000, labelling Rayleigh / lambda_min = |sum z^j|^2 / n = 1.7071, diffusion passes to feel the turn ~ 1/lambda_min = 1.7
+  n= 4 N=16: lambda_min = 2 - zeta^-1 - zeta^1 (a=-1); labelling energy |1-omega|^2 = 2; |sum z^j|^2 = exact element of Q(zeta_16); brute force over 4^4: least violations 1, optimal labellings 16
+     reading: lambda_min = 0.152241, n^2 lambda_min = 2.4359 (-> (2 pi c/k)^2 = 2.4674), violated fraction 1/n = 0.2500, labelling Rayleigh / lambda_min = |sum z^j|^2 / n = 3.2843, diffusion passes to feel the turn ~ 1/lambda_min = 6.6
+  n= 8 N=32: lambda_min = 2 - zeta^-1 - zeta^1 (a=-1); labelling energy |1-omega|^2 = 2; |sum z^j|^2 = exact element of Q(zeta_32); brute force over 4^8: least violations 1, optimal labellings 32
+     reading: lambda_min = 0.038429, n^2 lambda_min = 2.4595 (-> (2 pi c/k)^2 = 2.4674), violated fraction 1/n = 0.1250, labelling Rayleigh / lambda_min = |sum z^j|^2 / n = 6.5054, diffusion passes to feel the turn ~ 1/lambda_min = 26.0
+  n=16 N=64: lambda_min = 2 - zeta^-1 - zeta^1 (a=-1); labelling energy |1-omega|^2 = 2; |sum z^j|^2 = exact element of Q(zeta_64); brute force skipped (4^16); one violation is forced: sum of defects round the cycle = c != 0 mod k
+     reading: lambda_min = 0.009631, n^2 lambda_min = 2.4654 (-> (2 pi c/k)^2 = 2.4674), violated fraction 1/n = 0.0625, labelling Rayleigh / lambda_min = |sum z^j|^2 / n = 12.9795, diffusion passes to feel the turn ~ 1/lambda_min = 103.8
+[A] elapsed_ms=480
+B  a pass is a hop: plain relaxation against momentum on a path, kappa = m^2
+  m= 3 kappa<=m^2=  9: a = 1/2; to energy below 2^-20 of the start: plain 28 passes (rate per pass (k-1)/(k+1) = 4/5), momentum 12 passes (rate q = (m-1)/(m+1) = 1/2)
+  m= 5 kappa<=m^2= 25: a = 1/6; to energy below 2^-20 of the start: plain 77 passes (rate per pass (k-1)/(k+1) = 12/13), momentum 20 passes (rate q = (m-1)/(m+1) = 2/3)
+  m= 9 kappa<=m^2= 81: a = 1/20; to energy below 2^-20 of the start: plain 246 passes (rate per pass (k-1)/(k+1) = 40/41), momentum 37 passes (rate q = (m-1)/(m+1) = 4/5)
+  m=17 kappa<=m^2=289: a = 1/72; to energy below 2^-20 of the start: plain 908 passes (rate per pass (k-1)/(k+1) = 144/145), momentum 73 passes (rate q = (m-1)/(m+1) = 8/9)
+  reading: plain/momentum = 2.33 at kappa 9, 3.85 at kappa 25, 6.65 at kappa 81, 12.44 at kappa 289
+[B] elapsed_ms=12847
+C  a unique game on the Petersen graph over S_3: loop closure at value 1 and at 1 - 1/15
+  key [0, 1, 0, 2, 2, 0, 1, 0, 1, 2]; loop closure from one vertex: 3 hypotheses x 15 edges, stops 1 (the key)
+  brute force over 3^10 = 59049: labellings by edges satisfied {15: 1, 13: 4, 12: 36, 11: 88} ...
+  corrupted edge 7 (2, 7): loop closure stops 0; optimum 14 of 15 with 1 optimal labellings; dropping each edge in turn locates only edge [7] (15 x 3 propagations), and the key returns
+[C] elapsed_ms=13075
+D  two flat blocks (K4, Z_3 differences) joined by two conflicting contacts
+  least violations 1; optimal labellings 6; gauge fixed 2; after one landmark 1
+  spectrum: lambda_2(L) <= 1 (block sign, Rayleigh 1), lambda_3(L) >= 4 (L >= L0 = two K4 blocks): two slow modes, the constant (gauge) and the block sign (the undetermined relative shift)
+[D] elapsed_ms=13097
+E  gradient play on f(x, y) = x y (x descends, y ascends): the turn alone, and with friction
+  eta = 1/2: simultaneous x5/4 per step (the turn pumps); alternating conserves a quadratic; friction 1/2: x13/16; friction 2: x1/4
+[E] elapsed_ms=13097
+F  the least certifiable relative drop delta = 1/m: (m/(m-1))^N > N |P|^2, |P| = 2^10
+  N=  1000: smallest certifiable drop 1/48 of the tension (reading 0.02083; (ln N + 2 ln|P|)/N = 0.02077)
+  N= 10000: smallest certifiable drop 1/433 of the tension (reading 0.00231; (ln N + 2 ln|P|)/N = 0.00231)
+  N=100000: smallest certifiable drop 1/3941 of the tension (reading 0.00025; (ln N + 2 ln|P|)/N = 0.00025)
+[F] elapsed_ms=14586
+all 394 checks hold
