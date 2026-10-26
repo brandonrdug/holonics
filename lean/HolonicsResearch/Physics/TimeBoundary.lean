@@ -25,6 +25,11 @@ This file proves #410's (l).
    forward and backward.
 7. **Neutral is `r = 1`** (`timeBoundary_one`): an unchanged medium, `Z′ = Z`, leaves the mode as it
    was, whatever `Z` is. Neutral is a ratio of one against the medium already held, never a value.
+8. **The step's norm is `max(1, |r|)`** (`timeBoundary_normSq_le`, `timeBoundary_real`,
+   `timeBoundary_I`, `timeBoundary_norm_attained`): `|A′|² ≤ max(1, r²)|A|²` for every `A`, with
+   equality at `A = 1` (the in-phase part is kept) or at `A = i` (the quadrature is scaled by `r`).
+9. **For `r > 1` the step expands** (`timeBoundary_expands`): `|A′| > |A|` at `A = i`. A drop of
+   impedance, `Z′ < Z`, pumps the quadrature: the medium's change does work on the mode.
 
 Consumers: the atlas row `wave.time-boundary`.
 -/
@@ -85,5 +90,43 @@ theorem timeBoundary_one (A : ℂ) : timeBoundary 1 A = A := by
   apply Complex.ext
   · simp [timeBoundary_re]
   · simp [timeBoundary_im]
+
+/-- [proved-standard; formal-checked] **The step's norm is at most `max(1, |r|)`:**
+`|A′|² ≤ max(1, r²)·|A|²`. -/
+theorem timeBoundary_normSq_le (r : ℝ) (A : ℂ) :
+    normSq (timeBoundary r A) ≤ max 1 (r ^ 2) * normSq A := by
+  rw [normSq_apply, normSq_apply, timeBoundary_re, timeBoundary_im]
+  have a := mul_le_mul_of_nonneg_right (le_max_left 1 (r ^ 2)) (mul_self_nonneg A.re)
+  have b := mul_le_mul_of_nonneg_right (le_max_right 1 (r ^ 2)) (mul_self_nonneg A.im)
+  nlinarith [a, b]
+
+/-- [proved-standard; formal-checked] The in-phase unit is kept. -/
+theorem timeBoundary_real (r : ℝ) : timeBoundary r 1 = 1 := by
+  apply Complex.ext
+  · simp [timeBoundary_re]
+  · simp [timeBoundary_im]
+
+/-- [proved-standard; formal-checked] The quadrature unit is scaled by `r`. -/
+theorem timeBoundary_I (r : ℝ) : timeBoundary r I = (r : ℂ) * I := by
+  apply Complex.ext
+  · simp [timeBoundary_re]
+  · simp [timeBoundary_im]
+
+/-- [proved-standard; formal-checked] **The norm `max(1, |r|)` is attained**, at `A = 1` when
+`r² ≤ 1` and at `A = i` when `r² ≥ 1`. -/
+theorem timeBoundary_norm_attained (r : ℝ) :
+    ∃ A : ℂ, A ≠ 0 ∧ normSq (timeBoundary r A) = max 1 (r ^ 2) * normSq A := by
+  rcases le_total (r ^ 2) 1 with h | h
+  · refine ⟨1, one_ne_zero, ?_⟩
+    rw [timeBoundary_real, max_eq_left h, one_mul]
+  · refine ⟨I, I_ne_zero, ?_⟩
+    rw [timeBoundary_I, max_eq_right h, normSq_mul, normSq_ofReal, normSq_I]
+    ring
+
+/-- [proved-standard; formal-checked] **For `r > 1` the step expands:** `|i′| > |i|`. -/
+theorem timeBoundary_expands {r : ℝ} (hr : 1 < r) :
+    normSq I < normSq (timeBoundary r I) := by
+  rw [timeBoundary_I, normSq_mul, normSq_ofReal, normSq_I]
+  nlinarith
 
 end Holonics.Physics.TimeBoundary

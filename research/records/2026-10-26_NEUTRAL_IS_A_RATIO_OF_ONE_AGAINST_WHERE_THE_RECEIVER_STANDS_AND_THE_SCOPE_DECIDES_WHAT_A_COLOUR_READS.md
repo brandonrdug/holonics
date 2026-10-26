@@ -214,7 +214,11 @@ against its fixed acceptance (never-met sums right at the equals).
 
 To #410:
 - (p) the converse of the neutral criterion: `Tr_H(ζ_n) = 0` only when `H` contains the kernel of
-  `(ℤ/n)ˣ → (ℤ/(n/p))ˣ` for some `p` with `p² ∣ n` (checked `n ≤ 200`).
+  `(ℤ/n)ˣ → (ℤ/(n/p))ˣ` for some `p` with `p² ∣ n` (checked `n ≤ 200`). The `⇐` half is
+  formal-checked in `Mathematics/ColourScope`: with `n = p·m` and `p ∣ m`, the unit `g = 1 + m`
+  steps along the fibre (`fibre_step_sq`, `fibre_generator_pow`) and lies in the kernel
+  (`fibre_generator_mem_ker`), and a scope holding `g`, or the kernel, reads `0`
+  (`scopeReading_eq_zero_of_fibre`, `scopeReading_eq_zero_of_ker_le`).
 
 Formal-checked the same day: `no_intrinsic_colour`, `fibre_primitive`, `fibre_cancels`,
 `new_prime_flips_sign`, `colour12_primitive`, `colour12_pow_six`, `scope_quarter_turn`,

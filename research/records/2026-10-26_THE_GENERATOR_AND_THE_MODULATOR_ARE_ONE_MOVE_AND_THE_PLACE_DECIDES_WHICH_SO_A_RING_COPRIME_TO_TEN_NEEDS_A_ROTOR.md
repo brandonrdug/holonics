@@ -455,8 +455,8 @@ G_h(t)         = (Cᵀδr)⁻ + P^(−σ_(t+1)) (conj(λ_(t+1)) ⊙ G_h(t+1))
   `‖h‖₂ ≤ ‖Bx‖₂/(1 − ρ_max) ≤ 2·2^12·max|Bx| = 2^13·max|Bx|` on a ring of four. That is about `2^6.5`
   times the per-mode bound `√(2^13 − 1)·max|Bx|` at `ρ_max = 1 − 2^−12`. It is a certified bound,
   not a shown need: no sharper bound for the Fourier step is derived.
-- [checked] **What a ring holds.** A ring of `K` modes stepped once a digit holds `n` mod every
-  divisor of `10^K − 1`:
+- [checked; formal-checked in `Mathematics/RotorStep`, §13 (i)] **What a ring holds.** A ring of
+  `K` modes stepped once a digit holds `n` mod every divisor of `10^K − 1`:
   - four modes hold `9999 = 3²·11·101`;
   - six modes hold `999999 = 3³·7·11·13·37`.
 
@@ -593,6 +593,20 @@ To #410:
   plane mirror is never conjugate to a turn, since their determinants are `−1` and `1`
   (`mirror_not_conj_turn`); and the mirrors are conjugate to each other by turns
   (`mirror_conj_by_turn`, `mirror_conj_by_turn_complex`: `v·conj(conj v·z) = v²·conj z`).
+
+(i) was formal-checked the same day in
+[`Mathematics/RotorStep`](../../lean/HolonicsResearch/Mathematics/RotorStep.lean):
+- the base closes its orbit on every divisor of `b^K − 1` (`orbit_closes`, `pow_mod_orbit`);
+- the positional rotor, `K` integer modes rotated one place with the digit added at mode `0`, reads
+  the digit move of its old reading (`rotorStep_reading`), so stepped from rest it holds the word's
+  number modulo every such divisor (`rotor_holds_number`);
+- the keyed rotor is the generator and the modulator in one move,
+  `ψ(c·bʲ·(b n + d)) = ψ(c·bʲ·d)·ψ(c·bʲ⁺¹·n)` (`keyed_rotor_step`), its ring closes when `b^K = 1`
+  (`keyed_rotor_wraps`), and read from rest mode `j` after the word is exactly `ψ(c·bʲ·n)`
+  (`keyed_rotor_reads`, `keyed_rotor_from_rest`): the equation at the consumer that the rotor
+  loop's next build fixes;
+- a monomial step, one mode's state per mode turned by a unit-modulus factor, keeps `∑|v_j|²`
+  (`monomial_step_keeps_power`).
 
 Atlas rows:
 - `radix.digit-move-place-kind`;
