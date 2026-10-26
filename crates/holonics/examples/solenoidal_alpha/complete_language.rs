@@ -21,6 +21,8 @@ mod tower_situated;
 mod tower_ring;
 #[path = "complete_language/tower_classes.rs"]
 mod tower_classes;
+#[path = "complete_language/tower_bank.rs"]
+mod tower_bank;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
@@ -822,6 +824,9 @@ pub(super) fn run_with_execution(
         Some("train-scaled-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Scaled),
         Some("train-two-ladder-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Both),
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
+        Some("found-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::found(args),
+        Some("join-tower-bank") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::join(args),
+        Some("train-sections-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::train(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
@@ -847,6 +852,18 @@ pub(super) fn run_with_execution(
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }
+/// The class-passage tower commands with each section's forward and reverse through a declared
+/// realization (`hnn::tower::realization`; `holonics-cuda`'s `tower_pass` example passes the card).
+pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::realization::PassRealization) -> Result<()> {
+    use holonics::hnn::tower::TurnLadder;
+    match args.first().map(String::as_str) {
+        Some("train-gated-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Fixed, realization),
+        Some("train-scaled-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Scaled, realization),
+        Some("train-two-ladder-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, realization),
+        _ => Err("a realized route trains the gated tower on a class passage: train-gated-tower-classes, train-scaled-tower-classes or train-two-ladder-tower-classes".into()),
+    }
+}
+
 pub(super) fn run(args: &[String]) -> Result<()> {
     run_with_execution(
         args,

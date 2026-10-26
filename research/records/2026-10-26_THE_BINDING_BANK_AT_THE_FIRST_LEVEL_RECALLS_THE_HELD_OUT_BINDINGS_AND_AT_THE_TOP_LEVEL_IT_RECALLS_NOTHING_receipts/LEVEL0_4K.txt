@@ -1,0 +1,14 @@
+TOWER_SECTIONS material=87430 bank=bank 0 64 8 8 section=64 streams=16 deposits_a_pass=256 train_sections=4096 dev_sections=1000
+TOWER_HELD pass=opening marked=16000 named=0 bits_a_marked=7.000 elapsed_ms=5619
+TOWER_SECTION pass=0 deposit=32 bits_a_marked=2.865 deposits=32 halvings=3 elapsed_ms=20273
+TOWER_SECTION pass=0 deposit=64 bits_a_marked=0.396 deposits=64 halvings=3 elapsed_ms=33989
+TOWER_SECTION pass=0 deposit=96 bits_a_marked=0.064 deposits=96 halvings=15 elapsed_ms=48197
+TOWER_SECTION pass=0 deposit=128 bits_a_marked=0.013 deposits=128 halvings=25 elapsed_ms=62564
+TOWER_SECTION pass=0 deposit=160 bits_a_marked=0.008 deposits=160 halvings=67 elapsed_ms=79136
+TOWER_SECTION pass=0 deposit=192 bits_a_marked=0.003 deposits=191 halvings=142 elapsed_ms=99621
+TOWER_SECTION pass=0 deposit=224 bits_a_marked=0.002 deposits=223 halvings=160 elapsed_ms=114138
+TOWER_SECTION pass=0 deposit=256 bits_a_marked=0.001 deposits=255 halvings=202 elapsed_ms=130965
+TOWER_STATE STATE.0 state_sha256=48e698c419dd738457462aaf3e3e3a3d08450a2b7dcd4a4a640f296acd2a71ce
+TOWER_HELD pass=0 train_bits_a_marked=0.419 marked=16000 named=15999 bits_a_marked=0.001 deposits=255/256 pass_ms=131282 elapsed_ms=136902
+TOWER_DONE state_sha256=48e698c419dd738457462aaf3e3e3a3d08450a2b7dcd4a4a640f296acd2a71ce elapsed_ms=136982
+RUN_RECEIPT exit=0 wall_ms=137047 peak_rss_kib=340820 user_ms=465461

@@ -1,0 +1,23 @@
+TOWER_TRAIN material=182017 streams=24 section=128 sections_a_pass=236 train_bytes=725141 dev_bytes=28757
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.843 deposits=32 halvings=20 elapsed_ms=1470
+TOWER_SWELL pass=0 section=32 L0 x=100965 h=692952 r=1083543 a=587479 push=9428287 read=8610247 contact=9758608 return=5329774 lambda=1070139554 L1 x=1240957 h=11585741 r=15829216 a=511151 push=7350010 read=5649274 contact=8170282 return=4156134 lambda=1070072662 readout=5156929
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.698 deposits=64 halvings=21 elapsed_ms=2636
+TOWER_SWELL pass=0 section=64 L0 x=131482 h=789066 r=1435931 a=670699 push=12846607 read=14588563 contact=12056322 return=9216083 lambda=1069950619 L1 x=1274259 h=9467453 r=17273596 a=525240 push=9247472 read=8238806 contact=10409022 return=4672174 lambda=1070110251 readout=8927112
+TOWER_SECTION pass=0 section=96 bits_a_byte=3.259 deposits=96 halvings=21 elapsed_ms=3782
+TOWER_SWELL pass=0 section=96 L0 x=155492 h=1215726 r=1626316 a=747900 push=15138146 read=16559419 contact=13028656 return=11931415 lambda=1069903608 L1 x=1717190 h=11623643 r=16835858 a=533433 push=10825183 read=10153147 contact=11543198 return=4948949 lambda=1070187654 readout=9630382
+TOWER_SECTION pass=0 section=128 bits_a_byte=3.097 deposits=128 halvings=21 elapsed_ms=4931
+TOWER_SWELL pass=0 section=128 L0 x=164259 h=956536 r=1691868 a=874340 push=15931474 read=17590529 contact=16018011 return=12893923 lambda=1069899855 L1 x=1628218 h=10728783 r=15929244 a=533019 push=10885123 read=10182951 contact=11567201 return=4956964 lambda=1070188913 readout=9583041
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.911 deposits=160 halvings=21 elapsed_ms=6044
+TOWER_SWELL pass=0 section=160 L0 x=168074 h=993236 r=1709211 a=988819 push=16181321 read=17670004 contact=17847825 return=13980643 lambda=1069806806 L1 x=1706027 h=10596143 r=12903844 a=541039 push=10873535 read=10182936 contact=11567543 return=4957068 lambda=1070188921 readout=10886767
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.897 deposits=192 halvings=21 elapsed_ms=7163
+TOWER_SWELL pass=0 section=192 L0 x=173576 h=1005805 r=1631835 a=913971 push=17095795 read=18934646 contact=19859925 return=15037570 lambda=1069757577 L1 x=2192875 h=11938326 r=13047563 a=559669 push=10940660 read=10511968 contact=11538391 return=5034802 lambda=1070266413 readout=10913804
+TOWER_SECTION pass=0 section=224 bits_a_byte=2.684 deposits=224 halvings=21 elapsed_ms=8272
+TOWER_SWELL pass=0 section=224 L0 x=175569 h=1021063 r=1491737 a=951557 push=17780032 read=19086440 contact=20260693 return=15552696 lambda=1069691126 L1 x=1805070 h=7548342 r=12831107 a=546703 push=12761791 read=8799680 contact=10757636 return=4726531 lambda=1070640032 readout=11078011
+TOWER_SECTION pass=0 section=236 bits_a_byte=2.712 deposits=236 halvings=21 elapsed_ms=8690
+TOWER_SWELL pass=0 section=236 L0 x=175070 h=1217801 r=1628387 a=919346 push=18090893 read=19411957 contact=20627165 return=15506016 lambda=1069715480 L1 x=1950749 h=7066409 r=13390132 a=536635 push=12937721 read=8879397 contact=10733883 return=4726073 lambda=1070672953 readout=11237925
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 24 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 3072 blocks (one a cell) x 256 threads, the modes' scan 24 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.0 state_bytes=6818435 state_sha256=6470451f07d29034cf2bb9d7aa3561a70695f63a9017a470e9ee1ac7c8f1ed69
+TOWER_PASS pass=0 train_bits_a_byte=3.309 dev_bits_a_byte=2.819 dev_regions gsm8k=2.819 strokes=0.000 cycles=0.000 words=0.000 deposits=236/236 pass_ms=8945 elapsed_ms=8948
+TOWER_DONE state_bytes=6818435 state_sha256=6470451f07d29034cf2bb9d7aa3561a70695f63a9017a470e9ee1ac7c8f1ed69 elapsed_ms=8983
+TOWER_CARD forwards=493 forward_ms=5187 reverses=236 reverse_ms=1054 elapsed_ms=8992
+MEASURED exit=0 wall_s=9.184 peak_rss_kib=148256

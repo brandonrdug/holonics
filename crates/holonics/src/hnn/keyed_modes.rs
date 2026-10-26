@@ -176,6 +176,11 @@ impl Exponential {
         }
         Self { roots, digits }
     }
+    /// The navigator's resident face, `2^(2^(−i))` on `2^(−62)` for `i = 1..=X`.
+    pub fn roots(&self) -> &[u128] {
+        &self.roots
+    }
+
     /// `2^(x / 2^X)` for `x ≤ 0` on `2^(−62)`, at least one grain (a class is never released to
     /// zero mass by its exponent).
     pub fn below_one(&self, x: i128) -> u128 {

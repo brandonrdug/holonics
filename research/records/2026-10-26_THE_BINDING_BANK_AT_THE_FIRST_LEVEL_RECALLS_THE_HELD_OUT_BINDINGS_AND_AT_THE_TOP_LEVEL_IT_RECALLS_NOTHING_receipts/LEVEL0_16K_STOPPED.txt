@@ -1,0 +1,14 @@
+TOWER_BANK_JOINED bank 0 64 8 8 material=87430 state_sha256=d611e62813bd9e842bce840bafecb2694ab1be305f70eb739223c0d815405d4a
+TOWER_SECTIONS material=87430 bank=bank 0 64 8 8 section=64 streams=16 deposits_a_pass=1024 train_sections=16384 dev_sections=1000
+TOWER_HELD pass=opening marked=16000 named=0 bits_a_marked=7.000 elapsed_ms=5912
+TOWER_SECTION pass=0 deposit=32 bits_a_marked=2.865 deposits=32 halvings=3 elapsed_ms=20927
+TOWER_SECTION pass=0 deposit=64 bits_a_marked=0.396 deposits=64 halvings=3 elapsed_ms=34021
+TOWER_SECTION pass=0 deposit=96 bits_a_marked=0.064 deposits=96 halvings=15 elapsed_ms=47593
+TOWER_SECTION pass=0 deposit=128 bits_a_marked=0.013 deposits=128 halvings=25 elapsed_ms=61318
+TOWER_SECTION pass=0 deposit=160 bits_a_marked=0.008 deposits=160 halvings=67 elapsed_ms=78201
+TOWER_SECTION pass=0 deposit=192 bits_a_marked=0.003 deposits=191 halvings=142 elapsed_ms=97276
+TOWER_SECTION pass=0 deposit=224 bits_a_marked=0.002 deposits=223 halvings=160 elapsed_ms=111878
+TOWER_SECTION pass=0 deposit=256 bits_a_marked=0.001 deposits=255 halvings=202 elapsed_ms=128143
+TOWER_SECTION pass=0 deposit=288 bits_a_marked=0.001 deposits=287 halvings=211 elapsed_ms=141195
+TOWER_SECTION pass=0 deposit=320 bits_a_marked=0.000 deposits=319 halvings=218 elapsed_ms=153555
+RUN_RECEIPT exit=-15 wall_ms=158129 peak_rss_kib=336304 user_ms=535394

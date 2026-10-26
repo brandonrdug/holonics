@@ -1,0 +1,9 @@
+TOWER_TRAIN material=182017 streams=240 section=128 sections_a_pass=23 train_bytes=725141 dev_bytes=28757
+TOWER_SECTION pass=0 section=23 bits_a_byte=5.038 deposits=23 halvings=28 elapsed_ms=11648
+TOWER_SWELL pass=0 section=23 L0 x=85944 h=465503 r=469783 a=526202 push=6521535 read=6110171 contact=8122364 return=3343548 lambda=1069735143 L1 x=831913 h=14054561 r=5890319 a=360740 push=4590018 read=4313480 contact=6778122 return=2967126 lambda=1069851029 readout=2991434
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 240 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 30720 blocks (one a cell) x 256 threads, the modes' scan 240 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.0 state_bytes=7312180 state_sha256=dbf29737d62a7c2ac4b9fee88578c9ca5411e80e6ed073116b7318ec088a281e
+TOWER_PASS pass=0 train_bits_a_byte=5.038 dev_bits_a_byte=4.265 dev_regions gsm8k=4.265 strokes=0.000 cycles=0.000 words=0.000 deposits=23/23 pass_ms=11854 elapsed_ms=11857
+TOWER_DONE state_bytes=7312180 state_sha256=dbf29737d62a7c2ac4b9fee88578c9ca5411e80e6ed073116b7318ec088a281e elapsed_ms=11901
+TOWER_CARD forwards=74 forward_ms=1135 reverses=23 reverse_ms=2436 elapsed_ms=11910
+MEASURED exit=0 wall_s=12.116 peak_rss_kib=157616

@@ -99,6 +99,14 @@ pub fn run_complete_language_with_execution(
 ) -> std::result::Result<(), Box<dyn Error>> {
     complete_language::run_with_execution(args, execution, backend)
 }
+/// The class-passage tower's training with each section's pass through `realization`
+/// (`hnn::tower::realization`): `args` are a `complete-language` tower-classes command's.
+pub fn run_tower_classes_with_realization(
+    args: &[String],
+    realization: &mut dyn holonics::hnn::tower::realization::PassRealization,
+) -> std::result::Result<(), Box<dyn Error>> {
+    complete_language::run_tower_classes_realized(args, realization)
+}
 #[cfg(test)]
 pub fn code_checkpoint_native_bytes(path: &str) -> std::result::Result<Vec<u8>, Box<dyn Error>> {
     let (mut checkpoint, _) = Checkpoint::load(path, 64 * 1024 * 1024)?;

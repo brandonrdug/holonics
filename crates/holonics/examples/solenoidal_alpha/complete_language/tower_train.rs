@@ -11,6 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::passage::{PassageDeclaration, PassageTree};
+use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
@@ -3172,7 +3173,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         regions: REGIONS,
         train_compared: None,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, looking)
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, looking, &mut HostPass::default())
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -3205,7 +3206,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None)
+    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None, &mut HostPass::default())
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3224,9 +3225,11 @@ pub(super) struct Reading {
 }
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
-/// OUT [FROM FROM_SHA]`.
+/// OUT [FROM FROM_SHA]`. Each section's forward and reverse run through `realization`
+/// (`hnn::tower::realization`; the host's own for every command but a card route's), which
+/// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, looking: Option<&Looking>) -> Result<()> {
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3315,7 +3318,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 let mut compared: Vec<&[Option<usize>]> = plain.iter().map(|c| c.as_slice()).collect();
                 compared.extend(forks.iter().map(|f| f.compared.as_slice()));
                 states.extend(forks.iter().map(|f| f.opening.clone()));
-                let result = learner.section_compared(&mut states, &parts, Some(&compared));
+                let result = learner.section_realized(&mut states, &parts, Some(&compared), realization);
                 states.truncate(streams);
                 let receipt = match result {
                     Ok(receipt) => receipt,
@@ -3370,7 +3373,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             let compared: Option<Vec<Vec<Option<usize>>>> =
                 reading.train_compared.as_ref().map(|mask| ranges.iter().map(|r| r.clone().map(|i| mask[i].then_some(classes[i])).collect()).collect());
             let slices: Option<Vec<&[Option<usize>]>> = compared.as_ref().map(|c| c.iter().map(|v| v.as_slice()).collect());
-            let receipt = match learner.section_compared(&mut states, &parts, slices.as_deref()) {
+            let receipt = match learner.section_realized(&mut states, &parts, slices.as_deref(), realization) {
                 Ok(receipt) => receipt,
                 Err(e) => {
                     println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
@@ -3399,6 +3402,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         }
         // Each pass's learner rests beside the run before the held-out read, so a run stopped at
         // its deadline or refused in the read keeps its last trained pass.
+        println!("TOWER_REALIZATION pass={pass} {}", realization.realization());
         let text = learner.to_text();
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;

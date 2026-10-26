@@ -144,6 +144,7 @@ pub mod port;
 mod publication;
 mod readout;
 mod store;
+pub mod tower;
 pub mod tree;
 pub mod word;
 
@@ -166,6 +167,7 @@ pub use inverse_exact::{ExactInverseExecution, ExactInverseOperator};
 pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
 pub use port::{Mounted, ObservedEpochDevice, Resident, Traffic};
+pub use tower::{TowerCard, TowerCardTimes};
 pub use tree::{CardTree, TreeTimes};
 pub use word::{Refusal, ResonatorPlan};
 
