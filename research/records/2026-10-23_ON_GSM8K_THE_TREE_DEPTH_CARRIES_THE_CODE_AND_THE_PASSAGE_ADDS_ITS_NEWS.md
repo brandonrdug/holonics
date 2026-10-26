@@ -1,5 +1,13 @@
 # On GSM8K the tree's depth carries the code, and the passage adds its news
 
+**Withdrawn, October 26.** The passage tree and its node lock this record builds or measures are an
+index of exact contexts with a longest-match copier: decayed counts per context, and the class that
+followed the deepest match's last visit. An audit made at Brandon's request found it, and commit
+`0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 Refs #405 #404 #73. Follows [the native face reads its own receiving tree](2026-10-22_THE_NATIVE_FACE_READS_ITS_OWN_RECEIVING_TREE.md)
 and the mathematics thread's
 [order is torsion record](2026-10-22_ORDER_IS_TORSION_AND_SUBGRAIN_INFORMATION_DISSOLVES_INTO_THE_CARRIED_RESIDUE.md)

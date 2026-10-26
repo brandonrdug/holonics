@@ -1,5 +1,12 @@
 # The replay is the pass, and its top step carries a third of the name's loss, so the role line closes at the second lap
 
+**Withdrawn, October 26.** The reset clock this record builds or measures is a copy pointer: it
+holds the unit that arrived after a chosen class and raises that unit's logit at the output. An
+audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 October 26. Refs #404, #405, #386. The section-by-section replay of the third lap's pass, fixed in
 the [stopped run's record](2026-10-26_THE_REPLAY_STOPPED_AT_ITS_FIRST_WINDOW_SO_IT_READS_THE_SECTIONS_OWN_OPENING_READ.md)
 §4, ran to its end on Brandon's PC. This record gives what it read, the decision its fixed rule

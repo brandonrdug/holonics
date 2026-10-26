@@ -3356,11 +3356,6 @@ impl TowerLearner {
         }
     }
 
-    /// The first and second moments, on the deposit's grain `2^(−32)` and its square.
-    pub fn moments(&self) -> (&[i128], &[i128]) {
-        (&self.first, &self.second)
-    }
-
     /// [definition; agent-inferred, October 25] **A founded family's moments, opened on the passage
     /// it was founded on.** The moments are the covector's running statistics, and a family opened
     /// with them at zero inside an opened learner claims a covector free of noise: the normalized

@@ -1,5 +1,13 @@
 # The binding bank at the first level recalls the held-out bindings, and at the top level it recalls nothing
 
+**Withdrawn, October 26.** The binding bank this record builds or measures is a key/query/value
+store: a fixed grid of slots written by the delta rule, opened as an induction copier and first
+accepted on a lookup benchmark (MQAR). An audit made at Brandon's request found it, and commit
+`0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 October 26. Refs #404, #405, #386. The build of spec 1 of
 [the binding bank record](2026-10-26_THE_BINDING_BANK_IS_A_STRAND_CLOCKED_BY_ITS_ANTECEDENT_AND_A_RELEASE_IS_TRACED_BY_ITS_ADDRESS.md)
 and its first readings against that record's fixed acceptance (§3). Receipts:

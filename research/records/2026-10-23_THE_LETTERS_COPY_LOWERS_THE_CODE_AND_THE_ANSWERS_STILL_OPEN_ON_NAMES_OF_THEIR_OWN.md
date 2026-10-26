@@ -1,5 +1,12 @@
 # The letters' copy lowers the code, and the answers still open on names of their own
 
+**Withdrawn, October 26.** The letters copy this record builds or measures runs the passage tree's
+node lock forward as a copier beside the tower. An audit made at Brandon's request found it, and
+commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 Refs #405 #404. Follows [the copy contact](2026-10-23_THE_COPY_CONTACT_CARRIES_THE_QUESTIONS_PIECES_INTO_THE_ANSWER_AND_THE_SUBJECT_STILL_DRIFTS.md).
 Status: [definition; agent-inferred, October 23], built and measured on the host; the step this
 record works on is closed without its acceptance, and the next step is arithmetic.
