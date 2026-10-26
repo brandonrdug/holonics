@@ -1,4 +1,5 @@
 """Synthetic exterior-contract tests; no dataset or model is required."""
+import importlib.util
 import json
 from pathlib import Path
 import struct
@@ -74,6 +75,14 @@ class ExteriorTools(unittest.TestCase):
             self.assertEqual(sections(root / "development_read.hlsn"),
                              [(b"dev?", b"unique solution #### 2")])
 
+
+    def test_written_rules_read_an_expression_outside_their_grammar_as_none(self):
+        spec = importlib.util.spec_from_file_location("written_rules", TOOLS / "written_rules.py")
+        rules = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rules)
+        self.assertEqual(rules.value("2*12"), 24)
+        self.assertIsNone(rules.value("8(2/3)"))
+        self.assertIsNone(rules.value("2**3"))
 
 
 if __name__ == "__main__":
