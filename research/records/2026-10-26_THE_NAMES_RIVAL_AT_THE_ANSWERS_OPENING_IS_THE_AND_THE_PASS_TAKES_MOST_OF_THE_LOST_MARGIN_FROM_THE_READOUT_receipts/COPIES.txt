@@ -1,0 +1,84 @@
+# The requests
+
+REQUESTS named_problems=4524 out=role_clock/copies/train.requests
+REQUESTS named_problems=421 out=role_clock/copies/dev.requests
+
+# The copies on the training text
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=21337 row_square=878974815077695 reach=9555400
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=37441 row_square=984173709392389 reach=10715167
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/copies/lapD8.train.copies elapsed_ms=37579
+RUN_RECEIPT exit=0 wall_s=37.6 peak_rss_kib=107344 user_s=294.7
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29362 row_square=944665327659282 reach=9865444
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=52442 row_square=1063990194873430 reach=11353193
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/copies/lap3T8.train.copies elapsed_ms=37610
+RUN_RECEIPT exit=0 wall_s=37.6 peak_rss_kib=107732 user_s=295.0
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29411 row_square=923793084376303 reach=9059991
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=51847 row_square=1140368517210452 reach=12192171
+TOWER_CLOCK_COPY clock=2 class=61 piece="=" bias=2374 row_square=320264632300096 reach=6999250
+TOWER_CLOCK_CELLS clocks=3 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/copies/lap3D8.train.copies elapsed_ms=37717
+RUN_RECEIPT exit=0 wall_s=37.7 peak_rss_kib=107432 user_s=296.6
+
+# The copies held out
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=21337 row_square=878974815077695 reach=9555400
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=37441 row_square=984173709392389 reach=10715167
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=421 read=421 skipped=0 out=role_clock/copies/lapD8.dev.copies elapsed_ms=4295
+RUN_RECEIPT exit=0 wall_s=4.3 peak_rss_kib=34016 user_s=33.4
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29362 row_square=944665327659282 reach=9865444
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=52442 row_square=1063990194873430 reach=11353193
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=421 read=421 skipped=0 out=role_clock/copies/lap3T8.dev.copies elapsed_ms=4312
+RUN_RECEIPT exit=0 wall_s=4.3 peak_rss_kib=34076 user_s=33.4
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29411 row_square=923793084376303 reach=9059991
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=51847 row_square=1140368517210452 reach=12192171
+TOWER_CLOCK_COPY clock=2 class=61 piece="=" bias=2374 row_square=320264632300096 reach=6999250
+TOWER_CLOCK_CELLS clocks=3 streams=8 requests=421 read=421 skipped=0 out=role_clock/copies/lap3D8.dev.copies elapsed_ms=4339
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=34096 user_s=33.7
+
+# The observer on the training text (the training text read as both the heard and the read text)
+
+role_clock/copies/lapD8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 695
+  means over the 1074: margin over the rival +0.417 bits = readout -3.865 + raise on the first unit +4.289 − raise on the rival +0.008
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 369, b'#### ' 6, b'If ' 3, b'x' 1
+role_clock/copies/lap3T8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 561
+  means over the 1074: margin over the rival -0.063 bits = readout -4.066 + raise on the first unit +4.009 − raise on the rival +0.007
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 477, b'If ' 26, b'#### ' 5, b'D' 1, b'M' 1, b'T' 1, b'Then ' 1, b'F' 1
+  beside the file before, over the 530 it kept: margin -0.424 = readout -0.112 + raise on the first unit -0.321 − raise on the rival -0.008
+  beside the file before, over the 165 it lost: margin -1.163 = readout -0.796 + raise on the first unit -0.348 − raise on the rival +0.019
+role_clock/copies/lap3D8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 599
+  means over the 1074: margin over the rival -0.047 bits = readout -4.039 + raise on the first unit +3.999 − raise on the rival +0.007
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 461, b'#### ' 7, b'If ' 2, b'He ' 2, b'U' 1, b'Then ' 1, b'H' 1
+  beside the file before, over the 490 it kept: margin -0.056 = readout -0.032 + raise on the first unit -0.016 − raise on the rival +0.009
+  beside the file before, over the 71 it lost: margin -1.086 = readout -0.998 + raise on the first unit -0.088 − raise on the rival +0.000
+
+# The observer held out
+
+role_clock/copies/lapD8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 53
+  means over the 97: margin over the rival -0.010 bits = readout -4.269 + raise on the first unit +4.260 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 44
+role_clock/copies/lap3T8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 37
+  means over the 97: margin over the rival -0.573 bits = readout -4.542 + raise on the first unit +3.969 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 60
+  beside the file before, over the 36 it kept: margin -0.599 = readout -0.208 + raise on the first unit -0.391 − raise on the rival +0.000
+  beside the file before, over the 17 it lost: margin -1.098 = readout -0.855 + raise on the first unit -0.244 − raise on the rival +0.000
+role_clock/copies/lap3D8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 43
+  means over the 97: margin over the rival -0.337 bits = readout -4.315 + raise on the first unit +3.978 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 53, b'#### ' 1
+  beside the file before, over the 33 it kept: margin +0.367 = readout +0.289 + raise on the first unit +0.078 − raise on the rival +0.000
+  beside the file before, over the 4 it lost: margin -0.934 = readout -0.766 + raise on the first unit -0.168 − raise on the rival +0.000
