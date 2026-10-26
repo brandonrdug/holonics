@@ -705,5 +705,11 @@ THE_REBUILD carries all five.
 - From §14, owed in #62: the transport closure `E T_a = U_a E`; `Q_R`'s variational identity; the
   localization condition `ker C ∩ {support ≤ 2k} = 0`; the capture and viability recursions; the
   hazard ladder's bound; `Q_a² = S_a`; the action-sufficient quotient's descent; and the
-  no-new-evidence identity for regenerated passages.
+  no-new-evidence identity for regenerated passages. Two are formal-checked on October 26:
+  `J² = −I`, `Q_a² = S_a` and `Q_a⁴ = id` in
+  [`Geometry/QuarterTurn`](../../lean/HolonicsResearch/Geometry/QuarterTurn.lean)
+  (`quarter_mul_self`, `quarterTurn_quarterTurn`, `quarterTurn_four`), and
+  `Σ_y P(y|h) P(θ|h, y) = P(θ|h)` with its zero expected update in
+  [`Foundation/Regeneration`](../../lean/HolonicsResearch/Foundation/Regeneration.lean)
+  (`regeneration_no_new_evidence`, `expected_update_zero`).
 - F6's rewrite and source-contract items 9 and 10 carry the plan and contract consequences.
