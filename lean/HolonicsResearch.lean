@@ -1204,3 +1204,8 @@ import HolonicsResearch.Geometry.TwoReflections
 import HolonicsResearch.Mathematics.ColourScope
 import HolonicsResearch.Mathematics.RotorStep
 import HolonicsResearch.HNN.PassiveMode
+import HolonicsResearch.HNN.RingHand
+import HolonicsResearch.Geometry.ShiftClock
+import HolonicsResearch.Geometry.TorusBraid
+import HolonicsResearch.HNN.ReferentMass
+import HolonicsResearch.HNN.AgreementRelease
