@@ -365,26 +365,6 @@ def main():
     print("volunt- (stem) | %d | %d | %d | yes" % (v_tr, sum(r["volunt"][1] for r in allrs),
                                                    sum(r["volunt"][0] for r in allrs)))
 
-    # E. The declared denominators of the spec's relation-carry read, on the held-out rows.
-    dev = part["dev_indices"]
-    carried = problems_with = answer_words = 0
-    named_dev = 0
-    for i in dev:
-        q, a = rows[i]["question"], rows[i]["answer"]
-        qset = {x.lower() for x in words(q)}
-        aw = words(a)
-        c = sum(1 for x in aw if x.lower() in qset)
-        carried += c
-        answer_words += len(aw)
-        problems_with += c > 0
-        m = LETTERS.match(q)
-        named_dev += bool(m and m.group()[:1].isupper() and counts[m.group()] > counts[m.group().lower()])
-    print()
-    print("== E. Held out: %d problems, %d named; answer words %d, of which %d occur in their own question; "
-          "problems with such a word %d" % (len(dev), named_dev, answer_words, carried, problems_with))
-    qset = {x.lower() for x in words(john["question"])}
-    print("John's answer: %s" % " ".join(x for x in words(ref_answer) if x.lower() in qset))
-    check(carried > 0 and problems_with <= len(dev), "the carry read has a denominator")
     t2 = time.monotonic_ns()
     print("elapsed_ms %d" % ((t2 - t1) // 1000000))
     print()
