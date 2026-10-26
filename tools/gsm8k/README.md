@@ -12,6 +12,10 @@ expression's exact value. None reads the answer key, none selects a release, and
 enters the machine. `ngram_release.py` writes an exterior n-gram baseline's releases for the same
 reads. The rules and their reason are in
 `research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_THE_MARKUP_IS_WRITTEN_AT_ITS_EQUALS.md`.
+With `pair` the rules compare two releases calculation by calculation at the equals.
+`digit_units.py` writes a cause-test foil of the founded units with every digit-bearing unit removed;
+it is never the product
+(`research/records/2026-10-26_THE_SECOND_LAP_WRITES_BACK_225_OF_1572_HEARD_CALCULATIONS_SO_THE_DIGIT_UNITS_ARE_TESTED_AS_THE_CAUSE.md`).
 
 1. Run `python3 -I tools/gsm8k/partition.py TRAIN_JSONL PARTITION_JSON` to group normalized
    questions and declare development rows from the training split. The standard test split is
