@@ -64,3 +64,57 @@ deterministic.
 - Part D was rewritten after an overstatement sent to design: a one-plane bound of `10 ≡ 0, ±1`
   holds in the phase chart only. In the coordinate chart one contracting coordinate holds the
   whole suffix and the nilpotent plane holds units and tens, and part D now checks both.
+
+## The follow-up receipt: `rotor_and_staircase.py`
+
+Written the same day for the record's §11 (design's questions and the rotor at the tower) and §12
+(Brandon's question: why only these rings). The same rules hold: integers and `Fraction` only, and
+phases held as exponents of `ω` or as Gaussian integers.
+
+Parts:
+- **H.** A ring of `K` modes, stepped once a digit with mode `j` turned by `10^j d`, holds `n` mod
+  every divisor of `10^K − 1`, for `K = 1, 2, 3, 4, 6` and every `n < 20000` in steps of 7. One
+  register read on past an operator holds the concatenation `10^len(b)·a + b`. A `k`-digit class
+  acts on ring 11 as `x ↦ (−1)^k x + D`, for every `D < 10^5`. A permutation keeps the passivity
+  bound, checked on rationals of denominator 4096.
+- **I.** For every base 2 to 60, the rings on which the digit maps are a turn, a mirror or a
+  flattening are exactly the divisors of `b − 1`, `b + 1` and `b`.
+- **J.** For `m < 2000`, the least grain `k` with `10^k ≡ 0, ±1 (mod m)` is checked in three cases:
+  - `ord/2` or `ord` for rings coprime to 10;
+  - `max(v₂, v₅)` for rings of 2s and 5s;
+  - none for mixed rings.
+  
+  It also checks the rings at grains 1 to 4, and lifting the exponent for 3 and 11 up to `k = 300`.
+- **K.** For primes below 1000, the rotor's plane count equals the Galois orbit of 10 up to the
+  mirror. For primes below `10^5`, it checks Euler's criterion against the Jacobi symbol computed
+  by reciprocity, and that `(10/p)` depends only on `p mod 40`.
+- **L.** In every base `b = rs` with `r` and `s` coprime, up to 60, the endings divisible by `r` add
+  as ring `s` and read every residue mod `s` once.
+- **M.** Steps on twelve notes make `gcd` strokes; `3^a ≠ 2^b`; the Pythagorean comma.
+- **N.** The bilinear identity `2Re(c₁h₁)·Re(c₂h₂) = Re(c₁c₂h₁h₂) + Re(c₁c̄₂h₁h̄₂)` holds in
+  Gaussian integers, with its sum and difference phases on rings 9, 10, 11, 7, 13 and 101.
+
+```bash
+cd research/records/2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR_receipts
+timeout 60 python3 -I rotor_and_staircase.py > rotor_and_staircase.txt
+```
+
+- **Projection.** About 5 s, from a first development read of its parts H to N. The deadline is
+  60 s, fixed by an outer `timeout`.
+- **Measured.** Through the same `runpy` wrapper the run took 5,154 ms wall time, with a peak
+  resident set of 13,124 KiB on one thread; the script's own clock read 5,134 ms. Measured over the
+  deadline: 5,154/60,000.
+- **Result.** The last line is `all 1749434 checks hold`.
+
+| File | SHA-256 |
+|---|---|
+| `rotor_and_staircase.py` | `19ea0486bc5becea71794c16c4d1bd4ab0308327f924b86051de0ff4651aec62` |
+| `rotor_and_staircase.txt` | `89a99c428cf334103c613dc95a07685134253819b4a0581285d5e37cb50a0340` |
+
+**Development notes.** Three checks were corrected before the committed run:
+- the mirror of `x ↦ D − x` was first written with the wrong fixed point; it is `6D`, since `2·6 ≡ 1`
+  mod 11;
+- the grain search first stopped at `k = 400` and missed ring 811 (`ord = 810`); it now runs to `m`;
+- "the rings at grain `k`" was first compared against every ring that had arrived by `k`. Ring 101
+  arrives at grain 2 but is not one plane at grain 3 (`1000 ≡ −10`), so the comparison is now the
+  grain-`k` rings themselves, plus a check that each of them has arrived.
