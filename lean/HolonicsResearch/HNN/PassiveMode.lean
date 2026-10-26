@@ -40,6 +40,15 @@ the rotor tower first hands each mode one mode's state, `h′_(t−1) = P^σ h_(
    `|α| + |β| = ρ`, so the turn and the mirror share the radius and the push keeps the gated
    `γ = √(1 − ρ²)`; with `|α| + |β| ≤ 1` the carried state `α h + β·conj(h)` is no larger than `h`,
    the circuit reading's `lost ≥ 0` mode by mode.
+7. **The pumped move's lower singular value is `||α| − |β||`, and the split collapses at
+   `|κ| = 1/2`** (`pumped_norm_ge`, `pumped_norm_min_attained`, `pumped_injective`,
+   `pumped_split_gap`, `pumped_split_collapse`, `pumped_split_kernel`, `pumped_split_injective`):
+   `z ↦ α z + β·conj(z)` stretches every state by at least `||α| − |β||` and stretches the unit
+   `e^(i(arg β − arg α + π)/2)` by exactly that, so its singular values are `|α| ± |β|` and a state
+   is readable from its image exactly when `|α| ≠ |β|`. For the tower's split
+   `α = ρ(1 − |κ|)U`, `β = ρκP` the gap is `ρ|1 − 2|κ||`: with `ρ > 0` the mode is readable exactly
+   when `|κ| ≠ 1/2`, and at `|κ| = 1/2` a unit state is carried to zero (the leak law of the
+   GPT-6 note of October 26).
 
 Consumers: the atlas rows `hnn.moment-tower`, `hnn.tower-gated-mode`, `hnn.tower-pumped-mode`,
 `hnn.tower-rotor` and `hnn.tower-circuit-reading`.
@@ -198,5 +207,95 @@ theorem pumped_recursion {ι : Type*} {ρmax M : ℝ} (hmax : ρmax < 1) (hM : 0
     intro j
     rw [hstep]
     exact pumped_step (hαβ t j) hmax hM rfl (ih (σ t j)) (hu t j)
+
+/-- [proved-standard; formal-checked] **The pumped move stretches by at least `||α| − |β||`.** -/
+theorem pumped_norm_ge (α β z : ℂ) : |‖α‖ - ‖β‖| * ‖z‖ ≤ ‖α * z + β * conj z‖ := by
+  have h := abs_norm_sub_norm_le (α * z) (-(β * conj z))
+  rwa [sub_neg_eq_add, norm_neg, norm_mul, norm_mul, Complex.norm_conj, ← sub_mul, abs_mul,
+    abs_norm] at h
+
+/-- [proved-standard; formal-checked] **The bound `||α| − |β||` is attained** at the unit
+`e^(i(arg β − arg α + π)/2)`, where `α z` and `β·conj(z)` point opposite ways. -/
+theorem pumped_norm_min_attained (α β : ℂ) :
+    ∃ z : ℂ, ‖z‖ = 1 ∧ ‖α * z + β * conj z‖ = |‖α‖ - ‖β‖| := by
+  obtain ⟨c, hc⟩ : ∃ c : ℝ, c = (arg β - arg α + Real.pi) / 2 := ⟨_, rfl⟩
+  refine ⟨exp (c * I), Complex.norm_exp_ofReal_mul_I c, ?_⟩
+  have hconj : conj (exp (c * I)) = exp ((-(c : ℂ)) * I) := by
+    rw [← Complex.exp_conj, map_mul, Complex.conj_ofReal, Complex.conj_I]
+    congr 1
+    ring
+  have e1 : (arg α : ℂ) * I + (c : ℂ) * I = ((arg α + c : ℝ) : ℂ) * I := by
+    push_cast
+    ring
+  have e2 : (arg β : ℂ) * I + (-(c : ℂ)) * I =
+      ((arg α + c : ℝ) : ℂ) * I + (-(Real.pi : ℂ)) * I := by
+    rw [hc]
+    push_cast
+    ring
+  have hpi : exp ((-(Real.pi : ℂ)) * I) = -1 := by
+    rw [neg_mul, Complex.exp_neg, Complex.exp_pi_mul_I]
+    norm_num
+  have key : α * exp (c * I) + β * conj (exp (c * I)) =
+      ((‖α‖ - ‖β‖ : ℝ) : ℂ) * exp (((arg α + c : ℝ) : ℂ) * I) := by
+    rw [hconj]
+    conv_lhs => rw [← Complex.norm_mul_exp_arg_mul_I α, ← Complex.norm_mul_exp_arg_mul_I β]
+    rw [mul_assoc, mul_assoc, ← Complex.exp_add, ← Complex.exp_add, e1, e2, Complex.exp_add, hpi]
+    push_cast
+    ring
+  rw [key, norm_mul, Complex.norm_real, Complex.norm_exp_ofReal_mul_I, mul_one, Real.norm_eq_abs]
+
+/-- [proved-standard; formal-checked] **A state is readable from its image when `|α| ≠ |β|`:** the
+pumped move then carries only zero to zero. -/
+theorem pumped_injective {α β : ℂ} (h : ‖α‖ ≠ ‖β‖) {z : ℂ} (hz : α * z + β * conj z = 0) :
+    z = 0 := by
+  have hpos : 0 < |‖α‖ - ‖β‖| := abs_pos.2 (sub_ne_zero.2 h)
+  have hle := pumped_norm_ge α β z
+  rw [hz, norm_zero] at hle
+  have hz0 : ‖z‖ = 0 := le_antisymm (by nlinarith [norm_nonneg z]) (norm_nonneg z)
+  exact norm_eq_zero.1 hz0
+
+/-- [proved-standard; formal-checked] **The split's gap:** the tower's turn and mirror
+`α = ρ(1 − |κ|)U`, `β = ρκP` differ in size by `ρ|1 − 2|κ||`. -/
+theorem pumped_split_gap {ρ κ : ℝ} (hρ : 0 ≤ ρ) (hκ : |κ| ≤ 1) {U P : ℂ} (hU : ‖U‖ = 1)
+    (hP : ‖P‖ = 1) :
+    |‖((ρ * (1 - |κ|) : ℝ) : ℂ) * U‖ - ‖((ρ * κ : ℝ) : ℂ) * P‖| = ρ * |1 - 2 * |κ|| := by
+  rw [norm_mul, norm_mul, hU, hP, mul_one, mul_one, Complex.norm_real, Complex.norm_real,
+    Real.norm_of_nonneg (mul_nonneg hρ (sub_nonneg.2 hκ)), Real.norm_eq_abs, abs_mul,
+    abs_of_nonneg hρ, ← mul_sub, abs_mul, abs_of_nonneg hρ,
+    show 1 - |κ| - |κ| = 1 - 2 * |κ| by ring]
+
+/-- [proved-standard; formal-checked] **The split collapses exactly at `|κ| = 1/2`.** -/
+theorem pumped_split_collapse {ρ κ : ℝ} (hρ : 0 < ρ) :
+    ρ * |1 - 2 * |κ|| = 0 ↔ |κ| = 1 / 2 := by
+  rw [mul_eq_zero, abs_eq_zero, sub_eq_zero]
+  constructor
+  · rintro (h | h)
+    · exact absurd h hρ.ne'
+    · linarith
+  · intro h
+    right
+    linarith
+
+/-- [proved-standard; formal-checked] **At `|κ| = 1/2` a unit state is carried to zero.** -/
+theorem pumped_split_kernel {ρ κ : ℝ} (hρ : 0 ≤ ρ) (hκ : |κ| = 1 / 2) {U P : ℂ} (hU : ‖U‖ = 1)
+    (hP : ‖P‖ = 1) :
+    ∃ z : ℂ, ‖z‖ = 1 ∧
+      ((ρ * (1 - |κ|) : ℝ) : ℂ) * U * z + ((ρ * κ : ℝ) : ℂ) * P * conj z = 0 := by
+  obtain ⟨z, hz1, hz⟩ :=
+    pumped_norm_min_attained (((ρ * (1 - |κ|) : ℝ) : ℂ) * U) (((ρ * κ : ℝ) : ℂ) * P)
+  refine ⟨z, hz1, ?_⟩
+  rw [← norm_eq_zero, hz, pumped_split_gap (κ := κ) hρ (by rw [hκ]; norm_num) hU hP, hκ]
+  norm_num
+
+/-- [proved-standard; formal-checked] **Away from `|κ| = 1/2` the split mode is readable:** with
+`ρ > 0` only zero is carried to zero. -/
+theorem pumped_split_injective {ρ κ : ℝ} (hρ : 0 < ρ) (hκ1 : |κ| ≤ 1) (hκ : |κ| ≠ 1 / 2)
+    {U P : ℂ} (hU : ‖U‖ = 1) (hP : ‖P‖ = 1) {z : ℂ}
+    (hz : ((ρ * (1 - |κ|) : ℝ) : ℂ) * U * z + ((ρ * κ : ℝ) : ℂ) * P * conj z = 0) : z = 0 := by
+  refine pumped_injective ?_ hz
+  intro h
+  have hgap := pumped_split_gap hρ.le hκ1 hU hP
+  rw [h, sub_self, abs_zero, eq_comm, pumped_split_collapse hρ] at hgap
+  exact hκ hgap
 
 end Holonics.HNN.PassiveMode
