@@ -470,3 +470,11 @@ faces. Nothing here grades a generation against an answer.
 - The gated mode's bound under a moving radius, `|h_t| ≤ √((1 + ρ_max)/(1 − ρ_max)) max|Bx|` for
   `ρ_t ≤ ρ_max < 1` and `γ_t = √(1 − ρ_t²)`, and the moment law's arrival (`toward` reaches a
   constant input exactly), in Lean (#410).
+
+The two bounds were formal-checked on October 26 in
+[`HNN/PassiveMode`](../../lean/HolonicsResearch/HNN/PassiveMode.lean). The margin
+`ρ K(ρ_max) + √(1 − ρ²) ≤ K(ρ_max)` for `0 ≤ ρ ≤ ρ_max < 1` is `passive_margin`, and one step is
+`passive_step`. The bound along every passage, `passive_recursion` and `passive_from_rest`, holds
+for any radius at most `ρ_max` (fixed at `|λ|`, the ungated mode, or moving, the gated mode) and
+for any hand-over of modes before the move (the rotor's permutation). The certified section's
+strict descent, the agreement release and the moment law's arrival stay owed.
