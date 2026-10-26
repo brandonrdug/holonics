@@ -1086,9 +1086,12 @@ impl RingFace {
 /// once from the half turn's navigator by the exponential series and rounded into the unit disk. So
 /// the move is a permutation times unimodular turns, and the passivity bound
 /// `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` holds unchanged up to the half grain of the turn's release
-/// to the state's grain, as the move's own release. A mode turned by zero is carried exactly, so a class
-/// that turns nothing steps its rings as a permutation, and with no ring, or every key zero, the
-/// rotor tower reads every passage as its twin without the rotor (the opening). `σ` and `r` have no
+/// to the state's grain, as the move's own release (Lean `HNN/PassiveMode.passive_recursion` proves
+/// the bound for any hand-over of modes and any coefficient of modulus at most `ρ_max < 1`, which
+/// the turned move `λ e^(2πi r/q)` is; the pumped step's conjugate term is owed in #410). A mode
+/// turned by zero is carried exactly, so a class that turns nothing steps its rings as a
+/// permutation, and with no ring, or every key zero, the rotor tower reads every passage as its twin
+/// without the rotor (the opening). `σ` and `r` have no
 /// covector: keys in `ℤ/w` and `ℤ/q` are located by loop closure, not by descent. The reverse
 /// carries the mode covector back through the monomial's adjoint,
 /// `G_h(t) = (Cᵀδr)⁻ + (T_(t+1) P^(σ_(t+1)))* (conj(λ_(t+1)) ⊙ G_h(t+1) + β_(t+1) ⊙ conj(G_h(t+1)))`,
@@ -3673,8 +3676,13 @@ impl TowerLearner {
     /// each section of `sections` (one slice a stream, as a training section reads them) is read
     /// forward and back from the streams' carried states, without a deposit, and the family's
     /// entries take `first = Σ g / n` and `second = Σ g² / n` over its `n` sections, on the
-    /// deposit's grain. Every other moment is left as carried. Returns `n`.
+    /// deposit's grain. Every other moment is left as carried. Returns `n`. A learner whose moments
+    /// have not opened refuses: its first compared section opens every moment at that section's
+    /// covector and square, so a family opened before it would be overwritten unread.
     pub fn open_moments(&mut self, family: std::ops::Range<usize>, states: &mut [TowerState], sections: &[Vec<&[usize]>]) -> Result<usize> {
+        if !self.opened {
+            return refuse("a family's moments open inside a learner whose moments have opened");
+        }
         if family.end > self.tower.theta.len() || family.is_empty() || sections.is_empty() {
             return refuse("moments open on a family of the material over at least one section");
         }
@@ -4850,9 +4858,14 @@ mod tests {
         let b: Vec<usize> = (0..25).map(|i| PASSAGE[(5 * i + 3) % 13]).collect();
         let sections: Vec<Vec<&[usize]>> = (0..2).map(|k| vec![&a[12 * k..12 * k + 13], &b[12 * k..12 * k + 13]]).collect();
         let family = tower.ring_family().expect("a ring-faced tower");
+        // A learner whose moments have not opened refuses: its first section would overwrite them.
+        let mut fresh = TowerLearner::new(tower.clone(), 6);
+        let mut states = vec![tower.rest(); 2];
+        assert!(fresh.open_moments(family.clone(), &mut states, &sections[..1]).is_err());
+        assert_eq!(states, vec![tower.rest(); 2]);
         // One section: the covector itself.
         let mut learner = TowerLearner::new(tower.clone(), 6);
-        let mut states = vec![tower.rest(); 2];
+        learner.opened = true;
         assert_eq!(learner.open_moments(family.clone(), &mut states, &sections[..1]).expect("opened"), 1);
         let reaches = tower.reaches();
         let mut g = vec![0i128; tower.theta.len()];
@@ -4872,6 +4885,7 @@ mod tests {
         }
         // Two sections: the means, the rest carried, the material and the streams as a frozen read.
         let mut learner = TowerLearner::new(tower.clone(), 6);
+        learner.opened = true;
         let mut states = vec![tower.rest(); 2];
         assert_eq!(learner.open_moments(family.clone(), &mut states, &sections).expect("opened"), 2);
         assert_eq!(learner.tower, tower);

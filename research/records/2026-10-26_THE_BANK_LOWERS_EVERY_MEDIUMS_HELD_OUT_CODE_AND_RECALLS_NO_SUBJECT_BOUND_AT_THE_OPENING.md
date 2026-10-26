@@ -157,8 +157,9 @@ reads John after every pass.
 
 Every run's projection, deadline, measured wall time and peak resident set are in `RUN.md`. The two
 prose passes ran at 0.82 and 0.56 of their projections. On Brandon's PC, the first three-pass run
-stopped itself at section 992 when a window ran past its bound; it was relaunched with that window's
-time as its bound, not with a larger deadline. On the cloud host, the amended bank's first pass
+stopped itself at section 992 when a window ran past its bound; it was relaunched on the same law
+with that window's time as its bound and its deadline raised from 270 to 285 s, a raised limit that
+the waiting standard refuses, recorded as it ran. On the cloud host, the amended bank's first pass
 stopped itself at section 64 (a mean of 815.6 ms a section against an 805.9 ms bound): its bound was
 the antecedent-only bank's largest window, a measurement of another law. The amended law was then
 timed on its own, beside the old one on the same 300 problems (the old one ran 7% slower than its
@@ -174,9 +175,11 @@ amended law, 827.5 ms; it ran at 0.90 of that projection.
   the earlier records' held-out sets, fixed by SHA-256; no training text enters a held-out read.
 - **An authored routine standing in for learning.** The compressors are exterior readings beside the
   tower, never a part of it; nothing in the bank names a subject, a separator or a phrase.
-- **A refusal answered with a larger limit.** Each run that stopped itself was relaunched with a
-  bound measured before the new launch, on the law being run, and its deadline from that projection;
-  no running run's limit was raised.
+- **A refusal answered with a larger limit.** Repeated once. The PC's three-pass run stopped itself
+  and was relaunched on the same law with the bound and deadline its own stopped window gave (270 to
+  285 s): a raised limit, recorded as such and not repeated. The cloud host's amended pass was
+  relaunched only after a fresh timing read of the amended law (its first bound belonged to another
+  law), which changes the declared read, not the limit.
 - **Text run on its codec's grain as the exception.** The same bank and commands read the MQAR class
   terrain, the Holonics bytes and the GSM8K units.
 
