@@ -411,12 +411,16 @@ To #410:
   `orbit_energies_multiply_to_ring`;
 - (k) the ring's spectrum factors over its Galois orbits, with `ψ_d(0) = Φ_d(1)`;
 - (l) the time boundary: `diag(1, r)` in `(Re, Im)`, the action conserved, and the pumped mode as
-  its case;
+  its case. Formal-checked the same day in
+  [`Physics/TimeBoundary`](../../lean/HolonicsResearch/Physics/TimeBoundary.lean), with
+  non-expansion for `0 ≤ r ≤ 1`, conjugation as time reversal and the time mirror at `r = 0`;
 - (m) the dilation current: `∂_μ(x_ν T^(μν)) = T^μ_μ + x_ν ∂_μ T^(μν)`, beside the angular current in
   `Physics/ReceiverStressEnergy`.
 - (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
   `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`. The norm half, `N(1 − ζ_n) = e^(Λ(n))`, is
-  `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file; the trace half remains owed;
+  `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file. `Tr ζ_n = μ(n)` is
+  `trace_primitive_colour` in [`Mathematics/ColourTrace`](../../lean/HolonicsResearch/Mathematics/ColourTrace.lean);
+  the Ramanujan sums `c_n(j)` and the layer trace remain owed;
 - (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
   substitution's chain.
 
