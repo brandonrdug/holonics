@@ -13,6 +13,17 @@ This record derives the lens and joins it to the owners it touches. It changes n
 or acceptance. Only the abstracts were read. Grades follow
 [the epistemic grades](../../docs/canon/EPISTEMIC_GRADES.md).
 
+**Withdrawn October 26: §5's passage tree and §8's locks.** §5 specified decayed counts of what
+followed each exact context, and §8 a copy of the cell that followed the deepest recurred context's
+last visit. That is an index of contexts with a longest-match copier: the recorded failure
+"recitation, or an index of contexts, counted as generation"
+([lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), failure 2),
+whose eighth recurrence began here and ran through the
+[binding bank](2026-10-26_THE_BINDING_BANK_IS_A_STRAND_CLOCKED_BY_ITS_ANTECEDENT_AND_A_RELEASE_IS_TRACED_BY_ITS_ADDRESS.md)
+and the referent key. Their measurements stand as exterior readings of how much a copier gains on
+this terrain; they enter nothing. §1 to §4 and §6 stand. §7 reads the receiving tree, an older index
+of contexts that goes to its own review.
+
 ## 1. The contacts are a cellular sheaf
 
 [derived] The cellular sheaf is assembled from objects that already exist:
@@ -123,6 +134,8 @@ What the table says:
 
 ## 5. The tree's second spectral placement: the passage tree
 
+[Withdrawn October 26: an index of contexts. See the note under the title.]
+
 The design thread measured that diagonal modes add nothing once the receiving tree reaches depth 16
 (0.614 against 0.613 bits a cell, GSM8K). It asked what a mode bank should carry that the tree
 cannot.
@@ -147,8 +160,9 @@ This makes a two-by-two table:
 
 In exact arithmetic the decay is a dyadic release with the residue carried
 (`CarriedRelease.residueRun_conserves`); the plain floor silences counts below `2^m`
-(`plainTransported_silences`). No routine looks up an earlier occurrence. Copying is what the
-counts read when the passage repeats itself.
+(`plainTransported_silences`). ~~No routine looks up an earlier occurrence. Copying is what the
+counts read when the passage repeats itself.~~ [Withdrawn: a table keyed by exact context is a
+lookup of earlier occurrences, whatever reads it.]
 
 **Measurement.** The read is an exterior float read on the first 1,000 GSM8K training problems,
 2,084,620 quarter-character cells, scored before each cell is counted. The tree is context-tree
@@ -344,6 +358,10 @@ receiving tree's owner decides; this read changes no crate.
 
 ## 8. The located equality: a copy is a pair contact whose offset is a key
 
+[Withdrawn October 26: both locks copy the cell that followed an earlier occurrence, and calling the
+offset a key let a pointer pass as a Holonics key, which is a navigator's configuration located by
+loop closure. See the note under the title.]
+
 §6 left the code in relations between cells. The design asked for the first of them as an exact
 law at the receiver's face: how a located offset's prediction joins the face, and its certified
 step.
@@ -448,9 +466,9 @@ By role, on the first 1,000 problems, bits a byte:
 - New numbers in the question cost more under a lock (4.34 to 4.52 bits). There a confident copy
   is wrong, and the bins cannot see that a number is new.
 
-So the node lock is the contact to build now: it is a placement of the passage tree's own node, it
+~~So the node lock is the contact to build now: it is a placement of the passage tree's own node, it
 needs no strand, and it carries most of the gain. The receiving tree's owner decides; this read
-changes no crate.
+changes no crate.~~ [Withdrawn: a copier is never the contact to build.]
 
 ## 9. Owed (#410)
 
@@ -468,7 +486,8 @@ changes no crate.
   any release `β_(t+1) = R(β'_t)`, `Σ −ln q = Σ −ln k + ln(1 + β_0) − ln(1 + β_n) +
   Σ [ln(1 + β_(t+1)) − ln(1 + β'_t)]` and its mirror in `e`; with `R` the clamp to `[2^(−K), 2^K]`,
   each release costs at most `ln(1 + 2^(−K))` on one line and nothing on the other.
-- The located equality's certified step: for `F(c) ∝ q(c) 2^(w(c) + α[c = ĉ])` the cell's code
+- [Withdrawn October 26 with §8, and its box leaves #410.] The located equality's certified step:
+  for `F(c) ∝ q(c) 2^(w(c) + α[c = ĉ])` the cell's code
   `−log₂ F(u)` has derivative `F(ĉ) − [u = ĉ]` and second derivative `ln 2 · F(ĉ)(1 − F(ĉ)) ≤ (ln 2)/4`
   in `α`, so a step of length `s ≤ 1/ln 2` along that covector lowers the cell's code by at least
   `(7/8) s g²`.

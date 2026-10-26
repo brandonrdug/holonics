@@ -33,6 +33,22 @@ Most repeated first. Each line: the failure; where it was first recorded; where 
    `2026-08-11_THE_TAPE_HAS_NO_VERTEX…`. Again six times: August 10–11 (corpus openings), August
    17–18 (longest match), August 24 (copied text), September 6–9 (one contact column per
    observation), F0's copy stage, and today's exact founding (a 10-cell word founds exactly 10).
+   **Eighth, October 23 to 26** (recorded October 26 after Brandon's alarm and an independent audit):
+   decayed counts per exact context and a node lock that copies the last continuation
+   ([the sheaf record](2026-10-23_THE_CONTACTS_ARE_A_SHEAF_WEIGHT_TYING_REPRESENTS_THE_WORDS_AND_THE_SQUARE_LAW_IS_THE_SCATTERING_READ.md)
+   §5 and §8, built as the passage tree and the letters copy); then bz2's in-context recall as the
+   bar; then a key/query/value store with delta-rule overwrite, opened as a copier and accepted on a
+   lookup benchmark
+   ([the binding bank](2026-10-26_THE_BINDING_BANK_IS_A_STRAND_CLOCKED_BY_ITS_ANTECEDENT_AND_A_RELEASE_IS_TRACED_BY_ITS_ADDRESS.md));
+   then a reset clock that copies a held arrival; then a referent key that would file a passage under
+   its named subject
+   ([the referent record](2026-10-26_A_REFERENT_IS_DENSE_BY_THE_LOOPS_THAT_CLOSE_THROUGH_IT_AND_SEVEN_IN_TEN_RUN_THROUGH_A_PRONOUN.md)).
+   Each step asked which key was wrong and none asked whether there should be keys. Two things let it
+   pass. **The word "key":** the bank's database key was licensed by the key law, whose key is a
+   navigator's configuration located by loop closure, and the atlas filed the store under the object
+   *key*. **Checks in letter:** the store overwrites and its trace is read outside, so it is neither
+   a tape nor an index the machine consults, and Holonics names (strand, harmonics, address, mass)
+   were laid over imported parts.
 3. **Text run on its codec's grain, as the exception.** First: laboratory `RED-FLAGS.md` #10–#11,
    the August 13 ruling ("recurring transformation, not recurring bytes"), the August 17 codec
    ladder. Again: September 20–22 (nibble fields), September 26–29 (the byte tree), today (the
@@ -112,7 +128,12 @@ Two independent reviews read today's code; they agree.
    located cause is unrepaired.
 4. **No recitation and no index.** Reproduced source is contamination. An exact realization of a
    passage is a tape. Retained state is a quotient sufficient for the admitted future, reported
-   against the data it read.
+   against the data it read. A store addressed by content is an index whatever it overwrites and
+   whatever it is called: a key/query/value memory, slots written by a learned hash, a table keyed by
+   context, or bindings filed under a named subject. A design is read against this before it is
+   specified, by asking whether it should have keys at all, not which key is right. A lookup
+   benchmark never stands as an acceptance. Addressing belongs to the geometry and the information's
+   evolution to the fluid dynamics (Brandon, October 26).
 5. **No authored routine** (the governing law "No catered machinery").
 6. **A deposition step is certified.** It reads a bound on the covector reaching its locus, over every
    station and re-entry, and sets its step from it; the energy bound is enforced at the commit, not

@@ -103,7 +103,9 @@ antecedents induce a consequence as flux only when they fit a constitution (the 
 Enigma/Bombe reading is literal: rotors are parametron rings whose stepping is winding with
 carry, fixed material and reflector return through the producing operands, the key is the
 navigators' initial configuration, and the Bombe infers it by pairwise loop closure over the
-menu of contacts. Dormant modes wait for a fitting antecedent. **Learning is locating keys** —
+menu of contacts. It is never a database key: a key/query/value store, a slot table or an index by
+content or by a named subject is the index the lessons refuse (October 26). Dormant modes wait
+for a fitting antecedent. **Learning is locating keys** —
 inferring configuration and gauge of relevant navigators from loop-closure constraints, which is
 compression (pruning) and navigation (the route). Resonating drives an existing mode at its
 eigenfrequency (RIDE); emanating founds or drives off-resonance (FOUND). The inference is
@@ -266,7 +268,8 @@ its atlas rows in the same commit.
 [the failures that recurred after them](research/records/2026-10-09_LESSONS_THE_FAILURES_THAT_RECURRED_FROM_SEPTEMBER_30_TO_OCTOBER_9.md)). Before any design, brief or build, name which recorded failure
 each choice could repeat; a choice that repeats one is refused before it is built. The most repeated:
 an authored routine standing in for learning; recitation or an index of contexts counted as
-generation; text run on its codec's grain as the exception (every design is checked against text,
+generation (eight times, the last a key/value store passed as a Holonics key); text run on its
+codec's grain as the exception (every design is checked against text,
 image, acoustic and motor input, and anything modality-specific lives only in a boundary codec); a
 located cause carried unrepaired into a new consumer; an uncertified deposition step; seen material
 graded as unseen; bits read as progress; a refusal answered with a larger limit; a design thought in

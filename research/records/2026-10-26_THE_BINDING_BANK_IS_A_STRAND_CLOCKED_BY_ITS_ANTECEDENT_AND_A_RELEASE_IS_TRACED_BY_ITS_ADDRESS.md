@@ -9,6 +9,35 @@ before the work, and a list of the theory gaps that would block the milestone. S
   declared size are [agent-inferred], each with its reason;
 - §3 and §5 are acceptances, fixed here, measured by the build.
 
+**Withdrawn, October 26.** This record specified a store, and both specs are withdrawn. The bank is
+a key/query/value memory imported from the transformer literature: learned key and query maps, a
+fixed grid of 64 slots, overwrite by the delta rule, and a key and query opened on one draw, so that
+before any learning a read returns what followed the last time the present face arrived. That is a
+copier. Its names (strand, harmonics, Farey address) were laid over the imported parts, so it read as
+native. With the passage tree and node lock of October 23, it is the eighth recurrence of the
+recorded failure "recitation, or an index of contexts,
+counted as generation"
+([lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), failure 2).
+Brandon, the same day: addressing belongs to the geometry, and the information's evolution to the
+fluid dynamics, never to a store. What went wrong, struck below in place:
+- **§1's diagnosis.** It named the failures "associative recall" after Zoology and took that
+  literature's cure, a key-by-value state, as what the tower lacked.
+- **§2.2's licence.** It cited CLAUDE.md's key law for the bank's key. A Holonics key is a
+  navigator's configuration located by loop closure; the bank's key is a database index. The shared
+  word let the second pass as the first, and the atlas then filed the bank under the object *key*.
+- **§3.4's acceptance.** MQAR is a lookup benchmark: a lookup table passes it perfectly, so it
+  measures the author, never the machine.
+- **§4.1's reading of the contacts.** It called the contacts the constitution's key–value memory
+  (Geva et al.). The contacts are a learned constitution moved by the covector, not a store.
+- **§4.3.5's composition.** It counted writing as verbatim runs stitched from two or more heard
+  documents. Stitched recitation is recitation.
+
+The checks this record ran passed in letter only: the bank overwrites and its trace is read outside,
+so it is neither a tape nor an index the machine consults. The September 29 antipattern rule names
+the copier outright, and no step read the spec against it. The exact laws of §2.3 to §2.6 are
+standard (a sum of roots of unity, a convex overwrite, a regrouped series) and remain true; they are
+laws of the store and enter nothing. Retiring the code belongs to its owner, the design thread.
+
 **The request** (Brandon, October 26, paraphrased): most of the theory feels developed; coordinate,
 keep the work aligned and ambitious, and use the momentum. The coordinator asked this thread to stop
 opening new theory and to give the design thread what it needs for binding inside the learner and for
@@ -40,9 +69,12 @@ the present one. Three measured failures have that shape [agent-inferred: one ca
 - **Arithmetic.** The question's quantities must be recalled at the calculation markup; the samples
   write well-formed markup with wrong arithmetic.
 
-The classical name is associative recall (Zoology, arXiv 2312.04927): models whose recurrent state is
+~~The classical name is associative recall (Zoology, arXiv 2312.04927): models whose recurrent state is
 a vector per channel fail it, and models whose state is a key-by-value product pass it. The tower's
-modes are the first kind.
+modes are the first kind.~~ [Withdrawn: the diagnosis imported the cure with the name. What the
+three failures share is that the passage does not keep returning to a region of its own (the
+[referent record](2026-10-26_A_REFERENT_IS_DENSE_BY_THE_LOOPS_THAT_CLOSE_THROUGH_IT_AND_SEVEN_IN_TEN_RUN_THROUGH_A_PRONOUN.md)),
+and that is the tower's own state's work, never a side memory's.]
 
 ## 2. Spec 1: the binding bank
 
@@ -90,8 +122,9 @@ join        x^(ℓ+1)_t = x^ℓ_t + W₂ v_t + b₂ + O [Re v̂_t ; Im v̂_t]
   `d_v × |N|` whatever the section's length. It is a quotient, never a tape (receipt B).
 - **Antecedent clocking** [agent-inferred]. The key reads the face before the arrival and the query
   reads the face after it. This is causal order, not a routine: the write pairs an arrival with the
-  context it came into, and the read asks what followed the present context. It is the key law of
-  CLAUDE.md ("an action expression and its antecedents induce a consequence"). `W_k`, `W_q`, `W_v`,
+  context it came into, and the read asks what followed the present context. ~~It is the key law of
+  CLAUDE.md ("an action expression and its antecedents induce a consequence").~~ [Withdrawn: the
+  key law names a navigator's configuration located by loop closure, never an index into slots.] `W_k`, `W_q`, `W_v`,
   `W_g` and `O` are located by the comparison's covector. Nothing says what to bind. Receipt E shows
   only the reach: with keys set by hand, the bank copies a repeated word's continuation exactly. The
   machine has to locate its own keys, and §3's acceptance measures whether it does.
@@ -215,7 +248,8 @@ sum over harmonics. In exact rationals the chunk form equals the recurrence on e
    W_g, b_g`, the hold and `O`, in the existing test form.
 3. **Card form.** The card's chunk form and the CPU's chunk form, at the declared `C`, give the same
    bits on a section.
-4. **Recall on the terrain.** The MQAR terrain is fixed in receipt F:
+4. ~~**Recall on the terrain.**~~ [Withdrawn: a lookup benchmark grades a lookup table perfectly,
+   so it measures the author.] The MQAR terrain is fixed in receipt F:
    - 64 key classes and 64 value classes, 16 bindings a passage, then the 16 keys again in a
      shuffled order, each followed by its value;
    - each passage is shuffled by SHA-256 of its index, so a key's value is fixed only inside its
@@ -244,10 +278,12 @@ A failed item is the next loop's subject, named by its measurement.
 A cold restart reads the constitution only (`Tower::from_text`): modes, contacts, face, founded
 units, pair and ring faces, and the bank's material. It does not read the passage, the bank's state or
 any index. The bindings live in two places.
-- **Across passages: the contacts.** A rectifying contact pair is the constitution's key–value
+- **Across passages: the contacts.** ~~A rectifying contact pair is the constitution's key–value
   memory: the rows of `W₁` are keys matched by the rectifier, and the columns of `W₂` are the values
   they add to the face. This is the classical reading of a feed-forward block (Geva et al.,
-  arXiv 2012.14913). What the heard text bound often enough is deposited there.
+  arXiv 2012.14913). What the heard text bound often enough is deposited there.~~ [Withdrawn: the
+  contacts are the constitution, moved by the covector of a declared comparison; reading them as
+  keys and values imports a store's picture onto them.]
 - **Inside the present passage: the bank.** After a cold restart the bank holds only the prompt and
   the release itself.
 
@@ -285,20 +321,22 @@ phrase came from, and it is never how the phrase was made.
    any of the 16 held-out paragraphs' own 600-byte continuations shares with the heard text: what
    the authors themselves reuse. A release whose longest verbatim run with the heard text exceeds
    `ℓ_rec` is shown, marked as recitation, and never counted as writing.
-5. **Composition.** In each release counted as writing, the maximal verbatim runs that span at least
+5. ~~**Composition.** In each release counted as writing, the maximal verbatim runs that span at least
    two whole words resolve to at least two different heard documents. (One word recurs in any text,
    so a run must join two words to name a source.) The runs are joined at seams that occur nowhere
-   in the heard text.
+   in the heard text.~~ [Withdrawn: runs stitched from heard documents are recitation, whatever
+   their seams.]
 6. **Trace.** Every released class carries (a) and (b), and every maximal run carries (c).
 
 Connectedness is Brandon's reading of the whole output. It is shown and never gated on.
 
 ## 5. The theory gaps that would block the milestone
 
-- **Binding in the learner.** This was the missing law; §2 states it, and the receipt checks it.
+- ~~**Binding in the learner.** This was the missing law; §2 states it, and the receipt checks it.
   Owed to #410: `bank_recall_exact` (for a primitive `M`-th root `ω`, `Σ_(n<M) ω^(nd) = M·[M ∣ d]`,
   so a grid read returns its binding; Mathlib's `IsPrimitiveRoot.geom_sum_eq_zero` is the core),
-  `bank_delta_overwrite` (`w_a ← ρ((1 − g)w_a + g v)` on the grid), and `bank_chunk_eq_recurrent`.
+  `bank_delta_overwrite` (`w_a ← ρ((1 − g)w_a + g v)` on the grid), and `bank_chunk_eq_recurrent`.~~
+  [Withdrawn with the spec, and the three boxes leave #410.]
 - **Provenance under the retention law.** §4.2 states it.
 - **Nothing else in the theory blocks.** The remaining blockers are construction, each with its law
   already in place:
@@ -316,6 +354,10 @@ Connectedness is Brandon's reading of the whole output. It is shown and never ga
     `contact.face-table-blocks`), which the pair contact already carries.
 
 ## 6. The recorded failures these choices could repeat
+
+[October 26: the list below was checked in letter and missed the one it repeated. The bank is an
+index of contexts with a copier at its opening (failure 2), and §4.3.5 counts stitched recitation as
+writing.]
 
 - **An authored routine standing in for learning.** Antecedent clocking is causal order, not a
   solution. Every map is located by the covector, and the terrain's bindings change with each
