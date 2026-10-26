@@ -84,7 +84,8 @@ def value(expression):
         return None
     try:
         return eval("".join(f"Fraction('{t}')" if t[0].isdigit() or t[0] == "." else t for t in tokens), {"Fraction": Fraction})
-    except (ZeroDivisionError, SyntaxError, ValueError):
+    except (ZeroDivisionError, SyntaxError, ValueError, TypeError):
+        # TypeError: a numeral written against a parenthesis, `8(2/3)`, reads as a call.
         return None
 
 
