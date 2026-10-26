@@ -606,7 +606,11 @@ To #410:
   (`keyed_rotor_reads`, `keyed_rotor_from_rest`): the equation at the consumer that the rotor
   loop's next build fixes;
 - a monomial step, one mode's state per mode turned by a unit-modulus factor, keeps `∑|v_j|²`
-  (`monomial_step_keeps_power`).
+  (`monomial_step_keeps_power`);
+- the passivity bound `|h| ≤ √((1 + ρ_max)/(1 − ρ_max))·max|Bx|` holds unchanged when each mode is
+  first handed one mode's state, by the margin `ρ K(ρ_max) + √(1 − ρ²) ≤ K(ρ_max)`
+  (`passive_margin`, `passive_recursion` in
+  [`HNN/PassiveMode`](../../lean/HolonicsResearch/HNN/PassiveMode.lean)).
 
 Atlas rows:
 - `radix.digit-move-place-kind`;
