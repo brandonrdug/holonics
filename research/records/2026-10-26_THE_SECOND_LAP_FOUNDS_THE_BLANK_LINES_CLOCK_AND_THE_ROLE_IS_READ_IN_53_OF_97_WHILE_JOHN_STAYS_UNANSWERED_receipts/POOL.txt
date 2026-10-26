@@ -1,0 +1,40 @@
+The second lap's pool, read by `found-tower-clock` at 8147a5dd7 on Brandon's PC, October 26, from
+the founded pass's state copyD8/STATE (3551b608…b8f3), whose clock after "any " is already fitted,
+over the whole training text (train_all.txt, 050b94f3…3b95), 8 streams, sections of 128 cells. Each
+line as printed, with the message channel's `&lt;`, `&gt;` escapes undone. Paths are relative to the
+run directory, which is not in the repository.
+
+B found-tower-clock role_clock/copyD8/STATE SHA train_all.txt SHA UNITS SHA 8 128 role_clock/lapD.state
+
+TOWER_CLOCK_STREAM stream=7 cells=167808 elapsed_ms=46721
+TOWER_CLOCK_STREAM stream=0 cells=167808 elapsed_ms=46856
+TOWER_CLOCK_STREAM stream=6 cells=167808 elapsed_ms=46866
+TOWER_CLOCK_STREAM stream=4 cells=167808 elapsed_ms=46871
+TOWER_CLOCK_STREAM stream=5 cells=167808 elapsed_ms=46885
+TOWER_CLOCK_STREAM stream=2 cells=167808 elapsed_ms=46998
+TOWER_CLOCK_STREAM stream=3 cells=167808 elapsed_ms=47103
+TOWER_CLOCK_STREAM stream=1 cells=167808 elapsed_ms=47209
+TOWER_CLOCK_POOL clocks=1177 cells=1342464 energy=283481773432856943063 grain_bits=48 read_ms=47239 drops_ms=7262
+TOWER_CLOCK_DROP rank=1 class=313 piece="\n\n" drop=103148189680674689 drop_ppm=363 rank_c=65 cells=1341484
+TOWER_CLOCK_DROP rank=2 class=1176 piece="200>>2" drop=55005167623406548 drop_ppm=194 rank_c=65 cells=1304023
+TOWER_CLOCK_DROP rank=3 class=61 piece="=" drop=52594133220722136 drop_ppm=185 rank_c=65 cells=1341327
+TOWER_CLOCK_DROP rank=4 class=1126 piece="00>>3" drop=41036932668892235 drop_ppm=144 rank_c=65 cells=1300674
+TOWER_CLOCK_DROP rank=5 class=36 piece="$" drop=21948382142831381 drop_ppm=77 rank_c=65 cells=1340726
+TOWER_CLOCK_DROP rank=6 class=115 piece="s" drop=20200746831219814 drop_ppm=71 rank_c=65 cells=1340383
+TOWER_CLOCK_DROP rank=7 class=50 piece="2" drop=19565947161371947 drop_ppm=69 rank_c=65 cells=1340569
+TOWER_CLOCK_DROP rank=8 class=49 piece="1" drop=18013490330386756 drop_ppm=63 rank_c=65 cells=1340901
+TOWER_CLOCK_DROP rank=9 class=570 piece="efor" drop=17978023556005407 drop_ppm=63 rank_c=65 cells=1331125
+TOWER_CLOCK_DROP rank=10 class=296 piece="a " drop=17658883389578709 drop_ppm=62 rank_c=65 cells=1341926
+TOWER_CLOCK_DROP rank=11 class=713 piece="costs " drop=17382916852147392 drop_ppm=61 rank_c=65 cells=1314657
+TOWER_CLOCK_DROP rank=12 class=258 piece=" t" drop=15696437136694777 drop_ppm=55 rank_c=65 cells=1337063
+TOWER_CLOCK_DROP rank=13 class=1013 piece="tim" drop=15404069734572231 drop_ppm=54 rank_c=65 cells=1285536
+TOWER_CLOCK_DROP rank=14 class=112 piece="p" drop=15014458870420297 drop_ppm=52 rank_c=65 cells=1339789
+TOWER_CLOCK_DROP rank=15 class=307 piece=" p" drop=14752142411809742 drop_ppm=52 rank_c=65 cells=1336934
+TOWER_CLOCK_DROP rank=16 class=402 piece="number of " drop=14725844841694642 drop_ppm=51 rank_c=65 cells=1330033
+TOWER_CLOCK_REST rank=876 class=1318 piece=rest drop=236665374406690 drop_ppm=0 rank_c=65 cells=1342464
+TOWER_CLOCK_SPREAD clocks=1177 ppm_at_rank_share_0=363 10=15 25=6 50=2 75=0 90=0 100=0
+TOWER_CLOCK_JOINED rank=53 class=335 piece="any " drop=7064039351456289 drop_ppm=24 rank_c=65 cells=1341240
+TOWER_CLOCK_FOUNDED class=313 piece="\n\n" material=290734 moment_sections=1311 moments_ms=100597 state_sha256=2f78e490365faea8524b239f6d14c73a5cd5b3db4b6d78cde9e5bed2568b919c elapsed_ms=155155
+RUN_RECEIPT exit=0 wall_s=155.2 peak_rss_kib=508640 user_s=1184.7 stopped=no
+
+lapD.state sha256 2f78e490365faea8524b239f6d14c73a5cd5b3db4b6d78cde9e5bed2568b919c
