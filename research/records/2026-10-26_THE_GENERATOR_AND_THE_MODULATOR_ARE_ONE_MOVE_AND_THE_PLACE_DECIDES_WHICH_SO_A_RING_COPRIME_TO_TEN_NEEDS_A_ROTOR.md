@@ -594,6 +594,21 @@ To #410:
   (`mirror_not_conj_turn`); and the mirrors are conjugate to each other by turns
   (`mirror_conj_by_turn`, `mirror_conj_by_turn_complex`: `v·conj(conj v·z) = v²·conj z`).
 
+(d) and (e) were formal-checked the same day:
+- (d) in [`Geometry/ShiftClock`](../../lean/HolonicsResearch/Geometry/ShiftClock.lean), for any
+  additive character `ψ` of `ℤ/n` into a commutative ring, so exact over `ℤ[i]` at `n = 4`:
+  `F X = Z F` (`fourier_shift`), `F Z = X⁻¹ F` (`fourier_clock`), `Z X = ψ(1)·X Z` (`clock_shift`),
+  `F̄ F = n` for a primitive `ψ` into a domain (`fourierBar_fourier`), and the dual turn
+  `n·Xˢ = F̄ Zˢ F` (`fourier_shift_iterate`, `clock_iterate`, `dual_turn`); the Gauss-sum line is
+  Mathlib's `gaussSum_sq`;
+- (e) in [`Geometry/TorusBraid`](../../lean/HolonicsResearch/Geometry/TorusBraid.lean): `TLT = LTL`
+  (`braid`), `TLT = [[0,1],[−1,0]]` (`quarter_turn`), `TL` of trace 1 and order 6 (`turn_cube`,
+  `orderOf_turn`), `TL⁻¹ = [[2,1],[1,1]]` (`cat_eq`), `A^(k+1) = [[F_(2k+3), F_(2k+2)],
+  [F_(2k+2), F_(2k+1)]]` (`cat_pow`), `|det(A^(k+1) − 1)| = L_(2k+2) − 2` (`abs_det_cat_pow_sub_one`,
+  `cat_counts`: 1, 5, 16, 45, 121) and the boosts' commutator `[[−7,6],[−6,5]]`
+  (`boost_commutator`). Still owed: that a hyperbolic automorphism `M` of the torus has exactly
+  `|det(M − 1)|` fixed points, which turns the determinant into the count.
+
 (i) was formal-checked the same day in
 [`Mathematics/RotorStep`](../../lean/HolonicsResearch/Mathematics/RotorStep.lean):
 - the base closes its orbit on every divisor of `b^K − 1` (`orbit_closes`, `pow_mod_orbit`);
