@@ -5099,7 +5099,8 @@ mod tests {
     }
 
     /// The code's difference agrees with the covector for every family of the bank (acceptance
-    /// §3.2): the key and query turns, the value, the gate, the hold and `O`.
+    /// §3.2): the key's turns at the antecedent and at the arrival, the query's turns, the value,
+    /// the gate, the hold and `O`.
     #[test]
     fn the_banked_covector_matches_the_code_difference() {
         // A passage of recurring pairs, the shape a bank reads: on it every bank family's covector
@@ -5176,7 +5177,7 @@ mod tests {
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked) = (0, 0, 0, 0, 0, 0, 0);
         let mut banks_checked = Vec::new();
-        let bank_families: Vec<usize> = tower.layout.bank.map_or(Vec::new(), |bl| vec![bl.key, bl.key_bias, bl.query, bl.query_bias, bl.value, bl.value_bias, bl.gate, bl.gate_bias, bl.hold, bl.join]);
+        let bank_families: Vec<usize> = tower.layout.bank.map_or(Vec::new(), |bl| vec![bl.key, bl.key_bias, bl.key_arrival, bl.query, bl.query_bias, bl.value, bl.value_bias, bl.gate, bl.gate_bias, bl.hold, bl.join]);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
