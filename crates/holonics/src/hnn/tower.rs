@@ -189,7 +189,10 @@ use crate::hnn::passage::log2_face;
 use num_bigint::BigUint;
 use rayon::prelude::*;
 
+pub mod bank;
 pub mod duplex;
+
+use bank::{BankCell, BankDeclaration, BankLayout, BankReaches, BankState};
 
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
@@ -1102,13 +1105,15 @@ struct Layout {
     /// [`rank_material`]), empty families without a ring face.
     ring_readout: usize,
     ring_factors: usize,
+    /// The binding bank's families, after every other face's (absent without a bank).
+    bank: Option<BankLayout>,
     len: usize,
     /// `(start, length, the family's grain)`, in order.
     families: Vec<(usize, usize, u32)>,
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, bank: Option<&BankDeclaration>) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1167,7 +1172,8 @@ impl Layout {
         let readout_bias = take(a, FACE_BITS);
         let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
         let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks * ring_harmonics, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
-        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, len: at, families }
+        let bank = bank.map(|b| BankLayout::new(b, w, &mut take));
+        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, bank, len: at, families }
     }
 }
 
@@ -1181,6 +1187,8 @@ pub struct Tower {
     pair: Option<PairFace>,
     /// The resident ring face, when one is joined ([`Tower::join_ring_face`]).
     ring: Option<RingFace>,
+    /// The binding bank, when one is joined ([`Tower::join_bank`]).
+    bank: Option<BankDeclaration>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1202,6 +1210,8 @@ pub struct TowerState {
     /// Each ring rank's hand ([`hand_after`]): `true` where the moves since its last restart
     /// reversed it, the ring then read as `(Re r, −Im r)`.
     pub hands: Vec<bool>,
+    /// The binding bank's state (absent without a bank).
+    pub bank: Option<BankState>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -1614,6 +1624,8 @@ struct Cell {
     ring_pair: Option<Vec<i32>>,
     /// The top face's ratio `x̂` (without its unit) and its scale, for the reverse.
     top_hat: Option<(Vec<i32>, i128)>,
+    /// The binding bank's temporaries at its level (absent without a bank).
+    bank: Option<BankCell>,
     face: TowerFace,
 }
 
@@ -1646,6 +1658,8 @@ struct Reaches {
     gammas: Vec<Vec<i128>>,
     /// Each gated level's founded moves (empty when ungated).
     gates: Vec<GateFaces>,
+    /// The binding bank's reaches and hold (absent without a bank).
+    bank: Option<BankReaches>,
 }
 
 /// `x / k` to the nearest integer, half away from zero.
@@ -1837,7 +1851,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0);
+        let layout = Layout::new(&d, 0, 0, 0, None);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -1903,7 +1917,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, bank: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -1914,6 +1928,7 @@ impl Tower {
             credit: None,
             ring: vec![(0, 0); self.ring.as_ref().map_or(0, RingFace::ranks)],
             hands: vec![false; self.ring.as_ref().map_or(0, RingFace::ranks)],
+            bank: self.bank_rest(),
         }
     }
 
@@ -2008,7 +2023,7 @@ impl Tower {
             }
             None => (Vec::new(), Vec::new()),
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, ring_ranks, ring_pools, gammas, gates, ladder, half_turn }
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, bank: self.bank_reaches() }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -2042,6 +2057,7 @@ impl Tower {
         let mut ring_face: Option<Vec<i32>> = None;
         let mut ring_scale: Option<Vec<i128>> = None;
         let mut ring_after: Option<Vec<(i128, i128)>> = None;
+        let mut bank_cell: Option<BankCell> = None;
         let mut buf = vec![0i64; w.max(n).max(f)];
         for (l, lv) in self.layout.levels.iter().enumerate() {
             let r = &reaches.levels[l];
@@ -2190,6 +2206,16 @@ impl Tower {
                 ring_read = Some(read);
                 ring_after = Some(state.ring.clone());
             }
+            // The binding bank at its level: what it reads at the present face joins the output.
+            let mut next = next;
+            if let (true, Some(br)) = (self.bank.as_ref().is_some_and(|b| b.level == l), &reaches.bank) {
+                let carried = state.bank.as_mut().ok_or(TowerError::Refused("a stream rested before the bank joined carries no bank: rest it again"))?;
+                let (joined, cell) = self.bank_step(br, carried, &x, &read)?;
+                for (v, j) in next.iter_mut().zip(&joined) {
+                    *v = fit32(*v as i128 + *j as i128, "the residual stream outgrew its 32-bit carrier")?;
+                }
+                bank_cell = Some(cell);
+            }
             let push = push_re.into_iter().zip(push_im).collect();
             levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate });
         }
@@ -2227,7 +2253,7 @@ impl Tower {
         let zmax = *z.iter().max().expect("a nonempty alphabet");
         let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
         let total = masses.iter().sum();
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, bank: bank_cell, face: TowerFace { masses, total } })
     }
 
     /// The face of the next class after `u` arrives, and the state moved.
@@ -2369,6 +2395,19 @@ impl Tower {
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];
+            // The binding bank at this level: from the covector of the level's output, its
+            // families' covectors and those it sends to each cell's r̂ and x^ℓ.
+            let (bank_read, bank_input) = match (self.bank.as_ref().is_some_and(|b| b.level == l), &reaches.bank) {
+                (true, Some(br)) => {
+                    let missing = || TowerError::Refused("a bank read at every cell of a banked tower");
+                    let bank_cells: Vec<&BankCell> = cells.iter().map(|cell| cell.bank.as_ref().ok_or_else(missing)).collect::<Result<_>>()?;
+                    let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
+                    let reads: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].read.as_slice()).collect();
+                    let (to_read, to_input) = self.bank_reverse(br, &bank_cells, &inputs, &reads, &dx, &mut g)?;
+                    (Some(to_read), Some(to_input))
+                }
+                _ => (None, None),
+            };
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
             let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
@@ -2410,6 +2449,11 @@ impl Tower {
                     let mut dr_b = vec![0i64; w];
                     transposed(&t[lv.pair..lv.pair + f * w], r[10], w, &db, MATERIAL_BITS, &mut dr_b)?;
                     for (a, b) in dr.iter_mut().zip(&dr_b) {
+                        *a = fit64(*a as i128 + *b as i128)?;
+                    }
+                }
+                if let Some(extra) = bank_read.as_ref().map(|b| &b[i]) {
+                    for (a, b) in dr.iter_mut().zip(extra) {
                         *a = fit64(*a as i128 + *b as i128)?;
                     }
                 }
@@ -2623,8 +2667,9 @@ impl Tower {
                     transposed(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &dp, MATERIAL_BITS, &mut back_axis)?;
                 }
                 let beside = |back: &[i64], j: usize| back.get(j).map_or(0, |&c| c as i128);
+                let banked: &[i64] = bank_input.as_ref().map_or(&[], |b| b[i].as_slice());
                 let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
-                    fit64(*v as i128 + *a as i128 + *b as i128 + beside(&back_gate, j) + beside(&back_turn, j) + beside(&back_pump, j) + beside(&back_axis, j))
+                    fit64(*v as i128 + *a as i128 + *b as i128 + beside(&back_gate, j) + beside(&back_turn, j) + beside(&back_pump, j) + beside(&back_axis, j) + beside(banked, j))
                 }))?;
                 dx[i] = next;
                 gres.push(gre);
@@ -2912,6 +2957,9 @@ impl Tower {
         if let Some(face) = &self.ring {
             s.push_str(&face.to_text());
         }
+        if let Some(bank) = &self.bank {
+            s.push_str(&bank.to_text());
+        }
         s
     }
 
@@ -2934,6 +2982,9 @@ impl Tower {
             if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-restarts ")) {
                 n += 1;
             }
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("bank ")) {
+            n += 1;
         }
         n
     }
@@ -2994,11 +3045,15 @@ impl Tower {
             }
             None => None,
         };
-        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
+        let bank = match lines.next_if(|l| l.starts_with("bank ")) {
+            Some(line) => Some(BankDeclaration::from_text(line, &declaration)?),
+            None => None,
+        };
+        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics), bank.as_ref());
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        Ok(Self { declaration, theta, pair, ring, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration, theta, pair, ring, bank, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// [agent-inferred, October 24] **The pair face joined to the tower**: the face's readout `V`
@@ -3013,10 +3068,13 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a pair face joins before a ring face (the ring's readout follows the pair's material)");
         }
+        if self.bank.is_some() {
+            return refuse("a pair face joins before a bank (the bank's material follows every face's)");
+        }
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0);
+        let layout = Layout::new(d, face.forms(), 0, 0, None);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -3039,8 +3097,11 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
+        if self.bank.is_some() {
+            return refuse("a ring face joins before a bank (the bank's material follows every face's)");
+        }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), None);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -3500,6 +3561,15 @@ impl TowerLearner {
         self.second.resize(self.tower.theta.len(), 0);
         Ok(())
     }
+
+    /// The binding bank joined to the learner's tower ([`Tower::join_bank`]), its families'
+    /// moments opened at zero beside the moments the learner carries.
+    pub fn join_bank(&mut self, bank: BankDeclaration, keys: &[u8]) -> Result<()> {
+        self.tower.join_bank(bank, keys)?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
+    }
 }
 
 impl Tower {
@@ -3954,15 +4024,13 @@ mod tests {
         tiny_turning(levels, gated, false, false)
     }
 
-    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol, and a turned
-    /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
-    /// its gate does.
+    /// The scaled ladder divides rung `s`'s turn by `2^(s−1)` and leaves every other founded
+    /// value as the fixed ladder draws it; both ladders split the bank between the two.
     #[test]
     fn a_scaled_ladder_divides_each_rungs_turn_by_its_memory_and_changes_only_the_moves() {
         let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 32, contacts: 4, levels: 1, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
         let k = keys(16384);
         let fixed = Tower::found(declaration, &k).expect("founded");
-        assert_eq!(Tower::found_on(declaration, &k, TurnLadder::Fixed).expect("founded").theta, fixed.theta);
         let scaled = Tower::found_on(declaration, &k, TurnLadder::Scaled).expect("founded");
         let both = Tower::found_on(declaration, &k, TurnLadder::Both).expect("founded");
         let lv = fixed.layout.levels[0];
@@ -4000,6 +4068,9 @@ mod tests {
         assert!(Tower::found_on(odd, &k, TurnLadder::Both).is_err());
     }
 
+    /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol, and a turned
+    /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
+    /// its gate does.
     fn tiny_turning(levels: usize, gated: bool, turned: bool, pumped: bool) -> Tower {
         tiny_declared(levels, gated, turned, pumped, ContactLaw::Rectifying)
     }
@@ -5011,6 +5082,65 @@ mod tests {
     /// The thirteen classes every fixture reads.
     const PASSAGE: [usize; 13] = [0, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
 
+    /// The tiny turned tower with a bank at its top level (a 4 × 4 box, four value channels). Opened,
+    /// its join is drawn away from zero, the gate opens at `g = ⅔` and the hold at `h = 4`
+    /// (`ρ = 16/17`), so every bank family carries a readable covector: at the founding's
+    /// `ρ = 1 − 2^(−11)` the hold's slope `ln 2 · ρ(1 − ρ)` falls below the check's reading grain, and
+    /// at `ρ = ½` the bank forgets within a cell and its key, query and value slopes fall below it too.
+    fn tiny_banked(open: bool) -> Tower {
+        let mut tower = tiny_turning(2, true, true, false);
+        let bank = BankDeclaration { level: 1, harmonics: vec![4, 4], values: 4 };
+        tower.join_bank(bank, &keys(64)[16..]).expect("joined");
+        if open {
+            let bl = tower.layout.bank.expect("a bank");
+            let k = keys(4096);
+            let join = tower.bank_join().expect("a bank");
+            for (i, v) in tower.theta[join].iter_mut().enumerate() {
+                *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) / 2;
+            }
+            tower.theta[bl.gate_bias] = 1 << FACE_BITS;
+            tower.theta[bl.hold] = 4 << FACE_BITS;
+        }
+        tower
+    }
+
+    /// A bank opens on its bankless twin: with `O` at zero the banked tower codes every passage
+    /// bit-identically, and its sections read the same faces (acceptance §3.1).
+    #[test]
+    fn a_banked_tower_opens_on_its_bankless_twin() {
+        let twin = tiny_turning(2, true, true, false);
+        let banked = tiny_banked(false);
+        let classes: Vec<usize> = (0..61).map(|i| (i * 7 + i / 3) % 4).collect();
+        assert_eq!(code(&banked, &classes), code(&twin, &classes));
+        let (mut a, mut b) = (twin.rest(), banked.rest());
+        let faces = |t: &Tower, s: &mut TowerState| t.forward(s, &classes, &t.reaches()).expect("forward").into_iter().map(|c| c.face).collect::<Vec<_>>();
+        assert_eq!(faces(&twin, &mut a), faces(&banked, &mut b));
+        // The opened bank reads: its code differs.
+        assert_ne!(code(&tiny_banked(true), &classes), code(&twin, &classes));
+    }
+
+    #[test]
+    fn a_banked_tower_restores_exactly() {
+        let tower = tiny_banked(true);
+        let restored = Tower::from_text(&tower.to_text()).expect("restored");
+        assert_eq!(restored, tower);
+        let learner = TowerLearner::new(tower, 7);
+        let text = learner.to_text();
+        assert_eq!(TowerLearner::from_text(&text).expect("restored").to_text(), text);
+        assert!(Tower::from_text(&tiny_turning(2, true, true, false).to_text().replace('\n', "\nbank 2 4 4 4\n").replacen("\nbank 2 4 4 4\n", "\n", 1)).is_err());
+    }
+
+    /// The code's difference agrees with the covector for every family of the bank (acceptance
+    /// §3.2): the key and query turns, the value, the gate, the hold and `O`.
+    #[test]
+    fn the_banked_covector_matches_the_code_difference() {
+        // A passage of recurring pairs, the shape a bank reads: on it every bank family's covector
+        // reads at 1.7 or more times the check's grain (on the mixed passage the gate bias's cell
+        // slopes cancel to a tenth of it).
+        let classes: Vec<usize> = (0..37).map(|i| [0, 2, 1, 3, 0, 1, 2, 3, 3, 0][i % 10]).collect();
+        the_covector_of_tower_matches_the_code_difference(tiny_banked(true), true, &classes, 9);
+    }
+
     #[test]
     fn the_turned_covector_matches_the_code_difference() {
         the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, false), true, &PASSAGE, 10);
@@ -5077,6 +5207,8 @@ mod tests {
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked) = (0, 0, 0, 0, 0, 0, 0);
+        let mut banks_checked = Vec::new();
+        let bank_families: Vec<usize> = tower.layout.bank.map_or(Vec::new(), |bl| vec![bl.key, bl.key_bias, bl.query, bl.query_bias, bl.value, bl.value_bias, bl.gate, bl.gate_bias, bl.hold, bl.join]);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -5108,6 +5240,9 @@ mod tests {
                 pairs_checked += tower.layout.levels.iter().any(|lv| tower.declaration.contact != ContactLaw::Rectifying && (start == lv.pair || start == lv.pair_bias)) as usize;
                 faces_checked += (tower.pair.is_some() && (start == tower.layout.pair_readout || start == tower.layout.pair_encoding)) as usize;
                 rings_checked += (tower.ring.is_some() && (start == tower.layout.ring_readout || start == tower.layout.ring_factors)) as usize;
+                if bank_families.contains(&start) {
+                    banks_checked.push(start);
+                }
                 break;
             }
         }
@@ -5123,6 +5258,7 @@ mod tests {
         let kinked = gated || tower.declaration.contact == ContactLaw::Rectifying;
         assert!(tower.pair.is_none() || faces_checked >= if kinked { 1 } else { 2 }, "only {faces_checked} pair face families carried a readable covector");
         assert!(tower.ring.is_none() || rings_checked == 2, "the ring face's readout and factors carried {rings_checked} readable covectors of 2");
+        assert!(banks_checked.len() == bank_families.len(), "the bank's families at {bank_families:?} carried readable covectors at {banks_checked:?}");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 

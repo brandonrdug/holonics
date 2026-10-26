@@ -21,6 +21,8 @@ mod tower_situated;
 mod tower_ring;
 #[path = "complete_language/tower_classes.rs"]
 mod tower_classes;
+#[path = "complete_language/tower_bank.rs"]
+mod tower_bank;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
 #[path = "complete_language/unit_copy.rs"]
@@ -822,6 +824,9 @@ pub(super) fn run_with_execution(
         Some("train-scaled-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Scaled),
         Some("train-two-ladder-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Both),
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
+        Some("found-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::found(args),
+        Some("join-tower-bank") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::join(args),
+        Some("train-sections-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::train(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
