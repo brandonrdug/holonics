@@ -166,7 +166,7 @@ theorem chargeThreshold_tendsto_zero {P : ℕ} (hP : 0 < P) :
   have hlog : Tendsto (fun N : ℕ => Real.log N / N) atTop (nhds 0) := by
     have h := (Real.tendsto_pow_log_div_mul_add_atTop 1 0 1 one_ne_zero).comp
       tendsto_natCast_atTop_atTop
-    simpa using h
+    simpa [Function.comp_def] using h
   have hup : Tendsto (fun N : ℕ => (Real.log N + 2 * Real.log P) / N) atTop (nhds 0) := by
     have h2 := tendsto_const_div_atTop_nhds_zero_nat (2 * Real.log P)
     simpa [add_div] using hlog.add h2
@@ -213,7 +213,7 @@ theorem threshold_thousand :
     1 / ((48 : ℝ) + 1) ≤ chargeThreshold (2 ^ 10) 1000 ∧
       chargeThreshold (2 ^ 10) 1000 < 1 / (48 : ℝ) := by
   have h := threshold_bracket (N := 1000) (P := 2 ^ 10) (m := 48) (by norm_num) (by norm_num)
-    (by norm_num) (by decide) (by decide)
+    (by norm_num) (by decide +kernel) (by decide +kernel)
   exact_mod_cast h
 
 /-- [proved-derived; formal-checked] **At `P = 2¹⁰`, `N = 10⁴`:** `1/434 ≤ δ_min < 1/433`. -/
@@ -221,7 +221,7 @@ theorem threshold_ten_thousand :
     1 / ((433 : ℝ) + 1) ≤ chargeThreshold (2 ^ 10) 10000 ∧
       chargeThreshold (2 ^ 10) 10000 < 1 / (433 : ℝ) := by
   have h := threshold_bracket (N := 10000) (P := 2 ^ 10) (m := 433) (by norm_num) (by norm_num)
-    (by norm_num) (by decide) (by decide)
+    (by norm_num) (by decide +kernel) (by decide +kernel)
   exact_mod_cast h
 
 /-- [proved-derived; formal-checked] **At `P = 2¹⁰`, `N = 10⁵`:** `1/3942 ≤ δ_min < 1/3941`. -/
@@ -229,7 +229,7 @@ theorem threshold_hundred_thousand :
     1 / ((3941 : ℝ) + 1) ≤ chargeThreshold (2 ^ 10) 100000 ∧
       chargeThreshold (2 ^ 10) 100000 < 1 / (3941 : ℝ) := by
   have h := threshold_bracket (N := 100000) (P := 2 ^ 10) (m := 3941) (by norm_num) (by norm_num)
-    (by norm_num) (by decide) (by decide)
+    (by norm_num) (by decide +kernel) (by decide +kernel)
   exact_mod_cast h
 
 end Holonics.HNN.ChargeThreshold

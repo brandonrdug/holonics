@@ -145,6 +145,7 @@ open Holonics.HolonCore
 variable {𝕜 : Type*} [Field 𝕜] {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq ι]
   [DecidableEq κ]
 
+omit [DecidableEq ι] [DecidableEq κ] in
 /-- [proved-derived; formal-checked] **The carry composes along a passage:** the defect of a
 composite coarse reading is the outer defect read at the inner's output plus the inner defect
 carried by the outer coarse map. -/
@@ -154,6 +155,7 @@ theorem squareDefect_comp (π : Matrix κ ι 𝕜) (Af Bf : Matrix ι ι 𝕜) (
   simp only [squareDefect, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_assoc]
   abel
 
+omit [DecidableEq ι] [DecidableEq κ] in
 /-- [proved-derived; formal-checked] Two steps that each close their scale square compose into one
 that closes it. -/
 theorem squareDefect_comp_eq_zero (π : Matrix κ ι 𝕜) (Af Bf : Matrix ι ι 𝕜)

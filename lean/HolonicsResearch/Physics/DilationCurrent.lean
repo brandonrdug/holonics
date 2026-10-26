@@ -117,6 +117,5 @@ theorem dilationCurrent_perfectFluid_time (x : Index → ℝ) (density pressure 
     dilationCurrent x (perfectFluidTensor density pressure) 0 = -(x 0 * density) := by
   simp only [dilationCurrent, Fin.sum_univ_four]
   simp [perfectFluidTensor, minkowskiMetricComponent, minkowskiSign, restObserver]
-  ring
 
 end Holonics.Physics.DilationCurrent

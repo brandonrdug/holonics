@@ -140,7 +140,7 @@ theorem eleven_face (xs ys : List ℕ) :
 /-- [proved-standard; formal-checked] **Reading leading first is the fold `x ↦ b x + d`:** from
 `a`, the fold over the reversed (least-significant-first) word gives `a bⁿ + Σ_k d_k bᵏ`. -/
 theorem foldl_digitMove (b a : R) (L : List ℕ) :
-    L.reverse.foldl (fun x d => digitMove b (d : R) x) a = a * b ^ L.length + Nat.ofDigits b L := by
+    L.reverse.foldl (fun x (d : ℕ) => digitMove b (d : R) x) a = a * b ^ L.length + Nat.ofDigits b L := by
   induction L with
   | nil => simp [Nat.ofDigits]
   | cons d L ih =>
@@ -151,14 +151,14 @@ theorem foldl_digitMove (b a : R) (L : List ℕ) :
 
 /-- [proved-standard; formal-checked] From rest the fold reads the word's value. -/
 theorem ofDigits_eq_fold (b : R) (L : List ℕ) :
-    Nat.ofDigits b L = L.reverse.foldl (fun x d => digitMove b (d : R) x) 0 := by
+    Nat.ofDigits b L = L.reverse.foldl (fun x (d : ℕ) => digitMove b (d : R) x) 0 := by
   rw [foldl_digitMove]
   ring
 
 /-- [proved-standard; formal-checked] **A number's face on a ring is the leading-first fold of its
 base-`b` digits.** -/
 theorem face_is_fold (b n : ℕ) :
-    (n : R) = (Nat.digits b n).reverse.foldl (fun x d => digitMove (b : R) (d : R) x) 0 := by
+    (n : R) = (Nat.digits b n).reverse.foldl (fun x (d : ℕ) => digitMove (b : R) (d : R) x) 0 := by
   conv_lhs => rw [← Nat.ofDigits_digits b n]
   rw [Nat.coe_ofDigits, ofDigits_eq_fold]
 

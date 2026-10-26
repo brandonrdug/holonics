@@ -258,7 +258,7 @@ theorem pumped_injective {α β : ℂ} (h : ‖α‖ ≠ ‖β‖) {z : ℂ} (hz
 `α = ρ(1 − |κ|)U`, `β = ρκP` differ in size by `ρ|1 − 2|κ||`. -/
 theorem pumped_split_gap {ρ κ : ℝ} (hρ : 0 ≤ ρ) (hκ : |κ| ≤ 1) {U P : ℂ} (hU : ‖U‖ = 1)
     (hP : ‖P‖ = 1) :
-    |‖((ρ * (1 - |κ|) : ℝ) : ℂ) * U‖ - ‖((ρ * κ : ℝ) : ℂ) * P‖| = ρ * |1 - 2 * |κ|| := by
+    |‖((ρ * (1 - |κ|) : ℝ) : ℂ) * U‖ - ‖((ρ * κ : ℝ) : ℂ) * P‖| = ρ * |1 - 2 * (|κ|)| := by
   rw [norm_mul, norm_mul, hU, hP, mul_one, mul_one, Complex.norm_real, Complex.norm_real,
     Real.norm_of_nonneg (mul_nonneg hρ (sub_nonneg.2 hκ)), Real.norm_eq_abs, abs_mul,
     abs_of_nonneg hρ, ← mul_sub, abs_mul, abs_of_nonneg hρ,
@@ -266,7 +266,7 @@ theorem pumped_split_gap {ρ κ : ℝ} (hρ : 0 ≤ ρ) (hκ : |κ| ≤ 1) {U P 
 
 /-- [proved-standard; formal-checked] **The split collapses exactly at `|κ| = 1/2`.** -/
 theorem pumped_split_collapse {ρ κ : ℝ} (hρ : 0 < ρ) :
-    ρ * |1 - 2 * |κ|| = 0 ↔ |κ| = 1 / 2 := by
+    ρ * |1 - 2 * (|κ|)| = 0 ↔ |κ| = 1 / 2 := by
   rw [mul_eq_zero, abs_eq_zero, sub_eq_zero]
   constructor
   · rintro (h | h)
