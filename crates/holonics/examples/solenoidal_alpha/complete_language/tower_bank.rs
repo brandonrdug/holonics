@@ -22,8 +22,9 @@
 //!   the pool of every class's reset clock (`hnn::tower::clock`) at the copy's port over the
 //!   training passage, frozen, in the training pass's partition (`STREAMS` streams from rest,
 //!   sections of `SECTION` cells), prints the sixteen largest drops, the rest's clock and the shares
-//!   down the whole ranking, joins the largest's clock, opens its copy's moments on the same sections
-//!   (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined on
+//!   down the whole ranking, joins the clock of the largest drop among the classes not yet clocked
+//!   (a clocked class's drop is printed beside it), opens the new copy's moments on the same
+//!   sections (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined on
 //!   is its twin; the founding is certified by one training pass from each, its code below the
 //!   twin's by more than `log₂` of the pool.
 //!
@@ -206,7 +207,14 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
         at(90),
         at(100)
     );
-    let class = drops[0].class;
+    // A class already clocked keeps its copy, which its own steps go on fitting: a second copy of
+    // the same held class is the same face. Its drop is read beside, and the founding is the top
+    // drop among the classes not yet clocked.
+    let clocked = tower.clock().map_or(Vec::new(), |c| c.classes.clone());
+    for (rank, d) in drops.iter().enumerate().filter(|(_, d)| clocked.contains(&d.class)) {
+        println!("TOWER_CLOCK_JOINED {}", line(rank + 1, d));
+    }
+    let class = drops.iter().find(|d| !clocked.contains(&d.class)).ok_or("every class of the pool is clocked")?.class;
     learner.join_clock(class).map_err(|e| e.to_string())?;
     // The copy's moments, opened on the passage it was founded on, in the training pass's
     // partition (`TowerLearner::open_moments`, section k of stream s reading `[s·chunk + k·section,
@@ -216,7 +224,10 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
     let sections: Vec<Vec<&[usize]>> = (0..(chunk - 1) / section)
         .map(|k| (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect())
         .collect();
-    let family = learner.tower.clock_join().ok_or("a founded tower has a clock")?;
+    // The new clock's copy is the last row and bias of the clocks' range; the clocks founded
+    // before keep the moments their passes left.
+    let joined = learner.tower.clock_join().ok_or("a founded tower has a clock")?;
+    let family = joined.end - (width + 1)..joined.end;
     let mut states: Vec<_> = (0..streams).map(|_| learner.tower.rest()).collect();
     let moment_sections = learner.open_moments(family, &mut states, &sections).map_err(|e| e.to_string())?;
     let moments_ms = moments_started.elapsed().as_millis();

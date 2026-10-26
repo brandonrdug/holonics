@@ -1,0 +1,86 @@
+The passes from the founded state role_clock/copyD.state (6417eb3d…a9d9), `train-unit-tower` at
+76568dd0a with the arguments `64 64 256 2 8 128 1 7`, on Brandon's PC, October 26. Every line as
+printed, except that only the first and last TOWER_SWELL of each pass are kept. Paths are relative
+to the run directory, which is not in the repository.
+
+Run 3: the opening, held-out cells read from the founded state before any pass
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/copyD.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=36532 user_s=33.9
+copyD.cells sha256 8163fb5d11ed12e9b7a0756c0607c1763b6b605606b54534032017625baab954 (the twin's opening cells)
+
+Run 4: timing, 300 training problems (train300.txt, 15b1aac8…0803)
+
+UNIT_READ units=1318 train_bytes=162937 train_units=62045 dev_bytes=397669 dev_units=151684
+TOWER_TRAIN material=290669 streams=8 section=128 sections_a_pass=60 train_bytes=162937 dev_bytes=397669
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.529 deposits=32 halvings=0 elapsed_ms=3785
+TOWER_SWELL pass=0 section=32 L0 x=336616 h=4686025 r=18671132 a=1119367 push=56154560 read=57749643 contact=46516047 return=28611634 lambda=1061281008 L1 x=548979 h=7810847 r=23031936 a=598052 push=55667603 read=109330175 contact=21074832 return=14995090 lambda=1072206358 readout=52397200
+TOWER_SECTION pass=0 section=60 bits_a_byte=1.510 deposits=60 halvings=0 elapsed_ms=7077
+TOWER_SWELL pass=0 section=60 L0 x=340572 h=4101039 r=17436210 a=1151473 push=55750751 read=57816867 contact=46974773 return=28647129 lambda=1060389720 L1 x=668278 h=8300573 r=22802009 a=614898 push=55658069 read=109391886 contact=21074832 return=14995090 lambda=1072191828 readout=52328792
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_STATE STATE.0 state_bytes=10259186 state_sha256=bb7a83dfc71c3b23fbf9c8c950bf3359ec8af26db3deb7341a0f2b31e3a39191
+TOWER_PASS pass=0 train_bits_a_byte=1.520 dev_bits_a_byte=1.571 dev_regions Q=1.799 P=1.303 N=2.237 M=1.117 deposits=60/60 pass_ms=11392 elapsed_ms=11427 train_code=257299662969 dev_code=655224310281 grain_bits=20
+TOWER_DONE state_bytes=10259186 state_sha256=bb7a83dfc71c3b23fbf9c8c950bf3359ec8af26db3deb7341a0f2b31e3a39191 elapsed_ms=11480
+RUN_RECEIPT exit=0 wall_s=11.6 peak_rss_kib=349756 user_s=83.2 stopped=no
+
+Run 5: the founded pass over the whole training text (copyD8)
+
+UNIT_READ units=1318 train_bytes=3528168 train_units=1342760 dev_bytes=397669 dev_units=151684
+TOWER_TRAIN material=290669 streams=8 section=128 sections_a_pass=1311 train_bytes=3528168 dev_bytes=397669
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.523 deposits=32 halvings=0 elapsed_ms=3765
+TOWER_SWELL pass=0 section=32 L0 x=324061 h=4154519 r=18230108 a=1061183 push=55483604 read=57290218 contact=46303762 return=28536311 lambda=1060588402 L1 x=519614 h=8106174 r=25477502 a=584861 push=55699334 read=108998641 contact=19225809 return=14995090 lambda=1072214988 readout=52268897
+TOWER_SECTION pass=0 section=64 bits_a_byte=1.512 deposits=64 halvings=0 elapsed_ms=7519
+TOWER_SECTION pass=0 section=96 bits_a_byte=1.536 deposits=96 halvings=0 elapsed_ms=11277
+TOWER_SECTION pass=0 section=128 bits_a_byte=1.507 deposits=128 halvings=0 elapsed_ms=15033
+TOWER_SECTION pass=0 section=160 bits_a_byte=1.524 deposits=160 halvings=0 elapsed_ms=18807
+TOWER_SECTION pass=0 section=192 bits_a_byte=1.509 deposits=192 halvings=0 elapsed_ms=22593
+TOWER_SECTION pass=0 section=224 bits_a_byte=1.470 deposits=224 halvings=0 elapsed_ms=26370
+TOWER_SECTION pass=0 section=256 bits_a_byte=1.563 deposits=256 halvings=0 elapsed_ms=30100
+TOWER_SECTION pass=0 section=288 bits_a_byte=1.526 deposits=288 halvings=0 elapsed_ms=33835
+TOWER_SECTION pass=0 section=320 bits_a_byte=1.501 deposits=320 halvings=0 elapsed_ms=37573
+TOWER_SECTION pass=0 section=352 bits_a_byte=1.509 deposits=352 halvings=0 elapsed_ms=41318
+TOWER_SECTION pass=0 section=384 bits_a_byte=1.532 deposits=384 halvings=0 elapsed_ms=45075
+TOWER_SECTION pass=0 section=416 bits_a_byte=1.510 deposits=416 halvings=0 elapsed_ms=48809
+TOWER_SECTION pass=0 section=448 bits_a_byte=1.524 deposits=448 halvings=0 elapsed_ms=52547
+TOWER_SECTION pass=0 section=480 bits_a_byte=1.530 deposits=480 halvings=0 elapsed_ms=56285
+TOWER_SECTION pass=0 section=512 bits_a_byte=1.522 deposits=512 halvings=0 elapsed_ms=60025
+TOWER_SECTION pass=0 section=544 bits_a_byte=1.475 deposits=544 halvings=0 elapsed_ms=63756
+TOWER_SECTION pass=0 section=576 bits_a_byte=1.540 deposits=576 halvings=0 elapsed_ms=67478
+TOWER_SECTION pass=0 section=608 bits_a_byte=1.519 deposits=608 halvings=0 elapsed_ms=71196
+TOWER_SECTION pass=0 section=640 bits_a_byte=1.513 deposits=640 halvings=0 elapsed_ms=74943
+TOWER_SECTION pass=0 section=672 bits_a_byte=1.536 deposits=672 halvings=0 elapsed_ms=78694
+TOWER_SECTION pass=0 section=704 bits_a_byte=1.515 deposits=704 halvings=0 elapsed_ms=82449
+TOWER_SECTION pass=0 section=736 bits_a_byte=1.490 deposits=736 halvings=0 elapsed_ms=86234
+TOWER_SECTION pass=0 section=768 bits_a_byte=1.511 deposits=768 halvings=0 elapsed_ms=89980
+TOWER_SECTION pass=0 section=800 bits_a_byte=1.517 deposits=800 halvings=0 elapsed_ms=93749
+TOWER_SECTION pass=0 section=832 bits_a_byte=1.524 deposits=832 halvings=0 elapsed_ms=97498
+TOWER_SECTION pass=0 section=864 bits_a_byte=1.514 deposits=864 halvings=0 elapsed_ms=101253
+TOWER_SECTION pass=0 section=896 bits_a_byte=1.506 deposits=896 halvings=0 elapsed_ms=104983
+TOWER_SECTION pass=0 section=928 bits_a_byte=1.555 deposits=928 halvings=0 elapsed_ms=108728
+TOWER_SECTION pass=0 section=960 bits_a_byte=1.525 deposits=960 halvings=0 elapsed_ms=112513
+TOWER_SECTION pass=0 section=992 bits_a_byte=1.501 deposits=992 halvings=0 elapsed_ms=116250
+TOWER_SECTION pass=0 section=1024 bits_a_byte=1.520 deposits=1024 halvings=0 elapsed_ms=120019
+TOWER_SECTION pass=0 section=1056 bits_a_byte=1.519 deposits=1056 halvings=0 elapsed_ms=123780
+TOWER_SECTION pass=0 section=1088 bits_a_byte=1.545 deposits=1088 halvings=0 elapsed_ms=127515
+TOWER_SECTION pass=0 section=1120 bits_a_byte=1.516 deposits=1120 halvings=0 elapsed_ms=131278
+TOWER_SECTION pass=0 section=1152 bits_a_byte=1.524 deposits=1152 halvings=0 elapsed_ms=135018
+TOWER_SECTION pass=0 section=1184 bits_a_byte=1.492 deposits=1184 halvings=0 elapsed_ms=138800
+TOWER_SECTION pass=0 section=1216 bits_a_byte=1.541 deposits=1216 halvings=0 elapsed_ms=142559
+TOWER_SECTION pass=0 section=1248 bits_a_byte=1.514 deposits=1248 halvings=0 elapsed_ms=146301
+TOWER_SECTION pass=0 section=1280 bits_a_byte=1.511 deposits=1280 halvings=0 elapsed_ms=150042
+TOWER_SECTION pass=0 section=1311 bits_a_byte=1.512 deposits=1311 halvings=0 elapsed_ms=153682
+TOWER_SWELL pass=0 section=1311 L0 x=354055 h=4888070 r=20843612 a=1173702 push=58532818 read=56799963 contact=48618438 return=34801670 lambda=1057362537 L1 x=622508 h=7353800 r=30606035 a=544389 push=63663600 read=121983509 contact=19253552 return=14995090 lambda=1072198123 readout=51909585
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_STATE STATE.0 state_bytes=9892198 state_sha256=3551b608e1f9444f27e76a2f04ebbd718d2afcd2f6f85bbc89719db11edab8f3
+TOWER_PASS pass=0 train_bits_a_byte=1.518 dev_bits_a_byte=1.580 dev_regions Q=1.796 P=1.318 N=2.240 M=1.167 deposits=1311/1311 pass_ms=158000 elapsed_ms=158029 train_code=5614112511860 dev_code=658947806479 grain_bits=20
+TOWER_DONE state_bytes=9892198 state_sha256=3551b608e1f9444f27e76a2f04ebbd718d2afcd2f6f85bbc89719db11edab8f3 elapsed_ms=158073
+RUN_RECEIPT exit=0 wall_s=158.5 peak_rss_kib=383880 user_s=1111.4 stopped=no
+
+The twin, from bankA7/STATE, measured before (the pool record's receipts, PASSES.txt):
+
+TOWER_PASS pass=0 train_bits_a_byte=1.524 dev_bits_a_byte=1.596 dev_regions Q=1.797 P=1.358 N=2.241 M=1.147 deposits=1311/1311 pass_ms=160544 elapsed_ms=160574 train_code=5636231354399 dev_code=665305828192 grain_bits=20
+
+The certificate: 5,636,231,354,399 − 5,614,112,511,860 = 22,118,842,539 on 2^(−20), 21,094.2 bits
+below the twin, against the bar of 11 bits (train_code below 5,636,219,820,063). Paid.
+Held-out, read beside: 665,305,828,192 − 658,947,806,479 = 6,358,021,713 on 2^(−20), 6,063.5 bits
+below the twin.
