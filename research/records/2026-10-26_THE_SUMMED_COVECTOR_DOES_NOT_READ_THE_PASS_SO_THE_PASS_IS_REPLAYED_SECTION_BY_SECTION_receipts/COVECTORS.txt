@@ -1,0 +1,55 @@
+# The build
+
+RUN_RECEIPT exit=0 wall_s=118.9 peak_rss_kib=3449764 user_s=191.9
+
+# The covectors by place, lapD8
+
+TOWER_CLOCK_COVECTOR_OPENINGS requests=4524 placed=4524 read=4519 unheld=4 name_mass=+906.5
+TOWER_CLOCK_COVECTOR place=question arrives=0 cells=369756 readout_name=-24785.960 readout_names=-19905.385 readout_others=-4880.575 readout_plain_ppt=-33 clock=0:dz=-177.9,raise=+0.864,name=-0.937,plain_ppt=0 clock=1:dz=+2999.5,raise=-55.469,name=-199364.209,plain_ppt=-810
+TOWER_CLOCK_COVECTOR place=question arrives=1 cells=3347 readout_name=+17867.085 readout_names=+14742.069 readout_others=+3125.016 readout_plain_ppt=27 clock=0:dz=+5.2,raise=-0.119,name=+0.113,plain_ppt=0 clock=1:dz=-2687.8,raise=+53.432,name=+191936.829,plain_ppt=765
+TOWER_CLOCK_COVECTOR place=opening arrives=0 cells=3405 readout_name=-62255.597 readout_names=-17676.309 readout_others=-44579.289 readout_plain_ppt=-66 clock=0:dz=+0.4,raise=-0.061,name=+0.058,plain_ppt=0 clock=1:dz=+661.1,raise=-64.979,name=-233548.379,plain_ppt=-744
+TOWER_CLOCK_COVECTOR place=opening arrives=1 cells=1118 readout_name=+51158.278 readout_names=+26419.090 readout_others=+24739.188 readout_plain_ppt=69 clock=0:dz=+0.5,raise=-0.068,name=+0.065,plain_ppt=0 clock=1:dz=-871.6,raise=+85.070,name=+305776.394,plain_ppt=975
+TOWER_CLOCK_COVECTOR place=answer arrives=0 cells=512056 readout_name=-23639.825 readout_names=-30401.996 readout_others=+6762.171 readout_plain_ppt=-33 clock=0:dz=-1705.7,raise=+16.897,name=-17.992,plain_ppt=0 clock=1:dz=+3467.4,raise=-94.979,name=-340937.324,plain_ppt=-1276
+TOWER_CLOCK_COVECTOR place=answer arrives=1 cells=4119 readout_name=+28611.067 readout_names=+21256.154 readout_others=+7354.913 readout_plain_ppt=43 clock=0:dz=+4.1,raise=-0.052,name=+0.047,plain_ppt=0 clock=1:dz=-3218.0,raise=+89.147,name=+321228.254,plain_ppt=1192
+TOWER_CLOCK_COVECTOR place=elsewhere arrives=0 cells=442964 readout_name=+665.003 readout_names=-7393.044 readout_others=+8058.048 readout_plain_ppt=8 clock=0:dz=+1748.7,raise=-12.783,name=+13.056,plain_ppt=0 clock=1:dz=+3491.6,raise=-155.832,name=-560897.002,plain_ppt=-1926
+TOWER_CLOCK_COVECTOR place=elsewhere arrives=1 cells=5699 readout_name=+1624.786 readout_names=+1629.480 readout_others=-4.694 readout_plain_ppt=0 clock=0:dz=-2723.8,raise=+21.755,name=-22.458,plain_ppt=0 clock=1:dz=-1479.0,raise=+65.165,name=+234680.884,plain_ppt=810
+TOWER_CLOCK_COVECTOR place=all arrives=- cells=1342464 readout_name=-10755.098 readout_names=-11329.917 readout_others=+574.819 readout_plain_ppt=14 clock=0:dz=-2848.5,raise=+26.433,name=-28.048,plain_ppt=0 clock=1:dz=+2363.1,raise=-78.445,name=-281124.495,plain_ppt=-1014
+TOWER_CLOCK_COVECTOR_STEP clock=0 class=335 bias=21337 bias_change=392159
+TOWER_CLOCK_COVECTOR_STEP clock=1 class=313 bias=37441 bias_change=-318538
+TOWER_CLOCK_COVECTOR_PLAIN total_sign=-
+TOWER_CLOCK_COVECTORS clocks=2 streams=8 section=128 cells=1342464 read_ms=43370 elapsed_ms=43433
+RUN_RECEIPT exit=0 wall_s=43.5 peak_rss_kib=204564 user_s=340.5
+
+# The covectors by place, lap3T8
+
+TOWER_CLOCK_COVECTOR_OPENINGS requests=4524 placed=4524 read=4519 unheld=4 name_mass=+750.3
+TOWER_CLOCK_COVECTOR place=question arrives=0 cells=369756 readout_name=-17494.844 readout_names=-17231.066 readout_others=-263.778 readout_plain_ppt=-378 clock=0:dz=-126.1,raise=-0.999,name=+1.389,plain_ppt=0 clock=1:dz=+2835.5,raise=-49.666,name=-186437.517,plain_ppt=-13511
+TOWER_CLOCK_COVECTOR place=question arrives=1 cells=3347 readout_name=+19565.130 readout_names=+16258.547 readout_others=+3306.583 readout_plain_ppt=525 clock=0:dz=+5.0,raise=-0.104,name=+0.136,plain_ppt=0 clock=1:dz=-2686.8,raise=+52.958,name=+198700.086,plain_ppt=13947
+TOWER_CLOCK_COVECTOR place=opening arrives=0 cells=3405 readout_name=-47823.494 readout_names=-12312.459 readout_others=-35511.035 readout_plain_ppt=-792 clock=0:dz=+0.6,raise=-0.078,name=+0.099,plain_ppt=0 clock=1:dz=+547.4,raise=-51.954,name=-195076.226,plain_ppt=-10769
+TOWER_CLOCK_COVECTOR place=opening arrives=1 cells=1118 readout_name=+55811.860 readout_names=+30002.791 readout_others=+25809.069 readout_plain_ppt=1375 clock=0:dz=+0.7,raise=-0.095,name=+0.122,plain_ppt=0 clock=1:dz=-914.1,raise=+86.406,name=+324416.037,plain_ppt=17906
+TOWER_CLOCK_COVECTOR place=answer arrives=0 cells=512056 readout_name=-10229.489 readout_names=-24093.000 readout_others=+13863.511 readout_plain_ppt=-148 clock=0:dz=-1632.1,raise=+10.691,name=-16.371,plain_ppt=0 clock=1:dz=+2878.4,raise=-70.853,name=-265745.553,plain_ppt=-17488
+TOWER_CLOCK_COVECTOR place=answer arrives=1 cells=4119 readout_name=+30542.112 readout_names=+22243.513 readout_others=+8298.599 readout_plain_ppt=828 clock=0:dz=+5.5,raise=-0.073,name=+0.088,plain_ppt=0 clock=1:dz=-3354.4,raise=+88.776,name=+333930.414,plain_ppt=21482
+TOWER_CLOCK_COVECTOR place=elsewhere arrives=0 cells=442964 readout_name=+7713.131 readout_names=-4582.046 readout_others=+12295.177 readout_plain_ppt=402 clock=0:dz=+1813.3,raise=-10.886,name=+15.854,plain_ppt=0 clock=1:dz=+3094.8,raise=-129.445,name=-486841.851,plain_ppt=-29231
+TOWER_CLOCK_COVECTOR place=elsewhere arrives=1 cells=5699 readout_name=+1818.745 readout_names=+2366.704 readout_others=-547.958 readout_plain_ppt=-5 clock=0:dz=-2734.6,raise=+16.096,name=-23.622,plain_ppt=0 clock=1:dz=-1514.2,raise=+66.057,name=+248451.893,plain_ppt=14859
+TOWER_CLOCK_COVECTOR place=all arrives=- cells=1342464 readout_name=+39903.211 readout_names=+12653.010 readout_others=+27250.202 readout_plain_ppt=1806 clock=0:dz=-2667.8,raise=+14.553,name=-22.305,plain_ppt=0 clock=1:dz=+886.7,raise=-7.721,name=-28602.716,plain_ppt=-2805
+TOWER_CLOCK_COVECTOR_STEP clock=0 class=335 bias=29362 bias_change=365900
+TOWER_CLOCK_COVECTOR_STEP clock=1 class=313 bias=52442 bias_change=-120902
+TOWER_CLOCK_COVECTOR_PLAIN total_sign=-
+TOWER_CLOCK_COVECTORS clocks=2 streams=8 section=128 cells=1342464 read_ms=43574 elapsed_ms=43639
+RUN_RECEIPT exit=0 wall_s=43.7 peak_rss_kib=206096 user_s=341.1
+
+# The measured change, lapD8 then lap3T8
+
+role_clock/calib/lapD8.train.copies then role_clock/calib/lap3T8.train.copies: at every named answer's opening, 4520 read in both, 4 with no clock holding the question's first unit in one
+  the log-mass of the question's first unit changes by -1415.655 bits in all (-0.3132 an opening)
+  clock 0: the raise changes by -0.025 bits an opening over the 4522 it holds a class at in both
+  clock 1: the raise changes by -0.261 bits an opening over the 4521 it holds a class at in both
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=50140 user_s=0.1
+
+# The measured change, lapD8 then lap3D8
+
+role_clock/calib/lapD8.train.copies then role_clock/calib/lap3D8.train.copies: at every named answer's opening, 4520 read in both, 4 with no clock holding the question's first unit in one
+  the log-mass of the question's first unit changes by -1400.863 bits in all (-0.3099 an opening)
+  clock 0: the raise changes by -0.082 bits an opening over the 4522 it holds a class at in both
+  clock 1: the raise changes by -0.280 bits an opening over the 4521 it holds a class at in both
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=50900 user_s=0.1
