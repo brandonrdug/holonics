@@ -190,6 +190,9 @@ use num_bigint::BigUint;
 use rayon::prelude::*;
 
 pub mod duplex;
+pub mod realization;
+
+use realization::{HostPass, PassRealization, Slot};
 
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
@@ -220,6 +223,9 @@ const UNIT_BITS: u32 = 62;
 pub enum TowerError {
     #[error("tower refused: {0}")]
     Refused(&'static str),
+    /// A declared realization of the section's pass refused (`realization`), with its reason.
+    #[error("tower realization refused: {0}")]
+    Realization(String),
 }
 
 type Result<T> = std::result::Result<T, TowerError>;
@@ -1250,8 +1256,7 @@ pub struct TowerFace {
 impl TowerFace {
     /// The class's code, `−log₂ p̂(a)`, on `2^(−20)` bits.
     pub fn code(&self, class: usize) -> i64 {
-        let p = (self.masses[class] << UNIT_BITS) / self.total;
-        -(log2_face(p.max(1), READ_BITS) as i64)
+        face_code(self.masses[class], self.total)
     }
 
     /// The face read at one base-four cell of a class (the exterior cell chart: a class index in
@@ -1272,6 +1277,13 @@ impl TowerFace {
         }
         Ok(cells)
     }
+}
+
+/// A class's code read off its mass and the face's total, `−log₂(mass/total)` on `2^(−20)` bits
+/// ([`TowerFace::code`]).
+pub fn face_code(mass: u128, total: u128) -> i64 {
+    let p = (mass << UNIT_BITS) / total;
+    -(log2_face(p.max(1), READ_BITS) as i64)
 }
 
 /// The base-four cells a class index of an alphabet of `alphabet` classes takes: the least `P`
@@ -3251,6 +3263,13 @@ impl TowerLearner {
     /// neither the code nor the certificate counts it; the code and the certificate read every
     /// other face at its declared class.
     pub fn section_compared(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<SectionReceipt> {
+        self.section_realized(states, classes, compared, &mut HostPass::default())
+    }
+
+    /// The section of [`TowerLearner::section_compared`] with its forward and reverse read through a
+    /// declared [`PassRealization`] (`realization`'s module header); every realization returns the
+    /// host's bits, so the receipt and the learner are the host's.
+    pub fn section_realized(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization) -> Result<SectionReceipt> {
         if states.len() != classes.len() || classes.iter().any(|c| c.len() < 2) {
             return refuse("a section needs one carried state and two classes a stream");
         }
@@ -3258,57 +3277,16 @@ impl TowerLearner {
             return refuse("a comparison for each class of each stream");
         }
         let target = |s: usize, i: usize| compared.map_or(Some(classes[s][i]), |m| m[s][i]);
-        let tower = &self.tower;
-        let reaches = tower.reaches();
+        let targets: Vec<Vec<Option<usize>>> = classes.iter().enumerate().map(|(s, c)| (1..c.len()).map(|i| target(s, i)).collect()).collect();
         let opening: Vec<TowerState> = states.to_vec();
-        let forwards: Vec<(Vec<Cell>, TowerState)> = opening
-            .par_iter()
-            .zip(classes.par_iter())
-            .map(|(open, c)| {
-                let mut s = open.clone();
-                let cells = tower.forward(&mut s, c, &reaches)?;
-                Ok((cells, s))
-            })
-            .collect::<Result<_>>()?;
-        self.swell = (0..tower.declaration.levels)
-            .map(|l| {
-                let mut m = [0u64; 4];
-                for lc in forwards.iter().flat_map(|(cells, _)| cells.iter().map(move |c| &c.levels[l])) {
-                    m[0] = m[0].max(reach(&lc.input));
-                    m[1] = m[1].max(reach64(&lc.state_face));
-                    m[2] = m[2].max(lc.read_scale as u64);
-                    m[3] = m[3].max(reach(&lc.drive)).max(reach(&lc.pair));
-                }
-                m
-            })
-            .collect();
-        let faces_old: Vec<(u128, u128)> = forwards
-            .iter()
-            .enumerate()
-            .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
-            .collect();
-        let part_codes = |passes: &[(Vec<Cell>, TowerState)]| -> Vec<i64> {
-            passes
-                .iter()
-                .enumerate()
-                .map(|(s, (cells, _))| cells.iter().enumerate().filter_map(|(i, cell)| target(s, i + 1).map(|t| cell.face.code(t))).sum::<i64>())
-                .collect()
-        };
-        let parts_before = part_codes(&forwards);
+        let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?;
+        self.swell = read.swell;
+        let faces_old: Vec<(u128, u128)> = read.faces.iter().flatten().flatten().copied().collect();
+        let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
+        let parts_before = part_codes(&read.faces);
         let code_before: i64 = parts_before.iter().sum();
-        let gradients: Vec<Vec<i128>> = opening
-            .par_iter()
-            .zip(forwards.par_iter())
-            .zip(classes.par_iter())
-            .enumerate()
-            .map(|(s, ((open, (cells, _)), c))| tower.reverse(open, cells, c, compared.map(|m| m[s])))
-            .collect::<Result<_>>()?;
-        let mut g = vec![0i128; tower.theta.len()];
-        for gs in &gradients {
-            for (a, b) in g.iter_mut().zip(gs) {
-                *a += *b;
-            }
-        }
+        let tower = &self.tower;
+        let mut g = realization.reverse(tower, &opening, classes, compared)?;
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
         // The moments.
@@ -3354,31 +3332,18 @@ impl TowerLearner {
             }
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
-                self.tower.carry_credit(states, forwards, &opening, &reaches)?;
+                realization.carry(&self.tower, states, &opening, Slot::Opened)?;
                 let parts = parts_before.iter().map(|&c| (c, c)).collect();
                 return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts });
             }
             candidate.project();
-            let creaches = candidate.reaches();
-            let rereads: Vec<(Vec<Cell>, TowerState)> = opening
-                .par_iter()
-                .zip(classes.par_iter())
-                .map(|(open, c)| {
-                    let mut s = open.clone();
-                    let cells = candidate.forward(&mut s, c, &creaches)?;
-                    Ok((cells, s))
-                })
-                .collect::<Result<_>>()?;
-            let faces_new: Vec<(u128, u128)> = rereads
-                .iter()
-                .enumerate()
-                .flat_map(|(s, (cells, _))| cells.iter().enumerate().filter_map(move |(i, cell)| target(s, i + 1).map(|t| (cell.face.masses[t], cell.face.total))))
-                .collect();
+            let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?;
+            let faces_new: Vec<(u128, u128)> = reread.faces.iter().flatten().flatten().copied().collect();
             if fewer_bits(&faces_old, &faces_new) {
-                let parts_after = part_codes(&rereads);
+                let parts_after = part_codes(&reread.faces);
                 let code_after: i64 = parts_after.iter().sum();
                 let parts = parts_before.iter().copied().zip(parts_after).collect();
-                candidate.carry_credit(states, rereads, &opening, &creaches)?;
+                realization.carry(&candidate, states, &opening, Slot::Reread)?;
                 self.tower = candidate;
                 return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts });
             }
