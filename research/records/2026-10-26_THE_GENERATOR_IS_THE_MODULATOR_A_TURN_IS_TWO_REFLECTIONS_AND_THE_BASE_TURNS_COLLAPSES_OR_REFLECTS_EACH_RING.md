@@ -101,8 +101,8 @@ base acts by its residue `b = 10 mod m`, and each ring is one of the Swing's kin
 | 2, 5, 10 | 0 | `v ← d` | collapse | the last digit |
 | 7, 13, 37, 101, 100, … | other | `v ← 10v + d` | coupled planes | the period of `1/m`; the tens |
 
-[derived, the mathematics thread; checked exactly over 411,365 integer cases, its record to
-follow] **What one plane carries.** On a ring coprime to 10, the digit maps generate the ring's
+[derived, the mathematics thread; checked exactly over 411,365 integer cases, its
+[record](2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR.md)] **What one plane carries.** On a ring coprime to 10, the digit maps generate the ring's
 whole affine group, which is finite, so it fixes a point and acts linearly, and its translations
 need every character in the orbit of `×10` and conjugation. One plane carries the residue only if
 `10 ≡ ±1`: rings 3, 9 and 11. A prime `p` needs `ord_p(10)` real planes, half that when the order is
@@ -207,8 +207,8 @@ expected to pass the acceptance: a pumped mode holds a sum's tens only in the co
 staircase its readout reads through many kinks, not in the phase chart where the sum is one
 crossing (§2). The loop's
 reading is which rings rise, which tells whether the towers' own descent locates keyed turns on
-mixed text at all; the rotor ring, the build the mathematics thread proposes, takes the same
-descent.
+mixed text at all; the rotor ring, the build the mathematics thread proposes (its record's §7–8, with its own
+acceptance on the never-met calculations against the 8-gram), takes the same descent.
 
 **The acceptance**, the product claim of this step: a tower writes at least 156 of the 312
 never-heard sums and differences right at the equals, and its held-out code after three passes is
