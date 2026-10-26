@@ -2,11 +2,11 @@
 
 | Script | What it reads | Projection | Deadline (outer `timeout`) | Measured wall | Peak resident |
 |---|---|---|---|---|---|
-| `referent_mass.py` | A: the 6,726 training problems (render `b`), named problems, person names and their sheets, the opener's mass and laps per problem, type against token; B: the held-out John problem and its reference answer; C: the 400 committed samples after the John question, by group; D: the carry of each word of the question; E: the held-out denominators of the spec's carry read | unmeasured before the first run, so planned at one to three minutes | 180 s (development runs), 60 s (final run, from the development runs' largest 1.9 s) | 1.45 s | 74,448 KiB |
+| `referent_mass.py` | A: the 6,726 training problems (render `b`), named problems, person names and their sheets, the opener's mass and loops per problem, the sheet against the next word; B: the held-out John problem and its reference answer; C: the 400 committed samples after the John question, by group; D: the carry of each word of the question | unmeasured before the first run, so planned at one to three minutes | 180 s (development runs), 60 s (final run, from the development runs' largest 1.9 s) | 1.61 s | 74,100 KiB |
 
-`referent_mass.py`: exit 0, `all 20 checks hold`. Output `referent_mass.txt`. Script SHA-256
-`04eddaa615a6ccdb602af35a05aabd30fd1b051d7c1a39604e9647b7ba578755`; output SHA-256
-`9f13bc90d4b424a817fe11bd7f43b134d08b4462614596fa3cb57fa66709075d`. The elapsed milliseconds differ
+`referent_mass.py`: exit 0, `all 19 checks hold`. Output `referent_mass.txt`. Script SHA-256
+`d5b1f21115c368bda7793bc28056cc13c4b1b34c5c0ae6f425f2196eeb798a17`; output SHA-256
+`00e270c196fbe26a96adccd72ff703dbb9ceef755ab67d8081d55f3a2d407c7e`. The elapsed milliseconds differ
 between runs, and every other field is deterministic.
 
 Exact arithmetic only: integers and `fractions.Fraction`. The decimals in the output are printed
@@ -18,7 +18,7 @@ Inputs:
 - the repository's committed sample files `2026-10-26_*_receipts/SAMPLES*.md`.
 
 No private data. Run as `timeout 60 python3 -I` through `runpy`, the peak read by
-`resource.getrusage` (`/usr/bin/time` is not installed here). Measured to projected wall: 1.45 s
+`resource.getrusage` (`/usr/bin/time` is not installed here). Measured to projected wall: 1.61 s
 against 60 s.
 
 Development, before the final run:
@@ -32,3 +32,7 @@ Development, before the final run:
   are now split by the sample's header.
 - **Per-sample reads.** One sample's "he is means he is" loop dominated the pooled mention counts, so
   the table leads with per-sample counts.
+- **Part E removed.** The first committed version (PR #498) had a fifth part, the held-out
+  denominators for the acceptance of a build this record specified. That build is withdrawn (the
+  record's §5), so the part and its check went with it: 20 checks became 19. Parts A to D are
+  unchanged, and every number they print is the same as in the first version.

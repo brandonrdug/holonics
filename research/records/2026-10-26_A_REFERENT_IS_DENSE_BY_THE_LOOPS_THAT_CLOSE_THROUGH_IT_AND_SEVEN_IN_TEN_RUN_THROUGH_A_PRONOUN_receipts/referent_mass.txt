@@ -15,7 +15,7 @@ answers whose first mention resolves to the opener: 3129/3520 (0.889)
 (name, next word) pairs: 7693 distinct over 11895 mentions; 5590 occur once
 after John in his 210 problems: 100 distinct next words over 325 mentions; most: has 42, buys 31, s 29, is 18, decides 16, have 8, and 8, runs 6
 training problems with volunt-: 7; opened by a name: 6 (Brenda, Hadley, James, Janet, Mr, Nick)
-elapsed_ms 1059
+elapsed_ms 1251
 
 == B. The held-out question and its reference answer
 question mentions: John->John he->John
@@ -75,9 +75,6 @@ many | 3861 | 40 | 132 | no
 a | 4521 | 90 | 220 | yes
 how | 5819 | 34 | 149 | no
 volunt- (stem) | 7 | 0 | 0 | yes
+elapsed_ms 272
 
-== E. Held out: 747 problems, 421 named; answer words 26709, of which 18790 occur in their own question; problems with such a word 747
-John's answer: He volunteers a year he volunteers for hours
-elapsed_ms 319
-
-all 20 checks hold
+all 19 checks hold
