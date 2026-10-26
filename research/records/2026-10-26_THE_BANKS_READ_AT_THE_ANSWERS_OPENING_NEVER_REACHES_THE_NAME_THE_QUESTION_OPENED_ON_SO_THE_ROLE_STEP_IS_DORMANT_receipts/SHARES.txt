@@ -1,0 +1,350 @@
+# The share reads, whole, with the landed cells' bytes left out (they are the GSM8K text's).
+# `python3 -I tools/listener/bank_trace.py share HEARD TEXT TRACE` (the PC blocks at 97dbb00d4), HEARD the training text 050b94f3…,
+# TEXT the held-out text e5bffe0e… (dev) or the training text (train). Each block ends where the
+# observer's list of the landed cells' bytes began.
+
+## Brandon's PC: the four-pass record's PC join and its four passes (bankA.state, bankA4 … bankA7)
+
+=== dev pass 0
+all: 421 reads
+  largest address on an earlier problem                   375  0.8907
+  largest address on another cell of the question          46  0.1093
+  largest share on elsewhere                              421  1.0000
+  the opening name's rank among the window's addresses: mean 42.35 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address on an earlier problem                    87  0.8969
+  largest address on another cell of the question          10  0.1031
+  largest share on elsewhere                               97  1.0000
+  the opening name's rank among the window's addresses: mean 42.99 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address on an earlier problem                   288  0.8889
+  largest address on another cell of the question          36  0.1111
+  largest share on elsewhere                              324  1.0000
+  the opening name's rank among the window's addresses: mean 42.16 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+=== dev pass 1
+all: 421 reads
+  largest address on an earlier problem                   161  0.3824
+  largest address on another cell of the question         249  0.5914
+  largest address on the name later in the question         7  0.0166
+  largest address on the read's own cell                    4  0.0095
+  largest share on elsewhere                              414  0.9834
+  largest share on the name                                 7  0.0166
+  the opening name's rank among the window's addresses: mean 54.82 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address on an earlier problem                    35  0.3608
+  largest address on another cell of the question          59  0.6082
+  largest address on the name later in the question         2  0.0206
+  largest address on the read's own cell                    1  0.0103
+  largest share on elsewhere                               96  0.9897
+  largest share on the name                                 1  0.0103
+  the opening name's rank among the window's addresses: mean 53.42 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address on an earlier problem                   126  0.3889
+  largest address on another cell of the question         190  0.5864
+  largest address on the name later in the question         5  0.0154
+  largest address on the read's own cell                    3  0.0093
+  largest share on elsewhere                              318  0.9815
+  largest share on the name                                 6  0.0185
+  the opening name's rank among the window's addresses: mean 55.23 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+=== dev pass 2
+all: 421 reads
+  largest address on an earlier problem                    76  0.1805
+  largest address on another cell of the question         324  0.7696
+  largest address on the name later in the question        17  0.0404
+  largest address on the read's own cell                    4  0.0095
+  largest share on elsewhere                              403  0.9572
+  largest share on the name                                18  0.0428
+  the opening name's rank among the window's addresses: mean 62.41 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address on an earlier problem                    16  0.1649
+  largest address on another cell of the question          76  0.7835
+  largest address on the name later in the question         4  0.0412
+  largest address on the read's own cell                    1  0.0103
+  largest share on elsewhere                               93  0.9588
+  largest share on the name                                 4  0.0412
+  the opening name's rank among the window's addresses: mean 63.56 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address on an earlier problem                    60  0.1852
+  largest address on another cell of the question         248  0.7654
+  largest address on the name later in the question        13  0.0401
+  largest address on the read's own cell                    3  0.0093
+  largest share on elsewhere                              310  0.9568
+  largest share on the name                                14  0.0432
+  the opening name's rank among the window's addresses: mean 62.06 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+=== dev pass 3
+all: 421 reads
+  largest address on an earlier problem                   137  0.3254
+  largest address on another cell of the question         244  0.5796
+  largest address on the name later in the question        19  0.0451
+  largest address on the read's own cell                   21  0.0499
+  largest share on elsewhere                              400  0.9501
+  largest share on the name                                21  0.0499
+  the opening name's rank among the window's addresses: mean 72.97 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address on an earlier problem                    32  0.3299
+  largest address on another cell of the question          53  0.5464
+  largest address on the name later in the question         5  0.0515
+  largest address on the read's own cell                    7  0.0722
+  largest share on elsewhere                               92  0.9485
+  largest share on the name                                 5  0.0515
+  the opening name's rank among the window's addresses: mean 74.63 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address on an earlier problem                   105  0.3241
+  largest address on another cell of the question         191  0.5895
+  largest address on the name later in the question        14  0.0432
+  largest address on the read's own cell                   14  0.0432
+  largest share on elsewhere                              308  0.9506
+  largest share on the name                                16  0.0494
+  the opening name's rank among the window's addresses: mean 72.47 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+=== dev pass 4
+all: 421 reads
+  largest address on an earlier problem                    87  0.2067
+  largest address on another cell of the question         322  0.7648
+  largest address on the name later in the question        10  0.0238
+  largest address on the read's own cell                    2  0.0048
+  largest share on elsewhere                              407  0.9667
+  largest share on the name                                14  0.0333
+  the opening name's rank among the window's addresses: mean 47.41 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address on an earlier problem                    17  0.1753
+  largest address on another cell of the question          75  0.7732
+  largest address on the name later in the question         4  0.0412
+  largest address on the read's own cell                    1  0.0103
+  largest share on elsewhere                               93  0.9588
+  largest share on the name                                 4  0.0412
+  the opening name's rank among the window's addresses: mean 49.62 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address on an earlier problem                    70  0.2160
+  largest address on another cell of the question         247  0.7623
+  largest address on the name later in the question         6  0.0185
+  largest address on the read's own cell                    1  0.0031
+  largest share on elsewhere                              314  0.9691
+  largest share on the name                                10  0.0309
+  the opening name's rank among the window's addresses: mean 46.75 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+=== train pass 0
+all: 4524 reads
+  largest address on an earlier problem                  4110  0.9085
+  largest address on another cell of the question         408  0.0902
+  largest address on the name later in the question         6  0.0013
+  largest share on elsewhere                             4523  0.9998
+  largest share on the name                                 1  0.0002
+  the opening name's rank among the window's addresses: mean 41.92 of 83.5 cells; first 0.0002; a uniform rank would be first 0.0139
+answer opens with the name: 1074 reads
+  largest address on an earlier problem                   952  0.8864
+  largest address on another cell of the question         120  0.1117
+  largest address on the name later in the question         2  0.0019
+  largest share on elsewhere                             1073  0.9991
+  largest share on the name                                 1  0.0009
+  the opening name's rank among the window's addresses: mean 42.87 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0138
+answer opens otherwise: 3450 reads
+  largest address on an earlier problem                  3158  0.9154
+  largest address on another cell of the question         288  0.0835
+  largest address on the name later in the question         4  0.0012
+  largest share on elsewhere                             3450  1.0000
+  the opening name's rank among the window's addresses: mean 41.63 of 83.2 cells; first 0.0003; a uniform rank would be first 0.0140
+=== train pass 1
+all: 4524 reads
+  largest address on an earlier problem                  1627  0.3596
+  largest address on another cell of the question        2770  0.6123
+  largest address on the name later in the question        79  0.0175
+  largest address on the read's own cell                   48  0.0106
+  largest share on elsewhere                             4447  0.9830
+  largest share on the name                                77  0.0170
+  the opening name's rank among the window's addresses: mean 52.54 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0139
+answer opens with the name: 1074 reads
+  largest address on an earlier problem                   410  0.3818
+  largest address on another cell of the question         626  0.5829
+  largest address on the name later in the question        31  0.0289
+  largest address on the read's own cell                    7  0.0065
+  largest share on elsewhere                             1045  0.9730
+  largest share on the name                                29  0.0270
+  the opening name's rank among the window's addresses: mean 52.85 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0138
+answer opens otherwise: 3450 reads
+  largest address on an earlier problem                  1217  0.3528
+  largest address on another cell of the question        2144  0.6214
+  largest address on the name later in the question        48  0.0139
+  largest address on the read's own cell                   41  0.0119
+  largest share on elsewhere                             3402  0.9861
+  largest share on the name                                48  0.0139
+  the opening name's rank among the window's addresses: mean 52.44 of 83.2 cells; first 0.0000; a uniform rank would be first 0.0140
+=== train pass 2
+all: 4524 reads
+  largest address on an earlier problem                   803  0.1775
+  largest address on another cell of the question        3544  0.7834
+  largest address on the name later in the question       105  0.0232
+  largest address on the read's own cell                   72  0.0159
+  largest share on elsewhere                             4424  0.9779
+  largest share on the name                               100  0.0221
+  the opening name's rank among the window's addresses: mean 61.98 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0139
+answer opens with the name: 1074 reads
+  largest address on an earlier problem                   184  0.1713
+  largest address on another cell of the question         833  0.7756
+  largest address on the name later in the question        39  0.0363
+  largest address on the read's own cell                   18  0.0168
+  largest share on elsewhere                             1042  0.9702
+  largest share on the name                                32  0.0298
+  the opening name's rank among the window's addresses: mean 62.85 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0138
+answer opens otherwise: 3450 reads
+  largest address on an earlier problem                   619  0.1794
+  largest address on another cell of the question        2711  0.7858
+  largest address on the name later in the question        66  0.0191
+  largest address on the read's own cell                   54  0.0157
+  largest share on elsewhere                             3382  0.9803
+  largest share on the name                                68  0.0197
+  the opening name's rank among the window's addresses: mean 61.71 of 83.2 cells; first 0.0000; a uniform rank would be first 0.0140
+=== train pass 3
+all: 4524 reads
+  largest address on an earlier problem                  1562  0.3453
+  largest address on another cell of the question        2659  0.5878
+  largest address on the name later in the question       133  0.0294
+  largest address on the read's own cell                  170  0.0376
+  largest share on elsewhere                             4370  0.9660
+  largest share on the name                               154  0.0340
+  the opening name's rank among the window's addresses: mean 74.88 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0139
+answer opens with the name: 1074 reads
+  largest address on an earlier problem                   359  0.3343
+  largest address on another cell of the question         619  0.5764
+  largest address on the name later in the question        54  0.0503
+  largest address on the read's own cell                   42  0.0391
+  largest share on elsewhere                             1022  0.9516
+  largest share on the name                                52  0.0484
+  the opening name's rank among the window's addresses: mean 75.96 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0138
+answer opens otherwise: 3450 reads
+  largest address on an earlier problem                  1203  0.3487
+  largest address on another cell of the question        2040  0.5913
+  largest address on the name later in the question        79  0.0229
+  largest address on the read's own cell                  128  0.0371
+  largest share on elsewhere                             3348  0.9704
+  largest share on the name                               102  0.0296
+  the opening name's rank among the window's addresses: mean 74.54 of 83.2 cells; first 0.0000; a uniform rank would be first 0.0140
+=== train pass 4
+all: 4524 reads
+  largest address on an earlier problem                   961  0.2124
+  largest address on another cell of the question        3374  0.7458
+  largest address on the name later in the question       147  0.0325
+  largest address on the read's own cell                   42  0.0093
+  largest share on elsewhere                             4357  0.9631
+  largest share on the name                               167  0.0369
+  the opening name's rank among the window's addresses: mean 45.98 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0139
+answer opens with the name: 1074 reads
+  largest address on an earlier problem                   214  0.1993
+  largest address on another cell of the question         804  0.7486
+  largest address on the name later in the question        46  0.0428
+  largest address on the read's own cell                   10  0.0093
+  largest share on elsewhere                             1016  0.9460
+  largest share on the name                                58  0.0540
+  the opening name's rank among the window's addresses: mean 46.75 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0138
+answer opens otherwise: 3450 reads
+  largest address on an earlier problem                   747  0.2165
+  largest address on another cell of the question        2570  0.7449
+  largest address on the name later in the question       101  0.0293
+  largest address on the read's own cell                   32  0.0093
+  largest share on elsewhere                             3341  0.9684
+  largest share on the name                               109  0.0316
+  the opening name's rank among the window's addresses: mean 45.75 of 83.2 cells; first 0.0000; a uniform rank would be first 0.0140
+
+## The cloud host: the bank record's cloud join and its one pass (hjohn/bankA.state, hjohn/bankA4)
+
+# Read with the observer at c88e9dcb9, which adds the quarter lines.
+
+=== dev cloud join (pass 0)
+all: 421 reads
+  largest address inside the question, quarter 1 of 4      29  0.0689
+  largest address inside the question, quarter 2 of 4      30  0.0713
+  largest address inside the question, quarter 3 of 4      24  0.0570
+  largest address inside the question, quarter 4 of 4      41  0.0974
+  largest address on an earlier problem                   297  0.7055
+  largest address on another cell of the question         117  0.2779
+  largest address on the name later in the question         5  0.0119
+  largest address on the read's own cell                    2  0.0048
+  largest share on elsewhere                              415  0.9857
+  largest share on the name                                 6  0.0143
+  the opening name's rank among the window's addresses: mean 37.64 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address inside the question, quarter 1 of 4       9  0.0928
+  largest address inside the question, quarter 2 of 4       5  0.0515
+  largest address inside the question, quarter 3 of 4       5  0.0515
+  largest address inside the question, quarter 4 of 4      12  0.1237
+  largest address on an earlier problem                    66  0.6804
+  largest address on another cell of the question          29  0.2990
+  largest address on the name later in the question         2  0.0206
+  largest share on elsewhere                               95  0.9794
+  largest share on the name                                 2  0.0206
+  the opening name's rank among the window's addresses: mean 38.37 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address inside the question, quarter 1 of 4      20  0.0617
+  largest address inside the question, quarter 2 of 4      25  0.0772
+  largest address inside the question, quarter 3 of 4      19  0.0586
+  largest address inside the question, quarter 4 of 4      29  0.0895
+  largest address on an earlier problem                   231  0.7130
+  largest address on another cell of the question          88  0.2716
+  largest address on the name later in the question         3  0.0093
+  largest address on the read's own cell                    2  0.0062
+  largest share on elsewhere                              320  0.9877
+  largest share on the name                                 4  0.0123
+  the opening name's rank among the window's addresses: mean 37.42 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+
+=== dev cloud pass 1
+all: 421 reads
+  largest address inside the question, quarter 1 of 4      40  0.0950
+  largest address inside the question, quarter 2 of 4      57  0.1354
+  largest address inside the question, quarter 3 of 4      85  0.2019
+  largest address inside the question, quarter 4 of 4     128  0.3040
+  largest address on an earlier problem                   111  0.2637
+  largest address on another cell of the question         294  0.6983
+  largest address on the name later in the question        14  0.0333
+  largest address on the read's own cell                    2  0.0048
+  largest share on elsewhere                              406  0.9644
+  largest share on the name                                15  0.0356
+  the opening name's rank among the window's addresses: mean 52.43 of 83.5 cells; first 0.0000; a uniform rank would be first 0.0140
+answer opens with the name: 97 reads
+  largest address inside the question, quarter 1 of 4       6  0.0619
+  largest address inside the question, quarter 2 of 4      11  0.1134
+  largest address inside the question, quarter 3 of 4      25  0.2577
+  largest address inside the question, quarter 4 of 4      32  0.3299
+  largest address on an earlier problem                    23  0.2371
+  largest address on another cell of the question          69  0.7113
+  largest address on the name later in the question         5  0.0515
+  largest share on elsewhere                               93  0.9588
+  largest share on the name                                 4  0.0412
+  the opening name's rank among the window's addresses: mean 52.43 of 84.2 cells; first 0.0000; a uniform rank would be first 0.0136
+answer opens otherwise: 324 reads
+  largest address inside the question, quarter 1 of 4      34  0.1049
+  largest address inside the question, quarter 2 of 4      46  0.1420
+  largest address inside the question, quarter 3 of 4      60  0.1852
+  largest address inside the question, quarter 4 of 4      96  0.2963
+  largest address on an earlier problem                    88  0.2716
+  largest address on another cell of the question         225  0.6944
+  largest address on the name later in the question         9  0.0278
+  largest address on the read's own cell                    2  0.0062
+  largest share on elsewhere                              313  0.9660
+  largest share on the name                                11  0.0340
+  the opening name's rank among the window's addresses: mean 52.43 of 83.3 cells; first 0.0000; a uniform rank would be first 0.0141
+
+## Brandon's PC: the quarter lines, re-read at c88e9dcb9
+
+# The same 10 traces read again by the observer at c88e9dcb9 into create-new .share2 files; only the
+# four quarter lines of each "all:" block were returned. Columns: count, share of all reads.
+
+=== dev pass 0:   quarter 1  6 0.0143 | quarter 2  4 0.0095 | quarter 3  19 0.0451 | quarter 4  17 0.0404
+=== dev pass 1:   quarter 1 35 0.0831 | quarter 2 63 0.1496 | quarter 3  72 0.1710 | quarter 4  90 0.2138
+=== dev pass 2:   quarter 1 43 0.1021 | quarter 2 50 0.1188 | quarter 3  99 0.2352 | quarter 4 153 0.3634
+=== dev pass 3:   quarter 1 28 0.0665 | quarter 2 46 0.1093 | quarter 3  67 0.1591 | quarter 4 143 0.3397
+=== dev pass 4:   quarter 1 35 0.0831 | quarter 2 71 0.1686 | quarter 3  93 0.2209 | quarter 4 135 0.3207
+=== train pass 0: quarter 1  54 0.0119 | quarter 2  73 0.0161 | quarter 3  116 0.0256 | quarter 4  171 0.0378
+=== train pass 1: quarter 1 419 0.0926 | quarter 2 573 0.1267 | quarter 3  869 0.1921 | quarter 4 1036 0.2290
+=== train pass 2: quarter 1 432 0.0955 | quarter 2 568 0.1256 | quarter 3 1082 0.2392 | quarter 4 1639 0.3623
+=== train pass 3: quarter 1 265 0.0586 | quarter 2 475 0.1050 | quarter 3  779 0.1722 | quarter 4 1443 0.3190
+=== train pass 4: quarter 1 365 0.0807 | quarter 2 693 0.1532 | quarter 3 1040 0.2299 | quarter 4 1465 0.3238
+
+# SHA-256 of the .share2 files
+560000e965cbb3937779404928ebc5c6db3d2dcd9cb20149bab5db154579430d  dev_pass0.share2
+cafd0076ffba87e237be224d57905c25beee95dae062caac291bf7c3fabd3d15  dev_pass1.share2
+b9d2763c6e3232d231eb38e107655b98784438ad887a3dc8d6a3a6fbdefbdff3  dev_pass2.share2
+653a6acc1c0478a0908b138e2ad8ad3e2798c78cd1824fdad41a1fe0f663618f  dev_pass3.share2
+027e4aa926245988bb9d667a83d9c75f2b14aedc1f7fdb4ef69a5e496b2ea8a8  dev_pass4.share2
+f8ddd7616398b7b7061e59b126adc2b165ad1a9d7dc486a1311ceaf8f3e99dcd  train_pass0.share2
+26278d36a4669f2f6bdbeed3aab7f3fb626e9f7b39821bb4e9e48429972215a3  train_pass1.share2
+31d5e0caf4bb9f8f46ce907f2825618f0897cd761611cdf2dd0e2cf400c00535  train_pass2.share2
+b76a814ab372a6f29eea17a8daeb30b7209b26a35abc101e9b75ffd73c6eea10  train_pass3.share2
+0787780d15a5ac615f91a7060597cc93e892dca67dc43a94e6171fde031790e3  train_pass4.share2
