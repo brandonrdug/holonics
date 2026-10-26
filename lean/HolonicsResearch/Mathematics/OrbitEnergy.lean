@@ -98,8 +98,10 @@ theorem prod_divisors_zpow_neg_moebius (n : ℕ) :
     congr 1
     push_cast
     ring
-  rw [Finset.prod_congr rfl h, ← Real.exp_sum, Finset.sum_neg_distrib, sum_moebius_mul_log_eq,
-    neg_neg]
+  -- Mathlib states the inversion with the arithmetic function `log`; read it through `Real.log`.
+  have hlog : ∑ d ∈ n.divisors, (μ d : ℝ) * Real.log d = -Λ n := by
+    simpa only [ArithmeticFunction.log_apply] using sum_moebius_mul_log_eq (n := n)
+  rw [Finset.prod_congr rfl h, ← Real.exp_sum, Finset.sum_neg_distrib, hlog, neg_neg]
 
 /-- [proved-standard; formal-checked] **The norm of a gap in product form:** for `n ≥ 2`,
 `∏_(d ∣ n) d^(−μ(d)) = Φ_n(1)`. -/
