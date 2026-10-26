@@ -71,7 +71,7 @@ shift):
 
 ```text
 antecedent  a_t   = [r̂_(t−1), x^ℓ_(t−1)]                    the face the arrival came into
-key turn    s(k_t) = 2^(−⌈log₂ w⌉) (W_k a_t + b_k)           d turns, half turns on 2^(−16)
+key turn    s(k_t) = 2^(−⌈log₂ w⌉) (W_k a_t + W_k′ x^ℓ_t + b_k)   d turns, half turns on 2^(−16); W_k′ by the October 26 amendment
 query turn  s(q_t) = 2^(−⌈log₂ w⌉) (W_q [r̂_t, x^ℓ_t] + b_q)   the present face
 value       v_t   = W_v x^ℓ_t + b_v                          d_v real channels
 harmonic    φ_n(s) = e^(iπ⟨n, s⟩),  n ∈ N                     the turned mode's dyadic ladder at ⟨n, s⟩ mod 2
@@ -95,6 +95,22 @@ join        x^(ℓ+1)_t = x^ℓ_t + W₂ v_t + b₂ + O [Re v̂_t ; Im v̂_t]
   `W_g` and `O` are located by the comparison's covector. Nothing says what to bind. Receipt E shows
   only the reach: with keys set by hand, the bank copies a repeated word's continuation exactly. The
   machine has to locate its own keys, and §3's acceptance measures whether it does.
+- **[October 26 amendment: the key reads the arrival too.]** After the subject read of
+  [the prose and subject record](2026-10-26_THE_BANK_LOWERS_EVERY_MEDIUMS_HELD_OUT_CODE_AND_RECALLS_NO_SUBJECT_BOUND_AT_THE_OPENING.md#2-item-6-the-subject-question-fails)
+  (0 of 16 samples about John). A key read from the antecedent alone is a function of the face
+  before the arrival. So:
+  - two arrivals under one antecedent face take one key, whatever they are, and the later
+    overwrites the earlier;
+  - an arrival under a face that no later query's turn reaches cannot be recalled. At rest the face
+    is zero, so the key is the bias `b_k` alone. `John`, the prompt's first unit, is bound there.
+
+  Such a bank answers "what followed this context" (copying). It cannot answer "which arrival was
+  of this kind": a subject, a quantity's role, or a unit by its own content. The action-key law
+  pairs the action expression with its antecedents, so the key reads both:
+  `s(k_t) = 2^(−⌈log₂ w⌉)(W_k a_t + W_k′ x^ℓ_t + b_k)`. `W_k′` opens at zero, so the amended bank
+  opens bit-identically on the built one, and the covector decides what each key carries. The
+  separator framing that record's next loop reads tests only the second point. The amendment covers
+  both.
 - **The opening.** `O` opens at zero, so a banked tower opens bit-identically on its bankless twin,
   as the gated, turned and pumped modes open on theirs. The key and query turns open at zero (every
   key on one turn: the read is the section's recent average). The gate opens at `g = ½`.
