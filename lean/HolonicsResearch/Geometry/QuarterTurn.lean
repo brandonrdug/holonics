@@ -54,13 +54,13 @@ def quarter : Matrix (Fin 2) (Fin 2) R := polarity * exchange
 theorem polarity_mul_self : (polarity : Matrix (Fin 2) (Fin 2) R) * polarity = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [polarity, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
+    simp [polarity, Matrix.mul_apply, Fin.sum_univ_two]
 
 /-- [proved-standard; formal-checked] The exchange is an involution. -/
 theorem exchange_mul_self : (exchange : Matrix (Fin 2) (Fin 2) R) * exchange = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [exchange, Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
+    simp [exchange, Matrix.mul_apply, Fin.sum_univ_two]
 
 /-- [proved-standard; formal-checked] **The quarter-turn** `J = DS = [[0, −1], [1, 0]]`. -/
 theorem quarter_eq : (quarter : Matrix (Fin 2) (Fin 2) R) = !![0, -1; 1, 0] := by
@@ -80,7 +80,7 @@ theorem exchange_mul_polarity :
 theorem quarter_mul_self : (quarter : Matrix (Fin 2) (Fin 2) R) * quarter = -1 := by
   rw [quarter_eq]
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.one_apply]
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
 
 /-- [proved-derived; formal-checked] **`J⁴ = I`.** -/
 theorem quarter_pow_four : (quarter : Matrix (Fin 2) (Fin 2) R) ^ 4 = 1 := by

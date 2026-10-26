@@ -97,7 +97,7 @@ theorem reading_factors {k : Type*} (E : Matrix m n K) (hE : ∀ v, E *ᵥ v = 0
     (R : Matrix k n K) : R = R * decoder E * E := by
   rw [Matrix.mul_assoc, decoder_mul E hE, Matrix.mul_one]
 
-omit [DecidableEq n] [LinearOrder K] [IsStrictOrderedRing K] in
+omit [Fintype m] [DecidableEq n] [LinearOrder K] [IsStrictOrderedRing K] in
 /-- [proved-derived; formal-checked] **The join to the encoding's factor law:** with `ker E = 0`,
 `Holonics.HNN.Encoding.factor_of_ker_le` gives every linear reading `ρ` as `D ∘ E`. -/
 theorem reading_factors_through_encoding {V : Type*} [AddCommGroup V] [Module K V]
@@ -135,9 +135,7 @@ theorem ker_eq_zero_of_minor (E : Matrix m n R) (f : n → m) (h : (E.submatrix 
   intro v hv
   have hsub : (E.submatrix f id) *ᵥ v = 0 := by
     funext i
-    first
-      | exact congrFun hv (f i)
-      | simpa [mulVec, dotProduct, submatrix] using congrFun hv (f i)
+    exact congrFun hv (f i)
   have hdet : (E.submatrix f id).det • v = 0 := by
     rw [← one_mulVec v, ← smul_mulVec, ← adjugate_mul, ← mulVec_mulVec, hsub, mulVec_zero]
   funext i

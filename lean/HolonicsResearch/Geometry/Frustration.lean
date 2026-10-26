@@ -1,5 +1,5 @@
 import Mathlib.Algebra.Module.BigOperators
-import Mathlib.Data.Nat.Lattice
+import Mathlib.Order.Lattice.Nat
 import Mathlib.Order.CompleteLattice.Basic
 import Mathlib.Tactic
 
@@ -92,9 +92,7 @@ theorem frustration_gauge_invariant (w : E → ℕ) (c : E → G) (g : V → G) 
     Γ.frustration w (Γ.gauge c g) = Γ.frustration w c := by
   unfold frustration
   refine (Equiv.iInf_congr (Equiv.addRight g) fun σ => ?_).symm
-  first
-    | exact Γ.cost_gauge w c g σ
-    | simpa using Γ.cost_gauge w c g σ
+  exact Γ.cost_gauge w c g σ
 
 end Cost
 

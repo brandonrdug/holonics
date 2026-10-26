@@ -99,7 +99,7 @@ the turns do not sum to zero round the cycle, no section closes every contact. -
 theorem frustrated_section_breaks (c σ : ZMod n → G) (hc : ∑ x, c x ≠ 0) :
     ∃ x, σ (x + 1) ≠ σ x + c x := by
   by_contra h
-  push_neg at h
+  push Not at h
   apply hc
   have hd : ∀ x, defect c σ x = 0 := fun x => by
     simp only [defect, h x]
