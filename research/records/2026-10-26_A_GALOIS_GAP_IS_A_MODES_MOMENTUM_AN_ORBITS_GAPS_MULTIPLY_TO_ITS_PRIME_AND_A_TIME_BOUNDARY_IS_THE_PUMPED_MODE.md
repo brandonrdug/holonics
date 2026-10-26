@@ -419,8 +419,9 @@ To #410:
 - (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
   `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`. The norm half, `N(1 − ζ_n) = e^(Λ(n))`, is
   `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file. `Tr ζ_n = μ(n)` is
-  `trace_primitive_colour` in [`Mathematics/ColourTrace`](../../lean/HolonicsResearch/Mathematics/ColourTrace.lean);
-  the Ramanujan sums `c_n(j)` and the layer trace remain owed;
+  `trace_primitive_colour` in [`Mathematics/ColourTrace`](../../lean/HolonicsResearch/Mathematics/ColourTrace.lean),
+  and the same file proves the rest the same day: the Ramanujan sums `c_n(j)` (`ramanujan_sum`, from
+  `sum_nthRoots_pow`) and the layer trace (`layer_fixes_below`, `layer_trace`). (n) is discharged;
 - (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
   substitution's chain.
 
