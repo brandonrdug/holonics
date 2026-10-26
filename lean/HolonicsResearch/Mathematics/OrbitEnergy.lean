@@ -3,6 +3,7 @@ import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
 import Mathlib.NumberTheory.ArithmeticFunction.VonMangoldt
 import Mathlib.RingTheory.RootsOfUnity.Complex
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Tactic
 
 /-!
@@ -24,6 +25,11 @@ The record `research/records/2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBI
    norm compression `N(1 − ζ_d) = e^(Λ(d))` of §12.
 4. **A ring's orbits multiply to its size** (`orbit_energies_multiply_to_ring`): for `m ≥ 1`,
    `∏_(d | m, d ≠ 1) Φ_d(1) = m`, so the orbit energies of ring `m` add to `log m`.
+5. **The orbit energy in product form** (`prod_divisors_zpow_neg_moebius`,
+   `prod_divisors_zpow_neg_moebius_eq_cyclotomic`): `∏_(d ∣ n) d^(−μ(d)) = e^(Λ(n))` for every
+   `n`, the Möbius inversion of `∑_(d ∣ n) Λ(d) = log n`; for `n ≥ 2` it is `Φ_n(1)`, so
+   `N(1 − ζ_n) = ∏_(d ∣ n) d^(−μ(d))`. The orbit's energy is read off the sizes of the rings below
+   it, each with the sign of its own count of primes.
 
 Consumers: the atlas rows `colour.orbit-energy` and `colour.trace-compression` (its norm half).
 -/
@@ -31,6 +37,7 @@ Consumers: the atlas rows `colour.orbit-energy` and `colour.trace-compression` (
 namespace Holonics.Mathematics.OrbitEnergy
 
 open Polynomial ArithmeticFunction
+open scoped ArithmeticFunction.Moebius
 
 /-- [proved-standard; formal-checked] **`Φ_d(1)` is the orbit's prime or 1.** -/
 theorem cyclotomic_eval_one (R : Type*) [CommRing R] {n : ℕ} (hn : 2 ≤ n) :
@@ -79,5 +86,25 @@ theorem orbit_energies_multiply_to_ring (R : Type*) [CommRing R] {m : ℕ} (hm :
     ∏ d ∈ m.divisors.erase 1, (cyclotomic d R).eval 1 = m := by
   rw [← eval_prod, prod_cyclotomic_eq_geom_sum hm]
   simp
+
+/-- [proved-standard; formal-checked] **The orbit energy in product form:**
+`∏_(d ∣ n) d^(−μ(d)) = e^(Λ(n))`, by Möbius inversion of `∑_(d ∣ n) Λ(d) = log n`. -/
+theorem prod_divisors_zpow_neg_moebius (n : ℕ) :
+    ∏ d ∈ n.divisors, (d : ℝ) ^ (-μ d) = Real.exp (Λ n) := by
+  have h : ∀ d ∈ n.divisors, (d : ℝ) ^ (-μ d) = Real.exp (-((μ d : ℝ) * Real.log d)) := by
+    intro d hd
+    have hd0 : (0 : ℝ) < d := by exact_mod_cast Nat.pos_of_mem_divisors hd
+    rw [← Real.rpow_intCast, Real.rpow_def_of_pos hd0]
+    congr 1
+    push_cast
+    ring
+  rw [Finset.prod_congr rfl h, ← Real.exp_sum, Finset.sum_neg_distrib, sum_moebius_mul_log_eq,
+    neg_neg]
+
+/-- [proved-standard; formal-checked] **The norm of a gap in product form:** for `n ≥ 2`,
+`∏_(d ∣ n) d^(−μ(d)) = Φ_n(1)`. -/
+theorem prod_divisors_zpow_neg_moebius_eq_cyclotomic {n : ℕ} (hn : 2 ≤ n) :
+    ∏ d ∈ n.divisors, (d : ℝ) ^ (-μ d) = (cyclotomic n ℝ).eval 1 := by
+  rw [prod_divisors_zpow_neg_moebius, cyclotomic_eval_one_eq_exp_vonMangoldt hn]
 
 end Holonics.Mathematics.OrbitEnergy
