@@ -25,7 +25,10 @@ case: the heard text's own reading of a proper name, with no list of names.
 - `role`: for each CELLS file (`read-tower-held-cells` output with ranks), at every named problem
   whose answer opens with the name, whether the face at the answer's opening gives the answer's
   first unit the largest mass (rank 0: no class carries more), and its code; a problem whose
-  opening is a chunk's first class (coded by no cell) is counted as skipped.
+  opening is a chunk's first class (coded by no cell) is counted as skipped. Then how many classes
+  carry more than the first unit, in bands, and, for every file after the first, how many of the
+  answers the file before gave the largest mass it keeps and how many it gains. TEXT may be the
+  heard text itself, which reads the role on seen problems.
 - `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
   cell set beside the arrival the clock holds there (the cell after the last cell whose bytes are
   the clock's class): where the cell's bytes repeat the held arrival's, and elsewhere by how many
@@ -146,16 +149,25 @@ def share(heard, text, path):
 
 def role(heard, text, paths):
     asked = [opening for _, opening, _, opens in named(heard, text) if opens]
+    before = None
     for path in paths:
         cells = {}
         for line in open(path):
             place, code, _, rank = line.rstrip("\n").split("\t")
             cells[int(place)] = (int(code), int(rank))
-        read = [cells[p] for p in asked if p in cells]
-        first = sum(rank == 0 for _, rank in read)
-        bits = sum(code for code, _ in read) / (1 << 20) / len(read) if read else float("nan")
+        read = {p: cells[p] for p in asked if p in cells}
+        first = {p for p, (_, rank) in read.items() if rank == 0}
+        bits = sum(code for code, _ in read.values()) / (1 << 20) / len(read) if read else float("nan")
         print(f"{path}: {len(asked)} named answers opening with the name, {len(read)} read, {len(asked) - len(read)} skipped; "
-              f"the first unit has the largest mass in {first}; its mean code {bits:.3f} bits")
+              f"the first unit has the largest mass in {len(first)}; its mean code {bits:.3f} bits")
+        # How far the first unit stands from the largest mass: the classes carrying more than it.
+        bands = ((0, 0), (1, 1), (2, 4), (5, 15), (16, None))
+        counts = [sum(lo <= rank and (hi is None or rank <= hi) for _, rank in read.values()) for lo, hi in bands]
+        print("  classes above the first unit: " + ", ".join(
+            f"{lo if lo == hi else f'{lo}+' if hi is None else f'{lo}-{hi}'} in {n}" for (lo, hi), n in zip(bands, counts)))
+        if before is not None:
+            print(f"  beside the file before: keeps the largest mass in {len(first & before)} of its {len(before)}, gains it in {len(first - before)}")
+        before = first
 
 
 def cells_of(path):

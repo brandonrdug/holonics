@@ -1,0 +1,48 @@
+The third lap's passes, `train-unit-tower` at 9b915dbe1 with the arguments `64 64 256 2 8 128 1 7`,
+on Brandon's PC, October 26. The lines as the PC sent them: TOWER_SECTION and TOWER_SWELL at the
+first and last section, and the mean-section watcher's line at the largest window. Neither pass took
+a halving. Paths are relative to the run directory, which is not in the repository.
+
+Run 2: the opening, held-out cells read from the refounded state before any pass
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lap3D.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=37032 user_s=33.9
+lap3D.cells sha256 44539a70ffcaeaeed75a66ecb0a83651744f33df0b174dc60fd997d60b46d16b (lapD8's cells)
+
+Run 3: the lap's twin, one pass from lapD8/STATE with nothing founded (lap3T8)
+
+TOWER_TRAIN material=290734 streams=8 section=128 sections_a_pass=1311 train_bytes=3528168 dev_bytes=397669
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_SWELL pass=0 section=32 L0 x=345310 h=5364539 r=25855327 a=1270745 push=59962385 read=55426658 contact=49722522 return=29533319 lambda=1055836585 L1 x=610280 h=7504660 r=30524202 a=506952 push=69302722 read=133737320 contact=19669623 return=15489441 lambda=1072484334 readout=54215516
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.502 deposits=32 halvings=0 elapsed_ms=3752
+RUNNER_WINDOW pass=0 section=1280 sections=32 ms_a_section=118.6 mean_ms_a_section=117.6 bound=154.0
+TOWER_SWELL pass=0 section=1311 L0 x=377157 h=6065711 r=29286537 a=1307312 push=63267612 read=55671959 contact=51872804 return=29814806 lambda=1052442444 L1 x=634103 h=7982513 r=36804362 a=477197 push=75965782 read=147281122 contact=19253552 return=16463007 lambda=1072141127 readout=53138831
+TOWER_SECTION pass=0 section=1311 bits_a_byte=1.494 deposits=1311 halvings=0 elapsed_ms=154170
+TOWER_STATE STATE.0 state_bytes=9698444 state_sha256=3331784425b940522736c535c8035d6b6fc23d531fb122d19c46d5cffc0ef6be
+TOWER_PASS pass=0 train_bits_a_byte=1.503 dev_bits_a_byte=1.566 dev_regions Q=1.782 P=1.316 N=2.182 M=1.124 deposits=1311/1311 pass_ms=158477 elapsed_ms=158506 train_code=5558272103776 dev_code=653018289793 grain_bits=20
+TOWER_DONE state_bytes=9698444 state_sha256=3331784425b940522736c535c8035d6b6fc23d531fb122d19c46d5cffc0ef6be elapsed_ms=158572
+RUN_RECEIPT exit=0 wall_s=159.0 peak_rss_kib=383000 user_s=1113.5 stopped=no
+
+Run 4: the founded lap, one pass from role_clock/lap3D.state (lap3D8)
+
+TOWER_TRAIN material=290799 streams=8 section=128 sections_a_pass=1311 train_bytes=3528168 dev_bytes=397669
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_SWELL pass=0 section=32 L0 x=345153 h=5332159 r=25887634 a=1270328 push=59939190 read=55382786 contact=49726449 return=29621343 lambda=1055842985 L1 x=610414 h=7543327 r=30477213 a=504279 push=69231413 read=133775957 contact=19567834 return=15517734 lambda=1072489014 readout=54205146
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.501 deposits=32 halvings=0 elapsed_ms=3778
+RUNNER_WINDOW pass=0 section=960 sections=32 ms_a_section=119.7 mean_ms_a_section=117.9 bound=154.0
+TOWER_SWELL pass=0 section=1311 L0 x=363962 h=6239743 r=28995713 a=1275380 push=62502090 read=57991361 contact=51763207 return=31019028 lambda=1051628349 L1 x=537268 h=8108973 r=35502341 a=465447 push=78434035 read=146892384 contact=20105963 return=17581959 lambda=1072499921 readout=55447405
+TOWER_SECTION pass=0 section=1311 bits_a_byte=1.489 deposits=1311 halvings=0 elapsed_ms=154510
+TOWER_STATE STATE.0 state_bytes=9703650 state_sha256=5118c9d525f7121c9085e0458e045f05b3eaea037a2e7ccd9ed6ac0fc0b52599
+TOWER_PASS pass=0 train_bits_a_byte=1.500 dev_bits_a_byte=1.560 dev_regions Q=1.775 P=1.307 N=2.177 M=1.133 deposits=1311/1311 pass_ms=158919 elapsed_ms=158947 train_code=5548287489073 dev_code=650410522709 grain_bits=20
+TOWER_DONE state_bytes=9703650 state_sha256=5118c9d525f7121c9085e0458e045f05b3eaea037a2e7ccd9ed6ac0fc0b52599 elapsed_ms=158998
+RUN_RECEIPT exit=0 wall_s=159.3 peak_rss_kib=382720 user_s=1115.9 stopped=no
+
+The certificate: 5,558,272,103,776 − 5,548,287,489,073 = 9,984,614,703 on 2^(−20), 9,522.1 bits
+below the lap's twin, against the bar of 11 bits (train_code below 5,558,260,569,440). Paid.
+Held-out, read beside: 653,018,289,793 − 650,410,522,709 = 2,607,767,084 on 2^(−20), 2,487.0 bits
+below the lap's twin.
+
+Beside, against the second lap's founded pass lapD8 (train code 5,571,140,075,926 and held-out code
+654,896,200,943 in the previous record's PASSES.txt): the twin codes the training text 12,271.9 bits
+lower and the held-out text 1,790.9 bits lower; the founded lap codes them 21,793.9 and 4,277.9 bits
+lower.

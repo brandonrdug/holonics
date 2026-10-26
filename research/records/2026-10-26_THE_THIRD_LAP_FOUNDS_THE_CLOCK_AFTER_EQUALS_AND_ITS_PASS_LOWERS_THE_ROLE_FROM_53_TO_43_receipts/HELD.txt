@@ -1,0 +1,34 @@
+The held-out reads of the third lap, October 26, on Brandon's PC: the cells from
+role_clock/lap3T8/STATE (33317844…f6be, the lap's twin) and role_clock/lap3D8/STATE (5118c9d5…2599,
+the founded lap), then the observer (tools/listener/bank_trace.py at 9b915dbe1) in modes `role` and
+`held`. The observers are read-only. Paths are relative to the run directory, which is not in the
+repository.
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lap3T8.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=36064 user_s=33.8
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lap3D8.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=36792 user_s=33.9
+
+cells    role_clock/lap3T8.cells   sha256 b80758c03d06164673ac57903ab1c8f6bc98fd4a3eabbad859efc8a922ba3fc0
+cells    role_clock/lap3D8.cells   sha256 0a70c76c2fb68d337500ad2136d531e9937db55f9c6834021fca8f184b50d142
+
+python3 -I tools/listener/bank_trace.py role train_all.txt dev.txt role_clock/twin8.cells role_clock/copyD8.cells role_clock/lapD8.cells role_clock/lap3T8.cells role_clock/lap3D8.cells
+
+role_clock/twin8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 1; its mean code 6.582 bits
+role_clock/copyD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.800 bits
+role_clock/lapD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 53; its mean code 2.876 bits
+role_clock/lap3T8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 37; its mean code 3.253 bits
+role_clock/lap3D8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 43; its mean code 3.158 bits
+RUN_RECEIPT exit=0 wall_s=0.3 peak_rss_kib=47072 user_s=0.3
+
+python3 -I tools/listener/bank_trace.py held dev.txt role_clock/lap3T8.cells role_clock/lap3D8.cells '"="'
+
+role_clock/lap3T8.cells then role_clock/lap3D8.cells: 151676 cells; the second codes -2487.0 bits against the first
+  before any reset: 897 cells; largest mass 298 then 297; code 4.446 then 4.476 bits a cell; difference +26.9 bits
+  the held arrival itself: 841 cells; largest mass 169 then 178; code 4.244 then 4.198 bits a cell; difference -38.2 bits
+  repeats the held arrival: 1216 cells; largest mass 439 then 838; code 3.410 then 2.033 bits a cell; difference -1674.5 bits
+  elsewhere, 1-8 cells after the reset: 6114 cells; largest mass 3057 then 3051; code 2.939 then 2.938 bits a cell; difference -6.4 bits
+  elsewhere, 9-32 cells after the reset: 16219 cells; largest mass 6077 then 6060; code 4.066 then 4.068 bits a cell; difference +23.5 bits
+  elsewhere, 33-128 cells after the reset: 46285 cells; largest mass 16132 then 16200; code 4.284 then 4.272 bits a cell; difference -571.0 bits
+  elsewhere, 129-1000000000 cells after the reset: 80104 cells; largest mass 29346 then 29479; code 4.105 then 4.102 bits a cell; difference -247.2 bits
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=68364 user_s=0.2
