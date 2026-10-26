@@ -3777,6 +3777,91 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// `read-unit-tower-at UNITS UNITS_SHA STATE STATE_SHA TEXT TEXT_SHA PLACES PLACES_SHA OUT`: the
+/// rested tower's carried modes at places an observer names in a run of problems. Each problem of
+/// `TEXT` is read alone from rest in the founded `UNITS`, framed as `read-unit-tower-written` frames
+/// it (a blank line, the question, its line end), followed by its true answer. `PLACES` holds one
+/// place a line, the problem's index and a byte of its framed text, tab-separated, each problem's
+/// bytes increasing. After the unit that holds a place's byte steps, `OUT` (create-new) receives,
+/// little-endian, the place's line in `PLACES` (`u32`) and every level's carried modes (`levels` ×
+/// `modes` × (re, im) `i64`, the state's own grain): the record `read-tower-classes-at` writes, with
+/// no top face. An exterior reading of what the frozen tower holds where an observer looks
+/// (`tools/gsm8k/numeral_rings.py`); nothing in it enters the tower.
+pub(super) fn read_unit_at(args: &[String]) -> Result<()> {
+    if args.len() != 10 {
+        return Err("read-unit-tower-at UNITS UNITS_SHA STATE STATE_SHA TEXT TEXT_SHA PLACES PLACES_SHA OUT".into());
+    }
+    let started = Instant::now();
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let named = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let out = Path::new(&args[9]);
+    if out.exists() {
+        return Err("OUT exists: the cells are written create-new".into());
+    }
+    let problems = problems_of(&text);
+    let mut places: Vec<Vec<(u32, usize)>> = vec![Vec::new(); problems.len()];
+    for (line, place) in std::str::from_utf8(&named)?.lines().enumerate() {
+        let (problem, byte) = match place.split('\t').collect::<Vec<_>>()[..] {
+            [p, b] => (count(p)?, count(b)?),
+            _ => return Err("a place is a problem and a byte, tab-separated".into()),
+        };
+        let list = places.get_mut(problem).ok_or("a place names no problem of the text")?;
+        if list.last().is_some_and(|&(_, last)| last >= byte) {
+            return Err("a problem's places are not increasing".into());
+        }
+        list.push((u32::try_from(line)?, byte));
+    }
+    let tower = &learner.tower;
+    let records: Vec<Vec<u8>> = problems
+        .par_iter()
+        .zip(&places)
+        .map(|(p, places)| -> std::result::Result<Vec<u8>, String> {
+            let mut records = Vec::new();
+            if places.is_empty() {
+                return Ok(records);
+            }
+            let line = p.iter().position(|&b| b == b'\n').unwrap_or(p.len());
+            let mut framed = b"\n\n".to_vec();
+            framed.extend_from_slice(&p[..line]);
+            framed.push(b'\n');
+            framed.extend_from_slice(&p[(line + 1).min(p.len())..]);
+            let mut state = tower.rest();
+            let (mut end, mut next) = (0usize, 0usize);
+            for c in units.parse(&framed).map_err(|e| e.to_string())? {
+                tower.advance(&mut state, c as usize).map_err(|e| e.to_string())?;
+                end += units.piece(c as usize).len();
+                while next < places.len() && places[next].1 < end {
+                    records.extend(places[next].0.to_le_bytes());
+                    state.modes.iter().flatten().for_each(|&(re, im)| {
+                        records.extend(re.to_le_bytes());
+                        records.extend(im.to_le_bytes());
+                    });
+                    next += 1;
+                }
+            }
+            if next < places.len() {
+                return Err("a place lies past its problem's framed text".into());
+            }
+            Ok(records)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let written: Vec<u8> = records.concat();
+    write_new(out, &written)?;
+    println!(
+        "UNIT_AT problems={} places={} levels={} modes={} bytes={} sha256={} elapsed_ms={}",
+        problems.len(),
+        places.iter().map(Vec::len).sum::<usize>(),
+        learner.tower.declaration.levels,
+        learner.tower.declaration.modes,
+        written.len(),
+        sha256(&written)?,
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// A text field of `LINES.tsv` or `LOOKS.tsv`: the bytes escaped (`read_lines`).
 fn field(bytes: &[u8]) -> String {
     bytes.iter().map(|&b| if b == b'|' { "\\x7c".to_string() } else { b.escape_ascii().to_string() }).collect()

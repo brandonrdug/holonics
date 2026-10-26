@@ -791,6 +791,7 @@ pub(super) fn run_with_execution(
         Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair),
         Some("sample-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_units(args),
         Some("read-unit-tower-written") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_unit_written(args),
+        Some("read-unit-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_unit_at(args),
         Some("sample-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample(args),
         Some("read-lines") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, false, tower_train::Look::Once),
         Some("read-lines-stream") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Once),

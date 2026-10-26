@@ -122,5 +122,24 @@ class ExteriorTools(unittest.TestCase):
             )
 
 
+    def test_numeral_rings_name_the_last_digit_of_each_whole_numeral(self):
+        spec = importlib.util.spec_from_file_location("numeral_rings", TOOLS / "numeral_rings.py")
+        rings = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rings)
+        text = b"Pay 120 or 1,500 now?\nIt is <<120*3=360>>360 and 2.500 or 45\n\nQ 1000?\nA 7\n\n"
+        # Framed: a blank line, the question and its line end, then the answer. 1,500 and 2.500 are
+        # not whole numerals of three digits, 45 and 7 are too short.
+        framed = b"\n\nPay 120 or 1,500 now?\nIt is <<120*3=360>>360 and 2.500 or 45\n"
+        found = rings.named("numerals", text)
+        self.assertEqual([(i, framed[b - 2 : b + 1] if i == 0 else None, v["numeral"]) for i, b, v in found],
+                         [(0, b"120", 120), (0, b"120", 120), (0, b"360", 360), (0, b"360", 360), (1, None, 1000)])
+        self.assertEqual(found[-1][1], len(b"\n\nQ 1000") - 1)
+        # The equals of a two-numeral sum or difference only: 120*3 is a product.
+        text = b"Q?\nA <<12+30=42>>42 <<120*3=360>>360 <<50-8=42>>42 <<1.5+2=3.5>>\n\n"
+        framed = b"\n\nQ?\nA <<12+30=42>>42 <<120*3=360>>360 <<50-8=42>>42 <<1.5+2=3.5>>\n"
+        found = rings.named("equals", text)
+        self.assertEqual([(framed[b - 5 : b + 1], v) for _, b, v in found],
+                         [(b"12+30=", {"a": 12, "b": 30, "result": 42}), (b"<50-8=", {"a": 50, "b": 8, "result": 42})])
+
 if __name__ == "__main__":
     unittest.main()

@@ -224,13 +224,37 @@ at most `C`'s 1.869 bits a byte. Until it passes, the step reports what it measu
 4. Rings 9 and 11 are above and ring 10 is not in `PP`: the seam is missing; the next loop is the
    seam state at the operator, the pair contact's operands.
 5. All three are above and the acceptance fails: what is missing is the tens and the carry, which
-   one plane cannot hold as a phase; the next loop is the rotor ring: a level's modes grouped in
-   rings of four, each cell stepping each ring by a located turn in the ring's dual chart before the
-   diagonal move (the plain tower at a zero turn, unitary, indexing no position and storing no
-   content).
+   one plane cannot hold as a phase; the next loop is the rotor ring on `PP` (the mathematics
+   thread's law): a level's modes grouped in rings of four, each class permuting each ring by an
+   integer key `σ ∈ ℤ/4` located by loop closure before the existing pumped move, so mode `j` holds
+   the character `10^j`; at `σ = 0` it is `PP` itself, the permutation is unitary, and it indexes no
+   position and stores no content.
 
 Beside the decision, read and reported: the heard profile of `P` and `PP`, by operation, and the
 held-out code by region.
+
+**The level read** (agent-inferred from the mathematics thread's request, fixed before it runs).
+`read-unit-tower-at` reads each of `C`, `P` and `PP` from rest on every problem, framed as the
+written read frames it and followed by its true answer, and writes each level's carried modes after
+the unit holding a place (`tools/gsm8k/numeral_rings.py places`). Two kinds of place are read:
+`numerals`, the last digit of each whole numeral of three or more digits (10,792 places in the first
+2,000 training problems, 3,810 in the held-out problems), labelled by the numeral; and `equals`, the
+`=` of each calculation `<<a+b=` or `<<a-b=` (2,200 and 841), labelled by `a`, by `b` and by the
+exact result, which reads the capture directly: whether the state at the equals still holds the
+operand read before the operator, the one read after it, and their sum or difference.
+`numeral_rings.py probe` fits a nearest class mean on the training cells labelled modulo 9, 10, 11,
+7, 13 and 100, names the held-out cells, and prints
+beside it the same probe on the modes' energies (blind to phase), the majority residue, the residue
+the numeral's last two digits name (the suffix, what position alone carries) and a foil read
+against another problem's cell. A level holds a ring as a phase where its modes name more than the
+suffix (pooled two-proportion `z > 1.96`) and more than its energies do. The derivation predicts
+that `C` holds none past the suffix, and that a pumped tower whose descent located keyed turns holds
+ring 9, and ring 11 under `PP`, but not 7 or 13, which need coupled planes. It is a reading of the
+state, not an acceptance; a ring left at its foil under `PP` names the capture at the operator as
+the first missing part (the pair block reads `a + b` and `a − b` only from operands captured there),
+and at the equals a ring-9 phase turned through the whole calculation holds a sum's result without
+any capture (the concatenation `10^len(b)·a + b` equals `a + b` modulo 9), so there the capture is
+named only by the result's other rings and by `a` held apart from `b`.
 
 [definition] **The run.** On the PC, at the commit of this record, with the binary built from it,
 under the `wait4` wrapper, `RAYON_NUM_THREADS=8` and an 8 GiB memory scope per run. `P` and `PP`
@@ -243,6 +267,10 @@ are independent and run together (16 of 24 cores, two scopes of 8 GiB).
   whose 32-section window passes `32 · 1.12 · w` is stopped and reported incomplete. No deadline is
   raised.
 - The reads as `C`'s, under the cause test's 30 s deadline each.
+- The level read: `read-unit-tower-at` unmeasured in release (80 problems took 18.8 s in a debug
+  build in the container), planned at one to three minutes, deadline 180 s a read, four reads a
+  state (two kinds, training and held-out); the probe 300 s a state and kind, the three states
+  together.
 
 ## 4. The recorded failures this loop could repeat
 

@@ -3,8 +3,9 @@
 
     python3 -I tools/listener/heard_runs.py MANIFEST HEARD TEXT [TEXT ...]
 
-An exterior census for spec 2 of the binding bank record (§4.2 (c), §4.3 items 4 and 5). Nothing
-here enters the machine: it reads a release after it is made, beside it.
+An exterior census of recitation: how much of a release repeats the heard text verbatim. It was
+first written for the binding bank's trace, retired on October 26 with the bank. Nothing here
+enters the machine: it reads a release after it is made, beside it.
 
 HEARD is the heard text, the concatenation MANIFEST names (medium, split, path, size, SHA-256 per
 file, in order; each file's bytes are checked). For each TEXT it reads, at every byte, the longest
