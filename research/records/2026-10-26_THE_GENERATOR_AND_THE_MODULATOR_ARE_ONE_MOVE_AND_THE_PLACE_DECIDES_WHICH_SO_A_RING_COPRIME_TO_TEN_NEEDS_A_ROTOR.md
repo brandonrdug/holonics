@@ -579,6 +579,14 @@ To #410:
 - (i) the rotor's step: a ring of `K` modes stepped once a digit holds `n` mod every divisor of
   `10^K − 1`, and a permutation keeps the passivity bound.
 
+(f), (g) and (h) were formal-checked the same day in
+[`Mathematics/BaseAction`](../../lean/HolonicsResearch/Mathematics/BaseAction.lean):
+- (f) is `digitMove_translation`, `digitMove_mirror`, `digitMove_flattening`,
+  `digitMove_on_characters`, `unit_permutes_characters`, `word_action`, `one_plane_iff` and
+  `mixed_ring_never_one_plane`;
+- (g) is `residue_address`, `address_nine_ten_eleven` and `address990`;
+- (h) is `two_reflections` and `two_reflections_generate`.
+
 Atlas rows:
 - `radix.digit-move-place-kind`;
 - `radix.long-division-strokes`;

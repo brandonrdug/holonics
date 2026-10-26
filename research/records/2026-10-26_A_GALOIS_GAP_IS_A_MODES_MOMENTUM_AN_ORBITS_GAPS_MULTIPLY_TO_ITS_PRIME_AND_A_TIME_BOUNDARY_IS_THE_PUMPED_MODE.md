@@ -405,14 +405,18 @@ sums right at the equals, against the 8-gram's 34/876 and C's 14/876.
 ## 16. Owed
 
 To #410:
-- (j) the orbit energy: `Φ_(p^k)(1) = p`, `Φ_d(1) = 1` otherwise, and `∏_(d|m, d>1) Φ_d(1) = m`;
+- (j) the orbit energy: `Φ_(p^k)(1) = p`, `Φ_d(1) = 1` otherwise, and `∏_(d|m, d>1) Φ_d(1) = m`.
+  Formal-checked the same day in [`Mathematics/OrbitEnergy`](../../lean/HolonicsResearch/Mathematics/OrbitEnergy.lean):
+  `orbit_gap_product`, `cyclotomic_eval_one`, `orbit_gap_product_eq_exp_vonMangoldt` and
+  `orbit_energies_multiply_to_ring`;
 - (k) the ring's spectrum factors over its Galois orbits, with `ψ_d(0) = Φ_d(1)`;
 - (l) the time boundary: `diag(1, r)` in `(Re, Im)`, the action conserved, and the pumped mode as
   its case;
 - (m) the dilation current: `∂_μ(x_ν T^(μν)) = T^μ_μ + x_ν ∂_μ T^(μν)`, beside the angular current in
   `Physics/ReceiverStressEnergy`.
 - (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
-  `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`;
+  `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`. The norm half, `N(1 − ζ_n) = e^(Λ(n))`, is
+  `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file; the trace half remains owed;
 - (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
   substitution's chain.
 

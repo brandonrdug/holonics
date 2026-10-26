@@ -1196,3 +1196,5 @@ import HolonicsResearch.Compression.Relabelling
 import HolonicsResearch.Geometry.FiniteTorusSubgroupReceiver
 import HolonicsResearch.Zeta.ModularScatteringResidual
 import HolonicsResearch.Zeta.ModularScatteringPairedTail
+import HolonicsResearch.Mathematics.BaseAction
+import HolonicsResearch.Mathematics.OrbitEnergy
