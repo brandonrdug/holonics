@@ -407,10 +407,13 @@ impl Tower {
         if self.bank.is_some() {
             return refuse("a tower takes one bank");
         }
+        if self.clock.is_some() {
+            return refuse("a bank joins before a clock (the clock's material follows the bank's)");
+        }
         let d = self.declaration;
         bank.check(&d)?;
         let start = self.layout.len;
-        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), Some(&bank));
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), Some(&bank), 0);
         self.theta.resize(layout.len, 0);
         let bl = layout.bank.expect("a bank's layout");
         debug_assert_eq!(bl.key, start);

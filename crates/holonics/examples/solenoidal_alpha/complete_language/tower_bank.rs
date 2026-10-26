@@ -18,6 +18,13 @@
 //!   reads every held-out section from rest: at its marked cells, the code and how many faces name
 //!   the class that arrives first.
 //!
+//! - `found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT`
+//!   reads the pool of every class's reset clock (`hnn::tower::clock`) over the training passage,
+//!   frozen, in the training pass's partition (`STREAMS` streams from rest, sections of `SECTION`
+//!   cells), prints the sixteen largest drops, joins the largest's clock at `LEVEL` and writes the
+//!   learner create-new. The learner it was joined on is its twin; the founding is certified by one
+//!   training pass from each, its code below the twin's by more than `log₂` of the pool.
+//!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
 //! 64 classes and the marks are its 16 answers, so the held-out reading is acceptance §3.4's count of
 //! the 16,000 answer cells named. Nothing here is MQAR-specific: a section is a stretch of classes
@@ -25,7 +32,9 @@
 use super::tower_train::{count, per, positive, STATE_BUDGET};
 use super::*;
 use holonics::hnn::tower::bank::BankDeclaration;
-use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TurnLadder};
+use holonics::hnn::tower::clock::ClockPool;
+use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TurnLadder, COVECTOR_BITS};
+use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::time::Instant;
 
@@ -107,6 +116,91 @@ pub(super) fn join(args: &[String]) -> Result<()> {
     learner.join_bank(bank, &keys).map_err(|e| e.to_string())?;
     let sha = write_learner(Path::new(&args[5]), &learner)?;
     println!("TOWER_BANK_JOINED {} material={} state_sha256={sha}", line.trim_end(), learner.tower.theta.len());
+    Ok(())
+}
+
+/// [agent-inferred, October 26; record
+/// `2026-10-26_THE_ROLE_KEY_IS_A_RESET_CLOCK_THE_POOL_FOUNDS_AND_ITS_ACCEPTANCE_IS_FIXED_BEFORE_THE_BUILD.md`
+/// §§2–4] The reset clocks' pool over the training passage and the founding of its largest drop.
+/// Each stream reads its share of the passage from rest in the training pass's sections
+/// (`Tower::read_join_covectors`), so every cell's join covector is the one that pass's reverse reads;
+/// the streams' pools add exactly. The clock founded is the largest drop's, whatever class it is.
+pub(super) fn found_clock(args: &[String]) -> Result<()> {
+    let usage = "found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT";
+    if args.len() != 11 {
+        return Err(usage.into());
+    }
+    let started = Instant::now();
+    let mut learner = learner_of(&args[1], &args[2])?;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let (streams, section, level) = (positive(&args[7])?, positive(&args[8])?, count(&args[9])?);
+    let out = Path::new(&args[10]);
+    let tower = &learner.tower;
+    let (alphabet, width) = (tower.declaration.alphabet, tower.declaration.width);
+    if units.len() != alphabet {
+        return Err("the units are not the tower's alphabet".into());
+    }
+    let classes: Vec<usize> = units.parse(&text).map_err(|e| e.to_string())?.into_iter().map(|u| u as usize).collect();
+    // The training pass's partition: `chunk` classes a stream, `(chunk − 1) / section` sections.
+    let chunk = classes.len() / streams;
+    if chunk < section + 1 {
+        return Err("the text must hold one section a stream".into());
+    }
+    let read = (chunk - 1) / section * section + 1;
+    let pools: Vec<ClockPool> = (0..streams)
+        .into_par_iter()
+        .map(|s| {
+            let mut pool = ClockPool::default();
+            let mut stream = ClockPool::open_stream(alphabet, width);
+            let mut state = tower.rest();
+            tower.read_join_covectors(&mut state, &classes[s * chunk..s * chunk + read], section, level, |u, dx| pool.cell(&mut stream, u, dx)).map_err(|e| e.to_string())?;
+            pool.close_stream(stream).map_err(|e| e.to_string())?;
+            println!("TOWER_CLOCK_STREAM stream={s} cells={} elapsed_ms={}", pool.cells, started.elapsed().as_millis());
+            Ok(pool)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut pool = ClockPool::default();
+    for p in pools {
+        pool.absorb(p).map_err(|e| e.to_string())?;
+    }
+    let read_ms = started.elapsed().as_millis();
+    let drops = pool.drops(tower).map_err(|e| e.to_string())?;
+    // Readings beside the drop, on `2^(−48)`: the drop's floor and its share of the covectors'
+    // energy in parts a million; the ceiling as read.
+    let grain = 2 * COVECTOR_BITS;
+    println!(
+        "TOWER_CLOCK_POOL clocks={} cells={} energy={} grain_bits={grain} read_ms={read_ms} drops_ms={}",
+        drops.len(),
+        pool.cells,
+        pool.energy,
+        started.elapsed().as_millis() - read_ms
+    );
+    let name = |class: usize| if class == alphabet { "rest".to_string() } else { format!("{:?}", String::from_utf8_lossy(units.piece(class))) };
+    for (rank, d) in drops.iter().take(16).enumerate() {
+        let floor = &d.drop_numerator / &d.drop_denominator;
+        let share = &d.drop_numerator * 1_000_000u32 / (&d.drop_denominator * pool.energy);
+        println!(
+            "TOWER_CLOCK_DROP rank={} class={} piece={} drop={floor} drop_ppm={share} ceiling={} rank_c={} followers={} cells={}",
+            rank + 1,
+            d.class,
+            name(d.class),
+            d.ceiling,
+            d.rank,
+            d.followers,
+            d.cells
+        );
+    }
+    let top = drops.first().ok_or("the pool read no clock")?;
+    let class = top.class;
+    learner.join_clock(level, class).map_err(|e| e.to_string())?;
+    let sha = write_learner(out, &learner)?;
+    println!(
+        "TOWER_CLOCK_FOUNDED level={level} class={class} piece={} material={} state_sha256={sha} elapsed_ms={}",
+        name(class),
+        learner.tower.theta.len(),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 

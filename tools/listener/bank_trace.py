@@ -3,6 +3,7 @@
 
     python3 -I tools/listener/bank_trace.py requests HEARD TEXT OUT
     python3 -I tools/listener/bank_trace.py share HEARD TEXT TRACE
+    python3 -I tools/listener/bank_trace.py role HEARD TEXT CELLS [CELLS ...]
 
 An exterior observer's reads; nothing here enters the machine. TEXT is GSM8K problems separated by a
 blank line, each a question line and its answer. A problem is named when its question's first word
@@ -21,6 +22,10 @@ case: the heard text's own reading of a proper name, with no list of names.
   from the name's cell to the read's; split by whether the answer opens with the name. Then the
   bytes of the cells the largest address falls on inside the problem, most frequent first (a
   cell's bytes run to the next cell with a nonzero address).
+- `role`: for each CELLS file (`read-tower-held-cells` output with ranks), at every named problem
+  whose answer opens with the name, whether the face at the answer's opening gives the answer's
+  first unit the largest mass (rank 0: no class carries more), and its code; a problem whose
+  opening is a chunk's first class (coded by no cell) is counted as skipped.
 """
 import collections
 import re
@@ -130,6 +135,20 @@ def share(heard, text, path):
         print(f"  {n:5d}  {cell!r}")
 
 
+def role(heard, text, paths):
+    asked = [opening for _, opening, _, opens in named(heard, text) if opens]
+    for path in paths:
+        cells = {}
+        for line in open(path):
+            place, code, _, rank = line.rstrip("\n").split("\t")
+            cells[int(place)] = (int(code), int(rank))
+        read = [cells[p] for p in asked if p in cells]
+        first = sum(rank == 0 for _, rank in read)
+        bits = sum(code for code, _ in read) / (1 << 20) / len(read) if read else float("nan")
+        print(f"{path}: {len(asked)} named answers opening with the name, {len(read)} read, {len(asked) - len(read)} skipped; "
+              f"the first unit has the largest mass in {first}; its mean code {bits:.3f} bits")
+
+
 def main():
     read = lambda p: open(p, "rb").read()
     command, args = (sys.argv[1], sys.argv[2:]) if len(sys.argv) > 1 else ("", [])
@@ -137,6 +156,8 @@ def main():
         requests(read(args[0]), read(args[1]), args[2])
     elif command == "share" and len(args) == 3:
         share(read(args[0]), read(args[1]), args[2])
+    elif command == "role" and len(args) >= 3:
+        role(read(args[0]), read(args[1]), args[2:])
     else:
         raise SystemExit(__doc__)
 

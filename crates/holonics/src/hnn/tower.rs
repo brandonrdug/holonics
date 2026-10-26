@@ -190,12 +190,14 @@ use num_bigint::BigUint;
 use rayon::prelude::*;
 
 pub mod bank;
+pub mod clock;
 pub mod duplex;
 pub mod realization;
 
 use realization::{HostPass, PassRealization, Slot};
 
 use bank::{BankCell, BankDeclaration, BankLayout, BankReaches, BankState, BankTrace};
+use clock::ClockDeclaration;
 
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
@@ -1113,13 +1115,15 @@ struct Layout {
     ring_factors: usize,
     /// The binding bank's families, after every other face's (absent without a bank).
     bank: Option<BankLayout>,
+    /// The reset clocks' joins, one `d × d` map a clock after the bank's (absent without a clock).
+    clock: Option<usize>,
     len: usize,
     /// `(start, length, the family's grain)`, in order.
     families: Vec<(usize, usize, u32)>,
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, bank: Option<&BankDeclaration>) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, bank: Option<&BankDeclaration>, clocks: usize) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1179,7 +1183,8 @@ impl Layout {
         let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
         let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks * ring_harmonics, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
         let bank = bank.map(|b| BankLayout::new(b, w, &mut take));
-        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, bank, len: at, families }
+        let clock = (clocks > 0).then(|| take(clocks * w * w, MATERIAL_BITS));
+        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, bank, clock, len: at, families }
     }
 }
 
@@ -1195,6 +1200,8 @@ pub struct Tower {
     ring: Option<RingFace>,
     /// The binding bank, when one is joined ([`Tower::join_bank`]).
     bank: Option<BankDeclaration>,
+    /// The reset clocks, when any is joined ([`Tower::join_clock`]).
+    clock: Option<ClockDeclaration>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1218,6 +1225,9 @@ pub struct TowerState {
     pub hands: Vec<bool>,
     /// The binding bank's state (absent without a bank).
     pub bank: Option<BankState>,
+    /// Each reset clock's held class, the alphabet where nothing is held yet (empty without a
+    /// clock).
+    pub held: Vec<usize>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -1267,6 +1277,12 @@ impl TowerFace {
     /// The class's code, `−log₂ p̂(a)`, on `2^(−20)` bits.
     pub fn code(&self, class: usize) -> i64 {
         face_code(self.masses[class], self.total)
+    }
+
+    /// The class's rank on the face: how many classes carry more mass than it (0 when none does).
+    pub fn rank(&self, class: usize) -> usize {
+        let m = self.masses[class];
+        self.masses.iter().filter(|&&x| x > m).count()
     }
 
     /// The face read at one base-four cell of a class (the exterior cell chart: a class index in
@@ -1638,6 +1654,8 @@ struct Cell {
     top_hat: Option<(Vec<i32>, i128)>,
     /// The binding bank's temporaries at its level (absent without a bank).
     bank: Option<BankCell>,
+    /// The classes the reset clocks held at this cell (absent without a clock).
+    clock: Option<Vec<usize>>,
     face: TowerFace,
 }
 
@@ -1672,6 +1690,8 @@ struct Reaches {
     gates: Vec<GateFaces>,
     /// The binding bank's reaches and hold (absent without a bank).
     bank: Option<BankReaches>,
+    /// Each reset clock's join reach (empty without a clock).
+    clock: Vec<u64>,
 }
 
 /// `x / k` to the nearest integer, half away from zero.
@@ -1863,7 +1883,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0, None);
+        let layout = Layout::new(&d, 0, 0, 0, None, 0);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -1929,7 +1949,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, bank: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, bank: None, clock: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -1941,6 +1961,7 @@ impl Tower {
             ring: vec![(0, 0); self.ring.as_ref().map_or(0, RingFace::ranks)],
             hands: vec![false; self.ring.as_ref().map_or(0, RingFace::ranks)],
             bank: self.bank_rest(),
+            held: self.clock_rest(),
         }
     }
 
@@ -2035,7 +2056,7 @@ impl Tower {
             }
             None => (Vec::new(), Vec::new()),
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, bank: self.bank_reaches() }
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, bank: self.bank_reaches(), clock: self.clock_reaches() }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -2070,6 +2091,7 @@ impl Tower {
         let mut ring_scale: Option<Vec<i128>> = None;
         let mut ring_after: Option<Vec<(i128, i128)>> = None;
         let mut bank_cell: Option<BankCell> = None;
+        let mut clock_cell: Option<Vec<usize>> = None;
         let mut buf = vec![0i64; w.max(n).max(f)];
         for (l, lv) in self.layout.levels.iter().enumerate() {
             let r = &reaches.levels[l];
@@ -2228,6 +2250,17 @@ impl Tower {
                 }
                 bank_cell = Some(cell);
             }
+            // The reset clocks at their level: what each holds joins the output.
+            if self.clock.as_ref().is_some_and(|c| c.level == l) {
+                if state.held.len() != reaches.clock.len() {
+                    return refuse("a stream rested before the clock joined carries no clock: rest it again");
+                }
+                let joined = self.clock_step(&reaches.clock, &mut state.held, seam, u)?;
+                for (v, j) in next.iter_mut().zip(&joined) {
+                    *v = fit32(*v as i128 + *j as i128, "the residual stream outgrew its 32-bit carrier")?;
+                }
+                clock_cell = Some(state.held.clone());
+            }
             let push = push_re.into_iter().zip(push_im).collect();
             levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate });
         }
@@ -2265,7 +2298,7 @@ impl Tower {
         let zmax = *z.iter().max().expect("a nonempty alphabet");
         let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
         let total = masses.iter().sum();
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, bank: bank_cell, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, bank: bank_cell, clock: clock_cell, face: TowerFace { masses, total } })
     }
 
     /// The face of the next class after `u` arrives, and the state moved.
@@ -2282,7 +2315,7 @@ impl Tower {
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
     fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<Vec<i128>> {
-        self.reverse_joined(opening, cells, classes, None, compared, None).map(|(g, _)| g)
+        self.reverse_joined(opening, cells, classes, None, compared, None, None).map(|(g, _)| g)
     }
 
     /// The reverse scan with a covector reaching each cell's top from outside the tower (the
@@ -2295,7 +2328,10 @@ impl Tower {
     /// release read against the truth where the two part. Beside the families' covector it returns
     /// each cell's input covector `δx⁰` (what the encoding's covector sums), on `2^(−24)`, and, when
     /// `modes` is given, keeps there every level's mode covectors `G_h` cell by cell
-    /// (`modes[level][cell][mode]`, the covector of the modes after the cell's push).
+    /// (`modes[level][cell][mode]`, the covector of the modes after the cell's push). When `join` is
+    /// given, keeps there the covector of its level's output cell by cell, on `2^(−24)`: what the
+    /// faces joined there read ([`Tower::read_join_covectors`]).
+    #[allow(clippy::too_many_arguments)]
     fn reverse_joined(
         &self,
         opening: &TowerState,
@@ -2304,6 +2340,7 @@ impl Tower {
         joined: Option<&[Vec<i64>]>,
         compared: Option<&[Option<usize>]>,
         mut modes: Option<&mut Vec<Vec<Vec<(i64, i64)>>>>,
+        mut join: Option<(usize, &mut Vec<Vec<i64>>)>,
     ) -> Result<(Vec<i128>, Vec<Vec<i64>>)> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
@@ -2407,6 +2444,11 @@ impl Tower {
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];
+            if let Some((level, out)) = join.as_mut() {
+                if *level == l {
+                    **out = dx.clone();
+                }
+            }
             // The binding bank at this level: from the covector of the level's output, its
             // families' covectors and those it sends to each cell's r̂ and x^ℓ.
             let (bank_read, bank_input) = match (self.bank.as_ref().is_some_and(|b| b.level == l), &reaches.bank) {
@@ -2420,6 +2462,12 @@ impl Tower {
                 }
                 _ => (None, None),
             };
+            // The reset clocks at this level: their joins and the held classes' encodings.
+            if self.clock.as_ref().is_some_and(|c| c.level == l) {
+                let missing = || TowerError::Refused("a clock read at every cell of a clocked tower");
+                let helds: Vec<&[usize]> = cells.iter().map(|cell| cell.clock.as_deref().ok_or_else(missing)).collect::<Result<_>>()?;
+                self.clock_reverse(&reaches.clock, &helds, &dx, &mut g)?;
+            }
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
             let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
@@ -2972,6 +3020,9 @@ impl Tower {
         if let Some(bank) = &self.bank {
             s.push_str(&bank.to_text());
         }
+        if let Some(clock) = &self.clock {
+            s.push_str(&clock.to_text());
+        }
         s
     }
 
@@ -2996,6 +3047,9 @@ impl Tower {
             }
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("bank ")) {
+            n += 1;
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("clock ")) {
             n += 1;
         }
         n
@@ -3061,11 +3115,15 @@ impl Tower {
             Some(line) => Some(BankDeclaration::from_text(line, &declaration)?),
             None => None,
         };
-        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics), bank.as_ref());
+        let clock = match lines.next_if(|l| l.starts_with("clock ")) {
+            Some(line) => Some(ClockDeclaration::from_text(line, &declaration)?),
+            None => None,
+        };
+        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics), bank.as_ref(), clock.as_ref().map_or(0, |c| c.classes.len()));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        Ok(Self { declaration, theta, pair, ring, bank, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration, theta, pair, ring, bank, clock, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// [agent-inferred, October 24] **The pair face joined to the tower**: the face's readout `V`
@@ -3080,13 +3138,13 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a pair face joins before a ring face (the ring's readout follows the pair's material)");
         }
-        if self.bank.is_some() {
-            return refuse("a pair face joins before a bank (the bank's material follows every face's)");
+        if self.bank.is_some() || self.clock.is_some() {
+            return refuse("a pair face joins before a bank or a clock (their material follows every face's)");
         }
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0, None);
+        let layout = Layout::new(d, face.forms(), 0, 0, None, 0);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -3109,11 +3167,11 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
-        if self.bank.is_some() {
-            return refuse("a ring face joins before a bank (the bank's material follows every face's)");
+        if self.bank.is_some() || self.clock.is_some() {
+            return refuse("a ring face joins before a bank or a clock (their material follows every face's)");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), None);
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), None, 0);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -3535,6 +3593,15 @@ impl TowerLearner {
         self.second.resize(self.tower.theta.len(), 0);
         Ok(())
     }
+
+    /// A reset clock joined to the learner's tower ([`Tower::join_clock`]), its join's moments
+    /// opened at zero beside the moments the learner carries.
+    pub fn join_clock(&mut self, level: usize, class: usize) -> Result<()> {
+        self.tower.join_clock(level, class)?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
+    }
 }
 
 impl Tower {
@@ -3771,7 +3838,7 @@ impl Tower {
             let opening = state.clone();
             let cells = self.forward(state, part, &reaches)?;
             let mut placed = Vec::new();
-            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed))?;
+            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed), None)?;
             let mut carried = carried_face(&opening.modes)?;
             for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
                 let modes: Vec<i64> = placed.iter().flat_map(|level| level[i].iter().flat_map(|&(re, im)| [re, im])).collect();
@@ -3790,6 +3857,35 @@ impl Tower {
                 each(InputCovector { class: part[i], carried: &carried, covector, modes: &modes, moves: &moves })?;
                 let after: Vec<Vec<(i64, i64)>> = cell.levels.iter().map(|lc| lc.state.clone()).collect();
                 carried = carried_face(&after)?;
+            }
+            start += part.len() - 1;
+        }
+        Ok(())
+    }
+
+    /// [agent-inferred, October 26] **The join covectors**: the frozen tower reads `classes` from
+    /// the state in sections of `section` cells, as a learner's stream does (each section's last
+    /// coded class arrives first in the next), and each cell's arriving class and the covector of
+    /// `level`'s output, on `2^(−24)` (what a face joined there reads), are handed to `each`. A
+    /// reading beside the code: the tower is not moved, and the receiver keeps only its sums, never
+    /// the cells. The reset clocks' pool reads it ([`clock::ClockPool`]).
+    pub fn read_join_covectors(&self, state: &mut TowerState, classes: &[usize], section: usize, level: usize, mut each: impl FnMut(usize, &[i64]) -> Result<()>) -> Result<()> {
+        if section == 0 {
+            return refuse("a section of at least one cell");
+        }
+        if level >= self.declaration.levels {
+            return refuse("a join covector is read at a level of the tower");
+        }
+        let reaches = self.reaches();
+        let mut start = 0;
+        while start + 1 < classes.len() {
+            let part = &classes[start..(start + section + 1).min(classes.len())];
+            let opening = state.clone();
+            let cells = self.forward(state, part, &reaches)?;
+            let mut at = Vec::new();
+            self.reverse_joined(&opening, &cells, part, None, None, None, Some((level, &mut at)))?;
+            for (i, dx) in at.iter().enumerate() {
+                each(part[i], dx)?;
             }
             start += part.len() - 1;
         }
@@ -5177,6 +5273,169 @@ mod tests {
         the_covector_of_tower_matches_the_code_difference(tiny_banked(true), true, &classes, 9);
     }
 
+    /// The tiny turned tower (banked or not) with two reset clocks at its top level, the bank's: the
+    /// clock of class 2 and the rest's. Opened, their joins are drawn away from zero as the bank's
+    /// join is.
+    fn tiny_clocked(banked: bool, open: bool) -> Tower {
+        let mut tower = if banked { tiny_banked(true) } else { tiny_turning(2, true, true, false) };
+        tower.join_clock(1, 2).expect("joined");
+        tower.join_clock(1, 4).expect("joined");
+        if open {
+            let k = keys(4096);
+            let join = tower.clock_join().expect("a clock");
+            for (i, v) in tower.theta[join].iter_mut().enumerate() {
+                let at = 4 * (i + 200);
+                *v = i32::from_be_bytes([k[at], k[at + 1], k[at + 2], k[at + 3]]) >> 7;
+            }
+        }
+        tower
+    }
+
+    /// The clocks' passage of recurring pairs, the bank's: class 2 recurs at different distances,
+    /// and its followers differ.
+    fn clocked_passage() -> Vec<usize> {
+        (0..37).map(|i| [0, 2, 1, 3, 0, 1, 2, 3, 3, 0][i % 10]).collect()
+    }
+
+    /// A clocked tower opens on its twin (record acceptance §4.1): with every `O` at zero it codes
+    /// every passage bit-identically and its cells read the same faces, banked or not.
+    #[test]
+    fn a_clocked_tower_opens_on_its_twin() {
+        let classes = clocked_passage();
+        for (twin, clocked) in [(tiny_turning(2, true, true, false), tiny_clocked(false, false)), (tiny_banked(true), tiny_clocked(true, false))] {
+            assert_eq!(code(&clocked, &classes), code(&twin, &classes));
+            let (mut a, mut b) = (twin.rest(), clocked.rest());
+            let faces = |t: &Tower, s: &mut TowerState| t.forward(s, &classes, &t.reaches()).expect("forward").into_iter().map(|c| c.face).collect::<Vec<_>>();
+            assert_eq!(faces(&twin, &mut a), faces(&clocked, &mut b));
+            // Each clock holds what follows its class: 2 is followed by 1 and by 3 in turn, last
+            // by 1, and the rest's clock holds the passage's first arrival.
+            assert_eq!(b.held, vec![1, 0]);
+        }
+        assert_ne!(code(&tiny_clocked(false, true), &classes), code(&tiny_turning(2, true, true, false), &classes));
+        // A stream rested before the join carries no clock.
+        let mut stale = tiny_turning(2, true, true, false).rest();
+        assert!(tiny_clocked(false, true).read(&mut stale, &classes).is_err());
+    }
+
+    #[test]
+    fn a_clocked_tower_restores_exactly() {
+        for banked in [false, true] {
+            let tower = tiny_clocked(banked, true);
+            let text = tower.to_text();
+            assert!(text.ends_with("clock 1 2 4\n"));
+            assert_eq!(Tower::from_text(&text).expect("restored"), tower);
+            let learner = TowerLearner::new(tower, 7);
+            let text = learner.to_text();
+            assert_eq!(TowerLearner::from_text(&text).expect("restored").to_text(), text);
+        }
+        let text = tiny_clocked(false, false).to_text();
+        for bad in ["clock 1 2 2\n", "clock 2 2 4\n", "clock 1 5\n"] {
+            assert!(Tower::from_text(&text.replace("clock 1 2 4\n", bad)).is_err(), "{bad:?} restored");
+        }
+        let mut tower = tiny_clocked(false, false);
+        assert!(tower.join_clock(0, 3).is_err(), "every clock joins one level");
+        assert!(tower.join_clock(1, 2).is_err(), "a class resets one clock");
+    }
+
+    /// The code's difference agrees with the covector for the clocks' joins (record acceptance
+    /// §4.2), with the bank at the same level and without it; the encoding's covector carries the
+    /// clocks' return through the held classes' encodings. On this passage the second level's gate
+    /// bias reads above the check's floor, and the faces' release moves its fitted slope by up to a
+    /// tenth at steps of `2^(−9)` and `2^(−10)` units on the turned twin as well (measured: the twin's
+    /// second mode 109,781,795 against a covector of 100,119,552 on `2^(−32)`, the clocked tower's
+    /// 134,849,957 against 121,948,672); at `2^(−8)` both read within 5%, so the unbanked tower is
+    /// read there.
+    #[test]
+    fn the_clocked_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_clocked(false, true), true, &clocked_passage(), 8);
+    }
+
+    #[test]
+    fn the_clocked_and_banked_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_clocked(true, true), true, &clocked_passage(), 9);
+    }
+
+    /// The faces read cell by cell code what `read_cells` codes, and a class's rank is 0 exactly
+    /// where no class carries more mass.
+    #[test]
+    fn the_faces_read_code_the_cells() {
+        let tower = tiny_clocked(true, true);
+        let classes = clocked_passage();
+        let codes = tower.read_cells(&mut tower.rest(), &classes).expect("codes");
+        let mut read = Vec::new();
+        let mut firsts = 0;
+        tower
+            .read_faces(&mut tower.rest(), &classes, |i, _, face| {
+                read.push(face.code(classes[i + 1]));
+                let top = *face.masses.iter().max().expect("a class");
+                for c in 0..face.masses.len() {
+                    assert_eq!(face.rank(c) == 0, face.masses[c] == top);
+                }
+                firsts += (face.rank(classes[i + 1]) == 0) as usize;
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(read, codes);
+        assert!(firsts > 0 && firsts < codes.len());
+    }
+
+    /// The join covectors are the reverse scan's, and the pool gathered from them holds each clock's
+    /// sums: on an opened clocked tower read as one section, `Σ_u D_u E(u)ᵀ` over the pool's held
+    /// sums for a clock is that clock's covector, its cells are the passage's, and read in sections
+    /// the covectors reach every cell once.
+    #[test]
+    fn the_pool_gathers_the_clocks_covector_from_the_join_covectors() {
+        let tower = tiny_clocked(true, true);
+        let classes = clocked_passage();
+        let (w, a) = (4, 4);
+        let opening = tower.rest();
+        let mut s = opening.clone();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        let g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let mut pool = clock::ClockPool::default();
+        let mut stream = clock::ClockPool::open_stream(a, w);
+        let mut state = tower.rest();
+        tower.read_join_covectors(&mut state, &classes, classes.len(), 1, |u, dx| pool.cell(&mut stream, u, dx)).expect("read");
+        pool.close_stream(stream).expect("closed");
+        assert_eq!(pool.cells, classes.len() as u64 - 1);
+        let start = tower.layout.clock.expect("a clock");
+        for (c, &class) in tower.clock().expect("a clock").classes.iter().enumerate() {
+            let mut cross = vec![0i128; w * w];
+            let mut held_cells = 0;
+            for (&(clock, held), (n, d)) in &pool.sums {
+                if clock != class {
+                    continue;
+                }
+                held_cells += n;
+                let e = tower.encoding(held);
+                for i in 0..w {
+                    for k in 0..w {
+                        cross[i * w + k] += d[i] * e[k] as i128;
+                    }
+                }
+            }
+            assert_eq!(cross, g[start + c * w * w..start + (c + 1) * w * w], "clock {class}");
+            assert!(cross.iter().any(|&v| v != 0) && held_cells > 0);
+        }
+        // A clock holds every cell from its first reset: the rest's every cell, class 2's from the
+        // cell after its first arrival.
+        let held = |clock: usize| pool.sums.iter().filter(|((c, _), _)| *c == clock).map(|(_, (n, _))| n).sum::<u64>();
+        assert_eq!((held(4), held(2)), (classes.len() as u64 - 1, classes.len() as u64 - 3));
+        // In sections the covectors reach every cell once, in the passage's order.
+        let mut arrived = Vec::new();
+        let mut state = tower.rest();
+        tower.read_join_covectors(&mut state, &classes, 5, 1, |u, _| {
+                arrived.push(u);
+                Ok(())
+            })
+            .expect("read");
+        assert_eq!(arrived, classes[..classes.len() - 1]);
+        // The drops read every clock that held a cell: four classes and the rest.
+        let drops = pool.drops(&tower).expect("drops");
+        assert_eq!(drops.len(), 5);
+        assert!(drops.windows(2).all(|p| !p[1].exceeds(&p[0])));
+    }
+
     #[test]
     fn the_turned_covector_matches_the_code_difference() {
         the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, false), true, &PASSAGE, 10);
@@ -5244,6 +5503,7 @@ mod tests {
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked) = (0, 0, 0, 0, 0, 0, 0);
         let mut banks_checked = Vec::new();
+        let mut clocks_checked = 0;
         let bank_families: Vec<usize> = tower.layout.bank.map_or(Vec::new(), |bl| vec![bl.key, bl.key_bias, bl.key_arrival, bl.query, bl.query_bias, bl.value, bl.value_bias, bl.gate, bl.gate_bias, bl.hold, bl.join]);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
@@ -5279,6 +5539,7 @@ mod tests {
                 if bank_families.contains(&start) {
                     banks_checked.push(start);
                 }
+                clocks_checked += (tower.layout.clock == Some(start)) as usize;
                 break;
             }
         }
@@ -5295,6 +5556,7 @@ mod tests {
         assert!(tower.pair.is_none() || faces_checked >= if kinked { 1 } else { 2 }, "only {faces_checked} pair face families carried a readable covector");
         assert!(tower.ring.is_none() || rings_checked == 2, "the ring face's readout and factors carried {rings_checked} readable covectors of 2");
         assert!(banks_checked.len() == bank_families.len(), "the bank's families at {bank_families:?} carried readable covectors at {banks_checked:?}");
+        assert!(tower.layout.clock.is_none() || clocks_checked == 1, "the clocks' joins carried no readable covector");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 

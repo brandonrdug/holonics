@@ -108,7 +108,8 @@ pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
 /// `read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [unjoined] [UNITS UNITS_SHA]`: the
 /// held-out read (`held_out`'s partition, each chunk from rest) written cell by cell to `OUT`
 /// (create-new): one line per coded class, the place in `DEV` of its first byte, its code on
-/// `2^(−20)` bits, and its bytes. A unit tower reads `DEV` in the founded `UNITS`; `unjoined` sets the
+/// `2^(−20)` bits, its bytes, and its rank on the face that coded it (how many classes carry more
+/// mass; 0 when the face gives it the largest). A unit tower reads `DEV` in the founded `UNITS`; `unjoined` sets the
 /// bank's join `O` to zero first, as `read-tower-held` does. A reading beside the code, for an observer
 /// to set each class's code beside what it knows of it (the runs the text shares with the heard text,
 /// whether an answer's unit was in its question); nothing here enters the machine.
@@ -142,17 +143,26 @@ pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
     });
     let chunk = classes.len().div_ceil(streams);
     let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
-    let parts: Vec<Vec<i64>> = starts
+    let parts: Vec<Vec<(i64, usize)>> = starts
         .par_iter()
         .map(|&start| {
             let mut state = learner.tower.rest();
-            learner.tower.read_cells(&mut state, &classes[start..(start + chunk).min(classes.len())]).map_err(|e| e.to_string())
+            let part = &classes[start..(start + chunk).min(classes.len())];
+            let mut read = Vec::with_capacity(part.len());
+            learner
+                .tower
+                .read_faces(&mut state, part, |i, _, face| {
+                    read.push((face.code(part[i + 1]), face.rank(part[i + 1])));
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(read)
         })
         .collect::<std::result::Result<_, String>>()?;
     let mut written = String::new();
-    for (&start, codes) in starts.iter().zip(&parts) {
-        for (i, code) in codes.iter().enumerate() {
-            written.push_str(&format!("{}\t{code}\t{}\n", places[start + i + 1], lengths[start + i + 1]));
+    for (&start, read) in starts.iter().zip(&parts) {
+        for (i, (code, rank)) in read.iter().enumerate() {
+            written.push_str(&format!("{}\t{code}\t{}\t{rank}\n", places[start + i + 1], lengths[start + i + 1]));
         }
     }
     std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[6])?, written.as_bytes())?;
@@ -3624,7 +3634,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams)?;
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
-            "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={}",
+            "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={} train_code={code} dev_code={dev_code} grain_bits={READ_BITS}",
             pass, per(code, bytes), per(dev_code, dev_coded), named_region_line(&reading.regions, &regions), deposits, sections_run,
             pass_started.elapsed().as_millis(), started.elapsed().as_millis()
         );

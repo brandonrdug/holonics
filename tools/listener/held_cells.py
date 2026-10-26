@@ -7,8 +7,8 @@
     python3 -I tools/listener/held_cells.py copy DEV DEV_ROLES CELLS [CELLS ...]
 
 An exterior observer's reads; nothing here enters the machine. A CELLS file has one line a coded
-cell: the place of its first byte in DEV, its code on `2^(−20)` bits, and its bytes (one for a byte
-tower, a founded unit's length for a units tower). A cell belongs to the class of its first byte,
+cell: the place of its first byte in DEV, its code on `2^(−20)` bits, its bytes (one for a byte
+tower, a founded unit's length for a units tower) and, when written, its rank on the face. A cell belongs to the class of its first byte,
 and a class's reading is its cells' code over their bytes. Every read is of role 0 (the prose of the
 mixed Holonics text) except `copy`, which reads a GSM8K held-out text (problems separated by a blank
 line; roles: question 0, answer prose 1, answer numbers 2, markup 3). A word is a run of letters.
@@ -45,7 +45,7 @@ WORD_OR_NUMBER = re.compile(rb"[A-Za-z]+|[0-9]+(?:[.,][0-9]+)*")
 def cells_of(path):
     cells = {}
     for line in open(path):
-        place, code, length = line.split("\t")
+        place, code, length = line.split("\t")[:3]
         cells[int(place)] = (int(code), int(length))
     return cells
 

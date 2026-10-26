@@ -191,6 +191,7 @@ pub struct ResidentLaw {
     pub pair_face: bool,
     pub ring_face: bool,
     pub bank: bool,
+    pub clock: bool,
 }
 
 impl Tower {
@@ -241,6 +242,7 @@ impl Tower {
             pair_face: self.pair.is_some(),
             ring_face: self.ring.is_some(),
             bank: self.bank.is_some(),
+            clock: self.clock.is_some(),
         })
     }
 }
