@@ -175,7 +175,7 @@ theorem pumped_step {ρ ρmax M : ℝ} (h : ρ ≤ ρmax) (hmax : ρmax < 1) (hM
       ≤ ‖α * h' + β * conj h'‖ + ‖(Real.sqrt (1 - ρ ^ 2) : ℂ) * u‖ := norm_add_le _ _
     _ ≤ ρ * ‖h'‖ + Real.sqrt (1 - ρ ^ 2) * ‖u‖ := by
         rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg hs, ← hαβ]
-        exact add_le_add_right (pumped_norm_le α β h') _
+        exact add_le_add (pumped_norm_le α β h') le_rfl
     _ ≤ ρ * (passiveBound ρmax * M) + Real.sqrt (1 - ρ ^ 2) * M :=
         add_le_add (mul_le_mul_of_nonneg_left hh h0) (mul_le_mul_of_nonneg_left hu hs)
     _ = (ρ * passiveBound ρmax + Real.sqrt (1 - ρ ^ 2)) * M := by ring
