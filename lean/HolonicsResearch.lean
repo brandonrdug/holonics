@@ -1200,3 +1200,5 @@ import HolonicsResearch.Mathematics.BaseAction
 import HolonicsResearch.Mathematics.OrbitEnergy
 import HolonicsResearch.Mathematics.ColourTrace
 import HolonicsResearch.Physics.TimeBoundary
+import HolonicsResearch.Geometry.TwoReflections
+import HolonicsResearch.Mathematics.ColourScope

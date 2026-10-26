@@ -23,6 +23,8 @@ This file proves #410's (l).
 5. **Conjugation is time reversal** (`timeBoundary_conj`): the step commutes with `conj`.
 6. **The time mirror is `r = 0`** (`timeBoundary_zero`): the step keeps only `Re A`, split equally
    forward and backward.
+7. **Neutral is `r = 1`** (`timeBoundary_one`): an unchanged medium, `Z′ = Z`, leaves the mode as it
+   was, whatever `Z` is. Neutral is a ratio of one against the medium already held, never a value.
 
 Consumers: the atlas row `wave.time-boundary`.
 -/
@@ -74,6 +76,12 @@ theorem timeBoundary_conj (r : ℝ) (A : ℂ) :
 
 /-- [proved-standard; formal-checked] **The time mirror is `r = 0`:** only `Re A` is kept. -/
 theorem timeBoundary_zero (A : ℂ) : timeBoundary 0 A = (A.re : ℂ) := by
+  apply Complex.ext
+  · simp [timeBoundary_re]
+  · simp [timeBoundary_im]
+
+/-- [proved-standard; formal-checked] **Neutral is `r = 1`:** an unchanged medium keeps the mode. -/
+theorem timeBoundary_one (A : ℂ) : timeBoundary 1 A = A := by
   apply Complex.ext
   · simp [timeBoundary_re]
   · simp [timeBoundary_im]
