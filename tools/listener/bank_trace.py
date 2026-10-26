@@ -4,6 +4,7 @@
     python3 -I tools/listener/bank_trace.py requests HEARD TEXT OUT
     python3 -I tools/listener/bank_trace.py share HEARD TEXT TRACE
     python3 -I tools/listener/bank_trace.py role HEARD TEXT CELLS [CELLS ...]
+    python3 -I tools/listener/bank_trace.py copies HEARD TEXT UNITS COPIES [COPIES ...]
 
 An exterior observer's reads; nothing here enters the machine. TEXT is GSM8K problems separated by a
 blank line, each a question line and its answer. A problem is named when its question's first word
@@ -29,6 +30,14 @@ case: the heard text's own reading of a proper name, with no list of names.
   carry more than the first unit, in bands, and, for every file after the first, how many of the
   answers the file before gave the largest mass it keeps and how many it gains. TEXT may be the
   heard text itself, which reads the role on seen problems.
+- `copies`: for each COPIES file (`read-tower-clock-cells` output at the `requests` reads), at
+  every named problem whose answer opens with the name, read: the margin of the answer's first unit
+  over its strongest rival on the face (the logits' difference, in bits), the copies' raise on the
+  first unit and on the rival (each the sum of the raises of the clocks holding it), and the readout's
+  own margin, the margin less the first unit's raise and plus the rival's. Then which clocks hold
+  the first unit and the rival, the rivals' pieces where the rival carries more (UNITS is the founding
+  list, `founded-units-v1`), and, for every file after the first, the mean change of each part over
+  the answers the file before gave the largest mass, split by whether this file keeps it.
 - `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
   cell set beside the arrival the clock holds there (the cell after the last cell whose bytes are
   the clock's class): where the cell's bytes repeat the held arrival's, and elsewhere by how many
@@ -170,6 +179,63 @@ def role(heard, text, paths):
         before = first
 
 
+def pieces_of(path):
+    """The units' pieces from a founding list: the 256 bytes, then each merge's two pieces joined."""
+    lines = open(path).read().split("\n")
+    head = lines[0].split(" ")
+    if len(head) != 2 or head[0] != "founded-units-v1":
+        raise SystemExit("not a founding list")
+    pieces = [bytes([b]) for b in range(256)]
+    for line in lines[1:1 + int(head[1])]:
+        a, b = (int(x) for x in line.split(" "))
+        pieces.append(pieces[a] + pieces[b])
+    return pieces
+
+
+def copies(heard, text, pieces, paths):
+    asked = [opening for _, opening, _, opens in named(heard, text) if opens]
+    grain, raise_grain = 1 << 20, 1 << 16
+    before = None
+    for path in paths:
+        rows = {}
+        for line in open(path):
+            k = line.rstrip("\n").split("\t")
+            place, unit, code, rank, rival, rival_code = (int(x) for x in k[:6])
+            clocks = [(int(h), None if r == "-" else int(r)) for h, r in zip(k[6::2], k[7::2])]
+            rows[place] = (unit, code, rank, rival, rival_code, clocks)
+        parts = {}
+        for p in asked:
+            if p not in rows:
+                continue
+            unit, code, rank, rival, rival_code, clocks = rows[p]
+            on_unit = sum(r for h, r in clocks if h == unit and r is not None) / raise_grain
+            on_rival = sum(r for h, r in clocks if h == rival and r is not None) / raise_grain
+            margin = (rival_code - code) / grain
+            parts[p] = (rank == 0, margin, on_unit, on_rival, margin - on_unit + on_rival,
+                        tuple(c for c, (h, _) in enumerate(clocks) if h == unit),
+                        tuple(c for c, (h, _) in enumerate(clocks) if h == rival), rival)
+        n = len(parts)
+        first = {p for p, v in parts.items() if v[0]}
+        mean = lambda i, ps: sum(parts[p][i] for p in ps) / len(ps) if ps else float("nan")
+        print(f"{path}: {len(asked)} named answers opening with the name, {n} read; the first unit has the largest mass in {len(first)}")
+        print(f"  means over the {n}: margin over the rival {mean(1, parts):+.3f} bits = readout {mean(4, parts):+.3f}"
+              f" + raise on the first unit {mean(2, parts):+.3f} − raise on the rival {mean(3, parts):+.3f}")
+        holds = collections.Counter(v[5] for v in parts.values())
+        rivals = collections.Counter(v[6] for v in parts.values())
+        print("  clocks holding the first unit: " + ", ".join(f"{list(k) or 'none'} in {m}" for k, m in holds.most_common()))
+        print("  clocks holding the rival: " + ", ".join(f"{list(k) or 'none'} in {m}" for k, m in rivals.most_common()))
+        above = collections.Counter(pieces[v[7]] for v in parts.values() if not v[0])
+        print("  the rival where it carries more, most frequent first: " + ", ".join(f"{piece!r} {m}" for piece, m in above.most_common(12)))
+        if before is not None:
+            for kind, ps in (("kept", before[1] & first), ("lost", before[1] - first)):
+                ps = [p for p in ps if p in parts and p in before[0]]
+                if ps:
+                    change = lambda i: sum(parts[p][i] - before[0][p][i] for p in ps) / len(ps)
+                    print(f"  beside the file before, over the {len(ps)} it {kind}: margin {change(1):+.3f} = readout {change(4):+.3f}"
+                          f" + raise on the first unit {change(2):+.3f} − raise on the rival {change(3):+.3f}")
+        before = (parts, first)
+
+
 def cells_of(path):
     cells = {}
     for line in open(path):
@@ -229,6 +295,8 @@ def main():
         share(read(args[0]), read(args[1]), args[2])
     elif command == "role" and len(args) >= 3:
         role(read(args[0]), read(args[1]), args[2:])
+    elif command == "copies" and len(args) >= 4:
+        copies(read(args[0]), read(args[1]), pieces_of(args[2]), args[3:])
     elif command == "held" and len(args) in (3, 4):
         reset = class_bytes(args[3]) if len(args) == 4 else b"\n\n"
         held(read(args[0]), args[1], args[2], reset)

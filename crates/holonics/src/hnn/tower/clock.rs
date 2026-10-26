@@ -141,19 +141,31 @@ impl Tower {
     /// The clocks' copies at the readout: each clock holding a class adds `⟨r_A, x⟩ + b_A` to that
     /// class's logit, on `2^(−40)` released to the logit's `2^(−16)` as the readout is.
     pub(super) fn clock_copy(&self, reaches: &[u64], held: &[usize], x: &[i32], z: &mut [i64]) -> Result<()> {
+        for (&h, raise) in held.iter().zip(self.clock_raises(reaches, held, x)?) {
+            if let Some(v) = raise {
+                z[h] = fit64(z[h] as i128 + v as i128)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Each clock's raise `⟨r_A, x⟩ + b_A` on the logit's `2^(−16)`, none where it holds nothing.
+    fn clock_raises(&self, reaches: &[u64], held: &[usize], x: &[i32]) -> Result<Vec<Option<i64>>> {
         let start = self.layout.clock.expect("a clock's layout");
         let (w, a) = (self.declaration.width, self.declaration.alphabet);
         let t = &self.theta;
-        let mut v = [0i64; 1];
-        for (c, &h) in held.iter().enumerate() {
-            if h >= a {
-                continue;
-            }
-            let row = start + c * (w + 1);
-            affine(&t[row..row + w], reaches[c], w, x, Some(&t[row + w..row + w + 1]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
-            z[h] = fit64(z[h] as i128 + v[0] as i128)?;
-        }
-        Ok(())
+        held.iter()
+            .enumerate()
+            .map(|(c, &h)| {
+                if h >= a {
+                    return Ok(None);
+                }
+                let row = start + c * (w + 1);
+                let mut v = [0i64; 1];
+                affine(&t[row..row + w], reaches[c], w, x, Some(&t[row + w..row + w + 1]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
+                Ok(Some(v[0]))
+            })
+            .collect()
     }
 
     /// The copies' reverse scan over one section: `dzs` is each cell's readout covector (on
@@ -193,6 +205,27 @@ impl Tower {
         for i in 0..classes.len().saturating_sub(1) {
             let cell = self.step(state, classes[i], &reaches)?;
             pool.cell(stream, classes[i], &cell.top, &covector(&cell.face, classes[i + 1]))?;
+        }
+        Ok(())
+    }
+
+    /// [agent-inferred, October 26; record
+    /// `2026-10-26_THE_THIRD_LAP_FOUNDS_THE_CLOCK_AFTER_EQUALS_AND_ITS_PASS_LOWERS_THE_ROLE_FROM_53_TO_43.md`
+    /// §4] **The copies' reading**: the frozen tower reads `classes` from the state, and each cell's
+    /// index, face (the masses of the class that arrives next), each clock's held class (the
+    /// alphabet where it holds nothing) and its copy's raise `⟨r_A, x⟩ + b_A` on the logit's
+    /// `2^(−16)` are handed to `each`. A reading beside the code: the tower is not moved. Refused
+    /// without a clock.
+    pub fn read_clocks(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &TowerFace, &[usize], &[Option<i64>]) -> Result<()>) -> Result<()> {
+        if self.clock.is_none() {
+            return refuse("a copies' reading needs a clock");
+        }
+        let reaches = self.reaches();
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            let held = cell.clock.as_deref().expect("a clocked tower's cell holds its clocks");
+            let raises = self.clock_raises(&reaches.clock, held, &cell.top)?;
+            each(i, &cell.face, held, &raises)?;
         }
         Ok(())
     }

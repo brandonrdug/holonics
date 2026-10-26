@@ -1,0 +1,55 @@
+# The training text's cells, one read a state
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=1342752 grain_bits=20 out=role_clock/seen/copyD8.train.cells
+RUN_RECEIPT exit=0 wall_s=38.1 peak_rss_kib=155440 user_s=297.9
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=1342752 grain_bits=20 out=role_clock/seen/lapT8.train.cells
+RUN_RECEIPT exit=0 wall_s=38.2 peak_rss_kib=155356 user_s=298.3
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=1342752 grain_bits=20 out=role_clock/seen/lapD8.train.cells
+RUN_RECEIPT exit=0 wall_s=38.2 peak_rss_kib=156912 user_s=298.5
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=1342752 grain_bits=20 out=role_clock/seen/lap3T8.train.cells
+RUN_RECEIPT exit=0 wall_s=38.3 peak_rss_kib=155216 user_s=298.6
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=1342752 grain_bits=20 out=role_clock/seen/lap3D8.train.cells
+RUN_RECEIPT exit=0 wall_s=38.3 peak_rss_kib=153908 user_s=299.7
+
+# The role on the seen problems (the training text read as both the heard and the read text)
+
+role_clock/seen/copyD8.train.cells: 1074 named answers opening with the name, 1074 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.471 bits
+  classes above the first unit: 0 in 0, 1 in 8, 2-4 in 44, 5-15 in 414, 16+ in 608
+role_clock/seen/lapT8.train.cells: 1074 named answers opening with the name, 1074 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.364 bits
+  classes above the first unit: 0 in 0, 1 in 11, 2-4 in 65, 5-15 in 421, 16+ in 577
+  beside the file before: keeps the largest mass in 0 of its 0, gains it in 0
+role_clock/seen/lapD8.train.cells: 1074 named answers opening with the name, 1074 read, 0 skipped; the first unit has the largest mass in 695; its mean code 2.577 bits
+  classes above the first unit: 0 in 695, 1 in 196, 2-4 in 100, 5-15 in 64, 16+ in 19
+  beside the file before: keeps the largest mass in 0 of its 0, gains it in 695
+role_clock/seen/lap3T8.train.cells: 1074 named answers opening with the name, 1074 read, 0 skipped; the first unit has the largest mass in 561; its mean code 2.877 bits
+  classes above the first unit: 0 in 561, 1 in 281, 2-4 in 137, 5-15 in 64, 16+ in 31
+  beside the file before: keeps the largest mass in 530 of its 695, gains it in 31
+role_clock/seen/lap3D8.train.cells: 1074 named answers opening with the name, 1074 read, 0 skipped; the first unit has the largest mass in 599; its mean code 2.889 bits
+  classes above the first unit: 0 in 599, 1 in 261, 2-4 in 96, 5-15 in 85, 16+ in 33
+  beside the file before: keeps the largest mass in 490 of its 561, gains it in 109
+RUN_RECEIPT exit=0 wall_s=2.0 peak_rss_kib=271708 user_s=1.9
+
+# The role held out
+
+role_clock/twin8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 1; its mean code 6.582 bits
+  classes above the first unit: 0 in 1, 1 in 2, 2-4 in 5, 5-15 in 35, 16+ in 54
+role_clock/copyD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.800 bits
+  classes above the first unit: 0 in 0, 1 in 2, 2-4 in 0, 5-15 in 37, 16+ in 58
+  beside the file before: keeps the largest mass in 0 of its 1, gains it in 0
+role_clock/lapT8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.718 bits
+  classes above the first unit: 0 in 0, 1 in 1, 2-4 in 2, 5-15 in 35, 16+ in 59
+  beside the file before: keeps the largest mass in 0 of its 0, gains it in 0
+role_clock/lapD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 53; its mean code 2.876 bits
+  classes above the first unit: 0 in 53, 1 in 27, 2-4 in 8, 5-15 in 4, 16+ in 5
+  beside the file before: keeps the largest mass in 0 of its 0, gains it in 53
+role_clock/lap3T8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 37; its mean code 3.253 bits
+  classes above the first unit: 0 in 37, 1 in 36, 2-4 in 11, 5-15 in 7, 16+ in 6
+  beside the file before: keeps the largest mass in 36 of its 53, gains it in 1
+role_clock/lap3D8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 43; its mean code 3.158 bits
+  classes above the first unit: 0 in 43, 1 in 29, 2-4 in 11, 5-15 in 8, 16+ in 6
+  beside the file before: keeps the largest mass in 33 of its 37, gains it in 10
+RUN_RECEIPT exit=0 wall_s=0.4 peak_rss_kib=46860 user_s=0.3

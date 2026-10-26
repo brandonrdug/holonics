@@ -27,6 +27,10 @@
 //!   sections (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined on
 //!   is its twin; the founding is certified by one training pass from each, its code below the
 //!   twin's by more than `log₂` of the pool.
+//! - `read-tower-clock-cells STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS REQUESTS
+//!   REQUESTS_SHA OUT` prints each clock's copy and writes, at the reads an observer requests, the
+//!   coded class's strongest rival on the face and each clock's held class and raise
+//!   (`Tower::read_clocks`).
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
 //! 64 classes and the marks are its 16 answers, so the held-out reading is acceptance §3.4's count of
@@ -236,6 +240,104 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
         "TOWER_CLOCK_FOUNDED class={class} piece={} material={} moment_sections={moment_sections} moments_ms={moments_ms} state_sha256={sha} elapsed_ms={}",
         name(class),
         learner.tower.theta.len(),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
+/// [agent-inferred, October 26; record
+/// `2026-10-26_THE_THIRD_LAP_FOUNDS_THE_CLOCK_AFTER_EQUALS_AND_ITS_PASS_LOWERS_THE_ROLE_FROM_53_TO_43.md`
+/// §4] The clocks' copies, read in `read-tower-held-cells`' partition of `TEXT` (`STREAMS` chunks,
+/// each from rest). Each clock's copy is printed (`TOWER_CLOCK_COPY`): its class, its bias `b_A` on
+/// `2^(−16)`, its row's square `‖r_A‖²` on `2^(−48)` and its reach `max |r_A|` on `2^(−24)`. `OUT`
+/// (create-new) holds one line for each read requested, tab-separated: `p class code rank rival
+/// rival_code`, then `held raise` for each clock in founding order. `p` is the place in `TEXT` of the
+/// coded class's first byte, `class` that class and `code` and `rank` its code and rank on the face,
+/// `rival` the other class carrying the largest mass (on a tie the lowest) and `rival_code` its code,
+/// codes on `2^(−20)` bits (the face's mass is `2^z`, so `rival_code − code` is, to the face's
+/// grain, the logits' margin `z_class − z_rival` in bits); `held` is
+/// the class the clock holds (the alphabet where it holds nothing, its raise then `-`) and `raise`
+/// its copy's `⟨r_A, x⟩ + b_A` on the logit's `2^(−16)`. `REQUESTS` holds one read a line, its first
+/// tab-separated field `p` (the `requests` output of `tools/listener/bank_trace.py` serves); a
+/// request whose place no cell codes (a chunk's first class) is counted as skipped. A reading beside
+/// the code: nothing here enters the machine.
+pub(super) fn read_clock_cells(args: &[String]) -> Result<()> {
+    let usage = "read-tower-clock-cells STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS REQUESTS REQUESTS_SHA OUT";
+    if args.len() != 11 {
+        return Err(usage.into());
+    }
+    let started = Instant::now();
+    let learner = learner_of(&args[1], &args[2])?;
+    let tower = &learner.tower;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let streams = positive(&args[7])?;
+    let wanted: std::collections::HashSet<usize> = std::str::from_utf8(&pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?
+        .lines()
+        .map(|l| l.split('\t').next().unwrap_or("").parse::<usize>())
+        .collect::<std::result::Result<_, _>>()?;
+    let out = Path::new(&args[10]);
+    let (alphabet, width) = (tower.declaration.alphabet, tower.declaration.width);
+    if units.len() != alphabet {
+        return Err("the units are not the tower's alphabet".into());
+    }
+    let (clock, join) = tower.clock().zip(tower.clock_join()).ok_or("a copies' reading needs a clock")?;
+    let name = |class: usize| if class == alphabet { "rest".to_string() } else { format!("{:?}", String::from_utf8_lossy(units.piece(class))) };
+    for (c, &class) in clock.classes.iter().enumerate() {
+        let row = &tower.theta[join.start + c * (width + 1)..join.start + c * (width + 1) + width];
+        let square: i128 = row.iter().map(|&v| v as i128 * v as i128).sum();
+        let reach = row.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+        println!(
+            "TOWER_CLOCK_COPY clock={c} class={class} piece={} bias={} row_square={square} reach={reach}",
+            name(class),
+            tower.theta[join.start + c * (width + 1) + width]
+        );
+    }
+    let (classes, lengths): (Vec<usize>, Vec<usize>) = units.parse(&text).map_err(|e| e.to_string())?.into_iter().map(|u| (u as usize, units.piece(u as usize).len())).unzip();
+    let mut places = Vec::with_capacity(lengths.len());
+    lengths.iter().fold(0usize, |at, &n| {
+        places.push(at);
+        at + n
+    });
+    let chunk = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
+    let parts: Vec<Vec<String>> = starts
+        .par_iter()
+        .map(|&start| {
+            let mut state = tower.rest();
+            let part = &classes[start..(start + chunk).min(classes.len())];
+            let mut lines = Vec::new();
+            tower
+                .read_clocks(&mut state, part, |i, face, held, raises| {
+                    let place = places[start + i + 1];
+                    if wanted.contains(&place) {
+                        let next = part[i + 1];
+                        let rival = (0..face.masses.len()).filter(|&c| c != next).fold(usize::from(next == 0), |best, c| if face.masses[c] > face.masses[best] { c } else { best });
+                        let mut line = format!("{place}\t{next}\t{}\t{}\t{rival}\t{}", face.code(next), face.rank(next), face.code(rival));
+                        for (&h, r) in held.iter().zip(raises) {
+                            line.push_str(&format!("\t{h}\t{}", r.map_or("-".to_string(), |v| v.to_string())));
+                        }
+                        lines.push(line);
+                    }
+                    Ok(())
+                })
+                .map_err(|e| e.to_string())?;
+            Ok(lines)
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let read: usize = parts.iter().map(Vec::len).sum();
+    let mut written = String::new();
+    for line in parts.iter().flatten() {
+        written.push_str(line);
+        written.push('\n');
+    }
+    write_new(out, written.as_bytes())?;
+    println!(
+        "TOWER_CLOCK_CELLS clocks={} streams={streams} requests={} read={read} skipped={} out={} elapsed_ms={}",
+        clock.classes.len(),
+        wanted.len(),
+        wanted.len() - read,
+        args[10],
         started.elapsed().as_millis()
     );
     Ok(())
