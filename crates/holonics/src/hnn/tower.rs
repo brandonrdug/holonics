@@ -269,6 +269,34 @@ pub enum ContactLaw {
     PairLinear,
 }
 
+/// [definition; agent-inferred, October 25] **A founding's turn ladder**: the turns a level's
+/// modes are founded on, rung by rung (rung `s` the modes of memory `|λ| = 1 − 2^(−s)`, `J` modes a
+/// rung).
+///
+/// A mode that turns by `θ` a class puts each class at a phase set by its place in the passage, so
+/// a mode that turns many times over its memory holds the order of what it heard and scatters a
+/// long source by its length, and a mode that turns less than once holds its content. Measured on
+/// the digits' images (52 to 298 classes; the record
+/// `2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE.md`, "Why the
+/// state forgets the image"): founded fixed, the four slowest rungs at the label named 87 to 94 of
+/// 500 held-out labels, founded scaled 146 to 148, and the scaled tower named 55 against 46 after
+/// one pass; but a text tower alone coded GSM8K answers at 2.760 bits a class against 2.730 and a
+/// speech tower its half-cycles at 3.006 against 2.907, the slow resonators the fixed ladder holds.
+/// The whole listener founded on both ladders at 128 modes, after one pass, coded every mark but
+/// the half-cycles below the fixed ladder at 128 (transcripts 6.059 bits a class against 6.576,
+/// labels 4.226 against 4.397, answers 2.774 against 2.795; half-cycles 3.620 against 3.564).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TurnLadder {
+    /// `j·π/J` on every rung: each rung resonates at the same `J` turns, a slow mode as a narrow
+    /// resonator at a fixed period.
+    Fixed,
+    /// `j·π/(J·2^(s−1))` on rung `s`, `s` held at the margin's rung: each mode turns less than
+    /// once over its memory `2^s`.
+    Scaled,
+    /// Both, half the bank each over the same rungs: modes `0..N/2` fixed and `N/2..N` scaled.
+    Both,
+}
+
 /// [definition; agent-inferred, October 24] **The resident pair face**: `k` founded bilinear forms
 /// read at the pair `p` of the class before and the class arriving,
 ///
@@ -1789,8 +1817,16 @@ impl Tower {
     /// odometer's mixed radix and a closing ring's characters), the push by `1/√d` (the step
     /// scales it by the mode's `γ`, so a mode's state opens at the face's scale), the read by `1/√N`, the contacts
     /// by `√(6/d)` (a rectifier passes half its drive); the return and the readout at zero, so the
-    /// tower opens on the flat face (birth at zero) and each level on the identity.
+    /// tower opens on the flat face (birth at zero) and each level on the identity. The turn ladder
+    /// is [`TurnLadder::Fixed`]; [`Tower::found_on`] founds on a declared one.
     pub fn found(declaration: TowerDeclaration, keys: &[u8]) -> Result<Self> {
+        Self::found_on(declaration, keys, TurnLadder::Fixed)
+    }
+
+    /// The founding of [`Tower::found`] on a declared [`TurnLadder`]. The keys are drawn in the
+    /// same order whatever the ladder, so two ladders founded on one key stream share their
+    /// encoding, pushes, reads and contacts and differ only in their modes' turns.
+    pub fn found_on(declaration: TowerDeclaration, keys: &[u8], ladder: TurnLadder) -> Result<Self> {
         let d = declaration;
         if d.alphabet < 2 || d.width == 0 || d.modes == 0 || d.contacts == 0 || d.levels == 0 {
             return refuse("a tower needs two classes and a nonempty width, bank, contacts and levels");
@@ -1820,15 +1856,27 @@ impl Tower {
         };
         let e = layout.encoding;
         uniform(&mut theta[e..e + d.alphabet * d.width], 1, 1, FACE_BITS)?;
-        let turns = turn_ladder(d.modes);
+        if ladder == TurnLadder::Both && d.modes % 2 != 0 {
+            return refuse("two turn ladders need an even bank");
+        }
+        // The modes one ladder spans: the bank, or each half of it.
+        let span = if ladder == TurnLadder::Both { d.modes / 2 } else { d.modes };
+        let turns = turn_ladder(span);
         let sqrt_width = (d.width as u128).isqrt().max(1);
         for lv in &layout.levels {
             for k in 0..d.modes {
-                let s = (k / turns) as u32 + 1;
-                let j = (k % turns) as u64;
+                let (place, scaled) = match ladder {
+                    TurnLadder::Fixed => (k, false),
+                    TurnLadder::Scaled => (k, true),
+                    TurnLadder::Both => (k % span, k >= span),
+                };
+                let s = (place / turns) as u32 + 1;
+                let j = (place % turns) as u64;
                 let rho = (1i128 << MOVE_BITS) - (1i128 << (MOVE_BITS - s.min(MARGIN)));
-                // The turn by j·π/turns: turns is a power of two by the ladder's declaration.
-                let n = turns.trailing_zeros();
+                // The turn by j·π/turns, or by j·π/(turns·2^(s−1)) on rung s when scaled (the
+                // margin's rung past it): turns is a power of two by the ladder's declaration, so
+                // the turn is dyadic.
+                let n = turns.trailing_zeros() + if scaled { s.min(MARGIN) - 1 } else { 0 };
                 let rot = dyadic_turn(j, n, MOVE_BITS);
                 let re = release(rot.re * rho, MOVE_BITS);
                 let im = release(rot.im * rho, MOVE_BITS);
@@ -3909,6 +3957,49 @@ mod tests {
     /// The tiny tower whose gated modes' turn may be keyed by the arriving symbol, and a turned
     /// one's pump; a turned one's turn, and a pumped one's depth and axis, open away from zero as
     /// its gate does.
+    #[test]
+    fn a_scaled_ladder_divides_each_rungs_turn_by_its_memory_and_changes_only_the_moves() {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 32, contacts: 4, levels: 1, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let k = keys(16384);
+        let fixed = Tower::found(declaration, &k).expect("founded");
+        assert_eq!(Tower::found_on(declaration, &k, TurnLadder::Fixed).expect("founded").theta, fixed.theta);
+        let scaled = Tower::found_on(declaration, &k, TurnLadder::Scaled).expect("founded");
+        let both = Tower::found_on(declaration, &k, TurnLadder::Both).expect("founded");
+        let lv = fixed.layout.levels[0];
+        let at = |t: &Tower, m: usize| (t.theta[lv.move_re + m] as i128, t.theta[lv.move_im + m] as i128);
+        // Only the moves differ: the keys are drawn in one order whatever the ladder.
+        let moved = |i: usize| (lv.move_re..lv.move_re + 32).contains(&i) || (lv.move_im..lv.move_im + 32).contains(&i);
+        let rest = |t: &Tower| t.theta.iter().enumerate().filter(|&(i, _)| !moved(i)).map(|(_, &v)| v).collect::<Vec<_>>();
+        assert_eq!(rest(&scaled), rest(&fixed));
+        assert_eq!(rest(&both), rest(&fixed));
+        // 32 modes: eight turns on four rungs. The first rung is one ladder's; on rung s the scaled
+        // mode's turn, raised to the power 2^(s−1), is the first rung's (to a few grains).
+        let one = 1i128 << MOVE_BITS;
+        let unit = |(re, im): (i128, i128), s: u32| {
+            let rho = one - (one >> s);
+            (div_nearest(re * one, rho), div_nearest(im * one, rho))
+        };
+        for m in 0..32 {
+            let (s, j) = ((m / 8) as u32 + 1, m % 8);
+            let mut u = unit(at(&scaled, m), s);
+            for _ in 1..s {
+                u = (release(u.0 * u.0 - u.1 * u.1, MOVE_BITS), release(2 * u.0 * u.1, MOVE_BITS));
+            }
+            let first = unit(at(&fixed, j), 1);
+            assert!((u.0 - first.0).abs() < 1 << 12 && (u.1 - first.1).abs() < 1 << 12, "mode {m}: {u:?} against {first:?}");
+            if s == 1 {
+                assert_eq!(at(&scaled, m), at(&fixed, m));
+            }
+        }
+        // Both: the first half is the fixed ladder over two rungs, the second the scaled one.
+        for m in 0..16 {
+            assert_eq!(at(&both, m), at(&fixed, m));
+            assert_eq!(at(&both, 16 + m), at(&scaled, m));
+        }
+        let odd = TowerDeclaration { modes: 3, ..declaration };
+        assert!(Tower::found_on(odd, &k, TurnLadder::Both).is_err());
+    }
+
     fn tiny_turning(levels: usize, gated: bool, turned: bool, pumped: bool) -> Tower {
         tiny_declared(levels, gated, turned, pumped, ContactLaw::Rectifying)
     }

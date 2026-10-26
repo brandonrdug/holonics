@@ -22,7 +22,7 @@
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
 use super::tower_train::{agreeing_class, agreement, count, fit, per, positive, roles_of, Reading, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::{ContactLaw, TowerLearner};
+use holonics::hnn::tower::{ContactLaw, TowerLearner, TurnLadder};
 use rayon::prelude::*;
 
 /// The held-out read's four exterior regions of a composed passage (`compose.py`'s roles).
@@ -45,10 +45,21 @@ fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
 
 /// `train-gated-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS
 /// KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]`; the
-/// code is reported a class.
-pub(super) fn train(args: &[String]) -> Result<()> {
+/// code is reported a class. `train-credited-tower-classes` takes the same arguments and its streams
+/// carry their passage credit (`hnn.tower-passage-credit`); `train-target-tower-classes` carries the
+/// credit and compares each face only where a target arrives ([`target_places`]);
+/// `train-turned-tower-classes` trains the turned tower (`hnn.tower-turned-mode`), whose arriving
+/// class turns each mode, so a mode can carry an accumulated relative change as its phase;
+/// `train-scaled-tower-classes` founds the gated tower on the scaled turn ladder and
+/// `train-two-ladder-tower-classes` on both ladders, half the bank each ([`TurnLadder`]).
+///
+/// [agent-inferred, October 25] The credit is what lets a section's target teach its source when the
+/// pair is longer than the declared section: a stroke runs about 168 classes against sections of
+/// 128, so without it a label's covector stops inside its image and never reaches the image's
+/// start (the state at the label kept little of the image, the record's "state at the label").
+pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
-        return Err("train-gated-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
@@ -62,8 +73,28 @@ pub(super) fn train(args: &[String]) -> Result<()> {
         dev_roles,
         alphabet,
         regions: CLASS_REGIONS,
+        train_compared: None,
     };
-    fit(&args[8..], reading, true, false, false, false, ContactLaw::Rectifying, None)
+    let reading = Reading { train_compared: targets.then(|| target_places(&reading.train, alphabet - 1)), ..reading };
+    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, None)
+}
+
+/// [agent-inferred, October 25] **A section's comparison is its target.** A passage of sections
+/// `source END target END` declares, place by place, which arriving classes are its targets: those
+/// after an odd count of end letters, the target and the end letter that closes it. The source and
+/// its end letter are heard and not compared, so the covector a step descends is the target's
+/// news given its source (a label given its image, an answer given its question, a transcript given
+/// its utterance), whatever the medium: the places come from the section's form, never its chart.
+fn target_places(classes: &[usize], end: usize) -> Vec<bool> {
+    let mut ends = 0usize;
+    classes
+        .iter()
+        .map(|&c| {
+            let target = ends % 2 == 1;
+            ends += usize::from(c == end);
+            target
+        })
+        .collect()
 }
 
 /// `read-tower-classes STATE STATE_SHA CLASSES CLASSES_SHA MARKS MARKS_SHA STREAMS`: the class passage
@@ -296,5 +327,15 @@ mod tests {
         assert_eq!(classes_of(&[0, 55, 1, 0, 0, 255], 257).unwrap(), vec![55, 256, 255]);
         assert!(classes_of(&[1, 1], 257).is_err());
         assert!(classes_of(&[0, 55, 1], 257).is_err());
+    }
+
+    /// In `source END target END`, the target and its closing end letter are compared, the source
+    /// and its end letter are not, section after section.
+    #[test]
+    fn the_targets_are_the_places_after_an_odd_count_of_end_letters() {
+        let e = 256;
+        let passage = [1, 2, e, 3, e, 4, e, 5, 6, e];
+        let want = [false, false, false, true, true, false, false, true, true, true];
+        assert_eq!(target_places(&passage, e), want);
     }
 }

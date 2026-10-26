@@ -29,8 +29,15 @@ markup and closing line, with wrong numbers. The speech tower writes a transcrip
 an utterance ends. The next failure is the link every track needs, a target read from its source.
 At the label the state keeps little of the image: exact exterior probes on the top face and the
 carried modes name at most 111 (sibling) and 105 (listener) of 500 held-out labels, where the same
-probe names 383 from the stroke chart itself. The next loop is a section's memory to its end
-letter. The
+probe names 383 from the stroke chart itself. October 26: the cause is the founding's turns. Every
+slow mode turned many times over its memory, so it scattered a long image by its length. Founded
+with each slow mode turning less than once over its memory (`TurnLadder::Scaled`), the digit
+tower's slowest modes at the label name 176 of 500 after one pass (147 before), and the tower
+names 55 (46). Text and speech lean on the turning modes, so the listener now founds half its 128
+modes each way (`TurnLadder::Both`). Against the fixed founding at 128 modes it codes every mark
+lower but the half-cycles (transcripts 6.059 against 6.576, labels 4.226 against 4.397,
+half-cycles 3.620 against 3.564). It still names labels near chance (26 of 500): the next loop is
+the readout reading that memory. The
 [record](research/records/2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE.md)
 holds the measurements and receipts.
 

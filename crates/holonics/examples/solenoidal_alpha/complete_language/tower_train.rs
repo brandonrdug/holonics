@@ -11,7 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::passage::{PassageDeclaration, PassageTree};
-use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, COVECTOR_BITS, READ_BITS};
+use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
@@ -3170,8 +3170,9 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         dev_roles: roles,
         alphabet: 256,
         regions: REGIONS,
+        train_compared: None,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, contact, looking)
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, looking)
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -3203,8 +3204,8 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={}",
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
-    let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS };
-    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, None)
+    let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
+    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3217,11 +3218,15 @@ pub(super) struct Reading {
     pub(super) dev_roles: Vec<u8>,
     pub(super) alphabet: usize,
     pub(super) regions: [&'static str; 4],
+    /// The places of `train` whose arriving class each face is compared with
+    /// (`TowerLearner::section_compared`); every place when `None`.
+    pub(super) train_compared: Option<Vec<bool>>,
 }
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`.
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, looking: Option<&Looking>) -> Result<()> {
+#[allow(clippy::too_many_arguments)]
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, looking: Option<&Looking>) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3255,7 +3260,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         }
         learner
     } else {
-        TowerLearner::new(Tower::found(declaration, &keys).map_err(|e| e.to_string())?, rate_bits)
+        TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
     };
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
@@ -3362,15 +3367,21 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             let ranges: Vec<std::ops::Range<usize>> =
                 (0..streams).map(|s| s * chunk + k * section..s * chunk + (k + 1) * section + 1).collect();
             let parts: Vec<&[usize]> = ranges.iter().map(|r| &classes[r.clone()]).collect();
-            let receipt = match learner.section(&mut states, &parts) {
+            let compared: Option<Vec<Vec<Option<usize>>>> =
+                reading.train_compared.as_ref().map(|mask| ranges.iter().map(|r| r.clone().map(|i| mask[i].then_some(classes[i])).collect()).collect());
+            let slices: Option<Vec<&[Option<usize>]>> = compared.as_ref().map(|c| c.iter().map(|v| v.as_slice()).collect());
+            let receipt = match learner.section_compared(&mut states, &parts, slices.as_deref()) {
                 Ok(receipt) => receipt,
                 Err(e) => {
                     println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                     return Err(e.to_string().into());
                 }
             };
-            // The section codes every class of a part after its first.
-            let coded: usize = ranges.iter().map(|r| reading.train_lengths[r.start + 1..r.end].iter().map(|&n| n as usize).sum::<usize>()).sum();
+            // The section codes every compared class of a part after its first.
+            let coded: usize = ranges
+                .iter()
+                .map(|r| (r.start + 1..r.end).filter(|&i| reading.train_compared.as_ref().is_none_or(|m| m[i])).map(|i| reading.train_lengths[i] as usize).sum::<usize>())
+                .sum();
             code += receipt.code_before;
             bytes += coded;
             window.0 += receipt.code_before;

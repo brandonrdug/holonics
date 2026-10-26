@@ -144,11 +144,117 @@ raster and pooled to 7 × 7. Held-out labels named, of 500 (chance 50, the commo
   both towers heard. The image's roughly 168 classes do not survive to its end letter.
 - **The readout loses a little, the state most.** The sibling's top face shows almost what its
   state keeps (103 against 111); the listener's face shows less (72 against 105).
-- So a readout founded at the label cannot name the digit: what it would read is not there. The
+- So these probes do not find the digit in the state at the label. That is the measured claim:
+  the probes are linear (and the energies quadratic), the foil reads 49 coordinates against the
+  state's 64 to 256, and a phase-aware or nonlinear probe of the carried modes is unread. The
   next loop is a section's memory, on all three media at once, since an answer needs its question
   and a transcript its utterance in the same way. The existing route is a ring founded at section
   arrivals, whose state is the phase-carried moment of its drive (`hnn.ring-moment-keys`,
   `hnn.tower-ring-founding`), read at the end letter by this probe beside the chart's 383.
+
+## Why the state forgets the image
+
+The state at the label held about twice chance under every training tried, so this loop asked
+what memory the image needs: first outside the tower, then in the tower's founding. Every count is
+held-out labels named of 500 by the exact exterior probes of `tools/listener/probe.py` (nearest
+class mean with each coordinate scaled by its within-label scatter, "scaled"; pooled covariance,
+"pooled"). The foils are in the receipts' `FOILS/`.
+
+**Training does not bring the image to the label.** The digit tower (old founding), read at its
+1,500 training and 500 held-out labels:
+
+| Digit tower | Carried modes, scaled | Energies, scaled | Top face, pooled | The tower names (label bits a class) |
+|---|---|---|---|---|
+| Founded, untrained | 73 | 94 | (flat face) | |
+| One pass | 111 | 121 | 99 | 46 (4.045) |
+| Four passes | 109 | 118 | 89 | 52 (4.036) |
+| One pass, its credit carried across the 128-class cuts | 115 | 111 | 120 | |
+| Four passes, then one comparing only the targets | 113 | 117 | 95 | 71 (3.367) |
+| One pass, turned modes | 107 | 103 | 111 | 38 (4.148) |
+
+The credited and target-only rows are read at the labels in the training passage, the others at
+the same labels in a passage of the image→label sections alone. Pooled on the 128 energies: 93
+founded, 135 after four passes. `train-credited-tower-classes` carries the passage credit
+(`hnn.tower-passage-credit`) because an image runs longer than a section;
+`train-target-tower-classes` compares only the places after an odd count of end letters (a
+section's target: a label, an answer, a transcript, or the image a numeral asks for); and
+`train-turned-tower-classes` keys each mode's turn by its input (`hnn.tower-turned-mode`).
+Comparing only the targets teaches the readout the label (46 → 71 named) but leaves the state as
+it was.
+
+**What the image needs, outside the tower.** Moments of the stroke chart's classes, exact
+integers, each section read from zero:
+
+| Exterior memory of an image's classes | Scaled | Pooled |
+|---|---|---|
+| Fading sums of the turn and octave classes, rungs `s = 2..7` (102 coordinates) | 144 | 203 |
+| The heading accumulated as a phase, the same rungs (48) | 165 | 259 |
+| The pen's place and its second moments, the same rungs (30) | 140 | 287 |
+| One rung (`s = 5`), the nine turn classes, still (9) | 106 | 134 |
+| The same, each moment turning by `(4+3i)/5` a class (18) | 59 | 73 |
+| The same, their energies (9) | 68 | 70 |
+| The same, the pair reads `Re, Im h_a h̄_b` of turning moments (90, 64 varying) | 88 | 97 |
+| Rungs 3, 5, 7, still (51) | 159 | |
+| Rungs 3, 5, 7 turning by `(4+3i)/5`, `(12+5i)/13`, `(24+7i)/25`, read at the end (306) | 82 | |
+| The same with the phase anchored at the section's first class (306) | 73 | |
+
+- **Turning memory scatters a source.** A moment that turns by a fixed angle a class puts each
+  stroke at a phase set by where the stroke sits in the image, and the images run 52 to 298
+  classes (101 to 218 for the middle 80%). Read at the end or in the section's own clock, the
+  turning moments name half what the still ones name, and pairing two turning moments of the
+  same frequency (which cancels a common turn) recovers 97, not 134.
+- **The tower founded every rung at `j·π/8` a class**, so its slow modes, whose memory runs
+  2^s classes, turned many times within it. An exterior founded first level with the tower's
+  shape (64 modes on 8 rungs, a random encoding of width 64, a random push scaled by `γ`), its
+  four slowest rungs read pooled: 96 founded as the tower was, 188 with no turn, 203 with the
+  turn on rung `s` scaled to `j·π/2^(s+2)`, so that each mode turns less than once over its
+  memory.
+
+**Founded with each rung's turn scaled to its memory** (`hnn::tower::TurnLadder::Scaled`:
+`j·π/(J·2^(s−1))` on rung `s`, held at the margin's rung; the first rung as before;
+`train-scaled-tower-classes`). The same keys, the fixed founding beside the scaled:
+
+| Digit tower | Old founding | Turn scaled to the memory |
+|---|---|---|
+| Founded: carried modes, scaled | 73 | 136 |
+| Founded: the four slowest rungs pooled, first / second level | 87 / 94 | 146 / 148 |
+| One pass: carried modes, scaled | 111 | 143 |
+| One pass: the four slowest rungs pooled, first / second level | 117 / 147 | 175 / 176 |
+| One pass: top face pooled | 99 | 106 |
+| One pass: the tower names (label bits a class) | 46 (4.045) | 55 (3.989) |
+| One pass: held-out bits a class, strokes / numerals / all | 3.082 / 2.034 / 3.070 | 3.076 / 1.995 / 3.063 |
+
+- The state at the label holds more of its image, founded and trained, and the digits' own code
+  is no worse. The readout does not yet read it: the top face moves 99 → 106 and the tower names
+  55, where the slowest rungs alone name 176. The label is 1,500 of the pass's 516,933 compared
+  classes.
+
+**The other media need the slow resonators.** Text and speech towers alone, one pass, fixed →
+scaled: GSM8K answers 2.730 → 2.760 bits a class, questions 2.883 → 2.932; half-cycles 2.907 →
+3.006, transcripts 5.116 → 5.059. A slow mode on the fixed ladder is a narrow resonator at a fixed
+period, and the half-cycles' and the text's next class lean on it. So the founding keeps both kinds
+(`TurnLadder::Both`: half the bank on each ladder over the same rungs;
+`train-two-ladder-tower-classes`). The whole listener, one pass each, held-out bits a class by
+mark (labels named of 500):
+
+| Founding of the listener | Answers | Questions | Labels (named) | Strokes | Transcripts | Half-cycles |
+|---|---|---|---|---|---|---|
+| Fixed, 64 modes (its first pass above) | 2.811 | 2.988 | 4.445 (21) | 3.128 | 6.335 | 3.432 |
+| Scaled, 64 modes | 2.830 | 3.001 | 4.326 (41) | 3.136 | 6.257 | 3.843 |
+| Fixed, 128 modes | 2.795 | 2.990 | 4.397 (28) | 3.138 | 6.576 | 3.564 |
+| Both, 128 modes (64 fixed, 64 scaled) | 2.774 | 2.966 | 4.226 (26) | 3.119 | 6.059 | 3.620 |
+
+- At an equal bank of 128 modes, both ladders code every mark but the half-cycles below the fixed
+  ladder, the two links most (a transcript from its utterance 0.517 bits a class lower, a label
+  from its image 0.171), and the half-cycles 0.056 higher (1.6%).
+- The scaled ladder alone buys the label (21 → 41 named) with the half-cycles (12% more bits).
+- [agent-inferred] The listener founds on both ladders at 128 modes from here. `Tower::found`
+  keeps the fixed ladder: at 64 modes both ladders would hold four rungs each and no memory past
+  16 classes, and the other routes' measurements stand on it.
+- The listener's tower still names the label near chance (it answers 4 for most images). On the
+  digit tower the memory reaches the label (the slowest rungs read 176 of 500 outside the tower)
+  and the tower names 55; the listener's state at the label was not probed. The next loop's
+  subject is the readout learning to read that memory.
 
 ## The recorded failures this step could repeat
 
@@ -173,7 +279,10 @@ raster and pooled to 7 × 7. Held-out labels named, of 500 (chance 50, the commo
 label confusions), `RELEASES.txt` (each release's prompt length and code, its length and whether
 it ended), `BASELINES.txt` (conditional xz and bzip2, PNG and FLAC context), `PROBE.txt` (the reads
 at the label with their times and digests, and every probe's training and held-out counts),
-`MANIFEST.json` (the composition's configuration, inputs and written files with their SHA-256).
+`MANIFEST.json` (the composition's configuration, inputs and written files with their SHA-256),
+`FOILS/` (the exterior memories and ladders of "Why the state forgets the image") and `MEMORY.txt`
+(that section's training runs, probe and foil outputs, and the listener's reads on each
+founding).
 
 Times (projection → measured):
 
@@ -188,3 +297,17 @@ Times (projection → measured):
 - The reads at the label, projected from 0.068 ms a class on 4 threads (deadlines 35, 15, 95 and
   15 s), took 21.3, 3.7, 62.3 and 9.9 s for the top face, and 32.0, 5.2, 89.5 and 13.9 s with the
   modes (class by class). The passage's training read came to 89.5 of its 95 s (0.94).
+- Why the state forgets the image (October 25 and 26), deadline → measured:
+  - The credited four-pass run stopped at its early stop: its first pass took 113.5 s against the
+    107.5 s allowed. It is read after that pass.
+  - The turned tower's training read reached its 35 s deadline. The declared read changed to the
+    image→label sections alone, not to a longer deadline.
+  - The digit tower on the scaled ladder: founding 60 → 0.2 s, one pass 180 → 106.0 s, its probes
+    1,500 → 268.8 and 350.0 s. Pooled covariance on 128 coordinates took 1,000 to 1,225 s, so
+    the four slowest rungs were pooled on their 64 coordinates a level (95 to 106 s each, four
+    together).
+  - Foils: the pairs 42.1 s and the ladders 216.6 s.
+  - Text and speech towers alone on the scaled ladder, one pass: 106 → 100.3 s and 73 → 66.3 s.
+  - The composed listener, one pass: scaled at 64 modes 300 → 285.9 s (projected 280, ratio 1.02);
+    at 128 modes, fixed and both, 400 → 348.9 and 352.0 s (projected 398, ratios 0.88). Peak
+    resident set 200,796 KiB.
