@@ -1,0 +1,341 @@
+# Why the state forgets the image: receipts (October 25 and 26)
+Held-out labels named of 500 (chance 50, the commonest label 54). Probes: tools/listener/probe.py;
+foils: FOILS/. Measure lines: exit, wall seconds, peak resident set (KiB).
+
+## Digit tower, old founding: training runs (credited 4-pass early stop; target-only; turned)
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.212 deposits=32 halvings=11 elapsed_ms=7902
+TOWER_SECTION pass=0 section=504 bits_a_byte=2.939 deposits=504 halvings=11 elapsed_ms=109814
+TOWER_PASS pass=0 train_bits_a_byte=3.108 dev_bits_a_byte=3.069 dev_regions gsm8k=0.000 strokes=3.081 cycles=0.000 words=2.095 deposits=504/504 pass_ms=113534 elapsed_ms=113547
+MEASURE exit=-15 wall_s=114.7 peak_rss_kib=136840
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.833 deposits=32 halvings=0 elapsed_ms=6483
+TOWER_SECTION pass=0 section=504 bits_a_byte=2.802 deposits=504 halvings=0 elapsed_ms=102018
+TOWER_PASS pass=0 train_bits_a_byte=2.782 dev_bits_a_byte=3.006 dev_regions gsm8k=0.000 strokes=3.022 cycles=0.000 words=1.684 deposits=504/504 pass_ms=105809 elapsed_ms=105869
+MEASURE exit=0 wall_s=106.1 peak_rss_kib=156516
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.078 deposits=32 halvings=28 elapsed_ms=9047
+TOWER_SECTION pass=0 section=504 bits_a_byte=2.912 deposits=504 halvings=28 elapsed_ms=111058
+TOWER_PASS pass=0 train_bits_a_byte=3.064 dev_bits_a_byte=3.033 dev_regions gsm8k=0.000 strokes=3.045 cycles=0.000 words=2.075 deposits=504/504 pass_ms=115635 elapsed_ms=115646
+MEASURE exit=0 wall_s=115.8 peak_rss_kib=124828
+
+## Probe at the label, credit1 (probe.py faces)
+== top_face
+nearest_mean train 307 of 1500
+nearest_mean held_out 95 of 500
+nearest_mean_scaled train 323 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 90 of 500 (coordinates 64 of 64)
+pooled_covariance train 510 of 1500
+pooled_covariance held_out 120 of 500
+== carried_modes
+nearest_mean train 415 of 1500
+nearest_mean held_out 113 of 500
+nearest_mean_scaled train 458 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 115 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 279 of 1500
+nearest_mean held_out 112 of 500
+nearest_mean_scaled train 452 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 111 of 500 (coordinates 128 of 128)
+
+## Probe at the label, target (probe.py faces)
+== top_face
+nearest_mean train 319 of 1500
+nearest_mean held_out 107 of 500
+nearest_mean_scaled train 324 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 116 of 500 (coordinates 64 of 64)
+pooled_covariance train 465 of 1500
+pooled_covariance held_out 95 of 500
+== carried_modes
+nearest_mean train 445 of 1500
+nearest_mean held_out 118 of 500
+nearest_mean_scaled train 439 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 113 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 327 of 1500
+nearest_mean held_out 117 of 500
+nearest_mean_scaled train 458 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 117 of 500 (coordinates 128 of 128)
+
+## Probe at the label, plain1 (probe.py faces)
+== top_face
+nearest_mean train 290 of 1500
+nearest_mean held_out 85 of 500
+nearest_mean_scaled train 325 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 86 of 500 (coordinates 64 of 64)
+pooled_covariance train 445 of 1500
+pooled_covariance held_out 99 of 500
+== carried_modes
+nearest_mean train 462 of 1500
+nearest_mean held_out 123 of 500
+nearest_mean_scaled train 455 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 111 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 310 of 1500
+nearest_mean held_out 114 of 500
+nearest_mean_scaled train 448 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 121 of 500 (coordinates 128 of 128)
+
+## Probe at the label, four (probe.py faces)
+== top_face
+nearest_mean train 318 of 1500
+nearest_mean held_out 99 of 500
+nearest_mean_scaled train 329 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 100 of 500 (coordinates 64 of 64)
+pooled_covariance train 467 of 1500
+pooled_covariance held_out 89 of 500
+== carried_modes
+nearest_mean train 462 of 1500
+nearest_mean held_out 103 of 500
+nearest_mean_scaled train 455 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 109 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 351 of 1500
+nearest_mean held_out 102 of 500
+nearest_mean_scaled train 501 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 118 of 500 (coordinates 128 of 128)
+
+## Probe at the label, turned (probe.py faces)
+== top_face
+nearest_mean train 273 of 1500
+nearest_mean held_out 95 of 500
+nearest_mean_scaled train 284 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 100 of 500 (coordinates 64 of 64)
+pooled_covariance train 450 of 1500
+pooled_covariance held_out 111 of 500
+== carried_modes
+nearest_mean train 374 of 1500
+nearest_mean held_out 103 of 500
+nearest_mean_scaled train 393 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 107 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 275 of 1500
+nearest_mean held_out 99 of 500
+nearest_mean_scaled train 404 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 103 of 500 (coordinates 128 of 128)
+
+## Probe at the label, founded (probe.py faces)
+== top_face
+nearest_mean train 134 of 1500
+nearest_mean held_out 53 of 500
+nearest_mean_scaled train 134 of 1500 (coordinates 0 of 64)
+nearest_mean_scaled held_out 53 of 500 (coordinates 0 of 64)
+pooled_covariance refused: singular
+== carried_modes
+nearest_mean train 390 of 1500
+nearest_mean held_out 83 of 500
+nearest_mean_scaled train 438 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 73 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 256 of 1500
+nearest_mean held_out 88 of 500
+nearest_mean_scaled train 467 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 94 of 500 (coordinates 128 of 128)
+
+## Pooled covariance on the 128 energies (pooled_modes.py): founded, then four passes
+mode_energies pooled_covariance held_out 93 of 500 coordinates 128 seconds 1008
+mode_energies pooled_covariance held_out 135 of 500 coordinates 128 seconds 1225
+
+## The tower's own label read (read-tower-classes on digit.dev)
+read0_digit_digit: CLASSES_READ mark=label cells=500 bits_a_class=4.045 top_is_next=46 named_right=46
+read2_digit_digit: CLASSES_READ mark=label cells=500 bits_a_class=4.036 top_is_next=52 named_right=52
+read_target_digit: CLASSES_READ mark=label cells=500 bits_a_class=3.367 top_is_next=71 named_right=71
+read_turned_digit: CLASSES_READ mark=label cells=500 bits_a_class=4.148 top_is_next=38 named_right=38
+read_scaled1_digit: CLASSES_READ mark=label cells=500 bits_a_class=3.989 top_is_next=55 named_right=55
+
+## Foil: memory_foil.py
+== turns (102 coordinates)
+nearest_mean_scaled held_out 144 of 500
+pooled_covariance held_out 203 coordinates 96
+== heading (48 coordinates)
+nearest_mean_scaled held_out 165 of 500
+pooled_covariance held_out 259 coordinates 48
+== place (30 coordinates)
+nearest_mean_scaled held_out 140 of 500
+pooled_covariance held_out 287 coordinates 30
+
+## Foil: phase_foil.py
+real (51 coordinates, 48 varying): nearest_mean_scaled held_out 159 of 500
+at_end (306 coordinates, 288 varying): nearest_mean_scaled held_out 82 of 500
+own_clock (306 coordinates, 288 varying): nearest_mean_scaled held_out 73 of 500
+
+## Foil: pair_foil.py
+zero_turn (8 varying of 9): nearest_mean_scaled 106 pooled_covariance 134 of 500
+rotated (16 varying of 18): nearest_mean_scaled 59 pooled_covariance 73 of 500
+energies (8 varying of 9): nearest_mean_scaled 68 pooled_covariance 70 of 500
+pairs (64 varying of 90): nearest_mean_scaled 88 pooled_covariance 97 of 500
+MEASURE exit=0 wall_s=42.1 peak_rss_kib=26572
+
+## Foil: ladder_foil.py current still scaled
+current: nearest_mean_scaled 86 pooled_slow4 96 of 500
+still: nearest_mean_scaled 131 pooled_slow4 188 of 500
+scaled: nearest_mean_scaled 168 pooled_slow4 203 of 500
+MEASURE exit=0 wall_s=216.6 peak_rss_kib=44056
+
+## Digit tower founded on the scaled ladder (founded, then one pass)
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=504 train_bytes=516933 dev_bytes=84205
+TOWER_DONE state_bytes=1319079 state_sha256=fdcc269640c9891235bd2199aeda3fbc738b6d6313c725e9250f9fcbfd4b1deb elapsed_ms=122
+MEASURE exit=0 wall_s=0.2 peak_rss_kib=26072
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=504 train_bytes=516933 dev_bytes=84205
+TOWER_PASS pass=0 train_bits_a_byte=3.101 dev_bits_a_byte=3.063 dev_regions gsm8k=0.000 strokes=3.076 cycles=0.000 words=1.995 deposits=504/504 pass_ms=105842 elapsed_ms=105852
+TOWER_DONE state_bytes=4707082 state_sha256=a156856e526ce500dabc1d39bcc4a71351d8aa8fef589790104091ca3f7e42b8 elapsed_ms=105967
+MEASURE exit=0 wall_s=106.0 peak_rss_kib=122284
+
+## Probe at the label, i2l_scaled0
+== top_face
+nearest_mean train 134 of 1500
+nearest_mean held_out 53 of 500
+nearest_mean_scaled train 134 of 1500 (coordinates 0 of 64)
+nearest_mean_scaled held_out 53 of 500 (coordinates 0 of 64)
+pooled_covariance refused: singular
+== carried_modes
+nearest_mean train 441 of 1500
+nearest_mean held_out 135 of 500
+nearest_mean_scaled train 477 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 136 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 296 of 1500
+nearest_mean held_out 82 of 500
+nearest_mean_scaled train 469 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 113 of 500 (coordinates 128 of 128)
+MEASURE exit=0 wall_s=268.8 peak_rss_kib=54080
+
+## Probe at the label, i2l_scaled1
+== top_face
+nearest_mean train 296 of 1500
+nearest_mean held_out 98 of 500
+nearest_mean_scaled train 316 of 1500 (coordinates 64 of 64)
+nearest_mean_scaled held_out 102 of 500 (coordinates 64 of 64)
+pooled_covariance train 471 of 1500
+pooled_covariance held_out 106 of 500
+== carried_modes
+nearest_mean train 449 of 1500
+nearest_mean held_out 123 of 500
+nearest_mean_scaled train 492 of 1500 (coordinates 256 of 256)
+nearest_mean_scaled held_out 143 of 500 (coordinates 256 of 256)
+== mode_energies
+nearest_mean train 336 of 1500
+nearest_mean held_out 98 of 500
+nearest_mean_scaled train 474 of 1500 (coordinates 128 of 128)
+nearest_mean_scaled held_out 117 of 500 (coordinates 128 of 128)
+MEASURE exit=0 wall_s=350.0 peak_rss_kib=56396
+
+## Four slowest rungs pooled (slow_pooled.py), founded
+level 0 slow4: nearest_mean_scaled 80 pooled_covariance 87 of 500 seconds 48
+level 1 slow4: nearest_mean_scaled 72 pooled_covariance 94 of 500 seconds 46
+MEASURE exit=0 wall_s=94.9 peak_rss_kib=45104
+
+## Four slowest rungs pooled (slow_pooled.py), plain1
+level 0 slow4: nearest_mean_scaled 119 pooled_covariance 117 of 500 seconds 52
+level 1 slow4: nearest_mean_scaled 119 pooled_covariance 147 of 500 seconds 52
+MEASURE exit=0 wall_s=105.5 peak_rss_kib=45128
+
+## Four slowest rungs pooled (slow_pooled.py), scaled0
+level 0 slow4: nearest_mean_scaled 135 pooled_covariance 146 of 500 seconds 47
+level 1 slow4: nearest_mean_scaled 140 pooled_covariance 148 of 500 seconds 47
+MEASURE exit=0 wall_s=95.3 peak_rss_kib=44988
+
+## Four slowest rungs pooled (slow_pooled.py), scaled1
+level 0 slow4: nearest_mean_scaled 139 pooled_covariance 175 of 500 seconds 50
+level 1 slow4: nearest_mean_scaled 131 pooled_covariance 176 of 500 seconds 50
+MEASURE exit=0 wall_s=101.5 peak_rss_kib=45036
+
+## Text and speech towers alone, scaled ladder, one pass
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.735 deposits=32 halvings=23 elapsed_ms=7895
+TOWER_PASS pass=0 train_bits_a_byte=3.139 dev_bits_a_byte=2.832 dev_regions gsm8k=2.832 strokes=0.000 cycles=0.000 words=0.000 deposits=506/506 pass_ms=100061 elapsed_ms=100071
+MEASURE exit=0 wall_s=100.3 peak_rss_kib=117176
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.760 top_is_next=12724
+CLASSES_READ mark=question cells=24677 bits_a_class=2.932 top_is_next=10217
+CLASSES_READ mark=end cells=200 bits_a_class=0.869 top_is_next=159
+MEASURE exit=0 wall_s=3.8 peak_rss_kib=17648
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.657 deposits=32 halvings=19 elapsed_ms=7044
+TOWER_PASS pass=0 train_bits_a_byte=2.885 dev_bits_a_byte=3.013 dev_regions gsm8k=0.000 strokes=0.000 cycles=3.007 words=5.094 deposits=346/346 pass_ms=66112 elapsed_ms=66121
+MEASURE exit=0 wall_s=66.3 peak_rss_kib=120580
+CLASSES_READ mark=transcript cells=261 bits_a_class=5.059 top_is_next=40
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.006 top_is_next=25891
+CLASSES_READ mark=end cells=8 bits_a_class=10.229 top_is_next=0
+MEASURE exit=0 wall_s=5.0 peak_rss_kib=17792
+
+## Composed listener, scaled ladder, one pass
+TOWER_TRAIN material=140673 streams=8 section=128 sections_a_pass=1357 train_bytes=1390356 dev_bytes=220036
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.137 deposits=32 halvings=16 elapsed_ms=7773
+TOWER_SECTION pass=0 section=1357 bits_a_byte=2.907 deposits=1357 halvings=19 elapsed_ms=275825
+TOWER_PASS pass=0 train_bits_a_byte=3.117 dev_bits_a_byte=3.344 dev_regions gsm8k=2.890 strokes=3.148 cycles=3.844 words=3.032 deposits=1357/1357 pass_ms=285633 elapsed_ms=285645
+MEASURE exit=0 wall_s=285.9 peak_rss_kib=148120
+== one1/read0s_one_digit.txt
+CLASSES_READ mark=label cells=500 bits_a_class=4.326 top_is_next=41
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.136 top_is_next=35785
+CLASSES_READ mark=end cells=1000 bits_a_class=2.841 top_is_next=551
+CLASSES_LABELS reads=500 named_right=41 confusion(arrived:named 0..9,other) 0:0,0,0,0,51,0,0,0,0,0,2 1:0,0,0,0,47,0,0,0,0,0,7 2:0,0,0,0,33,0,0,0,0,0,8 3:0,0,0,0,49,0,0,0,0,0,4 4:0,0,0,0,41,0,0,0,0,0,5 5:0,0,0,0,40,0,0,0,0,0,4 6:0,0,0,0,46,0,0,0,0,0,5 7:0,0,0,0,45,0,0,0,0,0,7 8:0,0,0,0,45,0,0,0,0,0,9
+CLASSES_READ_DONE cells=84205 elapsed_ms=5672
+MEASURE exit=0 wall_s=5.7 peak_rss_kib=18032
+== one1/read0s_one_sound.txt
+CLASSES_READ mark=transcript cells=261 bits_a_class=6.257 top_is_next=28
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.843 top_is_next=18466
+CLASSES_READ mark=end cells=8 bits_a_class=8.188 top_is_next=0
+CLASSES_READ_DONE cells=82275 elapsed_ms=5525
+MEASURE exit=0 wall_s=5.5 peak_rss_kib=17924
+== one1/read0s_one_text.txt
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.830 top_is_next=12242
+CLASSES_READ mark=question cells=24677 bits_a_class=3.001 top_is_next=9927
+CLASSES_READ mark=end cells=200 bits_a_class=0.559 top_is_next=194
+CLASSES_READ_DONE cells=53556 elapsed_ms=3533
+MEASURE exit=0 wall_s=3.6 peak_rss_kib=17836
+== one1/rel0s_one_digit.txt
+CLASSES_RELEASE_DONE prompts=10 agree=2 elapsed_ms=802
+MEASURE exit=0 wall_s=0.8 peak_rss_kib=37992
+== one1/rel0s_one_label.txt
+CLASSES_RELEASE_DONE prompts=20 agree=1 elapsed_ms=543
+MEASURE exit=0 wall_s=0.6 peak_rss_kib=37484
+== one1/rel0s_one_speech.txt
+CLASSES_RELEASE_DONE prompts=2 agree=2 elapsed_ms=13414
+MEASURE exit=0 wall_s=13.4 peak_rss_kib=38584
+== one1/rel0s_one_text.txt
+CLASSES_RELEASE_DONE prompts=3 agree=2 elapsed_ms=647
+MEASURE exit=0 wall_s=0.7 peak_rss_kib=37868
+== one1/rel0s_one_transcript.txt
+CLASSES_RELEASE_DONE prompts=2 agree=2 elapsed_ms=13632
+MEASURE exit=0 wall_s=13.7 peak_rss_kib=38428
+
+## Composed listener, 128 modes: fixed ladder, then both ladders, one pass each
+== fixed128
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.109 deposits=32 halvings=9 elapsed_ms=8931
+TOWER_SECTION pass=0 section=1357 bits_a_byte=2.877 deposits=1357 halvings=10 elapsed_ms=334120
+TOWER_PASS pass=0 train_bits_a_byte=3.086 dev_bits_a_byte=3.234 dev_regions gsm8k=2.861 strokes=3.151 cycles=3.564 words=3.126 deposits=1357/1357 pass_ms=348726 elapsed_ms=348740
+MEASURE exit=0 wall_s=348.9 peak_rss_kib=187500
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.795 top_is_next=12505
+CLASSES_READ mark=question cells=24677 bits_a_class=2.990 top_is_next=10142
+CLASSES_READ mark=end cells=200 bits_a_class=0.414 top_is_next=196
+MEASURE exit=0 wall_s=5.4 peak_rss_kib=20460
+CLASSES_READ mark=label cells=500 bits_a_class=4.397 top_is_next=28
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.138 top_is_next=35681
+CLASSES_READ mark=end cells=1000 bits_a_class=2.836 top_is_next=515
+CLASSES_LABELS reads=500 named_right=28 confusion(arrived:named 0..9,other) 0:0,0,0,0,20,0,0,0,0,0,33 1:0,0,0,0,36,0,0,0
+MEASURE exit=0 wall_s=8.4 peak_rss_kib=20532
+CLASSES_READ mark=transcript cells=261 bits_a_class=6.576 top_is_next=33
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.564 top_is_next=19391
+CLASSES_READ mark=end cells=8 bits_a_class=7.070 top_is_next=0
+MEASURE exit=0 wall_s=8.2 peak_rss_kib=20524
+CLASSES_RELEASE_DONE prompts=3 agree=2 elapsed_ms=955
+MEASURE exit=0 wall_s=1.0 peak_rss_kib=39672
+CLASSES_RELEASE_DONE prompts=20 agree=1 elapsed_ms=740
+MEASURE exit=0 wall_s=0.8 peak_rss_kib=39064
+== both128
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.205 deposits=32 halvings=11 elapsed_ms=9087
+TOWER_SECTION pass=0 section=1357 bits_a_byte=2.883 deposits=1357 halvings=11 elapsed_ms=336670
+TOWER_PASS pass=0 train_bits_a_byte=3.079 dev_bits_a_byte=3.242 dev_regions gsm8k=2.846 strokes=3.130 cycles=3.618 words=2.949 deposits=1357/1357 pass_ms=351696 elapsed_ms=351706
+MEASURE exit=0 wall_s=352.0 peak_rss_kib=200796
+CLASSES_READ mark=answer cells=28671 bits_a_class=2.774 top_is_next=12770
+CLASSES_READ mark=question cells=24677 bits_a_class=2.966 top_is_next=10367
+CLASSES_READ mark=end cells=200 bits_a_class=0.619 top_is_next=188
+MEASURE exit=0 wall_s=5.7 peak_rss_kib=20396
+CLASSES_READ mark=label cells=500 bits_a_class=4.226 top_is_next=26
+CLASSES_READ mark=stroke cells=82697 bits_a_class=3.119 top_is_next=35748
+CLASSES_READ mark=end cells=1000 bits_a_class=2.702 top_is_next=552
+CLASSES_LABELS reads=500 named_right=26 confusion(arrived:named 0..9,other) 0:0,0,0,0,29,0,0,0,0,0,24 1:0,0,0,0,37,0,0,0
+MEASURE exit=0 wall_s=8.6 peak_rss_kib=20420
+CLASSES_READ mark=transcript cells=261 bits_a_class=6.059 top_is_next=27
+CLASSES_READ mark=cycle cells=81998 bits_a_class=3.620 top_is_next=18284
+CLASSES_READ mark=end cells=8 bits_a_class=7.647 top_is_next=0
+MEASURE exit=0 wall_s=8.8 peak_rss_kib=20512
+CLASSES_RELEASE_DONE prompts=3 agree=2 elapsed_ms=965
+MEASURE exit=0 wall_s=1.0 peak_rss_kib=39592
+CLASSES_RELEASE_DONE prompts=20 agree=1 elapsed_ms=837
+MEASURE exit=0 wall_s=0.9 peak_rss_kib=39212
