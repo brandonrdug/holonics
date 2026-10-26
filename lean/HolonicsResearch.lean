@@ -1203,3 +1203,4 @@ import HolonicsResearch.Physics.TimeBoundary
 import HolonicsResearch.Geometry.TwoReflections
 import HolonicsResearch.Mathematics.ColourScope
 import HolonicsResearch.Mathematics.RotorStep
+import HolonicsResearch.HNN.PassiveMode
