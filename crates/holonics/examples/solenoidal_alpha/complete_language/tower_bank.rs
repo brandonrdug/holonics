@@ -21,8 +21,9 @@
 //! - `found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT`
 //!   reads the pool of every class's reset clock (`hnn::tower::clock`) over the training passage,
 //!   frozen, in the training pass's partition (`STREAMS` streams from rest, sections of `SECTION`
-//!   cells), prints the sixteen largest drops, joins the largest's clock at `LEVEL` and writes the
-//!   learner create-new. The learner it was joined on is its twin; the founding is certified by one
+//!   cells), prints the sixteen largest drops, joins the largest's clock at `LEVEL`, opens the
+//!   join's moments on the same sections (`TowerLearner::open_moments`) and writes the learner
+//!   create-new. The learner it was joined on is its twin; the founding is certified by one
 //!   training pass from each, its code below the twin's by more than `log₂` of the pool.
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
@@ -194,9 +195,24 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
     let top = drops.first().ok_or("the pool read no clock")?;
     let class = top.class;
     learner.join_clock(level, class).map_err(|e| e.to_string())?;
+    // The founded join's moments, opened on the passage it was founded on, in the same partition
+    // (`TowerLearner::open_moments`, section k of stream s reading `[s·chunk + k·section,
+    // s·chunk + (k + 1)·section]`). Opened at zero inside the opened learner, the normalized step
+    // moves every entry of `O` at the full rate from the first section (measured on the four-pass
+    // bank state: the pass from the founded state halved its step 90 times in its first 32
+    // sections against the twin's none, the level it joins swelled about sevenfold, and it ran
+    // 273.8 ms a section against the twin's 149.3).
+    let moments_started = Instant::now();
+    let sections: Vec<Vec<&[usize]>> = (0..(chunk - 1) / section)
+        .map(|k| (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect())
+        .collect();
+    let family = learner.tower.clock_join().ok_or("a founded tower has a clock")?;
+    let mut states: Vec<_> = (0..streams).map(|_| learner.tower.rest()).collect();
+    let moment_sections = learner.open_moments(family, &mut states, &sections).map_err(|e| e.to_string())?;
+    let moments_ms = moments_started.elapsed().as_millis();
     let sha = write_learner(out, &learner)?;
     println!(
-        "TOWER_CLOCK_FOUNDED level={level} class={class} piece={} material={} state_sha256={sha} elapsed_ms={}",
+        "TOWER_CLOCK_FOUNDED level={level} class={class} piece={} material={} moment_sections={moment_sections} moments_ms={moments_ms} state_sha256={sha} elapsed_ms={}",
         name(class),
         learner.tower.theta.len(),
         started.elapsed().as_millis()
