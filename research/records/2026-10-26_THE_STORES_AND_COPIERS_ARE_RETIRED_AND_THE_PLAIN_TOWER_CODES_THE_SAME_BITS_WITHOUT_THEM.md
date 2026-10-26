@@ -40,7 +40,8 @@ closure; it was cited for a database key, and the atlas filed the bank's rows un
 4. No retired name remains in `crates/`, `tools/` or `docs/atlas/`.
 
 All four hold. The receipts, from the worker's run in the container (base `36b17ebd8`, after
-`0934a25ff`):
+`0934a25ff`); the train and read logs of both are in the
+[receipts](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM_receipts/):
 
 - Train and read logs are equal line for line once `elapsed_ms` and `pass_ms` are masked:
   `TOWER_PASS pass=0 train_bits_a_byte=3.701 dev_bits_a_byte=3.465 dev_regions Q=2.280 P=3.566

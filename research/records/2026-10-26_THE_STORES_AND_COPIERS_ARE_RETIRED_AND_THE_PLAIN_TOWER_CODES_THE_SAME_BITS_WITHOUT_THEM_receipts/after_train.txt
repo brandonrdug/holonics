@@ -1,0 +1,8 @@
+UNIT_READ units=1318 train_bytes=40000 train_units=15316 dev_bytes=9266 dev_units=3541
+TOWER_TRAIN material=277542 streams=4 section=128 sections_a_pass=29 train_bytes=40000 dev_bytes=9266
+TOWER_SECTION pass=0 section=29 bits_a_byte=3.701 deposits=29 halvings=18 elapsed_ms=4049
+TOWER_SWELL pass=0 section=29 L0 x=86897 h=498028 r=283821 a=540085 push=8832476 read=8067268 contact=9651084 return=3169922 lambda=1070393133 L1 x=403183 h=1677812 r=931739 a=475348 push=6573453 read=7232669 contact=8735691 return=4377468 lambda=1069978709 readout=8094864
+TOWER_REALIZATION pass=0 host: one stream a thread on 4 threads
+TOWER_STATE STATE.0 state_bytes=9613757 state_sha256=37901d6487aa5d7f557895e7f644983253a383a636f4f4759504e89b84121775
+TOWER_PASS pass=0 train_bits_a_byte=3.701 dev_bits_a_byte=3.465 dev_regions Q=2.280 P=3.566 N=3.099 M=3.467 deposits=29/29 pass_ms=4364 elapsed_ms=4383 train_code=150339651308 dev_code=33627456105 grain_bits=20
+TOWER_DONE state_bytes=9613757 state_sha256=37901d6487aa5d7f557895e7f644983253a383a636f4f4759504e89b84121775 elapsed_ms=4513
