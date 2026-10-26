@@ -278,7 +278,8 @@ logistic of `W_κ x + b_κ`, the axis `p_t` read as the turn is. As a real `2×2
 past that its in-phase axis boosts and its quadrature is shed, so the mode's phase settles on one of
 two sheets across the pump's axis; on the edge it shears. These are the Swing's three kinds, keyed
 cell by cell. The move's real-linear norm is `|α| + |β| = ρ_t`, so the gated passivity bound holds
-with the same `γ_t`; the norm identity is owed in Lean (#410). The pump opens at zero, so a pumped
+with the same `γ_t`; the norm identity is formal-checked (`HNN/PassiveMode`: `pumped_norm_le`,
+`pumped_norm_attained`, `pumped_split_norm`, `pumped_recursion`; October 26). The pump opens at zero, so a pumped
 tower opens on its turned twin (tested: their codes agree exactly), and its covectors agree with the
 code's difference (tested).
 
