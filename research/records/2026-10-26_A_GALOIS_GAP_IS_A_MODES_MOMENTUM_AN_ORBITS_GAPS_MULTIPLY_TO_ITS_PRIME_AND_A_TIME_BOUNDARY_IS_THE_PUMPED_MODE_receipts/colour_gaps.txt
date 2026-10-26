@@ -1,0 +1,25 @@
+A. orbit energies: the product of a Galois orbit's gaps is Phi_d(1) = exp(Lambda(d))
+   Phi_d(1) = p for d = p^k and 1 otherwise, d <= 20000; rings multiply to m
+   Phi_9(1) = 3  Phi_10(1) = 1  Phi_7(1) = 7  Phi_12(1) = 1
+B. the cycle Laplacian's characteristic polynomial factors over the Galois orbits
+   m = 3..60: char poly = x (x-4)^[2|m] prod psi_d^2; psi_7 = [7, -14, 7, -1]  psi_9 = [3, -9, 6, -1]
+C. x -> u x keeps the ring's adjacency exactly when u = +-1 (mod m)
+   ring 3: 10 is a symmetry
+   ring 9: 10 is a symmetry
+   ring 11: 10 is a symmetry
+   ring 7: 10 is a strain
+   ring 13: 10 is a strain
+   ring 101: 10 is a strain
+D. the characters fixed by the digit move are those of Z/gcd(m, b-1); mirrored, Z/gcd(m, b+1)
+   base 10, ring 63: fixed 9 characters (the digit sum mod 9); ring 77: mirrored 11 (the alternating sum mod 11)
+E. a step in space keeps frequency and power; a step in time keeps wavenumber and action
+   r = Z/Z' = 1/9: alpha, beta = 5/9 4/9 (backward over forward 4/5)
+F. d_mu(x_nu T^{mu nu}) = T^mu_mu + x_nu d_mu T^{mu nu}, signature (-,+,+,+)
+   300 random polynomial tensors; the trace is the source of the dilation current
+G. the zero gas: Stieltjes, the Foster tank's sign, the roots of unity's resultant
+   Res(x^7 - 1, 7x^6) = 823543
+H. Hasse: a_p^2 < 4p for every elliptic curve over F_p, 5 <= p < 70
+   curves checked: 24390
+K. the relaxed Fourier step: the triangle inequality certifies 2^13, the per-mode bound sqrt(2^13 - 1)
+   ratio^2 = 2^26/(2^13 - 1), just above 2^13
+all 153862 checks hold (9062 ms)
