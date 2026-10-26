@@ -17,9 +17,10 @@ case: the heard text's own reading of a proper name, with no list of names.
   in the question, on the read's own cell, on another cell of the question, or in an earlier
   problem; whether the largest share `|a|² ‖w‖²` falls on the name; the opening name cell's rank
   among the window's addresses, beside the chance a uniform rank would give, `1/n` over the
-  window's `n` cells; split by whether the answer opens with the name. Then the bytes of the cells
-  the largest address falls on inside the problem, most frequent first (a cell's bytes run to the
-  next cell with a nonzero address).
+  window's `n` cells; where inside the question the largest address falls, by quarter of the way
+  from the name's cell to the read's; split by whether the answer opens with the name. Then the
+  bytes of the cells the largest address falls on inside the problem, most frequent first (a
+  cell's bytes run to the next cell with a nonzero address).
 """
 import collections
 import re
@@ -102,6 +103,9 @@ def share(heard, text, path):
             t = tally[kind]
             t["reads"] += 1
             t[f"largest address on {where}"] += 1
+            if largest >= name_place:
+                quarter = min(4 * (largest - name_place) // (read_place - name_place), 3) + 1
+                t[f"largest address inside the question, quarter {quarter} of 4"] += 1
             share_on = "the name" if largest_share == name_place or (largest_share >= name_place and holds_name(largest_share)) else "elsewhere"
             t[f"largest share on {share_on}"] += 1
             order = [r[0] for r in sorted(window, key=lambda r: (-r[1], -r[0]))]
