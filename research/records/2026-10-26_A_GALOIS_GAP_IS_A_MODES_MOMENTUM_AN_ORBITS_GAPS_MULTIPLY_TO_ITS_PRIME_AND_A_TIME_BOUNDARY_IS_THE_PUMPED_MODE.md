@@ -418,7 +418,13 @@ To #410:
   `timeBoundary_norm_attained`), and expansion for `r > 1` (`timeBoundary_expands`). (l) is
   discharged;
 - (m) the dilation current: `∂_μ(x_ν T^(μν)) = T^μ_μ + x_ν ∂_μ T^(μν)`, beside the angular current in
-  `Physics/ReceiverStressEnergy`.
+  `Physics/ReceiverStressEnergy`. Formal-checked on October 26 in
+  [`Physics/DilationCurrent`](../../lean/HolonicsResearch/Physics/DilationCurrent.lean)
+  (`dilationDivergence_expansion`, `dilationDivergence_of_conserved`,
+  `dilationDivergence_eq_zero_iff`), with the perfect fluid's trace `−ρ + 3p`
+  (`perfectFluid_stressTrace`), radiation traceless and keeping dilation
+  (`radiation_traceless`, `radiation_dilation_conserved`), dust reading `−ρ` and the charge at rest
+  `D^0 = −x^0 ρ`. (m) is discharged;
 - (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
   `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`. The norm half, `N(1 − ζ_n) = e^(Λ(n))`, is
   `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file. `Tr ζ_n = μ(n)` is
@@ -430,7 +436,14 @@ To #410:
   `prod_divisors_zpow_neg_moebius` and `prod_divisors_zpow_neg_moebius_eq_cyclotomic` in
   `Mathematics/OrbitEnergy`. (n) is discharged;
 - (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
-  substitution's chain.
+  substitution's chain. The two colours' arithmetic is formal-checked on October 26 in
+  [`Mathematics/FibonacciModelSet`](../../lean/HolonicsResearch/Mathematics/FibonacciModelSet.lean):
+  `τⁿ = (L_n + F_n√5)/2` and `τ′ⁿ = (L_n − F_n√5)/2` (`goldenRatio_pow`, `goldenConj_pow`), the
+  norm `L_n² − 5F_n² = 4(−1)ⁿ` (`lucas_sq_sub_five_fib_sq`), the hidden colour contracting
+  (`hidden_shrinks`, `hidden_tendsto_zero`), and the inflation `a ↦ ab`, `b ↦ a` multiplying the
+  chain by its root with `F_(n+1)` long and `F_n` short tiles (`gaps_inflate`, `count_iterate`,
+  `tile_count`), so one word measures `τⁿ⁺¹` seen and `τ′ⁿ⁺¹ → 0` hidden
+  (`hidden_length_tendsto_zero`). The window statement itself stays owed.
 
 Atlas rows:
 - `colour.orbit-energy`;

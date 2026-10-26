@@ -229,7 +229,13 @@ count of what must be supplied.
   - the twisted cycle's eigenvectors and the Fejér identity `|1 − z^n|² = |1 − z|²|Σ_(j<n) z^j|²`;
   - frustration's gauge invariance as a class function;
   - the critically tuned two-step contraction on a quadratic;
-  - the charge threshold's monotone fall in `N`.
+  - the charge threshold's monotone fall in `N`. Formal-checked on October 26 in
+    [`HNN/ChargeThreshold`](../../lean/HolonicsResearch/HNN/ChargeThreshold.lean): a lap certifies
+    exactly the drops above `δ* = 1 − (N|P|²)^(−1/N)` (`certifies_iff_threshold`),
+    `δ* ≤ (ln N + 2 ln|P|)/N` (`chargeThreshold_le`), `δ*` falls strictly in `N` for `|P| ≥ 2`
+    (`charge_threshold_antitone`) and goes to `0` (`chargeThreshold_tendsto_zero`), and at
+    `|P| = 2¹⁰` the least certifying `1/m` is `1/48`, `1/433` and `1/3941` at `N = 10³, 10⁴, 10⁵`
+    (`threshold_thousand`, `threshold_ten_thousand`, `threshold_hundred_thousand`).
 
 ## 5. The recorded failures these choices could repeat
 
