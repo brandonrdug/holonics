@@ -26,6 +26,12 @@ case: the heard text's own reading of a proper name, with no list of names.
   whose answer opens with the name, whether the face at the answer's opening gives the answer's
   first unit the largest mass (rank 0: no class carries more), and its code; a problem whose
   opening is a chunk's first class (coded by no cell) is counted as skipped.
+- `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
+  cell set beside the arrival a blank line's clock holds there (the cell after the last cell whose
+  bytes are a blank line): where the cell's bytes repeat the held arrival's, and elsewhere by how
+  many cells have passed since the reset. For each part: its cells, how many the face gives the
+  largest mass in each file, and the code each file gives it, whole and as the second file's
+  difference from the first, in bits.
 """
 import collections
 import re
@@ -149,6 +155,50 @@ def role(heard, text, paths):
               f"the first unit has the largest mass in {first}; its mean code {bits:.3f} bits")
 
 
+def cells_of(path):
+    cells = {}
+    for line in open(path):
+        place, code, length, rank = line.rstrip("\n").split("\t")
+        cells[int(place)] = (int(code), int(length), int(rank))
+    return cells
+
+
+def held(text, first, second):
+    a, b = cells_of(first), cells_of(second)
+    if a.keys() != b.keys() or any(a[p][1] != b[p][1] for p in a):
+        raise SystemExit("the two CELLS files do not code the same cells")
+    parts = collections.defaultdict(lambda: [0, 0, 0, 0, 0])
+    arrival, since = None, None
+    previous = None
+    for p in sorted(a):
+        piece = text[p:p + a[p][1]]
+        if previous == b"\n\n":
+            arrival, since = piece, 0
+            part = "the held arrival itself"
+        elif arrival is None:
+            part = "before any reset"
+        else:
+            since += 1
+            if piece == arrival:
+                part = "repeats the held arrival"
+            else:
+                part = "elsewhere, " + next(f"{lo}-{hi} cells after the reset" for lo, hi in ((1, 8), (9, 32), (33, 128), (129, 10**9)) if since <= hi)
+        r = parts[part]
+        r[0] += 1
+        r[1] += a[p][2] == 0
+        r[2] += b[p][2] == 0
+        r[3] += a[p][0]
+        r[4] += b[p][0]
+        previous = piece
+    order = ["before any reset", "the held arrival itself", "repeats the held arrival"] + [f"elsewhere, {lo}-{hi} cells after the reset" for lo, hi in ((1, 8), (9, 32), (33, 128), (129, 10**9))]
+    total = [sum(r[i] for r in parts.values()) for i in range(5)]
+    print(f"{first} then {second}: {total[0]} cells; the second codes {(total[4] - total[3]) / (1 << 20):+.1f} bits against the first")
+    for name in order:
+        if name in parts:
+            n, fa, fb, ca, cb = parts[name]
+            print(f"  {name}: {n} cells; largest mass {fa} then {fb}; code {ca / (1 << 20) / n:.3f} then {cb / (1 << 20) / n:.3f} bits a cell; difference {(cb - ca) / (1 << 20):+.1f} bits")
+
+
 def main():
     read = lambda p: open(p, "rb").read()
     command, args = (sys.argv[1], sys.argv[2:]) if len(sys.argv) > 1 else ("", [])
@@ -158,6 +208,8 @@ def main():
         share(read(args[0]), read(args[1]), args[2])
     elif command == "role" and len(args) >= 3:
         role(read(args[0]), read(args[1]), args[2:])
+    elif command == "held" and len(args) == 3:
+        held(read(args[0]), args[1], args[2])
     else:
         raise SystemExit(__doc__)
 

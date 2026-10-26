@@ -331,7 +331,9 @@ foreground shell time went to wait loops.
   per job unless a measured peak shows less is needed; a stop at a copied cap measures the cap, not
   the run. An unmeasured run is planned at one to three minutes, and a longer run is authorized when
   its cost and value are stated and it is scheduled beside the other workers' runs.
-- **Run independent work together.** The host has 24 cores and 32,746,147,840 bytes of memory.
+- **Run independent work together.** The host has 12 physical cores with two threads each
+  (24 hardware threads) and 32,746,147,840 bytes of memory; two 8-thread passes run together slow
+  each other 1.31× (measured October 26), so a time per unit measured alone projects a run alone.
   Independent runs launch together when their declared threads and resident sets fit beside the
   other workers' declared budgets. Each pin declares its thread budget, and a serial schedule of
   independent runs states its reason.

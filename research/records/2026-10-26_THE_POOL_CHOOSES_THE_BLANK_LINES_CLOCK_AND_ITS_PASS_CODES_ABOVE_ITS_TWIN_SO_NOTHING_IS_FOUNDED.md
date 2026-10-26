@@ -113,7 +113,62 @@ next foil then holds `E`. Beside the foils, `found-tower-clock` now prints the r
 (`TOWER_CLOCK_REST`: a face constant along each stream, the common part's likeliest carrier) and
 the shares down the whole ranking (`TOWER_CLOCK_SPREAD`).
 
-## 5. The recorded failures this loop could repeat
+## 5. The foils, read
+
+[measured] Every line is whole in
+[`FOILS.txt`](2026-10-26_THE_POOL_CHOOSES_THE_BLANK_LINES_CLOCK_AND_ITS_PASS_CODES_ABOVE_ITS_TWIN_SO_NOTHING_IS_FOUNDED_receipts/FOILS.txt).
+
+| pass from the founded state | training code above the twin's | held-out code above the twin's |
+|---|---|---|
+| F2, every family but `O` | 0 bits, exactly | 0 bits, exactly |
+| F0, no family | 23,344.5 bits | 779.7 bits |
+| the founded pass, every family with `O` | 153,876.1 bits | 12,813.3 bits |
+| F1, `O` alone | incomplete | incomplete |
+
+- **F2 is the twin.** Its windows equal the twin's from section 32 through 320, and it ends on the
+  twin's two codes. The hold works, and a join held at zero is inert in a learning pass.
+- **F0 is the frozen code.** It is 23,344.5 bits above the twin: what one pass of every family's
+  deposits gains. The founded pass is 130,531.6 bits above F0, so depositing `O` with every other
+  family codes worse than depositing nothing.
+- **F1 is incomplete, twice.**
+  - Beside F0 it stopped at section 96 on its time bound. The host has 12 physical cores with two
+    threads each, and two 8-thread passes slow each other 1.31×.
+  - Alone it stopped at section 320 because its deposits ran away. Its halvings were 0 to 2
+    through section 256, then 24 and 395. Its last window read 2.036 bits a byte with 307 of 320
+    sections deposited, and its first level's face swelled to `h=11,754,389`.
+  - It was not relaunched.
+- **Its excess, window by window.** At sections 32, 64, … 320, `O` alone codes above F0 by +0.025,
+  +0.064, +0.075, +0.051, +0.052, +0.068, +0.044, +0.048, +0.144 and +0.504 bits a byte. The
+  founded pass codes above its twin by +0.042, +0.089, +0.093, +0.067, +0.067, +0.066, +0.051,
+  +0.049, +0.065 and +0.055.
+- **The rest's clock and the spread.**
+  - The rest ranks 541st of 1,177, at 1,612 parts a million, with rank 8. Its printed drop is one
+    unit above its ceiling, within the ceiling's documented release of each of its 8 terms.
+  - The shares at 0, 10, 25, 50, 75, 90 and 100% of the ranking are 1,826, 1,677, 1,652, 1,606,
+    1,526, 1,383 and 11.
+
+[agent-inferred]
+- **The cost is in `O`'s own steps (causes 1 or 3), not in the coupling (cause 2).** Through
+  section 256, `O` alone costs about what `O` costs beside every family. The other families'
+  deposits only keep it from running away. No foil holding `E` is needed.
+- **Most of the top drop is the covector's slow part.**
+  - The rest's face carries nothing but which stream is read. Its 8 encodings are independent, so
+    its drop is `Σ_s n_s ‖μ_s‖²`, the energy of the covector's mean along each stream.
+  - That is 1,612 parts a million, about 270 times the 6 a rank-8 face would carry from a covector
+    with no mean. Half of the pool's clocks carry no more.
+  - The blank line's lead over the rest is 214 parts a million, about 4.5 noise floors at its rank.
+  - A held face is constant over long stretches, so every clock can carry that slow part, whatever
+    class it holds.
+- **What `O`'s steps fit.** They fit each section's share of that slow part and of its noise. Each
+  step lowers the section it was taken on: there is no halving through section 64. The next
+  sections pay for it. The clock's one gain lies where it was built to help, the answer's first unit
+  (−0.461 bits held out), yet its face is added at every cell.
+- **The next read.** Whether the held-out bits are won on the cells that repeat the held arrival
+  and lost on every other cell is read next, from the held-out cells already written. The reader is
+  the observer's `held` mode in `tools/listener/bank_trace.py`. The join's law changes only after
+  that read.
+
+## 6. The recorded failures this loop could repeat
 
 - **A located cause carried unrepaired.** The moments' cause was repaired by the ring's own law
   before the founding was read again. The cost left after it is this loop's subject. It is not given
