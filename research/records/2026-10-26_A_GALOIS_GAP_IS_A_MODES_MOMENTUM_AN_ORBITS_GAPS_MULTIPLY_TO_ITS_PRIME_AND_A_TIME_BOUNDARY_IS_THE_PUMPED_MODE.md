@@ -4,11 +4,13 @@ October 26. Refs #404, #405, #410. **Grade.** Each claim carries one of these gr
 - [owned]: an existing owner states it.
 - [proved-standard]: a classical result, with its source.
 - [proved-derived]: proved here.
-- [checked]: verified by this record's receipt, in integers and fractions only (153,862 checks).
+- [checked]: verified by this record's receipts, in integers and fractions only (153,862 and 30,248
+  checks).
 - [agent-inferred]: a choice or join made here.
 - [interpretation]: a reading across subjects.
 
-The exact receipt is `colour_gaps.py` (parts A to H and K) in
+The exact receipts are `colour_gaps.py` (parts A to H and K) and `colourless_tower.py` (parts P to
+R, for §12) in
 [`…_receipts/`](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE_receipts/RUN.md).
 It continues
 [the generator and the modulator are one move](2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR.md)
@@ -265,7 +267,92 @@ observer-current law `−T:∂u` ([`gr.observer-current`](../../docs/atlas/physi
 of §9 is the one-dimensional case, in which the colours (the zeros) are the poles of the Burgers
 field.
 
-## 12. For Athena: the seeds
+## 12. Colourless is compressible: the trace, the tower of colours and the quasicrystal
+
+Brandon, the same day (paraphrased). He agreed, and asked that we do as much as we can with it.
+- **Compression.** The colourless classes are what can be compressed. What can be abstracted that
+  way does not need all its details, and that saves energy.
+- **Infinitely many colours.** Zeros, primes, and solutions between charts are colours. They are
+  causal strings integrating local interactions along manifolds defined by the gaps in the
+  potentials they themselves define.
+- **Spectra of spectra.** There is recursive induction in spectra of spectra, as in lightning or
+  crystals of crystals: quasicrystals, fractals and tilings.
+- **Pairs of strands.** He asked whether there are only two colours. He thinks of pairs of strands,
+  which make a double helix when joined in pairs, and of coarse graining in which geometry and
+  orientation repeat as an orthogonal staircase or tower.
+
+[checked P; proved-standard] **Two compressions: the trace and the norm.**
+
+```text
+Tr ζ_n^j = c_n(j) = Σ_(d | gcd(n,j)) μ(n/d)·d      (Ramanujan),     Tr ζ_n = μ(n);
+N(1 − ζ_n) = Φ_n(1) = ∏_(d|n) d^(−μ(d)) = e^(Λ(n)).
+```
+
+- **The trace.** It sums the colours: it is the additive abstraction. Divided by the degree, it is
+  the projection onto the colourless part.
+  - Its kernel, the trace-zero part, is the detail: differences that no colourless receiver
+    distinguishes. That is the framework's compression kernel, and the colourless part is what is
+    retained.
+  - An orbit of `[K:F]` colours keeps one coordinate, so it saves a factor `[K:F]`.
+  - A primitive colour of order `n` compresses to `μ(n)`: `±1` when `n` is square-free, and
+    nothing when a prime repeats.
+- **The norm.** It multiplies the colours' gaps: it is the multiplicative abstraction, and it gives
+  `Λ` (§5).
+- **The pair.** `μ` and `Λ` are the two colourless shadows of the cyclotomic tower.
+
+[checked P; proved-standard] **RH as cancellation of compressed colours.** The compressed primitive
+colours of every order up to `N` sum to the Mertens function:
+- `Σ_(n≤N) Tr ζ_n = M(N)`, which is `M(200) = −8` in the receipt. It is also the sum of
+  `e^(2πir)` over the Farey fractions of order `N` in `(0, 1]`.
+- RH holds exactly when `M(N) = O(N^(1/2+ε))` (Littlewood), and its Farey form is Franel–Landau. It
+  is [`rh.prime-simplex-rh-growth`](../../docs/atlas/targets.tsv).
+- [interpretation] RH says the colourless shadows of all the colours cancel down to the square
+  root, as independent signs would: the half again.
+
+[checked Q; owned] **The tower of colours.**
+- **Layers.** The layer from `ℚ(ζ_(p^(k+1)))` down to `ℚ(ζ_(p^k))` is the group `{1 + i·p^k}`. Its
+  trace sends `ω^j` to `p·ω^j` when `p | j`, and to `0` otherwise. So each layer adds `p` colours
+  above every colour, and the trace keeps the old colours and erases the new ones.
+- **The digit's climb.** The digit move climbs the 3-tower as `ord_(3^k)(10) = 3^(k−2)`: each level
+  triples the colours it visits, which is the grain staircase of the last record.
+- **The limit.** The whole `ℤ_p` tower ([`Foundation/IwasawaTower`](../../lean/HolonicsResearch/Foundation/IwasawaTower.lean),
+  [`tower.ramified-layer-reducible`](../../docs/atlas/geometry.tsv)) has infinitely many colours,
+  and each finite stage compresses to the one below: spectra of spectra.
+
+[checked R; proved-standard] **The quasicrystal is a model set in the conjugate colour** (Baake and
+Grimm, *Aperiodic Order*, 2013).
+- **The chain.** The Fibonacci chain is `{m + nτ : m + nτ′ ∈ [−1, τ − 1)}`. Physical space is one
+  colour of `ℤ[τ]`, and the window lives in the other. In the receipt, the 1,086 points in
+  `[0, 1500]` have gaps `τ` and `1` in the order of `a → ab, b → a`.
+- **Inflation.** The substitution matrix has the two colours `τ` and `τ′` as eigenvalues.
+  Inflation boosts the seen colour and contracts the hidden one, `τ′ⁿ = (L_n − F_n√5)/2 → 0` (the
+  Pisot property).
+- **Why the hidden colour compresses.** Its details shrink at every inflation, so it can be held as
+  a window: each inflation is a level of the crystal of crystals.
+- **Its spectrum.** The diffraction is pure point, Bragg peaks indexed by `ℤ[τ]`: a spectrum that is
+  itself a point set.
+
+[proved-standard] **Dyson's quasicrystal** (Dyson, *Birds and Frogs*, 2009). If RH holds, the zeros
+form a one-dimensional quasicrystal: a point set whose Fourier transform is a point measure. The
+explicit formula puts that measure at `±log p^k` with weights `log p·p^(−k/2)`.
+- Zeros and prime powers are each other's spectrum, and §5's orbit energies are the weights.
+- Dyson proposed classifying one-dimensional quasicrystals as a road to RH.
+
+[interpretation] **The double helix.** An orbit of order `d` has `φ(d)` colours, not two, in
+`φ(d)/2` conjugate pairs.
+- Each pair is two strands turning opposite ways, forward and time-reversed (§8), and the pair
+  joined is a real plane: a double helix.
+- Ring 7 is three double helices coupled by the digit move.
+- An off-line zero quartet is two double helices joined by the functional reflection.
+- The tower repeats the pattern at every level, with `p` new strands above each strand.
+
+[interpretation] **Lightning.** Dielectric breakdown grows where the field is strongest
+(growth `∝ |∇φ|^η`; Niemeyer, Pietronero and Wiesmann, 1984), and the field is set by the channel
+already grown. The zero gas of §9 obeys the same self-defined law: each zero moves in the field of
+the gaps the zeros themselves define. That is the precise form of causal strings integrating along
+manifolds defined by the gaps in the potentials they define.
+
+## 13. For Athena: the seeds
 
 [agent-inferred] Each seed is for design to build and test against the fixed acceptance: never-met
 sums right at the equals, against the 8-gram's 34/876 and C's 14/876.
@@ -287,8 +374,16 @@ sums right at the equals, against the 8-gram's 34/876 and C's 14/876.
 5. **Validation.** Every identity here is generated exactly, so a terrain may present it (a terrain
    may generate its truth by exact routines). Athena validates by locating the faces on readings it
    never met, never by carrying an authored answer.
+6. **Compression is a trace.** Retention keeps the colourless part under the group that the
+   admitted future cannot tell apart, and the detail is the trace-zero part. A passage's phrasings
+   are colours of one meaning, and the meaning is their trace.
+7. **The tower is the staircase.** A founding opens a layer of `p` new colours above the colours
+   already held. Until the future needs them, the trace to the layer below is what is retained.
+8. **The quasicrystal navigator.** An inflation by a Pisot unit boosts the seen colour and contracts
+   the hidden one. So the hidden colour is held as a window, never as a store: addressing by
+   geometry, as the store law requires.
 
-## 13. What is not derived
+## 14. What is not derived
 
 - No step here proves RH, Hodge or regularity for Navier–Stokes. The passivity, colourless-class and
   stress readings are interpretations that place the known statements on one picture.
@@ -296,8 +391,9 @@ sums right at the equals, against the 8-gram's 34/876 and C's 14/876.
   measurement.
 - The physical size of the orbit work is not measured on Athena's modes, whose turning is a learned
   phase and not an LC frequency.
+- Seed 6 is a reading. No Galois group acting on a passage's phrasings is constructed.
 
-## 14. The recorded failures this could repeat
+## 15. The recorded failures this could repeat
 
 - **An authored routine standing in for learning.** Seed 1 must be located through the gate. A
   boundary keyed to a named operator is refused.
@@ -306,7 +402,7 @@ sums right at the equals, against the 8-gram's 34/876 and C's 14/876.
 - **An uncertified deposition step.** The time boundary is non-expansive only for `r ≤ 1` (§8).
 - **Bits read as progress.** The acceptance is fixed above.
 
-## 15. Owed
+## 16. Owed
 
 To #410:
 - (j) the orbit energy: `Φ_(p^k)(1) = p`, `Φ_d(1) = 1` otherwise, and `∏_(d|m, d>1) Φ_d(1) = m`;
@@ -315,6 +411,10 @@ To #410:
   its case;
 - (m) the dilation current: `∂_μ(x_ν T^(μν)) = T^μ_μ + x_ν ∂_μ T^(μν)`, beside the angular current in
   `Physics/ReceiverStressEnergy`.
+- (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
+  `p`-tower; `N(1 − ζ_n) = ∏_(d|n) d^(−μ(d))`;
+- (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
+  substitution's chain.
 
 Atlas rows:
 - `colour.orbit-energy`;
@@ -324,4 +424,7 @@ Atlas rows:
 - `wave.time-boundary`;
 - `wave.gap-exchange-mass`;
 - `gr.dilation-current`;
-- `hodge.colourless-classes-weil`.
+- `hodge.colourless-classes-weil`;
+- `colour.trace-compression`;
+- `colour.colour-tower`;
+- `quasi.fibonacci-model-set`.
