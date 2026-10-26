@@ -6,13 +6,17 @@ research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_
 
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN DIR [DIR ...]
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN pair DIR_A DIR_B
+    python3 -I tools/gsm8k/written_rules.py HELD TRAIN heard DIR [DIR ...]
 
 HELD is the held-out text and TRAIN the training text, each a run of problems separated by a blank
 line (a question line, then its answer lines). Each DIR holds `FREE.tsv` and `MARKS.tsv` as
 `read-unit-tower-written` or `ngram_release.py` writes them; the word `reference` reads the
 held-out answers themselves. One line is printed per DIR. With `pair`, a `PAIRED` line follows the
 two DIRs' lines: on met and on never-met calculations, how many only A writes right at the equals,
-how many only B, and how many both, so two releases are compared calculation by calculation.
+how many only B, and how many both, so two releases are compared calculation by calculation. With
+`heard`, a `HEARD` line follows each DIR's line: the calculations at the equals binned by how many
+times TRAIN holds their `<<expression=c>>` whole (0, 1, 2-3, 4-7, 8-15, 16 or more), right of each
+bin. Read on training problems, a calculation's own place in TRAIN is one of its hearings.
 
 The rules, fixed before any release was read:
 
@@ -46,6 +50,8 @@ NUMBER_WORDS = {
 WORD = re.compile(r"[a-z]+")
 NUMERAL = re.compile(r"\d[\d,]*\.?\d*|\.\d+")
 CALC = re.compile(r"<<([^<>=]*)=([^<>]*)>>")
+# A hearing count's bin by its bit length: 0, 1, 2-3, 4-7, 8-15, and 16 or more (clamped at 16).
+HEARD_BINS = ["0", "1", "2-3", "4-7", "8-15", "16+"]
 
 
 def problems_of(text):
@@ -157,14 +163,15 @@ def mark_reads(problems, marks, train):
         reference = [m for m in CALC.finditer(answer)]
         e = expression.decode()
         c = next(m.group(2) for m in reference if m.group(1) == e)
-        kind = "met" if f"<<{e}={c}>>" in train else "never"
+        heard = train.count(f"<<{e}={c}>>")
+        kind = "met" if heard else "never"
         v = value(e)
         end = release.find(b">>")
         w = number(release[:end].decode("utf-8", "replace")) if end >= 0 else None
         good = v is not None and w is not None and v == w
         seen[kind][0] += 1
         seen[kind][1] += good
-        each.append((kind, good))
+        each.append((kind, good, heard))
         op = re.fullmatch(r"\d*\.?\d+([+\-*/])\d*\.?\d+", e.replace(" ", ""))
         if op:
             by_op[op.group(1), "n"] += 1
@@ -175,8 +182,8 @@ def mark_reads(problems, marks, train):
 def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
-    pair = sys.argv[3] == "pair"
-    dirs = sys.argv[4:] if pair else sys.argv[3:]
+    pair, heard = sys.argv[3] == "pair", sys.argv[3] == "heard"
+    dirs = sys.argv[4:] if pair or heard else sys.argv[3:]
     if pair and (len(dirs) != 2 or "reference" in dirs):
         raise SystemExit("pair reads two release directories")
     goods = []
@@ -210,8 +217,15 @@ def main():
                 f"never_met={seen['never'][1]}/{seen['never'][0]} binary {ops}"
             )
         print(line)
+        if heard and marks is not None:
+            bins = Counter()
+            for _, good, k in each:
+                b = HEARD_BINS[min(k, 16).bit_length()]
+                bins[b, "n"] += 1
+                bins[b, "right"] += good
+            print(f"HEARD dir={d} " + " ".join(f"{b}={bins[b, 'right']}/{bins[b, 'n']}" for b in HEARD_BINS))
     if pair:
-        counts = Counter((kind, a, b) for (kind, a), (_, b) in zip(*goods))
+        counts = Counter((kind, a, b) for (kind, a, _), (_, b, _) in zip(*goods))
         print(
             "PAIRED " + " ".join(
                 f"{kind}_only_a={counts[kind, True, False]} {kind}_only_b={counts[kind, False, True]} "

@@ -84,6 +84,21 @@ class ExteriorTools(unittest.TestCase):
         self.assertIsNone(rules.value("8(2/3)"))
         self.assertIsNone(rules.value("2**3"))
 
+    def test_written_rules_bin_each_calculation_by_its_hearings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held = root / "held.txt"
+            held.write_bytes(b"Two and three?\nSum <<2+3=5>>5 then <<5*4=20>>20\n\n")
+            train = root / "train.txt"
+            train.write_bytes(b"Q?\nA <<2+3=5>>5\n\nQ?\nB <<2+3=5>>5 <<5*4=21>>\n\n")
+            release = root / "release"
+            release.mkdir()
+            (release / "FREE.tsv").write_text("0\tSum\\n\n")
+            (release / "MARKS.tsv").write_text("0\t0\t2+3\t5>>\n0\t1\t5*4\t21>>\n")
+            out = run("written_rules.py", held, train, "heard", release).splitlines()
+            self.assertIn("met=1/1 never_met=0/1", out[0])
+            self.assertEqual(out[1], f"HEARD dir={release} 0=0/1 1=0/0 2-3=1/1 4-7=0/0 8-15=0/0 16+=0/0")
+
 
 if __name__ == "__main__":
     unittest.main()
