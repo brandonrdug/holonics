@@ -1,6 +1,7 @@
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
-import Mathlib.NumberTheory.VonMangoldt
+import Mathlib.NumberTheory.ArithmeticFunction.VonMangoldt
+import Mathlib.RingTheory.RootsOfUnity.Complex
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 import Mathlib.Tactic
 
@@ -35,7 +36,7 @@ theorem cyclotomic_eval_one (R : Type*) [CommRing R] {n : ℕ} (hn : 2 ≤ n) :
   split_ifs with h
   · obtain ⟨p, k, hp, hk, rfl⟩ := h
     have hp' : p.Prime := Nat.prime_iff.mpr hp
-    haveI := Fact.mk hp'
+    have := Fact.mk hp'
     obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hk.ne'
     rw [eval_one_cyclotomic_prime_pow, hp'.pow_minFac (Nat.succ_ne_zero j)]
   · have hnp : ∀ {p : ℕ}, p.Prime → ∀ k : ℕ, p ^ k ≠ n := by
