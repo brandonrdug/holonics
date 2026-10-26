@@ -213,10 +213,10 @@ impl Tower {
     /// `2026-10-26_THE_THIRD_LAP_FOUNDS_THE_CLOCK_AFTER_EQUALS_AND_ITS_PASS_LOWERS_THE_ROLE_FROM_53_TO_43.md`
     /// §4] **The copies' reading**: the frozen tower reads `classes` from the state, and each cell's
     /// index, face (the masses of the class that arrives next), each clock's held class (the
-    /// alphabet where it holds nothing) and its copy's raise `⟨r_A, x⟩ + b_A` on the logit's
-    /// `2^(−16)` are handed to `each`. A reading beside the code: the tower is not moved. Refused
-    /// without a clock.
-    pub fn read_clocks(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &TowerFace, &[usize], &[Option<i64>]) -> Result<()>) -> Result<()> {
+    /// alphabet where it holds nothing), its copy's raise `⟨r_A, x⟩ + b_A` on the logit's
+    /// `2^(−16)` and the top face `x` the readout and the copies read are handed to `each`. A
+    /// reading beside the code: the tower is not moved. Refused without a clock.
+    pub fn read_clocks(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &TowerFace, &[usize], &[Option<i64>], &[i32]) -> Result<()>) -> Result<()> {
         if self.clock.is_none() {
             return refuse("a copies' reading needs a clock");
         }
@@ -225,7 +225,7 @@ impl Tower {
             let cell = self.step(state, classes[i], &reaches)?;
             let held = cell.clock.as_deref().expect("a clocked tower's cell holds its clocks");
             let raises = self.clock_raises(&reaches.clock, held, &cell.top)?;
-            each(i, &cell.face, held, &raises)?;
+            each(i, &cell.face, held, &raises, &cell.top)?;
         }
         Ok(())
     }

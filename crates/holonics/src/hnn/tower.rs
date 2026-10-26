@@ -1288,6 +1288,12 @@ impl TowerFace {
         face_code(self.masses[class], self.total)
     }
 
+    /// The comparison's descent covector against `target`, `p̂ − [· = target]` on `2^(−24)`: the
+    /// one law the reverse scan reads ([`covector`]), handed to an exterior reading.
+    pub fn covector(&self, target: usize) -> Vec<i64> {
+        covector(self, target)
+    }
+
     /// The class's rank on the face: how many classes carry more mass than it (0 when none does).
     pub fn rank(&self, class: usize) -> usize {
         let m = self.masses[class];
@@ -2989,11 +2995,7 @@ impl Tower {
                 continue;
             }
             for v in &mut g[start..start + len] {
-                *v = if grain == MATERIAL_BITS {
-                    release(*v, COVECTOR_BITS + FACE_BITS - STEP_BITS)
-                } else {
-                    *v << (STEP_BITS - COVECTOR_BITS)
-                };
+                *v = on_step_grain(grain, *v);
             }
         }
     }
@@ -3289,6 +3291,25 @@ fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     product(&nm) * product(&ot) > product(&om) * product(&nt)
 }
 
+/// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material
+/// family's `Σ δz x` on `2^(−40)` is released, a face family's `Σ δz` on `2^(−24)` raised. The moves
+/// step through their chart ([`Tower::to_move_chart`]) and are not read here.
+fn on_step_grain(grain: u32, v: i128) -> i128 {
+    if grain == MATERIAL_BITS {
+        release(v, COVECTOR_BITS + FACE_BITS - STEP_BITS)
+    } else {
+        v << (STEP_BITS - COVECTOR_BITS)
+    }
+}
+
+/// The deposit's step for one entry: its first moment `m` (on `2^(−32)`) over the root of its
+/// second `v`, at the rate `2^(−rate)`, on its family's own grain:
+/// `((m ≪ grain) ≫ rate) / (⌊√v⌋ + 1)`, before the certificate halves it.
+fn deposit_step(m: i128, v: i128, grain: u32, rate: u32) -> i128 {
+    let root = (v.max(0) as u128).isqrt() as i128 + 1;
+    ((m << grain) >> rate) / root
+}
+
 /// A moment moved toward its input at the rate `2^(−rate)`: `m + release(g − m, rate)`, and at
 /// least one grain when that release rounds to zero. Released to the nearest grain alone, a moment
 /// within `2^(rate−1)` grains of its input never reaches it, so a contact that stops conducting
@@ -3428,9 +3449,7 @@ impl TowerLearner {
         let mut step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.tower.layout.families {
             for i in start..start + len {
-                let root = (self.second[i].max(0) as u128).isqrt() as i128 + 1;
-                let num = self.first[i] << grain;
-                let q = (num >> self.rate_bits) / root;
+                let q = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
                 step[i] = if self.held.iter().any(|h| h.contains(&i)) { 0 } else { q };
             }
         }
@@ -3530,6 +3549,40 @@ impl TowerLearner {
             self.second[k] = div_nearest(squares[i], n);
         }
         Ok(sections.len())
+    }
+
+    /// [agent-inferred, October 26; record
+    /// `2026-10-26_THE_PASS_MOVES_THE_NAMES_MASS_AWAY_FROM_HOW_OFTEN_THE_ANSWER_OPENS_WITH_IT_SO_EACH_PLACES_PULL_IS_READ_THROUGH_THE_STEP.md`
+    /// §3] **The deposit's step for a declared covector**: the step the section's deposit takes at
+    /// `start..start + g.len()` were `g` its first moment, under the learner's second moments and
+    /// rate ([`deposit_step`]). `g` is on each family's natural grain (a material family's
+    /// `Σ δz x` on `2^(−40)`, a face family's `Σ δz` on `2^(−24)`); the step is on the family's own
+    /// grain, before the certificate. A reading: the learner is not moved. A pass's steps sum to
+    /// the step of its summed covector to first order while the second moments hold, so the
+    /// exterior reads which places' covectors a pass deposits along.
+    pub fn step_for(&self, start: usize, g: &[i128]) -> Result<Vec<i128>> {
+        let end = start + g.len();
+        if end > self.tower.theta.len() {
+            return refuse("a step is read on the material");
+        }
+        let mut step = vec![0i128; g.len()];
+        for &(fs, len, grain) in &self.tower.layout.families {
+            let (lo, hi) = (fs.max(start), (fs + len).min(end));
+            if lo >= hi {
+                continue;
+            }
+            if grain == MOVE_BITS {
+                return refuse("a move steps through its chart, not read by a declared covector");
+            }
+            for i in lo..hi {
+                let m = on_step_grain(grain, g[i - start]);
+                if m.checked_mul(1i128 << grain).is_none() {
+                    return refuse("a declared covector outgrew the step's 128-bit carrier");
+                }
+                step[i - start] = deposit_step(m, self.second[i], grain, self.rate_bits);
+            }
+        }
+        Ok(step)
     }
 
     /// The learner as text: the tower, then the moments.
@@ -5315,13 +5368,13 @@ mod tests {
         let mut tower = tiny_clocked(false, true);
         let forward = tower.forward(&mut tower.rest(), &classes, &tower.reaches()).expect("forward");
         let mut read = Vec::new();
-        tower.read_clocks(&mut tower.rest(), &classes, |i, face, held, raises| {
-            read.push((i, face.clone(), held.to_vec(), raises.to_vec()));
+        tower.read_clocks(&mut tower.rest(), &classes, |i, face, held, raises, top| {
+            read.push((i, face.clone(), held.to_vec(), raises.to_vec(), top.to_vec()));
             Ok(())
         }).expect("read");
         assert_eq!(read.len(), forward.len());
-        for ((i, face, held, raises), cell) in read.iter().zip(&forward) {
-            assert_eq!((face, Some(held)), (&cell.face, cell.clock.as_ref()), "cell {i}");
+        for ((i, face, held, raises, top), cell) in read.iter().zip(&forward) {
+            assert_eq!((face, Some(held), top), (&cell.face, cell.clock.as_ref(), &cell.top), "cell {i}");
             assert!(held.iter().zip(raises).all(|(&h, r)| r.is_some() == (h < tower.declaration.alphabet)));
         }
         // The rest's clock holds from the first cell; the clock of 2 holds nothing before 2 arrives.
@@ -5336,13 +5389,13 @@ mod tests {
         }
         let (biases, a) = ([tower.theta[join.start + w] as i64, tower.theta[join.start + 2 * w + 1] as i64], tower.declaration.alphabet);
         assert!(biases.iter().all(|&b| b != 0));
-        tower.read_clocks(&mut tower.rest(), &classes, |_, _, held, raises| {
+        tower.read_clocks(&mut tower.rest(), &classes, |_, _, held, raises, _| {
             for (c, (&h, r)) in held.iter().zip(raises).enumerate() {
                 assert_eq!(*r, (h < a).then_some(biases[c]));
             }
             Ok(())
         }).expect("read");
-        assert!(tiny_turning(2, true, true, false).read_clocks(&mut tiny_turning(2, true, true, false).rest(), &classes, |_, _, _, _| Ok(())).is_err());
+        assert!(tiny_turning(2, true, true, false).read_clocks(&mut tiny_turning(2, true, true, false).rest(), &classes, |_, _, _, _, _| Ok(())).is_err());
     }
 
     #[test]
@@ -5444,6 +5497,82 @@ mod tests {
         let drops = pool.drops().expect("drops");
         assert_eq!(drops.len(), 5);
         assert!(drops.windows(2).all(|p| !p[1].exceeds(&p[0])));
+    }
+
+    /// The step read for a declared covector is the deposit's (`TowerLearner::step_for`): a fresh
+    /// learner's first section opens its moments on the section's own covector, so the step read
+    /// for that covector on the clocks' copies and the readout is the step the section deposited
+    /// there, under the halvings its certificate took. A move's family is refused.
+    #[test]
+    fn the_step_read_for_a_sections_covector_is_the_step_it_deposits() {
+        let tower = tiny_clocked(false, true);
+        let classes = clocked_passage();
+        let mut s = tower.rest();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        let g = tower.reverse(&tower.rest(), &cells, &classes, None).expect("reverse");
+        let mut learner = TowerLearner::new(tower.clone(), 7);
+        let receipt = learner.section(&mut [tower.rest()], &[&classes]).expect("section");
+        assert!(receipt.deposited);
+        for range in [tower.clock_join().expect("a clock"), tower.readout_family()] {
+            let step = learner.step_for(range.start, &g[range.clone()]).expect("step");
+            let moved: Vec<i128> = range.clone().map(|i| tower.theta[i] as i128 - learner.tower.theta[i] as i128).collect();
+            assert!(step.iter().any(|&v| v != 0));
+            assert_eq!(step.iter().map(|&v| release(v, receipt.halvings)).collect::<Vec<_>>(), moved);
+        }
+        let mv = tower.layout.levels[0].move_re;
+        assert!(learner.step_for(mv, &g[mv..mv + 1]).is_err());
+        assert!(learner.step_for(tower.theta.len(), &[0]).is_err());
+    }
+
+    /// The first-order reading an exterior reader takes through the step
+    /// (`read-tower-clock-covectors`): when the readout and the copies move by the learner's step of
+    /// a covector `G`, `F = Σ_t log₂ p̂_t(n)` changes by `⟨Y, step(G)⟩`, `Y = Σ_t δz_t^(n) ⊗ (x_t, 1)`
+    /// the covector toward `n`, on `2^(−64)` bits (a row's step on `2^(−24)` against `Y` on
+    /// `2^(−40)`; a bias's on `2^(−16)` against `Σ δz` on `2^(−24)`, raised by 24). The top faces do
+    /// not move, so the change is the faces' alone, and a step taken at `2^(−k)` of its size changes
+    /// `F` by `2^(−k)` of the reading to first order.
+    #[test]
+    fn the_step_moves_a_names_log_mass_as_its_first_order_reading_says() {
+        let tower = tiny_clocked(false, true);
+        let classes = clocked_passage();
+        let mut learner = TowerLearner::new(tower.clone(), 7);
+        learner.section(&mut [tower.rest()], &[&classes]).expect("section");
+        let tower = learner.tower.clone();
+        let (a, w, name) = (tower.declaration.alphabet, tower.declaration.width, 1usize);
+        let cells = tower.forward(&mut tower.rest(), &classes, &tower.reaches()).expect("forward");
+        let g = tower.reverse(&tower.rest(), &cells, &classes, None).expect("reverse");
+        let (ro, cj) = (tower.readout_family(), tower.clock_join().expect("a clock"));
+        let (mut y_ro, mut y_cp) = (vec![0i128; ro.len()], vec![0i128; cj.len()]);
+        for cell in &cells {
+            let dn = cell.face.covector(name);
+            for k in 0..a {
+                for j in 0..w {
+                    y_ro[k * w + j] += dn[k] as i128 * cell.top[j] as i128;
+                }
+                y_ro[a * w + k] += dn[k] as i128;
+            }
+            for (c, &h) in cell.clock.as_ref().expect("held").iter().enumerate().filter(|(_, h)| **h < a) {
+                for j in 0..w {
+                    y_cp[c * (w + 1) + j] += dn[h] as i128 * cell.top[j] as i128;
+                }
+                y_cp[c * (w + 1) + w] += dn[h] as i128;
+            }
+        }
+        let (s_ro, s_cp) = (learner.step_for(ro.start, &g[ro.clone()]).expect("step"), learner.step_for(cj.start, &g[cj.clone()]).expect("step"));
+        let reading = |s: &[i128], y: &[i128], bias: &dyn Fn(usize) -> bool| -> i128 { s.iter().zip(y).enumerate().map(|(i, (u, v))| if bias(i) { (u * v) << 24 } else { u * v }).sum() };
+        let predicted = reading(&s_ro, &y_ro, &|i| i >= a * w) + reading(&s_cp, &y_cp, &|i| i % (w + 1) == w);
+        let f = |t: &Tower| -> i64 { -t.forward(&mut t.rest(), &classes, &t.reaches()).expect("forward").iter().map(|c| c.face.code(name)).sum::<i64>() };
+        for k in [3u32, 5] {
+            let mut moved = tower.clone();
+            for (i, s) in ro.clone().zip(&s_ro).chain(cj.clone().zip(&s_cp)) {
+                moved.theta[i] -= release(*s, k) as i32;
+            }
+            // F on 2^(−20) bits, against the reading released from 2^(−64) and by k.
+            let (actual, expected) = (f(&moved) - f(&tower), release(predicted, 44 + k) as i64);
+            assert!(expected.abs() > 1 << 12, "the reading moves F at k = {k}: {expected}");
+            // Measured: k = 3 moved F by −53,530 against −53,351, k = 5 by −13,178 against −13,338.
+            assert!((actual - expected).abs() * 32 < expected.abs(), "k = {k}: F moved {actual}, the reading says {expected}");
+        }
     }
 
     /// A founded clock's copy opens its moments on its passage, as the ring's founded families do

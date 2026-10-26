@@ -1,0 +1,133 @@
+# The build
+
+RUN_RECEIPT exit=0 wall_s=118.8 peak_rss_kib=3279548 user_s=191.9
+
+# The copies on the training text, lapD8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=21337 row_square=878974815077695 reach=9555400
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=37441 row_square=984173709392389 reach=10715167
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/calib/lapD8.train.copies elapsed_ms=37552
+RUN_RECEIPT exit=0 wall_s=37.6 peak_rss_kib=108172 user_s=293.6
+
+# lap3T8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29362 row_square=944665327659282 reach=9865444
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=52442 row_square=1063990194873430 reach=11353193
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/calib/lap3T8.train.copies elapsed_ms=37518
+RUN_RECEIPT exit=0 wall_s=37.5 peak_rss_kib=106516 user_s=293.8
+
+# lap3D8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29411 row_square=923793084376303 reach=9059991
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=51847 row_square=1140368517210452 reach=12192171
+TOWER_CLOCK_COPY clock=2 class=61 piece="=" bias=2374 row_square=320264632300096 reach=6999250
+TOWER_CLOCK_CELLS clocks=3 streams=8 requests=4524 read=4524 skipped=0 out=role_clock/calib/lap3D8.train.copies elapsed_ms=37618
+RUN_RECEIPT exit=0 wall_s=37.6 peak_rss_kib=106792 user_s=293.8
+
+# The copies held out, lapD8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=21337 row_square=878974815077695 reach=9555400
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=37441 row_square=984173709392389 reach=10715167
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=421 read=421 skipped=0 out=role_clock/calib/lapD8.dev.copies elapsed_ms=4293
+RUN_RECEIPT exit=0 wall_s=4.3 peak_rss_kib=35108 user_s=33.4
+
+# lap3T8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29362 row_square=944665327659282 reach=9865444
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=52442 row_square=1063990194873430 reach=11353193
+TOWER_CLOCK_CELLS clocks=2 streams=8 requests=421 read=421 skipped=0 out=role_clock/calib/lap3T8.dev.copies elapsed_ms=4297
+RUN_RECEIPT exit=0 wall_s=4.3 peak_rss_kib=34400 user_s=33.4
+
+# lap3D8
+
+TOWER_CLOCK_COPY clock=0 class=335 piece="any " bias=29411 row_square=923793084376303 reach=9059991
+TOWER_CLOCK_COPY clock=1 class=313 piece="\n\n" bias=51847 row_square=1140368517210452 reach=12192171
+TOWER_CLOCK_COPY clock=2 class=61 piece="=" bias=2374 row_square=320264632300096 reach=6999250
+TOWER_CLOCK_CELLS clocks=3 streams=8 requests=421 read=421 skipped=0 out=role_clock/calib/lap3D8.dev.copies elapsed_ms=4313
+RUN_RECEIPT exit=0 wall_s=4.3 peak_rss_kib=34120 user_s=33.4
+
+# The observer on the training text (the training text read as both the heard and the read text)
+
+role_clock/calib/lapD8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 695
+  means over the 1074: margin over the rival +0.417 bits = readout -3.865 + raise on the first unit +4.289 − raise on the rival +0.008
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 369, b'#### ' 6, b'If ' 3, b'x' 1
+  every named answer's opening: 4520 read, 4 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 906.6 (its own deviation 25.3); the answer opens with it in 1118
+    by the mass: [0.0,0.1) 1232: mass 0.051, opens 0.185; [0.1,0.2) 1313: mass 0.149, opens 0.241; [0.2,0.3) 992: mass 0.247, opens 0.301; [0.3,0.4) 552: mass 0.345, opens 0.297; [0.4,0.5) 254: mass 0.444, opens 0.268; [0.5,0.7) 172: mass 0.560, opens 0.250; [0.7,1.0) 5: mass 0.722, opens 0.000
+    the unit carries the largest mass where the answer opens otherwise in 1859
+    the answer's first unit's mean code 4.553 bits
+    the answers opening otherwise open with: b'The ' 584, b'First ' 383, b'He ' 375, b'If ' 189, b'Th' 170, b'She ' 131, b'A' 129, b'F' 127
+role_clock/calib/lap3T8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 561
+  means over the 1074: margin over the rival -0.063 bits = readout -4.066 + raise on the first unit +4.009 − raise on the rival +0.007
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 477, b'If ' 26, b'#### ' 5, b'D' 1, b'M' 1, b'T' 1, b'Then ' 1, b'F' 1
+  beside the file before, over the 530 it kept: margin -0.424 = readout -0.112 + raise on the first unit -0.321 − raise on the rival -0.008
+  beside the file before, over the 165 it lost: margin -1.163 = readout -0.796 + raise on the first unit -0.348 − raise on the rival +0.019
+  every named answer's opening: 4520 read, 4 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 750.4 (its own deviation 23.6); the answer opens with it in 1118
+    by the mass: [0.0,0.1) 1565: mass 0.051, opens 0.188; [0.1,0.2) 1534: mass 0.146, opens 0.262; [0.2,0.3) 774: mass 0.246, opens 0.315; [0.3,0.4) 422: mass 0.342, opens 0.296; [0.4,0.5) 146: mass 0.444, opens 0.253; [0.5,0.7) 76: mass 0.575, opens 0.197; [0.7,1.0) 3: mass 0.755, opens 0.333
+    the unit carries the largest mass where the answer opens otherwise in 1437
+    the answer's first unit's mean code 4.598 bits
+    the answers opening otherwise open with: b'The ' 584, b'First ' 383, b'He ' 375, b'If ' 189, b'Th' 170, b'She ' 131, b'A' 129, b'F' 127
+    beside the file before: the first unit's mean code changes by +0.045 bits over the 4520 read in both
+role_clock/calib/lap3D8.train.copies: 1074 named answers opening with the name, 1074 read; the first unit has the largest mass in 599
+  means over the 1074: margin over the rival -0.047 bits = readout -4.039 + raise on the first unit +3.999 − raise on the rival +0.007
+  clocks holding the first unit: [1] in 1072, none in 2
+  clocks holding the rival: none in 1071, [0] in 2, [1] in 1
+  the rival where it carries more, most frequent first: b'The ' 461, b'#### ' 7, b'If ' 2, b'He ' 2, b'U' 1, b'Then ' 1, b'H' 1
+  beside the file before, over the 490 it kept: margin -0.056 = readout -0.032 + raise on the first unit -0.016 − raise on the rival +0.009
+  beside the file before, over the 71 it lost: margin -1.086 = readout -0.998 + raise on the first unit -0.088 − raise on the rival +0.000
+  every named answer's opening: 4520 read, 4 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 754.5 (its own deviation 23.7); the answer opens with it in 1118
+    by the mass: [0.0,0.1) 1461: mass 0.048, opens 0.192; [0.1,0.2) 1650: mass 0.147, opens 0.255; [0.2,0.3) 791: mass 0.243, opens 0.332; [0.3,0.4) 349: mass 0.343, opens 0.284; [0.4,0.5) 181: mass 0.448, opens 0.199; [0.5,0.7) 88: mass 0.543, opens 0.205
+    the unit carries the largest mass where the answer opens otherwise in 1539
+    the answer's first unit's mean code 4.615 bits
+    the answers opening otherwise open with: b'The ' 584, b'First ' 383, b'He ' 375, b'If ' 189, b'Th' 170, b'She ' 131, b'A' 129, b'F' 127
+    beside the file before: the first unit's mean code changes by +0.017 bits over the 4520 read in both
+RUN_RECEIPT exit=0 wall_s=0.3 peak_rss_kib=50316 user_s=0.3
+
+# The observer held out
+
+role_clock/calib/lapD8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 53
+  means over the 97: margin over the rival -0.010 bits = readout -4.269 + raise on the first unit +4.260 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 44
+  every named answer's opening: 419 read, 2 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 79.7 (its own deviation 7.6); the answer opens with it in 102
+    by the mass: [0.0,0.1) 124: mass 0.045, opens 0.218; [0.1,0.2) 115: mass 0.152, opens 0.278; [0.2,0.3) 104: mass 0.246, opens 0.269; [0.3,0.4) 41: mass 0.343, opens 0.244; [0.4,0.5) 22: mass 0.446, opens 0.182; [0.5,0.7) 13: mass 0.551, opens 0.077
+    the unit carries the largest mass where the answer opens otherwise in 179
+    the answer's first unit's mean code 4.570 bits
+    the answers opening otherwise open with: b'The ' 63, b'He ' 34, b'First ' 28, b'Th' 22, b'A' 19, b'H' 15, b'F' 13, b'Let ' 13
+role_clock/calib/lap3T8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 37
+  means over the 97: margin over the rival -0.573 bits = readout -4.542 + raise on the first unit +3.969 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 60
+  beside the file before, over the 36 it kept: margin -0.599 = readout -0.208 + raise on the first unit -0.391 − raise on the rival +0.000
+  beside the file before, over the 17 it lost: margin -1.098 = readout -0.855 + raise on the first unit -0.244 − raise on the rival +0.000
+  every named answer's opening: 419 read, 2 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 62.7 (its own deviation 6.9); the answer opens with it in 102
+    by the mass: [0.0,0.1) 160: mass 0.049, opens 0.231; [0.1,0.2) 145: mass 0.147, opens 0.290; [0.2,0.3) 71: mass 0.237, opens 0.254; [0.3,0.4) 32: mass 0.347, opens 0.094; [0.4,0.5) 5: mass 0.416, opens 0.400; [0.5,0.7) 6: mass 0.583, opens 0.000
+    the unit carries the largest mass where the answer opens otherwise in 134
+    the answer's first unit's mean code 4.609 bits
+    the answers opening otherwise open with: b'The ' 63, b'He ' 34, b'First ' 28, b'Th' 22, b'A' 19, b'H' 15, b'F' 13, b'Let ' 13
+    beside the file before: the first unit's mean code changes by +0.039 bits over the 419 read in both
+role_clock/calib/lap3D8.dev.copies: 97 named answers opening with the name, 97 read; the first unit has the largest mass in 43
+  means over the 97: margin over the rival -0.337 bits = readout -4.315 + raise on the first unit +3.978 − raise on the rival +0.000
+  clocks holding the first unit: [1] in 97
+  clocks holding the rival: none in 97
+  the rival where it carries more, most frequent first: b'The ' 53, b'#### ' 1
+  beside the file before, over the 33 it kept: margin +0.367 = readout +0.289 + raise on the first unit +0.078 − raise on the rival +0.000
+  beside the file before, over the 4 it lost: margin -0.934 = readout -0.766 + raise on the first unit -0.168 − raise on the rival +0.000
+  every named answer's opening: 419 read, 2 with no clock holding the question's first unit
+    the face's mass on the question's first unit sums to 64.8 (its own deviation 7.0); the answer opens with it in 102
+    by the mass: [0.0,0.1) 147: mass 0.046, opens 0.259; [0.1,0.2) 158: mass 0.148, opens 0.215; [0.2,0.3) 71: mass 0.246, opens 0.310; [0.3,0.4) 25: mass 0.334, opens 0.200; [0.4,0.5) 8: mass 0.438, opens 0.250; [0.5,0.7) 10: mass 0.549, opens 0.100
+    the unit carries the largest mass where the answer opens otherwise in 148
+    the answer's first unit's mean code 4.664 bits
+    the answers opening otherwise open with: b'The ' 63, b'He ' 34, b'First ' 28, b'Th' 22, b'A' 19, b'H' 15, b'F' 13, b'Let ' 13
+    beside the file before: the first unit's mean code changes by +0.056 bits over the 419 read in both
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=46904 user_s=0.1
