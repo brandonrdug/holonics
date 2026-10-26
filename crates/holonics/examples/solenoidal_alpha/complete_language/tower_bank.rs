@@ -18,13 +18,13 @@
 //!   reads every held-out section from rest: at its marked cells, the code and how many faces name
 //!   the class that arrives first.
 //!
-//! - `found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT`
-//!   reads the pool of every class's reset clock (`hnn::tower::clock`) over the training passage,
-//!   frozen, in the training pass's partition (`STREAMS` streams from rest, sections of `SECTION`
-//!   cells), prints the sixteen largest drops, the rest's clock and the shares down the whole
-//!   ranking, joins the largest's clock at `LEVEL`, opens the join's moments on the same sections
-//!   (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined
-//!   on is its twin; the founding is certified by one training pass from each, its code below the
+//! - `found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION OUT` reads
+//!   the pool of every class's reset clock (`hnn::tower::clock`) at the copy's port over the
+//!   training passage, frozen, in the training pass's partition (`STREAMS` streams from rest,
+//!   sections of `SECTION` cells), prints the sixteen largest drops, the rest's clock and the shares
+//!   down the whole ranking, joins the largest's clock, opens its copy's moments on the same sections
+//!   (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined on
+//!   is its twin; the founding is certified by one training pass from each, its code below the
 //!   twin's by more than `log₂` of the pool.
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
@@ -121,23 +121,26 @@ pub(super) fn join(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [agent-inferred, October 26; record
+/// [agent-inferred, October 26; records
 /// `2026-10-26_THE_ROLE_KEY_IS_A_RESET_CLOCK_THE_POOL_FOUNDS_AND_ITS_ACCEPTANCE_IS_FIXED_BEFORE_THE_BUILD.md`
-/// §§2–4] The reset clocks' pool over the training passage and the founding of its largest drop.
-/// Each stream reads its share of the passage from rest in the training pass's sections
-/// (`Tower::read_join_covectors`), so every cell's join covector is the one that pass's reverse reads;
-/// the streams' pools add exactly. The clock founded is the largest drop's, whatever class it is.
+/// §§2–4 and
+/// `2026-10-26_THE_CLOCK_GAINS_ONLY_WHERE_ITS_ARRIVAL_RECURS_SO_ITS_JOIN_BECOMES_A_COPY_AT_THE_OUTPUT_AND_ITS_ACCEPTANCE_IS_FIXED_BEFORE_THE_BUILD.md`
+/// §4] The reset clocks' pool over the training passage and the founding of its largest drop. Each
+/// stream reads its share of the passage from rest, as the training pass's stream does
+/// (`Tower::read_clock_pool`: the readout's covector needs no reverse scan, so the sections do not
+/// part the read); the streams' pools add exactly. The clock founded is the largest drop's, whatever
+/// class it is.
 pub(super) fn found_clock(args: &[String]) -> Result<()> {
-    let usage = "found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT";
-    if args.len() != 11 {
+    let usage = "found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION OUT";
+    if args.len() != 10 {
         return Err(usage.into());
     }
     let started = Instant::now();
     let mut learner = learner_of(&args[1], &args[2])?;
     let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
-    let (streams, section, level) = (positive(&args[7])?, positive(&args[8])?, count(&args[9])?);
-    let out = Path::new(&args[10]);
+    let (streams, section) = (positive(&args[7])?, positive(&args[8])?);
+    let out = Path::new(&args[9]);
     let tower = &learner.tower;
     let (alphabet, width) = (tower.declaration.alphabet, tower.declaration.width);
     if units.len() != alphabet {
@@ -153,55 +156,41 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
     let pools: Vec<ClockPool> = (0..streams)
         .into_par_iter()
         .map(|s| {
-            let mut pool = ClockPool::default();
-            let mut stream = ClockPool::open_stream(alphabet, width);
+            let mut pool = ClockPool::new(alphabet, width);
+            let mut stream = pool.open_stream();
             let mut state = tower.rest();
-            tower.read_join_covectors(&mut state, &classes[s * chunk..s * chunk + read], section, level, |u, dx| pool.cell(&mut stream, u, dx)).map_err(|e| e.to_string())?;
-            pool.close_stream(stream).map_err(|e| e.to_string())?;
+            tower.read_clock_pool(&mut state, &classes[s * chunk..s * chunk + read], &mut pool, &mut stream).map_err(|e| e.to_string())?;
             println!("TOWER_CLOCK_STREAM stream={s} cells={} elapsed_ms={}", pool.cells, started.elapsed().as_millis());
             Ok(pool)
         })
         .collect::<std::result::Result<_, String>>()?;
-    let mut pool = ClockPool::default();
+    let mut pool = ClockPool::new(alphabet, width);
     for p in pools {
         pool.absorb(p).map_err(|e| e.to_string())?;
     }
     let read_ms = started.elapsed().as_millis();
-    let drops = pool.drops(tower).map_err(|e| e.to_string())?;
+    let drops = pool.drops().map_err(|e| e.to_string())?;
     if drops.is_empty() {
         return Err("the pool read no clock".into());
     }
-    // Readings beside the drop, on `2^(−48)`: the drop's floor and its share of the covectors'
-    // energy in parts a million; the ceiling as read.
-    let grain = 2 * COVECTOR_BITS;
+    // A reading beside the drop: its share of the readout covectors' energy (`Σ_t ‖δz_t‖²` on
+    // `2^(−48)`) in parts a million.
     println!(
-        "TOWER_CLOCK_POOL clocks={} cells={} energy={} grain_bits={grain} read_ms={read_ms} drops_ms={}",
+        "TOWER_CLOCK_POOL clocks={} cells={} energy={} grain_bits={} read_ms={read_ms} drops_ms={}",
         drops.len(),
         pool.cells,
         pool.energy,
+        2 * COVECTOR_BITS,
         started.elapsed().as_millis() - read_ms
     );
     let name = |class: usize| if class == alphabet { "rest".to_string() } else { format!("{:?}", String::from_utf8_lossy(units.piece(class))) };
     let share = |d: &ClockDrop| &d.drop_numerator * 1_000_000u32 / (&d.drop_denominator * pool.energy);
-    let line = |rank: usize, d: &ClockDrop| {
-        format!(
-            "rank={rank} class={} piece={} drop={} drop_ppm={} ceiling={} rank_c={} followers={} cells={}",
-            d.class,
-            name(d.class),
-            &d.drop_numerator / &d.drop_denominator,
-            share(d),
-            d.ceiling,
-            d.rank,
-            d.followers,
-            d.cells
-        )
-    };
+    let line = |rank: usize, d: &ClockDrop| format!("rank={rank} class={} piece={} drop={} drop_ppm={} rank_c={} cells={}", d.class, name(d.class), &d.drop_numerator / &d.drop_denominator, share(d), d.rank, d.cells);
     for (rank, d) in drops.iter().take(16).enumerate() {
         println!("TOWER_CLOCK_DROP {}", line(rank + 1, d));
     }
-    // Readings beside the ranking: the rest's clock, whose face is one held arrival a stream, so its
-    // drop is the part of the covector a face constant along each stream carries; and the shares
-    // down the whole ranking.
+    // Readings beside the ranking: the rest's clock, which holds one arrival a stream, and the
+    // shares down the whole ranking.
     if let Some((rank, d)) = drops.iter().enumerate().find(|(_, d)| d.class == alphabet) {
         println!("TOWER_CLOCK_REST {}", line(rank + 1, d));
     }
@@ -217,16 +206,12 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
         at(90),
         at(100)
     );
-    let top = drops.first().ok_or("the pool read no clock")?;
-    let class = top.class;
-    learner.join_clock(level, class).map_err(|e| e.to_string())?;
-    // The founded join's moments, opened on the passage it was founded on, in the same partition
-    // (`TowerLearner::open_moments`, section k of stream s reading `[s·chunk + k·section,
-    // s·chunk + (k + 1)·section]`). Opened at zero inside the opened learner, the normalized step
-    // moves every entry of `O` at the full rate from the first section (measured on the four-pass
-    // bank state: the pass from the founded state halved its step 90 times in its first 32
-    // sections against the twin's none, the level it joins swelled about sevenfold, and it ran
-    // 273.8 ms a section against the twin's 149.3).
+    let class = drops[0].class;
+    learner.join_clock(class).map_err(|e| e.to_string())?;
+    // The copy's moments, opened on the passage it was founded on, in the training pass's
+    // partition (`TowerLearner::open_moments`, section k of stream s reading `[s·chunk + k·section,
+    // s·chunk + (k + 1)·section]`): a family opened at zero inside an opened learner moves at the
+    // full rate from its first section (`hnn.tower-founded-moments`).
     let moments_started = Instant::now();
     let sections: Vec<Vec<&[usize]>> = (0..(chunk - 1) / section)
         .map(|k| (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect())
@@ -237,7 +222,7 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
     let moments_ms = moments_started.elapsed().as_millis();
     let sha = write_learner(out, &learner)?;
     println!(
-        "TOWER_CLOCK_FOUNDED level={level} class={class} piece={} material={} moment_sections={moment_sections} moments_ms={moments_ms} state_sha256={sha} elapsed_ms={}",
+        "TOWER_CLOCK_FOUNDED class={class} piece={} material={} moment_sections={moment_sections} moments_ms={moments_ms} state_sha256={sha} elapsed_ms={}",
         name(class),
         learner.tower.theta.len(),
         started.elapsed().as_millis()

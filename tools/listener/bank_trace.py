@@ -27,12 +27,15 @@ case: the heard text's own reading of a proper name, with no list of names.
   first unit the largest mass (rank 0: no class carries more), and its code; a problem whose
   opening is a chunk's first class (coded by no cell) is counted as skipped.
 - `held`: for two CELLS files over the same TEXT (a twin's, then a clocked tower's), every coded
-  cell set beside the arrival a blank line's clock holds there (the cell after the last cell whose
-  bytes are a blank line): where the cell's bytes repeat the held arrival's, and elsewhere by how
-  many cells have passed since the reset. For each part: its cells, how many the face gives the
+  cell set beside the arrival the clock holds there (the cell after the last cell whose bytes are
+  the clock's class): where the cell's bytes repeat the held arrival's, and elsewhere by how many
+  cells have passed since the reset. The class is the optional fourth argument, written as
+  `found-tower-clock` prints its `piece=` (a quoted string with its escapes); a blank line when
+  it is absent. For each part: its cells, how many the face gives the
   largest mass in each file, and the code each file gives it, whole and as the second file's
   difference from the first, in bits.
 """
+import ast
 import collections
 import re
 import sys
@@ -163,7 +166,13 @@ def cells_of(path):
     return cells
 
 
-def held(text, first, second):
+def class_bytes(printed):
+    """A class's bytes from the quoted string `found-tower-clock` prints as its `piece=`."""
+    printed = re.sub(r"\\u\{([0-9a-fA-F]+)\}", lambda m: "\\U" + m.group(1).rjust(8, "0"), printed)
+    return ast.literal_eval(printed).encode("utf-8")
+
+
+def held(text, first, second, reset=b"\n\n"):
     a, b = cells_of(first), cells_of(second)
     if a.keys() != b.keys() or any(a[p][1] != b[p][1] for p in a):
         raise SystemExit("the two CELLS files do not code the same cells")
@@ -172,7 +181,7 @@ def held(text, first, second):
     previous = None
     for p in sorted(a):
         piece = text[p:p + a[p][1]]
-        if previous == b"\n\n":
+        if previous == reset:
             arrival, since = piece, 0
             part = "the held arrival itself"
         elif arrival is None:
@@ -208,8 +217,9 @@ def main():
         share(read(args[0]), read(args[1]), args[2])
     elif command == "role" and len(args) >= 3:
         role(read(args[0]), read(args[1]), args[2:])
-    elif command == "held" and len(args) == 3:
-        held(read(args[0]), args[1], args[2])
+    elif command == "held" and len(args) in (3, 4):
+        reset = class_bytes(args[3]) if len(args) == 4 else b"\n\n"
+        held(read(args[0]), args[1], args[2], reset)
     else:
         raise SystemExit(__doc__)
 
