@@ -1,0 +1,51 @@
+The lap's passes, `train-unit-tower` at 8147a5dd7 with the arguments `64 64 256 2 8 128 1 7`, on
+Brandon's PC, October 26. Every line as printed, except that TOWER_SECTION and TOWER_SWELL are kept
+only at the first reported section, the largest window and the last. Neither pass took a halving.
+Paths are relative to the run directory, which is not in the repository.
+
+Run 2: the opening, held-out cells read from the refounded state before any pass
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lapD.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=36468 user_s=33.9
+lapD.cells sha256 5e51e0a39a0061c30c0e045d2582b106a490fddea8c1876993654d48ffee46fd (copyD8's cells)
+
+Run 3: the lap's twin, one pass from copyD8/STATE with nothing founded (lapT8)
+
+UNIT_READ units=1318 train_bytes=3528168 train_units=1342760 dev_bytes=397669 dev_units=151684
+TOWER_TRAIN material=290669 streams=8 section=128 sections_a_pass=1311 train_bytes=3528168 dev_bytes=397669
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.508 deposits=32 halvings=0 elapsed_ms=3781
+TOWER_SWELL pass=0 section=32 L0 x=337712 h=4686429 r=21345155 a=973022 push=58412348 read=58082684 contact=48441074 return=35130382 lambda=1057395170 L1 x=557326 h=7702301 r=28303276 a=567950 push=62181306 read=122129252 contact=19253552 return=14995090 lambda=1072178646 readout=51891950
+TOWER_SECTION pass=0 section=352 bits_a_byte=1.505 deposits=352 halvings=0 elapsed_ms=41535
+TOWER_SWELL pass=0 section=352 L0 x=312425 h=6071225 r=22456081 a=1041882 push=58620352 read=57758178 contact=49330971 return=34533252 lambda=1058476724 L1 x=597239 h=7319098 r=27828956 a=525723 push=65869258 read=126492725 contact=19253552 return=14995090 lambda=1072225465 readout=52503896
+TOWER_SECTION pass=0 section=1311 bits_a_byte=1.507 deposits=1311 halvings=0 elapsed_ms=154232
+TOWER_SWELL pass=0 section=1311 L0 x=356117 h=6362245 r=24954535 a=999607 push=61909426 read=57086469 contact=50149144 return=40103672 lambda=1051929363 L1 x=498829 h=7515587 r=32390126 a=503657 push=68457461 read=135180140 contact=19253552 return=15788394 lambda=1072094414 readout=51472017
+TOWER_STATE STATE.0 state_bytes=9805190 state_sha256=c45119509c55a7a7545d4d646b93152ce12ecbcf5c0af3cf1a75d483b77735b7
+TOWER_PASS pass=0 train_bits_a_byte=1.513 dev_bits_a_byte=1.582 dev_regions Q=1.790 P=1.333 N=2.232 M=1.156 deposits=1311/1311 pass_ms=158554 elapsed_ms=158583 train_code=5594825411911 dev_code=659819718320 grain_bits=20
+TOWER_DONE state_bytes=9805190 state_sha256=c45119509c55a7a7545d4d646b93152ce12ecbcf5c0af3cf1a75d483b77735b7 elapsed_ms=158646
+RUN_RECEIPT exit=0 wall_s=159.0 peak_rss_kib=384104 user_s=1114.8 stopped=no
+
+Run 4: the founded lap, one pass from role_clock/lapD.state (lapD8)
+
+UNIT_READ units=1318 train_bytes=3528168 train_units=1342760 dev_bytes=397669 dev_units=151684
+TOWER_TRAIN material=290734 streams=8 section=128 sections_a_pass=1311 train_bytes=3528168 dev_bytes=397669
+TOWER_REALIZATION pass=0 host: one stream a thread on 8 threads
+TOWER_SECTION pass=0 section=32 bits_a_byte=1.505 deposits=32 halvings=0 elapsed_ms=3779
+TOWER_SWELL pass=0 section=32 L0 x=337761 h=4685354 r=21366762 a=971555 push=58371343 read=58086276 contact=48459276 return=35131967 lambda=1057339270 L1 x=546989 h=7581613 r=28248524 a=565958 push=62226796 read=122154309 contact=19253552 return=14995090 lambda=1072181307 readout=51900204
+TOWER_SECTION pass=0 section=480 bits_a_byte=1.515 deposits=480 halvings=0 elapsed_ms=56534
+TOWER_SWELL pass=0 section=480 L0 x=284719 h=5007941 r=21569891 a=990139 push=57985845 read=58633160 contact=49711868 return=32843603 lambda=1058725349 L1 x=533014 h=8451240 r=30031465 a=510046 push=65074418 read=127141603 contact=19253552 return=14995090 lambda=1072196950 readout=52696488
+TOWER_SECTION pass=0 section=1311 bits_a_byte=1.500 deposits=1311 halvings=0 elapsed_ms=154393
+TOWER_SWELL pass=0 section=1311 L0 x=354577 h=5688616 r=23945408 a=1065417 push=59535748 read=55340992 contact=49726392 return=30982585 lambda=1055687951 L1 x=530529 h=7936304 r=32926855 a=483956 push=70104472 read=133972994 contact=19253552 return=15327758 lambda=1072495517 readout=54252805
+TOWER_STATE STATE.0 state_bytes=9800161 state_sha256=70c765788f02b857ed6f8b3bb7204394f4890ae241a696bed1bc12ec2b2851c0
+TOWER_PASS pass=0 train_bits_a_byte=1.506 dev_bits_a_byte=1.571 dev_regions Q=1.782 P=1.317 N=2.214 M=1.147 deposits=1311/1311 pass_ms=158734 elapsed_ms=158761 train_code=5571140075926 dev_code=654896200943 grain_bits=20
+TOWER_DONE state_bytes=9800161 state_sha256=70c765788f02b857ed6f8b3bb7204394f4890ae241a696bed1bc12ec2b2851c0 elapsed_ms=158812
+RUN_RECEIPT exit=0 wall_s=159.2 peak_rss_kib=382464 user_s=1114.8 stopped=no
+
+The certificate: 5,594,825,411,911 − 5,571,140,075,926 = 23,685,335,985 on 2^(−20), 22,588.1 bits
+below the lap's twin, against the bar of 11 bits (train_code below 5,594,813,877,575). Paid.
+Held-out, read beside: 659,819,718,320 − 654,896,200,943 = 4,923,517,377 on 2^(−20), 4,695.4 bits
+below the lap's twin.
+
+Beside, against the founded pass copyD8 (train code 5,614,112,511,860 and held-out code 658,947,806,479 in the
+previous record's PASSES.txt): the twin's second reading codes the training text 18,393.6 bits lower
+and the held-out text 831.5 bits higher; the founded lap codes them 40,981.7 and 3,863.9 bits lower.

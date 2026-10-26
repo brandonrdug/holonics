@@ -1,0 +1,39 @@
+The held-out reads of the lap, October 26, on Brandon's PC: the cells from role_clock/lapT8/STATE
+(c4511950…35b7, the lap's twin) and role_clock/lapD8/STATE (70c76578…51c0, the founded lap), then
+the observer (tools/listener/bank_trace.py at 8147a5dd7) in modes `role` and `held`. The observers
+are read-only. Paths are relative to the run directory, which is not in the repository.
+
+B read-tower-held-cells role_clock/lapT8/STATE SHA dev.txt SHA 8 role_clock/lapT8.cells UNITS SHA
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lapT8.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=37704 user_s=33.7
+
+B read-tower-held-cells role_clock/lapD8/STATE SHA dev.txt SHA 8 role_clock/lapD8.cells UNITS SHA
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/lapD8.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=36404 user_s=33.8
+
+cells    role_clock/twin8.cells    sha256 d538b2c99a2622c4b7128c4a7caea852bb3e077b316a936170e718f9474ce8b9
+cells    role_clock/copyD8.cells   sha256 5e51e0a39a0061c30c0e045d2582b106a490fddea8c1876993654d48ffee46fd
+cells    role_clock/lapT8.cells    sha256 fef905ad0a8b040b63244421052312e63429ba86265ea5fedff3e955b0283b95
+cells    role_clock/lapD8.cells    sha256 44539a70ffcaeaeed75a66ecb0a83651744f33df0b174dc60fd997d60b46d16b
+
+python3 -I tools/listener/bank_trace.py role train_all.txt dev.txt role_clock/twin8.cells role_clock/copyD8.cells role_clock/lapT8.cells role_clock/lapD8.cells
+
+role_clock/twin8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 1; its mean code 6.582 bits
+role_clock/copyD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.800 bits
+role_clock/lapT8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.718 bits
+role_clock/lapD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 53; its mean code 2.876 bits
+RUN_RECEIPT exit=0 wall_s=0.3 peak_rss_kib=47292 user_s=0.3
+
+python3 -I tools/listener/bank_trace.py held dev.txt role_clock/lapT8.cells role_clock/lapD8.cells '"\n\n"'
+
+role_clock/lapT8.cells then role_clock/lapD8.cells: 151676 cells; the second codes -4695.4 bits against the first
+  before any reset: 231 cells; largest mass 91 then 87; code 3.965 then 4.037 bits a cell; difference +16.8 bits
+  the held arrival itself: 746 cells; largest mass 58 then 57; code 5.298 then 5.211 bits a cell; difference -65.1 bits
+  repeats the held arrival: 1168 cells; largest mass 54 then 557; code 6.889 then 3.596 bits a cell; difference -3845.6 bits
+  elsewhere, 1-8 cells after the reset: 5964 cells; largest mass 1104 then 1117; code 5.685 then 5.706 bits a cell; difference +123.3 bits
+  elsewhere, 9-32 cells after the reset: 17804 cells; largest mass 3965 then 3885; code 5.383 then 5.398 bits a cell; difference +270.2 bits
+  elsewhere, 33-128 cells after the reset: 68505 cells; largest mass 24833 then 24935; code 4.164 then 4.157 bits a cell; difference -484.6 bits
+  elsewhere, 129-1000000000 cells after the reset: 57258 cells; largest mass 24803 then 24790; code 3.517 then 3.504 bits a cell; difference -710.4 bits
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=68268 user_s=0.2
