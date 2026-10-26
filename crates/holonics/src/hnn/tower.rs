@@ -5048,10 +5048,13 @@ mod tests {
     const PASSAGE: [usize; 13] = [0, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
 
     /// The tiny turned tower with a bank at its top level (a 4 × 4 box, four value channels). Opened,
-    /// its join is drawn away from zero, the gate opens at `g = ⅔` and the hold at `h = 4`
-    /// (`ρ = 16/17`), so every bank family carries a readable covector: at the founding's
+    /// its join is drawn away from zero, the gate opens at `g = ½` and the hold at `h = 2`
+    /// (`ρ = 4/5`), so every bank family carries a readable covector: at the founding's
     /// `ρ = 1 − 2^(−11)` the hold's slope `ln 2 · ρ(1 − ρ)` falls below the check's reading grain, and
     /// at `ρ = ½` the bank forgets within a cell and its key, query and value slopes fall below it too.
+    /// With the key on the face block alone, a join drawn on `2^(−8)` of the material's word left the
+    /// gate bias and the hold at a third of the grain; drawn on `2^(−7)` every family reads at three
+    /// times it or more (measured over holds 2–4 and gate biases −2 to 0).
     fn tiny_banked(open: bool) -> Tower {
         let mut tower = tiny_turning(2, true, true, false);
         let bank = BankDeclaration { level: 1, harmonics: vec![4, 4], values: 4 };
@@ -5061,10 +5064,10 @@ mod tests {
             let k = keys(4096);
             let join = tower.bank_join().expect("a bank");
             for (i, v) in tower.theta[join].iter_mut().enumerate() {
-                *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) / 2;
+                *v = i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 7;
             }
-            tower.theta[bl.gate_bias] = 1 << FACE_BITS;
-            tower.theta[bl.hold] = 4 << FACE_BITS;
+            tower.theta[bl.gate_bias] = 0;
+            tower.theta[bl.hold] = 2 << FACE_BITS;
         }
         tower
     }
@@ -5100,7 +5103,7 @@ mod tests {
     #[test]
     fn the_banked_covector_matches_the_code_difference() {
         // A passage of recurring pairs, the shape a bank reads: on it every bank family's covector
-        // reads at 1.7 or more times the check's grain (on the mixed passage the gate bias's cell
+        // reads at three or more times the check's grain (on a mixed passage the gate bias's cell
         // slopes cancel to a tenth of it).
         let classes: Vec<usize> = (0..37).map(|i| [0, 2, 1, 3, 0, 1, 2, 3, 3, 0][i % 10]).collect();
         the_covector_of_tower_matches_the_code_difference(tiny_banked(true), true, &classes, 9);

@@ -49,11 +49,16 @@
 //!   bias at zero; the query opens on the same material. The key at a cell then names the face
 //!   that arrived before it and the query the face arriving now, so the read at an arrival returns
 //!   what followed that face's last arrival from the first cell, and the read block enters by its
-//!   covector. Drawn over both blocks, the context read moves key and query apart: on the MQAR
-//!   terrain at the top level the held-out answers stayed at 6.03 bits, the code of a uniform guess
-//!   among the 64 values, from the 128th deposit to the 512th, since a read that recalls nothing
-//!   gives `O`'s covector nothing to correlate with. The read reaches nothing until `O` opens, so
-//!   the opening is still the twin's.
+//!   covector. The read reaches nothing until `O` opens, so the opening is still the twin's.
+//! - **The bank reads the first level** (`ℓ = 0`, where `x⁰` is the arrival's encoding `E(u)`), not
+//!   the record's top level. On the MQAR terrain (4,096 training passages, one pass) the bank at the
+//!   first level names 15,999 of the 16,000 held-out answers at 0.001 bits each; at the top level,
+//!   on the same opening, the held-out answers stay at chance among the 64 values (6.03 bits, 234
+//!   named) through every deposit, as they did there with the key drawn over both blocks (247 named
+//!   after 16,384 passages); the bankless tower names 243. The top level's face is the first level's mixture of the passage, so
+//!   two arrivals of one key class do not open on one key turn, and a read that recalls nothing
+//!   gives `O`'s covector nothing to correlate with. [measured; why the mixture defeats the key is
+//!   agent-inferred]
 //! - **The opening state's covector is held as given.** As the tower's passage credit is declared
 //!   for its modes only, a section's covector reaches the bank it opened on, and stops there: the
 //!   bank's history credit across sections is owed, not carried.
@@ -70,10 +75,10 @@ pub struct BankDeclaration {
 }
 
 impl BankDeclaration {
-    /// The record's first declaration: one bank at the top level, two turns, an `8 × 8` box, and
-    /// `d_v` the level's width.
+    /// The first declaration: one bank at the first level (the record's top level, moved by the
+    /// measurement in the module's notes), two turns, an `8 × 8` box, and `d_v` the level's width.
     pub fn first(tower: &TowerDeclaration) -> Self {
-        Self { level: tower.levels - 1, harmonics: vec![8, 8], values: tower.width }
+        Self { level: 0, harmonics: vec![8, 8], values: tower.width }
     }
 
     /// The box's extent `|N|`.
