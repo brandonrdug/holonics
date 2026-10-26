@@ -1,0 +1,12 @@
+## held_pass1.txt
+TOWER_HELD unjoined=false streams=8 dev_bits_a_byte=2.444 dev_regions Q=3.042 P=2.341 N=2.079 M=2.312 elapsed_ms=6381
+TOWER_HELD_CODES grain_bits=20 Q=38311483436/12009 P=29472813061/12009 N=26183216436/12008 M=29086969780/11997
+RUN_RECEIPT exit=0 wall_ms=6389 peak_rss_kib=22508 user_ms=24583
+## held_foil_pass1.txt
+TOWER_HELD unjoined=false streams=8 dev_bits_a_byte=2.488 dev_regions Q=3.083 P=2.402 N=2.117 M=2.351 elapsed_ms=3684
+TOWER_HELD_CODES grain_bits=20 Q=38820416306/12009 P=30242392571/12009 N=26660840347/12008 M=29572710565/11997
+RUN_RECEIPT exit=0 wall_ms=3692 peak_rss_kib=21564 user_ms=13915
+## unjoined.txt
+TOWER_HELD unjoined=true streams=8 dev_bits_a_byte=2.493 dev_regions Q=3.085 P=2.409 N=2.132 M=2.346 elapsed_ms=6280
+TOWER_HELD_CODES grain_bits=20 Q=38845310653/12009 P=30340218508/12009 N=26846413571/12008 M=29516472961/11997
+RUN_RECEIPT exit=0 wall_ms=6288 peak_rss_kib=22648 user_ms=23971

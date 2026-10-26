@@ -1,0 +1,19 @@
+## banked timing read
+TOWER_BANK_JOINED bank 0 64 8 8 material=211718 state_sha256=47abc751fbb84d59e414f9f104480aae7585b1b0891382eed92253e6b9fb0748
+TOWER_TRAIN material=211718 streams=8 section=128 sections_a_pass=31 train_bytes=32768 dev_bytes=48031
+TOWER_SECTION pass=0 section=31 bits_a_byte=2.952 deposits=31 halvings=20 elapsed_ms=24356
+TOWER_SWELL pass=0 section=31 L0 x=214122 h=9979687 r=62291761 a=200879 push=75706215 read=325694663 contact=47121618 pair=53558559 return=32137122 lambda=1053979564 L1 x=1248310 h=22100604 r=266547262 a=138297 push=70443867 read=280127841 contact=47240273 pair=39212120 return=27586110 lambda=1073240139 readout=41363599
+TOWER_REALIZATION pass=0 host: one stream a thread on 4 threads
+TOWER_STATE STATE.0 state_bytes=8205367 state_sha256=66af0d6610719bb4b304792fd3eaf22bde0960f124e730323f3aa536c4163a7f
+TOWER_PASS pass=0 train_bits_a_byte=2.952 dev_bits_a_byte=3.033 dev_regions Q=3.248 P=3.036 N=2.953 M=2.898 deposits=31/31 pass_ms=31024 elapsed_ms=31110
+TOWER_DONE state_bytes=8205367 state_sha256=66af0d6610719bb4b304792fd3eaf22bde0960f124e730323f3aa536c4163a7f elapsed_ms=31309
+RUN_RECEIPT exit=0 wall_ms=31404 peak_rss_kib=385176 user_ms=101572
+ALL_DONE
+## bankless timing read
+TOWER_TRAIN material=198784 streams=8 section=128 sections_a_pass=31 train_bytes=32768 dev_bytes=48031
+TOWER_SECTION pass=0 section=31 bits_a_byte=2.843 deposits=31 halvings=58 elapsed_ms=16764
+TOWER_REALIZATION pass=0 host: one stream a thread on 4 threads
+TOWER_STATE STATE.0 state_bytes=7692266 state_sha256=2bab82dbcbbe5b30af3b5b47b5ffb9a7129c82e855d1d6ef4a2d7e7d4d3561dc
+TOWER_PASS pass=0 train_bits_a_byte=2.843 dev_bits_a_byte=2.813 dev_regions Q=3.081 P=2.836 N=2.678 M=2.655 deposits=31/31 pass_ms=21024 elapsed_ms=21116
+TOWER_DONE state_bytes=7692266 state_sha256=2bab82dbcbbe5b30af3b5b47b5ffb9a7129c82e855d1d6ef4a2d7e7d4d3561dc elapsed_ms=21279
+RUN_RECEIPT exit=0 wall_ms=21323 peak_rss_kib=177672 user_ms=66072

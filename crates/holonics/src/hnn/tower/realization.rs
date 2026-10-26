@@ -174,8 +174,8 @@ pub struct ResidentLevel {
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face is
-/// joined. Read from the tower's own owners, so a realization holds no second copy of a law.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face or a
+/// binding bank is joined. Read from the tower's own owners, so a realization holds no second copy of a law.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -190,6 +190,7 @@ pub struct ResidentLaw {
     pub ln2_square: i128,
     pub pair_face: bool,
     pub ring_face: bool,
+    pub bank: bool,
 }
 
 impl Tower {
@@ -239,6 +240,7 @@ impl Tower {
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
             pair_face: self.pair.is_some(),
             ring_face: self.ring.is_some(),
+            bank: self.bank.is_some(),
         })
     }
 }

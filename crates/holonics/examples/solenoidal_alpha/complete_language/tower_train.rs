@@ -68,6 +68,43 @@ fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], str
     Ok(regions)
 }
 
+/// `read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS [unjoined]`: the
+/// trainer's held-out read (`held_out`) of a rested learner on byte text, alone: bits a byte by
+/// region (`TOWER_HELD`) and each region's code on `2^(−20)` bits over its bytes
+/// (`TOWER_HELD_CODES`). With `unjoined` the bank's join `O` is set to zero first. A tower with `O = 0`
+/// codes as its bankless twin (`a_banked_tower_opens_on_its_bankless_twin`), so the unjoined read is
+/// the trained tower with its bank's read removed and every other family as trained.
+pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
+    let usage = "read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS [unjoined]";
+    if args.len() != 8 && args.len() != 9 {
+        return Err(usage.into());
+    }
+    let started = Instant::now();
+    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let roles = roles_of(&args[5], &args[6], dev.len())?;
+    let streams = positive(&args[7])?;
+    let unjoined = match args.get(8).map(String::as_str) {
+        None => false,
+        Some("unjoined") => true,
+        Some(_) => return Err(usage.into()),
+    };
+    if unjoined {
+        let join = learner.tower.bank_join().ok_or("an unjoined read needs a bank")?;
+        learner.tower.theta[join].iter_mut().for_each(|t| *t = 0);
+    }
+    let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
+    let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams)?;
+    let (code, coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
+    println!(
+        "TOWER_HELD unjoined={unjoined} streams={streams} dev_bits_a_byte={} dev_regions {} elapsed_ms={}",
+        per(code, coded), named_region_line(&REGIONS, &regions), started.elapsed().as_millis()
+    );
+    let codes: Vec<String> = REGIONS.iter().zip(&regions).map(|(name, &(c, n))| format!("{name}={c}/{n}")).collect();
+    println!("TOWER_HELD_CODES grain_bits={READ_BITS} {}", codes.join(" "));
+    Ok(())
+}
+
 /// [agent-inferred, October 23] The modes' faces over a text, read through a frozen tower in the
 /// held-out read's streams (`held_out`): per level and mode, `max |h|` and `Σ |h|²` over the cells;
 /// per level and region of `roles` (the region of the class the state predicts next), the cells'
