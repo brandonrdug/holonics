@@ -3644,15 +3644,26 @@ impl TowerLearner {
         (&self.first, &self.second)
     }
 
+    /// Whether the moments are opened: a section opened on unopened moments takes its covector as
+    /// its first moment ([`TowerLearner::first_after`] with no prior).
+    pub fn opened(&self) -> bool {
+        self.opened
+    }
+
     /// [agent-inferred, October 26] **The first moment a section's covector moves to**: `g` at
     /// `start..start + g.len()` on each family's natural grain, put on the deposit's grain
-    /// ([`Tower::step_grain_at`]) and moved toward as a section moves it ([`toward`] at
-    /// [`FIRST_RATE`]); an unopened learner opens on it. A reading: the learner is not moved, so an
-    /// exterior that sums a section's covector itself checks its sum against the moment the section
-    /// leaves.
-    pub fn first_after(&self, start: usize, g: &[i128]) -> Result<Vec<i128>> {
+    /// ([`Tower::step_grain_at`]) and moved toward from `prior`, the first moment the section opened
+    /// with there, as a section moves it ([`toward`] at [`FIRST_RATE`]); a learner unopened when
+    /// the section opened (`prior` is `None`) opens on it. A reading: the learner is not moved, so
+    /// an exterior that sums a section's covector itself checks its sum against the moment the
+    /// section leaves, whether it reads the covector before the section or during it.
+    pub fn first_after(&self, start: usize, prior: Option<&[i128]>, g: &[i128]) -> Result<Vec<i128>> {
         let g = self.tower.step_grain_at(start, g)?;
-        Ok(if self.opened { self.first[start..start + g.len()].iter().zip(&g).map(|(&m, &v)| toward(m, v, FIRST_RATE)).collect() } else { g })
+        match prior {
+            None => Ok(g),
+            Some(prior) if prior.len() == g.len() => Ok(prior.iter().zip(&g).map(|(&m, &v)| toward(m, v, FIRST_RATE)).collect()),
+            Some(_) => refuse("a prior first moment of the covector's extent"),
+        }
     }
 
     /// The learner as text: the tower, then the moments.
@@ -5631,7 +5642,8 @@ mod tests {
 
     /// A section's moment and deposit are read from its covector (`TowerLearner::first_after`,
     /// `TowerLearner::step_of_moments`): on an opened learner, a second section's covector read by
-    /// the reverse from the carried state gives the first moment the section leaves, and the step
+    /// the reverse from the carried state gives, from the moment the section opened with, the first
+    /// moment the section leaves (read before the section or after it), and the step
     /// of that moment, released by the halvings its certificate took, is the section's deposit on
     /// the clocks' copies and the readout. A moment split in two parts carried 16 bits finer steps
     /// as the parts' steps sum, to the parts' rounding.
@@ -5649,8 +5661,12 @@ mod tests {
         let receipt = learner.section(&mut states, &[&classes]).expect("second section");
         assert!(receipt.deposited);
         for range in [tower.clock_join().expect("a clock"), tower.readout_family()] {
-            let first = before.first_after(range.start, &g[range.clone()]).expect("first");
+            let prior = &before.moments().0[range.clone()];
+            let first = before.first_after(range.start, Some(prior), &g[range.clone()]).expect("first");
             assert_eq!(first, learner.moments().0[range.clone()]);
+            assert_eq!(learner.first_after(range.start, Some(prior), &g[range.clone()]).expect("first after"), first, "read during or after the section");
+            assert_eq!(learner.first_after(range.start, None, &g[range.clone()]).expect("unopened"), before.tower.step_grain_at(range.start, &g[range.clone()]).expect("grain"));
+            assert!(learner.first_after(range.start, Some(&prior[1..]), &g[range.clone()]).is_err());
             let step = learner.step_of_moments(range.start, &[&first]).expect("step").remove(0);
             let moved: Vec<i128> = range.clone().map(|i| before.tower.theta[i] as i128 - learner.tower.theta[i] as i128).collect();
             assert!(step.iter().any(|&v| v != 0));
@@ -5664,8 +5680,45 @@ mod tests {
                 assert!(((parts[0][i] >> 16) - step[i]).abs() <= 1, "a finer moment steps finer");
             }
         }
-        assert!(learner.first_after(tower.layout.levels[0].move_re, &[0]).is_err());
+        assert!(learner.first_after(tower.layout.levels[0].move_re, None, &[0]).is_err());
         assert!(learner.step_of_moments(0, &[&[0], &[0, 0]]).is_err());
+    }
+
+    /// The section's opening read is handed to an exterior (`HostPass::read_opened`): after the
+    /// host's opening forward, each stream's sink receives every cell's index, face, held classes
+    /// and top face exactly as the copies' reading reads them from the same opening state, without a
+    /// second forward. Refused before an opening read is kept, with one sink for two streams, and
+    /// on a tower without a clock.
+    #[test]
+    fn the_opened_read_hands_the_cells_the_copies_reading_reads() {
+        type Seen = Vec<(usize, TowerFace, Vec<usize>, Vec<i32>)>;
+        let keep = |sink: &mut Seen, i: usize, face: &TowerFace, held: &[usize], top: &[i32]| {
+            sink.push((i, face.clone(), held.to_vec(), top.to_vec()));
+            Ok(())
+        };
+        let tower = tiny_clocked(false, true);
+        let classes = clocked_passage();
+        let parts: [&[usize]; 2] = [&classes[..19], &classes[18..]];
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|c| c[1..].iter().map(|&u| Some(u)).collect()).collect();
+        let mut pass = HostPass::default();
+        assert!(pass.read_opened(&mut [Seen::new(), Seen::new()], keep).is_err(), "nothing kept yet");
+        let mut opening = vec![tower.rest(), tower.rest()];
+        tower.forward(&mut opening[1], &classes[..18], &tower.reaches()).expect("the second stream opens later");
+        pass.forward(&tower, &opening, &parts, &targets, Slot::Opened).expect("forward");
+        let mut seen = vec![Seen::new(), Seen::new()];
+        pass.read_opened(&mut seen, keep).expect("read");
+        for (s, part) in parts.iter().enumerate() {
+            let mut want = Seen::new();
+            tower.read_clocks(&mut opening[s].clone(), part, |i, face, held, _, top| keep(&mut want, i, face, held, top)).expect("copies");
+            assert_eq!(want.len(), part.len() - 1);
+            assert_eq!(seen[s], want);
+        }
+        assert!(pass.read_opened(&mut [Seen::new()], keep).is_err(), "one sink a stream");
+        let plain = tiny_turning(2, true, true, false);
+        let mut pass = HostPass::default();
+        let opening = vec![plain.rest(), plain.rest()];
+        pass.forward(&plain, &opening, &parts, &targets, Slot::Opened).expect("forward");
+        assert!(pass.read_opened(&mut [Seen::new(), Seen::new()], keep).is_err(), "a tower without a clock");
     }
 
     /// The first-order reading an exterior reader takes through the step

@@ -80,6 +80,29 @@ impl HostPass {
             Slot::Reread => &mut self.reread,
         }
     }
+
+    /// [agent-inferred, October 26; record
+    /// `2026-10-26_THE_REPLAY_STOPPED_AT_ITS_FIRST_WINDOW_SO_IT_READS_THE_SECTIONS_OWN_OPENING_READ.md`
+    /// §2] **The opening read's cells, handed to an exterior**: each stream's cells of the forward
+    /// kept in [`Slot::Opened`], read in parallel by stream into that stream's sink, `each(sink, i,
+    /// face, held, top)` with the cell's index, its face, each clock's held class (the alphabet
+    /// where it holds nothing) and the top face the readout and the copies read: the arguments
+    /// [`Tower::read_clocks`] hands, from the very cells the section's reverse reads. A reading:
+    /// nothing moves, and no second forward is taken. Refused without a kept opening read, with a
+    /// sink count other than the streams', or on a tower without a clock.
+    pub fn read_opened<S: Send>(&self, sinks: &mut [S], each: impl Fn(&mut S, usize, &TowerFace, &[usize], &[i32]) -> Result<()> + Sync) -> Result<()> {
+        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("an exterior reads a kept opening read"))?;
+        if sinks.len() != forwards.len() {
+            return refuse("one sink a stream of the opening read");
+        }
+        sinks.par_iter_mut().zip(forwards.par_iter()).try_for_each(|(sink, (cells, _))| {
+            for (i, cell) in cells.iter().enumerate() {
+                let held = cell.clock.as_deref().ok_or(TowerError::Refused("an opening read handed out is a clocked tower's"))?;
+                each(sink, i, &cell.face, held, &cell.top)?;
+            }
+            Ok(())
+        })
+    }
 }
 
 impl PassRealization for HostPass {
