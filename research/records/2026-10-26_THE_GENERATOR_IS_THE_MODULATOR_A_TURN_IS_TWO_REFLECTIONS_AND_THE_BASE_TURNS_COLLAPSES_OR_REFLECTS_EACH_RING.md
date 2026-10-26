@@ -437,18 +437,170 @@ stepping without a turn), so the paired line isolates the turn, with this loop's
 reads, beside `PR`, `PP` and `C`. If the rings rise and the acceptance fails, the drive within a
 numeral and the capture at the operator are the next loop's subject.
 
-## 6. The recorded failures this loop could repeat
+## 6. What the turned loop measured
+
+[measured, October 26, on the PC; receipts in [`TURNS_RUN.md`](2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_A_TURN_IS_TWO_REFLECTIONS_AND_THE_BASE_TURNS_COLLAPSES_OR_REFLECTS_EACH_RING_receipts/TURNS_RUN.md)]
+**Both rotors were founded on §5's step.** The locator read the same torsion and kernels (step 1,
+rings `9:1`, `11:2` and `101:4`, seven moving modes); under the law `modulated` 113 of the 120
+stepping units turn, under `free` none. The three development passes ran together, `PR` on its own
+binary because the rotor's text had changed, so the evaluation rate was read under one load.
+
+**The changed read held both trainings.** Their largest windows ran 113.9 and 116.2 ms an
+evaluation against bounds of 134.2 and 139.4.
+
+| run | projection | deadline | wall | ratio | peak resident |
+|---|---|---|---|---|---|
+| train `PRT`, three passes | 592.59 s | 593 s | 415.0 s | 0.700 | 300,824 KiB |
+| train `PRS`, three passes | 661.46 s | 662 s | 416.7 s | 0.630 | 293,036 KiB |
+
+**The turned tower codes best and writes the most unseen calculations right, and the acceptance
+fails.** Held-out bits a byte after each pass, and the regions after the third:
+
+| tower | pass 0 | pass 1 | pass 2 | Q | P | N | M |
+|---|---|---|---|---|---|---|---|
+| `PR` | 1.970 | 1.843 | 1.779 | 1.201 | 2.459 | 0.423 | 1.786 |
+| `PRT` | 1.943 | 1.830 | 1.765 | 1.197 | 2.287 | 0.478 | 1.774 |
+| `PRS` | 1.937 | 1.829 | 1.772 | 1.221 | 2.340 | 0.478 | 1.780 |
+
+| tower | right at the equals | met (of 1,572) | never met (of 876) | `+` | `−` | `×` | `÷` |
+|---|---|---|---|---|---|---|---|
+| `C` | 190 | 176 | 14 | 14 | 21 | 114 | 29 |
+| `PR` | 277 | 259 | 18 | 26 | 26 | 158 | 52 |
+| `PRT` | 240 | 216 | 24 | 26 | 28 | 124 | 46 |
+| `PRS` | 288 | 269 | 19 | 29 | 24 | 169 | 48 |
+| 8-gram | | | 34 | | | | |
+
+24 of 876 is below the 8-gram's 34. Paired on the never-met calculations, `PRT` writes 18 right
+that `PRS` does not against 13, 19 against `PR`'s 13, and 21 against `C`'s 11; on the met ones it
+writes fewer than either rotor twin (80 against 133, 102 against 145). The turn moves the right
+writes off the most-heard material: 141 of the 528 calculations heard 16 times or more (`PR` 179,
+`PRS` 175).
+
+**The turned rings reach the written values; nothing at the equals holds the sum.** On the 312
+never-met sums and differences, how often the written value agrees with the exact one on a ring:
+
+| tower | ring 9 | foil | ring 10 | foil | ring 11 | foil | mod 990 | foil |
+|---|---|---|---|---|---|---|---|---|
+| `C` | 44 | 39 | 109 | 76 | 30 | 26 | 6 | 1 |
+| `PR` | 32 | 35 | 123 | 88 | 27 | 30 | 4 | 4 |
+| `PRT` | 45 | 25 | 122 | 76 | 37 | 23 | 7 | 1 |
+| `PRS` | 35 | 22 | 132 | 95 | 20 | 21 | 2 | 4 |
+
+`PRT` is the first tower whose rings 9 and 11 stand above their foils (`z` = 2.5 and 1.9 pooled;
+`PRS` 1.8 and −0.2), so the turn, not the step, carries ring 11. These counts include the right
+writes (7 agree modulo 990), and a digit-reordering error keeps ring 9; the gaps read below
+separates both in the next run. At the equals cells (841 held out) the level's modes do not name
+the result's residues more than the other towers: modulo 9, 10 and 11, `PRT` 133, 296 and 119,
+`PR` 160, 323 and 129, `C` 147, 332 and 133, the majority 92, 304 and 80. At the last digit of a
+held-out numeral its modes name residues modulo 7 and 13 as often as 9 and 11 (890 and 771 against
+758 and 866 at level 0), so that probe reads which numeral arrived, not its phase, as §5 found for
+`PR`.
+
+**How wrong the wrong values are** (a first read of `PRT`'s written values on the PC by a one-off
+script; [`written_rules.py`](../../tools/gsm8k/written_rules.py)` gaps` now reads the same for every
+tower, with rings 7 and 13 as controls and the right writes apart). Half the wrong values lie
+within a factor of two of the exact value and 91% within ten; 3% lie within a tenth, and none has
+the wrong sign. 66% have the right number of digits, against 42% for two unequal exact values.
+The ten most written values make up half of all writes. Right writes fall with the result's
+length: 18%, 10%, 5%, 2% and 0% for one to five digits. So the tower writes the right size and a
+common value, not the operands' combination.
+
+[agent-inferred] **Why: the turn forms each numeral's character and nothing captures it.** The
+character of `a` is formed on the ring modes as its digits arrive, and the operator, `b`'s digits
+and the level's own move then push and damp it: nothing holds `E(a)` while `b` arrives, so the
+product `E(a)E(b) = E(a + b)` is formed nowhere, and the equals cell reads only what is left. Two
+structural causes, from the GPT-6 review: `Tower::rest` sets the modes to zero and a monomial turn
+of zero is zero, so a ring holds the character only in proportion to what the drive pushed into
+it, never from `E(0)` at amplitude one; and the level's move `y = λz + β conj(z) + p` keeps a
+phase readable only while `||λ| − |β|| > 0`. The turn reaches the written values (rings 9 and 11),
+so the character is formed; the capture and the restart are missing.
+
+## 7. The capture loop, fixed before it is built
+
+[definition; agent-inferred with the GPT-6 review] **The navigator.** The capture is the helical
+code's face (`m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`, [guide](../../docs/ELEMENTARY_OBJECTS.md#the-helical-code-how-holons-encode))
+read in exact residues over epochs: a restart opens an epoch, a fold ends one strand of it and
+pairs the next by its hand, and the face is carried as integers, so no move damps it. A stream
+carries `R_j, K_j ∈ ℤ/q` for `j < w` and a hand `o ∈ {+1, −1}`. `q` is the located prime-power
+rings joined by the Chinese remainder theorem (`9·11·101 = 9999`) and `w` the order of 10 modulo
+`q` (4), so mode `j` holds the character `10^j` of a residue modulo 9999 (the gauges 7, 8 and 50 of
+the separate rings multiply their faces into `e^(2πi n/9999)`). Each byte of an arriving unit acts:
+
+```text
+located digit byte b:      R_j ← R_((j + 1) mod w) + o·θ_j[b]     θ_j[b] the joined located turn, 10^j·d
+byte with a located hand e: K ← K + R,  R ← 0,  o ← e              the fold
+any other byte:             K ← 0,  R ← 0,  o ← +1                 the restart, at E(0)
+```
+
+The fold is the pair contact's bilinear read `E(K)E(R) = E(K + R)` taken exactly on the residues;
+the restart puts the character at `E(0)` with amplitude one. The faces `e^(2πi K_j/q)` and
+`e^(2πi R_j/q)` at amplitude one are written into `2w` modes of the first level after its move, at
+every cell, past the rotor's rings; those modes take no push and no move, and the covector stops
+there (residues in `ℤ/q` have no covector, as the rotor's keys have none). The level reads them
+through `C`, the contacts and the readout like any mode.
+
+**The hands are located by closure.** The menu is the training text's calculations
+`<<x ∘ y = z>>` of three whole numerals with any one byte `∘` between the first two. Read by the
+navigator from rest, each is a row `φ(x) + e_∘ φ(y) + e_= φ(z) ≡ 0` at each prime of `q`, with
+`φ(n) = n mod p` the residue mode 0 holds. A byte gets a hand where the kernel of its rows modulo
+each prime is one line with a unit first entry, read at the gauge `1` and lifted where the rows
+close, and where the lines agree on `=`'s hand. No byte is named. What the training text gives,
+read before building and not an input: all 3,815 sums close at `(+1, −1)` and all 3,389
+differences at `(−1, −1)`, while 116 of 6,287 products and 27 of 2,853 quotients close at one of
+the four sign pairs and no pair closes them all, so `×` and `÷` get no hand and restart.
+
+**The equation at the consumer** (tests): from rest, after `a ∘ b =` read through units of one
+byte and of several, `K_j = 10^j (a + e_∘ b) mod 9999`; after the result `c`,
+`K_j + R_j ≡ 10^j (a + e_∘ b + e_= c)`, zero exactly when `c ≡ a + e_∘ b` modulo 9999; the
+locator on a synthetic menu of sums, differences and products returns `+1`, `−1` and `−1` and no
+hand for the product; the tower's covector matches its code difference with the navigator joined.
+
+**The run.** `PRC` (the rotor `modulated` with the navigator and its located hands) beside `PRN`
+(the same navigator with no hand, every byte but a digit restarting: each numeral's own exact
+character and nothing captured), both founded as `PRT` was and trained three passes together under
+the waiting standard, the projection read from a development pass of both beside `PRT`'s. `PRN`
+isolates the capture; `PRT` isolates the exact navigator from the damped ring.
+
+**The acceptance** is unchanged: never-met calculations right at the equals above the 8-gram's 34
+of 876, by the paired line against `PRT` and `PRN`; met ones are reported as recitation. Beside it:
+right writes by result length, the gaps read, the rings with their controls, and the level probe
+at the equals (the navigator's `K` modes hold the result's residues there by construction; the
+probe reads whether the level's read carries them).
+
+**Decisions fixed before the run.** A result of `L` digits is written from its first digit, and
+the leading tenth of mode `j`'s face holds the result's digit `3 − j`, so the first digit is in
+mode `4 − L`: the readout must know the size. (1) If `PRC` writes never-met sums and differences
+right above `PRN` and `PRT` but fails the acceptance with its right writes falling by length, the
+release by size is the next loop's subject: the pair contact reading the navigator's faces against
+the size the top face carries. (2) If `PRC` and `PRN` write alike, the faces are not read at the
+equals, and their read (where the readout meets them) is the subject. (3) Results of 9,999 or more
+wrap: 24 of the 298 never-met sums and differences in the held-out text, which bounds what this
+ring can write right; a wider ring is the face law's (`10^w − 1` for the next `w`), and the
+products' capture (the index chart, where a product of numerals is a sum of turns) waits on a
+passing acceptance.
+
+## 8. The recorded failures these loops could repeat
 
 - **An authored routine standing in for learning.** The rings, the foil and the bar are exterior
   reads; nothing enters the machine but the text. The towers find their angles by their own
   descent; no digit, operator or ring is named to them.
+- **An authored routine standing in for learning (the capture).** The navigator's law is the
+  helical code's face over epochs, and every key it uses is located from the text's calculations:
+  the turns by §5's closure, the hands by this loop's. No byte is named, the navigator never
+  writes (the tower's readout writes from what it reads), and `PRN` shows what the capture adds
+  over the exact numeral alone.
 - **Store or copy machinery standing in for learning.** The pumped mode and the pair contact keep
   no context, slot or key; a numeral's address is its phase on the rings.
+- **A store in the capture.** `K` is one phase on a ring, the face of the epoch's folded strands,
+  overwritten at every restart; it keys nothing and is looked up by nothing.
 - **Seen material graded as unseen.** The acceptance counts only the never-heard calculations.
 - **Text run on its codec's grain as the exception.** The pumped mode and the pair contact are
   modality-free (the tower reads classes of a declared alphabet). The rings are the arithmetic face
   of a law that reads any periodic structure: a beat in audio, a stride in motion, a period in an
   image row.
+- **Text run on its codec's grain (the capture).** A fold is an epoch boundary with a located
+  hand: it reads any strand whose loops close with signed characters, a meter's accents or a
+  stride's phases as well as a sum.
 - **Bits read as progress.** The held-out code is a condition beside the acceptance, never the
   claim.
 - **A refusal answered with a larger limit.** The deadlines are fixed above from measured rates.
