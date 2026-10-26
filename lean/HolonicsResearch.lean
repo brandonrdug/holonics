@@ -1226,3 +1226,6 @@ import HolonicsResearch.HNN.ReleasedTelescope
 import HolonicsResearch.Mathematics.AdditiveRuleJump
 import HolonicsResearch.Mathematics.CheckLoop
 import HolonicsResearch.HNN.FaceCovectors
+import HolonicsResearch.Mathematics.ClosureLine
+import HolonicsResearch.Foundation.SeparationDepth
+import HolonicsResearch.Mathematics.RadixItinerary
