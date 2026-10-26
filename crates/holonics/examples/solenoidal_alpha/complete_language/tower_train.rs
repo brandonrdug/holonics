@@ -166,8 +166,8 @@ pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
 /// [agent-inferred, October 26] `read-tower-bank-trace STATE STATE_SHA TEXT TEXT_SHA STREAMS REQUESTS
 /// REQUESTS_SHA OUT [UNITS UNITS_SHA]`: the bank's address trace (spec 2's trace (b),
 /// `holonics::hnn::tower::bank::BankTrace`) at the reads an observer requests, over `held_out`'s
-/// partition of `TEXT` (each chunk from rest), written to `OUT` (create-new). A unit tower reads
-/// `TEXT` in the founded `UNITS`.
+/// partition of `TEXT` (each chunk from rest), written to `OUT` (create-new) chunk by chunk as each
+/// finishes. A unit tower reads `TEXT` in the founded `UNITS`.
 ///
 /// `REQUESTS` holds one request a line, two byte places in `TEXT`: the read's `p` (the read at the
 /// cell whose next class holds byte `p`) and a window's start `f`. For each request read inside its
@@ -221,7 +221,10 @@ pub(super) fn read_tower_bank_trace(args: &[String]) -> Result<()> {
     // Each request's read cell (the class before the one holding p) and window's first arrival.
     let mut asked: Vec<(usize, usize, usize)> = requests.iter().map(|&(p, f)| Ok((holding(p)?, holding(f)?, p))).collect::<Result<_>>()?;
     asked.sort_unstable();
-    let parts: Vec<(String, usize, usize, (i128, usize))> = starts
+    // Each chunk's lines are written as it finishes, so a run stopped at its deadline keeps the
+    // chunks it read.
+    let file = std::sync::Mutex::new(std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?);
+    let parts: Vec<(usize, usize, (i128, usize))> = starts
         .par_iter()
         .map(|&start| {
             let end = (start + chunk).min(classes.len());
@@ -266,16 +269,15 @@ pub(super) fn read_tower_bank_trace(args: &[String]) -> Result<()> {
                 Ok(())
             };
             tower.read_bank_trace(&mut state, &classes[start..end], each).map_err(|e| e.to_string())?;
+            std::io::Write::write_all(&mut *file.lock().map_err(|_| "a chunk's write found the file poisoned".to_string())?, out.as_bytes()).map_err(|e| e.to_string())?;
             println!("TOWER_BANK_TRACE_CHUNK start={start} cells={} requests={read} elapsed_ms={}", end - start - 1, started.elapsed().as_millis());
-            Ok((out, read, skipped, hold))
+            Ok((read, skipped, hold))
         })
         .collect::<std::result::Result<_, String>>()?;
-    let written: String = parts.iter().map(|p| p.0.as_str()).collect();
-    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?, written.as_bytes())?;
-    let hold = parts.first().map_or((0, 0), |p| p.3);
+    let hold = parts.first().map_or((0, 0), |p| p.2);
     println!(
         "TOWER_BANK_TRACE units={} streams={streams} cells={} requests={} read={} skipped={} rho={} reach={} elapsed_ms={} out={}",
-        units.as_ref().map_or(0, Units::len), classes.len(), requests.len(), parts.iter().map(|p| p.1).sum::<usize>(), parts.iter().map(|p| p.2).sum::<usize>(), hold.0, hold.1, started.elapsed().as_millis(), args[8]
+        units.as_ref().map_or(0, Units::len), classes.len(), requests.len(), parts.iter().map(|p| p.0).sum::<usize>(), parts.iter().map(|p| p.1).sum::<usize>(), hold.0, hold.1, started.elapsed().as_millis(), args[8]
     );
     Ok(())
 }
