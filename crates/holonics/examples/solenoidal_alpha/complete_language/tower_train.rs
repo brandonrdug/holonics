@@ -3773,6 +3773,170 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
     Ok(())
 }
 
+/// The problems of a held text: each a question line and its answer lines, the problems separated
+/// by a blank line (the text as `tools/gsm8k` frames it). Each problem keeps its last line end.
+fn problems_of(text: &[u8]) -> Vec<&[u8]> {
+    let mut problems = Vec::new();
+    let (mut start, mut i) = (0, 0);
+    while i + 1 < text.len() {
+        if text[i] == b'\n' && text[i + 1] == b'\n' {
+            if i > start {
+                problems.push(&text[start..=i]);
+            }
+            start = i + 2;
+            i += 2;
+        } else {
+            i += 1;
+        }
+    }
+    if text[start.min(text.len())..].iter().any(|&b| b != b'\n') {
+        problems.push(&text[start..]);
+    }
+    problems
+}
+
+/// Where an answer writes a calculation: for each `<<` with an `=` before its `>>`, the
+/// expression between them and the offset just past the `=`.
+fn calculations_of(answer: &[u8]) -> Vec<(&[u8], usize)> {
+    let mut found = Vec::new();
+    let mut i = 0;
+    while i + 1 < answer.len() {
+        if answer[i] == b'<' && answer[i + 1] == b'<' {
+            let close = answer[i + 2..].windows(2).position(|w| w == b">>").map_or(answer.len(), |p| i + 2 + p);
+            if let Some(eq) = answer[i + 2..close].iter().position(|&b| b == b'=') {
+                found.push((&answer[i + 2..i + 2 + eq], i + 3 + eq));
+            }
+            i = close;
+        } else {
+            i += 1;
+        }
+    }
+    found
+}
+
+/// A fork of the rested tower receives `prompt` read in the units and releases units by `agree`
+/// exact agreeing draws, each moved through, until `stop` holds of its bytes, `bytes` bytes are
+/// released or `cap` units are. Returns the released bytes, the prompt's units and the units
+/// released.
+fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeyStream, agree: u32, bytes: usize, cap: usize, stop: fn(&[u8]) -> bool) -> std::result::Result<(Vec<u8>, [usize; 2]), String> {
+    let classes = units.parse(prompt).map_err(|e| e.to_string())?;
+    let mut state = tower.rest();
+    let mut face = None;
+    for &c in &classes {
+        face = Some(tower.advance(&mut state, c as usize).map_err(|e| e.to_string())?);
+    }
+    let mut face = face.ok_or("an empty prompt")?;
+    let (mut released, mut drawn) = (Vec::new(), 0);
+    while released.len() < bytes && drawn < cap {
+        let key = keys.next_key().ok_or("fewer keys than a problem's window draws")?;
+        let class = agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?;
+        released.extend_from_slice(units.piece(class));
+        drawn += 1;
+        if stop(&released) || released.len() >= bytes || drawn == cap {
+            break;
+        }
+        face = tower.advance(&mut state, class).map_err(|e| e.to_string())?;
+    }
+    Ok((released, [classes.len(), drawn]))
+}
+
+/// `read-unit-tower-written UNITS UNITS_SHA STATE STATE_SHA HELD HELD_SHA KEYS KEYS_SHA BYTES
+/// AGREE MARK_AGREE MARK_CAP OUT`: every held-out problem read by the rested tower, for the written
+/// rules of the record
+/// `2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_THE_MARKUP_IS_WRITTEN_AT_ITS_EQUALS`.
+/// For each problem a fork receives the framed question (a blank line, the question, its line
+/// end) and releases `BYTES` bytes at `AGREE` agreeing draws (`FREE.tsv`: the problem's index and
+/// the release). At every calculation the answer writes, `<<expression=`, a fork receives the
+/// framed question and the answer through that `=` and releases units at `MARK_AGREE` agreeing
+/// draws until its bytes hold `>>` or a line end, or `MARK_CAP` units are released (`MARKS.tsv`:
+/// the problem's index, the calculation's, the expression and the release). Every fork opens at
+/// rest, so each problem and each calculation is read alone, as the John prompt is. Problem `i`
+/// draws from its own window of the key file, `BYTES + MARK_CAP · (the most calculations a problem
+/// writes)` eight-byte keys: the free release from the window's start, the calculations after its
+/// first `BYTES`. The fields are escaped as [`field`] writes them. Nothing here grades: the rules
+/// are read outside the machine (`tools/gsm8k/written_rules.py`).
+pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-unit-tower-written UNITS UNITS_SHA STATE STATE_SHA HELD HELD_SHA KEYS KEYS_SHA BYTES AGREE MARK_AGREE MARK_CAP OUT".into());
+    }
+    let started = Instant::now();
+    let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let held = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let bytes = positive(&args[9])?;
+    let agree = agreement(Some(&args[10]))?;
+    let mark_agree = agreement(Some(&args[11]))?;
+    let mark_cap = positive(&args[12])?;
+    let out = Path::new(&args[13]);
+    let problems = problems_of(&held);
+    let split = |p: &[u8]| -> (Vec<u8>, Vec<u8>) {
+        let line = p.iter().position(|&b| b == b'\n').unwrap_or(p.len());
+        (p[..line].to_vec(), p[(line + 1).min(p.len())..].to_vec())
+    };
+    let most = problems.iter().map(|p| calculations_of(&split(p).1).len()).max().ok_or("a held text without problems")?;
+    let window = bytes + mark_cap * most;
+    if keys.len() < problems.len() * window * 8 {
+        return Err(format!("fewer eight-byte keys ({}) than the problems' windows ({} x {window})", keys.len() / 8, problems.len()).into());
+    }
+    std::fs::create_dir(out)?;
+    println!("TOWER_WRITTEN_OPEN problems={} most_calculations={most} window={window} elapsed_ms={}", problems.len(), started.elapsed().as_millis());
+    let tower = &learner.tower;
+    let done = std::sync::atomic::AtomicUsize::new(0);
+    type Read = (Vec<u8>, Vec<(Vec<u8>, Vec<u8>)>, [usize; 2]);
+    let reads: Vec<Read> = problems
+        .par_iter()
+        .enumerate()
+        .map(|(i, p)| -> std::result::Result<Read, String> {
+            let (question, answer) = split(p);
+            let at = i * window * 8;
+            let mut framed = b"\n\n".to_vec();
+            framed.extend_from_slice(&question);
+            framed.push(b'\n');
+            let mut free_keys = KeyStream::new(keys[at..at + bytes * 8].to_vec(), 8).map_err(|e| e.to_string())?;
+            let (free, [mut prompts, mut drawn]) = written_release(tower, &units, &framed, &mut free_keys, agree, bytes, usize::MAX, |_| false)?;
+            let mut mark_keys = KeyStream::new(keys[at + bytes * 8..at + window * 8].to_vec(), 8).map_err(|e| e.to_string())?;
+            let mut marks = Vec::new();
+            for (expression, through) in calculations_of(&answer) {
+                let mut prompt = framed.clone();
+                prompt.extend_from_slice(&answer[..through]);
+                let stop: fn(&[u8]) -> bool = |r| r.windows(2).any(|w| w == b">>") || r.contains(&b'\n');
+                let (release, [p, d]) = written_release(tower, &units, &prompt, &mut mark_keys, mark_agree, usize::MAX, mark_cap, stop)?;
+                prompts += p;
+                drawn += d;
+                marks.push((expression.to_vec(), release));
+            }
+            let n = done.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+            if n % 64 == 0 {
+                println!("TOWER_WRITTEN_PROGRESS problems={n} elapsed_ms={}", started.elapsed().as_millis());
+            }
+            Ok((free, marks, [prompts, drawn]))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let mut free_tsv = String::new();
+    let mut marks_tsv = String::new();
+    let (mut marks, mut prompts, mut drawn, mut most_moved, mut released) = (0, 0, 0, 0, 0);
+    for (i, (free, calcs, [p, d])) in reads.iter().enumerate() {
+        free_tsv.push_str(&format!("{i}\t{}\n", field(free)));
+        released += free.len();
+        for (j, (expression, release)) in calcs.iter().enumerate() {
+            marks_tsv.push_str(&format!("{i}\t{j}\t{}\t{}\n", field(expression), field(release)));
+        }
+        marks += calcs.len();
+        prompts += p;
+        drawn += d;
+        most_moved = most_moved.max(p + d);
+    }
+    write_new(&out.join("FREE.tsv"), free_tsv.as_bytes())?;
+    write_new(&out.join("MARKS.tsv"), marks_tsv.as_bytes())?;
+    println!(
+        "TOWER_WRITTEN problems={} calculations={marks} free_bytes={released} prompt_units={prompts} released_units={drawn} most_units_a_problem={most_moved} agree={agree} mark_agree={mark_agree} mark_cap={mark_cap} elapsed_ms={}",
+        reads.len(), started.elapsed().as_millis()
+    );
+    println!("TOWER_WRITTEN_FILES free_sha256={} marks_sha256={}", sha256(free_tsv.as_bytes())?, sha256(marks_tsv.as_bytes())?);
+    Ok(())
+}
+
 /// A text field of `LINES.tsv` or `LOOKS.tsv`: the bytes escaped (`read_lines`).
 fn field(bytes: &[u8]) -> String {
     bytes.iter().map(|&b| if b == b'|' { "\\x7c".to_string() } else { b.escape_ascii().to_string() }).collect()

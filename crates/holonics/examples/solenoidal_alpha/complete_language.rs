@@ -797,6 +797,7 @@ pub(super) fn run_with_execution(
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args),
         Some("sample-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_units(args),
+        Some("read-unit-tower-written") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_unit_written(args),
         Some("read-unit-copy") if backend == CompleteLanguageTrainingBackend::HostReference => unit_copy::read(args),
         Some("sample-unit-copy") if backend == CompleteLanguageTrainingBackend::HostReference => unit_copy::sample(args),
         Some("read-joined") if backend == CompleteLanguageTrainingBackend::HostReference => modes_train::read_joined(args),
