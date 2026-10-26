@@ -17,6 +17,15 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 26: the stores and copiers are retired (host).** The binding bank (a slot memory written
+by the delta rule), the reset clock (a copy pointer at the readout), the passage tree and its node
+lock (an index of contexts with a longest-match copier), the letters copy and the keyed-modes
+trainer that joined them are deleted, about 6,000 lines. The plain unit tower trains and reads to
+the same bits, state and written release without them. The October paragraphs below that measure
+them are history. The
+[record](research/records/2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)
+holds the audit and the receipts.
+
 **October 25: one listener hears GSM8K, MNIST and speech (host).** The arithmetic line stops at the
 tens, and the three general tracks return as sections of one passage over 257 classes: GSM8K
 questions and answers as octets, MNIST digits as pen strokes with their labels, LibriSpeech as

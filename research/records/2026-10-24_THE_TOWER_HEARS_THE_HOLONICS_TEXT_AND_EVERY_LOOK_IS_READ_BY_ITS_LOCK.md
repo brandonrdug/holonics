@@ -290,6 +290,13 @@ No held-out text line is met verbatim in training, since the files differ.
 
 ## The lock where a located key fires
 
+**Withdrawn, October 26.** The moments in this section were placed by the passage tree's node
+lock, an index of exact contexts with a longest-match copier, and `read-lines-located` and the
+passage tree were retired in commit `0934a25ff`
+([the retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements stand as reads at those moments only; a moment the tower locates itself is still
+owed, and the lookups are not a design to resume.
+
 `read-lines-located` (depth 4) places the moment with no declared byte. The passage tree
 (`hnn::passage`) hears the read stream, and a line's moment is its first cell whose four classes up to
 it lie in the line and form a context the tree's lock locates at full depth: the same four classes

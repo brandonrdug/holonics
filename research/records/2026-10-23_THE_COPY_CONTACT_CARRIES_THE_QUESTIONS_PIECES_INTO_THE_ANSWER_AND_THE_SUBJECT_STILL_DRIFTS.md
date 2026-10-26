@@ -1,5 +1,12 @@
 # The copy contact carries the question's pieces into the answer, and the subject still drifts
 
+**Withdrawn, October 26.** The letters copy this record builds or measures runs the passage tree's
+node lock forward as a copier beside the tower. An audit made at Brandon's request found it, and
+commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 Refs #405 #404. Follows [units founded by code length](2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY.md)
 (the units' gated tower, its working state) and [the node lock](2026-10-23_THE_NODE_LOCK_READS_THE_LOCATED_EQUALITY_AND_CONTEXT_PAST_EIGHT_CHARACTERS_ADDS_NOTHING.md)
 (the located equality). Status: [definition; agent-inferred, October 23], built and measured on

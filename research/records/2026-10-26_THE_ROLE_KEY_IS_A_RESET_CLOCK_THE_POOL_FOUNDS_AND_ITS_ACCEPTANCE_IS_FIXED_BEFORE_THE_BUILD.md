@@ -1,5 +1,12 @@
 # The role key is a reset clock the pool founds, and its acceptance is fixed before the build
 
+**Withdrawn, October 26.** The reset clock this record builds or measures is a copy pointer: it
+holds the unit that arrived after a chosen class and raises that unit's logit at the output. An
+audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 Refs #404 #405 #386. Design record, October 26. Grades: [definition] for the object's law,
 [agent-inferred] for each choice (its reason beside it), [measured] for the observer's pre-read.
 

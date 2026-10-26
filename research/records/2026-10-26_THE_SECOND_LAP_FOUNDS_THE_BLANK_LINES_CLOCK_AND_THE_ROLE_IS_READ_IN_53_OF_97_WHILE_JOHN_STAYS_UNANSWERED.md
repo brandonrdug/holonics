@@ -1,5 +1,12 @@
 # The second lap founds the blank line's clock, and the role is read in 53 of 97 while John stays unanswered
 
+**Withdrawn, October 26.** The reset clock this record builds or measures is a copy pointer: it
+holds the unit that arrived after a chosen class and raises that unit's logit at the output. An
+audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 October 26. Refs #404, #405, #386. The lap's acceptance, fixed before it ran
 ([record](2026-10-26_THE_POOL_FOUNDS_THE_CLOCK_AFTER_ANY_AND_ITS_COPY_PAYS_THE_CERTIFICATE_WHILE_THE_ROLE_STAYS_UNREAD.md)
 §5), read on Brandon's PC at `8147a5dd7`. Grades: [measured] for what the runs printed,

@@ -80,29 +80,6 @@ impl HostPass {
             Slot::Reread => &mut self.reread,
         }
     }
-
-    /// [agent-inferred, October 26; record
-    /// `2026-10-26_THE_REPLAY_STOPPED_AT_ITS_FIRST_WINDOW_SO_IT_READS_THE_SECTIONS_OWN_OPENING_READ.md`
-    /// §2] **The opening read's cells, handed to an exterior**: each stream's cells of the forward
-    /// kept in [`Slot::Opened`], read in parallel by stream into that stream's sink, `each(sink, i,
-    /// face, held, top)` with the cell's index, its face, each clock's held class (the alphabet
-    /// where it holds nothing) and the top face the readout and the copies read: the arguments
-    /// [`Tower::read_clocks`] hands, from the very cells the section's reverse reads. A reading:
-    /// nothing moves, and no second forward is taken. Refused without a kept opening read, with a
-    /// sink count other than the streams', or on a tower without a clock.
-    pub fn read_opened<S: Send>(&self, sinks: &mut [S], each: impl Fn(&mut S, usize, &TowerFace, &[usize], &[i32]) -> Result<()> + Sync) -> Result<()> {
-        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("an exterior reads a kept opening read"))?;
-        if sinks.len() != forwards.len() {
-            return refuse("one sink a stream of the opening read");
-        }
-        sinks.par_iter_mut().zip(forwards.par_iter()).try_for_each(|(sink, (cells, _))| {
-            for (i, cell) in cells.iter().enumerate() {
-                let held = cell.clock.as_deref().ok_or(TowerError::Refused("an opening read handed out is a clocked tower's"))?;
-                each(sink, i, &cell.face, held, &cell.top)?;
-            }
-            Ok(())
-        })
-    }
 }
 
 impl PassRealization for HostPass {
@@ -197,8 +174,8 @@ pub struct ResidentLevel {
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face or a
-/// binding bank is joined. Read from the tower's own owners, so a realization holds no second copy of a law.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face is
+/// joined. Read from the tower's own owners, so a realization holds no second copy of a law.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -213,8 +190,6 @@ pub struct ResidentLaw {
     pub ln2_square: i128,
     pub pair_face: bool,
     pub ring_face: bool,
-    pub bank: bool,
-    pub clock: bool,
 }
 
 impl Tower {
@@ -264,8 +239,6 @@ impl Tower {
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
             pair_face: self.pair.is_some(),
             ring_face: self.ring.is_some(),
-            bank: self.bank.is_some(),
-            clock: self.clock.is_some(),
         })
     }
 }

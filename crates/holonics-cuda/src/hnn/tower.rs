@@ -14,7 +14,7 @@
 //! streams and cells in its own order is the host's stream-by-stream sum, bit for bit.
 //!
 //! [definition] **The declaration the card carries**: a gated tower, rectifying contacts, not
-//! turned, not pumped, no pair or ring face, no binding bank, no passage credit, at most four
+//! turned, not pumped, no pair or ring face, no passage credit, at most four
 //! levels, streams of one section length. Any other is refused before a launch
 //! ([`TowerCard::admits`]), never run on a partial law.
 //!
@@ -306,12 +306,6 @@ impl<'c> TowerCard<'c> {
         if law.pair_face || law.ring_face {
             return refuse("the card carries no pair or ring face");
         }
-        if law.bank {
-            return refuse("the card carries no binding bank: the bank's chunk form is owed");
-        }
-        if law.clock {
-            return refuse("the card carries no reset clock");
-        }
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
@@ -571,7 +565,7 @@ impl<'c> TowerCard<'c> {
         if streams == 0 || cells == 0 || classes.iter().any(|c| c.len() != cells + 1) || targets.len() != streams || targets.iter().any(|t| t.len() != cells) {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
-        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.bank.is_some() || !o.held.is_empty() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
+        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
             return Err(TowerError::Refused("the card opens on uncredited states of the declared bank"));
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells };

@@ -1,8 +1,6 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
-//! and its streams' states; and the card refuses a declaration it does not carry, a banked tower
-//! among them.
-use holonics::hnn::tower::bank::BankDeclaration;
+//! and its streams' states; and the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
 use holonics_cuda::hnn::{Card, TowerCard};
@@ -94,19 +92,4 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let ragged: Vec<&[usize]> = vec![&classes[..], &classes[..9]];
     let ragged_targets = vec![targets[0].clone(), targets[0][..8].to_vec()];
     assert!(realized.forward(&host.tower, &[host.tower.rest(), host.tower.rest()], &ragged, &ragged_targets, Slot::Opened).is_err());
-}
-
-/// A banked tower is refused before any launch, by its law and by a banked opening state: the card
-/// has no bank, so running one would return a bankless tower's bits as the banked tower's.
-#[test]
-fn the_card_refuses_a_banked_tower() {
-    let mut banked = Tower::found_on(declaration(11, true), &keys(1 << 16), TurnLadder::Both).expect("founded");
-    let bank = BankDeclaration::first(&banked.declaration);
-    banked.join_bank(bank, &keys(1 << 16)).expect("joined");
-    let law = banked.resident_law().expect("the law");
-    assert!(law.bank);
-    assert!(TowerCard::admits(&law).is_err());
-    let (bankless, _) = learners(11);
-    assert!(TowerCard::admits(&bankless.tower.resident_law().expect("the law")).is_ok());
-    assert!(banked.rest().bank.is_some(), "a banked tower's rest carries the bank the opening check refuses");
 }

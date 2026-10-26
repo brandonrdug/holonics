@@ -84,6 +84,62 @@ class ExteriorTools(unittest.TestCase):
         self.assertIsNone(rules.value("8(2/3)"))
         self.assertIsNone(rules.value("2**3"))
 
+    def test_written_rules_bin_each_calculation_by_its_hearings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held = root / "held.txt"
+            held.write_bytes(b"Two and three?\nSum <<2+3=5>>5 then <<5*4=20>>20\n\n")
+            train = root / "train.txt"
+            train.write_bytes(b"Q?\nA <<2+3=5>>5\n\nQ?\nB <<2+3=5>>5 <<5*4=21>>\n\n")
+            release = root / "release"
+            release.mkdir()
+            (release / "FREE.tsv").write_text("0\tSum\\n\n")
+            (release / "MARKS.tsv").write_text("0\t0\t2+3\t5>>\n0\t1\t5*4\t21>>\n")
+            out = run("written_rules.py", held, train, "heard", release).splitlines()
+            self.assertIn("met=1/1 never_met=0/1", out[0])
+            self.assertEqual(out[1], f"HEARD dir={release} 0=0/1 1=0/0 2-3=1/1 4-7=0/0 8-15=0/0 16+=0/0")
+
+
+    def test_written_rules_read_never_met_sums_on_their_rings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held = root / "held.txt"
+            held.write_bytes(b"Q?\nA <<12+30=42>>42 <<50-8=42>>42 <<7+7=14>>14 <<2*3=6>>6 <<9+2=11>>11\n\n")
+            train = root / "train.txt"
+            train.write_bytes(b"Q?\nA <<1+1=2>>2\n\n")
+            release = root / "release"
+            release.mkdir()
+            (release / "FREE.tsv").write_text("0\tA\\n\n")
+            (release / "MARKS.tsv").write_text(
+                "0\t0\t12+30\t42>>\n0\t1\t50-8\t53>>\n0\t2\t7+7\t24>>\n0\t3\t2*3\t6>>\n0\t4\t9+2\t1\n"
+            )
+            out = run("written_rules.py", held, train, "rings", release).splitlines()
+            # Written 42, 53, 24 and an unfinished 1 against exact 42, 42, 14, 11 (differences 0,
+            # 11, 10); the foil reads 53, 24, the unfinished one and 42 against them (11, 18, -, 31).
+            self.assertEqual(
+                out[1],
+                f"RINGS dir={release} n=4 mod9=1 foil9=1 mod10=2 foil10=0 mod11=2 foil11=1 mod990=1 foil990=0",
+            )
+
+
+    def test_numeral_rings_name_the_last_digit_of_each_whole_numeral(self):
+        spec = importlib.util.spec_from_file_location("numeral_rings", TOOLS / "numeral_rings.py")
+        rings = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rings)
+        text = b"Pay 120 or 1,500 now?\nIt is <<120*3=360>>360 and 2.500 or 45\n\nQ 1000?\nA 7\n\n"
+        # Framed: a blank line, the question and its line end, then the answer. 1,500 and 2.500 are
+        # not whole numerals of three digits, 45 and 7 are too short.
+        framed = b"\n\nPay 120 or 1,500 now?\nIt is <<120*3=360>>360 and 2.500 or 45\n"
+        found = rings.named("numerals", text)
+        self.assertEqual([(i, framed[b - 2 : b + 1] if i == 0 else None, v["numeral"]) for i, b, v in found],
+                         [(0, b"120", 120), (0, b"120", 120), (0, b"360", 360), (0, b"360", 360), (1, None, 1000)])
+        self.assertEqual(found[-1][1], len(b"\n\nQ 1000") - 1)
+        # The equals of a two-numeral sum or difference only: 120*3 is a product.
+        text = b"Q?\nA <<12+30=42>>42 <<120*3=360>>360 <<50-8=42>>42 <<1.5+2=3.5>>\n\n"
+        framed = b"\n\nQ?\nA <<12+30=42>>42 <<120*3=360>>360 <<50-8=42>>42 <<1.5+2=3.5>>\n"
+        found = rings.named("equals", text)
+        self.assertEqual([(framed[b - 5 : b + 1], v) for _, b, v in found],
+                         [(b"12+30=", {"a": 12, "b": 30, "result": 42}), (b"<50-8=", {"a": 50, "b": 8, "result": 42})])
 
 if __name__ == "__main__":
     unittest.main()

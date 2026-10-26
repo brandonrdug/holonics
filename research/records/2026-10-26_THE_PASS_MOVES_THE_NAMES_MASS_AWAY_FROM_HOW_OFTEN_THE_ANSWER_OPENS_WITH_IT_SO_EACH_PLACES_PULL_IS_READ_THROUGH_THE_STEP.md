@@ -1,5 +1,12 @@
 # The pass moves the name's mass away from how often the answer opens with it, so each place's pull is read through the step
 
+**Withdrawn, October 26.** The reset clock this record builds or measures is a copy pointer: it
+holds the unit that arrived after a chosen class and raises that unit's logit at the output. An
+audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 October 26. Refs #404, #405, #386. The read the previous record fixed
 ([record](2026-10-26_THE_NAMES_RIVAL_AT_THE_ANSWERS_OPENING_IS_THE_AND_THE_PASS_TAKES_MOST_OF_THE_LOST_MARGIN_FROM_THE_READOUT.md)
 §5), on Brandon's PC at `f21cf37a2`, and the read it decides, built here with its decision fixed

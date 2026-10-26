@@ -1,5 +1,12 @@
 # The clock gains only where its arrival recurs, so its join becomes a copy at the output, and its acceptance is fixed before the build
 
+**Withdrawn, October 26.** The reset clock this record builds or measures is a copy pointer: it
+holds the unit that arrived after a chosen class and raises that unit's logit at the output. An
+audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
+retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
+The measurements below stand only as measurements of that machinery, never as progress of the
+learner, and nothing here is a design to resume.
+
 October 26. Refs #404, #405, #386. The read the
 [pool record](2026-10-26_THE_POOL_CHOOSES_THE_BLANK_LINES_CLOCK_AND_ITS_PASS_CODES_ABOVE_ITS_TWIN_SO_NOTHING_IS_FOUNDED.md)
 §5 named as next, the law it changes, and the acceptance of the changed law, fixed before it is
