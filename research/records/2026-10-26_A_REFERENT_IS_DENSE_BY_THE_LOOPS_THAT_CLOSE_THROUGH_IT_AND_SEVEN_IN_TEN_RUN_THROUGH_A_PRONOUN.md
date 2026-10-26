@@ -323,6 +323,16 @@ from a subject named for it.
 
 - **A store with a privileged subject** (this record's first version). Filing what a passage says
   under a named subject is an archive of facts, never retention. Refused in §5.
+- **An index of contexts counted as generation** (lessons failure 2, its eighth recurrence). The
+  first version worked inside the
+  [binding bank](2026-10-26_THE_BINDING_BANK_IS_A_STRAND_CLOCKED_BY_ITS_ANTECEDENT_AND_A_RELEASE_IS_TRACED_BY_ITS_ADDRESS.md),
+  itself a key/query/value store, now withdrawn. Inside that frame, keeping a referent can only
+  become keying the store by it. [agent-inferred] A region's density is the tower's own state's work: an address is
+  where the current sits on the rings, holding is a lock, and reading is the bend a later arrival
+  takes, never a lookup.
+- **The word "key".** A Holonics key is a navigator's configuration located by loop closure, never
+  a database key. The first version's "the held handle must key the bank" used the second in the
+  first's name.
 - **An authored routine standing in for learning.** The receipt's name rule, pronoun lists and
   coreference rule are observer instruments. They stay in the receipt and never enter the machine.
 - **Seen material graded as unseen.** The samples are read only after the held-out question.
