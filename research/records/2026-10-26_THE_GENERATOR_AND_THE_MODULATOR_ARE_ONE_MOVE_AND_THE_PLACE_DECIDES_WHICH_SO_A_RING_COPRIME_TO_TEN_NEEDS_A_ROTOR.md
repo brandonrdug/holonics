@@ -4,11 +4,12 @@ October 26. Refs #404, #405, #410. **Grade.** Each claim carries one of these gr
 - [owned]: an existing owner states it.
 - [proved-standard]: a classical result, with its source.
 - [proved-derived]: proved here.
-- [checked]: verified by this record's receipt, in integers and fractions only (1,000,350 checks).
+- [checked]: verified by this record's receipts, in integers and fractions only (1,000,350 and 1,749,434 checks).
 - [agent-inferred]: a choice or join made here.
 - [interpretation]: a reading across subjects.
 
-The exact receipt is `generator_modulator.py` in
+The exact receipts are `generator_modulator.py` (parts A to G) and `rotor_and_staircase.py`
+(parts H to N, for §11 and §12) in
 [`…_receipts/`](2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR_receipts/RUN.md).
 
 **Computational object.** The helical pair interaction, read here as a mode's move under an
@@ -327,6 +328,12 @@ Its properties:
 **The consumer equation** is the near-miss record's: on every ring the learner holds,
 `x_q(release) = T_q(x_q(a), x_q(b))`. Here `x_q` is held by a rotor instead of rebuilt by contacts.
 
+[checked] **Correction, the same day (§11).** Read on past the operator, one rotor register holds
+the concatenation `10^len(b)·a + b`, which is the sum only on ring 9. So `x_q(a)` must be captured
+at the operator and the ring restarted, and `T_q` is read by the pair contact's bilinear block. The
+rotor therefore stands on the pair-contact tower, not on `C`, and its step is an integer key located
+by closure, with the Fourier form below kept as a foil. §11 gives the law at the consumer.
+
 **The acceptance, fixed before any build runs.** The rotor tower `R` is trained with `C`'s recipe:
 - width 64, 64 modes, 256 contacts, two levels, eight streams;
 - sections of 128, three passes, rate `2^(−7)`;
@@ -370,14 +377,201 @@ derivation, and it waits on design's train-slice read:
   calculations are reported as recitation.
 - **Bits read as progress.** Code lengths are reported beside the acceptance, never as it.
 
-## 11. Owed
+## 11. Design's questions, and the rotor at the tower
+
+Design asked four things on October 26:
+- a check of its own derivation;
+- how a class holding several digits acts on ring 11;
+- whether its predictions for the pumped towers `P` and `PP` hold;
+- the rotor's law as equations at `hnn::tower`.
+
+The answers below are checked by part H of `rotor_and_staircase.py`.
+
+[checked] **One register holds the concatenation.** Read on past an operator, one register holds
+`10^len(b)·a + b`. That is `a + b` mod 9, `(−1)^len(b)·a + b` mod 11 and `b` mod 10. Ring 9 is the
+one ring on which the concatenation is the sum.
+
+So a sum on any other ring needs three pieces:
+1. **Capture.** The operator opens the gate of a mode that captures the first operand's ring.
+2. **Restart.** The ring restarts. Its founded `|λ|` is small, so the digits close its gate and it
+   holds; the operator opens the gate, so the ring releases at `|λ|²` and takes the push.
+3. **The bilinear read.** At the equals the pair contact's bilinear block reads both products:
+   `2Re(c₁h₁)·Re(c₂h₂) = Re(c₁c₂·h₁h₂) + Re(c₁c̄₂·h₁h̄₂)` (part N). Here `h₁h₂` carries the phase of
+   `a + b` and `h₁h̄₂` the phase of `a − b`, on every ring at once.
+
+[owned] `contact.face-table-blocks` calls a sum's ring face additive. It is, in the ring's own
+chart. Realized as two co-present phases in a plane, it is their product, which is the bilinear
+block. The chart decides, as in §3.
+
+Design's predictions follow from this:
+- `C` stays at its foil;
+- `P` rises on ring 9, about half on ring 11, and stays at its foil on ring 10;
+- `PP` rises on all three only if descent finds the capture.
+
+So under `PP`, a ring left at its foil names the capture before it names the hand or the seam.
+
+[checked] **A class holding several digits, on ring 11.** A class of `k` digits with value `D` acts
+as `x ↦ (−1)^k x + D`:
+- for even `k`, a turn;
+- for odd `k`, the mirror about `6D`.
+
+That gives 22 actions, the dihedral group of 11. The closure's key on ring 11 splits into two parts:
+- a sign character on the classes, located first as a parity system over GF(2) around the loops;
+- translations, a linear system over `ℤ/11` twisted by the signs.
+
+Both stages are linear.
+
+[proved-derived] **The rotor's law at the consumer.**
+
+```text
+(P^σ h)_(4k+j) = h_(4k + ((j + σ) mod 4))          σ ∈ ℤ/4, keyed by the arriving class
+h'_(t−1)       = P^(σ_t) h_(t−1)
+h_t            = λ_t ⊙ h'_(t−1) + γ_t ⊙ B x_t       the turned move (the pumped move likewise on h')
+G_h(t)         = (Cᵀδr)⁻ + P^(−σ_(t+1)) (conj(λ_(t+1)) ⊙ G_h(t+1))
+```
+
+- **Step, then the move.** The character law is `χ_a(10n + d) = ω^(ad)·χ_(10a)(n)`: the mode for
+  `a` takes the old mode for `10a`, then turns by `a·d`.
+- **What the keys hold.** Let mode `j` hold the character `10^j`. Then `σ = 1` for every digit, and
+  mode `j` turns by `2·10^j·d/p` half turns. The turned mode's keyed turn already represents that
+  turn.
+- **Covectors.** Every covector that reads `h_(t−1)` reads `h'_(t−1)` instead. `σ` has no covector.
+- **The opening.** At `σ = 0` the rotor tower opens on its turned twin.
+- [agent-inferred] **σ is located by closure.** It is an integer key per class and per ring, opens
+  at 0, and is located by closure, not by descent, for two reasons:
+  - a step from 0 to 1 is a permutation, and any relaxed path between them passes through mixtures
+    of modes;
+  - `σ` is a winding, which changes only at a crossing, in whole units: helicity changes only at a
+    reconnection (Moffatt), §6.
+
+  The Fourier form of §8 stays as a foil.
+- [checked] **Passivity.** A permutation hands each mode exactly one mode's state, so the tower's
+  bound `|h| ≤ √((1 + ρ_max)/(1 − ρ_max))·max|Bx|` holds unchanged, because
+  `ρK + √(1 − ρ²) ≤ K(ρ_max)` for every `ρ ≤ ρ_max`. The relaxed Fourier step mixes modes and keeps
+  only the ring's ℓ² norm, which needs a carrier `2^6.5` times wider.
+- [checked] **What a ring holds.** A ring of `K` modes stepped once a digit holds `n` mod every
+  divisor of `10^K − 1`:
+  - four modes hold `9999 = 3²·11·101`;
+  - six modes hold `999999 = 3³·7·11·13·37`.
+
+[proved-standard; agent-inferred] **The fluid side.**
+- **Kelvin.** Kelvin's carried circulation is the held mode: a closed gate, not `ρ = 1`.
+- **Reconnection.** Through a reconnection, link and writhe convert into twist and the sum is kept
+  (Scheeler et al.). So when a key is relocated, the reading is the joint two-sided code length
+  `L(A) + L(B|A)`. One side's bits can move while the joint is kept.
+
+[checked; proved-standard] **Design's derivation** holds, with three corrections:
+- **The helix's group is infinite.** The helical code's screw has infinite order, so its dihedral
+  group is the infinite one, `⟨a, b | a² = b² = 1⟩`. `(ab)ⁿ = 1` holds only on a ring of `n`.
+- **A reflection is not a conjugated turn.** A reflection is never conjugate to a turn, because their
+  determinants differ. Reflections are conjugate to each other by turns:
+  `R_ψ = Rot(ψ/2)·R_0·Rot(−ψ/2)` for `R_ψ z = e^(iψ) z̄`.
+- **Floquet's frame doubles past the bifurcation.** The real Floquet frame needs the doubled period
+  once the monodromy has a negative eigenvalue, which is the pump's half-turn sheet.
+
+Its reading of `Lk = Tw + Wr` as the symmetric joint code length is an interpretation that holds.
+The shared quantity is the mutual information `I(A:B) = I(B:A)`. It is exact for entropies, and for
+description lengths it holds to `O(log)`.
+
+## 12. Why only these rings: the base's neighbours, the grain staircase and the Galois colours
+
+Brandon, October 26 (paraphrased). He asked why only 2, 3, 5, 9, 10 and 11 are one-plane turns.
+He read a Fermat-like and cryptanalytic flavour in the list, and noticed that:
+- 2 cycles the even endings, and 5 the endings 0 and 5;
+- 9 is `3²` while `4 = 2²` is missing;
+- the list feels like a staircase.
+
+He joined this to chart transitions, foveation, stereophony and colour: gauging information takes
+two or more receptors, whose comparison has spectral gaps to work with.
+
+[checked, part I] **The base's three neighbours.** One plane can turn, mirror or flatten. A digit
+multiplies a ring's angle by the base, so ring `m` is one plane in one of three ways:
+- a turn exactly when `b ≡ 1 (mod m)`;
+- a mirror exactly when `b ≡ −1`;
+- a flattening exactly when `b ≡ 0`.
+
+These are the divisors of `b − 1`, `b + 1` and `b`, checked for every base from 2 to 60:
+- base 10 gives 2, 3, 5, 9, 10 and 11;
+- base 9 gives 2, 3, 4, 5, 8, 9 and 10, and there 2 is a turn.
+
+This is `radix.cheap-face-table` read as motion.
+
+[checked, part J] **The staircase is the grain.** Read `k` digits at once and the base is `10^k`, so
+the one-plane rings are the divisors of `10^k − 1`, `10^k` and `10^k + 1`:
+- 4, 25 and 101 arrive at two digits;
+- 7, 13 and 37 arrive at three (`999 = 3³·37`, `1001 = 7·11·13`).
+
+Three cases cover every ring:
+- a ring coprime to ten arrives at `ord_m(10)/2` or `ord_m(10)` digits (Euler);
+- a ring made of 2s and 5s arrives at `max(v₂, v₅)` digits;
+- a ring that mixes both kinds never arrives. Rings 6, 12, 14, 15, 18, 22, … always need two
+  planes, one for each kind.
+
+Prime powers climb by lifting the exponent. Since `v₃(10^k − 1) = 2 + v₃(k)`, rings 3, 9, 27 and 81
+arrive at grains 1, 1, 3 and 9. Rings 11, 121 and 1331 arrive at 1, 11 and 121.
+
+[interpretation] Depth and width trade: a coarse fovea sees as one turn what a fine one holds in
+coupled planes. The tower's levels are those depths (§7(e)).
+
+[checked, part L] **The 2 and the 5 nest.** In base 10 the even endings 0, 2, 4, 6, 8 add as ring 5
+and read every residue mod 5 once. The endings 0 and 5 are ring 2. In any base `b = rs` with `r` and
+`s` coprime, the endings divisible by `r` are a copy of ring `s`, so each factor's cycle runs on the
+other's zeros.
+
+[proved-standard; checked, part K] **The colours are Galois conjugates.** On the `p`-th roots of
+unity, multiplying the angle by 10 is the Galois automorphism `σ₁₀ = σ₂σ₅`, the product of the
+Frobenius elements at the base's primes. One plane is one complex embedding and its mirror; the
+mirror is complex conjugation, the Frobenius at the real place. So a ring is one plane only when
+`σ₁₀` is the identity or the mirror.
+
+Otherwise the orbit carries a root to its conjugates, other "colours" of the same number, and the
+rotor needs one plane per conjugate pair:
+- rings 7, 13 and 37 need three planes, as the eye has three kinds of cone;
+- ring 101 needs two, as there are two ears;
+- ring 41 needs five, 73 four, and 17 eight.
+
+Whether the half-way grain `(p − 1)/2` is a turn or a mirror is the Legendre symbol `(10/p)`
+(Euler's criterion). Quadratic reciprocity sets it by `p mod 40`: a mirror for
+`p ≡ 7, 11, 17, 19, 21, 23, 29, 33`. That `±1` is the quadratic character of §5.
+
+[interpretation] **Two receptors.** The pair contact compares two co-present receptors and reads
+their sum and difference at once (part N). In audio these are mid and side; in vision, luminance
+and the opponent channels. Coprime receptors meet once per residue pair, modulo their product (the
+helical code's law), which is how two rings resolve more than either alone.
+
+[interpretation] **Fermat and cryptanalysis.** Fermat's little theorem is why every coprime ring
+arrives at some grain. The digit move is the cyclotomic Frobenius. Fermat's Last Theorem was proved
+through Frobenius acting by `2×2` matrices on an elliptic curve's torsion (Wiles); that is the
+two-plane case, and `trace.hasse-bound` holds its trace. In cryptanalysis the same order of the base
+sets the cost of a discrete logarithm: Pohlig–Hellman splits it along the factors of `p − 1`. The
+index chart of §7 is that discrete logarithm.
+
+[interpretation; checked, part M] **Music.** A step on twelve notes makes `gcd(step, 12)` strokes:
+- fifths make one stroke, the circle of fifths;
+- minor thirds make three diminished sevenths;
+- major thirds make four augmented triads.
+
+This is the same split as long division (§4). Twelve fifths overshoot seven octaves by
+`3¹²/2¹⁹ = 531441/524288`, the Pythagorean comma. A power of 3 never equals a power of 2, so the helix
+of fifths never closes, and its carry is the comma.
+
+## 13. Owed
 
 To #410:
 - (a) the one-plane theorem for rings coprime to the base, the converse of `cheap_faces`;
 - (b) the dihedral-section bound for uncoupled banks;
 - (c) the rotor's plane count as a lower bound, with the rotor attaining it;
 - (d) `F X = Z F` and `Z X = ω X Z` on `ZMod n`;
-- (e) the braid words in `SL(2,ℤ)` and the cat map's Lucas fixed points.
+- (e) the braid words in `SL(2,ℤ)` and the cat map's Lucas fixed points;
+- (f) the base-action lemma: on `ℤ/m`, `x ↦ bx + d` is a translation if `b ≡ 1`, the mirror
+  `x ↦ d − x` if `b ≡ −1`, the constant `d` if `b ≡ 0`, and otherwise permutes the characters
+  `a ↦ ba`, turning each by `a·d`. Its corollary is the grain staircase: ring `m` is one plane at
+  grain `k` iff `m` divides `b^k − 1`, `b^k` or `b^k + 1`, and a ring mixing the base's primes with
+  others never is;
+- (g) the residue address: by CRT, `n mod lcm(m_i)` from the rings' faces (`990` from 9, 10 and 11);
+- (h) the dihedral group generated by two reflections, finite (`(ab)ⁿ = 1`) and infinite;
+- (i) the rotor's step: a ring of `K` modes stepped once a digit holds `n` mod every divisor of
+  `10^K − 1`, and a permutation keeps the passivity bound.
 
 Atlas rows:
 - `radix.digit-move-place-kind`;
@@ -387,4 +581,6 @@ Atlas rows:
 - `radix.rotor-planes`;
 - `motion.fourier-exchanges-shift-and-clock`;
 - `motion.torus-twists-every-kind`;
-- `motion.generator-is-modulator`.
+- `motion.generator-is-modulator`;
+- `radix.concatenation-not-sum`, `radix.base-neighbour-rings`, `radix.grain-staircase`,
+  `radix.rotor-galois-orbit` and `contact.bilinear-sum-difference` (§11 and §12).
