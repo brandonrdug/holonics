@@ -3595,7 +3595,8 @@ impl TowerLearner {
     }
 
     /// A reset clock joined to the learner's tower ([`Tower::join_clock`]), its join's moments
-    /// opened at zero beside the moments the learner carries.
+    /// opened at zero beside the moments the learner carries; its founding opens them on its
+    /// passage ([`TowerLearner::open_moments`]).
     pub fn join_clock(&mut self, level: usize, class: usize) -> Result<()> {
         self.tower.join_clock(level, class)?;
         self.first.resize(self.tower.theta.len(), 0);
@@ -5434,6 +5435,35 @@ mod tests {
         let drops = pool.drops(&tower).expect("drops");
         assert_eq!(drops.len(), 5);
         assert!(drops.windows(2).all(|p| !p[1].exceeds(&p[0])));
+    }
+
+    /// A founded clock's join opens its moments on its passage, as the ring's founded families do
+    /// (`TowerLearner::open_moments`): at `O = 0` the join's covector reaches it, over one section
+    /// the moments are that covector and its square on the deposit's grain, and every other moment
+    /// is left as carried.
+    #[test]
+    fn a_clocks_join_opens_its_moments_on_its_passage() {
+        let tower = tiny_clocked(true, false);
+        let classes = clocked_passage();
+        let sections: Vec<Vec<&[usize]>> = vec![vec![&classes[..19]], vec![&classes[18..]]];
+        let family = tower.clock_join().expect("a clock");
+        let mut learner = TowerLearner::new(tower.clone(), 7);
+        let mut states = vec![tower.rest()];
+        assert_eq!(learner.open_moments(family.clone(), &mut states, &sections[..1]).expect("opened"), 1);
+        let mut s = tower.rest();
+        let cells = tower.forward(&mut s, sections[0][0], &tower.reaches()).expect("forward");
+        let mut g = tower.reverse(&tower.rest(), &cells, sections[0][0], None).expect("reverse");
+        tower.to_step_grain(&mut g);
+        tower.to_move_chart(&mut g);
+        assert!(family.clone().any(|i| g[i] != 0), "the covector reaches the join at zero");
+        for i in 0..tower.theta.len() {
+            let expected = if family.contains(&i) { (g[i], g[i] * g[i]) } else { (0, 0) };
+            assert_eq!((learner.first[i], learner.second[i]), expected, "entry {i}");
+        }
+        let mut learner = TowerLearner::new(tower.clone(), 7);
+        let mut states = vec![tower.rest()];
+        assert_eq!(learner.open_moments(family, &mut states, &sections).expect("opened"), 2);
+        assert_eq!(learner.tower, tower, "nothing deposits");
     }
 
     #[test]
