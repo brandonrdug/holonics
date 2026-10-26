@@ -109,7 +109,7 @@ join        x^(ℓ+1)_t = x^ℓ_t + W₂ v_t + b₂ + O [Re v̂_t ; Im v̂_t]
   pairs the action expression with its antecedents, so the key reads both:
   `s(k_t) = 2^(−⌈log₂ w⌉)(W_k a_t + W_k′ x^ℓ_t + b_k)`. `W_k′` opens at zero, so the amended bank
   opens bit-identically on the built one, and the covector decides what each key carries. The
-  separator framing that record's next loop reads tests only the first point. The amendment covers
+  separator framing that record's next loop reads tests only the second point. The amendment covers
   both.
 - **The opening.** `O` opens at zero, so a banked tower opens bit-identically on its bankless twin,
   as the gated, turned and pumped modes open on theirs. The key and query turns open at zero (every
