@@ -63,7 +63,7 @@ equivariance, which is the paper's monad-algebra morphism. A field can read only
 | linear part | image of the words | what a readout sees | owner |
 |---|---|---|---|
 | one `M` for every symbol | the length, `ℕ` | (symbol, lag residue) counts | `laggedRun_lag_residue` |
-| commuting, chosen by the symbol | the symbol counts, `ℕ^Σ` | each entry transported by the counts of what followed it | owed (§5) |
+| commuting, chosen by the symbol | the symbol counts, `ℕ^Σ` | each entry transported by the counts of what followed it | `selectedRun_commuting` |
 | reflections in one plane | the dihedral group | parity and a signed phase sum | `plane_turns_commute` |
 | non-commuting | the free monoid | order | the minimal realization, `E T_a = U_a E` |
 
@@ -477,15 +477,29 @@ changes no crate.~~ [Withdrawn: a copier is never the contact to build.]
   owners.
 - Commuting selected moves see only symbol counts: with linear parts that commute, each entry
   `β(u_t)` reaches the state transported by `∏_a λ_a^(n_a)`, with `n_a` the count of `a` after
-  `t` (`Finset.prod_comp`).
+  `t` (`Finset.prod_comp`). Formal-checked on October 26 in
+  [`Geometry/CommutingCounts`](../../lean/HolonicsResearch/Geometry/CommutingCounts.lean): each entry is carried by the linear
+  parts of the symbols after it (`selectedRun_eq_transport`), commuting transports with equal counts
+  are equal whatever the order (`transport_eq_of_counts`), and in a commutative ring the transport
+  is `∏_a λ_a^(n_a)` (`transport_eq_prod_counts`, `selectedRun_commuting`).
 - The face's two covectors: for `p_τ ∝ p^τ`, `d/dτ (−ln p_τ(u)) = −ln p(u) − H(p)` at `τ = 1`, with
   second derivative `Var_p(ln p)`; and under the true conditional, the news and the centred
   surprise are martingale differences, so no read of them lowers the expected code (Gibbs).
+  Formal-checked on October 26 in [`HNN/FaceCovectors`](../../lean/HolonicsResearch/HNN/FaceCovectors.lean) for a positive
+  normalized face on finite classes: the tilted code (`tiltedCode_eq`), its temperature derivative
+  `−ln p(u) − H(p)` (`tiltedCode_deriv_one`) and second derivative `Var_p(ln p)`
+  (`tiltedCode_second_deriv`), the two martingale differences (`news_mean_zero`,
+  `surprise_mean_zero`) and Gibbs's inequality for every positive face of mass at most one (`gibbs`).
 
 - The released ratio's telescope: for a mixture `q = (β e + k)/(β + 1)` with step `β' = β e/k` and
   any release `β_(t+1) = R(β'_t)`, `Σ −ln q = Σ −ln k + ln(1 + β_0) − ln(1 + β_n) +
   Σ [ln(1 + β_(t+1)) − ln(1 + β'_t)]` and its mirror in `e`; with `R` the clamp to `[2^(−K), 2^K]`,
   each release costs at most `ln(1 + 2^(−K))` on one line and nothing on the other.
+  Formal-checked on October 26 in [`HNN/ReleasedTelescope`](../../lean/HolonicsResearch/HNN/ReleasedTelescope.lean): the mixture's
+  code in either chart (`neg_log_mixture`, `neg_log_mixture_mirror`), the telescope for any release
+  (`released_telescope`, `released_telescope_mirror`), the clamp's cost (`release_cost`) and the
+  clamped code bound `Σ −ln q ≤ Σ −ln k + ln(1 + β_0) − ln(1 + β_n) + n ln(1 + 2^(−K))` with its
+  mirror (`released_code_le`, `released_code_le_mirror`).
 - [Withdrawn October 26 with §8, and its box leaves #410.] The located equality's certified step:
   for `F(c) ∝ q(c) 2^(w(c) + α[c = ĉ])` the cell's code
   `−log₂ F(u)` has derivative `F(ĉ) − [u = ĉ]` and second derivative `ln 2 · F(ĉ)(1 − F(ĉ)) ≤ (ln 2)/4`
