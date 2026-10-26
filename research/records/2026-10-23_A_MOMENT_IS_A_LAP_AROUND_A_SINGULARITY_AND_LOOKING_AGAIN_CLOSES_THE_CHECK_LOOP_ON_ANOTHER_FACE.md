@@ -206,6 +206,18 @@ Agreed with the design thread, which builds it:
     and `|Lⁿh − h*| ≤ ρⁿ |h − h*|`, beside `PhaseCarrier.modulatedCarrier_compose`. A velocity
     gradient's direct and reflected parts are `∂_z w` and `∂_z̄ w`, and its determinant is `−W/4`
     with no divergence (Okubo–Weiss).
+  - Formal-checked on October 26 in [`Mathematics/CheckLoop`](../../lean/HolonicsResearch/Mathematics/CheckLoop.lean): the check
+    loop decides (`check_loop_decides`) and composes for `+`, `−` and `·` (`face_add`, `face_sub`,
+    `face_mul`, `release_add`, `release_sub`, `release_mul`); the look moves readings apart by at
+    most `|a| + |b|` (`look_norm_sub_le`), has one fixed point at `ρ < 1` with rate `ρⁿ`
+    (`look_fixed_exists`, `look_fixed_unique`, `look_iterate`) and composes through
+    `modulatedCarrier_compose` (`look_compose`); the velocity gradient splits into direct and
+    reflected parts with determinant `−W/4` without divergence (`gradient_split`, `gradient_det`,
+    `okubo_weiss`); and the loss's covector is a source and a vortex (`log_norm_hasDerivAt`,
+    `arg_branch_hasDerivAt`), one lap circulates `2π` (`lap_circulation`), and every lift of
+    `R = c / w` moves by `−ẇ/w` through `Objects/Ratio.lift_deriv_eq_logDeriv`
+    (`loss_lift_deriv`). Still owed: the pair potential's join to `Physics/Fluid/Singularity`, and
+    the change of frame `G M G⁻¹` carrying the fixed point.
 
 ## Receipts
 
