@@ -111,3 +111,34 @@ role_clock/clockB8.cells: 97 named answers opening with the name, 97 read, 0 ski
 Run 5's prompt bits a byte: 1.969 for the founded state on the framed prompt, 2.080 for the twin on
 the framed prompt, 2.689 for the founded state on the prompt as written. Every run exited 0. The
 worktree's only untracked path was its `target/`, retired by name before the worktree was removed.
+
+## The hold foils (`89e8c00a0`)
+
+`solenoidal_alpha` at `89e8c00a0`, binary SHA-256
+`3a2734ebca2e6271064ffc8d2a67e203654bc944e1e9e39740c5c8c88e2761a6`, release build 1 min 59 s in its
+own worktree. Every input matched its SHA-256, the founded state `clockB.state` (`fdd0d38d…c9cb`)
+among them.
+
+```text
+B train-unit-tower UNITS SHA train_all.txt SHA dev.txt SHA dev.roles SHA keys SHA 64 64 256 2 8 128 1 7 OUT clockB.state SHA all|all-but-clock-join|clock-join
+B found-tower-clock bankA7/STATE SHA train_all.txt SHA UNITS SHA 8 128 0 clockC.state
+```
+
+The plan ran the foils in two pairs. F1 stopped on its time bound beside F0. Two 8-thread passes
+on the PC's 12 physical cores, with two threads each, slow each other 1.31×: F0 read 111.3 ms a
+section beside F1 and 83.9 alone. The partition changed and the bounds did not: F2, the refounding
+and F1 again then ran one at a time.
+
+| run | projection | deadline | measured wall | ratio | peak resident |
+|---|---|---|---|---|---|
+| F0, `all` (beside F1, then alone) | 1,311 × 154.0 ms + 5 s = 206.9 s | 207 s | 119.0 s | 0.58 | 281,952 KiB |
+| F1, `all-but-clock-join`, beside F0 | 206.9 s | 207 s | stopped early at section 96 (mean 154.2 ms) | — | 453,776 KiB |
+| F2, `clock-join`, alone | 206.9 s | 207 s | 158.8 s | 0.77 | 382,900 KiB |
+| the refounding, alone | 95.0 + 18.6 + 102.9 + 10 s = 226.5 s | 227 s | 217.0 s | 0.96 | 627,548 KiB |
+| F1 again, alone | 206.9 s | 207 s | stopped early at section 320 (mean 158.1 ms; its window 489.1 ms) | — | 490,920 KiB |
+
+The largest windows were 111.3 ms (F0), 155.0 ms (F1 beside F0) and 118.6 ms (F2). The refounding's
+eight streams reported between 94.3 and 95.0 s, inside the 104.9 s bound, and it wrote
+`fdd0d38d3452032a8e9d6c90c41c2d52d4cf3ea3ebca79d38e929704ae4cc9cb` again. The states: F0
+`e3b1e4bb3d5bd90afabbeaea2993f306392b3a44b5a6470ef9f49541ea211b56`, F2
+`b50a03a156750037364d766e1662c8fa7f636cacf965e9cf8636603141511ab6`. Neither F1 run wrote a state.
