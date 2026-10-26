@@ -585,7 +585,14 @@ To #410:
   `digitMove_on_characters`, `unit_permutes_characters`, `word_action`, `one_plane_iff` and
   `mixed_ring_never_one_plane`;
 - (g) is `residue_address`, `address_nine_ten_eleven` and `address990`;
-- (h) is `two_reflections` and `two_reflections_generate`.
+- (h) is `two_reflections` and `two_reflections_generate` inside `DihedralGroup n`, and the rest of
+  the box is in [`Geometry/TwoReflections`](../../lean/HolonicsResearch/Geometry/TwoReflections.lean):
+  in any group, two distinct involutions other than `1` generate a copy of
+  `DihedralGroup (orderOf (ab))` (`dihedralHom`, `two_involutions_dihedral`), with `2·orderOf(ab)`
+  elements (`card_two_involutions`, `0` by `Nat.card`'s convention when `ab` has infinite order); a
+  plane mirror is never conjugate to a turn, since their determinants are `−1` and `1`
+  (`mirror_not_conj_turn`); and the mirrors are conjugate to each other by turns
+  (`mirror_conj_by_turn`, `mirror_conj_by_turn_complex`: `v·conj(conj v·z) = v²·conj z`).
 
 Atlas rows:
 - `radix.digit-move-place-kind`;

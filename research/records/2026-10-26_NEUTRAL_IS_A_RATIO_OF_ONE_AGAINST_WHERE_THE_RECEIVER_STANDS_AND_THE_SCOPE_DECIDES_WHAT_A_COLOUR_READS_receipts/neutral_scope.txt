@@ -1,0 +1,5 @@
+S: n <= 200: 3866 (n, scope) pairs; neutral 972 (1128 real, 1766 turning, 972 neutral); neutral exactly when the scope holds a repeated prime's fibre: 972 = 972
+S: twelfth turn: Q(i) reads i, Q(sqrt3) reads sqrt3, Q(zeta3) reads 0, Q reads 0
+F: n <= 400: 16224 fibres over repeated primes, each primitive and cancelling; a single prime's fibre always holds one non-unit
+M: mu(p n) = -mu(n) for 115996 pairs, n <= 5000, p <= 100, p not dividing n
+all 300536 checks hold (12769 ms)
