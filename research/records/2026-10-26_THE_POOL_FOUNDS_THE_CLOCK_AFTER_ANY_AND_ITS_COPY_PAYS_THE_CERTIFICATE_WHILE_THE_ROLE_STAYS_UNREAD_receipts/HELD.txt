@@ -1,0 +1,30 @@
+The held-out reads of the founded pass, October 26, on Brandon's PC: the cells from
+role_clock/copyD8/STATE (3551b608…b8f3), then the observer (tools/listener/bank_trace.py at
+76568dd0a) in modes `role` and `held`. The observers are read-only. Paths are relative to the run
+directory, which is not in the repository.
+
+B read-tower-held-cells role_clock/copyD8/STATE SHA dev.txt SHA 8 role_clock/copyD8.cells UNITS SHA
+
+TOWER_HELD_CELLS unjoined=false units=1318 streams=8 cells=151676 grain_bits=20 out=role_clock/copyD8.cells
+RUN_RECEIPT exit=0 wall_s=4.4 peak_rss_kib=37196 user_s=33.8
+
+cells    role_clock/twin8.cells    sha256 d538b2c99a2622c4b7128c4a7caea852bb3e077b316a936170e718f9474ce8b9
+cells    role_clock/copyD8.cells   sha256 5e51e0a39a0061c30c0e045d2582b106a490fddea8c1876993654d48ffee46fd
+
+python3 -I tools/listener/bank_trace.py role train_all.txt dev.txt role_clock/twin8.cells role_clock/copyD8.cells
+
+role_clock/twin8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 1; its mean code 6.582 bits
+role_clock/copyD8.cells: 97 named answers opening with the name, 97 read, 0 skipped; the first unit has the largest mass in 0; its mean code 6.800 bits
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=47068 user_s=0.2
+
+python3 -I tools/listener/bank_trace.py held dev.txt role_clock/twin8.cells role_clock/copyD8.cells '"any "'
+
+role_clock/twin8.cells then role_clock/copyD8.cells: 151676 cells; the second codes -6063.5 bits against the first
+  before any reset: 56 cells; largest mass 10 then 10; code 6.057 then 5.886 bits a cell; difference -9.6 bits
+  the held arrival itself: 564 cells; largest mass 57 then 65; code 6.738 then 6.850 bits a cell; difference +63.2 bits
+  repeats the held arrival: 1266 cells; largest mass 261 then 686; code 6.379 then 3.593 bits a cell; difference -3526.8 bits
+  elsewhere, 1-8 cells after the reset: 4488 cells; largest mass 1791 then 1802; code 4.101 then 4.055 bits a cell; difference -207.3 bits
+  elsewhere, 9-32 cells after the reset: 12137 cells; largest mass 4631 then 4725; code 4.047 then 4.010 bits a cell; difference -449.8 bits
+  elsewhere, 33-128 cells after the reset: 39636 cells; largest mass 15382 then 15481; code 3.895 then 3.876 bits a cell; difference -732.2 bits
+  elsewhere, 129-1000000000 cells after the reset: 93529 cells; largest mass 32285 then 32606; code 4.281 then 4.268 bits a cell; difference -1201.0 bits
+RUN_RECEIPT exit=0 wall_s=0.2 peak_rss_kib=68140 user_s=0.2

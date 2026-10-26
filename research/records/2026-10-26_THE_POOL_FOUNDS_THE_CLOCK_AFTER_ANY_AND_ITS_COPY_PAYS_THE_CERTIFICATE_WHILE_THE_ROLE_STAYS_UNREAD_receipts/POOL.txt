@@ -1,0 +1,67 @@
+The copy's pool, read by `found-tower-clock` at 76568dd0a on Brandon's PC, October 26, from the
+four-pass bank state bankA7/STATE (1dee7db0…6ea4), 8 streams, sections of 128 cells. Each line as
+printed. Paths are relative to the run directory, which is not in the repository.
+
+Run 1: the training text's first eighth (role_clock/train8.txt, 717deec4…8a4d)
+
+TOWER_CLOCK_STREAM stream=5 cells=20992 elapsed_ms=5625
+TOWER_CLOCK_STREAM stream=1 cells=20992 elapsed_ms=5637
+TOWER_CLOCK_STREAM stream=6 cells=20992 elapsed_ms=5674
+TOWER_CLOCK_STREAM stream=4 cells=20992 elapsed_ms=5683
+TOWER_CLOCK_STREAM stream=7 cells=20992 elapsed_ms=5695
+TOWER_CLOCK_STREAM stream=0 cells=20992 elapsed_ms=5700
+TOWER_CLOCK_STREAM stream=2 cells=20992 elapsed_ms=5707
+TOWER_CLOCK_STREAM stream=3 cells=20992 elapsed_ms=5737
+TOWER_CLOCK_POOL clocks=1151 cells=167936 energy=35734927692231110197 grain_bits=48 read_ms=5766 drops_ms=6512
+TOWER_CLOCK_DROP rank=1 class=313 piece="\n\n" drop=13798953515885091 drop_ppm=386 rank_c=65 cells=167011
+TOWER_CLOCK_DROP rank=2 class=335 piece="any " drop=13299155817607716 drop_ppm=372 rank_c=65 cells=166369
+TOWER_CLOCK_DROP rank=3 class=61 piece="=" drop=5847427241255342 drop_ppm=163 rank_c=65 cells=166137
+TOWER_CLOCK_DROP rank=4 class=36 piece="$" drop=4519134240390945 drop_ppm=126 rank_c=65 cells=165569
+TOWER_CLOCK_DROP rank=5 class=115 piece="s" drop=3300443127372325 drop_ppm=92 rank_c=65 cells=165806
+TOWER_CLOCK_DROP rank=6 class=402 piece="number of " drop=3285263279587221 drop_ppm=91 rank_c=65 cells=161773
+TOWER_CLOCK_DROP rank=7 class=296 piece="a " drop=2664653406487140 drop_ppm=74 rank_c=65 cells=167082
+TOWER_CLOCK_DROP rank=8 class=50 piece="2" drop=2545009803754364 drop_ppm=71 rank_c=65 cells=166098
+TOWER_CLOCK_DROP rank=9 class=275 piece="0 " drop=2501822294820972 drop_ppm=70 rank_c=65 cells=164692
+TOWER_CLOCK_DROP rank=10 class=286 piece="of " drop=2405857385978620 drop_ppm=67 rank_c=65 cells=165091
+TOWER_CLOCK_DROP rank=11 class=340 piece="5 " drop=2373023712220946 drop_ppm=66 rank_c=65 cells=162050
+TOWER_CLOCK_DROP rank=12 class=49 piece="1" drop=2209999647603792 drop_ppm=61 rank_c=65 cells=166036
+TOWER_CLOCK_DROP rank=13 class=320 piece="?\n" drop=2197158032299023 drop_ppm=61 rank_c=65 cells=166563
+TOWER_CLOCK_DROP rank=14 class=391 piece="2 " drop=2171044431661394 drop_ppm=60 rank_c=65 cells=161463
+TOWER_CLOCK_DROP rank=15 class=307 piece=" p" drop=2151782029000690 drop_ppm=60 rank_c=65 cells=165383
+TOWER_CLOCK_DROP rank=16 class=492 piece="<<3" drop=2046627566591928 drop_ppm=57 rank_c=65 cells=162719
+TOWER_CLOCK_REST rank=512 class=1318 piece=rest drop=136615666327771 drop_ppm=3 rank_c=65 cells=167936
+TOWER_CLOCK_SPREAD clocks=1151 ppm_at_rank_share_0=386 10=17 25=7 50=3 75=1 90=0 100=0
+TOWER_CLOCK_FOUNDED class=313 piece="\n\n" material=290669 moment_sections=164 moments_ms=12541 state_sha256=5fe8cb85ccd01635b836285d78915f3c4c625784dde28f1f8fd7cd2be6d6831a elapsed_ms=24883
+RUN_RECEIPT exit=0 wall_s=24.9 peak_rss_kib=427496 user_s=190.1 stopped=no
+
+Run 2: the whole training text (train_all.txt, 050b94f3…3b95)
+
+TOWER_CLOCK_STREAM stream=7 cells=167808 elapsed_ms=46722
+TOWER_CLOCK_STREAM stream=0 cells=167808 elapsed_ms=46937
+TOWER_CLOCK_STREAM stream=6 cells=167808 elapsed_ms=46974
+TOWER_CLOCK_STREAM stream=1 cells=167808 elapsed_ms=47018
+TOWER_CLOCK_STREAM stream=3 cells=167808 elapsed_ms=47031
+TOWER_CLOCK_STREAM stream=4 cells=167808 elapsed_ms=47130
+TOWER_CLOCK_STREAM stream=5 cells=167808 elapsed_ms=47178
+TOWER_CLOCK_STREAM stream=2 cells=167808 elapsed_ms=47332
+TOWER_CLOCK_POOL clocks=1177 cells=1342464 energy=285722581081897510982 grain_bits=48 read_ms=47371 drops_ms=7256
+TOWER_CLOCK_DROP rank=1 class=335 piece="any " drop=116019110908411072 drop_ppm=406 rank_c=65 cells=1341240
+TOWER_CLOCK_DROP rank=2 class=313 piece="\n\n" drop=102333375277320063 drop_ppm=358 rank_c=65 cells=1341484
+TOWER_CLOCK_DROP rank=3 class=61 piece="=" drop=50453527425313585 drop_ppm=176 rank_c=65 cells=1341327
+TOWER_CLOCK_DROP rank=4 class=36 piece="$" drop=29430544705315456 drop_ppm=103 rank_c=65 cells=1340726
+TOWER_CLOCK_DROP rank=5 class=402 piece="number of " drop=26588486711768443 drop_ppm=93 rank_c=65 cells=1330033
+TOWER_CLOCK_DROP rank=6 class=275 piece="0 " drop=25269790427405686 drop_ppm=88 rank_c=65 cells=1338879
+TOWER_CLOCK_DROP rank=7 class=115 piece="s" drop=23965281625525225 drop_ppm=83 rank_c=65 cells=1340383
+TOWER_CLOCK_DROP rank=8 class=296 piece="a " drop=21198509128666725 drop_ppm=74 rank_c=65 cells=1341926
+TOWER_CLOCK_DROP rank=9 class=50 piece="2" drop=19350934633865473 drop_ppm=67 rank_c=65 cells=1340569
+TOWER_CLOCK_DROP rank=10 class=49 piece="1" drop=18047013954014822 drop_ppm=63 rank_c=65 cells=1340901
+TOWER_CLOCK_DROP rank=11 class=340 piece="5 " drop=17598487772197974 drop_ppm=61 rank_c=65 cells=1340808
+TOWER_CLOCK_DROP rank=12 class=597 piece=".00" drop=17508979477420033 drop_ppm=61 rank_c=65 cells=1281929
+TOWER_CLOCK_DROP rank=13 class=258 piece=" t" drop=16463216907457208 drop_ppm=57 rank_c=65 cells=1337063
+TOWER_CLOCK_DROP rank=14 class=267 piece=" the " drop=16319981319410226 drop_ppm=57 rank_c=65 cells=1339699
+TOWER_CLOCK_DROP rank=15 class=570 piece="efor" drop=15265333661380498 drop_ppm=53 rank_c=65 cells=1331125
+TOWER_CLOCK_DROP rank=16 class=697 piece="/100" drop=15097149017461004 drop_ppm=52 rank_c=65 cells=1313421
+TOWER_CLOCK_REST rank=899 class=1318 piece=rest drop=217854542616714 drop_ppm=0 rank_c=65 cells=1342464
+TOWER_CLOCK_SPREAD clocks=1177 ppm_at_rank_share_0=406 10=16 25=6 50=2 75=0 90=0 100=0
+TOWER_CLOCK_FOUNDED class=335 piece="any " material=290669 moment_sections=1311 moments_ms=100156 state_sha256=6417eb3dd37ea302d838c1dc6a95b2efa6a8df04b539c6c2d6a9c66b0539a9d9 elapsed_ms=154842
+RUN_RECEIPT exit=0 wall_s=154.9 peak_rss_kib=506560 user_s=1182.3 stopped=no
