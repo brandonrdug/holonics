@@ -413,7 +413,10 @@ To #410:
 - (l) the time boundary: `diag(1, r)` in `(Re, Im)`, the action conserved, and the pumped mode as
   its case. Formal-checked the same day in
   [`Physics/TimeBoundary`](../../lean/HolonicsResearch/Physics/TimeBoundary.lean), with
-  non-expansion for `0 ≤ r ≤ 1`, conjugation as time reversal and the time mirror at `r = 0`;
+  non-expansion for `0 ≤ r ≤ 1`, conjugation as time reversal and the time mirror at `r = 0`. The
+  same file proves the step's norm, `max(1, |r|)` (`timeBoundary_normSq_le`, attained by
+  `timeBoundary_norm_attained`), and expansion for `r > 1` (`timeBoundary_expands`). (l) is
+  discharged;
 - (m) the dilation current: `∂_μ(x_ν T^(μν)) = T^μ_μ + x_ν ∂_μ T^(μν)`, beside the angular current in
   `Physics/ReceiverStressEnergy`.
 - (n) the two compressions: `Tr ζ_n^j = c_n(j)`, `Tr ζ_n = μ(n)`, and the layer trace of the
@@ -421,7 +424,11 @@ To #410:
   `cyclotomic_eval_one_eq_exp_vonMangoldt` in the same file. `Tr ζ_n = μ(n)` is
   `trace_primitive_colour` in [`Mathematics/ColourTrace`](../../lean/HolonicsResearch/Mathematics/ColourTrace.lean),
   and the same file proves the rest the same day: the Ramanujan sums `c_n(j)` (`ramanujan_sum`, from
-  `sum_nthRoots_pow`) and the layer trace (`layer_fixes_below`, `layer_trace`). (n) is discharged;
+  `sum_nthRoots_pow`), the layer trace (`layer_fixes_below`, `layer_trace`) and the sum of the
+  traces of every order up to `N`, which is the Mertens function `M(N)` (`sum_traces_eq_mertens`).
+  The product form `∏_(d|n) d^(−μ(d)) = e^(Λ(n))`, and `= Φ_n(1)` for `n ≥ 2`, is
+  `prod_divisors_zpow_neg_moebius` and `prod_divisors_zpow_neg_moebius_eq_cyclotomic` in
+  `Mathematics/OrbitEnergy`. (n) is discharged;
 - (o) the Fibonacci model set: the window `[−1, τ − 1)` in the conjugate colour gives the
   substitution's chain.
 
