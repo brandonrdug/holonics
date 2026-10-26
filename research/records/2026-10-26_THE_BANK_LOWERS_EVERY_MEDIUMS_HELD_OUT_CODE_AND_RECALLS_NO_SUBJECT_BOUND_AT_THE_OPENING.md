@@ -95,24 +95,67 @@ whole, as released. Two observer reads, outside the machine:
 opening (0 of 16 samples about John), and six of its eight two-draw releases loop on a phrase the bank
 recalls.
 
-**Why** [agent-inferred, from the law, not measured]. A key is the face before the arrival. `John`
-is the prompt's first unit, so it is bound under the rest face. In the training passage every
-question follows the separator after the previous answer (`#### n` and a blank line), so the bank
-learned keys and queries for subjects bound under the separator's face, and the rest face is one no
-cell of the answer reproduces. The read returns what followed the present face's last arrival: once
-the release writes `a sheld`, the next `a ` recalls `sheld`, and two agreeing draws sharpen that
-recall into the loop. The release is the passage's continuation, so the bank binds it like any
-arrival.
+**Why, as first read** [agent-inferred, from the law; §2.1 refutes it as the whole cause]. A key is
+the face before the arrival. `John` is the prompt's first unit, so it is bound under the rest face.
+In the training passage every question follows the separator after the previous answer (`#### n`
+and a blank line), and the rest face is one no cell of the answer reproduces. The read returns what
+followed the present face's last arrival: once the release writes `a sheld`, the next `a ` reads it
+back, and the rewrite carries no news, so nothing damps the binding but the hold. It is an echo with
+a round-trip gain near one, which two agreeing draws push over; one draw stays below.
 
-**The next loop** reads the original pass-3 tower here with the bank joined, the question as
-written and the question preceded by the separator the training passage puts before every question.
+### 2.1 On the original tower: the question framed, and the key that reads the arrival
+
+The original pass-3 units tower is on the cloud host with its eight key streams, so the subject was
+read there three ways, each after one more pass:
+- **Framed.** The question preceded by the separator the training passage puts before every
+  question (a blank line), so `John` is bound under the separator's face, as every subject in the
+  training text is. The bankless pass-3 tower read the framed question as the framing's control.
+- **The key reads the arrival.** The spec record's October 26 amendment (from the mathematics
+  thread): `s(k_t) = 2^(−σ)(W_k a_t + W_k′ x^ℓ_t + b_k)`, `W_k′` opening at zero, so the bank opens
+  bit-identically on the antecedent-only one. A key read from the antecedent alone gives every
+  arrival under one face one key, the later overwriting the earlier, and cannot recall an arrival by
+  its own content. Built in `hnn::tower::bank` with its covector; the covector check now reads
+  eleven families and passes.
+
+| learner (one pass after pass 3) | held out, all | questions | answer prose | digits | markup | prompt code, as written / framed | about John, as written | about John, framed | two-draw loops, as written / framed |
+|---|---|---|---|---|---|---|---|---|---|
+| bankless pass 3 (control) | 1.839 | 1.928 | 1.725 | 2.443 | 1.426 | — / 2.028 | 0 / 16 (units record) | 0 / 16 | — / 0 of 8 |
+| bank, antecedent key | 1.604 | 1.811 | 1.348 | 2.243 | 1.217 | 2.185 / 1.940 | 0 / 16 | 0 / 16 | 3 / 2 of 8 |
+| bank, key reads the arrival too | 1.604 | 1.816 | 1.346 | 2.253 | 1.200 | 2.456 / 2.172 | 1 / 16 | 0 / 16 | 1 / 1 of 8 |
+
+Every sample is in
+[`SAMPLES_FRAMING.md`](2026-10-26_THE_BANK_LOWERS_EVERY_MEDIUMS_HELD_OUT_CODE_AND_RECALLS_NO_SUBJECT_BOUND_AT_THE_OPENING_receipts/SAMPLES_FRAMING.md)
+and every pass line in `PASSES_JOHN.txt`. The one sample about John is the amended bank's key stream
+8, one draw, which opens `John takes Linume, Ley have 30 gallons, 9:00 * 3 = <<600*3=660>>720 feet`
+and then drifts. Two other samples write `John` inside a new problem they opened after `####`. A loop
+here is a sample whose last 150 bytes repeat with a period of at most 40 bytes over at least 60
+bytes (an observer's read; no one-draw sample loops except one of the amended bank's).
+
+**What this shows** [measured]:
+- Binding `John` under the trained separator's face does not bring the subject back: 0 of 16 on
+  the antecedent key, so the rest-face key is not the whole cause.
+- The key that reads the arrival codes the held-out problems as the antecedent key does after one
+  pass (1.604 both), loops less (2 two-draw loops in 16 against 5), and opens one sample on John.
+  The subject's bar, 12 of 16, is not met by any learner.
+
+**The heard text holds the copy** (an observer's read of the training text, outside the machine):
+of the 4,647 training problems whose question opens on a name, 2,653 answers name it and 1,078 open
+with it. So the relation the subject read asks for is in what the tower heard; one pass at rate
+`2^(−7)` has not carried it into the bank's keys [agent-inferred]. The next loop trains the amended
+bank further on Brandon's PC, where a banked pass takes about a fifth of the cloud host's time, and
+reads John after every pass.
 
 ## 3. Time
 
 Every run's projection, deadline, measured wall time and peak resident set are in `RUN.md`. The two
 prose passes ran at 0.82 and 0.56 of their projections. On Brandon's PC, the first three-pass run
 stopped itself at section 992 when a window ran past its bound; it was relaunched with that window's
-time as its bound, not with a larger deadline.
+time as its bound, not with a larger deadline. On the cloud host, the amended bank's first pass
+stopped itself at section 64 (a mean of 815.6 ms a section against an 805.9 ms bound): its bound was
+the antecedent-only bank's largest window, a measurement of another law. The amended law was then
+timed on its own, beside the old one on the same 300 problems (the old one ran 7% slower than its
+earlier read, the amended one 3% slower again), and relaunched on the largest window measured on the
+amended law, 827.5 ms; it ran at 0.90 of that projection.
 
 ## 4. The recorded failures these choices could repeat
 
@@ -123,8 +166,9 @@ time as its bound, not with a larger deadline.
   the earlier records' held-out sets, fixed by SHA-256; no training text enters a held-out read.
 - **An authored routine standing in for learning.** The compressors are exterior readings beside the
   tower, never a part of it; nothing in the bank names a subject, a separator or a phrase.
-- **A refusal answered with a larger limit.** The run that stopped itself was relaunched with its
-  measured window as its bound and its deadline from the same projection.
+- **A refusal answered with a larger limit.** Each run that stopped itself was relaunched with a
+  bound measured before the new launch, on the law being run, and its deadline from that projection;
+  no running run's limit was raised.
 - **Text run on its codec's grain as the exception.** The same bank and commands read the MQAR class
   terrain, the Holonics bytes and the GSM8K units.
 
@@ -132,7 +176,8 @@ time as its bound, not with a larger deadline.
 
 - Item 5's first half, held-out prose at or below bz2 given the prose part of the training text:
   0.269 bits a byte to close.
-- Item 6, the subject question: the framing read above, then the release's own recall.
+- Item 6, the subject question: 1 of 16 at best against a bar of 12; the amended bank trained
+  further, read after every pass, and the release's echo through its own bindings.
 - Item 3, the card form: the card now refuses a banked tower before a launch
   (`the_card_refuses_a_banked_tower`).
 - Lean, carried in #410: `bank_recall_exact`, `bank_delta_overwrite`, `bank_chunk_eq_recurrent`.

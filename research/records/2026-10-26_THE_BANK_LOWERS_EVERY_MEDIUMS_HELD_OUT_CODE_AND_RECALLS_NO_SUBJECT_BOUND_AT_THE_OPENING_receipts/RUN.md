@@ -90,3 +90,51 @@ held-out read; banked 128.5 ms; the two together 166.4 and 77.4 ms, with held-ou
 
 The relaunch took the stopped run's largest window as its per-section bound: a measurement taken
 before launch, not a raised limit. The deadline came from the same projection.
+
+## Item 6 on the original tower (the cloud host, 4 cores, every command on 4 threads)
+
+### Inputs
+
+The units record's own tower at pass 3 (`2bf016e35a141a4a…`, its pass lines head `PASSES_JOHN.txt`),
+its eight 16 KiB sample streams, the units and the prompt above, and the item-5 key stream
+`keys_tower.bin` (`1f748645…`) for founding and training. The framed
+prompt is the same question after the blank line the training text puts before every question
+(`e697eca00b6ca348…`). `train300` is the first 300 training problems (`15b1aac8f8376361…`). Two
+binaries: `B0`, `solenoidal_alpha` at `b34006930` (`c5c8eba308de0d44…`), and `B1`, the same with the
+amended key (`c7749388027ac1a2…`).
+
+### Commands
+
+```text
+B0 complete-language join-tower-bank pass3/STATE SHA keys_tower.bin SHA bankO.state level=0
+B0 complete-language train-unit-tower UNITS SHA … keys_tower.bin SHA 64 64 256 2 8 128 1 7 bank4 bankO.state SHA
+B1 complete-language join-tower-bank pass3/STATE SHA keys_tower.bin SHA bankA.state level=0
+B1 complete-language train-unit-tower UNITS SHA … keys_tower.bin SHA 64 64 256 2 8 128 1 7 bankA4 bankA.state SHA
+B0|B1 complete-language sample-unit-tower UNITS SHA STATE SHA prompt|prompt_framed SHA keys_sN SHA 400 OUT [2]
+```
+
+The timing reads ran the same pass over `train300`.
+
+### States
+
+| state | SHA-256 |
+|---|---|
+| `bankO.state`, the antecedent-key bank joined | `bc50a31121652936…` |
+| `bank4/STATE`, its pass | `8205e987c9e4ae3b…` |
+| `bankA.state`, the amended bank joined (`O = 0`, `W_k′ = 0`) | `90660e440a5a6811…` |
+| `bankA4/STATE`, its pass | `0983677b150041db…` |
+
+### Time
+
+| run | projection | deadline | measured wall | ratio | peak resident | outcome |
+|---|---|---|---|---|---|---|
+| timing read, antecedent key, `train300` | unmeasured, planned at 1–3 min | 180 s | 66.4 s | — | 316,264 KiB | complete; largest window 715.3 ms |
+| antecedent-key pass | 1,311 × 715.3 ms + 23.4 s = 961 s | 965 s | 947.8 s | 0.99 | 386,080 KiB | complete |
+| amended pass, first launch | 1,311 × 805.9 ms + 23.4 s = 1,080 s | 1,080 s | 53.5 s | — | 368,952 KiB | stopped itself at section 64, mean 815.6 ms past its 805.9 ms bound (a bound read on the antecedent-only law); incomplete |
+| timing reads side by side, `train300` | the earlier read, 66.4 s | 180 s each | 72.4 s amended, 68.8 s antecedent-only | 1.09, 1.04 | 331,296 and 318,884 KiB | complete |
+| amended pass | 1,311 × 827.5 ms + 25.2 s = 1,110 s | 1,110 s | 1,003.1 s | 0.90 | 393,312 KiB | complete |
+| 80 samples, 4 at a time | — | 300 s each | — | — | — | complete |
+
+The amended pass's bound is the largest window measured on the amended law before its launch (the
+stopped run's), and its read time is its own timing read's: measurements of the law being run, not a
+raised limit.

@@ -9,7 +9,7 @@
 //!
 //! ```text
 //! antecedent  a_t    = [r̂_(t−1), x^ℓ_(t−1)]                      the face the arrival came into
-//! key turn    s(k_t) = 2^(−σ) (W_k a_t + b_k)                     d turns, half turns on 2^(−16)
+//! key turn    s(k_t) = 2^(−σ) (W_k a_t + W_k′ x^ℓ_t + b_k)          d turns, half turns on 2^(−16)
 //! query turn  s(q_t) = 2^(−σ) (W_q [r̂_t, x^ℓ_t] + b_q)            the present face
 //! value       v_t    = W_v x^ℓ_t + b_v                            d_v real channels
 //! harmonic    φ_n(s) = e^(iπ⟨n, s⟩),  n ∈ N = Π_i {0..M_i−1}      |N| = 2^m
@@ -59,6 +59,14 @@
 //!   two arrivals of one key class do not open on one key turn, and a read that recalls nothing
 //!   gives `O`'s covector nothing to correlate with. [measured; why the mixture defeats the key is
 //!   agent-inferred]
+//! - **The key reads the arrival as well as its antecedent** (the spec record's October 26
+//!   amendment, after the subject read). A key read from the antecedent alone gives every arrival
+//!   under one face one key, the later overwriting the earlier, and an arrival under the rest face
+//!   the bias alone: such a bank copies what followed a context and cannot recall an arrival by its
+//!   own content. `W_k′` reads the arrival's face `x^ℓ_t` and opens at zero, so the amended bank
+//!   opens bit-identically on the antecedent-only one, and the covector decides what each key
+//!   carries. Each part is released to the face's grain before they are added, so a zero `W_k′`
+//!   adds exactly nothing.
 //! - **The opening state's covector is held as given.** As the tower's passage credit is declared
 //!   for its modes only, a section's covector reaches the bank it opened on, and stops there: the
 //!   bank's history credit across sections is owed, not carried.
@@ -128,6 +136,7 @@ impl BankDeclaration {
 pub(super) struct BankLayout {
     pub(super) key: usize,
     pub(super) key_bias: usize,
+    pub(super) key_arrival: usize,
     pub(super) query: usize,
     pub(super) query_bias: usize,
     pub(super) value: usize,
@@ -145,6 +154,7 @@ impl BankLayout {
         Self {
             key: take(turns * a, MATERIAL_BITS),
             key_bias: take(turns, FACE_BITS),
+            key_arrival: take(turns * width, MATERIAL_BITS),
             query: take(turns * a, MATERIAL_BITS),
             query_bias: take(turns, FACE_BITS),
             value: take(dv * width, MATERIAL_BITS),
@@ -187,6 +197,7 @@ pub(super) struct BankCell {
 #[derive(Clone, Debug)]
 pub(super) struct BankReaches {
     key: u64,
+    key_arrival: u64,
     query: u64,
     value: u64,
     gate: u64,
@@ -325,6 +336,7 @@ impl Tower {
         }
         Some(BankReaches {
             key: reach(&t[bl.key..bl.key + turns * a]),
+            key_arrival: reach(&t[bl.key_arrival..bl.key_arrival + turns * w]),
             query: reach(&t[bl.query..bl.query + turns * a]),
             value: reach(&t[bl.value..bl.value + dv * w]),
             gate: reach(&t[bl.gate..bl.gate + w]),
@@ -336,7 +348,7 @@ impl Tower {
         })
     }
 
-    /// The turns `2^(−σ) (W r + b)` of a key or query face `r` (`2d` entries), half turns on
+    /// The query's turns `2^(−σ) (W r + b)` at the present face `r` (`2d` entries), half turns on
     /// `2^(−16)`.
     fn bank_turns(&self, material: usize, bias: usize, wmax: u64, face: &[i32]) -> Result<Vec<i64>> {
         let bank = self.bank.as_ref().expect("a bank");
@@ -346,6 +358,23 @@ impl Tower {
         affine(&t[material..material + turns * a], wmax, a, face, Some(&t[bias..bias + turns]), MATERIAL_BITS, MATERIAL_BITS, &mut s)?;
         for v in &mut s {
             *v = fit64(release(*v as i128, turn_spread(a)))?;
+        }
+        Ok(s)
+    }
+
+    /// The key's turns `2^(−σ) (W_k a + W_k′ x + b_k)` at the antecedent `a` (`2d` entries) and the
+    /// arrival's face `x` (`d`), half turns on `2^(−16)`: each part released to the face's grain,
+    /// then added.
+    fn key_turns(&self, reaches: &BankReaches, antecedent: &[i32], x: &[i32]) -> Result<Vec<i64>> {
+        let (bank, bl) = (self.bank.as_ref().expect("a bank"), self.layout.bank.expect("a bank's layout"));
+        let (turns, a, w) = (bank.harmonics.len(), antecedent.len(), x.len());
+        let t = &self.theta;
+        let mut s = vec![0i64; turns];
+        affine(&t[bl.key..bl.key + turns * a], reaches.key, a, antecedent, Some(&t[bl.key_bias..bl.key_bias + turns]), MATERIAL_BITS, MATERIAL_BITS, &mut s)?;
+        let mut own = vec![0i64; turns];
+        affine(&t[bl.key_arrival..bl.key_arrival + turns * w], reaches.key_arrival, w, x, None, 0, MATERIAL_BITS, &mut own)?;
+        for (v, o) in s.iter_mut().zip(own) {
+            *v = fit64(release(*v as i128 + o as i128, turn_spread(a)))?;
         }
         Ok(s)
     }
@@ -361,7 +390,7 @@ impl Tower {
             return refuse("a bank's state of another shape");
         }
         let present: Vec<i32> = read.iter().chain(x).copied().collect();
-        let key_phase = harmonics(&bank.harmonics, &self.bank_turns(bl.key, bl.key_bias, reaches.key, &state.antecedent)?, &reaches.ladder);
+        let key_phase = harmonics(&bank.harmonics, &self.key_turns(reaches, &state.antecedent, x)?, &reaches.ladder);
         let query_phase = harmonics(&bank.harmonics, &self.bank_turns(bl.query, bl.query_bias, reaches.query, &present)?, &reaches.ladder);
         let mut value = vec![0i64; dv];
         affine(&t[bl.value..bl.value + dv * w], reaches.value, w, x, Some(&t[bl.value_bias..bl.value_bias + dv]), MATERIAL_BITS, MATERIAL_BITS, &mut value)?;
@@ -514,6 +543,7 @@ impl Tower {
         let antecedents: Vec<&[i32]> = cells.iter().map(|c| c.antecedent.as_slice()).collect();
         let presents: Vec<Vec<i32>> = reads.iter().zip(inputs).map(|(r, x)| r.iter().chain(x.iter()).copied().collect()).collect();
         outer_sum(&mut g[bl.key..bl.key + turns * a], a, &key_cov, &antecedents)?;
+        outer_sum(&mut g[bl.key_arrival..bl.key_arrival + turns * w], w, &key_cov, inputs)?;
         outer_sum(&mut g[bl.query..bl.query + turns * a], a, &query_cov, &presents)?;
         outer_sum(&mut g[bl.value..bl.value + dv * w], w, &value_cov, inputs)?;
         outer_sum(&mut g[bl.gate..bl.gate + w], w, &gate_cov, inputs)?;
@@ -531,6 +561,7 @@ impl Tower {
         }
         let (mut to_read, mut to_input) = (vec![vec![0i64; w]; span], vec![vec![0i64; w]; span]);
         let mut back = vec![0i64; a];
+        let mut through_key = vec![0i64; w];
         let add = |dst: &mut [i64], src: &[i64]| -> Result<()> {
             for (d, &s) in dst.iter_mut().zip(src) {
                 *d = fit64(*d as i128 + s as i128)?;
@@ -541,7 +572,10 @@ impl Tower {
             transposed(&t[bl.query..bl.query + turns * a], reaches.query, a, &query_cov[i], MATERIAL_BITS, &mut back)?;
             add(&mut to_read[i], &back[..w])?;
             add(&mut to_input[i], &back[w..])?;
-            // The key at cell i reads cell i − 1's face; the opening's is held as given.
+            // The key at cell i reads cell i's arrival, and cell i − 1's face; the opening's is held
+            // as given.
+            transposed(&t[bl.key_arrival..bl.key_arrival + turns * w], reaches.key_arrival, w, &key_cov[i], MATERIAL_BITS, &mut through_key)?;
+            add(&mut to_input[i], &through_key)?;
             if i > 0 {
                 transposed(&t[bl.key..bl.key + turns * a], reaches.key, a, &key_cov[i], MATERIAL_BITS, &mut back)?;
                 add(&mut to_read[i - 1], &back[..w])?;
