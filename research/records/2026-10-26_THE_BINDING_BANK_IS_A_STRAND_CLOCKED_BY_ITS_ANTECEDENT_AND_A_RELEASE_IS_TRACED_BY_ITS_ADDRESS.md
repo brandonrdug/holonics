@@ -28,6 +28,10 @@ the present one. Three measured failures have that shape [agent-inferred: one ca
   ([record](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK.md));
   bz2 given the same training text coded them at 2.601 (October 25 orientation reading). bz2's block
   sorting codes a byte by the earlier occurrences of its context in the passage: in-context recall.
+  [October 26 correction: the 3.117 was read at 8 chunks, in which prose falls in three pieces, not
+  64; no reading of bz2 reproduces 2.601, and the bar is now declared with its pieces in
+  [the prose and subject record](2026-10-26_THE_BANK_LOWERS_EVERY_MEDIUMS_HELD_OUT_CODE_AND_RECALLS_NO_SUBJECT_BOUND_AT_THE_OPENING.md#1-item-5-prose): bz2 given the prose part of the training text,
+  2.773.]
 - **The subject.** None of the 16 samples continuing the held-out question about John answers about
   John, and 12 open on an invented or foreign name
   ([record](2026-10-23_THE_COPY_CONTACT_CARRIES_THE_QUESTIONS_PIECES_INTO_THE_ANSWER_AND_THE_SUBJECT_STILL_DRIFTS.md)).
@@ -209,6 +213,9 @@ sum over harmonics. In exact rationals the chunk form equals the recurrence on e
 5. **Prose.** On the 64 held-out Holonics prose pieces, the banked listener codes at or below bz2
    given the same training text, both measured in one receipt. Setting `O` to zero after training
    raises its code: the read carries code, and removing it shows that.
+   [October 26: read in [the prose and subject record](2026-10-26_THE_BANK_LOWERS_EVERY_MEDIUMS_HELD_OUT_CODE_AND_RECALLS_NO_SUBJECT_BOUND_AT_THE_OPENING.md#1-item-5-prose) on the tower's 8 chunks,
+   with the bar declared there as each compressor's lower code given the whole training text or the
+   prose part of it.]
 6. **The subject.** Continuing the copy-contact record's held-out question about John over the same
    eight key streams, at least 12 of the 16 samples answer about John (now none does).
 
