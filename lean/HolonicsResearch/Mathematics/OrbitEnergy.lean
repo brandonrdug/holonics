@@ -22,6 +22,8 @@ The record `research/records/2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBI
    `orbit_gap_product_eq_exp_vonMangoldt`): for `d ≥ 2`, `Φ_d(1) = e^(Λ(d))`. Only prime-power
    orbits carry energy, and a repetition `p^k` carries the primitive weight `log p`. This is the
    norm compression `N(1 − ζ_d) = e^(Λ(d))` of §12.
+4. **A ring's orbits multiply to its size** (`orbit_energies_multiply_to_ring`): for `m ≥ 1`,
+   `∏_(d | m, d ≠ 1) Φ_d(1) = m`, so the orbit energies of ring `m` add to `log m`.
 
 Consumers: the atlas rows `colour.orbit-energy` and `colour.trace-compression` (its norm half).
 -/
@@ -71,5 +73,11 @@ theorem orbit_gap_product_eq_exp_vonMangoldt {n : ℕ} (hn : 2 ≤ n) :
     push_cast
     rfl
   · simp
+
+/-- [proved-standard; formal-checked] **A ring's orbits multiply to its size.** -/
+theorem orbit_energies_multiply_to_ring (R : Type*) [CommRing R] {m : ℕ} (hm : 0 < m) :
+    ∏ d ∈ m.divisors.erase 1, (cyclotomic d R).eval 1 = m := by
+  rw [← eval_prod, prod_cyclotomic_eq_geom_sum hm]
+  simp
 
 end Holonics.Mathematics.OrbitEnergy
