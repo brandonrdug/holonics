@@ -10,7 +10,6 @@
 //! the rested tower: it opens at rest, receives the prompt, and releases each byte by an exact draw
 //! on its face.
 use super::*;
-use holonics::hnn::passage::{PassageDeclaration, PassageTree};
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
@@ -68,36 +67,24 @@ fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], str
     Ok(regions)
 }
 
-/// `read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS [unjoined]`: the
-/// trainer's held-out read (`held_out`) of a rested learner on byte text, alone: bits a byte by
-/// region (`TOWER_HELD`) and each region's code on `2^(−20)` bits over its bytes
-/// (`TOWER_HELD_CODES`). With `unjoined` the bank's join `O` is set to zero first. A tower with `O = 0`
-/// codes as its bankless twin (`a_banked_tower_opens_on_its_bankless_twin`), so the unjoined read is
-/// the trained tower with its bank's read removed and every other family as trained.
+/// `read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS`: the trainer's
+/// held-out read (`held_out`) of a rested learner on byte text, alone: bits a byte by region
+/// (`TOWER_HELD`) and each region's code on `2^(−20)` bits over its bytes (`TOWER_HELD_CODES`).
 pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
-    let usage = "read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS [unjoined]";
-    if args.len() != 8 && args.len() != 9 {
+    let usage = "read-tower-held STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS";
+    if args.len() != 8 {
         return Err(usage.into());
     }
     let started = Instant::now();
-    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let roles = roles_of(&args[5], &args[6], dev.len())?;
     let streams = positive(&args[7])?;
-    let unjoined = match args.get(8).map(String::as_str) {
-        None => false,
-        Some("unjoined") => true,
-        Some(_) => return Err(usage.into()),
-    };
-    if unjoined {
-        let join = learner.tower.bank_join().ok_or("an unjoined read needs a bank")?;
-        learner.tower.theta[join].iter_mut().for_each(|t| *t = 0);
-    }
     let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
     let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams)?;
     let (code, coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
     println!(
-        "TOWER_HELD unjoined={unjoined} streams={streams} dev_bits_a_byte={} dev_regions {} elapsed_ms={}",
+        "TOWER_HELD streams={streams} dev_bits_a_byte={} dev_regions {} elapsed_ms={}",
         per(code, coded), named_region_line(&REGIONS, &regions), started.elapsed().as_millis()
     );
     let codes: Vec<String> = REGIONS.iter().zip(&regions).map(|(name, &(c, n))| format!("{name}={c}/{n}")).collect();
@@ -105,31 +92,22 @@ pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// `read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [unjoined] [UNITS UNITS_SHA]`: the
+/// `read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [UNITS UNITS_SHA]`: the
 /// held-out read (`held_out`'s partition, each chunk from rest) written cell by cell to `OUT`
 /// (create-new): one line per coded class, the place in `DEV` of its first byte, its code on
 /// `2^(−20)` bits, its bytes, and its rank on the face that coded it (how many classes carry more
-/// mass; 0 when the face gives it the largest). A unit tower reads `DEV` in the founded `UNITS`; `unjoined` sets the
-/// bank's join `O` to zero first, as `read-tower-held` does. A reading beside the code, for an observer
-/// to set each class's code beside what it knows of it (the runs the text shares with the heard text,
-/// whether an answer's unit was in its question); nothing here enters the machine.
+/// mass; 0 when the face gives it the largest). A unit tower reads `DEV` in the founded `UNITS`. A
+/// reading beside the code, for an observer to set each class's code beside what it knows of it (the
+/// runs the text shares with the heard text, whether an answer's unit was in its question); nothing
+/// here enters the machine.
 pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
-    let usage = "read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [unjoined] [UNITS UNITS_SHA]";
-    let mut rest = args.get(7..).ok_or(usage)?;
-    let unjoined = rest.first().map(String::as_str) == Some("unjoined");
-    if unjoined {
-        rest = &rest[1..];
-    }
-    let units = match rest {
+    let usage = "read-tower-held-cells STATE STATE_SHA DEV DEV_SHA STREAMS OUT [UNITS UNITS_SHA]";
+    let units = match args.get(7..).ok_or(usage)? {
         [] => None,
         [path, sha] => Some(Units::from_text(std::str::from_utf8(&pinned_read(path, sha, READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?),
         _ => return Err(usage.into()),
     };
-    let mut learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    if unjoined {
-        let join = learner.tower.bank_join().ok_or("an unjoined read needs a bank")?;
-        learner.tower.theta[join].iter_mut().for_each(|t| *t = 0);
-    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let dev = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let streams = positive(&args[5])?;
     let (classes, lengths): (Vec<usize>, Vec<usize>) = match &units {
@@ -167,127 +145,8 @@ pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
     }
     std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[6])?, written.as_bytes())?;
     println!(
-        "TOWER_HELD_CELLS unjoined={unjoined} units={} streams={streams} cells={} grain_bits={READ_BITS} out={}",
+        "TOWER_HELD_CELLS units={} streams={streams} cells={} grain_bits={READ_BITS} out={}",
         units.as_ref().map_or(0, Units::len), parts.iter().map(Vec::len).sum::<usize>(), args[6]
-    );
-    Ok(())
-}
-
-/// [agent-inferred, October 26] `read-tower-bank-trace STATE STATE_SHA TEXT TEXT_SHA STREAMS REQUESTS
-/// REQUESTS_SHA OUT [UNITS UNITS_SHA]`: the bank's address trace (spec 2's trace (b),
-/// `holonics::hnn::tower::bank::BankTrace`) at the reads an observer requests, over `held_out`'s
-/// partition of `TEXT` (each chunk from rest), written to `OUT` (create-new) chunk by chunk as each
-/// finishes. A unit tower reads `TEXT` in the founded `UNITS`.
-///
-/// `REQUESTS` holds one request a line, two byte places in `TEXT`: the read's `p` (the read at the
-/// cell whose next class holds byte `p`) and a window's start `f`. For each request read inside its
-/// chunk, `OUT` holds `R p read_place window_place nonzero largest_address largest_share`: the first
-/// bytes of the class the read faces and of the class holding byte `f`, how many kept cells' addresses
-/// are nonzero at the address's grain, and the
-/// arrival place (its first byte) of the cell whose address `|a|²` is largest and of the cell whose
-/// share `|a|² ‖w‖²` is largest (on a tie, the later cell). Then `A p place a_re a_im w2` for every
-/// cell whose arrival lies at or after the class holding byte `f`: its address on `2^(−30)` and
-/// `‖w_τ‖²` on `2^(−48)`. A request whose read falls on a chunk's first class (read by no cell of that
-/// chunk) is counted as skipped. A reading beside the code: nothing here enters the machine, and an
-/// observer sets each address beside what it knows of the cell (the question's name, the answer's
-/// opening).
-pub(super) fn read_tower_bank_trace(args: &[String]) -> Result<()> {
-    let usage = "read-tower-bank-trace STATE STATE_SHA TEXT TEXT_SHA STREAMS REQUESTS REQUESTS_SHA OUT [UNITS UNITS_SHA]";
-    let units = match args.get(9..).ok_or(usage)? {
-        [] => None,
-        [path, sha] => Some(Units::from_text(std::str::from_utf8(&pinned_read(path, sha, READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?),
-        _ => return Err(usage.into()),
-    };
-    let started = Instant::now();
-    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    let tower = &learner.tower;
-    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let streams = positive(&args[5])?;
-    let requests: Vec<(usize, usize)> = std::str::from_utf8(&pinned_read(&args[6], &args[7], READ_BUDGET as usize)?)?
-        .lines()
-        .map(|line| match line.split('\t').collect::<Vec<_>>()[..] {
-            [p, f] => Ok((count(p)?, count(f)?)),
-            _ => Err("a request is two places, tab-separated".into()),
-        })
-        .collect::<Result<_>>()?;
-    let (classes, lengths): (Vec<usize>, Vec<usize>) = match &units {
-        None => (text.iter().map(|&b| b as usize).collect(), vec![1; text.len()]),
-        Some(units) => units.parse(&text).map_err(|e| e.to_string())?.into_iter().map(|u| (u as usize, units.piece(u as usize).len())).unzip(),
-    };
-    let mut places = Vec::with_capacity(lengths.len());
-    lengths.iter().fold(0usize, |at, &n| {
-        places.push(at);
-        at + n
-    });
-    // The class holding byte `p`.
-    let holding = |p: usize| -> Result<usize> {
-        if p >= text.len() {
-            return Err("a requested place outside the text".into());
-        }
-        Ok(places.partition_point(|&x| x <= p) - 1)
-    };
-    let chunk = classes.len().div_ceil(streams);
-    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
-    // Each request's read cell (the class before the one holding p) and window's first arrival.
-    let mut asked: Vec<(usize, usize, usize)> = requests.iter().map(|&(p, f)| Ok((holding(p)?, holding(f)?, p))).collect::<Result<_>>()?;
-    asked.sort_unstable();
-    // Each chunk's lines are written as it finishes, so a run stopped at its deadline keeps the
-    // chunks it read.
-    let file = std::sync::Mutex::new(std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?);
-    let parts: Vec<(usize, usize, (i128, usize))> = starts
-        .par_iter()
-        .map(|&start| {
-            let end = (start + chunk).min(classes.len());
-            let mine: Vec<(usize, usize, usize)> = asked.iter().copied().filter(|&(j, _, _)| j > start && j < end).collect();
-            let skipped = asked.iter().filter(|&&(j, _, _)| j == start).count();
-            let mut state = tower.rest();
-            let mut out = String::new();
-            let mut next = 0usize;
-            let (mut read, mut hold) = (0usize, (0i128, 0usize));
-            let each = |i: usize, _: &TowerFace, trace: &holonics::hnn::tower::bank::BankTrace| -> std::result::Result<(), TowerError> {
-                hold = (trace.rho(), trace.reach());
-                while next < mine.len() && mine[next].0 == start + i + 1 {
-                    let (_, first, p) = mine[next];
-                    next += 1;
-                    read += 1;
-                    let outgrew = || TowerError::Refused("a trace's share outgrew its 128-bit carrier");
-                    let mut rows = Vec::new();
-                    let (mut largest, mut shared) = ((0i128, 0usize), (0u128, 0usize));
-                    let addresses = trace.addresses();
-                    for &(tau, (ar, ai)) in &addresses {
-                        let w2 = trace.written(tau).expect("a kept cell").iter().try_fold(0u128, |s, &(wr, wi)| {
-                            s.checked_add((wr.unsigned_abs() as u128).pow(2))?.checked_add((wi.unsigned_abs() as u128).pow(2))
-                        });
-                        let w2 = w2.ok_or_else(outgrew)?;
-                        let a2 = (ar as i128).pow(2) + (ai as i128).pow(2);
-                        // |a|² on 2^(−60) released to 2^(−30), to the nearest numerator.
-                        let share = (((a2 + (1 << 29)) >> 30) as u128).checked_mul(w2).ok_or_else(outgrew)?;
-                        let place = places[start + tau];
-                        if (a2, place) > (largest.0, largest.1) {
-                            largest = (a2, place);
-                        }
-                        if (share, place) > shared {
-                            shared = (share, place);
-                        }
-                        if start + tau >= first {
-                            rows.push(format!("A\t{p}\t{place}\t{ar}\t{ai}\t{w2}\n"));
-                        }
-                    }
-                    out.push_str(&format!("R\t{p}\t{}\t{}\t{}\t{}\t{}\n", places[start + i + 1], places[first], addresses.len(), largest.1, shared.1));
-                    rows.iter().rev().for_each(|r| out.push_str(r));
-                }
-                Ok(())
-            };
-            tower.read_bank_trace(&mut state, &classes[start..end], each).map_err(|e| e.to_string())?;
-            std::io::Write::write_all(&mut *file.lock().map_err(|_| "a chunk's write found the file poisoned".to_string())?, out.as_bytes()).map_err(|e| e.to_string())?;
-            println!("TOWER_BANK_TRACE_CHUNK start={start} cells={} requests={read} elapsed_ms={}", end - start - 1, started.elapsed().as_millis());
-            Ok((read, skipped, hold))
-        })
-        .collect::<std::result::Result<_, String>>()?;
-    let hold = parts.first().map_or((0, 0), |p| p.2);
-    println!(
-        "TOWER_BANK_TRACE units={} streams={streams} cells={} requests={} read={} skipped={} rho={} reach={} elapsed_ms={} out={}",
-        units.as_ref().map_or(0, Units::len), classes.len(), requests.len(), parts.iter().map(|p| p.0).sum::<usize>(), parts.iter().map(|p| p.1).sum::<usize>(), hold.0, hold.1, started.elapsed().as_millis(), args[8]
     );
     Ok(())
 }
@@ -3402,10 +3261,10 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
 /// held-out text are read in the units, and each code is reported over the bytes its units decode
-/// to. A continued learner may declare a `HOLD` ([`held_families`]).
+/// to.
 pub(super) fn train_units(args: &[String]) -> Result<()> {
-    if args.len() != 20 && args.len() != 22 && args.len() != 23 {
-        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [HOLD]]".into());
+    if args.len() != 20 && args.len() != 22 {
+        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
     let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
@@ -3431,23 +3290,6 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
     fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None, &mut HostPass::default())
-}
-
-/// [agent-inferred, October 26] **A declared hold** (`TowerLearner::held`): a foil whose named
-/// families read and do not deposit, so one pass separates which families' steps carry a change.
-/// `clock-join` holds a founded clock's join, `all-but-clock-join` every family but that join, and
-/// `all` every family (the pass is then the frozen state's code, the moments still moving).
-fn held_families(tower: &Tower, hold: &str) -> Result<Vec<std::ops::Range<usize>>> {
-    let len = tower.theta.len();
-    if hold == "all" {
-        return Ok(vec![0..len]);
-    }
-    let join = tower.clock_join().ok_or("a clock's hold needs a clocked tower")?;
-    match hold {
-        "clock-join" => Ok(vec![join]),
-        "all-but-clock-join" => Ok(vec![0..join.start, join.end..len]),
-        _ => Err("HOLD is clock-join, all-but-clock-join or all".into()),
-    }
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3506,11 +3348,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     } else {
         TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
     };
-    // A continued learner may declare a hold after FROM ([`held_families`]), never written with it.
-    if args.len() == 14 {
-        learner.held = held_families(&learner.tower, &args[13])?;
-        println!("TOWER_HOLD hold={} held={} material={}", args[13], learner.held.iter().map(|r| r.len()).sum::<usize>(), learner.tower.theta.len());
-    }
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
@@ -3971,23 +3808,14 @@ fn field(bytes: &[u8]) -> String {
 /// and it looks again only where it writes its line's head again, at most `LOOKS` looks. Its
 /// stream is the plain text, the passage a tower trained with the look (`Looking`) read.
 ///
-/// `read-lines-located … AGREE LOOKS DEPTH OUT` looks as `read-lines-again` does at a moment no
-/// byte declares: the first place in a line where a located key fires. The passage tree
-/// ([`PassageTree`]) hears the read stream class by class, and the moment is the first cell whose
-/// line holds `DEPTH` classes up to it that the tree's lock locates at full depth, an earlier
-/// visit of the same context (the located equality `(t, t − δ)`), with at least one class of the
-/// line still to come. The key is the line's own expression, in any medium, and the look asks for
-/// what follows it. A line where no key fires is carried in the stream unread, as a line without
-/// `=` is in the other reads.
-///
 /// Every text field of both files (head, rest, looks) is its bytes escaped as Rust's
 /// `escape_ascii` writes them, with `|` written `\x7c`, so a field holds no tab or `|` and reads
 /// back to its exact bytes (Python's `codecs.escape_decode`). A look is the tower's bytes, which
 /// need not be UTF-8.
-pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look, located: bool) -> Result<()> {
-    let arity = if look == Look::Once { 10 } else { 11 } + usize::from(located);
+pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look) -> Result<()> {
+    let arity = if look == Look::Once { 10 } else { 11 };
     if args.len() != arity {
-        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw|read-lines-carried|read-lines-own STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT; read-lines-located STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS DEPTH OUT".into());
+        return Err("read-lines|read-lines-stream STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE OUT; read-lines-again|read-lines-redraw|read-lines-carried|read-lines-own STATE STATE_SHA TEXT TEXT_SHA KEYS KEYS_SHA WRITTEN AGREE LOOKS OUT".into());
     }
     let started = Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -4010,13 +3838,7 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look, located: 
     let mut lines = 0usize;
     let mut carried = tower.rest();
     let mut carried_face = tower.advance(&mut carried, b'\n' as usize).map_err(|e| e.to_string())?;
-    let moments = if located {
-        let moments = located_moments(&text, args[10].parse()?)?;
-        println!("MOMENTS_LOCATED depth={} lines={} located={}", args[10], moments.len(), moments.iter().flatten().count());
-        moments
-    } else {
-        text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).map(|l| l.iter().position(|&b| b == b'=')).collect()
-    };
+    let moments: Vec<Option<usize>> = text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).map(|l| l.iter().position(|&b| b == b'=')).collect();
     for (i, line) in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()).enumerate() {
         let Some(eq) = moments[i] else {
             for &b in line.iter().chain(b"\n") {
@@ -4135,36 +3957,6 @@ pub(super) fn read_lines(args: &[String], in_stream: bool, look: Look, located: 
     }
     println!("LINES_READ lines={} written={} agree={} lines_sha256={} elapsed_ms={}", lines, written.min(lines), agree, sha256(rows.as_bytes())?, started.elapsed().as_millis());
     Ok(())
-}
-
-/// The moment of each nonempty line of `text` where a located key fires (`read-lines-located`):
-/// the passage tree hears the stream the reads carry (a line's end, then each nonempty line and its
-/// end), and a line's moment is its first cell `p` whose `depth` classes up to `p` lie in the line
-/// and are a context the tree's lock locates at full depth (visited before, so followed before),
-/// with a class of the line after `p`. The lock reads node visits only, so the horizon and backoff
-/// (the GSM8K route's, `2^13` and one occurrence) do not move a moment.
-fn located_moments(text: &[u8], depth: usize) -> Result<Vec<Option<usize>>> {
-    if depth == 0 {
-        return Err("a located key holds at least one class".into());
-    }
-    let mut tree = PassageTree::new(PassageDeclaration { alphabet: 256, phases: 1, depth, horizon: 13, backoff: 1 })?;
-    let mut context = vec![b'\n' as usize];
-    let mut now = 0u64;
-    let mut moments = Vec::new();
-    for line in text.split(|&b| b == b'\n').filter(|l| !l.is_empty()) {
-        let mut moment = None;
-        for (p, &b) in line.iter().chain(b"\n").enumerate() {
-            tree.deposit(0, &context, b as usize, now)?;
-            now += 1;
-            context.insert(0, b as usize);
-            context.truncate(depth);
-            if moment.is_none() && p + 1 >= depth && p + 1 < line.len() && tree.lock(0, &context, now)?.is_some_and(|(_, d, _)| d == depth) {
-                moment = Some(p);
-            }
-        }
-        moments.push(moment);
-    }
-    Ok(moments)
 }
 
 /// How a written line meets its own moment again (`read_lines`).

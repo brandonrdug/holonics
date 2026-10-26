@@ -53,7 +53,7 @@
 
 use std::collections::{BinaryHeap, HashMap};
 
-use crate::hnn::passage::log2_face;
+use crate::hnn::keyed_modes::log2_face;
 
 /// The code's grain, `2^(−32)` bits.
 pub const CODE_BITS: u32 = 32;
