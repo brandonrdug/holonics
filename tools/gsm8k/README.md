@@ -1,7 +1,17 @@
 # GSM8K exterior framing
 
 The scripts partition and frame passages for the listener. Dataset content, keys and raw output
-remain exterior. No generation is graded against numeric answers or delimiter patterns.
+remain exterior. No generation is graded against the answer key's numeric answers or scored on its
+delimiter pattern.
+
+The written-rule reads (`written_rules.py`) read a release on all held-out problems by rules fixed
+before the read: whether it stays on the problem's words, whether each calculation it writes is the
+exact value of its own expression, and whether its first calculation takes the question's numbers;
+and, at each calculation of a held-out answer, whether the value written after its `=` is that
+expression's exact value. None reads the answer key, none selects a release, and nothing they read
+enters the machine. `ngram_release.py` writes an exterior n-gram baseline's releases for the same
+reads. The rules and their reason are in
+`research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_THE_MARKUP_IS_WRITTEN_AT_ITS_EQUALS.md`.
 
 1. Run `python3 -I tools/gsm8k/partition.py TRAIN_JSONL PARTITION_JSON` to group normalized
    questions and declare development rows from the training split. The standard test split is

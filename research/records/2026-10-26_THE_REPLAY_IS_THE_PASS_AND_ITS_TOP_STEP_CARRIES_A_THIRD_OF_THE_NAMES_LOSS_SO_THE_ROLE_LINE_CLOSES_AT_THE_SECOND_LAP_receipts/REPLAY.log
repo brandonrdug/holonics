@@ -1,0 +1,60 @@
+TOWER_REPLAY_OPEN requests=4524 placed=4524 openings=4519 unheld=4 name_mass=+906.5 F=-12641.553 elapsed_ms=44838
+TOWER_REPLAY_SECTION section=32 deposits=32 halvings=0 read_ms=197 elapsed_ms=49398
+TOWER_REPLAY_SECTION section=64 deposits=64 halvings=0 read_ms=395 elapsed_ms=53914
+TOWER_REPLAY_SECTION section=96 deposits=96 halvings=0 read_ms=598 elapsed_ms=58431
+TOWER_REPLAY_SECTION section=128 deposits=128 halvings=0 read_ms=783 elapsed_ms=62921
+TOWER_REPLAY_SECTION section=160 deposits=160 halvings=0 read_ms=984 elapsed_ms=67458
+TOWER_REPLAY_SECTION section=192 deposits=192 halvings=0 read_ms=1168 elapsed_ms=71943
+TOWER_REPLAY_SECTION section=224 deposits=224 halvings=0 read_ms=1350 elapsed_ms=76479
+TOWER_REPLAY_SECTION section=256 deposits=256 halvings=0 read_ms=1550 elapsed_ms=81016
+TOWER_REPLAY_SECTION section=288 deposits=288 halvings=0 read_ms=1742 elapsed_ms=85539
+TOWER_REPLAY_SECTION section=320 deposits=320 halvings=0 read_ms=1936 elapsed_ms=90095
+TOWER_REPLAY_SECTION section=352 deposits=352 halvings=0 read_ms=2133 elapsed_ms=94612
+TOWER_REPLAY_SECTION section=384 deposits=384 halvings=0 read_ms=2325 elapsed_ms=99140
+TOWER_REPLAY_SECTION section=416 deposits=416 halvings=0 read_ms=2514 elapsed_ms=103678
+TOWER_REPLAY_SECTION section=448 deposits=448 halvings=0 read_ms=2706 elapsed_ms=108215
+TOWER_REPLAY_SECTION section=480 deposits=480 halvings=0 read_ms=2890 elapsed_ms=112738
+TOWER_REPLAY_SECTION section=512 deposits=512 halvings=0 read_ms=3078 elapsed_ms=117283
+TOWER_REPLAY_SECTION section=544 deposits=544 halvings=0 read_ms=3277 elapsed_ms=121803
+TOWER_REPLAY_SECTION section=576 deposits=576 halvings=0 read_ms=3467 elapsed_ms=126331
+TOWER_REPLAY_SECTION section=608 deposits=608 halvings=0 read_ms=3662 elapsed_ms=130865
+TOWER_REPLAY_SECTION section=640 deposits=640 halvings=0 read_ms=3849 elapsed_ms=135403
+TOWER_REPLAY_SECTION section=672 deposits=672 halvings=0 read_ms=4044 elapsed_ms=139952
+TOWER_REPLAY_SECTION section=704 deposits=704 halvings=0 read_ms=4243 elapsed_ms=144535
+TOWER_REPLAY_SECTION section=736 deposits=736 halvings=0 read_ms=4441 elapsed_ms=149050
+TOWER_REPLAY_SECTION section=768 deposits=768 halvings=0 read_ms=4637 elapsed_ms=153599
+TOWER_REPLAY_SECTION section=800 deposits=800 halvings=0 read_ms=4836 elapsed_ms=158143
+TOWER_REPLAY_SECTION section=832 deposits=832 halvings=0 read_ms=5042 elapsed_ms=162822
+TOWER_REPLAY_SECTION section=864 deposits=864 halvings=0 read_ms=5235 elapsed_ms=167378
+TOWER_REPLAY_SECTION section=896 deposits=896 halvings=0 read_ms=5430 elapsed_ms=171937
+TOWER_REPLAY_SECTION section=928 deposits=928 halvings=0 read_ms=5629 elapsed_ms=176502
+TOWER_REPLAY_SECTION section=960 deposits=960 halvings=0 read_ms=5823 elapsed_ms=181049
+TOWER_REPLAY_SECTION section=992 deposits=992 halvings=0 read_ms=6011 elapsed_ms=185587
+TOWER_REPLAY_SECTION section=1024 deposits=1024 halvings=0 read_ms=6201 elapsed_ms=190105
+TOWER_REPLAY_SECTION section=1056 deposits=1056 halvings=0 read_ms=6389 elapsed_ms=194651
+TOWER_REPLAY_SECTION section=1088 deposits=1088 halvings=0 read_ms=6584 elapsed_ms=199180
+TOWER_REPLAY_SECTION section=1120 deposits=1120 halvings=0 read_ms=6773 elapsed_ms=203707
+TOWER_REPLAY_SECTION section=1152 deposits=1152 halvings=0 read_ms=6965 elapsed_ms=208233
+TOWER_REPLAY_SECTION section=1184 deposits=1184 halvings=0 read_ms=7154 elapsed_ms=212794
+TOWER_REPLAY_SECTION section=1216 deposits=1216 halvings=0 read_ms=7349 elapsed_ms=217325
+TOWER_REPLAY_SECTION section=1248 deposits=1248 halvings=0 read_ms=7546 elapsed_ms=221899
+TOWER_REPLAY_SECTION section=1280 deposits=1280 halvings=0 read_ms=7732 elapsed_ms=226407
+TOWER_REPLAY_SECTION section=1311 deposits=1311 halvings=0 read_ms=7911 elapsed_ms=230770
+TOWER_REPLAY_STATE state_sha256=3331784425b940522736c535c8035d6b6fc23d531fb122d19c46d5cffc0ef6be expected=match
+TOWER_REPLAY_END openings=4519 name_mass=+750.3 F=-14057.377 delta_F=-1415.823
+TOWER_REPLAY_PART part=place=question,arrives=0 readout=-18468.647/-20532.010 clock=0:name=+2.027/+2.851,bias=-61577.4 clock=1:name=-144998.624/-157855.084,bias=-346058.1
+TOWER_REPLAY_PART part=place=question,arrives=1 readout=+16414.312/+18610.000 clock=0:name=+0.109/+0.150,bias=-877.7 clock=1:name=+182909.756/+197939.479,bias=+384467.2
+TOWER_REPLAY_PART part=place=opening,arrives=0 readout=-48315.381/-49623.076 clock=0:name=+0.046/+0.062,bias=-51.1 clock=1:name=-177649.646/-184106.161,bias=-74023.2
+TOWER_REPLAY_PART part=place=opening,arrives=1 readout=+51093.183/+53340.879 clock=0:name=+0.063/+0.084,bias=-68.8 clock=1:name=+308627.516/+320137.742,bias=+128837.0
+TOWER_REPLAY_PART part=place=answer,arrives=0 readout=-18367.537/-18743.401 clock=0:name=-3.195/-4.413,bias=+80497.0 clock=1:name=-201114.316/-214001.054,bias=-333543.3
+TOWER_REPLAY_PART part=place=answer,arrives=1 readout=+26909.832/+29174.095 clock=0:name=+0.061/+0.093,bias=-1016.8 clock=1:name=+298078.553/+317303.119,bias=+491187.9
+TOWER_REPLAY_PART part=place=elsewhere,arrives=0 readout=-9278.904/-11866.040 clock=0:name=+13.302/+14.070,bias=-351605.3 clock=1:name=-488714.566/-514906.652,bias=-442405.0
+TOWER_REPLAY_PART part=place=elsewhere,arrives=1 readout=+499.054/+86.395 clock=0:name=-12.598/-13.240,bias=+343349.9 clock=1:name=+222089.511/+234937.928,bias=+207077.2
+TOWER_REPLAY_PART part=opening-moment readout=-410.952/-440.584 clock=0:name=+0.136/+0.103,bias=-623.9 clock=1:name=+193.569/+157.516,bias=-504.0
+TOWER_REPLAY_PART part=remainder readout=+1.830/+1.899 clock=0:name=+0.000/+0.000,bias=-1.0 clock=1:name=-1.839/-1.921,bias=-34.8
+TOWER_REPLAY_PART part=all readout=+76.789/+8.156 clock=0:name=-0.049/-0.240,bias=+8025.0 clock=1:name=-580.087/-395.087,bias=+15001.0
+TOWER_REPLAY_TOP start=-503.346 end=-387.171 trapezoid=-445.259 delta_F=-1415.823
+TOWER_REPLAY_BIAS clock=0 class=335 bias_start=21337 bias_end=29362 realized=8025 predicted_start=392159 predicted_path=8059
+TOWER_REPLAY_BIAS clock=1 class=313 bias_start=37441 bias_end=52442 realized=15001 predicted_start=-318538 predicted_path=14379
+TOWER_REPLAY clocks=2 streams=8 section=128 sections=1311 cells=1342464 deposits=1311 halvings=0 read_ms=7911 elapsed_ms=276219
+RUN_RECEIPT exit=0 wall_s=276.3 peak_rss_kib=598440 user_s=1926.8
