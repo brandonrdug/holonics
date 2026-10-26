@@ -54,8 +54,13 @@ weight_c = q_c(a) · 2^(w_(2c) − top),   F = weight / Σ weight,   covector F 
 `μ = min(p_max, 2(1 − p_max))`, held at its dyadic ceiling. Both halves bound the face variance
 (`faceVariance_le_centred`, and the second moment about any class). With the unit weight, a
 sharply read face still added full curvature, and every later step shrank against a metric that
-kept growing. The step is still certified by `receiving_fisher_face`. The complement half's Lean
-statement is owed in #62.
+kept growing. The step is still certified by `receiving_fisher_face`. The complement half is
+formal-checked on October 26 in
+[`HNN/ComplementFisher`](../../lean/HolonicsResearch/HNN/ComplementFisher.lean): the variance is at
+most the second moment about any point (`faceVariance_le_moment`), at most
+`2(1 − p_k) Σ_i (v_i − a)²` for every class `k` and centre `a` (`faceVariance_le_complement`), so at most
+`min(p_max, 2(1 − p_max)) Σ_c (v_c − v̄)²` (`faceVariance_le_fisher_weight`) and under any larger
+weight such as its dyadic ceiling (`faceVariance_le_of_weight_le`).
 
 What it repeats from the lessons, and why it is refused there:
 

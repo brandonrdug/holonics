@@ -192,7 +192,15 @@ defect, the chart test of §2, and the parametron lattice of §3 as what a cellu
 
 - Lean: the affine rule's jump (`f` of degree 1 over GF(2) ⇒ its `2ᵏ`-step map is the rule with
   offsets scaled by `2ᵏ`), and the ECA count (16 affine, 104 threshold) as a decided statement
-  (#410).
+  (#410). The jump is formal-checked on October 26 in
+  [`Mathematics/AdditiveRuleJump`](../../lean/HolonicsResearch/Mathematics/AdditiveRuleJump.lean), with a correction: squaring
+  `f = δ + α x_(i−s) + β x_i + γ x_(i+s)` gives the same weights at offset `2s` and the constant
+  `δ (1 + α + β + γ)` (`rule_twice`), so the `2^(k+1)`-step map is that rule at offset `2^(k+1) s`
+  (`rule_iterate`). The rule keeps its constant only when the constant is zero or the linear weight
+  is even (`rule_iterate_of_even`: rules 0, 60, 90, 102, 150, 153, 165, 170, 195, 204, 240, 255);
+  the odd-weight complements 15, 51, 85 and 105 lose it and jump as rules 240, 204, 170 and 150 at
+  the scaled offsets. Rule 90's jump is `rule90_jump`. Still owed: the count and the five
+  count-conserving rules as decided statements.
 
 ## Receipts
 
