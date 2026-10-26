@@ -226,9 +226,29 @@ count of what must be supplied.
     (`α = 4/(√λ_max + √λ_min)²`, `β = q²`) is the momentum form. Its consumer equation is the per-pass
     contraction `q` on the bridge's quadratic, and it is owed with its owner.
 - **Lean, owed to #410:**
-  - the twisted cycle's eigenvectors and the Fejér identity `|1 − z^n|² = |1 − z|²|Σ_(j<n) z^j|²`;
-  - frustration's gauge invariance as a class function;
-  - the critically tuned two-step contraction on a quadratic;
+  - the twisted cycle's eigenvectors and the Fejér identity `|1 − z^n|² = |1 − z|²|Σ_(j<n) z^j|²`.
+    Formal-checked on October 26 in
+    [`Geometry/TwistedCycle`](../../lean/HolonicsResearch/Geometry/TwistedCycle.lean), on the
+    cycle's cover: the powers are eigenvectors, `L(z^x) = (1 − z)(1 − z⁻¹) z^x` (`power_eigen`),
+    with eigenvalue `|1 − z|²` on the unit circle (`eigenvalue_of_unit`); the defects of a section
+    sum to `−Σc` round the cycle, so every section of a frustrated cycle breaks a contact
+    (`defects_sum`, `frustrated_section_breaks`); and the Fejér identity (`fejer_identity`). Still
+    owed: that `|1 − ζ^c|²` is the least eigenvalue, `n²λ₁ → (2πc/k)²`, and a section's Rayleigh
+    quotient;
+  - frustration's gauge invariance as a class function. Formal-checked on October 26 in
+    [`Geometry/Frustration`](../../lean/HolonicsResearch/Geometry/Frustration.lean) on any finite
+    graph with a connection in an additive group: a gauge move carries the broken contacts
+    (`holds_gauge`, `cost_gauge`), so frustration is a class function
+    (`frustration_gauge_invariant`); an exact cochain has no circulation on a cycle
+    (`circulation_coboundary`, `circulation_gauge`); and relaxing the potential is the gauge move by
+    `−τ d₀ᵀc`, so it keeps every circulation and every frustration (`relax_eq_gauge`,
+    `relax_keeps_holonomy`, `frustration_relax`);
+  - the critically tuned two-step contraction on a quadratic. Formal-checked on October 26 in
+    [`HNN/CarriedRate`](../../lean/HolonicsResearch/HNN/CarriedRate.lean) on every eigendirection:
+    the tuned rate puts `αλ` in `[(1 − q)², (1 + q)²]` (`tuned_band`), where both roots have modulus
+    exactly `q` (`carried_rate_contraction`), the error falls as
+    `‖e_(t+1)‖ ≤ (t + 1) q^t (‖e₁‖ + q‖e₀‖)` (`carried_error_bound`), and the plain step contracts
+    by `(κ − 1)/(κ + 1)` (`plain_step`). The pass counts stay the receipt's measurements;
   - the charge threshold's monotone fall in `N`. Formal-checked on October 26 in
     [`HNN/ChargeThreshold`](../../lean/HolonicsResearch/HNN/ChargeThreshold.lean): a lap certifies
     exactly the drops above `δ* = 1 − (N|P|²)^(−1/N)` (`certifies_iff_threshold`),
