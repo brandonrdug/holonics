@@ -5306,6 +5306,45 @@ mod tests {
         assert!(ta.iter().zip(&tb).any(|(x, y)| x.face != y.face));
     }
 
+    /// The copies' reading reads the faces the forward reads, each clock's held class as the stream
+    /// carries it, and each raise as the copy adds it: with the rows at zero, a held clock's raise
+    /// is its bias, and none where it holds nothing.
+    #[test]
+    fn the_copies_reading_reads_each_held_class_and_its_raise() {
+        let classes = clocked_passage();
+        let mut tower = tiny_clocked(false, true);
+        let forward = tower.forward(&mut tower.rest(), &classes, &tower.reaches()).expect("forward");
+        let mut read = Vec::new();
+        tower.read_clocks(&mut tower.rest(), &classes, |i, face, held, raises| {
+            read.push((i, face.clone(), held.to_vec(), raises.to_vec()));
+            Ok(())
+        }).expect("read");
+        assert_eq!(read.len(), forward.len());
+        for ((i, face, held, raises), cell) in read.iter().zip(&forward) {
+            assert_eq!((face, Some(held)), (&cell.face, cell.clock.as_ref()), "cell {i}");
+            assert!(held.iter().zip(raises).all(|(&h, r)| r.is_some() == (h < tower.declaration.alphabet)));
+        }
+        // The rest's clock holds from the first cell; the clock of 2 holds nothing before 2 arrives.
+        assert_eq!(read[0].3[0], None);
+        assert!(read[0].3[1].is_some());
+        let join = tower.clock_join().expect("a clock");
+        let w = tower.declaration.width;
+        for (i, v) in tower.theta[join.clone()].iter_mut().enumerate() {
+            if i % (w + 1) != w {
+                *v = 0;
+            }
+        }
+        let (biases, a) = ([tower.theta[join.start + w] as i64, tower.theta[join.start + 2 * w + 1] as i64], tower.declaration.alphabet);
+        assert!(biases.iter().all(|&b| b != 0));
+        tower.read_clocks(&mut tower.rest(), &classes, |_, _, held, raises| {
+            for (c, (&h, r)) in held.iter().zip(raises).enumerate() {
+                assert_eq!(*r, (h < a).then_some(biases[c]));
+            }
+            Ok(())
+        }).expect("read");
+        assert!(tiny_turning(2, true, true, false).read_clocks(&mut tiny_turning(2, true, true, false).rest(), &classes, |_, _, _, _| Ok(())).is_err());
+    }
+
     #[test]
     fn a_clocked_tower_restores_exactly() {
         for banked in [false, true] {
