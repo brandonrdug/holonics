@@ -8,6 +8,7 @@ research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN pair DIR_A DIR_B
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN heard DIR [DIR ...]
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN rings DIR [DIR ...]
+    python3 -I tools/gsm8k/written_rules.py HELD TRAIN gaps DIR [DIR ...]
 
 HELD is the held-out text and TRAIN the training text, each a run of problems separated by a blank
 line (a question line, then its answer lines). Each DIR holds `FREE.tsv` and `MARKS.tsv` as
@@ -23,6 +24,29 @@ whole numerals, how many written values are integers right modulo 9, 10 and 11 (
 base 10 turns, collapses and reflects), each beside its shifted foil, the written value of the next
 such calculation read against this one's exact value (the last against the first), and how many
 are right on all three (modulo 990). An unfinished or fractional written value is right on none.
+With `gaps`, six lines follow each DIR's line for each of all, met and never-met calculations at
+the equals, reading how far each wrong value is from the exact one and what it was written from:
+
+- `GAPS`: the wrong calculations split into unfinished (no `>>`), not a number, an expression
+  outside the grammar, and numbers (both values read).
+- `GAP_SIZE`, on the wrong numbers: within a factor of 2 and of 10 of the exact value (same sign),
+  within a tenth of it, of the opposite sign, smaller and larger in magnitude, and with the exact
+  value's count of whole-part digits, beside its foil.
+- `GAP_RINGS`, on the wrong numbers that are both integers: right modulo 9, 10 and 11, and modulo
+  7 and 13, where the base neither collapses nor reflects, each beside the foil. A miss is right
+  modulo `m` when `m` divides its gap, and misses near their exact value have small gaps, which no
+  modulus above them divides; 7 and 13 read that depletion beside the base's rings.
+- `GAP_FROM`, on the wrong numbers: the written value is a value TRAIN writes after some
+  calculation's `=`; it is one of the expression's numerals; and, on the expressions `a op b` of
+  two numerals, it is `a+b`, `a-b`, `b-a`, `a*b`, `a/b` or `b/a` for another operation.
+- `GAP_WRITES`, on every written number: how many are written, how many distinct values, the share
+  of the ten commonest, and the commonest value with its count and how many of those are right.
+- `GAP_LENGTH`: right of all calculations by the exact value's whole-part digits (1, 2, 3, 4, 5+).
+
+A foil pairs each wrong value with the next wrong number's exact value (the last with the first),
+keeping only the pairs where the two differ, so it is conditioned as the misses are: a wrong
+one-digit value can never share its exact value's residue, and an unconditioned foil would read
+that as the written value's failure. Each foil is printed over its own count of pairs.
 
 The rules, fixed before any release was read:
 
@@ -177,7 +201,7 @@ def mark_reads(problems, marks, train):
         good = v is not None and w is not None and v == w
         seen[kind][0] += 1
         seen[kind][1] += good
-        each.append((kind, good, heard, e, v, w))
+        each.append((kind, good, heard, e, v, w, end >= 0))
         op = re.fullmatch(r"\d*\.?\d+([+\-*/])\d*\.?\d+", e.replace(" ", ""))
         if op:
             by_op[op.group(1), "n"] += 1
@@ -188,7 +212,7 @@ def mark_reads(problems, marks, train):
 def rings_line(each):
     """The never-met sums and differences, read on the rings 9, 10 and 11 and beside their foil."""
     read = [
-        (v, w) for kind, _, _, e, v, w in each
+        (v, w) for kind, _, _, e, v, w, _ in each
         if kind == "never" and re.fullmatch(r"\d+[+\-]\d+", e.replace(" ", ""))
     ]
     if not read:
@@ -203,11 +227,104 @@ def rings_line(each):
     return " ".join(out)
 
 
+def digits(x):
+    """The count of a value's whole-part digits; a value below one has one."""
+    return len(str(abs(x.numerator) // x.denominator))
+
+
+def binary_values(expression):
+    """The other operations' values on an expression `a op b` of two numerals, else None."""
+    m = re.fullmatch(r"(\d*\.?\d+)([+\-*/])(\d*\.?\d+)", expression.replace(" ", ""))
+    if not m:
+        return None
+    a, b = Fraction(m.group(1)), Fraction(m.group(3))
+    out = {a + b, a - b, b - a, a * b}
+    out.update(x / y for x, y in ((a, b), (b, a)) if y != 0)
+    return out
+
+
+def gaps_lines(d, each, results):
+    """How far the wrong values are from the exact ones, and what they were written from."""
+    lines = []
+    for name in ("all", "met", "never"):
+        rows = [r for r in each if name == "all" or r[0] == name]
+        wrong = [r for r in rows if not r[1]]
+        numbers = [(e, v, w) for _, _, _, e, v, w, _ in wrong if v is not None and w is not None]
+        unfinished = sum(not finished for *_, finished in wrong)
+        not_number = sum(finished and w is None for *_, w, finished in wrong)
+        unread = sum(v is None and w is not None for _, _, _, _, v, w, _ in wrong)
+        lines.append(
+            f"GAPS dir={d} set={name} n={len(rows)} right={len(rows) - len(wrong)} wrong={len(wrong)} "
+            f"unfinished={unfinished} not_number={not_number} unread={unread} numbers={len(numbers)}"
+        )
+        ratio = lambda v, w, k: v != 0 and w * v > 0 and Fraction(1, k) <= w / v <= k
+        foil = [
+            (v2, w) for i, (_, _, w) in enumerate(numbers)
+            for _, v2, _ in [numbers[(i + 1) % len(numbers)]] if v2 != w
+        ]
+        size = Counter()
+        for _, v, w in numbers:
+            size["x2"] += ratio(v, w, 2)
+            size["x10"] += ratio(v, w, 10)
+            size["tenth"] += v != 0 and abs(w - v) * 10 <= abs(v)
+            size["sign"] += w * v < 0
+            size["small"] += abs(w) < abs(v)
+            size["large"] += abs(w) > abs(v)
+            size["digits"] += digits(w) == digits(v)
+        foil_digits = sum(digits(w) == digits(v) for v, w in foil)
+        lines.append(
+            f"GAP_SIZE dir={d} set={name} n={len(numbers)} x2={size['x2']} x10={size['x10']} "
+            f"tenth={size['tenth']} opposite_sign={size['sign']} smaller={size['small']} "
+            f"larger={size['large']} digits={size['digits']} foil_digits={foil_digits}/{len(foil)}"
+        )
+        whole = lambda pairs: [(v, w) for v, w in pairs if v.denominator == 1 and w.denominator == 1]
+        on, off = whole((v, w) for _, v, w in numbers), whole(foil)
+        lines.append(
+            f"GAP_RINGS dir={d} set={name} n={len(on)} " + " ".join(
+                f"mod{m}={sum((v - w) % m == 0 for v, w in on)} "
+                f"foil{m}={sum((v - w) % m == 0 for v, w in off)}/{len(off)}" for m in (9, 10, 11, 7, 13)
+            )
+        )
+        binary = [(binary_values(e), v, w) for e, v, w in numbers]
+        binary = [(o, v, w) for o, v, w in binary if o is not None]
+        heard = sum(w in results for _, _, w in numbers)
+        operand = sum(w in {Fraction(t) for t in re.findall(r"\d*\.?\d+", e)} for e, _, w in numbers)
+        other = sum(w in o - {v} for o, v, w in binary)
+        lines.append(
+            f"GAP_FROM dir={d} set={name} n={len(numbers)} heard_result={heard} operand={operand} "
+            f"other_operation={other}/{len(binary)}"
+        )
+        written = Counter(w for _, _, _, _, _, w, _ in rows if w is not None)
+        total = sum(written.values())
+        top = written.most_common(10)
+        first = (
+            f"{top[0][0]}:{top[0][1]}:{sum(good for _, good, _, _, _, w, _ in rows if w == top[0][0])}"
+            if top else "-"
+        )
+        lines.append(
+            f"GAP_WRITES dir={d} set={name} written={total} distinct={len(written)} "
+            f"top10={sum(c for _, c in top)} commonest={first}"
+        )
+        length = Counter()
+        for _, good, _, _, v, _, _ in rows:
+            if v is not None:
+                b = min(digits(v), 5)
+                length[b, "n"] += 1
+                length[b, "right"] += good
+        lines.append(
+            f"GAP_LENGTH dir={d} set={name} " + " ".join(
+                f"{b if b < 5 else '5+'}={length[b, 'right']}/{length[b, 'n']}" for b in range(1, 6)
+            )
+        )
+    return lines
+
+
 def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
     pair, heard, rings = sys.argv[3] == "pair", sys.argv[3] == "heard", sys.argv[3] == "rings"
-    dirs = sys.argv[4:] if pair or heard or rings else sys.argv[3:]
+    gaps = sys.argv[3] == "gaps"
+    dirs = sys.argv[4:] if pair or heard or rings or gaps else sys.argv[3:]
     if pair and (len(dirs) != 2 or "reference" in dirs):
         raise SystemExit("pair reads two release directories")
     goods = []
@@ -216,6 +333,7 @@ def main():
     train_text = train.decode("utf-8", "replace")
     counts = Counter(w for w in WORD.findall(train_text.lower()) if len(w) >= 4)
     common = {w for w, _ in counts.most_common(100)}
+    results = {n for _, c in CALC.findall(train_text) for n in [number(c)] if n is not None}
     for d in dirs:
         if d == "reference":
             answers = [a for _, a in problems]
@@ -243,6 +361,8 @@ def main():
         print(line)
         if rings and marks is not None:
             print(f"RINGS dir={d} " + rings_line(each))
+        if gaps and marks is not None:
+            print("\n".join(gaps_lines(d, each, results)))
         if heard and marks is not None:
             bins = Counter()
             for _, good, k, *_ in each:
