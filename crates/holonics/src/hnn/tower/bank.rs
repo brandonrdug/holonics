@@ -260,6 +260,142 @@ fn written(before: &[(i64, i64)], w: &[(i128, i128)], phase: &[(i128, i128)], rh
     Ok(out)
 }
 
+/// [definition; agent-inferred, October 26] **The bank's address trace** (spec 2's trace (b), the
+/// spec record's §4.2). Unrolling the write, `S_t = Σ_(τ≤t) ρ^(t−τ+1) w_τ φ(s(k_τ))ᴴ`, with
+/// `w_τ = g_τ e_τ` the news each cell wrote, so the read at cell `t` is a sum over the cells that
+/// wrote:
+///
+/// ```text
+/// v̂_t = Σ_(τ≤t) a(τ, t) w_τ,    a(τ, t) = ρ^(t−τ+1) · 2^(−m) Σ_n conj(φ_n(s(k_τ))) φ_n(s(q_t))
+/// ```
+///
+/// The address `a(τ, t)` is the hold's decay times the box's Dirichlet kernel at the turn
+/// difference `s(q_t) − s(k_τ)`: it is one where the query's turn falls on the key's and falls off
+/// away from it, so `|a(τ, t)|` says which earlier cell's binding the present read reaches.
+/// - **Resolved outside the machine.** An observer keeps the trace beside a frozen reading
+///   ([`Tower::read_bank_trace`]). The machine never keeps or consults it: it is no tape and no
+///   index, and the bank reads `S` alone.
+/// - **The kept cells come from the hold.** `ρ^L`, carried on `2^(−62)` and read on the address's
+///   `2^(−30)`, releases to zero from `L = reach + 1` on, so every earlier cell's address is zero at
+///   that grain and the trace keeps the last `reach` cells.
+/// - **The sum returns the read to within the bank's roundings.** The bank's `S` rounds each cell's
+///   write and decay, and the trace rounds each address once, so [`BankTrace::returned`] differs from
+///   the read by those roundings, not by a term the address leaves out
+///   (`the_bank_trace_returns_the_read`).
+#[derive(Clone, Debug)]
+pub struct BankTrace {
+    /// `ρ` on `2^(−30)`, and `m = log₂ |N|`.
+    rho: i128,
+    m: u32,
+    reach: usize,
+    /// The cells read so far, and the kept ones, oldest first: `φ(s(k_τ))` on `2^(−30)` and `w_τ`
+    /// on `2^(−24)`.
+    cells: usize,
+    kept: std::collections::VecDeque<(Vec<(i64, i64)>, Vec<(i64, i64)>)>,
+    /// The present cell's `φ(s(q_t))` on `2^(−30)` and its read `[Re v̂_t ; Im v̂_t]` on `2^(−16)`.
+    query: Vec<(i64, i64)>,
+    read: Vec<i32>,
+}
+
+impl BankTrace {
+    /// The empty trace of a bank at its section's hold.
+    pub(super) fn open(reaches: &BankReaches, bank: &BankDeclaration) -> Self {
+        let (rho, m) = (reaches.rho, bank.box_bits());
+        // ρ^L on 2^(−62) until it reads as zero on 2^(−30).
+        let fine = rho << (62 - MOVE_BITS);
+        let (mut decay, mut reach) = (fine, 0usize);
+        while release(decay, 62 - MOVE_BITS) != 0 {
+            reach += 1;
+            decay = release(decay * fine, 62);
+        }
+        Self { rho, m, reach, cells: 0, kept: std::collections::VecDeque::new(), query: Vec::new(), read: Vec::new() }
+    }
+
+    /// A cell of the reading, its key and write kept and its query and read made present.
+    pub(super) fn push(&mut self, cell: &BankCell) -> Result<()> {
+        let narrow = |v: &[(i128, i128)]| collect_exact(v.iter().map(|&(re, im)| Ok((fit64(re)?, fit64(im)?))));
+        if self.kept.len() == self.reach {
+            self.kept.pop_front();
+        }
+        if self.reach > 0 {
+            self.kept.push_back((narrow(&cell.key_phase)?, narrow(&cell.written)?));
+        }
+        self.query = narrow(&cell.query_phase)?;
+        self.read = cell.read.clone();
+        self.cells += 1;
+        Ok(())
+    }
+
+    /// `ρ` on `2^(−30)`.
+    pub fn rho(&self) -> i128 {
+        self.rho
+    }
+
+    /// The cells whose address can be nonzero at its grain.
+    pub fn reach(&self) -> usize {
+        self.reach
+    }
+
+    /// The cells read so far; the present cell is `cells() − 1`.
+    pub fn cells(&self) -> usize {
+        self.cells
+    }
+
+    /// The present cell's read `[Re v̂_t ; Im v̂_t]` on `2^(−16)`, what `O` reads.
+    pub fn read(&self) -> &[i32] {
+        &self.read
+    }
+
+    /// `w_τ` on `2^(−24)` for a kept cell `τ`.
+    pub fn written(&self, tau: usize) -> Option<&[(i64, i64)]> {
+        let first = self.cells - self.kept.len();
+        (tau >= first && tau < self.cells).then(|| self.kept[tau - first].1.as_slice())
+    }
+
+    /// The present read's addresses `a(τ, t)` on `2^(−30)`, the present cell first and each earlier
+    /// kept cell after it, every one whose address is nonzero at its grain.
+    pub fn addresses(&self) -> Vec<(usize, (i64, i64))> {
+        let fine = self.rho << (62 - MOVE_BITS);
+        let mut decay = fine;
+        let mut out = Vec::new();
+        for (back, (key, _)) in self.kept.iter().rev().enumerate() {
+            let d = release(decay, 62 - MOVE_BITS);
+            if d == 0 {
+                break;
+            }
+            // conj(k) q = (kr qr + ki qi) + i (kr qi − ki qr), on 2^(−60), times 2^(−m).
+            let (mut re, mut im) = (0i128, 0i128);
+            for (&(kr, ki), &(qr, qi)) in key.iter().zip(&self.query) {
+                let (kr, ki, qr, qi) = (kr as i128, ki as i128, qr as i128, qi as i128);
+                re += kr * qr + ki * qi;
+                im += kr * qi - ki * qr;
+            }
+            let (kre, kim) = (release(re, MOVE_BITS + self.m), release(im, MOVE_BITS + self.m));
+            let a = (release(d * kre, MOVE_BITS) as i64, release(d * kim, MOVE_BITS) as i64);
+            if a != (0, 0) {
+                out.push((self.cells - 1 - back, a));
+            }
+            decay = release(decay * fine, 62);
+        }
+        out
+    }
+
+    /// `Σ_τ a(τ, t) w_τ` per channel on `2^(−24)`: the read the addresses return.
+    pub fn returned(&self) -> Vec<(i64, i64)> {
+        let dv = self.read.len() / 2;
+        let mut sum = vec![(0i128, 0i128); dv];
+        for (tau, (ar, ai)) in self.addresses() {
+            let w = self.written(tau).expect("a kept cell");
+            for (s, &(wr, wi)) in sum.iter_mut().zip(w) {
+                let (ar, ai, wr, wi) = (ar as i128, ai as i128, wr as i128, wi as i128);
+                s.0 += ar * wr - ai * wi;
+                s.1 += ar * wi + ai * wr;
+            }
+        }
+        sum.into_iter().map(|(re, im)| (release(re, MOVE_BITS) as i64, release(im, MOVE_BITS) as i64)).collect()
+    }
+}
+
 impl Tower {
     /// [agent-inferred, October 26] **The binding bank joined to the tower** (the module
     /// [`crate::hnn::tower::bank`]): its families are appended after the tower's other faces and
