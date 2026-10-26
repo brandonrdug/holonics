@@ -100,5 +100,27 @@ class ExteriorTools(unittest.TestCase):
             self.assertEqual(out[1], f"HEARD dir={release} 0=0/1 1=0/0 2-3=1/1 4-7=0/0 8-15=0/0 16+=0/0")
 
 
+    def test_written_rules_read_never_met_sums_on_their_rings(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held = root / "held.txt"
+            held.write_bytes(b"Q?\nA <<12+30=42>>42 <<50-8=42>>42 <<7+7=14>>14 <<2*3=6>>6 <<9+2=11>>11\n\n")
+            train = root / "train.txt"
+            train.write_bytes(b"Q?\nA <<1+1=2>>2\n\n")
+            release = root / "release"
+            release.mkdir()
+            (release / "FREE.tsv").write_text("0\tA\\n\n")
+            (release / "MARKS.tsv").write_text(
+                "0\t0\t12+30\t42>>\n0\t1\t50-8\t53>>\n0\t2\t7+7\t24>>\n0\t3\t2*3\t6>>\n0\t4\t9+2\t1\n"
+            )
+            out = run("written_rules.py", held, train, "rings", release).splitlines()
+            # Written 42, 53, 24 and an unfinished 1 against exact 42, 42, 14, 11 (differences 0,
+            # 11, 10); the foil reads 53, 24, the unfinished one and 42 against them (11, 18, -, 31).
+            self.assertEqual(
+                out[1],
+                f"RINGS dir={release} n=4 mod9=1 foil9=1 mod10=2 foil10=0 mod11=2 foil11=1 mod990=1 foil990=0",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

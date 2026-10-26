@@ -7,6 +7,7 @@ research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN DIR [DIR ...]
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN pair DIR_A DIR_B
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN heard DIR [DIR ...]
+    python3 -I tools/gsm8k/written_rules.py HELD TRAIN rings DIR [DIR ...]
 
 HELD is the held-out text and TRAIN the training text, each a run of problems separated by a blank
 line (a question line, then its answer lines). Each DIR holds `FREE.tsv` and `MARKS.tsv` as
@@ -16,7 +17,12 @@ two DIRs' lines: on met and on never-met calculations, how many only A writes ri
 how many only B, and how many both, so two releases are compared calculation by calculation. With
 `heard`, a `HEARD` line follows each DIR's line: the calculations at the equals binned by how many
 times TRAIN holds their `<<expression=c>>` whole (0, 1, 2-3, 4-7, 8-15, 16 or more), right of each
-bin. Read on training problems, a calculation's own place in TRAIN is one of its hearings.
+bin. Read on training problems, a calculation's own place in TRAIN is one of its hearings. With
+`rings`, a `RINGS` line follows each DIR's line: on the never-met sums and differences of two
+whole numerals, how many written values are integers right modulo 9, 10 and 11 (the rings where the
+base 10 turns, collapses and reflects), each beside its shifted foil, the written value of the next
+such calculation read against this one's exact value (the last against the first), and how many
+are right on all three (modulo 990). An unfinished or fractional written value is right on none.
 
 The rules, fixed before any release was read:
 
@@ -171,7 +177,7 @@ def mark_reads(problems, marks, train):
         good = v is not None and w is not None and v == w
         seen[kind][0] += 1
         seen[kind][1] += good
-        each.append((kind, good, heard))
+        each.append((kind, good, heard, e, v, w))
         op = re.fullmatch(r"\d*\.?\d+([+\-*/])\d*\.?\d+", e.replace(" ", ""))
         if op:
             by_op[op.group(1), "n"] += 1
@@ -179,11 +185,29 @@ def mark_reads(problems, marks, train):
     return seen, by_op, each
 
 
+def rings_line(each):
+    """The never-met sums and differences, read on the rings 9, 10 and 11 and beside their foil."""
+    read = [
+        (v, w) for kind, _, _, e, v, w in each
+        if kind == "never" and re.fullmatch(r"\d+[+\-]\d+", e.replace(" ", ""))
+    ]
+    if not read:
+        return "n=0"
+    shifted = [(v, read[(i + 1) % len(read)][1]) for i, (v, _) in enumerate(read)]
+    on = lambda m, v, w: w is not None and w.denominator == 1 and (v - w) % m == 0
+    out = [f"n={len(read)}"]
+    for m in (9, 10, 11, 990):
+        right = sum(on(m, v, w) for v, w in read)
+        foil = sum(on(m, v, w) for v, w in shifted)
+        out.append(f"mod{m}={right} foil{m}={foil}")
+    return " ".join(out)
+
+
 def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
-    pair, heard = sys.argv[3] == "pair", sys.argv[3] == "heard"
-    dirs = sys.argv[4:] if pair or heard else sys.argv[3:]
+    pair, heard, rings = sys.argv[3] == "pair", sys.argv[3] == "heard", sys.argv[3] == "rings"
+    dirs = sys.argv[4:] if pair or heard or rings else sys.argv[3:]
     if pair and (len(dirs) != 2 or "reference" in dirs):
         raise SystemExit("pair reads two release directories")
     goods = []
@@ -217,15 +241,17 @@ def main():
                 f"never_met={seen['never'][1]}/{seen['never'][0]} binary {ops}"
             )
         print(line)
+        if rings and marks is not None:
+            print(f"RINGS dir={d} " + rings_line(each))
         if heard and marks is not None:
             bins = Counter()
-            for _, good, k in each:
+            for _, good, k, *_ in each:
                 b = HEARD_BINS[min(k, 16).bit_length()]
                 bins[b, "n"] += 1
                 bins[b, "right"] += good
             print(f"HEARD dir={d} " + " ".join(f"{b}={bins[b, 'right']}/{bins[b, 'n']}" for b in HEARD_BINS))
     if pair:
-        counts = Counter((kind, a, b) for (kind, a, _), (_, b, _) in zip(*goods))
+        counts = Counter((kind, a, b) for (kind, a, *_), (_, b, *_) in zip(*goods))
         print(
             "PAIRED " + " ".join(
                 f"{kind}_only_a={counts[kind, True, False]} {kind}_only_b={counts[kind, False, True]} "

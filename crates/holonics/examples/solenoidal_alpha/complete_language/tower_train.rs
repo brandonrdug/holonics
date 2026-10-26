@@ -3402,10 +3402,14 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
 /// held-out text are read in the units, and each code is reported over the bytes its units decode
-/// to. A continued learner may declare a `HOLD` ([`held_families`]).
-pub(super) fn train_units(args: &[String]) -> Result<()> {
+/// to. A continued learner may declare a `HOLD` ([`held_families`]). `train-unit-pumped-tower`
+/// trains the pumped tower on the same units (each arriving unit turns and reflects every mode, the
+/// Swing's three kinds keyed by the unit), and `train-unit-pair-pumped-tower` the pumped tower whose
+/// contacts are pair contacts, which take the product of two modes' phases (record
+/// `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
+pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw) -> Result<()> {
     if args.len() != 20 && args.len() != 22 && args.len() != 23 {
-        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [HOLD]]".into());
+        return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [HOLD]]".into());
     }
     let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
     let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
@@ -3430,7 +3434,7 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None, &mut HostPass::default())
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, &mut HostPass::default())
 }
 
 /// [agent-inferred, October 26] **A declared hold** (`TowerLearner::held`): a foil whose named
