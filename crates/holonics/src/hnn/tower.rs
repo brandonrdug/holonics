@@ -1055,109 +1055,246 @@ impl RingFace {
     }
 }
 
-/// [definition; agent-inferred with the mathematics thread, October 26] **The rotor**: each level's
-/// modes grouped in rings of [`ROTOR_RING`], `R_k = {4k, …, 4k + 3}`, and each arriving class `u`
-/// stepping each ring by its integer key `σ = σ(level, u, k) ∈ ℤ/4` before the level's move:
+/// [definition; agent-inferred with the mathematics thread, October 26] **The rotor**: a ring's
+/// generator and modulator as one monomial move. A level's first modes are grouped in rings `R_k`,
+/// each of a width `w_k` and a modulus `q_k` (the modes past the rings are still), and each
+/// arriving class `u` steps ring `k` by its key `σ = σ(level, u, k) ∈ ℤ/w_k` and turns the ring's
+/// mode `j` by its key `r = r(level, u, s_k + j) ∈ ℤ/q_k` before the level's move, `s_k` the ring's
+/// first mode:
 ///
 /// ```text
-/// h'_(t−1) = P^(σ_t) h_(t−1),   (P^σ h)_(4k+j) = h_(4k + ((j + σ) mod 4))
+/// h'_(t−1) = T_t P^(σ_t) h_(t−1),   (T P^σ h)_(s_k + j) = e^(2πi r_(s_k + j)/q_k) h_(s_k + ((j + σ) mod w_k))
 /// h_t      = λ_t ⊙ h' + β_t ⊙ conj(h') + γ_t ⊙ B x_t        (the level's own move, on h')
 /// ```
 ///
-/// Why (the record
-/// `2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR.md`
-/// and its §11): reading a digit `d` maps a numeral `n ↦ 10 n + d`, and on a character
-/// `χ_a(n) = ω^(an)` that is `χ_a(10n + d) = ω^(ad) χ_(10a)(n)`: the turn `ω^(ad)` (the modulator)
-/// and a step of the character's index `a ↦ 10a` (the generator, a translation of the index). With
-/// mode `j` holding the character `10^j`, the step is the cyclic shift of the ring (it closes after
-/// four because `10^4 ≡ 1` modulo every divisor of `9999 = 3²·11·101`) and the keyed turn of mode
-/// `j` is `2·10^j·d/p` half turns. The Fourier chart exchanges the two (`F X = Z F`): the shift is
-/// a turn of the ring's harmonics, so the step is a modulator in the dual chart and the turn a
-/// generator, one move read in two charts. A turned mode alone holds a numeral only modulo 9, where
-/// ten turns as one.
+/// Why (the records
+/// `2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR.md`,
+/// its §11, and
+/// `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_A_TURN_IS_TWO_REFLECTIONS_AND_THE_BASE_TURNS_COLLAPSES_OR_REFLECTS_EACH_RING.md`,
+/// §5): reading a digit `d` maps a numeral `n ↦ 10 n + d`, and on a character
+/// `χ_a(n) = e^(2πi a n/q)` that is `χ_a(10n + d) = χ_a(d) χ_(10a)(n)`: the turn `χ_a(d)` (the
+/// modulator) and a step of the character's index `a ↦ 10a` (the generator, a translation of the
+/// index). With mode `j` of a ring holding the character `c·10^j`, the step is the ring's cyclic
+/// shift, which closes after `w` steps, `w` the order of 10 modulo `q` (9 → 1, 11 → 2, 101 → 4), and
+/// the turn of mode `j` is `r = c·10^j·d mod q`; a unit of several digits steps by their count and
+/// turns by the characters of their value. The step alone (the generator without the modulator) is
+/// a clock of position: its modes hold sums of drives, never the product of turns a numeral is. The
+/// Fourier chart exchanges the two (`F X = Z F`): the shift is a turn of the ring's harmonics, so
+/// the step is a modulator in the dual chart and the turn a generator, one move read in two charts.
 ///
-/// The step is a permutation: each mode takes exactly one mode's state, so the passivity bound
-/// `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` holds unchanged. At `σ = 0` everywhere the rotor tower
-/// reads every passage as its twin without the rotor (the opening). `σ` has no covector: a key in
-/// `ℤ/4` is located by loop closure, not by descent, since any relaxed path between two steps
-/// passes through mixtures of modes. The reverse carries the mode covector back through the
-/// inverse permutation, `G_h(t) = (Cᵀδr)⁻ + P^(−σ_(t+1))(conj(λ_(t+1)) ⊙ G_h(t+1) + β_(t+1) ⊙
-/// conj(G_h(t+1)))`, and every covector that read `h_(t−1)` reads `h'_(t−1)`.
+/// The turns are integer residues; each key's face `e^(2πi r/q)` on `2^(−30)` is resident, generated
+/// once from the half turn's navigator by the exponential series and rounded into the unit disk. So
+/// the move is a permutation times unimodular turns, and the passivity bound
+/// `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` holds unchanged up to the half grain of the turn's release
+/// to the state's grain, as the move's own release (Lean `HNN/PassiveMode`: `passive_recursion`
+/// proves the bound for any hand-over of modes and coefficients of modulus at most `ρ_max < 1`, and
+/// `pumped_recursion` for the pumped step with `|α| + |β| ≤ ρ_max`; a turn `e` enters as `α e` and
+/// `β ē`, which keeps both moduli). A mode turned by zero is carried exactly, so a class that turns
+/// nothing steps its rings as a permutation, and with no ring, or every key zero, the rotor tower
+/// reads every passage as its twin without the rotor (the opening). `σ` and `r` have no covector:
+/// keys in `ℤ/w` and `ℤ/q` are located by loop closure, not by descent. The reverse
+/// carries the mode covector back through the monomial's adjoint,
+/// `G_h(t) = (Cᵀδr)⁻ + (T_(t+1) P^(σ_(t+1)))* (conj(λ_(t+1)) ⊙ G_h(t+1) + β_(t+1) ⊙ conj(G_h(t+1)))`,
+/// mode `s_k + ((j + σ) mod w_k)` taking `e^(−2πi r/q)` times mode `s_k + j`'s, and every covector
+/// that read `h_(t−1)` reads `h'_(t−1)`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Rotor {
-    /// `σ`, level-major, then class, then ring, each below [`ROTOR_RING`].
-    steps: Vec<u8>,
+    rings: Vec<RotorRing>,
+    /// `σ`, level-major, then class, then ring, each below its ring's width.
+    steps: Vec<u32>,
+    /// `r`, level-major, then class, then moving mode, each below its ring's modulus.
+    turns: Vec<u32>,
+    levels: usize,
     alphabet: usize,
-    rings: usize,
+    modes: usize,
+    /// Each moving mode's ring and the ring's first mode.
+    places: Vec<(usize, usize)>,
+    /// Each key's resident face `e^(2πi r/q)` on `2^(−30)`, aligned with `turns`.
+    faces: Vec<(i128, i128)>,
 }
 
-/// The rotor's ring: four modes, which hold a numeral modulo every divisor of `10^4 − 1`.
-pub const ROTOR_RING: usize = 4;
+/// A ring of the rotor: `width` modes, mode `j` holding the character `c·10^j` of a numeral modulo
+/// `modulus`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RotorRing {
+    pub width: usize,
+    pub modulus: u32,
+}
+
+/// `e^(2πi r/q)` on `2^(−30)`: the angle read from the half turn's navigator thirty grains finer
+/// (`half_turn`), taken in `(−π, π]`, the exponential series summed at the grain, and the face
+/// rounded into the closed unit disk, its larger part released a grain toward zero until
+/// `|e|² ≤ 1` (a turn keeps the passivity bound).
+fn ring_face(r: u32, q: u32) -> (i128, i128) {
+    let fine = half_turn(2 * MOVE_BITS);
+    let signed = if 2 * u64::from(r) <= u64::from(q) { i128::from(r) } else { i128::from(r) - i128::from(q) };
+    let angle = div_nearest(2 * signed * fine, i128::from(q) << MOVE_BITS);
+    let (mut a, mut b) = exp_series(0, angle);
+    while a * a + b * b > 1i128 << (2 * MOVE_BITS) {
+        if a.abs() >= b.abs() {
+            a -= a.signum();
+        } else {
+            b -= b.signum();
+        }
+    }
+    (a, b)
+}
 
 impl Rotor {
-    /// The rotor of `steps` (level-major, then class, then ring, each below [`ROTOR_RING`]) on a
-    /// tower of `declaration`. Refused unless a level's modes are whole rings and there is one key
-    /// for each level, class and ring.
-    pub fn new(declaration: &TowerDeclaration, steps: Vec<u8>) -> Result<Self> {
+    /// The rotor of `rings` on a tower of `declaration`, with `steps` (level-major, then class, then
+    /// ring, each below its ring's width) and `turns` (level-major, then class, then moving mode,
+    /// each below its ring's modulus). Refused unless every ring holds a mode and a modulus above
+    /// one, the rings fit in a level's modes, and there is one key for each level, class and ring,
+    /// and for each level, class and moving mode.
+    pub fn new(declaration: &TowerDeclaration, rings: Vec<RotorRing>, steps: Vec<u32>, turns: Vec<u32>) -> Result<Self> {
         let d = declaration;
-        if d.modes == 0 || d.modes % ROTOR_RING != 0 {
-            return refuse("a rotor's modes are whole rings of four");
+        if rings.iter().any(|g| g.width == 0 || g.modulus < 2) {
+            return refuse("a rotor's ring holds a mode and a modulus above one");
         }
-        let rings = d.modes / ROTOR_RING;
-        if steps.len() != d.levels * d.alphabet * rings || steps.iter().any(|&s| s as usize >= ROTOR_RING) {
-            return refuse("a rotor holds one step in Z/4 for each level, class and ring");
+        let mut places = Vec::new();
+        for (k, g) in rings.iter().enumerate() {
+            let first = places.len();
+            places.extend((0..g.width).map(|_| (k, first)));
         }
-        Ok(Self { steps, alphabet: d.alphabet, rings })
+        let moving = places.len();
+        if moving > d.modes {
+            return refuse("a rotor's rings that do not fit in a level's modes");
+        }
+        let keyed = d.levels * d.alphabet;
+        if steps.len() != keyed * rings.len() || steps.chunks(rings.len().max(1)).any(|s| s.iter().zip(&rings).any(|(&s, g)| s as usize >= g.width)) {
+            return refuse("a rotor holds one step below its ring's width for each level, class and ring");
+        }
+        if turns.len() != keyed * moving || turns.chunks(moving.max(1)).any(|r| r.iter().zip(&places).any(|(&r, &(k, _))| r >= rings[k].modulus)) {
+            return refuse("a rotor holds one turn below its ring's modulus for each level, class and moving mode");
+        }
+        let mut resident = std::collections::BTreeMap::new();
+        let faces = turns
+            .iter()
+            .enumerate()
+            .map(|(i, &r)| {
+                let q = rings[places[i % moving].0].modulus;
+                *resident.entry((q, r)).or_insert_with(|| ring_face(r, q))
+            })
+            .collect();
+        Ok(Self { rings, steps, turns, levels: d.levels, alphabet: d.alphabet, modes: d.modes, places, faces })
     }
 
-    /// The rotor that steps nothing: the opening, which reads as the tower without it.
-    pub fn opening(declaration: &TowerDeclaration) -> Result<Self> {
-        let rings = declaration.modes / ROTOR_RING.max(1);
-        Self::new(declaration, vec![0; declaration.levels * declaration.alphabet * rings])
+    /// The rotor with no ring: the opening, which reads as the tower without it.
+    pub fn opening(declaration: &TowerDeclaration) -> Self {
+        Self { rings: Vec::new(), steps: Vec::new(), turns: Vec::new(), levels: declaration.levels, alphabet: declaration.alphabet, modes: declaration.modes, places: Vec::new(), faces: Vec::new() }
+    }
+
+    /// The rings, from a level's first mode.
+    pub fn rings(&self) -> &[RotorRing] {
+        &self.rings
     }
 
     /// The key `σ` of ring `ring` at level `level` when `class` arrives.
     pub fn step(&self, level: usize, class: usize, ring: usize) -> usize {
-        self.steps[(level * self.alphabet + class) * self.rings + ring] as usize
+        self.steps[(level * self.alphabet + class) * self.rings.len() + ring] as usize
     }
 
-    /// The keys, level-major, then class, then ring.
-    pub fn steps(&self) -> &[u8] {
+    /// The key `r` of mode `mode` at level `level` when `class` arrives (zero past the rings).
+    pub fn turn(&self, level: usize, class: usize, mode: usize) -> u32 {
+        let moving = self.places.len();
+        if mode < moving { self.turns[(level * self.alphabet + class) * moving + mode] } else { 0 }
+    }
+
+    /// The steps, level-major, then class, then ring.
+    pub fn steps(&self) -> &[u32] {
         &self.steps
     }
 
-    /// Whether `class` steps no ring of `level`.
+    /// The turns, level-major, then class, then moving mode.
+    pub fn turns(&self) -> &[u32] {
+        &self.turns
+    }
+
+    /// Whether `class` steps and turns nothing at `level`.
     fn still(&self, level: usize, class: usize) -> bool {
-        let at = (level * self.alphabet + class) * self.rings;
-        self.steps[at..at + self.rings].iter().all(|&s| s == 0)
+        let (k, moving) = (self.rings.len(), self.places.len());
+        let at = level * self.alphabet + class;
+        self.steps[at * k..(at + 1) * k].iter().all(|&s| s == 0) && self.turns[at * moving..(at + 1) * moving].iter().all(|&r| r == 0)
     }
 
-    /// `h' = P^σ h` at `level` when `class` arrives: mode `4k + j` takes mode `4k + ((j + σ) mod 4)`.
-    pub fn stepped<T: Copy>(&self, level: usize, class: usize, h: &[T]) -> Vec<T> {
-        (0..h.len()).map(|m| h[self.source(level, class, m)]).collect()
-    }
-
-    /// The mode whose state mode `m` takes at `level` when `class` arrives.
-    fn source(&self, level: usize, class: usize, m: usize) -> usize {
-        let (k, j) = (m / ROTOR_RING, m % ROTOR_RING);
-        k * ROTOR_RING + (j + self.step(level, class, k)) % ROTOR_RING
-    }
-
-    /// `rotor LEVELS ALPHABET RINGS` and the keys as one digit each.
-    fn to_text(&self) -> String {
-        let levels = self.steps.len() / (self.alphabet * self.rings).max(1);
-        let keys: String = self.steps.iter().map(|&s| char::from(b'0' + s)).collect();
-        format!("rotor {levels} {} {}\n{keys}\n", self.alphabet, self.rings)
-    }
-
-    fn from_text(head: &str, keys: &str, declaration: &TowerDeclaration) -> Result<Self> {
-        let d = declaration;
-        let expected = format!("rotor {} {} {}", d.levels, d.alphabet, d.modes / ROTOR_RING.max(1));
-        if head != expected {
-            return refuse("a rotor's head that is not the tower's");
+    /// The mode whose state mode `m` takes at `level` when `class` arrives: within its ring,
+    /// `s_k + ((j + σ) mod w_k)`, and itself past the rings.
+    pub fn source(&self, level: usize, class: usize, m: usize) -> usize {
+        match self.places.get(m) {
+            Some(&(k, first)) => first + (m - first + self.step(level, class, k)) % self.rings[k].width,
+            None => m,
         }
-        let steps: Vec<u8> = keys.bytes().map(|b| b.wrapping_sub(b'0')).collect();
-        Self::new(d, steps)
+    }
+
+    /// `h' = T P^σ h` at `level` when `class` arrives: mode `s_k + j` takes mode
+    /// `s_k + ((j + σ) mod w_k)` turned by its key's face, released to the state's grain (carried
+    /// exactly where the key is zero).
+    pub fn moved(&self, level: usize, class: usize, h: &[(i64, i64)]) -> Result<Vec<(i64, i64)>> {
+        let moving = self.places.len();
+        let at = (level * self.alphabet + class) * moving;
+        let mut out = h.to_vec();
+        for m in 0..moving {
+            let (x, y) = h[self.source(level, class, m)];
+            out[m] = if self.turns[at + m] == 0 {
+                (x, y)
+            } else {
+                let (a, b) = self.faces[at + m];
+                let (x, y) = (i128::from(x), i128::from(y));
+                (fit64(release(a * x - b * y, MOVE_BITS))?, fit64(release(a * y + b * x, MOVE_BITS))?)
+            };
+        }
+        Ok(out)
+    }
+
+    /// The covector of `h` from the covector `g` of `h' = T P^σ h`: mode `s_k + ((j + σ) mod w_k)`
+    /// takes `e^(−2πi r/q)` times mode `s_k + j`'s (exactly where the key is zero), the modes past the
+    /// rings their own.
+    pub fn back(&self, level: usize, class: usize, g: &[(i128, i128)]) -> Vec<(i128, i128)> {
+        let moving = self.places.len();
+        let at = (level * self.alphabet + class) * moving;
+        let mut out = g.to_vec();
+        for m in 0..moving {
+            let (x, y) = g[m];
+            out[self.source(level, class, m)] = if self.turns[at + m] == 0 {
+                (x, y)
+            } else {
+                let (a, b) = self.faces[at + m];
+                (release(a * x + b * y, MOVE_BITS), release(a * y - b * x, MOVE_BITS))
+            };
+        }
+        out
+    }
+
+    /// `rotor LEVELS ALPHABET MODES` and each ring as `WIDTH:MODULUS`, then the steps and the turns,
+    /// one line each.
+    fn to_text(&self) -> String {
+        let join = |keys: &[u32]| keys.iter().map(u32::to_string).collect::<Vec<_>>().join(" ");
+        let rings: String = self.rings.iter().map(|g| format!(" {}:{}", g.width, g.modulus)).collect();
+        format!("rotor {} {} {}{rings}\n{}\n{}\n", self.levels, self.alphabet, self.modes, join(&self.steps), join(&self.turns))
+    }
+
+    fn from_text(head: &str, steps: &str, turns: &str, declaration: &TowerDeclaration) -> Result<Self> {
+        let d = declaration;
+        let bad = TowerError::Refused("a rotor's text that is not the tower's");
+        let words: Vec<&str> = head.split(' ').collect();
+        if words.len() < 4 || words[..4].join(" ") != format!("rotor {} {} {}", d.levels, d.alphabet, d.modes) {
+            return Err(bad);
+        }
+        let rings = words[4..]
+            .iter()
+            .map(|w| {
+                let (width, modulus) = w.split_once(':').ok_or(bad.clone())?;
+                Ok(RotorRing { width: width.parse().map_err(|_| bad.clone())?, modulus: modulus.parse().map_err(|_| bad.clone())? })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        // A line of keys, each a count; an empty line holds none (a rotor without rings).
+        let keys = |line: &str| -> Result<Vec<u32>> {
+            if line.is_empty() {
+                return Ok(Vec::new());
+            }
+            line.split(' ').map(|w| w.parse().map_err(|_| bad.clone())).collect()
+        };
+        Self::new(d, rings, keys(steps)?, keys(turns)?)
     }
 }
 
@@ -2219,8 +2356,8 @@ impl Tower {
                 Some(face) if face.level == l => Some(carried_face(std::slice::from_ref(&state.modes[l]))?),
                 _ => None,
             };
-            // The rotor's step `h' = P^σ h` before the move ([`Rotor`]).
-            let stepped: Option<Vec<(i64, i64)>> = self.rotor.as_ref().filter(|r| !r.still(l, u)).map(|r| r.stepped(l, u, &state.modes[l]));
+            // The rotor's step and turn `h' = T P^σ h` before the move ([`Rotor`]).
+            let stepped: Option<Vec<(i64, i64)>> = self.rotor.as_ref().filter(|r| !r.still(l, u)).map(|r| r.moved(l, u, &state.modes[l])).transpose()?;
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
             let mut face = vec![0i64; 2 * n];
@@ -2616,14 +2753,11 @@ impl Tower {
                         (release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS), release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))
                     })
                     .collect();
-                // The rotor's step carried back by its inverse: mode k of h'_t took mode source(k)
-                // of h_t, so its covector returns there ([`Rotor`]).
+                // The rotor's step and turn carried back by the monomial's adjoint: mode k of h'_t
+                // took mode source(k) of h_t turned by its key, so its covector returns there turned
+                // back ([`Rotor`]).
                 if let Some(rotor) = self.rotor.as_ref().filter(|r| i + 1 < cells_n && !r.still(l, classes[i + 1])) {
-                    let mut moved = vec![(0i128, 0i128); n];
-                    for (k, v) in back.iter().enumerate() {
-                        moved[rotor.source(l, classes[i + 1], k)] = *v;
-                    }
-                    back = moved;
+                    back = rotor.back(l, classes[i + 1], &back);
                 }
                 for k in 0..n {
                     gh.push((fit64(read_cov[i][k].0 as i128 + back[k].0)?, fit64(read_cov[i][k].1 as i128 + back[k].1)?));
@@ -2646,8 +2780,8 @@ impl Tower {
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let unstepped: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
-                // The covectors of the move read the state it acted on, h' = P^σ h ([`Rotor`]).
-                let stepped = self.rotor.as_ref().filter(|r| !r.still(l, classes[i])).map(|r| r.stepped(l, classes[i], unstepped));
+                // The covectors of the move read the state it acted on, h' = T P^σ h ([`Rotor`]).
+                let stepped = self.rotor.as_ref().filter(|r| !r.still(l, classes[i])).map(|r| r.moved(l, classes[i], unstepped)).transpose()?;
                 let previous: &[(i64, i64)] = stepped.as_deref().unwrap_or(unstepped);
                 let gh = &gh_all[i];
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
@@ -3043,7 +3177,7 @@ impl Tower {
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
     /// three more with a pair face, two more with a ring face (one more a rank with its pair
-    /// moves, one more with its harmonics and one more with its restarts) and two more with a
+    /// moves, one more with its harmonics and one more with its restarts) and three more with a
     /// rotor.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
@@ -3063,7 +3197,7 @@ impl Tower {
             }
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("rotor ")) {
-            n += 2;
+            n += 3;
         }
         n
     }
@@ -3125,7 +3259,10 @@ impl Tower {
             None => None,
         };
         let rotor = match lines.next_if(|l| l.starts_with("rotor ")) {
-            Some(head) => Some(Rotor::from_text(head, lines.next().unwrap_or(""), &declaration)?),
+            Some(head) => {
+                let (steps, turns) = (lines.next().unwrap_or(""), lines.next().unwrap_or(""));
+                Some(Rotor::from_text(head, steps, turns, &declaration)?)
+            }
             None => None,
         };
         let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
@@ -3199,8 +3336,9 @@ impl Tower {
     }
 
     /// [agent-inferred with the mathematics thread, October 26] **The rotor joined to the tower**
-    /// ([`Rotor`]): it adds no material and no state, so a rotor that steps nothing leaves every
-    /// passage read as before, and a located one changes only which mode each move acts on.
+    /// ([`Rotor`]): it adds no material and no state, so a rotor that steps and turns nothing
+    /// leaves every passage read as before, and a located one changes only the state each move acts
+    /// on.
     /// Refused beside a ring face (a ring founded on a mode's own moves reads the mode unstepped;
     /// its law under a step is owed) or when one is already joined.
     pub fn join_rotor(&mut self, rotor: Rotor) -> Result<()> {
@@ -3211,7 +3349,7 @@ impl Tower {
             return refuse("a rotor beside a ring face: the ring's law under a step is owed");
         }
         let d = &self.declaration;
-        if rotor.alphabet != d.alphabet || rotor.rings * ROTOR_RING != d.modes || rotor.steps.len() != d.levels * d.alphabet * rotor.rings {
+        if (rotor.levels, rotor.alphabet, rotor.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("a rotor of another tower's shape");
         }
         self.rotor = Some(rotor);
@@ -3538,8 +3676,13 @@ impl TowerLearner {
     /// each section of `sections` (one slice a stream, as a training section reads them) is read
     /// forward and back from the streams' carried states, without a deposit, and the family's
     /// entries take `first = Σ g / n` and `second = Σ g² / n` over its `n` sections, on the
-    /// deposit's grain. Every other moment is left as carried. Returns `n`.
+    /// deposit's grain. Every other moment is left as carried. Returns `n`. A learner whose moments
+    /// have not opened refuses: its first compared section opens every moment at that section's
+    /// covector and square, so a family opened before it would be overwritten unread.
     pub fn open_moments(&mut self, family: std::ops::Range<usize>, states: &mut [TowerState], sections: &[Vec<&[usize]>]) -> Result<usize> {
+        if !self.opened {
+            return refuse("a family's moments open inside a learner whose moments have opened");
+        }
         if family.end > self.tower.theta.len() || family.is_empty() || sections.is_empty() {
             return refuse("moments open on a family of the material over at least one section");
         }
@@ -3811,8 +3954,8 @@ impl Tower {
             let mut levels = Vec::with_capacity(cell.levels.len());
             for (l, lc) in cell.levels.iter().enumerate() {
                 let lv = &self.layout.levels[l];
-                // The move acts on the stepped state ([`Rotor`]).
-                let moved = self.rotor.as_ref().map_or_else(|| opening[l].clone(), |r| r.stepped(l, classes[i], &opening[l]));
+                // The move acts on the stepped and turned state ([`Rotor`]).
+                let moved = self.rotor.as_ref().map_or_else(|| Ok(opening[l].clone()), |r| r.moved(l, classes[i], &opening[l]))?;
                 let modes: Vec<CircuitMode> = collect_exact((0..n).map(|k| {
                     let (hr, hi) = (moved[k].0 as i128, moved[k].1 as i128);
                     let lam = match lc.gate.get(k) {
@@ -4300,19 +4443,35 @@ mod tests {
         assert_eq!(code(&pumped, &classes), code(&turned, &classes));
     }
 
-    /// The pumped tiny tower of four modes (one ring) a level, with a rotor stepping classes 1 and
-    /// 2 at the first level (by one and by three) and class 3 at the second (by two).
+    /// The tiny rotor's rings on four modes a level: a ring of one mode modulo 9 and a ring of two
+    /// modes modulo 11, the fourth mode still.
+    const TINY_RINGS: [RotorRing; 2] = [RotorRing { width: 1, modulus: 9 }, RotorRing { width: 2, modulus: 11 }];
+
+    /// The tiny rotor's keys on a two-level tower of four classes, `(steps, turns)`: at the first
+    /// level class 1 steps the ring of two by one and turns as the digit 1 (`1`, `1`, `10`), class 2
+    /// turns as the digit 2 without a step (`2`, `2`, `9`) and class 3 steps without a turn (the
+    /// generator alone); at the second class 3 steps and turns (`5`, `3`, `8`). Class 0 is still.
+    fn tiny_keys() -> (Vec<u32>, Vec<u32>) {
+        let mut steps = vec![0u32; 2 * 4 * 2];
+        let mut turns = vec![0u32; 2 * 4 * 3];
+        steps[2 + 1] = 1;
+        turns[3..6].copy_from_slice(&[1, 1, 10]);
+        turns[6..9].copy_from_slice(&[2, 2, 9]);
+        steps[6 + 1] = 1;
+        steps[14 + 1] = 1;
+        turns[21..24].copy_from_slice(&[5, 3, 8]);
+        (steps, turns)
+    }
+
+    /// The pumped tiny tower of four modes a level with [`tiny_keys`]' rotor.
     fn tiny_rotor() -> Tower {
         rotor_on(tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying))
     }
 
-    /// [`tiny_rotor`]'s rotor on a two-level tower of four modes a level.
+    /// [`tiny_keys`]' rotor on a two-level tower of four modes a level.
     fn rotor_on(mut tower: Tower) -> Tower {
-        let mut steps = vec![0u8; 2 * 4];
-        steps[1] = 1;
-        steps[2] = 3;
-        steps[4 + 3] = 2;
-        tower.join_rotor(Rotor::new(&tower.declaration, steps).expect("rotor")).expect("joined");
+        let (steps, turns) = tiny_keys();
+        tower.join_rotor(Rotor::new(&tower.declaration, TINY_RINGS.to_vec(), steps, turns).expect("rotor")).expect("joined");
         tower
     }
 
@@ -4322,27 +4481,50 @@ mod tests {
         assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
         let learner = TowerLearner::new(tower.clone(), 7);
         assert_eq!(TowerLearner::from_text(&learner.to_text()).expect("restored").tower, tower);
+        let mut opened = tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying);
+        opened.join_rotor(Rotor::opening(&opened.declaration)).expect("joined");
+        assert_eq!(Tower::from_text(&opened.to_text()).expect("restored"), opened);
         let declaration = tower.declaration;
-        assert!(Rotor::new(&declaration, vec![4; 8]).is_err());
-        assert!(Rotor::new(&declaration, vec![0; 7]).is_err());
-        assert!(Rotor::opening(&TowerDeclaration { modes: 2, ..declaration }).is_err());
+        let rings = TINY_RINGS.to_vec();
+        let (steps, turns) = tiny_keys();
+        let refused = |rings: Vec<RotorRing>, steps: Vec<u32>, turns: Vec<u32>| Rotor::new(&declaration, rings, steps, turns).is_err();
+        // A step at the width of its ring, a turn at the modulus of its ring.
+        let mut wide = steps.clone();
+        wide[2] = 1;
+        assert!(refused(rings.clone(), wide, turns.clone()));
+        let mut over = turns.clone();
+        over[3] = 9;
+        assert!(refused(rings.clone(), steps.clone(), over));
+        // Keys of the wrong count, rings that do not fit, a ring without a mode or a modulus.
+        assert!(refused(rings.clone(), steps[1..].to_vec(), turns.clone()));
+        assert!(refused(rings.clone(), steps.clone(), turns[1..].to_vec()));
+        assert!(refused(vec![RotorRing { width: 5, modulus: 9 }], vec![0; 8], vec![0; 40]));
+        assert!(refused(vec![RotorRing { width: 0, modulus: 9 }], vec![0; 8], Vec::new()));
+        assert!(refused(vec![RotorRing { width: 1, modulus: 1 }], vec![0; 8], vec![0; 8]));
+        // The text of another tower's rotor.
+        let text = tower.to_text().replace("rotor 2 4 4 ", "rotor 2 4 3 ");
+        assert!(Tower::from_text(&text).is_err());
     }
 
-    /// A rotor that steps nothing reads every passage as its twin without one.
+    /// A rotor that steps and turns nothing reads every passage as its twin without one, with or
+    /// without rings.
     #[test]
     fn a_still_rotor_opens_on_its_twin() {
         let twin = tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying);
-        let mut still = twin.clone();
-        still.join_rotor(Rotor::opening(&still.declaration).expect("opening")).expect("joined");
         let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        let mut still = twin.clone();
+        still.join_rotor(Rotor::opening(&still.declaration)).expect("joined");
         assert_eq!(code(&still, &classes), code(&twin, &classes));
+        let mut ringed = twin.clone();
+        ringed.join_rotor(Rotor::new(&ringed.declaration, TINY_RINGS.to_vec(), vec![0; 16], vec![0; 24]).expect("rotor")).expect("joined");
+        assert_eq!(code(&ringed, &classes), code(&twin, &classes));
         assert_ne!(code(&tiny_rotor(), &classes), code(&twin, &classes));
     }
 
-    /// One cell of the rotor tower is its twin's cell from the stepped state: the move acts on
-    /// `P^σ h`, and nothing else in the cell reads the state before it.
+    /// One cell of the rotor tower is its twin's cell from the stepped and turned state: the move
+    /// acts on `T P^σ h`, and nothing else in the cell reads the state before it.
     #[test]
-    fn a_rotor_steps_each_ring_before_the_move() {
+    fn a_rotor_steps_and_turns_each_ring_before_the_move() {
         let rotor_tower = tiny_rotor();
         let twin = tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying);
         let rotor = rotor_tower.rotor().expect("rotor").clone();
@@ -4354,15 +4536,60 @@ mod tests {
             let mut moved = s.clone();
             let face = rotor_tower.advance(&mut moved, u).expect("advance");
             let mut stepped = s.clone();
-            stepped.modes = (0..2).map(|l| rotor.stepped(l, u, &s.modes[l])).collect();
+            stepped.modes = (0..2).map(|l| rotor.moved(l, u, &s.modes[l]).expect("moved")).collect();
             let twin_face = twin.advance(&mut stepped, u).expect("advance");
             assert_eq!(moved, stepped, "class {u}");
             assert_eq!(face, twin_face, "class {u}");
         }
-        // Mode 4k + j takes mode 4k + ((j + σ) mod 4).
-        assert_eq!(rotor.stepped(0, 1, &[10, 11, 12, 13]), vec![11, 12, 13, 10]);
-        assert_eq!(rotor.stepped(0, 2, &[10, 11, 12, 13]), vec![13, 10, 11, 12]);
-        assert_eq!(rotor.stepped(1, 3, &[10, 11, 12, 13]), vec![12, 13, 10, 11]);
+        // The generator alone is a permutation: mode s_k + j takes mode s_k + ((j + σ) mod w_k),
+        // the ring of one mode and the still mode their own.
+        let h = [(10, 1), (11, 2), (12, 3), (13, 4)];
+        assert_eq!(rotor.moved(0, 3, &h).expect("moved"), vec![(10, 1), (12, 3), (11, 2), (13, 4)]);
+        assert_eq!(rotor.moved(0, 0, &h).expect("moved"), h.to_vec());
+    }
+
+    /// A turn's face is its root of unity at the grain: nine turns by `1/9` of a turn, and eleven by
+    /// `1/11`, return a state of ten units to itself within a few grains, and each face lies in the
+    /// closed unit disk within two grains of its circle.
+    #[test]
+    fn a_rotor_turns_by_roots_of_unity() {
+        let declaration = TowerDeclaration { alphabet: 1, width: 1, modes: 2, contacts: 1, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let rotor = Rotor::new(&declaration, vec![RotorRing { width: 1, modulus: 9 }, RotorRing { width: 1, modulus: 11 }], vec![0, 0], vec![1, 1]).expect("rotor");
+        let start = (10i64 << STATE_BITS, 3i64 << STATE_BITS);
+        let mut h = vec![start, start];
+        for _ in 0..9 {
+            h = rotor.moved(0, 0, &h).expect("moved");
+        }
+        assert!((h[0].0 - start.0).abs() <= 16 && (h[0].1 - start.1).abs() <= 16, "{:?}", h[0]);
+        for _ in 0..2 {
+            h = rotor.moved(0, 0, &h).expect("moved");
+        }
+        assert!((h[1].0 - start.0).abs() <= 16 && (h[1].1 - start.1).abs() <= 16, "{:?}", h[1]);
+        for q in [9u32, 11, 101] {
+            for r in 0..q {
+                let (a, b) = ring_face(r, q);
+                let norm = a * a + b * b;
+                assert!(norm <= 1i128 << (2 * MOVE_BITS) && norm >= (1i128 << (2 * MOVE_BITS)) - (4i128 << (MOVE_BITS + 1)), "{r}/{q}");
+            }
+        }
+    }
+
+    /// The reverse is the monomial's adjoint: `Re⟨g, T P^σ h⟩ = Re⟨(T P^σ)* g, h⟩` within the grains
+    /// each side releases.
+    #[test]
+    fn a_rotor_reverse_is_its_adjoint() {
+        let rotor = tiny_rotor().rotor().expect("rotor").clone();
+        let k = keys(512);
+        let word = |i: usize| i64::from(i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 12);
+        for (l, u) in [(0usize, 1usize), (0, 2), (0, 3), (1, 3)] {
+            let h: Vec<(i64, i64)> = (0..4).map(|m| (word(4 * m + 8 * u + l), word(4 * m + 1 + 8 * u + l))).collect();
+            let g: Vec<(i128, i128)> = (0..4).map(|m| (i128::from(word(64 + 4 * m + u)), i128::from(word(65 + 4 * m + u)))).collect();
+            let forward = rotor.moved(l, u, &h).expect("moved");
+            let back = rotor.back(l, u, &g);
+            let pair = |a: &[(i128, i128)], b: &[(i64, i64)]| a.iter().zip(b).map(|(&(x, y), &(p, q))| x * i128::from(p) + y * i128::from(q)).sum::<i128>();
+            let bound: i128 = g.iter().map(|&(x, y)| x.abs() + y.abs()).sum::<i128>() + h.iter().map(|&(x, y)| i128::from(x.abs() + y.abs())).sum::<i128>();
+            assert!((pair(&g, &forward) - pair(&back, &h)).abs() <= bound, "level {l} class {u}");
+        }
     }
 
     /// A rotor beside a ring face, or a credited opening under a rotor, is refused: their laws
@@ -4370,7 +4597,7 @@ mod tests {
     #[test]
     fn a_rotor_refuses_what_it_does_not_carry() {
         let mut tower = tiny_rotor();
-        assert!(tower.join_rotor(Rotor::opening(&tower.declaration).expect("opening")).is_err());
+        assert!(tower.join_rotor(Rotor::opening(&tower.declaration)).is_err());
         let opening = tower.rest_with_credit();
         let mut s = opening.clone();
         let classes = [0usize, 1, 2, 3];
@@ -4380,7 +4607,7 @@ mod tests {
         assert!(tower.advance_credit(&mut credit, &opening, &cells, &tower.reaches()).is_err());
         assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
         tower.rotor = None;
-        assert!(tower.join_rotor(Rotor::opening(&tower.declaration).expect("opening")).is_ok());
+        assert!(tower.join_rotor(Rotor::opening(&tower.declaration)).is_ok());
     }
 
     #[test]
@@ -4631,9 +4858,14 @@ mod tests {
         let b: Vec<usize> = (0..25).map(|i| PASSAGE[(5 * i + 3) % 13]).collect();
         let sections: Vec<Vec<&[usize]>> = (0..2).map(|k| vec![&a[12 * k..12 * k + 13], &b[12 * k..12 * k + 13]]).collect();
         let family = tower.ring_family().expect("a ring-faced tower");
+        // A learner whose moments have not opened refuses: its first section would overwrite them.
+        let mut fresh = TowerLearner::new(tower.clone(), 6);
+        let mut states = vec![tower.rest(); 2];
+        assert!(fresh.open_moments(family.clone(), &mut states, &sections[..1]).is_err());
+        assert_eq!(states, vec![tower.rest(); 2]);
         // One section: the covector itself.
         let mut learner = TowerLearner::new(tower.clone(), 6);
-        let mut states = vec![tower.rest(); 2];
+        learner.opened = true;
         assert_eq!(learner.open_moments(family.clone(), &mut states, &sections[..1]).expect("opened"), 1);
         let reaches = tower.reaches();
         let mut g = vec![0i128; tower.theta.len()];
@@ -4653,6 +4885,7 @@ mod tests {
         }
         // Two sections: the means, the rest carried, the material and the streams as a frozen read.
         let mut learner = TowerLearner::new(tower.clone(), 6);
+        learner.opened = true;
         let mut states = vec![tower.rest(); 2];
         assert_eq!(learner.open_moments(family.clone(), &mut states, &sections).expect("opened"), 2);
         assert_eq!(learner.tower, tower);

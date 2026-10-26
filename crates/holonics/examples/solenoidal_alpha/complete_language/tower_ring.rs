@@ -1123,7 +1123,7 @@ fn wide_primes() -> impl Iterator<Item = u64> {
 /// pivot and zero at every other pivot), and the row of the system each pivot came from.
 pub(super) struct Echelon {
     pub(super) pivots: Vec<usize>,
-    rows: Vec<Vec<u64>>,
+    pub(super) rows: Vec<Vec<u64>>,
     sources: Vec<usize>,
 }
 

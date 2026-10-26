@@ -343,7 +343,8 @@ stepping. `PP`'s first-pass state reproduced the stopped run's bit for bit.
 
 **The changed read held both runs.** Neither was stopped; their largest windows ran 105.7 and
 106.0 ms an evaluation against bounds of 121.9 and 122.1. The window that stopped the first `PP`
-reads 60.2 ms an evaluation once its 55 halvings are counted.
+took 4,095 ms over 32 sections and the 55 halvings the stopped log counts within it (74 at its
+end): 47.1 ms an evaluation, inside the changed read's bound of 121.9.
 
 | run | projection | deadline | wall | ratio | peak resident |
 |---|---|---|---|---|---|
@@ -415,16 +416,26 @@ The locator already holds the modulator. At step 1 the rows' rank drops by one m
 byte `b`) that closes every loop of the menu modulo `p`, located from the text's own calculations.
 The founding kept `s` and dropped the kernel.
 
-**The next loop, fixed before it is built** (agent-inferred): the rotor carries keyed turns. The
-kernel modulo each torsion prime is founded as each stepping unit's turn per ring mode, a residue
-`r ∈ ℤ/p` composed over the unit's bytes as the rows compose them (`φ_j` of the unit), held as an
-integer and read through the navigator's face `e^(2πi r/p)`; a ring takes one prime and one unit
-multiple `c` of the kernel (its Galois orbit under the step), and the ring width is declared on
-the rotor. The equation at the consumer: read from rest with the drive closed, mode `j` of a ring
-after the numeral `n` is `χ_(c·10^j)(n)` exactly, for every numeral of the menu (a test). Then the
-same run as this loop, `PRT` beside `PR`, with the same acceptance and reads. If the rings rise and
-the acceptance fails, the drive within a numeral (the sum above) and the capture at the operator
-are the next loop's subject.
+**The next loop, fixed before it is built** (agent-inferred with the mathematics thread): the
+rotor carries keyed turns, `h' = T P^σ h` with `(T P^σ h)_(s_k + j) = e^(2πi r/q_k) h_(s_k + ((j + σ)
+mod w_k))`, one monomial move (`Rotor`). At each torsion prime of the located step whose kernel is
+one line, the line is the turn modulo `p` at the gauge `c = 1` (one character a prime suffices, its
+orbit kept whole), lifted to `p^e` while the rows close with it (to 9 at 3; nothing lifts at 11 or
+101), and the ring's width is the turn's period in the mode, the order of 10: ring 9 one mode, ring
+11 two, ring 101 four. Seven of the 64 modes move and the rest hold still until a loop needs another
+ring (7, 13 and 37 arrive with a period of 6). Each stepping unit's turn on a ring mode is a residue
+composed over its bytes as the rows compose them, held as an integer and read through its resident
+face `e^(2πi r/q)` (`found-unit-rotor-tower … PERIOD LAW`). The equation at the consumer is a test:
+read from rest, the residue on mode `j` of a ring after the numeral `n` is `10^j·n` modulo the
+ring's modulus, through units of one digit and of several with unlocated bytes between them
+(`the_numeral_read_is_its_characters`), and the located kernels are the tenfold characters
+(`the_turns_are_the_tenfold_characters`). There is no restart: the modulated strand over the
+generator-only strand is `χ(n)` only where the step is monomial on the orbit, and the level's own
+move after the rotor damps and reflects (`λ`, `β`), so whether the character survives that move is
+what the run measures. The run is `PRT` (law `modulated`) beside `PRS` (law `free`: the same rings
+stepping without a turn), so the paired line isolates the turn, with this loop's acceptance and
+reads, beside `PR`, `PP` and `C`. If the rings rise and the acceptance fails, the drive within a
+numeral and the capture at the operator are the next loop's subject.
 
 ## 6. The recorded failures this loop could repeat
 
