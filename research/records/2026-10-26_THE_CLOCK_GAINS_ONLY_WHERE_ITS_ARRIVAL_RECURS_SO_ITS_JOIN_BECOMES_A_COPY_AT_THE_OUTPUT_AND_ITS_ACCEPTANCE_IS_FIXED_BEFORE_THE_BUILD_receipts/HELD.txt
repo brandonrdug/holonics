@@ -1,0 +1,22 @@
+The observer's held read (tools/listener/bank_trace.py at 4400bcd3b, mode `held`), October 26, on
+Brandon's PC, in the run directory of the pool record's receipts. Read-only: it opens the text and
+the two cells files and writes nothing.
+
+script   bank_trace.py at 4400bcd3b  sha256 b46fe55221388ed18af44079932db8cb75eff35907455ea35e2217ea926fe747
+text     dev.txt                     sha256 e5bffe0ea3949a2e8efec1c43120918891867c342a9e9ffd288cc798a8363153
+cells A  role_clock/twin8.cells      sha256 d538b2c99a2622c4b7128c4a7caea852bb3e077b316a936170e718f9474ce8b9
+cells B  role_clock/clockB8.cells    sha256 47c5746e1d0dd4594379c6ecdcc0e7bb2a9e54d4bff8cf02ec8154e39db45b03
+
+command  python3 -I bin/receipt.py timeout 10 python3 -I role_clock/bank_trace_4400bcd3b.py held dev.txt role_clock/twin8.cells role_clock/clockB8.cells
+
+role_clock/twin8.cells then role_clock/clockB8.cells: 151676 cells; the second codes +12813.3 bits against the first
+  before any reset: 231 cells; largest mass 88 then 86; code 4.047 then 4.101 bits a cell; difference +12.6 bits
+  the held arrival itself: 746 cells; largest mass 60 then 52; code 5.261 then 5.331 bits a cell; difference +52.6 bits
+  repeats the held arrival: 1168 cells; largest mass 43 then 54; code 6.966 then 6.550 bits a cell; difference -486.9 bits
+  elsewhere, 1-8 cells after the reset: 5964 cells; largest mass 1093 then 1046; code 5.709 then 5.916 bits a cell; difference +1236.0 bits
+  elsewhere, 9-32 cells after the reset: 17804 cells; largest mass 3849 then 3612; code 5.409 then 5.564 bits a cell; difference +2776.6 bits
+  elsewhere, 33-128 cells after the reset: 68505 cells; largest mass 24714 then 24042; code 4.198 then 4.291 bits a cell; difference +6407.9 bits
+  elsewhere, 129-1000000000 cells after the reset: 57258 cells; largest mass 24570 then 24166; code 3.555 then 3.605 bits a cell; difference +2814.5 bits
+RUN_RECEIPT exit=0 wall_s=0.3 peak_rss_kib=67796 user_s=0.2
+
+Projection 10 s (deadline); measured 0.3 s; ratio 0.03; peak resident set 67,796 KiB.
