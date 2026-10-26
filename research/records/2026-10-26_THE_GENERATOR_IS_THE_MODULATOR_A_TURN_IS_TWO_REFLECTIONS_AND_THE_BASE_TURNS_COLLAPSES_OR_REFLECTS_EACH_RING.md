@@ -579,6 +579,18 @@ ring can write right; a wider ring is the face law's (`10^w − 1` for the next 
 products' capture (the index chart, where a product of numerals is a sum of turns) waits on a
 passing acceptance.
 
+**Built** (October 26, before its run): `holonics::hnn::tower::Navigator` and its join, with the
+locator in `tower_rotor` (laws `captured` and `numeral`). Its tests read the claims above: the fold
+from rest through units of one byte and of several closes every sum and difference of a synthetic
+menu and is one character off where the result is one more; the locator returns `+` at one, `-` and
+`=` at minus one and the product at none; the written faces sit at amplitude one and the level's
+other modes move as on the twin without a navigator; and the covector matches the code difference
+on the pumped rotor tower and on the ungated one. One reading of the ungated toy tower bears on
+the run: through rectifying contacts the unit faces hold the level's reads where a step of either
+level's moves, or of the second level's read, crosses a contact's kink, so 17 of its 23 families
+could be read there (each one read matched); through pair contacts, the contact the run's towers
+use, every family is read. The Lean statement of the fold is owed in #410.
+
 ## 8. The recorded failures these loops could repeat
 
 - **An authored routine standing in for learning.** The rings, the foil and the bar are exterior
