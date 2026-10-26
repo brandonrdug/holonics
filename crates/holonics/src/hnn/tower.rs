@@ -1086,13 +1086,13 @@ impl RingFace {
 /// once from the half turn's navigator by the exponential series and rounded into the unit disk. So
 /// the move is a permutation times unimodular turns, and the passivity bound
 /// `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` holds unchanged up to the half grain of the turn's release
-/// to the state's grain, as the move's own release (Lean `HNN/PassiveMode.passive_recursion` proves
-/// the bound for any hand-over of modes and any coefficient of modulus at most `ρ_max < 1`, which
-/// the turned move `λ e^(2πi r/q)` is; the pumped step's conjugate term is owed in #410). A mode
-/// turned by zero is carried exactly, so a class that turns nothing steps its rings as a
-/// permutation, and with no ring, or every key zero, the rotor tower reads every passage as its twin
-/// without the rotor (the opening). `σ` and `r` have no
-/// covector: keys in `ℤ/w` and `ℤ/q` are located by loop closure, not by descent. The reverse
+/// to the state's grain, as the move's own release (Lean `HNN/PassiveMode`: `passive_recursion`
+/// proves the bound for any hand-over of modes and coefficients of modulus at most `ρ_max < 1`, and
+/// `pumped_recursion` for the pumped step with `|α| + |β| ≤ ρ_max`; a turn `e` enters as `α e` and
+/// `β ē`, which keeps both moduli). A mode turned by zero is carried exactly, so a class that turns
+/// nothing steps its rings as a permutation, and with no ring, or every key zero, the rotor tower
+/// reads every passage as its twin without the rotor (the opening). `σ` and `r` have no covector:
+/// keys in `ℤ/w` and `ℤ/q` are located by loop closure, not by descent. The reverse
 /// carries the mode covector back through the monomial's adjoint,
 /// `G_h(t) = (Cᵀδr)⁻ + (T_(t+1) P^(σ_(t+1)))* (conj(λ_(t+1)) ⊙ G_h(t+1) + β_(t+1) ⊙ conj(G_h(t+1)))`,
 /// mode `s_k + ((j + σ) mod w_k)` taking `e^(−2πi r/q)` times mode `s_k + j`'s, and every covector
