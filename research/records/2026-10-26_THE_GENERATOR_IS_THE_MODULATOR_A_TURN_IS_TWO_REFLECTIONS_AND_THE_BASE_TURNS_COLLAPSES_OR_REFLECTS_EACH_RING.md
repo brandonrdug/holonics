@@ -333,7 +333,100 @@ its question, whether ring 9 is learned without pair contacts, does not decide t
   against the 8-gram's 34 of 876 and `C`'s 14, by the paired line against `PP`; met calculations are
   reported as recitation. The level read of §3 is read for `PR` beside `PP`.
 
-## 5. The recorded failures this loop could repeat
+## 5. What the rotor loop measured
+
+[measured, October 26, on the PC; receipts in `ROTOR_RUN.md`] **The locator found the tenfold
+step on the real text.** Over the training text's 7,204 calculations of whole numerals (10 digit
+bytes, 40 unknown turns), the rows carry torsion `3` at step 0, `{3, 11, 101}` at steps 1 and 3
+(carried `3333`) and `{3, 11}` at step 2; `PR` was founded at step 1, with 120 of the 1,318 units
+stepping. `PP`'s first-pass state reproduced the stopped run's bit for bit.
+
+**The changed read held both runs.** Neither was stopped; their largest windows ran 105.7 and
+106.0 ms an evaluation against bounds of 121.9 and 122.1. The window that stopped the first `PP`
+reads 60.2 ms an evaluation once its 55 halvings are counted.
+
+| run | projection | deadline | wall | ratio | peak resident |
+|---|---|---|---|---|---|
+| train `PP`, three passes | 549.49 s | 550 s | 410.7 s | 0.747 | 293,148 KiB |
+| train `PR`, three passes | 550.69 s | 551 s | 408.1 s | 0.741 | 291,368 KiB |
+
+**The rotor tower codes best and recites most.** Held-out bits a byte after each pass, and the
+regions after the third (question, answer prose, answer numbers, calculation markup):
+
+| tower | pass 0 | pass 1 | pass 2 | Q | P | N | M |
+|---|---|---|---|---|---|---|---|
+| `C` | 1.984 | | 1.869 | 1.318 | 2.390 | 0.608 | 1.878 |
+| `PP` | 1.931 | 1.823 | 1.880 | 1.496 | 2.485 | 0.720 | 1.885 |
+| `PR` | 1.970 | 1.843 | 1.779 | 1.201 | 2.459 | 0.423 | 1.786 |
+
+`PP` coded more in its third pass than its second; `PR` coded less each pass. At the equals:
+
+| tower | right | met (of 1,572) | never met (of 876) | `+` | `−` | `×` | `÷` |
+|---|---|---|---|---|---|---|---|
+| `C` | 190 | 176 | 14 | 14 | 21 | 114 | 29 |
+| `PP` | 109 | 104 | 5 | 14 | 11 | 63 | 16 |
+| `PR` | 277 | 259 | 18 | 26 | 26 | 158 | 52 |
+| 8-gram | | | 34 | | | | |
+
+Paired: `PR` against `PP` writes 197 met calculations only it writes right against 42, and 16
+never-met against 3 (sign test 0.004); against `C`, 140 against 57 met (`z` = 4.3 pooled) and 15
+against 11 never-met (0.56). Its right writes sit on what it heard most: 179 of 528 calculations
+heard 16 or more times, 39 of 326 heard 8–15, 9 of 239 heard once (`C` 131, 23, 7).
+
+**The acceptance fails, and no ring rises.** 18 of 876 never-met calculations is below the
+8-gram's 34 (and §3's 156 of 312). On the 312 never-met sums and differences:
+
+| tower | ring 9 | foil | ring 10 | foil | ring 11 | foil | mod 990 | foil |
+|---|---|---|---|---|---|---|---|---|
+| `C` | 44 | 39 | 109 | 76 | 30 | 26 | 6 | 1 |
+| `PP` | 39 | 32 | 113 | 84 | 23 | 23 | 3 | 1 |
+| `PR` | 32 | 35 | 123 | 88 | 27 | 30 | 4 | 4 |
+
+Ring 10 is above its foil (`PR` `z` = 3.0, `PP` 2.5); rings 9 and 11 are not (`PR` −0.4 and −0.4,
+`PP` 0.9 and 0.0). At the last digit of a held-out numeral (3,810), the modes against the energies:
+
+| level | tower | 9 | 10 | 11 | 7 | 13 | 100 |
+|---|---|---|---|---|---|---|---|
+| 0 | `PP` | 550 / 367 | 1,700 / 1,268 | 621 / 394 | 653 / 461 | 574 / 346 | 611 / 49 |
+| 0 | `PR` | 788 / 700 | 1,040 / 1,825 | 771 / 816 | 887 / 922 | 798 / 715 | 482 / 1,218 |
+| 1 | `PP` | 480 / 432 | 1,461 / 1,519 | 420 / 287 | 662 / 522 | 449 / 399 | 361 / 126 |
+| 1 | `PR` | 817 / 636 | 2,490 / 1,677 | 832 / 486 | 930 / 737 | 788 / 478 | 1,135 / 293 |
+| | suffix | 1,530 | 3,800 | 1,518 | 1,574 | 1,491 | 3,800 |
+
+Every ring of every tower is below its suffix (`z` < −17 for `PR`). `PR`'s modes name ring 13 as
+often as rings 9 and 11 at both levels, and 13 is a ring the tenfold step cannot hold in four
+modes (10 has order 6 modulo 13): what the modes name is which numeral, the identities the
+training text repeats, not a phase. By §3's decision 2 (ring 9 not above its foil in `PP`), the
+keyed turn is not learned by descent.
+
+[agent-inferred] **Why: the rotor as founded is the generator without the modulator.** A unit
+steps by `s` times its located bytes, whatever the digits are, so each digit carries mode `j`'s
+content to mode `j + 1` and nothing else: a clock of position modulo 4. A character obeys
+`χ(10n + d) = χ_10(n) χ(d)`: the shift (`χ_c ↦ χ_10c`, the generator) and the turn by the
+arriving digit (`χ_c(d)`, the modulator) are one move, and the founding kept only the first. The
+turn was left to the pumped mode's descent (`W_φ`, `b_φ`), and descent did not find it. What `PR`
+gained is what position buys, which is what the n-grams have: recitation, the answer numbers' code
+(0.423 against `C`'s 0.608) and ring 10. The linear state cannot supply the missing product from
+its drive either: it holds `Σ_s M_(>s) B x_s`, a sum of the arrivals' drives, where a character
+is a product of their turns.
+
+The locator already holds the modulator. At step 1 the rows' rank drops by one modulo each of 3,
+11 and 101, so each has a one-dimensional kernel: a turn key `θ_m[b]` (mode `m` of the ring, digit
+byte `b`) that closes every loop of the menu modulo `p`, located from the text's own calculations.
+The founding kept `s` and dropped the kernel.
+
+**The next loop, fixed before it is built** (agent-inferred): the rotor carries keyed turns. The
+kernel modulo each torsion prime is founded as each stepping unit's turn per ring mode, a residue
+`r ∈ ℤ/p` composed over the unit's bytes as the rows compose them (`φ_j` of the unit), held as an
+integer and read through the navigator's face `e^(2πi r/p)`; a ring takes one prime and one unit
+multiple `c` of the kernel (its Galois orbit under the step), and the ring width is declared on
+the rotor. The equation at the consumer: read from rest with the drive closed, mode `j` of a ring
+after the numeral `n` is `χ_(c·10^j)(n)` exactly, for every numeral of the menu (a test). Then the
+same run as this loop, `PRT` beside `PR`, with the same acceptance and reads. If the rings rise and
+the acceptance fails, the drive within a numeral (the sum above) and the capture at the operator
+are the next loop's subject.
+
+## 6. The recorded failures this loop could repeat
 
 - **An authored routine standing in for learning.** The rings, the foil and the bar are exterior
   reads; nothing enters the machine but the text. The towers find their angles by their own
