@@ -600,7 +600,10 @@ To #410:
   `F X = Z F` (`fourier_shift`), `F Z = X⁻¹ F` (`fourier_clock`), `Z X = ψ(1)·X Z` (`clock_shift`),
   `F̄ F = n` for a primitive `ψ` into a domain (`fourierBar_fourier`), and the dual turn
   `n·Xˢ = F̄ Zˢ F` (`fourier_shift_iterate`, `clock_iterate`, `dual_turn`); the Gauss-sum line is
-  Mathlib's `gaussSum_sq`;
+  Mathlib's `gaussSum_sq`. The Gaussian instance followed on October 26 in the same file: `i` is a
+  primitive fourth root of unity in `ℤ[i]` (`gaussI_primitive`), `ψ(j) = iʲ` is a primitive character
+  of `ℤ/4` (`gaussChar_isPrimitive`), and `4·Xˢ = F̄ diag(i^(js)) F` holds exactly
+  (`dual_turn_gauss`);
 - (e) in [`Geometry/TorusBraid`](../../lean/HolonicsResearch/Geometry/TorusBraid.lean): `TLT = LTL`
   (`braid`), `TLT = [[0,1],[−1,0]]` (`quarter_turn`), `TL` of trace 1 and order 6 (`turn_cube`,
   `orderOf_turn`), `TL⁻¹ = [[2,1],[1,1]]` (`cat_eq`), `A^(k+1) = [[F_(2k+3), F_(2k+2)],

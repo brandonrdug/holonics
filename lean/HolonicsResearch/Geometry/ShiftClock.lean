@@ -1,4 +1,5 @@
 import Mathlib.NumberTheory.GaussSum
+import Mathlib.NumberTheory.Zsqrtd.GaussianInt
 import Mathlib.Tactic
 
 /-!
@@ -23,8 +24,11 @@ for `n = 4` the Gaussian integers with `ω = i`.
    `(F̄ f)(j) = Σ_k ψ(−j k) f(k)`, `F̄ F = n`. Over `ℤ[i]` at `n = 4` this is the chart "exact in
    Gaussian integers over 4".
 4. **Stepping a ring is a turn in its dual chart** (`fourier_shift_iterate`, `clock_iterate`,
-   `dual_turn`): `F Xˢ = Zˢ F` with `(Zˢ f)(j) = ψ(j)ˢ f(j)`, so `n·Xˢ = F̄ Zˢ F`. At `n = 4`,
-   `ψ(j) = iʲ`, this is `F⁻¹ diag(i^(js)) F = Xˢ`.
+   `dual_turn`): `F Xˢ = Zˢ F` with `(Zˢ f)(j) = ψ(j)ˢ f(j)`, so `n·Xˢ = F̄ Zˢ F`.
+5. **The Gaussian instance** (`gaussI`, `gaussI_primitive`, `gaussChar`, `gaussChar_isPrimitive`,
+   `dual_turn_gauss`): `i` is a primitive fourth root of unity in `ℤ[i]`, so `ψ(j) = iʲ` is a
+   primitive character of `ℤ/4`, and `4·Xˢ = F̄ diag(i^(js)) F` holds exactly in the Gaussian
+   integers: stepping the ring of four is a quarter-turn in its dual chart.
 
 Mathlib's `gaussSum_sq` carries the record's Gauss-sum line, `τ(χ)² = χ(−1)·q` for the quadratic
 character of a finite field of `q` elements.
@@ -141,5 +145,39 @@ theorem dual_turn [IsDomain R] (ψ : AddChar (ZMod n) R) (hψ : ψ.IsPrimitive) 
     (fun j => (n : R) * (shift^[s] f) j) =
       fourierBar ψ (fun j => ψ j ^ s * fourier ψ f j) := by
   rw [← clock_iterate, ← fourier_shift_iterate, fourierBar_fourier ψ hψ]
+
+section Gauss
+
+/-- [definition] The Gaussian integer `i`. -/
+def gaussI : GaussianInt := ⟨0, 1⟩
+
+/-- [proved-standard; formal-checked] `i⁴ = 1`. -/
+theorem gaussI_pow_four : gaussI ^ 4 = 1 := by decide
+
+/-- [proved-standard; formal-checked] **`i` is a primitive fourth root of unity.** -/
+theorem gaussI_primitive : IsPrimitiveRoot gaussI 4 := by
+  refine IsPrimitiveRoot.mk_of_lt gaussI (by norm_num) gaussI_pow_four fun l hl hl4 => ?_
+  interval_cases l <;> decide
+
+/-- [definition] The character `ψ(j) = iʲ` of `ℤ/4` in the Gaussian integers. -/
+def gaussChar : AddChar (ZMod 4) GaussianInt := AddChar.zmodChar 4 gaussI_pow_four
+
+/-- [proved-standard; formal-checked] `ψ(j) = iʲ`. -/
+theorem gaussChar_apply (j : ZMod 4) : gaussChar j = gaussI ^ j.val :=
+  AddChar.zmodChar_apply gaussI_pow_four j
+
+/-- [proved-standard; formal-checked] **`ψ(j) = iʲ` is primitive.** -/
+theorem gaussChar_isPrimitive : gaussChar.IsPrimitive :=
+  AddChar.zmodChar_primitive_of_primitive_root 4 gaussI_primitive
+
+/-- [proved-standard; formal-checked] **Stepping the ring of four is a quarter-turn in its dual
+chart, exactly in `ℤ[i]`:** `4·Xˢ = F̄ diag(i^(js)) F`. -/
+theorem dual_turn_gauss (s : ℕ) (f : ZMod 4 → GaussianInt) :
+    (fun j => (4 : GaussianInt) * (shift^[s] f) j) =
+      fourierBar gaussChar (fun j => gaussChar j ^ s * fourier gaussChar f j) := by
+  have h := dual_turn gaussChar gaussChar_isPrimitive s f
+  rwa [Nat.cast_ofNat] at h
+
+end Gauss
 
 end Holonics.Geometry.ShiftClock

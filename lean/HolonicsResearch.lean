@@ -1209,3 +1209,8 @@ import HolonicsResearch.Geometry.ShiftClock
 import HolonicsResearch.Geometry.TorusBraid
 import HolonicsResearch.HNN.ReferentMass
 import HolonicsResearch.HNN.AgreementRelease
+import HolonicsResearch.HNN.ChargeThreshold
+import HolonicsResearch.Mathematics.CheapConvolution
+import HolonicsResearch.Mathematics.BindingFourCycle
+import HolonicsResearch.Physics.DilationCurrent
+import HolonicsResearch.Mathematics.FibonacciModelSet

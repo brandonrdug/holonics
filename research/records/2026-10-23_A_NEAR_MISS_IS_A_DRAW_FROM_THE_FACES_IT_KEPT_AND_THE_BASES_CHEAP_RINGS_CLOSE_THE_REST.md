@@ -306,7 +306,15 @@ selection in the design thread: a ring face is located by this return, never aut
   `radix.held-face-reading-order` (the fold reading of a word's face; a held face's gain is the same
   in every order), `arith.binding-four-cycle` (`□G ≡ 0 ⇔ G = f(a) + g(b)`; `□(ab/q) = (i − k)(j − l)/q`)
   and `tower.square-defect-composition` (`squareDefect π (B_f A_f) (B_c A_c) = squareDefect π B_f B_c · A_f
-  + B_c · squareDefect π A_f A_c`) (#410).
+  + B_c · squareDefect π A_f A_c`) (#410). Formal-checked on October 26, except the gain: in
+  [`Mathematics/CheapConvolution`](../../lean/HolonicsResearch/Mathematics/CheapConvolution.lean)
+  the collapse in any commutative ring, so on every `ℤ/q` (`conv_face_of_one`,
+  `conv_face_of_neg_one`), the carries dropping out (`carried_product_face_of_one`,
+  `carried_product_face_of_neg_one`, `nine_face`, `eleven_face`) and the leading-first fold
+  (`face_is_fold`); in [`Mathematics/BindingFourCycle`](../../lean/HolonicsResearch/Mathematics/BindingFourCycle.lean)
+  the binding (`fourCycle_eq_zero_iff`, `unit_squares_decide`, `fourCycle_mul_div`,
+  `unit_square_mul_div`, `fourCycle_of_hom`) and the defect's composition (`squareDefect_comp`).
+  Still owed: a held face's gain `I(W; q | F)` is the same in every reading order.
 - The readings in §8 on the trained machine.
 
 ## Receipts
