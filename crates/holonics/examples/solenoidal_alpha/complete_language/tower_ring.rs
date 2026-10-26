@@ -1121,8 +1121,8 @@ fn wide_primes() -> impl Iterator<Item = u64> {
 
 /// A row echelon modulo a prime: the pivot columns ascending, the reduced rows (each one at its
 /// pivot and zero at every other pivot), and the row of the system each pivot came from.
-struct Echelon {
-    pivots: Vec<usize>,
+pub(super) struct Echelon {
+    pub(super) pivots: Vec<usize>,
     rows: Vec<Vec<u64>>,
     sources: Vec<usize>,
 }
@@ -1137,7 +1137,7 @@ struct Echelon {
 /// echelon are those of reducing against the echelon basis in order (the form this replaced; on the
 /// sums' and differences' units together one closure's echelons took about 18 core-seconds,
 /// `ring/found34sd.txt`).
-fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
+pub(super) fn echelon_mod(rows: &[Vec<i128>], p: u64, stop: usize) -> Echelon {
     let wide = p as i128;
     let mut basis: Vec<(usize, Vec<u64>)> = Vec::new();
     let mut sources = Vec::new();
@@ -1215,7 +1215,7 @@ fn cramer_mod(m: &[Vec<i128>], v: &[Vec<i128>], q: u64) -> Option<(u64, Vec<Vec<
 /// column (`det M` there, `M⁻¹`'s solution at the pivots, scaled by `det M`). No elimination over the integers is made: its entries grew past
 /// 128 bits in `ring/found19.txt` and past the founding's deadline in `BigInt` in
 /// `ring/found20.txt`, while the minor's entries stay the rows' own.
-fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt, Vec<Vec<BigInt>>) {
+pub(super) fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt, Vec<Vec<BigInt>>) {
     let columns = rows.first().map_or(0, Vec::len);
     for p in wide_primes() {
         let e = echelon_mod(rows, p, columns);
@@ -1280,7 +1280,7 @@ fn rational_rank(rows: &[Vec<i128>]) -> (usize, BigInt, Vec<Vec<BigInt>>) {
 /// the readout reads it on; a prime past `2π·2^FACE_BITS < 2^(FACE_BITS + 3)` turns the ring by less
 /// than one grain a residue, which no reader of the face separates, so a larger factor is not
 /// sought (and a pivot's cofactor past it needs no factoring).
-fn readable_primes(x: &BigInt) -> Vec<i128> {
+pub(super) fn readable_primes(x: &BigInt) -> Vec<i128> {
     let bound = 1i128 << (FACE_BITS + 3);
     let mut out = Vec::new();
     let mut x = x.clone();

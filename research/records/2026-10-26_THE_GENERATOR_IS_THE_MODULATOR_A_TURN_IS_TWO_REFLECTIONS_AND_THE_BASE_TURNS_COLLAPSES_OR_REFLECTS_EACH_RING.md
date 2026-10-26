@@ -272,7 +272,68 @@ are independent and run together (16 of 24 cores, two scopes of 8 GiB).
   state (two kinds, training and held-out); the probe 300 s a state and kind, the three states
   together.
 
-## 4. The recorded failures this loop could repeat
+## 4. What the first loop measured, and the rotor loop
+
+[measured, October 26, on the PC] **`C` holds no ring past its last two digits.** At the last digit
+of a held-out numeral (3,810 places), `C`'s first level names it, against the suffix (what the last
+two digits alone name), the majority residue, the energy probe and the foil:
+
+| ring | modes | energy | majority | suffix | foil |
+|---|---|---|---|---|---|
+| 9 | 1,017 | 621 | 637 | 1,530 | 418 |
+| 10 | 2,964 | 1,841 | 3,079 | 3,800 | 2,206 |
+| 11 | 991 | 583 | 599 | 1,518 | 362 |
+| 7 | 1,064 | | | 1,574 | |
+| 13 | 942 | | | 1,491 | |
+| 100 | 1,744 | | | 3,800 | |
+
+The second level names fewer on every ring. At the equals (841 held-out calculations) the second
+operand `b` is named on ring 9 at 247 against its suffix's 676 and on ring 100 at 442 against 839;
+`a` and the result sit near their majority. Nothing passes its suffix, as §3 predicted: the plain
+tower's modes carry a numeral's ending and nothing a ring adds.
+
+[measured; incomplete] **`P` and `PP` were stopped by the window guard.** Their development passes
+coded the first 800 problems at 2.479 (`P`, 17.0 s) and 2.495 (`PP`, 19.4 s) bits a byte against
+`C`'s 2.458 (14.4 s). In training, `P` stopped at pass 0, section 1,184 (a window of 3,157 ms against
+its bound of 3,046.4 ms) and wrote no state; `PP` finished pass 0, coding the held-out text at 1.931
+bits a byte against `C`'s 1.984 after the same pass, and stopped at pass 1, section 1,120 (4,095 ms
+against 3,960.3 ms). Neither was relaunched. The bound came from one development window with the
+cause test's margin; the training windows ran 1.5–7.9% above it in steady state, the stopping
+windows coincided with load from other programs on the host, and the pumped towers halved more
+steps than `C` (`P` 8 and `PP` 18 against `C`'s 1 by pass 0's section 1,184; `PP` 74 against 0 by
+pass 1's section 1,120). A halving rereads the section, so a window's work is not 32 sections. The
+decision of §3 is unread.
+
+[agent-inferred] **The next loop changes the read, not the limit.**
+- The unit of work is an evaluation: a section, and each halving it makes (a halving costs one
+  forward read, less than a section, so the count bounds the work from above).
+- `w` is the largest milliseconds an evaluation took in any 32-section window measured before
+  launch: the development passes and the stopped runs' full-text windows, which ran side by side
+  under the host's own load (the waiting standard's largest measured value). A tower whose
+  full-text windows were never measured takes its twin's, scaled by the ratio of their development
+  passes when that ratio exceeds one.
+- The guard stops a window whose time passes `1.12·w·(32 + H)` with `H` the window's halvings; the
+  deadline is `3·(S·1.12·w·(1 + η) + h) + 1 s`, with `η` the largest halvings a section measured in
+  a pass before launch.
+
+[agent-inferred with the mathematics thread] **The rotor loop.** The mathematics thread places the
+rotor on `PP` (its record's §11), and at `σ = 0` the rotor tower is `PP` itself, so one paired run
+reads both: `PP` retrained (its first pass should reproduce the stopped run's state bit for bit, a
+check of the realization), and `PR`, the same tower with the rotor (`hnn::tower::Rotor`). `P` waits;
+its question, whether ring 9 is learned without pair contacts, does not decide this loop.
+- `found-unit-rotor-tower` (`tower_rotor.rs`) locates the step by loop closure over the training
+  text's calculations of whole numerals and founds `PR` as `PP` is founded. Under a step `s` for every
+  byte of a numeral, each loop and each final mode is an integer row over the unknown turns
+  `θ_m[b]`; the step is the `s` whose rows' torsion (their rank modulo `p` below their rank over the
+  rationals) carries the most. Its test reads `{3, 11, 101}` at `s = 1` and `s = 3`, `{3, 11}` at
+  `s = 2` and `{3}` at `s = 0`: the rings of `9999`, `99` and `9` that §11 of the mathematics
+  record derives, located from the rows, not supplied. A unit steps by `s` times its located bytes,
+  modulo 4; the second level holds still.
+- The acceptance is the mathematics thread's: never-met calculations right at the equals, `PR`
+  against the 8-gram's 34 of 876 and `C`'s 14, by the paired line against `PP`; met calculations are
+  reported as recitation. The level read of §3 is read for `PR` beside `PP`.
+
+## 5. The recorded failures this loop could repeat
 
 - **An authored routine standing in for learning.** The rings, the foil and the bar are exterior
   reads; nothing enters the machine but the text. The towers find their angles by their own

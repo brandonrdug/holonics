@@ -17,6 +17,8 @@ mod tower_train;
 mod tower_situated;
 #[path = "complete_language/tower_ring.rs"]
 mod tower_ring;
+#[path = "complete_language/tower_rotor.rs"]
+mod tower_rotor;
 #[path = "complete_language/tower_classes.rs"]
 mod tower_classes;
 #[path = "complete_language/duplex_train.rs"]
@@ -819,6 +821,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
+        Some("found-unit-rotor-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_rotor::found_unit_rotor_tower(args),
         Some("join-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::join_tower_ring(args),
         Some("read-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_at(args),
         Some("read-tower-cells") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::read_tower_cells(args),

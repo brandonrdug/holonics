@@ -1055,6 +1055,112 @@ impl RingFace {
     }
 }
 
+/// [definition; agent-inferred with the mathematics thread, October 26] **The rotor**: each level's
+/// modes grouped in rings of [`ROTOR_RING`], `R_k = {4k, …, 4k + 3}`, and each arriving class `u`
+/// stepping each ring by its integer key `σ = σ(level, u, k) ∈ ℤ/4` before the level's move:
+///
+/// ```text
+/// h'_(t−1) = P^(σ_t) h_(t−1),   (P^σ h)_(4k+j) = h_(4k + ((j + σ) mod 4))
+/// h_t      = λ_t ⊙ h' + β_t ⊙ conj(h') + γ_t ⊙ B x_t        (the level's own move, on h')
+/// ```
+///
+/// Why (the record
+/// `2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE_AND_THE_PLACE_DECIDES_WHICH_SO_A_RING_COPRIME_TO_TEN_NEEDS_A_ROTOR.md`
+/// and its §11): reading a digit `d` maps a numeral `n ↦ 10 n + d`, and on a character
+/// `χ_a(n) = ω^(an)` that is `χ_a(10n + d) = ω^(ad) χ_(10a)(n)`: the turn `ω^(ad)` (the modulator)
+/// and a step of the character's index `a ↦ 10a` (the generator, a translation of the index). With
+/// mode `j` holding the character `10^j`, the step is the cyclic shift of the ring (it closes after
+/// four because `10^4 ≡ 1` modulo every divisor of `9999 = 3²·11·101`) and the keyed turn of mode
+/// `j` is `2·10^j·d/p` half turns. The Fourier chart exchanges the two (`F X = Z F`): the shift is
+/// a turn of the ring's harmonics, so the step is a modulator in the dual chart and the turn a
+/// generator, one move read in two charts. A turned mode alone holds a numeral only modulo 9, where
+/// ten turns as one.
+///
+/// The step is a permutation: each mode takes exactly one mode's state, so the passivity bound
+/// `|h_t| ≤ ρ_t |h_(t−1)| + γ_t |B x_t|` holds unchanged. At `σ = 0` everywhere the rotor tower
+/// reads every passage as its twin without the rotor (the opening). `σ` has no covector: a key in
+/// `ℤ/4` is located by loop closure, not by descent, since any relaxed path between two steps
+/// passes through mixtures of modes. The reverse carries the mode covector back through the
+/// inverse permutation, `G_h(t) = (Cᵀδr)⁻ + P^(−σ_(t+1))(conj(λ_(t+1)) ⊙ G_h(t+1) + β_(t+1) ⊙
+/// conj(G_h(t+1)))`, and every covector that read `h_(t−1)` reads `h'_(t−1)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Rotor {
+    /// `σ`, level-major, then class, then ring, each below [`ROTOR_RING`].
+    steps: Vec<u8>,
+    alphabet: usize,
+    rings: usize,
+}
+
+/// The rotor's ring: four modes, which hold a numeral modulo every divisor of `10^4 − 1`.
+pub const ROTOR_RING: usize = 4;
+
+impl Rotor {
+    /// The rotor of `steps` (level-major, then class, then ring, each below [`ROTOR_RING`]) on a
+    /// tower of `declaration`. Refused unless a level's modes are whole rings and there is one key
+    /// for each level, class and ring.
+    pub fn new(declaration: &TowerDeclaration, steps: Vec<u8>) -> Result<Self> {
+        let d = declaration;
+        if d.modes == 0 || d.modes % ROTOR_RING != 0 {
+            return refuse("a rotor's modes are whole rings of four");
+        }
+        let rings = d.modes / ROTOR_RING;
+        if steps.len() != d.levels * d.alphabet * rings || steps.iter().any(|&s| s as usize >= ROTOR_RING) {
+            return refuse("a rotor holds one step in Z/4 for each level, class and ring");
+        }
+        Ok(Self { steps, alphabet: d.alphabet, rings })
+    }
+
+    /// The rotor that steps nothing: the opening, which reads as the tower without it.
+    pub fn opening(declaration: &TowerDeclaration) -> Result<Self> {
+        let rings = declaration.modes / ROTOR_RING.max(1);
+        Self::new(declaration, vec![0; declaration.levels * declaration.alphabet * rings])
+    }
+
+    /// The key `σ` of ring `ring` at level `level` when `class` arrives.
+    pub fn step(&self, level: usize, class: usize, ring: usize) -> usize {
+        self.steps[(level * self.alphabet + class) * self.rings + ring] as usize
+    }
+
+    /// The keys, level-major, then class, then ring.
+    pub fn steps(&self) -> &[u8] {
+        &self.steps
+    }
+
+    /// Whether `class` steps no ring of `level`.
+    fn still(&self, level: usize, class: usize) -> bool {
+        let at = (level * self.alphabet + class) * self.rings;
+        self.steps[at..at + self.rings].iter().all(|&s| s == 0)
+    }
+
+    /// `h' = P^σ h` at `level` when `class` arrives: mode `4k + j` takes mode `4k + ((j + σ) mod 4)`.
+    pub fn stepped<T: Copy>(&self, level: usize, class: usize, h: &[T]) -> Vec<T> {
+        (0..h.len()).map(|m| h[self.source(level, class, m)]).collect()
+    }
+
+    /// The mode whose state mode `m` takes at `level` when `class` arrives.
+    fn source(&self, level: usize, class: usize, m: usize) -> usize {
+        let (k, j) = (m / ROTOR_RING, m % ROTOR_RING);
+        k * ROTOR_RING + (j + self.step(level, class, k)) % ROTOR_RING
+    }
+
+    /// `rotor LEVELS ALPHABET RINGS` and the keys as one digit each.
+    fn to_text(&self) -> String {
+        let levels = self.steps.len() / (self.alphabet * self.rings).max(1);
+        let keys: String = self.steps.iter().map(|&s| char::from(b'0' + s)).collect();
+        format!("rotor {levels} {} {}\n{keys}\n", self.alphabet, self.rings)
+    }
+
+    fn from_text(head: &str, keys: &str, declaration: &TowerDeclaration) -> Result<Self> {
+        let d = declaration;
+        let expected = format!("rotor {} {} {}", d.levels, d.alphabet, d.modes / ROTOR_RING.max(1));
+        if head != expected {
+            return refuse("a rotor's head that is not the tower's");
+        }
+        let steps: Vec<u8> = keys.bytes().map(|b| b.wrapping_sub(b'0')).collect();
+        Self::new(d, steps)
+    }
+}
+
 /// `x` released by `s` bits, rounded half up, or widened by `−s` bits: a pair form's release.
 fn shifted(x: i128, s: i32) -> Result<i128> {
     if s > 0 {
@@ -1186,6 +1292,8 @@ pub struct Tower {
     pair: Option<PairFace>,
     /// The resident ring face, when one is joined ([`Tower::join_ring_face`]).
     ring: Option<RingFace>,
+    /// The rotor, when one is joined ([`Tower::join_rotor`]).
+    rotor: Option<Rotor>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1897,7 +2005,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2111,11 +2219,13 @@ impl Tower {
                 Some(face) if face.level == l => Some(carried_face(std::slice::from_ref(&state.modes[l]))?),
                 _ => None,
             };
+            // The rotor's step `h' = P^σ h` before the move ([`Rotor`]).
+            let stepped: Option<Vec<(i64, i64)>> = self.rotor.as_ref().filter(|r| !r.still(l, u)).map(|r| r.stepped(l, u, &state.modes[l]));
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
             let mut face = vec![0i64; 2 * n];
             for k in 0..n {
-                let (hr, hi) = modes[k];
+                let (hr, hi) = stepped.as_ref().map_or(modes[k], |h| h[k]);
                 let ((lr, li), gamma) = match gate.get(k) {
                     Some(m) => ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128),
                     None => ((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), gammas[k]),
@@ -2280,6 +2390,9 @@ impl Tower {
         }
         if compared.is_some_and(|m| m.len() != classes.len()) {
             return refuse("a comparison for each class of the section");
+        }
+        if self.rotor.is_some() && opening.credit.is_some() {
+            return refuse("a credited opening under a rotor: the credit's moments through the step are owed");
         }
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
@@ -2491,16 +2604,29 @@ impl Tower {
             for i in (0..cells_n).rev() {
                 let mut gh = Vec::with_capacity(n);
                 let later = if d.gated && i + 1 < cells_n { Some(&cells[i + 1].levels[l].gate) } else { None };
+                // conj(λ_(t+1)) G_h(t+1) (+ β_(t+1) conj(G_h(t+1))): the covector of h'_t.
+                let mut back: Vec<(i128, i128)> = (0..n)
+                    .map(|k| {
+                        let (lr, li) = match later {
+                            Some(gate) => (gate[k].lam.0 as i128, gate[k].lam.1 as i128),
+                            None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
+                        };
+                        let (br, bi) = later.map_or((0, 0), |gate| (gate[k].beta.0 as i128, gate[k].beta.1 as i128));
+                        let (cr, ci) = (carried[k].0 as i128, carried[k].1 as i128);
+                        (release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS), release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))
+                    })
+                    .collect();
+                // The rotor's step carried back by its inverse: mode k of h'_t took mode source(k)
+                // of h_t, so its covector returns there ([`Rotor`]).
+                if let Some(rotor) = self.rotor.as_ref().filter(|r| i + 1 < cells_n && !r.still(l, classes[i + 1])) {
+                    let mut moved = vec![(0i128, 0i128); n];
+                    for (k, v) in back.iter().enumerate() {
+                        moved[rotor.source(l, classes[i + 1], k)] = *v;
+                    }
+                    back = moved;
+                }
                 for k in 0..n {
-                    let (lr, li) = match later {
-                        Some(gate) => (gate[k].lam.0 as i128, gate[k].lam.1 as i128),
-                        None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
-                    };
-                    let (br, bi) = later.map_or((0, 0), |gate| (gate[k].beta.0 as i128, gate[k].beta.1 as i128));
-                    let (cr, ci) = (carried[k].0 as i128, carried[k].1 as i128);
-                    let re = fit64(read_cov[i][k].0 as i128 + release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS))?;
-                    let im = fit64(read_cov[i][k].1 as i128 + release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))?;
-                    gh.push((re, im));
+                    gh.push((fit64(read_cov[i][k].0 as i128 + back[k].0)?, fit64(read_cov[i][k].1 as i128 + back[k].1)?));
                 }
                 carried = gh.clone();
                 gh_all[i] = gh;
@@ -2519,7 +2645,10 @@ impl Tower {
             let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
-                let previous: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
+                let unstepped: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
+                // The covectors of the move read the state it acted on, h' = P^σ h ([`Rotor`]).
+                let stepped = self.rotor.as_ref().filter(|r| !r.still(l, classes[i])).map(|r| r.stepped(l, classes[i], unstepped));
+                let previous: &[(i64, i64)] = stepped.as_deref().unwrap_or(unstepped);
                 let gh = &gh_all[i];
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
                 let mut ds = vec![0i64; if d.turned { n } else { 0 }];
@@ -2726,6 +2855,9 @@ impl Tower {
     /// where `d_s = v_s ∂ρ_s/∂q` is the gate's drive (zero at a held cell). The per-mode moments
     /// keep the cell recursion.
     fn advance_credit(&self, credit: &mut [LevelCredit], opening: &TowerState, cells: &[Cell], reaches: &Reaches) -> Result<()> {
+        if self.rotor.is_some() {
+            return refuse("a passage credit under a rotor: its moments through the step are owed");
+        }
         let d = &self.declaration;
         let (w, n) = (d.width, d.modes);
         let t = &self.theta;
@@ -2903,12 +3035,16 @@ impl Tower {
         if let Some(face) = &self.ring {
             s.push_str(&face.to_text());
         }
+        if let Some(rotor) = &self.rotor {
+            s.push_str(&rotor.to_text());
+        }
         s
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
-    /// three more with a pair face and two more with a ring face (one more a rank with its pair
-    /// moves, one more with its harmonics and one more with its restarts).
+    /// three more with a pair face, two more with a ring face (one more a rank with its pair
+    /// moves, one more with its harmonics and one more with its restarts) and two more with a
+    /// rotor.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -2925,6 +3061,9 @@ impl Tower {
             if text.lines().nth(n).is_some_and(|l| l.starts_with("ring-restarts ")) {
                 n += 1;
             }
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("rotor ")) {
+            n += 2;
         }
         n
     }
@@ -2985,11 +3124,15 @@ impl Tower {
             }
             None => None,
         };
+        let rotor = match lines.next_if(|l| l.starts_with("rotor ")) {
+            Some(head) => Some(Rotor::from_text(head, lines.next().unwrap_or(""), &declaration)?),
+            None => None,
+        };
         let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        Ok(Self { declaration, theta, pair, ring, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration, theta, pair, ring, rotor, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// [agent-inferred, October 24] **The pair face joined to the tower**: the face's readout `V`
@@ -3030,6 +3173,9 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
+        if self.rotor.is_some() {
+            return refuse("a ring face beside a rotor: the ring's law under a step is owed");
+        }
         let mut face = face;
         let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
@@ -3050,6 +3196,31 @@ impl Tower {
     /// The resident ring face, when one is joined.
     pub fn ring_face(&self) -> Option<&RingFace> {
         self.ring.as_ref()
+    }
+
+    /// [agent-inferred with the mathematics thread, October 26] **The rotor joined to the tower**
+    /// ([`Rotor`]): it adds no material and no state, so a rotor that steps nothing leaves every
+    /// passage read as before, and a located one changes only which mode each move acts on.
+    /// Refused beside a ring face (a ring founded on a mode's own moves reads the mode unstepped;
+    /// its law under a step is owed) or when one is already joined.
+    pub fn join_rotor(&mut self, rotor: Rotor) -> Result<()> {
+        if self.rotor.is_some() {
+            return refuse("a tower takes one rotor");
+        }
+        if self.ring.is_some() {
+            return refuse("a rotor beside a ring face: the ring's law under a step is owed");
+        }
+        let d = &self.declaration;
+        if rotor.alphabet != d.alphabet || rotor.rings * ROTOR_RING != d.modes || rotor.steps.len() != d.levels * d.alphabet * rotor.rings {
+            return refuse("a rotor of another tower's shape");
+        }
+        self.rotor = Some(rotor);
+        Ok(())
+    }
+
+    /// The rotor, when one is joined.
+    pub fn rotor(&self) -> Option<&Rotor> {
+        self.rotor.as_ref()
     }
 
     /// [agent-inferred, October 25] **The ring's readout opened at its founding**: `W` (`A` rows
@@ -3640,8 +3811,10 @@ impl Tower {
             let mut levels = Vec::with_capacity(cell.levels.len());
             for (l, lc) in cell.levels.iter().enumerate() {
                 let lv = &self.layout.levels[l];
+                // The move acts on the stepped state ([`Rotor`]).
+                let moved = self.rotor.as_ref().map_or_else(|| opening[l].clone(), |r| r.stepped(l, classes[i], &opening[l]));
                 let modes: Vec<CircuitMode> = collect_exact((0..n).map(|k| {
-                    let (hr, hi) = (opening[l][k].0 as i128, opening[l][k].1 as i128);
+                    let (hr, hi) = (moved[k].0 as i128, moved[k].1 as i128);
                     let lam = match lc.gate.get(k) {
                         Some(m) => m.lam,
                         None => (i64::from(t[lv.move_re + k]), i64::from(t[lv.move_im + k])),
@@ -3677,6 +3850,9 @@ impl Tower {
     pub fn read_input_covectors(&self, state: &mut TowerState, classes: &[usize], section: usize, mut each: impl FnMut(InputCovector) -> Result<()>) -> Result<()> {
         if section == 0 {
             return refuse("a section of at least one cell");
+        }
+        if self.rotor.is_some() {
+            return refuse("input covectors under a rotor: their carried face is the unstepped state the moves do not act on");
         }
         let reaches = self.reaches();
         let t = &self.theta;
@@ -3864,7 +4040,13 @@ mod tests {
     /// its one-sided opening (its material at the return's scale, its bias at unit) so its
     /// bilinear block carries a covector.
     fn tiny_declared(levels: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 2, contacts: 4, levels, gated, turned, pumped, contact };
+        tiny_shaped(levels, 2, gated, turned, pumped, contact)
+    }
+
+    /// [`tiny_declared`] with `modes` modes a level.
+    fn tiny_shaped(levels: usize, modes: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes, contacts: 4, levels, gated, turned, pumped, contact };
+        let nw = modes * declaration.width;
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -3882,16 +4064,16 @@ mod tests {
         }
         if gated {
             for lv in &layout.levels {
-                fill(&mut tower.theta, lv.gate, 8);
-                for v in &mut tower.theta[lv.gate..lv.gate + 8] {
+                fill(&mut tower.theta, lv.gate, nw);
+                for v in &mut tower.theta[lv.gate..lv.gate + nw] {
                     *v *= 8;
                 }
             }
         }
         if turned {
             for lv in &layout.levels {
-                fill(&mut tower.theta, lv.turn, 8);
-                for v in &mut tower.theta[lv.turn..lv.turn + 8] {
+                fill(&mut tower.theta, lv.turn, nw);
+                for v in &mut tower.theta[lv.turn..lv.turn + nw] {
                     *v *= 8;
                 }
             }
@@ -3906,12 +4088,12 @@ mod tests {
             // |κ| near ½ the quadrature is shed and the gate's covector falls below the reading;
             // the axis's covector scales with |β|).
             for lv in &layout.levels {
-                fill(&mut tower.theta, lv.pump, 8);
-                fill(&mut tower.theta, lv.pump_axis, 8);
-                for v in &mut tower.theta[lv.pump..lv.pump + 8] {
+                fill(&mut tower.theta, lv.pump, nw);
+                fill(&mut tower.theta, lv.pump_axis, nw);
+                for v in &mut tower.theta[lv.pump..lv.pump + nw] {
                     *v *= 4;
                 }
-                for v in &mut tower.theta[lv.pump_axis..lv.pump_axis + 8] {
+                for v in &mut tower.theta[lv.pump_axis..lv.pump_axis + nw] {
                     *v *= 32;
                 }
             }
@@ -4116,6 +4298,89 @@ mod tests {
         }
         let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
         assert_eq!(code(&pumped, &classes), code(&turned, &classes));
+    }
+
+    /// The pumped tiny tower of four modes (one ring) a level, with a rotor stepping classes 1 and
+    /// 2 at the first level (by one and by three) and class 3 at the second (by two).
+    fn tiny_rotor() -> Tower {
+        rotor_on(tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying))
+    }
+
+    /// [`tiny_rotor`]'s rotor on a two-level tower of four modes a level.
+    fn rotor_on(mut tower: Tower) -> Tower {
+        let mut steps = vec![0u8; 2 * 4];
+        steps[1] = 1;
+        steps[2] = 3;
+        steps[4 + 3] = 2;
+        tower.join_rotor(Rotor::new(&tower.declaration, steps).expect("rotor")).expect("joined");
+        tower
+    }
+
+    #[test]
+    fn a_rotor_tower_restores_exactly() {
+        let tower = tiny_rotor();
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let learner = TowerLearner::new(tower.clone(), 7);
+        assert_eq!(TowerLearner::from_text(&learner.to_text()).expect("restored").tower, tower);
+        let declaration = tower.declaration;
+        assert!(Rotor::new(&declaration, vec![4; 8]).is_err());
+        assert!(Rotor::new(&declaration, vec![0; 7]).is_err());
+        assert!(Rotor::opening(&TowerDeclaration { modes: 2, ..declaration }).is_err());
+    }
+
+    /// A rotor that steps nothing reads every passage as its twin without one.
+    #[test]
+    fn a_still_rotor_opens_on_its_twin() {
+        let twin = tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying);
+        let mut still = twin.clone();
+        still.join_rotor(Rotor::opening(&still.declaration).expect("opening")).expect("joined");
+        let classes = [0usize, 2, 1, 3, 3, 0, 1, 2, 2, 0, 3, 1, 0];
+        assert_eq!(code(&still, &classes), code(&twin, &classes));
+        assert_ne!(code(&tiny_rotor(), &classes), code(&twin, &classes));
+    }
+
+    /// One cell of the rotor tower is its twin's cell from the stepped state: the move acts on
+    /// `P^σ h`, and nothing else in the cell reads the state before it.
+    #[test]
+    fn a_rotor_steps_each_ring_before_the_move() {
+        let rotor_tower = tiny_rotor();
+        let twin = tiny_shaped(2, 4, true, true, true, ContactLaw::Rectifying);
+        let rotor = rotor_tower.rotor().expect("rotor").clone();
+        let mut s = rotor_tower.rest();
+        for &u in &[0usize, 2, 1, 3, 3] {
+            rotor_tower.advance(&mut s, u).expect("advance");
+        }
+        for u in 0..4 {
+            let mut moved = s.clone();
+            let face = rotor_tower.advance(&mut moved, u).expect("advance");
+            let mut stepped = s.clone();
+            stepped.modes = (0..2).map(|l| rotor.stepped(l, u, &s.modes[l])).collect();
+            let twin_face = twin.advance(&mut stepped, u).expect("advance");
+            assert_eq!(moved, stepped, "class {u}");
+            assert_eq!(face, twin_face, "class {u}");
+        }
+        // Mode 4k + j takes mode 4k + ((j + σ) mod 4).
+        assert_eq!(rotor.stepped(0, 1, &[10, 11, 12, 13]), vec![11, 12, 13, 10]);
+        assert_eq!(rotor.stepped(0, 2, &[10, 11, 12, 13]), vec![13, 10, 11, 12]);
+        assert_eq!(rotor.stepped(1, 3, &[10, 11, 12, 13]), vec![12, 13, 10, 11]);
+    }
+
+    /// A rotor beside a ring face, or a credited opening under a rotor, is refused: their laws
+    /// under a step are owed.
+    #[test]
+    fn a_rotor_refuses_what_it_does_not_carry() {
+        let mut tower = tiny_rotor();
+        assert!(tower.join_rotor(Rotor::opening(&tower.declaration).expect("opening")).is_err());
+        let opening = tower.rest_with_credit();
+        let mut s = opening.clone();
+        let classes = [0usize, 1, 2, 3];
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
+        let mut credit = opening.credit.clone().expect("credit");
+        assert!(tower.advance_credit(&mut credit, &opening, &cells, &tower.reaches()).is_err());
+        assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
+        tower.rotor = None;
+        assert!(tower.join_rotor(Rotor::opening(&tower.declaration).expect("opening")).is_ok());
     }
 
     #[test]
@@ -4905,6 +5170,27 @@ mod tests {
     fn the_pumped_covector_matches_the_code_difference() {
         let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
         the_covector_of_tower_matches_the_code_difference(tiny_turning(2, true, true, true), true, &classes, 9);
+    }
+
+    /// The rotor's reverse carries the mode covector back through the inverse step, and every
+    /// covector of the move reads the stepped state: read on the ungated tower, whose moves'
+    /// covectors are the products `conj(h') G_h` themselves, over the pumped passage of 37 classes.
+    #[test]
+    fn the_rotor_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(rotor_on(tiny_shaped(2, 4, false, false, false, ContactLaw::Rectifying)), false, &classes, 10);
+    }
+
+    /// The pumped rotor tower, read at steps of `2^(−8)` units. At `2^(−9)` the second level's
+    /// gate, whose covectors sit nearest the reading's grain, fitted −58.0 against a covector of
+    /// −67.2 (×10⁶) on its largest parameter, at `2^(−8)` −63.3, and at `2^(−10)` and `2^(−11)`
+    /// −52.3 and −34.3: the fit drifts with the step, the mark of the faces' release, while the first
+    /// level's gate, carried back through both levels' steps, fitted within 3% at `2^(−8)` (measured
+    /// October 26; no gate was held on the passage).
+    #[test]
+    fn the_pumped_rotor_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(tiny_rotor(), true, &classes, 8);
     }
 
     fn the_covector_matches_the_code_difference_of(gated: bool) {
