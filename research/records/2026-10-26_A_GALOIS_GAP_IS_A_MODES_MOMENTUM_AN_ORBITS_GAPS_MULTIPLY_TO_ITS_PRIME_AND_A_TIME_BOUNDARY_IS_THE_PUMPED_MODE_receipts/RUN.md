@@ -68,3 +68,43 @@ deterministic.
 - An identity first written for "the orbits multiply to `m`" multiplied `m`'s own prime powers back
   together, which is a tautology. It was replaced by the product of the computed orbit values and by
   the polynomial identity `∏ Φ_d = 1 + x + … + x^(m−1)`.
+
+## The second receipt: `colourless_tower.py`
+
+Written the same day for the record's §12, after Brandon's reply that the colourless classes are
+the compressible things. The same rules hold: elements of `ℚ(ζ_n)` are integer polynomials reduced
+modulo `Φ_n`, and numbers of `ℚ(√5)` are pairs compared by exact sign tests.
+
+Parts:
+- **P.** The trace of `ζ_n^j` against the Ramanujan sum `c_n(j)` for every `n ≤ 200` and `j < n`,
+  with `Tr ζ_n = μ(n)`. The Mertens function `M(N)` as the running sum of these traces for
+  `N ≤ 200` (`M(200) = −8`). The norm `∏_(d|n) d^(−μ(d)) = e^(Λ(n))` for `n ≤ 5000`.
+- **Q.** For each prime power `p^(k+1) ≤ 400`, the layer trace down to `ℚ(ζ_(p^k))`: `p·ω^j` when
+  `p | j`, `0` otherwise. Also `ord_(3^k)(10) = 3^(k−2)` for `k = 2, …, 12`.
+- **R.** The Fibonacci model set with window `[−1, τ − 1)` in the conjugate colour. Its 1,086 points
+  in `[0, 1500]` are in exact order, with gaps `τ` and `1` in the order of `a → ab, b → a`, starting
+  at 0. For `n ≤ 60`, `τⁿ` and `τ′ⁿ` against the Lucas and Fibonacci numbers, with the hidden
+  colour `|τ′ⁿ|` strictly shrinking.
+
+```bash
+cd research/records/2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE_receipts
+timeout 60 python3 -I colourless_tower.py > colourless_tower.txt
+```
+
+- **Projection.** About 5 s, from a first development run of 4,966 ms. The deadline is 60 s, fixed
+  by an outer `timeout`.
+- **Measured.** Through the same `runpy` wrapper the run took 4,879 ms wall time, with a peak
+  resident set of 12,764 KiB on one thread; the script's own clock read 4,857 ms. Measured over the
+  deadline: 4,879/60,000.
+- **Result.** The last line is `all 30248 checks hold`.
+
+| File | SHA-256 |
+|---|---|
+| `colourless_tower.py` | `b6ae728d350aa367bfb02c4acecfd5f8aa447fe45cec54954815d43f8c67fb22` |
+| `colourless_tower.txt` | `86ea37f1661c8d4c89306758f635420f6acb78602d76bf23ca060a5024c7a90d` |
+
+**Development notes.**
+- The window `[−1, τ − 1)` was found by trying candidate windows on a scratch run before the exact
+  check. The committed check is exact.
+- The model set's points are sorted by a rational approximation of `√5`, and their order is then
+  verified exactly.

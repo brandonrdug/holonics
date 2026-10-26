@@ -1,0 +1,7 @@
+P. the trace of a colour is the Ramanujan sum; a primitive colour compresses to mu(n)
+   n <= 200 for the traces and M(N); n <= 5000 for the norm; M(200) = -8
+Q. each layer of a prime's tower adds p colours above every colour; the trace erases them
+   layers checked for p^(k+1) <= 400; ord_(3^k)(10) = 3^(k-2) for k = 2..12
+R. the Fibonacci chain is the model set of the window [-1, tau - 1) in the conjugate colour
+   points in [0, 1500 ]: 1086  first gaps: abaababaabaababaababa
+all 30248 checks hold (4857 ms)
