@@ -61,7 +61,7 @@ def pairing (p : Fin 8 → R) (a b c : R) : R :=
 /-- [proved-standard; formal-checked] The pairing is the dot product with the lift. -/
 theorem pairing_eq_dot (p : Fin 8 → R) (a b c : R) :
     pairing p a b c = ∑ i, p i * lift a b c i := by
-  simp [pairing, lift, Fin.sum_univ_eight] <;> ring
+  simp [pairing, lift, Fin.sum_univ_eight]
 
 /-- [proved-standard; formal-checked] Closure is additive in the coefficients. -/
 theorem pairing_add (p p' : Fin 8 → R) (a b c : R) :
@@ -94,7 +94,8 @@ theorem closes_unique_of_unit {p : Fin 8 → R} {a b : R} (hD : IsUnit (denom p 
     ∃! c, pairing p a b c = 0 := by
   obtain ⟨u, hu⟩ := hD
   refine ⟨-(↑u⁻¹ * numer p a b), ?_, ?_⟩
-  · rw [pairing_eq, ← hu]
+  · dsimp only
+    rw [pairing_eq, ← hu]
     have h := u.mul_inv
     linear_combination (-(numer p a b)) * h
   · intro c hc
@@ -126,19 +127,22 @@ def quotientLine : Fin 8 → R := ![0, 1, 0, 0, 0, 0, -1, 0]
 /-- [proved-standard; formal-checked] The sum's line closes exactly on `c = a + b`. -/
 theorem sum_closes (a b c : R) : pairing sumLine a b c = 0 ↔ c = a + b := by
   have h : pairing sumLine a b c = a + b - c := by
-    simp [pairing, sumLine] <;> ring
+    simp [pairing, sumLine]
+    ring
   rw [h, sub_eq_zero, eq_comm]
 
 /-- [proved-standard; formal-checked] The difference's line closes exactly on `c = a − b`. -/
 theorem difference_closes (a b c : R) : pairing differenceLine a b c = 0 ↔ c = a - b := by
   have h : pairing differenceLine a b c = a - b - c := by
-    simp [pairing, differenceLine] <;> ring
+    simp [pairing, differenceLine]
+    ring
   rw [h, sub_eq_zero, eq_comm]
 
 /-- [proved-standard; formal-checked] The product's line closes exactly on `c = ab`. -/
 theorem product_closes (a b c : R) : pairing productLine a b c = 0 ↔ c = a * b := by
   have h : pairing productLine a b c = a * b - c := by
-    simp [pairing, productLine] <;> ring
+    simp [pairing, productLine]
+    ring
   rw [h, sub_eq_zero, eq_comm]
 
 /-- [proved-standard; formal-checked] The quotient's line closes exactly on `a = bc`; its
@@ -146,7 +150,8 @@ denominator is `−b`, so the consequence is unique where `b` is a unit and is t
 otherwise. -/
 theorem quotient_closes (a b c : R) : pairing quotientLine a b c = 0 ↔ a = b * c := by
   have h : pairing quotientLine a b c = a - b * c := by
-    simp [pairing, quotientLine] <;> ring
+    simp [pairing, quotientLine]
+    ring
   rw [h, sub_eq_zero]
 
 /-- [proved-standard; formal-checked] **Seven rows locate the sum.** If `2` is a unit and `p`

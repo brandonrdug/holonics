@@ -164,7 +164,7 @@ theorem stable_or_classCount (hne : Nonempty Source) (d : ℕ) :
   induction d with
   | zero =>
     right
-    haveI : Nonempty (Quotient (depthSetoid observe step 0)) := ⟨Quotient.mk _ hne.some⟩
+    have : Nonempty (Quotient (depthSetoid observe step 0)) := ⟨Quotient.mk _ hne.some⟩
     have h0 : 0 < Nat.card (Quotient (depthSetoid observe step 0)) := Nat.card_pos
     unfold classCount
     omega
