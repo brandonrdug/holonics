@@ -21,10 +21,11 @@
 //! - `found-tower-clock STATE STATE_SHA TEXT TEXT_SHA UNITS UNITS_SHA STREAMS SECTION LEVEL OUT`
 //!   reads the pool of every class's reset clock (`hnn::tower::clock`) over the training passage,
 //!   frozen, in the training pass's partition (`STREAMS` streams from rest, sections of `SECTION`
-//!   cells), prints the sixteen largest drops, joins the largest's clock at `LEVEL`, opens the
-//!   join's moments on the same sections (`TowerLearner::open_moments`) and writes the learner
-//!   create-new. The learner it was joined on is its twin; the founding is certified by one
-//!   training pass from each, its code below the twin's by more than `log₂` of the pool.
+//!   cells), prints the sixteen largest drops, the rest's clock and the shares down the whole
+//!   ranking, joins the largest's clock at `LEVEL`, opens the join's moments on the same sections
+//!   (`TowerLearner::open_moments`) and writes the learner create-new. The learner it was joined
+//!   on is its twin; the founding is certified by one training pass from each, its code below the
+//!   twin's by more than `log₂` of the pool.
 //!
 //! On the MQAR terrain (`tools/listener/mqar.py`, the record's generator) a section is one passage of
 //! 64 classes and the marks are its 16 answers, so the held-out reading is acceptance §3.4's count of
@@ -33,7 +34,7 @@
 use super::tower_train::{count, per, positive, STATE_BUDGET};
 use super::*;
 use holonics::hnn::tower::bank::BankDeclaration;
-use holonics::hnn::tower::clock::ClockPool;
+use holonics::hnn::tower::clock::{ClockDrop, ClockPool};
 use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TurnLadder, COVECTOR_BITS};
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
@@ -167,6 +168,9 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
     }
     let read_ms = started.elapsed().as_millis();
     let drops = pool.drops(tower).map_err(|e| e.to_string())?;
+    if drops.is_empty() {
+        return Err("the pool read no clock".into());
+    }
     // Readings beside the drop, on `2^(−48)`: the drop's floor and its share of the covectors'
     // energy in parts a million; the ceiling as read.
     let grain = 2 * COVECTOR_BITS;
@@ -178,20 +182,41 @@ pub(super) fn found_clock(args: &[String]) -> Result<()> {
         started.elapsed().as_millis() - read_ms
     );
     let name = |class: usize| if class == alphabet { "rest".to_string() } else { format!("{:?}", String::from_utf8_lossy(units.piece(class))) };
-    for (rank, d) in drops.iter().take(16).enumerate() {
-        let floor = &d.drop_numerator / &d.drop_denominator;
-        let share = &d.drop_numerator * 1_000_000u32 / (&d.drop_denominator * pool.energy);
-        println!(
-            "TOWER_CLOCK_DROP rank={} class={} piece={} drop={floor} drop_ppm={share} ceiling={} rank_c={} followers={} cells={}",
-            rank + 1,
+    let share = |d: &ClockDrop| &d.drop_numerator * 1_000_000u32 / (&d.drop_denominator * pool.energy);
+    let line = |rank: usize, d: &ClockDrop| {
+        format!(
+            "rank={rank} class={} piece={} drop={} drop_ppm={} ceiling={} rank_c={} followers={} cells={}",
             d.class,
             name(d.class),
+            &d.drop_numerator / &d.drop_denominator,
+            share(d),
             d.ceiling,
             d.rank,
             d.followers,
             d.cells
-        );
+        )
+    };
+    for (rank, d) in drops.iter().take(16).enumerate() {
+        println!("TOWER_CLOCK_DROP {}", line(rank + 1, d));
     }
+    // Readings beside the ranking: the rest's clock, whose face is one held arrival a stream, so its
+    // drop is the part of the covector a face constant along each stream carries; and the shares
+    // down the whole ranking.
+    if let Some((rank, d)) = drops.iter().enumerate().find(|(_, d)| d.class == alphabet) {
+        println!("TOWER_CLOCK_REST {}", line(rank + 1, d));
+    }
+    let at = |q: usize| share(&drops[((drops.len() - 1) * q / 100).min(drops.len() - 1)]);
+    println!(
+        "TOWER_CLOCK_SPREAD clocks={} ppm_at_rank_share_0={} 10={} 25={} 50={} 75={} 90={} 100={}",
+        drops.len(),
+        at(0),
+        at(10),
+        at(25),
+        at(50),
+        at(75),
+        at(90),
+        at(100)
+    );
     let top = drops.first().ok_or("the pool read no clock")?;
     let class = top.class;
     learner.join_clock(level, class).map_err(|e| e.to_string())?;

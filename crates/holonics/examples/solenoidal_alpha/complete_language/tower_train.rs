@@ -3402,10 +3402,10 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
 /// held-out text are read in the units, and each code is reported over the bytes its units decode
-/// to.
+/// to. A continued learner may declare a `HOLD` ([`held_families`]).
 pub(super) fn train_units(args: &[String]) -> Result<()> {
-    if args.len() != 20 && args.len() != 22 {
-        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+    if args.len() != 20 && args.len() != 22 && args.len() != 23 {
+        return Err("train-unit-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [HOLD]]".into());
     }
     let units = Units::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?;
     let train = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
@@ -3431,6 +3431,23 @@ pub(super) fn train_units(args: &[String]) -> Result<()> {
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
     fit(&args[9..], reading, true, false, false, false, ContactLaw::Rectifying, TurnLadder::Fixed, None, &mut HostPass::default())
+}
+
+/// [agent-inferred, October 26] **A declared hold** (`TowerLearner::held`): a foil whose named
+/// families read and do not deposit, so one pass separates which families' steps carry a change.
+/// `clock-join` holds a founded clock's join, `all-but-clock-join` every family but that join, and
+/// `all` every family (the pass is then the frozen state's code, the moments still moving).
+fn held_families(tower: &Tower, hold: &str) -> Result<Vec<std::ops::Range<usize>>> {
+    let len = tower.theta.len();
+    if hold == "all" {
+        return Ok(vec![0..len]);
+    }
+    let join = tower.clock_join().ok_or("a clock's hold needs a clocked tower")?;
+    match hold {
+        "clock-join" => Ok(vec![join]),
+        "all-but-clock-join" => Ok(vec![0..join.start, join.end..len]),
+        _ => Err("HOLD is clock-join, all-but-clock-join or all".into()),
+    }
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3479,7 +3496,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     }
     // A run continues a rested learner (its tower and moments) when one is named; its declaration
     // and rate must be the declared ones.
-    let mut learner = if args.len() == 13 {
+    let mut learner = if args.len() >= 13 {
         let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
         if learner.tower.declaration != declaration || learner.rate_bits != rate_bits {
@@ -3489,6 +3506,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     } else {
         TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
     };
+    // A continued learner may declare a hold after FROM ([`held_families`]), never written with it.
+    if args.len() == 14 {
+        learner.held = held_families(&learner.tower, &args[13])?;
+        println!("TOWER_HOLD hold={} held={} material={}", args[13], learner.held.iter().map(|r| r.len()).sum::<usize>(), learner.tower.theta.len());
+    }
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
