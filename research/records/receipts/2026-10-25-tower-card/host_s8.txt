@@ -1,0 +1,51 @@
+TOWER_TRAIN material=182017 streams=8 section=128 sections_a_pass=708 train_bytes=725141 dev_bytes=28757
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.931 deposits=32 halvings=12 elapsed_ms=1596
+TOWER_SWELL pass=0 section=32 L0 x=99393 h=1293168 r=1184500 a=629874 push=9355822 read=8874287 contact=10858286 return=4726641 lambda=1070219586 L1 x=596396 h=4512243 r=6686244 a=539390 push=6966446 read=6493376 contact=8341463 return=4672525 lambda=1070278421 readout=7290504
+TOWER_SECTION pass=0 section=64 bits_a_byte=4.043 deposits=64 halvings=12 elapsed_ms=2978
+TOWER_SWELL pass=0 section=64 L0 x=129288 h=1621528 r=1696226 a=732038 push=14574016 read=12564381 contact=11795299 return=8753199 lambda=1070444062 L1 x=715466 h=13015105 r=8776045 a=546483 push=7881017 read=7881472 contact=8730342 return=4819180 lambda=1070423679 readout=9075209
+TOWER_SECTION pass=0 section=96 bits_a_byte=3.722 deposits=96 halvings=12 elapsed_ms=4390
+TOWER_SWELL pass=0 section=96 L0 x=144593 h=1457404 r=2064829 a=815077 push=15991780 read=14536160 contact=12171994 return=10305769 lambda=1070314682 L1 x=792742 h=15777984 r=9423553 a=548725 push=9834800 read=9578423 contact=8741175 return=4821343 lambda=1070447057 readout=9185999
+TOWER_SECTION pass=0 section=128 bits_a_byte=3.583 deposits=128 halvings=12 elapsed_ms=5766
+TOWER_SWELL pass=0 section=128 L0 x=152465 h=1505911 r=2119238 a=905293 push=16444380 read=16494536 contact=14002133 return=11418218 lambda=1070239855 L1 x=1057454 h=15666653 r=8577138 a=543075 push=9762046 read=9661733 contact=8741321 return=4821364 lambda=1070462571 readout=12066964
+TOWER_SECTION pass=0 section=160 bits_a_byte=3.393 deposits=160 halvings=12 elapsed_ms=7125
+TOWER_SWELL pass=0 section=160 L0 x=161044 h=1537075 r=2312712 a=936474 push=18385543 read=17737635 contact=16108095 return=11038095 lambda=1070222253 L1 x=971298 h=14650808 r=9349410 a=548146 push=9734855 read=9751893 contact=8741321 return=4821364 lambda=1070464497 readout=12244318
+TOWER_SECTION pass=0 section=192 bits_a_byte=3.331 deposits=192 halvings=12 elapsed_ms=8498
+TOWER_SWELL pass=0 section=192 L0 x=160171 h=1590093 r=2142073 a=958883 push=19783351 read=18839322 contact=15556680 return=12732688 lambda=1070146433 L1 x=926653 h=13114864 r=10249416 a=541431 push=9743766 read=9750172 contact=8741321 return=4821364 lambda=1070464649 readout=13505761
+TOWER_SECTION pass=0 section=224 bits_a_byte=3.155 deposits=224 halvings=12 elapsed_ms=9874
+TOWER_SWELL pass=0 section=224 L0 x=166415 h=1269737 r=2062905 a=945532 push=20050249 read=19522487 contact=14988614 return=13325503 lambda=1069914023 L1 x=958266 h=14055111 r=9144008 a=556242 push=9707210 read=9729054 contact=8741321 return=4821364 lambda=1070463489 readout=13870458
+TOWER_SECTION pass=0 section=256 bits_a_byte=3.127 deposits=256 halvings=12 elapsed_ms=11238
+TOWER_SWELL pass=0 section=256 L0 x=175125 h=1137423 r=2203483 a=1052804 push=20777443 read=19677377 contact=17006718 return=14409561 lambda=1069824348 L1 x=792980 h=13056741 r=9124541 a=552494 push=9714325 read=9758137 contact=8741321 return=4821364 lambda=1070463738 readout=14446477
+TOWER_SECTION pass=0 section=288 bits_a_byte=2.962 deposits=288 halvings=12 elapsed_ms=12637
+TOWER_SWELL pass=0 section=288 L0 x=182442 h=1038429 r=2171202 a=1033516 push=20592649 read=20137706 contact=17087318 return=14058338 lambda=1069883462 L1 x=915279 h=13472417 r=9626959 a=547708 push=9717636 read=9762350 contact=8741321 return=4821364 lambda=1070463854 readout=15004191
+TOWER_SECTION pass=0 section=320 bits_a_byte=2.953 deposits=320 halvings=12 elapsed_ms=14011
+TOWER_SWELL pass=0 section=320 L0 x=179775 h=1442105 r=2108383 a=1027235 push=19940669 read=21088340 contact=16956407 return=14857654 lambda=1069848401 L1 x=759610 h=12523667 r=7785103 a=551649 push=9717060 read=9762332 contact=8741321 return=4821364 lambda=1070463004 readout=14800393
+TOWER_SECTION pass=0 section=352 bits_a_byte=2.888 deposits=352 halvings=12 elapsed_ms=15423
+TOWER_SWELL pass=0 section=352 L0 x=174634 h=1476861 r=2707907 a=1017384 push=20758714 read=21537077 contact=17024462 return=14861941 lambda=1069982598 L1 x=1361146 h=11914311 r=9495858 a=553854 push=9718206 read=9772945 contact=8741321 return=4821364 lambda=1070463006 readout=14746675
+TOWER_SECTION pass=0 section=384 bits_a_byte=2.850 deposits=384 halvings=12 elapsed_ms=16787
+TOWER_SWELL pass=0 section=384 L0 x=176350 h=1639562 r=2480758 a=1029025 push=20888455 read=22389000 contact=17905270 return=15098357 lambda=1069933822 L1 x=905196 h=11598503 r=8373570 a=562403 push=9710700 read=9776502 contact=8741321 return=4821364 lambda=1070462932 readout=14372822
+TOWER_SECTION pass=0 section=416 bits_a_byte=2.897 deposits=416 halvings=12 elapsed_ms=18182
+TOWER_SWELL pass=0 section=416 L0 x=180393 h=1574686 r=2491269 a=1071168 push=21165946 read=22998615 contact=17597584 return=16089437 lambda=1069945204 L1 x=1084047 h=12240680 r=7703884 a=563068 push=9726358 read=9824116 contact=8741321 return=4821364 lambda=1070468109 readout=15207519
+TOWER_SECTION pass=0 section=448 bits_a_byte=2.809 deposits=448 halvings=12 elapsed_ms=19559
+TOWER_SWELL pass=0 section=448 L0 x=181179 h=1923117 r=2342467 a=1060785 push=21475603 read=23139926 contact=18150944 return=17042524 lambda=1069885833 L1 x=898454 h=12839493 r=8094342 a=553045 push=9678090 read=9812723 contact=8741321 return=4821364 lambda=1070470770 readout=15574704
+TOWER_SECTION pass=0 section=480 bits_a_byte=2.748 deposits=480 halvings=12 elapsed_ms=20937
+TOWER_SWELL pass=0 section=480 L0 x=188779 h=1638947 r=2463690 a=1118030 push=21380100 read=23604785 contact=20203010 return=18049910 lambda=1069819636 L1 x=781624 h=11489311 r=7027697 a=568486 push=9677391 read=9812571 contact=8741321 return=4821364 lambda=1070470807 readout=15357070
+TOWER_SECTION pass=0 section=512 bits_a_byte=2.752 deposits=512 halvings=12 elapsed_ms=22309
+TOWER_SWELL pass=0 section=512 L0 x=192145 h=1373017 r=2686578 a=1101811 push=21514125 read=23112804 contact=21606419 return=18398289 lambda=1069813482 L1 x=726923 h=12133151 r=6765879 a=554240 push=9677388 read=9812571 contact=8741321 return=4821364 lambda=1070470807 readout=15342775
+TOWER_SECTION pass=0 section=544 bits_a_byte=2.649 deposits=544 halvings=12 elapsed_ms=23686
+TOWER_SWELL pass=0 section=544 L0 x=193733 h=1232521 r=2397331 a=1182206 push=22183248 read=24045106 contact=21563632 return=19071738 lambda=1069855830 L1 x=855334 h=11831744 r=7403214 a=541837 push=9755552 read=9833767 contact=8741321 return=4821364 lambda=1070468230 readout=16871000
+TOWER_SECTION pass=0 section=576 bits_a_byte=2.586 deposits=576 halvings=12 elapsed_ms=25062
+TOWER_SWELL pass=0 section=576 L0 x=195170 h=1473471 r=2692412 a=1127546 push=22680685 read=24033388 contact=21790113 return=18996049 lambda=1069768763 L1 x=870248 h=11380345 r=7369016 a=567672 push=9828559 read=9873234 contact=8741321 return=4821364 lambda=1070465670 readout=15758747
+TOWER_SECTION pass=0 section=608 bits_a_byte=2.570 deposits=608 halvings=12 elapsed_ms=26436
+TOWER_SWELL pass=0 section=608 L0 x=179340 h=1992242 r=2493852 a=1111375 push=23314905 read=25360277 contact=23010034 return=19832738 lambda=1069764540 L1 x=758581 h=10991562 r=6883823 a=570376 push=10083000 read=9899165 contact=8741321 return=4821364 lambda=1070463741 readout=15325407
+TOWER_SECTION pass=0 section=640 bits_a_byte=2.676 deposits=640 halvings=12 elapsed_ms=27831
+TOWER_SWELL pass=0 section=640 L0 x=201012 h=1243816 r=2687649 a=1143590 push=23066914 read=25295809 contact=23950158 return=19650948 lambda=1069814475 L1 x=714040 h=8477025 r=6371747 a=583385 push=10564477 read=10085983 contact=8741321 return=4821364 lambda=1070456607 readout=15543195
+TOWER_SECTION pass=0 section=672 bits_a_byte=2.667 deposits=672 halvings=12 elapsed_ms=29220
+TOWER_SWELL pass=0 section=672 L0 x=204325 h=1320287 r=2793469 a=1129414 push=23406023 read=25208016 contact=23492539 return=19691824 lambda=1069868223 L1 x=810994 h=6544335 r=8402796 a=559932 push=11005859 read=10480909 contact=8741321 return=5263641 lambda=1070774981 readout=16217044
+TOWER_SECTION pass=0 section=704 bits_a_byte=2.647 deposits=704 halvings=12 elapsed_ms=30600
+TOWER_SWELL pass=0 section=704 L0 x=186290 h=1902168 r=3088857 a=1178315 push=23995620 read=25948759 contact=24004270 return=20526133 lambda=1069930215 L1 x=888845 h=4131292 r=7101887 a=633667 push=10330398 read=11237940 contact=9178395 return=5689635 lambda=1070808651 readout=15829184
+TOWER_SECTION pass=0 section=708 bits_a_byte=2.576 deposits=708 halvings=12 elapsed_ms=30774
+TOWER_SWELL pass=0 section=708 L0 x=203451 h=1573620 r=2939968 a=1109716 push=23775579 read=25999718 contact=23918929 return=20753132 lambda=1069942804 L1 x=905164 h=4636258 r=7221734 a=633874 push=10417768 read=11639716 contact=9181647 return=5692260 lambda=1070693560 readout=15227452
+TOWER_STATE STATE.0 state_bytes=6399776 state_sha256=c1e2ee3b9dd83c3331e122150aa2471fbfb49bc5bc5b3e58171570ae6e09bab2
+TOWER_PASS pass=0 train_bits_a_byte=3.085 dev_bits_a_byte=2.777 dev_regions gsm8k=2.777 strokes=0.000 cycles=0.000 words=0.000 deposits=708/708 pass_ms=31157 elapsed_ms=31160
+TOWER_DONE state_bytes=6399776 state_sha256=c1e2ee3b9dd83c3331e122150aa2471fbfb49bc5bc5b3e58171570ae6e09bab2 elapsed_ms=31203
+streams=8 exit=0

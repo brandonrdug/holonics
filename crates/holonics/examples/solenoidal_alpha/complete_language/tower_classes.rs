@@ -22,6 +22,7 @@
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
 use super::tower_train::{agreeing_class, agreement, count, fit, per, positive, roles_of, Reading, STATE_BUDGET};
 use super::*;
+use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{ContactLaw, TowerLearner, TurnLadder};
 use rayon::prelude::*;
 
@@ -58,6 +59,13 @@ fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
 /// 128, so without it a label's covector stops inside its image and never reaches the image's
 /// start (the state at the label kept little of the image, the record's "state at the label").
 pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder) -> Result<()> {
+    train_realized(args, credit, targets, turned, ladder, &mut HostPass::default())
+}
+
+/// [`train`] with each section's forward and reverse run through `realization`
+/// (`hnn::tower::realization`): the card's route (`holonics-cuda`'s `tower_pass` example) runs the
+/// same passes on the card, and its saved learner is the host's.
+pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
         return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -76,7 +84,7 @@ pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, 
         train_compared: None,
     };
     let reading = Reading { train_compared: targets.then(|| target_places(&reading.train, alphabet - 1)), ..reading };
-    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, None)
+    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, None, realization)
 }
 
 /// [agent-inferred, October 25] **A section's comparison is its target.** A passage of sections

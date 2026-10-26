@@ -1,0 +1,15 @@
+TOWER_TRAIN material=182017 streams=48 section=128 sections_a_pass=118 train_bytes=725141 dev_bytes=28757
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.714 deposits=32 halvings=17 elapsed_ms=2452
+TOWER_SWELL pass=0 section=32 L0 x=103120 h=696666 r=832997 a=594997 push=9837215 read=8267424 contact=10324088 return=5501145 lambda=1069883396 L1 x=953219 h=16430088 r=14231296 a=518810 push=7278368 read=6127508 contact=7523581 return=3562704 lambda=1069998679 readout=5395890
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.580 deposits=64 halvings=17 elapsed_ms=4410
+TOWER_SWELL pass=0 section=64 L0 x=137250 h=709324 r=1077439 a=748290 push=12902701 read=11992548 contact=13244210 return=10068617 lambda=1069914511 L1 x=1222302 h=15025896 r=13878849 a=538467 push=8946592 read=6814665 contact=10021887 return=3765660 lambda=1070047889 readout=9729445
+TOWER_SECTION pass=0 section=96 bits_a_byte=3.104 deposits=96 halvings=17 elapsed_ms=6342
+TOWER_SWELL pass=0 section=96 L0 x=136749 h=873471 r=1155574 a=854879 push=13600154 read=14505434 contact=14418650 return=11308445 lambda=1069914018 L1 x=1102646 h=14017225 r=12791201 a=570458 push=9098847 read=6826965 contact=10295447 return=3771383 lambda=1070050269 readout=11490000
+TOWER_SECTION pass=0 section=118 bits_a_byte=2.935 deposits=118 halvings=17 elapsed_ms=7672
+TOWER_SWELL pass=0 section=118 L0 x=143863 h=851170 r=1174986 a=853830 push=14892822 read=16755267 contact=15106935 return=11729489 lambda=1069891631 L1 x=1191578 h=13671222 r=12873811 a=564067 push=9096680 read=6820911 contact=10299330 return=3775317 lambda=1070050337 readout=11612162
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 48 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 6144 blocks (one a cell) x 256 threads, the modes' scan 48 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.0 state_bytes=6687351 state_sha256=6921252a56eef4492367d9df561f4d9b87565b3110e0bcb2ee126f29240c6f37
+TOWER_PASS pass=0 train_bits_a_byte=3.638 dev_bits_a_byte=2.997 dev_regions gsm8k=2.997 strokes=0.000 cycles=0.000 words=0.000 deposits=118/118 pass_ms=7948 elapsed_ms=7951
+TOWER_DONE state_bytes=6687351 state_sha256=6921252a56eef4492367d9df561f4d9b87565b3110e0bcb2ee126f29240c6f37 elapsed_ms=8001
+TOWER_CARD forwards=253 forward_ms=2723 reverses=118 reverse_ms=2468 elapsed_ms=8009
+MEASURED exit=0 wall_s=8.208 peak_rss_kib=146716

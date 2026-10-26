@@ -685,6 +685,12 @@ impl Card {
         Ok(self.context.make_current()?)
     }
 
+    /// The card's ordered stream, for an owner that launches its own image's entries in the
+    /// card's order (so [`Card::write`] and [`Card::fetch`] wait for them).
+    pub(crate) fn stream(&self) -> &Stream {
+        &self.stream
+    }
+
     /// An entry's lowered limits.
     pub fn entry(&self, name: &'static str) -> Result<EntryCensus, DeviceError> {
         self.current()?;
