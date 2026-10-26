@@ -1,0 +1,91 @@
+A. One move, one pivot
+   x -> 10x + d is the dilation by 10 about -d/9 (checked for d = 0..9);
+   every numeral below 10^5 is the word of those dilations (100,000 numerals);
+   mod 10^k, k = 1..12, the pivot -d/9 is the repdigit dd...d (e.g. -1 = ...999).
+B. The place decides the kind
+   |10| = 10 at the real place (a boost: digits grow), 1/2 at 2 and 1/5 at 5 (a contraction
+   toward the pivot: the units-first, suffix geometry); the product is 1 (and for a = 2..2000).
+   p =   3: ord_p(10) =   1 = the period of 1/3; at this place the move is a shear: a translation, x -> x + d
+   p =   7: ord_p(10) =   6 = the period of 1/7; at this place the move is a turn of order 6
+   p =  11: ord_p(10) =   2 = the period of 1/11; at this place the move is a half-turn: x -> d - x
+   p =  13: ord_p(10) =   6 = the period of 1/13; at this place the move is a turn of order 6
+   p =  17: ord_p(10) =  16 = the period of 1/17; at this place the move is a turn of order 16
+   p =  19: ord_p(10) =  18 = the period of 1/19; at this place the move is a turn of order 18
+   p =  23: ord_p(10) =  22 = the period of 1/23; at this place the move is a turn of order 22
+   p =  29: ord_p(10) =  28 = the period of 1/29; at this place the move is a turn of order 28
+   p =  31: ord_p(10) =  15 = the period of 1/31; at this place the move is a turn of order 15
+   p =  37: ord_p(10) =   3 = the period of 1/37; at this place the move is a turn of order 3
+   p =  41: ord_p(10) =   5 = the period of 1/41; at this place the move is a turn of order 5
+   p =  43: ord_p(10) =  21 = the period of 1/43; at this place the move is a turn of order 21
+   p =  47: ord_p(10) =  46 = the period of 1/47; at this place the move is a turn of order 46
+   p =  53: ord_p(10) =  13 = the period of 1/53; at this place the move is a turn of order 13
+   p =  59: ord_p(10) =  58 = the period of 1/59; at this place the move is a turn of order 58
+   p =  61: ord_p(10) =  60 = the period of 1/61; at this place the move is a turn of order 60
+   p =  67: ord_p(10) =  33 = the period of 1/67; at this place the move is a turn of order 33
+   p =  71: ord_p(10) =  35 = the period of 1/71; at this place the move is a turn of order 35
+   p =  73: ord_p(10) =   8 = the period of 1/73; at this place the move is a turn of order 8
+   p =  79: ord_p(10) =  13 = the period of 1/79; at this place the move is a turn of order 13
+   p =  83: ord_p(10) =  41 = the period of 1/83; at this place the move is a turn of order 41
+   p =  89: ord_p(10) =  44 = the period of 1/89; at this place the move is a turn of order 44
+   p =  97: ord_p(10) =  96 = the period of 1/97; at this place the move is a turn of order 96
+   p = 101: ord_p(10) =   4 = the period of 1/101; at this place the move is a turn of order 4
+   p = 103: ord_p(10) =  34 = the period of 1/103; at this place the move is a turn of order 34
+   p = 107: ord_p(10) =  53 = the period of 1/107; at this place the move is a turn of order 53
+   p = 109: ord_p(10) = 108 = the period of 1/109; at this place the move is a turn of order 108
+C. One stroke or a link
+   primes below   1000 (2 and 5 left out): 166; the long division of 1/p is one stroke
+     through every nonzero remainder (10 generates) at 60, share 0.361445
+   primes below  10000 (2 and 5 left out): 1227; the long division of 1/p is one stroke
+     through every nonzero remainder (10 generates) at 467, share 0.380603
+   primes below 100000 (2 and 5 left out): 9590; the long division of 1/p is one stroke
+     through every nonzero remainder (10 generates) at 3617, share 0.377163
+   Artin's product over primes below 1000: 0.374003 (a reading; the density of
+   primes where 10 generates is Artin's constant if GRH holds, Hooley 1967)
+   strokes per prime below 10^5 (strokes: primes): 1: 3617, 2: 2684, 3: 635, 4: 711, 5: 192, 6: 473 ...
+D. What one plane carries
+   for every m < 120 coprime to 10 the digit maps generate the whole affine group of Z/m,
+   m * ord_m(10) moves with every translation; so any one-plane realization is a finite group
+   of turns, and the digit move can only send a turn to itself or its inverse:
+   rings coprime to 10 that one plane carries (m <= 300): [3, 9, 11]
+   in the phase chart (the residue held as a turn, where a sum is one crossing) one plane
+   carries exactly the rings [2, 3, 5, 9, 10, 11] (10 = 0, 1 or -1 mod m)
+   least digit grain k at which one plane carries ring m (10^k = 0, 1 or -1 mod m):
+     2:1  3:1  4:2  5:1  7:3  8:3  9:1  10:1  11:1  13:3  16:4  20:2  25:2  27:3  33:2  37:3  41:5  73:4  99:2  100:2  101:2
+   checked on every numeral below 10^5: ring 9 is a turn by each digit, ring 11 a conjugation
+   then a turn, ring 10 a reset; one contracting coordinate x -> (x + d)/10 holds every digit
+   of the suffix (the j-th from the end is the j-th place of x: the chaos-game address);
+   one real plane holds units and tens as two coordinates by the nilpotent move (s, t) -> (d, s)
+E. The rotor and the cascade
+   ring    3: 1 characters in the orbit of 1 under x10 (cycle); real planes 1
+   ring    7: 6 characters in the orbit of 1 under x10 (cycle); real planes 3
+   ring    9: 1 characters in the orbit of 1 under x10 (cycle); real planes 1
+   ring   11: 2 characters in the orbit of 1 under x10 (cycle); real planes 1
+   ring   13: 6 characters in the orbit of 1 under x10 (cycle); real planes 3
+   ring   17: 16 characters in the orbit of 1 under x10 (cycle); real planes 8
+   ring   37: 3 characters in the orbit of 1 under x10 (cycle); real planes 3
+   ring   41: 5 characters in the orbit of 1 under x10 (cycle); real planes 5
+   ring   73: 8 characters in the orbit of 1 under x10 (cycle); real planes 4
+   ring  101: 4 characters in the orbit of 1 under x10 (cycle); real planes 2
+   ring 1001: 6 characters in the orbit of 1 under x10 (cycle); real planes 3
+   ring    4: 2 characters in the orbit of 1 under x10 (chain into the constant); real planes 2
+   ring    8: 3 characters in the orbit of 1 under x10 (chain into the constant); real planes 3
+   ring   20: 2 characters in the orbit of 1 under x10 (chain into the constant); real planes 2
+   ring   40: 3 characters in the orbit of 1 under x10 (chain into the constant); real planes 3
+   ring  100: 2 characters in the orbit of 1 under x10 (chain into the constant); real planes 2
+   ring 1000: 3 characters in the orbit of 1 under x10 (chain into the constant); real planes 3
+   for every prime p < 200 (not 2, 5): planes = ord_p(10)/2 when the order is even, else ord_p(10);
+   every ring above reads every numeral below 3000 exactly.
+F. Fourier exchanges the generator and the modulator
+   n = 2..40: F X = Z F and F Z = X^-1 F (the shift and the clock exchange), Z X = w X Z
+   ring of four: F^-1 diag(i^(ks)) F e_c = e_(c+s), exactly in Gaussian integers over 4
+   the quadratic character (the +-1 sheet) against the additive turn: tau^2 = (-1/q) q for
+   every odd prime q < 60 (3:-3, 5:+5, 7:-7, 11:-11, 13:+13, 17:+17, ...): |tau| = q^(1/2)
+G. The torus: twists compose into every kind
+   T = sigma_1, L = sigma_2: T L T = L T L; T L^-1 = [[2, 1], [1, 1]] (boost, trace 3: the cat map);
+   T L has trace 1 and (T L)^3 = -I (a turn of order 6); T L T = [[0, 1], [-1, 0]], the quarter turn
+   (the Fourier chart, S^2 = -I); [A, B] = [[-7, 6], [-6, 5]] for the boosts A, B: trace -2, a shear
+   the cat map's fixed points on the torus: |det(A^k - I)| = L_2k - 2 (Lucas), k = 1..20,
+   counted point by point for k = 1..5: 1, 5, 16, 45, 121
+   the (p, q) curve on the torus has gcd(p, q) strokes, p, q = 1..40: coprime windings are one
+   stroke (a knot), the rest a link of gcd strokes
+all 1000350 checks hold (4524 ms)
