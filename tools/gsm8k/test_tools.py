@@ -122,6 +122,40 @@ class ExteriorTools(unittest.TestCase):
             )
 
 
+    def test_written_rules_read_how_far_each_wrong_value_falls_and_what_it_was_written_from(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            held = root / "held.txt"
+            held.write_bytes(
+                b"Q?\nA <<12+30=42>>42 <<50-8=42>>42 <<7+7=14>>14 <<2*3=6>>6 <<9+2=11>>11 "
+                b"<<300*4=1200>>1200\n\n"
+            )
+            train = root / "train.txt"
+            train.write_bytes(b"Q?\nA <<1+1=2>>2 <<3+4=7>>7 <<2*3=6>>6\n\n")
+            release = root / "release"
+            release.mkdir()
+            (release / "FREE.tsv").write_text("0\tA\\n\n")
+            (release / "MARKS.tsv").write_text(
+                "0\t0\t12+30\t24>>\n0\t1\t50-8\t58>>\n0\t2\t7+7\t7>>\n0\t3\t2*3\t6>>\n"
+                "0\t4\t9+2\t1\n0\t5\t300*4\tabc>>\n"
+            )
+            out = run("written_rules.py", held, train, "gaps", release).splitlines()
+            # Written 24, 58 and 7 against 42, 42 and 14; the foil reads them against the next
+            # wrong number's exact value, 42, 14 and 42. 58 is 50+8 and 7 an operand and heard.
+            self.assertEqual(out[1:7], [
+                f"GAPS dir={release} set=all n=6 right=1 wrong=5 unfinished=1 not_number=1 unread=0 numbers=3",
+                f"GAP_SIZE dir={release} set=all n=3 x2=3 x10=3 tenth=0 opposite_sign=0 smaller=2 larger=1 "
+                "digits=2 foil_digits=2/3",
+                f"GAP_RINGS dir={release} set=all n=3 mod9=1 foil9=1/3 mod10=0 foil10=0/3 mod11=0 foil11=1/3 "
+                "mod7=1 foil7=1/3 mod13=0 foil13=0/3",
+                f"GAP_FROM dir={release} set=all n=3 heard_result=1 operand=1 other_operation=1/3",
+                f"GAP_WRITES dir={release} set=all written=4 distinct=4 top10=4 commonest=24:1:0",
+                f"GAP_LENGTH dir={release} set=all 1=1/1 2=0/4 3=0/0 4=0/1 5+=0/0",
+            ])
+            self.assertEqual(out[7], f"GAPS dir={release} set=met n=1 right=1 wrong=0 unfinished=0 not_number=0 unread=0 numbers=0")
+            self.assertEqual(out[13], f"GAPS dir={release} set=never n=5 right=0 wrong=5 unfinished=1 not_number=1 unread=0 numbers=3")
+
+
     def test_numeral_rings_name_the_last_digit_of_each_whole_numeral(self):
         spec = importlib.util.spec_from_file_location("numeral_rings", TOOLS / "numeral_rings.py")
         rings = importlib.util.module_from_spec(spec)

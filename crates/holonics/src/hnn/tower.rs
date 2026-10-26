@@ -1126,7 +1126,11 @@ pub struct RotorRing {
 /// rounded into the closed unit disk, its larger part released a grain toward zero until
 /// `|e|² ≤ 1` (a turn keeps the passivity bound).
 fn ring_face(r: u32, q: u32) -> (i128, i128) {
-    let fine = half_turn(2 * MOVE_BITS);
+    ring_face_at(r, q, half_turn(2 * MOVE_BITS))
+}
+
+/// [`ring_face`] from the half turn `fine` on `2^(−60)`, held by the caller.
+fn ring_face_at(r: u32, q: u32, fine: i128) -> (i128, i128) {
     let signed = if 2 * u64::from(r) <= u64::from(q) { i128::from(r) } else { i128::from(r) - i128::from(q) };
     let angle = div_nearest(2 * signed * fine, i128::from(q) << MOVE_BITS);
     let (mut a, mut b) = exp_series(0, angle);
@@ -1187,6 +1191,11 @@ impl Rotor {
     /// The rings, from a level's first mode.
     pub fn rings(&self) -> &[RotorRing] {
         &self.rings
+    }
+
+    /// The count of moving modes, the rings' widths summed: a level's first modes.
+    pub fn moving(&self) -> usize {
+        self.places.len()
     }
 
     /// The key `σ` of ring `ring` at level `level` when `class` arrives.
@@ -1295,6 +1304,231 @@ impl Rotor {
             line.split(' ').map(|w| w.parse().map_err(|_| bad.clone())).collect()
         };
         Self::new(d, rings, keys(steps)?, keys(turns)?)
+    }
+}
+
+/// [definition; agent-inferred with the GPT-6 review, October 26] **The navigator**: the helical
+/// code's face (`m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`) read in exact residues over epochs (the record
+/// `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_A_TURN_IS_TWO_REFLECTIONS_AND_THE_BASE_TURNS_COLLAPSES_OR_REFLECTS_EACH_RING.md`,
+/// §7). A restart opens an epoch, a fold ends one strand of it and pairs the next by its hand, and
+/// the face is carried as integers, so no move damps it. A stream carries `R_j, K_j ∈ ℤ/q` for
+/// `j < w` and a hand `o ∈ (ℤ/q)ˣ`, and each byte of an arriving class's word acts in turn:
+///
+/// ```text
+/// located digit byte b:       R_j ← R_((j + s) mod w) + o·θ_j[b]
+/// byte with a located hand e: K ← K + R,  R ← 0,  o ← e        the fold
+/// any other byte:             K ← 0,  R ← 0,  o ← 1            the restart, at E(0)
+/// ```
+///
+/// The fold is the pair contact's bilinear read `E(K) E(R) = E(K + R)` taken exactly on the
+/// residues, so from rest `a ∘ b = c` leaves `K_j + R_j = θ-character of (a + e_∘ b + e_= c)`,
+/// zero exactly where the calculation closes. After its level's move, the faces `e^(2πi K_j/q)`,
+/// then `e^(2πi R_j/q)`, at amplitude one on the state's grain are written into the level's modes
+/// `first..first + 2w`: those modes take no push and no move, and the covector stops there
+/// (residues in `ℤ/q` have no covector; the turns and the hands are located by loop closure, as the
+/// rotor's keys are). The level reads them through `C`, the contacts and the readout like any mode.
+/// A navigator with no hand reads each numeral's own character and captures nothing; one with no
+/// digit and no hand restarts at every byte and writes ones.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Navigator {
+    level: usize,
+    first: usize,
+    modulus: u32,
+    width: usize,
+    step: usize,
+    /// Each located digit byte with its turns `θ_j[b]`, `j < w`, ascending by byte.
+    digits: Vec<(u8, Vec<u32>)>,
+    /// Each byte with a located hand and the hand, ascending by byte.
+    hands: Vec<(u8, u32)>,
+    /// Each class's bytes, in the order the boundary codec reads them.
+    words: Vec<Vec<u8>>,
+    levels: usize,
+    alphabet: usize,
+    modes: usize,
+    /// The half turn on `2^(−60)`, the faces' resident navigator.
+    half_turn: i128,
+}
+
+/// `a` and `b` share no prime: Euclid's remainders reach one.
+fn coprime(a: u64, b: u64) -> bool {
+    let (mut a, mut b) = (a, b);
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a == 1
+}
+
+impl Navigator {
+    /// The navigator on `level` of a tower of `declaration`, writing modes `first..first + 2·width`:
+    /// the digit bytes' turns (`width` each, below `modulus`), the hand bytes' hands (units modulo
+    /// `modulus`), and one word for each class. Refused unless the level and its modes are the
+    /// tower's, the modulus is above one, the step is below the width, the bytes ascend and no byte
+    /// is both a digit and a hand.
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(declaration: &TowerDeclaration, level: usize, first: usize, modulus: u32, width: usize, step: usize, digits: Vec<(u8, Vec<u32>)>, hands: Vec<(u8, u32)>, words: Vec<Vec<u8>>) -> Result<Self> {
+        let d = declaration;
+        if level >= d.levels || width == 0 || first + 2 * width > d.modes {
+            return refuse("a navigator's modes that are not its level's");
+        }
+        if modulus < 2 || step >= width {
+            return refuse("a navigator holds a modulus above one and a step below its width");
+        }
+        if words.len() != d.alphabet {
+            return refuse("a navigator holds one word for each class");
+        }
+        if digits.windows(2).any(|p| p[0].0 >= p[1].0) || hands.windows(2).any(|p| p[0].0 >= p[1].0) {
+            return refuse("a navigator's bytes ascend, each once");
+        }
+        if digits.iter().any(|(b, _)| hands.binary_search_by_key(b, |&(h, _)| h).is_ok()) {
+            return refuse("a byte that is both a navigator's digit and its hand");
+        }
+        if digits.iter().any(|(_, turns)| turns.len() != width || turns.iter().any(|&r| r >= modulus)) {
+            return refuse("a navigator's digit turns each mode by a residue below its modulus");
+        }
+        if hands.iter().any(|&(_, e)| e >= modulus || !coprime(u64::from(e), u64::from(modulus))) {
+            return refuse("a navigator's hand is a unit below its modulus");
+        }
+        Ok(Self { level, first, modulus, width, step, digits, hands, words, levels: d.levels, alphabet: d.alphabet, modes: d.modes, half_turn: half_turn(2 * MOVE_BITS) })
+    }
+
+    /// The level whose modes it writes.
+    pub fn level(&self) -> usize {
+        self.level
+    }
+
+    /// The first mode it writes: `K` in `first..first + w`, `R` in `first + w..first + 2w`.
+    pub fn first(&self) -> usize {
+        self.first
+    }
+
+    /// The modulus `q`.
+    pub fn modulus(&self) -> u32 {
+        self.modulus
+    }
+
+    /// The width `w`.
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    /// The located digit bytes and their turns.
+    pub fn digits(&self) -> &[(u8, Vec<u32>)] {
+        &self.digits
+    }
+
+    /// The located hand bytes and their hands.
+    pub fn hands(&self) -> &[(u8, u32)] {
+        &self.hands
+    }
+
+    /// Whether mode `mode` of level `level` is written by the navigator.
+    fn covers(&self, level: usize, mode: usize) -> bool {
+        level == self.level && (self.first..self.first + 2 * self.width).contains(&mode)
+    }
+
+    /// A stream's rested residues, `K` then `R`, at zero.
+    fn rested(&self) -> Vec<u32> {
+        vec![0; 2 * self.width]
+    }
+
+    /// The residues `K` then `R` and the hand `o` after the word of `class` is heard, each byte in
+    /// turn by the law above.
+    pub fn heard(&self, residues: &mut [u32], hand: &mut u32, class: usize) -> Result<()> {
+        let (q, w) = (u64::from(self.modulus), self.width);
+        if residues.len() != 2 * w || class >= self.words.len() || *hand >= self.modulus {
+            return refuse("a stream rested before its navigator joined: rest it again");
+        }
+        let (k, r) = residues.split_at_mut(w);
+        for &b in &self.words[class] {
+            if let Ok(i) = self.digits.binary_search_by_key(&b, |(d, _)| *d) {
+                r.rotate_left(self.step);
+                for (v, &turn) in r.iter_mut().zip(&self.digits[i].1) {
+                    *v = ((u64::from(*v) + u64::from(*hand) * u64::from(turn) % q) % q) as u32;
+                }
+            } else if let Ok(i) = self.hands.binary_search_by_key(&b, |&(h, _)| h) {
+                for (kv, rv) in k.iter_mut().zip(r.iter_mut()) {
+                    *kv = ((u64::from(*kv) + u64::from(*rv)) % q) as u32;
+                    *rv = 0;
+                }
+                *hand = self.hands[i].1;
+            } else {
+                k.fill(0);
+                r.fill(0);
+                *hand = 1;
+            }
+        }
+        Ok(())
+    }
+
+    /// The faces `e^(2πi v/q)` of the residues, on the state's grain `2^(−24)`.
+    fn faces(&self, residues: &[u32]) -> Result<Vec<(i64, i64)>> {
+        collect_exact(residues.iter().map(|&v| {
+            let (a, b) = ring_face_at(v, self.modulus, self.half_turn);
+            Ok((fit64(release(a, MOVE_BITS - STATE_BITS))?, fit64(release(b, MOVE_BITS - STATE_BITS))?))
+        }))
+    }
+
+    /// `navigator LEVELS ALPHABET MODES LEVEL FIRST MODULUS WIDTH STEP`, then the digits as
+    /// `BYTE:TURN,…`, the hands as `BYTE:HAND` and the words in hexadecimal (`-` for an empty word),
+    /// one line each.
+    fn to_text(&self) -> String {
+        let digits: String = self.digits.iter().map(|(b, turns)| format!(" {b}:{}", turns.iter().map(u32::to_string).collect::<Vec<_>>().join(","))).collect();
+        let hands: String = self.hands.iter().map(|(b, e)| format!(" {b}:{e}")).collect();
+        let words: String = self.words.iter().map(|w| if w.is_empty() { " -".to_string() } else { format!(" {}", w.iter().map(|b| format!("{b:02x}")).collect::<String>()) }).collect();
+        format!(
+            "navigator {} {} {} {} {} {} {} {}\nnavigator-digits{digits}\nnavigator-hands{hands}\nnavigator-words{words}\n",
+            self.levels, self.alphabet, self.modes, self.level, self.first, self.modulus, self.width, self.step
+        )
+    }
+
+    fn from_text(head: &str, digits: &str, hands: &str, words: &str, declaration: &TowerDeclaration) -> Result<Self> {
+        let d = declaration;
+        let bad = TowerError::Refused("a navigator's text that is not the tower's");
+        let head: Vec<&str> = head.split(' ').collect();
+        if head.len() != 9 || head[..4].join(" ") != format!("navigator {} {} {}", d.levels, d.alphabet, d.modes) {
+            return Err(bad);
+        }
+        let count = |w: &str| w.parse::<usize>().map_err(|_| bad.clone());
+        // A tagged line's entries after its tag; a line with no entry holds none.
+        let entries = |line: &'static str, text: &'_ str| -> Result<Vec<String>> {
+            let rest = text.strip_prefix(line).ok_or(TowerError::Refused("a navigator's text that is not the tower's"))?;
+            if rest.is_empty() {
+                return Ok(Vec::new());
+            }
+            rest.strip_prefix(' ').map(|r| r.split(' ').map(str::to_string).collect()).ok_or(TowerError::Refused("a navigator's text that is not the tower's"))
+        };
+        let pair = |entry: &str| -> Result<(u8, String)> {
+            let (b, v) = entry.split_once(':').ok_or(bad.clone())?;
+            Ok((b.parse().map_err(|_| bad.clone())?, v.to_string()))
+        };
+        let digits = entries("navigator-digits", digits)?
+            .iter()
+            .map(|e| {
+                let (b, turns) = pair(e)?;
+                Ok((b, turns.split(',').map(|t| t.parse().map_err(|_| bad.clone())).collect::<Result<Vec<u32>>>()?))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let hands = entries("navigator-hands", hands)?
+            .iter()
+            .map(|e| {
+                let (b, hand) = pair(e)?;
+                Ok((b, hand.parse().map_err(|_| bad.clone())?))
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let words = entries("navigator-words", words)?
+            .iter()
+            .map(|w| {
+                if w == "-" {
+                    return Ok(Vec::new());
+                }
+                if w.len() % 2 != 0 {
+                    return Err(bad.clone());
+                }
+                (0..w.len()).step_by(2).map(|i| u8::from_str_radix(&w[i..i + 2], 16).map_err(|_| bad.clone())).collect()
+            })
+            .collect::<Result<Vec<Vec<u8>>>>()?;
+        let modulus = head[6].parse().map_err(|_| bad.clone())?;
+        Self::new(d, count(head[4])?, count(head[5])?, modulus, count(head[7])?, count(head[8])?, digits, hands, words)
     }
 }
 
@@ -1431,6 +1665,8 @@ pub struct Tower {
     ring: Option<RingFace>,
     /// The rotor, when one is joined ([`Tower::join_rotor`]).
     rotor: Option<Rotor>,
+    /// The navigator, when one is joined ([`Tower::join_navigator`]).
+    navigator: Option<Navigator>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1452,6 +1688,10 @@ pub struct TowerState {
     /// Each ring rank's hand ([`hand_after`]): `true` where the moves since its last restart
     /// reversed it, the ring then read as `(Re r, −Im r)`.
     pub hands: Vec<bool>,
+    /// The navigator's residues `K` then `R` (empty without a navigator, [`Navigator`]).
+    pub navigator: Vec<u32>,
+    /// The navigator's hand `o`, one at rest.
+    pub navigator_hand: u32,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -2142,7 +2382,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, navigator: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2153,6 +2393,8 @@ impl Tower {
             credit: None,
             ring: vec![(0, 0); self.ring.as_ref().map_or(0, RingFace::ranks)],
             hands: vec![false; self.ring.as_ref().map_or(0, RingFace::ranks)],
+            navigator: self.navigator.as_ref().map_or_else(Vec::new, Navigator::rested),
+            navigator_hand: 1,
         }
     }
 
@@ -2276,6 +2518,15 @@ impl Tower {
             affine(&t[pe..pe + w * k], reaches.pair[1], k, c, None, 0, MATERIAL_BITS, &mut lift)?;
             x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the pair face's lift outgrew the face's 32-bit carrier")))?;
         }
+        // The navigator hears the arriving word; its faces are written after its level's move
+        // ([`Navigator`]).
+        let navigated: Option<(&Navigator, Vec<(i64, i64)>)> = match &self.navigator {
+            Some(nav) => {
+                nav.heard(&mut state.navigator, &mut state.navigator_hand, u)?;
+                Some((nav, nav.faces(&state.navigator)?))
+            }
+            None => None,
+        };
         let mut levels = Vec::with_capacity(d.levels);
         let mut ring_read: Option<Vec<i64>> = None;
         let mut ring_face: Option<Vec<i32>> = None;
@@ -2362,6 +2613,14 @@ impl Tower {
             let gammas = &reaches.gammas[l];
             let mut face = vec![0i64; 2 * n];
             for k in 0..n {
+                // A navigator's mode takes no push and no move: its face is written.
+                if let Some((nav, faces)) = navigated.as_ref().filter(|(nav, _)| nav.covers(l, k)) {
+                    let (nr, ni) = faces[k - nav.first];
+                    modes[k] = (nr, ni);
+                    face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
+                    face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
+                    continue;
+                }
                 let (hr, hi) = stepped.as_ref().map_or(modes[k], |h| h[k]);
                 let ((lr, li), gamma) = match gate.get(k) {
                     Some(m) => ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128),
@@ -2530,6 +2789,9 @@ impl Tower {
         }
         if self.rotor.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a rotor: the credit's moments through the step are owed");
+        }
+        if self.navigator.is_some() && opening.credit.is_some() {
+            return refuse("a credited opening under a navigator: the credit's moments beside its written modes are owed");
         }
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
@@ -2760,6 +3022,11 @@ impl Tower {
                     back = rotor.back(l, classes[i + 1], &back);
                 }
                 for k in 0..n {
+                    // A navigator's mode is written, not moved: its covector stops there.
+                    if self.navigator.as_ref().is_some_and(|nav| nav.covers(l, k)) {
+                        gh.push((0, 0));
+                        continue;
+                    }
                     gh.push((fit64(read_cov[i][k].0 as i128 + back[k].0)?, fit64(read_cov[i][k].1 as i128 + back[k].1)?));
                 }
                 carried = gh.clone();
@@ -2992,6 +3259,9 @@ impl Tower {
         if self.rotor.is_some() {
             return refuse("a passage credit under a rotor: its moments through the step are owed");
         }
+        if self.navigator.is_some() {
+            return refuse("a passage credit under a navigator: its moments beside the written modes are owed");
+        }
         let d = &self.declaration;
         let (w, n) = (d.width, d.modes);
         let t = &self.theta;
@@ -3172,13 +3442,16 @@ impl Tower {
         if let Some(rotor) = &self.rotor {
             s.push_str(&rotor.to_text());
         }
+        if let Some(nav) = &self.navigator {
+            s.push_str(&nav.to_text());
+        }
         s
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
     /// three more with a pair face, two more with a ring face (one more a rank with its pair
-    /// moves, one more with its harmonics and one more with its restarts) and three more with a
-    /// rotor.
+    /// moves, one more with its harmonics and one more with its restarts), three more with a
+    /// rotor and four more with a navigator.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -3198,6 +3471,9 @@ impl Tower {
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("rotor ")) {
             n += 3;
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("navigator ")) {
+            n += 4;
         }
         n
     }
@@ -3265,11 +3541,27 @@ impl Tower {
             }
             None => None,
         };
+        let navigator = match lines.next_if(|l| l.starts_with("navigator ")) {
+            Some(head) => {
+                let (digits, hands, words) = (lines.next().unwrap_or(""), lines.next().unwrap_or(""), lines.next().unwrap_or(""));
+                Some(Navigator::from_text(head, digits, hands, words, &declaration)?)
+            }
+            None => None,
+        };
         let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        Ok(Self { declaration, theta, pair, ring, rotor, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        // The rotor and the navigator join by their own laws, so a text that holds them together
+        // is read under the same refusals as their joins.
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, navigator: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        if let Some(rotor) = rotor {
+            tower.join_rotor(rotor)?;
+        }
+        if let Some(nav) = navigator {
+            tower.join_navigator(nav)?;
+        }
+        Ok(tower)
     }
 
     /// [agent-inferred, October 24] **The pair face joined to the tower**: the face's readout `V`
@@ -3313,6 +3605,9 @@ impl Tower {
         if self.rotor.is_some() {
             return refuse("a ring face beside a rotor: the ring's law under a step is owed");
         }
+        if self.navigator.is_some() {
+            return refuse("a ring face beside a navigator: the ring's carried face over written modes is owed");
+        }
         let mut face = face;
         let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
@@ -3352,6 +3647,9 @@ impl Tower {
         if (rotor.levels, rotor.alphabet, rotor.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("a rotor of another tower's shape");
         }
+        if self.navigator.as_ref().is_some_and(|nav| rotor.moving() > nav.first) {
+            return refuse("a rotor whose rings reach a navigator's written modes");
+        }
         self.rotor = Some(rotor);
         Ok(())
     }
@@ -3359,6 +3657,34 @@ impl Tower {
     /// The rotor, when one is joined.
     pub fn rotor(&self) -> Option<&Rotor> {
         self.rotor.as_ref()
+    }
+
+    /// [agent-inferred with the GPT-6 review, October 26] **The navigator joined to the tower**
+    /// ([`Navigator`]): it adds no material, and its residues and hand are a stream's state, so a
+    /// stream rested before the join is rested again. Refused beside a ring face (the ring reads a
+    /// mode's carried face, which a written mode does not carry), when one is already joined, at
+    /// another tower's shape, or where a rotor's rings reach its modes.
+    pub fn join_navigator(&mut self, navigator: Navigator) -> Result<()> {
+        if self.navigator.is_some() {
+            return refuse("a tower takes one navigator");
+        }
+        if self.ring.is_some() {
+            return refuse("a navigator beside a ring face: the ring's carried face over written modes is owed");
+        }
+        let d = &self.declaration;
+        if (navigator.levels, navigator.alphabet, navigator.modes) != (d.levels, d.alphabet, d.modes) {
+            return refuse("a navigator of another tower's shape");
+        }
+        if self.rotor.as_ref().is_some_and(|rotor| rotor.moving() > navigator.first) {
+            return refuse("a navigator whose written modes a rotor's rings reach");
+        }
+        self.navigator = Some(navigator);
+        Ok(())
+    }
+
+    /// The navigator, when one is joined.
+    pub fn navigator(&self) -> Option<&Navigator> {
+        self.navigator.as_ref()
     }
 
     /// [agent-inferred, October 25] **The ring's readout opened at its founding**: `W` (`A` rows
@@ -3964,7 +4290,12 @@ impl Tower {
                     };
                     let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
                     let (lr, li, br, bi) = (lam.0 as i128, lam.1 as i128, beta.0 as i128, beta.1 as i128);
-                    let carried = (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?);
+                    // A navigator's mode is written whole: nothing is carried to it by a move.
+                    let carried = if self.navigator.as_ref().is_some_and(|nav| nav.covers(l, k)) {
+                        lc.state[k]
+                    } else {
+                        (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?)
+                    };
                     Ok(CircuitMode { before: opening[l][k], carried, after: lc.state[k], lam, beta })
                 }))?;
                 let carried: Vec<(i64, i64)> = modes.iter().map(|m| m.carried).collect();
@@ -3996,6 +4327,9 @@ impl Tower {
         }
         if self.rotor.is_some() {
             return refuse("input covectors under a rotor: their carried face is the unstepped state the moves do not act on");
+        }
+        if self.navigator.is_some() {
+            return refuse("input covectors under a navigator: its written modes are not what the moves carry");
         }
         let reaches = self.reaches();
         let t = &self.theta;
@@ -4608,6 +4942,182 @@ mod tests {
         assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
         tower.rotor = None;
         assert!(tower.join_rotor(Rotor::opening(&tower.declaration)).is_ok());
+    }
+
+    /// The tenfold digit turns modulo `q` over `w` modes: digit `d` turns mode `j` by `10^j·d`.
+    fn tenfold_digits(q: u32, w: usize) -> Vec<(u8, Vec<u32>)> {
+        (0..10u32)
+            .map(|d| {
+                let mut tenfold = 1u64;
+                let turns = (0..w)
+                    .map(|_| {
+                        let r = (tenfold * u64::from(d) % u64::from(q)) as u32;
+                        tenfold = tenfold * 10 % u64::from(q);
+                        r
+                    })
+                    .collect();
+                (b'0' + d as u8, turns)
+            })
+            .collect()
+    }
+
+    /// The tiny navigator on the first level of a tower of four classes (`1`, `2`, `+`, `=`),
+    /// modulo 11 over two modes from mode `first`, `+` folding at one and `=` at minus one.
+    fn tiny_navigator(declaration: &TowerDeclaration, first: usize) -> Navigator {
+        let digits: Vec<(u8, Vec<u32>)> = tenfold_digits(11, 2).into_iter().filter(|(b, _)| matches!(b, b'1' | b'2')).collect();
+        let words = vec![b"1".to_vec(), b"2".to_vec(), b"+".to_vec(), b"=".to_vec()];
+        Navigator::new(declaration, 0, first, 11, 2, 1, digits, vec![(b'+', 1), (b'=', 10)], words).expect("navigator")
+    }
+
+    /// The rotor tower of seven modes a level with the tiny navigator on modes 3 to 6, past the
+    /// rotor's three moving modes.
+    fn navigated(gated: bool, contact: ContactLaw) -> Tower {
+        let mut tower = rotor_on(tiny_shaped(2, 7, gated, gated, gated, contact));
+        let nav = tiny_navigator(&tower.declaration, 3);
+        tower.join_navigator(nav).expect("joined");
+        tower
+    }
+
+    /// The equation at the consumer: from rest, `a ∘ b =` read through words of one byte and of
+    /// several leaves `K_j = 10^j (a + e_∘ b)` and `R = 0`, the result `c` then
+    /// `K_j + R_j = 10^j (a + e_∘ b + e_= c)` modulo `q`, zero exactly where the calculation closes;
+    /// any other byte restarts at zero with the hand one.
+    #[test]
+    fn a_navigator_folds_its_hands() {
+        let words: Vec<Vec<u8>> = ["12", "+3", "0=", "4", "2", "1", "50", "-8", "=", " x", "<<", "-"].iter().map(|w| w.as_bytes().to_vec()).collect();
+        let declaration = TowerDeclaration { alphabet: words.len(), width: 1, modes: 4, contacts: 1, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let q = 99u64;
+        let nav = Navigator::new(&declaration, 0, 0, 99, 2, 1, tenfold_digits(99, 2), vec![(b'+', 1), (b'-', 98), (b'=', 98)], words).expect("navigator");
+        let read = |classes: &[usize]| {
+            let (mut residues, mut hand) = (vec![0u32; 4], 1u32);
+            for &u in classes {
+                nav.heard(&mut residues, &mut hand, u).expect("heard");
+            }
+            (residues, hand)
+        };
+        let character = |n: i64| -> Vec<u32> { (0..2).map(|j| (n * 10i64.pow(j)).rem_euclid(q as i64) as u32).collect() };
+        let sum = |r: &[u32]| -> Vec<u32> { (0..2).map(|j| ((u64::from(r[j]) + u64::from(r[2 + j])) % q) as u32).collect() };
+        // 12 + 30 = : K holds 42, R nothing, the hand minus one.
+        let (r, hand) = read(&[0, 1, 2]);
+        assert_eq!((r[..2].to_vec(), r[2..].to_vec(), hand), (character(42), vec![0, 0], 98));
+        // … 42 closes it, 41 leaves one.
+        assert_eq!(sum(&read(&[0, 1, 2, 3, 4]).0), vec![0, 0]);
+        assert_eq!(sum(&read(&[0, 1, 2, 3, 5]).0), character(1));
+        // 50 - 8 = 42 closes; the hand of `-` is minus one.
+        assert_eq!(read(&[6, 7, 8]).0[..2].to_vec(), character(42));
+        assert_eq!(sum(&read(&[6, 7, 8, 3, 4]).0), vec![0, 0]);
+        // A byte with no turn and no hand restarts, mid-word or alone.
+        assert_eq!(read(&[0, 1, 2, 9]), (vec![0; 4], 1));
+        assert_eq!(read(&[6, 10, 4]).0, [vec![0, 0], character(2)].concat());
+        // A word of a hand alone folds: 50 - leaves K = 50 and the hand minus one.
+        assert_eq!(read(&[6, 11]), ([character(50), vec![0, 0]].concat(), 98));
+    }
+
+    /// The navigator's modes are written after the move with the faces of its residues at
+    /// amplitude one, and the level's other modes move as on its twin without a navigator (the
+    /// first level reads only the encoding).
+    #[test]
+    fn a_navigator_writes_its_faces_after_the_move() {
+        let tower = navigated(true, ContactLaw::Rectifying);
+        let twin = rotor_on(tiny_shaped(2, 7, true, true, true, ContactLaw::Rectifying));
+        let nav = tower.navigator().expect("navigator").clone();
+        let (mut s, mut t) = (tower.rest(), twin.rest());
+        for &u in &[0usize, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1] {
+            tower.advance(&mut s, u).expect("advance");
+            twin.advance(&mut t, u).expect("advance");
+            let faces = nav.faces(&s.navigator).expect("faces");
+            assert_eq!(s.modes[0][3..7], faces[..], "class {u}");
+            assert_eq!(s.modes[0][..3], t.modes[0][..3], "class {u}");
+            for &(re, im) in &faces {
+                let norm = i128::from(re) * i128::from(re) + i128::from(im) * i128::from(im);
+                assert!((norm - (1i128 << (2 * STATE_BITS))).abs() <= 1i128 << (STATE_BITS + 2), "{re} {im}");
+            }
+        }
+        // `1 2 + 2 1 = 1 2 + 1 = = 2`: the last fold was `=`'s, so the hand is minus one.
+        assert_eq!(s.navigator_hand, 10);
+    }
+
+    #[test]
+    fn a_navigator_tower_restores_exactly() {
+        let tower = navigated(true, ContactLaw::Rectifying);
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let learner = TowerLearner::new(tower.clone(), 7);
+        assert_eq!(TowerLearner::from_text(&learner.to_text()).expect("restored").tower, tower);
+        // A navigator with no digit and no hand, an empty word among its words.
+        let mut plain = tiny_shaped(2, 4, false, false, false, ContactLaw::Rectifying);
+        let words = vec![Vec::new(), b"a".to_vec(), b"bc".to_vec(), vec![0, 255]];
+        plain.join_navigator(Navigator::new(&plain.declaration, 1, 0, 7, 2, 0, Vec::new(), Vec::new(), words).expect("navigator")).expect("joined");
+        assert_eq!(Tower::from_text(&plain.to_text()).expect("restored"), plain);
+        // The text of another tower's navigator, or a hand that is not a unit.
+        let text = tower.to_text().replace("navigator 2 4 7 ", "navigator 2 4 6 ");
+        assert!(Tower::from_text(&text).is_err());
+        let text = tower.to_text().replace("navigator-hands 43:1 ", "navigator-hands 43:0 ");
+        assert!(Tower::from_text(&text).is_err());
+    }
+
+    /// The navigator refuses what it does not carry: a second navigator, a rotor reaching its
+    /// modes, modes past the level, a step at its width, bytes out of order or in both tables, a
+    /// turn at its modulus, a hand that is not a unit, a credited opening, the credit, and the
+    /// input covectors' reading.
+    #[test]
+    fn a_navigator_refuses_what_it_does_not_carry() {
+        let mut tower = navigated(false, ContactLaw::Rectifying);
+        let d = tower.declaration;
+        assert!(tower.join_navigator(tiny_navigator(&d, 3)).is_err());
+        let mut early = rotor_on(tiny_shaped(2, 7, false, false, false, ContactLaw::Rectifying));
+        assert!(early.join_navigator(tiny_navigator(&d, 2)).is_err());
+        let mut late = tiny_shaped(2, 7, false, false, false, ContactLaw::Rectifying);
+        late.join_navigator(tiny_navigator(&d, 2)).expect("joined");
+        let (steps, turns) = tiny_keys();
+        assert!(late.join_rotor(Rotor::new(&d, TINY_RINGS.to_vec(), steps, turns).expect("rotor")).is_err());
+        let words = || vec![b"1".to_vec(), b"2".to_vec(), b"+".to_vec(), b"=".to_vec()];
+        let digits = || tenfold_digits(11, 2);
+        let refused = |level: usize, first: usize, q: u32, w: usize, s: usize, digits: Vec<(u8, Vec<u32>)>, hands: Vec<(u8, u32)>| Navigator::new(&d, level, first, q, w, s, digits, hands, words()).is_err();
+        assert!(refused(2, 0, 11, 2, 1, digits(), Vec::new()));
+        assert!(refused(0, 4, 11, 2, 1, digits(), Vec::new()));
+        assert!(refused(0, 0, 11, 2, 2, digits(), Vec::new()));
+        assert!(refused(0, 0, 1, 2, 1, Vec::new(), Vec::new()));
+        assert!(refused(0, 0, 11, 2, 1, digits().into_iter().rev().collect(), Vec::new()));
+        assert!(refused(0, 0, 11, 2, 1, digits(), vec![(b'1', 1)]));
+        assert!(refused(0, 0, 11, 2, 1, vec![(b'1', vec![1, 11])], Vec::new()));
+        assert!(refused(0, 0, 22, 2, 1, Vec::new(), vec![(b'+', 2)]));
+        assert!(Navigator::new(&d, 0, 0, 11, 2, 1, digits(), Vec::new(), words()[1..].to_vec()).is_err());
+        let opening = tower.rest_with_credit();
+        let mut s = opening.clone();
+        let classes = [0usize, 1, 2, 3];
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
+        tower.rotor = None;
+        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
+        let mut credit = opening.credit.clone().expect("credit");
+        assert!(tower.advance_credit(&mut credit, &opening, &cells, &tower.reaches()).is_err());
+        assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
+        // A stream rested before the join carries no residues.
+        let bare = tiny_shaped(2, 7, false, false, false, ContactLaw::Rectifying);
+        assert!(tower.advance(&mut bare.rest(), 0).is_err());
+    }
+
+    /// The navigator's modes carry no covector, and the covectors of everything that reads them
+    /// match the code difference: on the ungated rotor tower over the pumped passage of 37 classes,
+    /// read through pair contacts, which have no kink, at steps of `2^(−11)` units. Measured
+    /// October 26: through rectifying contacts the faces at amplitude one hold the reads where a
+    /// step of either level's moves, or of the second level's read, crosses a contact's kink
+    /// somewhere on the passage (every family read there matched, 17 of 23 were read); through
+    /// pair contacts at `2^(−10)` the second level's move fitted 13% off its covector with the
+    /// navigator and its twin without one failed alike at `2^(−9)` and `2^(−10)`, while both read
+    /// within the tenth at `2^(−11)` (the pair contact's release, not the navigator).
+    #[test]
+    fn the_navigator_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(navigated(false, ContactLaw::Pair), false, &classes, 11);
+    }
+
+    /// The pumped rotor tower with the navigator, read at steps of `2^(−8)` units as the pumped rotor
+    /// tower is.
+    #[test]
+    fn the_pumped_navigator_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(navigated(true, ContactLaw::Rectifying), true, &classes, 8);
     }
 
     #[test]
