@@ -38,6 +38,9 @@ namespace Holonics.Mathematics.ColourScope
 open ArithmeticFunction Finset Polynomial Complex
 open scoped ArithmeticFunction.Moebius
 
+-- `CyclotomicField n ℚ` carries two `ℚ`-algebra instances (its own and `DivisionRing.toRatAlgebra`);
+-- Mathlib unifies them under this option (`NumberField/Cyclotomic/Basic`).
+set_option backward.isDefEq.respectTransparency false in
 /-- [proved-standard; formal-checked] **No colour is intrinsic.** For every unit `j` mod `n`, an
 automorphism of the cyclotomic field carries the chosen primitive colour to its `j`-th power. -/
 theorem no_intrinsic_colour (n : ℕ) [NeZero n] (j : (ZMod n)ˣ) :
@@ -98,6 +101,7 @@ noncomputable def colour12 : ℂ := exp (↑(Real.pi / 6) * I)
 /-- [proved-standard; formal-checked] It is a primitive twelfth root of unity. -/
 theorem colour12_primitive : IsPrimitiveRoot colour12 12 := by
   have h := Complex.isPrimitiveRoot_exp 12 (by norm_num)
+  rw [colour12]
   convert h using 2
   push_cast
   ring

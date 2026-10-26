@@ -39,14 +39,14 @@ section Involutions
 variable {G : Type*} [Group G]
 
 /-- The turn part: `i ↦ tⁱ` on `ZMod (orderOf t)`, read through an integer representative. -/
-def turnPow (t : G) (i : ZMod (orderOf t)) : G := t ^ (i.cast : ℤ)
+noncomputable def turnPow (t : G) (i : ZMod (orderOf t)) : G := t ^ (i.cast : ℤ)
 
 /-- [proved-standard; formal-checked] `turnPow` agrees with the integer power. -/
 theorem turnPow_intCast (t : G) (k : ℤ) : turnPow t (k : ZMod (orderOf t)) = t ^ k := by
   rw [turnPow, zpow_eq_zpow_iff_modEq, ← ZMod.intCast_eq_intCast_iff, ZMod.intCast_zmod_cast]
 
 /-- The candidate map from `DihedralGroup (orderOf (a b))` to `G`. -/
-def dihedralToGroup (a b : G) : DihedralGroup (orderOf (a * b)) → G
+noncomputable def dihedralToGroup (a b : G) : DihedralGroup (orderOf (a * b)) → G
   | .r i => turnPow (a * b) i
   | .sr i => a * turnPow (a * b) i
 
@@ -59,10 +59,10 @@ theorem conj_pow_of_involutions {a b : G} (ha : a * a = 1) (hb : b * b = 1) (k :
     rw [mul_inv_rev, ha', hb', ← mul_assoc, ha, one_mul]
   calc a * (a * b) ^ k * a = a * (a * b) ^ k * a⁻¹ := by rw [ha']
     _ = (a * (a * b) * a⁻¹) ^ k := (conj_zpow).symm
-    _ = (a * b) ^ (-k) := by rw [hconj, inv_zpow', ]
+    _ = (a * b) ^ (-k) := by rw [hconj, inv_zpow']
 
 /-- [proved-standard; formal-checked] **The dihedral homomorphism of two involutions.** -/
-def dihedralHom {a b : G} (ha : a * a = 1) (hb : b * b = 1) :
+noncomputable def dihedralHom {a b : G} (ha : a * a = 1) (hb : b * b = 1) :
     DihedralGroup (orderOf (a * b)) →* G where
   toFun := dihedralToGroup a b
   map_one' := by
@@ -70,24 +70,28 @@ def dihedralHom {a b : G} (ha : a * a = 1) (hb : b * b = 1) :
     rw [show (0 : ZMod (orderOf (a * b))) = ((0 : ℤ) : ZMod _) by simp, turnPow_intCast,
       zpow_zero]
   map_mul' := by
+    -- `a` carries `tᵏ` past itself as `t⁻ᵏ`.
+    have key : ∀ k : ℤ, (a * b) ^ k * a = a * (a * b) ^ (-k) := fun k => by
+      rw [← conj_pow_of_involutions ha hb k]
+      simp only [← mul_assoc, ha, one_mul]
     rintro (i | i) (j | j) <;>
       obtain ⟨x, rfl⟩ := ZMod.intCast_surjective i <;>
       obtain ⟨y, rfl⟩ := ZMod.intCast_surjective j <;>
       simp only [DihedralGroup.r_mul_r, DihedralGroup.r_mul_sr, DihedralGroup.sr_mul_r,
         DihedralGroup.sr_mul_sr, dihedralToGroup, ← Int.cast_add, ← Int.cast_sub,
-        turnPow_intCast, zpow_add, zpow_sub]
-    · group
+        turnPow_intCast] <;>
+      try simp only [mul_assoc]
+    · rw [zpow_add]
     · -- tˣ · a tʸ = a t^(y − x)
-      have h := conj_pow_of_involutions ha hb x
-      calc (a * b) ^ x * (a * (a * b) ^ y)
-          = a * (a * (a * b) ^ x * a) * (a * b) ^ y := by
-            rw [← mul_assoc a a, ha, one_mul]; group
-        _ = a * ((a * b) ^ y * ((a * b) ^ x)⁻¹) := by rw [h, zpow_neg]; group
-    · group
-    · have h := conj_pow_of_involutions ha hb x
-      calc a * (a * b) ^ x * (a * (a * b) ^ y)
-          = (a * (a * b) ^ x * a) * (a * b) ^ y := by group
-        _ = (a * b) ^ y * ((a * b) ^ x)⁻¹ := by rw [h, zpow_neg]; group
+      calc a * (a * b) ^ (y - x) = a * ((a * b) ^ (-x) * (a * b) ^ y) := by
+            rw [← zpow_add, neg_add_eq_sub]
+        _ = (a * b) ^ x * (a * (a * b) ^ y) := by rw [← mul_assoc, ← key, mul_assoc]
+    · rw [zpow_add]
+    · -- a tˣ · a tʸ = t^(y − x)
+      calc (a * b) ^ (y - x) = (a * b) ^ (-x) * (a * b) ^ y := by rw [← zpow_add, neg_add_eq_sub]
+        _ = a * (a * ((a * b) ^ (-x) * (a * b) ^ y)) := by rw [← mul_assoc a a, ha, one_mul]
+        _ = a * ((a * b) ^ x * (a * (a * b) ^ y)) := by
+            rw [← mul_assoc a ((a * b) ^ (-x)), ← key, mul_assoc]
 
 /-- [proved-standard; formal-checked] **Two involutions make the dihedral group.** For
 involutions `a ≠ b`, both `≠ 1`, the homomorphism is injective and its image is `⟨a, b⟩`. -/
@@ -101,8 +105,10 @@ theorem two_involutions_dihedral {a b : G} (ha : a * a = 1) (hb : b * b = 1) (ha
   have hnot : ∀ k : ℤ, a ≠ t ^ k := by
     intro k hk
     have hcomm : a * t * a = t := by
-      rw [hk, ← zpow_add_one, ← zpow_one_add, mul_assoc, ← zpow_add, ← zpow_add]
-      ring_nf
+      have hta : t * a = a * t := by
+        rw [hk]
+        exact (Commute.self_zpow t k).eq
+      rw [mul_assoc, hta, ← mul_assoc, ha, one_mul]
     have hinv := conj_pow_of_involutions ha hb 1
     rw [zpow_one, ← ht, hcomm] at hinv
     -- `t = t⁻¹`, so `t * t = 1`
@@ -120,9 +126,9 @@ theorem two_involutions_dihedral {a b : G} (ha : a * a = 1) (hb : b * b = 1) (ha
       have hk' : a = 1 ∨ a = t := by
         rcases Int.emod_two_eq_zero_or_one k with h0 | h0
         · left
-          rw [hk, ← Int.ediv_add_emod k 2, h0, add_zero, zpow_mul, zpow_two, htt, one_zpow]
+          rw [hk, ← Int.mul_ediv_add_emod k 2, h0, add_zero, zpow_mul, zpow_two, htt, one_zpow]
         · right
-          rw [hk, ← Int.ediv_add_emod k 2, h0, zpow_add, zpow_mul, zpow_two, htt, one_zpow,
+          rw [hk, ← Int.mul_ediv_add_emod k 2, h0, zpow_add, zpow_mul, zpow_two, htt, one_zpow,
             one_mul, zpow_one]
       rcases hk' with h | h
       · exact absurd h ha1
@@ -138,8 +144,10 @@ theorem two_involutions_dihedral {a b : G} (ha : a * a = 1) (hb : b * b = 1) (ha
     · congr 1
       rw [ZMod.intCast_eq_intCast_iff, ← zpow_eq_zpow_iff_modEq]
       exact hij
-    · exact absurd (by rw [hij]; group : a = t ^ (x - y)) (hnot _)
-    · exact absurd (by rw [← hij]; group : a = t ^ (y - x)) (hnot _)
+    · rw [← ht] at hij
+      exact absurd (by rw [zpow_sub, hij, mul_inv_cancel_right] : a = t ^ (x - y)) (hnot _)
+    · rw [← ht] at hij
+      exact absurd (by rw [zpow_sub, ← hij, mul_inv_cancel_right] : a = t ^ (y - x)) (hnot _)
     · congr 1
       rw [ZMod.intCast_eq_intCast_iff, ← zpow_eq_zpow_iff_modEq]
       exact mul_left_cancel hij
@@ -153,14 +161,12 @@ theorem two_involutions_dihedral {a b : G} (ha : a * a = 1) (hb : b * b = 1) (ha
       · exact Subgroup.mul_mem _ (Subgroup.subset_closure (by simp))
           (Subgroup.zpow_mem _ (Subgroup.mul_mem _ (Subgroup.subset_closure (by simp))
             (Subgroup.subset_closure (by simp))) x)
-    · rw [Subgroup.closure_le]
-      rintro g (rfl | rfl)
-      · refine ⟨.sr 0, ?_⟩
-        simp only [dihedralHom, MonoidHom.coe_mk, OneHom.coe_mk, dihedralToGroup]
+    · rw [Subgroup.closure_le, Set.insert_subset_iff, Set.singleton_subset_iff]
+      refine ⟨⟨.sr 0, ?_⟩, ⟨.sr 1, ?_⟩⟩
+      · simp only [dihedralHom, MonoidHom.coe_mk, OneHom.coe_mk, dihedralToGroup]
         rw [show (0 : ZMod (orderOf (a * b))) = ((0 : ℤ) : ZMod _) by simp, turnPow_intCast,
           zpow_zero, mul_one]
-      · refine ⟨.sr 1, ?_⟩
-        simp only [dihedralHom, MonoidHom.coe_mk, OneHom.coe_mk, dihedralToGroup]
+      · simp only [dihedralHom, MonoidHom.coe_mk, OneHom.coe_mk, dihedralToGroup]
         rw [show (1 : ZMod (orderOf (a * b))) = ((1 : ℤ) : ZMod _) by simp, turnPow_intCast,
           zpow_one, ← mul_assoc, ha, one_mul]
 
@@ -211,7 +217,7 @@ theorem turnMat_mul_inverse {a b : R} (hab : a ^ 2 + b ^ 2 = 1) :
     turnMat a b * turnMat a (-b) = 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [turnMat, Matrix.mul_apply, Fin.sum_univ_two] <;>
-    linear_combination hab
+    first | linear_combination hab | linear_combination
 
 /-- [proved-standard; formal-checked] **The mirrors are conjugate by turns:** the turn `(a, b)`
 carries the mirror `(1, 0)` to the mirror `(a² − b², 2ab)`. -/
