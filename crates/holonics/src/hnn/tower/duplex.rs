@@ -357,11 +357,11 @@ impl Duplex {
         let inputs: Vec<&[i32]> = strands.meetings.iter().map(|m| m.input.as_slice()).collect();
         outer_sum(&mut gm[l.readout..l.readout_bias], f, &dzs, &conducts)?;
         outer_sum(&mut gm[l.contact..l.contact_bias], 2 * w, &das, &inputs)?;
-        let mut gf = self.forward.reverse_joined(open, &strands.forward, classes, Some(&joined_f), None, None)?.0;
+        let mut gf = self.forward.reverse_joined(open, &strands.forward, classes, Some(&joined_f), None, None, None)?.0;
         let tops_f: Vec<&[i32]> = (1..t).map(|p| strands.forward[p - 1].top.as_slice()).collect();
         outer_sum(&mut gf[fo..fo + a * w], w, &dzs, &tops_f)?;
         let backward: Vec<usize> = classes.iter().rev().copied().collect();
-        let mut gr = self.reverse.reverse_joined(&self.reverse.rest(), &strands.reverse, &backward, Some(&joined_r), None, None)?.0;
+        let mut gr = self.reverse.reverse_joined(&self.reverse.rest(), &strands.reverse, &backward, Some(&joined_r), None, None, None)?.0;
         let tops_r: Vec<&[i32]> = (1..t).map(|p| strands.reverse[t - 1 - p].top.as_slice()).collect();
         outer_sum(&mut gr[ro..ro + a * w], w, &dzs, &tops_r)?;
         for dz in &dzs {

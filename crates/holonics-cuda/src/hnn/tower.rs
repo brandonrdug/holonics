@@ -309,6 +309,9 @@ impl<'c> TowerCard<'c> {
         if law.bank {
             return refuse("the card carries no binding bank: the bank's chunk form is owed");
         }
+        if law.clock {
+            return refuse("the card carries no reset clock");
+        }
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
@@ -568,7 +571,7 @@ impl<'c> TowerCard<'c> {
         if streams == 0 || cells == 0 || classes.iter().any(|c| c.len() != cells + 1) || targets.len() != streams || targets.iter().any(|t| t.len() != cells) {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
-        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.bank.is_some() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
+        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.bank.is_some() || !o.held.is_empty() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
             return Err(TowerError::Refused("the card opens on uncredited states of the declared bank"));
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells };

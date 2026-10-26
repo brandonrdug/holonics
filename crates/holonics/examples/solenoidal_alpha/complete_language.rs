@@ -829,6 +829,7 @@ pub(super) fn run_with_execution(
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
         Some("found-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::found(args),
         Some("join-tower-bank") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::join(args),
+        Some("found-tower-clock") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::found_clock(args),
         Some("train-sections-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_bank::train(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
