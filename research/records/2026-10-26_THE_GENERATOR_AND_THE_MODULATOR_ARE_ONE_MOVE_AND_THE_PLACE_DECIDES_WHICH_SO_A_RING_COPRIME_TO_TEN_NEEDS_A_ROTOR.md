@@ -447,8 +447,14 @@ G_h(t)         = (Cᵀδr)⁻ + P^(−σ_(t+1)) (conj(λ_(t+1)) ⊙ G_h(t+1))
   The Fourier form of §8 stays as a foil.
 - [checked] **Passivity.** A permutation hands each mode exactly one mode's state, so the tower's
   bound `|h| ≤ √((1 + ρ_max)/(1 − ρ_max))·max|Bx|` holds unchanged, because
-  `ρK + √(1 − ρ²) ≤ K(ρ_max)` for every `ρ ≤ ρ_max`. The relaxed Fourier step mixes modes and keeps
-  only the ring's ℓ² norm, which needs a carrier `2^6.5` times wider.
+  `ρK + √(1 − ρ²) ≤ K(ρ_max)` for every `ρ ≤ ρ_max`.
+- [agent-inferred; corrected on review, the arithmetic checked in part K of the
+  [Galois-gap receipt](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE_receipts/RUN.md)]
+  **The relaxed Fourier step.** It mixes modes, so a mode's input no longer meets its own `λ`, and
+  only the ring's ℓ² norm is kept. The triangle inequality then certifies
+  `‖h‖₂ ≤ ‖Bx‖₂/(1 − ρ_max) ≤ 2·2^12·max|Bx| = 2^13·max|Bx|` on a ring of four. That is about `2^6.5`
+  times the per-mode bound `√(2^13 − 1)·max|Bx|` at `ρ_max = 1 − 2^−12`. It is a certified bound,
+  not a shown need: no sharper bound for the Fourier step is derived.
 - [checked] **What a ring holds.** A ring of `K` modes stepped once a digit holds `n` mod every
   divisor of `10^K − 1`:
   - four modes hold `9999 = 3²·11·101`;
