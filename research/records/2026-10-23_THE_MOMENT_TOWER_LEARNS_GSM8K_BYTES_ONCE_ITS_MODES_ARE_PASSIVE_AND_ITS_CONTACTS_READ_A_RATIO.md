@@ -309,7 +309,8 @@ tower the samples open on the same bytes (the same keys) and part at byte 78 (on
 **Release by agreement.** The samples above draw each class from the face itself. The samplers now
 take a declared number `k` of agreeing draws: the class falls where `k` independent draws from one
 face agree, so it is drawn from `p_i^k / Σ_j p_j^k`, exactly and with one key a class
-(`agreement_face`; atlas `receiver.agreement-release`). At `k = 2` (the collision face) the same
+(`agreement_face`; atlas `receiver.agreement-release`; formal-checked over any field in
+[`HNN/AgreementRelease`](../../lean/HolonicsResearch/HNN/AgreementRelease.lean), `agreement_release`). At `k = 2` (the collision face) the same
 learned faces release mostly words. A greedy left-to-right search of each sample against the
 training text finds no copied run longer than 26 bytes (`the total number of the`).
 

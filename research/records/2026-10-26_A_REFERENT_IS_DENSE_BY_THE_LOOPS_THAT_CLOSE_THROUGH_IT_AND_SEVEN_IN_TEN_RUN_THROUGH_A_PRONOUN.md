@@ -214,8 +214,10 @@ through one region are linked to each other through it.
 - The law: `1/h′ = 1/h + 1`, and `vᵀw′ − vᵀw = (m/(M + m))(y − vᵀw)` with `m = 1`, `M = 1/h`.
 - After `k` identified returns from an opening of mass 1, `M = k` and the next return's share is
   `1/(k + 1)`.
-- [proved-derived] The region is the running mean of its returns: `w_k = w_(k−1) + (y_k − w_(k−1))/k`
-  sums to `w_k = (1/k) Σ_(j≤k) y_j`.
+- [proved-derived; formal-checked] The region is the running mean of its returns:
+  `w_k = w_(k−1) + (y_k − w_(k−1))/k` sums to `w_k = (1/k) Σ_(j≤k) y_j`, and after `k` returns from an
+  opening of mass 1, `1/h_k = k + 1` ([`HNN/ReferentMass`](../../lean/HolonicsResearch/HNN/ReferentMass.lean):
+  `inverse_mass_after`, `mass_from_opening`, `running_mean`, `pull_toward_region`).
 - [interpretation] A dense region bends the next crossing toward itself by `M/(M + 1)`. This is the
   fabric's curvature: a heavy region bends a later path onto itself, and it stores nothing to do so.
 - A crossing that is not identified lies outside the span: share 1, no mass, a new region. In the

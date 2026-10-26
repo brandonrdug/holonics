@@ -1252,7 +1252,7 @@ cell and level the frozen tower gives the modes' stored energy before the class 
 (`carried = Σ_k |α_t h_k + β_t h̄_k|²`) and the energy after the push (`after`), exact on `2^(−48)`,
 beside the read's scale, the contacts' reach and the cell's code. `lost = before − carried` is what
 the level dissipates at the tick (nonnegative: `|α_t| + |β_t| = ρ_t < 1`, the pumped mode's norm
-identity, owed in Lean in #410), `push = after − carried` the power the arriving class brings, and
+identity, formal-checked in `HNN/PassiveMode`: `pumped_norm_le`, `pumped_carried_le`), `push = after − carried` the power the arriving class brings, and
 `dE = after − before = push − lost`. The test `the_circuit_readings_energies_are_the_forwards`
 checks the energies and the code against the forward on the pumped pair-contact fixture and the
 ungated one.
@@ -3530,7 +3530,12 @@ unchanged. A reflection between restarts then reverses exactly the turns met bet
 is the mathematics thread's composition of two reflections into a turn
 ([its §11](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md#11-with-the-hand-reversible-a-reflection-at--reads-every-difference-and-with-a-restart-at--one-key-reads-sums-and-differences)).
 The library's tests check the hand against a replica of the read, the covector against the code
-difference with reflections and with restarts at every class, and the face's text.
+difference with reflections and with restarts at every class, and the face's text. The hand's law is
+formal-checked (October 26, [`HNN/RingHand`](../../lean/HolonicsResearch/HNN/RingHand.lean)): the
+move's matrix is `ring_carry` and its transpose `ring_carry_adjoint` (`handMatrix_mulVec`,
+`transpose_handMatrix`), its determinant is `|λ|² − |β|²` (`det_handMatrix`), the re-basing is an
+involution whose covector is `(g_x, −g_y)` (`flipY_mul_self`, `flipY_adjoint`), and the hand that
+`hand_after` reaches from rest makes `o · ∏ det M_i > 0` (`hand_from_rest_reads_positive`).
 
 **The closure locates the reflector and the restart.** Each origin is solved with no reflector and
 with each other class as the reflector; each closure row counts every pair with the hand in force
