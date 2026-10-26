@@ -48,8 +48,8 @@ use super::tower_train::{count, per, positive, STATE_BUDGET};
 use super::*;
 use holonics::hnn::tower::bank::BankDeclaration;
 use holonics::hnn::tower::clock::{ClockDrop, ClockPool};
-use holonics::hnn::tower::realization::HostPass;
-use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, FIRST_RATE, READ_BITS};
+use holonics::hnn::tower::realization::{HostPass, PassRead, PassRealization, Slot};
+use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, FIRST_RATE, READ_BITS};
 use holonics::hnn::units::Units;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
@@ -721,16 +721,64 @@ fn name_shares(step: &[Vec<i128>; 2], toward: &PlaceSums, alphabet: usize, width
 }
 
 /// [agent-inferred, October 26; record
+/// `2026-10-26_THE_REPLAY_STOPPED_AT_ITS_FIRST_WINDOW_SO_IT_READS_THE_SECTIONS_OWN_OPENING_READ.md`
+/// §2] **The host's pass with its opening read summed by place.** Each section's forward, reverse and
+/// carry are the host's ([`HostPass`]); after the opening forward its cells are handed out
+/// (`HostPass::read_opened`) and summed into each stream's [`PlaceSums`] by [`add_cell`], `starts[s]`
+/// the stream's first class in the text. The sums are of the very cells the reverse reads, and no
+/// second forward is taken.
+struct PlacedPass<'a> {
+    host: HostPass,
+    placing: &'a Placing,
+    classes: &'a [usize],
+    starts: Vec<usize>,
+    sums: Vec<PlaceSums>,
+    opened: usize,
+    read: std::time::Duration,
+}
+
+impl PassRealization for PlacedPass<'_> {
+    fn realization(&self) -> String {
+        format!("{}, its opening read summed by place", self.host.realization())
+    }
+
+    fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> std::result::Result<PassRead, TowerError> {
+        let read = self.host.forward(tower, opening, classes, targets, slot)?;
+        if slot == Slot::Opened {
+            let began = Instant::now();
+            let (placing, text) = (self.placing, self.classes);
+            let mut sinks: Vec<(&mut PlaceSums, usize)> = self.sums.iter_mut().zip(self.starts.iter().copied()).collect();
+            self.host.read_opened(&mut sinks, |(sums, start), i, face, held, top| {
+                add_cell(sums, placing, placing.places[*start + i + 1], text[*start + i + 1], face, held, top);
+                Ok(())
+            })?;
+            self.opened += 1;
+            self.read += began.elapsed();
+        }
+        Ok(read)
+    }
+
+    fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> std::result::Result<Vec<i128>, TowerError> {
+        self.host.reverse(tower, opening, classes, compared)
+    }
+
+    fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> std::result::Result<(), TowerError> {
+        self.host.carry(tower, states, opening, slot)
+    }
+}
+
+/// [agent-inferred, October 26; record
 /// `2026-10-26_THE_SUMMED_COVECTOR_DOES_NOT_READ_THE_PASS_SO_THE_PASS_IS_REPLAYED_SECTION_BY_SECTION.md`
 /// §3] **One training pass replayed section by section, with each place's share of its step.** The
 /// learner of `STATE` takes one pass over `TEXT` in the training pass's own partition (`STREAMS`
 /// streams from rest, `(chunk − 1) / SECTION` sections, `TowerLearner::section_realized` on the
 /// host, as `train-unit-tower` takes it), and the end state's SHA-256 is compared with `EXPECT_SHA`.
-/// Before each section the streams' carried states read the section at the present material, and
-/// every cell's covector on the clocks' copies and the readout is summed by its group (the eight of
-/// [`read_clock_covectors`]). The groups' sum must be the section's own covector: the first moment it
-/// moves to (`TowerLearner::first_after`) is checked against the moment the section leaves, and a
-/// difference refuses. The first moment is linear in the sections' covectors, so it splits into
+/// The section's own opening read is summed by place as the section takes it ([`PlacedPass`]): every
+/// cell's covector on the clocks' copies and the readout is summed by its group (the eight of
+/// [`read_clock_covectors`]), from the very cells the section's reverse reads, with no second
+/// forward. The groups' sum must be the section's own covector: the first moment it moves to from
+/// the moment the section opened with (`TowerLearner::first_after`) is checked against the moment
+/// the section leaves, and a difference refuses. The first moment is linear in the sections' covectors, so it splits into
 /// parts carried `2^(−FINE)` finer: each group's, moved toward the group's covector at the first
 /// moment's rate, and the moment the pass opened with, decaying at that rate. Each part's share of a
 /// section's step is the deposit's step of its moment at the section's second moments
@@ -792,40 +840,47 @@ pub(super) fn replay_clock_pass(args: &[String]) -> Result<()> {
     let mut shares: Vec<[Vec<i128>; 2]> = (0..10).map(|_| zeros()).collect();
     let mut path = zeros();
     let mut states: Vec<TowerState> = (0..streams).map(|_| learner.tower.rest()).collect();
-    let mut stream_sums: Vec<PlaceSums> = (0..streams).map(|_| PlaceSums::new(lens[0], lens[1])).collect();
-    let (mut deposits, mut halvings, mut cells, mut read_ms) = (0usize, 0u32, [0u64; 8], 0u128);
+    let mut pass = PlacedPass {
+        host: HostPass::default(),
+        placing: &placing,
+        classes: &classes,
+        starts: vec![0; streams],
+        sums: (0..streams).map(|_| PlaceSums::new(lens[0], lens[1])).collect(),
+        opened: 0,
+        read: std::time::Duration::ZERO,
+    };
+    if !learner.opened() {
+        return Err("a replay reads a learner whose moments are opened".into());
+    }
+    let (mut deposits, mut halvings, mut cells) = (0usize, 0u32, [0u64; 8]);
     const SPAN: usize = 4096;
     for k in 0..sections {
         let ranges: Vec<std::ops::Range<usize>> = (0..streams).map(|s| s * chunk + k * section..s * chunk + (k + 1) * section + 1).collect();
         let parts: Vec<&[usize]> = ranges.iter().map(|r| &classes[r.clone()]).collect();
-        let read_started = Instant::now();
-        let tower = &learner.tower;
-        stream_sums
-            .par_iter_mut()
-            .zip(states.par_iter())
-            .zip(ranges.par_iter())
-            .try_for_each(|((sums, opening), r)| {
-                sums.clear();
-                let part = &classes[r.clone()];
-                tower
-                    .read_clocks(&mut opening.clone(), part, |i, face, held, _, top| {
-                        add_cell(sums, &placing, placing.places[r.start + i + 1], part[i + 1], face, held, top);
-                        Ok(())
-                    })
-                    .map_err(|e| e.to_string())
-            })?;
+        for (start, r) in pass.starts.iter_mut().zip(&ranges) {
+            *start = r.start;
+        }
+        pass.sums.iter_mut().for_each(PlaceSums::clear);
+        pass.opened = 0;
+        let prior: [Vec<i128>; 2] = [learner.moments().0[families[0].clone()].to_vec(), learner.moments().0[families[1].clone()].to_vec()];
+        let before: [Vec<i32>; 2] = [learner.tower.theta[families[0].clone()].to_vec(), learner.tower.theta[families[1].clone()].to_vec()];
+        let receipt = learner.section_realized(&mut states, &parts, None, &mut pass).map_err(|e| e.to_string())?;
+        if pass.opened != 1 {
+            return Err(format!("section {}: the section read its opening {} times", k + 1, pass.opened).into());
+        }
+        let stream_sums = &pass.sums;
         let groups: Vec<[Vec<i128>; 2]> = (0..8)
             .into_par_iter()
             .map(|g| {
                 let mut sum = zeros();
-                for ss in &stream_sums {
+                for ss in stream_sums {
                     sum[0].iter_mut().zip(&ss.copy[g]).for_each(|(a, b)| *a += b);
                     sum[1].iter_mut().zip(&ss.readout[g]).for_each(|(a, b)| *a += b);
                 }
                 sum
             })
             .collect();
-        for ss in &stream_sums {
+        for ss in stream_sums {
             cells.iter_mut().zip(ss.cells).for_each(|(a, b)| *a += b);
         }
         let mut whole = zeros();
@@ -834,12 +889,9 @@ pub(super) fn replay_clock_pass(args: &[String]) -> Result<()> {
                 whole[f].iter_mut().zip(&g[f]).for_each(|(a, b)| *a += b);
             }
         }
-        read_ms += read_started.elapsed().as_millis();
-        let expected = [learner.first_after(families[0].start, &whole[0]).map_err(|e| e.to_string())?, learner.first_after(families[1].start, &whole[1]).map_err(|e| e.to_string())?];
-        let before: [Vec<i32>; 2] = [learner.tower.theta[families[0].clone()].to_vec(), learner.tower.theta[families[1].clone()].to_vec()];
-        let receipt = learner.section_realized(&mut states, &parts, None, &mut HostPass::default()).map_err(|e| e.to_string())?;
         for f in 0..2 {
-            if learner.moments().0[families[f].clone()] != expected[f][..] {
+            let expected = learner.first_after(families[f].start, Some(&prior[f]), &whole[f]).map_err(|e| e.to_string())?;
+            if learner.moments().0[families[f].clone()] != expected[..] {
                 return Err(format!("section {}: the places' covector is not the section's on the {}", k + 1, ["copies", "readout"][f]).into());
             }
         }
@@ -884,7 +936,7 @@ pub(super) fn replay_clock_pass(args: &[String]) -> Result<()> {
         deposits += receipt.deposited as usize;
         halvings += receipt.halvings;
         if (k + 1) % 32 == 0 || k + 1 == sections {
-            println!("TOWER_REPLAY_SECTION section={} deposits={deposits} halvings={halvings} read_ms={read_ms} elapsed_ms={}", k + 1, started.elapsed().as_millis());
+            println!("TOWER_REPLAY_SECTION section={} deposits={deposits} halvings={halvings} read_ms={} elapsed_ms={}", k + 1, pass.read.as_millis(), started.elapsed().as_millis());
         }
     }
     let state = learner.to_text();
@@ -948,9 +1000,10 @@ pub(super) fn replay_clock_pass(args: &[String]) -> Result<()> {
         );
     }
     println!(
-        "TOWER_REPLAY clocks={} streams={streams} section={section} sections={sections} cells={} deposits={deposits} halvings={halvings} read_ms={read_ms} elapsed_ms={}",
+        "TOWER_REPLAY clocks={} streams={streams} section={section} sections={sections} cells={} deposits={deposits} halvings={halvings} read_ms={} elapsed_ms={}",
         clock.classes.len(),
         cells.iter().sum::<u64>(),
+        pass.read.as_millis(),
         started.elapsed().as_millis()
     );
     Ok(())

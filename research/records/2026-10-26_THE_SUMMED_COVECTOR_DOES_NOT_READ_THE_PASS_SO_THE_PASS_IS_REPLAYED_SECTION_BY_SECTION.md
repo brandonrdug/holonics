@@ -137,6 +137,10 @@ the second moments or the opening moment, whose shares the part lines give.
 `lapD8/STATE` stays the state the role and John are read from, and no lap is taken until the read
 decides.
 
+The run on the PC stopped at its first 32-section window, and the replay now reads each section's
+own opening read; its run is fixed in the
+[next record](2026-10-26_THE_REPLAY_STOPPED_AT_ITS_FIRST_WINDOW_SO_IT_READS_THE_SECTIONS_OWN_OPENING_READ.md).
+
 ## 5. The recorded failures this loop could repeat
 
 - **A located cause carried unrepaired into a new consumer.** The summed reading failed its gate, so
