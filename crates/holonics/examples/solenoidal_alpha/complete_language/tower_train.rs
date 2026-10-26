@@ -163,6 +163,123 @@ pub(super) fn read_tower_held_cells(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [agent-inferred, October 26] `read-tower-bank-trace STATE STATE_SHA TEXT TEXT_SHA STREAMS REQUESTS
+/// REQUESTS_SHA OUT [UNITS UNITS_SHA]`: the bank's address trace (spec 2's trace (b),
+/// `holonics::hnn::tower::bank::BankTrace`) at the reads an observer requests, over `held_out`'s
+/// partition of `TEXT` (each chunk from rest), written to `OUT` (create-new). A unit tower reads
+/// `TEXT` in the founded `UNITS`.
+///
+/// `REQUESTS` holds one request a line, two byte places in `TEXT`: the read's `p` (the read at the
+/// cell whose next class holds byte `p`) and a window's start `f`. For each request read inside its
+/// chunk, `OUT` holds `R p read_place window_place nonzero largest_address largest_share`: the first
+/// bytes of the class the read faces and of the class holding byte `f`, how many kept cells' addresses
+/// are nonzero at the address's grain, and the
+/// arrival place (its first byte) of the cell whose address `|a|²` is largest and of the cell whose
+/// share `|a|² ‖w‖²` is largest (on a tie, the later cell). Then `A p place a_re a_im w2` for every
+/// cell whose arrival lies at or after the class holding byte `f`: its address on `2^(−30)` and
+/// `‖w_τ‖²` on `2^(−48)`. A request whose read falls on a chunk's first class (read by no cell of that
+/// chunk) is counted as skipped. A reading beside the code: nothing here enters the machine, and an
+/// observer sets each address beside what it knows of the cell (the question's name, the answer's
+/// opening).
+pub(super) fn read_tower_bank_trace(args: &[String]) -> Result<()> {
+    let usage = "read-tower-bank-trace STATE STATE_SHA TEXT TEXT_SHA STREAMS REQUESTS REQUESTS_SHA OUT [UNITS UNITS_SHA]";
+    let units = match args.get(9..).ok_or(usage)? {
+        [] => None,
+        [path, sha] => Some(Units::from_text(std::str::from_utf8(&pinned_read(path, sha, READ_BUDGET as usize)?)?).map_err(|e| e.to_string())?),
+        _ => return Err(usage.into()),
+    };
+    let started = Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let streams = positive(&args[5])?;
+    let requests: Vec<(usize, usize)> = std::str::from_utf8(&pinned_read(&args[6], &args[7], READ_BUDGET as usize)?)?
+        .lines()
+        .map(|line| match line.split('\t').collect::<Vec<_>>()[..] {
+            [p, f] => Ok((count(p)?, count(f)?)),
+            _ => Err("a request is two places, tab-separated".into()),
+        })
+        .collect::<Result<_>>()?;
+    let (classes, lengths): (Vec<usize>, Vec<usize>) = match &units {
+        None => (text.iter().map(|&b| b as usize).collect(), vec![1; text.len()]),
+        Some(units) => units.parse(&text).map_err(|e| e.to_string())?.into_iter().map(|u| (u as usize, units.piece(u as usize).len())).unzip(),
+    };
+    let mut places = Vec::with_capacity(lengths.len());
+    lengths.iter().fold(0usize, |at, &n| {
+        places.push(at);
+        at + n
+    });
+    // The class holding byte `p`.
+    let holding = |p: usize| -> Result<usize> {
+        if p >= text.len() {
+            return Err("a requested place outside the text".into());
+        }
+        Ok(places.partition_point(|&x| x <= p) - 1)
+    };
+    let chunk = classes.len().div_ceil(streams);
+    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
+    // Each request's read cell (the class before the one holding p) and window's first arrival.
+    let mut asked: Vec<(usize, usize, usize)> = requests.iter().map(|&(p, f)| Ok((holding(p)?, holding(f)?, p))).collect::<Result<_>>()?;
+    asked.sort_unstable();
+    let parts: Vec<(String, usize, usize, (i128, usize))> = starts
+        .par_iter()
+        .map(|&start| {
+            let end = (start + chunk).min(classes.len());
+            let mine: Vec<(usize, usize, usize)> = asked.iter().copied().filter(|&(j, _, _)| j > start && j < end).collect();
+            let skipped = asked.iter().filter(|&&(j, _, _)| j == start).count();
+            let mut state = tower.rest();
+            let mut out = String::new();
+            let mut next = 0usize;
+            let (mut read, mut hold) = (0usize, (0i128, 0usize));
+            let each = |i: usize, _: &TowerFace, trace: &holonics::hnn::tower::bank::BankTrace| -> std::result::Result<(), TowerError> {
+                hold = (trace.rho(), trace.reach());
+                while next < mine.len() && mine[next].0 == start + i + 1 {
+                    let (_, first, p) = mine[next];
+                    next += 1;
+                    read += 1;
+                    let outgrew = || TowerError::Refused("a trace's share outgrew its 128-bit carrier");
+                    let mut rows = Vec::new();
+                    let (mut largest, mut shared) = ((0i128, 0usize), (0u128, 0usize));
+                    let addresses = trace.addresses();
+                    for &(tau, (ar, ai)) in &addresses {
+                        let w2 = trace.written(tau).expect("a kept cell").iter().try_fold(0u128, |s, &(wr, wi)| {
+                            s.checked_add((wr.unsigned_abs() as u128).pow(2))?.checked_add((wi.unsigned_abs() as u128).pow(2))
+                        });
+                        let w2 = w2.ok_or_else(outgrew)?;
+                        let a2 = (ar as i128).pow(2) + (ai as i128).pow(2);
+                        // |a|² on 2^(−60) released to 2^(−30), to the nearest numerator.
+                        let share = (((a2 + (1 << 29)) >> 30) as u128).checked_mul(w2).ok_or_else(outgrew)?;
+                        let place = places[start + tau];
+                        if (a2, place) > (largest.0, largest.1) {
+                            largest = (a2, place);
+                        }
+                        if (share, place) > shared {
+                            shared = (share, place);
+                        }
+                        if start + tau >= first {
+                            rows.push(format!("A\t{p}\t{place}\t{ar}\t{ai}\t{w2}\n"));
+                        }
+                    }
+                    out.push_str(&format!("R\t{p}\t{}\t{}\t{}\t{}\t{}\n", places[start + i + 1], places[first], addresses.len(), largest.1, shared.1));
+                    rows.iter().rev().for_each(|r| out.push_str(r));
+                }
+                Ok(())
+            };
+            tower.read_bank_trace(&mut state, &classes[start..end], each).map_err(|e| e.to_string())?;
+            println!("TOWER_BANK_TRACE_CHUNK start={start} cells={} requests={read} elapsed_ms={}", end - start - 1, started.elapsed().as_millis());
+            Ok((out, read, skipped, hold))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let written: String = parts.iter().map(|p| p.0.as_str()).collect();
+    std::io::Write::write_all(&mut std::fs::OpenOptions::new().write(true).create_new(true).open(&args[8])?, written.as_bytes())?;
+    let hold = parts.first().map_or((0, 0), |p| p.3);
+    println!(
+        "TOWER_BANK_TRACE units={} streams={streams} cells={} requests={} read={} skipped={} rho={} reach={} elapsed_ms={} out={}",
+        units.as_ref().map_or(0, Units::len), classes.len(), requests.len(), parts.iter().map(|p| p.1).sum::<usize>(), parts.iter().map(|p| p.2).sum::<usize>(), hold.0, hold.1, started.elapsed().as_millis(), args[8]
+    );
+    Ok(())
+}
+
 /// [agent-inferred, October 23] The modes' faces over a text, read through a frozen tower in the
 /// held-out read's streams (`held_out`): per level and mode, `max |h|` and `Σ |h|²` over the cells;
 /// per level and region of `roles` (the region of the class the state predicts next), the cells'

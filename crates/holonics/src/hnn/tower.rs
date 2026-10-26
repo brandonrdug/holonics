@@ -195,7 +195,7 @@ pub mod realization;
 
 use realization::{HostPass, PassRealization, Slot};
 
-use bank::{BankCell, BankDeclaration, BankLayout, BankReaches, BankState};
+use bank::{BankCell, BankDeclaration, BankLayout, BankReaches, BankState, BankTrace};
 
 /// A face's grain, `2^(−16)`.
 pub const FACE_BITS: u32 = 16;
@@ -3689,6 +3689,26 @@ impl Tower {
         Ok(())
     }
 
+    /// [agent-inferred, October 26] **The bank's trace reading** (spec 2's trace (b), [`BankTrace`]):
+    /// the frozen tower reads `classes` from the state, and each cell's index, face (the masses of
+    /// the class that arrives next) and the bank's trace (the kept cells' keys and writes, and this
+    /// cell's query and read) are handed to `each`, which resolves the present read's addresses
+    /// where it asks. A reading beside the code: the tower is not moved, and the trace is the
+    /// observer's, never the machine's. Refused without a bank.
+    pub fn read_bank_trace(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, &TowerFace, &BankTrace) -> Result<()>) -> Result<()> {
+        let reaches = self.reaches();
+        let (Some(bank), Some(br)) = (self.bank.as_ref(), reaches.bank.as_ref()) else {
+            return refuse("a bank's trace needs a bank");
+        };
+        let mut trace = BankTrace::open(br, bank);
+        for i in 0..classes.len().saturating_sub(1) {
+            let cell = self.step(state, classes[i], &reaches)?;
+            trace.push(cell.bank.as_ref().ok_or(TowerError::Refused("a banked cell without its bank"))?)?;
+            each(i, &cell.face, &trace)?;
+        }
+        Ok(())
+    }
+
     /// [agent-inferred, October 24] **The circuit reading**: the frozen tower reads `classes` from
     /// the state, and each cell's [`CircuitCell`] (every level's stored, carried and pushed energy,
     /// its read's scale and its contacts' reach, and the code of the class that arrives next) is
@@ -5085,6 +5105,53 @@ mod tests {
         assert_eq!(faces(&twin, &mut a), faces(&banked, &mut b));
         // The opened bank reads: its code differs.
         assert_ne!(code(&tiny_banked(true), &classes), code(&twin, &classes));
+    }
+
+    /// The bank's addresses return its read (spec 2's trace (b)): at every cell, `Σ_τ a(τ, t) w_τ`
+    /// released to the face's `2^(−16)` is the read `O` reads to within one step, the bank's and the
+    /// address's roundings (at `ρ = 4/5` the carried `S` drifts at most `½ (1 + ρ)/(1 − ρ) = 4.5`
+    /// steps of `2^(−24)` an entry, and each address's three roundings at most `1.5 · 2^(−30) |w_τ|`),
+    /// while leaving the present cell's term out moves it by more; and the trace keeps exactly the
+    /// cells whose decay reads above zero.
+    #[test]
+    fn the_bank_trace_returns_the_read() {
+        let tower = tiny_banked(true);
+        let classes: Vec<usize> = (0..37).map(|i| [0, 2, 1, 3, 0, 1, 2, 3, 3, 0][i % 10]).collect();
+        let mut state = tower.rest();
+        let (mut cells, mut largest, mut left_out) = (0, 0i64, 0i64);
+        tower
+            .read_bank_trace(&mut state, &classes, |i, _, trace| {
+                assert_eq!(trace.cells(), i + 1);
+                let read = trace.read();
+                let dv = read.len() / 2;
+                let returned = trace.returned();
+                let present = trace.addresses().into_iter().find(|&(tau, _)| tau == i).expect("the present cell's address");
+                let w = trace.written(i).expect("the present cell is kept");
+                for c in 0..dv {
+                    let (re, im) = (release(returned[c].0 as i128, STATE_BITS - FACE_BITS) as i64, release(returned[c].1 as i128, STATE_BITS - FACE_BITS) as i64);
+                    assert!((re - read[c] as i64).abs() <= 1 && (im - read[dv + c] as i64).abs() <= 1, "cell {i} channel {c}: returned ({re}, {im}) read ({}, {})", read[c], read[dv + c]);
+                    largest = largest.max((read[c] as i64).abs()).max((read[dv + c] as i64).abs());
+                    // The present cell's term, a(t, t) w_t, on 2^(−16).
+                    let (ar, ai, wr, wi) = (present.1 .0 as i128, present.1 .1 as i128, w[c].0 as i128, w[c].1 as i128);
+                    let term = release(ar * wr - ai * wi, MOVE_BITS + STATE_BITS - FACE_BITS).abs().max(release(ar * wi + ai * wr, MOVE_BITS + STATE_BITS - FACE_BITS).abs());
+                    left_out = left_out.max(term as i64);
+                }
+                cells += 1;
+                Ok(())
+            })
+            .expect("traced");
+        assert_eq!(cells, classes.len() - 1);
+        assert!(largest > 1 << 8 && left_out > 2, "the read ({largest}) and the present term ({left_out}) stand above the check's step");
+        // The reach: ρ^reach on 2^(−62) reads above zero on 2^(−30), ρ^(reach + 1) does not.
+        let reaches = tower.reaches();
+        let trace = BankTrace::open(reaches.bank.as_ref().expect("a bank"), tower.bank().expect("a bank"));
+        let fine = trace.rho() << (62 - MOVE_BITS);
+        let mut decay = fine;
+        for _ in 1..trace.reach() {
+            decay = release(decay * fine, 62);
+        }
+        assert!(release(decay, 62 - MOVE_BITS) != 0 && release(release(decay * fine, 62), 62 - MOVE_BITS) == 0);
+        assert!(trace.reach() > classes.len() && trace.reach() < 1 << 8);
     }
 
     #[test]
