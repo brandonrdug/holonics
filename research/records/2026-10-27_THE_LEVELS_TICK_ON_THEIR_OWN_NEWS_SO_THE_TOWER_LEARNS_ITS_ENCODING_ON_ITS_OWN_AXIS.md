@@ -2,9 +2,11 @@
 
 Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Host law
 built and tested (§6.1, §7); the card carries it, its parity at the race's declaration equal (§6.2,
-§7); the measurement (§6.3) beside the plain race read through lap 12 (§8); the Lean (§6.4) in
-`HNN/NewsClock`. §8 replaces §2's move with the held step after the race measured the first law's
-two clocks: host and card built, the host tests passing and the card equal to the host. Owners: `holonics::hnn::tower` (`NewsClock`,
+§7); the measurement (§6.3) beside the plain race read to both races' ends, the news race's lap 21
+and the plain race's lap 45 (§8); the Lean (§6.4) in `HNN/NewsClock`. §8 replaces §2's move with
+the held step after the race measured the first law's two clocks: host and card built, the host
+tests passing and the card equal to the host (merged as `f2f286431`); the held step's covector Lean
+owed in #410. Owners: `holonics::hnn::tower` (`NewsClock`,
 `Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
 loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
