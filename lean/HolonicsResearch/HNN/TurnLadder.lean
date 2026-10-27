@@ -123,7 +123,6 @@ theorem scaled_eq_pow {J : ℕ} (hJ : J ≠ 0) (j m : ℕ) (hm : 1 ≤ m) :
   push_cast
   rw [pow_succ]
   field_simp
-  ring
 
 /-- [proved-derived; formal-checked] **A scaled mode never turns once around within what it
 remembers**: for `0 < j < J` and `0 < n ≤ 2^m`, `e^(iπj/(J·2^(m−1)))^n ≠ 1`. -/
@@ -133,7 +132,7 @@ theorem scaled_no_full_turn {J j m n : ℕ} (hm : 1 ≤ m) (hj : 0 < j) (hjJ : j
   have hJ : J ≠ 0 := by omega
   have hN : J * 2 ^ m ≠ 0 := mul_ne_zero hJ (pow_ne_zero _ two_ne_zero)
   have hζ := Complex.isPrimitiveRoot_exp (J * 2 ^ m) hN
-  rw [scaled_eq_pow hJ j m hm, ← pow_mul, hζ.pow_eq_one_iff_dvd]
+  rw [scaled_eq_pow hJ j m hm, ← pow_mul, ne_eq, hζ.pow_eq_one_iff_dvd]
   intro hdvd
   have hpos : 0 < j * n := Nat.mul_pos hj hn
   have hle := Nat.le_of_dvd hpos hdvd
