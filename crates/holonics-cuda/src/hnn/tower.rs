@@ -776,8 +776,9 @@ impl<'c> TowerCard<'c> {
 
     /// The groups a family's streams are split over: enough blocks to hold every multiprocessor
     /// four deep (`4·SM` over the family's tiles), at most one group a stream.
+    /// A family with no outputs (the pair face's on a tower without one) is one empty tile.
     fn groups(rows: u32, width: u32, streams: u32, multiprocessors: u32) -> u32 {
-        let tiles = width.div_ceil(OUTER_COLS) * rows.div_ceil(OUTER_ROWS);
+        let tiles = (width.div_ceil(OUTER_COLS) * rows.div_ceil(OUTER_ROWS)).max(1);
         (4 * multiprocessors).div_ceil(tiles).clamp(1, streams.max(1))
     }
 
@@ -868,5 +869,22 @@ impl PassRealization for TowerCard<'_> {
             *state = end;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A tower without a pair face sizes its group sums from the families it has: the pair face's
+    /// two families have no outputs, take one empty tile and no group sums (they once divided by
+    /// zero and refused every pairless frame before its first section).
+    #[test]
+    fn a_family_with_no_outputs_takes_no_group_sums() {
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0 };
+        assert_eq!(TowerCard::groups(11, 0, 3, 80), 1);
+        let paired = Shape { forms: 3, ..plain };
+        assert!(TowerCard::partial_extent(&plain, 80) > 0);
+        assert!(TowerCard::partial_extent(&paired, 80) >= TowerCard::partial_extent(&plain, 80));
     }
 }
