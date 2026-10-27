@@ -2,7 +2,9 @@
 //
 // The forward and the reverse scan of `holonics::hnn::tower` (its module law; the host owner is
 // `Tower::step` and `Tower::reverse_joined`) for the declaration the card carries: gated modes,
-// rectifying contacts, no turn, no pump, no pair or ring face, no passage credit. Every quantity
+// rectifying contacts, no turn, no pump, no ring face, no passage credit, with or without the pair
+// face (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class
+// arriving). Every quantity
 // is the host's integer numerator on the host's grain, every product's remainder released to the
 // nearest numerator (half away from zero), every quotient the host's, every sum exact: a sum runs
 // in 64 bits where the host's bound on its terms admits it and in 128 bits otherwise, and either
@@ -26,7 +28,8 @@
 //   a tile of 16 × 64 outputs a block, four a thread; summed per stream in 64 bits when that
 //   stream's bound `Σ_t max|y_t| max(max|x_t|, 1)` is below 2^63, in 128 bits otherwise.
 // - `tower_encoding`, `tower_moves`: the encoding's covector (each cell's bottom covector at its
-//   class) and the moves' Cartesian covectors summed over the streams.
+//   class) and the moves' Cartesian covectors summed over the streams. The pair face's readout and
+//   lift take theirs through `tower_outer` (`Σ δz c(p)ᵀ` and `Σ δx⁰ c(p)ᵀ`).
 
 #include <stdint.h>
 
@@ -62,9 +65,12 @@ struct TowerLevel {
 
 struct TowerLaw {
     uint32_t alphabet, width, modes, contacts, levels, cells, streams, face_digits;
-    uint32_t move_digits, families, pad0, pad1;
+    uint32_t move_digits, families, forms, pad0;
     uint64_t encoding, readout, readout_bias, readout_reach;
     int64_t ln2_square;
+    // The pair face (`forms = 0` without one): its readout V (A × k) and lift P (W × k), and their
+    // reaches max |V|, max |P|.
+    uint64_t pair_readout, pair_lift, pair_reach[2];
     TowerLevel level[TOWER_MAX_LEVELS];
 };
 
@@ -107,6 +113,13 @@ struct TowerFrame {
     uint64_t *r_dy, *r_da, *r_dread, *r_gre, *r_gim, *r_dq;           // [S][T][L]
     wide *moves_g;                                                    // [S][L][N][2]
     wide *gradient;                                                   // [len]
+    // The pair face: its resident values c(prev, cur) at ((prev·A + cur)·k + v), prev over the
+    // alphabet and the start A; each stream's class before its first cell; the face read at each
+    // cell, max |c| there, and max |δx⁰| (the bottom covector, what the lift's covector reads).
+    const int32_t *pair_values; // [(A + 1)·A·k]
+    const uint32_t *previous;   // [S]
+    int32_t *pair;              // [S][T][k]
+    uint64_t *r_pair, *r_dx;    // [S][T]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -356,6 +369,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int32_t *rd = (int32_t *)carve(at, 4ull * W);
     int32_t *dv = (int32_t *)carve(at, 4ull * F);
     int32_t *cd = (int32_t *)carve(at, 4ull * F);
+    int32_t *pc = (int32_t *)carve(at, 4ull * law.forms);
+    const uint32_t K = law.forms;
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     if (tid == 0) {
@@ -382,6 +397,41 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         }
         for (uint32_t j = tid; j < W; j += B) {
             x[j] = th[law.encoding + (uint64_t)u * W + j];
+        }
+        // The pair face read at (the class before, the class arriving): c(p), lifted into the
+        // encoding, x⁰ = E(u) + P c(p) on 2^(−40) released to the face's 2^(−16).
+        uint64_t pmax = 0;
+        if (K > 0) {
+            uint32_t prev = t == 0 ? fr.previous[s] : fr.classes[(uint64_t)s * (T + 1) + t - 1];
+            if (prev > A) {
+                if (tid == 0) {
+                    atomicOr(&st, TOWER_REFUSED_CLASS);
+                }
+                prev = A;
+            }
+            for (uint32_t v = tid; v < K; v += B) {
+                pc[v] = fr.pair_values[((uint64_t)prev * A + u) * K + v];
+            }
+            __syncthreads();
+            uint64_t mp = 0;
+            for (uint32_t v = tid; v < K; v += B) {
+                const uint64_t a = magnitude(pc[v]);
+                mp = a > mp ? a : mp;
+            }
+            pmax = block_max(mp, red);
+            const bool n_lift = narrow_terms(law.pair_reach[1], pmax, K, &st);
+            for (uint32_t j = tid; j < W; j += B) {
+                const int64_t lift = fit64(rel(dot(th + law.pair_lift + (uint64_t)j * K, 1, K, pc, n_lift), MATERIAL_BITS), &st);
+                x[j] = fit32((wide)x[j] + (wide)lift, &st);
+            }
+            if (keep) {
+                for (uint32_t v = tid; v < K; v += B) {
+                    fr.pair[qc * K + v] = pc[v];
+                }
+                if (tid == 0) {
+                    fr.r_pair[qc] = pmax;
+                }
+            }
         }
         __syncthreads();
         uint64_t m = 0;
@@ -563,12 +613,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             xmax = block_max(m, red);
         }
         // The readout's face z = U x + c, and the masses 2^(z − z_max) on 2^(−62).
+        // The pair face read by its own readout, z += V c(p), released to 2^(−16) beside it.
         const bool n_z = narrow_terms(law.readout_reach, xmax, W, &st);
+        const bool n_v = K > 0 && narrow_terms(law.pair_reach[0], pmax, K, &st);
         int64_t zm = INT64_MIN;
         for (uint32_t c = tid; c < A; c += B) {
             wide sum = dot(tt + law.readout + c, A, W, x, n_z);
             sum += (wide)th[law.readout_bias + c] << MATERIAL_BITS;
             z[c] = fit64(rel(sum, MATERIAL_BITS), &st);
+            if (K > 0) {
+                const int64_t read = fit64(rel(dot(th + law.pair_readout + (uint64_t)c * K, 1, K, pc, n_v), MATERIAL_BITS), &st);
+                z[c] = fit64((wide)z[c] + (wide)read, &st);
+            }
             zm = z[c] > zm ? z[c] : zm;
         }
         const int64_t zmax = block_max_signed(zm, red);
@@ -881,9 +937,20 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         back[o] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
+    uint64_t mx = 0;
     for (uint32_t j = tid; j < W; j += B) {
         const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j];
-        fr.dx[q * W + j] = fit64(sum, &st);
+        const int64_t v = fit64(sum, &st);
+        fr.dx[q * W + j] = v;
+        const uint64_t a = magnitude(v);
+        mx = a > mx ? a : mx;
+    }
+    // The bottom level's dx is the cell's input covector δx⁰, what the pair face's lift reads.
+    if (l == 0) {
+        const uint64_t rx = block_max(mx, red);
+        if (tid == 0) {
+            fr.r_dx[q] = rx;
+        }
     }
     __syncthreads();
     if (tid == 0 && st != 0) {

@@ -171,13 +171,27 @@ pub struct ResidentLevel {
     pub logs: Vec<i64>,
 }
 
+/// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
+/// ([`PairFace`]): the count of forms `k`, the places of its readout `V` (`A × k`) and its lift
+/// into the encoding `P` (`d × k`) in the material, their reaches `[max |V|, max |P|]`, and the
+/// face's resident values `c_v(prev, cur)` at `((prev · A + cur) · k + v)`, `prev` over the
+/// alphabet and the start `A` (the forms' face at their founding, generated from `W_v` and `E₀`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentPair {
+    pub forms: usize,
+    pub readout: usize,
+    pub lift: usize,
+    pub reaches: [u64; 2],
+    pub values: Vec<i32>,
+}
+
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair face, ring face,
-/// rotor or strands are joined. Read from the tower's own owners, so a realization holds no second
-/// copy of a law, and a realization that does not carry a joined part refuses the tower rather
-/// than reading it without that part.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face when one is joined, and
+/// whether a ring face, rotor or strands are. Read from the tower's own owners, so a realization
+/// holds no second copy of a law, and a realization that does not carry a joined part refuses the
+/// tower rather than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -190,7 +204,7 @@ pub struct ResidentLaw {
     pub face_roots: Vec<u128>,
     pub move_roots: Vec<u128>,
     pub ln2_square: i128,
-    pub pair_face: bool,
+    pub pair: Option<ResidentPair>,
     pub ring_face: bool,
     pub rotor: bool,
     pub strands: bool,
@@ -272,7 +286,13 @@ impl Tower {
             face_roots: self.exponential.roots().to_vec(),
             move_roots: self.fine.roots().to_vec(),
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
-            pair_face: self.pair.is_some(),
+            pair: self.pair.as_ref().map(|face| ResidentPair {
+                forms: face.forms(),
+                readout: self.layout.pair_readout,
+                lift: self.layout.pair_encoding,
+                reaches: reaches.pair,
+                values: face.values.clone(),
+            }),
             ring_face: self.ring.is_some(),
             rotor: self.rotor.is_some(),
             strands: self.strands.is_some(),

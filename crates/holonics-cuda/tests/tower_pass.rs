@@ -1,8 +1,9 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
-//! and its streams' states; and the card refuses a declaration it does not carry.
+//! and its streams' states, with and without the pair face; and the card refuses a declaration it
+//! does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{ContactLaw, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
+use holonics::hnn::tower::{ContactLaw, PairFace, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
 
 /// A declared exterior key stream: a 64-bit linear congruential walk, its high octets.
@@ -26,17 +27,48 @@ fn declaration(alphabet: usize, gated: bool) -> TowerDeclaration {
     TowerDeclaration { alphabet, width: 8, modes: 8, contacts: 16, levels: 2, gated, turned: false, pumped: false, contact: ContactLaw::Rectifying }
 }
 
-fn learners(alphabet: usize) -> (TowerLearner, TowerLearner) {
+/// The gated tower founded on the keys, with `forms` pair forms joined when `forms > 0`
+/// (`join_pair`).
+fn learners(alphabet: usize, forms: usize) -> (TowerLearner, TowerLearner) {
     let tower = Tower::found_on(declaration(alphabet, true), &keys(1 << 16), TurnLadder::Both).expect("founded");
-    (TowerLearner::new(tower.clone(), 5), TowerLearner::new(tower, 5))
+    let mut learner = TowerLearner::new(tower, 5);
+    if forms > 0 {
+        join_pair(&mut learner, forms);
+    }
+    (learner.clone(), learner)
+}
+
+/// The fixture's pair face: `forms` forms whose weights are read off the key stream, each released
+/// so that its values sit near the face's unit (as the host's own fixture does), joined with its
+/// readout and lift opened away from zero so that they move the faces and carry a covector.
+fn join_pair(learner: &mut TowerLearner, forms: usize) {
+    let d = learner.tower.declaration;
+    let hat = d.width + 1;
+    let k = keys(1 << 16);
+    let weights: Vec<Vec<i64>> = (0..forms).map(|v| (0..hat * hat).map(|j| k[3000 + v * hat * hat + j] as i64 - 128).collect()).collect();
+    let opening: Vec<i32> = (0..d.alphabet).flat_map(|u| learner.tower.encoding(u).to_vec()).collect();
+    let shifts = weights
+        .iter()
+        .map(|w| {
+            let top = PairFace::exact_values(d.alphabet, d.width, &opening, w).iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+            (128 - top.leading_zeros() as i32 - FACE_BITS as i32).max(0)
+        })
+        .collect();
+    let face = PairFace::new(d.alphabet, d.width, opening, weights, shifts).expect("a pair face");
+    learner.join_pair_face(face).expect("joined");
+    let pair = learner.tower.resident_law().expect("the law").pair.expect("the pair face");
+    let opened = (pair.readout..pair.readout + d.alphabet * forms).chain(pair.lift..pair.lift + d.width * forms);
+    for (j, i) in opened.enumerate() {
+        learner.tower.theta[i] = (i32::from_be_bytes([k[4 * j + 8000], k[4 * j + 8001], k[4 * j + 8002], k[4 * j + 8003]]) >> 8) / 4;
+    }
 }
 
 /// Host against card in lockstep: the opening read and its covector on the same material, then
 /// both learners take the section; `compared` holds every other place out of the comparison.
-fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool) {
+fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, forms: usize) {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
-    let (mut host, mut carded) = learners(alphabet);
+    let (mut host, mut carded) = learners(alphabet, forms);
     let classes = passage(alphabet, streams * (sections * section + 1));
     let chunk = classes.len() / streams;
     let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
@@ -68,13 +100,27 @@ fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, ho
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pass_is_the_hosts_section_after_section() {
-    lockstep(11, 3, 9, 6, false);
+    lockstep(11, 3, 9, 6, false, 0);
 }
 
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 4, true);
+    lockstep(11, 2, 12, 4, true, 0);
+}
+
+/// The pair face's acceptance (the record `2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD…`): 32 sections
+/// equal face by face and covector entry by entry, the learners and their states after each.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pair_faced_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, 3);
+}
+
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, 2);
 }
 
 #[test]
@@ -87,7 +133,7 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let parts: Vec<&[usize]> = vec![&classes[..]];
     let targets = vec![classes[1..].iter().map(|&c| Some(c)).collect::<Vec<_>>()];
     assert!(realized.forward(&ungated, &[ungated.rest()], &parts, &targets, Slot::Opened).is_err());
-    let (host, _) = learners(11);
+    let (host, _) = learners(11, 0);
     assert!(realized.forward(&host.tower, &[host.tower.rest_with_credit()], &parts, &targets, Slot::Opened).is_err());
     let ragged: Vec<&[usize]> = vec![&classes[..], &classes[..9]];
     let ragged_targets = vec![targets[0].clone(), targets[0][..8].to_vec()];

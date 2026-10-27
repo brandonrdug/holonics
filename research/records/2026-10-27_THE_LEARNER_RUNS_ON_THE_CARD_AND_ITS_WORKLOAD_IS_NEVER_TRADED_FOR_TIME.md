@@ -91,7 +91,7 @@ Each part is ticked here when it changes, and none stands for another.
 
 | Part | Status (October 27) |
 |---|---|
-| The policy documented | The guides' section and this record, PR #528; ticked when it merges. |
+| The policy documented | Done: the guides' section and this record, PR #528, merged as `bc642aa`. |
 | The gate built | In part, not yet on a branch. Built by design and being gated: the certificate decided by partition (log₂ readings, the exact products as fallback), `train-unit-tower` through `TowerCard`, the held-out read through the realization (`Tower::read_parts_realized`), `TowerCard` refusing the rotor, the strands and openings with ring hands or strand residues, and its counters counting only completed launches. Owed: a trainer's refusal of a host learner run without Brandon's exception, and the written read on the card (design); the pair, ring, turned, pumped, rotor and strands faces with their parity (this thread; the pair face is drafted). |
 | The gate independently verified | Not yet. Owed: a review by a worker that did not build it (Epime or a reviewer thread) of the trainers' refusal and of one card run's device line, and the per-face parities run on the 4080. |
 
