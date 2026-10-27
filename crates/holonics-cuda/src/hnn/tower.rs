@@ -24,8 +24,8 @@
 //! its face read through the pair contact with the top face), and with or without a news clock
 //! (`NewsClock`, never beside the ring face: each stream carries its open face and phase beside its
 //! modes, the forward reads every level's ticks from the arriving class's code under the open face
-//! and moves each level's modes once a tick, and the modes' scan carries the covector back through
-//! each tick). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
+//! and each level's modes take their step once a tick with the arrival held, and the modes' scan
+//! carries the covector back through each tick). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
 //! law.
 //!
 //! # The realizations (hardware law)

@@ -1828,10 +1828,25 @@ impl Layout {
 /// Δτ_l(t) = ⌊S_t / (B rˡ⁻¹)⌋ − ⌊S_(t−1) / (B rˡ⁻¹)⌋
 /// ```
 ///
-/// ticks at arrival `t`, and its modes move `h_t = λ_t^(Δτ_l(t)) h_(t−1) + γ_t P x_t`: every
-/// arrival's input enters, and the level turns and decays only as its own clock advances, so the
-/// arrivals of a span it predicts share one phase (the helical code's moment on the level's own
-/// clock). A crossing of a multiple of `B rˡ` is a crossing of a multiple of `B rˡ⁻¹`, so each
+/// ticks at arrival `t`, and at each tick its modes take the level's step with the arrival held,
+///
+/// ```text
+/// h ← λ_t h + γ_t P x_t      Δτ_l(t) times,
+/// h_t = λ_t^Δτ h_(t−1) + (1 + λ_t + … + λ_t^(Δτ−1)) γ_t P x_t,
+/// ```
+///
+/// so a level is the plain tower run on its own clock, its input read where its news crosses a
+/// section, and an arrival that ticks no time moves nothing. The level's input is the output of
+/// the level below, which ticks at least as often and carries the span between, so a level hears
+/// one input a section of news: the boundaries of its own tokens, placed where the tower's
+/// prediction has gathered news (agent-inferred, October 27). The drive and the decay run on the
+/// one clock, so each tick is the plain passive step and passivity bounds a mode exactly as it
+/// does at level 0, whatever the span between ticks. The first law pushed every arrival and moved
+/// only on ticks: a drive on the arrivals' clock beside a move on the news clock, two clocks.
+/// Between ticks a level then integrated its span's pushes undecayed, and on the card's news race
+/// levels 2 and 3 carried modes and reads some ten times the plain race's, their faces' sums
+/// widening to 128 bits lap by lap while the race trailed the plain race by about 0.22 bit (record,
+/// "The drive's clock"). A crossing of a multiple of `B rˡ` is a crossing of a multiple of `B rˡ⁻¹`, so each
 /// coarser level's ticks lie among the finer's: an epoch tower whose coarsening is the odometer's
 /// carry (`aeon::EpochTower`). The boundaries are where the tower's own prediction has gathered a
 /// section of news, so the grain moves with the learning, on the axis of information time; nothing
@@ -2288,7 +2303,7 @@ struct LevelCell {
     strands: Vec<i32>,
     /// The gated modes' moves at this cell (empty when ungated).
     gate: Vec<GatedMove>,
-    /// How many times the level's move acted at this cell: one without a news clock, else the
+    /// How many times the level's step acted at this cell: one without a news clock, else the
     /// level's ticks `Δτ_l(t)` ([`NewsClock`]).
     ticks: u32,
 }
@@ -2918,15 +2933,17 @@ impl Tower {
                 };
                 // The pump's reflection β conj(h) (zero unless pumped).
                 let (br, bi) = gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
-                // The move acts `moves` times (once without a news clock), then the push enters.
+                // The step `h ← λ_t h + γ_t P x_t` acts once a tick of the level's clock (once without
+                // a news clock), the arrival held through its ticks; an arrival that ticks no time
+                // moves nothing ([`NewsClock`]).
+                let pr = release(gamma * push_re[k] as i128, MOVE_BITS);
+                let pi = release(gamma * push_im[k] as i128, MOVE_BITS);
                 let (mut hr, mut hi) = (hr as i128, hi as i128);
                 for _ in 0..moves {
                     (hr, hi) = (release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS), release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS));
+                    (hr, hi) = (i128::from(fit64(hr + pr)?), i128::from(fit64(hi + pi)?));
                 }
-                let pr = release(gamma * push_re[k] as i128, MOVE_BITS);
-                let pi = release(gamma * push_im[k] as i128, MOVE_BITS);
-                let nr = fit64(hr + pr)?;
-                let ni = fit64(hi + pi)?;
+                let (nr, ni) = (fit64(hr)?, fit64(hi)?);
                 modes[k] = (nr, ni);
                 face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
                 face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
@@ -3380,37 +3397,45 @@ impl Tower {
                 let mut ds = vec![0i64; if d.turned { n } else { 0 }];
                 let mut dk = vec![0i64; if d.pumped { n } else { 0 }];
                 let mut dp = vec![0i64; if d.pumped { n } else { 0 }];
+                // The covector of each mode's push `γ_t P x_t`, summed over the steps it entered.
+                let mut gp: Vec<(i128, i128)> = gh.iter().map(|v| (v.0 as i128, v.1 as i128)).collect();
                 for k in 0..n {
                     let (hr, hi) = (previous[k].0 as i128, previous[k].1 as i128);
                     let (gr, gi) = (gh[k].0 as i128, gh[k].1 as i128);
                     // conj(h_(t−1)) G_h(t), the covector of λ_t, and Re(conj(G_h) B x), of γ_t.
                     // The ring's covector of the move it rode, on the same convention.
                     let ring_move = if k == ring_mode { ring_moves[i] } else { [0; 4] };
-                    let (glr, gli) = if lc.ticks == 1 {
-                        (hr * gr + hi * gi + ring_move[0], hr * gi - hi * gr + ring_move[1])
+                    let (push_r, push_i) = (lc.push[k].0 as i128, lc.push[k].1 as i128);
+                    let (glr, gli, through) = if lc.ticks == 1 {
+                        (hr * gr + hi * gi + ring_move[0], hr * gi - hi * gr + ring_move[1], gr * push_r + gi * push_i)
                     } else {
-                        // Under a news clock the move acted Δτ times: `∂(λ^Δτ h)/∂λ` is the sum over
-                        // its sub-moves of `conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾`, the states between them read again by
-                        // the step's own law and the covector carried back through each
-                        // (`G⁽ʲ⁻¹⁾ = conj(λ) G⁽ʲ⁾`); no tick sends none. Refused beside a ring or
-                        // pump ([`Tower::join_news`]).
-                        let (lr, li) = lc.gate.get(k).map_or((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), |m| (m.lam.0 as i128, m.lam.1 as i128));
+                        // Under a news clock the step acted Δτ times with the arrival held:
+                        // `∂h_t/∂λ` is the sum over its sub-steps of `conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾`, `∂h_t/∂γ`
+                        // of `Re(conj(G⁽ʲ⁾) P x)` and the push's covector of `G⁽ʲ⁾`, the states
+                        // between them read again by the step's own law and the covector carried
+                        // back through each (`G⁽ʲ⁻¹⁾ = conj(λ) G⁽ʲ⁾`); no tick sends none. Refused
+                        // beside a ring or pump ([`Tower::join_news`]).
+                        let ((lr, li), gamma) = lc.gate.get(k).map_or(((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), gammas[k]), |m| ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128));
+                        let (pr, pi) = (release(gamma * push_r, MOVE_BITS), release(gamma * push_i, MOVE_BITS));
                         let mut between = Vec::with_capacity(lc.ticks as usize);
                         let (mut ar, mut ai) = (hr, hi);
                         for _ in 0..lc.ticks {
                             between.push((ar, ai));
-                            (ar, ai) = (release(lr * ar - li * ai, MOVE_BITS), release(lr * ai + li * ar, MOVE_BITS));
+                            (ar, ai) = (release(lr * ar - li * ai, MOVE_BITS) + pr, release(lr * ai + li * ar, MOVE_BITS) + pi);
                         }
                         let (mut cr, mut ci) = (gr, gi);
-                        let (mut sr, mut si) = (0i128, 0i128);
+                        let (mut sr, mut si, mut through) = (0i128, 0i128, 0i128);
+                        let (mut pgr, mut pgi) = (0i128, 0i128);
                         for &(ar, ai) in between.iter().rev() {
                             sr += ar * cr + ai * ci;
                             si += ar * ci - ai * cr;
+                            through += cr * push_r + ci * push_i;
+                            (pgr, pgi) = (pgr + cr, pgi + ci);
                             (cr, ci) = (release(lr * cr + li * ci, MOVE_BITS), release(lr * ci - li * cr, MOVE_BITS));
                         }
-                        (sr, si)
+                        gp[k] = (pgr, pgi);
+                        (sr, si, through)
                     };
-                    let through = gr * lc.push[k].0 as i128 + gi * lc.push[k].1 as i128;
                     match lc.gate.get(k) {
                         None => {
                             g[lv.move_re + k] += glr;
@@ -3463,8 +3488,8 @@ impl Tower {
                     }
                 }
                 let gamma_at = |k: usize| lc.gate.get(k).map_or(gammas[k], |m| m.gamma as i128);
-                let gre: Vec<i64> = collect_exact(gh.iter().enumerate().map(|(k, v)| fit64(release(gamma_at(k) * v.0 as i128, MOVE_BITS))))?;
-                let gim: Vec<i64> = collect_exact(gh.iter().enumerate().map(|(k, v)| fit64(release(gamma_at(k) * v.1 as i128, MOVE_BITS))))?;
+                let gre: Vec<i64> = collect_exact(gp.iter().enumerate().map(|(k, v)| fit64(release(gamma_at(k) * v.0, MOVE_BITS))))?;
+                let gim: Vec<i64> = collect_exact(gp.iter().enumerate().map(|(k, v)| fit64(release(gamma_at(k) * v.1, MOVE_BITS))))?;
                 let mut back_re = vec![0i64; w];
                 let mut back_im = vec![0i64; w];
                 transposed(&t[lv.push_re..lv.push_re + n * w], r[0], w, &gre, MATERIAL_BITS, &mut back_re)?;
@@ -4806,9 +4831,9 @@ impl Tower {
     /// the state, and each cell's [`CircuitCell`] (every level's stored, carried and pushed energy,
     /// its read's scale and its contacts' reach, and the code of the class that arrives next) is
     /// handed to `each`. A reading beside the code: the tower is not moved. The carried part is
-    /// formed by the step's own law, `λ_t h + β_t h̄` released from `2^(−54)` to the state's grain
-    /// (applied as often as the level ticked under a news clock), so `carried` is what the step
-    /// adds the push to.
+    /// formed by the step's own law, `λ_t h + β_t h̄` released from `2^(−54)` to the state's grain,
+    /// so `carried` is what the step adds the push to; under a news clock it is the move alone,
+    /// taken as often as the level ticked, and the held arrival's pushes enter between its ticks.
     pub fn read_circuit(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, CircuitCell) -> Result<()>) -> Result<()> {
         let reaches = self.reaches();
         let n = self.declaration.modes;
@@ -7225,6 +7250,44 @@ mod tests {
         assert_eq!(s.open.as_ref(), Some(&cells.last().expect("a cell").face));
     }
 
+    /// A clocked level takes the plain step once a tick with the arrival held: an arrival that
+    /// ticks no time leaves the level's modes as they were, and one that ticks `Δτ` times moves
+    /// them by `h ← λ_t h + γ_t P x_t` taken `Δτ` times, gated and ungated. On a one-bit section
+    /// level 1 ticks 0, 1, 2 and 3 times over the passage.
+    #[test]
+    fn a_clocked_level_takes_the_plain_step_once_a_tick_with_the_arrival_held() {
+        for gated in [true, false] {
+            let mut tower = tiny_with(3, gated);
+            tower.join_news(NewsClock::new(1, 2).expect("a clock")).expect("joined");
+            let reaches = tower.reaches();
+            let t = &tower.theta;
+            let mut s = tower.rest();
+            let opening = s.modes.clone();
+            let cells = tower.forward(&mut s, &news_passage(), &reaches).expect("forward");
+            let mut seen = [0usize; 4];
+            for (i, cell) in cells.iter().enumerate() {
+                for l in 1..3 {
+                    let (lc, lv) = (&cell.levels[l], &tower.layout.levels[l]);
+                    let before = if i == 0 { &opening[l] } else { &cells[i - 1].levels[l].state };
+                    seen[(lc.ticks as usize).min(3)] += 1;
+                    for (k, &(hr, hi)) in before.iter().enumerate() {
+                        let ((lr, li), gamma) = lc.gate.get(k).map_or(((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), reaches.gammas[l][k]), |m| ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128));
+                        let (pr, pi) = (release(gamma * lc.push[k].0 as i128, MOVE_BITS), release(gamma * lc.push[k].1 as i128, MOVE_BITS));
+                        let (mut ar, mut ai) = (hr as i128, hi as i128);
+                        for _ in 0..lc.ticks {
+                            (ar, ai) = (release(lr * ar - li * ai, MOVE_BITS) + pr, release(lr * ai + li * ar, MOVE_BITS) + pi);
+                        }
+                        assert_eq!(lc.state[k], (ar as i64, ai as i64), "gated {gated}, cell {i}, level {l}, mode {k}");
+                        if lc.ticks == 0 {
+                            assert_eq!(lc.state[k], (hr, hi), "gated {gated}, cell {i}, level {l}, mode {k}");
+                        }
+                    }
+                }
+            }
+            assert!(seen.iter().all(|&c| c > 0), "gated {gated}: {seen:?}");
+        }
+    }
+
     /// One level ticks at every arrival, so on one level the clock is the tower without it, face
     /// for face and mode for mode; on more levels it moves them otherwise. The tower's text adds its
     /// line only when a clock is joined.
@@ -7262,22 +7325,27 @@ mod tests {
     }
 
     /// The covector of every family on the clocked tower is the code difference it predicts, the
-    /// moves' over each level's ticks (none, one or several), read on the passage's own side of
-    /// every section crossing; gated and ungated, on the passage and steps the unclocked covector is
-    /// read at. Level 1's section is one bit, so its ticks run 0, 1, 2 and 3 over the passage and a
-    /// third level's 0, 1 and 2. On the sixty-one classes of [`news_passage`] at a two-bit section a
-    /// step of `2^(−7)` units moved some crossing for most families: 29 gated families read at
-    /// `2^(−8)`, under the three quarters asked, and 5 or 6 ungated ones at `2^(−8)` to `2^(−10)`
-    /// (measured October 27).
+    /// steps' over each level's ticks (none, one or several), read on the passage's own side of
+    /// every section crossing, at a one-bit section on the first 31 classes of [`news_passage`].
+    /// A level steps only on its ticks, so on the thirteen classes the unclocked covector is read
+    /// on the upper levels tick a few times and their read, gate and move covectors fall under 1/64
+    /// bit a unit: 18 of 27 gated families read, 18 of 23 ungated and 27 of 39 on three gated
+    /// levels, every one within a tenth. On the 31 classes 26 of 27 gated families read and 20 of
+    /// 23 ungated. Three levels are read ungated, 30 of 33: on three gated levels most families'
+    /// steps cross a kink or section (20 of 39 read, one 11% off, as the unclocked gated tower on
+    /// two levels also misses one by 12% on these classes). On all 61 classes the unclocked tower's
+    /// own fit at `2^(−10)` misses some families by more than a tenth (by up to 45%), the faces'
+    /// release over the longer passage, so the passage stops at 31 (measured October 27).
     #[test]
     fn the_news_clock_covector_matches_the_code_difference() {
         let clocked = |mut tower: Tower| {
             tower.join_news(NewsClock::new(1, 2).expect("a clock")).expect("joined");
             tower
         };
-        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(true)), true, &PASSAGE, 10);
-        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(false)), false, &PASSAGE, 10);
-        the_covector_of_tower_matches_the_code_difference(clocked(tiny_with(3, true)), true, &PASSAGE, 10);
+        let classes = &news_passage()[..31];
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(true)), true, classes, 10);
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(false)), false, classes, 10);
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_with(3, false)), false, classes, 10);
     }
 
     /// Under a news clock a stream's open face and phase are its state: a passage read in two

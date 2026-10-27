@@ -2,8 +2,9 @@
 //
 // The forward and the reverse scan of `holonics::hnn::tower` (its module law; the host owner is
 // `Tower::step` and `Tower::reverse_joined`) for the declaration the card carries (with or without
-// a news clock, `NewsClock`: each level's modes move once a tick of its own clock, read by thread 0
-// from the arriving class's code under the open face): gated modes,
+// a news clock, `NewsClock`: each level's modes take their step once a tick of its own clock with
+// the arrival held, the ticks read by thread 0 from the arriving class's code under the open
+// face): gated modes,
 // turned or not (each cell's founded unit turned by `e^(iπ s_t)`, `s_t = 2^(−spread)(W_φ x + b_φ)`
 // composed from the ladder's dyadic turns), rectifying contacts, no pump, no passage credit, with
 // or without the pair face
@@ -849,18 +850,19 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     atomicOr(&st, TOWER_REFUSED_UNIT);
                     gamma = 1;
                 }
-                // The move acts once a tick of the level's clock (once without a news clock),
-                // then the push enters.
+                // The step h ← λ_t h + γ_t P x_t acts once a tick of the level's clock (once
+                // without a news clock), the arrival held through its ticks; an arrival that ticks
+                // no time moves nothing.
+                const wide pr = rel((wide)gamma * pq[k], MOVE_BITS);
+                const wide pi = rel((wide)gamma * pq[N + k], MOVE_BITS);
                 wide hr = h[(l * N + k) * 2], hi = h[(l * N + k) * 2 + 1];
                 for (uint32_t j = 0; j < tk[l]; j++) {
                     const wide ar = rel(lr * hr - li * hi, MOVE_BITS);
-                    hi = rel(lr * hi + li * hr, MOVE_BITS);
-                    hr = ar;
+                    hi = fit64(rel(lr * hi + li * hr, MOVE_BITS) + pi, &st);
+                    hr = fit64(ar + pr, &st);
                 }
-                const wide pr = rel((wide)gamma * pq[k], MOVE_BITS);
-                const wide pi = rel((wide)gamma * pq[N + k], MOVE_BITS);
-                const int64_t nr = fit64(hr + pr, &st);
-                const int64_t ni = fit64(hi + pi, &st);
+                const int64_t nr = (int64_t)hr;
+                const int64_t ni = (int64_t)hi;
                 h[(l * N + k) * 2] = nr;
                 h[(l * N + k) * 2 + 1] = ni;
                 if (ringed && k == law.ring_mode) {
@@ -1673,7 +1675,11 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             const wide hr = previous[0], hi = previous[1];
             const int64_t *mv = fr.moves + (ql * N + k) * 6;
             const uint32_t ticks = law.news ? fr.ticks[ql] : 1;
-            wide glr, gli;
+            const wide push_r = fr.push[ql * 2 * N + k], push_i = fr.push[ql * 2 * N + N + k];
+            const wide open = mv[0], rho = mv[1], gamma = mv[2];
+            // The covectors of λ_t and γ_t, and of the push γ_t P x_t summed over the steps it
+            // entered.
+            wide glr, gli, through, pgr = gr, pgi = gi;
             if (ticks == 1) {
                 glr = hr * gr + hi * gi;
                 gli = hr * gi - hi * gr;
@@ -1682,22 +1688,32 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                     glr += fr.ring_dmove[q * 2];
                     gli += fr.ring_dmove[q * 2 + 1];
                 }
+                through = (wide)gr * push_r + (wide)gi * push_i;
             } else {
-                // The move acted Δτ times: the covector of λ_t is the sum over its sub-moves of
-                // conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾, each state between them read again by the forward's law from
-                // h_(t−1) and the covector carried back through each, G⁽ʲ⁻¹⁾ = conj(λ_t) G⁽ʲ⁾; no tick
-                // sends none (`Tower::reverse_joined`; the card carries no ring beside the clock).
+                // The step acted Δτ times with the arrival held: the covector of λ_t is the sum over
+                // its sub-steps of conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾, of γ_t the sum of Re(conj(G⁽ʲ⁾) P x) and of the
+                // push the sum of G⁽ʲ⁾, each state between them read again by the forward's law from
+                // h_(t−1) and the covector carried back through each, G⁽ʲ⁻¹⁾ = conj(λ_t) G⁽ʲ⁾; no
+                // tick sends none (`Tower::reverse_joined`; the card carries no ring beside the
+                // clock).
                 const wide mr = mv[3], mi = mv[4];
+                const wide pr = rel(gamma * push_r, MOVE_BITS), pi = rel(gamma * push_i, MOVE_BITS);
                 wide sr = 0, si = 0, gcr = gr, gci = gi;
+                through = 0;
+                pgr = 0;
+                pgi = 0;
                 for (uint32_t j = ticks; j >= 1; j--) {
                     wide ar = hr, ai = hi;
                     for (uint32_t i = 1; i < j; i++) {
-                        const wide nr = rel(mr * ar - mi * ai, MOVE_BITS);
-                        ai = rel(mr * ai + mi * ar, MOVE_BITS);
+                        const wide nr = rel(mr * ar - mi * ai, MOVE_BITS) + pr;
+                        ai = rel(mr * ai + mi * ar, MOVE_BITS) + pi;
                         ar = nr;
                     }
                     sr += ar * gcr + ai * gci;
                     si += ar * gci - ai * gcr;
+                    through += gcr * push_r + gci * push_i;
+                    pgr += gcr;
+                    pgi += gci;
                     const wide nc = rel(mr * gcr + mi * gci, MOVE_BITS);
                     gci = rel(mr * gci - mi * gcr, MOVE_BITS);
                     gcr = nc;
@@ -1705,8 +1721,6 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 glr = sr;
                 gli = si;
             }
-            const wide through = (wide)gr * fr.push[ql * 2 * N + k] + (wide)gi * fr.push[ql * 2 * N + N + k];
-            const wide open = mv[0], rho = mv[1], gamma = mv[2];
             const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
             around += turning;
             // The cell's unit: the founded one, turned by the cell's own turn when the level is.
@@ -1725,8 +1739,8 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 f = rel(f * (one - open), MOVE_BITS);
                 dq = fit64(rel(g_rho * GATE_REACH * f, COVECTOR_BITS + MOVE_BITS), &st);
             }
-            fr.gre[ql * N + k] = fit64(rel(gamma * gr, MOVE_BITS), &st);
-            fr.gim[ql * N + k] = fit64(rel(gamma * gi, MOVE_BITS), &st);
+            fr.gre[ql * N + k] = fit64(rel(gamma * pgr, MOVE_BITS), &st);
+            fr.gim[ql * N + k] = fit64(rel(gamma * pgi, MOVE_BITS), &st);
             fr.dq[ql * N + k] = dq;
         }
         // The Cartesian covector of the founded move: G_λ = u G_|λ| + i u G_φ/|λ|.

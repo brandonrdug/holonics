@@ -2,7 +2,9 @@
 
 Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Host law
 built and tested (§6.1, §7); the card carries it, its parity at the race's declaration equal (§6.2,
-§7); the measurement (§6.3) running beside the plain race; the Lean (§6.4) in `HNN/NewsClock`. Owners: `holonics::hnn::tower` (`NewsClock`,
+§7); the measurement (§6.3) beside the plain race read through lap 12 (§8); the Lean (§6.4) in
+`HNN/NewsClock`. §8 replaces §2's move with the held step after the race measured the first law's
+two clocks: host and card built, the host tests passing, the card's parity owed. Owners: `holonics::hnn::tower` (`NewsClock`,
 `Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
 loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
@@ -55,7 +57,8 @@ negative, so its running sum `S_t = Σ_{k ≤ t} c_k` is a monotone clock.
 h_t = λ_t^(Δτ_l(t)) h_{t−1} + γ_t P x_t
 ```
 
-Every arrival's input enters the level (no octet is dropped), and the level turns and decays only
+(The first law, built, raced and replaced in §8 by the step held through the ticks.) Every
+arrival's input enters the level (no octet is dropped), and the level turns and decays only
 as its own clock advances. Between ticks it holds its phase and gathers the span: the level's state
 is the helical code's moment `m = Σ_k Ĝ(τ_l(k))⁻¹ E(u_k)` with `τ_l` the level's own clock, so the
 arrivals of one span share one phase. Each tick carries the same news, `B rˡ⁻¹` bits: the induced
@@ -166,4 +169,87 @@ clock, so the bits it certifies are the candidate's whole read, its segmentation
   window was 6,136 ms (every other full window 5,048 to 5,265 ms), so its lap deadline is `⌈1.12 ·
   (23 · 6.136 + 0.800)⌉ + 120 = 279` s and its window stop 6,872 ms, fixed for the race. Its laps
   are reported beside the plain race's and none is claimed here before they run.
+
+## 8. The drive's clock (October 27, measured on the race)
+
+**What the race measured.** Through lap 12 on the RTX 4080 SUPER the news race read 1.986 bits a
+class on training and 2.156 held out (GSM8K 2.176, prose 2.141), from 2.799 and 2.463 at lap 0.
+From lap 3 it trailed the plain race lap for lap by about 0.22 bit (the plain race's lap 12: 1.763
+and 1.914), and its held-out reading stayed between 2.15 and 2.17 from lap 8. Its upper levels
+swelled: at lap 12 level 2's largest mode reached 3,817,935,029 state numerators and level 3's
+largest read 10,511,165,077, some ten times the plain race's levels 2 and 3, which stay between
+about `10^7` and `5·10^8`. Its
+forward on the card slowed lap by lap (43.8 ms a launch at lap 0, 48.1 at lap 9, the plain race's
+39.1 and 39.6 at its laps 0 and 40), its pass from 117.8 s (lap 5) to 127.0 s (lap 12) and its
+widest 32-section window from 5,203 ms to 6,054 ms against the race's fixed stop of 6,872 ms; its
+reverse held level.
+
+**How the races ended.** The news race ran to lap 21 and stopped on its own window rule at
+09:06:19 UTC, with no other load on the host (load average 1.8): its upper levels kept growing,
+level 2's largest mode reaching 9,364,325,803 and its largest read 20,602,068,538 at lap 21, about
+twice lap 12's, so its ordinary 32-section windows had crept to about 5.8 s (from about 5.1 s at
+lap 5), and one burst of 25 certificate halvings took a window to 7,279 ms against the 6,872 ms
+stop. Its last reading, its best held out: 1.958 bits a class on training and 2.121 held out
+(GSM8K 2.128, prose 2.115). The plain race stopped at 08:51:51 UTC after lap 45, when a Lean build
+on the same host took its cores and pushed its widest window to 6,322 ms against its 5,953 ms stop
+(the card did not slow); its last reading, its best on both, 1.691 and 1.850 (GSM8K 1.800, prose
+1.888), its levels' modes between about `10^7` and `10^8` and its reads about `3–5·10^8` at lap 40.
+At the races' end the news race trailed by about 0.27 bit held out. Both ran on the RTX 4080 SUPER
+under the card lock; laps 0 to 45 and 0 to 21 are complete, and the writings stay outside the
+repository.
+
+**The cause: two clocks.** The first law moved a level only on its own ticks but pushed it at every
+arrival: a drive on the arrivals' clock beside a move on the news clock, the second clock §2 meant
+to refuse. Between ticks a level integrated its span's pushes undecayed, so a tick's drive was the
+span's length times `γ |P x|` and passivity no longer bounded the mode by its drive (`|h| ≤ √((1 +
+ρ)/(1 − ρ)) max|P x|` at level 0): the spans of levels 2 and 3 are about 8 and 16 octets at 2 bits a
+class, and their modes grew toward that factor as their pushes learned to agree within a span.
+[agent-inferred] The slowdown follows the magnitude: the card sums a dot product in 64 bits only
+while `max|w| · max|face| · (count + 1) < 2^62` (`narrow_terms`) and in 128 bits otherwise, so the
+swelling faces moved the upper levels' reads to the wide carrier, a lawful widening at a declared
+crossing whose cost rises with the faces.
+
+**The law now: the plain step once a tick, the arrival held.** At each of the level's `Δτ_l(t)`
+ticks its modes take the level's own step with the arrival's input held,
+
+```text
+h ← λ_t h + γ_t P x_t      Δτ_l(t) times,
+h_t = λ_t^Δτ h_{t−1} + (1 + λ_t + … + λ_t^(Δτ−1)) γ_t P x_t,
+```
+
+each step released to the state's grain as the plain step is. An arrival that ticks no time moves
+nothing. The drive and the move run on the one clock, so a level is the plain tower run on its own
+clock, every tick the plain passive step (Lean `HNN/PassiveMode`, `passive_step` and
+`passive_recursion` over the ticks' sequence; an arrival without a tick is the identity), and its
+modes are bounded exactly as level 0's are, whatever the span between ticks. The level's input is
+the output of the level below, which ticks at least as often and carries the span between, so the
+level hears one input a section of news, read at the arrival whose news completes the section: the
+level's own tokens, their boundaries placed where the tower's prediction has gathered news, and
+moving as it learns. The zero-order hold is the exact clocked form of a step whose input is held
+over an interval of `Δτ` ticks. One level on the clock is still the tower without it (every
+`Δτ = 1`), face for face.
+
+**The reverse.** Over the `Δτ` sub-steps the covector of `λ_t` is `Σ_j conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾` as
+before, that of `γ_t` is `Σ_j Re(conj(G⁽ʲ⁾) P x_t)` and the push's is `γ_t Σ_j G⁽ʲ⁾`, the states
+between the sub-steps read again by the step's own law (pushes included) and the covector carried
+back through each, `G⁽ʲ⁻¹⁾ = conj(λ_t) G⁽ʲ⁾`; no tick sends none, to the move, the push or the
+input. The covector the cell hands its predecessor is unchanged, `conj(λ_t)^Δτ G_h(t)`, since the
+push carries no state. The Lean of the held step's covectors is owed in #410 (the sum over the
+sub-steps as the derivative of `λⁿ h + (Σ_(j<n) λʲ) γ P x` in `λ`, `γ` and `P x`, beside
+`move_covector_is_derivative`).
+
+**Built.** Host: `Tower::step` takes the held step and `Tower::reverse_joined` its covectors;
+`a_clocked_level_takes_the_plain_step_once_a_tick_with_the_arrival_held` checks every clocked cell
+of the passage against the step taken `Δτ` times and a no-tick cell against the state before it,
+gated and ungated, beside the clock's earlier tests. The covector matches the code difference on
+the first 31 classes of the clock's passage, two levels gated and ungated and three ungated: a
+level now steps only on its ticks, so on the thirteen classes the unclocked covector is read on the
+upper levels tick a few times and too few of their covectors stand above the reading's grain
+(18 of 27 gated families read, every one within a tenth); on the 31 classes 26 of 27 read gated,
+20 of 23 ungated and 30 of 33 on three levels ungated, none off by a tenth. On all 61 classes the
+unclocked tower's own fit misses some families by more than a tenth (up to 45%), the faces' release
+over the longer passage, so the reading stops at 31. Card: the forward's level loop and the modes'
+scan in `kernels/tower.cu` carry the same law (the push and its covector summed over the
+sub-steps); its parity on the card is owed. The race on the first law ran to its end (above); a
+race on the held step needs its own authorization.
 
