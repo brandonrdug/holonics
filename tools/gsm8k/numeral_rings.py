@@ -4,7 +4,8 @@ An exterior reading, never learner material, and no floats. Record:
 research/records/2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_A_TURN_IS_TWO_REFLECTIONS_AND_THE_BASE_TURNS_COLLAPSES_OR_REFLECTS_EACH_RING.md
 
     python3 -I tools/gsm8k/numeral_rings.py places KIND TEXT OUT [FIRST]
-    python3 -I tools/gsm8k/numeral_rings.py probe KIND TRAIN TRAIN_CELLS HELD HELD_CELLS LEVELS MODES [FIRST]
+    python3 -I tools/gsm8k/numeral_rings.py probe KIND TRAIN TRAIN_CELLS HELD HELD_CELLS LEVELS MODES [FIRST] [modes=A:B]
+    python3 -I tools/gsm8k/numeral_rings.py scale CELLS LEVELS MODES
 
 `places` names places in every problem of TEXT (a run of problems separated by a blank line, a
 question line then its answer lines), each a byte of the problem's framed text (a blank line, the
@@ -29,9 +30,18 @@ to the phase (`energy`), the most frequent training residue named every time (`m
 residue most frequent among training labels with the same last two digits (`suffix`, what those
 digits alone name), and the modes probe read against the residue of the held-out cell half the list
 away, so in another problem (`foil`; a result's numeral is written twice in a row).
+With `modes=A:B` the probe reads only modes `A..B` of each level (the strands' written modes, record
+research/records/2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md
+§6), so what those modes hold is read apart from the modes beside them.
+
+`scale` prints, for each level of the records in CELLS, every mode's largest and root-mean-square
+modulus over the cells, `mode:max/rms`, in 256ths of amplitude one (the state's grain `2^(−24)`,
+each modulus the integer square root of `re^2 + im^2`, the mean's root floored): how loud each
+mode is where the probe reads it.
 """
 
 import operator
+from math import isqrt as math_isqrt
 import re
 import sys
 from fractions import Fraction
@@ -73,17 +83,36 @@ def named(kind, text, first=None):
     return found
 
 
-def cells(path, places, levels, modes):
-    """Each level's modes and energies at every place, beside the place's labels."""
+def cells(path, places, levels, modes, span=None):
+    """Each level's modes and energies at every place, beside the place's labels; with `span`
+    `(a, b)`, only modes `a..b` of each level."""
     _, state, _ = probe.faces(path, 0, levels, modes)
     if [c for c, _ in state] != list(range(len(places))):
         raise SystemExit(f"{path}: the records do not hold the places in order")
+    a, b = span or (0, modes)
     out = []
     for level in range(levels):
-        part = [(v, x[2 * modes * level: 2 * modes * (level + 1)]) for (_, _, v), (_, x) in zip(places, state)]
-        energy = [(v, [x[2 * k] ** 2 + x[2 * k + 1] ** 2 for k in range(modes)]) for v, x in part]
+        part = [(v, x[2 * modes * level + 2 * a: 2 * modes * level + 2 * b]) for (_, _, v), (_, x) in zip(places, state)]
+        energy = [(v, [x[2 * k] ** 2 + x[2 * k + 1] ** 2 for k in range(b - a)]) for v, x in part]
         out.append((part, energy))
     return out
+
+
+def scale(path, levels, modes):
+    """Per level, each mode's largest and root-mean-square modulus over the cells, in 256ths of
+    amplitude one on the state's grain `2^(-24)`."""
+    _, state, _ = probe.faces(path, 0, levels, modes)
+    if not state:
+        raise SystemExit(f"{path}: no cells")
+    lines = []
+    for level in range(levels):
+        loud = []
+        for k in range(modes):
+            at = 2 * modes * level + 2 * k
+            e = [x[at] ** 2 + x[at + 1] ** 2 for _, x in state]
+            loud.append(f"{k}:{math_isqrt(max(e)) >> 16}/{math_isqrt(sum(e) // len(e)) >> 16}")
+        lines.append(f"NUMERAL_SCALE cells={path} level={level} n={len(state)} modes(mode:max/rms,1/256) {' '.join(loud)}")
+    return lines
 
 
 def named_right(train, held, m):
@@ -123,11 +152,20 @@ def main(argv):
         with open(out, "x") as f:
             f.write(rows)
         print(f"PLACES kind={argv[2]} text={argv[3]} places={rows.count(chr(10))} out={out}")
-    elif len(argv) in (9, 10) and argv[1] == "probe":
+    elif len(argv) in (9, 10, 11) and argv[1] == "probe":
         kind, levels, modes = argv[2], int(argv[7]), int(argv[8])
-        first = int(argv[9]) if len(argv) == 10 else None
-        train = cells(argv[4], named(kind, Path(argv[3]).read_bytes(), first), levels, modes)
-        held = cells(argv[6], named(kind, Path(argv[5]).read_bytes()), levels, modes)
+        rest = argv[9:]
+        span = None
+        if rest and rest[-1].startswith("modes="):
+            a, _, b = rest.pop()[len("modes="):].partition(":")
+            span = (int(a), int(b))
+            if not 0 <= span[0] < span[1] <= modes:
+                raise SystemExit(f"modes={a}:{b} is not a span of the {modes} modes")
+        if len(rest) > 1:
+            sys.exit(__doc__)
+        first = int(rest[0]) if rest else None
+        train = cells(argv[4], named(kind, Path(argv[3]).read_bytes(), first), levels, modes, span)
+        held = cells(argv[6], named(kind, Path(argv[5]).read_bytes()), levels, modes, span)
         for level in range(levels):
             (tm, te), (hm, he) = train[level], held[level]
             for label in tm[0][0]:
@@ -139,11 +177,15 @@ def main(argv):
                     majority, suffix = suffix_right(tml, hml, m)
                     half = len(hml) // 2
                     foil = sum(n == hml[(i + half) % len(hml)][0] % m for i, n in enumerate(names))
+                    only = f" modes={span[0]}:{span[1]}" if span else ""
                     print(
-                        f"NUMERAL_RINGS cells={argv[6]} kind={kind} label={label} level={level} mod={m} "
+                        f"NUMERAL_RINGS cells={argv[6]}{only} kind={kind} label={label} level={level} mod={m} "
                         f"held={len(hml)} train={len(tml)} modes={right} energy={energy} "
                         f"majority={majority} suffix={suffix} foil={foil}"
                     )
+    elif len(argv) == 5 and argv[1] == "scale":
+        for line in scale(argv[2], int(argv[3]), int(argv[4])):
+            print(line)
     else:
         sys.exit(__doc__)
 

@@ -1384,7 +1384,8 @@ impl StrandLaw {
         }
     }
 
-    fn name(self) -> &'static str {
+    /// The law's name as the strands' text writes it.
+    pub fn name(self) -> &'static str {
         match self {
             Self::Turned => "turned",
             Self::Stepped => "stepped",
@@ -3975,6 +3976,15 @@ fn toward(m: i128, g: i128, rate: u32) -> i128 {
     m + if step == 0 { (g - m).signum() } else { step }
 }
 
+/// One level of [`Tower::bilinear_modes`]: each drive's weight on each mode (`2^(−48)`) and the
+/// bilinear block between modes (`2^(−96)`), rows the first drive's modes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BilinearModes {
+    pub first: Vec<BigUint>,
+    pub second: Vec<BigUint>,
+    pub block: Vec<Vec<BigUint>>,
+}
+
 /// [definition; agent-inferred] **The learner**: the tower, the covector's moments and the
 /// deposits' receipts.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -4533,46 +4543,74 @@ impl Tower {
     /// the coexact (a local curl). An exterior reading of the material: the tower is not moved. A
     /// rectifying tower has no bilinear block (a typed refusal).
     pub fn bilinear_rungs(&self) -> Result<Vec<Vec<Vec<BigUint>>>> {
+        let n = self.declaration.modes;
+        let turns = turn_ladder(n);
+        let rung = |k: usize| (k / turns).min(MARGIN as usize - 1);
+        let rungs = rung(n - 1) + 1;
+        let levels = self.bilinear_modes()?;
+        Ok(levels
+            .into_iter()
+            .map(|level| {
+                let mut e = vec![vec![BigUint::from(0u32); rungs]; rungs];
+                for (k, row) in level.block.into_iter().enumerate() {
+                    for (k2, x) in row.into_iter().enumerate() {
+                        e[rung(k)][rung(k2)] += x;
+                    }
+                }
+                e
+            })
+            .collect())
+    }
+
+    /// [definition; agent-inferred, October 27] **The bilinear weight mode by mode**, the read
+    /// [`Tower::bilinear_rungs`] sums over rungs: per level, `E_(k,k′) = Σ_o |A_(o,k)|² |B_(o,k′)|²`
+    /// on `2^(−96)` and each drive's weight on each mode, `Σ_o |A_(o,k)|²` and `Σ_o |B_(o,k)|²` on
+    /// `2^(−48)`. A coefficient multiplies the mode's face, so what a contact hears of a mode is its
+    /// weight times the mode's loudness where it is read; strands' modes are written at amplitude
+    /// one ([`Strands`]). A rectifying tower has no bilinear block (a typed refusal).
+    pub fn bilinear_modes(&self) -> Result<Vec<BilinearModes>> {
         let d = &self.declaration;
         if d.contact == ContactLaw::Rectifying {
             return refuse("a rectifying contact has no bilinear block");
         }
         let (w, n, f) = (d.width, d.modes, d.contacts);
-        let turns = turn_ladder(n);
-        let rung = |k: usize| (k / turns).min(MARGIN as usize - 1);
-        let rungs = rung(n - 1) + 1;
         let t = &self.theta;
         let mut levels = Vec::with_capacity(self.layout.levels.len());
         for lv in &self.layout.levels {
-            // Σ over a rung of |drive read back onto mode k|², per contact, on 2^(−48).
-            let on_rungs = |material: usize| -> Vec<Vec<u128>> {
+            // |drive read back onto mode k|², per contact, on 2^(−48).
+            let on_modes = |material: usize| -> Vec<Vec<u128>> {
                 (0..f)
                     .map(|o| {
-                        let mut e = vec![0u128; rungs];
-                        for k in 0..n {
-                            let (mut re, mut im) = (0i128, 0i128);
-                            for i in 0..w {
-                                let m = t[material + o * w + i] as i128;
-                                re += m * t[lv.read_re + i * n + k] as i128;
-                                im += m * t[lv.read_im + i * n + k] as i128;
-                            }
-                            let (re, im) = (release(re, MATERIAL_BITS).unsigned_abs(), release(im, MATERIAL_BITS).unsigned_abs());
-                            e[rung(k)] += re * re + im * im;
-                        }
-                        e
+                        (0..n)
+                            .map(|k| {
+                                let (mut re, mut im) = (0i128, 0i128);
+                                for i in 0..w {
+                                    let m = t[material + o * w + i] as i128;
+                                    re += m * t[lv.read_re + i * n + k] as i128;
+                                    im += m * t[lv.read_im + i * n + k] as i128;
+                                }
+                                let (re, im) = (release(re, MATERIAL_BITS).unsigned_abs(), release(im, MATERIAL_BITS).unsigned_abs());
+                                re * re + im * im
+                            })
+                            .collect()
                     })
                     .collect()
             };
-            let (a, b) = (on_rungs(lv.contact), on_rungs(lv.pair));
-            let mut e = vec![vec![BigUint::from(0u32); rungs]; rungs];
+            let (a, b) = (on_modes(lv.contact), on_modes(lv.pair));
+            let weight = |drive: &[Vec<u128>]| -> Vec<BigUint> { (0..n).map(|k| drive.iter().map(|o| BigUint::from(o[k])).sum()).collect() };
+            let mut block = vec![vec![BigUint::from(0u32); n]; n];
             for (ao, bo) in a.iter().zip(&b) {
-                for (s, &x) in ao.iter().enumerate() {
-                    for (s2, &y) in bo.iter().enumerate() {
-                        e[s][s2] += BigUint::from(x) * BigUint::from(y);
+                for (k, &x) in ao.iter().enumerate() {
+                    if x == 0 {
+                        continue;
+                    }
+                    let x = BigUint::from(x);
+                    for (k2, &y) in bo.iter().enumerate() {
+                        block[k][k2] += &x * BigUint::from(y);
                     }
                 }
             }
-            levels.push(e);
+            levels.push(BilinearModes { first: weight(&a), second: weight(&b), block });
         }
         Ok(levels)
     }
@@ -5339,6 +5377,38 @@ mod tests {
         let e = &tower.bilinear_rungs().expect("read")[0];
         assert!(e[0][0] > zero);
         assert_eq!([&e[0][1], &e[1][0], &e[1][1]], [&zero, &zero, &zero]);
+    }
+
+    /// Mode by mode, the bilinear weight sums to the rungs' read, each drive's weight on a mode is
+    /// its block's row or column sum over the other drive's weights per contact, and a mode the
+    /// read takes nothing of carries no weight in either drive.
+    #[test]
+    fn the_bilinear_weight_mode_by_mode_sums_to_the_rungs() {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes: 16, contacts: 4, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Pair };
+        let mut tower = Tower::found(declaration, &keys(16384)).expect("founded");
+        let lv = tower.layout.levels[0].clone();
+        let (contact, pair) = (tower.theta[lv.contact..lv.contact + 16].to_vec(), lv.pair);
+        tower.theta[pair..pair + 16].copy_from_slice(&contact);
+        for i in 0..4 {
+            tower.theta[lv.read_re + i * 16 + 5] = 0;
+            tower.theta[lv.read_im + i * 16 + 5] = 0;
+        }
+        let zero = BigUint::from(0u32);
+        let modes = &tower.bilinear_modes().expect("read")[0];
+        let rungs = &tower.bilinear_rungs().expect("read")[0];
+        let rung = |k: usize| (k / turn_ladder(16)).min(MARGIN as usize - 1);
+        for (s, row) in rungs.iter().enumerate() {
+            for (s2, e) in row.iter().enumerate() {
+                let sum: BigUint = (0..16).filter(|&k| rung(k) == s).flat_map(|k| (0..16).filter(move |&k2| rung(k2) == s2).map(move |k2| (k, k2))).map(|(k, k2)| modes.block[k][k2].clone()).sum();
+                assert_eq!(&sum, e);
+            }
+        }
+        // The two drives read the same material, so their weights and the block are symmetric.
+        assert_eq!(modes.first, modes.second);
+        assert!((0..16).all(|k| (0..16).all(|k2| modes.block[k][k2] == modes.block[k2][k])));
+        assert_eq!(modes.first[5], zero);
+        assert!((0..16).all(|k| modes.block[5][k] == zero && modes.block[k][5] == zero));
+        assert!((0..16).filter(|&k| k != 5).all(|k| modes.first[k] > zero && modes.block[k][k] > zero));
     }
 
     /// Founded, the pair contact's second drive is `W_b = 0`, `b_b = 1`: the pair contact and its

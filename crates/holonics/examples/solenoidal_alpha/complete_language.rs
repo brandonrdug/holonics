@@ -802,6 +802,7 @@ pub(super) fn run_with_execution(
         Some("read-lines-carried") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Carried),
         Some("read-lines-own") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_lines(args, true, tower_train::Look::Own),
         Some("read-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair(args),
+        Some("read-tower-pair-modes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_pair_modes(args),
         Some("read-tower-held") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_held(args),
         Some("read-tower-held-cells") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_held_cells(args),
         Some("read-tower-faces") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_faces(args),

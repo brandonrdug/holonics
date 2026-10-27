@@ -366,6 +366,76 @@ pub(super) fn read_tower_pair(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [agent-inferred, October 27] `read-tower-pair-modes STATE STATE_SHA`: where a pair tower's
+/// bilinear weight sits mode by mode ([`Tower::bilinear_modes`]), in thousandths of the level's
+/// whole. Per level, each drive's weight on every mode (`TOWER_PAIR_MODES drive=first|second`,
+/// `mode:thousandths`); on the strands' level, the block between each written mode (named by its
+/// strand's law and its ring's modulus) and the level's other modes, below the strands and past
+/// them (`TOWER_PAIR_STRANDS`, rows the first drive's), and the comparison's own entries, a turned
+/// mode against the stepped mode of its ring in either order (`TOWER_PAIR_COMPARISON`). Record
+/// `2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md`
+/// §6: a coefficient multiplies the mode's face, so what a contact hears of a mode is this weight
+/// times the mode's loudness (`numeral_rings.py scale`). An exterior reading; the tower is not moved.
+pub(super) fn read_tower_pair_modes(args: &[String]) -> Result<()> {
+    if args.len() != 3 {
+        return Err("read-tower-pair-modes STATE STATE_SHA".into());
+    }
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let levels = tower.bilinear_modes().map_err(|e| e.to_string())?;
+    let per = |part: &BigUint, whole: &BigUint, scale: u32| -> String {
+        if *whole == BigUint::from(0u32) { "0".into() } else { ((part * scale + whole / 2u32) / whole).to_string() }
+    };
+    let thousandths = |part: &BigUint, whole: &BigUint| per(part, whole, 1000);
+    for (l, level) in levels.iter().enumerate() {
+        for (name, drive) in [("first", &level.first), ("second", &level.second)] {
+            let whole: BigUint = drive.iter().sum();
+            let each: Vec<String> = drive.iter().enumerate().map(|(k, x)| format!("{k}:{}", thousandths(x, &whole))).collect();
+            println!("TOWER_PAIR_MODES level={l} drive={name} whole_bits={} {}", whole.bits(), each.join(" "));
+        }
+        let Some(strands) = tower.strands().filter(|s| s.level() == l) else {
+            continue;
+        };
+        let whole: BigUint = level.block.iter().flatten().sum();
+        let (first, rings) = (strands.first(), strands.rings());
+        let written = 3 * rings.len();
+        let n = level.first.len();
+        // Groups: the modes below the strands, each written mode, the modes past them.
+        let group = |k: usize| if k < first { 0 } else if k < first + written { 1 + k - first } else { written + 1 };
+        let mut names = vec!["below".to_string()];
+        for law in strands.laws() {
+            for ring in rings {
+                names.push(format!("{}{}", law.name(), ring.modulus));
+            }
+        }
+        names.push("past".into());
+        let g = names.len();
+        let mut e = vec![vec![BigUint::from(0u32); g]; g];
+        for k in 0..n {
+            for k2 in 0..n {
+                e[group(k)][group(k2)] += &level.block[k][k2];
+            }
+        }
+        let rows: Vec<String> = e.iter().map(|row| row.iter().map(|x| thousandths(x, &whole)).collect::<Vec<_>>().join(",")).collect();
+        println!("TOWER_PAIR_STRANDS level={l} whole_bits={} groups={} {}", whole.bits(), names.join(","), rows.join(";"));
+        // The comparison's entries: the turned and the stepped strand of one ring, both orders.
+        let at = |law: holonics::hnn::tower::StrandLaw| strands.laws().iter().position(|&x| x == law);
+        if let (Some(t), Some(s)) = (at(holonics::hnn::tower::StrandLaw::Turned), at(holonics::hnn::tower::StrandLaw::Stepped)) {
+            let entries: Vec<String> = rings
+                .iter()
+                .enumerate()
+                .map(|(i, ring)| {
+                    let (a, b) = (first + t * rings.len() + i, first + s * rings.len() + i);
+                    let both = &level.block[a][b] + &level.block[b][a];
+                    format!("{}:{}/{}", ring.modulus, thousandths(&both, &whole), per(&both, &whole, 1_000_000))
+                })
+                .collect();
+            println!("TOWER_PAIR_COMPARISON level={l} (ring:thousandths/millionths) {}", entries.join(" "));
+        }
+    }
+    Ok(())
+}
+
 /// `read-tower-tension STATE STATE_SHA TEXT TEXT_SHA ROLES ROLES_SHA STREAMS`: the tension a frozen
 /// tower leaves on a text ([`TensionCell`], the mathematics thread's split of October 24), per
 /// region of `roles`, at line starts (the cells read just after a line feed, pooled over the

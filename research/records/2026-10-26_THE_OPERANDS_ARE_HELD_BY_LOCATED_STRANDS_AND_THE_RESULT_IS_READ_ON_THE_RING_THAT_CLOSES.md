@@ -238,3 +238,70 @@ ring).
 - **Seen material graded as unseen.** The acceptance counts only never-heard calculations.
 - **Bits read as progress.** The held-out code is a condition beside the acceptance.
 - **A refusal answered with a larger limit.** Deadlines are fixed from measured rates.
+
+## 6. The run: `PRK` writes as `PRI` does, so decision 4 holds
+
+[measured] Brandon's PC, October 26 ([STRANDS_RUN.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/STRANDS_RUN.md)).
+On the training partition the located keys close all 7,042 calculations of the two largest closing
+groups, with 15,480 of 15,613 result digits read as §3 says, so decision 1 passes. Both towers then
+trained three passes together, 407 and 409 s against a projection of 646 and 640 s. They finished
+at 1.782 (`PRK`) and 1.797 (`PRI`) held-out bits a byte, against `PRT`'s 1.765.
+
+| Right at the equals | `PRK` | `PRI` | `PRT` | 8-gram |
+|---|---|---|---|---|
+| never-met calculations (of 876) | 16 | 22 | 24 | 34 |
+| sums of two numbers, met or not (of 470) | 24 | 24 | 26 | |
+| differences of two numbers, met or not (of 388) | 20 | 23 | 28 | |
+| all calculations (of 2,448) | 230 | 214 | 240 | |
+
+Paired on the never-met calculations, 14 are right only for `PRK`, 22 only for `PRT` and 2 for
+both. Against `PRI` the counts are 9, 15 and 7. The acceptance fails and `PRK` writes no better
+than its foil, so **decision 4 holds**: the comparison is not read at the equals, and the pair
+contact's block between two strands is the subject.
+
+**How wrong the writes are** (the gaps read, never-met calculations, `PRK`). Of 857 wrong numbers:
+- 293 are within a factor of 2 of the exact result, 715 within a factor of 10, and 23 within a
+  tenth of it;
+- 589 are smaller and 268 larger; none has the opposite sign;
+- 853 are results heard after some `=` in training, the commonest 150 (written 120 times);
+- the last digit is right for 315 of 816 against a foil's 214 of 811; on 9, 11, 7 and 13 the
+  residues match about as often as the foil (95, 65, 85, 55 against 85, 59, 106, 61);
+- by result length, 7 of 102 one-digit results are right, 5 of 374 two-digit, 4 of 244
+  three-digit, and none of 156 longer.
+
+`PRI` and `PRT` fail the same way. The tower writes a result it heard, of about the right size,
+with the last digit above chance. It does not write the sum of the two operands it holds.
+
+**The level probe** (§4's read beside the acceptance; class means over all 64 modes of a level).
+At a numeral's last digit, `PRK`'s first level names the numeral's residue more often than `PRI`'s:
+1,052 against 681 of 3,810 on 9, 992 against 625 on 11, 1,068 against 716 on 7. The strands are
+written and the level carries them. At the equals, the operand read last (`b`) is named well by
+both towers: 272 and 239 of 841 on 9, against a majority of 134. The result is named on 9 at 146
+against a majority of 92. The operand read first (`a`) is named at 138 against a majority of 143,
+and at 335 against 426 on 10, though the held strand carries `−a` exactly from the operator on
+(§3's keys, `held ← −turned`), on ring 9 as its residue. The probe weighs every mode by its
+modulus. An earlier tower's level read had its loudest modes at an rms of about 3 to 17 times
+amplitude one [agent-inferred, to be read on these states], so the strands may be drowned in the
+probe as in the tower's read, which normalizes by the level's power.
+
+**Three reads locate the failure before anything is built** (`tools/gsm8k/numeral_rings.py scale`
+and `probe … modes=7:19`, and `read-tower-pair-modes`):
+1. how loud each mode is at the equals and at the numerals: the strands' twelve modes against the
+   rest;
+2. the probe on the strands' twelve modes alone (turned 7..10, stepped 11..14, held 15..18, each
+   the rings 9, 99, 999 and 9999): whether `a`, `b` and the result are held there at the equals;
+3. where the trained contacts' bilinear weight sits, mode by mode
+   (`Tower::bilinear_modes`, block `(k, k′) = Σ_o |A_(o,k)|² |B_(o,k′)|²`): the share on each strand
+   group's block, and on each ring's turned × stepped pair, the comparison's own block.
+
+**Decisions fixed before the reads** [agent-inferred, each from the chart]:
+- 4a. If the strands-only probe names `a` and `b` on 9 at the equals for 90% or more, but all 64
+  modes do not, and the strands' rms is a quarter of the other modes' or less, then the strands are
+  drowned. The next loop writes their faces at the level's power, the gauge the read divides by,
+  not at amplitude one, and runs again.
+- 4b. If the strands are not drowned but the turned × stepped block of each ring holds no more
+  than its equal share of the bilinear weight, then the comparison's block never forms. The
+  contact opens at `W_b = 0`, and result digits are about 0.4% of the bytes. The next loop opens
+  the contact on the located comparison, `r_turned + r_stepped` (§3), the locator's own return.
+- 4c. If the strands-only probe does not name `a` on 9, then the strands do not hold the operand on
+  the stream where §3 says they do, and the join of the strands to the level is the subject.

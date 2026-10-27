@@ -175,5 +175,22 @@ class ExteriorTools(unittest.TestCase):
         self.assertEqual([(framed[b - 5 : b + 1], v) for _, b, v in found],
                          [(b"12+30=", {"a": 12, "b": 30, "result": 42}), (b"<50-8=", {"a": 50, "b": 8, "result": 42})])
 
+    def test_numeral_rings_read_a_span_of_modes_and_each_modes_loudness(self):
+        spec = importlib.util.spec_from_file_location("numeral_rings", TOOLS / "numeral_rings.py")
+        rings = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rings)
+        one = 1 << 24
+        # Two cells, one level of two modes: mode 0 at amplitude one, mode 1 at 5 then 0.
+        cells = [(0, [one, 0, 3 * one, 4 * one]), (1, [0, -one, 0, 0])]
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "cells"
+            path.write_bytes(b"".join(struct.pack("<I", c) + struct.pack("<4q", *x) for c, x in cells))
+            # max 5 and rms sqrt(25 / 2) = 3.53.. in 256ths: 1280 and 905.
+            self.assertEqual(rings.scale(path, 1, 2), [f"NUMERAL_SCALE cells={path} level=0 n=2 modes(mode:max/rms,1/256) 0:256/256 1:1280/905"])
+            places = [(0, 0, {"numeral": 1}), (0, 1, {"numeral": 2})]
+            part, energy = rings.cells(path, places, 1, 2, (1, 2))[0]
+            self.assertEqual(part, [({"numeral": 1}, [3 * one, 4 * one]), ({"numeral": 2}, [0, 0])])
+            self.assertEqual(energy, [({"numeral": 1}, [25 * one * one]), ({"numeral": 2}, [0])])
+
 if __name__ == "__main__":
     unittest.main()
