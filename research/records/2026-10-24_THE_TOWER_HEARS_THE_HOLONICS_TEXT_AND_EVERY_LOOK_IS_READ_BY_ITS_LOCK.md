@@ -3138,6 +3138,18 @@ cross block averages toward zero over a turn that runs round the circle, as the 
 blocks are dropped, and a block-diagonal curvature is positive, so its step descends and the
 exact code's line fixes its scale.
 
+[formal-checked, October 27] Both halves hold in exact arithmetic, in
+[`HNN/RingHarmonics`](../../lean/HolonicsResearch/HNN/RingHarmonics.lean). Every real function on
+`ℤ/n` is `a + Σ_(1≤h≤⌊n/2⌋) (b_h cos(2πhk/n) + c_h sin(2πhk/n))` (`harmonic_expansion`: the discrete
+Fourier inversion, each frequency past `⌊n/2⌋` folded onto `n − j`), and on the residue's face
+`r e^(2πik/n)` the harmonic `q_h` is `r e^(2πihk/n)` (`harmonic_residueFace`), so the readout affine
+in the harmonics' parts reads every function of the residue (`ring_read_at_harmonics`). Along the
+turn the reading `Σ_h ⟪G_h, q_h⟫` moves at `⟪∂ρ, iρ⟫` for the covector above
+(`hasDerivAt_reading_turn_adjoint`); along the radius it moves by `⟪∂ρ, ρ⟫` plus the harmonics'
+radial part, which `∂ρ` omits (`hasDerivAt_reading_radial_split`), and through the ratio
+`ρ = r q/|q|` the radius does not move the reading (`hasDerivAt_ratio_radial`), so the omission is
+exact.
+
 Three rounds saved 18,950, 5,603 and 1,747 nats against the 4,550 that 650 · 14 free parameters
 ask; the founding read the block at 2.288 bits a byte before, 2.188 under the one-cosine readout
 and 2.112 under the harmonics, in 545 s against a projection of 1,020 s (deadline 1,080 s).
