@@ -1,4 +1,6 @@
 import Holonics.Aeon.Clock.Epoch
+import Mathlib.Algebra.Polynomial.Derivative
+import Mathlib.Algebra.Star.Basic
 import Mathlib.Tactic
 
 /-!
@@ -42,6 +44,12 @@ product of its sub-moves, with the scale square between two levels.
    with `z ↦ z^r` holds exactly when the fine count's residue modulo `r` is the same at both ends,
    and otherwise up to that residue. The square relates one mode read on two clocks; the tower's
    levels carry their own learned modes.
+8. **The move's covector over its sub-moves is the derivative** (`subCovector_step`,
+   `move_covector`, `derivative_reads`, `move_covector_is_derivative`, `move_covector_no_tick`):
+   the reverse carries the covector back one sub-move at a time, `G⁽ʲ⁾ = conj(z) G⁽ʲ⁺¹⁾`, reaching
+   `conj(z)ⁿ G` before the arrival, and the move's covector summed over the `n` sub-moves,
+   `Σ_(j<n) conj(zʲ h) G⁽ʲ⁺¹⁾`, is `conj(∂(zⁿ h)/∂z) G = conj(n zⁿ⁻¹ h) G`. With `n = 0` the
+   covector passes through unchanged and the move receives none.
 
 The computational object is the helical pair interaction: each level's clock is a helix whose turn
 is the section and whose carry is the tick, and the mode's move is the turn read at that clock. Of
@@ -255,5 +263,69 @@ theorem scale_square_of_residue {M : Type*} [Monoid M] (z : M) (σ r a b : ℕ) 
   rw [← Nat.div_div_eq_div_mul, ← Nat.div_div_eq_div_mul, ← pow_mul]
   congr 1
   exact Nat.add_right_cancel hc
+
+/-! ## 6. The move's covector over its sub-moves -/
+
+/-- [definition] The state after `j` of an arrival's sub-moves of the mode `z` from `h`. -/
+def subState {R : Type*} [Monoid R] (z h : R) (j : ℕ) : R := z ^ j * h
+
+/-- [definition] The covector reaching sub-move `j` of `n`: the covector `G` after the arrival,
+carried back through the later sub-moves, `G⁽ʲ⁾ = conj(z)^(n − j) G`. -/
+def subCovector {R : Type*} [Monoid R] [StarMul R] (z G : R) (n j : ℕ) : R :=
+  star z ^ (n - j) * G
+
+/-- [proved-derived; formal-checked] **The reverse carries the covector back one sub-move at a
+time:** `G⁽ʲ⁾ = conj(z) G⁽ʲ⁺¹⁾` for `j < n`. -/
+theorem subCovector_step {R : Type*} [Monoid R] [StarMul R] (z G : R) {n j : ℕ} (hj : j < n) :
+    subCovector z G n j = star z * subCovector z G n (j + 1) := by
+  unfold subCovector
+  rw [show n - j = n - (j + 1) + 1 by omega, pow_succ', mul_assoc]
+
+/-- [proved-derived; formal-checked] Before the arrival the covector is `conj(z)ⁿ G`, and after
+its last sub-move it is `G`. -/
+theorem subCovector_ends {R : Type*} [Monoid R] [StarMul R] (z G : R) (n : ℕ) :
+    subCovector z G n 0 = star z ^ n * G ∧ subCovector z G n n = G := by
+  simp [subCovector]
+
+/-- [proved-derived; formal-checked] **The move's covector summed over its sub-moves:** each
+sub-move `j` pairs the state before it with the covector after it, and the `n` pairings sum to
+`conj(n zⁿ⁻¹ h) G`. -/
+theorem move_covector {R : Type*} [CommSemiring R] [StarRing R] (z h G : R) (n : ℕ) :
+    ∑ j ∈ range n, star (subState z h j) * subCovector z G n (j + 1) =
+      star ((n : R) * z ^ (n - 1) * h) * G := by
+  have hterm : ∀ j ∈ range n, star (subState z h j) * subCovector z G n (j + 1) =
+      star z ^ (n - 1) * star h * G := by
+    intro j hj
+    have hjn : j < n := Finset.mem_range.mp hj
+    simp only [subState, subCovector, star_mul', star_pow]
+    have hexp : n - 1 = j + (n - (j + 1)) := by omega
+    rw [hexp, pow_add]
+    ring
+  rw [Finset.sum_congr rfl hterm, Finset.sum_const, Finset.card_range, nsmul_eq_mul, star_mul',
+    star_mul', star_natCast, star_pow]
+  ring
+
+/-- [proved-standard; formal-checked] **`∂(zⁿ h)/∂z = n zⁿ⁻¹ h`**, read at `z`. -/
+theorem derivative_reads {R : Type*} [CommSemiring R] (z h : R) (n : ℕ) :
+    Polynomial.eval z (Polynomial.derivative (Polynomial.C h * Polynomial.X ^ n)) =
+      (n : R) * z ^ (n - 1) * h := by
+  rw [Polynomial.derivative_C_mul_X_pow]
+  simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X]
+  ring
+
+/-- [proved-derived; formal-checked] **The sub-moves' covector is the conjugate derivative:** the
+reverse over `n` sub-moves sends the move `conj(∂(zⁿ h)/∂z) G`. -/
+theorem move_covector_is_derivative {R : Type*} [CommSemiring R] [StarRing R] (z h G : R)
+    (n : ℕ) :
+    ∑ j ∈ range n, star (subState z h j) * subCovector z G n (j + 1) =
+      star (Polynomial.eval z (Polynomial.derivative (Polynomial.C h * Polynomial.X ^ n))) * G := by
+  rw [derivative_reads, move_covector]
+
+/-- [proved-derived; formal-checked] **An arrival that does not tick passes the covector through
+and sends none to the move.** -/
+theorem move_covector_no_tick {R : Type*} [CommSemiring R] [StarRing R] (z h G : R) :
+    ∑ j ∈ range 0, star (subState z h j) * subCovector z G 0 (j + 1) = 0 ∧
+      subCovector z G 0 0 = G := by
+  simp [subCovector]
 
 end Holonics.HNN.NewsClock
