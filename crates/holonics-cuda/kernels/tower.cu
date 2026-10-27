@@ -6,8 +6,11 @@
 // the arrival held, the ticks read by thread 0 from the arriving class's code under the open
 // face): gated modes,
 // turned or not (each cell's founded unit turned by `e^(iπ s_t)`, `s_t = 2^(−spread)(W_φ x + b_φ)`
-// composed from the ladder's dyadic turns), rectifying contacts, no pump, no passage credit, with
-// or without the pair face
+// composed from the ladder's dyadic turns), pumped or not (a turned mode's move the parametron's,
+// `h ← α_t h + β_t conj(h) + γ_t P x_t`, `α_t = ρ_t (1 − |κ_t|) U_t`, `β_t = ρ_t κ_t e^(iπ p_t)`,
+// `κ_t = 2r − 1` with `r` the logistic of `W_κ x + b_κ` and `p_t = 2^(−spread)(W_ψ x + b_ψ)`;
+// never beside a news clock), rectifying contacts, no passage credit, with or without the pair
+// face
 // (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
 // and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
 // their faces read through the pair contact with the top face, `z += W (x̂ ⊗ ρ)`; the products the
@@ -30,9 +33,10 @@
 // - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
 //   (cells are independent there: each reads its own forward temporaries and covector).
 // - `tower_reverse_modes`: one block a stream, one thread a mode, the cells in reverse order (the
-//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`), with each cell's gated move adjoint
-//   and a turned level's turn covector `δs`, which `tower_reverse_dx` returns through `W_φᵀ` and
-//   `tower_outer` sums against the level's input.
+//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`, `+ β_(t+1) conj(G_h(t+1))` when
+//   pumped), with each cell's gated move adjoint, a turned level's turn covector `δs` and a pumped
+//   level's depth and axis covectors `δκ`, `δp`, which `tower_reverse_dx` returns through `W_φᵀ`,
+//   `W_κᵀ` and `W_ψᵀ` and `tower_outer` sums against the level's input.
 // - `tower_reverse_ring`: one block a stream, the ring's scan over the cells in reverse order (one
 //   thread a rank), the carried face's covector onto the read covector before the modes' scan, and
 //   each factor's covector; `tower_ring_factors` sums the factors' over the streams.
@@ -75,9 +79,9 @@ typedef unsigned __int128 uwide;
 
 struct TowerLevel {
     uint64_t move_re, move_im, push_re, push_im, read_re, read_im, contact, contact_bias, ret,
-        ret_bias, gate, gate_bias, turn, turn_bias;
-    // max |w| of push (re, im), read (re, im), contact, return, gate, turn
-    uint64_t reach[8];
+        ret_bias, gate, gate_bias, turn, turn_bias, pump, pump_bias, pump_axis, pump_axis_bias;
+    // max |w| of push (re, im), read (re, im), contact, return, gate, turn, pump depth, pump axis
+    uint64_t reach[10];
 };
 
 struct TowerLaw {
@@ -98,6 +102,10 @@ struct TowerLaw {
     int64_t half_turn;
     uint32_t turned, turn_spread;
     int64_t ladder[TOWER_LADDER][2];
+    // The pumped modes (`pumped = 0` when not; a pumped mode is turned): ln 2 on 2^(−30), which
+    // the depth's covector reads.
+    uint32_t pumped, pad2;
+    int64_t ln2;
     TowerLevel level[TOWER_MAX_LEVELS];
     // The news clock (`news = 0` without one, every level then moving once a cell): each level's
     // section `B r^(l−1)` on 2^(−20) bits (level 0's unread: it ticks at every arrival) and the
@@ -182,7 +190,7 @@ struct TowerFrame {
     int32_t *ring_pair;           // [S][T][(W + 1)·2RH]
     uint64_t *r_ring_pair;        // [S][T]
     int64_t *ring_cov;            // [S][T][2R]
-    wide *ring_dmove;             // [S][T][2]
+    wide *ring_dmove;             // [S][T][4]: λ re, λ im, β re, β im
     wide *ring_g;                 // [S][R·(6N + 2W + 3)]
     // The turned modes: each cell's unit u e^(iπ s_t) on 2^(−30), the turn's covector δs, and
     // max |δs| (each empty when unturned).
@@ -195,6 +203,12 @@ struct TowerFrame {
     const uint64_t *news_open; // [S][A + 4]
     uint64_t *news_ends;       // [S][A + 4]
     uint32_t *ticks;           // [S][T][L]
+    // The pumped modes: each cell's pump (its opening r and depth κ on 2^(−30), its axis face
+    // e^(iπ p_t) and β_t), the depth's and the axis's covectors δκ, δp, and their max |·| (each
+    // empty when unpumped). A pumped cell's moves row holds its turn α_t as λ.
+    int64_t *pumps;   // [S][T][L][N][6]: r, κ, axis re, axis im, β re, β im
+    int64_t *dk, *dp; // [S][T][L][N]
+    uint64_t *r_dk, *r_dp; // [S][T][L]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -622,7 +636,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     wide *part = (wide *)carve(at, sizeof(wide) * G * W);
     uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
     int64_t *h = (int64_t *)carve(at, 8ull * L * 2 * N);
-    int64_t *pq = (int64_t *)carve(at, 8ull * (3 + law.turned) * N);
+    const uint32_t FAMS = 3 + law.turned + 2 * law.pumped;
+    int64_t *pq = (int64_t *)carve(at, 8ull * FAMS * N);
     int64_t *fc = (int64_t *)carve(at, 8ull * 2 * N);
     int64_t *rab = (int64_t *)carve(at, 8ull * 2 * W);
     int64_t *raw = (int64_t *)carve(at, 8ull * W);
@@ -647,7 +662,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int32_t *phi = (int32_t *)carve(at, 4ull * KP);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
-    __shared__ wide ring_lam[2];
+    __shared__ wide ring_lam[4];
     // The news clock: the open face (its masses in `ms`, its total, whether there is one), the
     // clock's phase, and each level's ticks at the arriving class.
     __shared__ uwide news_total;
@@ -803,17 +818,25 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             const bool n_im = narrow_terms(lv.reach[1], xmax, W, &st);
             const bool n_gate = narrow_terms(lv.reach[6], xmax, W, &st);
             const bool n_turn = law.turned && narrow_terms(lv.reach[7], xmax, W, &st);
+            const bool n_depth = law.pumped && narrow_terms(lv.reach[8], xmax, W, &st);
+            const bool n_axis = law.pumped && narrow_terms(lv.reach[9], xmax, W, &st);
             // A turned level's arriving turn s_t = 2^(−spread) (W_φ x + b_φ), in half turns on
-            // 2^(−16), beside the gate's logit.
-            for (uint32_t o = tid; o < (3 + law.turned) * N; o += B) {
+            // 2^(−16), beside the gate's logit; a pumped level's depth logit W_κ x + b_κ on
+            // 2^(−16) and its axis p_t = 2^(−spread) (W_ψ x + b_ψ) in half turns on 2^(−16).
+            for (uint32_t o = tid; o < FAMS * N; o += B) {
                 const uint32_t fam = o / N, k = o % N;
                 if (fam == 2) {
                     wide sum = dot(tt + lv.gate + k, N, W, x, n_gate);
                     sum += (wide)th[lv.gate_bias + k] << MATERIAL_BITS;
                     pq[o] = fit64(rel(sum, MATERIAL_BITS), &st);
-                } else if (fam == 3) {
-                    wide sum = dot(tt + lv.turn + k, N, W, x, n_turn);
-                    sum += (wide)th[lv.turn_bias + k] << MATERIAL_BITS;
+                } else if (fam == 4) {
+                    wide sum = dot(tt + lv.pump + k, N, W, x, n_depth);
+                    sum += (wide)th[lv.pump_bias + k] << MATERIAL_BITS;
+                    pq[o] = fit64(rel(sum, MATERIAL_BITS), &st);
+                } else if (fam == 3 || fam == 5) {
+                    const bool axis = fam == 5;
+                    wide sum = dot(tt + (axis ? lv.pump_axis : lv.turn) + k, N, W, x, axis ? n_axis : n_turn);
+                    sum += (wide)th[(axis ? lv.pump_axis_bias : lv.turn_bias) + k] << MATERIAL_BITS;
                     const int64_t turn = fit64(rel(sum, MATERIAL_BITS), &st);
                     pq[o] = fit64(rel((wide)turn, law.turn_spread), &st);
                 } else {
@@ -841,8 +864,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     ui = rel(ur * ti + ui * tr, MOVE_BITS);
                     ur = nr;
                 }
-                const wide lr = rel(rho * ur, MOVE_BITS);
-                const wide li = rel(rho * ui, MOVE_BITS);
+                wide lr = rel(rho * ur, MOVE_BITS);
+                wide li = rel(rho * ui, MOVE_BITS);
                 wide gap = ((wide)1 << (2 * MOVE_BITS)) - (lr * lr + li * li);
                 gap = gap < 0 ? 0 : gap;
                 uint64_t gamma = isqrt64((uint64_t)gap);
@@ -850,15 +873,31 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     atomicOr(&st, TOWER_REFUSED_UNIT);
                     gamma = 1;
                 }
-                // The step h ← λ_t h + γ_t P x_t acts once a tick of the level's clock (once
-                // without a news clock), the arrival held through its ticks; an arrival that ticks
-                // no time moves nothing.
+                // A pumped mode's turn α_t = ρ_t (1 − |κ|) U_t and pump β_t = ρ_t κ P_t: |α| + |β|
+                // = ρ_t, so γ_t is kept.
+                wide pump_open = 0, kappa = 0, axr = 0, axi = 0, br = 0, bi = 0;
+                if (law.pumped) {
+                    const wide one = (wide)1 << MOVE_BITS;
+                    pump_open = logistic(pq[4 * N + k], face_roots, law.face_digits);
+                    kappa = 2 * pump_open - one;
+                    turn_face(pq[5 * N + k], law, &axr, &axi);
+                    const wide keep_ = one - (kappa < 0 ? -kappa : kappa);
+                    const wide depth = rel(rho * kappa, MOVE_BITS);
+                    const wide ar = rel(keep_ * lr, MOVE_BITS);
+                    li = rel(keep_ * li, MOVE_BITS);
+                    lr = ar;
+                    br = rel(depth * axr, MOVE_BITS);
+                    bi = rel(depth * axi, MOVE_BITS);
+                }
+                // The step h ← λ_t h + γ_t P x_t (h ← α_t h + β_t conj(h) + γ_t P x_t when
+                // pumped) acts once a tick of the level's clock (once without a news clock), the
+                // arrival held through its ticks; an arrival that ticks no time moves nothing.
                 const wide pr = rel((wide)gamma * pq[k], MOVE_BITS);
                 const wide pi = rel((wide)gamma * pq[N + k], MOVE_BITS);
                 wide hr = h[(l * N + k) * 2], hi = h[(l * N + k) * 2 + 1];
                 for (uint32_t j = 0; j < tk[l]; j++) {
-                    const wide ar = rel(lr * hr - li * hi, MOVE_BITS);
-                    hi = fit64(rel(lr * hi + li * hr, MOVE_BITS) + pi, &st);
+                    const wide ar = rel(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS);
+                    hi = fit64(rel(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi, &st);
                     hr = fit64(ar + pr, &st);
                 }
                 const int64_t nr = (int64_t)hr;
@@ -868,6 +907,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 if (ringed && k == law.ring_mode) {
                     ring_lam[0] = lr;
                     ring_lam[1] = li;
+                    ring_lam[2] = br;
+                    ring_lam[3] = bi;
                 }
                 fc[k] = fit64(rel(nr, STATE_BITS - FACE_BITS), &st);
                 fc[N + k] = fit64(rel(ni, STATE_BITS - FACE_BITS), &st);
@@ -888,6 +929,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     if (law.turned) {
                         fr.units[(q * N + k) * 2] = (int64_t)ur;
                         fr.units[(q * N + k) * 2 + 1] = (int64_t)ui;
+                    }
+                    if (law.pumped) {
+                        int64_t *pm = fr.pumps + (q * N + k) * 6;
+                        pm[0] = (int64_t)pump_open;
+                        pm[1] = (int64_t)kappa;
+                        pm[2] = (int64_t)axr;
+                        pm[3] = (int64_t)axi;
+                        pm[4] = (int64_t)br;
+                        pm[5] = (int64_t)bi;
                     }
                 }
             }
@@ -923,7 +973,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     const wide vre = rel(mul_checked(pre, gamma, &st), sh[3]);
                     const wide vim = rel(mul_checked(pim, gamma, &st), sh[3]);
                     // the move: the rank's founded pair move at (prev, u), or the mode's
-                    wide m[4] = {ring_lam[0], ring_lam[1], 0, 0};
+                    wide m[4] = {ring_lam[0], ring_lam[1], ring_lam[2], ring_lam[3]};
                     bool founded = false;
                     uint32_t lo = fr.ring_index[r], hi = fr.ring_index[r + 1];
                     while (lo < hi) {
@@ -1472,7 +1522,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ring(T
     unsigned char *at = smem;
     wide *gs = (wide *)carve(at, sizeof(wide) * 2 * R);
     wide *ehf = (wide *)carve(at, sizeof(wide) * 5 * R);
-    wide *dm = (wide *)carve(at, sizeof(wide) * 2 * R);
+    wide *dm = (wide *)carve(at, sizeof(wide) * 4 * R);
     int64_t *sf = (int64_t *)carve(at, 8ull * dims);
     uint32_t *rode = (uint32_t *)carve(at, 4ull * R);
     __shared__ uint32_t st;
@@ -1533,10 +1583,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ring(T
                 xgy = mul_checked(mul_checked(x, gy, &st), up, &st);
                 ygx = mul_checked(mul_checked(y, gx, &st), up, &st);
             }
-            dm[2 * r] = add_checked(xgx, ygy, &st);
-            dm[2 * r + 1] = add_checked(xgy, -ygx, &st);
-            add_checked(xgx, -ygy, &st);
-            add_checked(xgy, ygx, &st);
+            dm[4 * r] = add_checked(xgx, ygy, &st);
+            dm[4 * r + 1] = add_checked(xgy, -ygx, &st);
+            dm[4 * r + 2] = add_checked(xgx, -ygy, &st);
+            dm[4 * r + 3] = add_checked(xgy, ygx, &st);
             rode[r] = hand & 4u;
             // conj(G) β and conj(G) α, then their products with γ and α, released by the push and σ.
             const wide *fa = fr.ring_factor + qr * 5;
@@ -1589,17 +1639,20 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ring(T
             }
             gsum[e] = add_checked(gsum[e], term, &st);
         }
-        // The mode's move takes the covector of every rank that rode it, not a founded pair move.
+        // The mode's move (its λ, and its β when pumped) takes the covector of every rank that
+        // rode it, not a founded pair move.
         if (tid == 0) {
-            wide d0 = 0, d1 = 0;
+            wide d[4] = {0, 0, 0, 0};
             for (uint32_t r = 0; r < R; r++) {
                 if (rode[r] == 0) {
-                    d0 += dm[2 * r];
-                    d1 += dm[2 * r + 1];
+                    for (uint32_t i = 0; i < 4; i++) {
+                        d[i] += dm[4 * r + i];
+                    }
                 }
             }
-            fr.ring_dmove[q * 2] = d0;
-            fr.ring_dmove[q * 2 + 1] = d1;
+            for (uint32_t i = 0; i < 4; i++) {
+                fr.ring_dmove[q * 4 + i] = d[i];
+            }
         }
         __syncthreads();
     }
@@ -1629,9 +1682,12 @@ extern "C" __global__ void tower_ring_factors(TowerLaw law, TowerFrame fr) {
 }
 
 // The modes' reverse scan of one level of one stream, one thread a mode, and each cell's gated move
-// adjoint: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1); the covectors of |λ| and arg λ summed
-// over the cells; the gate's logit covector δq; a turned level's turn covector
-// δs = 2^(−spread) π Re(conj(iλ_t) G_λ), through ∂θ/∂s = π; and γ_t G_h, what the pushes return.
+// adjoint: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1) (+ β_(t+1) conj(G_h(t+1)) when
+// pumped); the covectors of |λ| and arg λ summed over the cells; the gate's logit covector δq; a
+// turned level's turn covector δs = 2^(−spread) π Re(conj(iλ_t) G_λ), through ∂θ/∂s = π; a pumped
+// level's axis covector δp = 2^(−spread) π Re(conj(iβ_t) G_β) and depth covector
+// δκ = (−sgn(κ) Re(conj(ρU) G_λ) + Re(conj(ρP) G_β)) 2 ln 2 r (1 − r), with G_β = h_(t−1) G_h(t);
+// and γ_t G_h, what the pushes return.
 extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, L = law.levels, T = law.cells;
@@ -1649,22 +1705,28 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
         for (uint32_t step = 0; step < T; step++) {
             const uint32_t t = T - 1 - step;
             const uint64_t q = (uint64_t)s * T + t, ql = q * L + l;
-            wide lr, li;
+            wide lr, li, pbr = 0, pbi = 0;
             if (t + 1 < T) {
                 const int64_t *later = fr.moves + (((q + 1) * L + l) * N + k) * 6;
                 lr = later[3];
                 li = later[4];
+                if (law.pumped) {
+                    const int64_t *pump = fr.pumps + (((q + 1) * L + l) * N + k) * 6;
+                    pbr = pump[4];
+                    pbi = pump[5];
+                }
             } else {
                 lr = fr.theta[lv.move_re + k];
                 li = fr.theta[lv.move_im + k];
             }
             // The later cell's move acted once a tick of the level's clock (once without one):
-            // conj(λ_(t+1)) carried back that many times.
+            // conj(λ_(t+1)) carried back that many times (with β_(t+1) conj(·) when pumped, never
+            // beside a clock).
             const uint32_t later_ticks = law.news && t + 1 < T ? fr.ticks[(q + 1) * L + l] : 1;
             wide br = cr, bi = ci;
             for (uint32_t j = 0; j < later_ticks; j++) {
-                const wide ar = rel(lr * br + li * bi, MOVE_BITS);
-                bi = rel(lr * bi - li * br, MOVE_BITS);
+                const wide ar = rel(lr * br + li * bi + pbr * br + pbi * bi, MOVE_BITS);
+                bi = rel(lr * bi - li * br + pbi * br - pbr * bi, MOVE_BITS);
                 br = ar;
             }
             const int64_t gr = fit64((wide)fr.readcov[ql * 2 * N + k] + br, &st);
@@ -1679,14 +1741,21 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             const wide open = mv[0], rho = mv[1], gamma = mv[2];
             // The covectors of λ_t and γ_t, and of the push γ_t P x_t summed over the steps it
             // entered.
-            wide glr, gli, through, pgr = gr, pgi = gi;
+            // h_(t−1) G_h(t), the covector of β_t, on 2^(−48) (read when pumped).
+            wide glr, gli, through, pgr = gr, pgi = gi, gbr = 0, gbi = 0;
             if (ticks == 1) {
                 glr = hr * gr + hi * gi;
                 gli = hr * gi - hi * gr;
+                if (law.pumped) {
+                    gbr = hr * gr - hi * gi;
+                    gbi = hr * gi + hi * gr;
+                }
                 // The ring's covector of the move it rode, on the same convention.
                 if (law.ring_ranks > 0 && l == law.ring_level && k == law.ring_mode) {
-                    glr += fr.ring_dmove[q * 2];
-                    gli += fr.ring_dmove[q * 2 + 1];
+                    glr += fr.ring_dmove[q * 4];
+                    gli += fr.ring_dmove[q * 4 + 1];
+                    gbr += fr.ring_dmove[q * 4 + 2];
+                    gbi += fr.ring_dmove[q * 4 + 3];
                 }
                 through = (wide)gr * push_r + (wide)gi * push_i;
             } else {
@@ -1729,9 +1798,33 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             if (law.turned) {
                 fr.ds[ql * N + k] = fit64(rel((wide)law.half_turn * turning, MOVE_BITS + COVECTOR_BITS + law.turn_spread), &st);
             }
+            // A pumped cell's pump: its opening r, depth κ, axis face P and β.
+            wide popen = 0, kappa = 0, axr = 0, axi = 0;
+            if (law.pumped) {
+                const int64_t *pm = fr.pumps + (ql * N + k) * 6;
+                popen = pm[0];
+                kappa = pm[1];
+                axr = pm[2];
+                axi = pm[3];
+                // Re(conj(iβ) G_β): the covector of the pump axis's turn, through ∂θ/∂p = π.
+                const wide axis_turning = rel((wide)pm[4] * gbi - (wide)pm[5] * gbr, MOVE_BITS);
+                fr.dp[ql * N + k] = fit64(rel((wide)law.half_turn * axis_turning, MOVE_BITS + COVECTOR_BITS + law.turn_spread), &st);
+                // −sgn(κ) Re(conj(ρU) G_λ) + Re(conj(ρP) G_β), the covector of κ, on 2^(−48).
+                const wide vr = rel(rho * cu_r, MOVE_BITS), vi = rel(rho * cu_i, MOVE_BITS);
+                const wide qr = rel(rho * axr, MOVE_BITS), qi = rel(rho * axi, MOVE_BITS);
+                const wide sign = (kappa > 0) - (kappa < 0);
+                const wide g_kappa = rel(qr * gbr + qi * gbi - sign * (vr * glr + vi * gli), MOVE_BITS);
+                // ∂κ/∂q = 2 ln 2 r (1 − r), on 2^(−30).
+                const wide f = rel(rel((wide)law.ln2 * popen, MOVE_BITS) * (one - popen), MOVE_BITS);
+                fr.dk[ql * N + k] = fit64(rel(g_kappa * 2 * f, COVECTOR_BITS + MOVE_BITS), &st);
+            }
             int64_t dq = 0;
             if (mv[5] == 0) {
-                const wide g_rho = rel(cu_r * glr + cu_i * gli, MOVE_BITS) - div_nearest(rho * through, gamma);
+                // ∂α/∂ρ = (1 − |κ|) U and ∂β/∂ρ = κ P (U alone when unpumped).
+                const wide keep_ = one - (kappa < 0 ? -kappa : kappa);
+                const wide kur = rel(keep_ * cu_r, MOVE_BITS), kui = rel(keep_ * cu_i, MOVE_BITS);
+                const wide kr = rel(kappa * axr, MOVE_BITS), ki = rel(kappa * axi, MOVE_BITS);
+                const wide g_rho = rel(kur * glr + kui * gli + kr * gbr + ki * gbi, MOVE_BITS) - div_nearest(rho * through, gamma);
                 along += rel(g_rho * div_nearest((wide)GATE_REACH * open * rho, modulus), MOVE_BITS);
                 wide f = rel(rho * log, MOVE_BITS);
                 f = rel(f * (wide)law.ln2_square, MOVE_BITS);
@@ -1755,8 +1848,8 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
     }
 }
 
-// What the pushes, the gate and a turned level's turn return to the level's input:
-// dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq (+ W_φᵀ δs).
+// What the pushes, the gate, a turned level's turn and a pumped level's depth and axis return to
+// the level's input: dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq (+ W_φᵀ δs) (+ W_κᵀ δκ + W_ψᵀ δp).
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint64_t q = blockIdx.x, ql = q * law.levels + l;
     const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
@@ -1764,7 +1857,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     const TowerLevel &lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
-    const uint32_t fams = 3 + law.turned;
+    const uint32_t fams = 3 + law.turned + 2 * law.pumped;
     int64_t *v = (int64_t *)carve(at, 8ull * fams * N);
     int64_t *back = (int64_t *)carve(at, 8ull * fams * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
@@ -1772,7 +1865,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     if (tid == 0) {
         st = 0;
     }
-    uint64_t m0 = 0, m1 = 0, m2 = 0, m3 = 0;
+    uint64_t m0 = 0, m1 = 0, m2 = 0, m3 = 0, m4 = 0, m5 = 0;
     for (uint32_t k = tid; k < N; k += B) {
         v[k] = fr.gre[ql * N + k];
         v[N + k] = fr.gim[ql * N + k];
@@ -1786,11 +1879,20 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
             const uint64_t d = magnitude(v[3 * N + k]);
             m3 = d > m3 ? d : m3;
         }
+        if (law.pumped) {
+            v[4 * N + k] = fr.dk[ql * N + k];
+            v[5 * N + k] = fr.dp[ql * N + k];
+            const uint64_t d = magnitude(v[4 * N + k]), e = magnitude(v[5 * N + k]);
+            m4 = d > m4 ? d : m4;
+            m5 = e > m5 ? e : m5;
+        }
     }
     const uint64_t r0 = block_max(m0, red);
     const uint64_t r1 = block_max(m1, red);
     const uint64_t r2 = block_max(m2, red);
     const uint64_t r3 = law.turned ? block_max(m3, red) : 0;
+    const uint64_t r4 = law.pumped ? block_max(m4, red) : 0;
+    const uint64_t r5 = law.pumped ? block_max(m5, red) : 0;
     if (tid == 0) {
         fr.r_gre[ql] = r0;
         fr.r_gim[ql] = r1;
@@ -1798,21 +1900,25 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         if (law.turned) {
             fr.r_ds[ql] = r3;
         }
+        if (law.pumped) {
+            fr.r_dk[ql] = r4;
+            fr.r_dp[ql] = r5;
+        }
     }
-    const bool n0 = narrow_rows(lv.reach[0], r0, N);
-    const bool n1 = narrow_rows(lv.reach[1], r1, N);
-    const bool n2 = narrow_rows(lv.reach[6], r2, N);
-    const bool n3 = law.turned && narrow_rows(lv.reach[7], r3, N);
+    const bool narrow[6] = {narrow_rows(lv.reach[0], r0, N), narrow_rows(lv.reach[1], r1, N), narrow_rows(lv.reach[6], r2, N), law.turned && narrow_rows(lv.reach[7], r3, N), law.pumped && narrow_rows(lv.reach[8], r4, N), law.pumped && narrow_rows(lv.reach[9], r5, N)};
+    const uint64_t bases[6] = {lv.push_re, lv.push_im, lv.gate, lv.turn, lv.pump, lv.pump_axis};
     for (uint32_t o = tid; o < fams * W; o += B) {
         const uint32_t fam = o / W, j = o % W;
-        const uint64_t base = fam == 0 ? lv.push_re : fam == 1 ? lv.push_im : fam == 2 ? lv.gate : lv.turn;
-        const wide sum = dot(fr.theta + base + j, W, N, v + fam * N, fam == 0 ? n0 : fam == 1 ? n1 : fam == 2 ? n2 : n3);
+        const wide sum = dot(fr.theta + bases[fam] + j, W, N, v + fam * N, narrow[fam]);
         back[o] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
     uint64_t mx = 0;
     for (uint32_t j = tid; j < W; j += B) {
-        const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j] + (law.turned ? back[3 * W + j] : 0);
+        wide sum = (wide)fr.dx[q * W + j];
+        for (uint32_t fam = 0; fam < fams; fam++) {
+            sum += back[fam * W + j];
+        }
         const int64_t v = fit64(sum, &st);
         fr.dx[q * W + j] = v;
         const uint64_t a = magnitude(v);

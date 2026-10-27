@@ -251,9 +251,15 @@ pub struct ResidentLevel {
     /// The turned modes' turn `W_φ` (`N × d`) and bias `b_φ` (zero when unturned).
     pub turn: usize,
     pub turn_bias: usize,
-    /// `max |w|` of push (re, im), read (re, im), contact, return, gate and turn
-    /// (`Tower::reaches`).
-    pub reaches: [u64; 8],
+    /// The pumped modes' depth `W_κ` (`N × d`) and bias `b_κ`, and their axis `W_ψ` and bias `b_ψ`
+    /// (each zero when unpumped).
+    pub pump: usize,
+    pub pump_bias: usize,
+    pub pump_axis: usize,
+    pub pump_axis_bias: usize,
+    /// `max |w|` of push (re, im), read (re, im), contact, return, gate, turn, pump depth and pump
+    /// axis (`Tower::reaches`).
+    pub reaches: [u64; 10],
     /// The gated moves' founded faces, one a mode, on `2^(−30)`: the unit `u = λ/|λ|`, the
     /// modulus `|λ|` and `ℓ = log₂|λ|` (empty when ungated).
     pub units: Vec<(i64, i64)>,
@@ -301,7 +307,7 @@ pub struct ResidentRing {
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
+/// face's grain and at the moves'), `ln 2` and `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
 /// they are joined, whether a rotor or strands are, and the news clock when one is joined. Read
 /// from the tower's own owners, so a realization holds no second copy of a law, and a realization
 /// that does not carry a joined part refuses the tower rather than reading it without that part.
@@ -317,6 +323,8 @@ pub struct ResidentLaw {
     pub face_roots: Vec<u128>,
     pub move_roots: Vec<u128>,
     pub ln2_square: i128,
+    /// `ln 2` on `2^(−30)`, which the pump's depth reads (`∂κ/∂q = 2 ln 2 r (1 − r)`).
+    pub ln2: i128,
     /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16`, and the half turn `π`, on `2^(−30)`
     /// (empty and zero when unturned): the turn's navigator faces, generated where the tower reads
     /// its reaches.
@@ -433,7 +441,11 @@ impl Tower {
                 gate_bias: lv.gate_bias,
                 turn: lv.turn,
                 turn_bias: lv.turn_bias,
-                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]],
+                pump: lv.pump,
+                pump_bias: lv.pump_bias,
+                pump_axis: lv.pump_axis,
+                pump_axis_bias: lv.pump_axis_bias,
+                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]],
                 units,
                 moduli,
                 logs,
@@ -450,6 +462,7 @@ impl Tower {
             face_roots: self.exponential.roots().to_vec(),
             move_roots: self.fine.roots().to_vec(),
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
+            ln2: ln2_face(),
             ladder: collect_exact(reaches.ladder.iter().map(|&(re, im)| Ok((narrow(re)?, narrow(im)?))))?,
             half_turn: narrow(reaches.half_turn)?,
             pair: self.pair.as_ref().map(|face| ResidentPair {

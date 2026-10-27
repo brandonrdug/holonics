@@ -15,8 +15,11 @@
 //!
 //! [definition] **The declaration the card carries**: a gated tower, turned or not (each cell's
 //! founded unit turned by the arriving turn, composed from the ladder's dyadic turns, and the turn's
-//! covector returned through its family and summed against the level's input), rectifying contacts,
-//! not pumped, no passage credit, at most four levels, streams of one section length, with
+//! covector returned through its family and summed against the level's input), pumped or not (a
+//! turned mode's move the parametron's, `α_t h + β_t conj(h)`, its pump's opening, depth, axis and
+//! `β_t` kept at each cell for the reverse, and the depth's and axis's covectors returned through
+//! their families and summed against the level's input; never beside a news clock), rectifying
+//! contacts, no passage credit, at most four levels, streams of one section length, with
 //! or without the pair face (its values resident on the card beside the material, read at each
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
 //! ranks carried by every stream beside its modes, each riding its level's mode or its founded pair
@@ -88,7 +91,11 @@ struct LevelWords {
     gate_bias: u64,
     turn: u64,
     turn_bias: u64,
-    reach: [u64; 8],
+    pump: u64,
+    pump_bias: u64,
+    pump_axis: u64,
+    pump_axis_bias: u64,
+    reach: [u64; 10],
 }
 
 /// The law's words (`TowerLaw`).
@@ -126,6 +133,10 @@ struct LawWords {
     turned: u32,
     turn_spread: u32,
     ladder: [[i64; 2]; LADDER],
+    /// The pumped modes (`pumped = 0` when not) and `ln 2` on `2^(−30)`.
+    pumped: u32,
+    pad2: u32,
+    ln2: i64,
     level: [LevelWords; MAX_LEVELS],
     /// The news clock (`news = 0` without one): each level's section on `2^(−20)` bits (level 0's
     /// unread) and the clock's period ([`NewsClock`]).
@@ -220,6 +231,11 @@ struct FrameWords {
     news_open: u64,
     news_ends: u64,
     ticks: u64,
+    pumps: u64,
+    dk: u64,
+    dp: u64,
+    r_dk: u64,
+    r_dp: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -269,6 +285,8 @@ struct Shape {
     turned: usize,
     /// One when the levels tick on a news clock, else zero.
     news: usize,
+    /// One when the modes are pumped, else zero.
+    pumped: usize,
 }
 
 impl Shape {
@@ -362,11 +380,16 @@ struct Frame<'c> {
     news_open: CardBuffer<'c, u64>,
     news_ends: CardBuffer<'c, u64>,
     ticks: CardBuffer<'c, u32>,
+    /// The pumped modes' pump at each cell (opening, depth, axis, `β`) and the depth's and axis's
+    /// covectors `δκ`, `δp` (each empty when unpumped).
+    pumps: CardBuffer<'c, i64>,
+    dk: CardBuffer<'c, i64>,
+    dp: CardBuffer<'c, i64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
-    /// turn's covector `δs` (`Q·L`).
-    reach_offsets: [usize; 17],
+    /// turn's covector `δs`, then the pump's depth and axis covectors `δκ`, `δp` (each `Q·L`).
+    reach_offsets: [usize; 19],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -432,8 +455,11 @@ impl<'c> TowerCard<'c> {
     pub fn admits(law: &ResidentLaw) -> Result<()> {
         let d = &law.declaration;
         let refuse = |why: &'static str| Err(TowerError::Refused(why));
-        if !d.gated || d.pumped || d.contact != ContactLaw::Rectifying {
-            return refuse("the card carries the gated tower with rectifying contacts, not pumped");
+        if !d.gated || d.contact != ContactLaw::Rectifying {
+            return refuse("the card carries the gated tower with rectifying contacts");
+        }
+        if d.pumped && (!d.turned || law.news.is_some()) {
+            return refuse("the card pumps a turned mode, never beside a news clock");
         }
         if d.turned && (law.ladder.len() != LADDER || law.half_turn <= 0) {
             return refuse("the card turns a mode through the ladder's seventeen dyadic turns and the half turn");
@@ -498,7 +524,7 @@ impl<'c> TowerCard<'c> {
             streams: streams as u32,
             face_digits: law.face_roots.len() as u32,
             move_digits: law.move_roots.len() as u32,
-            families: (1 + (7 + usize::from(d.turned)) * d.levels) as u32,
+            families: (1 + (7 + usize::from(d.turned) + 2 * usize::from(d.pumped)) * d.levels) as u32,
             encoding: law.encoding as u64,
             readout: law.readout as u64,
             readout_bias: law.readout_bias as u64,
@@ -506,6 +532,10 @@ impl<'c> TowerCard<'c> {
             ln2_square: law.ln2_square as i64,
             ..LawWords::default()
         };
+        if d.pumped {
+            words.pumped = 1;
+            words.ln2 = law.ln2 as i64;
+        }
         if d.turned {
             words.turned = 1;
             words.half_turn = law.half_turn;
@@ -552,6 +582,10 @@ impl<'c> TowerCard<'c> {
                 gate_bias: lv.gate_bias as u64,
                 turn: lv.turn as u64,
                 turn_bias: lv.turn_bias as u64,
+                pump: lv.pump as u64,
+                pump_bias: lv.pump_bias as u64,
+                pump_axis: lv.pump_axis as u64,
+                pump_axis_bias: lv.pump_axis_bias as u64,
                 reach: lv.reaches,
             };
         }
@@ -570,6 +604,9 @@ impl<'c> TowerCard<'c> {
             if d.turned {
                 out.extend([lv.turn as u64, n, w]);
             }
+            if d.pumped {
+                out.extend([lv.pump as u64, n, w, lv.pump_axis as u64, n, w]);
+            }
         }
         out
     }
@@ -580,13 +617,13 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         let card = self.card;
-        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, .. } = shape;
+        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, .. } = shape;
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let q = s * t;
         let ql = q * l;
-        let mut reach_offsets = [0usize; 17];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned];
+        let mut reach_offsets = [0usize; 19];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -596,7 +633,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned) * l))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped) * l))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -653,13 +690,16 @@ impl<'c> TowerCard<'c> {
             top_scale: card.alloc(q * ringed)?,
             ring_pair: card.alloc(q * kp)?,
             ring_cov: card.alloc(q * 2 * r)?,
-            ring_dmove: card.alloc(q * 2 * ringed)?,
+            ring_dmove: card.alloc(q * 4 * ringed)?,
             ring_g: card.alloc(s * r * shape.rank_material())?,
             units: card.alloc(ql * n * 2 * turned)?,
             ds: card.alloc(ql * n * turned)?,
             news_open: card.alloc(s * (a + 4) * news)?,
             news_ends: card.alloc(s * (a + 4) * news)?,
             ticks: card.alloc(ql * news)?,
+            pumps: card.alloc(ql * n * 6 * pumped)?,
+            dk: card.alloc(ql * n * pumped)?,
+            dp: card.alloc(ql * n * pumped)?,
             reach_offsets,
         });
         Ok(())
@@ -749,6 +789,11 @@ impl<'c> TowerCard<'c> {
             news_open: frame.news_open.device_ptr(),
             news_ends: frame.news_ends.device_ptr(),
             ticks: frame.ticks.device_ptr(),
+            pumps: frame.pumps.device_ptr(),
+            dk: frame.dk.device_ptr(),
+            dp: frame.dp.device_ptr(),
+            r_dk: r(17),
+            r_dp: r(18),
         }
     }
 
@@ -805,7 +850,7 @@ impl<'c> TowerCard<'c> {
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -818,7 +863,7 @@ impl<'c> TowerCard<'c> {
 
     fn ring_shared(shape: &Shape) -> usize {
         let r = shape.ranks;
-        [16 * 2 * r, 16 * 5 * r, 16 * 2 * r, 8 * 2 * shape.modes, 4 * r].iter().map(|&o| carve(o)).sum()
+        [16 * 2 * r, 16 * 5 * r, 16 * 4 * r, 8 * 2 * shape.modes, 4 * r].iter().map(|&o| carve(o)).sum()
     }
 
     fn contacts_shared(shape: &Shape) -> usize {
@@ -828,7 +873,7 @@ impl<'c> TowerCard<'c> {
     }
 
     fn dx_shared(shape: &Shape) -> usize {
-        let families = 3 + shape.turned;
+        let families = 3 + shape.turned + 2 * shape.pumped;
         [8 * families * shape.modes, 8 * families * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
@@ -884,7 +929,7 @@ impl<'c> TowerCard<'c> {
         };
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1085,6 +1130,10 @@ impl<'c> TowerCard<'c> {
             if law.turned != 0 {
                 out.push((family(at64(fw.ds, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_ds, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
             }
+            if law.pumped != 0 {
+                out.push((family(at64(fw.dk, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dk, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump), Some(gradient(lv.pump_bias))), false));
+                out.push((family(at64(fw.dp, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dp, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump_axis), Some(gradient(lv.pump_axis_bias))), false));
+            }
         }
         // The pair face's readout takes the face's covector against the pair read, `Σ δz c(p)ᵀ`,
         // and its lift the bottom covector, `Σ δx⁰ c(p)ᵀ`.
@@ -1231,7 +1280,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);
