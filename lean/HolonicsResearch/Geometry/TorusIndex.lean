@@ -191,9 +191,7 @@ theorem latticeMap_injective {N : Matrix n n ℤ} (hN : N.det ≠ 0) :
 theorem det_latticeMap (N : Matrix n n ℤ) :
     LinearMap.det (latticeMap N).toIntLinearMap = N.det := by
   rw [← LinearMap.det_toLin' N]
-  first
-    | rfl
-    | exact congrArg LinearMap.det (LinearMap.ext fun w => rfl)
+  rfl
 
 /-! ## 3. The index law -/
 
@@ -221,7 +219,7 @@ theorem card_ker_act (N : Matrix n n ℤ) (hN : N.det ≠ 0) :
     _ = N.det.natAbs := by
         refine key.symm.trans (congrArg Int.natAbs ?_)
         refine Eq.trans ?_ (det_latticeMap N)
-        exact congrArg LinearMap.det (LinearMap.ext fun w => by first | rfl | simp)
+        exact congrArg LinearMap.det (LinearMap.ext fun w => rfl)
 
 /-! ## 4. The fixed points -/
 
@@ -258,7 +256,7 @@ theorem turn_fixed_point :
     norm_num [TorusBraid.turn_eq, Matrix.det_fin_two_of]
   have h := card_fixed_two _ hdet (by rw [TorusBraid.trace_turn]; norm_num)
   rw [TorusBraid.trace_turn] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The quarter turn `T L T` fixes two points**, `0` and
 `(½, ½)`. -/
@@ -271,7 +269,7 @@ theorem quarter_turn_fixed_points :
     norm_num [TorusBraid.quarter_turn, Matrix.trace_fin_two_of]
   have h := card_fixed_two _ hdet (by rw [htr]; norm_num)
   rw [htr] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The half turn `−1 = (T L T)²` fixes the four
 half-periods.** -/
@@ -283,7 +281,7 @@ theorem half_turn_fixed_points :
     norm_num [Matrix.trace_fin_two]
   have h := card_fixed_two _ hdet (by rw [htr]; norm_num)
   rw [htr] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The cat map's power `A^(k+1)` fixes `L_(2k+2) − 2`
 points**, with `L_(2k+2) = F_(2k+1) + F_(2k+3)`: 1, 5, 16, 45, 121 for `k = 0, …, 4`
