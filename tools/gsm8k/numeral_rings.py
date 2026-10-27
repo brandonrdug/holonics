@@ -30,7 +30,7 @@ to the phase (`energy`), the most frequent training residue named every time (`m
 residue most frequent among training labels with the same last two digits (`suffix`, what those
 digits alone name), and the modes probe read against the residue of the held-out cell half the list
 away, so in another problem (`foil`; a result's numeral is written twice in a row).
-With `modes=A:B` the probe reads only modes `A..B` of each level (the strands' written modes, record
+With `modes=A:B` the probe reads only modes `A..B` of each level (the modes `PRK`'s strands wrote, record
 research/records/2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md
 §6), so what those modes hold is read apart from the modes beside them.
 

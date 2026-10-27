@@ -116,9 +116,11 @@ class ExteriorTools(unittest.TestCase):
             out = run("written_rules.py", held, train, "rings", release).splitlines()
             # Written 42, 53, 24 and an unfinished 1 against exact 42, 42, 14, 11 (differences 0,
             # 11, 10); the foil reads 53, 24, the unfinished one and 42 against them (11, 18, -, 31).
+            # Only the right 42 has the leading digit and the length; of the foil, none.
             self.assertEqual(
                 out[1],
-                f"RINGS dir={release} n=4 mod9=1 foil9=1 mod10=2 foil10=0 mod11=2 foil11=1 mod990=1 foil990=0",
+                f"RINGS dir={release} n=4 mod9=1 foil9=1 mod10=2 foil10=0 mod11=2 foil11=1 mod990=1 foil990=0 "
+                "lead_length=1 foil_lead_length=0",
             )
 
 
@@ -142,18 +144,31 @@ class ExteriorTools(unittest.TestCase):
             out = run("written_rules.py", held, train, "gaps", release).splitlines()
             # Written 24, 58 and 7 against 42, 42 and 14; the foil reads them against the next
             # wrong number's exact value, 42, 14 and 42. 58 is 50+8 and 7 an operand and heard.
-            self.assertEqual(out[1:7], [
+            self.assertEqual(out[1:8], [
                 f"GAPS dir={release} set=all n=6 right=1 wrong=5 unfinished=1 not_number=1 unread=0 numbers=3",
                 f"GAP_SIZE dir={release} set=all n=3 x2=3 x10=3 tenth=0 opposite_sign=0 smaller=2 larger=1 "
                 "digits=2 foil_digits=2/3",
+                f"GAP_LEAD dir={release} set=all n=3 lead=0 foil_lead=0/3 lead_length=0 foil_lead_length=0/3 "
+                "one_digit=0 foil_one_digit=0/3",
                 f"GAP_RINGS dir={release} set=all n=3 mod9=1 foil9=1/3 mod10=0 foil10=0/3 mod11=0 foil11=1/3 "
                 "mod7=1 foil7=1/3 mod13=0 foil13=0/3",
                 f"GAP_FROM dir={release} set=all n=3 heard_result=1 operand=1 other_operation=1/3",
                 f"GAP_WRITES dir={release} set=all written=4 distinct=4 top10=4 commonest=24:1:0",
                 f"GAP_LENGTH dir={release} set=all 1=1/1 2=0/4 3=0/0 4=0/1 5+=0/0",
             ])
-            self.assertEqual(out[7], f"GAPS dir={release} set=met n=1 right=1 wrong=0 unfinished=0 not_number=0 unread=0 numbers=0")
-            self.assertEqual(out[13], f"GAPS dir={release} set=never n=5 right=0 wrong=5 unfinished=1 not_number=1 unread=0 numbers=3")
+            self.assertEqual(out[8], f"GAPS dir={release} set=met n=1 right=1 wrong=0 unfinished=0 not_number=0 unread=0 numbers=0")
+            self.assertEqual(out[15], f"GAPS dir={release} set=never n=5 right=0 wrong=5 unfinished=1 not_number=1 unread=0 numbers=3")
+
+
+    def test_the_leads_read_how_close_a_wrong_value_is_in_its_digits(self):
+        spec = importlib.util.spec_from_file_location("written_rules", TOOLS / "written_rules.py")
+        rules = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(rules)
+        F = rules.Fraction
+        # 45 for 42: lead, length, one digit; 4 for 42: the lead alone; 52 for 42: one digit, no lead;
+        # 4200 for 42: the lead alone; 17 for 42: nothing.
+        pairs = [(F(42), F(w)) for w in (45, 4, 52, 4200, 17)]
+        self.assertEqual(dict(rules.leads(pairs)), {"lead": 3, "lead_length": 1, "one_digit": 2})
 
 
     def test_numeral_rings_name_the_last_digit_of_each_whole_numeral(self):
