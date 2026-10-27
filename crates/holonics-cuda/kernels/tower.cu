@@ -9,7 +9,10 @@
 // composed from the ladder's dyadic turns), pumped or not (a turned mode's move the parametron's,
 // `h ← α_t h + β_t conj(h) + γ_t P x_t`, `α_t = ρ_t (1 − |κ_t|) U_t`, `β_t = ρ_t κ_t e^(iπ p_t)`,
 // `κ_t = 2r − 1` with `r` the logistic of `W_κ x + b_κ` and `p_t = 2^(−spread)(W_ψ x + b_ψ)`;
-// never beside a news clock), rectifying contacts, no passage credit, with or without the pair
+// never beside a news clock), with or without a rotor (`Rotor`: before a level's move each arriving
+// class steps the level's rings and turns their modes, `h' = T P^σ h`, mode `m` taking mode `s(m)`
+// turned by `e^(2πi r/q)` from the rotor's resident keys; never beside the ring face or a news
+// clock), rectifying contacts, no passage credit, with or without the pair
 // face
 // (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
 // and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
@@ -34,7 +37,9 @@
 //   (cells are independent there: each reads its own forward temporaries and covector).
 // - `tower_reverse_modes`: one block a stream, one thread a mode, the cells in reverse order (the
 //   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`, `+ β_(t+1) conj(G_h(t+1))` when
-//   pumped), with each cell's gated move adjoint, a turned level's turn covector `δs` and a pumped
+//   pumped, carried back through the rotor's adjoint at the later cell when one is joined, the
+//   block's threads exchanging it through shared memory, every covector of the move reading the
+//   stepped state `h'`), with each cell's gated move adjoint, a turned level's turn covector `δs` and a pumped
 //   level's depth and axis covectors `δκ`, `δp`, which `tower_reverse_dx` returns through `W_φᵀ`,
 //   `W_κᵀ` and `W_ψᵀ` and `tower_outer` sums against the level's input.
 // - `tower_reverse_ring`: one block a stream, the ring's scan over the cells in reverse order (one
@@ -104,7 +109,9 @@ struct TowerLaw {
     int64_t ladder[TOWER_LADDER][2];
     // The pumped modes (`pumped = 0` when not; a pumped mode is turned): ln 2 on 2^(−30), which
     // the depth's covector reads.
-    uint32_t pumped, pad2;
+    uint32_t pumped;
+    // The rotor's moving modes a level (`moving = 0` without a rotor).
+    uint32_t moving;
     int64_t ln2;
     TowerLevel level[TOWER_MAX_LEVELS];
     // The news clock (`news = 0` without one, every level then moving once a cell): each level's
@@ -209,6 +216,10 @@ struct TowerFrame {
     int64_t *pumps;   // [S][T][L][N][6]: r, κ, axis re, axis im, β re, β im
     int64_t *dk, *dp; // [S][T][L][N]
     uint64_t *r_dk, *r_dp; // [S][T][L]
+    // The rotor's keys (empty without one): for each level, class and moving mode m, the source
+    // mode s(m), the mode m' with s(m') = m, and m's turn e^(2πi r/q) on 2^(−30) (the unit where the
+    // key is zero, which carries the mode exactly).
+    const int64_t *rotor; // [L][A][moving][4]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -660,6 +671,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int32_t *rho = (int32_t *)carve(at, 4ull * K2);
     int32_t *hat = (int32_t *)carve(at, 4ull * W * (R > 0));
     int32_t *phi = (int32_t *)carve(at, 4ull * KP);
+    // The rotor's stepped and turned state h' of the level's moving modes.
+    int64_t *hs = (int64_t *)carve(at, 8ull * 2 * law.moving);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -845,8 +858,20 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 }
             }
             __syncthreads();
+            // The rotor's step and turn h' = T P^σ h before the move (`Rotor::moved`): moving mode m
+            // takes mode s(m) of the state as it stood, turned by its key's face.
+            if (law.moving) {
+                const int64_t *keys = fr.rotor + ((uint64_t)l * A + u) * law.moving * 4;
+                for (uint32_t m = tid; m < law.moving; m += B) {
+                    const int64_t *key = keys + m * 4;
+                    const wide x = h[(l * N + (uint32_t)key[0]) * 2], y = h[(l * N + (uint32_t)key[0]) * 2 + 1];
+                    hs[2 * m] = fit64(rel(key[2] * x - key[3] * y, MOVE_BITS), &st);
+                    hs[2 * m + 1] = fit64(rel(key[2] * y + key[3] * x, MOVE_BITS), &st);
+                }
+                __syncthreads();
+            }
             // The gated move λ_t = |λ|^(c r) u, held at the margin (its unit turned by e^(iπ s_t)
-            // when the level is turned), and the state h = λ_t h + γ_t B x.
+            // when the level is turned), and the state h = λ_t h + γ_t B x (on h' under a rotor).
             for (uint32_t k = tid; k < N; k += B) {
                 const int64_t *gf = fr.gates + ((uint64_t)l * N + k) * 4;
                 const wide open = logistic(pq[2 * N + k], face_roots, law.face_digits);
@@ -895,6 +920,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 const wide pr = rel((wide)gamma * pq[k], MOVE_BITS);
                 const wide pi = rel((wide)gamma * pq[N + k], MOVE_BITS);
                 wide hr = h[(l * N + k) * 2], hi = h[(l * N + k) * 2 + 1];
+                if (k < law.moving) {
+                    hr = hs[2 * k];
+                    hi = hs[2 * k + 1];
+                }
                 for (uint32_t j = 0; j < tk[l]; j++) {
                     const wide ar = rel(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS);
                     hi = fit64(rel(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi, &st);
@@ -1690,9 +1719,13 @@ extern "C" __global__ void tower_ring_factors(TowerLaw law, TowerFrame fr) {
 // and γ_t G_h, what the pushes return.
 extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, B = blockDim.x;
-    const uint32_t N = law.modes, L = law.levels, T = law.cells;
+    const uint32_t A = law.alphabet, N = law.modes, L = law.levels, T = law.cells;
     const TowerLevel &lv = law.level[l];
     const wide one = (wide)1 << MOVE_BITS;
+    // Under a rotor the block holds exactly one thread a mode, and each step's carried covector is
+    // exchanged here between the modes of a ring.
+    extern __shared__ __align__(16) unsigned char smem[];
+    wide *xb = (wide *)smem;
     __shared__ uint32_t st;
     if (threadIdx.x == 0) {
         st = 0;
@@ -1729,12 +1762,41 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 bi = rel(lr * bi - li * br + pbi * br - pbr * bi, MOVE_BITS);
                 br = ar;
             }
+            // The rotor's step and turn at the later cell carried back by the monomial's adjoint
+            // (`Rotor::back`): mode m of h'_(t+1) took mode s(m) of h_t turned by its key, so mode k
+            // takes the covector of the m' with s(m') = k, turned back by m''s key.
+            if (law.moving) {
+                xb[2 * k] = br;
+                xb[2 * k + 1] = bi;
+                __syncthreads();
+                if (t + 1 < T && k < law.moving) {
+                    uint32_t un = fr.classes[(uint64_t)s * (T + 1) + t + 1];
+                    un = un < A ? un : 0;
+                    const int64_t *keys = fr.rotor + ((uint64_t)l * A + un) * law.moving * 4;
+                    const uint32_t from = (uint32_t)keys[k * 4 + 1];
+                    const wide a = keys[from * 4 + 2], b = keys[from * 4 + 3];
+                    const wide x = xb[2 * from], y = xb[2 * from + 1];
+                    br = rel(a * x + b * y, MOVE_BITS);
+                    bi = rel(a * y - b * x, MOVE_BITS);
+                }
+                __syncthreads();
+            }
             const int64_t gr = fit64((wide)fr.readcov[ql * 2 * N + k] + br, &st);
             const int64_t gi = fit64((wide)fr.readcov[ql * 2 * N + N + k] + bi, &st);
             cr = gr;
             ci = gi;
             const int64_t *previous = t == 0 ? fr.opening + (((uint64_t)s * L + l) * N + k) * 2 : fr.state + (((q - 1) * L + l) * N + k) * 2;
-            const wide hr = previous[0], hi = previous[1];
+            wide hr = previous[0], hi = previous[1];
+            // The covectors of the move read the state it acted on, h' = T P^σ h under a rotor.
+            if (k < law.moving) {
+                uint32_t uc = fr.classes[(uint64_t)s * (T + 1) + t];
+                uc = uc < A ? uc : 0;
+                const int64_t *key = fr.rotor + (((uint64_t)l * A + uc) * law.moving + k) * 4;
+                const int64_t *src = previous + ((int64_t)key[0] - (int64_t)k) * 2;
+                const wide x = src[0], y = src[1];
+                hr = fit64(rel(key[2] * x - key[3] * y, MOVE_BITS), &st);
+                hi = fit64(rel(key[2] * y + key[3] * x, MOVE_BITS), &st);
+            }
             const int64_t *mv = fr.moves + (ql * N + k) * 6;
             const uint32_t ticks = law.news ? fr.ticks[ql] : 1;
             const wide push_r = fr.push[ql * 2 * N + k], push_i = fr.push[ql * 2 * N + N + k];

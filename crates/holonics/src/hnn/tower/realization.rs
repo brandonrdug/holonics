@@ -304,11 +304,24 @@ pub struct ResidentRing {
     pub restarts: Vec<Option<usize>>,
 }
 
+/// [definition; agent-inferred, October 27] **The rotor as a realization reads it** ([`Rotor`]):
+/// the count of moving modes a level and, for each level, class and moving mode `m` at
+/// `((level · A + class) · moving + m) · 4`, the mode `s(m)` whose state `m` takes, the mode `m'`
+/// with `s(m') = m` (whose covector returns to `m`), and `m`'s turn `e^(2πi r/q)` on `2^(−30)`,
+/// the key's resident face. A zero key is held as the unit `(2^30, 0)`: released at `2^(−30)`, the
+/// unit carries a mode exactly, as the host's zero key does, so a class that steps and turns
+/// nothing reads every mode as itself.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentRotor {
+    pub moving: usize,
+    pub keys: Vec<i64>,
+}
+
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `ln 2` and `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
-/// they are joined, whether a rotor or strands are, and the news clock when one is joined. Read
+/// face's grain and at the moves'), `ln 2` and `(ln 2)²` on `2^(−30)`, the pair face, the ring face
+/// and the rotor when they are joined, whether strands are, and the news clock when one is joined. Read
 /// from the tower's own owners, so a realization holds no second copy of a law, and a realization
 /// that does not carry a joined part refuses the tower rather than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -332,7 +345,7 @@ pub struct ResidentLaw {
     pub half_turn: i64,
     pub pair: Option<ResidentPair>,
     pub ring: Option<ResidentRing>,
-    pub rotor: bool,
+    pub rotor: Option<ResidentRotor>,
     pub strands: bool,
     pub news: Option<NewsClock>,
 }
@@ -485,7 +498,21 @@ impl Tower {
                 moves: face.moves.clone(),
                 restarts: face.restarts.clone(),
             }),
-            rotor: self.rotor.is_some(),
+            rotor: self.rotor.as_ref().map(|rotor| {
+                let (d, moving) = (&self.declaration, rotor.moving());
+                let mut keys = vec![0i64; d.levels * d.alphabet * moving * 4];
+                for (at, entry) in keys.chunks_mut(4).enumerate() {
+                    let (lc, m) = (at / moving, at % moving);
+                    let (level, class) = (lc / d.alphabet, lc % d.alphabet);
+                    let source = rotor.source(level, class, m);
+                    let first = rotor.places[m].1;
+                    let width = rotor.rings[rotor.places[m].0].width;
+                    let step = rotor.step(level, class, rotor.places[m].0);
+                    let (a, b) = if rotor.turns[at] == 0 { (1i128 << MOVE_BITS, 0) } else { rotor.faces[at] };
+                    entry.copy_from_slice(&[source as i64, (first + (m - first + width - step) % width) as i64, a as i64, b as i64]);
+                }
+                ResidentRotor { moving, keys }
+            }),
             strands: self.strands.is_some(),
             news: self.news,
         })

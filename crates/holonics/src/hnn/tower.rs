@@ -5884,17 +5884,41 @@ mod tests {
         assert!(tower.advance_realized(&mut states, &[&[0, 1], &[2]], &mut pass).is_err());
     }
 
-    /// The resident law names a joined rotor and joined strands, so a realization that reads
-    /// neither (the card's) refuses such a tower instead of reading it as the plain one.
+    /// The resident law names joined strands, so a realization that reads none (the card's)
+    /// refuses such a tower instead of reading it as the plain one; it carries a joined rotor's
+    /// keys, and stepping and turning by them is [`Rotor::moved`], and returning a covector by
+    /// them its adjoint [`Rotor::back`], at every level and class (the card's equation).
     #[test]
-    fn the_resident_law_names_a_joined_rotor_and_strands() {
+    fn the_resident_law_carries_a_joined_rotor_and_names_strands() {
         let plain = tiny_contacts(2, 9, 4, true, false, false, ContactLaw::Rectifying);
         let law = plain.resident_law().expect("law");
-        assert!(!law.rotor && !law.strands);
-        let rotor = rotor_on(plain.clone()).resident_law().expect("law");
-        assert!(rotor.rotor && !rotor.strands);
+        assert!(law.rotor.is_none() && !law.strands);
+        let tower = rotor_on(plain.clone());
+        let law = tower.resident_law().expect("law");
+        let (rotor, resident) = (tower.rotor().expect("joined"), law.rotor.expect("carried"));
+        assert!(!law.strands && resident.moving == rotor.moving());
+        let d = tower.declaration;
+        let h: Vec<(i64, i64)> = (0..d.modes as i64).map(|k| (1000 + 7919 * k, -3000 + 104_729 * k)).collect();
+        let g: Vec<(i128, i128)> = h.iter().map(|&(x, y)| (i128::from(y) << 20, i128::from(x) << 21)).collect();
+        for level in 0..d.levels {
+            for class in 0..d.alphabet {
+                let keys = &resident.keys[(level * d.alphabet + class) * resident.moving * 4..][..resident.moving * 4];
+                let (mut moved, mut back) = (h.clone(), g.clone());
+                for m in 0..resident.moving {
+                    let (source, from) = (keys[4 * m] as usize, keys[4 * m + 1] as usize);
+                    let (a, b) = (i128::from(keys[4 * m + 2]), i128::from(keys[4 * m + 3]));
+                    let (x, y) = (i128::from(h[source].0), i128::from(h[source].1));
+                    moved[m] = (fit64(release(a * x - b * y, MOVE_BITS)).expect("fits"), fit64(release(a * y + b * x, MOVE_BITS)).expect("fits"));
+                    let (a, b) = (i128::from(keys[4 * from + 2]), i128::from(keys[4 * from + 3]));
+                    let (x, y) = g[from];
+                    back[m] = (release(a * x + b * y, MOVE_BITS), release(a * y - b * x, MOVE_BITS));
+                }
+                assert_eq!(moved, rotor.moved(level, class, &h).expect("moved"), "level {level}, class {class}: the step and turn");
+                assert_eq!(back, rotor.back(level, class, &g), "level {level}, class {class}: the adjoint");
+            }
+        }
         let strands = stranded(plain, false).resident_law().expect("law");
-        assert!(!strands.rotor && strands.strands);
+        assert!(strands.rotor.is_none() && strands.strands);
     }
 
     const STRANDED: [usize; 13] = [0, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1];
