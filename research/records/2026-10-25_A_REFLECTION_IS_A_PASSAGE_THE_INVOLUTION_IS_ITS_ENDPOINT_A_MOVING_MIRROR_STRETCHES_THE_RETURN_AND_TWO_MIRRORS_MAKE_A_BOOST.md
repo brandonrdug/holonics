@@ -159,6 +159,14 @@ Lean (#410), beside `Physics/Spacetime/Boost`:
 - in the box with one receding wall, `ω_n L_n` is constant and `L_(n+1) = L_n (1 + β)/(1 − β)` over ℚ;
 - over `ℚ(i)`, the reactive wall has `|Γ| = 1` and `Γ⁻¹ dΓ/dx = −2i/(1 + x²)`.
 
+Proved in Lean, `HolonicsResearch/Physics/Spacetime/MovingMirror` (pending the library build):
+`mirror_mirror`, `mirror_interval`, `mirror_pairing`, `mirror_worldline`, `mirror_future`,
+`mirror_null_axes`, `mirror_ratio` (§§2–3); `mirror_mul` (§4); `stretch_on_worldline`,
+`doppler_of_betaOf`, `radar_echo`, `radar_echo_tx` (§3); `bounce_on_wall`, `boxLength_succ`,
+`boxLength_pow`, `wall_reading`, `freq_mul_length` (§5, for any `β` with `1 ± β ≠ 0`); and
+`reactive_norm`, `reactive_logDeriv` over any field with `i² = −1`, with `reactiveWall_normSq`,
+`reactiveWall_logDeriv` and the delay `reactiveWall_delay` over `ℂ`.
+
 ## Receipts
 
 [`2026-10-25_A_REFLECTION_IS_A_PASSAGE_receipts/`](2026-10-25_A_REFLECTION_IS_A_PASSAGE_receipts/):
