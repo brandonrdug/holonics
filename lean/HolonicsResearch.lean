@@ -287,6 +287,7 @@ import HolonicsResearch.Holon.RingCellHolonomy
 import HolonicsResearch.Holon.Inertia
 import HolonicsResearch.Holon.Syndrome
 import HolonicsResearch.Aeon.Production.Kolmogorov
+import HolonicsResearch.Aeon.Clock.NearReturn
 import HolonicsResearch.Transport.HolonicGeneratedPortMomentPassage
 import Holonics.Transport.ContinuingTube
 import HolonicsResearch.Transport.ArtifactRelease
