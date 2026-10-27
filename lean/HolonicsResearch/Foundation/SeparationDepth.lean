@@ -34,7 +34,11 @@ soon.
 
 So the boundary of a passage is not a window chosen in advance: it is read by refining one letter
 at a time, and it stops at the first letter that separates no new class, never later than the
-count of classes.
+count of classes. The stop is global. `futureAgreement_of_stable` needs depth-`d` agreement to
+imply depth-`(d + 1)` agreement for every pair of states, over every admitted receiver and word;
+one pair whose next letter separates nothing has not stopped the search, since a longer word can
+still separate it. A release at depth `d` is lawful only where the declared future is shown stable
+there.
 
 The computational object is the helical pair interaction: each move is a navigator step and each
 receiver a contact's reading, and the depth is how many steps a contact needs to tell two states

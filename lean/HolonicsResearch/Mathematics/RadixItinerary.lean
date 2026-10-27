@@ -1,4 +1,5 @@
 import Mathlib.Algebra.Order.Field.Rat
+import Mathlib.Data.Nat.Log
 import Mathlib.Tactic
 
 /-!
@@ -19,14 +20,21 @@ block's digit `k`, read from the most significant end. This file proves it on `�
    `b D mod q = r b + t`, the block rotated left by one place.
 2. **`k` turns rotate the block by `k` places** (`block_rotates`): with `q + 1 = K M`, a residue
    `S = A M + C < q` (`A < K`, `C < M`) has `K S mod q = C K + A`.
-3. **The itinerary** (`point_succ`, `point_period`): `D_(k+1) = b D_k mod q`, and after `w` turns
-   the point returns to `S`: the release closes as a cycle, not by a count.
+3. **The itinerary and its clock** (`point_succ`, `point_period`, `turn_order`,
+   `early_return_1111`, `early_return_1212`): `D_(k+1) = b D_k mod q`, and after `w` turns the
+   point returns to `S`. The turn itself has order exactly `w`: `bᵏ mod q ≠ 1` for `0 < k < w`. A
+   single point can return sooner: on `9999`, `1111` returns after one turn and `1212` after two.
+   So the release does not end when its point returns (that would write `1` for `1111`); it runs on
+   the lifted clock `(D, k) ↦ (b D mod q, k + 1 mod w)`, whose second coordinate has the turn's own
+   order `w`, reads all `w` quotients, and ends when `k` returns to `0`.
 4. **The digit** (`digit_of_point`): on `q + 1 = b^(k + 1 + m)`, for `S < q`,
    `⌊b D_k / q⌋ = ⌊S / bᵐ⌋ mod b`, the digit `k` places below the top of the block.
 5. **The length is the first nonzero digit** (`digit_zero_above_length`,
    `digit_nonzero_at_length`): the digit at place `k` is zero when `S < bᵐ`, and nonzero when
    `bᵐ ≤ S < b^(m+1)`. So a value of `L` digits reads `w − L` zeros and then its leading digit:
-   the release starts at the first nonzero digit of the itinerary and needs no separate size.
+   the release reads the whole block, suppresses the leading zeros, and needs no separate size.
+   The block is all zeros exactly when the value is `0` (`digits_zero_iff`), and then the release
+   writes `0`.
 6. **The fibre** (`point_fibre`): `S` and `S + q` have the same itinerary, so the residue alone
    never separates a value from one a whole ring larger; a value at or past `q` needs the
    archimedean face (its length and leading digits), which this file does not supply.
@@ -107,6 +115,30 @@ theorem point_succ (q b S k : ℕ) : b ^ (k + 1) * S % q = b * (b ^ k * S % q) %
 theorem point_period {q b w S : ℕ} (hq : q + 1 = b ^ w) (hS : S < q) : b ^ w * S % q = S := by
   rw [← hq, show (q + 1) * S = S + q * S by ring, Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hS]
 
+/-- [proved-standard; formal-checked] **The turn has order exactly `w`:** on `q + 1 = bʷ` with
+`b > 1`, no fewer than `w` turns give the identity, since `bᵏ mod q ≠ 1` for `0 < k < w`. This is
+the release's clock: the turn count closes at `w` whatever point it carries. -/
+theorem turn_order {b w k q : ℕ} (hb : 1 < b) (hk : 0 < k) (hkw : k < w) (hq : q + 1 = b ^ w) :
+    b ^ k % q ≠ 1 := by
+  have hlt : b ^ k < b ^ w := Nat.pow_lt_pow_right hb hkw
+  have hge : b ^ 1 ≤ b ^ k := Nat.pow_le_pow_right (by omega) hk
+  rw [pow_one] at hge
+  rcases Nat.lt_or_ge (b ^ k) q with h | h
+  · rw [Nat.mod_eq_of_lt h]
+    omega
+  · have heq : b ^ k = q := by omega
+    rw [heq, Nat.mod_self]
+    omega
+
+/-- [counterexample; formal-checked] **A point can return before the clock closes:** on
+`9999 = 10⁴ − 1`, the block `1111` returns after one turn. -/
+theorem early_return_1111 : 10 * 1111 % 9999 = 1111 := by norm_num
+
+/-- [counterexample; formal-checked] On `9999`, the block `1212` returns after two turns,
+and not after one. -/
+theorem early_return_1212 : 10 ^ 2 * 1212 % 9999 = 1212 ∧ 10 * 1212 % 9999 ≠ 1212 := by
+  norm_num
+
 /-- [proved-standard; formal-checked] **The digit is the turn's quotient.** On
 `q + 1 = b^(k + 1 + m)`, for `S < q`, the quotient of the turn at the point `D_k = bᵏ S mod q` is
 `⌊S / bᵐ⌋ mod b`, the digit `k` places below the top of the `(k + 1 + m)`-digit block. -/
@@ -172,6 +204,17 @@ theorem digit_nonzero_at_length {b m S : ℕ} (hb : 0 < b) (hlo : b ^ m ≤ S)
   have hpos : 0 < S / b ^ m := Nat.div_pos hlo hBpos
   rw [Nat.mod_eq_of_lt hlt]
   exact hpos.ne'
+
+/-- [proved-standard; formal-checked] **The all-zero block is the value zero:** every digit of `S`
+is `0` exactly when `S = 0`, so a block with no nonzero digit releases `0`. -/
+theorem digits_zero_iff {b S : ℕ} (hb : 1 < b) : (∀ m, S / b ^ m % b = 0) ↔ S = 0 := by
+  constructor
+  · intro h
+    by_contra hS
+    exact digit_nonzero_at_length (by omega) (Nat.pow_log_le_self b hS)
+      (Nat.lt_pow_succ_log_self hb S) (h (Nat.log b S))
+  · rintro rfl m
+    simp
 
 /-- [proved-standard; formal-checked] **The residue's fibre:** `S` and `S + q` have the same
 itinerary point at every turn, so the ring alone never separates them. -/

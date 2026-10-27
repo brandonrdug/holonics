@@ -115,13 +115,19 @@ each new depth either adds a class or ends the search, so two states agree on ev
 exactly when they agree on every history of at most `|states|` moves
 (`stable_or_classCount`, `futureAgreement_iff_agreeUpTo_card`; Moore's bound).
 
-[agent-inferred] For a calculation this gives the capture's lifetime without a window. Two pasts
-that differ only in the first operand's residue are separated by the rest of the calculation, at
-depth the length of `∘ b = c`; once `c` has passed, no admitted future reads that residue, the two
-pasts are one class, and the held ring releases it: the residue dissolves into the kernel at the
-first depth that separates nothing new. The bound `|states|` only guarantees that the refinement
-ends; the working rule is `futureAgreement_of_stable`, which stops at the first letter that adds no
-class.
+[agent-inferred] For a calculation this locates the capture's lifetime without a window, and says
+what a release owes. Two pasts that differ only in the first operand's residue are separated at
+least until `c` is written, at depth the length of `∘ b = c`. Releasing the residue after `c` is
+lawful only where the declared admitted future is shown stable: `futureAgreement_of_stable` needs
+depth-`d` agreement to imply depth-`(d + 1)` agreement for every pair of states, over every
+admitted receiver and word. A quiet continuation is not that. One pair whose next letter separates
+nothing can still be separated later, and an admitted future that can ask about the first operand
+again without restating it (a reference back such as "half as many" or "the rest", which text
+admits by the referent law) separates the two pasts after `c`. Where the declared future is shown
+stable at `c`, the residue dissolves into the kernel there; where it is not, the operand's
+distinction is kept past `c`, carried rather than released. The stopping rule is global, the class
+count over all pairs (`stable_or_classCount`), never one pair's quiet letter; the bound `|states|`
+guarantees that the refinement ends.
 
 ## 5. The release reads the radix itinerary
 
@@ -133,11 +139,15 @@ value. The release reads that block by turning it:
   turns to `b D = t q + (r b + t)`, so the quotient `⌊b D / q⌋` is the leading digit `t` and the
   remainder is the block rotated left by one place;
 - `k` turns rotate the block by `k` places (`block_rotates`), the itinerary advances by one turn
-  (`point_succ`: `D_(k+1) = b D_k mod q` for `D_k = bᵏ S mod q`, the phase `frac(bᵏ S/q)`) and closes
-  after `w` turns (`point_period`);
+  (`point_succ`: `D_(k+1) = b D_k mod q` for `D_k = bᵏ S mod q`, the phase `frac(bᵏ S/q)`), and every
+  point is back after `w` turns (`point_period`);
+- the turn has order exactly `w` (`turn_order`: `bᵏ mod q ≠ 1` for `0 < k < w`), but a single point
+  can return sooner: on `9999`, `1111` is back after one turn and `1212` after two
+  (`early_return_1111`, `early_return_1212`);
 - the quotient of the turn at `D_k` is the block's digit `k` from the top (`digit_of_point`);
 - a value of `L` digits reads `w − L` zeros and then its nonzero leading digit
-  (`digit_zero_above_length`, `digit_nonzero_at_length`);
+  (`digit_zero_above_length`, `digit_nonzero_at_length`), and the block is all zeros exactly when
+  the value is `0` (`digits_zero_iff`);
 - `S` and `S + q` have the same itinerary (`point_fibre`), so the residue never separates a value
   from one a whole ring larger.
 
@@ -145,12 +155,15 @@ value. The release reads that block by turning it:
 `42, 420, 4200, 2004` and back to `42`, emitting `0, 0, 4, 2`; `1234` emits `1, 2, 3, 4`; `9998`
 emits `9, 9, 9, 8`; `10041 = 42 + 9999` emits what `42` emits. For every `S < 9999` the four
 emitted quotients are its zero-padded digits, and for every `0 < S < 9999` the first nonzero one
-is at place `4 − L`.
+is at place `4 − L`. `1111` turns to itself at once and emits `1` at each of the four turns of the
+clock.
 
 [derived] So §8(d)'s "which face to read at each place it writes" has one answer: the same phase,
-turned once more by the base. The release starts at the first turn whose quotient is nonzero, writes
-each quotient as a digit, and ends when the itinerary closes on its starting point: a cycle read by
-completeness, not a count. The digit is the carry of the turn, the winding of the helix (circle plus
+turned once more by the base. The release runs on the lifted clock
+`(D, k) ↦ (b D mod q, k + 1 mod w)`: it reads the quotient at each of the `w` turns, writes them from
+the first nonzero one on, writes `0` when none is nonzero, and ends when `k` returns to `0`. The end
+is the turn's own order `w`, a cycle read by completeness; it is not the point's return, which comes
+early on a block of shorter period (ending there would write `1` for `1111`). The digit is the carry of the turn, the winding of the helix (circle plus
 carry); the base `b` is the rotor's located turn, and the digit's sector is the tenth of the circle
 the phase falls in, as §8(d) said. The read is on the joined ring, never on one ring alone: the
 quotient `⌊b D / q⌋` depends on the whole residue. On `9999 = 9 · 11 · 101` the joined phase is a
