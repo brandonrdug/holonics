@@ -12,6 +12,8 @@
 //!   or `train-unit-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
+//! - `tower_pass release complete-language release-tower-classes ARGS…`: the class release with
+//!   every prompt's read and every drawn class's step on the card, the prompts drawing together.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]
@@ -179,8 +181,8 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
         Some("parity") => parity(&args[1..]),
-        Some("train") => train(&args[1..]),
-        _ => Err("tower_pass parity …|train complete-language …".into()),
+        Some("train") | Some("release") => train(&args[1..]),
+        _ => Err("tower_pass parity …|train complete-language …|release complete-language …".into()),
     };
     if let Err(error) = result {
         eprintln!("tower_pass: {error}");

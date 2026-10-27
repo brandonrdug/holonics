@@ -61,6 +61,15 @@ pub trait PassRealization {
 
     /// Each stream's continuing state from the read kept in `slot`, its credit moved along it.
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()>;
+
+    /// Every stream's whole face at the last cell of the read kept in [`Slot::Opened`]: each
+    /// class's mass and their total on `2^(−62)`, the face a release draws from.
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>>;
+
+    /// Whether this realization carries `tower`'s law. A run reads it before any model work or
+    /// output, so a law the realization does not carry is refused at the run's start, never at its
+    /// first section.
+    fn admit(&self, tower: &Tower) -> Result<()>;
 }
 
 type Kept = (Vec<(Vec<Cell>, TowerState)>, Reaches);
@@ -88,6 +97,7 @@ impl PassRealization for HostPass {
     }
 
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
+        tower.admit_read(classes, targets)?;
         let reaches = tower.reaches();
         let forwards: Vec<(Vec<Cell>, TowerState)> = opening
             .par_iter()
@@ -144,6 +154,16 @@ impl PassRealization for HostPass {
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
         let (forwards, reaches) = self.kept(slot).take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
         tower.carry_credit(states, forwards, opening, &reaches)
+    }
+
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("a face is read from the opening forward"))?;
+        forwards.iter().map(|(cells, _)| cells.last().map(|c| c.face.clone()).ok_or(TowerError::Refused("an opening read of no cell"))).collect()
+    }
+
+    /// The host realizes every law the tower states.
+    fn admit(&self, _tower: &Tower) -> Result<()> {
+        Ok(())
     }
 }
 
@@ -226,6 +246,41 @@ impl Tower {
             at += cells;
         }
         Ok(codes)
+    }
+
+    /// [definition; agent-inferred, October 27] Every class a realization reads and every class it
+    /// compares a face with lies in the declared alphabet. A face has no mass at a class outside
+    /// it (the card's read is zero there, the host's face has no entry), and the certificate
+    /// decides on positive masses, so such a read is refused before any realization reads it.
+    pub fn admit_read(&self, classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<()> {
+        let a = self.declaration.alphabet;
+        if classes.iter().any(|c| c.iter().any(|&u| u >= a)) || targets.iter().flatten().flatten().any(|&t| t >= a) {
+            return Err(TowerError::Refused("a class read or compared outside the declared alphabet"));
+        }
+        Ok(())
+    }
+
+    /// [definition; agent-inferred, October 27] **The advance through a realization**: each
+    /// stream reads its classes from its state and returns the whole face after its last class
+    /// and the code of each class after its first (`2^(−20)` bits), its state moved past every
+    /// class: [`Tower::advance`] class by class, on whatever realizes the pass. A release (a
+    /// prompt, then one drawn class at a time) runs where the training runs. The streams' class
+    /// lists have one length; the read's last place is compared with nothing, so the face it
+    /// returns is the one the next class is drawn from.
+    pub fn advance_realized(&self, states: &mut [TowerState], classes: &[&[usize]], realization: &mut dyn PassRealization) -> Result<(Vec<TowerFace>, Vec<i64>)> {
+        let n = classes.first().map_or(0, |c| c.len());
+        if n == 0 || classes.iter().any(|c| c.len() != n) || states.len() != classes.len() {
+            return Err(TowerError::Refused("an advance reads one nonempty length of classes a stream"));
+        }
+        let windows: Vec<Vec<usize>> = classes.iter().map(|c| c.iter().copied().chain([0]).collect()).collect();
+        let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).chain([None]).collect()).collect();
+        let reads: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
+        let read = realization.forward(self, states, &reads, &targets, Slot::Opened)?;
+        let codes = read.faces.iter().map(|faces| faces.iter().flatten().map(|&(m, t)| face_code(m, t)).sum()).collect();
+        let faces = realization.last_faces()?;
+        let opening = states.to_vec();
+        realization.carry(self, states, &opening, Slot::Opened)?;
+        Ok((faces, codes))
     }
 
     /// The tower's [`ResidentLaw`] for a section read under its current material.

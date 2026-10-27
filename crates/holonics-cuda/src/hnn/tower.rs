@@ -33,7 +33,7 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::hnn::tower::realization::{PassRead, PassRealization, ResidentLaw, Slot};
-use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerState};
+use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerFace, TowerState};
 
 use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
@@ -562,6 +562,7 @@ impl<'c> TowerCard<'c> {
     fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let law = tower.resident_law()?;
         Self::admits(&law)?;
+        tower.admit_read(classes, targets)?;
         let d = law.declaration;
         let streams = classes.len();
         let cells = classes.first().map_or(0, |c| c.len().saturating_sub(1));
@@ -792,6 +793,10 @@ impl PassRealization for TowerCard<'_> {
         self.report()
     }
 
+    fn admit(&self, tower: &Tower) -> Result<()> {
+        Self::admits(&tower.resident_law()?)
+    }
+
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let started = Instant::now();
         // Only a completed read is counted, so the timing reports passes the card carried.
@@ -808,6 +813,23 @@ impl PassRealization for TowerCard<'_> {
         self.times.reverses += 1;
         self.times.reverse_ns += started.elapsed().as_nanos();
         Ok(g)
+    }
+
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+        // The opening read keeps every cell's masses on the card; only the last cell's cross back.
+        if !self.opened_current {
+            return Err(TowerError::Refused("a face is read from the opening forward, still resident"));
+        }
+        let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
+        let shape = frame.shape;
+        (0..shape.streams)
+            .map(|s| {
+                let q = s * shape.cells + shape.cells - 1;
+                let masses = self.card.fetch_range(&frame.masses, q * shape.alphabet, shape.alphabet).map_err(device)?;
+                let total = self.card.fetch_range(&frame.totals, 2 * q, 2).map_err(device)?;
+                Ok(TowerFace { masses: masses.into_iter().map(u128::from).collect(), total: total[0] as u128 | (total[1] as u128) << 64 })
+            })
+            .collect()
     }
 
     fn carry(&mut self, _tower: &Tower, states: &mut [TowerState], _opening: &[TowerState], slot: Slot) -> Result<()> {
