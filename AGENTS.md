@@ -308,9 +308,9 @@ Athena text milestone claimed before a test of use was retracted or retired.
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
 the aim is a plastic network that runs fast on it, never transformer-style vertical data scaling.
-From October 23 to 27 every Athena tower training run went through the host realization on eight CPU
-threads (the card ran only the October 25 parity of the gated tower's pass), while the learner stayed
-at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of tens to
+From October 23 to 27 the Athena tower training runs went through the host realization on eight CPU
+threads (the card ran only the October 25 pass of the gated tower, a narrower law), while the learner
+stayed at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of tens to
 hundreds of CPU seconds: the run rules were kept and the architecture and data were given up.
 - **Learning runs on the card.** Every training pass, lap and measurement of an HNN learner runs
   through its card realization. The host realization is the reference that checks the card's bits,

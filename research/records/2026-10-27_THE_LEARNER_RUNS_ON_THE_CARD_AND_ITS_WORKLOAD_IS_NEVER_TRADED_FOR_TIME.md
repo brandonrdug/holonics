@@ -25,20 +25,21 @@ Read from the records, the code and the briefs:
 | September 20 | Brandon flags a run on one CPU thread with little GPU use. |
 | September 30 | The learning-failure diagnosis records that the card carries none of the learning path. |
 | October 18 | The PC link finds `RAYON_NUM_THREADS=1`, `CARGO_BUILD_JOBS=1` and `RUST_TEST_THREADS=1` in the run wrappers; the pin is retired. |
-| October 20 | The complete-language trainer gains a card executor; its dataset run waits on authorization in its record. |
+| October 20 | The complete-language trainer gains a card executor; its dataset run waits on authorization in its record. Brandon approves two narrow runs that day: a CPU correctness reference (40 minutes, four cores, 8 GiB, five passes) and a GPU training plan whose scoring and output run on the CPU. Neither covers the tower runs that follow. |
 | October 23 | The moment tower (`hnn::tower`) is built and trained on the host, eight threads. |
-| October 25 | `TowerCard` runs the gated tower's pass on the card with the host's bits, 3.9 times the host at 96 streams; the record names the host's certificate as the next loop's subject. No training driver selects `TowerCard`: its only callers are the `tower_pass` example and its test. |
-| October 26 to 27 | Thirteen arithmetic towers (C, F, PP, PR, PRT, PRS, PRN, PRC, PRK, PRI, PRA, PRJ, PRE) and the bank, role and replay runs train through the host realization under `RAYON_NUM_THREADS=8`, two levels of 64 modes, eight streams, three passes of 3.5 MB, deadlines of tens to hundreds of seconds. The card ran none of their learning; the logs show the host realization ran, not what else held the card. Each new face (ring, turn, pump, pair face) is one `TowerCard::admits` refuses, and the rotor and strands are ones it cannot see (`ResidentLaw` does not carry them), so the work could not have gone to the card without a port. No record names a device. |
+| October 25 | `TowerCard` runs the gated tower's pass on the card with the host's bits, 3.9 times the host at 96 streams; the record names the host's certificate as the next loop's subject. Its training route (`tower_pass train complete-language`, through `tower_classes::train_realized`) runs the class-passage trainers' pass on the card, and the October 25 training pass ran there; but every pass of that route reads its held-out passage on the host (`tower_train::held_out`, `Tower::read_cells`, rayon), and no unit-tower trainer selects `TowerCard`. |
+| October 26 to 27 | Thirteen arithmetic towers (C, F, PP, PR, PRT, PRS, PRN, PRC, PRK, PRI, PRA, PRJ, PRE) and the bank, role and replay runs train through the host realization under `RAYON_NUM_THREADS=8`, two levels of 64 modes, eight streams, three passes of 3.5 MB, deadlines of tens to hundreds of seconds. The card ran none of their learning; the logs show the host realization ran, not what else held the card. Each new face (ring, turn, pump, pair face) is one `TowerCard::admits` refuses, and the rotor and strands are ones it cannot see (`ResidentLaw` does not carry them), so the work could not have gone to the card without a port. No record names a device. On October 27 the eight healed re-reads of design's review run on the host, eight threads, launched before the ruling: the written read has no card realization yet. |
 
 **Who.** The design thread wrote the briefs and its sessions on the PC launched the runs. The
 coordinator relayed their results, and no review asked which device ran, this thread's own review of
 October 27 included. The waiting standard in the guides was written entirely in host threads and
 CPU seconds. Its clause that an unmeasured run is planned at one to three minutes, beside "never
 raise a limit", pushed the workload down where it should have pushed the device up. This is the
-third recurrence of the same failure (September 20, October 18, October 23 to 27). The one card run
-of those days is the October 25 parity of the gated, rectifying tower's pass on the 4080, a narrower
-law than the towers trained after it; its record leaves 14 of the observed-epoch port's library
-tests failing, failures it found already present on main.
+third recurrence of the same failure (September 20, October 18, October 23 to 27). The card's runs
+of those days are the October 25 parity and training pass of the gated, rectifying tower on the
+4080, a narrower law than the towers trained after it; its record leaves 14 of the observed-epoch
+port's library tests failing, failures it found already present on main. Brandon's two narrow
+approvals of October 20 are the only host exceptions on record, and neither covers these runs.
 
 ## The rule
 
@@ -69,10 +70,11 @@ diverge:
   certificates agree on every call; (b) the saved learner's SHA-256 equals the October 25 receipt's;
   (c) the host part a section is reported beside the card's time.
 - **The trainers on the card and the first long run** (design): `train-unit-tower` and the other
-  trainers routed through `TowerCard`, then the plain gated tower on units, on the 4080, for hours of
-  laps, with its writing shown each hour.
+  trainers routed through `TowerCard`, the held-out read through the realization, then the plain
+  gated tower on units, on the 4080, for hours of laps in segments under the card lock, with its
+  writing shown each hour. The written read's card realization is owed by design too.
 - **The refused faces on the card** (this thread): the pair face first, then the ring, turned and
-  pumped faces, in `kernels/tower.cu`, `holonics_cuda::hnn::tower` and the `ResidentLaw` exports of
+  pumped faces, then the rotor and the strands, in `kernels/tower.cu`, `holonics_cuda::hnn::tower` and the `ResidentLaw` exports of
   `hnn::tower::realization`. Acceptance per face, fixed before its build as on October 25: 32
   sections equal face by face and covector entry by entry, host against card, and one full pass with
   the host's SHA-256.
@@ -87,7 +89,7 @@ Each part is ticked here when it changes, and none stands for another.
 | Part | Status (October 27) |
 |---|---|
 | The policy documented | The guides' section and this record, PR #528; ticked when it merges. |
-| The gate built | Not yet. Owed: the trainers route through `TowerCard` and refuse a learner run on the host unless Brandon's exception is named (design); `TowerCard` refuses every face it does not carry, the rotor and strands included, and carries the pair, ring, turned and pumped faces with their parity (this thread). |
+| The gate built | In part, not yet on a branch. Built by design and being gated: the certificate decided by partition (log₂ readings, the exact products as fallback), `train-unit-tower` through `TowerCard`, the held-out read through the realization (`Tower::read_parts_realized`), `TowerCard` refusing the rotor, the strands and openings with ring hands or strand residues, and its counters counting only completed launches. Owed: a trainer's refusal of a host learner run without Brandon's exception, and the written read on the card (design); the pair, ring, turned, pumped, rotor and strands faces with their parity (this thread; the pair face is drafted). |
 | The gate independently verified | Not yet. Owed: a review by a worker that did not build it (Epime or a reviewer thread) of the trainers' refusal and of one card run's device line, and the per-face parities run on the 4080. |
 
 ## The recorded failures this step could repeat
