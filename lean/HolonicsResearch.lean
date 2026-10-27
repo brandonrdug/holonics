@@ -284,6 +284,7 @@ import HolonicsResearch.Foundation.HolonicGranularBoundaryRadiation
 import HolonicsResearch.Foundation.HolonicBoundaryCycleReflection
 import HolonicsResearch.Holon.HolonicQuadraticMomentCondensation
 import HolonicsResearch.Holon.RingCellHolonomy
+import HolonicsResearch.Holon.Inertia
 import HolonicsResearch.Transport.HolonicGeneratedPortMomentPassage
 import Holonics.Transport.ContinuingTube
 import HolonicsResearch.Transport.ArtifactRelease
