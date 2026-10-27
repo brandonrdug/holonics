@@ -162,6 +162,7 @@ def standing (c₀ : Ctx) : StandingLaw Action Receiver Source (Ctx × Retained)
   sufficient receiver word x := by
     simp only [D.encode_word, D.decode_square]
 
+include D in
 /-- [proved-derived; formal-checked] **A descending encoding is action-sufficient**: two presents
 it merges in any context share their whole admitted future. -/
 theorem futureAgreement_of_encode_eq {c : Ctx} {left right : Source}
@@ -295,7 +296,7 @@ theorem sufficient_not_self_continuing :
   refine ⟨fun left right h receiver word => ?_, ?_⟩
   · show (transportWord exchange word left).1 = (transportWord exchange word right).1
     rw [first_transportWord, first_transportWord]
-    exact congrArg Prod.fst h
+    exact (congrArg Prod.fst h :)
   · rintro ⟨U, hU⟩
     have h1 := hU (false, false, false)
     have h2 := hU (false, true, false)
@@ -487,7 +488,7 @@ theorem founded_restrict_eq_span (T : ι → X →ₗ[K] X) (V₀ : Submodule K 
   rw [founded_eq_span_wordForms, Submodule.map_span]
   congr 1
   ext ψ
-  simp only [Set.mem_image, Set.mem_setOf_eq]
+  simp only [Set.mem_image, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨_, ⟨ρ, hρ, word, rfl⟩, rfl⟩
     exact ⟨ρ, hρ, word, LinearMap.dualMap_apply' _ _⟩
