@@ -29,7 +29,9 @@ permutation of a finite state set, the span of the emission's shifts is the foun
 to the visited orbit, so its Hankel rank is that restriction's rank; the founded dimension exceeds
 it by the forms silent on the orbit, an invariant space (`silent_invariant`) whose rational
 eigenvectors are conserved charges or half-turns (`eigenvalue_of_finite_order`). The Hankel-rank
-identification is owed (#62).
+identification is `HNN/Encoding.hankel_identification` and `hankel_rank_eq`; the kernel it needs,
+`ker E = ⋂_w ker(ρ T_w)`, and `founded = span {ρ ∘ T_w}` are proved in the research module
+`Foundation/MinimalRetention` (`encode_eq_iff_futureAgreement`, `founded_eq_span_wordForms`).
 
 It constructs an observable transport representation. It does **not** infer an unknown `T_a`
 ([counterexample] no finite observation determines an unrestricted navigator family,
