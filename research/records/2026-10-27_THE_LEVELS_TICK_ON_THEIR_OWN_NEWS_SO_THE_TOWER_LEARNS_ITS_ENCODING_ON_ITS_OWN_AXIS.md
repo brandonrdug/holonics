@@ -4,7 +4,7 @@ Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 
 built and tested (§6.1, §7); the card carries it, its parity at the race's declaration equal (§6.2,
 §7); the measurement (§6.3) beside the plain race read through lap 12 (§8); the Lean (§6.4) in
 `HNN/NewsClock`. §8 replaces §2's move with the held step after the race measured the first law's
-two clocks: host and card built, the host tests passing, the card's parity owed. Owners: `holonics::hnn::tower` (`NewsClock`,
+two clocks: host and card built, the host tests passing and the card equal to the host. Owners: `holonics::hnn::tower` (`NewsClock`,
 `Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
 loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
@@ -250,6 +250,14 @@ upper levels tick a few times and too few of their covectors stand above the rea
 unclocked tower's own fit misses some families by more than a tenth (up to 45%), the faces' release
 over the longer passage, so the reading stops at 31. Card: the forward's level loop and the modes'
 scan in `kernels/tower.cu` carry the same law (the push and its covector summed over the
-sub-steps); its parity on the card is owed. The race on the first law ran to its end (above); a
+sub-steps). On the RTX 4080 SUPER at `e61399f2d` the card suite passed 13 of 13 and the parity at
+the race's declaration on the race passage was equal in every face, covector entry, learner and
+state: clocked (`B = 8`, `r = 2`), 32 sections at 24 streams (98,304 faces, 10,588,192 entries;
+host 14.7 s, card 3.4 s; peak resident 1,027,932 KiB) and 4 at 320 (163,840 faces, 1,323,524
+entries; host 15.7 s, card 1.2 s; 1,345,312 KiB); and without the clock, 32 sections at 24
+streams, whose halvings section by section (`0 0 1 1 2 3 1 2 0 1 …`, 110 forwards) are the plain
+race's own parity at its head, so the plain tower is unchanged. The clocked course departs from
+the first law's from section 7 (its halvings `… 2 3 2 2 1 3 3 2 2 0 2 11 …` against `… 1 3 2 2 1 3
+1 1 2 3 0 1 …`), as a changed law's should. The race on the first law ran to its end (above); a
 race on the held step needs its own authorization.
 
