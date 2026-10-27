@@ -412,6 +412,15 @@ a unit (`a_silent_moment_reaches_zero`). The weights that drifted keep their val
 before this fix trained with the stall; the 1,000-problem runs never reached it (no stalled moment
 in the narrow tower's seven passes).
 
+[formal-checked, October 27] In [`HNN/CertifiedSection`](../../lean/HolonicsResearch/HNN/CertifiedSection.lean):
+the release is odd, keeps its sign and never passes its argument, and is zero once `2|x| < 2^b`
+(`release_eq_zero`), so every step releases to zero after finitely many halvings (`halving_ends`).
+One `toward` move from `m ≠ g` moves strictly toward `g` and never past it (`toward_of_lt`,
+`toward_of_gt`), so a constant input is reached within `|g − m|` sections and kept
+(`toward_iterate`); a silent contact's moments reach zero (`silent_moment_reaches_zero`) and its
+step `((m ≪ grain) ≫ rate)/(⌊√v⌋ + 1)` is zero from then on, whatever `v` is
+(`silent_step_reaches_zero`).
+
 ## The gated mode
 
 An ungated mode forgets at its founded rate whatever byte arrives, so a level cannot hold a
@@ -477,5 +486,16 @@ The two bounds were formal-checked on October 26 in
 `ρ K(ρ_max) + √(1 − ρ²) ≤ K(ρ_max)` for `0 ≤ ρ ≤ ρ_max < 1` is `passive_margin`, and one step is
 `passive_step`. The bound along every passage, `passive_recursion` and `passive_from_rest`, holds
 for any radius at most `ρ_max` (fixed at `|λ|`, the ungated mode, or moving, the gated mode) and
-for any hand-over of modes before the move (the rotor's permutation). The certified section's
-strict descent, the agreement release and the moment law's arrival stay owed.
+for any hand-over of modes before the move (the rotor's permutation). The agreement release is
+formal-checked in [`HNN/AgreementRelease`](../../lean/HolonicsResearch/HNN/AgreementRelease.lean)
+(`agreement_release`). The certified section's strict descent and the moment law's arrival were
+formal-checked on October 27 in
+[`HNN/CertifiedSection`](../../lean/HolonicsResearch/HNN/CertifiedSection.lean). With positive
+masses and totals, the exact products compare as the codes do (`fewerBitsExact_iff`). For any
+integer reading within `s` grains of `G log₂`, the partitioned decision (readings outside the band
+`2s(a + b)`, products inside it, products for a zero mass or total) is the exact comparison in every
+case (`fewerBits_iff`), so a certified step strictly lowers the section's code
+(`certified_lowers_code`). The section stops at the first halving at which nothing moves or the
+certificate holds, and stops at all (`section_deposit`). The reading's own bound, below `log₂ v` by
+less than a grain, is the Rust `log2_reading`'s documented property and the hypothesis there; the
+moment law above is `toward_iterate`.
