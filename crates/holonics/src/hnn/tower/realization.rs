@@ -23,7 +23,8 @@
 //! section reads them, and refuses any declaration it does not carry.
 //!
 //! The forward is read twice a section: once at the opening ([`Slot::Opened`]), whose temporaries
-//! the reverse reads, and once under each candidate deposit ([`Slot::Reread`]), which needs only its
+//! the reverse reads (a realization may keep them or read them again; [`HostPass`] reads them
+//! again), and once under each candidate deposit ([`Slot::Reread`]), which needs only its
 //! faces and its continuing states.
 use super::*;
 
@@ -72,10 +73,24 @@ pub trait PassRealization {
     fn admit(&self, tower: &Tower) -> Result<()>;
 }
 
-type Kept = (Vec<(Vec<Cell>, TowerState)>, Reaches);
+/// One stream's forward as the host keeps it between calls: its continuing state, its face after
+/// its last class, and its cells only where the stream carries a passage credit, whose carry reads
+/// every cell (`Tower::carry_credit`).
+struct KeptStream {
+    cells: Vec<Cell>,
+    end: TowerState,
+    last: Option<TowerFace>,
+}
 
-/// [definition] **The host's realization**: each stream's forward and reverse on its own thread,
-/// the streams' covectors summed in stream order.
+type Kept = (Vec<KeptStream>, Reaches);
+
+/// [definition; agent-inferred, October 27] **The host's realization**: each stream's forward and
+/// reverse on its own thread, the streams' covectors summed over the threads' partition. It keeps
+/// no cell between calls (except a credit-carrying stream's): its reverse reads each stream's
+/// forward again from the opening, the same exact steps, so a section holds the cells of the
+/// streams its threads are reading, not of every stream. Measured before this partition: the
+/// 24-stream, four-level parity's host reference peaked at 1,673,124 KiB holding every stream's
+/// cells, which projects to about 22.3 GB at 320 streams.
 #[derive(Default)]
 pub struct HostPass {
     opened: Option<Kept>,
@@ -91,74 +106,106 @@ impl HostPass {
     }
 }
 
+/// Two covectors summed entry by entry; integer addition is associative, so any partition of the
+/// streams gives the same sum.
+fn summed(mut a: Vec<i128>, b: Vec<i128>) -> Vec<i128> {
+    for (x, y) in a.iter_mut().zip(&b) {
+        *x += *y;
+    }
+    a
+}
+
 impl PassRealization for HostPass {
     fn realization(&self) -> String {
-        format!("host: one stream a thread on {} threads", rayon::current_num_threads())
+        format!("host: one stream a thread on {} threads, the reverse reading each stream's forward again", rayon::current_num_threads())
     }
 
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
+        if opening.len() != classes.len() || targets.len() != classes.len() {
+            return Err(TowerError::Refused("a forward reads one opening state and one comparison a stream"));
+        }
         tower.admit_read(classes, targets)?;
         let reaches = tower.reaches();
-        let forwards: Vec<(Vec<Cell>, TowerState)> = opening
+        let levels = if slot == Slot::Opened { tower.declaration.levels } else { 0 };
+        let streams: Vec<(KeptStream, Vec<Option<(u128, u128)>>, Vec<[u64; 4]>)> = opening
             .par_iter()
             .zip(classes.par_iter())
-            .map(|(open, c)| {
-                let mut s = open.clone();
-                let cells = tower.forward(&mut s, c, &reaches)?;
-                Ok((cells, s))
+            .zip(targets.par_iter())
+            .map(|((open, c), t)| {
+                let mut end = open.clone();
+                let cells = tower.forward(&mut end, c, &reaches)?;
+                let faces = cells.iter().zip(t).map(|(cell, t)| t.map(|t| (cell.face.masses[t], cell.face.total))).collect();
+                let swell = (0..levels)
+                    .map(|l| {
+                        let mut m = [0u64; 4];
+                        for lc in cells.iter().map(|c| &c.levels[l]) {
+                            m[0] = m[0].max(reach(&lc.input));
+                            m[1] = m[1].max(reach64(&lc.state_face));
+                            m[2] = m[2].max(lc.read_scale as u64);
+                            m[3] = m[3].max(reach(&lc.drive)).max(reach(&lc.pair));
+                        }
+                        m
+                    })
+                    .collect();
+                let last = cells.last().map(|c| c.face.clone());
+                let cells = if end.credit.is_some() { cells } else { Vec::new() };
+                Ok((KeptStream { cells, end, last }, faces, swell))
             })
             .collect::<Result<_>>()?;
-        let swell = if slot == Slot::Opened {
-            (0..tower.declaration.levels)
-                .map(|l| {
-                    let mut m = [0u64; 4];
-                    for lc in forwards.iter().flat_map(|(cells, _)| cells.iter().map(move |c| &c.levels[l])) {
-                        m[0] = m[0].max(reach(&lc.input));
-                        m[1] = m[1].max(reach64(&lc.state_face));
-                        m[2] = m[2].max(lc.read_scale as u64);
-                        m[3] = m[3].max(reach(&lc.drive)).max(reach(&lc.pair));
-                    }
-                    m
-                })
-                .collect()
-        } else {
-            Vec::new()
-        };
-        let faces = forwards
-            .iter()
-            .zip(targets)
-            .map(|((cells, _), t)| cells.iter().zip(t).map(|(cell, t)| t.map(|t| (cell.face.masses[t], cell.face.total))).collect())
-            .collect();
-        *self.kept(slot) = Some((forwards, reaches));
+        let mut swell = vec![[0u64; 4]; levels];
+        for (_, _, m) in &streams {
+            for (a, b) in swell.iter_mut().zip(m) {
+                for (x, y) in a.iter_mut().zip(b) {
+                    *x = (*x).max(*y);
+                }
+            }
+        }
+        let mut faces = Vec::with_capacity(streams.len());
+        let mut kept = Vec::with_capacity(streams.len());
+        for (k, f, _) in streams {
+            faces.push(f);
+            kept.push(k);
+        }
+        *self.kept(slot) = Some((kept, reaches));
         Ok(PassRead { faces, swell })
     }
 
     fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
-        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("a reverse reads the section's opening forward"))?;
-        let gradients: Vec<Vec<i128>> = opening
+        let (kept, reaches) = self.opened.as_ref().ok_or(TowerError::Refused("a reverse reads the section's opening forward"))?;
+        if kept.len() != opening.len() || classes.len() != opening.len() {
+            return Err(TowerError::Refused("a reverse reads the streams its opening forward read"));
+        }
+        let n = tower.theta.len();
+        opening
             .par_iter()
-            .zip(forwards.par_iter())
+            .zip(kept.par_iter())
             .zip(classes.par_iter())
             .enumerate()
-            .map(|(s, ((open, (cells, _)), c))| tower.reverse(open, cells, c, compared.map(|m| m[s])))
-            .collect::<Result<_>>()?;
-        let mut g = vec![0i128; tower.theta.len()];
-        for gs in &gradients {
-            for (a, b) in g.iter_mut().zip(gs) {
-                *a += *b;
-            }
-        }
-        Ok(g)
+            .try_fold(
+                || vec![0i128; n],
+                |acc, (s, ((open, k), c))| -> Result<Vec<i128>> {
+                    let read;
+                    let cells = if k.cells.is_empty() {
+                        let mut end = open.clone();
+                        read = tower.forward(&mut end, c, reaches)?;
+                        &read
+                    } else {
+                        &k.cells
+                    };
+                    Ok(summed(acc, tower.reverse(open, cells, c, compared.map(|m| m[s]))?))
+                },
+            )
+            .try_reduce(|| vec![0i128; n], |a, b| Ok(summed(a, b)))
     }
 
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
-        let (forwards, reaches) = self.kept(slot).take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
-        tower.carry_credit(states, forwards, opening, &reaches)
+        let (kept, reaches) = self.kept(slot).take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
+        tower.carry_credit(states, kept.into_iter().map(|k| (k.cells, k.end)).collect(), opening, &reaches)
     }
 
     fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
-        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("a face is read from the opening forward"))?;
-        forwards.iter().map(|(cells, _)| cells.last().map(|c| c.face.clone()).ok_or(TowerError::Refused("an opening read of no cell"))).collect()
+        let (kept, _) = self.opened.as_ref().ok_or(TowerError::Refused("a face is read from the opening forward"))?;
+        kept.iter().map(|k| k.last.clone().ok_or(TowerError::Refused("an opening read of no cell"))).collect()
     }
 
     /// The host realizes every law the tower states.
@@ -228,6 +275,7 @@ impl Tower {
         if section == 0 {
             return Err(TowerError::Refused("a realized read takes windows of at least one cell"));
         }
+        self.admit_read(parts, &[])?;
         let longest = parts.iter().map(|p| p.len()).max().unwrap_or(0);
         let mut codes: Vec<Vec<i64>> = parts.iter().map(|p| Vec::with_capacity(p.len().saturating_sub(1))).collect();
         let mut states: Vec<TowerState> = parts.iter().map(|_| self.rest()).collect();
@@ -251,7 +299,9 @@ impl Tower {
     /// [definition; agent-inferred, October 27] Every class a realization reads and every class it
     /// compares a face with lies in the declared alphabet. A face has no mass at a class outside
     /// it (the card's read is zero there, the host's face has no entry), and the certificate
-    /// decides on positive masses, so such a read is refused before any realization reads it.
+    /// decides on positive masses, so such a read is refused before any realization reads it. The
+    /// section, the realized read and the realized advance call it themselves, so a realization
+    /// that does not is still never handed such a read.
     pub fn admit_read(&self, classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<()> {
         let a = self.declaration.alphabet;
         if classes.iter().any(|c| c.iter().any(|&u| u >= a)) || targets.iter().flatten().flatten().any(|&t| t >= a) {
@@ -272,6 +322,7 @@ impl Tower {
         if n == 0 || classes.iter().any(|c| c.len() != n) || states.len() != classes.len() {
             return Err(TowerError::Refused("an advance reads one nonempty length of classes a stream"));
         }
+        self.admit_read(classes, &[])?;
         let windows: Vec<Vec<usize>> = classes.iter().map(|c| c.iter().copied().chain([0]).collect()).collect();
         let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).chain([None]).collect()).collect();
         let reads: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();

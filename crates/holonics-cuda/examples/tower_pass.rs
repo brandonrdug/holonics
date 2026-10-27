@@ -95,6 +95,9 @@ fn parity(args: &[String]) -> Result<()> {
         let t0 = Instant::now();
         let read_h = reference.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
         let g_h = reference.reverse(&host.tower, &states_h, &parts, None)?;
+        // The reference's kept read is not the learner's: free it before the learners take the
+        // section.
+        drop(reference);
         let t1 = Instant::now();
         let read_c = card.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
         let g_c = card.reverse(&host.tower, &states_h, &parts, None)?;
@@ -161,6 +164,8 @@ fn train(args: &[String]) -> Result<()> {
     if args.first().map(String::as_str) != Some("complete-language") {
         return Err("train complete-language COMMAND ARGS…".into());
     }
+    // The command as run, so a host parity reference can name the card run it checks.
+    println!("TOWER_COMMAND {}", args[1..].join(" "));
     let opened = Card::open(0)?;
     let mut card = TowerCard::open(&opened)?;
     let started = Instant::now();

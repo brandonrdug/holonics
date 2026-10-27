@@ -4242,6 +4242,7 @@ impl TowerLearner {
         }
         let target = |s: usize, i: usize| compared.map_or(Some(classes[s][i]), |m| m[s][i]);
         let targets: Vec<Vec<Option<usize>>> = classes.iter().enumerate().map(|(s, c)| (1..c.len()).map(|i| target(s, i)).collect()).collect();
+        self.tower.admit_read(classes, &targets)?;
         let opening: Vec<TowerState> = states.to_vec();
         let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?;
         self.swell = read.swell;
@@ -5506,6 +5507,37 @@ mod tests {
         let outside: [&[usize]; 1] = [&[0, a, 2]];
         assert!(pass.forward(&tower, &states, &outside, &[vec![Some(1), Some(2)]], Slot::Reread).is_err());
         assert!(pass.forward(&tower, &states, &classes, &[vec![Some(1), Some(2)]], Slot::Reread).is_ok());
+    }
+
+    /// The host's realization keeps no cell between its calls (but a credit-carrying stream's), so
+    /// its reverse reads each stream's forward again: the summed covector is each stream's forward
+    /// and reverse summed, and the carry is each stream's, its credit moved along its cells.
+    #[test]
+    fn the_host_pass_reads_each_stream_again_for_its_reverse() {
+        let tower = tiny_of(true);
+        let classes: [&[usize]; 3] = [&[0, 1, 2, 1], &[3, 0, 2, 2], &[1, 1, 3, 0]];
+        let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).collect()).collect();
+        let opening = vec![tower.rest(), tower.rest_with_credit(), tower.rest()];
+        let reaches = tower.reaches();
+        let mut expected = vec![0i128; tower.theta.len()];
+        let mut ends = Vec::new();
+        for (open, c) in opening.iter().zip(&classes) {
+            let mut end = open.clone();
+            let cells = tower.forward(&mut end, c, &reaches).expect("forward");
+            for (a, b) in expected.iter_mut().zip(tower.reverse(open, &cells, c, None).expect("reverse")) {
+                *a += b;
+            }
+            ends.push((cells, end));
+        }
+        let mut carried = opening.clone();
+        tower.carry_credit(&mut carried, ends, &opening, &reaches).expect("carry");
+        let mut pass = realization::HostPass::default();
+        pass.forward(&tower, &opening, &classes, &targets, Slot::Opened).expect("forward");
+        assert_eq!(pass.reverse(&tower, &opening, &classes, None).expect("reverse"), expected);
+        let mut states = opening.clone();
+        pass.carry(&tower, &mut states, &opening, Slot::Opened).expect("carry");
+        assert_eq!(states, carried);
+        assert!(carried[1].credit != opening[1].credit);
     }
 
     /// The advance through a realization is [`Tower::advance`] class by class: the same faces,

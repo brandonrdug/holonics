@@ -862,17 +862,19 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
 }
 
 /// [project-postulate, October 27] Every command of this route learns, reads, founds or releases on
-/// the host, which is model compute: it runs only under Brandon's own exception (naming the
-/// workload, its purpose and its limits) or as the parity reference that checks a card run (the
-/// guide's "GPU first, and the design fixes the workload"). `HOLONICS_HOST_EXCEPTION` names which;
-/// without it the command is refused before it reads anything, and with it the run's first line
-/// names its device. Card runs go through `holonics-cuda`'s `tower_pass`, which never enters here.
+/// the host, which is model compute: it runs only under Brandon's own exception or as the parity
+/// reference that checks a card run (the guide's "GPU first, and the design fixes the workload").
+/// `HOLONICS_HOST_EXCEPTION` names the manifest that says which ([`host_exception`]); without it,
+/// or with a manifest that does not name this run, the command is refused before it reads
+/// anything, and with it the run's first line names its device and the manifest's SHA-256. Card
+/// runs go through `holonics-cuda`'s `tower_pass`, which never enters here.
 pub(super) fn run(args: &[String]) -> Result<()> {
-    let exception = std::env::var("HOLONICS_HOST_EXCEPTION").unwrap_or_default();
-    if exception.trim().is_empty() {
-        return Err("complete-language on the host is model compute: it runs only under Brandon's exception or as a card run's parity reference, named in HOLONICS_HOST_EXCEPTION; a learner runs on the card through holonics-cuda's tower_pass".into());
+    let path = std::env::var("HOLONICS_HOST_EXCEPTION").unwrap_or_default();
+    if path.trim().is_empty() {
+        return Err("complete-language on the host is model compute: it runs only under Brandon's exception or as a card run's parity reference, whose manifest HOLONICS_HOST_EXCEPTION names; a learner runs on the card through holonics-cuda's tower_pass".into());
     }
-    println!("DEVICE host exception={}", exception.trim());
+    let (kind, digest) = host_exception(path.trim(), args)?;
+    println!("DEVICE host exception={kind} manifest={} manifest_sha256={digest}", path.trim());
     run_with_execution(
         args,
         &HostObservedEpochExecution,
@@ -880,9 +882,97 @@ pub(super) fn run(args: &[String]) -> Result<()> {
     )
 }
 
+/// [project-postulate, October 27] **The host exception's manifest**: one `key value` a line, each
+/// key once, binding the exception to this run.
+/// - `kind exception`: Brandon's own exception. `words` (his words granting it), `command` (this
+///   run's arguments exactly, space-joined) and `limits` (its time and memory).
+/// - `kind parity`: the reference that checks a card release. `command` (this run's arguments
+///   exactly, a `release-tower-classes`) and `card_log`, the log of the card release it checks,
+///   which must already hold that run's `TOWER_REALIZATION card` line and its `TOWER_COMMAND` line:
+///   the same arguments but the output directory, the last.
+///
+/// Returns the kind and the manifest's SHA-256.
+fn host_exception(path: &str, args: &[String]) -> Result<(String, String)> {
+    let text = std::fs::read_to_string(path)?;
+    let mut fields: BTreeMap<&str, &str> = BTreeMap::new();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        let (key, value) = line.split_once(' ').ok_or("a host exception's manifest line is `key value`")?;
+        if fields.insert(key, value.trim()).is_some() {
+            return Err(format!("the host exception's manifest names {key} twice").into());
+        }
+    }
+    let field = |key: &str| -> Result<String> {
+        let value = fields.get(key).copied().unwrap_or("");
+        if value.is_empty() {
+            return Err(format!("the host exception's manifest names no {key}").into());
+        }
+        Ok(value.to_owned())
+    };
+    if field("command")? != args.join(" ") {
+        return Err("the host exception's manifest names another command than this run's".into());
+    }
+    let kind = field("kind")?;
+    match kind.as_str() {
+        "exception" => {
+            field("words")?;
+            field("limits")?;
+        }
+        "parity" => {
+            let (out, prefix) = match args.split_last() {
+                Some((out, prefix)) if prefix.first().map(String::as_str) == Some("release-tower-classes") => (out, prefix.join(" ")),
+                _ => return Err("a parity reference on the host checks a card release (release-tower-classes)".into()),
+            };
+            let log = std::fs::read_to_string(field("card_log")?)?;
+            if !log.lines().any(|l| l.starts_with("TOWER_REALIZATION card")) {
+                return Err("the card log names no card realization".into());
+            }
+            let checked = log
+                .lines()
+                .filter_map(|l| l.strip_prefix("TOWER_COMMAND "))
+                .filter_map(|c| c.strip_prefix(prefix.as_str()))
+                .filter_map(|rest| rest.strip_prefix(' '))
+                .any(|theirs| !theirs.is_empty() && !theirs.contains(' ') && theirs != out);
+            if !checked {
+                return Err("the card log holds no card release of this command into another output".into());
+            }
+        }
+        _ => return Err("a host exception's kind is exception or parity".into()),
+    }
+    Ok((kind, sha256(text.as_bytes())?))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// The host exception names this run: Brandon's words, its command and limits, or the card
+    /// release it checks, already run into another output; anything else is refused.
+    #[test]
+    fn the_host_exception_is_bound_to_its_run() {
+        let dir = std::env::temp_dir().join(format!("holonics-host-exception-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("dir");
+        let write = |name: &str, text: &str| {
+            let path = dir.join(name);
+            std::fs::write(&path, text).expect("write");
+            path.to_string_lossy().into_owned()
+        };
+        let train: Vec<String> = ["train-two-ladder-tower-classes", "257", "OUT"].iter().map(|s| s.to_string()).collect();
+        let release: Vec<String> = ["release-tower-classes", "STATE", "SHA", "1024", "1", "HOST"].iter().map(|s| s.to_string()).collect();
+        let granted = write("granted", "kind exception\nwords his words\ncommand train-two-ladder-tower-classes 257 OUT\nlimits 60 s, 8 GiB\n");
+        assert_eq!(host_exception(&granted, &train).expect("granted").0, "exception");
+        assert!(host_exception(&granted, &release).is_err());
+        let wordless = write("wordless", "kind exception\ncommand train-two-ladder-tower-classes 257 OUT\nlimits 60 s\n");
+        assert!(host_exception(&wordless, &train).is_err());
+        let card = write("card.log", "TOWER_COMMAND release-tower-classes STATE SHA 1024 1 CARD\nTOWER_REALIZATION card NVIDIA\n");
+        let parity = write("parity", &format!("kind parity\ncommand release-tower-classes STATE SHA 1024 1 HOST\ncard_log {card}\n"));
+        assert_eq!(host_exception(&parity, &release).expect("parity").0, "parity");
+        let same = write("same.log", "TOWER_COMMAND release-tower-classes STATE SHA 1024 1 HOST\nTOWER_REALIZATION card NVIDIA\n");
+        let unchecked = write("unchecked", &format!("kind parity\ncommand release-tower-classes STATE SHA 1024 1 HOST\ncard_log {same}\n"));
+        assert!(host_exception(&unchecked, &release).is_err());
+        let other = write("other.log", "TOWER_COMMAND release-tower-classes STATE OTHER 1024 1 CARD\nTOWER_REALIZATION card NVIDIA\n");
+        let elsewhere = write("elsewhere", &format!("kind parity\ncommand release-tower-classes STATE SHA 1024 1 HOST\ncard_log {other}\n"));
+        assert!(host_exception(&elsewhere, &release).is_err());
+        std::fs::remove_dir_all(&dir).expect("remove");
+    }
     #[test]
     fn receiver_ablation_cli_is_explicit_and_requires_prepared_state() {
         assert_eq!(sampling_policy("combined-family",true).unwrap(),continuation::SamplingPolicy::CombinedFamilyAblation);
