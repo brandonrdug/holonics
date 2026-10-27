@@ -1207,6 +1207,7 @@ import HolonicsResearch.HNN.PassiveMode
 import HolonicsResearch.HNN.RingHand
 import HolonicsResearch.Geometry.ShiftClock
 import HolonicsResearch.Geometry.TorusBraid
+import HolonicsResearch.Geometry.TorusIndex
 import HolonicsResearch.HNN.ReferentMass
 import HolonicsResearch.HNN.AgreementRelease
 import HolonicsResearch.HNN.ChargeThreshold
