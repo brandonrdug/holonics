@@ -105,6 +105,12 @@ at period `L`, its primes joined by the Chinese remainder theorem at the same ga
 ratio of the located turns of neighbouring modes. The rotor's own menu becomes the closing groups,
 each oriented by its hand: this replaces `loops_of`, which read `<<`, `+`, `-`, `=` and `>>` by name.
 
+[agent-inferred, October 27] The group that gives the turns is the first, largest first, whose
+closure under one hand carries **strictly more** than under every other hand (the product of its
+torsion primes at its best step), not the first that closes under any: a group of short numerals
+closes modulo 2 under every hand, since the last digit's parity is a character of period one in
+the tens and `−1 ≡ 1 (mod 2)`.
+
 **Laws and keys.** A symbolic search from rest over the strands' laws (27) and the keys of the
 largest closing group's `u` and `v` bytes (1,372 each: 343 signed transfers and 4 orientation
 acts), scored first by closure at the end of `z` on ring `len(z)` and then by the next-symbol read
@@ -113,6 +119,44 @@ digit), ties to the fewest changed rows. Then each other closing group's bytes w
 held, then every keyed byte on the real stream (the states before `w` read from the text under the
 current keys), until no key changes; `w`'s key is located there. Bytes in no menu position keep the
 identity. The next-symbol criterion selects among arrangements that all close; it writes nothing.
+
+[agent-inferred and measured, October 27; amends the paragraph above] **The search as built**
+(`tower_rotor::locate_strands`; `locate-strands TRAIN TRAIN_SHA PERIOD` prints its lines alone):
+
+- **The two largest closing groups are searched jointly**, their shared bytes enumerated together.
+  Searched one at a time, the first group fixes the equals' sheet from rest, where keeping and
+  setting it tie, and the second group's results are then read on the sheet its own `u` reversed.
+- **A symbol.** From rest, each strand holds after `x u y v` a signed combination of `x` held, `x`
+  stepped through `y`, and `y`; a comparison reads the held strands' sum, the moving strands' sum
+  and the result's coefficient. The score depends only on that symbol (`5⁷` of them), so each is
+  read once per group. A byte that stands only at a `u` is searched by its classes of action from
+  rest (54 or fewer), every other byte by all 1,372 keys.
+- **A comparison that does not read the result is dead**: on ring `L` every stepped residue returns
+  after `L` digits (`μ^L ≡ 1`), so a held and a stepped copy of one operand cancel at every result's
+  end and close the ring whatever the calculation.
+- **On the stream**, the bytes no symbolic stage located take their keys first, and a key moves
+  only on a strictly better score. The symbolic stages read every calculation from rest, and the
+  stream's state before `w` is rest only once `w`'s key is located; moved first, a located key
+  takes a key that reads the leftover strands.
+
+[measured] On a synthetic menu of 30 products, 25 sums and 20 differences (`<<x∘y=z>>`, the test
+`the_located_strands_close_the_menu`), the products close under no hand; the sums are the first
+closing group, hand `(1, 1)`, the differences hand `(1, −1)` (on 60, 50 and 40, the test
+`the_closing_groups_and_their_hands`, the rings are `9, 99, 999, 9999` with `μ = 10` and the turns
+the digits). The joint search returns the laws (turned, stepped, held), the
+comparison `r_turned + r_stepped`, and the keys
+
+```text
++   turned ← 0,  stepped kept,  held ← −turned,   sheet flipped
+-   turned ← 0,  stepped kept,  held ← −turned,   sheet kept
+=   turned kept, stepped ← held, held kept,        sheet set to +1
+```
+
+which is §2's chart in the other gauge: the operand read last stays in the turned strand and the
+first moves to the stepped one, so after `k` digits the comparison is `p_k − 10^k(x + e_∘ y)` with
+the sum's `y` read on the reversed sheet. Moved first on the stream, the sums' `u` key took a key
+that reads the leftover strands and the stream closed 4 of 45 calculations; with the unlocated
+bytes first, `<` takes `turned ← 0` and all 45 close with all 171 digits written right.
 
 **The foil** `PRI`: the same strands, laws and turns with every key the identity, so `H` reads every
 numeral of the text in one strand and nothing is held.
