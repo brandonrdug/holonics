@@ -16,7 +16,13 @@
 //! loops `z − s_x x − s_y y`. The first group, largest first, whose closure under one hand carries
 //! more than under every other (the product of its torsion primes at its best step, below) gives
 //! the turns; every group is then read against them on each ring and gets the one hand under which
-//! all its rows close, or none. The closing groups, each oriented by its hand, are the menu. The
+//! all its rows close, or none. The closing groups, each oriented by its hand, are the menu.
+//!
+//! [agent-inferred] A group closes only where its own rows carry the closure: at the located step
+//! and the period, their rank over the rationals is the count of columns they touch, so the turns
+//! closing them make the rank modulo each ring's primes fall below it. One calculation is `period`
+//! rows over as many columns as its digits times the modes, and closes under a hand by the
+//! arithmetic of one sum, which certifies no ring. The
 //! only byte named is a digit (a numeral is still a run of named digit bytes); no value of a numeral
 //! enters the rows, only which byte stands at which place.
 //!
@@ -518,6 +524,16 @@ fn hand_of(text: &[u8], stretches: &[Stretch], rings: &[LocatedRing], bytes: &[u
     }
 }
 
+/// A group's rows under `hand` at the located `step` and `period`: their rank over the rationals
+/// and the count of columns they touch. The group's own rows carry its closure when the two are
+/// equal (the rank modulo a ring's primes then falls below the rank, since the turns close them).
+fn own_rank(text: &[u8], stretches: &[Stretch], hand: usize, bytes: &[u8], step: usize, period: usize) -> (usize, usize) {
+    let loops = loops_of(text, stretches, HANDS[hand]);
+    let rows = rows_of(&loops, bytes, step, period);
+    let touched = (0..period * bytes.len()).filter(|&c| rows.iter().any(|r| r[c] != 0)).count();
+    (rational_rank(&rows).0, touched)
+}
+
 /// A closing group: its context, stretches and hand.
 struct Closing {
     context: [u8; 4],
@@ -837,12 +853,30 @@ fn search(groups: &[Searched], rings: &[LocatedRing], laws: &[[StrandLaw; 3]], c
 }
 
 /// What the strands meet along the text: a run of bytes no keyed byte stands between (each located
-/// digit stepping, and turning a turned strand, on every ring: `(μ^n, N)` for each ring), a keyed
-/// byte, or a scored calculation's result, read digit by digit.
+/// digit stepping, and turning a turned strand, on every ring: `(μ^n, N)` for each ring), the keyed
+/// bytes that stand together with no located digit between them (they act as one key, composed),
+/// or a scored calculation's result, read digit by digit.
 enum Event {
     Run(Vec<(u64, u64)>),
-    Key(u8),
+    Keys(Vec<u8>),
     Result(usize),
+}
+
+/// `first` then `then`, as one key: each strand takes what `then` names of what `first` left, and
+/// the sheet takes `then`'s act after `first`'s.
+fn composed(first: StrandKey, then: StrandKey) -> StrandKey {
+    let source = then.source.map(|v| match v {
+        0 => 0,
+        v if v > 0 => first.source[v as usize - 1],
+        v => -first.source[(-v) as usize - 1],
+    });
+    let sheet = match (then.sheet.after(first.sheet.after(false)), then.sheet.after(first.sheet.after(true))) {
+        (false, true) => Sheet::Kept,
+        (true, false) => Sheet::Flipped,
+        (false, false) => Sheet::Plus,
+        (true, true) => Sheet::Minus,
+    };
+    StrandKey { source, sheet }
 }
 
 /// The text as its events, read from its first byte.
@@ -865,8 +899,13 @@ fn events_of(text: &[u8], rows: &[Row], rings: &[LocatedRing], digit: &[Option<u
         }
         let b = usize::from(text[i]);
         if keyed[b] {
-            events.extend(run.take().map(Event::Run));
-            events.push(Event::Key(text[i]));
+            if let Some(steps) = run.take() {
+                events.push(Event::Run(steps));
+            }
+            match events.last_mut() {
+                Some(Event::Keys(bytes)) => bytes.push(text[i]),
+                _ => events.push(Event::Keys(vec![text[i]])),
+            }
         } else if let Some(d) = digit[b] {
             let steps = run.get_or_insert_with(|| vec![(1, 0); rings.len()]);
             for ((m, n), ring) in steps.iter_mut().zip(rings) {
@@ -909,8 +948,8 @@ fn stream(events: &[Event], text: &[u8], rows: &[Row], rings: &[LocatedRing], di
                     }
                 }
             }
-            Event::Key(b) => {
-                let key = keys[usize::from(*b)];
+            Event::Keys(bytes) => {
+                let key = bytes.iter().fold(StrandKey::IDENTITY, |k, &b| composed(k, keys[usize::from(b)]));
                 for (v, ring) in r.iter_mut().zip(rings) {
                     *v = key.apply(*v, ring.modulus);
                 }
@@ -1175,12 +1214,23 @@ fn menu_of(text: &[u8], period: usize, report: bool) -> std::result::Result<Menu
     if rings.is_empty() {
         return Err("the first closing group locates no ring".into());
     }
-    let closing: Vec<Closing> = groups
-        .into_iter()
-        .filter_map(|(context, stretches)| hand_of(text, &stretches, &rings, &bytes).map(|hand| Closing { context, stretches, hand }))
-        .collect();
+    let largest = rings.last().expect("a ring");
+    let mut closing = Vec::new();
+    let mut refused = 0;
+    for (context, stretches) in groups {
+        let Some(hand) = hand_of(text, &stretches, &rings, &bytes) else { continue };
+        let (rank, touched) = own_rank(text, &stretches, hand, &bytes, largest.step, largest.length);
+        if rank == touched {
+            closing.push(Closing { context, stretches, hand });
+        } else {
+            refused += 1;
+            if report {
+                println!("STRANDS_UNCARRIED context={} stretches={} hand={},{} rank={rank} touched={touched}", shown(&context), stretches.len(), HANDS[hand][0], HANDS[hand][1]);
+            }
+        }
+    }
     if report {
-        println!("STRANDS_CLOSING groups={} stretches={}", closing.len(), closing.iter().map(|c| c.stretches.len()).sum::<usize>());
+        println!("STRANDS_CLOSING groups={} stretches={} uncarried={refused}", closing.len(), closing.iter().map(|c| c.stretches.len()).sum::<usize>());
     }
     Ok(Menu { closing, rings, bytes })
 }

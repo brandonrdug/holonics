@@ -123,6 +123,11 @@ identity. The next-symbol criterion selects among arrangements that all close; i
 [agent-inferred and measured, October 27; amends the paragraph above] **The search as built**
 (`tower_rotor::locate_strands`; `locate-strands TRAIN TRAIN_SHA PERIOD` prints its lines alone):
 
+- **A group closes only where its own rows carry the closure**: under its hand, at the located
+  step and the period, their rank over the rationals is the count of columns they touch, so the
+  turns that close them make the rank modulo each ring's primes fall below it. One calculation is
+  `period` rows over as many columns as its digits times the modes; it closes under a hand by the
+  arithmetic of one sum and certifies no ring.
 - **The two largest closing groups are searched jointly**, their shared bytes enumerated together.
   Searched one at a time, the first group fixes the equals' sheet from rest, where keeping and
   setting it tie, and the second group's results are then read on the sheet its own `u` reversed.
@@ -137,7 +142,8 @@ identity. The next-symbol criterion selects among arrangements that all close; i
 - **On the stream**, the bytes no symbolic stage located take their keys first, and a key moves
   only on a strictly better score. The symbolic stages read every calculation from rest, and the
   stream's state before `w` is rest only once `w`'s key is located; moved first, a located key
-  takes a key that reads the leftover strands.
+  takes a key that reads the leftover strands. Keyed bytes that stand together with no located
+  digit between them act as one key, their composition.
 
 [measured] On a synthetic menu of 30 products, 25 sums and 20 differences (`<<x∘y=z>>`, the test
 `the_located_strands_close_the_menu`), the products close under no hand; the sums are the first
@@ -157,6 +163,26 @@ first moves to the stepped one, so after `k` digits the comparison is `p_k − 1
 the sum's `y` read on the reversed sheet. Moved first on the stream, the sums' `u` key took a key
 that reads the leftover strands and the stream closed 4 of 45 calculations; with the unlocated
 bytes first, `<` takes `turned ← 0` and all 45 close with all 171 digits written right.
+
+[measured] A development read on a local copy of the GSM8K training problems (3,925,837 bytes, not
+the PC's training partition; four threads): 30,018 stretches in 457 groups. The products, the
+largest group (7,041), close under no hand; the sums `<+=>` (4,266) are the first closing group,
+hand `(1, 1)`, carrying `{3, 11, 101}` at step 1 and nothing under the other hands. The rings are
+`9` (`μ = 1`, step 0), `99`, `999 = 3³·37` and `9999` (`μ = 10`), the turns the digits. Six groups
+close and are carried by their own rows: the sums and differences in the markup (`<+=>` 4,266,
+`<-=>` 3,764, and 61 and 59 more ending in `.`) and in the prose (` += `, 39; ` -= `, 28). Eighteen
+more close under one hand but are not carried: seventeen of one calculation and one of three
+(ranks 4 and 12 against 8 to 32 columns touched). Admitted, they had pulled the space, the
+newline, `$`, `(`, `)`, `,`, `/`, `:` and `*` into the keyed bytes and the stream ran 14 s a byte;
+that read was stopped past its deadline and is not used. With them refused, stage 1 returns the
+synthetic menu's laws, comparison and keys exactly; symbolically every row of the two largest
+groups closes (4,150 and 3,694 with a ring; 116 and 70 results longer than four digits have none).
+On the stream the space takes `turned ← 0, sheet set to +1` and `<` takes `turned ← 0`; `.`, `>`
+keep the identity; the second round changes nothing. **All 8,031 calculations of the six groups
+close on the stream, 7,844 of 7,844 in the two largest (decision 1 needs 99%)**, and 17,234 of
+17,382 result digits are the tenth of the comparison's conjugate face (the rest are the results
+of all nines, their ring's zero, §2). Wall time 65 s
+([LOCATE_DEV.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/LOCATE_DEV.md)).
 
 **The foil** `PRI`: the same strands, laws and turns with every key the identity, so `H` reads every
 numeral of the text in one strand and nothing is held.
