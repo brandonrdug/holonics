@@ -71,13 +71,16 @@ diverge:
   (c) the host part a section is reported beside the card's time.
 - **The trainers on the card and the first long run** (design): `train-unit-tower` and the other
   trainers routed through `TowerCard`, the held-out read through the realization, then the plain
-  gated tower on units, on the 4080, for hours of laps in segments under the card lock, with its
-  writing shown each hour. The written read's card realization is owed by design too.
+  gated two-ladder tower on the class passage (alphabet 257) through the October 25 card route, on
+  the 4080, for hours of laps in segments under the card lock, with its writing shown each hour. Not
+  on units: founding a unit alphabet has no card realization yet, so a units run would need host
+  learning; the unit trainer's card route stays built for when the founder is ported. The written
+  read's card realization is owed by design too.
 - **The refused faces on the card** (this thread): the pair face first, then the ring, turned and
-  pumped faces, then the rotor and the strands, in `kernels/tower.cu`, `holonics_cuda::hnn::tower` and the `ResidentLaw` exports of
-  `hnn::tower::realization`. Acceptance per face, fixed before its build as on October 25: 32
-  sections equal face by face and covector entry by entry, host against card, and one full pass with
-  the host's SHA-256.
+  pumped faces, then the rotor and the strands, in `kernels/tower.cu`, `holonics_cuda::hnn::tower`
+  and the `ResidentLaw` exports of `hnn::tower::realization`. Acceptance per face, fixed before its
+  build as on October 25: 32 sections equal face by face and covector entry by entry, host against
+  card, and one full pass with the host's SHA-256.
 - **The rule in the guides and this record** (this thread).
 
 Until each acceptance passes on the PC, its repair is reported as built, not as done.
