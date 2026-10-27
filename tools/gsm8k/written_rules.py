@@ -22,9 +22,12 @@ bin. Read on training problems, a calculation's own place in TRAIN is one of its
 `rings`, a `RINGS` line follows each DIR's line: on the never-met sums and differences of two
 whole numerals, how many written values are integers right modulo 9, 10 and 11 (the rings where the
 base 10 turns, collapses and reflects), each beside its shifted foil, the written value of the next
-such calculation read against this one's exact value (the last against the first), and how many
-are right on all three (modulo 990). An unfinished or fractional written value is right on none.
-With `gaps`, six lines follow each DIR's line for each of all, met and never-met calculations at
+such calculation read against this one's exact value (the last against the first), how many
+are right on all three (modulo 990), and how many positive whole values are written with the exact
+value's leading digit and count of digits, right ones included (`lead_length`, beside the same
+foil; the record of October 26's decision 5b). An unfinished or fractional written value is right
+on none.
+With `gaps`, seven lines follow each DIR's line for each of all, met and never-met calculations at
 the equals, reading how far each wrong value is from the exact one and what it was written from:
 
 - `GAPS`: the wrong calculations split into unfinished (no `>>`), not a number, an expression
@@ -32,6 +35,9 @@ the equals, reading how far each wrong value is from the exact one and what it w
 - `GAP_SIZE`, on the wrong numbers: within a factor of 2 and of 10 of the exact value (same sign),
   within a tenth of it, of the opposite sign, smaller and larger in magnitude, and with the exact
   value's count of whole-part digits, beside its foil.
+- `GAP_LEAD`, on the wrong numbers that are both positive integers: the leading digit right, the
+  leading digit and the count of digits right, and every digit right but one (same count), each
+  beside the foil: how close the written value is in its digits, where `GAP_SIZE` reads magnitude.
 - `GAP_RINGS`, on the wrong numbers that are both integers: right modulo 9, 10 and 11, and modulo
   7 and 13, where the base neither collapses nor reflects, each beside the foil. A miss is right
   modulo `m` when `m` divides its gap, and misses near their exact value have small gaps, which no
@@ -210,7 +216,8 @@ def mark_reads(problems, marks, train):
 
 
 def rings_line(each):
-    """The never-met sums and differences, read on the rings 9, 10 and 11 and beside their foil."""
+    """The never-met sums and differences, read on the rings 9, 10 and 11, by leading digit and
+    length, and beside their foil."""
     read = [
         (v, w) for kind, _, _, e, v, w, _ in each
         if kind == "never" and re.fullmatch(r"\d+[+\-]\d+", e.replace(" ", ""))
@@ -224,6 +231,8 @@ def rings_line(each):
         right = sum(on(m, v, w) for v, w in read)
         foil = sum(on(m, v, w) for v, w in shifted)
         out.append(f"mod{m}={right} foil{m}={foil}")
+    positive = lambda pairs: [(v, w) for v, w in pairs if w is not None and v.denominator == 1 == w.denominator and v > 0 and w > 0]
+    out.append(f"lead_length={leads(positive(read))['lead_length']} foil_lead_length={leads(positive(shifted))['lead_length']}")
     return " ".join(out)
 
 
@@ -240,6 +249,18 @@ def binary_values(expression):
     a, b = Fraction(m.group(1)), Fraction(m.group(3))
     out = {a + b, a - b, b - a, a * b}
     out.update(x / y for x, y in ((a, b), (b, a)) if y != 0)
+    return out
+
+
+def leads(pairs):
+    """On pairs `(exact, written)` of positive integers: how many have the leading digit right, the
+    leading digit and the count of digits right, and all digits but one right (same count)."""
+    out = Counter()
+    for v, w in pairs:
+        a, b = str(v.numerator), str(w.numerator)
+        out["lead"] += a[0] == b[0]
+        out["lead_length"] += a[0] == b[0] and len(a) == len(b)
+        out["one_digit"] += len(a) == len(b) and sum(x != y for x, y in zip(a, b)) == 1
     return out
 
 
@@ -276,6 +297,14 @@ def gaps_lines(d, each, results):
             f"GAP_SIZE dir={d} set={name} n={len(numbers)} x2={size['x2']} x10={size['x10']} "
             f"tenth={size['tenth']} opposite_sign={size['sign']} smaller={size['small']} "
             f"larger={size['large']} digits={size['digits']} foil_digits={foil_digits}/{len(foil)}"
+        )
+        positive = lambda pairs: [(v, w) for v, w in pairs if v.denominator == 1 == w.denominator and v > 0 and w > 0]
+        near, far = positive((v, w) for _, v, w in numbers), positive(foil)
+        lead, foil_lead = leads(near), leads(far)
+        lines.append(
+            f"GAP_LEAD dir={d} set={name} n={len(near)} " + " ".join(
+                f"{k}={lead[k]} foil_{k}={foil_lead[k]}/{len(far)}" for k in ("lead", "lead_length", "one_digit")
+            )
         )
         whole = lambda pairs: [(v, w) for v, w in pairs if v.denominator == 1 and w.denominator == 1]
         on, off = whole((v, w) for _, v, w in numbers), whole(foil)

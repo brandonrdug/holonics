@@ -1323,17 +1323,22 @@ impl Rotor {
 ///
 /// `μ_L` is the located step's multiplier on ring `L` (the ratio of the located turns of
 /// neighbouring modes). **No key adds two residues**: a key transfers, reflects or clears, so no
-/// state holds a sum of two numerals. After its level's move the faces `e^(2πi r/q_L)` of every
-/// strand on every ring, strand-major, at amplitude one on the state's grain, are written into the
-/// level's modes `first..first + 3R`: those modes take no push and no move, and the covector stops
-/// there (residues have no covector; the turns, laws and keys are located by loop closure, as the
-/// rotor's keys are). The level reads them through `C`, the pair contacts and the readout like any
-/// mode: the comparison of two strands is a pair contact's product, and a written digit is the
-/// readout's.
+/// state holds a sum of two numerals. The faces `e^(2πi r/q_L)` of every strand on every ring,
+/// strand-major, are read at their level's contacts beside the level's read (record §7): their two
+/// parts `s` on the face's grain join `r̂ = r/‖r‖_rms` as ratio components, in its gauge, so no
+/// level's power divides them,
+///
+/// ```text
+/// a = W_a r̂ + W_sa s + b_a,     b = W_b r̂ + W_sb s + b_b,     v = a ⊙ b
+/// ```
+///
+/// and a contact's product of two faces is the comparison of two strands
+/// ([`Tower::open_strands_comparison`]), while a written digit is the readout's. The faces carry no
+/// covector (residues have none; the turns, laws and keys are located by loop closure, as the
+/// rotor's keys are); `W_sa` and `W_sb` take `δa ⊗ s` and `δb ⊗ s`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Strands {
     level: usize,
-    first: usize,
     rings: Vec<StrandRing>,
     laws: [StrandLaw; 3],
     /// Each located digit byte with its turn on every ring, ascending by byte.
@@ -1491,16 +1496,15 @@ impl StrandKey {
 }
 
 impl Strands {
-    /// The strands on `level` of a tower of `declaration`, writing modes `first..first + 3·rings`:
-    /// the rings, the three laws, the digit bytes' turns (one below each ring's modulus), the keyed
-    /// bytes' keys, and one word for each class. Refused unless the level and its modes are the
-    /// tower's, every ring has a modulus above one and a multiplier below it, the bytes ascend and no
-    /// byte is both a digit and keyed, and every key's sources name a strand or zero.
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(declaration: &TowerDeclaration, level: usize, first: usize, rings: Vec<StrandRing>, laws: [StrandLaw; 3], digits: Vec<(u8, Vec<u32>)>, keys: Vec<(u8, StrandKey)>, words: Vec<Vec<u8>>) -> Result<Self> {
+    /// The strands read at the contacts of `level` of a tower of `declaration`: the rings, the three
+    /// laws, the digit bytes' turns (one below each ring's modulus), the keyed bytes' keys, and one
+    /// word for each class. Refused unless the level is the tower's and there is a ring, every ring
+    /// has a modulus above one and a multiplier below it, the bytes ascend and no byte is both a
+    /// digit and keyed, and every key's sources name a strand or zero.
+    pub fn new(declaration: &TowerDeclaration, level: usize, rings: Vec<StrandRing>, laws: [StrandLaw; 3], digits: Vec<(u8, Vec<u32>)>, keys: Vec<(u8, StrandKey)>, words: Vec<Vec<u8>>) -> Result<Self> {
         let d = declaration;
-        if level >= d.levels || rings.is_empty() || first + 3 * rings.len() > d.modes {
-            return refuse("strands' modes that are not their level's");
+        if level >= d.levels || rings.is_empty() {
+            return refuse("strands on a level the tower does not have, or on no ring");
         }
         if rings.iter().any(|g| g.modulus < 2 || g.multiplier >= g.modulus) {
             return refuse("a strands' ring holds a modulus above one and a multiplier below it");
@@ -1520,17 +1524,12 @@ impl Strands {
         if keys.iter().any(|(_, key)| key.source.iter().any(|v| !(-3..=3).contains(v))) {
             return refuse("a strands' key takes a strand or zero");
         }
-        Ok(Self { level, first, rings, laws, digits, keys, words, levels: d.levels, alphabet: d.alphabet, modes: d.modes, half_turn: half_turn(2 * MOVE_BITS) })
+        Ok(Self { level, rings, laws, digits, keys, words, levels: d.levels, alphabet: d.alphabet, modes: d.modes, half_turn: half_turn(2 * MOVE_BITS) })
     }
 
-    /// The level whose modes they write.
+    /// The level whose contacts read them.
     pub fn level(&self) -> usize {
         self.level
-    }
-
-    /// The first mode they write: strand `s` on ring `i` in `first + s·R + i`.
-    pub fn first(&self) -> usize {
-        self.first
     }
 
     /// The rings.
@@ -1553,19 +1552,20 @@ impl Strands {
         &self.keys
     }
 
-    /// The count of written modes, `3R`.
-    pub fn written(&self) -> usize {
+    /// The count of residues, `3R`: strand `s` on ring `i` at `s·R + i`.
+    pub fn residues(&self) -> usize {
         3 * self.rings.len()
     }
 
-    /// Whether mode `mode` of level `level` is written by the strands.
-    fn covers(&self, level: usize, mode: usize) -> bool {
-        level == self.level && (self.first..self.first + self.written()).contains(&mode)
+    /// The count of the faces' parts the contacts read, `6R`: residue `j`'s face at `2j` (its real
+    /// part) and `2j + 1` (its imaginary part).
+    pub fn parts(&self) -> usize {
+        6 * self.rings.len()
     }
 
     /// A stream's rested residues, strand-major, at zero.
     fn rested(&self) -> Vec<u32> {
-        vec![0; self.written()]
+        vec![0; self.residues()]
     }
 
     /// The residues (strand-major) and the orientation after the byte `b`, by the law above.
@@ -1592,7 +1592,7 @@ impl Strands {
 
     /// The residues and the orientation after the word of `class` is heard, each byte in turn.
     pub fn heard(&self, residues: &mut [u32], reversed: &mut bool, class: usize) -> Result<()> {
-        if residues.len() != self.written() || class >= self.words.len() {
+        if residues.len() != self.residues() || class >= self.words.len() {
             return refuse("a stream rested before its strands joined: rest it again");
         }
         for &b in &self.words[class] {
@@ -1601,16 +1601,20 @@ impl Strands {
         Ok(())
     }
 
-    /// The faces `e^(2πi r/q)` of the residues, strand-major, on the state's grain `2^(−24)`.
-    fn faces(&self, residues: &[u32]) -> Result<Vec<(i64, i64)>> {
+    /// The faces `e^(2πi r/q)` of the residues, strand-major, as the parts the contacts read
+    /// ([`Strands::parts`]) on the face's grain `2^(−16)`.
+    pub fn faces(&self, residues: &[u32]) -> Result<Vec<i32>> {
         let n = self.rings.len();
-        collect_exact(residues.iter().enumerate().map(|(i, &v)| {
+        let mut parts = Vec::with_capacity(2 * residues.len());
+        for (i, &v) in residues.iter().enumerate() {
             let (a, b) = ring_face_at(v, self.rings[i % n].modulus, self.half_turn);
-            Ok((fit64(release(a, MOVE_BITS - STATE_BITS))?, fit64(release(b, MOVE_BITS - STATE_BITS))?))
-        }))
+            parts.push(fit32(release(a, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?);
+            parts.push(fit32(release(b, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?);
+        }
+        Ok(parts)
     }
 
-    /// `strands LEVELS ALPHABET MODES LEVEL FIRST LAW LAW LAW`, then the rings as `MODULUS:MULTIPLIER`,
+    /// `strands LEVELS ALPHABET MODES LEVEL LAW LAW LAW`, then the rings as `MODULUS:MULTIPLIER`,
     /// the digits as `BYTE:TURN,…`, the keys as `BYTE:S,S,S:SHEET` and the words in hexadecimal (`-`
     /// for an empty word), one line each.
     fn to_text(&self) -> String {
@@ -1620,8 +1624,8 @@ impl Strands {
         let words: String = self.words.iter().map(|w| if w.is_empty() { " -".to_string() } else { format!(" {}", w.iter().map(|b| format!("{b:02x}")).collect::<String>()) }).collect();
         let [a, b, c] = self.laws.map(StrandLaw::name);
         format!(
-            "strands {} {} {} {} {} {a} {b} {c}\nstrands-rings{rings}\nstrands-digits{digits}\nstrands-keys{keys}\nstrands-words{words}\n",
-            self.levels, self.alphabet, self.modes, self.level, self.first
+            "strands {} {} {} {} {a} {b} {c}\nstrands-rings{rings}\nstrands-digits{digits}\nstrands-keys{keys}\nstrands-words{words}\n",
+            self.levels, self.alphabet, self.modes, self.level
         )
     }
 
@@ -1629,7 +1633,7 @@ impl Strands {
         let d = declaration;
         let bad = TowerError::Refused("strands' text that is not the tower's");
         let head: Vec<&str> = head.split(' ').collect();
-        if head.len() != 9 || head[..4].join(" ") != format!("strands {} {} {}", d.levels, d.alphabet, d.modes) {
+        if head.len() != 8 || head[..4].join(" ") != format!("strands {} {} {}", d.levels, d.alphabet, d.modes) {
             return Err(bad);
         }
         let count = |w: &str| w.parse::<usize>().map_err(|_| bad.clone());
@@ -1679,7 +1683,7 @@ impl Strands {
                 (0..w.len()).step_by(2).map(|i| u8::from_str_radix(&w[i..i + 2], 16).map_err(|_| bad.clone())).collect()
             })
             .collect::<Result<Vec<Vec<u8>>>>()?;
-        Self::new(d, count(head[4])?, count(head[5])?, rings, [law(head[6])?, law(head[7])?, law(head[8])?], digits, keys, words)
+        Self::new(d, count(head[4])?, rings, [law(head[5])?, law(head[6])?, law(head[7])?], digits, keys, words)
     }
 }
 
@@ -1735,13 +1739,17 @@ struct Layout {
     /// [`rank_material`]), empty families without a ring face.
     ring_readout: usize,
     ring_factors: usize,
+    /// The strands' faces read at their level's contacts: `W_sa` (`f × 6R`) and, under a pair law,
+    /// `W_sb` (`f × 6R`), empty families without strands ([`Strands`]).
+    strand_contact: usize,
+    strand_pair: usize,
     len: usize,
     /// `(start, length, the family's grain)`, in order.
     families: Vec<(usize, usize, u32)>,
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1800,7 +1808,12 @@ impl Layout {
         let readout_bias = take(a, FACE_BITS);
         let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
         let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks * ring_harmonics, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
-        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, len: at, families }
+        let (strand_contact, strand_pair) = match strand_parts {
+            0 => (0, 0),
+            c if d.contact == ContactLaw::Rectifying => (take(f * c, MATERIAL_BITS), 0),
+            c => (take(f * c, MATERIAL_BITS), take(f * c, MATERIAL_BITS)),
+        };
+        Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, strand_contact, strand_pair, len: at, families }
     }
 }
 
@@ -2167,9 +2180,11 @@ struct LevelCell {
     /// `‖r‖_rms` on `2^(−16)` (zero when the face is zero).
     read_scale: i128,
     drive: Vec<i32>,
-    /// The pair contact's second drive `W_b r̂ + b_b` (empty when rectifying).
+    /// The pair contact's second drive `W_b r̂ + W_sb s + b_b` (empty when rectifying).
     pair: Vec<i32>,
     conduct: Vec<i32>,
+    /// The strands' faces `s` the contacts read beside `r̂`, on `2^(−16)` (empty off their level).
+    strands: Vec<i32>,
     /// The gated modes' moves at this cell (empty when ungated).
     gate: Vec<GatedMove>,
 }
@@ -2268,6 +2283,8 @@ struct Reaches {
     pair: [u64; 2],
     /// The ring face's readout `W` (zero without a ring face).
     ring: u64,
+    /// The strands' `W_sa` and `W_sb` (zero without strands).
+    strands: [u64; 2],
     /// The ring's ranks as the material holds their factors, and each class's pool from them
     /// (empty without a ring face).
     ring_ranks: Vec<RingRank>,
@@ -2467,7 +2484,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0);
+        let layout = Layout::new(&d, 0, 0, 0, 0);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -2640,7 +2657,12 @@ impl Tower {
             }
             None => (Vec::new(), Vec::new()),
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, ring_ranks, ring_pools, gammas, gates, ladder, half_turn }
+        let strands = self.strands.as_ref().map_or([0, 0], |strands| {
+            let (l, extent) = (&self.layout, d.contacts * strands.parts());
+            let pair = if d.contact == ContactLaw::Rectifying { 0 } else { reach(&t[l.strand_pair..l.strand_pair + extent]) };
+            [reach(&t[l.strand_contact..l.strand_contact + extent]), pair]
+        });
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -2669,12 +2691,12 @@ impl Tower {
             affine(&t[pe..pe + w * k], reaches.pair[1], k, c, None, 0, MATERIAL_BITS, &mut lift)?;
             x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the pair face's lift outgrew the face's 32-bit carrier")))?;
         }
-        // The strands hear the arriving word; their faces are written after their level's move
-        // ([`Strands`]).
-        let stranded: Option<(&Strands, Vec<(i64, i64)>)> = match &self.strands {
+        // The strands hear the arriving word; their faces are read at their level's contacts
+        // beside the level's read ([`Strands`]).
+        let stranded: Option<(usize, Vec<i32>)> = match &self.strands {
             Some(strands) => {
                 strands.heard(&mut state.strands, &mut state.reversed, u)?;
-                Some((strands, strands.faces(&state.strands)?))
+                Some((strands.level, strands.faces(&state.strands)?))
             }
             None => None,
         };
@@ -2764,14 +2786,6 @@ impl Tower {
             let gammas = &reaches.gammas[l];
             let mut face = vec![0i64; 2 * n];
             for k in 0..n {
-                // A strand's mode takes no push and no move: its face is written.
-                if let Some((strands, faces)) = stranded.as_ref().filter(|(strands, _)| strands.covers(l, k)) {
-                    let (nr, ni) = faces[k - strands.first];
-                    modes[k] = (nr, ni);
-                    face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
-                    face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
-                    continue;
-                }
                 let (hr, hi) = stepped.as_ref().map_or(modes[k], |h| h[k]);
                 let ((lr, li), gamma) = match gate.get(k) {
                     Some(m) => ((m.lam.0 as i128, m.lam.1 as i128), m.gamma as i128),
@@ -2797,8 +2811,22 @@ impl Tower {
             // scale is a gauge, and the normalized step lets it grow (see "The read's carrier").
             let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
             let (read, read_scale) = ratio_to_power(&raw)?;
+            // The strands' faces read at this level's contacts beside `r̂`: `W_s s`, each drive's
+            // part released on its own as the pair face's lift is.
+            let faces = stranded.as_ref().filter(|(level, _)| *level == l).map(|(_, s)| s.as_slice());
+            let heard = |material: usize, reach: u64, drive: &mut [i64]| -> Result<()> {
+                let Some(s) = faces else { return Ok(()) };
+                let c = s.len();
+                let mut part = vec![0i64; f];
+                affine(&t[material..material + f * c], reach, c, s, None, 0, MATERIAL_BITS, &mut part)?;
+                for (a, b) in drive.iter_mut().zip(&part) {
+                    *a = fit64(*a as i128 + *b as i128)?;
+                }
+                Ok(())
+            };
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
+            heard(self.layout.strand_contact, reaches.strands[0], drive_buf)?;
             let drive = to32(drive_buf, "a contact drive outgrew its 32-bit carrier")?;
             let (conduct, pair) = match d.contact {
                 ContactLaw::Rectifying => (drive.iter().map(|&a| a.max(0)).collect(), Vec::new()),
@@ -2807,6 +2835,7 @@ impl Tower {
                     // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
                     let mut second = vec![0i64; f];
                     affine(&t[lv.pair..lv.pair + f * w], r[10], w, &read, Some(&t[lv.pair_bias..lv.pair_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut second)?;
+                    heard(self.layout.strand_pair, reaches.strands[1], &mut second)?;
                     let second = to32(&second, "a pair contact's second drive outgrew its 32-bit carrier")?;
                     let conduct = collect_exact((0..f).map(|o| {
                         let (a, b) = (drive[o] as i128, second[o] as i128);
@@ -2842,7 +2871,8 @@ impl Tower {
                 ring_after = Some(state.ring.clone());
             }
             let push = push_re.into_iter().zip(push_im).collect();
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate });
+            let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -2940,9 +2970,6 @@ impl Tower {
         }
         if self.rotor.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a rotor: the credit's moments through the step are owed");
-        }
-        if self.strands.is_some() && opening.credit.is_some() {
-            return refuse("a credited opening under strands: the credit's moments beside their written modes are owed");
         }
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
@@ -3145,6 +3172,18 @@ impl Tower {
             if d.contact != ContactLaw::Rectifying {
                 outer_sum(&mut g[lv.pair..lv.pair + f * w], w, &dbs, &reads)?;
             }
+            // The strands' faces read at this level: their material takes each drive's covector
+            // against the faces, and the faces carry none.
+            if let Some(strands) = self.strands.as_ref().filter(|strands| strands.level == l) {
+                let c = strands.parts();
+                let faces: Vec<&[i32]> = (0..cells_n).map(|i| level(i).strands.as_slice()).collect();
+                let sc = self.layout.strand_contact;
+                outer_sum(&mut g[sc..sc + f * c], c, &das, &faces)?;
+                if d.contact != ContactLaw::Rectifying {
+                    let sp = self.layout.strand_pair;
+                    outer_sum(&mut g[sp..sp + f * c], c, &dbs, &faces)?;
+                }
+            }
             outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &dreads, &faces_re)?;
             outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &negs, &faces_im)?;
             // The reverse scan of the modes: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)
@@ -3173,11 +3212,6 @@ impl Tower {
                     back = rotor.back(l, classes[i + 1], &back);
                 }
                 for k in 0..n {
-                    // A strand's mode is written, not moved: its covector stops there.
-                    if self.strands.as_ref().is_some_and(|strands| strands.covers(l, k)) {
-                        gh.push((0, 0));
-                        continue;
-                    }
                     gh.push((fit64(read_cov[i][k].0 as i128 + back[k].0)?, fit64(read_cov[i][k].1 as i128 + back[k].1)?));
                 }
                 carried = gh.clone();
@@ -3409,9 +3443,6 @@ impl Tower {
     fn advance_credit(&self, credit: &mut [LevelCredit], opening: &TowerState, cells: &[Cell], reaches: &Reaches) -> Result<()> {
         if self.rotor.is_some() {
             return refuse("a passage credit under a rotor: its moments through the step are owed");
-        }
-        if self.strands.is_some() {
-            return refuse("a passage credit under strands: its moments beside the written modes are owed");
         }
         let d = &self.declaration;
         let (w, n) = (d.width, d.modes);
@@ -3699,18 +3730,26 @@ impl Tower {
             }
             None => None,
         };
-        let layout = Layout::new(&declaration, pair.as_ref().map_or(0, |face| face.forms()), ring.as_ref().map_or(0, RingFace::ranks), ring.as_ref().map_or(0, RingFace::harmonics));
+        let layout = Layout::new(
+            &declaration,
+            pair.as_ref().map_or(0, |face| face.forms()),
+            ring.as_ref().map_or(0, RingFace::ranks),
+            ring.as_ref().map_or(0, RingFace::harmonics),
+            strands.as_ref().map_or(0, Strands::parts),
+        );
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
         // The rotor and the strands join by their own laws, so a text that holds them together is
-        // read under the same refusals as their joins.
+        // read under the same refusals as their joins; the strands' material is the text's.
         let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
         if let Some(rotor) = rotor {
             tower.join_rotor(rotor)?;
         }
         if let Some(strands) = strands {
+            let theta = std::mem::take(&mut tower.theta);
             tower.join_strands(strands)?;
+            tower.theta = theta;
         }
         Ok(tower)
     }
@@ -3727,10 +3766,13 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a pair face joins before a ring face (the ring's readout follows the pair's material)");
         }
+        if self.strands.is_some() {
+            return refuse("a pair face joins before strands (the strands' material follows the pair's)");
+        }
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0);
+        let layout = Layout::new(d, face.forms(), 0, 0, 0);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -3757,10 +3799,10 @@ impl Tower {
             return refuse("a ring face beside a rotor: the ring's law under a step is owed");
         }
         if self.strands.is_some() {
-            return refuse("a ring face beside strands: the ring's carried face over written modes is owed");
+            return refuse("a ring face joins before strands (the strands' material follows the ring's)");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics());
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -3798,9 +3840,6 @@ impl Tower {
         if (rotor.levels, rotor.alphabet, rotor.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("a rotor of another tower's shape");
         }
-        if self.strands.as_ref().is_some_and(|strands| rotor.moving() > strands.first) {
-            return refuse("a rotor whose rings reach the strands' written modes");
-        }
         self.rotor = Some(rotor);
         Ok(())
     }
@@ -3810,26 +3849,78 @@ impl Tower {
         self.rotor.as_ref()
     }
 
-    /// [agent-inferred, October 26] **The strands joined to the tower** ([`Strands`]): they add no
-    /// material, and their residues and orientation are a stream's state, so a stream rested before
-    /// the join is rested again. Refused beside a ring face (the ring reads a mode's carried face,
-    /// which a written mode does not carry), when strands are already joined, at another tower's
-    /// shape, or where a rotor's rings reach their modes.
+    /// [agent-inferred, October 27] **The strands joined to the tower** ([`Strands`]): their faces'
+    /// material at their level's contacts, `W_sa` and under a pair law `W_sb`, is appended at zero,
+    /// so the joined tower reads every passage exactly as the tower did, and the section's covector
+    /// moves it from there. Their residues and orientation are a stream's state, so a stream rested
+    /// before the join is rested again. Refused when strands are already joined or at another
+    /// tower's shape.
     pub fn join_strands(&mut self, strands: Strands) -> Result<()> {
         if self.strands.is_some() {
             return refuse("a tower takes one set of strands");
-        }
-        if self.ring.is_some() {
-            return refuse("strands beside a ring face: the ring's carried face over written modes is owed");
         }
         let d = &self.declaration;
         if (strands.levels, strands.alphabet, strands.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("strands of another tower's shape");
         }
-        if self.rotor.as_ref().is_some_and(|rotor| rotor.moving() > strands.first) {
-            return refuse("strands whose written modes a rotor's rings reach");
-        }
+        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts());
+        self.theta.resize(layout.len, 0);
+        self.layout = layout;
         self.strands = Some(strands);
+        Ok(())
+    }
+
+    /// [derived; agent-inferred, October 27] **The pair contacts opened on the strands'
+    /// comparison** (record §7): the located comparison `(e_s r_s + e_t r_t) mod q_L` of strands
+    /// `s` and `t` has the face `e^(2πi e_s r_s/q) e^(2πi e_t r_t/q)`, whose parts are four products
+    /// of one strand's part by the other's,
+    ///
+    /// ```text
+    /// Re = cos_s cos_t − e_s e_t sin_s sin_t,     Im = e_s sin_s cos_t + e_t cos_s sin_t
+    /// ```
+    ///
+    /// so contacts `4i..4i + 4` of the strands' level, for ring `i`, are opened to conduct exactly
+    /// `cos_s cos_t`, `e_s e_t sin_s sin_t`, `e_s sin_s cos_t` and `e_t cos_s sin_t`: their `W_a`,
+    /// `W_b`, `b_a` and `b_b` at zero, and `W_sa`, `W_sb` one on the factors, on the material's
+    /// grain. The return and the readout read the comparison from there; every other family is as
+    /// it was. Refused without strands, under a contact law other than the pair, for a comparison
+    /// that is not of two strands each signed `±1`, or with fewer than four contacts a ring.
+    pub fn open_strands_comparison(&mut self, compared: [usize; 2], signs: [i8; 2]) -> Result<()> {
+        let d = self.declaration;
+        let Some(strands) = &self.strands else {
+            return refuse("a comparison opens on joined strands");
+        };
+        if d.contact != ContactLaw::Pair {
+            return refuse("a comparison is a pair contact's product: it opens under the pair law");
+        }
+        if compared.iter().any(|&s| s > 2) || compared[0] == compared[1] || signs.iter().any(|&e| e != 1 && e != -1) {
+            return refuse("a comparison of two strands, each signed ±1");
+        }
+        let (w, rings, c) = (d.width, strands.rings.len(), strands.parts());
+        if d.contacts < 4 * rings {
+            return refuse("a comparison opens four contacts a ring");
+        }
+        let lv = self.layout.levels[strands.level];
+        let unit = 1i32 << MATERIAL_BITS;
+        let (s, t) = (compared[0], compared[1]);
+        let (es, et) = (i32::from(signs[0]), i32::from(signs[1]));
+        for i in 0..rings {
+            // Residue j's real part at 2j, its imaginary part at 2j + 1.
+            let (cs, ct) = (2 * (s * rings + i), 2 * (t * rings + i));
+            let products = [((cs, 1), (ct, 1)), ((cs + 1, es), (ct + 1, et)), ((cs + 1, es), (ct, 1)), ((cs, 1), (ct + 1, et))];
+            for (j, ((a, ea), (b, eb))) in products.into_iter().enumerate() {
+                let o = 4 * i + j;
+                self.theta[lv.contact + o * w..lv.contact + (o + 1) * w].fill(0);
+                self.theta[lv.pair + o * w..lv.pair + (o + 1) * w].fill(0);
+                self.theta[lv.contact_bias + o] = 0;
+                self.theta[lv.pair_bias + o] = 0;
+                let (sa, sb) = (self.layout.strand_contact + o * c, self.layout.strand_pair + o * c);
+                self.theta[sa..sa + c].fill(0);
+                self.theta[sb..sb + c].fill(0);
+                self.theta[sa + a] = ea * unit;
+                self.theta[sb + b] = eb * unit;
+            }
+        }
         Ok(())
     }
 
@@ -3976,8 +4067,9 @@ fn toward(m: i128, g: i128, rate: u32) -> i128 {
     m + if step == 0 { (g - m).signum() } else { step }
 }
 
-/// One level of [`Tower::bilinear_modes`]: each drive's weight on each mode (`2^(−48)`) and the
-/// bilinear block between modes (`2^(−96)`), rows the first drive's modes.
+/// One level of [`Tower::bilinear_modes`]: each drive's weight on each entry (`2^(−48)`) and the
+/// bilinear block between entries (`2^(−96)`), rows the first drive's. The entries are the level's
+/// modes and, on the strands' level, each strand residue's face after them ([`Strands::residues`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BilinearModes {
     pub first: Vec<BigUint>,
@@ -4450,12 +4542,7 @@ impl Tower {
                     };
                     let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
                     let (lr, li, br, bi) = (lam.0 as i128, lam.1 as i128, beta.0 as i128, beta.1 as i128);
-                    // A strand's mode is written whole: nothing is carried to it by a move.
-                    let carried = if self.strands.as_ref().is_some_and(|strands| strands.covers(l, k)) {
-                        lc.state[k]
-                    } else {
-                        (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?)
-                    };
+                    let carried = (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?);
                     Ok(CircuitMode { before: opening[l][k], carried, after: lc.state[k], lam, beta })
                 }))?;
                 let carried: Vec<(i64, i64)> = modes.iter().map(|m| m.carried).collect();
@@ -4487,9 +4574,6 @@ impl Tower {
         }
         if self.rotor.is_some() {
             return refuse("input covectors under a rotor: their carried face is the unstepped state the moves do not act on");
-        }
-        if self.strands.is_some() {
-            return refuse("input covectors under strands: their written modes are not what the moves carry");
         }
         let reaches = self.reaches();
         let t = &self.theta;
@@ -4552,8 +4636,9 @@ impl Tower {
             .into_iter()
             .map(|level| {
                 let mut e = vec![vec![BigUint::from(0u32); rungs]; rungs];
-                for (k, row) in level.block.into_iter().enumerate() {
-                    for (k2, x) in row.into_iter().enumerate() {
+                // The modes' entries only: a strand's face has no rung.
+                for (k, row) in level.block.into_iter().take(n).enumerate() {
+                    for (k2, x) in row.into_iter().take(n).enumerate() {
                         e[rung(k)][rung(k2)] += x;
                     }
                 }
@@ -4566,8 +4651,11 @@ impl Tower {
     /// [`Tower::bilinear_rungs`] sums over rungs: per level, `E_(k,k′) = Σ_o |A_(o,k)|² |B_(o,k′)|²`
     /// on `2^(−96)` and each drive's weight on each mode, `Σ_o |A_(o,k)|²` and `Σ_o |B_(o,k)|²` on
     /// `2^(−48)`. A coefficient multiplies the mode's face, so what a contact hears of a mode is its
-    /// weight times the mode's loudness where it is read; strands' modes are written at amplitude
-    /// one ([`Strands`]). A rectifying tower has no bilinear block (a typed refusal).
+    /// weight times the mode's loudness where it is read. On the strands' level each strand
+    /// residue `j` is an entry after the modes, `n + j`, its coefficient the two parts of its face
+    /// `|W_s(o, 2j)|² + |W_s(o, 2j + 1)|²`: the faces are at amplitude one ([`Strands`]), so the
+    /// weight is what a contact hears of it. A rectifying tower has no bilinear block (a typed
+    /// refusal).
     pub fn bilinear_modes(&self) -> Result<Vec<BilinearModes>> {
         let d = &self.declaration;
         if d.contact == ContactLaw::Rectifying {
@@ -4576,7 +4664,7 @@ impl Tower {
         let (w, n, f) = (d.width, d.modes, d.contacts);
         let t = &self.theta;
         let mut levels = Vec::with_capacity(self.layout.levels.len());
-        for lv in &self.layout.levels {
+        for (l, lv) in self.layout.levels.iter().enumerate() {
             // |drive read back onto mode k|², per contact, on 2^(−48).
             let on_modes = |material: usize| -> Vec<Vec<u128>> {
                 (0..f)
@@ -4596,9 +4684,24 @@ impl Tower {
                     })
                     .collect()
             };
-            let (a, b) = (on_modes(lv.contact), on_modes(lv.pair));
-            let weight = |drive: &[Vec<u128>]| -> Vec<BigUint> { (0..n).map(|k| drive.iter().map(|o| BigUint::from(o[k])).sum()).collect() };
-            let mut block = vec![vec![BigUint::from(0u32); n]; n];
+            let (mut a, mut b) = (on_modes(lv.contact), on_modes(lv.pair));
+            // The strand residues' faces after the modes, on their level: each part's coefficient
+            // on 2^(−24), squared to 2^(−48).
+            if let Some(strands) = self.strands.as_ref().filter(|strands| strands.level == l) {
+                let c = strands.parts();
+                for (drive, material) in [(&mut a, self.layout.strand_contact), (&mut b, self.layout.strand_pair)] {
+                    for (o, row) in drive.iter_mut().enumerate() {
+                        let at = material + o * c;
+                        row.extend((0..c / 2).map(|j| {
+                            let (re, im) = (t[at + 2 * j].unsigned_abs() as u128, t[at + 2 * j + 1].unsigned_abs() as u128);
+                            re * re + im * im
+                        }));
+                    }
+                }
+            }
+            let entries = a.first().map_or(n, Vec::len);
+            let weight = |drive: &[Vec<u128>]| -> Vec<BigUint> { (0..entries).map(|k| drive.iter().map(|o| BigUint::from(o[k])).sum()).collect() };
+            let mut block = vec![vec![BigUint::from(0u32); entries]; entries];
             for (ao, bo) in a.iter().zip(&b) {
                 for (k, &x) in ao.iter().enumerate() {
                     if x == 0 {
@@ -4710,8 +4813,13 @@ mod tests {
 
     /// [`tiny_declared`] with `modes` modes a level.
     fn tiny_shaped(levels: usize, modes: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
-        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes, contacts: 4, levels, gated, turned, pumped, contact };
-        let nw = modes * declaration.width;
+        tiny_contacts(levels, modes, 4, gated, turned, pumped, contact)
+    }
+
+    /// [`tiny_shaped`] with `contacts` contacts a level (four reads as [`tiny_shaped`]).
+    fn tiny_contacts(levels: usize, modes: usize, contacts: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
+        let declaration = TowerDeclaration { alphabet: 4, width: 4, modes, contacts, levels, gated, turned, pumped, contact };
+        let (nw, fw) = (modes * declaration.width, contacts * declaration.width);
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
         // Open the readout and the returns away from zero so every family carries a covector.
         let k = keys(8192);
@@ -4725,7 +4833,7 @@ mod tests {
         };
         fill(&mut tower.theta, layout.readout, 16);
         for lv in &layout.levels {
-            fill(&mut tower.theta, lv.ret, 16);
+            fill(&mut tower.theta, lv.ret, fw);
         }
         if gated {
             for lv in &layout.levels {
@@ -4745,7 +4853,7 @@ mod tests {
         }
         if contact != ContactLaw::Rectifying {
             for lv in &layout.levels {
-                fill(&mut tower.theta, lv.pair, 16);
+                fill(&mut tower.theta, lv.pair, fw);
             }
         }
         if pumped {
@@ -5136,7 +5244,7 @@ mod tests {
     /// `d` turning each ring by `d`, the laws held, stepped and turned for strands `A`, `G`, `H`, and
     /// the record's keys: `<` clears `H` on the sheet `+1`, `+` and `-` hand `H` to `A` and clear it
     /// on the sheets `+1` and `−1`, and `=` hands `H` to `G` and `−A` to `H` on the sheet `+1`.
-    fn tenfold_strands(declaration: &TowerDeclaration, level: usize, first: usize, words: Vec<Vec<u8>>) -> Strands {
+    fn tenfold_strands(declaration: &TowerDeclaration, level: usize, words: Vec<Vec<u8>>) -> Strands {
         let rings = vec![StrandRing { modulus: 9, multiplier: 1 }, StrandRing { modulus: 99, multiplier: 10 }];
         let digits = (0..10u32).map(|d| (b'0' + d as u8, vec![d % 9, d])).collect();
         let keys = vec![
@@ -5145,7 +5253,7 @@ mod tests {
             (b'<', StrandKey { source: [1, 2, 0], sheet: Sheet::Plus }),
             (b'=', StrandKey { source: [1, 3, -1], sheet: Sheet::Plus }),
         ];
-        Strands::new(declaration, level, first, rings, [StrandLaw::Held, StrandLaw::Stepped, StrandLaw::Turned], digits, keys, words).expect("strands")
+        Strands::new(declaration, level, rings, [StrandLaw::Held, StrandLaw::Stepped, StrandLaw::Turned], digits, keys, words).expect("strands")
     }
 
     /// The equation at the consumer (the record's §2): from rest, after `<<x ∘ y =` and the first
@@ -5158,7 +5266,7 @@ mod tests {
     fn the_strands_read_the_comparison_chart() {
         let words: Vec<Vec<u8>> = ["<<12", "+3", "0=", "4", "2", " x"].iter().map(|w| w.as_bytes().to_vec()).collect();
         let declaration = TowerDeclaration { alphabet: words.len(), width: 1, modes: 6, contacts: 1, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Rectifying };
-        let strands = tenfold_strands(&declaration, 0, 0, words);
+        let strands = tenfold_strands(&declaration, 0, words);
         let read = |bytes: &[u8]| {
             let (mut r, mut reversed) = (vec![0u32; 6], false);
             for &b in bytes {
@@ -5211,50 +5319,112 @@ mod tests {
         assert_eq!((r[0], r[1], r[3]), (50 % 9, 50, 99 - 8));
     }
 
-    /// The tiny strands on the first level of a tower of four classes (`1`, `2`, `+`, `=`), writing
-    /// six modes from `first`.
-    fn tiny_strands(declaration: &TowerDeclaration, first: usize) -> Strands {
-        tenfold_strands(declaration, 0, first, vec![b"1".to_vec(), b"2".to_vec(), b"+".to_vec(), b"=".to_vec()])
+    /// The tiny strands read at `level` of a tower of four classes (`1`, `2`, `+`, `=`).
+    fn tiny_strands(declaration: &TowerDeclaration, level: usize) -> Strands {
+        tenfold_strands(declaration, level, vec![b"1".to_vec(), b"2".to_vec(), b"+".to_vec(), b"=".to_vec()])
     }
 
-    /// The rotor tower of `modes` modes a level with the tiny strands on modes 3 to 8, past the
-    /// rotor's three moving modes; the modes past them move.
-    fn stranded(modes: usize, gated: bool, contact: ContactLaw) -> Tower {
-        let mut tower = rotor_on(tiny_shaped(2, modes, gated, gated, gated, contact));
-        let strands = tiny_strands(&tower.declaration, 3);
+    /// The tower with the tiny strands read at its second level's contacts, opened on their
+    /// comparison `H − G` when `opened`.
+    fn stranded(mut tower: Tower, opened: bool) -> Tower {
+        let strands = tiny_strands(&tower.declaration, 1);
         tower.join_strands(strands).expect("joined");
+        if opened {
+            tower.open_strands_comparison([2, 1], [1, -1]).expect("opened");
+        }
         tower
     }
 
-    /// The strands' modes are written after the move with the faces of their residues at amplitude
-    /// one, and the level's other modes move as on its twin without strands (the first level reads
-    /// only the encoding).
+    /// The passage the strands' tests read: `1 2 + 2 1 = 1 2 + 1 = = 2`.
+    const STRANDED: [usize; 13] = [0, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1];
+
+    /// Joined at zero, the strands' material reads nothing: on the rotor tower the modes and faces
+    /// are its twin's without strands at every cell, and so is every family's covector, under each
+    /// contact law, gated and pumped or not, while the strands hear every word (`=`'s key last, on
+    /// the sheet `+1`) and their material takes a covector (`δa ⊗ s`, and `δb ⊗ s` under the pair
+    /// law; the linear foil's second drive carries none at `b_a = 0`, as its twin's).
     #[test]
-    fn the_strands_write_their_faces_after_the_move() {
-        let tower = stranded(11, true, ContactLaw::Rectifying);
-        let twin = rotor_on(tiny_shaped(2, 11, true, true, true, ContactLaw::Rectifying));
+    fn strands_joined_at_zero_read_as_the_tower_without_them() {
+        for (gated, contact) in [(true, ContactLaw::Rectifying), (false, ContactLaw::Pair), (true, ContactLaw::Pair), (false, ContactLaw::PairLinear)] {
+            let twin = rotor_on(tiny_contacts(2, 9, 4, gated, gated, gated, contact));
+            let tower = stranded(twin.clone(), false);
+            let (mut s, mut t) = (tower.rest(), twin.rest());
+            for &u in &STRANDED {
+                assert_eq!(tower.advance(&mut s, u).expect("advance"), twin.advance(&mut t, u).expect("advance"), "class {u}");
+                assert_eq!(s.modes, t.modes, "class {u}");
+            }
+            assert!(!s.reversed);
+            assert_ne!(s.strands, vec![0; 6]);
+            let covector = |tower: &Tower| {
+                let opening = tower.rest();
+                let mut s = opening.clone();
+                let cells = tower.forward(&mut s, &STRANDED, &tower.reaches()).expect("forward");
+                tower.reverse(&opening, &cells, &STRANDED, None).expect("reverse")
+            };
+            let (g, h) = (covector(&tower), covector(&twin));
+            assert_eq!(g[..twin.layout.len], h[..]);
+            let (sc, sp) = (tower.layout.strand_contact, tower.layout.strand_pair);
+            assert!(g[sc..sc + 4 * 12].iter().any(|&x| x != 0));
+            assert!(contact != ContactLaw::Pair || g[sp..sp + 4 * 12].iter().any(|&x| x != 0));
+        }
+    }
+
+    /// Opened on the comparison `H − G`, contacts `4i..4i + 4` conduct exactly the four products of
+    /// the two strands' faces on ring `i`, read at their level, and `(v₀ − v₁, v₂ + v₃)` is the
+    /// comparison's face `e^(2πi (r_H − r_G)/q_i)` to the products' release; each drive's weight
+    /// sits on its strand's residue alone, four units, and the block on the pair of them.
+    #[test]
+    fn the_opened_contacts_conduct_the_strands_comparison() {
+        let tower = stranded(tiny_contacts(2, 9, 8, false, false, false, ContactLaw::Pair), true);
         let strands = tower.strands().expect("strands").clone();
-        let (mut s, mut t) = (tower.rest(), twin.rest());
-        for &u in &[0usize, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1] {
-            tower.advance(&mut s, u).expect("advance");
-            twin.advance(&mut t, u).expect("advance");
-            let faces = strands.faces(&s.strands).expect("faces");
-            assert_eq!(s.modes[0][3..9], faces[..], "class {u}");
-            assert_eq!(s.modes[0][..3], t.modes[0][..3], "class {u}");
-            assert_eq!(s.modes[0][9..], t.modes[0][9..], "class {u}");
-            for &(re, im) in &faces {
-                let norm = i128::from(re) * i128::from(re) + i128::from(im) * i128::from(im);
-                assert!((norm - (1i128 << (2 * STATE_BITS))).abs() <= 1i128 << (STATE_BITS + 2), "{re} {im}");
+        let reaches = tower.reaches();
+        let half = half_turn(2 * MOVE_BITS);
+        let mut s = tower.rest();
+        let mut compared = 0;
+        for &u in &STRANDED {
+            let cell = tower.step(&mut s, u, &reaches).expect("step");
+            let level = &cell.levels[1];
+            assert_eq!(level.strands, strands.faces(&s.strands).expect("faces"));
+            assert!(cell.levels[0].strands.is_empty());
+            for (i, ring) in strands.rings().iter().enumerate() {
+                let part = |j: usize| i128::from(level.strands[j]);
+                let (h, g) = (2 * (2 * 2 + i), 2 * (2 + i));
+                let products = [part(h) * part(g), -part(h + 1) * part(g + 1), part(h + 1) * part(g), -part(h) * part(g + 1)];
+                for (j, p) in products.into_iter().enumerate() {
+                    assert_eq!(i128::from(level.conduct[4 * i + j]), release(p, FACE_BITS), "class {u}, ring {i}, contact {j}");
+                }
+                let v = |j: usize| i128::from(level.conduct[4 * i + j]);
+                let q = ring.modulus;
+                let c = (s.strands[2 * 2 + i] + q - s.strands[2 + i]) % q;
+                let (re, im) = ring_face_at(c, q, half);
+                let (re, im) = (release(re, MOVE_BITS - FACE_BITS), release(im, MOVE_BITS - FACE_BITS));
+                assert!((v(0) - v(1) - re).abs() <= 2 && (v(2) + v(3) - im).abs() <= 2, "class {u}, ring {i}: {} {} against {re} {im}", v(0) - v(1), v(2) + v(3));
+                compared += usize::from(c != 0);
             }
         }
-        // `1 2 + 2 1 = 1 2 + 1 = = 2`: the last key was `=`'s, on the sheet `+1`.
-        assert!(!s.reversed);
-        assert_eq!(s.strands.len(), 6);
+        assert!(compared > 0);
+        let modes = &tower.bilinear_modes().expect("read")[1];
+        let (n, rings) = (tower.declaration.modes, strands.rings().len());
+        let zero = BigUint::from(0u32);
+        let four: BigUint = BigUint::from(4u32) << 48u32;
+        assert_eq!(modes.first.len(), n + 3 * rings);
+        for j in 0..3 * rings {
+            let (h, g) = (j / rings == 2, j / rings == 1);
+            assert_eq!(modes.first[n + j], if h { four.clone() } else { zero.clone() }, "residue {j}");
+            assert_eq!(modes.second[n + j], if g { four.clone() } else { zero.clone() }, "residue {j}");
+        }
+        assert!(modes.first[..n].iter().chain(&modes.second[..n]).all(|x| *x == zero));
+        for i in 0..rings {
+            assert_eq!(modes.block[n + 2 * rings + i][n + rings + i], BigUint::from(4u32) << 96u32);
+        }
+        assert_eq!(tower.bilinear_modes().expect("read")[0].first.len(), n);
     }
 
     #[test]
     fn a_strands_tower_restores_exactly() {
-        let tower = stranded(11, true, ContactLaw::Rectifying);
+        let opened = stranded(tiny_contacts(2, 9, 8, false, false, false, ContactLaw::Pair), true);
+        assert_eq!(Tower::from_text(&opened.to_text()).expect("restored"), opened);
+        let tower = stranded(rotor_on(tiny_shaped(2, 11, true, true, true, ContactLaw::Rectifying)), false);
         assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
         let learner = TowerLearner::new(tower.clone(), 7);
         assert_eq!(TowerLearner::from_text(&learner.to_text()).expect("restored").tower, tower);
@@ -5262,7 +5432,7 @@ mod tests {
         let mut plain = tiny_shaped(2, 4, false, false, false, ContactLaw::Rectifying);
         let words = vec![Vec::new(), b"a".to_vec(), b"bc".to_vec(), vec![0, 255]];
         let ring = vec![StrandRing { modulus: 7, multiplier: 3 }];
-        plain.join_strands(Strands::new(&plain.declaration, 1, 1, ring, [StrandLaw::Turned; 3], Vec::new(), Vec::new(), words).expect("strands")).expect("joined");
+        plain.join_strands(Strands::new(&plain.declaration, 1, ring, [StrandLaw::Turned; 3], Vec::new(), Vec::new(), words).expect("strands")).expect("joined");
         assert_eq!(Tower::from_text(&plain.to_text()).expect("restored"), plain);
         // The text of another tower's strands, or a key whose source names no strand.
         let text = tower.to_text().replace("strands 2 4 11 ", "strands 2 4 10 ");
@@ -5272,62 +5442,68 @@ mod tests {
         assert!(Tower::from_text(&text).is_err());
     }
 
-    /// The strands refuse what they do not carry: a second set, a rotor reaching their modes, modes
-    /// past the level, a ring without a modulus or with its multiplier at it, bytes out of order or
-    /// in both tables, a turn at its modulus, a key naming no strand, a word missing, a credited
-    /// opening, the credit, and the input covectors' reading.
+    /// The strands refuse what they do not carry: a second set, a level past the tower's, no ring,
+    /// a ring without a modulus or with its multiplier at it, bytes out of order or in both tables,
+    /// a turn at its modulus, a key naming no strand, a word missing, and a stream rested before
+    /// the join. The comparison opens on joined strands only, under the pair law, on two strands
+    /// each signed `±1`, with four contacts a ring. Beside them the credit and the input covectors
+    /// are read as without them (the faces are an input with no covector).
     #[test]
     fn the_strands_refuse_what_they_do_not_carry() {
-        let mut tower = stranded(11, false, ContactLaw::Rectifying);
+        let mut tower = stranded(rotor_on(tiny_shaped(2, 11, false, false, false, ContactLaw::Rectifying)), false);
         let d = tower.declaration;
-        assert!(tower.join_strands(tiny_strands(&d, 3)).is_err());
-        let mut early = rotor_on(tiny_shaped(2, 11, false, false, false, ContactLaw::Rectifying));
-        assert!(early.join_strands(tiny_strands(&d, 2)).is_err());
-        let mut late = tiny_shaped(2, 11, false, false, false, ContactLaw::Rectifying);
-        late.join_strands(tiny_strands(&d, 2)).expect("joined");
-        let (steps, turns) = tiny_keys();
-        assert!(late.join_rotor(Rotor::new(&d, TINY_RINGS.to_vec(), steps, turns).expect("rotor")).is_err());
+        assert!(tower.join_strands(tiny_strands(&d, 0)).is_err());
         let words = || vec![b"1".to_vec(), b"2".to_vec(), b"+".to_vec(), b"=".to_vec()];
         let ring = |modulus: u32, multiplier: u32| vec![StrandRing { modulus, multiplier }];
         let digit = |b: u8, t: u32| vec![(b, vec![t])];
         let key = |b: u8, source: [i8; 3]| vec![(b, StrandKey { source, sheet: Sheet::Kept })];
         let laws = [StrandLaw::Held, StrandLaw::Stepped, StrandLaw::Turned];
-        let refused = |level: usize, first: usize, rings: Vec<StrandRing>, digits: Vec<(u8, Vec<u32>)>, keys: Vec<(u8, StrandKey)>| Strands::new(&d, level, first, rings, laws, digits, keys, words()).is_err();
-        assert!(!refused(0, 6, ring(11, 10), digit(b'1', 1), key(b'+', [3, 2, 0])));
-        assert!(refused(2, 0, ring(11, 10), Vec::new(), Vec::new()));
-        assert!(refused(0, 9, ring(11, 10), Vec::new(), Vec::new()));
-        assert!(refused(0, 0, Vec::new(), Vec::new(), Vec::new()));
-        assert!(refused(0, 0, ring(1, 0), Vec::new(), Vec::new()));
-        assert!(refused(0, 0, ring(11, 11), Vec::new(), Vec::new()));
-        assert!(refused(0, 0, ring(11, 10), vec![(b'2', vec![2]), (b'1', vec![1])], Vec::new()));
-        assert!(refused(0, 0, ring(11, 10), digit(b'+', 1), key(b'+', [3, 2, 0])));
-        assert!(refused(0, 0, ring(11, 10), digit(b'1', 11), Vec::new()));
-        assert!(refused(0, 0, ring(11, 10), Vec::new(), key(b'+', [4, 2, 0])));
-        assert!(Strands::new(&d, 0, 0, ring(11, 10), laws, Vec::new(), Vec::new(), words()[1..].to_vec()).is_err());
-        let opening = tower.rest_with_credit();
-        let mut s = opening.clone();
-        let classes = [0usize, 1, 2, 3];
-        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
-        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
-        tower.rotor = None;
-        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
-        let mut credit = opening.credit.clone().expect("credit");
-        assert!(tower.advance_credit(&mut credit, &opening, &cells, &tower.reaches()).is_err());
-        assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
+        let refused = |level: usize, rings: Vec<StrandRing>, digits: Vec<(u8, Vec<u32>)>, keys: Vec<(u8, StrandKey)>| Strands::new(&d, level, rings, laws, digits, keys, words()).is_err();
+        assert!(!refused(1, ring(11, 10), digit(b'1', 1), key(b'+', [3, 2, 0])));
+        assert!(refused(2, ring(11, 10), Vec::new(), Vec::new()));
+        assert!(refused(0, Vec::new(), Vec::new(), Vec::new()));
+        assert!(refused(0, ring(1, 0), Vec::new(), Vec::new()));
+        assert!(refused(0, ring(11, 11), Vec::new(), Vec::new()));
+        assert!(refused(0, ring(11, 10), vec![(b'2', vec![2]), (b'1', vec![1])], Vec::new()));
+        assert!(refused(0, ring(11, 10), digit(b'+', 1), key(b'+', [3, 2, 0])));
+        assert!(refused(0, ring(11, 10), digit(b'1', 11), Vec::new()));
+        assert!(refused(0, ring(11, 10), Vec::new(), key(b'+', [4, 2, 0])));
+        assert!(Strands::new(&d, 0, ring(11, 10), laws, Vec::new(), Vec::new(), words()[1..].to_vec()).is_err());
         // A stream rested before the join carries no residues.
         let bare = tiny_shaped(2, 11, false, false, false, ContactLaw::Rectifying);
         assert!(tower.advance(&mut bare.rest(), 0).is_err());
+        // The comparison.
+        assert!(tower.open_strands_comparison([2, 1], [1, -1]).is_err());
+        let mut pair = tiny_contacts(2, 9, 8, false, false, false, ContactLaw::Pair);
+        assert!(pair.open_strands_comparison([2, 1], [1, -1]).is_err());
+        let mut narrow = tiny_contacts(2, 9, 7, false, false, false, ContactLaw::Pair);
+        narrow.join_strands(tiny_strands(&narrow.declaration, 1)).expect("joined");
+        assert!(narrow.open_strands_comparison([2, 1], [1, -1]).is_err());
+        pair.join_strands(tiny_strands(&pair.declaration, 1)).expect("joined");
+        for (compared, signs) in [([2, 2], [1, -1]), ([3, 1], [1, -1]), ([2, 1], [2, -1]), ([2, 1], [1, 0])] {
+            assert!(pair.clone().open_strands_comparison(compared, signs).is_err(), "{compared:?} {signs:?}");
+        }
+        assert!(pair.open_strands_comparison([2, 1], [1, -1]).is_ok());
+        // The credit and the input covectors are read beside the strands.
+        let opening = pair.rest_with_credit();
+        let mut s = opening.clone();
+        let classes = [0usize, 1, 2, 3];
+        let reaches = pair.reaches();
+        let cells = pair.forward(&mut s, &classes, &reaches).expect("forward");
+        assert!(pair.reverse(&opening, &cells, &classes, None).is_ok());
+        let mut credit = opening.credit.clone().expect("credit");
+        assert!(pair.advance_credit(&mut credit, &opening, &cells, &reaches).is_ok());
+        assert!(pair.read_input_covectors(&mut pair.rest(), &classes, 2, |_| Ok(())).is_ok());
     }
 
-    /// The strands' modes carry no covector, and the covectors of everything that reads them match
-    /// the code difference: on the ungated rotor tower over the passage of 37 classes, read through
-    /// pair contacts, at steps of `2^(−11)` units (the retired navigator's reading of the pair
-    /// contact's release: both it and its twin without written modes failed alike at `2^(−9)` and
-    /// `2^(−10)`).
+    /// Joined at zero, the strands' material's covector and every other family's match the code
+    /// difference on the tower over the passage of 37 classes, read through pair contacts, at steps
+    /// of `2^(−12)` units: its twin without strands reads its first level's moves there and not at
+    /// `2^(−10)` or `2^(−11)` units, with the rotor at none of the three (measured October 27).
     #[test]
     fn the_strands_covector_matches_the_code_difference() {
         let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
-        the_covector_of_tower_matches_the_code_difference(stranded(9, false, ContactLaw::Pair), false, &classes, 11);
+        the_covector_of_tower_matches_the_code_difference(stranded(tiny_contacts(2, 9, 4, false, false, false, ContactLaw::Pair), false), false, &classes, 12);
     }
 
     /// The pumped rotor tower with the strands, read at steps of `2^(−8)` units as the pumped rotor
@@ -5335,7 +5511,15 @@ mod tests {
     #[test]
     fn the_pumped_strands_covector_matches_the_code_difference() {
         let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
-        the_covector_of_tower_matches_the_code_difference(stranded(11, true, ContactLaw::Rectifying), true, &classes, 8);
+        the_covector_of_tower_matches_the_code_difference(stranded(rotor_on(tiny_shaped(2, 11, true, true, true, ContactLaw::Rectifying)), false), true, &classes, 8);
+    }
+
+    /// The tower opened on the strands' comparison, at steps of `2^(−11)` units: the opened
+    /// contacts' covector reaches their strands' material.
+    #[test]
+    fn the_opened_strands_covector_matches_the_code_difference() {
+        let classes: Vec<usize> = (0..37).map(|i| (i * 7 + i / 3) % 4).collect();
+        the_covector_of_tower_matches_the_code_difference(stranded(tiny_contacts(2, 9, 8, false, false, false, ContactLaw::Pair), true), false, &classes, 11);
     }
 
     #[test]
@@ -6235,7 +6419,7 @@ mod tests {
         // releases every face to `2^(−16)`, and on the tiny tower that rounding moves one central
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
-        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked) = (0, 0, 0, 0, 0, 0, 0);
+        let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked, mut strands_checked) = (0, 0, 0, 0, 0, 0, 0, 0);
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -6267,6 +6451,7 @@ mod tests {
                 pairs_checked += tower.layout.levels.iter().any(|lv| tower.declaration.contact != ContactLaw::Rectifying && (start == lv.pair || start == lv.pair_bias)) as usize;
                 faces_checked += (tower.pair.is_some() && (start == tower.layout.pair_readout || start == tower.layout.pair_encoding)) as usize;
                 rings_checked += (tower.ring.is_some() && (start == tower.layout.ring_readout || start == tower.layout.ring_factors)) as usize;
+                strands_checked += (tower.strands.is_some() && (start == tower.layout.strand_contact || start == tower.layout.strand_pair)) as usize;
                 break;
             }
         }
@@ -6282,6 +6467,8 @@ mod tests {
         let kinked = gated || tower.declaration.contact == ContactLaw::Rectifying;
         assert!(tower.pair.is_none() || faces_checked >= if kinked { 1 } else { 2 }, "only {faces_checked} pair face families carried a readable covector");
         assert!(tower.ring.is_none() || rings_checked == 2, "the ring face's readout and factors carried {rings_checked} readable covectors of 2");
+        let strand_families = if tower.declaration.contact == ContactLaw::Rectifying { 1 } else { 2 };
+        assert!(tower.strands.is_none() || strands_checked == strand_families, "the strands' material carried {strands_checked} readable covectors of {strand_families}");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 

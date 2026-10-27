@@ -318,3 +318,103 @@ and `probe … modes=7:19`, and `read-tower-pair-modes`):
   the contact on the located comparison, `r_turned + r_stepped` (§3), the locator's own return.
 - 4c. If the strands-only probe does not name `a` on 9, then the strands do not hold the operand on
   the stream where §3 says they do, and the join of the strands to the level is the subject.
+
+**The reads** [measured] (Brandon's PC, October 27, at `f92c361f9`;
+[READS.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/READS.md)):
+1. At level 0 the strands stand at amplitude one, and the level's other 52 modes at a pooled rms of
+   5.9 (`PRK` at the equals) down to 4.0 times it (`PRI` at the numerals): the strands are 0.17 of
+   the rest in `PRK` and 0.23 in `PRI`.
+2. On the strands alone, at the equals, `PRK` names `a` on 9 for 755 of 841 (all 64 modes: 138,
+   against a majority of 143), `a` on 100 for 390 (majority 134), `b` on 9 for 247 and the result
+   on 9 for 124 (majority 92). `PRI`'s strands name nothing above its majority: with every key the
+   identity they hold the last numeral and nothing else. How far the misses fall (a gap read beside
+   the probe, the distance on the ring from the named residue to the true one): 79 of `PRK`'s 86
+   misses of `a` on 9 are one step off (mean 1.08 steps, the foil's 2.51), and on 100 they fall at
+   10.1 steps against the foil's 23.2. Read through all 64 modes, `a`'s misses on 9 fall at 2.22
+   steps, the foil's distance. The strands hold the first operand nearly exactly, and the level's
+   read loses it.
+3. `PRK`'s turned × stepped entries, the comparison's own block, hold 59, 50, 60 and 74 millionths
+   of level 0's bilinear weight on the rings 9, 99, 999 and 9999, against an equal share of 488 (two
+   entries of a 64 × 64 block): about an eighth. `PRI`'s hold 25 to 30, an eighteenth. Every
+   strand's row of the block holds 0 or 1 thousandth.
+
+**The decision read from them.** 4a does not fire as written: the strands name `a` at 89.8%, under
+its 90%, and `b` at 29.4%. Its `b` clause was ill-posed [agent-inferred]: at the equals the turned
+strand holds `−e_∘ b`, the operand with its operator's sign, so a class mean over the sums and
+differences of one residue averages a face with its conjugate and names `b` only up to its sign.
+Its other two clauses hold, so the strands are drowned in the read all the same. 4c does not fire.
+By the rules as written **4b fires**: the comparison's block is an eighth of its share. Both reads
+point at one repair, and the next loop makes both: the level's read loses the strands, so they must
+not be read through the modes the read divides by the level's power; and the contact never forms
+their product, so it is opened there. A rule fixed before a read names the sign its operand is held
+with, as it names its denominator.
+
+## 7. The next loop: the strands meet the contact as ratios, and the contact opens on the comparison
+
+[definition; agent-inferred] **The strands read at the contact.** The strands write no mode. Their
+faces join the level's read where the pair contact reads it, as ratio components beside it: with
+`s` the faces' two parts, strand-major (`6R` entries on the face's grain),
+
+```text
+a = W_a r̂ + W_sa s + b_a,     b = W_b r̂ + W_sb s + b_b,     v = a ⊙ b
+δW_sa = Σ_t δa_t ⊗ s_t,       δW_sb = Σ_t δb_t ⊗ s_t,       s carries no covector
+```
+
+`r̂ = r/‖r‖_rms` is a ratio of power one a component, and a face is a ratio of modulus one, so the
+two enter in one gauge and nothing divides the faces by the level's power (read 1). The level's
+modes past the rotor's rings return to the moves, as `PRT`'s. Joined at zero (`W_sa = W_sb = 0`),
+the tower reads every passage exactly as it reads it without the strands, and the section's
+covector moves the new families from there.
+
+[derived] **The contact opened on the located comparison.** The comparison `(e_s r_s + e_t r_t)
+mod q_L` (§3, the locator's return) has the face `e^(2πi e_s r_s/q_L) e^(2πi e_t r_t/q_L)`:
+
+```text
+Re = cos_s cos_t − e_s e_t sin_s sin_t,     Im = e_s sin_s cos_t + e_t cos_s sin_t
+```
+
+four products of one strand's part by the other's. The opening sets four contacts a ring to those
+products: their `W_a`, `W_b`, `b_a` and `b_b` zero; `W_sa` one on `cos_s`, `e_s sin_s`,
+`e_s sin_s` and `cos_s`; `W_sb` one on `cos_t`, `e_t sin_t`, `cos_t` and `e_t sin_t`. Each opened
+contact then conducts its product exactly, and the comparison's face is the signed sum
+`v₀ − v₁ + i(v₂ + v₃)`, which the return and the readout must learn to read; every other family
+stays as founded. The opening is a located key, as the ring face's readout is opened at its
+founding: the strands, signs and rings are the locator's return over the text's own closing
+groups, nothing adds two operands, and every digit is the readout's.
+
+**Owners.** `Strands` (its faces; no written modes), `Tower::join_strands` (it appends `W_sa` and,
+under the pair law, `W_sb`, `f × 6R` on the material's grain, at zero), `Tower::open_strands_comparison`,
+the step and the reverse scan, `Tower::bilinear_modes` (the strands' columns beside the modes),
+`read-tower-pair-modes`, and the laws in `tower_rotor`. The equations at the consumer are the
+tests: joined at zero, every face, state and covector is the tower's without strands; opened, contact
+`4i + j` conducts exactly the `j`-th product of ring `i`'s faces at every cell; the new families'
+covector matches the code difference; the tower restores exactly from its text.
+
+**The run.** Three towers founded as `PRK` was and trained three passes together under the waiting
+standard: `PRA` (located keys, joined and opened), `PRJ` (located keys, joined at zero and not
+opened: does the passage find the product alone?) and `PRE` (every key the identity, joined and
+opened on the same comparison: the foil, opened contacts on strands that hold no operand). `PRT` and
+`PRK` stand.
+
+**The acceptance** is unchanged: never-met calculations right at the equals above the 8-gram's 34
+of 876, by the paired line against `PRE`, `PRJ` and `PRT`. Beside it: the gaps read with the
+leading digit and the length (`GAP_LEAD`), and where the bilinear weight sits.
+
+**Decisions fixed before the run** [agent-inferred]:
+- 5a. If `PRA` passes, the comparison is read at the equals, and the next loop is the products (the
+  index chart) and results past four digits.
+- 5b. If `PRA` fails but writes the leading digit and the length of never-met sums and differences
+  of two whole numerals right for more calculations than each of `PRJ` and `PRE` (`RINGS`'s
+  `lead_length`, right ones included), the comparison's
+  face is read and the ring of the result's length is not selected: that selection is the subject
+  (§4's decision 3).
+- 5c. Otherwise, before anything is built, the opened contacts are read: whether their rows stay
+  opened after training, and how much of the return's and the readout's weight reaches them.
+
+**The recorded failures it could repeat.** An authored routine standing in for learning: the
+opening sets a contact at a key the locator located from the text, and `PRJ` reads whether the
+passage finds that product unaided. A located cause carried unrepaired into a new consumer: both
+located causes (reads 1 and 3) are repaired in this loop. Text run on its codec's grain: the
+strands' faces are a navigator's faces, read beside any level's read. A rule without its
+denominator or sign: each decision above names its set. No new law enters: the opening's identity is
+the product of two unit faces, and the chart, the hand theorem and the release stay owed in #410.

@@ -106,8 +106,10 @@
 //! `found-unit-rotor-tower UNITS UNITS_SHA TRAIN TRAIN_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS
 //! RATE_BITS PERIOD LAW OUT` founds the pumped pair-contact tower exactly as
 //! `train-unit-pair-pumped-tower` founds it, joins the located rotor (`LAW` is `modulated` or
-//! `free`; `strands` and `strands-still` are `modulated` with the located strands joined past the
-//! rotor's rings, the second with every key the identity), and writes the rested learner
+//! `free`; `strands` and `strands-still` are `modulated` with the located strands read at the first
+//! level's contacts, joined at zero, the second with every key the identity; `strands-opened` and
+//! `strands-still-opened` open those contacts on the located comparison,
+//! [`holonics::hnn::tower::Tower::open_strands_comparison`]), and writes the rested learner
 //! (create-new) for that command's `FROM`.
 use super::tower_ring::{echelon_mod, rational_rank, readable_primes};
 use super::tower_train::{count, positive};
@@ -1271,13 +1273,16 @@ pub(super) fn found_unit_rotor_tower(args: &[String]) -> Result<()> {
     };
     let rate_bits: u32 = args[11].parse()?;
     let period = positive(&args[12])?;
-    // Whether the rotor turns, and whether strands join (with their located keys or none).
-    let (turned, strands) = match args[13].as_str() {
-        "modulated" => (true, None),
-        "free" => (false, None),
-        "strands" => (true, Some(true)),
-        "strands-still" => (true, Some(false)),
-        _ => return Err("LAW is modulated (the rings step and turn), free (they step alone), strands (modulated with the located strands) or strands-still (with every strands' key the identity)".into()),
+    // Whether the rotor turns, whether strands join (with their located keys or none), and whether
+    // the contacts open on their comparison.
+    let (turned, strands, opened) = match args[13].as_str() {
+        "modulated" => (true, None, false),
+        "free" => (false, None, false),
+        "strands" => (true, Some(true), false),
+        "strands-opened" => (true, Some(true), true),
+        "strands-still" => (true, Some(false), false),
+        "strands-still-opened" => (true, Some(false), true),
+        _ => return Err("LAW is modulated (the rings step and turn), free (they step alone), strands (modulated with the located strands), strands-still (with every strands' key the identity), or either with -opened (the contacts opened on the located comparison)".into()),
     };
     let out = Path::new(&args[14]);
     if out.exists() {
@@ -1324,7 +1329,6 @@ pub(super) fn found_unit_rotor_tower(args: &[String]) -> Result<()> {
     let (k, alphabet) = (rings.len(), declaration.alphabet);
     let stepping = (0..alphabet).filter(|&u| rotor.steps()[u * k..(u + 1) * k].iter().any(|&v| v != 0)).count();
     let turning = (0..alphabet).filter(|&u| rotor.turns()[u * moving..(u + 1) * moving].iter().any(|&v| v != 0)).count();
-    let first = rotor.moving();
     let mut tower = Tower::found_on(declaration, &keys, TurnLadder::Fixed).map_err(|e| e.to_string())?;
     tower.join_rotor(rotor).map_err(|e| e.to_string())?;
     if let Some(keyed) = strands {
@@ -1333,11 +1337,14 @@ pub(super) fn found_unit_rotor_tower(args: &[String]) -> Result<()> {
         let digits: Vec<(u8, Vec<u32>)> = menu.bytes.iter().enumerate().map(|(i, &b)| (b, menu.rings.iter().map(|r| r.turns[i]).collect())).collect();
         let strand_rings: Vec<StrandRing> = menu.rings.iter().map(|r| StrandRing { modulus: r.modulus, multiplier: r.multiplier }).collect();
         let words: Vec<Vec<u8>> = pieces.iter().map(|p| p.to_vec()).collect();
-        let strands = Strands::new(&declaration, 0, first, strand_rings, arrangement.laws, digits, keys.clone(), words).map_err(|e| e.to_string())?;
+        let strands = Strands::new(&declaration, 0, strand_rings, arrangement.laws, digits, keys.clone(), words).map_err(|e| e.to_string())?;
+        let parts = strands.parts();
         tower.join_strands(strands).map_err(|e| e.to_string())?;
+        if opened {
+            tower.open_strands_comparison(arrangement.comparison.strands, arrangement.comparison.signs).map_err(|e| e.to_string())?;
+        }
         println!(
-            "STRANDS_FOUNDED level=0 first={first} written={} rings={} laws={} comparison={},{}:{},{} keys={}",
-            3 * menu.rings.len(),
+            "STRANDS_FOUNDED level=0 parts={parts} opened={opened} rings={} laws={} comparison={},{}:{},{} keys={}",
             menu.rings.iter().map(|r| format!("{}:{}", r.modulus, r.multiplier)).collect::<Vec<_>>().join(","),
             laws_text(arrangement.laws),
             arrangement.comparison.strands[0],
@@ -1567,10 +1574,10 @@ mod tests {
             assert_eq!(score.closed, g.rows.len(), "{}", shown(&g.context));
         }
         // The strands' own law, byte by byte, at every result's end against the events.
-        let declaration = TowerDeclaration { alphabet: 1, width: 1, modes: 12, contacts: 1, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let declaration = TowerDeclaration { alphabet: 1, width: 1, modes: 1, contacts: 1, levels: 1, gated: false, turned: false, pumped: false, contact: ContactLaw::Rectifying };
         let digits: Vec<(u8, Vec<u32>)> = menu.bytes.iter().enumerate().map(|(i, &b)| (b, menu.rings.iter().map(|r| r.turns[i]).collect())).collect();
         let strand_rings: Vec<StrandRing> = menu.rings.iter().map(|r| StrandRing { modulus: r.modulus, multiplier: r.multiplier }).collect();
-        let strands = Strands::new(&declaration, 0, 0, strand_rings, arrangement.laws, digits, arrangement.keys.clone(), vec![Vec::new()]).expect("strands");
+        let strands = Strands::new(&declaration, 0, strand_rings, arrangement.laws, digits, arrangement.keys.clone(), vec![Vec::new()]).expect("strands");
         let (mut residues, mut reversed) = (vec![0u32; 12], false);
         let mut ends: Vec<(usize, &Row)> = rows.iter().map(|r| (r.stretch.numerals[2].1, r)).collect();
         ends.sort_by_key(|&(e, _)| e);

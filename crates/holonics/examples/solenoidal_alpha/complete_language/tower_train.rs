@@ -367,15 +367,17 @@ pub(super) fn read_tower_pair(args: &[String]) -> Result<()> {
 }
 
 /// [agent-inferred, October 27] `read-tower-pair-modes STATE STATE_SHA`: where a pair tower's
-/// bilinear weight sits mode by mode ([`Tower::bilinear_modes`]), in thousandths of the level's
-/// whole. Per level, each drive's weight on every mode (`TOWER_PAIR_MODES drive=first|second`,
-/// `mode:thousandths`); on the strands' level, the block between each written mode (named by its
-/// strand's law and its ring's modulus) and the level's other modes, below the strands and past
-/// them (`TOWER_PAIR_STRANDS`, rows the first drive's), and the comparison's own entries, a turned
-/// mode against the stepped mode of its ring in either order (`TOWER_PAIR_COMPARISON`). Record
+/// bilinear weight sits entry by entry ([`Tower::bilinear_modes`]), in thousandths of the level's
+/// whole. Per level, each drive's weight on every entry (`TOWER_PAIR_MODES drive=first|second`,
+/// `entry:thousandths`: the level's modes, then on the strands' level each strand residue's face);
+/// on the strands' level, the block between the modes and each strand residue (named by its
+/// strand's law and its ring's modulus; `TOWER_PAIR_STRANDS`, rows the first drive's), and the
+/// comparison's own entries, a turned residue against the stepped residue of its ring in either
+/// order (`TOWER_PAIR_COMPARISON`). Record
 /// `2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md`
-/// §6: a coefficient multiplies the mode's face, so what a contact hears of a mode is this weight
-/// times the mode's loudness (`numeral_rings.py scale`). An exterior reading; the tower is not moved.
+/// §6 and §7: a coefficient multiplies the entry's face, so what a contact hears of a mode is this
+/// weight times the mode's loudness (`numeral_rings.py scale`), and of a strand's face, at amplitude
+/// one, this weight. An exterior reading; the tower is not moved.
 pub(super) fn read_tower_pair_modes(args: &[String]) -> Result<()> {
     if args.len() != 3 {
         return Err("read-tower-pair-modes STATE STATE_SHA".into());
@@ -397,22 +399,20 @@ pub(super) fn read_tower_pair_modes(args: &[String]) -> Result<()> {
             continue;
         };
         let whole: BigUint = level.block.iter().flatten().sum();
-        let (first, rings) = (strands.first(), strands.rings());
-        let written = 3 * rings.len();
-        let n = level.first.len();
-        // Groups: the modes below the strands, each written mode, the modes past them.
-        let group = |k: usize| if k < first { 0 } else if k < first + written { 1 + k - first } else { written + 1 };
-        let mut names = vec!["below".to_string()];
+        let rings = strands.rings();
+        let (n, entries) = (tower.declaration.modes, level.first.len());
+        // Groups: the level's modes, then each strand residue.
+        let group = |k: usize| if k < n { 0 } else { 1 + k - n };
+        let mut names = vec!["modes".to_string()];
         for law in strands.laws() {
             for ring in rings {
                 names.push(format!("{}{}", law.name(), ring.modulus));
             }
         }
-        names.push("past".into());
         let g = names.len();
         let mut e = vec![vec![BigUint::from(0u32); g]; g];
-        for k in 0..n {
-            for k2 in 0..n {
+        for k in 0..entries {
+            for k2 in 0..entries {
                 e[group(k)][group(k2)] += &level.block[k][k2];
             }
         }
@@ -425,7 +425,7 @@ pub(super) fn read_tower_pair_modes(args: &[String]) -> Result<()> {
                 .iter()
                 .enumerate()
                 .map(|(i, ring)| {
-                    let (a, b) = (first + t * rings.len() + i, first + s * rings.len() + i);
+                    let (a, b) = (n + t * rings.len() + i, n + s * rings.len() + i);
                     let both = &level.block[a][b] + &level.block[b][a];
                     format!("{}:{}/{}", ring.modulus, thousandths(&both, &whole), per(&both, &whole, 1_000_000))
                 })
