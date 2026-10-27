@@ -153,7 +153,7 @@ theorem ticks_of_residue (σ a c : ℕ) : ticks σ a (a + c) = (a % σ + c) / σ
   · have h1 := Nat.div_add_mod a σ
     have h2 : a + c = (a % σ + c) + σ * (a / σ) := by omega
     rw [h2, Nat.add_mul_div_left _ _ hσ]
-    omega
+    exact Nat.add_sub_cancel _ _
 
 /-- [proved-derived; formal-checked] **A residue modulo `σ'` carries every section `σ ∣ σ'`:** the
 stream that carries the flux modulo the coarsest section carries every level's next ticks. -/
