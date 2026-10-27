@@ -64,8 +64,10 @@ symmetric support, and not reversible: `σ = (1/3) log 2 > 0` (`rotation_product
 cycle `0 → 1 → 2 → 0` reads affinity `3 log 2` (`rotation_cycle_affinity`), and it has the
 non-real eigenvalue `−1/2 + i√3/6` (`rotation_nonreal_eigenvalue`).
 
-[open] Owed in #62: the converse of Kolmogorov's criterion (every cycle affinity zero ⇒ detailed
-balance). Scope: finite state spaces; the positivity and support hypotheses are stated where used.
+The converse of Kolmogorov's criterion (every cycle's ratio product one ⇒ detailed balance, the law
+read along a spanning tree) is proved in the ratio chart in `HolonicsResearch`
+(`Aeon/Production/Kolmogorov`), which is not imported here. Scope: finite state spaces; the
+positivity and support hypotheses are stated where used.
 The continuous-time and port-Hamiltonian forms of production (`⟨Jv, DJv⟩/T`) are not treated here.
 No `axiom`, no `sorry`.
 -/

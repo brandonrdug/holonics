@@ -44,8 +44,8 @@ split into and what they conserve or produce.
 [open] Owed in #62: `h = log ρ(M)` as an equality, the radius of convergence of `ζ` and its first
 pole at `e^(−h)` (these need Perron–Frobenius); Abramov's formula for general ergodic maps, and the
 identification of the induced shift's Kolmogorov–Sinai entropy with the per-word entropy proved
-here; the converse of Kolmogorov's criterion (zero cycle affinities ⇒ detailed balance); the
-continuum Hodge theorem; the record's agent-inferred reading of relative completeness as exact
-reading. `PositiveCellHodge` lives only
-in `HolonicsResearch` (`Physics/HolonicDiscreteMaxwellOperator`) and is not joined here.
+here; the continuum Hodge theorem; the record's agent-inferred reading of relative completeness as
+exact reading. `PositiveCellHodge` lives only in `HolonicsResearch`
+(`Physics/HolonicDiscreteMaxwellOperator`) and is not joined here, and neither is the converse of
+Kolmogorov's criterion (`Aeon/Production/Kolmogorov`, in the ratio chart).
 -/
