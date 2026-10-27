@@ -195,7 +195,7 @@ theorem one_le_posIndex_example : 1 ≤ posIndex (splitForm : Matrix (Fin 2) (Fi
     intro h
     have := congrFun h 0
     simp at this
-  rw [← finrank_span_singleton hv]
+  rw [← finrank_span_singleton (K := K) hv]
   refine le_posIndex fun w hw hw0 => ?_
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hw
   have ha : a ≠ 0 := by
@@ -212,7 +212,7 @@ theorem one_le_negIndex_example : 1 ≤ negIndex (splitForm : Matrix (Fin 2) (Fi
     intro h
     have := congrFun h 1
     simp at this
-  rw [negIndex, ← finrank_span_singleton hv]
+  rw [negIndex, ← finrank_span_singleton (K := K) hv]
   refine le_posIndex fun w hw hw0 => ?_
   obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hw
   have ha : a ≠ 0 := by
@@ -280,12 +280,12 @@ theorem frobenius_sq_eq_trace (A : Matrix n n ℝ) (hA : A.IsHermitian) :
 `tr(A²) = Σ λ_i²` (the spectral theorem). -/
 theorem trace_mul_self_eq_sum_sq (A : Matrix n n ℝ) (hA : A.IsHermitian) :
     (A * A).trace = ∑ i, hA.eigenvalues i ^ 2 := by
-  have h2 : A * A = conjStarAlgAut ℝ _ hA.eigenvectorUnitary
+  have h2 : A * A = Unitary.conjStarAlgAut ℝ _ hA.eigenvectorUnitary
       (diagonal (RCLike.ofReal ∘ hA.eigenvalues : n → ℝ) *
         diagonal (RCLike.ofReal ∘ hA.eigenvalues : n → ℝ)) := by
     rw [map_mul, ← hA.spectral_theorem]
-  rw [h2, conjStarAlgAut_apply, trace_mul_comm, ← mul_assoc, Unitary.coe_star_mul_self, one_mul,
-    diagonal_mul_diagonal, trace_diagonal]
+  rw [h2, Unitary.conjStarAlgAut_apply, trace_mul_comm, ← mul_assoc, Unitary.coe_star_mul_self,
+    one_mul, diagonal_mul_diagonal, trace_diagonal]
   simp [sq, RCLike.ofReal_real_eq_id]
 
 /-- [proved-standard; formal-checked] **The rank–trace defect**: for a real symmetric `A` with
