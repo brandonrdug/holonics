@@ -882,7 +882,9 @@ mod tests {
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
         let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0 };
-        assert_eq!(TowerCard::groups(11, 0, 3, 80), 1);
+        // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
+        // sums' extent is `11 · 0 · 3 = 0`.
+        assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);
         let paired = Shape { forms: 3, ..plain };
         assert!(TowerCard::partial_extent(&plain, 80) > 0);
         assert!(TowerCard::partial_extent(&paired, 80) >= TowerCard::partial_extent(&plain, 80));
