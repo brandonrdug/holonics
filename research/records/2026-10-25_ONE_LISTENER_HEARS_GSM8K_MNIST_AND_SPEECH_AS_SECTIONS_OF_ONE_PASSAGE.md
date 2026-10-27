@@ -229,6 +229,12 @@ integers, each section read from zero:
   55, where the slowest rungs alone name 176. The label is 1,500 of the pass's 516,933 compared
   classes.
 
+The turns over the memory are proved in Lean (`HNN/TurnLadder`): a rung's memory is
+`1/(1 − ρ) = 2^min(s, 12)` (`memory`); over it a fixed mode turns `2π·2^(s−1) j/J`
+(`fixed_turn_over_memory`, `fixed_whole_turns`), a scaled mode `2πj/J` on every rung
+(`scaled_turn_over_memory`) and never once around for `0 < j < J` (`scaled_no_full_turn`); and the
+two halves of a bank of both hold the same places (`both_halves`).
+
 **The other media need the slow resonators.** Text and speech towers alone, one pass, fixed →
 scaled: GSM8K answers 2.730 → 2.760 bits a class, questions 2.883 → 2.932; half-cycles 2.907 →
 3.006, transcripts 5.116 → 5.059. A slow mode on the fixed ladder is a narrow resonator at a fixed

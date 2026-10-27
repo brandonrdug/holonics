@@ -219,6 +219,15 @@ Lean (#410):
   `Re((1 + ρ)/(1 − ρ)) = (1 − |ρ|²)/|1 − ρ|²` over `ℚ(i)`;
 - the plasma shell: `(ω − ck)(ω + ck) = ω_p²` and the boost to the rest frame at velocity `ck/ω`.
 
+Proved in Lean, `HolonicsResearch/Physics/Spacetime/Echo`:
+`echo_identity`, `doppler_sub`, `heard_mul_return`, `echo_self`, `echo_instances` and the wind's
+round trip `round_trip_wind`; the mode class `transform_vanishes`, `mode_class` over any field
+holding a primitive `4N`-th root, with `mode_condition` and `round_trip_log` over `ℂ`; Young's rule
+`sineCoefficient_eq`, `young`, `young_sixteen`; the sum of round trips `round_trip_sum`,
+`round_trip_remainder`, `poisson_kernel`, `normSq_one_sub`, `poisson_doppler`, `half_power`,
+`airy_eq_poisson_div`; the plasma shell `plasma_shell`, `plasma_rest`, `plasma_rest_instance`; and
+the beat as the pair contact's slip, `slip_eq_zero_iff`, `fifth_lock`, `tempered_fifth_beats`.
+
 ## Receipts
 
 [`2026-10-25_A_COMPARISON_IS_AN_ECHO_receipts/`](2026-10-25_A_COMPARISON_IS_AN_ECHO_receipts/):
