@@ -1,4 +1,5 @@
 import Holonics.Objects.Ratio
+import Mathlib.Analysis.SpecialFunctions.Log.Base
 
 /-!
 # The native face joined to its receiving tree: the covector stays `F − e_t`
