@@ -85,7 +85,7 @@ theorem release_of_ne {b : ℕ} (hb : b ≠ 0) (x : ℤ) :
   rw [release, if_neg hb, two_pow_eq hb]
 
 theorem ediv_bounds (a d : ℤ) (hd : 0 < d) : d * (a / d) ≤ a ∧ a < d * (a / d) + d := by
-  have h1 := Int.ediv_add_emod a d
+  have h1 := Int.mul_ediv_add_emod a d
   have h2 := Int.emod_nonneg a hd.ne'
   have h3 := Int.emod_lt_of_pos a hd
   constructor <;> linarith
@@ -93,7 +93,7 @@ theorem ediv_bounds (a d : ℤ) (hd : 0 < d) : d * (a / d) ≤ a ∧ a < d * (a 
 theorem halfUp_le {x p : ℤ} (hx : 0 ≤ x) (hp : 1 ≤ p) : (x + p) / (2 * p) ≤ x := by
   have h := (ediv_bounds (x + p) (2 * p) (by linarith)).1
   by_contra hq
-  push_neg at hq
+  push Not at hq
   have h1 : 2 * p * (x + 1) ≤ 2 * p * ((x + p) / (2 * p)) :=
     mul_le_mul_of_nonneg_left (Int.add_one_le_iff.2 hq) (by linarith)
   nlinarith [mul_le_mul_of_nonneg_right hp hx]
@@ -154,7 +154,7 @@ theorem release_eq_zero_of_nonneg {x : ℤ} {b : ℕ} (hx : 0 ≤ x) (h : 2 * x 
 
 /-- [proved-derived; formal-checked] A value below half a coarse grain releases to zero. -/
 theorem release_eq_zero {x : ℤ} {b : ℕ} (h : 2 * |x| < 2 ^ b) : release x b = 0 := by
-  rcases le_or_lt 0 x with hx | hx
+  rcases le_or_gt 0 x with hx | hx
   · rw [abs_of_nonneg hx] at h
     exact release_eq_zero_of_nonneg hx h
   · rw [abs_of_neg hx] at h
