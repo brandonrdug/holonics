@@ -230,7 +230,7 @@ theorem futureAgreement_iff_constitution (S : Solver d) (left right : DepositSta
 
 /-- [definition] **The minimal retention of a depositing medium**: the future-agreement class of
 the constitution under the constitution-only machine. The retention does not mention the solver. -/
-def depositionMinimalStanding (S : Solver d) :
+noncomputable def depositionMinimalStanding (S : Solver d) :
     StandingLaw (Fin p → ℚ) (Fin p → ℚ) (DepositState q)
       (Quotient (futureSetoid (observeConstitution d) (stepConstitution L d)))
       (Option (Fin q → ℚ)) where
@@ -436,6 +436,7 @@ theorem founded_encoding_isMinimal [Fintype κ] (T : ι → X →ₗ[K] X) (read
   rw [hretain]
   exact (encode_eq_iff_futureAgreement T read b left right).mpr h
 
+omit [FiniteDimensional K X] in
 /-- Agreement on every word of at most `n` moves makes every form of the `n`-th rung agree. -/
 theorem ladder_le_agreeingForms (T : ι → X →ₗ[K] X) (read : C → Dual K X) (n : ℕ)
     (left right : X)
@@ -453,9 +454,11 @@ theorem ladder_le_agreeingForms (T : ι → X →ₗ[K] X) (read : C → Dual K 
     refine sup_le (ih left right (agreeUpTo_mono _ _ (Nat.le_succ n) h)) (iSup_le fun a => ?_)
     rw [Submodule.map_le_iff_le_comap]
     intro φ hφ
-    rw [Submodule.mem_comap, mem_agreeingForms]
-    exact mem_agreeingForms.mp
+    rw [Submodule.mem_comap, mem_agreeingForms, LinearMap.dualMap_apply,
+      LinearMap.dualMap_apply]
+    have hih := mem_agreeingForms.mp
       (ih _ _ (agreeUpTo_transport (fun c x => read c x) (fun a x => T a x) [a] h) hφ)
+    simpa only [transportWord_cons, transportWord_nil] using hih
 
 /-- [proved-standard; formal-checked] **The linear depth bound**: two states share their future
 exactly when they agree on every word of at most `dim X − dim span{ρ_c}` moves, the dimension the
