@@ -28,23 +28,27 @@ Read from the records, the code and the briefs:
 | October 20 | The complete-language trainer gains a card executor; its dataset run waits on authorization in its record. |
 | October 23 | The moment tower (`hnn::tower`) is built and trained on the host, eight threads. |
 | October 25 | `TowerCard` runs the gated tower's pass on the card with the host's bits, 3.9 times the host at 96 streams; the record names the host's certificate as the next loop's subject. No training driver selects `TowerCard`: its only callers are the `tower_pass` example and its test. |
-| October 26 to 27 | Thirteen arithmetic towers (C, F, PP, PR, PRT, PRS, PRN, PRC, PRK, PRI, PRA, PRJ, PRE) and the bank, role and replay runs train on the host under `RAYON_NUM_THREADS=8`, two levels of 64 modes, eight streams, three passes of 3.5 MB, deadlines of tens to hundreds of seconds. Each new face (rotor, ring, turn, pump, strands) is one `TowerCard::admits` refuses, so the work could not have gone to the card without a port. No record names a device. |
+| October 26 to 27 | Thirteen arithmetic towers (C, F, PP, PR, PRT, PRS, PRN, PRC, PRK, PRI, PRA, PRJ, PRE) and the bank, role and replay runs train through the host realization under `RAYON_NUM_THREADS=8`, two levels of 64 modes, eight streams, three passes of 3.5 MB, deadlines of tens to hundreds of seconds. The card ran none of their learning; the logs show the host realization ran, not what else held the card. Each new face (ring, turn, pump, pair face) is one `TowerCard::admits` refuses, and the rotor and strands are ones it cannot see (`ResidentLaw` does not carry them), so the work could not have gone to the card without a port. No record names a device. |
 
 **Who.** The design thread wrote the briefs and its sessions on the PC launched the runs. The
 coordinator relayed their results, and no review asked which device ran, this thread's own review of
 October 27 included. The waiting standard in the guides was written entirely in host threads and
 CPU seconds. Its clause that an unmeasured run is planned at one to three minutes, beside "never
 raise a limit", pushed the workload down where it should have pushed the device up. This is the
-third recurrence of the same failure (September 20, October 18, October 23 to 27).
+third recurrence of the same failure (September 20, October 18, October 23 to 27). The one card run
+of those days is the October 25 parity of the gated, rectifying tower's pass on the 4080, a narrower
+law than the towers trained after it; its record leaves 14 of the observed-epoch port's library
+tests failing, failures it found already present on main.
 
 ## The rule
 
 The guides now carry it (section "GPU first, and the design fixes the workload", and the amended
 waiting standard). In short:
 - Learning runs on the card; the host realization checks the card's bits.
-- A new part enters a learner run with its card realization and its parity against the host, or
-  under a host fallback declared in the brief before launch. An undeclared host run is a defect and
-  incomplete evidence.
+- A new part enters a learner run with its card realization and its parity against the host.
+  Learning on the host needs Brandon's own exception, in his words, naming the workload, its purpose
+  and its limits; a brief, a worker or another agent cannot grant it, and without it the run is
+  blocked. A host learner run without it is a defect and incomplete evidence.
 - Each receipt states the device, the card's time, the host's time and threads; a dominant host
   share is the next loop's subject.
 - The design fixes the data, the passes and the learner's levels and modes. A run that does not fit
@@ -75,6 +79,16 @@ diverge:
 - **The rule in the guides and this record** (this thread).
 
 Until each acceptance passes on the PC, its repair is reported as built, not as done.
+
+## Status, kept in three parts
+
+Each part is ticked here when it changes, and none stands for another.
+
+| Part | Status (October 27) |
+|---|---|
+| The policy documented | The guides' section and this record, PR #528; ticked when it merges. |
+| The gate built | Not yet. Owed: the trainers route through `TowerCard` and refuse a learner run on the host unless Brandon's exception is named (design); `TowerCard` refuses every face it does not carry, the rotor and strands included, and carries the pair, ring, turned and pumped faces with their parity (this thread). |
+| The gate independently verified | Not yet. Owed: a review by a worker that did not build it (Epime or a reviewer thread) of the trainers' refusal and of one card run's device line, and the per-face parities run on the 4080. |
 
 ## The recorded failures this step could repeat
 

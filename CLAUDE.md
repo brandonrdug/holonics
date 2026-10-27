@@ -308,17 +308,19 @@ Athena text milestone claimed before a test of use was retracted or retired.
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
 the aim is a plastic network that runs fast on it, never transformer-style vertical data scaling.
-From October 23 to 27 every Athena tower run went on eight CPU threads with the card idle, while the
-learner stayed at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of
-tens to hundreds of CPU seconds: the run rules were kept and the architecture and data were given up.
+From October 23 to 27 every Athena tower training run went through the host realization on eight CPU
+threads (the card ran only the October 25 parity of the gated tower's pass), while the learner stayed
+at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of tens to
+hundreds of CPU seconds: the run rules were kept and the architecture and data were given up.
 - **Learning runs on the card.** Every training pass, lap and measurement of an HNN learner runs
   through its card realization. The host realization is the reference that checks the card's bits,
   not where learning runs.
 - **A part enters a run with its card realization.** A new face, contact, ring, pump or step enters a
-  learner run only with its card realization and its parity against the host. Otherwise the brief
-  declares a host fallback before launch: the part, why the card cannot carry it, the host threads,
-  and the loop that ports it. An undeclared host run is a defect, reported as one, and its result is
-  incomplete evidence.
+  learner run only with its card realization and its parity against the host. Learning on the host
+  needs Brandon's own exception, in his words, naming the workload, its purpose and its limits; a
+  brief, a worker or another agent's agreement does not grant one. Without it the run is blocked
+  until the part's card realization passes its parity. A host learner run without that exception
+  is a defect, reported as one, and its result is incomplete evidence.
 - **Host work inside a card run is measured.** Each receipt names the device and states the card's
   time, the host's time and the host threads. When the host's share dominates (the certificate held
   the card to 3.9 times the host on October 25), that host work is the next loop's subject.
@@ -364,7 +366,7 @@ foreground shell time went to wait loops.
   is never a reason to cut the workload.
 - **Run independent work together.** The card (80 multiprocessors, under `.local/gpu.lock`) is the
   default device for learner runs; the thread budgets below are for a card run's host part or a
-  declared host fallback. The host has 12 physical cores with two threads each
+  host run under Brandon's exception. The host has 12 physical cores with two threads each
   (24 hardware threads) and 32,746,147,840 bytes of memory; two 8-thread passes run together slow
   each other 1.31× (measured October 26), so a time per unit measured alone projects a run alone.
   Independent runs launch together when their declared threads and resident sets fit beside the
@@ -432,8 +434,8 @@ older one.
   - which of the six general objects of the [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) it
     touches (helix, pair, faces and placement, cell holonomy, tube, tower thread), keeping the rest
     attached.
-  - the device line (GPU first): the card and its lock, or a host fallback declared with its
-    reason, and the workload the design fixed;
+  - the device line (GPU first): the card and its lock, or Brandon's exception for a host run,
+    and the workload the design fixed;
   - the waiting standard above: background launch, the projection and its fixed deadline, early
     stop, no raised limit, the thread budget and isolated scratch.
 - The primary inspects source and integrates the returns; worker measurements are receipts.
