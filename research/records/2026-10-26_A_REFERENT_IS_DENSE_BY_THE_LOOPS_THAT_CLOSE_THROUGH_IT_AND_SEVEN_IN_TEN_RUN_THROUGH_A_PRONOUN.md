@@ -201,6 +201,12 @@ vertices and the same `N − 1` edges. Adjacent mentions become a loop edge, whi
 cycle rank is then `β₁ = E − V + C = (N − 1) − (N − k + 1) + 1 = k − 1`. Identifying each region's
 returns in turn adds its own `k_r − 1`, so `β₁ = Σ_r (k_r − 1)`.
 
+[formal-checked, October 27] [`HNN/RegionLoops`](../../lean/HolonicsResearch/HNN/RegionLoops.lean)
+reads a gluing as any surjection from the mentions onto the glued vertices: the passage stays
+connected with one component (`gluedGraph_connected`, `components_eq_one`), and
+`β₁ = Σ_v (k_v − 1)` (`cycleRank_eq_sum`), `k − 1` for one region with `N − k + 1` vertices
+(`cycleRank_one_region`, `card_one_region`).
+
 Each independent cycle runs from one crossing along the passage to the next return and closes
 through the region: a loop. [interpretation] The holonomy of a loop is the turn the passage
 accumulates going round it. A return that does not agree, such as "she" or a new name, does not
