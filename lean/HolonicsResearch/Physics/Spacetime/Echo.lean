@@ -406,7 +406,7 @@ theorem young {N a n : ℕ} (ha : 0 < a) (haN : a < N) (hn : 0 < n) (hnN : n < N
       have hq' : (n : ℝ) * a = N * q := by exact_mod_cast hq
       have he : π * (n : ℝ) * a / N = (q : ℝ) * π := by
         field_simp
-        linear_combination π * hq'
+        linear_combination hq'
       rw [he]
       exact Real.sin_nat_mul_pi q
     rw [hs, mul_zero] at key

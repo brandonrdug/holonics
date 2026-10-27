@@ -333,7 +333,7 @@ theorem reactiveWall_hasDerivAt (x : ℝ) :
     (hu.const_mul I).add_const 1
   have h := hc.fun_div hd (reactiveWall_den_ne x)
   show HasDerivAt (fun y : ℝ => (I * (y : ℂ) - 1) / (I * y + 1)) _ x
-  convert h using 1
+  refine h.congr_deriv ?_
   ring
 
 /-- [proved-derived; formal-checked] **The reactive wall's turn rate**: `Γ⁻¹ dΓ/dx = −2i/(1 + x²)`,
