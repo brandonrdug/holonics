@@ -80,7 +80,7 @@ theorem supp_sub_subset (v w : ι → A) : supp (v - w) ⊆ supp v ∪ supp w :=
   rw [mem_supp] at hi
   rw [mem_union, mem_supp, mem_supp]
   by_contra h
-  push_neg at h
+  push Not at h
   exact hi (by simp [h.1, h.2])
 
 /-- [definition] The part of `v` on the places `S`. -/
@@ -327,7 +327,7 @@ theorem exists_cobound_of_closed (hc : Connected src tgt) (b : V) (ω : E → A)
   have h1 := hω b ((Classical.choice (hc b (src e))).append (.fwd e r))
   have h2 := hω b ((Classical.choice (hc b (tgt e))).append r)
   rw [read_append] at h1 h2
-  simp only [read] at h1
+  simp only [Walk.read] at h1
   show ω e = (Classical.choice (hc b (tgt e))).read ω - (Classical.choice (hc b (src e))).read ω
   exact solve h1 h2
 
@@ -426,13 +426,13 @@ theorem locates_iff_minCut {B : Type*} [AddCommGroup B] (C : (E → A) →+ B)
   constructor
   · intro hsep S hS hSu
     by_contra hle
-    push_neg at hle
+    push Not at hle
     have h0 := hsep (cobound src tgt (lift S a)) ((hker _).mpr ⟨_, rfl⟩)
       (by rw [supp_cobound_lift ha]; exact hle)
     obtain ⟨x, hx⟩ := hS
     obtain ⟨y, hy⟩ : ∃ y, y ∉ S := by
       by_contra h
-      push_neg at h
+      push Not at h
       exact hSu (eq_univ_of_forall h)
     obtain ⟨p⟩ := hc x y
     obtain ⟨e, he⟩ := p.exists_cut_edge hx hy
@@ -443,7 +443,7 @@ theorem locates_iff_minCut {B : Type*} [AddCommGroup B] (C : (E → A) →+ B)
     by_contra hne
     obtain ⟨e, he⟩ : ∃ e, cobound src tgt f e ≠ 0 := by
       by_contra h
-      push_neg at h
+      push Not at h
       exact hne (funext h)
     have h1 : (level f (src e)).Nonempty := ⟨src e, by simp [level]⟩
     have h2 : level f (src e) ≠ univ := by
@@ -461,7 +461,7 @@ theorem locates_iff_minCut {B : Type*} [AddCommGroup B] (C : (E → A) →+ B)
 edges are located uniquely by their readings on every closed walk iff every edge cut has more than
 `2k` edges. -/
 theorem cycleReading_locates_iff (hc : Connected src tgt) {a : A} (ha : a ≠ 0) (k : ℕ) :
-    Locates (cycleReading src tgt) k ↔
+    Locates (cycleReading (A := A) src tgt) k ↔
       ∀ S : Finset V, S.Nonempty → S ≠ univ → 2 * k < (cut src tgt S).card :=
   locates_iff_minCut (cycleReading src tgt) (cycleReading_eq_zero_iff hc) hc ha k
 
