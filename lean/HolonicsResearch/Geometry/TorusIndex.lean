@@ -69,28 +69,35 @@ def castVec (w : n → ℤ) : n → ℝ := fun i => (w i : ℝ)
 /-- [definition] An integer matrix read as a real one. -/
 abbrev toReal (N : Matrix n n ℤ) : Matrix n n ℝ := N.map fun x => (x : ℝ)
 
+omit [Fintype n] [DecidableEq n] in
 theorem proj_add (u v : n → ℝ) : proj (u + v) = proj u + proj v := funext fun _ => rfl
 
+omit [Fintype n] [DecidableEq n] in
 theorem proj_sub (u v : n → ℝ) : proj (u - v) = proj u - proj v := funext fun _ => rfl
 
+omit [Fintype n] [DecidableEq n] in
 /-- [proved-standard; formal-checked] Every torus point has a real lift. -/
 theorem proj_surjective : Function.Surjective (proj (n := n)) := by
   intro x
   choose v hv using fun i => QuotientAddGroup.mk_surjective (x i)
   exact ⟨v, funext hv⟩
 
+omit [Fintype n] [DecidableEq n] in
 theorem castVec_add (a b : n → ℤ) : castVec (a + b) = castVec a + castVec b := by
   funext i
   simp [castVec]
 
+omit [Fintype n] [DecidableEq n] in
 theorem castVec_injective : Function.Injective (castVec (n := n)) :=
   fun a b h => funext fun i => Int.cast_injective (congrFun h i)
 
+omit [Fintype n] [DecidableEq n] in
 /-- [proved-standard; formal-checked] A lattice point is the torus's zero. -/
 theorem proj_castVec (w : n → ℤ) : proj (castVec w) = 0 := by
   funext i
   exact (AddCircle.coe_eq_zero_iff (1 : ℝ)).mpr ⟨w i, by simp [castVec]⟩
 
+omit [Fintype n] [DecidableEq n] in
 /-- [proved-standard; formal-checked] A real lift reads the torus's zero exactly on the lattice. -/
 theorem proj_eq_zero_iff (v : n → ℝ) : proj v = 0 ↔ ∃ z : n → ℤ, castVec z = v := by
   constructor
@@ -116,11 +123,13 @@ theorem inv_mulVec_toReal {N : Matrix n n ℤ} (hN : N.det ≠ 0) (v : n → ℝ
     (toReal N)⁻¹ *ᵥ (toReal N *ᵥ v) = v := by
   rw [mulVec_mulVec, Matrix.nonsing_inv_mul _ (isUnit_det_toReal hN), one_mulVec]
 
+omit [DecidableEq n] in
 theorem toReal_mulVec_castVec (N : Matrix n n ℤ) (w : n → ℤ) :
     toReal N *ᵥ castVec w = castVec (N *ᵥ w) := by
   funext i
   simp [toReal, castVec, mulVec, dotProduct]
 
+omit [DecidableEq n] in
 /-- [proved-standard; formal-checked] **The torus map on a lift is the lift of `N v`.** -/
 theorem act_proj (N : Matrix n n ℤ) (v : n → ℝ) : act N (proj v) = proj (toReal N *ᵥ v) := by
   funext i
@@ -174,6 +183,7 @@ theorem act_eq_zero_iff {N : Matrix n n ℤ} (hN : N.det ≠ 0) (x : UnitAddToru
 def latticeMap (N : Matrix n n ℤ) : (n → ℤ) →+ (n → ℤ) :=
   AddMonoidHom.mk' (fun w => N *ᵥ w) fun a b => mulVec_add N a b
 
+omit [DecidableEq n] in
 theorem latticeMap_apply (N : Matrix n n ℤ) (w : n → ℤ) : latticeMap N w = N *ᵥ w := rfl
 
 /-- [proved-standard; formal-checked] An integer matrix of nonzero determinant is injective on the
@@ -191,9 +201,7 @@ theorem latticeMap_injective {N : Matrix n n ℤ} (hN : N.det ≠ 0) :
 theorem det_latticeMap (N : Matrix n n ℤ) :
     LinearMap.det (latticeMap N).toIntLinearMap = N.det := by
   rw [← LinearMap.det_toLin' N]
-  first
-    | rfl
-    | exact congrArg LinearMap.det (LinearMap.ext fun w => rfl)
+  rfl
 
 /-! ## 3. The index law -/
 
@@ -221,7 +229,7 @@ theorem card_ker_act (N : Matrix n n ℤ) (hN : N.det ≠ 0) :
     _ = N.det.natAbs := by
         refine key.symm.trans (congrArg Int.natAbs ?_)
         refine Eq.trans ?_ (det_latticeMap N)
-        exact congrArg LinearMap.det (LinearMap.ext fun w => by first | rfl | simp)
+        exact congrArg LinearMap.det (LinearMap.ext fun w => rfl)
 
 /-! ## 4. The fixed points -/
 
@@ -258,7 +266,7 @@ theorem turn_fixed_point :
     norm_num [TorusBraid.turn_eq, Matrix.det_fin_two_of]
   have h := card_fixed_two _ hdet (by rw [TorusBraid.trace_turn]; norm_num)
   rw [TorusBraid.trace_turn] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The quarter turn `T L T` fixes two points**, `0` and
 `(½, ½)`. -/
@@ -271,7 +279,7 @@ theorem quarter_turn_fixed_points :
     norm_num [TorusBraid.quarter_turn, Matrix.trace_fin_two_of]
   have h := card_fixed_two _ hdet (by rw [htr]; norm_num)
   rw [htr] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The half turn `−1 = (T L T)²` fixes the four
 half-periods.** -/
@@ -283,7 +291,7 @@ theorem half_turn_fixed_points :
     norm_num [Matrix.trace_fin_two]
   have h := card_fixed_two _ hdet (by rw [htr]; norm_num)
   rw [htr] at h
-  exact h.trans (by first | rfl | decide | norm_num)
+  exact h.trans rfl
 
 /-- [proved-standard; formal-checked] **The cat map's power `A^(k+1)` fixes `L_(2k+2) − 2`
 points**, with `L_(2k+2) = F_(2k+1) + F_(2k+3)`: 1, 5, 16, 45, 121 for `k = 0, …, 4`
