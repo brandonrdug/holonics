@@ -1,8 +1,8 @@
 # The levels tick on their own news, so the tower learns its encoding on its own axis
 
 Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Host law
-built and tested (§6.1, §7); the card's port written, its parity on the card owed (§6.2); the
-measurement (§6.3) owed; the Lean (§6.4) in `HNN/NewsClock`. Owners: `holonics::hnn::tower` (`NewsClock`,
+built and tested (§6.1, §7); the card carries it, its parity at the race's declaration equal (§6.2,
+§7); the measurement (§6.3) running beside the plain race; the Lean (§6.4) in `HNN/NewsClock`. Owners: `holonics::hnn::tower` (`NewsClock`,
 `Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
 loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
@@ -149,5 +149,20 @@ clock, so the bits it certifies are the candidate's whole read, its segmentation
   cell, `Δτ` a few at the race's sections). The card refuses the clock beside the ring face, as the
   host does. Its parity tests (32 sections clocked, the clock beside turned modes and the pair face,
   the clocked advance class by class) are in `tests/tower_pass.rs`, and `tower_pass parity` takes
-  the clock; their run on the card is owed.
+  the clock. On the RTX 4080 SUPER at `07b7e4a8f` (merged as `9ea537430`) the suite passed 13 of 13,
+  these three among them, and the parity at the race's declaration (width 64, 128 modes, 256
+  contacts, four levels, sections of 128 classes, the clock `B = 8`, `r = 2`) on the race passage
+  was equal in every face, covector entry and learner: 32 sections at 24 streams (98,304 faces,
+  10,588,192 entries; host 14.3 s, card 3.0 s; peak resident 1,025,648 KiB) and 4 at 320 (163,840
+  faces, 1,323,524 entries; host 16.8 s, card 1.1 s; 1,319,676 KiB). A clocked learner's release ran
+  on the card.
+- **The race beside the plain race** (§6.3, `race.sh` with the command
+  `train-two-ladder-news-tower-classes`; launched 07:45 UTC October 27 on the plain race's passage,
+  keys and declaration, the two races taking the card lock lap by lap). Its opening read, one lap on
+  the card: training 2.799 bits a class, held out 2.463 (GSM8K 2.529, prose 2.412), against the
+  plain tower's 2.748 and 2.356 (2.407, 2.317) at its own opening; 726 of 726 deposits certified;
+  118.7 s, its forwards 64.7 s and reverses 34.7 s; peak resident 547,368 KiB. Its widest 32-section
+  window was 6,136 ms (every other full window 5,048 to 5,265 ms), so its lap deadline is `⌈1.12 ·
+  (23 · 6.136 + 0.800)⌉ + 120 = 279` s and its window stop 6,872 ms, fixed for the race. Its laps
+  are reported beside the plain race's and none is claimed here before they run.
 
