@@ -1233,3 +1233,5 @@ import HolonicsResearch.Mathematics.RadixItinerary
 import HolonicsResearch.Physics.Spacetime.MovingMirror
 import HolonicsResearch.Physics.Spacetime.Echo
 import HolonicsResearch.HNN.TurnLadder
+import HolonicsResearch.HNN.NativeTreeJoin
+import HolonicsResearch.HNN.RegionLoops

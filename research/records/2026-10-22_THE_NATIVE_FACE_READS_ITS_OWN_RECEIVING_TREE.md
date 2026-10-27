@@ -47,7 +47,11 @@ weight_c = q_c(a) · 2^(w_(2c) − top),   F = weight / Σ weight,   covector F 
    constitution's tree through `observed_epoch_prefix`. Forecast and released cells read the frozen
    tree at their moving address and deposit nothing.
 4. The covector is the logit gradient of `−log₂ F_t` with the tree mass held fixed (a constant
-   factor of each class's weight), so the R law is unchanged. The Lean statement is owed in #62.
+   factor of each class's weight), so the R law is unchanged. It is formal-checked on October 27 in
+   [`HNN/NativeTreeJoin`](../../lean/HolonicsResearch/HNN/NativeTreeJoin.lean):
+   `∂/∂w_j (−log₂ F_t) = F_j − [t = j]` (`hasDerivAt_joinedCode_coordinate`), the `ln 2` of the
+   power cancelling the `ln 2` of the code, on the joined face `joinedFace_mass`; the tree is a shift
+   of the wave by `log₂ q` (`joinedPotential_eq_shift`).
 
 **The readout's metric takes the producing face's Fisher bound** (`native_fisher_weight`, atlas
 `hnn.native-fisher-weight`). Each native sample enters the Gram at
