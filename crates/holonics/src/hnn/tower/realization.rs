@@ -185,11 +185,34 @@ pub struct ResidentPair {
     pub values: Vec<i32>,
 }
 
+/// [definition; agent-inferred, October 27] **The ring face as a realization reads it**
+/// ([`RingFace`]): the level and mode it rides, its ranks `R` and the harmonics `H` its readout
+/// reads, the places of its readout `W` (`A × (d + 1)·2RH`) and of its factors (rank by rank `a₀`,
+/// `a₁` over `2N`, `b₀`, `b₁` over `d + 1` and `g` over `2N + 1`) in the material, the readout's
+/// reach `max |W|`, each rank's releases of `a`, `b` and `g` with its push and read shifts, the
+/// encoding `E₀` its pools read (`A × d`), and each rank's founded pair moves `(prev, cur, [Re λ,
+/// Im λ, Re β, Im β])` and restarting class. The pools are generated from `b` and `E₀` wherever the
+/// material is read, never held.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentRing {
+    pub level: usize,
+    pub mode: usize,
+    pub ranks: usize,
+    pub harmonics: usize,
+    pub readout: usize,
+    pub factors: usize,
+    pub reach: u64,
+    pub shifts: Vec<([u32; 3], u32, u32)>,
+    pub opening: Vec<i32>,
+    pub moves: Vec<Vec<(usize, usize, [i64; 4])>>,
+    pub restarts: Vec<Option<usize>>,
+}
+
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face when one is joined, and
-/// whether a ring face, rotor or strands are. Read from the tower's own owners, so a realization
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
+/// they are joined, and whether a rotor or strands are. Read from the tower's own owners, so a realization
 /// holds no second copy of a law, and a realization that does not carry a joined part refuses the
 /// tower rather than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -205,7 +228,7 @@ pub struct ResidentLaw {
     pub move_roots: Vec<u128>,
     pub ln2_square: i128,
     pub pair: Option<ResidentPair>,
-    pub ring_face: bool,
+    pub ring: Option<ResidentRing>,
     pub rotor: bool,
     pub strands: bool,
 }
@@ -293,7 +316,19 @@ impl Tower {
                 reaches: reaches.pair,
                 values: face.values.clone(),
             }),
-            ring_face: self.ring.is_some(),
+            ring: self.ring.as_ref().map(|face| ResidentRing {
+                level: face.level,
+                mode: face.mode,
+                ranks: face.ranks(),
+                harmonics: face.harmonics,
+                readout: self.layout.ring_readout,
+                factors: self.layout.ring_factors,
+                reach: reaches.ring,
+                shifts: face.shifts.clone(),
+                opening: face.opening.clone(),
+                moves: face.moves.clone(),
+                restarts: face.restarts.clone(),
+            }),
             rotor: self.rotor.is_some(),
             strands: self.strands.is_some(),
         })
