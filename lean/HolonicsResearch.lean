@@ -1235,3 +1235,4 @@ import HolonicsResearch.Physics.Spacetime.Echo
 import HolonicsResearch.HNN.TurnLadder
 import HolonicsResearch.HNN.NativeTreeJoin
 import HolonicsResearch.HNN.RegionLoops
+import HolonicsResearch.HNN.PassageCredit

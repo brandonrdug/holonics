@@ -33,6 +33,17 @@ with the sum over `s` taken by `outer_sum` (integer addition is associative, so 
 product a cell's), and the products `π_s` by a backward scan. The section's covector is paired with
 these moments at its opening.
 
+[formal-checked, October 27] In exact arithmetic the law holds over the whole passage, in
+[`HNN/PassageCredit`](../../lean/HolonicsResearch/HNN/PassageCredit.lean), for a mode in any normed
+`ℝ`-algebra (the moves need not commute). The moments carried from `P_0 = h_0'` with the step's own
+source `d_t = λ_t' h_(t−1) + u_t'` are the state's derivative `d h_T/dx` (`hasDerivAt_state`); for
+the push row the move is fixed and `d_t = γ_t x_t` (`source_of_fixed_move`), and the closed form
+above is `carried_eq_sum`. The passage's covector `Σ_t G_t(P_t)` (`hasDerivAt_passage`) splits at an
+opening into the first section's, the second section's from rest, and the second section's
+covector carried back to its opening paired with the carried `P_m` (`passage_covector_split`):
+without the credit the second section misses exactly that pairing. The Rust releases each product
+to its grain, so the test reads the identity to the moments' release.
+
 **Measured.** On all 6,726 problems from the gated runs' founding keys, the credited tower read
 2.462 bits a byte held out after pass 1 and 2.342 after pass 2, against the gated tower's 2.435
 and 2.321: 1.1% and 0.9% worse. The online code over pass 2 was 2.326 against 2.321. The
@@ -238,7 +249,9 @@ success. Nothing here grades a generation against an answer.
 
 - The passage credit's closed form: the carried moments `P_T`, `W_T` equal the derivative of the
   state with respect to the push and gate rows over the passage
-  (`the_opening_credit_completes_the_passage_covector` checks it in Rust).
+  (`the_opening_credit_completes_the_passage_covector` checks it in Rust). Formal-checked on
+  October 27 in [`HNN/PassageCredit`](../../lean/HolonicsResearch/HNN/PassageCredit.lean)
+  (`hasDerivAt_state`, `carried_eq_sum`, `passage_covector_split`).
 - The order-one price: the founding's `Δ` is the change of the complete code, the order-one KT
   code in the units plus the description, with the alphabet's growth
   (`each_price_is_the_change_of_the_order_one_code` checks it in Rust).
