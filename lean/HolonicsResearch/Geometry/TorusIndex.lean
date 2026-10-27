@@ -205,13 +205,15 @@ theorem card_ker_act (N : Matrix n n ℤ) (hN : N.det ≠ 0) :
   have hker : LinearMap.ker (lift N).toIntLinearMap =
       LinearMap.range (latticeMap N).toIntLinearMap := by
     ext w
-    exact LinearMap.mem_ker.trans ((lift_eq_zero_iff hN w).trans LinearMap.mem_range.symm)
+    exact LinearMap.mem_ker.trans ((lift_eq_zero_iff hN w).trans
+      (LinearMap.mem_range (f := (latticeMap N).toIntLinearMap)).symm)
   have key := Submodule.natAbs_det_equiv (LinearMap.range (latticeMap N).toIntLinearMap)
     (LinearEquiv.ofInjective (latticeMap N).toIntLinearMap inj)
   calc Nat.card {x : UnitAddTorus n // act N x = 0}
       = Nat.card (LinearMap.range (lift N).toIntLinearMap) :=
         Nat.card_congr (Equiv.subtypeEquivRight fun x =>
-          (act_eq_zero_iff hN x).trans LinearMap.mem_range.symm)
+          (act_eq_zero_iff hN x).trans
+            (LinearMap.mem_range (f := (lift N).toIntLinearMap)).symm)
     _ = Nat.card ((n → ℤ) ⧸ LinearMap.ker (lift N).toIntLinearMap) :=
         Nat.card_congr (lift N).toIntLinearMap.quotKerEquivRange.toEquiv.symm
     _ = Nat.card ((n → ℤ) ⧸ LinearMap.range (latticeMap N).toIntLinearMap) :=
