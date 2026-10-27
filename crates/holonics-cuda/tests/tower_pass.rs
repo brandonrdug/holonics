@@ -1,9 +1,9 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
-//! and its streams' states, with and without the pair face, the ring face and the turned modes; and
-//! the card refuses a declaration it does not carry.
+//! and its streams' states, with and without the pair face, the ring face, the turned modes and the
+//! news clock; and the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{ContactLaw, PairFace, RingFace, RingRank, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder, FACE_BITS};
+use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
 
 /// A declared exterior key stream: a 64-bit linear congruential walk, its high octets.
@@ -28,12 +28,13 @@ fn declaration(alphabet: usize, gated: bool, turned: bool, pumped: bool) -> Towe
 }
 
 /// The faces a fixture joins to the gated tower: `forms` pair forms (none at zero), the ring face
-/// it names, and whether its modes are turned.
+/// it names, whether its modes are turned, and the news clock its levels tick on.
 #[derive(Clone, Copy, Default)]
 struct Faces {
     forms: usize,
     ring: Option<Ringed>,
     turned: bool,
+    news: Option<NewsClock>,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -45,8 +46,9 @@ struct Ringed {
 }
 
 /// The gated tower founded on the keys, turned when `faces.turned` (its turn opened by
-/// `open_turn`), with `faces.forms` pair forms joined when there are any (`join_pair`) and the ring
-/// face when `faces.ring` names one (`join_ring`).
+/// `open_turn`), with `faces.forms` pair forms joined when there are any (`join_pair`), the ring
+/// face when `faces.ring` names one (`join_ring`) and the news clock last when `faces.news` names
+/// one.
 fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     let tower = Tower::found_on(declaration(alphabet, true, faces.turned, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
@@ -58,6 +60,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     }
     if let Some(ring) = faces.ring {
         join_ring(&mut learner, ring);
+    }
+    if let Some(clock) = faces.news {
+        learner.join_news(clock).expect("the clock joins");
     }
     (learner.clone(), learner)
 }
@@ -215,7 +220,7 @@ fn the_cards_ring_faced_pass_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 0, mode: 1, harmonics: 1 }), turned: false });
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 0, mode: 1, harmonics: 1 }), turned: false, news: None });
 }
 
 /// The turned modes' acceptance: 32 sections equal face by face and covector entry by entry, the
@@ -231,7 +236,24 @@ fn the_cards_turned_pass_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_turned_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), turned: true });
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), turned: true, news: None });
+}
+
+/// The news clock's acceptance: 32 sections equal face by face and covector entry by entry, the
+/// learners and their states (each stream's open face and phase) after each. Level 1's section is
+/// two bits, under the four or so a class carries, so it ticks none, once or several times at an
+/// arrival.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_news_clocked_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), ..Faces::default() });
+}
+
+/// The news clock beside turned modes and the pair face, an uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_turned_pair_faced_news_clocked_pass_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, turned: true, news: Some(NewsClock::new(3, 2).expect("a clock")), ..Faces::default() });
 }
 
 /// The card's advance is the host's, class by class: three prompts read whole together, then one
@@ -239,10 +261,22 @@ fn the_cards_turned_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_ho
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces::default());
+}
+
+/// The same under a news clock: each prompt's open face and phase carried from one advance to the
+/// next on the card as on the host.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_news_clocked_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), ..Faces::default() });
+}
+
+fn advance_class_by_class(faces: Faces) {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let alphabet = 13;
-    let (host, _) = learners(alphabet, Faces::default());
+    let (host, _) = learners(alphabet, faces);
     let tower = &host.tower;
     let classes = passage(alphabet, 27);
     let prompts: Vec<&[usize]> = classes.chunks(9).collect();
@@ -283,4 +317,14 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let ragged: Vec<&[usize]> = vec![&classes[..], &classes[..9]];
     let ragged_targets = vec![targets[0].clone(), targets[0][..8].to_vec()];
     assert!(realized.forward(&host.tower, &[host.tower.rest(), host.tower.rest()], &ragged, &ragged_targets, Slot::Opened).is_err());
+    // An open face or a news phase without a news clock, and a phase past the clock's period.
+    let mut opened = host.tower.rest();
+    opened.open = Some(TowerFace { masses: vec![1; 11], total: 11 });
+    assert!(realized.forward(&host.tower, &[opened], &parts, &targets, Slot::Opened).is_err());
+    let clock = NewsClock::new(8, 2).expect("a clock");
+    let mut clocked = host.tower.clone();
+    clocked.join_news(clock).expect("joined");
+    let mut past = clocked.rest();
+    past.news = clock.period(2).expect("the period");
+    assert!(realized.forward(&clocked, &[past], &parts, &targets, Slot::Opened).is_err());
 }

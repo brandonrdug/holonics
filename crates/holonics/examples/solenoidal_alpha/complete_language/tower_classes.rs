@@ -23,7 +23,7 @@
 use super::tower_train::{agreeing_class, agreement, count, fit, per, positive, roles_of, Reading, STATE_BUDGET};
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
-use holonics::hnn::tower::{ContactLaw, TowerLearner, TurnLadder};
+use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TurnLadder};
 use rayon::prelude::*;
 
 /// The held-out read's four exterior regions of a composed passage (`compose.py`'s roles).
@@ -52,22 +52,25 @@ fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
 /// `train-turned-tower-classes` trains the turned tower (`hnn.tower-turned-mode`), whose arriving
 /// class turns each mode, so a mode can carry an accumulated relative change as its phase;
 /// `train-scaled-tower-classes` founds the gated tower on the scaled turn ladder and
-/// `train-two-ladder-tower-classes` on both ladders, half the bank each ([`TurnLadder`]).
+/// `train-two-ladder-tower-classes` on both ladders, half the bank each ([`TurnLadder`]);
+/// `train-two-ladder-news-tower-classes` founds it so and joins the news clock `B = 8`, `r = 2`
+/// ([`NewsClock`]), so each level above the first ticks on its own news and the grain its modes
+/// move at is the tower's own (record `2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS…`).
 ///
 /// [agent-inferred, October 25] The credit is what lets a section's target teach its source when the
 /// pair is longer than the declared section: a stroke runs about 168 classes against sections of
 /// 128, so without it a label's covector stops inside its image and never reaches the image's
 /// start (the state at the label kept little of the image, the record's "state at the label").
-pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder) -> Result<()> {
-    train_realized(args, credit, targets, turned, ladder, &mut HostPass::default())
+pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>) -> Result<()> {
+    train_realized(args, credit, targets, turned, ladder, news, &mut HostPass::default())
 }
 
 /// [`train`] with each section's forward and reverse run through `realization`
 /// (`hnn::tower::realization`): the card's route (`holonics-cuda`'s `tower_pass` example) runs the
 /// same passes on the card, and its saved learner is the host's.
-pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, realization: &mut dyn PassRealization) -> Result<()> {
+pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
@@ -84,7 +87,13 @@ pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turne
         train_compared: None,
     };
     let reading = Reading { train_compared: targets.then(|| target_places(&reading.train, alphabet - 1)), ..reading };
-    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, None, realization)
+    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, news, None, realization)
+}
+
+/// The news clock the clocked race joins: `B = 8` bits, the news of one octet read with no
+/// prediction, and `r = 2`, the least radix whose carry merges epochs (agent-inferred; [`NewsClock`]).
+pub(crate) fn race_news_clock() -> NewsClock {
+    NewsClock::new(8, 2).expect("a whole positive section and ratio")
 }
 
 /// [agent-inferred, October 25] **A section's comparison is its target.** A passage of sections

@@ -1,9 +1,11 @@
 # The levels tick on their own news, so the tower learns its encoding on its own axis
 
-Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Owners to be
-built: `holonics::hnn::tower` (`Tower::step`, `Tower::reverse_joined`, `TowerState`),
+Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Host law
+built and tested (§6.1, §7); the card's port written, its parity on the card owed (§6.2); the
+measurement (§6.3) and Lean (§6.4) owed. Owners: `holonics::hnn::tower` (`NewsClock`,
+`Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
-loop of the forward and the reverse). Existing owners it joins: `holonics::aeon::EpochTower`,
+loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
 Lean `Aeon/Clock/Epoch` (`odometer_tower`, `monotone_count_is_flux`, `coarse_epoch_is_union_of_fine`),
 `hnn::tower::face_code`, the helical code's moments (the elementary objects, "The helical code").
 
@@ -117,3 +119,30 @@ clock, so the bits it certifies are the candidate's whole read, its segmentation
 4. **Lean** (into #410): the flux clock's ticks form an epoch tower under a monotone flux, and the
    clocked move over a span is the product of its sub-moves (the scale square
    `r ∘ T_fine = T_coarse ∘ r` for diagonal modes).
+
+## 7. What was built (October 27)
+
+- **Host.** `NewsClock { bits, radix }` joins a tower (`Tower::join_news`, saved as
+  `news-clock B r`); the stream carries the open face and the phase (`TowerState::open`,
+  `TowerState::news`). Acceptance 1 holds in the tests of `hnn::tower`: on one level the clock is
+  the tower without it, face for face and mode for mode; a read's ticks form an epoch tower and
+  count from rest the sections their news has crossed; a passage read in carried sections is the
+  passage read whole; a learner's section carried across a save advances through the host's
+  realization as class by class. The covector matches the code difference on the passage and
+  steps the unclocked covector is read at, two levels gated and ungated and three gated, with level
+  1's section at one bit so its ticks run 0, 1, 2 and 3 over the passage. On a longer passage with
+  more crossings the reading is the limit, not the law: a step that moves a section crossing
+  anywhere is not read, and on sixty-one classes at a two-bit section most families' steps moved
+  one; the same three-level tower without the clock drifts with the step as much on that passage
+  (its first gate bias −105.8, −113.6 and −139.3 against −113.8, ×10⁶, at `2^(−8)` to `2^(−10)`).
+- **Card.** The forward's thread 0 reads each arrival's code from the face the block formed
+  (`face_code` on the card, the host's integers: the width, then twenty squarings of the mantissa)
+  and every level's ticks before the cell's levels move; the move acts once a tick, the face becomes
+  the open face, and each stream's open face and phase cross in and out beside its modes. The modes'
+  scan carries the covector back through the later cell's ticks and sums the move's covector over
+  its sub-moves, the states between them read again from the state before the move (`Δτ²` moves a
+  cell, `Δτ` a few at the race's sections). The card refuses the clock beside the ring face, as the
+  host does. Its parity tests (32 sections clocked, the clock beside turned modes and the pair face,
+  the clocked advance class by class) are in `tests/tower_pass.rs`, and `tower_pass parity` takes
+  the clock; their run on the card is owed.
+

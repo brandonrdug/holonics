@@ -1,8 +1,9 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS`: founds the gated tower (rectifying, on both turn ladders) on the
-//!   keys, and runs `SECTIONS` sections of the class passage (two bytes a class, big-endian,
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX]`: founds the gated tower (rectifying, on both
+//!   turn ladders) on the keys, its levels on the news clock `NewsClock(NEWS_BITS, NEWS_RADIX)` when
+//!   one is named, and runs `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
 //!   host's through `HostPass`, the card's through `TowerCard`) and their texts and continuing
@@ -14,7 +15,7 @@
 //!   `TOWER_PARITY_SHA` with both learners' SHA-256 after the last section.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
-//!   or `train-unit-tower` on the founded units) with every section's forward and reverse on the
+//!   `train-two-ladder-news-tower-classes`, or `train-unit-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
 //! - `tower_pass release complete-language release-tower-classes ARGS…`: the class release with
@@ -25,7 +26,7 @@
 mod exterior;
 
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{face_code, ContactLaw, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
+use holonics::hnn::tower::{face_code, ContactLaw, NewsClock, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
 use holonics_cuda::hnn::{Card, TowerCard};
 use std::error::Error;
 use std::io::Write;
@@ -61,8 +62,8 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    if args.len() != 12 {
-        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS".into());
+    if args.len() != 12 && args.len() != 14 {
+        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX]".into());
     }
     let bytes = pinned(&args[0], &args[1])?;
     let keys = pinned(&args[2], &args[3])?;
@@ -91,7 +92,10 @@ fn parity(args: &[String]) -> Result<()> {
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
     }
-    let tower = Tower::found_on(declaration, &keys, TurnLadder::Both)?;
+    let mut tower = Tower::found_on(declaration, &keys, TurnLadder::Both)?;
+    if args.len() == 14 {
+        tower.join_news(NewsClock::new(args[12].parse()?, args[13].parse()?)?)?;
+    }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
     lockstep(&mut host, &mut carded, &classes, streams, section, sections)

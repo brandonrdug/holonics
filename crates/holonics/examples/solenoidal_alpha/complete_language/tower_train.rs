@@ -11,7 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
-use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
+use holonics::hnn::tower::{code_of, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
@@ -3317,7 +3317,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         regions: REGIONS,
         train_compared: None,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, looking, &mut HostPass::default())
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, None, looking, &mut HostPass::default())
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -3353,7 +3353,7 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, realization)
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, None, realization)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3376,7 +3376,7 @@ pub(super) struct Reading {
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3409,12 +3409,17 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let mut learner = if args.len() >= 13 {
         let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
-        if learner.tower.declaration != declaration || learner.rate_bits != rate_bits {
-            return Err("the continued learner's declaration or rate differs from the declared one".into());
+        if learner.tower.declaration != declaration || learner.rate_bits != rate_bits || learner.tower.news() != news {
+            return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
         learner
     } else {
-        TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
+        let mut learner = TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits);
+        // A clocked run's levels tick on their own news from the founding on ([`NewsClock`]).
+        if let Some(clock) = news {
+            learner.join_news(clock).map_err(|e| e.to_string())?;
+        }
+        learner
     };
     // The realization admits the whole law before any section is read or any output is written.
     realization.admit(&learner.tower).map_err(|e| e.to_string())?;

@@ -1817,6 +1817,98 @@ impl Layout {
     }
 }
 
+/// [definition; agent-inferred, October 27] **The news clock** (record
+/// `2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS`):
+/// each level is a receiver whose clock counts its own news. The news of an arrival is its code
+/// under the face that predicted it, `c_t = −log₂ p̂_(t−1)(u_t)` on `2^(−20)` bits
+/// ([`face_code`]), never negative, so its running sum `S_t` is a monotone clock. Level 0 ticks at
+/// every arrival; level `l ≥ 1` ticks at the sections `S = j · B rˡ⁻¹` bits, advancing
+///
+/// ```text
+/// Δτ_l(t) = ⌊S_t / (B rˡ⁻¹)⌋ − ⌊S_(t−1) / (B rˡ⁻¹)⌋
+/// ```
+///
+/// ticks at arrival `t`, and its modes move `h_t = λ_t^(Δτ_l(t)) h_(t−1) + γ_t P x_t`: every
+/// arrival's input enters, and the level turns and decays only as its own clock advances, so the
+/// arrivals of a span it predicts share one phase (the helical code's moment on the level's own
+/// clock). A crossing of a multiple of `B rˡ` is a crossing of a multiple of `B rˡ⁻¹`, so each
+/// coarser level's ticks lie among the finer's: an epoch tower whose coarsening is the odometer's
+/// carry (`aeon::EpochTower`). The boundaries are where the tower's own prediction has gathered a
+/// section of news, so the grain moves with the learning, on the axis of information time; nothing
+/// names a class, a boundary letter or a modality. A stream carries the open face (the prediction
+/// the next arrival is read against, none at rest, so the first arrival moves no level above 0)
+/// and the clock's open phase, `S` modulo the coarsest section. `B` and `r` are agent-inferred:
+/// `B = 8`, the news of one octet read with no prediction, and `r = 2`, the least radix whose carry
+/// merges epochs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NewsClock {
+    /// `B`, level 1's section in whole bits.
+    pub bits: u32,
+    /// `r`, each level's section over the section of the level below it.
+    pub radix: u32,
+}
+
+impl NewsClock {
+    /// The clock with level 1's section `bits` and the ratio `radix`; refused at zero.
+    pub fn new(bits: u32, radix: u32) -> Result<Self> {
+        if bits == 0 || radix == 0 {
+            return refuse("a news clock's section and ratio are whole and positive");
+        }
+        Ok(Self { bits, radix })
+    }
+
+    /// Level `l`'s section `B rˡ⁻¹` on the code's grain `2^(−20)` bits (`l ≥ 1`).
+    pub fn section(&self, level: usize) -> Result<u64> {
+        let ratio = u32::try_from(level - 1).ok().and_then(|e| u64::from(self.radix).checked_pow(e));
+        ratio.and_then(|r| (u64::from(self.bits) << READ_BITS).checked_mul(r)).ok_or(TowerError::Refused("a news clock's section outgrew its 64-bit carrier"))
+    }
+
+    /// The clock's period on a tower of `levels`: the coarsest level's section (one where no level
+    /// above 0 ticks by news).
+    pub fn period(&self, levels: usize) -> Result<u64> {
+        if levels < 2 {
+            Ok(1)
+        } else {
+            self.section(levels - 1)
+        }
+    }
+
+    /// Every level's ticks at an arrival carrying `code` from the open phase `news`, and the phase
+    /// after it.
+    fn ticks(&self, levels: usize, news: u64, code: i64) -> Result<(Vec<u32>, u64)> {
+        let period = self.period(levels)?;
+        if news >= period {
+            return refuse("a news phase past its clock's period");
+        }
+        let Ok(code) = u64::try_from(code) else {
+            return refuse("an arrival's news is never negative");
+        };
+        let sum = news.checked_add(code).ok_or(TowerError::Refused("a news phase outgrew its 64-bit carrier"))?;
+        let mut ticks = Vec::with_capacity(levels);
+        ticks.push(1);
+        for l in 1..levels {
+            let section = self.section(l)?;
+            let advanced = u32::try_from(sum / section - news / section).map_err(|_| TowerError::Refused("an arrival's ticks outgrew their 32-bit carrier"))?;
+            ticks.push(advanced);
+        }
+        Ok((ticks, sum % period))
+    }
+
+    /// `news-clock B r` as the tower's text writes it.
+    fn to_text(self) -> String {
+        format!("news-clock {} {}\n", self.bits, self.radix)
+    }
+
+    fn from_text(head: &str) -> Result<Self> {
+        let words: Vec<&str> = head.split(' ').collect();
+        let count = |s: &str| s.parse::<u32>().map_err(|_| TowerError::Refused("a news clock's section and ratio are counts"));
+        match words.as_slice() {
+            ["news-clock", bits, radix] => Self::new(count(bits)?, count(radix)?),
+            _ => refuse("not a news clock's text"),
+        }
+    }
+}
+
 /// [definition; agent-inferred] **The located material**: every family as one vector of integer
 /// numerators on its grain (`Layout`).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1831,6 +1923,9 @@ pub struct Tower {
     rotor: Option<Rotor>,
     /// The strands, when they are joined ([`Tower::join_strands`]).
     strands: Option<Strands>,
+    /// The levels' news clock, when one is joined ([`Tower::join_news`]); without it every level
+    /// moves once an arrival.
+    news: Option<NewsClock>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1856,6 +1951,12 @@ pub struct TowerState {
     pub strands: Vec<u32>,
     /// The strands' orientation: `true` on the reversed sheet `o = −1`, `false` at rest.
     pub reversed: bool,
+    /// Under a news clock, the face the next arrival is read against (none at rest, and none
+    /// without a clock).
+    pub open: Option<TowerFace>,
+    /// Under a news clock, its open phase: the news summed so far, modulo the coarsest section, on
+    /// `2^(−20)` bits (zero without a clock).
+    pub news: u64,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -2187,6 +2288,9 @@ struct LevelCell {
     strands: Vec<i32>,
     /// The gated modes' moves at this cell (empty when ungated).
     gate: Vec<GatedMove>,
+    /// How many times the level's move acted at this cell: one without a news clock, else the
+    /// level's ticks `Δτ_l(t)` ([`NewsClock`]).
+    ticks: u32,
 }
 
 /// A gated mode's move at one cell: the gate `r` and `λ_t`, `ρ_t = |λ_t|`, `γ_t` on `2^(−30)`, and
@@ -2550,7 +2654,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2563,6 +2667,8 @@ impl Tower {
             hands: vec![false; self.ring.as_ref().map_or(0, RingFace::ranks)],
             strands: self.strands.as_ref().map_or_else(Vec::new, Strands::rested),
             reversed: false,
+            open: None,
+            news: 0,
         }
     }
 
@@ -2676,6 +2782,24 @@ impl Tower {
         if state.previous > d.alphabet {
             return refuse("a carried class outside the declared alphabet and its start");
         }
+        // The news clock: the arrival's code under the open face decides every level's ticks
+        // before the step reads it ([`NewsClock`]).
+        let ticks: Vec<u32> = match &self.news {
+            Some(clock) => {
+                if state.credit.is_some() {
+                    return refuse("a passage credit under a news clock: its moments over a clocked move are owed");
+                }
+                let code = match &state.open {
+                    Some(face) if face.masses.len() != d.alphabet || face.total == 0 => return refuse("an open face of another alphabet, or empty"),
+                    Some(face) => face.code(u),
+                    None => 0,
+                };
+                let (ticks, news) = clock.ticks(d.levels, state.news, code)?;
+                state.news = news;
+                ticks
+            }
+            None => Vec::new(),
+        };
         let t = &self.theta;
         let e = self.layout.encoding + u * w;
         let mut x: Vec<i32> = t[e..e + w].to_vec();
@@ -2784,6 +2908,7 @@ impl Tower {
             let stepped: Option<Vec<(i64, i64)>> = self.rotor.as_ref().filter(|r| !r.still(l, u)).map(|r| r.moved(l, u, &state.modes[l])).transpose()?;
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
+            let moves = ticks.get(l).copied().unwrap_or(1);
             let mut face = vec![0i64; 2 * n];
             for k in 0..n {
                 let (hr, hi) = stepped.as_ref().map_or(modes[k], |h| h[k]);
@@ -2793,11 +2918,15 @@ impl Tower {
                 };
                 // The pump's reflection β conj(h) (zero unless pumped).
                 let (br, bi) = gate.get(k).map_or((0, 0), |m| (m.beta.0 as i128, m.beta.1 as i128));
-                let (hr, hi) = (hr as i128, hi as i128);
+                // The move acts `moves` times (once without a news clock), then the push enters.
+                let (mut hr, mut hi) = (hr as i128, hi as i128);
+                for _ in 0..moves {
+                    (hr, hi) = (release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS), release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS));
+                }
                 let pr = release(gamma * push_re[k] as i128, MOVE_BITS);
                 let pi = release(gamma * push_im[k] as i128, MOVE_BITS);
-                let nr = fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS) + pr)?;
-                let ni = fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS) + pi)?;
+                let nr = fit64(hr + pr)?;
+                let ni = fit64(hi + pi)?;
                 modes[k] = (nr, ni);
                 face[k] = fit64(release(nr as i128, STATE_BITS - FACE_BITS))?;
                 face[n + k] = fit64(release(ni as i128, STATE_BITS - FACE_BITS))?;
@@ -2872,7 +3001,7 @@ impl Tower {
             }
             let push = push_re.into_iter().zip(push_im).collect();
             let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -2908,6 +3037,9 @@ impl Tower {
         let zmax = *z.iter().max().expect("a nonempty alphabet");
         let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
         let total = masses.iter().sum();
+        if self.news.is_some() {
+            state.open = Some(TowerFace { masses: masses.clone(), total });
+        }
         Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, face: TowerFace { masses, total } })
     }
 
@@ -2970,6 +3102,9 @@ impl Tower {
         }
         if self.rotor.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a rotor: the credit's moments through the step are owed");
+        }
+        if self.news.is_some() && opening.credit.is_some() {
+            return refuse("a credited opening under a news clock: its moments over a clocked move are owed");
         }
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
@@ -3193,6 +3328,8 @@ impl Tower {
             for i in (0..cells_n).rev() {
                 let mut gh = Vec::with_capacity(n);
                 let later = if d.gated && i + 1 < cells_n { Some(&cells[i + 1].levels[l].gate) } else { None };
+                // The later cell's move acted `Δτ` times ([`NewsClock`]; once without one).
+                let later_ticks = if i + 1 < cells_n { cells[i + 1].levels[l].ticks } else { 1 };
                 // conj(λ_(t+1)) G_h(t+1) (+ β_(t+1) conj(G_h(t+1))): the covector of h'_t.
                 let mut back: Vec<(i128, i128)> = (0..n)
                     .map(|k| {
@@ -3201,8 +3338,11 @@ impl Tower {
                             None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
                         };
                         let (br, bi) = later.map_or((0, 0), |gate| (gate[k].beta.0 as i128, gate[k].beta.1 as i128));
-                        let (cr, ci) = (carried[k].0 as i128, carried[k].1 as i128);
-                        (release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS), release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS))
+                        let (mut cr, mut ci) = (carried[k].0 as i128, carried[k].1 as i128);
+                        for _ in 0..later_ticks {
+                            (cr, ci) = (release(lr * cr + li * ci + br * cr + bi * ci, MOVE_BITS), release(lr * ci - li * cr + bi * cr - br * ci, MOVE_BITS));
+                        }
+                        (cr, ci)
                     })
                     .collect();
                 // The rotor's step and turn carried back by the monomial's adjoint: mode k of h'_t
@@ -3246,7 +3386,30 @@ impl Tower {
                     // conj(h_(t−1)) G_h(t), the covector of λ_t, and Re(conj(G_h) B x), of γ_t.
                     // The ring's covector of the move it rode, on the same convention.
                     let ring_move = if k == ring_mode { ring_moves[i] } else { [0; 4] };
-                    let (glr, gli) = (hr * gr + hi * gi + ring_move[0], hr * gi - hi * gr + ring_move[1]);
+                    let (glr, gli) = if lc.ticks == 1 {
+                        (hr * gr + hi * gi + ring_move[0], hr * gi - hi * gr + ring_move[1])
+                    } else {
+                        // Under a news clock the move acted Δτ times: `∂(λ^Δτ h)/∂λ` is the sum over
+                        // its sub-moves of `conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾`, the states between them read again by
+                        // the step's own law and the covector carried back through each
+                        // (`G⁽ʲ⁻¹⁾ = conj(λ) G⁽ʲ⁾`); no tick sends none. Refused beside a ring or
+                        // pump ([`Tower::join_news`]).
+                        let (lr, li) = lc.gate.get(k).map_or((t[lv.move_re + k] as i128, t[lv.move_im + k] as i128), |m| (m.lam.0 as i128, m.lam.1 as i128));
+                        let mut between = Vec::with_capacity(lc.ticks as usize);
+                        let (mut ar, mut ai) = (hr, hi);
+                        for _ in 0..lc.ticks {
+                            between.push((ar, ai));
+                            (ar, ai) = (release(lr * ar - li * ai, MOVE_BITS), release(lr * ai + li * ar, MOVE_BITS));
+                        }
+                        let (mut cr, mut ci) = (gr, gi);
+                        let (mut sr, mut si) = (0i128, 0i128);
+                        for &(ar, ai) in between.iter().rev() {
+                            sr += ar * cr + ai * ci;
+                            si += ar * ci - ai * cr;
+                            (cr, ci) = (release(lr * cr + li * ci, MOVE_BITS), release(lr * ci - li * cr, MOVE_BITS));
+                        }
+                        (sr, si)
+                    };
                     let through = gr * lc.push[k].0 as i128 + gi * lc.push[k].1 as i128;
                     match lc.gate.get(k) {
                         None => {
@@ -3627,13 +3790,16 @@ impl Tower {
         if let Some(strands) = &self.strands {
             s.push_str(&strands.to_text());
         }
+        if let Some(clock) = self.news {
+            s.push_str(&clock.to_text());
+        }
         s
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
     /// three more with a pair face, two more with a ring face (one more a rank with its pair
     /// moves, one more with its harmonics and one more with its restarts), three more with a
-    /// rotor and five more with strands.
+    /// rotor, five more with strands and one more with a news clock.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
@@ -3656,6 +3822,9 @@ impl Tower {
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("strands ")) {
             n += 5;
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("news-clock ")) {
+            n += 1;
         }
         n
     }
@@ -3730,6 +3899,7 @@ impl Tower {
             }
             None => None,
         };
+        let news = lines.next_if(|l| l.starts_with("news-clock ")).map(NewsClock::from_text).transpose()?;
         let layout = Layout::new(
             &declaration,
             pair.as_ref().map_or(0, |face| face.forms()),
@@ -3740,9 +3910,10 @@ impl Tower {
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
-        // The rotor and the strands join by their own laws, so a text that holds them together is
-        // read under the same refusals as their joins; the strands' material is the text's.
-        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        // The rotor, the strands and the news clock join by their own laws, so a text that holds
+        // them together is read under the same refusals as their joins; the strands' material is
+        // the text's.
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
         if let Some(rotor) = rotor {
             tower.join_rotor(rotor)?;
         }
@@ -3750,6 +3921,9 @@ impl Tower {
             let theta = std::mem::take(&mut tower.theta);
             tower.join_strands(strands)?;
             tower.theta = theta;
+        }
+        if let Some(clock) = news {
+            tower.join_news(clock)?;
         }
         Ok(tower)
     }
@@ -3798,6 +3972,9 @@ impl Tower {
         if self.rotor.is_some() {
             return refuse("a ring face beside a rotor: the ring's law under a step is owed");
         }
+        if self.news.is_some() {
+            return refuse("a ring face under a news clock: the ring rides its mode's single move, and its law over a clocked move is owed");
+        }
         if self.strands.is_some() {
             return refuse("a ring face joins before strands (the strands' material follows the ring's)");
         }
@@ -3836,12 +4013,44 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a rotor beside a ring face: the ring's law under a step is owed");
         }
+        if self.news.is_some() {
+            return refuse("a rotor under a news clock: the rotor steps once an arrival, and its step on a level's own clock is owed");
+        }
         let d = &self.declaration;
         if (rotor.levels, rotor.alphabet, rotor.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("a rotor of another tower's shape");
         }
         self.rotor = Some(rotor);
         Ok(())
+    }
+
+    /// [agent-inferred, October 27] **The news clock joined to the tower** ([`NewsClock`]): it adds
+    /// no material, so the tower's families are kept, and each level above 0 then moves on its own
+    /// clock. A stream's open face and phase are its state, so a stream rested before the join is
+    /// rested again. Refused when a clock is already joined, under a pump (the reflection `β h̄`
+    /// over a clocked move is owed), beside a ring face (the ring rides its mode's single move) or
+    /// a rotor (it steps once an arrival).
+    pub fn join_news(&mut self, clock: NewsClock) -> Result<()> {
+        if self.news.is_some() {
+            return refuse("a tower takes one news clock");
+        }
+        if self.declaration.pumped {
+            return refuse("a news clock under a pump: the reflection over a clocked move is owed");
+        }
+        if self.ring.is_some() {
+            return refuse("a news clock beside a ring face: the ring rides its mode's single move, and its law over a clocked move is owed");
+        }
+        if self.rotor.is_some() {
+            return refuse("a news clock beside a rotor: the rotor steps once an arrival, and its step on a level's own clock is owed");
+        }
+        NewsClock::new(clock.bits, clock.radix)?.period(self.declaration.levels)?;
+        self.news = Some(clock);
+        Ok(())
+    }
+
+    /// The news clock, when one is joined.
+    pub fn news(&self) -> Option<NewsClock> {
+        self.news
     }
 
     /// The rotor, when one is joined.
@@ -4433,6 +4642,12 @@ impl TowerLearner {
         self.second.resize(self.tower.theta.len(), 0);
         Ok(())
     }
+
+    /// The news clock joined to the learner's tower ([`Tower::join_news`]): it adds no material,
+    /// so the moments are kept.
+    pub fn join_news(&mut self, clock: NewsClock) -> Result<()> {
+        self.tower.join_news(clock)
+    }
 }
 
 impl Tower {
@@ -4591,8 +4806,9 @@ impl Tower {
     /// the state, and each cell's [`CircuitCell`] (every level's stored, carried and pushed energy,
     /// its read's scale and its contacts' reach, and the code of the class that arrives next) is
     /// handed to `each`. A reading beside the code: the tower is not moved. The carried part is
-    /// formed by the step's own law, `λ_t h + β_t h̄` released from `2^(−54)` to the state's grain,
-    /// so `carried` is what the step adds the push to.
+    /// formed by the step's own law, `λ_t h + β_t h̄` released from `2^(−54)` to the state's grain
+    /// (applied as often as the level ticked under a news clock), so `carried` is what the step
+    /// adds the push to.
     pub fn read_circuit(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(usize, CircuitCell) -> Result<()>) -> Result<()> {
         let reaches = self.reaches();
         let n = self.declaration.modes;
@@ -4613,7 +4829,12 @@ impl Tower {
                     };
                     let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
                     let (lr, li, br, bi) = (lam.0 as i128, lam.1 as i128, beta.0 as i128, beta.1 as i128);
-                    let carried = (fit64(release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS))?, fit64(release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS))?);
+                    // The move acts as often as the level ticked ([`NewsClock`]; once without one).
+                    let (mut cr, mut ci) = (hr, hi);
+                    for _ in 0..lc.ticks {
+                        (cr, ci) = (release(lr * cr - li * ci + br * cr + bi * ci, MOVE_BITS), release(lr * ci + li * cr + bi * cr - br * ci, MOVE_BITS));
+                    }
+                    let carried = (fit64(cr)?, fit64(ci)?);
                     Ok(CircuitMode { before: opening[l][k], carried, after: lc.state[k], lam, beta })
                 }))?;
                 let carried: Vec<(i64, i64)> = modes.iter().map(|m| m.carried).collect();
@@ -4645,6 +4866,9 @@ impl Tower {
         }
         if self.rotor.is_some() {
             return refuse("input covectors under a rotor: their carried face is the unstepped state the moves do not act on");
+        }
+        if self.news.is_some() {
+            return refuse("input covectors under a news clock: a cell's moves act Δτ times, and the reading hands one move a cell");
         }
         let reaches = self.reaches();
         let t = &self.theta;
@@ -6653,15 +6877,21 @@ mod tests {
         let cells = tower.forward(&mut s, &classes, &reaches).expect("forward");
         let mut g = tower.reverse(&opening, &cells, &classes, compared).expect("reverse");
         tower.to_step_grain(&mut g);
-        // Which contacts conduct at every cell, and each pump's depth's sign: the covector is the
-        // derivative on the passage's own side of every kink, so a perturbation that moves a contact
-        // or a pump's |κ| across its kink is not read.
-        let conducting = |t: &Tower| -> Vec<bool> {
+        // Which contacts conduct at every cell, each pump's depth's sign and each level's ticks:
+        // the covector is the derivative on the passage's own side of every kink and section
+        // crossing, so a perturbation that moves a contact or a pump's |κ| across its kink, or the
+        // news across a level's section ([`NewsClock`]), is not read.
+        let conducting = |t: &Tower| -> Vec<u32> {
             let mut s = t.rest();
             let cells = t.forward(&mut s, &classes, &t.reaches()).expect("forward");
             cells
                 .iter()
-                .flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| a > 0).chain(l.gate.iter().map(|m| m.kappa > 0))).collect::<Vec<_>>())
+                .flat_map(|c| {
+                    c.levels
+                        .iter()
+                        .flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| u32::from(a > 0)).chain(l.gate.iter().map(|m| u32::from(m.kappa > 0))).chain(std::iter::once(l.ticks)))
+                        .collect::<Vec<_>>()
+                })
                 .collect()
         };
         let base = conducting(&tower);
@@ -6940,5 +7170,214 @@ mod tests {
         let compared: Vec<Option<usize>> =
             PASSAGE.iter().enumerate().map(|(i, &c)| if i % 7 == 3 { None } else if i % 5 == 2 { Some((c + 1) % 4) } else { Some(c) }).collect();
         the_covector_of_tower_matches_the_code_difference_compared(tiny_of(true), true, &PASSAGE, Some(&compared), 10);
+    }
+
+    /// The news clock on a tiny tower: level 1's section two bits and each level's twice the one
+    /// below it, so over four classes (about two bits an arrival) the levels tick twice, once and
+    /// not at all at one arrival.
+    fn news_on(mut tower: Tower) -> Tower {
+        tower.join_news(NewsClock::new(2, 2).expect("a clock")).expect("joined");
+        tower
+    }
+
+    /// The passage the news clock's tests read: sixty-one classes over four.
+    fn news_passage() -> Vec<usize> {
+        (0..61).map(|i| (i * 7 + i / 3) % 4).collect()
+    }
+
+    /// The levels tick on their own news: level 0 at every arrival, and above it each arrival's
+    /// ticks fall level by level, so each coarser level's ticks lie among the finer's (the epoch
+    /// tower); from rest each level's ticks count the sections its news has crossed, the first
+    /// arrival (read against no face) moving none; the stream ends on the last face and the news
+    /// modulo the coarsest section.
+    #[test]
+    fn the_levels_tick_on_their_own_news_as_an_epoch_tower() {
+        let tower = news_on(tiny_with(4, true));
+        let clock = tower.news().expect("a clock");
+        let classes = news_passage();
+        let mut s = tower.rest();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        let (mut news, mut totals) = (0i64, [0u64; 4]);
+        for (i, cell) in cells.iter().enumerate() {
+            let ticks: Vec<u32> = cell.levels.iter().map(|l| l.ticks).collect();
+            assert_eq!(ticks[0], 1, "cell {i}");
+            for l in 1..3 {
+                assert!(ticks[l + 1] <= ticks[l], "cell {i}: {ticks:?}");
+            }
+            if i > 0 {
+                news += cells[i - 1].face.code(classes[i]);
+            } else {
+                assert!(ticks[1..].iter().all(|&t| t == 0));
+            }
+            for (total, &t) in totals.iter_mut().zip(&ticks) {
+                *total += u64::from(t);
+            }
+            for l in 1..4 {
+                assert_eq!(totals[l], news as u64 / clock.section(l).expect("a section"), "cell {i}, level {l}");
+            }
+        }
+        // The levels move at their own rates: level 1 ticks more than once at some arrival, the
+        // coarsest holds through some, and each coarser level ticks less over the passage.
+        assert!(cells.iter().any(|c| c.levels[1].ticks > 1));
+        assert!(cells.iter().any(|c| c.levels[3].ticks == 0));
+        assert!(totals[1] > totals[2] && totals[2] > totals[3] && totals[3] > 0, "{totals:?}");
+        assert_eq!(s.news, news as u64 % clock.period(4).expect("a period"));
+        assert_eq!(s.open.as_ref(), Some(&cells.last().expect("a cell").face));
+    }
+
+    /// One level ticks at every arrival, so on one level the clock is the tower without it, face
+    /// for face and mode for mode; on more levels it moves them otherwise. The tower's text adds its
+    /// line only when a clock is joined.
+    #[test]
+    fn one_level_on_the_news_clock_is_the_tower_without_it() {
+        let classes = news_passage();
+        let plain = tiny_with(1, true);
+        let clocked = news_on(plain.clone());
+        let (mut s, mut t) = (plain.rest(), clocked.rest());
+        for &u in &classes {
+            assert_eq!(plain.advance(&mut s, u).expect("advance"), clocked.advance(&mut t, u).expect("advance"), "class {u}");
+            assert_eq!(s.modes, t.modes, "class {u}");
+        }
+        assert!(!plain.to_text().contains("news-clock"));
+        let plain = tiny_with(3, true);
+        assert_ne!(code(&plain, &classes), code(&news_on(plain.clone()), &classes));
+    }
+
+    #[test]
+    fn a_news_clock_tower_restores_exactly() {
+        let tower = news_on(tiny_with(3, true));
+        let text = tower.to_text();
+        assert!(text.ends_with("news-clock 2 2\n"));
+        assert_eq!(Tower::from_text(&text).expect("restored"), tower);
+        let learner = TowerLearner::new(tower.clone(), 7);
+        let restored = TowerLearner::from_text(&learner.to_text()).expect("restored");
+        assert_eq!(restored.tower, tower);
+        assert_eq!(restored.to_text(), learner.to_text());
+        // With strands, which join before the clock.
+        let stranded = news_on(stranded(tiny_contacts(3, 9, 8, false, false, false, ContactLaw::Pair), true));
+        assert_eq!(Tower::from_text(&stranded.to_text()).expect("restored"), stranded);
+        for (from, to) in [("news-clock 2 2", "news-clock 0 2"), ("news-clock 2 2", "news-clock 2"), ("news-clock 2 2", "news-clock 2 -1")] {
+            assert!(Tower::from_text(&text.replace(from, to)).is_err(), "{to}");
+        }
+    }
+
+    /// The covector of every family on the clocked tower is the code difference it predicts, the
+    /// moves' over each level's ticks (none, one or several), read on the passage's own side of
+    /// every section crossing; gated and ungated, on the passage and steps the unclocked covector is
+    /// read at. Level 1's section is one bit, so its ticks run 0, 1, 2 and 3 over the passage and a
+    /// third level's 0, 1 and 2. On the sixty-one classes of [`news_passage`] at a two-bit section a
+    /// step of `2^(−7)` units moved some crossing for most families: 29 gated families read at
+    /// `2^(−8)`, under the three quarters asked, and 5 or 6 ungated ones at `2^(−8)` to `2^(−10)`
+    /// (measured October 27).
+    #[test]
+    fn the_news_clock_covector_matches_the_code_difference() {
+        let clocked = |mut tower: Tower| {
+            tower.join_news(NewsClock::new(1, 2).expect("a clock")).expect("joined");
+            tower
+        };
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(true)), true, &PASSAGE, 10);
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_of(false)), false, &PASSAGE, 10);
+        the_covector_of_tower_matches_the_code_difference(clocked(tiny_with(3, true)), true, &PASSAGE, 10);
+    }
+
+    /// Under a news clock a stream's open face and phase are its state: a passage read in two
+    /// carried sections (the second opening on the first's last class) is the passage read whole,
+    /// code for code, and a stream that drops its open face reads it otherwise.
+    #[test]
+    fn a_news_clocked_passage_read_in_carried_sections_is_the_passage_read_whole() {
+        let tower = news_on(tiny_with(3, true));
+        let classes = news_passage();
+        let whole = tower.read_cells(&mut tower.rest(), &classes).expect("read");
+        for half in [1, 17, 30, 59] {
+            let mut s = tower.rest();
+            let mut parts = tower.read_cells(&mut s, &classes[..=half]).expect("read");
+            parts.extend(tower.read_cells(&mut s, &classes[half..]).expect("read"));
+            assert_eq!(parts, whole, "half {half}");
+        }
+        let mut s = tower.rest();
+        tower.read_cells(&mut s, &classes[..=30]).expect("read");
+        let mut dropped = TowerState { open: None, ..s };
+        assert_ne!(tower.read_cells(&mut dropped, &classes[30..]).expect("read"), whole[30..]);
+    }
+
+    /// A learner's section under a news clock carries each stream's state under the material it
+    /// ends with (its own clock read again), and across a save the advance through the host's
+    /// realization is the advance class by class: the same faces, codes and continuing states.
+    #[test]
+    fn a_news_clocked_section_carried_across_a_save_advances_class_by_class() {
+        let tower = news_on(tiny_with(3, true));
+        let classes = news_passage();
+        let streams: [&[usize]; 2] = [&classes[..31], &classes[30..]];
+        let mut learner = TowerLearner::new(tower, 7);
+        let mut states = vec![learner.tower.rest(), learner.tower.rest()];
+        learner.section(&mut states, &streams).expect("section");
+        for (state, stream) in states.iter().zip(streams) {
+            let mut direct = learner.tower.rest();
+            learner.tower.read_cells(&mut direct, stream).expect("read");
+            assert_eq!(state, &direct);
+            assert!(state.open.is_some());
+        }
+        let restored = TowerLearner::from_text(&learner.to_text()).expect("restored");
+        assert_eq!(restored.tower, learner.tower);
+        let tower = restored.tower;
+        let prompts: [&[usize]; 2] = [&[0, 1, 2, 1, 3], &[3, 3, 0, 2, 1]];
+        let mut host = states.clone();
+        let (mut faces, mut codes) = (Vec::new(), Vec::new());
+        for (s, prompt) in prompts.iter().enumerate() {
+            let (mut face, mut code): (Option<TowerFace>, i64) = (None, 0);
+            for &u in prompt.iter() {
+                if let Some(f) = &face {
+                    code += f.code(u);
+                }
+                face = Some(tower.advance(&mut host[s], u).expect("advance"));
+            }
+            faces.push(face.expect("a face"));
+            codes.push(code);
+        }
+        let mut pass = realization::HostPass::default();
+        let (read, read_codes) = tower.advance_realized(&mut states, &prompts, &mut pass).expect("realized");
+        assert_eq!((read, read_codes), (faces, codes));
+        assert_eq!(states, host);
+    }
+
+    /// The news clock refuses what it does not carry: a zero section or ratio, a second clock, a
+    /// pump, a ring face or a rotor on either side of the join, a coarsest section past its
+    /// carrier, a passage credit, the input covectors' reading, a phase past the period and an open
+    /// face of another alphabet. A turned tower takes it.
+    #[test]
+    fn the_news_clock_refuses_what_it_does_not_carry() {
+        assert!(NewsClock::new(0, 2).is_err());
+        assert!(NewsClock::new(2, 0).is_err());
+        let clock = NewsClock::new(2, 2).expect("a clock");
+        let mut tower = news_on(tiny_with(3, true));
+        assert!(tower.join_news(clock).is_err());
+        assert!(tiny_turning(2, true, true, true).join_news(clock).is_err());
+        assert!(tiny_turning(2, true, true, false).join_news(clock).is_ok());
+        assert!(rotor_on(tiny_shaped(2, 4, false, false, false, ContactLaw::Rectifying)).join_news(clock).is_err());
+        let mut clocked = news_on(tiny_shaped(2, 4, false, false, false, ContactLaw::Rectifying));
+        let (steps, turns) = tiny_keys();
+        let rotor = Rotor::new(&clocked.declaration, TINY_RINGS.to_vec(), steps, turns).expect("rotor");
+        assert!(clocked.join_rotor(rotor).is_err());
+        assert!(tiny_ring_faced(tiny_declared(2, true, true, false, ContactLaw::Pair)).join_news(clock).is_err());
+        let mut clocked = news_on(tiny_declared(2, true, true, false, ContactLaw::Pair));
+        let face = tiny_ring_face(&clocked);
+        assert!(clocked.join_ring_face(face).is_err());
+        assert!(tiny_with(4, true).join_news(NewsClock::new(u32::MAX, u32::MAX).expect("a clock")).is_err());
+        let classes = [0usize, 1, 2, 3];
+        let reaches = tower.reaches();
+        assert!(tower.forward(&mut tower.rest_with_credit(), &classes, &reaches).is_err());
+        let opening = tower.rest_with_credit();
+        let mut bare = TowerState { credit: None, ..opening.clone() };
+        let cells = tower.forward(&mut bare, &classes, &reaches).expect("forward");
+        assert!(tower.reverse(&opening, &cells, &classes, None).is_err());
+        assert!(tower.read_input_covectors(&mut tower.rest(), &classes, 2, |_| Ok(())).is_err());
+        let mut past = TowerState { news: clock.period(3).expect("a period"), ..tower.rest() };
+        assert!(tower.read(&mut past, &classes).is_err());
+        let mut other = tower.rest();
+        tower.advance(&mut other, 0).expect("advance");
+        if let Some(face) = other.open.as_mut() {
+            face.masses.pop();
+        }
+        assert!(tower.advance(&mut other, 1).is_err());
     }
 }

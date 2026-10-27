@@ -812,12 +812,13 @@ pub(super) fn run_with_execution(
         Some("read-tower-floor") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_tower_floor(args),
         Some("found-tower-pair") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_tower_pair(args),
         Some("found-tower-situated") if backend == CompleteLanguageTrainingBackend::HostReference => tower_situated::found_tower_situated(args),
-        Some("train-gated-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Fixed),
-        Some("train-credited-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, true, false, false, holonics::hnn::tower::TurnLadder::Fixed),
-        Some("train-target-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, true, true, false, holonics::hnn::tower::TurnLadder::Fixed),
-        Some("train-turned-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, true, holonics::hnn::tower::TurnLadder::Fixed),
-        Some("train-scaled-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Scaled),
-        Some("train-two-ladder-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Both),
+        Some("train-gated-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Fixed, None),
+        Some("train-credited-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, true, false, false, holonics::hnn::tower::TurnLadder::Fixed, None),
+        Some("train-target-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, true, true, false, holonics::hnn::tower::TurnLadder::Fixed, None),
+        Some("train-turned-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, true, holonics::hnn::tower::TurnLadder::Fixed, None),
+        Some("train-scaled-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Scaled, None),
+        Some("train-two-ladder-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Both, None),
+        Some("train-two-ladder-news-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train(args, false, false, false, holonics::hnn::tower::TurnLadder::Both, Some(tower_classes::race_news_clock())),
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
@@ -852,12 +853,13 @@ pub(super) fn run_with_execution(
 pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::realization::PassRealization) -> Result<()> {
     use holonics::hnn::tower::TurnLadder;
     match args.first().map(String::as_str) {
-        Some("train-gated-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Fixed, realization),
-        Some("train-scaled-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Scaled, realization),
-        Some("train-two-ladder-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, realization),
+        Some("train-gated-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Fixed, None, realization),
+        Some("train-scaled-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Scaled, None, realization),
+        Some("train-two-ladder-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, None, realization),
+        Some("train-two-ladder-news-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, Some(tower_classes::race_news_clock()), realization),
         Some("train-unit-tower") => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, realization),
         Some("release-tower-classes") => tower_classes::release_realized(args, realization),
-        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-unit-tower or release-tower-classes".into()),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-unit-tower or release-tower-classes".into()),
     }
 }
 

@@ -21,8 +21,12 @@
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
 //! ranks carried by every stream beside its modes, each riding its level's mode or its founded pair
 //! move at the cell's pair, its pools generated from `b` and `E₀` where the material is read, and
-//! its face read through the pair contact with the top face). Any other is refused before a launch
-//! ([`TowerCard::admits`]), never run on a partial law.
+//! its face read through the pair contact with the top face), and with or without a news clock
+//! (`NewsClock`, never beside the ring face: each stream carries its open face and phase beside its
+//! modes, the forward reads every level's ticks from the arriving class's code under the open face
+//! and moves each level's modes once a tick, and the modes' scan carries the covector back through
+//! each tick). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
+//! law.
 //!
 //! # The realizations (hardware law)
 //!
@@ -123,6 +127,12 @@ struct LawWords {
     turn_spread: u32,
     ladder: [[i64; 2]; LADDER],
     level: [LevelWords; MAX_LEVELS],
+    /// The news clock (`news = 0` without one): each level's section on `2^(−20)` bits (level 0's
+    /// unread) and the clock's period ([`NewsClock`]).
+    news: u32,
+    pad1: u32,
+    sections: [u64; MAX_LEVELS],
+    period: u64,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -207,6 +217,9 @@ struct FrameWords {
     units: u64,
     ds: u64,
     r_ds: u64,
+    news_open: u64,
+    news_ends: u64,
+    ticks: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -254,6 +267,8 @@ struct Shape {
     ring_moves: usize,
     /// One when the modes are turned, else zero.
     turned: usize,
+    /// One when the levels tick on a news clock, else zero.
+    news: usize,
 }
 
 impl Shape {
@@ -341,6 +356,12 @@ struct Frame<'c> {
     /// empty when unturned).
     units: CardBuffer<'c, i64>,
     ds: CardBuffer<'c, i64>,
+    /// The news clock's open face and phase for each stream before its first cell and after its
+    /// last (whether it has one, the total's two words, the phase, then the masses), and each
+    /// cell's ticks a level (each empty without a clock).
+    news_open: CardBuffer<'c, u64>,
+    news_ends: CardBuffer<'c, u64>,
+    ticks: CardBuffer<'c, u32>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
@@ -446,6 +467,15 @@ impl<'c> TowerCard<'c> {
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
+        if let Some(clock) = &law.news {
+            if law.ring.is_some() {
+                return refuse("the card carries no ring beside a news clock");
+            }
+            clock.period(d.levels)?;
+            for l in 1..d.levels {
+                clock.section(l)?;
+            }
+        }
         if law.face_roots.iter().chain(&law.move_roots).any(|&r| r >= 1u128 << 63) {
             return refuse("the exponential's roots lie below 2^63");
         }
@@ -499,6 +529,13 @@ impl<'c> TowerCard<'c> {
             words.ring_factors = ring.factors as u64;
             words.ring_reach = ring.reach;
         }
+        if let Some(clock) = &law.news {
+            words.news = 1;
+            words.period = clock.period(d.levels).expect("admitted");
+            for l in 1..d.levels {
+                words.sections[l] = clock.section(l).expect("admitted");
+            }
+        }
         for (slot, lv) in words.level.iter_mut().zip(&law.levels) {
             *slot = LevelWords {
                 move_re: lv.move_re as u64,
@@ -543,7 +580,7 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         let card = self.card;
-        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, .. } = shape;
+        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, .. } = shape;
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let q = s * t;
@@ -620,6 +657,9 @@ impl<'c> TowerCard<'c> {
             ring_g: card.alloc(s * r * shape.rank_material())?,
             units: card.alloc(ql * n * 2 * turned)?,
             ds: card.alloc(ql * n * turned)?,
+            news_open: card.alloc(s * (a + 4) * news)?,
+            news_ends: card.alloc(s * (a + 4) * news)?,
+            ticks: card.alloc(ql * news)?,
             reach_offsets,
         });
         Ok(())
@@ -706,6 +746,9 @@ impl<'c> TowerCard<'c> {
             units: frame.units.device_ptr(),
             ds: frame.ds.device_ptr(),
             r_ds: r(16),
+            news_open: frame.news_open.device_ptr(),
+            news_ends: frame.news_ends.device_ptr(),
+            ticks: frame.ticks.device_ptr(),
         }
     }
 
@@ -749,7 +792,7 @@ impl<'c> TowerCard<'c> {
         let status = self.card.fetch(&frame.status).map_err(device)?;
         for (s, &bits) in status.iter().enumerate() {
             if bits != 0 {
-                let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a gated move reached the unit circle"), (16, "a class outside the declared alphabet")];
+                let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a gated move reached the unit circle"), (16, "a class outside the declared alphabet"), (32, "a news phase or an arrival's ticks outgrew its carrier, or an open face was empty")];
                 let named: Vec<&str> = names.iter().filter(|(b, _)| bits & b != 0).map(|(_, n)| *n).collect();
                 return Err(TowerError::Realization(format!("the card refused stream {s}: {}", named.join("; "))));
             }
@@ -806,9 +849,42 @@ impl<'c> TowerCard<'c> {
         {
             return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and no strand residue"));
         }
+        // The news clock's open face and phase, each mass within the face's total and a 64-bit
+        // word (the forward's own faces are), the phase below the clock's period.
+        let news_open: Vec<u64> = match &law.news {
+            None => {
+                if opening.iter().any(|o| o.open.is_some() || o.news != 0) {
+                    return Err(TowerError::Refused("an open face or news phase without a news clock"));
+                }
+                Vec::new()
+            }
+            Some(clock) => {
+                let period = clock.period(d.levels)?;
+                let mut words = Vec::with_capacity(streams * (d.alphabet + 4));
+                for o in opening {
+                    if o.news >= period {
+                        return Err(TowerError::Refused("a news phase past its clock's period"));
+                    }
+                    match &o.open {
+                        None => {
+                            words.extend([0, 0, 0, o.news]);
+                            words.extend(std::iter::repeat_n(0, d.alphabet));
+                        }
+                        Some(face) => {
+                            if face.masses.len() != d.alphabet || face.total == 0 || face.masses.iter().any(|&m| m > face.total || m > u64::MAX as u128) {
+                                return Err(TowerError::Refused("the card opens on a face of the alphabet, each mass a 64-bit word within its total"));
+                            }
+                            words.extend([1, face.total as u64, (face.total >> 64) as u64, o.news]);
+                            words.extend(face.masses.iter().map(|&m| m as u64));
+                        }
+                    }
+                }
+                words
+            }
+        };
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -859,6 +935,9 @@ impl<'c> TowerCard<'c> {
                 let hands: Vec<u32> = opening.iter().flat_map(|o| o.hands.iter().map(|&h| u32::from(h))).collect();
                 card.write(&frame.hands_open, 0, &hands).map_err(device)?;
             }
+            if !news_open.is_empty() {
+                card.write(&frame.news_open, 0, &news_open).map_err(device)?;
+            }
             card.zero_octets(&frame.status, 0, 4 * streams).map_err(device)?;
             if keep {
                 card.zero_octets(&frame.swell, 0, 8 * 4 * d.levels).map_err(device)?;
@@ -874,6 +953,7 @@ impl<'c> TowerCard<'c> {
         let ends = self.card.fetch(&frame.ends).map_err(device)?;
         let (ring_ends, hands_ends) = if ranks > 0 { (self.card.fetch(&frame.ring_ends).map_err(device)?, self.card.fetch(&frame.hands_ends).map_err(device)?) } else { (Vec::new(), Vec::new()) };
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
+        let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let faces: Vec<Vec<Option<(u128, u128)>>> = targets
             .iter()
             .enumerate()
@@ -904,6 +984,11 @@ impl<'c> TowerCard<'c> {
                 if ranks > 0 {
                     state.ring = (0..ranks).map(|r| (ring_ends[(s * ranks + r) * 2], ring_ends[(s * ranks + r) * 2 + 1])).collect();
                     state.hands = (0..ranks).map(|r| hands_ends[s * ranks + r] != 0).collect();
+                }
+                if !news_ends.is_empty() {
+                    let end = &news_ends[s * (d.alphabet + 4)..(s + 1) * (d.alphabet + 4)];
+                    state.open = (end[0] != 0).then(|| TowerFace { masses: end[4..].iter().map(|&m| u128::from(m)).collect(), total: end[1] as u128 | (end[2] as u128) << 64 });
+                    state.news = end[3];
                 }
                 state
             })
@@ -1146,7 +1231,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

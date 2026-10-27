@@ -283,9 +283,9 @@ pub struct ResidentRing {
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
 /// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
-/// they are joined, and whether a rotor or strands are. Read from the tower's own owners, so a realization
-/// holds no second copy of a law, and a realization that does not carry a joined part refuses the
-/// tower rather than reading it without that part.
+/// they are joined, whether a rotor or strands are, and the news clock when one is joined. Read
+/// from the tower's own owners, so a realization holds no second copy of a law, and a realization
+/// that does not carry a joined part refuses the tower rather than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -307,6 +307,7 @@ pub struct ResidentLaw {
     pub ring: Option<ResidentRing>,
     pub rotor: bool,
     pub strands: bool,
+    pub news: Option<NewsClock>,
 }
 
 impl Tower {
@@ -450,6 +451,7 @@ impl Tower {
             }),
             rotor: self.rotor.is_some(),
             strands: self.strands.is_some(),
+            news: self.news,
         })
     }
 }
