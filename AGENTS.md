@@ -305,6 +305,34 @@ Athena text milestone claimed before a test of use was retracted or retired.
 - A failed gate is the next loop's subject. Work on the failure, not past it, and name the blocker
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
+[project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
+[the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
+the aim is a plastic network that runs fast on it, never transformer-style vertical data scaling.
+From October 23 to 27 the Athena tower training runs went through the host realization on eight CPU
+threads (the card ran only the October 25 pass of the gated tower, a narrower law), while the learner
+stayed at two levels of 64 modes, eight streams and three passes of 3.5 MB under deadlines of tens to
+hundreds of CPU seconds: the run rules were kept and the architecture and data were given up.
+- **Learning runs on the card.** Every training pass, lap and measurement of an HNN learner runs
+  through its card realization. The host realization is the reference that checks the card's bits,
+  not where learning runs.
+- **A part enters a run with its card realization.** A new face, contact, ring, pump or step enters a
+  learner run only with its card realization and its parity against the host. Learning on the host
+  needs Brandon's own exception, in his words, naming the workload, its purpose and its limits; a
+  brief, a worker or another agent's agreement does not grant one. Without it the run is blocked
+  until the part's card realization passes its parity. A host learner run without that exception
+  is a defect, reported as one, and its result is incomplete evidence.
+- **Host work inside a card run is measured.** Each receipt names the device and states the card's
+  time, the host's time and the host threads. When the host's share dominates (the certificate held
+  the card to 3.9 times the host on October 25), that host work is the next loop's subject.
+- **The workload is not a limit's variable.** The design fixes the data, the passes and the
+  learner's levels and modes; time and memory are projected from that workload on the card. A run
+  that does not fit gets the card, a better partition of the work, or a stated long run scheduled
+  beside the others. It never gets less data, fewer passes or a smaller learner: that trades the law
+  for the clock, and the waiting standard below never licenses it.
+- **Whoever launches owns the device line.** A brief names its device, the card lock
+  (`.local/gpu.lock`) and the card's memory beside the host's threads and memory. The reviewer and
+  the coordinator read that line before reading a result.
+
 [project-postulate] **Waiting, deadlines and concurrency** (Brandon, September 30: "they're wasting a
 ton of time waiting repeatedly and we need standards for this so that they don't freely keep raising
 the limit"; [the audit](research/records/2026-09-30_AUDIT_WAITING_DEADLINES_AND_CONCURRENCY_THE_WORKERS_BLOCKED_ON_THEIR_OWN_RUNS.md)). Since the reset, 87,780 s of the workers' 194,986 s of
@@ -328,13 +356,17 @@ foreground shell time went to wait loops.
 - **Never raise a limit** (lesson 9). A run past its deadline is reported incomplete and is not
   relaunched with a larger deadline, timeout or budget (the audit found 9 deadline raises and 20
   tool-timeout raises). The next loop changes the law, the partition or the declared read, and says
-  why.
+  why. It never cuts the workload the design fixed (GPU first, above).
 - **Limits come from the workload** (Brandon, October 8). A memory ceiling is set from the peak of
   what the run materializes, estimated from the workload and then measured, and is at least 8 GiB
   per job unless a measured peak shows less is needed; a stop at a copied cap measures the cap, not
-  the run. An unmeasured run is planned at one to three minutes, and a longer run is authorized when
-  its cost and value are stated and it is scheduled beside the other workers' runs.
-- **Run independent work together.** The host has 12 physical cores with two threads each
+  the run. An unmeasured run is first read for one to three minutes on the opening sections of its
+  whole workload, on the card, and the run is projected from that read. A longer run is authorized
+  when its cost and value are stated and it is scheduled beside the other workers' runs; its length
+  is never a reason to cut the workload.
+- **Run independent work together.** The card (80 multiprocessors, under `.local/gpu.lock`) is the
+  default device for learner runs; the thread budgets below are for a card run's host part or a
+  host run under Brandon's exception. The host has 12 physical cores with two threads each
   (24 hardware threads) and 32,746,147,840 bytes of memory; two 8-thread passes run together slow
   each other 1.31× (measured October 26), so a time per unit measured alone projects a run alone.
   Independent runs launch together when their declared threads and resident sets fit beside the
@@ -401,6 +433,8 @@ older one.
   - which of the six general objects of the [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) it
     touches (helix, pair, faces and placement, cell holonomy, tube, tower thread), keeping the rest
     attached.
+  - the device line (GPU first): the card and its lock, or Brandon's exception for a host run,
+    and the workload the design fixed;
   - the waiting standard above: background launch, the projection and its fixed deadline, early
     stop, no raised limit, the thread budget and isolated scratch.
 - The primary inspects source and integrates the returns; worker measurements are receipts.
