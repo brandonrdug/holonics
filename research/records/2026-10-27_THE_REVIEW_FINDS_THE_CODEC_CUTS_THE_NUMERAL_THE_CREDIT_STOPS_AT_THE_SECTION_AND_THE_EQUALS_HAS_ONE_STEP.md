@@ -156,7 +156,9 @@ never-met right above fix 1's count by the paired line (`b − c > 1.96·√(b +
 from fixes 1 and 2's reads, before it is built: if the leading digit stays at its foil while the
 last digit is above, the order is the limit, and a numeral is presented lowest place first at the
 codec (the chart's places already name each digit's power, so the order is a presentation, decoded
-back); otherwise the release takes silent steps at the equals before it writes. Pass: the leading
+back); otherwise the release takes more steps of its own clock before it writes, never steps
+triggered by a named mark: a step keyed to the `=` byte would be a routine authored for the task
+(the `=` is where the read checks, never a law of the learning). Pass: the leading
 digit right above its foil on never-met calculations, and never-met right above 34.
 
 ## 5. Strategy beyond the equals
@@ -187,6 +189,11 @@ another variant of the contact can be read.
 - **A located cause carried unrepaired into a new consumer.** The zeroed 17% was in every read since
   the units were founded; every count above carries it, and fix 1's reads are compared with that
   stated.
+- **Every key located is not nothing authored.** The rotor towers, `UA` and `US` among them, are
+  founded from a menu of stretches of three numerals with single bytes between them, a shape chosen
+  because calculations have it; the closing byte (`=`) and its keys are located from the text, but
+  the stretch is authored. It computes no value, and it stands as a stated qualification on every
+  rotor tower's read until the menu is located from unnamed bytes.
 - **Bits read as progress.** The held-out bits are reported beside the read and decide nothing.
 - **Seen material graded as unseen.** Met and never-met calculations are read apart.
 
