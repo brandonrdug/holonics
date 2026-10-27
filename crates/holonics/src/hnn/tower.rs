@@ -4012,7 +4012,62 @@ fn turn_ladder(modes: usize) -> usize {
 
 /// The exact comparison of two sections' codes: does `new` code strictly fewer bits than `old`?
 /// `Π p_new > Π p_old`, over the products of their faces' numerators and denominators.
+///
+/// [definition; agent-inferred, October 27] **The certificate decided by partition.** The products
+/// are compared through their logarithms first: each numerator and denominator `v` is read on
+/// `2^(−CERTIFICATE_DIGITS)` ([`log2_reading`]), whose reading lies within `CERTIFICATE_SLACK`
+/// grains of `log₂ v`. When the two sides' summed readings differ by more than every reading's
+/// slack together, the sign of the difference is the sign of `log₂ Π p_new − log₂ Π p_old`, and so
+/// the answer of the exact comparison; only inside that band are the products formed
+/// ([`fewer_bits_exact`]). The answer is always the exact comparison's: the readings partition the
+/// sections into those they decide and those the products decide. The readings are an integer sum,
+/// so any partition of the faces sums them to the same bits. Measured October 25, the products
+/// took 0.5 s a section at 320 streams and bounded the card's pass.
 fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    let side = |faces: &[(u128, u128)]| -> i128 { faces.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
+    let difference = side(new) - side(old);
+    let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
+    if difference > slack {
+        return true;
+    }
+    if difference < -slack {
+        return false;
+    }
+    fewer_bits_exact(old, new)
+}
+
+/// The fractional digits of the certificate's logarithmic readings.
+const CERTIFICATE_DIGITS: u32 = 32;
+
+/// How far a reading may lie from `log₂ v`, in grains of `2^(−CERTIFICATE_DIGITS)`. With `μ` the
+/// mantissa, `d_k` the digits and `ε_k ≥ 0` the logarithm each release at `2^(−62)` takes off
+/// (`ε_k < 2^(−61)`, the mantissa staying in `[1, 2)`), the squarings unroll to
+/// `log₂ μ = Σ_(k≤K) 2^(−k) d_k + 2^(−K) log₂ μ_K + Σ_(k≤K) 2^(−k) ε_k`, so a reading lies below
+/// `log₂ v` by less than one grain and `2^(−60)` (the entry release included), never above it;
+/// three grains hold that with room.
+const CERTIFICATE_SLACK: i128 = 3;
+
+/// `log₂ v` for `v ≥ 1` on `2^(−CERTIFICATE_DIGITS)`: the whole part from `v`'s width, then the
+/// mantissa's binary digits by squaring (released at `2^(−62)`), halving it when it passes two.
+/// A `v` wider than 63 bits enters through its leading 63 (a relative release below `2^(−62)`).
+fn log2_reading(v: u128) -> i128 {
+    let v = v.max(1);
+    let width = 128 - v.leading_zeros();
+    let mut mantissa = if width > 63 { v >> (width - 63) } else { v << (63 - width) }; // in [2^62, 2^63)
+    let mut fraction = 0i128;
+    for _ in 0..CERTIFICATE_DIGITS {
+        mantissa = (mantissa * mantissa) >> 62;
+        fraction <<= 1;
+        if mantissa >= 1u128 << 63 {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    ((width as i128 - 1) << CERTIFICATE_DIGITS) + fraction
+}
+
+/// The products themselves: `Π m_new · Π t_old > Π m_old · Π t_new`.
+fn fewer_bits_exact(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     fn product(v: &[u128]) -> BigUint {
         match v.len() {
             0 => BigUint::from(1u8),
@@ -4734,6 +4789,74 @@ pub fn code_of(m: u128, t: u128) -> i64 {
 mod tests {
     use super::*;
 
+    #[test]
+    fn the_certificates_reading_lies_within_one_grain_below_the_logarithm() {
+        // floor(log₂ v · 2^32), read to 80 digits outside: a reading is it or one grain below.
+        for (v, floor) in [
+            (1u128, 0i128),
+            (2, 1 << 32),
+            (3, 6_807_362_105),
+            (10, 14_267_572_527),
+            (1_000_003, 85_605_453_752),
+            ((1 << 100) + 12_345, 429_496_729_600),
+            (u128::MAX, 549_755_813_887),
+        ] {
+            let r = log2_reading(v);
+            assert!(r <= floor && r >= floor - 1, "{v}: {r} against {floor}");
+        }
+        for k in 0..128 {
+            assert_eq!(log2_reading(1u128 << k), (k as i128) << CERTIFICATE_DIGITS);
+        }
+    }
+
+    #[test]
+    fn the_certificate_decided_by_partition_is_the_exact_comparison() {
+        // A fixed integer sequence (splitmix64) of faces; the partition's answer is the products'.
+        let mut state = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = move || {
+            state = state.wrapping_add(0x9e37_79b9_7f4a_7c15);
+            let mut z = state;
+            z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+            z ^ (z >> 31)
+        };
+        let mut face = |next: &mut dyn FnMut() -> u64| {
+            let total = (next() as u128) << (next() % 12) | 1;
+            let mass = (next() as u128 % total).max(1);
+            (mass, total)
+        };
+        let (mut decided, mut fell_back) = (0, 0);
+        for round in 0..400 {
+            let n = 1 + round % 97;
+            let old: Vec<(u128, u128)> = (0..n).map(|_| face(&mut next)).collect();
+            let new: Vec<(u128, u128)> = match round % 4 {
+                // unrelated faces
+                0 => (0..n).map(|_| face(&mut next)).collect(),
+                // the same faces in another order: equal products, never fewer bits
+                1 => old.iter().rev().copied().collect(),
+                // one mass moved by one: a difference far inside the slack
+                2 => {
+                    let mut v = old.clone();
+                    let i = (next() as usize) % n;
+                    v[i].0 = if next() % 2 == 0 { v[i].0 + 1 } else { (v[i].0 - 1).max(1) };
+                    v
+                }
+                // every mass doubled where it stays below its total
+                _ => old.iter().map(|&(m, t)| ((2 * m).min(t), t)).collect(),
+            };
+            let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
+            let side = |f: &[(u128, u128)]| -> i128 { f.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
+            if (side(&new) - side(&old)).abs() > slack {
+                decided += 1;
+            } else {
+                fell_back += 1;
+            }
+            assert_eq!(fewer_bits(&old, &new), fewer_bits_exact(&old, &new), "round {round}");
+            assert_eq!(fewer_bits(&new, &old), fewer_bits_exact(&new, &old), "round {round}, reversed");
+        }
+        assert!(decided > 0 && fell_back > 0, "both sides of the partition are exercised: {decided} {fell_back}");
+    }
+
     fn keys(n: usize) -> Vec<u8> {
         // A fixed exterior key stream for the fixtures: the bytes of a counter's squares.
         (0..n as u64).flat_map(|i| (i.wrapping_mul(2654435761) ^ (i * i)).to_be_bytes()[4..].to_vec()).collect()
@@ -5336,6 +5459,34 @@ mod tests {
     }
 
     /// The passage the strands' tests read: `1 2 + 2 1 = 1 2 + 1 = = 2`.
+    /// The held-out read through a realization is the frozen read, code for code, whatever the
+    /// window and however unequal the parts.
+    #[test]
+    fn a_realized_read_is_the_frozen_read_cell_by_cell() {
+        let tower = tiny_of(true);
+        let classes: Vec<usize> = (0..61usize).map(|i| (i * 7 + i / 3) % 4).collect();
+        let parts: Vec<&[usize]> = classes.chunks(17).collect();
+        let frozen: Vec<Vec<i64>> = parts.iter().map(|p| tower.read_cells(&mut tower.rest(), p).expect("read")).collect();
+        for section in [1, 3, 16, 40] {
+            let read = tower.read_parts_realized(&parts, section, &mut realization::HostPass::default()).expect("realized");
+            assert_eq!(read, frozen, "section {section}");
+        }
+        assert!(tower.read_parts_realized(&parts, 0, &mut realization::HostPass::default()).is_err());
+    }
+
+    /// The resident law names a joined rotor and joined strands, so a realization that reads
+    /// neither (the card's) refuses such a tower instead of reading it as the plain one.
+    #[test]
+    fn the_resident_law_names_a_joined_rotor_and_strands() {
+        let plain = tiny_contacts(2, 9, 4, true, false, false, ContactLaw::Rectifying);
+        let law = plain.resident_law().expect("law");
+        assert!(!law.rotor && !law.strands);
+        let rotor = rotor_on(plain.clone()).resident_law().expect("law");
+        assert!(rotor.rotor && !rotor.strands);
+        let strands = stranded(plain, false).resident_law().expect("law");
+        assert!(!strands.rotor && strands.strands);
+    }
+
     const STRANDED: [usize; 13] = [0, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1];
 
     /// Joined at zero, the strands' material reads nothing: on the rotor tower the modes and faces

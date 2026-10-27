@@ -7,10 +7,11 @@
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
 //!   host's through `HostPass`, the card's through `TowerCard`) and their texts and continuing
 //!   states are compared. Prints one `TOWER_PARITY` line a section and `TOWER_PARITY_DONE`.
-//! - `tower_pass train complete-language ARGS…`: a `complete-language` tower-classes training
-//!   command (`train-gated-tower-classes`, `train-scaled-tower-classes`,
-//!   `train-two-ladder-tower-classes`) with every section's forward and reverse on the card; its
-//!   saved learner is the host's (`TOWER_STATE`'s digest names it).
+//! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
+//!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
+//!   or `train-unit-tower` on the founded units) with every section's forward and reverse on the
+//!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
+//!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]

@@ -224,3 +224,54 @@ against decision 1a; then the rules (`rings`, `heard` and `gaps` over the healed
 the healed and the unhealed reads, and `pair` of each healed read with its unhealed one). No tower
 is founded or trained. Every output stays on the PC; the receipt is copied here with the release
 text, marks and unit pieces left out.
+
+## 8. Fix 1's run: the healed read reaches the cut calculations, and no tower passes
+
+[measured] On Brandon's PC from `4c02fa710` (binary SHA-256 `e66322bd…2292`). **Device: the host,
+eight threads** (`RAYON_NUM_THREADS=8`); the written read has no card realization yet, and these
+reads were launched before the October 27 GPU-first ruling. Its port is owed by design (the
+[GPU-first record](2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)).
+Every input was checked by full SHA-256, and every final state matched its training log.
+
+Eight of the eleven towers were read. `PR`, `PRK` and `PRI` were refused before any read: their
+saved states use the rotor's and the strands' older text (a `rotor` head without its rings, a
+`strands` head of nine fields), which the current parser no longer takes. An old save is a
+superseded prototype, so they stay unread.
+
+- **1a holds.** All eight healed `FREE.tsv` files equal their unhealed reads' by SHA-256; the free
+  release did not move. The seven towers on the committed units wrote one `CUTS.tsv`
+  (`ce6c893f…ddd4`); `F`'s digit units end every equals (`e93f4626…5a2c`, no cut calculation).
+- **The heal reaches the cut.** On the 422 calculations whose `=` no unit ends at, every tower
+  wrote 0 right unhealed and 7 to 11 right healed.
+- **1b fails.** Never-met right at the equals, healed: `C` 14, `F` 22, `PP` 8, `PRT` 26, `PRS` 22,
+  `PRA` 16, `PRJ` 21, `PRE` 28, all below the 8-gram's 34 of 876.
+- **1c: the zero was not only the cut.** In every tower the share right on the cut calculations
+  stays below half its share on the others:
+
+| tower | cut (of 422) | others (of 2,026) | ratio of shares | right, unhealed → healed | never met, unhealed → healed |
+|---|---|---|---|---|---|
+| `C` | 7 | 184 | 0.18 | 190 → 191 | 14 → 14 |
+| `PP` | 8 | 102 | 0.38 | 109 → 110 | 5 → 8 |
+| `PRT` | 10 | 227 | 0.21 | 240 → 237 | 24 → 26 |
+| `PRS` | 11 | 268 | 0.20 | 288 → 279 | 19 → 22 |
+| `PRA` | 8 | 267 | 0.14 | 286 → 275 | 18 → 16 |
+| `PRJ` | 10 | 227 | 0.21 | 233 → 237 | 19 → 21 |
+| `PRE` | 10 | 228 | 0.21 | 245 → 238 | 26 → 28 |
+| `F` | (none) | 155 of 2,448 | | 156 → 155 | 25 → 22 |
+
+- **The heal moves the bounded calculations too.** It withholds the prompt's last unit on every
+  calculation, and 1,486 of the 2,448 withheld units are wider than the `=`, so those releases are
+  drawn again; each calculation's draws also move the key stream under every later calculation of
+  its problem. Right on the bounded calculations fell in most towers (`PRA` 286 → 267, `PRS` 288 →
+  268, `PRE` 245 → 228). Paired calculation by calculation, only `PRS`'s met calculations move
+  past the line, down (healed alone 12, unhealed alone 24; `12 > 11.76`); no never-met pair does.
+
+[derived] The healed reads replace the unhealed ones in every later comparison. The cut
+calculations stay low after healing: where the units fuse the equals with the bytes around it, the
+tower must open its release on a unit that agrees with an unspent tail, and its face holds little
+mass there. Per 1c, that is this line's next subject, read on the learner the long card run trains;
+it is not answered by another variant read on the host.
+
+Receipts: build 128.6 s against a 127 s projection (deadline 180 s, peak 3.44 GB); the eight reads
+12.8 to 17.0 s against their own earlier walls (ratios 0.94 to 1.00, deadline 30 s, peak 40 to
+46 MB); the three refusals 0.0 to 0.1 s; the rules 4.2 to 35.0 s under 60 s.

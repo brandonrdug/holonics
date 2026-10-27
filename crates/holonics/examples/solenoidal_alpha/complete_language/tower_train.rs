@@ -39,29 +39,19 @@ pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
 /// The held-out reading: the frozen tower's code of `classes`, cut into `streams` contiguous
 /// parts, each read from rest; per region of `roles` (the coded class's region, the region of its
 /// first byte), on `2^(−20)` bits, with the bytes coded (`lengths`, each class's bytes).
-fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize) -> Result<[(i64, usize); 4]> {
-    let chunk = classes.len().div_ceil(streams);
-    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
-    let parts: Vec<[(i64, usize); 4]> = starts
-        .par_iter()
-        .map(|&start| {
-            let part = &classes[start..(start + chunk).min(classes.len())];
-            let mut state = tower.rest();
-            let codes = tower.read_cells(&mut state, part).map_err(|e| e.to_string())?;
-            let mut regions = [(0i64, 0usize); 4];
-            for (i, code) in codes.into_iter().enumerate() {
-                let region = &mut regions[roles[start + i + 1] as usize];
-                region.0 += code;
-                region.1 += lengths[start + i + 1] as usize;
-            }
-            Ok(regions)
-        })
-        .collect::<std::result::Result<_, String>>()?;
+fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize, section: usize, realization: &mut dyn PassRealization) -> Result<[(i64, usize); 4]> {
+    // Each part from rest, read through the declared realization (the card's route reads it on
+    // the card) in windows of the training section.
+    let chunk = classes.len().div_ceil(streams).max(1);
+    let parts: Vec<&[usize]> = classes.chunks(chunk).collect();
+    let codes = tower.read_parts_realized(&parts, section, realization).map_err(|e| e.to_string())?;
     let mut regions = [(0i64, 0usize); 4];
-    for part in parts {
-        for (r, (code, n)) in part.into_iter().enumerate() {
-            regions[r].0 += code;
-            regions[r].1 += n;
+    for (p, part) in codes.into_iter().enumerate() {
+        let start = p * chunk;
+        for (i, code) in part.into_iter().enumerate() {
+            let region = &mut regions[roles[start + i + 1] as usize];
+            region.0 += code;
+            region.1 += lengths[start + i + 1] as usize;
         }
     }
     Ok(regions)
@@ -81,7 +71,8 @@ pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
     let roles = roles_of(&args[5], &args[6], dev.len())?;
     let streams = positive(&args[7])?;
     let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
-    let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams)?;
+    let section = classes.len().div_ceil(streams).max(1);
+    let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams, section, &mut HostPass::default())?;
     let (code, coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
     println!(
         "TOWER_HELD streams={streams} dev_bits_a_byte={} dev_regions {} elapsed_ms={}",
@@ -3335,7 +3326,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 /// turns and reflects every mode, the Swing's three kinds keyed by the unit), and
 /// `train-unit-pair-pumped-tower` the pumped tower whose contacts are pair contacts, which take the
 /// product of two modes' phases (record `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
-pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw) -> Result<()> {
+pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 20 && args.len() != 22 {
         return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -3362,7 +3353,7 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, &mut HostPass::default())
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, realization)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3563,7 +3554,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;
         println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
-        let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams)?;
+        let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams, section, realization)?;
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
             "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={} train_code={code} dev_code={dev_code} grain_bits={READ_BITS}",

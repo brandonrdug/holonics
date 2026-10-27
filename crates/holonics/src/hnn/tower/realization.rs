@@ -174,8 +174,10 @@ pub struct ResidentLevel {
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face is
-/// joined. Read from the tower's own owners, so a realization holds no second copy of a law.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair face, ring face,
+/// rotor or strands are joined. Read from the tower's own owners, so a realization holds no second
+/// copy of a law, and a realization that does not carry a joined part refuses the tower rather
+/// than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -190,9 +192,42 @@ pub struct ResidentLaw {
     pub ln2_square: i128,
     pub pair_face: bool,
     pub ring_face: bool,
+    pub rotor: bool,
+    pub strands: bool,
 }
 
 impl Tower {
+    /// [definition; agent-inferred, October 27] **A frozen read through a realization**: each part
+    /// read from rest, the code `−log₂ p̂` of every class after its first on `2^(−20)` bits, as
+    /// [`Tower::read_cells`] reads it, in windows of `section` cells whose continuing states are
+    /// carried into the next window ([`Slot::Reread`]), so the held-out read runs where the
+    /// training passes run. A part shorter than the longest is padded past its end with places
+    /// compared with nothing; the forward reads in order, so the padding moves no face the part
+    /// reads. The tower is not moved.
+    pub fn read_parts_realized(&self, parts: &[&[usize]], section: usize, realization: &mut dyn PassRealization) -> Result<Vec<Vec<i64>>> {
+        if section == 0 {
+            return Err(TowerError::Refused("a realized read takes windows of at least one cell"));
+        }
+        let longest = parts.iter().map(|p| p.len()).max().unwrap_or(0);
+        let mut codes: Vec<Vec<i64>> = parts.iter().map(|p| Vec::with_capacity(p.len().saturating_sub(1))).collect();
+        let mut states: Vec<TowerState> = parts.iter().map(|_| self.rest()).collect();
+        let mut at = 0usize;
+        while at + 1 < longest {
+            let cells = section.min(longest - 1 - at);
+            let windows: Vec<Vec<usize>> = parts.iter().map(|p| (at..=at + cells).map(|i| p.get(i).copied().unwrap_or(0)).collect()).collect();
+            let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| (at + 1..=at + cells).map(|i| p.get(i).copied()).collect()).collect();
+            let classes: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
+            let read = realization.forward(self, &states, &classes, &targets, Slot::Reread)?;
+            for (code, faces) in codes.iter_mut().zip(&read.faces) {
+                code.extend(faces.iter().flatten().map(|&(m, t)| face_code(m, t)));
+            }
+            let opening = states.clone();
+            realization.carry(self, &mut states, &opening, Slot::Reread)?;
+            at += cells;
+        }
+        Ok(codes)
+    }
+
     /// The tower's [`ResidentLaw`] for a section read under its current material.
     pub fn resident_law(&self) -> Result<ResidentLaw> {
         let reaches = self.reaches();
@@ -239,6 +274,8 @@ impl Tower {
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
             pair_face: self.pair.is_some(),
             ring_face: self.ring.is_some(),
+            rotor: self.rotor.is_some(),
+            strands: self.strands.is_some(),
         })
     }
 }

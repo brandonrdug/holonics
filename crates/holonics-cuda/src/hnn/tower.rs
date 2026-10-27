@@ -306,6 +306,9 @@ impl<'c> TowerCard<'c> {
         if law.pair_face || law.ring_face {
             return refuse("the card carries no pair or ring face");
         }
+        if law.rotor || law.strands {
+            return refuse("the card carries no rotor or strands: its forward reads no step or strand contact and its reverse has no strand gradient");
+        }
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
@@ -565,8 +568,10 @@ impl<'c> TowerCard<'c> {
         if streams == 0 || cells == 0 || classes.iter().any(|c| c.len() != cells + 1) || targets.len() != streams || targets.iter().any(|t| t.len() != cells) {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
-        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
-            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank"));
+        if opening.len() != streams
+            || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || !o.hands.is_empty() || !o.strands.is_empty() || o.reversed || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
+        {
+            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, with no ring, hand or strand residue"));
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells };
         self.frame(shape).map_err(device)?;
@@ -789,19 +794,20 @@ impl PassRealization for TowerCard<'_> {
 
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let started = Instant::now();
-        let read = self.read_forward(tower, opening, classes, targets, slot);
+        // Only a completed read is counted, so the timing reports passes the card carried.
+        let read = self.read_forward(tower, opening, classes, targets, slot)?;
         self.times.forwards += 1;
         self.times.forward_ns += started.elapsed().as_nanos();
-        read
+        Ok(read)
     }
 
     fn reverse(&mut self, _tower: &Tower, _opening: &[TowerState], _classes: &[&[usize]], _compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
         // The comparison is the opening read's targets, uploaded with it.
         let started = Instant::now();
-        let g = self.read_reverse();
+        let g = self.read_reverse()?;
         self.times.reverses += 1;
         self.times.reverse_ns += started.elapsed().as_nanos();
-        g
+        Ok(g)
     }
 
     fn carry(&mut self, _tower: &Tower, states: &mut [TowerState], _opening: &[TowerState], slot: Slot) -> Result<()> {
