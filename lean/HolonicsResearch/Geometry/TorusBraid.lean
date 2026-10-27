@@ -29,10 +29,11 @@ shear).
    `trace_boost_commutator`): with
    `B = [[1,1],[1,2]]`, `A B A⁻¹ B⁻¹ = [[−7,6],[−6,5]]`, trace `−2`.
 
-Owed: that a hyperbolic automorphism `M` of the torus `ℝ²/ℤ²` has exactly `|det(M − 1)|` fixed
-points (the index of `(M − 1)ℤ²` in `ℤ²`), which turns item 5's determinant into the count.
+The index law that turns item 5's determinant into the count, that an automorphism `M` of the
+torus `ℝ²/ℤ²` with `det(M − 1) ≠ 0` has exactly `|det(M − 1)|` fixed points, is
+`Geometry/TorusIndex` (`card_fixed`, `cat_fixed_points`).
 
-Consumers: the atlas row `motion.torus-twists-every-kind`.
+Consumers: the atlas row `motion.torus-twists-every-kind` and `Geometry/TorusIndex`.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -161,7 +162,7 @@ theorem det_cat_pow_sub_one (k : ℕ) :
   ring
 
 /-- [proved-standard; formal-checked] **`|det(A^(k+1) − 1)| = L_(2k+2) − 2`**, the number of the
-cat map's fixed points on the torus once the index law (owed above) is joined. -/
+cat map's fixed points on the torus by the index law (`TorusIndex.cat_fixed_points`). -/
 theorem abs_det_cat_pow_sub_one (k : ℕ) :
     |(A ^ (k + 1) - 1).det| = ((Nat.fib (2 * k + 1) : ℤ) + Nat.fib (2 * k + 3)) - 2 := by
   rw [det_cat_pow_sub_one, abs_sub_comm]

@@ -186,7 +186,8 @@ chart).
 shear. They satisfy the braid relation `TLT = LTL`, and their words give every kind of move:
 - `TL⁻¹ = [[2,1],[1,1]]` is a boost (trace 3): the cat map, Arnold's mixing of the torus. Its fixed
   points on the torus number `|det(Aᵏ − 1)| = L_(2k) − 2`, the Lucas numbers. This is checked for
-  `k = 1, …, 20`, and point by point for `k ≤ 5`: 1, 5, 16, 45, 121.
+  `k = 1, …, 20`, and point by point for `k ≤ 5`: 1, 5, 16, 45, 121; the count is formal-checked
+  for every `k` (§13 (e)).
 - `TL` is a turn of order six.
 - `TLT = [[0,1],[−1,0]]` is the quarter turn, which in the Weil representation is the Fourier chart
   of §5.
@@ -609,8 +610,13 @@ To #410:
   `orderOf_turn`), `TL⁻¹ = [[2,1],[1,1]]` (`cat_eq`), `A^(k+1) = [[F_(2k+3), F_(2k+2)],
   [F_(2k+2), F_(2k+1)]]` (`cat_pow`), `|det(A^(k+1) − 1)| = L_(2k+2) − 2` (`abs_det_cat_pow_sub_one`,
   `cat_counts`: 1, 5, 16, 45, 121) and the boosts' commutator `[[−7,6],[−6,5]]`
-  (`boost_commutator`). Still owed: that a hyperbolic automorphism `M` of the torus has exactly
-  `|det(M − 1)|` fixed points, which turns the determinant into the count.
+  (`boost_commutator`). The index law that turns the determinant into the count followed on
+  October 27 in [`Geometry/TorusIndex`](../../lean/HolonicsResearch/Geometry/TorusIndex.lean): an
+  integer matrix `M` on `ℝⁿ/ℤⁿ` with `det(M − 1) ≠ 0` has exactly `|det(M − 1)|` fixed points
+  (`card_fixed`, through the lattice index `#(ℤⁿ/Nℤⁿ) = |det N|`, `card_ker_act`), so on the
+  two-torus a move of determinant 1 and trace other than 2 fixes `|2 − tr M|` points
+  (`card_fixed_two`): the turns `T L`, `T L T` and `−1` fix 1, 2 and 4, and the boost `A^(k+1)`
+  fixes `L_(2k+2) − 2` (`cat_fixed_points`).
 
 (i) was formal-checked the same day in
 [`Mathematics/RotorStep`](../../lean/HolonicsResearch/Mathematics/RotorStep.lean):
