@@ -46,8 +46,11 @@ encoding that merges exactly the directions every reading merges has the reading
 the receiving forms, meet the Hankel rank. The passage's own chart reads its continuation counts,
 which intertwine with its right actions (`continuation_intertwines`, Rust
 `hnn::encoding::PassageChart::passage`; the pin of September 29 of the passage's own transports).
-[open] That Birth's executed closure (`Compression/Landmark/Context/Birth`) spans exactly the
-readings `ρ ∘ T_w` restricted to the reached span is its ladder's statement, joined here in #62.
+Birth's executed closure (`Compression/Landmark/Context/Birth`) spans exactly the readings
+`ρ ∘ T_w` (`HolonicsResearch/Foundation/MinimalRetention.founded_eq_span_wordForms`), and on a
+reached span `R` its forms restrict to the span of `ρ ∘ T_w |_R`
+(`HolonicsResearch/Foundation/ActionDescent.founded_restrict_eq_span`); `encoding_descends_iff`
+holds with the encoding changing between contexts (`ActionDescent.linear_descent_iff`).
 
 The computational object is the helical pair interaction. Of the winding guide's six objects this
 module touches the **helix** (the transports and the moment's advance), the **pair** (the offset

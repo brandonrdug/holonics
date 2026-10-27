@@ -1887,7 +1887,7 @@ equation extraction (#146).
 | Mode release, FOUND by interconnection, far-field moment quotient `V_m` | deferred to after U3 (#73) |
 | Encoding, Context and JointPrediction (joint against marginal witnesses) | U6, after U1; the continuation-transport discovery of [F1's after-note](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md#f1-the-word-alphabet-campaign-5-73-148) stays live |
 | Concrete-tick diamond, complete word-sensitivity certificate | owed in #62 |
-| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | the carry word's consumer is the selective step, whose carry is a ring's section flux cell by cell (U5, Lean `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`); Hearing's consumer is `hnn::retention::separator` at the aeon's close (U2); owed in #62 (relative completeness, action-sufficient descent) |
+| The carry word's runtime consumer, relative completeness, action-sufficient descent in Lean, Hearing's consumer | the carry word's consumer is the selective step, whose carry is a ring's section flux cell by cell (U5, Lean `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`); Hearing's consumer is `hnn::retention::separator` at the aeon's close (U2); relative completeness owed in #410; action-sufficient descent is Lean `Foundation/ActionDescent` |
 | F4's decoder, producing keys, causal provenance, grain and fibre, release squares | U3 and F4's gate |
 | F5's cold restore, atomic native transition, truthful health receipts | F5's gate |
 | Moving-continuum electromagnetic reception | deferred to U7 (the physical terrains); owed in #62 |
