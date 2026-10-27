@@ -179,8 +179,9 @@ synthetic menu's laws, comparison and keys exactly; symbolically every row of th
 groups closes (4,150 and 3,694 with a ring; 116 and 70 results longer than four digits have none).
 On the stream the space takes `turned ← 0, sheet set to +1` and `<` takes `turned ← 0`; `.`, `>`
 keep the identity; the second round changes nothing. **All 8,031 calculations of the six groups
-close on the stream, 7,844 of 7,844 in the two largest (decision 1 needs 99%)**, and 17,234 of
-17,382 result digits are the tenth of the comparison's conjugate face (the rest are the results
+that a ring carries close on the stream**: 7,844 of the 8,030 in the two largest, 97.7%, the other
+186 being results longer than four digits, which no ring carries (§6 on decision 1's denominator).
+17,234 of 17,382 result digits are the tenth of the comparison's conjugate face (the rest are the results
 of all nines, their ring's zero, §2). Wall time 65 s
 ([LOCATE_DEV.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/LOCATE_DEV.md)).
 
@@ -243,9 +244,20 @@ ring).
 
 [measured] Brandon's PC, October 26 ([STRANDS_RUN.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/STRANDS_RUN.md)).
 On the training partition the located keys close all 7,042 calculations of the two largest closing
-groups, with 15,480 of 15,613 result digits read as §3 says, so decision 1 passes. Both towers then
-trained three passes together, 407 and 409 s against a projection of 646 and 640 s. They finished
-at 1.782 (`PRK`) and 1.797 (`PRI`) held-out bits a byte, against `PRT`'s 1.765.
+groups that a ring carries, with 15,480 of 15,613 of their result digits read as §3 says. The two
+groups hold 7,204 calculations: the other 162 (100 sums, 62 differences) are results of five or
+more digits, which no ring of length 1 to 4 carries (`rows_on` in `tower_rotor` admits no other
+exclusion here: every byte of a numeral is a digit and every digit turns).
+
+**Decision 1's denominator** (GPT-6's receipt question). Decision 1 was meant as the keys' closure
+on the calculations a ring carries, and was written without naming its denominator; the brief to
+the PC read it on those rows (7,042 of 7,042). On all the two groups' calculations it is 7,042 of
+7,204, 97.75%, below its 99%: by its own words decision 1 stopped the loop before founding, and the
+training went ahead on the rows' reading. The acceptance below is measured either way. A rule fixed
+before a run names its denominator.
+
+Both towers trained three passes together, 407 and 409 s against a projection of 646 and 640 s.
+They finished at 1.782 (`PRK`) and 1.797 (`PRI`) held-out bits a byte, against `PRT`'s 1.765.
 
 | Right at the equals | `PRK` | `PRI` | `PRT` | 8-gram |
 |---|---|---|---|---|
