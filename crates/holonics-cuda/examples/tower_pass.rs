@@ -7,6 +7,11 @@
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
 //!   host's through `HostPass`, the card's through `TowerCard`) and their texts and continuing
 //!   states are compared. Prints one `TOWER_PARITY` line a section and `TOWER_PARITY_DONE`.
+//! - `tower_pass parity-state STATE STATE_SHA CLASSES CLASSES_SHA OCTETS STREAMS SECTION [SECTIONS]`:
+//!   the same lockstep from a saved learner (`TowerLearner::to_text`, any face the card carries,
+//!   the pair face among them) over a class passage of `OCTETS` (1 or 2, big-endian) bytes a class,
+//!   every stream from rest; without `SECTIONS`, the whole passage. Prints, beside the lines above,
+//!   `TOWER_PARITY_SHA` with both learners' SHA-256 after the last section.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
 //!   or `train-unit-tower` on the founded units) with every section's forward and reverse on the
@@ -23,7 +28,8 @@ use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{face_code, ContactLaw, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
 use holonics_cuda::hnn::{Card, TowerCard};
 use std::error::Error;
-use std::process::Command;
+use std::io::Write;
+use std::process::{Command, Stdio};
 use std::time::Instant;
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
@@ -40,6 +46,18 @@ fn pinned(path: &str, sha: &str) -> Result<Vec<u8>> {
 
 fn count(s: &str) -> Result<usize> {
     Ok(s.parse::<usize>()?)
+}
+
+/// The SHA-256 of `bytes` (`sha256sum`, the exterior's).
+fn digest(bytes: &[u8]) -> Result<String> {
+    let mut process = Command::new("sha256sum").stdin(Stdio::piped()).stdout(Stdio::piped()).spawn()?;
+    process.stdin.take().ok_or("sha256sum's input")?.write_all(bytes)?;
+    let output = process.wait_with_output()?;
+    let digest = std::str::from_utf8(&output.stdout)?.split_whitespace().next().unwrap_or("").to_owned();
+    if !output.status.success() || digest.len() != 64 {
+        return Err("sha256sum failed".into());
+    }
+    Ok(digest)
 }
 
 fn parity(args: &[String]) -> Result<()> {
@@ -76,6 +94,47 @@ fn parity(args: &[String]) -> Result<()> {
     let tower = Tower::found_on(declaration, &keys, TurnLadder::Both)?;
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
+    lockstep(&mut host, &mut carded, &classes, streams, section, sections)
+}
+
+fn parity_state(args: &[String]) -> Result<()> {
+    if args.len() != 7 && args.len() != 8 {
+        return Err("parity-state STATE STATE_SHA CLASSES CLASSES_SHA OCTETS STREAMS SECTION [SECTIONS]".into());
+    }
+    let state = pinned(&args[0], &args[1])?;
+    let host = TowerLearner::from_text(std::str::from_utf8(&state)?)?;
+    let bytes = pinned(&args[2], &args[3])?;
+    let classes: Vec<usize> = match count(&args[4])? {
+        1 => bytes.iter().map(|&b| b as usize).collect(),
+        2 if bytes.len() % 2 == 0 => bytes.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as usize).collect(),
+        _ => return Err("a class passage holds one or two bytes a class".into()),
+    };
+    if classes.iter().any(|&c| c >= host.tower.declaration.alphabet) {
+        return Err("a class outside the learner's alphabet".into());
+    }
+    let (streams, section) = (count(&args[5])?, count(&args[6])?);
+    if streams == 0 || section == 0 || classes.len() / streams < section + 1 {
+        return Err("the passage must hold a section in every stream".into());
+    }
+    let whole = (classes.len() / streams - 1) / section;
+    let sections = match args.get(7) {
+        Some(n) => count(n)?,
+        None => whole,
+    };
+    let mut host = host;
+    let mut carded = TowerLearner::from_text(std::str::from_utf8(&state)?)?;
+    lockstep(&mut host, &mut carded, &classes, streams, section, sections)?;
+    println!("TOWER_PARITY_SHA sections={sections} whole_pass={} host={} card={}", sections == whole, digest(host.to_text().as_bytes())?, digest(carded.to_text().as_bytes())?);
+    Ok(())
+}
+
+/// Host against card in lockstep over `sections` sections of the passage split into `streams`
+/// streams, every stream from rest.
+fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize) -> Result<()> {
+    let chunk = classes.len() / streams;
+    if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
+        return Err("the passage must hold the declared sections in every stream".into());
+    }
     let opened = Card::open(0)?;
     let mut card = TowerCard::open(&opened)?;
     if std::env::var_os("TOWER_PROFILE").is_some() {
@@ -186,8 +245,9 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
         Some("parity") => parity(&args[1..]),
+        Some("parity-state") => parity_state(&args[1..]),
         Some("train") | Some("release") => train(&args[1..]),
-        _ => Err("tower_pass parity …|train complete-language …|release complete-language …".into()),
+        _ => Err("tower_pass parity …|parity-state …|train complete-language …|release complete-language …".into()),
     };
     if let Err(error) = result {
         eprintln!("tower_pass: {error}");
