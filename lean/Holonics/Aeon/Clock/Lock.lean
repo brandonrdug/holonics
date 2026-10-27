@@ -52,9 +52,11 @@ open phases vanish (`IsCycle`, over `Winding.openPhase`).
    and some convergent closes exactly, so its aeon of `q_n` ticks is a cycle
    (`rational_ratio_locks_at_a_convergent`).
 
-[open] The strict form `|q_n α − p_n| < 1/q_(n+1)` and the three-distance theorem are not proved
-here; Mathlib states the non-strict bound. The Farey address theory beyond neighbours and mediants
-lives in `HolonicsResearch/Geometry/Farey`, which this foundation module does not import.
+Mathlib states the non-strict bound. The strict form `|q_n α − p_n| < 1/q_(n+1)`, the exact miss,
+and the near-returns of a rational clock (strict before the last step, exact at it) are proved in
+`HolonicsResearch` (`Aeon/Clock/NearReturn`). [open] The three-distance theorem is not proved. The
+Farey address theory beyond neighbours and mediants lives in `HolonicsResearch/Geometry/Farey`,
+which this foundation module does not import.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/
