@@ -418,3 +418,33 @@ located causes (reads 1 and 3) are repaired in this loop. Text run on its codec'
 strands' faces are a navigator's faces, read beside any level's read. A rule without its
 denominator or sign: each decision above names its set. No new law enters: the opening's identity is
 the product of two unit faces, and the chart, the hand theorem and the release stay owed in #410.
+
+## 8. The opened run: the acceptance fails, and the review supersedes decision 5c
+
+[measured] `PRA`, `PRJ` and `PRE` were founded, trained three passes together and read on Brandon's
+PC as §7 fixed ([OPENED_RUN.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/OPENED_RUN.md)).
+Every training ended inside its deadline (452.2 to 454.7 s against 613 to 644 s, measured to
+projected 0.71 to 0.74) and every read ran to its end. The strands, rotor and keys founded as `PRK`'s.
+
+| | all | met | never met | `lead_length` | held-out bits a byte |
+|---|---|---|---|---|---|
+| `PRA` | 286 / 2,448 | 268 / 1,572 | 18 / 876 | 38 | 1.824 |
+| `PRJ` | 233 | 214 | 19 | 43 | 1.810 |
+| `PRE` | 245 | 219 | 26 | 32 | 1.785 |
+| `PRT` | 240 | 216 | 24 | 32 | |
+| `PRK` | 230 | 214 | 16 | 25 | |
+
+Paired against `PRE` on met calculations, only `PRA` is right at 145 and only `PRE` at 96
+(`49 > 1.96·√241 = 30.4`); against `PRJ`, 137 and 83 (`54 > 29.1`). On never-met calculations the
+pairs are 11 against 19 (`PRE`) and 13 against 14 (`PRJ`). The opened comparison's share of the
+contacts' bilinear weight was 250 thousandths a ring at founding and 0 on every ring of every
+final state (`TOWER_PAIR_COMPARISON`).
+
+[agent-inferred] The acceptance fails: 18 never-met calculations against the 8-gram's 34. Decision
+5b fails: `PRA`'s `lead_length` of 38 is below `PRJ`'s 43. The opening lifted met calculations past
+the paired line and moved none of the never-met ones, so what it conducted was recall. Decision 5c
+(read whether the opened rows stay opened) is not run: the
+[review](2026-10-27_THE_REVIEW_FINDS_THE_CODEC_CUTS_THE_NUMERAL_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
+finds that the codec gave the comparison no coherent target at the equals (17% of the read was
+impossible) and that the release had one step there, and whether the rows were erased or diluted
+does not change the next loop, which is the review's fix 1.

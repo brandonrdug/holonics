@@ -12,7 +12,7 @@
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
-use holonics::hnn::units::{Units, CODE_BITS};
+use holonics::hnn::units::{Chart, Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
 use rayon::prelude::*;
@@ -3358,8 +3358,8 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         at += n as usize;
     }
     println!(
-        "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={}",
-        units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
+        "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={} train_outside={} dev_outside={}",
+        units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len(), units.outside(&train), units.outside(&dev)
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
     fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, &mut HostPass::default())
@@ -3577,8 +3577,25 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     Ok(())
 }
 
-/// `found-units TRAIN TRAIN_SHA OUT`: found units from the training text (`hnn::units`) and write
-/// the founding list.
+/// [definition; agent-inferred, October 27] **The text codec's chart** (`hnn::units`, the review
+/// record §2): the letters, the space, the apostrophe and every byte past ASCII are one kind, so a
+/// word and the space before it may found one unit; the line end is a kind; every other byte is a
+/// kind alone, so no unit crosses `=`, `<<`, `>>` or any other mark; the decimal digits are counted,
+/// `.` is their point and `,` a group of three, so each digit is read with its place.
+fn text_chart() -> Result<Chart> {
+    let kinds = (0..=255u8)
+        .map(|b| match b {
+            b if b.is_ascii_alphabetic() || b == b' ' || b == b'\'' || b >= 0x80 => 0,
+            b'\n' => 1,
+            b => 2 + u16::from(b),
+        })
+        .collect();
+    Chart::declare(kinds, (b'0'..=b'9').collect(), Some(b'.'), Some((b',', 3))).map_err(|e| e.to_string().into())
+}
+
+/// `found-units TRAIN TRAIN_SHA OUT`: found units from the training text under the text codec's
+/// chart (`hnn::units`) and write the founding list. Beside the founding it reads every
+/// calculation's equals (`<<…=…>>`) in the training text and counts those the units cut through.
 pub(super) fn found_units(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("found-units TRAIN TRAIN_SHA OUT".into());
@@ -3587,16 +3604,27 @@ pub(super) fn found_units(args: &[String]) -> Result<()> {
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
     let out = Path::new(&args[3]);
     std::fs::create_dir(out)?;
-    let (units, read, receipt) = Units::found(&train).map_err(|e| e.to_string())?;
+    let (units, read, receipt) = Units::found_charted(&train, text_chart()?).map_err(|e| e.to_string())?;
     let text = units.to_text();
     write_new(&out.join("UNITS"), text.as_bytes())?;
     let bits = |code: i128| per((code >> (CODE_BITS - READ_BITS)) as i64, train.len());
+    let (up, down) = units.chart().map_or((1, 0), Chart::founded_places);
     println!(
-        "UNITS_FOUNDED units={} founded={} refused={} undecided={} priced={} symbols={}->{} order_one_bits_a_byte={}->{} description_bits_a_byte={} complete_bits_a_byte={} elapsed_ms={}",
+        "UNITS_FOUNDED units={} founded={} refused={} undecided={} priced={} symbols={}->{} order_one_bits_a_byte={}->{} description_bits_a_byte={} complete_bits_a_byte={} places_whole={up} places_fraction={down} elapsed_ms={}",
         units.len(), receipt.founded, receipt.refused, receipt.undecided, receipt.priced, receipt.symbols_before, receipt.symbols_after,
         bits(receipt.code_before), bits(receipt.code_after), bits(receipt.description), bits(receipt.code_after + receipt.description),
         started.elapsed().as_millis()
     );
+    let mut ends = std::collections::HashSet::new();
+    let mut at = 0usize;
+    for &u in &read {
+        ends.insert(at);
+        at += units.piece(u as usize).len();
+    }
+    ends.insert(at);
+    let equals = calculations_of(&train);
+    let cut = equals.iter().filter(|&&(_, past)| !(ends.contains(&(past - 1)) && ends.contains(&past))).count();
+    println!("UNITS_EQUALS calculations={} cut={cut}", equals.len());
     println!("UNITS_STATE units_bytes={} units_sha256={}", text.len(), sha256(text.as_bytes())?);
     // The units the passage reads most, with their counts, and the longest founded.
     let mut counts = vec![0usize; units.len()];
