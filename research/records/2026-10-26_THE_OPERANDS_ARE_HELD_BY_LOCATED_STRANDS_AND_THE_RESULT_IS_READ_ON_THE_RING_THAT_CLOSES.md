@@ -219,8 +219,10 @@ gaps read, the rings, and the level probe at the equals.
 
 **Owed in #410:** the chart (on ring `L`, after `k` written digits the comparison is
 `−10^k s_k`, and the ring closes at `k = L` exactly where `z ≡ x + e_∘ y`); the hand theorem; and
-the release (the next digit is the tenth of the conjugate face; the size is the largest ring outside
-the first tenth).
+the release (for a positive result, the next digit is the tenth of the conjugate face at every
+`k < L`, so all `L` digits are read and none stops where the face's itinerary first returns; the size
+is the largest ring outside the first tenth; zero is its own case, inside the first tenth on every
+ring).
 
 ## 5. The recorded failures this loop could repeat
 
