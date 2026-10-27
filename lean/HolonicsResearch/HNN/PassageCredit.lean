@@ -182,7 +182,7 @@ theorem hasDerivAt_passage {lam u : ℕ → ℝ → 𝔸} {h0 : ℝ → 𝔸} {l
 
 /-- [definition] The section's covector at its opening: the section's readings `G_(m+k)`, each
 carried back to the opening through the transport, as a reading of the opening's moments. -/
-def openingCovector (lam : ℕ → 𝔸) (G : ℕ → 𝔸 →L[ℝ] ℝ) (m n : ℕ) (P : 𝔸) : ℝ :=
+noncomputable def openingCovector (lam : ℕ → 𝔸) (G : ℕ → 𝔸 →L[ℝ] ℝ) (m n : ℕ) (P : 𝔸) : ℝ :=
   ∑ k ∈ range n, G (m + k) (carry lam m k * P)
 
 /-- [proved-derived; formal-checked] **The opening credit completes the passage's covector**: over a
