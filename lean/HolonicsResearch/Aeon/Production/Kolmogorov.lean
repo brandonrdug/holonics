@@ -204,8 +204,8 @@ theorem kolmogorov_iff (hnn : ∀ x y, 0 ≤ P x y) (hsupp : ∀ x y, 0 < P x y 
 /-- [definition] The cycle `0 → 1 → 2 → 0` of the biased rotation, along its forward
 transitions. -/
 def rotationLoop : Aeon (supportComplex Rotation.P) 0 0 :=
-  ⟨[(⟨(0, 1), by norm_num [Rotation.P]⟩, true), (⟨(1, 2), by norm_num [Rotation.P]⟩, true),
-      (⟨(2, 0), by norm_num [Rotation.P]⟩, true)], by
+  ⟨[(⟨(0, 1), by norm_num [Rotation.P]⟩, true), (⟨(1, 2), by simp [Rotation.P]⟩, true),
+      (⟨(2, 0), by simp [Rotation.P]⟩, true)], by
     simp [ParametricComplex.Chained, ParametricComplex.start, ParametricComplex.finish,
       supportComplex]⟩
 
@@ -214,7 +214,8 @@ step has ratio `(2/3)/(1/3) = 2`. -/
 theorem rotation_cycle_ratio :
     ((Additive.toMul (wordReading (ratioForm Rotation.admissible.support) rotationLoop.steps) :
       ℚˣ) : ℚ) = 8 := by
-  simp [rotationLoop, wordReading, stepReading, ratioForm, toMul_ofMul, Rotation.P] <;> norm_num
+  simp [rotationLoop, wordReading, stepReading, ratioForm, toMul_ofMul, Rotation.P]
+  norm_num
 
 /-- [counterexample; formal-checked] **The biased rotation has no reversible law**: no positive
 law is in detailed balance with it. -/
