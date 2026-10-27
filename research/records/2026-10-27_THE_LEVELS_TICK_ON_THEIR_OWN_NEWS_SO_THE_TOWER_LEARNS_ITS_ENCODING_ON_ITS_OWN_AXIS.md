@@ -2,7 +2,7 @@
 
 Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 27]. Host law
 built and tested (§6.1, §7); the card's port written, its parity on the card owed (§6.2); the
-measurement (§6.3) and Lean (§6.4) owed. Owners: `holonics::hnn::tower` (`NewsClock`,
+measurement (§6.3) owed; the Lean (§6.4) in `HNN/NewsClock`. Owners: `holonics::hnn::tower` (`NewsClock`,
 `Tower::join_news`, `Tower::step`, `Tower::reverse_joined`, `TowerState`),
 `holonics::hnn::tower::realization`, `holonics_cuda::hnn::tower` and `kernels/tower.cu` (the level
 loop of the forward and the reverse), the command `train-two-ladder-news-tower-classes`. Existing owners it joins: `holonics::aeon::EpochTower`,
@@ -118,7 +118,12 @@ clock, so the bits it certifies are the candidate's whole read, its segmentation
    learned segmentation's grain), and the six writings whole. No claim is made before it runs.
 4. **Lean** (into #410): the flux clock's ticks form an epoch tower under a monotone flux, and the
    clocked move over a span is the product of its sub-moves (the scale square
-   `r ∘ T_fine = T_coarse ∘ r` for diagonal modes).
+   `r ∘ T_fine = T_coarse ∘ r` for diagonal modes). Proved in `HolonicsResearch/HNN/NewsClock`
+   (atlas `hnn.tower-news-clock-carry`): the coarse count is the carry of the fine count through
+   the flux (levels `l ≥ 1`), so the ticks form an epoch tower and `Δτ_(l+1) ≤ Δτ_l`; a span's move
+   is the product of its sub-moves, for one mode `z^(Δ⌊S/σ⌋)`; the scale square is exact where the
+   fine count's residue modulo `r` is the same at both ends of the arrival, and holds up to that
+   residue otherwise.
 
 ## 7. What was built (October 27)
 
