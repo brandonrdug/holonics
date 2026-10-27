@@ -5921,6 +5921,23 @@ mod tests {
         assert!(strands.rotor.is_none() && strands.strands);
     }
 
+    /// The resident law places each level's second drive and its bias, with the reach `max |W_b|`
+    /// the card's pair contact reads beside its drive (zero under rectifying contacts).
+    #[test]
+    fn the_resident_law_places_the_pair_contacts_second_drive() {
+        for contact in [ContactLaw::Rectifying, ContactLaw::Pair, ContactLaw::PairLinear] {
+            let tower = tiny_contacts(2, 9, 4, true, false, false, contact);
+            let law = tower.resident_law().expect("law");
+            let fw = tower.declaration.contacts * tower.declaration.width;
+            for (resident, lv) in law.levels.iter().zip(&tower.layout.levels) {
+                assert_eq!((resident.pair, resident.pair_bias), (lv.pair, lv.pair_bias));
+                let paired = contact != ContactLaw::Rectifying;
+                assert_eq!(resident.reaches[10], if paired { reach(&tower.theta[lv.pair..lv.pair + fw]) } else { 0 });
+                assert!(!paired || resident.reaches[10] > 0, "{contact:?}: the opened second drive has a reach");
+            }
+        }
+    }
+
     const STRANDED: [usize; 13] = [0, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1];
 
     /// Joined at zero, the strands' material reads nothing: on the rotor tower the modes and faces

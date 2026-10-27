@@ -849,8 +849,8 @@ pub(super) fn run_with_execution(
 }
 /// The tower commands with each section's forward and reverse through a declared realization
 /// (`hnn::tower::realization`; `holonics-cuda`'s `tower_pass` example passes the card): the
-/// gated tower on a class passage, and the gated and the pumped tower (rectifying) on the founded
-/// units.
+/// gated tower on a class passage, and the gated and the pumped tower (rectifying, or the pumped
+/// tower on pair contacts) on the founded units.
 pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::realization::PassRealization) -> Result<()> {
     use holonics::hnn::tower::TurnLadder;
     match args.first().map(String::as_str) {
@@ -860,8 +860,9 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
         Some("train-two-ladder-news-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, Some(tower_classes::race_news_clock()), realization),
         Some("train-unit-tower") => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, realization),
         Some("train-unit-pumped-tower") => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, realization),
+        Some("train-unit-pair-pumped-tower") => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, realization),
         Some("release-tower-classes") => tower_classes::release_realized(args, realization),
-        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-unit-tower, train-unit-pumped-tower or release-tower-classes".into()),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower or release-tower-classes".into()),
     }
 }
 

@@ -12,8 +12,8 @@
 // never beside a news clock), with or without a rotor (`Rotor`: before a level's move each arriving
 // class steps the level's rings and turns their modes, `h' = T P^σ h`, mode `m` taking mode `s(m)`
 // turned by `e^(2πi r/q)` from the rotor's resident keys; never beside the ring face or a news
-// clock), rectifying contacts, no passage credit, with or without the pair
-// face
+// clock), contacts rectifying (`v = max(a, 0)`), the pair contact (`v = a ⊙ b`, `b = W_b r̂ + b_b`)
+// or its foil (`v = a b_b + b_a (b − b_b)`), no passage credit, with or without the pair face
 // (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
 // and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
 // their faces read through the pair contact with the top face, `z += W (x̂ ⊗ ρ)`; the products the
@@ -35,6 +35,9 @@
 //   memory across the cells. With `keep`, the cell's temporaries are written for the reverse.
 // - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
 //   (cells are independent there: each reads its own forward temporaries and covector).
+// - `tower_pair_biases`: the pair contact's foil only, one thread a bias entry summing its own
+//   covector over every cell (the pair contact's and the rectifier's biases ride their drive's
+//   outer sum).
 // - `tower_reverse_modes`: one block a stream, one thread a mode, the cells in reverse order (the
 //   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`, `+ β_(t+1) conj(G_h(t+1))` when
 //   pumped, carried back through the rotor's adjoint at the later cell when one is joined, the
@@ -84,14 +87,17 @@ typedef unsigned __int128 uwide;
 
 struct TowerLevel {
     uint64_t move_re, move_im, push_re, push_im, read_re, read_im, contact, contact_bias, ret,
-        ret_bias, gate, gate_bias, turn, turn_bias, pump, pump_bias, pump_axis, pump_axis_bias;
-    // max |w| of push (re, im), read (re, im), contact, return, gate, turn, pump depth, pump axis
-    uint64_t reach[10];
+        ret_bias, gate, gate_bias, turn, turn_bias, pump, pump_bias, pump_axis, pump_axis_bias,
+        pair, pair_bias;
+    // max |w| of push (re, im), read (re, im), contact, return, gate, turn, pump depth, pump axis,
+    // the pair contact's second drive
+    uint64_t reach[11];
 };
 
 struct TowerLaw {
     uint32_t alphabet, width, modes, contacts, levels, cells, streams, face_digits;
-    uint32_t move_digits, families, forms, pad0;
+    // The contact law: 0 rectifying, 1 the pair contact, 2 its foil.
+    uint32_t move_digits, families, forms, contact;
     uint64_t encoding, readout, readout_bias, readout_reach;
     int64_t ln2_square;
     // The pair face (`forms = 0` without one): its readout V (A × k) and lift P (W × k), and their
@@ -220,6 +226,12 @@ struct TowerFrame {
     // mode s(m), the mode m' with s(m') = m, and m's turn e^(2πi r/q) on 2^(−30) (the unit where the
     // key is zero, which carries the mode exactly).
     const int64_t *rotor; // [L][A][moving][4]
+    // The pair contact's second drive b at each cell, its covector δb and max |δb| (each empty
+    // under rectifying contacts), and the foil's bias covectors δb_a, δb_b (empty but under it).
+    int32_t *second;           // [S][T][L][F]
+    int64_t *db;               // [S][T][L][F]
+    uint64_t *r_db;            // [S][T][L]
+    int64_t *da_bias, *db_bias; // [S][T][L][F]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -1100,8 +1112,11 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 m = v > m ? v : m;
             }
             const uint64_t rmax = block_max(m, red);
-            // The rectifying contacts.
+            // The contacts: the drive a = W r̂ + b_a, rectified, v = max(a, 0); or beside it the pair
+            // contact's second drive b = W_b r̂ + b_b and v = a ⊙ b on 2^(−32) released to the face
+            // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
             const bool n_c = narrow_terms(lv.reach[4], rmax, W, &st);
+            const bool n_p = law.contact != 0 && narrow_terms(lv.reach[10], rmax, W, &st);
             m = 0;
             uint64_t mc = 0;
             for (uint32_t o = tid; o < F; o += B) {
@@ -1109,10 +1124,25 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 sum += (wide)th[lv.contact_bias + o] << MATERIAL_BITS;
                 const int32_t d = fit32(fit64(rel(sum, MATERIAL_BITS), &st), &st);
                 dv[o] = d;
-                cd[o] = d > 0 ? d : 0;
-                const uint64_t v = magnitude(d);
+                uint64_t v = magnitude(d);
+                int32_t c = d > 0 ? d : 0;
+                if (law.contact != 0) {
+                    wide second = dot(tt + lv.pair + o, F, W, rd, n_p);
+                    second += (wide)th[lv.pair_bias + o] << MATERIAL_BITS;
+                    const int32_t e = fit32(fit64(rel(second, MATERIAL_BITS), &st), &st);
+                    const wide ba = th[lv.contact_bias + o], bb = th[lv.pair_bias + o];
+                    const wide product = law.contact == 1 ? (wide)d * e : (wide)d * bb + ba * ((wide)e - bb);
+                    c = fit32(rel(product, FACE_BITS), &st);
+                    if (keep) {
+                        fr.second[q * F + o] = e;
+                    }
+                    const uint64_t ve = magnitude(e);
+                    v = ve > v ? ve : v;
+                }
+                cd[o] = c;
                 m = v > m ? v : m;
-                mc = (uint64_t)cd[o] > mc ? (uint64_t)cd[o] : mc;
+                const uint64_t vc = magnitude(c);
+                mc = vc > mc ? vc : mc;
             }
             const uint64_t dmax = block_max(m, red);
             const uint64_t cmax = block_max(mc, red);
@@ -1448,6 +1478,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
     uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
     int64_t *dy = (int64_t *)carve(at, 8ull * W);
     int64_t *da = (int64_t *)carve(at, 8ull * F);
+    int64_t *db = (int64_t *)carve(at, 8ull * F * (law.contact != 0));
     int64_t *dr = (int64_t *)carve(at, 8ull * W);
     int64_t *dread = (int64_t *)carve(at, 8ull * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
@@ -1464,19 +1495,40 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         m = a > m ? a : m;
     }
     const uint64_t ymax = block_max(m, red);
-    // dv = Rᵀ dy, and the rectifier passes it where the drive conducts.
+    // dv = Rᵀ dy; the rectifier passes it where the drive conducts, the pair contact to each drive
+    // through its partner (δa = dv ⊙ b, δb = dv ⊙ a, each bias the same), the foil to each drive's
+    // material through the other drive's bias (δa = dv b_b, δb = dv b_a) and to each bias through
+    // the other drive (dv ⊙ b, dv ⊙ a), each on 2^(−32) released to the material's convention.
     const bool n_v = narrow_rows(lv.reach[5], ymax, W);
     m = 0;
+    uint64_t mb = 0;
     for (uint32_t i = tid; i < F; i += B) {
         const int64_t v = fit64(rel(dot(fr.theta + lv.ret + i, F, W, dy, n_v), MATERIAL_BITS), &st);
-        const int64_t a = fr.drive[ql * F + i] > 0 ? v : 0;
-        da[i] = a;
-        fr.da[ql * F + i] = a;
-        const uint64_t mag = magnitude(a);
+        const int32_t a = fr.drive[ql * F + i];
+        int64_t ga = a > 0 ? v : 0;
+        if (law.contact != 0) {
+            const int32_t b = fr.second[ql * F + i];
+            const wide ya = law.contact == 1 ? b : fr.theta[lv.pair_bias + i];
+            const wide yb = law.contact == 1 ? a : fr.theta[lv.contact_bias + i];
+            ga = fit64(rel((wide)v * ya, FACE_BITS), &st);
+            const int64_t gb = fit64(rel((wide)v * yb, FACE_BITS), &st);
+            db[i] = gb;
+            fr.db[ql * F + i] = gb;
+            if (law.contact == 2) {
+                fr.da_bias[ql * F + i] = fit64(rel((wide)v * b, FACE_BITS), &st);
+                fr.db_bias[ql * F + i] = fit64(rel((wide)v * a, FACE_BITS), &st);
+            }
+            const uint64_t mag = magnitude(gb);
+            mb = mag > mb ? mag : mb;
+        }
+        da[i] = ga;
+        fr.da[ql * F + i] = ga;
+        const uint64_t mag = magnitude(ga);
         m = mag > m ? mag : m;
     }
     const uint64_t amax = block_max(m, red);
-    // dr = Kᵀ da, split over `G` groups of the contacts.
+    const uint64_t bmax = block_max(mb, red);
+    // dr = Kᵀ da (and + K_bᵀ db, each released on its own), split over `G` groups of the contacts.
     const bool n_r = narrow_rows(lv.reach[4], amax, F);
     for (uint32_t idx = tid; idx < G * W; idx += B) {
         const uint32_t g = idx / W, j = idx % W;
@@ -1492,6 +1544,23 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         dr[j] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
+    if (law.contact != 0) {
+        const bool n_b = narrow_rows(lv.reach[10], bmax, F);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)F * g / G), to = (uint32_t)((uint64_t)F * (g + 1) / G);
+            part[idx] = dot(fr.theta + lv.pair + (uint64_t)from * W + j, W, to - from, db + from, n_b);
+        }
+        __syncthreads();
+        for (uint32_t j = tid; j < W; j += B) {
+            wide sum = 0;
+            for (uint32_t g = 0; g < G; g++) {
+                sum += part[g * W + j];
+            }
+            dr[j] = fit64((wide)dr[j] + (wide)fit64(rel(sum, MATERIAL_BITS), &st), &st);
+        }
+        __syncthreads();
+    }
     // The ratio's adjoint ∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms.
     const int64_t scale = fr.scale[ql];
     uwide dot_part = 0;
@@ -1517,6 +1586,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         fr.r_dy[ql] = ymax;
         fr.r_da[ql] = amax;
         fr.r_dread[ql] = dmax;
+        if (law.contact != 0) {
+            fr.r_db[ql] = bmax;
+        }
     }
     // The modes' read covector: C_reᵀ ∂r and C_imᵀ (−∂r).
     const bool n_re = narrow_rows(lv.reach[2], dmax, W);
@@ -2188,5 +2260,24 @@ extern "C" __global__ void tower_moves(TowerLaw law, TowerFrame fr) {
         }
         fr.gradient[lv.move_re + k] = re;
         fr.gradient[lv.move_im + k] = im;
+    }
+}
+
+// The pair contact's foil: each level's biases b_a, b_b take covectors of their own (dv ⊙ b,
+// dv ⊙ a), summed over every cell (integer addition: any order). Entry e is level e / 2F, its
+// second bias when (e mod 2F) ≥ F.
+extern "C" __global__ void tower_pair_biases(TowerLaw law, TowerFrame fr) {
+    const uint32_t F = law.contacts, L = law.levels;
+    const uint64_t cells = (uint64_t)law.streams * law.cells;
+    for (uint32_t e = blockIdx.x * blockDim.x + threadIdx.x; e < 2 * F * L; e += gridDim.x * blockDim.x) {
+        const uint32_t l = e / (2 * F), i = e % F;
+        const bool second = e % (2 * F) >= F;
+        const int64_t *y = second ? fr.db_bias : fr.da_bias;
+        wide acc = 0;
+        for (uint64_t q = 0; q < cells; q++) {
+            acc += y[(q * L + l) * F + i];
+        }
+        const TowerLevel &lv = law.level[l];
+        fr.gradient[(second ? lv.pair_bias : lv.contact_bias) + i] = acc;
     }
 }

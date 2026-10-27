@@ -1,7 +1,8 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
 //! and its streams' states, with and without the pair face, the ring face, the turned modes, the
-//! pumped modes, the rotor and the news clock; and the card refuses a declaration it does not carry.
+//! pumped modes, the rotor and the news clock, on rectifying contacts, the pair contact or its foil;
+//! and the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
@@ -29,7 +30,8 @@ fn declaration(alphabet: usize, gated: bool, turned: bool, pumped: bool) -> Towe
 
 /// The faces a fixture joins to the gated tower: `forms` pair forms (none at zero), the ring face
 /// it names, whether its modes are turned, whether they are pumped (a pumped mode is turned),
-/// whether a rotor steps them, and the news clock its levels tick on.
+/// whether a rotor steps them, the news clock its levels tick on, and its contact law when it is not
+/// rectifying.
 #[derive(Clone, Copy, Default)]
 struct Faces {
     forms: usize,
@@ -38,6 +40,7 @@ struct Faces {
     pumped: bool,
     rotor: bool,
     news: Option<NewsClock>,
+    contact: Option<ContactLaw>,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -52,11 +55,16 @@ struct Ringed {
 /// opened by `open_turn`), pumped when `faces.pumped` (its pump opened by `open_pump`), with
 /// `faces.forms` pair forms joined when there are any (`join_pair`), the ring face when
 /// `faces.ring` names one (`join_ring`), the rotor when `faces.rotor` (`join_rotor`) and the news
-/// clock last when `faces.news` names one.
+/// clock last when `faces.news` names one; on `faces.contact`'s law, its second drive opened
+/// (`open_pair_contacts`).
 fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     let turned = faces.turned || faces.pumped;
-    let tower = Tower::found_on(declaration(alphabet, true, turned, faces.pumped), &keys(1 << 16), TurnLadder::Both).expect("founded");
+    let contact = faces.contact.unwrap_or(ContactLaw::Rectifying);
+    let tower = Tower::found_on(TowerDeclaration { contact, ..declaration(alphabet, true, turned, faces.pumped) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
+    if contact != ContactLaw::Rectifying {
+        open_pair_contacts(&mut learner);
+    }
     if turned {
         open_turn(&mut learner);
     }
@@ -117,6 +125,27 @@ fn open_pump(learner: &mut TowerLearner) {
                 learner.tower.theta[i] = (k[j] as i32 - 128) << 10;
                 j += 1;
             }
+        }
+    }
+}
+
+/// The pair contact founds its second drive at zero material and unit bias, so it opens one-sided
+/// (`v = a`); the fixture opens each level's second drive `W_b` (about ±¼ on `2^(−24)`) and moves
+/// both drives' biases by about ±¼ on `2^(−16)` off the key stream, so the product and the foil's
+/// cross terms move the faces and carry covectors from the first section.
+fn open_pair_contacts(learner: &mut TowerLearner) {
+    let d = learner.tower.declaration;
+    let k = keys(1 << 16);
+    let law = learner.tower.resident_law().expect("the law");
+    let mut j = 40000;
+    for lv in &law.levels {
+        for i in lv.pair..lv.pair + d.contacts * d.width {
+            learner.tower.theta[i] = (k[j] as i32 - 128) << 15;
+            j += 1;
+        }
+        for i in (lv.contact_bias..lv.contact_bias + d.contacts).chain(lv.pair_bias..lv.pair_bias + d.contacts) {
+            learner.tower.theta[i] += (k[j] as i32 - 128) << 7;
+            j += 1;
         }
     }
 }
@@ -349,6 +378,36 @@ fn the_cards_rotor_advance_is_the_hosts_class_by_class() {
     advance_class_by_class(Faces { pumped: true, rotor: true, ..Faces::default() });
 }
 
+/// The pair contact's acceptance: 32 sections equal face by face and covector entry by entry, the
+/// learners and their states after each, every contact's product read.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pair_contact_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
+/// The foil's acceptance, its biases' covectors summed on their own.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pair_linear_contact_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { contact: Some(ContactLaw::PairLinear), ..Faces::default() });
+}
+
+/// The saved unit learners' declaration in small: a rotor stepping pumped modes on pair contacts
+/// beside the pair face, an uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_rotor_on_pair_contacts_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, pumped: true, rotor: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
+/// The same declaration's advance is the host's, class by class.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_rotor_on_pair_contacts_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { pumped: true, rotor: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
 /// The news clock's acceptance: 32 sections equal face by face and covector entry by entry, the
 /// learners and their states (each stream's open face and phase) after each. Level 1's section is
 /// two bits, under the four or so a class carries, so it ticks none, once or several times at an
@@ -420,7 +479,7 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let parts: Vec<&[usize]> = vec![&classes[..]];
     let targets = vec![classes[1..].iter().map(|&c| Some(c)).collect::<Vec<_>>()];
     assert!(realized.forward(&ungated, &[ungated.rest()], &parts, &targets, Slot::Opened).is_err());
-    let paired = Tower::found_on(TowerDeclaration { contact: ContactLaw::Pair, ..declaration(11, true, false, false) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
+    let paired = Tower::found_on(TowerDeclaration { contact: ContactLaw::Pair, ..declaration(11, false, false, false) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
     assert!(realized.forward(&paired, &[paired.rest()], &parts, &targets, Slot::Opened).is_err());
     let (host, _) = learners(11, Faces::default());
     assert!(realized.forward(&host.tower, &[host.tower.rest_with_credit()], &parts, &targets, Slot::Opened).is_err());

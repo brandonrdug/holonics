@@ -257,9 +257,13 @@ pub struct ResidentLevel {
     pub pump_bias: usize,
     pub pump_axis: usize,
     pub pump_axis_bias: usize,
-    /// `max |w|` of push (re, im), read (re, im), contact, return, gate, turn, pump depth and pump
-    /// axis (`Tower::reaches`).
-    pub reaches: [u64; 10],
+    /// The pair contact's second drive `W_b` (`F × d`) and bias `b_b` (each zero under rectifying
+    /// contacts).
+    pub pair: usize,
+    pub pair_bias: usize,
+    /// `max |w|` of push (re, im), read (re, im), contact, return, gate, turn, pump depth, pump
+    /// axis and the pair contact's second drive (`Tower::reaches`).
+    pub reaches: [u64; 11],
     /// The gated moves' founded faces, one a mode, on `2^(−30)`: the unit `u = λ/|λ|`, the
     /// modulus `|λ|` and `ℓ = log₂|λ|` (empty when ungated).
     pub units: Vec<(i64, i64)>,
@@ -458,7 +462,9 @@ impl Tower {
                 pump_bias: lv.pump_bias,
                 pump_axis: lv.pump_axis,
                 pump_axis_bias: lv.pump_axis_bias,
-                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9]],
+                pair: lv.pair,
+                pair_bias: lv.pair_bias,
+                reaches: *r,
                 units,
                 moduli,
                 logs,
