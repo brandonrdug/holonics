@@ -45,6 +45,25 @@ pub struct PassRead {
     pub swell: Vec<[u64; 4]>,
 }
 
+impl PassRead {
+    /// [definition; agent-inferred, October 27] **A realization's read, admitted**: one face at each
+    /// compared place and none elsewhere, each in the domain of [`face_code`] (a positive total
+    /// and a mass no greater than it; a lawful face's largest class adds `2^62` to its total, so its
+    /// total is never zero). Every caller admits a realization's read before a code or the
+    /// certificate reads it, so a realization that returns a face outside the domain is refused,
+    /// never divided by.
+    pub fn admitted(self, targets: &[Vec<Option<usize>>]) -> Result<PassRead> {
+        let placed = self.faces.len() == targets.len() && self.faces.iter().zip(targets).all(|(f, t)| f.len() == t.len() && f.iter().zip(t).all(|(f, t)| f.is_some() == t.is_some()));
+        if !placed {
+            return Err(TowerError::Refused("a realization returned faces that are not one a compared place"));
+        }
+        if self.faces.iter().flatten().flatten().any(|&(m, t)| t == 0 || m > t) {
+            return Err(TowerError::Refused("a realization returned a face with no total or a mass past its total"));
+        }
+        Ok(self)
+    }
+}
+
 /// [definition; agent-inferred, October 25] **A realization of the section's pass** (the module
 /// header): the streams' forward, their summed covector and their continuing states, each the host's
 /// bits.
@@ -332,7 +351,7 @@ impl Tower {
             let windows: Vec<Vec<usize>> = parts.iter().map(|p| (at..=at + cells).map(|i| p.get(i).copied().unwrap_or(0)).collect()).collect();
             let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| (at + 1..=at + cells).map(|i| p.get(i).copied()).collect()).collect();
             let classes: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
-            let read = realization.forward(self, &states, &classes, &targets, Slot::Reread)?;
+            let read = realization.forward(self, &states, &classes, &targets, Slot::Reread)?.admitted(&targets)?;
             for (code, faces) in codes.iter_mut().zip(&read.faces) {
                 code.extend(faces.iter().flatten().map(|&(m, t)| face_code(m, t)));
             }
@@ -373,9 +392,13 @@ impl Tower {
         let windows: Vec<Vec<usize>> = classes.iter().map(|c| c.iter().copied().chain([0]).collect()).collect();
         let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).chain([None]).collect()).collect();
         let reads: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
-        let read = realization.forward(self, states, &reads, &targets, Slot::Opened)?;
+        let read = realization.forward(self, states, &reads, &targets, Slot::Opened)?.admitted(&targets)?;
         let codes = read.faces.iter().map(|faces| faces.iter().flatten().map(|&(m, t)| face_code(m, t)).sum()).collect();
         let faces = realization.last_faces()?;
+        let alphabet = self.declaration.alphabet;
+        if faces.len() != classes.len() || faces.iter().any(|f| f.masses.len() != alphabet || f.total == 0 || f.masses.iter().any(|&m| m > f.total)) {
+            return Err(TowerError::Refused("a realization returned a last face that is not one a stream over the alphabet, with a positive total and no mass past it"));
+        }
         let opening = states.to_vec();
         realization.carry(self, states, &opening, Slot::Opened)?;
         Ok((faces, codes))

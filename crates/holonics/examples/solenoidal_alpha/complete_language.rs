@@ -893,6 +893,14 @@ pub(super) fn run(args: &[String]) -> Result<()> {
 ///   which must already hold that run's `TOWER_REALIZATION card` line and its `TOWER_COMMAND` line:
 ///   the same arguments but the output directory, the last.
 ///
+/// [project-postulate; agent-inferred, October 27] **What the check proves.** It is a declaration
+/// check: it binds a manifest to this run's command and prints the manifest's SHA-256 beside the
+/// run's device. It cannot prove that the `words` are Brandon's, and it does not enforce `limits`.
+/// An `exception` manifest is verified against Brandon's own message by the coordinator or Codex
+/// before launch, never granted by a brief or an agent, and its limits are held by the launch's
+/// own scope (its memory ceiling and outer `timeout`). A `parity` manifest proves more, since the
+/// card log it names must already hold that card release. The design thread owns this check.
+///
 /// Returns the kind and the manifest's SHA-256.
 fn host_exception(path: &str, args: &[String]) -> Result<(String, String)> {
     let text = std::fs::read_to_string(path)?;

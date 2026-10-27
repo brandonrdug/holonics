@@ -2037,7 +2037,9 @@ impl TowerFace {
 }
 
 /// A class's code read off its mass and the face's total, `−log₂(mass/total)` on `2^(−20)` bits
-/// ([`TowerFace::code`]).
+/// ([`TowerFace::code`]). Its domain is a positive total and a mass no greater than it, which every
+/// face the tower forms satisfies; a face a realization returns is admitted to it before it is read
+/// ([`realization::PassRead::admitted`]).
 pub fn face_code(mass: u128, total: u128) -> i64 {
     let p = (mass << UNIT_BITS) / total;
     -(log2_face(p.max(1), READ_BITS) as i64)
@@ -4478,7 +4480,7 @@ impl TowerLearner {
         let targets: Vec<Vec<Option<usize>>> = classes.iter().enumerate().map(|(s, c)| (1..c.len()).map(|i| target(s, i)).collect()).collect();
         self.tower.admit_read(classes, &targets)?;
         let opening: Vec<TowerState> = states.to_vec();
-        let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?;
+        let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
         self.swell = read.swell;
         let faces_old: Vec<(u128, u128)> = read.faces.iter().flatten().flatten().copied().collect();
         let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
@@ -4534,7 +4536,7 @@ impl TowerLearner {
                 return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts });
             }
             candidate.project();
-            let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?;
+            let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
             let faces_new: Vec<(u128, u128)> = reread.faces.iter().flatten().flatten().copied().collect();
             if fewer_bits(&faces_old, &faces_new) {
                 let parts_after = part_codes(&reread.faces);
@@ -5756,6 +5758,64 @@ mod tests {
         let outside: [&[usize]; 1] = [&[0, a, 2]];
         assert!(pass.forward(&tower, &states, &outside, &[vec![Some(1), Some(2)]], Slot::Reread).is_err());
         assert!(pass.forward(&tower, &states, &classes, &[vec![Some(1), Some(2)]], Slot::Reread).is_ok());
+    }
+
+    /// A realization whose read returns a face outside [`face_code`]'s domain (a zero total, a mass
+    /// past its total) or no face at a compared place, or whose last face has no total, is refused
+    /// by the section, the realized read and the realized advance before any code is read; the
+    /// host's own reads pass through the same admission.
+    #[test]
+    fn a_realizations_face_outside_its_domain_is_refused() {
+        struct Altered {
+            host: realization::HostPass,
+            face: Option<Option<(u128, u128)>>,
+            last: bool,
+        }
+        impl PassRealization for Altered {
+            fn realization(&self) -> String {
+                "altered".into()
+            }
+            fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<realization::PassRead> {
+                let mut read = self.host.forward(tower, opening, classes, targets, slot)?;
+                if let (Some(face), Some(place)) = (self.face, read.faces[0].iter_mut().find(|f| f.is_some())) {
+                    *place = face;
+                }
+                Ok(read)
+            }
+            fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
+                self.host.reverse(tower, opening, classes, compared)
+            }
+            fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
+                self.host.carry(tower, states, opening, slot)
+            }
+            fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+                let mut faces = self.host.last_faces()?;
+                if self.last {
+                    faces[0].total = 0;
+                }
+                Ok(faces)
+            }
+            fn admit(&self, tower: &Tower) -> Result<()> {
+                self.host.admit(tower)
+            }
+        }
+        let tower = tiny_of(true);
+        let classes: [&[usize]; 2] = [&[0, 1, 2, 1, 3], &[3, 3, 0, 2, 1]];
+        let run = |face: Option<Option<(u128, u128)>>, last: bool| -> [bool; 3] {
+            let altered = || Altered { host: realization::HostPass::default(), face, last };
+            let mut learner = TowerLearner::new(tower.clone(), 7);
+            let mut states = vec![tower.rest(), tower.rest()];
+            let section = learner.section_realized(&mut states, &classes, None, &mut altered()).is_ok();
+            let read = tower.read_parts_realized(&classes, 3, &mut altered()).is_ok();
+            let mut states = vec![tower.rest(), tower.rest()];
+            let advance = tower.advance_realized(&mut states, &classes, &mut altered()).is_ok();
+            [section, read, advance]
+        };
+        assert_eq!(run(None, false), [true; 3]);
+        assert_eq!(run(Some(Some((0, 0))), false), [false; 3]);
+        assert_eq!(run(Some(Some((5, 3))), false), [false; 3]);
+        assert_eq!(run(Some(None), false), [false; 3]);
+        assert_eq!(run(None, true), [true, true, false]);
     }
 
     /// The host's realization keeps no cell between its calls (but a credit-carrying stream's), so
