@@ -50,31 +50,6 @@
 //! constituents and decodes to its bytes); the helix, the cell holonomy and the tube stay attached
 //! through the tower that reads the units. Nothing here is text-specific: the founding reads any
 //! passage of byte classes (an acoustic or motor code's classes alike).
-//!
-//! [definition; agent-inferred, October 27] **The codec's chart**
-//! ([the review](../../../../research/records/2026-10-27_THE_REVIEW_FINDS_THE_CODEC_CUTS_THE_NUMERAL_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
-//! §2). The order-one price founds whatever lowers the code, and on GSM8K it founded units that
-//! join a mark to the digit after it (`=3`, `0>>`): a read cut at the equals then asks for a
-//! continuation the founded passage never holds, and a numeral is cut where frequency cuts it, not
-//! by place. A founding may therefore declare a chart of its byte classes:
-//!
-//! ```text
-//! kinds      each byte class has a kind; (a, b) is proposed only when both are of one kind, so no
-//!            founded unit crosses a class of another kind, and a cut at a mark falls where every
-//!            reading of the passage has a boundary
-//! counted    the counted classes (value order) never merge: a run of them is a word on its base's
-//!            tower, each class read with its place, the power of the base it stands at;
-//!            12,400 = 1·10⁴ + 2·10³ + 4·10² + 0·10¹ + 0·10⁰, so its 4 is read as "4 at place 2"
-//! marks      the point ends the whole places (the places after it are −1, −2, …); a group mark
-//!            followed by exactly its width of counted classes continues a run no longer than it
-//! classes    a counted class at place 0 is its byte's own class; every other founded place adds
-//!            one class a value, decoding to the same byte, so decode(parse(x)) = x
-//! founded    the places are those the passage holds; a place past them reads as the outermost
-//!            founded place (the founding's grain), which `Units::outside` counts
-//! ```
-//!
-//! The chart is declared by the application's boundary codec (for text: the digits counted, `.` the
-//! point, `,` a group of three, every mark a kind alone); nothing in this owner names a modality.
 
 use std::collections::{BinaryHeap, HashMap};
 
@@ -84,8 +59,6 @@ use crate::hnn::keyed_modes::log2_face;
 pub const CODE_BITS: u32 = 32;
 const NONE: u32 = u32::MAX;
 const UNIT_BITS: u32 = 62;
-/// The kind of a class that never merges: a counted class at any place.
-const FENCED: u16 = u16::MAX;
 
 /// Refusals of the founding.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -149,160 +122,11 @@ fn pair(k: u64) -> (u32, u32) {
     ((k >> 32) as u32, k as u32)
 }
 
-/// **The codec's chart** of byte classes (module doc): each class's kind, the counted classes in
-/// value order with their point and group mark, and the places a founding found.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Chart {
-    kinds: Vec<u16>,
-    counted: Vec<u8>,
-    point: Option<u8>,
-    group: Option<(u8, usize)>,
-    /// The founded places: whole places `0..up`, fractional places `1..=down`.
-    up: usize,
-    down: usize,
-}
-
-impl Chart {
-    /// Declare a chart: one kind for each of the 256 byte classes, the counted classes in value
-    /// order (at least two, each once), the point, and the group mark with its width. Refused when
-    /// a mark is counted, the point and the group are one class, or a group has no width.
-    pub fn declare(kinds: Vec<u16>, counted: Vec<u8>, point: Option<u8>, group: Option<(u8, usize)>) -> Result<Chart> {
-        if kinds.len() != 256 || kinds.contains(&FENCED) {
-            return refuse("a chart names one declared kind for each of the 256 byte classes");
-        }
-        let mut seen = [false; 256];
-        for &c in &counted {
-            if seen[c as usize] {
-                return refuse("a chart counts each class once");
-            }
-            seen[c as usize] = true;
-        }
-        if counted.len() < 2 {
-            return refuse("a chart counts at least two classes");
-        }
-        if point.is_some_and(|p| seen[p as usize]) || group.is_some_and(|(g, w)| seen[g as usize] || w == 0 || Some(g) == point) {
-            return refuse("a chart's point and group mark are two classes it does not count, and a group has a width");
-        }
-        Ok(Chart { kinds, counted, point, group, up: 1, down: 0 })
-    }
-
-    /// The founded places: whole places `0..up` and fractional places `1..=down`.
-    pub fn founded_places(&self) -> (usize, usize) {
-        (self.up, self.down)
-    }
-
-    fn base(&self) -> usize {
-        self.counted.len()
-    }
-
-    fn value(&self, b: u8) -> Option<usize> {
-        self.counted.iter().position(|&c| c == b)
-    }
-
-    /// Each byte's place on its base's tower: `Some(k)` for a counted byte of a numeral, `None` for
-    /// every other byte.
-    fn read_places(&self, bytes: &[u8]) -> Vec<Option<i64>> {
-        let counted = |i: usize| i < bytes.len() && self.value(bytes[i]).is_some();
-        let mut place = vec![None; bytes.len()];
-        let mut i = 0;
-        while i < bytes.len() {
-            if !counted(i) {
-                i += 1;
-                continue;
-            }
-            let mut whole = Vec::new();
-            let mut j = i;
-            while counted(j) {
-                whole.push(j);
-                j += 1;
-            }
-            if let Some((g, w)) = self.group {
-                if whole.len() <= w {
-                    while j < bytes.len() && bytes[j] == g && (1..=w).all(|t| counted(j + t)) && !counted(j + w + 1) {
-                        whole.extend(j + 1..=j + w);
-                        j += w + 1;
-                    }
-                }
-            }
-            for (t, &at) in whole.iter().enumerate() {
-                place[at] = Some((whole.len() - 1 - t) as i64);
-            }
-            if let Some(p) = self.point {
-                if j < bytes.len() && bytes[j] == p && counted(j + 1) {
-                    let mut k = j + 1;
-                    while counted(k) {
-                        place[k] = Some(-((k - j) as i64));
-                        k += 1;
-                    }
-                    j = k;
-                }
-            }
-            i = j;
-        }
-        place
-    }
-
-    /// The class of `value` at `place`, and whether the place lies past the founded ones (then the
-    /// class is the outermost founded place's on that side, or the byte's own when that side founded
-    /// none).
-    fn class(&self, value: usize, place: i64) -> (u32, bool) {
-        let byte = self.counted[value] as u32;
-        let index = if place > 0 {
-            let k = place as usize;
-            if self.up <= 1 {
-                return (byte, true);
-            }
-            (k.min(self.up - 1) - 1, k >= self.up)
-        } else if place < 0 {
-            let k = (-place) as usize;
-            if self.down == 0 {
-                return (byte, true);
-            }
-            (self.up - 1 + k.min(self.down) - 1, k > self.down)
-        } else {
-            return (byte, false);
-        };
-        ((256 + index.0 * self.base() + value) as u32, index.1)
-    }
-
-    /// The passage's classes under the chart, and how many counted bytes read past the founded
-    /// places.
-    fn classes(&self, bytes: &[u8]) -> (Vec<u32>, usize) {
-        let mut outside = 0;
-        let classes = bytes
-            .iter()
-            .zip(self.read_places(bytes))
-            .map(|(&b, place)| match place {
-                Some(k) => {
-                    let (class, past) = self.class(self.value(b).expect("a placed byte is counted"), k);
-                    outside += usize::from(past);
-                    class
-                }
-                None => b as u32,
-            })
-            .collect();
-        (classes, outside)
-    }
-
-    /// The places a passage holds: one past its largest whole place, and its deepest fractional one.
-    fn found_places(&mut self, bytes: &[u8]) {
-        let places = self.read_places(bytes);
-        self.up = 1 + places.iter().flatten().filter(|&&k| k > 0).max().copied().unwrap_or(0) as usize;
-        self.down = places.iter().flatten().filter(|&&k| k < 0).map(|&k| (-k) as usize).max().unwrap_or(0);
-    }
-
-    fn placed_classes(&self) -> usize {
-        self.base() * (self.up - 1 + self.down)
-    }
-}
-
-/// The founded units: the 256 bytes, then each founded place's classes (a chart's), then each
-/// merge's unit in founding order.
+/// The founded units: the 256 bytes, then each merge's unit in founding order.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Units {
     merges: Vec<(u32, u32)>,
     pieces: Vec<Vec<u8>>,
-    chart: Option<Chart>,
 }
 
 /// The founding's receipt: the units founded and what each cost, the pairs refused or undecided,
@@ -332,11 +156,12 @@ struct Passage {
 }
 
 impl Passage {
-    fn new(unit: Vec<u32>) -> Result<Self> {
-        if unit.len() >= NONE as usize {
+    fn new(bytes: &[u8]) -> Result<Self> {
+        if bytes.len() >= NONE as usize {
             return refuse("a passage past 2^32 − 1 positions");
         }
-        let n = unit.len();
+        let n = bytes.len();
+        let unit: Vec<u32> = bytes.iter().map(|&b| b as u32).collect();
         let next = (0..n).map(|i| if i + 1 < n { (i + 1) as u32 } else { NONE }).collect();
         let prev = (0..n).map(|i| if i > 0 { (i - 1) as u32 } else { NONE }).collect();
         let mut positions: HashMap<u64, Vec<u32>> = HashMap::new();
@@ -448,56 +273,7 @@ fn order_one_code(table: &mut GammaTable, units: &[u32], alphabet: usize) -> i12
 impl Units {
     /// The bytes alone, before any founding.
     pub fn bytes() -> Self {
-        Units { merges: Vec::new(), pieces: (0..=255u8).map(|b| vec![b]).collect(), chart: None }
-    }
-
-    /// The bytes and a chart's founded places, before any merge: each place's class of a value
-    /// decodes to that value's byte.
-    fn charted(chart: Chart) -> Self {
-        let mut pieces: Vec<Vec<u8>> = (0..=255u8).map(|b| vec![b]).collect();
-        for _ in 0..chart.up - 1 + chart.down {
-            pieces.extend(chart.counted.iter().map(|&c| vec![c]));
-        }
-        Units { merges: Vec::new(), pieces, chart: Some(chart) }
-    }
-
-    /// The chart the units were founded under, if any.
-    pub fn chart(&self) -> Option<&Chart> {
-        self.chart.as_ref()
-    }
-
-    /// The first merge's unit: past the bytes and the founded places' classes.
-    fn first_merge(&self) -> usize {
-        self.pieces.len() - self.merges.len()
-    }
-
-    /// The kind of each standing unit: a byte's declared kind, `FENCED` for a counted class at any
-    /// place, a merge's its pieces' kind; one kind for every unit when no chart is declared.
-    fn kinds(&self) -> Vec<u16> {
-        let mut kinds: Vec<u16> = match &self.chart {
-            None => vec![0; 256],
-            Some(c) => (0..256).map(|b| if c.value(b as u8).is_some() { FENCED } else { c.kinds[b] }).collect(),
-        };
-        kinds.resize(self.first_merge(), FENCED);
-        for &(a, _) in &self.merges {
-            kinds.push(kinds[a as usize]);
-        }
-        kinds
-    }
-
-    /// The passage's classes before any merge (its bytes, each counted byte read at its place when a
-    /// chart is declared), and how many counted bytes read past the founded places.
-    fn classes(&self, passage: &[u8]) -> (Vec<u32>, usize) {
-        match &self.chart {
-            None => (passage.iter().map(|&b| b as u32).collect(), 0),
-            Some(c) => c.classes(passage),
-        }
-    }
-
-    /// How many counted bytes of `passage` read past the founded places (each read at the outermost
-    /// founded place on its side): the place released at the founding's grain.
-    pub fn outside(&self, passage: &[u8]) -> usize {
-        self.classes(passage).1
+        Units { merges: Vec::new(), pieces: (0..=255u8).map(|b| vec![b]).collect() }
     }
 
     pub fn len(&self) -> usize {
@@ -530,30 +306,17 @@ impl Units {
     /// **Found units from a passage** by the module's law; returns the units, the passage read in
     /// them, and the receipt.
     pub fn found(passage: &[u8]) -> Result<(Units, Vec<u32>, FoundingReceipt)> {
-        Units::found_on(passage, Units::bytes())
-    }
-
-    /// **Found units under a chart** (module doc): the chart's places are founded from the passage,
-    /// and a pair is proposed only when both its units are of one kind and neither is counted. The
-    /// receipt's code before is the passage's in the charted classes.
-    pub fn found_charted(passage: &[u8], mut chart: Chart) -> Result<(Units, Vec<u32>, FoundingReceipt)> {
-        chart.found_places(passage);
-        Units::found_on(passage, Units::charted(chart))
-    }
-
-    fn found_on(passage: &[u8], mut units: Units) -> Result<(Units, Vec<u32>, FoundingReceipt)> {
-        let classes = units.classes(passage).0;
-        let mut kinds = units.kinds();
-        let mut text = Passage::new(classes.clone())?;
+        let mut units = Units::bytes();
+        let mut text = Passage::new(passage)?;
         let mut table = GammaTable::default();
         let mut cells: HashMap<u64, u64> = HashMap::new();
-        let mut contexts: Vec<u64> = vec![0; units.len()];
-        for w in classes.windows(2) {
-            *cells.entry(key(w[0], w[1])).or_default() += 1;
+        let mut contexts: Vec<u64> = vec![0; 256];
+        for w in passage.windows(2) {
+            *cells.entry(key(w[0] as u32, w[1] as u32)).or_default() += 1;
             contexts[w[0] as usize] += 1;
         }
         let mut receipt = FoundingReceipt { symbols_before: passage.len(), ..FoundingReceipt::default() };
-        receipt.code_before = order_one_code(&mut table, &classes, units.len());
+        receipt.code_before = order_one_code(&mut table, &text.read(), 256);
         let mut proposals: BinaryHeap<(u64, u64)> = cells.iter().map(|(&k, &n)| (n, k)).collect();
         let mut refused_at: HashMap<u64, u64> = HashMap::new();
         // The table's enclosure: four grains a recurrence step (the fraction's truncation and the
@@ -565,9 +328,6 @@ impl Units {
                 continue;
             }
             let (a, b) = pair(k);
-            if kinds[a as usize] != kinds[b as usize] || kinds[a as usize] == FENCED {
-                continue;
-            }
             let alphabet = units.len();
             let z = alphabet as u32;
             let taken = text.occurrences(a, b);
@@ -617,7 +377,6 @@ impl Units {
                 }
                 text.merge(&taken, z);
                 units.push(a, b);
-                kinds.push(kinds[a as usize]);
                 receipt.founded += 1;
                 receipt.description += describe;
             } else {
@@ -637,12 +396,11 @@ impl Units {
     /// **A passage read in the units**: the founded merges replayed in order, each over its
     /// occurrences left to right; `decode(parse(x)) = x`.
     pub fn parse(&self, passage: &[u8]) -> Result<Vec<u32>> {
-        let mut text = Passage::new(self.classes(passage).0)?;
-        let first = self.first_merge();
+        let mut text = Passage::new(passage)?;
         for (i, &(a, b)) in self.merges.iter().enumerate() {
             let taken = text.occurrences(a, b);
             if !taken.is_empty() {
-                text.merge(&taken, (first + i) as u32);
+                text.merge(&taken, (256 + i) as u32);
             }
             text.positions.remove(&key(a, b));
         }
@@ -654,42 +412,24 @@ impl Units {
         units.iter().flat_map(|&u| self.pieces[u as usize].iter().copied()).collect()
     }
 
-    /// The founding list as text: a header, the chart when one is declared (its kinds, then its
-    /// counted classes, marks and founded places), then one merge a line.
+    /// The founding list as text: a header, then one merge a line.
     pub fn to_text(&self) -> String {
-        let mut s = match &self.chart {
-            None => format!("founded-units-v1 {}\n", self.merges.len()),
-            Some(c) => {
-                let list = |v: &[u8]| v.iter().map(u8::to_string).collect::<Vec<_>>().join(",");
-                let kinds = c.kinds.iter().map(u16::to_string).collect::<Vec<_>>().join(" ");
-                let point = c.point.map_or("none".to_string(), |p| p.to_string());
-                let group = c.group.map_or("none".to_string(), |(g, w)| format!("{g}:{w}"));
-                format!(
-                    "founded-units-v2 {}\nkinds {kinds}\nchart counted={} point={point} group={group} up={} down={}\n",
-                    self.merges.len(),
-                    list(&c.counted),
-                    c.up,
-                    c.down
-                )
-            }
-        };
+        let mut s = format!("founded-units-v1 {}\n", self.merges.len());
         for &(a, b) in &self.merges {
             s.push_str(&format!("{a} {b}\n"));
         }
         s
     }
 
-    /// The founding list from its text, refused unless the chart is a declared chart, and each merge
-    /// names two units standing, of one kind and neither counted.
+    /// The founding list from its text, refused unless each merge names two units standing.
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        if head.len() != 2 || (head[0] != "founded-units-v1" && head[0] != "founded-units-v2") {
+        if head.len() != 2 || head[0] != "founded-units-v1" {
             return refuse("not a founding list's text");
         }
         let count: usize = head[1].parse().map_err(|_| UnitsError::Refused("a founding count that is not a count"))?;
-        let mut units = if head[0] == "founded-units-v1" { Units::bytes() } else { Units::charted(chart_from(&mut lines)?) };
-        let mut kinds = units.kinds();
+        let mut units = Units::bytes();
         for line in lines {
             let (a, b) = line.split_once(' ').ok_or(UnitsError::Refused("a merge names two units"))?;
             let a: u32 = a.parse().map_err(|_| UnitsError::Refused("a merge's unit that is not a count"))?;
@@ -697,51 +437,13 @@ impl Units {
             if a as usize >= units.len() || b as usize >= units.len() {
                 return refuse("a merge names a unit not yet founded");
             }
-            if kinds[a as usize] != kinds[b as usize] || kinds[a as usize] == FENCED {
-                return refuse("a merge joins units of two kinds, or a counted class");
-            }
             units.push(a, b);
-            kinds.push(kinds[a as usize]);
         }
         if units.merges.len() != count {
             return refuse("the founding list's count differs from its merges");
         }
         Ok(units)
     }
-}
-
-/// A chart from its two lines of a founding list's text.
-fn chart_from<'a>(lines: &mut impl Iterator<Item = &'a str>) -> Result<Chart> {
-    let bad = || UnitsError::Refused("a chart's lines are its kinds, then its counted classes, marks and places");
-    let kinds: Vec<u16> = lines
-        .next()
-        .and_then(|l| l.strip_prefix("kinds "))
-        .ok_or_else(bad)?
-        .split(' ')
-        .map(|k| k.parse().map_err(|_| bad()))
-        .collect::<Result<_>>()?;
-    let fields: Vec<&str> = lines.next().and_then(|l| l.strip_prefix("chart ")).ok_or_else(bad)?.split(' ').collect();
-    let field = |name: &str| fields.iter().find_map(|f| f.strip_prefix(name).and_then(|v| v.strip_prefix('='))).ok_or_else(bad);
-    let byte = |v: &str| v.parse::<u8>().map_err(|_| bad());
-    let counted: Vec<u8> = field("counted")?.split(',').map(byte).collect::<Result<_>>()?;
-    let point = match field("point")? {
-        "none" => None,
-        p => Some(byte(p)?),
-    };
-    let group = match field("group")? {
-        "none" => None,
-        g => {
-            let (g, w) = g.split_once(':').ok_or_else(bad)?;
-            Some((byte(g)?, w.parse::<usize>().map_err(|_| bad())?))
-        }
-    };
-    let mut chart = Chart::declare(kinds, counted, point, group)?;
-    chart.up = field("up")?.parse().map_err(|_| bad())?;
-    chart.down = field("down")?.parse().map_err(|_| bad())?;
-    if chart.up == 0 {
-        return refuse("a chart founds at least the place of one");
-    }
-    Ok(chart)
 }
 
 #[cfg(test)]
@@ -757,88 +459,6 @@ mod tests {
             }
         }
         text
-    }
-
-    /// A chart of the text codec's form: letters and the space one kind, every other byte a kind
-    /// alone, the decimal digits counted with `.` the point and `,` a group of three.
-    fn chart() -> Chart {
-        let kinds = (0..=255u8).map(|b| if b.is_ascii_alphabetic() || b == b' ' { 0 } else { 1 + u16::from(b) }).collect();
-        Chart::declare(kinds, (b'0'..=b'9').collect(), Some(b'.'), Some((b',', 3))).unwrap()
-    }
-
-    #[test]
-    fn the_chart_reads_each_counted_byte_at_its_place() {
-        let c = chart();
-        let text = b"It cost 12,400.50 or 3.5, 1,23 and 1234,567 at 8.";
-        let places: Vec<(char, i64)> =
-            text.iter().zip(c.read_places(text)).filter_map(|(&b, k)| k.map(|k| (b as char, k))).collect();
-        let want = [
-            ('1', 4), ('2', 3), ('4', 2), ('0', 1), ('0', 0), ('5', -1), ('0', -2),
-            ('3', 0), ('5', -1),
-            ('1', 0), ('2', 1), ('3', 0),
-            ('1', 3), ('2', 2), ('3', 1), ('4', 0), ('5', 2), ('6', 1), ('7', 0),
-            ('8', 0),
-        ];
-        assert_eq!(places, want);
-        // Refusals: a counted mark, a class counted twice, a group without width.
-        let kinds: Vec<u16> = vec![0; 256];
-        assert!(Chart::declare(kinds.clone(), vec![b'0', b'1'], Some(b'1'), None).is_err());
-        assert!(Chart::declare(kinds.clone(), vec![b'0', b'0'], None, None).is_err());
-        assert!(Chart::declare(kinds.clone(), vec![b'0', b'1'], None, Some((b',', 0))).is_err());
-        assert!(Chart::declare(vec![0; 255], vec![b'0', b'1'], None, None).is_err());
-    }
-
-    #[test]
-    fn the_charted_founding_never_crosses_a_kind_and_decodes() {
-        let mut text = Vec::new();
-        for i in 0..300u32 {
-            text.extend_from_slice(format!("the cat had <<{}+3={}>>{} toys, 1,200 in all. ", i % 7, i % 7 + 3, i % 7 + 3).as_bytes());
-        }
-        let (units, read, receipt) = Units::found_charted(&text, chart()).unwrap();
-        assert!(receipt.founded > 0);
-        assert_eq!(units.chart().unwrap().founded_places(), (4, 0));
-        // Every unit's bytes are of one kind, and a counted byte stands alone at its place.
-        let kinds = units.kinds();
-        for u in 256..units.len() {
-            let piece = units.piece(u);
-            if kinds[u] == FENCED {
-                assert_eq!(piece.len(), 1);
-                assert!(piece[0].is_ascii_digit());
-            } else {
-                assert!(piece.iter().all(|&b| !b.is_ascii_digit() && units.chart().unwrap().kinds[b as usize] == kinds[u]), "{piece:?}");
-            }
-        }
-        // The equals is a boundary on both sides wherever the passage holds it.
-        let mut at = 0;
-        let mut ends = std::collections::HashSet::new();
-        for &u in &read {
-            ends.insert(at);
-            at += units.piece(u as usize).len();
-        }
-        ends.insert(at);
-        for (i, &b) in text.iter().enumerate() {
-            if b == b'=' {
-                assert!(ends.contains(&i) && ends.contains(&(i + 1)));
-            }
-        }
-        // 1,200 reads its 1 at place 3, its 2 at place 2.
-        let one = units.parse(b"1,200").unwrap();
-        assert_eq!(one.len(), 5);
-        assert_eq!(units.decode(&one), b"1,200");
-        assert_eq!([one[0], one[1], one[2], one[3], one[4]], [256 + 2 * 10 + 1, u32::from(b','), 256 + 10 + 2, 256, u32::from(b'0')]);
-        assert_eq!(units.decode(&read), text);
-        assert_eq!(units.parse(&text).unwrap(), read);
-        assert_eq!(units.outside(&text), 0);
-        // A numeral past the founded places reads its outer places at the outermost one, exactly.
-        let long = b"98765 and 0.25";
-        assert_eq!(units.outside(long), 1 + 2);
-        assert_eq!(units.decode(&units.parse(long).unwrap()), long);
-        // The list restores whole, and refuses a merge across kinds.
-        assert_eq!(Units::from_text(&units.to_text()).unwrap(), units);
-        let mut forged = units.to_text();
-        forged = forged.replacen(&format!("founded-units-v2 {}", units.merges().len()), &format!("founded-units-v2 {}", units.merges().len() + 1), 1);
-        forged.push_str(&format!("{} {}\n", b'=', b'3'));
-        assert!(Units::from_text(&forged).is_err());
     }
 
     #[test]
@@ -883,7 +503,7 @@ mod tests {
         // less the description.
         let text = passage();
         let mut table = GammaTable::default();
-        let mut passage = Passage::new(text.iter().map(|&b| b as u32).collect()).unwrap();
+        let mut passage = Passage::new(&text).unwrap();
         let before = order_one_code(&mut table, &passage.read(), 256);
         let (a, b) = (b'a' as u32, b't' as u32);
         let taken = passage.occurrences(a, b);

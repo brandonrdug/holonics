@@ -444,7 +444,7 @@ final state (`TOWER_PAIR_COMPARISON`).
 5b fails: `PRA`'s `lead_length` of 38 is below `PRJ`'s 43. The opening lifted met calculations past
 the paired line and moved none of the never-met ones, so what it conducted was recall. Decision 5c
 (read whether the opened rows stay opened) is not run: the
-[review](2026-10-27_THE_REVIEW_FINDS_THE_CODEC_CUTS_THE_NUMERAL_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
-finds that the codec gave the comparison no coherent target at the equals (17% of the read was
-impossible) and that the release had one step there, and whether the rows were erased or diluted
-does not change the next loop, which is the review's fix 1.
+[review](2026-10-27_THE_REVIEW_FINDS_THE_READ_CUTS_INSIDE_THE_MACHINES_OWN_UNITS_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
+finds that the read cut 17% of its calculations inside one of the machine's units, where no tower
+could write them, and that the release had one step at the equals, and whether the rows were erased
+or diluted does not change the next loop, which is the review's fix 1.

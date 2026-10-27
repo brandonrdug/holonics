@@ -12,7 +12,7 @@
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{code_of, ContactLaw, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
-use holonics::hnn::units::{Chart, Units, CODE_BITS};
+use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use num_bigint::BigUint;
 use rayon::prelude::*;
@@ -3358,8 +3358,8 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         at += n as usize;
     }
     println!(
-        "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={} train_outside={} dev_outside={}",
-        units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len(), units.outside(&train), units.outside(&dev)
+        "UNIT_READ units={} train_bytes={} train_units={} dev_bytes={} dev_units={}",
+        units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
     fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, &mut HostPass::default())
@@ -3577,25 +3577,8 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     Ok(())
 }
 
-/// [definition; agent-inferred, October 27] **The text codec's chart** (`hnn::units`, the review
-/// record §2): the letters, the space, the apostrophe and every byte past ASCII are one kind, so a
-/// word and the space before it may found one unit; the line end is a kind; every other byte is a
-/// kind alone, so no unit crosses `=`, `<<`, `>>` or any other mark; the decimal digits are counted,
-/// `.` is their point and `,` a group of three, so each digit is read with its place.
-fn text_chart() -> Result<Chart> {
-    let kinds = (0..=255u8)
-        .map(|b| match b {
-            b if b.is_ascii_alphabetic() || b == b' ' || b == b'\'' || b >= 0x80 => 0,
-            b'\n' => 1,
-            b => 2 + u16::from(b),
-        })
-        .collect();
-    Chart::declare(kinds, (b'0'..=b'9').collect(), Some(b'.'), Some((b',', 3))).map_err(|e| e.to_string().into())
-}
-
-/// `found-units TRAIN TRAIN_SHA OUT`: found units from the training text under the text codec's
-/// chart (`hnn::units`) and write the founding list. Beside the founding it reads every
-/// calculation's equals (`<<…=…>>`) in the training text and counts those the units cut through.
+/// `found-units TRAIN TRAIN_SHA OUT`: found units from the training text (`hnn::units`) and write
+/// the founding list.
 pub(super) fn found_units(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("found-units TRAIN TRAIN_SHA OUT".into());
@@ -3604,27 +3587,16 @@ pub(super) fn found_units(args: &[String]) -> Result<()> {
     let train = pinned_read(&args[1], &args[2], READ_BUDGET as usize)?;
     let out = Path::new(&args[3]);
     std::fs::create_dir(out)?;
-    let (units, read, receipt) = Units::found_charted(&train, text_chart()?).map_err(|e| e.to_string())?;
+    let (units, read, receipt) = Units::found(&train).map_err(|e| e.to_string())?;
     let text = units.to_text();
     write_new(&out.join("UNITS"), text.as_bytes())?;
     let bits = |code: i128| per((code >> (CODE_BITS - READ_BITS)) as i64, train.len());
-    let (up, down) = units.chart().map_or((1, 0), Chart::founded_places);
     println!(
-        "UNITS_FOUNDED units={} founded={} refused={} undecided={} priced={} symbols={}->{} order_one_bits_a_byte={}->{} description_bits_a_byte={} complete_bits_a_byte={} places_whole={up} places_fraction={down} elapsed_ms={}",
+        "UNITS_FOUNDED units={} founded={} refused={} undecided={} priced={} symbols={}->{} order_one_bits_a_byte={}->{} description_bits_a_byte={} complete_bits_a_byte={} elapsed_ms={}",
         units.len(), receipt.founded, receipt.refused, receipt.undecided, receipt.priced, receipt.symbols_before, receipt.symbols_after,
         bits(receipt.code_before), bits(receipt.code_after), bits(receipt.description), bits(receipt.code_after + receipt.description),
         started.elapsed().as_millis()
     );
-    let mut ends = std::collections::HashSet::new();
-    let mut at = 0usize;
-    for &u in &read {
-        ends.insert(at);
-        at += units.piece(u as usize).len();
-    }
-    ends.insert(at);
-    let equals = calculations_of(&train);
-    let cut = equals.iter().filter(|&&(_, past)| !(ends.contains(&(past - 1)) && ends.contains(&past))).count();
-    println!("UNITS_EQUALS calculations={} cut={cut}", equals.len());
     println!("UNITS_STATE units_bytes={} units_sha256={}", text.len(), sha256(text.as_bytes())?);
     // The units the passage reads most, with their counts, and the longest founded.
     let mut counts = vec![0usize; units.len()];
@@ -3754,28 +3726,70 @@ fn calculations_of(answer: &[u8]) -> Vec<(&[u8], usize)> {
 
 /// A fork of the rested tower receives `prompt` read in the units and releases units by `agree`
 /// exact agreeing draws, each moved through, until `stop` holds of its bytes, `bytes` bytes are
-/// released or `cap` units are. Returns the released bytes, the prompt's units and the units
-/// released.
-fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeyStream, agree: u32, bytes: usize, cap: usize, stop: fn(&[u8]) -> bool) -> std::result::Result<(Vec<u8>, [usize; 2]), String> {
-    let classes = units.parse(prompt).map_err(|e| e.to_string())?;
+/// released or `cap` units are. Returns the released bytes, the prompt's units, the units released,
+/// the bytes of the withheld tail, whether the tail's last draw ran past it and the tail's units
+/// placed without a draw (none agreeing held mass).
+///
+/// [definition; agent-inferred, October 27] **The read meets the units** (`heal`; the review
+/// record §2). A prompt cut at a byte the passage does not end a unit at (an `=` the founded units
+/// join to the digit after it, `=3`) ends in a unit the tower never met there. Healed, the fork
+/// receives the prompt without its last unit and releases with that unit's bytes as the release's
+/// opening: while the tail is unspent only units whose bytes agree with it are drawn (the face
+/// restricted to them, the tower's own conditional given the bytes it was shown), and a unit that
+/// runs past the tail (`=3`) writes the rest. The returned release is what follows the tail. The
+/// units stay as founded; only the check's cut moves to a boundary of the machine's own reading.
+#[allow(clippy::too_many_arguments)]
+fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeyStream, agree: u32, bytes: usize, cap: usize, stop: fn(&[u8]) -> bool, heal: bool) -> std::result::Result<(Vec<u8>, [usize; 5]), String> {
+    let mut classes = units.parse(prompt).map_err(|e| e.to_string())?;
+    let tail: Vec<u8> = match heal {
+        true => units.piece(classes.pop().ok_or("an empty prompt")? as usize).to_vec(),
+        false => Vec::new(),
+    };
     let mut state = tower.rest();
     let mut face = None;
     for &c in &classes {
         face = Some(tower.advance(&mut state, c as usize).map_err(|e| e.to_string())?);
     }
     let mut face = face.ok_or("an empty prompt")?;
-    let (mut released, mut drawn) = (Vec::new(), 0);
-    while released.len() < bytes && drawn < cap {
+    let (mut released, mut drawn, mut past, mut placed) = (Vec::new(), 0, false, 0);
+    while released.len() < bytes.saturating_add(tail.len()) && drawn < cap {
         let key = keys.next_key().ok_or("fewer keys than a problem's window draws")?;
-        let class = agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?;
+        let class = if released.len() < tail.len() {
+            // The units whose bytes agree with the unspent tail: a prefix of it, or running past it.
+            let rest = &tail[released.len()..];
+            let agreeing: Vec<u128> = face
+                .masses
+                .iter()
+                .enumerate()
+                .map(|(u, &m)| {
+                    let piece = units.piece(u);
+                    if rest.starts_with(piece) || piece.starts_with(rest) { m } else { 0 }
+                })
+                .collect();
+            let class = match agreeing.iter().any(|&m| m > 0) {
+                true => agreeing_class(&agreeing, agree, &key).map_err(|e| e.to_string())?,
+                // No agreeing unit holds mass at the face's grain: the shown bytes are placed as
+                // the units parse them.
+                false => {
+                    placed += 1;
+                    units.parse(rest).map_err(|e| e.to_string())?[0] as usize
+                }
+            };
+            past = units.piece(class).len() > rest.len();
+            class
+        } else {
+            agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?
+        };
         released.extend_from_slice(units.piece(class));
         drawn += 1;
-        if stop(&released) || released.len() >= bytes || drawn == cap {
+        let after = &released[tail.len().min(released.len())..];
+        if released.len() >= tail.len() && (stop(after) || after.len() >= bytes) || drawn == cap {
             break;
         }
         face = tower.advance(&mut state, class).map_err(|e| e.to_string())?;
     }
-    Ok((released, [classes.len(), drawn]))
+    let after = released.get(tail.len()..).unwrap_or_default().to_vec();
+    Ok((after, [classes.len(), drawn, tail.len(), usize::from(past), placed]))
 }
 
 /// `read-unit-tower-written UNITS UNITS_SHA STATE STATE_SHA HELD HELD_SHA KEYS KEYS_SHA BYTES
@@ -3785,9 +3799,13 @@ fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeySt
 /// For each problem a fork receives the framed question (a blank line, the question, its line
 /// end) and releases `BYTES` bytes at `AGREE` agreeing draws (`FREE.tsv`: the problem's index and
 /// the release). At every calculation the answer writes, `<<expression=`, a fork receives the
-/// framed question and the answer through that `=` and releases units at `MARK_AGREE` agreeing
-/// draws until its bytes hold `>>` or a line end, or `MARK_CAP` units are released (`MARKS.tsv`:
-/// the problem's index, the calculation's, the expression and the release). Every fork opens at
+/// framed question and the answer through that `=`, healed ([`written_release`]: the prompt's last
+/// unit is withheld and the release opens with its bytes, so the cut falls where the units read),
+/// and releases units at `MARK_AGREE` agreeing draws until its bytes past the `=` hold `>>` or a
+/// line end, or `MARK_CAP` units are released, the tail's among them (`MARKS.tsv`:
+/// the problem's index, the calculation's, the expression and the release; `CUTS.tsv`: the
+/// problem's index, the calculation's, and 1 where the whole problem read in the units ends a unit
+/// at that `=`, else 0). Every fork opens at
 /// rest, so each problem and each calculation is read alone, as the John prompt is. Problem `i`
 /// draws from its own window of the key file, `BYTES + MARK_CAP · (the most calculations a problem
 /// writes)` eight-byte keys: the free release from the window's start, the calculations after its
@@ -3821,7 +3839,7 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
     println!("TOWER_WRITTEN_OPEN problems={} most_calculations={most} window={window} elapsed_ms={}", problems.len(), started.elapsed().as_millis());
     let tower = &learner.tower;
     let done = std::sync::atomic::AtomicUsize::new(0);
-    type Read = (Vec<u8>, Vec<(Vec<u8>, Vec<u8>)>, [usize; 2]);
+    type Read = (Vec<u8>, Vec<(Vec<u8>, Vec<u8>, bool)>, [usize; 5]);
     let reads: Vec<Read> = problems
         .par_iter()
         .enumerate()
@@ -3832,46 +3850,77 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
             framed.extend_from_slice(&question);
             framed.push(b'\n');
             let mut free_keys = KeyStream::new(keys[at..at + bytes * 8].to_vec(), 8).map_err(|e| e.to_string())?;
-            let (free, [mut prompts, mut drawn]) = written_release(tower, &units, &framed, &mut free_keys, agree, bytes, usize::MAX, |_| false)?;
+            let (free, [mut prompts, mut drawn, _, _, _]) = written_release(tower, &units, &framed, &mut free_keys, agree, bytes, usize::MAX, |_| false, false)?;
+            let (mut wide, mut past, mut placed) = (0usize, 0usize, 0usize);
             let mut mark_keys = KeyStream::new(keys[at + bytes * 8..at + window * 8].to_vec(), 8).map_err(|e| e.to_string())?;
+            // Where the problem's own reading in the units ends a unit: the whole problem parsed
+            // as the training text frames it.
+            let mut whole = framed.clone();
+            whole.extend_from_slice(&answer);
+            let mut ends = std::collections::BTreeSet::new();
+            let mut end = 0;
+            for u in units.parse(&whole).map_err(|e| e.to_string())? {
+                end += units.piece(u as usize).len();
+                ends.insert(end);
+            }
             let mut marks = Vec::new();
             for (expression, through) in calculations_of(&answer) {
                 let mut prompt = framed.clone();
                 prompt.extend_from_slice(&answer[..through]);
                 let stop: fn(&[u8]) -> bool = |r| r.windows(2).any(|w| w == b">>") || r.contains(&b'\n');
-                let (release, [p, d]) = written_release(tower, &units, &prompt, &mut mark_keys, mark_agree, usize::MAX, mark_cap, stop)?;
+                let (release, [p, d, tail, ran, put]) = written_release(tower, &units, &prompt, &mut mark_keys, mark_agree, usize::MAX, mark_cap, stop, true)?;
                 prompts += p;
                 drawn += d;
-                marks.push((expression.to_vec(), release));
+                wide += usize::from(tail > 1);
+                past += ran;
+                placed += put;
+                marks.push((expression.to_vec(), release, ends.contains(&(framed.len() + through))));
             }
             let n = done.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
             if n % 64 == 0 {
                 println!("TOWER_WRITTEN_PROGRESS problems={n} elapsed_ms={}", started.elapsed().as_millis());
             }
-            Ok((free, marks, [prompts, drawn]))
+            Ok((free, marks, [prompts, drawn, wide, past, placed]))
         })
         .collect::<std::result::Result<_, String>>()?;
     let mut free_tsv = String::new();
     let mut marks_tsv = String::new();
-    let (mut marks, mut prompts, mut drawn, mut most_moved, mut released) = (0, 0, 0, 0, 0);
-    for (i, (free, calcs, [p, d])) in reads.iter().enumerate() {
+    let mut cuts_tsv = String::new();
+    let mut bounded = 0;
+    let (mut marks, mut prompts, mut drawn, mut most_moved, mut released, mut wide, mut past, mut placed) = (0, 0, 0, 0, 0, 0, 0, 0);
+    for (i, (free, calcs, [p, d, w, r, q])) in reads.iter().enumerate() {
         free_tsv.push_str(&format!("{i}\t{}\n", field(free)));
         released += free.len();
-        for (j, (expression, release)) in calcs.iter().enumerate() {
+        for (j, (expression, release, at_end)) in calcs.iter().enumerate() {
             marks_tsv.push_str(&format!("{i}\t{j}\t{}\t{}\n", field(expression), field(release)));
+            cuts_tsv.push_str(&format!("{i}\t{j}\t{}\n", u8::from(*at_end)));
+            bounded += usize::from(*at_end);
         }
         marks += calcs.len();
         prompts += p;
         drawn += d;
+        wide += w;
+        past += r;
+        placed += q;
         most_moved = most_moved.max(p + d);
     }
     write_new(&out.join("FREE.tsv"), free_tsv.as_bytes())?;
     write_new(&out.join("MARKS.tsv"), marks_tsv.as_bytes())?;
+    write_new(&out.join("CUTS.tsv"), cuts_tsv.as_bytes())?;
     println!(
         "TOWER_WRITTEN problems={} calculations={marks} free_bytes={released} prompt_units={prompts} released_units={drawn} most_units_a_problem={most_moved} agree={agree} mark_agree={mark_agree} mark_cap={mark_cap} elapsed_ms={}",
         reads.len(), started.elapsed().as_millis()
     );
-    println!("TOWER_WRITTEN_FILES free_sha256={} marks_sha256={}", sha256(free_tsv.as_bytes())?, sha256(marks_tsv.as_bytes())?);
+    // The healed cut: marks whose `=` the problem's own reading ends a unit at, marks whose
+    // withheld unit held more than the `=` (an operand's digit joined to it), marks whose release
+    // opened with a unit running past the tail (`=3`), and tail units placed without a draw.
+    println!("TOWER_WRITTEN_HEALED calculations={marks} bounded_at_equals={bounded} tail_wider_than_equals={wide} opened_past_tail={past} tail_units_placed={placed}");
+    println!(
+        "TOWER_WRITTEN_FILES free_sha256={} marks_sha256={} cuts_sha256={}",
+        sha256(free_tsv.as_bytes())?,
+        sha256(marks_tsv.as_bytes())?,
+        sha256(cuts_tsv.as_bytes())?
+    );
     Ok(())
 }
 

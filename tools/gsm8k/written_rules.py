@@ -9,6 +9,7 @@ research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN heard DIR [DIR ...]
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN rings DIR [DIR ...]
     python3 -I tools/gsm8k/written_rules.py HELD TRAIN gaps DIR [DIR ...]
+    python3 -I tools/gsm8k/written_rules.py HELD TRAIN cuts CUTS DIR [DIR ...]
 
 HELD is the held-out text and TRAIN the training text, each a run of problems separated by a blank
 line (a question line, then its answer lines). Each DIR holds `FREE.tsv` and `MARKS.tsv` as
@@ -48,6 +49,12 @@ the equals, reading how far each wrong value is from the exact one and what it w
 - `GAP_WRITES`, on every written number: how many are written, how many distinct values, the share
   of the ten commonest, and the commonest value with its count and how many of those are right.
 - `GAP_LENGTH`: right of all calculations by the exact value's whole-part digits (1, 2, 3, 4, 5+).
+
+With `cuts`, a `CUTS` line follows each DIR's line: right at the equals, all and never met, split
+by whether the problem's own reading in the units ends a unit at the calculation's `=` (`CUTS` is a
+`CUTS.tsv` that `read-unit-tower-written` writes, one row a calculation in the reader's order: the
+problem's index, the calculation's, and 1 or 0), so a read cut inside a unit is read apart from a
+read cut at its boundary (the review of October 27, §2.2).
 
 A foil pairs each wrong value with the next wrong number's exact value (the last with the first),
 keeping only the pairs where the two differ, so it is conditioned as the misses are: a wrong
@@ -352,8 +359,8 @@ def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
     pair, heard, rings = sys.argv[3] == "pair", sys.argv[3] == "heard", sys.argv[3] == "rings"
-    gaps = sys.argv[3] == "gaps"
-    dirs = sys.argv[4:] if pair or heard or rings or gaps else sys.argv[3:]
+    gaps, cuts = sys.argv[3] == "gaps", sys.argv[3] == "cuts"
+    dirs = sys.argv[5:] if cuts else sys.argv[4:] if pair or heard or rings or gaps else sys.argv[3:]
     if pair and (len(dirs) != 2 or "reference" in dirs):
         raise SystemExit("pair reads two release directories")
     goods = []
@@ -363,6 +370,12 @@ def main():
     counts = Counter(w for w in WORD.findall(train_text.lower()) if len(w) >= 4)
     common = {w for w, _ in counts.most_common(100)}
     results = {n for _, c in CALC.findall(train_text) for n in [number(c)] if n is not None}
+    if cuts:
+        expected = [(i, j) for i, (_, a) in enumerate(problems) for j, _ in enumerate(calculations_of(a))]
+        rows = read_tsv(sys.argv[4], 3)
+        if [(int(r[0]), int(r[1])) for r in rows] != expected or any(r[2] not in ("0", "1") for r in rows):
+            raise SystemExit(f"{sys.argv[4]} does not hold one 0 or 1 a held-out calculation in the reader's order")
+        at_end = [r[2] == "1" for r in rows]
     for d in dirs:
         if d == "reference":
             answers = [a for _, a in problems]
@@ -392,6 +405,17 @@ def main():
             print(f"RINGS dir={d} " + rings_line(each))
         if gaps and marks is not None:
             print("\n".join(gaps_lines(d, each, results)))
+        if cuts and marks is not None:
+            split = Counter()
+            for (kind, good, *_), bounded in zip(each, at_end):
+                side = "bounded" if bounded else "unbounded"
+                for key in (side, f"{side}_never" if kind == "never" else None):
+                    if key:
+                        split[key, "n"] += 1
+                        split[key, "right"] += good
+            print(f"CUTS dir={d} " + " ".join(
+                f"{k}={split[k, 'right']}/{split[k, 'n']}" for k in ("bounded", "bounded_never", "unbounded", "unbounded_never")
+            ))
         if heard and marks is not None:
             bins = Counter()
             for _, good, k, *_ in each:

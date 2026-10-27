@@ -17,16 +17,19 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
-**October 27: the review stops the contact variants and builds the codec's chart (host).** Seven
-rotor towers wrote 214 to 288 of 2,448 held-out calculations right at the equals and at most 26 of
-the 876 never met in training, below the 8-gram's 34. The
-[review](research/records/2026-10-27_THE_REVIEW_FINDS_THE_CODEC_CUTS_THE_NUMERAL_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
-finds four limits outside the contact they varied: the frequency-founded units fuse a mark with a
-digit, so 422 calculations have no boundary after their `=` and every tower writes 0 of them; the
-covector stops at 128-unit sections, shorter than a problem; and the release has one step at the
-equals. `hnn::units` now founds under a declared chart (kinds no unit crosses, digits that never
-merge and are read with their place). Fix 1's run founds two towers on the charted units; credit
-over whole problems and time at the equals follow in that order.
+**October 27: the review stops the contact variants and the read meets the machine's units
+(host).** Seven rotor towers wrote 214 to 288 of 2,448 held-out calculations right at the equals and
+at most 26 of the 876 never met in training, below the 8-gram's 34. The
+[review](research/records/2026-10-27_THE_REVIEW_FINDS_THE_READ_CUTS_INSIDE_THE_MACHINES_OWN_UNITS_THE_CREDIT_STOPS_AT_THE_SECTION_AND_THE_EQUALS_HAS_ONE_STEP.md)
+finds three limits outside the contact they varied: the read cut each prompt at a byte, so where
+the machine's own units join the `=` to the result's first digit (422 calculations) every tower
+writes 0; the covector stops at 128-unit sections, shorter than a problem; and the release has one
+step at the equals. The units are the machine's own learned reading and stay as founded (a chart
+written into their founding was retired the same day as a hand-written tokenizer). The written read
+now heals its cut (`tower_train::written_release`: the prompt's last unit withheld, the release
+drawn among the units agreeing with its bytes) and marks which cuts fall inside a unit
+(`CUTS.tsv`, the rules' `cuts`). Fix 1's run re-reads every tower healed; credit over whole problems
+and time at the equals follow in that order.
 
 **October 26: the stores and copiers are retired (host).** The binding bank (a slot memory written
 by the delta rule), the reset clock (a copy pointer at the readout), the passage tree and its node
