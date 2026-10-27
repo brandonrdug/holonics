@@ -123,7 +123,8 @@ clock, so the bits it certifies are the candidate's whole read, its segmentation
    the flux (levels `l ≥ 1`), so the ticks form an epoch tower and `Δτ_(l+1) ≤ Δτ_l`; a span's move
    is the product of its sub-moves, for one mode `z^(Δ⌊S/σ⌋)`; the scale square is exact where the
    fine count's residue modulo `r` is the same at both ends of the arrival, and holds up to that
-   residue otherwise.
+   residue otherwise; §4's covector over the `Δτ` sub-moves sums to `conj(∂(λⁿ h)/∂λ) G`
+   (`move_covector_is_derivative`).
 
 ## 7. What was built (October 27)
 
