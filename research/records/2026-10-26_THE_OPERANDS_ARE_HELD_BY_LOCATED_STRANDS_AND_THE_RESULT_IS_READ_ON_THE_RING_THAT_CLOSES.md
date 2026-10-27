@@ -174,7 +174,8 @@ close and are carried by their own rows: the sums and differences in the markup 
 more close under one hand but are not carried: seventeen of one calculation and one of three
 (ranks 4 and 12 against 8 to 32 columns touched). Admitted, they had pulled the space, the
 newline, `$`, `(`, `)`, `,`, `/`, `:` and `*` into the keyed bytes and the stream ran 14 s a byte;
-that read was stopped past its deadline and is not used. With them refused, stage 1 returns the
+that read was stopped early, at about 105 s of its 240 s deadline, when its rate projected past it,
+and is not used ([LOCATE_DEV_STOPPED.md](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES_receipts/LOCATE_DEV_STOPPED.md)). With them refused, stage 1 returns the
 synthetic menu's laws, comparison and keys exactly; symbolically every row of the two largest
 groups closes (4,150 and 3,694 with a ring; 116 and 70 results longer than four digits have none).
 On the stream the space takes `turned ← 0, sheet set to +1` and `<` takes `turned ← 0`; `.`, `>`
