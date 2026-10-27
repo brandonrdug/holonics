@@ -110,6 +110,11 @@ theorem wordReading_add (ω η : E → A) (w : List (E × Bool)) :
   | cons s w ih =>
     rcases s with ⟨e, _ | _⟩ <;> simp [stepReading, ih] <;> abel
 
+theorem wordReading_zero (w : List (E × Bool)) : wordReading (0 : E → A) w = 0 := by
+  induction w with
+  | nil => rfl
+  | cons s w ih => simp [stepReading, ih]
+
 end Word
 
 /-! ## 2. Clocks: the closed forms -/

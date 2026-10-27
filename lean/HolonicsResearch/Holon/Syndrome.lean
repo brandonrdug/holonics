@@ -1,3 +1,4 @@
+import Holonics.Physics.Information.ClockJoin
 import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Fintype.Card
@@ -28,16 +29,17 @@ enumeration over `(ℤ/4)^n` (`ChannelMenu::separation_witness`). #410 owes the 
    `(0, 1)`, `(0, 2)`, `(1, 2)` locate one defect with its turn (`menuThree_locates`) and do not
    locate two (`menuThree_not_locates_two`, broken by `(1, 1, 1)`); two channels detect one defect
    (`menuTwo_detects`) but do not locate it (`menuTwo_not_locates`, broken by `(1, 1)`).
-3. **All cycles of a connected graph** (`cycleReading`, `cycleReading_eq_zero_iff`): on a multigraph
-   with edge ends `src` and `tgt`, a defect reads zero on every closed walk iff it is a coboundary
-   `d₀ f`, `(d₀ f) e = f (tgt e) − f (src e)`, when every vertex reaches every other along edges
-   taken either way (`Connected`). A closed walk reads the telescoping sum (`read_cobound`); the
-   converse integrates along walks from one vertex.
+3. **All cycles of a connected complex** (`cycleReading`, `cycleReading_eq_zero_iff`): on a
+   parametric complex (`Aeon/Clock/Groupoid`) whose occurrences are reached by aeons `path v` from
+   one occurrence `base`, a defect reads zero on every closed aeon iff it is exact, `ω = dφ`
+   (`exactForm`): the existing owner's `Physics/Information/ClockJoin.join_iff_silent`, Stokes and
+   its converse.
 4. **The min-cut form** (`locates_iff_minCut`, `cycleReading_locates_iff`): for any menu with
-   `ker C = im d₀` on a connected multigraph and a nonzero value in `A`, `Locates C k` iff every
-   nonempty proper vertex set `S` has more than `2k` edges with exactly one end in `S`. The
-   support of `d₀` of the lift of `S` is its cut (`supp_cobound_lift`), and a nonzero `d₀ f`
-   contains the cut of a level set of `f` (`cut_level_subset`).
+   `ker C = im d₀` on such a complex and a nonzero value in `A`, `Locates C k` iff every
+   nonempty proper occurrence set `S` has more than `2k` edges with exactly one end in `S`. The
+   support of `d₀` of the lift of `S` is its cut (`supp_exactForm_lift`), a nonzero `dφ` contains
+   the cut of a level set of `φ` (`cut_level_subset`), and an aeon leaving `S` crosses its cut
+   (`exists_cut_edge`).
 
 The computational object is the helical pair interaction: each channel is a pair contact between the
 observed frame and the hidden directions, its defect the contact's slip, and the syndrome is the
@@ -55,8 +57,7 @@ No `sorry`, no `axiom`, no `native_decide`.
 namespace Holonics.Holon.Syndrome
 
 open Finset
-
-universe u v
+open Holonics.Aeon.Clock.Groupoid Holonics.Aeon.Clock.Reading Holonics.Physics.Information
 
 /-! ## 1. Location is separation -/
 
@@ -235,129 +236,39 @@ theorem menuTwo_not_locates : ¬ Locates (menu (A := ZMod 4) twoSrc twoTgt) 1 :=
   have h10 : (1 : ZMod 4) = 0 := congrFun h1 0
   exact absurd h10 (by decide)
 
-/-! ## 3. All cycles of a connected graph -/
-
-/-- [definition] **A walk on a multigraph** with edge ends `src` and `tgt`: each step crosses an
-edge forward or backward. -/
-inductive Walk {V : Type u} {E : Type v} (src tgt : E → V) : V → V → Type (max u v)
-  | nil (x : V) : Walk src tgt x x
-  | fwd (e : E) {y : V} : Walk src tgt (tgt e) y → Walk src tgt (src e) y
-  | bwd (e : E) {y : V} : Walk src tgt (src e) y → Walk src tgt (tgt e) y
-
-/-- [definition] **Connected**: every vertex reaches every other along edges taken either way. -/
-def Connected {V : Type u} {E : Type v} (src tgt : E → V) : Prop :=
-  ∀ x y : V, Nonempty (Walk src tgt x y)
-
-/-- [definition] **The coboundary** `d₀ f`: edge `e` reads `f (tgt e) − f (src e)`. -/
-def cobound {V : Type u} {E : Type v} {A : Type*} [AddCommGroup A] (src tgt : E → V)
-    (f : V → A) : E → A :=
-  fun e => f (tgt e) - f (src e)
-
-namespace Walk
-
-variable {V : Type u} {E : Type v} {src tgt : E → V} {A : Type*} [AddCommGroup A]
-
-/-- [definition] A defect's reading along a walk: forward edges add it, backward edges subtract. -/
-def read (ω : E → A) : {x y : V} → Walk src tgt x y → A
-  | _, _, .nil _ => 0
-  | _, _, .fwd e p => ω e + p.read ω
-  | _, _, .bwd e p => -ω e + p.read ω
-
-/-- [definition] One walk followed by another. -/
-def append : {x y z : V} → Walk src tgt x y → Walk src tgt y z → Walk src tgt x z
-  | _, _, _, .nil _, q => q
-  | _, _, _, .fwd e p, q => .fwd e (p.append q)
-  | _, _, _, .bwd e p, q => .bwd e (p.append q)
-
-theorem read_append (ω : E → A) {x y z : V} (p : Walk src tgt x y) (q : Walk src tgt y z) :
-    (p.append q).read ω = p.read ω + q.read ω := by
-  induction p with
-  | nil _ => simp [append, read]
-  | fwd e p ih => simp [append, read, ih, add_assoc]
-  | bwd e p ih => simp [append, read, ih, add_assoc]
-
-theorem read_zero {x y : V} (p : Walk src tgt x y) : p.read (0 : E → A) = 0 := by
-  induction p with
-  | nil _ => simp [read]
-  | fwd e p ih => simp [read, ih]
-  | bwd e p ih => simp [read, ih]
-
-theorem read_add (ω η : E → A) {x y : V} (p : Walk src tgt x y) :
-    p.read (ω + η) = p.read ω + p.read η := by
-  induction p with
-  | nil _ => simp [read]
-  | fwd e p ih =>
-    simp only [read, ih, Pi.add_apply]
-    abel
-  | bwd e p ih =>
-    simp only [read, ih, Pi.add_apply, neg_add]
-    abel
-
-/-- [proved-standard; formal-checked] A walk reads a coboundary as the telescoping difference. -/
-theorem read_cobound (f : V → A) {x y : V} (p : Walk src tgt x y) :
-    p.read (cobound src tgt f) = f y - f x := by
-  induction p with
-  | nil _ => simp [read]
-  | fwd e p ih =>
-    simp only [read, ih, cobound]
-    abel
-  | bwd e p ih =>
-    simp only [read, ih, cobound]
-    abel
-
-end Walk
+/-! ## 3. All cycles of a connected complex -/
 
 section Cycles
 
-variable {V : Type u} {E : Type v} {src tgt : E → V} {A : Type*} [AddCommGroup A]
+variable {V E F : Type*} (K : ParametricComplex V E F) {A : Type*} [AddCommGroup A]
 
-open Walk
-
-private theorem solve {P Q R w : A} (h1 : P + (w + R) = 0) (h2 : Q + R = 0) : w = Q - P :=
-  calc w = (P + (w + R)) - (Q + R) + Q - P := by abel
-    _ = Q - P := by rw [h1, h2]; abel
-
-/-- [proved-standard; formal-checked] On a connected multigraph, a defect reading zero on every
-closed walk is a coboundary: integrate it along walks from one vertex. -/
-theorem exists_cobound_of_closed (hc : Connected src tgt) (b : V) (ω : E → A)
-    (hω : ∀ x (p : Walk src tgt x x), p.read ω = 0) :
-    ∃ f : V → A, ω = cobound src tgt f := by
-  refine ⟨fun x => (Classical.choice (hc b x)).read ω, funext fun e => ?_⟩
-  obtain ⟨r⟩ := hc (tgt e) b
-  have h1 := hω b ((Classical.choice (hc b (src e))).append (.fwd e r))
-  have h2 := hω b ((Classical.choice (hc b (tgt e))).append r)
-  rw [read_append] at h1 h2
-  simp only [Walk.read] at h1
-  show ω e = (Classical.choice (hc b (tgt e))).read ω - (Classical.choice (hc b (src e))).read ω
-  exact solve h1 h2
-
-/-- [definition] **The menu of all cycles**: a defect read on every closed walk. -/
-def cycleReading (src tgt : E → V) : (E → A) →+ ((Σ x : V, Walk src tgt x x) → A) where
-  toFun ω := fun c => c.2.read ω
+/-- [definition] **The menu of all cycles**: a defect read on every closed aeon. -/
+def cycleReading : (E → A) →+ ((Σ u : V, Aeon K u u) → A) where
+  toFun ω := fun c => wordReading ω c.2.steps
   map_zero' := by
     funext c
-    exact read_zero c.2
+    exact wordReading_zero c.2.steps
   map_add' ω η := by
     funext c
-    exact read_add ω η c.2
+    exact wordReading_add ω η c.2.steps
 
-theorem cycleReading_apply (ω : E → A) (c : Σ x : V, Walk src tgt x x) :
-    cycleReading src tgt ω c = c.2.read ω := rfl
+theorem cycleReading_apply (ω : E → A) (c : Σ u : V, Aeon K u u) :
+    cycleReading K ω c = wordReading ω c.2.steps := rfl
 
-/-- [proved-standard; formal-checked] **`ker C = im d₀`** for the menu of all cycles of a connected
-multigraph. -/
-theorem cycleReading_eq_zero_iff (hc : Connected src tgt) (ω : E → A) :
-    cycleReading src tgt ω = 0 ↔ ∃ f : V → A, ω = cobound src tgt f := by
+variable {K}
+
+/-- [proved-standard; formal-checked] **`ker C = im d₀`** for the menu of all cycles of a complex
+whose occurrences are reached by aeons from one occurrence (`ClockJoin.join_iff_silent`). -/
+theorem cycleReading_eq_zero_iff (base : V) (path : ∀ v, Aeon K base v) (ω : E → A) :
+    cycleReading K ω = 0 ↔ ∃ φ : V → A, ω = exactForm K φ := by
+  refine Iff.trans ?_ (ClockJoin.join_iff_silent ω base path).symm
   constructor
+  · intro h u γ
+    exact (cycleReading_apply K ω ⟨u, γ⟩).symm.trans (congrFun h ⟨u, γ⟩)
   · intro h
-    rcases isEmpty_or_nonempty V with hV | ⟨⟨b⟩⟩
-    · exact ⟨fun _ => 0, funext fun e => (hV.false (src e)).elim⟩
-    · exact exists_cobound_of_closed hc b ω fun x p =>
-        (cycleReading_apply ω ⟨x, p⟩).symm.trans (congrFun h ⟨x, p⟩)
-  · rintro ⟨f, rfl⟩
     funext c
     rw [cycleReading_apply]
-    exact (read_cobound f c.2).trans (sub_self _)
+    exact h c.1 c.2
 
 end Cycles
 
@@ -365,105 +276,108 @@ end Cycles
 
 section Cut
 
-variable {V : Type u} {E : Type v} [Fintype V] [DecidableEq V] [Fintype E] [DecidableEq E]
-  {A : Type*} [AddCommGroup A] [DecidableEq A] (src tgt : E → V)
+variable {V E F : Type*} [Fintype V] [DecidableEq V] [Fintype E] [DecidableEq E]
+  (K : ParametricComplex V E F) {A : Type*} [AddCommGroup A] [DecidableEq A]
 
-/-- [definition] **The cut of a vertex set** `S`: the edges with exactly one end in `S`. -/
-def cut (S : Finset V) : Finset E := univ.filter fun e => ¬(src e ∈ S ↔ tgt e ∈ S)
+/-- [definition] **The cut of an occurrence set** `S`: the edges with exactly one end in `S`. -/
+def cut (S : Finset V) : Finset E := univ.filter fun e => ¬(K.src e ∈ S ↔ K.tgt e ∈ S)
 
-variable {src tgt}
+variable {K}
 
-theorem mem_cut {S : Finset V} {e : E} : e ∈ cut src tgt S ↔ ¬(src e ∈ S ↔ tgt e ∈ S) := by
+theorem mem_cut {S : Finset V} {e : E} : e ∈ cut K S ↔ ¬(K.src e ∈ S ↔ K.tgt e ∈ S) := by
   simp [cut]
 
-/-- [proved-standard] A walk from inside `S` to outside it crosses the cut of `S`. -/
-theorem Walk.exists_cut_edge {S : Finset V} {x y : V} (p : Walk src tgt x y) (hx : x ∈ S)
-    (hy : y ∉ S) : ∃ e, e ∈ cut src tgt S := by
-  induction p with
-  | nil _ => exact absurd hx hy
-  | fwd e p ih =>
-    by_cases ht : tgt e ∈ S
-    · exact ih ht hy
-    · exact ⟨e, by simp [mem_cut, hx, ht]⟩
-  | bwd e p ih =>
-    by_cases hs : src e ∈ S
-    · exact ih hs hy
-    · exact ⟨e, by simp [mem_cut, hx, hs]⟩
+/-- [proved-standard] A chained word from inside `S` to outside it crosses the cut of `S`. -/
+theorem exists_cut_edge {S : Finset V} {u v : V} {w : List (E × Bool)} (hw : K.Chained u w v)
+    (hu : u ∈ S) (hv : v ∉ S) : ∃ e, e ∈ cut K S := by
+  induction w generalizing u with
+  | nil =>
+    rw [ParametricComplex.chained_nil] at hw
+    subst hw
+    exact absurd hu hv
+  | cons s w ih =>
+    obtain ⟨h1, h2⟩ := hw
+    by_cases hf : K.finish s ∈ S
+    · exact ih h2 hf
+    · rcases s with ⟨e, _ | _⟩ <;>
+        simp [ParametricComplex.start, ParametricComplex.finish] at h1 hf <;>
+        subst h1 <;>
+        exact ⟨e, mem_cut.mpr (by simp [hu, hf])⟩
 
 /-- [definition] The value `a` on `S` and `0` off it. -/
 def lift (S : Finset V) (a : A) : V → A := fun x => if x ∈ S then a else 0
 
 /-- [proved-standard] The support of `d₀` of the lift of `S` is the cut of `S`. -/
-theorem supp_cobound_lift {a : A} (ha : a ≠ 0) (S : Finset V) :
-    supp (cobound src tgt (lift S a)) = cut src tgt S := by
+theorem supp_exactForm_lift {a : A} (ha : a ≠ 0) (S : Finset V) :
+    supp (exactForm K (lift S a)) = cut K S := by
   ext e
   rw [mem_supp, mem_cut]
-  simp only [cobound, lift]
-  by_cases hs : src e ∈ S <;> by_cases ht : tgt e ∈ S <;> simp [hs, ht, ha]
+  simp only [exactForm, lift]
+  by_cases hs : K.src e ∈ S <;> by_cases ht : K.tgt e ∈ S <;> simp [hs, ht, ha]
 
-/-- [definition] The level set of `f` at the value it takes at `b`. -/
-def level (f : V → A) (b : V) : Finset V := univ.filter fun x => f x = f b
+/-- [definition] The level set of `φ` at the value it takes at `b`. -/
+def level (φ : V → A) (b : V) : Finset V := univ.filter fun x => φ x = φ b
 
-/-- [proved-standard] The cut of a level set of `f` lies in the support of `d₀ f`. -/
-theorem cut_level_subset (f : V → A) (b : V) :
-    cut src tgt (level f b) ⊆ supp (cobound src tgt f) := by
+/-- [proved-standard] The cut of a level set of `φ` lies in the support of `d₀ φ`. -/
+theorem cut_level_subset (φ : V → A) (b : V) : cut K (level φ b) ⊆ supp (exactForm K φ) := by
   intro e he
   rw [mem_cut] at he
   rw [mem_supp]
   intro h0
   apply he
-  have h : f (tgt e) = f (src e) := sub_eq_zero.mp h0
+  have h : φ (K.tgt e) = φ (K.src e) := sub_eq_zero.mp h0
   simp [level, h]
 
 /-- [proved-standard; formal-checked] **The min-cut form**: for a menu with `ker C = im d₀` on a
-connected multigraph and a nonzero value in `A`, defects on at most `k` edges are located uniquely
-iff every nonempty proper vertex set has more than `2k` edges in its cut. -/
+complex whose occurrences are reached by aeons from one occurrence, and a nonzero value in `A`,
+defects on at most `k` edges are located uniquely iff every nonempty proper occurrence set has more
+than `2k` edges in its cut. -/
 theorem locates_iff_minCut {B : Type*} [AddCommGroup B] (C : (E → A) →+ B)
-    (hker : ∀ ω, C ω = 0 ↔ ∃ f : V → A, ω = cobound src tgt f) (hc : Connected src tgt)
-    {a : A} (ha : a ≠ 0) (k : ℕ) :
-    Locates C k ↔ ∀ S : Finset V, S.Nonempty → S ≠ univ → 2 * k < (cut src tgt S).card := by
+    (hker : ∀ ω, C ω = 0 ↔ ∃ φ : V → A, ω = exactForm K φ) (base : V)
+    (path : ∀ v, Aeon K base v) {a : A} (ha : a ≠ 0) (k : ℕ) :
+    Locates C k ↔ ∀ S : Finset V, S.Nonempty → S ≠ univ → 2 * k < (cut K S).card := by
   rw [locates_iff_separates]
   constructor
   · intro hsep S hS hSu
     by_contra hle
     push Not at hle
-    have h0 := hsep (cobound src tgt (lift S a)) ((hker _).mpr ⟨_, rfl⟩)
-      (by rw [supp_cobound_lift ha]; exact hle)
+    have h0 := hsep (exactForm K (lift S a)) ((hker _).mpr ⟨_, rfl⟩)
+      (by rw [supp_exactForm_lift ha]; exact hle)
     obtain ⟨x, hx⟩ := hS
     obtain ⟨y, hy⟩ : ∃ y, y ∉ S := by
       by_contra h
       push Not at h
       exact hSu (eq_univ_of_forall h)
-    obtain ⟨p⟩ := hc x y
-    obtain ⟨e, he⟩ := p.exists_cut_edge hx hy
-    rw [← supp_cobound_lift ha, h0] at he
+    obtain ⟨e, he⟩ := exists_cut_edge ((path x).reverse.concat (path y)).chained hx hy
+    rw [← supp_exactForm_lift ha, h0] at he
     simp [mem_supp] at he
   · intro hcut v hv hs
-    obtain ⟨f, rfl⟩ := (hker v).mp hv
+    obtain ⟨φ, rfl⟩ := (hker v).mp hv
     by_contra hne
-    obtain ⟨e, he⟩ : ∃ e, cobound src tgt f e ≠ 0 := by
+    obtain ⟨e, he⟩ : ∃ e, exactForm K φ e ≠ 0 := by
       by_contra h
       push Not at h
       exact hne (funext h)
-    have h1 : (level f (src e)).Nonempty := ⟨src e, by simp [level]⟩
-    have h2 : level f (src e) ≠ univ := by
+    have h1 : (level φ (K.src e)).Nonempty := ⟨K.src e, by simp [level]⟩
+    have h2 : level φ (K.src e) ≠ univ := by
       intro h
-      have ht : tgt e ∈ level f (src e) := by
+      have ht : K.tgt e ∈ level φ (K.src e) := by
         rw [h]
         exact mem_univ _
       simp only [level, mem_filter, mem_univ, true_and] at ht
-      exact he (by simp [cobound, ht])
+      exact he (by simp [exactForm, ht])
     have hgt := hcut _ h1 h2
-    have hle := card_le_card (cut_level_subset (src := src) (tgt := tgt) f (src e))
+    have hle := card_le_card (cut_level_subset (K := K) φ (K.src e))
     omega
 
-/-- [proved-standard; formal-checked] **All cycles of a connected graph**: defects on at most `k`
-edges are located uniquely by their readings on every closed walk iff every edge cut has more than
+/-- [proved-standard; formal-checked] **All cycles of a connected complex**: defects on at most `k`
+edges are located uniquely by their readings on every closed aeon iff every edge cut has more than
 `2k` edges. -/
-theorem cycleReading_locates_iff (hc : Connected src tgt) {a : A} (ha : a ≠ 0) (k : ℕ) :
-    Locates (cycleReading (A := A) src tgt) k ↔
-      ∀ S : Finset V, S.Nonempty → S ≠ univ → 2 * k < (cut src tgt S).card :=
-  locates_iff_minCut (cycleReading src tgt) (cycleReading_eq_zero_iff hc) hc ha k
+theorem cycleReading_locates_iff (base : V) (path : ∀ v, Aeon K base v) {a : A} (ha : a ≠ 0)
+    (k : ℕ) :
+    Locates (cycleReading (A := A) K) k ↔
+      ∀ S : Finset V, S.Nonempty → S ≠ univ → 2 * k < (cut K S).card :=
+  locates_iff_minCut (cycleReading K) (cycleReading_eq_zero_iff base path) base path ha k
 
 end Cut
 
