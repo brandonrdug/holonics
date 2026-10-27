@@ -61,6 +61,15 @@ pub trait PassRealization {
 
     /// Each stream's continuing state from the read kept in `slot`, its credit moved along it.
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()>;
+
+    /// Every stream's whole face at the last cell of the read kept in [`Slot::Opened`]: each
+    /// class's mass and their total on `2^(−62)`, the face a release draws from.
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>>;
+
+    /// Whether this realization carries `tower`'s law. A run reads it before any model work or
+    /// output, so a law the realization does not carry is refused at the run's start, never at its
+    /// first section.
+    fn admit(&self, tower: &Tower) -> Result<()>;
 }
 
 type Kept = (Vec<(Vec<Cell>, TowerState)>, Reaches);
@@ -88,6 +97,7 @@ impl PassRealization for HostPass {
     }
 
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
+        tower.admit_read(classes, targets)?;
         let reaches = tower.reaches();
         let forwards: Vec<(Vec<Cell>, TowerState)> = opening
             .par_iter()
@@ -145,6 +155,16 @@ impl PassRealization for HostPass {
         let (forwards, reaches) = self.kept(slot).take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
         tower.carry_credit(states, forwards, opening, &reaches)
     }
+
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+        let (forwards, _) = self.opened.as_ref().ok_or(TowerError::Refused("a face is read from the opening forward"))?;
+        forwards.iter().map(|(cells, _)| cells.last().map(|c| c.face.clone()).ok_or(TowerError::Refused("an opening read of no cell"))).collect()
+    }
+
+    /// The host realizes every law the tower states.
+    fn admit(&self, _tower: &Tower) -> Result<()> {
+        Ok(())
+    }
 }
 
 /// One level's families in the material and their reaches, as a section reads them.
@@ -174,8 +194,10 @@ pub struct ResidentLevel {
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair or ring face is
-/// joined. Read from the tower's own owners, so a realization holds no second copy of a law.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair face, ring face,
+/// rotor or strands are joined. Read from the tower's own owners, so a realization holds no second
+/// copy of a law, and a realization that does not carry a joined part refuses the tower rather
+/// than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -190,9 +212,77 @@ pub struct ResidentLaw {
     pub ln2_square: i128,
     pub pair_face: bool,
     pub ring_face: bool,
+    pub rotor: bool,
+    pub strands: bool,
 }
 
 impl Tower {
+    /// [definition; agent-inferred, October 27] **A frozen read through a realization**: each part
+    /// read from rest, the code `−log₂ p̂` of every class after its first on `2^(−20)` bits, as
+    /// [`Tower::read_cells`] reads it, in windows of `section` cells whose continuing states are
+    /// carried into the next window ([`Slot::Reread`]), so the held-out read runs where the
+    /// training passes run. A part shorter than the longest is padded past its end with places
+    /// compared with nothing; the forward reads in order, so the padding moves no face the part
+    /// reads. The tower is not moved.
+    pub fn read_parts_realized(&self, parts: &[&[usize]], section: usize, realization: &mut dyn PassRealization) -> Result<Vec<Vec<i64>>> {
+        if section == 0 {
+            return Err(TowerError::Refused("a realized read takes windows of at least one cell"));
+        }
+        let longest = parts.iter().map(|p| p.len()).max().unwrap_or(0);
+        let mut codes: Vec<Vec<i64>> = parts.iter().map(|p| Vec::with_capacity(p.len().saturating_sub(1))).collect();
+        let mut states: Vec<TowerState> = parts.iter().map(|_| self.rest()).collect();
+        let mut at = 0usize;
+        while at + 1 < longest {
+            let cells = section.min(longest - 1 - at);
+            let windows: Vec<Vec<usize>> = parts.iter().map(|p| (at..=at + cells).map(|i| p.get(i).copied().unwrap_or(0)).collect()).collect();
+            let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| (at + 1..=at + cells).map(|i| p.get(i).copied()).collect()).collect();
+            let classes: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
+            let read = realization.forward(self, &states, &classes, &targets, Slot::Reread)?;
+            for (code, faces) in codes.iter_mut().zip(&read.faces) {
+                code.extend(faces.iter().flatten().map(|&(m, t)| face_code(m, t)));
+            }
+            let opening = states.clone();
+            realization.carry(self, &mut states, &opening, Slot::Reread)?;
+            at += cells;
+        }
+        Ok(codes)
+    }
+
+    /// [definition; agent-inferred, October 27] Every class a realization reads and every class it
+    /// compares a face with lies in the declared alphabet. A face has no mass at a class outside
+    /// it (the card's read is zero there, the host's face has no entry), and the certificate
+    /// decides on positive masses, so such a read is refused before any realization reads it.
+    pub fn admit_read(&self, classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<()> {
+        let a = self.declaration.alphabet;
+        if classes.iter().any(|c| c.iter().any(|&u| u >= a)) || targets.iter().flatten().flatten().any(|&t| t >= a) {
+            return Err(TowerError::Refused("a class read or compared outside the declared alphabet"));
+        }
+        Ok(())
+    }
+
+    /// [definition; agent-inferred, October 27] **The advance through a realization**: each
+    /// stream reads its classes from its state and returns the whole face after its last class
+    /// and the code of each class after its first (`2^(−20)` bits), its state moved past every
+    /// class: [`Tower::advance`] class by class, on whatever realizes the pass. A release (a
+    /// prompt, then one drawn class at a time) runs where the training runs. The streams' class
+    /// lists have one length; the read's last place is compared with nothing, so the face it
+    /// returns is the one the next class is drawn from.
+    pub fn advance_realized(&self, states: &mut [TowerState], classes: &[&[usize]], realization: &mut dyn PassRealization) -> Result<(Vec<TowerFace>, Vec<i64>)> {
+        let n = classes.first().map_or(0, |c| c.len());
+        if n == 0 || classes.iter().any(|c| c.len() != n) || states.len() != classes.len() {
+            return Err(TowerError::Refused("an advance reads one nonempty length of classes a stream"));
+        }
+        let windows: Vec<Vec<usize>> = classes.iter().map(|c| c.iter().copied().chain([0]).collect()).collect();
+        let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).chain([None]).collect()).collect();
+        let reads: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();
+        let read = realization.forward(self, states, &reads, &targets, Slot::Opened)?;
+        let codes = read.faces.iter().map(|faces| faces.iter().flatten().map(|&(m, t)| face_code(m, t)).sum()).collect();
+        let faces = realization.last_faces()?;
+        let opening = states.to_vec();
+        realization.carry(self, states, &opening, Slot::Opened)?;
+        Ok((faces, codes))
+    }
+
     /// The tower's [`ResidentLaw`] for a section read under its current material.
     pub fn resident_law(&self) -> Result<ResidentLaw> {
         let reaches = self.reaches();
@@ -239,6 +329,8 @@ impl Tower {
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
             pair_face: self.pair.is_some(),
             ring_face: self.ring.is_some(),
+            rotor: self.rotor.is_some(),
+            strands: self.strands.is_some(),
         })
     }
 }

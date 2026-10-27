@@ -788,9 +788,9 @@ pub(super) fn run_with_execution(
         Some("train-pair-linear-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::PairLinear),
         Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, true, holonics::hnn::tower::ContactLaw::Rectifying),
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
-        Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying),
-        Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying),
-        Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair),
+        Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
+        Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
+        Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("sample-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::sample_units(args),
         Some("read-unit-tower-written") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_unit_written(args),
         Some("read-unit-tower-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::read_unit_at(args),
@@ -846,19 +846,33 @@ pub(super) fn run_with_execution(
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
     }
 }
-/// The class-passage tower commands with each section's forward and reverse through a declared
-/// realization (`hnn::tower::realization`; `holonics-cuda`'s `tower_pass` example passes the card).
+/// The tower commands with each section's forward and reverse through a declared realization
+/// (`hnn::tower::realization`; `holonics-cuda`'s `tower_pass` example passes the card): the
+/// gated tower on a class passage, and the plain gated tower on the founded units.
 pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::realization::PassRealization) -> Result<()> {
     use holonics::hnn::tower::TurnLadder;
     match args.first().map(String::as_str) {
         Some("train-gated-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Fixed, realization),
         Some("train-scaled-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Scaled, realization),
         Some("train-two-ladder-tower-classes") => tower_classes::train_realized(args, false, false, false, TurnLadder::Both, realization),
-        _ => Err("a realized route trains the gated tower on a class passage: train-gated-tower-classes, train-scaled-tower-classes or train-two-ladder-tower-classes".into()),
+        Some("train-unit-tower") => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, realization),
+        Some("release-tower-classes") => tower_classes::release_realized(args, realization),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-unit-tower or release-tower-classes".into()),
     }
 }
 
+/// [project-postulate, October 27] Every command of this route learns, reads, founds or releases on
+/// the host, which is model compute: it runs only under Brandon's own exception (naming the
+/// workload, its purpose and its limits) or as the parity reference that checks a card run (the
+/// guide's "GPU first, and the design fixes the workload"). `HOLONICS_HOST_EXCEPTION` names which;
+/// without it the command is refused before it reads anything, and with it the run's first line
+/// names its device. Card runs go through `holonics-cuda`'s `tower_pass`, which never enters here.
 pub(super) fn run(args: &[String]) -> Result<()> {
+    let exception = std::env::var("HOLONICS_HOST_EXCEPTION").unwrap_or_default();
+    if exception.trim().is_empty() {
+        return Err("complete-language on the host is model compute: it runs only under Brandon's exception or as a card run's parity reference, named in HOLONICS_HOST_EXCEPTION; a learner runs on the card through holonics-cuda's tower_pass".into());
+    }
+    println!("DEVICE host exception={}", exception.trim());
     run_with_execution(
         args,
         &HostObservedEpochExecution,

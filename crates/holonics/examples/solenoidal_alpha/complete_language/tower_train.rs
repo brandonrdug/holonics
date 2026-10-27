@@ -39,29 +39,19 @@ pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
 /// The held-out reading: the frozen tower's code of `classes`, cut into `streams` contiguous
 /// parts, each read from rest; per region of `roles` (the coded class's region, the region of its
 /// first byte), on `2^(−20)` bits, with the bytes coded (`lengths`, each class's bytes).
-fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize) -> Result<[(i64, usize); 4]> {
-    let chunk = classes.len().div_ceil(streams);
-    let starts: Vec<usize> = (0..classes.len()).step_by(chunk).collect();
-    let parts: Vec<[(i64, usize); 4]> = starts
-        .par_iter()
-        .map(|&start| {
-            let part = &classes[start..(start + chunk).min(classes.len())];
-            let mut state = tower.rest();
-            let codes = tower.read_cells(&mut state, part).map_err(|e| e.to_string())?;
-            let mut regions = [(0i64, 0usize); 4];
-            for (i, code) in codes.into_iter().enumerate() {
-                let region = &mut regions[roles[start + i + 1] as usize];
-                region.0 += code;
-                region.1 += lengths[start + i + 1] as usize;
-            }
-            Ok(regions)
-        })
-        .collect::<std::result::Result<_, String>>()?;
+fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize, section: usize, realization: &mut dyn PassRealization) -> Result<[(i64, usize); 4]> {
+    // Each part from rest, read through the declared realization (the card's route reads it on
+    // the card) in windows of the training section.
+    let chunk = classes.len().div_ceil(streams).max(1);
+    let parts: Vec<&[usize]> = classes.chunks(chunk).collect();
+    let codes = tower.read_parts_realized(&parts, section, realization).map_err(|e| e.to_string())?;
     let mut regions = [(0i64, 0usize); 4];
-    for part in parts {
-        for (r, (code, n)) in part.into_iter().enumerate() {
-            regions[r].0 += code;
-            regions[r].1 += n;
+    for (p, part) in codes.into_iter().enumerate() {
+        let start = p * chunk;
+        for (i, code) in part.into_iter().enumerate() {
+            let region = &mut regions[roles[start + i + 1] as usize];
+            region.0 += code;
+            region.1 += lengths[start + i + 1] as usize;
         }
     }
     Ok(regions)
@@ -81,7 +71,8 @@ pub(super) fn read_tower_held(args: &[String]) -> Result<()> {
     let roles = roles_of(&args[5], &args[6], dev.len())?;
     let streams = positive(&args[7])?;
     let classes: Vec<usize> = dev.iter().map(|&b| b as usize).collect();
-    let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams)?;
+    let section = classes.len().div_ceil(streams).max(1);
+    let regions = held_out(&learner.tower, &classes, &vec![1; classes.len()], &roles, streams, section, &mut HostPass::default())?;
     let (code, coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
     println!(
         "TOWER_HELD streams={streams} dev_bits_a_byte={} dev_regions {} elapsed_ms={}",
@@ -3335,7 +3326,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 /// turns and reflects every mode, the Swing's three kinds keyed by the unit), and
 /// `train-unit-pair-pumped-tower` the pumped tower whose contacts are pair contacts, which take the
 /// product of two modes' phases (record `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
-pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw) -> Result<()> {
+pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 20 && args.len() != 22 {
         return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -3362,7 +3353,7 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, &mut HostPass::default())
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, realization)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3404,10 +3395,14 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let passes = count(&args[8])?;
     let rate_bits: u32 = args[9].parse()?;
     let out = Path::new(&args[10]);
-    std::fs::create_dir(out)?;
     let classes = &reading.train;
     if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
         return Err("the training text must hold one section a stream".into());
+    }
+    // A run that trains declares at least one pass: a learner saved after none would be read as
+    // trained (Epime's review of October 27). A rested learner is read alone by the read commands.
+    if passes == 0 {
+        return Err("a training run declares at least one pass".into());
     }
     // A run continues a rested learner (its tower and moments) when one is named; its declaration
     // and rate must be the declared ones.
@@ -3421,6 +3416,10 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     } else {
         TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
     };
+    // The realization admits the whole law before any section is read or any output is written.
+    realization.admit(&learner.tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
+    std::fs::create_dir(out)?;
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
@@ -3563,7 +3562,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;
         println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
-        let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams)?;
+        let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams, section, realization)?;
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
             "TOWER_PASS pass={} train_bits_a_byte={} dev_bits_a_byte={} dev_regions {} deposits={}/{} pass_ms={} elapsed_ms={} train_code={code} dev_code={dev_code} grain_bits={READ_BITS}",
@@ -3726,28 +3725,70 @@ fn calculations_of(answer: &[u8]) -> Vec<(&[u8], usize)> {
 
 /// A fork of the rested tower receives `prompt` read in the units and releases units by `agree`
 /// exact agreeing draws, each moved through, until `stop` holds of its bytes, `bytes` bytes are
-/// released or `cap` units are. Returns the released bytes, the prompt's units and the units
-/// released.
-fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeyStream, agree: u32, bytes: usize, cap: usize, stop: fn(&[u8]) -> bool) -> std::result::Result<(Vec<u8>, [usize; 2]), String> {
-    let classes = units.parse(prompt).map_err(|e| e.to_string())?;
+/// released or `cap` units are. Returns the released bytes, the prompt's units, the units released,
+/// the bytes of the withheld tail, whether the tail's last draw ran past it and the tail's units
+/// placed without a draw (none agreeing held mass).
+///
+/// [definition; agent-inferred, October 27] **The read meets the units** (`heal`; the review
+/// record §2). A prompt cut at a byte the passage does not end a unit at (an `=` the founded units
+/// join to the digit after it, `=3`) ends in a unit the tower never met there. Healed, the fork
+/// receives the prompt without its last unit and releases with that unit's bytes as the release's
+/// opening: while the tail is unspent only units whose bytes agree with it are drawn (the face
+/// restricted to them, the tower's own conditional given the bytes it was shown), and a unit that
+/// runs past the tail (`=3`) writes the rest. The returned release is what follows the tail. The
+/// units stay as founded; only the check's cut moves to a boundary of the machine's own reading.
+#[allow(clippy::too_many_arguments)]
+fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeyStream, agree: u32, bytes: usize, cap: usize, stop: fn(&[u8]) -> bool, heal: bool) -> std::result::Result<(Vec<u8>, [usize; 5]), String> {
+    let mut classes = units.parse(prompt).map_err(|e| e.to_string())?;
+    let tail: Vec<u8> = match heal {
+        true => units.piece(classes.pop().ok_or("an empty prompt")? as usize).to_vec(),
+        false => Vec::new(),
+    };
     let mut state = tower.rest();
     let mut face = None;
     for &c in &classes {
         face = Some(tower.advance(&mut state, c as usize).map_err(|e| e.to_string())?);
     }
     let mut face = face.ok_or("an empty prompt")?;
-    let (mut released, mut drawn) = (Vec::new(), 0);
-    while released.len() < bytes && drawn < cap {
+    let (mut released, mut drawn, mut past, mut placed) = (Vec::new(), 0, false, 0);
+    while released.len() < bytes.saturating_add(tail.len()) && drawn < cap {
         let key = keys.next_key().ok_or("fewer keys than a problem's window draws")?;
-        let class = agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?;
+        let class = if released.len() < tail.len() {
+            // The units whose bytes agree with the unspent tail: a prefix of it, or running past it.
+            let rest = &tail[released.len()..];
+            let agreeing: Vec<u128> = face
+                .masses
+                .iter()
+                .enumerate()
+                .map(|(u, &m)| {
+                    let piece = units.piece(u);
+                    if rest.starts_with(piece) || piece.starts_with(rest) { m } else { 0 }
+                })
+                .collect();
+            let class = match agreeing.iter().any(|&m| m > 0) {
+                true => agreeing_class(&agreeing, agree, &key).map_err(|e| e.to_string())?,
+                // No agreeing unit holds mass at the face's grain: the shown bytes are placed as
+                // the units parse them.
+                false => {
+                    placed += 1;
+                    units.parse(rest).map_err(|e| e.to_string())?[0] as usize
+                }
+            };
+            past = units.piece(class).len() > rest.len();
+            class
+        } else {
+            agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?
+        };
         released.extend_from_slice(units.piece(class));
         drawn += 1;
-        if stop(&released) || released.len() >= bytes || drawn == cap {
+        let after = &released[tail.len().min(released.len())..];
+        if released.len() >= tail.len() && (stop(after) || after.len() >= bytes) || drawn == cap {
             break;
         }
         face = tower.advance(&mut state, class).map_err(|e| e.to_string())?;
     }
-    Ok((released, [classes.len(), drawn]))
+    let after = released.get(tail.len()..).unwrap_or_default().to_vec();
+    Ok((after, [classes.len(), drawn, tail.len(), usize::from(past), placed]))
 }
 
 /// `read-unit-tower-written UNITS UNITS_SHA STATE STATE_SHA HELD HELD_SHA KEYS KEYS_SHA BYTES
@@ -3757,9 +3798,13 @@ fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeySt
 /// For each problem a fork receives the framed question (a blank line, the question, its line
 /// end) and releases `BYTES` bytes at `AGREE` agreeing draws (`FREE.tsv`: the problem's index and
 /// the release). At every calculation the answer writes, `<<expression=`, a fork receives the
-/// framed question and the answer through that `=` and releases units at `MARK_AGREE` agreeing
-/// draws until its bytes hold `>>` or a line end, or `MARK_CAP` units are released (`MARKS.tsv`:
-/// the problem's index, the calculation's, the expression and the release). Every fork opens at
+/// framed question and the answer through that `=`, healed ([`written_release`]: the prompt's last
+/// unit is withheld and the release opens with its bytes, so the cut falls where the units read),
+/// and releases units at `MARK_AGREE` agreeing draws until its bytes past the `=` hold `>>` or a
+/// line end, or `MARK_CAP` units are released, the tail's among them (`MARKS.tsv`:
+/// the problem's index, the calculation's, the expression and the release; `CUTS.tsv`: the
+/// problem's index, the calculation's, and 1 where the whole problem read in the units ends a unit
+/// at that `=`, else 0). Every fork opens at
 /// rest, so each problem and each calculation is read alone, as the John prompt is. Problem `i`
 /// draws from its own window of the key file, `BYTES + MARK_CAP · (the most calculations a problem
 /// writes)` eight-byte keys: the free release from the window's start, the calculations after its
@@ -3793,7 +3838,7 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
     println!("TOWER_WRITTEN_OPEN problems={} most_calculations={most} window={window} elapsed_ms={}", problems.len(), started.elapsed().as_millis());
     let tower = &learner.tower;
     let done = std::sync::atomic::AtomicUsize::new(0);
-    type Read = (Vec<u8>, Vec<(Vec<u8>, Vec<u8>)>, [usize; 2]);
+    type Read = (Vec<u8>, Vec<(Vec<u8>, Vec<u8>, bool)>, [usize; 5]);
     let reads: Vec<Read> = problems
         .par_iter()
         .enumerate()
@@ -3804,46 +3849,77 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
             framed.extend_from_slice(&question);
             framed.push(b'\n');
             let mut free_keys = KeyStream::new(keys[at..at + bytes * 8].to_vec(), 8).map_err(|e| e.to_string())?;
-            let (free, [mut prompts, mut drawn]) = written_release(tower, &units, &framed, &mut free_keys, agree, bytes, usize::MAX, |_| false)?;
+            let (free, [mut prompts, mut drawn, _, _, _]) = written_release(tower, &units, &framed, &mut free_keys, agree, bytes, usize::MAX, |_| false, false)?;
+            let (mut wide, mut past, mut placed) = (0usize, 0usize, 0usize);
             let mut mark_keys = KeyStream::new(keys[at + bytes * 8..at + window * 8].to_vec(), 8).map_err(|e| e.to_string())?;
+            // Where the problem's own reading in the units ends a unit: the whole problem parsed
+            // as the training text frames it.
+            let mut whole = framed.clone();
+            whole.extend_from_slice(&answer);
+            let mut ends = std::collections::BTreeSet::new();
+            let mut end = 0;
+            for u in units.parse(&whole).map_err(|e| e.to_string())? {
+                end += units.piece(u as usize).len();
+                ends.insert(end);
+            }
             let mut marks = Vec::new();
             for (expression, through) in calculations_of(&answer) {
                 let mut prompt = framed.clone();
                 prompt.extend_from_slice(&answer[..through]);
                 let stop: fn(&[u8]) -> bool = |r| r.windows(2).any(|w| w == b">>") || r.contains(&b'\n');
-                let (release, [p, d]) = written_release(tower, &units, &prompt, &mut mark_keys, mark_agree, usize::MAX, mark_cap, stop)?;
+                let (release, [p, d, tail, ran, put]) = written_release(tower, &units, &prompt, &mut mark_keys, mark_agree, usize::MAX, mark_cap, stop, true)?;
                 prompts += p;
                 drawn += d;
-                marks.push((expression.to_vec(), release));
+                wide += usize::from(tail > 1);
+                past += ran;
+                placed += put;
+                marks.push((expression.to_vec(), release, ends.contains(&(framed.len() + through))));
             }
             let n = done.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
             if n % 64 == 0 {
                 println!("TOWER_WRITTEN_PROGRESS problems={n} elapsed_ms={}", started.elapsed().as_millis());
             }
-            Ok((free, marks, [prompts, drawn]))
+            Ok((free, marks, [prompts, drawn, wide, past, placed]))
         })
         .collect::<std::result::Result<_, String>>()?;
     let mut free_tsv = String::new();
     let mut marks_tsv = String::new();
-    let (mut marks, mut prompts, mut drawn, mut most_moved, mut released) = (0, 0, 0, 0, 0);
-    for (i, (free, calcs, [p, d])) in reads.iter().enumerate() {
+    let mut cuts_tsv = String::new();
+    let mut bounded = 0;
+    let (mut marks, mut prompts, mut drawn, mut most_moved, mut released, mut wide, mut past, mut placed) = (0, 0, 0, 0, 0, 0, 0, 0);
+    for (i, (free, calcs, [p, d, w, r, q])) in reads.iter().enumerate() {
         free_tsv.push_str(&format!("{i}\t{}\n", field(free)));
         released += free.len();
-        for (j, (expression, release)) in calcs.iter().enumerate() {
+        for (j, (expression, release, at_end)) in calcs.iter().enumerate() {
             marks_tsv.push_str(&format!("{i}\t{j}\t{}\t{}\n", field(expression), field(release)));
+            cuts_tsv.push_str(&format!("{i}\t{j}\t{}\n", u8::from(*at_end)));
+            bounded += usize::from(*at_end);
         }
         marks += calcs.len();
         prompts += p;
         drawn += d;
+        wide += w;
+        past += r;
+        placed += q;
         most_moved = most_moved.max(p + d);
     }
     write_new(&out.join("FREE.tsv"), free_tsv.as_bytes())?;
     write_new(&out.join("MARKS.tsv"), marks_tsv.as_bytes())?;
+    write_new(&out.join("CUTS.tsv"), cuts_tsv.as_bytes())?;
     println!(
         "TOWER_WRITTEN problems={} calculations={marks} free_bytes={released} prompt_units={prompts} released_units={drawn} most_units_a_problem={most_moved} agree={agree} mark_agree={mark_agree} mark_cap={mark_cap} elapsed_ms={}",
         reads.len(), started.elapsed().as_millis()
     );
-    println!("TOWER_WRITTEN_FILES free_sha256={} marks_sha256={}", sha256(free_tsv.as_bytes())?, sha256(marks_tsv.as_bytes())?);
+    // The healed cut: marks whose `=` the problem's own reading ends a unit at, marks whose
+    // withheld unit held more than the `=` (an operand's digit joined to it), marks whose release
+    // opened with a unit running past the tail (`=3`), and tail units placed without a draw.
+    println!("TOWER_WRITTEN_HEALED calculations={marks} bounded_at_equals={bounded} tail_wider_than_equals={wide} opened_past_tail={past} tail_units_placed={placed}");
+    println!(
+        "TOWER_WRITTEN_FILES free_sha256={} marks_sha256={} cuts_sha256={}",
+        sha256(free_tsv.as_bytes())?,
+        sha256(marks_tsv.as_bytes())?,
+        sha256(cuts_tsv.as_bytes())?
+    );
     Ok(())
 }
 

@@ -33,7 +33,7 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::hnn::tower::realization::{PassRead, PassRealization, ResidentLaw, Slot};
-use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerState};
+use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerFace, TowerState};
 
 use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
@@ -306,6 +306,9 @@ impl<'c> TowerCard<'c> {
         if law.pair_face || law.ring_face {
             return refuse("the card carries no pair or ring face");
         }
+        if law.rotor || law.strands {
+            return refuse("the card carries no rotor or strands: its forward reads no step or strand contact and its reverse has no strand gradient");
+        }
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
@@ -559,14 +562,17 @@ impl<'c> TowerCard<'c> {
     fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let law = tower.resident_law()?;
         Self::admits(&law)?;
+        tower.admit_read(classes, targets)?;
         let d = law.declaration;
         let streams = classes.len();
         let cells = classes.first().map_or(0, |c| c.len().saturating_sub(1));
         if streams == 0 || cells == 0 || classes.iter().any(|c| c.len() != cells + 1) || targets.len() != streams || targets.iter().any(|t| t.len() != cells) {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
-        if opening.len() != streams || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet) {
-            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank"));
+        if opening.len() != streams
+            || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || !o.hands.is_empty() || !o.strands.is_empty() || o.reversed || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
+        {
+            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, with no ring, hand or strand residue"));
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells };
         self.frame(shape).map_err(device)?;
@@ -787,21 +793,43 @@ impl PassRealization for TowerCard<'_> {
         self.report()
     }
 
+    fn admit(&self, tower: &Tower) -> Result<()> {
+        Self::admits(&tower.resident_law()?)
+    }
+
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let started = Instant::now();
-        let read = self.read_forward(tower, opening, classes, targets, slot);
+        // Only a completed read is counted, so the timing reports passes the card carried.
+        let read = self.read_forward(tower, opening, classes, targets, slot)?;
         self.times.forwards += 1;
         self.times.forward_ns += started.elapsed().as_nanos();
-        read
+        Ok(read)
     }
 
     fn reverse(&mut self, _tower: &Tower, _opening: &[TowerState], _classes: &[&[usize]], _compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
         // The comparison is the opening read's targets, uploaded with it.
         let started = Instant::now();
-        let g = self.read_reverse();
+        let g = self.read_reverse()?;
         self.times.reverses += 1;
         self.times.reverse_ns += started.elapsed().as_nanos();
-        g
+        Ok(g)
+    }
+
+    fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+        // The opening read keeps every cell's masses on the card; only the last cell's cross back.
+        if !self.opened_current {
+            return Err(TowerError::Refused("a face is read from the opening forward, still resident"));
+        }
+        let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
+        let shape = frame.shape;
+        (0..shape.streams)
+            .map(|s| {
+                let q = s * shape.cells + shape.cells - 1;
+                let masses = self.card.fetch_range(&frame.masses, q * shape.alphabet, shape.alphabet).map_err(device)?;
+                let total = self.card.fetch_range(&frame.totals, 2 * q, 2).map_err(device)?;
+                Ok(TowerFace { masses: masses.into_iter().map(u128::from).collect(), total: total[0] as u128 | (total[1] as u128) << 64 })
+            })
+            .collect()
     }
 
     fn carry(&mut self, _tower: &Tower, states: &mut [TowerState], _opening: &[TowerState], slot: Slot) -> Result<()> {
