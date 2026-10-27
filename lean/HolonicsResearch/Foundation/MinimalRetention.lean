@@ -1,6 +1,7 @@
 import Holonics.Foundation.Standing.Law
 import Holonics.Objects.Retention
 import Holonics.Compression.Landmark.Context.Birth
+import Holonics.Compression.Core.FaceMap
 import HolonicsResearch.Foundation.SeparationDepth
 import Mathlib.Tactic
 
@@ -285,32 +286,18 @@ end Deposition
 
 /-! ## 3. The linear chart: the founded encoding is the minimal retention -/
 
+universe u
+
 section Linear
 
 open Module
 open Holonics.Compression.Landmark.Context.Birth
+open Holonics.Compression.Core.FaceMap
 open Holonics.Foundation.SeparationDepth
 
-variable {K X ι C κ : Type*} [Field K] [AddCommGroup X] [Module K X]
-
-/-- [definition] The linear map a word of transports performs, the rightmost letter first. -/
-def wordMap (T : ι → X →ₗ[K] X) : List ι → X →ₗ[K] X
-  | [] => LinearMap.id
-  | a :: word => T a ∘ₗ wordMap T word
-
-theorem wordMap_apply (T : ι → X →ₗ[K] X) (word : List ι) (x : X) :
-    wordMap T word x = transportWord (fun a x => T a x) word x := by
-  induction word with
-  | nil => rfl
-  | cons a word ih =>
-    show T a (wordMap T word x) = T a (transportWord (fun a x => T a x) word x)
-    rw [ih]
-
-theorem wordMap_append_single (T : ι → X →ₗ[K] X) (word : List ι) (a : ι) :
-    wordMap T (word ++ [a]) = wordMap T word ∘ₗ T a := by
-  ext x
-  rw [LinearMap.comp_apply, wordMap_apply, wordMap_apply]
-  exact transportWord_append (fun a x => T a x) word [a] x
+/- The linear map of a word of transports is `Compression/Core/FaceMap.wordMap`, the rightmost
+letter first. -/
+variable {K C κ : Type*} {X ι : Type u} [Field K] [AddCommGroup X] [Module K X]
 
 /-- [definition] The forms that agree on two states. -/
 def agreeingForms (left right : X) : Submodule K (Dual K X) :=
@@ -349,7 +336,8 @@ theorem founded_eq_span_wordForms (T : ι → X →ₗ[K] X) (V₀ : Submodule K
       rintro _ ⟨ρ, hρ, word, rfl⟩
       refine Submodule.subset_span ⟨ρ, hρ, word ++ [a], ?_⟩
       show (T a).dualMap (ρ ∘ₗ wordMap T word) = ρ ∘ₗ wordMap T (word ++ [a])
-      rw [wordMap_append_single, LinearMap.dualMap_apply', LinearMap.comp_assoc]
+      ext x
+      simp only [LinearMap.dualMap_apply, LinearMap.comp_apply, wordMap_append_singleton]
   · rw [Submodule.span_le]
     rintro _ ⟨ρ, hρ, word, rfl⟩
     exact comp_wordMap_mem_founded T V₀ word (le_founded _ V₀ hρ)
