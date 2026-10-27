@@ -19,9 +19,11 @@ points of boosts on the clock torus. `Geometry/TorusIndex` proves the count for 
 2. **The count is the Lefschetz number** (`card_fixed_lefschetz`): a move with `L(N) ≠ 0` fixes
    exactly `|L(N)|` points. For a hyperbolic move every fixed point has index `sign det(1 − N)`, so
    the signed count is `L(N)` itself; the theorem states the unsigned count.
-3. **A boost's period-`n` points** (`boost_periodic_points`): for `det M = 1` and `tr² M > 4`,
-   `#{x : Mⁿ x = x} = |t_n − 2|` for every `n ≥ 1`, through `det_pow_sub_one` and the growth
-   `n + 2 ≤ |t_n|` (`SiteKind.boost_counts_grow`), which keeps `t_n` off `2`.
+3. **A boost's period-`n` points** (`boost_periodic_points`, `boost_iterate_points`): for
+   `det M = 1` and `tr² M > 4`, `#{x : Mⁿ x = x} = |t_n − 2|` for every `n ≥ 1`, through
+   `det_pow_sub_one` and the growth `n + 2 ≤ |t_n|` (`SiteKind.boost_counts_grow`), which keeps
+   `t_n` off `2`. The count is the same read on the `n`-fold step `(act M)^[n]`
+   (`TorusIndex.act_pow`).
 4. **Their growth is the rapidity** (`boost_periodic_rate`): with `k > 1` and `k + k⁻¹ = tr M`,
    `(1/n) log #{x : Mⁿ x = x} → log k`, the topological entropy of the boost on the torus
    (`SiteKind.torus_count_rate` read as a count).
@@ -86,6 +88,15 @@ theorem boost_periodic_points (M : Matrix (Fin 2) (Fin 2) ℤ) (hdet : M.det = 1
     rw [h2, abs_of_pos (by norm_num : (0 : ℤ) < 2)] at hgrow
     omega
   rw [card_fixed _ hne, hd, ← Int.natAbs_neg, neg_sub]
+
+/-- [proved-standard; formal-checked] The same count read on the boost's `n`-fold step: the points
+with `(act M)^[n] x = x` (`TorusIndex.act_pow`). -/
+theorem boost_iterate_points (M : Matrix (Fin 2) (Fin 2) ℤ) (hdet : M.det = 1)
+    (hboost : 4 < M.trace ^ 2) {n : ℕ} (hn : 0 < n) :
+    Nat.card {x : UnitAddTorus (Fin 2) // (act M)^[n] x = x} =
+      (TraceSequence.trace M.trace 1 n - 2).natAbs := by
+  rw [← boost_periodic_points M hdet hboost hn]
+  exact Nat.card_congr (Equiv.subtypeEquivRight fun x => by rw [act_pow])
 
 /-- [proved-standard; formal-checked] **The periodic points grow at the rapidity**: with `k > 1`
 and `k + k⁻¹ = tr M`, `(1/n) log #{x : Mⁿ x = x} → log k`. -/

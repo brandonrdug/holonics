@@ -1206,6 +1206,7 @@ import HolonicsResearch.Mathematics.RotorStep
 import HolonicsResearch.HNN.PassiveMode
 import HolonicsResearch.HNN.RingHand
 import HolonicsResearch.Geometry.ShiftClock
+import HolonicsResearch.Geometry.Crystallographic
 import HolonicsResearch.Geometry.TorusBraid
 import HolonicsResearch.Geometry.TorusIndex
 import HolonicsResearch.Geometry.TorusPeriodic

@@ -16,8 +16,10 @@ record `research/records/2026-10-26_THE_GENERATOR_AND_THE_MODULATOR_ARE_ONE_MOVE
 
 [proved-standard; formal-checked] What is proved.
 
-1. **The torus map** (`act`, `act_proj`): an integer matrix `N` moves a point of the torus
-   `UnitAddTorus n = n → ℝ/ℤ` by `x ↦ N x`, and on a real lift `v` it is the lift of `N v`.
+1. **The torus map** (`act`, `act_proj`, `act_mul`, `act_one`, `act_pow`): an integer matrix `N`
+   moves a point of the torus `UnitAddTorus n = n → ℝ/ℤ` by `x ↦ N x`, and on a real lift `v` it is
+   the lift of `N v`. A product acts as the composite, so `Mᵏ` acts as the `k`-fold step of `M` and
+   the fixed points of `Mᵏ` are the period-`k` points of `M`.
 2. **Its kernel is the lattice read back through `N`** (`lift`, `lift_eq_zero_iff`,
    `act_eq_zero_iff`): for `det N ≠ 0` the points with `N x = 0` are exactly the images of `N⁻¹ w`
    for `w ∈ ℤⁿ`, and `w` lands on `0` exactly when `w ∈ N ℤⁿ`. The map `w ↦ N⁻¹ w mod ℤⁿ` therefore
@@ -137,6 +139,30 @@ theorem act_proj (N : Matrix n n ℤ) (v : n → ℝ) : act N (proj v) = proj (t
   rw [QuotientAddGroup.mk_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [← zsmul_eq_mul, QuotientAddGroup.mk_zsmul]
+
+theorem toReal_mul (A B : Matrix n n ℤ) : toReal (A * B) = toReal A * toReal B := by
+  have e : ∀ M : Matrix n n ℤ, toReal M = (Int.castRingHom ℝ).mapMatrix M := fun M => by
+    ext i j
+    simp [toReal]
+  rw [e, e, e, map_mul]
+
+/-- [proved-standard; formal-checked] A product of moves acts as their composite. -/
+theorem act_mul (A B : Matrix n n ℤ) (x : UnitAddTorus n) : act (A * B) x = act A (act B x) := by
+  obtain ⟨v, rfl⟩ := proj_surjective x
+  rw [act_proj, act_proj, act_proj, toReal_mul, mulVec_mulVec]
+
+theorem act_one (x : UnitAddTorus n) : act 1 x = x := by
+  obtain ⟨v, rfl⟩ := proj_surjective x
+  rw [act_proj, show toReal (1 : Matrix n n ℤ) = 1 from Matrix.map_one _ Int.cast_zero Int.cast_one,
+    one_mulVec]
+
+/-- [proved-standard; formal-checked] **`Mᵏ` acts as the `k`-fold step of `M`**, so the fixed
+points of `act (Mᵏ)` are the period-`k` points of `act M`. -/
+theorem act_pow (M : Matrix n n ℤ) (k : ℕ) (x : UnitAddTorus n) :
+    act (M ^ k) x = (act M)^[k] x := by
+  induction k generalizing x with
+  | zero => rw [pow_zero, act_one, Function.iterate_zero_apply]
+  | succ k ih => rw [pow_succ, act_mul, ih, ← Function.iterate_succ_apply]
 
 /-! ## 2. The kernel is the lattice read back through `N` -/
 
