@@ -13,8 +13,10 @@
 //! through the card's forward. Integer sums are associative, so the card's covector summed over
 //! streams and cells in its own order is the host's stream-by-stream sum, bit for bit.
 //!
-//! [definition] **The declaration the card carries**: a gated tower, rectifying contacts, not
-//! turned, not pumped, no passage credit, at most four levels, streams of one section length, with
+//! [definition] **The declaration the card carries**: a gated tower, turned or not (each cell's
+//! founded unit turned by the arriving turn, composed from the ladder's dyadic turns, and the turn's
+//! covector returned through its family and summed against the level's input), rectifying contacts,
+//! not pumped, no passage credit, at most four levels, streams of one section length, with
 //! or without the pair face (its values resident on the card beside the material, read at each
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
 //! ranks carried by every stream beside its modes, each riding its level's mode or its founded pair
@@ -52,6 +54,8 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/tower.ptx"));
 const THREADS: u32 = 256;
 /// The levels the law's words carry (`TOWER_MAX_LEVELS`).
 const MAX_LEVELS: usize = 4;
+/// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16` (`TOWER_LADDER`).
+const LADDER: usize = 17;
 /// The outer sums' tile (`OUTER_ROWS`, `OUTER_COLS`).
 const OUTER_ROWS: u32 = 16;
 const OUTER_COLS: u32 = 64;
@@ -78,7 +82,9 @@ struct LevelWords {
     ret_bias: u64,
     gate: u64,
     gate_bias: u64,
-    reach: [u64; 7],
+    turn: u64,
+    turn_bias: u64,
+    reach: [u64; 8],
 }
 
 /// The law's words (`TowerLaw`).
@@ -112,6 +118,10 @@ struct LawWords {
     ring_readout: u64,
     ring_factors: u64,
     ring_reach: u64,
+    half_turn: i64,
+    turned: u32,
+    turn_spread: u32,
+    ladder: [[i64; 2]; LADDER],
     level: [LevelWords; MAX_LEVELS],
 }
 
@@ -194,6 +204,9 @@ struct FrameWords {
     ring_cov: u64,
     ring_dmove: u64,
     ring_g: u64,
+    units: u64,
+    ds: u64,
+    r_ds: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -239,6 +252,8 @@ struct Shape {
     ranks: usize,
     harmonics: usize,
     ring_moves: usize,
+    /// One when the modes are turned, else zero.
+    turned: usize,
 }
 
 impl Shape {
@@ -322,10 +337,15 @@ struct Frame<'c> {
     ring_cov: CardBuffer<'c, i64>,
     ring_dmove: CardBuffer<'c, i128>,
     ring_g: CardBuffer<'c, i128>,
+    /// The turned modes' unit at each cell, `u e^(iπ s_t)`, and the turn's covector `δs` (each
+    /// empty when unturned).
+    units: CardBuffer<'c, i64>,
+    ds: CardBuffer<'c, i64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
-    /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`).
-    reach_offsets: [usize; 16],
+    /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
+    /// turn's covector `δs` (`Q·L`).
+    reach_offsets: [usize; 17],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -391,8 +411,11 @@ impl<'c> TowerCard<'c> {
     pub fn admits(law: &ResidentLaw) -> Result<()> {
         let d = &law.declaration;
         let refuse = |why: &'static str| Err(TowerError::Refused(why));
-        if !d.gated || d.turned || d.pumped || d.contact != ContactLaw::Rectifying {
-            return refuse("the card carries the gated tower with rectifying contacts, not turned and not pumped");
+        if !d.gated || d.pumped || d.contact != ContactLaw::Rectifying {
+            return refuse("the card carries the gated tower with rectifying contacts, not pumped");
+        }
+        if d.turned && (law.ladder.len() != LADDER || law.half_turn <= 0) {
+            return refuse("the card turns a mode through the ladder's seventeen dyadic turns and the half turn");
         }
         if let Some(ring) = &law.ring {
             let r = ring.ranks;
@@ -445,7 +468,7 @@ impl<'c> TowerCard<'c> {
             streams: streams as u32,
             face_digits: law.face_roots.len() as u32,
             move_digits: law.move_roots.len() as u32,
-            families: (1 + 7 * d.levels) as u32,
+            families: (1 + (7 + usize::from(d.turned)) * d.levels) as u32,
             encoding: law.encoding as u64,
             readout: law.readout as u64,
             readout_bias: law.readout_bias as u64,
@@ -453,6 +476,14 @@ impl<'c> TowerCard<'c> {
             ln2_square: law.ln2_square as i64,
             ..LawWords::default()
         };
+        if d.turned {
+            words.turned = 1;
+            words.half_turn = law.half_turn;
+            words.turn_spread = usize::BITS - d.width.saturating_sub(1).leading_zeros();
+            for (slot, &(re, im)) in words.ladder.iter_mut().zip(&law.ladder) {
+                *slot = [re, im];
+            }
+        }
         if let Some(pair) = &law.pair {
             words.forms = pair.forms as u32;
             words.pair_readout = pair.readout as u64;
@@ -482,6 +513,8 @@ impl<'c> TowerCard<'c> {
                 ret_bias: lv.ret_bias as u64,
                 gate: lv.gate as u64,
                 gate_bias: lv.gate_bias as u64,
+                turn: lv.turn as u64,
+                turn_bias: lv.turn_bias as u64,
                 reach: lv.reaches,
             };
         }
@@ -497,6 +530,9 @@ impl<'c> TowerCard<'c> {
             for (offset, rows, cols) in [(lv.push_re, n, w), (lv.push_im, n, w), (lv.gate, n, w), (lv.read_re, w, n), (lv.read_im, w, n), (lv.contact, f, w), (lv.ret, w, f)] {
                 out.extend([offset as u64, rows, cols]);
             }
+            if d.turned {
+                out.extend([lv.turn as u64, n, w]);
+            }
         }
         out
     }
@@ -507,13 +543,13 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         let card = self.card;
-        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, .. } = shape;
+        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, .. } = shape;
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let q = s * t;
         let ql = q * l;
-        let mut reach_offsets = [0usize; 16];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q];
+        let mut reach_offsets = [0usize; 17];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -523,7 +559,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + 7 * l))?,
+            families: card.alloc(3 * (1 + (7 + turned) * l))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -582,6 +618,8 @@ impl<'c> TowerCard<'c> {
             ring_cov: card.alloc(q * 2 * r)?,
             ring_dmove: card.alloc(q * 2 * ringed)?,
             ring_g: card.alloc(s * r * shape.rank_material())?,
+            units: card.alloc(ql * n * 2 * turned)?,
+            ds: card.alloc(ql * n * turned)?,
             reach_offsets,
         });
         Ok(())
@@ -665,6 +703,9 @@ impl<'c> TowerCard<'c> {
             ring_cov: frame.ring_cov.device_ptr(),
             ring_dmove: frame.ring_dmove.device_ptr(),
             ring_g: frame.ring_g.device_ptr(),
+            units: frame.units.device_ptr(),
+            ds: frame.ds.device_ptr(),
+            r_ds: r(16),
         }
     }
 
@@ -721,7 +762,7 @@ impl<'c> TowerCard<'c> {
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * 3 * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -744,7 +785,8 @@ impl<'c> TowerCard<'c> {
     }
 
     fn dx_shared(shape: &Shape) -> usize {
-        [8 * 3 * shape.modes, 8 * 3 * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
+        let families = 3 + shape.turned;
+        [8 * families * shape.modes, 8 * families * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
@@ -766,7 +808,7 @@ impl<'c> TowerCard<'c> {
         }
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -955,6 +997,9 @@ impl<'c> TowerCard<'c> {
             out.push((family(at64(fw.gre, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gre, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_re), None), false));
             out.push((family(at64(fw.gim, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gim, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_im), None), false));
             out.push((family(at64(fw.dq, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dq, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
+            if law.turned != 0 {
+                out.push((family(at64(fw.ds, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_ds, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
+            }
         }
         // The pair face's readout takes the face's covector against the pair read, `Σ δz c(p)ᵀ`,
         // and its lift the bottom covector, `Σ δx⁰ c(p)ᵀ`.
@@ -1101,7 +1146,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

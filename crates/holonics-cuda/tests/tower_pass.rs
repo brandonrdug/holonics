@@ -1,7 +1,7 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
-//! and its streams' states, with and without the pair face and the ring face; and the card refuses
-//! a declaration it does not carry.
+//! and its streams' states, with and without the pair face, the ring face and the turned modes; and
+//! the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{ContactLaw, PairFace, RingFace, RingRank, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
@@ -23,8 +23,17 @@ fn passage(alphabet: usize, len: usize) -> Vec<usize> {
     (0..len).map(|i| if i % 7 == 3 { (i / 7) % alphabet } else { (i * 5 + i / 13) % (alphabet - 1) }).collect()
 }
 
-fn declaration(alphabet: usize, gated: bool) -> TowerDeclaration {
-    TowerDeclaration { alphabet, width: 8, modes: 8, contacts: 16, levels: 2, gated, turned: false, pumped: false, contact: ContactLaw::Rectifying }
+fn declaration(alphabet: usize, gated: bool, turned: bool, pumped: bool) -> TowerDeclaration {
+    TowerDeclaration { alphabet, width: 8, modes: 8, contacts: 16, levels: 2, gated, turned, pumped, contact: ContactLaw::Rectifying }
+}
+
+/// The faces a fixture joins to the gated tower: `forms` pair forms (none at zero), the ring face
+/// it names, and whether its modes are turned.
+#[derive(Clone, Copy, Default)]
+struct Faces {
+    forms: usize,
+    ring: Option<Ringed>,
+    turned: bool,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -35,18 +44,42 @@ struct Ringed {
     harmonics: usize,
 }
 
-/// The gated tower founded on the keys, with `forms` pair forms joined when `forms > 0`
-/// (`join_pair`) and the ring face when `ring` names one (`join_ring`).
-fn learners(alphabet: usize, forms: usize, ring: Option<Ringed>) -> (TowerLearner, TowerLearner) {
-    let tower = Tower::found_on(declaration(alphabet, true), &keys(1 << 16), TurnLadder::Both).expect("founded");
+/// The gated tower founded on the keys, turned when `faces.turned` (its turn opened by
+/// `open_turn`), with `faces.forms` pair forms joined when there are any (`join_pair`) and the ring
+/// face when `faces.ring` names one (`join_ring`).
+fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
+    let tower = Tower::found_on(declaration(alphabet, true, faces.turned, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
-    if forms > 0 {
-        join_pair(&mut learner, forms);
+    if faces.turned {
+        open_turn(&mut learner);
     }
-    if let Some(ring) = ring {
+    if faces.forms > 0 {
+        join_pair(&mut learner, faces.forms);
+    }
+    if let Some(ring) = faces.ring {
         join_ring(&mut learner, ring);
     }
     (learner.clone(), learner)
+}
+
+/// A turned tower founds its turn at zero, on its gated twin; the fixture opens each level's turn
+/// `W_φ` (about ±¼ on `2^(−24)`) and bias `b_φ` (about ±2 half turns on `2^(−16)`) off the key
+/// stream, so every mode turns through the whole ladder from the first section.
+fn open_turn(learner: &mut TowerLearner) {
+    let d = learner.tower.declaration;
+    let k = keys(1 << 16);
+    let law = learner.tower.resident_law().expect("the law");
+    let mut j = 12000;
+    for lv in &law.levels {
+        for i in lv.turn..lv.turn + d.modes * d.width {
+            learner.tower.theta[i] = (k[j] as i32 - 128) << 15;
+            j += 1;
+        }
+        for i in lv.turn_bias..lv.turn_bias + d.modes {
+            learner.tower.theta[i] = (k[j] as i32 - 128) << 10;
+            j += 1;
+        }
+    }
 }
 
 /// A ring rank whose factors are read off the key stream at `at` (as the host's fixture reads
@@ -110,10 +143,10 @@ fn join_pair(learner: &mut TowerLearner, forms: usize) {
 
 /// Host against card in lockstep: the opening read and its covector on the same material, then
 /// both learners take the section; `compared` holds every other place out of the comparison.
-fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, forms: usize, ring: Option<Ringed>) {
+fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, faces: Faces) {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
-    let (mut host, mut carded) = learners(alphabet, forms, ring);
+    let (mut host, mut carded) = learners(alphabet, faces);
     let classes = passage(alphabet, streams * (sections * section + 1));
     let chunk = classes.len() / streams;
     let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
@@ -145,13 +178,13 @@ fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, ho
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pass_is_the_hosts_section_after_section() {
-    lockstep(11, 3, 9, 6, false, 0, None);
+    lockstep(11, 3, 9, 6, false, Faces::default());
 }
 
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 4, true, 0, None);
+    lockstep(11, 2, 12, 4, true, Faces::default());
 }
 
 /// The pair face's acceptance (the record `2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD…`): 32 sections
@@ -159,13 +192,13 @@ fn the_cards_pass_holds_an_uncompared_place_as_the_host_does() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pair_faced_pass_is_the_hosts_for_thirty_two_sections() {
-    lockstep(11, 3, 9, 32, false, 3, None);
+    lockstep(11, 3, 9, 32, false, Faces { forms: 3, ..Faces::default() });
 }
 
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, 2, None);
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ..Faces::default() });
 }
 
 /// The ring face's acceptance: 32 sections equal face by face and covector entry by entry, the
@@ -174,7 +207,7 @@ fn the_cards_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_ring_faced_pass_is_the_hosts_for_thirty_two_sections() {
-    lockstep(11, 3, 9, 32, false, 0, Some(Ringed { level: 1, mode: 3, harmonics: 3 }));
+    lockstep(11, 3, 9, 32, false, Faces { ring: Some(Ringed { level: 1, mode: 3, harmonics: 3 }), ..Faces::default() });
 }
 
 /// The ring on the bottom level beside the pair face, read through its turn alone, an uncompared
@@ -182,7 +215,23 @@ fn the_cards_ring_faced_pass_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, 2, Some(Ringed { level: 0, mode: 1, harmonics: 1 }));
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 0, mode: 1, harmonics: 1 }), turned: false });
+}
+
+/// The turned modes' acceptance: 32 sections equal face by face and covector entry by entry, the
+/// learners and their states after each, every mode turned through the ladder.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_turned_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { turned: true, ..Faces::default() });
+}
+
+/// Turned modes beside the pair face and the ring face, the ring riding a turned mode, an
+/// uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_turned_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), turned: true });
 }
 
 /// The card's advance is the host's, class by class: three prompts read whole together, then one
@@ -193,7 +242,7 @@ fn the_cards_advance_is_the_hosts_class_by_class() {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let alphabet = 13;
-    let (host, _) = learners(alphabet, 0, None);
+    let (host, _) = learners(alphabet, Faces::default());
     let tower = &host.tower;
     let classes = passage(alphabet, 27);
     let prompts: Vec<&[usize]> = classes.chunks(9).collect();
@@ -222,12 +271,14 @@ fn the_cards_advance_is_the_hosts_class_by_class() {
 fn the_card_refuses_a_declaration_it_does_not_carry() {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
-    let ungated = Tower::found_on(declaration(11, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
+    let ungated = Tower::found_on(declaration(11, false, false, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
     let classes = passage(11, 10);
     let parts: Vec<&[usize]> = vec![&classes[..]];
     let targets = vec![classes[1..].iter().map(|&c| Some(c)).collect::<Vec<_>>()];
     assert!(realized.forward(&ungated, &[ungated.rest()], &parts, &targets, Slot::Opened).is_err());
-    let (host, _) = learners(11, 0, None);
+    let pumped = Tower::found_on(declaration(11, true, true, true), &keys(1 << 16), TurnLadder::Both).expect("founded");
+    assert!(realized.forward(&pumped, &[pumped.rest()], &parts, &targets, Slot::Opened).is_err());
+    let (host, _) = learners(11, Faces::default());
     assert!(realized.forward(&host.tower, &[host.tower.rest_with_credit()], &parts, &targets, Slot::Opened).is_err());
     let ragged: Vec<&[usize]> = vec![&classes[..], &classes[..9]];
     let ragged_targets = vec![targets[0].clone(), targets[0][..8].to_vec()];

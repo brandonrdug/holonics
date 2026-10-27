@@ -2,7 +2,9 @@
 //
 // The forward and the reverse scan of `holonics::hnn::tower` (its module law; the host owner is
 // `Tower::step` and `Tower::reverse_joined`) for the declaration the card carries: gated modes,
-// rectifying contacts, no turn, no pump, no passage credit, with or without the pair face
+// turned or not (each cell's founded unit turned by `e^(iπ s_t)`, `s_t = 2^(−spread)(W_φ x + b_φ)`
+// composed from the ladder's dyadic turns), rectifying contacts, no pump, no passage credit, with
+// or without the pair face
 // (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
 // and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
 // their faces read through the pair contact with the top face, `z += W (x̂ ⊗ ρ)`; the products the
@@ -25,7 +27,9 @@
 // - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
 //   (cells are independent there: each reads its own forward temporaries and covector).
 // - `tower_reverse_modes`: one block a stream, one thread a mode, the cells in reverse order (the
-//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`), with each cell's gated move adjoint.
+//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`), with each cell's gated move adjoint
+//   and a turned level's turn covector `δs`, which `tower_reverse_dx` returns through `W_φᵀ` and
+//   `tower_outer` sums against the level's input.
 // - `tower_reverse_ring`: one block a stream, the ring's scan over the cells in reverse order (one
 //   thread a rank), the carried face's covector onto the read covector before the modes' scan, and
 //   each factor's covector; `tower_ring_factors` sums the factors' over the streams.
@@ -43,6 +47,8 @@ typedef unsigned __int128 uwide;
 
 #define TOWER_MAX_LEVELS 4
 #define TOWER_THREADS 256
+// The turned modes' ladder e^(iπ/2^i), i = 0..=TURN_BITS.
+#define TOWER_LADDER 17
 
 // Refusal bits (`src/hnn/tower.rs` names them).
 #define TOWER_REFUSED_CARRIER 1u
@@ -60,12 +66,13 @@ typedef unsigned __int128 uwide;
 #define UNIT_BITS 62
 #define MARGIN 12
 #define GATE_REACH 2
+#define TURN_BITS 16
 
 struct TowerLevel {
     uint64_t move_re, move_im, push_re, push_im, read_re, read_im, contact, contact_bias, ret,
-        ret_bias, gate, gate_bias;
-    // max |w| of push (re, im), read (re, im), contact, return, gate
-    uint64_t reach[7];
+        ret_bias, gate, gate_bias, turn, turn_bias;
+    // max |w| of push (re, im), read (re, im), contact, return, gate, turn
+    uint64_t reach[8];
 };
 
 struct TowerLaw {
@@ -81,6 +88,11 @@ struct TowerLaw {
     // factors (R ranks of 6N + 2W + 3: a₀, a₁ over 2N, b₀, b₁ over W + 1, g over 2N + 1), and max |W|.
     uint32_t ring_level, ring_mode, ring_ranks, ring_harmonics;
     uint64_t ring_readout, ring_factors, ring_reach;
+    // The turned modes (`turned = 0` when not): the half turn π on 2^(−30), the turn's spread
+    // ⌈log₂ W⌉, and the ladder e^(iπ/2^i) on 2^(−30), i = 0..=TURN_BITS.
+    int64_t half_turn;
+    uint32_t turned, turn_spread;
+    int64_t ladder[TOWER_LADDER][2];
     TowerLevel level[TOWER_MAX_LEVELS];
 };
 
@@ -161,6 +173,11 @@ struct TowerFrame {
     int64_t *ring_cov;            // [S][T][2R]
     wide *ring_dmove;             // [S][T][2]
     wide *ring_g;                 // [S][R·(6N + 2W + 3)]
+    // The turned modes: each cell's unit u e^(iπ s_t) on 2^(−30), the turn's covector δs, and
+    // max |δs| (each empty when unturned).
+    int64_t *units;   // [S][T][L][N][2]
+    int64_t *ds;      // [S][T][L][N]
+    uint64_t *r_ds;   // [S][T][L]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -315,6 +332,26 @@ __device__ wide logistic(int64_t q, const uint64_t *roots, uint32_t digits) {
     }
     const wide e = below_one((wide)q, roots, digits);
     return div_nearest(e << MOVE_BITS, unit + e);
+}
+
+// `e^(iπ s)` on `2^(−30)` for a turn `s` in half turns on `2^(−16)` (`turn_face`): `s` read
+// modulo the full turn and composed from the ladder's dyadic turns, its binary digits from the
+// half turn down.
+__device__ void turn_face(int64_t s, const TowerLaw &law, wide *re, wide *im) {
+    const int64_t full = (int64_t)1 << (TURN_BITS + 1);
+    int64_t m = s % full;
+    const uint64_t j = (uint64_t)(m < 0 ? m + full : m);
+    wide vr = (wide)1 << MOVE_BITS, vi = 0;
+    for (uint32_t i = 0; i < TOWER_LADDER; i++) {
+        if (j & ((uint64_t)1 << (TURN_BITS - i))) {
+            const wide cr = law.ladder[i][0], ci = law.ladder[i][1];
+            const wide nr = rel(vr * cr - vi * ci, MOVE_BITS);
+            vi = rel(vr * ci + vi * cr, MOVE_BITS);
+            vr = nr;
+        }
+    }
+    *re = vr;
+    *im = vi;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -542,7 +579,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     wide *part = (wide *)carve(at, sizeof(wide) * G * W);
     uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
     int64_t *h = (int64_t *)carve(at, 8ull * L * 2 * N);
-    int64_t *pq = (int64_t *)carve(at, 8ull * 3 * N);
+    int64_t *pq = (int64_t *)carve(at, 8ull * (3 + law.turned) * N);
     int64_t *fc = (int64_t *)carve(at, 8ull * 2 * N);
     int64_t *rab = (int64_t *)carve(at, 8ull * 2 * W);
     int64_t *raw = (int64_t *)carve(at, 8ull * W);
@@ -660,19 +697,28 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             const bool n_re = narrow_terms(lv.reach[0], xmax, W, &st);
             const bool n_im = narrow_terms(lv.reach[1], xmax, W, &st);
             const bool n_gate = narrow_terms(lv.reach[6], xmax, W, &st);
-            for (uint32_t o = tid; o < 3 * N; o += B) {
+            const bool n_turn = law.turned && narrow_terms(lv.reach[7], xmax, W, &st);
+            // A turned level's arriving turn s_t = 2^(−spread) (W_φ x + b_φ), in half turns on
+            // 2^(−16), beside the gate's logit.
+            for (uint32_t o = tid; o < (3 + law.turned) * N; o += B) {
                 const uint32_t fam = o / N, k = o % N;
                 if (fam == 2) {
                     wide sum = dot(tt + lv.gate + k, N, W, x, n_gate);
                     sum += (wide)th[lv.gate_bias + k] << MATERIAL_BITS;
                     pq[o] = fit64(rel(sum, MATERIAL_BITS), &st);
+                } else if (fam == 3) {
+                    wide sum = dot(tt + lv.turn + k, N, W, x, n_turn);
+                    sum += (wide)th[lv.turn_bias + k] << MATERIAL_BITS;
+                    const int64_t turn = fit64(rel(sum, MATERIAL_BITS), &st);
+                    pq[o] = fit64(rel((wide)turn, law.turn_spread), &st);
                 } else {
                     const wide sum = dot(tt + (fam == 0 ? lv.push_re : lv.push_im) + k, N, W, x, fam == 0 ? n_re : n_im);
                     pq[o] = fit64(rel(sum, MATERIAL_BITS + FACE_BITS - STATE_BITS), &st);
                 }
             }
             __syncthreads();
-            // The gated move λ_t = |λ|^(c r) u, held at the margin, and the state h = λ_t h + γ_t B x.
+            // The gated move λ_t = |λ|^(c r) u, held at the margin (its unit turned by e^(iπ s_t)
+            // when the level is turned), and the state h = λ_t h + γ_t B x.
             for (uint32_t k = tid; k < N; k += B) {
                 const int64_t *gf = fr.gates + ((uint64_t)l * N + k) * 4;
                 const wide open = logistic(pq[2 * N + k], face_roots, law.face_digits);
@@ -682,8 +728,16 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 if (held) {
                     rho = radius;
                 }
-                const wide lr = rel(rho * gf[0], MOVE_BITS);
-                const wide li = rel(rho * gf[1], MOVE_BITS);
+                wide ur = gf[0], ui = gf[1];
+                if (law.turned) {
+                    wide tr, ti;
+                    turn_face(pq[3 * N + k], law, &tr, &ti);
+                    const wide nr = rel(ur * tr - ui * ti, MOVE_BITS);
+                    ui = rel(ur * ti + ui * tr, MOVE_BITS);
+                    ur = nr;
+                }
+                const wide lr = rel(rho * ur, MOVE_BITS);
+                const wide li = rel(rho * ui, MOVE_BITS);
                 wide gap = ((wide)1 << (2 * MOVE_BITS)) - (lr * lr + li * li);
                 gap = gap < 0 ? 0 : gap;
                 uint64_t gamma = isqrt64((uint64_t)gap);
@@ -718,6 +772,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     mv[3] = (int64_t)lr;
                     mv[4] = (int64_t)li;
                     mv[5] = held ? 1 : 0;
+                    if (law.turned) {
+                        fr.units[(q * N + k) * 2] = (int64_t)ur;
+                        fr.units[(q * N + k) * 2 + 1] = (int64_t)ui;
+                    }
                 }
             }
             __syncthreads();
@@ -1444,7 +1502,8 @@ extern "C" __global__ void tower_ring_factors(TowerLaw law, TowerFrame fr) {
 
 // The modes' reverse scan of one level of one stream, one thread a mode, and each cell's gated move
 // adjoint: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1); the covectors of |λ| and arg λ summed
-// over the cells; the gate's logit covector δq; and γ_t G_h, what the pushes return.
+// over the cells; the gate's logit covector δq; a turned level's turn covector
+// δs = 2^(−spread) π Re(conj(iλ_t) G_λ), through ∂θ/∂s = π; and γ_t G_h, what the pushes return.
 extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, L = law.levels, T = law.cells;
@@ -1487,10 +1546,17 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             const wide through = (wide)gr * fr.push[ql * 2 * N + k] + (wide)gi * fr.push[ql * 2 * N + N + k];
             const int64_t *mv = fr.moves + (ql * N + k) * 6;
             const wide open = mv[0], rho = mv[1], gamma = mv[2];
-            around += rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
+            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
+            around += turning;
+            // The cell's unit: the founded one, turned by the cell's own turn when the level is.
+            const wide cu_r = law.turned ? (wide)fr.units[(ql * N + k) * 2] : ur;
+            const wide cu_i = law.turned ? (wide)fr.units[(ql * N + k) * 2 + 1] : ui;
+            if (law.turned) {
+                fr.ds[ql * N + k] = fit64(rel((wide)law.half_turn * turning, MOVE_BITS + COVECTOR_BITS + law.turn_spread), &st);
+            }
             int64_t dq = 0;
             if (mv[5] == 0) {
-                const wide g_rho = rel(ur * glr + ui * gli, MOVE_BITS) - div_nearest(rho * through, gamma);
+                const wide g_rho = rel(cu_r * glr + cu_i * gli, MOVE_BITS) - div_nearest(rho * through, gamma);
                 along += rel(g_rho * div_nearest((wide)GATE_REACH * open * rho, modulus), MOVE_BITS);
                 wide f = rel(rho * log, MOVE_BITS);
                 f = rel(f * (wide)law.ln2_square, MOVE_BITS);
@@ -1514,7 +1580,8 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
     }
 }
 
-// What the pushes and the gate return to the level's input: dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq.
+// What the pushes, the gate and a turned level's turn return to the level's input:
+// dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq (+ W_φᵀ δs).
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint64_t q = blockIdx.x, ql = q * law.levels + l;
     const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
@@ -1522,14 +1589,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     const TowerLevel &lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
-    int64_t *v = (int64_t *)carve(at, 8ull * 3 * N);
-    int64_t *back = (int64_t *)carve(at, 8ull * 3 * W);
+    const uint32_t fams = 3 + law.turned;
+    int64_t *v = (int64_t *)carve(at, 8ull * fams * N);
+    int64_t *back = (int64_t *)carve(at, 8ull * fams * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
     __shared__ uint32_t st;
     if (tid == 0) {
         st = 0;
     }
-    uint64_t m0 = 0, m1 = 0, m2 = 0;
+    uint64_t m0 = 0, m1 = 0, m2 = 0, m3 = 0;
     for (uint32_t k = tid; k < N; k += B) {
         v[k] = fr.gre[ql * N + k];
         v[N + k] = fr.gim[ql * N + k];
@@ -1538,28 +1606,38 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         m0 = a > m0 ? a : m0;
         m1 = b > m1 ? b : m1;
         m2 = c > m2 ? c : m2;
+        if (law.turned) {
+            v[3 * N + k] = fr.ds[ql * N + k];
+            const uint64_t d = magnitude(v[3 * N + k]);
+            m3 = d > m3 ? d : m3;
+        }
     }
     const uint64_t r0 = block_max(m0, red);
     const uint64_t r1 = block_max(m1, red);
     const uint64_t r2 = block_max(m2, red);
+    const uint64_t r3 = law.turned ? block_max(m3, red) : 0;
     if (tid == 0) {
         fr.r_gre[ql] = r0;
         fr.r_gim[ql] = r1;
         fr.r_dq[ql] = r2;
+        if (law.turned) {
+            fr.r_ds[ql] = r3;
+        }
     }
     const bool n0 = narrow_rows(lv.reach[0], r0, N);
     const bool n1 = narrow_rows(lv.reach[1], r1, N);
     const bool n2 = narrow_rows(lv.reach[6], r2, N);
-    for (uint32_t o = tid; o < 3 * W; o += B) {
+    const bool n3 = law.turned && narrow_rows(lv.reach[7], r3, N);
+    for (uint32_t o = tid; o < fams * W; o += B) {
         const uint32_t fam = o / W, j = o % W;
-        const uint64_t base = fam == 0 ? lv.push_re : fam == 1 ? lv.push_im : lv.gate;
-        const wide sum = dot(fr.theta + base + j, W, N, v + fam * N, fam == 0 ? n0 : fam == 1 ? n1 : n2);
+        const uint64_t base = fam == 0 ? lv.push_re : fam == 1 ? lv.push_im : fam == 2 ? lv.gate : lv.turn;
+        const wide sum = dot(fr.theta + base + j, W, N, v + fam * N, fam == 0 ? n0 : fam == 1 ? n1 : fam == 2 ? n2 : n3);
         back[o] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
     uint64_t mx = 0;
     for (uint32_t j = tid; j < W; j += B) {
-        const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j];
+        const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j] + (law.turned ? back[3 * W + j] : 0);
         const int64_t v = fit64(sum, &st);
         fr.dx[q * W + j] = v;
         const uint64_t a = magnitude(v);

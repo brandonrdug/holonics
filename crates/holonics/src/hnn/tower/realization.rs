@@ -182,8 +182,12 @@ pub struct ResidentLevel {
     pub ret_bias: usize,
     pub gate: usize,
     pub gate_bias: usize,
-    /// `max |w|` of push (re, im), read (re, im), contact, return and gate (`Tower::reaches`).
-    pub reaches: [u64; 7],
+    /// The turned modes' turn `W_φ` (`N × d`) and bias `b_φ` (zero when unturned).
+    pub turn: usize,
+    pub turn_bias: usize,
+    /// `max |w|` of push (re, im), read (re, im), contact, return, gate and turn
+    /// (`Tower::reaches`).
+    pub reaches: [u64; 8],
     /// The gated moves' founded faces, one a mode, on `2^(−30)`: the unit `u = λ/|λ|`, the
     /// modulus `|λ|` and `ℓ = log₂|λ|` (empty when ungated).
     pub units: Vec<(i64, i64)>,
@@ -247,6 +251,11 @@ pub struct ResidentLaw {
     pub face_roots: Vec<u128>,
     pub move_roots: Vec<u128>,
     pub ln2_square: i128,
+    /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16`, and the half turn `π`, on `2^(−30)`
+    /// (empty and zero when unturned): the turn's navigator faces, generated where the tower reads
+    /// its reaches.
+    pub ladder: Vec<(i64, i64)>,
+    pub half_turn: i64,
     pub pair: Option<ResidentPair>,
     pub ring: Option<ResidentRing>,
     pub rotor: bool,
@@ -347,7 +356,9 @@ impl Tower {
                 ret_bias: lv.ret_bias,
                 gate: lv.gate,
                 gate_bias: lv.gate_bias,
-                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6]],
+                turn: lv.turn,
+                turn_bias: lv.turn_bias,
+                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]],
                 units,
                 moduli,
                 logs,
@@ -364,6 +375,8 @@ impl Tower {
             face_roots: self.exponential.roots().to_vec(),
             move_roots: self.fine.roots().to_vec(),
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
+            ladder: collect_exact(reaches.ladder.iter().map(|&(re, im)| Ok((narrow(re)?, narrow(im)?))))?,
+            half_turn: narrow(reaches.half_turn)?,
             pair: self.pair.as_ref().map(|face| ResidentPair {
                 forms: face.forms(),
                 readout: self.layout.pair_readout,
