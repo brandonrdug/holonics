@@ -229,8 +229,12 @@ pub struct ResidentLevel {
     pub ret_bias: usize,
     pub gate: usize,
     pub gate_bias: usize,
-    /// `max |w|` of push (re, im), read (re, im), contact, return and gate (`Tower::reaches`).
-    pub reaches: [u64; 7],
+    /// The turned modes' turn `W_φ` (`N × d`) and bias `b_φ` (zero when unturned).
+    pub turn: usize,
+    pub turn_bias: usize,
+    /// `max |w|` of push (re, im), read (re, im), contact, return, gate and turn
+    /// (`Tower::reaches`).
+    pub reaches: [u64; 8],
     /// The gated moves' founded faces, one a mode, on `2^(−30)`: the unit `u = λ/|λ|`, the
     /// modulus `|λ|` and `ℓ = log₂|λ|` (empty when ungated).
     pub units: Vec<(i64, i64)>,
@@ -238,13 +242,50 @@ pub struct ResidentLevel {
     pub logs: Vec<i64>,
 }
 
+/// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
+/// ([`PairFace`]): the count of forms `k`, the places of its readout `V` (`A × k`) and its lift
+/// into the encoding `P` (`d × k`) in the material, their reaches `[max |V|, max |P|]`, and the
+/// face's resident values `c_v(prev, cur)` at `((prev · A + cur) · k + v)`, `prev` over the
+/// alphabet and the start `A` (the forms' face at their founding, generated from `W_v` and `E₀`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentPair {
+    pub forms: usize,
+    pub readout: usize,
+    pub lift: usize,
+    pub reaches: [u64; 2],
+    pub values: Vec<i32>,
+}
+
+/// [definition; agent-inferred, October 27] **The ring face as a realization reads it**
+/// ([`RingFace`]): the level and mode it rides, its ranks `R` and the harmonics `H` its readout
+/// reads, the places of its readout `W` (`A × (d + 1)·2RH`) and of its factors (rank by rank `a₀`,
+/// `a₁` over `2N`, `b₀`, `b₁` over `d + 1` and `g` over `2N + 1`) in the material, the readout's
+/// reach `max |W|`, each rank's releases of `a`, `b` and `g` with its push and read shifts, the
+/// encoding `E₀` its pools read (`A × d`), and each rank's founded pair moves `(prev, cur, [Re λ,
+/// Im λ, Re β, Im β])` and restarting class. The pools are generated from `b` and `E₀` wherever the
+/// material is read, never held.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ResidentRing {
+    pub level: usize,
+    pub mode: usize,
+    pub ranks: usize,
+    pub harmonics: usize,
+    pub readout: usize,
+    pub factors: usize,
+    pub reach: u64,
+    pub shifts: Vec<([u32; 3], u32, u32)>,
+    pub opening: Vec<i32>,
+    pub moves: Vec<Vec<(usize, usize, [i64; 4])>>,
+    pub restarts: Vec<Option<usize>>,
+}
+
 /// [definition; agent-inferred, October 25] **The tower's law as a realization reads it for one
 /// section**: the declaration, every family's place in the material, the reaches, the gated moves'
 /// founded faces, the exponential navigator's resident faces (`2^(2^(−i))` on `2^(−62)`, at the
-/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)` and whether a pair face, ring face,
-/// rotor or strands are joined. Read from the tower's own owners, so a realization holds no second
-/// copy of a law, and a realization that does not carry a joined part refuses the tower rather
-/// than reading it without that part.
+/// face's grain and at the moves'), `(ln 2)²` on `2^(−30)`, the pair face and the ring face when
+/// they are joined, whether a rotor or strands are, and the news clock when one is joined. Read
+/// from the tower's own owners, so a realization holds no second copy of a law, and a realization
+/// that does not carry a joined part refuses the tower rather than reading it without that part.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResidentLaw {
     pub declaration: TowerDeclaration,
@@ -257,10 +298,16 @@ pub struct ResidentLaw {
     pub face_roots: Vec<u128>,
     pub move_roots: Vec<u128>,
     pub ln2_square: i128,
-    pub pair_face: bool,
-    pub ring_face: bool,
+    /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16`, and the half turn `π`, on `2^(−30)`
+    /// (empty and zero when unturned): the turn's navigator faces, generated where the tower reads
+    /// its reaches.
+    pub ladder: Vec<(i64, i64)>,
+    pub half_turn: i64,
+    pub pair: Option<ResidentPair>,
+    pub ring: Option<ResidentRing>,
     pub rotor: bool,
     pub strands: bool,
+    pub news: Option<NewsClock>,
 }
 
 impl Tower {
@@ -361,7 +408,9 @@ impl Tower {
                 ret_bias: lv.ret_bias,
                 gate: lv.gate,
                 gate_bias: lv.gate_bias,
-                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6]],
+                turn: lv.turn,
+                turn_bias: lv.turn_bias,
+                reaches: [r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]],
                 units,
                 moduli,
                 logs,
@@ -378,10 +427,31 @@ impl Tower {
             face_roots: self.exponential.roots().to_vec(),
             move_roots: self.fine.roots().to_vec(),
             ln2_square: release(ln2_face() * ln2_face(), MOVE_BITS),
-            pair_face: self.pair.is_some(),
-            ring_face: self.ring.is_some(),
+            ladder: collect_exact(reaches.ladder.iter().map(|&(re, im)| Ok((narrow(re)?, narrow(im)?))))?,
+            half_turn: narrow(reaches.half_turn)?,
+            pair: self.pair.as_ref().map(|face| ResidentPair {
+                forms: face.forms(),
+                readout: self.layout.pair_readout,
+                lift: self.layout.pair_encoding,
+                reaches: reaches.pair,
+                values: face.values.clone(),
+            }),
+            ring: self.ring.as_ref().map(|face| ResidentRing {
+                level: face.level,
+                mode: face.mode,
+                ranks: face.ranks(),
+                harmonics: face.harmonics,
+                readout: self.layout.ring_readout,
+                factors: self.layout.ring_factors,
+                reach: reaches.ring,
+                shifts: face.shifts.clone(),
+                opening: face.opening.clone(),
+                moves: face.moves.clone(),
+                restarts: face.restarts.clone(),
+            }),
             rotor: self.rotor.is_some(),
             strands: self.strands.is_some(),
+            news: self.news,
         })
     }
 }

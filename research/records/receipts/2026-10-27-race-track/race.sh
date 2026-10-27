@@ -4,7 +4,7 @@
 # the same prompts and keys, so laps differ only by the learner. The lock is released between
 # segments so other card work can run. No lap starts after HOURS from launch.
 #
-#   race.sh BIN LOCK RACE OUT HOURS LAP_S WRITE_S WINDOW_MS
+#   race.sh BIN LOCK RACE OUT HOURS LAP_S WRITE_S WINDOW_MS [COMMAND]
 #
 # BIN: tower_pass (release build). LOCK: the card lock (the main checkout's .local/gpu.lock).
 # RACE: the composed passage's directory (compose_race_passage.py). OUT: where the laps, their
@@ -12,22 +12,24 @@
 # segment's fixed deadline in seconds, from the opening read's projection; never raised.
 # WINDOW_MS: the opening read's largest 32-section window. After each lap's writing, the race stops
 # if any of that lap's windows (the stretch to its first TOWER_SECTION not counted) passed 1.12
-# times WINDOW_MS, or if fewer than two of its windows were read (fail closed).
+# times WINDOW_MS, or if fewer than two of its windows were read (fail closed). COMMAND is the
+# training command, `train-two-ladder-tower-classes` (the plain race) unless given;
+# `train-two-ladder-news-tower-classes` runs the same race with the levels ticking on their own news.
 set -u
-BIN=$1; LOCK=$2; RACE=$3; OUTDIR=$4; HOURS=$5; LAP=$6; WRITE=$7; WINDOW=$8
+BIN=$1; LOCK=$2; RACE=$3; OUTDIR=$4; HOURS=$5; LAP=$6; WRITE=$7; WINDOW=$8; COMMAND=${9:-train-two-ladder-tower-classes}
 sha() { sha256sum "$1" | cut -d' ' -f1; }
 T=$RACE/TRAIN.classes; D=$RACE/DEV.classes; R=$RACE/DEV.roles; K=$RACE/KEYS
 P=$RACE/PROMPTS.classes; RK=$RACE/RELEASE_KEYS
 TS=$(sha "$T"); DS=$(sha "$D"); RS=$(sha "$R"); KS=$(sha "$K"); PS=$(sha "$P"); RKS=$(sha "$RK")
 mkdir -p "$OUTDIR" || exit 1
-echo "RACE_START bin=$(sha "$BIN") train=$TS dev=$DS roles=$RS keys=$KS prompts=$PS release_keys=$RKS hours=$HOURS lap_s=$LAP write_s=$WRITE window_ms=$WINDOW at=$(date -u +%FT%TZ)"
+echo "RACE_START bin=$(sha "$BIN") train=$TS dev=$DS roles=$RS keys=$KS prompts=$PS release_keys=$RKS hours=$HOURS lap_s=$LAP write_s=$WRITE window_ms=$WINDOW command=$COMMAND at=$(date -u +%FT%TZ)"
 end=$(( $(date +%s) + HOURS * 3600 ))
 k=0
 FROM=()
 while [ "$(date +%s)" -lt "$end" ]; do
   OUT=$OUTDIR/lap$k
   echo "RACE_LAP_START lap=$k at=$(date -u +%FT%TZ)"
-  flock "$LOCK" timeout "$LAP" "$BIN" train complete-language train-two-ladder-tower-classes 257 \
+  flock "$LOCK" timeout "$LAP" "$BIN" train complete-language "$COMMAND" 257 \
     "$T" "$TS" "$D" "$DS" "$R" "$RS" "$K" "$KS" 64 128 256 4 320 128 1 7 "$OUT" "${FROM[@]}" > "$OUT.log" 2>&1
   status=$?
   grep -E "^(TOWER_SECTION|TOWER_PASS|TOWER_STATE|TOWER_CARD|TOWER_REALIZATION|TOWER_DONE)" "$OUT.log" | sed "s/^/lap=$k /"

@@ -1,8 +1,16 @@
 // **The gated tower's training pass on the card** (#404, #76; owner `src/hnn/tower.rs`).
 //
 // The forward and the reverse scan of `holonics::hnn::tower` (its module law; the host owner is
-// `Tower::step` and `Tower::reverse_joined`) for the declaration the card carries: gated modes,
-// rectifying contacts, no turn, no pump, no pair or ring face, no passage credit. Every quantity
+// `Tower::step` and `Tower::reverse_joined`) for the declaration the card carries (with or without
+// a news clock, `NewsClock`: each level's modes move once a tick of its own clock, read by thread 0
+// from the arriving class's code under the open face): gated modes,
+// turned or not (each cell's founded unit turned by `e^(iπ s_t)`, `s_t = 2^(−spread)(W_φ x + b_φ)`
+// composed from the ladder's dyadic turns), rectifying contacts, no pump, no passage credit, with
+// or without the pair face
+// (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
+// and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
+// their faces read through the pair contact with the top face, `z += W (x̂ ⊗ ρ)`; the products the
+// host widens to a big integer released here through 256 bits). Every quantity
 // is the host's integer numerator on the host's grain, every product's remainder released to the
 // nearest numerator (half away from zero), every quotient the host's, every sum exact: a sum runs
 // in 64 bits where the host's bound on its terms admits it and in 128 bits otherwise, and either
@@ -21,12 +29,18 @@
 // - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
 //   (cells are independent there: each reads its own forward temporaries and covector).
 // - `tower_reverse_modes`: one block a stream, one thread a mode, the cells in reverse order (the
-//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`), with each cell's gated move adjoint.
+//   scan `G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1)`), with each cell's gated move adjoint
+//   and a turned level's turn covector `δs`, which `tower_reverse_dx` returns through `W_φᵀ` and
+//   `tower_outer` sums against the level's input.
+// - `tower_reverse_ring`: one block a stream, the ring's scan over the cells in reverse order (one
+//   thread a rank), the carried face's covector onto the read covector before the modes' scan, and
+//   each factor's covector; `tower_ring_factors` sums the factors' over the streams.
 // - `tower_outer`: the families' outer sums `Σ_(s,t) y_(s,t) x_(s,t)ᵀ` over every stream's cells,
 //   a tile of 16 × 64 outputs a block, four a thread; summed per stream in 64 bits when that
 //   stream's bound `Σ_t max|y_t| max(max|x_t|, 1)` is below 2^63, in 128 bits otherwise.
 // - `tower_encoding`, `tower_moves`: the encoding's covector (each cell's bottom covector at its
-//   class) and the moves' Cartesian covectors summed over the streams.
+//   class) and the moves' Cartesian covectors summed over the streams. The pair face's readout and
+//   lift take theirs through `tower_outer` (`Σ δz c(p)ᵀ` and `Σ δx⁰ c(p)ᵀ`).
 
 #include <stdint.h>
 
@@ -35,6 +49,8 @@ typedef unsigned __int128 uwide;
 
 #define TOWER_MAX_LEVELS 4
 #define TOWER_THREADS 256
+// The turned modes' ladder e^(iπ/2^i), i = 0..=TURN_BITS.
+#define TOWER_LADDER 17
 
 // Refusal bits (`src/hnn/tower.rs` names them).
 #define TOWER_REFUSED_CARRIER 1u
@@ -42,6 +58,7 @@ typedef unsigned __int128 uwide;
 #define TOWER_REFUSED_WORD32 4u
 #define TOWER_REFUSED_UNIT 8u
 #define TOWER_REFUSED_CLASS 16u
+#define TOWER_REFUSED_NEWS 32u
 
 // The grains (`holonics::hnn::tower`).
 #define FACE_BITS 16
@@ -52,20 +69,41 @@ typedef unsigned __int128 uwide;
 #define UNIT_BITS 62
 #define MARGIN 12
 #define GATE_REACH 2
+#define TURN_BITS 16
+#define READ_BITS 20
 
 struct TowerLevel {
     uint64_t move_re, move_im, push_re, push_im, read_re, read_im, contact, contact_bias, ret,
-        ret_bias, gate, gate_bias;
-    // max |w| of push (re, im), read (re, im), contact, return, gate
-    uint64_t reach[7];
+        ret_bias, gate, gate_bias, turn, turn_bias;
+    // max |w| of push (re, im), read (re, im), contact, return, gate, turn
+    uint64_t reach[8];
 };
 
 struct TowerLaw {
     uint32_t alphabet, width, modes, contacts, levels, cells, streams, face_digits;
-    uint32_t move_digits, families, pad0, pad1;
+    uint32_t move_digits, families, forms, pad0;
     uint64_t encoding, readout, readout_bias, readout_reach;
     int64_t ln2_square;
+    // The pair face (`forms = 0` without one): its readout V (A × k) and lift P (W × k), and their
+    // reaches max |V|, max |P|.
+    uint64_t pair_readout, pair_lift, pair_reach[2];
+    // The ring face (`ring_ranks = 0` without one): the level and mode it rides, its ranks R and
+    // the harmonics H its readout reads, the places of its readout W (A × (W + 1)·2RH) and of its
+    // factors (R ranks of 6N + 2W + 3: a₀, a₁ over 2N, b₀, b₁ over W + 1, g over 2N + 1), and max |W|.
+    uint32_t ring_level, ring_mode, ring_ranks, ring_harmonics;
+    uint64_t ring_readout, ring_factors, ring_reach;
+    // The turned modes (`turned = 0` when not): the half turn π on 2^(−30), the turn's spread
+    // ⌈log₂ W⌉, and the ladder e^(iπ/2^i) on 2^(−30), i = 0..=TURN_BITS.
+    int64_t half_turn;
+    uint32_t turned, turn_spread;
+    int64_t ladder[TOWER_LADDER][2];
     TowerLevel level[TOWER_MAX_LEVELS];
+    // The news clock (`news = 0` without one, every level then moving once a cell): each level's
+    // section `B r^(l−1)` on 2^(−20) bits (level 0's unread: it ticks at every arrival) and the
+    // clock's period, the coarsest section (`NewsClock`).
+    uint32_t news, pad1;
+    uint64_t sections[TOWER_MAX_LEVELS];
+    uint64_t period;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -107,6 +145,55 @@ struct TowerFrame {
     uint64_t *r_dy, *r_da, *r_dread, *r_gre, *r_gim, *r_dq;           // [S][T][L]
     wide *moves_g;                                                    // [S][L][N][2]
     wide *gradient;                                                   // [len]
+    // The pair face: its resident values c(prev, cur) at ((prev·A + cur)·k + v), prev over the
+    // alphabet and the start A; each stream's class before its first cell; the face read at each
+    // cell, max |c| there, and max |δx⁰| (the bottom covector, what the lift's covector reads).
+    const int32_t *pair_values; // [(A + 1)·A·k]
+    const uint32_t *previous;   // [S]
+    int32_t *pair;              // [S][T][k]
+    uint64_t *r_pair, *r_dx;    // [S][T]
+    // The ring face: the encoding E₀ its pools read; each rank's releases of a, b and g, its push
+    // and read shifts; its restarting class (−1 for none); its founded pair moves (rank r's rows
+    // at [index[r], index[r + 1]), each prev, cur, Re λ, Im λ, Re β, Im β on 2^(−30), ascending by
+    // pair); each stream's rings and hands before its first cell and after its last. Kept for the
+    // reverse at each cell: each rank's ring after the cell, its factors α, β, γ, the move it rode
+    // and its hand (bit 0 the hand it reads after its move, bit 1 re-based by its restart, bit 2 a
+    // founded pair move); the face ρ with its harmonics and each rank's scale; the top's ratio and
+    // scale; the pair read φ = x̂ ⊗ ρ and max |φ|. The reverse's own: each rank's read covector,
+    // the covector of the mode's move the ring rode (Re, Im), each stream's factor covector.
+    const int32_t *ring_opening;  // [A][W]
+    const uint32_t *ring_shifts;  // [R][5]
+    const int32_t *ring_restarts; // [R]
+    const uint32_t *ring_index;   // [R + 1]
+    const int64_t *ring_table;    // [M][6]
+    const wide *ring_open;        // [S][R][2]
+    const uint32_t *hands_open;   // [S][R]
+    wide *ring_ends;              // [S][R][2]
+    uint32_t *hands_ends;         // [S][R]
+    wide *ring_after;             // [S][T][R][2]
+    wide *ring_factor;            // [S][T][R][5]: α re, α im, β re, β im, γ
+    int64_t *ring_move;           // [S][T][R][4]
+    uint32_t *ring_hand;          // [S][T][R]
+    int32_t *ring_rho;            // [S][T][2RH]
+    int64_t *ring_scale;          // [S][T][R]
+    int32_t *top_hat;             // [S][T][W]
+    int64_t *top_scale;           // [S][T]
+    int32_t *ring_pair;           // [S][T][(W + 1)·2RH]
+    uint64_t *r_ring_pair;        // [S][T]
+    int64_t *ring_cov;            // [S][T][2R]
+    wide *ring_dmove;             // [S][T][2]
+    wide *ring_g;                 // [S][R·(6N + 2W + 3)]
+    // The turned modes: each cell's unit u e^(iπ s_t) on 2^(−30), the turn's covector δs, and
+    // max |δs| (each empty when unturned).
+    int64_t *units;   // [S][T][L][N][2]
+    int64_t *ds;      // [S][T][L][N]
+    uint64_t *r_ds;   // [S][T][L]
+    // The news clock: each stream's open face before its first cell and after its last (whether
+    // it has one, the total's low and high words, the clock's phase, then the masses), and each
+    // cell's ticks a level (empty without a clock).
+    const uint64_t *news_open; // [S][A + 4]
+    uint64_t *news_ends;       // [S][A + 4]
+    uint32_t *ticks;           // [S][T][L]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -263,6 +350,196 @@ __device__ wide logistic(int64_t q, const uint64_t *roots, uint32_t digits) {
     return div_nearest(e << MOVE_BITS, unit + e);
 }
 
+// A class's code `−log₂(mass/total)` on `2^(−20)` bits (`face_code`): `p = mass 2^62 / total`, at
+// least one grain, its whole part from its width and twenty binary digits of its mantissa's
+// logarithm, each read by squaring the mantissa released at `2^(−62)` and halving it past two
+// (`log2_face`). The opening's masses are checked `≤ total` before upload and the forward's own
+// are, so `p ≤ 2^62`.
+__device__ int64_t face_code(uint64_t mass, uwide total) {
+    uwide p = ((uwide)mass << UNIT_BITS) / total;
+    if (p == 0) {
+        p = 1;
+    }
+    const uint64_t lo = (uint64_t)p;
+    const int64_t width = 64 - __clzll((long long)lo);
+    const int64_t whole = width - 1 - UNIT_BITS;
+    uwide mantissa = (uwide)lo << (uint32_t)(UNIT_BITS + 1 - width);
+    int64_t fraction = 0;
+    for (uint32_t i = 0; i < READ_BITS; i++) {
+        mantissa = (mantissa * mantissa) >> UNIT_BITS;
+        fraction <<= 1;
+        if (mantissa >= ((uwide)2 << UNIT_BITS)) {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    return -(whole * ((int64_t)1 << READ_BITS) + fraction);
+}
+
+// `e^(iπ s)` on `2^(−30)` for a turn `s` in half turns on `2^(−16)` (`turn_face`): `s` read
+// modulo the full turn and composed from the ladder's dyadic turns, its binary digits from the
+// half turn down.
+__device__ void turn_face(int64_t s, const TowerLaw &law, wide *re, wide *im) {
+    const int64_t full = (int64_t)1 << (TURN_BITS + 1);
+    int64_t m = s % full;
+    const uint64_t j = (uint64_t)(m < 0 ? m + full : m);
+    wide vr = (wide)1 << MOVE_BITS, vi = 0;
+    for (uint32_t i = 0; i < TOWER_LADDER; i++) {
+        if (j & ((uint64_t)1 << (TURN_BITS - i))) {
+            const wide cr = law.ladder[i][0], ci = law.ladder[i][1];
+            const wide nr = rel(vr * cr - vi * ci, MOVE_BITS);
+            vi = rel(vr * ci + vi * cr, MOVE_BITS);
+            vr = nr;
+        }
+    }
+    *re = vr;
+    *im = vi;
+}
+
+// -------------------------------------------------------------------------------------------
+// the ring face's wide law (`holonics::hnn::tower::RingFace`): its checked products and its
+// products released through 256 bits, where the host widens to a big integer
+
+__device__ __forceinline__ uwide mag128(wide x) {
+    return x < 0 ? (uwide)0 - (uwide)x : (uwide)x;
+}
+
+struct u256 {
+    uwide lo, hi;
+};
+
+// `a b` over 256 bits.
+__device__ __forceinline__ u256 mul_u128(uwide a, uwide b) {
+    const uint64_t a0 = (uint64_t)a, a1 = (uint64_t)(a >> 64), b0 = (uint64_t)b, b1 = (uint64_t)(b >> 64);
+    const uwide p00 = (uwide)a0 * b0, p01 = (uwide)a0 * b1, p10 = (uwide)a1 * b0, p11 = (uwide)a1 * b1;
+    const uwide mid = (p00 >> 64) + (uint64_t)p01 + (uint64_t)p10;
+    u256 r;
+    r.lo = (mid << 64) | (uint64_t)p00;
+    r.hi = p11 + (p01 >> 64) + (p10 >> 64) + (mid >> 64);
+    return r;
+}
+
+// `x y` where it lies in 128 bits (`checked_mul`), the refusal otherwise.
+__device__ wide mul_checked(wide x, wide y, uint32_t *st) {
+    const u256 p = mul_u128(mag128(x), mag128(y));
+    const bool neg = (x < 0) != (y < 0);
+    const uwide limit = ((uwide)1 << 127) - (neg ? 0 : 1);
+    if (p.hi != 0 || p.lo > limit) {
+        atomicOr(st, TOWER_REFUSED_CARRIER);
+        return 0;
+    }
+    return neg ? (wide)((uwide)0 - p.lo) : (wide)p.lo;
+}
+
+// `x + y` and `x − y` where they lie in 128 bits (`checked_add`, `checked_sub`).
+__device__ wide add_checked(wide x, wide y, uint32_t *st) {
+    const wide r = (wide)((uwide)x + (uwide)y);
+    if ((x >= 0) == (y >= 0) && (r >= 0) != (x >= 0)) {
+        atomicOr(st, TOWER_REFUSED_CARRIER);
+        return 0;
+    }
+    return r;
+}
+
+__device__ wide sub_checked(wide x, wide y, uint32_t *st) {
+    const wide r = (wide)((uwide)x - (uwide)y);
+    if ((x >= 0) != (y >= 0) && (r >= 0) != (x >= 0)) {
+        atomicOr(st, TOWER_REFUSED_CARRIER);
+        return 0;
+    }
+    return r;
+}
+
+// `x y` released by `bits`, half away from zero, exactly (`wide_release`): through 128 bits where
+// the product lies there, through 256 otherwise, refused where the released value leaves 128 bits.
+__device__ wide release_product(wide x, wide y, unsigned bits, uint32_t *st) {
+    u256 p = mul_u128(mag128(x), mag128(y));
+    const bool neg = (x < 0) != (y < 0);
+    const bool narrow = p.hi == 0 && p.lo <= ((uwide)1 << 127) - (neg ? 0 : 1);
+    if (bits > 0 && bits <= 256) {
+        // add the half, 2^(bits − 1), with its carry
+        if (bits - 1 < 128) {
+            const uwide half = (uwide)1 << (bits - 1);
+            const uwide lo = p.lo + half;
+            p.hi += lo < p.lo ? 1 : 0;
+            p.lo = lo;
+        } else {
+            p.hi += (uwide)1 << (bits - 1 - 128);
+        }
+        if (bits < 128) {
+            p.lo = (p.lo >> bits) | (p.hi << (128 - bits));
+            p.hi >>= bits;
+        } else if (bits == 128) {
+            p.lo = p.hi;
+            p.hi = 0;
+        } else {
+            p.lo = bits - 128 < 128 ? p.hi >> (bits - 128) : 0;
+            p.hi = 0;
+        }
+    } else if (bits > 256) {
+        p.lo = 0;
+        p.hi = 0;
+    }
+    const uwide limit = ((uwide)1 << 127) - (narrow && neg ? 0 : 1);
+    if (p.hi != 0 || p.lo > limit) {
+        atomicOr(st, TOWER_REFUSED_CARRIER);
+        return 0;
+    }
+    return neg ? (wide)((uwide)0 - p.lo) : (wide)p.lo;
+}
+
+// The ring carried by one move `h ↦ λh + βh̄`, `m = [Re λ, Im λ, Re β, Im β]` on 2^(−30)
+// (`ring_carry`), and its adjoint (`ring_carry_adjoint`).
+__device__ __forceinline__ void ring_carry(const wide *m, wide re, wide im, wide *out) {
+    out[0] = rel((m[0] + m[2]) * re + (m[3] - m[1]) * im, MOVE_BITS);
+    out[1] = rel((m[1] + m[3]) * re + (m[0] - m[2]) * im, MOVE_BITS);
+}
+
+__device__ __forceinline__ void ring_carry_adjoint(const wide *m, wide gx, wide gy, wide *out) {
+    out[0] = rel((m[0] + m[2]) * gx + (m[1] + m[3]) * gy, MOVE_BITS);
+    out[1] = rel((m[3] - m[1]) * gx + (m[0] - m[2]) * gy, MOVE_BITS);
+}
+
+// The ring's hand after a move (`hand_after`): kept where |λ| > |β|, reversed where below, and
+// the given hand restarted where they are equal.
+__device__ __forceinline__ bool hand_after(const wide *m, bool hand) {
+    const wide l = m[0] * m[0] + m[1] * m[1], b = m[2] * m[2] + m[3] * m[3];
+    return l > b ? hand : l < b ? !hand : false;
+}
+
+// `r / ‖r‖_rms` on 2^(−16) and `‖r‖_rms` of a rank's read `(re, im)` (`ratio_to_power`), then its
+// harmonics `q_h = q_(h−1) ρ / |ρ|` (`harmonics_of`), `2H` words into `q`. Returns the scale.
+__device__ int64_t ring_face(int64_t re, int64_t im, uint32_t harmonics, int32_t *q, uint32_t *st) {
+    const wide power = (wide)re * re + (wide)im * im;
+    const wide scale = (wide)isqrt128((uwide)(power / 2));
+    if (scale == 0) {
+        for (uint32_t i = 0; i < 2 * harmonics; i++) {
+            q[i] = 0;
+        }
+        return 0;
+    }
+    const wide r0 = fit32(div_nearest((wide)re << FACE_BITS, scale), st);
+    const wide r1 = fit32(div_nearest((wide)im << FACE_BITS, scale), st);
+    q[0] = (int32_t)r0;
+    q[1] = (int32_t)r1;
+    const wide modulus = (wide)isqrt128((uwide)(r0 * r0 + r1 * r1));
+    wide x = r0, y = r1;
+    for (uint32_t h = 1; h < harmonics; h++) {
+        if (modulus == 0) {
+            q[2 * h] = 0;
+            q[2 * h + 1] = 0;
+            continue;
+        }
+        const wide nx = div_nearest(x * r0 - y * r1, modulus);
+        const wide ny = div_nearest(x * r1 + y * r0, modulus);
+        x = nx;
+        y = ny;
+        q[2 * h] = fit32(x, st);
+        q[2 * h + 1] = fit32(y, st);
+    }
+    return fit64(scale, st);
+}
+
 // -------------------------------------------------------------------------------------------
 // block reductions (every thread of the block calls them; the result is the block's)
 
@@ -344,7 +621,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     wide *part = (wide *)carve(at, sizeof(wide) * G * W);
     uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
     int64_t *h = (int64_t *)carve(at, 8ull * L * 2 * N);
-    int64_t *pq = (int64_t *)carve(at, 8ull * 3 * N);
+    int64_t *pq = (int64_t *)carve(at, 8ull * (3 + law.turned) * N);
     int64_t *fc = (int64_t *)carve(at, 8ull * 2 * N);
     int64_t *rab = (int64_t *)carve(at, 8ull * 2 * W);
     int64_t *raw = (int64_t *)carve(at, 8ull * W);
@@ -356,13 +633,53 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int32_t *rd = (int32_t *)carve(at, 4ull * W);
     int32_t *dv = (int32_t *)carve(at, 4ull * F);
     int32_t *cd = (int32_t *)carve(at, 4ull * F);
+    int32_t *pc = (int32_t *)carve(at, 4ull * law.forms);
+    const uint32_t K = law.forms;
+    // The ring face: each rank's ring and hand, the carried face it pushes from, the face ρ with
+    // its harmonics, the top's ratio and the pair read φ.
+    const uint32_t R = law.ring_ranks, H = law.ring_harmonics, K2 = 2 * R * H, KP = (W + 1) * K2;
+    wide *rg = (wide *)carve(at, sizeof(wide) * 2 * R);
+    uint32_t *hd = (uint32_t *)carve(at, 4ull * R);
+    int64_t *rs = (int64_t *)carve(at, 8ull * 2 * N * (R > 0));
+    int32_t *rho = (int32_t *)carve(at, 4ull * K2);
+    int32_t *hat = (int32_t *)carve(at, 4ull * W * (R > 0));
+    int32_t *phi = (int32_t *)carve(at, 4ull * KP);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
+    __shared__ wide ring_lam[2];
+    // The news clock: the open face (its masses in `ms`, its total, whether there is one), the
+    // clock's phase, and each level's ticks at the arriving class.
+    __shared__ uwide news_total;
+    __shared__ uint64_t news_phase;
+    __shared__ uint32_t news_has;
+    __shared__ uint32_t tk[TOWER_MAX_LEVELS];
     if (tid == 0) {
         st = 0;
+        for (uint32_t l = 0; l < TOWER_MAX_LEVELS; l++) {
+            tk[l] = 1;
+        }
+        news_has = 0;
+        news_total = 0;
+        news_phase = 0;
+        if (law.news) {
+            const uint64_t *open = fr.news_open + (uint64_t)s * (A + 4);
+            news_has = open[0] != 0;
+            news_total = (uwide)open[1] | ((uwide)open[2] << 64);
+            news_phase = open[3];
+        }
+    }
+    if (law.news) {
+        for (uint32_t c = tid; c < A; c += B) {
+            ms[c] = fr.news_open[(uint64_t)s * (A + 4) + 4 + c];
+        }
     }
     for (uint32_t i = tid; i < L * 2 * N; i += B) {
         h[i] = fr.opening[(uint64_t)s * L * 2 * N + i];
+    }
+    for (uint32_t r = tid; r < R; r += B) {
+        rg[2 * r] = fr.ring_open[((uint64_t)s * R + r) * 2];
+        rg[2 * r + 1] = fr.ring_open[((uint64_t)s * R + r) * 2 + 1];
+        hd[r] = fr.hands_open[(uint64_t)s * R + r];
     }
     uint64_t sw[TOWER_MAX_LEVELS][4] = {};
     const int32_t *th = fr.theta;
@@ -380,8 +697,87 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             }
             u = 0;
         }
+        // The news clock: the arrival's code under the open face (none at rest) advances the
+        // phase, and each level above 0 ticks by the sections the running news crosses
+        // (`NewsClock::ticks`).
+        if (law.news) {
+            if (tid == 0) {
+                uint64_t code = 0;
+                if (news_has) {
+                    if (news_total == 0) {
+                        atomicOr(&st, TOWER_REFUSED_NEWS);
+                    } else {
+                        const int64_t c = face_code(ms[u], news_total);
+                        if (c < 0) {
+                            atomicOr(&st, TOWER_REFUSED_NEWS);
+                        } else {
+                            code = (uint64_t)c;
+                        }
+                    }
+                }
+                const uint64_t sum = news_phase + code;
+                if (sum < code || news_phase >= law.period) {
+                    atomicOr(&st, TOWER_REFUSED_NEWS);
+                }
+                for (uint32_t l = 1; l < L && l < TOWER_MAX_LEVELS; l++) {
+                    const uint64_t section = law.sections[l];
+                    const uint64_t advanced = section == 0 ? 0 : sum / section - news_phase / section;
+                    if (section == 0 || advanced > UINT32_MAX) {
+                        atomicOr(&st, TOWER_REFUSED_NEWS);
+                    }
+                    tk[l] = advanced > UINT32_MAX ? 0 : (uint32_t)advanced;
+                }
+                news_phase = law.period == 0 ? 0 : sum % law.period;
+                if (keep) {
+                    for (uint32_t l = 0; l < L; l++) {
+                        fr.ticks[qc * L + l] = tk[l];
+                    }
+                }
+            }
+            __syncthreads();
+        }
         for (uint32_t j = tid; j < W; j += B) {
             x[j] = th[law.encoding + (uint64_t)u * W + j];
+        }
+        // The seam: the class before this one, the start A at rest (what the pair face and the
+        // ring's founded pair moves read beside the class arriving).
+        uint32_t prev = A;
+        if (K > 0 || R > 0) {
+            prev = t == 0 ? fr.previous[s] : fr.classes[(uint64_t)s * (T + 1) + t - 1];
+            if (prev > A) {
+                if (tid == 0) {
+                    atomicOr(&st, TOWER_REFUSED_CLASS);
+                }
+                prev = A;
+            }
+        }
+        // The pair face read at (the class before, the class arriving): c(p), lifted into the
+        // encoding, x⁰ = E(u) + P c(p) on 2^(−40) released to the face's 2^(−16).
+        uint64_t pmax = 0;
+        if (K > 0) {
+            for (uint32_t v = tid; v < K; v += B) {
+                pc[v] = fr.pair_values[((uint64_t)prev * A + u) * K + v];
+            }
+            __syncthreads();
+            uint64_t mp = 0;
+            for (uint32_t v = tid; v < K; v += B) {
+                const uint64_t a = magnitude(pc[v]);
+                mp = a > mp ? a : mp;
+            }
+            pmax = block_max(mp, red);
+            const bool n_lift = narrow_terms(law.pair_reach[1], pmax, K, &st);
+            for (uint32_t j = tid; j < W; j += B) {
+                const int64_t lift = fit64(rel(dot(th + law.pair_lift + (uint64_t)j * K, 1, K, pc, n_lift), MATERIAL_BITS), &st);
+                x[j] = fit32((wide)x[j] + (wide)lift, &st);
+            }
+            if (keep) {
+                for (uint32_t v = tid; v < K; v += B) {
+                    fr.pair[qc * K + v] = pc[v];
+                }
+                if (tid == 0) {
+                    fr.r_pair[qc] = pmax;
+                }
+            }
         }
         __syncthreads();
         uint64_t m = 0;
@@ -393,23 +789,40 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         for (uint32_t l = 0; l < L; l++) {
             const TowerLevel &lv = law.level[l];
             const uint64_t q = qc * L + l;
+            const bool ringed = R > 0 && l == law.ring_level;
+            // The ring's carried face before the move, each mode's (re, im) on 2^(−16)
+            // (`carried_face`).
+            if (ringed) {
+                for (uint32_t i = tid; i < 2 * N; i += B) {
+                    rs[i] = fit64(rel(h[l * 2 * N + i], STATE_BITS - FACE_BITS), &st);
+                }
+            }
             // The pushes on 2^(−40) released to the state's 2^(−24), and the gate's logit.
             const bool n_re = narrow_terms(lv.reach[0], xmax, W, &st);
             const bool n_im = narrow_terms(lv.reach[1], xmax, W, &st);
             const bool n_gate = narrow_terms(lv.reach[6], xmax, W, &st);
-            for (uint32_t o = tid; o < 3 * N; o += B) {
+            const bool n_turn = law.turned && narrow_terms(lv.reach[7], xmax, W, &st);
+            // A turned level's arriving turn s_t = 2^(−spread) (W_φ x + b_φ), in half turns on
+            // 2^(−16), beside the gate's logit.
+            for (uint32_t o = tid; o < (3 + law.turned) * N; o += B) {
                 const uint32_t fam = o / N, k = o % N;
                 if (fam == 2) {
                     wide sum = dot(tt + lv.gate + k, N, W, x, n_gate);
                     sum += (wide)th[lv.gate_bias + k] << MATERIAL_BITS;
                     pq[o] = fit64(rel(sum, MATERIAL_BITS), &st);
+                } else if (fam == 3) {
+                    wide sum = dot(tt + lv.turn + k, N, W, x, n_turn);
+                    sum += (wide)th[lv.turn_bias + k] << MATERIAL_BITS;
+                    const int64_t turn = fit64(rel(sum, MATERIAL_BITS), &st);
+                    pq[o] = fit64(rel((wide)turn, law.turn_spread), &st);
                 } else {
                     const wide sum = dot(tt + (fam == 0 ? lv.push_re : lv.push_im) + k, N, W, x, fam == 0 ? n_re : n_im);
                     pq[o] = fit64(rel(sum, MATERIAL_BITS + FACE_BITS - STATE_BITS), &st);
                 }
             }
             __syncthreads();
-            // The gated move λ_t = |λ|^(c r) u, held at the margin, and the state h = λ_t h + γ_t B x.
+            // The gated move λ_t = |λ|^(c r) u, held at the margin (its unit turned by e^(iπ s_t)
+            // when the level is turned), and the state h = λ_t h + γ_t B x.
             for (uint32_t k = tid; k < N; k += B) {
                 const int64_t *gf = fr.gates + ((uint64_t)l * N + k) * 4;
                 const wide open = logistic(pq[2 * N + k], face_roots, law.face_digits);
@@ -419,8 +832,16 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 if (held) {
                     rho = radius;
                 }
-                const wide lr = rel(rho * gf[0], MOVE_BITS);
-                const wide li = rel(rho * gf[1], MOVE_BITS);
+                wide ur = gf[0], ui = gf[1];
+                if (law.turned) {
+                    wide tr, ti;
+                    turn_face(pq[3 * N + k], law, &tr, &ti);
+                    const wide nr = rel(ur * tr - ui * ti, MOVE_BITS);
+                    ui = rel(ur * ti + ui * tr, MOVE_BITS);
+                    ur = nr;
+                }
+                const wide lr = rel(rho * ur, MOVE_BITS);
+                const wide li = rel(rho * ui, MOVE_BITS);
                 wide gap = ((wide)1 << (2 * MOVE_BITS)) - (lr * lr + li * li);
                 gap = gap < 0 ? 0 : gap;
                 uint64_t gamma = isqrt64((uint64_t)gap);
@@ -428,13 +849,24 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     atomicOr(&st, TOWER_REFUSED_UNIT);
                     gamma = 1;
                 }
-                const wide hr = h[(l * N + k) * 2], hi = h[(l * N + k) * 2 + 1];
+                // The move acts once a tick of the level's clock (once without a news clock),
+                // then the push enters.
+                wide hr = h[(l * N + k) * 2], hi = h[(l * N + k) * 2 + 1];
+                for (uint32_t j = 0; j < tk[l]; j++) {
+                    const wide ar = rel(lr * hr - li * hi, MOVE_BITS);
+                    hi = rel(lr * hi + li * hr, MOVE_BITS);
+                    hr = ar;
+                }
                 const wide pr = rel((wide)gamma * pq[k], MOVE_BITS);
                 const wide pi = rel((wide)gamma * pq[N + k], MOVE_BITS);
-                const int64_t nr = fit64(rel(lr * hr - li * hi, MOVE_BITS) + pr, &st);
-                const int64_t ni = fit64(rel(lr * hi + li * hr, MOVE_BITS) + pi, &st);
+                const int64_t nr = fit64(hr + pr, &st);
+                const int64_t ni = fit64(hi + pi, &st);
                 h[(l * N + k) * 2] = nr;
                 h[(l * N + k) * 2 + 1] = ni;
+                if (ringed && k == law.ring_mode) {
+                    ring_lam[0] = lr;
+                    ring_lam[1] = li;
+                }
                 fc[k] = fit64(rel(nr, STATE_BITS - FACE_BITS), &st);
                 fc[N + k] = fit64(rel(ni, STATE_BITS - FACE_BITS), &st);
                 if (keep) {
@@ -451,9 +883,101 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     mv[3] = (int64_t)lr;
                     mv[4] = (int64_t)li;
                     mv[5] = held ? 1 : 0;
+                    if (law.turned) {
+                        fr.units[(q * N + k) * 2] = (int64_t)ur;
+                        fr.units[(q * N + k) * 2 + 1] = (int64_t)ui;
+                    }
                 }
             }
             __syncthreads();
+            // The ring rides its mode's move at this cell (its founded pair move where it has
+            // one), pushed from the face it carried before (`RingFace::advance`), each rank by one
+            // thread; then its face, a ratio to its own power with its harmonics (`RingFace::face`).
+            if (ringed) {
+                const uint32_t dims = 2 * N, hatn = W + 1, RM = 6 * N + 2 * W + 3;
+                for (uint32_t r = tid; r < R; r += B) {
+                    const int32_t *fac = th + law.ring_factors + (uint64_t)r * RM;
+                    const uint32_t *sh = fr.ring_shifts + 5 * r;
+                    wide sa0 = 0, sa1 = 0, sg = 0, sb0 = 0, sb1 = 0;
+                    for (uint32_t j = 0; j < dims; j++) {
+                        sa0 += (wide)fac[j] * rs[j];
+                        sa1 += (wide)fac[dims + j] * rs[j];
+                        sg += (wide)fac[2 * dims + 2 * hatn + j] * rs[j];
+                    }
+                    sg += (wide)fac[2 * dims + 2 * hatn + dims] << FACE_BITS;
+                    for (uint32_t j = 0; j < W; j++) {
+                        const wide e = fr.ring_opening[(uint64_t)u * W + j];
+                        sb0 += (wide)fac[2 * dims + j] * e;
+                        sb1 += (wide)fac[2 * dims + hatn + j] * e;
+                    }
+                    sb0 += (wide)fac[2 * dims + W] << FACE_BITS;
+                    sb1 += (wide)fac[2 * dims + hatn + W] << FACE_BITS;
+                    const wide a0 = rel(sa0, sh[0]), a1 = rel(sa1, sh[0]);
+                    const wide b0 = rel(sb0, sh[1]), b1 = rel(sb1, sh[1]);
+                    const wide gamma = rel(sg, sh[2]);
+                    // the push v = αβγ, released by the push shift
+                    const wide pre = sub_checked(mul_checked(a0, b0, &st), mul_checked(a1, b1, &st), &st);
+                    const wide pim = add_checked(mul_checked(a0, b1, &st), mul_checked(a1, b0, &st), &st);
+                    const wide vre = rel(mul_checked(pre, gamma, &st), sh[3]);
+                    const wide vim = rel(mul_checked(pim, gamma, &st), sh[3]);
+                    // the move: the rank's founded pair move at (prev, u), or the mode's
+                    wide m[4] = {ring_lam[0], ring_lam[1], 0, 0};
+                    bool founded = false;
+                    uint32_t lo = fr.ring_index[r], hi = fr.ring_index[r + 1];
+                    while (lo < hi) {
+                        const uint32_t mid = lo + (hi - lo) / 2;
+                        const int64_t *row = fr.ring_table + 6ull * mid;
+                        const uint64_t key = ((uint64_t)row[0] << 32) | (uint64_t)row[1];
+                        const uint64_t want = ((uint64_t)prev << 32) | (uint64_t)u;
+                        if (key == want) {
+                            m[0] = row[2];
+                            m[1] = row[3];
+                            m[2] = row[4];
+                            m[3] = row[5];
+                            founded = true;
+                            break;
+                        }
+                        if (key < want) {
+                            lo = mid + 1;
+                        } else {
+                            hi = mid;
+                        }
+                    }
+                    wide carried[2];
+                    ring_carry(m, rg[2 * r], rg[2 * r + 1], carried);
+                    wide hre = carried[0] + vre, him = carried[1] + vim;
+                    const bool read_hand = hand_after(m, hd[r] != 0);
+                    const int64_t qre = fit64(rel(hre, sh[4]), &st);
+                    const int64_t qim = fit64(rel(him, sh[4]), &st);
+                    const bool rebased = read_hand && fr.ring_restarts[r] == (int32_t)u;
+                    if (rebased) {
+                        him = -him;
+                    }
+                    rg[2 * r] = hre;
+                    rg[2 * r + 1] = him;
+                    hd[r] = read_hand && !rebased ? 1 : 0;
+                    const int64_t scale = ring_face(qre, read_hand ? -qim : qim, H, rho + 2 * H * r, &st);
+                    if (keep) {
+                        const uint64_t qr = qc * R + r;
+                        fr.ring_after[qr * 2] = hre;
+                        fr.ring_after[qr * 2 + 1] = him;
+                        wide *fa = fr.ring_factor + qr * 5;
+                        fa[0] = a0;
+                        fa[1] = a1;
+                        fa[2] = b0;
+                        fa[3] = b1;
+                        fa[4] = gamma;
+                        for (uint32_t i = 0; i < 4; i++) {
+                            fr.ring_move[qr * 4 + i] = (int64_t)m[i];
+                        }
+                        fr.ring_hand[qr] = (read_hand ? 1u : 0u) | (rebased ? 2u : 0u) | (founded ? 4u : 0u);
+                        fr.ring_scale[qr] = scale;
+                        for (uint32_t i = 0; i < 2 * H; i++) {
+                            fr.ring_rho[qc * K2 + 2 * H * r + i] = rho[2 * H * r + i];
+                        }
+                    }
+                }
+            }
             uint64_t mre = 0, mim = 0;
             for (uint32_t k = tid; k < N; k += B) {
                 const uint64_t a = magnitude(fc[k]), b = magnitude(fc[N + k]);
@@ -562,13 +1086,70 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             }
             xmax = block_max(m, red);
         }
+        // The ring read through its pair contact with the top face (`RingFace::pair_read`):
+        // x̂ = (x / ‖x‖_rms, 1) on 2^(−16) and φ = x̂ ⊗ ρ released to 2^(−16), row j of x̂ by
+        // column k of ρ.
+        uint64_t phimax = 0;
+        if (R > 0) {
+            uwide power = 0;
+            for (uint32_t j = tid; j < W; j += B) {
+                power += (uwide)((wide)x[j] * (wide)x[j]);
+            }
+            power = block_sum(power, redw);
+            if (tid == 0) {
+                const uwide root = isqrt128((uwide)((wide)power / (wide)W));
+                if (root > (uwide)INT64_MAX) {
+                    atomicOr(&st, TOWER_REFUSED_WORD64);
+                }
+                scale_s = root > (uwide)INT64_MAX ? 0 : (int64_t)root;
+            }
+            __syncthreads();
+            const int64_t top_scale = scale_s;
+            for (uint32_t j = tid; j < W; j += B) {
+                hat[j] = top_scale == 0 ? 0 : fit32(div_nearest((wide)x[j] << FACE_BITS, top_scale), &st);
+            }
+            __syncthreads();
+            uint64_t mph = 0;
+            for (uint32_t i = tid; i < KP; i += B) {
+                const uint32_t j = i / K2, k = i % K2;
+                const wide xj = j < W ? (wide)hat[j] : (wide)1 << FACE_BITS;
+                phi[i] = fit32(rel(xj * (wide)rho[k], FACE_BITS), &st);
+                const uint64_t a = magnitude(phi[i]);
+                mph = a > mph ? a : mph;
+            }
+            phimax = block_max(mph, red);
+            if (keep) {
+                for (uint32_t i = tid; i < KP; i += B) {
+                    fr.ring_pair[qc * KP + i] = phi[i];
+                }
+                for (uint32_t j = tid; j < W; j += B) {
+                    fr.top_hat[qc * W + j] = hat[j];
+                }
+                if (tid == 0) {
+                    fr.top_scale[qc] = top_scale;
+                    fr.r_ring_pair[qc] = phimax;
+                }
+            }
+        }
         // The readout's face z = U x + c, and the masses 2^(z − z_max) on 2^(−62).
+        // The pair face read by its own readout, z += V c(p), and the ring's, z += W φ, each
+        // released to 2^(−16) beside it.
         const bool n_z = narrow_terms(law.readout_reach, xmax, W, &st);
+        const bool n_v = K > 0 && narrow_terms(law.pair_reach[0], pmax, K, &st);
+        const bool n_w = R > 0 && narrow_terms(law.ring_reach, phimax, KP, &st);
         int64_t zm = INT64_MIN;
         for (uint32_t c = tid; c < A; c += B) {
             wide sum = dot(tt + law.readout + c, A, W, x, n_z);
             sum += (wide)th[law.readout_bias + c] << MATERIAL_BITS;
             z[c] = fit64(rel(sum, MATERIAL_BITS), &st);
+            if (K > 0) {
+                const int64_t read = fit64(rel(dot(th + law.pair_readout + (uint64_t)c * K, 1, K, pc, n_v), MATERIAL_BITS), &st);
+                z[c] = fit64((wide)z[c] + (wide)read, &st);
+            }
+            if (R > 0) {
+                const int64_t read = fit64(rel(dot(th + law.ring_readout + (uint64_t)c * KP, 1, KP, phi, n_w), MATERIAL_BITS), &st);
+                z[c] = fit64((wide)z[c] + (wide)read, &st);
+            }
             zm = z[c] > zm ? z[c] : zm;
         }
         const int64_t zmax = block_max_signed(zm, red);
@@ -583,6 +1164,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             fr.faces[qc * 3] = target >= 0 && (uint32_t)target < A ? ms[target] : 0;
             fr.faces[qc * 3 + 1] = (uint64_t)total;
             fr.faces[qc * 3 + 2] = (uint64_t)(total >> 64);
+            // The face the next arrival is read against.
+            news_total = total;
+            news_has = 1;
         }
         if (keep) {
             for (uint32_t c = tid; c < A; c += B) {
@@ -601,6 +1185,23 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     }
     for (uint32_t i = tid; i < L * 2 * N; i += B) {
         fr.ends[(uint64_t)s * L * 2 * N + i] = h[i];
+    }
+    for (uint32_t r = tid; r < R; r += B) {
+        fr.ring_ends[((uint64_t)s * R + r) * 2] = rg[2 * r];
+        fr.ring_ends[((uint64_t)s * R + r) * 2 + 1] = rg[2 * r + 1];
+        fr.hands_ends[(uint64_t)s * R + r] = hd[r];
+    }
+    if (law.news) {
+        uint64_t *end = fr.news_ends + (uint64_t)s * (A + 4);
+        for (uint32_t c = tid; c < A; c += B) {
+            end[4 + c] = ms[c];
+        }
+        if (tid == 0) {
+            end[0] = news_has;
+            end[1] = (uint64_t)news_total;
+            end[2] = (uint64_t)(news_total >> 64);
+            end[3] = news_phase;
+        }
     }
     if (tid == 0) {
         if (st != 0) {
@@ -630,6 +1231,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_top(To
     wide *part = (wide *)carve(at, sizeof(wide) * G * W);
     int64_t *dz = (int64_t *)carve(at, 8ull * A);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
+    // The ring's pair read: the readout's covector `back = Wᵀ δz` over φ, then `∂ρ` and `∂x̂`.
+    const uint32_t R = law.ring_ranks, H = law.ring_harmonics, K2 = 2 * R * H, KP = (W + 1) * K2;
+    uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32 * (R > 0));
+    int64_t *dxs = (int64_t *)carve(at, 8ull * W);
+    int64_t *back = (int64_t *)carve(at, 8ull * KP);
+    int64_t *drho = (int64_t *)carve(at, 8ull * K2);
+    int64_t *dhat = (int64_t *)carve(at, 8ull * W * (R > 0));
     __shared__ uint32_t st;
     if (tid == 0) {
         st = 0;
@@ -664,7 +1272,80 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_top(To
         for (uint32_t g = 0; g < G; g++) {
             sum += part[g * W + j];
         }
-        fr.dx[q * W + j] = fit64(rel(sum, MATERIAL_BITS), &st);
+        dxs[j] = fit64(rel(sum, MATERIAL_BITS), &st);
+    }
+    __syncthreads();
+    if (R > 0) {
+        // `back = Wᵀ δz` released by the material's grain (`transposed`).
+        const bool n_w = narrow_rows(law.ring_reach, ymax, A);
+        for (uint32_t k = tid; k < KP; k += B) {
+            back[k] = fit64(rel(dot(fr.theta + law.ring_readout + k, KP, A, dz, n_w), MATERIAL_BITS), &st);
+        }
+        __syncthreads();
+        // ∂ρ_k = Σ_j ∂φ_jk x̂_j and ∂x̂_j = Σ_k ∂φ_jk ρ_k, each released by the face's grain.
+        const int32_t *rho = fr.ring_rho + q * K2;
+        const int32_t *hat = fr.top_hat + q * W;
+        for (uint32_t k = tid; k < K2; k += B) {
+            wide sum = 0;
+            for (uint32_t j = 0; j <= W; j++) {
+                const wide xj = j < W ? (wide)hat[j] : (wide)1 << FACE_BITS;
+                sum += (wide)back[j * K2 + k] * xj;
+            }
+            drho[k] = fit64(rel(sum, FACE_BITS), &st);
+        }
+        for (uint32_t j = tid; j < W; j += B) {
+            wide sum = 0;
+            for (uint32_t k = 0; k < K2; k++) {
+                sum += (wide)back[j * K2 + k] * (wide)rho[k];
+            }
+            dhat[j] = fit64(rel(sum, FACE_BITS), &st);
+        }
+        __syncthreads();
+        // Each rank's read covector: the harmonics' adjoint to the turn (`harmonics_adjoint`),
+        // then the ratio's (`ratio_adjoint`), one thread a rank.
+        for (uint32_t r = tid; r < R; r += B) {
+            const int32_t *qr = rho + 2 * H * r;
+            const int64_t *gq = drho + 2 * H * r;
+            const wide re = qr[0], im = qr[1];
+            const wide n2 = re * re + im * im;
+            wide d0 = gq[0], d1 = gq[1];
+            if (n2 != 0 && H > 1) {
+                wide turn = 0;
+                for (uint32_t h = 1; h < H; h++) {
+                    const wide a = sub_checked((wide)gq[2 * h + 1] * qr[2 * h], (wide)gq[2 * h] * qr[2 * h + 1], &st);
+                    turn = add_checked(turn, mul_checked(a, (wide)(h + 1), &st), &st);
+                }
+                d0 = fit64(d0 + div_nearest(mul_checked(turn, -im, &st), n2), &st);
+                d1 = fit64(d1 + div_nearest(mul_checked(turn, re, &st), n2), &st);
+            }
+            const int64_t scale = fr.ring_scale[q * R + r];
+            int64_t c0 = 0, c1 = 0;
+            if (scale != 0) {
+                const wide mean = div_nearest(re * d0 + im * d1, 2);
+                c0 = fit64(div_nearest((d0 - rel(mean * re, 2 * FACE_BITS)) << FACE_BITS, scale), &st);
+                c1 = fit64(div_nearest((d1 - rel(mean * im, 2 * FACE_BITS)) << FACE_BITS, scale), &st);
+            }
+            fr.ring_cov[q * 2 * R + 2 * r] = c0;
+            fr.ring_cov[q * 2 * R + 2 * r + 1] = c1;
+        }
+        // The top's covector through x̂'s ratio (`ratio_adjoint`).
+        const int64_t top_scale = fr.top_scale[q];
+        uwide dot_part = 0;
+        for (uint32_t j = tid; j < W; j += B) {
+            dot_part += (uwide)((wide)hat[j] * (wide)dhat[j]);
+        }
+        const wide mean = div_nearest((wide)block_sum(dot_part, redw), (wide)W);
+        for (uint32_t j = tid; j < W; j += B) {
+            int64_t e = 0;
+            if (top_scale != 0) {
+                e = fit64(div_nearest(((wide)dhat[j] - rel(mean * (wide)hat[j], 2 * FACE_BITS)) << FACE_BITS, top_scale), &st);
+            }
+            dxs[j] = fit64((wide)dxs[j] + (wide)e, &st);
+        }
+        __syncthreads();
+    }
+    for (uint32_t j = tid; j < W; j += B) {
+        fr.dx[q * W + j] = dxs[j];
     }
     __syncthreads();
     if (tid == 0 && st != 0) {
@@ -771,9 +1452,184 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
     }
 }
 
+// The ring's reverse over one stream (`RingFace::reverse`), one block a stream, the cells in
+// reverse order, every rank's scan carried together: at cell t each rank's covector
+// `G_t = (g_ρx, o_t g_ρy) + Mᵀ_(t+1) G_(t+1)` (one thread a rank, the restart's re-basing carrying
+// it back), its move's covector, and `e`, `h`, `f`; then the carried face's covector `∂ŝ_t` summed
+// over the ranks in their order (one thread a coordinate), added to the read covector of the
+// state it was pushed from (the cell before's, the opening's not being material), and each
+// factor's covector summed over the cells (one thread a factor entry); at the end each sum is
+// carried to the material's convention by `2^(24 − release)`. Runs after the level's contacts
+// (which write the read covector) and before its modes' scan (which reads it, and the move's
+// covector the ring returns where no rank rode a founded pair move).
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ring(TowerLaw law, TowerFrame fr) {
+    const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
+    const uint32_t W = law.width, N = law.modes, L = law.levels, T = law.cells, R = law.ring_ranks;
+    const uint32_t l = law.ring_level, dims = 2 * N, hatn = W + 1, RM = 6 * N + 2 * W + 3;
+    extern __shared__ __align__(16) unsigned char smem[];
+    unsigned char *at = smem;
+    wide *gs = (wide *)carve(at, sizeof(wide) * 2 * R);
+    wide *ehf = (wide *)carve(at, sizeof(wide) * 5 * R);
+    wide *dm = (wide *)carve(at, sizeof(wide) * 2 * R);
+    int64_t *sf = (int64_t *)carve(at, 8ull * dims);
+    uint32_t *rode = (uint32_t *)carve(at, 4ull * R);
+    __shared__ uint32_t st;
+    if (tid == 0) {
+        st = 0;
+    }
+    wide *gsum = fr.ring_g + (uint64_t)s * R * RM;
+    for (uint32_t e = tid; e < R * RM; e += B) {
+        gsum[e] = 0;
+    }
+    for (uint32_t i = tid; i < 2 * R; i += B) {
+        gs[i] = 0;
+    }
+    __syncthreads();
+    for (uint32_t step = 0; step < T; step++) {
+        const uint32_t t = T - 1 - step;
+        const uint64_t q = (uint64_t)s * T + t;
+        const uint32_t arrived = fr.classes[(uint64_t)s * (T + 1) + t];
+        const uint32_t u = arrived < law.alphabet ? arrived : 0; // the forward refused it
+        // ŝ_t, the carried face of the state the push read (the cell before's, or the opening's).
+        const int64_t *before = t == 0 ? fr.opening + ((uint64_t)s * L + l) * dims : fr.state + ((q - 1) * L + l) * dims;
+        for (uint32_t j = tid; j < dims; j += B) {
+            sf[j] = fit64(rel(before[j], STATE_BITS - FACE_BITS), &st);
+        }
+        for (uint32_t r = tid; r < R; r += B) {
+            const uint64_t qr = q * R + r;
+            const uint32_t *sh = fr.ring_shifts + 5 * r;
+            const uint32_t sigma = sh[4], total = sh[3] + sigma;
+            wide back[2] = {0, 0};
+            if (t + 1 < T) {
+                const int64_t *mn = fr.ring_move + (qr + R) * 4;
+                const wide m[4] = {mn[0], mn[1], mn[2], mn[3]};
+                ring_carry_adjoint(m, gs[2 * r], gs[2 * r + 1], back);
+            }
+            const uint32_t hand = fr.ring_hand[qr];
+            if (hand & 2u) {
+                back[1] = -back[1];
+            }
+            const wide gy0 = fr.ring_cov[q * 2 * R + 2 * r + 1];
+            const wide gx = (wide)fr.ring_cov[q * 2 * R + 2 * r] + back[0];
+            const wide gy = ((hand & 1u) ? -gy0 : gy0) + back[1];
+            gs[2 * r] = gx;
+            gs[2 * r + 1] = gy;
+            const wide x = t == 0 ? fr.ring_open[((uint64_t)s * R + r) * 2] : fr.ring_after[(qr - R) * 2];
+            const wide y = t == 0 ? fr.ring_open[((uint64_t)s * R + r) * 2 + 1] : fr.ring_after[(qr - R) * 2 + 1];
+            // The move's covector on the modes' convention: (x gx + y gy, x gy − y gx, x gx − y gy,
+            // x gy + y gx) 2^(8−σ).
+            wide xgx, ygy, xgy, ygx;
+            if (sigma >= 8) {
+                xgx = release_product(x, gx, sigma - 8, &st);
+                ygy = release_product(y, gy, sigma - 8, &st);
+                xgy = release_product(x, gy, sigma - 8, &st);
+                ygx = release_product(y, gx, sigma - 8, &st);
+            } else {
+                const wide up = (wide)1 << (8 - sigma);
+                xgx = mul_checked(mul_checked(x, gx, &st), up, &st);
+                ygy = mul_checked(mul_checked(y, gy, &st), up, &st);
+                xgy = mul_checked(mul_checked(x, gy, &st), up, &st);
+                ygx = mul_checked(mul_checked(y, gx, &st), up, &st);
+            }
+            dm[2 * r] = add_checked(xgx, ygy, &st);
+            dm[2 * r + 1] = add_checked(xgy, -ygx, &st);
+            add_checked(xgx, -ygy, &st);
+            add_checked(xgy, ygx, &st);
+            rode[r] = hand & 4u;
+            // conj(G) β and conj(G) α, then their products with γ and α, released by the push and σ.
+            const wide *fa = fr.ring_factor + qr * 5;
+            const wide a0 = fa[0], a1 = fa[1], b0 = fa[2], b1 = fa[3], gamma = fa[4];
+            const wide cb0 = add_checked(mul_checked(gx, b0, &st), mul_checked(gy, b1, &st), &st);
+            const wide cb1 = sub_checked(mul_checked(gx, b1, &st), mul_checked(gy, b0, &st), &st);
+            const wide ca0 = add_checked(mul_checked(gx, a0, &st), mul_checked(gy, a1, &st), &st);
+            const wide ca1 = sub_checked(mul_checked(gx, a1, &st), mul_checked(gy, a0, &st), &st);
+            wide *o = ehf + 5 * r;
+            o[0] = release_product(cb0, gamma, total, &st);
+            o[1] = release_product(cb1, gamma, total, &st);
+            o[2] = release_product(ca0, gamma, total, &st);
+            o[3] = release_product(ca1, gamma, total, &st);
+            o[4] = sub_checked(release_product(cb0, a0, total, &st), release_product(cb1, a1, total, &st), &st);
+        }
+        __syncthreads();
+        // ∂ŝ_t, the ranks in their order, onto the read covector of the state before.
+        for (uint32_t j = tid; j < dims; j += B) {
+            wide sum = 0;
+            for (uint32_t r = 0; r < R; r++) {
+                const int32_t *fac = fr.theta + law.ring_factors + (uint64_t)r * RM;
+                const uint32_t *sh = fr.ring_shifts + 5 * r;
+                const wide *o = ehf + 5 * r;
+                const wide through_a = rel(sub_checked(mul_checked(o[0], fac[j], &st), mul_checked(o[1], fac[dims + j], &st), &st), sh[0]);
+                const wide through_g = rel(mul_checked(o[4], fac[2 * dims + 2 * hatn + j], &st), sh[2]);
+                sum = add_checked(add_checked(sum, through_a, &st), through_g, &st);
+            }
+            const int64_t v = fit64(sum, &st);
+            if (t > 0) {
+                // ŝ's (re, im) of mode j/2 onto the read covector's re and im blocks.
+                int64_t *rc = fr.readcov + ((q - 1) * L + l) * dims + (j & 1u) * N + j / 2;
+                *rc = fit64((wide)*rc + (wide)v, &st);
+            }
+        }
+        // Each factor's covector: ∂a = Σ (Re e, −Im e) ŝ, ∂b = Σ (Re h, −Im h) x̂, ∂g = Σ f (ŝ, 2^16).
+        for (uint32_t e = tid; e < R * RM; e += B) {
+            const uint32_t r = e / RM, i = e % RM;
+            const wide *o = ehf + 5 * r;
+            wide term;
+            if (i < 2 * dims) {
+                const wide sj = sf[i % dims];
+                term = i < dims ? mul_checked(o[0], sj, &st) : mul_checked(o[1], -sj, &st);
+            } else if (i < 2 * dims + 2 * hatn) {
+                const uint32_t k = i - 2 * dims, j = k % hatn;
+                const wide xj = j < W ? (wide)fr.ring_opening[(uint64_t)u * W + j] : (wide)1 << FACE_BITS;
+                term = k < hatn ? mul_checked(o[2], xj, &st) : mul_checked(o[3], -xj, &st);
+            } else {
+                const uint32_t j = i - 2 * dims - 2 * hatn;
+                term = mul_checked(o[4], j < dims ? (wide)sf[j] : (wide)1 << FACE_BITS, &st);
+            }
+            gsum[e] = add_checked(gsum[e], term, &st);
+        }
+        // The mode's move takes the covector of every rank that rode it, not a founded pair move.
+        if (tid == 0) {
+            wide d0 = 0, d1 = 0;
+            for (uint32_t r = 0; r < R; r++) {
+                if (rode[r] == 0) {
+                    d0 += dm[2 * r];
+                    d1 += dm[2 * r + 1];
+                }
+            }
+            fr.ring_dmove[q * 2] = d0;
+            fr.ring_dmove[q * 2 + 1] = d1;
+        }
+        __syncthreads();
+    }
+    // Each sum on the material's convention: 2^40 per unit of 2^(−24), from its factor's release.
+    for (uint32_t e = tid; e < R * RM; e += B) {
+        const uint32_t r = e / RM, i = e % RM;
+        const uint32_t *sh = fr.ring_shifts + 5 * r;
+        const uint32_t bits = i < 2 * dims ? sh[0] : i < 2 * dims + 2 * hatn ? sh[1] : sh[2];
+        gsum[e] = bits >= MATERIAL_BITS ? rel(gsum[e], bits - MATERIAL_BITS) : mul_checked(gsum[e], (wide)1 << (MATERIAL_BITS - bits), &st);
+    }
+    __syncthreads();
+    if (tid == 0 && st != 0) {
+        atomicOr(fr.status + s, st);
+    }
+}
+
+// The ring's factor covector summed over the streams into the gradient.
+extern "C" __global__ void tower_ring_factors(TowerLaw law, TowerFrame fr) {
+    const uint64_t entries = (uint64_t)law.ring_ranks * (6 * law.modes + 2 * law.width + 3);
+    for (uint64_t e = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; e < entries; e += (uint64_t)gridDim.x * blockDim.x) {
+        uwide sum = 0;
+        for (uint32_t s = 0; s < law.streams; s++) {
+            sum += (uwide)fr.ring_g[s * entries + e];
+        }
+        fr.gradient[law.ring_factors + e] += (wide)sum;
+    }
+}
+
 // The modes' reverse scan of one level of one stream, one thread a mode, and each cell's gated move
 // adjoint: G_h(t) = read covector + conj(λ_(t+1)) G_h(t+1); the covectors of |λ| and arg λ summed
-// over the cells; the gate's logit covector δq; and γ_t G_h, what the pushes return.
+// over the cells; the gate's logit covector δq; a turned level's turn covector
+// δs = 2^(−spread) π Re(conj(iλ_t) G_λ), through ∂θ/∂s = π; and γ_t G_h, what the pushes return.
 extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, L = law.levels, T = law.cells;
@@ -800,21 +1656,68 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 lr = fr.theta[lv.move_re + k];
                 li = fr.theta[lv.move_im + k];
             }
-            const int64_t gr = fit64((wide)fr.readcov[ql * 2 * N + k] + rel(lr * cr + li * ci, MOVE_BITS), &st);
-            const int64_t gi = fit64((wide)fr.readcov[ql * 2 * N + N + k] + rel(lr * ci - li * cr, MOVE_BITS), &st);
+            // The later cell's move acted once a tick of the level's clock (once without one):
+            // conj(λ_(t+1)) carried back that many times.
+            const uint32_t later_ticks = law.news && t + 1 < T ? fr.ticks[(q + 1) * L + l] : 1;
+            wide br = cr, bi = ci;
+            for (uint32_t j = 0; j < later_ticks; j++) {
+                const wide ar = rel(lr * br + li * bi, MOVE_BITS);
+                bi = rel(lr * bi - li * br, MOVE_BITS);
+                br = ar;
+            }
+            const int64_t gr = fit64((wide)fr.readcov[ql * 2 * N + k] + br, &st);
+            const int64_t gi = fit64((wide)fr.readcov[ql * 2 * N + N + k] + bi, &st);
             cr = gr;
             ci = gi;
             const int64_t *previous = t == 0 ? fr.opening + (((uint64_t)s * L + l) * N + k) * 2 : fr.state + (((q - 1) * L + l) * N + k) * 2;
             const wide hr = previous[0], hi = previous[1];
-            const wide glr = hr * gr + hi * gi;
-            const wide gli = hr * gi - hi * gr;
-            const wide through = (wide)gr * fr.push[ql * 2 * N + k] + (wide)gi * fr.push[ql * 2 * N + N + k];
             const int64_t *mv = fr.moves + (ql * N + k) * 6;
+            const uint32_t ticks = law.news ? fr.ticks[ql] : 1;
+            wide glr, gli;
+            if (ticks == 1) {
+                glr = hr * gr + hi * gi;
+                gli = hr * gi - hi * gr;
+                // The ring's covector of the move it rode, on the same convention.
+                if (law.ring_ranks > 0 && l == law.ring_level && k == law.ring_mode) {
+                    glr += fr.ring_dmove[q * 2];
+                    gli += fr.ring_dmove[q * 2 + 1];
+                }
+            } else {
+                // The move acted Δτ times: the covector of λ_t is the sum over its sub-moves of
+                // conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾, each state between them read again by the forward's law from
+                // h_(t−1) and the covector carried back through each, G⁽ʲ⁻¹⁾ = conj(λ_t) G⁽ʲ⁾; no tick
+                // sends none (`Tower::reverse_joined`; the card carries no ring beside the clock).
+                const wide mr = mv[3], mi = mv[4];
+                wide sr = 0, si = 0, gcr = gr, gci = gi;
+                for (uint32_t j = ticks; j >= 1; j--) {
+                    wide ar = hr, ai = hi;
+                    for (uint32_t i = 1; i < j; i++) {
+                        const wide nr = rel(mr * ar - mi * ai, MOVE_BITS);
+                        ai = rel(mr * ai + mi * ar, MOVE_BITS);
+                        ar = nr;
+                    }
+                    sr += ar * gcr + ai * gci;
+                    si += ar * gci - ai * gcr;
+                    const wide nc = rel(mr * gcr + mi * gci, MOVE_BITS);
+                    gci = rel(mr * gci - mi * gcr, MOVE_BITS);
+                    gcr = nc;
+                }
+                glr = sr;
+                gli = si;
+            }
+            const wide through = (wide)gr * fr.push[ql * 2 * N + k] + (wide)gi * fr.push[ql * 2 * N + N + k];
             const wide open = mv[0], rho = mv[1], gamma = mv[2];
-            around += rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
+            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
+            around += turning;
+            // The cell's unit: the founded one, turned by the cell's own turn when the level is.
+            const wide cu_r = law.turned ? (wide)fr.units[(ql * N + k) * 2] : ur;
+            const wide cu_i = law.turned ? (wide)fr.units[(ql * N + k) * 2 + 1] : ui;
+            if (law.turned) {
+                fr.ds[ql * N + k] = fit64(rel((wide)law.half_turn * turning, MOVE_BITS + COVECTOR_BITS + law.turn_spread), &st);
+            }
             int64_t dq = 0;
             if (mv[5] == 0) {
-                const wide g_rho = rel(ur * glr + ui * gli, MOVE_BITS) - div_nearest(rho * through, gamma);
+                const wide g_rho = rel(cu_r * glr + cu_i * gli, MOVE_BITS) - div_nearest(rho * through, gamma);
                 along += rel(g_rho * div_nearest((wide)GATE_REACH * open * rho, modulus), MOVE_BITS);
                 wide f = rel(rho * log, MOVE_BITS);
                 f = rel(f * (wide)law.ln2_square, MOVE_BITS);
@@ -838,7 +1741,8 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
     }
 }
 
-// What the pushes and the gate return to the level's input: dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq.
+// What the pushes, the gate and a turned level's turn return to the level's input:
+// dx += P_reᵀ γG_re + P_imᵀ γG_im + W_gᵀ δq (+ W_φᵀ δs).
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint64_t q = blockIdx.x, ql = q * law.levels + l;
     const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
@@ -846,14 +1750,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     const TowerLevel &lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
-    int64_t *v = (int64_t *)carve(at, 8ull * 3 * N);
-    int64_t *back = (int64_t *)carve(at, 8ull * 3 * W);
+    const uint32_t fams = 3 + law.turned;
+    int64_t *v = (int64_t *)carve(at, 8ull * fams * N);
+    int64_t *back = (int64_t *)carve(at, 8ull * fams * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
     __shared__ uint32_t st;
     if (tid == 0) {
         st = 0;
     }
-    uint64_t m0 = 0, m1 = 0, m2 = 0;
+    uint64_t m0 = 0, m1 = 0, m2 = 0, m3 = 0;
     for (uint32_t k = tid; k < N; k += B) {
         v[k] = fr.gre[ql * N + k];
         v[N + k] = fr.gim[ql * N + k];
@@ -862,28 +1767,49 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         m0 = a > m0 ? a : m0;
         m1 = b > m1 ? b : m1;
         m2 = c > m2 ? c : m2;
+        if (law.turned) {
+            v[3 * N + k] = fr.ds[ql * N + k];
+            const uint64_t d = magnitude(v[3 * N + k]);
+            m3 = d > m3 ? d : m3;
+        }
     }
     const uint64_t r0 = block_max(m0, red);
     const uint64_t r1 = block_max(m1, red);
     const uint64_t r2 = block_max(m2, red);
+    const uint64_t r3 = law.turned ? block_max(m3, red) : 0;
     if (tid == 0) {
         fr.r_gre[ql] = r0;
         fr.r_gim[ql] = r1;
         fr.r_dq[ql] = r2;
+        if (law.turned) {
+            fr.r_ds[ql] = r3;
+        }
     }
     const bool n0 = narrow_rows(lv.reach[0], r0, N);
     const bool n1 = narrow_rows(lv.reach[1], r1, N);
     const bool n2 = narrow_rows(lv.reach[6], r2, N);
-    for (uint32_t o = tid; o < 3 * W; o += B) {
+    const bool n3 = law.turned && narrow_rows(lv.reach[7], r3, N);
+    for (uint32_t o = tid; o < fams * W; o += B) {
         const uint32_t fam = o / W, j = o % W;
-        const uint64_t base = fam == 0 ? lv.push_re : fam == 1 ? lv.push_im : lv.gate;
-        const wide sum = dot(fr.theta + base + j, W, N, v + fam * N, fam == 0 ? n0 : fam == 1 ? n1 : n2);
+        const uint64_t base = fam == 0 ? lv.push_re : fam == 1 ? lv.push_im : fam == 2 ? lv.gate : lv.turn;
+        const wide sum = dot(fr.theta + base + j, W, N, v + fam * N, fam == 0 ? n0 : fam == 1 ? n1 : fam == 2 ? n2 : n3);
         back[o] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
+    uint64_t mx = 0;
     for (uint32_t j = tid; j < W; j += B) {
-        const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j];
-        fr.dx[q * W + j] = fit64(sum, &st);
+        const wide sum = (wide)fr.dx[q * W + j] + back[j] + back[W + j] + back[2 * W + j] + (law.turned ? back[3 * W + j] : 0);
+        const int64_t v = fit64(sum, &st);
+        fr.dx[q * W + j] = v;
+        const uint64_t a = magnitude(v);
+        mx = a > mx ? a : mx;
+    }
+    // The bottom level's dx is the cell's input covector δx⁰, what the pair face's lift reads.
+    if (l == 0) {
+        const uint64_t rx = block_max(mx, red);
+        if (tid == 0) {
+            fr.r_dx[q] = rx;
+        }
     }
     __syncthreads();
     if (tid == 0 && st != 0) {

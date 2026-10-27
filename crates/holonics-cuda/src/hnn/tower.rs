@@ -13,20 +13,32 @@
 //! through the card's forward. Integer sums are associative, so the card's covector summed over
 //! streams and cells in its own order is the host's stream-by-stream sum, bit for bit.
 //!
-//! [definition] **The declaration the card carries**: a gated tower, rectifying contacts, not
-//! turned, not pumped, no pair or ring face, no passage credit, at most four
-//! levels, streams of one section length. Any other is refused before a launch
-//! ([`TowerCard::admits`]), never run on a partial law.
+//! [definition] **The declaration the card carries**: a gated tower, turned or not (each cell's
+//! founded unit turned by the arriving turn, composed from the ladder's dyadic turns, and the turn's
+//! covector returned through its family and summed against the level's input), rectifying contacts,
+//! not pumped, no passage credit, at most four levels, streams of one section length, with
+//! or without the pair face (its values resident on the card beside the material, read at each
+//! cell's pair of the class before and the class arriving) and with or without the ring face (its
+//! ranks carried by every stream beside its modes, each riding its level's mode or its founded pair
+//! move at the cell's pair, its pools generated from `b` and `E₀` where the material is read, and
+//! its face read through the pair contact with the top face), and with or without a news clock
+//! (`NewsClock`, never beside the ring face: each stream carries its open face and phase beside its
+//! modes, the forward reads every level's ticks from the arriving class's code under the open face
+//! and moves each level's modes once a tick, and the modes' scan carries the covector back through
+//! each tick). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
+//! law.
 //!
 //! # The realizations (hardware law)
 //!
 //! | Kernel | Block | Thread | A thread loops over |
 //! |---|---|---|---|
 //! | `tower_transpose` | a grid striding one matrix family (`grid.y` the family) | one material entry | — |
-//! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: a push or gate logit, a mode's move, a read, a contact, a return part, a class's face; 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (the return's contacts in `256/W` groups) |
-//! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage; 256 threads | the stage's outputs, within each its column's weights |
+//! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: the pair face's lift, a push or gate logit, a mode's move, a ring rank's advance and face, a read, a contact, a return part, a class's face (with its pair read and the ring's pair read); 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (the return's contacts in `256/W` groups; a ring rank its factors) |
+//! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage (the ring's readout covector, its face's and each rank's read covector among them); 256 threads | the stage's outputs, within each its column's weights |
 //! | `tower_reverse_modes` | one stream of one level | one mode | the stream's cells in reverse order (the scan) |
-//! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
+//! | `tower_reverse_ring` | one stream | one ring rank's scan step, then one face coordinate, then one factor entry | the stream's cells in reverse order, every rank's scan carried together; a coordinate the ranks in their order |
+//! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift and the ring's readout among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
+//! | `tower_ring_factors` | a grid striding the ring's factors | one factor entry | the streams |
 //! | `tower_encoding` | one class | one face coordinate | every cell, summing where its class arrived |
 //! | `tower_moves` | one level | one mode | the streams |
 use core::ffi::c_void;
@@ -46,6 +58,8 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/tower.ptx"));
 const THREADS: u32 = 256;
 /// The levels the law's words carry (`TOWER_MAX_LEVELS`).
 const MAX_LEVELS: usize = 4;
+/// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16` (`TOWER_LADDER`).
+const LADDER: usize = 17;
 /// The outer sums' tile (`OUTER_ROWS`, `OUTER_COLS`).
 const OUTER_ROWS: u32 = 16;
 const OUTER_COLS: u32 = 64;
@@ -72,7 +86,9 @@ struct LevelWords {
     ret_bias: u64,
     gate: u64,
     gate_bias: u64,
-    reach: [u64; 7],
+    turn: u64,
+    turn_bias: u64,
+    reach: [u64; 8],
 }
 
 /// The law's words (`TowerLaw`).
@@ -89,14 +105,34 @@ struct LawWords {
     face_digits: u32,
     move_digits: u32,
     families: u32,
+    forms: u32,
     pad0: u32,
-    pad1: u32,
     encoding: u64,
     readout: u64,
     readout_bias: u64,
     readout_reach: u64,
     ln2_square: i64,
+    pair_readout: u64,
+    pair_lift: u64,
+    pair_reach: [u64; 2],
+    ring_level: u32,
+    ring_mode: u32,
+    ring_ranks: u32,
+    ring_harmonics: u32,
+    ring_readout: u64,
+    ring_factors: u64,
+    ring_reach: u64,
+    half_turn: i64,
+    turned: u32,
+    turn_spread: u32,
+    ladder: [[i64; 2]; LADDER],
     level: [LevelWords; MAX_LEVELS],
+    /// The news clock (`news = 0` without one): each level's section on `2^(−20)` bits (level 0's
+    /// unread) and the clock's period ([`NewsClock`]).
+    news: u32,
+    pad1: u32,
+    sections: [u64; MAX_LEVELS],
+    period: u64,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -151,6 +187,39 @@ struct FrameWords {
     r_dq: u64,
     moves_g: u64,
     gradient: u64,
+    pair_values: u64,
+    previous: u64,
+    pair: u64,
+    r_pair: u64,
+    r_dx: u64,
+    ring_opening: u64,
+    ring_shifts: u64,
+    ring_restarts: u64,
+    ring_index: u64,
+    ring_table: u64,
+    ring_open: u64,
+    hands_open: u64,
+    ring_ends: u64,
+    hands_ends: u64,
+    ring_after: u64,
+    ring_factor: u64,
+    ring_move: u64,
+    ring_hand: u64,
+    ring_rho: u64,
+    ring_scale: u64,
+    top_hat: u64,
+    top_scale: u64,
+    ring_pair: u64,
+    r_ring_pair: u64,
+    ring_cov: u64,
+    ring_dmove: u64,
+    ring_g: u64,
+    units: u64,
+    ds: u64,
+    r_ds: u64,
+    news_open: u64,
+    news_ends: u64,
+    ticks: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -189,6 +258,30 @@ struct Shape {
     len: usize,
     streams: usize,
     cells: usize,
+    /// The pair face's forms (zero without one).
+    forms: usize,
+    /// The ring face's ranks, the harmonics its readout reads, and its founded pair moves (each
+    /// zero without one).
+    ranks: usize,
+    harmonics: usize,
+    ring_moves: usize,
+    /// One when the modes are turned, else zero.
+    turned: usize,
+    /// One when the levels tick on a news clock, else zero.
+    news: usize,
+}
+
+impl Shape {
+    /// The ring's face with its harmonics `2RH`, and the pair read `x̂ ⊗ ρ`, `(W + 1)·2RH`.
+    fn ring_reads(&self) -> (usize, usize) {
+        let k2 = 2 * self.ranks * self.harmonics;
+        (k2, (self.width + 1) * k2)
+    }
+
+    /// One ring rank's factors in the material, `6N + 2W + 3`.
+    fn rank_material(&self) -> usize {
+        6 * self.modes + 2 * self.width + 3
+    }
 }
 
 /// The section's resident buffers (`TowerFrame`'s owners).
@@ -232,9 +325,48 @@ struct Frame<'c> {
     gradient: CardBuffer<'c, i128>,
     /// The outer sums' group sums (`tower_outer_reduce`), sized for the widest family's groups.
     partial: CardBuffer<'c, i128>,
+    /// The pair face's values `c(prev, cur)`, each stream's class before its first cell, and the
+    /// face read at each cell (each empty without a pair face).
+    pair_values: CardBuffer<'c, i32>,
+    previous: CardBuffer<'c, u32>,
+    pair: CardBuffer<'c, i32>,
+    /// The ring face (`TowerFrame`'s ring words; each empty without one).
+    ring_opening: CardBuffer<'c, i32>,
+    ring_shifts: CardBuffer<'c, u32>,
+    ring_restarts: CardBuffer<'c, i32>,
+    ring_index: CardBuffer<'c, u32>,
+    ring_table: CardBuffer<'c, i64>,
+    ring_open: CardBuffer<'c, i128>,
+    hands_open: CardBuffer<'c, u32>,
+    ring_ends: CardBuffer<'c, i128>,
+    hands_ends: CardBuffer<'c, u32>,
+    ring_after: CardBuffer<'c, i128>,
+    ring_factor: CardBuffer<'c, i128>,
+    ring_move: CardBuffer<'c, i64>,
+    ring_hand: CardBuffer<'c, u32>,
+    ring_rho: CardBuffer<'c, i32>,
+    ring_scale: CardBuffer<'c, i64>,
+    top_hat: CardBuffer<'c, i32>,
+    top_scale: CardBuffer<'c, i64>,
+    ring_pair: CardBuffer<'c, i32>,
+    ring_cov: CardBuffer<'c, i64>,
+    ring_dmove: CardBuffer<'c, i128>,
+    ring_g: CardBuffer<'c, i128>,
+    /// The turned modes' unit at each cell, `u e^(iπ s_t)`, and the turn's covector `δs` (each
+    /// empty when unturned).
+    units: CardBuffer<'c, i64>,
+    ds: CardBuffer<'c, i64>,
+    /// The news clock's open face and phase for each stream before its first cell and after its
+    /// last (whether it has one, the total's two words, the phase, then the masses), and each
+    /// cell's ticks a level (each empty without a clock).
+    news_open: CardBuffer<'c, u64>,
+    news_ends: CardBuffer<'c, u64>,
+    ticks: CardBuffer<'c, u32>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
-    /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`).
-    reach_offsets: [usize; 13],
+    /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
+    /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
+    /// turn's covector `δs` (`Q·L`).
+    reach_offsets: [usize; 17],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -300,17 +432,49 @@ impl<'c> TowerCard<'c> {
     pub fn admits(law: &ResidentLaw) -> Result<()> {
         let d = &law.declaration;
         let refuse = |why: &'static str| Err(TowerError::Refused(why));
-        if !d.gated || d.turned || d.pumped || d.contact != ContactLaw::Rectifying {
-            return refuse("the card carries the gated tower with rectifying contacts, not turned and not pumped");
+        if !d.gated || d.pumped || d.contact != ContactLaw::Rectifying {
+            return refuse("the card carries the gated tower with rectifying contacts, not pumped");
         }
-        if law.pair_face || law.ring_face {
-            return refuse("the card carries no pair or ring face");
+        if d.turned && (law.ladder.len() != LADDER || law.half_turn <= 0) {
+            return refuse("the card turns a mode through the ladder's seventeen dyadic turns and the half turn");
+        }
+        if let Some(ring) = &law.ring {
+            let r = ring.ranks;
+            if ring.level >= d.levels || ring.mode >= d.modes || r == 0 || ring.harmonics == 0 || ring.shifts.len() != r || ring.moves.len() != r || ring.restarts.len() != r || ring.opening.len() != d.alphabet * d.width {
+                return refuse("the card reads a ring face of one or more ranks on a level and mode of the tower, each rank with its shifts, moves and restart");
+            }
+            if ring.shifts.iter().any(|&([ra, rb, rg], push, read)| [ra, rb, rg, push, read].iter().any(|&b| b >= 127)) {
+                return refuse("the card releases a ring's values by fewer than 127 bits");
+            }
+            if ring.moves.iter().flatten().any(|&(prev, cur, _)| prev > d.alphabet || cur >= d.alphabet) || ring.restarts.iter().flatten().any(|&c| c >= d.alphabet) {
+                return refuse("the card reads a ring's pair moves and restarts over the alphabet");
+            }
+            let reads = (d.width + 1).checked_mul(2 * r).and_then(|v| v.checked_mul(ring.harmonics));
+            let factors = r.checked_mul(6 * d.modes + 2 * d.width + 3);
+            let moves: usize = ring.moves.iter().map(Vec::len).sum();
+            if reads.is_none_or(|v| v > u32::MAX as usize / 8) || factors.is_none_or(|v| v > u32::MAX as usize / 8) || moves > u32::MAX as usize / 8 {
+                return refuse("the card's ring extents fit its 32-bit words");
+            }
+        }
+        if let Some(pair) = &law.pair {
+            if pair.forms == 0 || pair.forms > u32::MAX as usize / 8 || pair.values.len() != (d.alphabet + 1) * d.alphabet * pair.forms {
+                return refuse("the card reads a pair face of one value a form at every pair");
+            }
         }
         if law.rotor || law.strands {
             return refuse("the card carries no rotor or strands: its forward reads no step or strand contact and its reverse has no strand gradient");
         }
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
+        }
+        if let Some(clock) = &law.news {
+            if law.ring.is_some() {
+                return refuse("the card carries no ring beside a news clock");
+            }
+            clock.period(d.levels)?;
+            for l in 1..d.levels {
+                clock.section(l)?;
+            }
         }
         if law.face_roots.iter().chain(&law.move_roots).any(|&r| r >= 1u128 << 63) {
             return refuse("the exponential's roots lie below 2^63");
@@ -334,7 +498,7 @@ impl<'c> TowerCard<'c> {
             streams: streams as u32,
             face_digits: law.face_roots.len() as u32,
             move_digits: law.move_roots.len() as u32,
-            families: (1 + 7 * d.levels) as u32,
+            families: (1 + (7 + usize::from(d.turned)) * d.levels) as u32,
             encoding: law.encoding as u64,
             readout: law.readout as u64,
             readout_bias: law.readout_bias as u64,
@@ -342,6 +506,36 @@ impl<'c> TowerCard<'c> {
             ln2_square: law.ln2_square as i64,
             ..LawWords::default()
         };
+        if d.turned {
+            words.turned = 1;
+            words.half_turn = law.half_turn;
+            words.turn_spread = usize::BITS - d.width.saturating_sub(1).leading_zeros();
+            for (slot, &(re, im)) in words.ladder.iter_mut().zip(&law.ladder) {
+                *slot = [re, im];
+            }
+        }
+        if let Some(pair) = &law.pair {
+            words.forms = pair.forms as u32;
+            words.pair_readout = pair.readout as u64;
+            words.pair_lift = pair.lift as u64;
+            words.pair_reach = pair.reaches;
+        }
+        if let Some(ring) = &law.ring {
+            words.ring_level = ring.level as u32;
+            words.ring_mode = ring.mode as u32;
+            words.ring_ranks = ring.ranks as u32;
+            words.ring_harmonics = ring.harmonics as u32;
+            words.ring_readout = ring.readout as u64;
+            words.ring_factors = ring.factors as u64;
+            words.ring_reach = ring.reach;
+        }
+        if let Some(clock) = &law.news {
+            words.news = 1;
+            words.period = clock.period(d.levels).expect("admitted");
+            for l in 1..d.levels {
+                words.sections[l] = clock.section(l).expect("admitted");
+            }
+        }
         for (slot, lv) in words.level.iter_mut().zip(&law.levels) {
             *slot = LevelWords {
                 move_re: lv.move_re as u64,
@@ -356,6 +550,8 @@ impl<'c> TowerCard<'c> {
                 ret_bias: lv.ret_bias as u64,
                 gate: lv.gate as u64,
                 gate_bias: lv.gate_bias as u64,
+                turn: lv.turn as u64,
+                turn_bias: lv.turn_bias as u64,
                 reach: lv.reaches,
             };
         }
@@ -371,6 +567,9 @@ impl<'c> TowerCard<'c> {
             for (offset, rows, cols) in [(lv.push_re, n, w), (lv.push_im, n, w), (lv.gate, n, w), (lv.read_re, w, n), (lv.read_im, w, n), (lv.contact, f, w), (lv.ret, w, f)] {
                 out.extend([offset as u64, rows, cols]);
             }
+            if d.turned {
+                out.extend([lv.turn as u64, n, w]);
+            }
         }
         out
     }
@@ -381,11 +580,13 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         let card = self.card;
-        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t } = shape;
+        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, .. } = shape;
+        let (k2, kp) = shape.ring_reads();
+        let ringed = usize::from(r > 0);
         let q = s * t;
         let ql = q * l;
-        let mut reach_offsets = [0usize; 13];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql];
+        let mut reach_offsets = [0usize; 17];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -395,7 +596,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + 7 * l))?,
+            families: card.alloc(3 * (1 + (7 + turned) * l))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -430,6 +631,35 @@ impl<'c> TowerCard<'c> {
             moves_g: card.alloc(s * l * n * 2)?,
             gradient: card.alloc(len)?,
             partial: card.alloc(Self::partial_extent(&shape, card.census().multiprocessors))?,
+            pair_values: card.alloc((a + 1) * a * k)?,
+            previous: card.alloc(s)?,
+            pair: card.alloc(q * k)?,
+            ring_opening: card.alloc(a * w * ringed)?,
+            ring_shifts: card.alloc(5 * r)?,
+            ring_restarts: card.alloc(r)?,
+            ring_index: card.alloc((r + 1) * ringed)?,
+            ring_table: card.alloc(6 * m)?,
+            ring_open: card.alloc(s * r * 2)?,
+            hands_open: card.alloc(s * r)?,
+            ring_ends: card.alloc(s * r * 2)?,
+            hands_ends: card.alloc(s * r)?,
+            ring_after: card.alloc(q * r * 2)?,
+            ring_factor: card.alloc(q * r * 5)?,
+            ring_move: card.alloc(q * r * 4)?,
+            ring_hand: card.alloc(q * r)?,
+            ring_rho: card.alloc(q * k2)?,
+            ring_scale: card.alloc(q * r)?,
+            top_hat: card.alloc(q * w * ringed)?,
+            top_scale: card.alloc(q * ringed)?,
+            ring_pair: card.alloc(q * kp)?,
+            ring_cov: card.alloc(q * 2 * r)?,
+            ring_dmove: card.alloc(q * 2 * ringed)?,
+            ring_g: card.alloc(s * r * shape.rank_material())?,
+            units: card.alloc(ql * n * 2 * turned)?,
+            ds: card.alloc(ql * n * turned)?,
+            news_open: card.alloc(s * (a + 4) * news)?,
+            news_ends: card.alloc(s * (a + 4) * news)?,
+            ticks: card.alloc(ql * news)?,
             reach_offsets,
         });
         Ok(())
@@ -486,6 +716,39 @@ impl<'c> TowerCard<'c> {
             r_dq: r(12),
             moves_g: frame.moves_g.device_ptr(),
             gradient: frame.gradient.device_ptr(),
+            pair_values: frame.pair_values.device_ptr(),
+            previous: frame.previous.device_ptr(),
+            pair: frame.pair.device_ptr(),
+            r_pair: r(13),
+            r_dx: r(14),
+            ring_opening: frame.ring_opening.device_ptr(),
+            ring_shifts: frame.ring_shifts.device_ptr(),
+            ring_restarts: frame.ring_restarts.device_ptr(),
+            ring_index: frame.ring_index.device_ptr(),
+            ring_table: frame.ring_table.device_ptr(),
+            ring_open: frame.ring_open.device_ptr(),
+            hands_open: frame.hands_open.device_ptr(),
+            ring_ends: frame.ring_ends.device_ptr(),
+            hands_ends: frame.hands_ends.device_ptr(),
+            ring_after: frame.ring_after.device_ptr(),
+            ring_factor: frame.ring_factor.device_ptr(),
+            ring_move: frame.ring_move.device_ptr(),
+            ring_hand: frame.ring_hand.device_ptr(),
+            ring_rho: frame.ring_rho.device_ptr(),
+            ring_scale: frame.ring_scale.device_ptr(),
+            top_hat: frame.top_hat.device_ptr(),
+            top_scale: frame.top_scale.device_ptr(),
+            ring_pair: frame.ring_pair.device_ptr(),
+            r_ring_pair: r(15),
+            ring_cov: frame.ring_cov.device_ptr(),
+            ring_dmove: frame.ring_dmove.device_ptr(),
+            ring_g: frame.ring_g.device_ptr(),
+            units: frame.units.device_ptr(),
+            ds: frame.ds.device_ptr(),
+            r_ds: r(16),
+            news_open: frame.news_open.device_ptr(),
+            news_ends: frame.news_ends.device_ptr(),
+            ticks: frame.ticks.device_ptr(),
         }
     }
 
@@ -529,7 +792,7 @@ impl<'c> TowerCard<'c> {
         let status = self.card.fetch(&frame.status).map_err(device)?;
         for (s, &bits) in status.iter().enumerate() {
             if bits != 0 {
-                let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a gated move reached the unit circle"), (16, "a class outside the declared alphabet")];
+                let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a gated move reached the unit circle"), (16, "a class outside the declared alphabet"), (32, "a news phase or an arrival's ticks outgrew its carrier, or an open face was empty")];
                 let named: Vec<&str> = names.iter().filter(|(b, _)| bits & b != 0).map(|(_, n)| *n).collect();
                 return Err(TowerError::Realization(format!("the card refused stream {s}: {}", named.join("; "))));
             }
@@ -538,14 +801,24 @@ impl<'c> TowerCard<'c> {
     }
 
     fn forward_shared(shape: &Shape) -> usize {
-        let (a, w, n, f, l) = (shape.alphabet, shape.width, shape.modes, shape.contacts, shape.levels);
+        let (a, w, n, f, l, k, r) = (shape.alphabet, shape.width, shape.modes, shape.contacts, shape.levels, shape.forms, shape.ranks);
+        let (k2, kp) = shape.ring_reads();
+        let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * 3 * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
-        let g = (THREADS as usize / shape.width).max(1);
-        [16 * g * shape.width, 8 * shape.alphabet, 8 * 32].iter().map(|&o| carve(o)).sum()
+        let w = shape.width;
+        let (k2, kp) = shape.ring_reads();
+        let ringed = usize::from(shape.ranks > 0);
+        let g = (THREADS as usize / w).max(1);
+        [16 * g * w, 8 * shape.alphabet, 8 * 32, 16 * 32 * ringed, 8 * w, 8 * kp, 8 * k2, 8 * w * ringed].iter().map(|&o| carve(o)).sum()
+    }
+
+    fn ring_shared(shape: &Shape) -> usize {
+        let r = shape.ranks;
+        [16 * 2 * r, 16 * 5 * r, 16 * 2 * r, 8 * 2 * shape.modes, 4 * r].iter().map(|&o| carve(o)).sum()
     }
 
     fn contacts_shared(shape: &Shape) -> usize {
@@ -555,7 +828,8 @@ impl<'c> TowerCard<'c> {
     }
 
     fn dx_shared(shape: &Shape) -> usize {
-        [8 * 3 * shape.modes, 8 * 3 * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
+        let families = 3 + shape.turned;
+        [8 * families * shape.modes, 8 * families * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
@@ -569,12 +843,48 @@ impl<'c> TowerCard<'c> {
         if streams == 0 || cells == 0 || classes.iter().any(|c| c.len() != cells + 1) || targets.len() != streams || targets.iter().any(|t| t.len() != cells) {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
+        let ranks = law.ring.as_ref().map_or(0, |r| r.ranks);
         if opening.len() != streams
-            || opening.iter().any(|o| o.credit.is_some() || !o.ring.is_empty() || !o.hands.is_empty() || !o.strands.is_empty() || o.reversed || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
+            || opening.iter().any(|o| o.credit.is_some() || o.ring.len() != ranks || o.hands.len() != ranks || !o.strands.is_empty() || o.reversed || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
         {
-            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, with no ring, hand or strand residue"));
+            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and no strand residue"));
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells };
+        // The news clock's open face and phase, each mass within the face's total and a 64-bit
+        // word (the forward's own faces are), the phase below the clock's period.
+        let news_open: Vec<u64> = match &law.news {
+            None => {
+                if opening.iter().any(|o| o.open.is_some() || o.news != 0) {
+                    return Err(TowerError::Refused("an open face or news phase without a news clock"));
+                }
+                Vec::new()
+            }
+            Some(clock) => {
+                let period = clock.period(d.levels)?;
+                let mut words = Vec::with_capacity(streams * (d.alphabet + 4));
+                for o in opening {
+                    if o.news >= period {
+                        return Err(TowerError::Refused("a news phase past its clock's period"));
+                    }
+                    match &o.open {
+                        None => {
+                            words.extend([0, 0, 0, o.news]);
+                            words.extend(std::iter::repeat_n(0, d.alphabet));
+                        }
+                        Some(face) => {
+                            if face.masses.len() != d.alphabet || face.total == 0 || face.masses.iter().any(|&m| m > face.total || m > u64::MAX as u128) {
+                                return Err(TowerError::Refused("the card opens on a face of the alphabet, each mass a 64-bit word within its total"));
+                            }
+                            words.extend([1, face.total as u64, (face.total >> 64) as u64, o.news]);
+                            words.extend(face.masses.iter().map(|&m| m as u64));
+                        }
+                    }
+                }
+                words
+            }
+        };
+        let forms = law.pair.as_ref().map_or(0, |p| p.forms);
+        let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -598,6 +908,36 @@ impl<'c> TowerCard<'c> {
             card.write(&frame.targets, 0, &target_words).map_err(device)?;
             let states: Vec<i64> = opening.iter().flat_map(|o| o.modes.iter().flatten().flat_map(|&(re, im)| [re, im])).collect();
             card.write(&frame.opening, 0, &states).map_err(device)?;
+            if let Some(pair) = &law.pair {
+                card.write(&frame.pair_values, 0, &pair.values).map_err(device)?;
+            }
+            if law.pair.is_some() || law.ring.is_some() {
+                let previous: Vec<u32> = opening.iter().map(|o| o.previous as u32).collect();
+                card.write(&frame.previous, 0, &previous).map_err(device)?;
+            }
+            if let Some(ring) = &law.ring {
+                card.write(&frame.ring_opening, 0, &ring.opening).map_err(device)?;
+                let shifts: Vec<u32> = ring.shifts.iter().flat_map(|&([ra, rb, rg], push, read)| [ra, rb, rg, push, read]).collect();
+                card.write(&frame.ring_shifts, 0, &shifts).map_err(device)?;
+                let restarts: Vec<i32> = ring.restarts.iter().map(|c| c.map_or(-1, |c| c as i32)).collect();
+                card.write(&frame.ring_restarts, 0, &restarts).map_err(device)?;
+                let index: Vec<u32> = std::iter::once(0).chain(ring.moves.iter().scan(0u32, |at, t| {
+                    *at += t.len() as u32;
+                    Some(*at)
+                })).collect();
+                card.write(&frame.ring_index, 0, &index).map_err(device)?;
+                if ring_moves > 0 {
+                    let table: Vec<i64> = ring.moves.iter().flatten().flat_map(|&(prev, cur, m)| [prev as i64, cur as i64, m[0], m[1], m[2], m[3]]).collect();
+                    card.write(&frame.ring_table, 0, &table).map_err(device)?;
+                }
+                let rings: Vec<i128> = opening.iter().flat_map(|o| o.ring.iter().flat_map(|&(re, im)| [re, im])).collect();
+                card.write(&frame.ring_open, 0, &rings).map_err(device)?;
+                let hands: Vec<u32> = opening.iter().flat_map(|o| o.hands.iter().map(|&h| u32::from(h))).collect();
+                card.write(&frame.hands_open, 0, &hands).map_err(device)?;
+            }
+            if !news_open.is_empty() {
+                card.write(&frame.news_open, 0, &news_open).map_err(device)?;
+            }
             card.zero_octets(&frame.status, 0, 4 * streams).map_err(device)?;
             if keep {
                 card.zero_octets(&frame.swell, 0, 8 * 4 * d.levels).map_err(device)?;
@@ -611,7 +951,9 @@ impl<'c> TowerCard<'c> {
         let frame = self.frame.as_ref().expect("the frame was just sized");
         let faces = self.card.fetch(&frame.faces).map_err(device)?;
         let ends = self.card.fetch(&frame.ends).map_err(device)?;
+        let (ring_ends, hands_ends) = if ranks > 0 { (self.card.fetch(&frame.ring_ends).map_err(device)?, self.card.fetch(&frame.hands_ends).map_err(device)?) } else { (Vec::new(), Vec::new()) };
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
+        let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let faces: Vec<Vec<Option<(u128, u128)>>> = targets
             .iter()
             .enumerate()
@@ -639,6 +981,15 @@ impl<'c> TowerCard<'c> {
                     }
                 }
                 state.previous = c[cells - 1];
+                if ranks > 0 {
+                    state.ring = (0..ranks).map(|r| (ring_ends[(s * ranks + r) * 2], ring_ends[(s * ranks + r) * 2 + 1])).collect();
+                    state.hands = (0..ranks).map(|r| hands_ends[s * ranks + r] != 0).collect();
+                }
+                if !news_ends.is_empty() {
+                    let end = &news_ends[s * (d.alphabet + 4)..(s + 1) * (d.alphabet + 4)];
+                    state.open = (end[0] != 0).then(|| TowerFace { masses: end[4..].iter().map(|&m| u128::from(m)).collect(), total: end[1] as u128 | (end[2] as u128) << 64 });
+                    state.news = end[3];
+                }
                 state
             })
             .collect();
@@ -669,11 +1020,20 @@ impl<'c> TowerCard<'c> {
         let mode_threads = (shape.modes as u32).next_multiple_of(32).min(THREADS);
         for level in (0..l).rev() {
             self.law_launch("tower_reverse_contacts", Dim3::x(q), THREADS, Self::contacts_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            // The ring's reverse reads the level's read covector and returns its own to it and to
+            // the mode's move, before the modes' scan.
+            if shape.ranks > 0 && level == words.ring_level as usize {
+                self.law_launch("tower_reverse_ring", Dim3::x(s as u32), THREADS, Self::ring_shared(&shape) as u32, &words, &fw, None).map_err(device)?;
+            }
             self.law_launch("tower_reverse_modes", Dim3::x(s as u32), mode_threads, 0, &words, &fw, Some(level as u32)).map_err(device)?;
             self.law_launch("tower_reverse_dx", Dim3::x(q), THREADS, Self::dx_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
         }
         for outer in self.outer_families(&words, &fw) {
             self.launch_outer(&outer.0, outer.1).map_err(device)?;
+        }
+        if shape.ranks > 0 {
+            let entries = (shape.ranks * shape.rank_material()) as u32;
+            self.law_launch("tower_ring_factors", Dim3::x(entries.div_ceil(THREADS).min(1024)), THREADS, 0, &words, &fw, None).map_err(device)?;
         }
         let class_threads = (shape.width as u32).next_multiple_of(32).min(THREADS);
         self.law_launch("tower_encoding", Dim3::x(shape.alphabet as u32), class_threads, 0, &words, &fw, None).map_err(device)?;
@@ -722,21 +1082,39 @@ impl<'c> TowerCard<'c> {
             out.push((family(at64(fw.gre, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gre, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_re), None), false));
             out.push((family(at64(fw.gim, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gim, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_im), None), false));
             out.push((family(at64(fw.dq, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dq, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
+            if law.turned != 0 {
+                out.push((family(at64(fw.ds, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_ds, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
+            }
+        }
+        // The pair face's readout takes the face's covector against the pair read, `Σ δz c(p)ᵀ`,
+        // and its lift the bottom covector, `Σ δx⁰ c(p)ᵀ`.
+        let k = law.forms as u64;
+        if k > 0 {
+            out.push((family(fw.dz, a, fw.pair, k, fw.r_dz, fw.r_pair, 1, a, k, false, gradient(law.pair_readout), None), false));
+            out.push((family(fw.dx, w, fw.pair, k, fw.r_dx, fw.r_pair, 1, w, k, false, gradient(law.pair_lift), None), false));
+        }
+        // The ring's readout takes the face's covector against its pair read with the top face,
+        // `Σ δz (x̂ ⊗ ρ)ᵀ`.
+        if law.ring_ranks > 0 {
+            let kp = (w + 1) * 2 * law.ring_ranks as u64 * law.ring_harmonics as u64;
+            out.push((family(fw.dz, a, fw.ring_pair, kp, fw.r_dz, fw.r_ring_pair, 1, a, kp, false, gradient(law.ring_readout), None), false));
         }
         out
     }
 
     /// The groups a family's streams are split over: enough blocks to hold every multiprocessor
     /// four deep (`4·SM` over the family's tiles), at most one group a stream.
+    /// A family with no outputs (the pair face's on a tower without one) is one empty tile.
     fn groups(rows: u32, width: u32, streams: u32, multiprocessors: u32) -> u32 {
-        let tiles = width.div_ceil(OUTER_COLS) * rows.div_ceil(OUTER_ROWS);
+        let tiles = (width.div_ceil(OUTER_COLS) * rows.div_ceil(OUTER_ROWS)).max(1);
         (4 * multiprocessors).div_ceil(tiles).clamp(1, streams.max(1))
     }
 
     /// The group sums' extent: the widest family's outputs times its groups.
     fn partial_extent(shape: &Shape, multiprocessors: u32) -> usize {
-        let (a, w, n, f) = (shape.alphabet as u32, shape.width as u32, shape.modes as u32, shape.contacts as u32);
-        [(a, w + 1), (w, f + 1), (f, w + 1), (w, n), (n, w + 1)]
+        let (a, w, n, f, k) = (shape.alphabet as u32, shape.width as u32, shape.modes as u32, shape.contacts as u32, shape.forms as u32);
+        let kp = shape.ring_reads().1 as u32;
+        [(a, w + 1), (w, f + 1), (f, w + 1), (w, n), (n, w + 1), (a, k), (w, k), (a, kp)]
             .iter()
             .map(|&(rows, width)| (rows * width) as usize * Self::groups(rows, width, shape.streams as u32, multiprocessors) as usize)
             .max()
@@ -841,5 +1219,24 @@ impl PassRealization for TowerCard<'_> {
             *state = end;
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A tower without a pair face sizes its group sums from the families it has: the pair face's
+    /// two families have no outputs, take one empty tile and no group sums (they once divided by
+    /// zero and refused every pairless frame before its first section).
+    #[test]
+    fn a_family_with_no_outputs_takes_no_group_sums() {
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0 };
+        // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
+        // sums' extent is `11 · 0 · 3 = 0`.
+        assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);
+        let paired = Shape { forms: 3, ..plain };
+        assert!(TowerCard::partial_extent(&plain, 80) > 0);
+        assert!(TowerCard::partial_extent(&paired, 80) >= TowerCard::partial_extent(&plain, 80));
     }
 }
