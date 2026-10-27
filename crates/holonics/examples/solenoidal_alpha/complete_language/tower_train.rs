@@ -3395,10 +3395,14 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let passes = count(&args[8])?;
     let rate_bits: u32 = args[9].parse()?;
     let out = Path::new(&args[10]);
-    std::fs::create_dir(out)?;
     let classes = &reading.train;
     if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
         return Err("the training text must hold one section a stream".into());
+    }
+    // A run that trains declares at least one pass: a learner saved after none would be read as
+    // trained (Epime's review of October 27). A rested learner is read alone by the read commands.
+    if passes == 0 {
+        return Err("a training run declares at least one pass".into());
     }
     // A run continues a rested learner (its tower and moments) when one is named; its declaration
     // and rate must be the declared ones.
@@ -3412,6 +3416,10 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     } else {
         TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits)
     };
+    // The realization admits the whole law before any section is read or any output is written.
+    realization.admit(&learner.tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
+    std::fs::create_dir(out)?;
     let chunk = classes.len() / streams;
     let sections_a_pass = (chunk - 1) / section;
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();

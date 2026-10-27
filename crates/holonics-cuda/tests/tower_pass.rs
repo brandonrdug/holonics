@@ -185,6 +185,38 @@ fn the_cards_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does
     lockstep(11, 2, 12, 8, true, 2, Some(Ringed { level: 0, mode: 1, harmonics: 1 }));
 }
 
+/// The card's advance is the host's, class by class: three prompts read whole together, then one
+/// class at a time on every stream, each stream's whole face and continuing state equal.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_advance_is_the_hosts_class_by_class() {
+    let card = Card::open(0).expect("the card");
+    let mut realized = TowerCard::open(&card).expect("the tower's image");
+    let alphabet = 13;
+    let (host, _) = learners(alphabet, 0, None);
+    let tower = &host.tower;
+    let classes = passage(alphabet, 27);
+    let prompts: Vec<&[usize]> = classes.chunks(9).collect();
+    let mut expected_states: Vec<TowerState> = prompts.iter().map(|_| tower.rest()).collect();
+    let expected: Vec<_> = prompts
+        .iter()
+        .zip(expected_states.iter_mut())
+        .map(|(p, s)| p.iter().map(|&u| tower.advance(s, u).expect("advance")).last().expect("a face"))
+        .collect();
+    let mut states: Vec<TowerState> = prompts.iter().map(|_| tower.rest()).collect();
+    let (faces, _) = tower.advance_realized(&mut states, &prompts, &mut realized).expect("card advance");
+    assert_eq!(faces, expected, "the prompts' faces");
+    assert_eq!(states, expected_states, "the prompts' states");
+    for u in [2usize, 0, 7, 12] {
+        let expected: Vec<_> = expected_states.iter_mut().map(|s| tower.advance(s, u).expect("advance")).collect();
+        let step = [u];
+        let steps = vec![&step[..]; prompts.len()];
+        let (faces, _) = tower.advance_realized(&mut states, &steps, &mut realized).expect("card advance");
+        assert_eq!(faces, expected, "class {u}: the faces");
+        assert_eq!(states, expected_states, "class {u}: the states");
+    }
+}
+
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_refuses_a_declaration_it_does_not_carry() {

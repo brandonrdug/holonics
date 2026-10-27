@@ -5,6 +5,11 @@ edition = "2024"
 publish = false
 license.workspace = true
 
+[features]
+# The certificate's acceptance read: each decision its readings make is compared with the exact
+# products, and a disagreement stops the run (`hnn::tower`, `fewer_bits`).
+certificate-check = []
+
 [dependencies]
 num-rational = { workspace = true }
 num-bigint = { workspace = true }

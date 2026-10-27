@@ -255,6 +255,16 @@ pub(super) fn read_at(args: &[String]) -> Result<()> {
 /// prompt (classes through its end letter) forks the rested tower, which releases at most `COUNT`
 /// classes; prompt `p` reads its keys from the `p`-th share of `COUNT` eight-byte keys.
 pub(super) fn release(args: &[String]) -> Result<()> {
+    release_realized(args, &mut HostPass::default())
+}
+
+/// [agent-inferred, October 27] [`release`] with every read and step run through `realization`
+/// ([`Tower::advance_realized`]), so a release runs where the training runs. Each prompt is read
+/// whole as one stream; then the prompts draw together, one class each a step, so the card reads
+/// every releasing prompt's class in one launch. A prompt that has released its end letter or its
+/// count draws no further key and its later faces are never read, so each release is the one the
+/// prompt makes alone.
+pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 10 {
         return Err("release-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS KEYS_SHA COUNT AGREE OUT".into());
     }
@@ -275,37 +285,52 @@ pub(super) fn release(args: &[String]) -> Result<()> {
     if keys.len() < prompts.len() * share {
         return Err("fewer keys than the prompts' declared shares".into());
     }
+    realization.admit(tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
     std::fs::create_dir(out)?;
-    let releases: Vec<(Vec<usize>, bool, i64)> = prompts
-        .par_iter()
-        .enumerate()
-        .map(|(p, prompt)| {
-            // A section of the passage is entered after the end letter of the one before it, so a
-            // prompt is entered the same way: from rest through one end letter, then its source.
-            // From rest alone, a numeral and its end letter are also the close of every GSM8K
-            // answer, and the request would not say which section it opens.
-            let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
-            let mut state = tower.rest();
-            let prompt_code = tower.read(&mut state.clone(), &entered).map_err(|e| e.to_string())?;
-            let mut face = None;
-            for &c in entered.iter() {
-                face = Some(tower.advance(&mut state, c).map_err(|e| e.to_string())?);
-            }
-            let mut face = face.ok_or("an empty prompt")?;
-            let mut stream = KeyStream::new(keys[p * share..(p + 1) * share].to_vec(), 8).map_err(|e| format!("{e:?}"))?;
-            let mut released = Vec::new();
-            while released.len() < limit {
-                let key = stream.next_key().ok_or("fewer keys than the declared count")?;
-                let class = agreeing_class(&face.masses, agree, &key).map_err(|e| e.to_string())?;
-                released.push(class);
-                if class == end {
-                    return Ok((released, true, prompt_code));
-                }
-                face = tower.advance(&mut state, class).map_err(|e| e.to_string())?;
-            }
-            Ok((released, false, prompt_code))
-        })
+    // A section of the passage is entered after the end letter of the one before it, so a prompt
+    // is entered the same way: from rest through one end letter, then its source. From rest alone,
+    // a numeral and its end letter are also the close of every GSM8K answer, and the request would
+    // not say which section it opens.
+    let (mut states, mut faces, mut codes) = (Vec::with_capacity(prompts.len()), Vec::with_capacity(prompts.len()), Vec::with_capacity(prompts.len()));
+    for prompt in &prompts {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = vec![tower.rest()];
+        let (face, code) = tower.advance_realized(&mut state, &[&entered], realization).map_err(|e| e.to_string())?;
+        states.extend(state);
+        faces.extend(face);
+        codes.extend(code);
+    }
+    let mut streams: Vec<KeyStream> = (0..prompts.len())
+        .map(|p| KeyStream::new(keys[p * share..(p + 1) * share].to_vec(), 8).map_err(|e| format!("{e:?}")))
         .collect::<std::result::Result<_, String>>()?;
+    let mut released: Vec<Vec<usize>> = vec![Vec::new(); prompts.len()];
+    let mut ended = vec![false; prompts.len()];
+    loop {
+        let mut drawn = vec![end; prompts.len()];
+        let mut releasing = false;
+        for p in 0..prompts.len() {
+            if ended[p] || released[p].len() >= limit {
+                continue;
+            }
+            let key = streams[p].next_key().ok_or("fewer keys than the declared count")?;
+            let class = agreeing_class(&faces[p].masses, agree, &key).map_err(|e| e.to_string())?;
+            released[p].push(class);
+            if class == end {
+                ended[p] = true;
+            } else if released[p].len() < limit {
+                drawn[p] = class;
+                releasing = true;
+            }
+        }
+        if !releasing {
+            break;
+        }
+        let steps: Vec<[usize; 1]> = drawn.iter().map(|&c| [c]).collect();
+        let reads: Vec<&[usize]> = steps.iter().map(|s| &s[..]).collect();
+        faces = tower.advance_realized(&mut states, &reads, realization).map_err(|e| e.to_string())?.0;
+    }
+    let releases: Vec<(Vec<usize>, bool, i64)> = released.into_iter().zip(ended).zip(codes).map(|((r, e), c)| (r, e, c)).collect();
     let mut written = Vec::new();
     let mut rows = String::from("prompt\tprompt_classes\tprompt_bits_a_class\treleased\tended\toctets\n");
     for (p, (released, ended, code)) in releases.iter().enumerate() {

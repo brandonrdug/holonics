@@ -4022,18 +4022,33 @@ fn turn_ladder(modes: usize) -> usize {
 /// ([`fewer_bits_exact`]). The answer is always the exact comparison's: the readings partition the
 /// sections into those they decide and those the products decide. The readings are an integer sum,
 /// so any partition of the faces sums them to the same bits. Measured October 25, the products
-/// took 0.5 s a section at 320 streams and bounded the card's pass.
+/// took 0.5 s a section at 320 streams and bounded the card's pass. The readings hold for positive
+/// values only: a zero mass or total (never a face's, whose masses are at least one; Epime's review
+/// of October 27 named the witness `[(0, 3)]` against `[(0, 2)]`) is decided by the products.
 fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    if old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
+        return fewer_bits_exact(old, new);
+    }
     let side = |faces: &[(u128, u128)]| -> i128 { faces.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
     let difference = side(new) - side(old);
     let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
     if difference > slack {
-        return true;
+        return checked(true, old, new);
     }
     if difference < -slack {
-        return false;
+        return checked(false, old, new);
     }
     fewer_bits_exact(old, new)
+}
+
+/// A decision the readings made. Built with the `certificate-check` feature, it is compared with the
+/// products and a disagreement stops the run: the acceptance read that the partition decides as the
+/// products do on every call of a whole pass. Without the feature it is the decision.
+fn checked(decided: bool, old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    #[cfg(feature = "certificate-check")]
+    assert_eq!(decided, fewer_bits_exact(old, new), "the certificate's readings decided against its products");
+    let _ = (old, new);
+    decided
 }
 
 /// The fractional digits of the certificate's logarithmic readings.
@@ -5472,6 +5487,60 @@ mod tests {
             assert_eq!(read, frozen, "section {section}");
         }
         assert!(tower.read_parts_realized(&parts, 0, &mut realization::HostPass::default()).is_err());
+    }
+
+    /// The certificate decides as the products do where a mass or total is zero (the readings'
+    /// domain is positive values), and a read of a class outside the alphabet, or a comparison
+    /// with one, is refused before the realization reads it.
+    #[test]
+    fn the_certificate_and_the_read_stay_in_their_domain() {
+        assert!(!fewer_bits(&[(0, 3)], &[(0, 2)]));
+        assert_eq!(fewer_bits(&[(0, 3)], &[(0, 2)]), fewer_bits_exact(&[(0, 3)], &[(0, 2)]));
+        assert!(fewer_bits(&[(0, 3)], &[(1, 2)]));
+        let tower = tiny_of(true);
+        let a = tower.declaration.alphabet;
+        let mut pass = realization::HostPass::default();
+        let states = vec![tower.rest()];
+        let classes: [&[usize]; 1] = [&[0, 1, 2]];
+        assert!(pass.forward(&tower, &states, &classes, &[vec![Some(1), Some(a)]], Slot::Reread).is_err());
+        let outside: [&[usize]; 1] = [&[0, a, 2]];
+        assert!(pass.forward(&tower, &states, &outside, &[vec![Some(1), Some(2)]], Slot::Reread).is_err());
+        assert!(pass.forward(&tower, &states, &classes, &[vec![Some(1), Some(2)]], Slot::Reread).is_ok());
+    }
+
+    /// The advance through a realization is [`Tower::advance`] class by class: the same faces,
+    /// the same codes and the same continuing states, a prompt read whole and then one class at a
+    /// time, on two streams at once.
+    #[test]
+    fn a_realized_advance_is_the_advance_class_by_class() {
+        let tower = tiny_of(true);
+        let prompts: [&[usize]; 2] = [&[0, 1, 2, 1, 3], &[3, 3, 0, 2, 1]];
+        let mut host: Vec<TowerState> = (0..2).map(|_| tower.rest()).collect();
+        let mut faces = Vec::new();
+        let mut codes = Vec::new();
+        for (s, prompt) in prompts.iter().enumerate() {
+            let (mut face, mut code) = (None, 0i64);
+            for &u in prompt.iter() {
+                if let Some(f) = &face {
+                    code += TowerFace::code(f, u);
+                }
+                face = Some(tower.advance(&mut host[s], u).expect("advance"));
+            }
+            faces.push(face.expect("a face"));
+            codes.push(code);
+        }
+        let mut pass = realization::HostPass::default();
+        let mut states: Vec<TowerState> = (0..2).map(|_| tower.rest()).collect();
+        let (read, read_codes) = tower.advance_realized(&mut states, &prompts, &mut pass).expect("realized");
+        assert_eq!((read, read_codes), (faces, codes));
+        assert_eq!(states, host);
+        for u in [2usize, 0, 3] {
+            let expected: Vec<TowerFace> = host.iter_mut().map(|s| tower.advance(s, u).expect("advance")).collect();
+            let (read, _) = tower.advance_realized(&mut states, &[&[u], &[u]], &mut pass).expect("realized");
+            assert_eq!(read, expected);
+            assert_eq!(states, host);
+        }
+        assert!(tower.advance_realized(&mut states, &[&[0, 1], &[2]], &mut pass).is_err());
     }
 
     /// The resident law names a joined rotor and joined strands, so a realization that reads
