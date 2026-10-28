@@ -7,6 +7,11 @@ solution. **Grade:** [project-postulate] is Brandon's lens; [agent-inferred] a p
 [standard] a stated mathematical identity; [owned] points to an existing owner. This is a research
 and design record, not an Athena measurement.
 
+The consuming derivation is now in [joint precision and the inherited clock](2026-10-28_THE_CONTACT_CARRIES_JOINT_PRECISION_AND_COARSE_GRAINING_CARRIES_A_CLOCK.md):
+it computes the joint fibre through a contact, the boundary response's storage derivative,
+a same-static-face family with unbounded latency, and the material/thermal variations. Those
+calculations advance the design statements below.
+
 ## 1. The correction: a numeral is already a situated object
 
 [project-postulate; agent-inferred] A number face is a packet on a continuing current: an ordered
