@@ -94,9 +94,13 @@ half-turn; their coupled phase energy has the exact binary Ising restriction. Bi
 oriented changes and composed paths belong to the construction before any machine-word grouping or
 application alphabet is chosen ([notation](HOLONIC_NOTATION.md#arrows-signs-and-turns)).
 
-[interpretation; agent-inferred] **Counting and variable-grain faces.** A count reads oriented
-crossings relative to a receiver's unit and clock; its radix is the receiver's grouping, with each
-place's phase and carry reading a ring and its winding. A register or packet can have the grain of
+[interpretation; agent-inferred] **Counting and variable-grain faces.** A number is an oriented
+packet: its components, unit, clock, incidence, carry and reachable contacts belong to its
+situation. A count reads its crossings relative to a receiver; its radix is the receiver's grouping,
+with each place's phase and carry reading a ring and its winding. Two packets' received faces can
+agree after transport to a common receiver and unit; that does not identify the packets themselves.
+The [oriented-packet lens](../research/records/2026-10-28_A_NUMBER_IS_AN_ORIENTED_PACKET_TROPICAL_CANCELLATION_AND_CULTIVATED_LOCALITY.md) joins tropical cancellation, linguistic
+loops and locally cultivated problem–solution relations to the field's continuation law. A register or packet can have the grain of
 the participating face rather than an octet. The tower's news clock already changes its section
 arrivals with its own prediction; contact-selected radices and packet widths are a research join.
 A contact's color reads relative phase, slip and material through its receiving scope. Odd-ring

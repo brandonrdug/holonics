@@ -1118,7 +1118,9 @@ factorization `bits/s = occ/s × bits/occ`, the entropy/KL rate split and the re
 ### 11. Holarchy
 
 [definition] A **Holarchy** is a Holon perceived as a compound of distinct Holons, always in a
-context (Brandon, September 23). Its decomposition is spatial; its parametric orientation carries
+context (Brandon, September 23). Holon and Holarchy name the same whole with different emphasis:
+its apparent size and constituent count belong to the receiver's grain, and a Holarchy is not
+required to be objectively large (Brandon, October 28; [oriented-packet lens](../research/records/2026-10-28_A_NUMBER_IS_AN_ORIENTED_PACKET_TROPICAL_CANCELLATION_AND_CULTIVATED_LOCALITY.md)). Its decomposition is spatial; its parametric orientation carries
 its aeons (§12), which it decomposes in time the same receiver-relative way. It is what
 `Holon::interconnect` returns: the joined whole
 together with its retained constituents, incidence, typed gluing and restrictions. When the join

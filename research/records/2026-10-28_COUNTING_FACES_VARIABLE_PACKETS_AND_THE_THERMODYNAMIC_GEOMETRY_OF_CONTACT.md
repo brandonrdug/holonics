@@ -1,5 +1,10 @@
 # Counting faces, variable packets, and the thermodynamic geometry of contact
 
+> **Later October 28 correction:** The binary and seven packets are distinct oriented objects.
+> Their faces can agree at a declared receiver with a shared unit and transported frame; a printed
+> numeral equality alone hides that contact and can privilege an implicit decimal chart. The
+> [oriented-packet lens](2026-10-28_A_NUMBER_IS_AN_ORIENTED_PACKET_TROPICAL_CANCELLATION_AND_CULTIVATED_LOCALITY.md) states the correction and the active continuation relation.
+
 **Date:** October 28, 2026. **Occasion:** Brandon's lens on counting, packets of variable grain,
 prime faces across bases 2–10, base 7 and odd polygons, color at a receiving contact, tropical
 geometry, information diffusion, and thermodynamics in Athena. **Grade:** [interpretation] is a
@@ -24,9 +29,10 @@ ring sizes is a mixed-radix chart, not a new kind of object. The grain can chang
 and its participating receiver. Humans' ten digits make decimal grouping bodily intuitive; other
 counting bases also exist.
 
-For example, `47 = 101111₂ = 65₇`: the same 47 crossings are read in two charts. The seven-wheel
-reads `47 = 6·7 + 5`, then `48 = 66₇`, then `49 = 100₇`: a completed ring turns the next ring,
-and another completion turns the next. Three seven-state rings hold `7³ = 343` joint states, about
+For a seven-ring receiver, the successive packet faces `[6,5]₇`, `[6,6]₇` and `[1,0,0]₇`
+show a completed ring turning the next ring, and another completion turning the next. A binary
+packet such as `[1,0,1,1,1,1]₂` can be compared with the first seven-packet through a declared
+common count receiver, its frame and its unit; the packets keep their own carriers and turns. Three seven-state rings hold `7³ = 343` joint states, about
 8.42 bits of capacity; a binary carrier with nine positions has 512 states. This is a comparison of
 capacities, not an assertion that physical seven-state matter is already present.
 
@@ -42,8 +48,8 @@ its participating interaction.
 
 ## Prime faces in bases 2–10
 
-[standard] The columns are the same primes in ordinary decimal order; each entry is their numeral
-in the row's base. These are a small sample of prime faces, not a list of all primes. A digit is a
+[standard] The columns identify primes through an ordinary decimal reference chart; each entry is the corresponding
+numeral in the row's base. A common prime/count receiver supplies that comparison. These are a small sample of prime faces, not a list of all primes. A digit is a
 place reading: the trailing digit is the phase `p mod b` at that receiver.
 
 | Base | 2 | 3 | 5 | 7 | 11 | 13 | 17 | 19 | 23 | 29 | 31 |
