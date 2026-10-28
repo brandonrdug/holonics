@@ -541,3 +541,18 @@ the same A_Q in both momentum and material rates, including its adjoint stress a
 return; rebuild step 4 builds the HNN's current/material/encoded-action join. Neither operation
 is replaced by another boundary wrapper or by proving that a state changes later. Their completion is judged by their actual equations
 and generated physical/application faces.
+
+
+## Conducting bridges, inherited clocks and neck closure
+
+[proved-derived; source-qualified, October 28] The
+[free-energy/bridge synthesis](../research/records/2026-10-28_THE_FREE_ENERGY_RETURN_JOINS_WEIL_SHELLS_HODGE_FIBRES_AND_CONDUCTING_BRIDGES.md) joins the existing dynamic interior return to
+lightning's conducting path and to neck closure. Two relaxed regions coupled by `g(t)` have the
+difference rate `λ=g(t)(1/C₁+1/C₂)` at fixed capacities; their difference reads
+`δ(t)=δ(0)exp(−∫λ)`. A slender diffusive neck supplies `g=κA/ℓ`; a plasma channel supplies its
+conductivity from ionization, attachment, heating and transport. A spectral zero at disconnection
+reopens a retained mode; its vanishing determinant is not permission to eliminate it. The
+relativistic source retains its causal principal symbol and observer clock; its positive local
+fluctuation sector is the domain of a Gaussian free-energy reading. These equations connect the
+existing constitutive instances and do not replace their distinct momentum, electromagnetic or
+thermal balances.
