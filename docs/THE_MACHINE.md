@@ -94,6 +94,16 @@ half-turn; their coupled phase energy has the exact binary Ising restriction. Bi
 oriented changes and composed paths belong to the construction before any machine-word grouping or
 application alphabet is chosen ([notation](HOLONIC_NOTATION.md#arrows-signs-and-turns)).
 
+[interpretation; agent-inferred] **Counting and variable-grain faces.** A count reads oriented
+crossings relative to a receiver's unit and clock; its radix is the receiver's grouping, with each
+place's phase and carry reading a ring and its winding. A register or packet can have the grain of
+the participating face rather than an octet. The tower's news clock already changes its section
+arrivals with its own prediction; contact-selected radices and packet widths are a research join.
+A contact's color reads relative phase, slip and material through its receiving scope. Odd-ring
+frustration, simplicial boundary flux, finite-temperature potentials and their tropical faces are
+readings of this same circuit. The [October 28 counting-faces lens](../research/records/2026-10-28_COUNTING_FACES_VARIABLE_PACKETS_AND_THE_THERMODYNAMIC_GEOMETRY_OF_CONTACT.md)
+works through bases 2–10, base 7 and the Athena consumer, with the retained fibre at recharting.
+
 [project-postulate] **Compression is intelligence is navigation**
 ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)). Holonic Compression couples a
 fractal navigator's resonating modes with terrain; its kernel (what no admitted future receiver
