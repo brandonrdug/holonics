@@ -1231,6 +1231,7 @@ import HolonicsResearch.HNN.ComplementFisher
 import HolonicsResearch.Geometry.CommutingCounts
 import HolonicsResearch.HNN.ReleasedTelescope
 import HolonicsResearch.Mathematics.AdditiveRuleJump
+import HolonicsResearch.Mathematics.ElementaryRuleCensus
 import HolonicsResearch.Mathematics.CheckLoop
 import HolonicsResearch.HNN.FaceCovectors
 import HolonicsResearch.HNN.NewsClock
