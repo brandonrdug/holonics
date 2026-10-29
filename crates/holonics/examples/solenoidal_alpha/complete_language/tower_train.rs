@@ -14,6 +14,7 @@ use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{code_of, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
+use holonics::receiver::release::{agreeing_class, agreement_face};
 use num_bigint::BigUint;
 use rayon::prelude::*;
 
@@ -4388,37 +4389,6 @@ impl Looker {
         }
         Ok(true)
     }
-}
-
-/// The release at which `agree` independent draws from the face fall on the same class: the face's
-/// masses raised to that power over their sum. One draw is the face itself; two give its collision
-/// face `p²/Σp²`, the release where two receivers of the same face agree. The release is exact and
-/// spends one key a draw whatever `agree` is.
-pub(super) fn agreement_face(masses: &[u128], agree: u32) -> Vec<Rat> {
-    let powered: Vec<num_bigint::BigInt> = masses.iter().map(|&u| num_bigint::BigInt::from(u).pow(agree)).collect();
-    let total: num_bigint::BigInt = powered.iter().sum();
-    powered.into_iter().map(|u| Rat::new(u, total.clone())).collect()
-}
-
-/// The class `agree` agreeing draws fall on at `key = n/d`: the inverse-CDF class of the face
-/// `m^agree / Σ m^agree`, the first `c` with `d Σ_(j≤c) m_j^agree > n Σ m^agree`. It is
-/// `release::draw_exact` over [`agreement_face`] read in integers, without normalizing a ratio for
-/// every class.
-pub(super) fn agreeing_class(masses: &[u128], agree: u32, key: &Rat) -> Result<usize> {
-    if key < &Rat::from_integer(0.into()) || key >= &Rat::from_integer(1.into()) {
-        return Err("a key outside [0, 1)".into());
-    }
-    let powered: Vec<num_bigint::BigInt> = masses.iter().map(|&m| num_bigint::BigInt::from(m).pow(agree)).collect();
-    let total: num_bigint::BigInt = powered.iter().sum();
-    let target = key.numer() * &total;
-    let mut through = num_bigint::BigInt::from(0);
-    for (class, p) in powered.iter().enumerate() {
-        through += p;
-        if &through * key.denom() > target {
-            return Ok(class);
-        }
-    }
-    Err("an empty face".into())
 }
 
 /// The declared number of agreeing draws: one when none is named.

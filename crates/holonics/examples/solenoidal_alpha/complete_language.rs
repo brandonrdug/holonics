@@ -23,6 +23,8 @@ mod tower_rotor;
 mod tower_classes;
 #[path = "complete_language/duplex_train.rs"]
 mod duplex_train;
+#[path = "complete_language/tower_body.rs"]
+mod tower_body;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -824,6 +826,10 @@ pub(super) fn run_with_execution(
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
         Some("release-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::release(args),
+        Some("found-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::found(args),
+        Some("hear-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::hear(args),
+        Some("ask-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::ask(args),
+        Some("answer-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::answer(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
         Some("found-unit-rotor-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_rotor::found_unit_rotor_tower(args),
         Some("locate-strands") if backend == CompleteLanguageTrainingBackend::HostReference => tower_rotor::locate_strands_on(args),
@@ -852,7 +858,8 @@ pub(super) fn run_with_execution(
 /// The tower commands with each section's forward and reverse through a declared realization
 /// (`hnn::tower::realization`; `holonics-cuda`'s `tower_pass` example passes the card): the
 /// gated tower on a class passage, and the gated and the pumped tower (rectifying, or the pumped
-/// tower on pair contacts) on the founded units.
+/// tower on pair contacts) on the founded units, and the continuing body's operations
+/// (`tower_body`).
 pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::realization::PassRealization) -> Result<()> {
     use holonics::hnn::tower::TurnLadder;
     match args.first().map(String::as_str) {
@@ -866,7 +873,11 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
         Some("train-unit-pumped-tower") => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, realization),
         Some("train-unit-pair-pumped-tower") => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, realization),
         Some("release-tower-classes") => tower_classes::release_realized(args, realization),
-        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower or release-tower-classes".into()),
+        Some("found-tower-body") => tower_body::found(args),
+        Some("hear-tower-body") => tower_body::hear_realized(args, realization),
+        Some("ask-tower-body") => tower_body::ask_realized(args, realization),
+        Some("answer-tower-body") => tower_body::answer_realized(args, realization),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower, release-tower-classes, or the body's found-tower-body, hear-tower-body, ask-tower-body and answer-tower-body".into()),
     }
 }
 

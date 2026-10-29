@@ -218,6 +218,7 @@ use crate::hnn::keyed_modes::{dyadic_turn, ln2_face, log2_face, release, Exponen
 use num_bigint::BigUint;
 use rayon::prelude::*;
 
+pub mod body;
 pub mod duplex;
 pub mod participation;
 pub mod realization;
@@ -5761,7 +5762,7 @@ mod tests {
         assert!(decided > 0 && fell_back > 0, "both sides of the partition are exercised: {decided} {fell_back}");
     }
 
-    fn keys(n: usize) -> Vec<u8> {
+    pub(super) fn keys(n: usize) -> Vec<u8> {
         // A fixed exterior key stream for the fixtures: the bytes of a counter's squares.
         (0..n as u64).flat_map(|i| (i.wrapping_mul(2654435761) ^ (i * i)).to_be_bytes()[4..].to_vec()).collect()
     }
@@ -5844,7 +5845,7 @@ mod tests {
     }
 
     /// [`tiny_shaped`] with `contacts` contacts a level (four reads as [`tiny_shaped`]).
-    fn tiny_contacts(levels: usize, modes: usize, contacts: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
+    pub(super) fn tiny_contacts(levels: usize, modes: usize, contacts: usize, gated: bool, turned: bool, pumped: bool, contact: ContactLaw) -> Tower {
         let declaration = TowerDeclaration { alphabet: 4, width: 4, modes, contacts, levels, gated, turned, pumped, contact };
         let (nw, fw) = (modes * declaration.width, contacts * declaration.width);
         let mut tower = Tower::found(declaration, &keys(4096)).expect("founded");
@@ -7894,7 +7895,7 @@ mod tests {
 
     /// A tiny gated tower of four modes with participation joined over a section of sixteen, its
     /// heads the founded memory's runs; `opened` fills `W₁ᵃ` so the current conducts.
-    fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
+    pub(super) fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
         tiny_participating_of(contact, opened, false)
     }
 

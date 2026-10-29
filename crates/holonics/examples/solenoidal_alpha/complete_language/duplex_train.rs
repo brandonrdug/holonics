@@ -6,7 +6,8 @@
 //! reverse opens at rest at each section's end. After each pass the frozen duplex reads the
 //! held-out text in the same number of streams, the reverse opening at each section's end as in
 //! training, and prints the forward's and the meeting's codes per region beside the pass.
-use super::tower_train::{agreement, agreement_face, count, per, region_line, roles_of, REGIONS};
+use super::tower_train::{agreement, count, per, region_line, roles_of, REGIONS};
+use holonics::receiver::release::agreement_face;
 use super::*;
 use holonics::hnn::tower::duplex::{Duplex, DuplexLearner};
 use holonics::hnn::tower::{ContactLaw, TowerDeclaration, TowerFace, TowerState};
