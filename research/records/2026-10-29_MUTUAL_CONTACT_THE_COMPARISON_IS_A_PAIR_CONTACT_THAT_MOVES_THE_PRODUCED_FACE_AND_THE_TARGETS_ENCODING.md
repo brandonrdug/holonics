@@ -174,7 +174,27 @@ sum the same integers in any order.
   rotor, a news clock, a pair or ring face, strands or participation. Its parity cases are
   `the_cards_mutual_pass_is_the_hosts_for_thirty_two_sections` and
   `the_cards_pumped_mutual_pair_contact_holds_an_uncompared_place_as_the_host_does`, plus
-  `tower_pass parity … mutual` at the race's declaration. They run on the 4080. Their receipt is
-  added here when they have run.
+  `tower_pass parity … mutual` at the race's declaration. On the RTX 4080 SUPER at `fae03c54f`
+  (B-PC): `tower_pass` 34 of 34 in 20.0 s, both mutual cases among them; the parity at the race's
+  size (4 sections at 320 streams, mutual) equal in all 163,840 faces and 1,274,116 covector
+  entries, host 18,671 ms, card 1,899 ms.
 - **The race entry** is `train-two-ladder-mutual-tower-classes`: the plain race's command, with the
   contact joined at the founding.
+- **The race** (acceptance 3), on the RTX 4080 SUPER at `fae03c54f`, laps 0 to 45 complete, every
+  lap 726 of 726 deposits certified. Held out, bits a class, beside the plain race:
+
+  | lap | 0 | 4 | 10 | 15 | 20 | 30 | 40 | 45 |
+  |---|---|---|---|---|---|---|---|---|
+  | mutual | 2.569 | 2.103 | 2.016 | 1.986 | 1.974 | 1.955 | 1.949 | 1.944 |
+  | plain | 2.356 | 2.004 | 1.918 | 1.901 | 1.886 | 1.862 | 1.857 | 1.850 |
+
+  At lap 45 the mutual tower reads 1.774 on training and 1.944 held out (GSM8K 1.908, prose 1.971),
+  against the plain race's 1.691 and 1.850 (1.800, 1.888). The gap closes from 0.21 at lap 0 to
+  about 0.09 by lap 15 and holds there to lap 45; the train–held-out spread is 0.17 against the
+  plain race's 0.16. Laps took 131–180 s, the widest 32-section window 5,799–7,964 ms. The writings
+  at laps 0, 1, 2, 4, 8, 16, 32 and 45 were shown whole and stay outside the repository: the same
+  record-shaped prose with invented words and GSM8K-shaped problems with wrong arithmetic as the
+  plain race's. [agent-inferred] A gap that stops closing while both towers still descend reads as
+  a held capacity, not a slower course: the contact reads every class through the encoding `E`
+  that also carries the passage in, so at width 64 one material serves both ports where the plain
+  readout has its own `U`. The measurement decides nothing beside the writings.

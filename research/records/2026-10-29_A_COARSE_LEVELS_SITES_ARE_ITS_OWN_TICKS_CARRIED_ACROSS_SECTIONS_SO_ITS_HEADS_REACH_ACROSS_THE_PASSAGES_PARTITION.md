@@ -1,0 +1,103 @@
+# A coarse level's sites are its own ticks, carried across sections, so its heads reach across the passage's partition
+
+Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 29].
+Claude (opus), design lead. The first of the October 28 expansions in the order fixed by
+[the audit](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#4-the-order-now):
+the consumer of [the radix record §1](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#1-a-value-is-a-radix-move-and-the-towers-modes-are-registers-in-their-own-radices)
+(atlas `hnn.news-packet-participation`), which answers the item "the section" that
+[the participation record §8](2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md#8-what-the-first-build-leaves-by-name)
+left owed. Owners it joins: the news clock (`NewsClock`, the held step in `Tower::step`,
+[record](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md)),
+participation (`hnn::tower::participation`, `LevelSites`, `Tower::reverse_joined`'s participation
+return and transport covector), the stream state's text (`TowerState::to_text`), the growth
+(`Tower::widen_state`) and the card (`kernels/tower.cu`, `TowerCard`).
+
+## 1. What the participation race measured
+
+[source-inspected; measured] Every level of the participating tower admits a site at every arrival
+and closes its section after 128 sites, so every level's heads read the same 128 classes. At the
+answers' opening of the race's laps 0 and 1 (RTX 4080 SUPER), level 0's heads weigh the last few
+classes and levels 1 to 3 reach back at most 59 classes, their shares in steps of one head's whole
+weight: each upper head sits on nearly one site. The coarse levels carry the longer memories (their
+modes decay slower), but their participation reads the same section as level 0's, so a head with
+a slow transport has nothing far back to reach. A lap took 929 to 1,241 s against the plain race's
+113 s, the four levels' participation each reading 128 sites.
+
+## 2. The law
+
+[definition; agent-inferred] **A level's sites are its ticks.** Under the news clock, level `l` takes
+its step `Δτ_l(t)` times at arrival `t` (the held step). Participation follows the same clock:
+
+```text
+Δτ_l(t) ≥ 1:   U ← U u_t^Δτ,   L ← L + Δτ (−log₂|λ_t|),   the input's charts admitted as a site,
+               the probe reads every admitted site, the current y_l read and held
+Δτ_l(t) = 0:   nothing moves: no site, no probe, y_l(t) = y_l(t−1)   (the zero-order hold)
+```
+
+The current is held as the modes are: an arrival that ticks no time moves nothing, so the level
+presents the same state and the same current to its contacts. Level 0 ticks at every arrival, and
+without a news clock every level does, so the present participation is this law with every
+`Δτ = 1`, face for face.
+
+**A level's section is its own.** It closes after `section` of that level's sites, releasing them
+and resting its frames, so a level-`l` section spans `section` ticks of `l`. On the race's clock
+(`B = 8`, `r = 2`) at its held-out 1.85 bits a class, level 1 ticks about every 4.3 classes, level 2
+every 8.6 and level 3 every 17, so a section of 128 sites reaches about 550, 1,100 and 2,200 classes
+(several GSM8K problems), where level 0's reaches 128. The partition is the passage's own news, so
+the reach moves with the learning and nothing names a window.
+
+**The sites are carried with the modes.** A level's open section is part of the stream's state
+across the learner's sections, as its modes are (`LevelSites`, now with each level's own count and
+its held current). A learner's section reverses from its opening, where the modes are constants;
+the sites carried at the opening are constants with them, read by the section's probes and
+receiving no covector, while the sites the section admits receive theirs. This is the same
+truncation the modes already take at the opening, so carrying the sites adds no new cut. A held
+cell's current covector joins its last tick's (and is dropped when that tick precedes the opening,
+as the opening state's is). A level's section that closes inside a learner section parts the
+section's transport sums at its close. The turn and met covectors of a move taken `Δτ` times count
+it `Δτ` times.
+
+**Not a store.** The carried sites are the open section's present terrain, released at its close
+by the level's own count, exactly as the participation record's §4 reads them; nothing is written
+to be looked up, and the address remains the transport.
+
+**The order** [agent-inferred]. The radix record's consumer also gives a coarse site the packet
+`x_P = Read(m_P)` as its input, in place of the held arrival. That is a change to the clocked
+tower's own input (it changes the plain clocked tower, without participation), with its own
+acceptance (the radix record's (a)–(c)), so it is built and measured after this one: this build
+changes only participation's clock and section, so the measurement changes one thing.
+
+## 3. Acceptance, fixed before the build
+
+1. **Unchanged without a clock.** Every participation test passes unchanged; a participating
+   tower without a news clock gives the same faces, covectors and text as before.
+2. **Ticks.** On a clocked participating tower, each level's sites are exactly its ticked arrivals;
+   at a no-tick arrival a level's state, frames, met dissipation and current equal its
+   predecessor's; a level's section closes after `section` of its own sites.
+3. **Carried sites.** A passage read across several learner sections gives the faces it gives read
+   whole (the forward does not see the sections), and the states between sections carry the
+   coarse levels' open sites.
+4. **The covector.** On a small clocked participating tower, over a section whose opening carries
+   sites at the coarse levels, the covector matches the code difference for participation's
+   families and the moves, gates, pushes and reads below.
+5. **Text and growth.** A state with carried sites and held currents restores whole from its text,
+   and grows (`Tower::widen_state`) to the grown tower's faces.
+6. **Card.** Parity at the race's declaration with the clock (`B = 8`, `r = 2`) on the race passage:
+   every face, covector entry, learner and state equal, host against card; the `tower_pass` suite
+   whole.
+7. **The measurement.** The clocked participating race beside the participation race and a clocked
+   race without participation (the held step, never yet raced), lap for lap on the race's passage,
+   keys and declaration: bits by region, the writings whole, and each level's reach at the answers'
+   opening.
+
+## 4. The recorded failures these choices could repeat
+
+- **An index of contexts counted as generation, a store**: the carried sites are the open
+  section's terrain, released by count; no key is written to be looked up.
+- **A design thought in the programming language (windows, offsets)**: the reach is the passage's
+  own news partition, not a declared window.
+- **A located cause carried unrepaired**: the participation record's §8 item "the section" is the
+  cause measured in §1 (upper heads on one site); this build repairs it there.
+- **An uncertified deposition step**: the certificate rereads the section with its carried sites.
+- **Text on its codec's grain**: the clock counts the tower's own code in bits, for every medium.
+- **Bits read as progress**: the writings and the reach are shown beside the bits.
