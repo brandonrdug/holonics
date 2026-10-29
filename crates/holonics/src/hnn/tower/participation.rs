@@ -37,8 +37,10 @@
 //! remainder below its grain is released to the nearest numerator, and every sum is an integer sum,
 //! so the sites summed in any order give the same bits.
 //!
-//! **Not claimed.** The return stops at the frame and the dissipation: the transport's own covector
-//! `Σ a dU Ψ` into the gates and turns is owed, as is the pump's reflection share (record §8).
+//! **The transport's own covector** `Σ a dU Ψ` into the gates and turns is not summed here: this
+//! return hands back each site's met dissipation (`probe_met`, `sites_met`) beside its charts'
+//! covectors, and `Tower::reverse_joined` turns them into each move's turn and met covector (record
+//! §6). **Not claimed:** the pump's reflection share (record §8).
 use super::{div_nearest, fit64, refuse, release, Result, FACE_BITS, MOVE_BITS, UNIT_BITS};
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 

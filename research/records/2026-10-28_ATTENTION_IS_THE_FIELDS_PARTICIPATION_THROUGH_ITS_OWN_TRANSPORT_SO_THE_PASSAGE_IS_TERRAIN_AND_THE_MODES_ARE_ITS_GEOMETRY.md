@@ -267,8 +267,31 @@ participation through `train-two-ladder-participating-tower-classes` (host and c
 `tower_pass parity … participating`, its heads founded by `Tower::founded_participation`: one head a
 run of first-level modes whose memory sits at one octave. Read off the exact moduli, the turn's
 rounding split the race bank's sixteen rungs of eight into 90 runs (`hnn::tower` test
-`the_founded_heads_are_the_first_levels_rungs`). Owed: those two card tests and the parity at the
-race's own declaration. Nothing is measured (3).
+`the_founded_heads_are_the_first_levels_rungs`).
+
+**Status, October 29 (card, the race's declaration).** On the RTX 4080 SUPER the suite passes 32 of
+32 with those two tests, and 2 passes at the race's declaration: 4 sections at 320 streams and 32 at
+24, every face, covector entry, learner and state equal, host against card. One block a stream with
+one warp a head runs the heads; the pass takes 15.0 s at 24 streams (32.2 s before the warps) and
+10.0 s at 320 streams (13.1 s before). A read that runs past its section's close is refused on
+the card, so a realized advance reads each section to its close (`advance_realized`;
+`a_realized_advance_reads_each_section_to_its_close`).
+
+**Status, October 29 (measurement 3, laps 0 and 1, at `87cfec59c`'s law).** The race's passage, keys
+and declaration with participation, on the card. Bits a byte, training / held out / GSM8K region /
+prose region:
+
+| lap | with participation | plain race | lap wall time (with / plain) |
+|---|---|---|---|
+| 0 | 2.617 / 2.298 / 2.346 / 2.260 | 2.748 / 2.356 / 2.407 / 2.317 | 1,241 s / 113 s |
+| 1 | 2.045 / 2.152 / 2.156 / 2.149 | — / 2.139 / — / — | 929 s / about 113 s |
+
+Lap 0 reads lower than the plain lap 0 on all four; lap 1 reads 0.013 bit above the plain lap 1 held
+out. Every deposit certified (726 of 726). At each answer's opening, level 0's heads weigh the last
+few classes and levels 1 to 3 reach back up to 59 classes; above level 0 the heads' shares come in
+steps of one head's whole weight, so each of those heads sits on nearly one site (inferred from the
+steps). The writings are shown to Brandon outside the repository. Laps continue; the lap that runs
+with the transport covector (§6) is a separate race.
 
 **The device line.** The card under the lock for every learner run; the host realization only as the
 parity reference. The workload is the race's (its passage, keys, declaration and laps); time and
