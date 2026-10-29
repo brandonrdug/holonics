@@ -3,6 +3,7 @@
 //! and its streams' states, with and without the pair face, the ring face, the turned modes, the
 //! pumped modes, the rotor, the strands and the news clock, on rectifying contacts, the pair contact
 //! or its foil; and the card refuses a declaration it does not carry.
+use holonics::hnn::tower::body::{Answer, TowerBody};
 use holonics::hnn::tower::participation::ParticipationDeclaration;
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Sheet, StrandKey, StrandLaw, StrandRing, Strands, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
@@ -442,6 +443,58 @@ fn the_cards_participation_reads_an_open_section_on_across_calls_as_the_host_doe
         realized.carry(&host.tower, &mut states_c, &opening_c, Slot::Opened).expect("card carry");
         assert_eq!(states_h, states_c, "round {round}: the continuing states with their sections");
         assert!(states_h.iter().all(|s| s.sites.iter().all(|sites| sites.len() == open)), "round {round}: {open} sites open");
+    }
+}
+
+/// [agent-inferred, October 29] **The continuing body on the card** (acceptance 2 of the record
+/// `2026-10-29_THE_CONTINUING_BODY_RESTS_WITH_ITS_CURRENTS_AND_ONE_OPEN_SECTION_…`): a participating
+/// body on four hearing currents hears two passages, is asked, hears the answer and is asked again,
+/// on the card as on the host, its whole text and its releases to the bit after every operation;
+/// and a card body rested after its first hearing and restarted cold from its text, with a new
+/// card realization, is the host's body that never stopped.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold() {
+    let card = Card::open(0).expect("the card");
+    let (learner, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
+    let k = keys(1 << 14);
+    let (first, second) = (passage(11, 300), passage(11, 511)[300..].to_vec());
+    let prompt: Vec<usize> = (0..9).map(|i| (i * 3 + 1) % 10).collect();
+    let answer: Vec<usize> = (0..14).map(|i| (i * 7 + 2) % 10).collect();
+    let found = || TowerBody::found(learner.clone(), 4, 12).expect("founded");
+    // The rest of the life after the first hearing; each operation's text and release.
+    let after = |body: &mut TowerBody, realization: &mut dyn PassRealization| -> Vec<(String, Option<Answer>)> {
+        let mut seen = Vec::new();
+        body.hear(&second, realization).expect("heard");
+        seen.push((body.to_text(), None));
+        let asked = body.ask(&prompt, &k, 40, 1, realization).expect("asked");
+        seen.push((body.to_text(), Some(asked)));
+        body.answer(&answer, realization).expect("answered");
+        seen.push((body.to_text(), None));
+        let again = body.ask(&prompt, &k, 40, 2, realization).expect("asked");
+        seen.push((body.to_text(), Some(again)));
+        seen
+    };
+    let mut host = found();
+    let mut reference = HostPass::default();
+    host.hear(&first, &mut reference).expect("heard");
+    let host_seen = after(&mut host, &mut reference);
+    let mut on_card = found();
+    let mut realized = TowerCard::open(&card).expect("the tower's image");
+    on_card.hear(&first, &mut realized).expect("heard");
+    let rested = on_card.to_text();
+    assert_eq!(TowerBody::from_text(&rested).expect("restored").to_text(), rested, "the body's text re-encodes equal");
+    let card_seen = after(&mut on_card, &mut realized);
+    assert!(host_seen.iter().all(|(_, a)| a.as_ref().is_none_or(|a| a.participation.is_some() && !a.released.is_empty())));
+    for (i, (h, c)) in host_seen.iter().zip(&card_seen).enumerate() {
+        assert_eq!(h, c, "operation {i}: the card's body is the host's");
+    }
+    drop(realized);
+    let mut cold = TowerBody::from_text(&rested).expect("restored");
+    let mut fresh = TowerCard::open(&card).expect("the tower's image");
+    let cold_seen = after(&mut cold, &mut fresh);
+    for (i, (h, c)) in host_seen.iter().zip(&cold_seen).enumerate() {
+        assert_eq!(h, c, "operation {i}: the card's body restarted cold is the host's that never stopped");
     }
 }
 

@@ -21,7 +21,8 @@
 //!
 //! Nothing here is text-, image- or sound-specific: a medium is only the chart that wrote its
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
-use super::tower_train::{agreeing_class, agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
+use super::tower_train::{agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
+use holonics::receiver::release::agreeing_class;
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TurnLadder};
@@ -34,7 +35,7 @@ const CLASS_REGIONS: [&str; 4] = ["gsm8k", "strokes", "cycles", "words"];
 /// heard before its image or sound.
 const MARK_NAMES: [&str; 9] = ["none", "label", "answer", "question", "transcript", "stroke", "cycle", "end", "named"];
 
-fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
+pub(super) fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
     if bytes.len() % 2 != 0 {
         return Err("a class file holds two bytes a class".into());
     }
@@ -397,42 +398,53 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
 /// thousandths of a head, print with the eight classes that end there (`|` the end letter); each
 /// head's own top sites go to `PARTICIPATION.tsv`. A reading beside the writings, never a score.
 fn participation_read(tower: &holonics::hnn::tower::Tower, prompts: &[&[usize]], end: usize, out: &Path) -> Result<()> {
-    const SHOWN: usize = 5;
-    let mut rows = String::from("prompt\tlevel\thead\tsites\treleased\ttop(back:classes:thousandths)\n");
+    let mut rows = String::from(PARTICIPATION_HEAD);
     for (p, prompt) in prompts.iter().enumerate() {
         let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
         let mut state = tower.rest();
         tower.read_cells(&mut state, &entered).map_err(|e| e.to_string())?;
         let Some(levels) = tower.participation_at(&mut state, end).map_err(|e| e.to_string())? else { return Ok(()) };
-        let last = entered.len() - 1;
-        let shown = |back: usize| -> String {
-            let at = last - back;
-            entered[at.saturating_sub(7)..=at].iter().map(|&c| if c < 256 { (c as u8).escape_ascii().to_string() } else { "|".into() }).collect()
-        };
-        // The admitted site `j` of `sites` arrived `sites − 1 − j` classes before the opening.
-        let top = |weights: &[u128]| -> Vec<(usize, u128)> {
-            let mut order: Vec<(usize, u128)> = weights.iter().enumerate().map(|(j, &w)| (weights.len() - 1 - j, w)).collect();
-            order.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
-            order.truncate(SHOWN);
-            order
-        };
-        for (l, heads) in levels.iter().enumerate() {
-            let sites = heads.first().map_or(0, |h| h.weights.len());
-            let mut summed = vec![0u128; sites];
-            for (h, part) in heads.iter().enumerate() {
-                let share: Vec<u128> = part.weights.iter().map(|&e| e * 1000 / part.mass.max(1)).collect();
-                for (s, &v) in summed.iter_mut().zip(&share) {
-                    *s += v;
-                }
-                let listed: Vec<String> = top(&share).into_iter().map(|(back, v)| format!("{back}:{:?}:{v}", shown(back))).collect();
-                rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{}\n", part.released, listed.join(" ")));
-            }
-            let listed: Vec<String> = top(&summed).into_iter().map(|(back, v)| format!("{back}:{:?}:{}", shown(back), v / heads.len().max(1) as u128)).collect();
-            println!("CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} top(back:classes:thousandths) {}", heads.len(), listed.join(" "));
-        }
+        participation_rows(p, &entered, &levels, &mut rows);
     }
     write_new(&out.join("PARTICIPATION.tsv"), rows.as_bytes())?;
     Ok(())
+}
+
+/// `PARTICIPATION.tsv`'s header.
+pub(super) const PARTICIPATION_HEAD: &str = "prompt\tlevel\thead\tsites\treleased\ttop(back:classes:thousandths)\n";
+
+/// One prompt's participation at its answer's opening, `entered` the classes read with the opening's
+/// end letter last: per level the sites carrying the most weight, summed over the heads in
+/// thousandths of a head, printed with the eight classes that end there (`|` the end letter), and
+/// each head's own top sites appended to `rows`.
+pub(super) fn participation_rows(p: usize, entered: &[usize], levels: &[Vec<holonics::hnn::tower::participation::Participation>], rows: &mut String) {
+    const SHOWN: usize = 5;
+    let last = entered.len() - 1;
+    let shown = |back: usize| -> String {
+        let at = last - back;
+        entered[at.saturating_sub(7)..=at].iter().map(|&c| if c < 256 { (c as u8).escape_ascii().to_string() } else { "|".into() }).collect()
+    };
+    // The admitted site `j` of `sites` arrived `sites − 1 − j` classes before the opening.
+    let top = |weights: &[u128]| -> Vec<(usize, u128)> {
+        let mut order: Vec<(usize, u128)> = weights.iter().enumerate().map(|(j, &w)| (weights.len() - 1 - j, w)).collect();
+        order.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        order.truncate(SHOWN);
+        order
+    };
+    for (l, heads) in levels.iter().enumerate() {
+        let sites = heads.first().map_or(0, |h| h.weights.len());
+        let mut summed = vec![0u128; sites];
+        for (h, part) in heads.iter().enumerate() {
+            let share: Vec<u128> = part.weights.iter().map(|&e| e * 1000 / part.mass.max(1)).collect();
+            for (s, &v) in summed.iter_mut().zip(&share) {
+                *s += v;
+            }
+            let listed: Vec<String> = top(&share).into_iter().map(|(back, v)| format!("{back}:{:?}:{v}", shown(back))).collect();
+            rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{}\n", part.released, listed.join(" ")));
+        }
+        let listed: Vec<String> = top(&summed).into_iter().map(|(back, v)| format!("{back}:{:?}:{}", shown(back), v / heads.len().max(1) as u128)).collect();
+        println!("CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} top(back:classes:thousandths) {}", heads.len(), listed.join(" "));
+    }
 }
 
 #[cfg(test)]

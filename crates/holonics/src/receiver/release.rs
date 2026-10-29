@@ -461,6 +461,38 @@ pub fn draw_exact(face: &[Rat], key: &Rat) -> Result<ReleaseReturn, DrawRefusal>
     draw(&points, key)
 }
 
+/// [definition; agent-inferred, October 25] **The agreement release**: the release at which
+/// `agree` independent draws from the face fall on the same class, the face's masses raised to that
+/// power over their sum. One draw is the face itself; two give its collision face `p²/Σp²`, where
+/// two receivers of the same face agree (atlas `receiver.agreement-release`). Exact, and one key a
+/// draw whatever `agree` is.
+pub fn agreement_face(masses: &[u128], agree: u32) -> Vec<Rat> {
+    let powered: Vec<BigInt> = masses.iter().map(|&u| BigInt::from(u).pow(agree)).collect();
+    let total: BigInt = powered.iter().sum();
+    powered.into_iter().map(|u| Rat::new(u, total.clone())).collect()
+}
+
+/// The class `agree` agreeing draws fall on at `key = n/d`: the inverse-CDF class of the face
+/// `m^agree / Σ m^agree`, the first `c` with `d Σ_(j≤c) m_j^agree > n Σ m^agree`. It is
+/// [`draw_exact`] over [`agreement_face`] read in integers, without normalizing a ratio for every
+/// class.
+pub fn agreeing_class(masses: &[u128], agree: u32, key: &Rat) -> Result<usize, DrawRefusal> {
+    if key < &Rat::zero() || key >= &Rat::one() {
+        return Err(DrawRefusal::KeyOutOfRange { key: key.clone() });
+    }
+    let powered: Vec<BigInt> = masses.iter().map(|&m| BigInt::from(m).pow(agree)).collect();
+    let total: BigInt = powered.iter().sum();
+    let target = key.numer() * &total;
+    let mut through = BigInt::zero();
+    for (class, p) in powered.iter().enumerate() {
+        through += p;
+        if &through * key.denom() > target {
+            return Ok(class);
+        }
+    }
+    Err(DrawRefusal::EmptyFace)
+}
+
 /// The inverse-CDF reading of a validated face: the certified class, or every crossing class.
 fn inverse_cdf(face: &[ExactInterval], key: &Rat) -> Result<CertifiedDraw, UnresolvedDraw> {
     let mut lower_prefix = Rat::zero();
