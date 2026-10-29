@@ -31,7 +31,9 @@ numbers:
   `𝓕(conj Φ)(k) = conj(𝓕Φ(−k))` (`dft_conj`); a field is real exactly when its transform is
   Hermitian (`real_iff_hermitian`); the bilinear product pairs `k` with `−k`,
   `Σ Φ Ψ = N⁻¹ Σ_k 𝓕Φ(k) 𝓕Ψ(−k)` (`bilinear_plancherel`), and it **diagonalizes** to
-  `N⁻¹ Σ_k |𝓕Φ(k)|²` only on the Hermitian slice (`hermitian_diagonal`).
+  `N⁻¹ Σ_k |𝓕Φ(k)|²` only on the Hermitian slice (`hermitian_diagonal`), while the Hermitian
+  energy diagonalizes for every complex field, `Σ_k |𝓕Φ(k)|² = N Σ_j |Φ(j)|²`
+  (`hermitian_plancherel`).
 
 [counterexample; formal-checked]
 
@@ -241,6 +243,19 @@ theorem hermitian_diagonal (Φ : ZMod N → ℂ) (hreal : ∀ j, conj (Φ j) = �
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [(real_iff_hermitian Φ).mp hreal k, Complex.mul_conj]
 
+/-- [proved-standard; formal-checked] **The Hermitian energy diagonalizes for every field**:
+`Σ_k |𝓕Φ(k)|² = N Σ_j |Φ(j)|²`, the bilinear product read against the conjugate field. -/
+theorem hermitian_plancherel (Φ : ZMod N → ℂ) :
+    ∑ k, Complex.normSq (𝓕 Φ k) = N * ∑ j, Complex.normSq (Φ j) := by
+  have hN : (N : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne N)
+  have h := bilinear_plancherel Φ (fun j => conj (Φ j))
+  simp only [dft_conj, neg_neg, Complex.mul_conj] at h
+  have h' : ((∑ k, Complex.normSq (𝓕 Φ k) : ℝ) : ℂ) =
+      ((N * ∑ j, Complex.normSq (Φ j) : ℝ) : ℂ) := by
+    push_cast
+    rw [h, ← mul_assoc, mul_inv_cancel₀ hN, one_mul]
+  exact_mod_cast h'
+
 /-- [definition] The imaginary complex-fluid state `U = i δ₀` on `ℤ/N` (`a = 0`, `b = δ₀`). -/
 def imaginaryState : ZMod N → ℂ := fun j => if j = 0 then Complex.I else 0
 
@@ -276,6 +291,7 @@ section Audit
 #print axioms real_iff_hermitian
 #print axioms bilinear_plancherel
 #print axioms hermitian_diagonal
+#print axioms hermitian_plancherel
 #print axioms imaginary_state_witness
 
 end Audit
