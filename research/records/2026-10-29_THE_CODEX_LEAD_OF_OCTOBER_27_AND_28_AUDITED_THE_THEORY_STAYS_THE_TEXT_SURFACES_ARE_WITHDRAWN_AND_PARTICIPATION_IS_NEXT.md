@@ -65,7 +65,9 @@ variation `δs = (δJ)u + J δu` carrying both the contact's geometry and the pa
   followed as intake for Soulkiller. Equation extraction is parked (#146 under #409), the
   September 5 retraction keeps native foundations ahead of inherited-model production, and Brandon
   fixed the order on October 28 as Athena first. The decoder is lawful intake (it converts the
-  blocks to exact dyadic ratios at the boundary) and stays on the branch for #146.
+  blocks to exact dyadic ratios at the boundary) and stays on the branch for #146. [Revised the same day: Brandon
+  unparked #146; the decoder is the overture's intake
+  ([record](2026-10-29_INHERITED_WEIGHTS_ARE_AN_OVERTURE_EXTRACTION_RECYCLES_PROCESSED_INFORMATION_INTO_THE_ENGINES_INITIAL_CONFIGURATION.md)).]
 - **The playground preview** was schematic and not connected; Codex paused it itself.
 - **The claim, put to Brandon, that the native runtime now persists and grows** is withdrawn as an
   Athena claim: the persistence predates it, and by Codex's own report the text model does not

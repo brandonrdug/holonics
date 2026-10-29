@@ -240,7 +240,11 @@ float table or an authored table of answers ([systolic flow](research/records/20
 
 [definition] **"Soulkiller" is a name only** (borrowed from a game). Its subject is **equation
 extraction**: reading a foreign realization's operators and coefficients as the element relations,
-interconnection and navigators of a Holon, so that the extracted equations are native objects.
+interconnection and navigators of a Holon, so that the extracted equations are native objects. Inherited
+coefficients are an overture (Brandon, October 29; [record](research/records/2026-10-29_INHERITED_WEIGHTS_ARE_AN_OVERTURE_EXTRACTION_RECYCLES_PROCESSED_INFORMATION_INTO_THE_ENGINES_INITIAL_CONFIGURATION.md)): information that
+seeds native navigators' initial configuration and constitution, converted exactly at the boundary,
+after which only deposition changes it. A foreign model is never served, run inside a law or taken
+as the model.
 
 [definition] **Hardware law.** Co-present regions execute together when their complete read/write,
 lineage, obstruction and resource effects commute.

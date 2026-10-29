@@ -149,6 +149,18 @@
 //! zero, `v = (W_a r̂ + b_a) b_b + b_a (W_b r̂)`: the same material and the same opening with every
 //! block but the product, so what the product carries is read against it.
 //!
+//! **Participation** ([`participation`], [`Tower::join_participation`], agent-inferred, October 29;
+//! record `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`). Each level's cell admits its input
+//! as a site of the open section, rotated back by each mode's frame (the running product of the
+//! cells' unit moves), and probes every admitted site through the head's pairing and friction; the
+//! participating current is read like the modes' face, `r̂ᵃ = Re(Cᵃ y)/‖·‖_rms`, and offered to
+//! the same contacts, `W₁ r̂ + W₁ᵃ r̂ᵃ + b₁`. `W₁ᵃ` opens at zero, so a joined tower opens on itself
+//! face for face. The reverse returns participation's covector into the charts, the current's read,
+//! `W₁ᵃ`, the friction and the level's input (tested against the code's difference); it stops at the
+//! frames and the met dissipation, so under an opened participation the moves' and gates' covector
+//! lacks participation's share (owed, record §8), and the certificate's reread still decides each
+//! deposit. A section admits its own sites; one longer than the declared section is refused.
+//!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
 //! Athena alpha plan's §A2.4: the reverse pairs the forward prefix operands with the backward
@@ -189,8 +201,10 @@ use num_bigint::BigUint;
 use rayon::prelude::*;
 
 pub mod duplex;
+pub mod participation;
 pub mod realization;
 
+use participation::{advance_frame, participate, participation_return, rotate_back, Head, LevelSites, Participation, ParticipationDeclaration, Phasor, Probe, Site};
 use realization::{HostPass, PassRealization, Slot};
 
 /// A face's grain, `2^(−16)`.
@@ -1729,6 +1743,19 @@ struct LevelLayout {
     /// The pair contact's second drive, material and bias (empty families when rectifying).
     pair: usize,
     pair_bias: usize,
+    /// Participation's charts `Ȟ, H, Ψ` (re, im), the current's read `Cᵃ` (re, im), the contacts'
+    /// `W₁ᵃ` and each head's friction `κ` (empty families without participation,
+    /// [`participation`]).
+    pa_probe_re: usize,
+    pa_probe_im: usize,
+    pa_key_re: usize,
+    pa_key_im: usize,
+    pa_value_re: usize,
+    pa_value_im: usize,
+    pa_read_re: usize,
+    pa_read_im: usize,
+    pa_contact: usize,
+    pa_friction: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1755,7 +1782,7 @@ struct Layout {
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize, participation: Option<&ParticipationDeclaration>) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1789,6 +1816,16 @@ impl Layout {
                 pump_axis_bias: 0,
                 pair: 0,
                 pair_bias: 0,
+                pa_probe_re: 0,
+                pa_probe_im: 0,
+                pa_key_re: 0,
+                pa_key_im: 0,
+                pa_value_re: 0,
+                pa_value_im: 0,
+                pa_read_re: 0,
+                pa_read_im: 0,
+                pa_contact: 0,
+                pa_friction: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
@@ -1819,6 +1856,21 @@ impl Layout {
             c if d.contact == ContactLaw::Rectifying => (take(f * c, MATERIAL_BITS), 0),
             c => (take(f * c, MATERIAL_BITS), take(f * c, MATERIAL_BITS)),
         };
+        // Participation's material follows every other part's, so joining it moves no family.
+        if let Some(p) = participation {
+            for level in &mut levels {
+                level.pa_probe_re = take(n * w, MATERIAL_BITS);
+                level.pa_probe_im = take(n * w, MATERIAL_BITS);
+                level.pa_key_re = take(n * w, MATERIAL_BITS);
+                level.pa_key_im = take(n * w, MATERIAL_BITS);
+                level.pa_value_re = take(n * w, MATERIAL_BITS);
+                level.pa_value_im = take(n * w, MATERIAL_BITS);
+                level.pa_read_re = take(w * n, MATERIAL_BITS);
+                level.pa_read_im = take(w * n, MATERIAL_BITS);
+                level.pa_contact = take(f * w, MATERIAL_BITS);
+                level.pa_friction = take(p.heads.len(), FACE_BITS);
+            }
+        }
         Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, strand_contact, strand_pair, len: at, families }
     }
 }
@@ -1947,6 +1999,8 @@ pub struct Tower {
     /// The levels' news clock, when one is joined ([`Tower::join_news`]); without it every level
     /// moves once an arrival.
     news: Option<NewsClock>,
+    /// The levels' participation, when it is joined ([`Tower::join_participation`]).
+    participation: Option<ParticipationDeclaration>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -1978,6 +2032,8 @@ pub struct TowerState {
     /// Under a news clock, its open phase: the news summed so far, modulo the coarsest section, on
     /// `2^(−20)` bits (zero without a clock).
     pub news: u64,
+    /// Each level's open section of participation (empty without participation).
+    pub sites: Vec<LevelSites>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -2314,6 +2370,24 @@ struct LevelCell {
     /// How many times the level's step acted at this cell: one without a news clock, else the
     /// level's ticks `Δτ_l(t)` ([`NewsClock`]).
     ticks: u32,
+    /// The level's participation at this cell (absent without participation).
+    participation: Option<ParticipationCell>,
+}
+
+/// One level's participation at one cell: the site it admitted (its rotated charts and its heads'
+/// dissipation), the frame it was rotated by, the probe, each head's participation, the current
+/// `y` and its ratio read `r̂ᵃ` with its scale.
+#[derive(Clone, Debug)]
+struct ParticipationCell {
+    probe: Vec<Phasor>,
+    key: Vec<Phasor>,
+    value: Vec<Phasor>,
+    frame: Vec<Phasor>,
+    dissipation: Vec<i64>,
+    parts: Vec<Participation>,
+    current: Vec<Phasor>,
+    read: Vec<i32>,
+    read_scale: i128,
 }
 
 /// A gated mode's move at one cell: the gate `r` and `λ_t`, `ρ_t = |λ_t|`, `γ_t` on `2^(−30)`, and
@@ -2334,6 +2408,9 @@ struct GatedMove {
     kappa: i64,
     axis: (i64, i64),
     beta: (i64, i64),
+    /// `log₂ ρ_t` on `2^(−16)`: the gate's exponent `c r ℓ`, or the margin's when held (what
+    /// participation's met dissipation sums).
+    log: i64,
 }
 
 /// A gated level's founded moves read once a section: `u = λ/|λ|`, `|λ|` and `ℓ = log₂|λ|` on
@@ -2418,6 +2495,11 @@ struct Reaches {
     ring_pools: Vec<(i128, i128)>,
     /// Each level's `γ_k = √(1 − |λ_k|²)` on `2^(−30)`.
     gammas: Vec<Vec<i128>>,
+    /// Per level, participation's probe, key and current charts (re, im), the current's read
+    /// (re, im) and the contacts' `W₁ᵃ` (empty without participation).
+    participation: Vec<[u64; 9]>,
+    /// `log₂` of the moves' margin radius on `2^(−16)`: a held gated move's met dissipation.
+    held_log: i64,
     /// Each gated level's founded moves (empty when ungated).
     gates: Vec<GateFaces>,
 }
@@ -2611,7 +2693,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0, 0);
+        let layout = Layout::new(&d, 0, 0, 0, 0, None);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -2677,7 +2759,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2692,6 +2774,7 @@ impl Tower {
             reversed: false,
             open: None,
             news: 0,
+            sites: self.participation.as_ref().map_or_else(Vec::new, |_| vec![LevelSites::rest(self.declaration.modes); self.declaration.levels]),
         }
     }
 
@@ -2791,7 +2874,29 @@ impl Tower {
             let pair = if d.contact == ContactLaw::Rectifying { 0 } else { reach(&t[l.strand_pair..l.strand_pair + extent]) };
             [reach(&t[l.strand_contact..l.strand_contact + extent]), pair]
         });
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn }
+        let participation = if self.participation.is_none() {
+            Vec::new()
+        } else {
+            let (nw, wn, fw) = (d.modes * d.width, d.width * d.modes, d.contacts * d.width);
+            self.layout
+                .levels
+                .iter()
+                .map(|lv| {
+                    [
+                        reach(&t[lv.pa_probe_re..lv.pa_probe_re + nw]),
+                        reach(&t[lv.pa_probe_im..lv.pa_probe_im + nw]),
+                        reach(&t[lv.pa_key_re..lv.pa_key_re + nw]),
+                        reach(&t[lv.pa_key_im..lv.pa_key_im + nw]),
+                        reach(&t[lv.pa_value_re..lv.pa_value_re + nw]),
+                        reach(&t[lv.pa_value_im..lv.pa_value_im + nw]),
+                        reach(&t[lv.pa_read_re..lv.pa_read_re + wn]),
+                        reach(&t[lv.pa_read_im..lv.pa_read_im + wn]),
+                        reach(&t[lv.pa_contact..lv.pa_contact + fw]),
+                    ]
+                })
+                .collect()
+        };
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -2894,6 +2999,7 @@ impl Tower {
                     if held {
                         rho = radius();
                     }
+                    let log = if held { reaches.held_log } else { fit64(release(exponent, MOVE_BITS - FACE_BITS))? };
                     let (mut ur, mut ui) = faces.units[k];
                     if d.turned {
                         let (tr, ti) = turn_face(turns[k], &reaches.ladder);
@@ -2904,7 +3010,7 @@ impl Tower {
                     if gamma == 0 {
                         return refuse("a gated move reached the unit circle");
                     }
-                    let mut moved = GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held, ..GatedMove::default() };
+                    let mut moved = GatedMove { open: open as i64, unit: (ur as i64, ui as i64), lam: (lr as i64, li as i64), rho: rho as i64, gamma: gamma as i64, held, log, ..GatedMove::default() };
                     if d.pumped {
                         // α_t = ρ_t (1 − |κ|) U_t and β_t = ρ_t κ P_t: |α| + |β| = ρ_t, so γ_t is kept.
                         let one = 1i128 << MOVE_BITS;
@@ -2978,9 +3084,66 @@ impl Tower {
                 }
                 Ok(())
             };
+            // Participation ([`participation`]): the cell's move advances each mode's frame and met
+            // dissipation, the level's input presents its rotated charts as the section's newest
+            // site and probes every admitted site, and the participating current is read like the
+            // modes' face and offered to the same contacts through `W₁ᵃ`.
+            let mut part_cell = None;
+            let mut part_drive = None;
+            if let Some(p) = &self.participation {
+                let pr = &reaches.participation[l];
+                let chart = |re: usize, im: usize, rre: u64, rim: u64| -> Result<Vec<Phasor>> {
+                    let (mut a, mut b) = (vec![0i64; n], vec![0i64; n]);
+                    affine(&t[re..re + n * w], rre, w, &x, None, 0, MATERIAL_BITS, &mut a)?;
+                    affine(&t[im..im + n * w], rim, w, &x, None, 0, MATERIAL_BITS, &mut b)?;
+                    Ok(a.into_iter().zip(b).collect())
+                };
+                let (probe_chart, key_chart, value_chart) = (chart(lv.pa_probe_re, lv.pa_probe_im, pr[0], pr[1])?, chart(lv.pa_key_re, lv.pa_key_im, pr[2], pr[3])?, chart(lv.pa_value_re, lv.pa_value_im, pr[4], pr[5])?);
+                let sites = &mut state.sites[l];
+                if sites.len() >= p.section {
+                    *sites = LevelSites::rest(n);
+                }
+                for (k, m) in gate.iter().enumerate() {
+                    sites.frame[k] = advance_frame(sites.frame[k], m.unit)?;
+                    sites.met[k] -= m.log;
+                }
+                let frame = sites.frame.clone();
+                let (probe, key, value) = (rotate_back(&frame, &probe_chart)?, rotate_back(&frame, &key_chart)?, rotate_back(&frame, &value_chart)?);
+                let heads = p.ranges();
+                let dissipation: Vec<i64> = heads.iter().map(|h| fit64(div_nearest(sites.met[h.clone()].iter().map(|&v| v as i128).sum(), h.len() as i128))).collect::<Result<_>>()?;
+                sites.keys.push(key.clone());
+                sites.values.push(value.clone());
+                sites.dissipation.push(dissipation.clone());
+                let mut current = vec![(0i64, 0i64); n];
+                let mut parts = Vec::with_capacity(heads.len());
+                for (h, range) in heads.iter().enumerate() {
+                    let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
+                    let at = Probe { q: &probe[range.clone()], unit: &frame[range.clone()], dissipation: dissipation[h] };
+                    let admitted: Vec<Site> = (0..sites.len()).map(|j| Site { k: &sites.keys[j][range.clone()], w: &sites.values[j][range.clone()], dissipation: sites.dissipation[j][h] }).collect();
+                    let part = participate(&head, &at, &admitted, &self.exponential)?;
+                    current[range.clone()].copy_from_slice(&part.current);
+                    parts.push(part);
+                }
+                // Re(Cᵃ y) = Cᵃ_re y_re − Cᵃ_im y_im, on 2^(−40) released to 2^(−16), read as a ratio.
+                let (y_re, y_im): (Vec<i64>, Vec<i64>) = current.iter().copied().unzip();
+                let (mut ra, mut rb) = (vec![0i64; w], vec![0i64; w]);
+                affine(&t[lv.pa_read_re..lv.pa_read_re + w * n], pr[6], n, &y_re, None, 0, 0, &mut ra)?;
+                affine(&t[lv.pa_read_im..lv.pa_read_im + w * n], pr[7], n, &y_im, None, 0, 0, &mut rb)?;
+                let raw: Vec<i64> = collect_exact(ra.iter().zip(&rb).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
+                let (pread, pscale) = ratio_to_power(&raw)?;
+                let mut extra = vec![0i64; f];
+                affine(&t[lv.pa_contact..lv.pa_contact + f * w], pr[8], w, &pread, None, 0, MATERIAL_BITS, &mut extra)?;
+                part_drive = Some(extra);
+                part_cell = Some(ParticipationCell { probe, key, value, frame, dissipation, parts, current, read: pread, read_scale: pscale });
+            }
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
             heard(self.layout.strand_contact, reaches.strands[0], drive_buf)?;
+            if let Some(extra) = &part_drive {
+                for (a, b) in drive_buf.iter_mut().zip(extra) {
+                    *a = fit64(*a as i128 + *b as i128)?;
+                }
+            }
             let drive = to32(drive_buf, "a contact drive outgrew its 32-bit carrier")?;
             let (conduct, pair) = match d.contact {
                 ContactLaw::Rectifying => (drive.iter().map(|&a| a.max(0)).collect(), Vec::new()),
@@ -3026,7 +3189,7 @@ impl Tower {
             }
             let push = push_re.into_iter().zip(push_im).collect();
             let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -3076,6 +3239,10 @@ impl Tower {
 
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
+        // A section's participation admits its own sites ([`participation`]).
+        for sites in &mut state.sites {
+            *sites = LevelSites::rest(self.declaration.modes);
+        }
         collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
     }
 
@@ -3219,6 +3386,15 @@ impl Tower {
             let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
             let mut dreads: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut negs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            // Participation's returns: each cell's probe, key and current covectors (summed over the
+            // later sites that read it), and the current read's covectors, on 2^(−24).
+            let participating = self.participation.as_ref();
+            if participating.is_some_and(|p| cells_n > p.section) {
+                return refuse("a section longer than its participation's");
+            }
+            let span = if participating.is_some() { cells_n } else { 0 };
+            let (mut pa_q, mut pa_k, mut pa_w) = (vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span]);
+            let (mut pa_dreads, mut pa_negs): (Vec<Vec<i64>>, Vec<Vec<i64>>) = (Vec::with_capacity(span), Vec::with_capacity(span));
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let dy = &dx[i];
@@ -3257,6 +3433,42 @@ impl Tower {
                     for (a, b) in dr.iter_mut().zip(&dr_b) {
                         *a = fit64(*a as i128 + *b as i128)?;
                     }
+                }
+                if let (Some(p), Some(pc)) = (participating, &lc.participation) {
+                    let pr = &reaches.participation[l];
+                    let mut dhat = vec![0i64; w];
+                    transposed(&t[lv.pa_contact..lv.pa_contact + f * w], pr[8], w, &da, MATERIAL_BITS, &mut dhat)?;
+                    let dra = ratio_adjoint(&pc.read, pc.read_scale, &dhat)?;
+                    let nega: Vec<i64> = dra.iter().map(|v| -v).collect();
+                    let (mut gy_re, mut gy_im) = (vec![0i64; n], vec![0i64; n]);
+                    transposed(&t[lv.pa_read_re..lv.pa_read_re + w * n], pr[6], n, &dra, MATERIAL_BITS, &mut gy_re)?;
+                    transposed(&t[lv.pa_read_im..lv.pa_read_im + w * n], pr[7], n, &nega, MATERIAL_BITS, &mut gy_im)?;
+                    let gy: Vec<Phasor> = gy_re.into_iter().zip(gy_im).collect();
+                    for (h, range) in p.ranges().into_iter().enumerate() {
+                        let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
+                        let at = Probe { q: &pc.probe[range.clone()], unit: &pc.frame[range.clone()], dissipation: pc.dissipation[h] };
+                        let admitted = (0..=i)
+                            .map(|j| {
+                                let site = cells[j].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
+                                Ok(Site { k: &site.key[range.clone()], w: &site.value[range.clone()], dissipation: site.dissipation[h] })
+                            })
+                            .collect::<Result<Vec<_>>>()?;
+                        let back = participation_return(&head, &at, &admitted, &pc.parts[h], &gy[range.clone()])?;
+                        g[lv.pa_friction + h] += back.friction;
+                        for (slot, v) in pa_q[i][range.clone()].iter_mut().zip(&back.probe) {
+                            *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                        }
+                        for (j, (keys, currents)) in back.keys.iter().zip(&back.currents).enumerate() {
+                            for (slot, v) in pa_k[j][range.clone()].iter_mut().zip(keys) {
+                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                            }
+                            for (slot, v) in pa_w[j][range.clone()].iter_mut().zip(currents) {
+                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                            }
+                        }
+                    }
+                    pa_dreads.push(dra);
+                    pa_negs.push(nega);
                 }
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
@@ -3546,6 +3758,54 @@ impl Tower {
                     dps.push(dp);
                 }
             }
+            // Participation's charts: a rotated chart's covector turns forward by its site's frame
+            // (`G_c = U ⊙ G_rotated`), reaches the chart's material against the level's input and the
+            // input through the material; the current's read and `W₁ᵃ` take theirs against the
+            // current and its ratio read.
+            if participating.is_some() {
+                let pr = &reaches.participation[l];
+                let mut charts: [Vec<Vec<i64>>; 6] = Default::default();
+                for i in 0..cells_n {
+                    let pc = cells[i].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
+                    let mut turned = |cov: &[(i128, i128)]| -> Result<(Vec<i64>, Vec<i64>)> {
+                        let mut re = Vec::with_capacity(n);
+                        let mut im = Vec::with_capacity(n);
+                        for (&(gr, gi), &(ur, ui)) in cov.iter().zip(&pc.frame) {
+                            let (ur, ui) = (ur as i128, ui as i128);
+                            re.push(fit64(release(ur * gr - ui * gi, MOVE_BITS))?);
+                            im.push(fit64(release(ur * gi + ui * gr, MOVE_BITS))?);
+                        }
+                        Ok((re, im))
+                    };
+                    let (qr, qi) = turned(&pa_q[i])?;
+                    let (kr, ki) = turned(&pa_k[i])?;
+                    let (vr, vi) = turned(&pa_w[i])?;
+                    let mut back = vec![0i128; w];
+                    for (material, reach, cov) in [(lv.pa_probe_re, pr[0], &qr), (lv.pa_probe_im, pr[1], &qi), (lv.pa_key_re, pr[2], &kr), (lv.pa_key_im, pr[3], &ki), (lv.pa_value_re, pr[4], &vr), (lv.pa_value_im, pr[5], &vi)] {
+                        let mut part = vec![0i64; w];
+                        transposed(&t[material..material + n * w], reach, w, cov, MATERIAL_BITS, &mut part)?;
+                        for (slot, v) in back.iter_mut().zip(&part) {
+                            *slot += *v as i128;
+                        }
+                    }
+                    let next: Vec<i64> = collect_exact(dx[i].iter().zip(&back).map(|(a, b)| fit64(*a as i128 + b)))?;
+                    dx[i] = next;
+                    for (slot, cov) in charts.iter_mut().zip([qr, qi, kr, ki, vr, vi]) {
+                        slot.push(cov);
+                    }
+                }
+                let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
+                for (material, cov) in [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im].into_iter().zip(&charts) {
+                    outer_sum(&mut g[material..material + n * w], w, cov, &inputs)?;
+                }
+                let part_of = |i: usize| cells[i].levels[l].participation.as_ref().expect("checked above");
+                let pa_reads: Vec<&[i32]> = (0..cells_n).map(|i| part_of(i).read.as_slice()).collect();
+                let y_re: Vec<Vec<i64>> = (0..cells_n).map(|i| part_of(i).current.iter().map(|c| c.0).collect()).collect();
+                let y_im: Vec<Vec<i64>> = (0..cells_n).map(|i| part_of(i).current.iter().map(|c| c.1).collect()).collect();
+                outer_sum(&mut g[lv.pa_contact..lv.pa_contact + f * w], w, &das, &pa_reads)?;
+                outer_sum(&mut g[lv.pa_read_re..lv.pa_read_re + w * n], n, &pa_dreads, &y_re)?;
+                outer_sum(&mut g[lv.pa_read_im..lv.pa_read_im + w * n], n, &pa_negs, &y_im)?;
+            }
             // The opening's credit: the covector reaching the carried state, a = conj(λ_0) G_h(0),
             // meets the moments its history carried (see [`LevelCredit`]).
             if let Some(credit) = opening.credit.as_ref().map(|c| &c[l]) {
@@ -3826,6 +4086,10 @@ impl Tower {
         if let Some(clock) = self.news {
             s.push_str(&clock.to_text());
         }
+        if let Some(p) = &self.participation {
+            s.push_str(&p.to_text());
+            s.push('\n');
+        }
         s
     }
 
@@ -3857,6 +4121,9 @@ impl Tower {
             n += 5;
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("news-clock ")) {
+            n += 1;
+        }
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("participation ")) {
             n += 1;
         }
         n
@@ -3933,12 +4200,14 @@ impl Tower {
             None => None,
         };
         let news = lines.next_if(|l| l.starts_with("news-clock ")).map(NewsClock::from_text).transpose()?;
+        let participation = lines.next_if(|l| l.starts_with("participation ")).map(ParticipationDeclaration::from_text).transpose()?;
         let layout = Layout::new(
             &declaration,
             pair.as_ref().map_or(0, |face| face.forms()),
             ring.as_ref().map_or(0, RingFace::ranks),
             ring.as_ref().map_or(0, RingFace::harmonics),
             strands.as_ref().map_or(0, Strands::parts),
+            participation.as_ref(),
         );
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
@@ -3946,7 +4215,7 @@ impl Tower {
         // The rotor, the strands and the news clock join by their own laws, so a text that holds
         // them together is read under the same refusals as their joins; the strands' material is
         // the text's.
-        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
         if let Some(rotor) = rotor {
             tower.join_rotor(rotor)?;
         }
@@ -3957,6 +4226,14 @@ impl Tower {
         }
         if let Some(clock) = news {
             tower.join_news(clock)?;
+        }
+        if let Some(p) = participation {
+            tower.admits_participation(&p)?;
+            tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p));
+            if tower.theta.len() != tower.layout.len {
+                return refuse("material of the wrong extent");
+            }
+            tower.participation = Some(p);
         }
         Ok(tower)
     }
@@ -3970,6 +4247,9 @@ impl Tower {
         if self.pair.is_some() {
             return refuse("a tower takes one pair face");
         }
+        if self.participation.is_some() {
+            return refuse("participation joins last: its material follows every other part's");
+        }
         if self.ring.is_some() {
             return refuse("a pair face joins before a ring face (the ring's readout follows the pair's material)");
         }
@@ -3979,7 +4259,7 @@ impl Tower {
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0, 0);
+        let layout = Layout::new(d, face.forms(), 0, 0, 0, None);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -4002,6 +4282,9 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
+        if self.participation.is_some() {
+            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+        }
         if self.rotor.is_some() {
             return refuse("a ring face beside a rotor: the ring's law under a step is owed");
         }
@@ -4012,7 +4295,7 @@ impl Tower {
             return refuse("a ring face joins before strands (the strands' material follows the ring's)");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0);
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0, None);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -4043,6 +4326,9 @@ impl Tower {
         if self.rotor.is_some() {
             return refuse("a tower takes one rotor");
         }
+        if self.participation.is_some() {
+            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+        }
         if self.ring.is_some() {
             return refuse("a rotor beside a ring face: the ring's law under a step is owed");
         }
@@ -4067,6 +4353,9 @@ impl Tower {
         if self.news.is_some() {
             return refuse("a tower takes one news clock");
         }
+        if self.participation.is_some() {
+            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+        }
         if self.declaration.pumped {
             return refuse("a news clock under a pump: the reflection over a clocked move is owed");
         }
@@ -4086,6 +4375,57 @@ impl Tower {
         self.news
     }
 
+    /// Whether this tower admits a participation of this declaration: over its whole bank, on gated
+    /// modes (a site's frame is the product of the cells' unit moves), and not beside a rotor (it
+    /// moves modes between frames), a ring face or a news clock (their participation is owed).
+    fn admits_participation(&self, p: &ParticipationDeclaration) -> Result<()> {
+        if p.modes() != self.declaration.modes {
+            return refuse("a participation whose heads do not span the bank");
+        }
+        if !self.declaration.gated {
+            return refuse("participation reads gated modes: a site's frame is the product of the cells' unit moves");
+        }
+        if self.rotor.is_some() || self.ring.is_some() || self.news.is_some() {
+            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+        }
+        Ok(())
+    }
+
+    /// [agent-inferred, October 29] **Participation joined to the tower**
+    /// ([`participation`]; record `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`): each level
+    /// gains the charts `Ȟ, H, Ψ`, founded as the push is (a copy of it, so a site's charts open at
+    /// its push's scale), the current's read `Cᵃ`, founded as the modes' read is (a copy), the
+    /// contacts' `W₁ᵃ` at zero, so the joined tower opens on itself face for face and the first
+    /// deposit reaches `W₁ᵃ`, and each head's friction at one, so a head first forgets as its rung
+    /// does. Its material follows every other part's, so it joins last. A stream rested before the
+    /// join is rested again.
+    pub fn join_participation(&mut self, p: ParticipationDeclaration) -> Result<()> {
+        if self.participation.is_some() {
+            return refuse("a tower takes one participation");
+        }
+        self.admits_participation(&p)?;
+        let d = self.declaration;
+        let (n, w) = (d.modes, d.width);
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p));
+        self.theta.resize(layout.len, 0);
+        for lv in &layout.levels {
+            for (to, from) in [(lv.pa_probe_re, lv.push_re), (lv.pa_probe_im, lv.push_im), (lv.pa_key_re, lv.push_re), (lv.pa_key_im, lv.push_im), (lv.pa_value_re, lv.push_re), (lv.pa_value_im, lv.push_im)] {
+                self.theta.copy_within(from..from + n * w, to);
+            }
+            self.theta.copy_within(lv.read_re..lv.read_re + w * n, lv.pa_read_re);
+            self.theta.copy_within(lv.read_im..lv.read_im + w * n, lv.pa_read_im);
+            self.theta[lv.pa_friction..lv.pa_friction + p.heads.len()].fill(1 << FACE_BITS);
+        }
+        self.layout = layout;
+        self.participation = Some(p);
+        Ok(())
+    }
+
+    /// The participation, when it is joined.
+    pub fn participation(&self) -> Option<&ParticipationDeclaration> {
+        self.participation.as_ref()
+    }
+
     /// The rotor, when one is joined.
     pub fn rotor(&self) -> Option<&Rotor> {
         self.rotor.as_ref()
@@ -4101,11 +4441,14 @@ impl Tower {
         if self.strands.is_some() {
             return refuse("a tower takes one set of strands");
         }
+        if self.participation.is_some() {
+            return refuse("participation joins last: its material follows every other part's");
+        }
         let d = &self.declaration;
         if (strands.levels, strands.alphabet, strands.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("strands of another tower's shape");
         }
-        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts());
+        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts(), None);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.strands = Some(strands);
@@ -4681,6 +5024,15 @@ impl TowerLearner {
     pub fn join_news(&mut self, clock: NewsClock) -> Result<()> {
         self.tower.join_news(clock)
     }
+
+    /// Participation joined to the learner's tower ([`Tower::join_participation`]): its families'
+    /// moments open at zero.
+    pub fn join_participation(&mut self, p: ParticipationDeclaration) -> Result<()> {
+        self.tower.join_participation(p)?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
+    }
 }
 
 impl Tower {
@@ -4735,8 +5087,17 @@ impl Tower {
         Ok(moved)
     }
 
-    /// Every move back inside its disk, `|λ| ≤ 1 − 2^(−12)`.
+    /// Every move back inside its disk, `|λ| ≤ 1 − 2^(−12)`, and every head's friction at or above
+    /// zero (a friction below zero would pump).
     fn project(&mut self) {
+        if let Some(p) = &self.participation {
+            let heads = p.heads.len();
+            for lv in self.layout.levels.clone() {
+                for v in &mut self.theta[lv.pa_friction..lv.pa_friction + heads] {
+                    *v = (*v).max(0);
+                }
+            }
+        }
         let radius = (1i128 << MOVE_BITS) - (1i128 << (MOVE_BITS - MARGIN));
         for lv in self.layout.levels.clone() {
             for k in 0..self.declaration.modes {
@@ -7157,6 +7518,160 @@ mod tests {
         let strand_families = if tower.declaration.contact == ContactLaw::Rectifying { 1 } else { 2 };
         assert!(tower.strands.is_none() || strands_checked == strand_families, "the strands' material carried {strands_checked} readable covectors of {strand_families}");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
+    }
+
+    /// A tiny gated tower of four modes with participation joined over a section of sixteen, its
+    /// heads the founded memory's runs; `opened` fills `W₁ᵃ` so the current conducts.
+    fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
+        let mut tower = tiny_contacts(2, 4, 4, true, false, false, contact);
+        let lv = tower.layout.levels[0];
+        let moduli: Vec<i128> = (0..4).map(|k| modulus_and_gamma(tower.theta[lv.move_re + k] as i128, tower.theta[lv.move_im + k] as i128).0).collect();
+        let founded = ParticipationDeclaration::founded(&moduli, 16).expect("declared");
+        let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { founded };
+        tower.join_participation(heads).expect("joined");
+        if opened {
+            // W₁ᵃ at the returns' scale, and the probe and key charts raised so the pairing moves
+            // the weights (opened at the push's scale, a tiny tower's pairing reads below a bit).
+            let k = keys(8192);
+            let mut i = 3000;
+            for lv in tower.layout.levels.clone() {
+                for v in &mut tower.theta[lv.pa_contact..lv.pa_contact + 16] {
+                    *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) * 8;
+                    i += 1;
+                }
+                for v in &mut tower.theta[lv.pa_probe_re..lv.pa_key_im + 16] {
+                    *v *= 2;
+                }
+            }
+        }
+        tower
+    }
+
+    fn participation_families(tower: &Tower) -> Vec<usize> {
+        tower.layout.levels.iter().flat_map(|lv| [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im, lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction]).collect()
+    }
+
+    #[test]
+    fn a_closed_participation_opens_on_the_plain_tower_face_for_face_and_covector_for_covector() {
+        for contact in [ContactLaw::Rectifying, ContactLaw::Pair] {
+            let plain = tiny_contacts(2, 4, 4, true, false, false, contact);
+            let joined = tiny_participating(contact, false);
+            assert_eq!(&joined.theta[..plain.theta.len()], &plain.theta[..]);
+            let (mut a, mut b) = (plain.rest(), joined.rest());
+            let ca = plain.forward(&mut a, &PASSAGE, &plain.reaches()).expect("forward");
+            let cb = joined.forward(&mut b, &PASSAGE, &joined.reaches()).expect("forward");
+            for (x, y) in ca.iter().zip(&cb) {
+                assert_eq!((&x.face.masses, x.face.total), (&y.face.masses, y.face.total));
+            }
+            assert_eq!(a.modes, b.modes);
+            let ga = plain.reverse(&plain.rest(), &ca, &PASSAGE, None).expect("reverse");
+            let gb = joined.reverse(&joined.rest(), &cb, &PASSAGE, None).expect("reverse");
+            assert_eq!(&gb[..ga.len()], &ga[..]);
+            // The first deposit reaches W₁ᵃ alone: the charts, the current's read and the friction
+            // carry no covector while W₁ᵃ is zero.
+            let pa_contacts: Vec<usize> = joined.layout.levels.iter().map(|lv| lv.pa_contact).collect();
+            for &(start, len, _) in joined.layout.families.iter().filter(|(start, _, _)| participation_families(&joined).contains(start)) {
+                let reached = gb[start..start + len].iter().any(|&v| v != 0);
+                assert_eq!(reached, pa_contacts.contains(&start), "family at {start}");
+            }
+            // Learner for learner, with participation's families held.
+            let mut lp = TowerLearner::new(plain.clone(), 6);
+            let mut lj = TowerLearner::new(joined.clone(), 6);
+            lj.held = participation_families(&joined).iter().map(|&start| {
+                let &(_, len, _) = joined.layout.families.iter().find(|(s, _, _)| *s == start).expect("a family");
+                start..start + len
+            }).collect();
+            let (mut sp, mut sj) = (vec![plain.rest()], vec![joined.rest()]);
+            lp.section(&mut sp, &[&PASSAGE]).expect("section");
+            lj.section(&mut sj, &[&PASSAGE]).expect("section");
+            assert_eq!(&lj.tower.theta[..lp.tower.theta.len()], &lp.tower.theta[..]);
+            assert_eq!(sp[0].modes, sj[0].modes);
+        }
+    }
+
+    #[test]
+    fn the_participation_covector_matches_the_code_difference() {
+        for contact in [ContactLaw::Rectifying, ContactLaw::Pair] {
+            let tower = tiny_participating(contact, true);
+            let opening = tower.rest();
+            let mut s = opening.clone();
+            let cells = tower.forward(&mut s, &PASSAGE, &tower.reaches()).expect("forward");
+            let mut g = tower.reverse(&opening, &cells, &PASSAGE, None).expect("reverse");
+            tower.to_step_grain(&mut g);
+            let conducting = |t: &Tower| -> Vec<u32> {
+                let mut s = t.rest();
+                let cells = t.forward(&mut s, &PASSAGE, &t.reaches()).expect("forward");
+                cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| u32::from(a > 0)).collect::<Vec<_>>())).collect()
+            };
+            let base = conducting(&tower);
+            let base_code = code(&tower, &PASSAGE);
+            let families = participation_families(&tower);
+            let mut checked = Vec::new();
+            for &(start, len, grain) in tower.layout.families.iter().filter(|(start, _, _)| families.contains(start)) {
+                let mut order: Vec<usize> = (start..start + len).collect();
+                order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
+                'parameter: for i in order {
+                    let gi = g[i];
+                    if gi.abs() < 1i128 << (STEP_BITS - 6) {
+                        break;
+                    }
+                    // Steps of 2^(−8) units: participation's weights and current release at the face's
+                    // grain, so on the tiny tower 2^(−10) steps read within its rounding.
+                    let h = 1i32 << (grain - 8);
+                    let (mut moment, mut spread) = (0i128, 0i128);
+                    for k in (-8i32..=8).filter(|&k| k != 0) {
+                        let mut moved = tower.clone();
+                        moved.theta[i] += k * h;
+                        if conducting(&moved) != base {
+                            continue 'parameter;
+                        }
+                        moment += k as i128 * (code(&moved, &PASSAGE) - base_code) as i128;
+                        spread += (k * k) as i128;
+                    }
+                    let numeric = (moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread);
+                    assert!((numeric - gi).abs() * 10 <= gi.abs(), "{contact:?}: family at {start} grain {grain}, parameter {i}: covector {gi} against {numeric}");
+                    checked.push(start);
+                    break;
+                }
+            }
+            // Every level's W₁ᵃ, the current's read, and charts of each kind carry a readable covector.
+            let level_of = |lv: &LevelLayout, kinds: &[usize]| kinds.iter().filter(|k| checked.contains(k)).count() > 0 && kinds.iter().all(|&k| families.contains(&k)) && lv.pa_contact > 0;
+            for lv in &tower.layout.levels {
+                assert!(checked.contains(&lv.pa_contact), "{contact:?}: W₁ᵃ at {} carried no readable covector", lv.pa_contact);
+                assert!(level_of(lv, &[lv.pa_read_re, lv.pa_read_im]), "{contact:?}: the current's read carried no readable covector");
+            }
+            for kinds in [[0usize, 1], [2, 3], [4, 5]] {
+                let starts: Vec<usize> = tower.layout.levels.iter().flat_map(|lv| [[lv.pa_probe_re, lv.pa_probe_im], [lv.pa_key_re, lv.pa_key_im], [lv.pa_value_re, lv.pa_value_im]][kinds[0] / 2]).collect();
+                assert!(starts.iter().any(|s| checked.contains(s)), "{contact:?}: charts {kinds:?} carried no readable covector");
+            }
+        }
+    }
+
+    #[test]
+    fn a_participating_tower_and_its_learner_restore_exactly() {
+        let tower = tiny_participating(ContactLaw::Rectifying, true);
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let mut learner = TowerLearner::new(tower.clone(), 6);
+        let mut states = vec![tower.rest()];
+        learner.section(&mut states, &[&PASSAGE]).expect("section");
+        let restored = TowerLearner::from_text(&learner.to_text()).expect("restored");
+        assert_eq!(restored.to_text(), learner.to_text());
+    }
+
+    #[test]
+    fn participation_refuses_what_it_does_not_carry() {
+        let ungated = tiny_contacts(2, 4, 4, false, false, false, ContactLaw::Rectifying);
+        let p = ParticipationDeclaration::new(vec![2, 2], 16, 1).expect("declared");
+        assert!(ungated.clone().join_participation(p.clone()).is_err());
+        assert!(tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying).join_participation(ParticipationDeclaration::new(vec![3], 16, 1).expect("declared")).is_err());
+        let mut joined = tiny_participating(ContactLaw::Rectifying, false);
+        assert!(joined.join_participation(p).is_err());
+        assert!(joined.join_news(NewsClock::new(4, 2).expect("a clock")).is_err());
+        // A section longer than the participation's is refused at its reverse.
+        let long: Vec<usize> = (0..24).map(|i| i % 4).collect();
+        let mut s = joined.rest();
+        let cells = joined.forward(&mut s, &long, &joined.reaches()).expect("forward");
+        assert!(joined.reverse(&joined.rest(), &cells, &long, None).is_err());
     }
 
     #[test]

@@ -447,6 +447,9 @@ pub struct ResidentLaw {
     pub rotor: Option<ResidentRotor>,
     pub strands: Option<ResidentStrands>,
     pub news: Option<NewsClock>,
+    /// The levels' participation, when it is joined: a realization that does not carry it refuses
+    /// the tower.
+    pub participation: Option<super::ParticipationDeclaration>,
 }
 
 impl Tower {
@@ -616,6 +619,7 @@ impl Tower {
             }),
             strands: self.strands.as_ref().map(|strands| ResidentStrands::of(strands, self.layout.strand_contact, self.layout.strand_pair, reaches.strands, self.declaration.alphabet)).transpose()?,
             news: self.news,
+            participation: self.participation.clone(),
         })
     }
 }
