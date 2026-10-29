@@ -121,6 +121,84 @@ theorem sourceDerivedScatter_involutive
   rw [map_sub, map_smul, hP]
   module
 
+/-- [proved-derived; formal-checked] **A reflection about an idempotent's range has determinant
+`(−1)^dim ker`.** On a finite-dimensional space `E = range P ⊕ ker P`, the scatter `2P − 1` fixes
+the range and negates the kernel, so it is conjugate to `id × (−id)`: each kernel direction is one
+half-turn, and the determinant is the parity of their count (`JunctionLaw`'s circuit of `k`
+reflections). -/
+theorem det_two_smul_sub_id_of_idempotent {K E : Type*} [Field K] [AddCommGroup E] [Module K E]
+    [FiniteDimensional K E] (P : E →ₗ[K] E) (hP : IsIdempotentElem P) :
+    LinearMap.det ((2 : K) • P - LinearMap.id) =
+      (-1) ^ Module.finrank K (LinearMap.ker P) := by
+  let e := Submodule.prodEquivOfIsCompl _ _ (LinearMap.IsIdempotentElem.isCompl hP)
+  have hconj : (2 : K) • P - LinearMap.id =
+      (e : (LinearMap.range P × LinearMap.ker P) →ₗ[K] E) ∘ₗ
+        LinearMap.prodMap LinearMap.id (-LinearMap.id) ∘ₗ
+        (e.symm : E →ₗ[K] (LinearMap.range P × LinearMap.ker P)) := by
+    apply LinearMap.ext
+    intro x
+    obtain ⟨y, rfl⟩ := e.surjective x
+    rw [LinearMap.comp_apply, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearEquiv.coe_coe,
+      LinearEquiv.symm_apply_apply]
+    obtain ⟨⟨a, ha⟩, ⟨b, hb⟩⟩ := y
+    have hPa : P a = a := (LinearMap.IsIdempotentElem.mem_range_iff hP).mp ha
+    have hPb : P b = 0 := LinearMap.mem_ker.mp hb
+    simp only [e, Submodule.coe_prodEquivOfIsCompl', LinearMap.prodMap_apply,
+      LinearMap.id_apply, LinearMap.neg_apply, Submodule.coe_neg, LinearMap.sub_apply,
+      LinearMap.smul_apply, map_add, hPa, hPb]
+    module
+  have hneg : (-LinearMap.id : LinearMap.ker P →ₗ[K] LinearMap.ker P) =
+      (-1 : K) • LinearMap.id := by
+    ext; simp
+  rw [hconj, LinearMap.det_conj, LinearMap.det_prodMap, LinearMap.det_id, one_mul, hneg,
+    LinearMap.det_smul, LinearMap.det_id, mul_one]
+
+theorem sourceDerivedProjection_isIdempotentElem
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv) :
+    IsIdempotentElem (sourceDerivedProjection D Dt Kinv) :=
+  LinearMap.ext (sourceDerivedProjection_idempotent D Dt Kinv hsolve)
+
+/-- [proved-derived; formal-checked] **The source-derived projection's kernel is the graph of
+`−D`**, `ker P = {(−D b, b)}`, so it is a copy of `W`. The normal solve makes `Kinv` surjective,
+hence injective on a finite-dimensional `V`, and `P(q,b) = 0` forces `q + D b = 0`. -/
+noncomputable def sourceDerivedProjection_kerEquiv [FiniteDimensional ℝ V]
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv) :
+    W ≃ₗ[ℝ] LinearMap.ker (sourceDerivedProjection D Dt Kinv) := by
+  have hinj : Function.Injective Kinv := by
+    have hsurj : Function.Surjective Kinv := fun v =>
+      ⟨(LinearMap.id + D.comp Dt : V →ₗ[ℝ] V) v, by simpa using LinearMap.congr_fun hsolve v⟩
+    exact LinearMap.injective_iff_surjective.mpr hsurj
+  refine LinearEquiv.ofBijective
+    (LinearMap.codRestrict _ (LinearMap.prod (-D) LinearMap.id) fun w => ?_) ⟨?_, ?_⟩
+  · simp [LinearMap.mem_ker, sourceDerivedProjection]
+  · intro w w' h
+    have := congrArg (fun x => (Subtype.val x).2) h
+    simpa using this
+  · rintro ⟨x, hx⟩
+    refine ⟨x.2, ?_⟩
+    have hx' : Kinv (x.1 + D x.2) = 0 := by
+      have := congrArg Prod.fst (LinearMap.mem_ker.mp hx)
+      simpa [sourceDerivedProjection] using this
+    have h0 : x.1 + D x.2 = 0 := hinj (by rw [hx', map_zero])
+    apply Subtype.ext
+    simp only [LinearMap.codRestrict_apply, LinearMap.prod_apply]
+    exact Prod.ext (eq_neg_of_add_eq_zero_left h0).symm rfl
+
+/-- [proved-derived; formal-checked] **The source-derived scatter has determinant `(−1)^dim W`.**
+The scatter `S = 2P − 1` is the half-turn about the solution subspace `range P`, whose
+codimension in `V × W` is `dim W` (`sourceDerivedProjection_kerEquiv`), so
+`det S = (−1)^codim`: it reverses orientation exactly when the source operand has odd
+dimension. -/
+theorem sourceDerivedScatter_det [FiniteDimensional ℝ V] [FiniteDimensional ℝ W]
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv) :
+    LinearMap.det (sourceDerivedScatter D Dt Kinv) = (-1) ^ Module.finrank ℝ W := by
+  rw [sourceDerivedScatter,
+    det_two_smul_sub_id_of_idempotent _ (sourceDerivedProjection_isIdempotentElem D Dt Kinv hsolve),
+    (sourceDerivedProjection_kerEquiv D Dt Kinv hsolve).finrank_eq]
+
 def jointHeldLinearPart {X : Type*} [AddCommGroup X] [Module ℝ X]
     (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) : X →ₗ[ℝ] X :=
   ((LinearMap.id : X →ₗ[ℝ] X) - hold).comp (mu • scatter)
@@ -651,6 +729,9 @@ section Audit
 #print axioms MetricGradientChart.lower_gradient
 #print axioms sourceDerivedProjection_idempotent
 #print axioms sourceDerivedScatter_involutive
+#print axioms det_two_smul_sub_id_of_idempotent
+#print axioms sourceDerivedProjection_kerEquiv
+#print axioms sourceDerivedScatter_det
 #print axioms jointHeldRelaxation_linear_part
 #print axioms sourceDerived_jointHeldPullback
 #print axioms sourceDerived_jointHeldRelaxation_scatter_invariant

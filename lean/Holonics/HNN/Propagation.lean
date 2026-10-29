@@ -34,7 +34,9 @@ transit    α_g = ι_gᵀ o_g,  α_h = ι_hᵀ o_h,   M_a ω = 2C w + h(α_g −
    one current into shares and their recombination (objects §3,
    `docs/ELEMENTARY_OBJECTS.md#the-swing`; the motion record's §6; named the junction Swing until
    September 28). Hence it is an involution (`junctionScattering_involutive`, from
-   `sourceDerivedScatter_involutive`), and it is a `W`-isometry for any weights with nonzero sum
+   `sourceDerivedScatter_involutive`) of determinant `(−1)^(#ports · dim V)`, one half-turn per
+   contact-port direction (`junctionScattering_det`, from `sourceDerivedScatter_det`), and it is a
+   `W`-isometry for any weights with nonzero sum
    (`junctionScattering_isometry`): it conserves the joint weighted norm and does no work. With one contact port it is exactly the scalar two-port junction of
    `HolonicConstitutiveCirculation`, whose conserved weighted square energy
    (`weighted_square_energy`) is the isometry's two-port case (`junctionScattering_twoPort`).
@@ -239,6 +241,20 @@ theorem junctionScattering_involutive (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 0)
     junction Y G (junction Y G x) = x := by
   rw [junction_eq_sourceDerivedScatter Y G hY hsum, junction_eq_sourceDerivedScatter Y G hY hsum]
   exact sourceDerivedScatter_involutive _ _ _ (junction_normalSolve Y G hY hsum) x
+
+/-- [proved-derived; formal-checked] **The junction scattering has determinant
+`(−1)^(#ports · dim V)`.** The junction is the source-derived scatter
+(`junction_eq_sourceDerivedScatter`), the half-turn about the common-potential subspace, whose
+codimension is the contact ports' whole space `ι → V`; so `det = (−1)^codim`
+(`sourceDerivedScatter_det`). It preserves orientation exactly when the ports carry an even
+number of dimensions. -/
+theorem junctionScattering_det [FiniteDimensional ℝ V] (Y : ℝ) (G : ι → ℝ) (hY : Y ≠ 0)
+    (hsum : admittanceSum Y G ≠ 0) :
+    LinearMap.det (sourceDerivedScatter (participationMap (V := V) Y G) diagonalPorts
+        (junctionSolve Y G)) =
+      (-1) ^ (Fintype.card ι * Module.finrank ℝ V) := by
+  rw [sourceDerivedScatter_det _ _ _ (junction_normalSolve Y G hY hsum),
+    Module.finrank_pi_fintype ℝ, Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
 end Junction
 
@@ -939,6 +955,7 @@ section Audit
 #print axioms junction_anchor_preserved
 #print axioms junction_eq_sourceDerivedScatter
 #print axioms junctionScattering_involutive
+#print axioms junctionScattering_det
 #print axioms junctionScattering_isometry
 #print axioms junctionScattering_twoPort
 #print axioms transit_balance
