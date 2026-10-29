@@ -1,6 +1,6 @@
 # A coarse level's sites are its own ticks, carried across sections, so its heads reach across the passage's partition
 
-Refs #404 #406. Status: [built on the host and tested (§5); the card ported, its parity on the 4080 owed; agent-inferred, October 29].
+Refs #404 #406. Status: [built on the host and the card and tested, parity at the race's declaration on the 4080 (§5); the measurement (acceptance 7) running; agent-inferred, October 29].
 Claude (opus), design lead. The first of the October 28 expansions in the order fixed by
 [the audit](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#4-the-order-now):
 the consumer of [the radix record §1](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#1-a-value-is-a-radix-move-and-the-towers-modes-are-registers-in-their-own-radices)
@@ -138,7 +138,7 @@ Tests (`hnn::tower`, 116 of 116 with these):
 - `a_clocked_states_text_restores_each_levels_sites_and_held_current` and the growth test on the
   clocked participating tower (acceptance 5).
 
-[source-inspected; owed on the 4080] **The card** (`kernels/tower.cu`, `TowerCard`): the forward
+[source-inspected; measured on the 4080] **The card** (`kernels/tower.cu`, `TowerCard`): the forward
 keeps each level's carried count and members in the block (`pa_open` `[S][L]`, `pa_member`),
 admits a site only at a tick, turns the frame `Δτ` times, reads the held current (`pa_hold`) at a
 cell the level is still at, and closes each level's section within a call; the ends return each
@@ -152,6 +152,13 @@ the class-by-class advance, and a section read on across calls and closed within
 covector over carried sites the host's). `tower_pass parity … NEWS_BITS NEWS_RADIX participating`
 runs the race's declaration; `train-two-ladder-news-participating-tower-classes` is the race's
 command.
+
+**Acceptance 6 on the 4080.** On the RTX 4080 SUPER at `16689828d` (B-PC, under the card lock),
+the kernel compiled on the first build; `tower_pass` passed 39 of 39 in 23.9 s, the five tests
+above among them. `tower_pass parity … 8 2 participating` at the race's declaration: 32 sections at
+24 streams, 98,304 faces and 21,076,000 covector entries equal and every learner equal (host
+52,717 ms, card 12,242 ms); 4 sections at 320 streams, 163,840 faces and 2,634,500 entries equal
+(host 71,890 ms, card 12,219 ms; peak resident set 5.66 GB).
 
 **A reading beside acceptance 7** [agent-inferred, from the unified-theory thread]: in
 `participation_return`, `g_z = ln 2 · a ⊙ (g_a − ⟨a, g_a⟩)` vanishes on a head whose weights sit on
