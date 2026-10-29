@@ -859,8 +859,18 @@ at every step it makes the encoding a descent of that medium. Lean:
 `Foundation/ChangingReceiverRetention` (`present_or_later_separator`, `wordDefect_cons`,
 `phaseAgreement_of_encode_eq`, and the dormant loop of the hollow triangle, released by the node
 receivers and kept for the harmonic clock admitted at phase 1,
-`Triangle.loop_later_phase_separator`). A receiver admitted by an action rather than by the clock
-is owed in #410.
+`Triangle.loop_later_phase_separator`). When an action admits a receiver by what it meets in the
+present rather than by the clock, a receiver not reached returns no reading, and the separator a
+later word returns is either an admission (reached at one present and not the other) or a reading;
+under a clock admission never separates, while a contact on the hollow triangle's cycle separates
+the dormant loop from zero by admission alone (`present_or_admitted_separator`,
+`clocked_admittedFuture_iff`, `Triangle.loop_admission_separator`). Along an action stream the
+defect is the exact orbit of the moves driven by the step defects, so a carried release at a
+declared grain splits it into a released part and a remainder that sum to it; released into a
+subgroup every decoder leaves unread and every move keeps, it costs no reading: each receiver reads
+the true present through the moved encoding plus the carried remainder, and a defect released
+whole there keeps the descent (`observe_eq_decode_remainder`, `phaseAgreement_of_defect_mem`,
+`defectRelease_unitGrain`).
 
 <a id="the-retention-contract"></a>
 <a id="collapse-relative-to-the-admitted-future"></a>
