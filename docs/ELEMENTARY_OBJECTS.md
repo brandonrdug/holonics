@@ -415,7 +415,11 @@ storage.
 linear rate splits uniquely as `A = T + B`, with `T` `G`-skew (the turn) and `B` `G`-self-adjoint (the
 boost), and `Ė = xᵀGBx + ½xᵀĠx + xᵀGf` for `ẋ = Ax + f`. Recharting moves neither part; a different
 receiver's metric can. The spectrum, each mode's `λ = β + iθ`, is the conserved face, and the split
-agrees with it when `A` is `G`-normal. In the Holon's quadratic chart `ẋ = (J − R)Qx + Bu` the turn is
+agrees with it when `A` is `G`-normal. When it is not, the boost reads the response: the energy of
+every motion stays below `e^(2λt)` times its start exactly when the boost's largest `G`-reading is at
+most `λ`, so `‖e^(tA)‖_G ≤ e^(t·λ_max(B))` and no smaller exponent holds
+(`Geometry/Motion.numerical_abscissa`). The lift-up of a sheared fluid mode decays in every mode while
+its energy grows (`Physics/Fluid/LiftUp`). In the Holon's quadratic chart `ẋ = (J − R)Qx + Bu` the turn is
 `JQ` and the boost `−RQ`. With the interval as metric every Lorentz move is skew: the rotation/boost
 split needs an observer. A complex channel `ż = (β + iθ)z` carries its turn as its frequency and its
 boost as its growth.

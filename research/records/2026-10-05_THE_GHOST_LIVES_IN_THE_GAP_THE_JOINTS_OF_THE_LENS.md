@@ -202,6 +202,15 @@ pseudospectrum) holds.
 `G`-reading (the numerical abscissa), and its consumer in the Navier–Stokes owners. Owners joined:
 `motion.turn-boost-split`, `motion.energy-moving-metric`, `receipt.spectrum-not-response`.
 
+[proved-standard; formal-checked] **Since discharged in #410.** The energy of every motion
+`e^(tA) y` stays below `e^(2λt)` times its start exactly when the boost's largest `G`-reading is at
+most `λ`, so `‖e^(tA)‖_G ≤ e^(t·λ_max(B))` and no smaller exponent bounds every motion
+(`Geometry/Motion.numerical_abscissa`, atlas `motion.numerical-abscissa`). The Navier–Stokes consumer
+is the lift-up of a streamwise-constant Fourier mode of uniform shear, `u̇ = −νk²u − Sv`,
+`v̇ = −νk²v`: every mode decays at `νk²`, the response is bounded at `|S|/2 − νk²` and at nothing
+smaller, and at `S = 1`, `νk² = 1/10` the energy from `(0, 1)` reaches `5e^(−2/5) > 1` at `t = 2`
+(`Physics/Fluid/LiftUp`, atlas `fluid.lift-up-transient`).
+
 ### J7. A fibre belongs to the reading, not to the object
 
 [proved-standard] Two cases where a reading fails to separate objects, and a richer receiver
@@ -315,7 +324,7 @@ nothing stays) are the two faces of one resonance set.
 ## 4. Owed in #62
 
 1. The three-distance theorem in the ratio chart over factored integers, for every `N` (J3).
-2. The numerical-abscissa bound `‖e^(tA)‖_G ≤ e^(t·λ_max(B))` and its Navier–Stokes consumer (J6).
+2. The numerical-abscissa bound `‖e^(tA)‖_G ≤ e^(t·λ_max(B))` and its Navier–Stokes consumer (J6); discharged in #410 (`Geometry/Motion.numerical_abscissa`, `Physics/Fluid/LiftUp`).
 3. A library constitution equal to the Harper/almost-Mathieu operator, with its gap labels
    `N = s + tα` read from `CarryWord` and an edge receiver whose channel count is `t` (J1).
 4. The Thouless integer of a parametron pump cycled around a gap, with the `ρ`-pump on `CarryWord`
