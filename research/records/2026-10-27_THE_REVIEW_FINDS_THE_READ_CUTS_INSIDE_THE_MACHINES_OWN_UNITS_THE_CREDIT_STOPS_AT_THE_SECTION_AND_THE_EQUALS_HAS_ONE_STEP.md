@@ -115,7 +115,8 @@ release apart on the two sides of that split.
 
 ## 3. What is naive, and what is not
 
-[agent-inferred] The tower has no attention, by law: the HNN keeps no key/value store, and a
+[superseded October 28 by [the participation record](2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md): the law refuses stores, not
+attention] [agent-inferred] The tower has no attention, by law: the HNN keeps no key/value store, and a
 selective recurrence holds the passage in its modes (two levels of 64 complex modes). That is not
 the naive part; the strands located 15,480 of 15,613 result digits from the state the tower
 already carries, so the operands are in the state. The units are not the naive part either: they

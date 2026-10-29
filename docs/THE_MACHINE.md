@@ -152,6 +152,15 @@ acoustic or motor chart is a boundary of it. Owners: Lean `Transport/HelicalPair
 [`holonic_chain/serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs))
 were port sources for the current contact owner `holon::contact`.
 
+[definition; agent-inferred, October 28] **Attention is the field's participation through its own
+transport.** The present site pairs its coholon chart with each earlier site's Holon chart through
+the turn the modes carried between them, the contact's friction dissipates that pairing along the
+dissipation they met, and the sites participate by the Gibbs face of the result, carried as the
+associative (mass, current) pair. Nothing is written to be looked up: the address is the transport.
+The selective tower is this law's participation-one restriction, and a fixed-geometry Transformer is
+its constant-move restriction. Owner and acceptance:
+[the participation record](../research/records/2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md).
+
 [project-postulate] **One picture, six general objects** ([winding guide](WINDING_CARRY_AND_PLACEMENT.md)).
 The pair unit continues into six objects. A design or worker brief states which it touches and
 keeps the rest attached:

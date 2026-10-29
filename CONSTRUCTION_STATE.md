@@ -17,6 +17,17 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 29: Claude retakes the lead; participation is the next law (host and card).** Codex led
+alone on October 27 and 28. The [audit](research/records/2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md)
+keeps its four theory records and its exact two-screw contact, which changes both participants and
+names the missing return (the joint reception gives no covector or deposit). It withdraws a course
+on the project's conversations (93% hosted-model replies), the class-stream live loop as Athena's
+I/O, a float notebook and the model intake. Brandon's October 27 ruling stands against the learner
+as built: the passage is streamed through it one octet after another. The
+[participation law](research/records/2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md)
+is next: each site reads every admitted earlier site through the modes' turn and dissipation. Mutual
+contact and the continuing body on the card follow, in that order.
+
 **October 27: the review stops the contact variants and the read meets the machine's units
 (host).** Seven rotor towers wrote 214 to 288 of 2,448 held-out calculations right at the equals and
 at most 26 of the 876 never met in training, below the 8-gram's 34. The

@@ -104,7 +104,10 @@ Enigma/Bombe reading is literal: rotors are parametron rings whose stepping is w
 carry, fixed material and reflector return through the producing operands, the key is the
 navigators' initial configuration, and the Bombe infers it by pairwise loop closure over the
 menu of contacts. It is never a database key: a key/query/value store, a slot table or an index by
-content or by a named subject is the index the lessons refuse (October 26). Dormant modes wait
+content or by a named subject is the index the lessons refuse (October 26). That refusal is of
+stores, never of attention: the participation of the passage's sites through the field's own
+transport, weighed by the relative turn and dissipation of its modes, is the field's operation
+([October 28](research/records/2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md)). Dormant modes wait
 for a fitting antecedent. **Learning is locating keys** —
 inferring configuration and gauge of relevant navigators from loop-closure constraints, which is
 compression (pruning) and navigation (the route). Resonating drives an existing mode at its
