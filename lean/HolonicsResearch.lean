@@ -1249,3 +1249,4 @@ import HolonicsResearch.HNN.RegionLoops
 import HolonicsResearch.HNN.PassageCredit
 import HolonicsResearch.HNN.RingHarmonics
 import HolonicsResearch.HNN.CertifiedSection
+import HolonicsResearch.Mathematics.OnePlaneRing
