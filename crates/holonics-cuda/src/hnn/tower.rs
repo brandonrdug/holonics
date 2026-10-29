@@ -1584,12 +1584,15 @@ impl<'c> TowerCard<'c> {
         (4 * multiprocessors).div_ceil(tiles).clamp(1, streams.max(1))
     }
 
-    /// The group sums' extent: the widest family's outputs times its groups.
+    /// The group sums' extent: the widest family's outputs times its groups, over every family's
+    /// rows and columns as [`TowerCard::outer_families`] launches them (a bias is one column more).
+    /// A family's groups depend on its own shape, so a family with no bias is listed beside the one
+    /// with: the pushes' and participation's charts `(n, w)` and `W₁ᵃ`'s `(f, w)`.
     fn partial_extent(shape: &Shape, multiprocessors: u32) -> usize {
         let (a, w, n, f, k) = (shape.alphabet as u32, shape.width as u32, shape.modes as u32, shape.contacts as u32, shape.forms as u32);
         let kp = shape.ring_reads().1 as u32;
         let c = 6 * shape.strand_rings as u32;
-        [(a, w + 1), (w, f + 1), (f, w + 1), (w, n), (n, w + 1), (a, k), (w, k), (a, kp), (f, c)]
+        [(a, w + 1), (w, f + 1), (f, w + 1), (f, w), (w, n), (n, w), (n, w + 1), (a, k), (w, k), (a, kp), (f, c)]
             .iter()
             .map(|&(rows, width)| (rows * width) as usize * Self::groups(rows, width, shape.streams as u32, multiprocessors) as usize)
             .max()
