@@ -161,6 +161,22 @@ restrictions; Athena's law is the one whose geometry is learned.
 
 ## 6. The card realization
 
+[proved-derived; agent-inferred, October 29] **The transport factors through each site's own frame.**
+With `U_t,m = Π_(k≤t) u_k,m` the running product of a mode's unit moves from the section's opening
+(`u_t = λ_t/|λ_t|`, the `unit` the gated and turned moves already carry) and
+`L_t,m = Σ_(k≤t) −log₂|λ_k,m|` (the `logs` they already carry), `e^(iΘ_ij,m) = U_i,m conj(U_j,m)` and
+`D_ij,m = L_i,m − L_j,m`. Rotating each site's charts back by its own frame,
+`q_i = conj(U_i) ⊙ Ȟ_i`, `k_j = conj(U_j) ⊙ H_j`, `w_j = conj(U_j) ⊙ Ψ_j`, gives
+
+```text
+s_ij = β_h Re⟨q_i, k_j⟩_h,      z_ij = s_ij − κ_h (L̄_i − L̄_j),      y_i = U_i ⊙ Σ_j a_ij w_j
+```
+
+so no arctangent and no winding enters the face (the winding stays in the lifted `Θ` for its own
+readings), every pairing is one complex inner product of two rotated charts, and the card's tiles
+are the online Gibbs reduction over them. On a pumped mode the move is real-linear, not a phase:
+the first build reads its turn part `α_t/|α_t|` and names the reflection's share as owed (§8).
+
 [definition; agent-inferred] On the RTX 4080 SUPER under `.local/gpu.lock`, beside the tower's
 forward and reverse in `kernels/tower.cu`:
 - per stream, level and head, the scores of a site against its admitted sites in tiles, the online
@@ -210,6 +226,8 @@ memory are projected from a one-to-three-minute read on the card before launch, 
   partition (the review's fix 2). Named here so it is not carried unrepaired.
 - **The transport's covector.** `Σ a dU Ψ` through `Θ` and `D` into the gates and turns.
 - **Curvature.** The path-dependent transport of a two-dimensional chart.
+- **The pump's reflection.** On a pumped mode the transport `α h + β conj(h)` is real-linear; the
+  first build pairs through its turn part only.
 
 ## 9. The guides repaired with this record
 
