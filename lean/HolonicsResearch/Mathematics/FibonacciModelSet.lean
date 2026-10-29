@@ -9,8 +9,9 @@ The record `research/records/2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBI
 (atlas `quasi.fibonacci-model-set`) reads the Fibonacci quasicrystal as a model set: physical space
 is one Galois colour of `ℤ[τ]`, the window lives in the conjugate, and inflation by the Pisot unit
 `τ` boosts the seen colour and contracts the hidden one, so the hidden colour is held as a window,
-never as a store. #410 owes it; this file proves the arithmetic of the two colours and of the
-inflation `a ↦ ab`, `b ↦ a`, exactly (`τ = Real.goldenRatio`, `τ′ = Real.goldenConj`).
+never as a store. #410 owes it; this file proves the arithmetic of the two colours, the
+inflation `a ↦ ab`, `b ↦ a`, and the window statement, exactly (`τ = Real.goldenRatio`,
+`τ′ = Real.goldenConj`).
 
 [proved-standard; formal-checked] What is proved.
 
@@ -30,8 +31,12 @@ inflation `a ↦ ab`, `b ↦ a`, exactly (`τ = Real.goldenRatio`, `τ′ = Real
 6. **One word, two colours** (`seen_length`, `hidden_length`, `hidden_length_tendsto_zero`): the
    same inflated word measures `τⁿ⁺¹` in the seen colour and `τ′ⁿ⁺¹ → 0` in the hidden one.
 
-Owed (#410): the window statement itself, that every vertex `m + nτ` of the chain has its
-conjugate `m + nτ′` in `[−1, τ − 1)` and every such point of `ℤ[τ] ∩ [0, ∞)` is a vertex.
+7. **The chain is the model set** (`window`, `legal`, `legal_inflate`, `legal_iterate`,
+   `legal_prefix`, `vertex_mem_window`, `small_step`, `legal_cover`, `mem_window_vertex`,
+   `vertices_eq_model_set`): every vertex `m + nτ` of the chain (`m` short and `n` long tiles from
+   the origin) has its conjugate `m + nτ′` in the window `[−1, τ − 1)`, and every such point of
+   `ℤ[τ] ∩ [0, ∞)` is a vertex. The chain is one infinite word: each inflation of `a` is a prefix
+   of the next (`inflate_append`, `iterate_prefix`).
 
 The computational object is the helical pair interaction: a tile is a pair of colours of one
 element of `ℤ[τ]`, and inflation is the one move that turns the seen colour out and the hidden one
@@ -259,5 +264,230 @@ theorem hidden_length_tendsto_zero :
   have h := hidden_tendsto_zero.comp (Filter.tendsto_add_atTop_nat 1)
   refine h.congr fun n => ?_
   exact (hidden_length n).symm
+
+/-! ## The window
+
+The chain is read in the hidden colour as a walk: starting at `0`, a long tile `a` moves the hidden
+coordinate by `τ′` and a short tile `b` by `1`, and the walk is legal when it takes `a` exactly on
+`(τ − 2, τ − 1)` and `b` exactly on `(−1, τ − 2)`. Inflation multiplies a legal walk by `τ′`
+(`legal_inflate`), so every inflation of `a` is legal and its vertices lie over the window; a
+point of `ℤ[τ]` over the window between two consecutive vertices would differ from the first by an
+element whose two colours are both shorter than `τ`, and the only such elements are `0` and `1`
+(`small_step`), which the walk's rule excludes. -/
+
+section Window
+
+local notation "τ" => Real.goldenRatio
+local notation "ψ" => Real.goldenConj
+
+
+/-- [definition] The window `[−1, τ − 1)` in the hidden colour. -/
+def window : Set ℝ := Set.Ico (-1) (Real.goldenRatio - 1)
+
+/-- [definition] A walk read in the hidden colour from `x`: a long tile is taken exactly where
+`τ − 2 < x < τ − 1`, a short one exactly where `−1 < x < τ − 2`, each step moving `x` by the tile's
+hidden length (`τ′` or `1`), and the walk ends inside `(−1, τ − 1)`. -/
+def legal : ℝ → List Bool → Prop
+  | x, [] => -1 < x ∧ x < Real.goldenRatio - 1
+  | x, true :: w => Real.goldenRatio - 2 < x ∧ x < Real.goldenRatio - 1 ∧
+      legal (x + Real.goldenConj) w
+  | x, false :: w => -1 < x ∧ x < Real.goldenRatio - 2 ∧ legal (x + 1) w
+
+/-- [proved-standard; formal-checked] **Inflation is multiplication by `τ′` in the hidden colour:**
+a legal walk from `x` inflates to a legal walk from `τ′x`. -/
+theorem legal_inflate (w : List Bool) (x : ℝ) (h : legal x w) : legal (ψ * x) (inflate w) := by
+  have hs := Real.goldenRatio_sq
+  have h1 := Real.one_lt_goldenRatio
+  have h2 := Real.goldenRatio_lt_two
+  have hψ : ψ = 1 - τ := by linarith [Real.goldenRatio_add_goldenConj]
+  induction w generalizing x with
+  | nil =>
+    obtain ⟨ha, hb⟩ := h
+    simp only [inflate, legal, hψ]
+    constructor <;> nlinarith [mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < x + 1),
+      mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < τ - 1 - x)]
+  | cons c w ih =>
+    cases c with
+    | true =>
+      obtain ⟨ha, hb, hw⟩ := h
+      have hi := ih (x + ψ) hw
+      simp only [inflate, legal]
+      rw [show ψ * x + ψ + 1 = ψ * (x + ψ) by rw [hψ]; nlinarith]
+      refine ⟨?_, ?_, ?_, ?_, hi⟩ <;> rw [hψ] <;>
+        nlinarith [mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < x - (τ - 2)),
+          mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < τ - 1 - x)]
+    | false =>
+      obtain ⟨ha, hb, hw⟩ := h
+      have hi := ih (x + 1) hw
+      simp only [inflate, legal]
+      rw [show ψ * x + ψ = ψ * (x + 1) by ring]
+      refine ⟨?_, ?_, hi⟩ <;> rw [hψ] <;>
+        nlinarith [mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < x + 1),
+          mul_pos (by linarith : (0 : ℝ) < τ - 1) (by linarith : 0 < τ - 2 - x)]
+
+/-- [proved-standard; formal-checked] Every inflation of `a` is a legal walk from `0`. -/
+theorem legal_iterate (n : ℕ) : legal 0 (inflate^[n] [true]) := by
+  induction n with
+  | zero =>
+    simp only [Function.iterate_zero, id, legal, zero_add]
+    have h1 := Real.one_lt_goldenRatio
+    have h2 := Real.goldenRatio_lt_two
+    have := Real.goldenRatio_add_goldenConj
+    refine ⟨by linarith, by linarith, by linarith, by linarith⟩
+  | succ n ih =>
+    rw [Function.iterate_succ_apply']
+    simpa using legal_inflate _ 0 ih
+
+/-- [proved-standard; formal-checked] Along a legal walk every prefix lands in `(−1, τ − 1)`. -/
+theorem legal_prefix (w : List Bool) (x : ℝ) (h : legal x w) (p : List Bool) (hp : p <+: w) :
+    -1 < x + gaps ψ p ∧ x + gaps ψ p < τ - 1 := by
+  have h1 := Real.one_lt_goldenRatio
+  induction w generalizing x p with
+  | nil =>
+    rw [List.prefix_nil.mp hp]
+    simpa [gaps, legal] using h
+  | cons c w ih =>
+    rcases List.prefix_cons_iff.mp hp with rfl | ⟨t, rfl, ht⟩
+    · cases c with
+      | true => obtain ⟨ha, hb, _⟩ := h; simp only [gaps, add_zero]; constructor <;> linarith
+      | false => obtain ⟨ha, hb, _⟩ := h; simp only [gaps, add_zero]; constructor <;> linarith
+    · cases c with
+      | true =>
+        have := ih (x + ψ) h.2.2 t ht
+        simp only [gaps]; constructor <;> linarith [this.1, this.2]
+      | false =>
+        have := ih (x + 1) h.2.2 t ht
+        simp only [gaps]; constructor <;> linarith [this.1, this.2]
+
+/-- [proved-standard; formal-checked] **Every vertex lies over the window:** each vertex
+`m + nτ` of the chain (`m` short and `n` long tiles from the origin) has its conjugate `m + nτ′` in
+`[−1, τ − 1)`. -/
+theorem vertex_mem_window (N : ℕ) (p : List Bool) (hp : p <+: inflate^[N] [true]) :
+    (countB p : ℝ) + countA p * ψ ∈ window := by
+  have h := legal_prefix _ 0 (legal_iterate N) p hp
+  rw [gaps_eq_count, zero_add] at h
+  exact ⟨by linarith [h.1], by linarith [h.2]⟩
+
+/-- [proved-standard; formal-checked] **The two colours of a short step:** an element `a + bτ` of
+`ℤ[τ]` with `0 ≤ a + bτ < τ` and `|a + bτ′| < τ` is `0` or `1`. -/
+theorem small_step (a b : ℤ) (h0 : 0 ≤ (a : ℝ) + b * τ) (h1 : (a : ℝ) + b * τ < τ)
+    (h2 : -τ < (a : ℝ) + b * ψ) (h3 : (a : ℝ) + b * ψ < τ) :
+    (a = 0 ∧ b = 0) ∨ (a = 1 ∧ b = 0) := by
+  have hg1 := Real.one_lt_goldenRatio
+  have hg2 := Real.goldenRatio_lt_two
+  have hψ : ψ = 1 - τ := by linarith [Real.goldenRatio_add_goldenConj]
+  rw [hψ] at h2 h3
+  have hb2 : b < 2 := by
+    by_contra hc
+    have hc' : (2 : ℝ) ≤ b := by exact_mod_cast not_lt.mp hc
+    nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ b - 2) (by linarith : (0 : ℝ) ≤ 2 * τ - 1)]
+  have hb0 : 0 ≤ b := by
+    by_contra hc
+    have hc' : (b : ℝ) ≤ -1 := by exact_mod_cast (show b ≤ -1 by omega)
+    nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ -1 - b) (by linarith : (0 : ℝ) ≤ 2 * τ - 1)]
+  interval_cases b
+  · have ha0 : (0 : ℝ) ≤ a := by simpa using h0
+    have ha2 : (a : ℝ) < 2 := by simp at h1; linarith
+    have : 0 ≤ a := by exact_mod_cast ha0
+    have : a < 2 := by exact_mod_cast ha2
+    interval_cases a <;> simp
+  · exfalso
+    have ha1 : (a : ℝ) < 0 := by push_cast at h1; linarith
+    have ha2 : (-2 : ℝ) < a := by push_cast at h0; linarith
+    have : a < 0 := by exact_mod_cast ha1
+    have : -2 < a := by exact_mod_cast ha2
+    have ha : a = -1 := by omega
+    subst ha
+    push_cast at h2
+    linarith
+
+/-- [proved-standard; formal-checked] **A legal walk covers its window:** every point of `ℤ[τ]`
+between the walk's start and end whose hidden colour lies in the window is a vertex of the walk. -/
+theorem legal_cover (w : List Bool) (x : ℝ) (h : legal x w) (a b : ℤ)
+    (h0 : 0 ≤ (a : ℝ) + b * τ) (hlt : (a : ℝ) + b * τ < gaps τ w)
+    (hw1 : -1 ≤ x + (a + b * ψ)) (hw2 : x + (a + b * ψ) < τ - 1) :
+    ∃ p, p <+: w ∧ (countB p : ℤ) = a ∧ (countA p : ℤ) = b := by
+  have hg1 := Real.one_lt_goldenRatio
+  induction w generalizing x a b with
+  | nil => simp [gaps] at hlt; linarith
+  | cons c w ih =>
+    have hx : -1 < x ∧ x < τ - 1 := by
+      cases c with
+      | true => obtain ⟨ha, hb, _⟩ := h; constructor <;> linarith
+      | false => obtain ⟨ha, hb, _⟩ := h; constructor <;> linarith
+    cases c with
+    | true =>
+      by_cases hs : (a : ℝ) + b * τ < τ
+      · rcases small_step a b h0 hs (by linarith) (by linarith) with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · exact ⟨[], List.nil_prefix, rfl, rfl⟩
+        · exfalso; obtain ⟨ha, _, _⟩ := h; push_cast at hw2; linarith
+      · obtain ⟨p, hp, hpa, hpb⟩ := ih (x + ψ) h.2.2 a (b - 1) (by push_cast; linarith)
+          (by simp only [gaps] at hlt; push_cast; linarith) (by push_cast; linarith)
+          (by push_cast; linarith)
+        refine ⟨true :: p, List.cons_prefix_cons.mpr ⟨rfl, hp⟩, ?_, ?_⟩
+        · simpa [countB] using hpa
+        · simp only [countA]; push_cast; omega
+    | false =>
+      by_cases hs : (a : ℝ) + b * τ < 1
+      · rcases small_step a b h0 (by linarith) (by linarith) (by linarith) with
+          ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · exact ⟨[], List.nil_prefix, rfl, rfl⟩
+        · exfalso; push_cast at hs; linarith
+      · obtain ⟨p, hp, hpa, hpb⟩ := ih (x + 1) h.2.2 (a - 1) b (by push_cast; linarith)
+          (by simp only [gaps] at hlt; push_cast; linarith) (by push_cast; linarith)
+          (by push_cast; linarith)
+        refine ⟨false :: p, List.cons_prefix_cons.mpr ⟨rfl, hp⟩, ?_, ?_⟩
+        · simp only [countB]; push_cast; omega
+        · simpa [countA] using hpb
+
+/-- [proved-standard; formal-checked] **Every point over the window is a vertex:** each
+`m + nτ ≥ 0` in `ℤ[τ]` whose conjugate `m + nτ′` lies in `[−1, τ − 1)` is a vertex of the chain. -/
+theorem mem_window_vertex (m n : ℤ) (h0 : 0 ≤ (m : ℝ) + n * τ)
+    (hw : (m : ℝ) + n * ψ ∈ window) :
+    ∃ N p, p <+: inflate^[N] [true] ∧ (countB p : ℤ) = m ∧ (countA p : ℤ) = n := by
+  obtain ⟨k, hk⟩ := pow_unbounded_of_one_lt ((m : ℝ) + n * τ) Real.one_lt_goldenRatio
+  refine ⟨k, legal_cover _ 0 (legal_iterate k) m n h0 ?_ (by simpa using hw.1)
+    (by simpa using hw.2)⟩
+  rw [seen_length]
+  exact hk.trans (seen_grows k)
+
+/-- [proved-standard; formal-checked] **The Fibonacci chain is the model set:** its vertices are
+exactly the points `m + nτ ≥ 0` of `ℤ[τ]` whose conjugate `m + nτ′` lies in the window
+`[−1, τ − 1)`. -/
+theorem vertices_eq_model_set :
+    {u : ℝ | ∃ N p, p <+: inflate^[N] [true] ∧ u = gaps τ p} =
+      {u : ℝ | ∃ m n : ℤ, u = m + n * τ ∧ 0 ≤ u ∧ (m : ℝ) + n * ψ ∈ window} := by
+  ext u
+  constructor
+  · rintro ⟨N, p, hp, rfl⟩
+    refine ⟨countB p, countA p, ?_, ?_, ?_⟩
+    · rw [gaps_eq_count]; push_cast; ring
+    · rw [gaps_eq_count]; have := Real.goldenRatio_pos; positivity
+    · push_cast; exact vertex_mem_window N p hp
+  · rintro ⟨m, n, rfl, h0, hw⟩
+    obtain ⟨N, p, hp, hm, hn⟩ := mem_window_vertex m n h0 hw
+    refine ⟨N, p, hp, ?_⟩
+    rw [gaps_eq_count, ← hm, ← hn]
+    push_cast; ring
+
+/-- [proved-standard; formal-checked] Inflation carries a concatenation to a concatenation. -/
+theorem inflate_append (u v : List Bool) : inflate (u ++ v) = inflate u ++ inflate v := by
+  induction u with
+  | nil => rfl
+  | cons c u ih => cases c <;> simp [inflate, ih]
+
+/-- [proved-standard; formal-checked] **The chain is one word:** each inflation of `a` is a prefix of
+the next, so the vertices of all of them are the vertices of one infinite chain. -/
+theorem iterate_prefix (n : ℕ) : inflate^[n] [true] <+: inflate^[n + 1] [true] := by
+  induction n with
+  | zero => exact ⟨[false], rfl⟩
+  | succ n ih =>
+    obtain ⟨t, ht⟩ := ih
+    refine ⟨inflate t, ?_⟩
+    rw [Function.iterate_succ_apply' _ (n + 1)]
+    conv_rhs => rw [← ht]
+    rw [inflate_append, ← Function.iterate_succ_apply' inflate n]
+
+end Window
 
 end Holonics.Mathematics.FibonacciModelSet
