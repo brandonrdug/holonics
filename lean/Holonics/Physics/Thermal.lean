@@ -2,6 +2,7 @@ import Holonics.Physics.Thermal.Exchange
 import Holonics.Physics.Thermal.ViscousPort
 import Holonics.Physics.Thermal.Schnakenberg
 import Holonics.Physics.Thermal.ChainAxes
+import Holonics.Physics.Thermal.LinearDiffusion
 
 /-!
 # The thermal instance of the Holon law
@@ -24,6 +25,11 @@ contract, "Physical instances" (`thermal exchange/diffuse/entropy_production`). 
   times the cycle affinity, bounded by the least forward flow (the neck); the entropy clock is a
   helix whose carry sits at the carry section, so entropy is the turn times the signed epochs
   plus a bounded state term.
+- `Thermal/LinearDiffusion`: a linear diffusion read by its stationary metric (the precision of
+  its stationary law): the stationary law fixes the boost `−½ D G` (the excess part) and leaves
+  the turn free; the turn is the stationary current (the housekeeping part), which circulates; the
+  diffusion is reversible exactly when the turn vanishes, and one stationary law carries both a
+  reversible and an irreversible drift.
 
 The retired `holonics-cuda` diffusion receipt: its energy balance is carried by
 `Thermal/Exchange.first_law` (two cells); many-cell diffusion is owed (#62).
