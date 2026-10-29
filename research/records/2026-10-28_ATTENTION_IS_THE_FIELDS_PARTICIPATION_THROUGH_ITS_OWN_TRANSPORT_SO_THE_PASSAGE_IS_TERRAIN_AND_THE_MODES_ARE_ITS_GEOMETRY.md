@@ -219,8 +219,22 @@ learner for learner with participation's families held; before `W₁ᵃ` opens o
 covector. 1(b) passes for every participation family the tiny tower reads above 1/64 bit a unit
 (charts of each kind, the current's read, `W₁ᵃ` on each level, the friction), within a tenth of the
 code's fitted slope. 1(c) and 1(d) pass in `hnn::tower::participation`, with the participation-one
-restriction (`m_i y_i` is the head's recurrence). The tower and its learner restore exactly. The card
-refuses a participating tower until its kernel and parity land (2), and nothing is measured (3).
+restriction (`m_i y_i` is the head's recurrence). The tower and its learner restore exactly.
+
+**Status, October 29 (card).** 2 passes on the RTX 4080 SUPER at the fixtures' declaration (width 8,
+8 modes, 16 contacts, two levels, the two-ladder founding): 32 sections at three streams equal face
+for face, covector entry for covector entry, receipt for receipt, learner for learner and state for
+state; the pair contact with every other place uncompared; turned modes with strands on the pair
+contact; and a read that ends inside its section carries the open section's sites as the host's
+state does (`holonics-cuda/tests/tower_pass.rs`, 31 of 31 with the suite). The kernels: the forward
+admits each cell's site and reads every admitted site head by head (`tower_forward`), the contacts
+return `W₁ᵃ` and the current's read (`tower_reverse_contacts`), one block a stream returns the Gibbs
+face into the probe, keys, currents and friction (`tower_reverse_participation`), the input takes the
+six charts' covectors (`tower_reverse_dx`), the outer sums take the charts', `W₁ᵃ`'s and `Cᵃ`'s, and
+`tower_pa_friction` sums the heads' friction. The section closes with its last site, which releases
+the sites and rests the frames, on the host and the card alike. Owed on the card: opening on an open
+section (a release carried across calls refuses there), and the parity at the race's own declaration.
+Nothing is measured (3).
 
 **The device line.** The card under the lock for every learner run; the host realization only as the
 parity reference. The workload is the race's (its passage, keys, declaration and laps); time and

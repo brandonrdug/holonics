@@ -92,6 +92,10 @@ struct TowerLevel {
     // max |w| of push (re, im), read (re, im), contact, return, gate, turn, pump depth, pump axis,
     // the pair contact's second drive
     uint64_t reach[11];
+    // Participation's families (zero without it): the charts probe, key, current (re, im), the
+    // current's read (re, im), the contacts' W₁ᵃ and the heads' friction; max |w| of the first nine.
+    uint64_t pa[10];
+    uint64_t pa_reach[9];
 };
 
 struct TowerLaw {
@@ -131,6 +135,11 @@ struct TowerLaw {
     // max |W_sb|.
     uint32_t strand_level, strand_rings;
     uint64_t strand_contact, strand_pair, strand_reach[2];
+    // Participation (`participation = 0` without it): its heads, the section that admits sites,
+    // the pairing's scale 2^(−beta) and log₂ of the margin radius on 2^(−16) (a held move's met
+    // dissipation). `ln2` is set beside it.
+    uint32_t participation, pa_heads, pa_section, pa_beta;
+    int64_t pa_held_log;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -247,6 +256,31 @@ struct TowerFrame {
     uint32_t *strand_ends;        // [S][3R + 1]
     int32_t *strand_faces;        // [S][T][6R]
     uint64_t *r_strand;           // [S][T][L]
+    // Participation (each empty without it, `participation`): the heads' starts; each cell's rotated
+    // probe, key and current charts and the frame it was rotated by ([S][T][L][N][2]), its heads'
+    // dissipation ([S][T][L][H]), the current y (re block, im block, [S][T][L][2N]), its ratio read
+    // ([S][T][L][W]) and scale ([S][T][L]); each stream's running frame and met dissipation
+    // ([S][L][N][2], [S][L][N]); one head's faces and weights at the cell being read ([S][T] each);
+    // the reverse's ∂r̂ᵃ through its ratio ([S][T][L][W]) and the current's covector ([S][T][L][2N]),
+    // the probe, key and current covectors of the level being returned ([S][T][N][2]), the chart
+    // covectors turned forward by their frames ([S][T][L][6][N]) and the friction's ([S][L][H]);
+    // the reaches of the ratio read, of y (re, im), of ∂r̂ᵃ ([S][T][L] each) and of the six chart
+    // covectors ([6][S][T][L]).
+    const uint32_t *pa_heads;     // [H + 1]
+    int64_t *pa_probe, *pa_key, *pa_value, *pa_frame;
+    int64_t *pa_diss;
+    int64_t *pa_current;
+    int32_t *pa_read;
+    int64_t *pa_scale;
+    int64_t *pa_run, *pa_met;
+    int64_t *pa_z;
+    uint64_t *pa_e;
+    int64_t *pa_dra, *pa_gy;
+    wide *pa_gq, *pa_gk, *pa_gw;
+    int64_t *pa_gchart;
+    wide *pa_gfric;
+    uint64_t *r_pa_read, *r_pa_yre, *r_pa_yim, *r_pa_dra;
+    uint64_t *r_pa_g;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -704,6 +738,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     const uint32_t SR = law.strand_rings;
     uint32_t *sr = (uint32_t *)carve(at, 4ull * 3 * SR);
     int32_t *sp = (int32_t *)carve(at, 4ull * 6 * SR);
+    // Participation: each mode's unit and log₂ ρ at the cell, the charts, the frame, the rotated
+    // probe, the current y (re block, im block), its raw read and ratio read, the heads' dissipation.
+    const uint32_t P = law.participation != 0, HH = law.pa_heads;
+    int64_t *pu = (int64_t *)carve(at, 8ull * 2 * N * P);
+    int64_t *pl = (int64_t *)carve(at, 8ull * N * P);
+    int64_t *pcs = (int64_t *)carve(at, 8ull * 6 * N * P);
+    int64_t *pfr = (int64_t *)carve(at, 8ull * 2 * N * P);
+    int64_t *ppr = (int64_t *)carve(at, 8ull * 2 * N * P);
+    int64_t *py = (int64_t *)carve(at, 8ull * 2 * N * P);
+    int64_t *praw = (int64_t *)carve(at, 8ull * W * P);
+    int32_t *prd = (int32_t *)carve(at, 4ull * W * P);
+    int64_t *pdis = (int64_t *)carve(at, 8ull * HH * P);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -985,6 +1031,11 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     ui = rel(ur * ti + ui * tr, MOVE_BITS);
                     ur = nr;
                 }
+                if (P) {
+                    pu[2 * k] = (int64_t)ur;
+                    pu[2 * k + 1] = (int64_t)ui;
+                    pl[k] = held ? law.pa_held_log : fit64(rel(exponent, MOVE_BITS - FACE_BITS), &st);
+                }
                 wide lr = rel(rho * ur, MOVE_BITS);
                 wide li = rel(rho * ui, MOVE_BITS);
                 wide gap = ((wide)1 << (2 * MOVE_BITS)) - (lr * lr + li * li);
@@ -1196,6 +1247,163 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 m = v > m ? v : m;
             }
             const uint64_t rmax = block_max(m, red);
+            // Participation (`Tower::step`, `participation`): the cell's move advances each mode's
+            // frame and met dissipation (from rest at the section's opening), the level's input
+            // presents its rotated charts as the section's newest site and probes every admitted
+            // site head by head (the Gibbs face of the pairing less the friction, carried as the
+            // integer (mass, current) pair), and the current is read like the modes' face, its ratio
+            // read offered to the contacts through W₁ᵃ.
+            uint64_t prmax = 0;
+            if (P) {
+                for (uint32_t o = tid; o < 6 * N; o += B) {
+                    const uint32_t fam = o / N, k = o % N;
+                    const bool nar = narrow_terms(lv.pa_reach[fam], xmax, W, &st);
+                    pcs[o] = fit64(rel(dot(tt + lv.pa[fam] + k, N, W, x, nar), MATERIAL_BITS), &st);
+                }
+                __syncthreads();
+                for (uint32_t k = tid; k < N; k += B) {
+                    int64_t *run = fr.pa_run + (((uint64_t)s * L + l) * N + k) * 2;
+                    int64_t *met = fr.pa_met + ((uint64_t)s * L + l) * N + k;
+                    const wide fre_ = t == 0 ? ((wide)1 << MOVE_BITS) : (wide)run[0];
+                    const wide fim_ = t == 0 ? 0 : (wide)run[1];
+                    const int64_t mt = (t == 0 ? 0 : *met) - pl[k];
+                    const wide ur = pu[2 * k], ui = pu[2 * k + 1];
+                    const int64_t nr = fit64(rel(fre_ * ur - fim_ * ui, MOVE_BITS), &st);
+                    const int64_t ni = fit64(rel(fre_ * ui + fim_ * ur, MOVE_BITS), &st);
+                    run[0] = nr;
+                    run[1] = ni;
+                    *met = mt;
+                    pfr[2 * k] = nr;
+                    pfr[2 * k + 1] = ni;
+                    fr.pa_frame[(q * N + k) * 2] = nr;
+                    fr.pa_frame[(q * N + k) * 2 + 1] = ni;
+                    for (uint32_t c = 0; c < 3; c++) {
+                        const wide cr = pcs[(2 * c) * N + k], ci = pcs[(2 * c + 1) * N + k];
+                        const int64_t rr = fit64(rel((wide)nr * cr + (wide)ni * ci, MOVE_BITS), &st);
+                        const int64_t ri = fit64(rel((wide)nr * ci - (wide)ni * cr, MOVE_BITS), &st);
+                        if (c == 0) {
+                            ppr[2 * k] = rr;
+                            ppr[2 * k + 1] = ri;
+                        } else {
+                            int64_t *dst = (c == 1 ? fr.pa_key : fr.pa_value) + (q * N + k) * 2;
+                            dst[0] = rr;
+                            dst[1] = ri;
+                        }
+                    }
+                }
+                __syncthreads();
+                for (uint32_t hh = tid; hh < HH; hh += B) {
+                    const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
+                    wide sum = 0;
+                    for (uint32_t k = from; k < to; k++) {
+                        sum += fr.pa_met[((uint64_t)s * L + l) * N + k];
+                    }
+                    const int64_t dis = fit64(div_nearest(sum, (wide)(to - from)), &st);
+                    pdis[hh] = dis;
+                    fr.pa_diss[q * HH + hh] = dis;
+                }
+                __syncthreads();
+                const uint64_t site0 = (uint64_t)s * T;
+                for (uint32_t hh = 0; hh < HH; hh++) {
+                    const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
+                    const wide friction = th[lv.pa[9] + hh];
+                    int64_t zm = INT64_MIN;
+                    for (uint32_t j = tid; j <= t; j += B) {
+                        const uint64_t qj = (site0 + j) * L + l;
+                        wide pairing = 0;
+                        for (uint32_t k = from; k < to; k++) {
+                            const int64_t *kj = fr.pa_key + (qj * N + k) * 2;
+                            pairing += (wide)ppr[2 * k] * kj[0] + (wide)ppr[2 * k + 1] * kj[1];
+                        }
+                        const wide met = (wide)pdis[hh] - (wide)fr.pa_diss[qj * HH + hh];
+                        const int64_t z = fit64(rel(pairing, FACE_BITS + law.pa_beta) - rel(friction * met, FACE_BITS), &st);
+                        fr.pa_z[site0 + j] = z;
+                        zm = z > zm ? z : zm;
+                    }
+                    const int64_t peak = block_max_signed(zm, red);
+                    uwide msum = 0;
+                    for (uint32_t j = tid; j <= t; j += B) {
+                        const int64_t z = fr.pa_z[site0 + j];
+                        const uint64_t e = (wide)peak - (wide)z >= ((wide)UNIT_BITS << FACE_BITS) ? 0 : below_one((wide)z - (wide)peak, face_roots, law.face_digits);
+                        fr.pa_e[site0 + j] = e;
+                        msum += e;
+                    }
+                    const uwide mass = block_sum(msum, redw);
+                    __syncthreads();
+                    for (uint32_t k = from + tid; k < to; k += B) {
+                        wide jr = 0, ji = 0;
+                        for (uint32_t j = 0; j <= t; j++) {
+                            const uint64_t qj = (site0 + j) * L + l;
+                            const wide e = (wide)fr.pa_e[site0 + j];
+                            jr += e * fr.pa_value[(qj * N + k) * 2];
+                            ji += e * fr.pa_value[(qj * N + k) * 2 + 1];
+                        }
+                        const wide mr = fit64(div_nearest(jr, (wide)mass), &st), mi = fit64(div_nearest(ji, (wide)mass), &st);
+                        const wide ur = pfr[2 * k], ui = pfr[2 * k + 1];
+                        py[k] = fit64(rel(ur * mr - ui * mi, MOVE_BITS), &st);
+                        py[N + k] = fit64(rel(ur * mi + ui * mr, MOVE_BITS), &st);
+                    }
+                    __syncthreads();
+                }
+                // Re(Cᵃ y) = Cᵃ_re y_re − Cᵃ_im y_im on 2^(−40), released to 2^(−16), read as a ratio.
+                uint64_t mya = 0, myb = 0;
+                for (uint32_t k = tid; k < N; k += B) {
+                    const uint64_t a = magnitude(py[k]), b = magnitude(py[N + k]);
+                    mya = a > mya ? a : mya;
+                    myb = b > myb ? b : myb;
+                }
+                const uint64_t yra = block_max(mya, red);
+                const uint64_t yrb = block_max(myb, red);
+                const bool n_ya = narrow_terms(lv.pa_reach[6], yra, N, &st);
+                const bool n_yb = narrow_terms(lv.pa_reach[7], yrb, N, &st);
+                for (uint32_t o = tid; o < 2 * W; o += B) {
+                    const uint32_t j = o % W;
+                    const bool im = o >= W;
+                    rab[o] = fit64(dot(tt + (im ? lv.pa[7] : lv.pa[6]) + j, W, N, py + (im ? N : 0), im ? n_yb : n_ya), &st);
+                }
+                __syncthreads();
+                uwide ppow = 0;
+                for (uint32_t j = tid; j < W; j += B) {
+                    const int64_t r = fit64(rel((wide)rab[j] - (wide)rab[W + j], MATERIAL_BITS), &st);
+                    praw[j] = r;
+                    ppow += (uwide)((wide)r * (wide)r);
+                }
+                ppow = block_sum(ppow, redw);
+                if (tid == 0) {
+                    const uwide root = isqrt128((uwide)((wide)ppow / (wide)W));
+                    if (root > (uwide)INT64_MAX) {
+                        atomicOr(&st, TOWER_REFUSED_WORD64);
+                    }
+                    scale_s = root > (uwide)INT64_MAX ? 0 : (int64_t)root;
+                }
+                __syncthreads();
+                const int64_t pscale = scale_s;
+                uint64_t pm = 0;
+                for (uint32_t j = tid; j < W; j += B) {
+                    prd[j] = pscale == 0 ? 0 : fit32(div_nearest((wide)praw[j] << FACE_BITS, pscale), &st);
+                    const uint64_t v = magnitude(prd[j]);
+                    pm = v > pm ? v : pm;
+                }
+                prmax = block_max(pm, red);
+                if (keep) {
+                    for (uint32_t k = tid; k < N; k += B) {
+                        fr.pa_probe[(q * N + k) * 2] = ppr[2 * k];
+                        fr.pa_probe[(q * N + k) * 2 + 1] = ppr[2 * k + 1];
+                        fr.pa_current[q * 2 * N + k] = py[k];
+                        fr.pa_current[q * 2 * N + N + k] = py[N + k];
+                    }
+                    for (uint32_t j = tid; j < W; j += B) {
+                        fr.pa_read[q * W + j] = prd[j];
+                    }
+                    if (tid == 0) {
+                        fr.pa_scale[q] = pscale;
+                        fr.r_pa_read[q] = prmax;
+                        fr.r_pa_yre[q] = yra;
+                        fr.r_pa_yim[q] = yrb;
+                    }
+                }
+                __syncthreads();
+            }
             // The contacts: the drive a = W r̂ + b_a, rectified, v = max(a, 0); or beside it the pair
             // contact's second drive b = W_b r̂ + b_b and v = a ⊙ b on 2^(−32) released to the face
             // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
@@ -1205,6 +1413,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             const bool n_p = law.contact != 0 && narrow_terms(lv.reach[10], rmax, W, &st);
             const bool n_sa = stranded && narrow_terms(law.strand_reach[0], smax, 6 * SR, &st);
             const bool n_sb = stranded && law.contact != 0 && narrow_terms(law.strand_reach[1], smax, 6 * SR, &st);
+            const bool n_pc = P && narrow_terms(lv.pa_reach[8], prmax, W, &st);
             m = 0;
             uint64_t mc = 0;
             for (uint32_t o = tid; o < F; o += B) {
@@ -1213,6 +1422,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 int64_t a64 = fit64(rel(sum, MATERIAL_BITS), &st);
                 if (stranded) {
                     a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + law.strand_contact + o, F, 6 * SR, sp, n_sa), MATERIAL_BITS), &st), &st);
+                }
+                if (P) {
+                    a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + lv.pa[8] + o, F, W, prd, n_pc), MATERIAL_BITS), &st), &st);
                 }
                 const int32_t d = fit32(a64, &st);
                 dv[o] = d;
@@ -1589,6 +1801,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
     int64_t *dr = (int64_t *)carve(at, 8ull * W);
     int64_t *dread = (int64_t *)carve(at, 8ull * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
+    const uint32_t P = law.participation != 0;
+    int64_t *pdh = (int64_t *)carve(at, 8ull * W * P);
+    int64_t *pdra = (int64_t *)carve(at, 8ull * W * P);
     __shared__ uint32_t st;
     if (tid == 0) {
         st = 0;
@@ -1696,6 +1911,56 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         if (law.contact != 0) {
             fr.r_db[ql] = bmax;
         }
+    }
+    // Participation's current: ∂r̂ᵃ = W₁ᵃᵀ δa, through its ratio, and the current's covector
+    // Cᵃ_reᵀ ∂rᵃ and Cᵃ_imᵀ (−∂rᵃ).
+    if (P) {
+        const bool n_pa = narrow_rows(lv.pa_reach[8], amax, F);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)F * g / G), to = (uint32_t)((uint64_t)F * (g + 1) / G);
+            part[idx] = dot(fr.theta + lv.pa[8] + (uint64_t)from * W + j, W, to - from, da + from, n_pa);
+        }
+        __syncthreads();
+        for (uint32_t j = tid; j < W; j += B) {
+            wide sum = 0;
+            for (uint32_t g = 0; g < G; g++) {
+                sum += part[g * W + j];
+            }
+            pdh[j] = fit64(rel(sum, MATERIAL_BITS), &st);
+        }
+        __syncthreads();
+        const int64_t pscale = fr.pa_scale[ql];
+        uwide pdot = 0;
+        for (uint32_t j = tid; j < W; j += B) {
+            pdot += (uwide)((wide)fr.pa_read[ql * W + j] * (wide)pdh[j]);
+        }
+        const wide pmean = div_nearest((wide)block_sum(pdot, redw), (wide)W);
+        uint64_t pm = 0;
+        for (uint32_t j = tid; j < W; j += B) {
+            int64_t v = 0;
+            if (pscale != 0) {
+                const wide read = fr.pa_read[ql * W + j];
+                v = fit64(div_nearest(((wide)pdh[j] - rel(pmean * read, 2 * FACE_BITS)) << FACE_BITS, pscale), &st);
+            }
+            pdra[j] = v;
+            fr.pa_dra[ql * W + j] = v;
+            const uint64_t a = magnitude(v);
+            pm = a > pm ? a : pm;
+        }
+        const uint64_t pdmax = block_max(pm, red);
+        if (tid == 0) {
+            fr.r_pa_dra[ql] = pdmax;
+        }
+        const bool n_ga = narrow_rows(lv.pa_reach[6], pdmax, W);
+        const bool n_gb = narrow_rows(lv.pa_reach[7], pdmax, W);
+        for (uint32_t o = tid; o < 2 * N; o += B) {
+            const uint32_t k = o % N;
+            const bool im = o >= N;
+            const wide sum = rel(dot(fr.theta + (im ? lv.pa[7] : lv.pa[6]) + k, N, W, pdra, im ? n_gb : n_ga), MATERIAL_BITS);
+            fr.pa_gy[ql * 2 * N + o] = fit64(im ? -sum : sum, &st);
+        }
+        __syncthreads();
     }
     // The modes' read covector: C_reᵀ ∂r and C_imᵀ (−∂r).
     const bool n_re = narrow_rows(lv.reach[2], dmax, W);
@@ -2098,7 +2363,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     const TowerLevel &lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
-    const uint32_t fams = 3 + law.turned + 2 * law.pumped;
+    const uint32_t own = 3 + law.turned + 2 * law.pumped;
+    const uint32_t fams = own + 6 * (law.participation != 0);
     int64_t *v = (int64_t *)carve(at, 8ull * fams * N);
     int64_t *back = (int64_t *)carve(at, 8ull * fams * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
@@ -2146,8 +2412,32 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
             fr.r_dp[ql] = r5;
         }
     }
-    const bool narrow[6] = {narrow_rows(lv.reach[0], r0, N), narrow_rows(lv.reach[1], r1, N), narrow_rows(lv.reach[6], r2, N), law.turned && narrow_rows(lv.reach[7], r3, N), law.pumped && narrow_rows(lv.reach[8], r4, N), law.pumped && narrow_rows(lv.reach[9], r5, N)};
-    const uint64_t bases[6] = {lv.push_re, lv.push_im, lv.gate, lv.turn, lv.pump, lv.pump_axis};
+    // The families in `v`'s order: push (re, im), gate, then the turn and the pump's depth and
+    // axis where present, then participation's six charts.
+    bool narrow[12] = {narrow_rows(lv.reach[0], r0, N), narrow_rows(lv.reach[1], r1, N), narrow_rows(lv.reach[6], r2, N)};
+    uint64_t bases[12] = {lv.push_re, lv.push_im, lv.gate};
+    uint32_t at_fam = 3;
+    if (law.turned) {
+        narrow[at_fam] = narrow_rows(lv.reach[7], r3, N);
+        bases[at_fam++] = lv.turn;
+    }
+    if (law.pumped) {
+        narrow[at_fam] = narrow_rows(lv.reach[8], r4, N);
+        bases[at_fam++] = lv.pump;
+        narrow[at_fam] = narrow_rows(lv.reach[9], r5, N);
+        bases[at_fam++] = lv.pump_axis;
+    }
+    if (law.participation) {
+        const uint64_t QL = (uint64_t)law.streams * law.cells * law.levels;
+        for (uint32_t f = 0; f < 6; f++) {
+            for (uint32_t k = tid; k < N; k += B) {
+                v[(own + f) * N + k] = fr.pa_gchart[(ql * 6 + f) * N + k];
+            }
+            narrow[own + f] = narrow_rows(lv.pa_reach[f], fr.r_pa_g[f * QL + ql], N);
+            bases[own + f] = lv.pa[f];
+        }
+        __syncthreads();
+    }
     for (uint32_t o = tid; o < fams * W; o += B) {
         const uint32_t fam = o / W, j = o % W;
         const wide sum = dot(fr.theta + bases[fam] + j, W, N, v + fam * N, narrow[fam]);
@@ -2175,6 +2465,168 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     __syncthreads();
     if (tid == 0 && st != 0) {
         atomicOr(fr.status + s, st);
+    }
+}
+
+// Participation's return over one stream (`participation_return`, `Tower::reverse_joined`), one
+// block a stream, at level `l`: at each cell its current's covector, turned back by the cell's
+// frame, returns through every head's Gibbs face (recomputed from the kept probe, keys and
+// dissipation, the forward's own bits) into the probe, every admitted site's key and current, and
+// the head's friction; then each cell's three covectors are turned forward by its frame into the
+// six chart covectors `tower_reverse_dx` returns to the input, with their reaches. Runs after the
+// level's contacts (which write the current's covector) and before its `tower_reverse_dx`.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_participation(TowerLaw law, TowerFrame fr, uint32_t l) {
+    const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
+    const uint32_t N = law.modes, L = law.levels, T = law.cells, HH = law.pa_heads;
+    const TowerLevel &lv = law.level[l];
+    extern __shared__ __align__(16) unsigned char smem[];
+    unsigned char *at = smem;
+    int64_t *gb = (int64_t *)carve(at, 8ull * 2 * N);
+    uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
+    uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
+    __shared__ uint32_t st;
+    if (tid == 0) {
+        st = 0;
+    }
+    const uint64_t site0 = (uint64_t)s * T;
+    const uint64_t QL = (uint64_t)law.streams * T * L;
+    const uint32_t scale_bits = FACE_BITS + law.pa_beta;
+    const uint64_t *face_roots = fr.roots;
+    wide *gq = fr.pa_gq + site0 * N * 2, *gk = fr.pa_gk + site0 * N * 2, *gw = fr.pa_gw + site0 * N * 2;
+    for (uint64_t i = tid; i < (uint64_t)T * N * 2; i += B) {
+        gq[i] = 0;
+        gk[i] = 0;
+        gw[i] = 0;
+    }
+    __syncthreads();
+    for (uint32_t i = 0; i < T; i++) {
+        const uint64_t qi = (site0 + i) * L + l;
+        for (uint32_t k = tid; k < N; k += B) {
+            const wide ur = fr.pa_frame[(qi * N + k) * 2], ui = fr.pa_frame[(qi * N + k) * 2 + 1];
+            const wide gr = fr.pa_gy[qi * 2 * N + k], gi = fr.pa_gy[qi * 2 * N + N + k];
+            gb[2 * k] = fit64(rel(ur * gr + ui * gi, MOVE_BITS), &st);
+            gb[2 * k + 1] = fit64(rel(ur * gi - ui * gr, MOVE_BITS), &st);
+        }
+        __syncthreads();
+        for (uint32_t hh = 0; hh < HH; hh++) {
+            const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
+            const wide friction = fr.theta[lv.pa[9] + hh];
+            const wide dis_i = fr.pa_diss[qi * HH + hh];
+            int64_t zm = INT64_MIN;
+            for (uint32_t j = tid; j <= i; j += B) {
+                const uint64_t qj = (site0 + j) * L + l;
+                wide pairing = 0;
+                for (uint32_t k = from; k < to; k++) {
+                    const int64_t *kj = fr.pa_key + (qj * N + k) * 2;
+                    pairing += (wide)fr.pa_probe[(qi * N + k) * 2] * kj[0] + (wide)fr.pa_probe[(qi * N + k) * 2 + 1] * kj[1];
+                }
+                const int64_t z = fit64(rel(pairing, scale_bits) - rel(friction * (dis_i - (wide)fr.pa_diss[qj * HH + hh]), FACE_BITS), &st);
+                fr.pa_z[site0 + j] = z;
+                zm = z > zm ? z : zm;
+            }
+            const int64_t peak = block_max_signed(zm, red);
+            uwide msum = 0;
+            for (uint32_t j = tid; j <= i; j += B) {
+                const int64_t z = fr.pa_z[site0 + j];
+                const uint64_t e = (wide)peak - (wide)z >= ((wide)UNIT_BITS << FACE_BITS) ? 0 : below_one((wide)z - (wide)peak, face_roots, law.face_digits);
+                fr.pa_e[site0 + j] = e;
+                msum += e;
+            }
+            const wide mass = (wide)block_sum(msum, redw);
+            // g_a_j = Re⟨w_j, g'⟩ and its weighted mean.
+            uwide asum = 0;
+            for (uint32_t j = tid; j <= i; j += B) {
+                const uint64_t qj = (site0 + j) * L + l;
+                wide dotv = 0;
+                for (uint32_t k = from; k < to; k++) {
+                    const int64_t *wj = fr.pa_value + (qj * N + k) * 2;
+                    dotv += (wide)wj[0] * gb[2 * k] + (wide)wj[1] * gb[2 * k + 1];
+                }
+                const int64_t ga = fit64(rel(dotv, FACE_BITS), &st);
+                fr.pa_z[site0 + j] = ga;
+                asum += (uwide)((wide)fr.pa_e[site0 + j] * (wide)ga);
+            }
+            const wide mean = div_nearest((wide)block_sum(asum, redw), mass);
+            // g_z_j, and the friction's covector.
+            uwide fsum = 0;
+            for (uint32_t j = tid; j <= i; j += B) {
+                const uint64_t qj = (site0 + j) * L + l;
+                const wide e = fr.pa_e[site0 + j];
+                const wide gz = rel((wide)law.ln2 * div_nearest(e * ((wide)fr.pa_z[site0 + j] - mean), mass), MOVE_BITS);
+                fr.pa_z[site0 + j] = fit64(gz, &st);
+                fsum += (uwide)(-rel(gz * (dis_i - (wide)fr.pa_diss[qj * HH + hh]), FACE_BITS));
+            }
+            const wide fric = (wide)block_sum(fsum, redw);
+            if (tid == 0) {
+                fr.pa_gfric[((uint64_t)s * L + l) * HH + hh] += fric;
+            }
+            __syncthreads();
+            // Every admitted site's key and current covectors, and the probe's.
+            const uint32_t span = to - from;
+            for (uint32_t idx = tid; idx < (i + 1) * span; idx += B) {
+                const uint32_t j = idx / span, k = from + idx % span;
+                const wide gz = fr.pa_z[site0 + j], e = fr.pa_e[site0 + j];
+                wide *kk = gk + ((uint64_t)j * N + k) * 2, *ww = gw + ((uint64_t)j * N + k) * 2;
+                kk[0] += fit64(rel(gz * fr.pa_probe[(qi * N + k) * 2], scale_bits), &st);
+                kk[1] += fit64(rel(gz * fr.pa_probe[(qi * N + k) * 2 + 1], scale_bits), &st);
+                ww[0] += fit64(div_nearest(e * gb[2 * k], mass), &st);
+                ww[1] += fit64(div_nearest(e * gb[2 * k + 1], mass), &st);
+            }
+            for (uint32_t k = from + tid; k < to; k += B) {
+                wide ar = 0, ai = 0;
+                for (uint32_t j = 0; j <= i; j++) {
+                    const uint64_t qj = (site0 + j) * L + l;
+                    const wide gz = fr.pa_z[site0 + j];
+                    ar += gz * fr.pa_key[(qj * N + k) * 2];
+                    ai += gz * fr.pa_key[(qj * N + k) * 2 + 1];
+                }
+                gq[((uint64_t)i * N + k) * 2] += fit64(rel(ar, scale_bits), &st);
+                gq[((uint64_t)i * N + k) * 2 + 1] += fit64(rel(ai, scale_bits), &st);
+            }
+            __syncthreads();
+        }
+    }
+    // Each cell's covectors turned forward by its frame: the six chart covectors and their reaches.
+    for (uint32_t j = 0; j < T; j++) {
+        const uint64_t qj = (site0 + j) * L + l;
+        uint64_t mx[6] = {0, 0, 0, 0, 0, 0};
+        for (uint32_t k = tid; k < N; k += B) {
+            const wide ur = fr.pa_frame[(qj * N + k) * 2], ui = fr.pa_frame[(qj * N + k) * 2 + 1];
+            const wide *src[3] = {gq + ((uint64_t)j * N + k) * 2, gk + ((uint64_t)j * N + k) * 2, gw + ((uint64_t)j * N + k) * 2};
+            for (uint32_t c = 0; c < 3; c++) {
+                const wide gr = src[c][0], gi = src[c][1];
+                const int64_t re = fit64(rel(ur * gr - ui * gi, MOVE_BITS), &st);
+                const int64_t im = fit64(rel(ur * gi + ui * gr, MOVE_BITS), &st);
+                fr.pa_gchart[(qj * 6 + 2 * c) * N + k] = re;
+                fr.pa_gchart[(qj * 6 + 2 * c + 1) * N + k] = im;
+                const uint64_t a = magnitude(re), b = magnitude(im);
+                mx[2 * c] = a > mx[2 * c] ? a : mx[2 * c];
+                mx[2 * c + 1] = b > mx[2 * c + 1] ? b : mx[2 * c + 1];
+            }
+        }
+        for (uint32_t f = 0; f < 6; f++) {
+            const uint64_t r = block_max(mx[f], red);
+            if (tid == 0) {
+                fr.r_pa_g[f * QL + qj] = r;
+            }
+        }
+    }
+    __syncthreads();
+    if (tid == 0 && st != 0) {
+        atomicOr(fr.status + s, st);
+    }
+}
+
+// The heads' friction covectors summed over the streams, one block a level.
+extern "C" __global__ void tower_pa_friction(TowerLaw law, TowerFrame fr) {
+    const uint32_t l = blockIdx.x, L = law.levels, HH = law.pa_heads;
+    const TowerLevel &lv = law.level[l];
+    for (uint32_t hh = threadIdx.x; hh < HH; hh += blockDim.x) {
+        wide sum = 0;
+        for (uint32_t s = 0; s < law.streams; s++) {
+            sum += fr.pa_gfric[((uint64_t)s * L + l) * HH + hh];
+        }
+        fr.gradient[lv.pa[9] + hh] = sum;
     }
 }
 

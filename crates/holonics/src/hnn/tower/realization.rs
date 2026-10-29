@@ -269,6 +269,11 @@ pub struct ResidentLevel {
     pub units: Vec<(i64, i64)>,
     pub moduli: Vec<i64>,
     pub logs: Vec<i64>,
+    /// Participation's families (zero without it): the charts `Ȟ, H, Ψ` (re, im), the current's
+    /// read `Cᵃ` (re, im), the contacts' `W₁ᵃ` and the heads' friction, and `max |w|` of the first
+    /// nine.
+    pub participation: [usize; 10],
+    pub participation_reaches: [u64; 9],
 }
 
 /// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
@@ -450,6 +455,8 @@ pub struct ResidentLaw {
     /// The levels' participation, when it is joined: a realization that does not carry it refuses
     /// the tower.
     pub participation: Option<super::ParticipationDeclaration>,
+    /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
+    pub held_log: i64,
 }
 
 impl Tower {
@@ -566,6 +573,8 @@ impl Tower {
                 units,
                 moduli,
                 logs,
+                participation: [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im, lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction],
+                participation_reaches: reaches.participation.get(l).copied().unwrap_or([0; 9]),
             })
         }))?;
         Ok(ResidentLaw {
@@ -620,6 +629,7 @@ impl Tower {
             strands: self.strands.as_ref().map(|strands| ResidentStrands::of(strands, self.layout.strand_contact, self.layout.strand_pair, reaches.strands, self.declaration.alphabet)).transpose()?,
             news: self.news,
             participation: self.participation.clone(),
+            held_log: reaches.held_log,
         })
     }
 }
