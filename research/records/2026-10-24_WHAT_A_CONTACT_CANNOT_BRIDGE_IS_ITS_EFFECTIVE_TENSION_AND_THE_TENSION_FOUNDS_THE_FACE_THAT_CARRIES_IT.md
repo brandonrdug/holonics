@@ -584,6 +584,31 @@ One box in #410:
   `−Δ_r h` and a passed pivot's border entry `Δ · ρ_p`; `Π (1 + h_t) = det G_N / det G_0` with the
   prequential identity; and the mean square error `σ² (1 + h)` in range.
 
+Formal-checked on October 29 in
+[`HNN/EffectiveTension`](../../lean/HolonicsResearch/HNN/EffectiveTension.lean), over weighted
+moments `Σ_t w_t a_t z_tᵀ` with `w ≥ 0` and any generalized inverse `G` of the face Gram
+(`H G H = H`; `pinv` satisfies the four Penrose equations, so it is `H⁺`):
+- the normal law `Z G H = Z` (`moment_mul_ginv_mul`), the least residual in the Loewner order with
+  equality at the bridge `W = B G` (`residual_eq_tension_add`, `tension_le_residual`,
+  `residual_bridge`), `S ⪰ 0` (`posSemidef_tension`), independence of `G`
+  (`tension_eq_of_isGInv`), the orthogonal remainder (`remainder_orthogonal`) and the rebase
+  (`tension_le_of_factor`, `tension_rebase`);
+- the quotient formula `S − M G_Q Mᵀ` (`tension_fromRows`) and the removal of a pool face `Wᵀ c`
+  (`tension_fromRows_pool`);
+- the within-context tension and its ceiling (`within_eq_sum`, `tension_context`,
+  `tension_context_le`);
+- the turn invariance of `R`, a turn that moves the real face, and the gradient of `½ |log R|²`
+  off the branch cut (`ratio_turn`, `turn_moves_real_face`, `hasFDerivAt_half_sq_log_ratio`);
+- for invertible `S₀`, `det S / det S₀ = det(I − S₀⁻¹(S₀ − S))`, the product of `1 − μ` over the
+  roots `μ` over `ℂ` of the characteristic polynomial of `S₀⁻¹(S₀ − S)` (`det_ratio`,
+  `det_one_sub_eq_prod_roots`);
+- the alignment-code identity for a coupling injective on both sides, and its unit value
+  `|H| + |T| − 2|c|` (`alignment_code`, `alignment_code_unit`).
+
+Not formal: the best rank-`k` pool face (a Ky Fan maximum principle, not in Mathlib), which stays
+proved-standard, and the worked numbers, which stay checked by the receipts. The leverage of a
+reading (§9) is its own box in #410 and is still owed.
+
 ## Receipts
 
 [`2026-10-24_EFFECTIVE_TENSION_receipts/`](2026-10-24_EFFECTIVE_TENSION_receipts/): `tension.py` and its
