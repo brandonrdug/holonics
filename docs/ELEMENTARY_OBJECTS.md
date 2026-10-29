@@ -423,7 +423,10 @@ boost as its growth.
 [proved-standard; formal-checked] **A move has the pivot it holds.** `x ↦ Mx + b` pivots about
 `O = (I − M)⁻¹b`; when `M` fixes directions semisimply it moves about the invariant set
 `O + ker(I − M)` with free fall `b_∥` along it (a screw: a helix is a turn about an axis with free
-fall along it); a shear has no such split. What a move holds invariant is its **grip**: a turn holds a
+fall along it); a shear has no such split. A rigid move always has the split, and in three dimensions
+a proper one other than a translation turns about a line and falls the exact projection of its
+translation on it (Chasles, `motion.chasles-screw`); a curve of constant `τ/κ` turns about a fixed
+axis while it falls along it (Lancret, `motion.lancret-general-helix`). What a move holds invariant is its **grip**: a turn holds a
 distance, a positive scalar dilation a bearing, a Möbius move every cross ratio. For
 `m(z) = (az + b)/(cz + d)` with pivots `z₁, z₂` and `μ_i = cz_i + d`,
 

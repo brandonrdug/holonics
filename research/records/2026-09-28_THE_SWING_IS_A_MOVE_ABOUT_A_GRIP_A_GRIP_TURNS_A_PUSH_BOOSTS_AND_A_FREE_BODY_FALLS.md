@@ -198,7 +198,8 @@ In phase space free fall is the shear of §3.1.
   is invariant, and `Mx + b = O + M(x − O) + b_∥`: the move about it, then free fall `b_∥` along it.
   Its points are fixed only when `b_∥ = 0`. For a proper rigid move in three dimensions this is
   Chasles's screw, with a one-dimensional axis; a helix is a turn about an axis with free fall
-  along it.
+  along it. [formal-checked] A rigid move always has this split, and in three dimensions a proper
+  one other than a translation has a line for its axis (`motion.chasles-screw`).
 - **A shear has no such split.** For `M = [[1, 1], [0, 1]]`, `ker(I − M)` and `range(I − M)`
   coincide; with `b = (0, 1)` the orbit of the origin is `(n(n − 1)/2, n)`. Free fall in phase space
   is exactly this case.
@@ -287,6 +288,8 @@ polynomial in the jets of the one complex rate. `v⁻¹v̇` is the Maurer–Cart
 - **Three dimensions.** With `σ = (v·v̇)/|v|²` and `Ω_⊥ = (v × v̇)/|v|²`, `v̇ = σv + Ω_⊥ × v`; the
   velocity does not determine the body's spin about `v`. The Frenet frame turns at `|v|(τT + κB)` per
   unit time (torsion needs `κ ≠ 0`). Constant speed, curvature and torsion give the circular helix.
+  [formal-checked] A constant `τ/κ` alone gives a general helix: the axis `(τ/κ)T + B` is fixed and
+  the tangent keeps a constant reading against it (Lancret, `motion.lancret-general-helix`).
 
 ### 3.7 Momentum and inertia
 
@@ -544,7 +547,9 @@ which the Rust tests check on every pair of `[−2, 2]²`.
 - **Owed in #62:** `PSL(2, ℂ) ≅ SO⁺(1, 3)`; Chasles; Lancret; the crystallographic restriction;
   the hypergeometric monodromy and the Schwarz map; Hill's Floquet kinds for the pump; the Weyl
   split and Petrov; Raychaudhuri; the reversibility of linear diffusions; polar factors over exact
-  square-root extensions; and the chase consumer of `(v, v′)`.
+  square-root extensions; and the chase consumer of `(v, v′)`. Since discharged in #410: Chasles
+  and Lancret (`Geometry/Motion`) and the reversibility of linear diffusions
+  (`Physics/Thermal/LinearDiffusion`).
 
 ## 10. The first draft's errors (corrected above)
 
