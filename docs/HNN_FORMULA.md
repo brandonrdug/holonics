@@ -768,8 +768,9 @@ at a distance, so the HNN never takes it as its step (light record §8.1). The s
 is local: junction scattering about the participation anchor, a half-turn about it
 (`hnn::propagation::{participation, scattering_about}`, with `junction_scattering` the tests' exact
 reference; Lean
-`HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry}`), one contact hop per
-tick. This global scattering survives in two roles only:
+`HNN/Propagation.{junctionScattering_involutive, junctionScattering_isometry, junctionScattering_det}`;
+its determinant is `(−1)^(#ports · dim V)`, one half-turn per contact-port direction), one contact
+hop per tick. This global scattering survives in two roles only:
 - as the overdamped continuum-limit reading of that local law (atlas `heat.telegraph-relaxation`);
 - as the prototype's history.
 
