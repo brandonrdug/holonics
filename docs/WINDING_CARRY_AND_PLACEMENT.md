@@ -58,6 +58,15 @@ set aside cascade decompositions because irreducible factors discard the gluing;
 cocycle supplies that gluing in the cyclic extension example. A general cascade retains its
 full dependency and decoder maps as in §6.
 
+[interpretation; agent-inferred] A packet is an oriented group of crossings with its own incidence,
+clock, unit and contact relations, not a fixed hardware octet. Distinct packets can return the same
+face at a common receiving interaction while continuing to carry different internal relations. The odometer holds a declared grouping; the tower's news clock changes when its
+sections are crossed, and selecting a contact's radix and packet width through the field remains a
+research join. In base 7, a digit is one of seven phases and its carry turns the next ring; a
+prime's last-place phase and a base's place-winding on a seven-ring are two different readings.
+The [counting-faces record](../research/records/2026-10-28_COUNTING_FACES_VARIABLE_PACKETS_AND_THE_THERMODYNAMIC_GEOMETRY_OF_CONTACT.md)
+joins these to odd-contact frustration, color, thermodynamics and the field's consuming contact.
+
 ## 2. Pair = torus with a modular address
 
 [proved-derived; formal-checked] Two periodic phase charts form a torus. At a supplied contact configuration, a rational

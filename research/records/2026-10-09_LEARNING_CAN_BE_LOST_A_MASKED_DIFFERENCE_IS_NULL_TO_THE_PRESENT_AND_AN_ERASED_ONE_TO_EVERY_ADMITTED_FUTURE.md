@@ -1,5 +1,11 @@
 # Learning can be lost: a masked difference is null to the present, an erased one to every admitted future
 
+> **October 28 correction:** The rounded block-count formula in §2.2 and §4.5 is not a
+> thermodynamic entropy and cannot by itself determine Landauer heat. The [counting-faces lens](2026-10-28_COUNTING_FACES_VARIABLE_PACKETS_AND_THE_THERMODYNAMIC_GEOMETRY_OF_CONTACT.md)
+> keeps the merge/masking distinction, and supplies the distribution- and process-dependent
+> thermal reading; uniform reset of seven states has the ideal bound `k_B T ln 7`, not three
+> times the one-bit bound.
+
 **Date.** October 9 (the lens: October 7). **Issues.** #73, #62, #63. **Grade.** Lens record. Each
 section carries its own grade. §2 joins formal-checked owners. §2.4's contraction is checked by
 exact computation, and the lemmas of §2.2 and §2.5 are proved here. The joins in §4 are owed.

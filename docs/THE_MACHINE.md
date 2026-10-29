@@ -94,6 +94,20 @@ half-turn; their coupled phase energy has the exact binary Ising restriction. Bi
 oriented changes and composed paths belong to the construction before any machine-word grouping or
 application alphabet is chosen ([notation](HOLONIC_NOTATION.md#arrows-signs-and-turns)).
 
+[interpretation; agent-inferred] **Counting and variable-grain faces.** A number is an oriented
+packet: its components, unit, clock, incidence, carry and reachable contacts belong to its
+situation. A count reads its crossings relative to a receiver; its radix is the receiver's grouping,
+with each place's phase and carry reading a ring and its winding. Two packets' received faces can
+agree after transport to a common receiver and unit; that does not identify the packets themselves.
+The [oriented-packet lens](../research/records/2026-10-28_A_NUMBER_IS_AN_ORIENTED_PACKET_TROPICAL_CANCELLATION_AND_CULTIVATED_LOCALITY.md) joins tropical cancellation, linguistic
+loops and locally cultivated problem–solution relations to the field's continuation law. A register or packet can have the grain of
+the participating face rather than an octet. The tower's news clock already changes its section
+arrivals with its own prediction; contact-selected radices and packet widths are a research join.
+A contact's color reads relative phase, slip and material through its receiving scope. Odd-ring
+frustration, simplicial boundary flux, finite-temperature potentials and their tropical faces are
+readings of this same circuit. The [October 28 counting-faces lens](../research/records/2026-10-28_COUNTING_FACES_VARIABLE_PACKETS_AND_THE_THERMODYNAMIC_GEOMETRY_OF_CONTACT.md)
+works through bases 2–10, base 7 and the Athena consumer, with the retained fibre at recharting.
+
 [project-postulate] **Compression is intelligence is navigation**
 ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)). Holonic Compression couples a
 fractal navigator's resonating modes with terrain; its kernel (what no admitted future receiver
@@ -137,6 +151,15 @@ acoustic or motor chart is a boundary of it. Owners: Lean `Transport/HelicalPair
 ([`holonic_interaction/helical.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction/helical.rs),
 [`holonic_chain/serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs))
 were port sources for the current contact owner `holon::contact`.
+
+[definition; agent-inferred, October 28] **Attention is the field's participation through its own
+transport.** The present site pairs its coholon chart with each earlier site's Holon chart through
+the turn the modes carried between them, the contact's friction dissipates that pairing along the
+dissipation they met, and the sites participate by the Gibbs face of the result, carried as the
+associative (mass, current) pair. Nothing is written to be looked up: the address is the transport.
+The selective tower is this law's participation-one restriction, and a fixed-geometry Transformer is
+its constant-move restriction. Owner and acceptance:
+[the participation record](../research/records/2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_THROUGH_ITS_OWN_TRANSPORT_SO_THE_PASSAGE_IS_TERRAIN_AND_THE_MODES_ARE_ITS_GEOMETRY.md).
 
 [project-postulate] **One picture, six general objects** ([winding guide](WINDING_CARRY_AND_PLACEMENT.md)).
 The pair unit continues into six objects. A design or worker brief states which it touches and

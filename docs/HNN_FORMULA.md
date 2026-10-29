@@ -103,6 +103,27 @@ interior survives each. Owners: `Computation/HolonicArchitectureCharts`,
 `Physics/ReflectedBoundaryMemory`. S4 evaluates the resolvent by structured Cauchy kernels;
 Mamba's selective maps need the ordered product. Neither prescribes the HNN's topology.
 
+[proved-derived; October 28] **The first dynamic boundary face carries storage.** For a reciprocal
+linear region `C ẋ = −Lx+u`, `C=diag(C_B,C_I) ≻ 0`, `L=[[A,B],[B*,D]] ⪰ 0`, `D ≻ 0`,
+`Λ(s)=A+s C_B−B(D+s C_I)⁻¹B*` retains the initial interior and its forcing. With harmonic extension
+`E=[I;−D⁻¹B*]`, its static face and first frequency derivative are
+`S=Λ(0)=E*LE` and `C_eff=Λ′(0)=E*CE=C_B+BD⁻¹C_I D⁻¹B*`. The low-frequency local rates solve
+`S v=λ C_eff v`; that approximation needs separation from the interior poles. The
+[contact and clock derivation](../research/records/2026-10-28_THE_CONTACT_CARRIES_JOINT_PRECISION_AND_COARSE_GRAINING_CARRIES_A_CLOCK.md) gives its exact remainder, a passive
+family with identical `S=1` and arbitrarily slow boundary return, and the material variations
+`δS=E*δL E`, `δλ=v*(δS−λδC_eff)v` for a simple normalized generalized eigenvalue. A moving
+extension carries `E*CĖ` in the projected dynamics. These extend the owned static/dynamic Schur
+laws at their consumer; `KronReduction` does not yet implement this dynamic capacity/rate reading.
+
+[proved-derived; research join, October 28] The [free-energy/bridge synthesis](../research/records/2026-10-28_THE_FREE_ENERGY_RETURN_JOINS_WEIL_SHELLS_HODGE_FIBRES_AND_CONDUCTING_BRIDGES.md) applies the same boundary return to
+conditioned Weil shells, Hodge complement modes and the actual conducting/thermal instances. A
+new contact `w h h*` changes the boundary form by `w aa*/(1+wr)` and the conditional determinant
+by `1+wr`, with `a=E* h`, `r=h_I*D⁻¹h_I`. For a scalar graph interior that determinant counts
+rooted forests. On the action side, the finite-time endpoint map `A_T` gives `W_T=A_T A_T*`,
+minimum effort `x*W_T^+x` on its range, and reached volume proportional to `√det′W_T` at fixed
+rank and effort. These are consuming receiver relations; the code's actual actions, energy
+metric, clocks and source-derived comparison remain attached.
+
 [definition] **The diffusion clocks.** Deterministic diffusion conducts a field through its
 constituted evolution; probabilistic diffusion conducts a source measure through transition
 kernels; generative denoising carries an initial field toward product receivers by an evolution
