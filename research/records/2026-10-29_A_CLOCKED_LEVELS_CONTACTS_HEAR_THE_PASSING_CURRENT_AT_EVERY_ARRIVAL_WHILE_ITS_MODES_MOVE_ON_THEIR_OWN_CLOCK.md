@@ -156,6 +156,13 @@ three-quarters, none off). `bash tools/gate.sh`: 22 of 22.
 **Card.** `kernels/tower.cu` reads `W₁ˣ` transposed in the forward (`tower_forward`, the drive's
 part beside `W₁ᵃ`'s) and returns `W₁ˣᵀ δa` to the input covector in `tower_reverse_contacts`, after
 the level's output covector is kept for the return's material; `TowerCard::outer_families` sums
-`δa x_lᵀ`. The law words carry the family, its reach and the flag. Parity at the race's
-declaration is owed (acceptance 3). The race commands are `train-two-ladder-passage-tower-classes`
+`δa x_lᵀ`. The law words carry the family, its reach and the flag. [measured, RTX 4080 SUPER] At
+`cf459c4e8` the card's 39 tests passed, but the first parity was refused before any section: the
+frame sized its list of transposed families without the passage (a write of 99 words into 87, the
+missing 12 being one `W₁ˣ` family on each of four levels), and no card test joined the passage.
+The frame's shape now carries the passage, and two card tests join it, opened off the keys:
+`the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections` (clocked and unclocked) and
+`the_cards_clocked_participating_passage_on_the_pair_contact_holds_an_uncompared_place_as_the_host_does`
+(beside clocked participation on the pair contact, beside the mutual contact, and advanced class
+by class under the clock). Parity at the race's declaration is owed (acceptance 3). The race commands are `train-two-ladder-passage-tower-classes`
 and `train-two-ladder-news-passage-tower-classes`; `tower_pass parity … passage` joins it.
