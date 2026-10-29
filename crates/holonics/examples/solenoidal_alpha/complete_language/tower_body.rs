@@ -18,6 +18,9 @@
 //!   its opening (`PARTICIPATION.tsv`), the sites of the conversation's open section.
 //! - `answer-tower-body BODY BODY_SHA ANSWER ANSWER_SHA OUT`: the class file heard as the target of the
 //!   last ask, compared with its end letter.
+//! - `grow-tower-body BODY BODY_SHA FACTOR KEYS KEYS_SHA OUT`: the body widened by `FACTOR` at rest,
+//!   the copies' differences drawn from the declared founding keys (record
+//!   `2026-10-29_THE_BODY_GROWS_BY_COPIES_…`).
 //!
 //! Nothing here is text-specific: the classes are the exterior codec's (octets and the end letter,
 //! the alphabet's last), and the releases print their octets beside the classes.
@@ -113,6 +116,28 @@ pub(crate) fn answer_realized(args: &[String], realization: &mut dyn PassRealiza
     rest(&body, Path::new(&args[5]), "answer", &heard, started)
 }
 
+/// `grow-tower-body BODY BODY_SHA FACTOR KEYS KEYS_SHA OUT`: the body grown at rest by `FACTOR`
+/// ([`TowerBody::grow`]), the copies' differences drawn from the declared founding keys, four
+/// bytes a draw. It moves no section, so it runs on the host on either route.
+pub(super) fn grow(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("grow-tower-body BODY BODY_SHA FACTOR KEYS KEYS_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let mut body = TowerBody::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let factor = positive(&args[3])?;
+    let keys = pinned_read(&args[4], &args[5], READ_BUDGET as usize)?;
+    let draws = body.learner.tower.growth_draws(factor);
+    if keys.len() < 4 * draws {
+        return Err(format!("the growth draws {draws} keys, {} bytes; the key file holds {}", 4 * draws, keys.len()).into());
+    }
+    let before = body.learner.tower.declaration;
+    body.grow(factor, &keys).map_err(|e| e.to_string())?;
+    let d = body.learner.tower.declaration;
+    println!("TOWER_BODY_GROW factor={factor} width={}->{} modes={}->{} contacts={}->{}", before.width, d.width, before.modes, d.modes, before.contacts, d.contacts);
+    rest(&body, Path::new(&args[6]), "grow", &Hearing::default(), started)
+}
+
 /// The body read from its pinned text, admitted by the realization.
 fn read_body(path: &str, sha: &str, realization: &mut dyn PassRealization) -> Result<TowerBody> {
     let body = TowerBody::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -186,6 +211,13 @@ mod tests {
         run(hear, &["hear-tower-body", &at("FOUND"), &pinned("FOUND"), &passage, &passage_sha, &at("HEARD")]);
         run(ask, &["ask-tower-body", &at("HEARD"), &pinned("HEARD"), &prompts, &prompts_sha, &keys, &keys_sha, "6", "1", &at("ASKED")]);
         run(answer, &["answer-tower-body", &at("ASKED/BODY"), &pinned("ASKED/BODY"), &answered, &answered_sha, &at("ANSWERED")]);
+        let (founding, founding_sha) = put("FOUNDING", &key[..4 * 4096]);
+        run(grow, &["grow-tower-body", &at("ANSWERED"), &pinned("ANSWERED"), "2", &founding, &founding_sha, &at("GROWN")]);
+        let (question, question_sha) = put("QUESTION", &classes(&[2, 0, 4]));
+        run(ask, &["ask-tower-body", &at("ANSWERED"), &pinned("ANSWERED"), &question, &question_sha, &keys, &keys_sha, "6", "1", &at("ASKED_OLD")]);
+        run(ask, &["ask-tower-body", &at("GROWN"), &pinned("GROWN"), &question, &question_sha, &keys, &keys_sha, "6", "1", &at("ASKED_GROWN")]);
+        let releases = |d: &str| std::fs::read(dir.join(d).join("RELEASES.classes")).expect("releases");
+        assert_eq!(releases("ASKED_GROWN"), releases("ASKED_OLD"), "the grown body releases what the body releases");
         let rows = std::fs::read_to_string(dir.join("ASKED/RELEASES.tsv")).expect("releases");
         assert_eq!(rows.lines().count(), 3, "a row a prompt");
         assert!(std::fs::read_to_string(dir.join("ASKED/PARTICIPATION.tsv")).expect("participation").lines().count() > 1);

@@ -498,6 +498,54 @@ fn the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold() {
     }
 }
 
+/// The growth's acceptance 7 (record `2026-10-29_THE_BODY_GROWS_BY_COPIES_…`): a body that heard,
+/// grown at rest, hears, asks and answers on the card as on the host, and a grown card body
+/// restarted cold with a new card realization is the host's that never stopped.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_grown_body_continues_as_the_hosts() {
+    let card = Card::open(0).expect("the card");
+    let (learner, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
+    let k = keys(1 << 14);
+    let founding = keys(learner.tower.growth_draws(2) * 4);
+    let (first, second) = (passage(11, 300), passage(11, 511)[300..].to_vec());
+    let prompt: Vec<usize> = (0..9).map(|i| (i * 3 + 1) % 10).collect();
+    let answer: Vec<usize> = (0..14).map(|i| (i * 7 + 2) % 10).collect();
+    let grown = |realization: &mut dyn PassRealization| -> TowerBody {
+        let mut body = TowerBody::found(learner.clone(), 4, 12).expect("founded");
+        body.hear(&first, realization).expect("heard");
+        body.grow(2, &founding).expect("grown");
+        body
+    };
+    let after = |body: &mut TowerBody, realization: &mut dyn PassRealization| -> Vec<(String, Option<Answer>)> {
+        let mut seen = Vec::new();
+        body.hear(&second, realization).expect("heard");
+        seen.push((body.to_text(), None));
+        let asked = body.ask(&prompt, &k, 40, 1, realization).expect("asked");
+        seen.push((body.to_text(), Some(asked)));
+        body.answer(&answer, realization).expect("answered");
+        seen.push((body.to_text(), None));
+        seen
+    };
+    let mut reference = HostPass::default();
+    let mut host = grown(&mut reference);
+    let host_seen = after(&mut host, &mut reference);
+    let mut realized = TowerCard::open(&card).expect("the tower's image");
+    let mut on_card = grown(&mut realized);
+    let rested = on_card.to_text();
+    let card_seen = after(&mut on_card, &mut realized);
+    for (i, (h, c)) in host_seen.iter().zip(&card_seen).enumerate() {
+        assert_eq!(h, c, "operation {i}: the card's grown body is the host's");
+    }
+    drop(realized);
+    let mut cold = TowerBody::from_text(&rested).expect("restored");
+    let mut fresh = TowerCard::open(&card).expect("the tower's image");
+    let cold_seen = after(&mut cold, &mut fresh);
+    for (i, (h, c)) in host_seen.iter().zip(&cold_seen).enumerate() {
+        assert_eq!(h, c, "operation {i}: the grown card body restarted cold is the host's that never stopped");
+    }
+}
+
 /// The pair face's acceptance (the record `2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD…`): 32 sections
 /// equal face by face and covector entry by entry, the learners and their states after each.
 #[test]

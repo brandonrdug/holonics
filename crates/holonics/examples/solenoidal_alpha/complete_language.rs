@@ -830,6 +830,7 @@ pub(super) fn run_with_execution(
         Some("hear-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::hear(args),
         Some("ask-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::ask(args),
         Some("answer-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::answer(args),
+        Some("grow-tower-body") if backend == CompleteLanguageTrainingBackend::HostReference => tower_body::grow(args),
         Some("found-tower-ring") if backend == CompleteLanguageTrainingBackend::HostReference => tower_ring::found_tower_ring(args),
         Some("found-unit-rotor-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_rotor::found_unit_rotor_tower(args),
         Some("locate-strands") if backend == CompleteLanguageTrainingBackend::HostReference => tower_rotor::locate_strands_on(args),
@@ -877,7 +878,8 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
         Some("hear-tower-body") => tower_body::hear_realized(args, realization),
         Some("ask-tower-body") => tower_body::ask_realized(args, realization),
         Some("answer-tower-body") => tower_body::answer_realized(args, realization),
-        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower, release-tower-classes, or the body's found-tower-body, hear-tower-body, ask-tower-body and answer-tower-body".into()),
+        Some("grow-tower-body") => tower_body::grow(args),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower, release-tower-classes, or the body's found-tower-body, hear-tower-body, ask-tower-body, answer-tower-body and grow-tower-body".into()),
     }
 }
 
