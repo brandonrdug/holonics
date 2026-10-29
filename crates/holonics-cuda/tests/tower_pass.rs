@@ -1,9 +1,9 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
-//! and its streams' states, with and without the pair face, the ring face, the turned modes and the
-//! news clock; and the card refuses a declaration it does not carry.
+//! and its streams' states, with and without the pair face, the ring face, the turned modes, the
+//! pumped modes, the rotor and the news clock; and the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
+use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
 
 /// A declared exterior key stream: a 64-bit linear congruential walk, its high octets.
@@ -28,12 +28,15 @@ fn declaration(alphabet: usize, gated: bool, turned: bool, pumped: bool) -> Towe
 }
 
 /// The faces a fixture joins to the gated tower: `forms` pair forms (none at zero), the ring face
-/// it names, whether its modes are turned, and the news clock its levels tick on.
+/// it names, whether its modes are turned, whether they are pumped (a pumped mode is turned),
+/// whether a rotor steps them, and the news clock its levels tick on.
 #[derive(Clone, Copy, Default)]
 struct Faces {
     forms: usize,
     ring: Option<Ringed>,
     turned: bool,
+    pumped: bool,
+    rotor: bool,
     news: Option<NewsClock>,
 }
 
@@ -45,21 +48,29 @@ struct Ringed {
     harmonics: usize,
 }
 
-/// The gated tower founded on the keys, turned when `faces.turned` (its turn opened by
-/// `open_turn`), with `faces.forms` pair forms joined when there are any (`join_pair`), the ring
-/// face when `faces.ring` names one (`join_ring`) and the news clock last when `faces.news` names
-/// one.
+/// The gated tower founded on the keys, turned when `faces.turned` or `faces.pumped` (its turn
+/// opened by `open_turn`), pumped when `faces.pumped` (its pump opened by `open_pump`), with
+/// `faces.forms` pair forms joined when there are any (`join_pair`), the ring face when
+/// `faces.ring` names one (`join_ring`), the rotor when `faces.rotor` (`join_rotor`) and the news
+/// clock last when `faces.news` names one.
 fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
-    let tower = Tower::found_on(declaration(alphabet, true, faces.turned, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
+    let turned = faces.turned || faces.pumped;
+    let tower = Tower::found_on(declaration(alphabet, true, turned, faces.pumped), &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
-    if faces.turned {
+    if turned {
         open_turn(&mut learner);
+    }
+    if faces.pumped {
+        open_pump(&mut learner);
     }
     if faces.forms > 0 {
         join_pair(&mut learner, faces.forms);
     }
     if let Some(ring) = faces.ring {
         join_ring(&mut learner, ring);
+    }
+    if faces.rotor {
+        join_rotor(&mut learner);
     }
     if let Some(clock) = faces.news {
         learner.join_news(clock).expect("the clock joins");
@@ -85,6 +96,59 @@ fn open_turn(learner: &mut TowerLearner) {
             j += 1;
         }
     }
+}
+
+/// A pumped tower founds its pump at zero (`κ = 0`, `β = 0`), on its turned twin; the fixture opens
+/// each level's depth `W_κ` and axis `W_ψ` (about ±¼ on `2^(−24)`) and their biases (about ±2 on
+/// `2^(−16)`: a depth logit of ±2, so `|κ|` reaches about ¾ and modes pass the bifurcation, and an
+/// axis of ±2 half turns) off the key stream, so the pump turns and boosts from the first section.
+fn open_pump(learner: &mut TowerLearner) {
+    let d = learner.tower.declaration;
+    let k = keys(1 << 16);
+    let law = learner.tower.resident_law().expect("the law");
+    let mut j = 20000;
+    for lv in &law.levels {
+        for (material, bias) in [(lv.pump, lv.pump_bias), (lv.pump_axis, lv.pump_axis_bias)] {
+            for i in material..material + d.modes * d.width {
+                learner.tower.theta[i] = (k[j] as i32 - 128) << 15;
+                j += 1;
+            }
+            for i in bias..bias + d.modes {
+                learner.tower.theta[i] = (k[j] as i32 - 128) << 10;
+                j += 1;
+            }
+        }
+    }
+}
+
+/// A rotor of three rings on a level's first seven modes, of moduli 9, 11 and 101 and widths 1, 2
+/// and 4 (the orders of 10 modulo each), the eighth mode still; its steps and turns are read off the
+/// key stream, so some turns are zero, and the first class steps and turns nothing at any level.
+fn join_rotor(learner: &mut TowerLearner) {
+    let d = learner.tower.declaration;
+    let rings = vec![RotorRing { width: 1, modulus: 9 }, RotorRing { width: 2, modulus: 11 }, RotorRing { width: 4, modulus: 101 }];
+    let k = keys(1 << 16);
+    let mut j = 30000;
+    let mut key = |class: usize, below: u32| {
+        j += 1;
+        if class == 0 { 0 } else { u32::from(k[j]) % below }
+    };
+    let mut steps = Vec::new();
+    let mut turns = Vec::new();
+    for _ in 0..d.levels {
+        for class in 0..d.alphabet {
+            for g in &rings {
+                steps.push(key(class, g.width as u32));
+            }
+            for g in &rings {
+                for _ in 0..g.width {
+                    turns.push(key(class, g.modulus));
+                }
+            }
+        }
+    }
+    let rotor = Rotor::new(&d, rings, steps, turns).expect("the rotor");
+    learner.tower.join_rotor(rotor).expect("the rotor joins");
 }
 
 /// A ring rank whose factors are read off the key stream at `at` (as the host's fixture reads
@@ -220,7 +284,7 @@ fn the_cards_ring_faced_pass_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 0, mode: 1, harmonics: 1 }), turned: false, news: None });
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 0, mode: 1, harmonics: 1 }), ..Faces::default() });
 }
 
 /// The turned modes' acceptance: 32 sections equal face by face and covector entry by entry, the
@@ -236,7 +300,53 @@ fn the_cards_turned_pass_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_turned_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
-    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), turned: true, news: None });
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), turned: true, ..Faces::default() });
+}
+
+/// The pumped modes' acceptance: 32 sections equal face by face and covector entry by entry, the
+/// learners and their states after each, every mode turned through the ladder and pumped, some
+/// past the bifurcation.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { pumped: true, ..Faces::default() });
+}
+
+/// Pumped modes beside the pair face and the ring face, the ring riding a pumped mode (its move's
+/// `α` and `β`), an uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_ring_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, ring: Some(Ringed { level: 1, mode: 5, harmonics: 2 }), pumped: true, ..Faces::default() });
+}
+
+/// The pumped tower's advance is the host's, class by class.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { pumped: true, ..Faces::default() });
+}
+
+/// The rotor's acceptance: 32 sections equal face by face and covector entry by entry, the learners
+/// and their states after each, three rings stepped and turned at every class but the first.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_rotor_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { rotor: true, ..Faces::default() });
+}
+
+/// The rotor stepping pumped modes beside the pair face, an uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_rotor_and_pair_faced_pass_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, pumped: true, rotor: true, ..Faces::default() });
+}
+
+/// The rotor tower's advance is the host's, class by class, the still first class among them.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_rotor_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { pumped: true, rotor: true, ..Faces::default() });
 }
 
 /// The news clock's acceptance: 32 sections equal face by face and covector entry by entry, the
@@ -310,8 +420,8 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let parts: Vec<&[usize]> = vec![&classes[..]];
     let targets = vec![classes[1..].iter().map(|&c| Some(c)).collect::<Vec<_>>()];
     assert!(realized.forward(&ungated, &[ungated.rest()], &parts, &targets, Slot::Opened).is_err());
-    let pumped = Tower::found_on(declaration(11, true, true, true), &keys(1 << 16), TurnLadder::Both).expect("founded");
-    assert!(realized.forward(&pumped, &[pumped.rest()], &parts, &targets, Slot::Opened).is_err());
+    let paired = Tower::found_on(TowerDeclaration { contact: ContactLaw::Pair, ..declaration(11, true, false, false) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
+    assert!(realized.forward(&paired, &[paired.rest()], &parts, &targets, Slot::Opened).is_err());
     let (host, _) = learners(11, Faces::default());
     assert!(realized.forward(&host.tower, &[host.tower.rest_with_credit()], &parts, &targets, Slot::Opened).is_err());
     let ragged: Vec<&[usize]> = vec![&classes[..], &classes[..9]];
