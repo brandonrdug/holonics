@@ -213,6 +213,15 @@ is owed, and named in §8.
    the moves between `j` and `i` only); its participation-one restriction is the tower's recurrence;
    the head's Gibbs face is the posterior of its frictioned faces.
 
+**Status, October 29 (host).** 1(a) passes for the rectifying and pair contacts: the joined tower
+opens on the plain tower face for face, covector entry for covector entry on every shared family, and
+learner for learner with participation's families held; before `W₁ᵃ` opens only `W₁ᵃ` carries a
+covector. 1(b) passes for every participation family the tiny tower reads above 1/64 bit a unit
+(charts of each kind, the current's read, `W₁ᵃ` on each level, the friction), within a tenth of the
+code's fitted slope. 1(c) and 1(d) pass in `hnn::tower::participation`, with the participation-one
+restriction (`m_i y_i` is the head's recurrence). The tower and its learner restore exactly. The card
+refuses a participating tower until its kernel and parity land (2), and nothing is measured (3).
+
 **The device line.** The card under the lock for every learner run; the host realization only as the
 parity reference. The workload is the race's (its passage, keys, declaration and laps); time and
 memory are projected from a one-to-three-minute read on the card before launch, never by cutting it.

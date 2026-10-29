@@ -1252,3 +1252,5 @@ import HolonicsResearch.HNN.CertifiedSection
 import HolonicsResearch.Mathematics.OnePlaneRing
 import HolonicsResearch.Mathematics.RotorPlanes
 import HolonicsResearch.Mathematics.UncoupledBank
+import HolonicsResearch.Mathematics.RingSpectrum
+import HolonicsResearch.HNN.EffectiveTension

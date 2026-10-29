@@ -518,6 +518,9 @@ impl<'c> TowerCard<'c> {
         if !d.gated {
             return refuse("the card carries the gated tower");
         }
+        if law.participation.is_some() {
+            return refuse("the card's participation is owed: it carries the tower without it");
+        }
         if d.pumped && (!d.turned || law.news.is_some()) {
             return refuse("the card pumps a turned mode, never beside a news clock");
         }

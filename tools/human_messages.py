@@ -25,7 +25,7 @@ What is a human message:
   `claude-ambiguous`, with a diagnostic, rather than attributed to Brandon. These labels do not
   establish fresh user authorization. Envelope-like quotations inside ordinary prose stay prose.
 - **Codex** (`~/.codex/sessions/**/rollout-*.jsonl`). Only Brandon's interactive threads (the
-  terminal, `codex-tui`/`cli`, and Codex Desktop, `vscode`) whose working directory is this
+  terminal, `codex-tui` with source `cli` or `vscode`, and Codex Desktop, `vscode`) whose working directory is this
   checkout. Workers, `codex exec` consultations and threads launched by Claude are agents'. A
   `user` message's text, less the injected AGENTS.md, environment, plugin, image and `/goal`
   continuation wrappers. A message with attached files keeps only its "My request" part.
@@ -69,7 +69,8 @@ CLAUDE_HARNESS = ("<local-command", "<command-name>", "<command-message>", "<com
 CODEX_HARNESS = ("<codex_internal_context", "<environment_context", "<user_instructions",
                  "<user_shell_command", "<recommended_plugins", "<INSTRUCTIONS>", "# AGENTS.md",
                  "<image", "</image>", "<turn_aborted")
-CODEX_HUMAN_THREADS = {("codex-tui", "cli"), ("Codex Desktop", "vscode")}
+# The terminal reports `vscode` as its source since it runs on the desktop app's server (October 28).
+CODEX_HUMAN_THREADS = {("codex-tui", "cli"), ("codex-tui", "vscode"), ("Codex Desktop", "vscode")}
 REMINDER = re.compile(r"<system-reminder>.*?</system-reminder>", re.S)
 REQUEST = re.compile(r"^## My request[^\n]*:\s*$", re.M)
 BARE_COMMAND = re.compile(r"^/[\w:-]+$")  # `/compact` alone: an operation, not a message
