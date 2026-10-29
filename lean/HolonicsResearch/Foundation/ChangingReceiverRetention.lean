@@ -227,6 +227,7 @@ end Defect
 
 section Harmonic
 
+open Matrix
 open Module
 open Holonics.Foundation.HodgeReceiver
 open Holonics.Compression.Core.FaceMap
@@ -311,6 +312,7 @@ end Harmonic
 
 namespace Triangle
 
+open Matrix
 open Holonics.Foundation.HodgeReceiver
 open Holonics.Aeon.Production
 
