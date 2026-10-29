@@ -16,15 +16,15 @@ reverse), the layout and the tower's text, the card (`kernels/tower.cu`, `TowerC
 about 15, 30, 45 and 60 minutes, and run longer only once it is plainly improving. The clocked
 tower (the news clock `B = 8`, `r = 2`, the held step) raced with and without participation from
 22:33 UTC, the race's declaration otherwise unchanged (width 64, 128 modes, 256 contacts, four
-levels, 320 streams, sections of 128, rate `2^(−7)`), beside the unclocked towers' laps from
-earlier the same day. Held-out bits a byte:
+levels, 320 streams, sections of 128, rate `2^(−7)`), beside the unclocked towers' laps (the participating
+tower's from earlier the same day, the plain tower's from October 27). Held-out bits a byte:
 
 | lap | plain | clocked plain | participating | clocked participating |
 |---|---|---|---|---|
 | 0 | 2.356 | 2.465 | 2.298 | 2.334 |
 | 1 | 2.139 | 2.365 | 2.152 | 2.238 |
-| 2 | | 2.303 | | 2.192 |
-| 3 | | 2.265 | | 2.161 |
+| 2 | 2.060 | 2.303 | | 2.192 |
+| 3 | 2.020 | 2.265 | | 2.161 |
 
 Both clocked races ran four laps in the hour (the plain one waited on the card between its laps
 while the participating one held it). A plain lap takes about 114 s on the card in either clock; a
@@ -61,6 +61,18 @@ state `h_close`); it leaves the coarse contacts silent between ticks, so it is n
 The control that tests the inference: the plain tower with one level, raced two laps on the same
 passage. If the clocked plain tower reads about as the one-level tower does, its upper levels add
 little at the arrivals they do not tick.
+
+[measured, RTX 4080 SUPER, October 29, at `1ec7c9dae`] The one-level tower (no clock, no
+participation, the declaration otherwise the race's) reads 2.462 and 2.354 held out at laps 0 and 1,
+against the clocked plain tower's 2.465 and 2.365: the clocked tower's three upper levels add 0.003
+and −0.011. The one-level lap takes 49 s against 114 s for four levels. The race's readings agree:
+the clocked plain tower's level 3 keeps its founded frictions (16 modes at each memory octave from
+`2^1` to `2^8` classes) through lap 2 and moves one or two modes by lap 3, level 2 moves a few, and
+only level 1 learns toward short memories as the unclocked levels do; under participation level 1
+also keeps its founded frictions through lap 2. A coarse level whose contacts return a constant at
+most arrivals hands its modes almost no covector, so its constitution barely moves. The passage
+reaches that too: once the coarse contacts matter at every arrival, the covector their read `W₁ r̂`
+returns to the modes grows with them.
 
 ## 3. The law
 
@@ -100,7 +112,8 @@ beside its covectors through the push, the gate and the charts. The modes' scan 
    entry equal, host against card (RTX 4080 SUPER).
 4. **The race.** One hour on the card, the clocked tower with the join beside the clocked plain
    tower, read at about 15, 30, 45 and 60 minutes with the writings whole. The claim: it reads no
-   worse than the unclocked plain tower held out at its laps 1 and 3 (2.139 at lap 1). Short of
+   worse than the unclocked plain tower held out at its laps 1 and 3 (2.139 at lap 1, 2.020 at lap
+   3, measured October 27 on the same declaration). Short of
    that, the located cause is not the whole cause, and the next loop works on the remainder.
 
 ## 5. The recorded failures these choices could repeat
