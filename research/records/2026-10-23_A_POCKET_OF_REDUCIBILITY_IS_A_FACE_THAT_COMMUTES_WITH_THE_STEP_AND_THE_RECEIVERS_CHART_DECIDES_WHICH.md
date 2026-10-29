@@ -199,8 +199,14 @@ defect, the chart test of §2, and the parametron lattice of §3 as what a cellu
   (`rule_iterate`). The rule keeps its constant only when the constant is zero or the linear weight
   is even (`rule_iterate_of_even`: rules 0, 60, 90, 102, 150, 153, 165, 170, 195, 204, 240, 255);
   the odd-weight complements 15, 51, 85 and 105 lose it and jump as rules 240, 204, 170 and 150 at
-  the scaled offsets. Rule 90's jump is `rule90_jump`. Still owed: the count and the five
-  count-conserving rules as decided statements.
+  the scaled offsets. Rule 90's jump is `rule90_jump`. The count and the five count-conserving
+  rules are formal-checked on October 29 in
+  [`Mathematics/ElementaryRuleCensus`](../../lean/HolonicsResearch/Mathematics/ElementaryRuleCensus.lean):
+  the kernel checks a certificate per rule (integer weights for the 104 thresholds, a summable
+  quadruple refusing every real threshold for the other 152), and conservation is proved for every
+  cycle length, not only up to 12: a rule conserves count exactly when it has the flux form
+  `f(l, c, r) = l + J(c, r) − J(l, c)` with `J(u, v) = f(0, u, v) + f(0, 0, u)`
+  (`conserving_iff_fluxForm`), which the cycles `abc00` and `bc000` of length five already force.
 
 ## Receipts
 

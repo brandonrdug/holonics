@@ -29,8 +29,9 @@ odd weight (rules 15, 51, 85 and 105) drop their constant at the first squaring:
 map, `k ≥ 1`, is the linear rule with the scaled offsets (rules 240, 204, 170 and 150 read at the
 scaled offsets).
 
-Still owed (#410): the count of the 256 rules (16 affine, 104 threshold, 8 both) and the five
-count-conserving rules as decided statements.
+The census of the 256 rules (16 affine, 104 threshold, 8 both) and the five count-conserving
+rules are proved in `Mathematics/ElementaryRuleCensus`, whose `affine_step` reads the 16 affine
+rules as this file's `rule` at offset one.
 
 The computational object is the helical pair interaction: each cell's update is a contact with its
 two neighbours, and degree at most one means no contact binds two neighbours at once. Of the
