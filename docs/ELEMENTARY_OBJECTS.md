@@ -830,14 +830,26 @@ sufficient retention for every solver while the last flux is not, and that the c
 future-sufficient **quotient of the constitution** (`Standing.standingLaw_exists_iff_future_factors`),
 never a record of the fluxes that shaped it.
 
-[proved-derived; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)]
+[formal-checked; GPT-6 Astra, September 27, [record](../research/records/2026-09-27_THE_LEARNER_MUST_MOVE_A_CHASE_TERRAIN_DATA_AS_PARTICLES_WITH_FLUX_AND_RELEASE_AS_A_THRESHOLD_COMMIT.md#14-gpt-6-astras-review)]
 **For an acting receiver, the admitted future includes its actions.** A passive quotient can merge
 two constitutions that emit alike under every action taken so far and differ under a probe. Where
 actions are admitted, retention is the **action-sufficient** quotient: `h ∼ h'` exactly when, for
 every admitted action word `a₁…a_m` and admitted receiver, the future faces under `do(a₁…a_m)` agree.
-In a linear chart this is `ker E ⊆ ker ρ` and `T_a ker E ⊆ ker E` for every admitted `a`: the
-decoding and continuation squares quantified over controls. Predictive-state representations
-(Littman, Sutton and Singh, 2001) are the established construction. Lean owed in #62.
+A retention `E` is action-sufficient exactly when every reading factors through it and every
+one-step continuation of the future-agreement class does. In a linear chart, with the relevance
+kernel `𝒩 = ⋂_(w,R) ker(ρ_R T_w)`, that is `ker E ⊆ 𝒩`: `ker E ⊆ ker ρ_R` and `T_a ker E ⊆ 𝒩` for
+every admitted `a`. A retention the machine keeps running also *descends*, through the decoding and
+continuation squares `D_(c,R) E_c = ρ_R` and `E_(next c a) T_a = U_(c,a) E_c`, whose encoding may
+change between contexts. They hold exactly when `ker E_c ⊆ ker ρ_R` and
+`T_a ker E_c ⊆ ker E_(next c a)`; otherwise a merged direction is read or carried apart, and that
+separating remainder is what a founding step keeps. With one context this is `ker E ⊆ ker ρ` and
+`T_a ker E ⊆ ker E`, stronger than sufficiency: a sufficient retention need not continue into
+itself, but always continues into the minimal chart. Predictive-state representations (Littman,
+Sutton and Singh, 2001) are the established construction. Lean: `Foundation/ActionDescent`
+(`futures_factor_iff`, `nonempty_descent_iff`, `descent_or_separator`, `linear_descent_iff`,
+`ker_le_ker_faceMap_iff`, `Control.sufficient_not_self_continuing`). Receivers and actions that
+themselves change between contexts are owed in #410 (retention and release through changing
+receivers).
 
 <a id="the-retention-contract"></a>
 <a id="collapse-relative-to-the-admitted-future"></a>
