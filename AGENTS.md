@@ -466,8 +466,9 @@ The open issues (October 22):
   contact and chain laws #408 (which merged #27, #28 and #48);
 - step 7, Lean curation #147;
 - formal obligations #410, which carries every owed Lean statement as one box each;
-- parked work #409: step 6's equation extraction #146 and target laws #20, #22, #23 and #32, and
-  the contact terms #30 and #31, closed until their work starts.
+- step 6, equation extraction #146, unparked October 29 (its overture route: inherited coefficients
+  seed the engine's opening, never stand in for it); parked work #409: target laws #20, #22, #23 and
+  #32, and the contact terms #30 and #31, closed until their work starts.
 
 Closed and done: K1 #72, compression and landmarks #145, physics #74–#75, the Lean package #70.
 #62 and #63 closed on October 22; older references to #62 resolve through its closing pointer to

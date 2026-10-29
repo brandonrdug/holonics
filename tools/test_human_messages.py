@@ -217,5 +217,32 @@ class ProvenanceFixtures(unittest.TestCase):
             self.assertNotIn("Private malformed body", err.getvalue())
 
 
+class CodexThreadSources(unittest.TestCase):
+    """The terminal's `codex-tui` threads count under both sources; a worker's dict source does not."""
+
+    def collect(self, meta_rows):
+        root = Path(tempfile.mkdtemp())
+        glob_root = root / ".codex" / "sessions"
+        glob_root.mkdir(parents=True)
+        for name, meta in meta_rows:
+            user = {"type": "response_item", "timestamp": SENT,
+                    "payload": {"type": "message", "role": "user",
+                                "content": [{"type": "input_text", "text": f"message from {name}"}]}}
+            compact = {"separators": (",", ":")}  # Codex writes compact records; the reader's needle relies on it.
+            (glob_root / f"rollout-{name}.jsonl").write_text(json.dumps({"payload": meta}, **compact) + "\n" + json.dumps(user, **compact) + "\n")
+        with mock.patch("os.path.expanduser", side_effect=lambda p: p.replace("~", str(root))):
+            return [text for _, _, _, text in messages.codex_messages(None)]
+
+    def test_terminal_source_cli_and_vscode_both_count(self):
+        rows = [("cli", {"cwd": messages.ROOT, "originator": "codex-tui", "source": "cli", "id": "a"}),
+                ("vscode", {"cwd": messages.ROOT, "originator": "codex-tui", "source": "vscode", "id": "b"})]
+        self.assertEqual(sorted(self.collect(rows)), ["message from cli", "message from vscode"])
+
+    def test_worker_dict_source_is_not_a_human_thread(self):
+        rows = [("worker", {"cwd": messages.ROOT, "originator": "codex-tui",
+                            "source": {"subagent": {"thread_spawn": {}}}, "id": "c"})]
+        self.assertEqual(self.collect(rows), [])
+
+
 if __name__ == "__main__":
     unittest.main()

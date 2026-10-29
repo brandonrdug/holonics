@@ -60,6 +60,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
+use holonics::hnn::tower::participation::LevelSites;
 use holonics::hnn::tower::realization::{PassRead, PassRealization, ResidentLaw, Slot};
 use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerFace, TowerState};
 
@@ -111,6 +112,9 @@ struct LevelWords {
     pair: u64,
     pair_bias: u64,
     reach: [u64; 11],
+    /// Participation's families and the first nine's reaches (zero without it).
+    pa: [u64; 10],
+    pa_reach: [u64; 9],
 }
 
 /// The law's words (`TowerLaw`).
@@ -168,6 +172,13 @@ struct LawWords {
     strand_contact: u64,
     strand_pair: u64,
     strand_reach: [u64; 2],
+    /// Participation (`participation = 0` without it): its heads, its section, the pairing's
+    /// scale and a held move's met dissipation ([`holonics::hnn::tower::participation`]).
+    participation: u32,
+    pa_heads: u32,
+    pa_section: u32,
+    pa_beta: u32,
+    pa_held_log: i64,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -271,6 +282,31 @@ struct FrameWords {
     strand_ends: u64,
     strand_faces: u64,
     r_strand: u64,
+    pa_heads: u64,
+    pa_probe: u64,
+    pa_key: u64,
+    pa_value: u64,
+    pa_frame: u64,
+    pa_diss: u64,
+    pa_current: u64,
+    pa_read: u64,
+    pa_scale: u64,
+    pa_run: u64,
+    pa_met: u64,
+    pa_z: u64,
+    pa_e: u64,
+    pa_dra: u64,
+    pa_gy: u64,
+    pa_gq: u64,
+    pa_gk: u64,
+    pa_gw: u64,
+    pa_gchart: u64,
+    pa_gfric: u64,
+    r_pa_read: u64,
+    r_pa_yre: u64,
+    r_pa_yim: u64,
+    r_pa_dra: u64,
+    r_pa_g: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -331,6 +367,8 @@ struct Shape {
     /// The strands' rings and their resident table's words (each zero without strands).
     strand_rings: usize,
     strand_table: usize,
+    /// Participation's heads (zero without it).
+    heads: usize,
 }
 
 impl Shape {
@@ -444,12 +482,35 @@ struct Frame<'c> {
     strand_open: CardBuffer<'c, u32>,
     strand_ends: CardBuffer<'c, u32>,
     strand_faces: CardBuffer<'c, i32>,
+    /// Participation's buffers (`TowerFrame`'s participation words; each empty without it).
+    pa_heads: CardBuffer<'c, u32>,
+    pa_probe: CardBuffer<'c, i64>,
+    pa_key: CardBuffer<'c, i64>,
+    pa_value: CardBuffer<'c, i64>,
+    pa_frame: CardBuffer<'c, i64>,
+    pa_diss: CardBuffer<'c, i64>,
+    pa_current: CardBuffer<'c, i64>,
+    pa_read: CardBuffer<'c, i32>,
+    pa_scale: CardBuffer<'c, i64>,
+    pa_run: CardBuffer<'c, i64>,
+    pa_met: CardBuffer<'c, i64>,
+    pa_z: CardBuffer<'c, i64>,
+    pa_e: CardBuffer<'c, u64>,
+    pa_dra: CardBuffer<'c, i64>,
+    pa_gy: CardBuffer<'c, i64>,
+    pa_gq: CardBuffer<'c, i128>,
+    pa_gk: CardBuffer<'c, i128>,
+    pa_gw: CardBuffer<'c, i128>,
+    pa_gchart: CardBuffer<'c, i64>,
+    pa_gfric: CardBuffer<'c, i128>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
     /// turn's covector `δs`, then the pump's depth and axis covectors `δκ`, `δp`, then the second
-    /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`).
-    reach_offsets: [usize; 21],
+    /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`), then
+    /// participation's ratio read, current (re, im) and `∂r̂ᵃ` (each `Q·L`) and its six chart
+    /// covectors (`6·Q·L`).
+    reach_offsets: [usize; 26],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -518,8 +579,8 @@ impl<'c> TowerCard<'c> {
         if !d.gated {
             return refuse("the card carries the gated tower");
         }
-        if law.participation.is_some() {
-            return refuse("the card's participation is owed: it carries the tower without it");
+        if law.participation.as_ref().is_some_and(|p| law.rotor.is_some() || law.ring.is_some() || law.news.is_some() || p.heads.len() > u32::MAX as usize) {
+            return refuse("the card carries participation on gated modes, never beside a rotor, a ring face or a news clock");
         }
         if d.pumped && (!d.turned || law.news.is_some()) {
             return refuse("the card pumps a turned mode, never beside a news clock");
@@ -651,6 +712,14 @@ impl<'c> TowerCard<'c> {
                 words.sections[l] = clock.section(l).expect("admitted");
             }
         }
+        if let Some(p) = &law.participation {
+            words.participation = 1;
+            words.pa_heads = p.heads.len() as u32;
+            words.pa_section = p.section as u32;
+            words.pa_beta = p.beta_shift;
+            words.pa_held_log = law.held_log;
+            words.ln2 = law.ln2 as i64;
+        }
         for (slot, lv) in words.level.iter_mut().zip(&law.levels) {
             *slot = LevelWords {
                 move_re: lv.move_re as u64,
@@ -674,6 +743,8 @@ impl<'c> TowerCard<'c> {
                 pair: lv.pair as u64,
                 pair_bias: lv.pair_bias as u64,
                 reach: lv.reaches,
+                pa: lv.participation.map(|v| v as u64),
+                pa_reach: lv.participation_reaches,
             };
         }
         words
@@ -696,6 +767,12 @@ impl<'c> TowerCard<'c> {
             }
             if d.contact != ContactLaw::Rectifying {
                 out.extend([lv.pair as u64, f, w]);
+            }
+            if law.participation.is_some() {
+                let p = &lv.participation;
+                for (offset, rows, cols) in [(p[0], n, w), (p[1], n, w), (p[2], n, w), (p[3], n, w), (p[4], n, w), (p[5], n, w), (p[6], w, n), (p[7], w, n), (p[8], f, w)] {
+                    out.extend([offset as u64, rows, cols]);
+                }
             }
         }
         if let Some(strands) = &law.strands {
@@ -720,8 +797,9 @@ impl<'c> TowerCard<'c> {
         let ringed = usize::from(r > 0);
         let q = s * t;
         let ql = q * l;
-        let mut reach_offsets = [0usize; 21];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded];
+        let (heads, pa) = (shape.heads, usize::from(shape.heads > 0));
+        let mut reach_offsets = [0usize; 26];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -731,7 +809,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired) * l + stranded * (1 + paired)))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa) * l + stranded * (1 + paired)))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -807,6 +885,26 @@ impl<'c> TowerCard<'c> {
             strand_open: card.alloc(s * (3 * sr + 1) * stranded)?,
             strand_ends: card.alloc(s * (3 * sr + 1) * stranded)?,
             strand_faces: card.alloc(q * 6 * sr)?,
+            pa_heads: card.alloc((heads + 1) * pa)?,
+            pa_probe: card.alloc(ql * n * 2 * pa)?,
+            pa_key: card.alloc(ql * n * 2 * pa)?,
+            pa_value: card.alloc(ql * n * 2 * pa)?,
+            pa_frame: card.alloc(ql * n * 2 * pa)?,
+            pa_diss: card.alloc(ql * heads)?,
+            pa_current: card.alloc(ql * 2 * n * pa)?,
+            pa_read: card.alloc(ql * w * pa)?,
+            pa_scale: card.alloc(ql * pa)?,
+            pa_run: card.alloc(s * l * n * 2 * pa)?,
+            pa_met: card.alloc(s * l * n * pa)?,
+            pa_z: card.alloc(q * pa)?,
+            pa_e: card.alloc(q * pa)?,
+            pa_dra: card.alloc(ql * w * pa)?,
+            pa_gy: card.alloc(ql * 2 * n * pa)?,
+            pa_gq: card.alloc(q * n * 2 * pa)?,
+            pa_gk: card.alloc(q * n * 2 * pa)?,
+            pa_gw: card.alloc(q * n * 2 * pa)?,
+            pa_gchart: card.alloc(ql * 6 * n * pa)?,
+            pa_gfric: card.alloc(s * l * heads)?,
             reach_offsets,
         });
         Ok(())
@@ -912,6 +1010,31 @@ impl<'c> TowerCard<'c> {
             strand_ends: frame.strand_ends.device_ptr(),
             strand_faces: frame.strand_faces.device_ptr(),
             r_strand: r(20),
+            pa_heads: frame.pa_heads.device_ptr(),
+            pa_probe: frame.pa_probe.device_ptr(),
+            pa_key: frame.pa_key.device_ptr(),
+            pa_value: frame.pa_value.device_ptr(),
+            pa_frame: frame.pa_frame.device_ptr(),
+            pa_diss: frame.pa_diss.device_ptr(),
+            pa_current: frame.pa_current.device_ptr(),
+            pa_read: frame.pa_read.device_ptr(),
+            pa_scale: frame.pa_scale.device_ptr(),
+            pa_run: frame.pa_run.device_ptr(),
+            pa_met: frame.pa_met.device_ptr(),
+            pa_z: frame.pa_z.device_ptr(),
+            pa_e: frame.pa_e.device_ptr(),
+            pa_dra: frame.pa_dra.device_ptr(),
+            pa_gy: frame.pa_gy.device_ptr(),
+            pa_gq: frame.pa_gq.device_ptr(),
+            pa_gk: frame.pa_gk.device_ptr(),
+            pa_gw: frame.pa_gw.device_ptr(),
+            pa_gchart: frame.pa_gchart.device_ptr(),
+            pa_gfric: frame.pa_gfric.device_ptr(),
+            r_pa_read: r(21),
+            r_pa_yre: r(22),
+            r_pa_yim: r(23),
+            r_pa_dra: r(24),
+            r_pa_g: r(25),
         }
     }
 
@@ -968,7 +1091,8 @@ impl<'c> TowerCard<'c> {
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings].iter().map(|&o| carve(o)).sum()
+        let p = usize::from(shape.heads > 0);
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -987,12 +1111,17 @@ impl<'c> TowerCard<'c> {
     fn contacts_shared(shape: &Shape) -> usize {
         let (w, f) = (shape.width, shape.contacts);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * w, 8 * f, 8 * f * shape.paired, 8 * w, 8 * w, 8 * 32].iter().map(|&o| carve(o)).sum()
+        let p = usize::from(shape.heads > 0);
+        [16 * g * w, 16 * 32, 8 * w, 8 * f, 8 * f * shape.paired, 8 * w, 8 * w, 8 * 32, 8 * w * p, 8 * w * p].iter().map(|&o| carve(o)).sum()
     }
 
     fn dx_shared(shape: &Shape) -> usize {
-        let families = 3 + shape.turned + 2 * shape.pumped;
+        let families = 3 + shape.turned + 2 * shape.pumped + 6 * usize::from(shape.heads > 0);
         [8 * families * shape.modes, 8 * families * shape.width, 8 * 32].iter().map(|&o| carve(o)).sum()
+    }
+
+    fn participation_shared(shape: &Shape) -> usize {
+        [8 * 2 * shape.modes, 16 * 32, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
@@ -1054,7 +1183,15 @@ impl<'c> TowerCard<'c> {
         };
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()) };
+        if law.participation.as_ref().is_some_and(|p| cells > p.section) {
+            return Err(TowerError::Refused("a section longer than its participation's"));
+        }
+        // The card opens participation where a section closed; a stream read across calls with
+        // its section open (a release) is owed.
+        if law.participation.is_some() && opening.iter().any(|o| o.sites.iter().any(|sites| !sites.is_empty())) {
+            return Err(TowerError::Refused("the card opens participation where a section closed: a stream carried across calls with its section open is owed"));
+        }
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1116,6 +1253,13 @@ impl<'c> TowerCard<'c> {
             if !news_open.is_empty() {
                 card.write(&frame.news_open, 0, &news_open).map_err(device)?;
             }
+            if let Some(p) = &law.participation {
+                let starts: Vec<u32> = std::iter::once(0).chain(p.heads.iter().scan(0u32, |at, &h| {
+                    *at += h as u32;
+                    Some(*at)
+                })).collect();
+                card.write(&frame.pa_heads, 0, &starts).map_err(device)?;
+            }
             card.zero_octets(&frame.status, 0, 4 * streams).map_err(device)?;
             if keep {
                 card.zero_octets(&frame.swell, 0, 8 * 4 * d.levels).map_err(device)?;
@@ -1133,6 +1277,19 @@ impl<'c> TowerCard<'c> {
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
+        // A read that ends inside its section (a frozen read's last window) carries the section's
+        // open sites, as the host's state does; a whole section closes and releases them.
+        let open_sections = match &law.participation {
+            Some(p) if cells < p.section => Some((
+                self.card.fetch(&frame.pa_key).map_err(device)?,
+                self.card.fetch(&frame.pa_value).map_err(device)?,
+                self.card.fetch(&frame.pa_diss).map_err(device)?,
+                self.card.fetch(&frame.pa_run).map_err(device)?,
+                self.card.fetch(&frame.pa_met).map_err(device)?,
+                p.heads.len(),
+            )),
+            _ => None,
+        };
         let faces: Vec<Vec<Option<(u128, u128)>>> = targets
             .iter()
             .enumerate()
@@ -1160,6 +1317,24 @@ impl<'c> TowerCard<'c> {
                     }
                 }
                 state.previous = c[cells - 1];
+                // Participation's sites: released when the section closes, carried while it is open.
+                if law.participation.is_some() {
+                    state.sites = vec![LevelSites::rest(d.modes); d.levels];
+                }
+                if let Some((keys, values, diss, run, met, heads)) = &open_sections {
+                    let (n, l_) = (d.modes, d.levels);
+                    for (l, sites) in state.sites.iter_mut().enumerate() {
+                        let phasor = |v: &[i64], at: usize| (v[2 * at], v[2 * at + 1]);
+                        sites.frame = (0..n).map(|k| phasor(run, (s * l_ + l) * n + k)).collect();
+                        sites.met = (0..n).map(|k| met[(s * l_ + l) * n + k]).collect();
+                        for t in 0..cells {
+                            let q = (s * cells + t) * l_ + l;
+                            sites.keys.push((0..n).map(|k| phasor(keys, q * n + k)).collect());
+                            sites.values.push((0..n).map(|k| phasor(values, q * n + k)).collect());
+                            sites.dissipation.push(diss[q * heads..(q + 1) * heads].to_vec());
+                        }
+                    }
+                }
                 if ranks > 0 {
                     state.ring = (0..ranks).map(|r| (ring_ends[(s * ranks + r) * 2], ring_ends[(s * ranks + r) * 2 + 1])).collect();
                     state.hands = (0..ranks).map(|r| hands_ends[s * ranks + r] != 0).collect();
@@ -1200,6 +1375,9 @@ impl<'c> TowerCard<'c> {
         let card = self.card;
         card.zero_octets(&frame.status, 0, 4 * s).map_err(device)?;
         card.zero_octets(&frame.gradient, 0, 16 * shape.len).map_err(device)?;
+        if shape.heads > 0 {
+            card.zero_octets(&frame.pa_gfric, 0, 16 * s * l * shape.heads).map_err(device)?;
+        }
         self.law_launch("tower_reverse_top", Dim3::x(q), THREADS, Self::top_shared(&shape) as u32, &words, &fw, None).map_err(device)?;
         let mode_threads = (shape.modes as u32).next_multiple_of(32).min(THREADS);
         // Under a rotor the modes' scan exchanges each step's covector between the modes of a ring
@@ -1207,6 +1385,11 @@ impl<'c> TowerCard<'c> {
         let (scan_threads, scan_shared) = if shape.moving > 0 { (shape.modes as u32, 32 * shape.modes as u32) } else { (mode_threads, 0) };
         for level in (0..l).rev() {
             self.law_launch("tower_reverse_contacts", Dim3::x(q), THREADS, Self::contacts_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            // Participation's return reads the current's covector the contacts wrote and writes the
+            // chart covectors the level's `tower_reverse_dx` returns to the input.
+            if shape.heads > 0 {
+                self.law_launch("tower_reverse_participation", Dim3::x(s as u32), THREADS, Self::participation_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            }
             // The ring's reverse reads the level's read covector and returns its own to it and to
             // the mode's move, before the modes' scan.
             if shape.ranks > 0 && level == words.ring_level as usize {
@@ -1230,6 +1413,10 @@ impl<'c> TowerCard<'c> {
         let class_threads = (shape.width as u32).next_multiple_of(32).min(THREADS);
         self.law_launch("tower_encoding", Dim3::x(shape.alphabet as u32), class_threads, 0, &words, &fw, None).map_err(device)?;
         self.law_launch("tower_moves", Dim3::x(l as u32), mode_threads, 0, &words, &fw, None).map_err(device)?;
+        if shape.heads > 0 {
+            let head_threads = (shape.heads as u32).next_multiple_of(32).min(THREADS);
+            self.law_launch("tower_pa_friction", Dim3::x(l as u32), head_threads, 0, &words, &fw, None).map_err(device)?;
+        }
         self.status()?;
         let frame = self.frame.as_ref().expect("checked above");
         self.card.fetch(&frame.gradient).map_err(device)
@@ -1286,6 +1473,17 @@ impl<'c> TowerCard<'c> {
             if law.pumped != 0 {
                 out.push((family(at64(fw.dk, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dk, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump), Some(gradient(lv.pump_bias))), false));
                 out.push((family(at64(fw.dp, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dp, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump_axis), Some(gradient(lv.pump_axis_bias))), false));
+            }
+            // Participation: each chart takes its turned covector against the level's input, W₁ᵃ the
+            // drives' covector against the ratio read, and the current's read ∂r̂ᵃ against y.
+            if law.participation != 0 {
+                let ql = s as u64 * t as u64 * l;
+                for f_ in 0..6u64 {
+                    out.push((family(at64(fw.pa_gchart, (lu * 6 + f_) * n), l * 6 * n, at32(fw.input, lu * w), l * w, at64(fw.r_pa_g, f_ * ql + lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pa[f_ as usize]), None), false));
+                }
+                out.push((family(at64(fw.da, lu * f), l * f, at32(fw.pa_read, lu * w), l * w, at64(fw.r_da, lu), at64(fw.r_pa_read, lu), l, f, w, false, gradient(lv.pa[8]), None), false));
+                out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yre, lu), l, w, n, false, gradient(lv.pa[6]), None), true));
+                out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n + n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yim, lu), l, w, n, true, gradient(lv.pa[7]), None), true));
             }
         }
         // The strands' materials take their level's drives' covectors against the faces,
@@ -1375,7 +1573,7 @@ impl<'c> TowerCard<'c> {
 }
 
 fn entry_takes_extra(entry: &str) -> bool {
-    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx")
+    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx" | "tower_reverse_participation")
 }
 
 impl PassRealization for TowerCard<'_> {
@@ -1443,7 +1641,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

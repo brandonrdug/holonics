@@ -159,7 +159,9 @@
 //! `W₁ᵃ`, the friction and the level's input (tested against the code's difference); it stops at the
 //! frames and the met dissipation, so under an opened participation the moves' and gates' covector
 //! lacks participation's share (owed, record §8), and the certificate's reread still decides each
-//! deposit. A section admits its own sites; one longer than the declared section is refused.
+//! deposit. A section admits its own sites and releases them with its last; a stream read across
+//! calls (a release) carries its open section in its state. A reverse opens where a section closed,
+//! and one longer than the declared section is refused.
 //!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
@@ -3100,9 +3102,6 @@ impl Tower {
                 };
                 let (probe_chart, key_chart, value_chart) = (chart(lv.pa_probe_re, lv.pa_probe_im, pr[0], pr[1])?, chart(lv.pa_key_re, lv.pa_key_im, pr[2], pr[3])?, chart(lv.pa_value_re, lv.pa_value_im, pr[4], pr[5])?);
                 let sites = &mut state.sites[l];
-                if sites.len() >= p.section {
-                    *sites = LevelSites::rest(n);
-                }
                 for (k, m) in gate.iter().enumerate() {
                     sites.frame[k] = advance_frame(sites.frame[k], m.unit)?;
                     sites.met[k] -= m.log;
@@ -3123,6 +3122,11 @@ impl Tower {
                     let part = participate(&head, &at, &admitted, &self.exponential)?;
                     current[range.clone()].copy_from_slice(&part.current);
                     parts.push(part);
+                }
+                // The section closes with its last site: its sites are released and its frames
+                // rest, so the next arrival opens the next section.
+                if sites.len() >= p.section {
+                    *sites = LevelSites::rest(n);
                 }
                 // Re(Cᵃ y) = Cᵃ_re y_re − Cᵃ_im y_im, on 2^(−40) released to 2^(−16), read as a ratio.
                 let (y_re, y_im): (Vec<i64>, Vec<i64>) = current.iter().copied().unzip();
@@ -3239,10 +3243,6 @@ impl Tower {
 
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
-        // A section's participation admits its own sites ([`participation`]).
-        for sites in &mut state.sites {
-            *sites = LevelSites::rest(self.declaration.modes);
-        }
         collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
     }
 
@@ -3391,6 +3391,9 @@ impl Tower {
             let participating = self.participation.as_ref();
             if participating.is_some_and(|p| cells_n > p.section) {
                 return refuse("a section longer than its participation's");
+            }
+            if participating.is_some() && opening.sites.iter().any(|sites| !sites.is_empty()) {
+                return refuse("a participating section's reverse opens where a section closed: its earlier sites are not its cells");
             }
             let span = if participating.is_some() { cells_n } else { 0 };
             let (mut pa_q, mut pa_k, mut pa_w) = (vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span]);

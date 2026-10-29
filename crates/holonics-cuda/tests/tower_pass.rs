@@ -3,6 +3,7 @@
 //! and its streams' states, with and without the pair face, the ring face, the turned modes, the
 //! pumped modes, the rotor, the strands and the news clock, on rectifying contacts, the pair contact
 //! or its foil; and the card refuses a declaration it does not carry.
+use holonics::hnn::tower::participation::ParticipationDeclaration;
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Sheet, StrandKey, StrandLaw, StrandRing, Strands, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
@@ -42,6 +43,8 @@ struct Faces {
     strands: bool,
     news: Option<NewsClock>,
     contact: Option<ContactLaw>,
+    /// Participation joined last over sections of this length (`open_participation`).
+    participation: Option<usize>,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -87,7 +90,34 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     if let Some(clock) = faces.news {
         learner.join_news(clock).expect("the clock joins");
     }
+    if let Some(section) = faces.participation {
+        open_participation(&mut learner, section);
+    }
     (learner.clone(), learner)
+}
+
+/// Participation joined over sections of `section`, its heads the founded memory's runs; its
+/// contacts' `W₁ᵃ` opened about ±¼ on `2^(−24)` off the key stream and its probe and key charts
+/// doubled, so the current moves the drives and every family carries a covector from the first
+/// section.
+fn open_participation(learner: &mut TowerLearner, section: usize) {
+    let d = learner.tower.declaration;
+    let law = learner.tower.resident_law().expect("the law");
+    let moduli: Vec<i128> = law.levels[0].moduli.iter().map(|&m| m as i128).collect();
+    learner.join_participation(ParticipationDeclaration::founded(&moduli, section).expect("declared")).expect("participation joins");
+    let law = learner.tower.resident_law().expect("the law");
+    let k = keys(1 << 16);
+    let mut j = 60000;
+    for lv in &law.levels {
+        let p = lv.participation;
+        for i in p[8]..p[8] + d.contacts * d.width {
+            learner.tower.theta[i] = (k[j] as i32 - 128) << 15;
+            j += 1;
+        }
+        for i in p[0]..p[0] + 4 * d.modes * d.width {
+            learner.tower.theta[i] *= 2;
+        }
+    }
 }
 
 /// A turned tower founds its turn at zero, on its gated twin; the fixture opens each level's turn
@@ -323,6 +353,51 @@ fn the_cards_pass_is_the_hosts_section_after_section() {
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_pass_holds_an_uncompared_place_as_the_host_does() {
     lockstep(11, 2, 12, 4, true, Faces::default());
+}
+
+/// Participation's acceptance on the card (record `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION…`,
+/// §7.2): 32 sections equal face by face, covector entry by entry, learner for learner and state
+/// for state; with the pair contact and an uncompared place; and turned, stranded and paired.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_participating_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { participation: Some(9), ..Faces::default() });
+}
+
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_participating_pair_contact_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { participation: Some(12), contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_turned_stranded_participating_pass_is_the_hosts_for_eight_sections() {
+    lockstep(11, 2, 12, 8, false, Faces { participation: Some(12), turned: true, strands: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
+/// A read that ends inside its participation's section carries the open section's sites, on the
+/// card as on the host; the card refuses to open on one (a stream carried across calls is owed).
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_participation_carries_an_open_section_as_the_host_does() {
+    let card = Card::open(0).expect("the card");
+    let mut realized = TowerCard::open(&card).expect("the tower's image");
+    let (host, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
+    let classes = passage(11, 16);
+    let parts: Vec<&[usize]> = vec![&classes[0..8], &classes[8..16]];
+    let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
+    let opening = vec![host.tower.rest(); 2];
+    let mut reference = HostPass::default();
+    let read_h = reference.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("host forward");
+    let read_c = realized.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("card forward");
+    assert_eq!(read_h, read_c, "the faces and the swell");
+    let (mut ends_h, mut ends_c) = (opening.clone(), opening.clone());
+    reference.carry(&host.tower, &mut ends_h, &opening, Slot::Opened).expect("host carry");
+    realized.carry(&host.tower, &mut ends_c, &opening, Slot::Opened).expect("card carry");
+    assert_eq!(ends_h, ends_c, "the continuing states with their open sections");
+    assert!(ends_h.iter().all(|s| s.sites.iter().all(|sites| sites.len() == 7)), "seven sites open");
+    assert!(realized.forward(&host.tower, &ends_h, &parts, &targets, Slot::Opened).is_err(), "the card refuses an open section");
 }
 
 /// The pair face's acceptance (the record `2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD…`): 32 sections
