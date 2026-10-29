@@ -1,6 +1,6 @@
 # The body grows by copies whose parts sum to what it learned, so it restarts wider on the same faces
 
-Refs #404 #407. Status: [design fixed before the build; agent-inferred, October 29]; built and measured on the host; the card's acceptance owed (§4).
+Refs #404 #407. Status: [design fixed before the build; agent-inferred, October 29]; built and measured on the host and the card (§4).
 Claude (opus). The step after [the continuing body](2026-10-29_THE_CONTINUING_BODY_RESTS_WITH_ITS_CURRENTS_AND_ONE_OPEN_SECTION_AND_AN_ANSWER_READS_ITS_PARTICIPATION.md):
 the audit kept the growth semantics of Codex's continuing surface
 ([audit §3](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#3-withdrawn-and-why))
@@ -106,5 +106,8 @@ prints the key bytes a growth draws when the file holds too few).
   sites, each head copy's participation equal to the old head's; its text re-encodes and it hears
   on. Chained through the commands, the grown body's release file equals the body's.
 
-**Owed on the 4080**: acceptance 7 (`the_cards_grown_body_continues_as_the_hosts`, beside the
-body's card test).
+**Acceptance 7 on the 4080.** On the RTX 4080 SUPER at `dfa6ff678` (B-PC, under the card lock,
+alone on the card), `tower_pass` passed 36 of 36, among them
+`the_cards_grown_body_continues_as_the_hosts` (a participating body heard, grown by two, heard,
+asked and answered on the card as on the host, and resumed cold from its text): build 30.5 s, tests
+11.8 s.

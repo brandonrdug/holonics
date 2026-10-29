@@ -1,6 +1,6 @@
 # The continuing body rests with its currents and one open section, and an answer reads its participation
 
-Refs #404 #407 #405. Status: [design fixed before the build; agent-inferred, October 29]; built and measured on the host; the card's acceptance and the product run owed (§6).
+Refs #404 #407 #405. Status: [design fixed before the build; agent-inferred, October 29]; built and measured on the host and the card, the product run included (§6).
 Claude (opus), the third item of the order fixed in the
 [October 29 audit](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#4-the-order-now).
 Owners it joins: the tower's learner and its section (`TowerLearner::section_realized`,
@@ -166,5 +166,23 @@ decides nothing.
   SHA-256.
 - Gate 1 passed on the change (all 22 entries).
 
-**Owed on the 4080**: acceptance 2 (`the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold`
-in `holonics-cuda/tests/tower_pass.rs`, alone on an idle card) and acceptance 6, the product run.
+**Acceptance 2 on the 4080.** On the RTX 4080 SUPER at `dfa6ff678` (B-PC, under the card lock,
+alone on the card), `tower_pass` passed 36 of 36, among them
+`the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold`: build 30.5 s, tests 11.8 s.
+
+**Acceptance 6, the product, on the 4080.** At `dfa6ff678` on the RTX 4080 SUPER (B-PC, under the
+card lock), a body founded from the participating race's lap-4 learner on 16 currents and sections
+of 128 heard this record and the mutual contact's as classes, each followed by END (10 sections
+learned and certified, 20,480 places, 1.984 → 1.941 bits a class, 2,544 ms); was asked the race's
+six release prompts and the design question "What does the continuing body keep when it rests, and
+what does it release?" (201 sections read, nothing learned, 21,177 ms); was asked again from its
+rested text in a fresh process (20,873 ms), whose releases and body equal the first ask's byte for
+byte; heard the answer (one section learned on its 74 compared places, 1.586 → 1.569, 537 ms); and
+was asked the question again (1,989 ms), whose arrivals closed the answer's open section, so the
+answer's last places were learned (1.854 → 1.827 on 115 places) before the release. Every step
+rested exact. At the question's opening level 0's heads read its last two classes and every head of
+levels 1 to 3 sits whole (999 or 1000 thousandths) on one site up to 52 classes back in the
+question. The releases, before and after the answer, are babble in the records' register; they
+were shown to Brandon whole and stay outside the repository. [agent-inferred] An ask moves no
+material of its own; when it closes a section an answer left open, that section compares the
+answer's places alone, so the answer's deposit completes there.
