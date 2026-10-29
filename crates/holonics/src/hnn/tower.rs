@@ -1607,11 +1607,17 @@ impl Strands {
         let n = self.rings.len();
         let mut parts = Vec::with_capacity(2 * residues.len());
         for (i, &v) in residues.iter().enumerate() {
-            let (a, b) = ring_face_at(v, self.rings[i % n].modulus, self.half_turn);
-            parts.push(fit32(release(a, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?);
-            parts.push(fit32(release(b, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?);
+            let (a, b) = self.face(i % n, v)?;
+            parts.extend([a, b]);
         }
         Ok(parts)
+    }
+
+    /// The face `e^(2πi r/q)` of residue `r` on ring `ring`, its real and imaginary parts on the
+    /// face's grain `2^(−16)`: the navigator's face the contacts read.
+    pub fn face(&self, ring: usize, r: u32) -> Result<(i32, i32)> {
+        let (a, b) = ring_face_at(r, self.rings[ring].modulus, self.half_turn);
+        Ok((fit32(release(a, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?, fit32(release(b, MOVE_BITS - FACE_BITS), "a strand's face outgrew its carrier")?))
     }
 
     /// `strands LEVELS ALPHABET MODES LEVEL LAW LAW LAW`, then the rings as `MODULUS:MULTIPLIER`,
@@ -5884,19 +5890,18 @@ mod tests {
         assert!(tower.advance_realized(&mut states, &[&[0, 1], &[2]], &mut pass).is_err());
     }
 
-    /// The resident law names joined strands, so a realization that reads none (the card's)
-    /// refuses such a tower instead of reading it as the plain one; it carries a joined rotor's
-    /// keys, and stepping and turning by them is [`Rotor::moved`], and returning a covector by
-    /// them its adjoint [`Rotor::back`], at every level and class (the card's equation).
+    /// The resident law carries a joined rotor's keys, and stepping and turning by them is
+    /// [`Rotor::moved`], and returning a covector by them its adjoint [`Rotor::back`], at every level
+    /// and class (the card's equation); it carries joined strands, and none on a tower without them.
     #[test]
     fn the_resident_law_carries_a_joined_rotor_and_names_strands() {
         let plain = tiny_contacts(2, 9, 4, true, false, false, ContactLaw::Rectifying);
         let law = plain.resident_law().expect("law");
-        assert!(law.rotor.is_none() && !law.strands);
+        assert!(law.rotor.is_none() && law.strands.is_none());
         let tower = rotor_on(plain.clone());
         let law = tower.resident_law().expect("law");
         let (rotor, resident) = (tower.rotor().expect("joined"), law.rotor.expect("carried"));
-        assert!(!law.strands && resident.moving == rotor.moving());
+        assert!(law.strands.is_none() && resident.moving == rotor.moving());
         let d = tower.declaration;
         let h: Vec<(i64, i64)> = (0..d.modes as i64).map(|k| (1000 + 7919 * k, -3000 + 104_729 * k)).collect();
         let g: Vec<(i128, i128)> = h.iter().map(|&(x, y)| (i128::from(y) << 20, i128::from(x) << 21)).collect();
@@ -5918,7 +5923,98 @@ mod tests {
             }
         }
         let strands = stranded(plain, false).resident_law().expect("law");
-        assert!(strands.rotor.is_none() && strands.strands);
+        assert!(strands.rotor.is_none() && strands.strands.is_some());
+    }
+
+    /// The strands' resident table read as the card reads it (one ring at a time, the orientation
+    /// carried alike) is [`Strands::heard`] and [`Strands::faces`] at every arrival of a passage
+    /// whose words step, turn, transfer, reflect and clear on both sheets, from rest and from a
+    /// reversed opening, under every contact law; it places the strands' materials and their
+    /// reaches as the host reads them.
+    #[test]
+    fn the_resident_strands_table_hears_and_faces_as_the_host() {
+        for contact in [ContactLaw::Rectifying, ContactLaw::Pair, ContactLaw::PairLinear] {
+            let mut tower = tiny_contacts(2, 9, 4, true, false, false, contact);
+            let words = ["12", "-3", "+=7", "<9 "].map(|w| w.as_bytes().to_vec()).to_vec();
+            tower.join_strands(tenfold_strands(&tower.declaration, 1, words)).expect("joined");
+            let strands = tower.strands.as_ref().expect("joined");
+            let resident = tower.resident_law().expect("law").strands.expect("carried");
+            let (l, c) = (&tower.layout, tower.declaration.contacts * strands.parts());
+            assert_eq!((resident.level, resident.rings, resident.contact, resident.pair), (strands.level, strands.rings.len(), l.strand_contact, l.strand_pair));
+            assert_eq!(resident.reaches, tower.reaches().strands);
+            assert_eq!(resident.reaches[1] == 0, contact == ContactLaw::Rectifying || reach(&tower.theta[l.strand_pair..l.strand_pair + c]) == 0);
+            let t = &resident.table;
+            let n = resident.rings;
+            let at = |i: usize| t[i] as usize;
+            let card = |residues: &mut [u32], reversed: &mut bool, class: usize| -> Vec<i32> {
+                for b in at(at(6) + class)..at(at(6) + class + 1) {
+                    let act = t[at(3) + at(at(7) + b)];
+                    for k in 0..n {
+                        let (q, mu) = (u64::from(t[8 + 3 * k] as u32), u64::from(t[8 + 3 * k + 1] as u32));
+                        if act > 0 {
+                            let theta = u64::from(t[at(4) + (act as usize - 1) * n + k] as u32) % q;
+                            let turn = if *reversed { (q - theta) % q } else { theta };
+                            for j in 0..3 {
+                                let r = u64::from(residues[j * n + k]);
+                                residues[j * n + k] = match t[j] {
+                                    0 => ((r * mu % q + turn) % q) as u32,
+                                    1 => (r * mu % q) as u32,
+                                    _ => r as u32,
+                                };
+                            }
+                        } else if act < 0 {
+                            let key = &t[at(5) + (-act as usize - 1) * 4..][..4];
+                            let old = [residues[k], residues[n + k], residues[2 * n + k]];
+                            for j in 0..3 {
+                                residues[j * n + k] = match key[j] {
+                                    0 => 0,
+                                    v if v > 0 => old[v as usize - 1],
+                                    v => ((q - u64::from(old[(-v) as usize - 1]) % q) % q) as u32,
+                                };
+                            }
+                        }
+                    }
+                    if act < 0 {
+                        *reversed = match t[at(5) + (-act as usize - 1) * 4 + 3] {
+                            0 => *reversed,
+                            1 => !*reversed,
+                            s => s == 3,
+                        };
+                    }
+                }
+                (0..3 * n).flat_map(|j| {
+                    let face = at(8 + 3 * (j % n) + 2) + 2 * residues[j] as usize;
+                    [t[face], t[face + 1]]
+                }).collect()
+            };
+            for opening in [false, true] {
+                let (mut host, mut host_reversed) = (vec![0u32; strands.residues()], opening);
+                let (mut read, mut read_reversed) = (host.clone(), opening);
+                for (i, &class) in STRANDED.iter().cycle().take(4 * STRANDED.len()).enumerate() {
+                    strands.heard(&mut host, &mut host_reversed, class).expect("heard");
+                    let faces = card(&mut read, &mut read_reversed, class);
+                    assert_eq!((&read, read_reversed), (&host, host_reversed), "{contact:?}, arrival {i}: the residues and the sheet");
+                    assert_eq!(faces, strands.faces(&host).expect("faces"), "{contact:?}, arrival {i}: the faces");
+                }
+            }
+        }
+    }
+
+    /// The resident law places each level's second drive and its bias, with the reach `max |W_b|`
+    /// the card's pair contact reads beside its drive (zero under rectifying contacts).
+    #[test]
+    fn the_resident_law_places_the_pair_contacts_second_drive() {
+        for contact in [ContactLaw::Rectifying, ContactLaw::Pair, ContactLaw::PairLinear] {
+            let tower = tiny_contacts(2, 9, 4, true, false, false, contact);
+            let law = tower.resident_law().expect("law");
+            let fw = tower.declaration.contacts * tower.declaration.width;
+            for (resident, lv) in law.levels.iter().zip(&tower.layout.levels) {
+                assert_eq!((resident.pair, resident.pair_bias), (lv.pair, lv.pair_bias));
+                let paired = contact != ContactLaw::Rectifying;
+                assert_eq!(resident.reaches[10], if paired { reach(&tower.theta[lv.pair..lv.pair + fw]) } else { 0 });
+                assert!(!paired || resident.reaches[10] > 0, "{contact:?}: the opened second drive has a reach");
+            }
+        }
     }
 
     const STRANDED: [usize; 13] = [0, 1, 2, 1, 0, 3, 0, 1, 2, 0, 3, 3, 1];
