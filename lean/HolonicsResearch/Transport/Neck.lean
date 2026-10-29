@@ -37,6 +37,12 @@ stated here, in this order, and each one carries its hypotheses in the open.
    reach zero width with bounded angle under an invertible map. `phaseArea_comp` is the composition law and `reducedEtendue_interface` is the
    `n₁/n₂` form across a refracting interface.
 
+[definition] Across a chain of media the neck is a rank: `Transport/HolonicChain` reads it as the
+rank of the cross block between consecutive media, bounds every transfer by it at each `s` off the
+joint poles with no hypothesis on the downstream block (the Gustafson–Fiedler–Markham nullity
+theorem, `HolonicChain.nullity_cross_blocks`, `HolonicChain.transfer_rank_le_cross_rank`); this owner
+states no second form of it.
+
 [definition] The jet order at a neck is `Transport/JetStaircase.lean`'s reading of `A(s) − A_min`,
 not a second notion founded here; `neck_jet_order_is_a_truncation_reading` records that the order
 this owner reports is a property of that truncation.
