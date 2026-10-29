@@ -3373,12 +3373,14 @@ pub(super) struct Reading {
 }
 
 /// What a founded run joins before its first section: nothing, participation over its section
-/// (one head a founded rung), or the mutual contact at the comparison.
+/// (one head a founded rung), the mutual contact at the comparison, or the passage (every level's
+/// contacts reading the passing current).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(super) enum Joined {
     Nothing,
     Participation,
     MutualContact,
+    Passage,
 }
 
 /// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
@@ -3433,6 +3435,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
+        if learner.tower.passage() != (joined == Joined::Passage) {
+            return Err("the continued learner's passage differs from the declared one".into());
+        }
         learner
     } else {
         let mut learner = TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits);
@@ -3454,6 +3459,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             Joined::MutualContact => {
                 learner.join_mutual_contact(MUTUAL_SHIFT).map_err(|e| e.to_string())?;
                 println!("TOWER_MUTUAL_CONTACT shift={MUTUAL_SHIFT}");
+            }
+            // A passage run's contacts read the passing current from the founding on, its `W₁ˣ` at
+            // zero ([`Tower::join_passage`]).
+            Joined::Passage => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE");
             }
         }
         learner

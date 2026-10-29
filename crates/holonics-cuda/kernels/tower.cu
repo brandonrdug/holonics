@@ -96,6 +96,8 @@ struct TowerLevel {
     // current's read (re, im), the contacts' W₁ᵃ and the heads' friction; max |w| of the first nine.
     uint64_t pa[10];
     uint64_t pa_reach[9];
+    // The passage's W₁ˣ (F × W) and max |W₁ˣ| (zero without it).
+    uint64_t passage, passage_reach;
 };
 
 struct TowerLaw {
@@ -144,6 +146,9 @@ struct TowerLaw {
     // (W × W), and the face is z_a = release(2⟨y, E_a⟩ − ‖E_a‖², 16 + b) + c_a, y = J x, b the
     // shift (`Tower::join_mutual_contact`).
     uint32_t mutual, mutual_shift;
+    // The passage (`passage = 0` without it): every level's contacts read the passing current,
+    // `a = W r̂ + W₁ˣ x + b` (`Tower::join_passage`).
+    uint32_t passage, pad2;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -1522,6 +1527,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             const bool n_sa = stranded && narrow_terms(law.strand_reach[0], smax, 6 * SR, &st);
             const bool n_sb = stranded && law.contact != 0 && narrow_terms(law.strand_reach[1], smax, 6 * SR, &st);
             const bool n_pc = P && narrow_terms(lv.pa_reach[8], prmax, W, &st);
+            const bool n_x = law.passage != 0 && narrow_terms(lv.passage_reach, xmax, W, &st);
             m = 0;
             uint64_t mc = 0;
             for (uint32_t o = tid; o < F; o += B) {
@@ -1533,6 +1539,11 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 }
                 if (P) {
                     a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + lv.pa[8] + o, F, W, prd, n_pc), MATERIAL_BITS), &st), &st);
+                }
+                // The passage: the contacts meet the current passing the level, W₁ˣ x released on
+                // its own.
+                if (law.passage != 0) {
+                    a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + lv.passage + o, F, W, x, n_x), MATERIAL_BITS), &st), &st);
                 }
                 const int32_t d = fit32(a64, &st);
                 dv[o] = d;
@@ -2124,6 +2135,25 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
             const bool im = o >= N;
             const wide sum = rel(dot(fr.theta + (im ? lv.pa[7] : lv.pa[6]) + k, N, W, pdra, im ? n_gb : n_ga), MATERIAL_BITS);
             fr.pa_gy[ql * 2 * N + o] = fit64(im ? -sum : sum, &st);
+        }
+        __syncthreads();
+    }
+    // The passage: the passing current's covector gains W₁ˣᵀ δa, released on its own (the level's
+    // output covector dy was kept above for the return's material).
+    if (law.passage != 0) {
+        const bool n_x = narrow_rows(lv.passage_reach, amax, F);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)F * g / G), to = (uint32_t)((uint64_t)F * (g + 1) / G);
+            part[idx] = dot(fr.theta + lv.passage + (uint64_t)from * W + j, W, to - from, da + from, n_x);
+        }
+        __syncthreads();
+        for (uint32_t j = tid; j < W; j += B) {
+            wide sum = 0;
+            for (uint32_t g = 0; g < G; g++) {
+                sum += part[g * W + j];
+            }
+            fr.dx[q * W + j] = fit64((wide)dy[j] + (wide)fit64(rel(sum, MATERIAL_BITS), &st), &st);
         }
         __syncthreads();
     }
