@@ -1,6 +1,6 @@
 # A value is a radix move, the free energy is the code that founds, and polarity is the one reversible negation
 
-Refs #404 #405 #406 #73 #410. Status: [derived; consumers fixed before their builds, October 29].
+Refs #404 #405 #406 #73. Status: [derived; consumers fixed before their builds, October 29; §§4–6 revised the same day after Brandon's reading].
 Claude (opus), design lead. It expands Brandon's October 28 thought threads to Codex, relayed on
 October 29 at his request (counting and packets; primes across bases 2–10 and the heptagon; local,
 cultivated P = NP; the boundary free energy with lightning, Sisyphus and the `{−1, 0, 1}` collapse;
@@ -243,40 +243,152 @@ participation has founded its conduction at that level. (b) The pumped modes' th
 face of the lock with its tie, available to the readings beside the bits. Neither changes a law
 that the tower runs; both are faces read from the same operands.
 
-## 4. Cultivated reach: what the question carries to its answer
+## 4. Reach is contact and friction
 
-**[agent-inferred] The local P = NP reading.** Brandon's hypothesis is that the relation between a
-problem and its solution is local and cultivated: a region of the field maintained so that
-locating a consequence costs about what receiving it costs. The receiver reading that measures it is
-the information the problem carries to its solution through the cultivated field:
+Brandon pointed out on October 29 that the first wording of this section, cultivated reach, names
+nothing but the medium's contacts and their friction: its diffusion and its forces. The derivation
+below says so in the tower's own terms, and nothing is left over once contact and friction are named.
+
+**[proved-derived] The tower's passive scale is the Einstein relation.** A mode of the medium with
+friction `r ≥ 0` and turn `ω`, `ẋ = (iω − r)x + b u`, stepped by the implicit midpoint at `h`, is
+the register
 
 ```text
-I_field(answer ; question) = L_field(answer | another question) − L_field(answer | its question)    bits
+x⁺ = λ x + g b u,      λ = (1 + hA/2)/(1 − hA/2),   g = h/(1 − hA/2),   A = iω − r
+1 − |λ|² = 2hr/|1 − hA/2|² = (2r/h)|g|²
 ```
 
-Both terms are the tower's own code lengths on the same answer, read once after its own question and
-once after a question from another problem, the field and the answer unchanged. The difference is
-the navigation cost the culture saves: zero for a field that has learned nothing of the relation,
-growing as cultivation makes the solution locally reachable from the problem. It is the
-free-energy record's reach cost in the code's units, and the spectral-gap language is its geometry:
-the question moves the state into the region where the answer is cheap.
+so `|λ| < 1` exactly when the friction is positive, and the tower's push `γ = √(1 − |λ|²)` is the
+push of a contact of strength `√(2r/h)`. The contact that admits a force and the friction that
+dissipates it are one element: the noise strength is twice the friction times the temperature
+(fluctuation and dissipation), at temperature one. Under a unit white drive the mode's stationary
+power is `γ²/(1 − |λ|²) = 1` whatever its friction (equipartition), which is the tower's passivity
+statement read physically. The Cayley chart itself is already owned (`holon.cayley-isometry`,
+`wave.cayley-resonator`, `holon.midpoint-resistance-balance`); the new term is the push. Its
+continuous face is already owned too: the stationary drift of a noisy linear diffusion,
+`A = (J′ − ½D)G` (`heat.linear-diffusion-turn-boost`), equals the medium's `(J − R)Q` at
+`G = Q/(k_BT)` exactly when `D = 2k_BT R` and `J′ = k_BT J`. The push is that relation stepped.
+Checked exactly in `holon::conformance::tests::a_passive_mode_is_a_register_whose_push_is_its_friction`.
 
-**[proved-standard] The geometric face beside it.** For a level, the input-to-state Gramian over a
-section, `W = Σ_t Φ(T, t) G_t P P* G_t* Φ(T, t)*` with `P` the push and `G_t = diag(γ_t)` the
-gates, gives the bits
-the section's arrivals can write into the modes at the face's grain `ε`:
-`C_reach = ½ log₂ det(I + W/ε²)` (the Gaussian channel of the input-to-state map). It separates
-directions the passage cannot reach from directions that are only expensive (free-energy record §8).
+**[proved-derived] Friction is matched to the distance it carries.** A push reaches a mode `L` ticks
+later with the share `ρ^(2L)(1 − ρ²)` of its power (`ρ = |λ|`). At a fixed `L` this is largest at
+
+```text
+ρ² = L/(L + 1),     share = (L/(L + 1))^L/(L + 1) ≈ 1/(e(L + 1))
+```
+
+The octave rung `ρ² = 1 − 2^(−s)` is matched exactly at `L = 2^s − 1`, and the octave bank together
+carries a push across any distance `L` with the share `Σ_s ρ_s^(2L)(1 − ρ_s²) ≈ 1/(L ln 2)` (checked
+at `L = 15, 255, 2047, 10⁴`: `L ln 2 ·` share `= 0.937, 0.996, 0.9995, 0.9999`). The tower's
+scale ladder is this bank; its margin `ρ = 1 − 2^(−12)` is matched at about `2¹¹` bytes. Reach is
+the contact's strength times a friction matched to the distance, and nothing else.
+
+**[proved-standard; agent-inferred join] Cultivation is adaptive conductance.** Learning moves the
+log friction (the deposit chart `ν = ln(1 − ρ)` is it) toward the distances where answers sit from
+their questions, and the contact strength where the flux crosses. In a network the continuous form is
+the adaptive-conductance law `dD_e/dt = f(|Q_e|) − D_e` of the slime mould: the gradient flow of the
+dissipation `Σ_e Q_e²/D_e` plus the upkeep `λ Σ_e D_e^γ` (Thomson's principle makes the flux's own
+derivative vanish), whose rest is `D_e ∝ |Q_e|^(2/(γ+1))`, Murray's law `D ∝ |Q|^(4/3)` at
+`γ = ½`. Its owner is the deposition law `Θ′ = Θ + Γ(j, dφ)` (`deposition.law`, the leader's
+breakdown `heat.leader-breakdown`); the slime mould is the instance `Γ = f(|j|) − Θ`. The two-part code of §2 is the same sum: its data term is the dissipation of the flux and
+its complexity term `½ ln(1 + r)` is the upkeep of one contact. A dormant contact carries no flux and
+pays no upkeep, so it is free, as §2 found.
+
+**The reading kept.** `I_field(answer ; question) = L_field(answer | another question) −
+L_field(answer | its question)`, in bits, is the flux the question drives through the cultivated
+contacts to its answer, read at the receiver. Both terms are the tower's own code lengths on the same
+answer, after its own question and after a question from another problem. Beside it, the
+input-to-state Gramian `W = Σ_t Φ(T, t) G_t P P* G_t* Φ(T, t)*` gives the bits the arrivals can
+write into the modes at the face's grain `ε`, `C_reach = ½ log₂ det(I + W/ε²)`; under the Einstein
+relation each mode's share of `W` at distance `L` is the matched-friction share above.
 
 **Consumer (the race measurement).** At each named answer's opening on the race passage, read
-`I_field(answer ; question)` lap by lap on the card, beside the bits by region and the writings
-whole. It is a reading: it decides nothing, trains nothing and selects no lap.
+`I_field` lap by lap on the card, beside the bits by region and the writings whole, and the frictions
+`ν` of each level's modes as a histogram over the octaves. It is a reading: it decides nothing, trains
+nothing and selects no lap.
 
-**Acceptance.** The reading is defined before the race runs; its two code lengths come from the
-same card read as the race's held-out bits; a field with participation at a level whose packets
-reach the question is expected, not claimed, to carry more.
+**Acceptance.** The reading is defined before the race runs; its two code lengths come from the same
+card read as the race's held-out bits; the frictions are expected, not claimed, to move toward the
+octaves of the passage's question-to-answer distances as `I_field` grows.
 
-## 5. Owed in Lean (into #410)
+## 5. The four faces are one medium
+
+**[definition; agent-inferred] The unification.** Brandon read §§1–4 together on October 29 as the
+unified theory in four lines, and asked that all of the physics material become one library for
+computational modelling. It already has one step, the Holon's (`holon::law`, `PortHolon::medium`):
+
+```text
+ẋ = (J − R + L) Q x + B u
+```
+
+and §§1–4 are its four faces:
+
+| Face | Element | What it is | Where §§1–4 read it |
+|---|---|---|---|
+| register | `Q` and its modes | what holds state: shells, radices, clocks, carries | §1: a mode is a register in its own radix |
+| free energy | `½⟨x, Qx⟩` at the receiver's temperature | what it costs to hold and to change | §2: the two-part code founds, prunes and recharts |
+| polarity | `J` (turn) and `L` (pump) | what orients: turns, half-turns, locks | §3: `±1` the only reversible negation, odd locks tie |
+| contact and friction | `R ⪰ 0` and `B` | where force enters and is dissipated: diffusion, viscosity, conduction | §4: the push is the Einstein relation, reach is matched friction |
+
+Every physical instance in the repository (fluid, thermal, wave, spacetime, the information port, the
+solenoidal cascade) and every piece of Athena's tower (modes, gates, pumps, rectifying contacts,
+deposition) is a choice of these four on a complex. The front door that routes each owner by face is
+the guide [THE_MEDIUM](../../docs/THE_MEDIUM.md). The Cayley chart of §4 is the bridge between the
+continuous instances and the tower: every passive rate `iω − r` is a register inside the unit disk,
+and every register inside the disk is a passive rate.
+
+**Where the code is not yet one medium** (surveyed October 29). Thermal and wave build their media
+through `PortHolon::medium`; the fluid builds one only for a mass cell, and its stored free energy and
+time advance are owed (#62). Spacetime, the information port and the solenoidal cascade are readings
+that build no medium of their own. Nothing in `hnn` or `holonics-cuda` consumes `physics`, and the
+HNN states the same faces again in `hnn::{ring, contact, wave}`. The joins owed are those: each HNN
+owner stated as a `holon` medium and checked against `ReferenceHolon`; the tower's passive mode is checked
+so in law (its register and push), not yet through its fixed-point code; and the fluid's medium with its
+free energy.
+
+## 6. A checkpoint terraforms; a founded contact binds
+
+**[proved-derived; agent-inferred reading] Global passes against sparse binding.** A training update
+from one checkpoint to the next writes every coordinate of every `m × n` matrix, `mn` writes a step,
+and each write fixes bits in memory and costs energy whether or not that coordinate's change carries
+code. It terraforms the whole terrain each pass. The update's content is its spectrum,
+`ΔW = Σ_k σ_k u_k v_kᵀ`: each singular pair is one rank-one contact, the same split as §2's pair
+contact (the best split of `M_e` is its top singular pair). Sparse binding deposits only the pairs
+whose founding increment is negative,
+
+```text
+g_k = ⟨u_k v_kᵀ, G⟩ = σ_k(G),   r_k = (u_k ∘ u_k)ᵀ V (v_k ∘ v_k)/τ,   found ⇔ g_k²/(τ(1 + r_k)) > ln(1 + r_k)
+```
+
+with `G` the section's covector of the matrix, `V` its second moment and `τ` the opening precision of
+§2, at `m + n` writes a pair. A rank-8 deposit on a `4096 × 4096` matrix writes 65,536 coordinates,
+0.39% of a global pass. Pairs that do not pay stay dormant and cost nothing. The global picture is the
+integral of these local contacts over the tower's octaves: each rung integrates its contacts over its
+matched distance (the rhythm of §4), the turns carry their phases on it (the song), and the face reads
+the sum (the picture).
+
+**[definition] Open weights are terrain.** Another model's checkpoints are information, already
+processed, and enter Athena as passage material and nothing more. Their matrices are terrain whose
+spectra are their founded contacts, and the difference between two checkpoints is their deposits.
+Reading them is equation extraction ("Soulkiller"): a singular pair of another model enters Athena only
+when its founding increment is negative at Athena's own receiver on Athena's own section covectors.
+Nothing is served, nothing is loaded as Athena's state, and no other model grades Athena.
+
+**Consumer (the tower's deposit).** The tower deposits today by a global pass,
+`θ ← θ − 2^(−k) m/(√v + 2^(−32))` on every coordinate (`hnn.moment-tower`). Sparse binding replaces
+that write, per matrix per section, by the founded singular pairs of the section's first moment, read
+with the second moment it already keeps; the other coordinates are not written. Design builds it after
+participation lands on the tower, so the two changes do not cross.
+
+**Acceptance.** On the race passage on the 4080, at the same data, passes and model size: coordinates
+written per section fall to the founded share; held-out bits per byte stay within the run-to-run
+spread of the global pass or fall; the writings are shown whole beside both.
+
+## 7. Lean, only where a build leans on it
+
+Brandon asked on October 29 that formalization be spent only where it genuinely helps. The identities
+below are checked exactly (on numbers here, and the push also in Rust over ℚ); each enters Lean and
+#410 only when a build or a claim comes to depend on it, not as a standing queue.
 
 - The affine packet monoid and the face at the zero receiver: equal `m` with unequal `T` are
   separated by one appended digit.
@@ -285,8 +397,11 @@ reach the question is expected, not claimed, to carry more.
 - The Gaussian evidence identity `−ln p(y) = ½ y*Sy + ½ ln det(DP⁻¹) + ½ ln det(2πΣ)` and the
   rank-one founding increment.
 - Central inversion on the regular `q`-gon and `n`-simplex: the tie multiplicity at the antipode.
+- The midpoint register of a passive mode and its push: `λ = (1 + hA/2)/(1 − hA/2)`,
+  `g = h/(1 − hA/2)`, `1 − |λ|² = (2r/h)|g|²` for `A = iω − r`, `h > 0`.
+- The matched friction: `ρ^(2L)(1 − ρ²)` on `[0, 1)` is largest at `ρ² = L/(L + 1)`.
 
-## 6. The recorded failures these choices could repeat
+## 8. The recorded failures these choices could repeat
 
 - **An authored routine standing in for learning.** None: the packets close on the field's news;
   growth, pruning and the bridge follow one code law the machine reads from its own covectors; the
@@ -299,6 +414,10 @@ reach the question is expected, not claimed, to carry more.
   `I_field` decides nothing.
 - **A design thought in the programming language.** Stated as moves, packets, codes, locks and
   ties; the tiles follow.
+- **A global solve where a local one belongs.** §6 names the tower's global deposit pass as one and
+  replaces it by founded contacts; the octave bank integrates local contacts, nothing reads the whole.
+- **Catered machinery.** Another model's weights enter only as terrain through Athena's own founding
+  test; no other model is served, loaded as state or used as a grader.
 - **The latest phrasing narrowing the work.** RH, Hodge and the fluids stay on the same objects
   (the free-energy record's Weil shell, Hodge fibre and neck); the ternary hinge
   `spec(T_a) = {−1, 0, +1}` of the first prime-active aperture is the same three-valued lock read
