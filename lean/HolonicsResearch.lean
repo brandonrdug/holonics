@@ -1250,3 +1250,4 @@ import HolonicsResearch.HNN.PassageCredit
 import HolonicsResearch.HNN.RingHarmonics
 import HolonicsResearch.HNN.CertifiedSection
 import HolonicsResearch.Mathematics.OnePlaneRing
+import HolonicsResearch.Mathematics.RotorPlanes

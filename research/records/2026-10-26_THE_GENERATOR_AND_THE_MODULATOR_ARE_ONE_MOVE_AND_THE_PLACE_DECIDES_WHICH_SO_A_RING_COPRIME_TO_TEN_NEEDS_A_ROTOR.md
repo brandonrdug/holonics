@@ -658,6 +658,27 @@ digit acts on the pair `(𝓕p(k), conj 𝓕p(−k))` by one complex `2 × 2` ma
 into a map whose eigenvectors are those pairs, with eigenvalue `ψ(k)`, so at most the two colours
 `±k` are present. The digit `0` carries colour `k` to colour `b⁻¹k`, which must again be `±k`.
 
+(c) was formal-checked on October 29 in
+[`Mathematics/RotorPlanes`](../../lean/HolonicsResearch/Mathematics/RotorPlanes.lean), for any unit
+base on a prime ring `ℤ/q`:
+- a real realization in `ℝ^ι` with distinct points and the digits `0` and `1` real-affine has
+  `dim ℝ^ι ≥ |⟨b, −1⟩|` (`rotor_plane_bound`). The colours `Q(k) = 𝓕p(k) ∈ ℂ^ι` are eigenvectors
+  of digit `1` after `ord(b) − 1` zeros, with eigenvalue `ψ(k)`, so they are independent; digit `0`
+  carries `Q(k)` to `Q(b⁻¹k)` (`colour_digit`) and reality gives `Q(−k) = conj Q(k)`, so the
+  colours present are a union of `⟨b, −1⟩`-orbits, and one off `0` is present because the points
+  are distinct;
+- on an odd prime ring `|⟨b, −1⟩|` is `ord(b)` for even order and `2·ord(b)` for odd
+  (`card_closure_neg_one`): `ord(b)/2` planes or `ord(b)` planes;
+- the rotor attains it in the real chart: one coordinate `cas(ux) = Re ψ(ux) + Im ψ(ux)` for each
+  `u ∈ ⟨b, −1⟩`, and the digit `d` is `v_u ↦ Re ψ(ud)·v_(ub) + Im ψ(ud)·v_(−ub)` (`hartley_digit`,
+  `hartley_injective`), so `|⟨b, −1⟩|` is the least dimension (`rotor_planes`,
+  `rotor_planes_count`);
+- base ten: the primes 3, 7, 11, 13, 17, 37, 41, 73 and 101 need 1, 3, 1, 3, 8, 3, 5, 4 and 2 planes
+  (`rotor_planes_ten`); the composite rings 9 and 1001 stay checked, not formal;
+- the chain of (d): on `ℤ/bᵏ` the keyed rotor from rest reads `ψ(bʲ n)` at mode `j` and `1` at
+  every mode from `k` on (`chain_modes`), and mode `0` of two words agrees exactly when their
+  numbers agree modulo `bᵏ` (`chain_reads_last_digits`).
+
 Atlas rows:
 - `radix.digit-move-place-kind`;
 - `radix.long-division-strokes`;
