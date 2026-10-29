@@ -513,12 +513,47 @@ impl Tower {
     /// prompt, then one drawn class at a time) runs where the training runs. The streams' class
     /// lists have one length; the read's last place is compared with nothing, so the face it
     /// returns is the one the next class is drawn from.
+    ///
+    /// [agent-inferred, October 29] A participating tower's section closes at its last site, and a
+    /// realization reads a section to its close and no further (the card does; the host need not),
+    /// so the advance is read in calls that end where a stream's open section closes, the streams'
+    /// open sites carried between them. Each call's first class is compared with the face the call
+    /// before it returned, so the codes are the whole read's.
     pub fn advance_realized(&self, states: &mut [TowerState], classes: &[&[usize]], realization: &mut dyn PassRealization) -> Result<(Vec<TowerFace>, Vec<i64>)> {
         let n = classes.first().map_or(0, |c| c.len());
         if n == 0 || classes.iter().any(|c| c.len() != n) || states.len() != classes.len() {
             return Err(TowerError::Refused("an advance reads one nonempty length of classes a stream"));
         }
         self.admit_read(classes, &[])?;
+        let mut codes = vec![0i64; classes.len()];
+        let mut faces: Vec<TowerFace> = Vec::new();
+        let mut a = 0;
+        while a < n {
+            let close = match self.participation() {
+                Some(p) => {
+                    let open = states.iter().map(|s| p.section.checked_sub(s.sites.first().map_or(0, LevelSites::len)).filter(|&r| r > 0));
+                    a + open.collect::<Option<Vec<usize>>>().ok_or(TowerError::Refused("an open section past its close"))?.into_iter().min().unwrap_or(n)
+                }
+                None => n,
+            };
+            let b = close.min(n);
+            for (s, face) in faces.iter().enumerate() {
+                codes[s] += face.code(classes[s][a]);
+            }
+            let parts: Vec<&[usize]> = classes.iter().map(|c| &c[a..b]).collect();
+            let (read, read_codes) = self.advance_call(states, &parts, realization)?;
+            for (sum, c) in codes.iter_mut().zip(read_codes) {
+                *sum += c;
+            }
+            faces = read;
+            a = b;
+        }
+        Ok((faces, codes))
+    }
+
+    /// One call of [`Tower::advance_realized`]: every stream's classes read from its state, within
+    /// its open section.
+    fn advance_call(&self, states: &mut [TowerState], classes: &[&[usize]], realization: &mut dyn PassRealization) -> Result<(Vec<TowerFace>, Vec<i64>)> {
         let windows: Vec<Vec<usize>> = classes.iter().map(|c| c.iter().copied().chain([0]).collect()).collect();
         let targets: Vec<Vec<Option<usize>>> = classes.iter().map(|c| c[1..].iter().map(|&u| Some(u)).chain([None]).collect()).collect();
         let reads: Vec<&[usize]> = windows.iter().map(Vec::as_slice).collect();

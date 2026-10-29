@@ -7603,6 +7603,70 @@ mod tests {
         assert_eq!(plain.participation_at(&mut plain.rest(), 0).expect("read"), None);
     }
 
+    /// [agent-inferred, October 29] A realization that reads a participating tower's section to its
+    /// close and no further (the card's read) still advances a prompt longer than the section: the
+    /// realized advance reads in calls that end where a stream's open section closes. Forty
+    /// classes on two streams whose sections close at different places (one from rest, one five
+    /// classes in) are the advance class by class: the same faces, codes and continuing states,
+    /// eight and thirteen sites left open.
+    #[test]
+    fn a_realized_advance_reads_each_section_to_its_close() {
+        struct Closing(realization::HostPass);
+        impl PassRealization for Closing {
+            fn realization(&self) -> String {
+                "closing".into()
+            }
+            fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<realization::PassRead> {
+                let section = tower.participation().map_or(usize::MAX, |p| p.section);
+                if opening.iter().zip(classes).any(|(o, c)| o.sites.first().map_or(0, LevelSites::len) + c.len() - 1 > section) {
+                    return Err(TowerError::Refused("a read across its section's close"));
+                }
+                self.0.forward(tower, opening, classes, targets, slot)
+            }
+            fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
+                self.0.reverse(tower, opening, classes, compared)
+            }
+            fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
+                self.0.carry(tower, states, opening, slot)
+            }
+            fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+                self.0.last_faces()
+            }
+            fn admit(&self, tower: &Tower) -> Result<()> {
+                self.0.admit(tower)
+            }
+        }
+        let tower = tiny_participating(ContactLaw::Rectifying, true);
+        let a = tower.declaration.alphabet;
+        let prompts: Vec<Vec<usize>> = (0..2).map(|s| (0..40).map(|i| (i * 7 + 3 + s) % a).collect()).collect();
+        let mut host = vec![tower.rest(), tower.rest()];
+        for i in 0..5 {
+            tower.advance(&mut host[1], (i * 3 + 1) % a).expect("advance");
+        }
+        let mut states = host.clone();
+        let mut faces = Vec::new();
+        let mut codes = Vec::new();
+        for (s, prompt) in prompts.iter().enumerate() {
+            let (mut face, mut code) = (None, 0i64);
+            for &u in prompt {
+                if let Some(f) = &face {
+                    code += TowerFace::code(f, u);
+                }
+                face = Some(tower.advance(&mut host[s], u).expect("advance"));
+            }
+            faces.push(face.expect("a face"));
+            codes.push(code);
+        }
+        let reads: Vec<&[usize]> = prompts.iter().map(Vec::as_slice).collect();
+        let mut closing = Closing(realization::HostPass::default());
+        assert!(closing.forward(&tower, &states, &[&prompts[0][..18], &prompts[1][..18]], &[vec![None; 17], vec![None; 17]], Slot::Opened).is_err(), "a read across the close");
+        let (read, read_codes) = tower.advance_realized(&mut states, &reads, &mut closing).expect("realized");
+        assert_eq!((read, read_codes), (faces, codes));
+        assert_eq!(states, host);
+        let open: Vec<usize> = states.iter().map(|s| s.sites[0].len()).collect();
+        assert_eq!(open, vec![8, 13]);
+    }
+
     /// The race's bank founds one head a rung: 128 modes on both turn ladders are two halves of
     /// eight rungs of eight turns, so sixteen heads of eight. The founded moduli alone split a rung
     /// wherever a turn's rounding moved its last bits (90 heads at this founding).

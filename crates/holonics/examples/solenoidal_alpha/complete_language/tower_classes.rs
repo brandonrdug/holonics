@@ -289,7 +289,8 @@ pub(super) fn release(args: &[String]) -> Result<()> {
 
 /// [agent-inferred, October 27] [`release`] with every read and step run through `realization`
 /// ([`Tower::advance_realized`]), so a release runs where the training runs. Each prompt is read
-/// whole as one stream; then the prompts draw together, one class each a step, so the card reads
+/// whole as one stream (on a participating tower in calls that end at its sections' closes); then
+/// the prompts draw together, one class each a step, so the card reads
 /// every releasing prompt's class in one launch. A prompt that has released its end letter or its
 /// count draws no further key and its later faces are never read, so each release is the one the
 /// prompt makes alone.
