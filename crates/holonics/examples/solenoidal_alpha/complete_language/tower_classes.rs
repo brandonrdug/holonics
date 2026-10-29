@@ -62,8 +62,9 @@ pub(super) fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
 /// declared section, one head a rung of the first level
 /// ([`holonics::hnn::tower::Tower::founded_participation`]), so each
 /// site reads the section's earlier sites through the modes' own transport (record
-/// `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`). A continued learner keeps the
-/// participation it was founded with. `train-two-ladder-mutual-tower-classes` founds it so and
+/// `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`); `train-two-ladder-news-participating-tower-classes`
+/// joins the news clock and then participation, so each level's sites are its own ticks. A continued
+/// learner keeps the participation it was founded with. `train-two-ladder-mutual-tower-classes` founds it so and
 /// joins the mutual contact ([`holonics::hnn::tower::Tower::join_mutual_contact`]): each face is
 /// compared with the target's own encoding through a learned contact, and both move (record
 /// `2026-10-29_MUTUAL_CONTACT_…`).
@@ -84,9 +85,11 @@ pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turne
 }
 
 /// `train-two-ladder-participating-tower-classes`: [`train_realized`] on both turn ladders with
-/// participation joined after the founding.
-pub(crate) fn train_participating_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, false, false, false, TurnLadder::Both, None, Joined::Participation, realization)
+/// participation joined after the founding; `train-two-ladder-news-participating-tower-classes`
+/// joins the race's news clock first, so each level's sites are its own ticks (record
+/// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
+pub(crate) fn train_participating_realized(args: &[String], news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Participation, realization)
 }
 
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
@@ -98,7 +101,7 @@ pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassR
 #[allow(clippy::too_many_arguments)]
 fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-mutual-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;

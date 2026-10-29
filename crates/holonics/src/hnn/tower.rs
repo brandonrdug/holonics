@@ -159,9 +159,12 @@
 //! `W₁ᵃ`, the friction and the level's input, and through the frames and the met dissipation into
 //! each move's turn and met covector (the transport covector, record §6; tested against the code's
 //! difference). The pump's reflection share is not claimed (record §8). The certificate's reread
-//! still decides each deposit. A section admits its own sites and releases them with its last; a stream read across
-//! calls (a release) carries its open section in its state. A reverse opens where a section closed,
-//! and one longer than the declared section is refused.
+//! still decides each deposit. A level's section admits its own sites and releases them with its
+//! last, and a stream carries its open sections in its state. Under a news clock a level's sites are
+//! its own ticks and an arrival that ticks no time holds the level's current, so a coarse level's
+//! section spans its own clock across the learner's sections; a reverse reads the sites carried at
+//! its opening as constants, as it reads the opening's modes (record
+//! `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
 //!
 //! **The mutual contact** ([`Tower::join_mutual_contact`], agent-inferred, October 29; record
 //! `2026-10-29_MUTUAL_CONTACT_…`). The readout's comparison is one-sided: `U`'s row `a` is a second
@@ -2400,20 +2403,27 @@ struct LevelCell {
     participation: Option<ParticipationCell>,
 }
 
-/// One level's participation at one cell: the site it admitted (its rotated charts and its heads'
-/// dissipation), the frame it was rotated by, the probe, each head's participation, the current
-/// `y` and its ratio read `r̂ᵃ` with its scale.
+/// One level's participation at one cell: the site it admitted when the level ticked (absent at an
+/// arrival that ticks no time), the current `y` it presents (its site's, or the last site's held)
+/// and its ratio read `r̂ᵃ` with its scale.
 #[derive(Clone, Debug)]
 struct ParticipationCell {
+    site: Option<SiteCell>,
+    current: Vec<Phasor>,
+    read: Vec<i32>,
+    read_scale: i128,
+}
+
+/// A site a level admitted at a tick: its rotated charts and its heads' dissipation, the frame it was
+/// rotated by, the probe and each head's participation.
+#[derive(Clone, Debug)]
+struct SiteCell {
     probe: Vec<Phasor>,
     key: Vec<Phasor>,
     value: Vec<Phasor>,
     frame: Vec<Phasor>,
     dissipation: Vec<i64>,
     parts: Vec<Participation>,
-    current: Vec<Phasor>,
-    read: Vec<i32>,
-    read_scale: i128,
 }
 
 /// A gated mode's move at one cell: the gate `r` and `λ_t`, `ρ_t = |λ_t|`, `γ_t` on `2^(−30)`, and
@@ -3112,48 +3122,64 @@ impl Tower {
                 }
                 Ok(())
             };
-            // Participation ([`participation`]): the cell's move advances each mode's frame and met
-            // dissipation, the level's input presents its rotated charts as the section's newest
-            // site and probes every admitted site, and the participating current is read like the
-            // modes' face and offered to the same contacts through `W₁ᵃ`.
+            // Participation ([`participation`]): at each tick of the level's clock (every arrival
+            // without a news clock) the move advances each mode's frame and met dissipation, the
+            // level's input presents its rotated charts as the section's newest site and probes
+            // every admitted site, and the participating current is read like the modes' face and
+            // offered to the same contacts through `W₁ᵃ`. An arrival that ticks no time admits no
+            // site and presents the last site's current, held as the modes are (record
+            // `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
             let mut part_cell = None;
             let mut part_drive = None;
             if let Some(p) = &self.participation {
                 let pr = &reaches.participation[l];
-                let chart = |re: usize, im: usize, rre: u64, rim: u64| -> Result<Vec<Phasor>> {
-                    let (mut a, mut b) = (vec![0i64; n], vec![0i64; n]);
-                    affine(&t[re..re + n * w], rre, w, &x, None, 0, MATERIAL_BITS, &mut a)?;
-                    affine(&t[im..im + n * w], rim, w, &x, None, 0, MATERIAL_BITS, &mut b)?;
-                    Ok(a.into_iter().zip(b).collect())
-                };
-                let (probe_chart, key_chart, value_chart) = (chart(lv.pa_probe_re, lv.pa_probe_im, pr[0], pr[1])?, chart(lv.pa_key_re, lv.pa_key_im, pr[2], pr[3])?, chart(lv.pa_value_re, lv.pa_value_im, pr[4], pr[5])?);
                 let sites = &mut state.sites[l];
-                for (k, m) in gate.iter().enumerate() {
-                    sites.frame[k] = advance_frame(sites.frame[k], m.unit)?;
-                    sites.met[k] -= m.log;
-                }
-                let frame = sites.frame.clone();
-                let (probe, key, value) = (rotate_back(&frame, &probe_chart)?, rotate_back(&frame, &key_chart)?, rotate_back(&frame, &value_chart)?);
-                let heads = p.ranges();
-                let dissipation: Vec<i64> = heads.iter().map(|h| fit64(div_nearest(sites.met[h.clone()].iter().map(|&v| v as i128).sum(), h.len() as i128))).collect::<Result<_>>()?;
-                sites.keys.push(key.clone());
-                sites.values.push(value.clone());
-                sites.dissipation.push(dissipation.clone());
-                let mut current = vec![(0i64, 0i64); n];
-                let mut parts = Vec::with_capacity(heads.len());
-                for (h, range) in heads.iter().enumerate() {
-                    let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
-                    let at = Probe { q: &probe[range.clone()], unit: &frame[range.clone()], dissipation: dissipation[h] };
-                    let admitted: Vec<Site> = (0..sites.len()).map(|j| Site { k: &sites.keys[j][range.clone()], w: &sites.values[j][range.clone()], dissipation: sites.dissipation[j][h] }).collect();
-                    let part = participate(&head, &at, &admitted, &self.exponential)?;
-                    current[range.clone()].copy_from_slice(&part.current);
-                    parts.push(part);
-                }
-                // The section closes with its last site: its sites are released and its frames
-                // rest, so the next arrival opens the next section.
-                if sites.len() >= p.section {
-                    *sites = LevelSites::rest(n);
-                }
+                let (site, current) = if moves == 0 {
+                    (None, sites.current.clone())
+                } else {
+                    let chart = |re: usize, im: usize, rre: u64, rim: u64| -> Result<Vec<Phasor>> {
+                        let (mut a, mut b) = (vec![0i64; n], vec![0i64; n]);
+                        affine(&t[re..re + n * w], rre, w, &x, None, 0, MATERIAL_BITS, &mut a)?;
+                        affine(&t[im..im + n * w], rim, w, &x, None, 0, MATERIAL_BITS, &mut b)?;
+                        Ok(a.into_iter().zip(b).collect())
+                    };
+                    let (probe_chart, key_chart, value_chart) = (chart(lv.pa_probe_re, lv.pa_probe_im, pr[0], pr[1])?, chart(lv.pa_key_re, lv.pa_key_im, pr[2], pr[3])?, chart(lv.pa_value_re, lv.pa_value_im, pr[4], pr[5])?);
+                    // The move acted `Δτ` times, so the frame turns and the dissipation meets it as often.
+                    for (k, m) in gate.iter().enumerate() {
+                        for _ in 0..moves {
+                            sites.frame[k] = advance_frame(sites.frame[k], m.unit)?;
+                        }
+                        sites.met[k] = fit64(sites.met[k] as i128 - i128::from(moves) * m.log as i128)?;
+                    }
+                    let frame = sites.frame.clone();
+                    let (probe, key, value) = (rotate_back(&frame, &probe_chart)?, rotate_back(&frame, &key_chart)?, rotate_back(&frame, &value_chart)?);
+                    let heads = p.ranges();
+                    let dissipation: Vec<i64> = heads.iter().map(|h| fit64(div_nearest(sites.met[h.clone()].iter().map(|&v| v as i128).sum(), h.len() as i128))).collect::<Result<_>>()?;
+                    sites.keys.push(key.clone());
+                    sites.values.push(value.clone());
+                    sites.dissipation.push(dissipation.clone());
+                    let mut current = vec![(0i64, 0i64); n];
+                    let mut parts = Vec::with_capacity(heads.len());
+                    for (h, range) in heads.iter().enumerate() {
+                        let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
+                        let at = Probe { q: &probe[range.clone()], unit: &frame[range.clone()], dissipation: dissipation[h] };
+                        let admitted: Vec<Site> = (0..sites.len()).map(|j| Site { k: &sites.keys[j][range.clone()], w: &sites.values[j][range.clone()], dissipation: sites.dissipation[j][h] }).collect();
+                        let part = participate(&head, &at, &admitted, &self.exponential)?;
+                        current[range.clone()].copy_from_slice(&part.current);
+                        parts.push(part);
+                    }
+                    // Under a news clock the current is held through the arrivals that tick no time;
+                    // without one every arrival ticks and nothing is held.
+                    if self.news.is_some() {
+                        sites.current = current.clone();
+                    }
+                    // The section closes with its last site: its sites are released and its frames
+                    // rest, so the level's next tick opens the next section; the current is held.
+                    if sites.len() >= p.section {
+                        *sites = sites.reopened();
+                    }
+                    (Some(SiteCell { probe, key, value, frame, dissipation, parts }), current)
+                };
                 // Re(Cᵃ y) = Cᵃ_re y_re − Cᵃ_im y_im, on 2^(−40) released to 2^(−16), read as a ratio.
                 let (y_re, y_im): (Vec<i64>, Vec<i64>) = current.iter().copied().unzip();
                 let (mut ra, mut rb) = (vec![0i64; w], vec![0i64; w]);
@@ -3164,7 +3190,7 @@ impl Tower {
                 let mut extra = vec![0i64; f];
                 affine(&t[lv.pa_contact..lv.pa_contact + f * w], pr[8], w, &pread, None, 0, MATERIAL_BITS, &mut extra)?;
                 part_drive = Some(extra);
-                part_cell = Some(ParticipationCell { probe, key, value, frame, dissipation, parts, current, read: pread, read_scale: pscale });
+                part_cell = Some(ParticipationCell { site, current, read: pread, read_scale: pscale });
             }
             let drive_buf = &mut buf[..f];
             affine(&t[lv.contact..lv.contact + f * w], r[4], w, &read, Some(&t[lv.contact_bias..lv.contact_bias + f]), MATERIAL_BITS, MATERIAL_BITS, drive_buf)?;
@@ -3319,12 +3345,13 @@ impl Tower {
     /// [agent-inferred, October 29] **The participation a receiver meets as `u` arrives**: the state
     /// moved as [`Tower::advance`] moves it, and at each level, head by head, the participation of
     /// the section's admitted sites at this site, the present one last (their weights on `2^(−62)` of
-    /// the peak, the mass, the sites released). A reading (record §7.3), not a learned path; `None` on
-    /// a tower without participation.
+    /// the peak, the mass, the sites released); none at a level whose clock does not tick at this
+    /// arrival, which presents its last site's current. A reading (record §7.3), not a learned path;
+    /// `None` on a tower without participation.
     pub fn participation_at(&self, state: &mut TowerState, u: usize) -> Result<Option<Vec<Vec<Participation>>>> {
         let reaches = self.reaches();
         let cell = self.step(state, u, &reaches)?;
-        Ok(self.participation.as_ref().map(|_| cell.levels.into_iter().map(|lc| lc.participation.map(|pc| pc.parts).unwrap_or_default()).collect()))
+        Ok(self.participation.as_ref().map(|_| cell.levels.into_iter().map(|lc| lc.participation.and_then(|pc| pc.site).map(|site| site.parts).unwrap_or_default()).collect()))
     }
 
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
@@ -3487,21 +3514,18 @@ impl Tower {
             let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
             let mut dreads: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut negs: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
-            // Participation's returns: each cell's probe, key and current covectors (summed over the
-            // later sites that read it), and the current read's covectors, on 2^(−24).
+            // Participation's returns: each site's probe, key and current covectors (summed over the
+            // later sites that read it), and the current read's covectors, on 2^(−24). The sites
+            // carried at the opening are read as constants, as the opening's modes are (record
+            // `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
             let participating = self.participation.as_ref();
-            if participating.is_some_and(|p| cells_n > p.section) {
-                return refuse("a section longer than its participation's");
-            }
-            if participating.is_some() && opening.sites.iter().any(|sites| !sites.is_empty()) {
-                return refuse("a participating section's reverse opens where a section closed: its earlier sites are not its cells");
-            }
             let span = if participating.is_some() { cells_n } else { 0 };
             let (mut pa_q, mut pa_k, mut pa_w) = (vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span]);
             let (mut pa_dreads, mut pa_negs): (Vec<Vec<i64>>, Vec<Vec<i64>>) = (Vec::with_capacity(span), Vec::with_capacity(span));
-            // The transport's reads: each cell's current covector, and each cell's covector of its
-            // heads' mean met dissipation (as probe and as site), on 2^(−40).
-            let mut pa_gys: Vec<Vec<Phasor>> = Vec::with_capacity(span);
+            // The transport's reads: each cell's own current covector (a held cell's joins its last
+            // site's below), and each site's covector of its heads' mean met dissipation (as probe
+            // and as site), on 2^(−40).
+            let mut pa_gy_own: Vec<Vec<Phasor>> = Vec::with_capacity(span);
             let mut pa_met = vec![vec![0i128; participating.map_or(0, |p| p.heads.len())]; span];
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
@@ -3542,7 +3566,7 @@ impl Tower {
                         *a = fit64(*a as i128 + *b as i128)?;
                     }
                 }
-                if let (Some(p), Some(pc)) = (participating, &lc.participation) {
+                if let (Some(_), Some(pc)) = (participating, &lc.participation) {
                     let pr = &reaches.participation[l];
                     let mut dhat = vec![0i64; w];
                     transposed(&t[lv.pa_contact..lv.pa_contact + f * w], pr[8], w, &da, MATERIAL_BITS, &mut dhat)?;
@@ -3551,37 +3575,9 @@ impl Tower {
                     let (mut gy_re, mut gy_im) = (vec![0i64; n], vec![0i64; n]);
                     transposed(&t[lv.pa_read_re..lv.pa_read_re + w * n], pr[6], n, &dra, MATERIAL_BITS, &mut gy_re)?;
                     transposed(&t[lv.pa_read_im..lv.pa_read_im + w * n], pr[7], n, &nega, MATERIAL_BITS, &mut gy_im)?;
-                    let gy: Vec<Phasor> = gy_re.into_iter().zip(gy_im).collect();
-                    for (h, range) in p.ranges().into_iter().enumerate() {
-                        let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
-                        let at = Probe { q: &pc.probe[range.clone()], unit: &pc.frame[range.clone()], dissipation: pc.dissipation[h] };
-                        let admitted = (0..=i)
-                            .map(|j| {
-                                let site = cells[j].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
-                                Ok(Site { k: &site.key[range.clone()], w: &site.value[range.clone()], dissipation: site.dissipation[h] })
-                            })
-                            .collect::<Result<Vec<_>>>()?;
-                        let back = participation_return(&head, &at, &admitted, &pc.parts[h], &gy[range.clone()])?;
-                        g[lv.pa_friction + h] += back.friction;
-                        pa_met[i][h] += back.probe_met;
-                        for (j, &v) in back.sites_met.iter().enumerate() {
-                            pa_met[j][h] += v;
-                        }
-                        for (slot, v) in pa_q[i][range.clone()].iter_mut().zip(&back.probe) {
-                            *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
-                        }
-                        for (j, (keys, currents)) in back.keys.iter().zip(&back.currents).enumerate() {
-                            for (slot, v) in pa_k[j][range.clone()].iter_mut().zip(keys) {
-                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
-                            }
-                            for (slot, v) in pa_w[j][range.clone()].iter_mut().zip(currents) {
-                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
-                            }
-                        }
-                    }
                     pa_dreads.push(dra);
                     pa_negs.push(nega);
-                    pa_gys.push(gy);
+                    pa_gy_own.push(gy_re.into_iter().zip(gy_im).collect());
                 }
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
@@ -3596,6 +3592,66 @@ impl Tower {
                 }
                 dreads.push(dread);
                 negs.push(neg);
+            }
+            // Participation's sites, in order: a held cell's current covector joins its last site's
+            // (before the section's first site that site is the opening's, a constant, and it is
+            // dropped); each site's probe reads the sites carried at the opening, as constants, until
+            // the level's section closes, and the sites admitted since; a site's return reaches the
+            // admitted sites alone. `closes[i]`: the level's section closed with cell `i`'s site.
+            let mut pa_gys: Vec<Vec<(i128, i128)>> = vec![vec![(0, 0); n]; span];
+            let mut closes = vec![false; span];
+            if let Some(p) = participating {
+                let site_of = |i: usize| cells[i].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower")).map(|pc| pc.site.as_ref());
+                let mut held = vec![(0i128, 0i128); n];
+                for i in (0..cells_n).rev() {
+                    for (slot, v) in held.iter_mut().zip(&pa_gy_own[i]) {
+                        *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                    }
+                    if site_of(i)?.is_some() {
+                        pa_gys[i] = std::mem::replace(&mut held, vec![(0, 0); n]);
+                    }
+                }
+                let rest = LevelSites::rest(n);
+                let carried = opening.sites.get(l).unwrap_or(&rest);
+                let mut constants = carried.len();
+                let mut members: Vec<usize> = Vec::new();
+                for i in 0..cells_n {
+                    let Some(site) = site_of(i)? else { continue };
+                    members.push(i);
+                    for (h, range) in p.ranges().into_iter().enumerate() {
+                        let head = Head { beta_shift: p.beta_shift, friction: t[lv.pa_friction + h] as i64 };
+                        let at = Probe { q: &site.probe[range.clone()], unit: &site.frame[range.clone()], dissipation: site.dissipation[h] };
+                        let mut admitted: Vec<Site> = (0..constants).map(|j| Site { k: &carried.keys[j][range.clone()], w: &carried.values[j][range.clone()], dissipation: carried.dissipation[j][h] }).collect();
+                        for &j in &members {
+                            let s = site_of(j)?.ok_or(TowerError::Refused("a member of a section is a site"))?;
+                            admitted.push(Site { k: &s.key[range.clone()], w: &s.value[range.clone()], dissipation: s.dissipation[h] });
+                        }
+                        let gy: Vec<Phasor> = collect_exact(pa_gys[i][range.clone()].iter().map(|&(re, im)| Ok((fit64(re)?, fit64(im)?))))?;
+                        let back = participation_return(&head, &at, &admitted, &site.parts[h], &gy)?;
+                        g[lv.pa_friction + h] += back.friction;
+                        pa_met[i][h] += back.probe_met;
+                        for (j, &v) in back.sites_met.iter().enumerate().skip(constants) {
+                            pa_met[members[j - constants]][h] += v;
+                        }
+                        for (slot, v) in pa_q[i][range.clone()].iter_mut().zip(&back.probe) {
+                            *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                        }
+                        for (j, (keys, currents)) in back.keys.iter().zip(&back.currents).enumerate().skip(constants) {
+                            let c = members[j - constants];
+                            for (slot, v) in pa_k[c][range.clone()].iter_mut().zip(keys) {
+                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                            }
+                            for (slot, v) in pa_w[c][range.clone()].iter_mut().zip(currents) {
+                                *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
+                            }
+                        }
+                    }
+                    if constants + members.len() >= p.section {
+                        closes[i] = true;
+                        constants = 0;
+                        members.clear();
+                    }
+                }
             }
             // The ring rides this level: its face's covector reaches the carried face each push read
             // (the state after the cell before, on the modes' convention) and the mode's move.
@@ -3708,13 +3764,15 @@ impl Tower {
                 gh_all[i] = gh;
             }
             // [agent-inferred, October 29] The transport covector (the participation record's §6): a
-            // site's charts are read through its frame `U_i = Π_(t≤i) u_t` (`q = conj(U) Ȟ`,
-            // `k = conj(U) H`, `w = conj(U) Ψ`, `y = U J/m`) and met through its heads' dissipation
-            // `D_i = −mean Σ_(t≤i) log₂ ρ_t`. So `g_φ(i) = Im(conj(G_q) q) + Im(conj(G_k) k) +
-            // Im(conj(G_w) w) − Im(conj(g_y) y)` summed over the later sites `i ≥ t` is the covector
-            // of the turn `arg u_t`, and the later sites' met covectors, shared over the head's modes
-            // and negated, that of `log₂ ρ_t`; both on 2^(−48). Their sums over the section vanish
-            // (a common turn and a common dissipation move no face): the gauge.
+            // site's charts are read through its frame `U_i = Π_(t≤i) u_t^(Δτ_t)` over its section's
+            // ticks (`q = conj(U) Ȟ`, `k = conj(U) H`, `w = conj(U) Ψ`, `y = U J/m`) and met through its
+            // heads' dissipation `D_i = −mean Σ_(t≤i) Δτ_t log₂ ρ_t`. So `g_φ(i) = Im(conj(G_q) q) +
+            // Im(conj(G_k) k) + Im(conj(G_w) w) − Im(conj(g_y) y)` summed over the later sites `i ≥ t`
+            // of the same section, `Δτ_t` times, is the covector of the turn `arg u_t`, and the later
+            // sites' met covectors, shared over the head's modes and negated, `Δτ_t` times, that of
+            // `log₂ ρ_t`; both on 2^(−48). Over a section that opens and closes within the reverse
+            // their sums vanish (a common turn and a common dissipation move no face): the gauge;
+            // sites carried from before the opening are constants and absorb their share.
             let (mut transport_turn, mut transport_log) = (vec![vec![0i128; n]; span], vec![vec![0i128; n]; span]);
             if let Some(p) = participating {
                 let ranges = p.ranges();
@@ -3722,16 +3780,28 @@ impl Tower {
                 let (mut turn_after, mut met_after) = (vec![0i128; n], vec![0i128; ranges.len()]);
                 for i in (0..cells_n).rev() {
                     let pc = cells[i].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
+                    if let Some(site) = &pc.site {
+                        // A section closed with this site: the later sites are the next section's,
+                        // whose frames opened after it.
+                        if closes[i] {
+                            turn_after.iter_mut().for_each(|v| *v = 0);
+                            met_after.iter_mut().for_each(|v| *v = 0);
+                        }
+                        for k in 0..n {
+                            turn_after[k] += (im(pa_q[i][k], site.probe[k]) + im(pa_k[i][k], site.key[k]) + im(pa_w[i][k], site.value[k]) - im(pa_gys[i][k], pc.current[k])) << (STATE_BITS - FACE_BITS);
+                        }
+                        for (h, _) in ranges.iter().enumerate() {
+                            met_after[h] += pa_met[i][h];
+                        }
+                    }
+                    let moves = i128::from(cells[i].levels[l].ticks);
                     for k in 0..n {
-                        let gy = (pa_gys[i][k].0 as i128, pa_gys[i][k].1 as i128);
-                        turn_after[k] += (im(pa_q[i][k], pc.probe[k]) + im(pa_k[i][k], pc.key[k]) + im(pa_w[i][k], pc.value[k]) - im(gy, pc.current[k])) << (STATE_BITS - FACE_BITS);
-                        transport_turn[i][k] = turn_after[k];
+                        transport_turn[i][k] = moves * turn_after[k];
                     }
                     for (h, range) in ranges.iter().enumerate() {
-                        met_after[h] += pa_met[i][h];
                         let share = -div_nearest(met_after[h] << (STATE_BITS - FACE_BITS), range.len() as i128);
                         for k in range.clone() {
-                            transport_log[i][k] = share;
+                            transport_log[i][k] = moves * share;
                         }
                     }
                 }
@@ -3918,10 +3988,17 @@ impl Tower {
                 let mut charts: [Vec<Vec<i64>>; 6] = Default::default();
                 for i in 0..cells_n {
                     let pc = cells[i].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
+                    // A held cell read no charts: its rows are zero.
+                    let Some(site) = &pc.site else {
+                        for slot in charts.iter_mut() {
+                            slot.push(vec![0; n]);
+                        }
+                        continue;
+                    };
                     let mut turned = |cov: &[(i128, i128)]| -> Result<(Vec<i64>, Vec<i64>)> {
                         let mut re = Vec::with_capacity(n);
                         let mut im = Vec::with_capacity(n);
-                        for (&(gr, gi), &(ur, ui)) in cov.iter().zip(&pc.frame) {
+                        for (&(gr, gi), &(ur, ui)) in cov.iter().zip(&site.frame) {
                             let (ur, ui) = (ur as i128, ui as i128);
                             re.push(fit64(release(ur * gr - ui * gi, MOVE_BITS))?);
                             im.push(fit64(release(ur * gi + ui * gr, MOVE_BITS))?);
@@ -4460,7 +4537,7 @@ impl Tower {
             return refuse("a ring face beside a mutual contact is owed: it reads the readout the contact replaces");
         }
         if self.participation.is_some() {
-            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+            return refuse("participation beside a rotor or a ring face is owed");
         }
         if self.rotor.is_some() {
             return refuse("a ring face beside a rotor: the ring's law under a step is owed");
@@ -4504,7 +4581,7 @@ impl Tower {
             return refuse("a tower takes one rotor");
         }
         if self.participation.is_some() {
-            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+            return refuse("participation beside a rotor or a ring face is owed");
         }
         if self.ring.is_some() {
             return refuse("a rotor beside a ring face: the ring's law under a step is owed");
@@ -4531,7 +4608,7 @@ impl Tower {
             return refuse("a tower takes one news clock");
         }
         if self.participation.is_some() {
-            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+            return refuse("participation joins last: a news clock joins before it");
         }
         if self.declaration.pumped {
             return refuse("a news clock under a pump: the reflection over a clocked move is owed");
@@ -4554,7 +4631,7 @@ impl Tower {
 
     /// Whether this tower admits a participation of this declaration: over its whole bank, on gated
     /// modes (a site's frame is the product of the cells' unit moves), and not beside a rotor (it
-    /// moves modes between frames), a ring face or a news clock (their participation is owed).
+    /// moves modes between frames) or a ring face (their participation is owed).
     fn admits_participation(&self, p: &ParticipationDeclaration) -> Result<()> {
         if p.modes() != self.declaration.modes {
             return refuse("a participation whose heads do not span the bank");
@@ -4562,8 +4639,8 @@ impl Tower {
         if !self.declaration.gated {
             return refuse("participation reads gated modes: a site's frame is the product of the cells' unit moves");
         }
-        if self.rotor.is_some() || self.ring.is_some() || self.news.is_some() {
-            return refuse("participation beside a rotor, a ring face or a news clock is owed");
+        if self.rotor.is_some() || self.ring.is_some() {
+            return refuse("participation beside a rotor or a ring face is owed");
         }
         if self.mutual.is_some() {
             return refuse("participation beside a mutual contact is owed: its contacts' return is re-derived under the contact");
@@ -8206,12 +8283,196 @@ mod tests {
         assert!(tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying).join_participation(ParticipationDeclaration::new(vec![3], 16, 1).expect("declared")).is_err());
         let mut joined = tiny_participating(ContactLaw::Rectifying, false);
         assert!(joined.join_participation(p).is_err());
+        // Participation joins last: a news clock joins before it.
         assert!(joined.join_news(NewsClock::new(4, 2).expect("a clock")).is_err());
-        // A section longer than the participation's is refused at its reverse.
+        // A section longer than the participation's closes it within its reverse.
         let long: Vec<usize> = (0..24).map(|i| i % 4).collect();
         let mut s = joined.rest();
         let cells = joined.forward(&mut s, &long, &joined.reaches()).expect("forward");
-        assert!(joined.reverse(&joined.rest(), &cells, &long, None).is_err());
+        assert!(joined.reverse(&joined.rest(), &cells, &long, None).is_ok());
+    }
+
+    /// A tiny two-level participating tower on a news clock of `bits` bits (joined before
+    /// participation), its charts opened as [`tiny_participating_of`] opens them.
+    pub(super) fn tiny_clocked_participating(contact: ContactLaw, turned: bool, bits: u32) -> Tower {
+        let mut tower = tiny_contacts(2, 4, 4, true, turned, false, contact);
+        tower.join_news(NewsClock::new(bits, 2).expect("a clock")).expect("joined");
+        tower.join_participation(ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared")).expect("joined");
+        let k = keys(8192);
+        let mut i = 3000;
+        for lv in tower.layout.levels.clone() {
+            for v in &mut tower.theta[lv.pa_contact..lv.pa_contact + 16] {
+                *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) * 8;
+                i += 1;
+            }
+            for v in &mut tower.theta[lv.pa_probe_re..lv.pa_key_im + 16] {
+                *v *= 2;
+            }
+        }
+        tower
+    }
+
+    /// [agent-inferred, October 29] **A clocked level's sites are its ticks** (record
+    /// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`, acceptance 2): on a clocked
+    /// participating tower each level admits a site exactly at the arrivals where its clock ticks;
+    /// at an arrival that ticks no time the level's state, frames, met dissipation, sites and
+    /// current equal its predecessor's; a level's section closes after its own sixteenth site; and
+    /// level 0, which ticks at every arrival, admits every arrival. Over four classes an arrival
+    /// carries about two bits, so a clock of three bits leaves level 1 still at some arrivals and a
+    /// clock of one bit ticks it two or three times at each.
+    #[test]
+    fn a_clocked_levels_sites_are_its_ticks_and_its_current_is_held() {
+        let mut seen = [0usize; 3];
+        for bits in [3, 1] {
+            let tower = tiny_clocked_participating(ContactLaw::Rectifying, false, bits);
+            let classes = news_passage();
+            let reaches = tower.reaches();
+            let mut s = tower.rest();
+            let mut open = vec![0usize; 2];
+            for (i, &u) in classes.iter().enumerate() {
+                let before = s.clone();
+                let cell = tower.step(&mut s, u, &reaches).expect("step");
+                for l in 0..2 {
+                    let lc = &cell.levels[l];
+                    let pc = lc.participation.as_ref().expect("a participation at every cell");
+                    seen[(lc.ticks as usize).min(2)] += usize::from(l == 1);
+                    if l == 0 {
+                        assert_eq!(lc.ticks, 1, "level 0 ticks at every arrival");
+                    }
+                    if lc.ticks == 0 {
+                        assert!(pc.site.is_none(), "cell {i}, level {l}: a site without a tick");
+                        assert_eq!(s.modes[l], before.modes[l], "cell {i}, level {l}");
+                        assert_eq!(s.sites[l], before.sites[l], "cell {i}, level {l}");
+                        assert_eq!(pc.current, before.sites[l].current, "cell {i}, level {l}: the current is held");
+                    } else {
+                        let site = pc.site.as_ref().expect("a site at a tick");
+                        open[l] += 1;
+                        assert_eq!(site.parts[0].weights.len(), open[l], "cell {i}, level {l}");
+                        assert_eq!(pc.current, s.sites[l].current, "cell {i}, level {l}: the site's current is held");
+                        if open[l] == 16 {
+                            open[l] = 0;
+                        }
+                    }
+                    assert_eq!(s.sites[l].len(), open[l], "cell {i}, level {l}");
+                }
+            }
+        }
+        assert!(seen.iter().all(|&c| c > 0), "level 1 ticked none, once and more at some arrivals: {seen:?}");
+    }
+
+    /// [agent-inferred, October 29] **Carried sites** (acceptance 3, and acceptance 1 under a clock):
+    /// a passage read in three calls gives the faces and the state it gives read whole, the states
+    /// between them carrying the levels' open sites; and with participation's contacts closed the
+    /// clocked participating tower is the clocked tower face for face.
+    #[test]
+    fn a_clocked_participation_carries_its_sites_across_calls() {
+        let tower = tiny_clocked_participating(ContactLaw::Pair, false, 3);
+        let classes = news_passage();
+        let reaches = tower.reaches();
+        let mut whole = tower.rest();
+        let faces = tower.forward(&mut whole, &classes, &reaches).expect("forward");
+        let mut parted = tower.rest();
+        let mut at = 0;
+        // Each call opens on the class the call before it ends on (its last target).
+        for end in [20, 41, classes.len() - 1] {
+            let cells = tower.forward(&mut parted, &classes[at..=end], &reaches).expect("forward");
+            for (j, cell) in cells.iter().enumerate() {
+                assert_eq!((&cell.face.masses, cell.face.total), (&faces[at + j].face.masses, faces[at + j].face.total), "class {}", at + j);
+            }
+            if end < classes.len() - 1 {
+                assert!(parted.sites.iter().all(|s| !s.is_empty()), "the state at {end} carries open sites");
+            }
+            at = end;
+        }
+        assert_eq!(parted, whole);
+        let mut plain = tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Pair);
+        plain.join_news(NewsClock::new(3, 2).expect("a clock")).expect("joined");
+        let mut closed = tower.clone();
+        for lv in closed.layout.levels.clone() {
+            closed.theta[lv.pa_contact..lv.pa_contact + 16].iter_mut().for_each(|v| *v = 0);
+        }
+        let (mut a, mut b) = (plain.rest(), closed.rest());
+        let ca = plain.forward(&mut a, &classes, &plain.reaches()).expect("forward");
+        let cb = closed.forward(&mut b, &classes, &closed.reaches()).expect("forward");
+        for (x, y) in ca.iter().zip(&cb) {
+            assert_eq!((&x.face.masses, x.face.total), (&y.face.masses, y.face.total));
+        }
+        assert_eq!(a.modes, b.modes);
+    }
+
+    /// [agent-inferred, October 29] **The covector over a carried opening** (acceptance 4): on the
+    /// clocked participating tower, plain and turned, a section read from an opening that carries
+    /// both levels' open sites (twenty classes in, level 0 holding four sites and closing its
+    /// section within the reverse) gives covectors that match the code difference, read from that
+    /// same opening, for participation's families and the gates, moves, turns, pushes and reads;
+    /// on a clock of three bits level 1 holds its current through the arrivals it is still at, and
+    /// on one of one bit its moves act two or three times a cell. A level still at a third of the
+    /// arrivals reads fewer sites, so its covectors sit within a few times the reading's grain, and
+    /// the difference is read at the participation tests' step and at twice it, a parameter matching
+    /// at either: at their step level 1's largest key covector (5,040,148 at 2^(−32)) read 6,957,096,
+    /// and at twice and four times it 5,009,006 and 5,167,706; at twice the step its largest read
+    /// covector (16,971,702) read 20,063,011, and within a tenth at the step.
+    #[test]
+    fn the_clocked_participation_covector_matches_the_code_difference_from_a_carried_opening() {
+        for (contact, turned, bits) in [(ContactLaw::Rectifying, false, 3), (ContactLaw::Rectifying, true, 3), (ContactLaw::Pair, false, 3), (ContactLaw::Rectifying, false, 1), (ContactLaw::Rectifying, true, 1)] {
+            let tower = tiny_clocked_participating(contact, turned, bits);
+            let passage = news_passage();
+            let (prefix, classes) = (&passage[..=20], &passage[20..44]);
+            let mut opening = tower.rest();
+            tower.forward(&mut opening, prefix, &tower.reaches()).expect("forward");
+            assert!(opening.sites.iter().all(|s| !s.is_empty()), "the opening carries open sites");
+            let mut s = opening.clone();
+            let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
+            let mut g = tower.reverse(&opening, &cells, classes, None).expect("reverse");
+            tower.to_step_grain(&mut g);
+            let from = |t: &Tower| {
+                let mut s = opening.clone();
+                t.read(&mut s, classes).expect("read")
+            };
+            let conducting = |t: &Tower| -> Vec<u32> {
+                let mut s = opening.clone();
+                let cells = t.forward(&mut s, classes, &t.reaches()).expect("forward");
+                cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| u32::from(a > 0)).chain(std::iter::once(l.ticks)).collect::<Vec<_>>())).collect()
+            };
+            let base = conducting(&tower);
+            let base_code = from(&tower);
+            let read: Vec<usize> = participation_families(&tower)
+                .into_iter()
+                .chain(tower.layout.levels.iter().flat_map(|lv| [lv.gate, lv.gate_bias, lv.move_re, lv.move_im, lv.push_re, lv.read_re].into_iter().chain(if turned { vec![lv.turn, lv.turn_bias] } else { Vec::new() })))
+                .collect();
+            let mut checked = Vec::new();
+            for &(start, len, grain) in tower.layout.families.iter().filter(|(start, _, _)| read.contains(start)) {
+                let mut order: Vec<usize> = (start..start + len).collect();
+                order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
+                'parameter: for i in order {
+                    let gi = g[i];
+                    if gi.abs() < 1i128 << (STEP_BITS - 10) {
+                        break;
+                    }
+                    let mut numerics = Vec::new();
+                    'step: for h in [1i32 << (grain - 8), 1i32 << (grain - 7)] {
+                        let (mut moment, mut spread) = (0i128, 0i128);
+                        for k in (-8i32..=8).filter(|&k| k != 0) {
+                            let mut moved = tower.clone();
+                            moved.theta[i] += k * h;
+                            if conducting(&moved) != base {
+                                continue 'step;
+                            }
+                            moment += k as i128 * (from(&moved) - base_code) as i128;
+                            spread += (k * k) as i128;
+                        }
+                        numerics.push((moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread));
+                    }
+                    if numerics.is_empty() {
+                        continue 'parameter;
+                    }
+                    assert!(numerics.iter().any(|numeric| (numeric - gi).abs() * 10 <= gi.abs()), "{contact:?} turned {turned} on {bits} bits: family at {start} grain {grain}, parameter {i}: covector {gi} against {numerics:?}");
+                    checked.push(start);
+                    break;
+                }
+            }
+            eprintln!("{contact:?} turned {turned} on {bits} bits: {} of {} families read", checked.len(), read.len());
+        }
     }
 
     #[test]

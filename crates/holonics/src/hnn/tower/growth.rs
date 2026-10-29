@@ -181,8 +181,9 @@ impl Tower {
 
     /// [definition; agent-inferred, October 29] **A stream's state widened** with this tower by
     /// `factor`: each level's modes repeated, one copy after another, and participation's open
-    /// section with them (frames, met dissipation, keys and values a mode, each site's dissipation
-    /// a head). Refused on a state that carries a passage credit, whose lift is owed.
+    /// section with them (frames, met dissipation, keys, values and the held current a mode, each
+    /// site's dissipation a head). Refused on a state that carries a passage credit, whose lift is
+    /// owed.
     pub fn widen_state(&self, state: &TowerState, factor: usize) -> Result<TowerState> {
         let d = &self.declaration;
         if state.credit.is_some() {
@@ -201,6 +202,7 @@ impl Tower {
                 keys: s.keys.iter().map(|k| repeat(k)).collect(),
                 values: s.values.iter().map(|v| repeat(v)).collect(),
                 dissipation: s.dissipation.iter().map(|h| h.repeat(factor)).collect(),
+                current: repeat(&s.current),
             })
             .collect();
         Ok(TowerState { modes: state.modes.iter().map(|m| repeat(m)).collect(), sites, ..state.clone() })
@@ -226,16 +228,17 @@ impl TowerLearner {
 #[cfg(test)]
 mod tests {
     use super::super::realization::HostPass;
-    use super::super::tests::{keys, tiny_contacts, tiny_participating};
+    use super::super::tests::{keys, tiny_clocked_participating, tiny_contacts, tiny_participating};
     use super::*;
 
     const PASSAGE: [usize; 40] = [1, 2, 0, 1, 1, 3, 2, 2, 0, 1, 2, 1, 0, 0, 3, 1, 2, 2, 1, 0, 1, 2, 3, 0, 1, 1, 2, 0, 2, 1, 3, 1, 0, 2, 2, 1, 0, 1, 2, 3];
 
     /// Acceptance 1: the grown tower read from the widened state gives the old faces class by
-    /// class, its state after each the widened old state, across participation's section closes.
+    /// class, its state after each the widened old state, across participation's section closes,
+    /// and on a news clock across each level's own closes and held currents.
     #[test]
     fn the_grown_tower_reads_the_old_faces_from_the_widened_state() {
-        for tower in [tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying), tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Pair), tiny_participating(ContactLaw::Rectifying, true)] {
+        for tower in [tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying), tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Pair), tiny_participating(ContactLaw::Rectifying, true), tiny_clocked_participating(ContactLaw::Rectifying, false, 3)] {
             for factor in [2, 3] {
                 let grown = tower.widened(factor, &keys(1 << 16)).expect("grown");
                 assert_eq!(grown.declaration.modes, factor * tower.declaration.modes);

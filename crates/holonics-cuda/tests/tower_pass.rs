@@ -411,39 +411,57 @@ fn the_cards_turned_stranded_participating_pass_is_the_hosts_for_eight_sections(
 }
 
 /// A read that ends inside its participation's section carries the open section's sites, on the
-/// card as on the host, and the card reads on from them across calls, as a release does: the first
-/// read leaves seven of twelve sites open, the second closes the section at its last site and the
-/// third opens the next. A read across the close, and the reverse of a read that opened on carried
-/// sites, are refused on the card.
+/// card as on the host, and the card reads on from them across calls, as a release does, and
+/// closes the section within a call: the first read leaves seven of twelve sites open, the second
+/// closes the section at its fifth cell and leaves two of the next open, and the third leaves
+/// seven. Each read's covector, its opening's carried sites read as constants, is the host's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn the_cards_participation_reads_an_open_section_on_across_calls_as_the_host_does() {
+fn the_cards_participation_reads_a_section_on_across_calls_and_closes_it_within_one_as_the_host_does() {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let (host, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
     let classes = passage(11, 40);
     let mut reference = HostPass::default();
     let (mut states_h, mut states_c) = (vec![host.tower.rest(); 2], vec![host.tower.rest(); 2]);
-    for (round, (from, to, open)) in [(0, 8, 7), (7, 13, 0), (12, 20, 7)].into_iter().enumerate() {
+    for (round, (from, to, open)) in [(0, 8, 7), (7, 15, 2), (14, 20, 7)].into_iter().enumerate() {
         let parts: Vec<&[usize]> = vec![&classes[from..to], &classes[20 + from..20 + to]];
         let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
-        if round == 1 {
-            let across: Vec<&[usize]> = vec![&classes[7..15], &classes[27..35]];
-            let across_targets: Vec<Vec<Option<usize>>> = across.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
-            assert!(realized.forward(&host.tower, &states_c, &across, &across_targets, Slot::Opened).is_err(), "a read across the close");
-        }
         let read_h = reference.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened).expect("host forward");
         let read_c = realized.forward(&host.tower, &states_c, &parts, &targets, Slot::Opened).expect("card forward");
         assert_eq!(read_h, read_c, "round {round}: the faces and the swell");
-        if round == 1 {
-            assert!(realized.reverse(&host.tower, &states_c, &parts, None).is_err(), "a reverse over carried sites");
-        }
+        let g_h = reference.reverse(&host.tower, &states_h, &parts, None).expect("host reverse");
+        let g_c = realized.reverse(&host.tower, &states_c, &parts, None).expect("card reverse");
+        assert_eq!(g_h, g_c, "round {round}: the covector over the carried sites");
         let (opening_h, opening_c) = (states_h.clone(), states_c.clone());
         reference.carry(&host.tower, &mut states_h, &opening_h, Slot::Opened).expect("host carry");
         realized.carry(&host.tower, &mut states_c, &opening_c, Slot::Opened).expect("card carry");
         assert_eq!(states_h, states_c, "round {round}: the continuing states with their sections");
         assert!(states_h.iter().all(|s| s.sites.iter().all(|sites| sites.len() == open)), "round {round}: {open} sites open");
     }
+}
+
+/// [agent-inferred, October 29] **Participation on the news clock's ticks on the card** (record
+/// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`, acceptance 6): each level admits its
+/// sites at its own ticks, holds its current between them and closes its section at its own count,
+/// within a learner's section or across sections; 32 sections equal face by face, covector entry
+/// by entry, learner for learner and state for state. Level 1's clock is two bits, under the four
+/// or so a class carries, so it ticks none, once or several times at an arrival; a participation
+/// section of twelve over learner sections of nine closes level 0's within a call as well.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_clocked_participating_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), participation: Some(12), ..Faces::default() });
+}
+
+/// The same on the pair contact, an uncompared place held, on a clock of three bits that leaves
+/// level 1 still at some arrivals; and without a clock, sections of twelve over learner sections of
+/// nine, so the card closes level 0's section within a call and reverses over carried sites.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_clocked_participating_pair_contact_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), participation: Some(12), contact: Some(ContactLaw::Pair), ..Faces::default() });
+    lockstep(11, 2, 9, 8, false, Faces { participation: Some(12), ..Faces::default() });
 }
 
 /// [agent-inferred, October 29] **The continuing body on the card** (acceptance 2 of the record
@@ -739,6 +757,14 @@ fn the_cards_participating_advance_is_the_hosts_class_by_class() {
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_news_clocked_advance_is_the_hosts_class_by_class() {
     advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), ..Faces::default() });
+}
+
+/// The same with participation on the clock's ticks: each level's open section and held current
+/// carried from one advance to the next on the card as on the host.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_clocked_participating_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), participation: Some(12), ..Faces::default() });
 }
 
 fn advance_class_by_class(faces: Faces) {

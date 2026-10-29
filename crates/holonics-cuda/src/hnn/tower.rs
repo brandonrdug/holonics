@@ -40,7 +40,9 @@
 //! (`NewsClock`, never beside the ring face: each stream carries its open face and phase beside its
 //! modes, the forward reads every level's ticks from the arriving class's code under the open face
 //! and each level's modes take their step once a tick with the arrival held, and the modes' scan
-//! carries the covector back through each tick). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
+//! carries the covector back through each tick; participation beside it admits a level's sites at
+//! its ticks alone, holds its current between them and closes each level's section at its own
+//! count, within a call or across calls). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
 //! law.
 //!
 //! # The realizations (hardware law)
@@ -318,6 +320,10 @@ struct FrameWords {
     pa_open_key: u64,
     pa_open_value: u64,
     pa_open_diss: u64,
+    pa_hold: u64,
+    pa_sect: u64,
+    pa_member: u64,
+    pa_mark: u64,
     contact_y: u64,
     contact_gy: u64,
     r_contact_gy: u64,
@@ -528,11 +534,20 @@ struct Frame<'c> {
     pa_gmet: CardBuffer<'c, i128>,
     pa_tturn: CardBuffer<'c, i128>,
     pa_tlog: CardBuffer<'c, i128>,
-    /// The sites each stream carries open into the call, at their places in the section.
+    /// The sites each stream carries open into the call at each level (`[S][L]`), at their places
+    /// in the section.
     pa_open: CardBuffer<'c, u32>,
     pa_open_key: CardBuffer<'c, i64>,
     pa_open_value: CardBuffer<'c, i64>,
     pa_open_diss: CardBuffer<'c, i64>,
+    /// Each level's held current (`[S][L][2N]`), uploaded at the opening and carried through the
+    /// call; each level's open section at the call's end, its carried sites still read and the
+    /// sites admitted since (`[S][L][2]`), and those sites' cells (`[S][L][section]`); and the
+    /// reverse's mark of each cell at the level it returns (`[S][T]`).
+    pa_hold: CardBuffer<'c, i64>,
+    pa_sect: CardBuffer<'c, u32>,
+    pa_member: CardBuffer<'c, u32>,
+    pa_mark: CardBuffer<'c, u32>,
     /// The mutual contact's produced face `y = J x` and its covector `G_y` at each cell (each
     /// empty without it).
     contact_y: CardBuffer<'c, i64>,
@@ -556,9 +571,6 @@ pub struct TowerCard<'c> {
     opened: Option<LawWords>,
     /// Whether the frame's material is still the opening read's (a reread uploads its candidate).
     opened_current: bool,
-    /// Whether the opening read carried a stream's section open into the call (its reverse,
-    /// whose covector would reach sites read in earlier calls, is owed).
-    opened_open: bool,
     ends: [Option<Vec<TowerState>>; 2],
     times: TowerCardTimes,
     /// When set, each launch is waited on and timed by its entry (a measurement aid: it
@@ -592,7 +604,7 @@ impl<'c> TowerCard<'c> {
     pub fn open(card: &'c Card) -> std::result::Result<Self, DeviceError> {
         card.current()?;
         let module = Module::load_ptx(IMAGE)?;
-        Ok(Self { card, module, frame: None, opened: None, opened_current: false, opened_open: false, ends: [None, None], times: TowerCardTimes::default(), profile: None })
+        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ends: [None, None], times: TowerCardTimes::default(), profile: None })
     }
 
     /// Time every launch by its entry from here on (each launch waited on before and after).
@@ -619,8 +631,8 @@ impl<'c> TowerCard<'c> {
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
         }
-        if law.participation.as_ref().is_some_and(|p| law.rotor.is_some() || law.ring.is_some() || law.news.is_some() || p.heads.len() > u32::MAX as usize) {
-            return refuse("the card carries participation on gated modes, never beside a rotor, a ring face or a news clock");
+        if law.participation.as_ref().is_some_and(|p| law.rotor.is_some() || law.ring.is_some() || p.heads.len() > u32::MAX as usize) {
+            return refuse("the card carries participation on gated modes, never beside a rotor or a ring face");
         }
         if d.pumped && (!d.turned || law.news.is_some()) {
             return refuse("the card pumps a turned mode, never beside a news clock");
@@ -953,10 +965,14 @@ impl<'c> TowerCard<'c> {
             pa_gmet: card.alloc(q * heads)?,
             pa_tturn: card.alloc(q * n * pa)?,
             pa_tlog: card.alloc(q * n * pa)?,
-            pa_open: card.alloc(s * pa)?,
+            pa_open: card.alloc(s * l * pa)?,
             pa_open_key: card.alloc(s * sec * l * n * 2 * carried)?,
             pa_open_value: card.alloc(s * sec * l * n * 2 * carried)?,
             pa_open_diss: card.alloc(s * sec * l * heads * carried)?,
+            pa_hold: card.alloc(s * l * 2 * n * pa)?,
+            pa_sect: card.alloc(s * l * 2 * pa)?,
+            pa_member: card.alloc(s * l * sec * pa)?,
+            pa_mark: card.alloc(q * pa)?,
             contact_y: card.alloc(q * w * mutual)?,
             contact_gy: card.alloc(q * w * mutual)?,
             reach_offsets,
@@ -1096,6 +1112,10 @@ impl<'c> TowerCard<'c> {
             pa_open_key: frame.pa_open_key.device_ptr(),
             pa_open_value: frame.pa_open_value.device_ptr(),
             pa_open_diss: frame.pa_open_diss.device_ptr(),
+            pa_hold: frame.pa_hold.device_ptr(),
+            pa_sect: frame.pa_sect.device_ptr(),
+            pa_member: frame.pa_member.device_ptr(),
+            pa_mark: frame.pa_mark.device_ptr(),
             contact_y: frame.contact_y.device_ptr(),
             contact_gy: frame.contact_gy.device_ptr(),
             r_contact_gy: r(26),
@@ -1247,28 +1267,27 @@ impl<'c> TowerCard<'c> {
         };
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        if law.participation.as_ref().is_some_and(|p| cells > p.section) {
-            return Err(TowerError::Refused("a section longer than its participation's"));
-        }
-        // The sites each stream carries open into the call (a release reads its section across
-        // calls): the same count at every level, each site of the bank's modes and heads, and the
-        // read ending at or before the section's close (a read across the close is owed here).
-        let carried: Vec<usize> = opening.iter().map(|o| o.sites.first().map_or(0, LevelSites::len)).collect();
+        // The sites each stream carries open into the call at each level (a section runs on across
+        // calls, and closes within one at its level's own count), each site of the bank's modes and
+        // heads, with the frames, met dissipation and held current of the bank's modes.
+        let carried: Vec<Vec<usize>> = opening.iter().map(|o| o.sites.iter().map(LevelSites::len).collect()).collect();
         if let Some(p) = &law.participation {
-            let whole = |o: &TowerState, n0: usize| {
-                o.sites.iter().all(|sites| {
-                    sites.len() == n0
-                        && sites.frame.len() == d.modes
-                        && sites.met.len() == d.modes
-                        && sites.keys.iter().chain(&sites.values).all(|site| site.len() == d.modes)
-                        && sites.dissipation.iter().all(|site| site.len() == p.heads.len())
-                }) && (n0 == 0 || o.sites.len() == d.levels)
+            let whole = |o: &TowerState| {
+                (o.sites.is_empty() || o.sites.len() == d.levels)
+                    && o.sites.iter().all(|sites| {
+                        sites.len() < p.section
+                            && sites.frame.len() == d.modes
+                            && sites.met.len() == d.modes
+                            && sites.current.len() == d.modes
+                            && sites.keys.iter().chain(&sites.values).all(|site| site.len() == d.modes)
+                            && sites.dissipation.iter().all(|site| site.len() == p.heads.len())
+                    })
             };
-            if opening.iter().zip(&carried).any(|(o, &n0)| !whole(o, n0) || n0 + cells > p.section) {
-                return Err(TowerError::Refused("the card carries a section's open sites at every level of the bank, and reads to its close and no further"));
+            if !opening.iter().all(whole) {
+                return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1336,28 +1355,43 @@ impl<'c> TowerCard<'c> {
                     Some(*at)
                 })).collect();
                 card.write(&frame.pa_heads, 0, &starts).map_err(device)?;
-                // Each stream's open sites at their places ([S][section][L]), and its running frame
-                // and met dissipation, which the forward resumes from (a closed section rests).
-                let counts: Vec<u32> = carried.iter().map(|&n0| n0 as u32).collect();
-                card.write(&frame.pa_open, 0, &counts).map_err(device)?;
+                // Each stream's open sites at each level at their places ([S][section][L], a level's
+                // places past its own count unread), its running frames and met dissipation, which
+                // the forward resumes from (a section at rest opens from rest), and its held currents
+                // (re block, im block).
                 let (n, l_, h) = (d.modes, d.levels, p.heads.len());
-                for (s, (o, &n0)) in opening.iter().zip(&carried).enumerate().filter(|(_, (_, n0))| **n0 > 0) {
-                    let (mut keys, mut values, mut diss) = (Vec::with_capacity(n0 * l_ * n * 2), Vec::with_capacity(n0 * l_ * n * 2), Vec::with_capacity(n0 * l_ * h));
-                    for j in 0..n0 {
-                        for sites in &o.sites {
-                            keys.extend(sites.keys[j].iter().flat_map(|&(re, im)| [re, im]));
-                            values.extend(sites.values[j].iter().flat_map(|&(re, im)| [re, im]));
-                            diss.extend_from_slice(&sites.dissipation[j]);
+                let counts: Vec<u32> = carried.iter().flat_map(|c| (0..l_).map(|l| c.get(l).map_or(0, |&n0| n0 as u32))).collect();
+                card.write(&frame.pa_open, 0, &counts).map_err(device)?;
+                let mut held = vec![0i64; streams * l_ * 2 * n];
+                for (s, o) in opening.iter().enumerate().filter(|(_, o)| !o.sites.is_empty()) {
+                    let n0 = o.sites.iter().map(LevelSites::len).max().unwrap_or(0);
+                    if n0 > 0 {
+                        let (mut keys, mut values, mut diss) = (vec![0i64; n0 * l_ * n * 2], vec![0i64; n0 * l_ * n * 2], vec![0i64; n0 * l_ * h]);
+                        for (l, sites) in o.sites.iter().enumerate() {
+                            for j in 0..sites.len() {
+                                let at = j * l_ + l;
+                                keys[at * n * 2..(at + 1) * n * 2].copy_from_slice(&sites.keys[j].iter().flat_map(|&(re, im)| [re, im]).collect::<Vec<_>>());
+                                values[at * n * 2..(at + 1) * n * 2].copy_from_slice(&sites.values[j].iter().flat_map(|&(re, im)| [re, im]).collect::<Vec<_>>());
+                                diss[at * h..(at + 1) * h].copy_from_slice(&sites.dissipation[j]);
+                            }
                         }
+                        card.write(&frame.pa_open_key, s * p.section * l_ * n * 2, &keys).map_err(device)?;
+                        card.write(&frame.pa_open_value, s * p.section * l_ * n * 2, &values).map_err(device)?;
+                        card.write(&frame.pa_open_diss, s * p.section * l_ * h, &diss).map_err(device)?;
                     }
-                    card.write(&frame.pa_open_key, s * p.section * l_ * n * 2, &keys).map_err(device)?;
-                    card.write(&frame.pa_open_value, s * p.section * l_ * n * 2, &values).map_err(device)?;
-                    card.write(&frame.pa_open_diss, s * p.section * l_ * h, &diss).map_err(device)?;
                     let run: Vec<i64> = o.sites.iter().flat_map(|sites| sites.frame.iter().flat_map(|&(re, im)| [re, im])).collect();
                     let met: Vec<i64> = o.sites.iter().flat_map(|sites| sites.met.iter().copied()).collect();
                     card.write(&frame.pa_run, s * l_ * n * 2, &run).map_err(device)?;
                     card.write(&frame.pa_met, s * l_ * n, &met).map_err(device)?;
+                    for (l, sites) in o.sites.iter().enumerate() {
+                        let at = (s * l_ + l) * 2 * n;
+                        for (k, &(re, im)) in sites.current.iter().enumerate() {
+                            held[at + k] = re;
+                            held[at + n + k] = im;
+                        }
+                    }
                 }
+                card.write(&frame.pa_hold, 0, &held).map_err(device)?;
             }
             card.zero_octets(&frame.status, 0, 4 * streams).map_err(device)?;
             if keep {
@@ -1376,20 +1410,28 @@ impl<'c> TowerCard<'c> {
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
-        // A read that ends inside its section (a frozen read's last window, a release's step)
-        // carries the section's open sites, as the host's state does; a section read to its close
-        // releases them.
-        let closes = |n0: usize| law.participation.as_ref().is_none_or(|p| n0 + cells == p.section);
-        let open_sections = match &law.participation {
-            Some(p) if carried.iter().any(|&n0| !closes(n0)) => Some((
-                self.card.fetch(&frame.pa_key).map_err(device)?,
-                self.card.fetch(&frame.pa_value).map_err(device)?,
-                self.card.fetch(&frame.pa_diss).map_err(device)?,
-                self.card.fetch(&frame.pa_run).map_err(device)?,
-                self.card.fetch(&frame.pa_met).map_err(device)?,
-                p.heads.len(),
-            )),
-            _ => None,
+        // Each level's section at the read's end, as the host's state carries it: its carried sites
+        // still read and the sites admitted since (a section that closed rests), with its running
+        // frames, met dissipation and, under a news clock, its held current.
+        let sections = match &law.participation {
+            Some(p) => {
+                let sect = self.card.fetch(&frame.pa_sect).map_err(device)?;
+                let open = sect.iter().any(|&c| c > 0);
+                let fetch = |b: &CardBuffer<'_, i64>| if open { self.card.fetch(b) } else { Ok(Vec::new()) };
+                Some((
+                    sect,
+                    if open { self.card.fetch(&frame.pa_member).map_err(device)? } else { Vec::new() },
+                    fetch(&frame.pa_key).map_err(device)?,
+                    fetch(&frame.pa_value).map_err(device)?,
+                    fetch(&frame.pa_diss).map_err(device)?,
+                    fetch(&frame.pa_run).map_err(device)?,
+                    fetch(&frame.pa_met).map_err(device)?,
+                    if law.news.is_some() { self.card.fetch(&frame.pa_hold).map_err(device)? } else { Vec::new() },
+                    p.heads.len(),
+                    p.section,
+                ))
+            }
+            None => None,
         };
         let faces: Vec<Vec<Option<(u128, u128)>>> = targets
             .iter()
@@ -1418,24 +1460,39 @@ impl<'c> TowerCard<'c> {
                     }
                 }
                 state.previous = c[cells - 1];
-                // Participation's sites: released when the section closes, carried on from the
-                // opening's while it is open.
-                if law.participation.is_some() && (closes(carried[s]) || state.sites.len() != d.levels) {
-                    state.sites = vec![LevelSites::rest(d.modes); d.levels];
-                }
-                if let Some((keys, values, diss, run, met, heads)) = open_sections.as_ref().filter(|_| !closes(carried[s])) {
+                // Participation's sites at each level: released when its section closes, the
+                // opening's carried on with the sites admitted since while it is open; the held
+                // current carried under a news clock.
+                if let Some((sect, member, keys, values, diss, run, met, hold, heads, section)) = sections.as_ref() {
                     let (n, l_) = (d.modes, d.levels);
-                    for (l, sites) in state.sites.iter_mut().enumerate() {
-                        let phasor = |v: &[i64], at: usize| (v[2 * at], v[2 * at + 1]);
-                        sites.frame = (0..n).map(|k| phasor(run, (s * l_ + l) * n + k)).collect();
-                        sites.met = (0..n).map(|k| met[(s * l_ + l) * n + k]).collect();
-                        for t in 0..cells {
-                            let q = (s * cells + t) * l_ + l;
-                            sites.keys.push((0..n).map(|k| phasor(keys, q * n + k)).collect());
-                            sites.values.push((0..n).map(|k| phasor(values, q * n + k)).collect());
-                            sites.dissipation.push(diss[q * heads..(q + 1) * heads].to_vec());
-                        }
-                    }
+                    let phasor = |v: &[i64], at: usize| (v[2 * at], v[2 * at + 1]);
+                    let opened = std::mem::take(&mut state.sites);
+                    state.sites = (0..l_)
+                        .map(|l| {
+                            let (lead, members) = (sect[(s * l_ + l) * 2] as usize, sect[(s * l_ + l) * 2 + 1] as usize);
+                            let mut sites = LevelSites::rest(n);
+                            if !hold.is_empty() {
+                                sites.current = (0..n).map(|k| (hold[(s * l_ + l) * 2 * n + k], hold[(s * l_ + l) * 2 * n + n + k])).collect();
+                            }
+                            if lead + members == 0 {
+                                return sites;
+                            }
+                            if let Some(carried) = opened.get(l) {
+                                sites.keys.extend_from_slice(&carried.keys[..lead]);
+                                sites.values.extend_from_slice(&carried.values[..lead]);
+                                sites.dissipation.extend_from_slice(&carried.dissipation[..lead]);
+                            }
+                            sites.frame = (0..n).map(|k| phasor(run, (s * l_ + l) * n + k)).collect();
+                            sites.met = (0..n).map(|k| met[(s * l_ + l) * n + k]).collect();
+                            for &t in &member[(s * l_ + l) * section..(s * l_ + l) * section + members] {
+                                let q = (s * cells + t as usize) * l_ + l;
+                                sites.keys.push((0..n).map(|k| phasor(keys, q * n + k)).collect());
+                                sites.values.push((0..n).map(|k| phasor(values, q * n + k)).collect());
+                                sites.dissipation.push(diss[q * heads..(q + 1) * heads].to_vec());
+                            }
+                            sites
+                        })
+                        .collect();
                 }
                 if ranks > 0 {
                     state.ring = (0..ranks).map(|r| (ring_ends[(s * ranks + r) * 2], ring_ends[(s * ranks + r) * 2 + 1])).collect();
@@ -1458,7 +1515,6 @@ impl<'c> TowerCard<'c> {
         if keep {
             self.opened = Some(words);
             self.opened_current = true;
-            self.opened_open = carried.iter().any(|&n0| n0 > 0);
         } else {
             self.opened_current = false;
         }
@@ -1470,9 +1526,6 @@ impl<'c> TowerCard<'c> {
     /// `tower_moves`), from the opening read's temporaries.
     fn read_reverse(&mut self) -> Result<Vec<i128>> {
         let words = self.opened.filter(|_| self.opened_current).ok_or(TowerError::Refused("a card reverse reads the section's opening forward, its material still resident"))?;
-        if self.opened_open {
-            return Err(TowerError::Refused("a card reverse over a section carried open across calls is owed"));
-        }
         let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
         let shape = frame.shape;
         let fw = Self::frame_words(frame);
