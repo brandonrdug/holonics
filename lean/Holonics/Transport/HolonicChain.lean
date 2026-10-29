@@ -33,7 +33,11 @@ upstream block and a perspective reading only the downstream block,
 (`transfer_factors_through_the_neck`), so `rank (C X B) ≤ r` for **every** `s` off the poles
 (`transfer_rank_le_neck_rank`), feedback included. `r = 1` is the pinhole
 (`pinhole_transfer_rank_le_one`): plural inside each medium, a single channel at the interface's
-grain. [agent-inferred] The one-directional product form `C₂(sI−A₂₂)⁻¹U · V(sI−A₁₁)⁻¹B₁` needs
+grain. The bound needs neither the factorization nor an invertible `N₂₂`: by the nullity theorem
+(Gustafson 1984, Fiedler–Markham 1986; `nullity_cross_blocks`), complementary blocks of a matrix
+and of its inverse have equal nullity, so `rank X₂₁ = rank A₂₁` at every `s` off the joint poles
+(`resolvent_cross_rank`) and `rank (C X B) ≤ rank A₂₁` there (`transfer_rank_le_cross_rank`), an
+equality when the ports have full rank (`full_rank_ports_read_the_whole_neck`). [agent-inferred] The one-directional product form `C₂(sI−A₂₂)⁻¹U · V(sI−A₁₁)⁻¹B₁` needs
 `A₁₂ = 0`, which a port-Hamiltonian coupling never satisfies — the interconnection places `K` and
 `−Kᵀ` in the two off-diagonal blocks at once. The statement above is therefore the operative one
 and the product form is its special case; this correction is inferred from `portGenerator`'s own
@@ -201,6 +205,141 @@ theorem resolvent_cross_block {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) 
   ext i j
   simp [crossBlock, Matrix.one_apply_ne]
 
+/-! ### The nullity theorem: complementary blocks of a matrix and its inverse -/
+
+section Nullity
+
+variable {K : Type*} {r₁ r₂ c₁ c₂ : Type*} [Fintype r₁] [Fintype r₂] [Fintype c₁] [Fintype c₂]
+  [DecidableEq r₁] [DecidableEq r₂] [DecidableEq c₁] [DecidableEq c₂]
+
+/-- [proved-derived; formal-checked] A block of a product is the sum over the two halves of the
+shared index. -/
+theorem submatrix_mul_sum [CommRing K] {α β ρ γ ι₁ ι₂ : Type*} [Fintype ι₁] [Fintype ι₂]
+    (P : Matrix ρ (ι₁ ⊕ ι₂) K) (Q : Matrix (ι₁ ⊕ ι₂) γ K) (r : α → ρ) (c : β → γ) :
+    (P * Q).submatrix r c =
+      P.submatrix r Sum.inl * Q.submatrix Sum.inl c +
+        P.submatrix r Sum.inr * Q.submatrix Sum.inr c := by
+  ext i j
+  simp [Matrix.mul_apply, Fintype.sum_sum_type]
+
+/-- [proved-standard; formal-checked] **The nullity theorem, kernel form** (R. L. Gustafson,
+Linear Algebra Appl. 57 (1984), Theorem 1; M. Fiedler and T. L. Markham, Linear Algebra Appl. 74
+(1986)). For `N X = 1` and `X N = 1`, with `N`'s rows split `r₁ ⊕ r₂` and columns `c₁ ⊕ c₂`, the
+kernel of `N`'s block `(r₂, c₁)` and the kernel of `X`'s complementary block `(c₂, r₁)` are
+carried onto each other by the diagonal blocks: `v ↦ N₁₁ v` and `w ↦ X₁₁ w`. The two block rows
+`X₂₁ N₁₁ + X₂₂ N₂₁ = 0` and `X₁₁ N₁₁ + X₁₂ N₂₁ = 1`, with their mirrors in `N X = 1`, are the
+whole proof. -/
+noncomputable def crossKernelEquiv [CommRing K] (N : Matrix (r₁ ⊕ r₂) (c₁ ⊕ c₂) K)
+    (X : Matrix (c₁ ⊕ c₂) (r₁ ⊕ r₂) K) (hNX : N * X = 1) (hXN : X * N = 1) :
+    LinearMap.ker (N.submatrix Sum.inr Sum.inl).mulVecLin ≃ₗ[K]
+      LinearMap.ker (X.submatrix Sum.inr Sum.inl).mulVecLin := by
+  have bXN11 := congrArg
+    (fun M => M.submatrix (Sum.inl : c₁ → c₁ ⊕ c₂) (Sum.inl : c₁ → c₁ ⊕ c₂)) hXN
+  have bXN21 := congrArg
+    (fun M => M.submatrix (Sum.inr : c₂ → c₁ ⊕ c₂) (Sum.inl : c₁ → c₁ ⊕ c₂)) hXN
+  have bNX11 := congrArg
+    (fun M => M.submatrix (Sum.inl : r₁ → r₁ ⊕ r₂) (Sum.inl : r₁ → r₁ ⊕ r₂)) hNX
+  have bNX21 := congrArg
+    (fun M => M.submatrix (Sum.inr : r₂ → r₁ ⊕ r₂) (Sum.inl : r₁ → r₁ ⊕ r₂)) hNX
+  simp only [submatrix_mul_sum] at bXN11 bXN21 bNX11 bNX21
+  rw [Matrix.submatrix_one _ Sum.inl_injective] at bXN11 bNX11
+  have z₁ : (1 : Matrix (c₁ ⊕ c₂) (c₁ ⊕ c₂) K).submatrix Sum.inr Sum.inl = 0 := by
+    ext i j; simp
+  have z₂ : (1 : Matrix (r₁ ⊕ r₂) (r₁ ⊕ r₂) K).submatrix Sum.inr Sum.inl = 0 := by
+    ext i j; simp
+  rw [z₁] at bXN21
+  rw [z₂] at bNX21
+  exact
+  { toFun := fun v => ⟨N.submatrix Sum.inl Sum.inl *ᵥ v.1, by
+      have hv : N.submatrix Sum.inr Sum.inl *ᵥ v.1 = 0 := v.2
+      change X.submatrix Sum.inr Sum.inl *ᵥ (N.submatrix Sum.inl Sum.inl *ᵥ v.1) = 0
+      have := congrArg (fun M => M *ᵥ v.1) bXN21
+      simp only [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_zero, add_zero,
+        Matrix.zero_mulVec] at this
+      exact this⟩
+    invFun := fun w => ⟨X.submatrix Sum.inl Sum.inl *ᵥ w.1, by
+      have hw : X.submatrix Sum.inr Sum.inl *ᵥ w.1 = 0 := w.2
+      change N.submatrix Sum.inr Sum.inl *ᵥ (X.submatrix Sum.inl Sum.inl *ᵥ w.1) = 0
+      have := congrArg (fun M => M *ᵥ w.1) bNX21
+      simp only [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hw, Matrix.mulVec_zero, add_zero,
+        Matrix.zero_mulVec] at this
+      exact this⟩
+    map_add' := fun v w => Subtype.ext (Matrix.mulVec_add _ _ _)
+    map_smul' := fun a v => Subtype.ext (Matrix.mulVec_smul _ _ _)
+    left_inv := fun v => by
+      have hv : N.submatrix Sum.inr Sum.inl *ᵥ v.1 = 0 := v.2
+      apply Subtype.ext
+      change X.submatrix Sum.inl Sum.inl *ᵥ (N.submatrix Sum.inl Sum.inl *ᵥ v.1) = v.1
+      have := congrArg (fun M => M *ᵥ v.1) bXN11
+      simp only [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hv, Matrix.mulVec_zero, add_zero,
+        Matrix.one_mulVec] at this
+      exact this
+    right_inv := fun w => by
+      have hw : X.submatrix Sum.inr Sum.inl *ᵥ w.1 = 0 := w.2
+      apply Subtype.ext
+      change N.submatrix Sum.inl Sum.inl *ᵥ (X.submatrix Sum.inl Sum.inl *ᵥ w.1) = w.1
+      have := congrArg (fun M => M *ᵥ w.1) bNX11
+      simp only [Matrix.add_mulVec, ← Matrix.mulVec_mulVec, hw, Matrix.mulVec_zero, add_zero,
+        Matrix.one_mulVec] at this
+      exact this }
+
+/-- [proved-standard; formal-checked] **The nullity theorem**: complementary blocks of a matrix
+and of its inverse have equal nullity, `null N[r₂, c₁] = null X[c₂, r₁]`, over any field and for
+any split of the rows and columns. -/
+theorem nullity_cross_blocks [Field K] (N : Matrix (r₁ ⊕ r₂) (c₁ ⊕ c₂) K)
+    (X : Matrix (c₁ ⊕ c₂) (r₁ ⊕ r₂) K) (hNX : N * X = 1) (hXN : X * N = 1) :
+    Module.finrank K (LinearMap.ker (N.submatrix Sum.inr Sum.inl).mulVecLin) =
+      Module.finrank K (LinearMap.ker (X.submatrix Sum.inr Sum.inl).mulVecLin) :=
+  (crossKernelEquiv N X hNX hXN).finrank_eq
+
+/-- [proved-derived; formal-checked] Negation keeps the rank. -/
+theorem rank_neg [Field K] {m n : Type*} [Fintype m] [Fintype n] [DecidableEq n]
+    (M : Matrix m n K) : (-M).rank = M.rank := by
+  apply le_antisymm
+  · rw [show -M = M * (-1 : Matrix n n K) by simp]
+    exact Matrix.rank_mul_le_left _ _
+  · conv_lhs => rw [show M = -M * (-1 : Matrix n n K) by simp]
+    exact Matrix.rank_mul_le_left _ _
+
+/-- [proved-standard; formal-checked] **The cross blocks of a matrix and of its inverse have
+equal rank**: for a square split `m ⊕ n`, both `(n, m)` blocks have nullity read on `m`, so
+`rank X₂₁ = rank N₂₁`. -/
+theorem rank_cross_block_of_inverse [Field K] {m n : Type*} [Fintype m] [Fintype n]
+    [DecidableEq m] [DecidableEq n] {N X : Matrix (m ⊕ n) (m ⊕ n) K} (h : N * X = 1) :
+    (X.submatrix Sum.inr Sum.inl).rank = (N.submatrix Sum.inr Sum.inl).rank := by
+  have hk := nullity_cross_blocks N X h (mul_eq_one_comm.mp h)
+  have h₁ := LinearMap.finrank_range_add_finrank_ker (N.submatrix Sum.inr Sum.inl).mulVecLin
+  have h₂ := LinearMap.finrank_range_add_finrank_ker (X.submatrix Sum.inr Sum.inl).mulVecLin
+  simp only [Matrix.rank]
+  omega
+
+end Nullity
+
+/-- [proved-derived; formal-checked] **The resolvent's cross block has the coupling's rank** at
+every `s` off the joint poles: `rank X₂₁ = rank (−A₂₁) = rank A₂₁` by the nullity theorem, with no
+hypothesis on the downstream block `N₂₂`. -/
+theorem resolvent_cross_rank {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ} {s : ℚ}
+    (hX : (s • (1 : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ) - A) * X = 1) :
+    (X.submatrix Sum.inr Sum.inl).rank = (crossBlock A).rank := by
+  rw [rank_cross_block_of_inverse hX]
+  have hcross : (s • (1 : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ) - A).submatrix Sum.inr Sum.inl
+      = -crossBlock A := by
+    ext i j
+    simp [crossBlock, Matrix.one_apply_ne]
+  rw [hcross, rank_neg]
+
+/-- [proved-derived; formal-checked] **The unconditional neck rank bound.** Every transfer from a
+source on the upstream medium to a perspective on the downstream one has rank at most the
+coupling's rank, at every `s` off the joint poles: no factorization of `A₂₁` and no invertibility
+of `N₂₂` is assumed, because the nullity theorem reads `rank X₂₁` off `A₂₁` directly. -/
+theorem transfer_rank_le_cross_rank {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ} {s : ℚ}
+    {C : Matrix (Fin q) (Joint n₁ n₂) ℚ} {B : Matrix (Joint n₁ n₂) (Fin p) ℚ}
+    (hC : OnDownstream C) (hB : OnUpstream B)
+    (hX : (s • (1 : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ) - A) * X = 1) :
+    (C * X * B).rank ≤ (crossBlock A).rank := by
+  rw [port_transfer_is_the_cross_block hC hB, ← resolvent_cross_rank hX]
+  exact le_trans (Matrix.rank_mul_le_left _ _) (Matrix.rank_mul_le_right _ _)
+
 /-- [proved-derived; formal-checked] **The neck factorization.** With `A₂₁ = U V` of inner width
 `r`, everything the perspective reads of the source passes through `r` channels — in the feedback
 case as much as in the one-directional one, because the Schur complement never had to be formed.
@@ -267,22 +406,19 @@ the upstream one — which over a field is exactly full column rank for `C₂` a
 `B₁` — so the two ports neither lose nor add a channel and the transfer's rank is the rank of the
 resolvent's own cross block.
 
-The **nullity theorem** enters as the single named hypothesis `hnullity`, never as an axiom:
-complementary blocks of a nonsingular matrix and of its inverse have equal nullity, so
-`rank X_↗ = rank N_↗ = rank A_↗` at every probe off the joint poles with **no hypothesis on
-`N₂₂`**. Its own lift is owed and is issue #34 — `[proved-standard]` (R. L. Gustafson, *A note on
-matrix inversion*, Linear Algebra Appl. 57 (1984), Theorem 1; M. Fiedler and T. L. Markham,
-Linear Algebra Appl. 74 (1986)). Composing the two gives `rank H(s) = rank A_↗ = r` exactly, with
-no resolvent inverse taken — which is what `holonic_chain.rs::RankLicence::Determined` returns. -/
+The **nullity theorem** (`resolvent_cross_rank`) gives `rank X_↗ = rank N_↗ = rank A_↗` at
+every probe off the joint poles with **no hypothesis on `N₂₂`**. Composing the two gives
+`rank H(s) = rank A_↗ = r` exactly, with no resolvent inverse taken: what the retired
+`holonic_chain.rs::RankLicence::Determined` returned. -/
 theorem full_rank_ports_read_the_whole_neck
-    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ}
+    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ} {s : ℚ}
     {C : Matrix (Fin q) (Joint n₁ n₂) ℚ} {B : Matrix (Joint n₁ n₂) (Fin p) ℚ}
     {Cl : Matrix (Fin n₂) (Fin q) ℚ} {Br : Matrix (Fin p) (Fin n₁) ℚ}
     (hC : OnDownstream C) (hB : OnUpstream B)
     (hCl : Cl * downstreamPort C = 1) (hBr : upstreamPort B * Br = 1)
-    (hnullity : (X.submatrix Sum.inr Sum.inl).rank = (crossBlock A).rank) :
+    (hX : (s • (1 : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ) - A) * X = 1) :
     (C * X * B).rank = (crossBlock A).rank := by
-  rw [port_transfer_is_the_cross_block hC hB, ← hnullity]
+  rw [port_transfer_is_the_cross_block hC hB, ← resolvent_cross_rank hX]
   set Y := X.submatrix Sum.inr Sum.inl with hY
   have upper : (downstreamPort C * Y * upstreamPort B).rank ≤ Y.rank :=
     le_trans (Matrix.rank_mul_le_left _ _) (Matrix.rank_mul_le_right _ _)
@@ -300,15 +436,15 @@ theorem full_rank_ports_read_the_whole_neck
 coupling makes the transfer rank exactly one, not at most one: the single channel is carried, not
 merely bounded. -/
 theorem full_rank_ports_read_a_pinhole_as_one
-    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ}
+    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ} {s : ℚ}
     {C : Matrix (Fin q) (Joint n₁ n₂) ℚ} {B : Matrix (Joint n₁ n₂) (Fin p) ℚ}
     {Cl : Matrix (Fin n₂) (Fin q) ℚ} {Br : Matrix (Fin p) (Fin n₁) ℚ}
     (hC : OnDownstream C) (hB : OnUpstream B)
     (hCl : Cl * downstreamPort C = 1) (hBr : upstreamPort B * Br = 1)
-    (hnullity : (X.submatrix Sum.inr Sum.inl).rank = (crossBlock A).rank)
+    (hX : (s • (1 : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ) - A) * X = 1)
     (hpinhole : (crossBlock A).rank = 1) :
     (C * X * B).rank = 1 := by
-  rw [full_rank_ports_read_the_whole_neck hC hB hCl hBr hnullity, hpinhole]
+  rw [full_rank_ports_read_the_whole_neck hC hB hCl hBr hX, hpinhole]
 
 /-! ## 3. A closed neck transmits nothing -/
 
@@ -635,6 +771,11 @@ namespace Audit
 #print axioms port_transfer_is_the_cross_block
 #print axioms cross_block_of_inverse
 #print axioms resolvent_cross_block
+#print axioms crossKernelEquiv
+#print axioms nullity_cross_blocks
+#print axioms rank_cross_block_of_inverse
+#print axioms resolvent_cross_rank
+#print axioms transfer_rank_le_cross_rank
 #print axioms transfer_factors_through_the_neck
 #print axioms transfer_rank_le_neck_rank
 #print axioms pinhole_transfer_rank_le_one

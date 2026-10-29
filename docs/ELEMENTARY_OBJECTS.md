@@ -730,7 +730,10 @@ carries a faster density, and a point focus keeps its angular spread while its w
 of positive phase area keeps that area through any unimodular station (`Transport/Neck`).
 In a chain the neck is `rank A_↗`, the rank of the cross block between consecutive media: every
 upstream-to-downstream transfer `C(sI−A)⁻¹B`, at each `s` off the joint poles, has at most that rank, rank one is the pinhole, and a
-closed neck zeroes every Markov parameter (`Transport/HolonicChain`). The conservative coupling
+closed neck zeroes every Markov parameter (`Transport/HolonicChain`). The bound needs no hypothesis
+on the downstream block: complementary blocks of a matrix and of its inverse have equal nullity
+(the Gustafson–Fiedler–Markham nullity theorem, `nullity_cross_blocks`), so the resolvent's cross
+block has rank `rank A_↗` (`transfer_rank_le_cross_rank`), and full-rank ports read it exactly. The conservative coupling
 returns with a half-turn, `Ω_↘ = e^{iπ}Ω_↗ᵀ`, the dissipative one with none, `M_↘ = M_↗ᵀ`.
 
 [project-postulate] **Folds and junctions.** Brandon: a joint is equivalently a fold, and a split
