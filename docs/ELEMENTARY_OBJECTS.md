@@ -337,7 +337,9 @@ a chart choice; the exchange itself is chart-free (`Objects/Parametron.modeEnerg
 
 A Holon's motion decomposes into exact (potential-driven) ⊕ coexact (induced; Faraday emf is not an
 exact drop, `HolonicDiscreteInduction.emf_ne_exactDrop_of_fluxDifference_ne_zero`) ⊕ harmonic
-(dormant, silent at node/cell receivers, `CellHolonomy.dormant_mode_is_locally_silent`). Owners:
+(dormant, silent at node/cell receivers, `CellHolonomy.dormant_mode_is_locally_silent`; against
+them the retention releases exactly the harmonic modes, and a cycle receiver admitted later reads
+them, `Foundation/ChangingReceiverRetention.ker_faceMap_nodeCell`). Owners:
 `HodgeReceiver`, `PositiveCellHodge`, `Physics/CoupledIncidence`, the normal law `W H=B`.
 
 <a id="3-navigator"></a>
@@ -847,9 +849,18 @@ separating remainder is what a founding step keeps. With one context this is `ke
 itself, but always continues into the minimal chart. Predictive-state representations (Littman,
 Sutton and Singh, 2001) are the established construction. Lean: `Foundation/ActionDescent`
 (`futures_factor_iff`, `nonempty_descent_iff`, `descent_or_separator`, `linear_descent_iff`,
-`ker_le_ker_faceMap_iff`, `Control.sufficient_not_self_continuing`). Receivers and actions that
-themselves change between contexts are owed in #410 (retention and release through changing
-receivers).
+`ker_le_ker_faceMap_iff`, `Control.sufficient_not_self_continuing`). When the receivers and
+actions themselves change with a clocked phase, the phase and the present are one medium, and its
+minimal standing is the retention at each phase: two presents every present receiver reads alike
+are released together only when no later receiver of the admitted family reads them apart;
+otherwise a word to a later phase separates them. The changing-receiver defect
+`E_(next c a) T_(c,a) − U_(c,a) E_c` composes exactly through the moves along a word, and vanishing
+at every step it makes the encoding a descent of that medium. Lean:
+`Foundation/ChangingReceiverRetention` (`present_or_later_separator`, `wordDefect_cons`,
+`phaseAgreement_of_encode_eq`, and the dormant loop of the hollow triangle, released by the node
+receivers and kept for the harmonic clock admitted at phase 1,
+`Triangle.loop_later_phase_separator`). A receiver admitted by an action rather than by the clock
+is owed in #410.
 
 <a id="the-retention-contract"></a>
 <a id="collapse-relative-to-the-admitted-future"></a>
