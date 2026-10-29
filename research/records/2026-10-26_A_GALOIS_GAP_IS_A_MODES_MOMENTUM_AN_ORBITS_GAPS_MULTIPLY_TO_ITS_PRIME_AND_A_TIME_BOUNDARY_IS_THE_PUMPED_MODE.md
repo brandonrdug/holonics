@@ -443,7 +443,10 @@ To #410:
   (`hidden_shrinks`, `hidden_tendsto_zero`), and the inflation `a ↦ ab`, `b ↦ a` multiplying the
   chain by its root with `F_(n+1)` long and `F_n` short tiles (`gaps_inflate`, `count_iterate`,
   `tile_count`), so one word measures `τⁿ⁺¹` seen and `τ′ⁿ⁺¹ → 0` hidden
-  (`hidden_length_tendsto_zero`). The window statement itself stays owed.
+  (`hidden_length_tendsto_zero`). The window statement itself is since discharged in #410 in the
+  same file: the vertices of the chain are exactly the points `m + nτ ≥ 0` of `ℤ[τ]` with
+  `m + nτ′ ∈ [−1, τ − 1)` (`vertices_eq_model_set`), the chain read in the hidden colour as a walk
+  that inflation multiplies by `τ′` (`legal_inflate`).
 
 Atlas rows:
 - `colour.orbit-energy`;
