@@ -302,6 +302,9 @@ struct FrameWords {
     pa_gw: u64,
     pa_gchart: u64,
     pa_gfric: u64,
+    pa_gmet: u64,
+    pa_tturn: u64,
+    pa_tlog: u64,
     r_pa_read: u64,
     r_pa_yre: u64,
     r_pa_yim: u64,
@@ -510,6 +513,12 @@ struct Frame<'c> {
     pa_gw: CardBuffer<'c, i128>,
     pa_gchart: CardBuffer<'c, i64>,
     pa_gfric: CardBuffer<'c, i128>,
+    /// The transport: each cell's covector of its heads' mean met dissipation (`[S][T][H]`), and
+    /// each cell's later sums, the covectors of its unit move's turn and of its `log₂ ρ`
+    /// (`[S][T][N]` each, on `2^(−48)`), which the modes' scan reads.
+    pa_gmet: CardBuffer<'c, i128>,
+    pa_tturn: CardBuffer<'c, i128>,
+    pa_tlog: CardBuffer<'c, i128>,
     /// The sites each stream carries open into the call, at their places in the section.
     pa_open: CardBuffer<'c, u32>,
     pa_open_key: CardBuffer<'c, i64>,
@@ -920,6 +929,9 @@ impl<'c> TowerCard<'c> {
             pa_gw: card.alloc(q * n * 2 * pa)?,
             pa_gchart: card.alloc(ql * 6 * n * pa)?,
             pa_gfric: card.alloc(s * l * heads)?,
+            pa_gmet: card.alloc(q * heads)?,
+            pa_tturn: card.alloc(q * n * pa)?,
+            pa_tlog: card.alloc(q * n * pa)?,
             pa_open: card.alloc(s * pa)?,
             pa_open_key: card.alloc(s * sec * l * n * 2 * carried)?,
             pa_open_value: card.alloc(s * sec * l * n * 2 * carried)?,
@@ -1049,6 +1061,9 @@ impl<'c> TowerCard<'c> {
             pa_gw: frame.pa_gw.device_ptr(),
             pa_gchart: frame.pa_gchart.device_ptr(),
             pa_gfric: frame.pa_gfric.device_ptr(),
+            pa_gmet: frame.pa_gmet.device_ptr(),
+            pa_tturn: frame.pa_tturn.device_ptr(),
+            pa_tlog: frame.pa_tlog.device_ptr(),
             r_pa_read: r(21),
             r_pa_yre: r(22),
             r_pa_yim: r(23),
@@ -1451,7 +1466,8 @@ impl<'c> TowerCard<'c> {
         for level in (0..l).rev() {
             self.law_launch("tower_reverse_contacts", Dim3::x(q), THREADS, Self::contacts_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
             // Participation's return reads the current's covector the contacts wrote and writes the
-            // chart covectors the level's `tower_reverse_dx` returns to the input.
+            // chart covectors the level's `tower_reverse_dx` returns to the input, and the transport's
+            // sums the modes' scan adds to each cell's turn and gate.
             if shape.heads > 0 {
                 self.law_launch("tower_reverse_participation", Dim3::x(s as u32), THREADS, Self::participation_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
             }
