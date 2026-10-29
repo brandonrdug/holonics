@@ -14,6 +14,9 @@ import Mathlib.LinearAlgebra.CrossProduct
 import Mathlib.LinearAlgebra.Matrix.DotProduct
 import Mathlib.LinearAlgebra.Matrix.ToLinearEquiv
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
+import Mathlib.Analysis.Calculus.Deriv.MeanValue
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Exponential
 
 /-!
 # Motion: a move about its pivot, the turn and the boost, free fall, and the path jets
@@ -146,6 +149,16 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
    the tangent keeps the reading `T·a = c` against it, `a·a = c² + 1`, and the curve rises along
    it as `γ(s)·a = γ(s₀)·a + c(s − s₀)` (`lancret`): a curve of constant `τ/κ` is a general helix,
    a turn about an axis with free fall along it.
+17. **The numerical abscissa: the boost bounds the response.** Along `ẋ = A x` the energy
+   changes at `⟨x, (GA + AᵀG) x⟩` (`hasDerivAt_energy`). If every such reading is at most `2λ`
+   times the energy, `e^(−2λt)⟨x, G x⟩` falls (`energy_le_exp_abscissa`, the logarithmic norm of
+   Dahlquist and Lozinskii), and a motion that keeps the bound for small `t > 0` has its initial
+   reading within it (`abscissa_of_energy_le`). Through Mathlib's matrix exponential
+   (`hasDerivAt_exp_mulVec`) the two directions meet: against an invertible metric, the energy of
+   every motion `e^(tA) y` stays below `e^(2λt)` times its start exactly when every `G`-reading of
+   the boost is at most `λ` (`abscissa_iff`, `numerical_abscissa`), so
+   `‖e^(tA)‖_G ≤ e^(t·λ_max(B))` and no smaller exponent holds. The eigenvalues do not enter; the
+   Navier–Stokes consumer is `Physics/Fluid/LiftUp`, whose modes all decay while its energy grows.
 
 [interpretation] The words grip, push, free fall and sling are the record's readings of these
 identities; the split's dependence on the receiver (a different metric for the same motion moves
@@ -1302,6 +1315,163 @@ theorem lancret {γ T N B : ℝ → Fin 3 → ℝ} {κ τ : ℝ → ℝ} {c : �
 
 end Lancret
 
+/-! ## 17. The numerical abscissa: the boost bounds the response -/
+
+section Abscissa
+
+open Filter Topology
+
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] The product rule for the dot product of two moving
+vectors. -/
+theorem hasDerivAt_dotProduct {u v : ℝ → n → ℝ} {u' v' : n → ℝ} {t : ℝ}
+    (hu : HasDerivAt u u' t) (hv : HasDerivAt v v' t) :
+    HasDerivAt (fun s => u s ⬝ᵥ v s) (u' ⬝ᵥ v t + u t ⬝ᵥ v') t := by
+  have hcomp : ∀ i ∈ (Finset.univ : Finset n),
+      HasDerivAt (fun s => u s i * v s i) (u' i * v t i + u t i * v' i) t := fun i _ =>
+    (hasDerivAt_pi.1 hu i).mul (hasDerivAt_pi.1 hv i)
+  have h := HasDerivAt.fun_sum hcomp
+  rw [Finset.sum_add_distrib] at h
+  exact h
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] A fixed matrix carries the derivative of a moving vector. -/
+theorem hasDerivAt_mulVec (M : Matrix n n ℝ) {u : ℝ → n → ℝ} {u' : n → ℝ} {t : ℝ}
+    (hu : HasDerivAt u u' t) : HasDerivAt (fun s => M *ᵥ u s) (M *ᵥ u') t :=
+  hasDerivAt_pi.2 fun i => by
+    have hcomp : ∀ j ∈ (Finset.univ : Finset n),
+        HasDerivAt (fun s => M i j * u s j) (M i j * u' j) t := fun j _ =>
+      (hasDerivAt_pi.1 hu j).const_mul (M i j)
+    exact HasDerivAt.fun_sum hcomp
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **The receiver's energy along `ẋ = A x`** changes at
+`⟨x, (GA + AᵀG) x⟩` (`rate_quadratic`), for any metric `G`. -/
+theorem hasDerivAt_energy (G A : Matrix n n ℝ) {x : ℝ → n → ℝ} {t : ℝ}
+    (hx : HasDerivAt x (A *ᵥ x t) t) :
+    HasDerivAt (fun s => x s ⬝ᵥ (G *ᵥ x s)) (x t ⬝ᵥ ((G * A + Aᵀ * G) *ᵥ x t)) t := by
+  have h := hasDerivAt_dotProduct hx (hasDerivAt_mulVec G hx)
+  rw [add_comm, rate_quadratic] at h
+  exact h
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **The energy bound of the numerical abscissa** (the
+logarithmic norm; Dahlquist 1958, Lozinskii 1958). If every reading of the energy rate is at most
+`2λ` times the energy, `⟨y, (GA + AᵀG) y⟩ ≤ 2λ⟨y, G y⟩`, then along every motion `ẋ = A x` the
+energy grows at most as `e^(2λt)`: `e^(−2λt)⟨x, G x⟩` falls. -/
+theorem energy_le_exp_abscissa {G A : Matrix n n ℝ} {lam : ℝ} {x : ℝ → n → ℝ}
+    (hx : ∀ t, HasDerivAt x (A *ᵥ x t) t)
+    (hB : ∀ y, y ⬝ᵥ ((G * A + Aᵀ * G) *ᵥ y) ≤ 2 * lam * (y ⬝ᵥ (G *ᵥ y)))
+    {t : ℝ} (ht : 0 ≤ t) :
+    x t ⬝ᵥ (G *ᵥ x t) ≤ Real.exp (2 * lam * t) * (x 0 ⬝ᵥ (G *ᵥ x 0)) := by
+  have hg : ∀ s, HasDerivAt (fun s => Real.exp (-(2 * lam) * s) * (x s ⬝ᵥ (G *ᵥ x s)))
+      (Real.exp (-(2 * lam) * s) * (-(2 * lam)) * (x s ⬝ᵥ (G *ᵥ x s)) +
+        Real.exp (-(2 * lam) * s) * (x s ⬝ᵥ ((G * A + Aᵀ * G) *ᵥ x s))) s := fun s => by
+    have h1 : HasDerivAt (fun s => Real.exp (-(2 * lam) * s))
+        (Real.exp (-(2 * lam) * s) * (-(2 * lam))) s := by
+      simpa using ((hasDerivAt_id s).const_mul (-(2 * lam))).exp
+    exact h1.mul (hasDerivAt_energy G A (hx s))
+  have hanti : Antitone (fun s => Real.exp (-(2 * lam) * s) * (x s ⬝ᵥ (G *ᵥ x s))) := by
+    refine antitone_of_deriv_nonpos (fun s => (hg s).differentiableAt) fun s => ?_
+    rw [(hg s).deriv]
+    have := mul_le_mul_of_nonneg_left (hB (x s)) (Real.exp_pos (-(2 * lam) * s)).le
+    linarith
+  have h := hanti ht
+  simp only [mul_zero, Real.exp_zero, one_mul] at h
+  have h2 := mul_le_mul_of_nonneg_left h (Real.exp_pos (2 * lam * t)).le
+  rwa [← mul_assoc, ← Real.exp_add, show 2 * lam * t + -(2 * lam) * t = 0 by ring,
+    Real.exp_zero, one_mul] at h2
+
+omit [DecidableEq n] in
+/-- [proved-standard; formal-checked] **The bound is sharp at the start.** If one motion keeps
+`⟨x, G x⟩ ≤ e^(2λt)⟨x₀, G x₀⟩` for small `t > 0`, its initial reading of the energy rate is at
+most `2λ` times its initial energy. -/
+theorem abscissa_of_energy_le {G A : Matrix n n ℝ} {lam : ℝ} {x : ℝ → n → ℝ}
+    (hx : HasDerivAt x (A *ᵥ x 0) 0)
+    (hle : ∀ᶠ t in 𝓝[>] (0 : ℝ),
+      x t ⬝ᵥ (G *ᵥ x t) ≤ Real.exp (2 * lam * t) * (x 0 ⬝ᵥ (G *ᵥ x 0))) :
+    x 0 ⬝ᵥ ((G * A + Aᵀ * G) *ᵥ x 0) ≤ 2 * lam * (x 0 ⬝ᵥ (G *ᵥ x 0)) := by
+  have h1 : HasDerivAt (fun t => Real.exp (2 * lam * t))
+      (Real.exp (2 * lam * 0) * (2 * lam)) 0 := by
+    simpa using ((hasDerivAt_id (0 : ℝ)).const_mul (2 * lam)).exp
+  have hf := (h1.mul_const (x 0 ⬝ᵥ (G *ᵥ x 0))).sub (hasDerivAt_energy G A hx)
+  have hev : ∀ᶠ t in 𝓝[>] (0 : ℝ), 0 ≤ t⁻¹ •
+      ((fun t => Real.exp (2 * lam * t) * (x 0 ⬝ᵥ (G *ᵥ x 0)) - x t ⬝ᵥ (G *ᵥ x t)) (0 + t) -
+        (fun t => Real.exp (2 * lam * t) * (x 0 ⬝ᵥ (G *ᵥ x 0)) - x t ⬝ᵥ (G *ᵥ x t)) 0) := by
+    filter_upwards [hle, self_mem_nhdsWithin] with t ht htpos
+    simp only [zero_add, mul_zero, Real.exp_zero, one_mul, sub_self, smul_eq_mul, sub_zero]
+    exact mul_nonneg (inv_nonneg.2 (le_of_lt htpos)) (sub_nonneg.2 ht)
+  have := ge_of_tendsto hf.tendsto_slope_zero_right hev
+  simp only [mul_zero, Real.exp_zero, one_mul] at this
+  linarith
+
+/-- [proved-standard; formal-checked] `t ↦ e^(tA) y` is the motion of `ẋ = A x` through `y`. The
+matrix exponential is Mathlib's, read through the operator norm only inside the proof. -/
+theorem hasDerivAt_exp_mulVec (A : Matrix n n ℝ) (y : n → ℝ) (t : ℝ) :
+    HasDerivAt (fun s : ℝ => NormedSpace.exp (s • A) *ᵥ y)
+      (A *ᵥ (NormedSpace.exp (t • A) *ᵥ y)) t := by
+  let : NormedRing (Matrix n n ℝ) := Matrix.linftyOpNormedRing
+  let : NormedAlgebra ℝ (Matrix n n ℝ) := Matrix.linftyOpNormedAlgebra
+  let L : Matrix n n ℝ →ₗ[ℝ] n → ℝ :=
+    { toFun := fun M => M *ᵥ y
+      map_add' := fun M N => Matrix.add_mulVec M N y
+      map_smul' := fun c M => Matrix.smul_mulVec c M y }
+  have h := (LinearMap.toContinuousLinearMap L).hasFDerivAt.comp_hasDerivAt t
+    (hasDerivAt_exp_smul_const' (𝕂 := ℝ) A t)
+  have h2 : HasDerivAt (fun s : ℝ => NormedSpace.exp (s • A) *ᵥ y)
+      ((A * NormedSpace.exp (t • A)) *ᵥ y) t := h
+  rwa [← Matrix.mulVec_mulVec] at h2
+
+theorem exp_zero_mulVec (A : Matrix n n ℝ) (y : n → ℝ) :
+    NormedSpace.exp ((0 : ℝ) • A) *ᵥ y = y := by
+  rw [zero_smul, NormedSpace.exp_zero, Matrix.one_mulVec]
+
+/-- [proved-standard; formal-checked] **The numerical abscissa is the least exponent of the
+energy.** For any metric `G`, the energy of every motion `e^(tA) y` stays below `e^(2λt)` times
+its start for all `t ≥ 0` exactly when every reading `⟨y, (GA + AᵀG) y⟩` is at most `2λ⟨y, G y⟩`. -/
+theorem abscissa_iff (G A : Matrix n n ℝ) (lam : ℝ) :
+    (∀ y, y ⬝ᵥ ((G * A + Aᵀ * G) *ᵥ y) ≤ 2 * lam * (y ⬝ᵥ (G *ᵥ y))) ↔
+      ∀ y, ∀ t, 0 ≤ t →
+        (NormedSpace.exp (t • A) *ᵥ y) ⬝ᵥ (G *ᵥ (NormedSpace.exp (t • A) *ᵥ y)) ≤
+          Real.exp (2 * lam * t) * (y ⬝ᵥ (G *ᵥ y)) := by
+  constructor
+  · intro hB y t ht
+    have h := energy_le_exp_abscissa (x := fun s => NormedSpace.exp (s • A) *ᵥ y)
+      (fun s => hasDerivAt_exp_mulVec A y s) hB ht
+    simpa only [exp_zero_mulVec] using h
+  · intro h y
+    let x : ℝ → n → ℝ := fun s => NormedSpace.exp (s • A) *ᵥ y
+    have hx0 : x 0 = y := exp_zero_mulVec A y
+    have hle : ∀ᶠ t in 𝓝[>] (0 : ℝ),
+        x t ⬝ᵥ (G *ᵥ x t) ≤ Real.exp (2 * lam * t) * (x 0 ⬝ᵥ (G *ᵥ x 0)) := by
+      filter_upwards [self_mem_nhdsWithin] with t ht
+      rw [hx0]
+      exact h y t (le_of_lt ht)
+    have := abscissa_of_energy_le (hasDerivAt_exp_mulVec A y 0) hle
+    rwa [exp_zero_mulVec] at this
+
+/-- [proved-standard; formal-checked] **The boost bounds the response:**
+`‖e^(tA)‖_G ≤ e^(t·λ_max(B))`. Against an invertible metric `G`, the turn does no work
+(`energy_rate_is_boost`), so the energy of every motion `e^(tA) y` stays below `e^(2λt)` times its
+start exactly when every `G`-reading of the boost is at most `λ`, `⟨y, G B y⟩ ≤ λ⟨y, G y⟩`. With
+`G ≻ 0` the energy is the squared `G`-norm, so the least such `λ`, the boost's largest
+`G`-reading, is the least exponent of `‖e^(tA)‖_G`. The eigenvalues of `A` do not enter: when the
+turn and the boost do not commute (`HolonicsResearch/Geometry/TurnBoostNormality`), every mode can
+decay while the boost grows the energy (`Physics/Fluid/LiftUp`). -/
+theorem numerical_abscissa {G A : Matrix n n ℝ} (hG : IsUnit G.det) (lam : ℝ) :
+    (∀ y, y ⬝ᵥ (G *ᵥ (boost G A *ᵥ y)) ≤ lam * (y ⬝ᵥ (G *ᵥ y))) ↔
+      ∀ y, ∀ t, 0 ≤ t →
+        (NormedSpace.exp (t • A) *ᵥ y) ⬝ᵥ (G *ᵥ (NormedSpace.exp (t • A) *ᵥ y)) ≤
+          Real.exp (2 * lam * t) * (y ⬝ᵥ (G *ᵥ y)) := by
+  rw [← abscissa_iff]
+  refine forall_congr' fun y => ?_
+  rw [← rate_quadratic, energy_rate_is_boost hG]
+  constructor <;> intro h <;> linarith
+
+end Abscissa
+
 end Holonics.Geometry.Motion
 
 section Audit
@@ -1378,4 +1548,13 @@ open Holonics.Geometry.Motion
 #print axioms quarter_turn_screw
 #print axioms lancret_axis_const
 #print axioms lancret
+#print axioms hasDerivAt_dotProduct
+#print axioms hasDerivAt_mulVec
+#print axioms hasDerivAt_energy
+#print axioms energy_le_exp_abscissa
+#print axioms abscissa_of_energy_le
+#print axioms hasDerivAt_exp_mulVec
+#print axioms exp_zero_mulVec
+#print axioms abscissa_iff
+#print axioms numerical_abscissa
 end Audit

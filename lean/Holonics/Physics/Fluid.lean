@@ -3,6 +3,7 @@ import Holonics.Physics.Fluid.ControlVolume
 import Holonics.Physics.Fluid.ComplexFluid
 import Holonics.Physics.Fluid.Singularity
 import Holonics.Physics.Fluid.Body
+import Holonics.Physics.Fluid.LiftUp
 
 /-!
 # Physics.Fluid: the fluid instance of the Holon law
@@ -27,7 +28,11 @@ participating receiver. Its modules:
 * `Fluid/Body` — a closed dividing streamline, a loop whose lifts are continued by path lifting,
   balances its windings and, winding once around every site, forces zero net strength
   (Gauss/Rankine necessity); the half-body counterexample; and the block-membrane form joined to
-  relative completeness.
+  relative completeness;
+* `Fluid/LiftUp` — the lift-up of a streamwise-constant mode of uniform shear: every mode decays
+  at `ν k²`, while the boost's largest reading `|S|/2 − ν k²` bounds the response and no smaller
+  exponent does (`Geometry/Motion.numerical_abscissa`); the exact response is a free-fall shear
+  riding a uniform decay, with a witness of transient amplification.
 
 The Rust instance is `holonics::physics::fluid`.
 -/
