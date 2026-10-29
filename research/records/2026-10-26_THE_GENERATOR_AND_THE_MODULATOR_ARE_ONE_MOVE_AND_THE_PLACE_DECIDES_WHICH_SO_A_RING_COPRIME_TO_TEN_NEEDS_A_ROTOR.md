@@ -679,6 +679,31 @@ base on a prime ring `ℤ/q`:
   every mode from `k` on (`chain_modes`), and mode `0` of two words agrees exactly when their
   numbers agree modulo `bᵏ` (`chain_reads_last_digits`).
 
+(b) was formal-checked on October 29 in
+[`Mathematics/UncoupledBank`](../../lean/HolonicsResearch/Mathematics/UncoupledBank.lean), for any
+unit base on a prime ring `ℤ/q`:
+- planes `ℂ^ι` carrying the residues as distinct points, with the digits `0` and `1` acting on each
+  plane by a real-affine map of that plane alone, force `b ≡ ±1 (mod q)` (`uncoupled_bank`). The
+  colours of (a) work plane by plane (`OnePlaneRing.plane_modes`, which needs no distinct points): a
+  colour `k ≠ 0` present in one plane is carried by `b⁻¹` to `±k`, so when `b ≢ ±1` every plane is
+  constant and the points coincide. In base ten no bank holds a prime ring with `10 ≢ ±1`
+  (`no_uncoupled_bank_ten`), among them 7, 13, 37, 41 and 101 (`ten_turns_too_far`);
+- the digit group `ℤ/q ⋊ ⟨b⟩` has the translations as its only nontrivial abelian normal subgroup
+  (`abelian_normal_eq_translations`), and the quotient by them is `⟨b⟩`, of index `ord_q(b)`
+  (`quotient_translations`, `index_translations`);
+- the dihedral bound is stated through a turn core, an abelian normal subgroup holding every
+  square, which is the record's abelian normal subgroup with elementary abelian 2-quotient. It
+  passes to subgroups, quotients and products (`HasTurnCore.of_injective`, `.of_surjective`,
+  `.pi`), and `O(2)` has one, the turns, because two reflections compose to a turn
+  (`isometry_turnCore`, through `Geometry/ScrewTorsion.plane_reflections_compose`). The digit group
+  with `b² ≠ 1`, that is `ord_q(b) ≥ 3` (`three_le_orderOf_iff`), has none (`affine_not_turnCore`),
+  so it is no section of `∏ O(2)` (`not_section_of_planes`).
+
+Not formal: the step from a bank whose digits only permute each plane's reachable states to a
+section of a product of finite subgroups of `O(2)`, which §7(b) takes through an averaged inner
+product per plane. The colour route replaces that step for real-affine digits, and the turn-core
+bound is the group statement it feeds.
+
 Atlas rows:
 - `radix.digit-move-place-kind`;
 - `radix.long-division-strokes`;

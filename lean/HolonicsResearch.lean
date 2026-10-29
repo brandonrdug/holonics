@@ -1251,3 +1251,4 @@ import HolonicsResearch.HNN.RingHarmonics
 import HolonicsResearch.HNN.CertifiedSection
 import HolonicsResearch.Mathematics.OnePlaneRing
 import HolonicsResearch.Mathematics.RotorPlanes
+import HolonicsResearch.Mathematics.UncoupledBank

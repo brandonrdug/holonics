@@ -18,13 +18,14 @@ base. This file proves it.
    `card_affineGroup`). For a unit base `b`, the digit moves (any digit set containing `0` and `1`)
    generate exactly the moves `x ↦ bⁿ x + t`, every translation included, and there are
    `m · ord_m(b)` of them.
-2. **The one-plane theorem** (`one_plane_modes`, `one_plane`). Let `m ≥ 3` distinct points of one
-   real plane (the plane is `ℂ`; `affine_form` shows every real-affine map of it is
-   `z ↦ α z + β z̄ + γ`) carry the residues, and let the digits `0` and `1` act by real-affine maps.
-   Then `b ≡ ±1 (mod m)`. The proof reads the points through their colours `𝓕p(k)`: a digit acts
-   on the pair `(𝓕p(k), conj 𝓕p(−k))` by one complex `2 × 2` matrix (`lin_pair`), the digits
-   compose into a map with the pairs as eigenvectors of eigenvalue `ψ(k)`, so at most two colours
-   `±k` are present, and the digit `0` carries colour `k` to `b⁻¹ k`, which must be `±k`.
+2. **The one-plane theorem** (`plane_modes`, `one_plane_modes`, `one_plane`). Let `m ≥ 3`
+   distinct points of one real plane (the plane is `ℂ`; `affine_form` shows every real-affine map
+   of it is `z ↦ α z + β z̄ + γ`) carry the residues, and let the digits `0` and `1` act by
+   real-affine maps. Then `b ≡ ±1 (mod m)`. The proof reads the points through their colours
+   `𝓕p(k)`: a digit acts on the pair `(𝓕p(k), conj 𝓕p(−k))` by one complex `2 × 2` matrix
+   (`lin_pair`), the digits compose into a map with the pairs as eigenvectors of eigenvalue `ψ(k)`,
+   so at most two colours `±k` are present, and the digit `0` carries colour `k` to `b⁻¹ k`, which
+   must be `±k`. Up to that point (`plane_modes`) the points need not be distinct.
 3. **The points are a turned polygon** (`turned_polygon`). They are the image of the regular
    `m`-gon under an invertible real-affine map, centred on their barycentre, and the translation by
    `1` is a turn of order `m` about it. In particular they are never collinear.
@@ -37,11 +38,12 @@ base. This file proves it.
 
 Not proved here: the record's routes through the barycentre's finite group of turns and through
 eigenvalues of a real turn are replaced by the colours above; the bank of uncoupled planes (§7(b))
-is a separate #410 box, and the rotor's plane count (§7(c)) is `Mathematics/RotorPlanes`.
+is `Mathematics/UncoupledBank`, and the rotor's plane count (§7(c)) is `Mathematics/RotorPlanes`.
 
-Consumers: the atlas row `radix.one-plane-coprime-rings`, and `Mathematics/RotorPlanes`, which reads
+Consumers: the atlas row `radix.one-plane-coprime-rings`; `Mathematics/RotorPlanes`, which reads
 real points in any dimension through `dft_comp_add`, `dft_const` and `period` (stated for values in
-any complex vector space).
+any complex vector space); and `Mathematics/UncoupledBank`, which reads each plane of a bank through
+`plane_modes` and the digit group through `affineGroup`.
 -/
 
 open Complex ZMod Finset
@@ -293,20 +295,19 @@ theorem period {E : Type*} [AddCommGroup E] [Module ℂ E] (p : ZMod m → E) (t
     · rw [mul_comm t k, h k hk, AddChar.map_zero_eq_one, one_smul]
   exact congrFun (dft.injective this) x
 
-/-- [proved-derived; formal-checked] **The modes of a one-plane ring.** If `m ≥ 3` distinct points
-of the plane carry `ℤ/m` and the digits `0` and `1` act by real-affine maps, then the colours
-present are `0`, `k` and `−k` for one `k ≠ −k`; multiplication by `k` is injective; the inverse
-base carries `k` to `±k`; and the two colours have different sizes, so the plane is not
-collapsed onto a line. The proof: the digit moves compose into a map `f` on `ℂ²` with
-`f (pair j) = ψ(j) • pair j`, so at most two colours are present, and the digit `0` permutes the
-present colours by `c`. -/
-theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
-    (hp : Function.Injective p)
+/-- [proved-derived; formal-checked] **The modes of a plane moved by real-affine digits.** If the
+digits `0` and `1` act on the plane's points `p(x)` (not necessarily distinct) by real-affine maps,
+the digit moves compose into a map `f` on `ℂ²` with `f (pair j) = ψ(j) • pair j` for every `j ≠ 0`.
+Hence a colour `k ≠ 0` that is present, with `k ≠ −k`, leaves no colour present but `0`, `k` and
+`−k`, and the inverse base carries `k` to `±k`: the digit `0` permutes the present colours by
+`b⁻¹`. -/
+theorem plane_modes (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
     (hA : ∀ e : ZMod m, e = 0 ∨ e = 1 →
       ∃ α β γ : ℂ, ∀ x, p ((b : ZMod m) * x + e) = α * p x + β * conj (p x) + γ) :
-    ∃ k : ZMod m, 𝓕 p k ≠ 0 ∧ k ≠ -k ∧ (∀ j, 𝓕 p j ≠ 0 → j = 0 ∨ j = k ∨ j = -k) ∧
-      (∀ t, k * t = 0 → t = 0) ∧ (b⁻¹.val * k = k ∨ b⁻¹.val * k = -k) ∧
-      ‖𝓕 p k‖ ≠ ‖𝓕 p (-k)‖ := by
+    ∃ f : Module.End ℂ (Fin 2 → ℂ), (∀ j, j ≠ 0 → f (pair p j) = stdAddChar j • pair p j) ∧
+      ∀ k, k ≠ 0 → k ≠ -k → 𝓕 p k ≠ 0 →
+        (∀ j, 𝓕 p j ≠ 0 → j = 0 ∨ j = k ∨ j = -k) ∧
+          (b⁻¹.val * k = k ∨ b⁻¹.val * k = -k) := by
   obtain ⟨α0, β0, γ0, h0⟩ := hA 0 (Or.inl rfl)
   obtain ⟨α1, β1, γ1, h1⟩ := hA 1 (Or.inr rfl)
   set c : ZMod m := b⁻¹.val with hc
@@ -345,6 +346,7 @@ theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
     intro j hj
     rw [hf_def, Module.End.mul_apply, hpow _ j hj, hN1 _ (hcpow _ j hj), ← mul_assoc, ← pow_succ',
       Nat.sub_add_cancel ho, hco, one_mul]
+  refine ⟨f, hf, fun k hk0 hkk hqk => ?_⟩
   have hpair : ∀ j, 𝓕 p j ≠ 0 → pair p j ≠ 0 := by
     intro j hj hz
     apply hj
@@ -371,41 +373,12 @@ theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
       · exact heig i hi pi
       · exact heig j hj pj
       · exact heig k hk pk
-  have h2 : (2 : ZMod m) ≠ 0 := by
-    intro h
-    have h' : ((2 : ℕ) : ZMod m) = 0 := by exact_mod_cast h
-    rw [ZMod.natCast_eq_zero_iff] at h'
-    have := Nat.le_of_dvd two_pos h'
-    omega
-  obtain ⟨k, hqk, hk2⟩ : ∃ k, 𝓕 p k ≠ 0 ∧ k * 2 ≠ 0 := by
-    by_contra hno
-    push Not at hno
-    have := hp (period p 2 hno 0)
-    simp at this
-    exact h2 this
-  have hk0 : k ≠ 0 := by rintro rfl; simp at hk2
-  have hkk : k ≠ -k := by
-    intro h
-    apply hk2
-    rw [mul_two]
-    nth_rewrite 2 [h]
-    exact add_neg_cancel k
   have hS : ∀ j, 𝓕 p j ≠ 0 → j = 0 ∨ j = k ∨ j = -k := by
     intro j hj
     by_contra hno
     push Not at hno
     exact three j k (-k) hno.1 hk0 (neg_ne_zero.mpr hk0) hno.2.1 hno.2.2 hkk
       (hpair j hj) (hpair k hqk) (hpair' k hqk)
-  have hinj : ∀ t, k * t = 0 → t = 0 := by
-    intro t ht
-    have hper : ∀ j, 𝓕 p j ≠ 0 → j * t = 0 := by
-      intro j hj
-      rcases hS j hj with rfl | rfl | rfl
-      · simp
-      · exact ht
-      · rw [neg_mul, ht, neg_zero]
-    have := hp (period p t hper 0)
-    simpa using this
   have hck : pair p (c * k) ≠ 0 := by
     intro hz
     have hfix : (lin α0 β0 ^ o) (pair p k) = pair p k := by rw [hpow o k hk0, hco, one_mul]
@@ -428,6 +401,62 @@ theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
       · exact absurd (neg_eq_zero.mp h') (hc0 k hk0)
       · exact Or.inr (by rw [← neg_neg (c * k), h'])
       · exact Or.inl (neg_inj.mp h')
+  exact ⟨hS, hck'⟩
+
+/-- [proved-derived; formal-checked] **The modes of a one-plane ring.** If `m ≥ 3` distinct points
+of the plane carry `ℤ/m` and the digits `0` and `1` act by real-affine maps, then the colours
+present are `0`, `k` and `−k` for one `k ≠ −k`; multiplication by `k` is injective; the inverse
+base carries `k` to `±k`; and the two colours have different sizes, so the plane is not
+collapsed onto a line. The proof: `plane_modes`, and distinct points need a colour `k` with
+`2k ≠ 0`. -/
+theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
+    (hp : Function.Injective p)
+    (hA : ∀ e : ZMod m, e = 0 ∨ e = 1 →
+      ∃ α β γ : ℂ, ∀ x, p ((b : ZMod m) * x + e) = α * p x + β * conj (p x) + γ) :
+    ∃ k : ZMod m, 𝓕 p k ≠ 0 ∧ k ≠ -k ∧ (∀ j, 𝓕 p j ≠ 0 → j = 0 ∨ j = k ∨ j = -k) ∧
+      (∀ t, k * t = 0 → t = 0) ∧ (b⁻¹.val * k = k ∨ b⁻¹.val * k = -k) ∧
+      ‖𝓕 p k‖ ≠ ‖𝓕 p (-k)‖ := by
+  obtain ⟨f, hf, hmodes⟩ := plane_modes b p hA
+  have h2 : (2 : ZMod m) ≠ 0 := by
+    intro h
+    have h' : ((2 : ℕ) : ZMod m) = 0 := by exact_mod_cast h
+    rw [ZMod.natCast_eq_zero_iff] at h'
+    have := Nat.le_of_dvd two_pos h'
+    omega
+  obtain ⟨k, hqk, hk2⟩ : ∃ k, 𝓕 p k ≠ 0 ∧ k * 2 ≠ 0 := by
+    by_contra hno
+    push Not at hno
+    have := hp (period p 2 hno 0)
+    simp at this
+    exact h2 this
+  have hk0 : k ≠ 0 := by rintro rfl; simp at hk2
+  have hkk : k ≠ -k := by
+    intro h
+    apply hk2
+    rw [mul_two]
+    nth_rewrite 2 [h]
+    exact add_neg_cancel k
+  obtain ⟨hS, hck'⟩ := hmodes k hk0 hkk hqk
+  have hinj : ∀ t, k * t = 0 → t = 0 := by
+    intro t ht
+    have hper : ∀ j, 𝓕 p j ≠ 0 → j * t = 0 := by
+      intro j hj
+      rcases hS j hj with rfl | rfl | rfl
+      · simp
+      · exact ht
+      · rw [neg_mul, ht, neg_zero]
+    have := hp (period p t hper 0)
+    simpa using this
+  have hpair : pair p k ≠ 0 := by
+    intro hz
+    apply hqk
+    have := congrFun hz 0
+    simpa [pair] using this
+  have hpair' : pair p (-k) ≠ 0 := by
+    intro hz
+    apply hqk
+    have := congrFun hz 1
+    simpa [pair] using this
   have hnorm : ‖𝓕 p k‖ ≠ ‖𝓕 p (-k)‖ := by
     intro hn
     have hli := Module.End.eigenvectors_linearIndependent' f (fun t => stdAddChar (![k, -k] t))
@@ -443,8 +472,10 @@ theorem one_plane_modes (hm : 3 ≤ m) (b : (ZMod m)ˣ) (p : ZMod m → ℂ)
       (by
         intro t
         fin_cases t
-        · exact heig k hk0 (hpair k hqk)
-        · exact heig (-k) (neg_ne_zero.mpr hk0) (hpair' k hqk))
+        · exact Module.End.hasEigenvector_iff.mpr
+            ⟨Module.End.mem_eigenspace_iff.mpr (hf k hk0), hpair⟩
+        · exact Module.End.hasEigenvector_iff.mpr
+            ⟨Module.End.mem_eigenspace_iff.mpr (hf (-k) (neg_ne_zero.mpr hk0)), hpair'⟩)
     have hv : (fun t => pair p (![k, -k] t)) = ![pair p k, pair p (-k)] := by
       ext t; fin_cases t <;> rfl
     rw [hv, LinearIndependent.pair_iff] at hli
