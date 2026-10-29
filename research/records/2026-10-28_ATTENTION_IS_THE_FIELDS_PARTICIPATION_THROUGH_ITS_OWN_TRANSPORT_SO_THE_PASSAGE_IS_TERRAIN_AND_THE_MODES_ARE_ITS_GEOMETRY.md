@@ -189,9 +189,32 @@ forward and reverse in `kernels/tower.cu`:
 - the reverse through the Laplacian return `J = diag(a) − a aᵀ` (`resolvent.attention-variation`),
   the participation recomputed from the forward's operands rather than stored.
 
-The first law stops the covector at `Θ` and `D`: the participation reads the modes' geometry and the
-geometry learns through the modes' own path. The transport term `Σ a dU Ψ` of the complete variation
-is owed, and named in §8.
+The first law stopped the covector at `Θ` and `D`: the participation read the modes' geometry and the
+geometry learned through the modes' own path, the transport term `Σ a dU Ψ` of the complete variation
+owed (§8).
+
+[agent-inferred, October 29] **The transport covector** (`tower.participation-transport-covector`).
+A site's charts are `q = conj(U) Ȟ`, `k = conj(U) H`, `w = conj(U) Ψ` and its current `y = U J/m`, so
+a turn `dφ` of its frame moves them by `−i q dφ`, `−i k dφ`, `−i w dφ` and `+i y dφ`. With
+`dℓ = Re(conj(G) dx)`, the site's turn covector is
+
+`g_φ(i) = Im(conj(G_q) q) + Im(conj(G_k) k) + Im(conj(G_w) w) − Im(conj(g_y) y)`,
+
+`G_k` and `G_w` summed over the later probes that read the site. The frame at `i` is the product of
+the section's unit moves `u_t, t ≤ i`, so the covector of `arg u_t` gains `Σ_(i≥t) g_φ(i)`. It joins the
+turn's own `Re(conj(iλ_t) G_λ)` and reaches the founded move, the turn material and the arriving
+symbol's turn as that does. The met dissipation enters `z_ij` as `−κ(L̄_i − L̄_j)`, so a site's head
+mean has covector `g_L̄(i) = −κ Σ_(j≤i) g_z,ij + κ Σ_(i′≥i) g_z,i′i`. Each of the head's modes' `log₂ ρ_t
+= c r ℓ` gains `−Σ_(i≥t) g_L̄(i)/|h|`, which reaches the gate's logit through `c ℓ ln 2 · r(1 − r)` and
+the founded modulus through `c r/(|λ| ln 2)`; a move held at the margin carries none. A common turn
+or a common dissipation moves no face, so `Σ_i g_φ(i) = 0` and `Σ_i g_L̄(i) = 0` (the gauge), and an
+ungated level carries no frame. Both sums are on `2^(−48)`, the turn's own grain.
+
+On the tiny participating towers (plain, turned and paired) the gate, turn and founded-move families
+at every level match the code difference at their largest parameters
+(`the_transport_covector_matches_the_code_difference`). Without the term, the founded moves read up
+to four times their difference and a turned tower's turns read the wrong sign: on the turned tower
+the term is most of the turn's covector.
 
 ## 7. Acceptance, fixed before the build
 
@@ -244,8 +267,31 @@ participation through `train-two-ladder-participating-tower-classes` (host and c
 `tower_pass parity … participating`, its heads founded by `Tower::founded_participation`: one head a
 run of first-level modes whose memory sits at one octave. Read off the exact moduli, the turn's
 rounding split the race bank's sixteen rungs of eight into 90 runs (`hnn::tower` test
-`the_founded_heads_are_the_first_levels_rungs`). Owed: those two card tests and the parity at the
-race's own declaration. Nothing is measured (3).
+`the_founded_heads_are_the_first_levels_rungs`).
+
+**Status, October 29 (card, the race's declaration).** On the RTX 4080 SUPER the suite passes 32 of
+32 with those two tests, and 2 passes at the race's declaration: 4 sections at 320 streams and 32 at
+24, every face, covector entry, learner and state equal, host against card. One block a stream with
+one warp a head runs the heads; the pass takes 15.0 s at 24 streams (32.2 s before the warps) and
+10.0 s at 320 streams (13.1 s before). A read that runs past its section's close is refused on
+the card, so a realized advance reads each section to its close (`advance_realized`;
+`a_realized_advance_reads_each_section_to_its_close`).
+
+**Status, October 29 (measurement 3, laps 0 and 1, at `87cfec59c`'s law).** The race's passage, keys
+and declaration with participation, on the card. Bits a byte, training / held out / GSM8K region /
+prose region:
+
+| lap | with participation | plain race | lap wall time (with / plain) |
+|---|---|---|---|
+| 0 | 2.617 / 2.298 / 2.346 / 2.260 | 2.748 / 2.356 / 2.407 / 2.317 | 1,241 s / 113 s |
+| 1 | 2.045 / 2.152 / 2.156 / 2.149 | — / 2.139 / — / — | 929 s / about 113 s |
+
+Lap 0 reads lower than the plain lap 0 on all four; lap 1 reads 0.013 bit above the plain lap 1 held
+out. Every deposit certified (726 of 726). At each answer's opening, level 0's heads weigh the last
+few classes and levels 1 to 3 reach back up to 59 classes; above level 0 the heads' shares come in
+steps of one head's whole weight, so each of those heads sits on nearly one site (inferred from the
+steps). The writings are shown to Brandon outside the repository. Laps continue; the lap that runs
+with the transport covector (§6) is a separate race.
 
 **The device line.** The card under the lock for every learner run; the host realization only as the
 parity reference. The workload is the race's (its passage, keys, declaration and laps); time and
@@ -258,7 +304,8 @@ memory are projected from a one-to-three-minute read on the card before launch, 
   level-0 head's reach in it; the next loop admits the stream's earlier sites as present terrain
   (their charts carried as the modes' state is carried) or makes the section the passage's own
   partition (the review's fix 2). Named here so it is not carried unrepaired.
-- **The transport's covector.** `Σ a dU Ψ` through `Θ` and `D` into the gates and turns.
+- **The transport's covector.** `Σ a dU Ψ` through `Θ` and `D` into the gates and turns: returned on
+  October 29 (§6).
 - **Curvature.** The path-dependent transport of a two-dimensional chart.
 - **The pump's reflection.** On a pumped mode the transport `α h + β conj(h)` is real-linear; the
   first build pairs through its turn part only.

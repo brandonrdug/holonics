@@ -279,6 +279,9 @@ struct TowerFrame {
     wide *pa_gq, *pa_gk, *pa_gw;
     int64_t *pa_gchart;
     wide *pa_gfric;
+    // The transport: each cell's covector of its heads' mean met dissipation ([S][T][H]), and the
+    // later sums the modes' scan reads, of each cell's unit-move turn and log₂ ρ ([S][T][N] each).
+    wide *pa_gmet, *pa_tturn, *pa_tlog;
     uint64_t *r_pa_read, *r_pa_yre, *r_pa_yim, *r_pa_dra;
     uint64_t *r_pa_g;
     // The sites a stream carries open into the call ([S]), each at its place in the section
@@ -2340,7 +2343,9 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 glr = sr;
                 gli = si;
             }
-            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS);
+            // A participating level's turn also carries the transport's later sum (the participation's
+            // reverse wrote it before this scan).
+            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS) + (law.pa_heads > 0 ? fr.pa_tturn[q * N + k] : 0);
             around += turning;
             // The cell's unit: the founded one, turned by the cell's own turn when the level is.
             const wide cu_r = law.turned ? (wide)fr.units[(ql * N + k) * 2] : ur;
@@ -2381,6 +2386,15 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 f = rel(f * open, MOVE_BITS);
                 f = rel(f * (one - open), MOVE_BITS);
                 dq = fit64(rel(g_rho * GATE_REACH * f, COVECTOR_BITS + MOVE_BITS), &st);
+                // The transport's covector of log₂ ρ_t = c r ℓ: ∂/∂q = c ℓ ln 2 r (1 − r) and
+                // ∂/∂|λ| = c r/(|λ| ln 2), each on 2^(−30).
+                const wide met = law.pa_heads > 0 ? fr.pa_tlog[q * N + k] : 0;
+                if (met != 0) {
+                    const wide by_open = rel(rel(rel(log * (wide)law.ln2, MOVE_BITS) * open, MOVE_BITS) * (one - open), MOVE_BITS);
+                    dq = fit64((wide)dq + rel(met * GATE_REACH * by_open, COVECTOR_BITS + MOVE_BITS), &st);
+                    const wide lm = rel(modulus * (wide)law.ln2, MOVE_BITS);
+                    along += rel(met * div_nearest(((wide)GATE_REACH * open) * ((wide)1 << MOVE_BITS), lm > 0 ? lm : 1), MOVE_BITS);
+                }
             }
             fr.gre[ql * N + k] = fit64(rel(gamma * pgr, MOVE_BITS), &st);
             fr.gim[ql * N + k] = fit64(rel(gamma * pgi, MOVE_BITS), &st);
@@ -2538,10 +2552,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
     const uint64_t stride = T > law.pa_section ? T : law.pa_section;
     const uint64_t *face_roots = fr.roots;
     wide *gq = fr.pa_gq + site0 * N * 2, *gk = fr.pa_gk + site0 * N * 2, *gw = fr.pa_gw + site0 * N * 2;
+    wide *gmet = fr.pa_gmet + site0 * HH;
     for (uint64_t i = tid; i < (uint64_t)T * N * 2; i += B) {
         gq[i] = 0;
         gk[i] = 0;
         gw[i] = 0;
+    }
+    for (uint64_t i = tid; i < (uint64_t)T * HH; i += B) {
+        gmet[i] = 0;
     }
     __syncthreads();
     for (uint32_t i = 0; i < T; i++) {
@@ -2598,18 +2616,25 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 asum += (uwide)((wide)erow[j] * (wide)ga);
             }
             const wide mean = div_nearest((wide)warp_sum(asum), mass);
-            // g_z_j, and the friction's covector.
-            uwide fsum = 0;
+            // g_z_j, the friction's covector, and the sites' and the probe's met covectors κ g_z_j
+            // and −κ Σ_j g_z_j (the transport's, on 2^(−40)).
+            uwide fsum = 0, msum_met = 0;
             for (uint32_t j = lane; j <= i; j += 32) {
                 const uint64_t qj = (site0 + j) * L + l;
                 const wide e = erow[j];
                 const wide gz = rel((wide)law.ln2 * div_nearest(e * ((wide)zrow[j] - mean), mass), MOVE_BITS);
                 zrow[j] = fit64(gz, &st);
                 fsum += (uwide)(-rel(gz * (dis_i - (wide)fr.pa_diss[qj * HH + hh]), FACE_BITS));
+                const wide shared = gz * friction;
+                gmet[(uint64_t)j * HH + hh] += shared;
+                msum_met += (uwide)shared;
             }
             const wide fric = (wide)warp_sum(fsum);
+            const wide probe_met = (wide)warp_sum(msum_met);
+            __syncwarp();
             if (lane == 0) {
                 fr.pa_gfric[((uint64_t)s * L + l) * HH + hh] += fric;
+                gmet[(uint64_t)i * HH + hh] -= probe_met;
             }
             __syncwarp();
             // Every admitted site's key and current covectors, and the probe's.
@@ -2664,6 +2689,38 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
             const uint64_t r = block_max(mx[f], red);
             if (tid == 0) {
                 fr.r_pa_g[f * QL + qj] = r;
+            }
+        }
+    }
+    __syncthreads();
+    // The transport covector (`Tower::reverse_joined`): each site's turn covector
+    // g_φ(i) = Im(conj(G_q) q) + Im(conj(G_k) k) + Im(conj(G_w) w) − Im(conj(g_y) y), summed over the
+    // later sites, is the covector of each cell's unit-move turn, and the later sites' met covectors,
+    // shared over the head's modes and negated, that of its log₂ ρ; both on 2^(−48). A thread takes
+    // a mode (then a head), its cells in reverse order.
+    for (uint32_t k = tid; k < N; k += B) {
+        wide after = 0;
+        for (uint32_t step = 0; step < T; step++) {
+            const uint32_t i = T - 1 - step;
+            const uint64_t qi = (site0 + i) * L + l;
+            const int64_t *pq = fr.pa_probe + (qi * N + k) * 2, *pk = fr.pa_key + (qi * N + k) * 2, *pw = fr.pa_value + (qi * N + k) * 2;
+            const wide *cq = gq + ((uint64_t)i * N + k) * 2, *ck = gk + ((uint64_t)i * N + k) * 2, *cw = gw + ((uint64_t)i * N + k) * 2;
+            const wide yr = fr.pa_current[qi * 2 * N + k], yi = fr.pa_current[qi * 2 * N + N + k];
+            const wide gyr = fr.pa_gy[qi * 2 * N + k], gyi = fr.pa_gy[qi * 2 * N + N + k];
+            const wide phi = (cq[0] * pq[1] - cq[1] * pq[0]) + (ck[0] * pk[1] - ck[1] * pk[0]) + (cw[0] * pw[1] - cw[1] * pw[0]) - (gyr * yi - gyi * yr);
+            after += phi * ((wide)1 << (STATE_BITS - FACE_BITS));
+            fr.pa_tturn[(site0 + i) * N + k] = after;
+        }
+    }
+    for (uint32_t hh = tid; hh < HH; hh += B) {
+        const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
+        wide after = 0;
+        for (uint32_t step = 0; step < T; step++) {
+            const uint32_t i = T - 1 - step;
+            after += gmet[(uint64_t)i * HH + hh];
+            const wide share = -div_nearest(after * ((wide)1 << (STATE_BITS - FACE_BITS)), (wide)(to - from));
+            for (uint32_t k = from; k < to; k++) {
+                fr.pa_tlog[(site0 + i) * N + k] = share;
             }
         }
     }

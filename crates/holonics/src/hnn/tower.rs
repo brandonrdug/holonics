@@ -3409,6 +3409,10 @@ impl Tower {
             let span = if participating.is_some() { cells_n } else { 0 };
             let (mut pa_q, mut pa_k, mut pa_w) = (vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span]);
             let (mut pa_dreads, mut pa_negs): (Vec<Vec<i64>>, Vec<Vec<i64>>) = (Vec::with_capacity(span), Vec::with_capacity(span));
+            // The transport's reads: each cell's current covector, and each cell's covector of its
+            // heads' mean met dissipation (as probe and as site), on 2^(−40).
+            let mut pa_gys: Vec<Vec<Phasor>> = Vec::with_capacity(span);
+            let mut pa_met = vec![vec![0i128; participating.map_or(0, |p| p.heads.len())]; span];
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let dy = &dx[i];
@@ -3469,6 +3473,10 @@ impl Tower {
                             .collect::<Result<Vec<_>>>()?;
                         let back = participation_return(&head, &at, &admitted, &pc.parts[h], &gy[range.clone()])?;
                         g[lv.pa_friction + h] += back.friction;
+                        pa_met[i][h] += back.probe_met;
+                        for (j, &v) in back.sites_met.iter().enumerate() {
+                            pa_met[j][h] += v;
+                        }
                         for (slot, v) in pa_q[i][range.clone()].iter_mut().zip(&back.probe) {
                             *slot = (slot.0 + v.0 as i128, slot.1 + v.1 as i128);
                         }
@@ -3483,6 +3491,7 @@ impl Tower {
                     }
                     pa_dreads.push(dra);
                     pa_negs.push(nega);
+                    pa_gys.push(gy);
                 }
                 let dread = ratio_adjoint(&lc.read, lc.read_scale, &dr)?;
                 let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
@@ -3608,6 +3617,35 @@ impl Tower {
                 carried = gh.clone();
                 gh_all[i] = gh;
             }
+            // [agent-inferred, October 29] The transport covector (the participation record's §6): a
+            // site's charts are read through its frame `U_i = Π_(t≤i) u_t` (`q = conj(U) Ȟ`,
+            // `k = conj(U) H`, `w = conj(U) Ψ`, `y = U J/m`) and met through its heads' dissipation
+            // `D_i = −mean Σ_(t≤i) log₂ ρ_t`. So `g_φ(i) = Im(conj(G_q) q) + Im(conj(G_k) k) +
+            // Im(conj(G_w) w) − Im(conj(g_y) y)` summed over the later sites `i ≥ t` is the covector
+            // of the turn `arg u_t`, and the later sites' met covectors, shared over the head's modes
+            // and negated, that of `log₂ ρ_t`; both on 2^(−48). Their sums over the section vanish
+            // (a common turn and a common dissipation move no face): the gauge.
+            let (mut transport_turn, mut transport_log) = (vec![vec![0i128; n]; span], vec![vec![0i128; n]; span]);
+            if let Some(p) = participating {
+                let ranges = p.ranges();
+                let im = |g: (i128, i128), c: Phasor| g.0 * c.1 as i128 - g.1 * c.0 as i128;
+                let (mut turn_after, mut met_after) = (vec![0i128; n], vec![0i128; ranges.len()]);
+                for i in (0..cells_n).rev() {
+                    let pc = cells[i].levels[l].participation.as_ref().ok_or(TowerError::Refused("a participation read at every cell of a participating tower"))?;
+                    for k in 0..n {
+                        let gy = (pa_gys[i][k].0 as i128, pa_gys[i][k].1 as i128);
+                        turn_after[k] += (im(pa_q[i][k], pc.probe[k]) + im(pa_k[i][k], pc.key[k]) + im(pa_w[i][k], pc.value[k]) - im(gy, pc.current[k])) << (STATE_BITS - FACE_BITS);
+                        transport_turn[i][k] = turn_after[k];
+                    }
+                    for (h, range) in ranges.iter().enumerate() {
+                        met_after[h] += pa_met[i][h];
+                        let share = -div_nearest(met_after[h] << (STATE_BITS - FACE_BITS), range.len() as i128);
+                        for k in range.clone() {
+                            transport_log[i][k] = share;
+                        }
+                    }
+                }
+            }
             let gammas = &reaches.gammas[l];
             // S_k = Σ_t Re(conj(G_h) B x): the covector of the mode's γ, on 2^(−48).
             let mut through_gamma = vec![0i128; n];
@@ -3680,7 +3718,7 @@ impl Tower {
                             let faces = &reaches.gates[l];
                             // Re(conj(i λ_t) G_λ): the covector of λ_t's turn, the founded turn's
                             // and, through ∂θ/∂s = π, the arriving symbol's.
-                            let turning = release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS);
+                            let turning = release(m.lam.0 as i128 * gli - m.lam.1 as i128 * glr, MOVE_BITS) + transport_turn.get(i).map_or(0, |row| row[k]);
                             around[k] += turning;
                             if d.turned {
                                 ds[k] = fit64(release(reaches.half_turn * turning, MOVE_BITS + COVECTOR_BITS + turn_spread(w)))?;
@@ -3717,6 +3755,15 @@ impl Tower {
                                 f = release(f * open, MOVE_BITS);
                                 f = release(f * ((1i128 << MOVE_BITS) - open), MOVE_BITS);
                                 dq[k] = fit64(release(g_rho * GATE_REACH * f, COVECTOR_BITS + MOVE_BITS))?;
+                                // The transport's covector of log₂ ρ_t = c r ℓ: ∂/∂q = c ℓ ln 2 r (1 − r)
+                                // and ∂/∂|λ| = c r/(|λ| ln 2), each on 2^(−30).
+                                let met = transport_log.get(i).map_or(0, |row| row[k]);
+                                if met != 0 {
+                                    let by_open = release(release(release(faces.logs[k] * ln2, MOVE_BITS) * open, MOVE_BITS) * (one - open), MOVE_BITS);
+                                    dq[k] = fit64(dq[k] as i128 + release(met * GATE_REACH * by_open, COVECTOR_BITS + MOVE_BITS))?;
+                                    let by_modulus = div_nearest((GATE_REACH * open) << MOVE_BITS, release(faces.moduli[k].max(1) * ln2, MOVE_BITS).max(1));
+                                    along[k] += release(met * by_modulus, MOVE_BITS);
+                                }
                             }
                         }
                     }
@@ -7555,7 +7602,11 @@ mod tests {
     /// A tiny gated tower of four modes with participation joined over a section of sixteen, its
     /// heads the founded memory's runs; `opened` fills `W₁ᵃ` so the current conducts.
     fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
-        let mut tower = tiny_contacts(2, 4, 4, true, false, false, contact);
+        tiny_participating_of(contact, opened, false)
+    }
+
+    fn tiny_participating_of(contact: ContactLaw, opened: bool, turned: bool) -> Tower {
+        let mut tower = tiny_contacts(2, 4, 4, true, turned, false, contact);
         let founded = tower.founded_participation(16).expect("declared");
         let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { founded };
         tower.join_participation(heads).expect("joined");
@@ -7779,6 +7830,64 @@ mod tests {
             for kinds in [[0usize, 1], [2, 3], [4, 5]] {
                 let starts: Vec<usize> = tower.layout.levels.iter().flat_map(|lv| [[lv.pa_probe_re, lv.pa_probe_im], [lv.pa_key_re, lv.pa_key_im], [lv.pa_value_re, lv.pa_value_im]][kinds[0] / 2]).collect();
                 assert!(starts.iter().any(|s| checked.contains(s)), "{contact:?}: charts {kinds:?} carried no readable covector");
+            }
+        }
+    }
+
+    /// [agent-inferred, October 29] **The transport covector** (record
+    /// `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`, §6): a site reads its charts through its
+    /// frame `U_i`, the product of the section's unit moves, and is met through its dissipation,
+    /// the sum of their `−log₂ ρ`, so the gate, the turn and the founded move carry the
+    /// participation's covector through the frames and the friction. On a participating tower,
+    /// plain, turned and paired, each of those families at every level matches the code difference
+    /// at its largest parameter. Without the transport the founded moves read up to four times
+    /// their difference and a turned tower's turns the wrong sign. The gates' covectors on this
+    /// fixture lie between 2^(−10) and 2^(−6) bits a unit, so the floor is 2^(−10).
+    #[test]
+    fn the_transport_covector_matches_the_code_difference() {
+        for (contact, turned) in [(ContactLaw::Rectifying, false), (ContactLaw::Rectifying, true), (ContactLaw::Pair, false)] {
+            let tower = tiny_participating_of(contact, true, turned);
+            let opening = tower.rest();
+            let mut s = opening.clone();
+            let cells = tower.forward(&mut s, &PASSAGE, &tower.reaches()).expect("forward");
+            let mut g = tower.reverse(&opening, &cells, &PASSAGE, None).expect("reverse");
+            tower.to_step_grain(&mut g);
+            let conducting = |t: &Tower| -> Vec<u32> {
+                let mut s = t.rest();
+                let cells = t.forward(&mut s, &PASSAGE, &t.reaches()).expect("forward");
+                cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().filter(|_| l.pair.is_empty()).map(|&a| u32::from(a > 0)).collect::<Vec<_>>())).collect()
+            };
+            let base = conducting(&tower);
+            let base_code = code(&tower, &PASSAGE);
+            let transported: Vec<usize> = tower.layout.levels.iter().flat_map(|lv| [lv.gate, lv.gate_bias, lv.move_re, lv.move_im].into_iter().chain(if turned { vec![lv.turn, lv.turn_bias] } else { Vec::new() })).collect();
+            let mut checked = Vec::new();
+            for &(start, len, grain) in tower.layout.families.iter().filter(|(start, _, _)| transported.contains(start)) {
+                let mut order: Vec<usize> = (start..start + len).collect();
+                order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
+                'parameter: for i in order {
+                    let gi = g[i];
+                    if gi.abs() < 1i128 << (STEP_BITS - 10) {
+                        break;
+                    }
+                    let h = 1i32 << (grain - 8);
+                    let (mut moment, mut spread) = (0i128, 0i128);
+                    for k in (-8i32..=8).filter(|&k| k != 0) {
+                        let mut moved = tower.clone();
+                        moved.theta[i] += k * h;
+                        if conducting(&moved) != base {
+                            continue 'parameter;
+                        }
+                        moment += k as i128 * (code(&moved, &PASSAGE) - base_code) as i128;
+                        spread += (k * k) as i128;
+                    }
+                    let numeric = (moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread);
+                    assert!((numeric - gi).abs() * 10 <= gi.abs(), "{contact:?} turned {turned}: family at {start} grain {grain}, parameter {i}: covector {gi} against {numeric}");
+                    checked.push(start);
+                    break;
+                }
+            }
+            for start in &transported {
+                assert!(checked.contains(start), "{contact:?} turned {turned}: the family at {start} carried no readable covector");
             }
         }
     }

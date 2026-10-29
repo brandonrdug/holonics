@@ -37,8 +37,10 @@
 //! remainder below its grain is released to the nearest numerator, and every sum is an integer sum,
 //! so the sites summed in any order give the same bits.
 //!
-//! **Not claimed.** The return stops at the frame and the dissipation: the transport's own covector
-//! `Σ a dU Ψ` into the gates and turns is owed, as is the pump's reflection share (record §8).
+//! **The transport's own covector** `Σ a dU Ψ` into the gates and turns is not summed here: this
+//! return hands back each site's met dissipation (`probe_met`, `sites_met`) beside its charts'
+//! covectors, and `Tower::reverse_joined` turns them into each move's turn and met covector (record
+//! §6). **Not claimed:** the pump's reflection share (record §8).
 use super::{div_nearest, fit64, refuse, release, Result, FACE_BITS, MOVE_BITS, UNIT_BITS};
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 
@@ -189,6 +191,11 @@ pub struct ParticipationReturn {
     pub keys: Vec<Vec<Phasor>>,
     pub currents: Vec<Vec<Phasor>>,
     pub friction: i128,
+    /// [agent-inferred, October 29] The covector of the probe's mean met dissipation,
+    /// `−κ Σ_j g_z_ij`, and of each admitted site's, `κ g_z_ij`, on `2^(−40)` a bit: the friction's
+    /// share of the transport covector (the record's §6), which the cells' gates receive.
+    pub probe_met: i128,
+    pub sites_met: Vec<i128>,
 }
 
 fn conj_mul(a: Phasor, b: Phasor) -> (i128, i128) {
@@ -289,7 +296,7 @@ pub fn participation_return(head: &Head, probe: &Probe, sites: &[Site], part: &P
         .collect();
     let mean = div_nearest(part.weights.iter().zip(&ga).map(|(&e, &a)| e as i128 * a).sum(), mass);
     let ln2 = ln2_face();
-    let mut ret = ParticipationReturn { probe: vec![(0, 0); modes], keys: Vec::with_capacity(sites.len()), currents: Vec::with_capacity(sites.len()), friction: 0 };
+    let mut ret = ParticipationReturn { probe: vec![(0, 0); modes], keys: Vec::with_capacity(sites.len()), currents: Vec::with_capacity(sites.len()), friction: 0, probe_met: 0, sites_met: Vec::with_capacity(sites.len()) };
     let mut probe_acc = vec![(0i128, 0i128); modes];
     for ((site, &e), &a) in sites.iter().zip(&part.weights).zip(&ga) {
         let e = e as i128;
@@ -297,6 +304,10 @@ pub fn participation_return(head: &Head, probe: &Probe, sites: &[Site], part: &P
         let gz = release(ln2 * div_nearest(e * (a - mean), mass), MOVE_BITS);
         let met = probe.dissipation as i128 - site.dissipation as i128;
         ret.friction -= release(gz * met, FACE_BITS);
+        // z_ij = s_ij − κ (D_i − D_j): ∂z/∂D_i = −κ, ∂z/∂D_j = κ.
+        let shared = gz * head.friction as i128;
+        ret.probe_met -= shared;
+        ret.sites_met.push(shared);
         // g_k_j = β g_z q_i and g_q_i += β g_z k_j, on 2^(−24).
         let scale = FACE_BITS + head.beta_shift;
         ret.keys.push(probe.q.iter().map(|&q| Ok((fit64(release(gz * q.0 as i128, scale))?, fit64(release(gz * q.1 as i128, scale))?))).collect::<Result<Vec<_>>>()?);
