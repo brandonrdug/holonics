@@ -177,7 +177,8 @@ HodgeReceiver.harmonic_meets_every_class (existence); closed_field_retains_uniqu
 ```
 
 [definition] For matrix transports the gauge-free faces are the class functions of §3, which
-is why a matrix is the natural unit of a face. For proper rigid edge transports the holonomy lies in `SE(3)` and admits a screw reading.
+is why a matrix is the natural unit of a face. For proper rigid edge transports the holonomy lies in `SE(3)` and admits a screw reading
+(Chasles, `Geometry/Motion.chasles`).
 `winding::triangle_holonomy` accepts general affine maps, including shear and singular maps;
 those need not be rigid screws. `burgers_step` returns the translation only when the linear
 part is identity. For a rotating affine holonomy `(R,t)`, closure of a based point is
