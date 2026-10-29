@@ -3317,7 +3317,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         regions: REGIONS,
         train_compared: None,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, None, false, looking, &mut HostPass::default())
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, None, Joined::Nothing, looking, &mut HostPass::default())
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -3353,7 +3353,7 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, false, None, realization)
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, Joined::Nothing, None, realization)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3371,12 +3371,26 @@ pub(super) struct Reading {
     pub(super) train_compared: Option<Vec<bool>>,
 }
 
+/// What a founded run joins before its first section: nothing, participation over its section
+/// (one head a founded rung), or the mutual contact at the comparison.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Joined {
+    Nothing,
+    Participation,
+    MutualContact,
+}
+
+/// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
+/// participation's pairing uses, so a founded encoding's `2⟨y, E⟩` spans a few bits of face (record
+/// `2026-10-29_MUTUAL_CONTACT_…`, §3).
+pub(super) const MUTUAL_SHIFT: u32 = 2;
+
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
 /// OUT [FROM FROM_SHA]`. Each section's forward and reverse run through `realization`
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, participating: bool, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3412,8 +3426,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.declaration != declaration || learner.rate_bits != rate_bits || learner.tower.news() != news {
             return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
-        if learner.tower.participation().map(|p| p.section) != participating.then_some(section) {
+        if learner.tower.participation().map(|p| p.section) != (joined == Joined::Participation).then_some(section) {
             return Err("the continued learner's participation differs from the declared one".into());
+        }
+        if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
+            return Err("the continued learner's comparison differs from the declared one".into());
         }
         learner
     } else {
@@ -3424,10 +3441,19 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         }
         // A participating run reads its sections' earlier sites from the founding on, one head a
         // founded rung ([`Tower::founded_participation`]).
-        if participating {
-            let founded = learner.tower.founded_participation(section).map_err(|e| e.to_string())?;
-            println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?}", founded.section, founded.beta_shift, founded.heads);
-            learner.join_participation(founded).map_err(|e| e.to_string())?;
+        match joined {
+            Joined::Nothing => {}
+            Joined::Participation => {
+                let founded = learner.tower.founded_participation(section).map_err(|e| e.to_string())?;
+                println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?}", founded.section, founded.beta_shift, founded.heads);
+                learner.join_participation(founded).map_err(|e| e.to_string())?;
+            }
+            // A mutual run compares each face with the target's own encoding through a learned
+            // contact from the founding on ([`Tower::join_mutual_contact`]).
+            Joined::MutualContact => {
+                learner.join_mutual_contact(MUTUAL_SHIFT).map_err(|e| e.to_string())?;
+                println!("TOWER_MUTUAL_CONTACT shift={MUTUAL_SHIFT}");
+            }
         }
         learner
     };

@@ -140,6 +140,10 @@ struct TowerLaw {
     // dissipation). `ln2` is set beside it.
     uint32_t participation, pa_heads, pa_section, pa_beta;
     int64_t pa_held_log;
+    // The mutual contact (`mutual = 0` without it): the readout's place holds its geometry J
+    // (W × W), and the face is z_a = release(2⟨y, E_a⟩ − ‖E_a‖², 16 + b) + c_a, y = J x, b the
+    // shift (`Tower::join_mutual_contact`).
+    uint32_t mutual, mutual_shift;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -289,6 +293,10 @@ struct TowerFrame {
     // opening with the stream's running frame and met dissipation (`pa_run`, `pa_met`).
     const uint32_t *pa_open;
     const int64_t *pa_open_key, *pa_open_value, *pa_open_diss;
+    // The mutual contact (each empty without it): the produced face through it, y = J x on
+    // 2^(−16), and its covector G_y on 2^(−24) ([S][T][W] each), and max |G_y| ([S][T]).
+    int64_t *contact_y, *contact_gy;
+    uint64_t *r_contact_gy;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -776,6 +784,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int64_t *praw = (int64_t *)carve(at, 8ull * W * P);
     int32_t *prd = (int32_t *)carve(at, 4ull * W * P);
     int64_t *pdis = (int64_t *)carve(at, 8ull * HH * P);
+    // The mutual contact's produced face y = J x.
+    int64_t *yc = (int64_t *)carve(at, 8ull * W * (law.mutual != 0));
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -1602,12 +1612,34 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         }
         // The readout's face z = U x + c, and the masses 2^(z − z_max) on 2^(−62).
         // The pair face read by its own readout, z += V c(p), and the ring's, z += W φ, each
-        // released to 2^(−16) beside it.
+        // released to 2^(−16) beside it. Under a mutual contact the face is the contact's:
+        // y = J x released to 2^(−16), then z_a = release(2⟨y, E_a⟩ − ‖E_a‖², 16 + b) + c_a.
         const bool n_z = narrow_terms(law.readout_reach, xmax, W, &st);
         const bool n_v = K > 0 && narrow_terms(law.pair_reach[0], pmax, K, &st);
         const bool n_w = R > 0 && narrow_terms(law.ring_reach, phimax, KP, &st);
+        if (law.mutual) {
+            for (uint32_t j = tid; j < W; j += B) {
+                yc[j] = fit64(rel(dot(tt + law.readout + j, W, W, x, n_z), MATERIAL_BITS), &st);
+            }
+            __syncthreads();
+            if (keep) {
+                for (uint32_t j = tid; j < W; j += B) {
+                    fr.contact_y[qc * W + j] = yc[j];
+                }
+            }
+        }
         int64_t zm = INT64_MIN;
         for (uint32_t c = tid; c < A; c += B) {
+            if (law.mutual) {
+                const int32_t *ec = th + law.encoding + (uint64_t)c * W;
+                wide sum = 0;
+                for (uint32_t j = 0; j < W; j++) {
+                    sum += ((wide)2 * (wide)yc[j] - (wide)ec[j]) * (wide)ec[j];
+                }
+                z[c] = fit64(rel(sum, FACE_BITS + law.mutual_shift) + (wide)th[law.readout_bias + c], &st);
+                zm = z[c] > zm ? z[c] : zm;
+                continue;
+            }
             wide sum = dot(tt + law.readout + c, A, W, x, n_z);
             sum += (wide)th[law.readout_bias + c] << MATERIAL_BITS;
             z[c] = fit64(rel(sum, MATERIAL_BITS), &st);
@@ -1715,6 +1747,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_top(To
     int64_t *back = (int64_t *)carve(at, 8ull * KP);
     int64_t *drho = (int64_t *)carve(at, 8ull * K2);
     int64_t *dhat = (int64_t *)carve(at, 8ull * W * (R > 0));
+    // The mutual contact's covector of the produced face, G_y.
+    int64_t *gyc = (int64_t *)carve(at, 8ull * W * (law.mutual != 0));
     __shared__ uint32_t st;
     if (tid == 0) {
         st = 0;
@@ -1737,11 +1771,38 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_top(To
     if (tid == 0) {
         fr.r_dz[q] = ymax;
     }
-    const bool narrow = narrow_rows(law.readout_reach, ymax, A);
-    for (uint32_t idx = tid; idx < G * W; idx += B) {
-        const uint32_t g = idx / W, j = idx % W;
-        const uint32_t from = (uint32_t)((uint64_t)A * g / G), to = (uint32_t)((uint64_t)A * (g + 1) / G);
-        part[idx] = dot(fr.theta + law.readout + (uint64_t)from * W + j, W, to - from, dz + from, narrow);
+    if (law.mutual) {
+        // The mutual contact's return (`Tower::mutual_return`): G_y = 2β Σ_a δz_a E_a on 2^(−40)
+        // released by 15 + b, then Jᵀ G_y (J row-major, W × W) in the readout's place.
+        __syncthreads();
+        uint64_t gm = 0;
+        for (uint32_t j = tid; j < W; j += B) {
+            wide sum = 0;
+            for (uint32_t c = 0; c < A; c++) {
+                sum += (wide)dz[c] * (wide)fr.theta[law.encoding + (uint64_t)c * W + j];
+            }
+            gyc[j] = fit64(rel(sum, FACE_BITS - 1 + law.mutual_shift), &st);
+            fr.contact_gy[q * W + j] = gyc[j];
+            const uint64_t a = magnitude(gyc[j]);
+            gm = a > gm ? a : gm;
+        }
+        const uint64_t gmax = block_max(gm, red);
+        if (tid == 0) {
+            fr.r_contact_gy[q] = gmax;
+        }
+        const bool n_j = narrow_rows(law.readout_reach, gmax, W);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)W * g / G), to = (uint32_t)((uint64_t)W * (g + 1) / G);
+            part[idx] = dot(fr.theta + law.readout + (uint64_t)from * W + j, W, to - from, gyc + from, n_j);
+        }
+    } else {
+        const bool narrow = narrow_rows(law.readout_reach, ymax, A);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)A * g / G), to = (uint32_t)((uint64_t)A * (g + 1) / G);
+            part[idx] = dot(fr.theta + law.readout + (uint64_t)from * W + j, W, to - from, dz + from, narrow);
+        }
     }
     __syncthreads();
     for (uint32_t j = tid; j < W; j += B) {
@@ -2904,18 +2965,35 @@ extern "C" __global__ void tower_outer_reduce(TowerOuter f) {
 }
 
 // The encoding's covector: each cell's bottom covector summed at the class that arrived there.
+// Under a mutual contact the class's encoding is also the target the contact compares, and takes
+// the contact's reaction G_E_u = 2β δz_u (y − E_u) at every cell, released entry by entry by
+// 15 + b; the contact's constants take Σ δz_u (`Tower::mutual_return`).
 extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
-    const uint32_t u = blockIdx.x, W = law.width, T = law.cells;
+    const uint32_t u = blockIdx.x, W = law.width, T = law.cells, A = law.alphabet;
     const uint64_t cells = (uint64_t)law.streams * T;
     for (uint32_t j = threadIdx.x; j < W; j += blockDim.x) {
         wide acc = 0;
+        const wide e = fr.theta[law.encoding + (uint64_t)u * W + j];
         for (uint64_t q = 0; q < cells; q++) {
             const uint64_t s = q / T, t = q % T;
             if (fr.classes[s * (T + 1) + t] == u) {
                 acc += fr.dx[q * W + j];
             }
+            if (law.mutual) {
+                const wide dzu = fr.dz[q * A + u];
+                if (dzu != 0) {
+                    acc += rel(dzu * ((wide)fr.contact_y[q * W + j] - e), FACE_BITS - 1 + law.mutual_shift);
+                }
+            }
         }
         fr.gradient[law.encoding + (uint64_t)u * W + j] = acc;
+    }
+    if (law.mutual && threadIdx.x == 0) {
+        wide acc = 0;
+        for (uint64_t q = 0; q < cells; q++) {
+            acc += fr.dz[q * A + u];
+        }
+        fr.gradient[law.readout_bias + u] = acc;
     }
 }
 

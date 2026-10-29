@@ -112,6 +112,9 @@ impl Tower {
         if self.pair.is_some() {
             return refuse("the duplex reads its towers' faces off their tops, which a pair face does not read alone");
         }
+        if self.mutual.is_some() {
+            return refuse("the duplex reads its towers' faces through their readouts, which a mutual contact replaces");
+        }
         let (a, w) = (self.declaration.alphabet, self.declaration.width);
         let (ro, rb) = (self.layout.readout, self.layout.readout_bias);
         let mut z = vec![0i64; a];

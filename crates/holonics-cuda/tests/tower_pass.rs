@@ -45,6 +45,8 @@ struct Faces {
     contact: Option<ContactLaw>,
     /// Participation joined last over sections of this length (`open_participation`).
     participation: Option<usize>,
+    /// The mutual contact joined at the founding (`open_mutual`).
+    mutual: bool,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -66,6 +68,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     let contact = faces.contact.unwrap_or(ContactLaw::Rectifying);
     let tower = Tower::found_on(TowerDeclaration { contact, ..declaration(alphabet, true, turned, faces.pumped) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
+    if faces.mutual {
+        open_mutual(&mut learner);
+    }
     if contact != ContactLaw::Rectifying {
         open_pair_contacts(&mut learner);
     }
@@ -117,6 +122,19 @@ fn open_participation(learner: &mut TowerLearner, section: usize) {
         for i in p[0]..p[0] + 4 * d.modes * d.width {
             learner.tower.theta[i] *= 2;
         }
+    }
+}
+
+/// The mutual contact joined at `β = 2^(−2)` on the founded tower, its geometry `J` opened about
+/// ±¼ on `2^(−24)` off the key stream, so the contact has closed and the levels below receive its
+/// covector from the first section.
+fn open_mutual(learner: &mut TowerLearner) {
+    learner.join_mutual_contact(2).expect("the contact joins");
+    let law = learner.tower.resident_law().expect("the law");
+    let w = learner.tower.declaration.width;
+    let k = keys(1 << 16);
+    for (i, v) in learner.tower.theta[law.readout..law.readout + w * w].iter_mut().enumerate() {
+        *v = (k[50000 + i] as i32 - 128) << 15;
     }
 }
 
@@ -362,6 +380,21 @@ fn the_cards_pass_holds_an_uncompared_place_as_the_host_does() {
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_participating_pass_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 3, 9, 32, false, Faces { participation: Some(9), ..Faces::default() });
+}
+
+/// The mutual contact's acceptance on the card (record `2026-10-29_MUTUAL_CONTACT_…`, §5.2): 32
+/// sections equal face by face, covector entry by entry, learner for learner and state for state;
+/// and pumped on the pair contact with an uncompared place.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_mutual_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { mutual: true, ..Faces::default() });
+}
+
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_pumped_mutual_pair_contact_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { mutual: true, pumped: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
 }
 
 #[test]

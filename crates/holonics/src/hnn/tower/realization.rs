@@ -455,6 +455,10 @@ pub struct ResidentLaw {
     /// The levels' participation, when it is joined: a realization that does not carry it refuses
     /// the tower.
     pub participation: Option<super::ParticipationDeclaration>,
+    /// The mutual contact's `b` (`β = 2^(−b)`), when the comparison is one (the readout's place
+    /// then holds the contact's geometry `J`, `d × d`): a realization that does not carry it refuses
+    /// the tower.
+    pub mutual: Option<u32>,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -664,6 +668,7 @@ impl Tower {
             strands: self.strands.as_ref().map(|strands| ResidentStrands::of(strands, self.layout.strand_contact, self.layout.strand_pair, reaches.strands, self.declaration.alphabet)).transpose()?,
             news: self.news,
             participation: self.participation.clone(),
+            mutual: self.mutual,
             held_log: reaches.held_log,
         })
     }
