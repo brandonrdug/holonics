@@ -24,7 +24,9 @@
 use super::tower_train::{agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
 use holonics::receiver::release::agreeing_class;
 use super::*;
-use holonics::hnn::tower::realization::{HostPass, PassRealization};
+use holonics::hnn::tower::participation::ENTROPY_BITS;
+use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
+use holonics::hnn::tower::READ_BITS;
 use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TurnLadder};
 use rayon::prelude::*;
 
@@ -414,12 +416,15 @@ fn participation_read(tower: &holonics::hnn::tower::Tower, prompts: &[&[usize]],
 }
 
 /// `PARTICIPATION.tsv`'s header.
-pub(super) const PARTICIPATION_HEAD: &str = "prompt\tlevel\thead\tsites\treleased\ttop(back:classes:thousandths)\n";
+pub(super) const PARTICIPATION_HEAD: &str = "prompt\tlevel\thead\tsites\treleased\tentropy_millibits\ttop(back:classes:thousandths)\n";
 
 /// One prompt's participation at its answer's opening, `entered` the classes read with the opening's
 /// end letter last: per level the sites carrying the most weight, summed over the heads in
-/// thousandths of a head, printed with the eight classes that end there (`|` the end letter), and
-/// each head's own top sites appended to `rows`.
+/// thousandths of a head, printed with the eight classes that end there (`|` the end letter) and the
+/// heads' mean entropy in thousandths of a bit ([`Participation::entropy`]), and each head's own top
+/// sites and entropy appended to `rows`.
+///
+/// [`Participation::entropy`]: holonics::hnn::tower::participation::Participation::entropy
 pub(super) fn participation_rows(p: usize, entered: &[usize], levels: &[Vec<holonics::hnn::tower::participation::Participation>], rows: &mut String) {
     const SHOWN: usize = 5;
     let last = entered.len() - 1;
@@ -437,18 +442,177 @@ pub(super) fn participation_rows(p: usize, entered: &[usize], levels: &[Vec<holo
     for (l, heads) in levels.iter().enumerate() {
         let sites = heads.first().map_or(0, |h| h.weights.len());
         let mut summed = vec![0u128; sites];
+        let mut entropy = 0i128;
         for (h, part) in heads.iter().enumerate() {
             let share: Vec<u128> = part.weights.iter().map(|&e| e * 1000 / part.mass.max(1)).collect();
             for (s, &v) in summed.iter_mut().zip(&share) {
                 *s += v;
             }
+            let bits = millibits(part.entropy());
+            entropy += bits;
             let listed: Vec<String> = top(&share).into_iter().map(|(back, v)| format!("{back}:{:?}:{v}", shown(back))).collect();
-            rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{}\n", part.released, listed.join(" ")));
+            rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{bits}\t{}\n", part.released, listed.join(" ")));
         }
         let listed: Vec<String> = top(&summed).into_iter().map(|(back, v)| format!("{back}:{:?}:{}", shown(back), v / heads.len().max(1) as u128)).collect();
-        println!("CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} top(back:classes:thousandths) {}", heads.len(), listed.join(" "));
+        println!(
+            "CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} entropy_millibits={} top(back:classes:thousandths) {}",
+            heads.len(),
+            entropy / heads.len().max(1) as i128,
+            listed.join(" ")
+        );
     }
 }
+
+/// A reading on `2^(−ENTROPY_BITS)` bits in thousandths of a bit, to the nearest.
+fn millibits(x: i128) -> i128 {
+    (x * 1000 + (1 << (ENTROPY_BITS - 1))) >> ENTROPY_BITS
+}
+
+/// A code on `2^(−READ_BITS)` bits written in bits to the thousandth, its sign kept.
+fn signed_bits(code: i64) -> String {
+    let milli = (code.unsigned_abs() as u128 * 1000 + (1 << (READ_BITS - 1))) >> READ_BITS;
+    format!("{}{}.{:03}", if code < 0 { "-" } else { "" }, milli / 1000, milli % 1000)
+}
+
+/// [agent-inferred, October 29] `read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA
+/// STREAMS SECTION OUT`: the race's readings of one lap's rested learner, on the host, beside the
+/// lap's bits and writings (records `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…` §5 and
+/// `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…` §§3–4). Each decides nothing, trains nothing and selects
+/// no lap.
+/// - `TOWER_RACE_FRICTIONS`: per level, how many modes sit at each friction octave, written as the
+///   memory of `2^k` classes the octave matches (`Tower::mode_octaves`).
+/// - `TOWER_RACE_BRIDGE`: per participating level, the join `W₁ᵃ`'s root mean square in thousandths
+///   of the contacts', and each one's largest entry on `2^(−24)` (`Tower::participation_bridge`).
+/// - At each prompt's opening, entered as the release enters it, each level's heads' participation
+///   and entropy (`CLASSES_PARTICIPATION`, `OUT/PARTICIPATION.tsv`).
+/// - `TOWER_RACE_SHARE`: over the held-out passage's opening, cut into `STREAMS` parts read from rest
+///   with `SECTION` classes coded a part and every class compared, each head's mean entropy over the
+///   sites it admitted and the share of its chart covector reaching its score charts (probe and key)
+///   against its value chart, in thousandths (`Tower::participation_shares`).
+/// - `TOWER_RACE_FLUX`: for each distinct prompt, the classes that follow its first place in `DEV`
+///   to the next end letter, coded after its own prompt and after each other prompt;
+///   `I = L(after another) − L(after its own)` in bits is the flux the prompt drives into what
+///   follows it (atlas `culture.question-answer-information`). The host's codes are the card's
+///   (the parity), so this is the race's own read.
+pub(super) fn read_race(args: &[String]) -> Result<()> {
+    if args.len() != 10 {
+        return Err("read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA STREAMS SECTION OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let alphabet = tower.declaration.alphabet;
+    let end = alphabet - 1;
+    let dev = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, alphabet)?;
+    let prompts_classes = classes_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?, alphabet)?;
+    let streams = positive(&args[7])?;
+    let section = positive(&args[8])?;
+    let out = Path::new(&args[9]);
+    let mut prompts: Vec<&[usize]> = prompts_classes.split_inclusive(|&c| c == end).collect();
+    if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
+        return Err("every prompt closes with the end letter".into());
+    }
+    prompts.dedup();
+    if dev.len() < streams * (section + 1) {
+        return Err("the held-out passage must hold one section a stream".into());
+    }
+    std::fs::create_dir(out)?;
+    // The frictions and the bridge, read off the material.
+    for (l, octaves) in tower.mode_octaves().iter().enumerate() {
+        let mut counts: std::collections::BTreeMap<i128, usize> = std::collections::BTreeMap::new();
+        for &o in octaves {
+            *counts.entry(MOVE_OCTAVE - o).or_default() += 1;
+        }
+        let listed: Vec<String> = counts.iter().rev().map(|(k, n)| format!("2^{k}:{n}")).collect();
+        println!("TOWER_RACE_FRICTIONS level={l} memory_classes:modes {}", listed.join(" "));
+    }
+    for (l, b) in tower.participation_bridge().unwrap_or_default().iter().enumerate() {
+        let rms = (b.bridge_squares.saturating_mul(1_000_000) / b.contact_squares.max(1)).isqrt();
+        println!("TOWER_RACE_BRIDGE level={l} rms_thousandths_of_contacts={rms} bridge_largest={} contacts_largest={} entries={}", b.bridge_largest, b.contact_largest, b.entries);
+    }
+    // The participation at each prompt's opening.
+    if tower.participation().is_some() {
+        participation_read(tower, &prompts, end, out)?;
+    }
+    // Each head's entropy and covector share over the held-out opening.
+    let parts: Vec<&[usize]> = (0..streams).map(|p| &dev[p * (dev.len() / streams)..p * (dev.len() / streams) + section + 1]).collect();
+    if let Some(declared) = tower.participation() {
+        let heads = declared.heads.len();
+        let entropies: Vec<Vec<(i128, usize)>> = parts
+            .par_iter()
+            .map(|part| -> std::result::Result<Vec<(i128, usize)>, String> {
+                let mut state = tower.rest();
+                let mut summed = vec![(0i128, 0usize); tower.declaration.levels * heads];
+                for &u in &part[..section] {
+                    let levels = tower.participation_at(&mut state, u).map_err(|e| e.to_string())?.unwrap_or_default();
+                    for (l, level) in levels.iter().enumerate() {
+                        for (h, head) in level.iter().enumerate() {
+                            let slot = &mut summed[l * heads + h];
+                            slot.0 += head.entropy();
+                            slot.1 += 1;
+                        }
+                    }
+                }
+                Ok(summed)
+            })
+            .collect::<std::result::Result<_, String>>()?;
+        let opening: Vec<_> = parts.iter().map(|_| tower.rest()).collect();
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|c| c[1..].iter().map(|&u| Some(u)).collect()).collect();
+        let mut host = HostPass::default();
+        host.forward(tower, &opening, &parts, &targets, Slot::Opened).map_err(|e| e.to_string())?;
+        let g = host.reverse(tower, &opening, &parts, None).map_err(|e| e.to_string())?;
+        for (l, level) in tower.participation_shares(&g).map_err(|e| e.to_string())?.iter().enumerate() {
+            let rows: Vec<String> = level
+                .iter()
+                .enumerate()
+                .map(|(h, share)| {
+                    let (sum, sites) = entropies.iter().fold((0i128, 0usize), |a, e| (a.0 + e[l * heads + h].0, a.1 + e[l * heads + h].1));
+                    let entropy = if sites == 0 { "-".to_string() } else { millibits(sum / sites as i128).to_string() };
+                    let score = share.score_thousandths().map_or("-".to_string(), |v| v.to_string());
+                    format!("{h}:{}:{entropy}:{sites}:{score}", share.modes)
+                })
+                .collect();
+            println!("TOWER_RACE_SHARE level={l} head:modes:entropy_millibits:sites:score_thousandths {}", rows.join(" "));
+        }
+    }
+    // The flux each prompt drives into what follows it.
+    let follows: Vec<Option<&[usize]>> = prompts
+        .iter()
+        .map(|prompt| {
+            let at = dev.windows(prompt.len()).position(|w| w == *prompt)? + prompt.len();
+            let rest = &dev[at..];
+            let close = rest.iter().position(|&c| c == end)?;
+            Some(&rest[..=close])
+        })
+        .collect();
+    let pairs: Vec<(usize, usize)> = (0..prompts.len()).flat_map(|a| (0..prompts.len()).map(move |q| (a, q))).filter(|&(a, _)| follows[a].is_some()).collect();
+    let codes: Vec<((usize, usize), i64)> = pairs
+        .par_iter()
+        .map(|&(a, q)| -> std::result::Result<((usize, usize), i64), String> {
+            let entered: Vec<usize> = std::iter::once(end).chain(prompts[q].iter().copied()).collect();
+            let mut state = tower.rest();
+            tower.read_cells(&mut state, &entered).map_err(|e| e.to_string())?;
+            let after: Vec<usize> = std::iter::once(end).chain(follows[a].unwrap_or_default().iter().copied()).collect();
+            Ok(((a, q), tower.read(&mut state, &after).map_err(|e| e.to_string())?))
+        })
+        .collect::<std::result::Result<_, String>>()?;
+    let code = |a: usize, q: usize| codes.iter().find(|(k, _)| *k == (a, q)).map(|&(_, c)| c);
+    for (a, follow) in follows.iter().enumerate() {
+        let Some(follow) = follow else {
+            println!("TOWER_RACE_FLUX prompt={a} follows=absent");
+            continue;
+        };
+        let own = code(a, a).unwrap_or(0);
+        let others: Vec<String> = (0..prompts.len()).filter(|&q| q != a).filter_map(|q| code(a, q).map(|c| format!("{q}:{}", signed_bits(c - own)))).collect();
+        println!("TOWER_RACE_FLUX prompt={a} follows_classes={} own_bits={} flux_bits_after_prompt {}", follow.len(), signed_bits(own), others.join(" "));
+    }
+    println!("TOWER_RACE_DONE prompts={} streams={streams} section={section} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// The friction octave's memory: an octave `o` of `1 − |λ|` on `2^(−30)` matches about `2^(30 − o)`
+/// classes.
+const MOVE_OCTAVE: i128 = 30;
 
 #[cfg(test)]
 mod tests {
@@ -472,5 +636,47 @@ mod tests {
         let passage = [1, 2, e, 3, e, 4, e, 5, 6, e];
         let want = [false, false, false, true, true, false, false, true, true, true];
         assert_eq!(target_places(&passage, e), want);
+    }
+
+    /// A code's bits keep their sign to the thousandth.
+    #[test]
+    fn a_signed_code_reads_in_bits() {
+        assert_eq!(signed_bits(3 << READ_BITS), "3.000");
+        assert_eq!(signed_bits(-(1 << (READ_BITS - 1))), "-0.500");
+        assert_eq!(signed_bits(0), "0.000");
+    }
+
+    /// The race's readings run on a tiny participating learner: the prompts' openings write each
+    /// head's entropy, the flux is read for each distinct prompt found in the held-out passage, and
+    /// the reading is written create-new.
+    #[test]
+    fn the_race_readings_run_on_a_rested_learner() {
+        use holonics::hnn::tower::{Tower, TowerDeclaration};
+        let dir = std::env::temp_dir().join(format!("holonics-tower-race-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let classes = |v: &[usize]| -> Vec<u8> { v.iter().flat_map(|&c| (c as u16).to_be_bytes()).collect() };
+        let key: Vec<u8> = (0..4096u32).flat_map(|i| (i.wrapping_mul(2654435761) ^ i.wrapping_mul(i)).to_be_bytes()).collect();
+        let declaration = TowerDeclaration { alphabet: 5, width: 4, modes: 4, contacts: 4, levels: 2, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let mut tower = Tower::found(declaration, &key).expect("founded");
+        let heads = tower.founded_participation(8).expect("declared");
+        tower.join_participation(heads).expect("joined");
+        let (state, state_sha) = put("STATE", TowerLearner::new(tower, 6).to_text().as_bytes());
+        let mut dev: Vec<usize> = vec![1, 2, 4, 3, 3, 1, 4, 3, 0, 4, 2, 2, 1, 4];
+        dev.extend((0..30).map(|i| (i * i + i / 3) % 4));
+        let (dev, dev_sha) = put("DEV", &classes(&dev));
+        let (prompts, prompts_sha) = put("PROMPTS", &classes(&[1, 2, 4, 1, 2, 4, 3, 0, 4, 3, 0, 4, 0, 0, 0, 4]));
+        let args = ["read-tower-race", &state, &state_sha, &dev, &dev_sha, &prompts, &prompts_sha, "2", "6", &at("READ")].map(String::from);
+        read_race(&args).expect("read");
+        let rows = std::fs::read_to_string(dir.join("READ/PARTICIPATION.tsv")).expect("participation");
+        assert!(rows.starts_with(PARTICIPATION_HEAD));
+        assert!(rows.lines().skip(1).all(|r| r.split('\t').nth(5).is_some_and(|e| e.parse::<i128>().is_ok_and(|v| v >= 0))), "{rows}");
+        assert!(read_race(&args).is_err(), "a reading is written create-new");
+        std::fs::remove_dir_all(&dir).expect("removed");
     }
 }

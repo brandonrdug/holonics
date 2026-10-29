@@ -225,6 +225,7 @@ pub mod body;
 pub mod duplex;
 pub mod growth;
 pub mod participation;
+pub mod reading;
 pub mod realization;
 
 use participation::{advance_frame, participate, participation_return, rotate_back, Head, LevelSites, Participation, ParticipationDeclaration, Phasor, Probe, Site};
@@ -4746,14 +4747,7 @@ impl Tower {
     /// `1 − ρ = 2^(−s)` (`wave.matched-friction-reach`). The octave read is the nearest one,
     /// `⌊log₂(3(1 − |λ|)/2)⌋`, so a rung's rounding on either side keeps it.
     pub fn founded_participation(&self, section: usize) -> Result<ParticipationDeclaration> {
-        let lv = self.layout.levels[0];
-        let octaves: Vec<i128> = (0..self.declaration.modes)
-            .map(|k| {
-                let distance = ((1i128 << MOVE_BITS) - modulus_and_gamma(self.theta[lv.move_re + k] as i128, self.theta[lv.move_im + k] as i128).0).max(1);
-                (distance + distance / 2).ilog2() as i128
-            })
-            .collect();
-        ParticipationDeclaration::founded(&octaves, section)
+        ParticipationDeclaration::founded(&self.mode_octaves()[0], section)
     }
 
     /// The rotor, when one is joined.

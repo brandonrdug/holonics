@@ -167,3 +167,23 @@ the bits and the reach, the measurement reads each head's participation entropy 
 answers' openings and the share of each head's covector reaching its score charts (probe, key,
 friction) against its value chart, for the clocked and unclocked races.
 
+[source-inspected; tested on tiny towers] **Built as one reading of a lap's rested learner**,
+`read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA STREAMS SECTION OUT` (host; its
+codes are the card's by the parity), with the readings the radix record §§3–4 asks of the race:
+- each head's entropy `−Σ a log₂ a` (`Participation::entropy`, on `2^(−20)` bits) at each prompt's
+  opening, now also a column of every `PARTICIPATION.tsv` the release and the body write;
+- over the held-out passage's opening, each head's mean entropy over its sites and the share of its
+  chart covector reaching probe and key against value (`Tower::participation_shares`);
+- each level's modes counted by friction octave, written as the memory each octave matches
+  (`Tower::mode_octaves`, the octave the heads are founded on);
+- the bridge `W₁ᵃ`'s size against the contacts' at each level (`Tower::participation_bridge`): it
+  opens at zero, so its size is whether participation has founded its conduction there;
+- the flux `I = L(what follows a prompt | another prompt) − L(it | its own prompt)` in bits for each
+  of the race's prompts, the continuation being the classes after the prompt's first place in the
+  held-out passage up to the next end letter (atlas `culture.question-answer-information`; the
+  prompts are a first span, so their continuation is the next span of the same source, and the flux
+  is what four kilobytes of context save on the next four).
+
+Brandon asked on October 29 that a new design race for one hour first, read near 15, 30, 45 and 60
+minutes, and run longer only when it is plainly improving; the two clocked races are declared so.
+
