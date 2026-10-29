@@ -424,9 +424,10 @@ Each join names its owner; "checked" marks an identity verified exactly before w
   - [formal-checked] the arrow that survives at stationarity lives on cycles: an open chain is
     reversible and has no stationary arrow, and a ring's production is its one current times its
     cycle affinity (`heat.chain-no-arrow`, `heat.ring-current-affinity`);
-  - [proved-standard] a linear diffusion is reversible exactly when its drift has no turn relative to
-    its stationary metric (the housekeeping and excess split; Hatano and Sasa, 2001; Kwon, Ao and
-    Thouless, 2005): stationary production is a circulation.
+  - [proved-standard; formal-checked] a linear diffusion is reversible exactly when its drift has no
+    turn relative to its stationary metric (the housekeeping and excess split; Hatano and Sasa, 2001;
+    Kwon, Ao and Thouless, 2005): stationary production is a circulation
+    (`heat.linear-diffusion-turn-boost`).
 
 ### 5.5 Transcendentals as constraints
 

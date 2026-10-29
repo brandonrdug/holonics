@@ -519,7 +519,10 @@ numeral, would join them ([record](../research/records/2026-09-25_THE_MUSIC_IS_I
   `i∂_t F = ∇ × F` for `F = E + iB`, a turn, and a current's `J·E` is the push. For a linear field the
   turn and boost are Helmholtz–Hodge (coexact and exact), and vortex stretching is strain boosting
   vorticity. Relaxation lowers the divergence to the stationary face (a boost), and the arrow that
-  survives at stationarity lives on cycles (`heat.chain-no-arrow`, `heat.ring-current-affinity`).
+  survives at stationarity lives on cycles (`heat.chain-no-arrow`, `heat.ring-current-affinity`). For
+  a linear diffusion it is the turn against the stationary metric, which the stationary law leaves
+  free: the diffusion is reversible exactly when that turn vanishes
+  (`heat.linear-diffusion-turn-boost`).
 - **Einstein.** Free fall is the geodesic; two boosts leave a turn (`Physics/Spacetime/Wigner`); tidal
   curvature and frame dragging are the Weyl tensor's strain and rotation parts.
 - **The quantum.** Unitary evolution is a turn and imaginary time a boost
