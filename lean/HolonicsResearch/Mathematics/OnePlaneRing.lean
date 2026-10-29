@@ -36,10 +36,12 @@ base. This file proves it.
    exactly when `m` divides `9`, `11` or `10`.
 
 Not proved here: the record's routes through the barycentre's finite group of turns and through
-eigenvalues of a real turn are replaced by the colours above; the bank of uncoupled planes and the
-rotor's plane bound (§7(b), (c)) are separate #410 boxes.
+eigenvalues of a real turn are replaced by the colours above; the bank of uncoupled planes (§7(b))
+is a separate #410 box, and the rotor's plane count (§7(c)) is `Mathematics/RotorPlanes`.
 
-Consumers: the atlas row `radix.one-plane-coprime-rings`.
+Consumers: the atlas row `radix.one-plane-coprime-rings`, and `Mathematics/RotorPlanes`, which reads
+real points in any dimension through `dft_comp_add`, `dft_const` and `period` (stated for values in
+any complex vector space).
 -/
 
 open Complex ZMod Finset
@@ -182,15 +184,15 @@ section Plane
 variable {m : ℕ} [NeZero m]
 
 /-- [proved-standard; formal-checked] A translation turns every colour:
-`𝓕(Φ(· + t))(k) = ψ(t k) 𝓕Φ(k)`. -/
-theorem dft_comp_add (Φ : ZMod m → ℂ) (t k : ZMod m) :
-    𝓕 (fun x => Φ (x + t)) k = stdAddChar (t * k) * 𝓕 Φ k := by
-  simp only [dft_apply, smul_eq_mul, Finset.mul_sum]
-  have := Equiv.sum_comp (Equiv.addRight t) (fun i => stdAddChar (-((i - t) * k)) * Φ i)
+`𝓕(Φ(· + t))(k) = ψ(t k) 𝓕Φ(k)`, for values in any complex vector space. -/
+theorem dft_comp_add {E : Type*} [AddCommGroup E] [Module ℂ E] (Φ : ZMod m → E) (t k : ZMod m) :
+    𝓕 (fun x => Φ (x + t)) k = stdAddChar (t * k) • 𝓕 Φ k := by
+  simp only [dft_apply, Finset.smul_sum, smul_smul]
+  have := Equiv.sum_comp (Equiv.addRight t) (fun i => stdAddChar (-((i - t) * k)) • Φ i)
   simp only [Equiv.coe_addRight, add_sub_cancel_right] at this
   rw [this]
   refine Finset.sum_congr rfl fun j _ => ?_
-  rw [← mul_assoc, ← AddChar.map_add_eq_mul]
+  rw [← AddChar.map_add_eq_mul]
   congr 2
   ring
 
@@ -204,9 +206,9 @@ theorem dft_conj (Φ : ZMod m → ℂ) (k : ZMod m) :
   ring
 
 /-- [proved-standard; formal-checked] A constant has no colour off frequency `0`. -/
-theorem dft_const (γ : ℂ) {k : ZMod m} (hk : k ≠ 0) :
+theorem dft_const {E : Type*} [AddCommGroup E] [Module ℂ E] (γ : E) {k : ZMod m} (hk : k ≠ 0) :
     𝓕 (fun _ : ZMod m => γ) k = 0 := by
-  simp only [dft_apply, smul_eq_mul, ← Finset.sum_mul]
+  simp only [dft_apply, ← Finset.sum_smul]
   have h := AddChar.sum_mulShift (-k) (isPrimitive_stdAddChar m)
   simp only [neg_eq_zero, hk, if_false] at h
   rw [show (∑ x : ZMod m, stdAddChar (-(x * k))) = ∑ x : ZMod m, stdAddChar (x * -k) by
@@ -228,7 +230,7 @@ theorem dft_digit (p : ZMod m → ℂ) (b : (ZMod m)ˣ) (α β γ : ℂ) (e : ZM
   have h1 : 𝓕 (fun x => p ((b : ZMod m) * x + e)) k =
       stdAddChar (e * (b⁻¹.val * k)) * 𝓕 p (b⁻¹.val * k) := by
     have := dft_comp_unitMul (fun y => p (y + e)) b k
-    rw [this, dft_comp_add]
+    rw [this, dft_comp_add, smul_eq_mul]
   have h2 : 𝓕 (fun x => p ((b : ZMod m) * x + e)) k = α * 𝓕 p k + β * conj (𝓕 p (-k)) := by
     have e1 : (fun x => p ((b : ZMod m) * x + e)) =
         α • p + β • (fun x => conj (p x)) + (fun _ => γ) := by
@@ -280,15 +282,15 @@ theorem no_three_modes (f : Module.End ℂ (Fin 2 → ℂ)) (μ : Fin 3 → ℂ)
   simp at this
 
 /-- [proved-standard; formal-checked] If every colour present is annihilated by `t`, the points
-repeat with period `t`. -/
-theorem period (p : ZMod m → ℂ) (t : ZMod m) (h : ∀ k, 𝓕 p k ≠ 0 → k * t = 0) (x : ZMod m) :
-    p (x + t) = p x := by
+repeat with period `t` (values in any complex vector space). -/
+theorem period {E : Type*} [AddCommGroup E] [Module ℂ E] (p : ZMod m → E) (t : ZMod m)
+    (h : ∀ k, 𝓕 p k ≠ 0 → k * t = 0) (x : ZMod m) : p (x + t) = p x := by
   have : 𝓕 (fun x => p (x + t)) = 𝓕 p := by
     funext k
     rw [dft_comp_add]
     by_cases hk : 𝓕 p k = 0
-    · rw [hk, mul_zero]
-    · rw [mul_comm t k, h k hk, AddChar.map_zero_eq_one, one_mul]
+    · rw [hk, smul_zero]
+    · rw [mul_comm t k, h k hk, AddChar.map_zero_eq_one, one_smul]
   exact congrFun (dft.injective this) x
 
 /-- [proved-derived; formal-checked] **The modes of a one-plane ring.** If `m ≥ 3` distinct points
