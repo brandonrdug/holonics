@@ -219,7 +219,7 @@ Re-locking after such a negation, with no side information, erases the tie: at l
 on an odd ring and `k_B T ln n` on a simplex (Landauer). This makes Brandon's diffusion entrance
 exact: the odd vertex's antipode is a tie cell, a place where the coarse grain's state diffuses either
 way and where a reset pays. Polarity `±1` is the one negation that is a permutation on a simplex
-lock, which is why the sign is "only one side of the polarization": it is the binary lock's
+lock, which is why a sign means nothing beyond the side of a polarization: it is the binary lock's
 reversible half-turn. Carrying the orientation (the packet's `T`, the ring's winding) is the side
 information that keeps a negation reversible on an odd ring; collapsing to the face erases it.
 
