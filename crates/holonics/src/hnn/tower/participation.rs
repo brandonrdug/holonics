@@ -42,7 +42,7 @@
 //! covectors, and `Tower::reverse_joined` turns them into each move's turn and met covector (record
 //! §6). **Not claimed:** the pump's reflection share (record §8).
 use super::{div_nearest, fit64, refuse, release, Result, FACE_BITS, MOVE_BITS, UNIT_BITS};
-use crate::hnn::keyed_modes::{ln2_face, Exponential};
+use crate::hnn::keyed_modes::{ln2_face, log2_face, Exponential};
 
 /// A complex numerator pair on a declared grain.
 pub type Phasor = (i64, i64);
@@ -193,6 +193,31 @@ pub struct Participation {
     pub weights: Vec<u128>,
     pub mass: u128,
     pub released: usize,
+}
+
+/// The binary digits of [`Participation::entropy`]'s grain.
+pub const ENTROPY_BITS: u32 = 20;
+
+impl Participation {
+    /// [agent-inferred, October 29] **The participation's entropy**, `H = −Σ_j a_ij log₂ a_ij`
+    /// with `a_ij = e_ij / m_i`, on `2^(−ENTROPY_BITS)` bits: zero when one site carries the whole
+    /// mass and `log₂ k` when `k` sites carry it evenly, read as `log₂ m − Σ_j e_ij log₂ e_ij / m`
+    /// (the weights' grain cancels between the two terms). A reading beside the bits (record
+    /// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…` §5): the return's `g_z` vanishes as
+    /// `H → 0`, so a head near zero learns what to carry and almost never where to look. Each
+    /// logarithm is [`log2_face`]'s, below `log₂` by less than a grain; a weight wider than
+    /// `2^62` enters through its leading bits.
+    pub fn entropy(&self) -> i128 {
+        let lg = |x: u128| -> i128 {
+            let shift = (128 - x.leading_zeros()).saturating_sub(UNIT_BITS);
+            log2_face((x >> shift).max(1), ENTROPY_BITS) + ((shift as i128) << ENTROPY_BITS)
+        };
+        if self.mass == 0 {
+            return 0;
+        }
+        let carried: i128 = self.weights.iter().filter(|&&e| e > 0).map(|&e| e as i128 * lg(e)).sum();
+        lg(self.mass) - div_nearest(carried, self.mass as i128)
+    }
 }
 
 /// The covectors the participation returns, on `2^(−24)`.

@@ -1,6 +1,6 @@
 # A coarse level's sites are its own ticks, carried across sections, so its heads reach across the passage's partition
 
-Refs #404 #406. Status: [built on the host and tested (§5); the card ported, its parity on the 4080 owed; agent-inferred, October 29].
+Refs #404 #406. Status: [built on the host and the card and tested, parity at the race's declaration on the 4080 (§5); the measurement (acceptance 7) running; agent-inferred, October 29].
 Claude (opus), design lead. The first of the October 28 expansions in the order fixed by
 [the audit](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#4-the-order-now):
 the consumer of [the radix record §1](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#1-a-value-is-a-radix-move-and-the-towers-modes-are-registers-in-their-own-radices)
@@ -138,7 +138,7 @@ Tests (`hnn::tower`, 116 of 116 with these):
 - `a_clocked_states_text_restores_each_levels_sites_and_held_current` and the growth test on the
   clocked participating tower (acceptance 5).
 
-[source-inspected; owed on the 4080] **The card** (`kernels/tower.cu`, `TowerCard`): the forward
+[source-inspected; measured on the 4080] **The card** (`kernels/tower.cu`, `TowerCard`): the forward
 keeps each level's carried count and members in the block (`pa_open` `[S][L]`, `pa_member`),
 admits a site only at a tick, turns the frame `Δτ` times, reads the held current (`pa_hold`) at a
 cell the level is still at, and closes each level's section within a call; the ends return each
@@ -153,10 +153,37 @@ covector over carried sites the host's). `tower_pass parity … NEWS_BITS NEWS_R
 runs the race's declaration; `train-two-ladder-news-participating-tower-classes` is the race's
 command.
 
+**Acceptance 6 on the 4080.** On the RTX 4080 SUPER at `16689828d` (B-PC, under the card lock),
+the kernel compiled on the first build; `tower_pass` passed 39 of 39 in 23.9 s, the five tests
+above among them. `tower_pass parity … 8 2 participating` at the race's declaration: 32 sections at
+24 streams, 98,304 faces and 21,076,000 covector entries equal and every learner equal (host
+52,717 ms, card 12,242 ms); 4 sections at 320 streams, 163,840 faces and 2,634,500 entries equal
+(host 71,890 ms, card 12,219 ms; peak resident set 5.66 GB).
+
 **A reading beside acceptance 7** [agent-inferred, from the unified-theory thread]: in
 `participation_return`, `g_z = ln 2 · a ⊙ (g_a − ⟨a, g_a⟩)` vanishes on a head whose weights sit on
 one site, so such a head's probe, key and friction charts learn nothing about where to look. Beside
 the bits and the reach, the measurement reads each head's participation entropy in bits at the
 answers' openings and the share of each head's covector reaching its score charts (probe, key,
 friction) against its value chart, for the clocked and unclocked races.
+
+[source-inspected; tested on tiny towers] **Built as one reading of a lap's rested learner**,
+`read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA STREAMS SECTION OUT` (host; its
+codes are the card's by the parity), with the readings the radix record §§3–4 asks of the race:
+- each head's entropy `−Σ a log₂ a` (`Participation::entropy`, on `2^(−20)` bits) at each prompt's
+  opening, now also a column of every `PARTICIPATION.tsv` the release and the body write;
+- over the held-out passage's opening, each head's mean entropy over its sites and the share of its
+  chart covector reaching probe and key against value (`Tower::participation_shares`);
+- each level's modes counted by friction octave, written as the memory each octave matches
+  (`Tower::mode_octaves`, the octave the heads are founded on);
+- the bridge `W₁ᵃ`'s size against the contacts' at each level (`Tower::participation_bridge`): it
+  opens at zero, so its size is whether participation has founded its conduction there;
+- the flux `I = L(what follows a prompt | another prompt) − L(it | its own prompt)` in bits for each
+  of the race's prompts, the continuation being the classes after the prompt's first place in the
+  held-out passage up to the next end letter (atlas `culture.question-answer-information`; the
+  prompts are a first span, so their continuation is the next span of the same source, and the flux
+  is what four kilobytes of context save on the next four).
+
+Brandon asked on October 29 that a new design race for one hour first, read near 15, 30, 45 and 60
+minutes, and run longer only when it is plainly improving; the two clocked races are declared so.
 

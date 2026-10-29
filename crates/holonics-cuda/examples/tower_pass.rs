@@ -28,6 +28,8 @@
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
 //! - `tower_pass release complete-language release-tower-classes ARGS…`: the class release with
 //!   every prompt's read and every drawn class's step on the card, the prompts drawing together.
+//! - `tower_pass read complete-language read-tower-race ARGS…`: the race's readings of a rested
+//!   learner, its covector and codes read on the card.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]
@@ -289,8 +291,8 @@ fn main() {
         Some("parity") => parity(&args[1..]),
         Some("parity-state") => parity_state(&args[1..]),
         Some("parity-units") => parity_units(&args[1..]),
-        Some("train") | Some("release") => train(&args[1..]),
-        _ => Err("tower_pass parity …|parity-state …|parity-units …|train complete-language …|release complete-language …".into()),
+        Some("train") | Some("release") | Some("read") => train(&args[1..]),
+        _ => Err("tower_pass parity …|parity-state …|parity-units …|train complete-language …|release complete-language …|read complete-language …".into()),
     };
     if let Err(error) = result {
         eprintln!("tower_pass: {error}");
