@@ -281,6 +281,11 @@ struct TowerFrame {
     wide *pa_gfric;
     uint64_t *r_pa_read, *r_pa_yre, *r_pa_yim, *r_pa_dra;
     uint64_t *r_pa_g;
+    // The sites a stream carries open into the call ([S]), each at its place in the section
+    // ([S][section][L][N][2] keys and currents, [S][section][L][H] dissipations), uploaded at the
+    // opening with the stream's running frame and met dissipation (`pa_run`, `pa_met`).
+    const uint32_t *pa_open;
+    const int64_t *pa_open_key, *pa_open_value, *pa_open_diss;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -1261,12 +1266,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     pcs[o] = fit64(rel(dot(tt + lv.pa[fam] + k, N, W, x, nar), MATERIAL_BITS), &st);
                 }
                 __syncthreads();
+                // The cell's place in its section: after the sites the stream carried open into
+                // the call, so a section read across calls runs on as one (a release's).
+                const uint32_t n0 = fr.pa_open[s], place = n0 + t;
                 for (uint32_t k = tid; k < N; k += B) {
                     int64_t *run = fr.pa_run + (((uint64_t)s * L + l) * N + k) * 2;
                     int64_t *met = fr.pa_met + ((uint64_t)s * L + l) * N + k;
-                    const wide fre_ = t == 0 ? ((wide)1 << MOVE_BITS) : (wide)run[0];
-                    const wide fim_ = t == 0 ? 0 : (wide)run[1];
-                    const int64_t mt = (t == 0 ? 0 : *met) - pl[k];
+                    const wide fre_ = place == 0 ? ((wide)1 << MOVE_BITS) : (wide)run[0];
+                    const wide fim_ = place == 0 ? 0 : (wide)run[1];
+                    const int64_t mt = (place == 0 ? 0 : *met) - pl[k];
                     const wide ur = pu[2 * k], ui = pu[2 * k + 1];
                     const int64_t nr = fit64(rel(fre_ * ur - fim_ * ui, MOVE_BITS), &st);
                     const int64_t ni = fit64(rel(fre_ * ui + fim_ * ur, MOVE_BITS), &st);
@@ -1303,40 +1311,47 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     fr.pa_diss[q * HH + hh] = dis;
                 }
                 __syncthreads();
-                const uint64_t site0 = (uint64_t)s * T;
+                // Site j of the section: carried open into the call (j < n0) at its place, else
+                // read at this call's cell j − n0; the faces and weights take the stream's row of
+                // the section.
+                const uint64_t site0 = (uint64_t)s * T, row = (uint64_t)s * law.pa_section;
                 for (uint32_t hh = 0; hh < HH; hh++) {
                     const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
                     const wide friction = th[lv.pa[9] + hh];
                     int64_t zm = INT64_MIN;
-                    for (uint32_t j = tid; j <= t; j += B) {
-                        const uint64_t qj = (site0 + j) * L + l;
+                    for (uint32_t j = tid; j <= place; j += B) {
+                        const bool carried = j < n0;
+                        const uint64_t qj = (carried ? row + j : site0 + j - n0) * L + l;
+                        const int64_t *keys = carried ? fr.pa_open_key : fr.pa_key;
                         wide pairing = 0;
                         for (uint32_t k = from; k < to; k++) {
-                            const int64_t *kj = fr.pa_key + (qj * N + k) * 2;
+                            const int64_t *kj = keys + (qj * N + k) * 2;
                             pairing += (wide)ppr[2 * k] * kj[0] + (wide)ppr[2 * k + 1] * kj[1];
                         }
-                        const wide met = (wide)pdis[hh] - (wide)fr.pa_diss[qj * HH + hh];
+                        const wide met = (wide)pdis[hh] - (wide)(carried ? fr.pa_open_diss : fr.pa_diss)[qj * HH + hh];
                         const int64_t z = fit64(rel(pairing, FACE_BITS + law.pa_beta) - rel(friction * met, FACE_BITS), &st);
-                        fr.pa_z[site0 + j] = z;
+                        fr.pa_z[row + j] = z;
                         zm = z > zm ? z : zm;
                     }
                     const int64_t peak = block_max_signed(zm, red);
                     uwide msum = 0;
-                    for (uint32_t j = tid; j <= t; j += B) {
-                        const int64_t z = fr.pa_z[site0 + j];
+                    for (uint32_t j = tid; j <= place; j += B) {
+                        const int64_t z = fr.pa_z[row + j];
                         const uint64_t e = (wide)peak - (wide)z >= ((wide)UNIT_BITS << FACE_BITS) ? 0 : below_one((wide)z - (wide)peak, face_roots, law.face_digits);
-                        fr.pa_e[site0 + j] = e;
+                        fr.pa_e[row + j] = e;
                         msum += e;
                     }
                     const uwide mass = block_sum(msum, redw);
                     __syncthreads();
                     for (uint32_t k = from + tid; k < to; k += B) {
                         wide jr = 0, ji = 0;
-                        for (uint32_t j = 0; j <= t; j++) {
-                            const uint64_t qj = (site0 + j) * L + l;
-                            const wide e = (wide)fr.pa_e[site0 + j];
-                            jr += e * fr.pa_value[(qj * N + k) * 2];
-                            ji += e * fr.pa_value[(qj * N + k) * 2 + 1];
+                        for (uint32_t j = 0; j <= place; j++) {
+                            const bool carried = j < n0;
+                            const uint64_t qj = (carried ? row + j : site0 + j - n0) * L + l;
+                            const int64_t *values = carried ? fr.pa_open_value : fr.pa_value;
+                            const wide e = (wide)fr.pa_e[row + j];
+                            jr += e * values[(qj * N + k) * 2];
+                            ji += e * values[(qj * N + k) * 2 + 1];
                         }
                         const wide mr = fit64(div_nearest(jr, (wide)mass), &st), mi = fit64(div_nearest(ji, (wide)mass), &st);
                         const wide ur = pfr[2 * k], ui = pfr[2 * k + 1];

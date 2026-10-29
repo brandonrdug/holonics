@@ -4429,6 +4429,24 @@ impl Tower {
         self.participation.as_ref()
     }
 
+    /// [agent-inferred, October 29] **The participation founded on this tower over `section`
+    /// sites**: one head a run of first-level modes whose memory `1/(1 − |λ|)` sits at one octave
+    /// ([`ParticipationDeclaration::founded`]). The octave and not the modulus, because a founded
+    /// move's modulus carries its turn's rounding (a few units on `2^(−30)`), so the modes of one
+    /// rung differ in their last bits, while the ladder's rungs are octaves of friction
+    /// `1 − ρ = 2^(−s)` (`wave.matched-friction-reach`). The octave read is the nearest one,
+    /// `⌊log₂(3(1 − |λ|)/2)⌋`, so a rung's rounding on either side keeps it.
+    pub fn founded_participation(&self, section: usize) -> Result<ParticipationDeclaration> {
+        let lv = self.layout.levels[0];
+        let octaves: Vec<i128> = (0..self.declaration.modes)
+            .map(|k| {
+                let distance = ((1i128 << MOVE_BITS) - modulus_and_gamma(self.theta[lv.move_re + k] as i128, self.theta[lv.move_im + k] as i128).0).max(1);
+                (distance + distance / 2).ilog2() as i128
+            })
+            .collect();
+        ParticipationDeclaration::founded(&octaves, section)
+    }
+
     /// The rotor, when one is joined.
     pub fn rotor(&self) -> Option<&Rotor> {
         self.rotor.as_ref()
@@ -7527,9 +7545,7 @@ mod tests {
     /// heads the founded memory's runs; `opened` fills `W₁ᵃ` so the current conducts.
     fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
         let mut tower = tiny_contacts(2, 4, 4, true, false, false, contact);
-        let lv = tower.layout.levels[0];
-        let moduli: Vec<i128> = (0..4).map(|k| modulus_and_gamma(tower.theta[lv.move_re + k] as i128, tower.theta[lv.move_im + k] as i128).0).collect();
-        let founded = ParticipationDeclaration::founded(&moduli, 16).expect("declared");
+        let founded = tower.founded_participation(16).expect("declared");
         let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { founded };
         tower.join_participation(heads).expect("joined");
         if opened {
@@ -7548,6 +7564,22 @@ mod tests {
             }
         }
         tower
+    }
+
+    /// The race's bank founds one head a rung: 128 modes on both turn ladders are two halves of
+    /// eight rungs of eight turns, so sixteen heads of eight. The founded moduli alone split a rung
+    /// wherever a turn's rounding moved its last bits (90 heads at this founding).
+    #[test]
+    fn the_founded_heads_are_the_first_levels_rungs() {
+        let declaration = TowerDeclaration { alphabet: 257, width: 8, modes: 128, contacts: 8, levels: 2, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let tower = Tower::found_on(declaration, &keys(1 << 16), TurnLadder::Both).expect("founded");
+        let founded = tower.founded_participation(128).expect("declared");
+        assert_eq!(founded.heads, vec![8; 16]);
+        assert_eq!(founded.section, 128);
+        let lv = tower.layout.levels[0];
+        let moduli: Vec<i128> = (0..128).map(|k| modulus_and_gamma(tower.theta[lv.move_re + k] as i128, tower.theta[lv.move_im + k] as i128).0).collect();
+        let by_modulus = ParticipationDeclaration::founded(&moduli, 128).expect("declared");
+        assert!(by_modulus.heads.len() > founded.heads.len(), "the rounding split no rung");
     }
 
     fn participation_families(tower: &Tower) -> Vec<usize> {

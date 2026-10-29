@@ -232,9 +232,20 @@ return `W₁ᵃ` and the current's read (`tower_reverse_contacts`), one block a 
 face into the probe, keys, currents and friction (`tower_reverse_participation`), the input takes the
 six charts' covectors (`tower_reverse_dx`), the outer sums take the charts', `W₁ᵃ`'s and `Cᵃ`'s, and
 `tower_pa_friction` sums the heads' friction. The section closes with its last site, which releases
-the sites and rests the frames, on the host and the card alike. Owed on the card: opening on an open
-section (a release carried across calls refuses there), and the parity at the race's own declaration.
-Nothing is measured (3).
+the sites and rests the frames, on the host and the card alike.
+
+**Status, October 29 (design thread, built, not yet run on the card).** The card reads on from a
+section carried open across calls, as a release does: each stream's open sites are uploaded at their
+places in the section with its running frame and met dissipation, the forward resumes from them, a
+read past the section's close and the reverse of a read that opened on carried sites are refused;
+`the_cards_participation_reads_an_open_section_on_across_calls_as_the_host_does` and
+`the_cards_participating_advance_is_the_hosts_class_by_class` are its acceptance. The race joins
+participation through `train-two-ladder-participating-tower-classes` (host and card) and
+`tower_pass parity … participating`, its heads founded by `Tower::founded_participation`: one head a
+run of first-level modes whose memory sits at one octave. Read off the exact moduli, the turn's
+rounding split the race bank's sixteen rungs of eight into 90 runs (`hnn::tower` test
+`the_founded_heads_are_the_first_levels_rungs`). Owed: those two card tests and the parity at the
+race's own declaration. Nothing is measured (3).
 
 **The device line.** The card under the lock for every learner run; the host realization only as the
 parity reference. The workload is the race's (its passage, keys, declaration and laps); time and

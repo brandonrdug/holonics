@@ -318,10 +318,10 @@ mod tests {
         );
     }
 
-    /// The tower's push is the Einstein relation (record `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…` §4;
-    /// Lean owed in #410): the midpoint step of the mode `A = iω − r` is the register
-    /// `λ = (1 + hA/2)/(1 − hA/2)` with push `g = h/(1 − hA/2)`, and `1 − |λ|² = (2r/h)|g|²`, so
-    /// `γ = √(1 − |λ|²)` (`hnn.moment-tower`) is a contact of strength `√(2r/h)`.
+    /// The tower's push is the Einstein relation (record `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…` §4):
+    /// the midpoint step of the mode `A = iω − r` is the register `λ = (1 + hA/2)/(1 − hA/2)` with
+    /// push `g = h/(1 − hA/2)`, and `1 − |λ|² = (2r/h)|g|²`, so `γ = √(1 − |λ|²)`
+    /// (`hnn.moment-tower`) is a contact of strength `√(2r/h)`.
     #[test]
     fn a_passive_mode_is_a_register_whose_push_is_its_friction() {
         let (omega, r, h) = (integer(2), integer(1), rat(1, 2));

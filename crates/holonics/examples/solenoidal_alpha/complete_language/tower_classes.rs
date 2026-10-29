@@ -55,7 +55,13 @@ fn classes_of(bytes: &[u8], alphabet: usize) -> Result<Vec<usize>> {
 /// `train-two-ladder-tower-classes` on both ladders, half the bank each ([`TurnLadder`]);
 /// `train-two-ladder-news-tower-classes` founds it so and joins the news clock `B = 8`, `r = 2`
 /// ([`NewsClock`]), so each level above the first ticks on its own news and the grain its modes
-/// move at is the tower's own (record `2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS…`).
+/// move at is the tower's own (record `2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS…`);
+/// `train-two-ladder-participating-tower-classes` founds it so and joins participation over the
+/// declared section, one head a rung of the first level
+/// ([`holonics::hnn::tower::Tower::founded_participation`]), so each
+/// site reads the section's earlier sites through the modes' own transport (record
+/// `2026-10-28_ATTENTION_IS_THE_FIELDS_PARTICIPATION_…`). A continued learner keeps the
+/// participation it was founded with.
 ///
 /// [agent-inferred, October 25] The credit is what lets a section's target teach its source when the
 /// pair is longer than the declared section: a stroke runs about 168 classes against sections of
@@ -69,8 +75,19 @@ pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, 
 /// (`hnn::tower::realization`): the card's route (`holonics-cuda`'s `tower_pass` example) runs the
 /// same passes on the card, and its saved learner is the host's.
 pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, credit, targets, turned, ladder, news, false, realization)
+}
+
+/// `train-two-ladder-participating-tower-classes`: [`train_realized`] on both turn ladders with
+/// participation joined after the founding.
+pub(crate) fn train_participating_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, None, true, realization)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, participating: bool, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
@@ -87,7 +104,7 @@ pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turne
         train_compared: None,
     };
     let reading = Reading { train_compared: targets.then(|| target_places(&reading.train, alphabet - 1)), ..reading };
-    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, news, None, realization)
+    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, news, participating, None, realization)
 }
 
 /// The news clock the clocked race joins: `B = 8` bits, the news of one octet read with no
