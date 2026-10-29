@@ -475,8 +475,8 @@ fn signed_bits(code: i64) -> String {
 }
 
 /// [agent-inferred, October 29] `read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA
-/// STREAMS SECTION OUT`: the race's readings of one lap's rested learner, on the host, beside the
-/// lap's bits and writings (records `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…` §5 and
+/// STREAMS SECTION OUT`: the race's readings of one lap's rested learner, beside the lap's bits and
+/// writings (records `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…` §5 and
 /// `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…` §§3–4). Each decides nothing, trains nothing and selects
 /// no lap.
 /// - `TOWER_RACE_FRICTIONS`: per level, how many modes sit at each friction octave, written as the
@@ -492,9 +492,17 @@ fn signed_bits(code: i64) -> String {
 /// - `TOWER_RACE_FLUX`: for each distinct prompt, the classes that follow its first place in `DEV`
 ///   to the next end letter, coded after its own prompt and after each other prompt;
 ///   `I = L(after another) − L(after its own)` in bits is the flux the prompt drives into what
-///   follows it (atlas `culture.question-answer-information`). The host's codes are the card's
-///   (the parity), so this is the race's own read.
+///   follows it (atlas `culture.question-answer-information`).
+///
+/// The covector and the codes are read through `realization` (the card's route, `tower_pass read
+/// complete-language read-tower-race …`, reads them on the card); the participation at the prompts'
+/// openings and over the held-out opening is read on the host, as the release reads it.
 pub(super) fn read_race(args: &[String]) -> Result<()> {
+    read_race_realized(args, &mut HostPass::default())
+}
+
+/// [`read_race`] with its covector and codes read through `realization`.
+pub(crate) fn read_race_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 10 {
         return Err("read-tower-race STATE STATE_SHA DEV DEV_SHA PROMPTS PROMPTS_SHA STREAMS SECTION OUT".into());
     }
@@ -516,6 +524,8 @@ pub(super) fn read_race(args: &[String]) -> Result<()> {
     if dev.len() < streams * (section + 1) {
         return Err("the held-out passage must hold one section a stream".into());
     }
+    realization.admit(tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
     std::fs::create_dir(out)?;
     // The frictions and the bridge, read off the material.
     for (l, octaves) in tower.mode_octaves().iter().enumerate() {
@@ -558,9 +568,8 @@ pub(super) fn read_race(args: &[String]) -> Result<()> {
             .collect::<std::result::Result<_, String>>()?;
         let opening: Vec<_> = parts.iter().map(|_| tower.rest()).collect();
         let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|c| c[1..].iter().map(|&u| Some(u)).collect()).collect();
-        let mut host = HostPass::default();
-        host.forward(tower, &opening, &parts, &targets, Slot::Opened).map_err(|e| e.to_string())?;
-        let g = host.reverse(tower, &opening, &parts, None).map_err(|e| e.to_string())?;
+        realization.forward(tower, &opening, &parts, &targets, Slot::Opened).map_err(|e| e.to_string())?;
+        let g = realization.reverse(tower, &opening, &parts, None).map_err(|e| e.to_string())?;
         for (l, level) in tower.participation_shares(&g).map_err(|e| e.to_string())?.iter().enumerate() {
             let rows: Vec<String> = level
                 .iter()
@@ -585,17 +594,19 @@ pub(super) fn read_race(args: &[String]) -> Result<()> {
             Some(&rest[..=close])
         })
         .collect();
-    let pairs: Vec<(usize, usize)> = (0..prompts.len()).flat_map(|a| (0..prompts.len()).map(move |q| (a, q))).filter(|&(a, _)| follows[a].is_some()).collect();
-    let codes: Vec<((usize, usize), i64)> = pairs
-        .par_iter()
-        .map(|&(a, q)| -> std::result::Result<((usize, usize), i64), String> {
-            let entered: Vec<usize> = std::iter::once(end).chain(prompts[q].iter().copied()).collect();
-            let mut state = tower.rest();
-            tower.read_cells(&mut state, &entered).map_err(|e| e.to_string())?;
-            let after: Vec<usize> = std::iter::once(end).chain(follows[a].unwrap_or_default().iter().copied()).collect();
-            Ok(((a, q), tower.read(&mut state, &after).map_err(|e| e.to_string())?))
-        })
-        .collect::<std::result::Result<_, String>>()?;
+    // Each continuation is entered after a prompt as the release enters the prompt (from rest
+    // through one end letter), its first class compared with the face the prompt's read returned.
+    let mut codes: Vec<((usize, usize), i64)> = Vec::new();
+    for (a, follow) in follows.iter().enumerate() {
+        let Some(follow) = follow else { continue };
+        for (q, prompt) in prompts.iter().enumerate() {
+            let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+            let mut states = vec![tower.rest()];
+            let (faces, _) = tower.advance_realized(&mut states, &[&entered], realization).map_err(|e| e.to_string())?;
+            let (_, read) = tower.advance_realized(&mut states, &[follow], realization).map_err(|e| e.to_string())?;
+            codes.push(((a, q), faces[0].code(follow[0]) + read[0]));
+        }
+    }
     let code = |a: usize, q: usize| codes.iter().find(|(k, _)| *k == (a, q)).map(|&(_, c)| c);
     for (a, follow) in follows.iter().enumerate() {
         let Some(follow) = follow else {
