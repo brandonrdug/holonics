@@ -409,7 +409,18 @@ To #410:
   Formal-checked the same day in [`Mathematics/OrbitEnergy`](../../lean/HolonicsResearch/Mathematics/OrbitEnergy.lean):
   `orbit_gap_product`, `cyclotomic_eval_one`, `orbit_gap_product_eq_exp_vonMangoldt` and
   `orbit_energies_multiply_to_ring`;
-- (k) the ring's spectrum factors over its Galois orbits, with `ψ_d(0) = Φ_d(1)`;
+- (k) the ring's spectrum factors over its Galois orbits, with `ψ_d(0) = Φ_d(1)`.
+  Formal-checked on October 29 in
+  [`Mathematics/RingSpectrum`](../../lean/HolonicsResearch/Mathematics/RingSpectrum.lean): the
+  colours diagonalize the cycle Laplacian (`dft_cycleLaplacian`, `charpoly_cycleLaplacian`), the
+  characteristic polynomial is `x (x − 4)^[2 ∣ m] ∏_(d ∣ m, d ≥ 3) ψ_d(x)²`
+  (`prod_colours`, `orbit_factor`, `charpoly_cycleLaplacian_orbits`), `ψ_d` is `±` a monic
+  polynomial of degree `φ(d)/2` with `ψ_d(0) = Φ_d(1)` (`orbitPoly_eq`, `natDegree_orbitMinpoly`,
+  `orbitPoly_eval_zero`), that monic polynomial is the minimal polynomial over `ℚ` of
+  `2 − ζ − ζ⁻¹` for every colour `ζ` of order `d` (`orbitMinpoly_eq_minpoly`), and the nonzero
+  eigenvalues multiply to `m²` (`prod_one_sub_colour`, `prod_gapSq_ne_zero`), for every `m ≥ 1`.
+  The worked cases `ψ_7` and `ψ_9` and the spanning-tree reading `m²/m = m` (Kirchhoff's
+  matrix-tree theorem, not in Mathlib) stay checked, not formal. (k) is discharged;
 - (l) the time boundary: `diag(1, r)` in `(Re, Im)`, the action conserved, and the pumped mode as
   its case. Formal-checked the same day in
   [`Physics/TimeBoundary`](../../lean/HolonicsResearch/Physics/TimeBoundary.lean), with
