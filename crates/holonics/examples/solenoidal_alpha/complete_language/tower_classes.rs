@@ -16,7 +16,8 @@
 //! - `release-tower-classes` forks the rested tower at each prompt (a source passage and its end
 //!   letter) and releases classes by agreeing exact draws until it releases the end letter or the
 //!   declared count; each prompt draws from its own declared share of the keys, so the releases do
-//!   not depend on their order.
+//!   not depend on their order. On a participating tower it first reads, at each prompt's closing
+//!   end letter where the answer opens, every level's heads over the section's sites.
 //!
 //! Nothing here is text-, image- or sound-specific: a medium is only the chart that wrote its
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
@@ -279,7 +280,9 @@ pub(super) fn read_at(args: &[String]) -> Result<()> {
 
 /// `release-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS KEYS_SHA COUNT AGREE OUT`: each
 /// prompt (classes through its end letter) forks the rested tower, which releases at most `COUNT`
-/// classes; prompt `p` reads its keys from the `p`-th share of `COUNT` eight-byte keys.
+/// classes; prompt `p` reads its keys from the `p`-th share of `COUNT` eight-byte keys. A
+/// participating tower's participation at each answer's opening is read first
+/// ([`participation_read`]).
 pub(super) fn release(args: &[String]) -> Result<()> {
     release_realized(args, &mut HostPass::default())
 }
@@ -314,6 +317,9 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     realization.admit(tower).map_err(|e| e.to_string())?;
     println!("TOWER_REALIZATION {}", realization.realization());
     std::fs::create_dir(out)?;
+    if tower.participation().is_some() {
+        participation_read(tower, &prompts, end, out)?;
+    }
     // A section of the passage is entered after the end letter of the one before it, so a prompt
     // is entered the same way: from rest through one end letter, then its source. From rest alone,
     // a numeral and its end letter are also the close of every GSM8K answer, and the request would
@@ -371,6 +377,51 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     write_new(&out.join("RELEASES.classes"), &written)?;
     write_new(&out.join("RELEASES.tsv"), rows.as_bytes())?;
     println!("CLASSES_RELEASE_DONE prompts={} agree={agree} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [agent-inferred, October 29] **The participation at each answer's opening** (the participation
+/// record, §7.3): each prompt is read again on the host, entered as the release enters it, and at
+/// its closing end letter, where the answer opens, each level's heads are read over the section's
+/// admitted sites. Per prompt and level the sites carrying the most weight, summed over the heads in
+/// thousandths of a head, print with the eight classes that end there (`|` the end letter); each
+/// head's own top sites go to `PARTICIPATION.tsv`. A reading beside the writings, never a score.
+fn participation_read(tower: &holonics::hnn::tower::Tower, prompts: &[&[usize]], end: usize, out: &Path) -> Result<()> {
+    const SHOWN: usize = 5;
+    let mut rows = String::from("prompt\tlevel\thead\tsites\treleased\ttop(back:classes:thousandths)\n");
+    for (p, prompt) in prompts.iter().enumerate() {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = tower.rest();
+        tower.read_cells(&mut state, &entered).map_err(|e| e.to_string())?;
+        let Some(levels) = tower.participation_at(&mut state, end).map_err(|e| e.to_string())? else { return Ok(()) };
+        let last = entered.len() - 1;
+        let shown = |back: usize| -> String {
+            let at = last - back;
+            entered[at.saturating_sub(7)..=at].iter().map(|&c| if c < 256 { (c as u8).escape_ascii().to_string() } else { "|".into() }).collect()
+        };
+        // The admitted site `j` of `sites` arrived `sites − 1 − j` classes before the opening.
+        let top = |weights: &[u128]| -> Vec<(usize, u128)> {
+            let mut order: Vec<(usize, u128)> = weights.iter().enumerate().map(|(j, &w)| (weights.len() - 1 - j, w)).collect();
+            order.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+            order.truncate(SHOWN);
+            order
+        };
+        for (l, heads) in levels.iter().enumerate() {
+            let sites = heads.first().map_or(0, |h| h.weights.len());
+            let mut summed = vec![0u128; sites];
+            for (h, part) in heads.iter().enumerate() {
+                let share: Vec<u128> = part.weights.iter().map(|&e| e * 1000 / part.mass.max(1)).collect();
+                for (s, &v) in summed.iter_mut().zip(&share) {
+                    *s += v;
+                }
+                let listed: Vec<String> = top(&share).into_iter().map(|(back, v)| format!("{back}:{:?}:{v}", shown(back))).collect();
+                rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{}\n", part.released, listed.join(" ")));
+            }
+            let listed: Vec<String> = top(&summed).into_iter().map(|(back, v)| format!("{back}:{:?}:{}", shown(back), v / heads.len().max(1) as u128)).collect();
+            println!("CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} top(back:classes:thousandths) {}", heads.len(), listed.join(" "));
+        }
+    }
+    write_new(&out.join("PARTICIPATION.tsv"), rows.as_bytes())?;
     Ok(())
 }
 

@@ -3241,6 +3241,17 @@ impl Tower {
         Ok(self.step(state, u, &reaches)?.face)
     }
 
+    /// [agent-inferred, October 29] **The participation a receiver meets as `u` arrives**: the state
+    /// moved as [`Tower::advance`] moves it, and at each level, head by head, the participation of
+    /// the section's admitted sites at this site, the present one last (their weights on `2^(−62)` of
+    /// the peak, the mass, the sites released). A reading (record §7.3), not a learned path; `None` on
+    /// a tower without participation.
+    pub fn participation_at(&self, state: &mut TowerState, u: usize) -> Result<Option<Vec<Vec<Participation>>>> {
+        let reaches = self.reaches();
+        let cell = self.step(state, u, &reaches)?;
+        Ok(self.participation.as_ref().map(|_| cell.levels.into_iter().map(|lc| lc.participation.map(|pc| pc.parts).unwrap_or_default()).collect()))
+    }
+
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
         collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
@@ -7564,6 +7575,32 @@ mod tests {
             }
         }
         tower
+    }
+
+    /// The participation a receiver meets at a site is the forward's: the state moves as `advance`
+    /// moves it, every level returns one participation a head over the section's sites so far, the
+    /// present one last, and the section opens again after its sixteenth site. A tower without
+    /// participation reads none.
+    #[test]
+    fn the_participation_at_a_site_is_the_sections_admitted_sites() {
+        let tower = tiny_participating(ContactLaw::Rectifying, true);
+        let classes: Vec<usize> = (0..20).map(|i| (i * 7 + 3) % tower.declaration.alphabet).collect();
+        let (mut a, mut b) = (tower.rest(), tower.rest());
+        for (i, &u) in classes.iter().enumerate() {
+            tower.advance(&mut a, u).expect("advance");
+            let levels = tower.participation_at(&mut b, u).expect("read").expect("participating");
+            assert_eq!(a, b, "class {i}");
+            assert_eq!(levels.len(), tower.declaration.levels);
+            for heads in &levels {
+                assert_eq!(heads.len(), 2);
+                for part in heads {
+                    assert_eq!(part.weights.len(), i % 16 + 1, "class {i}");
+                    assert_eq!(part.mass, part.weights.iter().sum::<u128>());
+                }
+            }
+        }
+        let plain = tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying);
+        assert_eq!(plain.participation_at(&mut plain.rest(), 0).expect("read"), None);
     }
 
     /// The race's bank founds one head a rung: 128 modes on both turn ladders are two halves of
