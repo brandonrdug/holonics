@@ -203,6 +203,22 @@ impl TowerBody {
         close(&mut self.learner, self.section, std::slice::from_mut(&mut self.conversation), realization)
     }
 
+    /// [definition; agent-inferred, October 29] **The body grown by `factor`** at rest
+    /// ([`TowerLearner::widened`], record `2026-10-29_THE_BODY_GROWS_BY_COPIES_…`): the learner
+    /// widened, its differences drawn from the declared founding keys, and every current's state
+    /// widened ([`Tower::widen_state`]), its pending classes, the section and the draw state kept.
+    /// The grown body reads the faces the body read, so its next ask releases what the body's
+    /// would.
+    pub fn grow(&mut self, factor: usize, keys: &[u8]) -> Result<()> {
+        let learner = self.learner.widened(factor, keys)?;
+        let tower = &self.learner.tower;
+        let widen = |c: &Current| -> Result<Current> { Ok(Current { state: tower.widen_state(&c.state, factor)?, pending: c.pending.clone() }) };
+        let currents = self.currents.iter().map(widen).collect::<Result<Vec<_>>>()?;
+        let conversation = widen(&self.conversation)?;
+        *self = Self { learner, section: self.section, currents, conversation, drawn: self.drawn };
+        Ok(())
+    }
+
     /// The body at rest: the learner's text, the body's line (hearing currents, section, keys
     /// drawn), then each current (the hearing currents, the conversation last) as its state's text
     /// and its pending line, `pending u,q …`.
@@ -590,6 +606,32 @@ mod tests {
         let mut plain = plain;
         assert_eq!(plain.ask(&[1, 2], &keys(512), 4, 1, pass).expect("asked").participation, None);
         assert!(plain.ask(&[1, 3], &keys(512), 4, 1, pass).is_err(), "a prompt holding the end letter");
+    }
+
+    /// The growth's acceptance 5: a grown body's ask releases what the body's releases, each head
+    /// copy's participation the old head's, its text re-encodes, and it hears on.
+    #[test]
+    fn a_grown_body_releases_what_the_body_releases() {
+        let mut body = tiny_body();
+        let pass = &mut HostPass::default();
+        body.hear(&passage(150, 1), pass).expect("heard");
+        let mut grown = body.clone();
+        grown.grow(2, &keys(1 << 16)).expect("grown");
+        assert_eq!(grown.learner.tower.declaration.modes, 2 * body.learner.tower.declaration.modes);
+        let k = keys(4096);
+        let (old, new) = (body.ask(&[1, 2, 0, 1, 1, 2], &k, 24, 1, pass).expect("asked"), grown.ask(&[1, 2, 0, 1, 1, 2], &k, 24, 1, pass).expect("asked"));
+        assert_eq!((&new.released, new.ended, &new.read), (&old.released, old.ended, &old.read));
+        let (old_levels, new_levels) = (old.participation.expect("participating"), new.participation.expect("participating"));
+        for (o, g) in old_levels.iter().zip(&new_levels) {
+            assert_eq!(g.len(), 2 * o.len());
+            for (h, part) in g.iter().enumerate() {
+                assert_eq!(part, &o[h % o.len()], "a head copy reads the old head's sites");
+            }
+        }
+        let text = grown.to_text();
+        assert_eq!(TowerBody::from_text(&text).expect("restored").to_text(), text);
+        let heard = grown.hear(&passage(97, 2), pass).expect("heard");
+        assert!(heard.learned > 0);
     }
 
     /// A state's text restores every part, a credit-carrying stream's moments and an open face and
