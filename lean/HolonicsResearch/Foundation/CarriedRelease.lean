@@ -46,7 +46,11 @@ What is proved.
 8. **The transported residue in any module** (`residueRun_conserves`): for a linear transport
    `A_t`, which may change at every step, and any release rule, the lattice part `A_t q + q_rel`
    and the residue `e' = A_t e + Δ − q_rel` sum to the exact orbit at every length. No two
-   transports need commute.
+   transports need commute. A release into a subgroup the transports keep stays there
+   (`residueRun_fst_mem`), so an additive reading blind to that subgroup reads the orbit through
+   the residue alone (`residueRun_read`); at the unit grain, released by whole windings, the residue
+   stays inside one step and the phase receiver `R → R ⧸ ℤ` is such a reading
+   (`residueRun_windings`).
 9. **The jet's residue carries its cross term** (`jetOrbit_eq`, `jet_lattice_drive`): a state
    `x' = U_t x + b_t` carried with its jet `J' = U_t J + V_t x + v_t` is one orbit of the block
    `L_t (x, J) = (U_t x, V_t x + U_t J)`, so its joint release conserves by 8 with the residue
@@ -253,6 +257,56 @@ theorem residueRun_conserves (A : ℕ → M →+ M) (Δ : ℕ → M) (rel : M �
     simp only [residueRun, linearOrbit]
     rw [← ih, map_add]
     abel
+
+/-- [proved-derived; formal-checked] **The released part stays in a kept subgroup**: when every
+release lands in `K` and every transport keeps `K`, the lattice part lies in `K` at every length. -/
+theorem residueRun_fst_mem (A : ℕ → M →+ M) (Δ : ℕ → M) (rel : M → M) (K : AddSubgroup M)
+    (hrel : ∀ y, rel y ∈ K) (hA : ∀ k y, y ∈ K → A k y ∈ K) (t : ℕ) :
+    (residueRun A Δ rel t).1 ∈ K := by
+  induction t with
+  | zero => exact K.zero_mem
+  | succ t ih => exact K.add_mem (hA t _ ih) (hrel _)
+
+/-- [proved-derived; formal-checked] **A reading blind to the released part reads the orbit
+through the residue alone**: an additive reading that vanishes on a kept subgroup holding every
+release reads the exact orbit as it reads the residue. -/
+theorem residueRun_read {F : Type*} [AddCommGroup F] (A : ℕ → M →+ M) (Δ : ℕ → M) (rel : M → M)
+    (K : AddSubgroup M) (hrel : ∀ y, rel y ∈ K) (hA : ∀ k y, y ∈ K → A k y ∈ K) (D : M →+ F)
+    (hD : ∀ y ∈ K, D y = 0) (t : ℕ) :
+    D (linearOrbit A Δ t) = D (residueRun A Δ rel t).2 := by
+  rw [← residueRun_conserves A Δ rel t, map_add, hD _ (residueRun_fst_mem A Δ rel K hrel hA t),
+    zero_add]
+
+/-- [proved-derived; formal-checked] **At the unit grain the phase receiver reads the residue
+alone**: a line's transported residue released by whole windings keeps its residue inside one grain
+step at every length; when the transports keep whole windings whole, the released part is whole
+windings, which the phase receiver `R → R ⧸ ℤ` leaves unread, so it reads the exact orbit as the
+residue. A grain `g > 0` is the unit grain of `x / g`. -/
+theorem residueRun_windings (A : ℕ → R →+ R) (Δ : ℕ → R)
+    (hA : ∀ k y, y ∈ AddSubgroup.zmultiples (1 : R) → A k y ∈ AddSubgroup.zmultiples (1 : R))
+    (t : ℕ) :
+    (residueRun A Δ (fun y => (windings y : R)) t).1 ∈ AddSubgroup.zmultiples (1 : R) ∧
+      0 ≤ (residueRun A Δ (fun y => (windings y : R)) t).2 ∧
+      (residueRun A Δ (fun y => (windings y : R)) t).2 < 1 ∧
+      QuotientAddGroup.mk' (AddSubgroup.zmultiples (1 : R)) (linearOrbit A Δ t) =
+        QuotientAddGroup.mk' (AddSubgroup.zmultiples (1 : R))
+          (residueRun A Δ (fun y => (windings y : R)) t).2 := by
+  have hrel : ∀ y : R, (windings y : R) ∈ AddSubgroup.zmultiples (1 : R) :=
+    fun y => ⟨windings y, by simp⟩
+  have hD : ∀ y ∈ AddSubgroup.zmultiples (1 : R),
+      QuotientAddGroup.mk' (AddSubgroup.zmultiples (1 : R)) y = 0 :=
+    fun y hy => (QuotientAddGroup.eq_zero_iff y).mpr hy
+  have hbound : 0 ≤ (residueRun A Δ (fun y => (windings y : R)) t).2 ∧
+      (residueRun A Δ (fun y => (windings y : R)) t).2 < 1 := by
+    cases t with
+    | zero => simp [residueRun]
+    | succ t =>
+      simp only [residueRun]
+      set z := A t (residueRun A Δ (fun y => (windings y : R)) t).2 + Δ t
+      have hs := reading_split z
+      constructor <;> linarith [hs.1, hs.2.1, hs.2.2]
+  exact ⟨residueRun_fst_mem A Δ _ _ hrel hA t, hbound.1, hbound.2,
+    residueRun_read A Δ _ _ hrel hA _ hD t⟩
 
 /-- [proved-derived] The exact orbit is additive in its drive. -/
 theorem linearOrbit_add (A : ℕ → M →+ M) (Δ₁ Δ₂ : ℕ → M) (t : ℕ) :
