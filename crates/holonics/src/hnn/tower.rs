@@ -156,12 +156,28 @@
 //! participating current is read like the modes' face, `r̂ᵃ = Re(Cᵃ y)/‖·‖_rms`, and offered to
 //! the same contacts, `W₁ r̂ + W₁ᵃ r̂ᵃ + b₁`. `W₁ᵃ` opens at zero, so a joined tower opens on itself
 //! face for face. The reverse returns participation's covector into the charts, the current's read,
-//! `W₁ᵃ`, the friction and the level's input (tested against the code's difference); it stops at the
-//! frames and the met dissipation, so under an opened participation the moves' and gates' covector
-//! lacks participation's share (owed, record §8), and the certificate's reread still decides each
-//! deposit. A section admits its own sites and releases them with its last; a stream read across
+//! `W₁ᵃ`, the friction and the level's input, and through the frames and the met dissipation into
+//! each move's turn and met covector (the transport covector, record §6; tested against the code's
+//! difference). The pump's reflection share is not claimed (record §8). The certificate's reread
+//! still decides each deposit. A section admits its own sites and releases them with its last; a stream read across
 //! calls (a release) carries its open section in its state. A reverse opens where a section closed,
 //! and one longer than the declared section is refused.
+//!
+//! **The mutual contact** ([`Tower::join_mutual_contact`], agent-inferred, October 29; record
+//! `2026-10-29_MUTUAL_CONTACT_…`). The readout's comparison is one-sided: `U`'s row `a` is a second
+//! face of class `a`, and the target's encoding meets the comparison nowhere. Joined as a mutual
+//! contact, the comparison is a pair contact between the produced face and each class's own
+//! encoding, the face it enters through:
+//!
+//! ```text
+//! slip       Δ_a = J x − E_a                                   J (d × d) the contact's geometry
+//! face       z_a = β (2⟨y, E_a⟩ − ‖E_a‖²) + c_a,  y = J x       −β Q_a + c_a, the gauge β‖y‖² dropped
+//! covector   G_y = 2β Σ_a δz_a E_a,  G_x = Jᵀ G_y,  G_J = G_y xᵀ
+//!            G_E_a = 2β δz_a (y − E_a),  G_c = δz             the target's encoding moves too
+//! ```
+//!
+//! `J` opens at zero and `c_a` at the face's release of `β‖E_a‖²`, so the joined tower opens on the
+//! flat face; `β = 2^(−b)`. The encoding's covector sums its input path's and the contact's.
 //!
 //! **What a section holds.** The forward's temporaries of its own cells, for the reverse scan, and
 //! the streams' opening states, for the reread. They are released when the section closes (the
@@ -1764,6 +1780,8 @@ struct LevelLayout {
 struct Layout {
     encoding: usize,
     levels: Vec<LevelLayout>,
+    /// The readout `U` (`A × d`), or under a mutual contact its geometry `J` (`d × d`); the bias
+    /// `c` (`A`) follows it.
     readout: usize,
     readout_bias: usize,
     /// The pair face's readout `V` (`A × k`) and its lift into the encoding `P` (`d × k`), empty
@@ -1784,7 +1802,7 @@ struct Layout {
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize, participation: Option<&ParticipationDeclaration>) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize, participation: Option<&ParticipationDeclaration>, mutual: bool) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1849,7 +1867,8 @@ impl Layout {
             }
             levels.push(level);
         }
-        let readout = take(a * w, MATERIAL_BITS);
+        // The readout `U` (`A × d`), or under a mutual contact the contact's geometry `J` (`d × d`).
+        let readout = take(if mutual { w * w } else { a * w }, MATERIAL_BITS);
         let readout_bias = take(a, FACE_BITS);
         let (pair_readout, pair_encoding) = if forms > 0 { (take(a * forms, MATERIAL_BITS), take(w * forms, MATERIAL_BITS)) } else { (0, 0) };
         let (ring_readout, ring_factors) = if ring_ranks > 0 { (take(a * (w + 1) * 2 * ring_ranks * ring_harmonics, MATERIAL_BITS), take(ring_ranks * rank_material(d), MATERIAL_BITS)) } else { (0, 0) };
@@ -2003,6 +2022,9 @@ pub struct Tower {
     news: Option<NewsClock>,
     /// The levels' participation, when it is joined ([`Tower::join_participation`]).
     participation: Option<ParticipationDeclaration>,
+    /// The mutual contact's `b` (`β = 2^(−b)`), when the comparison is one
+    /// ([`Tower::join_mutual_contact`]).
+    mutual: Option<u32>,
     layout: Layout,
     exponential: Exponential,
     /// The exponential's face on the moves' grain, `2^(−30)`: a gated mode's `|λ|^(c r)`.
@@ -2465,6 +2487,8 @@ struct Cell {
     ring_pair: Option<Vec<i32>>,
     /// The top face's ratio `x̂` (without its unit) and its scale, for the reverse.
     top_hat: Option<(Vec<i32>, i128)>,
+    /// Under a mutual contact, the produced face through it, `y = J x` on `2^(−16)`.
+    contact: Option<Vec<i64>>,
     face: TowerFace,
 }
 
@@ -2695,7 +2719,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0, 0, None);
+        let layout = Layout::new(&d, 0, 0, 0, 0, None, false);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -2761,7 +2785,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, mutual: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2898,7 +2922,7 @@ impl Tower {
                 })
                 .collect()
         };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout + d.alphabet * d.width]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout_bias]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -3199,7 +3223,14 @@ impl Tower {
         let mut z = vec![0i64; a];
         let ro = self.layout.readout;
         let rb = self.layout.readout_bias;
-        affine(&t[ro..ro + a * w], reaches.readout, w, &x, Some(&t[rb..rb + a]), MATERIAL_BITS, MATERIAL_BITS, &mut z)?;
+        // The face: the readout's `z = U x + c`, or the mutual contact's Gibbs face of the slips.
+        let contact = match self.mutual {
+            Some(b) => Some(self.mutual_face(&x, reaches.readout, b, &mut z)?),
+            None => {
+                affine(&t[ro..ro + a * w], reaches.readout, w, &x, Some(&t[rb..rb + a]), MATERIAL_BITS, MATERIAL_BITS, &mut z)?;
+                None
+            }
+        };
         // The pair face read by its own readout: `z += V c(p)`, released to 2^(−16) beside the
         // tower's read.
         if let Some(c) = pair {
@@ -3232,7 +3263,49 @@ impl Tower {
         if self.news.is_some() {
             state.open = Some(TowerFace { masses: masses.clone(), total });
         }
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, face: TowerFace { masses, total } })
+    }
+
+    /// [agent-inferred, October 29] **The mutual contact's face** at the top `x` (record
+    /// `2026-10-29_MUTUAL_CONTACT_…`, §3 and §4): the produced face through the contact,
+    /// `y = J x` released to `2^(−16)`, and each class's
+    /// `z_a = release(2⟨y, E_a⟩ − ‖E_a‖², 16 + b) + c_a`, the Gibbs face `−β Q_a + c_a` of the slip
+    /// `Δ_a = y − E_a` with the gauge `β‖y‖²` (common to every class) dropped. Returns `y`.
+    fn mutual_face(&self, x: &[i32], reach: u64, b: u32, z: &mut [i64]) -> Result<Vec<i64>> {
+        let w = self.declaration.width;
+        let t = &self.theta;
+        let (ro, rb, e) = (self.layout.readout, self.layout.readout_bias, self.layout.encoding);
+        let mut y = vec![0i64; w];
+        affine(&t[ro..ro + w * w], reach, w, x, None, 0, MATERIAL_BITS, &mut y)?;
+        for (c, slot) in z.iter_mut().enumerate() {
+            // (2y − E)·E = 2⟨y, E⟩ − ‖E‖², on 2^(−32).
+            let sum: i128 = y.iter().zip(&t[e + c * w..e + (c + 1) * w]).map(|(&yj, &ej)| (2 * yj as i128 - ej as i128) * ej as i128).sum();
+            *slot = fit64(release(sum, FACE_BITS + b) + t[rb + c] as i128)?;
+        }
+        Ok(y)
+    }
+
+    /// [agent-inferred, October 29] **The mutual contact's return at one cell**: both participants
+    /// move. The produced face's covector `G_y = 2β Σ_a δz_a E_a`, on `2^(−40)` released by `15 + b`
+    /// to `2^(−24)`, is returned (the tower takes `Jᵀ G_y`, the geometry `G_y xᵀ`); the target's
+    /// encoding takes `G_E_a = 2β δz_a (y − E_a)`, released entry by entry by `15 + b` to the
+    /// input path's grain `2^(−24)` and added to `g` beside it, so the two paths sum in one family.
+    fn mutual_return(&self, y: &[i64], dz: &[i64], b: u32, g: &mut [i128]) -> Result<Vec<i64>> {
+        let w = self.declaration.width;
+        let e = self.layout.encoding;
+        let shift = FACE_BITS - 1 + b;
+        let mut gy = vec![0i128; w];
+        for (c, &dzc) in dz.iter().enumerate() {
+            if dzc == 0 {
+                continue;
+            }
+            let dzc = dzc as i128;
+            for (j, (&ej, &yj)) in self.theta[e + c * w..e + (c + 1) * w].iter().zip(y).enumerate() {
+                gy[j] += dzc * ej as i128;
+                g[e + c * w + j] += release(dzc * (yj as i128 - ej as i128), shift);
+            }
+        }
+        collect_exact(gy.into_iter().map(|v| fit64(release(v, shift))))
     }
 
     /// The face of the next class after `u` arrives, and the state moved.
@@ -3309,6 +3382,8 @@ impl Tower {
         if self.news.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a news clock: its moments over a clocked move are owed");
         }
+        // Under a mutual contact, each cell's covector of the produced face through it, `G_y`.
+        let mut gys: Vec<Vec<i64>> = Vec::with_capacity(if self.mutual.is_some() { cells_n } else { 0 });
         for (i, cell) in cells.iter().enumerate() {
             let target = compared.map_or(Some(classes[i + 1]), |m| m[i + 1]);
             let face = &cell.face;
@@ -3320,12 +3395,25 @@ impl Tower {
                 *slot += v as i128;
             }
             let mut back = vec![0i64; w];
-            transposed(&t[ro..ro + a * w], reaches.readout, w, &dz, MATERIAL_BITS, &mut back)?;
+            match self.mutual {
+                Some(b) => {
+                    let y = cell.contact.as_deref().ok_or(TowerError::Refused("a contact read at every cell of a mutual tower"))?;
+                    let gy = self.mutual_return(y, &dz, b, &mut g)?;
+                    transposed(&t[ro..ro + w * w], reaches.readout, w, &gy, MATERIAL_BITS, &mut back)?;
+                    gys.push(gy);
+                }
+                None => transposed(&t[ro..ro + a * w], reaches.readout, w, &dz, MATERIAL_BITS, &mut back)?,
+            }
             dx.push(back);
             dzs.push(dz);
         }
         let tops: Vec<&[i32]> = cells.iter().map(|cell| cell.top.as_slice()).collect();
-        outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops)?;
+        if self.mutual.is_some() {
+            // The contact's geometry: `G_J = Σ_t G_y xᵀ`, on the readout's grain `2^(−40)`.
+            outer_sum(&mut g[ro..ro + w * w], w, &gys, &tops)?;
+        } else {
+            outer_sum(&mut g[ro..ro + a * w], w, &dzs, &tops)?;
+        }
         // The pair face's readout takes the face's covector against the pair read there.
         let pairs: Vec<&[i32]> = cells.iter().filter_map(|cell| cell.pair.as_deref()).collect();
         let forms = self.pair.as_ref().map_or(0, |face| face.forms());
@@ -4132,6 +4220,9 @@ impl Tower {
         let mut s = format!("moment-tower-v1 {} {} {} {} {}{gated}{turned}{pumped}{contact}\n", d.alphabet, d.width, d.modes, d.contacts, d.levels);
         s.push_str(&self.theta.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
         s.push('\n');
+        if let Some(b) = self.mutual {
+            s.push_str(&format!("mutual-contact {b}\n"));
+        }
         if let Some(face) = &self.pair {
             s.push_str(&face.to_text());
         }
@@ -4154,12 +4245,15 @@ impl Tower {
         s
     }
 
-    /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two,
-    /// three more with a pair face, two more with a ring face (one more a rank with its pair
+    /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two, one
+    /// more with a mutual contact, three more with a pair face, two more with a ring face (one more a rank with its pair
     /// moves, one more with its harmonics and one more with its restarts), three more with a
     /// rotor, five more with strands and one more with a news clock.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
+        if text.lines().nth(n).is_some_and(|l| l.starts_with("mutual-contact ")) {
+            n += 1;
+        }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("pair-face ")) {
             n += 3;
         }
@@ -4226,6 +4320,13 @@ impl Tower {
             .map(|s| s.parse::<i32>().map_err(|_| TowerError::Refused("material that is not an integer")))
             .collect::<Result<_>>()?;
         let mut lines = lines.peekable();
+        let mutual = match lines.next_if(|l| l.starts_with("mutual-contact ")) {
+            Some(line) => match line.split(' ').collect::<Vec<_>>().as_slice() {
+                ["mutual-contact", b] => Some(b.parse::<u32>().map_err(|_| TowerError::Refused("a mutual contact's scale is a count"))?),
+                _ => return refuse("not a mutual contact's text"),
+            },
+            None => None,
+        };
         let pair = match lines.next_if(|l| l.starts_with("pair-face ")) {
             Some(head) => {
                 let (forms, opening) = (lines.next().unwrap_or(""), lines.next().unwrap_or(""));
@@ -4269,6 +4370,7 @@ impl Tower {
             ring.as_ref().map_or(0, RingFace::harmonics),
             strands.as_ref().map_or(0, Strands::parts),
             participation.as_ref(),
+            mutual.is_some(),
         );
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
@@ -4276,7 +4378,13 @@ impl Tower {
         // The rotor, the strands and the news clock join by their own laws, so a text that holds
         // them together is read under the same refusals as their joins; the strands' material is
         // the text's.
-        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, mutual, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        if let Some(b) = tower.mutual {
+            Self::admits_mutual(b)?;
+            if tower.pair.is_some() || tower.ring.is_some() {
+                return refuse("a pair or ring face beside a mutual contact is owed: each reads the readout the contact replaces");
+            }
+        }
         if let Some(rotor) = rotor {
             tower.join_rotor(rotor)?;
         }
@@ -4290,7 +4398,7 @@ impl Tower {
         }
         if let Some(p) = participation {
             tower.admits_participation(&p)?;
-            tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p));
+            tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p), false);
             if tower.theta.len() != tower.layout.len {
                 return refuse("material of the wrong extent");
             }
@@ -4308,6 +4416,9 @@ impl Tower {
         if self.pair.is_some() {
             return refuse("a tower takes one pair face");
         }
+        if self.mutual.is_some() {
+            return refuse("a pair face beside a mutual contact is owed: it reads the readout the contact replaces");
+        }
         if self.participation.is_some() {
             return refuse("participation joins last: its material follows every other part's");
         }
@@ -4320,7 +4431,7 @@ impl Tower {
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0, 0, None);
+        let layout = Layout::new(d, face.forms(), 0, 0, 0, None, false);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -4343,6 +4454,9 @@ impl Tower {
         if self.ring.is_some() {
             return refuse("a tower takes one ring face");
         }
+        if self.mutual.is_some() {
+            return refuse("a ring face beside a mutual contact is owed: it reads the readout the contact replaces");
+        }
         if self.participation.is_some() {
             return refuse("participation beside a rotor, a ring face or a news clock is owed");
         }
@@ -4356,7 +4470,7 @@ impl Tower {
             return refuse("a ring face joins before strands (the strands' material follows the ring's)");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0, None);
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0, None, false);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -4449,7 +4563,65 @@ impl Tower {
         if self.rotor.is_some() || self.ring.is_some() || self.news.is_some() {
             return refuse("participation beside a rotor, a ring face or a news clock is owed");
         }
+        if self.mutual.is_some() {
+            return refuse("participation beside a mutual contact is owed: its contacts' return is re-derived under the contact");
+        }
         Ok(())
+    }
+
+    /// Whether `b` is a mutual contact's scale `β = 2^(−b)`: no finer than the face's grain.
+    fn admits_mutual(b: u32) -> Result<()> {
+        if b > FACE_BITS {
+            return refuse("a mutual contact's scale finer than the face's grain");
+        }
+        Ok(())
+    }
+
+    /// [agent-inferred, October 29] **The comparison joined as a mutual contact** (record
+    /// `2026-10-29_MUTUAL_CONTACT_THE_COMPARISON_IS_A_PAIR_CONTACT_…`): the produced face `x` and
+    /// each class's own encoding `E_a`, the face the class enters through, meet through a pair
+    /// contact, `Δ_a = J x − E_a`, and the face is the Gibbs face of the slips with their common
+    /// gauge dropped, `z_a = β (2⟨J x, E_a⟩ − ‖E_a‖²) + c_a`, `β = 2^(−b)`. The readout `U` gives its
+    /// place to the contact's geometry `J` (`d × d`), opened at zero, and `c_a` is founded as the
+    /// face's release of `β‖E_a‖²`, so the joined tower opens on the flat face, as the founded
+    /// readout does. The reverse moves both participants: the tower through `Jᵀ G_y`, the geometry
+    /// by `G_y xᵀ`, and the target's encoding by `G_E_a = 2β δz_a (J x − E_a)` beside its input
+    /// path's covector. While `J` is at zero the levels receive no covector: the contact has not
+    /// closed. It joins a founded tower first: refused once the readout or its bias has moved (a
+    /// learned readout's law under the contact is not derived) or beside a joined part that reads
+    /// the readout (a pair or ring face, strands, participation; the duplex and the tension
+    /// reading refuse it too). A rotor and a news clock read no readout and may join after it.
+    pub fn join_mutual_contact(&mut self, b: u32) -> Result<()> {
+        if self.mutual.is_some() {
+            return refuse("a tower takes one mutual contact");
+        }
+        Self::admits_mutual(b)?;
+        if self.pair.is_some() || self.ring.is_some() || self.strands.is_some() || self.participation.is_some() {
+            return refuse("a mutual contact joins before every part that reads the readout");
+        }
+        let d = self.declaration;
+        let (a, w) = (d.alphabet, d.width);
+        let (ro, rb) = (self.layout.readout, self.layout.readout_bias);
+        if self.theta[ro..rb + a].iter().any(|&v| v != 0) {
+            return refuse("a mutual contact joins a founded readout: a learned readout's law under the contact is not derived");
+        }
+        let layout = Layout::new(&d, 0, 0, 0, 0, None, true);
+        let mut theta = self.theta[..ro].to_vec();
+        theta.resize(layout.len, 0);
+        let e = layout.encoding;
+        for c in 0..a {
+            let norm: i128 = theta[e + c * w..e + (c + 1) * w].iter().map(|&v| v as i128 * v as i128).sum();
+            theta[layout.readout_bias + c] = fit32(-release(-norm, FACE_BITS + b), "a founded contact constant outgrew its 32-bit carrier")?;
+        }
+        self.theta = theta;
+        self.layout = layout;
+        self.mutual = Some(b);
+        Ok(())
+    }
+
+    /// The mutual contact's `b` (`β = 2^(−b)`), when the comparison is one.
+    pub fn mutual_contact(&self) -> Option<u32> {
+        self.mutual
     }
 
     /// [agent-inferred, October 29] **Participation joined to the tower**
@@ -4467,7 +4639,7 @@ impl Tower {
         self.admits_participation(&p)?;
         let d = self.declaration;
         let (n, w) = (d.modes, d.width);
-        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p));
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p), false);
         self.theta.resize(layout.len, 0);
         for lv in &layout.levels {
             for (to, from) in [(lv.pa_probe_re, lv.push_re), (lv.pa_probe_im, lv.push_im), (lv.pa_key_re, lv.push_re), (lv.pa_key_im, lv.push_im), (lv.pa_value_re, lv.push_re), (lv.pa_value_im, lv.push_im)] {
@@ -4520,6 +4692,9 @@ impl Tower {
         if self.strands.is_some() {
             return refuse("a tower takes one set of strands");
         }
+        if self.mutual.is_some() {
+            return refuse("strands beside a mutual contact is owed: it reads the readout the contact replaces");
+        }
         if self.participation.is_some() {
             return refuse("participation joins last: its material follows every other part's");
         }
@@ -4527,7 +4702,7 @@ impl Tower {
         if (strands.levels, strands.alphabet, strands.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("strands of another tower's shape");
         }
-        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts(), None);
+        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts(), None, false);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.strands = Some(strands);
@@ -5104,6 +5279,19 @@ impl TowerLearner {
         self.tower.join_news(clock)
     }
 
+    /// The comparison joined as a mutual contact on the learner's tower
+    /// ([`Tower::join_mutual_contact`]), before its first section: the readout's family changes its
+    /// extent, so moments that have opened would be carried on other parameters.
+    pub fn join_mutual_contact(&mut self, b: u32) -> Result<()> {
+        if self.opened {
+            return refuse("a mutual contact joins a learner before its first section");
+        }
+        self.tower.join_mutual_contact(b)?;
+        self.first = vec![0; self.tower.theta.len()];
+        self.second = vec![0; self.tower.theta.len()];
+        Ok(())
+    }
+
     /// Participation joined to the learner's tower ([`Tower::join_participation`]): its families'
     /// moments open at zero.
     pub fn join_participation(&mut self, p: ParticipationDeclaration) -> Result<()> {
@@ -5222,6 +5410,9 @@ impl Tower {
     /// compared with the class that arrives next) is handed to `each`. A reading beside the code:
     /// the tower is not moved, and the receiver keeps only the three moment sums, never the cells.
     pub fn read_tension(&self, state: &mut TowerState, classes: &[usize], mut each: impl FnMut(TensionCell) -> Result<()>) -> Result<()> {
+        if self.mutual.is_some() {
+            return refuse("the tension reading reads the readout's covector, which a mutual contact replaces");
+        }
         let reaches = self.reaches();
         let (w, n) = (self.declaration.width, self.declaration.modes);
         let top_level = self.layout.levels.len() - 1;
@@ -7491,6 +7682,105 @@ mod tests {
         the_covector_of_tower_matches_the_code_difference(tiny_rotor(), true, &classes, 8);
     }
 
+    /// A tiny gated, turned tower (the race's mode law) with the comparison joined as a mutual
+    /// contact, `β = 2^(−2)`; `opened` fills the contact's geometry `J` so the contact has closed
+    /// and the levels receive its covector.
+    fn tiny_mutual(opened: bool) -> Tower {
+        let mut tower = tiny_turning(2, true, true, false);
+        let (ro, rb, a) = (tower.layout.readout, tower.layout.readout_bias, tower.declaration.alphabet);
+        tower.theta[ro..rb + a].fill(0);
+        tower.join_mutual_contact(2).expect("joined");
+        if opened {
+            let k = keys(8192);
+            let w = tower.declaration.width;
+            for (i, v) in tower.theta[ro..ro + w * w].iter_mut().enumerate() {
+                let j = 2000 + i;
+                *v = i32::from_be_bytes([k[4 * j], k[4 * j + 1], k[4 * j + 2], k[4 * j + 3]]) >> 9;
+            }
+        }
+        tower
+    }
+
+    /// The mutual contact's opening (record `2026-10-29_MUTUAL_CONTACT_…` §5, (a) and (c)): with
+    /// `J` at zero every class sits at `z = 0` at every cell, so the joined tower opens on the flat
+    /// face; and before `J` opens only the contact's geometry, its constants and the target's
+    /// encoding carry a covector (the levels receive none: the contact has not closed).
+    #[test]
+    fn a_mutual_tower_opens_flat_and_only_its_contact_and_encoding_move_before_it_closes() {
+        let tower = tiny_mutual(false);
+        // A passage whose targets are not uniform, so the flat face's covector does not cancel
+        // over it at the constants.
+        let classes = [0usize, 0, 1, 0, 2, 0, 3, 0, 1, 1, 0, 2, 0];
+        let opening = tower.rest();
+        let mut s = opening.clone();
+        let cells = tower.forward(&mut s, &classes, &tower.reaches()).expect("forward");
+        for cell in &cells {
+            assert!(cell.face.masses.iter().all(|&m| m == cell.face.masses[0]), "a class off the flat face at the opening");
+        }
+        let g = tower.reverse(&opening, &cells, &classes, None).expect("reverse");
+        let (e, ro, rb) = (tower.layout.encoding, tower.layout.readout, tower.layout.readout_bias);
+        let (a, w) = (tower.declaration.alphabet, tower.declaration.width);
+        let moving = [e..e + a * w, ro..ro + w * w, rb..rb + a];
+        for range in &moving {
+            assert!(g[range.clone()].iter().any(|&v| v != 0), "the family at {} carried no covector", range.start);
+        }
+        for (i, &v) in g.iter().enumerate() {
+            assert!(v == 0 || moving.iter().any(|r| r.contains(&i)), "parameter {i} moved before the contact closed");
+        }
+        // The target moves toward the produced face and the face's constants take the comparison:
+        // at y = 0 the reaction is `G_E_a = −2β δz_a E_a`, released entry by entry.
+        let mut expected = vec![0i128; a * w];
+        let mut constants = vec![0i128; a];
+        for (i, cell) in cells.iter().enumerate() {
+            let dz = covector(&cell.face, classes[i + 1]);
+            for c in 0..a {
+                constants[c] += dz[c] as i128;
+                for j in 0..w {
+                    expected[c * w + j] += release(dz[c] as i128 * -(tower.theta[e + c * w + j] as i128), FACE_BITS - 1 + 2);
+                }
+            }
+        }
+        assert_eq!(&g[e..e + a * w], &expected[..]);
+        assert_eq!(&g[rb..rb + a], &constants[..]);
+    }
+
+    /// The mutual contact's covector (§5 (b)): with its geometry opened, the code's difference
+    /// agrees with the reverse on `J`, the constants `c`, the encoding (its input path and the
+    /// contact's reaction summed) and the families of the levels below.
+    #[test]
+    fn the_mutual_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(tiny_mutual(true), true, &PASSAGE, 10);
+    }
+
+    /// A mutual tower and its learner restore whole from their text (§5 (d)), and the contact is
+    /// refused where its law is not derived: on a moved readout, twice, after the learner's first
+    /// section, beside the parts that read the readout, and in the tension reading.
+    #[test]
+    fn a_mutual_tower_restores_from_its_text_and_refuses_what_is_not_derived() {
+        let tower = tiny_mutual(true);
+        assert_eq!(tower.mutual_contact(), Some(2));
+        assert_eq!(Tower::from_text(&tower.to_text()).expect("restored"), tower);
+        let mut learner = TowerLearner::new(tiny_mutual(true), 6);
+        let seq: Vec<usize> = (0..17).map(|i| (i * 3 + i / 4) % 4).collect();
+        let mut states = vec![learner.tower.rest()];
+        learner.section(&mut states, &[&seq]).expect("section");
+        let restored = TowerLearner::from_text(&learner.to_text()).expect("restored");
+        assert_eq!(restored.tower, learner.tower);
+        assert_eq!(restored.to_text(), learner.to_text());
+        assert!(learner.join_mutual_contact(2).is_err(), "a second contact, or one after the first section");
+        let mut moved = tiny_turning(2, true, true, false);
+        assert!(moved.join_mutual_contact(2).is_err(), "a moved readout");
+        let mut fresh = tiny_mutual(false);
+        assert!(fresh.join_mutual_contact(2).is_err(), "a second contact");
+        let section = fresh.founded_participation(16).expect("declared");
+        assert!(fresh.join_participation(section).is_err(), "participation beside the contact");
+        assert!(fresh.read_tension(&mut fresh.rest(), &PASSAGE, |_| Ok(())).is_err(), "the tension reading");
+        let mut wide = tiny_turning(2, true, true, false);
+        let (ro, rb, a) = (wide.layout.readout, wide.layout.readout_bias, wide.declaration.alphabet);
+        wide.theta[ro..rb + a].fill(0);
+        assert!(wide.join_mutual_contact(FACE_BITS + 1).is_err(), "a scale finer than the face's grain");
+    }
+
     fn the_covector_matches_the_code_difference_of(gated: bool) {
         the_covector_of_tower_matches_the_code_difference(tiny_of(gated), gated, &PASSAGE, 10);
     }
@@ -7547,6 +7837,7 @@ mod tests {
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked, mut strands_checked) = (0, 0, 0, 0, 0, 0, 0, 0);
+        let mut mutual_checked = 0;
         let base_code = compared_code(&tower, &classes, compared);
         for &(start, len, grain) in &tower.layout.families {
             let mut order: Vec<usize> = (start..start + len).collect();
@@ -7579,6 +7870,7 @@ mod tests {
                 faces_checked += (tower.pair.is_some() && (start == tower.layout.pair_readout || start == tower.layout.pair_encoding)) as usize;
                 rings_checked += (tower.ring.is_some() && (start == tower.layout.ring_readout || start == tower.layout.ring_factors)) as usize;
                 strands_checked += (tower.strands.is_some() && (start == tower.layout.strand_contact || start == tower.layout.strand_pair)) as usize;
+                mutual_checked += (tower.mutual.is_some() && [tower.layout.encoding, tower.layout.readout, tower.layout.readout_bias].contains(&start)) as usize;
                 break;
             }
         }
@@ -7596,6 +7888,7 @@ mod tests {
         assert!(tower.ring.is_none() || rings_checked == 2, "the ring face's readout and factors carried {rings_checked} readable covectors of 2");
         let strand_families = if tower.declaration.contact == ContactLaw::Rectifying { 1 } else { 2 };
         assert!(tower.strands.is_none() || strands_checked == strand_families, "the strands' material carried {strands_checked} readable covectors of {strand_families}");
+        assert!(tower.mutual.is_none() || mutual_checked == 3, "the mutual contact's geometry, constants and encoding carried {mutual_checked} readable covectors of 3");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
