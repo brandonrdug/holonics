@@ -1,6 +1,6 @@
 # A coarse level's sites are its own ticks, carried across sections, so its heads reach across the passage's partition
 
-Refs #404 #406. Status: [design fixed before the build; agent-inferred, October 29].
+Refs #404 #406. Status: [built on the host and tested (§5); the card ported, its parity on the 4080 owed; agent-inferred, October 29].
 Claude (opus), design lead. The first of the October 28 expansions in the order fixed by
 [the audit](2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md#4-the-order-now):
 the consumer of [the radix record §1](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#1-a-value-is-a-radix-move-and-the-towers-modes-are-registers-in-their-own-radices)
@@ -40,7 +40,8 @@ without a news clock every level does, so the present participation is this law 
 `Δτ = 1`, face for face.
 
 **A level's section is its own.** It closes after `section` of that level's sites, releasing them
-and resting its frames, so a level-`l` section spans `section` ticks of `l`. On the race's clock
+and resting its frames, so a level-`l` section spans `section` of the arrivals where `l` ticks (an
+arrival that ticks twice admits one site and turns its frame twice). On the race's clock
 (`B = 8`, `r = 2`) at its held-out 1.85 bits a class, level 1 ticks about every 4.3 classes, level 2
 every 8.6 and level 3 every 17, so a section of 128 sites reaches about 550, 1,100 and 2,200 classes
 (several GSM8K problems), where level 0's reaches 128. The partition is the passage's own news, so
@@ -101,3 +102,61 @@ changes only participation's clock and section, so the measurement changes one t
 - **An uncertified deposition step**: the certificate rereads the section with its carried sites.
 - **Text on its codec's grain**: the clock counts the tower's own code in bits, for every medium.
 - **Bits read as progress**: the writings and the reach are shown beside the bits.
+
+## 5. Built
+
+[source-inspected; tested] **The host** (`hnn::tower`):
+- `LevelSites` carries each level's own count of open sites and its held `current`;
+  `LevelSites::reopened` releases a closed section's sites and rests its frames, keeping the current.
+- `Tower::step` admits a site only where the level's clock ticks, advances the frames and the met
+  dissipation `Δτ` times, holds the current under a news clock (without one every level ticks at
+  every arrival, so nothing is held), and closes each level's section at its own count.
+- `Tower::reverse_joined` reads the sites carried at the opening as constants, joins a held
+  cell's current covector to its last site's (dropped before the call's first site), parts the
+  transport sums where a level's section closes, and counts each move's turn and met covectors
+  `Δτ` times. The refusals of a reverse over carried sites and of a section longer than
+  participation's are gone.
+- `join_news` refuses after participation (the clock joins first); `admits_participation` admits
+  a news clock. `TowerState::to_text` and `Tower::state_from_text` carry each level's count, frames,
+  met dissipation and current; `Tower::widen_state` repeats the current with the modes.
+
+Tests (`hnn::tower`, 116 of 116 with these):
+- `a_clocked_levels_sites_are_its_ticks_and_its_current_is_held` (acceptance 2), on clocks of three
+  bits (level 1 still at some arrivals) and one bit (two or three ticks at each);
+- `a_clocked_participation_carries_its_sites_across_calls` (acceptances 1 and 3): three calls equal
+  the passage read whole, and with participation's contacts closed the tower is the plain clocked
+  tower face for face;
+- `the_clocked_participation_covector_matches_the_code_difference_from_a_carried_opening`
+  (acceptance 4): from an opening carrying both levels' sites, rectifying plain and turned and the
+  pair contact on three bits, and rectifying plain and turned on one bit, 30 of 32, 36 of 36, 32 of
+  32, 32 of 32 and 35 of 36 families read, every one within a tenth. A level still at a third of
+  the arrivals reads fewer sites, so its covectors sit within a few times the reading's grain: the
+  difference is read at the participation tests' step and at twice it, a parameter matching at
+  either. At one step level 1's largest key covector, 5,040,148 at `2^(−32)`, read 6,957,096, and
+  5,009,006 and 5,167,706 at twice and four times; at twice the step level 1's largest read
+  covector, 16,971,702, read 20,063,011, and within a tenth at one.
+- `a_clocked_states_text_restores_each_levels_sites_and_held_current` and the growth test on the
+  clocked participating tower (acceptance 5).
+
+[source-inspected; owed on the 4080] **The card** (`kernels/tower.cu`, `TowerCard`): the forward
+keeps each level's carried count and members in the block (`pa_open` `[S][L]`, `pa_member`),
+admits a site only at a tick, turns the frame `Δτ` times, reads the held current (`pa_hold`) at a
+cell the level is still at, and closes each level's section within a call; the ends return each
+level's section (`pa_sect`). `tower_reverse_participation` joins held cells' current covectors to
+their sites, reads the carried sites as constants, marks the closes (`pa_mark`) where the transport
+sums part, writes zero chart covectors at held cells and counts the transport `Δτ` times. The
+refusals of participation beside a clock, of a read across a close and of a reverse over carried
+sites are gone. Tests (`tower_pass`): the clocked participating pass for 32 sections, on the pair
+contact with an uncompared place, unclocked sections of twelve over learner sections of nine,
+the class-by-class advance, and a section read on across calls and closed within one (its
+covector over carried sites the host's). `tower_pass parity … NEWS_BITS NEWS_RADIX participating`
+runs the race's declaration; `train-two-ladder-news-participating-tower-classes` is the race's
+command.
+
+**A reading beside acceptance 7** [agent-inferred, from the unified-theory thread]: in
+`participation_return`, `g_z = ln 2 · a ⊙ (g_a − ⟨a, g_a⟩)` vanishes on a head whose weights sit on
+one site, so such a head's probe, key and friction charts learn nothing about where to look. Beside
+the bits and the reach, the measurement reads each head's participation entropy in bits at the
+answers' openings and the share of each head's covector reaching its score charts (probe, key,
+friction) against its value chart, for the clocked and unclocked races.
+

@@ -117,7 +117,12 @@ impl ParticipationDeclaration {
 /// [definition; agent-inferred, October 29] **A level's open section**: each mode's frame `U` on
 /// `2^(−30)` and met dissipation `L` on `2^(−16)` bits since the section opened, and the sites it has
 /// admitted, each with its rotated key and current charts and its heads' mean dissipation. The sites
-/// are the section's present terrain; they are released when the section closes.
+/// are the section's present terrain; they are released when the section closes. Under a news clock a
+/// level's sites are its own ticks, so its section spans its own clock and is carried with the modes
+/// across the learner's sections; `current` is the participating current `y` of the level's last
+/// site, held through the arrivals that tick no time (zero before the first, and always zero without
+/// a news clock, where every arrival ticks; record
+/// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LevelSites {
     pub frame: Vec<Phasor>,
@@ -125,11 +130,17 @@ pub struct LevelSites {
     pub keys: Vec<Vec<Phasor>>,
     pub values: Vec<Vec<Phasor>>,
     pub dissipation: Vec<Vec<i64>>,
+    pub current: Vec<Phasor>,
 }
 
 impl LevelSites {
     pub fn rest(modes: usize) -> Self {
-        Self { frame: vec![(1 << MOVE_BITS, 0); modes], met: vec![0; modes], keys: Vec::new(), values: Vec::new(), dissipation: Vec::new() }
+        Self { frame: vec![(1 << MOVE_BITS, 0); modes], met: vec![0; modes], keys: Vec::new(), values: Vec::new(), dissipation: Vec::new(), current: vec![(0, 0); modes] }
+    }
+    /// The section opened afresh after a close: frames and met dissipation at rest, no sites, the
+    /// last site's current still held.
+    pub fn reopened(&self) -> Self {
+        Self { current: self.current.clone(), ..Self::rest(self.frame.len()) }
     }
     pub fn len(&self) -> usize {
         self.keys.len()

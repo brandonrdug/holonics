@@ -362,8 +362,9 @@ impl TowerState {
     /// previous reversed news`, then the modes (level-major, `re im`), the ring, its hands, the
     /// strands, the credit (`-` when the stream carries none; per level its push, along, around,
     /// gate bias and gate moments), the open face (`-` without one; its total, then its masses)
-    /// and participation's open section (`-` without participation; its site count, then per
-    /// level the frame, the met dissipation and each site's key, value and heads' dissipation).
+    /// and participation's open sections (`-` without participation; per level its site count, the
+    /// frame, the met dissipation, the held current and each site's key, value and heads'
+    /// dissipation).
     pub fn to_text(&self) -> String {
         let mut s = format!("state {} {} {}\n", self.previous, u8::from(self.reversed), self.news);
         let mut modes = Vec::new();
@@ -392,11 +393,13 @@ impl TowerState {
         }
         match self.sites.first() {
             None => s.push_str("sites -\n"),
-            Some(first) => {
-                let mut v = vec![first.len() as i64];
+            Some(_) => {
+                let mut v = Vec::new();
                 for level in &self.sites {
+                    v.push(level.len() as i64);
                     flatten(&mut v, &level.frame);
                     v.extend(&level.met);
+                    flatten(&mut v, &level.current);
                     for j in 0..level.len() {
                         flatten(&mut v, &level.keys[j]);
                         flatten(&mut v, &level.values[j]);
@@ -478,31 +481,40 @@ impl Tower {
         let sites = match (lines[7], self.participation()) {
             ("sites -", None) => Vec::new(),
             (text, Some(p)) if text != "sites -" => {
-                let n0 = text.split(' ').nth(1).and_then(|w| w.parse::<usize>().ok()).ok_or(TowerError::Refused("a site count that is not a count"))?;
-                if n0 >= p.section {
-                    return refuse("an open section holds fewer sites than its section");
-                }
                 let (n, h) = (d.modes, p.heads.len());
-                let v = entries::<i64>(text, "sites", 1 + d.levels * (3 * n + n0 * (4 * n + h)))?;
-                let mut at = 1;
-                let mut take = |k: usize| {
-                    let part = v[at..at + k].to_vec();
+                let mut words = text.split(' ');
+                if words.next() != Some("sites") {
+                    return refuse("not a line of sites");
+                }
+                let v = words.map(|w| w.parse::<i64>().map_err(|_| TowerError::Refused("an entry of sites that is not an integer"))).collect::<Result<Vec<_>>>()?;
+                let mut at = 0;
+                let mut take = |k: usize| -> Result<Vec<i64>> {
+                    let part = v.get(at..at + k).ok_or(TowerError::Refused("a line of sites shorter than its counts"))?.to_vec();
                     at += k;
-                    part
+                    Ok(part)
                 };
-                (0..d.levels)
+                let levels = (0..d.levels)
                     .map(|_| {
-                        let frame = paired(&take(2 * n));
-                        let met = take(n);
-                        let mut level = LevelSites { frame, met, keys: Vec::new(), values: Vec::new(), dissipation: Vec::new() };
-                        for _ in 0..n0 {
-                            level.keys.push(paired(&take(2 * n)));
-                            level.values.push(paired(&take(2 * n)));
-                            level.dissipation.push(take(h));
+                        let count = usize::try_from(take(1)?[0]).map_err(|_| TowerError::Refused("a site count that is not a count"))?;
+                        if count >= p.section {
+                            return refuse("an open section holds fewer sites than its section");
                         }
-                        level
+                        let frame = paired(&take(2 * n)?);
+                        let met = take(n)?;
+                        let current = paired(&take(2 * n)?);
+                        let mut level = LevelSites { frame, met, keys: Vec::new(), values: Vec::new(), dissipation: Vec::new(), current };
+                        for _ in 0..count {
+                            level.keys.push(paired(&take(2 * n)?));
+                            level.values.push(paired(&take(2 * n)?));
+                            level.dissipation.push(take(h)?);
+                        }
+                        Ok(level)
                     })
-                    .collect()
+                    .collect::<Result<Vec<_>>>()?;
+                if at != v.len() {
+                    return refuse("a line of sites longer than its counts");
+                }
+                levels
             }
             _ => return refuse("participation's open section on a participating tower alone"),
         };
@@ -512,7 +524,7 @@ impl Tower {
 
 #[cfg(test)]
 mod tests {
-    use super::super::tests::{keys, tiny_contacts, tiny_participating};
+    use super::super::tests::{keys, tiny_clocked_participating, tiny_contacts, tiny_participating};
     use super::*;
     use crate::hnn::tower::realization::HostPass;
 
@@ -651,5 +663,22 @@ mod tests {
         let mut short = lines.clone();
         short[1] = "modes 1 2";
         assert!(tower.state_from_text(&short).is_err());
+    }
+
+    /// [agent-inferred, October 29] Acceptance 5 of the record
+    /// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`: under a news clock each level carries
+    /// its own count of open sites and its held current, and the state's text restores them whole.
+    #[test]
+    fn a_clocked_states_text_restores_each_levels_sites_and_held_current() {
+        let tower = tiny_clocked_participating(ContactLaw::Rectifying, false, 3);
+        let mut state = tower.rest();
+        for &u in &[1, 2, 0, 1, 1, 3, 2, 2, 0, 1, 2, 1, 0, 0, 3, 1, 2, 2, 1, 0, 1, 2] {
+            tower.advance(&mut state, u).expect("advance");
+        }
+        assert_ne!(state.sites[0].len(), state.sites[1].len(), "the levels' counts differ");
+        assert!(state.sites.iter().all(|s| s.current.iter().any(|&c| c != (0, 0))), "each level holds a current");
+        let text = state.to_text();
+        let lines: Vec<&str> = text.lines().collect();
+        assert_eq!(tower.state_from_text(&lines).expect("restored"), state);
     }
 }

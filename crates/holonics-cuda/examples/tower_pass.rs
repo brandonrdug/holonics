@@ -1,10 +1,10 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX | participating | mutual]`: founds the gated
-//!   tower (rectifying, on both turn ladders) on the keys, its levels on the news clock
-//!   `NewsClock(NEWS_BITS, NEWS_RADIX)` when one is named, with participation over `SECTION`
-//!   joined (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating] | participating | mutual]`:
+//!   founds the gated tower (rectifying, on both turn ladders) on the keys, its levels on the news
+//!   clock `NewsClock(NEWS_BITS, NEWS_RADIX)` when one is named, with participation over `SECTION`
+//!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
@@ -22,7 +22,7 @@
 //!   trainer reads it.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
@@ -71,10 +71,11 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    let participating = args.len() == 13 && args[12] == "participating";
+    let participating = (args.len() == 13 || args.len() == 15) && args[args.len() - 1] == "participating";
     let mutual = args.len() == 13 && args[12] == "mutual";
-    if args.len() != 12 && args.len() != 14 && !participating && !mutual {
-        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX | participating | mutual]".into());
+    let clocked = args.len() == 14 || args.len() == 15;
+    if !(args.len() == 12 || (clocked && (args.len() == 14 || participating)) || (args.len() == 13 && (participating || mutual))) {
+        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating] | participating | mutual]".into());
     }
     let bytes = pinned(&args[0], &args[1])?;
     let keys = pinned(&args[2], &args[3])?;
@@ -104,7 +105,7 @@ fn parity(args: &[String]) -> Result<()> {
         return Err("the passage must hold the declared sections in every stream".into());
     }
     let mut tower = Tower::found_on(declaration, &keys, TurnLadder::Both)?;
-    if args.len() == 14 {
+    if clocked {
         tower.join_news(NewsClock::new(args[12].parse()?, args[13].parse()?)?)?;
     }
     if participating {
