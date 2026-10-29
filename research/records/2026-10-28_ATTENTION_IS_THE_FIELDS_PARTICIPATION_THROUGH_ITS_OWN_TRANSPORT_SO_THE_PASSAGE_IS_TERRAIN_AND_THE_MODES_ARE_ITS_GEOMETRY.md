@@ -189,9 +189,32 @@ forward and reverse in `kernels/tower.cu`:
 - the reverse through the Laplacian return `J = diag(a) − a aᵀ` (`resolvent.attention-variation`),
   the participation recomputed from the forward's operands rather than stored.
 
-The first law stops the covector at `Θ` and `D`: the participation reads the modes' geometry and the
-geometry learns through the modes' own path. The transport term `Σ a dU Ψ` of the complete variation
-is owed, and named in §8.
+The first law stopped the covector at `Θ` and `D`: the participation read the modes' geometry and the
+geometry learned through the modes' own path, the transport term `Σ a dU Ψ` of the complete variation
+owed (§8).
+
+[agent-inferred, October 29] **The transport covector** (`tower.participation-transport-covector`).
+A site's charts are `q = conj(U) Ȟ`, `k = conj(U) H`, `w = conj(U) Ψ` and its current `y = U J/m`, so
+a turn `dφ` of its frame moves them by `−i q dφ`, `−i k dφ`, `−i w dφ` and `+i y dφ`. With
+`dℓ = Re(conj(G) dx)`, the site's turn covector is
+
+`g_φ(i) = Im(conj(G_q) q) + Im(conj(G_k) k) + Im(conj(G_w) w) − Im(conj(g_y) y)`,
+
+`G_k` and `G_w` summed over the later probes that read the site. The frame at `i` is the product of
+the section's unit moves `u_t, t ≤ i`, so the covector of `arg u_t` gains `Σ_(i≥t) g_φ(i)`. It joins the
+turn's own `Re(conj(iλ_t) G_λ)` and reaches the founded move, the turn material and the arriving
+symbol's turn as that does. The met dissipation enters `z_ij` as `−κ(L̄_i − L̄_j)`, so a site's head
+mean has covector `g_L̄(i) = −κ Σ_(j≤i) g_z,ij + κ Σ_(i′≥i) g_z,i′i`. Each of the head's modes' `log₂ ρ_t
+= c r ℓ` gains `−Σ_(i≥t) g_L̄(i)/|h|`, which reaches the gate's logit through `c ℓ ln 2 · r(1 − r)` and
+the founded modulus through `c r/(|λ| ln 2)`; a move held at the margin carries none. A common turn
+or a common dissipation moves no face, so `Σ_i g_φ(i) = 0` and `Σ_i g_L̄(i) = 0` (the gauge), and an
+ungated level carries no frame. Both sums are on `2^(−48)`, the turn's own grain.
+
+On the tiny participating towers (plain, turned and paired) the gate, turn and founded-move families
+at every level match the code difference at their largest parameters
+(`the_transport_covector_matches_the_code_difference`). Without the term, the founded moves read up
+to four times their difference and a turned tower's turns read the wrong sign: on the turned tower
+the term is most of the turn's covector.
 
 ## 7. Acceptance, fixed before the build
 
@@ -258,7 +281,8 @@ memory are projected from a one-to-three-minute read on the card before launch, 
   level-0 head's reach in it; the next loop admits the stream's earlier sites as present terrain
   (their charts carried as the modes' state is carried) or makes the section the passage's own
   partition (the review's fix 2). Named here so it is not carried unrepaired.
-- **The transport's covector.** `Σ a dU Ψ` through `Θ` and `D` into the gates and turns.
+- **The transport's covector.** `Σ a dU Ψ` through `Θ` and `D` into the gates and turns: returned on
+  October 29 (§6).
 - **Curvature.** The path-dependent transport of a two-dimensional chart.
 - **The pump's reflection.** On a pumped mode the transport `α h + β conj(h)` is real-linear; the
   first build pairs through its turn part only.
