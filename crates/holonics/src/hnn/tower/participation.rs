@@ -45,6 +45,96 @@ use crate::hnn::keyed_modes::{ln2_face, Exponential};
 /// A complex numerator pair on a declared grain.
 pub type Phasor = (i64, i64);
 
+/// [definition; agent-inferred, October 29] **A tower's declared participation**: each level's heads
+/// (contiguous runs of modes, in order, that together span the bank), the section whose arrivals a
+/// site may read (the learner's section: the first build admits the present section's sites, record
+/// §8), and the pairing's scale `β = 2^(−beta_shift)`. Its material (the charts `Ȟ, H, Ψ`, the
+/// current's read `Cᵃ`, the contacts' `W₁ᵃ` and each head's friction) sits in the tower's material.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParticipationDeclaration {
+    pub heads: Vec<usize>,
+    pub section: usize,
+    pub beta_shift: u32,
+}
+
+impl ParticipationDeclaration {
+    pub fn new(heads: Vec<usize>, section: usize, beta_shift: u32) -> Result<Self> {
+        if heads.is_empty() || heads.contains(&0) || section == 0 {
+            return refuse("a participation of nonempty heads over a nonempty section");
+        }
+        Ok(Self { heads, section, beta_shift })
+    }
+    /// The heads founded on a bank: one head a run of modes that share a founded memory, read off the
+    /// founded moves' moduli, and `β` founded on the largest head ([`Head::founded`]).
+    pub fn founded(moduli: &[i128], section: usize) -> Result<Self> {
+        let mut heads = Vec::new();
+        let mut run = 0usize;
+        for (k, m) in moduli.iter().enumerate() {
+            if k > 0 && *m != moduli[k - 1] {
+                heads.push(run);
+                run = 0;
+            }
+            run += 1;
+        }
+        if run > 0 {
+            heads.push(run);
+        }
+        let widest = heads.iter().copied().max().unwrap_or(1);
+        Self::new(heads, section, Head::founded(widest).beta_shift)
+    }
+    pub fn modes(&self) -> usize {
+        self.heads.iter().sum()
+    }
+    pub fn ranges(&self) -> Vec<std::ops::Range<usize>> {
+        let mut at = 0;
+        self.heads
+            .iter()
+            .map(|&h| {
+                at += h;
+                at - h..at
+            })
+            .collect()
+    }
+    pub(super) fn to_text(&self) -> String {
+        let heads: Vec<String> = self.heads.iter().map(usize::to_string).collect();
+        format!("participation {} {} {}", self.section, self.beta_shift, heads.join(","))
+    }
+    pub(super) fn from_text(line: &str) -> Result<Self> {
+        let words: Vec<&str> = line.split(' ').collect();
+        let count = |w: &str| w.parse::<usize>().map_err(|_| super::TowerError::Refused("a participation that is not the tower's"));
+        if words.len() != 4 || words[0] != "participation" {
+            return refuse("a participation that is not the tower's");
+        }
+        let heads = words[3].split(',').map(count).collect::<Result<Vec<_>>>()?;
+        Self::new(heads, count(words[1])?, count(words[2])? as u32)
+    }
+}
+
+/// [definition; agent-inferred, October 29] **A level's open section**: each mode's frame `U` on
+/// `2^(−30)` and met dissipation `L` on `2^(−16)` bits since the section opened, and the sites it has
+/// admitted, each with its rotated key and current charts and its heads' mean dissipation. The sites
+/// are the section's present terrain; they are released when the section closes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LevelSites {
+    pub frame: Vec<Phasor>,
+    pub met: Vec<i64>,
+    pub keys: Vec<Vec<Phasor>>,
+    pub values: Vec<Vec<Phasor>>,
+    pub dissipation: Vec<Vec<i64>>,
+}
+
+impl LevelSites {
+    pub fn rest(modes: usize) -> Self {
+        Self { frame: vec![(1 << MOVE_BITS, 0); modes], met: vec![0; modes], keys: Vec::new(), values: Vec::new(), dissipation: Vec::new() }
+    }
+    pub fn len(&self) -> usize {
+        self.keys.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.keys.is_empty()
+    }
+}
+
 /// One head's declared and learned law: the pairing's scale `β = 2^(−beta_shift)` and the friction
 /// `κ` on `2^(−16)`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
