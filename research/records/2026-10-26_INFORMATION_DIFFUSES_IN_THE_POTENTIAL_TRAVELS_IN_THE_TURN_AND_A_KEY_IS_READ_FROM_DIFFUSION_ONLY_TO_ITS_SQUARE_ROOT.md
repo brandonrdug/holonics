@@ -232,9 +232,14 @@ count of what must be supplied.
     cycle's cover: the powers are eigenvectors, `L(z^x) = (1 − z)(1 − z⁻¹) z^x` (`power_eigen`),
     with eigenvalue `|1 − z|²` on the unit circle (`eigenvalue_of_unit`); the defects of a section
     sum to `−Σc` round the cycle, so every section of a frustrated cycle breaks a contact
-    (`defects_sum`, `frustrated_section_breaks`); and the Fejér identity (`fejer_identity`). Still
-    owed: that `|1 − ζ^c|²` is the least eigenvalue, `n²λ₁ → (2πc/k)²`, and a section's Rayleigh
-    quotient;
+    (`defects_sum`, `frustrated_section_breaks`); and the Fejér identity (`fejer_identity`). The
+    rest is since discharged in #410 in the same file: `λ₁ = |1 − ζ_N^c|²` (with `2|c| ≤ k`) is the
+    least eigenvalue, every section having `λ₁ · mass ≤ energy` and every eigenvalue on a nonzero
+    section being real and at least `λ₁` (`least_energy`, `least_eigenvalue`, through the Hermitian
+    Plancherel identity of `Physics/Fluid/ComplexFluid`); `|n²λ₁ − (2πc/k)²| ≤ 5(2πc/k)⁴/(48n²)`,
+    so `n²λ₁ → (2πc/k)²` (`least_rate`, `tendsto_least`); and the labelling's Rayleigh quotient is
+    `λ₁ |Σ_(j<n) ζ^(cj)|²/n`, whose Fejér factor over `n` tends to `|1 − e^(2πic/k)|²/(2πc/k)²`
+    (`lap_section_rayleigh`, `tendsto_fejer`);
   - frustration's gauge invariance as a class function. Formal-checked on October 26 in
     [`Geometry/Frustration`](../../lean/HolonicsResearch/Geometry/Frustration.lean) on any finite
     graph with a connection in an additive group: a gauge move carries the broken contacts
