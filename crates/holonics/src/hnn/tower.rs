@@ -189,6 +189,7 @@ use num_bigint::BigUint;
 use rayon::prelude::*;
 
 pub mod duplex;
+pub mod participation;
 pub mod realization;
 
 use realization::{HostPass, PassRealization, Slot};
