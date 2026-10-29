@@ -116,10 +116,13 @@ decides nothing.
    an ask, and an answer's sections compare the answer's places and its end letter alone.
 5. **Provenance.** Every ask on a participating body returns the opening's participation; none
    without participation.
-6. **The product.** On the 4080, a body founded from the participating race's last learner with
-   the race's streams hears a passage the race did not read, rests, starts cold, and answers the
-   race's release prompts and an unseen design question. Each answer is shown whole with its
-   provenance, beside the cold restart's equality.
+6. **The product.** On the 4080, a body founded from the participating race's last learner hears a
+   passage the race did not read, rests, starts cold, and answers the race's release prompts and an
+   unseen design question. Each answer is shown whole with its provenance, beside the cold
+   restart's equality. [agent-inferred, before the run: the passage is this record and the mutual
+   contact's, about 22,100 classes; the race's 320 streams would cut it into parts shorter than one
+   section of 128, so no section would close and nothing would be learned. The body hears on 16
+   currents, about ten sections each.]
 
 **Lessons, checked before the build** ([the failures that repeated](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)).
 - Retention as a tape or journal: refused. π holds at most one open section and the release is not
