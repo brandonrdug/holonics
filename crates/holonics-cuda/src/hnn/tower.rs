@@ -911,8 +911,8 @@ impl<'c> TowerCard<'c> {
             pa_scale: card.alloc(ql * pa)?,
             pa_run: card.alloc(s * l * n * 2 * pa)?,
             pa_met: card.alloc(s * l * n * pa)?,
-            pa_z: card.alloc(s * t.max(sec) * pa)?,
-            pa_e: card.alloc(s * t.max(sec) * pa)?,
+            pa_z: card.alloc(s * heads * t.max(sec) * pa)?,
+            pa_e: card.alloc(s * heads * t.max(sec) * pa)?,
             pa_dra: card.alloc(ql * w * pa)?,
             pa_gy: card.alloc(ql * 2 * n * pa)?,
             pa_gq: card.alloc(q * n * 2 * pa)?,
@@ -1626,8 +1626,13 @@ impl<'c> TowerCard<'c> {
             None => format!("card {}: no section read yet", census.name),
             Some(shape) => {
                 let q = shape.streams * shape.cells;
+                let participation = if shape.heads > 0 {
+                    format!("; participation's {} heads one warp a head, the warps taking the heads in turn, in the forward's block and in its own reverse of {} blocks (one a stream, its cells in order)", shape.heads, shape.streams)
+                } else {
+                    String::new()
+                };
                 format!(
-                    "card {} ({} multiprocessors): forward {} blocks (one a stream, its {} cells in order) x {THREADS} threads; reverse {q} blocks (one a cell) x {THREADS} threads, the modes' scan {} blocks x {} threads (one a mode); outer sums in tiles of {OUTER_ROWS}x{OUTER_COLS} outputs, 4 a thread",
+                    "card {} ({} multiprocessors): forward {} blocks (one a stream, its {} cells in order) x {THREADS} threads; reverse {q} blocks (one a cell) x {THREADS} threads, the modes' scan {} blocks x {} threads (one a mode); outer sums in tiles of {OUTER_ROWS}x{OUTER_COLS} outputs, 4 a thread{participation}",
                     census.name,
                     census.multiprocessors,
                     shape.streams,
