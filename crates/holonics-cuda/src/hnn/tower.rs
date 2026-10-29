@@ -26,7 +26,11 @@
 //! `b = W_b r̂ + b_b` read beside the first and kept at each cell for the reverse, the product
 //! `v = a ⊙ b`, or the foil's `a b_b + b_a (b − b_b)`, released to the face; the reverse returns
 //! each drive's covector through its partner, the foil's through the other drive's bias, and sums
-//! the foil's biases on their own, `tower_pair_biases`), no passage credit, at most four levels,
+//! the foil's biases on their own, `tower_pair_biases`), with or without strands (each stream's
+//! residues and orientation heard from the arriving class's word, one thread a ring, through the
+//! strands' resident table, their faces read off the rings' resident faces at their level's
+//! contacts beside `r̂`, and their materials' covectors `δa ⊗ s`, `δb ⊗ s` summed by the outer
+//! sums; the faces carry none), no passage credit, at most four levels,
 //! streams of one section length, with
 //! or without the pair face (its values resident on the card beside the material, read at each
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
@@ -44,11 +48,11 @@
 //! | Kernel | Block | Thread | A thread loops over |
 //! |---|---|---|---|
 //! | `tower_transpose` | a grid striding one matrix family (`grid.y` the family) | one material entry | — |
-//! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: the pair face's lift, a push or gate logit, a mode's move, a ring rank's advance and face, a read, a contact, a return part, a class's face (with its pair read and the ring's pair read); 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (a contact both its drives under the pair law; the return's contacts in `256/W` groups; a ring rank its factors) |
+//! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: the pair face's lift, a strands' ring (its three residues heard byte by byte, then their faces), a push or gate logit, a mode's move, a ring rank's advance and face, a read, a contact, a return part, a class's face (with its pair read and the ring's pair read); 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (a contact both its drives under the pair law; the return's contacts in `256/W` groups; a ring rank its factors) |
 //! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage (the ring's readout covector, its face's and each rank's read covector among them); 256 threads | the stage's outputs, within each its column's weights |
 //! | `tower_reverse_modes` | one stream of one level (under a rotor, exactly one thread a mode, the block exchanging each step's covector through shared memory) | one mode | the stream's cells in reverse order (the scan) |
 //! | `tower_reverse_ring` | one stream | one ring rank's scan step, then one face coordinate, then one factor entry | the stream's cells in reverse order, every rank's scan carried together; a coordinate the ranks in their order |
-//! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift and the ring's readout among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
+//! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift, the ring's readout and the strands' materials among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
 //! | `tower_ring_factors` | a grid striding the ring's factors | one factor entry | the streams |
 //! | `tower_encoding` | one class | one face coordinate | every cell, summing where its class arrived |
 //! | `tower_moves` | one level | one mode | the streams |
@@ -157,6 +161,13 @@ struct LawWords {
     pad1: u32,
     sections: [u64; MAX_LEVELS],
     period: u64,
+    /// The strands (`strand_rings = 0` without them): their level, their rings, the places of
+    /// `W_sa` and `W_sb` and their reaches ([`holonics::hnn::tower::realization::ResidentStrands`]).
+    strand_level: u32,
+    strand_rings: u32,
+    strand_contact: u64,
+    strand_pair: u64,
+    strand_reach: [u64; 2],
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -255,6 +266,11 @@ struct FrameWords {
     r_db: u64,
     da_bias: u64,
     db_bias: u64,
+    strands: u64,
+    strand_open: u64,
+    strand_ends: u64,
+    strand_faces: u64,
+    r_strand: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -312,6 +328,9 @@ struct Shape {
     paired: usize,
     /// One under the pair contact's foil, whose biases' covectors are summed on their own.
     foil: usize,
+    /// The strands' rings and their resident table's words (each zero without strands).
+    strand_rings: usize,
+    strand_table: usize,
 }
 
 impl Shape {
@@ -419,12 +438,18 @@ struct Frame<'c> {
     db: CardBuffer<'c, i64>,
     da_bias: CardBuffer<'c, i64>,
     db_bias: CardBuffer<'c, i64>,
+    /// The strands' resident table, each stream's residues and orientation before its first cell
+    /// and after its last, and the faces their level reads at each cell (each empty without them).
+    strands: CardBuffer<'c, i32>,
+    strand_open: CardBuffer<'c, u32>,
+    strand_ends: CardBuffer<'c, u32>,
+    strand_faces: CardBuffer<'c, i32>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
     /// turn's covector `δs`, then the pump's depth and axis covectors `δκ`, `δp`, then the second
-    /// drive's covector `δb` (each `Q·L`).
-    reach_offsets: [usize; 20],
+    /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`).
+    reach_offsets: [usize; 21],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -522,8 +547,10 @@ impl<'c> TowerCard<'c> {
                 return refuse("the card reads a pair face of one value a form at every pair");
             }
         }
-        if law.strands {
-            return refuse("the card carries no strands: its forward reads no strand contact and its reverse has no strand gradient");
+        if let Some(strands) = &law.strands {
+            if strands.level >= d.levels || strands.rings == 0 || strands.rings > u32::MAX as usize / 8 || strands.table.len() < 8 + 3 * strands.rings {
+                return refuse("the card hears strands of one or more rings on a level of the tower, through their resident table");
+            }
         }
         if let Some(rotor) = &law.rotor {
             if rotor.moving > d.modes || d.modes > THREADS as usize || rotor.keys.len() != d.levels * d.alphabet * rotor.moving * 4 {
@@ -564,7 +591,7 @@ impl<'c> TowerCard<'c> {
             streams: streams as u32,
             face_digits: law.face_roots.len() as u32,
             move_digits: law.move_roots.len() as u32,
-            families: (1 + (7 + usize::from(d.turned) + 2 * usize::from(d.pumped) + usize::from(d.contact != ContactLaw::Rectifying)) * d.levels) as u32,
+            families: (Self::families(law).len() / 3) as u32,
             contact: match d.contact {
                 ContactLaw::Rectifying => 0,
                 ContactLaw::Pair => 1,
@@ -606,6 +633,13 @@ impl<'c> TowerCard<'c> {
             words.ring_readout = ring.readout as u64;
             words.ring_factors = ring.factors as u64;
             words.ring_reach = ring.reach;
+        }
+        if let Some(strands) = &law.strands {
+            words.strand_level = strands.level as u32;
+            words.strand_rings = strands.rings as u32;
+            words.strand_contact = strands.contact as u64;
+            words.strand_pair = strands.pair as u64;
+            words.strand_reach = strands.reaches;
         }
         if let Some(clock) = &law.news {
             words.news = 1;
@@ -661,6 +695,13 @@ impl<'c> TowerCard<'c> {
                 out.extend([lv.pair as u64, f, w]);
             }
         }
+        if let Some(strands) = &law.strands {
+            let c = 6 * strands.rings as u64;
+            out.extend([strands.contact as u64, f, c]);
+            if d.contact != ContactLaw::Rectifying {
+                out.extend([strands.pair as u64, f, c]);
+            }
+        }
         out
     }
 
@@ -670,13 +711,14 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         let card = self.card;
-        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, moving, paired, foil, .. } = shape;
+        let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, moving, paired, foil, strand_rings: sr, strand_table, .. } = shape;
+        let stranded = usize::from(sr > 0);
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let q = s * t;
         let ql = q * l;
-        let mut reach_offsets = [0usize; 20];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired];
+        let mut reach_offsets = [0usize; 21];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -686,7 +728,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired) * l))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired) * l + stranded * (1 + paired)))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -758,6 +800,10 @@ impl<'c> TowerCard<'c> {
             db: card.alloc(ql * f * paired)?,
             da_bias: card.alloc(ql * f * foil)?,
             db_bias: card.alloc(ql * f * foil)?,
+            strands: card.alloc(strand_table)?,
+            strand_open: card.alloc(s * (3 * sr + 1) * stranded)?,
+            strand_ends: card.alloc(s * (3 * sr + 1) * stranded)?,
+            strand_faces: card.alloc(q * 6 * sr)?,
             reach_offsets,
         });
         Ok(())
@@ -858,6 +904,11 @@ impl<'c> TowerCard<'c> {
             r_db: r(19),
             da_bias: frame.da_bias.device_ptr(),
             db_bias: frame.db_bias.device_ptr(),
+            strands: frame.strands.device_ptr(),
+            strand_open: frame.strand_open.device_ptr(),
+            strand_ends: frame.strand_ends.device_ptr(),
+            strand_faces: frame.strand_faces.device_ptr(),
+            r_strand: r(20),
         }
     }
 
@@ -914,7 +965,7 @@ impl<'c> TowerCard<'c> {
         let (k2, kp) = shape.ring_reads();
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -953,10 +1004,17 @@ impl<'c> TowerCard<'c> {
             return Err(TowerError::Refused("the card reads streams of one section length"));
         }
         let ranks = law.ring.as_ref().map_or(0, |r| r.ranks);
+        // Each strand's residue lies below its ring's modulus (strand-major, ring `j mod R`), as
+        // every residue heard from rest does.
+        let strand_rings = law.strands.as_ref().map_or(0, |st| st.rings);
+        let below = |o: &TowerState| match &law.strands {
+            None => o.strands.is_empty() && !o.reversed,
+            Some(st) => o.strands.len() == 3 * st.rings && o.strands.iter().enumerate().all(|(j, &r)| i64::from(r) < i64::from(st.table[8 + 3 * (j % st.rings)])),
+        };
         if opening.len() != streams
-            || opening.iter().any(|o| o.credit.is_some() || o.ring.len() != ranks || o.hands.len() != ranks || !o.strands.is_empty() || o.reversed || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
+            || opening.iter().any(|o| o.credit.is_some() || o.ring.len() != ranks || o.hands.len() != ranks || !below(o) || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
         {
-            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and no strand residue"));
+            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and each strand's residue below its ring's modulus"));
         }
         // The news clock's open face and phase, each mass within the face's total and a 64-bit
         // word (the forward's own faces are), the phase below the clock's period.
@@ -993,7 +1051,7 @@ impl<'c> TowerCard<'c> {
         };
         let forms = law.pair.as_ref().map_or(0, |p| p.forms);
         let (harmonics, ring_moves) = law.ring.as_ref().map_or((0, 0), |r| (r.harmonics, r.moves.iter().map(Vec::len).sum()));
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1022,6 +1080,11 @@ impl<'c> TowerCard<'c> {
             }
             if let Some(rotor) = law.rotor.as_ref().filter(|r| r.moving > 0) {
                 card.write(&frame.rotor, 0, &rotor.keys).map_err(device)?;
+            }
+            if let Some(strands) = &law.strands {
+                card.write(&frame.strands, 0, &strands.table).map_err(device)?;
+                let open: Vec<u32> = opening.iter().flat_map(|o| o.strands.iter().copied().chain([u32::from(o.reversed)])).collect();
+                card.write(&frame.strand_open, 0, &open).map_err(device)?;
             }
             if law.pair.is_some() || law.ring.is_some() {
                 let previous: Vec<u32> = opening.iter().map(|o| o.previous as u32).collect();
@@ -1066,6 +1129,7 @@ impl<'c> TowerCard<'c> {
         let (ring_ends, hands_ends) = if ranks > 0 { (self.card.fetch(&frame.ring_ends).map_err(device)?, self.card.fetch(&frame.hands_ends).map_err(device)?) } else { (Vec::new(), Vec::new()) };
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
+        let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
         let faces: Vec<Vec<Option<(u128, u128)>>> = targets
             .iter()
             .enumerate()
@@ -1096,6 +1160,11 @@ impl<'c> TowerCard<'c> {
                 if ranks > 0 {
                     state.ring = (0..ranks).map(|r| (ring_ends[(s * ranks + r) * 2], ring_ends[(s * ranks + r) * 2 + 1])).collect();
                     state.hands = (0..ranks).map(|r| hands_ends[s * ranks + r] != 0).collect();
+                }
+                if strand_rings > 0 {
+                    let end = &strand_ends[s * (3 * strand_rings + 1)..(s + 1) * (3 * strand_rings + 1)];
+                    state.strands = end[..3 * strand_rings].to_vec();
+                    state.reversed = end[3 * strand_rings] != 0;
                 }
                 if !news_ends.is_empty() {
                     let end = &news_ends[s * (d.alphabet + 4)..(s + 1) * (d.alphabet + 4)];
@@ -1216,6 +1285,15 @@ impl<'c> TowerCard<'c> {
                 out.push((family(at64(fw.dp, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dp, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump_axis), Some(gradient(lv.pump_axis_bias))), false));
             }
         }
+        // The strands' materials take their level's drives' covectors against the faces,
+        // `Σ δa sᵀ` and `Σ δb sᵀ`; the faces carry none.
+        if law.strand_rings > 0 {
+            let (su, c) = (law.strand_level as u64, 6 * law.strand_rings as u64);
+            out.push((family(at64(fw.da, su * f), l * f, fw.strand_faces, c, at64(fw.r_da, su), at64(fw.r_strand, su), l, f, c, false, gradient(law.strand_contact), None), false));
+            if law.contact != 0 {
+                out.push((family(at64(fw.db, su * f), l * f, fw.strand_faces, c, at64(fw.r_db, su), at64(fw.r_strand, su), l, f, c, false, gradient(law.strand_pair), None), false));
+            }
+        }
         // The pair face's readout takes the face's covector against the pair read, `Σ δz c(p)ᵀ`,
         // and its lift the bottom covector, `Σ δx⁰ c(p)ᵀ`.
         let k = law.forms as u64;
@@ -1244,7 +1322,8 @@ impl<'c> TowerCard<'c> {
     fn partial_extent(shape: &Shape, multiprocessors: u32) -> usize {
         let (a, w, n, f, k) = (shape.alphabet as u32, shape.width as u32, shape.modes as u32, shape.contacts as u32, shape.forms as u32);
         let kp = shape.ring_reads().1 as u32;
-        [(a, w + 1), (w, f + 1), (f, w + 1), (w, n), (n, w + 1), (a, k), (w, k), (a, kp)]
+        let c = 6 * shape.strand_rings as u32;
+        [(a, w + 1), (w, f + 1), (f, w + 1), (w, n), (n, w + 1), (a, k), (w, k), (a, kp), (f, c)]
             .iter()
             .map(|&(rows, width)| (rows * width) as usize * Self::groups(rows, width, shape.streams as u32, multiprocessors) as usize)
             .max()
@@ -1361,7 +1440,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

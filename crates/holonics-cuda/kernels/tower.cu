@@ -126,6 +126,11 @@ struct TowerLaw {
     uint32_t news, pad1;
     uint64_t sections[TOWER_MAX_LEVELS];
     uint64_t period;
+    // The strands (`strand_rings = 0` without them): the level whose contacts read them, their
+    // rings R, the places of W_sa and W_sb (F × 6R each, W_sb under a pair law) and max |W_sa|,
+    // max |W_sb|.
+    uint32_t strand_level, strand_rings;
+    uint64_t strand_contact, strand_pair, strand_reach[2];
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -232,6 +237,16 @@ struct TowerFrame {
     int64_t *db;               // [S][T][L][F]
     uint64_t *r_db;            // [S][T][L]
     int64_t *da_bias, *db_bias; // [S][T][L][F]
+    // The strands (each empty without them): their resident table (`ResidentStrands`: the laws,
+    // where each part begins, each ring's modulus, multiplier and faces, each byte's act, the
+    // digits' turns, the keys, the classes' words and each ring's faces e^(2πi r/q) on 2^(−16));
+    // each stream's residues (strand-major) and orientation before its first cell and after its
+    // last; the faces the strands' level reads at each cell, and their max |s| at that level.
+    const int32_t *strands;       // the table
+    const uint32_t *strand_open;  // [S][3R + 1]
+    uint32_t *strand_ends;        // [S][3R + 1]
+    int32_t *strand_faces;        // [S][T][6R]
+    uint64_t *r_strand;           // [S][T][L]
 };
 
 // -------------------------------------------------------------------------------------------
@@ -685,6 +700,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int32_t *phi = (int32_t *)carve(at, 4ull * KP);
     // The rotor's stepped and turned state h' of the level's moving modes.
     int64_t *hs = (int64_t *)carve(at, 8ull * 2 * law.moving);
+    // The strands' residues (strand-major) and the faces their level reads.
+    const uint32_t SR = law.strand_rings;
+    uint32_t *sr = (uint32_t *)carve(at, 4ull * 3 * SR);
+    int32_t *sp = (int32_t *)carve(at, 4ull * 6 * SR);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -721,6 +740,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         rg[2 * r] = fr.ring_open[((uint64_t)s * R + r) * 2];
         rg[2 * r + 1] = fr.ring_open[((uint64_t)s * R + r) * 2 + 1];
         hd[r] = fr.hands_open[(uint64_t)s * R + r];
+    }
+    // Each thread carries the strands' orientation alike; ring k's residues are thread k's.
+    const int32_t *tb = fr.strands;
+    bool reversed = SR > 0 && fr.strand_open[(uint64_t)s * (3 * SR + 1) + 3 * SR] != 0;
+    for (uint32_t k = tid; k < SR; k += B) {
+        for (uint32_t j = 0; j < 3; j++) {
+            sr[j * SR + k] = fr.strand_open[(uint64_t)s * (3 * SR + 1) + j * SR + k];
+        }
     }
     uint64_t sw[TOWER_MAX_LEVELS][4] = {};
     const int32_t *th = fr.theta;
@@ -821,6 +848,63 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             }
         }
         __syncthreads();
+        // The strands hear the arriving word, each byte in turn (`Strands::hear_byte`), one thread
+        // a ring: a located digit steps and turns each strand by its law, a located key transfers,
+        // reflects or clears each strand and sets the orientation, any other byte moves nothing.
+        // Their faces e^(2πi r/q) are then read off the rings' resident faces.
+        uint64_t smax = 0;
+        if (SR > 0) {
+            const uint32_t from = (uint32_t)tb[tb[6] + u], to = (uint32_t)tb[tb[6] + u + 1];
+            for (uint32_t b = from; b < to; b++) {
+                const int32_t act = tb[tb[3] + tb[tb[7] + b]];
+                if (act > 0) {
+                    const int32_t *turns = tb + tb[4] + (uint64_t)(act - 1) * SR;
+                    for (uint32_t k = tid; k < SR; k += B) {
+                        const uint64_t q = (uint64_t)tb[8 + 3 * k], mu = (uint64_t)tb[8 + 3 * k + 1];
+                        const uint64_t theta = (uint64_t)turns[k] % q;
+                        const uint64_t turn = reversed ? (q - theta) % q : theta;
+                        for (uint32_t j = 0; j < 3; j++) {
+                            const uint32_t at_law = (uint32_t)tb[j];
+                            const uint64_t r = sr[j * SR + k];
+                            if (at_law == 0) {
+                                sr[j * SR + k] = (uint32_t)((r * mu % q + turn) % q);
+                            } else if (at_law == 1) {
+                                sr[j * SR + k] = (uint32_t)(r * mu % q);
+                            }
+                        }
+                    }
+                } else if (act < 0) {
+                    const int32_t *key = tb + tb[5] + (uint64_t)(-act - 1) * 4;
+                    for (uint32_t k = tid; k < SR; k += B) {
+                        const uint32_t q = (uint32_t)tb[8 + 3 * k];
+                        const uint32_t old[3] = {sr[k], sr[SR + k], sr[2 * SR + k]};
+                        for (uint32_t j = 0; j < 3; j++) {
+                            const int32_t v = key[j];
+                            sr[j * SR + k] = v == 0 ? 0 : v > 0 ? old[v - 1] : (q - old[-v - 1] % q) % q;
+                        }
+                    }
+                    reversed = key[3] == 0 ? reversed : key[3] == 1 ? !reversed : key[3] == 3;
+                }
+            }
+            uint64_t ms_ = 0;
+            for (uint32_t k = tid; k < SR; k += B) {
+                for (uint32_t j = 0; j < 3; j++) {
+                    const int32_t *face = tb + tb[8 + 3 * k + 2] + 2 * (uint64_t)sr[j * SR + k];
+                    const uint64_t at_part = 2 * ((uint64_t)j * SR + k);
+                    sp[at_part] = face[0];
+                    sp[at_part + 1] = face[1];
+                    const uint64_t a = magnitude(face[0]), c = magnitude(face[1]);
+                    ms_ = a > ms_ ? a : ms_;
+                    ms_ = c > ms_ ? c : ms_;
+                }
+            }
+            smax = block_max(ms_, red);
+            if (keep) {
+                for (uint32_t i = tid; i < 6 * SR; i += B) {
+                    fr.strand_faces[qc * 6 * SR + i] = sp[i];
+                }
+            }
+        }
         uint64_t m = 0;
         for (uint32_t j = tid; j < W; j += B) {
             const uint64_t v = magnitude(x[j]);
@@ -1115,21 +1199,33 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             // The contacts: the drive a = W r̂ + b_a, rectified, v = max(a, 0); or beside it the pair
             // contact's second drive b = W_b r̂ + b_b and v = a ⊙ b on 2^(−32) released to the face
             // (the foil: a b_b + b_a (b − b_b), the product's block held at zero).
+            // At the strands' level each drive also reads their faces, `W_s s` released on its own.
+            const bool stranded = SR > 0 && l == law.strand_level;
             const bool n_c = narrow_terms(lv.reach[4], rmax, W, &st);
             const bool n_p = law.contact != 0 && narrow_terms(lv.reach[10], rmax, W, &st);
+            const bool n_sa = stranded && narrow_terms(law.strand_reach[0], smax, 6 * SR, &st);
+            const bool n_sb = stranded && law.contact != 0 && narrow_terms(law.strand_reach[1], smax, 6 * SR, &st);
             m = 0;
             uint64_t mc = 0;
             for (uint32_t o = tid; o < F; o += B) {
                 wide sum = dot(tt + lv.contact + o, F, W, rd, n_c);
                 sum += (wide)th[lv.contact_bias + o] << MATERIAL_BITS;
-                const int32_t d = fit32(fit64(rel(sum, MATERIAL_BITS), &st), &st);
+                int64_t a64 = fit64(rel(sum, MATERIAL_BITS), &st);
+                if (stranded) {
+                    a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + law.strand_contact + o, F, 6 * SR, sp, n_sa), MATERIAL_BITS), &st), &st);
+                }
+                const int32_t d = fit32(a64, &st);
                 dv[o] = d;
                 uint64_t v = magnitude(d);
                 int32_t c = d > 0 ? d : 0;
                 if (law.contact != 0) {
                     wide second = dot(tt + lv.pair + o, F, W, rd, n_p);
                     second += (wide)th[lv.pair_bias + o] << MATERIAL_BITS;
-                    const int32_t e = fit32(fit64(rel(second, MATERIAL_BITS), &st), &st);
+                    int64_t b64 = fit64(rel(second, MATERIAL_BITS), &st);
+                    if (stranded) {
+                        b64 = fit64((wide)b64 + (wide)fit64(rel(dot(tt + law.strand_pair + o, F, 6 * SR, sp, n_sb), MATERIAL_BITS), &st), &st);
+                    }
+                    const int32_t e = fit32(b64, &st);
                     const wide ba = th[lv.contact_bias + o], bb = th[lv.pair_bias + o];
                     const wide product = law.contact == 1 ? (wide)d * e : (wide)d * bb + ba * ((wide)e - bb);
                     c = fit32(rel(product, FACE_BITS), &st);
@@ -1179,6 +1275,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     fr.r_face_im[q] = fim;
                     fr.r_read[q] = rmax;
                     fr.r_conduct[q] = cmax;
+                    if (stranded) {
+                        fr.r_strand[q] = smax;
+                    }
                 }
             }
             if (tid == 0 && l < TOWER_MAX_LEVELS) {
@@ -1301,6 +1400,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         fr.ring_ends[((uint64_t)s * R + r) * 2] = rg[2 * r];
         fr.ring_ends[((uint64_t)s * R + r) * 2 + 1] = rg[2 * r + 1];
         fr.hands_ends[(uint64_t)s * R + r] = hd[r];
+    }
+    for (uint32_t k = tid; k < SR; k += B) {
+        for (uint32_t j = 0; j < 3; j++) {
+            fr.strand_ends[(uint64_t)s * (3 * SR + 1) + j * SR + k] = sr[j * SR + k];
+        }
+    }
+    if (SR > 0 && tid == 0) {
+        fr.strand_ends[(uint64_t)s * (3 * SR + 1) + 3 * SR] = reversed;
     }
     if (law.news) {
         uint64_t *end = fr.news_ends + (uint64_t)s * (A + 4);

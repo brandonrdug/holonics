@@ -1,10 +1,10 @@
 //! The gated tower's training pass on the card returns the host's bits (`holonics_cuda::hnn::tower`):
 //! every face at its target, the whole summed covector, and, section after section, the learner
 //! and its streams' states, with and without the pair face, the ring face, the turned modes, the
-//! pumped modes, the rotor and the news clock, on rectifying contacts, the pair contact or its foil;
-//! and the card refuses a declaration it does not carry.
+//! pumped modes, the rotor, the strands and the news clock, on rectifying contacts, the pair contact
+//! or its foil; and the card refuses a declaration it does not carry.
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
+use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Sheet, StrandKey, StrandLaw, StrandRing, Strands, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
 
 /// A declared exterior key stream: a 64-bit linear congruential walk, its high octets.
@@ -30,8 +30,8 @@ fn declaration(alphabet: usize, gated: bool, turned: bool, pumped: bool) -> Towe
 
 /// The faces a fixture joins to the gated tower: `forms` pair forms (none at zero), the ring face
 /// it names, whether its modes are turned, whether they are pumped (a pumped mode is turned),
-/// whether a rotor steps them, the news clock its levels tick on, and its contact law when it is not
-/// rectifying.
+/// whether a rotor steps them, whether strands are read at its second level's contacts, the news
+/// clock its levels tick on, and its contact law when it is not rectifying.
 #[derive(Clone, Copy, Default)]
 struct Faces {
     forms: usize,
@@ -39,6 +39,7 @@ struct Faces {
     turned: bool,
     pumped: bool,
     rotor: bool,
+    strands: bool,
     news: Option<NewsClock>,
     contact: Option<ContactLaw>,
 }
@@ -54,9 +55,9 @@ struct Ringed {
 /// The gated tower founded on the keys, turned when `faces.turned` or `faces.pumped` (its turn
 /// opened by `open_turn`), pumped when `faces.pumped` (its pump opened by `open_pump`), with
 /// `faces.forms` pair forms joined when there are any (`join_pair`), the ring face when
-/// `faces.ring` names one (`join_ring`), the rotor when `faces.rotor` (`join_rotor`) and the news
-/// clock last when `faces.news` names one; on `faces.contact`'s law, its second drive opened
-/// (`open_pair_contacts`).
+/// `faces.ring` names one (`join_ring`), the rotor when `faces.rotor` (`join_rotor`), the strands
+/// when `faces.strands` (`join_strands`) and the news clock last when `faces.news` names one; on
+/// `faces.contact`'s law, its second drive opened (`open_pair_contacts`).
 fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     let turned = faces.turned || faces.pumped;
     let contact = faces.contact.unwrap_or(ContactLaw::Rectifying);
@@ -79,6 +80,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     }
     if faces.rotor {
         join_rotor(&mut learner);
+    }
+    if faces.strands {
+        learner = join_strands(learner);
     }
     if let Some(clock) = faces.news {
         learner.join_news(clock).expect("the clock joins");
@@ -178,6 +182,42 @@ fn join_rotor(learner: &mut TowerLearner) {
     }
     let rotor = Rotor::new(&d, rings, steps, turns).expect("the rotor");
     learner.tower.join_rotor(rotor).expect("the rotor joins");
+}
+
+/// Strands read at the second level's contacts, on the staircase rings 9, 99 and 999 (multipliers
+/// 1, 10 and 10), digit `d` turning each by `d`, the laws held, stepped and turned, and the record's
+/// keys: `<` clears the third strand on the sheet `+1`, `+` and `-` hand it to the first and clear
+/// it on the sheets `+1` and `−1`, `=` hands it to the second and the first's reflection to it on
+/// `+1`. The classes' words cycle through numerals, operators and bytes that move nothing, so the
+/// strands step, turn, transfer, reflect and clear on both sheets. Their materials `W_sa` and, on a
+/// pair law, `W_sb` (founded at zero) are opened about ±1/16 on `2^(−24)` off the key stream, so
+/// the faces move the drives and the materials carry covectors from the first section. Joining adds
+/// material, so the learner is founded again on the joined tower, its moments at zero as before.
+fn join_strands(learner: TowerLearner) -> TowerLearner {
+    let mut tower = learner.tower;
+    let d = tower.declaration;
+    let rings = vec![StrandRing { modulus: 9, multiplier: 1 }, StrandRing { modulus: 99, multiplier: 10 }, StrandRing { modulus: 999, multiplier: 10 }];
+    let digits = (0..10u32).map(|v| (b'0' + v as u8, vec![v % 9, v, v])).collect();
+    let keys_of = vec![
+        (b'+', StrandKey { source: [3, 2, 0], sheet: Sheet::Plus }),
+        (b'-', StrandKey { source: [3, 2, 0], sheet: Sheet::Minus }),
+        (b'<', StrandKey { source: [1, 2, 0], sheet: Sheet::Plus }),
+        (b'=', StrandKey { source: [1, 3, -1], sheet: Sheet::Plus }),
+    ];
+    let pieces = ["1", "23", "+", "-4", "=", "<5", "67", "8=", "9-", "0", " ", "+1=", "-="];
+    let words = (0..d.alphabet).map(|c| pieces[c % pieces.len()].as_bytes().to_vec()).collect();
+    let strands = Strands::new(&d, 1, rings, [StrandLaw::Held, StrandLaw::Stepped, StrandLaw::Turned], digits, keys_of, words).expect("strands");
+    tower.join_strands(strands).expect("the strands join");
+    let law = tower.resident_law().expect("the law").strands.expect("the strands");
+    let extent = d.contacts * 6 * law.rings;
+    let k = keys(1 << 16);
+    let mut j = 50000;
+    let pair = if d.contact == ContactLaw::Rectifying { 0..0 } else { law.pair..law.pair + extent };
+    for i in (law.contact..law.contact + extent).chain(pair) {
+        tower.theta[i] = (k[j] as i32 - 128) << 13;
+        j += 1;
+    }
+    TowerLearner::new(tower, 5)
 }
 
 /// A ring rank whose factors are read off the key stream at `at` (as the host's fixture reads
@@ -408,6 +448,36 @@ fn the_cards_pumped_rotor_on_pair_contacts_advance_is_the_hosts_class_by_class()
     advance_class_by_class(Faces { pumped: true, rotor: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
 }
 
+/// The strands' acceptance: 32 sections equal face by face and covector entry by entry, the
+/// learners and their states (each stream's residues and sheet) after each.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_stranded_pass_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { strands: true, ..Faces::default() });
+}
+
+/// Strands beside the saved unit learners' declaration in small: a rotor stepping pumped modes on
+/// pair contacts beside the pair face, each drive reading the faces, an uncompared place held.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_stranded_pumped_rotor_on_pair_contacts_holds_an_uncompared_place_as_the_host_does() {
+    lockstep(11, 2, 12, 8, true, Faces { forms: 2, pumped: true, rotor: true, strands: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
+/// Strands on the foil's contacts beside turned modes.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_stranded_turned_pass_on_the_foil_is_the_hosts_for_eight_sections() {
+    lockstep(13, 3, 9, 8, false, Faces { turned: true, strands: true, contact: Some(ContactLaw::PairLinear), ..Faces::default() });
+}
+
+/// The stranded advance is the host's, class by class, each stream's residues and sheet carried.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_stranded_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { pumped: true, rotor: true, strands: true, contact: Some(ContactLaw::Pair), ..Faces::default() });
+}
+
 /// The news clock's acceptance: 32 sections equal face by face and covector entry by entry, the
 /// learners and their states (each stream's open face and phase) after each. Level 1's section is
 /// two bits, under the four or so a class carries, so it ticks none, once or several times at an
@@ -496,4 +566,12 @@ fn the_card_refuses_a_declaration_it_does_not_carry() {
     let mut past = clocked.rest();
     past.news = clock.period(2).expect("the period");
     assert!(realized.forward(&clocked, &[past], &parts, &targets, Slot::Opened).is_err());
+    // A strand's residue at its ring's modulus, and strand residues on a tower without strands.
+    let (stranded, _) = learners(11, Faces { strands: true, ..Faces::default() });
+    let mut beyond = stranded.tower.rest();
+    beyond.strands[0] = 9;
+    assert!(realized.forward(&stranded.tower, &[beyond.clone()], &parts, &targets, Slot::Opened).is_err());
+    let mut unstranded = host.tower.rest();
+    unstranded.strands = vec![0; beyond.strands.len()];
+    assert!(realized.forward(&host.tower, &[unstranded], &parts, &targets, Slot::Opened).is_err());
 }
