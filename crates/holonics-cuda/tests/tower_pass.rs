@@ -377,27 +377,39 @@ fn the_cards_turned_stranded_participating_pass_is_the_hosts_for_eight_sections(
 }
 
 /// A read that ends inside its participation's section carries the open section's sites, on the
-/// card as on the host; the card refuses to open on one (a stream carried across calls is owed).
+/// card as on the host, and the card reads on from them across calls, as a release does: the first
+/// read leaves seven of twelve sites open, the second closes the section at its last site and the
+/// third opens the next. A read across the close, and the reverse of a read that opened on carried
+/// sites, are refused on the card.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
-fn the_cards_participation_carries_an_open_section_as_the_host_does() {
+fn the_cards_participation_reads_an_open_section_on_across_calls_as_the_host_does() {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let (host, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
-    let classes = passage(11, 16);
-    let parts: Vec<&[usize]> = vec![&classes[0..8], &classes[8..16]];
-    let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
-    let opening = vec![host.tower.rest(); 2];
+    let classes = passage(11, 40);
     let mut reference = HostPass::default();
-    let read_h = reference.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("host forward");
-    let read_c = realized.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("card forward");
-    assert_eq!(read_h, read_c, "the faces and the swell");
-    let (mut ends_h, mut ends_c) = (opening.clone(), opening.clone());
-    reference.carry(&host.tower, &mut ends_h, &opening, Slot::Opened).expect("host carry");
-    realized.carry(&host.tower, &mut ends_c, &opening, Slot::Opened).expect("card carry");
-    assert_eq!(ends_h, ends_c, "the continuing states with their open sections");
-    assert!(ends_h.iter().all(|s| s.sites.iter().all(|sites| sites.len() == 7)), "seven sites open");
-    assert!(realized.forward(&host.tower, &ends_h, &parts, &targets, Slot::Opened).is_err(), "the card refuses an open section");
+    let (mut states_h, mut states_c) = (vec![host.tower.rest(); 2], vec![host.tower.rest(); 2]);
+    for (round, (from, to, open)) in [(0, 8, 7), (7, 13, 0), (12, 20, 7)].into_iter().enumerate() {
+        let parts: Vec<&[usize]> = vec![&classes[from..to], &classes[20 + from..20 + to]];
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
+        if round == 1 {
+            let across: Vec<&[usize]> = vec![&classes[7..15], &classes[27..35]];
+            let across_targets: Vec<Vec<Option<usize>>> = across.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
+            assert!(realized.forward(&host.tower, &states_c, &across, &across_targets, Slot::Opened).is_err(), "a read across the close");
+        }
+        let read_h = reference.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened).expect("host forward");
+        let read_c = realized.forward(&host.tower, &states_c, &parts, &targets, Slot::Opened).expect("card forward");
+        assert_eq!(read_h, read_c, "round {round}: the faces and the swell");
+        if round == 1 {
+            assert!(realized.reverse(&host.tower, &states_c, &parts, None).is_err(), "a reverse over carried sites");
+        }
+        let (opening_h, opening_c) = (states_h.clone(), states_c.clone());
+        reference.carry(&host.tower, &mut states_h, &opening_h, Slot::Opened).expect("host carry");
+        realized.carry(&host.tower, &mut states_c, &opening_c, Slot::Opened).expect("card carry");
+        assert_eq!(states_h, states_c, "round {round}: the continuing states with their sections");
+        assert!(states_h.iter().all(|s| s.sites.iter().all(|sites| sites.len() == open)), "round {round}: {open} sites open");
+    }
 }
 
 /// The pair face's acceptance (the record `2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD…`): 32 sections
@@ -576,6 +588,15 @@ fn the_cards_turned_pair_faced_news_clocked_pass_holds_an_uncompared_place_as_th
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_advance_is_the_hosts_class_by_class() {
     advance_class_by_class(Faces::default());
+}
+
+/// The same with participation over sections of twelve: each prompt's nine sites carried open
+/// into its next advance, the section closing at the third drawn class and the fourth opening the
+/// next.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_participating_advance_is_the_hosts_class_by_class() {
+    advance_class_by_class(Faces { participation: Some(12), ..Faces::default() });
 }
 
 /// The same under a news clock: each prompt's open face and phase carried from one advance to the

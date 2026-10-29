@@ -64,13 +64,15 @@ impl ParticipationDeclaration {
         }
         Ok(Self { heads, section, beta_shift })
     }
-    /// The heads founded on a bank: one head a run of modes that share a founded memory, read off the
-    /// founded moves' moduli, and `β` founded on the largest head ([`Head::founded`]).
-    pub fn founded(moduli: &[i128], section: usize) -> Result<Self> {
+    /// The heads founded on a bank: one head a run of modes that share a founded memory, read off
+    /// each mode's memory at the grain the bank declares (the tower's is the octave,
+    /// [`super::Tower::founded_participation`]), and `β` founded on the largest head
+    /// ([`Head::founded`]).
+    pub fn founded(memories: &[i128], section: usize) -> Result<Self> {
         let mut heads = Vec::new();
         let mut run = 0usize;
-        for (k, m) in moduli.iter().enumerate() {
-            if k > 0 && *m != moduli[k - 1] {
+        for (k, m) in memories.iter().enumerate() {
+            if k > 0 && *m != memories[k - 1] {
                 heads.push(run);
                 run = 0;
             }

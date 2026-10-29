@@ -3317,7 +3317,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
         regions: REGIONS,
         train_compared: None,
     };
-    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, None, looking, &mut HostPass::default())
+    fit(&args[7..], reading, gated, turned, pumped, credit, contact, TurnLadder::Fixed, None, false, looking, &mut HostPass::default())
 }
 
 /// `train-unit-tower` trains the gated tower on founded units (`hnn::units`): the training and
@@ -3353,7 +3353,7 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, None, realization)
+    fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, false, None, realization)
 }
 
 /// A passage read in a tower's classes: the training and held-out classes, the bytes each class
@@ -3376,7 +3376,7 @@ pub(super) struct Reading {
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, participating: bool, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3412,12 +3412,22 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.declaration != declaration || learner.rate_bits != rate_bits || learner.tower.news() != news {
             return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
+        if learner.tower.participation().map(|p| p.section) != participating.then_some(section) {
+            return Err("the continued learner's participation differs from the declared one".into());
+        }
         learner
     } else {
         let mut learner = TowerLearner::new(Tower::found_on(declaration, &keys, ladder).map_err(|e| e.to_string())?, rate_bits);
         // A clocked run's levels tick on their own news from the founding on ([`NewsClock`]).
         if let Some(clock) = news {
             learner.join_news(clock).map_err(|e| e.to_string())?;
+        }
+        // A participating run reads its sections' earlier sites from the founding on, one head a
+        // founded rung ([`Tower::founded_participation`]).
+        if participating {
+            let founded = learner.tower.founded_participation(section).map_err(|e| e.to_string())?;
+            println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?}", founded.section, founded.beta_shift, founded.heads);
+            learner.join_participation(founded).map_err(|e| e.to_string())?;
         }
         learner
     };

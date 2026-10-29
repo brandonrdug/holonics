@@ -318,6 +318,54 @@ mod tests {
         );
     }
 
+    /// The tower's push is the Einstein relation (record `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…` §4):
+    /// the midpoint step of the mode `A = iω − r` is the register `λ = (1 + hA/2)/(1 − hA/2)` with
+    /// push `g = h/(1 − hA/2)`, and `1 − |λ|² = (2r/h)|g|²`, so `γ = √(1 − |λ|²)`
+    /// (`hnn.moment-tower`) is a contact of strength `√(2r/h)`.
+    #[test]
+    fn a_passive_mode_is_a_register_whose_push_is_its_friction() {
+        let (omega, r, h) = (integer(2), integer(1), rat(1, 2));
+        let law = medium_law(
+            &integer_matrix(&[&[0, -2], &[2, 0]]).unwrap(),
+            &integer_matrix(&[&[1, 0], &[0, 1]]).unwrap(),
+            diagonal(&[1, 1]),
+            &integer_matrix(&[&[1], &[0]]).unwrap(),
+            h.clone(),
+        );
+        // 1 − hA/2 and 1 + hA/2 as (re, im); λ = num/den, g = h/den.
+        let den = (
+            Rat::one() + &h * &r / integer(2),
+            -(&h * &omega) / integer(2),
+        );
+        let num = (Rat::one() - &h * &r / integer(2), &h * &omega / integer(2));
+        let norm = &den.0 * &den.0 + &den.1 * &den.1;
+        let lambda = (
+            (&num.0 * &den.0 + &num.1 * &den.1) / &norm,
+            (&num.1 * &den.0 - &num.0 * &den.1) / &norm,
+        );
+        let g = (&h * &den.0 / &norm, -(&h * &den.1) / &norm);
+        assert_eq!(lambda, (rat(11, 29), rat(16, 29)));
+        for (x, u) in [((1, 0), 0), ((0, 0), 1), ((3, -1), 2)] {
+            let (x0, x1, u) = (integer(x.0), integer(x.1), integer(u));
+            let advance = check_exact_advance(
+                &law,
+                &HolonState::new(vec![x0.clone(), x1.clone()]),
+                &[u.clone()],
+            )
+            .unwrap();
+            assert_eq!(
+                advance.state.configuration,
+                vec![
+                    &lambda.0 * &x0 - &lambda.1 * &x1 + &g.0 * &u,
+                    &lambda.1 * &x0 + &lambda.0 * &x1 + &g.1 * &u,
+                ]
+            );
+        }
+        let lambda_power = &lambda.0 * &lambda.0 + &lambda.1 * &lambda.1;
+        let g_power = &g.0 * &g.0 + &g.1 * &g.1;
+        assert_eq!(Rat::one() - lambda_power, integer(2) * &r / &h * g_power);
+    }
+
     /// `Holon/Conformance.pairContact_resistive`: slip `f = Jv`, traction `e = −Df`.
     #[test]
     fn the_pair_contact_is_a_resistive_element() {

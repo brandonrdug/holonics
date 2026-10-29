@@ -3241,6 +3241,17 @@ impl Tower {
         Ok(self.step(state, u, &reaches)?.face)
     }
 
+    /// [agent-inferred, October 29] **The participation a receiver meets as `u` arrives**: the state
+    /// moved as [`Tower::advance`] moves it, and at each level, head by head, the participation of
+    /// the section's admitted sites at this site, the present one last (their weights on `2^(−62)` of
+    /// the peak, the mass, the sites released). A reading (record §7.3), not a learned path; `None` on
+    /// a tower without participation.
+    pub fn participation_at(&self, state: &mut TowerState, u: usize) -> Result<Option<Vec<Vec<Participation>>>> {
+        let reaches = self.reaches();
+        let cell = self.step(state, u, &reaches)?;
+        Ok(self.participation.as_ref().map(|_| cell.levels.into_iter().map(|lc| lc.participation.map(|pc| pc.parts).unwrap_or_default()).collect()))
+    }
+
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
         collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
@@ -4427,6 +4438,24 @@ impl Tower {
     /// The participation, when it is joined.
     pub fn participation(&self) -> Option<&ParticipationDeclaration> {
         self.participation.as_ref()
+    }
+
+    /// [agent-inferred, October 29] **The participation founded on this tower over `section`
+    /// sites**: one head a run of first-level modes whose memory `1/(1 − |λ|)` sits at one octave
+    /// ([`ParticipationDeclaration::founded`]). The octave and not the modulus, because a founded
+    /// move's modulus carries its turn's rounding (a few units on `2^(−30)`), so the modes of one
+    /// rung differ in their last bits, while the ladder's rungs are octaves of friction
+    /// `1 − ρ = 2^(−s)` (`wave.matched-friction-reach`). The octave read is the nearest one,
+    /// `⌊log₂(3(1 − |λ|)/2)⌋`, so a rung's rounding on either side keeps it.
+    pub fn founded_participation(&self, section: usize) -> Result<ParticipationDeclaration> {
+        let lv = self.layout.levels[0];
+        let octaves: Vec<i128> = (0..self.declaration.modes)
+            .map(|k| {
+                let distance = ((1i128 << MOVE_BITS) - modulus_and_gamma(self.theta[lv.move_re + k] as i128, self.theta[lv.move_im + k] as i128).0).max(1);
+                (distance + distance / 2).ilog2() as i128
+            })
+            .collect();
+        ParticipationDeclaration::founded(&octaves, section)
     }
 
     /// The rotor, when one is joined.
@@ -7527,9 +7556,7 @@ mod tests {
     /// heads the founded memory's runs; `opened` fills `W₁ᵃ` so the current conducts.
     fn tiny_participating(contact: ContactLaw, opened: bool) -> Tower {
         let mut tower = tiny_contacts(2, 4, 4, true, false, false, contact);
-        let lv = tower.layout.levels[0];
-        let moduli: Vec<i128> = (0..4).map(|k| modulus_and_gamma(tower.theta[lv.move_re + k] as i128, tower.theta[lv.move_im + k] as i128).0).collect();
-        let founded = ParticipationDeclaration::founded(&moduli, 16).expect("declared");
+        let founded = tower.founded_participation(16).expect("declared");
         let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { founded };
         tower.join_participation(heads).expect("joined");
         if opened {
@@ -7548,6 +7575,112 @@ mod tests {
             }
         }
         tower
+    }
+
+    /// The participation a receiver meets at a site is the forward's: the state moves as `advance`
+    /// moves it, every level returns one participation a head over the section's sites so far, the
+    /// present one last, and the section opens again after its sixteenth site. A tower without
+    /// participation reads none.
+    #[test]
+    fn the_participation_at_a_site_is_the_sections_admitted_sites() {
+        let tower = tiny_participating(ContactLaw::Rectifying, true);
+        let classes: Vec<usize> = (0..20).map(|i| (i * 7 + 3) % tower.declaration.alphabet).collect();
+        let (mut a, mut b) = (tower.rest(), tower.rest());
+        for (i, &u) in classes.iter().enumerate() {
+            tower.advance(&mut a, u).expect("advance");
+            let levels = tower.participation_at(&mut b, u).expect("read").expect("participating");
+            assert_eq!(a, b, "class {i}");
+            assert_eq!(levels.len(), tower.declaration.levels);
+            for heads in &levels {
+                assert_eq!(heads.len(), 2);
+                for part in heads {
+                    assert_eq!(part.weights.len(), i % 16 + 1, "class {i}");
+                    assert_eq!(part.mass, part.weights.iter().sum::<u128>());
+                }
+            }
+        }
+        let plain = tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying);
+        assert_eq!(plain.participation_at(&mut plain.rest(), 0).expect("read"), None);
+    }
+
+    /// [agent-inferred, October 29] A realization that reads a participating tower's section to its
+    /// close and no further (the card's read) still advances a prompt longer than the section: the
+    /// realized advance reads in calls that end where a stream's open section closes. Forty
+    /// classes on two streams whose sections close at different places (one from rest, one five
+    /// classes in) are the advance class by class: the same faces, codes and continuing states,
+    /// eight and thirteen sites left open.
+    #[test]
+    fn a_realized_advance_reads_each_section_to_its_close() {
+        struct Closing(realization::HostPass);
+        impl PassRealization for Closing {
+            fn realization(&self) -> String {
+                "closing".into()
+            }
+            fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<realization::PassRead> {
+                let section = tower.participation().map_or(usize::MAX, |p| p.section);
+                if opening.iter().zip(classes).any(|(o, c)| o.sites.first().map_or(0, LevelSites::len) + c.len() - 1 > section) {
+                    return Err(TowerError::Refused("a read across its section's close"));
+                }
+                self.0.forward(tower, opening, classes, targets, slot)
+            }
+            fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
+                self.0.reverse(tower, opening, classes, compared)
+            }
+            fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
+                self.0.carry(tower, states, opening, slot)
+            }
+            fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
+                self.0.last_faces()
+            }
+            fn admit(&self, tower: &Tower) -> Result<()> {
+                self.0.admit(tower)
+            }
+        }
+        let tower = tiny_participating(ContactLaw::Rectifying, true);
+        let a = tower.declaration.alphabet;
+        let prompts: Vec<Vec<usize>> = (0..2).map(|s| (0..40).map(|i| (i * 7 + 3 + s) % a).collect()).collect();
+        let mut host = vec![tower.rest(), tower.rest()];
+        for i in 0..5 {
+            tower.advance(&mut host[1], (i * 3 + 1) % a).expect("advance");
+        }
+        let mut states = host.clone();
+        let mut faces = Vec::new();
+        let mut codes = Vec::new();
+        for (s, prompt) in prompts.iter().enumerate() {
+            let (mut face, mut code) = (None, 0i64);
+            for &u in prompt {
+                if let Some(f) = &face {
+                    code += TowerFace::code(f, u);
+                }
+                face = Some(tower.advance(&mut host[s], u).expect("advance"));
+            }
+            faces.push(face.expect("a face"));
+            codes.push(code);
+        }
+        let reads: Vec<&[usize]> = prompts.iter().map(Vec::as_slice).collect();
+        let mut closing = Closing(realization::HostPass::default());
+        assert!(closing.forward(&tower, &states, &[&prompts[0][..18], &prompts[1][..18]], &[vec![None; 17], vec![None; 17]], Slot::Opened).is_err(), "a read across the close");
+        let (read, read_codes) = tower.advance_realized(&mut states, &reads, &mut closing).expect("realized");
+        assert_eq!((read, read_codes), (faces, codes));
+        assert_eq!(states, host);
+        let open: Vec<usize> = states.iter().map(|s| s.sites[0].len()).collect();
+        assert_eq!(open, vec![8, 13]);
+    }
+
+    /// The race's bank founds one head a rung: 128 modes on both turn ladders are two halves of
+    /// eight rungs of eight turns, so sixteen heads of eight. The founded moduli alone split a rung
+    /// wherever a turn's rounding moved its last bits (90 heads at this founding).
+    #[test]
+    fn the_founded_heads_are_the_first_levels_rungs() {
+        let declaration = TowerDeclaration { alphabet: 257, width: 8, modes: 128, contacts: 8, levels: 2, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let tower = Tower::found_on(declaration, &keys(1 << 16), TurnLadder::Both).expect("founded");
+        let founded = tower.founded_participation(128).expect("declared");
+        assert_eq!(founded.heads, vec![8; 16]);
+        assert_eq!(founded.section, 128);
+        let lv = tower.layout.levels[0];
+        let moduli: Vec<i128> = (0..128).map(|k| modulus_and_gamma(tower.theta[lv.move_re + k] as i128, tower.theta[lv.move_im + k] as i128).0).collect();
+        let by_modulus = ParticipationDeclaration::founded(&moduli, 128).expect("declared");
+        assert!(by_modulus.heads.len() > founded.heads.len(), "the rounding split no rung");
     }
 
     fn participation_families(tower: &Tower) -> Vec<usize> {
