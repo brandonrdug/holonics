@@ -636,6 +636,28 @@ To #410:
   (`passive_margin`, `passive_recursion` in
   [`HNN/PassiveMode`](../../lean/HolonicsResearch/HNN/PassiveMode.lean)).
 
+(a) was formal-checked on October 29 in
+[`Mathematics/OnePlaneRing`](../../lean/HolonicsResearch/Mathematics/OnePlaneRing.lean), for any
+unit base:
+- the digit moves (any digits containing `0` and `1`) generate exactly the moves `x ↦ bⁿx + t`
+  (`closure_digits`), and there are `m · ord_m(b)` of them (`card_affineGroup`; base ten is
+  `digits_ten`);
+- if `m ≥ 3` distinct points of one real plane carry the residues and the digits `0` and `1` act
+  by real-affine maps (every such map of `ℂ` is `z ↦ αz + βz̄ + γ`, `affine_form`), then
+  `b ≡ ±1 (mod m)` (`one_plane`);
+- the points are then a turned `m`-gon about their barycentre, `p(x) = p̄ + Aψ(kx) + B·conj ψ(kx)`
+  with `|A| ≠ |B|` and `k` no zero divisor, so the translation by 1 is a turn of order `m` and the
+  points are never collinear (`turned_polygon`);
+- in base ten, a ring `m ≥ 3` coprime to ten fits one plane exactly when `m ∈ {3, 9, 11}`
+  (`one_plane_ten_iff`);
+- in the phase chart the move is real-affine exactly when `b ≡ 0, ±1 (mod m)`
+  (`phase_chart_affine_iff`), which in base ten is `m ∣ 9, 11` or `10` (`phase_chart_ten_iff`).
+
+The proof replaces the route through the barycentre's group of turns with the points' colours. A
+digit acts on the pair `(𝓕p(k), conj 𝓕p(−k))` by one complex `2 × 2` matrix. The digits compose
+into a map whose eigenvectors are those pairs, with eigenvalue `ψ(k)`, so at most the two colours
+`±k` are present. The digit `0` carries colour `k` to colour `b⁻¹k`, which must again be `±k`.
+
 Atlas rows:
 - `radix.digit-move-place-kind`;
 - `radix.long-division-strokes`;
