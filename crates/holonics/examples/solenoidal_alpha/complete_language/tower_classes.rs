@@ -103,6 +103,14 @@ pub(crate) fn train_passage_realized(args: &[String], news: NewsClock, realizati
     train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::Passage, realization)
 }
 
+/// `train-two-ladder-stacked-news-packet-tower-classes`: [`train_passage_realized`] under
+/// [`race_stacked_news_clock`] with the packets joined after the passage, so each clocked level's
+/// push, gate and turn hear the packet its clock closed (record
+/// `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET…`, §4).
+pub(crate) fn train_packet_realized(args: &[String], news: NewsClock, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::PassagePackets, realization)
+}
+
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
 /// contact joined at the founding.
 pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {

@@ -50,6 +50,8 @@ struct Faces {
     mutual: bool,
     /// The passage joined last (`open_passage`); it needs the news clock.
     passage: bool,
+    /// The packets joined after the passage (`join_packets`); they need the news clock.
+    packets: bool,
     /// The levels (two when zero).
     levels: usize,
 }
@@ -106,6 +108,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     }
     if faces.passage {
         open_passage(&mut learner);
+    }
+    if faces.packets {
+        learner.join_packets().expect("the packets join");
     }
     (learner.clone(), learner)
 }
@@ -504,6 +509,25 @@ fn the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), passage: true, ..Faces::default() });
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, ..Faces::default() });
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, ..Faces::default() });
+}
+
+/// [agent-inferred, October 30] **The packets on the card** (record
+/// `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED…`, acceptance 6): each clocked
+/// level's push, gate and turn hear the read of the packet the fine level's moves carried since its
+/// last tick, and the read's covector returns to the fine level's read and scan; 32 sections equal
+/// face by face, covector entry by entry, learner for learner and state for state (the open
+/// packets among it), on the clock from level 1, on three levels from level 2 with the passage, and
+/// at the race's declaration, six levels from level 4 with the passage; then advanced class by
+/// class, a stream's open packets carried from each call into the next.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, ..Faces::default() });
+    lockstep(11, 2, 9, 8, false, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), turned: true, contact: Some(ContactLaw::Pair), packets: true, ..Faces::default() });
+    advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, ..Faces::default() });
+    advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, ..Faces::default() });
 }
 
 /// The same beside participation on the clock's ticks and the pair contact, an uncompared place

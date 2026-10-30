@@ -825,6 +825,7 @@ pub(super) fn run_with_execution(
         Some("train-two-ladder-news-participating-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train_participating_realized(args, Some(tower_classes::race_news_clock()), &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-two-ladder-mutual-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train_mutual_realized(args, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-two-ladder-stacked-news-passage-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train_passage_realized(args, tower_classes::race_stacked_news_clock(), &mut holonics::hnn::tower::realization::HostPass::default()),
+        Some("train-two-ladder-stacked-news-packet-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train_packet_realized(args, tower_classes::race_stacked_news_clock(), &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-two-ladder-news-passage-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::train_passage_realized(args, tower_classes::race_news_clock(), &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("read-tower-classes") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read(args),
         Some("read-tower-classes-at") if backend == CompleteLanguageTrainingBackend::HostReference => tower_classes::read_at(args),
@@ -876,6 +877,7 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
         Some("train-two-ladder-news-participating-tower-classes") => tower_classes::train_participating_realized(args, Some(tower_classes::race_news_clock()), realization),
         Some("train-two-ladder-mutual-tower-classes") => tower_classes::train_mutual_realized(args, realization),
         Some("train-two-ladder-stacked-news-passage-tower-classes") => tower_classes::train_passage_realized(args, tower_classes::race_stacked_news_clock(), realization),
+        Some("train-two-ladder-stacked-news-packet-tower-classes") => tower_classes::train_packet_realized(args, tower_classes::race_stacked_news_clock(), realization),
         Some("train-two-ladder-news-passage-tower-classes") => tower_classes::train_passage_realized(args, tower_classes::race_news_clock(), realization),
         Some("train-unit-tower") => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, realization),
         Some("train-unit-pumped-tower") => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, realization),
@@ -887,7 +889,7 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
         Some("ask-tower-body") => tower_body::ask_realized(args, realization),
         Some("answer-tower-body") => tower_body::answer_realized(args, realization),
         Some("grow-tower-body") => tower_body::grow(args),
-        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-news-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-two-ladder-news-passage-tower-classes, train-two-ladder-stacked-news-passage-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower, release-tower-classes, or the body's found-tower-body, hear-tower-body, ask-tower-body, answer-tower-body and grow-tower-body".into()),
+        _ => Err("a realized route trains the gated tower on a class passage or on the founded units, or releases from it: train-gated-tower-classes, train-scaled-tower-classes, train-two-ladder-tower-classes, train-two-ladder-news-tower-classes, train-two-ladder-participating-tower-classes, train-two-ladder-news-participating-tower-classes, train-two-ladder-mutual-tower-classes, train-two-ladder-news-passage-tower-classes, train-two-ladder-stacked-news-passage-tower-classes, train-two-ladder-stacked-news-packet-tower-classes, train-unit-tower, train-unit-pumped-tower, train-unit-pair-pumped-tower, release-tower-classes, or the body's found-tower-body, hear-tower-body, ask-tower-body, answer-tower-body and grow-tower-body".into()),
     }
 }
 
