@@ -1,8 +1,8 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets]`:
-//!   founds the gated tower (rectifying, on both turn ladders) on the keys, its levels on the news
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair]`:
+//!   founds the gated tower (rectifying, or with pair contacts when `pair` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
@@ -25,6 +25,7 @@
 //!   trainer reads it.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
+//!   `train-two-ladder-pair-tower-classes`,
 //!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
@@ -76,7 +77,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -90,8 +91,11 @@ fn parity(args: &[String]) -> Result<()> {
     };
     // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′.
     let packets = word == Some("packets");
+    // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
+    // `train-two-ladder-pair-tower-classes`.
+    let pair = word == Some("pair");
     let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
-    if (word.is_some() && !(participating || mutual || passage)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
+    if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
     }
     let bytes = pinned(&args[0], &args[1])?;
@@ -113,7 +117,7 @@ fn parity(args: &[String]) -> Result<()> {
         gated: true,
         turned: false,
         pumped: false,
-        contact: ContactLaw::Rectifying,
+        contact: if pair { ContactLaw::Pair } else { ContactLaw::Rectifying },
     };
     let (streams, section, sections) = (count(&args[8])?, count(&args[9])?, count(&args[10])?);
     let rate_bits: u32 = args[11].parse()?;
