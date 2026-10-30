@@ -81,9 +81,19 @@ differences are founded, and when, is the code's decision, section by section. P
 pair back to its mean and growing the field again when no dormant pair is left are the reverse test
 and the growth map, owed after this build.
 
-**The copies' moments.** Each copy's drive row and bias take half the old covector (their return is
-`c/2`), so they carry `m/2` and `v/4`; each return part takes the old covector whole, so it carries
-`m` and `v`. Every copy opens on the old normalized step.
+**A dormant pair deposits as one contact** (revised October 30 after acceptance 6's lap 0, §7). A
+deposit moves an entry by `m/(⌊√v⌋ + 1)` at the rate, which does not change when its covector is
+scaled. So while a pair is dormant its drives' copies take their covectors summed (the old contact's)
+on the old contact's moments and move together as its drives did, and its return's step is read
+once, from its first part's moments (its second's are equal: both parts read the same conduction),
+and split between the parts as the widening split the column, Euclidean with the remainder on the
+first. The column then moves by the old column's step, and the dormant learner is the pair learner
+in the wider chart, up to the reverse's grain. Every copy carries its old entry's moments. A founded
+pair's copies learn on their own: each copy's covector is then about half the old, so its drives'
+moments are re-lifted to `m/2`, `v/4` at the founding, and each copy still steps as the old drive
+did. (The first build lifted the drives to `m/2`, `v/4` and let each return part step on the old
+column's covector whole, so the column moved twice its step; the control measured that at 0.097
+bits a byte above the pair race.)
 
 **The direction, carried and turned.** Each dormant pair carries a unit direction `v_e` on the read
 `r̂` it shares (width `d` entries on `2^(−16)`), opened at the contact's own first drive row,
@@ -132,17 +142,22 @@ The face moves by `c θ̂ φ`, second order in `ε` and downhill by the score, w
 change of `−(ln 2 · g)²/(2(τ + σ))` nats. A founded pair carries no direction afterwards: its copies
 are two contacts learning on their own.
 
-**The certificate pays the price, on the line the reread measured** (agent-inferred, October 30,
-after the first measurement, §7). The test above only proposes; the reread decides. After the
-section's step deposits, the deposited tower with the founded split is read again over the section.
-That reading is the section's exact code at `θ̂`, so with `g` the line's slope at zero, its change
-`Δ` fixes the curvature the line actually has, `H = 2(Δ − g θ̂)/θ̂²`, where `σ` was only the
-squares' estimate. The split deposits only if the code falls by more than the coordinate's Laplace
-price, `(½ τ θ² + ½ ln(1 + σ′/τ) + ln K)/ln 2` bits with `σ′ = max(σ, ln 2 · H, 0)` (the larger
-reading; the price grows with it). A bare "fewer bits" would admit a coordinate that lowers the code
-by less than its own description. Refused, and when the measured line is bounded below under the
-prior (`τ + ln 2 · H > 0`), its mode `θ* = −ln 2 · g/(τ + ln 2 · H)` is read once more under the
-same price. Only a section where a pair founds pays these readings.
+**The certificate pays the price on the next section** (agent-inferred, October 30; revised after
+acceptance 6's lap 0, §7). The test above only proposes, and the proposal is held. At the next
+section's opening, before its own step, that section is read with and without the split; the split
+deposits only where the section codes fewer bits under it by more than the coordinate's Laplace
+price, `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2` bits, with `σ = ln²2 · S` read at `ln 2`'s head. A
+bare "fewer bits" would admit a coordinate that lowers the code by less than its own description.
+The section then steps from the tower the certificate leaves, and the training code is the opening's
+code without the split, read before the decision. While a founding is pending its pair's direction is
+held, so the split that deposits is the one its score read. A pending founding at a pass's end is
+released before the directions rest. The certificate costs one forward a section that holds a
+proposal, and a second where it admits one (the reverse reads the opening forward of the tower it
+steps from). (The first build certified the founding on the section it was fit on, at `θ̂` and then
+at the measured line's mode. At 40,960 cells a section `ln²2 · S` is far above `τ`, so `θ̂` was
+nearly that section's own Newton step along the new coordinate, and the price grows only with the
+logarithm of the section: 725 of 726 proposals passed, and the race's training code read 0.077 bits
+a byte above the control's.)
 
 **Read on the tower it lands on** (agent-inferred, October 30, after the card's first paired parity,
 §7). The score is the code's slope along the split on the tower it was read on, and only there. The
@@ -151,7 +166,7 @@ what the split would take, and sometimes more than all of it: over ten sections 
 parity passage, the step turned the sign of 27 pairs' scores. Decided on the opening read, 20 of the
 race's first 28 proposed foundings raised the code they were predicted to lower (§7). So where the
 step deposits, the section is read forward and back once more on the tower the step left, and the
-test, the reread and the directions' turn all use that read. The founding then pays only for what
+test and the directions' turn use that read. The founding then pays only for what
 the old coordinates left after their step: the effective tension's law, a new coordinate paying for
 what the old ones do not bridge. It costs one forward and one reverse a section where the step
 deposits; that forward also serves the carry where no founding deposits, which before read the
@@ -188,12 +203,14 @@ cells sum in 128 bits, so neither side's carrier decides.
    the two-part code is a Laplace evidence and admits chance at a rate its price sets, not none.
 4. **The founding is predicted.** On a tiny tower over a mixed passage, every pair the test founds
    is reported with its predicted fit change and the reread's measured change; the claim is that
-   the certificate admits more foundings than it refuses, and every admitted one lowers the code.
+   the certificate admits more foundings than it refuses, and every admitted one lowers the code
+   (since the certificate moved to the next section, §4: the code of the section it was certified
+   on, which it was not fit on).
 5. **The card is the host.** The card's score, squares and turned sums equal the host's at the
    race's declaration with paired pair contacts, in the parity, every entry.
 6. **The race.** Only if the pair race's claim (§3) holds: one hour of the four-level pair tower
-   widened to paired contacts, founding active, beside one hour of the same tower with founding
-   refused (the copies dormant throughout; it also measures what the doubled return alone does).
+   widened to paired contacts, founding active, beside one hour of the same tower with every pair
+   dormant throughout (each depositing as one contact, §4: the pair learner in the wider chart).
    The claim: the founding race's mean held-out reading over its last five laps is below the
    dormant race's over the same laps. Each lap's card time is reported, and the founding count per
    level.
@@ -207,9 +224,12 @@ cells sum in 128 bits, so neither side's carrier decides.
 - *A design thought in the programming language*: the contact is the pair interaction of two drives
   on one face, the helical pair's contact, not a gating unit added for capacity.
 - *A refusal answered with a larger limit*: the race keeps the hour and the lap rule.
-- *An uncertified deposition step*: a founding deposits only through the section's reread.
+- *An uncertified deposition step*: a founding deposits only through the next section's
+  certificate.
 - *Seen material graded as unseen*: the direction a section tests was turned on the sections before
-  it, so the score is not selected on the data it is read on.
+  it, so the score is not selected on the data it is read on; and the founding is certified on the
+  section after the one it was fit on (§4; the first build certified it on its own section, and
+  725 of 726 passed).
 - *An authored routine standing in for learning*: the split's place, direction and size come from
   the passage's own covectors through the code; nothing names where the body should grow.
 
@@ -377,3 +397,20 @@ Acceptance 6 is read again with both repairs; its claim is unchanged.
 card 6,453 ms (167 forwards in 5,049 ms, 64 reverses in 638 ms); wall 32.3 s, peak resident set
 1,979,192 KiB. The host half (the packets' covector under pair contacts with the passage opened
 predicts the code difference) passed at the same head, so C′'s hour with pair contacts runs.
+
+**The two repairs, on the host** (October 30, the cloud container's host, tiny pair tower: two
+levels, width 4, four contacts widened to eight, four streams of the parity passage, sections of
+64). *The dormant control.* Over twelve sections from the same learner, the widened learner whose
+dormant pairs deposit as one contact keeps each pair's drive copies equal and every copy's moments
+equal to its partner's, and it parts from the pair learner by at most 1,385 grains of an entry
+(drives and summed return columns) and 299 grains of `2^(−20)` bits of a section's code, against a
+largest single step of 22,833,840 grains: the copies' covectors are released one by one, so their
+sum is the old covector to a grain a cell, and that grain is carried through the sections. The same
+widened learner with its copies depositing apart (each return part on the old column's covector
+whole, the first build) parts by 2,439,797 grains and 1,263,149 grains of code. *The next-section
+certificate.* Over 24 sections (8 to 31), the test proposed 7 foundings; the next section admitted 1
+(proposed on section 28 at −14.4 bits on its own section, it lowered section 29's opening code by
+16.4) and refused 5, four of which raised the next section's code (by 4.1 to 19.8 bits) and one of
+which lowered it by less than its price; the seventh was proposed on the last section. Proposed on
+256 cells a section, the coordinate the test fits mostly does not carry to the next section; the
+race's sections hold 40,960.

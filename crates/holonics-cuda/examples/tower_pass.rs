@@ -294,15 +294,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         if let Some(f) = &founding_h {
             admitted += usize::from(f.admitted);
             println!(
-                "TOWER_PARITY_SPLIT section={} split_equal={split_equal} founding_equal={} directions_equal={directions_equal} foundings={} admitted={} code_before={} reread={} remeasured={:?} code_after={} dormant={}",
+                "TOWER_PARITY_SPLIT section={} split_equal={split_equal} founding_equal={} directions_equal={directions_equal} certified={} admitted={} code_before={} reread={} proposed={} dormant={}",
                 k + 1,
                 founding_h == founding_c,
-                f.foundings.len(),
+                f.certified.is_some(),
                 f.admitted,
                 f.code_before,
                 f.reread,
-                f.remeasured,
-                f.code_after,
+                f.proposed.is_some(),
                 f.dormant
             );
         }
