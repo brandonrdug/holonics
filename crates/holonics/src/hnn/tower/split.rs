@@ -32,6 +32,12 @@
 //! ([`measured_line`], [`price_bits`]); refused, the line's own mode is read once more
 //! ([`TowerLearner::section_founding`]). The squares' curvature is a sampled estimate, and on the
 //! tiny parity passage the measured line was not the test's quadratic (agent-inferred, October 30).
+//!
+//! The score is the code's slope along the split on the tower it was read on, and only there: the
+//! section's step moves the drives both copies share along the same covectors, so the split is read
+//! again on the tower the step left, and the test decides on what the step did not take
+//! (agent-inferred, October 30; measured: decided on the opening read, 20 of the race's first 28
+//! proposed foundings raised the code they were predicted to lower).
 use super::*;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
@@ -712,6 +718,84 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// The streams' split read summed, each stream read forward from its opening on `tower`.
+    fn split_of(tower: &Tower, opening: &[TowerState], parts: &[&[usize]], directions: &PairedContacts) -> SplitRead {
+        let reaches = tower.reaches();
+        opening.iter().zip(parts).fold(SplitRead::default(), |sum, (o, c)| {
+            let mut end = o.clone();
+            let cells = tower.forward(&mut end, c, &reaches).expect("forward");
+            sum.summed(&tower.reverse_split(o, &cells, c, None, directions).expect("split").1).expect("summed")
+        })
+    }
+
+    /// The score is the code's slope along the split on the tower it was read on: a split of
+    /// `θ = ∓2^(−8)` against the score's sign moves the section's code by `g θ` within a quarter of
+    /// it and `2^(−14)` bits, on every pair of the ungated, gated and turned tiny towers.
+    #[test]
+    fn the_score_is_the_codes_slope_along_the_split() {
+        for (gated, turned) in [(false, false), (true, false), (true, true)] {
+            let (paired, directions) = {
+                let mut learner = TowerLearner::new(tiny_pair(gated, turned), 6);
+                let mut states = vec![learner.tower.rest()];
+                for k in 0..4 {
+                    learner.section(&mut states, &[&PASSAGE[k * 9..k * 9 + 10]]).expect("section");
+                }
+                learner.paired().expect("paired")
+            };
+            let tower = &paired.tower;
+            let opening = [tower.rest()];
+            let read = split_of(tower, &opening, &[&PASSAGE], &directions);
+            let code = tower.read(&mut tower.rest(), &PASSAGE).expect("read");
+            for (l, pairs) in read.levels.iter().enumerate() {
+                for (e, r) in pairs.iter().enumerate() {
+                    let theta = -r.score.signum() << (2 * MATERIAL_BITS - 8);
+                    let founding = Founding { level: l, pair: e, theta, predicted: 0, surplus: 0, score: r.score, squares: r.squares };
+                    let moved = tower.found_splits(&directions, &[founding]).expect("split").read(&mut tower.rest(), &PASSAGE).expect("read") - code;
+                    // g θ on 2^(−20) bits: the score on 2^(−24), θ on 2^(−48).
+                    let slope = release(r.score * theta, COVECTOR_BITS + 2 * MATERIAL_BITS - READ_BITS);
+                    let off = (moved as i128 - slope).abs();
+                    assert!(off <= slope.abs() / 4 + (1 << 6), "gated {gated} turned {turned} level {l} pair {e}: moved {moved} against {slope}");
+                }
+            }
+        }
+    }
+
+    /// The founding is decided on the tower the step left: a founding section's proposal and its
+    /// directions' turn are those of the split read on that tower, not on the opening's, and the step
+    /// moves the score (here it turns some pair's sign).
+    #[test]
+    fn the_founding_is_decided_on_the_tower_the_step_left() {
+        let streams: Vec<Vec<usize>> = (0..4).map(|s| parity_passage(0x9e37_79b9 ^ (s as u32 + 1), 64 * 12 + 1)).collect();
+        let section = |k: usize| -> Vec<&[usize]> { streams.iter().map(|p| &p[k * 64..k * 64 + 65]).collect() };
+        let mut learner = TowerLearner::new(tiny_pair(true, false), 6);
+        let mut states = vec![learner.tower.rest(); 4];
+        for k in 0..2 {
+            learner.section(&mut states, &section(k)).expect("section");
+        }
+        let (mut learner, mut directions) = learner.paired().expect("paired");
+        let (mut deposited, mut turned_sign) = (0usize, 0usize);
+        let key = |f: &Founding| (f.level, f.pair, f.score, f.squares, f.predicted, f.surplus);
+        for k in 2..12 {
+            let parts = section(k);
+            let opening = states.clone();
+            let before = directions.clone();
+            let opened = split_of(&learner.tower, &opening, &parts, &before);
+            let mut stepped = learner.clone();
+            deposited += stepped.section(&mut opening.clone(), &parts).expect("section").deposited as usize;
+            let read = split_of(&stepped.tower, &opening, &parts, &before);
+            let decided = stepped.foundings(&before, &read).expect("decided");
+            let (_, receipt) = learner.section_founding(&mut states, &parts, None, &mut HostPass::default(), &mut directions).expect("section");
+            assert_eq!(receipt.foundings.iter().map(key).collect::<Vec<_>>(), decided.iter().map(key).collect::<Vec<_>>(), "section {k}");
+            let mut expected = before.clone();
+            expected.turned(&read, if receipt.admitted { &receipt.foundings } else { &[] }).expect("turned");
+            assert_eq!(directions, expected, "section {k}");
+            turned_sign += opened.levels.iter().flatten().zip(read.levels.iter().flatten()).filter(|(a, b)| a.score.signum() * b.score.signum() < 0).count();
+        }
+        assert!(deposited > 0, "no section's step deposited");
+        assert!(turned_sign > 0, "the step turned no pair's score");
+        eprintln!("SPLIT_STALE deposited={deposited} turned_sign={turned_sign}");
     }
 
     /// Acceptance 3: no news, no founding: a pair whose score is zero founds nothing at any price,

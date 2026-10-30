@@ -5578,10 +5578,11 @@ impl TowerLearner {
 
     /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
     /// splits** ([`split`]): the section of [`TowerLearner::section_realized`] whose reverse also
-    /// forms the split read; after the step's certificate, the pairs the rank-one test admits are
-    /// split on the tower the step left, and the splits deposit only if the section read again
-    /// codes fewer bits under them. Each dormant pair's direction then turns, and an admitted pair's
-    /// direction retires.
+    /// forms the split read; after the step's certificate, the split is read again on the tower the
+    /// step left (where it deposited), the pairs the rank-one test admits on that read are split
+    /// there, and the splits deposit only if the section read again codes fewer bits under them.
+    /// Each dormant pair's direction then turns on that read, and an admitted pair's direction
+    /// retires.
     pub fn section_founding(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization, paired: &mut split::PairedContacts) -> Result<(SectionReceipt, split::FoundingReceipt)> {
         let (receipt, founding) = self.section_inner(states, classes, compared, realization, Some(paired))?;
         Ok((receipt, founding.ok_or(TowerError::Refused("a founding section returns its founding"))?))
@@ -5670,9 +5671,25 @@ impl TowerLearner {
             }
             halvings += 1;
         };
-        // The founding, certified on the tower the step left before any stream carries on.
+        // The founding, read and certified on the tower the step left before any stream carries on.
         let founding = match (paired, split_read) {
             (Some(paired), Some(read)) => {
+                // [agent-inferred, October 30] The score is the code's slope along a split on the
+                // tower it was read on, and the step moves the drives both copies share along the
+                // same covectors: on the tiny pair tower the step halved most pairs' scores and
+                // turned the sign of 34 of 159, and on the race's paired parity 20 of the 28
+                // foundings decided on the opening read raised the code they were predicted to
+                // lower. So the split is read again on the tower the step left, and the founding is
+                // decided on what the step did not take (the effective tension's law: a new
+                // coordinate pays only for what the old ones leave). The opening slot then holds the
+                // step's tower, which the carry reads where no founding deposits.
+                let read = if slot == Slot::Reread {
+                    realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
+                    slot = Slot::Opened;
+                    realization.reverse_split(&self.tower, &opening, classes, compared, paired)?.1
+                } else {
+                    read
+                };
                 let foundings = self.foundings(paired, &read)?;
                 let mut out = split::FoundingReceipt { code_before: receipt.code_after, reread: receipt.code_after, code_after: receipt.code_after, ..Default::default() };
                 if let Some(founding) = foundings.into_iter().next() {
@@ -5705,13 +5722,7 @@ impl TowerLearner {
                             out.code_after = code;
                             out.foundings = vec![split::Founding { theta, ..founding }];
                         }
-                        None => {
-                            // The reread slot held the step's tower: read it there again for the carry.
-                            if slot == Slot::Reread {
-                                realization.forward(&self.tower, &opening, classes, &targets, Slot::Reread)?;
-                            }
-                            out.foundings = vec![founding];
-                        }
+                        None => out.foundings = vec![founding],
                     }
                 }
                 let retired: &[split::Founding] = if out.admitted { &out.foundings } else { &[] };
