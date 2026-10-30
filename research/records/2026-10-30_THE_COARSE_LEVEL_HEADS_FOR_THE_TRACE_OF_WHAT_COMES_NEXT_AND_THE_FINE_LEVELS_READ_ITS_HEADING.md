@@ -842,3 +842,21 @@ below C′'s. The refusals stay about 28 a window from section 160 on and are th
 pass time, and a lead held to a few hundredths of a bit a byte. §13 located them in the parts' steps
 meeting, with the readout's step against the rest the largest meeting, and the next law takes that
 meeting as its subject.
+
+## 15. The heading over three laps
+
+[agent-inferred, October 30] **Why now.** One lap settles the opening, where C′ itself trailed the
+four arrival levels (2.390 against 2.356, the packet record's lap 0) and caught them only from lap
+4. Whether the heading's read helps past the opening, at the pace the passage keeps, is read lap by
+lap, beside both. The refusals' cost (§14) is read with it, a lap at a time.
+
+**Acceptance, fixed before launch.**
+23. On the 4080, a38c1c63f's law over three whole laps from C′'s founding, the held-out read at
+    each lap's end is at or below C′'s (2.390, 2.200, 2.082), reported beside the four arrival
+    levels' (2.356, 2.139, 2.060), with each lap's refusals and pass time beside C′'s, and the
+    writing at the end shown. A lap that ends above C′'s says the heading's lead is the opening's
+    alone.
+
+The projection: each lap at §14's bound, 23 windows at 18,781 ms and the held-out read's 2,120 ms,
+434.1 s, three laps 1,302.3 s; the deadline 1,303 s, and window `k`'s limit `k × 18,781 ms` plus
+2,120 ms for each held-out read so far.
