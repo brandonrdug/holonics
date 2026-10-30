@@ -227,6 +227,7 @@ pub mod growth;
 pub mod participation;
 pub mod reading;
 pub mod realization;
+pub mod split;
 
 use participation::{advance_frame, participate, participation_return, rotate_back, Head, LevelSites, Participation, ParticipationDeclaration, Phasor, Probe, Site};
 use realization::{HostPass, PassRealization, Slot};
@@ -3505,7 +3506,7 @@ impl Tower {
     /// The reverse scan of one stream's section: the covector of every family, on its natural
     /// grain (material `2^(−40)`, faces and biases `2^(−24)`, moves `2^(−48)`).
     fn reverse(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<Vec<i128>> {
-        self.reverse_joined(opening, cells, classes, None, compared, None).map(|(g, _)| g)
+        self.reverse_joined(opening, cells, classes, None, compared, None, None).map(|(g, _)| g)
     }
 
     /// The reverse scan with a covector reaching each cell's top from outside the tower (the
@@ -3518,7 +3519,9 @@ impl Tower {
     /// release read against the truth where the two part. Beside the families' covector it returns
     /// each cell's input covector `δx⁰` (what the encoding's covector sums), on `2^(−24)`, and, when
     /// `modes` is given, keeps there every level's mode covectors `G_h` cell by cell
-    /// (`modes[level][cell][mode]`, the covector of the modes after the cell's push).
+    /// (`modes[level][cell][mode]`, the covector of the modes after the cell's push), and, when
+    /// `contacts` is given, every level's contact covectors `δv` cell by cell (`contacts[level][cell]
+    /// [contact]`, the covector of each contact's conduction on `2^(−24)`, [`split`]).
     #[allow(clippy::too_many_arguments)]
     fn reverse_joined(
         &self,
@@ -3528,6 +3531,7 @@ impl Tower {
         joined: Option<&[Vec<i64>]>,
         compared: Option<&[Option<usize>]>,
         mut modes: Option<&mut Vec<Vec<Vec<(i64, i64)>>>>,
+        mut contacts: Option<&mut Vec<Vec<Vec<i64>>>>,
     ) -> Result<(Vec<i128>, Vec<Vec<i64>>)> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
@@ -3544,6 +3548,9 @@ impl Tower {
         let rb = self.layout.readout_bias;
         if let Some(out) = modes.as_deref_mut() {
             *out = vec![Vec::new(); d.levels];
+        }
+        if let Some(out) = contacts.as_deref_mut() {
+            *out = vec![Vec::with_capacity(cells_n); d.levels];
         }
         if compared.is_some_and(|m| m.len() != classes.len()) {
             return refuse("a comparison for each class of the section");
@@ -3686,6 +3693,9 @@ impl Tower {
                 }
                 let mut dv = vec![0i64; f];
                 transposed(&t[lv.ret..lv.ret + w * f], r[5], f, dy, MATERIAL_BITS, &mut dv)?;
+                if let Some(out) = contacts.as_deref_mut() {
+                    out[l].push(dv.clone());
+                }
                 // The covectors of each drive's material part and of its bias: one covector a drive
                 // except in the foil, whose material parts meet the other drive's bias alone.
                 let times = |y: &[i32]| -> Result<Vec<i64>> { collect_exact(dv.iter().zip(y).map(|(&v, &y)| fit64(release(v as i128 * y as i128, FACE_BITS)))) };
@@ -5354,6 +5364,22 @@ fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     fewer_bits_exact(old, new)
 }
 
+/// [definition; agent-inferred, October 30] **The certificate with a price**: `new` codes fewer
+/// bits than `old` by more than `price` (bits, given from above). The readings lie below each
+/// `log₂` by less than their slack, so the gain is read from below; a gain inside the slack of the
+/// price is refused, as a tie is (a founding pays its description: [`split::price_bits`]).
+fn fewer_bits_by(old: &[(u128, u128)], new: &[(u128, u128)], price: &crate::ratio::Rat) -> bool {
+    if old.len() != new.len() || old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
+        return false;
+    }
+    let side = |faces: &[(u128, u128)]| -> i128 { faces.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
+    let gain = side(new) - side(old);
+    let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
+    let scale = crate::ratio::Rat::from_integer(num_bigint::BigInt::from(1) << CERTIFICATE_DIGITS);
+    let Some(price) = num_traits::ToPrimitive::to_i128(&(price * scale).ceil().to_integer()) else { return false };
+    gain - slack > price
+}
+
 /// A decision the readings made. Built with the `certificate-check` feature, it is compared with the
 /// products and a disagreement stops the run: the acceptance read that the partition decides as the
 /// products do on every call of a whole pass. Without the feature it is the decision.
@@ -5547,6 +5573,21 @@ impl TowerLearner {
     /// declared [`PassRealization`] (`realization`'s module header); every realization returns the
     /// host's bits, so the receipt and the learner are the host's.
     pub fn section_realized(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization) -> Result<SectionReceipt> {
+        self.section_inner(states, classes, compared, realization, None).map(|(receipt, _)| receipt)
+    }
+
+    /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
+    /// splits** ([`split`]): the section of [`TowerLearner::section_realized`] whose reverse also
+    /// forms the split read; after the step's certificate, the pairs the rank-one test admits are
+    /// split on the tower the step left, and the splits deposit only if the section read again
+    /// codes fewer bits under them. Each dormant pair's direction then turns, and an admitted pair's
+    /// direction retires.
+    pub fn section_founding(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization, paired: &mut split::PairedContacts) -> Result<(SectionReceipt, split::FoundingReceipt)> {
+        let (receipt, founding) = self.section_inner(states, classes, compared, realization, Some(paired))?;
+        Ok((receipt, founding.ok_or(TowerError::Refused("a founding section returns its founding"))?))
+    }
+
+    fn section_inner(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization, paired: Option<&mut split::PairedContacts>) -> Result<(SectionReceipt, Option<split::FoundingReceipt>)> {
         if states.len() != classes.len() || classes.iter().any(|c| c.len() < 2) {
             return refuse("a section needs one carried state and two classes a stream");
         }
@@ -5564,7 +5605,13 @@ impl TowerLearner {
         let parts_before = part_codes(&read.faces);
         let code_before: i64 = parts_before.iter().sum();
         let tower = &self.tower;
-        let mut g = realization.reverse(tower, &opening, classes, compared)?;
+        let (mut g, split_read) = match paired.as_deref() {
+            None => (realization.reverse(tower, &opening, classes, compared)?, None),
+            Some(p) => {
+                let (g, read) = realization.reverse_split(tower, &opening, classes, compared, p)?;
+                (g, Some(read))
+            }
+        };
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
         // The moments.
@@ -5593,7 +5640,7 @@ impl TowerLearner {
         // The certificate halves a refused step until it is certified or has released below every
         // family's grain; then the section deposits nothing.
         let mut halvings = 0u32;
-        loop {
+        let (receipt, faces_end, mut slot) = loop {
             let mut candidate = self.tower.clone();
             let mut moved = false;
             for &(start, len, grain) in &self.tower.layout.families {
@@ -5608,9 +5655,8 @@ impl TowerLearner {
             }
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
-                realization.carry(&self.tower, states, &opening, Slot::Opened)?;
                 let parts = parts_before.iter().map(|&c| (c, c)).collect();
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts });
+                break (SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts }, faces_old, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -5619,12 +5665,64 @@ impl TowerLearner {
                 let parts_after = part_codes(&reread.faces);
                 let code_after: i64 = parts_after.iter().sum();
                 let parts = parts_before.iter().copied().zip(parts_after).collect();
-                realization.carry(&candidate, states, &opening, Slot::Reread)?;
                 self.tower = candidate;
-                return Ok(SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts });
+                break (SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts }, faces_new, Slot::Reread);
             }
             halvings += 1;
-        }
+        };
+        // The founding, certified on the tower the step left before any stream carries on.
+        let founding = match (paired, split_read) {
+            (Some(paired), Some(read)) => {
+                let foundings = self.foundings(paired, &read)?;
+                let mut out = split::FoundingReceipt { code_before: receipt.code_after, reread: receipt.code_after, code_after: receipt.code_after, ..Default::default() };
+                if let Some(founding) = foundings.into_iter().next() {
+                    let (width, dormant) = (self.tower.declaration.width, paired.dormant());
+                    // The reread at θ̂ measures the line; its exact code deposits the founding only
+                    // past the coordinate's price on the curvature the line has. Refused, the line's
+                    // own mode is read once more.
+                    let reread_at = |theta: i128, realization: &mut dyn PassRealization| -> Result<(Tower, Vec<(u128, u128)>, i64)> {
+                        let candidate = self.tower.found_splits(paired, &[split::Founding { theta, ..founding.clone() }])?;
+                        let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
+                        let code: i64 = part_codes(&reread.faces).iter().sum();
+                        Ok((candidate, reread.faces.iter().flatten().flatten().copied().collect(), code))
+                    };
+                    let (candidate, faces_new, code) = reread_at(founding.theta, realization)?;
+                    out.reread = code;
+                    let (sigma, mode) = split::measured_line(&founding, width, code - receipt.code_after)?;
+                    let mut admitted = fewer_bits_by(&faces_end, &faces_new, &split::price_bits(founding.theta, &sigma, width, dormant)?).then_some((candidate, founding.theta, code));
+                    if admitted.is_none() {
+                        if let Some(theta) = mode.filter(|&t| t != founding.theta) {
+                            let (candidate, faces_new, code) = reread_at(theta, realization)?;
+                            out.remeasured = Some(code);
+                            admitted = fewer_bits_by(&faces_end, &faces_new, &split::price_bits(theta, &sigma, width, dormant)?).then_some((candidate, theta, code));
+                        }
+                    }
+                    match admitted {
+                        Some((candidate, theta, code)) => {
+                            self.tower = candidate;
+                            slot = Slot::Reread;
+                            out.admitted = true;
+                            out.code_after = code;
+                            out.foundings = vec![split::Founding { theta, ..founding }];
+                        }
+                        None => {
+                            // The reread slot held the step's tower: read it there again for the carry.
+                            if slot == Slot::Reread {
+                                realization.forward(&self.tower, &opening, classes, &targets, Slot::Reread)?;
+                            }
+                            out.foundings = vec![founding];
+                        }
+                    }
+                }
+                let retired: &[split::Founding] = if out.admitted { &out.foundings } else { &[] };
+                paired.turned(&read, retired)?;
+                out.dormant = paired.dormant();
+                Some(out)
+            }
+            _ => None,
+        };
+        realization.carry(&self.tower, states, &opening, slot)?;
+        Ok((receipt, founding))
     }
 
     /// [definition; agent-inferred, October 25] **A founded family's moments, opened on the passage
@@ -6035,7 +6133,7 @@ impl Tower {
             let opening = state.clone();
             let cells = self.forward(state, part, &reaches)?;
             let mut placed = Vec::new();
-            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed))?;
+            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed), None)?;
             let mut carried = carried_face(&opening.modes)?;
             for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
                 let modes: Vec<i64> = placed.iter().flat_map(|level| level[i].iter().flat_map(|&(re, im)| [re, im])).collect();

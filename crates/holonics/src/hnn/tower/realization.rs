@@ -26,6 +26,7 @@
 //! the reverse reads (a realization may keep them or read them again; [`HostPass`] reads them
 //! again), and once under each candidate deposit ([`Slot::Reread`]), which needs only its
 //! faces and its continuing states.
+use super::split::{PairedContacts, SplitRead};
 use super::*;
 
 /// Which forward of a section a read is: the opening read (whose temporaries the reverse reads) or
@@ -78,6 +79,19 @@ pub trait PassRealization {
     /// The streams' covector summed, from the read kept in [`Slot::Opened`] (`Tower::reverse_joined`
     /// without a joined covector).
     fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>>;
+
+    /// The streams' covector summed with their split read on paired contacts (`split`'s module
+    /// header), from the read kept in [`Slot::Opened`]. A realization that does not form the split
+    /// read refuses; [`PassRealization::forms_split`] says so before any section is read.
+    fn reverse_split(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, paired: &PairedContacts) -> Result<(Vec<i128>, SplitRead)> {
+        let _ = (tower, opening, classes, compared, paired);
+        Err(TowerError::Realization(format!("{} does not form the paired contacts' split read", self.realization())))
+    }
+
+    /// Whether [`PassRealization::reverse_split`] is carried.
+    fn forms_split(&self) -> bool {
+        false
+    }
 
     /// Each stream's continuing state from the read kept in `slot`, its credit moved along it.
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()>;
@@ -215,6 +229,39 @@ impl PassRealization for HostPass {
                 },
             )
             .try_reduce(|| vec![0i128; n], |a, b| Ok(summed(a, b)))
+    }
+
+    fn reverse_split(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, paired: &PairedContacts) -> Result<(Vec<i128>, SplitRead)> {
+        let (kept, reaches) = self.opened.as_ref().ok_or(TowerError::Refused("a reverse reads the section's opening forward"))?;
+        if kept.len() != opening.len() || classes.len() != opening.len() {
+            return Err(TowerError::Refused("a reverse reads the streams its opening forward read"));
+        }
+        let n = tower.theta.len();
+        opening
+            .par_iter()
+            .zip(kept.par_iter())
+            .zip(classes.par_iter())
+            .enumerate()
+            .try_fold(
+                || (vec![0i128; n], SplitRead::default()),
+                |(acc, split), (s, ((open, k), c))| -> Result<(Vec<i128>, SplitRead)> {
+                    let read;
+                    let cells = if k.cells.is_empty() {
+                        let mut end = open.clone();
+                        read = tower.forward(&mut end, c, reaches)?;
+                        &read
+                    } else {
+                        &k.cells
+                    };
+                    let (g, r) = tower.reverse_split(open, cells, c, compared.map(|m| m[s]), paired)?;
+                    Ok((summed(acc, g), split.summed(&r)?))
+                },
+            )
+            .try_reduce(|| (vec![0i128; n], SplitRead::default()), |a, b| Ok((summed(a.0, b.0), a.1.summed(&b.1)?)))
+    }
+
+    fn forms_split(&self) -> bool {
+        true
     }
 
     fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
