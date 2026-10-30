@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and that part is read again in three (§13)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); the heading raced over a whole lap against C′, fixed before launch (§14)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -732,4 +732,53 @@ most refusals is the next law's subject. Five forwards a refusal at the largest 
 92 ms (a38c1c63f), over 197 refusals add 90.8 s: the projection is `152.4 s + 90.8 s = 243.2 s`,
 the deadline 244 s, and window `k`'s limit `k × 18,781 ms` plus `461 ms` for each refusal read so
 far.
+
+**At the card** (1a39fd28e). The card tests passed, 43 of 43, and the parity was equal. The lap's
+arrivals, refusals, held-out reads and final state were a38c1c63f's exactly, and it ran 178.2 s
+against its 243.2 s projection (0.73), 1,717 forwards in 148.8 s. **Acceptance 21 passed.**
+
+| Window | Raised alone by: descent | read | readout | clocked | rest | Summed change, bits: descent | read | readout | clocked | rest | Whole step |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 12 | 17 | 16 | 11 | 38 | −65,750 | −32,305 | +294,737 | −113,491 | +763,414 | +3,270,495 |
+| 2 | 0 | 2 | 0 | 0 | 2 | −6,865 | −1,220 | −12,624 | −793 | −9,912 | +18,482 |
+| 3 | 0 | 0 | 0 | 0 | 1 | −287 | −13 | −742 | −20 | −205 | +1,430 |
+| 4 | 0 | 5 | 0 | 0 | 4 | −2,365 | −200 | −5,423 | −148 | −2,487 | +8,954 |
+| 5 | 2 | 4 | 0 | 2 | 13 | −3,449 | −408 | −7,889 | −248 | +1,813 | +20,235 |
+| 6 | 5 | 5 | 0 | 2 | 17 | −2,972 | −160 | −7,538 | −219 | +5,688 | +24,102 |
+| 7 | 0 | 3 | 0 | 0 | 16 | −3,629 | −405 | −8,484 | −337 | +4,364 | +25,260 |
+| 8 | 1 | 3 | 0 | 1 | 14 | −3,682 | −462 | −7,864 | −414 | +8,776 | +30,605 |
+
+(The race's tower carries the clocked levels' passage, whose material follows the readout's, so it
+reads in the rest here.)
+
+**What it located.** From the second window on, the five parts' summed change is below zero in
+every window while the whole step raises the arrivals: no family overshoots alone, and the
+refusals are the parts' steps meeting. The readout's step alone lowers the arrivals the most, and
+the readout with the clocked levels and the rest together raised them (+19,868 bits in the last
+window, §13's three-part reading) while apart they sum to −3,502: the readout's step meets the
+other families' change of what it reads. With `D` held those same steps meet as C′'s do. What the
+readout reads under the heading is `x^L + Σ D ĥ⁺`, and the rest moves `ĥ⁺` twice: through the
+clocked levels' inputs, and through their ticks, which the news the face codes sets; a step that
+changes the section's code by a few thousand bits moves the cumulative news by that much and the
+clocked levels' ticks with it, a change the covector does not carry. Which of the two it is stays
+open; the measurement that separates them reads a refused step on the ticks the section opened
+with, which the card's forward does not yet take.
+
+## 14. The heading over a whole lap
+
+[agent-inferred, October 30] **Why now.** The refusals cost the heading part of its step, and the
+lead over C′ narrowed from 0.40 bits a byte at section 32 to 0.02 at 256. Whether the heading helps
+is settled over the passage, not its first third: C′'s race read its held-out bits at the end of
+each whole lap of 726 sections, 2.390 after the first.
+
+**Acceptance, fixed before launch.**
+22. On the 4080, a38c1c63f's law over one whole lap of 726 sections, the held-out read at the
+    lap's end is at or below C′'s 2.390, the arrivals' windows reported beside C′'s at the same
+    sections, the refusals beside C′'s, and the writing shown. If the heading ends above 2.390, the
+    refusals cost more than the read gives, and the meeting of the steps located in §13 is the next
+    law's subject.
+
+The projection: 23 windows (22 of 32 sections and one of 22) at the largest measured window,
+18,781 ms, plus the held-out read's 2,120 ms, is 434.1 s; the deadline 435 s, and window `k`'s limit
+`k × 18,781 ms`.
 
