@@ -188,3 +188,41 @@ realizes its own block, so an extraction within it loses less than the source's 
 does. The face grain is not the bound: the charts are released onto `2^(−16)`, and the pairing sums
 64 such terms. The four owed terms are the build after it, each tested at its consumer: the joined
 level reproduces the source layer on a declared input, under the same bound.
+
+## 7. Step 2 built: the attention block founds a participating level (October 30)
+
+**The founding.** [agent-inferred; owner `Tower::found_attention`, its law in
+`hnn::tower::overture`] §6's choices, built. A source head of 64 dimensions is 64 native modes:
+32 rotary modes turn by `e^(−iω_m)` a site and carry the probe and key charts, the pair
+`(m, m + 32)` as one phasor; 32 still modes carry the value chart. The probe chart carries
+`log₂ e · 2^(beta_shift)/√d`, so with `beta_shift = 3` the face is the source's score in bits.
+Each grouped key/value head is read by the three query heads it serves. The read `Cᵃ` is the output
+projection on the still modes. The gain is folded into every chart, `log₂ e` and `ω_m` enter as
+their navigators' faces, and each composed coefficient is released onto `2^(−24)` once, its
+remainder counted. The moves sit at the margin and the friction at zero, so only the frames carry
+the source's place. The level's own push, read, gate and turn rest at zero.
+
+**The check, measured.** [measured; host, a reading of one founded level, no model run and no
+learning; `overture_founding`] SmolLM2-135M's layer-0 block founds level 0 of a one-level tower of
+576 modes in 9 heads of 64. The founding released 995,328 chart coefficients: 517,775 keep a
+remainder below the grain and 55 release to zero, the folded gain and `log₂ e` leaving most
+compositions a remainder. The summed remainder is `0.0087` (a decimal reading) over the charts. It
+released 331,776 read coefficients, 24 with a remainder and none to zero. Sixteen declared inputs of
+unit power (each coordinate `±1`, its sign a fixed bit mix of site and place) are read by the
+founded level and by the source's block computed once at the boundary on `2^(−40)`.
+- **Accepted.** Every head's current lies within `2^(−12)` of its largest component (heads 0 to 2
+  within `2^(−13)`), and the read within `2^(−13)`. That is four bits inside the `2^(−8)` fixed
+  before the build.
+- **The foil fails.** The same block founded on the rotary base `10000` instead of the source's
+  `100000`, checked against the same reference, lies `2^(−2)` to `2^(−5)` from it in every head and
+  `2^(−4)` in the read. So the check reads the place the frames carry, not only the values.
+- **What the inputs reach.** On these inputs every head spreads its weight almost evenly: its
+  entropy at the last site is 3.93 to 3.99 bits of the 4 that 16 sites allow. A check on peaked
+  attention needs the source's own embeddings as input, and those reach the charts only through owed
+  term (1), the input read as a ratio to its power.
+- **Time.** The file read 0.3 s, the founding 0.8 s, the reference 0.9 s and the check 1.2 s
+  (unoptimized build).
+
+A unit test founds a grouped block of two heads of four on six sites, checks it within `2^(−8)`,
+and refuses the turned-back moves as a foil. The four owed terms of §6 are next, each tested at its
+consumer under the same bound.

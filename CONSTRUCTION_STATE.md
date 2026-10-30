@@ -28,7 +28,9 @@ as built: the passage is streamed through it one octet after another. The
 is next: each site reads every admitted earlier site through the modes' turn and dissipation. Mutual
 contact and the continuing body on the card follow, in that order. Equation extraction is unparked the same day as
 the [overture route](research/records/2026-10-29_INHERITED_WEIGHTS_ARE_AN_OVERTURE_EXTRACTION_RECYCLES_PROCESSED_INFORMATION_INTO_THE_ENGINES_INITIAL_CONFIGURATION.md): inherited
-coefficients seed the engine's opening, never stand in for it.
+coefficients seed the engine's opening, never stand in for it. On October 30 SmolLM2's layer-0
+attention founds a participating level and reads 16 declared inputs within `2^(−12)` of the source's
+block (host reading); four terms remain before a source layer is a native level.
 
 **October 27: the review stops the contact variants and the read meets the machine's units
 (host).** Seven rotor towers wrote 214 to 288 of 2,448 held-out calculations right at the equals and
