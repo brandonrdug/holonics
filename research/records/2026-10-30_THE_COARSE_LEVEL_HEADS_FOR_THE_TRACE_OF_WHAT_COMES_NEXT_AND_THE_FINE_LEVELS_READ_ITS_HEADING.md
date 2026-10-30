@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts, fixed before the build (§13)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and that part is read again in three (§13)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -695,4 +695,41 @@ Recorded failures this could repeat: *a located cause carried unrepaired into a 
 reading changes no law; the next law follows its counts); *a refusal answered with a larger limit*
 (the projection grows by the reading's own measured forwards, fixed before launch, and the lap
 keeps its 256 sections).
+
+**At the card** (93133e17d, B-PC's RTX 4080 SUPER alone under the card's lock).
+
+- The card tests passed, 43 of 43, and the parity was equal.
+- **Acceptance 20 passed.** The lap's arrivals, refusals, held-out reads and final state are
+  a38c1c63f's exactly (the state's digest is the same), so the reading moved nothing. The lap ran
+  131.5 s against its 206.8 s projection (0.64), 1,323 forwards in 105.3 s.
+
+| Window | Refused | Raised by the descent's step alone | the read's | every other family's | Summed change, bits: descent | read | other |
+|---|---|---|---|---|---|---|---|
+| 1 | 53 | 12 | 17 | 44 | −65,750 | −32,305 | +2,558,325 |
+| 2 | 20 | 0 | 2 | 9 | −6,865 | −1,220 | −1,527 |
+| 3 | 2 | 0 | 0 | 1 | −287 | −13 | +472 |
+| 4 | 19 | 0 | 5 | 9 | −2,365 | −200 | +2,353 |
+| 5 | 23 | 2 | 4 | 16 | −3,449 | −408 | +10,474 |
+| 6 | 29 | 5 | 5 | 25 | −2,972 | −160 | +14,475 |
+| 7 | 28 | 0 | 3 | 23 | −3,629 | −405 | +14,708 |
+| 8 | 23 | 1 | 3 | 21 | −3,682 | −462 | +19,868 |
+
+**What it located.** At the refused steps the descent's step alone lowers the arrivals in every
+window, and so does the read's: the heading's own families descend. Every other family's step alone
+raises them, at most refusals from the fifth window on and by a sum that grows (21 of 23 refusals
+in the last window). With `D` held those same families are refused as C′'s are. So the open
+descent makes the other families' steps overshoot: a family the face reads through the heading
+moves what the descent reads (the clocked levels' modes through `r̂` and their ticks), or the
+readout's step reads the descent's term beside `x^L`.
+
+**The reading split in three** (acceptance 21, fixed before the build). The other families are read
+again in three parts: the readout `U` and its bias `c` (whose step multiplies the descent's term
+`D ĥ⁺` beside `x^L`), the clocked levels' own material from the first clocked level's block to the
+readout (their moves among it; their modes are what the heading reads), and the rest (the encoding
+and the arrival levels, which drive the clocked levels and set the news their ticks count). The
+lap's arrivals and refusals are a38c1c63f's again, and the part that alone raises the arrivals at
+most refusals is the next law's subject. Five forwards a refusal at the largest measured forward,
+92 ms (a38c1c63f), over 197 refusals add 90.8 s: the projection is `152.4 s + 90.8 s = 243.2 s`,
+the deadline 244 s, and window `k`'s limit `k × 18,781 ms` plus `461 ms` for each refusal read so
+far.
 

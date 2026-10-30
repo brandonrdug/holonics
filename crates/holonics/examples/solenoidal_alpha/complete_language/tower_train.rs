@@ -3584,8 +3584,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         println!("TOWER_HOLD {words} entries={}", learner.held.iter().map(|r| r.len()).sum::<usize>());
     }
     // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_PARTS=1`): each refused step
-    // read again under the descent's, the heading's read's and every other family's step alone
-    // (the record's §13); it costs three forwards a refusal and moves nothing.
+    // read again under each of its five parts alone, the descent, the heading's read, the
+    // readout, the clocked levels and the rest (the record's §13); it costs five forwards a
+    // refusal and moves nothing.
     if std::env::var("TOWER_REFUSAL_PARTS").is_ok_and(|v| v == "1") {
         if learner.tower.heading_families()[0].is_empty() {
             return Err("TOWER_REFUSAL_PARTS reads the heading's parts, and this tower has no heading".into());
@@ -3623,7 +3624,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         // The window's refused steps: how many, how many raised the arrivals' code and how many
         // the closure's, and the changes they made.
         let mut refusals = (0usize, 0usize, 0usize, 0i64, 0i64);
-        let mut refusal_parts = ([0usize; 3], [0i64; 3]);
+        let mut refusal_parts = ([0usize; 5], [0i64; 5]);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3773,10 +3774,21 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 if learner.refusal_parts {
                     let (rose, change) = refusal_parts;
                     println!(
-                        "TOWER_REFUSAL_PARTS pass={} section={} descent_rose={} read_rose={} rest_rose={} descent_change_bits={} read_change_bits={} rest_change_bits={}",
-                        pass, k + 1, rose[0], rose[1], rose[2], signed_bits(change[0]), signed_bits(change[1]), signed_bits(change[2])
+                        "TOWER_REFUSAL_PARTS pass={} section={} rose descent={} read={} readout={} clocked={} rest={} change_bits descent={} read={} readout={} clocked={} rest={}",
+                        pass,
+                        k + 1,
+                        rose[0],
+                        rose[1],
+                        rose[2],
+                        rose[3],
+                        rose[4],
+                        signed_bits(change[0]),
+                        signed_bits(change[1]),
+                        signed_bits(change[2]),
+                        signed_bits(change[3]),
+                        signed_bits(change[4])
                     );
-                    refusal_parts = ([0; 3], [0; 3]);
+                    refusal_parts = ([0; 5], [0; 5]);
                 }
                 refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());

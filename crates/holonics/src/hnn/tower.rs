@@ -5889,8 +5889,9 @@ pub struct TowerLearner {
     pub held: Vec<std::ops::Range<usize>>,
     /// [agent-inferred, October 30] A run's declared reading of the refused steps under the
     /// heading (the record's §13), never written with the learner: each refused step is read
-    /// again under each of its parts alone, the descent's, the heading's read's and every other
-    /// family's, at the same halvings ([`SectionReceipt::refused_parts`]).
+    /// again under each of its parts alone, the descent's, the heading's read's, the readout's,
+    /// the clocked levels' and every other family's, at the same halvings
+    /// ([`SectionReceipt::refused_parts`]).
     pub refusal_parts: bool,
 }
 
@@ -5916,8 +5917,9 @@ pub struct SectionReceipt {
     pub refused: Vec<(i64, i64)>,
     /// Under the learner's declared reading ([`TowerLearner::refusal_parts`]), each refused step's
     /// change to the arrivals' code under its parts alone (after minus before, on `2^(−20)` bits):
-    /// the descent's, the heading's read's, and every other family's (the moves among them).
-    pub refused_parts: Vec<[i64; 3]>,
+    /// the descent's, the heading's read's, the readout's and its bias's, the clocked levels' own
+    /// material's (their moves among it), and every other family's.
+    pub refused_parts: Vec<[i64; 5]>,
 }
 
 /// [agent-inferred, October 30] A clocked level's closure over a section's opening read
@@ -6148,8 +6150,28 @@ impl TowerLearner {
         let closure_before: i64 = closure.iter().map(|c| c.code).sum();
         let mut refused = Vec::new();
         let mut refused_parts = Vec::new();
+        // The refused step's parts: the descent, the heading's read, the readout and its bias, the
+        // clocked levels' own material (their moves among it, from the level whose block begins
+        // at its first move to the next level's), and every other family.
         let [heading_read, descent] = self.tower.heading_families();
-        let part_of = |i: usize| if descent.iter().any(|r| r.contains(&i)) { 0 } else if heading_read.iter().any(|r| r.contains(&i)) { 1 } else { 2 };
+        let clocked = self.tower.heading_from().map(|first| {
+            let levels = &self.tower.layout.levels;
+            levels[first].move_re..self.tower.layout.readout
+        });
+        let readout = self.tower.layout.readout..self.tower.layout.readout_bias + self.tower.declaration.alphabet;
+        let part_of = |i: usize| {
+            if descent.iter().any(|r| r.contains(&i)) {
+                0
+            } else if heading_read.iter().any(|r| r.contains(&i)) {
+                1
+            } else if readout.contains(&i) {
+                2
+            } else if clocked.as_ref().is_some_and(|c| c.contains(&i)) {
+                3
+            } else {
+                4
+            }
+        };
         let (receipt, mut slot) = loop {
             let mut candidate = self.tower.clone();
             let mut moved = false;
@@ -6203,18 +6225,20 @@ impl TowerLearner {
             refused.push((arrivals_after - code_before, closure_after - closure_before));
             if self.refusal_parts {
                 // The refused step read again under each of its parts alone, at the same halvings.
-                let mut alone = [0i64; 3];
+                let mut alone = [0i64; 5];
                 for (n, change) in alone.iter_mut().enumerate() {
+                    let part: Vec<i128> = step.iter().enumerate().map(|(i, &q)| if part_of(i) == n { q } else { 0 }).collect();
                     let mut candidate = self.tower.clone();
                     for &(start, len, grain) in &self.tower.layout.families {
                         if grain == MOVE_BITS {
                             continue;
                         }
-                        for i in (start..start + len).filter(|&i| part_of(i) == n) {
-                            candidate.theta[i] = fit32(candidate.theta[i] as i128 - release(step[i], halvings), "a deposited parameter outgrew its 32-bit carrier")?;
+                        for i in start..start + len {
+                            candidate.theta[i] = fit32(candidate.theta[i] as i128 - release(part[i], halvings), "a deposited parameter outgrew its 32-bit carrier")?;
                         }
                     }
-                    if n == 2 {
+                    candidate.move_by_chart(&part, halvings)?;
+                    if n == 4 {
                         for &(a, b) in &returns {
                             let half = release(step[a], halvings).div_euclid(2);
                             candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
@@ -6223,7 +6247,6 @@ impl TowerLearner {
                         if let Some(o) = &opens {
                             candidate.part_split(o.level, o.pair, &o.direction, o.sign, release(unit, halvings))?;
                         }
-                        candidate.move_by_chart(&step, halvings)?;
                     }
                     candidate.project();
                     let read = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -10493,9 +10516,10 @@ mod tests {
     }
 
     /// [agent-inferred, October 30] **A refused step read by its parts** (the record's acceptance
-    /// 19): under the declared reading every refused step is read again under the descent's step
-    /// alone, the heading's read's alone and every other family's alone, and the reading moves
-    /// nothing: the learner and the rest of the receipt are those of the learner without it.
+    /// 19 and 21): under the declared reading every refused step is read again under each of its
+    /// five parts alone (the descent, the heading's read, the readout, the clocked levels and the
+    /// rest), and the reading moves nothing: the learner and the rest of the receipt are those of
+    /// the learner without it.
     #[test]
     fn a_refused_step_is_read_by_its_parts_and_the_reading_moves_nothing() {
         let classes = news_passage();
