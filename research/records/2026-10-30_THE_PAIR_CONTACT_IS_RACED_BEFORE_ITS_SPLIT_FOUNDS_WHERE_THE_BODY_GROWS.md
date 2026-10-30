@@ -304,5 +304,20 @@ mode, which lies between zero and `θ̂`, rose too: the line did not descend alo
 misread curvature on the right slope would not produce. Inferred from the tiny tower, where the
 step moved the score and turned its sign: the score was stale on the tower the founding landed on
 (§4, read on the tower it lands on), built after this reading. The card's split read is unchanged by it; the learner's section now reads
-forward and back once more, so the paired parity is owed again at the new head. §3's claim holds,
-so the race (acceptance 6) is owed.
+forward and back once more, so the paired parity is owed again at the new head.
+
+**§5 acceptance 5 again, with the split read on the stepped tower** (October 30, RTX 4080 SUPER, head
+`e945ff809`, alone on the card). The same parity: 98,304 faces, 19,075,104 gradient entries and every
+learner equal; on all 32 sections the split reads, the foundings and the carried directions equal,
+none unequal. Host 29,044 ms, card 8,381 ms (262 forwards in 6,026 ms, 95 reverses in 976 ms); wall
+43.7 s, peak resident set 1,963,660 KiB. Acceptance 5 holds at the stepped head; the stepped read
+costs the card 31 forwards and 31 reverses over the 32 sections.
+
+**Acceptance 4 at the race's width, read on the stepped tower.** Twenty-nine of the 32 sections
+proposed one founding each (sections 1, 2 and 19 proposed none), and the certificate admitted all
+29 at `θ̂`: every reread lowered its section's code, by 17.5 to 1,837.9 bits (0.11% to 8.44% of
+sections coding 13,600 to 21,800 bits), 7,531 bits over the 29, the largest in the first sections
+(475, 212, 694, 1,838, 841, 702 and 497 bits at sections 3 to 9) and 17 to 210 bits from section 14
+on. The dormant copies fell from 1,024 to 995. Read on the opening tower the same passage admitted 5
+of 28. Acceptance 4's claim holds at the race's width: the certificate admits more than it refuses,
+and every admitted founding lowers the code. §3's claim holds, so the race (acceptance 6) is owed.
