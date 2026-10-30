@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's (§11)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent steps at the closure's scale, its acceptance fixed before the build (§12)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -575,4 +575,64 @@ the face is C′'s and `C^→` carries no covector, so that lap is C′ exactly 
 `C^→` held, only `D` moves. If the `C^→`-held lap refuses about as C′ does, the overshoot is the
 read's step and its law changes next; if it still refuses about twenty a window, it is the
 descent's. The lap keeps its 256 sections and its projection rule.
+
+**The holds located the refusals in the descent's step** (a38c1c63f's binary, two 256-section laps
+on the card, neither stopped early):
+
+| Hold | Arrivals at 256 | − C′ | Refusals a window | Halvings | Dev | GSM8K | Wall |
+|---|---|---|---|---|---|---|---|
+| none | 2.721 | −0.019 | 53, 20, 2, 19, 23, 29, 28, 23 | 197 | 2.809 | 2.861 | 95.1 s |
+| `C^→` | 2.792 | +0.052 | 46, 19, 18, 28, 28, 27, 30, 29 | 225 | 2.844 | 2.907 | 97.3 s |
+| `D` | 2.740 | 0 | 21, 1, 3, 2, 0, 0, 0, 0 | 27 | 2.797 | 2.894 | 78.7 s |
+
+With `D` held at zero the lap is C′ to every printed digit at every window, arrivals and refusals,
+so the route adds nothing else. With `C^→` held and `D` moving the refusals stay: the descent's
+step is the overshoot. Holding the read also costs the arrivals 0.07 bits a byte (the read learns
+something the face uses) and the held-out reads. The `D`-held lap gives C′'s own held-out read at
+256 sections (dev 2.797, the GSM8K region 2.894), which C′'s 726-section lap never printed; against
+it the unheld lap is 0.012 behind on dev and 0.033 ahead on the GSM8K region.
+
+## 12. The descent steps at the closure's scale
+
+[agent-inferred, October 30] **The cause.** Every material entry steps `2^(−k) m/√v`, about
+`2^(−k)` while its covector keeps one sign, and the descent opens at zero and grows, so its steps
+stay full. Its covector reaches it through the readout, `δx^L = Uᵀδz`, and its step returns through
+the readout to the face: a step on every entry moves the face by `2^(−k) ‖ĥ⁺‖₁ U sign(Uᵀδz)`,
+which carries the readout's sum over the width once more than the readout's own step,
+`2^(−k) ‖x^L‖₁ sign(δz)`. That sum of `w` unit-scale terms spreads as `√w`, the spread the closure's
+face already takes out with `2^(−s)`, `s = ⌈½⌈log₂ w⌉⌉` (`s = 3` at `w = 64`). The measured
+overshoot is smaller than `√w` because the certificate halves every family's step together: at one
+halving a section the descent and every other family took half their steps.
+
+**The law.**
+
+```text
+θ ← θ − 2^(−k) m/(√v + 2^(−32))      every family but the descent
+D ← D − 2^(−k−s) m/(√v + 2^(−32))    the descent, s = ⌈½⌈log₂ w⌉⌉
+```
+
+Under a step normalized by its second moment this is the face reading `2^(−s) D ĥ⁺` with the
+material's step, the closure's scale on the descent's sum; it is carried in the deposit, which the
+learner owns on the host, so the card's forward and reverse are unchanged.
+
+**Acceptance, fixed before the build.**
+17. On the host a section's deposit moves each descent entry by its moments' step at `2^(−k−s)`
+    and each readout entry at `2^(−k)`, each released by the certificate's halvings.
+18. On the 4080 over the passage's first 256 sections, the refusals after the first window are at
+    most twice C′'s (C′ 6, so at most 12; the unscaled lap 144), and the arrivals at section 256 are
+    at or below the unscaled lap's 2.721. The held-out reads are reported beside C′'s at 256
+    sections (2.797, 2.894), and the writing is shown. If the refusals fall and the arrivals end
+    above 2.721, the descent's step at `2^(−s)` is slower than its admissible step, and the next
+    loop reads the step between.
+
+**Built.** `TowerLearner::section` steps the descent's family at the rate `k + s`
+([`closure_shift`]); the module's deposit law and `Tower::join_heading` say so. The card crate is
+unchanged.
+
+Recorded failures this could repeat: *a refusal answered with a larger limit* (the step changes for
+the one family the holds located; the lap keeps its sections and its projection); *a located cause
+carried unrepaired into a new consumer* (the refusals' cause is removed at the family that carries
+it, not by a smaller step for every family); *bits read as progress* (acceptance 18 shows the
+writing and the held-out reads); *a design thought in the programming language* (the scale is the
+spread of the readout's sum over the width, the same `2^(−s)` the closure's face takes).
 

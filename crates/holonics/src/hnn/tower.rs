@@ -29,7 +29,8 @@
 //!            G_B = Σ_t γ G_h(t) x^ℓ_tᵀ
 //! deposit    θ ← θ − 2^(−k) m / (√v + 2^(−32))               m, v the covector's first and second moments
 //!                                                            over sections (`1 − 2^(−3)`, `1 − 2^(−8)`);
-//!                                                            a move in its chart (ln(1 − |λ|), arg λ)
+//!                                                            a move in its chart (ln(1 − |λ|), arg λ);
+//!                                                            the heading's descent at `2^(−k−s)`
 //! certificate the section reread from its opening states under the deposit codes strictly fewer
 //!            bits (an exact comparison of the products of its faces); else the step halves, until
 //!            it is certified or has released below every family's grain (then nothing is
@@ -5476,7 +5477,8 @@ impl Tower {
     /// (`Tower::closure_faces`). The closure is read beside the section's code and is not learned:
     /// pulling the arrivals' terrain it cost them, and on the heading's read alone it located
     /// nothing (the record's §10–§11), so the heading the face reads takes the arrivals' covector
-    /// alone.
+    /// alone. The descent steps at `2^(−s)` of the material's step, `s` the closure's scale: at
+    /// the material's step it overshot the arrivals' code in most sections (the record's §12).
     ///
     /// [agent-inferred] `C^→_l` opens as a copy of the level's read, so a heading opens on what the
     /// level's contacts read (a heading at zero is no ratio, and its closure would have no
@@ -6095,11 +6097,19 @@ impl TowerLearner {
                 *v = toward(*v, square, SECOND_RATE);
             }
         }
-        // The proposed step on each family's grain.
+        // The proposed step on each family's grain. [agent-inferred, October 30] The heading's
+        // descent steps at `2^(−s)` of the material's step, `s` the closure's scale
+        // ([`closure_shift`], the record's §12): its covector reaches it through the readout,
+        // `δx^L = Uᵀδz`, and its step returns through the readout to the face, so a step of every
+        // entry moves the face by the readout's sum over the width once more than the readout's
+        // own step does, and that sum of unit-scale terms spreads as `√w`.
+        let [_, descent] = self.tower.heading_families();
+        let descent_rate = self.rate_bits + closure_shift(self.tower.declaration.width);
         let mut step = vec![0i128; g.len()];
         for &(start, len, grain) in &self.tower.layout.families {
+            let rate = if descent.iter().any(|r| r.start == start) { descent_rate } else { self.rate_bits };
             for i in start..start + len {
-                let q = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                let q = deposit_step(self.first[i], self.second[i], grain, rate);
                 step[i] = if self.held.iter().any(|h| h.contains(&i)) { 0 } else { q };
             }
         }
@@ -10448,6 +10458,33 @@ mod tests {
         let receipt = plain.section(&mut states, &[&classes[..31]]).expect("section");
         assert_eq!(receipt.refused.len(), receipt.halvings as usize);
         assert!(receipt.refused.iter().all(|&(_, c)| c == 0), "a closure without the heading");
+    }
+
+    /// [agent-inferred, October 30] **The descent steps at the closure's scale** (the record's
+    /// acceptance 17): a section's deposit moves each entry of the descent by its moments' step at
+    /// `2^(−s)` of the material's rate, and every other material entry at the material's rate,
+    /// each released by the certificate's halvings.
+    #[test]
+    fn the_descent_steps_at_the_closures_scale() {
+        let classes = news_passage();
+        let joined = headed(3);
+        let mut learner = TowerLearner::new(joined.clone(), 7);
+        let mut states = vec![learner.tower.rest()];
+        let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
+        assert!(receipt.deposited);
+        let s = closure_shift(joined.declaration.width);
+        assert!(s >= 1);
+        let [_, descent] = joined.heading_families();
+        let readout = joined.layout.readout..joined.layout.readout_bias;
+        let mut moved = [0usize; 2];
+        for (ranges, rate, n) in [(descent, 7 + s, 0), (vec![readout], 7, 1)] {
+            for i in ranges.into_iter().flatten() {
+                let step = release(deposit_step(learner.first[i], learner.second[i], MATERIAL_BITS, rate), receipt.halvings);
+                assert_eq!(joined.theta[i] as i128 - learner.tower.theta[i] as i128, step, "entry {i} at rate {rate}");
+                moved[n] += (step != 0) as usize;
+            }
+        }
+        assert!(moved.iter().all(|&m| m > 0), "the descent and the readout moved {moved:?} entries");
     }
 
     /// A declared hold of the heading's families keeps them as joined through a section that
