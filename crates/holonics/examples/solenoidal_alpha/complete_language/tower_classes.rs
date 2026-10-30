@@ -94,12 +94,13 @@ pub(crate) fn train_participating_realized(args: &[String], news: Option<NewsClo
     train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Participation, realization)
 }
 
-/// `train-two-ladder-passage-tower-classes`: [`train_realized`] on both turn ladders with the
-/// passage joined at the founding, so every level's contacts read the passing current;
-/// `train-two-ladder-news-passage-tower-classes` joins the race's news clock first (record
-/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`).
-pub(crate) fn train_passage_realized(args: &[String], news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Passage, realization)
+/// `train-two-ladder-news-passage-tower-classes`: [`train_realized`] on both turn ladders under the
+/// race's news clock, with the passage joined at the founding, so the contacts of every level the
+/// clock holds read the passing current; `train-two-ladder-stacked-news-passage-tower-classes`
+/// joins [`race_stacked_news_clock`] instead (record
+/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, §7 and §8).
+pub(crate) fn train_passage_realized(args: &[String], news: NewsClock, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::Passage, realization)
 }
 
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
@@ -135,6 +136,14 @@ fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladd
 /// prediction, and `r = 2`, the least radix whose carry merges epochs (agent-inferred; [`NewsClock`]).
 pub(crate) fn race_news_clock() -> NewsClock {
     NewsClock::new(8, 2).expect("a whole positive section and ratio")
+}
+
+/// The race's news clock above the plain race's four arrival levels (`F = 4`): those levels tick
+/// at every arrival and the levels above them on `B = 8`, `r = 2` (agent-inferred, October 30;
+/// record `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, §8). A declaration of
+/// four levels or fewer holds no level under it and is refused.
+pub(crate) fn race_stacked_news_clock() -> NewsClock {
+    NewsClock::above(8, 2, 4).expect("a whole positive section and ratio")
 }
 
 /// [agent-inferred, October 25] **A section's comparison is its target.** A passage of sections

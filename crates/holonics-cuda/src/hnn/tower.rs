@@ -30,8 +30,8 @@
 //! residues and orientation heard from the arriving class's word, one thread a ring, through the
 //! strands' resident table, their faces read off the rings' resident faces at their level's
 //! contacts beside `r̂`, and their materials' covectors `δa ⊗ s`, `δb ⊗ s` summed by the outer
-//! sums; the faces carry none), no passage credit, at most four levels,
-//! streams of one section length, with
+//! sums; the faces carry none), no passage credit, any number of levels (each level's words
+//! resident on the card, which the law's parameter words address), streams of one section length, with
 //! or without the pair face (its values resident on the card beside the material, read at each
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
 //! ranks carried by every stream beside its modes, each riding its level's mode or its founded pair
@@ -75,8 +75,6 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/tower.ptx"));
 
 /// The kernels' block (`TOWER_THREADS`).
 const THREADS: u32 = 256;
-/// The levels the law's words carry (`TOWER_MAX_LEVELS`).
-const MAX_LEVELS: usize = 4;
 /// The turned modes' ladder `e^(iπ/2^i)`, `i = 0..=16` (`TOWER_LADDER`).
 const LADDER: usize = 17;
 /// The outer sums' tile (`OUTER_ROWS`, `OUTER_COLS`).
@@ -120,6 +118,9 @@ struct LevelWords {
     /// The passage's `W₁ˣ` and its reach (zero without it).
     passage: u64,
     passage_reach: u64,
+    /// A clocked level's section `B r^(l−F)` on `2^(−20)` bits (unread below the clock's first
+    /// clocked level and without a clock; [`NewsClock`]).
+    section: u64,
 }
 
 /// The law's words (`TowerLaw`).
@@ -163,12 +164,14 @@ struct LawWords {
     pumped: u32,
     moving: u32,
     ln2: i64,
-    level: [LevelWords; MAX_LEVELS],
-    /// The news clock (`news = 0` without one): each level's section on `2^(−20)` bits (level 0's
-    /// unread) and the clock's period ([`NewsClock`]).
+    /// The card address of each level's words (`[L]`, the frame's `levels`), so the law's
+    /// parameter words do not grow with the tower's levels.
+    level: u64,
+    /// The news clock (`news = 0` without one): its first clocked level (the levels below it tick at
+    /// every arrival; each clocked level's section is in its words) and the clock's period
+    /// ([`NewsClock`]).
     news: u32,
-    pad1: u32,
-    sections: [u64; MAX_LEVELS],
+    news_first: u32,
     period: u64,
     /// The strands (`strand_rings = 0` without them): their level, their rings, the places of
     /// `W_sa` and `W_sb` and their reaches ([`holonics::hnn::tower::realization::ResidentStrands`]).
@@ -188,8 +191,8 @@ struct LawWords {
     /// holds its geometry `J` (`W × W`) ([`Tower::join_mutual_contact`]).
     mutual: u32,
     mutual_shift: u32,
-    /// The passage (`passage = 0` without it): every level's contacts read the passing current
-    /// through `W₁ˣ` ([`Tower::join_passage`]).
+    /// The passage (`passage = 0` without it): the contacts of every level from the news clock's
+    /// first clocked level read the passing current through `W₁ˣ` ([`Tower::join_passage`]).
     passage: u32,
     pad2: u32,
 }
@@ -401,8 +404,8 @@ struct Shape {
     carried: usize,
     /// One under the mutual contact, else zero.
     mutual: usize,
-    /// One when the passage is joined, else zero: each level then transposes `W₁ˣ` beside its
-    /// other families.
+    /// The levels whose contacts hear the passing current (zero without the passage): each transposes
+    /// `W₁ˣ` beside its other families.
     passage: usize,
 }
 
@@ -432,6 +435,8 @@ struct Frame<'c> {
     opening: CardBuffer<'c, i64>,
     ends: CardBuffer<'c, i64>,
     faces: CardBuffer<'c, u64>,
+    /// Each level's words (`TowerLevel`, `[L]`), which the law's words address.
+    levels: CardBuffer<'c, LevelWords>,
     swell: CardBuffer<'c, u64>,
     status: CardBuffer<'c, u32>,
     input: CardBuffer<'c, i32>,
@@ -577,8 +582,9 @@ pub struct TowerCard<'c> {
     card: &'c Card,
     module: Module,
     frame: Option<Frame<'c>>,
-    /// The law of the material the frame holds from the last opening read.
-    opened: Option<LawWords>,
+    /// The law of the material the frame holds from the last opening read, and its levels' words
+    /// (resident in the frame's `levels`, read here by the outer sums' places).
+    opened: Option<(LawWords, Vec<LevelWords>)>,
     /// Whether the frame's material is still the opening read's (a reread uploads its candidate).
     opened_current: bool,
     ends: [Option<Vec<TowerState>>; 2],
@@ -683,8 +689,8 @@ impl<'c> TowerCard<'c> {
                 return refuse("the card steps a rotor's moving modes with a key for each level, class and moving mode, its modes' scan one thread a mode in one block");
             }
         }
-        if d.levels == 0 || d.levels > MAX_LEVELS {
-            return refuse("the card carries one to four levels");
+        if d.levels == 0 || d.levels > u32::MAX as usize {
+            return refuse("the card carries one or more levels, counted in a 32-bit word");
         }
 
         if let Some(clock) = &law.news {
@@ -692,7 +698,7 @@ impl<'c> TowerCard<'c> {
                 return refuse("the card carries no ring beside a news clock");
             }
             clock.period(d.levels)?;
-            for l in 1..d.levels {
+            for l in clock.first()..d.levels {
                 clock.section(l)?;
             }
         }
@@ -706,7 +712,9 @@ impl<'c> TowerCard<'c> {
         Ok(())
     }
 
-    fn law_words(law: &ResidentLaw, streams: usize, cells: usize) -> LawWords {
+    /// The law's words and each level's words (the frame's `levels`, which `LawWords::level`
+    /// addresses once they are resident).
+    fn law_words(law: &ResidentLaw, streams: usize, cells: usize) -> (LawWords, Vec<LevelWords>) {
         let d = &law.declaration;
         let mut words = LawWords {
             alphabet: d.alphabet as u32,
@@ -770,10 +778,8 @@ impl<'c> TowerCard<'c> {
         }
         if let Some(clock) = &law.news {
             words.news = 1;
+            words.news_first = clock.first;
             words.period = clock.period(d.levels).expect("admitted");
-            for l in 1..d.levels {
-                words.sections[l] = clock.section(l).expect("admitted");
-            }
         }
         if let Some(p) = &law.participation {
             words.participation = 1;
@@ -788,8 +794,11 @@ impl<'c> TowerCard<'c> {
             words.mutual = 1;
             words.mutual_shift = b;
         }
-        for (slot, lv) in words.level.iter_mut().zip(&law.levels) {
-            *slot = LevelWords {
+        let levels = law
+            .levels
+            .iter()
+            .enumerate()
+            .map(|(l, lv)| LevelWords {
                 move_re: lv.move_re as u64,
                 move_im: lv.move_im as u64,
                 push_re: lv.push_re as u64,
@@ -815,9 +824,10 @@ impl<'c> TowerCard<'c> {
                 pa_reach: lv.participation_reaches,
                 passage: lv.passage as u64,
                 passage_reach: lv.passage_reach,
-            };
-        }
-        words
+                section: law.news.filter(|c| l >= c.first()).map_or(0, |c| c.section(l).expect("admitted")),
+            })
+            .collect();
+        (words, levels)
     }
 
     /// The matrix families `(offset, rows, cols)` the forward reads transposed.
@@ -825,7 +835,8 @@ impl<'c> TowerCard<'c> {
         let d = &law.declaration;
         let (a, w, n, f) = (d.alphabet as u64, d.width as u64, d.modes as u64, d.contacts as u64);
         let mut out = vec![law.readout as u64, if law.mutual.is_some() { w } else { a }, w];
-        for lv in &law.levels {
+        let heard = if law.passage { law.news.map_or(law.levels.len(), |c| c.first()) } else { law.levels.len() };
+        for (l, lv) in law.levels.iter().enumerate() {
             for (offset, rows, cols) in [(lv.push_re, n, w), (lv.push_im, n, w), (lv.gate, n, w), (lv.read_re, w, n), (lv.read_im, w, n), (lv.contact, f, w), (lv.ret, w, f)] {
                 out.extend([offset as u64, rows, cols]);
             }
@@ -844,7 +855,7 @@ impl<'c> TowerCard<'c> {
                     out.extend([offset as u64, rows, cols]);
                 }
             }
-            if law.passage {
+            if l >= heard {
                 out.extend([lv.passage as u64, f, w]);
             }
         }
@@ -883,7 +894,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa + shape.passage) * l + stranded * (1 + paired)))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa) * l + shape.passage + stranded * (1 + paired)))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -891,6 +902,7 @@ impl<'c> TowerCard<'c> {
             opening: card.alloc(s * l * n * 2)?,
             ends: card.alloc(s * l * n * 2)?,
             faces: card.alloc(q * 3)?,
+            levels: card.alloc(l)?,
             swell: card.alloc(l * 4)?,
             status: card.alloc(s)?,
             input: card.alloc(ql * w)?,
@@ -1193,7 +1205,7 @@ impl<'c> TowerCard<'c> {
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
         let p = usize::from(shape.heads > 0);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -1304,13 +1316,15 @@ impl<'c> TowerCard<'c> {
                 return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: usize::from(law.passage) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 } };
         self.frame(shape).map_err(device)?;
-        let words = Self::law_words(&law, streams, cells);
+        let (mut words, levels) = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
         {
             let frame = self.frame.as_ref().expect("the frame was just sized");
             let card = self.card;
+            card.write(&frame.levels, 0, &levels).map_err(device)?;
+            words.level = frame.levels.device_ptr();
             card.write(&frame.theta, 0, &tower.theta).map_err(device)?;
             card.write(&frame.families, 0, &Self::families(&law)).map_err(device)?;
             let mut gates = Vec::with_capacity(d.levels * d.modes * 4);
@@ -1530,7 +1544,7 @@ impl<'c> TowerCard<'c> {
             .collect();
         self.ends[slot_index(slot)] = Some(ends);
         if keep {
-            self.opened = Some(words);
+            self.opened = Some((words, levels));
             self.opened_current = true;
         } else {
             self.opened_current = false;
@@ -1542,7 +1556,7 @@ impl<'c> TowerCard<'c> {
     /// The streams' covector summed (`tower_reverse_*`, `tower_outer_*`, `tower_encoding`,
     /// `tower_moves`), from the opening read's temporaries.
     fn read_reverse(&mut self) -> Result<Vec<i128>> {
-        let words = self.opened.filter(|_| self.opened_current).ok_or(TowerError::Refused("a card reverse reads the section's opening forward, its material still resident"))?;
+        let (words, levels) = self.opened.clone().filter(|_| self.opened_current).ok_or(TowerError::Refused("a card reverse reads the section's opening forward, its material still resident"))?;
         let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
         let shape = frame.shape;
         let fw = Self::frame_words(frame);
@@ -1575,7 +1589,7 @@ impl<'c> TowerCard<'c> {
             self.law_launch("tower_reverse_modes", Dim3::x(s as u32), scan_threads, scan_shared, &words, &fw, Some(level as u32)).map_err(device)?;
             self.law_launch("tower_reverse_dx", Dim3::x(q), THREADS, Self::dx_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
         }
-        for outer in self.outer_families(&words, &fw) {
+        for outer in self.outer_families(&words, &levels, &fw) {
             self.launch_outer(&outer.0, outer.1).map_err(device)?;
         }
         // The foil's biases each take a covector of their own, summed over every cell.
@@ -1600,7 +1614,7 @@ impl<'c> TowerCard<'c> {
     }
 
     /// Every family's outer sum: `(words, whether x is 64-bit)`.
-    fn outer_families(&self, law: &LawWords, fw: &FrameWords) -> Vec<(OuterWords, bool)> {
+    fn outer_families(&self, law: &LawWords, levels: &[LevelWords], fw: &FrameWords) -> Vec<(OuterWords, bool)> {
         let (a, w, n, f, l) = (law.alphabet as u64, law.width as u64, law.modes as u64, law.contacts as u64, law.levels as u64);
         let (s, t) = (law.streams, law.cells);
         let gradient = |offset: u64| fw.gradient + 16 * offset;
@@ -1636,7 +1650,7 @@ impl<'c> TowerCard<'c> {
             (family(fw.dz, a, fw.top, w, fw.r_dz, fw.r_top, 1, a, w, false, gradient(law.readout), Some(gradient(law.readout_bias))), false)
         }];
         for level in 0..l as usize {
-            let lv = &law.level[level];
+            let lv = &levels[level];
             let lu = level as u64;
             out.push((family(at64(fw.dy, lu * w), l * w, at32(fw.conduct, lu * f), l * f, at64(fw.r_dy, lu), at64(fw.r_conduct, lu), l, w, f, false, gradient(lv.ret), Some(gradient(lv.ret_bias))), false));
             // Each drive's material takes its covector against the read; its bias the same covector,
@@ -1669,8 +1683,9 @@ impl<'c> TowerCard<'c> {
                 out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yre, lu), l, w, n, false, gradient(lv.pa[6]), None), true));
                 out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n + n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yim, lu), l, w, n, true, gradient(lv.pa[7]), None), true));
             }
-            // The passage: `W₁ˣ` takes the drives' covector against the level's input.
-            if law.passage != 0 {
+            // The passage: `W₁ˣ` takes the drives' covector against the level's input, on the levels
+            // the clock holds.
+            if law.passage != 0 && level as u32 >= law.news_first {
                 out.push((family(at64(fw.da, lu * f), l * f, at32(fw.input, lu * w), l * w, at64(fw.r_da, lu), at64(fw.r_input, lu), l, f, w, false, gradient(lv.passage), None), false));
             }
         }

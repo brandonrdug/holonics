@@ -274,8 +274,8 @@ pub struct ResidentLevel {
     /// nine.
     pub participation: [usize; 10],
     pub participation_reaches: [u64; 9],
-    /// The passage's `W₁ˣ` (`F × d`) and its `max |w|` (each zero without the passage,
-    /// [`Tower::join_passage`]).
+    /// The passage's `W₁ˣ` (`F × d`) and its `max |w|` (each zero without the passage or below the
+    /// news clock's first clocked level, [`Tower::join_passage`]).
     pub passage: usize,
     pub passage_reach: u64,
 }
@@ -463,8 +463,9 @@ pub struct ResidentLaw {
     /// then holds the contact's geometry `J`, `d × d`): a realization that does not carry it refuses
     /// the tower.
     pub mutual: Option<u32>,
-    /// Whether every level's contacts hear the passing current ([`Tower::join_passage`]): a
-    /// realization that does not carry it refuses the tower.
+    /// Whether the contacts of the levels the news clock holds (from its first clocked level) hear
+    /// the passing current ([`Tower::join_passage`]): a realization that does not carry it refuses
+    /// the tower.
     pub passage: bool,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,

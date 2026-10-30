@@ -48,8 +48,10 @@ struct Faces {
     participation: Option<usize>,
     /// The mutual contact joined at the founding (`open_mutual`).
     mutual: bool,
-    /// The passage joined last (`open_passage`).
+    /// The passage joined last (`open_passage`); it needs the news clock.
     passage: bool,
+    /// The levels (two when zero).
+    levels: usize,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -69,7 +71,8 @@ struct Ringed {
 fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     let turned = faces.turned || faces.pumped;
     let contact = faces.contact.unwrap_or(ContactLaw::Rectifying);
-    let tower = Tower::found_on(TowerDeclaration { contact, ..declaration(alphabet, true, turned, faces.pumped) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
+    let levels = if faces.levels == 0 { 2 } else { faces.levels };
+    let tower = Tower::found_on(TowerDeclaration { contact, levels, ..declaration(alphabet, true, turned, faces.pumped) }, &keys(1 << 16), TurnLadder::Both).expect("founded");
     let mut learner = TowerLearner::new(tower, 5);
     if faces.mutual {
         open_mutual(&mut learner);
@@ -107,16 +110,17 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     (learner.clone(), learner)
 }
 
-/// The passage joined last, each level's `W₁ˣ` opened about ±¼ on `2^(−24)` off the key stream
-/// (where participation's `W₁ᵃ` opens), so every arrival's current moves the contacts' drive and
-/// the family carries a covector from the first section.
+/// The passage joined last, the `W₁ˣ` of each level the clock holds opened about ±¼ on `2^(−24)`
+/// off the key stream (where participation's `W₁ᵃ` opens), so every arrival's current moves those
+/// contacts' drive and the family carries a covector from the first section.
 fn open_passage(learner: &mut TowerLearner) {
     learner.join_passage().expect("the passage joins");
     let d = learner.tower.declaration;
+    let first = learner.tower.news().expect("the passage's clock").first();
     let law = learner.tower.resident_law().expect("the law");
     let k = keys(1 << 16);
     let mut j = 40000;
-    for lv in &law.levels {
+    for lv in &law.levels[first..] {
         for i in lv.passage..lv.passage + d.contacts * d.width {
             learner.tower.theta[i] = (k[j] as i32 - 128) << 15;
             j += 1;
@@ -487,25 +491,30 @@ fn the_cards_clocked_participating_pair_contact_holds_an_uncompared_place_as_the
 }
 
 /// [agent-inferred, October 29] **The passage on the card** (record
-/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, acceptance 3): every level's
-/// contacts read the current passing it, `W₁ˣ x`, beside their read of the level's face; 32
-/// sections equal face by face, covector entry by entry, learner for learner and state for state,
-/// on the news clock (level 1 ticking none, once or several times at an arrival) and without it.
+/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, acceptance 3, and §8): the
+/// contacts of every level the news clock holds read the current passing it, `W₁ˣ x`, beside
+/// their read of the level's face; 32 sections equal face by face, covector entry by entry, learner
+/// for learner and state for state, on the clock from level 1 (level 1 ticking none, once or
+/// several times at an arrival), on three levels from level 2 (levels 0 and 1 ticking at every
+/// arrival and carrying no `W₁ˣ`), and on six levels from level 4, past the four levels the law's
+/// parameter words once held in place (each level's words now resident on the card).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), passage: true, ..Faces::default() });
-    lockstep(11, 3, 9, 32, false, Faces { passage: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, ..Faces::default() });
 }
 
 /// The same beside participation on the clock's ticks and the pair contact, an uncompared place
-/// held, and beside the mutual contact; and advanced class by class under the clock.
+/// held; and advanced class by class under the clock from level 1 and, on three levels, from
+/// level 2.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_clocked_participating_passage_on_the_pair_contact_holds_an_uncompared_place_as_the_host_does() {
     lockstep(11, 2, 12, 8, true, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), participation: Some(12), contact: Some(ContactLaw::Pair), passage: true, ..Faces::default() });
-    lockstep(11, 3, 9, 8, false, Faces { mutual: true, passage: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), passage: true, ..Faces::default() });
+    advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, ..Faces::default() });
 }
 
 /// [agent-inferred, October 29] **The continuing body on the card** (acceptance 2 of the record

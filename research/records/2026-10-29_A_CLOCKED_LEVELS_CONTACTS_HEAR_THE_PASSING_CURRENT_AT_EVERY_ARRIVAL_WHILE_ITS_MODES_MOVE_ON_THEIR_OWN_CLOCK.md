@@ -1,8 +1,10 @@
 # A clocked level's contacts hear the passing current at every arrival while its modes move on their own clock
 
 Refs #404 #406. Status: [the measurement in §1; the law and its acceptance fixed before the build;
-built on the host and the card, acceptances 1 and 2 on the host (§6); card parity (3) and the race
-(4) owed; agent-inferred, October 29].
+built on the host and the card, acceptances 1 to 3 met (§6); the race (4) failed its claim (§7);
+the passage now joins only the levels a news clock holds, and the clock begins above the arrival
+stack (§8), built on the host (acceptances 1 and 2), whose card parity and race are owed;
+agent-inferred, October 29 and 30].
 Claude (opus), design lead. Read beside
 [the coarse level's sites](2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS_CARRIED_ACROSS_SECTIONS_SO_ITS_HEADS_REACH_ACROSS_THE_PASSAGES_PARTITION.md)
 (whose acceptance 7 is §1's measurement), [the news clock](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md)
@@ -163,6 +165,102 @@ missing 12 being one `W₁ˣ` family on each of four levels), and no card test j
 The frame's shape now carries the passage, and two card tests join it, opened off the keys:
 `the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections` (clocked and unclocked) and
 `the_cards_clocked_participating_passage_on_the_pair_contact_holds_an_uncompared_place_as_the_host_does`
-(beside clocked participation on the pair contact, beside the mutual contact, and advanced class
-by class under the clock). Parity at the race's declaration is owed (acceptance 3). The race commands are `train-two-ladder-passage-tower-classes`
+(beside clocked participation on the pair contact and advanced class by class under the clock).
+[measured, RTX 4080 SUPER, at `25710373a`] The card's 41 tests pass, and the parity at the race's
+declaration is equal (acceptance 3): every face, covector entry and learner equal over 32 sections
+at 24 streams clocked (98,304 faces, 12,685,344 covector entries), over 4 sections at 320 streams
+clocked (163,840 faces, 1,585,668 entries) and over 32 sections at 24 streams unclocked. The race commands are `train-two-ladder-passage-tower-classes`
 and `train-two-ladder-news-passage-tower-classes`; `tower_pass parity … passage` joins it.
+
+## 7. The race (October 30)
+
+[measured, RTX 4080 SUPER, at `25710373a`] The clocked tower with the passage (A) and the
+unclocked tower with it (B) raced together from 00:07 UTC, each lap waiting on the other's for the
+card; both stopped by the window rule after lap 9 (a game held about 2 GiB of the card through
+lap 9, so its times are contaminated and its bits are not). The unclocked plain tower was raced
+again at the merged commit `53cff3ff6` for four laps and reproduced October 27's laps 2 and 3 code
+for code, so the reference stands. Held-out bits a byte:
+
+| lap | plain | B (unclocked, passage) | clocked plain | A (clocked, passage) |
+|---|---|---|---|---|
+| 0 | 2.356 | 2.327 | 2.465 | 2.448 |
+| 1 | 2.139 | 2.168 | 2.365 | 2.338 |
+| 2 | 2.060 | 2.104 | 2.303 | 2.279 |
+| 3 | 2.020 | 2.054 | 2.265 | 2.239 |
+| 5 | 1.970 | 2.002 | | 2.202 |
+| 9 | | 1.965 | | 2.161 |
+
+A passage lap took about 127 s on the card against 114 s plain. At lap 9 A read 2.187 on GSM8K
+and B 1.934.
+
+**Acceptance 4 fails.** A reads 2.338 and 2.239 at laps 1 and 3 against the plain tower's 2.139
+and 2.020: the passage closes about 0.03 of the clocked tower's 0.2-bit deficit. The located cause
+is real but not the whole cause. In the unclocked tower the passage costs about 0.03 at every lap.
+
+**What the readings show** (A's and B's lap 9 states, read on the card). With the passage the
+clocked coarse levels learn: level 1's modes all left their founded spread for the reading's
+shortest octaves (`2^0` to `2^5`), and levels 2 and 3 moved most of their modes toward short memories, where without it level
+3 had kept its founding through lap 2. The clocked tower uses context as the unclocked one does:
+on GSM8K another prompt's context costs A's continuation 90 to 138 bits and B's 117 to 132. So the
+coarse levels learn and are read; what A lacks is the depth the arrival levels give each arrival.
+A level that ticks at every arrival runs its recurrence on the arrival's own input, and the plain
+tower runs four of them per arrival; the clocked tower runs one, with three held faces read
+through contacts.
+
+## 8. The next loop: the clock begins above the arrival stack
+
+[definition; agent-inferred, October 30] **The clock begins above the arrival stack.** The levels
+below a clock's first clocked level `F` tick at every arrival; level `l ≥ F` ticks at the
+sections `B r^(l−F)`. `F = 1` is the clock of October 27. A clocked level then adds coarse reach
+above the depth the arrival levels give each arrival, instead of replacing it. **The passage
+joins only the levels the clock holds** (`l ≥ F`): there the contacts would otherwise return a
+constant between ticks (§2); at a level that ticks at every arrival the contacts already meet the
+arrival through the state it pushed, and there the join cost the tower (§7). The passage is
+refused without a clock.
+
+**Acceptance (fixed before the build).**
+
+1. A clock from level `F` on four levels: levels below `F` tick at every arrival and read face for
+   face as the unclocked tower's; the levels from `F` tick at `B r^(l−F)` on their own news; the
+   text writes `F` and restores whole; a clock above the top level is the tower without it, as
+   one level on a clock is, and the passage is refused there.
+2. The passage joins only levels `l ≥ F`, opens at zero and its covector matches the code
+   difference on three levels clocked from level 2.
+3. Card parity at the race's declaration, six levels clocked from level 4 with the passage.
+4. **The race.** One hour on the card: six levels, the clock (`B = 8`, `r = 2`) from level 4
+   with the passage on levels 4 and 5 (C, `train-two-ladder-stacked-news-passage-tower-classes`),
+   beside the plain tower of six levels (E). The claim: C reads no worse held out than E at laps 1
+   and 3. Short of that, at this declaration a clocked level is worth less than an arrival level,
+   and the clock's place is the participation's reach (radix record §1), not the bits.
+
+**Built on the host** (`NewsClock::above`, `Tower::hears`; the card's law word `news_first`).
+Acceptance 1 is `the_clock_begins_above_the_arrival_stack`. Acceptance 2 is
+`the_passage_covector_matches_the_code_difference` and its two opened siblings, read at steps of
+`2^(−9)` units. Two properties of the fixture surfaced there, neither a fault of the reverse:
+
+- At the first cell a clocked level has not ticked: its state rests and the tiny tower's contact
+  biases are zero, so its four drives sit exactly on the rectifier's kink, and every step of a
+  passage at zero, from `2^(−9)` to `2^(−14)` units, carries them across. The passage at zero is
+  read with the heard level's contact biases opened.
+- With the passage on clocked levels only, the fitted slope's error grows as the step shrinks:
+  12%, 35% and 62% at `2^(−10)`, `2^(−11)` and `2^(−12)` units on one family whose covector stays
+  110.6, and within a tenth at `2^(−8)` and `2^(−9)`. That is the forward's rounding to `2^(−16)`,
+  not a covector off by a constant.
+
+**Six levels on the card.** The race's six levels met two walls before any card work. The founding
+reads 1,245,440 key bytes at six levels (852,224 at four) and the race's key file held 1,048,576;
+the race's keys are now the same rule counted to `2^16` (2,097,152 bytes, whose first 1,048,576
+are the old file, so a four-level tower founds the same on either). And the card's law carried its
+levels' words in place, in the kernel's parameter words: 2,256 octets of law and 1,088 of frame at
+four levels, 424 more a level, against the 4,096-octet parameter space, so it refused a fifth.
+Each level's words (with its section, which the law held beside them) are now resident on the
+card, addressed from the law, and the forward carves its per-level ticks, open sites and swell
+from its shared memory by the declared levels: the card carries any number of levels. Its parity
+at six levels is `the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections`' third case.
+
+The recorded failures these choices could repeat: *a located cause carried unrepaired into a new
+consumer* (the passage at the arrival levels is retired before the stacked clock consumes it);
+*bits read as progress* (the claim is a fixed comparison at two laps, with the writings beside it);
+*a refusal answered with a larger limit* (the window rule stopped A and B at lap 9 and neither was
+relaunched).
+

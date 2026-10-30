@@ -1,9 +1,10 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating | passage] | participating | mutual | passage]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage]`:
 //!   founds the gated tower (rectifying, on both turn ladders) on the keys, its levels on the news
-//!   clock `NewsClock(NEWS_BITS, NEWS_RADIX)` when one is named, with participation over `SECTION`
+//!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
+//!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
 //!   the passage joined last (`Tower::join_passage`) when `passage` is, and runs
@@ -23,7 +24,7 @@
 //!   trainer reads it.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-passage-tower-classes`, `train-two-ladder-news-passage-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
@@ -74,12 +75,21 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    let last = |word: &str| (args.len() == 13 || args.len() == 15) && args[args.len() - 1] == word;
-    let (participating, passage) = (last("participating"), last("passage"));
-    let mutual = args.len() == 13 && args[12] == "mutual";
-    let clocked = args.len() == 14 || args.len() == 15;
-    if !(args.len() == 12 || (clocked && (args.len() == 14 || participating || passage)) || (args.len() == 13 && (participating || mutual || passage))) {
-        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating | passage] | participating | mutual | passage]".into());
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage]";
+    if args.len() < 12 {
+        return Err(USAGE.into());
+    }
+    let word = args.last().filter(|w| w.parse::<u32>().is_err()).map(String::as_str);
+    let numbers = &args[12..args.len() - usize::from(word.is_some())];
+    let clock = match numbers {
+        [] => None,
+        [bits, radix] => Some(NewsClock::new(bits.parse()?, radix.parse()?)?),
+        [bits, radix, first] => Some(NewsClock::above(bits.parse()?, radix.parse()?, first.parse()?)?),
+        _ => return Err(USAGE.into()),
+    };
+    let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage"));
+    if (word.is_some() && !(participating || mutual || passage)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
+        return Err(USAGE.into());
     }
     let bytes = pinned(&args[0], &args[1])?;
     let keys = pinned(&args[2], &args[3])?;
@@ -109,8 +119,8 @@ fn parity(args: &[String]) -> Result<()> {
         return Err("the passage must hold the declared sections in every stream".into());
     }
     let mut tower = Tower::found_on(declaration, &keys, TurnLadder::Both)?;
-    if clocked {
-        tower.join_news(NewsClock::new(args[12].parse()?, args[13].parse()?)?)?;
+    if let Some(clock) = clock {
+        tower.join_news(clock)?;
     }
     if participating {
         let founded = tower.founded_participation(section)?;
@@ -123,7 +133,7 @@ fn parity(args: &[String]) -> Result<()> {
     }
     if passage {
         tower.join_passage()?;
-        println!("TOWER_PASSAGE");
+        println!("TOWER_PASSAGE first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
