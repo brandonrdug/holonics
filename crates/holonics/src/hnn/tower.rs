@@ -224,6 +224,7 @@ use rayon::prelude::*;
 pub mod body;
 pub mod duplex;
 pub mod growth;
+pub mod overture;
 pub mod participation;
 pub mod reading;
 pub mod realization;
@@ -2086,6 +2087,16 @@ pub struct Tower {
     fine: Exponential,
 }
 
+/// [agent-inferred, October 30] **A participation read with its sites' arrivals**
+/// ([`Tower::participation_read`]): each level's heads' participation at the read's last class, and
+/// for each level the place in the read whose arrival admitted each site the heads weigh, oldest
+/// first (`None` for a site carried in from before the read).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParticipationRead {
+    pub levels: Vec<Vec<Participation>>,
+    pub arrivals: Vec<Vec<Option<usize>>>,
+}
+
 /// [definition; agent-inferred] **A stream's continuing state**: each level's modes on
 /// `2^(−24)`, `(re, im)`.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -3496,6 +3507,50 @@ impl Tower {
         let reaches = self.reaches();
         let cell = self.step(state, u, &reaches)?;
         Ok(self.participation.as_ref().map(|_| cell.levels.into_iter().map(|lc| lc.participation.and_then(|pc| pc.site).map(|site| site.parts).unwrap_or_default()).collect()))
+    }
+
+    /// [agent-inferred, October 30] **The participation read with each site's arrival**: `classes`
+    /// read from `state`, the last through [`Tower::participation_at`], and beside each level's
+    /// heads the place in `classes` whose arrival admitted each of that level's sites, oldest
+    /// first (`None` for a site the state carried in). Under a news clock a level admits a site
+    /// only where its clock ticks, so its sites are not the last classes read and a reading that
+    /// labels them so misplaces every coarse level's reach. `None` on a tower without
+    /// participation.
+    pub fn participation_read(&self, state: &mut TowerState, classes: &[usize]) -> Result<Option<ParticipationRead>> {
+        let Some((&last, before)) = classes.split_last() else { return refuse("a participation read of no class") };
+        let counts = |s: &TowerState| -> Vec<usize> { s.sites.iter().map(|l| l.keys.len()).collect() };
+        let mut arrivals: Vec<Vec<Option<usize>>> = counts(state).into_iter().map(|n| vec![None; n]).collect();
+        let reaches = self.reaches();
+        for (i, &u) in before.iter().enumerate() {
+            let opened = counts(state);
+            self.step(state, u, &reaches)?;
+            for ((a, &was), &now) in arrivals.iter_mut().zip(&opened).zip(&counts(state)) {
+                // A close releases the section's sites; what the arrival admits after it is new.
+                if now < was {
+                    a.clear();
+                }
+                a.resize(now.max(a.len()), Some(i));
+            }
+        }
+        let Some(levels) = self.participation_at(state, last)? else { return Ok(None) };
+        // A level that ticks at the last arrival reads its open sites and the present one last; a
+        // close at that tick has released the oldest, so the sites read are the newest of them.
+        let arrivals = arrivals
+            .into_iter()
+            .zip(&levels)
+            .map(|(mut a, heads)| {
+                let read = heads.first().map_or(0, |h| h.weights.len());
+                if read == 0 {
+                    return Vec::new();
+                }
+                a.push(Some(before.len()));
+                let carried = read.saturating_sub(a.len());
+                let mut labels = vec![None; carried];
+                labels.extend_from_slice(&a[a.len() - (read - carried)..]);
+                labels
+            })
+            .collect();
+        Ok(Some(ParticipationRead { levels, arrivals }))
     }
 
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
@@ -4951,6 +5006,9 @@ impl Tower {
         if !self.declaration.gated {
             return refuse("participation reads gated modes: a site's frame is the product of the cells' unit moves");
         }
+        if self.declaration.pumped {
+            return refuse("participation on pumped modes is owed: a pumped move's frame is real-linear, not its turn part alone");
+        }
         if self.rotor.is_some() || self.ring.is_some() {
             return refuse("participation beside a rotor or a ring face is owed");
         }
@@ -5588,8 +5646,8 @@ impl TowerLearner {
     /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
     /// splits** ([`split`]): the founding the section before proposed is certified on this
     /// section's opening, read with and without it, and deposits only where it codes fewer bits by
-    /// more than its price; the section then steps from the tower the certificate leaves, its dormant
-    /// pairs depositing as one contact, and its reverse also forms the split read. After the step's
+    /// more than its price; the section then steps from the tower the certificate leaves, every pair
+    /// (dormant or founded) depositing as one contact, and its reverse also forms the split read. After the step's
     /// certificate the split is read again on the tower the step left (where it deposited), the pair
     /// the rank-one test admits there is proposed and held for the next section, and each other
     /// dormant pair's direction turns on that read.
@@ -5634,7 +5692,6 @@ impl TowerLearner {
                 out.admitted = fewer_bits_by(&faces_old, &faces_new, &split::certified_price(&proposed, width, dormant)?);
                 if out.admitted {
                     self.tower = candidate;
-                    self.relift(&proposed)?;
                     paired.levels[proposed.level][proposed.pair] = None;
                 }
                 // The reverse reads the opening forward of the tower it steps from, and a realization
@@ -5657,17 +5714,23 @@ impl TowerLearner {
             }
             _ => (realization.reverse(tower, &opening, classes, compared)?, None),
         };
-        // A dormant pair deposits as one contact (`split`'s header): its drives' copies take their
-        // covectors' sum, and its return steps once, split between its parts below.
+        // Every pair, dormant or founded, deposits as one contact (`split`'s header): its drives'
+        // copies take their covectors' sum, and its return parts their covectors' mean, which steps
+        // once, split between the parts below. A dormant pair's parts read the same conduction, so
+        // the mean is either part's covector exactly.
         let (drives, returns) = match &pairs {
             split::Pairs::Unpaired => (Vec::new(), Vec::new()),
-            split::Pairs::Dormant => tower.dormant_entries(&|_, _| true)?,
-            split::Pairs::Founding(p) => tower.dormant_entries(&|l, e| p.levels[l][e].is_some())?,
+            split::Pairs::Dormant | split::Pairs::Founding(_) => tower.pair_entries()?,
         };
         for &(a, b) in &drives {
             let sum = g[a] + g[b];
             g[a] = sum;
             g[b] = sum;
+        }
+        for &(a, b) in &returns {
+            let mean = div_nearest(g[a] + g[b], 2);
+            g[a] = mean;
+            g[b] = mean;
         }
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
@@ -8835,6 +8898,8 @@ mod tests {
         let p = ParticipationDeclaration::new(vec![2, 2], 16, 1).expect("declared");
         assert!(ungated.clone().join_participation(p.clone()).is_err());
         assert!(tiny_contacts(2, 4, 4, true, false, false, ContactLaw::Rectifying).join_participation(ParticipationDeclaration::new(vec![3], 16, 1).expect("declared")).is_err());
+        // A pumped move is real-linear: its frame is owed (the attention record §8).
+        assert!(tiny_contacts(2, 4, 4, true, true, true, ContactLaw::Rectifying).join_participation(p.clone()).is_err());
         let mut joined = tiny_participating(ContactLaw::Rectifying, false);
         assert!(joined.join_participation(p).is_err());
         // Participation joins last: a news clock joins before it.
@@ -8864,6 +8929,40 @@ mod tests {
             }
         }
         tower
+    }
+
+    /// [agent-inferred, October 30] A participation read places each site at the arrival that
+    /// admitted it: on a clocked tower level 0 admits every arrival and a coarse level only its
+    /// ticks, so the read's arrivals are, level by level, the newest of that level's ticks, across
+    /// the sections' closes. Counting a coarse level's sites back from the opening as classes
+    /// misplaced them (the hardware review of October 29).
+    #[test]
+    fn a_participation_read_places_each_site_at_the_arrival_that_admitted_it() {
+        let tower = tiny_clocked_participating(ContactLaw::Rectifying, false, 3);
+        let passage = news_passage();
+        let mut ticks = vec![Vec::new(); 2];
+        let mut state = tower.rest();
+        for (i, &u) in passage.iter().enumerate() {
+            let levels = tower.participation_at(&mut state, u).expect("read").expect("participating");
+            for (l, heads) in levels.iter().enumerate() {
+                if heads.first().is_some_and(|h| !h.weights.is_empty()) {
+                    ticks[l].push(i);
+                }
+            }
+        }
+        assert_eq!(ticks[0].len(), passage.len(), "level 0 ticks at every arrival");
+        assert!(ticks[1].len() > 16 && ticks[1].len() < passage.len(), "level 1 ticks at fewer arrivals, past a close");
+        // Read to level 1's last tick, so that both levels read their sites there.
+        let end = *ticks[1].last().expect("a tick");
+        let read = tower.participation_read(&mut tower.rest(), &passage[..=end]).expect("read").expect("participating");
+        for (l, (heads, arrivals)) in read.levels.iter().zip(&read.arrivals).enumerate() {
+            let sites = heads[0].weights.len();
+            let ticked: Vec<usize> = ticks[l].iter().copied().filter(|&i| i <= end).collect();
+            let newest: Vec<Option<usize>> = ticked[ticked.len() - sites..].iter().map(|&i| Some(i)).collect();
+            assert_eq!(arrivals, &newest, "level {l}");
+            assert_eq!(arrivals.last(), Some(&Some(end)), "level {l}: the present site is the last arrival");
+        }
+        assert_eq!(tower.participation_read(&mut tower.rest(), &[]).ok(), None, "a read of no class is refused");
     }
 
     /// [agent-inferred, October 29] **A clocked level's sites are its ticks** (record

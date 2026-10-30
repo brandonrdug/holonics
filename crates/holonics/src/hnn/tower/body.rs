@@ -31,10 +31,10 @@
 //! open interval a current.
 //!
 //! **Provenance.** At an answer's opening (the end letter after its prompt) each level's heads
-//! read the open section's admitted sites ([`Tower::participation_at`]); what lies before the
-//! section's opening is carried by the modes and has no site. The reading runs on the host from the
+//! read the open section's admitted sites, each labelled with the arrival that admitted it
+//! ([`Tower::participation_read`]); what lies before the section's opening is carried by the modes
+//! and has no site. The reading runs on the host from the
 //! carried state, which every realization returns to the bit, and decides nothing.
-use super::participation::Participation;
 use super::realization::PassRealization;
 use super::*;
 use crate::receiver::release::{agreeing_class, KeyStream};
@@ -96,7 +96,7 @@ pub struct Answer {
     pub released: Vec<usize>,
     pub ended: bool,
     pub read: Vec<usize>,
-    pub participation: Option<Vec<Vec<Participation>>>,
+    pub participation: Option<ParticipationRead>,
     pub hearing: Hearing,
 }
 
@@ -165,11 +165,7 @@ impl TowerBody {
         let tower = &self.learner.tower;
         let read: Vec<usize> = self.conversation.pending.iter().map(|&(u, _)| u).collect();
         let participation = match tower.participation() {
-            Some(_) => {
-                let mut state = self.conversation.state.clone();
-                tower.read_cells(&mut state, &read)?;
-                tower.participation_at(&mut state, end)?
-            }
+            Some(_) => tower.participation_read(&mut self.conversation.state.clone(), &read)?,
             None => None,
         };
         let mut fork = vec![self.conversation.state.clone()];
@@ -624,12 +620,14 @@ mod tests {
         let asked = body.ask(&[1, 2, 0, 1, 1, 2, 0, 0, 1], &keys(4096), 30, 2, pass).expect("asked");
         assert_eq!(body.learner.to_text(), material, "an ask moves no material");
         assert_eq!(asked.hearing.learned, 0, "a prompt is heard, never compared");
-        let levels = asked.participation.expect("participating");
-        assert_eq!(levels.len(), body.learner.tower.declaration.levels);
-        for heads in &levels {
+        let read = asked.participation.expect("participating");
+        assert_eq!(read.levels.len(), body.learner.tower.declaration.levels);
+        for (heads, arrivals) in read.levels.iter().zip(&read.arrivals) {
             for part in heads {
                 assert_eq!(part.weights.len(), asked.read.len(), "one weight a site of the open section, the opening's own last");
             }
+            let every: Vec<Option<usize>> = (0..asked.read.len()).map(Some).collect();
+            assert_eq!(arrivals, &every, "without a clock each arrival admits one site");
         }
         assert_eq!(asked.read.last(), Some(&3));
         // The answer closes the conversation's section: of its sixteen read places, the answer's
@@ -660,7 +658,7 @@ mod tests {
         let k = keys(4096);
         let (old, new) = (body.ask(&[1, 2, 0, 1, 1, 2], &k, 24, 1, pass).expect("asked"), grown.ask(&[1, 2, 0, 1, 1, 2], &k, 24, 1, pass).expect("asked"));
         assert_eq!((&new.released, new.ended, &new.read), (&old.released, old.ended, &old.read));
-        let (old_levels, new_levels) = (old.participation.expect("participating"), new.participation.expect("participating"));
+        let (old_levels, new_levels) = (old.participation.expect("participating").levels, new.participation.expect("participating").levels);
         for (o, g) in old_levels.iter().zip(&new_levels) {
             assert_eq!(g.len(), 2 * o.len());
             for (h, part) in g.iter().enumerate() {

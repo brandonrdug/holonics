@@ -187,3 +187,22 @@ codes are the card's by the parity), with the readings the radix record §§3–
 Brandon asked on October 29 that a new design race for one hour first, read near 15, 30, 45 and 60
 minutes, and run longer only when it is plainly improving; the two clocked races are declared so.
 
+**The hardware review of October 29, joined** [agent-inferred, October 30]. A review of the card
+realization at `18a16ad69` named six points; each was checked against the source.
+- *The reading's labels.* `participation_rows` placed a level's sites by counting back from the
+  opening, one class a site. Under a news clock a coarse level admits a site only where its clock
+  ticks, so in every clocked reading the places printed for levels 1 to 3 were wrong; the unclocked
+  readings of §1 are right, and no record reports a clocked one. `Tower::participation_read` now
+  places each site at the arrival that admitted it (`None` for a site the state carried in), the
+  reading and the body's answers print that arrival, and
+  `a_participation_read_places_each_site_at_the_arrival_that_admitted_it` holds it across the
+  sections' closes.
+- *Held, with no consumer in the race.* The card fetches participation's carried sites whole at
+  every forward (about 660 MiB a forward at the race's shape, computed), the carried sites take no
+  covector (only the probe side learns, so a question read in an earlier section cannot learn to
+  be found by its answer), and the card refuses the mutual contact beside participation or the news
+  clock. The race line now runs neither participation nor the mutual contact (C′ and the pair
+  split), so each is built, with the per-phase card timing, when participation rejoins the race.
+- *Owed before a growth run at twice the race's width.* The card's frame is allocated whole for the
+  section (about 8 GiB at the race's shape), so a body twice as wide does not fit the 16 GB card
+  until the frame's scratch is reused by lifetime.

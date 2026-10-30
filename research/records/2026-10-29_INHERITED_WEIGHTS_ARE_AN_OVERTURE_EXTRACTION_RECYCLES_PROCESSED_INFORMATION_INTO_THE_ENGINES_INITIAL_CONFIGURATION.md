@@ -63,3 +63,166 @@ here:
 
 This corrects the October 29 audit record's §3. The served model stays withdrawn; the intake is
 lawful as the overture's.
+
+## 5. Audit, October 30: what step 1 takes in, and what it leaves out
+
+[agent-inferred] Participation's card parity passed on October 29, so the order of §4 has reached
+this work. Three choices fix step 1 before it is built.
+- **The intake is the exterior intake law, given a Rust owner.** The law already has its Lean owner
+  (`Foundation/ExteriorIntake.decode_exact_on_finite`, atlas `receipt.exterior-intake`): a finite
+  IEEE word decodes exactly to its dyadic ratio, and a nonfinite word is refused. No Rust owner
+  carries it yet. The K-block decoder named in §4 sits on an unpushed branch and is not the port
+  source after all: a source released unquantized needs none. A `bf16` word is a sign, an odd
+  mantissa and a power of two, so its intake has no remainder, while a quantized block is a lossy
+  face of the same trained weights. The source is therefore taken as released, in `safetensors`
+  `bf16`, and §4's step 1 reads "the exact intake of one small open model's blocks".
+- **The lexical layer is founded natively; only the interior is the overture.** The source's
+  embedding and unembedding are charts of its byte-pair vocabulary, an authored tokenizer that the
+  engine refuses. So the encoding `E` and the readout `U` are founded on the engine's own units, as
+  every race founds them, and only the interior blocks of §3 (attention as participation,
+  normalization, the gated contacts, the residual joins) enter from the source. That an interior
+  carries across a re-founded lexical layer is measured in the literature: Artetxe, Ruder and
+  Yogatama (2020, "On the cross-lingual transferability of monolingual representations") move a
+  trained encoder's body to new languages by learning new embeddings alone. Here the interior is
+  not frozen; deposition moves it from the overture.
+- **The tower is declared at the source's interior shape**, or at a prefix of its layers, which is
+  a lawful restriction: width the hidden size, one participation head per query head with its
+  rotary pairs as complex modes, contacts the gated MLP's width, levels the layers taken. Grouped
+  key and value heads enter as copies of one chart in each head that shares it; deposition then
+  parts them. The first source is a small llama-shaped decoder released under Apache-2.0
+  (SmolLM2-135M: by its published configuration hidden size 576, 30 layers, 9 query heads over 3
+  key-value heads, MLP width 1536, rotary positions, RMS normalization, a SiLU-gated MLP, no
+  biases), its configuration read and pinned at intake rather than assumed.
+
+Step 1's deliverable is the Rust owner of the intake: a `safetensors` file's `bf16`, `f16` and `f32`
+tensors decoded to exact dyadic ratios at the boundary, nonfinite words refused, with the tensor
+names and shapes kept as exterior codec information only. It is checked on constructed files at
+every boundary case of each format. The weights themselves stay in `.local/` and are never
+committed. The card's cost for step 3 is projected from step 2's measured pass, not assumed.
+
+**Step 1, built (October 30).** `holonics::hnn::overture` carries the intake: `FloatFormat::decode`
+is the Lean `decode` over `binary16`, `bfloat16` and `binary32`, and `Safetensors::read` admits a file
+whose tensors' ranges hold their shapes and tile its data exactly. Its tests decode every `bfloat16`
+and `binary16` word against Lean's value computed independently, refuse exactly the all-ones exponent
+field (256 and 2,048 words), check that `binary32` carries every half-width value and that `bfloat16`
+is `binary32`'s upper half, and refuse each malformed file by name.
+
+[measured; host, decoding only, no model run] The released SmolLM2-135M file at revision `93efa2f0`
+(269,060,552 bytes, SHA-256 `80521b40…5da1`; the weights stay in `.local/`) reads whole in 21.9 s
+through `cargo run --example overture_intake`: 272 tensors, all `bfloat16`, 134,515,008 values, none
+refused and none zero. Their leading bits sit at places `−30` through `3`, so with `bfloat16`'s eight
+significant bits an exact carrier needs places `3` down to `−37`. The tower's material grain is
+`2^(−24)`; the attention charts reach down to place `−30` and the MLP charts to `−28`. Step 2
+therefore owes the founding's grain law: the opening material either widens its carrier to hold the
+overture's places, or is released onto the material grain at a declared tolerance with each
+coefficient's remainder accounted. The 30 layers hold 106,202,880 of the values; the embedding's
+28,311,552 (tied to the unembedding) are left behind with the vocabulary, and the final norm's 576
+go with the readout that is founded natively.
+
+## 6. Step 2's grain law, and §3 read against the tower's step (October 30)
+
+**The grain law, decided.** [measured; host, decoding only, no model run] Released onto the tower's
+material grain `2^(−24)` to the nearest, the 30 layers' 106,202,880 coefficients land exactly but
+for 3,940. Of those, 3,926 keep their leading bits with a remainder below the grain and 14 release to
+zero (`down_proj` 917 and 6, `gate_proj` 917 and 2, `up_proj` 933 and 1, `q_proj` 433 and 2,
+`o_proj` 406 and 2, `v_proj` 164 and 0, `k_proj` 156 and 1). In every kind the remainders' summed
+magnitude is between `3.3·10⁻¹²` and `4.9·10⁻¹²` of the coefficients' (a decimal reading). Both
+norms' gains land exactly.
+
+[agent-inferred] So the opening material stays on the tower's own carrier. Each coefficient
+releases onto `2^(−24)` to the nearest, and the founding returns, block by block, how many
+coefficients it released and their remainder. Widening the material carrier would change a law
+that every level and the card share, for 0.004% of the coefficients and a remainder twelve decimal
+orders below their mass. A coefficient the founding composes is released once, after the
+composition, with its remainder in the same receipt. Two compositions arise: a norm's gain folded
+into the chart that reads it, and the base change of the Gibbs face below.
+
+**§3 read against the step.** [agent-inferred, read from `Tower::step` and
+`hnn::tower::participation`] Three of §3's blocks are restrictions as they stand. Two more hold once
+the founding chooses its modes and folds a base change. Four terms are owed.
+- **Holds.** Rotary positions are constant moves of the frame that participation carries. A source
+  head's 64 dimensions pair as `(m, m + 32)` (the source's rotation is not interleaved), with
+  `ω_m = 100000^(−m/32)`. The native frame turns the charts back where the source turns them
+  forward, so the moves are `u_m = e^(−iω_m)`. Grouped key and value heads are copies (§5). The
+  friction is `κ = 0`. The MLP's down projection is the join's `W₂`. There are no biases.
+- **Holds with a choice of modes.** Participation carries a value by the same relative frame as the
+  probe and the key: `y_i = U_i Σ_j a_ij conj(U_j) Ψ_j`. The source's values do not turn. So a
+  source head takes 64 native modes:
+  - 32 rotary modes carry `Ȟ` and `H`, with `Ψ` zero;
+  - 32 still modes (`u = 1`) carry `Ψ`, with `Ȟ` and `H` zero.
+
+  The face sums over the head's modes, so the still modes add nothing to it, and the rotary modes add
+  nothing to the current. The output projection is `Cᵃ` on the still modes: for a value pair `(a, b)`,
+  `Cᵃ_re = O[:, a]` and `Cᵃ_im = −O[:, b]`. The tower's 576 modes hold the 9 heads.
+- **Holds with a base change.** The Gibbs face is base 2, the source's softmax base `e`. So
+  `2^(β Re⟨q, k⟩) = e^(qᵀk/8)` when the probe chart carries the factor `log₂ e · 2^(beta_shift)/8`.
+  `log₂ e` enters as a navigator's face, released with the chart.
+- **Owed (1): the charts' input.** The charts read the level's input `x` as it stands. The source's
+  `Q`, `K` and `V` read it normalized, `x/‖x‖_rms · g`, a scale per site that no fixed chart carries.
+  The owed term reads the input as a ratio to its own power, the read the contacts already take, with
+  `g` folded into each chart. The source's `ε = 10⁻⁵` is a floor for its floats. The ratio read has
+  none, and the two differ by `ε/(2 mean x²)` relative.
+- **Owed (2): the attention's join.** Participation's current is read through `Cᵃ`, normalized
+  again, and enters the contacts' drive through `W₁ᵃ`. The source adds `O y` to the residual. The
+  owed term is the join `x ← x + Re(Cᵃ y)`.
+- **Owed (3): the contacts' read.** The contacts read the modes' face `r̂ = Re(C h)/‖Re(C h)‖_rms`.
+  The source's MLP reads the residual after the attention has joined it, normalized. A gated tower
+  cannot make its modes transparent: `λ = 0` has no logarithm for the gate to raise. The passage join
+  (`Tower::join_passage`) already lets the contacts read the passing current, `W₁ˣ x`, but only under
+  a news clock, as `x` stands, and before any attention join. The owed term is that read taken as a
+  ratio to its power, after the join. The modes open silent (push zero), so the opening is the
+  source's operation and deposition grows them.
+- **Owed (4): the gate.** The source's MLP is `silu(W_g n) ⊙ (W_u n)`; the pair contact's two
+  factors are both linear. The owed law is a gated pair contact `v = a σ₂(a log₂ e) ⊙ b`, with `σ₂`
+  the gate law's base-2 logistic.
+
+With the four terms, one native level reads `x' = x + Re(Cᵃ y(x/‖x‖))` and then
+`x'' = x' + W₂ v(x'/‖x'‖)`. That is the source layer, and each term is a general law of the level
+rather than a routine for this source. Step 2 builds the founding with its receipts. It checks the
+block whose owner is already whole: the attention block as participation, on a declared normalized
+input, against the source's block computed once at the boundary. Its acceptance is fixed before the
+build. On a declared normalized input of 16 sites, every head's current, and the read the output
+projection makes of all nine, differ from the source block's exact operation by at most `2^(−8)` of
+their largest component. That is the relative grain of the `bfloat16` carrier in which the source
+realizes its own block, so an extraction within it loses less than the source's own realization
+does. The face grain is not the bound: the charts are released onto `2^(−16)`, and the pairing sums
+64 such terms. The four owed terms are the build after it, each tested at its consumer: the joined
+level reproduces the source layer on a declared input, under the same bound.
+
+## 7. Step 2 built: the attention block founds a participating level (October 30)
+
+**The founding.** [agent-inferred; owner `Tower::found_attention`, its law in
+`hnn::tower::overture`] §6's choices, built. A source head of 64 dimensions is 64 native modes:
+32 rotary modes turn by `e^(−iω_m)` a site and carry the probe and key charts, the pair
+`(m, m + 32)` as one phasor; 32 still modes carry the value chart. The probe chart carries
+`log₂ e · 2^(beta_shift)/√d`, so with `beta_shift = 3` the face is the source's score in bits.
+Each grouped key/value head is read by the three query heads it serves. The read `Cᵃ` is the output
+projection on the still modes. The gain is folded into every chart, `log₂ e` and `ω_m` enter as
+their navigators' faces, and each composed coefficient is released onto `2^(−24)` once, its
+remainder counted. The moves sit at the margin and the friction at zero, so only the frames carry
+the source's place. The level's own push, read, gate and turn rest at zero.
+
+**The check, measured.** [measured; host, a reading of one founded level, no model run and no
+learning; `overture_founding`] SmolLM2-135M's layer-0 block founds level 0 of a one-level tower of
+576 modes in 9 heads of 64. The founding released 995,328 chart coefficients: 517,775 keep a
+remainder below the grain and 55 release to zero, the folded gain and `log₂ e` leaving most
+compositions a remainder. The summed remainder is `0.0087` (a decimal reading) over the charts. It
+released 331,776 read coefficients, 24 with a remainder and none to zero. Sixteen declared inputs of
+unit power (each coordinate `±1`, its sign a fixed bit mix of site and place) are read by the
+founded level and by the source's block computed once at the boundary on `2^(−40)`.
+- **Accepted.** Every head's current lies within `2^(−12)` of its largest component (heads 0 to 2
+  within `2^(−13)`), and the read within `2^(−13)`. That is four bits inside the `2^(−8)` fixed
+  before the build.
+- **The foil fails.** The same block founded on the rotary base `10000` instead of the source's
+  `100000`, checked against the same reference, lies `2^(−2)` to `2^(−5)` from it in every head and
+  `2^(−4)` in the read. So the check reads the place the frames carry, not only the values.
+- **What the inputs reach.** On these inputs every head spreads its weight almost evenly: its
+  entropy at the last site is 3.93 to 3.99 bits of the 4 that 16 sites allow. A check on peaked
+  attention needs the source's own embeddings as input, and those reach the charts only through owed
+  term (1), the input read as a ratio to its power.
+- **Time.** The file read 0.3 s, the founding 0.8 s, the reference 0.9 s and the check 1.2 s
+  (unoptimized build).
+
+A unit test founds a grouped block of two heads of four on six sites, checks it within `2^(−8)`,
+and refuses the turned-back moves as a foil. The four owed terms of §6 are next, each tested at its
+consumer under the same bound.
