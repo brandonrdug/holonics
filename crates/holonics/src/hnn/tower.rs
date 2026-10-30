@@ -2074,6 +2074,8 @@ pub struct Tower {
     participation: Option<ParticipationDeclaration>,
     /// Whether every level's contacts hear the passing current ([`Tower::join_passage`]).
     passage: bool,
+    /// Whether each clocked level hears the packet its clock closed ([`Tower::join_packets`]).
+    packets: bool,
     /// The mutual contact's `b` (`β = 2^(−b)`), when the comparison is one
     /// ([`Tower::join_mutual_contact`]).
     mutual: Option<u32>,
@@ -2110,6 +2112,10 @@ pub struct TowerState {
     pub news: u64,
     /// Each level's open section of participation (empty without participation).
     pub sites: Vec<LevelSites>,
+    /// Under packets, each level's open packet on the modes' grain: the fine level's motion from
+    /// rest since the level's last tick, at the levels the clock holds (empty below them, and
+    /// empty without packets; [`Tower::join_packets`]).
+    pub packets: Vec<Vec<(i64, i64)>>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -2448,6 +2454,26 @@ struct LevelCell {
     ticks: u32,
     /// The level's participation at this cell (absent without participation).
     participation: Option<ParticipationCell>,
+    /// The level's open packet at this cell, at a level that hears one (absent elsewhere).
+    packet: Option<PacketCell>,
+}
+
+/// [agent-inferred, October 30] A clocked level's packet at one cell ([`Tower::join_packets`]): the
+/// fine level's motion from rest since the level's last tick, after this arrival's move and before
+/// the tick that closes it, and at a tick its read, the input of the level's push, gate and turn.
+#[derive(Clone, Debug)]
+struct PacketCell {
+    state: Vec<(i64, i64)>,
+    read: Option<PacketRead>,
+}
+
+/// A closed packet's read through the fine level's read: its face `(re…, im…)` on `2^(−16)`, the
+/// ratio read `x̃ = r̂(Re(C a))` on `2^(−16)` and its scale.
+#[derive(Clone, Debug)]
+struct PacketRead {
+    face: Vec<i64>,
+    read: Vec<i32>,
+    scale: i128,
 }
 
 /// One level's participation at one cell: the site it admitted when the level ticked (absent at an
@@ -2846,7 +2872,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, passage: false, mutual: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, mutual: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2862,6 +2888,10 @@ impl Tower {
             open: None,
             news: 0,
             sites: self.participation.as_ref().map_or_else(Vec::new, |_| vec![LevelSites::rest(self.declaration.modes); self.declaration.levels]),
+            packets: match self.packet_from() {
+                Some(first) => (0..self.declaration.levels).map(|l| if l >= first { vec![(0, 0); self.declaration.modes] } else { Vec::new() }).collect(),
+                None => Vec::new(),
+            },
         }
     }
 
@@ -3048,21 +3078,41 @@ impl Tower {
         let mut buf = vec![0i64; w.max(n).max(f)];
         for (l, lv) in self.layout.levels.iter().enumerate() {
             let r = &reaches.levels[l];
+            let moves = ticks.get(l).copied().unwrap_or(1);
+            // The packet ([`Tower::join_packets`]): at a tick of a level that hears one, its push,
+            // gate and turn read the packet the fine level's moves left since its last tick,
+            // `x̃ = r̂(Re(C_(l−1) a))`, and the packet rests; elsewhere they read the passing current.
+            let packet = match self.packet_from() {
+                Some(first) if l >= first && moves == 0 => Some(PacketCell { state: state.packets[l].clone(), read: None }),
+                Some(first) if l >= first => {
+                    let held = std::mem::replace(&mut state.packets[l], vec![(0, 0); n]);
+                    let read = self.packet_read(l - 1, &held, &reaches.levels[l - 1])?;
+                    Some(PacketCell { state: held, read: Some(read) })
+                }
+                _ => None,
+            };
+            let xin: &[i32] = packet.as_ref().and_then(|p| p.read.as_ref()).map_or(&x, |p| &p.read);
+            // [agent-inferred, October 30] An arrival that ticks the level no time moves nothing, so
+            // its push and gate enter no face and are not read: the push rests at zero and the gate
+            // is empty ([`NewsClock`]; the record `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET…`, §4).
+            let still = moves == 0;
             // The push, on 2^(−40) released to the state's 2^(−24).
             let mut push_re = vec![0i64; n];
             let mut push_im = vec![0i64; n];
-            affine(&t[lv.push_re..lv.push_re + n * w], r[0], w, &x, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_re)?;
-            affine(&t[lv.push_im..lv.push_im + n * w], r[1], w, &x, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_im)?;
+            if !still {
+                affine(&t[lv.push_re..lv.push_re + n * w], r[0], w, xin, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_re)?;
+                affine(&t[lv.push_im..lv.push_im + n * w], r[1], w, xin, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_im)?;
+            }
             // The gated move at this cell: λ_t = |λ|^(c r) u, held at the margin, γ_t = √(1 − |λ_t|²).
             let mut gate = Vec::new();
-            if d.gated {
+            if d.gated && !still {
                 let faces = &reaches.gates[l];
                 let mut q = vec![0i64; n];
-                affine(&t[lv.gate..lv.gate + n * w], r[6], w, &x, Some(&t[lv.gate_bias..lv.gate_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut q)?;
+                affine(&t[lv.gate..lv.gate + n * w], r[6], w, xin, Some(&t[lv.gate_bias..lv.gate_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut q)?;
                 // The arriving symbol's turn `s_t = 2^(−spread) (W_φ x + b_φ)`, in half turns on 2^(−16).
                 let mut turns = vec![0i64; if d.turned { n } else { 0 }];
                 if d.turned {
-                    affine(&t[lv.turn..lv.turn + n * w], r[7], w, &x, Some(&t[lv.turn_bias..lv.turn_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut turns)?;
+                    affine(&t[lv.turn..lv.turn + n * w], r[7], w, xin, Some(&t[lv.turn_bias..lv.turn_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut turns)?;
                     for v in &mut turns {
                         *v = fit64(release(*v as i128, turn_spread(w)))?;
                     }
@@ -3072,8 +3122,8 @@ impl Tower {
                 let mut depths = vec![0i64; if d.pumped { n } else { 0 }];
                 let mut axes = vec![0i64; if d.pumped { n } else { 0 }];
                 if d.pumped {
-                    affine(&t[lv.pump..lv.pump + n * w], r[8], w, &x, Some(&t[lv.pump_bias..lv.pump_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut depths)?;
-                    affine(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &x, Some(&t[lv.pump_axis_bias..lv.pump_axis_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut axes)?;
+                    affine(&t[lv.pump..lv.pump + n * w], r[8], w, xin, Some(&t[lv.pump_bias..lv.pump_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut depths)?;
+                    affine(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, xin, Some(&t[lv.pump_axis_bias..lv.pump_axis_bias + n]), MATERIAL_BITS, MATERIAL_BITS, &mut axes)?;
                     for v in &mut axes {
                         *v = fit64(release(*v as i128, turn_spread(w)))?;
                     }
@@ -3125,7 +3175,12 @@ impl Tower {
             let stepped: Option<Vec<(i64, i64)>> = self.rotor.as_ref().filter(|r| !r.still(l, u)).map(|r| r.moved(l, u, &state.modes[l])).transpose()?;
             let modes = &mut state.modes[l];
             let gammas = &reaches.gammas[l];
-            let moves = ticks.get(l).copied().unwrap_or(1);
+            // The packet the next level hears moves with this level's step, from rest since that
+            // level's last tick ([`Tower::join_packets`]).
+            let mut coarse = match state.packets.get_mut(l + 1) {
+                Some(a) if !a.is_empty() => Some(a),
+                _ => None,
+            };
             let mut face = vec![0i64; 2 * n];
             for k in 0..n {
                 let (hr, hi) = stepped.as_ref().map_or(modes[k], |h| h[k]);
@@ -3144,6 +3199,14 @@ impl Tower {
                 for _ in 0..moves {
                     (hr, hi) = (release(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS), release(lr * hi + li * hr + bi * hr - br * hi, MOVE_BITS));
                     (hr, hi) = (i128::from(fit64(hr + pr)?), i128::from(fit64(hi + pi)?));
+                }
+                if let Some(a) = coarse.as_deref_mut() {
+                    let (mut ar, mut ai) = (a[k].0 as i128, a[k].1 as i128);
+                    for _ in 0..moves {
+                        (ar, ai) = (release(lr * ar - li * ai + br * ar + bi * ai, MOVE_BITS), release(lr * ai + li * ar + bi * ar - br * ai, MOVE_BITS));
+                        (ar, ai) = (i128::from(fit64(ar + pr)?), i128::from(fit64(ai + pi)?));
+                    }
+                    a[k] = (fit64(ar)?, fit64(ai)?);
                 }
                 let (nr, ni) = (fit64(hr)?, fit64(hi)?);
                 modes[k] = (nr, ni);
@@ -3304,7 +3367,7 @@ impl Tower {
             }
             let push = push_re.into_iter().zip(push_im).collect();
             let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell, packet });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -3351,6 +3414,27 @@ impl Tower {
             state.open = Some(TowerFace { masses: masses.clone(), total });
         }
         Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, face: TowerFace { masses, total } })
+    }
+
+    /// [agent-inferred, October 30] **A closed packet's read** ([`Tower::join_packets`]): the packet
+    /// `a` on the modes' grain released to the face's `2^(−16)`, read through the fine level's own
+    /// read `Re(C a) = C_re a_re − C_im a_im` as that level's state is, and taken as a ratio (its
+    /// scale a gauge).
+    fn packet_read(&self, fine: usize, a: &[(i64, i64)], reach: &[u64; 11]) -> Result<PacketRead> {
+        let (w, n) = (self.declaration.width, self.declaration.modes);
+        let lv = self.layout.levels[fine];
+        let t = &self.theta;
+        let mut face = vec![0i64; 2 * n];
+        for (k, &(re, im)) in a.iter().enumerate() {
+            face[k] = fit64(release(re as i128, STATE_BITS - FACE_BITS))?;
+            face[n + k] = fit64(release(im as i128, STATE_BITS - FACE_BITS))?;
+        }
+        let (mut read_a, mut read_b) = (vec![0i64; w], vec![0i64; w]);
+        affine(&t[lv.read_re..lv.read_re + w * n], reach[2], n, &face[..n], None, 0, 0, &mut read_a)?;
+        affine(&t[lv.read_im..lv.read_im + w * n], reach[3], n, &face[n..], None, 0, 0, &mut read_b)?;
+        let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
+        let (read, scale) = ratio_to_power(&raw)?;
+        Ok(PacketRead { face, read, scale })
     }
 
     /// [agent-inferred, October 29] **The mutual contact's face** at the top `x` (record
@@ -3565,9 +3649,15 @@ impl Tower {
                 }
             }
         }
+        // The covector of each cell's open packet, returned by the level that hears it to the fine
+        // level whose moves carry it ([`Tower::join_packets`]): zero away from that level's ticks.
+        let mut packet_cov: Vec<Vec<(i64, i64)>> = Vec::new();
         for l in (0..d.levels).rev() {
             let lv = self.layout.levels[l];
             let r = &reaches.levels[l];
+            // The covector of the packet this level's moves carry, at each cell (empty when the
+            // next level hears none).
+            let incoming = std::mem::take(&mut packet_cov);
             let mut read_cov: Vec<Vec<(i64, i64)>> = Vec::with_capacity(cells_n);
             let mut das: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut dbs: Vec<Vec<i64>> = Vec::with_capacity(if d.contact != ContactLaw::Rectifying { cells_n } else { 0 });
@@ -3809,9 +3899,17 @@ impl Tower {
             // (+ β_(t+1) conj(G_h(t+1)) when pumped).
             let mut carried: Vec<(i64, i64)> = vec![(0, 0); n];
             let mut gh_all: Vec<Vec<(i64, i64)>> = vec![Vec::new(); cells_n];
+            // The packet the next level hears moves with these modes, so its covector is carried back
+            // by the same moves, `G_a(t) = G_a,tick(t) + conj(λ_(t+1))^(Δτ) G_a(t+1)`, cut where that
+            // level ticked and the packet rested ([`Tower::join_packets`]).
+            let carrying = !incoming.is_empty();
+            let rested = |i: usize| carrying && cells[i].levels[l + 1].ticks > 0;
+            let mut carried_a: Vec<(i64, i64)> = vec![(0, 0); n];
+            let mut ga_all: Vec<Vec<(i64, i64)>> = vec![Vec::new(); if carrying { cells_n } else { 0 }];
             for i in (0..cells_n).rev() {
                 let mut gh = Vec::with_capacity(n);
-                let later = if d.gated && i + 1 < cells_n { Some(&cells[i + 1].levels[l].gate) } else { None };
+                // A later cell that ticked no time carries the covector through no move, its gate empty.
+                let later = if d.gated && i + 1 < cells_n { Some(&cells[i + 1].levels[l].gate).filter(|gate| !gate.is_empty()) } else { None };
                 // The later cell's move acted `Δτ` times ([`NewsClock`]; once without one).
                 let later_ticks = if i + 1 < cells_n { cells[i + 1].levels[l].ticks } else { 1 };
                 // conj(λ_(t+1)) G_h(t+1) (+ β_(t+1) conj(G_h(t+1))): the covector of h'_t.
@@ -3840,6 +3938,25 @@ impl Tower {
                 }
                 carried = gh.clone();
                 gh_all[i] = gh;
+                if carrying {
+                    let ga: Vec<(i64, i64)> = (0..n)
+                        .map(|k| {
+                            let (mut cr, mut ci) = if rested(i) { (0, 0) } else { (carried_a[k].0 as i128, carried_a[k].1 as i128) };
+                            if !rested(i) {
+                                let (lr, li) = match later {
+                                    Some(gate) => (gate[k].lam.0 as i128, gate[k].lam.1 as i128),
+                                    None => (t[lv.move_re + k] as i128, t[lv.move_im + k] as i128),
+                                };
+                                for _ in 0..later_ticks {
+                                    (cr, ci) = (release(lr * cr + li * ci, MOVE_BITS), release(lr * ci - li * cr, MOVE_BITS));
+                                }
+                            }
+                            Ok((fit64(cr + incoming[i][k].0 as i128)?, fit64(ci + incoming[i][k].1 as i128)?))
+                        })
+                        .collect::<Result<_>>()?;
+                    carried_a = ga.clone();
+                    ga_all[i] = ga;
+                }
             }
             // [agent-inferred, October 29] The transport covector (the participation record's §6): a
             // site's charts are read through its frame `U_i = Π_(t≤i) u_t^(Δτ_t)` over its section's
@@ -3896,6 +4013,8 @@ impl Tower {
             let mut dps: Vec<Vec<i64>> = Vec::with_capacity(if d.pumped { cells_n } else { 0 });
             let mut gres: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
             let mut gims: Vec<Vec<i64>> = Vec::with_capacity(cells_n);
+            // The covector of each tick's packet read, on 2^(−24) (zero away from the ticks).
+            let mut dpacket: Vec<Vec<i64>> = vec![Vec::new(); cells_n];
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let unstepped: &[(i64, i64)] = if i == 0 { &opening.modes[l] } else { &cells[i - 1].levels[l].state };
@@ -3903,6 +4022,19 @@ impl Tower {
                 let stepped = self.rotor.as_ref().filter(|r| !r.still(l, classes[i])).map(|r| r.moved(l, classes[i], unstepped)).transpose()?;
                 let previous: &[(i64, i64)] = stepped.as_deref().unwrap_or(unstepped);
                 let gh = &gh_all[i];
+                // The packet the next level hears, before this cell's move: the opening's (a
+                // constant), at rest after that level's tick, or as the cell before left it.
+                let packet_before: Option<Vec<(i64, i64)>> = if carrying {
+                    Some(if i == 0 {
+                        opening.packets[l + 1].clone()
+                    } else if rested(i - 1) {
+                        vec![(0, 0); n]
+                    } else {
+                        cells[i - 1].levels[l + 1].packet.as_ref().ok_or(TowerError::Refused("a packet at every cell of a level that hears one"))?.state.clone()
+                    })
+                } else {
+                    None
+                };
                 let mut dq = vec![0i64; if d.gated { n } else { 0 }];
                 let mut ds = vec![0i64; if d.turned { n } else { 0 }];
                 let mut dk = vec![0i64; if d.pumped { n } else { 0 }];
@@ -3916,9 +4048,12 @@ impl Tower {
                     // The ring's covector of the move it rode, on the same convention.
                     let ring_move = if k == ring_mode { ring_moves[i] } else { [0; 4] };
                     let (push_r, push_i) = (lc.push[k].0 as i128, lc.push[k].1 as i128);
-                    let (glr, gli, through) = if lc.ticks == 1 {
-                        (hr * gr + hi * gi + ring_move[0], hr * gi - hi * gr + ring_move[1], gr * push_r + gi * push_i)
-                    } else {
+                    // A state the move carries and its covector after the move: their covectors of
+                    // λ_t, of γ_t (`Re(conj(G) P x)`) and of the push.
+                    let carry = |(hr, hi): (i128, i128), (gr, gi): (i128, i128)| -> (i128, i128, i128, (i128, i128)) {
+                        if lc.ticks == 1 {
+                            return (hr * gr + hi * gi, hr * gi - hi * gr, gr * push_r + gi * push_i, (gr, gi));
+                        }
                         // Under a news clock the step acted Δτ times with the arrival held:
                         // `∂h_t/∂λ` is the sum over its sub-steps of `conj(h⁽ʲ⁻¹⁾) G⁽ʲ⁾`, `∂h_t/∂γ`
                         // of `Re(conj(G⁽ʲ⁾) P x)` and the push's covector of `G⁽ʲ⁾`, the states
@@ -3943,9 +4078,19 @@ impl Tower {
                             (pgr, pgi) = (pgr + cr, pgi + ci);
                             (cr, ci) = (release(lr * cr + li * ci, MOVE_BITS), release(lr * ci - li * cr, MOVE_BITS));
                         }
-                        gp[k] = (pgr, pgi);
-                        (sr, si, through)
+                        (sr, si, through, (pgr, pgi))
                     };
+                    let (mut glr, mut gli, mut through, pushed) = carry((hr, hi), (gr, gi));
+                    (glr, gli) = (glr + ring_move[0], gli + ring_move[1]);
+                    gp[k] = pushed;
+                    // The packet shares the move: its covectors of λ_t, γ_t and the push are summed
+                    // with the modes' ([`Tower::join_packets`]).
+                    if let Some(before) = &packet_before {
+                        let (a, ga) = ((before[k].0 as i128, before[k].1 as i128), (ga_all[i][k].0 as i128, ga_all[i][k].1 as i128));
+                        let (sr, si, th, (pgr, pgi)) = carry(a, ga);
+                        (glr, gli, through) = (glr + sr, gli + si, through + th);
+                        gp[k] = (gp[k].0 + pgr, gp[k].1 + pgi);
+                    }
                     match lc.gate.get(k) {
                         None => {
                             g[lv.move_re + k] += glr;
@@ -4040,10 +4185,17 @@ impl Tower {
                     transposed(&t[lv.pump_axis..lv.pump_axis + n * w], r[9], w, &dp, MATERIAL_BITS, &mut back_axis)?;
                 }
                 let beside = |back: &[i64], j: usize| back.get(j).map_or(0, |&c| c as i128);
-                let next: Vec<i64> = collect_exact(dx[i].iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
+                // At a tick of a level that hears a packet, its push, gate and turn read the packet,
+                // so their covectors return to the packet's read, not to the passing current.
+                let heard = lc.packet.as_ref().and_then(|p| p.read.as_ref());
+                let base: Vec<i64> = if heard.is_some() { vec![0; w] } else { std::mem::take(&mut dx[i]) };
+                let next: Vec<i64> = collect_exact(base.iter().zip(back_re.iter().zip(&back_im)).enumerate().map(|(j, (v, (a, b)))| {
                     fit64(*v as i128 + *a as i128 + *b as i128 + beside(&back_gate, j) + beside(&back_turn, j) + beside(&back_pump, j) + beside(&back_axis, j))
                 }))?;
-                dx[i] = next;
+                match heard {
+                    Some(_) => dpacket[i] = next,
+                    None => dx[i] = next,
+                }
                 gres.push(gre);
                 gims.push(gim);
                 if d.gated {
@@ -4150,7 +4302,35 @@ impl Tower {
             if let Some(out) = modes.as_deref_mut() {
                 out[l] = std::mem::take(&mut gh_all);
             }
-            let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].input.as_slice()).collect();
+            // The packet's return ([`Tower::join_packets`]): at each tick the read's ratio adjoint
+            // reaches the fine level's read `C_(l−1)` against the packet's face, and returns
+            // `G_a = C_(l−1)ᵀ δr` to the fine level's scan.
+            let ticked: Vec<usize> = (0..cells_n).filter(|&i| !dpacket[i].is_empty()).collect();
+            if self.packet_from().is_some_and(|first| l >= first) {
+                let fine = self.layout.levels[l - 1];
+                let rf = &reaches.levels[l - 1];
+                let read_of = |i: usize| cells[i].levels[l].packet.as_ref().and_then(|p| p.read.as_ref()).ok_or(TowerError::Refused("a packet read at every tick of a level that hears one"));
+                let (mut dreads_p, mut negs_p) = (Vec::with_capacity(ticked.len()), Vec::with_capacity(ticked.len()));
+                packet_cov = vec![vec![(0, 0); n]; cells_n];
+                for &i in &ticked {
+                    let p = read_of(i)?;
+                    let dread = ratio_adjoint(&p.read, p.scale, &dpacket[i])?;
+                    let neg: Vec<i64> = dread.iter().map(|v| -v).collect();
+                    let (mut are, mut aim) = (vec![0i64; n], vec![0i64; n]);
+                    transposed(&t[fine.read_re..fine.read_re + w * n], rf[2], n, &dread, MATERIAL_BITS, &mut are)?;
+                    transposed(&t[fine.read_im..fine.read_im + w * n], rf[3], n, &neg, MATERIAL_BITS, &mut aim)?;
+                    packet_cov[i] = are.into_iter().zip(aim).collect();
+                    dreads_p.push(dread);
+                    negs_p.push(neg);
+                }
+                let faces_re: Vec<&[i64]> = ticked.iter().map(|&i| read_of(i).map(|p| &p.face[..n])).collect::<Result<_>>()?;
+                let faces_im: Vec<&[i64]> = ticked.iter().map(|&i| read_of(i).map(|p| &p.face[n..])).collect::<Result<_>>()?;
+                outer_sum(&mut g[fine.read_re..fine.read_re + w * n], n, &dreads_p, &faces_re)?;
+                outer_sum(&mut g[fine.read_im..fine.read_im + w * n], n, &negs_p, &faces_im)?;
+            }
+            // The push, gate and turn read the packet at a tick of a level that hears one, else the
+            // passing current.
+            let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].packet.as_ref().and_then(|p| p.read.as_ref()).map_or(cell.levels[l].input.as_slice(), |p| p.read.as_slice())).collect();
             outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs)?;
             outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs)?;
             if d.turned {
@@ -4395,6 +4575,9 @@ impl Tower {
         if let Some(clock) = self.news {
             s.push_str(&clock.to_text());
         }
+        if self.packets {
+            s.push_str("packets\n");
+        }
         if let Some(p) = &self.participation {
             s.push_str(&p.to_text());
             s.push('\n');
@@ -4408,7 +4591,8 @@ impl Tower {
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two, one
     /// more with a mutual contact, three more with a pair face, two more with a ring face (one more a rank with its pair
     /// moves, one more with its harmonics and one more with its restarts), three more with a
-    /// rotor, five more with strands and one more with a news clock.
+    /// rotor, five more with strands, and one more each with a news clock, packets, participation
+    /// and the passage.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("mutual-contact ")) {
@@ -4436,6 +4620,9 @@ impl Tower {
             n += 5;
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("news-clock ")) {
+            n += 1;
+        }
+        if text.lines().nth(n) == Some("packets") {
             n += 1;
         }
         if text.lines().nth(n).is_some_and(|l| l.starts_with("participation ")) {
@@ -4525,6 +4712,7 @@ impl Tower {
             None => None,
         };
         let news = lines.next_if(|l| l.starts_with("news-clock ")).map(NewsClock::from_text).transpose()?;
+        let packets = lines.next_if(|&l| l == "packets").is_some();
         let participation = lines.next_if(|l| l.starts_with("participation ")).map(ParticipationDeclaration::from_text).transpose()?;
         let passage = lines.next_if(|&l| l == "passage").is_some();
         if passage && news.is_none() {
@@ -4546,7 +4734,7 @@ impl Tower {
         // The rotor, the strands and the news clock join by their own laws, so a text that holds
         // them together is read under the same refusals as their joins; the strands' material is
         // the text's.
-        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, passage: false, mutual, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, mutual, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
         if let Some(b) = tower.mutual {
             Self::admits_mutual(b)?;
             if tower.pair.is_some() || tower.ring.is_some() {
@@ -4563,6 +4751,9 @@ impl Tower {
         }
         if let Some(clock) = news {
             tower.join_news(clock)?;
+        }
+        if packets {
+            tower.join_packets()?;
         }
         if let Some(p) = participation {
             tower.admits_participation(&p)?;
@@ -4756,6 +4947,9 @@ impl Tower {
         if self.mutual.is_some() {
             return refuse("participation beside a mutual contact is owed: its contacts' return is re-derived under the contact");
         }
+        if self.packets {
+            return refuse("packets beside participation are owed: its sites at the clocked levels are then the packets");
+        }
         Ok(())
     }
 
@@ -4897,6 +5091,46 @@ impl Tower {
     /// The first level whose contacts hear the passing current, when the passage is joined.
     pub(crate) fn heard_from(&self) -> Option<usize> {
         if self.passage {
+            self.news.map(|c| c.first())
+        } else {
+            None
+        }
+    }
+
+    /// [definition; agent-inferred, October 30] **The packets joined** (record
+    /// `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED…`): each level the news clock
+    /// holds (from its first clocked level `F`) carries its open packet `a_l`, the fine level's
+    /// recurrence from rest since the level's last tick, moved by the fine level's own step
+    /// (`a_l ← λ_t a_l + γ_t P x̃_(l−1)`, `Δτ_(l−1)(t)` times), and at its tick takes
+    /// `x̃_l = r̂(Re(C_(l−1) a_l))` as the input of its push, gate and turn, then rests the packet.
+    /// The fine level's state is `T_P h(open) + m_P` over a packet `P`; `T_P h(open)` is history the
+    /// coarse level already holds, and `m_P = a_l` is the packet's news. The passing current still
+    /// crosses the contacts, and the residual stream is unchanged. It adds no material, so the
+    /// tower's families are kept; a stream's open packets are its state, so a stream rested before
+    /// the join is rested again. Refused without a news clock (or one above the top level) and
+    /// beside participation, whose sites at the clocked levels are then the packets (owed).
+    pub fn join_packets(&mut self) -> Result<()> {
+        if self.packets {
+            return refuse("a tower takes its packets once");
+        }
+        if self.participation.is_some() {
+            return refuse("packets beside participation are owed: its sites at the clocked levels are then the packets");
+        }
+        if !self.news.is_some_and(|c| c.first() < self.declaration.levels) {
+            return refuse("packets are closed by a news clock: without one, or above the top, no level hears a packet");
+        }
+        self.packets = true;
+        Ok(())
+    }
+
+    /// Whether the clocked levels hear their packets ([`Tower::join_packets`]).
+    pub fn packets(&self) -> bool {
+        self.packets
+    }
+
+    /// The first level that hears a packet, when packets are joined.
+    pub(crate) fn packet_from(&self) -> Option<usize> {
+        if self.packets {
             self.news.map(|c| c.first())
         } else {
             None
@@ -5541,6 +5775,15 @@ impl TowerLearner {
         Ok(())
     }
 
+    /// The packets joined to the learner's tower ([`Tower::join_packets`]), before its first
+    /// section: they add no material, but a stream's open packets are its state.
+    pub fn join_packets(&mut self) -> Result<()> {
+        if self.opened {
+            return refuse("packets join a learner before its first section: its streams' packets are their state");
+        }
+        self.tower.join_packets()
+    }
+
     /// The passage joined to the learner's tower ([`Tower::join_passage`]), its moments at zero.
     pub fn join_passage(&mut self) -> Result<()> {
         self.tower.join_passage()?;
@@ -5735,8 +5978,10 @@ impl Tower {
                 let moved = self.rotor.as_ref().map_or_else(|| Ok(opening[l].clone()), |r| r.moved(l, classes[i], &opening[l]))?;
                 let modes: Vec<CircuitMode> = collect_exact((0..n).map(|k| {
                     let (hr, hi) = (moved[k].0 as i128, moved[k].1 as i128);
+                    // A level that ticked no time took the identity move ([`NewsClock`]).
                     let lam = match lc.gate.get(k) {
                         Some(m) => m.lam,
+                        None if lc.ticks == 0 => (1 << MOVE_BITS, 0),
                         None => (i64::from(t[lv.move_re + k]), i64::from(t[lv.move_im + k])),
                     };
                     let beta = lc.gate.get(k).map_or((0, 0), |m| m.beta);
@@ -9205,6 +9450,145 @@ mod tests {
         let mut holding_none = plain.clone();
         holding_none.join_news(NewsClock::above(2, 2, 4).expect("a clock")).expect("a clock above the top is the tower without it");
         assert!(holding_none.join_passage().is_err(), "a clock that holds no level hears no passage");
+    }
+
+    /// The tower the packets' tests read: `levels` gated levels clocked from level 2 on a two-bit
+    /// clock, with packets.
+    fn packeted(levels: usize) -> Tower {
+        let mut tower = tiny_with(levels, true);
+        tower.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("joined");
+        tower.join_packets().expect("joined");
+        tower
+    }
+
+    /// [agent-inferred, October 30] **A clocked level hears the packet its clock closed** (record
+    /// `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET…`, acceptances 2 and 3): on four levels clocked
+    /// from level 2, levels 0 and 1 read face for face as the stacked tower's; at each tick of a
+    /// clocked level its packet is the fine level's motion since the level's last tick,
+    /// `h(close) − T_P h(open)` within the rounding of the packet's moves, read as the level's
+    /// input; an arrival that ticks no time leaves the level's modes and advances its packet; the
+    /// text writes the packets and restores whole; and packets are refused without a clock, beside
+    /// participation and on a learner after its first section.
+    #[test]
+    fn a_clocked_level_hears_the_packet_its_clock_closed() {
+        let classes = news_passage();
+        let tower = packeted(4);
+        let mut stacked = tiny_with(4, true);
+        stacked.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("joined");
+        let (mut s, mut t) = (stacked.rest(), tower.rest());
+        let a = stacked.forward(&mut s, &classes, &stacked.reaches()).expect("forward");
+        let b = tower.forward(&mut t, &classes, &tower.reaches()).expect("forward");
+        let n = tower.declaration.modes;
+        assert_eq!(t.packets.iter().map(Vec::len).collect::<Vec<_>>(), vec![0, 0, n, n]);
+        for (i, (x, y)) in a.iter().zip(&b).enumerate() {
+            for l in 0..2 {
+                assert_eq!((&x.levels[l].state, &x.levels[l].drive), (&y.levels[l].state, &y.levels[l].drive), "cell {i}, level {l}");
+                assert!(y.levels[l].packet.is_none(), "cell {i}, level {l}");
+            }
+        }
+        assert!(a.iter().zip(&b).any(|(x, y)| x.face != y.face), "the packets change the clocked levels' input");
+        let (mut checked, mut held) = (0, 0);
+        for l in 2..4 {
+            // T_P h(open) from the level's last tick (from rest at the opening), and the fine
+            // moves since: each rounds h, a and the transport once.
+            let mut transported: Vec<(i128, i128)> = vec![(0, 0); n];
+            let mut moves = 0i128;
+            for (i, cell) in b.iter().enumerate() {
+                let (lc, fine) = (&cell.levels[l], &cell.levels[l - 1]);
+                let packet = lc.packet.as_ref().expect("a packet at every cell of a level that hears one");
+                // T_P h(open), carried by the fine level's moves at this cell.
+                for (k, slot) in transported.iter_mut().enumerate().filter(|_| fine.ticks > 0) {
+                    let (lr, li) = (fine.gate[k].lam.0 as i128, fine.gate[k].lam.1 as i128);
+                    for _ in 0..fine.ticks {
+                        *slot = (release(lr * slot.0 - li * slot.1, MOVE_BITS), release(lr * slot.1 + li * slot.0, MOVE_BITS));
+                    }
+                }
+                moves += i128::from(fine.ticks);
+                if i > 0 && lc.ticks == 0 {
+                    assert_eq!(lc.state, b[i - 1].levels[l].state, "cell {i}, level {l}: a level that ticks no time holds its modes");
+                    held += 1;
+                }
+                if lc.ticks == 0 {
+                    assert!(packet.read.is_none(), "cell {i}, level {l}");
+                    continue;
+                }
+                let read = packet.read.as_ref().expect("a read at a tick");
+                for k in 0..n {
+                    let (hr, hi) = (fine.state[k].0 as i128, fine.state[k].1 as i128);
+                    let (dr, di) = (hr - transported[k].0 - packet.state[k].0 as i128, hi - transported[k].1 - packet.state[k].1 as i128);
+                    assert!(dr.abs() <= 2 * moves + 1 && di.abs() <= 2 * moves + 1, "cell {i}, level {l}, mode {k}: {dr} {di} over {moves} moves");
+                }
+                assert_eq!(read.read, tower.packet_read(l - 1, &packet.state, &tower.reaches().levels[l - 1]).expect("read").read, "cell {i}, level {l}");
+                transported = fine.state.iter().map(|&(re, im)| (re as i128, im as i128)).collect();
+                moves = 0;
+                checked += 1;
+            }
+        }
+        assert!(checked > 0 && held > 0, "{checked} ticks checked, {held} held");
+        let text = tower.to_text();
+        assert!(text.contains("news-clock 2 2 2\npackets\n"));
+        assert_eq!(Tower::from_text(&text).expect("restored"), tower);
+        assert!(Tower::from_text(&text.replace("news-clock 2 2 2\n", "")).is_err(), "packets read without their clock");
+        let state = t.to_text();
+        assert!(state.lines().nth(8).is_some_and(|l| l.starts_with("packets ")) && stacked.rest().to_text().ends_with("packets -\n"));
+        assert_eq!(tower.state_from_text(&state.lines().collect::<Vec<_>>()).expect("restored"), t);
+        assert!(stacked.state_from_text(&state.lines().collect::<Vec<_>>()).is_err(), "open packets on a tower without them");
+        assert!(tower.clone().join_packets().is_err(), "packets join once");
+        assert!(tiny_with(3, true).join_packets().is_err(), "without a clock no level hears a packet");
+        let mut top = tiny_with(2, true);
+        top.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("a clock above the top");
+        assert!(top.join_packets().is_err(), "a clock that holds no level closes no packet");
+        assert!(tiny_clocked_participating(ContactLaw::Rectifying, false, 3).join_packets().is_err(), "beside participation the packets are owed");
+        assert!(tower.clone().join_participation(ParticipationDeclaration::new(vec![4, 4], 16, 0).expect("declared")).is_err(), "participation beside packets is owed");
+        let mut learner = TowerLearner::new(stacked.clone(), 7);
+        let mut states = vec![learner.tower.rest()];
+        learner.section(&mut states, &[&classes[..31]]).expect("section");
+        assert!(learner.join_packets().is_err(), "packets join a learner before its first section");
+    }
+
+    /// [agent-inferred, October 30] **The packets' covector is the code difference it predicts**
+    /// (acceptance 4) over the first 31 classes of [`news_passage`]: three gated levels clocked
+    /// from level 2 with packets, with and without the passage opened. Level 2's push, gate and
+    /// turn read the packet level 1's moves carried since level 2's last tick, so level 1's read,
+    /// moves, gate and push take covectors through the packet beside their own.
+    #[test]
+    fn the_packets_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(packeted(3), true, &news_passage()[..31], 9);
+    }
+
+    #[test]
+    fn the_packets_covector_beside_the_opened_passage_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(passage_opened(packeted(3)), true, &news_passage()[..31], 9);
+    }
+
+    /// Under packets a stream's open packets are its state (acceptance 5): a passage read in two
+    /// carried sections is the passage read whole, code for code, a stream that drops its packets
+    /// reads it otherwise, and a learner's section carries each stream's packets as a read does.
+    #[test]
+    fn a_packeted_passage_read_in_carried_sections_is_the_passage_read_whole() {
+        let tower = packeted(4);
+        let classes = news_passage();
+        let whole = tower.read_cells(&mut tower.rest(), &classes).expect("read");
+        for half in [1, 17, 30, 59] {
+            let mut s = tower.rest();
+            let mut parts = tower.read_cells(&mut s, &classes[..=half]).expect("read");
+            parts.extend(tower.read_cells(&mut s, &classes[half..]).expect("read"));
+            assert_eq!(parts, whole, "half {half}");
+        }
+        let mut s = tower.rest();
+        tower.read_cells(&mut s, &classes[..=30]).expect("read");
+        assert!(s.packets[2..].iter().flatten().any(|&v| v != (0, 0)), "an open packet at the cut");
+        let mut dropped = TowerState { packets: tower.rest().packets, ..s };
+        assert_ne!(tower.read_cells(&mut dropped, &classes[30..]).expect("read"), whole[30..]);
+        let streams: [&[usize]; 2] = [&classes[..31], &classes[30..]];
+        let mut learner = TowerLearner::new(tower, 7);
+        let mut states = vec![learner.tower.rest(), learner.tower.rest()];
+        learner.section(&mut states, &streams).expect("section");
+        for (state, stream) in states.iter().zip(streams) {
+            let mut direct = learner.tower.rest();
+            learner.tower.read_cells(&mut direct, stream).expect("read");
+            assert_eq!(state, &direct);
+        }
     }
 
     /// Under a news clock a stream's open face and phase are its state: a passage read in two

@@ -187,8 +187,8 @@ impl Tower {
     }
 
     /// [definition; agent-inferred, October 29] **A stream's state widened** with this tower by
-    /// `factor`: each level's modes repeated, one copy after another, and participation's open
-    /// section with them (frames, met dissipation, keys, values and the held current a mode, each
+    /// `factor`: each level's modes repeated, one copy after another, its open packet with them, and
+    /// participation's open section with them (frames, met dissipation, keys, values and the held current a mode, each
     /// site's dissipation a head). Refused on a state that carries a passage credit, whose lift is
     /// owed.
     pub fn widen_state(&self, state: &TowerState, factor: usize) -> Result<TowerState> {
@@ -212,7 +212,8 @@ impl Tower {
                 current: repeat(&s.current),
             })
             .collect();
-        Ok(TowerState { modes: state.modes.iter().map(|m| repeat(m)).collect(), sites, ..state.clone() })
+        let packets = state.packets.iter().map(|a| repeat(a)).collect();
+        Ok(TowerState { modes: state.modes.iter().map(|m| repeat(m)).collect(), sites, packets, ..state.clone() })
     }
 }
 

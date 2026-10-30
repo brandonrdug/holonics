@@ -3381,6 +3381,9 @@ pub(super) enum Joined {
     Participation,
     MutualContact,
     Passage,
+    /// The passage with the packets ([`Tower::join_packets`]): each clocked level's push, gate and
+    /// turn hear the packet its clock closed.
+    PassagePackets,
 }
 
 /// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
@@ -3435,8 +3438,8 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        if learner.tower.passage() != (joined == Joined::Passage) {
-            return Err("the continued learner's passage differs from the declared one".into());
+        if learner.tower.passage() != matches!(joined, Joined::Passage | Joined::PassagePackets) || learner.tower.packets() != (joined == Joined::PassagePackets) {
+            return Err("the continued learner's passage or packets differ from the declared ones".into());
         }
         learner
     } else {
@@ -3465,6 +3468,13 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             Joined::Passage => {
                 learner.join_passage().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={}", learner.tower.news().map_or(0, |c| c.first()));
+            }
+            // A packet run also gives each clocked level the packet its clock closed as the input
+            // of its push, gate and turn ([`Tower::join_packets`]).
+            Joined::PassagePackets => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_packets().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE first_clocked_level={} packets", learner.tower.news().map_or(0, |c| c.first()));
             }
         }
         learner

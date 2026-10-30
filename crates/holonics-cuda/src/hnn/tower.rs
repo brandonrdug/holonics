@@ -42,8 +42,13 @@
 //! and each level's modes take their step once a tick with the arrival held, and the modes' scan
 //! carries the covector back through each tick; participation beside it admits a level's sites at
 //! its ticks alone, holds its current between them and closes each level's section at its own
-//! count, within a call or across calls). Any other is refused before a launch ([`TowerCard::admits`]), never run on a partial
-//! law.
+//! count, within a call or across calls; under the clock, a level at a cell where it is still
+//! computes only its contacts, its push and gate skipped and, without participation, its read held
+//! from its last tick, the faces unchanged; and with the packets, `Tower::join_packets`, each
+//! clocked level carries its open packet through the fine level's moves, hears its read at a tick
+//! as the input of its push, gate and turn, and returns the read's covector to the fine level's read
+//! and scan, `tower_reverse_packet`). Any other is refused before a launch ([`TowerCard::admits`]),
+//! never run on a partial law.
 //!
 //! # The realizations (hardware law)
 //!
@@ -52,6 +57,7 @@
 //! | `tower_transpose` | a grid striding one matrix family (`grid.y` the family) | one material entry | — |
 //! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: the pair face's lift, a strands' ring (its three residues heard byte by byte, then their faces), a push or gate logit, a mode's move, a ring rank's advance and face, a read, a contact, a return part, a class's face (with its pair read and the ring's pair read); 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (a contact both its drives under the pair law; the return's contacts in `256/W` groups; a ring rank its factors) |
 //! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage (the ring's readout covector, its face's and each rank's read covector among them); 256 threads | the stage's outputs, within each its column's weights |
+//! | `tower_reverse_packet` | one cell of one stream, at a level that hears a packet | one coordinate of the packet read's covector, then one of the packet's | the read's coordinates, then a mode's column of the fine level's read |
 //! | `tower_reverse_modes` | one stream of one level (under a rotor, exactly one thread a mode, the block exchanging each step's covector through shared memory) | one mode | the stream's cells in reverse order (the scan) |
 //! | `tower_reverse_ring` | one stream | one ring rank's scan step, then one face coordinate, then one factor entry | the stream's cells in reverse order, every rank's scan carried together; a coordinate the ranks in their order |
 //! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift, the ring's readout and the strands' materials among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
@@ -194,7 +200,10 @@ struct LawWords {
     /// The passage (`passage = 0` without it): the contacts of every level from the news clock's
     /// first clocked level read the passing current through `W₁ˣ` ([`Tower::join_passage`]).
     passage: u32,
-    pad2: u32,
+    /// The packets (`packets = 0` without them; else the clocked levels `L − F` that carry one):
+    /// a clocked level's push, gate and turn read its packet's ratio at its ticks
+    /// ([`Tower::join_packets`]).
+    packets: u32,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -337,6 +346,19 @@ struct FrameWords {
     contact_y: u64,
     contact_gy: u64,
     r_contact_gy: u64,
+    pk_open: u64,
+    pk_ends: u64,
+    pk_state: u64,
+    pk_read: u64,
+    pk_scale: u64,
+    pk_face: u64,
+    pk_dx: u64,
+    pk_dread: u64,
+    pk_cov: u64,
+    r_pk_read: u64,
+    r_pk_face_re: u64,
+    r_pk_face_im: u64,
+    r_pk_dread: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -360,7 +382,9 @@ struct OuterWords {
     bias_out: u64,
     status: u64,
     groups: u32,
-    pad: u32,
+    /// One when the family's sum is added to its covector's place (a packet's read on its fine
+    /// level's read), zero when it writes it.
+    accumulate: u32,
     partial: u64,
 }
 
@@ -407,6 +431,8 @@ struct Shape {
     /// The levels whose contacts hear the passing current (zero without the passage): each transposes
     /// `W₁ˣ` beside its other families.
     passage: usize,
+    /// The clocked levels that hear a packet (zero without the packets).
+    packets: usize,
 }
 
 impl Shape {
@@ -567,14 +593,29 @@ struct Frame<'c> {
     /// empty without it).
     contact_y: CardBuffer<'c, i64>,
     contact_gy: CardBuffer<'c, i64>,
+    /// The packets (each empty without them): each stream's open packets from the first clocked
+    /// level up (`[S][L − F][N][2]`) and its closing ones; each cell's packet as its level finds it
+    /// (`[S][T][L][N][2]`), its ratio read and scale at a tick (`[S][T][L][W]`, `[S][T][L]`), its
+    /// face (re block, im block, `[S][T][L][2N]`); the reverse's covector of the ratio read, its
+    /// adjoint (`[S][T][L][W]` each) and the packet's covector at a tick (`[S][T][L][2N]`).
+    pk_open: CardBuffer<'c, i64>,
+    pk_ends: CardBuffer<'c, i64>,
+    pk_state: CardBuffer<'c, i64>,
+    pk_read: CardBuffer<'c, i32>,
+    pk_scale: CardBuffer<'c, i64>,
+    pk_face: CardBuffer<'c, i64>,
+    pk_dx: CardBuffer<'c, i64>,
+    pk_dread: CardBuffer<'c, i64>,
+    pk_cov: CardBuffer<'c, i64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
     /// turn's covector `δs`, then the pump's depth and axis covectors `δκ`, `δp`, then the second
     /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`), then
     /// participation's ratio read, current (re, im) and `∂r̂ᵃ` (each `Q·L`) and its six chart
-    /// covectors (`6·Q·L`), then the mutual contact's `G_y` (`Q`).
-    reach_offsets: [usize; 27],
+    /// covectors (`6·Q·L`), then the mutual contact's `G_y` (`Q`), then the packets' ratio read,
+    /// face (re, im) and the read's adjoint (each `Q·L`).
+    reach_offsets: [usize; 31],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -689,6 +730,9 @@ impl<'c> TowerCard<'c> {
                 return refuse("the card steps a rotor's moving modes with a key for each level, class and moving mode, its modes' scan one thread a mode in one block");
             }
         }
+        if law.packets && law.news.is_none_or(|c| c.first() == 0 || c.first() >= d.levels) {
+            return refuse("the card hears packets under a news clock that holds a level above its first");
+        }
         if d.levels == 0 || d.levels > u32::MAX as usize {
             return refuse("the card carries one or more levels, counted in a 32-bit word");
         }
@@ -790,6 +834,7 @@ impl<'c> TowerCard<'c> {
             words.ln2 = law.ln2 as i64;
         }
         words.passage = u32::from(law.passage);
+        words.packets = if law.packets { law.news.map_or(0, |c| (d.levels - c.first()) as u32) } else { 0 };
         if let Some(b) = law.mutual {
             words.mutual = 1;
             words.mutual_shift = b;
@@ -883,8 +928,9 @@ impl<'c> TowerCard<'c> {
         let ql = q * l;
         let (heads, sec, pa, carried) = (shape.heads, shape.section, usize::from(shape.heads > 0), shape.carried);
         let mutual = shape.mutual;
-        let mut reach_offsets = [0usize; 27];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual];
+        let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
+        let mut reach_offsets = [0usize; 31];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -1004,6 +1050,15 @@ impl<'c> TowerCard<'c> {
             pa_mark: card.alloc(q * pa)?,
             contact_y: card.alloc(q * w * mutual)?,
             contact_gy: card.alloc(q * w * mutual)?,
+            pk_open: card.alloc(s * pk * n * 2)?,
+            pk_ends: card.alloc(s * pk * n * 2)?,
+            pk_state: card.alloc(ql * n * 2 * pkd)?,
+            pk_read: card.alloc(ql * w * pkd)?,
+            pk_scale: card.alloc(ql * pkd)?,
+            pk_face: card.alloc(ql * 2 * n * pkd)?,
+            pk_dx: card.alloc(ql * w * pkd)?,
+            pk_dread: card.alloc(ql * w * pkd)?,
+            pk_cov: card.alloc(ql * 2 * n * pkd)?,
             reach_offsets,
         });
         Ok(())
@@ -1148,6 +1203,19 @@ impl<'c> TowerCard<'c> {
             contact_y: frame.contact_y.device_ptr(),
             contact_gy: frame.contact_gy.device_ptr(),
             r_contact_gy: r(26),
+            pk_open: frame.pk_open.device_ptr(),
+            pk_ends: frame.pk_ends.device_ptr(),
+            pk_state: frame.pk_state.device_ptr(),
+            pk_read: frame.pk_read.device_ptr(),
+            pk_scale: frame.pk_scale.device_ptr(),
+            pk_face: frame.pk_face.device_ptr(),
+            pk_dx: frame.pk_dx.device_ptr(),
+            pk_dread: frame.pk_dread.device_ptr(),
+            pk_cov: frame.pk_cov.device_ptr(),
+            r_pk_read: r(27),
+            r_pk_face_re: r(28),
+            r_pk_face_im: r(29),
+            r_pk_dread: r(30),
         }
     }
 
@@ -1205,7 +1273,10 @@ impl<'c> TowerCard<'c> {
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
         let p = usize::from(shape.heads > 0);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l].iter().map(|&o| carve(o)).sum()
+        // The packets and a still level's held read (under a news clock without participation).
+        let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
+        let hold = usize::from(shape.news > 0 && shape.heads == 0);
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l, 8 * pk * 2 * n, 4 * w * pkd, 4 * l * w * hold, 8 * 4 * l * hold, 4 * l * hold].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -1237,6 +1308,10 @@ impl<'c> TowerCard<'c> {
         [8 * 2 * shape.modes, 16 * 32, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
+    fn packet_shared(shape: &Shape) -> usize {
+        [16 * 32, 8 * 32, 8 * shape.width].iter().map(|&o| carve(o)).sum()
+    }
+
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
     fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let law = tower.resident_law()?;
@@ -1260,6 +1335,16 @@ impl<'c> TowerCard<'c> {
             || opening.iter().any(|o| o.credit.is_some() || o.ring.len() != ranks || o.hands.len() != ranks || !below(o) || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
         {
             return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and each strand's residue below its ring's modulus"));
+        }
+        // Each stream's open packets: one a level from the clock's first clocked level up, of the
+        // bank's modes, none below it; none without the packets ([`Tower::join_packets`]).
+        let packet_from = if law.packets { law.news.map(|c| c.first()) } else { None };
+        let packeted = |o: &TowerState| match packet_from {
+            None => o.packets.is_empty(),
+            Some(first) => o.packets.len() == d.levels && o.packets.iter().enumerate().all(|(l, a)| a.len() == if l >= first { d.modes } else { 0 }),
+        };
+        if !opening.iter().all(packeted) {
+            return Err(TowerError::Refused("the card opens each stream's packets on the levels that hear one, of the bank's modes"));
         }
         // The news clock's open face and phase, each mass within the face's total and a 64-bit
         // word (the forward's own faces are), the phase below the clock's period.
@@ -1316,7 +1401,7 @@ impl<'c> TowerCard<'c> {
                 return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 } };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 } };
         self.frame(shape).map_err(device)?;
         let (mut words, levels) = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1380,6 +1465,10 @@ impl<'c> TowerCard<'c> {
             if !news_open.is_empty() {
                 card.write(&frame.news_open, 0, &news_open).map_err(device)?;
             }
+            if packet_from.is_some() {
+                let open: Vec<i64> = opening.iter().flat_map(|o| o.packets.iter().flatten().flat_map(|&(re, im)| [re, im])).collect();
+                card.write(&frame.pk_open, 0, &open).map_err(device)?;
+            }
             if let Some(p) = &law.participation {
                 let starts: Vec<u32> = std::iter::once(0).chain(p.heads.iter().scan(0u32, |at, &h| {
                     *at += h as u32;
@@ -1441,6 +1530,7 @@ impl<'c> TowerCard<'c> {
         let swell = if keep { self.card.fetch(&frame.swell).map_err(device)? } else { Vec::new() };
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
+        let packet_ends = if packet_from.is_some() { self.card.fetch(&frame.pk_ends).map_err(device)? } else { Vec::new() };
         // Each level's section at the read's end, as the host's state carries it: its carried sites
         // still read and the sites admitted since (a section that closed rests), with its running
         // frames, met dissipation and, under a news clock, its held current.
@@ -1539,6 +1629,16 @@ impl<'c> TowerCard<'c> {
                     state.open = (end[0] != 0).then(|| TowerFace { masses: end[4..].iter().map(|&m| u128::from(m)).collect(), total: end[1] as u128 | (end[2] as u128) << 64 });
                     state.news = end[3];
                 }
+                if let Some(first) = packet_from {
+                    let per = (d.levels - first) * d.modes * 2;
+                    let end = &packet_ends[s * per..(s + 1) * per];
+                    for (l, a) in state.packets.iter_mut().enumerate().skip(first) {
+                        for (k, mode) in a.iter_mut().enumerate() {
+                            let at = ((l - first) * d.modes + k) * 2;
+                            *mode = (end[at], end[at + 1]);
+                        }
+                    }
+                }
                 state
             })
             .collect();
@@ -1588,6 +1688,11 @@ impl<'c> TowerCard<'c> {
             }
             self.law_launch("tower_reverse_modes", Dim3::x(s as u32), scan_threads, scan_shared, &words, &fw, Some(level as u32)).map_err(device)?;
             self.law_launch("tower_reverse_dx", Dim3::x(q), THREADS, Self::dx_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            // A level that hears a packet returns its read's covector to the fine level's scan,
+            // which runs next (`tower_reverse_packet`).
+            if shape.packets > 0 && level as u32 >= words.news_first {
+                self.law_launch("tower_reverse_packet", Dim3::x(q), THREADS, Self::packet_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            }
         }
         for outer in self.outer_families(&words, &levels, &fw) {
             self.launch_outer(&outer.0, outer.1).map_err(device)?;
@@ -1638,9 +1743,10 @@ impl<'c> TowerCard<'c> {
             bias_out: bias_out.unwrap_or(0),
             status: fw.status,
             groups: 1,
-            pad: 0,
+            accumulate: 0,
             partial: 0,
         };
+        let added = |(words, wide): (OuterWords, bool)| (OuterWords { accumulate: 1, ..words }, wide);
         // The readout takes `Σ δz xᵀ` and its bias `Σ δz`; under a mutual contact its place holds
         // `J`, which takes `Σ G_y xᵀ`, and the classes' constants are summed beside the encoding's
         // covector (`tower_encoding`).
@@ -1662,11 +1768,21 @@ impl<'c> TowerCard<'c> {
             }
             out.push((family(at64(fw.dread, lu * w), l * w, at64(fw.face, lu * 2 * n), l * 2 * n, at64(fw.r_dread, lu), at64(fw.r_face_re, lu), l, w, n, false, gradient(lv.read_re), None), true));
             out.push((family(at64(fw.dread, lu * w), l * w, at64(fw.face, lu * 2 * n + n), l * 2 * n, at64(fw.r_dread, lu), at64(fw.r_face_im, lu), l, w, n, true, gradient(lv.read_im), None), true));
-            out.push((family(at64(fw.gre, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gre, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_re), None), false));
-            out.push((family(at64(fw.gim, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_gim, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.push_im), None), false));
-            out.push((family(at64(fw.dq, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dq, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
+            // A level that hears a packet: its push, gate and turn read the packet's read (zero where
+            // the level is still, as are their covectors), and the read's covector against the
+            // packet's face is added onto the fine level's read, whose own family was pushed above.
+            let hears = law.packets != 0 && level as u32 >= law.news_first;
+            let (input, r_input) = if hears { (at32(fw.pk_read, lu * w), at64(fw.r_pk_read, lu)) } else { (at32(fw.input, lu * w), at64(fw.r_input, lu)) };
+            if hears {
+                let fine = &levels[level - 1];
+                out.push(added((family(at64(fw.pk_dread, lu * w), l * w, at64(fw.pk_face, lu * 2 * n), l * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_re, lu), l, w, n, false, gradient(fine.read_re), None), true)));
+                out.push(added((family(at64(fw.pk_dread, lu * w), l * w, at64(fw.pk_face, lu * 2 * n + n), l * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_im, lu), l, w, n, true, gradient(fine.read_im), None), true)));
+            }
+            out.push((family(at64(fw.gre, lu * n), l * n, input, l * w, at64(fw.r_gre, lu), r_input, l, n, w, false, gradient(lv.push_re), None), false));
+            out.push((family(at64(fw.gim, lu * n), l * n, input, l * w, at64(fw.r_gim, lu), r_input, l, n, w, false, gradient(lv.push_im), None), false));
+            out.push((family(at64(fw.dq, lu * n), l * n, input, l * w, at64(fw.r_dq, lu), r_input, l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
             if law.turned != 0 {
-                out.push((family(at64(fw.ds, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_ds, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
+                out.push((family(at64(fw.ds, lu * n), l * n, input, l * w, at64(fw.r_ds, lu), r_input, l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
             }
             if law.pumped != 0 {
                 out.push((family(at64(fw.dk, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dk, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump), Some(gradient(lv.pump_bias))), false));
@@ -1784,7 +1900,7 @@ impl<'c> TowerCard<'c> {
 }
 
 fn entry_takes_extra(entry: &str) -> bool {
-    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx" | "tower_reverse_participation")
+    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx" | "tower_reverse_participation" | "tower_reverse_packet")
 }
 
 impl PassRealization for TowerCard<'_> {
@@ -1852,7 +1968,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0, packets: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

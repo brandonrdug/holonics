@@ -83,7 +83,7 @@ pub(super) fn train(args: &[String], credit: bool, targets: bool, turned: bool, 
 /// (`hnn::tower::realization`): the card's route (`holonics-cuda`'s `tower_pass` example) runs the
 /// same passes on the card, and its saved learner is the host's.
 pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, credit, targets, turned, ladder, news, Joined::Nothing, realization)
+    train_joined(args, credit, targets, turned, ladder, news, Joined::Nothing, ContactLaw::Rectifying, realization)
 }
 
 /// `train-two-ladder-participating-tower-classes`: [`train_realized`] on both turn ladders with
@@ -91,7 +91,7 @@ pub(crate) fn train_realized(args: &[String], credit: bool, targets: bool, turne
 /// joins the race's news clock first, so each level's sites are its own ticks (record
 /// `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
 pub(crate) fn train_participating_realized(args: &[String], news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Participation, realization)
+    train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Participation, ContactLaw::Rectifying, realization)
 }
 
 /// `train-two-ladder-news-passage-tower-classes`: [`train_realized`] on both turn ladders under the
@@ -100,17 +100,34 @@ pub(crate) fn train_participating_realized(args: &[String], news: Option<NewsClo
 /// joins [`race_stacked_news_clock`] instead (record
 /// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, §7 and §8).
 pub(crate) fn train_passage_realized(args: &[String], news: NewsClock, realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::Passage, realization)
+    train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::Passage, ContactLaw::Rectifying, realization)
+}
+
+/// `train-two-ladder-stacked-news-packet-tower-classes`: [`train_passage_realized`] under
+/// [`race_stacked_news_clock`] with the packets joined after the passage, so each clocked level's
+/// push, gate and turn hear the packet its clock closed (record
+/// `2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET…`, §4).
+pub(crate) fn train_packet_realized(args: &[String], news: NewsClock, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::PassagePackets, ContactLaw::Rectifying, realization)
+}
+
+/// `train-two-ladder-pair-tower-classes`: [`train_realized`] on both turn ladders with every
+/// contact the pair contact ([`ContactLaw::Pair`]), so a contact can read a conjunction of two drives
+/// off the same face, the law whose founded split grows the body (record
+/// `2026-10-29_A_VALUE_IS_A_RADIX_MOVE…`, §2). Its second drive opens at zero material and unit
+/// bias and draws no key, so it is founded on the same draws as the rectifying tower.
+pub(crate) fn train_pair_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, None, Joined::Nothing, ContactLaw::Pair, realization)
 }
 
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
 /// contact joined at the founding.
 pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
-    train_joined(args, false, false, false, TurnLadder::Both, None, Joined::MutualContact, realization)
+    train_joined(args, false, false, false, TurnLadder::Both, None, Joined::MutualContact, ContactLaw::Rectifying, realization)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, realization: &mut dyn PassRealization) -> Result<()> {
+fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 {
         return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -129,7 +146,7 @@ fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladd
         train_compared: None,
     };
     let reading = Reading { train_compared: targets.then(|| target_places(&reading.train, alphabet - 1)), ..reading };
-    fit(&args[8..], reading, true, turned, false, credit, ContactLaw::Rectifying, ladder, news, joined, None, realization)
+    fit(&args[8..], reading, true, turned, false, credit, contact, ladder, news, joined, None, realization)
 }
 
 /// The news clock the clocked race joins: `B = 8` bits, the news of one octet read with no

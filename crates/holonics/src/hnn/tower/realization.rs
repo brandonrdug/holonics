@@ -467,6 +467,9 @@ pub struct ResidentLaw {
     /// the passing current ([`Tower::join_passage`]): a realization that does not carry it refuses
     /// the tower.
     pub passage: bool,
+    /// Whether the levels the news clock holds hear the packet their clock closed
+    /// ([`Tower::join_packets`]): a realization that does not carry it refuses the tower.
+    pub packets: bool,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -680,6 +683,7 @@ impl Tower {
             participation: self.participation.clone(),
             mutual: self.mutual,
             passage: self.passage,
+            packets: self.packets,
             held_log: reaches.held_log,
         })
     }
