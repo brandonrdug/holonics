@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); the closure locates the key, its acceptance fixed before the build (§10)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, its acceptance fixed before the build (§11)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -461,3 +461,75 @@ certificate next); *a located cause carried unrepaired into a new consumer* (the
 is removed at its source, not throttled by a smaller step); *bits read as progress* (acceptance 13
 shows the writing beside its bits); *a refusal answered with a larger limit* (the law changes; the
 lap keeps its 256 sections and its projection rule).
+
+**At the card** (4981b209b, B-PC's RTX 4080 SUPER alone under the card's lock).
+
+- **Acceptance 12 passed.** The card tests passed, 43 of 43, and the parity at C′'s declaration was
+  equal (98,304 faces, 92,385 closure faces, 17,711,136 gradient entries, every learner).
+- **Acceptance 13 missed on both halves.** The arrivals ended at 2.755 bits a byte, 0.015 above C′,
+  and the closure ended 0.012 and 0.013 bits a tick above flat. The lap ran 94.4 s against its
+  152.4 s projection (0.62), peak resident set 695,608 KiB. The held-out read: train 3.388, dev
+  2.800, the GSM8K region 2.835, the best of the heading laps. The writing ran all six prompts to
+  1,024 classes in 9.1 s; its prompts are held-out material, so it stays outside the repository.
+
+| After section | Arrivals, bits a byte | − C′ | Refusals that window | L4 closure − flat | L5 |
+|---|---|---|---|---|---|
+| 32 | 5.067 | −0.431 | 40 | +0.140 | +0.107 |
+| 64 | 3.861 | −0.241 | 6 | +0.024 | +0.022 |
+| 96 | 3.412 | −0.222 | 14 | +0.016 | +0.016 |
+| 128 | 3.212 | −0.152 | 21 | +0.014 | +0.015 |
+| 160 | 3.039 | −0.100 | 27 | +0.013 | +0.015 |
+| 192 | 2.911 | −0.049 | 28 | +0.013 | +0.013 |
+| 224 | 2.850 | −0.007 | 26 | +0.012 | +0.014 |
+| 256 | 2.755 | +0.015 | 26 | +0.012 | +0.013 |
+
+- **Off the terrain, the closure locates nothing.** It falls from its opening's +0.14 to flat in the
+  first windows and stays there: read linearly through `C^→` alone, the coarse modes the arrivals
+  train carry no heading of the next span's trace. At 0ff331247 the closure located (−0.844) only
+  by moving the modes and the encoding the arrivals use.
+- **The arrivals are the best of any heading lap,** and lead C′ by 0.43 bits a byte at section 32
+  and 0.24 at 64. The lead comes from the face's read of the coarse levels, which learns from the
+  arrivals; it shrinks as the refusals return (6, 14, 21, 27 a window) and is gone at 224.
+- **The refusals are small and all raise the arrivals.** A refused step raises the section's
+  arrivals by about 770 bits out of about 113,000, so a full step overshoots slightly in most
+  sections from 160 on, where C′'s full step still descends.
+
+## 11. The closure is read, not learned
+
+[agent-inferred, October 30] **The cause.** §9 and §10 between them measure the closure in both
+places it can learn: on the shared terrain it locates and costs the arrivals; on the heading's read
+alone it locates nothing. In the second place its covector still moves `C^→`, which the arrivals
+read through `D`, so its only effect on the arrivals is a step they did not ask for. A covector
+that locates nothing is not a key, and the anti-reduction law (every operator has a caller and an
+acceptance that vanishes when it is removed) refuses an operator whose removal is not measured.
+
+**The law.**
+
+```text
+covector(θ) = ∂A/∂θ for every family θ, C^→ and D among them
+Z_l is read at every section and moves nothing
+```
+
+The heading is the coarse level's read that the face takes, `z = U(x^L + Σ_l D_l ĥ⁺_l) + c`; the
+closure reads whether that heading points at the span its next tick closes, as a measurement of the
+coarse field, the landmark reading of §4.
+
+**Acceptance, fixed before the build.**
+14. Every family's covector is the arrivals' code difference it predicts, with `D` at zero (where
+    the heading's read carries no covector at all) and opened.
+15. The card is equal to the host at C′'s declaration, and the card tests pass.
+16. On the 4080 over the passage's first 256 sections, the arrivals at section 256 are at or below
+    C′'s 2.740 bits a byte, each window's refusals reported beside the key-only lap's and C′'s, the
+    closure reported, and the writing shown. If the arrivals end above the key-only lap's 2.755, the
+    closure's covector on `C^→` was helping them, and it returns.
+
+**Built.** The host retires the closure's covector (`Tower::reverse_joined`); the certificate was
+already the arrivals' alone. The card's `tower_reverse_heading` keeps only the face's return to the
+read covector, the heading's read takes only the face's outer sum, and the frame no longer carries
+the closure heading's scale and face, its covector, or their reaches. The forward still reads the
+closure at every section.
+
+Recorded failures this could repeat: *an authored routine standing in for learning* (none enters;
+the face's read is learned from the arrivals); *bits read as progress* (acceptance 16 shows the
+writing); *a located cause carried unrepaired into a new consumer* (the refusals' remaining share is
+measured with the closure gone, not carried into another law).

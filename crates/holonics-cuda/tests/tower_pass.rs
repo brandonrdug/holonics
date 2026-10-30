@@ -555,11 +555,11 @@ fn the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections() {
 }
 
 /// [agent-inferred, October 30] **The heading on the card** (record
-/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6, 9 and 12):
-/// each clocked level reads its heading from its modes before the arrival for its closure and
-/// after it into the face through its descent, closes the trace of its span at its tick, and the
-/// closure's covector returns to the heading's read alone (the key, record §10) and the face's to
-/// the heading's read, the modes after the cell and the descent; 32 sections equal face by face
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6, 9, 12 and
+/// 15): each clocked level reads its heading from its modes before the arrival for its closure and
+/// after it into the face through its descent, closes the trace of its span at its tick, the
+/// closure is read and not learned (record §11), and the face's covector returns to the heading's
+/// read, the modes after the cell and the descent; 32 sections equal face by face
 /// (the closures among them), covector entry by entry, learner for learner and state for state
 /// (the open traces among it), on the clock from level 1, on three levels from level 2 with the
 /// passage, and at the race's declaration, six levels from level 4 with the passage; on the turned

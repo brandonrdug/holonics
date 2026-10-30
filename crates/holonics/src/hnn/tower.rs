@@ -3785,32 +3785,9 @@ impl Tower {
         if self.news.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a news clock: its moments over a clocked move are owed");
         }
-        // The closure's covectors ([`Tower::join_heading`]): each tick's face, compared with its own
-        // trace, returns `g_ji = e_ji/Σ_i e_ji − [i = j]` on 2^(−24); the heading takes
-        // `Σ_i g_ji 2^(−s) τ_i` through its ratio's adjoint, as the covector of the raw read
-        // `Re(C^→ h)` at the tick's cell. It reaches the heading's read `C^→` alone: the closure
-        // locates the key, and the modes it read and the traces it met are the arrivals' terrain
-        // (the record's §10).
-        let mut heading_cov: Vec<Vec<(usize, Vec<i64>)>> = vec![Vec::new(); d.levels];
-        let closure_missing = || TowerError::Refused("a heading at every cell and a trace at every tick of a level that carries one");
-        for (l, (ticks, faces)) in self.closures(cells)?.into_iter().enumerate() {
-            let shift = FACE_BITS + closure_shift(w);
-            for (j, (&cj, face)) in ticks.iter().zip(&faces).enumerate() {
-                let heading = cells[cj].levels[l].heading.as_ref().ok_or_else(closure_missing)?;
-                let mut dh = vec![0i128; w];
-                for (&ci, gji) in ticks.iter().zip(covector(face, j)) {
-                    if gji == 0 {
-                        continue;
-                    }
-                    let tau = &cells[ci].levels[l].trace.as_ref().ok_or_else(closure_missing)?.read;
-                    for k in 0..w {
-                        dh[k] += gji as i128 * tau[k] as i128;
-                    }
-                }
-                let dh: Vec<i64> = collect_exact(dh.into_iter().map(|v| fit64(release(v, shift))))?;
-                heading_cov[l].push((cj, ratio_adjoint(&heading.read, heading.scale, &dh)?));
-            }
-        }
+        // The closure is read, not learned ([`Tower::join_heading`], the record's §11): the heading
+        // the face reads takes the arrivals' covector alone.
+        let ahead_missing = || TowerError::Refused("a heading after every cell of a level that carries one");
         // Under a mutual contact, each cell's covector of the produced face through it, `G_y`.
         let mut gys: Vec<Vec<i64>> = Vec::with_capacity(if self.mutual.is_some() { cells_n } else { 0 });
         for (i, cell) in cells.iter().enumerate() {
@@ -4028,20 +4005,12 @@ impl Tower {
                 dreads.push(dread);
                 negs.push(neg);
             }
-            // The closure's covector of the heading ([`Tower::join_heading`]) reaches its read `C^→`
-            // against the modes it read, and stops there (the key, the record's §10). The face's
-            // covector of the heading after each cell reaches `C^→` and the modes after the cell,
-            // whose covector the level's own scan carries into its moves, its push and its packets.
-            if !heading_cov[l].is_empty() || !ahead_cov[l].is_empty() {
+            // The face's covector of the heading after each cell ([`Tower::join_heading`]) reaches its
+            // read `C^→` and the modes after the cell, whose covector the level's own scan carries
+            // into its moves, its push and its packets.
+            if !ahead_cov[l].is_empty() {
                 let hreach = &reaches.heading[l];
-                let (mut dreads_h, mut negs_h, mut faces_h) = (Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()));
-                for (i, dr) in &heading_cov[l] {
-                    let neg: Vec<i64> = dr.iter().map(|v| -v).collect();
-                    faces_h.push(cells[*i].levels[l].heading.as_ref().ok_or_else(closure_missing)?.face.as_slice());
-                    dreads_h.push(dr.as_slice());
-                    negs_h.push(neg);
-                }
-                // The face's covector of the heading after cell `i` reaches the modes after it.
+                let (mut dreads_h, mut negs_h, mut faces_h) = (Vec::with_capacity(ahead_cov[l].len()), Vec::with_capacity(ahead_cov[l].len()), Vec::with_capacity(ahead_cov[l].len()));
                 for (i, dr) in ahead_cov[l].iter().enumerate() {
                     let neg: Vec<i64> = dr.iter().map(|v| -v).collect();
                     let (mut hre, mut him) = (vec![0i64; n], vec![0i64; n]);
@@ -4050,7 +4019,7 @@ impl Tower {
                     for (slot, (a, b)) in read_cov[i].iter_mut().zip(hre.into_iter().zip(him)) {
                         *slot = (fit64(slot.0 as i128 + a as i128)?, fit64(slot.1 as i128 + b as i128)?);
                     }
-                    faces_h.push(cells[i].levels[l].ahead.as_ref().ok_or_else(closure_missing)?.face.as_slice());
+                    faces_h.push(cells[i].levels[l].ahead.as_ref().ok_or_else(ahead_missing)?.face.as_slice());
                     dreads_h.push(dr.as_slice());
                     negs_h.push(neg);
                 }
@@ -5504,9 +5473,10 @@ impl Tower {
     /// `D` is carried whole). Each such level carries the open trace of the arrivals since its
     /// last tick, `o_l ← o_l + E(u)`, closed at the tick as `τ_l = r̂(o_l)`; the heading the level
     /// held meets the traces of the section's ticks through a pair contact
-    /// (`Tower::closure_faces`). The closure's covector reaches the heading's read `C^→_l` alone, the
-    /// key it locates; the modes it read and the traces it met are the arrivals' terrain, and its
-    /// code is read beside the section's, not certified (the record's §10).
+    /// (`Tower::closure_faces`). The closure is read beside the section's code and is not learned:
+    /// pulling the arrivals' terrain it cost them, and on the heading's read alone it located
+    /// nothing (the record's §10–§11), so the heading the face reads takes the arrivals' covector
+    /// alone.
     ///
     /// [agent-inferred] `C^→_l` opens as a copy of the level's read, so a heading opens on what the
     /// level's contacts read (a heading at zero is no ratio, and its closure would have no
@@ -6045,9 +6015,8 @@ impl TowerLearner {
         let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
         self.swell.clone_from(&read.swell);
         // The certificate compares the arrivals' faces; under the heading each tick's closure face
-        // is read beside them and not certified ([`Tower::join_heading`]; the record's §10: the
-        // closure locates the heading's key, and its pull on the arrivals' terrain was what the
-        // arrivals' certificate refused).
+        // is read beside them ([`Tower::join_heading`]; the closure is read, not learned, the
+        // record's §10–§11).
         let heading = self.tower.heading();
         let compared_faces = |r: &realization::PassRead| -> Result<Vec<(u128, u128)>> {
             if heading && r.closures.len() != classes.len() {
@@ -8920,14 +8889,12 @@ mod tests {
     }
 
     /// The code of a passage whose faces are compared with `compared` (the classes read when it is
-    /// `None`), read from rest; under the heading, with every tick's closure code when `closure`
-    /// ([`Tower::join_heading`]).
-    fn compared_code(tower: &Tower, classes: &[usize], compared: Option<&[Option<usize>]>, closure: bool) -> i64 {
+    /// `None`), read from rest.
+    fn compared_code(tower: &Tower, classes: &[usize], compared: Option<&[Option<usize>]>) -> i64 {
+        let Some(compared) = compared else { return code(tower, classes) };
         let mut s = tower.rest();
         let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
-        let closed: i64 = if closure { tower.closure_faces(&cells).expect("closures").iter().flatten().map(|&(m, t)| face_code(m, t)).sum() } else { 0 };
-        let Some(compared) = compared else { return code(tower, classes) + closed };
-        closed + cells.iter().enumerate().filter_map(|(i, cell)| compared[i + 1].map(|t| cell.face.code(t))).sum::<i64>()
+        cells.iter().enumerate().filter_map(|(i, cell)| compared[i + 1].map(|t| cell.face.code(t))).sum::<i64>()
     }
 
     /// The code read at sixteen steps `k 2^(−step)` units, `0 < |k| ≤ 8`.
@@ -8971,14 +8938,16 @@ mod tests {
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked, mut strands_checked) = (0, 0, 0, 0, 0, 0, 0, 0);
         let (mut mutual_checked, mut passages_checked, mut headings_checked, mut descents_checked) = (0, 0, 0, 0);
         let headed = |start: usize, of: fn(&LevelLayout) -> usize| tower.heading_from().is_some_and(|first| tower.layout.levels[first..].iter().any(|lv| of(lv) == start));
-        // Under the heading the heading's read `C^→` carries the arrivals' and the closure's code,
-        // every other family the arrivals' alone (the closure locates the key, the record's §10),
-        // and the face's read of the heading carries its covector through `Dᵀ` at any `D`
-        // ([`Tower::join_heading`]).
-        let base_codes = [compared_code(&tower, &classes, compared, false), compared_code(&tower, &classes, compared, true)];
+        // Under the heading every family carries the arrivals' code alone (the closure is read, not
+        // learned, the record's §11), and the face's read of the heading carries its covector
+        // through `Dᵀ` at any `D` ([`Tower::join_heading`]); with `D` at zero the heading's read
+        // carries none.
+        let base_code = compared_code(&tower, &classes, compared);
+        let [read_families, descent_families] = tower.heading_families();
+        let open_descent = descent_families.iter().cloned().flatten().any(|i| tower.theta[i] != 0);
+        assert!(open_descent || read_families.iter().cloned().flatten().all(|i| g[i] == 0), "the heading's read moved with its descent at zero");
         for &(start, len, grain) in &tower.layout.families {
             let descent = headed(start, |lv| lv.descent);
-            let keyed = headed(start, |lv| lv.heading_re) || headed(start, |lv| lv.heading_im);
             let mut order: Vec<usize> = (start..start + len).collect();
             order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
             'parameter: for i in order {
@@ -8994,7 +8963,7 @@ mod tests {
                     if conducting(&moved) != base {
                         continue 'parameter;
                     }
-                    moment += k as i128 * (compared_code(&moved, &classes, compared, keyed) - base_codes[keyed as usize]) as i128; // on 2^(−20)
+                    moment += k as i128 * (compared_code(&moved, &classes, compared) - base_code) as i128; // on 2^(−20)
                     spread += (k * k) as i128;
                 }
                 // The fitted slope against g, both in bits a unit on 2^(−32).
@@ -9011,7 +8980,7 @@ mod tests {
                 strands_checked += (tower.strands.is_some() && (start == tower.layout.strand_contact || start == tower.layout.strand_pair)) as usize;
                 mutual_checked += (tower.mutual.is_some() && [tower.layout.encoding, tower.layout.readout, tower.layout.readout_bias].contains(&start)) as usize;
                 passages_checked += tower.layout.levels.iter().enumerate().any(|(l, lv)| tower.hears(l) && lv.passage == start) as usize;
-                headings_checked += keyed as usize;
+                headings_checked += (headed(start, |lv| lv.heading_re) || headed(start, |lv| lv.heading_im)) as usize;
                 descents_checked += descent as usize;
                 break;
             }
@@ -9032,7 +9001,7 @@ mod tests {
         assert!(tower.strands.is_none() || strands_checked == strand_families, "the strands' material carried {strands_checked} readable covectors of {strand_families}");
         assert!(tower.mutual.is_none() || mutual_checked == 3, "the mutual contact's geometry, constants and encoding carried {mutual_checked} readable covectors of 3");
         assert!(!tower.passage || passages_checked >= 1, "no level's passage carried a readable covector");
-        assert!(!tower.heading || (headings_checked >= 1 && descents_checked >= 1), "the heading's read carried {headings_checked} and its descent {descents_checked} readable covectors");
+        assert!(!tower.heading || ((headings_checked >= 1 || !open_descent) && descents_checked >= 1), "the heading's read carried {headings_checked} and its descent {descents_checked} readable covectors");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -10375,9 +10344,8 @@ mod tests {
     /// [agent-inferred, October 30] **The heading's covector is the code difference it predicts**
     /// (acceptance 4) over the first 31 classes of [`news_passage`]: three gated levels clocked
     /// from level 2 with packets and the heading, `D` at zero, with and without the passage
-    /// opened. Every family carries the arrivals' code, and the heading's read `C^→` also every
-    /// tick's closure: the closure locates the key and leaves the modes it read and the traces'
-    /// encoding rows to the arrivals (the record's §10).
+    /// opened. Every family carries the arrivals' code alone: the closure is read, not learned
+    /// (the record's §11), so with `D` at zero the heading's read carries no covector.
     #[test]
     fn the_headings_covector_matches_the_code_difference() {
         the_covector_of_tower_matches_the_code_difference(headed(3), true, &news_passage()[..31], 9);

@@ -50,9 +50,9 @@
 //! and scan, `tower_reverse_packet`; and with the heading, `Tower::join_heading`, each clocked level
 //! reads its heading from its modes before the arrival for its closure and after it for the face,
 //! which reads it through the descent, carries the open trace of its span and closes it at a tick,
-//! the section's closure is read at the forward's end and returned to the heading's read alone,
-//! and the face's covector through the descent to the heading after each cell and the read covector of the cell's own
-//! state, `tower_reverse_ahead` and `tower_reverse_heading`). Any other is refused before a
+//! the section's closure is read at the forward's end (read, not learned), and the face's
+//! covector returns through the descent to the heading after each cell and the read covector of
+//! the cell's own state, `tower_reverse_ahead` and `tower_reverse_heading`). Any other is refused before a
 //! launch ([`TowerCard::admits`]), never run on a partial law.
 //!
 //! # The realizations (hardware law)
@@ -64,7 +64,7 @@
 //! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage (the ring's readout covector, its face's and each rank's read covector among them); 256 threads | the stage's outputs, within each its column's weights |
 //! | `tower_reverse_ahead` | one cell of one stream | one coordinate of `Dᵀ δx` at each clocked level, then one of its ratio's adjoint | the top's covector against a column of the descent |
 //! | `tower_reverse_packet` | one cell of one stream, at a level that hears a packet | one coordinate of the packet read's covector, then one of the packet's | the read's coordinates, then a mode's column of the fine level's read |
-//! | `tower_reverse_heading` | one stream of one clocked level | one trace of the section's menu, then one coordinate of a covector, then one of the read covector | a tick's row (or a trace's column) of the closure, the ticks in order; a coordinate its sum over the menu |
+//! | `tower_reverse_heading` | one stream of one clocked level | one coordinate of the read covector | the stream's cells in order |
 //! | `tower_reverse_modes` | one stream of one level (under a rotor, exactly one thread a mode, the block exchanging each step's covector through shared memory) | one mode | the stream's cells in reverse order (the scan) |
 //! | `tower_reverse_ring` | one stream | one ring rank's scan step, then one face coordinate, then one factor entry | the stream's cells in reverse order, every rank's scan carried together; a coordinate the ranks in their order |
 //! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift, the ring's readout and the strands' materials among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
@@ -388,17 +388,11 @@ struct FrameWords {
     tr_open: u64,
     tr_ends: u64,
     hd_read: u64,
-    hd_scale: u64,
-    hd_face: u64,
     tr_read: u64,
     hd_list: u64,
     hd_count: u64,
     hd_close: u64,
     hd_g: u64,
-    hd_dread: u64,
-    r_hd_face_re: u64,
-    r_hd_face_im: u64,
-    r_hd_dread: u64,
     ah_read: u64,
     ah_scale: u64,
     ah_face: u64,
@@ -671,22 +665,18 @@ struct Frame<'c> {
     split_out: CardBuffer<'c, i128>,
     /// The heading (each empty without it; `HD = L − F`, the levels that carry one): each
     /// stream's open trace before its first cell and after its last (`[S][HD][W]`); each cell's
-    /// heading read and scale (`[S][T][HD][W]`, `[S][T][HD]`) and its face (re block, im block,
-    /// `[S][T][HD][2N]`); each trace's ratio read at a tick (`[S][T][HD][W]`); each stream's
-    /// ticks a level in the section, their count and each tick's closure (`[S][HD][T]`, `[S][HD]`,
-    /// `[S][HD][T][4]`: `e_jj`, the total's two words, `z_max`); the reverse's covector scratch
-    /// (`[S][T]`) and the heading read's covector (`[S][T][HD][W]`).
+    /// heading read before its arrival, which the closure reads (`[S][T][HD][W]`); each trace's
+    /// ratio read at a tick (`[S][T][HD][W]`); each stream's ticks a level in the section, their
+    /// count and each tick's closure (`[S][HD][T]`, `[S][HD]`, `[S][HD][T][4]`: `e_jj`, the
+    /// total's two words, `z_max`); and the closure's scratch (`[S][T]`).
     tr_open: CardBuffer<'c, i64>,
     tr_ends: CardBuffer<'c, i64>,
     hd_read: CardBuffer<'c, i32>,
-    hd_scale: CardBuffer<'c, i64>,
-    hd_face: CardBuffer<'c, i64>,
     tr_read: CardBuffer<'c, i32>,
     hd_list: CardBuffer<'c, u32>,
     hd_count: CardBuffer<'c, u32>,
     hd_close: CardBuffer<'c, u64>,
     hd_g: CardBuffer<'c, i64>,
-    hd_dread: CardBuffer<'c, i64>,
     /// The heading after each cell, which the face reads through the descent (each empty without
     /// the heading): its ratio read and scale (`[S][T][HD][W]`, `[S][T][HD]`) and the face it read
     /// (`[S][T][HD][2N]`); the reverse's covector of its raw read (`[S][T][HD][W]`) and the top's
@@ -703,10 +693,10 @@ struct Frame<'c> {
     /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`), then
     /// participation's ratio read, current (re, im) and `∂r̂ᵃ` (each `Q·L`) and its six chart
     /// covectors (`6·Q·L`), then the mutual contact's `G_y` (`Q`), then the packets' ratio read,
-    /// face (re, im) and the read's adjoint (each `Q·L`), then the heading's: the ratio after each
-    /// cell, the face (re, im) and the read's adjoint (each `Q·HD`, `[HD][S][T]`), then the face and
-    /// the read's adjoint after each cell (each `Q·HD`) and the top's covector (`Q`).
-    reach_offsets: [usize; 39],
+    /// face (re, im) and the read's adjoint (each `Q·L`), then the heading's after each cell: the
+    /// ratio, the face (re, im) and the read's adjoint (each `Q·HD`, `[HD][S][T]`) and the top's
+    /// covector (`Q`).
+    reach_offsets: [usize; 36],
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -1035,8 +1025,8 @@ impl<'c> TowerCard<'c> {
         let mutual = shape.mutual;
         let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
         let (hd, hdd) = (shape.heading, usize::from(shape.heading > 0));
-        let mut reach_offsets = [0usize; 39];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd, q * hd, q * hd, q * hd, q * hd, q * hd, q * hd, q * hd, q * hdd];
+        let mut reach_offsets = [0usize; 36];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd, q * hd, q * hd, q * hd, q * hd, q * hdd];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -1173,14 +1163,11 @@ impl<'c> TowerCard<'c> {
             tr_open: card.alloc(s * hd * w)?,
             tr_ends: card.alloc(s * hd * w)?,
             hd_read: card.alloc(q * hd * w)?,
-            hd_scale: card.alloc(q * hd)?,
-            hd_face: card.alloc(q * hd * 2 * n)?,
             tr_read: card.alloc(q * hd * w)?,
             hd_list: card.alloc(s * hd * t)?,
             hd_count: card.alloc(s * hd)?,
             hd_close: card.alloc(s * hd * t * 4)?,
             hd_g: card.alloc(q * hdd)?,
-            hd_dread: card.alloc(q * hd * w)?,
             ah_read: card.alloc(q * hd * w)?,
             ah_scale: card.alloc(q * hd)?,
             ah_face: card.alloc(q * hd * 2 * n)?,
@@ -1349,27 +1336,21 @@ impl<'c> TowerCard<'c> {
             tr_open: frame.tr_open.device_ptr(),
             tr_ends: frame.tr_ends.device_ptr(),
             hd_read: frame.hd_read.device_ptr(),
-            hd_scale: frame.hd_scale.device_ptr(),
-            hd_face: frame.hd_face.device_ptr(),
             tr_read: frame.tr_read.device_ptr(),
             hd_list: frame.hd_list.device_ptr(),
             hd_count: frame.hd_count.device_ptr(),
             hd_close: frame.hd_close.device_ptr(),
             hd_g: frame.hd_g.device_ptr(),
-            hd_dread: frame.hd_dread.device_ptr(),
-            r_hd_face_re: r(32),
-            r_hd_face_im: r(33),
-            r_hd_dread: r(34),
             ah_read: frame.ah_read.device_ptr(),
             ah_scale: frame.ah_scale.device_ptr(),
             ah_face: frame.ah_face.device_ptr(),
             ah_dread: frame.ah_dread.device_ptr(),
             ah_top: frame.ah_top.device_ptr(),
             r_ah_read: r(31),
-            r_ah_face_re: r(35),
-            r_ah_face_im: r(36),
-            r_ah_dread: r(37),
-            r_ah_top: r(38),
+            r_ah_face_re: r(32),
+            r_ah_face_im: r(33),
+            r_ah_dread: r(34),
+            r_ah_top: r(35),
         }
     }
 
@@ -1467,10 +1448,6 @@ impl<'c> TowerCard<'c> {
 
     fn participation_shared(shape: &Shape) -> usize {
         [8 * 2 * shape.modes, 16 * 32, 8 * 32].iter().map(|&o| carve(o)).sum()
-    }
-
-    fn heading_shared(shape: &Shape) -> usize {
-        [16 * 32, 8 * 32, 8 * shape.width].iter().map(|&o| carve(o)).sum()
     }
 
     fn ahead_shared(shape: &Shape) -> usize {
@@ -1901,10 +1878,11 @@ impl<'c> TowerCard<'c> {
         let (scan_threads, scan_shared) = if shape.moving > 0 { (shape.modes as u32, 32 * shape.modes as u32) } else { (mode_threads, 0) };
         for level in (0..l).rev() {
             self.law_launch("tower_reverse_contacts", Dim3::x(q), THREADS, Self::contacts_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
-            // A level that carries a heading returns its closure's covector to the read covector
-            // the contacts wrote, before the level's scan reads it (`tower_reverse_heading`).
+            // A level that carries a heading returns the face's covector of the heading after each
+            // cell to the read covector the contacts wrote, before the level's scan reads it
+            // (`tower_reverse_heading`).
             if shape.heading > 0 && level as u32 >= words.news_first {
-                self.law_launch("tower_reverse_heading", Dim3::x(s as u32), THREADS, Self::heading_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+                self.law_launch("tower_reverse_heading", Dim3::x(s as u32), THREADS, 0, &words, &fw, Some(level as u32)).map_err(device)?;
             }
             // Participation's return reads the current's covector the contacts wrote and writes the
             // chart covectors the level's `tower_reverse_dx` returns to the input, and the transport's
@@ -2051,14 +2029,12 @@ impl<'c> TowerCard<'c> {
             // The heading (its buffers `[S][T][HD]…` and reaches `[HD][S][T]`, from the clock's
             // first clocked level): the descent takes the top's covector against the heading after
             // the cell that the face read, `Σ δx ĥ⁺ᵀ`, and the heading's read the covector of its
-            // raw read against the face it read, at the ticks (zero elsewhere) and after each cell.
+            // raw read against the face it read after each cell (the closure is read, not learned).
             if law.heading != 0 && level as u32 >= law.news_first {
                 let (hd, i, q) = (law.heading as u64, lu - law.news_first as u64, s as u64 * t as u64);
                 out.push((family(fw.ah_top, w, at32(fw.ah_read, i * w), hd * w, fw.r_ah_top, at64(fw.r_ah_read, i * q), 1, w, w, false, gradient(lv.descent), None), false));
-                out.push((family(at64(fw.hd_dread, i * w), hd * w, at64(fw.hd_face, i * 2 * n), hd * 2 * n, at64(fw.r_hd_dread, i * q), at64(fw.r_hd_face_re, i * q), 1, w, n, false, gradient(lv.heading_re), None), true));
-                out.push((family(at64(fw.hd_dread, i * w), hd * w, at64(fw.hd_face, i * 2 * n + n), hd * 2 * n, at64(fw.r_hd_dread, i * q), at64(fw.r_hd_face_im, i * q), 1, w, n, true, gradient(lv.heading_im), None), true));
-                out.push(added((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_re, i * q), 1, w, n, false, gradient(lv.heading_re), None), true)));
-                out.push(added((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n + n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_im, i * q), 1, w, n, true, gradient(lv.heading_im), None), true)));
+                out.push((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_re, i * q), 1, w, n, false, gradient(lv.heading_re), None), true));
+                out.push((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n + n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_im, i * q), 1, w, n, true, gradient(lv.heading_im), None), true));
             }
         }
         // The strands' materials take their level's drives' covectors against the faces,
