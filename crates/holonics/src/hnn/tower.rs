@@ -5636,12 +5636,14 @@ impl TowerLearner {
                     self.tower = candidate;
                     self.relift(&proposed)?;
                     paired.levels[proposed.level][proposed.pair] = None;
-                    // The reverse reads the opening forward of the tower it steps from.
-                    let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
-                    self.swell = read.swell;
-                    faces_old = read.faces.iter().flatten().flatten().copied().collect();
-                    parts_old = part_codes(&read.faces);
                 }
+                // The reverse reads the opening forward of the tower it steps from, and a realization
+                // need not keep an opening read across a reread (the card's temporaries are one
+                // frame), so the opening is read again whether the founding was admitted or not.
+                let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
+                self.swell = read.swell;
+                faces_old = read.faces.iter().flatten().flatten().copied().collect();
+                parts_old = part_codes(&read.faces);
                 out.certified = Some(proposed);
             }
             founding = Some(out);

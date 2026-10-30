@@ -128,6 +128,10 @@ type Kept = (Vec<KeptStream>, Reaches);
 pub struct HostPass {
     opened: Option<Kept>,
     reread: Option<Kept>,
+    /// Whether the opening read is the last forward. The host keeps both reads, but a card keeps
+    /// one frame of temporaries, which a reread replaces; the host refuses as the card does, so a
+    /// learner that reverses an opening read a reread has replaced is caught on the host.
+    current: bool,
 }
 
 impl HostPass {
@@ -200,11 +204,12 @@ impl PassRealization for HostPass {
             kept.push(k);
         }
         *self.kept(slot) = Some((kept, reaches));
+        self.current = slot == Slot::Opened;
         Ok(PassRead { faces, swell })
     }
 
     fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
-        let (kept, reaches) = self.opened.as_ref().ok_or(TowerError::Refused("a reverse reads the section's opening forward"))?;
+        let (kept, reaches) = self.opened.as_ref().filter(|_| self.current).ok_or(TowerError::Refused("a reverse reads the section's opening forward, not replaced by a reread"))?;
         if kept.len() != opening.len() || classes.len() != opening.len() {
             return Err(TowerError::Refused("a reverse reads the streams its opening forward read"));
         }
@@ -232,7 +237,7 @@ impl PassRealization for HostPass {
     }
 
     fn reverse_split(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, paired: &PairedContacts) -> Result<(Vec<i128>, SplitRead)> {
-        let (kept, reaches) = self.opened.as_ref().ok_or(TowerError::Refused("a reverse reads the section's opening forward"))?;
+        let (kept, reaches) = self.opened.as_ref().filter(|_| self.current).ok_or(TowerError::Refused("a reverse reads the section's opening forward, not replaced by a reread"))?;
         if kept.len() != opening.len() || classes.len() != opening.len() {
             return Err(TowerError::Refused("a reverse reads the streams its opening forward read"));
         }
@@ -270,7 +275,7 @@ impl PassRealization for HostPass {
     }
 
     fn last_faces(&mut self) -> Result<Vec<TowerFace>> {
-        let (kept, _) = self.opened.as_ref().ok_or(TowerError::Refused("a face is read from the opening forward"))?;
+        let (kept, _) = self.opened.as_ref().filter(|_| self.current).ok_or(TowerError::Refused("a face is read from the opening forward, not replaced by a reread"))?;
         kept.iter().map(|k| k.last.clone().ok_or(TowerError::Refused("an opening read of no cell"))).collect()
     }
 

@@ -453,3 +453,22 @@ the same rate fell at every quarter mark. Card time: a training pass 180 to 195 
 **Decision** [agent-inferred, October 30]. C′ with pair contacts does not run longer and is not the
 tower the split grows on: the split races on the four-level pair tower, as acceptance 6 declares.
 The rise from lap 13 is the subject of this line's next loop, after acceptance 6 reads.
+
+**§5 acceptance 5 at the repaired split, stopped at section 7** (October 30, RTX 4080 SUPER, head
+`662d6aafe`, alone on the card; wall 10.5 s, peak resident set 1,865,764 KiB). Host and card were
+equal through section 6 in every split read, founding and direction. Section 3 proposed a founding
+that section 4 admitted (code 18,965,648,716 → 18,814,339,091 on `2^(−20)` bits); section 4
+proposed one that section 5 admitted. Section 6's proposal reached section 7, where the card
+refused its own reverse ("a card reverse reads the section's opening forward, its material still
+resident"). No value differed. The race and its control did not start.
+
+*The cause.* After the certificate's reread the learner read the section's opening forward again
+only when the founding was admitted. A card keeps one frame of temporaries, which the reread
+replaces, so a refused founding left the reverse with no opening read. Sections 1 to 6 never
+refused a certificate on the card; the host keeps both reads, so the host tests passed over five
+refusals.
+
+*The repair.* The opening is read again after every certificate, admitted or refused. The host
+realization now refuses a reverse whose opening read a reread has replaced, as the card does, so
+the host acceptance (7 proposed, 1 admitted, 5 refused) runs the refused path the card runs. The
+card's cost is one more forward a certified section.
