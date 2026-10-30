@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed, the smoke stopped at its first window (§8)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section (§8)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -263,3 +263,45 @@ certificate's readings and its exact products are now summed across streams in p
 sums and products are exact in any grouping, so the bits are unchanged. The next read is the
 passage's first 256 sections, projected at the largest measured rate (586.9 ms a section, startup
 included): 150 s, plus the held-out read.
+
+**The 256-section smoke completed** (113efb262): 142.7 s against its 153 s projection (0.93), the
+first window at 16.3 s where it had been 18.8 s, with the same bits. Peak resident set 688,880 KiB.
+
+| After section | Arrivals, bits a byte | C′ | Halvings that window | C′ | Level 4 closure − flat, bits a tick | Level 5 |
+|---|---|---|---|---|---|---|
+| 32 | 5.257 | 5.498 | 72 | 21 | +0.113 | +0.104 |
+| 64 | 4.495 | 4.102 | 80 | 1 | 0.000 | +0.002 |
+| 96 | 4.131 | 3.634 | 84 | 3 | −0.029 | −0.018 |
+| 128 | 3.901 | 3.364 | 90 | 2 | −0.153 | −0.098 |
+| 160 | 3.757 | 3.139 | 104 | 0 | −0.359 | −0.236 |
+| 192 | 3.672 | 2.960 | 112 | 0 | −0.447 | −0.311 |
+| 224 | 3.578 | 2.857 | 87 | 0 | −0.534 | −0.397 |
+| 256 | 3.470 | 2.740 | 91 | 0 | −0.603 | −0.451 |
+
+- **The heading is located and still falling.** Both clocked levels cross below flat at section 96
+  and keep falling: by section 256 level 4 closes its spans 0.603 bits a tick below the flat menu
+  (5.178 against 5.781) and level 5 0.451 below (4.355 against 4.806). The first claim's mark, a
+  bit a tick, is not reached at 256 of the passage's 726 sections.
+- **The arrivals pay for it.** They lead C′ in the first window and trail it from the second, by
+  0.73 bits a byte at section 256. The held-out read after the lap: train 4.033, dev 3.406, the
+  GSM8K region 3.417.
+- **The certificate never settles.** C′'s step is refused 21 times in its first window and almost
+  never after; the heading's is refused about 2.8 times a section in every window, and nearly
+  every refused step raised both codes. A section admits on average about a seventh of the full
+  step, on every family.
+- **The writing timed out.** The release of six prompts on the lap's learner returned at its 9 s
+  timeout before its first prompt (C′'s whole six took 6.5 to 7 s). Its rate is unmeasured, so
+  there is no writing to show from this lap.
+
+[agent-inferred] The arrivals' cost is the step, not the heading's information: the closure
+locates while the global halving throttles every family to a seventh of its step. The next loop
+separates which family's full step overshoots, with a declared hold (`TOWER_HOLD`, the learner's
+`held`: a family read and never deposited) on the same 256 sections:
+- hold the descent `D` (it stays at zero, so the fine levels never read the heading, and the
+  closure still moves `C^→` and the material it shares with the arrivals);
+- hold the heading's read `C^→` (it stays the read it was joined as, and `D` moves);
+- hold both (the closure's covector moves only the shared material).
+
+If one hold brings the halvings back to C′'s, that family's step is the overshoot and its law
+changes next; if holding both still refuses about 2.8 a section, the overshoot is the closure's
+covector on the shared material.

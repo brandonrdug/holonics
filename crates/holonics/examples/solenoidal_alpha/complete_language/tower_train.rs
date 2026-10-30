@@ -3566,6 +3566,23 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         Ok(v) => v.parse::<usize>()?.clamp(1, (chunk - 1) / section),
         Err(_) => (chunk - 1) / section,
     };
+    // [agent-inferred, October 30] A declared hold (`TOWER_HOLD`, `heading` and/or `descent`): the
+    // heading's read `C^→` or its descent `D` read and never deposited, a foil that separates which
+    // family's step the certificate refuses.
+    if let Ok(words) = std::env::var("TOWER_HOLD") {
+        let [heading, descent] = learner.tower.heading_families();
+        if heading.is_empty() {
+            return Err("TOWER_HOLD holds the heading's families, and this tower has no heading".into());
+        }
+        for word in words.split(',') {
+            match word {
+                "heading" => learner.held.extend(heading.iter().cloned()),
+                "descent" => learner.held.extend(descent.iter().cloned()),
+                _ => return Err(format!("TOWER_HOLD names heading or descent, not {word}").into()),
+            }
+        }
+        println!("TOWER_HOLD {words} entries={}", learner.held.iter().map(|r| r.len()).sum::<usize>());
+    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",

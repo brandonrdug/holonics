@@ -5523,6 +5523,19 @@ impl Tower {
         self.heading
     }
 
+    /// The heading's own material, each empty without it: at every clocked level its read `C^→`
+    /// (re, im), and its descent `D`. A run's declared hold ([`TowerLearner::held`]) names them to
+    /// separate which family's step the certificate refuses.
+    pub fn heading_families(&self) -> [Vec<std::ops::Range<usize>>; 2] {
+        let Some(first) = self.heading_from() else { return [Vec::new(), Vec::new()] };
+        let (w, n) = (self.declaration.width, self.declaration.modes);
+        let levels = &self.layout.levels[first..];
+        [
+            levels.iter().flat_map(|lv| [lv.heading_re..lv.heading_re + w * n, lv.heading_im..lv.heading_im + w * n]).collect(),
+            levels.iter().map(|lv| lv.descent..lv.descent + w * w).collect(),
+        ]
+    }
+
     /// The first level that carries a heading, when the heading is joined.
     pub(crate) fn heading_from(&self) -> Option<usize> {
         if self.heading {
@@ -10421,6 +10434,31 @@ mod tests {
         let receipt = plain.section(&mut states, &[&classes[..31]]).expect("section");
         assert_eq!(receipt.refused.len(), receipt.halvings as usize);
         assert!(receipt.refused.iter().all(|&(_, c)| c == 0), "a closure without the heading");
+    }
+
+    /// A declared hold of the heading's families keeps them as joined through a section that
+    /// deposits, while the section without it steps the descent.
+    #[test]
+    fn a_held_heading_keeps_its_material_as_joined() {
+        let classes = news_passage();
+        let joined = headed(3);
+        let [heading, descent] = joined.heading_families();
+        assert_eq!((heading.len(), descent.len()), (2, 1));
+        assert_eq!(packeted(3).heading_families(), [Vec::new(), Vec::new()]);
+        let run = |held: Vec<std::ops::Range<usize>>| {
+            let mut learner = TowerLearner::new(joined.clone(), 7);
+            learner.held = held;
+            let mut states = vec![learner.tower.rest()];
+            let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
+            (receipt.deposited, learner.tower.theta)
+        };
+        let (deposited, moved) = run(Vec::new());
+        assert!(deposited);
+        assert!(descent.iter().any(|r| moved[r.clone()] != joined.theta[r.clone()]), "an unheld descent did not step");
+        let (deposited, kept) = run(heading.iter().chain(&descent).cloned().collect());
+        assert!(deposited);
+        assert!(heading.iter().chain(&descent).all(|r| kept[r.clone()] == joined.theta[r.clone()]));
+        assert_ne!(kept, joined.theta);
     }
 
     /// Under a news clock a stream's open face and phase are its state: a passage read in two
