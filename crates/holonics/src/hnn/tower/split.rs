@@ -43,18 +43,30 @@
 //! (agent-inferred, October 30; measured: decided on the opening read, 20 of the race's first 28
 //! proposed foundings raised the code they were predicted to lower).
 //!
-//! While a pair is dormant its copies deposit as one contact ([`Tower::dormant_entries`]): its
-//! drives' covectors are summed and both copies take the sum, the old contact's covector, on the
-//! old contact's moments, so they move together as its drives do; its return's step is read once,
-//! from its first part's moments (its second's are equal: both parts read the same conduction), and
-//! split between the parts as the widening split the column (Euclidean, the remainder on the
-//! first), so the column moves by the old column's step. The widened learner is then the pair
-//! learner in a wider chart, up to the reverse's grain (agent-inferred, October 30; measured: with
-//! each return part stepping on the old column's covector whole, the column moved twice its step
-//! and the dormant control read 0.097 bits a byte above the pair race at lap 0). A deposit's step
-//! `m/(⌊√v⌋ + 1)` does not change when its covector is scaled, so a founded pair's copies, whose
-//! covectors are each about half the old, step as its drives did; their drives' moments are
-//! re-lifted to `m/2`, `v/4` at the founding, so the moments read the covector each copy now takes.
+//! Every pair deposits as one contact, dormant or founded ([`Tower::pair_entries`]): its drives'
+//! covectors are summed and both copies take the sum, the old contact's covector, on the old
+//! contact's moments, so they move together as its drives do; its return parts take their
+//! covectors' mean (while dormant the two are equal: both parts read the same conduction), whose
+//! step is read once, from the first part's moments, and split between the parts as the widening
+//! split the column (Euclidean, the remainder on the first), so the column moves by the old
+//! column's step. The widened learner is then the pair learner in a wider chart, up to the
+//! reverse's grain (agent-inferred, October 30; measured: with each return part stepping on the old
+//! column's covector whole, the column moved twice its step and the dormant control read 0.097 bits
+//! a byte above the pair race at lap 0; tied, the control read 2.228 held-out at lap 0 against the
+//! pair race's 2.229, on the RTX 4080 SUPER).
+//!
+//! A founding therefore deposits one coordinate, the one its price certified: the copies' drives
+//! keep the difference `±ε v` it laid down, so the pair's face carries `c θ̂ φ` beside the contact
+//! the pair still learns as, and nothing else of the pair is freed. The founded coordinate stays at
+//! its certified value; its own descent is owed (agent-inferred, October 30; measured: with a
+//! founded pair's copies learning on their own, each on its own covector with its drives' moments
+//! re-lifted to `m/2`, `v/4`, the founding race's certificate halved every section's step about 4.3
+//! times through lap 0, flat from the first sections while the founded pairs grew from 27 to 584,
+//! where the dormant control's halvings stopped by section 224; its training code read 3.110 bits a
+//! byte at section 608 against the control's 2.115. The price charged one coordinate's code and
+//! address while the freeing released every entry of two contacts. Inferred, not located: the
+//! copies' own steps break the cancellation of the split's first-order terms `±ε y` in
+//! `U₁ r_o + U₂ r_(o+f)`, which is exact only while the pair moves as one).
 use super::*;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
@@ -82,7 +94,7 @@ pub const SCORE_BITS: u32 = 48;
 
 /// [definition] **The paired contacts' carried directions**: `levels[l][e]` is the unit direction
 /// of dormant pair `e` (contacts `e` and `e + f/2`) on the read it shares, on `2^(−16)`, or `None`
-/// once the pair is founded and its copies learn on their own; and the founding the last section
+/// once the pair is founded (its split held, the pair still one contact); and the founding the last section
 /// proposed, held for the next section's certificate (the module header). The text carries the
 /// directions alone: a run releases a pending founding at each pass's end, before its directions
 /// rest, so a run continued from them is the run that went on.
@@ -532,19 +544,19 @@ impl Tower {
         Ok(tower)
     }
 
-    /// [definition; agent-inferred, October 30] **The dormant pairs' entries** (the module header):
-    /// for each pair `e` of level `l` that `dormant(l, e)` names (contacts `e` and `e + f/2`), each
-    /// drive entry's two copies (both drives' rows and biases), then each return row's two parts.
-    /// Refused on a tower that is not paired pair contacts.
-    pub(super) fn dormant_entries(&self, dormant: &dyn Fn(usize, usize) -> bool) -> Result<(Vec<(usize, usize)>, Vec<(usize, usize)>)> {
+    /// [definition; agent-inferred, October 30] **The pairs' entries** (the module header): for
+    /// each pair `e` of each level (contacts `e` and `e + f/2`), each drive entry's two copies (both
+    /// drives' rows and biases), then each return row's two parts. Refused on a tower that is not
+    /// paired pair contacts.
+    pub(super) fn pair_entries(&self) -> Result<(Vec<(usize, usize)>, Vec<(usize, usize)>)> {
         let d = &self.declaration;
         if d.contact != ContactLaw::Pair || d.contacts % 2 != 0 {
-            return refuse("dormant pairs are an even count of pair contacts");
+            return refuse("paired contacts are an even count of pair contacts");
         }
         let (w, f, h) = (d.width, d.contacts, d.contacts / 2);
         let (mut drives, mut returns) = (Vec::new(), Vec::new());
-        for (l, lv) in self.layout.levels.iter().enumerate() {
-            for e in (0..h).filter(|&e| dormant(l, e)) {
+        for lv in &self.layout.levels {
+            for e in 0..h {
                 for (start, len) in [(lv.contact, w), (lv.contact_bias, 1), (lv.pair, w), (lv.pair_bias, 1)] {
                     drives.extend((0..len).map(|i| (start + e * len + i, start + (e + h) * len + i)));
                 }
@@ -570,17 +582,6 @@ impl TowerLearner {
         let second = from.iter().map(|&i| self.second[i]).collect();
         let paired = PairedContacts::opened(&tower)?;
         Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new() }, paired))
-    }
-
-    /// A founded pair's drives' moments re-lifted (the module header): each copy's covector is now
-    /// its own, about half the old, so its moments carry `m/2` and `v/4`.
-    pub(super) fn relift(&mut self, founding: &Founding) -> Result<()> {
-        let (drives, _) = self.tower.dormant_entries(&|l, e| l == founding.level && e == founding.pair)?;
-        for i in drives.into_iter().flat_map(|(a, b)| [a, b]) {
-            self.first[i] = div_nearest(self.first[i], 2);
-            self.second[i] = div_nearest(self.second[i], 4);
-        }
-        Ok(())
     }
 
     /// The section's proposal decided (the module header): of the pairs the test admits, the one
@@ -887,7 +888,9 @@ mod tests {
     /// section and certified on the next, which it was not fit on: an admitted founding lowers that
     /// section's opening code (by more than its price) and retires its pair, a refused one leaves
     /// the pair dormant and the section stepping from the unfounded tower, and the training code
-    /// read at each opening is the unfounded one.
+    /// read at each opening is the unfounded one. Every pair, dormant or founded, deposits as one
+    /// contact: its copies' moments stay equal, and a section that founds nothing leaves every
+    /// pair's drive difference (zero while dormant, the founding's `±ε v` once founded) as it was.
     #[test]
     fn a_founding_is_certified_on_the_section_after_the_one_it_was_fit_on() {
         let streams = parity_streams(33);
@@ -895,6 +898,10 @@ mod tests {
         let mut pass = HostPass::default();
         assert!(pass.forms_split());
         let (mut admitted, mut refused, mut proposed) = (0usize, 0usize, 0usize);
+        let (drives, returns) = learner.tower.pair_entries().expect("entries");
+        let differences = |l: &TowerLearner| -> Vec<i32> { drives.iter().map(|&(x, y)| l.tower.theta[x] - l.tower.theta[y]).collect() };
+        let mut held = differences(&learner);
+        let mut carried = 0usize;
         for k in 8..32 {
             let tower_before = learner.tower.clone();
             let opening = states.clone();
@@ -906,6 +913,15 @@ mod tests {
                 proposed += 1;
                 assert!(p.predicted < 0 && p.theta != 0 && p.surplus > 0);
             }
+            for &(x, y) in drives.iter().chain(&returns) {
+                assert_eq!((learner.first[x], learner.second[x]), (learner.first[y], learner.second[y]), "section {k}: the copies' moments");
+            }
+            let now = differences(&learner);
+            if !founding.admitted {
+                assert_eq!(now, held, "section {k}: a section that founds nothing keeps every pair's drive difference");
+                carried += usize::from(held.iter().any(|&d| d != 0));
+            }
+            held = now;
             let Some(f) = &founding.certified else {
                 assert_eq!(founding.reread, founding.code_before);
                 continue;
@@ -929,7 +945,8 @@ mod tests {
             );
         }
         assert!(proposed > 0, "no section proposed a founding");
-        eprintln!("SPLIT_FOUNDINGS proposed={proposed} admitted={admitted} refused={refused} dormant={}", directions.dormant());
+        assert!(admitted == 0 || carried > 0, "no section carried a founded pair");
+        eprintln!("SPLIT_FOUNDINGS proposed={proposed} admitted={admitted} refused={refused} dormant={} carried={carried}", directions.dormant());
     }
 
     /// How far a widened learner's drives and summed return columns part from the pair learner's,
@@ -977,7 +994,7 @@ mod tests {
             step = step.max(before.iter().zip(&plain.tower.theta).map(|(x, y)| (x - y).abs()).max().unwrap_or(0));
             code_tied = code_tied.max((a.code_before - b.code_before).abs()).max((a.code_after - b.code_after).abs());
             code_apart = code_apart.max((a.code_before - c.code_before).abs()).max((a.code_after - c.code_after).abs());
-            let (drives, returns) = tied.tower.dormant_entries(&|_, _| true).expect("entries");
+            let (drives, returns) = tied.tower.pair_entries().expect("entries");
             for &(x, y) in drives.iter().chain(&returns) {
                 assert_eq!((tied.first[x], tied.second[x]), (tied.first[y], tied.second[y]), "section {k}: the copies' moments");
             }

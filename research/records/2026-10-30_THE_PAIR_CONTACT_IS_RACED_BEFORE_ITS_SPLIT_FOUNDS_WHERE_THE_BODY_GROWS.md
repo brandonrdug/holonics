@@ -96,12 +96,21 @@ on the old contact's moments and move together as its drives did, and its return
 once, from its first part's moments (its second's are equal: both parts read the same conduction),
 and split between the parts as the widening split the column, Euclidean with the remainder on the
 first. The column then moves by the old column's step, and the dormant learner is the pair learner
-in the wider chart, up to the reverse's grain. Every copy carries its old entry's moments. A founded
-pair's copies learn on their own: each copy's covector is then about half the old, so its drives'
-moments are re-lifted to `m/2`, `v/4` at the founding, and each copy still steps as the old drive
-did. (The first build lifted the drives to `m/2`, `v/4` and let each return part step on the old
-column's covector whole, so the column moved twice its step; the control measured that at 0.097
-bits a byte above the pair race.)
+in the wider chart, up to the reverse's grain. Every copy carries its old entry's moments. (The
+first build lifted the drives to `m/2`, `v/4` and let each return part step on the old column's
+covector whole, so the column moved twice its step; the control measured that at 0.097 bits a byte
+above the pair race.)
+
+**A founded pair still deposits as one contact** (revised October 30 after the founding race's
+second lap 0, §7). The certificate charges one coordinate: its code and its address. So a founding
+deposits that one coordinate and frees nothing else: the founded pair's drives keep taking their
+covectors summed, which moves both copies by one step and keeps the difference `±ε v` the founding
+laid down, and its return parts take their covectors' mean (equal to either part's while the pair
+is dormant), stepped once and split as before. The pair's face is the contact it learns as plus
+`c θ̂ φ`, held at the certified `θ̂`; the founded coordinate's own descent is owed. (The second
+build let a founded pair's copies learn on their own, each on its own covector, the drives' moments
+re-lifted to `m/2`, `v/4`. The price paid for one coordinate while the freeing released every entry
+of two contacts, and the certificate then halved every section's step about 4.3 times, §7.)
 
 **The direction, carried and turned.** Each dormant pair carries a unit direction `v_e` on the read
 `r̂` it shares (width `d` entries on `2^(−16)`), opened at the contact's own first drive row,
@@ -147,8 +156,8 @@ W_a[o] += ε v,  W_a[o+f] −= ε v,   W_b[o] += sgn(θ̂) ε v,  W_b[o+f] −= 
 ```
 
 The face moves by `c θ̂ φ`, second order in `ε` and downhill by the score, with a predicted fit
-change of `−(ln 2 · g)²/(2(τ + σ))` nats. A founded pair carries no direction afterwards: its copies
-are two contacts learning on their own.
+change of `−(ln 2 · g)²/(2(τ + σ))` nats. A founded pair carries no direction afterwards, and it
+deposits as one contact with its split held (above).
 
 **The certificate pays the price on the next section** (agent-inferred, October 30; revised after
 acceptance 6's lap 0, §7). The test above only proposes, and the proposal is held. At the next
@@ -472,3 +481,40 @@ refusals.
 realization now refuses a reverse whose opening read a reread has replaced, as the card does, so
 the host acceptance (7 proposed, 1 admitted, 5 refused) runs the refused path the card runs. The
 card's cost is one more forward a certified section.
+
+**§5 acceptance 6 at `c4a9604dc`, the founding stopped in lap 0** (October 30, RTX 4080 SUPER,
+alone on the card; incomplete). The paired parity at that head first: 98,304 faces, 19,075,104
+gradient entries and every learner equal, 22 foundings admitted; wall 43.3 s, peak resident set
+1,903,624 KiB. The founding race then passed its 560 s cap near section 634 of 726 (0.88 s a section
+against the 0.77 its projection allowed; peak resident set 642,524 KiB). Its dormant control ran its
+lap 0 alone afterwards: exit 0 in 186.2 s (1,686 forwards in 101.5 s, 726 reverses in 55.0 s; peak
+resident set 663,276 KiB). Training bits a byte by 32-section window, and the step's halvings so far:
+
+| section | control bits | control halvings | founding bits | founding halvings |
+|---|---|---|---|---|
+| 32 | 5.246 | 84 | | 141 |
+| 128 | 3.192 | 160 | | |
+| 224 | 2.777 | 211 | | |
+| 608 | 2.115 | 211 | 3.110 | 2,591 |
+| 726 | 2.080 | 211 | | |
+
+- **The dormant law holds.** The control's held-out reading is 2.228 against the pair race's 2.229
+  at lap 0 (training 2.629, GSM8K 2.260): tied, the widened learner is the pair learner in its wider
+  chart on the card, as the host's twelve sections read.
+- **The founding stalls the step.** The founding race's certificate halved the step about 4.3 times
+  a section in every window, from the first, while its founded pairs grew from 27 (section 32) to
+  584 (dormant 997 → 440). Its foundings kept paying: 24 to 32 admitted a window, each lowering the
+  section it was certified on (the windows' sums −78,496 bits in sections 1 to 32, its largest
+  16,614, then −1,215 to −9,800 bits). The halvings did not grow with the founded count, which a
+  doubled return step on each founded pair would make them do, and a doubled step costs one halving,
+  not four.
+- **The cause** [source-inspected; the mechanism inferred, not located]. A founded pair's copies
+  learned on their own, each on its own covector, so the founding released every entry of two
+  contacts while its certificate charged one coordinate. The split stands as two first-order terms
+  `±ε y` in `U₁ r_o + U₂ r_(o+f)` that cancel only while the pair moves as one.
+
+*The repair* (§4). Every pair, dormant or founded, deposits as one contact: the founded pair's
+drives keep the summed covector, so its copies keep the difference `±ε v` the founding laid down,
+and its return parts step once on their covectors' mean. A dormant pair's parts read the same
+conduction, so the mean is either part's covector and the control is unchanged to the bit. The
+founding deposits the one coordinate its price paid for, held at its certified value.

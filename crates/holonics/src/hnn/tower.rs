@@ -5646,8 +5646,8 @@ impl TowerLearner {
     /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
     /// splits** ([`split`]): the founding the section before proposed is certified on this
     /// section's opening, read with and without it, and deposits only where it codes fewer bits by
-    /// more than its price; the section then steps from the tower the certificate leaves, its dormant
-    /// pairs depositing as one contact, and its reverse also forms the split read. After the step's
+    /// more than its price; the section then steps from the tower the certificate leaves, every pair
+    /// (dormant or founded) depositing as one contact, and its reverse also forms the split read. After the step's
     /// certificate the split is read again on the tower the step left (where it deposited), the pair
     /// the rank-one test admits there is proposed and held for the next section, and each other
     /// dormant pair's direction turns on that read.
@@ -5692,7 +5692,6 @@ impl TowerLearner {
                 out.admitted = fewer_bits_by(&faces_old, &faces_new, &split::certified_price(&proposed, width, dormant)?);
                 if out.admitted {
                     self.tower = candidate;
-                    self.relift(&proposed)?;
                     paired.levels[proposed.level][proposed.pair] = None;
                 }
                 // The reverse reads the opening forward of the tower it steps from, and a realization
@@ -5715,17 +5714,23 @@ impl TowerLearner {
             }
             _ => (realization.reverse(tower, &opening, classes, compared)?, None),
         };
-        // A dormant pair deposits as one contact (`split`'s header): its drives' copies take their
-        // covectors' sum, and its return steps once, split between its parts below.
+        // Every pair, dormant or founded, deposits as one contact (`split`'s header): its drives'
+        // copies take their covectors' sum, and its return parts their covectors' mean, which steps
+        // once, split between the parts below. A dormant pair's parts read the same conduction, so
+        // the mean is either part's covector exactly.
         let (drives, returns) = match &pairs {
             split::Pairs::Unpaired => (Vec::new(), Vec::new()),
-            split::Pairs::Dormant => tower.dormant_entries(&|_, _| true)?,
-            split::Pairs::Founding(p) => tower.dormant_entries(&|l, e| p.levels[l][e].is_some())?,
+            split::Pairs::Dormant | split::Pairs::Founding(_) => tower.pair_entries()?,
         };
         for &(a, b) in &drives {
             let sum = g[a] + g[b];
             g[a] = sum;
             g[b] = sum;
+        }
+        for &(a, b) in &returns {
+            let mean = div_nearest(g[a] + g[b], 2);
+            g[a] = mean;
+            g[b] = mean;
         }
         tower.to_step_grain(&mut g);
         tower.to_move_chart(&mut g);
