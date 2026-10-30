@@ -3559,7 +3559,13 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     println!("TOWER_REALIZATION {}", realization.realization());
     std::fs::create_dir(out)?;
     let chunk = classes.len() / streams;
-    let sections_a_pass = (chunk - 1) / section;
+    // [agent-inferred, October 30] A lap may be declared as the passage's first sections
+    // (`TOWER_LAP_SECTIONS`): a partition of the pass whose time a smoke's deadline projects from
+    // a measured rate, the learner resting and read after them as after a whole pass.
+    let sections_a_pass = match std::env::var("TOWER_LAP_SECTIONS") {
+        Ok(v) => v.parse::<usize>()?.clamp(1, (chunk - 1) / section),
+        Err(_) => (chunk - 1) / section,
+    };
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3587,6 +3593,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let mut window = (0i64, 0usize);
         // Under the heading, each clocked level's closure over the window: ticks, code, flat.
         let mut closures: Vec<(usize, usize, i64, i64)> = Vec::new();
+        // The window's refused steps: how many, how many raised the arrivals' code and how many
+        // the closure's, and the changes they made.
+        let mut refusals = (0usize, 0usize, 0usize, 0i64, 0i64);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3712,6 +3721,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             deposits += receipt.deposited as usize;
             halvings += receipt.halvings;
             gather_closures(&mut closures, &receipt.closure);
+            for &(arrivals, closure) in &receipt.refused {
+                refusals = (refusals.0 + 1, refusals.1 + usize::from(arrivals > 0), refusals.2 + usize::from(closure > 0), refusals.3 + arrivals, refusals.4 + closure);
+            }
             if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
@@ -3720,6 +3732,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 if !closures.is_empty() {
                     println!("TOWER_CLOSURE pass={} section={} {}", pass, k + 1, closure_line(&closures));
                 }
+                println!(
+                    "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={} arrivals_change_bits={} closure_change_bits={}",
+                    pass, k + 1, refusals.0, refusals.1, refusals.2, signed_bits(refusals.3), signed_bits(refusals.4)
+                );
+                refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                 window = (0, 0);
                 closures.clear();

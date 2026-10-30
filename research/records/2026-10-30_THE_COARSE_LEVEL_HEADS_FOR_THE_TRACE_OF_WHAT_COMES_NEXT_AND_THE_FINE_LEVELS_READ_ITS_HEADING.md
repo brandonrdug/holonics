@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, tested on the host to acceptance 1–5, the card's parity owed]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed, the smoke stopped at its first window (§8)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -219,3 +219,29 @@ From [the lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE
 - No orbit of colours is classified by its energy (the Galois-gap record's §5), no landmark pins a
   slow mode, and no potential is located from the tower's own contacts (the diffusion law's
   statement 6 at the tower).
+
+## 8. At the card
+
+Measured on B-PC's RTX 4080 SUPER at 86bda62ea, alone under the card's lock.
+
+- **Acceptance 6 passed.** The card tests passed, 43 of 43 (among them
+  `the_cards_heading_is_the_hosts_for_thirty_two_sections`). `tower_pass parity … 8 2 4 heading` at
+  C′'s six-level declaration (24 streams, 32 sections of 128) had 98,304 faces, 96,591 closure
+  faces, 17,711,136 gradient entries and every learner equal, 29.9 s. The same parity with
+  `packets`, after the packet buffers were narrowed to the levels that hear one, was equal too.
+- **The smoke stopped at its first window.** Its lap was projected as the parity's card time
+  ratio (5,173 ms against C′'s 4,030 ms over the 32 sections, 1.28) times C′'s largest lap, 220 s.
+  Its first window ran 18,311 ms against its share of 12,330 ms, so it was stopped there,
+  incomplete. The projection error is the certificate: 72 halvings over the first 32 sections at
+  320 streams against C′'s 21 (the parity's 24 streams halved 0 or 1 times a section, so its card
+  time did not carry the rereads). The window read:
+  - arrivals 5.257 bits a byte, against C′'s 5.498 at the same window;
+  - closure 6.498 bits a tick at level 4 against its flat 6.385, and 5.519 at level 5 against
+    5.415: still above flat.
+
+[agent-inferred] The next loop's subject is the refusals, not a longer deadline. Each refused step
+now returns the change it made to the arrivals' code and to the closure's (`SectionReceipt::refused`),
+and the race prints them by window (`TOWER_REFUSALS`), so a window reads which code the refused
+steps raised. The smoke's read is now a declared partition, the passage's first 288 sections
+(`TOWER_LAP_SECTIONS`), projected at the first window's measured 572 ms a section: 165 s, inside the
+three minutes, with the learner rested and its writing read after them.

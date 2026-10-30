@@ -5895,6 +5895,10 @@ pub struct SectionReceipt {
     /// Under the heading, each clocked level's closure on the section's opening read (empty
     /// without it); its code joins the arrivals' in the certificate, never in `code_before`.
     pub closure: Vec<ClosureReading>,
+    /// Each step the certificate refused, in order: the change it made to the arrivals' code and
+    /// to the closure's (after minus before, on `2^(−20)` bits), so a refusal reads which code
+    /// the step raised.
+    pub refused: Vec<(i64, i64)>,
 }
 
 /// [agent-inferred, October 30] A clocked level's closure over a section's opening read
@@ -6119,6 +6123,8 @@ impl TowerLearner {
         // family's grain; then the section deposits nothing.
         let mut halvings = 0u32;
         let mut opened = false;
+        let closure_before: i64 = closure.iter().map(|c| c.code).sum();
+        let mut refused = Vec::new();
         let (receipt, mut slot) = loop {
             let mut candidate = self.tower.clone();
             let mut moved = false;
@@ -6147,7 +6153,7 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure }, Slot::Opened);
+                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -6165,8 +6171,11 @@ impl TowerLearner {
                         opened = true;
                     }
                 }
-                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure }, Slot::Reread);
+                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused }, Slot::Reread);
             }
+            let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
+            let closure_after: i64 = reread.closures.iter().flatten().flatten().map(|&(m, t)| face_code(m, t)).sum();
+            refused.push((arrivals_after - code_before, closure_after - closure_before));
             halvings += 1;
         };
         // The next founding, proposed on the tower the step left and held for the next section.
@@ -9669,7 +9678,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new() };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -10381,6 +10390,28 @@ mod tests {
             learner.tower.read_cells(&mut direct, stream).expect("read");
             assert_eq!(state, &direct);
         }
+    }
+
+    /// A refused step reads which code it raised: one refusal a halving, each with its change to
+    /// the arrivals' code and to the closure's, whose sum never falls by more than the faces'
+    /// rounding (the certificate refused it). A rate of `2^(−1)` steps far past the curvature, so
+    /// the first steps are refused.
+    #[test]
+    fn a_refused_step_reads_the_codes_it_raised() {
+        let classes = news_passage();
+        let mut learner = TowerLearner::new(headed(3), 1);
+        let mut states = vec![learner.tower.rest()];
+        let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
+        assert!(receipt.halvings > 0, "a step at the rate 2^(-1) was certified at once");
+        assert_eq!(receipt.refused.len(), receipt.halvings as usize);
+        let faces = (receipt.cells + receipt.closure.iter().map(|c| c.ticks).sum::<usize>()) as i64;
+        assert!(receipt.refused.iter().all(|&(a, c)| a + c >= -faces), "{:?}", receipt.refused);
+        assert!(receipt.refused.iter().any(|&(_, c)| c != 0), "the closure's code moved under no refused step");
+        let mut plain = TowerLearner::new(packeted(3), 1);
+        let mut states = vec![plain.tower.rest()];
+        let receipt = plain.section(&mut states, &[&classes[..31]]).expect("section");
+        assert_eq!(receipt.refused.len(), receipt.halvings as usize);
+        assert!(receipt.refused.iter().all(|&(_, c)| c == 0), "a closure without the heading");
     }
 
     /// Under a news clock a stream's open face and phase are its state: a passage read in two
