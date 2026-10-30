@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent steps at the closure's scale, its acceptance fixed before the build (§12)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts, fixed before the build (§13)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -635,4 +635,64 @@ carried unrepaired into a new consumer* (the refusals' cause is removed at the f
 it, not by a smaller step for every family); *bits read as progress* (acceptance 18 shows the
 writing and the held-out reads); *a design thought in the programming language* (the scale is the
 spread of the readout's sum over the width, the same `2^(−s)` the closure's face takes).
+
+**At the card** (435cb9e39, B-PC's RTX 4080 SUPER alone under the card's lock).
+
+- The card tests passed, 43 of 43, and the parity was equal (every learner).
+- **Acceptance 18 failed on every part.** The refusals after the first window were 176 (the bar
+  12, the unscaled lap 144), the arrivals ended at 2.950 bits a byte (the unscaled lap 2.721, C′
+  2.740), and the held-out reads were dev 2.986 and the GSM8K region 3.080 against C′'s 2.797 and
+  2.894. The lap ran 82.6 s against 152.4 s (0.54), peak resident set 698,664 KiB. The writing ran
+  six prompts to 1,024 classes in 8.2 s and stays outside the repository.
+
+| After section | Arrivals | − C′ | Unscaled | Refusals that window | Unscaled | L4 closure − flat | L5 |
+|---|---|---|---|---|---|---|---|
+| 32 | 5.376 | −0.122 | 5.103 | 18 | 53 | +0.307 | +0.223 |
+| 64 | 4.065 | −0.037 | 3.901 | 17 | 20 | +0.242 | +0.191 |
+| 96 | 3.719 | +0.085 | 3.454 | 20 | 2 | +0.242 | +0.197 |
+| 128 | 3.507 | +0.143 | 3.165 | 26 | 19 | +0.238 | +0.199 |
+| 160 | 3.321 | +0.182 | 2.998 | 25 | 23 | +0.228 | +0.202 |
+| 192 | 3.168 | +0.208 | 2.872 | 28 | 29 | +0.223 | +0.204 |
+| 224 | 3.076 | +0.219 | 2.810 | 29 | 28 | +0.221 | +0.203 |
+| 256 | 2.950 | +0.210 | 2.721 | 31 | 23 | +0.219 | +0.202 |
+
+**What it located.** A step that only overshot would be refused less at an eighth of its size. The
+descent's step at an eighth was refused as often after the first window, and the descent learned
+slower, so the arrivals lost the heading's gain. Beside the holds (`D` held at zero reads C′
+exactly, refusals included; `C^→` held still refuses), the refusals come with the descent being
+open, not with the size of its step: once the face reads the heading at all, some family's step
+raises the arrivals although the covector predicted a fall. The law of this section is retired;
+the descent steps at the material's step again.
+
+## 13. Each refused step read by its parts
+
+[agent-inferred, October 30] **The question.** Which part of a refused step raises the arrivals:
+the descent's own step, the heading's read's, or every other family's step moving what the open
+descent reads (the clocked levels' modes, through `r̂` and the clock's ticks)? The holds answer it
+only on average over a lap; the reading answers it at each refusal.
+
+**The reading.** Under a run's declared reading (`TOWER_REFUSAL_PARTS=1`, the learner's
+`refusal_parts`), each refused step is read again three times at the same halvings, with only the
+descent's entries stepped, only the heading's read's, and only every other family's (the moves
+among them), and returns each read's change to the arrivals' code (`SectionReceipt::refused_parts`;
+the race prints `TOWER_REFUSAL_PARTS` a window: how many refused steps each part alone raised, and
+each part's summed change). It costs three forwards a refusal and moves nothing.
+
+**Acceptance, fixed before the build.**
+19. On the host the reading moves nothing: the learner, the streams' states and the receipt are
+    those of the learner without it, and every refused step returns three changes.
+20. On the 4080 over the passage's first 256 sections at a38c1c63f's law, the lap's arrivals and
+    refusals are a38c1c63f's to every printed digit (the reading moves nothing on the card), and each
+    window reports which parts alone raised the arrivals. The reading is decided by the counts: the
+    part that alone raises the arrivals at most refusals is the next law's subject.
+
+The lap's projection adds the reading's forwards: a38c1c63f's lap carried 732 forwards in 67.5 s,
+92 ms each, and refused 197 steps, so the reading adds `3 × 197 × 92 ms = 54.4 s` at most at that
+rate; the projection is `152.4 s + 54.4 s = 206.8 s`, the deadline 207 s, and window `k`'s limit
+`k × 18,781 ms` plus `276 ms` for each refusal read so far.
+
+Recorded failures this could repeat: *a located cause carried unrepaired into a new consumer* (the
+reading changes no law; the next law follows its counts); *a refusal answered with a larger limit*
+(the projection grows by the reading's own measured forwards, fixed before launch, and the lap
+keeps its 256 sections).
 

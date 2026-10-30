@@ -3583,6 +3583,16 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         }
         println!("TOWER_HOLD {words} entries={}", learner.held.iter().map(|r| r.len()).sum::<usize>());
     }
+    // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_PARTS=1`): each refused step
+    // read again under the descent's, the heading's read's and every other family's step alone
+    // (the record's §13); it costs three forwards a refusal and moves nothing.
+    if std::env::var("TOWER_REFUSAL_PARTS").is_ok_and(|v| v == "1") {
+        if learner.tower.heading_families()[0].is_empty() {
+            return Err("TOWER_REFUSAL_PARTS reads the heading's parts, and this tower has no heading".into());
+        }
+        learner.refusal_parts = true;
+        println!("TOWER_REFUSAL_PARTS declared");
+    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3613,6 +3623,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         // The window's refused steps: how many, how many raised the arrivals' code and how many
         // the closure's, and the changes they made.
         let mut refusals = (0usize, 0usize, 0usize, 0i64, 0i64);
+        let mut refusal_parts = ([0usize; 3], [0i64; 3]);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3741,6 +3752,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             for &(arrivals, closure) in &receipt.refused {
                 refusals = (refusals.0 + 1, refusals.1 + usize::from(arrivals > 0), refusals.2 + usize::from(closure > 0), refusals.3 + arrivals, refusals.4 + closure);
             }
+            for parts in &receipt.refused_parts {
+                for (n, &change) in parts.iter().enumerate() {
+                    refusal_parts.0[n] += usize::from(change > 0);
+                    refusal_parts.1[n] += change;
+                }
+            }
             if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
@@ -3753,6 +3770,14 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                     "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={} arrivals_change_bits={} closure_change_bits={}",
                     pass, k + 1, refusals.0, refusals.1, refusals.2, signed_bits(refusals.3), signed_bits(refusals.4)
                 );
+                if learner.refusal_parts {
+                    let (rose, change) = refusal_parts;
+                    println!(
+                        "TOWER_REFUSAL_PARTS pass={} section={} descent_rose={} read_rose={} rest_rose={} descent_change_bits={} read_change_bits={} rest_change_bits={}",
+                        pass, k + 1, rose[0], rose[1], rose[2], signed_bits(change[0]), signed_bits(change[1]), signed_bits(change[2])
+                    );
+                    refusal_parts = ([0; 3], [0; 3]);
+                }
                 refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                 window = (0, 0);
