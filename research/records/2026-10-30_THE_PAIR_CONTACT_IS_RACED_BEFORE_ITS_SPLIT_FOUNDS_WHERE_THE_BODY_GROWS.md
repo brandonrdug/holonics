@@ -1,8 +1,8 @@
 # The pair contact is raced before its split founds where the body grows
 
 Refs #404 #408. Status: [the race's contact law and its acceptance fixed before the race; the split's design
-and acceptance fixed before its build, its host built (§7), its certificate priced after the first
-measurement (§4); agent-inferred, October 30].
+and acceptance fixed before its build, its host built and the card equal to it on the RTX 4080 SUPER
+(§7), its certificate priced after the first measurement (§4); agent-inferred, October 30].
 Claude (opus), design lead. Read beside
 [the radix record §2](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#2-the-boundary-free-energy-is-the-two-part-code-and-it-founds-prunes-and-recharts),
 which states the split this record builds toward, and
@@ -187,6 +187,12 @@ cells sum in 128 bits, so neither side's carrier decides.
 
 ## 7. Receipts
 
+**§3 acceptance 1, the pair contact on the card** (October 30, RTX 4080 SUPER, head `3b7b15869`, alone
+on the card). `tower_pass parity` at the race's four-level declaration with `pair`, 24 streams, 32
+sections of 128: 98,304 faces, 12,718,112 gradient entries and every learner equal, none unequal.
+Host 14,042 ms, card 4,729 ms (181 forwards in 3,743 ms, 64 reverses in 413 ms); wall 24.1 s against a
+600 s deadline, peak resident set 1,580,380 KiB. Acceptance 1 holds.
+
 **The split on the host** (October 30, the cloud container's host, unit tests only; no learning run).
 `cargo test -p holonics --lib hnn::tower::split`: 4 of 4 pass.
 
@@ -212,5 +218,15 @@ What it measured: the squares' curvature and the slope at zero do not describe t
 tower's scale. The measured line is not the test's quadratic (both readings lie off any parabola
 through zero with slope `g`). The tiny tower's prior precision is `τ = 4`, so `θ̂` is near one and the
 founding is far from the local regime; at the race's width 64, `τ = 1,024`. The claim of
-acceptance 4 (the certificate admits more than it refuses) is not met on this passage. The card's
-split read (acceptance 5) and the race (acceptance 6) are owed, the race only if §3's claim holds.
+acceptance 4 (the certificate admits more than it refuses) is not met on this passage.
+
+**§5 acceptance 5, the split on the card** (October 30, RTX 4080 SUPER, head `e9e6ce65c`, alone on the
+card). `tower_pass parity … split` at the race's four-level declaration with paired pair contacts
+(512 contacts, 1,024 dormant copies), 24 streams, 32 sections of 128, host and card learners founding
+in lockstep: 98,304 faces, 19,075,104 gradient entries and every learner equal; on every section the
+split reads (score, squares, turned sums), the foundings and the carried directions equal, none
+unequal; 5 foundings admitted over the 32 sections. The card formed the split read in 1,024 blocks
+(one per dormant pair of a level) of 256 threads. Host 22,826 ms, card 7,666 ms (265 forwards in
+5,740 ms, 64 reverses in 620 ms); wall 43.8 s against a 600 s deadline, peak resident set
+2,020,612 KiB. The build reported no `nvcc` or `ptxas` error. Acceptance 5 holds. The race
+(acceptance 6) is owed, only if §3's claim holds.
