@@ -11,6 +11,7 @@
 //! on its face.
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
+use holonics::hnn::tower::split::PairedContacts;
 use holonics::hnn::tower::{code_of, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
@@ -3384,6 +3385,13 @@ pub(super) enum Joined {
     /// The passage with the packets ([`Tower::join_packets`]): each clocked level's push, gate and
     /// turn hear the packet its clock closed.
     PassagePackets,
+    /// The pair contacts paired at the founding ([`TowerLearner::paired`]), each section founding
+    /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
+    /// learner (`PAIRED.<pass>`, `PAIRED`).
+    Split,
+    /// The pair contacts paired at the founding with every founding refused: the copies stay
+    /// dormant throughout, the split race's control (what the doubled return alone does).
+    DormantSplit,
 }
 
 /// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
@@ -3392,7 +3400,8 @@ pub(super) enum Joined {
 pub(super) const MUTUAL_SHIFT: u32 = 2;
 
 /// The passes: `args` are `KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS
-/// OUT [FROM FROM_SHA]`. Each section's forward and reverse run through `realization`
+/// OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]`, the paired directions named only when a founding split
+/// run continues (`CONTACTS` is the field before its pairing). Each section's forward and reverse run through `realization`
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
@@ -3416,6 +3425,16 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let rate_bits: u32 = args[9].parse()?;
     let out = Path::new(&args[10]);
     let classes = &reading.train;
+    let paired_run = matches!(joined, Joined::Split | Joined::DormantSplit);
+    if paired_run && (looking.is_some() || contact != ContactLaw::Pair) {
+        return Err("a split run trains the pair tower on its passage, without a look".into());
+    }
+    if joined == Joined::Split && !realization.forms_split() {
+        return Err(format!("{} does not form the paired contacts' split read", realization.realization()).into());
+    }
+    if (joined == Joined::Split && args.len() == 13) || (joined != Joined::Split && args.len() > 13) {
+        return Err("a founding split run continues with its learner and its paired directions; every other run with its learner alone".into());
+    }
     if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
         return Err("the training text must hold one section a stream".into());
     }
@@ -3426,10 +3445,19 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     }
     // A run continues a rested learner (its tower and moments) when one is named; its declaration
     // and rate must be the declared ones.
+    // A paired run's learner carries the field widened by two.
+    let carried = if paired_run { TowerDeclaration { contacts: declaration.contacts * 2, ..declaration } } else { declaration };
+    let mut paired: Option<PairedContacts> = None;
     let mut learner = if args.len() >= 13 {
         let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
-        if learner.tower.declaration != declaration || learner.rate_bits != rate_bits || learner.tower.news() != news {
+        if joined == Joined::Split {
+            let text = pinned_read(&args[13], &args[14], STATE_BUDGET)?;
+            let directions = PairedContacts::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+            directions.admits(&learner.tower).map_err(|e| e.to_string())?;
+            paired = Some(directions);
+        }
+        if learner.tower.declaration != carried || learner.rate_bits != rate_bits || learner.tower.news() != news {
             return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
         if learner.tower.participation().map(|p| p.section) != (joined == Joined::Participation).then_some(section) {
@@ -3476,6 +3504,16 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_packets().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={} packets", learner.tower.news().map_or(0, |c| c.first()));
             }
+            // A split run widens the contact field by two at the founding, every pair dormant
+            // ([`TowerLearner::paired`]); the founding run carries their directions.
+            Joined::Split | Joined::DormantSplit => {
+                let (widened, directions) = learner.paired().map_err(|e| e.to_string())?;
+                learner = widened;
+                println!("TOWER_PAIRED contacts={} dormant={} founding={}", learner.tower.declaration.contacts, directions.dormant(), joined == Joined::Split);
+                if joined == Joined::Split {
+                    paired = Some(directions);
+                }
+            }
         }
         learner
     };
@@ -3511,6 +3549,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
         let mut sections_run = sections_a_pass;
+        let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
             let mut lookers: Vec<Looker> = look_keys.drain(..).enumerate().map(|(s, keys)| Looker::new(s * chunk, (s + 1) * chunk, keys)).collect();
             let mut k = 0usize;
@@ -3591,7 +3630,25 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             let compared: Option<Vec<Vec<Option<usize>>>> =
                 reading.train_compared.as_ref().map(|mask| ranges.iter().map(|r| r.clone().map(|i| mask[i].then_some(classes[i])).collect()).collect());
             let slices: Option<Vec<&[Option<usize>]>> = compared.as_ref().map(|c| c.iter().map(|v| v.as_slice()).collect());
-            let receipt = match learner.section_realized(&mut states, &parts, slices.as_deref(), realization) {
+            let result = match paired.as_mut() {
+                Some(directions) => learner.section_founding(&mut states, &parts, slices.as_deref(), realization, directions).map(|(receipt, founding)| {
+                    if !founding.foundings.is_empty() {
+                        let f = &founding.foundings[0];
+                        proposed += 1;
+                        if founding.admitted {
+                            admitted[f.level] += 1;
+                        }
+                        println!(
+                            "TOWER_FOUNDING pass={} section={} level={} pair={} predicted_bits={} reread_bits={} remeasured_bits={} admitted={} dormant={}",
+                            pass, k + 1, f.level, f.pair, signed_bits(f.predicted), signed_bits(founding.reread - founding.code_before),
+                            founding.remeasured.map_or("none".into(), |c| signed_bits(c - founding.code_before)), founding.admitted, founding.dormant
+                        );
+                    }
+                    receipt
+                }),
+                None => learner.section_realized(&mut states, &parts, slices.as_deref(), realization),
+            };
+            let receipt = match result {
                 Ok(receipt) => receipt,
                 Err(e) => {
                     println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
@@ -3625,6 +3682,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;
         println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
+        if let Some(directions) = &paired {
+            let text = directions.to_text();
+            let name = format!("PAIRED.{pass}");
+            write_new(&out.join(&name), text.as_bytes())?;
+            println!("TOWER_PAIRED {name} paired_bytes={} paired_sha256={} proposed={proposed} admitted={admitted:?} dormant={}", text.len(), sha256(text.as_bytes())?, directions.dormant());
+        }
         let regions = held_out(&learner.tower, &reading.dev, &reading.dev_lengths, &reading.dev_roles, streams, section, realization)?;
         let (dev_code, dev_coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
         println!(
@@ -3635,6 +3698,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     }
     let text = learner.to_text();
     write_new(&out.join("STATE"), text.as_bytes())?;
+    if let Some(directions) = &paired {
+        let text = directions.to_text();
+        write_new(&out.join("PAIRED"), text.as_bytes())?;
+        println!("TOWER_PAIRED PAIRED paired_bytes={} paired_sha256={}", text.len(), sha256(text.as_bytes())?);
+    }
     println!("TOWER_DONE state_bytes={} state_sha256={} elapsed_ms={}", text.len(), sha256(text.as_bytes())?, started.elapsed().as_millis());
     Ok(())
 }

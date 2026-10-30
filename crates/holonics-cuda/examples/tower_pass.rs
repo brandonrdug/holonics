@@ -29,7 +29,8 @@
 //!   trainer reads it.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
-//!   `train-two-ladder-pair-tower-classes`,
+//!   `train-two-ladder-pair-tower-classes`, `train-two-ladder-split-tower-classes`,
+//!   `train-two-ladder-dormant-split-tower-classes`,
 //!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
