@@ -35,6 +35,8 @@
 //   memory across the cells. With `keep`, the cell's temporaries are written for the reverse.
 // - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
 //   (cells are independent there: each reads its own forward temporaries and covector).
+// - `tower_split_read`: the paired contacts' split read (`Tower::split_read_of`), one block a
+//   dormant pair of one level, over every stream's cells in chunks of the block.
 // - `tower_pair_biases`: the pair contact's foil only, one thread a bias entry summing its own
 //   covector over every cell (the pair contact's and the rectifier's biases ride their drive's
 //   outer sum).
@@ -83,6 +85,8 @@ typedef unsigned __int128 uwide;
 #define GATE_REACH 2
 #define TURN_BITS 16
 #define READ_BITS 20
+// A split read's score term is refused at 2^SCORE_BITS (`split::SCORE_BITS`).
+#define SCORE_BITS 48
 
 struct TowerLevel {
     uint64_t move_re, move_im, push_re, push_im, read_re, read_im, contact, contact_bias, ret,
@@ -154,6 +158,10 @@ struct TowerLaw {
     // else the clocked levels L − F that carry one, `Tower::join_packets`): a clocked level's push,
     // gate and turn read the ratio of the packet its fine level moved since its last tick.
     uint32_t passage, packets;
+    // The split read (`split = 0` without it): the pair contact's reverse keeps each contact's
+    // covector δv at its product (`tower_reverse_contacts`), which `tower_split_read` reads
+    // against each dormant pair's direction (`holonics::hnn::tower::split`).
+    uint32_t split, split_pad;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -331,6 +339,12 @@ struct TowerFrame {
     int64_t *pk_dx, *pk_dread;
     int64_t *pk_cov;
     uint64_t *r_pk_read, *r_pk_face_re, *r_pk_face_im, *r_pk_dread;
+    // The split read (each empty without it): each contact's covector δv on 2^(−24)
+    // ([S][T][L][F]); each pair's direction on 2^(−16) ([L][H][W], H = F/2, zero where the pair is
+    // founded); and each pair's read: its score, its squares and its turned sum ([L][H][2 + W]).
+    int64_t *split_dv;
+    const int32_t *split_dir;
+    wide *split_out;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -2212,6 +2226,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
     uint64_t mb = 0;
     for (uint32_t i = tid; i < F; i += B) {
         const int64_t v = fit64(rel(dot(fr.theta + lv.ret + i, F, W, dy, n_v), MATERIAL_BITS), &st);
+        if (law.split != 0) {
+            fr.split_dv[ql * F + i] = v;
+        }
         const int32_t a = fr.drive[ql * F + i];
         int64_t ga = a > 0 ? v : 0;
         if (law.contact != 0) {
@@ -3570,5 +3587,93 @@ extern "C" __global__ void tower_pair_biases(TowerLaw law, TowerFrame fr) {
         }
         const TowerLevel lv = law.level[l];
         fr.gradient[(second ? lv.pair_bias : lv.contact_bias) + i] = acc;
+    }
+}
+
+// The paired contacts' split read (`Tower::split_read_of`), one block a dormant pair `e` of one
+// level `l` (`grid.x` the pair, `grid.y` the level): over every stream's cells, in chunks of the
+// block (one thread a cell), each cell's `y = v·r̂`, `φ = y²`, `δv = δv_e + δv_(e+H)`, its score
+// term `s = δv φ` and its turned weight `δv y` (each released by 16, as the host releases them);
+// the score and its squares summed over the block, and the turned sum `Σ (δv y) r̂` over `B/W`
+// groups of each chunk's cells (integer sums: any order). A score term at or past 2^SCORE_BITS is
+// refused, as the host refuses it: below it, the squares of fewer than 2^31 cells stay below 2^127.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_split_read(TowerLaw law, TowerFrame fr) {
+    const uint32_t e = blockIdx.x, l = blockIdx.y, tid = threadIdx.x, B = blockDim.x;
+    const uint32_t W = law.width, F = law.contacts, H = F / 2, L = law.levels;
+    const uint32_t G = B / W > 0 ? B / W : 1;
+    const uint64_t Q = (uint64_t)law.streams * law.cells;
+    extern __shared__ __align__(16) unsigned char smem[];
+    unsigned char *at = smem;
+    wide *part = (wide *)carve(at, sizeof(wide) * G * W);
+    uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
+    wide *turn = (wide *)carve(at, sizeof(wide) * B);
+    int32_t *v = (int32_t *)carve(at, 4ull * W);
+    __shared__ uint32_t st;
+    if (tid == 0) {
+        st = 0;
+    }
+    const int32_t *dir = fr.split_dir + ((uint64_t)l * H + e) * W;
+    for (uint32_t j = tid; j < W; j += B) {
+        v[j] = dir[j];
+    }
+    for (uint32_t idx = tid; idx < G * W; idx += B) {
+        part[idx] = 0;
+    }
+    __syncthreads();
+    const wide bound = (wide)1 << SCORE_BITS;
+    wide score = 0;
+    uwide squares = 0;
+    for (uint64_t c0 = 0; c0 < Q; c0 += B) {
+        const uint64_t q = c0 + tid;
+        wide qv = 0;
+        if (q < Q) {
+            const uint64_t ql = q * L + l;
+            const int32_t *r = fr.read + ql * W;
+            wide dotv = 0;
+            for (uint32_t j = 0; j < W; j++) {
+                dotv += (wide)v[j] * (wide)r[j];
+            }
+            const wide y = rel(dotv, FACE_BITS);
+            const wide phi = rel(y * y, FACE_BITS);
+            const wide dv = (wide)fr.split_dv[ql * F + e] + (wide)fr.split_dv[ql * F + e + H];
+            const wide s = rel(dv * phi, FACE_BITS);
+            if (s >= bound || s <= -bound) {
+                atomicOr(&st, TOWER_REFUSED_CARRIER);
+            } else {
+                score += s;
+                squares += (uwide)(s * s);
+            }
+            qv = rel(dv * y, FACE_BITS);
+        }
+        turn[tid] = qv;
+        __syncthreads();
+        const uint32_t chunk = (uint32_t)(Q - c0 < B ? Q - c0 : B);
+        for (uint32_t idx = tid; idx < G * W; idx += B) {
+            const uint32_t g = idx / W, j = idx % W;
+            const uint32_t from = (uint32_t)((uint64_t)chunk * g / G), to = (uint32_t)((uint64_t)chunk * (g + 1) / G);
+            wide sum = 0;
+            for (uint32_t c = from; c < to; c++) {
+                sum += turn[c] * (wide)fr.read[((c0 + c) * L + l) * W + j];
+            }
+            part[idx] += sum;
+        }
+        __syncthreads();
+    }
+    const wide total = (wide)block_sum((uwide)score, redw);
+    const wide sq = (wide)block_sum(squares, redw);
+    wide *out = fr.split_out + ((uint64_t)l * H + e) * (2 + W);
+    for (uint32_t j = tid; j < W; j += B) {
+        wide sum = 0;
+        for (uint32_t g = 0; g < G; g++) {
+            sum += part[g * W + j];
+        }
+        out[2 + j] = sum;
+    }
+    if (tid == 0) {
+        out[0] = total;
+        out[1] = sq;
+        if (st != 0) {
+            atomicOr(fr.status, st);
+        }
     }
 }

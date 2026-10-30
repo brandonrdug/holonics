@@ -44,6 +44,10 @@ const TURN_BITS: u32 = 40;
 /// `log₂(1 + r)`'s grain, `2^(−20)`: the code reading's.
 const PRICE_BITS: u32 = READ_BITS;
 
+/// A cell's score term is refused at `2^48`, so its square is below `2^96` and the squares of
+/// fewer than `2^31` cells sum below `2^127` (the card sums them in the same 128 bits).
+pub const SCORE_BITS: u32 = 48;
+
 /// [definition] **The paired contacts' carried directions**: `levels[l][e]` is the unit direction
 /// of dormant pair `e` (contacts `e` and `e + f/2`) on the read it shares, on `2^(−16)`, or `None`
 /// once the pair is founded and its copies learn on their own.
@@ -340,7 +344,7 @@ impl PairedContacts {
     }
 
     /// Whether these directions are `tower`'s paired contacts'.
-    fn admits(&self, tower: &Tower) -> Result<()> {
+    pub fn admits(&self, tower: &Tower) -> Result<()> {
         let d = &tower.declaration;
         if d.contact != ContactLaw::Pair || d.contacts % 2 != 0 || self.levels.len() != d.levels {
             return refuse("paired directions of another tower");
@@ -463,6 +467,11 @@ impl Tower {
                             let y = release(v.iter().zip(r).map(|(&a, &b)| a as i128 * b as i128).sum(), FACE_BITS);
                             let phi = release(y * y, FACE_BITS);
                             let s = release(dv * phi, FACE_BITS);
+                            // Below 2^48 a term's square summed over fewer than 2^31 cells stays
+                            // below 2^127, the card's bound as the host's.
+                            if s.unsigned_abs() >= 1 << SCORE_BITS {
+                                return refuse("a pair's score term outgrew its carrier");
+                            }
                             read.score += s;
                             read.squares = read.squares.checked_add(s * s).ok_or(TowerError::Refused("a pair's squares outgrew their 128-bit carrier"))?;
                             let q = release(dv * y, FACE_BITS);
