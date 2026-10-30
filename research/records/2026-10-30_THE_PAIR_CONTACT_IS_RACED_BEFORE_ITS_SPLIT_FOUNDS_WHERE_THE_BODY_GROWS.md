@@ -52,6 +52,20 @@ differs.
 3. Short of the claim, the pair contact does not carry the race at this declaration; the split waits
    on a contact law it can grow on, and the next item in the order (the `{−1, 0, 1}` collapse,
    radix record §3) goes first.
+4. **On C′** [agent-inferred, October 30, fixed after the pair race and before its own]. The race
+   kept two winners apart: C′'s clocked levels hearing packets beat the four arrival levels, and the
+   pair contact beat the rectifier on them. Both act on different terms of one forward (the clock on
+   the levels' modes and inputs, the contact law on the face's read into the residual stream), so
+   they should compose. `train-two-ladder-stacked-news-packet-pair-tower-classes` is C′
+   (`train-two-ladder-stacked-news-packet-tower-classes`) with every contact the pair contact,
+   founded on C′'s draws. Acceptance: on the host, the packets' covector under pair contacts with the
+   passage opened predicts the code difference (`hnn::tower` test); on the card, `tower_pass parity
+   … 8 2 4 packets-pair` at C′'s six-level declaration, 24 streams, 32 sections of 128, every face,
+   gradient entry and learner equal; then one hour on the card with C′'s passage, keys, width,
+   modes, contacts, levels, clock, streams, section and rate. The claim: its mean held-out reading
+   over its hour's last five laps is below both C′'s and the pair tower's means over the same laps.
+   Short of it, the composition does not carry the race, and the pair contact stays on the four
+   arrival levels.
 
 ## 4. The founded split, designed before it is built
 

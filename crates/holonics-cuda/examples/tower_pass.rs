@@ -1,14 +1,14 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair | split]`:
-//!   founds the gated tower (rectifying, or with pair contacts when `pair` or `split` is; on both turn ladders) on the keys, its levels on the news
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | pair | split]`:
+//!   founds the gated tower (rectifying, or with pair contacts when `pair`, `packets-pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
 //!   the passage joined last (`Tower::join_passage`) when `passage` is (and the packets after it,
-//!   `Tower::join_packets`, when `packets` is), and runs
+//!   `Tower::join_packets`, when `packets` or `packets-pair` is), and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
@@ -31,7 +31,7 @@
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
 //!   `train-two-ladder-pair-tower-classes`, `train-two-ladder-split-tower-classes`,
 //!   `train-two-ladder-dormant-split-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, `train-two-ladder-stacked-news-packet-pair-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
@@ -83,7 +83,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair | split]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | pair | split]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -95,14 +95,15 @@ fn parity(args: &[String]) -> Result<()> {
         [bits, radix, first] => Some(NewsClock::above(bits.parse()?, radix.parse()?, first.parse()?)?),
         _ => return Err(USAGE.into()),
     };
-    // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′.
-    let packets = word == Some("packets");
+    // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′;
+    // `packets-pair` is C′ with every contact the pair contact.
+    let packets = word == Some("packets") || word == Some("packets-pair");
     // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
     // `train-two-ladder-pair-tower-classes`.
     // `split` founds the pair contacts and pairs them, every pair dormant
     // (`TowerLearner::paired`), the founded split's sections (`TowerLearner::section_founding`).
     let split = word == Some("split");
-    let pair = word == Some("pair") || split;
+    let pair = word == Some("pair") || word == Some("packets-pair") || split;
     let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
     if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
