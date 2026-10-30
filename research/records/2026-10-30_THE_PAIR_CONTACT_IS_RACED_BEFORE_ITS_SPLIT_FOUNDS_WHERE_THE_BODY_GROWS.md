@@ -414,3 +414,34 @@ certificate.* Over 24 sections (8 to 31), the test proposed 7 foundings; the nex
 which lowered it by less than its price; the seventh was proposed on the last section. Proposed on
 256 cells a section, the coordinate the test fits mostly does not carry to the next section; the
 race's sections hold 40,960.
+
+**§3 acceptance 4, C′'s hour with pair contacts** (October 30, RTX 4080 SUPER, head `9c0cf2f8a`,
+alone on the card). `train-two-ladder-stacked-news-packet-pair-tower-classes` on C′'s passage, keys
+and six-level declaration, one pass a lap, beside C′'s own laps. Seventeen laps, every lap and write
+exit 0; the hour's deadline stopped it at 3,439 s, since its longest lap (205.5 s) more would pass
+3,600 s. Held-out bits a byte:
+
+```text
+lap        0     1     2     3     4     5     6     7     8
+C′+pair 2.132 2.032 1.997 1.974 1.961 1.937 1.930 1.883 1.882
+C′      2.390 2.200 2.082 2.042 1.986 1.968 1.951 1.942 1.930
+
+lap        9    10    11    12    13    14    15    16
+C′+pair 1.895 1.884 1.891 1.830 1.825 1.850 1.862 1.873
+C′      1.919 1.913 1.905 1.901 1.896 1.889 1.890 1.889
+```
+
+**The claim fails.** Over the hour's last five laps (12 to 16) C′ with pair contacts reads 1.848
+on average, below C′'s 1.893 but above the four-level pair race's 1.840 at the same laps. It reads
+below C′ at every lap, by 0.258 at lap 0, narrowing to 0.014 at lap 11, reopening to 0.071 at laps 12
+and 13, and narrowing again to 0.016 at lap 16. From lap 13 the held-out rose three laps running
+(1.825, 1.850, 1.862, 1.873), and so did the training code (1.662, 1.669, 1.680, 1.699) and GSM8K's
+(1.753, 1.784, 1.795, 1.806): the learner lost fit on its own passage, which is not over-fitting.
+Its cause is not located. [agent-inferred candidate, not measured] the six-level tower's pair
+deposits at the race's rate `2^(−7)` overshoot once its moments settle; the four-level pair race at
+the same rate fell at every quarter mark. Card time: a training pass 180 to 195 s, the widest window
+9,078 ms against its 11,578 ms limit.
+
+**Decision** [agent-inferred, October 30]. C′ with pair contacts does not run longer and is not the
+tower the split grows on: the split races on the four-level pair tower, as acceptance 6 declares.
+The rise from lap 13 is the subject of this line's next loop, after acceptance 6 reads.

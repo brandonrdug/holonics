@@ -243,6 +243,26 @@ participation has founded its conduction at that level. (b) The pumped modes' th
 face of the lock with its tie, available to the readings beside the bits. Neither changes a law
 that the tower runs; both are faces read from the same operands.
 
+**Audit (October 30) [agent-inferred].** Read against the built tower:
+- Consumer (a) is built: `Tower::participation_bridge` (`hnn/tower/reading.rs`) reads each
+  participating level's `W₁ᵃ` beside its contacts, and `read-tower-race` prints it as
+  `TOWER_RACE_BRIDGE` every lap. It reads whether the join conducts, not the founding inequality
+  itself; the inequality's empirical form is the split's certificate (the next section coded in
+  fewer bits by the description price, `split::certified_price`), which the participation join
+  does not yet carry.
+- Consumer (b) is held unbuilt. No race tower pumps (every class race declares `pumped: false`;
+  only the unit towers pump), so the three-valued reading would have no consumer, and an
+  unconsumed reading is the reduction the guide refuses. It is built with the first race that
+  pumps.
+- The odd-lock claim holds in the code: a reversed strand turns by `(q − θ) mod q` and a negating
+  key maps a residue to `(q − r) mod q`, both reflections and so permutations on any ring; polarity
+  rides the separate `reversed` sheet, and no half-turn acts on an odd ring.
+- Dormancy is built as the dormant split (`split::Pairs::Dormant`): a tied pair learns as the
+  unsplit pair, so carrying the coordinate costs nothing until it is founded, as §2's first
+  corollary says. §2's second corollary, pruning a founded coordinate back to dormancy, is not
+  built: a certified founding never re-ties. It becomes the next loop's subject if the split race
+  shows foundings accumulating without its lap readings passing the dormant control's.
+
 ## 4. Reach is contact and friction
 
 Brandon pointed out on October 29 that the first wording of this section, cultivated reach, names
@@ -310,6 +330,32 @@ nothing and selects no lap.
 **Acceptance.** The reading is defined before the race runs; its two code lengths come from the same
 card read as the race's held-out bits; the frictions are expected, not claimed, to move toward the
 octaves of the passage's question-to-answer distances as `I_field` grows.
+
+**The first reading** (October 30, RTX 4080 SUPER; `read-tower-race` through the card's route on
+rested lap states, 320 streams, sections of 128, the races' three prompts; 16 to 17.5 s and at most
+250,412 KiB each). Neither race participates, so no bridge line is read. Modes of the six levels'
+768 whose friction matches a memory of 32 classes or more (in the level's own ticks), the summed code
+of the three prompts' continuations after their own prompt, and the summed flux over the six
+prompt pairs:
+
+```text
+                     modes ≥ 2^5   own code (bits)   flux (bits)
+C′ lap 0                 292           31,093           105.7
+C′ lap 45                 22           23,236           384.8
+C′+pair lap 0            228           27,483           282.5
+C′+pair lap 16            78           23,506           270.2
+```
+
+[measured] The frictions moved toward short memory, not toward the question-to-answer distance
+(each prompt's continuation runs 4,302 to 4,724 classes): over C′'s 45 laps the long-memory modes
+fell from 292 to 22, at every level (the four arrival levels from 165 to 12, the two above them
+from 127 to 10), while the flux grew 3.6 times. On C′ with pair contacts 61 of the 78 long modes
+that remain sit in the two levels above the arrival levels, which tick on the stacked clock, and the
+flux did not grow over its hour (282.5 to 270.2) while
+the continuations' own code fell 15%. So the expectation of the acceptance is not met: the reach
+the flux reads is not carried by frictions matched at the arrival levels. [agent-inferred] Where
+the passage's prompts reach their answers, it is through the coarse-clocked levels, whose tick
+already multiplies a short memory into a long distance; three prompts are too few to say more.
 
 ## 5. The four faces are one medium
 
