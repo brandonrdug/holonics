@@ -495,13 +495,15 @@ fn the_cards_clocked_participating_pair_contact_holds_an_uncompared_place_as_the
 /// contacts of every level the news clock holds read the current passing it, `W₁ˣ x`, beside
 /// their read of the level's face; 32 sections equal face by face, covector entry by entry, learner
 /// for learner and state for state, on the clock from level 1 (level 1 ticking none, once or
-/// several times at an arrival) and, on three levels, from level 2 (levels 0 and 1 ticking at every
-/// arrival and carrying no `W₁ˣ`).
+/// several times at an arrival), on three levels from level 2 (levels 0 and 1 ticking at every
+/// arrival and carrying no `W₁ˣ`), and on six levels from level 4, past the four levels the law's
+/// parameter words once held in place (each level's words now resident on the card).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), passage: true, ..Faces::default() });
     lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, ..Faces::default() });
 }
 
 /// The same beside participation on the clock's ticks and the pair contact, an uncompared place

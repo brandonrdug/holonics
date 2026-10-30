@@ -247,6 +247,17 @@ Acceptance 1 is `the_clock_begins_above_the_arrival_stack`. Acceptance 2 is
   110.6, and within a tenth at `2^(−8)` and `2^(−9)`. That is the forward's rounding to `2^(−16)`,
   not a covector off by a constant.
 
+**Six levels on the card.** The race's six levels met two walls before any card work. The founding
+reads 1,245,440 key bytes at six levels (852,224 at four) and the race's key file held 1,048,576;
+the race's keys are now the same rule counted to `2^16` (2,097,152 bytes, whose first 1,048,576
+are the old file, so a four-level tower founds the same on either). And the card's law carried its
+levels' words in place, in the kernel's parameter words: 2,256 octets of law and 1,088 of frame at
+four levels, 424 more a level, against the 4,096-octet parameter space, so it refused a fifth.
+Each level's words (with its section, which the law held beside them) are now resident on the
+card, addressed from the law, and the forward carves its per-level ticks, open sites and swell
+from its shared memory by the declared levels: the card carries any number of levels. Its parity
+at six levels is `the_cards_clocked_passage_is_the_hosts_for_thirty_two_sections`' third case.
+
 The recorded failures these choices could repeat: *a located cause carried unrepaired into a new
 consumer* (the passage at the arrival levels is retired before the stacked clock consumes it);
 *bits read as progress* (the claim is a fixed comparison at two laps, with the writings beside it);

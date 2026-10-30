@@ -60,7 +60,6 @@
 typedef __int128 wide;
 typedef unsigned __int128 uwide;
 
-#define TOWER_MAX_LEVELS 4
 #define TOWER_THREADS 256
 // The turned modes' ladder e^(iπ/2^i), i = 0..=TURN_BITS.
 #define TOWER_LADDER 17
@@ -98,6 +97,9 @@ struct TowerLevel {
     uint64_t pa_reach[9];
     // The passage's W₁ˣ (F × W) and max |W₁ˣ| (zero without it).
     uint64_t passage, passage_reach;
+    // A clocked level's section `B r^(l−F)` on 2^(−20) bits (unread below the clock's first
+    // clocked level F and without a clock).
+    uint64_t section;
 };
 
 struct TowerLaw {
@@ -125,13 +127,13 @@ struct TowerLaw {
     // The rotor's moving modes a level (`moving = 0` without a rotor).
     uint32_t moving;
     int64_t ln2;
-    TowerLevel level[TOWER_MAX_LEVELS];
+    // Each level's words, resident on the card (`[L]`), so the law's parameter words do not grow
+    // with the tower's levels.
+    const TowerLevel *level;
     // The news clock (`news = 0` without one, every level then moving once a cell): its first
-    // clocked level F (the levels below it tick at every arrival), each clocked level's section
-    // `B r^(l−F)` on 2^(−20) bits (the others' unread) and the clock's period, the coarsest section
-    // (`NewsClock`).
+    // clocked level F (the levels below it tick at every arrival; each level's section is in its
+    // words) and the clock's period, the coarsest section (`NewsClock`).
     uint32_t news, news_first;
-    uint64_t sections[TOWER_MAX_LEVELS];
     uint64_t period;
     // The strands (`strand_rings = 0` without them): the level whose contacts read them, their
     // rings R, the places of W_sa and W_sb (F × 6R each, W_sb under a pair law) and max |W_sa|,
@@ -799,26 +801,31 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     int64_t *pdis = (int64_t *)carve(at, 8ull * HH * P);
     // The mutual contact's produced face y = J x.
     int64_t *yc = (int64_t *)carve(at, 8ull * W * (law.mutual != 0));
+    // Each level's ticks at the arriving class; participation's open section at each level: the
+    // sites carried open into the call that it still reads (`lead`, zero once the level's section
+    // has closed in the call) and the sites it has admitted since, whose cells `pa_member` lists;
+    // and each level's swell, the maxima the opening read keeps (`[L][4]`).
+    uint32_t *tk = (uint32_t *)carve(at, 4ull * L);
+    uint32_t *pa_lead = (uint32_t *)carve(at, 4ull * L);
+    uint32_t *pa_members = (uint32_t *)carve(at, 4ull * L);
+    uint64_t *sw = (uint64_t *)carve(at, 8ull * 4 * L);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
-    // The news clock: the open face (its masses in `ms`, its total, whether there is one), the
-    // clock's phase, and each level's ticks at the arriving class.
+    // The news clock: the open face (its masses in `ms`, its total, whether there is one) and the
+    // clock's phase.
     __shared__ uwide news_total;
     __shared__ uint64_t news_phase;
     __shared__ uint32_t news_has;
-    __shared__ uint32_t tk[TOWER_MAX_LEVELS];
-    // Participation's open section at each level: the sites carried open into the call that it
-    // still reads (`lead`, zero once the level's section has closed in the call) and the sites it
-    // has admitted since, whose cells `pa_member` lists.
-    __shared__ uint32_t pa_lead[TOWER_MAX_LEVELS];
-    __shared__ uint32_t pa_members[TOWER_MAX_LEVELS];
     if (tid == 0) {
         st = 0;
-        for (uint32_t l = 0; l < TOWER_MAX_LEVELS; l++) {
+        for (uint32_t l = 0; l < L; l++) {
             tk[l] = 1;
-            pa_lead[l] = P && l < L ? fr.pa_open[(uint64_t)s * L + l] : 0;
+            pa_lead[l] = P ? fr.pa_open[(uint64_t)s * L + l] : 0;
             pa_members[l] = 0;
+            for (uint32_t i = 0; i < 4; i++) {
+                sw[l * 4 + i] = 0;
+            }
         }
         news_has = 0;
         news_total = 0;
@@ -851,7 +858,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             sr[j * SR + k] = fr.strand_open[(uint64_t)s * (3 * SR + 1) + j * SR + k];
         }
     }
-    uint64_t sw[TOWER_MAX_LEVELS][4] = {};
     const int32_t *th = fr.theta;
     const int32_t *tt = fr.theta_t;
     const uint64_t *face_roots = fr.roots;
@@ -889,13 +895,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 if (sum < code || news_phase >= law.period) {
                     atomicOr(&st, TOWER_REFUSED_NEWS);
                 }
-                for (uint32_t l = 1; l < L && l < TOWER_MAX_LEVELS; l++) {
+                for (uint32_t l = 1; l < L; l++) {
                     // The levels below the first clocked level tick at every arrival.
                     if (l < law.news_first) {
                         tk[l] = 1;
                         continue;
                     }
-                    const uint64_t section = law.sections[l];
+                    const uint64_t section = law.level[l].section;
                     const uint64_t advanced = section == 0 ? 0 : sum / section - news_phase / section;
                     if (section == 0 || advanced > UINT32_MAX) {
                         atomicOr(&st, TOWER_REFUSED_NEWS);
@@ -1019,7 +1025,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         }
         uint64_t xmax = block_max(m, red);
         for (uint32_t l = 0; l < L; l++) {
-            const TowerLevel &lv = law.level[l];
+            const TowerLevel lv = law.level[l];
             const uint64_t q = qc * L + l;
             const bool ringed = R > 0 && l == law.ring_level;
             // The ring's carried face before the move, each mode's (re, im) on 2^(−16)
@@ -1618,12 +1624,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     }
                 }
             }
-            if (tid == 0 && l < TOWER_MAX_LEVELS) {
+            if (tid == 0) {
                 const uint64_t fmax = fre > fim ? fre : fim;
-                sw[l][0] = xmax > sw[l][0] ? xmax : sw[l][0];
-                sw[l][1] = fmax > sw[l][1] ? fmax : sw[l][1];
-                sw[l][2] = (uint64_t)scale > sw[l][2] ? (uint64_t)scale : sw[l][2];
-                sw[l][3] = dmax > sw[l][3] ? dmax : sw[l][3];
+                uint64_t *sl = sw + l * 4;
+                sl[0] = xmax > sl[0] ? xmax : sl[0];
+                sl[1] = fmax > sl[1] ? fmax : sl[1];
+                sl[2] = (uint64_t)scale > sl[2] ? (uint64_t)scale : sl[2];
+                sl[3] = dmax > sl[3] ? dmax : sl[3];
             }
             __syncthreads();
             m = 0;
@@ -1786,15 +1793,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             atomicOr(fr.status + s, st);
         }
         if (P) {
-            for (uint32_t l = 0; l < L && l < TOWER_MAX_LEVELS; l++) {
+            for (uint32_t l = 0; l < L; l++) {
                 fr.pa_sect[((uint64_t)s * L + l) * 2] = pa_lead[l];
                 fr.pa_sect[((uint64_t)s * L + l) * 2 + 1] = pa_members[l];
             }
         }
         if (keep) {
-            for (uint32_t l = 0; l < L && l < TOWER_MAX_LEVELS; l++) {
+            for (uint32_t l = 0; l < L; l++) {
                 for (uint32_t i = 0; i < 4; i++) {
-                    atomicMax((unsigned long long *)(fr.swell + l * 4 + i), (unsigned long long)sw[l][i]);
+                    atomicMax((unsigned long long *)(fr.swell + l * 4 + i), (unsigned long long)sw[l * 4 + i]);
                 }
             }
         }
@@ -1973,7 +1980,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
     const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
     const uint32_t W = law.width, N = law.modes, F = law.contacts;
     const uint32_t G = B / W > 0 ? B / W : 1;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
     wide *part = (wide *)carve(at, sizeof(wide) * G * W);
@@ -2366,7 +2373,7 @@ extern "C" __global__ void tower_ring_factors(TowerLaw law, TowerFrame fr) {
 extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, B = blockDim.x;
     const uint32_t A = law.alphabet, N = law.modes, L = law.levels, T = law.cells;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     const wide one = (wide)1 << MOVE_BITS;
     // Under a rotor the block holds exactly one thread a mode, and each step's carried covector is
     // exchanged here between the modes of a ring.
@@ -2573,7 +2580,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     const uint64_t q = blockIdx.x, ql = q * law.levels + l;
     const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
     const uint32_t W = law.width, N = law.modes;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
     const uint32_t own = 3 + law.turned + 2 * law.pumped;
@@ -2694,7 +2701,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_participation(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, L = law.levels, T = law.cells, HH = law.pa_heads;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
     int64_t *gb = (int64_t *)carve(at, 8ull * 2 * N);
@@ -2958,7 +2965,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
 // The heads' friction covectors summed over the streams, one block a level.
 extern "C" __global__ void tower_pa_friction(TowerLaw law, TowerFrame fr) {
     const uint32_t l = blockIdx.x, L = law.levels, HH = law.pa_heads;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     for (uint32_t hh = threadIdx.x; hh < HH; hh += blockDim.x) {
         wide sum = 0;
         for (uint32_t s = 0; s < law.streams; s++) {
@@ -3164,7 +3171,7 @@ extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
 // The moves' covectors summed over the streams.
 extern "C" __global__ void tower_moves(TowerLaw law, TowerFrame fr) {
     const uint32_t l = blockIdx.x, N = law.modes, L = law.levels;
-    const TowerLevel &lv = law.level[l];
+    const TowerLevel lv = law.level[l];
     for (uint32_t k = threadIdx.x; k < N; k += blockDim.x) {
         wide re = 0, im = 0;
         for (uint32_t s = 0; s < law.streams; s++) {
@@ -3191,7 +3198,7 @@ extern "C" __global__ void tower_pair_biases(TowerLaw law, TowerFrame fr) {
         for (uint64_t q = 0; q < cells; q++) {
             acc += y[(q * L + l) * F + i];
         }
-        const TowerLevel &lv = law.level[l];
+        const TowerLevel lv = law.level[l];
         fr.gradient[(second ? lv.pair_bias : lv.contact_bias) + i] = acc;
     }
 }
