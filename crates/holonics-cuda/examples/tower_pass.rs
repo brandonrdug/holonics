@@ -1,13 +1,14 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets]`:
 //!   founds the gated tower (rectifying, on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
-//!   the passage joined last (`Tower::join_passage`) when `passage` is, and runs
+//!   the passage joined last (`Tower::join_passage`) when `passage` is (and the packets after it,
+//!   `Tower::join_packets`, when `packets` is), and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
@@ -75,7 +76,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -87,7 +88,9 @@ fn parity(args: &[String]) -> Result<()> {
         [bits, radix, first] => Some(NewsClock::above(bits.parse()?, radix.parse()?, first.parse()?)?),
         _ => return Err(USAGE.into()),
     };
-    let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage"));
+    // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′.
+    let packets = word == Some("packets");
+    let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
     if (word.is_some() && !(participating || mutual || passage)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
     }
@@ -134,6 +137,10 @@ fn parity(args: &[String]) -> Result<()> {
     if passage {
         tower.join_passage()?;
         println!("TOWER_PASSAGE first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
+    }
+    if packets {
+        tower.join_packets()?;
+        println!("TOWER_PACKETS first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
