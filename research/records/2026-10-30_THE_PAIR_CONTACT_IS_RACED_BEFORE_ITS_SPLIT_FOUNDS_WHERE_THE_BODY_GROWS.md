@@ -569,3 +569,40 @@ then started the control by mistake; it was stopped, and its partial log is not 
 descends on its own moments as a drive entry does, so its feature grows at the rate every other
 entry learns at. Its certificate is the test read again on the next section, which costs no forward
 and no reverse of its own.
+
+**§5 acceptance 6 at `8ffcf37d7`, the founding learns lap for lap with its control** (October 30, RTX
+4080 SUPER, alone on the card). The paired parity at that head first: 98,304 faces, 19,075,104
+gradient entries and every learner equal, all 32 split, founding and direction lines equal, 25
+foundings admitted and one certificate refused; wall 38.3 s, peak resident set 1,901,332 KiB. The
+founding race then ran its hour without the early stop: lap 0's halvings reached 193 by section 192
+and held there to section 726 (the control, at `c4a9604dc` and unchanged since, halved 211 times
+by section 224), and the laps read at the quarter marks (2, 6 and 9) halved 0, 2 and 1 times. Lap 0 proposed 725 foundings and admitted 722 (176, 189, 139 and 218 at
+levels 0 to 3); lap 1 admitted the last 302, and from lap 2 no pair was dormant. The hour stopped it
+after 12 laps at 3,576.2 s; the dormant control at the same head ran 19 laps in 3,434.7 s. Held-out
+bits a byte:
+
+```text
+lap          0     1     2     3     4     5     6     7     8     9    10    11
+founding 2.208 2.088 2.012 1.991 1.972 1.937 1.921 1.910 1.889 1.878 1.865 1.860
+dormant  2.228 2.079 2.013 1.988 1.973 1.931 1.936 1.908 1.902 1.881 1.867 1.859
+
+lap         12    13    14    15    16    17    18
+dormant  1.851 1.849 1.846 1.835 1.832 1.825 1.816
+```
+
+- **The claim holds by 0.003, inside the laps' own swing.** Over the founding race's last five laps
+  (7 to 11) it reads 1.880 on average against the control's 1.883 over the same laps. Lap by lap the
+  two differ by −0.020 to +0.009, in both signs; lap 11 reads 1.860 against 1.859 (GSM8K 1.801
+  against 1.801, training 1.713 against 1.712). The 1,024 founded coordinates are 1,024 scalars
+  beside 19,075,104 entries, and a lap-for-lap tie is what their number predicts.
+- **The hour went to reads nothing needed.** The founding race's laps took 291 s (card forwards
+  124.5 s, reverses 131.8 s) against the control's 164 to 174 s (reverses 55.0 s at lap 0), because
+  every section kept forming the split read on its opening and again on the tower its step left
+  after no pair was dormant. At `081a97b7f` a section with no pair dormant takes the plain reverse
+  (§4). The control's hour reached 1.816.
+
+**Decision** [agent-inferred, October 30]. The repaired founding is lawful on the card and costs
+nothing it does not use, but one coordinate a pair is not where the body grows: every pair founds
+within a lap and a half, and then nothing is left to found. The body grows where a founded pair keeps
+founding, one direction at a time on the complement of the directions it has founded, each
+coordinate priced by the same test.
