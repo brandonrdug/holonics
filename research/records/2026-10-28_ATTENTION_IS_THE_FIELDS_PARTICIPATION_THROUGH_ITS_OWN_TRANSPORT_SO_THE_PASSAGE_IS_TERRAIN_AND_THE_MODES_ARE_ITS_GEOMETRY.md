@@ -310,6 +310,38 @@ memory are projected from a one-to-three-minute read on the card before launch, 
 - **The pump's reflection.** On a pumped mode the transport `α h + β conj(h)` is real-linear; the
   first build pairs through its turn part only.
 
+  **The reflection's share, derived (October 30)** [proved-derived; the four identities checked
+  exactly on 500 random Gaussian-rational moves]. Write a real-linear move as the pair `(α, β)`.
+  Then
+
+  ```text
+  (α₂, β₂) ∘ (α₁, β₁) = (α₂α₁ + β₂ conj(β₁),  α₂β₁ + β₂ conj(α₁))
+  det (α, β) = |α|² − |β|²,     (α, β)⁻¹ = (conj(α), −β) / det,     (α, β)ᵀ = (conj(α), β)
+  ```
+
+  the last being the adjoint under `Re⟨·,·⟩` that the reverse already carries. The reflection's share
+  is the move's Beltrami coefficient `μ = β/α`: `|μ| < 1` keeps orientation, `|μ| = 1` is singular,
+  `|μ| > 1` reverses it. For the tower's pumped move, `α = ρ(1 − |κ|)U` and `β = ρκP`, so
+  `|μ| = |κ|/(1 − |κ|)` and `det = ρ²(1 − 2|κ|)`, which changes sign at `|κ| = ½`. With `P_t` the
+  running composite of a mode's moves from the section's opening, the pairing factors through each
+  site's own frame as before, `Re⟨Ȟ_i, P_i P_j⁻¹ H_j⟩ = Re⟨P_iᵀ Ȟ_i, P_j⁻¹ H_j⟩`, with the
+  dissipation read from the determinant, `L_t = Σ_(k≤t) −½ log₂ |det M_k|`, and the unimodular part
+  `P̃ = P/√|det P|` replacing the unit `U`. A turned mode (`β = 0`) gives back the first build
+  exactly.
+
+  The factorization has two costs the turned mode does not. The unimodular part is not bounded:
+  past the bifurcation its in-phase axis boosts, and the entries of `P̃_i` and `P̃_j⁻¹` grow with the
+  accumulated boost, while their product `P_i P_j⁻¹` stays inside passivity's bound
+  (`|α| + |β| = ρ`). An exact frame therefore re-opens where the accumulated boost outgrows its
+  carrier, at a declared crossing. A cell at `|κ| = ½` is singular, so the frame re-opens there too,
+  and the sites before it reach the sites after it through a rank-one transport.
+
+  **Decision** [agent-inferred, October 30]. The law is held unbuilt, because no race pumps (every
+  class race declares `pumped: false`; only the unit towers pump), so it would have no consumer.
+  Until a race pumps, participation joined to a pumped tower is refused rather than paired through
+  the turn part alone (`Tower::admits_participation`; the refusal lands with the next code change
+  from this line, the overture's intake for #146).
+
 ## 9. The guides repaired with this record
 
 - CLAUDE.md and AGENTS.md, "Keys and navigation": participation through the field's own transport is
