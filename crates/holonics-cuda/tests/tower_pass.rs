@@ -121,9 +121,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
 }
 
 /// The heading joined last, the descent `D` of each level the clock holds opened about ±1/8 on
-/// `2^(−24)` off the key stream (it founds at zero), so every heading moves the residual stream's
-/// opening face and the descent carries a covector from the first section; `C^→` opens as the
-/// level's read (`join_heading`).
+/// `2^(−24)` off the key stream (it founds at zero), so every heading after a cell moves the face's
+/// top and the descent carries a covector from the first section; `C^→` opens as the level's read
+/// (`join_heading`).
 fn open_heading(learner: &mut TowerLearner) {
     learner.join_heading().expect("the heading joins");
     let d = learner.tower.declaration;
@@ -555,10 +555,11 @@ fn the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections() {
 }
 
 /// [agent-inferred, October 30] **The heading on the card** (record
-/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6): each
-/// clocked level reads its heading from its modes before the arrival into the residual stream
-/// through its descent, closes the trace of its span at its tick, and the closure's covector
-/// returns to the heading's read, the modes it read, the descent and the traces' encodings; 32
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6 and 9):
+/// each clocked level reads its heading from its modes before the arrival for its closure and
+/// after it into the face through its descent, closes the trace of its span at its tick, and the
+/// closure's and the face's covectors return to the heading's read, the modes it read, the
+/// descent and the traces' encodings; 32
 /// sections equal face by face (the closures among them), covector entry by entry, learner for
 /// learner and state for state (the open traces among it), on the clock from level 1, on three
 /// levels from level 2 with the passage, and at the race's declaration, six levels from level 4

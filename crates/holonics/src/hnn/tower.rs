@@ -2500,6 +2500,9 @@ struct LevelCell {
     /// The level's heading at this cell, read from its modes before the arrival (absent without
     /// the heading or below the clock's first clocked level, [`Tower::join_heading`]).
     heading: Option<HeadingCell>,
+    /// The heading the level holds after the cell, read from its modes after the arrival, which
+    /// the face reads through the descent (absent where `heading` is).
+    ahead: Option<HeadingCell>,
     /// The trace of the span the level's tick closed at this cell (absent away from its ticks).
     trace: Option<TraceCell>,
 }
@@ -3148,10 +3151,9 @@ impl Tower {
             x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the pair face's lift outgrew the face's 32-bit carrier")))?;
         }
         // The heading ([`Tower::join_heading`]): each clocked level's heading, read from its modes
-        // before this arrival, `ĥ_l = r̂(Re(C^→_l h_l))`, enters the residual stream through its
-        // descent, `x⁰ = E(u) + Σ_l D_l ĥ_l` on 2^(−40) released to 2^(−16); the arrival's encoded
-        // face joins each clocked level's open trace, and a tick of the level closes the trace,
-        // `τ_l = r̂(o_l)`, and rests it.
+        // before this arrival, `ĥ_l = r̂(Re(C^→_l h_l))`, is what its closure compares at a tick;
+        // the arrival's encoded face joins each clocked level's open trace, and a tick of the level
+        // closes the trace, `τ_l = r̂(o_l)`, and rests it.
         let mut headings: Vec<Option<HeadingCell>> = vec![None; d.levels];
         let mut traces: Vec<Option<TraceCell>> = vec![None; d.levels];
         if let Some(first) = self.heading_from() {
@@ -3168,9 +3170,6 @@ impl Tower {
                 affine(&t[lv.heading_im..lv.heading_im + w * n], hr[1], n, &face[n..], None, 0, 0, &mut read_b)?;
                 let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
                 let (read, scale) = ratio_to_power(&raw)?;
-                let mut lift = vec![0i64; w];
-                affine(&t[lv.descent..lv.descent + w * w], hr[2], w, &read, None, 0, MATERIAL_BITS, &mut lift)?;
-                x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the heading's descent outgrew the face's 32-bit carrier")))?;
                 headings[l] = Some(HeadingCell { face, read, scale });
                 let open = &mut state.traces[l];
                 for (o, &v) in open.iter_mut().zip(&t[e..e + w]) {
@@ -3198,6 +3197,9 @@ impl Tower {
         let mut ring_scale: Option<Vec<i128>> = None;
         let mut ring_after: Option<Vec<(i128, i128)>> = None;
         let mut buf = vec![0i64; w.max(n).max(f)];
+        // The face reads each clocked level's heading after the arrival through its descent,
+        // `D_l ĥ⁺_l` on 2^(−40) released to 2^(−16), each added to the top in level order.
+        let mut descended: Vec<Vec<i64>> = Vec::new();
         for (l, lv) in self.layout.levels.iter().enumerate() {
             let r = &reaches.levels[l];
             let moves = ticks.get(l).copied().unwrap_or(1);
@@ -3487,9 +3489,30 @@ impl Tower {
                 ring_read = Some(read);
                 ring_after = Some(state.ring.clone());
             }
+            // The heading the level holds after this arrival, read from its modes after the cell,
+            // `ĥ⁺_l = r̂(Re(C^→_l h_l))`: the one it holds for the arrival the face predicts (the
+            // next span's at a tick), which the face reads through the descent `D_l`.
+            let ahead = match self.heading_from() {
+                Some(first) if l >= first => {
+                    let hr = &reaches.heading[l];
+                    let (mut read_a, mut read_b) = (vec![0i64; w], vec![0i64; w]);
+                    affine(&t[lv.heading_re..lv.heading_re + w * n], hr[0], n, &face[..n], None, 0, 0, &mut read_a)?;
+                    affine(&t[lv.heading_im..lv.heading_im + w * n], hr[1], n, &face[n..], None, 0, 0, &mut read_b)?;
+                    let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
+                    let (read, scale) = ratio_to_power(&raw)?;
+                    let mut lift = vec![0i64; w];
+                    affine(&t[lv.descent..lv.descent + w * w], hr[2], w, &read, None, 0, MATERIAL_BITS, &mut lift)?;
+                    descended.push(lift);
+                    Some(HeadingCell { face: face.clone(), read, scale })
+                }
+                _ => None,
+            };
             let push = push_re.into_iter().zip(push_im).collect();
             let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell, packet, heading: headings[l].take(), trace: traces[l].take() });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell, packet, heading: headings[l].take(), ahead, trace: traces[l].take() });
+        }
+        for lift in &descended {
+            x = collect_exact(x.iter().zip(lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the heading's descent outgrew the face's 32-bit carrier")))?;
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -3890,6 +3913,25 @@ impl Tower {
                 }
             }
         }
+        // The face's read of the heading ([`Tower::join_heading`]): the top's covector, known before
+        // any level's reverse, reaches each clocked level's descent against the heading after the
+        // cell, `G_D = Σ_t δx_t ĥ⁺ᵀ`, and that heading, `Dᵀ δx_t`, through its ratio's adjoint as
+        // the covector of the raw read `Re(C^→ h)` of the modes after the cell.
+        let mut ahead_cov: Vec<Vec<Vec<i64>>> = vec![Vec::new(); d.levels];
+        if let Some(first) = self.heading_from() {
+            let missing = || TowerError::Refused("a heading after every cell of a level that carries one");
+            for (l, covs) in ahead_cov.iter_mut().enumerate().skip(first) {
+                let lv = self.layout.levels[l];
+                let aheads: Vec<&HeadingCell> = cells.iter().map(|cell| cell.levels[l].ahead.as_ref().ok_or_else(missing)).collect::<Result<_>>()?;
+                let reads: Vec<&[i32]> = aheads.iter().map(|h| h.read.as_slice()).collect();
+                outer_sum(&mut g[lv.descent..lv.descent + w * w], w, &dx, &reads)?;
+                for (h, top) in aheads.iter().zip(&dx) {
+                    let mut back = vec![0i64; w];
+                    transposed(&t[lv.descent..lv.descent + w * w], reaches.heading[l][2], w, top, MATERIAL_BITS, &mut back)?;
+                    covs.push(ratio_adjoint(&h.read, h.scale, &back)?);
+                }
+            }
+        }
         // The covector of each cell's open packet, returned by the level that hears it to the fine
         // level whose moves carry it ([`Tower::join_packets`]): zero away from that level's ticks.
         let mut packet_cov: Vec<Vec<(i64, i64)>> = Vec::new();
@@ -3997,7 +4039,7 @@ impl Tower {
             // modes it read, and those modes: the state after the cell before the tick (the
             // opening's modes are a constant), whose covector the level's own scan carries into its
             // moves, its push and its packets.
-            if !heading_cov[l].is_empty() {
+            if !heading_cov[l].is_empty() || !ahead_cov[l].is_empty() {
                 let hreach = &reaches.heading[l];
                 let (mut dreads_h, mut negs_h, mut faces_h) = (Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()));
                 for (i, dr) in &heading_cov[l] {
@@ -4011,6 +4053,19 @@ impl Tower {
                         }
                     }
                     faces_h.push(cells[*i].levels[l].heading.as_ref().ok_or_else(closure_missing)?.face.as_slice());
+                    dreads_h.push(dr.as_slice());
+                    negs_h.push(neg);
+                }
+                // The face's covector of the heading after cell `i` reaches the modes after it.
+                for (i, dr) in ahead_cov[l].iter().enumerate() {
+                    let neg: Vec<i64> = dr.iter().map(|v| -v).collect();
+                    let (mut hre, mut him) = (vec![0i64; n], vec![0i64; n]);
+                    transposed(&t[lv.heading_re..lv.heading_re + w * n], hreach[0], n, dr, MATERIAL_BITS, &mut hre)?;
+                    transposed(&t[lv.heading_im..lv.heading_im + w * n], hreach[1], n, &neg, MATERIAL_BITS, &mut him)?;
+                    for (slot, (a, b)) in read_cov[i].iter_mut().zip(hre.into_iter().zip(him)) {
+                        *slot = (fit64(slot.0 as i128 + a as i128)?, fit64(slot.1 as i128 + b as i128)?);
+                    }
+                    faces_h.push(cells[i].levels[l].ahead.as_ref().ok_or_else(closure_missing)?.face.as_slice());
                     dreads_h.push(dr.as_slice());
                     negs_h.push(neg);
                 }
@@ -4630,16 +4685,6 @@ impl Tower {
             }
         }
         let e = self.layout.encoding;
-        // The descent takes the input's covector against the heading it read, `G_D = Σ δx⁰ ĥᵀ`; the
-        // heading itself is located by its closure alone, and the fine levels' covector stops at
-        // `D` ([`Tower::join_heading`]).
-        if let Some(first) = self.heading_from() {
-            for l in first..d.levels {
-                let lv = self.layout.levels[l];
-                let reads: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].heading.as_ref().map(|h| h.read.as_slice()).ok_or_else(closure_missing)).collect::<Result<_>>()?;
-                outer_sum(&mut g[lv.descent..lv.descent + w * w], w, &dx, &reads)?;
-            }
-        }
         // Each trace's covector reaches the encoding of every arrival of its span inside the
         // section; the span's arrivals before the opening were summed into the carried trace, a
         // constant.
@@ -5481,9 +5526,11 @@ impl Tower {
 
     /// [definition; agent-inferred, October 30] **The heading joined** (record
     /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §4): each level the
-    /// news clock holds (from its first clocked level `F`) reads its modes before each arrival
-    /// through its own heading material, `ĥ_l = r̂(Re(C^→_l h_l))`, and the residual stream opens on
-    /// `x⁰ = E(u) + Σ_l D_l ĥ_l`. Each such level carries the open trace of the arrivals since its
+    /// news clock holds (from its first clocked level `F`) reads its modes through its own heading
+    /// material, `ĥ_l = r̂(Re(C^→_l h_l))`, and the face reads the heading each level holds after
+    /// the arrival through its descent, `z = U (x^L + Σ_l D_l ĥ⁺_l) + c` (the record's §9: the top's
+    /// covector is the one the reverse knows before any level's, so the heading's covector through
+    /// `D` is carried whole). Each such level carries the open trace of the arrivals since its
     /// last tick, `o_l ← o_l + E(u)`, closed at the tick as `τ_l = r̂(o_l)`; the heading the level
     /// held meets the traces of the section's ticks through a pair contact
     /// (`Tower::closure_faces`), and the closure's code joins the section's.
@@ -8949,9 +8996,8 @@ mod tests {
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked, mut strands_checked) = (0, 0, 0, 0, 0, 0, 0, 0);
         let (mut mutual_checked, mut passages_checked, mut headings_checked, mut descents_checked) = (0, 0, 0, 0);
         let headed = |start: usize, of: fn(&LevelLayout) -> usize| tower.heading_from().is_some_and(|first| tower.layout.levels[first..].iter().any(|lv| of(lv) == start));
-        // Under the heading the code is the arrivals' and the closure's; at `D = 0` the term the
-        // heading's law omits (its covector from `x⁰`, through `Dᵀ`) is zero, so every family's
-        // covector is the whole code's difference ([`Tower::join_heading`]).
+        // Under the heading the code is the arrivals' and the closure's, and the face's read of the
+        // heading carries its covector through `Dᵀ` at any `D` ([`Tower::join_heading`]).
         let base_code = compared_code(&tower, &classes, compared, true);
         for &(start, len, grain) in &tower.layout.families {
             let descent = headed(start, |lv| lv.descent);
@@ -10364,6 +10410,25 @@ mod tests {
         let mut tower = passage_opened(packeted(3));
         tower.join_heading().expect("joined");
         the_covector_of_tower_matches_the_code_difference(tower, true, &news_passage()[..31], 9);
+    }
+
+    /// [agent-inferred, October 30] **The face's read of the heading carries its covector at any
+    /// descent** (the record's acceptance 8): with `D` opened from keys, so the face reads where
+    /// each clocked level is heading, every family's covector, the heading's read and the modes
+    /// it reads among them, is the code difference it predicts. Read at `x⁰` the term through `Dᵀ`
+    /// was not carried and this failed by construction.
+    #[test]
+    fn the_headings_covector_with_the_descent_open_matches_the_code_difference() {
+        let mut tower = headed(3);
+        let k = keys(8192);
+        let [_, descent] = tower.heading_families();
+        for (i, v) in descent.into_iter().flatten().enumerate() {
+            tower.theta[v] = i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 10;
+        }
+        let plain = packeted(3);
+        let classes = &news_passage()[..31];
+        assert_ne!(tower.read_cells(&mut tower.rest(), classes).expect("read"), plain.read_cells(&mut plain.rest(), classes).expect("read"), "the face reads the opened descent");
+        the_covector_of_tower_matches_the_code_difference(tower, true, classes, 9);
     }
 
     /// Under the heading a stream's open traces are its state (acceptance 5): a passage read in two

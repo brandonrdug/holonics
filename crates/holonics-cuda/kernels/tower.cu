@@ -33,8 +33,9 @@
 //   threads own the outputs of each read (the pushes and gates, the modes, the reads, the contacts,
 //   the return, the readout), the stages ordered by barriers. The modes' states stay in shared
 //   memory across the cells. With `keep`, the cell's temporaries are written for the reverse.
-// - `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx`: one block a cell of a stream
-//   (cells are independent there: each reads its own forward temporaries and covector).
+// - `tower_reverse_top`, `tower_reverse_ahead`, `tower_reverse_contacts`, `tower_reverse_dx`: one
+//   block a cell of a stream (cells are independent there: each reads its own forward temporaries
+//   and covector).
 // - `tower_split_read`: the paired contacts' split read (`Tower::split_read_of`), one block a
 //   dormant pair of one level, over every stream's cells in chunks of the block.
 // - `tower_pair_biases`: the pair contact's foil only, one thread a bias entry summing its own
@@ -167,9 +168,9 @@ struct TowerLaw {
     // against each dormant pair's direction (`holonics::hnn::tower::split`).
     uint32_t split, split_pad;
     // The heading (`heading = 0` without it; else the clocked levels L − F that carry one,
-    // `Tower::join_heading`): each clocked level's heading enters the residual stream through its
-    // descent, and a tick's heading is paired with the traces of the stream's ticks at that level
-    // in the section, `z_ji = 2^(−heading_shift) ⟨ĥ_j, τ_i⟩` on 2^(−16).
+    // `Tower::join_heading`): each clocked level's heading after a cell enters the top through its
+    // descent, the face reading it, and a tick's heading is paired with the traces of the stream's
+    // ticks at that level in the section, `z_ji = 2^(−heading_shift) ⟨ĥ_j, τ_i⟩` on 2^(−16).
     uint32_t heading, heading_shift;
 };
 
@@ -364,8 +365,12 @@ struct TowerFrame {
     // ([S][HD][T][4]); a stream's scratch ([S][T]); the reverse's: the covector of the heading's
     // raw read and of the trace's summed encoding (at the ticks, zero elsewhere, [S][T][HD][W]
     // each) and the cell whose tick closes each cell's span (UINT32_MAX past the section's last
-    // tick, [S][T][HD]); and the reaches of the heading's ratio, of its face (re, im) and of its
-    // covector ([HD][S][T], so they pair with the bottom covector's [S][T]).
+    // tick, [S][T][HD]); and the reaches of the heading's face (re, im) and of its covector
+    // ([HD][S][T], so they pair with the cells' [S][T]). The heading after each cell, which the
+    // face reads through the descent: its ratio and scale ([S][T][HD][W], [S][T][HD]) and the
+    // face it read ([S][T][HD][2N]); the reverse's: its raw read's covector ([S][T][HD][W]) and
+    // the top's covector it was read against ([S][T][W]); and the reaches of its ratio, its face
+    // (re, im) and its covector ([HD][S][T]) and of the top's covector ([S][T]).
     const int64_t *tr_open;
     int64_t *tr_ends;
     int32_t *hd_read;
@@ -379,7 +384,12 @@ struct TowerFrame {
     int64_t *hd_g;
     int64_t *hd_dread, *tr_dov;
     uint32_t *hd_closer;
-    uint64_t *r_hd_read, *r_hd_face_re, *r_hd_face_im, *r_hd_dread;
+    uint64_t *r_hd_face_re, *r_hd_face_im, *r_hd_dread;
+    int32_t *ah_read;
+    int64_t *ah_scale;
+    int64_t *ah_face;
+    int64_t *ah_dread, *ah_top;
+    uint64_t *r_ah_read, *r_ah_face_re, *r_ah_face_im, *r_ah_dread, *r_ah_top;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -960,6 +970,52 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     const uint64_t *face_roots = fr.roots;
     const uint64_t *move_roots = fr.roots + law.face_digits;
     const wide radius = ((wide)1 << MOVE_BITS) - ((wide)1 << (MOVE_BITS - MARGIN));
+    // The heading a clocked level holds (`Tower::join_heading`), read from its modes in `h`: their
+    // face on 2^(−16) into `fc` (re block, then im block) with its maxima, the raw read
+    // Re(C^→ h) = C^→_re h_re − C^→_im h_im on 2^(−40) released to 2^(−16), and its ratio
+    // ĥ = r̂(Re(C^→ h)) into `rd`, complete for every thread at the return; returns its scale.
+    const auto heading_read = [&](uint32_t l, uint64_t &fre, uint64_t &fim) -> int64_t {
+        const TowerLevel lv = law.level[l];
+        uint64_t mre = 0, mim = 0;
+        for (uint32_t k = tid; k < N; k += B) {
+            fc[k] = fit64(rel(h[(l * N + k) * 2], STATE_BITS - FACE_BITS), &st);
+            fc[N + k] = fit64(rel(h[(l * N + k) * 2 + 1], STATE_BITS - FACE_BITS), &st);
+            const uint64_t ma = magnitude(fc[k]), mb = magnitude(fc[N + k]);
+            mre = ma > mre ? ma : mre;
+            mim = mb > mim ? mb : mim;
+        }
+        fre = block_max(mre, red);
+        fim = block_max(mim, red);
+        const bool n_a = narrow_terms(lv.heading_reach[0], fre, N, &st);
+        const bool n_b = narrow_terms(lv.heading_reach[1], fim, N, &st);
+        for (uint32_t o = tid; o < 2 * W; o += B) {
+            const uint32_t j = o % W;
+            const bool im = o >= W;
+            rab[o] = fit64(dot(tt + (im ? lv.heading_im : lv.heading_re) + j, W, N, fc + (im ? N : 0), im ? n_b : n_a), &st);
+        }
+        __syncthreads();
+        uwide power = 0;
+        for (uint32_t j = tid; j < W; j += B) {
+            const int64_t r = fit64(rel((wide)rab[j] - (wide)rab[W + j], MATERIAL_BITS), &st);
+            raw[j] = r;
+            power += (uwide)((wide)r * (wide)r);
+        }
+        power = block_sum(power, redw);
+        if (tid == 0) {
+            const uwide root = isqrt128((uwide)((wide)power / (wide)W));
+            if (root > (uwide)INT64_MAX) {
+                atomicOr(&st, TOWER_REFUSED_WORD64);
+            }
+            scale_s = root > (uwide)INT64_MAX ? 0 : (int64_t)root;
+        }
+        __syncthreads();
+        const int64_t hscale = scale_s;
+        for (uint32_t j = tid; j < W; j += B) {
+            rd[j] = hscale == 0 ? 0 : fit32(div_nearest((wide)raw[j] << FACE_BITS, hscale), &st);
+        }
+        __syncthreads();
+        return hscale;
+    };
     __syncthreads();
     for (uint32_t t = 0; t < T; t++) {
         const uint64_t qc = (uint64_t)s * T + t;
@@ -1059,61 +1115,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         }
         __syncthreads();
         // The heading (`Tower::join_heading`): each clocked level's heading, read from its modes
-        // before this arrival, ĥ_l = r̂(Re(C^→_l h_l)), enters the residual stream through its
-        // descent, x⁰ = E(u) + Σ_l D_l ĥ_l on 2^(−40) released to 2^(−16); the arrival's encoded
-        // face joins each clocked level's open trace, and a tick of the level closes the trace,
-        // τ_l = r̂(o_l), rests it and lists the tick for the section's closure. The heading's
-        // ratio and the trace are kept at every read (the closure reads them at the section's end).
+        // before this arrival, ĥ_l = r̂(Re(C^→_l h_l)), is what its closure compares at a tick; the
+        // arrival's encoded face joins each clocked level's open trace, and a tick of the level
+        // closes the trace, τ_l = r̂(o_l), rests it and lists the tick for the section's closure.
+        // The heading's ratio and the trace are kept at every read (the closure reads them at the
+        // section's end).
         for (uint32_t i = 0; i < HD; i++) {
             const uint32_t l = law.news_first + i;
-            const TowerLevel lv = law.level[l];
             const uint64_t qh = qc * HD + i;
-            uint64_t mre = 0, mim = 0;
-            for (uint32_t k = tid; k < N; k += B) {
-                fc[k] = fit64(rel(h[(l * N + k) * 2], STATE_BITS - FACE_BITS), &st);
-                fc[N + k] = fit64(rel(h[(l * N + k) * 2 + 1], STATE_BITS - FACE_BITS), &st);
-                const uint64_t ma = magnitude(fc[k]), mb = magnitude(fc[N + k]);
-                mre = ma > mre ? ma : mre;
-                mim = mb > mim ? mb : mim;
-            }
-            const uint64_t fre = block_max(mre, red);
-            const uint64_t fim = block_max(mim, red);
-            const bool n_a = narrow_terms(lv.heading_reach[0], fre, N, &st);
-            const bool n_b = narrow_terms(lv.heading_reach[1], fim, N, &st);
-            for (uint32_t o = tid; o < 2 * W; o += B) {
-                const uint32_t j = o % W;
-                const bool im = o >= W;
-                rab[o] = fit64(dot(tt + (im ? lv.heading_im : lv.heading_re) + j, W, N, fc + (im ? N : 0), im ? n_b : n_a), &st);
-            }
-            __syncthreads();
-            uwide power = 0;
+            uint64_t fre = 0, fim = 0;
+            const int64_t hscale = heading_read(l, fre, fim);
             for (uint32_t j = tid; j < W; j += B) {
-                const int64_t r = fit64(rel((wide)rab[j] - (wide)rab[W + j], MATERIAL_BITS), &st);
-                raw[j] = r;
-                power += (uwide)((wide)r * (wide)r);
-            }
-            power = block_sum(power, redw);
-            if (tid == 0) {
-                const uwide root = isqrt128((uwide)((wide)power / (wide)W));
-                if (root > (uwide)INT64_MAX) {
-                    atomicOr(&st, TOWER_REFUSED_WORD64);
-                }
-                scale_s = root > (uwide)INT64_MAX ? 0 : (int64_t)root;
-            }
-            __syncthreads();
-            const int64_t hscale = scale_s;
-            uint64_t mx = 0;
-            for (uint32_t j = tid; j < W; j += B) {
-                rd[j] = hscale == 0 ? 0 : fit32(div_nearest((wide)raw[j] << FACE_BITS, hscale), &st);
                 fr.hd_read[qh * W + j] = rd[j];
-                const uint64_t v = magnitude(rd[j]);
-                mx = v > mx ? v : mx;
-            }
-            const uint64_t hmax = block_max(mx, red);
-            const bool n_d = narrow_terms(lv.heading_reach[2], hmax, W, &st);
-            for (uint32_t j = tid; j < W; j += B) {
-                const int64_t lift = fit64(rel(dot(th + lv.descent + (uint64_t)j * W, 1, W, rd, n_d), MATERIAL_BITS), &st);
-                x[j] = fit32((wide)x[j] + (wide)lift, &st);
             }
             if (keep) {
                 for (uint32_t o = tid; o < 2 * N; o += B) {
@@ -1124,7 +1137,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 fr.hd_scale[qh] = hscale;
                 if (keep) {
                     const uint64_t at_reach = (uint64_t)i * law.streams * T + qc;
-                    fr.r_hd_read[at_reach] = hmax;
                     fr.r_hd_face_re[at_reach] = fre;
                     fr.r_hd_face_im[at_reach] = fim;
                 }
@@ -1994,6 +2006,52 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             for (uint32_t j = tid; j < W; j += B) {
                 x[j] = nx[j];
                 const uint64_t v = magnitude(nx[j]);
+                m = v > m ? v : m;
+            }
+            xmax = block_max(m, red);
+        }
+        // The face reads each clocked level's heading after the arrival (`Tower::join_heading`):
+        // ĥ⁺_l = r̂(Re(C^→_l h_l)) read from the level's modes after the cell, the heading it holds
+        // for the arrival the face predicts, enters the top through its descent,
+        // x += D_l ĥ⁺_l on 2^(−40) released to 2^(−16), in level order.
+        if (HD > 0) {
+            for (uint32_t i = 0; i < HD; i++) {
+                const uint32_t l = law.news_first + i;
+                const TowerLevel lv = law.level[l];
+                const uint64_t qh = qc * HD + i;
+                uint64_t fre = 0, fim = 0;
+                const int64_t hscale = heading_read(l, fre, fim);
+                uint64_t mx = 0;
+                for (uint32_t j = tid; j < W; j += B) {
+                    const uint64_t v = magnitude(rd[j]);
+                    mx = v > mx ? v : mx;
+                }
+                const uint64_t hmax = block_max(mx, red);
+                const bool n_d = narrow_terms(lv.heading_reach[2], hmax, W, &st);
+                for (uint32_t j = tid; j < W; j += B) {
+                    const int64_t lift = fit64(rel(dot(th + lv.descent + (uint64_t)j * W, 1, W, rd, n_d), MATERIAL_BITS), &st);
+                    x[j] = fit32((wide)x[j] + (wide)lift, &st);
+                }
+                if (keep) {
+                    for (uint32_t j = tid; j < W; j += B) {
+                        fr.ah_read[qh * W + j] = rd[j];
+                    }
+                    for (uint32_t o = tid; o < 2 * N; o += B) {
+                        fr.ah_face[qh * 2 * N + o] = fc[o];
+                    }
+                    if (tid == 0) {
+                        const uint64_t at_reach = (uint64_t)i * law.streams * T + qc;
+                        fr.ah_scale[qh] = hscale;
+                        fr.r_ah_read[at_reach] = hmax;
+                        fr.r_ah_face_re[at_reach] = fre;
+                        fr.r_ah_face_im[at_reach] = fim;
+                    }
+                }
+                __syncthreads();
+            }
+            m = 0;
+            for (uint32_t j = tid; j < W; j += B) {
+                const uint64_t v = magnitude(x[j]);
                 m = v > m ? v : m;
             }
             xmax = block_max(m, red);
@@ -3274,6 +3332,76 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_packet
     }
 }
 
+// The face's read of the heading returned (`Tower::reverse_joined`), one block a cell of a stream.
+// The top's covector δx, known before any level's reverse, is kept for the descent's outer sum
+// `Σ δx ĥ⁺ᵀ` (`ah_top`) and reaches each clocked level's heading after the cell through `Dᵀ`, then
+// through its ratio's adjoint the covector of the raw read `Re(C^→ h)` (`ah_dread`), which
+// `tower_reverse_heading` returns through C^→ to the read covector of the cell's own state. Runs
+// after `tower_reverse_top` and before the top level's contacts.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ahead(TowerLaw law, TowerFrame fr) {
+    const uint64_t q = blockIdx.x;
+    const uint32_t s = (uint32_t)(q / law.cells), tid = threadIdx.x, B = blockDim.x;
+    const uint32_t W = law.width, HD = law.heading;
+    const uint64_t SQ = (uint64_t)law.streams * law.cells;
+    extern __shared__ __align__(16) unsigned char smem[];
+    unsigned char *at = smem;
+    uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
+    uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
+    int64_t *top = (int64_t *)carve(at, 8ull * W);
+    int64_t *dv = (int64_t *)carve(at, 8ull * W);
+    __shared__ uint32_t st;
+    if (tid == 0) {
+        st = 0;
+    }
+    uint64_t m = 0;
+    for (uint32_t j = tid; j < W; j += B) {
+        const int64_t v = fr.dx[q * W + j];
+        top[j] = v;
+        fr.ah_top[q * W + j] = v;
+        const uint64_t a = magnitude(v);
+        m = a > m ? a : m;
+    }
+    const uint64_t tmax = block_max(m, red);
+    if (tid == 0) {
+        fr.r_ah_top[q] = tmax;
+    }
+    for (uint32_t i = 0; i < HD; i++) {
+        const TowerLevel lv = law.level[law.news_first + i];
+        const uint64_t qh = q * HD + i;
+        const bool n_t = narrow_rows(lv.heading_reach[2], tmax, W);
+        for (uint32_t k = tid; k < W; k += B) {
+            dv[k] = fit64(rel(dot(fr.theta + lv.descent + k, W, W, top, n_t), MATERIAL_BITS), &st);
+        }
+        __syncthreads();
+        // The ratio's adjoint ∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms at the kept ratio and scale.
+        const int32_t *r = fr.ah_read + qh * W;
+        const int64_t scale = fr.ah_scale[qh];
+        uwide dot_part = 0;
+        for (uint32_t k = tid; k < W; k += B) {
+            dot_part += (uwide)((wide)r[k] * (wide)dv[k]);
+        }
+        const wide mean = div_nearest((wide)block_sum(dot_part, redw), (wide)W);
+        uint64_t mr = 0;
+        for (uint32_t k = tid; k < W; k += B) {
+            int64_t v = 0;
+            if (scale != 0) {
+                v = fit64(div_nearest(((wide)dv[k] - rel(mean * (wide)r[k], 2 * FACE_BITS)) << FACE_BITS, scale), &st);
+            }
+            fr.ah_dread[qh * W + k] = v;
+            const uint64_t a = magnitude(v);
+            mr = a > mr ? a : mr;
+        }
+        const uint64_t dmax = block_max(mr, red);
+        if (tid == 0) {
+            fr.r_ah_dread[(uint64_t)i * SQ + q] = dmax;
+        }
+        __syncthreads();
+    }
+    if (tid == 0 && st != 0) {
+        atomicOr(fr.status + s, st);
+    }
+}
+
 // The heading's return at a clocked level `l` over one stream (`Tower::reverse_joined`), one block a
 // stream. Each tick's face over the section's traces, read again from the forward's own bits and
 // its kept maximum and total, returns g_ji = e_ji/Σ_i e_ji − [i = j] on 2^(−24) (one thread a
@@ -3283,7 +3411,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_packet
 // the cell before's (the opening's is a constant). Each trace takes Σ_j g_ji 2^(−s) ĥ_j through
 // its ratio's adjoint (`tr_dov`), which `tower_encoding` returns to the encoding of every arrival
 // of its span inside the section, each cell naming the tick that closed its span (`hd_closer`).
-// Zero away from the ticks. Runs after the level's contacts (which write the read covector) and
+// Zero away from the ticks. Then the face's covector of the heading after each cell
+// (`tower_reverse_ahead`, `ah_dread`) reaches through C^→ the read covector of that cell's own
+// state. Runs after the level's contacts (which write the read covector) and
 // before its modes' scan (which reads it).
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_heading(TowerLaw law, TowerFrame fr, uint32_t l) {
     const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
@@ -3411,6 +3541,23 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_headin
         adjoint(trace + qa * W, fr.tr_scale[qa], fr.tr_dov + qa * W);
         __syncthreads();
     }
+    // The face's covector of the heading after each cell (`tower_reverse_ahead`) reaches, through
+    // C^→, C_reᵀ ∂r and C_imᵀ (−∂r), the read covector of that cell's own state.
+    for (uint32_t t = 0; t < T; t++) {
+        const int64_t *da = fr.ah_dread + cell(t) * W;
+        const uint64_t dmax = fr.r_ah_dread[(uint64_t)i * SQ + (uint64_t)s * T + t];
+        const bool n_re = narrow_rows(lv.heading_reach[0], dmax, W);
+        const bool n_im = narrow_rows(lv.heading_reach[1], dmax, W);
+        const uint64_t row = ((uint64_t)s * T + t) * L + l;
+        for (uint32_t o = tid; o < 2 * N; o += B) {
+            const uint32_t k = o % N;
+            const bool im = o >= N;
+            const wide sum = dot(fr.theta + (im ? lv.heading_im : lv.heading_re) + k, N, W, da, im ? n_im : n_re);
+            int64_t *rc = fr.readcov + row * 2 * N + o;
+            *rc = fit64((wide)*rc + (wide)fit64(rel(im ? -sum : sum, MATERIAL_BITS), &st), &st);
+        }
+    }
+    __syncthreads();
     if (tid == 0 && st != 0) {
         atomicOr(fr.status + s, st);
     }

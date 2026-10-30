@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section (§8)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7 and 8 passed on the host, 9 and 10 at the card (§9)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -210,7 +210,8 @@ From [the lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE
 
 ## 7. What is not derived
 
-- The fine levels' covector into the heading (one reverse across the levels in time) is not carried.
+- The fine levels' covector into the heading (one reverse across the levels in time) is not carried;
+  §9 moves the heading's read to the face, where its covector is carried whole.
 - The release is still a class at a time, steered by the heading; a joint-field release (the duplex
   refined under the heading) is the next step if the heading locates.
 - The menu's horizon is the learner's section, so the coarsest heading sees at most a section of
@@ -305,3 +306,76 @@ separates which family's full step overshoots, with a declared hold (`TOWER_HOLD
 If one hold brings the halvings back to C′'s, that family's step is the overshoot and its law
 changes next; if holding both still refuses about 2.8 a section, the overshoot is the closure's
 covector on the shared material.
+
+**The holds located the refusals in the descent** (f797b9b09, three 256-section laps on the card,
+none stopped early):
+
+| Hold | Arrivals at 256, bits a byte | − C′ | L4 / L5 closure − flat | Refusals a window | Wall |
+|---|---|---|---|---|---|
+| none (113efb262) | 3.470 | +0.730 | −0.603 / −0.451 | 72, 80, 84, 90, 104, 112, 87, 91 | 142.7 s |
+| `D` | 2.846 | +0.106 | −0.842 / −0.601 | 69, 15, 20, 31, 32, 49, 46, 34 | 100.9 s |
+| `C^→` | 3.424 | +0.684 | −0.441 / −0.318 | 98, 80, 101, 94, 119, 98, 98, 98 | 142.4 s |
+| both | 2.893 | +0.153 | −0.757 / −0.491 | 70, 24, 24, 30, 29, 42, 50, 33 | 89.2 s |
+
+With `D` held the arrivals lead C′ through section 160 (−0.375, −0.090, −0.085, −0.053, −0.005)
+and trail it by 0.106 at 256, and the closure locates further below flat than with `D` moving. The
+held-out read: dev 2.847, the GSM8K region 2.859. The writing of the unheld lap, released at its
+measured rate (128 classes in 7.0 s, 1,024 in 8.0 s: the time is the opening's), is babble with
+long runs of capitals; it stays outside the repository.
+
+## 9. The face reads the heading
+
+[agent-inferred, October 30] **The cause.** §4 stopped the fine levels' covector at `D`: once `D`
+moves, every step on `C^→`, on the clocked levels' material and on what feeds their modes moves
+`x⁰` through `D ĥ` along a path the covector does not carry. The certified step is then not descent
+on the arrivals' code, and the certificate refuses it and halves the whole step, so every family
+takes about a seventh of its step. The certificate did its work; the covector was incomplete. With
+`D` held at zero the covector is exact, and the refusals and the arrivals' cost go with it.
+
+**Where the covector is exact.** The reverse runs level by level from the top, each level scanning
+its cells backward. The covector of `x⁰_t` exists only after every level's scan, while the heading
+it read is the coarse level's modes at `t − 1`, whose scan ran first: carrying it at `x⁰` needs one
+reverse across the levels in time. The one covector the reverse holds before any level's scan is the
+top's, `δx^L_t = Uᵀ δz_t`. So the heading enters there:
+
+```text
+z_t = U (x^L_t + Σ_(l ≥ F) D_l ĥ⁺_l(t)) + c,     ĥ⁺_l(t) = r̂(Re(C^→_l h_l(t)))
+G_D += δx^L_t ĥ⁺_l(t)ᵀ,     δĥ⁺_l(t) = D_lᵀ δx^L_t
+```
+
+`ĥ⁺_l(t)` is the heading the level holds after cell `t`, for the arrival the face predicts: the
+next span's heading at a tick, the held heading otherwise, and the same value the next cell's
+closure compares. Its covector goes through `r̂`'s adjoint to `C^→_l` and to the modes after the
+cell, which the level's own scan already carries (as it carries its read's). It is exact at every
+`D`.
+
+**What it reads as.** The fine levels no longer hold the heading in their state. The face, where the
+receiver's prediction forms, reads the fine top and the coarse heading together, and release draws
+from it, so each released class is steered by where the coarse levels are heading and the fine
+levels then read that class. The NPC's step is its local steering plus the map's heading.
+
+**Acceptance, fixed before the build.**
+7. At `D = 0` the headed tower reads face for face as the packeted tower (acceptance 1 again).
+8. With `D` opened, every family's covector, the heading's read and the modes among them, is the
+   code difference it predicts. Read at `x⁰` this failed by construction.
+9. The card is equal to the host at C′'s six-level declaration (`tower_pass parity … heading`).
+10. On the 4080 over the passage's first 256 sections, the arrivals at section 256 are at or below
+    the `D`-held lap's 2.846 bits a byte and the closure is below flat at both clocked levels. Each
+    window's refusals are reported beside the `D`-held lap's and C′'s, and the writing is shown.
+
+**Built.** The host reads `ĥ⁺` in each clocked level's step after its modes move and adds
+`D_l ĥ⁺_l` to the top in level order once every level has run; the reverse takes `G_D` and `Dᵀ δx`
+from the top's covector before any level's scan and returns the heading's read covector to the
+state after the cell beside the closure's (`Tower::step`, `Tower::reverse_joined`). Acceptance 7 is
+the existing face-for-face test with `D` at zero; acceptance 8 is
+`the_headings_covector_with_the_descent_open_matches_the_code_difference`, with `D` opened off the
+key stream so the face reads it. The card reads the same heading after the levels in
+`tower_forward`, keeps the top's covector and returns it through `Dᵀ` and the ratio's adjoint in
+`tower_reverse_ahead` (one block a cell), and `tower_reverse_heading` adds its `C^→` return to each
+cell's own read covector; the descent's outer sum reads the kept top, and the heading's read takes
+the face's family beside the closure's.
+
+Recorded failures this could repeat: *a located cause carried unrepaired into a new consumer* (the
+incomplete covector is repaired, not carried into the release); *an uncertified deposition step*
+(the certificate still reads the whole code); *bits read as progress* (acceptance 10 reports the
+writing beside its bits).
