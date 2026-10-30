@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and tested to acceptance 1–5, the card owed]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, tested on the host to acceptance 1–5, the card's parity owed]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -172,7 +172,10 @@ products, so the deposit is certified on the comparison it descends.
    reads the trace as a direction.)
 6. **The card.** Parity at the race's declaration with the heading, host against card: every face,
    every closure face and every covector entry equal.
-7. **The smoke** (three minutes on the card from C′'s founding, the race's passage and keys):
+7. **The smoke** (one lap on the card from C′'s founding, the race's passage and keys, about three
+   minutes: C′'s laps ran 166 to 171 s. Its deadline is the lap's projection from the parity's
+   measured card time against C′'s, fixed before launch; agent-inferred, October 30, at the card's
+   build, since a heading lap can pass three minutes and the writing needs the lap's learner):
    - *The heading locates.* At each clocked level the closure's code a tick, read by window, ends the
      smoke at least one bit below `log₂` of its menu (the heading at least halves where the passage
      could be going), and the reading is printed each window so the minute it moves is seen.
@@ -202,7 +205,8 @@ From [the lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE
 - *An uncertified deposition step*: the certificate reads the code the step descends.
 - *A located cause carried unrepaired into a new consumer*: participation stays refused beside
   packets, and the duplex is not joined until the heading is measured.
-- *A refusal answered with a larger limit*: the smoke's three minutes are its deadline.
+- *A refusal answered with a larger limit*: the smoke's deadline is fixed from the parity's measured
+  time before launch and is not raised.
 
 ## 7. What is not derived
 

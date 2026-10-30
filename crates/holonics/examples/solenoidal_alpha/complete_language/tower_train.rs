@@ -12,7 +12,7 @@
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::split::PairedContacts;
-use holonics::hnn::tower::{code_of, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
+use holonics::hnn::tower::{code_of, ClosureReading, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use holonics::receiver::release::{agreeing_class, agreement_face};
@@ -3264,6 +3264,26 @@ fn signed_bits(code: i64) -> String {
     format!("{}{}", if code < 0 { "-" } else { "" }, per(code.abs(), 1))
 }
 
+/// A section's closure readings ([`ClosureReading`]) added to the window's, one entry a level.
+fn gather_closures(window: &mut Vec<(usize, usize, i64, i64)>, readings: &[ClosureReading]) {
+    for r in readings {
+        match window.iter_mut().find(|w| w.0 == r.level) {
+            Some(w) => (w.1, w.2, w.3) = (w.1 + r.ticks, w.2 + r.code, w.3 + r.flat),
+            None => window.push((r.level, r.ticks, r.code, r.flat)),
+        }
+    }
+}
+
+/// The window's closure per level: its ticks, the closure's code a tick and the flat menu's
+/// `log₂ |M|` a tick, in bits; the heading is located where the code falls below the flat.
+fn closure_line(window: &[(usize, usize, i64, i64)]) -> String {
+    window
+        .iter()
+        .map(|&(level, ticks, code, flat)| format!("level={level} ticks={ticks} code_bits_a_tick={} flat_bits_a_tick={}", per(code, ticks.max(1)), per(flat, ticks.max(1))))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 pub(super) fn per(code: i64, n: usize) -> String {
     let milli = (code as i128 * 1000 + ((n as i128) << (READ_BITS - 1))) / ((n as i128) << READ_BITS);
     format!("{}.{:03}", milli / 1000, milli % 1000)
@@ -3385,6 +3405,10 @@ pub(super) enum Joined {
     /// The passage with the packets ([`Tower::join_packets`]): each clocked level's push, gate and
     /// turn hear the packet its clock closed.
     PassagePackets,
+    /// The passage and the packets with the heading ([`Tower::join_heading`]): each clocked level
+    /// reads its modes through its own heading material before each arrival, and the heading meets
+    /// the trace of the arrivals its next tick closes.
+    PassagePacketsHeading,
     /// The pair contacts paired at the founding ([`TowerLearner::paired`]), each section founding
     /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
     /// learner (`PAIRED.<pass>`, `PAIRED`).
@@ -3467,8 +3491,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        if learner.tower.passage() != matches!(joined, Joined::Passage | Joined::PassagePackets) || learner.tower.packets() != (joined == Joined::PassagePackets) {
+        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading);
+        if learner.tower.passage() != (packets || joined == Joined::Passage) || learner.tower.packets() != packets {
             return Err("the continued learner's passage or packets differ from the declared ones".into());
+        }
+        if learner.tower.heading() != (joined == Joined::PassagePacketsHeading) {
+            return Err("the continued learner's heading differs from the declared one".into());
         }
         learner
     } else {
@@ -3504,6 +3532,14 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_passage().map_err(|e| e.to_string())?;
                 learner.join_packets().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={} packets", learner.tower.news().map_or(0, |c| c.first()));
+            }
+            // A heading run also gives each clocked level its heading, `D` at zero, so it opens on
+            // the packet run face for face ([`Tower::join_heading`]).
+            Joined::PassagePacketsHeading => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_packets().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
             }
             // A split run widens the contact field by two at the founding, every pair dormant
             // ([`TowerLearner::paired`]); the founding run carries their directions.
@@ -3549,6 +3585,8 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
         let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
+        // Under the heading, each clocked level's closure over the window: ticks, code, flat.
+        let mut closures: Vec<(usize, usize, i64, i64)> = Vec::new();
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3673,13 +3711,18 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             window.1 += coded;
             deposits += receipt.deposited as usize;
             halvings += receipt.halvings;
+            gather_closures(&mut closures, &receipt.closure);
             if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
                     pass, k + 1, per(window.0, window.1), deposits, halvings, started.elapsed().as_millis()
                 );
+                if !closures.is_empty() {
+                    println!("TOWER_CLOSURE pass={} section={} {}", pass, k + 1, closure_line(&closures));
+                }
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                 window = (0, 0);
+                closures.clear();
             }
         }
         // Each pass's learner rests beside the run before the held-out read, so a run stopped at

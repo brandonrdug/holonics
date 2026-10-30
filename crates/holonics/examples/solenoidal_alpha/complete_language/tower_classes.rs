@@ -111,6 +111,14 @@ pub(crate) fn train_packet_realized(args: &[String], news: NewsClock, realizatio
     train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::PassagePackets, ContactLaw::Rectifying, realization)
 }
 
+/// `train-two-ladder-stacked-news-heading-tower-classes`: [`train_packet_realized`] (the race's
+/// C′) with the heading joined after the packets, so each clocked level reads its modes through
+/// its own heading before each arrival and the heading meets the trace of the arrivals its next
+/// tick closes (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §4).
+pub(crate) fn train_heading_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeading, ContactLaw::Rectifying, realization)
+}
+
 /// `train-two-ladder-stacked-news-packet-pair-tower-classes`: [`train_packet_realized`] (the race's
 /// C′) with every contact the pair contact, founded on the same draws (record
 /// `2026-10-30_THE_PAIR_CONTACT_IS_RACED…`, §3 acceptance 4).
@@ -147,7 +155,7 @@ pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassR
 #[allow(clippy::too_many_arguments)]
 fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 && !(joined == Joined::Split && args.len() == 23) {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes|train-two-ladder-split-tower-classes|train-two-ladder-dormant-split-tower-classes|train-two-ladder-stacked-news-packet-pair-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes|train-two-ladder-split-tower-classes|train-two-ladder-dormant-split-tower-classes|train-two-ladder-stacked-news-packet-pair-tower-classes|train-two-ladder-stacked-news-heading-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
