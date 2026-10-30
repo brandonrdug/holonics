@@ -39,11 +39,14 @@ pub enum Slot {
 
 /// What a section reads of one forward: per stream, per cell, the face compared at its target, `(the
 /// target's mass, the total)` on `2^(−62)` (`None` where the place is compared with nothing), and,
-/// for the opening read, the swell per level (`TowerLearner::swell`; empty for a reread).
+/// for the opening read, the swell per level (`TowerLearner::swell`; empty for a reread). Under the
+/// heading, per stream and per level, each tick's closure face `(e_jj, Σ_i e_ji)` on `2^(−62)`
+/// (`Tower::join_heading`; empty without it).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PassRead {
     pub faces: Vec<Vec<Option<(u128, u128)>>>,
     pub swell: Vec<[u64; 4]>,
+    pub closures: Vec<Vec<Vec<(u128, u128)>>>,
 }
 
 impl PassRead {
@@ -58,8 +61,11 @@ impl PassRead {
         if !placed {
             return Err(TowerError::Refused("a realization returned faces that are not one a compared place"));
         }
-        if self.faces.iter().flatten().flatten().any(|&(m, t)| t == 0 || m > t) {
+        if self.faces.iter().flatten().flatten().chain(self.closures.iter().flatten().flatten()).any(|&(m, t)| t == 0 || m > t) {
             return Err(TowerError::Refused("a realization returned a face with no total or a mass past its total"));
+        }
+        if !self.closures.is_empty() && self.closures.len() != self.faces.len() {
+            return Err(TowerError::Refused("a realization returned closures that are not one a stream"));
         }
         Ok(self)
     }
@@ -164,7 +170,8 @@ impl PassRealization for HostPass {
         tower.admit_read(classes, targets)?;
         let reaches = tower.reaches();
         let levels = if slot == Slot::Opened { tower.declaration.levels } else { 0 };
-        let streams: Vec<(KeptStream, Vec<Option<(u128, u128)>>, Vec<[u64; 4]>)> = opening
+        type Read = (KeptStream, Vec<Option<(u128, u128)>>, Vec<[u64; 4]>, Vec<Vec<(u128, u128)>>);
+        let streams: Vec<Read> = opening
             .par_iter()
             .zip(classes.par_iter())
             .zip(targets.par_iter())
@@ -185,12 +192,13 @@ impl PassRealization for HostPass {
                     })
                     .collect();
                 let last = cells.last().map(|c| c.face.clone());
+                let closures = tower.closure_faces(&cells)?;
                 let cells = if end.credit.is_some() { cells } else { Vec::new() };
-                Ok((KeptStream { cells, end, last }, faces, swell))
+                Ok((KeptStream { cells, end, last }, faces, swell, closures))
             })
             .collect::<Result<_>>()?;
         let mut swell = vec![[0u64; 4]; levels];
-        for (_, _, m) in &streams {
+        for (_, _, m, _) in &streams {
             for (a, b) in swell.iter_mut().zip(m) {
                 for (x, y) in a.iter_mut().zip(b) {
                     *x = (*x).max(*y);
@@ -199,13 +207,17 @@ impl PassRealization for HostPass {
         }
         let mut faces = Vec::with_capacity(streams.len());
         let mut kept = Vec::with_capacity(streams.len());
-        for (k, f, _) in streams {
+        let mut closures = Vec::with_capacity(if tower.heading() { streams.len() } else { 0 });
+        for (k, f, _, c) in streams {
             faces.push(f);
             kept.push(k);
+            if tower.heading() {
+                closures.push(c);
+            }
         }
         *self.kept(slot) = Some((kept, reaches));
         self.current = slot == Slot::Opened;
-        Ok(PassRead { faces, swell })
+        Ok(PassRead { faces, swell, closures })
     }
 
     fn reverse(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {
@@ -522,6 +534,9 @@ pub struct ResidentLaw {
     /// Whether the levels the news clock holds hear the packet their clock closed
     /// ([`Tower::join_packets`]): a realization that does not carry it refuses the tower.
     pub packets: bool,
+    /// Whether the levels the news clock holds carry a heading the fine levels read
+    /// ([`Tower::join_heading`]): a realization that does not carry it refuses the tower.
+    pub heading: bool,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -736,6 +751,7 @@ impl Tower {
             mutual: self.mutual,
             passage: self.passage,
             packets: self.packets,
+            heading: self.heading,
             held_log: reaches.held_log,
         })
     }

@@ -1785,6 +1785,11 @@ struct LevelLayout {
     /// The contacts' `W₁ˣ` on the passing current (an empty family without the passage or on a level
     /// below the clock's first clocked level, [`Tower::join_passage`]).
     passage: usize,
+    /// The heading's read `C^→` (re, im, `w × n`) and its descent `D` (`w × w`), each an empty
+    /// family without the heading or below the clock's first clocked level ([`Tower::join_heading`]).
+    heading_re: usize,
+    heading_im: usize,
+    descent: usize,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1858,6 +1863,9 @@ impl Layout {
                 pa_contact: 0,
                 pa_friction: 0,
                 passage: 0,
+                heading_re: 0,
+                heading_im: 0,
+                descent: 0,
             };
             if d.gated {
                 level.gate = take(n * w, MATERIAL_BITS);
@@ -1912,6 +1920,21 @@ impl Layout {
             }
         }
         Self { encoding, levels, readout, readout_bias, pair_readout, pair_encoding, ring_readout, ring_factors, strand_contact, strand_pair, len: at, families }
+    }
+
+    /// The layout with the heading's material appended after every other part's
+    /// ([`Tower::join_heading`]): at each level from the clock's first clocked level, its read
+    /// `C^→` (re, im) and its descent `D`.
+    fn with_heading(mut self, d: &TowerDeclaration, first: usize) -> Self {
+        let (w, n) = (d.width, d.modes);
+        for level in self.levels.iter_mut().skip(first) {
+            for (slot, len) in [(&mut level.heading_re, w * n), (&mut level.heading_im, w * n), (&mut level.descent, w * w)] {
+                *slot = self.len;
+                self.families.push((self.len, len, MATERIAL_BITS));
+                self.len += len;
+            }
+        }
+        self
     }
 }
 
@@ -2078,6 +2101,8 @@ pub struct Tower {
     passage: bool,
     /// Whether each clocked level hears the packet its clock closed ([`Tower::join_packets`]).
     packets: bool,
+    /// Whether each clocked level carries a heading the fine levels read ([`Tower::join_heading`]).
+    heading: bool,
     /// The mutual contact's `b` (`β = 2^(−b)`), when the comparison is one
     /// ([`Tower::join_mutual_contact`]).
     mutual: Option<u32>,
@@ -2128,6 +2153,10 @@ pub struct TowerState {
     /// rest since the level's last tick, at the levels the clock holds (empty below them, and
     /// empty without packets; [`Tower::join_packets`]).
     pub packets: Vec<Vec<(i64, i64)>>,
+    /// Under the heading, each clocked level's open trace on the face's `2^(−16)`: the encoded
+    /// faces of the arrivals since the level's last tick, summed (empty below the clock's first
+    /// clocked level, and empty without the heading; [`Tower::join_heading`]).
+    pub traces: Vec<Vec<i64>>,
 }
 
 /// [definition; agent-inferred, October 23] **A level's passage credit**: the derivative of its
@@ -2468,6 +2497,29 @@ struct LevelCell {
     participation: Option<ParticipationCell>,
     /// The level's open packet at this cell, at a level that hears one (absent elsewhere).
     packet: Option<PacketCell>,
+    /// The level's heading at this cell, read from its modes before the arrival (absent without
+    /// the heading or below the clock's first clocked level, [`Tower::join_heading`]).
+    heading: Option<HeadingCell>,
+    /// The trace of the span the level's tick closed at this cell (absent away from its ticks).
+    trace: Option<TraceCell>,
+}
+
+/// [agent-inferred, October 30] A clocked level's heading at one cell ([`Tower::join_heading`]):
+/// its modes before the arrival as a face `(re…, im…)` on `2^(−16)`, and the heading
+/// `ĥ = r̂(Re(C^→ h))` on `2^(−16)` with its scale.
+#[derive(Clone, Debug)]
+struct HeadingCell {
+    face: Vec<i64>,
+    read: Vec<i32>,
+    scale: i128,
+}
+
+/// The trace a tick closed: `τ = r̂(o)` on `2^(−16)` and its scale, `o` the span's encoded
+/// faces summed.
+#[derive(Clone, Debug)]
+struct TraceCell {
+    read: Vec<i32>,
+    scale: i128,
 }
 
 /// [agent-inferred, October 30] A clocked level's packet at one cell ([`Tower::join_packets`]): the
@@ -2623,6 +2675,9 @@ struct Reaches {
     participation: Vec<[u64; 9]>,
     /// Per level, the contacts' `W₁ˣ` on the passing current (empty without the passage).
     passage: Vec<u64>,
+    /// Per level, the heading's read `C^→` (re, im) and its descent `D` (empty without the heading,
+    /// zero below the clock's first clocked level).
+    heading: Vec<[u64; 3]>,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held gated move's met dissipation.
     held_log: i64,
     /// Each gated level's founded moves (empty when ungated).
@@ -2714,6 +2769,14 @@ fn turn_face(s: i64, ladder: &[(i128, i128)]) -> (i128, i128) {
         }
     }
     value
+}
+
+/// [agent-inferred, October 30] The closure's scale `s = ⌈½ ⌈log₂ w⌉⌉` ([`Tower::join_heading`]):
+/// a heading and a trace are ratios with `|r̂|² = w`, so two of independent directions pair with
+/// spread `√w`, and `2^(−s)` brings it to about one bit (`s = 3` at `w = 64`).
+fn closure_shift(width: usize) -> u32 {
+    let bits = if width <= 1 { 0 } else { usize::BITS - (width - 1).leading_zeros() };
+    bits.div_ceil(2)
 }
 
 /// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` on `2^(−16)`, `r` on `2^(−16)`; a zero face reads
@@ -2884,7 +2947,7 @@ impl Tower {
         // The gate's material and bias open at zero: r = ½, the founded move; the turn's at zero,
         // so a turned tower opens on its gated twin; the pump's at zero (κ = 0, β = 0), so a pumped
         // tower opens on its turned twin.
-        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, mutual: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
+        Ok(Self { declaration: d, theta, pair: None, ring: None, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, heading: false, mutual: None, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) })
     }
 
     /// The rested state: every mode at zero, at the start.
@@ -2902,6 +2965,10 @@ impl Tower {
             sites: self.participation.as_ref().map_or_else(Vec::new, |_| vec![LevelSites::rest(self.declaration.modes); self.declaration.levels]),
             packets: match self.packet_from() {
                 Some(first) => (0..self.declaration.levels).map(|l| if l >= first { vec![(0, 0); self.declaration.modes] } else { Vec::new() }).collect(),
+                None => Vec::new(),
+            },
+            traces: match self.heading_from() {
+                Some(first) => (0..self.declaration.levels).map(|l| if l >= first { vec![0; self.declaration.width] } else { Vec::new() }).collect(),
                 None => Vec::new(),
             },
         }
@@ -3026,7 +3093,14 @@ impl Tower {
                 .collect()
         };
         let passage = if self.passage { self.layout.levels.iter().enumerate().map(|(l, lv)| if self.hears(l) { reach(&t[lv.passage..lv.passage + d.contacts * d.width]) } else { 0 }).collect() } else { Vec::new() };
-        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout_bias]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, passage, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
+        let heading = match self.heading_from() {
+            Some(first) => {
+                let (wn, ww) = (d.width * d.modes, d.width * d.width);
+                self.layout.levels.iter().enumerate().map(|(l, lv)| if l >= first { [reach(&t[lv.heading_re..lv.heading_re + wn]), reach(&t[lv.heading_im..lv.heading_im + wn]), reach(&t[lv.descent..lv.descent + ww])] } else { [0; 3] }).collect()
+            }
+            None => Vec::new(),
+        };
+        Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout_bias]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, passage, heading, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
     }
 
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
@@ -3072,6 +3146,42 @@ impl Tower {
             let mut lift = vec![0i64; w];
             affine(&t[pe..pe + w * k], reaches.pair[1], k, c, None, 0, MATERIAL_BITS, &mut lift)?;
             x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the pair face's lift outgrew the face's 32-bit carrier")))?;
+        }
+        // The heading ([`Tower::join_heading`]): each clocked level's heading, read from its modes
+        // before this arrival, `ĥ_l = r̂(Re(C^→_l h_l))`, enters the residual stream through its
+        // descent, `x⁰ = E(u) + Σ_l D_l ĥ_l` on 2^(−40) released to 2^(−16); the arrival's encoded
+        // face joins each clocked level's open trace, and a tick of the level closes the trace,
+        // `τ_l = r̂(o_l)`, and rests it.
+        let mut headings: Vec<Option<HeadingCell>> = vec![None; d.levels];
+        let mut traces: Vec<Option<TraceCell>> = vec![None; d.levels];
+        if let Some(first) = self.heading_from() {
+            for l in first..d.levels {
+                let lv = &self.layout.levels[l];
+                let hr = &reaches.heading[l];
+                let mut face = vec![0i64; 2 * n];
+                for (k, &(re, im)) in state.modes[l].iter().enumerate() {
+                    face[k] = fit64(release(re as i128, STATE_BITS - FACE_BITS))?;
+                    face[n + k] = fit64(release(im as i128, STATE_BITS - FACE_BITS))?;
+                }
+                let (mut read_a, mut read_b) = (vec![0i64; w], vec![0i64; w]);
+                affine(&t[lv.heading_re..lv.heading_re + w * n], hr[0], n, &face[..n], None, 0, 0, &mut read_a)?;
+                affine(&t[lv.heading_im..lv.heading_im + w * n], hr[1], n, &face[n..], None, 0, 0, &mut read_b)?;
+                let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
+                let (read, scale) = ratio_to_power(&raw)?;
+                let mut lift = vec![0i64; w];
+                affine(&t[lv.descent..lv.descent + w * w], hr[2], w, &read, None, 0, MATERIAL_BITS, &mut lift)?;
+                x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the heading's descent outgrew the face's 32-bit carrier")))?;
+                headings[l] = Some(HeadingCell { face, read, scale });
+                let open = &mut state.traces[l];
+                for (o, &v) in open.iter_mut().zip(&t[e..e + w]) {
+                    *o = fit64(*o as i128 + v as i128)?;
+                }
+                if ticks[l] > 0 {
+                    let (read, scale) = ratio_to_power(open)?;
+                    open.fill(0);
+                    traces[l] = Some(TraceCell { read, scale });
+                }
+            }
         }
         // The strands hear the arriving word; their faces are read at their level's contacts
         // beside the level's read ([`Strands`]).
@@ -3379,7 +3489,7 @@ impl Tower {
             }
             let push = push_re.into_iter().zip(push_im).collect();
             let strands = faces.map_or_else(Vec::new, <[i32]>::to_vec);
-            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell, packet });
+            levels.push(LevelCell { input: std::mem::replace(&mut x, next), push, state: state_copy, state_face: face, read, read_scale, drive, pair, conduct, gate, strands, ticks: moves, participation: part_cell, packet, heading: headings[l].take(), trace: traces[l].take() });
         }
         let a = d.alphabet;
         let mut z = vec![0i64; a];
@@ -3447,6 +3557,42 @@ impl Tower {
         let raw: Vec<i64> = collect_exact(read_a.iter().zip(&read_b).map(|(a, b)| fit64(release(*a as i128 - *b as i128, MATERIAL_BITS))))?;
         let (read, scale) = ratio_to_power(&raw)?;
         Ok(PacketRead { face, read, scale })
+    }
+
+    /// [agent-inferred, October 30] **The closure over a stream's section** ([`Tower::join_heading`]):
+    /// at each clocked level, each tick's heading paired with the trace of every tick of the
+    /// section, its menu, `z_ji = 2^(−s) ⟨ĥ(t_j), τ(i)⟩` bits on `2^(−16)` ([`closure_shift`]), and
+    /// the tick's face over the menu, the masses `2^(z_ji − max_i z_ji)` on `2^(−62)` and their
+    /// total, compared at the tick's own trace. Per level (none below the first clocked level and
+    /// none without the heading), the tick cells in order and their faces.
+    fn closures(&self, cells: &[Cell]) -> Result<Vec<(Vec<usize>, Vec<TowerFace>)>> {
+        let d = &self.declaration;
+        let Some(first) = self.heading_from() else { return Ok(Vec::new()) };
+        let shift = FACE_BITS + closure_shift(d.width);
+        let missing = || TowerError::Refused("a heading at every cell and a trace at every tick of a level that carries one");
+        let mut out = vec![(Vec::new(), Vec::new()); d.levels];
+        for (l, slot) in out.iter_mut().enumerate().skip(first) {
+            let ticks: Vec<usize> = (0..cells.len()).filter(|&i| cells[i].levels[l].trace.is_some()).collect();
+            let traces: Vec<&[i32]> = ticks.iter().map(|&i| cells[i].levels[l].trace.as_ref().map(|c| c.read.as_slice()).ok_or_else(missing)).collect::<Result<_>>()?;
+            let mut faces = Vec::with_capacity(ticks.len());
+            for &j in &ticks {
+                let heading = &cells[j].levels[l].heading.as_ref().ok_or_else(missing)?.read;
+                let z: Vec<i64> = collect_exact(traces.iter().map(|tau| fit64(release(heading.iter().zip(*tau).map(|(&a, &b)| a as i128 * b as i128).sum(), shift))))?;
+                let zmax = *z.iter().max().expect("a tick's own trace is on its menu");
+                let masses: Vec<u128> = z.iter().map(|&v| self.exponential.below_one((v - zmax) as i128)).collect();
+                let total = masses.iter().sum();
+                faces.push(TowerFace { masses, total });
+            }
+            *slot = (ticks, faces);
+        }
+        Ok(out)
+    }
+
+    /// Each clocked level's closure faces over a stream's section, `(e_jj, Σ_i e_ji)` on `2^(−62)`
+    /// tick by tick, what the certificate reads beside the arrivals' faces (empty without the
+    /// heading).
+    pub(crate) fn closure_faces(&self, cells: &[Cell]) -> Result<Vec<Vec<(u128, u128)>>> {
+        Ok(self.closures(cells)?.into_iter().map(|(_, faces)| faces.into_iter().enumerate().map(|(j, f)| (f.masses[j], f.total)).collect()).collect())
     }
 
     /// [agent-inferred, October 29] **The mutual contact's face** at the top `x` (record
@@ -3615,6 +3761,39 @@ impl Tower {
         }
         if self.news.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a news clock: its moments over a clocked move are owed");
+        }
+        // The closure's covectors ([`Tower::join_heading`]): each tick's face, compared with its own
+        // trace, returns `g_ji = e_ji/Σ_i e_ji − [i = j]` on 2^(−24); the heading takes
+        // `Σ_i g_ji 2^(−s) τ_i` and each trace `Σ_j g_ji 2^(−s) ĥ_j`, each through its ratio's
+        // adjoint, as the covector of the raw read `Re(C^→ h)` at the tick's cell and of the
+        // span's summed encoding `o`. Both sides of the comparison change.
+        let mut heading_cov: Vec<Vec<(usize, Vec<i64>)>> = vec![Vec::new(); d.levels];
+        let mut trace_cov: Vec<Vec<(usize, Vec<i64>)>> = vec![Vec::new(); d.levels];
+        let closure_missing = || TowerError::Refused("a heading at every cell and a trace at every tick of a level that carries one");
+        for (l, (ticks, faces)) in self.closures(cells)?.into_iter().enumerate() {
+            let shift = FACE_BITS + closure_shift(w);
+            let mut dtau = vec![vec![0i128; w]; ticks.len()];
+            for (j, (&cj, face)) in ticks.iter().zip(&faces).enumerate() {
+                let heading = cells[cj].levels[l].heading.as_ref().ok_or_else(closure_missing)?;
+                let mut dh = vec![0i128; w];
+                for (i, (&ci, gji)) in ticks.iter().zip(covector(face, j)).enumerate() {
+                    if gji == 0 {
+                        continue;
+                    }
+                    let tau = &cells[ci].levels[l].trace.as_ref().ok_or_else(closure_missing)?.read;
+                    for k in 0..w {
+                        dh[k] += gji as i128 * tau[k] as i128;
+                        dtau[i][k] += gji as i128 * heading.read[k] as i128;
+                    }
+                }
+                let dh: Vec<i64> = collect_exact(dh.into_iter().map(|v| fit64(release(v, shift))))?;
+                heading_cov[l].push((cj, ratio_adjoint(&heading.read, heading.scale, &dh)?));
+            }
+            for (&ci, dt) in ticks.iter().zip(dtau) {
+                let trace = cells[ci].levels[l].trace.as_ref().ok_or_else(closure_missing)?;
+                let dt: Vec<i64> = collect_exact(dt.into_iter().map(|v| fit64(release(v, shift))))?;
+                trace_cov[l].push((ci, ratio_adjoint(&trace.read, trace.scale, &dt)?));
+            }
         }
         // Under a mutual contact, each cell's covector of the produced face through it, `G_y`.
         let mut gys: Vec<Vec<i64>> = Vec::with_capacity(if self.mutual.is_some() { cells_n } else { 0 });
@@ -3813,6 +3992,32 @@ impl Tower {
                 }
                 dreads.push(dread);
                 negs.push(neg);
+            }
+            // The heading's covector ([`Tower::join_heading`]) reaches its read `C^→` against the
+            // modes it read, and those modes: the state after the cell before the tick (the
+            // opening's modes are a constant), whose covector the level's own scan carries into its
+            // moves, its push and its packets.
+            if !heading_cov[l].is_empty() {
+                let hreach = &reaches.heading[l];
+                let (mut dreads_h, mut negs_h, mut faces_h) = (Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()), Vec::with_capacity(heading_cov[l].len()));
+                for (i, dr) in &heading_cov[l] {
+                    let neg: Vec<i64> = dr.iter().map(|v| -v).collect();
+                    if *i > 0 {
+                        let (mut hre, mut him) = (vec![0i64; n], vec![0i64; n]);
+                        transposed(&t[lv.heading_re..lv.heading_re + w * n], hreach[0], n, dr, MATERIAL_BITS, &mut hre)?;
+                        transposed(&t[lv.heading_im..lv.heading_im + w * n], hreach[1], n, &neg, MATERIAL_BITS, &mut him)?;
+                        for (slot, (a, b)) in read_cov[i - 1].iter_mut().zip(hre.into_iter().zip(him)) {
+                            *slot = (fit64(slot.0 as i128 + a as i128)?, fit64(slot.1 as i128 + b as i128)?);
+                        }
+                    }
+                    faces_h.push(cells[*i].levels[l].heading.as_ref().ok_or_else(closure_missing)?.face.as_slice());
+                    dreads_h.push(dr.as_slice());
+                    negs_h.push(neg);
+                }
+                let faces_re: Vec<&[i64]> = faces_h.iter().map(|f| &f[..n]).collect();
+                let faces_im: Vec<&[i64]> = faces_h.iter().map(|f| &f[n..]).collect();
+                outer_sum(&mut g[lv.heading_re..lv.heading_re + w * n], n, &dreads_h, &faces_re)?;
+                outer_sum(&mut g[lv.heading_im..lv.heading_im + w * n], n, &negs_h, &faces_im)?;
             }
             // Participation's sites, in order: a held cell's current covector joins its last site's
             // (before the section's first site that site is the opening's, a constant, and it is
@@ -4425,6 +4630,30 @@ impl Tower {
             }
         }
         let e = self.layout.encoding;
+        // The descent takes the input's covector against the heading it read, `G_D = Σ δx⁰ ĥᵀ`; the
+        // heading itself is located by its closure alone, and the fine levels' covector stops at
+        // `D` ([`Tower::join_heading`]).
+        if let Some(first) = self.heading_from() {
+            for l in first..d.levels {
+                let lv = self.layout.levels[l];
+                let reads: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].heading.as_ref().map(|h| h.read.as_slice()).ok_or_else(closure_missing)).collect::<Result<_>>()?;
+                outer_sum(&mut g[lv.descent..lv.descent + w * w], w, &dx, &reads)?;
+            }
+        }
+        // Each trace's covector reaches the encoding of every arrival of its span inside the
+        // section; the span's arrivals before the opening were summed into the carried trace, a
+        // constant.
+        for covs in &trace_cov {
+            let mut start = 0;
+            for (closed, dov) in covs {
+                for &u in &classes[start..=*closed] {
+                    for (slot, &v) in g[e + u * w..e + (u + 1) * w].iter_mut().zip(dov) {
+                        *slot += v as i128;
+                    }
+                }
+                start = closed + 1;
+            }
+        }
         for (i, dxi) in dx.iter().enumerate() {
             let u = classes[i];
             for (slot, &v) in g[e + u * w..e + (u + 1) * w].iter_mut().zip(dxi) {
@@ -4650,14 +4879,17 @@ impl Tower {
         if self.passage {
             s.push_str("passage\n");
         }
+        if self.heading {
+            s.push_str("heading\n");
+        }
         s
     }
 
     /// The count of lines [`Tower::to_text`] takes for the tower whose text begins `text`: two, one
     /// more with a mutual contact, three more with a pair face, two more with a ring face (one more a rank with its pair
     /// moves, one more with its harmonics and one more with its restarts), three more with a
-    /// rotor, five more with strands, and one more each with a news clock, packets, participation
-    /// and the passage.
+    /// rotor, five more with strands, and one more each with a news clock, packets, participation,
+    /// the passage and the heading.
     fn text_lines(text: &str) -> usize {
         let mut n = 2;
         if text.lines().nth(n).is_some_and(|l| l.starts_with("mutual-contact ")) {
@@ -4694,6 +4926,9 @@ impl Tower {
             n += 1;
         }
         if text.lines().nth(n) == Some("passage") {
+            n += 1;
+        }
+        if text.lines().nth(n) == Some("heading") {
             n += 1;
         }
         n
@@ -4780,8 +5015,12 @@ impl Tower {
         let packets = lines.next_if(|&l| l == "packets").is_some();
         let participation = lines.next_if(|l| l.starts_with("participation ")).map(ParticipationDeclaration::from_text).transpose()?;
         let passage = lines.next_if(|&l| l == "passage").is_some();
+        let heading = lines.next_if(|&l| l == "heading").is_some();
         if passage && news.is_none() {
             return refuse("the passage joins the levels a news clock holds: without one no level is held");
+        }
+        if heading && !packets {
+            return refuse("the heading is closed at the packets' ticks: without packets no level closes a span");
         }
         let layout = Layout::new(
             &declaration,
@@ -4793,13 +5032,17 @@ impl Tower {
             mutual.is_some(),
             if passage { news.map(|c| c.first()) } else { None },
         );
+        let layout = match news.filter(|_| heading) {
+            Some(clock) => layout.with_heading(&declaration, clock.first()),
+            None => layout,
+        };
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
         }
         // The rotor, the strands and the news clock join by their own laws, so a text that holds
         // them together is read under the same refusals as their joins; the strands' material is
         // the text's.
-        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, mutual, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
+        let mut tower = Self { declaration, theta, pair, ring, rotor: None, strands: None, news: None, participation: None, passage: false, packets: false, heading: false, mutual, layout, exponential: Exponential::new(FACE_BITS), fine: Exponential::new(MOVE_BITS) };
         if let Some(b) = tower.mutual {
             Self::admits_mutual(b)?;
             if tower.pair.is_some() || tower.ring.is_some() {
@@ -4829,9 +5072,16 @@ impl Tower {
             }
             tower.participation = Some(p);
         }
-        if passage {
+        // The passage and the heading join last, in that order, each re-reading the layout; the
+        // material is the text's.
+        if passage || heading {
             let theta = std::mem::take(&mut tower.theta);
-            tower.join_passage()?;
+            if passage {
+                tower.join_passage()?;
+            }
+            if heading {
+                tower.join_heading()?;
+            }
             if theta.len() != tower.theta.len() {
                 return refuse("material of the wrong extent");
             }
@@ -4845,6 +5095,9 @@ impl Tower {
     /// exactly as the tower did, and the section's covector moves them from there. Refused when a
     /// face is already joined or the face's alphabet or width is not the tower's.
     pub fn join_pair_face(&mut self, face: PairFace) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -4887,6 +5140,9 @@ impl Tower {
     /// rested before the join carries no ring: rest it again. Refused when a ring face is already
     /// joined or comes without its founded factors.
     pub fn join_ring_face(&mut self, face: RingFace) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -4937,6 +5193,9 @@ impl Tower {
     /// Refused beside a ring face (a ring founded on a mode's own moves reads the mode unstepped;
     /// its law under a step is owed) or when one is already joined.
     pub fn join_rotor(&mut self, rotor: Rotor) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -4967,6 +5226,9 @@ impl Tower {
     /// over a clocked move is owed), beside a ring face (the ring rides its mode's single move) or
     /// a rotor (it steps once an arrival).
     pub fn join_news(&mut self, clock: NewsClock) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.news.is_some() {
             return refuse("a tower takes one news clock");
         }
@@ -5044,6 +5306,9 @@ impl Tower {
     /// the readout (a pair or ring face, strands, participation; the duplex and the tension
     /// reading refuse it too). A rotor and a news clock read no readout and may join after it.
     pub fn join_mutual_contact(&mut self, b: u32) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -5088,6 +5353,9 @@ impl Tower {
     /// does. Its material follows every other part's, so it joins last. A stream rested before the
     /// join is rested again.
     pub fn join_participation(&mut self, p: ParticipationDeclaration) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -5129,6 +5397,9 @@ impl Tower {
     /// and beside a ring face, a rotor or strands, whose contacts' lifts read the contacts' rows by
     /// their own laws.
     pub fn join_passage(&mut self) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("a tower takes one passage");
         }
@@ -5178,6 +5449,9 @@ impl Tower {
     /// the join is rested again. Refused without a news clock (or one above the top level) and
     /// beside participation, whose sites at the clocked levels are then the packets (owed).
     pub fn join_packets(&mut self) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.packets {
             return refuse("a tower takes its packets once");
         }
@@ -5199,6 +5473,59 @@ impl Tower {
     /// The first level that hears a packet, when packets are joined.
     pub(crate) fn packet_from(&self) -> Option<usize> {
         if self.packets {
+            self.news.map(|c| c.first())
+        } else {
+            None
+        }
+    }
+
+    /// [definition; agent-inferred, October 30] **The heading joined** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §4): each level the
+    /// news clock holds (from its first clocked level `F`) reads its modes before each arrival
+    /// through its own heading material, `ĥ_l = r̂(Re(C^→_l h_l))`, and the residual stream opens on
+    /// `x⁰ = E(u) + Σ_l D_l ĥ_l`. Each such level carries the open trace of the arrivals since its
+    /// last tick, `o_l ← o_l + E(u)`, closed at the tick as `τ_l = r̂(o_l)`; the heading the level
+    /// held meets the traces of the section's ticks through a pair contact
+    /// ([`Tower::closure_faces`]), and the closure's code joins the section's.
+    ///
+    /// [agent-inferred] `C^→_l` opens as a copy of the level's read, so a heading opens on what the
+    /// level's contacts read (a heading at zero is no ratio, and its closure would have no
+    /// covector), and `D_l` at zero, so the joined tower opens on itself face for face. Its material
+    /// follows every other part's, so it joins last; a stream's open traces are its state, so a
+    /// stream rested before the join is rested again. Refused without packets (the trace is the
+    /// span the packet's tick closes) and beside participation, a mutual contact, a ring face, a
+    /// rotor or strands, whose laws beside it are owed.
+    pub fn join_heading(&mut self) -> Result<()> {
+        if self.heading {
+            return refuse("a tower takes one heading");
+        }
+        let Some(first) = self.packet_from() else {
+            return refuse("the heading is closed at the packets' ticks: without packets no level closes a span");
+        };
+        if self.participation.is_some() || self.mutual.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
+            return refuse("the heading beside participation, a mutual contact, a ring face, a rotor or strands is owed");
+        }
+        let d = self.declaration;
+        let wn = d.width * d.modes;
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, 0, None, false, self.heard_from()).with_heading(&d, first);
+        self.theta.resize(layout.len, 0);
+        for lv in &layout.levels[first..] {
+            self.theta.copy_within(lv.read_re..lv.read_re + wn, lv.heading_re);
+            self.theta.copy_within(lv.read_im..lv.read_im + wn, lv.heading_im);
+        }
+        self.layout = layout;
+        self.heading = true;
+        Ok(())
+    }
+
+    /// Whether each clocked level carries a heading ([`Tower::join_heading`]).
+    pub fn heading(&self) -> bool {
+        self.heading
+    }
+
+    /// The first level that carries a heading, when the heading is joined.
+    pub(crate) fn heading_from(&self) -> Option<usize> {
+        if self.heading {
             self.news.map(|c| c.first())
         } else {
             None
@@ -5228,6 +5555,9 @@ impl Tower {
     /// before the join is rested again. Refused when strands are already joined or at another
     /// tower's shape.
     pub fn join_strands(&mut self, strands: Strands) -> Result<()> {
+        if self.heading {
+            return refuse("the heading joins last: its material follows every other part's");
+        }
         if self.passage {
             return refuse("the passage joins last: its material follows every other part's");
         }
@@ -5562,6 +5892,21 @@ pub struct SectionReceipt {
     pub halvings: u32,
     pub deposited: bool,
     pub parts: Vec<(i64, i64)>,
+    /// Under the heading, each clocked level's closure on the section's opening read (empty
+    /// without it); its code joins the arrivals' in the certificate, never in `code_before`.
+    pub closure: Vec<ClosureReading>,
+}
+
+/// [agent-inferred, October 30] A clocked level's closure over a section's opening read
+/// ([`Tower::join_heading`]): its ticks over every stream, their closure code `Σ_j ℓ_j`, and the
+/// flat menu's `Σ_j log₂ |M|`, both on the code's grain ([`face_code`]). The heading is located
+/// where `code` falls below `flat`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ClosureReading {
+    pub level: usize,
+    pub ticks: usize,
+    pub code: i64,
+    pub flat: i64,
 }
 
 impl TowerLearner {
@@ -5654,8 +5999,34 @@ impl TowerLearner {
         self.tower.admit_read(classes, &targets)?;
         let opening: Vec<TowerState> = states.to_vec();
         let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
-        self.swell = read.swell;
-        let faces_old: Vec<(u128, u128)> = read.faces.iter().flatten().flatten().copied().collect();
+        self.swell.clone_from(&read.swell);
+        // Under the heading the certificate compares the arrivals' faces and every tick's closure
+        // face together ([`Tower::join_heading`]); the arrivals alone are the section's code.
+        let heading = self.tower.heading();
+        let compared_faces = |r: &realization::PassRead| -> Result<Vec<(u128, u128)>> {
+            if heading && r.closures.len() != classes.len() {
+                return refuse("a read under the heading returns each stream's closure faces");
+            }
+            Ok(r.faces.iter().flatten().flatten().chain(r.closures.iter().flatten().flatten()).copied().collect())
+        };
+        let faces_old = compared_faces(&read)?;
+        let arrivals = read.faces.iter().flatten().flatten().count();
+        let closure: Vec<ClosureReading> = match self.tower.heading_from() {
+            Some(first) => (first..self.tower.declaration.levels)
+                .map(|level| {
+                    let mut reading = ClosureReading { level, ..Default::default() };
+                    for faces in read.closures.iter().filter_map(|stream| stream.get(level)) {
+                        reading.ticks += faces.len();
+                        reading.code += faces.iter().map(|&(m, t)| face_code(m, t)).sum::<i64>();
+                        if !faces.is_empty() {
+                            reading.flat += faces.len() as i64 * face_code(1, faces.len() as u128);
+                        }
+                    }
+                    reading
+                })
+                .collect(),
+            None => Vec::new(),
+        };
         let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
         // The section's code is read before any founding or step it decides, so a training code
         // stays the opening's.
@@ -5776,11 +6147,11 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                break (SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts }, Slot::Opened);
+                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
-            let faces_new: Vec<(u128, u128)> = reread.faces.iter().flatten().flatten().copied().collect();
+            let faces_new = compared_faces(&reread)?;
             if fewer_bits(&faces_old, &faces_new) {
                 let parts_after = part_codes(&reread.faces);
                 let code_after: i64 = parts_after.iter().sum();
@@ -5794,7 +6165,7 @@ impl TowerLearner {
                         opened = true;
                     }
                 }
-                break (SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts }, Slot::Reread);
+                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure }, Slot::Reread);
             }
             halvings += 1;
         };
@@ -5988,6 +6359,18 @@ impl TowerLearner {
     /// The passage joined to the learner's tower ([`Tower::join_passage`]), its moments at zero.
     pub fn join_passage(&mut self) -> Result<()> {
         self.tower.join_passage()?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
+    }
+
+    /// The heading joined to the learner's tower ([`Tower::join_heading`]), its moments at zero;
+    /// refused after the learner's first section, its streams' open traces being their state.
+    pub fn join_heading(&mut self) -> Result<()> {
+        if self.opened {
+            return refuse("the heading joins a learner before its first section: its streams' open traces are their state");
+        }
+        self.tower.join_heading()?;
         self.first.resize(self.tower.theta.len(), 0);
         self.second.resize(self.tower.theta.len(), 0);
         Ok(())
@@ -8484,12 +8867,14 @@ mod tests {
     }
 
     /// The code of a passage whose faces are compared with `compared` (the classes read when it is
-    /// `None`), read from rest.
-    fn compared_code(tower: &Tower, classes: &[usize], compared: Option<&[Option<usize>]>) -> i64 {
-        let Some(compared) = compared else { return code(tower, classes) };
+    /// `None`), read from rest; under the heading, with every tick's closure code when `closure`
+    /// ([`Tower::join_heading`]).
+    fn compared_code(tower: &Tower, classes: &[usize], compared: Option<&[Option<usize>]>, closure: bool) -> i64 {
         let mut s = tower.rest();
         let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
-        cells.iter().enumerate().filter_map(|(i, cell)| compared[i + 1].map(|t| cell.face.code(t))).sum()
+        let closed: i64 = if closure { tower.closure_faces(&cells).expect("closures").iter().flatten().map(|&(m, t)| face_code(m, t)).sum() } else { 0 };
+        let Some(compared) = compared else { return code(tower, classes) + closed };
+        closed + cells.iter().enumerate().filter_map(|(i, cell)| compared[i + 1].map(|t| cell.face.code(t))).sum::<i64>()
     }
 
     /// The code read at sixteen steps `k 2^(−step)` units, `0 < |k| ≤ 8`.
@@ -8531,9 +8916,14 @@ mod tests {
         // difference by up to a seventh (measured on the gated tower: ±2^(−7), ±2^(−8) and ±2^(−9)
         // units read 92.0, 105.4 and 91.2 against a covector of 104.6, ×10⁶).
         let (mut checked, mut gates_checked, mut turns_checked, mut pumps_checked, mut pairs_checked, mut faces_checked, mut rings_checked, mut strands_checked) = (0, 0, 0, 0, 0, 0, 0, 0);
-        let (mut mutual_checked, mut passages_checked) = (0, 0);
-        let base_code = compared_code(&tower, &classes, compared);
+        let (mut mutual_checked, mut passages_checked, mut headings_checked, mut descents_checked) = (0, 0, 0, 0);
+        let headed = |start: usize, of: fn(&LevelLayout) -> usize| tower.heading_from().is_some_and(|first| tower.layout.levels[first..].iter().any(|lv| of(lv) == start));
+        // Under the heading the code is the arrivals' and the closure's; at `D = 0` the term the
+        // heading's law omits (its covector from `x⁰`, through `Dᵀ`) is zero, so every family's
+        // covector is the whole code's difference ([`Tower::join_heading`]).
+        let base_code = compared_code(&tower, &classes, compared, true);
         for &(start, len, grain) in &tower.layout.families {
+            let descent = headed(start, |lv| lv.descent);
             let mut order: Vec<usize> = (start..start + len).collect();
             order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
             'parameter: for i in order {
@@ -8549,7 +8939,7 @@ mod tests {
                     if conducting(&moved) != base {
                         continue 'parameter;
                     }
-                    moment += k as i128 * (compared_code(&moved, &classes, compared) - base_code) as i128; // on 2^(−20)
+                    moment += k as i128 * (compared_code(&moved, &classes, compared, true) - base_code) as i128; // on 2^(−20)
                     spread += (k * k) as i128;
                 }
                 // The fitted slope against g, both in bits a unit on 2^(−32).
@@ -8566,6 +8956,8 @@ mod tests {
                 strands_checked += (tower.strands.is_some() && (start == tower.layout.strand_contact || start == tower.layout.strand_pair)) as usize;
                 mutual_checked += (tower.mutual.is_some() && [tower.layout.encoding, tower.layout.readout, tower.layout.readout_bias].contains(&start)) as usize;
                 passages_checked += tower.layout.levels.iter().enumerate().any(|(l, lv)| tower.hears(l) && lv.passage == start) as usize;
+                headings_checked += (headed(start, |lv| lv.heading_re) || headed(start, |lv| lv.heading_im)) as usize;
+                descents_checked += descent as usize;
                 break;
             }
         }
@@ -8585,6 +8977,7 @@ mod tests {
         assert!(tower.strands.is_none() || strands_checked == strand_families, "the strands' material carried {strands_checked} readable covectors of {strand_families}");
         assert!(tower.mutual.is_none() || mutual_checked == 3, "the mutual contact's geometry, constants and encoding carried {mutual_checked} readable covectors of 3");
         assert!(!tower.passage || passages_checked >= 1, "no level's passage carried a readable covector");
+        assert!(!tower.heading || (headings_checked >= 1 && descents_checked >= 1), "the heading's read carried {headings_checked} and its descent {descents_checked} readable covectors");
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -9276,7 +9669,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new() };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -9767,7 +10160,7 @@ mod tests {
         assert_eq!(Tower::from_text(&text).expect("restored"), tower);
         assert!(Tower::from_text(&text.replace("news-clock 2 2 2\n", "")).is_err(), "packets read without their clock");
         let state = t.to_text();
-        assert!(state.lines().nth(8).is_some_and(|l| l.starts_with("packets ")) && stacked.rest().to_text().ends_with("packets -\n"));
+        assert!(state.lines().nth(8).is_some_and(|l| l.starts_with("packets ")) && stacked.rest().to_text().ends_with("packets -\ntraces -\n"));
         assert_eq!(tower.state_from_text(&state.lines().collect::<Vec<_>>()).expect("restored"), t);
         assert!(stacked.state_from_text(&state.lines().collect::<Vec<_>>()).is_err(), "open packets on a tower without them");
         assert!(tower.clone().join_packets().is_err(), "packets join once");
@@ -9834,6 +10227,155 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 7);
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
         learner.section(&mut states, &streams).expect("section");
+        for (state, stream) in states.iter().zip(streams) {
+            let mut direct = learner.tower.rest();
+            learner.tower.read_cells(&mut direct, stream).expect("read");
+            assert_eq!(state, &direct);
+        }
+    }
+
+    /// The tower the heading's tests read: [`packeted`] with the heading joined.
+    fn headed(levels: usize) -> Tower {
+        let mut tower = packeted(levels);
+        tower.join_heading().expect("joined");
+        tower
+    }
+
+    /// [agent-inferred, October 30] **A clocked level heads for the trace its tick closes**
+    /// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptances
+    /// 1–3): on four levels clocked from level 2, with `D` at zero the headed tower reads face for
+    /// face as the packeted tower, with and without the passage; each clocked level holds its
+    /// heading between its ticks; its trace at a tick is the ratio of the encoded faces of the
+    /// arrivals since its last tick; the closure has one face a tick over the stream's ticks at
+    /// that level, none below the first clocked level; the text writes the heading and restores
+    /// whole; and the heading is refused without packets, beside participation, twice, before
+    /// another part, and on a learner after its first section.
+    #[test]
+    fn a_clocked_level_heads_for_the_trace_its_tick_closes() {
+        let classes = news_passage();
+        for (plain, tower) in [(packeted(4), headed(4)), {
+            let opened = passage_opened(packeted(4));
+            let mut headed = opened.clone();
+            headed.join_heading().expect("joined");
+            (opened, headed)
+        }] {
+            let (mut s, mut t) = (plain.rest(), tower.rest());
+            let a = plain.forward(&mut s, &classes, &plain.reaches()).expect("forward");
+            let b = tower.forward(&mut t, &classes, &tower.reaches()).expect("forward");
+            for (i, (x, y)) in a.iter().zip(&b).enumerate() {
+                assert_eq!((&x.face, &x.levels[3].state), (&y.face, &y.levels[3].state), "cell {i}");
+            }
+            let w = tower.declaration.width;
+            assert_eq!(t.traces.iter().map(Vec::len).collect::<Vec<_>>(), vec![0, 0, w, w]);
+            let closures = tower.closure_faces(&b).expect("closures");
+            assert!(closures[..2].iter().all(Vec::is_empty));
+            for l in 2..4 {
+                let mut open = vec![0i64; w];
+                let mut ticks = 0;
+                for (i, cell) in b.iter().enumerate() {
+                    let lc = &cell.levels[l];
+                    let heading = lc.heading.as_ref().expect("a heading at every cell of a clocked level");
+                    if i > 0 && b[i - 1].levels[l].ticks == 0 {
+                        assert_eq!(heading.read, b[i - 1].levels[l].heading.as_ref().expect("held").read, "cell {i}, level {l}: a level holds its heading between ticks");
+                    }
+                    for (o, &v) in open.iter_mut().zip(tower.encoding(classes[i])) {
+                        *o += v as i64;
+                    }
+                    match (&lc.trace, lc.ticks) {
+                        (None, 0) => {}
+                        (Some(trace), _) => {
+                            assert_eq!(trace.read, ratio_to_power(&open).expect("ratio").0, "cell {i}, level {l}");
+                            open.fill(0);
+                            ticks += 1;
+                        }
+                        (None, _) => panic!("cell {i}, level {l}: a tick closes its trace"),
+                    }
+                }
+                assert_eq!(open, t.traces[l], "level {l}: the open trace is the arrivals since the last tick");
+                assert!(ticks > 1, "level {l} ticked {ticks} times");
+                assert_eq!(closures[l].len(), ticks);
+                assert!(closures[l].iter().all(|&(m, total)| m > 0 && m <= total), "level {l}");
+            }
+            let text = tower.to_text();
+            assert!(text.ends_with("heading\n"));
+            assert_eq!(Tower::from_text(&text).expect("restored"), tower);
+            assert!(Tower::from_text(&text.replace("packets\n", "")).is_err(), "the heading read without its packets");
+            assert!(Tower::from_text(&text.replace("heading\n", "heading\nheading\n")).is_err());
+            let state = t.to_text();
+            assert!(state.lines().nth(9).is_some_and(|l| l.starts_with("traces ")) && plain.rest().to_text().ends_with("traces -\n"));
+            assert_eq!(tower.state_from_text(&state.lines().collect::<Vec<_>>()).expect("restored"), t);
+            assert!(plain.state_from_text(&state.lines().collect::<Vec<_>>()).is_err(), "open traces on a tower without the heading");
+        }
+        assert!(headed(3).join_heading().is_err(), "the heading joins once");
+        assert!(news_on(tiny_with(3, true)).join_heading().is_err(), "without packets no level closes a span");
+        assert!(headed(3).join_passage().is_err(), "the heading joins last");
+        let mut participating = tiny_clocked_participating(ContactLaw::Rectifying, false, 3);
+        assert!(participating.join_heading().is_err(), "beside participation, whose packets are owed, no level closes a span");
+        let mut learner = TowerLearner::new(packeted(3), 7);
+        let mut states = vec![learner.tower.rest()];
+        learner.section(&mut states, &[&classes[..31]]).expect("section");
+        assert!(learner.join_heading().is_err(), "the heading joins a learner before its first section");
+    }
+
+    /// [agent-inferred, October 30] **The heading's covector is the code difference it predicts**
+    /// (acceptance 4) over the first 31 classes of [`news_passage`]: three gated levels clocked
+    /// from level 2 with packets and the heading, `D` at zero, with and without the passage
+    /// opened. The code is the arrivals' and every tick's closure; the closure moves the heading's
+    /// read and the modes it read, whose covector the level's reverse carries into its moves, push
+    /// and packets, and the traces' encoding rows.
+    #[test]
+    fn the_headings_covector_matches_the_code_difference() {
+        the_covector_of_tower_matches_the_code_difference(headed(3), true, &news_passage()[..31], 9);
+    }
+
+    #[test]
+    fn the_headings_covector_beside_the_opened_passage_matches_the_code_difference() {
+        let mut tower = passage_opened(packeted(3));
+        tower.join_heading().expect("joined");
+        the_covector_of_tower_matches_the_code_difference(tower, true, &news_passage()[..31], 9);
+    }
+
+    /// Under the heading a stream's open traces are its state (acceptance 5): a passage read in two
+    /// carried sections ends on the state of the passage read whole, and a stream that drops its
+    /// traces closes its next span otherwise, unless the dropped part is parallel to the span's
+    /// rest (the trace is read as a ratio, a direction, so at the cut after class 30, whose open
+    /// trace is one encoding of the class that arrives next, the read is the same). A learner's
+    /// section carries each stream's traces as a read does and reads one closure a clocked level.
+    #[test]
+    fn a_headed_passage_read_in_carried_sections_is_the_passage_read_whole() {
+        let tower = headed(4);
+        let classes = news_passage();
+        let mut whole = tower.rest();
+        let codes = tower.read_cells(&mut whole, &classes).expect("read");
+        for half in [1, 17, 30, 59] {
+            let mut s = tower.rest();
+            let mut parts = tower.read_cells(&mut s, &classes[..=half]).expect("read");
+            parts.extend(tower.read_cells(&mut s, &classes[half..]).expect("read"));
+            assert_eq!((parts, &s), (codes.clone(), &whole), "half {half}");
+        }
+        let first_closures = |cut: usize| {
+            let mut s = tower.rest();
+            tower.read_cells(&mut s, &classes[..=cut]).expect("read");
+            let mut dropped = TowerState { traces: tower.rest().traces, ..s.clone() };
+            let open = s.traces.clone();
+            let carried = tower.forward(&mut s, &classes[cut..], &tower.reaches()).expect("forward");
+            let reread = tower.forward(&mut dropped, &classes[cut..], &tower.reaches()).expect("forward");
+            let first = |cells: &[Cell], l: usize| cells.iter().find_map(|c| c.levels[l].trace.as_ref().map(|t| t.read.clone()));
+            (open, (2..4).map(|l| (first(&carried, l), first(&reread, l))).collect::<Vec<_>>())
+        };
+        let (open, firsts) = first_closures(32);
+        assert!(open[3].iter().any(|&v| v != 0), "an open trace at the cut");
+        assert_ne!(firsts[1].0, firsts[1].1, "a dropped trace closes its span otherwise");
+        let (open, firsts) = first_closures(30);
+        assert!(open[3].iter().any(|&v| v != 0) && classes[29] == classes[30]);
+        assert_eq!(firsts[1].0, firsts[1].1, "a dropped part parallel to the rest closes the same direction");
+        let streams: [&[usize]; 2] = [&classes[..31], &classes[30..]];
+        let mut learner = TowerLearner::new(tower, 7);
+        let mut states = vec![learner.tower.rest(), learner.tower.rest()];
+        let receipt = learner.section(&mut states, &streams).expect("section");
+        assert_eq!(receipt.closure.iter().map(|c| c.level).collect::<Vec<_>>(), vec![2, 3]);
+        assert!(receipt.closure.iter().all(|c| c.ticks > 2 && c.flat > 0), "{:?}", receipt.closure);
+        assert_eq!(receipt.cells, 60);
         for (state, stream) in states.iter().zip(streams) {
             let mut direct = learner.tower.rest();
             learner.tower.read_cells(&mut direct, stream).expect("read");

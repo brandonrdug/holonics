@@ -120,6 +120,9 @@ impl Tower {
         if self.mutual.is_some() {
             return refuse("the growth's lift of the mutual contact is owed: its slip would count the copies");
         }
+        if self.heading {
+            return refuse("the growth's lift of the heading is owed: its closure pairs the copies' traces");
+        }
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
         let d = TowerDeclaration { width: grow(old.width)?, modes: grow(old.modes)?, contacts: grow(old.contacts)?, ..old };
         let participation = match &self.participation {

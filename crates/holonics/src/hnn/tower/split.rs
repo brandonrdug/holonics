@@ -444,8 +444,8 @@ impl Tower {
         if self.pair.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
             return refuse("the pairing's lift of a pair face, ring, rotor or strands is owed");
         }
-        if self.participation.is_some() || self.passage || self.mutual.is_some() {
-            return refuse("the pairing's lift of participation, the passage or the mutual contact is owed: each also drives or reads the contacts");
+        if self.participation.is_some() || self.passage || self.heading || self.mutual.is_some() {
+            return refuse("the pairing's lift of participation, the passage, the heading or the mutual contact is owed: each also drives or reads the contacts");
         }
         let d = TowerDeclaration { contacts: old.contacts.checked_mul(2).ok_or(TowerError::Refused("a paired extent outgrew its carrier"))?, ..old };
         let layout = Layout::new(&d, 0, 0, 0, 0, None, false, None);

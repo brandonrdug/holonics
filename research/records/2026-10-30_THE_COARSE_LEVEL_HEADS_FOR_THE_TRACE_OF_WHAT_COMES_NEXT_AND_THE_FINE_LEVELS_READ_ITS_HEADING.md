@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and tested to acceptance 1–5, the card owed]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -89,6 +89,10 @@ heading material `C^→_l` (complex, `w × n`, beside its read):
 Between its ticks a coarse level's modes do not move, so its heading is held, and the heading at a
 tick is the one it held since its last tick.
 
+[agent-inferred, at the build] `C^→_l` opens as a copy of the level's read `C_l`, as
+participation's read opens: a heading at zero is no ratio, so its closure would carry no covector
+into `C^→_l`, and the copy opens it on what the level's contacts already read.
+
 **The trace of a span.** Each clocked level carries the open trace of the arrivals since its last
 tick, the sum of their encoded faces:
 
@@ -102,8 +106,10 @@ does not tell apart; the trace is the span's colourless face (the Galois-gap rec
 over the span's translations). `o_l` is the present span, released at the tick, not a store.
 
 **The heading meets the trace through a pair contact over the passage's menu.** The menu of a tick
-is the traces of the same stream at the same level in the learner's section, `M_l`. With the pairing
-read on the bits' grain,
+is the traces of the same stream at the same level in the learner's section, `M_l`. At C′ (the
+clock's first section `B = 8` bits, about two bits a class) level 4 ticks about every four classes
+and level 5 every eight, so a section of 128 holds about 30 and 15 traces a stream [estimated from
+the clock's sections]: the heading has about five and four bits a tick to locate. With the pairing read on the bits' grain,
 
 ```text
 z_ji = 2^(−s) ⟨ĥ_l(t_j), τ_l(i)⟩ / 2^(2·16),   s = ⌈½ ⌈log₂ w⌉⌉     (bits; i ∈ M_l)
@@ -161,7 +167,9 @@ products, so the deposit is certified on the comparison it descends.
 4. **The covector.** It matches the code difference (arrivals plus closure) on three levels clocked
    from level 2 with packets, with and without the passage, at steps of `2^(−9)` units.
 5. **The state.** The state's text carries the open traces and restores whole; a passage read in
-   carried sections is the passage read whole.
+   carried sections is the passage read whole. (At the build: a stream that drops its trace closes
+   its span otherwise unless the dropped part is parallel to the span's rest, since the closure
+   reads the trace as a direction.)
 6. **The card.** Parity at the race's declaration with the heading, host against card: every face,
    every closure face and every covector entry equal.
 7. **The smoke** (three minutes on the card from C′'s founding, the race's passage and keys):
@@ -202,7 +210,8 @@ From [the lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE
 - The release is still a class at a time, steered by the heading; a joint-field release (the duplex
   refined under the heading) is the next step if the heading locates.
 - The menu's horizon is the learner's section, so the coarsest heading sees at most a section of
-  spans; reach beyond it is participation's or the carried modes'.
+  spans; reach beyond it is participation's or the carried modes'. Other streams' spans are not on
+  it: they would let the heading locate which passage it is on rather than where it is going.
 - No orbit of colours is classified by its energy (the Galois-gap record's §5), no landmark pins a
   slow mode, and no potential is located from the tower's own contacts (the diffusion law's
   statement 6 at the tower).

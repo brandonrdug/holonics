@@ -703,6 +703,9 @@ impl<'c> TowerCard<'c> {
         if !d.gated {
             return refuse("the card carries the gated tower");
         }
+        if law.heading {
+            return refuse("the card's heading is owed: the host carries the coarse level's heading, closure and descent");
+        }
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
         }
@@ -1680,7 +1683,7 @@ impl<'c> TowerCard<'c> {
             self.opened_current = false;
         }
         let swell = swell.chunks_exact(4).map(|c| [c[0], c[1], c[2], c[3]]).collect();
-        Ok(PassRead { faces, swell })
+        Ok(PassRead { faces, swell, closures: Vec::new() })
     }
 
     /// The streams' covector summed (`tower_reverse_*`, `tower_outer_*`, `tower_encoding`,
