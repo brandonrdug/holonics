@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, fixed before its build (§16)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, fixed before its build (§17)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -941,3 +941,128 @@ Recorded failures this could repeat: *a located cause carried unrepaired into a 
 reading changes no law; the next law follows its counts); *a refusal answered with a larger limit*
 (the projection grows by the reading's own measured forwards, fixed before launch, and the lap
 keeps its 256 sections).
+
+**At the card (acceptance 25 and 26 passed).** At 3335f75da (code e8b9d9be2) on the NVIDIA
+GeForce RTX 4080 SUPER, alone on the card: the card tests passed, 44 of 44, the new parity among
+them (acceptance 25). The 256-section lap under the reading ran 106.8 s against its 170.5 s
+projection (0.63), 929 forwards in 80.3 s, and every printed section, refusal, closure, state and
+pass line is a38c1c63f's lap's, the times aside (acceptance 26: the reading moved nothing).
+
+| Window | Refused | Rose on their own ticks | on the opening's | Summed change, bits: own ticks | opening's ticks |
+|---|---|---|---|---|---|
+| 1 | 53 | 53 | 53 | +3,270,495 | +3,278,769 |
+| 2 | 20 | 20 | 20 | +18,482 | +18,486 |
+| 3 | 2 | 2 | 2 | +1,430 | +1,429 |
+| 4 | 19 | 19 | 19 | +8,954 | +8,956 |
+| 5 | 23 | 23 | 23 | +20,235 | +20,236 |
+| 6 | 29 | 29 | 29 | +24,102 | +24,109 |
+| 7 | 28 | 28 | 28 | +25,260 | +25,283 |
+| 8 | 23 | 23 | 23 | +30,605 | +30,602 |
+
+**What it settles.** Every refused step, 197 of 197, rises as much on the ticks its section opened
+with as on its own, to within 0.25% of the change in every window. The ticks the step moves do not
+carry the refusals: the rise is the step's parts meeting through the clocked levels' inputs, which
+the covector carries to first order and the certificate meets at second. By the rule fixed before
+the build, the next law is the step's.
+
+## 17. The step's parts meet through the receiving face's metric
+
+[agent-inferred, October 30; the law derived in the unified-theory thread the same day, its toy
+receipts there] **What is owned, and what is missing.** A certified step bounds each locus's own
+curvature along its ray and charges the cross terms between loci at their Cauchy–Schwarz worst
+(atlas `holon.joint-step`); the tower's certificate instead reads the actual change and halves
+every family together when the code rises. §13 and §16 located the refusals in the cross terms
+themselves: each family's step alone lowers the arrivals or nearly does, and together they rise,
+through the clocked levels' inputs and not their ticks. The receiving face's own curvature is
+owned: the code's Hessian in its logits is the face's Fisher form, `ln 2 (diag p − p pᵀ)` in
+base-2 logits (atlas `receiver.fisher-certificate`), and the form pulled back through a family of
+moves is the witness's Gauss–Newton form (`hnn.witness-plane`). The missing term is that form read
+between the step's parts at the refused step, and a scale for each part chosen from it.
+
+**The law.** At the first refused halving `h₀` of a section, with the five parts of §13 (the
+descent, the heading's read, the readout with its bias, the clocked levels' material, and the
+rest with the dormant returns and a founding's opening), let `s_i` be part `i`'s step released at
+`h₀` and read the faces of five candidates, each the tower stepped by one part alone. At every
+compared cell `t`:
+- `z_t` is the opening face's base-2 logits on `2^(−16)` bits, `δz_t^(i)` part `i`'s change of
+  them, and `p_t` the opening face's masses partitioned on `2^(−32)` so they sum to one exactly
+  (each mass's floor, then the remaining grains to the largest remainders, ties to the lower
+  class).
+- `c_t^(i) = Σ_c p_tc δz_tc^(i)`, and the cell's Gram form
+  `G_t^(ij) = Σ_c p_tc δz_tc^(i) δz_tc^(j) − c_t^(i) c_t^(j)`, the covariance of two parts'
+  logit changes under the face: positive semidefinite by construction, a square and not an
+  assembly of measurements.
+
+Summed over the section, `g_i = Σ_t (c_t^(i) − δz_(t,target)^(i))` is part `i`'s first-order change
+of the arrivals' code and `G = Σ_t G_t` the meeting form. The model of the code's change under
+`Σ_i α_i s_i` is `m(α) = Σ_i α_i g_i + ½ ln 2 · αᵀ G α` (`ln 2` its navigator's face on
+`2^(−30)`), and the scales are `α* = argmin over [0, 1]⁵ of m`, solved exactly over the `3⁵ = 243`
+faces of the box (on each face the free scales solve their block of `ln 2 · G`, a face whose block
+is singular or whose solution leaves the box is passed over, and the least `m` is taken, the first
+face in order on a tie). The applied scales are `α*` released to `2^(−32)`, and `m` is read at them.
+
+The section steps by `Σ_i α_i s_i` and accepts when the certificate admits it (the arrivals' faces
+fall exactly) and the actual change is at most a quarter of `m`, both below zero. Otherwise the
+region shrinks: at `h₀ + k` the parts are `s_i / 2^k`, so the model is the same form read with
+`g / 2^k` and `G / 4^k`, solved again, and the faces are not read again. The section deposits
+nothing once the scaled step releases to zero. A section with no refused step steps as before.
+
+**The Schur reading.** Part `r`'s descent after the others have moved is
+`g_r − G_ro G_oo⁻¹ g_o` with curvature `G_rr − G_ro G_oo⁻¹ G_or`: a part whose conditioned descent
+is gone adds nothing once the others move, however much it descends alone. That is the box solve's
+face for the others free.
+
+**Choices, and their reasons.**
+- Five parts and one block each: the toy's two-block form (the readout against the rest) ended
+  above halving in two of five settings; one block a family is the least resolution that read the
+  meeting in §13.
+- The share a quarter: any share in `(0, 1)` keeps the descent (an accepted step falls, a refused one
+  shrinks until the first-order term dominates), and the toy never ended above halving at any share
+  from an eighth to three quarters; a quarter is the usual trust region's.
+- The form read once a refused section, the region shrunk without a new read: the model is the
+  second-order expansion at the opening, which only improves as the step shrinks, and a new read
+  costs six forwards. A smooth meeting falls by a quarter a halving, as the form scaled by `4^(−k)`
+  does.
+- The scales at most one: the law never steps past the learner's own step, so no refusal is
+  answered with a larger step.
+
+**The read.** `PassRealization::logits` reads every compared cell's face logits forward from the
+opening, kept in no slot: the host from its cells, the card from `tower_forward`'s read 3, which
+writes each cell's `z` and keeps nothing. The opening's logits are read the same way, so a form
+costs six forwards and their logits' crossing. The learner's `meeting` declares the law (the race's
+`TOWER_MEETING=1`); each form trial returns its reading (`SectionReceipt::meeting`: the halving,
+`g`, `G`, the applied scales, `m` and the actual change), and the race prints a window's
+`TOWER_MEETING`.
+
+**Acceptance, fixed before the build.**
+27. On the host: the form is positive semidefinite (its diagonal nonnegative and `αᵀGα ≥ 0` at
+    every vertex of the box and at the solved scales); the box solve meets its optimality
+    conditions exactly on every instance read (free scales stationary, a scale at zero with a
+    nonnegative slope, at one with a nonpositive one); a learner without the law is the learner as
+    before; on a fixture with refused steps every accepted form step fell by at least a quarter of
+    its model, and a section with no refused step is the plain learner's.
+28. On the card: the logits read is the host's, cell for cell, and 32 sections under the law are the
+    host's, receipt for receipt.
+29. On the 4080, over the passage's first 256 sections from C′'s founding at a38c1c63f's law with
+    the meeting form: the arrivals at the last window read below the heading's 2.721, reported
+    with each window's refusals, forms read, form trials and accepted steps, the summed model and
+    actual change, the mean scales by part, and each window's elapsed time beside the heading's
+    lap (§16). A lap that ends at or above 2.721 retires the law; one that ends below it but reads
+    above the heading at equal elapsed time makes the form's cost the next loop's subject before a
+    whole lap.
+
+The lap's projection: the heading's window bound `k × 18,781 ms`, and for each form read six
+forwards at 92 ms, their logits crossing (6 × 40,960 cells × 256 classes × 8 bytes, 503 MB, at
+4 GB/s, 126 ms) and the form's solve on the host at a bound of 300 ms, `978 ms`; for each form
+trial one forward, `92 ms`. Over at most 197 refused sections with one trial each, the projection is
+`152.4 s + 197 × 1,070 ms = 363.2 s`, the deadline 364 s, and window `k`'s limit `k × 18,781 ms`
+plus `978 ms` a form read and `92 ms` a trial so far. The crossing and the solve are unmeasured
+before the card suite; the first window that passes its limit stops the lap and is reported with
+its rate.
+
+Recorded failures this could repeat: *an uncertified deposition step* (every form step passes the
+exact certificate and the quarter share); *a refusal answered with a larger limit* (every scale is
+at most one and the region only shrinks; the projection is fixed before launch); *a located cause
+carried unrepaired into a new consumer* (this is the located cause's own law, and a section without
+a refusal is unchanged); *bits read as progress* (the arrivals are read beside the elapsed time,
+and the writing is shown before any longer race).
