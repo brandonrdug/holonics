@@ -457,11 +457,10 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
 fn participation_read(tower: &holonics::hnn::tower::Tower, prompts: &[&[usize]], end: usize, out: &Path) -> Result<()> {
     let mut rows = String::from(PARTICIPATION_HEAD);
     for (p, prompt) in prompts.iter().enumerate() {
-        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
-        let mut state = tower.rest();
-        tower.read_cells(&mut state, &entered).map_err(|e| e.to_string())?;
-        let Some(levels) = tower.participation_at(&mut state, end).map_err(|e| e.to_string())? else { return Ok(()) };
-        participation_rows(p, &entered, &levels, &mut rows);
+        // The end letter, the prompt, and the end letter that opens the answer, read last.
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt[..prompt.len() - 1].iter().copied()).chain([end]).collect();
+        let Some(read) = tower.participation_read(&mut tower.rest(), &entered).map_err(|e| e.to_string())? else { return Ok(()) };
+        participation_rows(p, &entered, &read, &mut rows);
     }
     write_new(&out.join("PARTICIPATION.tsv"), rows.as_bytes())?;
     Ok(())
@@ -472,26 +471,34 @@ pub(super) const PARTICIPATION_HEAD: &str = "prompt\tlevel\thead\tsites\trelease
 
 /// One prompt's participation at its answer's opening, `entered` the classes read with the opening's
 /// end letter last: per level the sites carrying the most weight, summed over the heads in
-/// thousandths of a head, printed with the eight classes that end there (`|` the end letter) and the
-/// heads' mean entropy in thousandths of a bit ([`Participation::entropy`]), and each head's own top
-/// sites and entropy appended to `rows`.
+/// thousandths of a head, printed as `back:classes:thousandths` with `back` how many classes before
+/// the opening the site's arrival came and the eight classes that end there (`|` the end letter),
+/// or `before:-:thousandths` for a site carried in from before the read; then the heads' mean
+/// entropy in thousandths of a bit ([`Participation::entropy`]), and each head's own top sites and
+/// entropy appended to `rows`. A clocked level admits a site only where its clock ticks, so each
+/// site is placed by the arrival that admitted it ([`Tower::participation_read`]), never by its
+/// count back from the opening.
 ///
 /// [`Participation::entropy`]: holonics::hnn::tower::participation::Participation::entropy
-pub(super) fn participation_rows(p: usize, entered: &[usize], levels: &[Vec<holonics::hnn::tower::participation::Participation>], rows: &mut String) {
+/// [`Tower::participation_read`]: holonics::hnn::tower::Tower::participation_read
+pub(super) fn participation_rows(p: usize, entered: &[usize], read: &holonics::hnn::tower::ParticipationRead, rows: &mut String) {
     const SHOWN: usize = 5;
     let last = entered.len() - 1;
-    let shown = |back: usize| -> String {
-        let at = last - back;
-        entered[at.saturating_sub(7)..=at].iter().map(|&c| if c < 256 { (c as u8).escape_ascii().to_string() } else { "|".into() }).collect()
+    let shown = |at: usize| -> String { entered[at.saturating_sub(7)..=at].iter().map(|&c| if c < 256 { (c as u8).escape_ascii().to_string() } else { "|".into() }).collect() };
+    let label = |arrival: Option<usize>| -> String {
+        match arrival {
+            Some(at) => format!("{}:{:?}", last - at, shown(at)),
+            None => "before:-".into(),
+        }
     };
-    // The admitted site `j` of `sites` arrived `sites − 1 − j` classes before the opening.
+    // The heaviest sites, the most recent first among equals.
     let top = |weights: &[u128]| -> Vec<(usize, u128)> {
-        let mut order: Vec<(usize, u128)> = weights.iter().enumerate().map(|(j, &w)| (weights.len() - 1 - j, w)).collect();
-        order.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        let mut order: Vec<(usize, u128)> = weights.iter().copied().enumerate().collect();
+        order.sort_by(|a, b| b.1.cmp(&a.1).then(b.0.cmp(&a.0)));
         order.truncate(SHOWN);
         order
     };
-    for (l, heads) in levels.iter().enumerate() {
+    for (l, (heads, arrivals)) in read.levels.iter().zip(&read.arrivals).enumerate() {
         let sites = heads.first().map_or(0, |h| h.weights.len());
         let mut summed = vec![0u128; sites];
         let mut entropy = 0i128;
@@ -502,10 +509,10 @@ pub(super) fn participation_rows(p: usize, entered: &[usize], levels: &[Vec<holo
             }
             let bits = millibits(part.entropy());
             entropy += bits;
-            let listed: Vec<String> = top(&share).into_iter().map(|(back, v)| format!("{back}:{:?}:{v}", shown(back))).collect();
+            let listed: Vec<String> = top(&share).into_iter().map(|(j, v)| format!("{}:{v}", label(arrivals[j]))).collect();
             rows.push_str(&format!("{p}\t{l}\t{h}\t{sites}\t{}\t{bits}\t{}\n", part.released, listed.join(" ")));
         }
-        let listed: Vec<String> = top(&summed).into_iter().map(|(back, v)| format!("{back}:{:?}:{}", shown(back), v / heads.len().max(1) as u128)).collect();
+        let listed: Vec<String> = top(&summed).into_iter().map(|(j, v)| format!("{}:{}", label(arrivals[j]), v / heads.len().max(1) as u128)).collect();
         println!(
             "CLASSES_PARTICIPATION prompt={p} level={l} sites={sites} heads={} entropy_millibits={} top(back:classes:thousandths) {}",
             heads.len(),

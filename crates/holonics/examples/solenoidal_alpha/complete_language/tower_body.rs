@@ -82,8 +82,8 @@ pub(crate) fn ask_realized(args: &[String], realization: &mut dyn PassRealizatio
     for (p, prompt) in prompts.iter().enumerate() {
         let from = body.drawn();
         let answer = body.ask(&prompt[..prompt.len() - 1], &keys, count, agree, realization).map_err(|e| e.to_string())?;
-        if let Some(levels) = &answer.participation {
-            participation_rows(p, &answer.read, levels, &mut participation);
+        if let Some(read) = &answer.participation {
+            participation_rows(p, &answer.read, read, &mut participation);
         }
         for &c in &answer.released {
             written.extend_from_slice(&(c as u16).to_be_bytes());

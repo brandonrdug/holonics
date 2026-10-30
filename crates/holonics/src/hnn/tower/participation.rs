@@ -40,7 +40,9 @@
 //! **The transport's own covector** `Σ a dU Ψ` into the gates and turns is not summed here: this
 //! return hands back each site's met dissipation (`probe_met`, `sites_met`) beside its charts'
 //! covectors, and `Tower::reverse_joined` turns them into each move's turn and met covector (record
-//! §6). **Not claimed:** the pump's reflection share (record §8).
+//! §6). **Refused:** a pumped tower. Its move is real-linear, so its frame is the composite of the
+//! moves, not the product of their turn parts; the law (the reflection's share is the Beltrami
+//! coefficient `β/α`) is derived in the record's §8 and held until a race pumps.
 use super::{div_nearest, fit64, refuse, release, Result, FACE_BITS, MOVE_BITS, UNIT_BITS};
 use crate::hnn::keyed_modes::{ln2_face, log2_face, Exponential};
 
