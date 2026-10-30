@@ -1,8 +1,9 @@
 # The pair contact is raced before its split founds where the body grows
 
-Refs #404 #408. Status: [the race's contact law and its acceptance fixed before the race; the split's design
-and acceptance fixed before its build, its host built and the card equal to it on the RTX 4080 SUPER
-(§7), its certificate priced after the first measurement (§4); agent-inferred, October 30].
+Refs #404 #408. Status: [the race's contact law and its acceptance fixed before the race, and the race's
+claim holds on the RTX 4080 SUPER (§7); the split's design and acceptance fixed before its build, its
+host built and the card equal to it (§7), its certificate priced after the first measurement (§4);
+agent-inferred, October 30].
 Claude (opus), design lead. Read beside
 [the radix record §2](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#2-the-boundary-free-energy-is-the-two-part-code-and-it-founds-prunes-and-recharts),
 which states the split this record builds toward, and
@@ -206,6 +207,36 @@ sections of 128: 98,304 faces, 12,718,112 gradient entries and every learner equ
 Host 14,042 ms, card 4,729 ms (181 forwards in 3,743 ms, 64 reverses in 413 ms); wall 24.1 s against a
 600 s deadline, peak resident set 1,580,380 KiB. Acceptance 1 holds.
 
+**§3 acceptance 2, the pair race** (October 30, RTX 4080 SUPER, head `3b7b15869`, alone on the card).
+`train-two-ladder-pair-tower-classes` on the four-level tower's passage, keys, width 64, 128 modes,
+256 contacts, four levels, 320 streams, sections of 128 and rate `2^(−7)`, one pass a lap, beside the
+rectifying four-level tower's laps from October 27. Held-out bits a byte:
+
+```text
+lap        0     1     2     3     4     5     6     7     8     9    10    11
+pair   2.229 2.074 2.011 2.019 1.965 1.940 1.923 1.904 1.890 1.878 1.871 1.861
+four   2.356 2.139 2.060 2.020 2.004 1.970 1.959 1.947 1.934 1.929 1.918 1.920
+
+lap       12    13    14    15    16    17    18    19    20    21    22    23
+pair   1.854 1.850 1.839 1.832 1.826 1.826 1.821 1.816 1.817 1.815 1.808 1.804
+four   1.914 1.914 1.922 1.901 1.899 1.895 1.890 1.882 1.886 1.885 1.880 1.877
+```
+
+**The claim holds.** Over the hour's last five laps (19 to 23) the pair tower reads 1.812 on average
+against the rectifier's 1.882. It reads below the rectifier at every lap, by 0.001 at lap 3 and by
+0.030, 0.059, 0.069 and 0.073 at the quarter marks (laps 5, 11, 18, 23): the lead grows at every
+mark. Its own rises are 0.008 (lap 3) and 0.001 (lap 20). Lap 23 reads 1.661 in training and 1.747
+on GSM8K; its held-out 1.804 is below what C′ reached at lap 45 (1.820) and the rectifier at lap 45
+(1.850).
+
+Card time: a training pass 134 to 140 s (lap 23: 1,475 forwards in 74,872 ms, 726 reverses in
+37,139 ms), a lap with its write at most 154.5 s, the widest window 6,345 ms against its 8,559 ms
+limit. Twenty-four laps, every lap and write exit 0; the hour's deadline stopped the race at 3,566 s,
+since a longest lap more would pass 3,600 s.
+
+**Decision** [agent-inferred, October 30]. The pair contact carries the race at this declaration, so
+the split grows on it: acceptance 5 is read again at the stepped head, and acceptance 6 races next.
+
 **The split on the host** (October 30, the cloud container's host, unit tests only; no learning run).
 `cargo test -p holonics --lib hnn::tower::split`: 6 of 6 pass.
 
@@ -273,5 +304,5 @@ mode, which lies between zero and `θ̂`, rose too: the line did not descend alo
 misread curvature on the right slope would not produce. Inferred from the tiny tower, where the
 step moved the score and turned its sign: the score was stale on the tower the founding landed on
 (§4, read on the tower it lands on), built after this reading. The card's split read is unchanged by it; the learner's section now reads
-forward and back once more, so the paired parity is owed again at the new head. The race
-(acceptance 6) is owed, only if §3's claim holds.
+forward and back once more, so the paired parity is owed again at the new head. §3's claim holds,
+so the race (acceptance 6) is owed.
