@@ -1,8 +1,8 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair]`:
-//!   founds the gated tower (rectifying, or with pair contacts when `pair` is; on both turn ladders) on the keys, its levels on the news
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair | split]`:
+//!   founds the gated tower (rectifying, or with pair contacts when `pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
@@ -13,7 +13,11 @@
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
 //!   host's through `HostPass`, the card's through `TowerCard`) and their texts and continuing
-//!   states are compared. Prints one `TOWER_PARITY` line a section and `TOWER_PARITY_DONE`.
+//!   states are compared. With `split`, both learners are paired (`TowerLearner::paired`, every
+//!   pair dormant), the opening's split read is compared beside the covector, and both take each
+//!   section by `TowerLearner::section_founding`, their foundings and directions compared too
+//!   (one `TOWER_PARITY_SPLIT` line a section). Prints one `TOWER_PARITY` line a section and
+//!   `TOWER_PARITY_DONE`.
 //! - `tower_pass parity-state STATE STATE_SHA CLASSES CLASSES_SHA OCTETS STREAMS SECTION [SECTIONS]`:
 //!   the same lockstep from a saved learner (`TowerLearner::to_text`, any face the card carries,
 //!   the pair face among them) over a class passage of `OCTETS` (1 or 2, big-endian) bytes a class,
@@ -40,6 +44,7 @@
 mod exterior;
 
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
+use holonics::hnn::tower::split::PairedContacts;
 use holonics::hnn::tower::{face_code, ContactLaw, NewsClock, Tower, TowerDeclaration, TowerLearner, TowerState, TurnLadder};
 use holonics::hnn::units::Units;
 use holonics_cuda::hnn::{Card, TowerCard};
@@ -77,7 +82,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | pair | split]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -93,7 +98,10 @@ fn parity(args: &[String]) -> Result<()> {
     let packets = word == Some("packets");
     // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
     // `train-two-ladder-pair-tower-classes`.
-    let pair = word == Some("pair");
+    // `split` founds the pair contacts and pairs them, every pair dormant
+    // (`TowerLearner::paired`), the founded split's sections (`TowerLearner::section_founding`).
+    let split = word == Some("split");
+    let pair = word == Some("pair") || split;
     let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
     if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
@@ -148,7 +156,16 @@ fn parity(args: &[String]) -> Result<()> {
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
-    lockstep(&mut host, &mut carded, &classes, streams, section, sections)
+    let paired = if split {
+        let (h, ph) = host.paired()?;
+        let (c, pc) = carded.paired()?;
+        (host, carded) = (h, c);
+        println!("TOWER_SPLIT contacts={} dormant={}", host.tower.declaration.contacts, ph.dormant());
+        Some((ph, pc))
+    } else {
+        None
+    };
+    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired)
 }
 
 fn parity_state(args: &[String]) -> Result<()> {
@@ -194,14 +211,15 @@ fn parity_from(state: &[u8], classes: &[usize], args: &[String]) -> Result<()> {
     };
     let mut host = host;
     let mut carded = TowerLearner::from_text(std::str::from_utf8(state)?)?;
-    lockstep(&mut host, &mut carded, classes, streams, section, sections)?;
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, None)?;
     println!("TOWER_PARITY_SHA sections={sections} whole_pass={} host={} card={}", sections == whole, digest(host.to_text().as_bytes())?, digest(carded.to_text().as_bytes())?);
     Ok(())
 }
 
 /// Host against card in lockstep over `sections` sections of the passage split into `streams`
-/// streams, every stream from rest.
-fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize) -> Result<()> {
+/// streams, every stream from rest; with `paired` (the host's directions, then the card's), each
+/// section's split read and founding too.
+fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>) -> Result<()> {
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -215,6 +233,7 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     let mut states_c = states_h.clone();
     let started = Instant::now();
     let (mut faces_all, mut faces_unequal, mut entries_all, mut entries_unequal, mut learners_unequal) = (0usize, 0usize, 0usize, 0usize, 0usize);
+    let (mut splits_unequal, mut admitted) = (0usize, 0usize);
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
     println!("TOWER_PARITY_OPEN material={} streams={streams} section={section} sections={sections} card={}", host.tower.theta.len(), opened.census().name);
     for k in 0..sections {
@@ -224,13 +243,27 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         let mut reference = HostPass::default();
         let t0 = Instant::now();
         let read_h = reference.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
-        let g_h = reference.reverse(&host.tower, &states_h, &parts, None)?;
+        let (g_h, split_h) = match &paired {
+            Some((p, _)) => {
+                let (g, read) = reference.reverse_split(&host.tower, &states_h, &parts, None, p)?;
+                (g, Some(read))
+            }
+            None => (reference.reverse(&host.tower, &states_h, &parts, None)?, None),
+        };
         // The reference's kept read is not the learner's: free it before the learners take the
         // section.
         drop(reference);
         let t1 = Instant::now();
         let read_c = card.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
-        let g_c = card.reverse(&host.tower, &states_h, &parts, None)?;
+        let (g_c, split_c) = match &paired {
+            Some((p, _)) => {
+                let (g, read) = card.reverse_split(&host.tower, &states_h, &parts, None, p)?;
+                (g, Some(read))
+            }
+            None => (card.reverse(&host.tower, &states_h, &parts, None)?, None),
+        };
+        let split_equal = split_h == split_c;
+        splits_unequal += usize::from(!split_equal);
         let t2 = Instant::now();
         let faces_h: Vec<(u128, u128)> = read_h.faces.iter().flatten().flatten().copied().collect();
         let faces_c: Vec<(u128, u128)> = read_c.faces.iter().flatten().flatten().copied().collect();
@@ -245,11 +278,33 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         entries_unequal += g_unequal;
         // Both learners take the section.
         let t3 = Instant::now();
-        let receipt_h = host.section_realized(&mut states_h, &parts, None, &mut HostPass::default())?;
+        let (receipt_h, founding_h) = match paired.as_mut() {
+            Some((p, _)) => host.section_founding(&mut states_h, &parts, None, &mut HostPass::default(), p).map(|(r, f)| (r, Some(f)))?,
+            None => (host.section_realized(&mut states_h, &parts, None, &mut HostPass::default())?, None),
+        };
         let t4 = Instant::now();
-        let receipt_c = carded.section_realized(&mut states_c, &parts, None, &mut card)?;
+        let (receipt_c, founding_c) = match paired.as_mut() {
+            Some((_, p)) => carded.section_founding(&mut states_c, &parts, None, &mut card, p).map(|(r, f)| (r, Some(f)))?,
+            None => (carded.section_realized(&mut states_c, &parts, None, &mut card)?, None),
+        };
         let t5 = Instant::now();
-        let learner_equal = receipt_h == receipt_c && host.to_text() == carded.to_text() && states_h == states_c;
+        let directions_equal = paired.as_ref().is_none_or(|(h, c)| h == c);
+        if let Some(f) = &founding_h {
+            admitted += usize::from(f.admitted);
+            println!(
+                "TOWER_PARITY_SPLIT section={} split_equal={split_equal} founding_equal={} directions_equal={directions_equal} foundings={} admitted={} code_before={} reread={} remeasured={:?} code_after={} dormant={}",
+                k + 1,
+                founding_h == founding_c,
+                f.foundings.len(),
+                f.admitted,
+                f.code_before,
+                f.reread,
+                f.remeasured,
+                f.code_after,
+                f.dormant
+            );
+        }
+        let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == states_c;
         learners_unequal += usize::from(!learner_equal);
         host_ns += (t1 - t0).as_nanos() + (t4 - t3).as_nanos();
         card_ns += (t2 - t1).as_nanos() + (t5 - t4).as_nanos();
@@ -280,11 +335,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         times.reverse_ns / 1_000_000,
         started.elapsed().as_millis()
     );
+    if paired.is_some() {
+        println!("TOWER_PARITY_SPLIT_DONE sections={sections} splits_unequal={splits_unequal} admitted={admitted}");
+    }
     println!("TOWER_REALIZATION {}", card.realization());
     for (entry, calls, ns) in card.profiled() {
         println!("TOWER_PROFILE entry={entry} launches={calls} ms={}", ns / 1_000_000);
     }
-    if faces_unequal + entries_unequal + learners_unequal > 0 {
+    if faces_unequal + entries_unequal + learners_unequal + splits_unequal > 0 {
         return Err("the card's pass is not the host's".into());
     }
     Ok(())

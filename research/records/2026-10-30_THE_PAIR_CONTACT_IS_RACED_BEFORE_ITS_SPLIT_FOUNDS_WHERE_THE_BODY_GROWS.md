@@ -135,7 +135,13 @@ their predictions do not add, and one reread cannot read their lines apart (meas
 
 **On the card.** The reverse forms, per level and dormant pair, `y = v·r̂`, the score's sum and its
 squares, and the turned sum. The host decides the founding and maps the split, as it decides the
-step; the card's material is the host's after each deposit.
+step; the card's material is the host's after each deposit. Realized (agent-inferred, October 30):
+`tower_reverse_contacts` keeps each contact's covector `δv` at its product beside its drives' when
+the split read is asked, and `tower_split_read`, one block a dormant pair of a level, reads every
+stream's cells a chunk of the block at a time (one thread a cell for `y`, `φ`, the score term and
+the turned weight `δv y`; then the turned sum's outputs in `256/W` groups of the chunk's cells).
+A score term at or past `2^48` is refused on both sides: below it, the squares of fewer than `2^31`
+cells sum in 128 bits, so neither side's carrier decides.
 
 ## 5. Acceptance of the split, fixed before the build
 
