@@ -1,8 +1,9 @@
 # The pair contact is raced before its split founds where the body grows
 
-Refs #404 #408. Status: [the race's contact law and its acceptance fixed before the race; the split's design
-and acceptance fixed before its build, its host built and the card equal to it on the RTX 4080 SUPER
-(§7), its certificate priced after the first measurement (§4); agent-inferred, October 30].
+Refs #404 #408. Status: [the race's contact law and its acceptance fixed before the race, and the race's
+claim holds on the RTX 4080 SUPER (§7); the split's design and acceptance fixed before its build, its
+host built and the card equal to it (§7), its certificate priced after the first measurement (§4);
+agent-inferred, October 30].
 Claude (opus), design lead. Read beside
 [the radix record §2](2026-10-29_A_VALUE_IS_A_RADIX_MOVE_THE_FREE_ENERGY_IS_THE_CODE_THAT_FOUNDS_AND_POLARITY_IS_THE_ONE_REVERSIBLE_NEGATION.md#2-the-boundary-free-energy-is-the-two-part-code-and-it-founds-prunes-and-recharts),
 which states the split this record builds toward, and
@@ -129,6 +130,19 @@ by less than its own description. Refused, and when the measured line is bounded
 prior (`τ + ln 2 · H > 0`), its mode `θ* = −ln 2 · g/(τ + ln 2 · H)` is read once more under the
 same price. Only a section where a pair founds pays these readings.
 
+**Read on the tower it lands on** (agent-inferred, October 30, after the card's first paired parity,
+§7). The score is the code's slope along the split on the tower it was read on, and only there. The
+section's step moves the drives both copies share along the same covectors, so it takes part of
+what the split would take, and sometimes more than all of it: over ten sections of the tiny tower's
+parity passage, the step turned the sign of 27 pairs' scores. Decided on the opening read, 20 of the
+race's first 28 proposed foundings raised the code they were predicted to lower (§7). So where the
+step deposits, the section is read forward and back once more on the tower the step left, and the
+test, the reread and the directions' turn all use that read. The founding then pays only for what
+the old coordinates left after their step: the effective tension's law, a new coordinate paying for
+what the old ones do not bridge. It costs one forward and one reverse a section where the step
+deposits; that forward also serves the carry where no founding deposits, which before read the
+step's tower again.
+
 **One founding a section**: of the pairs the test admits, the one with the largest surplus of fit
 over price. The address `ln K` already charges the choice. Several founded together share the face,
 their predictions do not add, and one reread cannot read their lines apart (measured: §7).
@@ -193,8 +207,46 @@ sections of 128: 98,304 faces, 12,718,112 gradient entries and every learner equ
 Host 14,042 ms, card 4,729 ms (181 forwards in 3,743 ms, 64 reverses in 413 ms); wall 24.1 s against a
 600 s deadline, peak resident set 1,580,380 KiB. Acceptance 1 holds.
 
+**§3 acceptance 2, the pair race** (October 30, RTX 4080 SUPER, head `3b7b15869`, alone on the card).
+`train-two-ladder-pair-tower-classes` on the four-level tower's passage, keys, width 64, 128 modes,
+256 contacts, four levels, 320 streams, sections of 128 and rate `2^(−7)`, one pass a lap, beside the
+rectifying four-level tower's laps from October 27. Held-out bits a byte:
+
+```text
+lap        0     1     2     3     4     5     6     7     8     9    10    11
+pair   2.229 2.074 2.011 2.019 1.965 1.940 1.923 1.904 1.890 1.878 1.871 1.861
+four   2.356 2.139 2.060 2.020 2.004 1.970 1.959 1.947 1.934 1.929 1.918 1.920
+
+lap       12    13    14    15    16    17    18    19    20    21    22    23
+pair   1.854 1.850 1.839 1.832 1.826 1.826 1.821 1.816 1.817 1.815 1.808 1.804
+four   1.914 1.914 1.922 1.901 1.899 1.895 1.890 1.882 1.886 1.885 1.880 1.877
+```
+
+**The claim holds.** Over the hour's last five laps (19 to 23) the pair tower reads 1.812 on average
+against the rectifier's 1.882. It reads below the rectifier at every lap, by 0.001 at lap 3 and by
+0.030, 0.059, 0.069 and 0.073 at the quarter marks (laps 5, 11, 18, 23): the lead grows at every
+mark. Its own rises are 0.008 (lap 3) and 0.001 (lap 20). Lap 23 reads 1.661 in training and 1.747
+on GSM8K; its held-out 1.804 is below what C′ reached at lap 45 (1.820) and the rectifier at lap 45
+(1.850).
+
+Card time: a training pass 134 to 140 s (lap 23: 1,475 forwards in 74,872 ms, 726 reverses in
+37,139 ms), a lap with its write at most 154.5 s, the widest window 6,345 ms against its 8,559 ms
+limit. Twenty-four laps, every lap and write exit 0; the hour's deadline stopped the race at 3,566 s,
+since a longest lap more would pass 3,600 s.
+
+**Decision** [agent-inferred, October 30]. The pair contact carries the race at this declaration, so
+the split grows on it: acceptance 5 is read again at the stepped head, and acceptance 6 races next.
+
 **The split on the host** (October 30, the cloud container's host, unit tests only; no learning run).
-`cargo test -p holonics --lib hnn::tower::split`: 4 of 4 pass.
+`cargo test -p holonics --lib hnn::tower::split`: 6 of 6 pass.
+
+- The score is the slope: on the ungated, gated and turned tiny towers, every pair's split of
+  `θ = ∓2^(−8)` against its score's sign moves the section's code by `g θ` within a quarter of it
+  and `2^(−14)` bits. Read by hand further out (a scratch reading, not kept): the line follows
+  `g θ` to `θ = 2^(−4)` and bends away from it by `θ = 2^(−2)`.
+- The founding is decided on the tower the step left: over ten sections of the parity passage, a
+  founding section's proposal and its directions' turn equal those of the split read on the
+  stepped tower; every step deposited, and the step turned the sign of 27 pairs' scores.
 
 - Acceptance 1: the tiny pair tower, ungated, gated, and gated with turned modes, widened by two,
   reads the old faces and keeps the old state over the 40-class passage; drive entries carry `m/2`,
@@ -207,7 +259,10 @@ Host 14,042 ms, card 4,729 ms (181 forwards in 3,743 ms, 64 reverses in 413 ms);
   squares of 4 founds alone and is refused among two dormant pairs (the address).
 - Acceptance 4, read on a passage of four streams whose low bit is the parity of the two high bits
   before it (the conjunction a single quadratic direction carries), the tiny pair tower taught 8
-  sections, then paired for 24: one section proposed a founding. Its test predicted the code would
+  sections, then paired for 24. Read on the stepped tower: one section (28) proposed a founding,
+  predicted to lower the code 5.45 bits; the reread at `θ̂ = −0.81` raised it 1.90, the line's mode
+  lowered it 1.76, under the coordinate's price. Refused, 1 of 1. Before the founding was read on
+  the stepped tower: one section proposed a founding. Its test predicted the code would
   fall 8.58 bits; the reread at `θ̂ = −0.957` measured a fall of 0.79, under the coordinate's price,
   and the line's mode `θ* ≈ −0.43` measured a rise of 0.10. Refused, 1 of 1. Before the price and the
   single founding, the same section had founded three pairs predicted to lower the code by 20.9 bits
@@ -228,5 +283,41 @@ split reads (score, squares, turned sums), the foundings and the carried directi
 unequal; 5 foundings admitted over the 32 sections. The card formed the split read in 1,024 blocks
 (one per dormant pair of a level) of 256 threads. Host 22,826 ms, card 7,666 ms (265 forwards in
 5,740 ms, 64 reverses in 620 ms); wall 43.8 s against a 600 s deadline, peak resident set
-2,020,612 KiB. The build reported no `nvcc` or `ptxas` error. Acceptance 5 holds. The race
-(acceptance 6) is owed, only if §3's claim holds.
+2,020,612 KiB. The build reported no `nvcc` or `ptxas` error. Acceptance 5 holds at that head, where
+the founding was decided on the opening read.
+
+**Acceptance 4 at the race's width, read off that parity.** The foundings are the host's and the
+card's alike. Codes in bits; the reread at `θ̂` and at the line's mode `θ*` against the section's
+code after its step:
+
+| sections | proposed | admitted | the reread at `θ̂` | at `θ*` |
+|---|---|---|---|---|
+| 1–3, 9 | 0 | | | |
+| 10, 15, 24, 26 | 4 | 4 | −127.5, −52.5, −108.3, −72.0 | not read |
+| 31 | 1 | 1 | −23.0 (not past its price) | −19.2 |
+| 4, 16 | 2 | 0 | −52.8, −8.7 | −22.2, −4.2 |
+| the other 21 | 21 | 0 | +12.6 to +784.0 | +3.0 to +103.9 |
+
+Five of 28 admitted, each lowering its section's code (sections code 13,400 to 17,900 bits).
+Acceptance 4's claim is not met at this width either. In 21 sections the reread rose, and the line's
+mode, which lies between zero and `θ̂`, rose too: the line did not descend along the score, which a
+misread curvature on the right slope would not produce. Inferred from the tiny tower, where the
+step moved the score and turned its sign: the score was stale on the tower the founding landed on
+(§4, read on the tower it lands on), built after this reading. The card's split read is unchanged by it; the learner's section now reads
+forward and back once more, so the paired parity is owed again at the new head.
+
+**§5 acceptance 5 again, with the split read on the stepped tower** (October 30, RTX 4080 SUPER, head
+`e945ff809`, alone on the card). The same parity: 98,304 faces, 19,075,104 gradient entries and every
+learner equal; on all 32 sections the split reads, the foundings and the carried directions equal,
+none unequal. Host 29,044 ms, card 8,381 ms (262 forwards in 6,026 ms, 95 reverses in 976 ms); wall
+43.7 s, peak resident set 1,963,660 KiB. Acceptance 5 holds at the stepped head; the stepped read
+costs the card 31 forwards and 31 reverses over the 32 sections.
+
+**Acceptance 4 at the race's width, read on the stepped tower.** Twenty-nine of the 32 sections
+proposed one founding each (sections 1, 2 and 19 proposed none), and the certificate admitted all
+29 at `θ̂`: every reread lowered its section's code, by 17.5 to 1,837.9 bits (0.11% to 8.44% of
+sections coding 13,600 to 21,800 bits), 7,531 bits over the 29, the largest in the first sections
+(475, 212, 694, 1,838, 841, 702 and 497 bits at sections 3 to 9) and 17 to 210 bits from section 14
+on. The dormant copies fell from 1,024 to 995. Read on the opening tower the same passage admitted 5
+of 28. Acceptance 4's claim holds at the race's width: the certificate admits more than it refuses,
+and every admitted founding lowers the code. §3's claim holds, so the race (acceptance 6) is owed.

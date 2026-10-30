@@ -120,6 +120,17 @@ pub(crate) fn train_pair_realized(args: &[String], realization: &mut dyn PassRea
     train_joined(args, false, false, false, TurnLadder::Both, None, Joined::Nothing, ContactLaw::Pair, realization)
 }
 
+/// `train-two-ladder-split-tower-classes`: [`train_pair_realized`] with the contact field widened
+/// by two at the founding and each section founding the pairs' splits (record
+/// `2026-10-30_THE_PAIR_CONTACT_IS_RACED_BEFORE_ITS_SPLIT_FOUNDS…`, §4, §5 acceptance 6);
+/// `train-two-ladder-dormant-split-tower-classes` widens it the same way and founds nothing, the
+/// race's control. `CONTACTS` names the field before its widening; a founding run continues with
+/// its learner and its directions (`PAIRED.<pass>`), the control with its learner alone.
+pub(crate) fn train_split_realized(args: &[String], founding: bool, realization: &mut dyn PassRealization) -> Result<()> {
+    let joined = if founding { Joined::Split } else { Joined::DormantSplit };
+    train_joined(args, false, false, false, TurnLadder::Both, None, joined, ContactLaw::Pair, realization)
+}
+
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
 /// contact joined at the founding.
 pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
@@ -128,8 +139,8 @@ pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassR
 
 #[allow(clippy::too_many_arguments)]
 fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
-    if args.len() != 19 && args.len() != 21 {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
+    if args.len() != 19 && args.len() != 21 && !(joined == Joined::Split && args.len() == 23) {
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes|train-two-ladder-split-tower-classes|train-two-ladder-dormant-split-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
@@ -689,6 +700,58 @@ mod tests {
         assert_eq!(signed_bits(3 << READ_BITS), "3.000");
         assert_eq!(signed_bits(-(1 << (READ_BITS - 1))), "-0.500");
         assert_eq!(signed_bits(0), "0.000");
+    }
+
+    /// The split race's routes on a tiny pair tower: the founding run widens the contact field at its
+    /// founding, rests its directions beside each learner and continues from both, and refuses to
+    /// continue without them; the control widens it the same way, founds nothing and continues
+    /// from its learner alone.
+    #[test]
+    fn the_split_routes_widen_rest_and_continue() {
+        use holonics::hnn::tower::split::PairedContacts;
+        let dir = std::env::temp_dir().join(format!("holonics-tower-split-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).expect("dir");
+        let at = |name: &str| dir.join(name).to_string_lossy().into_owned();
+        let put = |name: &str, bytes: &[u8]| {
+            std::fs::write(dir.join(name), bytes).expect("write");
+            (at(name), sha256(bytes).expect("sha"))
+        };
+        let classes = |v: &[usize]| -> Vec<u8> { v.iter().flat_map(|&c| (c as u16).to_be_bytes()).collect() };
+        let train: Vec<usize> = (0..200).map(|i| (i * i + i / 3) % 4).collect();
+        let dev: Vec<usize> = (0..60).map(|i| (i * 7 + i / 5) % 4).collect();
+        let (train, train_sha) = put("TRAIN", &classes(&train));
+        let (roles, roles_sha) = put("ROLES", &vec![0u8; dev.len()]);
+        let (dev, dev_sha) = put("DEV", &classes(&dev));
+        let keys: Vec<u8> = (0..4096u32).flat_map(|i| (i.wrapping_mul(2654435761) ^ i.wrapping_mul(i)).to_be_bytes()).collect();
+        let (keys, keys_sha) = put("KEYS", &keys);
+        let args = |command: &str, out: &str, from: &[&str]| -> Vec<String> {
+            let mut a: Vec<String> = [command, "5", &train, &train_sha, &dev, &dev_sha, &roles, &roles_sha, &keys, &keys_sha, "4", "4", "4", "2", "2", "16", "1", "6", &at(out)].map(String::from).to_vec();
+            a.extend(from.iter().map(|s| s.to_string()));
+            a
+        };
+        let state = |out: &str, name: &str| -> (String, String, TowerLearner) {
+            let text = std::fs::read(dir.join(out).join(name)).expect("rested");
+            (at(&format!("{out}/{name}")), sha256(&text).expect("sha"), TowerLearner::from_text(std::str::from_utf8(&text).expect("text")).expect("learner"))
+        };
+        let founding = "train-two-ladder-split-tower-classes";
+        train_split_realized(&args(founding, "S", &[]), true, &mut HostPass::default()).expect("founding run");
+        let (learner, learner_sha, rested) = state("S", "STATE.0");
+        assert_eq!(rested.tower.declaration.contacts, 8);
+        let text = std::fs::read(dir.join("S/PAIRED.0")).expect("directions rested");
+        let directions = PairedContacts::from_text(std::str::from_utf8(&text).expect("text")).expect("directions");
+        directions.admits(&rested.tower).expect("the directions are the learner's");
+        let paired_sha = sha256(&text).expect("sha");
+        let paired = at("S/PAIRED.0");
+        train_split_realized(&args(founding, "S2", &[&learner, &learner_sha, &paired, &paired_sha]), true, &mut HostPass::default()).expect("continued");
+        assert!(train_split_realized(&args(founding, "S3", &[&learner, &learner_sha]), true, &mut HostPass::default()).is_err(), "a founding run continues with its directions");
+        let dormant = "train-two-ladder-dormant-split-tower-classes";
+        train_split_realized(&args(dormant, "D", &[]), false, &mut HostPass::default()).expect("control");
+        assert!(!dir.join("D/PAIRED.0").exists(), "the control carries no directions");
+        let (learner, learner_sha, rested) = state("D", "STATE.0");
+        assert_eq!(rested.tower.declaration.contacts, 8);
+        train_split_realized(&args(dormant, "D2", &[&learner, &learner_sha]), false, &mut HostPass::default()).expect("control continued");
+        std::fs::remove_dir_all(&dir).expect("removed");
     }
 
     /// The race's readings run on a tiny participating learner: the prompts' openings write each
