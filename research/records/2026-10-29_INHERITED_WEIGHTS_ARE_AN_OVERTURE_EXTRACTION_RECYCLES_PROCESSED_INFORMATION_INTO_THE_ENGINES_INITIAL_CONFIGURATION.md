@@ -118,3 +118,73 @@ overture's places, or is released onto the material grain at a declared toleranc
 coefficient's remainder accounted. The 30 layers hold 106,202,880 of the values; the embedding's
 28,311,552 (tied to the unembedding) are left behind with the vocabulary, and the final norm's 576
 go with the readout that is founded natively.
+
+## 6. Step 2's grain law, and §3 read against the tower's step (October 30)
+
+**The grain law, decided.** [measured; host, decoding only, no model run] Released onto the tower's
+material grain `2^(−24)` to the nearest, the 30 layers' 106,202,880 coefficients land exactly but
+for 3,940. Of those, 3,926 keep their leading bits with a remainder below the grain and 14 release to
+zero (`down_proj` 917 and 6, `gate_proj` 917 and 2, `up_proj` 933 and 1, `q_proj` 433 and 2,
+`o_proj` 406 and 2, `v_proj` 164 and 0, `k_proj` 156 and 1). In every kind the remainders' summed
+magnitude is between `3.3·10⁻¹²` and `4.9·10⁻¹²` of the coefficients' (a decimal reading). Both
+norms' gains land exactly.
+
+[agent-inferred] So the opening material stays on the tower's own carrier. Each coefficient
+releases onto `2^(−24)` to the nearest, and the founding returns, block by block, how many
+coefficients it released and their remainder. Widening the material carrier would change a law
+that every level and the card share, for 0.004% of the coefficients and a remainder twelve decimal
+orders below their mass. A coefficient the founding composes is released once, after the
+composition, with its remainder in the same receipt. Two compositions arise: a norm's gain folded
+into the chart that reads it, and the base change of the Gibbs face below.
+
+**§3 read against the step.** [agent-inferred, read from `Tower::step` and
+`hnn::tower::participation`] Three of §3's blocks are restrictions as they stand. Two more hold once
+the founding chooses its modes and folds a base change. Four terms are owed.
+- **Holds.** Rotary positions are constant moves of the frame that participation carries. A source
+  head's 64 dimensions pair as `(m, m + 32)` (the source's rotation is not interleaved), with
+  `ω_m = 100000^(−m/32)`. The native frame turns the charts back where the source turns them
+  forward, so the moves are `u_m = e^(−iω_m)`. Grouped key and value heads are copies (§5). The
+  friction is `κ = 0`. The MLP's down projection is the join's `W₂`. There are no biases.
+- **Holds with a choice of modes.** Participation carries a value by the same relative frame as the
+  probe and the key: `y_i = U_i Σ_j a_ij conj(U_j) Ψ_j`. The source's values do not turn. So a
+  source head takes 64 native modes:
+  - 32 rotary modes carry `Ȟ` and `H`, with `Ψ` zero;
+  - 32 still modes (`u = 1`) carry `Ψ`, with `Ȟ` and `H` zero.
+
+  The face sums over the head's modes, so the still modes add nothing to it, and the rotary modes add
+  nothing to the current. The output projection is `Cᵃ` on the still modes: for a value pair `(a, b)`,
+  `Cᵃ_re = O[:, a]` and `Cᵃ_im = −O[:, b]`. The tower's 576 modes hold the 9 heads.
+- **Holds with a base change.** The Gibbs face is base 2, the source's softmax base `e`. So
+  `2^(β Re⟨q, k⟩) = e^(qᵀk/8)` when the probe chart carries the factor `log₂ e · 2^(beta_shift)/8`.
+  `log₂ e` enters as a navigator's face, released with the chart.
+- **Owed (1): the charts' input.** The charts read the level's input `x` as it stands. The source's
+  `Q`, `K` and `V` read it normalized, `x/‖x‖_rms · g`, a scale per site that no fixed chart carries.
+  The owed term reads the input as a ratio to its own power, the read the contacts already take, with
+  `g` folded into each chart. The source's `ε = 10⁻⁵` is a floor for its floats. The ratio read has
+  none, and the two differ by `ε/(2 mean x²)` relative.
+- **Owed (2): the attention's join.** Participation's current is read through `Cᵃ`, normalized
+  again, and enters the contacts' drive through `W₁ᵃ`. The source adds `O y` to the residual. The
+  owed term is the join `x ← x + Re(Cᵃ y)`.
+- **Owed (3): the contacts' read.** The contacts read the modes' face `r̂ = Re(C h)/‖Re(C h)‖_rms`.
+  The source's MLP reads the residual after the attention has joined it, normalized. A gated tower
+  cannot make its modes transparent: `λ = 0` has no logarithm for the gate to raise. The passage join
+  (`Tower::join_passage`) already lets the contacts read the passing current, `W₁ˣ x`, but only under
+  a news clock, as `x` stands, and before any attention join. The owed term is that read taken as a
+  ratio to its power, after the join. The modes open silent (push zero), so the opening is the
+  source's operation and deposition grows them.
+- **Owed (4): the gate.** The source's MLP is `silu(W_g n) ⊙ (W_u n)`; the pair contact's two
+  factors are both linear. The owed law is a gated pair contact `v = a σ₂(a log₂ e) ⊙ b`, with `σ₂`
+  the gate law's base-2 logistic.
+
+With the four terms, one native level reads `x' = x + Re(Cᵃ y(x/‖x‖))` and then
+`x'' = x' + W₂ v(x'/‖x'‖)`. That is the source layer, and each term is a general law of the level
+rather than a routine for this source. Step 2 builds the founding with its receipts. It checks the
+block whose owner is already whole: the attention block as participation, on a declared normalized
+input, against the source's block computed once at the boundary. Its acceptance is fixed before the
+build. On a declared normalized input of 16 sites, every head's current, and the read the output
+projection makes of all nine, differ from the source block's exact operation by at most `2^(−8)` of
+their largest component. That is the relative grain of the `bfloat16` carrier in which the source
+realizes its own block, so an extraction within it loses less than the source's own realization
+does. The face grain is not the bound: the charts are released onto `2^(−16)`, and the pairing sums
+64 such terms. The four owed terms are the build after it, each tested at its consumer: the joined
+level reproduces the source layer on a declared input, under the same bound.
