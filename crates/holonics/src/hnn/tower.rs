@@ -9013,7 +9013,8 @@ mod tests {
         let (mut s, mut t) = (tower.rest(), opened.rest());
         let (plain, heard) = (tower.forward(&mut s, &classes, &tower.reaches()).expect("forward"), opened.forward(&mut t, &classes, &opened.reaches()).expect("forward"));
         let (mut held, mut moved) = (0, 0);
-        for i in 1..classes.len() {
+        // One cell a class but the last, whose successor the passage does not carry.
+        for i in 1..plain.len() {
             if plain[i].levels[2].ticks == 0 {
                 assert_eq!(plain[i].levels[2].drive, plain[i - 1].levels[2].drive, "cell {i}");
                 held += 1;
