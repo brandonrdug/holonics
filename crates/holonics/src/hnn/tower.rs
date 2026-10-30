@@ -3591,7 +3591,7 @@ impl Tower {
     /// Each clocked level's closure faces over a stream's section, `(e_jj, Σ_i e_ji)` on `2^(−62)`
     /// tick by tick, what the certificate reads beside the arrivals' faces (empty without the
     /// heading).
-    pub(crate) fn closure_faces(&self, cells: &[Cell]) -> Result<Vec<Vec<(u128, u128)>>> {
+    fn closure_faces(&self, cells: &[Cell]) -> Result<Vec<Vec<(u128, u128)>>> {
         Ok(self.closures(cells)?.into_iter().map(|(_, faces)| faces.into_iter().enumerate().map(|(j, f)| (f.masses[j], f.total)).collect()).collect())
     }
 
@@ -5486,7 +5486,7 @@ impl Tower {
     /// `x⁰ = E(u) + Σ_l D_l ĥ_l`. Each such level carries the open trace of the arrivals since its
     /// last tick, `o_l ← o_l + E(u)`, closed at the tick as `τ_l = r̂(o_l)`; the heading the level
     /// held meets the traces of the section's ticks through a pair contact
-    /// ([`Tower::closure_faces`]), and the closure's code joins the section's.
+    /// (`Tower::closure_faces`), and the closure's code joins the section's.
     ///
     /// [agent-inferred] `C^→_l` opens as a copy of the level's read, so a heading opens on what the
     /// level's contacts read (a heading at zero is no ratio, and its closure would have no

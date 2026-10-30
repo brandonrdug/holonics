@@ -52,6 +52,8 @@ struct Faces {
     passage: bool,
     /// The packets joined after the passage (`join_packets`); they need the news clock.
     packets: bool,
+    /// The heading joined after the packets (`open_heading`); it needs them.
+    heading: bool,
     /// The levels (two when zero).
     levels: usize,
 }
@@ -112,7 +114,29 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     if faces.packets {
         learner.join_packets().expect("the packets join");
     }
+    if faces.heading {
+        open_heading(&mut learner);
+    }
     (learner.clone(), learner)
+}
+
+/// The heading joined last, the descent `D` of each level the clock holds opened about ±1/8 on
+/// `2^(−24)` off the key stream (it founds at zero), so every heading moves the residual stream's
+/// opening face and the descent carries a covector from the first section; `C^→` opens as the
+/// level's read (`join_heading`).
+fn open_heading(learner: &mut TowerLearner) {
+    learner.join_heading().expect("the heading joins");
+    let d = learner.tower.declaration;
+    let first = learner.tower.news().expect("the heading's clock").first();
+    let law = learner.tower.resident_law().expect("the law");
+    let k = keys(1 << 16);
+    let mut j = 44000;
+    for lv in &law.levels[first..] {
+        for i in lv.descent..lv.descent + d.width * d.width {
+            learner.tower.theta[i] = (k[j] as i32 - 128) << 14;
+            j += 1;
+        }
+    }
 }
 
 /// The passage joined last, the `W₁ˣ` of each level the clock holds opened about ±¼ on `2^(−24)`
@@ -528,6 +552,27 @@ fn the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections() {
     lockstep(11, 2, 9, 8, false, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), turned: true, contact: Some(ContactLaw::Pair), packets: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, ..Faces::default() });
+}
+
+/// [agent-inferred, October 30] **The heading on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6): each
+/// clocked level reads its heading from its modes before the arrival into the residual stream
+/// through its descent, closes the trace of its span at its tick, and the closure's covector
+/// returns to the heading's read, the modes it read, the descent and the traces' encodings; 32
+/// sections equal face by face (the closures among them), covector entry by entry, learner for
+/// learner and state for state (the open traces among it), on the clock from level 1, on three
+/// levels from level 2 with the passage, and at the race's declaration, six levels from level 4
+/// with the passage; on the turned pair contact with an uncompared place; then advanced class by
+/// class, a stream's open traces carried from each call into the next.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_heading_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, heading: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() });
+    lockstep(11, 2, 12, 8, true, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), turned: true, contact: Some(ContactLaw::Pair), packets: true, heading: true, ..Faces::default() });
+    advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, heading: true, ..Faces::default() });
+    advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
 }
 
 /// The same beside participation on the clock's ticks and the pair contact, an uncompared place

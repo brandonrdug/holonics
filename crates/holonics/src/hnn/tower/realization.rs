@@ -342,6 +342,13 @@ pub struct ResidentLevel {
     /// news clock's first clocked level, [`Tower::join_passage`]).
     pub passage: usize,
     pub passage_reach: u64,
+    /// The heading's read `C^→` (re, im, `w × n`), its descent `D` (`w × w`) and their `max |w|`
+    /// (each zero without the heading or below the news clock's first clocked level,
+    /// [`Tower::join_heading`]).
+    pub heading_re: usize,
+    pub heading_im: usize,
+    pub descent: usize,
+    pub heading_reaches: [u64; 3],
 }
 
 /// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
@@ -534,9 +541,10 @@ pub struct ResidentLaw {
     /// Whether the levels the news clock holds hear the packet their clock closed
     /// ([`Tower::join_packets`]): a realization that does not carry it refuses the tower.
     pub packets: bool,
-    /// Whether the levels the news clock holds carry a heading the fine levels read
-    /// ([`Tower::join_heading`]): a realization that does not carry it refuses the tower.
-    pub heading: bool,
+    /// The closure's shift `s` when the levels the news clock holds carry a heading the fine
+    /// levels read ([`Tower::join_heading`]; `z = 2^(−s) ⟨ĥ, τ⟩` on `2^(−16)`): a realization that
+    /// does not carry it refuses the tower.
+    pub heading: Option<u32>,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -694,6 +702,10 @@ impl Tower {
                 participation_reaches: reaches.participation.get(l).copied().unwrap_or([0; 9]),
                 passage: lv.passage,
                 passage_reach: reaches.passage.get(l).copied().unwrap_or(0),
+                heading_re: lv.heading_re,
+                heading_im: lv.heading_im,
+                descent: lv.descent,
+                heading_reaches: reaches.heading.get(l).copied().unwrap_or([0; 3]),
             })
         }))?;
         Ok(ResidentLaw {
@@ -751,7 +763,7 @@ impl Tower {
             mutual: self.mutual,
             passage: self.passage,
             packets: self.packets,
-            heading: self.heading,
+            heading: self.heading.then(|| super::closure_shift(self.declaration.width)),
             held_log: reaches.held_log,
         })
     }
