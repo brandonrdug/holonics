@@ -63,3 +63,58 @@ here:
 
 This corrects the October 29 audit record's §3. The served model stays withdrawn; the intake is
 lawful as the overture's.
+
+## 5. Audit, October 30: what step 1 takes in, and what it leaves out
+
+[agent-inferred] Participation's card parity passed on October 29, so the order of §4 has reached
+this work. Three choices fix step 1 before it is built.
+- **The intake is the exterior intake law, given a Rust owner.** The law already has its Lean owner
+  (`Foundation/ExteriorIntake.decode_exact_on_finite`, atlas `receipt.exterior-intake`): a finite
+  IEEE word decodes exactly to its dyadic ratio, and a nonfinite word is refused. No Rust owner
+  carries it yet. The K-block decoder named in §4 sits on an unpushed branch and is not the port
+  source after all: a source released unquantized needs none. A `bf16` word is a sign, an odd
+  mantissa and a power of two, so its intake has no remainder, while a quantized block is a lossy
+  face of the same trained weights. The source is therefore taken as released, in `safetensors`
+  `bf16`, and §4's step 1 reads "the exact intake of one small open model's blocks".
+- **The lexical layer is founded natively; only the interior is the overture.** The source's
+  embedding and unembedding are charts of its byte-pair vocabulary, an authored tokenizer that the
+  engine refuses. So the encoding `E` and the readout `U` are founded on the engine's own units, as
+  every race founds them, and only the interior blocks of §3 (attention as participation,
+  normalization, the gated contacts, the residual joins) enter from the source. That an interior
+  carries across a re-founded lexical layer is measured in the literature: Artetxe, Ruder and
+  Yogatama (2020, "On the cross-lingual transferability of monolingual representations") move a
+  trained encoder's body to new languages by learning new embeddings alone. Here the interior is
+  not frozen; deposition moves it from the overture.
+- **The tower is declared at the source's interior shape**, or at a prefix of its layers, which is
+  a lawful restriction: width the hidden size, one participation head per query head with its
+  rotary pairs as complex modes, contacts the gated MLP's width, levels the layers taken. Grouped
+  key and value heads enter as copies of one chart in each head that shares it; deposition then
+  parts them. The first source is a small llama-shaped decoder released under Apache-2.0
+  (SmolLM2-135M: by its published configuration hidden size 576, 30 layers, 9 query heads over 3
+  key-value heads, MLP width 1536, rotary positions, RMS normalization, a SiLU-gated MLP, no
+  biases), its configuration read and pinned at intake rather than assumed.
+
+Step 1's deliverable is the Rust owner of the intake: a `safetensors` file's `bf16`, `f16` and `f32`
+tensors decoded to exact dyadic ratios at the boundary, nonfinite words refused, with the tensor
+names and shapes kept as exterior codec information only. It is checked on constructed files at
+every boundary case of each format. The weights themselves stay in `.local/` and are never
+committed. The card's cost for step 3 is projected from step 2's measured pass, not assumed.
+
+**Step 1, built (October 30).** `holonics::hnn::overture` carries the intake: `FloatFormat::decode`
+is the Lean `decode` over `binary16`, `bfloat16` and `binary32`, and `Safetensors::read` admits a file
+whose tensors' ranges hold their shapes and tile its data exactly. Its tests decode every `bfloat16`
+and `binary16` word against Lean's value computed independently, refuse exactly the all-ones exponent
+field (256 and 2,048 words), check that `binary32` carries every half-width value and that `bfloat16`
+is `binary32`'s upper half, and refuse each malformed file by name.
+
+[measured; host, decoding only, no model run] The released SmolLM2-135M file at revision `93efa2f0`
+(269,060,552 bytes, SHA-256 `80521b40…5da1`; the weights stay in `.local/`) reads whole in 21.9 s
+through `cargo run --example overture_intake`: 272 tensors, all `bfloat16`, 134,515,008 values, none
+refused and none zero. Their leading bits sit at places `−30` through `3`, so with `bfloat16`'s eight
+significant bits an exact carrier needs places `3` down to `−37`. The tower's material grain is
+`2^(−24)`; the attention charts reach down to place `−30` and the MLP charts to `−28`. Step 2
+therefore owes the founding's grain law: the opening material either widens its carrier to hold the
+overture's places, or is released onto the material grain at a declared tolerance with each
+coefficient's remainder accounted. The 30 layers hold 106,202,880 of the values; the embedding's
+28,311,552 (tied to the unembedding) are left behind with the vocabulary, and the final norm's 576
+go with the readout that is founded natively.

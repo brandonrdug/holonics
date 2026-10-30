@@ -150,6 +150,7 @@
 //! | the mount certifies the Holarchy; its parametric orientation carries the aeons | `Holarchy/Join.interconnect`, `Holarchy/Join.Holarchy.parametric` | [`Reference`] (`mount_with`), [`reference::Resident::parametric`] |
 //! | native generation: the joint section, joint against marginals, the release at width zero, the consumer equation (U6) | `HNN/Prediction.{refine_iterate, jointSection, jointSection_receive, joint_not_marginals, release_width_zero, plural_section_held, consumer_eq}` | [`prediction`] (the bank's release; the linear readout that realized `refine_iterate` and `jointSection` was retired, batch H) |
 //! | the release's own comparison: the eigen-derivative at a simple root, a max comparison's descent, a strict decrease by disjoint enclosures (U6) | `HNN/ExecutedComparison.{product_deriv, simple_root_deriv, log_modulus_deriv, max_descends, sum_max_descends, disjoint_enclosures_decrease, predicates_release_the_section}` | [`executed`] |
+//! | the overture's intake: an exterior float word decoded to its exact dyadic value at the boundary, a nonfinite word refused (#146) | `HolonicsResearch/Foundation/ExteriorIntake.{decode, decode_exact_on_finite, decode_refuses_nonfinite}` | [`overture::FloatFormat::decode`], [`overture::Safetensors`] |
 //! | the aeon at its boundary: readings, epochs as section flux, the carry-out's cycle | `Aeon/Clock/Winding.{reading_navigatorClock, torus_cycle_reads_whole_windings}`, `Aeon/Clock/Epoch.signed_count_is_flux`, `HNN/Retention.lift_reading` | [`retention::aeon_readings`], [`AeonBoundary`] |
 //! | the first law over an aeon, on enclosed code lengths, with the face against the literal | `Aeon/Production/FirstLaw.{ledger_telescopes, enclosed_telescopes}` | [`crate::aeon::EnclosedLedger`] in the resident; [`AeonBoundary::first_law`], [`AeonBoundary::literal`] |
 //!
@@ -174,6 +175,7 @@ pub mod founding;
 pub mod keyed_modes;
 pub mod keys;
 pub mod moment;
+pub mod overture;
 pub mod paired;
 pub mod pending;
 pub mod phase_family;
