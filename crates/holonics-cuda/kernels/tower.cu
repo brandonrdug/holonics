@@ -32,7 +32,9 @@
 //   state moves from the one before: time is sequential within a stream) and, within a cell, its
 //   threads own the outputs of each read (the pushes and gates, the modes, the reads, the contacts,
 //   the return, the readout), the stages ordered by barriers. The modes' states stay in shared
-//   memory across the cells. With `keep`, the cell's temporaries are written for the reverse.
+//   memory across the cells. Its `read` is 1 for the opening read, whose cell temporaries are
+//   written for the reverse (`keep`), 0 for a reread, and 2 for a reread whose clocked levels tick
+//   where the opening read ticked (`Slot::OpeningTicks`), reading the opening's ticks.
 // - `tower_reverse_top`, `tower_reverse_ahead`, `tower_reverse_contacts`, `tower_reverse_dx`: one
 //   block a cell of a stream (cells are independent there: each reads its own forward temporaries
 //   and covector).
@@ -814,7 +816,8 @@ __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t oct
     return p;
 }
 
-extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerLaw law, TowerFrame fr, uint32_t keep) {
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerLaw law, TowerFrame fr, uint32_t read) {
+    const uint32_t keep = read == 1, opening_ticks = read == 2;
     const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
     const uint32_t A = law.alphabet, W = law.width, N = law.modes, F = law.contacts, L = law.levels,
                    T = law.cells;
@@ -1049,6 +1052,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                         atomicOr(&st, TOWER_REFUSED_NEWS);
                     }
                     tk[l] = advanced > UINT32_MAX ? 0 : (uint32_t)advanced;
+                    // A reread on the opening's ticks: the level ticks where the opening read did.
+                    if (opening_ticks) {
+                        tk[l] = fr.ticks[qc * L + l];
+                    }
                 }
                 news_phase = law.period == 0 ? 0 : sum % law.period;
                 if (keep) {

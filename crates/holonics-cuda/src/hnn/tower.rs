@@ -709,6 +709,9 @@ pub struct TowerCard<'c> {
     opened: Option<(LawWords, Vec<LevelWords>)>,
     /// Whether the frame's material is still the opening read's (a reread uploads its candidate).
     opened_current: bool,
+    /// Whether the frame holds an opening read's ticks under a news clock, which a reread on them
+    /// ([`Slot::OpeningTicks`]) reads; a frame sized again holds none.
+    ticks_kept: bool,
     ends: [Option<Vec<TowerState>>; 2],
     times: TowerCardTimes,
     /// When set, each launch is waited on and timed by its entry (a measurement aid: it
@@ -728,7 +731,7 @@ pub struct TowerCardTimes {
 fn slot_index(slot: Slot) -> usize {
     match slot {
         Slot::Opened => 0,
-        Slot::Reread => 1,
+        Slot::Reread | Slot::OpeningTicks => 1,
     }
 }
 
@@ -742,7 +745,7 @@ impl<'c> TowerCard<'c> {
     pub fn open(card: &'c Card) -> std::result::Result<Self, DeviceError> {
         card.current()?;
         let module = Module::load_ptx(IMAGE)?;
-        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ends: [None, None], times: TowerCardTimes::default(), profile: None })
+        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ticks_kept: false, ends: [None, None], times: TowerCardTimes::default(), profile: None })
     }
 
     /// Time every launch by its entry from here on (each launch waited on before and after).
@@ -1014,6 +1017,7 @@ impl<'c> TowerCard<'c> {
             return Ok(());
         }
         self.frame = None;
+        self.ticks_kept = false;
         let card = self.card;
         let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, moving, paired, foil, strand_rings: sr, strand_table, .. } = shape;
         let stranded = usize::from(sr > 0);
@@ -1560,8 +1564,18 @@ impl<'c> TowerCard<'c> {
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair), heading: hd };
         self.frame(shape).map_err(device)?;
+        if slot == Slot::OpeningTicks && (law.news.is_none() || !self.ticks_kept) {
+            return Err(TowerError::Refused("a reread on the opening's ticks reads a news clock's opening read, its frame still resident"));
+        }
         let (mut words, levels) = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
+        // The forward's read: the opening (its temporaries kept), a reread, or a reread on the
+        // opening's ticks.
+        let read = match slot {
+            Slot::Opened => 1u32,
+            Slot::Reread => 0,
+            Slot::OpeningTicks => 2,
+        };
         {
             let frame = self.frame.as_ref().expect("the frame was just sized");
             let card = self.card;
@@ -1681,7 +1695,7 @@ impl<'c> TowerCard<'c> {
             let fw = Self::frame_words(frame);
             let blocks = (law.len as u32).div_ceil(THREADS).clamp(1, 1024);
             self.law_launch("tower_transpose", Dim3 { x: blocks, y: words.families, z: 1 }, THREADS, 0, &words, &fw, None).map_err(device)?;
-            self.law_launch("tower_forward", Dim3::x(streams as u32), THREADS, Self::forward_shared(&shape) as u32, &words, &fw, Some(keep as u32)).map_err(device)?;
+            self.law_launch("tower_forward", Dim3::x(streams as u32), THREADS, Self::forward_shared(&shape) as u32, &words, &fw, Some(read)).map_err(device)?;
         }
         self.status()?;
         let frame = self.frame.as_ref().expect("the frame was just sized");
@@ -1841,6 +1855,7 @@ impl<'c> TowerCard<'c> {
         if keep {
             self.opened = Some((words, levels));
             self.opened_current = true;
+            self.ticks_kept = law.news.is_some();
         } else {
             self.opened_current = false;
         }

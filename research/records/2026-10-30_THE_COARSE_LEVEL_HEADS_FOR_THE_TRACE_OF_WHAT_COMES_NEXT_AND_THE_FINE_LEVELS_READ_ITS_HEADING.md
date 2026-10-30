@@ -860,3 +860,51 @@ lap, beside both. The refusals' cost (§14) is read with it, a lap at a time.
 The projection: each lap at §14's bound, 23 windows at 18,781 ms and the held-out read's 2,120 ms,
 434.1 s, three laps 1,302.3 s; the deadline 1,303 s, and window `k`'s limit `k × 18,781 ms` plus
 2,120 ms for each held-out read so far.
+
+## 16. A refused step read on the ticks its section opened with
+
+[agent-inferred, October 30] **The question.** §13 left the refusals' cause between two readings
+of one fact: the other families' step meets the readout's through what the face reads beside
+`x^L`, the heading after each arrival `ĥ⁺`. The rest moves `ĥ⁺` through the clocked levels'
+inputs, smoothly, as the covector carries it; or through their ticks, which the news sets: each
+arrival's code under the open face advances the news phase, and a clocked level ticks where the
+phase crosses its section (`NewsClock::ticks`). A step that changes the arrivals' code moves the
+phase at every later cell and the ticks with it, and the covector holds the ticks fixed. The
+reading that separates the two reads a refused step again with its clocked levels ticking where
+the section's opening read ticked.
+
+**The reading.** `Slot::OpeningTicks` is a reread whose clocked levels tick where the opening read
+ticked, cell by cell; the news phase still advances by the reread's own codes
+(`Tower::step_on`, `Tower::forward_on`). The host keeps the opening read's ticks; the card reads
+them from the frame the opening read wrote (`tower_forward`'s `read = 2`) and refuses before an
+opening read. Under a run's declared reading (`TOWER_REFUSAL_TICKS=1`, the learner's
+`refusal_ticks`) each refused step is read again whole on the opening's ticks and its change to
+the arrivals' code is returned (`SectionReceipt::refused_on_ticks`); the race prints a window's
+`TOWER_REFUSAL_TICKS`: how many refused steps rose on their own ticks and on the opening's, and
+the changes on each. It costs one forward a refusal and moves nothing.
+
+**Acceptance, fixed before the build.**
+24. On the host, a stream read on its own forward's ticks is that forward face for face, read on
+    a moved tick its clocked level ticks there; the host's reread on the opening's ticks of the
+    unchanged tower is the opening read; and the reading moves nothing (the learner, the states and
+    the receipt without the reading are the learner's without it).
+25. On the card, the reread on the opening's ticks is refused before an opening read and is the
+    host's after one, face for face, closure for closure and end for end, on three levels and at
+    the race's declaration; and 32 sections under the reading are the host's, receipt for receipt.
+26. On the 4080 over the passage's first 256 sections at a38c1c63f's law, the lap's arrivals and
+    refusals are a38c1c63f's to every printed digit, and each window reports how many refused steps
+    rose on the opening's ticks beside how many rose on their own. The reading decides the next
+    law's subject: if from the second window on most refused steps do not rise on the opening's
+    ticks, the rise is the ticks moving, and the next law is the clock's (how a clocked level's
+    motion reads a phase the step moves); if most still rise, the rise is the step's parts meeting
+    through the clocked levels' inputs, and the next law is the step's.
+
+The lap's projection adds the reading's forwards: a38c1c63f's 256 sections refused 197 steps, so
+the reading adds `197 × 92 ms = 18.1 s` at the largest measured forward; the projection is
+`152.4 s + 18.1 s = 170.5 s`, the deadline 171 s, and window `k`'s limit `k × 18,781 ms` plus
+92 ms for each refusal read so far.
+
+Recorded failures this could repeat: *a located cause carried unrepaired into a new consumer* (the
+reading changes no law; the next law follows its counts); *a refusal answered with a larger limit*
+(the projection grows by the reading's own measured forwards, fixed before launch, and the lap
+keeps its 256 sections).

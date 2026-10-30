@@ -232,7 +232,7 @@ impl TowerLearner {
         let (f, f2) = (factor as i128, (factor * factor) as i128);
         let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
-        Ok(Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false })
+        Ok(Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false })
     }
 }
 

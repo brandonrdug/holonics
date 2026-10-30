@@ -3594,6 +3594,16 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         learner.refusal_parts = true;
         println!("TOWER_REFUSAL_PARTS declared");
     }
+    // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_TICKS=1`): each refused step
+    // read again whole, its clocked levels ticking where the section's opening read ticked (the
+    // record's §16); it costs one forward a refusal and moves nothing.
+    if std::env::var("TOWER_REFUSAL_TICKS").is_ok_and(|v| v == "1") {
+        if learner.tower.news().is_none() {
+            return Err("TOWER_REFUSAL_TICKS reads the clocked levels' ticks, and this tower has no news clock".into());
+        }
+        learner.refusal_ticks = true;
+        println!("TOWER_REFUSAL_TICKS declared");
+    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3625,6 +3635,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         // the closure's, and the changes they made.
         let mut refusals = (0usize, 0usize, 0usize, 0i64, 0i64);
         let mut refusal_parts = ([0usize; 5], [0i64; 5]);
+        // The window's refused steps read on the opening's ticks: how many rose on their own ticks
+        // and on the opening's, and the changes on each.
+        let mut refusal_ticks = (0usize, 0usize, 0i64, 0i64);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3753,6 +3766,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             for &(arrivals, closure) in &receipt.refused {
                 refusals = (refusals.0 + 1, refusals.1 + usize::from(arrivals > 0), refusals.2 + usize::from(closure > 0), refusals.3 + arrivals, refusals.4 + closure);
             }
+            for (&(own, _), &opening) in receipt.refused.iter().zip(&receipt.refused_on_ticks) {
+                refusal_ticks = (refusal_ticks.0 + usize::from(own > 0), refusal_ticks.1 + usize::from(opening > 0), refusal_ticks.2 + own, refusal_ticks.3 + opening);
+            }
             for parts in &receipt.refused_parts {
                 for (n, &change) in parts.iter().enumerate() {
                     refusal_parts.0[n] += usize::from(change > 0);
@@ -3789,6 +3805,20 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                         signed_bits(change[4])
                     );
                     refusal_parts = ([0; 5], [0; 5]);
+                }
+                if learner.refusal_ticks {
+                    let (own, opening, own_change, opening_change) = refusal_ticks;
+                    println!(
+                        "TOWER_REFUSAL_TICKS pass={} section={} refused={} rose_on_own_ticks={} rose_on_opening_ticks={} change_bits own={} opening={}",
+                        pass,
+                        k + 1,
+                        refusals.0,
+                        own,
+                        opening,
+                        signed_bits(own_change),
+                        signed_bits(opening_change)
+                    );
+                    refusal_ticks = (0, 0, 0, 0);
                 }
                 refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());

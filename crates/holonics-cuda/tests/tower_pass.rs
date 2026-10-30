@@ -56,6 +56,9 @@ struct Faces {
     heading: bool,
     /// The levels (two when zero).
     levels: usize,
+    /// The learners' declared reading of each refused step on the opening's ticks
+    /// (`TowerLearner::refusal_ticks`).
+    refusal_ticks: bool,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -117,6 +120,7 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     if faces.heading {
         open_heading(&mut learner);
     }
+    learner.refusal_ticks = faces.refusal_ticks;
     (learner.clone(), learner)
 }
 
@@ -574,6 +578,58 @@ fn the_cards_heading_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 2, 12, 8, true, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), turned: true, contact: Some(ContactLaw::Pair), packets: true, heading: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, heading: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
+}
+
+/// [agent-inferred, October 30] **A reread on the opening's ticks** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…` §16, acceptance 25): the
+/// card refuses it before an opening read; after one, on three levels clocked from level 2 and at
+/// the race's declaration (six levels clocked from level 4), each with the passage, the packets and
+/// the heading, a candidate tower whose descent moved reads on the opening's ticks as the host's,
+/// face for face, closure for closure and end for end; and with the declared reading 32 sections
+/// are the host's, receipt for receipt (each refused step's read on the opening's ticks among it).
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_reread_on_the_opening_ticks_is_the_hosts() {
+    let card = Card::open(0).expect("the card");
+    let clocked = [
+        Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() },
+        Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() },
+    ];
+    for faces in clocked {
+        let mut realized = TowerCard::open(&card).expect("the tower's image");
+        let (host, _) = learners(11, faces);
+        let (streams, section) = (3, 9);
+        let classes = passage(11, streams * (section + 1));
+        let chunk = classes.len() / streams;
+        let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk..s * chunk + section + 1]).collect();
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
+        let opening: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
+        assert!(realized.forward(&host.tower, &opening, &parts, &targets, Slot::OpeningTicks).is_err(), "a reread on the opening's ticks before an opening read");
+        let mut reference = HostPass::default();
+        reference.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("host opening");
+        realized.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("card opening");
+        // The candidate: each clocked level's descent opened again off another part of the keys.
+        let mut candidate = host.tower.clone();
+        let d = candidate.declaration;
+        let first = candidate.news().expect("the clock").first();
+        let law = candidate.resident_law().expect("the law");
+        let k = keys(1 << 16);
+        let mut j = 20000;
+        for lv in &law.levels[first..] {
+            for i in lv.descent..lv.descent + d.width * d.width {
+                candidate.theta[i] = (k[j] as i32 - 128) << 15;
+                j += 1;
+            }
+        }
+        let host_read = reference.forward(&candidate, &opening, &parts, &targets, Slot::OpeningTicks).expect("host on the opening's ticks");
+        let card_read = realized.forward(&candidate, &opening, &parts, &targets, Slot::OpeningTicks).expect("card on the opening's ticks");
+        assert_eq!(host_read, card_read, "the read on the opening's ticks");
+        let (mut ends_h, mut ends_c) = (opening.clone(), opening.clone());
+        reference.carry(&candidate, &mut ends_h, &opening, Slot::OpeningTicks).expect("host carry");
+        realized.carry(&candidate, &mut ends_c, &opening, Slot::OpeningTicks).expect("card carry");
+        assert_eq!(ends_h, ends_c, "the ends on the opening's ticks");
+        lockstep(11, 3, 9, 32, false, Faces { refusal_ticks: true, ..faces });
+    }
 }
 
 /// The same beside participation on the clock's ticks and the pair contact, an uncompared place

@@ -3109,6 +3109,15 @@ impl Tower {
     /// One cell forward: the class `u` arrives, every level's modes move, and the face of the next
     /// class is read. The temporaries are returned for the reverse scan.
     fn step(&self, state: &mut TowerState, u: usize, reaches: &Reaches) -> Result<Cell> {
+        self.step_on(state, u, reaches, None)
+    }
+
+    /// [agent-inferred, October 30] The step with each level's ticks given, `held[l]`, in place of
+    /// the ones the news clock reads from the arrival's code; the news phase still advances by that
+    /// code. A run's declared reading of a refused step on the ticks its section opened with
+    /// ([`Slot::OpeningTicks`], record §16), never a learner's own step. Refused without a news
+    /// clock.
+    fn step_on(&self, state: &mut TowerState, u: usize, reaches: &Reaches, held: Option<&[u32]>) -> Result<Cell> {
         let d = &self.declaration;
         let (w, n, f) = (d.width, d.modes, d.contacts);
         if u >= d.alphabet {
@@ -3131,8 +3140,13 @@ impl Tower {
                 };
                 let (ticks, news) = clock.ticks(d.levels, state.news, code)?;
                 state.news = news;
-                ticks
+                match held {
+                    Some(held) if held.len() != d.levels => return refuse("held ticks are one a level"),
+                    Some(held) => held.to_vec(),
+                    None => ticks,
+                }
             }
+            None if held.is_some() => return refuse("held ticks without a news clock"),
             None => Vec::new(),
         };
         let t = &self.theta;
@@ -3725,6 +3739,20 @@ impl Tower {
     /// A section's forward: `classes[0..T]` arrive, `classes[1..=T]` are coded.
     fn forward(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches) -> Result<Vec<Cell>> {
         collect_exact(classes[..classes.len() - 1].iter().map(|&u| self.step(state, u, reaches)))
+    }
+
+    /// One stream's section read forward on the ticks `held` gives cell by cell (`held[i]` is
+    /// every level's ticks at cell `i`, [`Tower::step_on`]).
+    fn forward_on(&self, state: &mut TowerState, classes: &[usize], reaches: &Reaches, held: &[Vec<u32>]) -> Result<Vec<Cell>> {
+        if held.len() + 1 != classes.len() {
+            return refuse("held ticks are one a cell");
+        }
+        collect_exact(classes[..classes.len() - 1].iter().zip(held).map(|(&u, h)| self.step_on(state, u, reaches, Some(h))))
+    }
+
+    /// Every level's ticks at each cell of a read.
+    fn cell_ticks(cells: &[Cell]) -> Vec<Vec<u32>> {
+        cells.iter().map(|c| c.levels.iter().map(|l| l.ticks).collect()).collect()
     }
 
     /// The reverse scan of one stream's section: the covector of every family, on its natural
@@ -5893,6 +5921,11 @@ pub struct TowerLearner {
     /// the clocked levels' and every other family's, at the same halvings
     /// ([`SectionReceipt::refused_parts`]).
     pub refusal_parts: bool,
+    /// [agent-inferred, October 30] A run's declared reading of the refused steps under a news
+    /// clock (the record's §16), never written with the learner: each refused step is read again
+    /// whole, its clocked levels ticking where the section's opening read ticked
+    /// ([`Slot::OpeningTicks`], [`SectionReceipt::refused_on_ticks`]).
+    pub refusal_ticks: bool,
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
@@ -5920,6 +5953,10 @@ pub struct SectionReceipt {
     /// the descent's, the heading's read's, the readout's and its bias's, the clocked levels' own
     /// material's (their moves among it), and every other family's.
     pub refused_parts: Vec<[i64; 5]>,
+    /// Under the learner's declared reading ([`TowerLearner::refusal_ticks`]), each refused step's
+    /// change to the arrivals' code read whole on the ticks the section's opening read took (after
+    /// minus before, on `2^(−20)` bits), beside its change on its own ticks in `refused`.
+    pub refused_on_ticks: Vec<i64>,
 }
 
 /// [agent-inferred, October 30] A clocked level's closure over a section's opening read
@@ -5937,7 +5974,7 @@ pub struct ClosureReading {
 impl TowerLearner {
     pub fn new(tower: Tower, rate_bits: u32) -> Self {
         let len = tower.theta.len();
-        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false }
+        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false }
     }
 
     /// The swell and the reaches as one line: per level `x h r a` (faces, `2^(−16)`) and `push read
@@ -6150,6 +6187,7 @@ impl TowerLearner {
         let closure_before: i64 = closure.iter().map(|c| c.code).sum();
         let mut refused = Vec::new();
         let mut refused_parts = Vec::new();
+        let mut refused_on_ticks = Vec::new();
         // The refused step's parts: the descent, the heading's read, the readout and its bias, the
         // clocked levels' own material (their moves among it, from the level whose block begins
         // at its first move to the next level's), and every other family.
@@ -6200,7 +6238,7 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts }, Slot::Opened);
+                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -6218,11 +6256,16 @@ impl TowerLearner {
                         opened = true;
                     }
                 }
-                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts }, Slot::Reread);
+                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Reread);
             }
             let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
             let closure_after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
             refused.push((arrivals_after - code_before, closure_after - closure_before));
+            if self.refusal_ticks {
+                // The refused step read again whole on the ticks the section opened with.
+                let read = realization.forward(&candidate, &opening, classes, &targets, Slot::OpeningTicks)?.admitted(&targets)?;
+                refused_on_ticks.push(part_codes(&read.faces).iter().sum::<i64>() - code_before);
+            }
             if self.refusal_parts {
                 // The refused step read again under each of its parts alone, at the same halvings.
                 let mut alone = [0i64; 5];
@@ -6385,7 +6428,7 @@ impl TowerLearner {
         if first.len() != tower.theta.len() || second.len() != tower.theta.len() {
             return refuse("moments of the wrong extent");
         }
-        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false })
+        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false })
     }
 
     /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
@@ -9758,7 +9801,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new() };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new(), refused_on_ticks: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -10543,6 +10586,66 @@ mod tests {
         assert_eq!(read.refused_parts.len(), read.refused.len());
         assert!(read.refused_parts.iter().all(|parts| parts.iter().any(|&c| c != 0)), "a refused step read no change under any part");
         assert_eq!((SectionReceipt { refused_parts: Vec::new(), ..read }, read_tower, read_states), (plain, plain_tower, plain_states));
+    }
+
+    /// [agent-inferred, October 30] **A refused step read on the opening's ticks** (the record's
+    /// acceptance 24): a stream read on its own forward's ticks is that forward, face for face; read
+    /// on other ticks its clocked level ticks where they fall; the host's reread on the opening's
+    /// ticks of the unchanged tower is the opening read; and under the declared reading every
+    /// refused step is read again whole on the section's opening ticks while the learner and the
+    /// rest of the receipt are those of the learner without it.
+    #[test]
+    fn a_refused_step_is_read_on_the_opening_ticks_and_the_reading_moves_nothing() {
+        let classes = news_passage();
+        let mut joined = headed(3);
+        let k = keys(8192);
+        let [_, descent] = joined.heading_families();
+        for (i, v) in descent.into_iter().flatten().enumerate() {
+            joined.theta[v] = i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 10;
+        }
+        let reaches = joined.reaches();
+        let mut own = joined.rest();
+        let cells = joined.forward(&mut own, &classes[..31], &reaches).expect("forward");
+        let ticks = Tower::cell_ticks(&cells);
+        let mut again = joined.rest();
+        let held = joined.forward_on(&mut again, &classes[..31], &reaches, &ticks).expect("a forward on its own ticks");
+        let faces = |cells: &[Cell]| cells.iter().map(|c| c.face.clone()).collect::<Vec<_>>();
+        assert_eq!((faces(&held), &again), (faces(&cells), &own));
+        // One of the clocked level's ticks moved a cell later.
+        let first = joined.news().expect("a clock").first();
+        let i = (0..ticks.len() - 1).find(|&i| ticks[i][first] > 0).expect("a tick before the last cell");
+        let mut moved = ticks.clone();
+        moved[i][first] -= 1;
+        moved[i + 1][first] += 1;
+        let mut shifted = joined.rest();
+        let other = joined.forward_on(&mut shifted, &classes[..31], &reaches, &moved).expect("a forward on moved ticks");
+        assert_eq!(Tower::cell_ticks(&other), moved);
+        assert_ne!(faces(&other), faces(&cells), "a moved tick changed no face");
+        assert!(joined.forward_on(&mut joined.rest(), &classes[..31], &reaches, &moved[1..]).is_err(), "ticks short of the cells");
+        let unclocked = tiny_with(3, true);
+        assert!(unclocked.forward_on(&mut unclocked.rest(), &classes[..31], &unclocked.reaches(), &ticks).is_err(), "held ticks without a clock");
+        // The host's reread on the opening's ticks: refused before an opening read, and the opening
+        // read again on the unchanged tower.
+        let targets = vec![classes[1..31].iter().map(|&c| Some(c)).collect::<Vec<_>>()];
+        let opening = vec![joined.rest()];
+        let mut pass = realization::HostPass::default();
+        assert!(pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::OpeningTicks).is_err());
+        let opened = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::Opened).expect("opening");
+        let reread = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::OpeningTicks).expect("on the opening's ticks");
+        assert_eq!((reread.faces, reread.closures), (opened.faces, opened.closures));
+        let run = |read: bool| {
+            let mut learner = TowerLearner::new(joined.clone(), 2);
+            learner.refusal_ticks = read;
+            let mut states = vec![learner.tower.rest()];
+            let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
+            (receipt, learner.tower, states)
+        };
+        let (plain, plain_tower, plain_states) = run(false);
+        let (read, read_tower, read_states) = run(true);
+        assert!(!plain.refused.is_empty(), "the step at 2^(−2) was not refused");
+        assert!(plain.refused_on_ticks.is_empty());
+        assert_eq!(read.refused_on_ticks.len(), read.refused.len());
+        assert_eq!((SectionReceipt { refused_on_ticks: Vec::new(), ..read }, read_tower, read_states), (plain, plain_tower, plain_states));
     }
 
     /// A declared hold of the heading's families keeps them as joined through a section that

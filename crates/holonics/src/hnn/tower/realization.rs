@@ -29,12 +29,18 @@
 use super::split::{PairedContacts, SplitRead};
 use super::*;
 
-/// Which forward of a section a read is: the opening read (whose temporaries the reverse reads) or
-/// the certificate's reread under a candidate deposit.
+/// Which forward of a section a read is: the opening read (whose temporaries the reverse reads),
+/// the certificate's reread under a candidate deposit, or a reread on the ticks the opening read
+/// took at each cell.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Slot {
     Opened,
     Reread,
+    /// [agent-inferred, October 30] A reread whose clocked levels tick where the section's opening
+    /// read ticked, cell by cell, the news phase still advancing by the reread's own codes: a
+    /// run's declared reading of a refused step (record §16), kept as a reread is. Refused without
+    /// a news clock or before an opening read.
+    OpeningTicks,
 }
 
 /// What a section reads of one forward: per stream, per cell, the face compared at its target, `(the
@@ -119,6 +125,9 @@ struct KeptStream {
     cells: Vec<Cell>,
     end: TowerState,
     last: Option<TowerFace>,
+    /// Under a news clock, the opening read's ticks at each cell, every level's (empty for a
+    /// reread), which [`Slot::OpeningTicks`] reads.
+    ticks: Vec<Vec<u32>>,
 }
 
 type Kept = (Vec<KeptStream>, Reaches);
@@ -144,7 +153,7 @@ impl HostPass {
     fn kept(&mut self, slot: Slot) -> &mut Option<Kept> {
         match slot {
             Slot::Opened => &mut self.opened,
-            Slot::Reread => &mut self.reread,
+            Slot::Reread | Slot::OpeningTicks => &mut self.reread,
         }
     }
 }
@@ -168,6 +177,19 @@ impl PassRealization for HostPass {
             return Err(TowerError::Refused("a forward reads one opening state and one comparison a stream"));
         }
         tower.admit_read(classes, targets)?;
+        let held: Option<Vec<&[Vec<u32>]>> = match slot {
+            Slot::OpeningTicks => {
+                if tower.news().is_none() {
+                    return Err(TowerError::Refused("a reread on the opening's ticks without a news clock"));
+                }
+                let (kept, _) = self.opened.as_ref().ok_or(TowerError::Refused("a reread on the opening's ticks before an opening read"))?;
+                if kept.len() != opening.len() {
+                    return Err(TowerError::Refused("a reread on the opening's ticks reads the streams its opening read"));
+                }
+                Some(kept.iter().map(|k| k.ticks.as_slice()).collect())
+            }
+            _ => None,
+        };
         let reaches = tower.reaches();
         let levels = if slot == Slot::Opened { tower.declaration.levels } else { 0 };
         type Read = (KeptStream, Vec<Option<(u128, u128)>>, Vec<[u64; 4]>, Vec<Vec<(u128, u128)>>);
@@ -175,9 +197,13 @@ impl PassRealization for HostPass {
             .par_iter()
             .zip(classes.par_iter())
             .zip(targets.par_iter())
-            .map(|((open, c), t)| {
+            .enumerate()
+            .map(|(s, ((open, c), t))| {
                 let mut end = open.clone();
-                let cells = tower.forward(&mut end, c, &reaches)?;
+                let cells = match &held {
+                    Some(held) => tower.forward_on(&mut end, c, &reaches, held[s])?,
+                    None => tower.forward(&mut end, c, &reaches)?,
+                };
                 let faces = cells.iter().zip(t).map(|(cell, t)| t.map(|t| (cell.face.masses[t], cell.face.total))).collect();
                 let swell = (0..levels)
                     .map(|l| {
@@ -193,8 +219,9 @@ impl PassRealization for HostPass {
                     .collect();
                 let last = cells.last().map(|c| c.face.clone());
                 let closures = tower.closure_faces(&cells)?;
+                let ticks = if slot == Slot::Opened && tower.news().is_some() { Tower::cell_ticks(&cells) } else { Vec::new() };
                 let cells = if end.credit.is_some() { cells } else { Vec::new() };
-                Ok((KeptStream { cells, end, last }, faces, swell, closures))
+                Ok((KeptStream { cells, end, last, ticks }, faces, swell, closures))
             })
             .collect::<Result<_>>()?;
         let mut swell = vec![[0u64; 4]; levels];
