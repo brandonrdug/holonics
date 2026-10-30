@@ -5628,14 +5628,15 @@ impl TowerLearner {
     }
 
     /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
-    /// splits** ([`split`]): the section steps with every pair (dormant or founded) depositing as
-    /// one contact and each founded coordinate on its own moments in its drives' chart; its reverse
-    /// also forms the split read, on which the founding the section before proposed is certified
-    /// (its pair's test passes again, with the proposal's sign, on material it was not fit on), and
-    /// a certified founding's coordinate opens at one step of its chart, carried by this section's
-    /// step. After the step's certificate the split is read again on the tower the step left (where
-    /// it deposited), the pair the rank-one test admits there is proposed and held for the next
-    /// section, and each other dormant pair's direction turns on that read.
+    /// splits** ([`split`]): the section steps with each dormant pair's copies depositing as one
+    /// contact and each founded pair as two contacts, every copy on its own covectors; while a pair
+    /// is dormant its reverse also forms the split read, on which the founding the section before
+    /// proposed is certified (its pair's test passes again, with the proposal's sign, on material it
+    /// was not fit on), and a certified founding opens its pair at one step of the split's chart,
+    /// carried by this section's step, its drives' moments re-lifted to the copies. After the
+    /// step's certificate the split is read again on the tower the step left (where it deposited),
+    /// the pair the rank-one test admits there is proposed and held for the next section, and each
+    /// other dormant pair's direction turns on that read.
     pub fn section_founding(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization, paired: &mut split::PairedContacts) -> Result<(SectionReceipt, split::FoundingReceipt)> {
         let (receipt, founding) = self.section_inner(states, classes, compared, realization, split::Pairs::Founding(paired))?;
         Ok((receipt, founding.ok_or(TowerError::Refused("a founding section returns its founding"))?))
@@ -5670,19 +5671,14 @@ impl TowerLearner {
             }
             _ => (realization.reverse(tower, &opening, classes, compared)?, None),
         };
-        // Each founded coordinate's covector, read from its copies' own drive covectors before
-        // they are tied below.
-        let split_g = match &pairs {
-            split::Pairs::Founding(p) => p.split_covectors(tower, &g)?,
-            _ => Vec::new(),
-        };
-        // Every pair, dormant or founded, deposits as one contact (`split`'s header): its drives'
-        // copies take their covectors' sum, and its return parts their covectors' mean, which steps
-        // once, split between the parts below. A dormant pair's parts read the same conduction, so
-        // the mean is either part's covector exactly.
+        // A dormant pair deposits as one contact (`split`'s header): its drives' copies take their
+        // covectors' sum, and its return parts their covectors' mean, which steps once, split
+        // between the parts below; its parts read the same conduction, so the mean is either part's
+        // covector exactly. A founded pair is two contacts, each copy on its own covector.
         let (drives, returns) = match &pairs {
             split::Pairs::Unpaired => (Vec::new(), Vec::new()),
-            split::Pairs::Dormant | split::Pairs::Founding(_) => tower.pair_entries()?,
+            split::Pairs::Dormant => tower.pair_entries(&|_, _| true)?,
+            split::Pairs::Founding(p) => tower.pair_entries(&|l, e| p.levels[l][e].is_some())?,
         };
         for &(a, b) in &drives {
             let sum = g[a] + g[b];
@@ -5723,28 +5719,15 @@ impl TowerLearner {
         for &(_, b) in &returns {
             step[b] = 0;
         }
-        // [agent-inferred, October 30] The founded coordinates step in their drives' chart, on
-        // their own moments, as a drive entry does; and the founding the section before proposed
-        // is certified on this section, which it was not fit on (`split`'s header): its pair's test
-        // read on this section's opening must pass with the proposal's sign, and its coordinate
-        // then opens at one step of that chart (the step a moment of ratio one takes), carried by
-        // this section's step and released with it.
+        // [agent-inferred, October 30] The founding the section before proposed is certified on
+        // this section, which it was not fit on (`split`'s header): its pair's test read on this
+        // section's opening must pass with the proposal's sign, and the pair then opens at one
+        // step of the split's chart (the step a moment of ratio one takes), carried by this
+        // section's step and released with it.
         let unit = deposit_over(1, 1, MATERIAL_BITS, self.rate_bits);
         let mut founding = None;
         let mut opens: Option<split::FoundedSplit> = None;
-        let mut split_steps: Vec<i128> = Vec::new();
         if let split::Pairs::Founding(paired) = &mut pairs {
-            for (f, &gv) in paired.founded.iter_mut().zip(&split_g) {
-                let gv = on_step_grain(MATERIAL_BITS, gv);
-                let square = gv.checked_mul(gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
-                if f.opened {
-                    f.first = toward(f.first, gv, FIRST_RATE);
-                    f.second = toward(f.second, square, SECOND_RATE);
-                } else {
-                    (f.first, f.second, f.opened) = (gv, square, true);
-                }
-            }
-            split_steps = paired.founded.iter().map(|f| deposit_step(f.first, f.second, MATERIAL_BITS, self.rate_bits)).collect();
             let mut out = split::FoundingReceipt { code_before, ..Default::default() };
             if let Some(proposed) = paired.pending.take() {
                 let (width, dormant) = (self.tower.declaration.width, paired.dormant());
@@ -5755,7 +5738,7 @@ impl TowerLearner {
                     .map(|(theta, predicted, surplus)| split::Founding { level, pair, theta, predicted, surplus, score: read.score, squares: read.squares });
                 if out.confirmed.is_some() {
                     let direction = paired.levels[level][pair].clone().ok_or(TowerError::Refused("a pending founding of a pair that is not dormant"))?;
-                    opens = Some(split::FoundedSplit { level, pair, direction, sign: proposed.theta.signum() as i32, epsilon: 0, first: 0, second: 0, opened: false });
+                    opens = Some(split::FoundedSplit { level, pair, direction, sign: proposed.theta.signum() as i32 });
                 }
                 out.certified = Some(proposed);
             }
@@ -5785,17 +5768,10 @@ impl TowerLearner {
                 candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
                 candidate.theta[b] = fit32(candidate.theta[b] as i128 - half, "a deposited parameter outgrew its 32-bit carrier")?;
             }
-            if let split::Pairs::Founding(paired) = &pairs {
-                for (f, &q) in paired.founded.iter().zip(&split_steps) {
-                    let released = release(q, halvings);
-                    moved |= released != 0;
-                    candidate.part_split(f.level, f.pair, &f.direction, f.sign, f.epsilon, f.epsilon - released)?;
-                }
-                if let Some(o) = &opens {
-                    let released = release(unit, halvings);
-                    moved |= released != 0;
-                    candidate.part_split(o.level, o.pair, &o.direction, o.sign, 0, released)?;
-                }
+            if let Some(o) = &opens {
+                let released = release(unit, halvings);
+                moved |= released != 0;
+                candidate.part_split(o.level, o.pair, &o.direction, o.sign, released)?;
             }
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
@@ -5810,17 +5786,12 @@ impl TowerLearner {
                 let code_after: i64 = parts_after.iter().sum();
                 let parts = parts_before.iter().copied().zip(parts_after).collect();
                 self.tower = candidate;
-                if let split::Pairs::Founding(paired) = &mut pairs {
-                    for (f, &q) in paired.founded.iter_mut().zip(&split_steps) {
-                        f.epsilon -= release(q, halvings);
-                    }
-                    if let Some(mut o) = opens.take() {
-                        o.epsilon = release(unit, halvings);
-                        if o.epsilon != 0 {
-                            paired.levels[o.level][o.pair] = None;
-                            paired.founded.push(o);
-                            opened = true;
-                        }
+                if let (split::Pairs::Founding(paired), Some(o)) = (&mut pairs, opens.take()) {
+                    if release(unit, halvings) != 0 {
+                        self.relift(o.level, o.pair)?;
+                        paired.levels[o.level][o.pair] = None;
+                        paired.founded.push(o);
+                        opened = true;
                     }
                 }
                 break (SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts }, Slot::Reread);
@@ -5852,7 +5823,6 @@ impl TowerLearner {
             out.admitted = opened;
             out.proposed = paired.pending.clone();
             out.dormant = paired.dormant();
-            out.largest = paired.founded.iter().map(|f| f.epsilon.abs()).max().unwrap_or(0);
         }
         realization.carry(&self.tower, states, &opening, slot)?;
         Ok((receipt, founding))

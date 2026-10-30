@@ -38,46 +38,49 @@
 //! (agent-inferred, October 30; measured: decided on the opening read, 20 of the race's first 28
 //! proposed foundings raised the code they were predicted to lower).
 //!
-//! Every pair deposits as one contact, dormant or founded ([`Tower::pair_entries`]): its drives'
-//! covectors are summed and both copies take the sum, the old contact's covector, on the old
-//! contact's moments, so they move together as its drives do; its return parts take their
-//! covectors' mean (while dormant the two are equal: both parts read the same conduction), whose
-//! step is read once, from the first part's moments, and split between the parts as the widening
-//! split the column (Euclidean, the remainder on the first), so the column moves by the old
-//! column's step. The widened learner is then the pair learner in a wider chart, up to the
-//! reverse's grain (agent-inferred, October 30; measured: with each return part stepping on the old
-//! column's covector whole, the column moved twice its step and the dormant control read 0.097 bits
-//! a byte above the pair race at lap 0; tied, the control read 2.228 held-out at lap 0 against the
-//! pair race's 2.229, on the RTX 4080 SUPER).
+//! While a pair is dormant its copies deposit as one contact ([`Tower::pair_entries`]): its
+//! drives' covectors are summed and both copies take the sum, the old contact's covector, on the
+//! old contact's moments, so they move together as its drives do; its return parts take their
+//! covectors' mean (the two are equal: both parts read the same conduction), whose step is read
+//! once, from the first part's moments, and split between the parts as the widening split the
+//! column (Euclidean, the remainder on the first), so the column moves by the old column's step.
+//! The widened learner is then the pair learner in a wider chart, up to the reverse's grain
+//! (agent-inferred, October 30; measured: with each return part stepping on the old column's
+//! covector whole, the column moved twice its step and the dormant control read 0.097 bits a byte
+//! above the pair race at lap 0; tied, the control read 2.228 held-out at lap 0 against the pair
+//! race's 2.229, on the RTX 4080 SUPER).
 //!
-//! A founding therefore frees one coordinate, its half-difference `ε` along the direction it was
-//! founded on ([`FoundedSplit`]), in its drives' chart ([`Tower::part_split`]): copy `o`'s first
-//! drive row is the pair's own `+ ⟦ε v⟧` and its second `+ s ⟦ε v⟧`, the copy's the negatives, so
-//! the pair's face carries `c s ε² φ` beside the contact the pair still learns as. The coordinate
-//! opens at one step of that chart (the step a moment of ratio one takes at the learner's rate),
-//! carried and released by the step of the section that certified it, and then descends as a drive
-//! entry does: its covector `∂ℓ/∂ε` is read from the copies' own drive covectors before they are
-//! tied ([`PairedContacts::split_covectors`]), its moments open on its first covector, and its step
-//! is the drives' deposit step, halved with the section's. At the tied pair `ε = 0` is a saddle of
-//! the code (`∂ℓ/∂ε = 2 s ε g`), which is why the test, not the covector, opens it; past the opening
-//! the covector grows it while the score keeps the sign the tests read and returns it toward zero
-//! when the score turns.
+//! A certified founding opens its pair at one step of the split's chart ([`Tower::part_split`]):
+//! copy `o`'s first drive row is the pair's own `+ ⟦ε v⟧` and its second `+ s ⟦ε v⟧`, the copy's
+//! the negatives, with `ε` one step of that chart (the step a moment of ratio one takes at the
+//! learner's rate), carried and released by the step of the section that certified it; the founding
+//! is recorded ([`FoundedSplit`]). From then on the pair is two contacts: each copy's drives and
+//! return part learn on their own covectors. At the tied pair the split is a saddle of the code
+//! (along `v` the face moves by `c s ε² φ`, so `∂ℓ/∂ε = 2 s ε g`), which is why the test, not the
+//! covector, opens it; once the copies differ no direction of the pair is a saddle (the return
+//! parts' difference meets the drives' difference at first order), so its entries learn by their
+//! covectors as every other entry does. A deposit's step `m/(⌊√v⌋ + 1)` does not change when its
+//! covector is scaled, so a founded pair's drive copies, whose covectors are each about half the
+//! old, step as its drives did; their moments are re-lifted to `m/2`, `v/4` at the founding, so the
+//! moments read the covector each copy now takes ([`TowerLearner::relift`]).
 //!
-//! [agent-inferred, October 30] The coordinate is not deposited at the test's `θ̂`. Measured on the
-//! RTX 4080 SUPER, a founding deposited at `θ̂` (nearly its section's own Newton step, `ln²2 · S`
-//! far above `τ`) and certified by its reread code falling past its price stalled the step at lap
-//! 0 both ways it was carried: with the founded copies learning on their own (each on its own
-//! covector, its drives' moments re-lifted to `m/2`, `v/4`) the certificate halved every
-//! section's step about 4.3 times; held at `θ̂`, the pair still one contact, about 3.3 times, where
-//! the dormant control halved 211 times in 224 sections (821 in the held race, which stopped there
-//! at 3.626 bits a byte against the control's 2.777). The first foundings, at sections 3 to 10,
-//! certified falls of 1,773 to 11,157 bits on their sections; by section 32 the founded drives'
-//! largest entries at levels 2 and 3 were five to six times the control's (pair drive 8,220,268 and
-//! 6,976,131 against 1,363,235 and 1,185,143 on `2^(−24)`), and through section 224 those levels'
-//! reads and pushes did not grow (level 3's largest read 2,243,958 to 2,256,606) while the
-//! control's more than doubled. A coordinate fit by one section's Newton step lays a quadratic
-//! feature whose curvature the other entries' normalized steps were never scaled to; opened at
-//! one step, it grows at the rate every other entry learns at.
+//! [agent-inferred, October 30] The split is not opened at the test's `θ̂`. Measured on the RTX
+//! 4080 SUPER, a founding deposited at `θ̂` (nearly its section's own Newton step, `ln²2 · S` far
+//! above `τ`) stalled the step at lap 0 both ways it was carried: with the founded copies learning
+//! on their own the certificate halved every section's step about 4.3 times; held at `θ̂`, the pair
+//! still one contact, about 3.3 times, where the dormant control halved 211 times in 224 sections
+//! (821 in the held race, which stopped there at 3.626 bits a byte against the control's 2.777).
+//! The first foundings, at sections 3 to 10, certified falls of 1,773 to 11,157 bits on their
+//! sections; by section 32 the founded drives' largest entries at levels 2 and 3 were five to six
+//! times the control's (pair drive 8,220,268 and 6,976,131 against 1,363,235 and 1,185,143 on
+//! `2^(−24)`), and through section 224 those levels' reads and pushes did not grow (level 3's
+//! largest read 2,243,958 to 2,256,606) while the control's more than doubled. A coordinate fit by
+//! one section's Newton step lays a quadratic feature whose curvature the other entries'
+//! normalized steps were never scaled to. Opened at one step and held as one coordinate along `v`
+//! that descended on its own moments, the founding learned lap for lap with its control (1.860
+//! against 1.859 held-out at lap 11), every pair founded within a lap and a half: 1,024 scalars
+//! beside the tower's 596,097 entries. Freed, the founded pairs are 194 entries each, the 198,656
+//! a fully split tower adds to the pair tower's 397,441.
 use super::*;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
@@ -105,10 +108,10 @@ pub const SCORE_BITS: u32 = 48;
 
 /// [definition] **The paired contacts' carried directions**: `levels[l][e]` is the unit direction
 /// of dormant pair `e` (contacts `e` and `e + f/2`) on the read it shares, on `2^(−16)`, or `None`
-/// once the pair is founded; each founded pair's coordinate ([`FoundedSplit`]); and the founding
-/// the last section proposed, held for the next section's certificate (the module header). The text
-/// carries the directions and the founded coordinates: a run releases a pending founding at each
-/// pass's end, before its directions rest, so a run continued from them is the run that went on.
+/// once the pair is founded; each founded pair's opening ([`FoundedSplit`]); and the founding the
+/// last section proposed, held for the next section's certificate (the module header). The text
+/// carries the directions and the foundings: a run releases a pending founding at each pass's end,
+/// before its directions rest, so a run continued from them is the run that went on.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PairedContacts {
     pub levels: Vec<Vec<Option<Vec<i32>>>>,
@@ -116,22 +119,15 @@ pub struct PairedContacts {
     pub pending: Option<Founding>,
 }
 
-/// [definition; agent-inferred, October 30] **A founded pair's coordinate** (the module header):
-/// pair `pair` of level `level`, the direction `v` it was founded on (held, on `2^(−16)`), the sign
-/// `s` of the `θ̂` its two tests read, its half-difference `ε` on the drives' material grain
-/// `2^(−24)` (copy `o`'s first drive row is the pair's own row `+ ⟦ε v⟧`, its second `+ s ⟦ε v⟧`,
-/// copy `o + f/2`'s the negatives, `⟦·⟧` released to the row's grain), and `ε`'s moments on the
-/// drives' step grain, opened on its first covector.
+/// [definition; agent-inferred, October 30] **A founded pair's opening** (the module header): pair
+/// `pair` of level `level`, the direction `v` it opened along (on `2^(−16)`) and the sign `s` of the
+/// `θ̂` its two tests read. The pair is two contacts from then on.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FoundedSplit {
     pub level: usize,
     pub pair: usize,
     pub direction: Vec<i32>,
     pub sign: i32,
-    pub epsilon: i128,
-    pub first: i128,
-    pub second: i128,
-    pub opened: bool,
 }
 
 /// One dormant pair's read over a section: the score `Σ δv φ` on `2^(−24)` (bits a unit of `θ`),
@@ -169,8 +165,7 @@ pub struct Founding {
 /// and this one certified, if any; the section's opening code; the same pair's test read on this
 /// section's opening, where it passed with the proposal's sign; whether its coordinate opened (the
 /// test passed and the section's step, which carries the opening, deposited); the founding this
-/// section proposes, held for the next; the dormant pairs it leaves; and the founded coordinates'
-/// largest `|ε|` on `2^(−24)`.
+/// section proposes, held for the next; and the dormant pairs it leaves.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct FoundingReceipt {
     pub certified: Option<Founding>,
@@ -179,7 +174,6 @@ pub struct FoundingReceipt {
     pub admitted: bool,
     pub proposed: Option<Founding>,
     pub dormant: usize,
-    pub largest: i128,
 }
 
 impl SplitRead {
@@ -312,9 +306,17 @@ impl PairedContacts {
         self.levels.iter().flatten().filter(|v| v.is_some()).count()
     }
 
+    /// A reading of how far the founded pairs have learned apart: the largest difference between
+    /// a founded pair's drive copies on `tower`, on its rows' grain (zero while none is founded).
+    pub fn parting(&self, tower: &Tower) -> Result<i64> {
+        self.admits(tower)?;
+        let (drives, _) = tower.pair_entries(&|l, e| self.levels[l][e].is_none())?;
+        Ok(drives.iter().map(|&(a, b)| (tower.theta[a] as i64 - tower.theta[b] as i64).abs()).max().unwrap_or(0))
+    }
+
     /// The directions as text: `paired LEVELS PAIRS WIDTH`, then one line a level, each pair `-`
-    /// once founded or its entries joined by commas, then one line a founded coordinate,
-    /// `founded LEVEL PAIR SIGN EPSILON FIRST SECOND OPENED` and its direction joined by commas.
+    /// once founded or its entries joined by commas, then one line a founded pair,
+    /// `founded LEVEL PAIR SIGN` and its direction joined by commas.
     pub fn to_text(&self) -> String {
         let pairs = self.levels.first().map_or(0, |l| l.len());
         let width = self.levels.iter().flatten().flatten().chain(self.founded.iter().map(|f| &f.direction)).next().map_or(0, |v| v.len());
@@ -332,7 +334,7 @@ impl PairedContacts {
         }
         for f in &self.founded {
             let direction: Vec<String> = f.direction.iter().map(|x| x.to_string()).collect();
-            s.push_str(&format!("founded {} {} {} {} {} {} {} {}\n", f.level, f.pair, f.sign, f.epsilon, f.first, f.second, u8::from(f.opened), direction.join(",")));
+            s.push_str(&format!("founded {} {} {} {}\n", f.level, f.pair, f.sign, direction.join(",")));
         }
         s
     }
@@ -348,29 +350,23 @@ impl PairedContacts {
         if lines.len() < levels + 1 {
             return refuse("the paired directions are one line a level");
         }
-        let entry = |t: &str| t.parse::<i128>().map_err(|_| TowerError::Refused("a founded coordinate's entry that is not an integer"));
         let founded = lines[levels + 1..]
             .iter()
             .map(|line| {
                 let tokens: Vec<&str> = line.split(' ').collect();
-                if tokens.len() != 9 || tokens[0] != "founded" {
-                    return refuse("a line after the levels that is not a founded coordinate");
+                if tokens.len() != 5 || tokens[0] != "founded" {
+                    return refuse("a line after the levels that is not a founded pair");
                 }
-                let direction = tokens[8].split(',').map(|x| x.parse::<i32>().map_err(|_| TowerError::Refused("a direction entry that is not an integer"))).collect::<Result<Vec<_>>>()?;
+                let direction = tokens[4].split(',').map(|x| x.parse::<i32>().map_err(|_| TowerError::Refused("a direction entry that is not an integer"))).collect::<Result<Vec<_>>>()?;
                 if direction.len() != width {
                     return refuse("a direction of the wrong width");
                 }
                 let sign = match tokens[3] {
                     "1" => 1,
                     "-1" => -1,
-                    _ => return refuse("a founded coordinate's sign that is not one"),
+                    _ => return refuse("a founded pair's sign that is not one"),
                 };
-                let opened = match tokens[7] {
-                    "0" => false,
-                    "1" => true,
-                    _ => return refuse("a founded coordinate's opening that is not a bit"),
-                };
-                Ok(FoundedSplit { level: count(tokens[1])?, pair: count(tokens[2])?, direction, sign, epsilon: entry(tokens[4])?, first: entry(tokens[5])?, second: entry(tokens[6])?, opened })
+                Ok(FoundedSplit { level: count(tokens[1])?, pair: count(tokens[2])?, direction, sign })
             })
             .collect::<Result<Vec<_>>>()?;
         let levels = lines[1..levels + 1]
@@ -410,40 +406,19 @@ impl PairedContacts {
         if self.pending.as_ref().is_some_and(|f| self.levels.get(f.level).and_then(|l| l.get(f.pair)).is_none_or(|v| v.is_none())) {
             return refuse("a pending founding of a pair that is not dormant");
         }
-        // Each founded pair carries exactly one coordinate, and each coordinate is a founded pair's.
+        // Each founded pair carries exactly one founding, and each founding is a founded pair's.
         let mut carried: Vec<Vec<bool>> = self.levels.iter().map(|l| l.iter().map(|v| v.is_some()).collect()).collect();
         for f in &self.founded {
-            let slot = carried.get_mut(f.level).and_then(|l| l.get_mut(f.pair)).ok_or(TowerError::Refused("a founded coordinate of another tower"))?;
+            let slot = carried.get_mut(f.level).and_then(|l| l.get_mut(f.pair)).ok_or(TowerError::Refused("a founding of another tower"))?;
             if *slot || f.direction.len() != d.width || f.sign.abs() != 1 {
-                return refuse("a founded coordinate of a pair that is dormant or founded twice");
+                return refuse("a founding of a pair that is dormant or founded twice");
             }
             *slot = true;
         }
         if carried.iter().flatten().any(|c| !c) {
-            return refuse("a founded pair without its coordinate");
+            return refuse("a founded pair without its founding");
         }
         Ok(())
-    }
-
-    /// [definition; agent-inferred, October 30] **Each founded coordinate's covector** (the module
-    /// header), `∂ℓ/∂ε = v·(G_a[o] − G_a[o+f/2]) + s v·(G_b[o] − G_b[o+f/2])` on the material
-    /// covector's grain `2^(−40)`, read from the reverse's covector `g` before its copies are tied:
-    /// the chart moves copy `o`'s drive rows by `+v`, `+s v` and its copy's by `−v`, `−s v`.
-    pub(super) fn split_covectors(&self, tower: &Tower, g: &[i128]) -> Result<Vec<i128>> {
-        self.admits(tower)?;
-        let (w, h) = (tower.declaration.width, tower.declaration.contacts / 2);
-        Ok(self
-            .founded
-            .iter()
-            .map(|f| {
-                let lv = tower.layout.levels[f.level];
-                let along = |start: usize| -> i128 {
-                    let (a, b) = (start + f.pair * w, start + (f.pair + h) * w);
-                    f.direction.iter().enumerate().map(|(j, &v)| v as i128 * (g[a + j] - g[b + j])).sum()
-                };
-                release(along(lv.contact) + f.sign as i128 * along(lv.pair), FACE_BITS)
-            })
-            .collect())
     }
 }
 
@@ -596,22 +571,20 @@ impl Tower {
         for founding in foundings {
             let v = paired.levels.get(founding.level).and_then(|l| l.get(founding.pair)).and_then(|v| v.as_ref()).ok_or(TowerError::Refused("a founding of a pair that is not dormant"))?;
             let epsilon = founding.theta.unsigned_abs().isqrt() as i128;
-            tower.part_split(founding.level, founding.pair, v, founding.theta.signum() as i32, 0, epsilon)?;
+            tower.part_split(founding.level, founding.pair, v, founding.theta.signum() as i32, epsilon)?;
         }
         Ok(tower)
     }
 
     /// [definition; agent-inferred, October 30] **The split's chart** (the module header): pair
-    /// `pair` of level `level` moved from half-difference `from` to `to` along `v` with sign `s`:
-    /// each first drive entry's copy `o` takes `⟦to v⟧ − ⟦from v⟧` (each second drive entry's that
-    /// times `s`) and its copy `o + f/2` the negative, `⟦·⟧` released from the direction's grain to
-    /// the row's. The tied steps move both copies alike, so a pair opened from its tied copies
-    /// carries exactly `±⟦ε v⟧` and `±s ⟦ε v⟧` at every `ε` its chart has moved it to.
-    pub(super) fn part_split(&mut self, level: usize, pair: usize, v: &[i32], sign: i32, from: i128, to: i128) -> Result<()> {
+    /// `pair` of level `level` opened to half-difference `ε` along `v` with sign `s`: each first
+    /// drive entry's copy `o` takes `⟦ε v⟧` (each second drive entry's that times `s`) and its copy
+    /// `o + f/2` the negative, `⟦·⟧` released from the direction's grain to the row's.
+    pub(super) fn part_split(&mut self, level: usize, pair: usize, v: &[i32], sign: i32, epsilon: i128) -> Result<()> {
         let (w, h) = (self.declaration.width, self.declaration.contacts / 2);
         let lv = self.layout.levels[level];
         for (j, &x) in v.iter().enumerate() {
-            let delta = release(to * x as i128, FACE_BITS) - release(from * x as i128, FACE_BITS);
+            let delta = release(epsilon * x as i128, FACE_BITS);
             for (family, signed) in [(lv.contact, delta), (lv.pair, sign as i128 * delta)] {
                 for (copy, by) in [(pair, signed), (pair + h, -signed)] {
                     let at = family + copy * w + j;
@@ -623,18 +596,19 @@ impl Tower {
     }
 
     /// [definition; agent-inferred, October 30] **The pairs' entries** (the module header): for
-    /// each pair `e` of each level (contacts `e` and `e + f/2`), each drive entry's two copies (both
-    /// drives' rows and biases), then each return row's two parts. Refused on a tower that is not
-    /// paired pair contacts.
-    pub(super) fn pair_entries(&self) -> Result<(Vec<(usize, usize)>, Vec<(usize, usize)>)> {
+    /// each pair `e` of each level `l` (contacts `e` and `e + f/2`) with `of(l, e)`, each drive
+    /// entry's two copies (both drives' rows and biases), then each return row's two parts. The
+    /// dormant pairs' entries are those a section ties. Refused on a tower that is not paired pair
+    /// contacts.
+    pub(super) fn pair_entries(&self, of: &dyn Fn(usize, usize) -> bool) -> Result<(Vec<(usize, usize)>, Vec<(usize, usize)>)> {
         let d = &self.declaration;
         if d.contact != ContactLaw::Pair || d.contacts % 2 != 0 {
             return refuse("paired contacts are an even count of pair contacts");
         }
         let (w, f, h) = (d.width, d.contacts, d.contacts / 2);
         let (mut drives, mut returns) = (Vec::new(), Vec::new());
-        for lv in &self.layout.levels {
-            for e in 0..h {
+        for (l, lv) in self.layout.levels.iter().enumerate() {
+            for e in (0..h).filter(|&e| of(l, e)) {
                 for (start, len) in [(lv.contact, w), (lv.contact_bias, 1), (lv.pair, w), (lv.pair_bias, 1)] {
                     drives.extend((0..len).map(|i| (start + e * len + i, start + (e + h) * len + i)));
                 }
@@ -660,6 +634,17 @@ impl TowerLearner {
         let second = from.iter().map(|&i| self.second[i]).collect();
         let paired = PairedContacts::opened(&tower)?;
         Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new() }, paired))
+    }
+
+    /// A founded pair's drives' moments re-lifted (the module header): each copy's covector is now
+    /// its own, about half the old, so its moments carry `m/2` and `v/4`.
+    pub(super) fn relift(&mut self, level: usize, pair: usize) -> Result<()> {
+        let (drives, _) = self.tower.pair_entries(&|l, e| (l, e) == (level, pair))?;
+        for i in drives.into_iter().flat_map(|(a, b)| [a, b]) {
+            self.first[i] = div_nearest(self.first[i], 2);
+            self.second[i] = div_nearest(self.second[i], 4);
+        }
+        Ok(())
     }
 
     /// The section's proposal decided (the module header): of the pairs the test admits, the one
@@ -878,55 +863,6 @@ mod tests {
         }
     }
 
-    /// A founded coordinate's covector is the code's slope along it: on each pair of the ungated,
-    /// gated and turned tiny towers opened at `ε = 2^(−8)` (either sign), the code read at
-    /// `ε ± 2^(−10)` parts by `2 · 2^(−10)` times the covector read from the copies' own drive
-    /// covectors, within a quarter of it and `2^(−14)` bits; and the opened tower's directions rest
-    /// and return as text.
-    #[test]
-    fn the_founded_coordinates_covector_is_the_codes_slope_along_it() {
-        let (at, by) = (1i128 << (MATERIAL_BITS - 8), 1i128 << (MATERIAL_BITS - 10));
-        for (gated, turned) in [(false, false), (true, false), (true, true)] {
-            let (paired, directions) = {
-                let mut learner = TowerLearner::new(tiny_pair(gated, turned), 6);
-                let mut states = vec![learner.tower.rest()];
-                for k in 0..4 {
-                    learner.section(&mut states, &[&PASSAGE[k * 9..k * 9 + 10]]).expect("section");
-                }
-                learner.paired().expect("paired")
-            };
-            for (l, pairs) in directions.levels.iter().enumerate() {
-                for (e, v) in pairs.iter().enumerate() {
-                    let v = v.clone().expect("dormant");
-                    for sign in [1, -1] {
-                        let mut founded = directions.clone();
-                        founded.levels[l][e] = None;
-                        founded.founded.push(FoundedSplit { level: l, pair: e, direction: v.clone(), sign, epsilon: at, first: 0, second: 0, opened: false });
-                        let mut tower = paired.tower.clone();
-                        tower.part_split(l, e, &v, sign, 0, at).expect("opened");
-                        let opening = tower.rest();
-                        let mut end = opening.clone();
-                        let cells = tower.forward(&mut end, &PASSAGE, &tower.reaches()).expect("forward");
-                        let (g, _) = tower.reverse_split(&opening, &cells, &PASSAGE, None, &founded).expect("split");
-                        let covector = founded.split_covectors(&tower, &g).expect("covector")[0];
-                        let code_at = |epsilon: i128| -> i64 {
-                            let mut moved = paired.tower.clone();
-                            moved.part_split(l, e, &v, sign, 0, epsilon).expect("moved");
-                            moved.read(&mut moved.rest(), &PASSAGE).expect("read")
-                        };
-                        let moved = code_at(at + by) - code_at(at - by);
-                        // The covector on 2^(−40) bits a unit of ε, the move on 2^(−24): bits on 2^(−20).
-                        let slope = release(covector * 2 * by, COVECTOR_BITS + FACE_BITS + MATERIAL_BITS - READ_BITS);
-                        let off = (moved as i128 - slope).abs();
-                        assert!(off <= slope.abs() / 4 + (1 << 6), "gated {gated} turned {turned} level {l} pair {e} sign {sign}: moved {moved} against {slope}");
-                        founded.admits(&tower).expect("the coordinate is the tower's");
-                        assert_eq!(PairedContacts::from_text(&founded.to_text()).expect("read"), founded);
-                    }
-                }
-            }
-        }
-    }
-
     /// The parity passage's streams and a section of them.
     fn parity_streams(sections: usize) -> Vec<Vec<usize>> {
         (0..4).map(|s| parity_passage(0x9e37_79b9 ^ (s as u32 + 1), 64 * sections + 1)).collect()
@@ -937,8 +873,8 @@ mod tests {
     }
 
     /// The founding is proposed on the tower the step left: a founding section's proposal and its
-    /// directions' turn are those of the split read on that tower (with the pair retired whose
-    /// coordinate the step opened), not on the opening's; the pending pair's direction is held; and
+    /// directions' turn are those of the split read on that tower (with the pair retired that the
+    /// step opened), not on the opening's; the pending pair's direction is held; and
     /// the step moves the score (here it turns some pair's sign).
     #[test]
     fn the_founding_is_proposed_on_the_tower_the_step_left() {
@@ -953,8 +889,8 @@ mod tests {
             let (receipt, founding) = learner.section_founding(&mut states, &parts, None, &mut HostPass::default(), &mut directions).expect("section");
             deposited += receipt.deposited as usize;
             assert_eq!(founding.certified, before.pending, "section {k}");
-            // The directions the proposal reads: the pending founding taken, its pair retired if its
-            // coordinate opened, and the founded coordinates as the step left them.
+            // The directions the proposal reads: the pending founding taken, its pair retired if it
+            // opened, and the founded pairs.
             let mut at_read = PairedContacts { pending: None, founded: directions.founded.clone(), ..before.clone() };
             let stepped_from = tower_before.clone();
             if let (true, Some(f)) = (founding.admitted, &founding.certified) {
@@ -1011,57 +947,62 @@ mod tests {
         (paired, directions, learner, states)
     }
 
-    /// Once no pair is dormant the test has no pair to read: a founding section forms no split
-    /// read and no reread, proposes and certifies nothing, its coordinates still learn, and its
-    /// streams carry the tower its step left.
+    /// Once no pair is dormant the test has no pair to read and every pair is two contacts: a
+    /// founding section forms no split read, proposes and certifies nothing, and is the widened
+    /// learner's own section to the bit (its receipt, its material and moments, and the states its
+    /// streams carry); the founded copies part.
     #[test]
-    fn a_founding_section_with_no_pair_dormant_reads_no_split() {
+    fn a_founding_section_with_no_pair_dormant_is_the_widened_learners_own() {
         let streams = parity_streams(33);
         let (mut learner, mut directions, _, mut states) = paired_on_parity(&streams);
         for (l, pairs) in directions.levels.iter_mut().enumerate() {
             for (e, slot) in pairs.iter_mut().enumerate() {
                 let direction = slot.take().expect("a dormant pair");
-                directions.founded.push(FoundedSplit { level: l, pair: e, direction, sign: 1, epsilon: 0, first: 0, second: 0, opened: false });
+                directions.founded.push(FoundedSplit { level: l, pair: e, direction, sign: 1 });
             }
         }
         assert_eq!(directions.dormant(), 0);
         directions.admits(&learner.tower).expect("every pair founded");
+        let (mut own, mut own_states) = (learner.clone(), states.clone());
         let mut pass = HostPass::default();
         for k in 8..14 {
-            let opening = states.clone();
             let parts = parity_section(&streams, k);
             let (receipt, founding) = learner.section_founding(&mut states, &parts, None, &mut pass, &mut directions).expect("section");
             assert!(founding.certified.is_none() && founding.proposed.is_none() && founding.confirmed.is_none() && !founding.admitted, "section {k}");
             assert_eq!((founding.dormant, founding.code_before), (0, receipt.code_before), "section {k}");
-            assert_eq!(Some(founding.largest), directions.founded.iter().map(|f| f.epsilon.abs()).max(), "section {k}");
-            let mut end = opening;
-            for (state, classes) in end.iter_mut().zip(&parts) {
-                learner.tower.read(state, classes).expect("read");
-            }
-            assert_eq!(end, states, "section {k}: the streams carry the tower the step left");
+            assert_eq!(own.section(&mut own_states, &parts).expect("own section"), receipt, "section {k}");
+            assert_eq!((&own, &own_states), (&learner, &states), "section {k}");
         }
-        assert!(directions.founded.iter().all(|f| f.opened), "every coordinate's moments opened");
+        let (drives, _) = learner.tower.pair_entries(&|_, _| true).expect("entries");
+        let parted = drives.iter().filter(|&&(a, b)| learner.tower.theta[a] != learner.tower.theta[b]).count();
+        assert!(parted > 0, "no founded copy parted from its twin");
+        eprintln!("SPLIT_FREE parted={parted} of {}", drives.len());
     }
 
     /// Acceptance 4 (the host's reading): over a mixed passage, each founding is proposed on one
     /// section and certified on the next, which it was not fit on: the receipt confirms it exactly
     /// when its pair's test, read on that section's opening, passes with the proposal's sign; a
-    /// confirmed founding whose section deposits opens its coordinate at one step of its chart,
-    /// released by the section's halvings, and retires its pair, and otherwise its pair stays
-    /// dormant; the training code read at each opening is the tower's own. Every pair deposits as
-    /// one contact: its copies' moments stay equal, a dormant pair's drive copies stay equal, and a
-    /// founded pair's carry exactly its coordinate's chart, `±⟦ε v⟧` and `±s ⟦ε v⟧`.
+    /// confirmed founding whose section deposits opens its pair at one step of the split's chart,
+    /// released by the section's halvings, and retires it, and otherwise its pair stays dormant;
+    /// the training code read at each opening is the tower's own. A dormant pair deposits as one
+    /// contact: its copies' moments stay equal and its drive copies equal. A pair opened this
+    /// section carries exactly the chart, `±⟦ε v⟧` and `±s ⟦ε v⟧`, with its copies' moments still
+    /// equal; once founded its copies learn apart; and the founded directions rest and return as
+    /// text.
     #[test]
     fn a_founding_is_certified_on_the_section_after_the_one_it_was_fit_on() {
         let streams = parity_streams(33);
         let (mut learner, mut directions, _, mut states) = paired_on_parity(&streams);
         let mut pass = HostPass::default();
         assert!(pass.forms_split());
-        let (mut admitted, mut confirmed, mut refused, mut proposed, mut descended) = (0usize, 0usize, 0usize, 0usize, 0usize);
-        let (drives, returns) = learner.tower.pair_entries().expect("entries");
+        let (mut admitted, mut confirmed, mut refused, mut proposed, mut free, mut stepped) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
         let unit = deposit_over(1, 1, MATERIAL_BITS, learner.rate_bits);
         let (w, h) = (learner.tower.declaration.width, learner.tower.declaration.contacts / 2);
         let key = |f: &Founding| (f.level, f.pair, f.theta, f.predicted, f.surplus, f.score, f.squares);
+        let parts_of = |tower: &Tower, l: usize, e: usize| -> Vec<i128> {
+            let (drives, _) = tower.pair_entries(&|m, d| (m, d) == (l, e)).expect("entries");
+            drives.iter().map(|&(a, b)| (tower.theta[a] - tower.theta[b]) as i128).collect()
+        };
         for k in 8..32 {
             let (tower_before, before) = (learner.tower.clone(), directions.clone());
             let opening = states.clone();
@@ -1075,27 +1016,21 @@ mod tests {
                 proposed += 1;
                 assert!(p.predicted < 0 && p.theta != 0 && p.surplus > 0);
             }
+            let (drives, returns) = learner.tower.pair_entries(&|l, e| directions.levels[l][e].is_some()).expect("entries");
             for &(x, y) in drives.iter().chain(&returns) {
-                assert_eq!((learner.first[x], learner.second[x]), (learner.first[y], learner.second[y]), "section {k}: the copies' moments");
+                assert_eq!((learner.first[x], learner.second[x]), (learner.first[y], learner.second[y]), "section {k}: a dormant pair's copies' moments");
             }
-            // Each pair's copies: equal while dormant, the coordinate's chart once founded.
-            for (l, lv) in learner.tower.layout.levels.iter().enumerate() {
+            for &(x, y) in &drives {
+                assert_eq!(learner.tower.theta[x], learner.tower.theta[y], "section {k}: a dormant pair's drive copies");
+            }
+            for l in 0..learner.tower.layout.levels.len() {
                 for e in 0..h {
-                    let coordinate = directions.founded.iter().find(|f| (f.level, f.pair) == (l, e));
-                    assert_eq!(coordinate.is_some(), directions.levels[l][e].is_none(), "section {k}");
-                    for (family, len, scaled) in [(lv.contact, w, 1i128), (lv.contact_bias, 1, 0), (lv.pair, w, 1), (lv.pair_bias, 1, 0)] {
-                        for j in 0..len {
-                            let part = (learner.tower.theta[family + e * len + j] - learner.tower.theta[family + (e + h) * len + j]) as i128;
-                            let chart = coordinate.map_or(0, |f| {
-                                let s = if family == lv.pair { f.sign as i128 } else { 1 };
-                                2 * scaled * s * release(f.epsilon * f.direction[j] as i128, FACE_BITS)
-                            });
-                            assert_eq!(part, chart, "section {k} level {l} pair {e}");
-                        }
-                    }
+                    let founded = directions.founded.iter().any(|f| (f.level, f.pair) == (l, e));
+                    assert_eq!(founded, directions.levels[l][e].is_none(), "section {k}");
                 }
             }
-            descended += directions.founded.iter().filter(|f| before.founded.iter().any(|b| (b.level, b.pair) == (f.level, f.pair) && b.epsilon != f.epsilon)).count();
+            stepped += usize::from(!before.founded.is_empty() && receipt.deposited);
+            free += before.founded.iter().filter(|f| parts_of(&tower_before, f.level, f.pair) != parts_of(&learner.tower, f.level, f.pair)).count();
             let Some(f) = &founding.certified else {
                 assert_eq!(founding.confirmed, None);
                 continue;
@@ -1108,29 +1043,40 @@ mod tests {
             confirmed += usize::from(founding.confirmed.is_some());
             if founding.admitted {
                 admitted += 1;
-                assert!(founding.confirmed.is_some() && receipt.deposited, "section {k}: an opened coordinate was confirmed and carried by the step");
-                assert_eq!(directions.levels[f.level][f.pair], None, "an opened coordinate retires its pair");
+                assert!(founding.confirmed.is_some() && receipt.deposited, "section {k}: an opened pair was confirmed and carried by the step");
+                assert_eq!(directions.levels[f.level][f.pair], None, "an opened pair retires its direction");
                 let opened = directions.founded.last().expect("opened");
-                assert_eq!((opened.level, opened.pair, opened.sign), (f.level, f.pair, f.theta.signum() as i32));
-                assert_eq!(opened.epsilon, release(unit, receipt.halvings), "section {k}: the coordinate opens at one step");
+                let s = f.theta.signum() as i32;
+                assert_eq!((opened.level, opened.pair, opened.sign), (f.level, f.pair, s));
+                // The chart at one step: drive rows `2⟦ε v⟧`, biases unparted, pair rows `2s⟦ε v⟧`.
+                let epsilon = release(unit, receipt.halvings);
+                let half: Vec<i128> = opened.direction.iter().map(|&x| 2 * release(epsilon * x as i128, FACE_BITS)).collect();
+                let chart: Vec<i128> = half.iter().copied().chain([0]).chain(half.iter().map(|d| s as i128 * d)).chain([0]).collect();
+                assert_eq!(parts_of(&learner.tower, f.level, f.pair), chart, "section {k}: the pair opens at one step of the chart");
+                let (opened_drives, opened_returns) = learner.tower.pair_entries(&|l, e| (l, e) == (f.level, f.pair)).expect("entries");
+                for &(x, y) in opened_drives.iter().chain(&opened_returns) {
+                    assert_eq!((learner.first[x], learner.second[x]), (learner.first[y], learner.second[y]), "section {k}: the opened copies' moments");
+                }
             } else {
                 refused += 1;
                 assert!(directions.levels[f.level][f.pair].is_some(), "a refused founding leaves its pair dormant");
             }
             eprintln!(
-                "SPLIT_FOUNDING section={k} level={} pair={} predicted={} confirmed={:?} admitted={} dormant={} largest={}",
+                "SPLIT_FOUNDING section={k} level={} pair={} predicted={} confirmed={:?} admitted={} dormant={}",
                 f.level,
                 f.pair,
                 f.predicted,
                 founding.confirmed.as_ref().map(|c| c.predicted),
                 founding.admitted,
-                founding.dormant,
-                founding.largest
+                founding.dormant
             );
         }
         assert!(proposed > 0, "no section proposed a founding");
-        assert!(admitted == 0 || descended > 0, "no opened coordinate descended");
-        eprintln!("SPLIT_FOUNDINGS proposed={proposed} confirmed={confirmed} admitted={admitted} refused={refused} dormant={} descended={descended}", directions.dormant());
+        assert!(admitted > 0 && stepped > 0, "no founded pair was stepped");
+        assert!(free > 0, "no founded pair learned apart");
+        directions.admits(&learner.tower).expect("the founded pairs are the tower's");
+        assert_eq!(PairedContacts::from_text(&directions.to_text()).expect("read"), directions);
+        eprintln!("SPLIT_FOUNDINGS proposed={proposed} confirmed={confirmed} admitted={admitted} refused={refused} dormant={} stepped={stepped} free={free}", directions.dormant());
     }
 
     /// How far a widened learner's drives and summed return columns part from the pair learner's,
@@ -1178,7 +1124,7 @@ mod tests {
             step = step.max(before.iter().zip(&plain.tower.theta).map(|(x, y)| (x - y).abs()).max().unwrap_or(0));
             code_tied = code_tied.max((a.code_before - b.code_before).abs()).max((a.code_after - b.code_after).abs());
             code_apart = code_apart.max((a.code_before - c.code_before).abs()).max((a.code_after - c.code_after).abs());
-            let (drives, returns) = tied.tower.pair_entries().expect("entries");
+            let (drives, returns) = tied.tower.pair_entries(&|_, _| true).expect("entries");
             for &(x, y) in drives.iter().chain(&returns) {
                 assert_eq!((tied.first[x], tied.second[x]), (tied.first[y], tied.second[y]), "section {k}: the copies' moments");
             }

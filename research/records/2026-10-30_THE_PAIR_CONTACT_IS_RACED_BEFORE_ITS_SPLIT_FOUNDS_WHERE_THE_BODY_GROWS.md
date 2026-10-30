@@ -101,16 +101,16 @@ first build lifted the drives to `m/2`, `v/4` and let each return part step on t
 covector whole, so the column moved twice its step; the control measured that at 0.097 bits a byte
 above the pair race.)
 
-**A founded pair still deposits as one contact** (revised October 30 after the founding race's
-second lap 0, §7). The certificate charges one coordinate: its code and its address. So a founding
-deposits that one coordinate and frees nothing else: the founded pair's drives keep taking their
-covectors summed, which moves both copies by one step and keeps the difference `±ε v` the founding
-laid down, and its return parts take their covectors' mean (equal to either part's while the pair
-is dormant), stepped once and split as before. The pair's face is the contact it learns as plus
-`c θ̂ φ`, held at the certified `θ̂`; the founded coordinate's own descent is owed. (The second
-build let a founded pair's copies learn on their own, each on its own covector, the drives' moments
-re-lifted to `m/2`, `v/4`. The price paid for one coordinate while the freeing released every entry
-of two contacts, and the certificate then halved every section's step about 4.3 times, §7.)
+**A founded pair is two contacts once opened** (revised three times on October 30, §7). The
+certificate charges the opening: the one coordinate that takes the pair off its saddle, its code
+and its address. Once opened the pair learns as two contacts, each copy on its own covectors (§4,
+the opening). The first build freed the copies at an opening at `θ̂`, the drives' moments re-lifted
+to `m/2`, `v/4`, and the certificate then halved every section's step about 4.3 times (§7). The
+second held the pair as one contact plus `c θ̂ φ` at the certified `θ̂`, and the step still halved
+about 3.3 times a section. The third held it as one contact plus its coordinate, opened at one step
+and descending on its own moments, and learned lap for lap with its control (§7, `8ffcf37d7`). The
+stall followed the opening's size, not the freeing, so the copies are freed again from the one-step
+opening.
 
 **The direction, carried and turned.** Each dormant pair carries a unit direction `v_e` on the read
 `r̂` it shares (width `d` entries on `2^(−16)`), opened at the contact's own first drive row,
@@ -157,7 +157,7 @@ W_a[o] = W_a + ⟦ε v⟧,  W_a[o+f] = W_a − ⟦ε v⟧,   W_b[o] = W_b + s⟦
 
 The face moves by `c s ε² φ`, second order in `ε`, so `ε = 0` is a saddle of the code: its covector
 there is zero (`∂ℓ/∂ε = 2 s ε g`). The tied steps move both copies alike, so the chart is exact: a pair
-opened from its tied copies carries `±⟦ε v⟧` at every `ε` it has moved to. The test's line,
+opened from its tied copies carries exactly `±⟦ε v⟧`. The test's line,
 `θ̂ = −ln 2 · g / (τ + σ)` with predicted change `−(ln 2 · g)²/(2(τ + σ))` nats, is what the test
 reads; it is not where the coordinate is put (below).
 
@@ -170,22 +170,28 @@ certificate costs nothing beyond the section's own reverse. While a founding is 
 direction is held, so the coordinate that opens is the one its scores read. A pending founding at a
 pass's end is released before the directions rest.
 
-**The coordinate opens at one step and descends** (agent-inferred, October 30, after the second lap
-0 stall, §7). A certified coordinate opens at one step of its chart, the step a moment of ratio one
-takes at the learner's rate (`2^(24−k)` on `2^(−24)` at rate `2^(−k)`), carried by the certifying
-section's step and released by its halvings with it; it opens only where that step deposits. From
-then on it learns as a drive entry does: its covector `∂ℓ/∂ε = v·(G_a[o] − G_a[o+f]) + s v·(G_b[o]
-− G_b[o+f])` is read from the copies' own drive covectors before they are tied, its moments open
-on its first covector and move at the drives' rates, and its step is the drives' deposit step,
-halved with the section's. The covector grows it while the score keeps the tests' sign and returns
-it toward zero when the score turns. Before this, the founding deposited at `θ̂`, certified by its
-reread code falling past the Laplace price `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2`; at 40,960 cells
-a section `ln²2 · S` is far above `τ`, so `θ̂` was nearly the section's own Newton step along the new
-coordinate, and the feature it laid down was sharper than every other entry's normalized step was
-scaled to (§7: the step stalled at lap 0 whether the founded copies then learned on their own or
-held `θ̂`). Opened at one step, the coordinate grows at the rate every other entry learns at. The
-price's value term, which charged the jump, goes with it; the test still charges the coordinate's
-own precision and its address. Once no pair is dormant the test has no pair to read, so a founding
+**A founded pair opens at one step and is two contacts** (agent-inferred, October 30, after the second
+lap 0 stall and acceptance 6's tie, §7). A certified founding opens its pair at one step of the
+split's chart, the step a moment of ratio one takes at the learner's rate (`2^(24−k)` on `2^(−24)`
+at rate `2^(−k)`), carried by the certifying section's step and released by its halvings with it;
+it opens only where that step deposits. From then on the pair is two contacts: each copy's drives
+and return part learn on their own covectors, as every other contact's do. The test was needed
+because `ε = 0` is a saddle, where the copies' covectors are equal and no step parts them; once the
+pair is opened no direction of its copies is one, since each copy's drive covector reads its twin's
+other drive and its return part, and each return part reads its own copy's face, which part at
+first order. So the descent carries every direction the pair can open, not only the one founded.
+The drives' moments, which carried the summed covector while tied, are re-lifted to each copy's
+own, about half of it: `m/2` and `v/4`, so the ratio a moment steps by is unchanged at the opening.
+Before this, the founding deposited at `θ̂`, certified by its reread code falling past the Laplace
+price `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2`; at 40,960 cells a section `ln²2 · S` is far above
+`τ`, so `θ̂` was nearly the section's own Newton step along the new coordinate, and the feature it
+laid down was sharper than every other entry's normalized step was scaled to (§7: the step stalled
+at lap 0 whether the founded copies then learned on their own or held `θ̂`). Opened at one step and
+held as one coordinate along `v` that descended on its own moments, the founding learned lap for
+lap with its control (§7, `8ffcf37d7`): 1,024 scalars beside the tower's 596,097 entries, too few to
+grow the body. Freed, a founded pair is 194 entries, and a fully founded tower adds 198,656 to the
+pair tower's 397,441. The price's value term, which charged the jump, is retired; the test still
+charges the opening's precision and its address. Once no pair is dormant the test has no pair to read, so a founding
 section forms no split read and no reread on the tower its step left: its covector is the plain
 reverse's, as the split read's is (§7: at `8ffcf37d7` every pair had founded by lap 1, and the
 reads it kept forming doubled each later lap's reverse time).
@@ -244,7 +250,8 @@ cells sum in 128 bits, so neither side's carrier decides.
    dormant throughout (each depositing as one contact, §4: the pair learner in the wider chart).
    The claim: the founding race's mean held-out reading over its last five laps is below the
    dormant race's over the same laps. Each lap's card time is reported, and the founding count per
-   level.
+   level. A changed law of the founding is raced again under this claim, against the same dormant
+   hour.
 
 ## 6. The recorded failures these choices could repeat
 
@@ -594,7 +601,7 @@ dormant  1.851 1.849 1.846 1.835 1.832 1.825 1.816
   (7 to 11) it reads 1.880 on average against the control's 1.883 over the same laps. Lap by lap the
   two differ by −0.020 to +0.009, in both signs; lap 11 reads 1.860 against 1.859 (GSM8K 1.801
   against 1.801, training 1.713 against 1.712). The 1,024 founded coordinates are 1,024 scalars
-  beside 19,075,104 entries, and a lap-for-lap tie is what their number predicts.
+  beside the tower's 596,097 entries, and a lap-for-lap tie is what their number predicts.
 - **The hour went to reads nothing needed.** The founding race's laps took 291 s (card forwards
   124.5 s, reverses 131.8 s) against the control's 164 to 174 s (reverses 55.0 s at lap 0), because
   every section kept forming the split read on its opening and again on the tower its step left
@@ -603,6 +610,8 @@ dormant  1.851 1.849 1.846 1.835 1.832 1.825 1.816
 
 **Decision** [agent-inferred, October 30]. The repaired founding is lawful on the card and costs
 nothing it does not use, but one coordinate a pair is not where the body grows: every pair founds
-within a lap and a half, and then nothing is left to found. The body grows where a founded pair keeps
-founding, one direction at a time on the complement of the directions it has founded, each
-coordinate priced by the same test.
+within a lap and a half, and 1,024 scalars then carry all that founding added. The test is needed
+only at the saddle, and an opened pair has none, so a founded pair is two contacts after its
+one-step opening (§4): 194 entries a pair. The free copies stalled at `c4a9604dc` from an opening at
+`θ̂`; from one step they are acceptance 6 again, against the same control hour, which is unchanged
+to the bit at every founding law.
