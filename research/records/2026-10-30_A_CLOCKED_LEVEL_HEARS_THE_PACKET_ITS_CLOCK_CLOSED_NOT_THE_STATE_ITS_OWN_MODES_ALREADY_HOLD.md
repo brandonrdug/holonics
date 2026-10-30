@@ -1,7 +1,8 @@
 # A clocked level hears the packet its clock closed, not the state its own modes already hold
 
 Refs #404 #406. Status: [the measurement in §1; the law and its acceptance fixed before the build;
-agent-inferred, October 30].
+agent-inferred, October 30; the card's parity and the hour's race measured in §7, whose claim
+failed while a later lead continues under acceptance 8].
 Claude (opus), design lead. Read beside
 [the clocked levels' contacts](2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT_AT_EVERY_ARRIVAL_WHILE_ITS_MODES_MOVE_ON_THEIR_OWN_CLOCK.md)
 (whose §9 is §1's measurement) and
@@ -129,6 +130,64 @@ its modes, the packet moved in the fine level's mode loop and read at the next l
 through the fine level's read, the push, gate and turn covectors of a hearing level returned to
 the packet's read (`pk_dx`), `tower_reverse_packet` returning the read's ratio adjoint to the
 packet's covector, the fine level's scan carrying it, and the read's outer sums added onto the fine
-level's read (`accumulate`). Its parity with the host (acceptance 6) is owed on the RTX 4080 SUPER
-(`the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections`), then the race (acceptance 7).
+level's read (`accumulate`). Its parity with the host (acceptance 6,
+`the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections`) and the race (acceptance 7) are
+measured in §7.
 
+
+## 7. What the hour measured
+
+[measured, RTX 4080 SUPER, October 30] **The card is the host (acceptance 6 holds).** At `c6ce14204`
+the card's tower tests pass (42 in `tower_pass`, 22.06 s). At `454e17d60`, the race's declaration
+with the passage and the packets (six levels, the clock from level 4, 24 streams, 32 sections of
+128) reads equal host against card: 98,304 faces and 16,400,416 gradient entries, none unequal, every
+learner equal (27.9 s wall, peak resident set 1,906,580 KiB, host 16.4 s, card 5.2 s).
+
+**The race.** C′ (width 64, modes 128, contacts 256, six levels, the clock `B = 8`, `r = 2` from
+level 4, the passage and the packets; 320 streams, sections of 128, rate 7) ran its hour at
+`c6ce14204`, 21 laps. Held-out bits a byte, beside the four arrival levels alone (October 27):
+
+```text
+lap        0     1     2     3     4     5     6     7     8     9    10
+C′     2.390 2.200 2.082 2.042 1.986 1.968 1.951 1.942 1.930 1.919 1.913
+four   2.356 2.139 2.060 2.020 2.004 1.970 1.959 1.947 1.934 1.929 1.918
+
+lap       11    12    13    14    15    16    17    18    19    20
+C′     1.905 1.901 1.896 1.889 1.890 1.889 1.882 1.901 1.873 1.866
+four   1.920 1.914 1.914 1.922 1.901 1.899 1.895 1.890 1.882 1.886
+```
+
+The founding is matched: the four-level tower's keys are a byte prefix of the race's (1,048,576 of
+2,097,152 bytes), and the founding draws the encoding and then the levels in order, so C′'s
+encoding and its four arrival levels were founded exactly as the four-level tower was; C and E used
+the same keys as C′. What differs besides the two clocked levels is the code between October 27 and
+`c6ce14204`, which does not change a tower without a news clock [agent-inferred; C, founded the
+same way, read the four-level tower's 2.356 at lap 0].
+
+**The claim failed.** C′ read 2.200 against 2.139 at lap 1 and 2.042 against 2.020 at lap 3. The
+packets slow the opening: C, which hears the whole state, read 2.156 and 2.032 there.
+
+**The crossing.** From lap 4 C′ reads below the four arrival levels at 16 of 17 laps, by 0.011 a lap
+on average. At the hour's quarter marks the difference doubles each quarter: 0.002 at lap 5, 0.005
+at lap 10, 0.010 at lap 16 and 0.020 at lap 20, where C′'s 1.866 is what the four-level tower first
+reached at lap 27. The one exception, lap 18 (1.901 against 1.890), is its GSM8K region rising from
+1.830 to 1.879 and returning at lap 19 (1.824); the four-level tower's own single-lap rises reach
+0.021 (lap 25) and 0.051 (lap 34). C′ reads below C at lap 4, the last lap C ran (1.986 against
+1.999).
+
+**Card time.** 140.5 to 146.6 s a training pass (forward 91 to 95 s, reverse 49 to 52 s), 2:45 to
+2:51 a lap with its write, against 276 to 282 s for C: a still level computing only its contacts
+made the two clocked levels nearly free. The four-level tower took 166 s a pass at its October 27
+code; the card's code has changed since, so the two times are not one measurement.
+
+**Decision** [agent-inferred, October 30]. The claim as fixed failed, and nothing here re-declares
+it. The hour nevertheless measured a lead that grows at every quarter mark against a control founded
+identically, so by the rule for longer runs (run past the hour only a design that improves clearly
+between the quarter marks) C′ continues, under an acceptance fixed now: **8. The continuation.** C′
+continues from its lap-20 learner to lap 45, the four-level tower's last lap, on the same build and
+passage. The claim: at laps 25, 30, 35, 40 and 45 C′ reads below the four-level tower at the same
+lap (1.899, 1.862, 1.857, 1.857, 1.850). The run stops early at the second consecutive mark above
+the control. Short of the claim, clocked levels stay out of the race's declaration and the clock's
+work goes to participation's reach alone (radix record §1). Its projection is 25 laps at the
+hour's largest lap from start to start (183 s, lap 6 to lap 7, with its write), 4,575 s, which is
+its deadline.
