@@ -755,7 +755,7 @@ reads in the rest here.)
 every window while the whole step raises the arrivals: no family overshoots alone, and the
 refusals are the parts' steps meeting. The readout's step alone lowers the arrivals the most, and
 the readout with the clocked levels and the rest together raised them (+19,868 bits in the last
-window, §13's three-part reading) while apart they sum to −3,502: the readout's step meets the
+window, §13's three-part reading) while apart they sum to +498: the readout's step meets the
 other families' change of what it reads. With `D` held those same steps meet as C′'s do. What the
 readout reads under the heading is `x^L + Σ D ĥ⁺`, and the rest moves `ĥ⁺` twice: through the
 clocked levels' inputs, and through their ticks, which the news the face codes sets; a step that
