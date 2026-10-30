@@ -21,7 +21,15 @@ parity (`tower_pass parity … pair`).
 `±ε(u, w)`, found the coordinate `φ_t = (uᵀ r̂_t)(wᵀ r̂_t)`, with score `g_e = uᵀ M_e w`,
 `M_e = Σ_t δv_(e,t) r̂_t r̂_tᵀ`. A rectifying contact has no such form: its second derivative lives
 on its kink. Every race since October 27 runs rectifying contacts, so the split has no law to grow on
-in the race until the pair contact holds its place there. The pair contact has been carried by the
+in the race until the pair contact holds its place there.
+
+**Correction (October 30).** The premise is false. A rectifying contact's split founds a tent on its
+ties, `φ_t = ½(ε|uᵀr̂_t| − |s_t|)₊`, with its best tilt to leading order the top eigenvector of
+`M_e` restricted to the tie cells (the radix record §2, joined from the unified-theory notes). So the
+race's rectifying towers have a founding law of their own. The pair race and the pair split stand as
+measured and designed, since the split's acceptance (§5) holds on the pair tower; the rectifying
+split on C′, the race's best rectifying tower, is the founding to build after acceptance 6 reads, on
+the same section certificate (§4). The pair contact has been carried by the
 host and the card since October 24 and has never been raced at the race's declaration.
 
 The comparison is clean by construction. The pair contact's second drive opens at zero material and
@@ -81,9 +89,19 @@ differences are founded, and when, is the code's decision, section by section. P
 pair back to its mean and growing the field again when no dormant pair is left are the reverse test
 and the growth map, owed after this build.
 
-**The copies' moments.** Each copy's drive row and bias take half the old covector (their return is
-`c/2`), so they carry `m/2` and `v/4`; each return part takes the old covector whole, so it carries
-`m` and `v`. Every copy opens on the old normalized step.
+**A dormant pair deposits as one contact** (revised October 30 after acceptance 6's lap 0, §7). A
+deposit moves an entry by `m/(⌊√v⌋ + 1)` at the rate, which does not change when its covector is
+scaled. So while a pair is dormant its drives' copies take their covectors summed (the old contact's)
+on the old contact's moments and move together as its drives did, and its return's step is read
+once, from its first part's moments (its second's are equal: both parts read the same conduction),
+and split between the parts as the widening split the column, Euclidean with the remainder on the
+first. The column then moves by the old column's step, and the dormant learner is the pair learner
+in the wider chart, up to the reverse's grain. Every copy carries its old entry's moments. A founded
+pair's copies learn on their own: each copy's covector is then about half the old, so its drives'
+moments are re-lifted to `m/2`, `v/4` at the founding, and each copy still steps as the old drive
+did. (The first build lifted the drives to `m/2`, `v/4` and let each return part step on the old
+column's covector whole, so the column moved twice its step; the control measured that at 0.097
+bits a byte above the pair race.)
 
 **The direction, carried and turned.** Each dormant pair carries a unit direction `v_e` on the read
 `r̂` it shares (width `d` entries on `2^(−16)`), opened at the contact's own first drive row,
@@ -132,17 +150,22 @@ The face moves by `c θ̂ φ`, second order in `ε` and downhill by the score, w
 change of `−(ln 2 · g)²/(2(τ + σ))` nats. A founded pair carries no direction afterwards: its copies
 are two contacts learning on their own.
 
-**The certificate pays the price, on the line the reread measured** (agent-inferred, October 30,
-after the first measurement, §7). The test above only proposes; the reread decides. After the
-section's step deposits, the deposited tower with the founded split is read again over the section.
-That reading is the section's exact code at `θ̂`, so with `g` the line's slope at zero, its change
-`Δ` fixes the curvature the line actually has, `H = 2(Δ − g θ̂)/θ̂²`, where `σ` was only the
-squares' estimate. The split deposits only if the code falls by more than the coordinate's Laplace
-price, `(½ τ θ² + ½ ln(1 + σ′/τ) + ln K)/ln 2` bits with `σ′ = max(σ, ln 2 · H, 0)` (the larger
-reading; the price grows with it). A bare "fewer bits" would admit a coordinate that lowers the code
-by less than its own description. Refused, and when the measured line is bounded below under the
-prior (`τ + ln 2 · H > 0`), its mode `θ* = −ln 2 · g/(τ + ln 2 · H)` is read once more under the
-same price. Only a section where a pair founds pays these readings.
+**The certificate pays the price on the next section** (agent-inferred, October 30; revised after
+acceptance 6's lap 0, §7). The test above only proposes, and the proposal is held. At the next
+section's opening, before its own step, that section is read with and without the split; the split
+deposits only where the section codes fewer bits under it by more than the coordinate's Laplace
+price, `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2` bits, with `σ = ln²2 · S` read at `ln 2`'s head. A
+bare "fewer bits" would admit a coordinate that lowers the code by less than its own description.
+The section then steps from the tower the certificate leaves, and the training code is the opening's
+code without the split, read before the decision. While a founding is pending its pair's direction is
+held, so the split that deposits is the one its score read. A pending founding at a pass's end is
+released before the directions rest. The certificate costs one forward a section that holds a
+proposal, and a second where it admits one (the reverse reads the opening forward of the tower it
+steps from). (The first build certified the founding on the section it was fit on, at `θ̂` and then
+at the measured line's mode. At 40,960 cells a section `ln²2 · S` is far above `τ`, so `θ̂` was
+nearly that section's own Newton step along the new coordinate, and the price grows only with the
+logarithm of the section: 725 of 726 proposals passed, and the race's training code read 0.077 bits
+a byte above the control's.)
 
 **Read on the tower it lands on** (agent-inferred, October 30, after the card's first paired parity,
 §7). The score is the code's slope along the split on the tower it was read on, and only there. The
@@ -151,7 +174,7 @@ what the split would take, and sometimes more than all of it: over ten sections 
 parity passage, the step turned the sign of 27 pairs' scores. Decided on the opening read, 20 of the
 race's first 28 proposed foundings raised the code they were predicted to lower (§7). So where the
 step deposits, the section is read forward and back once more on the tower the step left, and the
-test, the reread and the directions' turn all use that read. The founding then pays only for what
+test and the directions' turn use that read. The founding then pays only for what
 the old coordinates left after their step: the effective tension's law, a new coordinate paying for
 what the old ones do not bridge. It costs one forward and one reverse a section where the step
 deposits; that forward also serves the carry where no founding deposits, which before read the
@@ -188,12 +211,14 @@ cells sum in 128 bits, so neither side's carrier decides.
    the two-part code is a Laplace evidence and admits chance at a rate its price sets, not none.
 4. **The founding is predicted.** On a tiny tower over a mixed passage, every pair the test founds
    is reported with its predicted fit change and the reread's measured change; the claim is that
-   the certificate admits more foundings than it refuses, and every admitted one lowers the code.
+   the certificate admits more foundings than it refuses, and every admitted one lowers the code
+   (since the certificate moved to the next section, §4: the code of the section it was certified
+   on, which it was not fit on).
 5. **The card is the host.** The card's score, squares and turned sums equal the host's at the
    race's declaration with paired pair contacts, in the parity, every entry.
 6. **The race.** Only if the pair race's claim (§3) holds: one hour of the four-level pair tower
-   widened to paired contacts, founding active, beside one hour of the same tower with founding
-   refused (the copies dormant throughout; it also measures what the doubled return alone does).
+   widened to paired contacts, founding active, beside one hour of the same tower with every pair
+   dormant throughout (each depositing as one contact, §4: the pair learner in the wider chart).
    The claim: the founding race's mean held-out reading over its last five laps is below the
    dormant race's over the same laps. Each lap's card time is reported, and the founding count per
    level.
@@ -207,9 +232,12 @@ cells sum in 128 bits, so neither side's carrier decides.
 - *A design thought in the programming language*: the contact is the pair interaction of two drives
   on one face, the helical pair's contact, not a gating unit added for capacity.
 - *A refusal answered with a larger limit*: the race keeps the hour and the lap rule.
-- *An uncertified deposition step*: a founding deposits only through the section's reread.
+- *An uncertified deposition step*: a founding deposits only through the next section's
+  certificate.
 - *Seen material graded as unseen*: the direction a section tests was turned on the sections before
-  it, so the score is not selected on the data it is read on.
+  it, so the score is not selected on the data it is read on; and the founding is certified on the
+  section after the one it was fit on (§4; the first build certified it on its own section, and
+  725 of 726 passed).
 - *An authored routine standing in for learning*: the split's place, direction and size come from
   the passage's own covectors through the code; nothing names where the body should grow.
 
@@ -377,3 +405,70 @@ Acceptance 6 is read again with both repairs; its claim is unchanged.
 card 6,453 ms (167 forwards in 5,049 ms, 64 reverses in 638 ms); wall 32.3 s, peak resident set
 1,979,192 KiB. The host half (the packets' covector under pair contacts with the passage opened
 predicts the code difference) passed at the same head, so C′'s hour with pair contacts runs.
+
+**The two repairs, on the host** (October 30, the cloud container's host, tiny pair tower: two
+levels, width 4, four contacts widened to eight, four streams of the parity passage, sections of
+64). *The dormant control.* Over twelve sections from the same learner, the widened learner whose
+dormant pairs deposit as one contact keeps each pair's drive copies equal and every copy's moments
+equal to its partner's, and it parts from the pair learner by at most 1,385 grains of an entry
+(drives and summed return columns) and 299 grains of `2^(−20)` bits of a section's code, against a
+largest single step of 22,833,840 grains: the copies' covectors are released one by one, so their
+sum is the old covector to a grain a cell, and that grain is carried through the sections. The same
+widened learner with its copies depositing apart (each return part on the old column's covector
+whole, the first build) parts by 2,439,797 grains and 1,263,149 grains of code. *The next-section
+certificate.* Over 24 sections (8 to 31), the test proposed 7 foundings; the next section admitted 1
+(proposed on section 28 at −14.4 bits on its own section, it lowered section 29's opening code by
+16.4) and refused 5, four of which raised the next section's code (by 4.1 to 19.8 bits) and one of
+which lowered it by less than its price; the seventh was proposed on the last section. Proposed on
+256 cells a section, the coordinate the test fits mostly does not carry to the next section; the
+race's sections hold 40,960.
+
+**§3 acceptance 4, C′'s hour with pair contacts** (October 30, RTX 4080 SUPER, head `9c0cf2f8a`,
+alone on the card). `train-two-ladder-stacked-news-packet-pair-tower-classes` on C′'s passage, keys
+and six-level declaration, one pass a lap, beside C′'s own laps. Seventeen laps, every lap and write
+exit 0; the hour's deadline stopped it at 3,439 s, since its longest lap (205.5 s) more would pass
+3,600 s. Held-out bits a byte:
+
+```text
+lap        0     1     2     3     4     5     6     7     8
+C′+pair 2.132 2.032 1.997 1.974 1.961 1.937 1.930 1.883 1.882
+C′      2.390 2.200 2.082 2.042 1.986 1.968 1.951 1.942 1.930
+
+lap        9    10    11    12    13    14    15    16
+C′+pair 1.895 1.884 1.891 1.830 1.825 1.850 1.862 1.873
+C′      1.919 1.913 1.905 1.901 1.896 1.889 1.890 1.889
+```
+
+**The claim fails.** Over the hour's last five laps (12 to 16) C′ with pair contacts reads 1.848
+on average, below C′'s 1.893 but above the four-level pair race's 1.840 at the same laps. It reads
+below C′ at every lap, by 0.258 at lap 0, narrowing to 0.014 at lap 11, reopening to 0.071 at laps 12
+and 13, and narrowing again to 0.016 at lap 16. From lap 13 the held-out rose three laps running
+(1.825, 1.850, 1.862, 1.873), and so did the training code (1.662, 1.669, 1.680, 1.699) and GSM8K's
+(1.753, 1.784, 1.795, 1.806): the learner lost fit on its own passage, which is not over-fitting.
+Its cause is not located. [agent-inferred candidate, not measured] the six-level tower's pair
+deposits at the race's rate `2^(−7)` overshoot once its moments settle; the four-level pair race at
+the same rate fell at every quarter mark. Card time: a training pass 180 to 195 s, the widest window
+9,078 ms against its 11,578 ms limit.
+
+**Decision** [agent-inferred, October 30]. C′ with pair contacts does not run longer and is not the
+tower the split grows on: the split races on the four-level pair tower, as acceptance 6 declares.
+The rise from lap 13 is the subject of this line's next loop, after acceptance 6 reads.
+
+**§5 acceptance 5 at the repaired split, stopped at section 7** (October 30, RTX 4080 SUPER, head
+`662d6aafe`, alone on the card; wall 10.5 s, peak resident set 1,865,764 KiB). Host and card were
+equal through section 6 in every split read, founding and direction. Section 3 proposed a founding
+that section 4 admitted (code 18,965,648,716 → 18,814,339,091 on `2^(−20)` bits); section 4
+proposed one that section 5 admitted. Section 6's proposal reached section 7, where the card
+refused its own reverse ("a card reverse reads the section's opening forward, its material still
+resident"). No value differed. The race and its control did not start.
+
+*The cause.* After the certificate's reread the learner read the section's opening forward again
+only when the founding was admitted. A card keeps one frame of temporaries, which the reread
+replaces, so a refused founding left the reverse with no opening read. Sections 1 to 6 never
+refused a certificate on the card; the host keeps both reads, so the host tests passed over five
+refusals.
+
+*The repair.* The opening is read again after every certificate, admitted or refused. The host
+realization now refuses a reverse whose opening read a reread has replaced, as the card does, so
+the host acceptance (7 proposed, 1 admitted, 5 refused) runs the refused path the card runs. The
+card's cost is one more forward a certified section.

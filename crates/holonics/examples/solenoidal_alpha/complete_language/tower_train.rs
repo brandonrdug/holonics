@@ -3389,8 +3389,9 @@ pub(super) enum Joined {
     /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
     /// learner (`PAIRED.<pass>`, `PAIRED`).
     Split,
-    /// The pair contacts paired at the founding with every founding refused: the copies stay
-    /// dormant throughout, the split race's control (what the doubled return alone does).
+    /// The pair contacts paired at the founding, every pair dormant throughout
+    /// ([`TowerLearner::section_dormant`]): the copies deposit as one contact and nothing founds,
+    /// the split race's control (the pair learner in the wider chart).
     DormantSplit,
 }
 
@@ -3632,20 +3633,21 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             let slices: Option<Vec<&[Option<usize>]>> = compared.as_ref().map(|c| c.iter().map(|v| v.as_slice()).collect());
             let result = match paired.as_mut() {
                 Some(directions) => learner.section_founding(&mut states, &parts, slices.as_deref(), realization, directions).map(|(receipt, founding)| {
-                    if !founding.foundings.is_empty() {
-                        let f = &founding.foundings[0];
-                        proposed += 1;
+                    proposed += usize::from(founding.proposed.is_some());
+                    // A founding proposed on the section before, certified on this one: its
+                    // predicted change on the section it was read on, and its change on this one.
+                    if let Some(f) = &founding.certified {
                         if founding.admitted {
                             admitted[f.level] += 1;
                         }
                         println!(
-                            "TOWER_FOUNDING pass={} section={} level={} pair={} predicted_bits={} reread_bits={} remeasured_bits={} admitted={} dormant={}",
-                            pass, k + 1, f.level, f.pair, signed_bits(f.predicted), signed_bits(founding.reread - founding.code_before),
-                            founding.remeasured.map_or("none".into(), |c| signed_bits(c - founding.code_before)), founding.admitted, founding.dormant
+                            "TOWER_FOUNDING pass={} section={} level={} pair={} predicted_bits={} certified_bits={} admitted={} dormant={}",
+                            pass, k + 1, f.level, f.pair, signed_bits(f.predicted), signed_bits(founding.reread - founding.code_before), founding.admitted, founding.dormant
                         );
                     }
                     receipt
                 }),
+                None if joined == Joined::DormantSplit => learner.section_dormant(&mut states, &parts, slices.as_deref(), realization),
                 None => learner.section_realized(&mut states, &parts, slices.as_deref(), realization),
             };
             let receipt = match result {
@@ -3682,6 +3684,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let name = format!("STATE.{pass}");
         write_new(&out.join(&name), text.as_bytes())?;
         println!("TOWER_STATE {name} state_bytes={} state_sha256={}", text.len(), sha256(text.as_bytes())?);
+        // A founding proposed on the pass's last section is released before the directions rest, so
+        // a run continued from them is the run that went on.
+        if let Some(f) = paired.as_mut().and_then(|d| d.pending.take()) {
+            println!("TOWER_FOUNDING_RELEASED pass={pass} level={} pair={} predicted_bits={}", f.level, f.pair, signed_bits(f.predicted));
+        }
         if let Some(directions) = &paired {
             let text = directions.to_text();
             let name = format!("PAIRED.{pass}");

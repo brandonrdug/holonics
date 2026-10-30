@@ -26,22 +26,48 @@
 //! only when the left side at the enclosure's foot passes the right side at its head (a tie is
 //! refused).
 //!
-//! One pair founds a section, the one with the largest surplus, and the test only proposes it: the
-//! section's reread at `θ̂` measures the line exactly, and the founding deposits only where the
-//! reread's code falls by more than the coordinate's price on the curvature the line has
-//! ([`measured_line`], [`price_bits`]); refused, the line's own mode is read once more
-//! ([`TowerLearner::section_founding`]). The squares' curvature is a sampled estimate, and on the
-//! tiny parity passage the measured line was not the test's quadratic (agent-inferred, October 30).
+//! One pair is proposed a section, the one with the largest surplus, and the test only proposes
+//! it: the proposal is held ([`PairedContacts::pending`]) and certified at the next section's
+//! opening, on material it was not fit on. That section is read with and without the split before
+//! its own step, and the founding deposits only where the section codes fewer bits under it by more
+//! than the coordinate's price ([`certified_price`]); the section then steps from the tower the
+//! certificate leaves. While its founding is pending a pair's direction is held, so the split that
+//! deposits is the one its score read (agent-inferred, October 30; measured: certified on the
+//! section it was fit on, where `ln²2 · S` is far above `τ` and `θ̂` is nearly that section's own
+//! Newton step, 725 of the race's 726 proposals passed and its training code read 0.077 bits a byte
+//! above the dormant control's at lap 0).
 //!
 //! The score is the code's slope along the split on the tower it was read on, and only there: the
 //! section's step moves the drives both copies share along the same covectors, so the split is read
 //! again on the tower the step left, and the test decides on what the step did not take
 //! (agent-inferred, October 30; measured: decided on the opening read, 20 of the race's first 28
 //! proposed foundings raised the code they were predicted to lower).
+//!
+//! While a pair is dormant its copies deposit as one contact ([`Tower::dormant_entries`]): its
+//! drives' covectors are summed and both copies take the sum, the old contact's covector, on the
+//! old contact's moments, so they move together as its drives do; its return's step is read once,
+//! from its first part's moments (its second's are equal: both parts read the same conduction), and
+//! split between the parts as the widening split the column (Euclidean, the remainder on the
+//! first), so the column moves by the old column's step. The widened learner is then the pair
+//! learner in a wider chart, up to the reverse's grain (agent-inferred, October 30; measured: with
+//! each return part stepping on the old column's covector whole, the column moved twice its step
+//! and the dormant control read 0.097 bits a byte above the pair race at lap 0). A deposit's step
+//! `m/(⌊√v⌋ + 1)` does not change when its covector is scaled, so a founded pair's copies, whose
+//! covectors are each about half the old, step as its drives did; their drives' moments are
+//! re-lifted to `m/2`, `v/4` at the founding, so the moments read the covector each copy now takes.
 use super::*;
 use crate::ratio::Rat;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
+
+/// How a section reads its learner's contacts: unpaired; paired with every pair dormant, the copies
+/// depositing as one contact and nothing founding (the split race's control); or paired and
+/// founding on the carried directions.
+pub(super) enum Pairs<'a> {
+    Unpaired,
+    Dormant,
+    Founding(&'a mut PairedContacts),
+}
 
 /// The read's working grain for a turned direction before it is normalized: the turned sum is
 /// released until its largest entry is below `2^40`, so its squares sum in 128 bits.
@@ -56,10 +82,14 @@ pub const SCORE_BITS: u32 = 48;
 
 /// [definition] **The paired contacts' carried directions**: `levels[l][e]` is the unit direction
 /// of dormant pair `e` (contacts `e` and `e + f/2`) on the read it shares, on `2^(−16)`, or `None`
-/// once the pair is founded and its copies learn on their own.
+/// once the pair is founded and its copies learn on their own; and the founding the last section
+/// proposed, held for the next section's certificate (the module header). The text carries the
+/// directions alone: a run releases a pending founding at each pass's end, before its directions
+/// rest, so a run continued from them is the run that went on.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PairedContacts {
     pub levels: Vec<Vec<Option<Vec<i32>>>>,
+    pub pending: Option<Founding>,
 }
 
 /// One dormant pair's read over a section: the score `Σ δv φ` on `2^(−24)` (bits a unit of `θ`),
@@ -78,9 +108,10 @@ pub struct SplitRead {
     pub levels: Vec<Vec<PairRead>>,
 }
 
-/// A founding the test admitted, before its certificate: the level and pair, `θ̂` on `2^(−48)`,
-/// the predicted change of the section's code in bits on `2^(−20)` (`−ln 2 · g²/(2(τ + ln²2 S))`,
-/// negative), the test's surplus (fit less price, nats on `2^(−20)`), and the read it was decided on.
+/// A founding the test proposed, before its certificate: the level and pair, `θ̂` on `2^(−48)`,
+/// the predicted change of the code of the section it was read on, in bits on `2^(−20)`
+/// (`−ln 2 · g²/(2(τ + ln²2 S))`, negative), the test's surplus (fit less price, nats on
+/// `2^(−20)`), and the read it was decided on.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Founding {
     pub level: usize,
@@ -92,18 +123,17 @@ pub struct Founding {
     pub squares: i128,
 }
 
-/// A section's founding and its certificate, codes on `2^(−20)` bits: the section's code after its
-/// step, the reread's code at the test's `θ̂`, and at the measured line's mode `θ*` when the first
-/// reread was refused and the line has one; the founding as deposited (its `θ` the one admitted);
-/// the code the section leaves; whether a reread admitted it; and the dormant pairs left.
+/// A founding section's receipt, codes on `2^(−20)` bits: the founding the section before proposed
+/// and this one certified, if any; the section's opening code without it and with it (equal when
+/// none was pending); whether the certificate admitted it; the founding this section proposes,
+/// held for the next; and the dormant pairs it leaves.
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub struct FoundingReceipt {
-    pub foundings: Vec<Founding>,
+    pub certified: Option<Founding>,
     pub code_before: i64,
     pub reread: i64,
-    pub remeasured: Option<i64>,
-    pub code_after: i64,
     pub admitted: bool,
+    pub proposed: Option<Founding>,
     pub dormant: usize,
 }
 
@@ -207,48 +237,10 @@ pub fn founded(read: &PairRead, width: usize, dormant: usize) -> Result<Option<(
     Ok(Some((theta, predicted, on_grain(&surplus, PRICE_BITS)?)))
 }
 
-/// [definition; agent-inferred, October 30] **The line a founding's reread measured, and the price
-/// its coordinate pays on it.** The test's quadratic takes the score's squares for the curvature
-/// along `θ` (the empirical Fisher); the reread reads the section's code exactly at `θ̂`, so with the
-/// score `g` as the line's slope at zero its measured change `Δ` fixes the curvature the line
-/// actually has, `H = 2(Δ − g θ̂)/θ̂²` (bits a unit of `θ²`). Measured on the paired parity passage,
-/// the squares under-read it about threefold: a founding predicted at `−8.6` bits lowered the code by
-/// `0.79`.
-///
-/// Returns the curvature the price is charged on, `σ = max(ln²2 · S, ln 2 · H, 0)` in nats (the
-/// larger reading, since the price grows with it), and the line's posterior mode
-/// `θ* = −ln 2 · g/(τ + ln 2 · H)` on `2^(−48)` when `τ + ln 2 · H > 0` (the line is bounded
-/// below under the prior), else `None`.
-pub fn measured_line(founding: &Founding, width: usize, measured: i64) -> Result<(Rat, Option<i128>)> {
-    let g = dyadic(founding.score, COVECTOR_BITS);
-    let s = dyadic(founding.squares, 2 * COVECTOR_BITS);
-    let theta = dyadic(founding.theta, 2 * MATERIAL_BITS);
-    if founding.theta == 0 {
-        return refuse("a founding at zero measures no line");
-    }
-    let delta = dyadic(measured as i128, PRICE_BITS);
-    let tau = Rat::new(BigInt::from(width * width), BigInt::from(4));
-    let ln2 = ln2_face();
-    let (lo, hi) = (dyadic(ln2 - 1, 30), dyadic(ln2 + 1, 30));
-    let two = Rat::from_integer(BigInt::from(2));
-    let zero = Rat::from_integer(BigInt::from(0));
-    let curvature = &two * (&delta - &g * &theta) / (&theta * &theta);
-    let mut sigma = &hi * &hi * &s;
-    if &hi * &curvature > sigma {
-        sigma = &hi * &curvature;
-    }
-    if sigma < zero {
-        sigma = zero.clone();
-    }
-    let bound = &tau + &lo * &curvature;
-    let mode = if bound > zero { Some(on_grain(&(-(&lo * &g) / bound), 2 * MATERIAL_BITS)?) } else { None };
-    Ok((sigma, mode.filter(|&t| t != 0)))
-}
-
 /// [definition; agent-inferred, October 30] **The price of a founded coordinate at `θ`**, in bits
 /// read from above: the two-part code's Laplace charge `(½ τ θ² + ½ ln(1 + σ/τ) + ln K)/ln 2`, the
-/// prior's cost of the value, the coordinate's own precision and its address among the `K`
-/// dormant pairs. A founding deposits only where the reread's exact code falls by more than this.
+/// prior's cost of the value, the coordinate's own precision on the curvature `σ` (nats) and its
+/// address among the `K` dormant pairs.
 pub fn price_bits(theta: i128, sigma: &Rat, width: usize, dormant: usize) -> Result<Rat> {
     if dormant == 0 {
         return refuse("a price among no dormant pairs");
@@ -261,6 +253,17 @@ pub fn price_bits(theta: i128, sigma: &Rat, width: usize, dormant: usize) -> Res
     let own = &half * log2_above(&(&tau / (&tau + sigma)))?;
     let address = log2_above(&Rat::new(BigInt::from(1), BigInt::from(dormant)))?;
     Ok(value + own + address)
+}
+
+/// [definition; agent-inferred, October 30] **The price a proposed founding pays at its
+/// certificate**: [`price_bits`] at its `θ̂` on the curvature its test read, `σ = ln²2 · S` with
+/// `ln 2` at its enclosure's head (the price grows with `σ`), among the `dormant` pairs it was
+/// chosen from. The founding deposits only where the next section's exact code falls by more than
+/// this.
+pub fn certified_price(founding: &Founding, width: usize, dormant: usize) -> Result<Rat> {
+    let s = dyadic(founding.squares, 2 * COVECTOR_BITS);
+    let hi = dyadic(ln2_face() + 1, 30);
+    price_bits(founding.theta, &(&hi * &hi * s), width, dormant)
 }
 
 impl PairedContacts {
@@ -285,7 +288,7 @@ impl PairedContacts {
                     .collect::<Result<Vec<_>>>()
             })
             .collect::<Result<Vec<_>>>()?;
-        Ok(Self { levels })
+        Ok(Self { levels, pending: None })
     }
 
     /// The pairs still dormant.
@@ -346,7 +349,7 @@ impl PairedContacts {
                     .collect::<Result<Vec<_>>>()
             })
             .collect::<Result<Vec<_>>>()?;
-        Ok(Self { levels })
+        Ok(Self { levels, pending: None })
     }
 
     /// Whether these directions are `tower`'s paired contacts'.
@@ -357,6 +360,9 @@ impl PairedContacts {
         }
         if self.levels.iter().any(|l| l.len() != d.contacts / 2 || l.iter().flatten().any(|v| v.len() != d.width)) {
             return refuse("paired directions of another tower");
+        }
+        if self.pending.as_ref().is_some_and(|f| self.levels.get(f.level).and_then(|l| l.get(f.pair)).is_none_or(|v| v.is_none())) {
+            return refuse("a pending founding of a pair that is not dormant");
         }
         Ok(())
     }
@@ -375,9 +381,8 @@ impl Tower {
         Ok(self.paired_from()?.0)
     }
 
-    /// The paired tower and, for each of its entries, the old entry it carries and whether its
-    /// covector is halved (a repeated drive row or bias) or kept (a return part, every other family).
-    fn paired_from(&self) -> Result<(Self, Vec<(usize, bool)>)> {
+    /// The paired tower and, for each of its entries, the old entry it carries.
+    fn paired_from(&self) -> Result<(Self, Vec<usize>)> {
         let old = self.declaration;
         if old.contact != ContactLaw::Pair {
             return refuse("only the pair contact splits: the rectifier's second derivative lives on its kink");
@@ -392,11 +397,11 @@ impl Tower {
         let layout = Layout::new(&d, 0, 0, 0, 0, None, false, None);
         let (w, f) = (old.width, old.contacts);
         let mut new = vec![0i32; layout.len];
-        let mut from = vec![(0usize, false); layout.len];
-        let keep = |new: &mut [i32], from: &mut [(usize, bool)], at: usize, to: usize, len: usize| {
+        let mut from = vec![0usize; layout.len];
+        let keep = |new: &mut [i32], from: &mut [usize], at: usize, to: usize, len: usize| {
             new[to..to + len].copy_from_slice(&self.theta[at..at + len]);
             for (i, slot) in from[to..to + len].iter_mut().enumerate() {
-                *slot = (at + i, false);
+                *slot = at + i;
             }
         };
         let (ol, nl) = (&self.layout, &layout);
@@ -427,7 +432,7 @@ impl Tower {
                     for e in 0..f {
                         for i in 0..len {
                             new[to + (c * f + e) * len + i] = self.theta[at + e * len + i];
-                            from[to + (c * f + e) * len + i] = (at + e * len + i, true);
+                            from[to + (c * f + e) * len + i] = at + e * len + i;
                         }
                     }
                 }
@@ -440,7 +445,7 @@ impl Tower {
                     for c in 0..2 {
                         let at = l.ret + j * 2 * f + c * f + e;
                         new[at] = fit32(q + i128::from(c == 0 && rem == 1), "a return part outgrew its 32-bit carrier")?;
-                        from[at] = (o.ret + j * f + e, false);
+                        from[at] = o.ret + j * f + e;
                     }
                 }
             }
@@ -526,26 +531,59 @@ impl Tower {
         }
         Ok(tower)
     }
+
+    /// [definition; agent-inferred, October 30] **The dormant pairs' entries** (the module header):
+    /// for each pair `e` of level `l` that `dormant(l, e)` names (contacts `e` and `e + f/2`), each
+    /// drive entry's two copies (both drives' rows and biases), then each return row's two parts.
+    /// Refused on a tower that is not paired pair contacts.
+    pub(super) fn dormant_entries(&self, dormant: &dyn Fn(usize, usize) -> bool) -> Result<(Vec<(usize, usize)>, Vec<(usize, usize)>)> {
+        let d = &self.declaration;
+        if d.contact != ContactLaw::Pair || d.contacts % 2 != 0 {
+            return refuse("dormant pairs are an even count of pair contacts");
+        }
+        let (w, f, h) = (d.width, d.contacts, d.contacts / 2);
+        let (mut drives, mut returns) = (Vec::new(), Vec::new());
+        for (l, lv) in self.layout.levels.iter().enumerate() {
+            for e in (0..h).filter(|&e| dormant(l, e)) {
+                for (start, len) in [(lv.contact, w), (lv.contact_bias, 1), (lv.pair, w), (lv.pair_bias, 1)] {
+                    drives.extend((0..len).map(|i| (start + e * len + i, start + (e + h) * len + i)));
+                }
+                returns.extend((0..w).map(|j| (lv.ret + j * f + e, lv.ret + j * f + e + h)));
+            }
+        }
+        Ok((drives, returns))
+    }
 }
 
 impl TowerLearner {
     /// [definition; agent-inferred, October 30] **The learner with its contacts paired**
-    /// ([`Tower::paired`]) and every pair dormant: a repeated drive row or bias takes half the old
-    /// covector (its return is half), so it carries `m/2` and `v/4`; a return part takes the old
-    /// covector whole and carries `m` and `v`. Every copy opens on the old normalized step. Refused
-    /// under a declared hold, whose ranges name the old material.
+    /// ([`Tower::paired`]) and every pair dormant: every entry carries its old entry's moments,
+    /// since a dormant pair deposits as one contact (the module header): its drives' copies take the
+    /// old covector summed, and each return part the old covector whole. Refused under a declared
+    /// hold, whose ranges name the old material.
     pub fn paired(&self) -> Result<(Self, PairedContacts)> {
         if !self.held.is_empty() {
             return refuse("a held learner's pairing: its holds name the old material");
         }
         let (tower, from) = self.tower.paired_from()?;
-        let first = from.iter().map(|&(i, halved)| if halved { div_nearest(self.first[i], 2) } else { self.first[i] }).collect();
-        let second = from.iter().map(|&(i, halved)| if halved { div_nearest(self.second[i], 4) } else { self.second[i] }).collect();
+        let first = from.iter().map(|&i| self.first[i]).collect();
+        let second = from.iter().map(|&i| self.second[i]).collect();
         let paired = PairedContacts::opened(&tower)?;
         Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new() }, paired))
     }
 
-    /// The section's founding decided (the module header): of the pairs the test admits, the one
+    /// A founded pair's drives' moments re-lifted (the module header): each copy's covector is now
+    /// its own, about half the old, so its moments carry `m/2` and `v/4`.
+    pub(super) fn relift(&mut self, founding: &Founding) -> Result<()> {
+        let (drives, _) = self.tower.dormant_entries(&|l, e| l == founding.level && e == founding.pair)?;
+        for i in drives.into_iter().flat_map(|(a, b)| [a, b]) {
+            self.first[i] = div_nearest(self.first[i], 2);
+            self.second[i] = div_nearest(self.second[i], 4);
+        }
+        Ok(())
+    }
+
+    /// The section's proposal decided (the module header): of the pairs the test admits, the one
     /// with the largest surplus, or none.
     pub(super) fn foundings(&self, paired: &PairedContacts, read: &SplitRead) -> Result<Vec<Founding>> {
         paired.admits(&self.tower)?;
@@ -578,19 +616,17 @@ impl TowerLearner {
 
 impl PairedContacts {
     /// Each dormant pair's direction turned by its read (`v ← M v/‖M v‖`; kept where the passage
-    /// did not reach it), and the directions of the pairs whose founding was admitted retired.
-    pub fn turned(&mut self, read: &SplitRead, founded: &[Founding]) -> Result<()> {
-        for (pairs, reads) in self.levels.iter_mut().zip(&read.levels) {
-            for (direction, r) in pairs.iter_mut().zip(reads) {
-                if direction.is_some() {
+    /// did not reach it), except the pending founding's, which is held for its certificate.
+    pub fn turned(&mut self, read: &SplitRead) -> Result<()> {
+        let held = self.pending.as_ref().map(|f| (f.level, f.pair));
+        for (l, (pairs, reads)) in self.levels.iter_mut().zip(&read.levels).enumerate() {
+            for (e, (direction, r)) in pairs.iter_mut().zip(reads).enumerate() {
+                if direction.is_some() && held != Some((l, e)) {
                     if let Some(v) = unit(&r.turned)? {
                         *direction = Some(v);
                     }
                 }
             }
-        }
-        for f in founded {
-            self.levels[f.level][f.pair] = None;
         }
         Ok(())
     }
@@ -635,8 +671,8 @@ mod tests {
     }
 
     /// Acceptance 1: the paired tower reads the old faces class by class and keeps the old state;
-    /// a repeated drive entry carries `m/2` and `v/4`, a return part `m` and `v`; the rectifier and
-    /// every part whose lift is owed are refused.
+    /// every copy carries its old entry's moments; the rectifier and every part whose lift is owed
+    /// are refused.
     #[test]
     fn the_paired_tower_reads_the_old_faces_and_its_copies_open_on_the_old_step() {
         for tower in [tiny_pair(false, false), tiny_pair(true, false), tiny_pair(true, true)] {
@@ -659,14 +695,15 @@ mod tests {
                 for c in 0..2 {
                     let to = n.contact + (c * f + e) * w + i;
                     assert_eq!(paired.tower.theta[to], learner.tower.theta[at]);
-                    assert_eq!(paired.first[to], div_nearest(learner.first[at], 2));
-                    assert_eq!(paired.second[to], div_nearest(learner.second[at], 4));
+                    assert_eq!(paired.first[to], learner.first[at]);
+                    assert_eq!(paired.second[to], learner.second[at]);
                 }
                 let at = o.ret + i * f + e;
                 let parts: i32 = (0..2).map(|c| paired.tower.theta[n.ret + i * 2 * f + c * f + e]).sum();
                 assert_eq!(parts, learner.tower.theta[at]);
                 for c in 0..2 {
                     assert_eq!(paired.first[n.ret + i * 2 * f + c * f + e], learner.first[at]);
+                    assert_eq!(paired.second[n.ret + i * 2 * f + c * f + e], learner.second[at]);
                 }
             }
         }
@@ -691,11 +728,11 @@ mod tests {
         let mut directions = opened.clone();
         for _ in 0..64 {
             let r = read(&directions);
-            directions.turned(&r, &[]).expect("turned");
+            directions.turned(&r).expect("turned");
         }
         let at = read(&directions);
         let mut once = directions.clone();
-        once.turned(&at, &[]).expect("turned");
+        once.turned(&at).expect("turned");
         for (a, b) in once.levels.iter().flatten().zip(directions.levels.iter().flatten()) {
             let (a, b) = (a.as_ref().expect("dormant"), b.as_ref().expect("dormant"));
             let same = a.iter().zip(b).all(|(x, y)| (x - y).abs() <= 4);
@@ -707,7 +744,7 @@ mod tests {
         let basis: Vec<SplitRead> = (0..w)
             .map(|j| {
                 let unit: Vec<i32> = (0..w).map(|i| if i == j { 1 << FACE_BITS } else { 0 }).collect();
-                read(&PairedContacts { levels: opened.levels.iter().map(|l| l.iter().map(|_| Some(unit.clone())).collect()).collect() })
+                read(&PairedContacts { levels: opened.levels.iter().map(|l| l.iter().map(|_| Some(unit.clone())).collect()).collect(), pending: None })
             })
             .collect();
         for (l, pairs) in at.levels.iter().enumerate() {
@@ -762,40 +799,56 @@ mod tests {
         }
     }
 
-    /// The founding is decided on the tower the step left: a founding section's proposal and its
-    /// directions' turn are those of the split read on that tower, not on the opening's, and the step
-    /// moves the score (here it turns some pair's sign).
+    /// The parity passage's streams and a section of them.
+    fn parity_streams(sections: usize) -> Vec<Vec<usize>> {
+        (0..4).map(|s| parity_passage(0x9e37_79b9 ^ (s as u32 + 1), 64 * sections + 1)).collect()
+    }
+
+    fn parity_section(streams: &[Vec<usize>], k: usize) -> Vec<&[usize]> {
+        streams.iter().map(|p| &p[k * 64..k * 64 + 65]).collect()
+    }
+
+    /// The founding is proposed on the tower the step left: a founding section's proposal and its
+    /// directions' turn are those of the split read on that tower (the founded tower when the
+    /// pending founding was admitted), not on the opening's; the pending pair's direction is held;
+    /// and the step moves the score (here it turns some pair's sign).
     #[test]
-    fn the_founding_is_decided_on_the_tower_the_step_left() {
-        let streams: Vec<Vec<usize>> = (0..4).map(|s| parity_passage(0x9e37_79b9 ^ (s as u32 + 1), 64 * 12 + 1)).collect();
-        let section = |k: usize| -> Vec<&[usize]> { streams.iter().map(|p| &p[k * 64..k * 64 + 65]).collect() };
-        let mut learner = TowerLearner::new(tiny_pair(true, false), 6);
-        let mut states = vec![learner.tower.rest(); 4];
-        for k in 0..2 {
-            learner.section(&mut states, &section(k)).expect("section");
-        }
-        let (mut learner, mut directions) = learner.paired().expect("paired");
-        let (mut deposited, mut turned_sign) = (0usize, 0usize);
+    fn the_founding_is_proposed_on_the_tower_the_step_left() {
+        let streams = parity_streams(33);
+        let (mut learner, mut directions, _, mut states) = paired_on_parity(&streams);
+        let (mut deposited, mut turned_sign, mut proposed) = (0usize, 0usize, 0usize);
         let key = |f: &Founding| (f.level, f.pair, f.score, f.squares, f.predicted, f.surplus);
-        for k in 2..12 {
-            let parts = section(k);
+        for k in 8..32 {
+            let parts = parity_section(&streams, k);
             let opening = states.clone();
-            let before = directions.clone();
-            let opened = split_of(&learner.tower, &opening, &parts, &before);
-            let mut stepped = learner.clone();
-            deposited += stepped.section(&mut opening.clone(), &parts).expect("section").deposited as usize;
-            let read = split_of(&stepped.tower, &opening, &parts, &before);
-            let decided = stepped.foundings(&before, &read).expect("decided");
-            let (_, receipt) = learner.section_founding(&mut states, &parts, None, &mut HostPass::default(), &mut directions).expect("section");
-            assert_eq!(receipt.foundings.iter().map(key).collect::<Vec<_>>(), decided.iter().map(key).collect::<Vec<_>>(), "section {k}");
-            let mut expected = before.clone();
-            expected.turned(&read, if receipt.admitted { &receipt.foundings } else { &[] }).expect("turned");
+            let (before, tower_before) = (directions.clone(), learner.tower.clone());
+            let (receipt, founding) = learner.section_founding(&mut states, &parts, None, &mut HostPass::default(), &mut directions).expect("section");
+            deposited += receipt.deposited as usize;
+            assert_eq!(founding.certified, before.pending, "section {k}");
+            // The directions the proposal reads: the pending founding taken, and retired if admitted.
+            let mut at_read = PairedContacts { pending: None, ..before.clone() };
+            let mut stepped_from = tower_before.clone();
+            if let (true, Some(f)) = (founding.admitted, &founding.certified) {
+                stepped_from = tower_before.found_splits(&before, std::slice::from_ref(f)).expect("founded");
+                at_read.levels[f.level][f.pair] = None;
+            }
+            let read = split_of(&learner.tower, &opening, &parts, &at_read);
+            let decided = learner.foundings(&at_read, &read).expect("decided");
+            assert_eq!(founding.proposed.as_ref().map(key), decided.first().map(key), "section {k}");
+            let mut expected = PairedContacts { pending: decided.into_iter().next(), ..at_read.clone() };
+            expected.turned(&read).expect("turned");
             assert_eq!(directions, expected, "section {k}");
+            if let Some(f) = &directions.pending {
+                proposed += 1;
+                assert_eq!(directions.levels[f.level][f.pair], at_read.levels[f.level][f.pair], "the pending pair's direction is held");
+            }
+            let opened = split_of(&stepped_from, &opening, &parts, &at_read);
             turned_sign += opened.levels.iter().flatten().zip(read.levels.iter().flatten()).filter(|(a, b)| a.score.signum() * b.score.signum() < 0).count();
         }
         assert!(deposited > 0, "no section's step deposited");
+        assert!(proposed > 0, "no section proposed a founding");
         assert!(turned_sign > 0, "the step turned no pair's score");
-        eprintln!("SPLIT_STALE deposited={deposited} turned_sign={turned_sign}");
+        eprintln!("SPLIT_STALE deposited={deposited} proposed={proposed} turned_sign={turned_sign}");
     }
 
     /// Acceptance 3: no news, no founding: a pair whose score is zero founds nothing at any price,
@@ -807,7 +860,7 @@ mod tests {
         let (paired, mut directions) = taught().paired().expect("paired");
         let before = directions.clone();
         let read = SplitRead { levels: directions.levels.iter().map(|l| l.iter().map(|_| quiet.clone()).collect()).collect() };
-        directions.turned(&read, &[]).expect("turned");
+        directions.turned(&read).expect("turned");
         assert_eq!(directions, before);
         assert!(paired.foundings(&directions, &read).expect("tested").is_empty());
         // A score of 4 bits against squares of 4 founds alone (a fit of 1.30 nats against an own
@@ -819,49 +872,123 @@ mod tests {
         assert_eq!(founded(&loud, 4, 2).expect("tested"), None, "the address raises the price");
     }
 
-    /// Acceptance 4 (the host's reading): over a mixed passage, every certified founding lowers the
-    /// section's code, and each founding carries its predicted change.
-    #[test]
-    fn a_certified_founding_lowers_the_code_it_was_predicted_to_lower() {
-        let streams: Vec<Vec<usize>> = (0..4).map(|s| parity_passage(0x9e37_79b9 ^ (s as u32 + 1), 64 * 33 + 1)).collect();
-        let section = |k: usize| -> Vec<&[usize]> { streams.iter().map(|p| &p[k * 64..k * 64 + 65]).collect() };
+    /// The widened learner after a few sections of the parity passage, with its streams' states.
+    fn paired_on_parity(streams: &[Vec<usize>]) -> (TowerLearner, PairedContacts, TowerLearner, Vec<TowerState>) {
         let mut learner = TowerLearner::new(tiny_pair(true, false), 6);
         let mut states = vec![learner.tower.rest(); 4];
         for k in 0..8 {
-            learner.section(&mut states, &section(k)).expect("section");
+            learner.section(&mut states, &parity_section(streams, k)).expect("section");
         }
-        let (mut learner, mut directions) = learner.paired().expect("paired");
+        let (paired, directions) = learner.paired().expect("paired");
+        (paired, directions, learner, states)
+    }
+
+    /// Acceptance 4 (the host's reading): over a mixed passage, each founding is proposed on one
+    /// section and certified on the next, which it was not fit on: an admitted founding lowers that
+    /// section's opening code (by more than its price) and retires its pair, a refused one leaves
+    /// the pair dormant and the section stepping from the unfounded tower, and the training code
+    /// read at each opening is the unfounded one.
+    #[test]
+    fn a_founding_is_certified_on_the_section_after_the_one_it_was_fit_on() {
+        let streams = parity_streams(33);
+        let (mut learner, mut directions, _, mut states) = paired_on_parity(&streams);
         let mut pass = HostPass::default();
         assert!(pass.forms_split());
-        let (mut admitted, mut refused) = (0usize, 0usize);
+        let (mut admitted, mut refused, mut proposed) = (0usize, 0usize, 0usize);
         for k in 8..32 {
-            let (_, receipt) = learner.section_founding(&mut states, &section(k), None, &mut pass, &mut directions).expect("section");
-            if receipt.foundings.is_empty() {
-                continue;
+            let tower_before = learner.tower.clone();
+            let opening = states.clone();
+            let (receipt, founding) = learner.section_founding(&mut states, &parity_section(&streams, k), None, &mut pass, &mut directions).expect("section");
+            assert_eq!(founding.code_before, receipt.code_before);
+            let unfounded: i64 = opening.iter().zip(parity_section(&streams, k)).map(|(o, c)| tower_before.read(&mut o.clone(), c).expect("read")).sum();
+            assert_eq!(receipt.code_before, unfounded, "the opening's code is the unfounded tower's");
+            if let Some(p) = &founding.proposed {
+                proposed += 1;
+                assert!(p.predicted < 0 && p.theta != 0 && p.surplus > 0);
             }
-            assert_eq!(receipt.foundings.len(), 1, "one founding a section");
-            let f = &receipt.foundings[0];
-            assert!(f.predicted < 0 && f.theta != 0 && f.surplus > 0);
-            if receipt.admitted {
+            let Some(f) = &founding.certified else {
+                assert_eq!(founding.reread, founding.code_before);
+                continue;
+            };
+            if founding.admitted {
                 admitted += 1;
-                assert!(receipt.code_after < receipt.code_before);
-                assert_eq!(receipt.code_after, receipt.remeasured.unwrap_or(receipt.reread));
+                assert!(founding.reread < founding.code_before, "an admitted founding lowers the section it was certified on");
+                assert_eq!(directions.levels[f.level][f.pair], None, "an admitted founding retires its pair");
             } else {
                 refused += 1;
-                assert_eq!(receipt.code_after, receipt.code_before);
+                assert!(directions.levels[f.level][f.pair].is_some(), "a refused founding leaves its pair dormant");
             }
             eprintln!(
-                "SPLIT_FOUNDING section={k} level={} pair={} predicted={} measured={} remeasured={:?} theta={} admitted={} dormant={}",
+                "SPLIT_FOUNDING section={k} level={} pair={} predicted={} certified={} admitted={} dormant={}",
                 f.level,
                 f.pair,
                 f.predicted,
-                receipt.reread - receipt.code_before,
-                receipt.remeasured.map(|c| c - receipt.code_before),
-                f.theta,
-                receipt.admitted,
-                receipt.dormant
+                founding.reread - founding.code_before,
+                founding.admitted,
+                founding.dormant
             );
         }
-        eprintln!("SPLIT_FOUNDINGS admitted={admitted} refused={refused} dormant={}", directions.dormant());
+        assert!(proposed > 0, "no section proposed a founding");
+        eprintln!("SPLIT_FOUNDINGS proposed={proposed} admitted={admitted} refused={refused} dormant={}", directions.dormant());
+    }
+
+    /// How far a widened learner's drives and summed return columns part from the pair learner's,
+    /// in grains of their entries.
+    fn parting(plain: &TowerLearner, widened: &TowerLearner) -> i32 {
+        let (f, w, h) = (widened.tower.declaration.contacts, widened.tower.declaration.width, plain.tower.declaration.contacts);
+        let mut worst = 0i32;
+        for l in 0..plain.tower.declaration.levels {
+            let (o, n) = (plain.tower.layout.levels[l], widened.tower.layout.levels[l]);
+            for e in 0..h {
+                for (old, new, len) in [(o.contact, n.contact, w), (o.contact_bias, n.contact_bias, 1), (o.pair, n.pair, w), (o.pair_bias, n.pair_bias, 1)] {
+                    for i in 0..len {
+                        worst = worst.max((plain.tower.theta[old + e * len + i] - widened.tower.theta[new + e * len + i]).abs());
+                    }
+                }
+                for j in 0..w {
+                    let column = widened.tower.theta[n.ret + j * f + e] + widened.tower.theta[n.ret + j * f + e + h];
+                    worst = worst.max((plain.tower.theta[o.ret + j * h + e] - column).abs());
+                }
+            }
+        }
+        worst
+    }
+
+    /// The dormant control is the pair learner in a wider chart: over sections of the parity
+    /// passage, each dormant pair's drive copies stay equal and their moments equal, the return
+    /// parts' moments stay equal, and the widened learner's codes, drives and summed return columns
+    /// part from the pair learner's only by the reverse's grain carried through the sections (the
+    /// copies' covectors are released one by one, so their sum is the old covector to a grain a
+    /// cell). The foil is the same widened learner whose copies deposit apart (each return part on
+    /// the old column's covector whole): it parts from the pair learner many times further.
+    #[test]
+    fn the_dormant_control_learns_as_the_pair_learner_in_its_wider_chart() {
+        let streams = parity_streams(20);
+        let (paired, _, mut plain, states) = paired_on_parity(&streams);
+        let (mut tied, mut apart) = (paired.clone(), paired);
+        let (mut states_p, mut states_t, mut states_a) = (states.clone(), states.clone(), states);
+        let (mut code_tied, mut code_apart, mut step) = (0i64, 0i64, 0i32);
+        for k in 8..20 {
+            let parts = parity_section(&streams, k);
+            let before = plain.tower.theta.clone();
+            let a = plain.section(&mut states_p, &parts).expect("pair section");
+            let b = tied.section_dormant(&mut states_t, &parts, None, &mut HostPass::default()).expect("dormant section");
+            let c = apart.section(&mut states_a, &parts).expect("foil section");
+            step = step.max(before.iter().zip(&plain.tower.theta).map(|(x, y)| (x - y).abs()).max().unwrap_or(0));
+            code_tied = code_tied.max((a.code_before - b.code_before).abs()).max((a.code_after - b.code_after).abs());
+            code_apart = code_apart.max((a.code_before - c.code_before).abs()).max((a.code_after - c.code_after).abs());
+            let (drives, returns) = tied.tower.dormant_entries(&|_, _| true).expect("entries");
+            for &(x, y) in drives.iter().chain(&returns) {
+                assert_eq!((tied.first[x], tied.second[x]), (tied.first[y], tied.second[y]), "section {k}: the copies' moments");
+            }
+            for &(x, y) in &drives {
+                assert_eq!(tied.tower.theta[x], tied.tower.theta[y], "section {k}: the drive copies");
+            }
+            eprintln!("SPLIT_DORMANT_SECTION k={k} code={}/{}/{} tied_parting={} apart_parting={}", a.code_after, b.code_after, c.code_after, parting(&plain, &tied), parting(&plain, &apart));
+        }
+        let (tied_parting, apart_parting) = (parting(&plain, &tied), parting(&plain, &apart));
+        eprintln!("SPLIT_DORMANT largest_step={step} code_tied={code_tied} code_apart={code_apart} tied_parting={tied_parting} apart_parting={apart_parting}");
+        assert!(code_tied * 8 < code_apart, "the tied codes part by {code_tied} grains, the foil's by {code_apart}");
+        assert!(tied_parting * 8 < apart_parting, "the tied entries part by {tied_parting} grains, the foil's by {apart_parting}");
     }
 }

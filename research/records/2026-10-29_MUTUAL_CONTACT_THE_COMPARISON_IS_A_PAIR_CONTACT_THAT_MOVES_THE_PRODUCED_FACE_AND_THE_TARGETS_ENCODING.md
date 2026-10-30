@@ -143,6 +143,15 @@ sum the same integers in any order.
   `U` or join after it. They are refused beside a mutual contact until each is re-derived. The
   measurement changes one thing.
 - **The tension reading** reads the readout's covector. Under a mutual contact it is refused.
+- **A peer contact** [derived join, October 30, from the unified-theory notes' §8 and §9b]. This
+  contact compares the produced face with the alphabet's own encodings, and its Gibbs face keeps the
+  classes apart: every class the face over-predicts is moved away from it. A contact between two
+  peers with no privileged target (the duplex's forward and reverse strands meeting at a place, or
+  two currents of the body) has no such term. Compared only by their slip `⟨Δ|Δ⟩`, two Holons can
+  lower it by collapsing onto each other. Such a contact minimizes the boundary free energy instead,
+  which adds the unresolved interior's volume, `(k_BT/2) log(det D / det D_ref)` (the contact
+  record of October 28, §5): the code length of what each participant still holds of its own. No
+  peer contact is built.
 
 ## 7. The recorded failures this design could repeat
 
