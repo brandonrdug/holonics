@@ -52,6 +52,20 @@ differs.
 3. Short of the claim, the pair contact does not carry the race at this declaration; the split waits
    on a contact law it can grow on, and the next item in the order (the `{−1, 0, 1}` collapse,
    radix record §3) goes first.
+4. **On C′** [agent-inferred, October 30, fixed after the pair race and before its own]. The race
+   kept two winners apart: C′'s clocked levels hearing packets beat the four arrival levels, and the
+   pair contact beat the rectifier on them. Both act on different terms of one forward (the clock on
+   the levels' modes and inputs, the contact law on the face's read into the residual stream), so
+   they should compose. `train-two-ladder-stacked-news-packet-pair-tower-classes` is C′
+   (`train-two-ladder-stacked-news-packet-tower-classes`) with every contact the pair contact,
+   founded on C′'s draws. Acceptance: on the host, the packets' covector under pair contacts with the
+   passage opened predicts the code difference (`hnn::tower` test); on the card, `tower_pass parity
+   … 8 2 4 packets-pair` at C′'s six-level declaration, 24 streams, 32 sections of 128, every face,
+   gradient entry and learner equal; then one hour on the card with C′'s passage, keys, width,
+   modes, contacts, levels, clock, streams, section and rate. The claim: its mean held-out reading
+   over its hour's last five laps is below both C′'s and the pair tower's means over the same laps.
+   Short of it, the composition does not carry the race, and the pair contact stays on the four
+   arrival levels.
 
 ## 4. The founded split, designed before it is built
 
@@ -321,3 +335,45 @@ sections coding 13,600 to 21,800 bits), 7,531 bits over the 29, the largest in t
 on. The dormant copies fell from 1,024 to 995. Read on the opening tower the same passage admitted 5
 of 28. Acceptance 4's claim holds at the race's width: the certificate admits more than it refuses,
 and every admitted founding lowers the code. §3's claim holds, so the race (acceptance 6) is owed.
+
+**§5 acceptance 6, stopped after lap 0** (October 30, RTX 4080 SUPER, head `e945ff809`, alone on the
+card; incomplete). The founding race and its dormant control, each with the pair race's arguments,
+read at lap 0 beside the pair race's lap 0 (bits a byte):
+
+| race | held-out | training | GSM8K | pass | foundings |
+|---|---|---|---|---|---|
+| pair (no copies) | 2.229 | | | 139.7 s at lap 5 | |
+| dormant control | 2.326 | 2.877 | 2.385 | 181.4 s | |
+| founding | 2.474 | 2.954 | 2.527 | 530.9 s | 725 of 726 sections; 256, 175, 118, 176 a level |
+
+The founding lap passed its projection's upper bound (about 310 s), and it already read 0.245 above
+the pair race, so it was stopped in lap 1 and the control ran its lap 0 alone. Peak resident sets
+666,240 and 668,656 KiB. Two causes, each located before any repair:
+
+1. *The widened learner is not the pair learner in a wider chart* [source-inspected]. A deposit
+   moves an entry by `m/(⌊√v⌋ + 1)` at the rate, which does not change when its covector is
+   scaled. A dormant pair's two return parts each take the old column's covector whole (`m`, `v`), so
+   each moves by the old column's step and their sum by twice it, while the copies' drives take half
+   the covector with `m/2`, `v/4` and move as the old drive. The face is the old face at the
+   widening, but its returns then learn at twice the rate: the control reads 0.097 above the pair
+   race at lap 0. Repair: a dormant pair deposits as one contact, the old column's step read once
+   from its copies' equal moments and split between them as the widening split the column
+   (Euclidean, the remainder on the first), so the control is the pair tower in the wider chart.
+2. *A founding is certified on the material it was fit on* (the recorded failure, seen material
+   graded as unseen). At 40,960 cells a section `ln²2 S` is far above `τ = 1,024`, so `θ̂` is nearly
+   the section's own Newton step along the new coordinate, and the reread certifies it on that same
+   section; the coordinate's price grows only with the logarithm of the section, so 725 of 726
+   proposals passed. Training bits are read at each section's opening, before its step and its
+   founding, and the founding race's are 0.077 above the control's: the coordinates fit to one
+   section raised the code of the sections after it. Repair: a founding is certified on the next
+   section, read with and without it before that section's own step, and deposits only where the
+   section it was not fit on falls by more than the coordinate's price.
+
+Acceptance 6 is read again with both repairs; its claim is unchanged.
+
+**§3 acceptance 4, the card** (October 30, RTX 4080 SUPER, head `9c0cf2f8a`, alone on the card).
+`tower_pass parity … 8 2 4 packets-pair` at C′'s six-level declaration, 24 streams, 32 sections of
+128: 98,304 faces, 19,595,296 gradient entries and every learner equal, none unequal. Host 19,504 ms,
+card 6,453 ms (167 forwards in 5,049 ms, 64 reverses in 638 ms); wall 32.3 s, peak resident set
+1,979,192 KiB. The host half (the packets' covector under pair contacts with the passage opened
+predicts the code difference) passed at the same head, so C′'s hour with pair contacts runs.

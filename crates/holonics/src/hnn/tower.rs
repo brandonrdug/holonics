@@ -9670,6 +9670,19 @@ mod tests {
         the_covector_of_tower_matches_the_code_difference(passage_opened(packeted(3)), true, &news_passage()[..31], 9);
     }
 
+    /// [agent-inferred, October 30] Under packets the pair contact keeps its covector: its two
+    /// drives read the face the clocked levels compose from their packets, so the pair block's
+    /// covector, and the packet's through the contacts, predict the code difference as the
+    /// rectifier's do (the race's C′ with the pair contact; record
+    /// `2026-10-30_THE_PAIR_CONTACT_IS_RACED…`, §3 acceptance 4).
+    #[test]
+    fn the_packets_covector_under_pair_contacts_matches_the_code_difference() {
+        let mut tower = tiny_declared(3, true, false, false, ContactLaw::Pair);
+        tower.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("joined");
+        tower.join_packets().expect("joined");
+        the_covector_of_tower_matches_the_code_difference(passage_opened(tower), true, &news_passage()[..31], 9);
+    }
+
     /// Under packets a stream's open packets are its state (acceptance 5): a passage read in two
     /// carried sections is the passage read whole, code for code, a stream that drops its packets
     /// reads it otherwise, and a learner's section carries each stream's packets as a read does.
