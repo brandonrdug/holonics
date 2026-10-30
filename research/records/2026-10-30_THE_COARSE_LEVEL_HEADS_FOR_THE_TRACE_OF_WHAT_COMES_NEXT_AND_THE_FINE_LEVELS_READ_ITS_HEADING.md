@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, its acceptance fixed before the build (§11)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's (§11)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -533,3 +533,46 @@ Recorded failures this could repeat: *an authored routine standing in for learni
 the face's read is learned from the arrivals); *bits read as progress* (acceptance 16 shows the
 writing); *a located cause carried unrepaired into a new consumer* (the refusals' remaining share is
 measured with the closure gone, not carried into another law).
+
+**At the card** (a38c1c63f, B-PC's RTX 4080 SUPER alone under the card's lock).
+
+- **Acceptance 15 passed.** The card tests passed, 43 of 43, and the parity at C′'s declaration was
+  equal (98,304 faces, 93,104 closure faces, 17,711,136 gradient entries, every learner).
+- **Acceptance 16 passed.** The arrivals ended at 2.721 bits a byte, 0.019 below C′, and led C′ at
+  every window. They ended below the key-only lap's 2.755, so the closure's covector does not
+  return. The lap ran 95.1 s against its 152.4 s projection (0.62), peak resident set 696,156 KiB.
+  The held-out read: train 3.378, dev 2.809, the GSM8K region 2.861, the words region 2.768; the
+  dev and GSM8K reads are a little behind the key-only lap's (2.800, 2.835) while the arrivals are
+  ahead. The writing ran all six prompts to 1,024 classes in 9.2 s; it is babble with recurring
+  English words and markdown shapes, and its prompts are held-out material, so it stays outside the
+  repository.
+
+| After section | Arrivals, bits a byte | − C′ | Key-only | Refusals that window | Key-only | C′ | L4 closure − flat | L5 |
+|---|---|---|---|---|---|---|---|---|
+| 32 | 5.103 | −0.395 | 5.067 | 53 | 40 | 21 | +0.311 | +0.220 |
+| 64 | 3.901 | −0.201 | 3.861 | 20 | 6 | 1 | +0.302 | +0.200 |
+| 96 | 3.454 | −0.180 | 3.412 | 2 | 14 | 3 | +0.285 | +0.195 |
+| 128 | 3.165 | −0.199 | 3.212 | 19 | 21 | 2 | +0.279 | +0.195 |
+| 160 | 2.998 | −0.141 | 3.039 | 23 | 27 | 0 | +0.276 | +0.193 |
+| 192 | 2.872 | −0.088 | 2.911 | 29 | 28 | 0 | +0.273 | +0.195 |
+| 224 | 2.810 | −0.047 | 2.850 | 28 | 26 | 0 | +0.266 | +0.196 |
+| 256 | 2.721 | −0.019 | 2.755 | 23 | 26 | 0 | +0.260 | +0.196 |
+
+- **The heading helps the arrivals without its closure learning.** From section 128 the arrivals
+  run 0.03 to 0.05 bits a byte below the key-only lap's, and their lead over C′ narrows from 0.20 to
+  0.02 across the lap.
+- **Read and not learned, the closure sits above flat** (+0.26 and +0.20 bits a tick at 256): the
+  heading the face learns to read is not the trace of the span the next tick closes. It is a
+  reading of the coarse field, and it stays one.
+- **The refusals remain** (197 halvings against the key-only lap's 188 and C′'s 27, 21 of C′'s in
+  its first window). Every refused step raised the arrivals: with the closure gone the
+  covector is the arrivals' own and exact on the host, so the full step overshoots along the
+  arrivals' code itself.
+
+[agent-inferred] **The next loop's subject is the refusals, located by the holds of §8 at this
+law.** The heading's families act on the arrivals only through `D_l ĥ⁺_l`. With `D` held at zero
+the face is C′'s and `C^→` carries no covector, so that lap is C′ exactly and checks the route; with
+`C^→` held, only `D` moves. If the `C^→`-held lap refuses about as C′ does, the overshoot is the
+read's step and its law changes next; if it still refuses about twenty a window, it is the
+descent's. The lap keeps its 256 sections and its projection rule.
+
