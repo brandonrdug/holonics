@@ -155,8 +155,39 @@ g_e = Σ_t δv_(e,t) (uᵀ r̂_t)(wᵀ r̂_t) = uᵀ M_e w,      M_e = Σ_t δv_
 
 and the best split is the top singular pair of `M_e`, with `g_e = σ_max(M_e)`. `δv_(e,t)` is the
 contact's covector, which the card's reverse already forms; `M_e` is one more outer sum in the same
-tiles. A rectifying contact has no such form (its second derivative lives on its kink), so the
-pair contact is also the contact that knows where to grow.
+tiles.
+
+**[proved-derived, joined October 30] The split of a rectifying contact founds a tent on its ties.**
+This paragraph first said that a rectifying contact has no such form because its second derivative
+lives on its kink. It has one, and it lives on the kink. For `a ≥ 0`,
+
+```text
+½ max(s + a, 0) + ½ max(s − a, 0) − max(s, 0) = ½ (a − |s|)₊
+```
+
+by cases: for `s ≥ a` and for `s ≤ −a` both sides vanish, for `0 ≤ s < a` both read `½(a − s)`, and
+for `−a < s < 0` both read `½(a + s)`. Splitting a rectifying contact `v = max(s, 0)`,
+`s = wᵀ r̂ + b`, into two copies carrying half its output each, with input rows `w ± εu` (or biases
+`b ± ε`), therefore keeps the face where the pre-activation is far from its kink and founds the
+feature
+
+```text
+φ_t = ½ (ε |uᵀ r̂_t| − |s_t|)₊        (bias split: ½ (ε − |s_t|)₊)
+```
+
+supported only on the tie cells `|s_t| < ε |uᵀ r̂_t|`; the sign of the tilt does not enter. Its score
+is the contact's covector on those cells, `g_e = Σ_t δv_(e,t) φ_t`, and the founding test is the
+inequality below with `σ_e` read on the same feature. The tent is never negative, so unlike the pair
+split its sign is not free: the test also asks that the covector descends along it. Over a band of
+cells whose pre-activations are spread evenly across the kink, the tent's mass at a cell family is
+`∫ ½(ε|x| − |s|)₊ ds = ½ ε² x²` per unit density, so to leading order in `ε` the score is a quadratic
+form in `u`, the tie-weighted moment `Σ_(t on the ties) δv_(e,t) r̂_t r̂_tᵀ` (the pair contact's
+`M_e` restricted to the kink), and the best tilt is its top eigenvector. At finite `ε` the optimum over
+tilts is not a quadratic form, and the eigenvector is its leading term only. `ε` is the family's
+founding scale, so no new number enters. In tropical terms, growth refines the tropical hypersurface
+where its ties carry flux. Both contacts therefore know where to grow: the pair contact on every
+cell through `M_e`, the rectifying contact on its ties. (The identity and the tilt were first derived
+in the unified-theory notes of October 29, which checked the identity exactly over 3,321 cases.)
 
 **Consumer (the continuing body's growth).** At a section's deposition, for each pair contact `e`:
 form `M_e`; take its top singular pair at the face's grain by power iteration on the exact sums;

@@ -21,7 +21,15 @@ parity (`tower_pass parity … pair`).
 `±ε(u, w)`, found the coordinate `φ_t = (uᵀ r̂_t)(wᵀ r̂_t)`, with score `g_e = uᵀ M_e w`,
 `M_e = Σ_t δv_(e,t) r̂_t r̂_tᵀ`. A rectifying contact has no such form: its second derivative lives
 on its kink. Every race since October 27 runs rectifying contacts, so the split has no law to grow on
-in the race until the pair contact holds its place there. The pair contact has been carried by the
+in the race until the pair contact holds its place there.
+
+**Correction (October 30).** The premise is false. A rectifying contact's split founds a tent on its
+ties, `φ_t = ½(ε|uᵀr̂_t| − |s_t|)₊`, with its best tilt to leading order the top eigenvector of
+`M_e` restricted to the tie cells (the radix record §2, joined from the unified-theory notes). So the
+race's rectifying towers have a founding law of their own. The pair race and the pair split stand as
+measured and designed, since the split's acceptance (§5) holds on the pair tower; the rectifying
+split on C′, the race's best rectifying tower, is the founding to build after acceptance 6 reads, on
+the same section certificate (§4). The pair contact has been carried by the
 host and the card since October 24 and has never been raced at the race's declaration.
 
 The comparison is clean by construction. The pair contact's second drive opens at zero material and
