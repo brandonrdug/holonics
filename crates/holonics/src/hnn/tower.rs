@@ -5740,7 +5740,7 @@ fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     if old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
         return fewer_bits_exact(old, new);
     }
-    let side = |faces: &[(u128, u128)]| -> i128 { faces.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
+    let side = |faces: &[(u128, u128)]| -> i128 { faces.par_iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
     let difference = side(new) - side(old);
     let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
     if difference > slack {
@@ -5794,16 +5794,23 @@ fn log2_reading(v: u128) -> i128 {
 
 /// The products themselves: `Π m_new · Π t_old > Π m_old · Π t_new`.
 fn fewer_bits_exact(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    // The halves of a long product are formed together: an exact product is the same in any
+    // grouping.
     fn product(v: &[u128]) -> BigUint {
         match v.len() {
             0 => BigUint::from(1u8),
             1 => BigUint::from(v[0]),
-            n => product(&v[..n / 2]) * product(&v[n / 2..]),
+            n if n < 1 << 12 => product(&v[..n / 2]) * product(&v[n / 2..]),
+            n => {
+                let (a, b) = rayon::join(|| product(&v[..n / 2]), || product(&v[n / 2..]));
+                a * b
+            }
         }
     }
     let (om, ot): (Vec<u128>, Vec<u128>) = old.iter().cloned().unzip();
     let (nm, nt): (Vec<u128>, Vec<u128>) = new.iter().cloned().unzip();
-    product(&nm) * product(&ot) > product(&om) * product(&nt)
+    let ((pnm, pot), (pom, pnt)) = rayon::join(|| rayon::join(|| product(&nm), || product(&ot)), || rayon::join(|| product(&om), || product(&nt)));
+    pnm * pot > pom * pnt
 }
 
 /// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material
@@ -6018,20 +6025,22 @@ impl TowerLearner {
         let closure: Vec<ClosureReading> = match self.tower.heading_from() {
             Some(first) => (first..self.tower.declaration.levels)
                 .map(|level| {
-                    let mut reading = ClosureReading { level, ..Default::default() };
-                    for faces in read.closures.iter().filter_map(|stream| stream.get(level)) {
-                        reading.ticks += faces.len();
-                        reading.code += faces.iter().map(|&(m, t)| face_code(m, t)).sum::<i64>();
-                        if !faces.is_empty() {
-                            reading.flat += faces.len() as i64 * face_code(1, faces.len() as u128);
-                        }
-                    }
-                    reading
+                    let (ticks, code, flat) = read
+                        .closures
+                        .par_iter()
+                        .filter_map(|stream| stream.get(level))
+                        .map(|faces| {
+                            let code = faces.iter().map(|&(m, t)| face_code(m, t)).sum::<i64>();
+                            let flat = if faces.is_empty() { 0 } else { faces.len() as i64 * face_code(1, faces.len() as u128) };
+                            (faces.len(), code, flat)
+                        })
+                        .reduce(|| (0, 0, 0), |a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2));
+                    ClosureReading { level, ticks, code, flat }
                 })
                 .collect(),
             None => Vec::new(),
         };
-        let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
+        let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.par_iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
         // The section's code is read before any founding or step it decides, so a training code
         // stays the opening's.
         let parts_before = part_codes(&read.faces);
@@ -6174,7 +6183,7 @@ impl TowerLearner {
                 break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused }, Slot::Reread);
             }
             let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
-            let closure_after: i64 = reread.closures.iter().flatten().flatten().map(|&(m, t)| face_code(m, t)).sum();
+            let closure_after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
             refused.push((arrivals_after - code_before, closure_after - closure_before));
             halvings += 1;
         };

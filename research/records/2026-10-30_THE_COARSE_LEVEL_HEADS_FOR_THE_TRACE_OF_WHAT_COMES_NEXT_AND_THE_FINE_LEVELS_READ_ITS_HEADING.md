@@ -245,3 +245,21 @@ and the race prints them by window (`TOWER_REFUSALS`), so a window reads which c
 steps raised. The smoke's read is now a declared partition, the passage's first 288 sections
 (`TOWER_LAP_SECTIONS`), projected at the first window's measured 572 ms a section: 165 s, inside the
 three minutes, with the learner rested and its writing read after them.
+
+**The 288-section smoke stopped at its first window too** (e64d3b62b), at 18,781 ms against the
+18,311 ms limit, which was one earlier measurement taken as the upper bound with no spread. The
+learning was the same to the bit (5.257 bits a byte, 72 halvings, the same closure line). The
+refusals read:
+- 72 refused steps. 69 raised the closure's code and 62 raised the arrivals' code.
+- Together they raised the arrivals' code by 3,643,772 bits and the closure's by 1,730,136 bits.
+- Over a section's roughly 41,000 coded bytes and 40,000 ticks, a refused full step costs about
+  1.2 bits a byte and 0.6 bits a tick.
+
+So the full step overshoots both codes; it is not one part paying for the other.
+
+[agent-inferred] The readings' own host work (each refused read's codes, summed stream by stream)
+is the likeliest share of the 470 ms between the two windows. The section's codes, the
+certificate's readings and its exact products are now summed across streams in parallel. Integer
+sums and products are exact in any grouping, so the bits are unchanged. The next read is the
+passage's first 256 sections, projected at the largest measured rate (586.9 ms a section, startup
+included): 150 s, plus the held-out read.
