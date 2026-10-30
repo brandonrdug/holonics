@@ -555,16 +555,16 @@ fn the_cards_clocked_packets_are_the_hosts_for_thirty_two_sections() {
 }
 
 /// [agent-inferred, October 30] **The heading on the card** (record
-/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6 and 9):
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, acceptance 6, 9 and 12):
 /// each clocked level reads its heading from its modes before the arrival for its closure and
 /// after it into the face through its descent, closes the trace of its span at its tick, and the
-/// closure's and the face's covectors return to the heading's read, the modes it read, the
-/// descent and the traces' encodings; 32
-/// sections equal face by face (the closures among them), covector entry by entry, learner for
-/// learner and state for state (the open traces among it), on the clock from level 1, on three
-/// levels from level 2 with the passage, and at the race's declaration, six levels from level 4
-/// with the passage; on the turned pair contact with an uncompared place; then advanced class by
-/// class, a stream's open traces carried from each call into the next.
+/// closure's covector returns to the heading's read alone (the key, record §10) and the face's to
+/// the heading's read, the modes after the cell and the descent; 32 sections equal face by face
+/// (the closures among them), covector entry by entry, learner for learner and state for state
+/// (the open traces among it), on the clock from level 1, on three levels from level 2 with the
+/// passage, and at the race's declaration, six levels from level 4 with the passage; on the turned
+/// pair contact with an uncompared place; then advanced class by class, a stream's open traces
+/// carried from each call into the next.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_heading_is_the_hosts_for_thirty_two_sections() {

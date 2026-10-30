@@ -50,9 +50,8 @@
 //! and scan, `tower_reverse_packet`; and with the heading, `Tower::join_heading`, each clocked level
 //! reads its heading from its modes before the arrival for its closure and after it for the face,
 //! which reads it through the descent, carries the open trace of its span and closes it at a tick,
-//! the section's closure is read at the forward's end and returned through the heading, the
-//! traces' encodings and the read covector of the state the heading read, and the face's covector
-//! through the descent to the heading after each cell and the read covector of the cell's own
+//! the section's closure is read at the forward's end and returned to the heading's read alone,
+//! and the face's covector through the descent to the heading after each cell and the read covector of the cell's own
 //! state, `tower_reverse_ahead` and `tower_reverse_heading`). Any other is refused before a
 //! launch ([`TowerCard::admits`]), never run on a partial law.
 //!
@@ -392,14 +391,11 @@ struct FrameWords {
     hd_scale: u64,
     hd_face: u64,
     tr_read: u64,
-    tr_scale: u64,
     hd_list: u64,
     hd_count: u64,
     hd_close: u64,
     hd_g: u64,
     hd_dread: u64,
-    tr_dov: u64,
-    hd_closer: u64,
     r_hd_face_re: u64,
     r_hd_face_im: u64,
     r_hd_dread: u64,
@@ -676,25 +672,21 @@ struct Frame<'c> {
     /// The heading (each empty without it; `HD = L − F`, the levels that carry one): each
     /// stream's open trace before its first cell and after its last (`[S][HD][W]`); each cell's
     /// heading read and scale (`[S][T][HD][W]`, `[S][T][HD]`) and its face (re block, im block,
-    /// `[S][T][HD][2N]`); each trace's ratio read and scale at a tick (`[S][T][HD][W]`,
-    /// `[S][T][HD]`); each stream's ticks a level in the section, their count and each tick's
-    /// closure (`[S][HD][T]`, `[S][HD]`, `[S][HD][T][4]`: `e_jj`, the total's two words, `z_max`);
-    /// the reverse's covector scratch (`[S][T]`), the heading read's and the trace's covectors
-    /// (`[S][T][HD][W]` each) and each cell's closing tick (`[S][T][HD]`).
+    /// `[S][T][HD][2N]`); each trace's ratio read at a tick (`[S][T][HD][W]`); each stream's
+    /// ticks a level in the section, their count and each tick's closure (`[S][HD][T]`, `[S][HD]`,
+    /// `[S][HD][T][4]`: `e_jj`, the total's two words, `z_max`); the reverse's covector scratch
+    /// (`[S][T]`) and the heading read's covector (`[S][T][HD][W]`).
     tr_open: CardBuffer<'c, i64>,
     tr_ends: CardBuffer<'c, i64>,
     hd_read: CardBuffer<'c, i32>,
     hd_scale: CardBuffer<'c, i64>,
     hd_face: CardBuffer<'c, i64>,
     tr_read: CardBuffer<'c, i32>,
-    tr_scale: CardBuffer<'c, i64>,
     hd_list: CardBuffer<'c, u32>,
     hd_count: CardBuffer<'c, u32>,
     hd_close: CardBuffer<'c, u64>,
     hd_g: CardBuffer<'c, i64>,
     hd_dread: CardBuffer<'c, i64>,
-    tr_dov: CardBuffer<'c, i64>,
-    hd_closer: CardBuffer<'c, u32>,
     /// The heading after each cell, which the face reads through the descent (each empty without
     /// the heading): its ratio read and scale (`[S][T][HD][W]`, `[S][T][HD]`) and the face it read
     /// (`[S][T][HD][2N]`); the reverse's covector of its raw read (`[S][T][HD][W]`) and the top's
@@ -1184,14 +1176,11 @@ impl<'c> TowerCard<'c> {
             hd_scale: card.alloc(q * hd)?,
             hd_face: card.alloc(q * hd * 2 * n)?,
             tr_read: card.alloc(q * hd * w)?,
-            tr_scale: card.alloc(q * hd)?,
             hd_list: card.alloc(s * hd * t)?,
             hd_count: card.alloc(s * hd)?,
             hd_close: card.alloc(s * hd * t * 4)?,
             hd_g: card.alloc(q * hdd)?,
             hd_dread: card.alloc(q * hd * w)?,
-            tr_dov: card.alloc(q * hd * w)?,
-            hd_closer: card.alloc(q * hd)?,
             ah_read: card.alloc(q * hd * w)?,
             ah_scale: card.alloc(q * hd)?,
             ah_face: card.alloc(q * hd * 2 * n)?,
@@ -1363,14 +1352,11 @@ impl<'c> TowerCard<'c> {
             hd_scale: frame.hd_scale.device_ptr(),
             hd_face: frame.hd_face.device_ptr(),
             tr_read: frame.tr_read.device_ptr(),
-            tr_scale: frame.tr_scale.device_ptr(),
             hd_list: frame.hd_list.device_ptr(),
             hd_count: frame.hd_count.device_ptr(),
             hd_close: frame.hd_close.device_ptr(),
             hd_g: frame.hd_g.device_ptr(),
             hd_dread: frame.hd_dread.device_ptr(),
-            tr_dov: frame.tr_dov.device_ptr(),
-            hd_closer: frame.hd_closer.device_ptr(),
             r_hd_face_re: r(32),
             r_hd_face_im: r(33),
             r_hd_dread: r(34),
@@ -1484,7 +1470,7 @@ impl<'c> TowerCard<'c> {
     }
 
     fn heading_shared(shape: &Shape) -> usize {
-        [16 * 32, 8 * 32, 8 * shape.width, 8 * shape.width].iter().map(|&o| carve(o)).sum()
+        [16 * 32, 8 * 32, 8 * shape.width].iter().map(|&o| carve(o)).sum()
     }
 
     fn ahead_shared(shape: &Shape) -> usize {
