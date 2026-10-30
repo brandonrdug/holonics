@@ -615,3 +615,38 @@ only at the saddle, and an opened pair has none, so a founded pair is two contac
 one-step opening (§4): 194 entries a pair. The free copies stalled at `c4a9604dc` from an opening at
 `θ̂`; from one step they are acceptance 6 again, against the same control hour, which is unchanged
 to the bit at every founding law.
+
+**§5 acceptance 6 at `4af249911`, the free copies read below their control from lap 6** (October 30,
+RTX 4080 SUPER, alone on the card). The paired parity at that head first: 98,304 faces, 19,075,104
+gradient entries and every learner equal, all 32 split lines equal, 26 foundings admitted, the
+largest parting between founded copies 94,288 at section 32; wall 38.3 s, peak resident set
+1,922,612 KiB. The founding race then ran its hour, 17 laps in 3,460.0 s (the control: 19 in
+3,434.7 s). Lap 0 founded 191, 145, 184 and 199 pairs at levels 0 to 3 and lap 1 the last 65, 111, 72
+and 57; from lap 2 no pair was dormant. Lap 0's halvings reached 240 by section 224 against the 422
+its stop allowed; laps 13 and 16 did not halve. Lap 0's largest parting was 10,937,632. A lap took
+183 to 200 s from lap 12 (lap 0, with its foundings, 317.1 s), against the control's 164 to 174 s.
+Held-out bits a byte:
+
+```text
+lap          0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16
+free     2.248 2.094 2.032 1.989 1.954 1.939 1.913 1.902 1.887 1.876 1.860 1.848 1.845 1.846 1.839 1.824 1.824
+dormant  2.228 2.079 2.013 1.988 1.973 1.931 1.936 1.908 1.902 1.881 1.867 1.859 1.851 1.849 1.846 1.835 1.832
+```
+
+- **The claim holds by 0.007.** Over the free copies' last five laps (12 to 16) they read 1.836 on
+  average against the control's 1.843 over the same laps.
+- **The opening is slower and the rest is below, by less than the swing.** Laps 0 to 2 read 0.015
+  to 0.020 above the control. From lap 6 every lap reads below it, by 0.003 to 0.023 (0.009 on
+  average over laps 6 to 16), the first founding law to do so lap after lap; a lap's own rise or
+  fall reaches 0.02.
+- **The writing is the four-level tower's kind.** Lap 16's six releases are pastiches of the
+  records (headings, grades, owner lines, code blocks of invented symbols) and GSM8K problems whose
+  calculator lines are shaped right and computed wrong (`<<6*12=84>>48`); no sentence carries a
+  subject from one line to the next. Lap 16 read 1.664 in training and 1.761 on GSM8K.
+
+**Decision** [agent-inferred, October 30]. The free copies are lawful on the card and earn a small,
+steady lead after the opening; the split stays an owner at the four-level pair declaration, and
+joins C′ only with the pairing's lift of the passage, still owed. What it grows is the local game's
+capacity: a body that founds more contacts plays the same local game at more places, and the
+writing shows no change of kind. The line moves to the coarse level's motive
+([the heading record](2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT_AND_THE_FINE_LEVELS_READ_ITS_HEADING.md)).
