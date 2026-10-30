@@ -5661,8 +5661,10 @@ impl TowerLearner {
         let parts_before = part_codes(&read.faces);
         let code_before: i64 = parts_before.iter().sum();
         let tower = &self.tower;
+        // The split read is formed only while a pair is dormant: with none, the test has no pair to
+        // read and no founding is pending, and the plain reverse's covector is the same.
         let (mut g, split_read) = match &pairs {
-            split::Pairs::Founding(p) => {
+            split::Pairs::Founding(p) if p.dormant() > 0 => {
                 let (g, read) = realization.reverse_split(tower, &opening, classes, compared, p)?;
                 (g, Some(read))
             }
@@ -5826,7 +5828,7 @@ impl TowerLearner {
             halvings += 1;
         };
         // The next founding, proposed on the tower the step left and held for the next section.
-        if let (split::Pairs::Founding(paired), Some(read), Some(out)) = (&mut pairs, split_read, founding.as_mut()) {
+        if let (split::Pairs::Founding(paired), Some(out)) = (&mut pairs, founding.as_mut()) {
             // [agent-inferred, October 30] The score is the code's slope along a split on the
             // tower it was read on, and the step moves the drives both copies share along the
             // same covectors: on the tiny pair tower the step halved most pairs' scores and turned
@@ -5835,16 +5837,18 @@ impl TowerLearner {
             // split is read again on the tower the step left, and the founding is decided on what
             // the step did not take (the effective tension's law: a new coordinate pays only for
             // what the old ones leave). The opening slot then holds the step's tower, which the
-            // carry reads.
-            let read = if slot == Slot::Reread {
-                realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
-                slot = Slot::Opened;
-                realization.reverse_split(&self.tower, &opening, classes, compared, paired)?.1
-            } else {
-                read
-            };
-            paired.pending = self.foundings(paired, &read)?.into_iter().next();
-            paired.turned(&read)?;
+            // carry reads. A section whose founding retired the last dormant pair reads nothing.
+            if let Some(read) = split_read.filter(|_| paired.dormant() > 0) {
+                let read = if slot == Slot::Reread {
+                    realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
+                    slot = Slot::Opened;
+                    realization.reverse_split(&self.tower, &opening, classes, compared, paired)?.1
+                } else {
+                    read
+                };
+                paired.pending = self.foundings(paired, &read)?.into_iter().next();
+                paired.turned(&read)?;
+            }
             out.admitted = opened;
             out.proposed = paired.pending.clone();
             out.dormant = paired.dormant();

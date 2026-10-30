@@ -185,7 +185,10 @@ coordinate, and the feature it laid down was sharper than every other entry's no
 scaled to (§7: the step stalled at lap 0 whether the founded copies then learned on their own or
 held `θ̂`). Opened at one step, the coordinate grows at the rate every other entry learns at. The
 price's value term, which charged the jump, goes with it; the test still charges the coordinate's
-own precision and its address.
+own precision and its address. Once no pair is dormant the test has no pair to read, so a founding
+section forms no split read and no reread on the tower its step left: its covector is the plain
+reverse's, as the split read's is (§7: at `8ffcf37d7` every pair had founded by lap 1, and the
+reads it kept forming doubled each later lap's reverse time).
 
 **Read on the tower it lands on** (agent-inferred, October 30, after the card's first paired parity,
 §7). The score is the code's slope along the split on the tower it was read on, and only there. The

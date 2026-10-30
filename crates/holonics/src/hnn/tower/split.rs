@@ -1011,6 +1011,38 @@ mod tests {
         (paired, directions, learner, states)
     }
 
+    /// Once no pair is dormant the test has no pair to read: a founding section forms no split
+    /// read and no reread, proposes and certifies nothing, its coordinates still learn, and its
+    /// streams carry the tower its step left.
+    #[test]
+    fn a_founding_section_with_no_pair_dormant_reads_no_split() {
+        let streams = parity_streams(33);
+        let (mut learner, mut directions, _, mut states) = paired_on_parity(&streams);
+        for (l, pairs) in directions.levels.iter_mut().enumerate() {
+            for (e, slot) in pairs.iter_mut().enumerate() {
+                let direction = slot.take().expect("a dormant pair");
+                directions.founded.push(FoundedSplit { level: l, pair: e, direction, sign: 1, epsilon: 0, first: 0, second: 0, opened: false });
+            }
+        }
+        assert_eq!(directions.dormant(), 0);
+        directions.admits(&learner.tower).expect("every pair founded");
+        let mut pass = HostPass::default();
+        for k in 8..14 {
+            let opening = states.clone();
+            let parts = parity_section(&streams, k);
+            let (receipt, founding) = learner.section_founding(&mut states, &parts, None, &mut pass, &mut directions).expect("section");
+            assert!(founding.certified.is_none() && founding.proposed.is_none() && founding.confirmed.is_none() && !founding.admitted, "section {k}");
+            assert_eq!((founding.dormant, founding.code_before), (0, receipt.code_before), "section {k}");
+            assert_eq!(Some(founding.largest), directions.founded.iter().map(|f| f.epsilon.abs()).max(), "section {k}");
+            let mut end = opening;
+            for (state, classes) in end.iter_mut().zip(&parts) {
+                learner.tower.read(state, classes).expect("read");
+            }
+            assert_eq!(end, states, "section {k}: the streams carry the tower the step left");
+        }
+        assert!(directions.founded.iter().all(|f| f.opened), "every coordinate's moments opened");
+    }
+
     /// Acceptance 4 (the host's reading): over a mixed passage, each founding is proposed on one
     /// section and certified on the next, which it was not fit on: the receipt confirms it exactly
     /// when its pair's test, read on that section's opening, passes with the proposal's sign; a
