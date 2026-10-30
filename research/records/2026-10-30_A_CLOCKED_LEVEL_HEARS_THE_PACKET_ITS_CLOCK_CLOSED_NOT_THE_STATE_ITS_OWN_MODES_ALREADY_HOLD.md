@@ -2,7 +2,8 @@
 
 Refs #404 #406. Status: [the measurement in §1; the law and its acceptance fixed before the build;
 agent-inferred, October 30; the card's parity and the hour's race measured in §7, whose claim
-failed while a later lead continues under acceptance 8].
+failed; the continuation's claim (acceptance 8) held at all five marks, and C′ is the race's base
+declaration from there].
 Claude (opus), design lead. Read beside
 [the clocked levels' contacts](2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT_AT_EVERY_ARRIVAL_WHILE_ITS_MODES_MOVE_ON_THEIR_OWN_CLOCK.md)
 (whose §9 is §1's measurement) and
@@ -191,3 +192,40 @@ the control. Short of the claim, clocked levels stay out of the race's declarati
 work goes to participation's reach alone (radix record §1). Its projection is 25 laps at the
 hour's largest lap from start to start (183 s, lap 6 to lap 7, with its write), 4,575 s, which is
 its deadline.
+
+**The continuation (acceptance 8 holds)** [measured, RTX 4080 SUPER, October 30]. C′ continued from
+its lap-20 learner at `c6ce14204`, no restart, on the same passage: 2:46 to 2:51 a lap with its
+write, 141.5 to 142.7 s a training pass. Held-out bits a byte:
+
+```text
+lap       21    22    23    24    25    26    27    28    29    30    31    32
+C′     1.882 1.855 1.863 1.861 1.863 1.857 1.848 1.851 1.847 1.852 1.851 1.850
+
+lap       33    34    35    36    37    38    39    40    41    42    43    44    45
+C′     1.840 1.838 1.842 1.862 1.847 1.840 1.845 1.839 1.835 1.845 1.827 1.833 1.820
+```
+
+At the five marks, against the four arrival levels at the same lap:
+
+```text
+lap       25    30    35    40    45
+C′     1.863 1.852 1.842 1.839 1.820
+four   1.899 1.862 1.857 1.857 1.850
+```
+
+C′ reads below at every mark, by 0.036, 0.010, 0.015, 0.018 and 0.030; at lap 45 its training
+reading is 1.679 against 1.691 and its GSM8K region 1.751 against 1.800. Its writing at lap 45 is
+the four-level tower's kind: markdown and GSM8K shapes with invented words and wrong arithmetic. The
+lead holds through the four-level tower's whole run without a rise past it at any mark, so the claim
+is met and the clocked levels with the passage and the packets are the race's base declaration from
+here [agent-inferred].
+
+**The deadline.** The run's loop checked its 4,575 s deadline before each lap only, so a 26th lap
+began 51 s before the deadline and ended 2:38 past it (lap 46, exit 0). It is outside the declared
+run and is not read here. A loop that checks the deadline against the projected end of its next unit,
+not its start, keeps the stop rule (the waiting standard: a run that passes its projection stops).
+
+**What it leaves.** The pair contact's race (the pair record §3) stays at the four-level declaration
+its claim was fixed at, since it compares contact laws there. The founded split cannot yet join C′:
+the pairing's lift of the passage is owed (`Tower::paired` refuses a tower with the passage), and
+it is the next step of the split once its own race reads.
