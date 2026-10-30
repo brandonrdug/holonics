@@ -3,8 +3,9 @@
 Refs #404 #406. Status: [the measurement in §1; the law and its acceptance fixed before the build;
 built on the host and the card, acceptances 1 to 3 met (§6); the race (4) failed its claim (§7);
 the passage now joins only the levels a news clock holds, and the clock begins above the arrival
-stack (§8), built on the host (acceptances 1 and 2), whose card parity and race are owed;
-agent-inferred, October 29 and 30].
+stack (§8), built on the host and the card, acceptances 1 to 4 met; the race (§9) shows the two
+clocked levels cost less than two arrival levels but do not yet pay against the four-level tower
+beneath them; agent-inferred, October 29 and 30].
 Claude (opus), design lead. Read beside
 [the coarse level's sites](2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS_CARRIED_ACROSS_SECTIONS_SO_ITS_HEADS_REACH_ACROSS_THE_PASSAGES_PARTITION.md)
 (whose acceptance 7 is §1's measurement), [the news clock](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md)
@@ -264,3 +265,58 @@ consumer* (the passage at the arrival levels is retired before the stacked clock
 *a refusal answered with a larger limit* (the window rule stopped A and B at lap 9 and neither was
 relaunched).
 
+## 9. The race of the stacked clock (October 30)
+
+[measured, RTX 4080 SUPER, at `53d99a06e`] **Card parity (acceptance 3).** `tower_pass` 41 of 41.
+The race's declaration, six levels clocked from level 4 with the passage, is equal host against
+card: 32 sections at 24 streams (98,304 faces, 16,400,416 covector entries) and 4 at 320 (163,840
+faces, 2,050,052 entries), every learner equal; four levels clocked from level 1 equal too.
+
+**The race (acceptance 4).** C and E raced together for the hour from about 02:18 UTC, as §8
+declares them, until the session that held the card closed (neither stopped by the window rule or
+an error; C was in lap 5, E had read lap 5). Held-out bits a byte, beside the plain four-level
+tower of §7 (the same four arrival levels as C, without the two clocked levels above them):
+
+| lap | plain, 4 levels | E, 6 plain levels | C, 4 levels + 2 clocked | C − plain 4 |
+|---|---|---|---|---|
+| 0 | 2.356 | 2.627 | 2.356 | 0.000 |
+| 1 | 2.139 | 2.293 | 2.156 | 0.017 |
+| 2 | 2.060 | 2.128 | 2.070 | 0.010 |
+| 3 | 2.020 | 2.059 | 2.032 | 0.012 |
+| 4 | | 2.021 | 1.999 | |
+| 5 | 1.970 | 1.986 | | |
+
+On GSM8K at lap 4, C read 1.974 and E 1.993. A training pass took C 276 to 282 s on the card, E
+256 to 350 s, and the four-level tower 166 s.
+
+**Acceptance 4 passes as fixed**: C reads better than E at every lap, 0.137 at lap 1 and 0.027 at
+lap 3, so a clocked level costs less than an arrival level at the same place. The gap narrows (0.271,
+0.137, 0.058, 0.027, 0.022), and E's own deficit to the four-level tower narrows too (0.154, 0.068,
+0.039, 0.016): at this declaration two levels above four, clocked or not, slow the opening laps and
+add nothing the hour reads. Against the four-level tower C reads the same at lap 0 and 0.010 to
+0.017 worse after, for 1.7 times the card time. The claim fixed in §8 compared C with the wrong
+control for the question the plan asks (whether clocked levels earn their place); the four-level
+tower is that control, and C does not pass it.
+
+**The writings** (lap 4, one prompt from the repository's prose and one GSM8K problem each, read
+whole outside the repository because one continues a GSM8K problem). Both write invented words in
+the corpus's shapes and neither computes. On the GSM8K prompt C kept the problem's form to the end
+(worked lines, the bracketed computations, the answer marks), where E returned to repository prose
+within a few lines. One row each: a reading, not a measurement.
+
+**Where the card time goes** [agent-inferred, read from `kernels/tower.cu`]. A clocked level
+computes its pushes, gate, turn and pump at every arrival and takes its step only on its ticks
+(`for (j = 0; j < tk[l]; j++)`), so between ticks its projections are computed and discarded; its
+contacts, which hear every arrival, are the only part of it the arrival needs. That is why C costs
+what E does. A clocked level between ticks owes only its contacts.
+
+**The next loop** [agent-inferred]. The clocked levels receive the fine state `h_close`, whose part
+`T_P h_open` their own modes already hold. The radix record's packet input `x_P = Read(m_P)`,
+`m_P = h_close(P) − T_P h_open(P)`, gives them only what the clock's packet closed; it is the
+change that could make them pay, and its race is against the four-level tower. The card's step
+between ticks is cut to the contacts in the same loop, so the race reads the time the clocked levels
+actually cost.
+
+The recorded failures this section guards against: *bits read as progress* (a claim that passed
+is read against the control the plan's question needs, not only the one it fixed); *a refusal
+answered with a larger limit* (neither run was relaunched to read further laps).
