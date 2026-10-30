@@ -5422,22 +5422,6 @@ fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     fewer_bits_exact(old, new)
 }
 
-/// [definition; agent-inferred, October 30] **The certificate with a price**: `new` codes fewer
-/// bits than `old` by more than `price` (bits, given from above). The readings lie below each
-/// `log₂` by less than their slack, so the gain is read from below; a gain inside the slack of the
-/// price is refused, as a tie is (a founding pays its description: [`split::price_bits`]).
-fn fewer_bits_by(old: &[(u128, u128)], new: &[(u128, u128)], price: &crate::ratio::Rat) -> bool {
-    if old.len() != new.len() || old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
-        return false;
-    }
-    let side = |faces: &[(u128, u128)]| -> i128 { faces.iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
-    let gain = side(new) - side(old);
-    let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
-    let scale = crate::ratio::Rat::from_integer(num_bigint::BigInt::from(1) << CERTIFICATE_DIGITS);
-    let Some(price) = num_traits::ToPrimitive::to_i128(&(price * scale).ceil().to_integer()) else { return false };
-    gain - slack > price
-}
-
 /// A decision the readings made. Built with the `certificate-check` feature, it is compared with the
 /// products and a disagreement stops the run: the acceptance read that the partition decides as the
 /// products do on every call of a whole pass. Without the feature it is the decision.
@@ -5644,13 +5628,14 @@ impl TowerLearner {
     }
 
     /// [definition; agent-inferred, October 30] **A section on paired contacts that founds their
-    /// splits** ([`split`]): the founding the section before proposed is certified on this
-    /// section's opening, read with and without it, and deposits only where it codes fewer bits by
-    /// more than its price; the section then steps from the tower the certificate leaves, every pair
-    /// (dormant or founded) depositing as one contact, and its reverse also forms the split read. After the step's
-    /// certificate the split is read again on the tower the step left (where it deposited), the pair
-    /// the rank-one test admits there is proposed and held for the next section, and each other
-    /// dormant pair's direction turns on that read.
+    /// splits** ([`split`]): the section steps with every pair (dormant or founded) depositing as
+    /// one contact and each founded coordinate on its own moments in its drives' chart; its reverse
+    /// also forms the split read, on which the founding the section before proposed is certified
+    /// (its pair's test passes again, with the proposal's sign, on material it was not fit on), and
+    /// a certified founding's coordinate opens at one step of its chart, carried by this section's
+    /// step. After the step's certificate the split is read again on the tower the step left (where
+    /// it deposited), the pair the rank-one test admits there is proposed and held for the next
+    /// section, and each other dormant pair's direction turns on that read.
     pub fn section_founding(&mut self, states: &mut [TowerState], classes: &[&[usize]], compared: Option<&[&[Option<usize>]]>, realization: &mut dyn PassRealization, paired: &mut split::PairedContacts) -> Result<(SectionReceipt, split::FoundingReceipt)> {
         let (receipt, founding) = self.section_inner(states, classes, compared, realization, split::Pairs::Founding(paired))?;
         Ok((receipt, founding.ok_or(TowerError::Refused("a founding section returns its founding"))?))
@@ -5669,43 +5654,12 @@ impl TowerLearner {
         let opening: Vec<TowerState> = states.to_vec();
         let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
         self.swell = read.swell;
-        let mut faces_old: Vec<(u128, u128)> = read.faces.iter().flatten().flatten().copied().collect();
+        let faces_old: Vec<(u128, u128)> = read.faces.iter().flatten().flatten().copied().collect();
         let part_codes = |faces: &[Vec<Option<(u128, u128)>>]| -> Vec<i64> { faces.iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).collect() };
         // The section's code is read before any founding or step it decides, so a training code
         // stays the opening's.
         let parts_before = part_codes(&read.faces);
         let code_before: i64 = parts_before.iter().sum();
-        let mut parts_old = parts_before.clone();
-        // [agent-inferred, October 30] The founding the section before proposed, certified on this
-        // section, which it was not fit on (`split`'s header): read with the split, it deposits only
-        // where the section codes fewer bits by more than the coordinate's price, and the section
-        // then steps from the founded tower.
-        let mut founding = None;
-        if let split::Pairs::Founding(paired) = &mut pairs {
-            let mut out = split::FoundingReceipt { code_before, reread: code_before, ..Default::default() };
-            if let Some(proposed) = paired.pending.take() {
-                let (width, dormant) = (self.tower.declaration.width, paired.dormant());
-                let candidate = self.tower.found_splits(paired, std::slice::from_ref(&proposed))?;
-                let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
-                let faces_new: Vec<(u128, u128)> = reread.faces.iter().flatten().flatten().copied().collect();
-                out.reread = part_codes(&reread.faces).iter().sum();
-                out.admitted = fewer_bits_by(&faces_old, &faces_new, &split::certified_price(&proposed, width, dormant)?);
-                if out.admitted {
-                    self.tower = candidate;
-                    paired.levels[proposed.level][proposed.pair] = None;
-                }
-                // The reverse reads the opening forward of the tower it steps from, and a realization
-                // need not keep an opening read across a reread (the card's temporaries are one
-                // frame), so the opening is read again whether the founding was admitted or not.
-                let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
-                self.swell = read.swell;
-                faces_old = read.faces.iter().flatten().flatten().copied().collect();
-                parts_old = part_codes(&read.faces);
-                out.certified = Some(proposed);
-            }
-            founding = Some(out);
-        }
-        let code_old: i64 = parts_old.iter().sum();
         let tower = &self.tower;
         let (mut g, split_read) = match &pairs {
             split::Pairs::Founding(p) => {
@@ -5713,6 +5667,12 @@ impl TowerLearner {
                 (g, Some(read))
             }
             _ => (realization.reverse(tower, &opening, classes, compared)?, None),
+        };
+        // Each founded coordinate's covector, read from its copies' own drive covectors before
+        // they are tied below.
+        let split_g = match &pairs {
+            split::Pairs::Founding(p) => p.split_covectors(tower, &g)?,
+            _ => Vec::new(),
         };
         // Every pair, dormant or founded, deposits as one contact (`split`'s header): its drives'
         // copies take their covectors' sum, and its return parts their covectors' mean, which steps
@@ -5761,9 +5721,48 @@ impl TowerLearner {
         for &(_, b) in &returns {
             step[b] = 0;
         }
+        // [agent-inferred, October 30] The founded coordinates step in their drives' chart, on
+        // their own moments, as a drive entry does; and the founding the section before proposed
+        // is certified on this section, which it was not fit on (`split`'s header): its pair's test
+        // read on this section's opening must pass with the proposal's sign, and its coordinate
+        // then opens at one step of that chart (the step a moment of ratio one takes), carried by
+        // this section's step and released with it.
+        let unit = deposit_over(1, 1, MATERIAL_BITS, self.rate_bits);
+        let mut founding = None;
+        let mut opens: Option<split::FoundedSplit> = None;
+        let mut split_steps: Vec<i128> = Vec::new();
+        if let split::Pairs::Founding(paired) = &mut pairs {
+            for (f, &gv) in paired.founded.iter_mut().zip(&split_g) {
+                let gv = on_step_grain(MATERIAL_BITS, gv);
+                let square = gv.checked_mul(gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+                if f.opened {
+                    f.first = toward(f.first, gv, FIRST_RATE);
+                    f.second = toward(f.second, square, SECOND_RATE);
+                } else {
+                    (f.first, f.second, f.opened) = (gv, square, true);
+                }
+            }
+            split_steps = paired.founded.iter().map(|f| deposit_step(f.first, f.second, MATERIAL_BITS, self.rate_bits)).collect();
+            let mut out = split::FoundingReceipt { code_before, ..Default::default() };
+            if let Some(proposed) = paired.pending.take() {
+                let (width, dormant) = (self.tower.declaration.width, paired.dormant());
+                let (level, pair) = (proposed.level, proposed.pair);
+                let read = split_read.as_ref().and_then(|r| r.levels.get(level)).and_then(|l| l.get(pair)).ok_or(TowerError::Refused("a pending founding's pair has no read"))?;
+                out.confirmed = split::founded(read, width, dormant)?
+                    .filter(|&(theta, _, _)| theta.signum() == proposed.theta.signum())
+                    .map(|(theta, predicted, surplus)| split::Founding { level, pair, theta, predicted, surplus, score: read.score, squares: read.squares });
+                if out.confirmed.is_some() {
+                    let direction = paired.levels[level][pair].clone().ok_or(TowerError::Refused("a pending founding of a pair that is not dormant"))?;
+                    opens = Some(split::FoundedSplit { level, pair, direction, sign: proposed.theta.signum() as i32, epsilon: 0, first: 0, second: 0, opened: false });
+                }
+                out.certified = Some(proposed);
+            }
+            founding = Some(out);
+        }
         // The certificate halves a refused step until it is certified or has released below every
         // family's grain; then the section deposits nothing.
         let mut halvings = 0u32;
+        let mut opened = false;
         let (receipt, mut slot) = loop {
             let mut candidate = self.tower.clone();
             let mut moved = false;
@@ -5784,10 +5783,22 @@ impl TowerLearner {
                 candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
                 candidate.theta[b] = fit32(candidate.theta[b] as i128 - half, "a deposited parameter outgrew its 32-bit carrier")?;
             }
+            if let split::Pairs::Founding(paired) = &pairs {
+                for (f, &q) in paired.founded.iter().zip(&split_steps) {
+                    let released = release(q, halvings);
+                    moved |= released != 0;
+                    candidate.part_split(f.level, f.pair, &f.direction, f.sign, f.epsilon, f.epsilon - released)?;
+                }
+                if let Some(o) = &opens {
+                    let released = release(unit, halvings);
+                    moved |= released != 0;
+                    candidate.part_split(o.level, o.pair, &o.direction, o.sign, 0, released)?;
+                }
+            }
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
-                let parts = parts_before.iter().copied().zip(parts_old.iter().copied()).collect();
-                break (SectionReceipt { cells: faces_old.len(), code_before, code_after: code_old, halvings, deposited: false, parts }, Slot::Opened);
+                let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
+                break (SectionReceipt { cells: faces_old.len(), code_before, code_after: code_before, halvings, deposited: false, parts }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -5797,6 +5808,19 @@ impl TowerLearner {
                 let code_after: i64 = parts_after.iter().sum();
                 let parts = parts_before.iter().copied().zip(parts_after).collect();
                 self.tower = candidate;
+                if let split::Pairs::Founding(paired) = &mut pairs {
+                    for (f, &q) in paired.founded.iter_mut().zip(&split_steps) {
+                        f.epsilon -= release(q, halvings);
+                    }
+                    if let Some(mut o) = opens.take() {
+                        o.epsilon = release(unit, halvings);
+                        if o.epsilon != 0 {
+                            paired.levels[o.level][o.pair] = None;
+                            paired.founded.push(o);
+                            opened = true;
+                        }
+                    }
+                }
                 break (SectionReceipt { cells: faces_old.len(), code_before, code_after, halvings, deposited: true, parts }, Slot::Reread);
             }
             halvings += 1;
@@ -5821,8 +5845,10 @@ impl TowerLearner {
             };
             paired.pending = self.foundings(paired, &read)?.into_iter().next();
             paired.turned(&read)?;
+            out.admitted = opened;
             out.proposed = paired.pending.clone();
             out.dormant = paired.dormant();
+            out.largest = paired.founded.iter().map(|f| f.epsilon.abs()).max().unwrap_or(0);
         }
         realization.carry(&self.tower, states, &opening, slot)?;
         Ok((receipt, founding))

@@ -3635,14 +3635,17 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 Some(directions) => learner.section_founding(&mut states, &parts, slices.as_deref(), realization, directions).map(|(receipt, founding)| {
                     proposed += usize::from(founding.proposed.is_some());
                     // A founding proposed on the section before, certified on this one: its
-                    // predicted change on the section it was read on, and its change on this one.
+                    // predicted change on the section it was read on, the same test's on this
+                    // one (`refused` where it did not pass with the proposal's sign), whether its
+                    // coordinate opened, and the founded coordinates' largest `|ε|` on `2^(−24)`.
                     if let Some(f) = &founding.certified {
                         if founding.admitted {
                             admitted[f.level] += 1;
                         }
+                        let confirmed = founding.confirmed.as_ref().map_or_else(|| "refused".to_string(), |c| signed_bits(c.predicted));
                         println!(
-                            "TOWER_FOUNDING pass={} section={} level={} pair={} predicted_bits={} certified_bits={} admitted={} dormant={}",
-                            pass, k + 1, f.level, f.pair, signed_bits(f.predicted), signed_bits(founding.reread - founding.code_before), founding.admitted, founding.dormant
+                            "TOWER_FOUNDING pass={} section={} level={} pair={} predicted_bits={} confirmed_bits={confirmed} admitted={} dormant={} largest_epsilon={}",
+                            pass, k + 1, f.level, f.pair, signed_bits(f.predicted), founding.admitted, founding.dormant, founding.largest
                         );
                     }
                     receipt

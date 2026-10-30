@@ -147,34 +147,45 @@ refused, as the test refuses chance. The second drive opens at zero material, so
 founded scale of its own; it is the first drive's family opened at its center, and its components
 take the first drive's variance (agent-inferred).
 
-**The split's map.** A founded pair opens its coordinate at the posterior mean,
-`θ̂ = −ln 2 · g / (τ + σ)`, with `ε = √|θ̂|` on the material's grain:
+**The split's map.** A founded pair's coordinate is its half-difference `ε` along the direction it
+was founded on, with `s = sgn θ̂` its tests' sign, on the material's grain:
 
 ```text
-W_a[o] += ε v,  W_a[o+f] −= ε v,   W_b[o] += sgn(θ̂) ε v,  W_b[o+f] −= sgn(θ̂) ε v
-⇒  ½c(a + δa)(b + δb) + ½c(a − δa)(b − δb) = c(ab + θ̂ φ)
+W_a[o] = W_a + ⟦ε v⟧,  W_a[o+f] = W_a − ⟦ε v⟧,   W_b[o] = W_b + s⟦ε v⟧,  W_b[o+f] = W_b − s⟦ε v⟧
+⇒  ½c(a + δa)(b + δb) + ½c(a − δa)(b − δb) = c(ab + s ε² φ)
 ```
 
-The face moves by `c θ̂ φ`, second order in `ε` and downhill by the score, with a predicted fit
-change of `−(ln 2 · g)²/(2(τ + σ))` nats. A founded pair carries no direction afterwards, and it
-deposits as one contact with its split held (above).
+The face moves by `c s ε² φ`, second order in `ε`, so `ε = 0` is a saddle of the code: its covector
+there is zero (`∂ℓ/∂ε = 2 s ε g`). The tied steps move both copies alike, so the chart is exact: a pair
+opened from its tied copies carries `±⟦ε v⟧` at every `ε` it has moved to. The test's line,
+`θ̂ = −ln 2 · g / (τ + σ)` with predicted change `−(ln 2 · g)²/(2(τ + σ))` nats, is what the test
+reads; it is not where the coordinate is put (below).
 
-**The certificate pays the price on the next section** (agent-inferred, October 30; revised after
-acceptance 6's lap 0, §7). The test above only proposes, and the proposal is held. At the next
-section's opening, before its own step, that section is read with and without the split; the split
-deposits only where the section codes fewer bits under it by more than the coordinate's Laplace
-price, `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2` bits, with `σ = ln²2 · S` read at `ln 2`'s head. A
-bare "fewer bits" would admit a coordinate that lowers the code by less than its own description.
-The section then steps from the tower the certificate leaves, and the training code is the opening's
-code without the split, read before the decision. While a founding is pending its pair's direction is
-held, so the split that deposits is the one its score read. A pending founding at a pass's end is
-released before the directions rest. The certificate costs one forward a section that holds a
-proposal, and a second where it admits one (the reverse reads the opening forward of the tower it
-steps from). (The first build certified the founding on the section it was fit on, at `θ̂` and then
-at the measured line's mode. At 40,960 cells a section `ln²2 · S` is far above `τ`, so `θ̂` was
-nearly that section's own Newton step along the new coordinate, and the price grows only with the
-logarithm of the section: 725 of 726 proposals passed, and the race's training code read 0.077 bits
-a byte above the control's.)
+**The certificate is the test again, on the next section** (agent-inferred, October 30; revised
+twice after acceptance 6's lap 0, §7). The test above only proposes, and the proposal is held. The
+next section's reverse forms the split read on its opening, before its own step, and the founding is
+certified where its pair's test passes there again with the proposal's sign: on material it was not
+fit on, the coordinate is still worth its own code and its address among the dormant pairs. The
+certificate costs nothing beyond the section's own reverse. While a founding is pending its pair's
+direction is held, so the coordinate that opens is the one its scores read. A pending founding at a
+pass's end is released before the directions rest.
+
+**The coordinate opens at one step and descends** (agent-inferred, October 30, after the second lap
+0 stall, §7). A certified coordinate opens at one step of its chart, the step a moment of ratio one
+takes at the learner's rate (`2^(24−k)` on `2^(−24)` at rate `2^(−k)`), carried by the certifying
+section's step and released by its halvings with it; it opens only where that step deposits. From
+then on it learns as a drive entry does: its covector `∂ℓ/∂ε = v·(G_a[o] − G_a[o+f]) + s v·(G_b[o]
+− G_b[o+f])` is read from the copies' own drive covectors before they are tied, its moments open
+on its first covector and move at the drives' rates, and its step is the drives' deposit step,
+halved with the section's. The covector grows it while the score keeps the tests' sign and returns
+it toward zero when the score turns. Before this, the founding deposited at `θ̂`, certified by its
+reread code falling past the Laplace price `(½ τ θ̂² + ½ ln(1 + σ/τ) + ln K)/ln 2`; at 40,960 cells
+a section `ln²2 · S` is far above `τ`, so `θ̂` was nearly the section's own Newton step along the new
+coordinate, and the feature it laid down was sharper than every other entry's normalized step was
+scaled to (§7: the step stalled at lap 0 whether the founded copies then learned on their own or
+held `θ̂`). Opened at one step, the coordinate grows at the rate every other entry learns at. The
+price's value term, which charged the jump, goes with it; the test still charges the coordinate's
+own precision and its address.
 
 **Read on the tower it lands on** (agent-inferred, October 30, after the card's first paired parity,
 §7). The score is the code's slope along the split on the tower it was read on, and only there. The
@@ -191,7 +202,7 @@ step's tower again.
 
 **One founding a section**: of the pairs the test admits, the one with the largest surplus of fit
 over price. The address `ln K` already charges the choice. Several founded together share the face,
-their predictions do not add, and one reread cannot read their lines apart (measured: §7).
+their predictions do not add, and one test reads one coordinate's line (measured: §7).
 
 **On the card.** The reverse forms, per level and dormant pair, `y = v·r̂`, the score's sum and its
 squares, and the turned sum. The host decides the founding and maps the split, as it decides the
@@ -518,3 +529,40 @@ drives keep the summed covector, so its copies keep the difference `±ε v` the 
 and its return parts step once on their covectors' mean. A dormant pair's parts read the same
 conduction, so the mean is either part's covector and the control is unchanged to the bit. The
 founding deposits the one coordinate its price paid for, held at its certified value.
+
+**§5 acceptance 6 at `c77196e66`, the held split stopped in lap 0** (October 30, RTX 4080 SUPER,
+alone on the card; incomplete). The paired parity at that head first: 98,304 faces, 19,075,104
+gradient entries and every learner equal, 21 foundings admitted. The founding race then stopped
+early as its declaration required: by section 224 its certificate had halved the step 821 times
+against the 422 its stop allowed (107 in sections 193 to 224), where the dormant control halved 211
+times in the same sections, and its training code read 3.626 bits a byte in the window ending at
+section 224 against the control's 2.777. It proposed foundings at every level and admitted 202 (level
+0: 42 proposed, 30 admitted; level 1: 9, 6; level 2: 55, 55; level 3: 116, 111). (The run's queue
+then started the control by mistake; it was stopped, and its partial log is not a reading.)
+
+- **Every admitted founding paid on its section, and the run lost.** The first, at sections 3 to
+  10, certified falls of 1,773, 2,996, 11,157, 8,481 and 8,968 bits on their sections; from section
+  161 to 223 they certified falls of 19 to 510 bits. Each fall is read against the unfounded tower
+  on the section it was certified on; the run's training code still read 0.85 bits a byte above the
+  control's at section 224.
+- **The founded drives outgrew every trained drive, and the levels above stopped learning.** At
+  section 32 the largest entries of the pair's second drive read 6,705,278, 2,582,342, 8,220,268 and
+  6,976,131 on `2^(−24)` at levels 0 to 3 against the control's 2,324,635, 982,820, 1,363,235 and
+  1,185,143 (first drive: 9,318,812, 6,953,195, 11,457,570 and 10,200,031 against 5,973,611,
+  5,667,957, 5,749,887 and 5,728,829), and they held there to section 224, the founded entries the
+  largest. Through those
+  sections level 3's largest read went from 2,243,958 to 2,256,606 and its push from 2,840,309 to
+  3,037,411, where the control's went from 2,507,854 to 5,681,443 and from 2,905,058 to 7,395,731;
+  level 2's read went from 2,186,561 to 3,434,308 against the control's 2,414,254 to 6,427,906.
+- **The cause** [inferred from these readings, not located entry by entry]. A founding deposited
+  at `θ̂`, nearly its section's own Newton step, lays a quadratic feature `c θ̂ φ` that in the first
+  sections carried up to 11,157 bits of a section's code. Its curvature along the read it shares
+  grows with `θ̂²`, while every other entry steps by the learner's normalized step, which is scaled
+  to its own moments and not to that curvature; the certificate, one halving for every entry,
+  then halves the whole step until the sharpest direction is satisfied. Held at `θ̂` the pair
+  halved the step about 3.3 times a section; its copies freed, about 4.3 times.
+
+*The repair* (§4). A certified founding opens its coordinate at one step of its drives' chart and
+descends on its own moments as a drive entry does, so its feature grows at the rate every other
+entry learns at. Its certificate is the test read again on the next section, which costs no forward
+and no reverse of its own.
