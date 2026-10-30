@@ -117,6 +117,9 @@ struct LevelWords {
     /// Participation's families and the first nine's reaches (zero without it).
     pa: [u64; 10],
     pa_reach: [u64; 9],
+    /// The passage's `W₁ˣ` and its reach (zero without it).
+    passage: u64,
+    passage_reach: u64,
 }
 
 /// The law's words (`TowerLaw`).
@@ -185,6 +188,10 @@ struct LawWords {
     /// holds its geometry `J` (`W × W`) ([`Tower::join_mutual_contact`]).
     mutual: u32,
     mutual_shift: u32,
+    /// The passage (`passage = 0` without it): every level's contacts read the passing current
+    /// through `W₁ˣ` ([`Tower::join_passage`]).
+    passage: u32,
+    pad2: u32,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -394,6 +401,9 @@ struct Shape {
     carried: usize,
     /// One under the mutual contact, else zero.
     mutual: usize,
+    /// One when the passage is joined, else zero: each level then transposes `W₁ˣ` beside its
+    /// other families.
+    passage: usize,
 }
 
 impl Shape {
@@ -676,6 +686,7 @@ impl<'c> TowerCard<'c> {
         if d.levels == 0 || d.levels > MAX_LEVELS {
             return refuse("the card carries one to four levels");
         }
+
         if let Some(clock) = &law.news {
             if law.ring.is_some() {
                 return refuse("the card carries no ring beside a news clock");
@@ -772,6 +783,7 @@ impl<'c> TowerCard<'c> {
             words.pa_held_log = law.held_log;
             words.ln2 = law.ln2 as i64;
         }
+        words.passage = u32::from(law.passage);
         if let Some(b) = law.mutual {
             words.mutual = 1;
             words.mutual_shift = b;
@@ -801,6 +813,8 @@ impl<'c> TowerCard<'c> {
                 reach: lv.reaches,
                 pa: lv.participation.map(|v| v as u64),
                 pa_reach: lv.participation_reaches,
+                passage: lv.passage as u64,
+                passage_reach: lv.passage_reach,
             };
         }
         words
@@ -829,6 +843,9 @@ impl<'c> TowerCard<'c> {
                 for (offset, rows, cols) in [(p[0], n, w), (p[1], n, w), (p[2], n, w), (p[3], n, w), (p[4], n, w), (p[5], n, w), (p[6], w, n), (p[7], w, n), (p[8], f, w)] {
                     out.extend([offset as u64, rows, cols]);
                 }
+            }
+            if law.passage {
+                out.extend([lv.passage as u64, f, w]);
             }
         }
         if let Some(strands) = &law.strands {
@@ -866,7 +883,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa) * l + stranded * (1 + paired)))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa + shape.passage) * l + stranded * (1 + paired)))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -1287,7 +1304,7 @@ impl<'c> TowerCard<'c> {
                 return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: usize::from(law.passage) };
         self.frame(shape).map_err(device)?;
         let words = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
@@ -1652,6 +1669,10 @@ impl<'c> TowerCard<'c> {
                 out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yre, lu), l, w, n, false, gradient(lv.pa[6]), None), true));
                 out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n + n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yim, lu), l, w, n, true, gradient(lv.pa[7]), None), true));
             }
+            // The passage: `W₁ˣ` takes the drives' covector against the level's input.
+            if law.passage != 0 {
+                out.push((family(at64(fw.da, lu * f), l * f, at32(fw.input, lu * w), l * w, at64(fw.r_da, lu), at64(fw.r_input, lu), l, f, w, false, gradient(lv.passage), None), false));
+            }
         }
         // The strands' materials take their level's drives' covectors against the faces,
         // `Σ δa sᵀ` and `Σ δb sᵀ`; the faces carry none.
@@ -1816,7 +1837,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

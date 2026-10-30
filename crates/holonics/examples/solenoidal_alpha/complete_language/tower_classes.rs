@@ -94,6 +94,14 @@ pub(crate) fn train_participating_realized(args: &[String], news: Option<NewsClo
     train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Participation, realization)
 }
 
+/// `train-two-ladder-passage-tower-classes`: [`train_realized`] on both turn ladders with the
+/// passage joined at the founding, so every level's contacts read the passing current;
+/// `train-two-ladder-news-passage-tower-classes` joins the race's news clock first (record
+/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`).
+pub(crate) fn train_passage_realized(args: &[String], news: Option<NewsClock>, realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, news, Joined::Passage, realization)
+}
+
 /// `train-two-ladder-mutual-tower-classes`: [`train_realized`] on both turn ladders with the mutual
 /// contact joined at the founding.
 pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {

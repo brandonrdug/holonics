@@ -1,11 +1,12 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating] | participating | mutual]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating | passage] | participating | mutual | passage]`:
 //!   founds the gated tower (rectifying, on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock(NEWS_BITS, NEWS_RADIX)` when one is named, with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
-//!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, and runs
+//!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
+//!   the passage joined last (`Tower::join_passage`) when `passage` is, and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face and the whole summed covector entry by entry, then both learners take the section (the
@@ -22,7 +23,7 @@
 //!   trainer reads it.
 //! - `tower_pass train complete-language ARGS…`: a `complete-language` tower training command
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-passage-tower-classes`, `train-two-ladder-news-passage-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
@@ -73,11 +74,12 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    let participating = (args.len() == 13 || args.len() == 15) && args[args.len() - 1] == "participating";
+    let last = |word: &str| (args.len() == 13 || args.len() == 15) && args[args.len() - 1] == word;
+    let (participating, passage) = (last("participating"), last("passage"));
     let mutual = args.len() == 13 && args[12] == "mutual";
     let clocked = args.len() == 14 || args.len() == 15;
-    if !(args.len() == 12 || (clocked && (args.len() == 14 || participating)) || (args.len() == 13 && (participating || mutual))) {
-        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating] | participating | mutual]".into());
+    if !(args.len() == 12 || (clocked && (args.len() == 14 || participating || passage)) || (args.len() == 13 && (participating || mutual || passage))) {
+        return Err("parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [participating | passage] | participating | mutual | passage]".into());
     }
     let bytes = pinned(&args[0], &args[1])?;
     let keys = pinned(&args[2], &args[3])?;
@@ -118,6 +120,10 @@ fn parity(args: &[String]) -> Result<()> {
     if mutual {
         tower.join_mutual_contact(2)?;
         println!("TOWER_MUTUAL_CONTACT shift=2");
+    }
+    if passage {
+        tower.join_passage()?;
+        println!("TOWER_PASSAGE");
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);

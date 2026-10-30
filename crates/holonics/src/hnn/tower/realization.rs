@@ -274,6 +274,10 @@ pub struct ResidentLevel {
     /// nine.
     pub participation: [usize; 10],
     pub participation_reaches: [u64; 9],
+    /// The passage's `W₁ˣ` (`F × d`) and its `max |w|` (each zero without the passage,
+    /// [`Tower::join_passage`]).
+    pub passage: usize,
+    pub passage_reach: u64,
 }
 
 /// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
@@ -459,6 +463,9 @@ pub struct ResidentLaw {
     /// then holds the contact's geometry `J`, `d × d`): a realization that does not carry it refuses
     /// the tower.
     pub mutual: Option<u32>,
+    /// Whether every level's contacts hear the passing current ([`Tower::join_passage`]): a
+    /// realization that does not carry it refuses the tower.
+    pub passage: bool,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -614,6 +621,8 @@ impl Tower {
                 logs,
                 participation: [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im, lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction],
                 participation_reaches: reaches.participation.get(l).copied().unwrap_or([0; 9]),
+                passage: lv.passage,
+                passage_reach: reaches.passage.get(l).copied().unwrap_or(0),
             })
         }))?;
         Ok(ResidentLaw {
@@ -669,6 +678,7 @@ impl Tower {
             news: self.news,
             participation: self.participation.clone(),
             mutual: self.mutual,
+            passage: self.passage,
             held_log: reaches.held_log,
         })
     }
