@@ -1780,8 +1780,8 @@ struct LevelLayout {
     pa_read_im: usize,
     pa_contact: usize,
     pa_friction: usize,
-    /// The contacts' `W₁ˣ` on the passing current (an empty family without the passage,
-    /// [`Tower::join_passage`]).
+    /// The contacts' `W₁ˣ` on the passing current (an empty family without the passage or on a level
+    /// below the clock's first clocked level, [`Tower::join_passage`]).
     passage: usize,
 }
 
@@ -1811,7 +1811,7 @@ struct Layout {
 }
 
 impl Layout {
-    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize, participation: Option<&ParticipationDeclaration>, mutual: bool, passage: bool) -> Self {
+    fn new(d: &TowerDeclaration, forms: usize, ring_ranks: usize, ring_harmonics: usize, strand_parts: usize, participation: Option<&ParticipationDeclaration>, mutual: bool, passage: Option<usize>) -> Self {
         let (a, w, n, f) = (d.alphabet, d.width, d.modes, d.contacts);
         let mut at = 0usize;
         let mut families = Vec::new();
@@ -1902,9 +1902,10 @@ impl Layout {
                 level.pa_friction = take(p.heads.len(), FACE_BITS);
             }
         }
-        // The passage's material follows participation's, so joining it moves no family.
-        if passage {
-            for level in &mut levels {
+        // The passage's material follows participation's, so joining it moves no family; it joins
+        // the levels from the clock's first clocked level, whose modes are held between ticks.
+        if let Some(first) = passage {
+            for level in levels.iter_mut().skip(first) {
                 level.passage = take(f * w, MATERIAL_BITS);
             }
         }
@@ -1950,33 +1951,61 @@ impl Layout {
 /// and the clock's open phase, `S` modulo the coarsest section. `B` and `r` are agent-inferred:
 /// `B = 8`, the news of one octet read with no prediction, and `r = 2`, the least radix whose carry
 /// merges epochs.
+///
+/// [agent-inferred, October 30] **The clock begins above the arrival stack** (record
+/// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, §8). The levels below the
+/// clock's first clocked level `F` tick at every arrival, the arrival's own depth; level `l ≥ F`
+/// ticks at the sections `B r^(l−F)`. `F = 1` is the clock above, where level 0 alone reads every
+/// arrival; on the card at the race's declaration a tower clocked from level 1 read as a one-level
+/// tower (2.365 held out at lap 1, the one-level tower 2.354), so its clocked levels added nothing at the
+/// arrivals they do not tick, while the four arrival levels of the plain tower read 2.139.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NewsClock {
-    /// `B`, level 1's section in whole bits.
+    /// `B`, the first clocked level's section in whole bits.
     pub bits: u32,
     /// `r`, each level's section over the section of the level below it.
     pub radix: u32,
+    /// `F`, the first level that ticks by news; the levels below it tick at every arrival.
+    pub first: u32,
 }
 
 impl NewsClock {
-    /// The clock with level 1's section `bits` and the ratio `radix`; refused at zero.
+    /// The clock with level 1's section `bits` and the ratio `radix`, every level above 0 ticking by
+    /// news; refused at zero.
     pub fn new(bits: u32, radix: u32) -> Result<Self> {
+        Self::above(bits, radix, 1)
+    }
+
+    /// The clock whose first clocked level is `first`, with its section `bits` and the ratio
+    /// `radix`; the levels below `first` tick at every arrival. Refused at zero.
+    pub fn above(bits: u32, radix: u32, first: u32) -> Result<Self> {
         if bits == 0 || radix == 0 {
             return refuse("a news clock's section and ratio are whole and positive");
         }
-        Ok(Self { bits, radix })
+        if first == 0 {
+            return refuse("level 0 reads every arrival: a clock's first clocked level is at least 1");
+        }
+        Ok(Self { bits, radix, first })
     }
 
-    /// Level `l`'s section `B rˡ⁻¹` on the code's grain `2^(−20)` bits (`l ≥ 1`).
+    /// The first level that ticks by news.
+    pub fn first(&self) -> usize {
+        self.first as usize
+    }
+
+    /// Level `l`'s section `B r^(l−F)` on the code's grain `2^(−20)` bits (`l ≥ F`).
     pub fn section(&self, level: usize) -> Result<u64> {
-        let ratio = u32::try_from(level - 1).ok().and_then(|e| u64::from(self.radix).checked_pow(e));
+        if level < self.first() {
+            return refuse("a level below the first clocked level ticks at every arrival and has no section");
+        }
+        let ratio = u32::try_from(level - self.first()).ok().and_then(|e| u64::from(self.radix).checked_pow(e));
         ratio.and_then(|r| (u64::from(self.bits) << READ_BITS).checked_mul(r)).ok_or(TowerError::Refused("a news clock's section outgrew its 64-bit carrier"))
     }
 
     /// The clock's period on a tower of `levels`: the coarsest level's section (one where no level
-    /// above 0 ticks by news).
+    /// ticks by news).
     pub fn period(&self, levels: usize) -> Result<u64> {
-        if levels < 2 {
+        if levels <= self.first() {
             Ok(1)
         } else {
             self.section(levels - 1)
@@ -1995,8 +2024,8 @@ impl NewsClock {
         };
         let sum = news.checked_add(code).ok_or(TowerError::Refused("a news phase outgrew its 64-bit carrier"))?;
         let mut ticks = Vec::with_capacity(levels);
-        ticks.push(1);
-        for l in 1..levels {
+        ticks.resize(self.first().min(levels), 1);
+        for l in self.first()..levels {
             let section = self.section(l)?;
             let advanced = u32::try_from(sum / section - news / section).map_err(|_| TowerError::Refused("an arrival's ticks outgrew their 32-bit carrier"))?;
             ticks.push(advanced);
@@ -2004,16 +2033,21 @@ impl NewsClock {
         Ok((ticks, sum % period))
     }
 
-    /// `news-clock B r` as the tower's text writes it.
+    /// `news-clock B r` as the tower's text writes it, and `news-clock B r F` above level 1.
     fn to_text(self) -> String {
-        format!("news-clock {} {}\n", self.bits, self.radix)
+        if self.first == 1 {
+            format!("news-clock {} {}\n", self.bits, self.radix)
+        } else {
+            format!("news-clock {} {} {}\n", self.bits, self.radix, self.first)
+        }
     }
 
     fn from_text(head: &str) -> Result<Self> {
         let words: Vec<&str> = head.split(' ').collect();
-        let count = |s: &str| s.parse::<u32>().map_err(|_| TowerError::Refused("a news clock's section and ratio are counts"));
+        let count = |s: &str| s.parse::<u32>().map_err(|_| TowerError::Refused("a news clock's section, ratio and first level are counts"));
         match words.as_slice() {
             ["news-clock", bits, radix] => Self::new(count(bits)?, count(radix)?),
+            ["news-clock", bits, radix, first] if *first != "1" => Self::above(count(bits)?, count(radix)?, count(first)?),
             _ => refuse("not a news clock's text"),
         }
     }
@@ -2746,7 +2780,7 @@ impl Tower {
         if d.pumped && !d.turned {
             return refuse("a pumped mode is a turned mode");
         }
-        let layout = Layout::new(&d, 0, 0, 0, 0, None, false, false);
+        let layout = Layout::new(&d, 0, 0, 0, 0, None, false, None);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -2949,7 +2983,7 @@ impl Tower {
                 })
                 .collect()
         };
-        let passage = if self.passage { self.layout.levels.iter().map(|lv| reach(&t[lv.passage..lv.passage + d.contacts * d.width])).collect() } else { Vec::new() };
+        let passage = if self.passage { self.layout.levels.iter().enumerate().map(|(l, lv)| if self.hears(l) { reach(&t[lv.passage..lv.passage + d.contacts * d.width]) } else { 0 }).collect() } else { Vec::new() };
         Reaches { levels, readout: reach(&t[self.layout.readout..self.layout.readout_bias]), pair, ring, strands, ring_ranks, ring_pools, gammas, gates, ladder, half_turn, participation, passage, held_log: log2_face((radius() as u128) << (UNIT_BITS - MOVE_BITS), FACE_BITS) as i64 }
     }
 
@@ -3218,7 +3252,7 @@ impl Tower {
             }
             // The passage ([`Tower::join_passage`]): the contacts meet the current passing the level,
             // `W₁ˣ x` on 2^(−40) released to the drive's 2^(−16), at every arrival.
-            if self.passage {
+            if self.hears(l) {
                 let mut heard = vec![0i64; f];
                 affine(&t[lv.passage..lv.passage + f * w], reaches.passage[l], w, &x, None, 0, MATERIAL_BITS, &mut heard)?;
                 for (a, b) in drive_buf.iter_mut().zip(&heard) {
@@ -3553,7 +3587,7 @@ impl Tower {
             let mut pa_gy_own: Vec<Vec<Phasor>> = Vec::with_capacity(span);
             let mut pa_met = vec![vec![0i128; participating.map_or(0, |p| p.heads.len())]; span];
             // The passage's return to the passing current, `W₁ˣᵀ δa`, each cell's, on 2^(−16).
-            let mut heard_back: Vec<Vec<i64>> = Vec::with_capacity(if self.passage { cells_n } else { 0 });
+            let mut heard_back: Vec<Vec<i64>> = Vec::with_capacity(if self.hears(l) { cells_n } else { 0 });
             for (i, cell) in cells.iter().enumerate() {
                 let lc = &cell.levels[l];
                 let dy = &dx[i];
@@ -3606,7 +3640,7 @@ impl Tower {
                     pa_negs.push(nega);
                     pa_gy_own.push(gy_re.into_iter().zip(gy_im).collect());
                 }
-                if self.passage {
+                if self.hears(l) {
                     let mut back = vec![0i64; w];
                     transposed(&t[lv.passage..lv.passage + f * w], reaches.passage[l], w, &da, MATERIAL_BITS, &mut back)?;
                     heard_back.push(back);
@@ -3744,7 +3778,7 @@ impl Tower {
             // The passage: `W₁ˣ` takes each drive's covector against the passing current, and the
             // current its return through `W₁ˣ`, beside its returns through the push and the charts
             // (after the return's material has read the level's output covector).
-            if self.passage {
+            if self.hears(l) {
                 let inputs: Vec<&[i32]> = (0..cells_n).map(|i| level(i).input.as_slice()).collect();
                 outer_sum(&mut g[lv.passage..lv.passage + f * w], w, &das, &inputs)?;
                 for (cov, back) in dx.iter_mut().zip(&heard_back) {
@@ -4493,6 +4527,9 @@ impl Tower {
         let news = lines.next_if(|l| l.starts_with("news-clock ")).map(NewsClock::from_text).transpose()?;
         let participation = lines.next_if(|l| l.starts_with("participation ")).map(ParticipationDeclaration::from_text).transpose()?;
         let passage = lines.next_if(|&l| l == "passage").is_some();
+        if passage && news.is_none() {
+            return refuse("the passage joins the levels a news clock holds: without one no level is held");
+        }
         let layout = Layout::new(
             &declaration,
             pair.as_ref().map_or(0, |face| face.forms()),
@@ -4501,7 +4538,7 @@ impl Tower {
             strands.as_ref().map_or(0, Strands::parts),
             participation.as_ref(),
             mutual.is_some(),
-            passage,
+            if passage { news.map(|c| c.first()) } else { None },
         );
         if theta.len() != layout.len || lines.next().is_some() {
             return refuse("material of the wrong extent");
@@ -4529,7 +4566,8 @@ impl Tower {
         }
         if let Some(p) = participation {
             tower.admits_participation(&p)?;
-            tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, passage);
+            let heard = if passage { tower.news.map(|c| c.first()) } else { None };
+            tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, heard);
             if tower.theta.len() != tower.layout.len {
                 return refuse("material of the wrong extent");
             }
@@ -4573,7 +4611,7 @@ impl Tower {
         if face.alphabet != d.alphabet || face.opening.len() != d.alphabet * d.width {
             return refuse("a pair face founded on another alphabet or width");
         }
-        let layout = Layout::new(d, face.forms(), 0, 0, 0, None, false, false);
+        let layout = Layout::new(d, face.forms(), 0, 0, 0, None, false, None);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.pair = Some(face);
@@ -4615,7 +4653,7 @@ impl Tower {
             return refuse("a ring face joins before strands (the strands' material follows the ring's)");
         }
         let mut face = face;
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0, None, false, false);
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), face.ranks(), face.harmonics(), 0, None, false, None);
         if face.founded.len() != face.ranks() * rank_material(&self.declaration) {
             return refuse("a ring face joins with its founded factors");
         }
@@ -4688,7 +4726,11 @@ impl Tower {
         if self.rotor.is_some() {
             return refuse("a news clock beside a rotor: the rotor steps once an arrival, and its step on a level's own clock is owed");
         }
-        NewsClock::new(clock.bits, clock.radix)?.period(self.declaration.levels)?;
+        if self.passage {
+            return refuse("the passage joins last: its material follows every other part's");
+        }
+        let clock = NewsClock::above(clock.bits, clock.radix, clock.first)?;
+        clock.period(self.declaration.levels)?;
         self.news = Some(clock);
         Ok(())
     }
@@ -4756,7 +4798,7 @@ impl Tower {
         if self.theta[ro..rb + a].iter().any(|&v| v != 0) {
             return refuse("a mutual contact joins a founded readout: a learned readout's law under the contact is not derived");
         }
-        let layout = Layout::new(&d, 0, 0, 0, 0, None, true, false);
+        let layout = Layout::new(&d, 0, 0, 0, 0, None, true, None);
         let mut theta = self.theta[..ro].to_vec();
         theta.resize(layout.len, 0);
         let e = layout.encoding;
@@ -4793,7 +4835,7 @@ impl Tower {
         self.admits_participation(&p)?;
         let d = self.declaration;
         let (n, w) = (d.modes, d.width);
-        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, false);
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, None);
         self.theta.resize(layout.len, 0);
         for lv in &layout.levels {
             for (to, from) in [(lv.pa_probe_re, lv.push_re), (lv.pa_probe_im, lv.push_im), (lv.pa_key_re, lv.push_re), (lv.pa_key_im, lv.push_im), (lv.pa_value_re, lv.push_re), (lv.pa_value_im, lv.push_im)] {
@@ -4814,12 +4856,16 @@ impl Tower {
     }
 
     /// [definition; agent-inferred, October 29] **The passage joined** (record
-    /// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`): every level's contacts
-    /// read the current passing the level, `a_l = W₁ r̂_l + W₁ˣ x_l + b`, beside its modes' face, so
-    /// a level whose modes move on their own clock still meets every arrival at its contacts. Its
-    /// `W₁ˣ` is appended at zero, so the joined tower reads every passage exactly as the tower did.
-    /// The passage joins last: its material follows every other part's. Refused beside a ring face,
-    /// a rotor or strands, whose contacts' lifts read the contacts' rows by their own laws.
+    /// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`): the contacts of every level
+    /// a news clock holds (from its first clocked level) read the current passing the level,
+    /// `a_l = W₁ r̂_l + W₁ˣ x_l + b`, beside its modes' face, so a level whose modes move on their
+    /// own clock still meets every arrival at its contacts. A level that ticks at every arrival
+    /// already meets it through the state the arrival pushed, and there the join cost the tower
+    /// (record §7: held out 2.168 against 2.139 at lap 1 unclocked), so it carries none. Its `W₁ˣ`
+    /// is appended at zero, so the joined tower reads every passage exactly as the tower did. The
+    /// passage joins last: its material follows every other part's. Refused without a news clock,
+    /// and beside a ring face, a rotor or strands, whose contacts' lifts read the contacts' rows by
+    /// their own laws.
     pub fn join_passage(&mut self) -> Result<()> {
         if self.passage {
             return refuse("a tower takes one passage");
@@ -4827,7 +4873,10 @@ impl Tower {
         if self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
             return refuse("the passage beside a ring face, a rotor or strands is owed");
         }
-        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, 0, self.participation.as_ref(), self.mutual.is_some(), true);
+        let Some(clock) = self.news.filter(|c| c.first() < self.declaration.levels) else {
+            return refuse("the passage joins the levels a news clock holds: without one, or above the top, no level is held");
+        };
+        let layout = Layout::new(&self.declaration, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, 0, self.participation.as_ref(), self.mutual.is_some(), Some(clock.first()));
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.passage = true;
@@ -4837,6 +4886,21 @@ impl Tower {
     /// Whether the passage is joined ([`Tower::join_passage`]).
     pub fn passage(&self) -> bool {
         self.passage
+    }
+
+    /// Whether level `l`'s contacts hear the passing current: the passage is joined and the level
+    /// ticks by news ([`Tower::join_passage`]).
+    fn hears(&self, l: usize) -> bool {
+        self.heard_from().is_some_and(|first| l >= first)
+    }
+
+    /// The first level whose contacts hear the passing current, when the passage is joined.
+    pub(crate) fn heard_from(&self) -> Option<usize> {
+        if self.passage {
+            self.news.map(|c| c.first())
+        } else {
+            None
+        }
     }
 
     /// [agent-inferred, October 29] **The participation founded on this tower over `section`
@@ -4878,7 +4942,7 @@ impl Tower {
         if (strands.levels, strands.alphabet, strands.modes) != (d.levels, d.alphabet, d.modes) {
             return refuse("strands of another tower's shape");
         }
-        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts(), None, false, false);
+        let layout = Layout::new(d, self.pair.as_ref().map_or(0, PairFace::forms), self.ring.as_ref().map_or(0, RingFace::ranks), self.ring.as_ref().map_or(0, RingFace::harmonics), strands.parts(), None, false, None);
         self.theta.resize(layout.len, 0);
         self.layout = layout;
         self.strands = Some(strands);
@@ -8055,7 +8119,7 @@ mod tests {
                 rings_checked += (tower.ring.is_some() && (start == tower.layout.ring_readout || start == tower.layout.ring_factors)) as usize;
                 strands_checked += (tower.strands.is_some() && (start == tower.layout.strand_contact || start == tower.layout.strand_pair)) as usize;
                 mutual_checked += (tower.mutual.is_some() && [tower.layout.encoding, tower.layout.readout, tower.layout.readout_bias].contains(&start)) as usize;
-                passages_checked += (tower.passage && tower.layout.levels.iter().any(|lv| lv.passage == start)) as usize;
+                passages_checked += tower.layout.levels.iter().enumerate().any(|(l, lv)| tower.hears(l) && lv.passage == start) as usize;
                 break;
             }
         }
@@ -8951,14 +9015,17 @@ mod tests {
         the_covector_of_tower_matches_the_code_difference(clocked(tiny_with(3, false)), false, classes, 10);
     }
 
-    /// The passage joined with its `W₁ˣ` filled from the keys, so every level's contacts hear the
-    /// passing current.
+    /// The passage joined with its `W₁ˣ` filled from the keys, so the contacts of every level the
+    /// clock holds hear the passing current.
     fn passage_opened(mut tower: Tower) -> Tower {
         tower.join_passage().expect("joined");
         let k = keys(8192);
         let (f, w, words) = (tower.declaration.contacts, tower.declaration.width, k.len() / 4);
         let mut i = 1500;
-        for lv in tower.layout.levels.clone() {
+        for (l, lv) in tower.layout.levels.clone().into_iter().enumerate() {
+            if !tower.hears(l) {
+                continue;
+            }
             for v in &mut tower.theta[lv.passage..lv.passage + f * w] {
                 let at = 4 * (i % words);
                 *v = i32::from_be_bytes([k[at], k[at + 1], k[at + 2], k[at + 3]]) >> 8;
@@ -8970,13 +9037,17 @@ mod tests {
 
     /// [agent-inferred, October 29] **The passage opens at zero** (record
     /// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, acceptance 1): joined, a
-    /// tower reads every passage face for face and state for state as it did, clocked and unclocked,
-    /// with and without participation; its text adds one line and restores whole, with the
-    /// learner's; it joins once and last.
+    /// tower reads every passage face for face and state for state as it did, clocked from level 1
+    /// and from level 2, with and without participation; its text adds one line and restores whole,
+    /// with the learner's; it joins once and last, only on the levels a clock holds (record §8).
     #[test]
     fn the_passage_opens_at_zero_and_restores_exactly() {
         let classes = news_passage();
-        for tower in [tiny_with(3, true), news_on(tiny_with(3, true)), tiny_clocked_participating(ContactLaw::Rectifying, false, 3), tiny_clocked_participating(ContactLaw::Pair, false, 1)] {
+        let above = |mut tower: Tower| {
+            tower.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("joined");
+            tower
+        };
+        for tower in [above(tiny_with(3, true)), news_on(tiny_with(3, true)), tiny_clocked_participating(ContactLaw::Rectifying, false, 3), tiny_clocked_participating(ContactLaw::Pair, false, 1)] {
             let mut joined = tower.clone();
             joined.join_passage().expect("joined");
             assert!(joined.passage() && !tower.passage());
@@ -8994,8 +9065,19 @@ mod tests {
             assert_eq!(TowerLearner::from_text(&learner.to_text()).expect("restored").to_text(), learner.to_text());
             assert!(joined.clone().join_passage().is_err(), "one passage");
             assert!(joined.clone().join_participation(ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared")).is_err(), "the passage joins last");
+            let first = joined.news().expect("a clock").first();
+            for (l, lv) in joined.layout.levels.iter().enumerate() {
+                assert_eq!(joined.hears(l), l >= first, "level {l}");
+                assert!(l < first || lv.passage >= tower.theta.len(), "level {l}: its W₁ˣ follows every other part's");
+            }
         }
-        let mut plain = TowerLearner::new(tiny_with(2, true), 7);
+        assert!(tiny_with(3, true).join_passage().is_err(), "without a clock no level is held");
+        let mut late = tiny_with(3, true);
+        late.join_news(NewsClock::new(2, 2).expect("a clock")).expect("joined");
+        late.join_passage().expect("joined");
+        let unclocked = late.to_text().replace("news-clock 2 2\n", "");
+        assert!(Tower::from_text(&unclocked).is_err(), "a passage read without its clock");
+        let mut plain = TowerLearner::new(news_on(tiny_with(2, true)), 7);
         plain.join_passage().expect("joined");
         assert_eq!((plain.first.len(), plain.second.len()), (plain.tower.theta.len(), plain.tower.theta.len()));
         assert!(stranded(tiny_contacts(3, 9, 8, false, false, false, ContactLaw::Pair), true).join_passage().is_err(), "the passage beside strands is owed");
@@ -9028,29 +9110,101 @@ mod tests {
     }
 
     /// [agent-inferred, October 29] **The passage's covector is the code difference it predicts**
-    /// (acceptance 2): on the two-level gated tower on a one-bit clock over the first 31 classes of
-    /// [`news_passage`] (the news clock's pattern), and unclocked, the passage at zero and opened.
+    /// (acceptance 2) over the first 31 classes of [`news_passage`] (the news clock's pattern): at
+    /// zero and opened on the three-level gated tower clocked from level 2 (level 2 alone hears the
+    /// passing current, the levels below it ticking at every arrival), and opened on the two-level
+    /// gated tower on a one-bit clock (level 1 alone hears it).
+    ///
+    /// [agent-inferred, October 30] At the first cell a clocked level has not ticked: its state
+    /// rests and the tiny tower's contact biases are zero, so every contact's drive is exactly on
+    /// its kink and any step of a passage at zero carries it across (measured on both fixtures:
+    /// the four drives at cell 0 are zero, and no parameter keeps its side at steps from `2^(−9)`
+    /// to `2^(−14)` units). The passage at zero is therefore read with the heard level's contact
+    /// biases opened, which moves no parameter of the passage.
+    ///
+    /// The heard levels are read at steps of `2^(−9)` units: with the passage on the clocked levels
+    /// only, the forward's rounding to `2^(−16)` moves the fitted slope by an error that grows as
+    /// the step shrinks (family 130 of the opened two-level tower, against its covector of 110.6:
+    /// 12%, 35% and 62% at steps of `2^(−10)`, `2^(−11)` and `2^(−12)`, within a tenth at `2^(−8)`
+    /// and `2^(−9)`), the signature of rounding, not of a covector off by a constant; at `2^(−8)`
+    /// the three-level tower's steps carry its heard level's contacts across their kinks.
     #[test]
     fn the_passage_covector_matches_the_code_difference() {
-        let clocked = |mut tower: Tower| {
-            tower.join_news(NewsClock::new(1, 2).expect("a clock")).expect("joined");
-            tower
-        };
-        let mut zero = clocked(tiny_of(true));
+        let classes = &news_passage()[..31];
+        let mut zero = tiny_with(3, true);
+        zero.join_news(NewsClock::above(1, 2, 2).expect("a clock")).expect("joined");
         zero.join_passage().expect("joined");
-        the_covector_of_tower_matches_the_code_difference(zero, true, &news_passage()[..31], 10);
+        let k = keys(8192);
+        let (f, words) = (zero.declaration.contacts, k.len() / 4);
+        for (l, lv) in zero.layout.levels.clone().into_iter().enumerate() {
+            if zero.hears(l) {
+                for (i, v) in zero.theta[lv.contact_bias..lv.contact_bias + f].iter_mut().enumerate() {
+                    let at = 4 * ((700 + i) % words);
+                    *v = i32::from_be_bytes([k[at], k[at + 1], k[at + 2], k[at + 3]]) >> 8;
+                }
+            }
+        }
+        the_covector_of_tower_matches_the_code_difference(zero, true, classes, 9);
     }
 
     #[test]
     fn the_opened_clocked_passage_covector_matches_the_code_difference() {
         let mut tower = tiny_of(true);
         tower.join_news(NewsClock::new(1, 2).expect("a clock")).expect("joined");
-        the_covector_of_tower_matches_the_code_difference(passage_opened(tower), true, &news_passage()[..31], 10);
+        the_covector_of_tower_matches_the_code_difference(passage_opened(tower), true, &news_passage()[..31], 9);
     }
 
     #[test]
-    fn the_opened_passage_covector_matches_the_code_difference() {
-        the_covector_of_tower_matches_the_code_difference(passage_opened(tiny_of(true)), true, &news_passage()[..31], 10);
+    fn the_opened_passage_above_the_arrival_stack_covector_matches_the_code_difference() {
+        let mut tower = tiny_with(3, true);
+        tower.join_news(NewsClock::above(1, 2, 2).expect("a clock")).expect("joined");
+        the_covector_of_tower_matches_the_code_difference(passage_opened(tower), true, &news_passage()[..31], 9);
+    }
+
+    /// [agent-inferred, October 30] **The clock begins above the arrival stack** (record
+    /// `2026-10-29_A_CLOCKED_LEVELS_CONTACTS_HEAR_THE_PASSING_CURRENT…`, §8, acceptance 1): on four
+    /// levels clocked from level 2, levels 0 and 1 tick at every arrival and read face for face,
+    /// state for state, as the unclocked tower's (no level hears the levels above it), while
+    /// levels 2 and 3 tick on their own news at the sections `B` and `B r`; the text writes the
+    /// first clocked level and restores whole; a clock is refused at level 0, a clock above the top
+    /// is the tower without it and hears no passage, and `news-clock B r 1` is not its text.
+    #[test]
+    fn the_clock_begins_above_the_arrival_stack() {
+        let classes = news_passage();
+        let plain = tiny_with(4, true);
+        let mut above = plain.clone();
+        let clock = NewsClock::above(2, 2, 2).expect("a clock");
+        above.join_news(clock).expect("joined");
+        let (mut s, mut t) = (plain.rest(), above.rest());
+        let a = plain.forward(&mut s, &classes, &plain.reaches()).expect("forward");
+        let b = above.forward(&mut t, &classes, &above.reaches()).expect("forward");
+        let (mut news, mut totals) = (0i64, [0u64; 4]);
+        for (i, (x, y)) in a.iter().zip(&b).enumerate() {
+            for l in 0..2 {
+                assert_eq!(y.levels[l].ticks, 1, "cell {i}, level {l}");
+                assert_eq!((&x.levels[l].state, &x.levels[l].drive), (&y.levels[l].state, &y.levels[l].drive), "cell {i}, level {l}");
+            }
+            if i > 0 {
+                news += b[i - 1].face.code(classes[i]);
+            }
+            for (total, lc) in totals.iter_mut().zip(&y.levels) {
+                *total += u64::from(lc.ticks);
+            }
+            assert_eq!(clock.section(2).expect("a section"), 2 << READ_BITS);
+            for l in 2..4 {
+                assert_eq!(totals[l], news as u64 / clock.section(l).expect("a section"), "cell {i}, level {l}");
+            }
+        }
+        assert!(clock.section(1).is_err(), "a level below the clock has no section");
+        assert!(b.iter().any(|y| y.levels[3].ticks == 0) && totals[2] > totals[3] && totals[3] > 0, "{totals:?}");
+        let text = above.to_text();
+        assert!(text.contains("news-clock 2 2 2\n"));
+        assert_eq!(Tower::from_text(&text).expect("restored"), above);
+        assert!(Tower::from_text(&text.replace("news-clock 2 2 2\n", "news-clock 2 2 1\n")).is_err());
+        assert!(NewsClock::above(2, 2, 0).is_err());
+        let mut holding_none = plain.clone();
+        holding_none.join_news(NewsClock::above(2, 2, 4).expect("a clock")).expect("a clock above the top is the tower without it");
+        assert!(holding_none.join_passage().is_err(), "a clock that holds no level hears no passage");
     }
 
     /// Under a news clock a stream's open face and phase are its state: a passage read in two

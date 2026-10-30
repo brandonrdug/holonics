@@ -3460,11 +3460,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_mutual_contact(MUTUAL_SHIFT).map_err(|e| e.to_string())?;
                 println!("TOWER_MUTUAL_CONTACT shift={MUTUAL_SHIFT}");
             }
-            // A passage run's contacts read the passing current from the founding on, its `W₁ˣ` at
-            // zero ([`Tower::join_passage`]).
+            // A passage run's contacts read the passing current from the founding on, on the levels
+            // its clock holds, its `W₁ˣ` at zero ([`Tower::join_passage`]).
             Joined::Passage => {
                 learner.join_passage().map_err(|e| e.to_string())?;
-                println!("TOWER_PASSAGE");
+                println!("TOWER_PASSAGE first_clocked_level={}", learner.tower.news().map_or(0, |c| c.first()));
             }
         }
         learner

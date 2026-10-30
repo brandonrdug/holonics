@@ -126,10 +126,11 @@ struct TowerLaw {
     uint32_t moving;
     int64_t ln2;
     TowerLevel level[TOWER_MAX_LEVELS];
-    // The news clock (`news = 0` without one, every level then moving once a cell): each level's
-    // section `B r^(l−1)` on 2^(−20) bits (level 0's unread: it ticks at every arrival) and the
-    // clock's period, the coarsest section (`NewsClock`).
-    uint32_t news, pad1;
+    // The news clock (`news = 0` without one, every level then moving once a cell): its first
+    // clocked level F (the levels below it tick at every arrival), each clocked level's section
+    // `B r^(l−F)` on 2^(−20) bits (the others' unread) and the clock's period, the coarsest section
+    // (`NewsClock`).
+    uint32_t news, news_first;
     uint64_t sections[TOWER_MAX_LEVELS];
     uint64_t period;
     // The strands (`strand_rings = 0` without them): the level whose contacts read them, their
@@ -889,6 +890,11 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     atomicOr(&st, TOWER_REFUSED_NEWS);
                 }
                 for (uint32_t l = 1; l < L && l < TOWER_MAX_LEVELS; l++) {
+                    // The levels below the first clocked level tick at every arrival.
+                    if (l < law.news_first) {
+                        tk[l] = 1;
+                        continue;
+                    }
                     const uint64_t section = law.sections[l];
                     const uint64_t advanced = section == 0 ? 0 : sum / section - news_phase / section;
                     if (section == 0 || advanced > UINT32_MAX) {
@@ -1527,7 +1533,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
             const bool n_sa = stranded && narrow_terms(law.strand_reach[0], smax, 6 * SR, &st);
             const bool n_sb = stranded && law.contact != 0 && narrow_terms(law.strand_reach[1], smax, 6 * SR, &st);
             const bool n_pc = P && narrow_terms(lv.pa_reach[8], prmax, W, &st);
-            const bool n_x = law.passage != 0 && narrow_terms(lv.passage_reach, xmax, W, &st);
+            const bool hears = law.passage != 0 && l >= law.news_first;
+            const bool n_x = hears && narrow_terms(lv.passage_reach, xmax, W, &st);
             m = 0;
             uint64_t mc = 0;
             for (uint32_t o = tid; o < F; o += B) {
@@ -1542,7 +1549,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 }
                 // The passage: the contacts meet the current passing the level, W₁ˣ x released on
                 // its own.
-                if (law.passage != 0) {
+                if (hears) {
                     a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + lv.passage + o, F, W, x, n_x), MATERIAL_BITS), &st), &st);
                 }
                 const int32_t d = fit32(a64, &st);
@@ -2139,8 +2146,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         __syncthreads();
     }
     // The passage: the passing current's covector gains W₁ˣᵀ δa, released on its own (the level's
-    // output covector dy was kept above for the return's material).
-    if (law.passage != 0) {
+    // output covector dy was kept above for the return's material), on the levels the clock holds.
+    if (law.passage != 0 && l >= law.news_first) {
         const bool n_x = narrow_rows(lv.passage_reach, amax, F);
         for (uint32_t idx = tid; idx < G * W; idx += B) {
             const uint32_t g = idx / W, j = idx % W;

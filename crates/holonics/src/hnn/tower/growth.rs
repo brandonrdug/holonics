@@ -126,7 +126,7 @@ impl Tower {
             Some(p) => Some(ParticipationDeclaration::new(p.heads.repeat(factor), p.section, p.beta_shift)?),
             None => None,
         };
-        let layout = Layout::new(&d, 0, 0, 0, 0, participation.as_ref(), false, self.passage);
+        let layout = Layout::new(&d, 0, 0, 0, 0, participation.as_ref(), false, self.heard_from());
         let mut g = Grower { old: &self.theta, new: vec![0; layout.len], from: vec![(0, true); layout.len], f: factor, keys, cursor: 0 };
         let (a, w, n, f) = (old.alphabet, old.width, old.modes, old.contacts);
         // The founding's scales in the grown declaration (`Tower::found_on`): the push and
@@ -175,9 +175,10 @@ impl Tower {
                 g.repeat(o.pa_friction, l.pa_friction, p.heads.len(), true);
             }
         }
-        // The passage's `W₁ˣ` splits as the contacts do, from zero where it is at zero.
-        if self.passage {
-            for (o, l) in ol.levels.iter().zip(&nl.levels) {
+        // The passage's `W₁ˣ` splits as the contacts do, from zero where it is at zero, on the levels
+        // the clock holds.
+        if let Some(first) = self.heard_from() {
+            for (o, l) in ol.levels.iter().zip(&nl.levels).skip(first) {
                 g.split(o.passage, l.passage, f, w, true, None)?;
             }
         }
