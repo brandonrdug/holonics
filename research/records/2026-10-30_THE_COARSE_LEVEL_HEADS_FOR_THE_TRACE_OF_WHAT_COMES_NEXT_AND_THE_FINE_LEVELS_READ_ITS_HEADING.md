@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, acceptance 30 passed: per unrefused section the heading's kernels carry its later laps' whole excess, 35.6 of 41.2 ms in the forward (§18); the heading held between its level's ticks, acceptance 31–32 passed and 33 failed as read: the forward fell from 81.1 to 76.7 ms a launch against a bar of 72.2 in a run whose unchanged kernels ran 10–14% slower (§19); the hold read at one card speed, acceptance 34–35 passed: the held forward 11.8% faster than the unheld at one speed, its excess over C′ cut by 55% (§20); the race at equal elapsed time, acceptance 36 failed: at the heading's lap ends C′ read 2.316 and 2.138 at equal time against its 2.344 and 2.146, the heading's laps 1.38 and 1.13 times C′'s, so the next loop is the clocked levels' return across the section's edge (§21)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, acceptance 30 passed: per unrefused section the heading's kernels carry its later laps' whole excess, 35.6 of 41.2 ms in the forward (§18); the heading held between its level's ticks, acceptance 31–32 passed and 33 failed as read: the forward fell from 81.1 to 76.7 ms a launch against a bar of 72.2 in a run whose unchanged kernels ran 10–14% slower (§19); the hold read at one card speed, acceptance 34–35 passed: the held forward 11.8% faster than the unheld at one speed, its excess over C′ cut by 55% (§20); the race at equal elapsed time, acceptance 36 failed: at the heading's lap ends C′ read 2.316 and 2.138 at equal time against its 2.344 and 2.146, the heading's laps 1.38 and 1.13 times C′'s, so the next loop is the clocked levels' return across the section's edge (§21); the clocked levels' credit across the section's edge, its law, carrier and acceptance fixed before the build (§22)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -1368,3 +1368,108 @@ one section; a level that learns from one section only cannot carry a forecast p
 loop carries the response of each clocked level's state to its recurrence, `S_(t+1) = A_t S_t + B_t`,
 through the packet and mode laws across the section's edge and returns it at the opening, with that
 read as its oracle (§22, fixed before its build).
+
+## 22. The clocked levels' credit crosses the section's edge
+
+[agent-inferred, October 31] **The located cause** (§21). A section's reverse opens at zero at its
+end and stops at its opening, and the race carries no passage credit, so a clocked level's
+recurrence learns only from its own section's ticks. The frozen-material read (c6ce14204, C′'s saved
+learners, 16 streams, B = section 16 read alone and after A of 1, 2 and 4 sections compared with
+nothing) put the omitted return at 5.94 times B's own covector on level 5's moves at lap 0 and 1.66
+at lap 45, 1.16 on level 4's moves at lap 45, and 0.76 and 0.57 on level 5's push and gate. The
+clocked levels' slowest modes hold 48 to 188 of their own ticks (laps 45 and 23), about 200 to 1,500
+arrivals at one tick in four and in eight, against a section of 128.
+
+**What is owned.** The passage credit (`LevelCredit`, atlas `hnn.tower-passage-credit`, Lean
+`HNN/PassageCredit`): a stream carries the derivative of a level's modes by the level's own
+recurrence families as phase-carried moments, and at a section's opening the covector reaching the
+carried state meets them. It refuses a news clock (its moments over a clocked move were owed), the
+card carries none, and on October 23, on the gated tower whose levels move at every arrival, it
+read 1.1% and 0.9% worse after passes 1 and 2.
+
+**The law.** On a tower whose news clock begins at level `F`, the credit is carried at the clocked
+levels `l ≥ F`.
+- *A clocked move.* At cell `t` the level moves `Δτ_l(t)` times with the arrival held,
+  `h⁽ʲ⁾ = λ_t h⁽ʲ⁻¹⁾ + γ_t p_t`, and every moment takes the same sub-steps:
+  ```text
+  P ← λ_t P + γ_t x̃_t                       K ← λ_t K + i λ_t h⁽ʲ⁻¹⁾
+  A ← λ_t A + v⁽ʲ⁾ c r_t ρ_t/|λ|            Q ← λ_t Q + v⁽ʲ⁾ ∂ρ_t/∂q
+  W ← λ_t W + v⁽ʲ⁾ (∂ρ_t/∂q) x̃_t            v⁽ʲ⁾ = u h⁽ʲ⁻¹⁾ − (ρ_t/γ_t) p_t
+  ```
+  `x̃_t` is what the push and gate read at the tick (the packet's read), and a cell that ticks the
+  level no time moves no moment. Over a section `P_T = Λ P_0 + Σ_s π_s c_s x̃_s`, with
+  `c_s = γ_s Σ_(j<Δτ_s) λ_s^j`, `π_s` the later cells' turns `λ^Δτ` and `Λ` the section's (`W`
+  likewise with `Σ_j λ_s^(Δτ_s−j) v⁽ʲ⁾ ∂ρ_s/∂q`). It is the existing law's sequence of moves, which
+  `HNN/PassageCredit.hasDerivAt_state` holds for any moves, so no new statement is owed.
+- *The packet a clocked level carries up.* Level `l`'s moves carry level `l+1`'s open packet from
+  rest since that level's tick by the same sub-steps, so the packet has moments of its own by level
+  `l`'s families (the recursion with the packet in place of `h`), rested with it at level `l+1`'s
+  tick. Level `F`'s packet, carried by level `F−1`, which moves at every arrival, has none: the
+  credit begins at the clock.
+- *The meeting.* At the opening, the covector of each credited level's carried modes,
+  `a_l = conj(λ_0)^(Δτ_l(0)) G_h(0)`, meets the level's moments in the shapes of the section's own
+  terms, and the covector of the packet it carries, `ā_l = conj(λ_0)^(Δτ_l(0)) G_a(0)`, meets the
+  packet's moments into the same families.
+- *Held as given* (declared). The input a level hears (the packet's read, the passing current) and
+  everything below the clock: what reached a clocked level's state through the packets it read in
+  an earlier section returns into its own families only. So the top level's families meet their
+  whole return across the edge, and a lower clocked level's meet theirs through its modes and its
+  open packet. The certificate still rereads the section from its opening: the certified step is
+  descent on the section under the passage's direction.
+
+**Why the clocked levels alone** (agent-inferred). The located cause is theirs; their memory runs
+two to twelve sections past the edge while the arrival levels' slowest modes hold 26 to 179
+arrivals; and the credit on levels that move at every arrival read worse on October 23. The
+arrival levels' omitted return is read beside, so a later loop joins them on its measurement.
+
+**The carrier and its memory, projected at the race** (`w = 64`, `N = 128`, `F = 4`, six levels,
+320 streams). A credited level's `P` and `W` are `N × w` complex moments and `A`, `K`, `Q` are `N`
+each, 268,288 bytes a stream; level 4's own and its packet's and level 5's own make 804,864 bytes a
+stream, 245.6 MiB over the streams. A pass opens its streams at rest, so the credit opens at zero
+each pass and no saved learner holds it. The host's section holds three copies (the carried states,
+the opening's and the ends), about 737 MiB. The card keeps the credit resident between sections: the
+opening's and one advanced copy for each kept read, 737 MiB, and each tick's turns and
+coefficients, about 608 MB; the host's states hold a marker of it, which the host's reverse, carry
+and text refuse until the card returns the values.
+
+**The card.** The forward writes, at each tick of a credited level, each mode's turn `λ_t^Δτ` and
+the coefficients of `P` and `W` (and the packet's `W`), and carries `A`, `K`, `Q` (and the packet's)
+by the cell recursion; a credit kernel after it sums `P` and `W` in closed form into its read's
+advanced credit. The reverse writes each credited level's opening covectors from its modes' scan,
+and a meeting kernel adds each stream's meeting to the covector before the outer sums are read
+(integer sums, so the order is free). The carry keeps its read's advanced credit.
+
+**Acceptance, fixed before the build.**
+37. *Unchanged without it.* Every tower test and the card suite pass unchanged, and a learner
+    without credit is the learner as before.
+38. *The law on the host.* On four gated levels clocked from level 2, with packets and the heading,
+    two sections with the second opening on the first's credit give the whole passage's covector:
+    in level 3's own families (the top) to the moments' release; and, with a first section in which
+    level 3 never ticks, in level 2's too (its modes and its packet are then its only paths). Without
+    the credit both miss at least 16 times the credit's error.
+39. *The card.* 32 sections at the race's declaration with the credit, host against card: every
+    face, covector entry and learner equal, and every stream's credit equal once fetched.
+40. *The oracle.* On the card, on the heading's saved learners (a38c1c63f's law, laps 0, 1, 2), 16
+    streams, B = section 16, A = 1, 2, 4 sections: the credit opened at rest at A's opening and
+    carried through A returns level 5's omitted return (`g_AB − g_B`) in moves, push and gate to
+    within 1/64 of its norm; level 4's share returned is reported (cosine and residual), beside the
+    arrival levels' omitted return.
+41. *The race.* On the 4080, C′ then the credited heading, two laps each from C′'s founding, back to
+    back on the idle card: at each of the credited heading's lap ends its held-out read is at or
+    below C′'s at the same elapsed time, reported lap for lap beside the uncredited heading's
+    (2.344, 2.146; its lines are deterministic, §20), with each window's arrivals, refusals and
+    closure, and the writing shown.
+
+**What it decides**, fixed before the race. With 41 passed the race runs toward an hour. Read
+below the uncredited heading lap for lap but not below C′ at equal time, the credit's cost is the
+next subject. Read above the uncredited heading lap for lap, the return the credit carries is not
+the one the section's step can certify (the reread holds the opening fixed), and the next loop
+reads the certificate.
+
+Recorded failures this could repeat: *an uncertified deposition step* (the step is certified on the
+section as before, and the halvings are reported); *a tape* (the moments are the stream's state; no
+cell outlives its section, and the card's per-tick coefficients are consumed inside the read that
+wrote them); *a refusal answered with a larger limit* (the race's projection is fixed from the
+parity's measured times before launch); *a located cause carried unrepaired into a new consumer*
+(the credit is joined at its owner, and the closure stays read and not learned); *a design thought
+in the programming language* (moments, turns and sub-steps, never offsets).
