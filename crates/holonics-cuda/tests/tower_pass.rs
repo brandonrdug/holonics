@@ -6,7 +6,7 @@
 use holonics::hnn::tower::body::{Answer, TowerBody};
 use holonics::hnn::tower::participation::ParticipationDeclaration;
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
-use holonics::hnn::tower::{ContactLaw, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Sheet, StrandKey, StrandLaw, StrandRing, Strands, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
+use holonics::hnn::tower::{ContactLaw, LevelCredit, NewsClock, PairFace, RingFace, RingRank, Rotor, RotorRing, Sheet, StrandKey, StrandLaw, StrandRing, Strands, Tower, TowerDeclaration, TowerFace, TowerLearner, TowerState, TurnLadder, FACE_BITS};
 use holonics_cuda::hnn::{Card, TowerCard};
 
 /// A declared exterior key stream: a 64-bit linear congruential walk, its high octets.
@@ -578,6 +578,60 @@ fn the_cards_heading_is_the_hosts_for_thirty_two_sections() {
     lockstep(11, 2, 12, 8, true, Faces { news: Some(NewsClock::new(3, 2).expect("a clock")), turned: true, contact: Some(ContactLaw::Pair), packets: true, heading: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::new(2, 2).expect("a clock")), packets: true, heading: true, ..Faces::default() });
     advance_class_by_class(Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
+}
+
+/// The credited learner's lockstep: [`lockstep`] with every stream opening on its credit. The card
+/// holds the credit resident between sections (its streams carry its mark), so its learner's
+/// sections run on one realization and each section's direct read and reverse on another, which
+/// uploads the host's credit; after each section the card's credit is fetched and compared.
+fn lockstep_credited(alphabet: usize, streams: usize, section: usize, sections: usize, faces: Faces) {
+    let card = Card::open(0).expect("the card");
+    let mut realized = TowerCard::open(&card).expect("the tower's image");
+    let mut direct = TowerCard::open(&card).expect("the tower's image");
+    let (mut host, mut carded) = learners(alphabet, faces);
+    let classes = passage(alphabet, streams * (sections * section + 1));
+    let chunk = classes.len() / streams;
+    let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest_with_credit()).collect();
+    let mut states_c = states_h.clone();
+    let mut deposits = 0;
+    for k in 0..sections {
+        let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect();
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().map(|&c| Some(c)).collect()).collect();
+        let mut reference = HostPass::default();
+        let read_h = reference.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened).expect("host forward");
+        let g_h = reference.reverse(&host.tower, &states_h, &parts, None).expect("host reverse");
+        let read_c = direct.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened).expect("card forward");
+        let g_c = direct.reverse(&host.tower, &states_h, &parts, None).expect("card reverse");
+        assert_eq!(read_h, read_c, "section {k}: the faces and the swell");
+        assert_eq!(g_h, g_c, "section {k}: the summed covector, the credit's meeting among it");
+        let receipt_h = host.section_realized(&mut states_h, &parts, None, &mut HostPass::default()).expect("host section");
+        let receipt_c = carded.section_realized(&mut states_c, &parts, None, &mut realized).expect("card section");
+        assert_eq!(receipt_h, receipt_c, "section {k}: the receipt");
+        assert!(states_c.iter().all(|s| s.credit.as_deref().is_some_and(|c| LevelCredit::residence(c).is_some())), "section {k}: the card's streams hold the resident credit's mark");
+        let mut fetched = states_c.clone();
+        realized.fetch_credit(&carded.tower, &mut fetched).expect("fetch");
+        assert_eq!(states_h, fetched, "section {k}: the continuing states, the credit among them");
+        assert_eq!(host.to_text(), carded.to_text(), "section {k}: the learner");
+        deposits += usize::from(receipt_h.deposited);
+    }
+    assert!(deposits > 0, "the passage deposits");
+}
+
+/// [agent-inferred, October 31] **The clocked levels' credit on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §22, acceptance 39): each
+/// credited level's moments take its moves' sub-steps in the forward, its material moments are moved
+/// in closed form after it (`tower_credit`), and at the opening the carried modes' and packet's
+/// covectors meet them (the modes' scan and `tower_credit_meet`); 32 sections equal face by face,
+/// covector entry by entry, learner for learner and state for state (each stream's credit fetched),
+/// on three levels clocked from level 2 (the top alone credited), on four (level 2 carrying its
+/// packet's moments) and at the race's declaration, six levels from level 4; each with the passage,
+/// the packets and the heading.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_clocked_credit_is_the_hosts_for_thirty_two_sections() {
+    lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
+    lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 4, passage: true, packets: true, heading: true, ..Faces::default() });
+    lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() });
 }
 
 /// [agent-inferred, October 30] **A reread on the opening's ticks** (record

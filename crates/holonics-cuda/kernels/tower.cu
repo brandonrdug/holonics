@@ -13,7 +13,11 @@
 // class steps the level's rings and turns their modes, `h' = T P^σ h`, mode `m` taking mode `s(m)`
 // turned by `e^(2πi r/q)` from the rotor's resident keys; never beside the ring face or a news
 // clock), contacts rectifying (`v = max(a, 0)`), the pair contact (`v = a ⊙ b`, `b = W_b r̂ + b_b`)
-// or its foil (`v = a b_b + b_a (b − b_b)`), no passage credit, with or without the pair face
+// or its foil (`v = a b_b + b_a (b − b_b)`), with or without the clocked levels' passage credit
+// under a news clock (`LevelCredit`: `tower_forward` moves its per-mode moments by each move's
+// sub-steps and keeps each cell's turn and coefficients, `tower_credit` sums its material moments in
+// closed form, `tower_reverse_modes` and `tower_credit_meet` meet them at the opening), with or
+// without the pair face
 // (`x⁰ = E(u) + P c(p)` and `z += V c(p)` at the pair of the class before and the class arriving)
 // and with or without the ring face (`RingFace`: its ranks advanced at their level after the move,
 // their faces read through the pair contact with the top face, `z += W (x̂ ⊗ ρ)`; the products the
@@ -174,6 +178,10 @@ struct TowerLaw {
     // descent, the face reading it, and a tick's heading is paired with the traces of the stream's
     // ticks at that level in the section, `z_ji = 2^(−heading_shift) ⟨ĥ_j, τ_i⟩` on 2^(−16).
     uint32_t heading, heading_shift;
+    // The clocked levels' credit (`credit = 0` without it; else the credited levels L − F,
+    // `LevelCredit`, record §22) and whether each credited level below the top carries the moments
+    // of the packet its moves carry up (`credit_packet`).
+    uint32_t credit, credit_packet;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -381,6 +389,22 @@ struct TowerFrame {
     int64_t *ah_face;
     int64_t *ah_dread, *ah_top;
     uint64_t *r_ah_read, *r_ah_face_re, *r_ah_face_im, *r_ah_dread, *r_ah_top;
+    // The clocked levels' credit (each empty without it; `CL` the credited levels L − F, a level's
+    // place among them l − F; `LevelCredit`): each stream's credit at the opening and the credit
+    // this read advances it to, in its canonical blocks ([S][E], `cr_block`: each credited level's
+    // own block, then its packet's; a block push 2NW, along 2N, around 2N, gate bias 2N, gate 2NW,
+    // `(re, im)` interleaved); each cell's turn λ^Δτ, push coefficient γ Σ λ^j, gate coefficient
+    // Σ λ^(Δτ−j) d⁽ʲ⁾ and the packet's gate coefficient ([S][T][CL][N][2] each; `tower_credit`
+    // turns the first into each cell's later turn and the rest into their rows), the input the push
+    // and gate read ([S][T][CL][W]) and whether the packet the level carries rested there
+    // ([S][T][CL]); and the reverse's opening covectors of the carried modes and packet
+    // ([S][CL][2][N][2]).
+    const int64_t *cr_open;
+    int64_t *cr_next;
+    int64_t *cr_turn, *cr_push, *cr_gate, *cr_pgate;
+    int32_t *cr_x;
+    uint32_t *cr_rest;
+    int64_t *cr_cov;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -810,6 +834,23 @@ extern "C" __global__ void tower_transpose(TowerLaw law, TowerFrame fr) {
 // -------------------------------------------------------------------------------------------
 // the forward
 
+// The credit's blocks (`LevelCredit`, `Tower::credit_words`): one block's words, the stream's, and
+// where credited level `ci`'s own (`set` 0) or packet (`set` 1) block begins.
+__device__ __forceinline__ uint64_t cr_block_words(const TowerLaw &law) {
+    return 4ull * law.modes * law.width + 6ull * law.modes;
+}
+__device__ __forceinline__ uint64_t cr_stream_words(const TowerLaw &law) {
+    return (law.credit_packet ? 2ull * law.credit - 1 : (uint64_t)law.credit) * cr_block_words(law);
+}
+__device__ __forceinline__ uint64_t cr_block(const TowerLaw &law, uint32_t s, uint32_t ci, uint32_t set) {
+    return s * cr_stream_words(law) + (law.credit_packet ? 2ull * ci + set : (uint64_t)ci) * cr_block_words(law);
+}
+// A complex product released to 2^(−30) (`product` in `Tower::advance_moments`).
+__device__ __forceinline__ void cmul(wide ar, wide ai, wide br, wide bi, wide *r, wide *i) {
+    *r = rel(ar * br - ai * bi, MOVE_BITS);
+    *i = rel(ar * bi + ai * br, MOVE_BITS);
+}
+
 __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t octets) {
     unsigned char *p = at;
     at += (octets + 15) & ~(uint64_t)15;
@@ -944,6 +985,16 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     }
     for (uint32_t i = tid; i < PK * 2 * N; i += B) {
         pk[i] = fr.pk_open[(uint64_t)s * PK * 2 * N + i];
+    }
+    // The credit's per-mode moments (along, around, gate bias) start from the opening's and move
+    // by the cell recursion below; `tower_credit` moves the material moments.
+    if (law.credit) {
+        const uint64_t blocks = law.credit_packet ? 2ull * law.credit - 1 : law.credit;
+        const uint64_t per = 6ull * N, bw = cr_block_words(law), at0 = 2ull * N * W;
+        for (uint64_t i = tid; i < blocks * per; i += B) {
+            const uint64_t at = s * cr_stream_words(law) + (i / per) * bw + at0 + i % per;
+            fr.cr_next[at] = fr.cr_open[at];
+        }
     }
     for (uint32_t i = tid; i < HD * W; i += B) {
         tro[i] = fr.tr_open[(uint64_t)s * HD * W + i];
@@ -1285,7 +1336,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 // The level's place among those that hear a packet.
                 const uint64_t qp = qc * PK + (l - F0);
                 uint64_t mre = 0, mim = 0;
+                // The credit of the packet the fine level carries rests with it (`LevelCredit`).
+                const bool credited_packet = law.credit && law.credit_packet && l - 1 >= F0;
+                if (credited_packet && tid == 0) {
+                    fr.cr_rest[qc * law.credit + (l - 1 - F0)] = still ? 0u : 1u;
+                }
                 for (uint32_t k = tid; k < N; k += B) {
+                    if (credited_packet && !still) {
+                        int64_t *blk = fr.cr_next + cr_block(law, s, l - 1 - F0, 1);
+                        for (uint32_t i = 0; i < 6; i++) {
+                            blk[2ull * N * W + (i / 2) * 2 * N + 2 * k + (i % 2)] = 0;
+                        }
+                    }
                     if (keep) {
                         fr.pk_state[(qp * N + k) * 2] = a[2 * k];
                         fr.pk_state[(qp * N + k) * 2 + 1] = a[2 * k + 1];
@@ -1365,6 +1427,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     }
                 }
             }
+            // The input the credited level's push and gate read at this cell (`tower_credit`).
+            if (law.credit && l >= F0) {
+                const uint64_t qx = qc * law.credit + (l - F0);
+                for (uint32_t j = tid; j < W; j += B) {
+                    fr.cr_x[qx * W + j] = still ? 0 : xin[j];
+                }
+            }
             // The pushes on 2^(−40) released to the state's 2^(−24), and the gate's logit.
             const bool n_re = !still && narrow_terms(lv.reach[0], xinmax, W, &st);
             const bool n_im = !still && narrow_terms(lv.reach[1], xinmax, W, &st);
@@ -1415,6 +1484,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 // A still level's state stands (a news clock carries no rotor, ring or pump); its
                 // push and moves rest at zero, as the host's empty gate.
                 if (still) {
+                    // A cell that ticks the credited level no time moves no moment: its turn is one.
+                    if (law.credit && l >= F0) {
+                        const uint64_t qk = ((qc * law.credit + (l - F0)) * N + k) * 2;
+                        fr.cr_turn[qk] = (int64_t)1 << MOVE_BITS;
+                        fr.cr_turn[qk + 1] = 0;
+                        fr.cr_push[qk] = fr.cr_push[qk + 1] = 0;
+                        fr.cr_gate[qk] = fr.cr_gate[qk + 1] = 0;
+                        fr.cr_pgate[qk] = fr.cr_pgate[qk + 1] = 0;
+                    }
                     const int64_t nr = h[(l * N + k) * 2], ni = h[(l * N + k) * 2 + 1];
                     fc[k] = fit64(rel(nr, STATE_BITS - FACE_BITS), &st);
                     fc[N + k] = fit64(rel(ni, STATE_BITS - FACE_BITS), &st);
@@ -1491,6 +1569,89 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 if (k < law.moving) {
                     hr = hs[2 * k];
                     hi = hs[2 * k + 1];
+                }
+                // The credit (`Tower::advance_moments`): each moment takes the move's sub-steps,
+                // `v`, `K` and the gate's drive reading the state between them (the modes', and the
+                // packet's for the packet's moments), and the cell's turn and coefficients are kept
+                // for `tower_credit`'s closed form. The card carries no turn, rotor or ring beside it.
+                if (law.credit && l >= F0) {
+                    const uint32_t cx = l - F0;
+                    const wide one = (wide)1 << MOVE_BITS;
+                    const wide modulus = gf[2] > 0 ? gf[2] : 1;
+                    const wide by_modulus = div_nearest((wide)GATE_REACH * open * rho, modulus);
+                    wide by_gate = rel(rho * gf[3], MOVE_BITS);
+                    by_gate = rel(by_gate * (wide)law.ln2_square, MOVE_BITS);
+                    by_gate = rel(by_gate * open, MOVE_BITS);
+                    by_gate = (wide)GATE_REACH * rel(by_gate * (one - open), MOVE_BITS);
+                    const wide p_r = pq[k], p_i = pq[N + k];
+                    const bool with_packet = law.credit_packet && l + 1 < L;
+                    const uint64_t qk = ((qc * law.credit + cx) * N + k) * 2;
+                    for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
+                        int64_t *blk = fr.cr_next + cr_block(law, s, cx, set) + 2ull * N * W;
+                        wide Ar = blk[2 * k], Ai = blk[2 * k + 1];
+                        wide Kr = blk[2 * N + 2 * k], Ki = blk[2 * N + 2 * k + 1];
+                        wide Qr = blk[4 * N + 2 * k], Qi = blk[4 * N + 2 * k + 1];
+                        wide sr = hr, si = hi;
+                        if (set == 1) {
+                            const int64_t *a = pk + ((uint64_t)(l + 1 - F0) * N + k) * 2;
+                            sr = a[0];
+                            si = a[1];
+                        }
+                        wide tr = one, ti = 0, cpr = 0, cpi = 0, cwr = 0, cwi = 0;
+                        for (uint32_t j = 0; j < tk[l]; j++) {
+                            wide xr, xi;
+                            cmul(lr, li, Ar, Ai, &Ar, &Ai);
+                            cmul(lr, li, Kr, Ki, &xr, &xi);
+                            wide nr_, ni_;
+                            cmul(lr, li, sr, si, &nr_, &ni_);
+                            Kr = fit64(xr - ni_, &st);
+                            Ki = fit64(xi + nr_, &st);
+                            cmul(lr, li, Qr, Qi, &Qr, &Qi);
+                            cmul(lr, li, cwr, cwi, &cwr, &cwi);
+                            if (!held) {
+                                const wide vr = rel((wide)gf[0] * sr - (wide)gf[1] * si, MOVE_BITS) - div_nearest(rho * p_r, (wide)gamma);
+                                const wide vi = rel((wide)gf[0] * si + (wide)gf[1] * sr, MOVE_BITS) - div_nearest(rho * p_i, (wide)gamma);
+                                Ar = fit64(Ar + rel(vr * by_modulus, MOVE_BITS), &st);
+                                Ai = fit64(Ai + rel(vi * by_modulus, MOVE_BITS), &st);
+                                const wide dr = rel(vr * by_gate, MOVE_BITS), di = rel(vi * by_gate, MOVE_BITS);
+                                Qr = fit64(Qr + dr, &st);
+                                Qi = fit64(Qi + di, &st);
+                                cwr += dr;
+                                cwi += di;
+                            } else {
+                                Ar = fit64(Ar, &st);
+                                Ai = fit64(Ai, &st);
+                                Qr = fit64(Qr, &st);
+                                Qi = fit64(Qi, &st);
+                            }
+                            cmul(lr, li, cpr, cpi, &cpr, &cpi);
+                            cpr += (wide)gamma;
+                            cmul(tr, ti, lr, li, &tr, &ti);
+                            const wide sn = fit64(rel(lr * sr - li * si, MOVE_BITS) + pr, &st);
+                            si = fit64(rel(lr * si + li * sr, MOVE_BITS) + pi, &st);
+                            sr = sn;
+                        }
+                        blk[2 * k] = (int64_t)Ar;
+                        blk[2 * k + 1] = (int64_t)Ai;
+                        blk[2 * N + 2 * k] = (int64_t)Kr;
+                        blk[2 * N + 2 * k + 1] = (int64_t)Ki;
+                        blk[4 * N + 2 * k] = (int64_t)Qr;
+                        blk[4 * N + 2 * k + 1] = (int64_t)Qi;
+                        if (set == 0) {
+                            fr.cr_turn[qk] = (int64_t)tr;
+                            fr.cr_turn[qk + 1] = (int64_t)ti;
+                            fr.cr_push[qk] = (int64_t)cpr;
+                            fr.cr_push[qk + 1] = (int64_t)cpi;
+                            fr.cr_gate[qk] = fit64(cwr, &st);
+                            fr.cr_gate[qk + 1] = fit64(cwi, &st);
+                        } else {
+                            fr.cr_pgate[qk] = fit64(cwr, &st);
+                            fr.cr_pgate[qk + 1] = fit64(cwi, &st);
+                        }
+                    }
+                    if (!with_packet) {
+                        fr.cr_pgate[qk] = fr.cr_pgate[qk + 1] = 0;
+                    }
                 }
                 for (uint32_t j = 0; j < tk[l]; j++) {
                     const wide ar = rel(lr * hr - li * hi + br * hr + bi * hi, MOVE_BITS);
@@ -3163,6 +3324,31 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             fr.gim[ql * N + k] = fit64(rel(gamma * pgi, MOVE_BITS), &st);
             fr.dq[ql * N + k] = dq;
         }
+        // The opening's credit (`LevelCredit`): the covector of the carried modes,
+        // a = conj(λ_0)^(Δτ(0)) G_h(0), and of the carried packet, meet the moments their history
+        // carried; the per-mode moments here, the material moments in `tower_credit_meet`, which
+        // reads the covectors kept.
+        if (law.credit && l >= F0) {
+            const uint32_t cx = l - F0;
+            const uint64_t ql0 = (uint64_t)s * T * L + l;
+            const uint32_t ticks0 = law.news ? fr.ticks[ql0] : 1;
+            const int64_t *mv0 = fr.moves + (ql0 * N + k) * 6;
+            const bool with_packet = law.credit_packet && carrying;
+            for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
+                wide ar = set == 0 ? cr : car, ai = set == 0 ? ci : cai;
+                for (uint32_t j = 0; j < ticks0; j++) {
+                    const wide nr_ = rel((wide)mv0[3] * ar + (wide)mv0[4] * ai, MOVE_BITS);
+                    ai = rel((wide)mv0[3] * ai - (wide)mv0[4] * ar, MOVE_BITS);
+                    ar = nr_;
+                }
+                int64_t *cov = fr.cr_cov + ((((uint64_t)s * law.credit + cx) * 2 + set) * N + k) * 2;
+                cov[0] = fit64(ar, &st);
+                cov[1] = fit64(ai, &st);
+                const int64_t *blk = fr.cr_open + cr_block(law, s, cx, set) + 2ull * N * law.width;
+                along += ar * (wide)blk[2 * k] + ai * (wide)blk[2 * k + 1];
+                around += ar * (wide)blk[2 * N + 2 * k] + ai * (wide)blk[2 * N + 2 * k + 1];
+            }
+        }
         // The Cartesian covector of the founded move: G_λ = u G_|λ| + i u G_φ/|λ|.
         const wide turn = div_nearest(around << MOVE_BITS, modulus);
         wide *out = fr.moves_g + (((uint64_t)s * L + l) * N + k) * 2;
@@ -3962,6 +4148,131 @@ extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
             acc += fr.dz[q * A + u];
         }
         fr.gradient[law.readout_bias + u] = acc;
+    }
+}
+
+// The credit's material moments moved through the read's cells in closed form
+// (`Tower::advance_moments`): one block a stream (`blockIdx.x`) and credited level (`blockIdx.y`).
+// Each mode's thread turns its cells' turns into the turn after each cell, π_s, and the whole
+// section's, and its coefficients into their rows π_s c_s; then each output P_kj (and W_kj, and the
+// packet's) is M_T = whole·M_0 + release(Σ_s row_s x_s), the packet's sums from after its last rest
+// and its opening moments kept only when it never rested.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLaw law, TowerFrame fr) {
+    const uint32_t s = blockIdx.x, cx = blockIdx.y, tid = threadIdx.x, B = blockDim.x;
+    const uint32_t N = law.modes, W = law.width, T = law.cells, CL = law.credit;
+    const uint32_t l = law.news_first + cx;
+    const bool with_packet = law.credit_packet && l + 1 < law.levels;
+    const wide one = (wide)1 << MOVE_BITS;
+    extern __shared__ __align__(16) unsigned char smem[];
+    wide *whole = (wide *)smem; // [N][2]
+    __shared__ uint32_t st, from;
+    if (tid == 0) {
+        st = 0;
+        from = 0;
+        if (with_packet) {
+            for (uint32_t t = T; t > 0; t--) {
+                if (fr.cr_rest[((uint64_t)s * T + t - 1) * CL + cx]) {
+                    from = t;
+                    break;
+                }
+            }
+        }
+    }
+    for (uint32_t k = tid; k < N; k += B) {
+        wide ar = one, ai = 0;
+        for (uint32_t step = 0; step < T; step++) {
+            const uint32_t t = T - 1 - step;
+            const uint64_t qk = ((((uint64_t)s * T + t) * CL + cx) * N + k) * 2;
+            const wide tr = fr.cr_turn[qk], ti = fr.cr_turn[qk + 1];
+            // The cell's rows π_t c_t, π_t the turn after it.
+            wide r, i;
+            cmul(ar, ai, fr.cr_push[qk], fr.cr_push[qk + 1], &r, &i);
+            fr.cr_push[qk] = fit64(r, &st);
+            fr.cr_push[qk + 1] = fit64(i, &st);
+            cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &r, &i);
+            fr.cr_gate[qk] = fit64(r, &st);
+            fr.cr_gate[qk + 1] = fit64(i, &st);
+            cmul(ar, ai, fr.cr_pgate[qk], fr.cr_pgate[qk + 1], &r, &i);
+            fr.cr_pgate[qk] = fit64(r, &st);
+            fr.cr_pgate[qk + 1] = fit64(i, &st);
+            cmul(ar, ai, tr, ti, &ar, &ai);
+        }
+        whole[2 * k] = ar;
+        whole[2 * k + 1] = ai;
+    }
+    __syncthreads();
+    // Each output: (set, family, k, j); a family's rows are the push's (both sets) or the gate's
+    // (its own set's).
+    const uint32_t sets = with_packet ? 2 : 1;
+    const uint64_t outputs = (uint64_t)sets * 2 * N * W;
+    for (uint64_t o = tid; o < outputs; o += B) {
+        const uint32_t set = (uint32_t)(o / (2ull * N * W));
+        const uint32_t fam = (uint32_t)((o / ((uint64_t)N * W)) % 2);
+        const uint32_t k = (uint32_t)((o / W) % N), j = (uint32_t)(o % W);
+        const uint32_t t0 = set == 1 ? from : 0;
+        const int64_t *rows = fam == 0 ? fr.cr_push : (set == 0 ? fr.cr_gate : fr.cr_pgate);
+        wide sr = 0, si = 0;
+        for (uint32_t t = t0; t < T; t++) {
+            const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
+            const wide x = fr.cr_x[qc * W + j];
+            sr += (wide)rows[(qc * N + k) * 2] * x;
+            si += (wide)rows[(qc * N + k) * 2 + 1] * x;
+        }
+        const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
+        const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j) * 2;
+        const int64_t *m0 = fr.cr_open + cr_block(law, s, cx, set) + place;
+        int64_t *m1 = fr.cr_next + cr_block(law, s, cx, set) + place;
+        wide er = 0, ei = 0;
+        if (t0 == 0) {
+            cmul(whole[2 * k], whole[2 * k + 1], m0[0], m0[1], &er, &ei);
+        }
+        m1[0] = fit64(er + rel(sr, shift), &st);
+        m1[1] = fit64(ei + rel(si, shift), &st);
+    }
+    __syncthreads();
+    if (tid == 0 && st != 0) {
+        atomicOr(fr.status + s, st);
+    }
+}
+
+// The opening's credit meets the material moments (`Tower::reverse_joined`): one thread an entry of
+// a credited level's push (re and im) and gate, or of its gate bias, summing over the streams and
+// the level's sets (its own moments and its packet's) each stream's release, added to the covector
+// the outer sums wrote (integer sums: any order).
+extern "C" __global__ void tower_credit_meet(TowerLaw law, TowerFrame fr) {
+    const uint32_t cx = blockIdx.y, N = law.modes, W = law.width, CL = law.credit;
+    const uint32_t l = law.news_first + cx;
+    const TowerLevel lv = law.level[l];
+    const uint32_t sets = law.credit_packet && l + 1 < law.levels ? 2 : 1;
+    const uint64_t items = (uint64_t)N * W + N;
+    for (uint64_t e = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; e < items; e += (uint64_t)gridDim.x * blockDim.x) {
+        const bool bias = e >= (uint64_t)N * W;
+        const uint32_t k = bias ? (uint32_t)(e - (uint64_t)N * W) : (uint32_t)(e / W), j = bias ? 0 : (uint32_t)(e % W);
+        wide pre = 0, pim = 0, gate = 0, gbias = 0;
+        for (uint32_t s = 0; s < law.streams; s++) {
+            for (uint32_t set = 0; set < sets; set++) {
+                const int64_t *cov = fr.cr_cov + ((((uint64_t)s * CL + cx) * 2 + set) * N + k) * 2;
+                const wide ar = cov[0], ai = cov[1];
+                const int64_t *blk = fr.cr_open + cr_block(law, s, cx, set);
+                if (bias) {
+                    const int64_t *q = blk + 2ull * N * W + 4ull * N + 2 * k;
+                    gbias += rel(ar * (wide)q[0] + ai * (wide)q[1], COVECTOR_BITS);
+                } else {
+                    const int64_t *p = blk + ((uint64_t)k * W + j) * 2;
+                    pre += rel(ar * (wide)p[0] + ai * (wide)p[1], STATE_BITS - FACE_BITS);
+                    pim += rel(ai * (wide)p[0] - ar * (wide)p[1], STATE_BITS - FACE_BITS);
+                    const int64_t *g = blk + 2ull * N * W + 6ull * N + ((uint64_t)k * W + j) * 2;
+                    gate += rel(ar * (wide)g[0] + ai * (wide)g[1], STATE_BITS - FACE_BITS);
+                }
+            }
+        }
+        if (bias) {
+            fr.gradient[lv.gate_bias + k] += gbias;
+        } else {
+            fr.gradient[lv.push_re + (uint64_t)k * W + j] += pre;
+            fr.gradient[lv.push_im + (uint64_t)k * W + j] += pim;
+            fr.gradient[lv.gate + (uint64_t)k * W + j] += gate;
+        }
     }
 }
 

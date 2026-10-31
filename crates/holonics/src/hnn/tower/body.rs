@@ -375,11 +375,16 @@ impl TowerState {
         s.push_str(&line("strands", self.strands.iter()));
         match &self.credit {
             None => s.push_str("credit -\n"),
+            // A credit a realization holds resident is not the host's to write: its text says so,
+            // and reading it back refuses.
+            Some(levels) if LevelCredit::residence(levels).is_some() => s.push_str("credit resident\n"),
             Some(levels) => {
                 let mut v = Vec::new();
                 for c in levels {
-                    for part in [&c.push, &c.along, &c.around, &c.gate_bias, &c.gate] {
-                        flatten(&mut v, part);
+                    for set in std::iter::once(c).chain(c.packet.as_deref()) {
+                        for part in set.parts() {
+                            flatten(&mut v, part);
+                        }
                     }
                 }
                 s.push_str(&line("credit", v));
@@ -461,26 +466,27 @@ impl Tower {
         let strands = entries::<u32>(lines[4], "strands", rest.strands.len())?;
         let credit = match lines[5] {
             "credit -" => None,
+            "credit resident" => return refuse("a credit a realization held resident was written without its moments"),
             text => {
-                let template = self.rest_with_credit().credit.unwrap_or_default();
-                let shape = |c: &LevelCredit| [c.push.len(), c.along.len(), c.around.len(), c.gate_bias.len(), c.gate.len()];
-                let total: usize = template.iter().map(|c| 2 * shape(c).iter().sum::<usize>()).sum();
+                let mut template = self.rest_with_credit().credit.unwrap_or_default();
+                let sets = |c: &LevelCredit| 1 + usize::from(c.packet.is_some());
+                let total: usize = template.iter().map(|c| sets(c) * 2 * c.parts().iter().map(|p| p.len()).sum::<usize>()).sum();
                 let v = entries::<i64>(text, "credit", total)?;
                 let mut at = 0;
-                let mut take = |n: usize| {
-                    let part = paired(&v[at..at + 2 * n]);
-                    at += 2 * n;
-                    part
+                let mut fill = |set: &mut LevelCredit| {
+                    for part in set.parts_mut() {
+                        let n = part.len();
+                        *part = paired(&v[at..at + 2 * n]);
+                        at += 2 * n;
+                    }
                 };
-                Some(
-                    template
-                        .iter()
-                        .map(|c| {
-                            let [p, a, r, gb, g] = shape(c);
-                            LevelCredit { push: take(p), along: take(a), around: take(r), gate_bias: take(gb), gate: take(g) }
-                        })
-                        .collect(),
-                )
+                for c in &mut template {
+                    fill(c);
+                    if let Some(packet) = c.packet.as_deref_mut() {
+                        fill(packet);
+                    }
+                }
+                Some(template)
             }
         };
         let open = match lines[6] {

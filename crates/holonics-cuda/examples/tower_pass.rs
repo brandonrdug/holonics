@@ -1,7 +1,7 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | pair | split]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | pair | split]`:
 //!   founds the gated tower (rectifying, or with pair contacts when `pair`, `packets-pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
@@ -9,7 +9,8 @@
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
 //!   the passage joined last (`Tower::join_passage`) when `passage` is (and the packets after it,
 //!   `Tower::join_packets`, when `packets` or `packets-pair` is, and the heading after them,
-//!   `Tower::join_heading`, when `heading` is), and runs
+//!   `Tower::join_heading`, when `heading` is, every stream carrying the clocked levels' credit when
+//!   `heading-credited` is, `LevelCredit`), and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
 //!   face (and, under the heading, each clocked level's closure faces) and the whole summed covector
@@ -33,7 +34,7 @@
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
 //!   `train-two-ladder-pair-tower-classes`, `train-two-ladder-split-tower-classes`,
 //!   `train-two-ladder-dormant-split-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, `train-two-ladder-stacked-news-packet-pair-tower-classes`, `train-two-ladder-stacked-news-heading-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, `train-two-ladder-stacked-news-packet-pair-tower-classes`, `train-two-ladder-stacked-news-heading-tower-classes`, `train-two-ladder-stacked-news-heading-credited-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
@@ -87,7 +88,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | pair | split]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | pair | split]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -102,7 +103,9 @@ fn parity(args: &[String]) -> Result<()> {
     // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′;
     // `packets-pair` is C′ with every contact the pair contact; `heading` is C′ with the heading
     // joined after the packets (`Tower::join_heading`), the race's H.
-    let heading = word == Some("heading");
+    // `heading-credited` is the race's H with every stream carrying the clocked levels' credit.
+    let credited = word == Some("heading-credited");
+    let heading = word == Some("heading") || credited;
     let packets = word == Some("packets") || word == Some("packets-pair") || heading;
     // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
     // `train-two-ladder-pair-tower-classes`.
@@ -177,7 +180,7 @@ fn parity(args: &[String]) -> Result<()> {
     } else {
         None
     };
-    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired)
+    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired, credited)
 }
 
 fn parity_state(args: &[String]) -> Result<()> {
@@ -223,15 +226,18 @@ fn parity_from(state: &[u8], classes: &[usize], args: &[String]) -> Result<()> {
     };
     let mut host = host;
     let mut carded = TowerLearner::from_text(std::str::from_utf8(state)?)?;
-    lockstep(&mut host, &mut carded, classes, streams, section, sections, None)?;
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, None, false)?;
     println!("TOWER_PARITY_SHA sections={sections} whole_pass={} host={} card={}", sections == whole, digest(host.to_text().as_bytes())?, digest(carded.to_text().as_bytes())?);
     Ok(())
 }
 
 /// Host against card in lockstep over `sections` sections of the passage split into `streams`
 /// streams, every stream from rest; with `paired` (the host's directions, then the card's), each
-/// section's split read and founding too.
-fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>) -> Result<()> {
+/// section's split read and founding too; with `credited`, every stream from rest with its credit,
+/// the card's learner holding it resident (each section's direct read on a second realization,
+/// which uploads the host's), and its credit fetched to compare the states.
+#[allow(clippy::too_many_arguments)]
+fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>, credited: bool) -> Result<()> {
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -241,7 +247,8 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     if std::env::var_os("TOWER_PROFILE").is_some() {
         card.profile();
     }
-    let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
+    let mut direct = TowerCard::open(&opened)?;
+    let mut states_h: Vec<TowerState> = (0..streams).map(|_| if credited { host.tower.rest_with_credit() } else { host.tower.rest() }).collect();
     let mut states_c = states_h.clone();
     let started = Instant::now();
     let (mut faces_all, mut faces_unequal, mut entries_all, mut entries_unequal, mut learners_unequal) = (0usize, 0usize, 0usize, 0usize, 0usize);
@@ -266,13 +273,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         // section.
         drop(reference);
         let t1 = Instant::now();
-        let read_c = card.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
+        let reading = if credited { &mut direct } else { &mut card };
+        let read_c = reading.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
         let (g_c, split_c) = match &paired {
             Some((p, _)) => {
-                let (g, read) = card.reverse_split(&host.tower, &states_h, &parts, None, p)?;
+                let (g, read) = reading.reverse_split(&host.tower, &states_h, &parts, None, p)?;
                 (g, Some(read))
             }
-            None => (card.reverse(&host.tower, &states_h, &parts, None)?, None),
+            None => (reading.reverse(&host.tower, &states_h, &parts, None)?, None),
         };
         let split_equal = split_h == split_c;
         splits_unequal += usize::from(!split_equal);
@@ -321,7 +329,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
                 paired.as_ref().map_or(Ok(0), |(p, _)| p.parting(&host.tower))?
             );
         }
-        let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == states_c;
+        let fetched = if credited {
+            let mut fetched = states_c.clone();
+            card.fetch_credit(&carded.tower, &mut fetched)?;
+            fetched
+        } else {
+            states_c.clone()
+        };
+        let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == fetched;
         learners_unequal += usize::from(!learner_equal);
         host_ns += (t1 - t0).as_nanos() + (t4 - t3).as_nanos();
         card_ns += (t2 - t1).as_nanos() + (t5 - t4).as_nanos();
