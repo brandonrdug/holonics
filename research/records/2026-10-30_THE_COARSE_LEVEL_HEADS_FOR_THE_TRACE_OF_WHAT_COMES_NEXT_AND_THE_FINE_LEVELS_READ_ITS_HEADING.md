@@ -3057,9 +3057,11 @@ after none to one), the training code rose from 1.470 to 1.871 and the held-out 
 largest magnitude of each level's carriers): at lap 13 level 1's state grew about seven times
 (10,567,904 to 65,349,968 and 75,786,219 grains) and its raw read about fifteen times (16,250,875 to
 252,741,798), the passing current into levels 1 to 4 about four times in two laps (3.0 to 13.5 million),
-and level 4's contact drive about five times. The passing current is the sum of every level's returns
-and nothing bounds it; the pair contact's return is a product of two drives, so it grows with the square
-of their scale and feeds back through that sum. The same run-away is the likeliest cause of C′'s rise
+and level 4's contact drive about five times, while the materials' largest entries barely moved (level
+1's push 17.3 to 19.8 million grains, its read 31.7 to 38.9 million). The passing current is the sum of
+every level's returns, bounded only through the materials' norms, and quadratically for the pair contact,
+whose return is a product of two drives; the run-away is in the carriers through materials that came into
+alignment, not in any one entry. Which carrier grows first is not yet read. The same run-away is the likeliest cause of C′'s rise
 with pair contacts from its 13th lap (October 30) and of the plateau the pair learner crossed at laps
 18 to 30 here; participation adds to the drives and tips it over. The next loop's subject is that place:
 what the contacts return into the passing current is bounded by passivity, proved for the pair contact,
