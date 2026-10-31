@@ -1820,3 +1820,23 @@ equal elapsed time by the same margin after a lap; the every-level credit's per-
 clocked one (0.021) is bought back by its 10% more time a lap, as in the hour-long race. Its excess
 is the subject: `tower_credit` at six levels (24.4 ms a launch) and the per-mode moments it moves in
 the forward's cell-by-cell scan.
+
+## 26. The credit's sums in 64 bits where they are bounded
+
+[agent-inferred, October 31] **The realization** (execution only). `tower_credit` reads each
+family's largest row and the level's largest input over the stream's section, and a family whose
+sum is bounded below `2^63` (`T max|row| max|x|`) sums in 64 bits; any other sums in 128, as
+before. Either is the integer sum, so the bits are the same (the outer sums' rule since October 25).
+A first try that staged the inputs in shared memory instead read slower (25.3 and 25.5 s against
+24.9 and 25.1 s to section 64, the shared memory costing blocks in flight) and was reverted.
+
+**At the card** (07:51Z, binary `tower_pass-26b` against `f1838a95…f8eb`, alternated, the
+every-level credit's first 64 sections): one set of lines; section 64 at 24,444 and 24,444 ms
+against 24,811 and 24,912 ms (1.7% sooner); `tower_credit` 16.3 ms a launch against 24.4. The card
+suite passed, 46 of 46.
+
+**What remains** of the every-level credit's excess over the clocked one (the capped race's
+64-section reads, 07:18Z): its forward 90.2 ms a launch against 84.1, about 13 ms on each forward
+that advances the credit, which runs its moments inside the forward's cell-by-cell scan; and its
+`tower_credit`. The next realization moves the moments out of the scan: the forward keeps each cell's
+move for the read a carry keeps, and a kernel of one thread a mode moves the moments in parallel.

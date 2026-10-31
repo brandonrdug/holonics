@@ -4209,7 +4209,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
     extern __shared__ __align__(16) unsigned char smem[];
     wide *whole = (wide *)smem; // [N][2]
     __shared__ uint32_t st, from;
+    // The rows' and inputs' largest magnitudes (record §26): a family whose sums are bounded below
+    // 2^63 sums in 64 bits, any other in 128 (either is the integer sum).
+    __shared__ unsigned long long row_max[3], x_max;
+    if (tid < 3) {
+        row_max[tid] = 0;
+    }
     if (tid == 0) {
+        x_max = 0;
         st = 0;
         from = 0;
         if (with_packet) {
@@ -4221,6 +4228,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
             }
         }
     }
+    __syncthreads();
+    uint64_t mp = 0, mg = 0, mq = 0;
     for (uint32_t k = tid; k < N; k += B) {
         wide ar = one, ai = 0;
         for (uint32_t step = 0; step < T; step++) {
@@ -4232,19 +4241,33 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
             cmul(ar, ai, fr.cr_push[qk], fr.cr_push[qk + 1], &r, &i);
             fr.cr_push[qk] = fit64(r, &st);
             fr.cr_push[qk + 1] = fit64(i, &st);
+            mp = max(mp, max(magnitude(fr.cr_push[qk]), magnitude(fr.cr_push[qk + 1])));
             cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &r, &i);
             fr.cr_gate[qk] = fit64(r, &st);
             fr.cr_gate[qk + 1] = fit64(i, &st);
+            mg = max(mg, max(magnitude(fr.cr_gate[qk]), magnitude(fr.cr_gate[qk + 1])));
             if (with_packet) {
                 const uint64_t qp = ((((uint64_t)s * T + t) * NP + px) * N + k) * 2;
                 cmul(ar, ai, fr.cr_pgate[qp], fr.cr_pgate[qp + 1], &r, &i);
                 fr.cr_pgate[qp] = fit64(r, &st);
                 fr.cr_pgate[qp + 1] = fit64(i, &st);
+                mq = max(mq, max(magnitude(fr.cr_pgate[qp]), magnitude(fr.cr_pgate[qp + 1])));
             }
             cmul(ar, ai, tr, ti, &ar, &ai);
         }
         whole[2 * k] = ar;
         whole[2 * k + 1] = ai;
+    }
+    atomicMax(&row_max[0], (unsigned long long)mp);
+    atomicMax(&row_max[1], (unsigned long long)mg);
+    atomicMax(&row_max[2], (unsigned long long)mq);
+    {
+        uint64_t mx = 0;
+        for (uint32_t i = tid; i < T * W; i += B) {
+            const uint32_t t = i / W, j = i % W;
+            mx = max(mx, magnitude(fr.cr_x[(((uint64_t)s * T + t) * CL + cx) * W + j]));
+        }
+        atomicMax(&x_max, (unsigned long long)mx);
     }
     __syncthreads();
     // Each output: (set, family, k, j); a family's rows are the push's (both sets) or the gate's
@@ -4258,13 +4281,28 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
         const uint32_t t0 = set == 1 ? from : 0;
         const bool packet_rows = fam == 1 && set == 1;
         const int64_t *rows = fam == 0 ? fr.cr_push : (set == 0 ? fr.cr_gate : fr.cr_pgate);
+        // The sum's bound, T max|row| max|x|: below 2^63 it runs in 64 bits.
+        const uwide bound = (uwide)row_max[fam == 0 ? 0 : (set == 0 ? 1 : 2)] * (uwide)x_max * (uwide)(T - t0);
         wide sr = 0, si = 0;
-        for (uint32_t t = t0; t < T; t++) {
-            const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
-            const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
-            const wide x = fr.cr_x[qc * W + j];
-            sr += (wide)rows[(qr * N + k) * 2] * x;
-            si += (wide)rows[(qr * N + k) * 2 + 1] * x;
+        if (bound < ((uwide)1 << 63)) {
+            int64_t r64 = 0, i64 = 0;
+            for (uint32_t t = t0; t < T; t++) {
+                const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
+                const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
+                const int64_t x = fr.cr_x[qc * W + j];
+                r64 += rows[(qr * N + k) * 2] * x;
+                i64 += rows[(qr * N + k) * 2 + 1] * x;
+            }
+            sr = r64;
+            si = i64;
+        } else {
+            for (uint32_t t = t0; t < T; t++) {
+                const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
+                const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
+                const wide x = fr.cr_x[qc * W + j];
+                sr += (wide)rows[(qr * N + k) * 2] * x;
+                si += (wide)rows[(qr * N + k) * 2 + 1] * x;
+            }
         }
         const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
         const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j) * 2;
