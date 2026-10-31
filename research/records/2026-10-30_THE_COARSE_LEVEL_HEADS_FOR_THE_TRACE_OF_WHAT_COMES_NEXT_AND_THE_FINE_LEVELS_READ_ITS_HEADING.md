@@ -1868,3 +1868,21 @@ passed, 46 of 46 (its credited parities compare every stream's fetched credit wi
 
 The every-level credit's lap now costs 1.068 times the clocked credit's (1.10 before §26–§27), and
 after a lap it leads C′ at equal elapsed time by more than the clocked credit does.
+
+**Toward an hour on it** (08:26Z to 08:53Z, one session, after gate 1 passed at `9aa442215`): the
+every-level credit four laps from C′'s founding (740.0 s against 860 s, peak 4,002,504 KiB), then
+the clocked credit five (858.1 s against 1,005 s); peak VRAM 10,852 MiB with the game's.
+
+| lap | every-level: elapsed, held-out (GSM8K), lap | clocked: elapsed, held-out (GSM8K), lap | clocked at the every-level lap end's time | every-level's lead |
+|---|---|---|---|---|
+| 1 | 190.0 s, 2.270 (2.310), 190.0 s | 177.1 s, 2.291 (2.328), 177.1 s | 2.278 | +0.008 |
+| 2 | 373.6 s, 2.113 (2.109), 183.6 s | 347.7 s, 2.125 (2.140), 170.5 s | 2.113 | −0.000 |
+| 3 | 556.8 s, 2.037 (2.018), 183.2 s | 518.1 s, 2.044 (2.036), 170.5 s | 2.036 | −0.001 |
+| 4 | 739.3 s, 1.992 (1.963), 182.5 s | 687.7 s, 2.008 (1.985), 169.6 s | 1.997 | +0.005 |
+| 5 | | 857.5 s, 1.972 (1.948), 169.8 s | | |
+
+Every lap's lines are the earlier runs'. The two credits stay level at equal elapsed time (within
+0.010 either way), the every-level credit ahead pass for pass by 0.007 to 0.021 held out and 0.018
+to 0.031 on the GSM8K region, its later laps 1.07 to 1.08 times the clocked credit's. Its 7%
+remains the subject before an equal-time lead: `tower_credit` and the moments' kernel at six levels
+against two.
