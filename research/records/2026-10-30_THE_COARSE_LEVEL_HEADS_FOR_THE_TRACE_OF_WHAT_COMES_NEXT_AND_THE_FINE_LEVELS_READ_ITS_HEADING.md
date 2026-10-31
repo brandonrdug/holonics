@@ -1744,3 +1744,18 @@ against 467 s, peak resident set 3,216,884 KiB, peak VRAM 10,856 MiB with the ga
   its session before §23 cut 6% of a section. Whether the every-level credit leads the clocked one at
   equal elapsed time is not read by this race (they ran in sessions of different card speed); a
   race of the two in one session reads it next.
+
+**The two credits in one session** (October 31, 06:31Z to 06:44Z, the same binary): the clocked
+credit for two laps (469.4 s against 580 s), then the every-level credit for one (258.7 s against
+310 s); peak VRAM 10,833 MiB with the game's.
+
+| | clocked credit | every-level credit |
+|---|---|---|
+| lap 1: held-out, elapsed | 2.291, 246.1 s | **2.270**, 258.2 s |
+| lap 2: held-out, elapsed | 2.125, 468.7 s | |
+| the clocked credit at 258.2 s (interpolated) | 2.282 | |
+
+At equal elapsed time the every-level credit leads the clocked one by 0.012 on held-out material,
+and its arrivals read below the clocked credit's at 17 of 23 windows (22 lap for lap); its first
+lap cost 1.049 times the clocked credit's. **The every-level credit is the working law.** The race
+runs toward an hour next, both continuing in one session.
