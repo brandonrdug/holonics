@@ -391,7 +391,7 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
-    let end = tower.declaration.alphabet - 1;
+    let end = end_class(tower.declaration.alphabet)?;
     let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let limit = positive(&args[7])?;
@@ -483,6 +483,22 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     Ok(())
 }
 
+/// [agent-inferred, October 31] The end letter's class: the alphabet's last, or the class the boundary
+/// codec declares in `TOWER_END_CLASS` (a unit release, whose end letter is the record separator's unit,
+/// record §33).
+fn end_class(alphabet: usize) -> Result<usize> {
+    match std::env::var("TOWER_END_CLASS") {
+        Ok(v) => {
+            let end = v.parse::<usize>()?;
+            if end >= alphabet {
+                return Err("TOWER_END_CLASS names a class outside the alphabet".into());
+            }
+            Ok(end)
+        }
+        Err(_) => Ok(alphabet - 1),
+    }
+}
+
 /// The code a class of each prompt's release read from the state its prompt left (`−log₂ p̂` summed on
 /// `2^(−20)` bits over the released classes, the first read against the prompt's own face), through
 /// `realization`.
@@ -519,7 +535,7 @@ pub(crate) fn release_span_realized(args: &[String], realization: &mut dyn PassR
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
-    let end = tower.declaration.alphabet - 1;
+    let end = end_class(tower.declaration.alphabet)?;
     let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
     let keys = pinned_read(&args[5], &args[6], KEY_BUDGET)?;
     let (limit, agree, candidates) = (positive(&args[7])?, positive(&args[8])?, positive(&args[9])?);

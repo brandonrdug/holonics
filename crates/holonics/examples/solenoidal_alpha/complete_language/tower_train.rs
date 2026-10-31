@@ -3349,6 +3349,19 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 /// `train-unit-pair-pumped-tower` the pumped tower whose contacts are pair contacts, which take the
 /// product of two modes' phases (record `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
 pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, turned, pumped, contact, false, realization)
+}
+
+/// [agent-inferred, October 31] `train-two-ladder-stacked-news-heading-credited-every-level-unit-tower
+/// UNITS …`: the race's working declaration (the stacked news clock, the passage, the packets, the
+/// heading and every level's credit, on both turn ladders) read in founded units, the passage's bytes
+/// parsed as `train-unit-tower` parses them (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §33).
+pub(super) fn train_units_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Rectifying, true, realization)
+}
+
+fn train_units_joined(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, race: bool, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 20 && args.len() != 22 {
         return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -3375,6 +3388,9 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
+    if race {
+        return fit(&args[9..], reading, true, false, false, Credit::From(0), contact, TurnLadder::Both, Some(super::tower_classes::race_stacked_news_clock()), Joined::PassagePacketsHeading, None, realization);
+    }
     fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, Joined::Nothing, None, realization)
 }
 
@@ -3587,6 +3603,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let sections_a_pass = match std::env::var("TOWER_LAP_SECTIONS") {
         Ok(v) => v.parse::<usize>()?.clamp(1, (chunk - 1) / section),
         Err(_) => (chunk - 1) / section,
+    };
+    // [agent-inferred, October 31] The windows the run's lines are read over (`TOWER_WINDOW_SECTIONS`,
+    // 32 sections when undeclared): a reading's partition, which moves nothing the learner does.
+    let window_sections = match std::env::var("TOWER_WINDOW_SECTIONS") {
+        Ok(v) => v.parse::<usize>()?.max(1),
+        Err(_) => 32,
     };
     // [agent-inferred, October 30] A declared hold (`TOWER_HOLD`, `heading` and/or `descent`): the
     // heading's read `C^→` or its descent `D` read and never deposited, a foil that separates which
@@ -3813,7 +3835,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                     refusal_parts.1[n] += change;
                 }
             }
-            if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
+            if (k + 1) % window_sections == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
                     pass, k + 1, per(window.0, window.1), deposits, halvings, started.elapsed().as_millis()

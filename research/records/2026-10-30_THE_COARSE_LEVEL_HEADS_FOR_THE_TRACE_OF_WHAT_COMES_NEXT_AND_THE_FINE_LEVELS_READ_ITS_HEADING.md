@@ -2378,3 +2378,108 @@ whole word problem's shape (question, working, answer line, end letter). Its sha
 span's: `p(s)²` over spans moves the release's code a class from about 1.9 to about 1.5 bits, where
 the class agreement moves it to about 1.0. Nothing in it computes, and the arithmetic in the
 writing is wrong at every mark.
+
+## 32. A repeating period, read by the working learner
+
+[agent-inferred, October 31] **Why now** (#405, "on an exactly repeating period, the code per cell
+falls on every repeat"; #404, "what it learns is kept"). The every-level credit is the working law,
+and every reading of it so far is a race's held-out code on the whole passage. The plainest test of
+online learning and retention on it has not been read: a passage that repeats one period exactly,
+where every deposit should lower what the receiver still has to be told, within minutes, and a cold
+restart should keep it. Two periods: the four digits `1729`, and one 79-byte sentence of the
+repository's own line ("Compression is intelligence is navigation, and the HNN executes both at
+scale. "), each repeated over 64 sections of 128 classes on one stream, from C′'s founding keys, the
+race's declaration with the heading and every level's credit, each section's code read
+(`TOWER_WINDOW_SECTIONS=1`, a reading's partition that moves nothing).
+
+**Acceptance, fixed before the run.**
+57. On each period the code of each of the first 16 sections is at most the one before it, and the
+    period's held-out read (257 classes of the same period, read from rest) after the pass is at most
+    1/8 bit a class.
+58. Cold restart: the learner continued from its saved state reads its first section at most 1/8 bit
+    a class, its streams opening at rest (only the material is carried).
+
+If 57 fails on the digits, the learner does not lock a four-class period in 64 deposits, and that
+measurement is the next subject.
+
+**At the card** (16:26Z, binary `tower_pass-32a` `77dd660c…a555`, each run 6.0 to 17.6 s against
+120 s; receipts `period-*.txt`). Each section's code, bits a class:
+
+| section | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 16 | 20 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| digits | 8.006 | 7.648 | 2.032 | 1.801 | 1.590 | 1.156 | 0.560 | 0.032 | 0.066 | 0.021 | 0.003 | 0.000 | 0.000 | 0.000 |
+| sentence | 8.006 | 7.805 | 4.622 | 4.379 | 4.349 | 4.214 | 4.068 | 4.079 | 4.093 | 3.779 | 3.583 | 3.259 | 1.881 | 0.751 |
+
+- **Acceptance 57 failed on its first half and passed on its second.** The code fell from 8 bits a
+  class to zero on the digits by section 12 and to 0.004 a class over the sentence's pass, but not at
+  every section: it rose at the digits' ninth section (0.032 to 0.066) and at the sentence's eighth,
+  ninth and fifteenth. The period's held-out read after the pass: 0.000 on the digits, 0.120 on the
+  sentence (bar 1/8).
+- **Acceptance 58 passed on the digits and failed on the sentence.** Continued from its saved state,
+  the digits' learner read its first section at 0.000; the sentence's at 0.239, then 0.001: from rest
+  a stream must first locate its phase in a 79-byte period (`log₂ 79 ≈ 6.3` bits, with the opening's
+  first classes read against the period's every place), which the bar did not allow for.
+
+So the working learner locks a four-class period in about ten deposits and a 79-byte one in about
+twenty-five, and a cold restart keeps the lock; its fall is not monotone, a deposit sometimes raising
+the next section's code by a few hundredths of a bit while the code falls by orders of magnitude.
+
+## 33. The working declaration reads founded units
+
+[agent-inferred, October 31] **Why now.** The every-level credit levels near 1.85 bits a byte held out
+after some twenty passes (§30), and C′ continued from its five laps approaches the same level. On
+October 23 the gated tower read in units founded by code length (`hnn::units`: an adjacent pair
+becomes one unit exactly when the complete code falls) coded the held-out GSM8K problems at 1.953,
+1.876 and 1.839 bits a byte over three passes against 2.435, 2.321 and 2.295 from bytes, and its
+samples wrote sentences with their grammar ([the record](2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY.md)).
+A unit is a run of bytes the passage's own code joined: local continuations aggregated into a
+coarser class by compression, the field's own tokenizing (CLAUDE.md, no catered machinery). The race
+has never read in units.
+
+**The law.** The working declaration (the stacked news clock, the passage, the packets, the heading
+and every level's credit) reads the race's passage in the October 23 founded units (1,318: the bytes
+and 1,062 founded on the GSM8K problems; their file is that record's receipt), parsed as the unit
+tower parses bytes. The passage's end letter, which no byte carries, is written at the boundary as
+the record separator `0x1E`, a byte the passage does not hold (agent-inferred: the codec's choice; it
+founds no unit and reads as itself). Founding units again on the race's whole passage is host
+compute, which the route refuses without Brandon's exception, so the founded units are the ones
+already held. The news clock reads each unit's code in bits, so the coarse levels' spans stay in
+information time.
+
+**Acceptance, fixed before the race.**
+59. The development read: the first 64 sections from C′'s founding keys, its held-out read after
+    them and its elapsed time, beside the byte declaration's (3.461 held out, 20.2 s), its peak VRAM
+    at most 12 GB with the game's.
+60. The race: one lap each from C′'s founding, at equal elapsed time, the unit declaration's
+    held-out read below the byte declaration's (2.270 after its lap at 196.7 s, §29), with the writing
+    shown (prompts parsed in the same units and the release decoded from them).
+
+**The card carries the units' alphabet.** At 1,318 classes the forward's shared surface (the
+alphabet's logits and face beside every other buffer) reached 56,768 bytes against the block's
+49,152, and the card refused the launch. [agent-inferred, from the card's census] When the forward's
+shared surface would pass the block, each stream's logits and face over the alphabet are kept in the
+frame (`face_z`, `face_ms`, `[S][A]`) instead (`Shape::face_global`), which leaves 35,680 bytes
+shared and two blocks a multiprocessor; the values are the same, and a declared realization
+(`TowerCard::force_face_global`, `TOWER_FACE_GLOBAL` in `tower_pass parity`) reads that path at the
+byte alphabet against the host. At the card (16:31Z, binary `tower_pass-33c` `a8c034de…5121`): the
+forced path's parity at the race's declaration was equal (98,304 faces, 92,512 closure faces,
+17,711,136 covector entries, every learner; 41.1 s), and the card suite passed, 46 of 46. The unit
+route's codec at the boundary: `tower_pass units-classes` parses a text in the founded units and
+`units-text` decodes a release; a release declares its end letter's class (`TOWER_END_CLASS`, the
+record separator's unit 30).
+
+**Acceptance 59** (the development read, 16:33Z, the first 64 sections from C′'s founding, deadline
+180 s): the passage reads as 15,108,518 units for 29,744,156 bytes (1.97 bytes a unit) and the
+held-out passage as 412,959 for 913,986, so a lap is 368 sections of units and the first 64 cover
+about 5.2 MB of the passage against the byte declaration's 2.6 MB.
+
+| over 64 sections | bytes (§29's read) | units |
+|---|---|---|
+| training code at sections 32, 64 (bits a byte) | 5.043, 3.792 | 4.085, 2.998 |
+| halvings | 41 | 30 |
+| held-out after the 64 sections (GSM8K, words) | 3.461 (3.494, 3.436) | **2.747** (2.665, 2.809) |
+| elapsed at section 64 | 20,193 ms | 24,709 ms |
+| peak VRAM with the game's | 10,876 MiB | 11,681 MiB |
+
+The material is 690,342 entries against 553,473 (the encoding and the readout over 1,318 classes),
+and the run fits under the 12 GB the card keeps for it.

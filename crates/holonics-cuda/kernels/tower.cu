@@ -188,7 +188,11 @@ struct TowerLaw {
     uint32_t closure, credit_advance;
     // The first credited level (the record's §24: every level's from 0; the clocked levels' from the
     // clock's first clocked level).
-    uint32_t credit_from, credit_pad;
+    uint32_t credit_from;
+    // Whether the forward keeps each stream's logits and face over the alphabet in the frame's
+    // `face_z`, `face_ms` rather than its shared surface (a wide alphabet, record §33): the same
+    // values, held where the card's block can carry them.
+    uint32_t face_global;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -416,6 +420,10 @@ struct TowerFrame {
     // its moves, pushes and states, and the carried packets, are kept in the frame's own buffers for
     // that read, `tower_credit_moments`).
     uint32_t *cr_tick;
+    // Each stream's logits and face over the alphabet when the forward keeps them here
+    // (`face_global`; [S][A] each).
+    int64_t *face_z;
+    uint64_t *face_ms;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -926,8 +934,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
     int64_t *fc = (int64_t *)carve(at, 8ull * 2 * N);
     int64_t *rab = (int64_t *)carve(at, 8ull * 2 * W);
     int64_t *raw = (int64_t *)carve(at, 8ull * W);
-    int64_t *z = (int64_t *)carve(at, 8ull * A);
-    uint64_t *ms = (uint64_t *)carve(at, 8ull * A);
+    const uint64_t AS = law.face_global ? 0 : A;
+    int64_t *z = law.face_global ? fr.face_z + (uint64_t)s * A : (int64_t *)carve(at, 8ull * AS);
+    uint64_t *ms = law.face_global ? fr.face_ms + (uint64_t)s * A : (uint64_t *)carve(at, 8ull * AS);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
     int32_t *x = (int32_t *)carve(at, 4ull * W);
     int32_t *nx = (int32_t *)carve(at, 4ull * W);

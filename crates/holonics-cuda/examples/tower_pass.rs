@@ -251,6 +251,12 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         card.profile();
     }
     let mut direct = TowerCard::open(&opened)?;
+    // [agent-inferred, October 31] A declared realization (`TOWER_FACE_GLOBAL`): both cards keep the
+    // alphabet's logits and face in the frame, the wide alphabet's path, read here against the host.
+    if std::env::var_os("TOWER_FACE_GLOBAL").is_some() {
+        card.force_face_global();
+        direct.force_face_global();
+    }
     let mut states_h: Vec<TowerState> = (0..streams)
         .map(|_| match credit_from {
             None => host.tower.rest(),
@@ -424,6 +430,32 @@ fn train(args: &[String]) -> Result<()> {
     result
 }
 
+/// [agent-inferred, October 31] `units-classes UNITS UNITS_SHA TEXT TEXT_SHA OUT`: the boundary codec
+/// for a unit release (record §33): `TEXT`'s bytes parsed in the founded `UNITS` as the unit tower
+/// parses them (`Units::parse`), written to `OUT` (create-new) as two big-endian bytes a class; and
+/// `units-text UNITS UNITS_SHA CLASSES CLASSES_SHA OUT`, a unit release's classes decoded to its bytes
+/// (`Units::decode`), the end letter's class read as the record separator it stands for.
+fn units_codec(args: &[String], decode: bool) -> Result<()> {
+    if args.len() != 5 {
+        return Err("units-classes|units-text UNITS UNITS_SHA INPUT INPUT_SHA OUT".into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned(&args[0], &args[1])?)?).map_err(|e| e.to_string())?;
+    let input = pinned(&args[2], &args[3])?;
+    let out: Vec<u8> = if decode {
+        let classes: Vec<u32> = input.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as u32).collect();
+        if classes.iter().any(|&c| c as usize >= units.len()) {
+            return Err("a class outside the founded units".into());
+        }
+        units.decode(&classes)
+    } else {
+        units.parse(&input).map_err(|e| e.to_string())?.into_iter().flat_map(|u| (u as u16).to_be_bytes()).collect()
+    };
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[4])?;
+    file.write_all(&out)?;
+    println!("UNITS_CODEC units={} input_bytes={} output_bytes={} output_sha256={}", units.len(), input.len(), out.len(), digest(&out)?);
+    Ok(())
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let result = match args.first().map(String::as_str) {
@@ -431,6 +463,8 @@ fn main() {
         Some("parity-state") => parity_state(&args[1..]),
         Some("parity-units") => parity_units(&args[1..]),
         Some("train") | Some("release") | Some("read") => train(&args[1..]),
+        Some("units-classes") => units_codec(&args[1..], false),
+        Some("units-text") => units_codec(&args[1..], true),
         _ => Err("tower_pass parity …|parity-state …|parity-units …|train complete-language …|release complete-language …|read complete-language …".into()),
     };
     if let Err(error) = result {
