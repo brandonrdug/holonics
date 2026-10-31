@@ -1,0 +1,7 @@
+BIN=93f0a1523d8dd68e98d47d23a096f69e6c4d275ffe239bd93af9f6509533444b FROM=188ae9089a217c83f37dfbf6cd856ca9c6a6f8e642b66c0f08e77537ce272602 at=2026-10-31T15:27:37Z
+NVIDIA_SMI before: 24 %, 210 MHz, 42, 20.34 W, 1072 MiB
+RUN_END every rc=241 MEASURE lap=every rc=-15 wall_s=671.3 peak_rss_kib=3311356
+TOWER_PASS pass=0 train_bits_a_byte=1.708 dev_bits_a_byte=1.858 dev_regions gsm8k=1.811 strokes=0.000 cycles=0.000 words=1.893 deposits=726/726 pass_ms=188541 elapsed_ms=188618 train_code=53272869774458 dev_code=1779744194298 grain_bits=20
+TOWER_PASS pass=1 train_bits_a_byte=1.707 dev_bits_a_byte=1.847 dev_regions gsm8k=1.792 strokes=0.000 cycles=0.000 words=1.890 deposits=726/726 pass_ms=188157 elapsed_ms=376775 train_code=53219364174962 dev_code=1769875466365 grain_bits=20
+TOWER_PASS pass=2 train_bits_a_byte=1.703 dev_bits_a_byte=1.852 dev_regions gsm8k=1.803 strokes=0.000 cycles=0.000 words=1.891 deposits=726/726 pass_ms=188473 elapsed_ms=565249 train_code=53110607172132 dev_code=1774741964429 grain_bits=20
+VRAM_PEAK_MIB=10858

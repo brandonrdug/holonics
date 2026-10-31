@@ -435,6 +435,13 @@ struct TowerFrame {
     int64_t *mo_open;
     uint32_t *mo_flag;
     uint64_t *r_mo_read, *r_mo_face_re, *r_mo_face_im, *r_mo_dr0;
+    // The force (record §30): each cell's f = Σ D↓ ĥ ([S][T][W]) with its reach at each level
+    // ([S][T][L], what the reads' outer sums pair with each arrival level's push covector), and a
+    // term's force covector δf = Σ_(l<F) (C_re γG_re − C_im γG_im) ([S][T][W]) with its reach ([S][T]).
+    int64_t *mo_f;
+    uint64_t *r_mo_f;
+    int64_t *mo_df;
+    uint64_t *r_mo_df;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -1020,6 +1027,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
     // D↓ ĥ, held while its heading stands.
     const uint32_t MO = law.motive != 0 ? 1 : 0;
     int64_t *hm_lift = (int64_t *)carve(at, 8ull * HD * W * MO);
+    // The force the arrival levels' pushes read at this cell, f = Σ_l D↓_l ĥ_l (record §30).
+    int64_t *mf = (int64_t *)carve(at, 8ull * W * MO);
+    __shared__ uint64_t mf_max;
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -1318,9 +1328,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     }
                 }
                 __syncthreads();
-                for (uint32_t j = tid; j < W; j += B) {
-                    x[j] = fit32((wide)x[j] + (wide)hm_lift[(uint64_t)i * W + j], &st);
-                }
             }
             if (law.closure) {
                 for (uint32_t j = tid; j < W; j += B) {
@@ -1358,6 +1365,33 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                 if (tid == 0) {
                     fr.hd_list[((uint64_t)s * HD + i) * T + hc[i]] = t;
                     hc[i] += 1;
+                }
+            }
+            __syncthreads();
+        }
+        // The motive's force at this cell (record §30): the lifts summed level by level, each released
+        // as the host releases it; each arrival level's push reads it through its read's adjoint.
+        if (MO) {
+            uint64_t mx = 0;
+            for (uint32_t j = tid; j < W; j += B) {
+                wide f = 0;
+                for (uint32_t i = 0; i < HD; i++) {
+                    f = fit64(f + (wide)hm_lift[(uint64_t)i * W + j], &st);
+                }
+                mf[j] = (int64_t)f;
+                const uint64_t a = magnitude(mf[j]);
+                mx = a > mx ? a : mx;
+            }
+            const uint64_t fmax = block_max(mx, red);
+            if (tid == 0) {
+                mf_max = fmax;
+            }
+            if (keep) {
+                for (uint32_t j = tid; j < W; j += B) {
+                    fr.mo_f[qc * W + j] = mf[j];
+                }
+                for (uint32_t l = tid; l < L; l += B) {
+                    fr.r_mo_f[qc * L + l] = fmax;
                 }
             }
             __syncthreads();
@@ -1572,7 +1606,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     pq[o] = fit64(rel((wide)turn, law.turn_spread), &st);
                 } else {
                     const wide sum = dot(tt + (fam == 0 ? lv.push_re : lv.push_im) + k, N, W, xin, fam == 0 ? n_re : n_im);
-                    pq[o] = fit64(rel(sum, MATERIAL_BITS + FACE_BITS - STATE_BITS), &st);
+                    int64_t p = fit64(rel(sum, MATERIAL_BITS + FACE_BITS - STATE_BITS), &st);
+                    // The force at an arrival level (record §30): p += C̄ᵀ f, (C_reᵀ f, −C_imᵀ f).
+                    if (MO && l < law.news_first) {
+                        const bool n_f = narrow_rows(fam == 0 ? lv.reach[2] : lv.reach[3], mf_max, W);
+                        const wide fsum = dot(th + (fam == 0 ? lv.read_re : lv.read_im) + k, N, W, mf, n_f);
+                        p = fit64((wide)p + (wide)fit64(rel(fam == 0 ? fsum : -fsum, MATERIAL_BITS + FACE_BITS - STATE_BITS), &st), &st);
+                    }
+                    pq[o] = p;
                 }
             }
             __syncthreads();
@@ -3688,15 +3729,16 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ahead(
 }
 
 // [agent-inferred, October 31] **One term's return at the motive** (`Tower::motive_return`, record
-// §29), one block a cell of a stream: the term's input covector δx⁰ reaches each clocked level's
-// heading before the cell through D↓ᵀ, then its ratio's adjoint at the kept ratio and scale, the
+// §29–§30), one block a cell of a stream: the term's force covector, δf = Σ_(l<F) (C_re γG_re −
+// C_im γG_im) over the arrival levels whose pushes read the force (kept with its reach for D↓'s
+// outer sum), reaches each clocked level's heading before the cell through D↓ᵀ, then its ratio's
+// adjoint at the kept ratio and scale, the
 // covector of the raw read Re(C^→ h) of the modes before the cell, which is the next term's only
 // source: the modes after the cell before (written as that cell's `ah_dread`, which
 // `tower_reverse_heading` returns through C^→ and the outer sums pair with that cell's face), or
 // at the first cell the carried modes (`mo_dr0`, and `mo_open` = C_reᵀ ∂r, C_imᵀ (−∂r), which the
 // modes' scan adds to the opening's covector the credit meets). The last cell's `ah_dread` is zero:
-// nothing in the section reads its heading. `mo_flag` is set where a source is not zero. Also
-// writes max |δx⁰| (`r_dx`), which D↓'s outer sum reads.
+// nothing in the section reads its heading. `mo_flag` is set where a source is not zero.
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_motive_return(TowerLaw law, TowerFrame fr) {
     const uint64_t q = blockIdx.x;
     const uint32_t s = (uint32_t)(q / law.cells), t = (uint32_t)(q % law.cells), tid = threadIdx.x, B = blockDim.x;
@@ -3715,16 +3757,28 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_motive_return(
         st = 0;
         any = 0;
     }
+    const uint32_t L = law.levels, N0 = law.modes;
     uint64_t m = 0;
     for (uint32_t j = tid; j < W; j += B) {
-        const int64_t v = fr.dx[q * W + j];
+        wide acc = 0;
+        for (uint32_t l = 0; l < law.news_first; l++) {
+            const TowerLevel fl = law.level[l];
+            const uint64_t ql = q * L + l;
+            const bool n_a = narrow_rows(fl.reach[2], fr.r_gre[ql], N0);
+            const bool n_b = narrow_rows(fl.reach[3], fr.r_gim[ql], N0);
+            const int64_t fa = fit64(rel(dot(fr.theta + fl.read_re + (uint64_t)j * N0, 1, N0, fr.gre + ql * N0, n_a), MATERIAL_BITS), &st);
+            const int64_t fb = fit64(rel(dot(fr.theta + fl.read_im + (uint64_t)j * N0, 1, N0, fr.gim + ql * N0, n_b), MATERIAL_BITS), &st);
+            acc = fit64(acc + (wide)fa - (wide)fb, &st);
+        }
+        const int64_t v = (int64_t)acc;
         dxs[j] = v;
+        fr.mo_df[q * W + j] = v;
         const uint64_t a = magnitude(v);
         m = a > m ? a : m;
     }
     const uint64_t xmax = block_max(m, red);
     if (tid == 0) {
-        fr.r_dx[q] = xmax;
+        fr.r_mo_df[q] = xmax;
     }
     for (uint32_t i = 0; i < HD; i++) {
         const TowerLevel lv = law.level[law.news_first + i];

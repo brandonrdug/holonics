@@ -449,6 +449,10 @@ struct FrameWords {
     r_mo_face_re: u64,
     r_mo_face_im: u64,
     r_mo_dr0: u64,
+    mo_f: u64,
+    r_mo_f: u64,
+    mo_df: u64,
+    r_mo_df: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -762,6 +766,9 @@ struct Frame<'c> {
     mo_dr0: CardBuffer<'c, i64>,
     mo_open: CardBuffer<'c, i64>,
     mo_flag: CardBuffer<'c, u32>,
+    /// The force each cell's arrival levels read and a term's force covector (record §30).
+    mo_f: CardBuffer<'c, i64>,
+    mo_df: CardBuffer<'c, i64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
@@ -772,7 +779,7 @@ struct Frame<'c> {
     /// face (re, im) and the read's adjoint (each `Q·L`), then the heading's after each cell: the
     /// ratio, the face (re, im) and the read's adjoint (each `Q·HD`, `[HD][S][T]`) and the top's
     /// covector (`Q`).
-    reach_offsets: [usize; 40],
+    reach_offsets: [usize; 42],
 }
 
 /// [agent-inferred, October 31] **The streams' credit resident on the card** (record
@@ -1156,8 +1163,8 @@ impl<'c> TowerCard<'c> {
         let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
         let (hd, hdd) = (shape.heading, usize::from(shape.heading > 0));
         let mo = shape.motive;
-        let mut reach_offsets = [0usize; 40];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd, q * hd, q * hd, q * hd, q * hd, q * hdd, q * hd * mo, s * hd * mo, s * hd * mo, s * hd * mo];
+        let mut reach_offsets = [0usize; 42];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd, q * hd, q * hd, q * hd, q * hd, q * hdd, q * hd * mo, s * hd * mo, s * hd * mo, s * hd * mo, ql * mo, q * mo];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -1318,6 +1325,8 @@ impl<'c> TowerCard<'c> {
             mo_dr0: card.alloc(s * hd * w * mo)?,
             mo_open: card.alloc(s * hd * n * 2 * mo)?,
             mo_flag: card.alloc(mo)?,
+            mo_f: card.alloc(q * w * mo)?,
+            mo_df: card.alloc(q * w * mo)?,
             reach_offsets,
         });
         Ok(())
@@ -1516,6 +1525,10 @@ impl<'c> TowerCard<'c> {
             r_mo_face_re: r(37),
             r_mo_face_im: r(38),
             r_mo_dr0: r(39),
+            mo_f: frame.mo_f.device_ptr(),
+            r_mo_f: r(40),
+            mo_df: frame.mo_df.device_ptr(),
+            r_mo_df: r(41),
         }
     }
 
@@ -2288,7 +2301,7 @@ impl<'c> TowerCard<'c> {
                 accumulate: 1,
                 partial: 0,
             };
-            out.push((words(fw.dx, w, fw.mo_read + 4 * i * w, hd * w, fw.r_dx, fw.r_mo_read + 8 * i * q, w, w, false, fw.gradient + 16 * lv.fine_descent, t), false));
+            out.push((words(fw.mo_df, w, fw.mo_read + 4 * i * w, hd * w, fw.r_mo_df, fw.r_mo_read + 8 * i * q, w, w, false, fw.gradient + 16 * lv.fine_descent, t), false));
             out.push((words(fw.mo_dr0 + 8 * i * w, hd * w, fw.mo_face + 8 * i * 2 * n, hd * 2 * n, fw.r_mo_dr0 + 8 * i * s as u64, fw.r_mo_face_re + 8 * i * s as u64, w, n, false, fw.gradient + 16 * lv.heading_re, 1), true));
             out.push((words(fw.mo_dr0 + 8 * i * w, hd * w, fw.mo_face + 8 * i * 2 * n + 8 * n, hd * 2 * n, fw.r_mo_dr0 + 8 * i * s as u64, fw.r_mo_face_im + 8 * i * s as u64, w, n, true, fw.gradient + 16 * lv.heading_im, 1), true));
         }
@@ -2420,6 +2433,16 @@ impl<'c> TowerCard<'c> {
         if law.ring_ranks > 0 {
             let kp = (w + 1) * 2 * law.ring_ranks as u64 * law.ring_harmonics as u64;
             out.push((family(fw.dz, a, fw.ring_pair, kp, fw.r_dz, fw.r_ring_pair, 1, a, kp, false, gradient(law.ring_readout), None), false));
+        }
+        // The motive's force (record §30): each arrival level's read, through whose adjoint its push
+        // read the force, takes the push's covector against the force, `G_(C_re) += f γG_reᵀ`,
+        // `G_(C_im) −= f γG_imᵀ`, added to the read's own sums.
+        if law.motive != 0 {
+            for (level, lv) in levels.iter().enumerate().take(law.news_first as usize) {
+                let lu = level as u64;
+                out.push(added((family(fw.mo_f, w, at64(fw.gre, lu * n), l * n, at64(fw.r_mo_f, lu), at64(fw.r_gre, lu), l, w, n, false, gradient(lv.read_re), None), true)));
+                out.push(added((family(fw.mo_f, w, at64(fw.gim, lu * n), l * n, at64(fw.r_mo_f, lu), at64(fw.r_gim, lu), l, w, n, true, gradient(lv.read_im), None), true)));
+            }
         }
         out
     }

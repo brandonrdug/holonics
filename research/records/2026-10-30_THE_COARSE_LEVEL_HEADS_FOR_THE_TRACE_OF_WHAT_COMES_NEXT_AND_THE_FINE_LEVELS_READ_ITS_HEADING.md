@@ -2217,3 +2217,70 @@ reads its step's width (the sum over `ĥ`'s width that a sign-coherent step adds
     with the series' growth measured over §29's lap (its window time rose 1.9 times from window 2
     to window 19), against the every-level credit's 2.270 at equal elapsed time, the cut read and
     the writing shown.
+
+**Built.** The force needs no port material of its own: an arrival level's read `Re(C h)` maps its
+modes to the stream's coordinates, and its adjoint `C̄ᵀ` maps an effort there back to a drive of the
+modes, `(C_reᵀ f, −C_imᵀ f)`, the collocated input of a passive port (the work `⟨f, Re(C h)⟩ =
+Re⟨C̄ᵀ f, h⟩`). On the host `Tower::step_on` forms `f = Σ_l D↓_l ĥ_l` before the levels move and adds
+`C̄_lᵀ f` to each arrival level's push, released as the push is (the stream opens on `E(u)` alone);
+`Tower::reverse_joined` returns the force's covector `δf = Σ_(l<F) (C_re γG_re − C_im γG_im)` and takes
+each arrival level's read's outer sum against the force; `Tower::reverse_series` carries `δf` where
+§29 carried `δx⁰`. The credit's moments read the push as it is kept, so they carry the force; the
+reads, which now drive their modes too, cross the section's edge as given (as every level's read
+does). On the card, `tower_forward` sums the held lifts into the force once a cell and adds the read's
+adjoint to each arrival level's push; `tower_motive_return` forms `δf` from each arrival level's kept
+push covector and its read; each arrival level's read takes the force's outer sums. The tower tests
+passed, 153 of 153: with `D↓` at zero the force reads face for face as the every-level credited
+heading; with `D` opened and `D↓` opened eight times smaller (opened as large, its pushes carried the
+series to 23 terms and crossed a contact's kink under every step of a gate's material), the series ran
+5 terms, every family's covector met the code difference, `D↓`'s own read at `2^(−12)` units met it,
+and the series cut at its first term lay more than ten times farther from it on the heading's read
+than the whole series.
+
+**At the card** (B-PC's RTX 4080 SUPER beside the game, 15:38Z, binary `tower_pass-30a`
+`5ff212be…c08c`). The card's motive test passed (16.3 s), the card suite 47 of 47, and at the race's
+declaration the parity was equal (98,304 faces, 95,499 closure faces, 17,973,280 covector entries,
+every learner; 43.2 s). **Acceptance 53 failed on the refusals and passed on the arrivals.**
+
+| over 64 sections | every-level credit | §29, the stream's opening | §30, the force |
+|---|---|---|---|
+| arrivals at section 32, 64 | 5.043, 3.792 | 5.326, 4.565 | 5.239, 4.331 |
+| halvings, windows 1, 2 | 41, 0 | 102, 103 | 123, 67 (bar 52) |
+| sections that deposited | 64 | 64 | 63 |
+| series terms, windows 1, 2 | 32, 32 | 97, 156 | 99, 124 |
+| held-out after 64 sections (GSM8K) | 3.461 (3.494) | 4.230 (4.216) | 3.886 (3.883) |
+| elapsed at section 64 | 20,193 ms | 46,330 ms | 47,469 ms |
+
+Read by parts (15:41Z, the same 64 sections, which the reading did not move; 126.1 s against 160 s):
+
+| window | refused | raised alone by: descents | read | readout | clocked | rest | summed change, bits: descents | read | readout | clocked | rest | whole step |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 123 | 69 | 58 | 31 | 59 | 106 | +32,020 | −29,962 | +367,132 | −94,852 | +2,128,166 | +5,093,789 |
+| 2 | 67 | 39 | 27 | 5 | 23 | 37 | +28,104 | −14,605 | −44,758 | −10,696 | +58,426 | +568,984 |
+
+The force removed most of `D↓`'s own overshoot (its part's rise fell from 703,811 to 28,104 bits in
+the second window) and a third of the refusals, and what remains is the parts meeting: in the second
+window the whole step raised the arrivals 568,984 bits while the parts alone summed to 16,471.
+
+**What it decides.** By the rule fixed before the build the force did not remove the refusals, and
+the rule named `D↓`'s step as the next subject; the parts reading has already read it, and its own
+step is no longer the cause. Both forms put a loop inside the section: the coarse modes read the
+fine levels' motion and the fine levels read the coarse modes a cell later, so every family's step
+reaches the force through the packets and the heading and comes back through the pushes. The
+section's one certified step meets that loop's curvature, the certificate halves every family
+together, and the arrivals are starved, under a series whose terms grow as `D↓` opens and that
+costs 2.3 times the section's time before any gain. A motive inside the section is retired for
+this declaration, and its code is removed (it stands at `3451e27c6` for §29 and at the commit that
+records this section for §30). The working law stays the every-level credit with the face's read of
+the heading. A coarse field that steers the fine field without closing a loop inside the certified
+step is not derived here: holding the heading of the section's opening is the learner's partition
+deciding the forward law, which the lessons refuse (the release would read a different law at each
+of its own cuts). The release's refinement of a proposed continuation, the other half of the
+review's point, is the next subject.
+
+**The every-level credit toward two hours** (the card kept working while §29 and §30 were built,
+binary `tower_pass-29n`, continued from its 20-pass state; stopped after three passes to free the
+card for §30's checks, so the run ended incomplete by intent): held-out 1.858, 1.847 and 1.852 at
+passes 21 to 23 (GSM8K 1.811, 1.792, 1.803), 188.2 to 188.5 s a pass, peak VRAM 10,858 MiB with the
+game's. Over passes 13 to 23 it moved 0.015 bits a byte: the every-level credit on this declaration
+has reached a level at about 1.85.

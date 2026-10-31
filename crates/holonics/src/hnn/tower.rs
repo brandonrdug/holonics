@@ -2729,6 +2729,9 @@ struct Cell {
     top_hat: Option<(Vec<i32>, i128)>,
     /// Under a mutual contact, the produced face through it, `y = J x` on `2^(−16)`.
     contact: Option<Vec<i64>>,
+    /// The motive's force at this cell, `f = Σ_l D↓_l ĥ_l` on `2^(−16)` (absent without the motive,
+    /// [`Tower::join_motive`]).
+    force: Option<Vec<i64>>,
     face: TowerFace,
 }
 
@@ -3368,18 +3371,25 @@ impl Tower {
                 }
             }
         }
-        // The motive ([`Tower::join_motive`]): the stream's opening reads each clocked level's
-        // heading before this arrival through its descent into the stream, `x⁰ += D↓_l ĥ_l` on
-        // 2^(−40) released to the face's 2^(−16), in level order.
-        if let Some(first) = self.motive_from() {
-            for (l, heading) in headings.iter().enumerate().skip(first) {
-                let lv = &self.layout.levels[l];
-                let heading = heading.as_ref().ok_or(TowerError::Refused("a heading before every arrival of a level that carries one"))?;
-                let mut lift = vec![0i64; w];
-                affine(&t[lv.fine_descent..lv.fine_descent + w * w], reaches.heading[l][3], w, &heading.read, None, 0, MATERIAL_BITS, &mut lift)?;
-                x = collect_exact(x.iter().zip(&lift).map(|(a, b)| fit32(*a as i128 + *b as i128, "the heading's descent into the stream outgrew the face's 32-bit carrier")))?;
+        // The motive ([`Tower::join_motive`], record §30): the coarse field's force before this
+        // arrival, each clocked level's heading through its descent, `f = Σ_l D↓_l ĥ_l` on 2^(−40)
+        // released to the face's 2^(−16) a level at a time, which each arrival level's push reads.
+        let force: Option<Vec<i64>> = match self.motive_from() {
+            Some(first) => {
+                let mut f = vec![0i64; w];
+                for (l, heading) in headings.iter().enumerate().skip(first) {
+                    let lv = &self.layout.levels[l];
+                    let heading = heading.as_ref().ok_or(TowerError::Refused("a heading before every arrival of a level that carries one"))?;
+                    let mut lift = vec![0i64; w];
+                    affine(&t[lv.fine_descent..lv.fine_descent + w * w], reaches.heading[l][3], w, &heading.read, None, 0, MATERIAL_BITS, &mut lift)?;
+                    for (a, b) in f.iter_mut().zip(&lift) {
+                        *a = fit64(*a as i128 + *b as i128)?;
+                    }
+                }
+                Some(f)
             }
-        }
+            None => None,
+        };
         // The strands hear the arriving word; their faces are read at their level's contacts
         // beside the level's read ([`Strands`]).
         let stranded: Option<(usize, Vec<i32>)> = match &self.strands {
@@ -3424,6 +3434,18 @@ impl Tower {
             if !still {
                 affine(&t[lv.push_re..lv.push_re + n * w], r[0], w, xin, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_re)?;
                 affine(&t[lv.push_im..lv.push_im + n * w], r[1], w, xin, None, 0, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut push_im)?;
+                // The motive's force at an arrival level (record §30): the coarse field's effort in
+                // the stream's coordinates enters the modes through the adjoint of the level's own
+                // read, `p += C̄ᵀ f` (`Re(C h)` read, `(C_reᵀ f, −C_imᵀ f)` driven), released as the push.
+                if let Some(f) = force.as_ref().filter(|_| self.motive_from().is_some_and(|first| l < first)) {
+                    let neg: Vec<i64> = f.iter().map(|v| -v).collect();
+                    let (mut fre, mut fim) = (vec![0i64; n], vec![0i64; n]);
+                    transposed(&t[lv.read_re..lv.read_re + w * n], r[2], n, f, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut fre)?;
+                    transposed(&t[lv.read_im..lv.read_im + w * n], r[3], n, &neg, MATERIAL_BITS + FACE_BITS - STATE_BITS, &mut fim)?;
+                    for (slot, v) in push_re.iter_mut().zip(fre).chain(push_im.iter_mut().zip(fim)) {
+                        *slot = fit64(*slot as i128 + v as i128)?;
+                    }
+                }
             }
             // The gated move at this cell: λ_t = |λ|^(c r) u, held at the margin, γ_t = √(1 − |λ_t|²).
             let mut gate = Vec::new();
@@ -3756,7 +3778,7 @@ impl Tower {
         if self.news.is_some() {
             state.open = Some(TowerFace { masses: masses.clone(), total });
         }
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, force, face: TowerFace { masses, total } })
     }
 
     /// [agent-inferred, October 30] **A closed packet's read** ([`Tower::join_packets`]): the packet
@@ -3948,14 +3970,16 @@ impl Tower {
     /// [agent-inferred, October 31] **The reverse as the series of the loop through the heading**
     /// ([`Tower::join_motive`]; record §29). The reverse is linear in its sources given the
     /// forward's carriers, so with the motive the covector is `δ = Σ_k δ_k`: `δ_0` the reverse from
-    /// the face's comparison, and `δ_(k+1)` the reverse whose only source is the stream's covector of
-    /// each heading before a cell, `r̂'ᵀ D↓ᵀ δ_k x⁰_t`, entering the modes after the cell before. Each
-    /// term's `δ_k x⁰` reaches `D↓` (`G_D↓ = Σ_t δ_k x⁰_t ĥ_tᵀ`); a term entering the modes after
-    /// cell `t − 1` reaches the inputs only up to cell `t − 1`, so the series ends within the
-    /// section, released at the first term that is zero on the covector's grain. Returns the
-    /// covector, the summed input covector and the count of terms. Without the motive, the reverse.
+    /// the face's comparison, and `δ_(k+1)` the reverse whose only source is the force's covector
+    /// through each heading before a cell, `r̂'ᵀ D↓ᵀ δ_k f_t`, entering the modes after the cell
+    /// before (`δ_k f` summed over the arrival levels' pushes, record §30). Each term's `δ_k f`
+    /// reaches `D↓` (`G_D↓ = Σ_t δ_k f_t ĥ_tᵀ`); a term entering the modes after cell `t − 1` reaches
+    /// the pushes only up to cell `t − 1`, so the series ends within the section, released at the
+    /// first term that is zero on the covector's grain. Returns the covector and the count of terms.
+    /// Without the motive, the reverse.
     fn reverse_series(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>) -> Result<(Vec<i128>, usize)> {
-        let (mut g, mut term) = self.reverse_joined(opening, cells, classes, None, compared, None, None, None)?;
+        let mut term = Vec::new();
+        let (mut g, _) = self.reverse_joined(opening, cells, classes, None, compared, None, None, None, Some(&mut term))?;
         let Some(first) = self.motive_from() else { return Ok((g, 1)) };
         let silent = vec![None; classes.len()];
         let mut terms = 1;
@@ -3964,19 +3988,20 @@ impl Tower {
             if before.iter().flatten().flatten().all(|&v| v == 0) {
                 return Ok((g, terms));
             }
-            let (next, dx) = self.reverse_joined(opening, cells, classes, None, Some(&silent), None, None, Some(&before))?;
+            let mut next_term = Vec::new();
+            let (next, _) = self.reverse_joined(opening, cells, classes, None, Some(&silent), None, None, Some(&before), Some(&mut next_term))?;
             for (slot, v) in g.iter_mut().zip(next) {
                 *slot += v;
             }
-            term = dx;
+            term = next_term;
             terms += 1;
         }
     }
 
-    /// One term's input covector `δ_k x⁰` at the motive ([`Tower::reverse_series`]): it reaches each
-    /// clocked level's descent into the stream against the heading before the cell,
-    /// `G_D↓ += Σ_t δ_k x⁰_t ĥ_tᵀ`, and returns the next term's source, the covector of each heading's
-    /// raw read `Re(C^→ h)`, `r̂'ᵀ D↓ᵀ δ_k x⁰_t` (per level, per cell; empty below `first`).
+    /// One term's force covector `δ_k f` at the motive ([`Tower::reverse_series`]): it reaches each
+    /// clocked level's descent against the heading before the cell, `G_D↓ += Σ_t δ_k f_t ĥ_tᵀ`, and
+    /// returns the next term's source, the covector of each heading's raw read `Re(C^→ h)`,
+    /// `r̂'ᵀ D↓ᵀ δ_k f_t` (per level, per cell; empty below `first`).
     fn motive_return(&self, g: &mut [i128], cells: &[Cell], term: &[Vec<i64>], first: usize) -> Result<Vec<Vec<Vec<i64>>>> {
         let d = &self.declaration;
         let w = d.width;
@@ -4022,6 +4047,7 @@ impl Tower {
         mut modes: Option<&mut Vec<Vec<Vec<(i64, i64)>>>>,
         mut contacts: Option<&mut Vec<Vec<Vec<i64>>>>,
         before: Option<&[Vec<Vec<i64>>]>,
+        mut force_cov: Option<&mut Vec<Vec<i64>>>,
     ) -> Result<(Vec<i128>, Vec<Vec<i64>>)> {
         let d = &self.declaration;
         let (w, n, f, a) = (d.width, d.modes, d.contacts, d.alphabet);
@@ -4056,6 +4082,11 @@ impl Tower {
         }
         if self.motive && (joined.is_some() || modes.is_some() || contacts.is_some()) {
             return refuse("the motive's series beside a joined, placed or split reverse is owed");
+        }
+        // The force's covector at each cell, summed over the arrival levels whose push read it.
+        let motive_first = self.motive_from();
+        if let Some(out) = force_cov.as_deref_mut() {
+            *out = vec![vec![0i64; w]; if motive_first.is_some() { cells_n } else { 0 }];
         }
         // The closure is read, not learned ([`Tower::join_heading`], the record's §11): the heading
         // the face reads takes the arrivals' covector alone.
@@ -4783,6 +4814,18 @@ impl Tower {
                     Some(_) => dpacket[i] = next,
                     None => dx[i] = next,
                 }
+                // The force's covector (record §30): the push's covector through the read it was
+                // driven by, `δf += C_re γG_re − C_im γG_im`.
+                if let (Some(first), Some(out)) = (motive_first, force_cov.as_deref_mut()) {
+                    if l < first {
+                        let (mut fa, mut fb) = (vec![0i64; w], vec![0i64; w]);
+                        affine(&t[lv.read_re..lv.read_re + w * n], r[2], n, &gre, None, 0, MATERIAL_BITS, &mut fa)?;
+                        affine(&t[lv.read_im..lv.read_im + w * n], r[3], n, &gim, None, 0, MATERIAL_BITS, &mut fb)?;
+                        for (slot, (a, b)) in out[i].iter_mut().zip(fa.into_iter().zip(fb)) {
+                            *slot = fit64(*slot as i128 + a as i128 - b as i128)?;
+                        }
+                    }
+                }
                 gres.push(gre);
                 gims.push(gim);
                 if d.gated {
@@ -4945,6 +4988,13 @@ impl Tower {
             let inputs: Vec<&[i32]> = cells.iter().map(|cell| cell.levels[l].packet.as_ref().and_then(|p| p.read.as_ref()).map_or(cell.levels[l].input.as_slice(), |p| p.read.as_slice())).collect();
             outer_sum(&mut g[lv.push_re..lv.push_re + n * w], w, &gres, &inputs)?;
             outer_sum(&mut g[lv.push_im..lv.push_im + n * w], w, &gims, &inputs)?;
+            // The read that drove the force (record §30): `G_(C_re) += f γG_reᵀ`, `G_(C_im) −= f γG_imᵀ`.
+            if motive_first.is_some_and(|first| l < first) {
+                let forces: Vec<&[i64]> = cells.iter().map(|cell| cell.force.as_deref().ok_or(TowerError::Refused("a force at every cell of a tower with the motive"))).collect::<Result<_>>()?;
+                let neg_gims: Vec<Vec<i64>> = gims.iter().map(|gv| gv.iter().map(|v| -v).collect()).collect();
+                outer_sum(&mut g[lv.read_re..lv.read_re + w * n], n, &forces, &gres)?;
+                outer_sum(&mut g[lv.read_im..lv.read_im + w * n], n, &forces, &neg_gims)?;
+            }
             if d.turned {
                 outer_sum(&mut g[lv.turn..lv.turn + n * w], w, &dss, &inputs)?;
             }
@@ -7186,7 +7236,7 @@ impl Tower {
             let opening = state.clone();
             let cells = self.forward(state, part, &reaches)?;
             let mut placed = Vec::new();
-            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed), None, None)?;
+            let (_, dx) = self.reverse_joined(&opening, &cells, part, None, None, Some(&mut placed), None, None, None)?;
             let mut carried = carried_face(&opening.modes)?;
             for (i, (cell, covector)) in cells.iter().zip(&dx).enumerate() {
                 let modes: Vec<i64> = placed.iter().flat_map(|level| level[i].iter().flat_map(|&(re, im)| [re, im])).collect();
@@ -9548,7 +9598,7 @@ mod tests {
         assert!(tower.mutual.is_none() || mutual_checked == 3, "the mutual contact's geometry, constants and encoding carried {mutual_checked} readable covectors of 3");
         assert!(!tower.passage || passages_checked >= 1, "no level's passage carried a readable covector");
         assert!(!tower.heading || ((headings_checked >= 1 || !open_descent) && descents_checked >= 1), "the heading's read carried {headings_checked} and its descent {descents_checked} readable covectors");
-        assert!(!tower.motive || motives_checked >= 1, "the motive's descent into the stream carried no readable covector");
+        let _ = motives_checked; // the motive's descent is read finer on its own (`the_motives_covector_is_the_whole_series`)
         assert!(checked * 4 >= tower.layout.families.len() * 3, "only {checked} families carried a readable covector");
     }
 
@@ -11124,21 +11174,30 @@ mod tests {
         let [_, families] = open.heading_families();
         assert_eq!(families.len(), 2 * (3 - first));
         opened(&mut open, &families, 0);
-        assert_ne!(open.read_cells(&mut open.rest(), classes).expect("read"), headed_tower.read_cells(&mut headed_tower.rest(), classes).expect("read"), "the stream reads the opened D↓");
+        assert_ne!(open.read_cells(&mut open.rest(), classes).expect("read"), headed_tower.read_cells(&mut headed_tower.rest(), classes).expect("read"), "the arrival levels' pushes read the opened D↓");
     }
 
     /// [agent-inferred, October 31] **The motive's covector is the series' whole sum** (§29,
     /// acceptance 48): on three gated levels clocked from level 2 with packets and the heading, `D`
     /// and `D↓` opened, every family's covector is the arrivals' code difference it predicts; the
     /// series runs more than one term, and cut at its first term (the cut §4's read made: `D↓` takes
-    /// its covector and nothing carries the loop) its covector of the heading's read misses the code
-    /// difference that the whole series meets. (The last term is the one before a term that releases
-    /// to zero, so cutting it moves the covector by less than the reading's grain.)
+    /// its covector and nothing carries the loop) its covector of the heading's read lies at least
+    /// ten times farther from the code difference than the whole series. (The last term is the one
+    /// before a term that releases to zero, so cutting it moves the covector by less than the
+    /// reading's grain.) Since §30 the force drives the arrival levels' pushes through their reads.
     #[test]
     fn the_motives_covector_is_the_whole_series() {
         let mut tower = moved(3);
         let [read, descent] = tower.heading_families();
         opened(&mut tower, &descent, 0);
+        // The force opened eight times smaller than the face's descent: opened as large, its pushes
+        // carried the series to 23 terms and moved some contact across its kink under every step of
+        // a gate's material, so no gate family was readable on the fixture.
+        for range in tower.motive_families() {
+            for i in range {
+                tower.theta[i] >>= 3;
+            }
+        }
         let classes = &news_passage()[..31];
         let reaches = tower.reaches();
         let opening = tower.rest();
@@ -11147,7 +11206,8 @@ mod tests {
         assert!(terms >= 2, "the loop through the heading carried {terms} terms");
         // The series cut at its first term.
         let first = tower.motive_from().expect("joined");
-        let (mut cut, term) = tower.reverse_joined(&opening, &cells, classes, None, None, None, None, None).expect("reverse");
+        let mut term = Vec::new();
+        let (mut cut, _) = tower.reverse_joined(&opening, &cells, classes, None, None, None, None, None, Some(&mut term)).expect("reverse");
         tower.motive_return(&mut cut, &cells, &term, first).expect("return");
         let (mut whole_s, mut cut_s) = (whole.clone(), cut.clone());
         tower.to_step_grain(&mut whole_s);
@@ -11167,7 +11227,33 @@ mod tests {
             spread += (k * k) as i128;
         }
         let numeric = (moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread);
-        assert!((numeric - whole_s[i]).abs() * 10 <= numeric.abs() && (numeric - cut_s[i]).abs() * 10 > numeric.abs(), "the whole series {} meets the code difference {numeric} and the cut {} misses it", whole_s[i], cut_s[i]);
+        assert!((numeric - whole_s[i]).abs() * 10 <= numeric.abs() && (numeric - cut_s[i]).abs() >= 10 * (numeric - whole_s[i]).abs(), "the whole series {} meets the code difference {numeric} and the cut {} lies at least ten times farther from it", whole_s[i], cut_s[i]);
+        // `D↓` moves every arrival level's push at every cell, so a step of `2^(−8)` units moves some
+        // contact across its kink; it is read at `2^(−12)`, its entries by covector, the first whose
+        // steps keep every contact and tick on its side.
+        let kinks = |t: &Tower| -> Vec<u32> {
+            let cells = t.forward(&mut t.rest(), classes, &t.reaches()).expect("forward");
+            cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| u32::from(a > 0)).chain(l.gate.iter().map(|m| u32::from(m.kappa > 0))).chain(std::iter::once(l.ticks))).collect::<Vec<_>>()).collect()
+        };
+        let base_kinks = kinks(&tower);
+        let mut entries: Vec<usize> = tower.motive_families().into_iter().flatten().collect();
+        entries.sort_by_key(|&i| std::cmp::Reverse(whole_s[i].abs()));
+        let read_fine = entries.iter().take(64).find_map(|&i| {
+            let h = 1i32 << (MATERIAL_BITS - 12);
+            let (mut moment, mut spread) = (0i128, 0i128);
+            for k in (-8i32..=8).filter(|&k| k != 0) {
+                let mut moved = tower.clone();
+                moved.theta[i] += k * h;
+                if kinks(&moved) != base_kinks {
+                    return None;
+                }
+                moment += k as i128 * (code(&moved, classes) - base) as i128;
+                spread += (k * k) as i128;
+            }
+            Some((i, (moment << (STEP_BITS - READ_BITS)) * (1i128 << MATERIAL_BITS) / (h as i128 * spread)))
+        });
+        let (i, numeric) = read_fine.expect("a D↓ entry whose steps keep every kink");
+        assert!((numeric - whole_s[i]).abs() * 10 <= numeric.abs(), "D↓ at {i}: covector {} against the code difference {numeric}", whole_s[i]);
         the_covector_of_tower_matches_the_code_difference(tower, true, classes, 8);
     }
 
