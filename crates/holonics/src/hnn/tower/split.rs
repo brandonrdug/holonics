@@ -557,7 +557,7 @@ impl Tower {
     pub(super) fn reverse_split(&self, opening: &TowerState, cells: &[Cell], classes: &[usize], compared: Option<&[Option<usize>]>, paired: &PairedContacts) -> Result<(Vec<i128>, SplitRead)> {
         paired.admits(self)?;
         let mut dvs = Vec::new();
-        let (g, _) = self.reverse_joined(opening, cells, classes, None, compared, None, Some(&mut dvs))?;
+        let (g, _) = self.reverse_joined(opening, cells, classes, None, compared, None, Some(&mut dvs), None)?;
         let read = self.split_read_of(cells, &dvs, paired)?;
         Ok((g, read))
     }

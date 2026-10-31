@@ -856,6 +856,9 @@ impl<'c> TowerCard<'c> {
         if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || law.participation.is_some() || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
             return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, participation, a rotor, a ring face or strands");
         }
+        if law.motive {
+            return refuse("the card does not yet move the fine levels under the heading (`Tower::join_motive`)");
+        }
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
         }
@@ -1048,7 +1051,7 @@ impl<'c> TowerCard<'c> {
                 heading_re: lv.heading_re as u64,
                 heading_im: lv.heading_im as u64,
                 descent: lv.descent as u64,
-                heading_reach: lv.heading_reaches,
+                heading_reach: [lv.heading_reaches[0], lv.heading_reaches[1], lv.heading_reaches[2]],
             })
             .collect();
         (words, levels)

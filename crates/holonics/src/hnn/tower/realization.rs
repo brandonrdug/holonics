@@ -388,7 +388,10 @@ pub struct ResidentLevel {
     pub heading_re: usize,
     pub heading_im: usize,
     pub descent: usize,
-    pub heading_reaches: [u64; 3],
+    /// The heading's descent into the stream `D↓` (`w × w`; zero without the motive,
+    /// [`Tower::join_motive`]); its `max |w|` is `heading_reaches[3]`.
+    pub fine_descent: usize,
+    pub heading_reaches: [u64; 4],
 }
 
 /// [definition; agent-inferred, October 27] **The pair face as a realization reads it**
@@ -585,6 +588,9 @@ pub struct ResidentLaw {
     /// levels read ([`Tower::join_heading`]; `z = 2^(−s) ⟨ĥ, τ⟩` on `2^(−16)`): a realization that
     /// does not carry it refuses the tower.
     pub heading: Option<u32>,
+    /// Whether the fine levels move under the heading ([`Tower::join_motive`]): a realization that
+    /// does not carry it refuses the tower.
+    pub motive: bool,
     /// `log₂` of the moves' margin radius on `2^(−16)`: a held move's met dissipation.
     pub held_log: i64,
 }
@@ -745,7 +751,8 @@ impl Tower {
                 heading_re: lv.heading_re,
                 heading_im: lv.heading_im,
                 descent: lv.descent,
-                heading_reaches: reaches.heading.get(l).copied().unwrap_or([0; 3]),
+                fine_descent: lv.fine_descent,
+                heading_reaches: reaches.heading.get(l).copied().unwrap_or([0; 4]),
             })
         }))?;
         Ok(ResidentLaw {
@@ -804,6 +811,7 @@ impl Tower {
             passage: self.passage,
             packets: self.packets,
             heading: self.heading.then(|| super::closure_shift(self.declaration.width)),
+            motive: self.motive,
             held_log: reaches.held_log,
         })
     }
