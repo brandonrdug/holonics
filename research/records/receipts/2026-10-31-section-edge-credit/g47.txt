@@ -1,0 +1,2 @@
+BIN=dd87fde31cc8e39933740982057ccbcf6fc6470eb06e43a1db920215fad3cbe8 FROM=aacb5ccc9ec1894bcae4dee93a5cf31a12290ec996274ab5a734722b6b466dc2 at=2026-10-31T21:52:41Z
+RUN_END pa0-fine rc=0 TOWER_PASS pass=0 train_bits_a_byte=1.470 dev_bits_a_byte=1.672 dev_regions Q=1.832 P=1.561 N=2.201 M=0.887 deposits=65/65 pass_ms=103956 elapsed_ms=104079  TOWER_PASS pass=1 train_bits_a_byte=1.662 dev_bits_a_byte=1.826 dev_regions Q=1.941 P=1.704 N=2.462 M=1.283 deposits=65/65 pass_ms=111747 elapsed_ms=215837  MEASURE lap=pa0-fine rc=0 wall_s=216.8 peak_rss_kib=3869936 

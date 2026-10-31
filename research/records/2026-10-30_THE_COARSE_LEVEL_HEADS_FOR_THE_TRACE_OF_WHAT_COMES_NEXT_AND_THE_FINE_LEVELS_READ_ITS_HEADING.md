@@ -3066,3 +3066,45 @@ with pair contacts from its 13th lap (October 30) and of the plateau the pair le
 18 to 30 here; participation adds to the drives and tips it over. The next loop's subject is that place:
 what the contacts return into the passing current is bounded by passivity, proved for the pair contact,
 before any part joins beside it.
+
+**The run-away read every four sections** (`g47*`; resumed from lap 12's learner, lap 13 reproduced bit
+for bit: 1.662 in training, 1.826 held out). The carriers' growth follows, it does not lead: at lap 13's
+first window (4 sections) the code on the opening sections is already 1.588 against 1.501 on the same
+sections a lap before, while level 1's state, its read and the passing current are as they were (12, 22
+and 3 million grains); the certificate's first refusals come at section 8, and the carriers grow only
+from about section 28 (level 1's state to 65 million grains by section 64). Level 0's contact drive
+opens lap 13 about a quarter larger (763,000 against some 600,000). **The cause, so read:** each step is
+certified on the section it was fit on (the October 31 hardware review: the certificate guarantees the
+current section, not the whole passage), and over lap 12 the accepted steps raised the code of
+sections the learner was not reading; on a passage of 65 sections repeated each lap, the next pass
+meets it. The pair learner's plateau at laps 18 to 30 reads as the same, milder; participation's drive
+sharpened it.
+
+## 45. The step certified on the section it has not read
+
+[agent-inferred, October 31] **The law.** A section's step is accepted, as now, when it lowers the
+section's own code (the certificate with its halvings); it is then read on the next section's opening
+before that section's own step: the next section's code under the stepped material against under the
+material before the step, both from the same opening states. Where the stepped material codes it higher,
+the step is halved and read again, as the certificate halves, until it does not or the step is refused
+(the material keeps its old value). The next section is unread by the step, so the read is a declared
+generalization of the certificate from the section it fit to the passage it has not met; it costs the
+next section's forward twice (the old material's read is the next section's opening read, which the
+section computes anyway). Its recorded failures: an uncertified deposition step (this certifies more),
+and a refusal answered with a larger limit (none is raised).
+
+**Before the build, the cause's size read** (agent-inferred at the build's first look). The next
+section's opening states depend on the step (they are this section's ends under each material), and the
+card holds the streams' credit resident between sections, so a read of the next section under the old
+material needs the old ends and must not disturb the resident credit; a probe read from rest has the
+same difficulty with the credit's residency. Before that build, one cheap read separates the step's size
+from its direction: the pair learner on GSM8K at half the rate (`2^(−8)`) for 40 laps. If the plateau and
+its training-code rise go with the half rate, the certificate's generalization is built with the rate
+law it implies; if they do not, the direction is the cause and the generalization is built first.
+
+**Acceptance, fixed before the build.**
+76. The half-rate read: 40 laps of the pair learner at `2^(−8)` on GSM8K, its training code lap by lap
+    beside the `2^(−7)` learner's (§43 and its continuation), and its receipt at laps 20 and 40.
+77. The certificate's generalization (next section or probe, whichever the card's resident credit admits
+    without disturbing it): a host test where a step lowers its own section's code and raises the
+    passage's elsewhere and is halved or refused, and the card the host's over 32 sections with it.
