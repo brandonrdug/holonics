@@ -2285,3 +2285,54 @@ card for §30's checks, so the run ended incomplete by intent): held-out 1.858, 
 passes 21 to 23 (GSM8K 1.811, 1.792, 1.803), 188.2 to 188.5 s a pass, peak VRAM 10,858 MiB with the
 game's. Over passes 13 to 23 it moved 0.015 bits a byte: the every-level credit on this declaration
 has reached a level at about 1.85.
+
+## 31. The release agrees over the heading's span
+
+[agent-inferred, October 31] **What the release does now.** Each class is drawn from the face as it
+stands (`agree 1`), or from its agreement face `p^k/Σp^k` (atlas `receiver.agreement-release`, the
+release at which `k` independent receivers of the face agree; the race's writing used `k = 1`). Read
+on the every-level credit after 23 passes (held-out 1.852, `cont2/STATE.2`) on the race's six
+prompts, `k = 1` invents words in every line and `k = 2` writes nearly every word as a word and every
+phrase in grammar, without a sentence that goes anywhere (the writings were shown in the thread and
+stay outside the repository). Both agree a class at a time: nothing in the release chooses at the
+coarse level's grain, which is the review's point that nothing refines a proposed continuation
+before it is released, and Brandon's that local continuations are never aggregated into a coarse
+motive.
+
+**The law.** The release agrees over the span the first clocked level's next tick closes. From a
+stream's state, independent candidates each draw class by class from the face (`agree 1`, one key a
+draw) until the first clocked level ticks on its news (or the end letter, or the bound), and a span is
+released when `k` candidates drew the same span; the stream continues from that span's end. The
+candidates are taken in disjoint groups of `k` in key order, so the first group that agrees is an
+exact draw from the span's agreement face,
+
+```text
+P(span = s | k independent draws agree) = p(s)^k / Σ_s' p(s')^k,     p(s) = Π_(c ∈ s) p̂(c | the classes before it)
+```
+
+and with `k = 1` it is the class release itself. The span is the coarse level's own grain in
+information time: the news clock ticks the first clocked level when the arrivals' surprise crosses
+its section (`B = 8` bits at the race's clock), so a span carries about eight bits of news whatever
+its length, and two receivers agree on it with probability `Σ p(s)²`, about `2^(−8)` or more. The
+count of candidates drawn together is the realization's, not the law's: a round that finds no
+agreeing group draws a new round, and the release stops with its keys when the declared keys run out,
+reporting the stream unfinished.
+
+**The recorded failures these choices could repeat.** *An authored routine standing in for
+learning*: the release reads only the learned faces and the learned clock; nothing reads a class's
+meaning. *Recitation or an index of contexts counted as generation*: nothing is stored or looked up;
+the candidates are drawn and discarded each round. *Text as the exception*: the span is the coarse
+clock's, for any medium. *Bits read as progress*: the writing is the reading; each release's own code
+a class is read beside it only to say how much sharper it is than the class release. *A refusal
+answered with a larger limit*: the keys are declared before the release and the release stops when
+they run out.
+
+**Acceptance, fixed before the build.**
+55. On the host fixture, the span release with `k = 1` releases what the class release releases for
+    the same keys (one candidate a group); with `k = 2` every released span was drawn by both
+    candidates of its group, the release is the same for the same keys, and a release whose keys run
+    out stops and reports the stream unfinished.
+56. On the 4080, the race's six prompts on the 23-pass learner to 1,024 classes or the end letter, `k
+    = 2`, within a deadline fixed from a measured round: the writing shown whole beside the `k = 1`
+    and `k = 2` class releases of the same learner, with the rounds a span took, the keys drawn and
+    each release's code a class.
