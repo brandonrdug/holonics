@@ -2065,3 +2065,61 @@ the section's edge.
 every-level credit lap for lap but not at equal time, the series' cost is the next subject. Not
 below it lap for lap, the heading carries nothing the fine levels can use, the read is retired and
 the next loop is the heading's target.
+
+**Built.** On the host, `Tower::join_motive` appends each clocked level's `D↓` after the heading's
+material (the state's text writes `motive` after `heading`); `Tower::step_on` adds `D↓_l ĥ_l` to the
+stream's opening after the heading before the arrival is read; `Tower::reverse_series` sums the
+reverse from the face's comparison and the reverses whose only source is the covector of each heading
+before a cell (`Tower::motive_return` forms it from a term's `δx⁰` and takes `D↓`'s outer sum;
+`Tower::reverse_joined` takes it as `before`, adding it to the modes after the cell before, or at the
+first cell to the carried modes' covector that the credit meets, and `C^→`'s outer sum against the
+modes before the cell). A joined, placed or split reverse beside the motive is refused (owed).
+Acceptance 48 as written read the series cut one term short; that term is the one before a term
+released to zero, so cutting it moves the covector by less than the reading's grain (347 of
+1,350,356,879 on the fixture's largest read entry), and the test reads the cut §4 made, the series
+at its first term: on three levels clocked from level 2 with `D` and `D↓` opened, the series ran 8
+terms, every family's covector met the code difference, and the first-term cut missed it on the
+heading's read by a factor of ten (131,185,927 against 1,518,519,036, the code difference within a
+tenth of the latter). The tower tests passed, 153 of 153, and gate 1 passed.
+
+On the card, `tower_forward` reads the motive's lift at its opening and after each cell at which a
+clocked level ticked and holds it between (record §19), adds it to the stream's opening, and keeps
+each heading before a cell, its scale and the carried modes' face; `TowerCard::read_reverse` runs
+the series: the first term as before, each later term with the stream's covector at zero and
+`tower_motive_return` (one block a cell) writing the source into the cell before's `ah_dread`, which
+`tower_reverse_heading` returns through `C^→`, and at the first cell into `mo_open`, which the modes'
+scan adds to the opening's covector before the credit meets it; a later term's outer sums, the
+encoding's and the moves' are added to the earlier terms' (the readout's and the face's descent's
+are the first term's alone), and `D↓`'s and the first cell's `C^→` sums are taken each term. The
+series ends at the first term whose source is zero on every cell (`mo_flag`, read back once a term).
+Each window prints `TOWER_SERIES` (the reverses and their summed terms), and
+`read-tower-held-classes` reads a saved learner's held-out code with and without `D↓`.
+
+**At the card** (B-PC's RTX 4080 SUPER beside the game, October 31, 15:03Z, binary `tower_pass-29m`
+`45806d25…ef37`).
+- **Acceptance 49 passed.** `the_cards_motive_is_the_hosts_for_thirty_two_sections` passed (three
+  locksteps of 32 sections, `D↓` opened, the credit fetched each section; 17.6 s), and at the race's
+  declaration `tower_pass parity … heading-credited-every-level-motive` (24 streams, 32 sections of
+  128) had 98,304 faces, 95,601 closure faces, 17,973,280 covector entries and every learner equal,
+  47.3 s against its 300 s deadline, peak resident set 3,223,664 KiB. The card suite (`--test
+  tower_pass`) passed, 47 of 47 (33.7 s). The library's port tests fail beside it, 14 of 76, on a
+  state's bit count (30,197 against 30,195), outside the tower; they are not this section's.
+- **Acceptance 47 on the card**: the every-level credit's first 64 sections on the motive's binary
+  print §28's lines (3.792 bits a byte at section 64, 41 halvings, 20,193 ms).
+- **Acceptance 50, the development read** (the first 64 sections from C′'s founding, each against a
+  180 s deadline):
+
+| over 64 sections | every-level credit | motive |
+|---|---|---|
+| arrivals at section 32, 64 (bits a byte) | 5.043, 3.792 | 5.326, 4.565 |
+| halvings, windows 1, 2 | 41, 0 | 102, 103 |
+| series terms, windows 1, 2 (32 reverses each) | 32, 32 | 97, 156 |
+| held-out after the 64 sections (GSM8K) | 3.461 (3.494) | 4.230 (4.216) |
+| elapsed at section 64 | 20,193 ms | 46,330 ms |
+| card: forwards, forward ms, reverse ms | 192, 14,566, 4,447 | 356, 27,165, 17,272 |
+
+The covector is exact (acceptance 48, 49), and the step is refused about three times a section in
+both windows, where the every-level credit refuses none after its first: every family then takes
+about an eighth of its step, the arrivals trail by 0.77 bits a byte at section 64, and the forwards
+of the rereads and the series' terms (three a section in the first window, nearly five in the
+second, growing as `D↓` opens) cost 2.3 times the time.

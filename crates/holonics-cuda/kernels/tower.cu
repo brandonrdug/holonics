@@ -112,9 +112,9 @@ struct TowerLevel {
     // clocked level F and without a clock).
     uint64_t section;
     // The heading (zero without it and below the clock's first clocked level,
-    // `Tower::join_heading`): its read C^→ (re, im, W × N) and its descent D (W × W), and max |w|
-    // of each.
-    uint64_t heading_re, heading_im, descent, heading_reach[3];
+    // `Tower::join_heading`): its read C^→ (re, im, W × N), its descent D (W × W) and its descent
+    // into the stream D↓ (W × W, zero without the motive, `Tower::join_motive`), and max |w| of each.
+    uint64_t heading_re, heading_im, descent, fine_descent, heading_reach[4];
 };
 
 struct TowerLaw {
@@ -188,7 +188,13 @@ struct TowerLaw {
     uint32_t closure, credit_advance;
     // The first credited level (the record's §24: every level's from 0; the clocked levels' from the
     // clock's first clocked level).
-    uint32_t credit_from, credit_pad;
+    uint32_t credit_from;
+    // The motive (`motive = 0` without it, `Tower::join_motive`, record §29): each clocked level's
+    // heading before an arrival enters the stream's opening through D↓, x⁰ += D↓ ĥ, and the reverse
+    // is the series of the loop through the heading; `term` is the series' term this reverse reads
+    // (0 the face's comparison; a later term's sums are added to the earlier terms').
+    uint32_t motive;
+    uint32_t term, term_pad;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -416,6 +422,19 @@ struct TowerFrame {
     // its moves, pushes and states, and the carried packets, are kept in the frame's own buffers for
     // that read, `tower_credit_moments`).
     uint32_t *cr_tick;
+    // The motive (each empty without it, `Tower::join_motive`): each clocked level's heading before
+    // each cell, its ratio and scale ([S][T][HD][W], [S][T][HD]), and its reach ([HD][S][T]); the
+    // carried modes' face at the opening ([S][HD][2N]) and its reaches ([HD][S] re, im); a later
+    // term's covector of the heading before the first cell's raw read ([S][HD][W], its reach
+    // [HD][S]) and of the carried modes it reaches ([S][HD][N][2]), which the credit meets; and
+    // whether a term's source is not zero ([1]).
+    int32_t *mo_read;
+    int64_t *mo_scale;
+    int64_t *mo_face;
+    int64_t *mo_dr0;
+    int64_t *mo_open;
+    uint32_t *mo_flag;
+    uint64_t *r_mo_read, *r_mo_face_re, *r_mo_face_im, *r_mo_dr0;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -997,6 +1016,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
     int64_t *hh_lift = (int64_t *)carve(at, 8ull * HD * W);
     uint64_t *hh_v = (uint64_t *)carve(at, 8ull * 4 * HD);
     uint32_t *hh = (uint32_t *)carve(at, 4ull * HD);
+    // The motive (`Tower::join_motive`): each clocked level's lift into the stream's opening,
+    // D↓ ĥ, held while its heading stands.
+    const uint32_t MO = law.motive != 0 ? 1 : 0;
+    int64_t *hm_lift = (int64_t *)carve(at, 8ull * HD * W * MO);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -1251,11 +1274,53 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
             const uint32_t l = law.news_first + i;
             const uint64_t qh = qc * HD + i;
             uint64_t fre = 0, fim = 0;
+            int64_t bscale;
             if (hh[i] != 0) {
-                heading_held(l, i, fre, fim);
+                bscale = heading_held(l, i, fre, fim);
             } else {
-                const int64_t hscale = heading_read(l, fre, fim);
-                heading_keep(i, fre, fim, hscale);
+                bscale = heading_read(l, fre, fim);
+                heading_keep(i, fre, fim, bscale);
+            }
+            // The motive (`Tower::join_motive`, record §29): the stream's opening reads the heading
+            // before this arrival through D↓, x⁰ += D↓ ĥ on 2^(−40) released to 2^(−16), the lift
+            // read at the forward's opening and after each cell at which the level ticked, and held
+            // between (record §19).
+            if (MO) {
+                const TowerLevel lv = law.level[l];
+                uint64_t mx = 0;
+                for (uint32_t j = tid; j < W; j += B) {
+                    const uint64_t v = magnitude(rd[j]);
+                    mx = v > mx ? v : mx;
+                }
+                const uint64_t bmax = block_max(mx, red);
+                if (t == 0) {
+                    const bool n_f = narrow_terms(lv.heading_reach[3], bmax, W, &st);
+                    for (uint32_t j = tid; j < W; j += B) {
+                        hm_lift[(uint64_t)i * W + j] = fit64(rel(dot(th + lv.fine_descent + (uint64_t)j * W, 1, W, rd, n_f), MATERIAL_BITS), &st);
+                    }
+                }
+                if (keep) {
+                    for (uint32_t j = tid; j < W; j += B) {
+                        fr.mo_read[qh * W + j] = rd[j];
+                    }
+                    if (tid == 0) {
+                        fr.mo_scale[qh] = bscale;
+                        fr.r_mo_read[(uint64_t)i * law.streams * T + qc] = bmax;
+                    }
+                    if (t == 0) {
+                        for (uint32_t o = tid; o < 2 * N; o += B) {
+                            fr.mo_face[((uint64_t)s * HD + i) * 2 * N + o] = fc[o];
+                        }
+                        if (tid == 0) {
+                            fr.r_mo_face_re[(uint64_t)i * law.streams + s] = fre;
+                            fr.r_mo_face_im[(uint64_t)i * law.streams + s] = fim;
+                        }
+                    }
+                }
+                __syncthreads();
+                for (uint32_t j = tid; j < W; j += B) {
+                    x[j] = fit32((wide)x[j] + (wide)hm_lift[(uint64_t)i * W + j], &st);
+                }
             }
             if (law.closure) {
                 for (uint32_t j = tid; j < W; j += B) {
@@ -2206,6 +2271,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                         const int64_t lift = fit64(rel(dot(th + lv.descent + (uint64_t)j * W, 1, W, rd, n_d), MATERIAL_BITS), &st);
                         hh_lift[(uint64_t)i * W + j] = lift;
                         x[j] = fit32((wide)x[j] + (wide)lift, &st);
+                    }
+                    // A re-read heading is the next arrival's heading before it: its lift into the
+                    // stream's opening is read again (`Tower::join_motive`).
+                    if (MO && held == 0) {
+                        const bool n_f = narrow_terms(lv.heading_reach[3], hmax, W, &st);
+                        for (uint32_t j = tid; j < W; j += B) {
+                            hm_lift[(uint64_t)i * W + j] = fit64(rel(dot(th + lv.fine_descent + (uint64_t)j * W, 1, W, rd, n_f), MATERIAL_BITS), &st);
+                        }
                     }
                     if (tid == 0) {
                         hh_v[i * 4 + 3] = hmax;
@@ -3315,6 +3388,13 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                     ai = rel((wide)mv0[3] * ai - (wide)mv0[4] * ar, MOVE_BITS);
                     ar = nr_;
                 }
+                // A later term of the motive's series reaches the carried modes themselves through
+                // the heading before the first cell (`tower_motive_return`, `Tower::join_motive`).
+                if (set == 0 && law.motive && law.heading > 0 && l >= law.news_first) {
+                    const int64_t *mo = fr.mo_open + (((uint64_t)s * law.heading + (l - law.news_first)) * N + k) * 2;
+                    ar += mo[0];
+                    ai += mo[1];
+                }
                 int64_t *cov = fr.cr_cov + ((((uint64_t)s * law.credit + cx) * 2 + set) * N + k) * 2;
                 cov[0] = fit64(ar, &st);
                 cov[1] = fit64(ai, &st);
@@ -3601,6 +3681,118 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_ahead(
             fr.r_ah_dread[(uint64_t)i * SQ + q] = dmax;
         }
         __syncthreads();
+    }
+    if (tid == 0 && st != 0) {
+        atomicOr(fr.status + s, st);
+    }
+}
+
+// [agent-inferred, October 31] **One term's return at the motive** (`Tower::motive_return`, record
+// §29), one block a cell of a stream: the term's input covector δx⁰ reaches each clocked level's
+// heading before the cell through D↓ᵀ, then its ratio's adjoint at the kept ratio and scale, the
+// covector of the raw read Re(C^→ h) of the modes before the cell, which is the next term's only
+// source: the modes after the cell before (written as that cell's `ah_dread`, which
+// `tower_reverse_heading` returns through C^→ and the outer sums pair with that cell's face), or
+// at the first cell the carried modes (`mo_dr0`, and `mo_open` = C_reᵀ ∂r, C_imᵀ (−∂r), which the
+// modes' scan adds to the opening's covector the credit meets). The last cell's `ah_dread` is zero:
+// nothing in the section reads its heading. `mo_flag` is set where a source is not zero. Also
+// writes max |δx⁰| (`r_dx`), which D↓'s outer sum reads.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_motive_return(TowerLaw law, TowerFrame fr) {
+    const uint64_t q = blockIdx.x;
+    const uint32_t s = (uint32_t)(q / law.cells), t = (uint32_t)(q % law.cells), tid = threadIdx.x, B = blockDim.x;
+    const uint32_t W = law.width, N = law.modes, HD = law.heading;
+    const uint64_t SQ = (uint64_t)law.streams * law.cells;
+    extern __shared__ __align__(16) unsigned char smem[];
+    unsigned char *at = smem;
+    uwide *redw = (uwide *)carve(at, sizeof(uwide) * 32);
+    uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
+    int64_t *dxs = (int64_t *)carve(at, 8ull * W);
+    int64_t *dv = (int64_t *)carve(at, 8ull * W);
+    int64_t *dr = (int64_t *)carve(at, 8ull * W);
+    __shared__ uint32_t st;
+    __shared__ uint32_t any;
+    if (tid == 0) {
+        st = 0;
+        any = 0;
+    }
+    uint64_t m = 0;
+    for (uint32_t j = tid; j < W; j += B) {
+        const int64_t v = fr.dx[q * W + j];
+        dxs[j] = v;
+        const uint64_t a = magnitude(v);
+        m = a > m ? a : m;
+    }
+    const uint64_t xmax = block_max(m, red);
+    if (tid == 0) {
+        fr.r_dx[q] = xmax;
+    }
+    for (uint32_t i = 0; i < HD; i++) {
+        const TowerLevel lv = law.level[law.news_first + i];
+        const uint64_t qh = q * HD + i;
+        const bool n_t = narrow_rows(lv.heading_reach[3], xmax, W);
+        for (uint32_t k = tid; k < W; k += B) {
+            dv[k] = fit64(rel(dot(fr.theta + lv.fine_descent + k, W, W, dxs, n_t), MATERIAL_BITS), &st);
+        }
+        __syncthreads();
+        // The ratio's adjoint ∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms at the kept ratio and scale.
+        const int32_t *r = fr.mo_read + qh * W;
+        const int64_t scale = fr.mo_scale[qh];
+        uwide dot_part = 0;
+        for (uint32_t k = tid; k < W; k += B) {
+            dot_part += (uwide)((wide)r[k] * (wide)dv[k]);
+        }
+        const wide mean = div_nearest((wide)block_sum(dot_part, redw), (wide)W);
+        uint64_t mr = 0;
+        for (uint32_t k = tid; k < W; k += B) {
+            int64_t v = 0;
+            if (scale != 0) {
+                v = fit64(div_nearest(((wide)dv[k] - rel(mean * (wide)r[k], 2 * FACE_BITS)) << FACE_BITS, scale), &st);
+            }
+            dr[k] = v;
+            const uint64_t a = magnitude(v);
+            mr = a > mr ? a : mr;
+        }
+        const uint64_t dmax = block_max(mr, red);
+        if (tid == 0 && dmax != 0) {
+            any = 1;
+        }
+        if (t > 0) {
+            const uint64_t qb = (q - 1) * HD + i;
+            for (uint32_t k = tid; k < W; k += B) {
+                fr.ah_dread[qb * W + k] = dr[k];
+            }
+            if (tid == 0) {
+                fr.r_ah_dread[(uint64_t)i * SQ + q - 1] = dmax;
+            }
+        } else {
+            const uint64_t qs = (uint64_t)s * HD + i;
+            for (uint32_t k = tid; k < W; k += B) {
+                fr.mo_dr0[qs * W + k] = dr[k];
+            }
+            if (tid == 0) {
+                fr.r_mo_dr0[(uint64_t)i * law.streams + s] = dmax;
+            }
+            const bool n_re = narrow_rows(lv.heading_reach[0], dmax, W);
+            const bool n_im = narrow_rows(lv.heading_reach[1], dmax, W);
+            for (uint32_t o = tid; o < 2 * N; o += B) {
+                const uint32_t k = o % N;
+                const bool im = o >= N;
+                const wide sum = dot(fr.theta + (im ? lv.heading_im : lv.heading_re) + k, N, W, dr, im ? n_im : n_re);
+                fr.mo_open[(qs * N + k) * 2 + (im ? 1 : 0)] = fit64(rel(im ? -sum : sum, MATERIAL_BITS), &st);
+            }
+        }
+        if (t == law.cells - 1) {
+            for (uint32_t k = tid; k < W; k += B) {
+                fr.ah_dread[qh * W + k] = 0;
+            }
+            if (tid == 0) {
+                fr.r_ah_dread[(uint64_t)i * SQ + q] = 0;
+            }
+        }
+        __syncthreads();
+    }
+    if (tid == 0 && any != 0) {
+        atomicOr(fr.mo_flag, 1u);
     }
     if (tid == 0 && st != 0) {
         atomicOr(fr.status + s, st);
@@ -4114,7 +4306,8 @@ extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
                 }
             }
         }
-        fr.gradient[law.encoding + (uint64_t)u * W + j] = acc;
+        // A later term of the motive's series adds to the earlier terms' sums.
+        fr.gradient[law.encoding + (uint64_t)u * W + j] = law.term ? fr.gradient[law.encoding + (uint64_t)u * W + j] + acc : acc;
     }
     if (law.mutual && threadIdx.x == 0) {
         wide acc = 0;
@@ -4627,8 +4820,8 @@ extern "C" __global__ void tower_moves(TowerLaw law, TowerFrame fr) {
             re += g[0];
             im += g[1];
         }
-        fr.gradient[lv.move_re + k] = re;
-        fr.gradient[lv.move_im + k] = im;
+        fr.gradient[lv.move_re + k] = law.term ? fr.gradient[lv.move_re + k] + re : re;
+        fr.gradient[lv.move_im + k] = law.term ? fr.gradient[lv.move_im + k] + im : im;
     }
 }
 

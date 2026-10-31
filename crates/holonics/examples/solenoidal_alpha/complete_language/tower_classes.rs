@@ -21,7 +21,7 @@
 //!
 //! Nothing here is text-, image- or sound-specific: a medium is only the chart that wrote its
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
-use super::tower_train::{agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
+use super::tower_train::{agreement, count, fit, held_out, named_region_line, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
 use holonics::receiver::release::agreeing_class;
 use super::*;
 use holonics::hnn::tower::participation::ENTROPY_BITS;
@@ -134,6 +134,14 @@ pub(crate) fn train_heading_credited_every_level_realized(args: &[String], reali
     train_joined(args, super::tower_train::Credit::From(0), false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeading, ContactLaw::Rectifying, realization)
 }
 
+/// `train-two-ladder-stacked-news-heading-credited-every-level-motive-tower-classes`:
+/// [`train_heading_credited_every_level_realized`] with the motive joined: the fine levels move under
+/// each clocked level's heading (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §29).
+pub(crate) fn train_heading_credited_every_level_motive_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, super::tower_train::Credit::From(0), false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeadingMotive, ContactLaw::Rectifying, realization)
+}
+
 /// `train-two-ladder-stacked-news-packet-pair-tower-classes`: [`train_packet_realized`] (the race's
 /// C′) with every contact the pair contact, founded on the same draws (record
 /// `2026-10-30_THE_PAIR_CONTACT_IS_RACED…`, §3 acceptance 4).
@@ -220,6 +228,41 @@ fn target_places(classes: &[usize], end: usize) -> Vec<bool> {
             target
         })
         .collect()
+}
+
+/// [agent-inferred, October 31] `read-tower-held-classes STATE STATE_SHA DEV DEV_SHA DEV_ROLES
+/// DEV_ROLES_SHA STREAMS SECTION`: the trainer's held-out read of a rested learner on a class
+/// passage, through `realization` (`TOWER_HELD`), and on a learner that carries the motive the same
+/// read with every `D↓` at zero (`TOWER_HELD_CUT`): the bits the fine levels draw from the heading
+/// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §29). A reading;
+/// it moves nothing.
+pub(crate) fn read_held_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    if args.len() != 9 {
+        return Err("read-tower-held-classes STATE STATE_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA STREAMS SECTION".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let dev = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, learner.tower.declaration.alphabet)?;
+    let roles = roles_of(&args[5], &args[6], dev.len())?;
+    let (streams, section) = (positive(&args[7])?, positive(&args[8])?);
+    realization.admit(&learner.tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
+    let ones = vec![1; dev.len()];
+    let mut read = |tower: &holonics::hnn::tower::Tower, name: &str| -> Result<()> {
+        let regions = held_out(tower, &dev, &ones, &roles, streams, section, realization)?;
+        let (code, coded) = regions.iter().fold((0i64, 0usize), |a, r| (a.0 + r.0, a.1 + r.1));
+        println!("{name} streams={streams} dev_bits_a_byte={} dev_regions {} dev_code={code} elapsed_ms={}", per(code, coded), named_region_line(&CLASS_REGIONS, &regions), started.elapsed().as_millis());
+        Ok(())
+    };
+    read(&learner.tower, "TOWER_HELD")?;
+    if learner.tower.motive() {
+        let mut cut = learner.tower.clone();
+        for range in cut.motive_families() {
+            cut.theta[range].fill(0);
+        }
+        read(&cut, "TOWER_HELD_CUT")?;
+    }
+    Ok(())
 }
 
 /// `read-tower-classes STATE STATE_SHA CLASSES CLASSES_SHA MARKS MARKS_SHA STREAMS`: the class passage

@@ -5939,6 +5939,13 @@ impl Tower {
         self.motive
     }
 
+    /// The motive's own material, each clocked level's `D↓` (empty without it).
+    pub fn motive_families(&self) -> Vec<std::ops::Range<usize>> {
+        let Some(first) = self.motive_from() else { return Vec::new() };
+        let ww = self.declaration.width * self.declaration.width;
+        self.layout.levels[first..].iter().map(|lv| lv.fine_descent..lv.fine_descent + ww).collect()
+    }
+
     /// The first level whose heading the stream's opening reads, when the motive is joined.
     pub(crate) fn motive_from(&self) -> Option<usize> {
         if self.motive {
@@ -6922,6 +6929,15 @@ impl TowerLearner {
             return refuse("the heading joins a learner before its first section: its streams' open traces are their state");
         }
         self.tower.join_heading()?;
+        self.first.resize(self.tower.theta.len(), 0);
+        self.second.resize(self.tower.theta.len(), 0);
+        Ok(())
+    }
+
+    /// The motive joined to the learner's tower ([`Tower::join_motive`]), its moments at zero. It adds
+    /// no stream state (`D↓` at zero reads as without it), so a continued learner may take it.
+    pub fn join_motive(&mut self) -> Result<()> {
+        self.tower.join_motive()?;
         self.first.resize(self.tower.theta.len(), 0);
         self.second.resize(self.tower.theta.len(), 0);
         Ok(())

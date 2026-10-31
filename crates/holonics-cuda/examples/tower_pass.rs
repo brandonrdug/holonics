@@ -1,7 +1,7 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | heading-credited-every-level-motive | pair | split]`:
 //!   founds the gated tower (rectifying, or with pair contacts when `pair`, `packets-pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
@@ -88,7 +88,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | heading-credited-every-level-motive | pair | split]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -104,7 +104,10 @@ fn parity(args: &[String]) -> Result<()> {
     // `packets-pair` is C′ with every contact the pair contact; `heading` is C′ with the heading
     // joined after the packets (`Tower::join_heading`), the race's H.
     // `heading-credited` is the race's H with every stream carrying the clocked levels' credit.
-    let every_level = word == Some("heading-credited-every-level");
+    // `heading-credited-every-level-motive` is the every-level credited heading with the motive
+    // joined (`Tower::join_motive`, the record's §29).
+    let motive = word == Some("heading-credited-every-level-motive");
+    let every_level = word == Some("heading-credited-every-level") || motive;
     let credited = word == Some("heading-credited") || every_level;
     let heading = word == Some("heading") || credited;
     let packets = word == Some("packets") || word == Some("packets-pair") || heading;
@@ -169,6 +172,10 @@ fn parity(args: &[String]) -> Result<()> {
     if heading {
         tower.join_heading()?;
         println!("TOWER_HEADING first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
+    }
+    if motive {
+        tower.join_motive()?;
+        println!("TOWER_MOTIVE first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
@@ -411,11 +418,12 @@ fn train(args: &[String]) -> Result<()> {
     let result = exterior::run_tower_classes_with_realization(&args[1..], &mut card);
     let times = card.times();
     println!(
-        "TOWER_CARD forwards={} forward_ms={} reverses={} reverse_ms={} elapsed_ms={}",
+        "TOWER_CARD forwards={} forward_ms={} reverses={} reverse_ms={} terms={} elapsed_ms={}",
         times.forwards,
         times.forward_ns / 1_000_000,
         times.reverses,
         times.reverse_ns / 1_000_000,
+        times.terms,
         started.elapsed().as_millis()
     );
     for (entry, calls, ns) in card.profiled() {

@@ -123,6 +123,13 @@ pub trait PassRealization {
     fn reread_closures(&mut self, on: bool) {
         let _ = on;
     }
+
+    /// [agent-inferred, October 31] The motive's series read since the last call (the record's
+    /// §29, [`Tower::join_motive`]): the reverses and the terms they summed. A realization that does
+    /// not count them reads none.
+    fn series_read(&mut self) -> Option<(u64, u64)> {
+        None
+    }
 }
 
 /// One stream's forward as the host keeps it between calls: its continuing state, its face after

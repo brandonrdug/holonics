@@ -54,6 +54,8 @@ struct Faces {
     packets: bool,
     /// The heading joined after the packets (`open_heading`); it needs them.
     heading: bool,
+    /// The motive joined after the heading (`open_motive`); it needs it.
+    motive: bool,
     /// The levels (two when zero).
     levels: usize,
     /// The learners' declared reading of each refused step on the opening's ticks
@@ -120,6 +122,9 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
     if faces.heading {
         open_heading(&mut learner);
     }
+    if faces.motive {
+        open_motive(&mut learner);
+    }
     learner.refusal_ticks = faces.refusal_ticks;
     (learner.clone(), learner)
 }
@@ -138,6 +143,25 @@ fn open_heading(learner: &mut TowerLearner) {
     for lv in &law.levels[first..] {
         for i in lv.descent..lv.descent + d.width * d.width {
             learner.tower.theta[i] = (k[j] as i32 - 128) << 14;
+            j += 1;
+        }
+    }
+}
+
+/// The motive joined after the heading, the descent into the stream `D↓` of each level the clock
+/// holds opened about ±1/8 on `2^(−24)` off the key stream (it founds at zero), so every heading
+/// before a cell moves the stream's opening and the series runs more than one term from the first
+/// section (`join_motive`, the record's §29).
+fn open_motive(learner: &mut TowerLearner) {
+    learner.join_motive().expect("the motive joins");
+    let d = learner.tower.declaration;
+    let first = learner.tower.news().expect("the heading's clock").first();
+    let law = learner.tower.resident_law().expect("the law");
+    let k = keys(1 << 16);
+    let mut j = 52000;
+    for lv in &law.levels[first..] {
+        for i in lv.fine_descent..lv.fine_descent + d.width * d.width {
+            learner.tower.theta[i] = (k[j % k.len()] as i32 - 128) << 14;
             j += 1;
         }
     }
@@ -646,6 +670,22 @@ fn the_cards_clocked_credit_is_the_hosts_for_thirty_two_sections() {
 /// face by face, covector entry by entry, learner for learner and state for state (each stream's
 /// credit fetched), on four levels clocked from level 2 and at the race's declaration, six levels
 /// from level 4, each with the passage, the packets and the heading.
+/// [agent-inferred, October 31] **The motive on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §29, acceptance 49): the
+/// stream's opening reads each clocked level's heading before the arrival through `D↓`, and the
+/// reverse sums the series of the loop through the heading (`tower_motive_return`); 32 sections
+/// equal face by face, covector entry by entry, learner for learner and state for state, on three
+/// levels clocked from level 2 with the passage, the packets and the heading, and with every
+/// level's credit (each stream's credit fetched) on four levels from level 2 and at the race's
+/// declaration, six levels from level 4.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_motive_is_the_hosts_for_thirty_two_sections() {
+    lockstep(11, 3, 9, 32, false, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, motive: true, ..Faces::default() });
+    lockstep_credited_from(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 4, passage: true, packets: true, heading: true, motive: true, ..Faces::default() }, Some(0));
+    lockstep_credited_from(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, motive: true, ..Faces::default() }, Some(0));
+}
+
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_every_level_credit_is_the_hosts_for_thirty_two_sections() {
