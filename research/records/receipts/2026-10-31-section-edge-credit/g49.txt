@@ -1,0 +1,6 @@
+BIN=dd87fde31cc8e39933740982057ccbcf6fc6470eb06e43a1db920215fad3cbe8 at=2026-10-31T22:11:22Z
+RUN_END pa0 rc=0 TOWER_CARD forwards=2779 forward_ms=1477336 reverses=1300 reverse_ms=595177 elapsed_ms=2235505 MEASURE lap=pa0 rc=0 wall_s=2236.0 peak_rss_kib=3846716 
+VRAM_PEAK_MIB=11000
+RECEIPT lap 5 done
+RECEIPT lap 10 done
+RECEIPT lap 20 done

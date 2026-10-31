@@ -3120,3 +3120,16 @@ equals 87 of 399 (met 85 of 260, never met 2 of 139) against 86 (79, 7). A lower
 learner that takes up its question less are not the same thing; bits a byte alone would have chosen the
 learner that hears the question less. **What it decides:** the run-away of §44 is to be read at the half
 rate before any certificate is widened (acceptance 77 waits on that read).
+
+**Participation from level 0 at the half rate** (`g49*`, 2,236.0 s, device peak 11,000 MiB). Stable: the
+training code fell at every lap of 20 (2.778 to 1.263) and the held-out code reached 1.545 (question
+1.694, prose 1.436, digits 2.097, calculations 0.794), against the half-rate pair learner's 1.543 at lap
+20, at 7.9 times its lap. Its receipt at laps 5, 10 and 20: flux 171.8, 533.4 and 789.6 bits (the pair
+learner's at lap 20, 808.3); on the problem's words 19, 24 and 21 of 128 (26); the first calculation from
+the question's numbers 9, 8 and 5 of 120 (5 of 121); exact at the equals 45, 75 and 83 of 399 (66), met
+38, 74 and 76 of 260 (62), never met 7, 1 and 7 of 139 (4). Participation writes back more of the
+calculations it heard and moves nothing else; acceptance 75, read at the half rate, fails again (5
+against a bar of twice the pair learner's). The first step's counts are a few in about 120 releases at
+one draw each, so a difference of a few is within the read's spread; from here they are reported with it.
+**What it decides:** the working declaration on GSM8K is the pair contact at `2^(−8)`, without
+participation; the next read is that learner run longer, with the receipt every ten laps.
