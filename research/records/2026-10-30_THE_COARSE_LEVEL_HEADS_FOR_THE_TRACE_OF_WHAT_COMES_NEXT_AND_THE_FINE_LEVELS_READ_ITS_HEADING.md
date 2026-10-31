@@ -2876,3 +2876,40 @@ where it appears, and the split does not join before it is read.
     its last lap. Lower at equal elapsed time at the third lap end sends the pair contact into the
     working declaration and its founded split next; otherwise the rectifier stays and the tie split's
     owner is the next growth.
+
+**Acceptance 70 passed and 71 passed** (`p41*`, RTX 4080 SUPER under the lock, `tower_pass-41a`
+`7fce5e79…`). The card was the host's for the working declaration with pair contacts on units (32
+sections of 24 streams, 25,285,824 covector entries and every learner equal, 45.2 s). Three laps at 160
+streams from C′'s founding keys held out 2.112, 2.005 and 1.958 at 138.0, 265.6 and 395.9 s (398.8 s
+wall against 823 s projected, 0.48; device peak 7,075 MiB), against the rectifying declaration's 2.164,
+2.063 and 2.012 at 117.1, 230.7 and 343.7 s: lower lap for lap by 0.052, 0.058 and 0.054, and at equal
+elapsed time about 1.977 at the rectifier's third lap end (interpolated between the pair's second and
+third), 0.035 below it. Its flux on the first 256 classes after the third lap was 352.6 bits (0 → 1
+2.197, 0 → 2 89.132, 1 → 0 0.842, 1 → 2 27.803, 2 → 0 121.379, 2 → 1 111.287), against the rectifier's
+545.2 after its third: it codes the passage lower and its continuation leans on the prompt less at this
+stage. By the decision fixed with it, the pair contact enters the working declaration and its founded
+split is next; the rise C′ with pair contacts showed from its 13th lap is read first, on twelve more
+laps.
+
+## 42. The founded split joins the working declaration
+
+[agent-inferred, October 31] **The lift.** The pairing (`Tower::paired`) widens the contact field by
+two with every pair dormant, face for face. It refused the passage and the heading. The passage's
+`W₁ˣ` drives the contacts, so its rows repeat with each contact's copy as the drives' rows do, and a
+dormant pair ties them as it ties the drives (`pair_entries`); the heading reads the modes and the
+face reads it, so the pairing keeps its families unchanged. The credit's moments are of the modes'
+recurrence, which the pairing leaves as it was, so a carried credit carries on. Participation and the
+mutual contact stay refused. Host: `the_working_declaration_pairs_with_its_passage_and_heading`
+(pair contacts on four levels clocked from level 2 with packets, passage and heading: face for face
+and the same state class by class, and a founding section from openings carrying the every-level
+credit runs on the host's realization, the passage's rows among the tied drives); the split's nine
+tests pass.
+
+**Acceptance, fixed before the build.**
+72. The host tests above; the card the host's for the paired working declaration with pair contacts on
+    units over 32 sections, the founding read beside it (split reads and foundings equal).
+73. The working declaration with pair contacts and its founded split, from C′'s founding keys at 160
+    streams, against the same declaration unsplit (§41's laps and continuation) at equal elapsed time,
+    with the foundings it certifies, the flux and the writing. The split founds a contact only where
+    its code pays, so its acceptance is a lower held-out code at equal elapsed time with the contacts it
+    founded; no growth at all is a reading of the law, not a failure of the build.

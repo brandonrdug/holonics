@@ -3368,6 +3368,13 @@ pub(super) fn train_units_pair_race(args: &[String], realization: &mut dyn PassR
     train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeading), realization)
 }
 
+/// `train-two-ladder-stacked-news-heading-credited-every-level-split-unit-tower`: the pair unit race
+/// with its contacts paired at the founding and each section reading their founded split (record
+/// `2026-10-30_…`, §42): the field widens contact by contact where its code pays.
+pub(super) fn train_units_split_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeadingSplit), realization)
+}
+
 /// `train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower`: the unit
 /// race's declaration with participation joined at the clocked levels alone, on their own ticks
 /// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
@@ -3451,6 +3458,9 @@ pub(super) enum Joined {
     /// ([`TowerLearner::section_dormant`]): the copies deposit as one contact and nothing founds,
     /// the split race's control (the pair learner in the wider chart).
     DormantSplit,
+    /// [`Joined::PassagePacketsHeading`] with its pair contacts paired at the founding and every
+    /// section reading their founding ([`Joined::Split`]; record `2026-10-30_…`, §42).
+    PassagePacketsHeadingSplit,
 }
 
 /// [agent-inferred, October 31] A clocked participation's section, its level's own count of ticks
@@ -3516,14 +3526,15 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let rate_bits: u32 = args[9].parse()?;
     let out = Path::new(&args[10]);
     let classes = &reading.train;
-    let paired_run = matches!(joined, Joined::Split | Joined::DormantSplit);
+    let founding_split = matches!(joined, Joined::Split | Joined::PassagePacketsHeadingSplit);
+    let paired_run = founding_split || joined == Joined::DormantSplit;
     if paired_run && (looking.is_some() || contact != ContactLaw::Pair) {
         return Err("a split run trains the pair tower on its passage, without a look".into());
     }
-    if joined == Joined::Split && !realization.forms_split() {
+    if founding_split && !realization.forms_split() {
         return Err(format!("{} does not form the paired contacts' split read", realization.realization()).into());
     }
-    if (joined == Joined::Split && args.len() == 13) || (joined != Joined::Split && args.len() > 13) {
+    if (founding_split && args.len() == 13) || (!founding_split && args.len() > 13) {
         return Err("a founding split run continues with its learner and its paired directions; every other run with its learner alone".into());
     }
     if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
@@ -3542,7 +3553,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let mut learner = if args.len() >= 13 {
         let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
-        if joined == Joined::Split {
+        if founding_split {
             let text = pinned_read(&args[13], &args[14], STATE_BUDGET)?;
             let directions = PairedContacts::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
             directions.admits(&learner.tower).map_err(|e| e.to_string())?;
@@ -3563,11 +3574,11 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading);
+        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading | Joined::PassagePacketsHeadingSplit);
         if learner.tower.passage() != (packets || joined == Joined::Passage) || learner.tower.packets() != packets {
             return Err("the continued learner's passage or packets differ from the declared ones".into());
         }
-        if learner.tower.heading() != matches!(joined, Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading) {
+        if learner.tower.heading() != matches!(joined, Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading | Joined::PassagePacketsHeadingSplit) {
             return Err("the continued learner's heading differs from the declared one".into());
         }
         learner
@@ -3628,6 +3639,18 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             }
             // A split run widens the contact field by two at the founding, every pair dormant
             // ([`TowerLearner::paired`]); the founding run carries their directions.
+            // A split heading run joins the passage, the packets and the heading, then pairs its
+            // contacts as a split run does.
+            Joined::PassagePacketsHeadingSplit => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_packets().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                let (widened, directions) = learner.paired().map_err(|e| e.to_string())?;
+                learner = widened;
+                println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
+                println!("TOWER_PAIRED contacts={} dormant={} founding=true", learner.tower.declaration.contacts, directions.dormant());
+                paired = Some(directions);
+            }
             Joined::Split | Joined::DormantSplit => {
                 let (widened, directions) = learner.paired().map_err(|e| e.to_string())?;
                 learner = widened;

@@ -87,7 +87,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
     Ok(digest)
 }
 
-const PARITY_USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split], each of packets, heading, heading-credited and heading-credited-every-level also with -participating or -pair, or parity-units-founded UNITS UNITS_SHA TEXT TEXT_SHA KEYS KEYS_SHA ... (the founded units' classes in place of CLASSES)";
+const PARITY_USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split], each of packets, heading, heading-credited and heading-credited-every-level also with -participating, -pair or -split, or parity-units-founded UNITS UNITS_SHA TEXT TEXT_SHA KEYS KEYS_SHA ... (the founded units' classes in place of CLASSES)";
 
 fn parity(args: &[String]) -> Result<()> {
     if args.len() < 12 {
@@ -131,6 +131,10 @@ fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> 
     // as the pair contact (record `2026-10-30_…`, §41).
     let pair_suffix = word.is_some_and(|w| w.ends_with("-pair") && w != "packets-pair");
     let word = word.map(|w| if pair_suffix { w.trim_end_matches("-pair") } else { w });
+    // `<word>-split` pairs those pair contacts and reads each section's founding (record `2026-10-30_…`,
+    // §42).
+    let split_suffix = word.is_some_and(|w| w.ends_with("-split"));
+    let word = word.map(|w| if split_suffix { w.trim_end_matches("-split") } else { w });
     let clock = match numbers {
         [] => None,
         [bits, radix] => Some(NewsClock::new(bits.parse()?, radix.parse()?)?),
@@ -149,7 +153,7 @@ fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> 
     // `train-two-ladder-pair-tower-classes`.
     // `split` founds the pair contacts and pairs them, every pair dormant
     // (`TowerLearner::paired`), the founded split's sections (`TowerLearner::section_founding`).
-    let split = word == Some("split");
+    let split = word == Some("split") || split_suffix;
     let pair = word == Some("pair") || word == Some("packets-pair") || split || pair_suffix;
     let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
     if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
