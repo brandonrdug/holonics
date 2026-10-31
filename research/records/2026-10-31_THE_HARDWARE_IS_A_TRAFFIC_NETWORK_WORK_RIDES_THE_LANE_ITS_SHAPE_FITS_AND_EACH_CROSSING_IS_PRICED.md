@@ -1,6 +1,6 @@
 # The hardware is a traffic network: work rides the lane its shape fits, and each crossing is priced
 
-Refs #404 #76. Status: [the lens, derived and joined to the hardware law; agent-inferred, October 31].
+Refs #404 #76. Status: [the lens, derived and joined to the hardware law; corrected the same day against local closure (§5); agent-inferred, October 31].
 Claude (opus). Read beside [the receiver cover](2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
 (the card carries the current; the host must not reconcile allocated worlds) and
 [GPU first](2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md).
@@ -55,3 +55,21 @@ answer to a measured failure (the learner's wide current carried on eight host t
 - **Learning stays on the card.** This lens does not move a learner's wide current to the host; it
   lets a deep segment (a founding, a codec, a certificate's exact comparison) ride the lane that fits
   it, with its crossing priced.
+
+## 5. No lane is a partition of the dynamics
+
+Brandon, the same day (paraphrased): a rule that a kind of work is built on the processor is not a
+good global rule if the dynamics are flexible enough to work around it; demanding that something work
+out on one part of the hardware or the other isolates partials of the dynamics and makes them close
+in partitions the transport drew. That worry is right, and it corrects §3–§4.
+
+[agent-inferred] A lane carries a segment of a run; it never owns a part of the law. The route is
+chosen per run from the segments' shapes and the crossings' prices, and it may change as the
+dynamics change: the units founding rides the CPU on October 31 because it is today one serial
+greedy chain run once, not because founding belongs to the CPU, and when founding becomes part of the
+learner's own motion (a founding from the reached residual, renewed as the passage is heard) it moves
+with that motion onto the card's lanes. A crossing is a price the route pays, never a wall at which a
+piece of the dynamics must close: no quantity is required to be complete on one device, and the laws
+are stated, tested and certified on the whole run (the host's reference and the card agree bit for
+bit wherever a segment runs). The hardware law's partition certifies which co-present regions commute;
+it does not license a partition of the mathematics.

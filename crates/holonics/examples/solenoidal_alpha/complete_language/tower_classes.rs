@@ -703,7 +703,7 @@ pub(crate) fn read_race_realized(args: &[String], realization: &mut dyn PassReal
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
     let alphabet = tower.declaration.alphabet;
-    let end = alphabet - 1;
+    let end = end_class(alphabet)?;
     let dev = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, alphabet)?;
     let prompts_classes = classes_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?, alphabet)?;
     let streams = positive(&args[7])?;
