@@ -2483,3 +2483,29 @@ about 5.2 MB of the passage against the byte declaration's 2.6 MB.
 
 The material is 690,342 entries against 553,473 (the encoding and the readout over 1,318 classes),
 and the run fits under the 12 GB the card keeps for it.
+
+**Acceptance 60 passed** (16:34Z to 16:38Z, one lock beside the game, binary `tower_pass-33c`; two
+laps against a 360 s deadline from the development read, 236.3 s; peak resident set 3,206,692 KiB,
+peak VRAM 11,829 MiB with the game's).
+
+| | bytes (§29's race, same founding) | units |
+|---|---|---|
+| lap 1: held-out (GSM8K, words), elapsed | 2.270 (2.310, 2.239), 196.7 s | **2.230** (2.213, 2.244), 119.9 s |
+| lap 2: held-out (GSM8K, words), elapsed | 2.113 (2.109, 2.116) near 390 s (§24's second lap, 1.97 times the first) | **2.111** (2.088, 2.130), 233.4 s |
+| halvings | 43 (lap 1) | 30, all in the first window |
+
+At its first lap's end the unit declaration reads below the byte declaration's first lap, which
+ended 77 s later; at its second lap's end (233.4 s) the byte declaration, between its lap ends,
+reads about 2.24, so at equal elapsed time the units lead by about 0.13 bits a byte. A lap of units
+covers the passage in 0.61 of the bytes' time (1.97 bytes a unit against 1.27 times the cost a
+section). The writing from the second lap's learner (agree 1 and 2, the prompts parsed in the same
+units, the end letter the record separator's unit) was shown whole in the thread and stays outside
+the repository: at agree 2 the word-problem prompts write whole GSM8K-shaped problems in real words
+(question, working, answer line), with wrong arithmetic and one loop of the dollar sign; the
+repository prompts write symbol runs and file tables. Each release's code a unit: agree 1, 3.22 to
+5.08 bits; agree 2, 1.13 to 3.28.
+
+**What it decides.** The unit declaration is the working law: it reads below the byte declaration
+lap for lap and at equal elapsed time. The units were founded on the GSM8K problems alone; units
+founded on the race's whole passage need host compute under Brandon's exception (the route refuses it
+without one) or a card realization of the founding.
