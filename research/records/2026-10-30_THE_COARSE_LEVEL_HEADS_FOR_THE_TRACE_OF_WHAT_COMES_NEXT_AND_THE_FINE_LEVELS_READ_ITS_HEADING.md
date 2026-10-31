@@ -2952,3 +2952,38 @@ calculation markup `<<…>>` (the end letter with P).
 Nothing in the receipt enters the machine or selects a release. The declarations raced on it: the
 rectifying working declaration, its pair contacts, and the pair contacts with the founded split (§41,
 §42), from C′'s founding keys at 160 streams.
+
+**The first receipts** (October 31, RTX 4080 SUPER under the lock, `tower_pass-43a` `5720d117…`; 160
+streams of 128, 65 sections a lap, 20 laps each from C′'s founding keys; `g43*`). §42's acceptance 72
+passed first: the paired working declaration with its founding read was the host's on the GSM8K units
+(35,869,888 covector entries, every learner, every split read and founding equal; 22 foundings
+admitted). The passage, its partition and the read's texts are `tools/gsm8k/tower_passage.py`'s
+(training text `6329816e…`, held-out `638c8134…`, regions `331a8612…`).
+
+| at lap 20 | rectifying | pair | pair + split | 8-gram | 6-gram | references |
+|---|---|---|---|---|---|---|
+| elapsed | 260.6 s | 284.8 s | 585.1 s | | | |
+| held-out code (Q / P / N / M) | 1.590 (1.716 / 1.483 / 2.181 / 0.943) | 1.551 (1.701 / 1.451 / 2.052 / 0.794) | 1.558 (1.699 / 1.449 / 2.134 / 0.836) | | | |
+| training code | 1.445 | 1.396 | 1.385 | | | |
+| a question's flux into its answer (six, summed), laps 5 / 10 / 20 | 83.4 / 153.6 / 250.1 | 192.0 / 384.6 / 544.5 | 186.7 / 428.6 / 515.2 | | | |
+| (a) on the problem's words, of 128 | 15 | 19 | 20 | 11 | 9 | 127 |
+| (b) free calculations, exact | 37 / 400 | 69 / 500 | 74 / 426 | 179 / 213 | 102 / 185 | 399 / 399 |
+| (c) first calculation from the question's numbers | 5 / 121 | 6 / 122 | 7 / 124 | 3 / 98 | 4 / 94 | 92 / 125 |
+| exact at the equals (met / never met) | 56 / 399 (54 / 260, 2 / 139) | 77 / 399 (70 / 260, 7 / 139) | 80 / 399 (76 / 260, 4 / 139) | 250 / 399 (243 / 260, 7 / 139) | 179 / 399 (174 / 260, 5 / 139) | |
+
+At equal elapsed time the pair contacts lead (1.562 at lap 18, 255.6 s, against the rectifier's 1.590 at
+260.6 s); the split's laps cost about twice the pair's, so it trails at equal time. The split founded
+1,247 of its 1,536 pairs where their code paid (289 dormant at lap 20): the field widened contact by
+contact by its own law, without a lower held-out code than the pair contacts' at the same lap. Device
+peaks 6,568, 6,893 and 8,588 MiB. **What the receipt shows that the code did not:** the learners stay on
+the problem's words a little more often than the n-grams, write back a calculation they heard far less
+often than the 8-gram (54 to 76 of 260 against 243), write an unheard calculation's value almost never
+(2 to 7 of 139, as the n-grams), and almost never open from the question's numbers (5 to 7 of about
+122; the references 92 of 125): GSM8K's form and some of its words are held, its arithmetic and the
+question's particulars are not. The pair contacts raise every line and more than double the question's
+flux into its answer. From lap 18 the pair and split training code rose (pair 1.321 to 1.396) while the
+held-out code fell; the rise C′ with pair contacts showed may be opening, and is read on.
+
+**What it decides.** The pair contact is the working contact on GSM8K. The next loop's subject is the
+measured blocker: the first calculation almost never takes the question's numbers (6 of 122 against
+the references' 92 of 125), the question's particulars not reaching the answer's first step.

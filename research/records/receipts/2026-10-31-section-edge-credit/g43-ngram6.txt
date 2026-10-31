@@ -1,0 +1,2 @@
+NGRAM_WRITTEN order=6 problems=128 calculations=399
+MEASURE lap=ngram6 rc=0 wall_s=10.4 peak_rss_kib=555768
