@@ -1969,3 +1969,99 @@ carrying it); the card suite passed, 46 of 46.
 The receipts directory's run reads (§22 to §28) had been written as `.log`, which the repository
 ignores, so only its scripts were committed; they are committed with this section as `.txt`, their
 machine paths written `$ROOT`.
+
+## 29. The fine levels move under the heading
+
+[agent-inferred, October 31] **What the heading is now.** Since §11 the heading is the coarse
+level's read that the face takes, `z = U(x^L + Σ_l D_l ĥ⁺_l) + c`. Between a level's ticks its modes
+stand, so the heading a tick leaves is the one the face reads for every arrival of the span the
+next tick closes (§19): it is trained by every class of that span, a forecast of the span in the
+face's own terms, and since §22 and §24 its families carry their return across the section's edge.
+The closure reads it against the span's trace in the encoding's terms, a space the heading is never
+asked to enter, so the closure sitting above flat says the heading is not the trace, not that it
+forecasts nothing. What the heading still does not do is move anything: the fine levels' pushes,
+gates, turns and contacts never read it, so the coarse levels' long memory reaches the released
+class only as a bias on its face and never the motion that forms the next class. The review's point
+(the coarse state is read at the output and not used as motive) and Brandon's lens (an NPC whose map
+steers each step, an auto-gradient with its terrain) name the same missing term.
+
+**The law.** The coarse field enters the fine field's motion: each clocked level's heading enters
+the residual stream's opening through its own descent into the stream, `D↓_l` (real, `w × w`,
+opening at zero, beside the face's `D_l`):
+
+```text
+x⁰_t = E(u_t) + Σ_(l ≥ F) D↓_l ĥ_l(t),     ĥ_l(t) = r̂(Re(C^→_l h_l(t−1))) = ĥ⁺_l(t−1)
+```
+
+`ĥ_l(t)` is the heading the level held before arrival `t`: the closure's heading, the face's
+heading after the cell before, and at a section's opening the heading of the carried modes. The
+arrival's encoded face is the coloured part of the opening, the coarse level's direction the
+colourless part that every arrival of its span shares (the Galois-gap record's §12: the coarse
+scope is the trace of the fine field, and here it is returned to it); in the fluid reading it is the
+coarse correction carried back into the fine state, a body force on every fine motion, where §9
+placed it only in the observation. Every level's push, gate, turn and contacts then read where the
+coarse levels are heading, and so does the release: each drawn class enters a fine field already
+moving under the heading.
+
+**The covector, and why §4's version of this read failed.** The forward is a loop within a section:
+the coarse modes at `t` read the fine levels' motion up to `t` (the packets), and the fine levels at
+`t + 1` read the coarse modes at `t`. The reverse runs level by level from the top, so the fine
+levels' covector of `x⁰` exists only after the coarse levels' scan has run. §4 stopped the covector
+at `D`, which is the loop's series cut at its first term: every step on `C^→`, on the clocked levels'
+material and on what feeds their modes moved `x⁰` along a path the covector did not carry, and §8–§9
+measured the result (a refused step 2.8 times a section). The reverse is linear in its sources given
+the forward's carriers, so the whole covector is the series
+
+```text
+δ = Σ_(k ≥ 0) δ_k,    δ_0 = R(top),    δ_(k+1) = R(a_k),
+a_k(l, t) = r̂'(ĥ_l(t))ᵀ D↓_lᵀ δ_k x⁰_t     (entering the modes after cell t − 1)
+G_(D↓_l) = Σ_k Σ_t δ_k x⁰_t ĥ_l(t)ᵀ
+```
+
+`R(·)` is the existing reverse (every level's scan, the packets' returns, the opening's meeting with
+the credit) with the named covector as its only source: `δ_0` is today's reverse, and each later
+term carries the covector once more round the loop through the heading. A term entering the modes
+after cell `t − 1` reaches the fine levels' inputs only at cells up to `t − 1`, so each term reaches
+at least one cell further back and the series is finite within a section (its length at most the
+section's cells). It is released when its term is zero at the covector's grain, the grain on which
+every term is already carried; no tolerance is chosen. At the opening (`t = 0`) the term enters the
+carried modes, whose covector meets the every-level credit (§24), so the read's return also crosses
+the section's edge.
+
+**The recorded failures these choices could repeat, and how each is refused.**
+- §9, *the closure's pull on the arrivals' terrain*: the closure stays read and moves nothing; the
+  heading is moved only by the arrivals' own code.
+- §9, *an incomplete covector carried into a new consumer* (the read §4 placed at `x⁰`): the series
+  carries the loop whole, and acceptance 48 requires its last term (the covector cut one term short
+  misses the code difference).
+- §10, *key-only closure learning stayed at flat*: no closure term enters any family.
+- §12 and §17, *a step scaled to a form starved levels*: `D↓` steps at the material's step under the
+  section's one certificate, like every family.
+- *A refusal answered with a larger limit*: the series' length is the mathematics' (zero at the
+  grain), read and reported; the race's deadline is fixed from a 64-section read before launch.
+- *A tape*: each term reuses the section's own forward carriers and is consumed in the section's
+  reverse.
+- *Text as the exception*: `x⁰` is the encoded arrival of whatever medium.
+
+**Acceptance, fixed before the build.**
+47. *Unchanged without it.* The tower tests and the card suite pass; a tower without the motive is
+    the tower as before; with `D↓` at zero the motive tower reads face for face as the every-level
+    credited heading, its covector equal.
+48. *The covector.* On four gated levels clocked from level 2 with packets, the heading and the
+    credit from level 0, with `D↓` opened: every family's covector is the arrivals' code difference
+    it predicts, and the series cut one term short misses it on the heading's read.
+49. *The card.* The race's declaration with the motive, 24 streams over 32 sections, host against
+    card: every face, covector entry, learner and fetched credit equal (`tower_pass parity …`).
+50. *The development read.* The motive's first 64 sections from C′'s founding print each window's
+    series terms, its refusals and its arrivals beside the every-level credit's, and fix the race's
+    deadline.
+51. *The race.* From C′'s founding, the motive for one lap, its held-out read at the lap's end at or
+    below the every-level credit's at the same elapsed time (§28: 2.270 at 184.9 s, read on its curve
+    with §27's later laps), reported with each window's arrivals, refusals and series terms, the
+    closure, the bits the fine levels draw from the heading (the same learner's held-out read with
+    `D↓` at zero), and the writing.
+
+**What it decides**, fixed before the race. With 51 passed the race runs toward an hour. Below the
+every-level credit lap for lap but not at equal time, the series' cost is the next subject. Not
+below it lap for lap, the heading carries nothing the fine levels can use, the read is retired and
+the next loop is the heading's target.
