@@ -17,6 +17,22 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 31: the working declaration reads founded units, and the release agrees over the heading's
+span (card).** On the RTX 4080 SUPER the race's declaration (the stacked news clock, packets, the
+heading the face reads, and every level's credit across the section's edge) read in the October 23
+founded units (1,318) codes the held-out passage at 2.230 bits a byte after one lap (119.9 s) and
+2.111 after two (233.4 s), against the same declaration on bytes, 2.270 after its lap (196.7 s) and
+about 2.24 at 233 s: the unit declaration is the working law. On bytes the every-level credit levels
+near 1.85 after twenty-odd passes and C′ near 1.87. Two motives inside the section (the heading read
+by the fine levels' opening, then as a force through each arrival level's read) were built exactly on
+host and card and retired: the section's one certified step could not cross the loop they close
+(halved about three times a section). The release can agree over the span the first clocked level's
+next tick closes (`Tower::release_spans`), and on one stream the learner locks a repeating period in
+ten to twenty-five deposits and keeps it across a cold restart. The
+[record](research/records/2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT_AND_THE_FINE_LEVELS_READ_ITS_HEADING.md)
+§29–§33 holds the laws, the races and their receipts; the writing is shown in the thread and kept out
+of the repository.
+
 **October 29: Claude retakes the lead; participation is the next law (host and card).** Codex led
 alone on October 27 and 28. The [audit](research/records/2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md)
 keeps its four theory records and its exact two-screw contact, which changes both participants and
