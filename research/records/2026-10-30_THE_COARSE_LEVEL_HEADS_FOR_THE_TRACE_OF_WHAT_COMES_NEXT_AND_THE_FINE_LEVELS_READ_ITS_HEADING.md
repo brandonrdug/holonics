@@ -1759,3 +1759,24 @@ At equal elapsed time the every-level credit leads the clocked one by 0.012 on h
 and its arrivals read below the clocked credit's at 17 of 23 windows (22 lap for lap); its first
 lap cost 1.049 times the clocked credit's. **The every-level credit is the working law.** The race
 runs toward an hour next, both continuing in one session.
+
+**Toward an hour** (06:44Z to 07:08Z, the same binary and session): the every-level credit three
+more laps from its `STATE.0` (741.8 s against 810 s, peak 4,002,856 KiB), then the clocked credit
+three more from its `STATE.1` (665.7 s against 765 s); peak VRAM 10,882 MiB with the game's. Each
+run's times continue its first (offsets 258.7 s and 469.4 s).
+
+| lap | every-level: elapsed, held-out (GSM8K), lap | clocked: elapsed, held-out (GSM8K), lap | clocked at the every-level lap end's time | every-level's lead |
+|---|---|---|---|---|
+| 1 | 258.2 s, 2.270 (2.310), 258.2 s | 246.1 s, 2.291 (2.328), 246.1 s | 2.282 | +0.012 |
+| 2 | 508.1 s, 2.113 (2.109), 249.4 s | 468.7 s, 2.125 (2.140), 222.6 s | 2.111 | −0.002 |
+| 3 | 754.5 s, 2.037 (2.018), 246.4 s | 692.3 s, 2.044 (2.036), 222.8 s | 2.034 | −0.003 |
+| 4 | 999.8 s, 1.992 (1.963), 245.3 s | 913.5 s, 2.008 (1.985), 221.2 s | 1.994 | +0.002 |
+| 5 | | 1,134.6 s, 1.972 (1.948), 221.1 s | | |
+
+**What it settles.** Lap for lap the every-level credit reads below the clocked one at every lap
+end, by 0.021, 0.012, 0.007 and 0.016 bits a byte held out (0.018 to 0.031 on the GSM8K region): it
+learns more from each pass of the data. At equal elapsed time the two are level past the first lap
+(within 0.003), because each of its later laps costs 1.11 times the clocked credit's. Its lead is
+bought back by its time, so **the subject of the next loop is the every-level credit's cost**: what
+its six levels' sub-steps, sums and meetings cost a section beside the clocked credit's two, read by
+kernel.
