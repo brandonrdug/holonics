@@ -3036,3 +3036,12 @@ beside them; the tower suite 157 passed. `TOWER_PARTICIPATION_FROM` declares the
 trainer and the parity, and the route
 `train-two-ladder-stacked-news-heading-credited-every-level-participating-pair-unit-tower` joins it
 with pair contacts.
+
+**Acceptance 74 passed; the cost read** (`g45*`, `tower_pass-44a` `dd87fde3…`). On the GSM8K units with
+participation from level 0 (section 256, sixteen founded heads of eight) beside packets, passage,
+heading and every-level credit, with pair contacts: 32 sections of 24 streams, 98,304 faces, 151,086
+closures and 41,017,536 covector entries equal, every learner equal (268.2 s: host 217.5 s, card
+41.2 s). One lap at 160 streams held out 2.193 (question 2.256, prose 2.048, digits 2.882, calculations
+2.031) in 146.0 s against the pair learner's 2.203 in 18.4 s: 7.9 times the lap (card forward 104.2 s of
+it), device peak 10,886 MiB. The 20 laps acceptance 75 reads are a stated long run, 2,944 s projected,
+deadline 3,000 s.

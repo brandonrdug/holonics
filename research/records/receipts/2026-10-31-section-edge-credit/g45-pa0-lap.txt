@@ -1,0 +1,9 @@
+TOWER_COMMAND train-two-ladder-stacked-news-heading-credited-every-level-participating-pair-unit-tower $ROOT/.local/wt/section-edge/research/records/2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY_receipts/UNITS d0973c39ebf391bf1115322a2df8c42157036e96c3eca79c37c869d557a2782a $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.bytes 6329816e363fdc47963fd5504c02b0ce19cf85165b0d3ef953c1253d9abe35fe $ROOT/.local/wt/section-edge/.local/run/gsm8k/DEV.bytes 638c8134d8d657d1e9f684b1b8291e4a292c579e3888570b2718b0f8dfcc01a1 $ROOT/.local/wt/section-edge/.local/run/gsm8k/DEV.roles 331a86120400dbe9be4bb5ab06e9580444cb75cde080b7922e88ddd7ff3c4068 $ROOT/.local/wt/race/.local/race/passage/KEYS2 d4a65962a1eb6f7e60332c049c630f5d3eca815a55d3c3256b9ec82efef48132 64 128 256 6 160 128 1 7 $ROOT/.local/wt/section-edge/.local/run/race/g45/pa0
+TOWER_PARTICIPATION section=256 beta_shift=2 heads=[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8] from=0
+TOWER_TRAIN material=1281798 streams=160 section=128 sections_a_pass=65 train_bytes=3521442 dev_bytes=396922
+TOWER_SECTION pass=0 section=32 bits_a_byte=3.236 deposits=32 halvings=53 elapsed_ms=81975
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.461 deposits=64 halvings=65 elapsed_ms=140142
+TOWER_SECTION pass=0 section=65 bits_a_byte=2.146 deposits=65 halvings=65 elapsed_ms=141454
+TOWER_PASS pass=0 train_bits_a_byte=2.838 dev_bits_a_byte=2.193 dev_regions Q=2.256 P=2.048 N=2.882 M=2.031 deposits=65/65 pass_ms=146027 elapsed_ms=146034 train_code=10321840937883 dev_code=911801897612 grain_bits=20
+TOWER_CARD forwards=203 forward_ms=104169 reverses=65 reverse_ms=33400 elapsed_ms=146675
+MEASURE lap=pa0-lap rc=0 wall_s=147.2 peak_rss_kib=3506056
