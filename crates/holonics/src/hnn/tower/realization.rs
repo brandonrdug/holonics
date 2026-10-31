@@ -116,6 +116,13 @@ pub trait PassRealization {
     /// output, so a law the realization does not carry is refused at the run's start, never at its
     /// first section.
     fn admit(&self, tower: &Tower) -> Result<()>;
+
+    /// [agent-inferred, October 31] Whether a reread under the heading reads the closure (the
+    /// record's §23): the opening read always does; a reread only under a run's declared reading
+    /// ([`TowerLearner::refusal_closure`]). A realization may read it on every read.
+    fn reread_closures(&mut self, on: bool) {
+        let _ = on;
+    }
 }
 
 /// One stream's forward as the host keeps it between calls: its continuing state, its face after
@@ -147,6 +154,8 @@ pub struct HostPass {
     /// one frame of temporaries, which a reread replaces; the host refuses as the card does, so a
     /// learner that reverses an opening read a reread has replaced is caught on the host.
     current: bool,
+    /// Whether a reread reads the closure ([`PassRealization::reread_closures`]).
+    reread_closures: bool,
 }
 
 impl HostPass {
@@ -218,7 +227,7 @@ impl PassRealization for HostPass {
                     })
                     .collect();
                 let last = cells.last().map(|c| c.face.clone());
-                let closures = tower.closure_faces(&cells)?;
+                let closures = if slot == Slot::Opened || self.reread_closures { tower.closure_faces(&cells)? } else { Vec::new() };
                 let ticks = if slot == Slot::Opened && tower.news().is_some() { Tower::cell_ticks(&cells) } else { Vec::new() };
                 let cells = if end.credit.is_some() { cells } else { Vec::new() };
                 Ok((KeptStream { cells, end, last, ticks }, faces, swell, closures))
@@ -234,11 +243,11 @@ impl PassRealization for HostPass {
         }
         let mut faces = Vec::with_capacity(streams.len());
         let mut kept = Vec::with_capacity(streams.len());
-        let mut closures = Vec::with_capacity(if tower.heading() { streams.len() } else { 0 });
+        let mut closures = Vec::with_capacity(if tower.heading() && (slot == Slot::Opened || self.reread_closures) { streams.len() } else { 0 });
         for (k, f, _, c) in streams {
             faces.push(f);
             kept.push(k);
-            if tower.heading() {
+            if tower.heading() && (slot == Slot::Opened || self.reread_closures) {
                 closures.push(c);
             }
         }
@@ -321,6 +330,10 @@ impl PassRealization for HostPass {
     /// The host realizes every law the tower states.
     fn admit(&self, _tower: &Tower) -> Result<()> {
         Ok(())
+    }
+
+    fn reread_closures(&mut self, on: bool) {
+        self.reread_closures = on;
     }
 }
 

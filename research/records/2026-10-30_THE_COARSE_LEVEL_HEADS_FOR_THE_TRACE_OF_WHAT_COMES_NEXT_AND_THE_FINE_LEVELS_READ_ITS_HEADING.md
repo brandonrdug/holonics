@@ -1611,3 +1611,136 @@ measurements, both named by them: the heading's later-lap cost (the closure diag
 forward and reread, the cheaper card item of the third review, an execution change whose
 acceptance is exact equality), and the arrival levels' omitted return, as large as the clocked
 levels' on these learners (§22's oracle), which the credit as fixed here holds as given.
+
+## 23. The credit advances where it is carried, and the closure is read once a section
+
+[agent-inferred, October 31] **Where the time goes** (`TOWER_PROFILE`, C′ and the credited heading
+over the passage's first 64 sections, back to back beside the game; receipts
+`2026-10-31-section-edge-credit/profile-*.log`). The credited heading's 8.3 s over C′'s split:
+`tower_forward` +5.5 s (16 more launches for its first window's refusals, and 126.2 against
+105.9 ms a launch), `tower_credit` +1.4 s (8.5 ms a launch, at every read), the heading's reverse
+kernels and outer sums +0.4 s, and the host +1.0 s (its credit opening once). Two of these are work
+no learning reads:
+- the credit is advanced at every read, while only the read a carry keeps continues the stream: the
+  opening read's advance is never carried once a step deposits (every section of every lap so far),
+  and a refused reread's never is;
+- the closure is read at every reread, where only a refusal's diagnostic reads it (§11: it moves
+  nothing, and the certificate compares the arrivals alone).
+
+**The realization** (execution only; the law, the learner and every receipt the learning reads are
+unchanged). The card's opening read meets the opening's credit in its reverse and advances none; a
+reread advances it into its slot and its material sums wait for the carry (`tower_credit` at
+`TowerCard::carry`); a carry of the opening read, which happens only when nothing deposited, reads
+the opening again advancing it, the same faces and ends. The closure is read on the opening read
+and, on a reread, only under the declared reading `TowerLearner::refusal_closure`
+(`TOWER_REFUSAL_CLOSURE`); without it a refused step's closure change is absent (`None`, printed
+`-`), never presented as unchanged. The host realizes the same boundary.
+
+**Acceptance, fixed before the measurement.**
+42. The tower tests pass, a refused step's arrivals change is the same with and without the
+    declared closure reading, and the learner, the states and the rest of the receipt are equal; the
+    card suite passes.
+43. On the 4080, the credited heading's first 64 sections print the development read's
+    `TOWER_SECTION`, `TOWER_CLOSURE` and `TOWER_PASS` lines (`c39155f2…8c27`) digit for digit, the
+    refusals' arrivals columns too, and its time a section is read beside that binary's in one
+    session, the two alternated (old, new, old, new).
+
+**At the card** (October 31, 05:44Z, the RTX 4080 SUPER beside the game; binary `53713d1c…deab`
+against `c39155f2…8c27`). Acceptance 42 passed: the tower tests 150 of 150
+(`a_refused_step_reads_the_codes_it_raised` reads the declared reading against its absence) and the
+card suite 45 of 45. Acceptance 43 passed: the four alternated runs print one set of
+`TOWER_SECTION`, `TOWER_CLOSURE` and `TOWER_PASS` lines and the same refusals' arrivals, the closure
+columns of the new binary's `TOWER_REFUSALS` reading `-`.
+
+| run | elapsed at section 64 | card time |
+|---|---:|---:|
+| old | 30,931 ms | 34,250 ms |
+| new | 28,974 ms | 32,122 ms |
+| old | 30,933 ms | 34,218 ms |
+| new | 29,048 ms | 32,228 ms |
+
+The new realization reaches section 64 6.2% sooner (the old runs agree to 2 ms and the new to 74),
+about 30 ms a section over a window with the first lap's refusals.
+
+## 24. Every level's credit
+
+[agent-inferred, October 31] **The cause** (§22's oracle). On the heading's early learners the
+arrival levels' slowest modes span 177 to 285 arrivals and their omitted return is as large as the
+clocked levels' (1.12, 0.94, 0.61 and 2.00 at lap 0, A = 4), so the same edge cuts their recurrence.
+
+**The law.** The credit of §22 carried from level 0 (`Tower::rest_with_credit_from(0)`): each
+arrival level's own recurrence families (its moves, push and gate, its input the passing current,
+held as given) with the moments of §22 at one sub-step a cell, and the last arrival level, whose
+moves carry the first clocked level's packet, carrying that packet's moments too. Nothing else
+changes: the clocked levels' credit, the meeting and what is held as given are §22's, and what a
+level's families do to the levels above through the passing current stays inside the section.
+
+**The carrier.** Eight blocks a stream (six levels' own and two packets'), 2,146,304 bytes, 655 MiB
+over 320 streams. To stay inside the card's 12 GB with the game beside it, the card keeps one advance
+beside the opening's credit (§23 made the second unneeded), 1.37 GB, and each cell's turns and
+coefficients, the packets' only at the two levels whose moves carry one, about 1.74 GB: some 3.1 GB
+in all, against §22's 1.38 GB as raced. The state's text now leads its
+credit with its first credited level.
+
+**Acceptance, fixed before the build.**
+44. The tower tests pass, the every-level credit's text and words restore whole and the top level
+    still meets its whole return across a cut; the card is the host's for 32 sections on four levels
+    and at the race's declaration with the credit from level 0 (the card suite); the race's
+    declaration at 24 streams (`tower_pass parity … heading-credited-every-level`) is equal, and with
+    the clocked credit it prints acceptance 39's lines.
+45. The oracle (`OPENING_RETURN_CREDIT_FROM=0`) on the heading's saved learners: level 5's return is
+    still the credit's (left at most 1/64), and the share of each arrival level's omitted return the
+    credit returns is reported.
+46. The race, C′ for two laps then the every-level credited heading for one, back to back: at the
+    lap's end its held-out read is at or below the clocked credit's 2.291 lap for lap and below C′'s at
+    equal elapsed time, with each window's arrivals and refusals and peak VRAM at most 12 GB.
+
+**Built.** `Tower::rest_with_credit_from` carries the credit from any level (`rest_with_credit` from
+the clock's first clocked level, as before); the state's text leads its credit with that level; the
+card reads the first credited level from the streams' credit (`TowerLaw::credit_from`), places each
+level's blocks after the levels below it (`cr_blocks_before`), and keeps the packet's gate
+coefficients only for the levels whose moves carry a packet. Race route
+`train-two-ladder-stacked-news-heading-credited-every-level-tower-classes`.
+
+**At the card** (October 31, binary `0da20022…546a`). Acceptance 44 passed: the tower tests 151 of
+151 (`every_levels_credit_is_carried_from_the_arrival_levels`, on a four-bit clock so the last
+arrival level's packet stays open across a cut), the card suite 46 of 46
+(`the_cards_every_level_credit_is_the_hosts_for_thirty_two_sections`), and at the race's
+declaration, 24 streams over 32 sections, the every-level credit equal (98,304 faces, 92,512
+closure faces, 17,711,136 covector entries, every learner and fetched credit; 28.5 s) and the
+clocked credit printing acceptance 39's lines. Acceptance 45 passed: with the credit from level 0 the
+oracle's level 5 is left 0 thousandths at every lap; the shares the credit returns at A = 4:
+
+| lap | whole material | L0 moves | L1 moves | L2 moves | L3 moves, push, gate | L4 moves | L5 |
+|---|---|---|---|---|---|---|---|
+| 0 | 83.6% | 81.5% | 94.1% | 94.3% | 83.1%, 7.3%, 11.9% | 99.8% | 100% |
+| 1 | 91.5% | 81.0% | 92.6% | 98.0% | 72.6%, 2.6%, 6.5% | 99.7% | 100% |
+| 2 | 75.9% | 63.2% | 90.6% | 85.8% | 84.7%, 7.0%, 16.5% | 99.6% | 100% |
+
+(Share = 1 − `‖g_AB − g_Bc‖/‖g_AB − g_B‖`.) Against the clocked credit's 0.8 to 3.3% of the whole,
+the every-level credit returns three quarters to nine tenths of it. What stays outside is the path
+held as given: level 3's push and gate reach the coarse levels mostly through the packets level 4
+read earlier, and each level's read and contacts only through the levels above.
+
+**The race (acceptance 46 passed).** October 31, 06:15Z to 06:28Z, one lock, beside the game,
+binary `0da20022…546a`. The 64-section read reached section 64 at 33,585 ms, fixing the lap's
+deadline at 467 s; C′'s two laps took 427.9 s against 560 s (its laps 216.2 and 211.3 s, the card
+quicker than at 02:40Z) and printed its lines; the every-level credited heading's lap took 274.5 s
+against 467 s, peak resident set 3,216,884 KiB, peak VRAM 10,856 MiB with the game's.
+
+| at its lap's end | held-out | GSM8K region | words | elapsed | refused steps |
+|---|---|---|---|---|---|
+| every-level credit | **2.270** | 2.310 | 2.239 | 273.9 s | 47 |
+| C′ at the same elapsed time | 2.338 | | | | |
+| the clocked credit, lap for lap (02:40Z) | 2.291 | 2.328 | 2.264 | | 59 |
+| C′, lap for lap | 2.390 | 2.466 | 2.331 | 216.2 s | |
+
+- **Lap for lap** the every-level credit reads below the clocked credit at 22 of 23 windows and on
+  held-out material by 0.021, and below C′ at all 23.
+- **At equal elapsed time** it leads C′'s held-out read by 0.068, and its arrivals read below C′'s
+  from section 448 on (11 of 23 windows; 2.146 against 2.134 at the lap's end, C′'s there its second
+  pass over seen material).
+- **It costs more**: its lap took 1.27 times C′'s here, where the clocked credit's took 1.10 times in
+  its session before §23 cut 6% of a section. Whether the every-level credit leads the clocked one at
+  equal elapsed time is not read by this race (they ran in sessions of different card speed); a
+  race of the two in one session reads it next.

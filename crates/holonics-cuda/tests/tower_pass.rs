@@ -585,13 +585,19 @@ fn the_cards_heading_is_the_hosts_for_thirty_two_sections() {
 /// sections run on one realization and each section's direct read and reverse on another, which
 /// uploads the host's credit; after each section the card's credit is fetched and compared.
 fn lockstep_credited(alphabet: usize, streams: usize, section: usize, sections: usize, faces: Faces) {
+    lockstep_credited_from(alphabet, streams, section, sections, faces, None)
+}
+
+/// [`lockstep_credited`] with the credit carried from level `from` (the tower's clocked levels when
+/// `None`; `Tower::rest_with_credit_from`).
+fn lockstep_credited_from(alphabet: usize, streams: usize, section: usize, sections: usize, faces: Faces, from: Option<usize>) {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let mut direct = TowerCard::open(&card).expect("the tower's image");
     let (mut host, mut carded) = learners(alphabet, faces);
     let classes = passage(alphabet, streams * (sections * section + 1));
     let chunk = classes.len() / streams;
-    let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest_with_credit()).collect();
+    let mut states_h: Vec<TowerState> = (0..streams).map(|_| from.map_or_else(|| host.tower.rest_with_credit(), |f| host.tower.rest_with_credit_from(f))).collect();
     let mut states_c = states_h.clone();
     let mut deposits = 0;
     for k in 0..sections {
@@ -632,6 +638,19 @@ fn the_cards_clocked_credit_is_the_hosts_for_thirty_two_sections() {
     lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() });
     lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 4, passage: true, packets: true, heading: true, ..Faces::default() });
     lockstep_credited(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() });
+}
+
+/// [agent-inferred, October 31] **Every level's credit on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §24): carried from level 0,
+/// the arrival levels' moments and the packet the last of them carries among it; 32 sections equal
+/// face by face, covector entry by entry, learner for learner and state for state (each stream's
+/// credit fetched), on four levels clocked from level 2 and at the race's declaration, six levels
+/// from level 4, each with the passage, the packets and the heading.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_every_level_credit_is_the_hosts_for_thirty_two_sections() {
+    lockstep_credited_from(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 4, passage: true, packets: true, heading: true, ..Faces::default() }, Some(0));
+    lockstep_credited_from(11, 3, 9, 32, Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() }, Some(0));
 }
 
 /// [agent-inferred, October 30] **A reread on the opening's ticks** (record

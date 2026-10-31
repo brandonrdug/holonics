@@ -21,6 +21,9 @@
 //! each level's slowest span `1/(1 − |λ|)` in its own ticks, for each declared length of A in
 //! sections.
 //!
+//! The credit is the tower's own (its clocked levels), or every level's from
+//! `OPENING_RETURN_CREDIT_FROM` up when that is set (`Tower::rest_with_credit_from`, §24).
+//!
 //! `opening_return STATE STATE_SHA CLASSES CLASSES_SHA STREAMS SECTION B HANDFUL LENGTHS`: the
 //! passage two bytes a class (big-endian), split into `STREAMS` streams as training splits it; the
 //! `HANDFUL` streams `j · STREAMS / HANDFUL`; B is section `B` of each; `LENGTHS` the lengths of A in
@@ -213,7 +216,10 @@ fn main() -> Result<()> {
         let g_ab = card.reverse(tower, opening, &parts, Some(&slices))?;
         // The credit opened at rest at A's opening and carried through A section by section, then
         // B read from the same opening with it.
-        let rest = tower.rest_with_credit().credit;
+        let rest = match std::env::var("OPENING_RETURN_CREDIT_FROM").ok().and_then(|v| v.parse::<usize>().ok()) {
+            Some(from) => tower.rest_with_credit_from(from).credit,
+            None => tower.rest_with_credit().credit,
+        };
         let mut carried: Vec<TowerState> = opening.iter().map(|o| TowerState { credit: rest.clone(), ..o.clone() }).collect();
         for k in b - m..b {
             let parts_k: Vec<&[usize]> = chosen.iter().map(|&s| part(s, k, k + 1)).collect();

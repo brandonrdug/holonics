@@ -182,6 +182,13 @@ struct TowerLaw {
     // `LevelCredit`, record §22) and whether each credited level below the top carries the moments
     // of the packet its moves carry up (`credit_packet`).
     uint32_t credit, credit_packet;
+    // Whether this forward reads the heading's closure (the opening read, or a reread under the
+    // declared reading, record §23) and whether it advances the credit (the read a carry keeps; the
+    // reverse meets the opening's credit whatever the forward did).
+    uint32_t closure, credit_advance;
+    // The first credited level (the record's §24: every level's from 0; the clocked levels' from the
+    // clock's first clocked level).
+    uint32_t credit_from, credit_pad;
 };
 
 // The section's resident buffers ([s][t][l][…] row-major; `q = s·T + t` a cell of a stream).
@@ -839,11 +846,34 @@ extern "C" __global__ void tower_transpose(TowerLaw law, TowerFrame fr) {
 __device__ __forceinline__ uint64_t cr_block_words(const TowerLaw &law) {
     return 4ull * law.modes * law.width + 6ull * law.modes;
 }
+// Whether credited level `l`'s moves carry the packet the level above hears, which then carries a
+// credit block of its own.
+__device__ __forceinline__ bool cr_packet(const TowerLaw &law, uint32_t l) {
+    return law.credit_packet && law.packets && l + 1 >= law.news_first && l + 1 < law.levels;
+}
+// The blocks before credited level `l`'s own: one a credited level below it, and one more for each
+// that carries a packet.
+__device__ __forceinline__ uint64_t cr_blocks_before(const TowerLaw &law, uint32_t l) {
+    uint64_t b = 0;
+    for (uint32_t m = law.credit_from; m < l; m++) {
+        b += cr_packet(law, m) ? 2 : 1;
+    }
+    return b;
+}
+// The packet-carrying credited levels below `l`: a level's place among them indexes the packet's
+// gate coefficients, which only they keep; at `l = L` their count.
+__device__ __forceinline__ uint32_t cr_packet_index(const TowerLaw &law, uint32_t l) {
+    uint32_t p = 0;
+    for (uint32_t m = law.credit_from; m < l; m++) {
+        p += cr_packet(law, m) ? 1 : 0;
+    }
+    return p;
+}
 __device__ __forceinline__ uint64_t cr_stream_words(const TowerLaw &law) {
-    return (law.credit_packet ? 2ull * law.credit - 1 : (uint64_t)law.credit) * cr_block_words(law);
+    return cr_blocks_before(law, law.levels) * cr_block_words(law);
 }
 __device__ __forceinline__ uint64_t cr_block(const TowerLaw &law, uint32_t s, uint32_t ci, uint32_t set) {
-    return s * cr_stream_words(law) + (law.credit_packet ? 2ull * ci + set : (uint64_t)ci) * cr_block_words(law);
+    return s * cr_stream_words(law) + (cr_blocks_before(law, law.credit_from + ci) + set) * cr_block_words(law);
 }
 // A complex product released to 2^(−30) (`product` in `Tower::advance_moments`).
 __device__ __forceinline__ void cmul(wide ar, wide ai, wide br, wide bi, wide *r, wide *i) {
@@ -859,6 +889,8 @@ __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t oct
 
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerLaw law, TowerFrame fr, uint32_t read) {
     const uint32_t keep = read == 1, opening_ticks = read == 2;
+    // The credit's advance (`tower_credit` sums it at the carry) and the closure's read.
+    const bool advancing = law.credit && law.credit_advance;
     const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
     const uint32_t A = law.alphabet, W = law.width, N = law.modes, F = law.contacts, L = law.levels,
                    T = law.cells;
@@ -988,8 +1020,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     }
     // The credit's per-mode moments (along, around, gate bias) start from the opening's and move
     // by the cell recursion below; `tower_credit` moves the material moments.
-    if (law.credit) {
-        const uint64_t blocks = law.credit_packet ? 2ull * law.credit - 1 : law.credit;
+    if (advancing) {
+        const uint64_t blocks = cr_blocks_before(law, L);
         const uint64_t per = 6ull * N, bw = cr_block_words(law), at0 = 2ull * N * W;
         for (uint64_t i = tid; i < blocks * per; i += B) {
             const uint64_t at = s * cr_stream_words(law) + (i / per) * bw + at0 + i % per;
@@ -1214,14 +1246,21 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 const int64_t hscale = heading_read(l, fre, fim);
                 heading_keep(i, fre, fim, hscale);
             }
-            for (uint32_t j = tid; j < W; j += B) {
-                fr.hd_read[qh * W + j] = rd[j];
+            if (law.closure) {
+                for (uint32_t j = tid; j < W; j += B) {
+                    fr.hd_read[qh * W + j] = rd[j];
+                }
             }
             int64_t *open = tro + (uint64_t)i * W;
             for (uint32_t j = tid; j < W; j += B) {
                 open[j] = fit64((wide)open[j] + (wide)th[law.encoding + (uint64_t)u * W + j], &st);
             }
-            if (tk[l] > 0) {
+            if (tk[l] > 0 && !law.closure) {
+                // A tick closes the span and rests its trace; only the closure reads the trace.
+                for (uint32_t j = tid; j < W; j += B) {
+                    open[j] = 0;
+                }
+            } else if (tk[l] > 0) {
                 uwide tp = 0;
                 for (uint32_t j = tid; j < W; j += B) {
                     tp += (uwide)((wide)open[j] * (wide)open[j]);
@@ -1337,13 +1376,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 const uint64_t qp = qc * PK + (l - F0);
                 uint64_t mre = 0, mim = 0;
                 // The credit of the packet the fine level carries rests with it (`LevelCredit`).
-                const bool credited_packet = law.credit && law.credit_packet && l - 1 >= F0;
+                const bool credited_packet = advancing && l - 1 >= law.credit_from && cr_packet(law, l - 1);
                 if (credited_packet && tid == 0) {
-                    fr.cr_rest[qc * law.credit + (l - 1 - F0)] = still ? 0u : 1u;
+                    fr.cr_rest[qc * law.credit + (l - 1 - law.credit_from)] = still ? 0u : 1u;
                 }
                 for (uint32_t k = tid; k < N; k += B) {
                     if (credited_packet && !still) {
-                        int64_t *blk = fr.cr_next + cr_block(law, s, l - 1 - F0, 1);
+                        int64_t *blk = fr.cr_next + cr_block(law, s, l - 1 - law.credit_from, 1);
                         for (uint32_t i = 0; i < 6; i++) {
                             blk[2ull * N * W + (i / 2) * 2 * N + 2 * k + (i % 2)] = 0;
                         }
@@ -1428,8 +1467,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 }
             }
             // The input the credited level's push and gate read at this cell (`tower_credit`).
-            if (law.credit && l >= F0) {
-                const uint64_t qx = qc * law.credit + (l - F0);
+            if (advancing && l >= law.credit_from) {
+                const uint64_t qx = qc * law.credit + (l - law.credit_from);
                 for (uint32_t j = tid; j < W; j += B) {
                     fr.cr_x[qx * W + j] = still ? 0 : xin[j];
                 }
@@ -1485,13 +1524,16 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 // push and moves rest at zero, as the host's empty gate.
                 if (still) {
                     // A cell that ticks the credited level no time moves no moment: its turn is one.
-                    if (law.credit && l >= F0) {
-                        const uint64_t qk = ((qc * law.credit + (l - F0)) * N + k) * 2;
+                    if (advancing && l >= law.credit_from) {
+                        const uint64_t qk = ((qc * law.credit + (l - law.credit_from)) * N + k) * 2;
                         fr.cr_turn[qk] = (int64_t)1 << MOVE_BITS;
                         fr.cr_turn[qk + 1] = 0;
                         fr.cr_push[qk] = fr.cr_push[qk + 1] = 0;
                         fr.cr_gate[qk] = fr.cr_gate[qk + 1] = 0;
-                        fr.cr_pgate[qk] = fr.cr_pgate[qk + 1] = 0;
+                        if (cr_packet(law, l)) {
+                            const uint64_t qp = ((qc * cr_packet_index(law, L) + cr_packet_index(law, l)) * N + k) * 2;
+                            fr.cr_pgate[qp] = fr.cr_pgate[qp + 1] = 0;
+                        }
                     }
                     const int64_t nr = h[(l * N + k) * 2], ni = h[(l * N + k) * 2 + 1];
                     fc[k] = fit64(rel(nr, STATE_BITS - FACE_BITS), &st);
@@ -1574,8 +1616,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                 // `v`, `K` and the gate's drive reading the state between them (the modes', and the
                 // packet's for the packet's moments), and the cell's turn and coefficients are kept
                 // for `tower_credit`'s closed form. The card carries no turn, rotor or ring beside it.
-                if (law.credit && l >= F0) {
-                    const uint32_t cx = l - F0;
+                if (advancing && l >= law.credit_from) {
+                    const uint32_t cx = l - law.credit_from;
                     const wide one = (wide)1 << MOVE_BITS;
                     const wide modulus = gf[2] > 0 ? gf[2] : 1;
                     const wide by_modulus = div_nearest((wide)GATE_REACH * open * rho, modulus);
@@ -1584,7 +1626,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                     by_gate = rel(by_gate * open, MOVE_BITS);
                     by_gate = (wide)GATE_REACH * rel(by_gate * (one - open), MOVE_BITS);
                     const wide p_r = pq[k], p_i = pq[N + k];
-                    const bool with_packet = law.credit_packet && l + 1 < L;
+                    const bool with_packet = cr_packet(law, l);
                     const uint64_t qk = ((qc * law.credit + cx) * N + k) * 2;
                     for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
                         int64_t *blk = fr.cr_next + cr_block(law, s, cx, set) + 2ull * N * W;
@@ -1645,12 +1687,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
                             fr.cr_gate[qk] = fit64(cwr, &st);
                             fr.cr_gate[qk + 1] = fit64(cwi, &st);
                         } else {
-                            fr.cr_pgate[qk] = fit64(cwr, &st);
-                            fr.cr_pgate[qk + 1] = fit64(cwi, &st);
+                            const uint64_t qp = ((qc * cr_packet_index(law, L) + cr_packet_index(law, l)) * N + k) * 2;
+                            fr.cr_pgate[qp] = fit64(cwr, &st);
+                            fr.cr_pgate[qp + 1] = fit64(cwi, &st);
                         }
-                    }
-                    if (!with_packet) {
-                        fr.cr_pgate[qk] = fr.cr_pgate[qk + 1] = 0;
                     }
                 }
                 for (uint32_t j = 0; j < tk[l]; j++) {
@@ -2396,7 +2436,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     // masses 2^(z_ji − max_i z_ji) on 2^(−62) and their total, compared at the tick's own trace:
     // e_jj, the total and max_i z_ji are kept for the reverse. One thread a trace; the stream's
     // scratch holds the tick's z row.
-    for (uint32_t i = 0; i < HD; i++) {
+    for (uint32_t i = 0; i < HD && law.closure; i++) {
         __syncthreads();
         const uint32_t n = hc[i];
         const uint32_t *list = fr.hd_list + ((uint64_t)s * HD + i) * T;
@@ -3328,12 +3368,12 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
         // a = conj(λ_0)^(Δτ(0)) G_h(0), and of the carried packet, meet the moments their history
         // carried; the per-mode moments here, the material moments in `tower_credit_meet`, which
         // reads the covectors kept.
-        if (law.credit && l >= F0) {
-            const uint32_t cx = l - F0;
+        if (law.credit && l >= law.credit_from) {
+            const uint32_t cx = l - law.credit_from;
             const uint64_t ql0 = (uint64_t)s * T * L + l;
             const uint32_t ticks0 = law.news ? fr.ticks[ql0] : 1;
             const int64_t *mv0 = fr.moves + (ql0 * N + k) * 6;
-            const bool with_packet = law.credit_packet && carrying;
+            const bool with_packet = carrying && cr_packet(law, l);
             for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
                 wide ar = set == 0 ? cr : car, ai = set == 0 ? ci : cai;
                 for (uint32_t j = 0; j < ticks0; j++) {
@@ -4160,8 +4200,9 @@ extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLaw law, TowerFrame fr) {
     const uint32_t s = blockIdx.x, cx = blockIdx.y, tid = threadIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, W = law.width, T = law.cells, CL = law.credit;
-    const uint32_t l = law.news_first + cx;
-    const bool with_packet = law.credit_packet && l + 1 < law.levels;
+    const uint32_t l = law.credit_from + cx;
+    const bool with_packet = cr_packet(law, l);
+    const uint32_t NP = cr_packet_index(law, law.levels), px = cr_packet_index(law, l);
     const wide one = (wide)1 << MOVE_BITS;
     extern __shared__ __align__(16) unsigned char smem[];
     wide *whole = (wide *)smem; // [N][2]
@@ -4192,9 +4233,12 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
             cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &r, &i);
             fr.cr_gate[qk] = fit64(r, &st);
             fr.cr_gate[qk + 1] = fit64(i, &st);
-            cmul(ar, ai, fr.cr_pgate[qk], fr.cr_pgate[qk + 1], &r, &i);
-            fr.cr_pgate[qk] = fit64(r, &st);
-            fr.cr_pgate[qk + 1] = fit64(i, &st);
+            if (with_packet) {
+                const uint64_t qp = ((((uint64_t)s * T + t) * NP + px) * N + k) * 2;
+                cmul(ar, ai, fr.cr_pgate[qp], fr.cr_pgate[qp + 1], &r, &i);
+                fr.cr_pgate[qp] = fit64(r, &st);
+                fr.cr_pgate[qp + 1] = fit64(i, &st);
+            }
             cmul(ar, ai, tr, ti, &ar, &ai);
         }
         whole[2 * k] = ar;
@@ -4210,13 +4254,15 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
         const uint32_t fam = (uint32_t)((o / ((uint64_t)N * W)) % 2);
         const uint32_t k = (uint32_t)((o / W) % N), j = (uint32_t)(o % W);
         const uint32_t t0 = set == 1 ? from : 0;
+        const bool packet_rows = fam == 1 && set == 1;
         const int64_t *rows = fam == 0 ? fr.cr_push : (set == 0 ? fr.cr_gate : fr.cr_pgate);
         wide sr = 0, si = 0;
         for (uint32_t t = t0; t < T; t++) {
             const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
+            const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
             const wide x = fr.cr_x[qc * W + j];
-            sr += (wide)rows[(qc * N + k) * 2] * x;
-            si += (wide)rows[(qc * N + k) * 2 + 1] * x;
+            sr += (wide)rows[(qr * N + k) * 2] * x;
+            si += (wide)rows[(qr * N + k) * 2 + 1] * x;
         }
         const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
         const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j) * 2;
@@ -4241,9 +4287,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
 // the outer sums wrote (integer sums: any order).
 extern "C" __global__ void tower_credit_meet(TowerLaw law, TowerFrame fr) {
     const uint32_t cx = blockIdx.y, N = law.modes, W = law.width, CL = law.credit;
-    const uint32_t l = law.news_first + cx;
+    const uint32_t l = law.credit_from + cx;
     const TowerLevel lv = law.level[l];
-    const uint32_t sets = law.credit_packet && l + 1 < law.levels ? 2 : 1;
+    const uint32_t sets = cr_packet(law, l) ? 2 : 1;
     const uint64_t items = (uint64_t)N * W + N;
     for (uint64_t e = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; e < items; e += (uint64_t)gridDim.x * blockDim.x) {
         const bool bias = e >= (uint64_t)N * W;

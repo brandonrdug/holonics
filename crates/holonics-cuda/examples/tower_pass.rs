@@ -1,7 +1,7 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | pair | split]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]`:
 //!   founds the gated tower (rectifying, or with pair contacts when `pair`, `packets-pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
@@ -88,7 +88,7 @@ fn digest(bytes: &[u8]) -> Result<String> {
 }
 
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | pair | split]";
+    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]";
     if args.len() < 12 {
         return Err(USAGE.into());
     }
@@ -104,7 +104,8 @@ fn parity(args: &[String]) -> Result<()> {
     // `packets-pair` is C′ with every contact the pair contact; `heading` is C′ with the heading
     // joined after the packets (`Tower::join_heading`), the race's H.
     // `heading-credited` is the race's H with every stream carrying the clocked levels' credit.
-    let credited = word == Some("heading-credited");
+    let every_level = word == Some("heading-credited-every-level");
+    let credited = word == Some("heading-credited") || every_level;
     let heading = word == Some("heading") || credited;
     let packets = word == Some("packets") || word == Some("packets-pair") || heading;
     // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
@@ -180,7 +181,7 @@ fn parity(args: &[String]) -> Result<()> {
     } else {
         None
     };
-    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired, credited)
+    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired, credited.then_some(if every_level { 0 } else { usize::MAX }))
 }
 
 fn parity_state(args: &[String]) -> Result<()> {
@@ -226,18 +227,20 @@ fn parity_from(state: &[u8], classes: &[usize], args: &[String]) -> Result<()> {
     };
     let mut host = host;
     let mut carded = TowerLearner::from_text(std::str::from_utf8(state)?)?;
-    lockstep(&mut host, &mut carded, classes, streams, section, sections, None, false)?;
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, None, None)?;
     println!("TOWER_PARITY_SHA sections={sections} whole_pass={} host={} card={}", sections == whole, digest(host.to_text().as_bytes())?, digest(carded.to_text().as_bytes())?);
     Ok(())
 }
 
 /// Host against card in lockstep over `sections` sections of the passage split into `streams`
 /// streams, every stream from rest; with `paired` (the host's directions, then the card's), each
-/// section's split read and founding too; with `credited`, every stream from rest with its credit,
+/// section's split read and founding too; with `credit_from`, every stream from rest with its credit,
 /// the card's learner holding it resident (each section's direct read on a second realization,
 /// which uploads the host's), and its credit fetched to compare the states.
 #[allow(clippy::too_many_arguments)]
-fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>, credited: bool) -> Result<()> {
+fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>, credit_from: Option<usize>) -> Result<()> {
+    // `credit_from`: the first credited level, `usize::MAX` for the tower's own clocked levels.
+    let credited = credit_from.is_some();
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -248,7 +251,13 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         card.profile();
     }
     let mut direct = TowerCard::open(&opened)?;
-    let mut states_h: Vec<TowerState> = (0..streams).map(|_| if credited { host.tower.rest_with_credit() } else { host.tower.rest() }).collect();
+    let mut states_h: Vec<TowerState> = (0..streams)
+        .map(|_| match credit_from {
+            None => host.tower.rest(),
+            Some(usize::MAX) => host.tower.rest_with_credit(),
+            Some(from) => host.tower.rest_with_credit_from(from),
+        })
+        .collect();
     let mut states_c = states_h.clone();
     let started = Instant::now();
     let (mut faces_all, mut faces_unequal, mut entries_all, mut entries_unequal, mut learners_unequal) = (0usize, 0usize, 0usize, 0usize, 0usize);

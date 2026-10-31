@@ -238,6 +238,13 @@ struct LawWords {
     /// ([`holonics::hnn::tower::LevelCredit`]).
     credit: u32,
     credit_packet: u32,
+    /// Whether this forward reads the heading's closure (the opening read, or a reread under the
+    /// declared reading) and whether it advances the credit (the read a carry keeps).
+    closure: u32,
+    credit_advance: u32,
+    /// The first credited level ([`Tower::rest_with_credit_from`]) and the words' padding.
+    credit_from: u32,
+    credit_pad: u32,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -502,8 +509,10 @@ struct Shape {
     split: usize,
     /// The clocked levels that carry a heading (zero without it).
     heading: usize,
-    /// The credited clocked levels (zero when the streams carry no credit).
+    /// The credited levels (zero when the streams carry no credit), and those among them whose
+    /// moves carry a packet.
     credit: usize,
+    credit_packets: usize,
 }
 
 impl Shape {
@@ -739,12 +748,14 @@ struct Frame<'c> {
 /// states hold a mark of it (`LevelCredit::resident_mark`), which [`TowerCard::fetch_credit`] returns.
 struct ResidentCredit<'c> {
     streams: usize,
+    /// The first credited level and one stream's words.
+    from: usize,
     extent: usize,
     generation: u64,
     open: CardBuffer<'c, i64>,
-    next: [CardBuffer<'c, i64>; 2],
-    /// Whether each slot's `next` advances the present `open` (the read kept there carried it).
-    advanced: [bool; 2],
+    /// The advance of the read a carry keeps (one: an opening read advances only when its carry
+    /// asks, after any reread, `TowerCard::carry`).
+    next: CardBuffer<'c, i64>,
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -765,6 +776,16 @@ pub struct TowerCard<'c> {
     credit: Option<ResidentCredit<'c>>,
     /// The generation the next resident credit takes (a mark of an older one is refused).
     generations: u64,
+    /// [agent-inferred, October 31] The read whose credit advance waits for its carry (its slot and
+    /// its law's words): `tower_credit` sums the material moments only for the read a carry keeps,
+    /// and an opening read advances none unless a carry asks for it (record §23).
+    credit_pending: Option<(usize, LawWords)>,
+    /// The opening read's classes and targets, which a carry of the opening reads again to advance
+    /// its credit; and whether the next opening read advances it.
+    opened_reads: Option<(Vec<Vec<usize>>, Vec<Vec<Option<usize>>>)>,
+    force_advance: bool,
+    /// Whether a reread reads the heading's closure ([`PassRealization::reread_closures`]).
+    reread_closures: bool,
     times: TowerCardTimes,
     /// When set, each launch is waited on and timed by its entry (a measurement aid: it
     /// serializes the card's stream).
@@ -797,7 +818,7 @@ impl<'c> TowerCard<'c> {
     pub fn open(card: &'c Card) -> std::result::Result<Self, DeviceError> {
         card.current()?;
         let module = Module::load_ptx(IMAGE)?;
-        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ticks_kept: false, ends: [None, None], credit: None, generations: 0, times: TowerCardTimes::default(), profile: None })
+        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ticks_kept: false, ends: [None, None], credit: None, generations: 0, credit_pending: None, opened_reads: None, force_advance: false, reread_closures: false, times: TowerCardTimes::default(), profile: None })
     }
 
     /// Time every launch by its entry from here on (each launch waited on before and after).
@@ -1070,6 +1091,8 @@ impl<'c> TowerCard<'c> {
         }
         self.frame = None;
         self.ticks_kept = false;
+        // A frame sized again holds no read's credit advance.
+        self.credit_pending = None;
         let card = self.card;
         let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, moving, paired, foil, strand_rings: sr, strand_table, .. } = shape;
         let stranded = usize::from(sr > 0);
@@ -1232,7 +1255,7 @@ impl<'c> TowerCard<'c> {
             cr_turn: card.alloc(q * shape.credit * n * 2)?,
             cr_push: card.alloc(q * shape.credit * n * 2)?,
             cr_gate: card.alloc(q * shape.credit * n * 2)?,
-            cr_pgate: card.alloc(q * shape.credit * n * 2)?,
+            cr_pgate: card.alloc(q * shape.credit_packets * n * 2)?,
             cr_x: card.alloc(q * shape.credit * w)?,
             cr_rest: card.alloc(q * shape.credit)?,
             cr_cov: card.alloc(s * shape.credit * 2 * n * 2)?,
@@ -1534,7 +1557,7 @@ impl<'c> TowerCard<'c> {
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
     /// [agent-inferred, October 31] The streams' credit at a read's opening made resident: marks of
     /// the present resident credit (each its own stream's), or values, uploaded as a new one.
-    fn admit_credit(&mut self, tower: &Tower, opening: &[TowerState]) -> Result<()> {
+    fn admit_credit(&mut self, tower: &Tower, opening: &[TowerState], from: usize) -> Result<()> {
         let marks: Vec<Option<(u64, usize)>> = opening.iter().map(|o| o.credit.as_deref().and_then(LevelCredit::residence)).collect();
         if marks.iter().all(Option::is_some) {
             let fits = self.credit.as_ref().is_some_and(|c| c.streams == opening.len() && marks.iter().enumerate().all(|(s, m)| *m == Some((c.generation, s))));
@@ -1543,30 +1566,27 @@ impl<'c> TowerCard<'c> {
         if marks.iter().any(Option::is_some) {
             return Err(TowerError::Refused("the streams' credit is resident or uploaded, never both"));
         }
-        let extent = tower.credit_extent();
+        let extent = tower.credit_extent(from);
         let mut words = Vec::with_capacity(extent * opening.len());
         for o in opening {
+            if o.credit.as_deref().and_then(|c| tower.credit_from_of(c)) != Some(from) {
+                return Err(TowerError::Refused("every stream's credit begins at the same level"));
+            }
             words.extend(tower.credit_words(o)?.ok_or(TowerError::Refused("every stream carries a credit"))?);
         }
         let streams = opening.len();
         if !self.credit.as_ref().is_some_and(|c| c.streams == streams && c.extent == extent) {
             self.credit = None;
             let card = self.card;
-            self.credit = Some(ResidentCredit {
-                streams,
-                extent,
-                generation: 0,
-                open: card.alloc(streams * extent).map_err(device)?,
-                next: [card.alloc(streams * extent).map_err(device)?, card.alloc(streams * extent).map_err(device)?],
-                advanced: [false, false],
-            });
+            self.credit = Some(ResidentCredit { streams, from, extent, generation: 0, open: card.alloc(streams * extent).map_err(device)?, next: card.alloc(streams * extent).map_err(device)? });
         }
         let generation = self.generations;
         self.generations += 1;
         let credit = self.credit.as_mut().expect("allocated above");
+        credit.from = from;
         self.card.write(&credit.open, 0, &words).map_err(device)?;
         credit.generation = generation;
-        credit.advanced = [false, false];
+        self.credit_pending = None;
         Ok(())
     }
 
@@ -1581,7 +1601,7 @@ impl<'c> TowerCard<'c> {
         }
         let words = self.card.fetch(&credit.open).map_err(device)?;
         for (s, state) in states.iter_mut().enumerate() {
-            state.credit = Some(tower.credit_from_words(&words[s * credit.extent..(s + 1) * credit.extent])?);
+            state.credit = Some(tower.credit_from_words(credit.from, &words[s * credit.extent..(s + 1) * credit.extent])?);
         }
         Ok(())
     }
@@ -1612,9 +1632,15 @@ impl<'c> TowerCard<'c> {
         // The streams' credit ([`ResidentCredit`]): none, or every stream's, at the levels a news
         // clock holds (`LevelCredit`); held resident since the last carry, or its values uploaded.
         let credited = opening.iter().filter(|o| o.credit.is_some()).count();
+        // The first credited level: the resident credit's for its marks, else every stream's own.
+        let credit_from = match opening.first().and_then(|o| o.credit.as_deref()) {
+            None => d.levels,
+            Some(c) if LevelCredit::residence(c).is_some() => self.credit.as_ref().map_or(d.levels, |r| r.from),
+            Some(c) => tower.credit_from_of(c).ok_or(TowerError::Refused("a stream's credit of another tower's levels"))?,
+        };
         let credit_levels = match (credited, &law.news) {
             (0, _) => 0,
-            (c, Some(clock)) if c == streams && clock.first() < d.levels && law.participation.is_none() => d.levels - clock.first(),
+            (c, Some(clock)) if c == streams && clock.first() < d.levels && law.participation.is_none() && credit_from < d.levels => d.levels - credit_from,
             (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level, beside no participation")),
             _ => return Err(TowerError::Refused("every stream carries a credit or none does")),
         };
@@ -1694,17 +1720,31 @@ impl<'c> TowerCard<'c> {
                 return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair), heading: hd, credit: credit_levels };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair), heading: hd, credit: credit_levels, credit_packets: if credit_levels > 0 && law.packets { (credit_from..d.levels).filter(|&l| law.news.is_some_and(|c| l + 1 >= c.first()) && l + 1 < d.levels).count() } else { 0 } };
         self.frame(shape).map_err(device)?;
         if slot == Slot::OpeningTicks && (law.news.is_none() || !self.ticks_kept) {
             return Err(TowerError::Refused("a reread on the opening's ticks reads a news clock's opening read, its frame still resident"));
         }
         let (mut words, levels) = Self::law_words(&law, streams, cells);
         let keep = slot == Slot::Opened;
+        // The closure is read on the opening read, and on a reread only under the declared reading.
+        let read_closure = hd > 0 && (keep || self.reread_closures);
+        words.closure = u32::from(read_closure);
+        // The credit advances in the reads a carry may keep: a reread, or an opening read a carry
+        // asked for (`TowerCard::carry`); its material moments wait for the carry.
+        let advance = credit_levels > 0 && (!keep || self.force_advance);
+        if credit_levels == 0 {
+            self.credit_pending = None;
+        }
         if credit_levels > 0 {
-            self.admit_credit(tower, opening)?;
+            self.admit_credit(tower, opening, credit_from)?;
             words.credit = credit_levels as u32;
             words.credit_packet = u32::from(law.packets);
+            words.credit_advance = u32::from(advance);
+            words.credit_from = credit_from as u32;
+            if keep && !self.force_advance {
+                self.opened_reads = Some((classes.iter().map(|c| c.to_vec()).collect(), targets.to_vec()));
+            }
         }
         // The forward's read: the opening (its temporaries kept), a reread, or a reread on the
         // opening's ticks.
@@ -1830,16 +1870,16 @@ impl<'c> TowerCard<'c> {
                 card.zero_octets(&frame.swell, 0, 8 * 4 * d.levels).map_err(device)?;
             }
             let mut fw = Self::frame_words(frame);
-            if let Some(credit) = self.credit.as_ref().filter(|_| credit_levels > 0) {
+            if let Some(credit) = self.credit.as_ref().filter(|_| advance) {
                 fw.cr_open = credit.open.device_ptr();
-                fw.cr_next = credit.next[slot_index(slot)].device_ptr();
+                fw.cr_next = credit.next.device_ptr();
             }
             let blocks = (law.len as u32).div_ceil(THREADS).clamp(1, 1024);
             self.law_launch("tower_transpose", Dim3 { x: blocks, y: words.families, z: 1 }, THREADS, 0, &words, &fw, None).map_err(device)?;
             self.law_launch("tower_forward", Dim3::x(streams as u32), THREADS, Self::forward_shared(&shape) as u32, &words, &fw, Some(read)).map_err(device)?;
-            // The credit's material moments in closed form over the read's cells (`tower_credit`).
-            if credit_levels > 0 {
-                self.law_launch("tower_credit", Dim3 { x: streams as u32, y: credit_levels as u32, z: 1 }, THREADS, (32 * d.modes) as u32, &words, &fw, None).map_err(device)?;
+            // The credit's material moments wait for the carry of this read (`tower_credit`).
+            if advance {
+                self.credit_pending = Some((slot_index(slot), words));
             }
         }
         self.status()?;
@@ -1851,11 +1891,8 @@ impl<'c> TowerCard<'c> {
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
         let packet_ends = if packet_from.is_some() { self.card.fetch(&frame.pk_ends).map_err(device)? } else { Vec::new() };
-        let (trace_ends, counts, closed) = if hd > 0 {
-            (self.card.fetch(&frame.tr_ends).map_err(device)?, self.card.fetch(&frame.hd_count).map_err(device)?, self.card.fetch(&frame.hd_close).map_err(device)?)
-        } else {
-            (Vec::new(), Vec::new(), Vec::new())
-        };
+        let trace_ends = if hd > 0 { self.card.fetch(&frame.tr_ends).map_err(device)? } else { Vec::new() };
+        let (counts, closed) = if read_closure { (self.card.fetch(&frame.hd_count).map_err(device)?, self.card.fetch(&frame.hd_close).map_err(device)?) } else { (Vec::new(), Vec::new()) };
         // Each level's section at the read's end, as the host's state carries it: its carried sites
         // still read and the sites admitted since (a section that closed rests), with its running
         // frames, met dissipation and, under a news clock, its held current.
@@ -1975,7 +2012,7 @@ impl<'c> TowerCard<'c> {
             .collect();
         // Each stream's closure faces a clocked level, `(e_jj, Σ_i e_ji)` tick by tick, as the
         // host's `Tower::closure_faces` reads them (empty below the first clocked level).
-        let closures: Vec<Vec<Vec<(u128, u128)>>> = match heading_from {
+        let closures: Vec<Vec<Vec<(u128, u128)>>> = match heading_from.filter(|_| read_closure) {
             None => Vec::new(),
             Some(first) => (0..streams)
                 .map(|s| {
@@ -1997,9 +2034,6 @@ impl<'c> TowerCard<'c> {
                 .collect(),
         };
         self.ends[slot_index(slot)] = Some(ends);
-        if let Some(credit) = self.credit.as_mut().filter(|_| credit_levels > 0) {
-            credit.advanced[slot_index(slot)] = true;
-        }
         if keep {
             self.opened = Some((words, levels));
             self.opened_current = true;
@@ -2382,6 +2416,10 @@ impl PassRealization for TowerCard<'_> {
         Ok((g, SplitRead { levels }))
     }
 
+    fn reread_closures(&mut self, on: bool) {
+        self.reread_closures = on;
+    }
+
     fn forms_split(&self) -> bool {
         true
     }
@@ -2403,12 +2441,36 @@ impl PassRealization for TowerCard<'_> {
             .collect()
     }
 
-    fn carry(&mut self, _tower: &Tower, states: &mut [TowerState], _opening: &[TowerState], slot: Slot) -> Result<()> {
-        let ends = self.ends[slot_index(slot)].take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
+    fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
+        let i = slot_index(slot);
+        let credited = self.ends[i].as_ref().is_some_and(|ends| ends.iter().any(|e| e.credit.is_some()));
+        // The carried read's credit advance: a reread's waits here; an opening read advanced none,
+        // so it is read again advancing it (the same faces and ends, bit for bit).
+        if credited && self.credit_pending.as_ref().map(|p| p.0) != Some(i) {
+            if i != 0 {
+                return Err(TowerError::Refused("a credited carry of a reread that a later read replaced"));
+            }
+            let (classes, targets) = self.opened_reads.clone().ok_or(TowerError::Refused("a credited carry of an opening read keeps its classes"))?;
+            let parts: Vec<&[usize]> = classes.iter().map(Vec::as_slice).collect();
+            self.force_advance = true;
+            let read = self.read_forward(tower, opening, &parts, &targets, Slot::Opened);
+            self.force_advance = false;
+            read?;
+        }
+        if credited {
+            let (_, words) = self.credit_pending.take().ok_or(TowerError::Refused("a credited carry reads its read's advance"))?;
+            let frame = self.frame.as_ref().ok_or(TowerError::Refused("a credited carry needs its frame"))?;
+            let mut fw = Self::frame_words(frame);
+            let credit = self.credit.as_ref().ok_or(TowerError::Refused("a credited carry reads the resident credit"))?;
+            fw.cr_open = credit.open.device_ptr();
+            fw.cr_next = credit.next.device_ptr();
+            self.law_launch("tower_credit", Dim3 { x: words.streams, y: words.credit, z: 1 }, THREADS, 32 * words.modes, &words, &fw, None).map_err(device)?;
+            self.status()?;
+        }
+        let ends = self.ends[i].take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
         if ends.len() != states.len() {
             return Err(TowerError::Refused("a carry continues every stream"));
         }
-        let credited = ends.iter().any(|e| e.credit.is_some());
         for (state, end) in states.iter_mut().zip(ends) {
             *state = end;
         }
@@ -2416,10 +2478,8 @@ impl PassRealization for TowerCard<'_> {
         // hold its mark.
         if credited {
             let generation = self.generations;
-            let credit = self.credit.as_mut().filter(|c| c.advanced[slot_index(slot)]).ok_or(TowerError::Refused("a credited carry reads the credit its kept read advanced"))?;
-            let i = slot_index(slot);
-            std::mem::swap(&mut credit.open, &mut credit.next[i]);
-            credit.advanced = [false, false];
+            let credit = self.credit.as_mut().ok_or(TowerError::Refused("a credited carry reads the resident credit"))?;
+            std::mem::swap(&mut credit.open, &mut credit.next);
             credit.generation = generation;
             self.generations += 1;
             for (s, state) in states.iter_mut().enumerate() {
@@ -2439,7 +2499,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0, packets: 0, split: 0, heading: 0, credit: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0, packets: 0, split: 0, heading: 0, credit: 0, credit_packets: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

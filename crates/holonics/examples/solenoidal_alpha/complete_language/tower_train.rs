@@ -3430,7 +3430,29 @@ pub(super) const MUTUAL_SHIFT: u32 = 2;
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+/// [agent-inferred, October 31] Which levels a run's streams carry the passage credit at
+/// (`TowerState::credit`): none, the tower's own (the clocked levels under a news clock, every level
+/// without one; `Tower::rest_with_credit`), or every level from a declared one up
+/// (`Tower::rest_with_credit_from`, the record's §24).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Credit {
+    None,
+    Clocked,
+    From(usize),
+}
+
+impl From<bool> for Credit {
+    fn from(carried: bool) -> Self {
+        if carried {
+            Credit::Clocked
+        } else {
+            Credit::None
+        }
+    }
+}
+
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: impl Into<Credit>, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+    let credit: Credit = credit.into();
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3597,6 +3619,15 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_TICKS=1`): each refused step
     // read again whole, its clocked levels ticking where the section's opening read ticked (the
     // record's §16); it costs one forward a refusal and moves nothing.
+    // [agent-inferred, October 31] A declared reading (`TOWER_REFUSAL_CLOSURE`): each refused
+    // step's reread reads the closure too (§23); without it the closure is read once a section.
+    if std::env::var("TOWER_REFUSAL_CLOSURE").is_ok_and(|v| v == "1") {
+        if !learner.tower.heading() {
+            return Err("TOWER_REFUSAL_CLOSURE reads the heading's closure, and this tower has no heading".into());
+        }
+        learner.refusal_closure = true;
+        println!("TOWER_REFUSAL_CLOSURE declared");
+    }
     if std::env::var("TOWER_REFUSAL_TICKS").is_ok_and(|v| v == "1") {
         if learner.tower.news().is_none() {
             return Err("TOWER_REFUSAL_TICKS reads the clocked levels' ticks, and this tower has no news clock".into());
@@ -3626,7 +3657,13 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     for pass in 0..passes {
         let pass_started = Instant::now();
         let mut states: Vec<TowerState> =
-            (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
+            (0..streams)
+                .map(|_| match credit {
+                    Credit::None => learner.tower.rest(),
+                    Credit::Clocked => learner.tower.rest_with_credit(),
+                    Credit::From(from) => learner.tower.rest_with_credit_from(from),
+                })
+                .collect();
         let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
         // Under the heading, each clocked level's closure over the window: ticks, code, flat.
@@ -3764,6 +3801,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             halvings += receipt.halvings;
             gather_closures(&mut closures, &receipt.closure);
             for &(arrivals, closure) in &receipt.refused {
+                let closure = closure.unwrap_or(0);
                 refusals = (refusals.0 + 1, refusals.1 + usize::from(arrivals > 0), refusals.2 + usize::from(closure > 0), refusals.3 + arrivals, refusals.4 + closure);
             }
             for (&(own, _), &opening) in receipt.refused.iter().zip(&receipt.refused_on_ticks) {
@@ -3783,9 +3821,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 if !closures.is_empty() {
                     println!("TOWER_CLOSURE pass={} section={} {}", pass, k + 1, closure_line(&closures));
                 }
+                // A refused step's closure is read only under the declared reading (§23); without it
+                // its columns read `-`.
+                let (rose, change) = if learner.refusal_closure { (refusals.2.to_string(), signed_bits(refusals.4).to_string()) } else { ("-".into(), "-".into()) };
                 println!(
-                    "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={} arrivals_change_bits={} closure_change_bits={}",
-                    pass, k + 1, refusals.0, refusals.1, refusals.2, signed_bits(refusals.3), signed_bits(refusals.4)
+                    "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={rose} arrivals_change_bits={} closure_change_bits={change}",
+                    pass, k + 1, refusals.0, refusals.1, signed_bits(refusals.3)
                 );
                 if learner.refusal_parts {
                     let (rose, change) = refusal_parts;

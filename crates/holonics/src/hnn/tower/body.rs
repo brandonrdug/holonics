@@ -379,7 +379,8 @@ impl TowerState {
             // and reading it back refuses.
             Some(levels) if LevelCredit::residence(levels).is_some() => s.push_str("credit resident\n"),
             Some(levels) => {
-                let mut v = Vec::new();
+                // The first credited level leads the moments (the template a read restores them on).
+                let mut v = vec![levels.iter().position(LevelCredit::carried).unwrap_or(levels.len()) as i64];
                 for c in levels {
                     for set in std::iter::once(c).chain(c.packet.as_deref()) {
                         for part in set.parts() {
@@ -468,11 +469,12 @@ impl Tower {
             "credit -" => None,
             "credit resident" => return refuse("a credit a realization held resident was written without its moments"),
             text => {
-                let mut template = self.rest_with_credit().credit.unwrap_or_default();
+                let from = text.split(' ').nth(1).and_then(|w| w.parse::<usize>().ok()).filter(|&f| f <= self.declaration.levels).ok_or(TowerError::Refused("a credit's text leads with its first credited level"))?;
+                let mut template = self.rest_with_credit_from(from).credit.unwrap_or_default();
                 let sets = |c: &LevelCredit| 1 + usize::from(c.packet.is_some());
                 let total: usize = template.iter().map(|c| sets(c) * 2 * c.parts().iter().map(|p| p.len()).sum::<usize>()).sum();
-                let v = entries::<i64>(text, "credit", total)?;
-                let mut at = 0;
+                let v = entries::<i64>(text, "credit", 1 + total)?;
+                let mut at = 1;
                 let mut fill = |set: &mut LevelCredit| {
                     for part in set.parts_mut() {
                         let n = part.len();

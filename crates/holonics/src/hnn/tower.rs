@@ -3044,21 +3044,40 @@ impl Tower {
     /// carries the moments of the packet its moves carry for the level above when packets are
     /// joined ([`LevelCredit`]).
     pub fn rest_with_credit(&self) -> TowerState {
+        self.rest_with_credit_from(self.news.map_or(0, |c| c.first()))
+    }
+
+    /// [agent-inferred, October 31] A learner's rested stream whose credit is carried from level
+    /// `from` up (the record's §24: at `from = 0` every level's, the arrival levels' among them), each
+    /// credited level whose moves carry the packet the level above hears carrying that packet's
+    /// moments too ([`LevelCredit`]). A `from` past the top carries none.
+    pub fn rest_with_credit_from(&self, from: usize) -> TowerState {
         let d = &self.declaration;
-        let from = self.news.map_or(0, |c| c.first());
+        let carries_packet = |l: usize| self.packet_from().is_some_and(|first| l + 1 >= first) && l + 1 < d.levels;
         let levels = (0..d.levels)
             .map(|l| {
                 if l < from {
                     return LevelCredit::empty();
                 }
                 let mut level = LevelCredit::rested(d.modes, d.width, d.gated);
-                if self.packets && l + 1 < d.levels {
+                if carries_packet(l) {
                     level.packet = Some(Box::new(LevelCredit::rested(d.modes, d.width, d.gated)));
                 }
                 level
             })
             .collect();
         TowerState { credit: Some(levels), ..self.rest() }
+    }
+
+    /// The first level a stream's credit carries (its levels below it carry an empty one), or the
+    /// level count when it carries none; `None` for a credit of another tower's levels or a
+    /// realization's mark.
+    pub fn credit_from_of(&self, credit: &[LevelCredit]) -> Option<usize> {
+        if credit.len() != self.declaration.levels || LevelCredit::residence(credit).is_some() {
+            return None;
+        }
+        let from = credit.iter().position(LevelCredit::carried).unwrap_or(credit.len());
+        credit[from..].iter().all(LevelCredit::carried).then_some(from)
     }
 
     /// [agent-inferred, October 31] **A stream's credit as words** in its canonical order, for a
@@ -3070,7 +3089,8 @@ impl Tower {
         if LevelCredit::residence(credit).is_some() {
             return refuse("a credit resident on a realization is returned before the host reads it");
         }
-        let mut v = Vec::with_capacity(self.credit_extent());
+        let from = self.credit_from_of(credit).ok_or(TowerError::Refused("a credit of another shape than this tower's"))?;
+        let mut v = Vec::with_capacity(self.credit_extent(from));
         for c in credit.iter().filter(|c| c.carried()) {
             for set in std::iter::once(c).chain(c.packet.as_deref()) {
                 for part in set.parts() {
@@ -3078,25 +3098,26 @@ impl Tower {
                 }
             }
         }
-        if v.len() != self.credit_extent() {
+        if v.len() != self.credit_extent(from) {
             return refuse("a credit of another shape than this tower's");
         }
         Ok(Some(v))
     }
 
-    /// The words of one stream's credit ([`Tower::credit_words`]).
-    pub fn credit_extent(&self) -> usize {
-        let rest = self.rest_with_credit();
+    /// The words of one stream's credit carried from level `from` ([`Tower::credit_words`]).
+    pub fn credit_extent(&self, from: usize) -> usize {
+        let rest = self.rest_with_credit_from(from);
         let credit = rest.credit.as_deref().unwrap_or_default();
         credit.iter().filter(|c| c.carried()).flat_map(|c| std::iter::once(c).chain(c.packet.as_deref())).map(|c| 2 * c.parts().iter().map(|p| p.len()).sum::<usize>()).sum()
     }
 
-    /// A stream's credit restored from its words ([`Tower::credit_words`]).
-    pub fn credit_from_words(&self, words: &[i64]) -> Result<Vec<LevelCredit>> {
-        if words.len() != self.credit_extent() {
+    /// A stream's credit carried from level `from`, restored from its words
+    /// ([`Tower::credit_words`]).
+    pub fn credit_from_words(&self, from: usize, words: &[i64]) -> Result<Vec<LevelCredit>> {
+        if words.len() != self.credit_extent(from) {
             return refuse("a credit's words of another extent than this tower's");
         }
-        let mut credit = self.rest_with_credit().credit.unwrap_or_default();
+        let mut credit = self.rest_with_credit_from(from).credit.unwrap_or_default();
         let mut at = 0;
         for c in credit.iter_mut().filter(|c| c.carried()) {
             let mut fill = |set: &mut LevelCredit| {
@@ -6116,6 +6137,11 @@ pub struct TowerLearner {
     /// whole, its clocked levels ticking where the section's opening read ticked
     /// ([`Slot::OpeningTicks`], [`SectionReceipt::refused_on_ticks`]).
     pub refusal_ticks: bool,
+    /// [agent-inferred, October 31] A run's declared reading of each refused step's closure (the
+    /// record's §8 to §10, §23), never written with the learner: under the heading the closure is
+    /// read once a section, on its opening read, and a refused step's reread reads it only under
+    /// this reading ([`SectionReceipt::refused`]).
+    pub refusal_closure: bool,
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
@@ -6134,10 +6160,11 @@ pub struct SectionReceipt {
     /// Under the heading, each clocked level's closure on the section's opening read (empty
     /// without it); its code joins the arrivals' in the certificate, never in `code_before`.
     pub closure: Vec<ClosureReading>,
-    /// Each step the certificate refused, in order: the change it made to the arrivals' code and
-    /// to the closure's (after minus before, on `2^(−20)` bits), so a refusal reads which code
-    /// the step raised.
-    pub refused: Vec<(i64, i64)>,
+    /// Each step the certificate refused, in order: the change it made to the arrivals' code and,
+    /// under the learner's declared reading ([`TowerLearner::refusal_closure`]) beside the heading,
+    /// to the closure's (after minus before, on `2^(−20)` bits; `None` where the reread read no
+    /// closure), so a refusal reads which code the step raised.
+    pub refused: Vec<(i64, Option<i64>)>,
     /// Under the learner's declared reading ([`TowerLearner::refusal_parts`]), each refused step's
     /// change to the arrivals' code under its parts alone (after minus before, on `2^(−20)` bits):
     /// the descent's, the heading's read's, the readout's and its bias's, the clocked levels' own
@@ -6164,7 +6191,7 @@ pub struct ClosureReading {
 impl TowerLearner {
     pub fn new(tower: Tower, rate_bits: u32) -> Self {
         let len = tower.theta.len();
-        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false }
+        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false }
     }
 
     /// The swell and the reaches as one line: per level `x h r a` (faces, `2^(−16)`) and `push read
@@ -6250,18 +6277,18 @@ impl TowerLearner {
         let targets: Vec<Vec<Option<usize>>> = classes.iter().enumerate().map(|(s, c)| (1..c.len()).map(|i| target(s, i)).collect()).collect();
         self.tower.admit_read(classes, &targets)?;
         let opening: Vec<TowerState> = states.to_vec();
+        // [agent-inferred, October 31] Under the heading the closure is read on the section's
+        // opening read, and a reread reads it only under the declared reading (the record's §23):
+        // it moves nothing and the certificate compares the arrivals alone.
+        let heading = self.tower.heading();
+        let reread_closures = heading && self.refusal_closure;
+        realization.reread_closures(reread_closures);
         let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
         self.swell.clone_from(&read.swell);
-        // The certificate compares the arrivals' faces; under the heading each tick's closure face
-        // is read beside them ([`Tower::join_heading`]; the closure is read, not learned, the
-        // record's §10–§11).
-        let heading = self.tower.heading();
-        let compared_faces = |r: &realization::PassRead| -> Result<Vec<(u128, u128)>> {
-            if heading && r.closures.len() != classes.len() {
-                return refuse("a read under the heading returns each stream's closure faces");
-            }
-            Ok(r.faces.iter().flatten().flatten().copied().collect())
-        };
+        if heading && read.closures.len() != classes.len() {
+            return refuse("an opening read under the heading returns each stream's closure faces");
+        }
+        let compared_faces = |r: &realization::PassRead| -> Result<Vec<(u128, u128)>> { Ok(r.faces.iter().flatten().flatten().copied().collect()) };
         let faces_old = compared_faces(&read)?;
         let arrivals = read.faces.iter().flatten().flatten().count();
         let closure: Vec<ClosureReading> = match self.tower.heading_from() {
@@ -6449,8 +6476,16 @@ impl TowerLearner {
                 break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Reread);
             }
             let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
-            let closure_after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
-            refused.push((arrivals_after - code_before, closure_after - closure_before));
+            let closure_change = if reread_closures {
+                if reread.closures.len() != classes.len() {
+                    return refuse("a reread under the declared closure reading returns each stream's closure faces");
+                }
+                let after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
+                Some(after - closure_before)
+            } else {
+                None
+            };
+            refused.push((arrivals_after - code_before, closure_change));
             if self.refusal_ticks {
                 // The refused step read again whole on the ticks the section opened with.
                 let read = realization.forward(&candidate, &opening, classes, &targets, Slot::OpeningTicks)?.admitted(&targets)?;
@@ -6618,7 +6653,7 @@ impl TowerLearner {
         if first.len() != tower.theta.len() || second.len() != tower.theta.len() {
             return refuse("moments of the wrong extent");
         }
-        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false })
+        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false })
     }
 
     /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
@@ -9971,13 +10006,66 @@ mod tests {
         let text = carried.to_text();
         assert_eq!(tower.state_from_text(&text.lines().collect::<Vec<_>>()).expect("restored"), carried);
         let words = tower.credit_words(&carried).expect("words").expect("a credit");
-        assert_eq!(words.len(), tower.credit_extent());
-        assert_eq!(Some(tower.credit_from_words(&words).expect("restored")), carried.credit);
+        assert_eq!(words.len(), tower.credit_extent(2));
+        assert_eq!(Some(tower.credit_from_words(2, &words).expect("restored")), carried.credit);
         let marked = TowerState { credit: Some(LevelCredit::resident_mark(7, 0)), ..carried.clone() };
         let marked_text = marked.to_text();
         assert!(tower.credit_words(&marked).is_err() && tower.state_from_text(&marked_text.lines().collect::<Vec<_>>()).is_err());
         let cells = tower.forward(&mut carried.clone(), &classes[..4], &reaches).expect("forward");
         assert!(tower.reverse(&marked, &cells, &classes[..4], None).is_err(), "a resident credit is not the host's to read");
+    }
+
+    /// [agent-inferred, October 31] **Every level's credit** (the record's §24): carried from level 0
+    /// on four gated levels clocked from level 2 with packets and the heading, the arrival levels
+    /// carry theirs (level 1, whose moves carry level 2's packet, its packet's moments too); the top
+    /// level's families still meet the whole passage's covector across a cut; every credited
+    /// level's moments move; the text and the words restore whole.
+    #[test]
+    fn every_levels_credit_is_carried_from_the_arrival_levels() {
+        // A four-bit clock, so level 2 ticks about every other arrival and its packet stays open.
+        let mut tower = tiny_with(4, true);
+        tower.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
+        tower.join_packets().expect("joined");
+        tower.join_heading().expect("joined");
+        let rest = tower.rest_with_credit_from(0);
+        let credit = rest.credit.as_ref().expect("credit");
+        assert!(credit.iter().all(LevelCredit::carried) && credit[0].packet.is_none() && credit[1].packet.is_some() && credit[2].packet.is_some() && credit[3].packet.is_none());
+        assert_eq!(tower.credit_from_of(credit), Some(0));
+        assert_eq!(tower.rest_with_credit_from(2), tower.rest_with_credit());
+        let classes = news_passage();
+        assert_eq!(headed(4).rest_with_credit_from(2), headed(4).rest_with_credit());
+        let reaches = tower.reaches();
+        let covector = |opening: &TowerState, part: &[usize]| -> (Vec<i128>, TowerState) {
+            let mut s = opening.clone();
+            let cells = tower.forward(&mut s, part, &reaches).expect("forward");
+            let g = tower.reverse(opening, &cells, part, None).expect("reverse");
+            tower.advance_credit(s.credit.as_mut().expect("credit"), opening, &cells, &reaches).expect("credit");
+            (g, s)
+        };
+        // A cut whose last cell does not tick level 2, so the packet level 1 carries is open there.
+        let mut probe = rest.clone();
+        let cells = tower.forward(&mut probe, &classes, &reaches).expect("forward");
+        let half = (2..classes.len() - 2).rev().find(|&h| cells[h - 1].levels[2].ticks == 0).expect("a cut inside level 2's span");
+        let (whole, _) = covector(&rest, &classes);
+        let (first, carried) = covector(&rest, &classes[..=half]);
+        let (second, _) = covector(&carried, &classes[half..]);
+        let c = carried.credit.as_ref().expect("credit");
+        let moved = |l: &LevelCredit| l.push.iter().any(|&p| p != (0, 0)) && l.along.iter().any(|&a| a != (0, 0));
+        assert!(c.iter().all(moved) && c[1].packet.as_deref().is_some_and(moved), "every credited level's moments moved, the open packet's among them");
+        let lv = tower.layout.levels[3];
+        let d = &tower.declaration;
+        for (start, len) in [(lv.move_re, d.modes), (lv.push_re, d.modes * d.width), (lv.gate, d.modes * d.width)] {
+            for i in start..start + len {
+                let error = (whole[i] - first[i] - second[i]).abs();
+                assert!(error * 64 <= whole[i].abs().max(1 << 12), "parameter {i}: whole {} against halves {}", whole[i], first[i] + second[i]);
+            }
+        }
+        let text = carried.to_text();
+        assert!(text.contains("credit 0 "));
+        assert_eq!(tower.state_from_text(&text.lines().collect::<Vec<_>>()).expect("restored"), carried);
+        let words = tower.credit_words(&carried).expect("words").expect("a credit");
+        assert_eq!(words.len(), tower.credit_extent(0));
+        assert_eq!(Some(tower.credit_from_words(0, &words).expect("restored")), carried.credit);
     }
 
     #[test]
@@ -10820,18 +10908,30 @@ mod tests {
     fn a_refused_step_reads_the_codes_it_raised() {
         let classes = news_passage();
         let mut learner = TowerLearner::new(headed(3), 1);
+        let mut unread = learner.clone();
+        learner.refusal_closure = true;
         let mut states = vec![learner.tower.rest()];
         let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
         assert!(receipt.halvings > 0, "a step at the rate 2^(-1) was certified at once");
         assert_eq!(receipt.refused.len(), receipt.halvings as usize);
         let faces = receipt.cells as i64;
         assert!(receipt.refused.iter().all(|&(a, _)| a >= -faces), "{:?}", receipt.refused);
-        assert!(receipt.refused.iter().any(|&(_, c)| c != 0), "the closure's code moved under no refused step");
+        assert!(receipt.refused.iter().any(|&(_, c)| c.is_some_and(|c| c != 0)), "the closure's code moved under no refused step");
+        // Without the declared reading the rereads read no closure (the record's §23): the learner,
+        // the states and the receipt are the reading's, the refused steps' closures aside.
+        let mut unread_states = vec![unread.tower.rest()];
+        let plain_receipt = unread.section(&mut unread_states, &[&classes[..31]]).expect("section");
+        assert_eq!((unread.to_text(), &unread_states), (learner.to_text(), &states));
+        assert!(plain_receipt.refused.iter().all(|&(_, c)| c.is_none()));
+        let arrivals = |r: &SectionReceipt| r.refused.iter().map(|&(a, _)| a).collect::<Vec<_>>();
+        assert_eq!(arrivals(&plain_receipt), arrivals(&receipt));
+        assert_eq!(SectionReceipt { refused: receipt.refused.iter().map(|&(a, _)| (a, None)).collect(), ..receipt.clone() }, plain_receipt);
         let mut plain = TowerLearner::new(packeted(3), 1);
+        plain.refusal_closure = true;
         let mut states = vec![plain.tower.rest()];
         let receipt = plain.section(&mut states, &[&classes[..31]]).expect("section");
         assert_eq!(receipt.refused.len(), receipt.halvings as usize);
-        assert!(receipt.refused.iter().all(|&(_, c)| c == 0), "a closure without the heading");
+        assert!(receipt.refused.iter().all(|&(_, c)| c.is_none()), "a closure without the heading");
     }
 
     /// [agent-inferred, October 30] **A refused step read by its parts** (the record's acceptance
@@ -10908,7 +11008,12 @@ mod tests {
         assert!(pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::OpeningTicks).is_err());
         let opened = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::Opened).expect("opening");
         let reread = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::OpeningTicks).expect("on the opening's ticks");
-        assert_eq!((reread.faces, reread.closures), (opened.faces, opened.closures));
+        assert_eq!(reread.faces, opened.faces);
+        // A reread reads the closure only under the declared reading (the record's §23).
+        assert!(reread.closures.is_empty(), "a reread read the closure undeclared");
+        pass.reread_closures(true);
+        let declared = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::OpeningTicks).expect("on the opening's ticks");
+        assert_eq!((declared.faces, declared.closures), (opened.faces, opened.closures));
         let run = |read: bool| {
             let mut learner = TowerLearner::new(joined.clone(), 2);
             learner.refusal_ticks = read;
