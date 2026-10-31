@@ -1,0 +1,144 @@
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.103 deposits=32 halvings=37 elapsed_ms=17223
+TOWER_CLOSURE pass=0 section=32 level=4 ticks=818479 code_bits_a_tick=6.706 flat_bits_a_tick=6.346 level=5 ticks=417670 code_bits_a_tick=5.585 flat_bits_a_tick=5.376
+TOWER_REFUSALS pass=0 section=32 refused=37 arrivals_rose=37 closure_rose=- arrivals_change_bits=2815897.826 closure_change_bits=-
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.830 deposits=64 halvings=38 elapsed_ms=28628
+TOWER_CLOSURE pass=0 section=64 level=4 ticks=616038 code_bits_a_tick=6.328 flat_bits_a_tick=5.922 level=5 ticks=313631 code_bits_a_tick=5.129 flat_bits_a_tick=4.949
+TOWER_REFUSALS pass=0 section=64 refused=1 arrivals_rose=1 closure_rose=- arrivals_change_bits=585.356 closure_change_bits=-
+TOWER_SECTION pass=0 section=96 bits_a_byte=3.405 deposits=96 halvings=54 elapsed_ms=41748
+TOWER_CLOSURE pass=0 section=96 level=4 ticks=548221 code_bits_a_tick=6.187 flat_bits_a_tick=5.754 level=5 ticks=278833 code_bits_a_tick=4.960 flat_bits_a_tick=4.780
+TOWER_REFUSALS pass=0 section=96 refused=16 arrivals_rose=16 closure_rose=- arrivals_change_bits=14430.483 closure_change_bits=-
+TOWER_SECTION pass=0 section=128 bits_a_byte=3.197 deposits=128 halvings=56 elapsed_ms=53165
+TOWER_CLOSURE pass=0 section=128 level=4 ticks=513988 code_bits_a_tick=6.097 flat_bits_a_tick=5.663 level=5 ticks=261819 code_bits_a_tick=4.874 flat_bits_a_tick=4.692
+TOWER_REFUSALS pass=0 section=128 refused=2 arrivals_rose=2 closure_rose=- arrivals_change_bits=685.356 closure_change_bits=-
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.981 deposits=160 halvings=56 elapsed_ms=64303
+TOWER_CLOSURE pass=0 section=160 level=4 ticks=478631 code_bits_a_tick=5.998 flat_bits_a_tick=5.563 level=5 ticks=244194 code_bits_a_tick=4.780 flat_bits_a_tick=4.595
+TOWER_REFUSALS pass=0 section=160 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.836 deposits=192 halvings=59 elapsed_ms=75292
+TOWER_CLOSURE pass=0 section=192 level=4 ticks=455145 code_bits_a_tick=5.929 flat_bits_a_tick=5.492 level=5 ticks=232232 code_bits_a_tick=4.711 flat_bits_a_tick=4.524
+TOWER_REFUSALS pass=0 section=192 refused=3 arrivals_rose=3 closure_rose=- arrivals_change_bits=2868.834 closure_change_bits=-
+TOWER_SECTION pass=0 section=224 bits_a_byte=2.763 deposits=224 halvings=59 elapsed_ms=85751
+TOWER_CLOSURE pass=0 section=224 level=4 ticks=443171 code_bits_a_tick=5.890 flat_bits_a_tick=5.456 level=5 ticks=226244 code_bits_a_tick=4.678 flat_bits_a_tick=4.489
+TOWER_REFUSALS pass=0 section=224 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=256 bits_a_byte=2.648 deposits=256 halvings=59 elapsed_ms=96216
+TOWER_CLOSURE pass=0 section=256 level=4 ticks=424731 code_bits_a_tick=5.826 flat_bits_a_tick=5.396 level=5 ticks=216854 code_bits_a_tick=4.618 flat_bits_a_tick=4.429
+TOWER_REFUSALS pass=0 section=256 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=288 bits_a_byte=2.577 deposits=288 halvings=59 elapsed_ms=106644
+TOWER_CLOSURE pass=0 section=288 level=4 ticks=413318 code_bits_a_tick=5.780 flat_bits_a_tick=5.359 level=5 ticks=211004 code_bits_a_tick=4.583 flat_bits_a_tick=4.392
+TOWER_REFUSALS pass=0 section=288 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=320 bits_a_byte=2.500 deposits=320 halvings=59 elapsed_ms=116960
+TOWER_CLOSURE pass=0 section=320 level=4 ticks=400972 code_bits_a_tick=5.729 flat_bits_a_tick=5.318 level=5 ticks=204722 code_bits_a_tick=4.544 flat_bits_a_tick=4.351
+TOWER_REFUSALS pass=0 section=320 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=352 bits_a_byte=2.449 deposits=352 halvings=59 elapsed_ms=127429
+TOWER_CLOSURE pass=0 section=352 level=4 ticks=392805 code_bits_a_tick=5.687 flat_bits_a_tick=5.289 level=5 ticks=200537 code_bits_a_tick=4.528 flat_bits_a_tick=4.322
+TOWER_REFUSALS pass=0 section=352 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=384 bits_a_byte=2.387 deposits=384 halvings=59 elapsed_ms=137837
+TOWER_CLOSURE pass=0 section=384 level=4 ticks=382777 code_bits_a_tick=5.650 flat_bits_a_tick=5.253 level=5 ticks=195392 code_bits_a_tick=4.491 flat_bits_a_tick=4.287
+TOWER_REFUSALS pass=0 section=384 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=416 bits_a_byte=2.338 deposits=416 halvings=59 elapsed_ms=148230
+TOWER_CLOSURE pass=0 section=416 level=4 ticks=374998 code_bits_a_tick=5.613 flat_bits_a_tick=5.227 level=5 ticks=191378 code_bits_a_tick=4.470 flat_bits_a_tick=4.259
+TOWER_REFUSALS pass=0 section=416 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=448 bits_a_byte=2.307 deposits=448 halvings=59 elapsed_ms=158296
+TOWER_CLOSURE pass=0 section=448 level=4 ticks=370257 code_bits_a_tick=5.586 flat_bits_a_tick=5.208 level=5 ticks=188972 code_bits_a_tick=4.453 flat_bits_a_tick=4.241
+TOWER_REFUSALS pass=0 section=448 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=480 bits_a_byte=2.288 deposits=480 halvings=59 elapsed_ms=168625
+TOWER_CLOSURE pass=0 section=480 level=4 ticks=367068 code_bits_a_tick=5.565 flat_bits_a_tick=5.193 level=5 ticks=187257 code_bits_a_tick=4.435 flat_bits_a_tick=4.225
+TOWER_REFUSALS pass=0 section=480 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=512 bits_a_byte=2.256 deposits=512 halvings=59 elapsed_ms=178406
+TOWER_CLOSURE pass=0 section=512 level=4 ticks=362031 code_bits_a_tick=5.534 flat_bits_a_tick=5.173 level=5 ticks=184710 code_bits_a_tick=4.416 flat_bits_a_tick=4.205
+TOWER_REFUSALS pass=0 section=512 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=544 bits_a_byte=2.229 deposits=544 halvings=59 elapsed_ms=188199
+TOWER_CLOSURE pass=0 section=544 level=4 ticks=357654 code_bits_a_tick=5.514 flat_bits_a_tick=5.158 level=5 ticks=182503 code_bits_a_tick=4.409 flat_bits_a_tick=4.191
+TOWER_REFUSALS pass=0 section=544 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=576 bits_a_byte=2.195 deposits=576 halvings=59 elapsed_ms=197930
+TOWER_CLOSURE pass=0 section=576 level=4 ticks=352437 code_bits_a_tick=5.491 flat_bits_a_tick=5.137 level=5 ticks=179672 code_bits_a_tick=4.387 flat_bits_a_tick=4.169
+TOWER_REFUSALS pass=0 section=576 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=608 bits_a_byte=2.196 deposits=608 halvings=59 elapsed_ms=207624
+TOWER_CLOSURE pass=0 section=608 level=4 ticks=352475 code_bits_a_tick=5.475 flat_bits_a_tick=5.139 level=5 ticks=179915 code_bits_a_tick=4.395 flat_bits_a_tick=4.172
+TOWER_REFUSALS pass=0 section=608 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=640 bits_a_byte=2.165 deposits=640 halvings=59 elapsed_ms=217353
+TOWER_CLOSURE pass=0 section=640 level=4 ticks=347928 code_bits_a_tick=5.446 flat_bits_a_tick=5.121 level=5 ticks=177328 code_bits_a_tick=4.372 flat_bits_a_tick=4.151
+TOWER_REFUSALS pass=0 section=640 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=672 bits_a_byte=2.166 deposits=672 halvings=59 elapsed_ms=227085
+TOWER_CLOSURE pass=0 section=672 level=4 ticks=347811 code_bits_a_tick=5.446 flat_bits_a_tick=5.119 level=5 ticks=177247 code_bits_a_tick=4.374 flat_bits_a_tick=4.150
+TOWER_REFUSALS pass=0 section=672 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=704 bits_a_byte=2.168 deposits=704 halvings=59 elapsed_ms=236815
+TOWER_CLOSURE pass=0 section=704 level=4 ticks=348335 code_bits_a_tick=5.442 flat_bits_a_tick=5.122 level=5 ticks=177500 code_bits_a_tick=4.378 flat_bits_a_tick=4.153
+TOWER_REFUSALS pass=0 section=704 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=0 section=726 bits_a_byte=2.154 deposits=726 halvings=59 elapsed_ms=243509
+TOWER_CLOSURE pass=0 section=726 level=4 ticks=237954 code_bits_a_tick=5.428 flat_bits_a_tick=5.111 level=5 ticks=121221 code_bits_a_tick=4.369 flat_bits_a_tick=4.141
+TOWER_REFUSALS pass=0 section=726 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_STATE STATE.0 state_bytes=21686949 state_sha256=398292888d6adbbd081d06f7f7d888bcaf5c3014798da251848e97937cb87c18
+TOWER_PASS pass=0 train_bits_a_byte=2.665 dev_bits_a_byte=2.291 dev_regions gsm8k=2.328 strokes=0.000 cycles=0.000 words=2.264 deposits=726/726 pass_ms=246077 elapsed_ms=246088 train_code=83098099136986 dev_code=2195321321680 grain_bits=20
+TOWER_SECTION pass=1 section=32 bits_a_byte=2.305 deposits=32 halvings=0 elapsed_ms=256043
+TOWER_CLOSURE pass=1 section=32 level=4 ticks=368941 code_bits_a_tick=5.508 flat_bits_a_tick=5.202 level=5 ticks=188417 code_bits_a_tick=4.467 flat_bits_a_tick=4.235
+TOWER_REFUSALS pass=1 section=32 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=64 bits_a_byte=2.135 deposits=64 halvings=0 elapsed_ms=265782
+TOWER_CLOSURE pass=1 section=64 level=4 ticks=343148 code_bits_a_tick=5.393 flat_bits_a_tick=5.099 level=5 ticks=174829 code_bits_a_tick=4.356 flat_bits_a_tick=4.129
+TOWER_REFUSALS pass=1 section=64 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=96 bits_a_byte=2.099 deposits=96 halvings=0 elapsed_ms=275477
+TOWER_CLOSURE pass=1 section=96 level=4 ticks=337303 code_bits_a_tick=5.372 flat_bits_a_tick=5.074 level=5 ticks=171877 code_bits_a_tick=4.330 flat_bits_a_tick=4.105
+TOWER_REFUSALS pass=1 section=96 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=128 bits_a_byte=2.088 deposits=128 halvings=0 elapsed_ms=285181
+TOWER_CLOSURE pass=1 section=128 level=4 ticks=335575 code_bits_a_tick=5.367 flat_bits_a_tick=5.068 level=5 ticks=171008 code_bits_a_tick=4.325 flat_bits_a_tick=4.099
+TOWER_REFUSALS pass=1 section=128 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=160 bits_a_byte=2.065 deposits=160 halvings=0 elapsed_ms=294886
+TOWER_CLOSURE pass=1 section=160 level=4 ticks=331882 code_bits_a_tick=5.355 flat_bits_a_tick=5.055 level=5 ticks=169028 code_bits_a_tick=4.308 flat_bits_a_tick=4.086
+TOWER_REFUSALS pass=1 section=160 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=192 bits_a_byte=2.049 deposits=192 halvings=0 elapsed_ms=304591
+TOWER_CLOSURE pass=1 section=192 level=4 ticks=329507 code_bits_a_tick=5.345 flat_bits_a_tick=5.044 level=5 ticks=167724 code_bits_a_tick=4.297 flat_bits_a_tick=4.073
+TOWER_REFUSALS pass=1 section=192 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=224 bits_a_byte=2.079 deposits=224 halvings=0 elapsed_ms=314292
+TOWER_CLOSURE pass=1 section=224 level=4 ticks=334219 code_bits_a_tick=5.363 flat_bits_a_tick=5.064 level=5 ticks=170235 code_bits_a_tick=4.319 flat_bits_a_tick=4.095
+TOWER_REFUSALS pass=1 section=224 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=256 bits_a_byte=2.043 deposits=256 halvings=0 elapsed_ms=324001
+TOWER_CLOSURE pass=1 section=256 level=4 ticks=328356 code_bits_a_tick=5.338 flat_bits_a_tick=5.040 level=5 ticks=167324 code_bits_a_tick=4.294 flat_bits_a_tick=4.070
+TOWER_REFUSALS pass=1 section=256 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=288 bits_a_byte=2.034 deposits=288 halvings=0 elapsed_ms=333722
+TOWER_CLOSURE pass=1 section=288 level=4 ticks=327154 code_bits_a_tick=5.332 flat_bits_a_tick=5.036 level=5 ticks=166540 code_bits_a_tick=4.286 flat_bits_a_tick=4.065
+TOWER_REFUSALS pass=1 section=288 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=320 bits_a_byte=2.020 deposits=320 halvings=0 elapsed_ms=343430
+TOWER_CLOSURE pass=1 section=320 level=4 ticks=325086 code_bits_a_tick=5.320 flat_bits_a_tick=5.025 level=5 ticks=165375 code_bits_a_tick=4.271 flat_bits_a_tick=4.053
+TOWER_REFUSALS pass=1 section=320 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=352 bits_a_byte=2.021 deposits=352 halvings=0 elapsed_ms=353113
+TOWER_CLOSURE pass=1 section=352 level=4 ticks=325045 code_bits_a_tick=5.318 flat_bits_a_tick=5.024 level=5 ticks=165433 code_bits_a_tick=4.275 flat_bits_a_tick=4.053
+TOWER_REFUSALS pass=1 section=352 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=384 bits_a_byte=2.002 deposits=384 halvings=0 elapsed_ms=362791
+TOWER_CLOSURE pass=1 section=384 level=4 ticks=322109 code_bits_a_tick=5.301 flat_bits_a_tick=5.012 level=5 ticks=163934 code_bits_a_tick=4.259 flat_bits_a_tick=4.041
+TOWER_REFUSALS pass=1 section=384 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=416 bits_a_byte=2.003 deposits=416 halvings=0 elapsed_ms=372495
+TOWER_CLOSURE pass=1 section=416 level=4 ticks=322260 code_bits_a_tick=5.305 flat_bits_a_tick=5.014 level=5 ticks=163962 code_bits_a_tick=4.262 flat_bits_a_tick=4.042
+TOWER_REFUSALS pass=1 section=416 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=448 bits_a_byte=1.997 deposits=448 halvings=0 elapsed_ms=382165
+TOWER_CLOSURE pass=1 section=448 level=4 ticks=321444 code_bits_a_tick=5.301 flat_bits_a_tick=5.010 level=5 ticks=163569 code_bits_a_tick=4.258 flat_bits_a_tick=4.038
+TOWER_REFUSALS pass=1 section=448 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=480 bits_a_byte=2.006 deposits=480 halvings=0 elapsed_ms=391846
+TOWER_CLOSURE pass=1 section=480 level=4 ticks=322706 code_bits_a_tick=5.298 flat_bits_a_tick=5.012 level=5 ticks=164225 code_bits_a_tick=4.261 flat_bits_a_tick=4.040
+TOWER_REFUSALS pass=1 section=480 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=512 bits_a_byte=1.992 deposits=512 halvings=0 elapsed_ms=401496
+TOWER_CLOSURE pass=1 section=512 level=4 ticks=320702 code_bits_a_tick=5.287 flat_bits_a_tick=5.004 level=5 ticks=163043 code_bits_a_tick=4.248 flat_bits_a_tick=4.031
+TOWER_REFUSALS pass=1 section=512 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=544 bits_a_byte=1.981 deposits=544 halvings=0 elapsed_ms=411180
+TOWER_CLOSURE pass=1 section=544 level=4 ticks=318821 code_bits_a_tick=5.281 flat_bits_a_tick=4.997 level=5 ticks=162221 code_bits_a_tick=4.242 flat_bits_a_tick=4.025
+TOWER_REFUSALS pass=1 section=544 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=576 bits_a_byte=1.978 deposits=576 halvings=0 elapsed_ms=420848
+TOWER_CLOSURE pass=1 section=576 level=4 ticks=318384 code_bits_a_tick=5.279 flat_bits_a_tick=4.994 level=5 ticks=161922 code_bits_a_tick=4.239 flat_bits_a_tick=4.022
+TOWER_REFUSALS pass=1 section=576 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=608 bits_a_byte=1.980 deposits=608 halvings=0 elapsed_ms=430501
+TOWER_CLOSURE pass=1 section=608 level=4 ticks=318698 code_bits_a_tick=5.280 flat_bits_a_tick=4.996 level=5 ticks=162132 code_bits_a_tick=4.240 flat_bits_a_tick=4.025
+TOWER_REFUSALS pass=1 section=608 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=640 bits_a_byte=1.966 deposits=640 halvings=0 elapsed_ms=440179
+TOWER_CLOSURE pass=1 section=640 level=4 ticks=316743 code_bits_a_tick=5.272 flat_bits_a_tick=4.989 level=5 ticks=161035 code_bits_a_tick=4.230 flat_bits_a_tick=4.015
+TOWER_REFUSALS pass=1 section=640 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=672 bits_a_byte=1.976 deposits=672 halvings=0 elapsed_ms=449833
+TOWER_CLOSURE pass=1 section=672 level=4 ticks=318235 code_bits_a_tick=5.279 flat_bits_a_tick=4.994 level=5 ticks=161831 code_bits_a_tick=4.238 flat_bits_a_tick=4.022
+TOWER_REFUSALS pass=1 section=672 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=704 bits_a_byte=1.988 deposits=704 halvings=0 elapsed_ms=459504
+TOWER_CLOSURE pass=1 section=704 level=4 ticks=320052 code_bits_a_tick=5.290 flat_bits_a_tick=5.003 level=5 ticks=162757 code_bits_a_tick=4.248 flat_bits_a_tick=4.030
+TOWER_REFUSALS pass=1 section=704 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_SECTION pass=1 section=726 bits_a_byte=1.982 deposits=726 halvings=0 elapsed_ms=466159
+TOWER_CLOSURE pass=1 section=726 level=4 ticks=219417 code_bits_a_tick=5.280 flat_bits_a_tick=4.997 level=5 ticks=111608 code_bits_a_tick=4.242 flat_bits_a_tick=4.024
+TOWER_REFUSALS pass=1 section=726 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_STATE STATE.1 state_bytes=21817388 state_sha256=1a28448320b11268dd851810ecfb61ab175919ed9f7d2d6309af4103a30a3122
+TOWER_PASS pass=1 train_bits_a_byte=2.035 dev_bits_a_byte=2.125 dev_regions gsm8k=2.140 strokes=0.000 cycles=0.000 words=2.112 deposits=726/726 pass_ms=222639 elapsed_ms=468728 train_code=63456375500842 dev_code=2035378007719 grain_bits=20
+TOWER_CARD forwards=3009 forward_ms=319925 reverses=1452 reverse_ms=103953 elapsed_ms=468949
+MEASURE lap=clocked rc=0 wall_s=469.4 peak_rss_kib=1741056

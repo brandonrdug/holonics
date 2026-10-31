@@ -1,0 +1,23 @@
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.103 deposits=32 halvings=37 elapsed_ms=16661
+TOWER_REFUSALS pass=0 section=32 refused=37 arrivals_rose=37 closure_rose=- arrivals_change_bits=2815897.826 closure_change_bits=-
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.830 deposits=64 halvings=38 elapsed_ms=27750
+TOWER_REFUSALS pass=0 section=64 refused=1 arrivals_rose=1 closure_rose=- arrivals_change_bits=585.356 closure_change_bits=-
+TOWER_PASS pass=0 train_bits_a_byte=4.466 dev_bits_a_byte=3.502 dev_regions gsm8k=3.539 strokes=0.000 cycles=0.000 words=3.472 deposits=64/64 pass_ms=30595 elapsed_ms=30605 train_code=12276481772768 dev_code=3354688225066 grain_bits=20
+TOWER_CARD forwards=189 forward_ms=23345 reverses=64 reverse_ms=4909 elapsed_ms=30783
+TOWER_PROFILE entry=tower_credit launches=64 ms=559
+TOWER_PROFILE entry=tower_credit_meet launches=64 ms=32
+TOWER_PROFILE entry=tower_encoding launches=64 ms=346
+TOWER_PROFILE entry=tower_forward launches=189 ms=21458
+TOWER_PROFILE entry=tower_moves launches=64 ms=9
+TOWER_PROFILE entry=tower_outer_reduce launches=3520 ms=132
+TOWER_PROFILE entry=tower_outer_x32 launches=2240 ms=1419
+TOWER_PROFILE entry=tower_outer_x64 launches=1280 ms=436
+TOWER_PROFILE entry=tower_reverse_ahead launches=64 ms=94
+TOWER_PROFILE entry=tower_reverse_contacts launches=384 ms=1199
+TOWER_PROFILE entry=tower_reverse_dx launches=384 ms=459
+TOWER_PROFILE entry=tower_reverse_heading launches=128 ms=113
+TOWER_PROFILE entry=tower_reverse_modes launches=384 ms=480
+TOWER_PROFILE entry=tower_reverse_packet launches=128 ms=67
+TOWER_PROFILE entry=tower_reverse_top launches=64 ms=52
+TOWER_PROFILE entry=tower_transpose launches=189 ms=13
+MEASURE lap=clocked rc=0 wall_s=31.2 peak_rss_kib=1629256

@@ -805,6 +805,13 @@ pub struct TowerCardTimes {
     pub reverse_ns: u128,
 }
 
+/// `tower_credit`'s shared bytes (record §28): the whole section's turns, and the staged chunk's
+/// rows (six words a cell of a warp's mode) and inputs (`CREDIT_CELLS` cells).
+fn credit_shared(words: &LawWords) -> u32 {
+    const CREDIT_CELLS: u32 = 32;
+    32 * words.modes + 48 * CREDIT_CELLS * (THREADS / 32) + 4 * CREDIT_CELLS * words.width
+}
+
 fn slot_index(slot: Slot) -> usize {
     match slot {
         Slot::Opened => 0,
@@ -2474,7 +2481,7 @@ impl PassRealization for TowerCard<'_> {
             // moments' closed form (record §27).
             let mode_threads = words.modes.next_multiple_of(32).min(THREADS);
             self.law_launch("tower_credit_moments", Dim3 { x: words.streams, y: words.credit, z: 1 }, mode_threads, 0, &words, &fw, None).map_err(device)?;
-            self.law_launch("tower_credit", Dim3 { x: words.streams, y: words.credit, z: 1 }, THREADS, 32 * words.modes, &words, &fw, None).map_err(device)?;
+            self.law_launch("tower_credit", Dim3 { x: words.streams, y: words.credit, z: 1 }, THREADS, credit_shared(&words), &words, &fw, None).map_err(device)?;
             self.status()?;
         }
         let ends = self.ends[i].take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;

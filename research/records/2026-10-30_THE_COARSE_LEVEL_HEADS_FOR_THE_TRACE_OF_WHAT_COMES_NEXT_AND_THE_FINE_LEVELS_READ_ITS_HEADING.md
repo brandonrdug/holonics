@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, acceptance 30 passed: per unrefused section the heading's kernels carry its later laps' whole excess, 35.6 of 41.2 ms in the forward (§18); the heading held between its level's ticks, acceptance 31–32 passed and 33 failed as read: the forward fell from 81.1 to 76.7 ms a launch against a bar of 72.2 in a run whose unchanged kernels ran 10–14% slower (§19); the hold read at one card speed, acceptance 34–35 passed: the held forward 11.8% faster than the unheld at one speed, its excess over C′ cut by 55% (§20); the race at equal elapsed time, acceptance 36 failed: at the heading's lap ends C′ read 2.316 and 2.138 at equal time against its 2.344 and 2.146, the heading's laps 1.38 and 1.13 times C′'s, so the next loop is the clocked levels' return across the section's edge (§21); the clocked levels' credit across the section's edge, its law, carrier and acceptance fixed before the build (§22), built on the host and the card with acceptance 37–40 passed: on the heading's saved learners it returns level 5's whole omitted return and level 4's moves to within 0.7%, while the arrival levels' omitted return, as large, stays outside it; acceptance 41 passed: the credited heading reads below C′ at equal elapsed time at every lap end over four laps (2.291, 2.125, 2.044, 2.008 against 2.370, 2.188, 2.074, 2.023), its first lap's refusals 59 against the heading's 573, the lead narrowing as its later laps cost 1.07 to 1.15 times C′'s (§22)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, acceptance 30 passed: per unrefused section the heading's kernels carry its later laps' whole excess, 35.6 of 41.2 ms in the forward (§18); the heading held between its level's ticks, acceptance 31–32 passed and 33 failed as read: the forward fell from 81.1 to 76.7 ms a launch against a bar of 72.2 in a run whose unchanged kernels ran 10–14% slower (§19); the hold read at one card speed, acceptance 34–35 passed: the held forward 11.8% faster than the unheld at one speed, its excess over C′ cut by 55% (§20); the race at equal elapsed time, acceptance 36 failed: at the heading's lap ends C′ read 2.316 and 2.138 at equal time against its 2.344 and 2.146, the heading's laps 1.38 and 1.13 times C′'s, so the next loop is the clocked levels' return across the section's edge (§21); the clocked levels' credit across the section's edge, its law, carrier and acceptance fixed before the build (§22), built on the host and the card with acceptance 37–40 passed: on the heading's saved learners it returns level 5's whole omitted return and level 4's moves to within 0.7%, while the arrival levels' omitted return, as large, stays outside it; acceptance 41 passed: the credited heading reads below C′ at equal elapsed time at every lap end over four laps (2.291, 2.125, 2.044, 2.008 against 2.370, 2.188, 2.074, 2.023), its first lap's refusals 59 against the heading's 573, the lead narrowing as its later laps cost 1.07 to 1.15 times C′'s (§22); the credit's realization made cheaper with the same bits (§23, §25–§28), every level's credit built (§24) and level with the clocked credit at equal elapsed time toward an hour, both ahead of C′ (§27), its steady cost 1.05 times the clocked credit's after §28]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -1616,7 +1616,7 @@ levels' on these learners (§22's oracle), which the credit as fixed here holds 
 
 [agent-inferred, October 31] **Where the time goes** (`TOWER_PROFILE`, C′ and the credited heading
 over the passage's first 64 sections, back to back beside the game; receipts
-`2026-10-31-section-edge-credit/profile-*.log`). The credited heading's 8.3 s over C′'s split:
+`2026-10-31-section-edge-credit/profile-*.txt`). The credited heading's 8.3 s over C′'s split:
 `tower_forward` +5.5 s (16 more launches for its first window's refusals, and 126.2 against
 105.9 ms a launch), `tower_credit` +1.4 s (8.5 ms a launch, at every read), the heading's reverse
 kernels and outer sums +0.4 s, and the host +1.0 s (its credit opening once). Two of these are work
@@ -1784,7 +1784,7 @@ kernel.
 ## 25. The forward keeps two streams a multiprocessor
 
 [agent-inferred, October 31] **Where the every-level credit's time goes** (`TOWER_PROFILE`, the
-clocked and every-level credits over the first 64 sections, 07:09Z; receipts `profile24-*.log`).
+clocked and every-level credits over the first 64 sections, 07:09Z; receipts `profile24-*.txt`).
 Its 4.45 s over the clocked credit's split: `tower_forward` +2.49 s (about 24 ms on each forward that
 advances the credit), `tower_credit` +1.0 s (24.4 against 8.7 ms a launch), the host +0.9 s (its
 credit's opening upload). `ptxas` reads the forward at 255 registers a thread with the credit
@@ -1886,3 +1886,59 @@ Every lap's lines are the earlier runs'. The two credits stay level at equal ela
 to 0.031 on the GSM8K region, its later laps 1.07 to 1.08 times the clocked credit's. Its 7%
 remains the subject before an equal-time lead: `tower_credit` and the moments' kernel at six levels
 against two.
+
+## 28. The credit's sums at the card's integer rate
+
+[agent-inferred, October 31] **The claim, fixed before the build** (execution only): the
+every-level credit's carry costs less on the card with the same bits. Acceptance: the card suite
+passes (its credited parities compare every stream's fetched credit with the host's for 32
+sections); over the every-level route's first 64 sections each run's section lines, read without
+their elapsed time, equal `tower_pass-27a`'s; and section 64 comes sooner, alternated against it.
+
+**Where the time was** (`clock64` read at each phase of three streams' blocks, printed on the
+first three carries; the probes are not committed). A `tower_credit` block ran about 1.5 ms: the
+turns after each cell 0.2M to 0.8M cycles, the rows 0.25M to 0.9M, the sums 2.7M to 3.3M. The
+inputs' largest magnitude was 2^16 to 2^18 at every level. Three rewrites of the sums alone came to
+the same 15.6 to 17 ms a launch, and the probes and the disassembly showed why: the 64-bit sums
+were refused at every block by the gate rows' magnitude, so every block summed in 128 bits; one
+warp a mode passing its rows lane to lane was bound by the shuffles; and rows read from the card's
+memory one cell at a time kept too few loads in flight. Each was reverted.
+
+**What it does now.**
+- `tower_credit` stages 32 cells of a warp's worth of modes at a time, one cell of one mode a
+  thread: each thread reads its cell's turn and coefficients and computes the rows π_t c_t into
+  shared memory beside the chunk's inputs, so the rows are never written back or read again
+  (965 to 802 ms over 64 sections, profiled).
+- Each row is summed in its two signed 32-bit halves, `r = h·2^32 + l' + 2^31`, so
+  `Σ r x = 2^32 Σ h x + Σ l' x + 2^31 Σ x`, each half's sum exact in 64 bits while `T max|x| < 2^32`
+  whatever the rows' magnitude (else 128 bits); the signed wide multiply-add is written as one
+  instruction (`mad.wide.s32`), which the compiler had widened and sign-corrected into five (802 to
+  686 ms). A zero row's halves are `(0, −2^31)`, so the packet gate's rows before its rest are left
+  out of its sum and its inputs' sum alike.
+- `tower_credit_moments` keeps its two sets in registers (no stack), reads a cell's push quotients
+  `ρ p / γ` and gate factors once a cell, and multiplies 64-bit words as such (`mul64`, the high
+  word by `mul.hi.s64`); `div_nearest` divides in 64 bits wherever the rounded magnitude and the
+  divisor fit, which is the same quotient (585 to 474 ms, and the forward 83 ms and the reverse
+  kernels 70 ms sooner over 64 sections, the division being theirs too).
+
+**At the card** (09:42Z and 09:44Z, binary `tower_pass-29` (`e9b4dcb4…`) against
+`tower_pass-27a`, alternated twice, the every-level route's first 64 sections): every run's section
+lines equal; section 64 at 22,079, 20,572, 22,117 and 20,681 ms against 22,616, 22,574, 22,384 and
+21,157, each new run 1.2% to 8.9% sooner than the old run before it (2.3% the median; the card ran
+faster as it warmed, so the pairs are the read). The card suite passed, 46 of 46, and gate 1
+passed. Profiled on the same binary, the two credits' kernels over 64 sections:
+
+| | clocked | every-level |
+|---|---|---|
+| `tower_credit` | 252 ms (384 at §27) | 745 ms (1,049) |
+| `tower_credit_moments` | 116 ms (137) | 507 ms (574) |
+| `tower_credit_meet` | 32 ms | 67 ms |
+| section 32 to 64 | 8,226 ms | 8,643 ms |
+
+From section 32 to 64 the every-level credit now costs 1.05 times the clocked credit's time; its
+other excess is about 1.3 s once a run, building and uploading the rested credit on the host (the
+host's state for 320 streams, 687 MB of words).
+
+The receipts directory's run reads (§22 to §28) had been written as `.log`, which the repository
+ignores, so only its scripts were committed; they are committed with this section as `.txt`, their
+machine paths written `$ROOT`.

@@ -430,9 +430,15 @@ __device__ __forceinline__ wide rel(wide x, unsigned bits) {
     return x >= 0 ? (x + half) >> bits : -((-x + half) >> bits);
 }
 
-// `x / k` to the nearest integer, half away from zero, `k > 0` (`div_nearest`).
+// `x / k` to the nearest integer, half away from zero, `k > 0` (`div_nearest`); in 64 bits when the
+// rounded magnitude and the divisor fit (the same quotient, record §28).
 __device__ __forceinline__ wide div_nearest(wide x, wide k) {
-    return x >= 0 ? (x + k / 2) / k : -((-x + k / 2) / k);
+    const wide n = (x >= 0 ? x : -x) + k / 2;
+    if (n <= (wide)INT64_MAX && k <= (wide)INT64_MAX) {
+        const wide q = (wide)((uint64_t)n / (uint64_t)k);
+        return x >= 0 ? q : -q;
+    }
+    return x >= 0 ? n / k : -(n / k);
 }
 
 __device__ __forceinline__ uint64_t magnitude(int64_t v) {
@@ -883,6 +889,15 @@ __device__ __forceinline__ uint64_t cr_block(const TowerLaw &law, uint32_t s, ui
 __device__ __forceinline__ void cmul(wide ar, wide ai, wide br, wide bi, wide *r, wide *i) {
     *r = rel(ar * br - ai * bi, MOVE_BITS);
     *i = rel(ar * bi + ai * br, MOVE_BITS);
+}
+// The exact product of two 64-bit words (its high word `mul.hi.s64`, record §28).
+__device__ __forceinline__ wide mul64(int64_t a, int64_t b) {
+    return (wide)(((uwide)(uint64_t)__mul64hi(a, b) << 64) | (uwide)((uint64_t)a * (uint64_t)b));
+}
+// `cmul` of 64-bit operands.
+__device__ __forceinline__ void cmul64(int64_t ar, int64_t ai, int64_t br, int64_t bi, wide *r, wide *i) {
+    *r = rel(mul64(ar, br) - mul64(ai, bi), MOVE_BITS);
+    *i = rel(mul64(ar, bi) + mul64(ai, br), MOVE_BITS);
 }
 
 __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t octets) {
@@ -4117,6 +4132,9 @@ extern "C" __global__ void tower_encoding(TowerLaw law, TowerFrame fr) {
 // each moment takes the move's sub-steps (`v`, `K` and the gate's drive reading the state between
 // them; the packet's moments the packet's, rested where the level above ticked), and each cell's
 // turn and coefficients are written for `tower_credit`; the moments' end goes to the advance.
+// The two sets are unrolled so their moments stay in registers, a cell's push quotients `ρ p / γ`
+// and gate factors are read once a cell, not once a sub-step, and the products of 64-bit words
+// (the move, the state, the moments) are taken as such (`mul64`, record §28).
 extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
     const uint32_t s = blockIdx.x, cx = blockIdx.y, B = blockDim.x;
     const uint32_t N = law.modes, W = law.width, T = law.cells, L = law.levels, CL = law.credit;
@@ -4131,10 +4149,17 @@ extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
     __syncthreads();
     for (uint32_t k = threadIdx.x; k < N; k += B) {
         const int64_t *gf = fr.gates + ((uint64_t)l * N + k) * 4;
+        const int64_t g0 = gf[0], g1 = gf[1];
+        const wide g3 = gf[3];
         const wide modulus = gf[2] > 0 ? gf[2] : 1;
-        wide M[2][6];
-        for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
+        int64_t M[2][6] = {{0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0}};
+#pragma unroll
+        for (uint32_t set = 0; set < 2; set++) {
+            if (set == 1 && !with_packet) {
+                continue;
+            }
             const int64_t *blk = fr.cr_open + cr_block(law, s, cx, set) + 2ull * N * W;
+#pragma unroll
             for (uint32_t i = 0; i < 3; i++) {
                 M[set][2 * i] = blk[2ull * i * N + 2 * k];
                 M[set][2 * i + 1] = blk[2ull * i * N + 2 * k + 1];
@@ -4151,18 +4176,28 @@ extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
             wide tr = one, ti = 0, cpr = 0, cpi = 0, cw[2][2] = {{0, 0}, {0, 0}};
             if (ticks > 0) {
                 const int64_t *mv = fr.moves + (q * N + k) * 6;
-                const wide open = mv[0], rho = mv[1], gamma = mv[2], lr = mv[3], li = mv[4];
+                const wide open = mv[0], rho = mv[1], gamma = mv[2];
+                const int64_t lr = mv[3], li = mv[4];
                 const bool held = mv[5] != 0;
                 const wide p_r = fr.push[q * 2 * N + k], p_i = fr.push[q * 2 * N + N + k];
                 const wide pr = rel(gamma * p_r, MOVE_BITS), pi = rel(gamma * p_i, MOVE_BITS);
-                const wide by_modulus = div_nearest((wide)GATE_REACH * open * rho, modulus);
-                wide by_gate = rel(rho * gf[3], MOVE_BITS);
-                by_gate = rel(by_gate * (wide)law.ln2_square, MOVE_BITS);
-                by_gate = rel(by_gate * open, MOVE_BITS);
-                by_gate = (wide)GATE_REACH * rel(by_gate * (one - open), MOVE_BITS);
-                for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
+                wide by_modulus = 0, by_gate = 0, ur = 0, ui = 0;
+                if (!held) {
+                    by_modulus = div_nearest((wide)GATE_REACH * open * rho, modulus);
+                    by_gate = rel(rho * g3, MOVE_BITS);
+                    by_gate = rel(by_gate * (wide)law.ln2_square, MOVE_BITS);
+                    by_gate = rel(by_gate * open, MOVE_BITS);
+                    by_gate = (wide)GATE_REACH * rel(by_gate * (one - open), MOVE_BITS);
+                    ur = div_nearest(rho * p_r, gamma);
+                    ui = div_nearest(rho * p_i, gamma);
+                }
+#pragma unroll
+                for (uint32_t set = 0; set < 2; set++) {
+                    if (set == 1 && !with_packet) {
+                        continue;
+                    }
                     // The state the moments follow before this cell: the modes', or the packet's.
-                    wide sr, si;
+                    int64_t sr, si;
                     if (set == 0) {
                         const int64_t *h0 = t == 0 ? fr.opening + (((uint64_t)s * L + l) * N + k) * 2 : fr.state + (((qc - 1) * L + l) * N + k) * 2;
                         sr = h0[0];
@@ -4179,46 +4214,46 @@ extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
                         sr = a[0];
                         si = a[1];
                     }
-                    wide *A = M[set];
+                    int64_t *A = M[set];
                     for (uint32_t j = 0; j < ticks; j++) {
-                        wide xr, xi;
-                        cmul(lr, li, A[0], A[1], &A[0], &A[1]);
-                        cmul(lr, li, A[2], A[3], &xr, &xi);
-                        wide nr_, ni_;
-                        cmul(lr, li, sr, si, &nr_, &ni_);
+                        wide a0, a1, xr, xi, nr_, ni_, a4, a5;
+                        cmul64(lr, li, A[0], A[1], &a0, &a1);
+                        cmul64(lr, li, A[2], A[3], &xr, &xi);
+                        cmul64(lr, li, sr, si, &nr_, &ni_);
                         A[2] = fit64(xr - ni_, &st);
                         A[3] = fit64(xi + nr_, &st);
-                        cmul(lr, li, A[4], A[5], &A[4], &A[5]);
+                        cmul64(lr, li, A[4], A[5], &a4, &a5);
                         cmul(lr, li, cw[set][0], cw[set][1], &cw[set][0], &cw[set][1]);
                         if (!held) {
-                            const wide vr = rel((wide)gf[0] * sr - (wide)gf[1] * si, MOVE_BITS) - div_nearest(rho * p_r, gamma);
-                            const wide vi = rel((wide)gf[0] * si + (wide)gf[1] * sr, MOVE_BITS) - div_nearest(rho * p_i, gamma);
-                            A[0] = fit64(A[0] + rel(vr * by_modulus, MOVE_BITS), &st);
-                            A[1] = fit64(A[1] + rel(vi * by_modulus, MOVE_BITS), &st);
+                            const wide vr = rel(mul64(g0, sr) - mul64(g1, si), MOVE_BITS) - ur;
+                            const wide vi = rel(mul64(g0, si) + mul64(g1, sr), MOVE_BITS) - ui;
+                            A[0] = fit64(a0 + rel(vr * by_modulus, MOVE_BITS), &st);
+                            A[1] = fit64(a1 + rel(vi * by_modulus, MOVE_BITS), &st);
                             const wide dr = rel(vr * by_gate, MOVE_BITS), di = rel(vi * by_gate, MOVE_BITS);
-                            A[4] = fit64(A[4] + dr, &st);
-                            A[5] = fit64(A[5] + di, &st);
+                            A[4] = fit64(a4 + dr, &st);
+                            A[5] = fit64(a5 + di, &st);
                             cw[set][0] += dr;
                             cw[set][1] += di;
                         } else {
-                            A[0] = fit64(A[0], &st);
-                            A[1] = fit64(A[1], &st);
-                            A[4] = fit64(A[4], &st);
-                            A[5] = fit64(A[5], &st);
+                            A[0] = fit64(a0, &st);
+                            A[1] = fit64(a1, &st);
+                            A[4] = fit64(a4, &st);
+                            A[5] = fit64(a5, &st);
                         }
                         if (set == 0) {
                             cmul(lr, li, cpr, cpi, &cpr, &cpi);
                             cpr += gamma;
                             cmul(tr, ti, lr, li, &tr, &ti);
                         }
-                        const wide sn = fit64(rel(lr * sr - li * si, MOVE_BITS) + pr, &st);
-                        si = fit64(rel(lr * si + li * sr, MOVE_BITS) + pi, &st);
+                        const int64_t sn = fit64(rel(mul64(lr, sr) - mul64(li, si), MOVE_BITS) + pr, &st);
+                        si = fit64(rel(mul64(lr, si) + mul64(li, sr), MOVE_BITS) + pi, &st);
                         sr = sn;
                     }
                 }
             }
             // The packet rests at the level above's tick, and its moments with it.
             if (rests) {
+#pragma unroll
                 for (uint32_t i = 0; i < 6; i++) {
                     M[1][i] = 0;
                 }
@@ -4235,11 +4270,16 @@ extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
                 fr.cr_pgate[qp + 1] = fit64(cw[1][1], &st);
             }
         }
-        for (uint32_t set = 0; set < (with_packet ? 2u : 1u); set++) {
+#pragma unroll
+        for (uint32_t set = 0; set < 2; set++) {
+            if (set == 1 && !with_packet) {
+                continue;
+            }
             int64_t *blk = fr.cr_next + cr_block(law, s, cx, set) + 2ull * N * W;
+#pragma unroll
             for (uint32_t i = 0; i < 3; i++) {
-                blk[2ull * i * N + 2 * k] = (int64_t)M[set][2 * i];
-                blk[2ull * i * N + 2 * k + 1] = (int64_t)M[set][2 * i + 1];
+                blk[2ull * i * N + 2 * k] = M[set][2 * i];
+                blk[2ull * i * N + 2 * k + 1] = M[set][2 * i + 1];
             }
         }
     }
@@ -4249,28 +4289,224 @@ extern "C" __global__ void tower_credit_moments(TowerLaw law, TowerFrame fr) {
     }
 }
 
+// A row's halves against inputs (record §28): `r = h·2^32 + l' + 2^31` with `h = r >> 32` and
+// `l' = (r mod 2^32) − 2^31` both signed 32-bit, so `Σ r x = 2^32 Σ h x + Σ l' x + 2^31 Σ x`; with
+// `T max|x| < 2^32` each half's sum is below 2^63 whatever the rows' magnitude.
+struct Halves {
+    int32_t h, l;
+};
+__device__ __forceinline__ Halves halves(int64_t r) {
+    return {(int32_t)(r >> 32), (int32_t)((uint32_t)r ^ 0x80000000u)};
+}
+// `c + a·b` for signed 32-bit `a`, `b` in one wide multiply-add (the compiler otherwise widens the
+// operands and corrects their signs, five instructions for one).
+__device__ __forceinline__ int64_t mad_wide(int32_t a, int32_t b, int64_t c) {
+    int64_t d;
+    asm("mad.wide.s32 %0, %1, %2, %3;" : "=l"(d) : "r"(a), "r"(b), "l"(c));
+    return d;
+}
+__device__ __forceinline__ void halves_mac(int64_t *acc, Halves r, int32_t x) {
+    acc[0] = mad_wide(r.h, x, acc[0]);
+    acc[1] = mad_wide(r.l, x, acc[1]);
+}
+__device__ __forceinline__ wide halves_sum(const int64_t *acc, int64_t sx) {
+    return (wide)acc[0] * ((wide)1 << 32) + (wide)acc[1] + (wide)sx * ((wide)1 << 31);
+}
+
+// The credit's staged chunk (record §28): `CREDIT_CELLS` cells of one warp's mode each, a
+// warp a mode.
+#define CREDIT_CELLS 32
+
+// The entries' sums in the rows' halves, staged: the block takes its modes a warp's worth at a
+// time (one mode a warp) and the cells `CREDIT_CELLS` at a time; every thread stages one cell of
+// one mode, reading its turn and coefficients and computing its rows π_t c_t (the push's, the
+// gate's, the packet gate's) into shared memory, with the chunk's inputs beside them; then each
+// lane sums its two entries `j`, `j + 1` against the staged rows. The cells before the packet's
+// rest sum the push's rows apart from those after it, and the packet gate's rows only from it.
+// Each entry's output is M_T = whole·M_0 + release(Σ), as `tower_credit` states.
+__device__ void credit_halves(const TowerLaw &law, const TowerFrame &fr, uint32_t s, uint32_t cx, bool with_packet, uint32_t NP, uint32_t px, uint32_t rest, const wide *whole, int64_t *rows, int32_t *xc, uint32_t *st) {
+    const uint32_t N = law.modes, W = law.width, T = law.cells, CL = law.credit;
+    const uint32_t tid = threadIdx.x, B = blockDim.x, G = B >> 5, lane = tid & 31, warp = tid >> 5;
+    const uint32_t pairs = (W + 1) / 2, sets = with_packet ? 2 : 1;
+    for (uint32_t k0 = 0; k0 < N; k0 += G) {
+        for (uint32_t jp0 = 0; jp0 < pairs; jp0 += 32) {
+            const uint32_t k = k0 + warp, j = 2 * (jp0 + lane);
+            const bool mine = k < N && j < W, second = j + 1 < W;
+            // [entry][re, im][high, low]: the push's before the rest and after it, the gate's, the
+            // packet gate's; each entry's inputs' sums before and after the rest.
+            int64_t before[2][2][2] = {}, after[2][2][2] = {}, gate[2][2][2] = {}, pg[2][2][2] = {};
+            int64_t sb[2] = {0, 0}, sa[2] = {0, 0};
+            for (uint32_t c = 0; c < T; c += CREDIT_CELLS) {
+                __syncthreads();
+                // Stage: one cell of one mode a thread, consecutive threads consecutive modes.
+                for (uint32_t i = tid; i < CREDIT_CELLS * G; i += B) {
+                    const uint32_t tt = i / G, kk = i % G, t = c + tt, m = k0 + kk;
+                    int64_t *r = rows + (uint64_t)i * 6;
+                    if (t < T && m < N) {
+                        const uint64_t qk = ((((uint64_t)s * T + t) * CL + cx) * N + m) * 2;
+                        const wide ar = fr.cr_turn[qk], ai = fr.cr_turn[qk + 1];
+                        wide re, im;
+                        cmul(ar, ai, fr.cr_push[qk], fr.cr_push[qk + 1], &re, &im);
+                        r[0] = fit64(re, st);
+                        r[1] = fit64(im, st);
+                        cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &re, &im);
+                        r[2] = fit64(re, st);
+                        r[3] = fit64(im, st);
+                        r[4] = 0;
+                        r[5] = 0;
+                        if (with_packet) {
+                            const uint64_t qp = ((((uint64_t)s * T + t) * NP + px) * N + m) * 2;
+                            cmul(ar, ai, fr.cr_pgate[qp], fr.cr_pgate[qp + 1], &re, &im);
+                            r[4] = fit64(re, st);
+                            r[5] = fit64(im, st);
+                        }
+                    } else {
+                        for (uint32_t f = 0; f < 6; f++) {
+                            r[f] = 0;
+                        }
+                    }
+                }
+                for (uint32_t i = tid; i < CREDIT_CELLS * W; i += B) {
+                    const uint32_t tt = i / W, jj = i % W, t = c + tt;
+                    xc[i] = t < T ? fr.cr_x[(((uint64_t)s * T + t) * CL + cx) * W + jj] : 0;
+                }
+                __syncthreads();
+                if (!mine) {
+                    continue;
+                }
+                const uint32_t span = min((uint32_t)CREDIT_CELLS, T - c);
+                for (uint32_t u = 0; u < span; u++) {
+                    const uint32_t t = c + u;
+                    const int64_t *r = rows + ((uint64_t)u * G + warp) * 6;
+                    const int32_t x0 = xc[u * W + j], x1 = second ? xc[u * W + j + 1] : 0;
+                    const Halves pr = halves(r[0]), pi = halves(r[1]), gr = halves(r[2]), gi = halves(r[3]);
+                    halves_mac(gate[0][0], gr, x0);
+                    halves_mac(gate[0][1], gi, x0);
+                    halves_mac(gate[1][0], gr, x1);
+                    halves_mac(gate[1][1], gi, x1);
+                    if (t < rest) {
+                        sb[0] += x0;
+                        sb[1] += x1;
+                        halves_mac(before[0][0], pr, x0);
+                        halves_mac(before[0][1], pi, x0);
+                        halves_mac(before[1][0], pr, x1);
+                        halves_mac(before[1][1], pi, x1);
+                    } else {
+                        sa[0] += x0;
+                        sa[1] += x1;
+                        halves_mac(after[0][0], pr, x0);
+                        halves_mac(after[0][1], pi, x0);
+                        halves_mac(after[1][0], pr, x1);
+                        halves_mac(after[1][1], pi, x1);
+                        if (with_packet) {
+                            const Halves qr = halves(r[4]), qi = halves(r[5]);
+                            halves_mac(pg[0][0], qr, x0);
+                            halves_mac(pg[0][1], qi, x0);
+                            halves_mac(pg[1][0], qr, x1);
+                            halves_mac(pg[1][1], qi, x1);
+                        }
+                    }
+                }
+            }
+            if (!mine) {
+                continue;
+            }
+#pragma unroll
+            for (uint32_t e = 0; e < 2; e++) {
+                if (e == 1 && !second) {
+                    continue;
+                }
+                for (uint32_t set = 0; set < sets; set++) {
+                    const uint32_t t0 = set == 1 ? rest : 0;
+                    for (uint32_t fam = 0; fam < 2; fam++) {
+                        wide sr, si;
+                        if (fam == 0) {
+                            sr = halves_sum(after[e][0], sa[e]);
+                            si = halves_sum(after[e][1], sa[e]);
+                            if (set == 0) {
+                                sr += halves_sum(before[e][0], sb[e]);
+                                si += halves_sum(before[e][1], sb[e]);
+                            }
+                        } else if (set == 0) {
+                            sr = halves_sum(gate[e][0], sb[e] + sa[e]);
+                            si = halves_sum(gate[e][1], sb[e] + sa[e]);
+                        } else {
+                            sr = halves_sum(pg[e][0], sa[e]);
+                            si = halves_sum(pg[e][1], sa[e]);
+                        }
+                        const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
+                        const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j + e) * 2;
+                        const int64_t *m0 = fr.cr_open + cr_block(law, s, cx, set) + place;
+                        int64_t *m1 = fr.cr_next + cr_block(law, s, cx, set) + place;
+                        wide er = 0, ei = 0;
+                        if (t0 == 0) {
+                            cmul(whole[2 * k], whole[2 * k + 1], m0[0], m0[1], &er, &ei);
+                        }
+                        m1[0] = fit64(er + rel(sr, shift), st);
+                        m1[1] = fit64(ei + rel(si, shift), st);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// The entries' sums in 128 bits (inputs too large for the halves): one output a thread.
+__device__ void credit_wide(const TowerLaw &law, const TowerFrame &fr, uint32_t s, uint32_t cx, bool with_packet, uint32_t NP, uint32_t px, uint32_t rest, const int32_t *xs, uint64_t xstep, const wide *whole, uint32_t *st) {
+    const uint32_t N = law.modes, W = law.width, T = law.cells, CL = law.credit;
+    const uint32_t sets = with_packet ? 2 : 1;
+    const uint64_t outputs = (uint64_t)sets * 2 * N * W;
+    for (uint64_t o = threadIdx.x; o < outputs; o += blockDim.x) {
+        const uint32_t set = (uint32_t)(o / (2ull * N * W));
+        const uint32_t fam = (uint32_t)((o / ((uint64_t)N * W)) % 2);
+        const uint32_t k = (uint32_t)((o / W) % N), j = (uint32_t)(o % W);
+        const uint32_t t0 = set == 1 ? rest : 0;
+        const bool packet_rows = fam == 1 && set == 1;
+        const int64_t *rows = fam == 0 ? fr.cr_push : (set == 0 ? fr.cr_gate : fr.cr_pgate);
+        wide sr = 0, si = 0;
+        for (uint32_t t = t0; t < T; t++) {
+            const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
+            const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
+            const wide x = xs[t * xstep + j];
+            sr += (wide)rows[(qr * N + k) * 2] * x;
+            si += (wide)rows[(qr * N + k) * 2 + 1] * x;
+        }
+        const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
+        const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j) * 2;
+        const int64_t *m0 = fr.cr_open + cr_block(law, s, cx, set) + place;
+        int64_t *m1 = fr.cr_next + cr_block(law, s, cx, set) + place;
+        wide er = 0, ei = 0;
+        if (t0 == 0) {
+            cmul(whole[2 * k], whole[2 * k + 1], m0[0], m0[1], &er, &ei);
+        }
+        m1[0] = fit64(er + rel(sr, shift), st);
+        m1[1] = fit64(ei + rel(si, shift), st);
+    }
+}
+
 // The credit's material moments moved through the read's cells in closed form
 // (`Tower::advance_moments`): one block a stream (`blockIdx.x`) and credited level (`blockIdx.y`).
-// Each mode's thread turns its cells' turns into the turn after each cell, π_s, and the whole
-// section's, and its coefficients into their rows π_s c_s; then each output P_kj (and W_kj, and the
-// packet's) is M_T = whole·M_0 + release(Σ_s row_s x_s), the packet's sums from after its last rest
-// and its opening moments kept only when it never rested.
-extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLaw law, TowerFrame fr) {
+// Each mode's thread turns its cells' turns into the turn after each cell, π_s, kept in place of
+// the cell's turn, and the whole section's; then each output P_kj (and W_kj, and the packet's) is
+// M_T = whole·M_0 + release(Σ_s π_s c_s x_s) (`credit_halves`, its rows staged as they are
+// computed, or `credit_wide`), the packet's sums from after its last rest and its opening moments
+// kept only when it never rested.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_credit(TowerLaw law, TowerFrame fr) {
     const uint32_t s = blockIdx.x, cx = blockIdx.y, tid = threadIdx.x, B = blockDim.x;
     const uint32_t N = law.modes, W = law.width, T = law.cells, CL = law.credit;
     const uint32_t l = law.credit_from + cx;
     const bool with_packet = cr_packet(law, l);
     const uint32_t NP = cr_packet_index(law, law.levels), px = cr_packet_index(law, l);
     const wide one = (wide)1 << MOVE_BITS;
+    // [N][2] whole turns, then the staged chunk's rows [CREDIT_CELLS][B/32][6] and inputs
+    // [CREDIT_CELLS][W] (`credit_shared`).
     extern __shared__ __align__(16) unsigned char smem[];
-    wide *whole = (wide *)smem; // [N][2]
+    wide *whole = (wide *)smem;
+    int64_t *rows = (int64_t *)(smem + 32ull * N);
+    int32_t *xc = (int32_t *)(smem + 32ull * N + 48ull * CREDIT_CELLS * (B >> 5));
     __shared__ uint32_t st, from;
-    // The rows' and inputs' largest magnitudes (record §26): a family whose sums are bounded below
-    // 2^63 sums in 64 bits, any other in 128 (either is the integer sum).
-    __shared__ unsigned long long row_max[3], x_max;
-    if (tid < 3) {
-        row_max[tid] = 0;
-    }
+    // The inputs' largest magnitude: below 2^32 / T the sums run in the rows' halves.
+    __shared__ unsigned long long x_max;
     if (tid == 0) {
         x_max = 0;
         st = 0;
@@ -4285,38 +4521,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
         }
     }
     __syncthreads();
-    uint64_t mp = 0, mg = 0, mq = 0;
-    for (uint32_t k = tid; k < N; k += B) {
-        wide ar = one, ai = 0;
-        for (uint32_t step = 0; step < T; step++) {
-            const uint32_t t = T - 1 - step;
-            const uint64_t qk = ((((uint64_t)s * T + t) * CL + cx) * N + k) * 2;
-            const wide tr = fr.cr_turn[qk], ti = fr.cr_turn[qk + 1];
-            // The cell's rows π_t c_t, π_t the turn after it.
-            wide r, i;
-            cmul(ar, ai, fr.cr_push[qk], fr.cr_push[qk + 1], &r, &i);
-            fr.cr_push[qk] = fit64(r, &st);
-            fr.cr_push[qk + 1] = fit64(i, &st);
-            mp = max(mp, max(magnitude(fr.cr_push[qk]), magnitude(fr.cr_push[qk + 1])));
-            cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &r, &i);
-            fr.cr_gate[qk] = fit64(r, &st);
-            fr.cr_gate[qk + 1] = fit64(i, &st);
-            mg = max(mg, max(magnitude(fr.cr_gate[qk]), magnitude(fr.cr_gate[qk + 1])));
-            if (with_packet) {
-                const uint64_t qp = ((((uint64_t)s * T + t) * NP + px) * N + k) * 2;
-                cmul(ar, ai, fr.cr_pgate[qp], fr.cr_pgate[qp + 1], &r, &i);
-                fr.cr_pgate[qp] = fit64(r, &st);
-                fr.cr_pgate[qp + 1] = fit64(i, &st);
-                mq = max(mq, max(magnitude(fr.cr_pgate[qp]), magnitude(fr.cr_pgate[qp + 1])));
-            }
-            cmul(ar, ai, tr, ti, &ar, &ai);
-        }
-        whole[2 * k] = ar;
-        whole[2 * k + 1] = ai;
-    }
-    atomicMax(&row_max[0], (unsigned long long)mp);
-    atomicMax(&row_max[1], (unsigned long long)mg);
-    atomicMax(&row_max[2], (unsigned long long)mq);
     {
         uint64_t mx = 0;
         for (uint32_t i = tid; i < T * W; i += B) {
@@ -4325,51 +4529,45 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_credit(TowerLa
         }
         atomicMax(&x_max, (unsigned long long)mx);
     }
+    // The turn after each cell, in place of the cell's own.
+    for (uint32_t k = tid; k < N; k += B) {
+        wide ar = one, ai = 0;
+        for (uint32_t step = 0; step < T; step++) {
+            const uint32_t t = T - 1 - step;
+            int64_t *turn = fr.cr_turn + ((((uint64_t)s * T + t) * CL + cx) * N + k) * 2;
+            const wide tr = turn[0], ti = turn[1];
+            turn[0] = fit64(ar, &st);
+            turn[1] = fit64(ai, &st);
+            cmul(ar, ai, tr, ti, &ar, &ai);
+        }
+        whole[2 * k] = ar;
+        whole[2 * k + 1] = ai;
+    }
     __syncthreads();
-    // Each output: (set, family, k, j); a family's rows are the push's (both sets) or the gate's
-    // (its own set's).
-    const uint32_t sets = with_packet ? 2 : 1;
-    const uint64_t outputs = (uint64_t)sets * 2 * N * W;
-    for (uint64_t o = tid; o < outputs; o += B) {
-        const uint32_t set = (uint32_t)(o / (2ull * N * W));
-        const uint32_t fam = (uint32_t)((o / ((uint64_t)N * W)) % 2);
-        const uint32_t k = (uint32_t)((o / W) % N), j = (uint32_t)(o % W);
-        const uint32_t t0 = set == 1 ? from : 0;
-        const bool packet_rows = fam == 1 && set == 1;
-        const int64_t *rows = fam == 0 ? fr.cr_push : (set == 0 ? fr.cr_gate : fr.cr_pgate);
-        // The sum's bound, T max|row| max|x|: below 2^63 it runs in 64 bits.
-        const uwide bound = (uwide)row_max[fam == 0 ? 0 : (set == 0 ? 1 : 2)] * (uwide)x_max * (uwide)(T - t0);
-        wide sr = 0, si = 0;
-        if (bound < ((uwide)1 << 63)) {
-            int64_t r64 = 0, i64 = 0;
-            for (uint32_t t = t0; t < T; t++) {
-                const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
-                const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
-                const int64_t x = fr.cr_x[qc * W + j];
-                r64 += rows[(qr * N + k) * 2] * x;
-                i64 += rows[(qr * N + k) * 2 + 1] * x;
-            }
-            sr = r64;
-            si = i64;
-        } else {
-            for (uint32_t t = t0; t < T; t++) {
-                const uint64_t qc = ((uint64_t)s * T + t) * CL + cx;
-                const uint64_t qr = packet_rows ? ((uint64_t)s * T + t) * NP + px : qc;
-                const wide x = fr.cr_x[qc * W + j];
-                sr += (wide)rows[(qr * N + k) * 2] * x;
-                si += (wide)rows[(qr * N + k) * 2 + 1] * x;
+    if ((uwide)x_max * (uwide)T < ((uwide)1 << 32)) {
+        credit_halves(law, fr, s, cx, with_packet, NP, px, from, whole, rows, xc, &st);
+    } else {
+        // The cells' rows π_t c_t in place of the coefficients, then the sums in 128 bits.
+        for (uint32_t i = tid; i < T * N; i += B) {
+            const uint32_t t = i / N, k = i % N;
+            const uint64_t qk = ((((uint64_t)s * T + t) * CL + cx) * N + k) * 2;
+            const wide ar = fr.cr_turn[qk], ai = fr.cr_turn[qk + 1];
+            wide r, im;
+            cmul(ar, ai, fr.cr_push[qk], fr.cr_push[qk + 1], &r, &im);
+            fr.cr_push[qk] = fit64(r, &st);
+            fr.cr_push[qk + 1] = fit64(im, &st);
+            cmul(ar, ai, fr.cr_gate[qk], fr.cr_gate[qk + 1], &r, &im);
+            fr.cr_gate[qk] = fit64(r, &st);
+            fr.cr_gate[qk + 1] = fit64(im, &st);
+            if (with_packet) {
+                const uint64_t qp = ((((uint64_t)s * T + t) * NP + px) * N + k) * 2;
+                cmul(ar, ai, fr.cr_pgate[qp], fr.cr_pgate[qp + 1], &r, &im);
+                fr.cr_pgate[qp] = fit64(r, &st);
+                fr.cr_pgate[qp + 1] = fit64(im, &st);
             }
         }
-        const unsigned shift = fam == 0 ? MOVE_BITS + FACE_BITS - STATE_BITS : FACE_BITS;
-        const uint64_t place = (fam == 0 ? 0 : 2ull * N * W + 6ull * N) + ((uint64_t)k * W + j) * 2;
-        const int64_t *m0 = fr.cr_open + cr_block(law, s, cx, set) + place;
-        int64_t *m1 = fr.cr_next + cr_block(law, s, cx, set) + place;
-        wide er = 0, ei = 0;
-        if (t0 == 0) {
-            cmul(whole[2 * k], whole[2 * k + 1], m0[0], m0[1], &er, &ei);
-        }
-        m1[0] = fit64(er + rel(sr, shift), &st);
-        m1[1] = fit64(ei + rel(si, shift), &st);
+        __syncthreads();
+        credit_wide(law, fr, s, cx, with_packet, NP, px, from, fr.cr_x + ((uint64_t)s * T * CL + cx) * W, (uint64_t)CL * W, whole, &st);
     }
     __syncthreads();
     if (tid == 0 && st != 0) {
