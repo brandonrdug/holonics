@@ -33,8 +33,10 @@
 //   threads own the outputs of each read (the pushes and gates, the modes, the reads, the contacts,
 //   the return, the readout), the stages ordered by barriers. The modes' states stay in shared
 //   memory across the cells. Its `read` is 1 for the opening read, whose cell temporaries are
-//   written for the reverse (`keep`), 0 for a reread, and 2 for a reread whose clocked levels tick
-//   where the opening read ticked (`Slot::OpeningTicks`), reading the opening's ticks.
+//   written for the reverse (`keep`), 0 for a reread, 2 for a reread whose clocked levels tick
+//   where the opening read ticked (`Slot::OpeningTicks`), reading the opening's ticks, and 3 for a
+//   reread that writes each cell's face logits (`zout`), which the meeting form reads
+//   (`PassRealization::logits`).
 // - `tower_reverse_top`, `tower_reverse_ahead`, `tower_reverse_contacts`, `tower_reverse_dx`: one
 //   block a cell of a stream (cells are independent there: each reads its own forward temporaries
 //   and covector).
@@ -381,6 +383,9 @@ struct TowerFrame {
     int64_t *ah_face;
     int64_t *ah_dread, *ah_top;
     uint64_t *r_ah_read, *r_ah_face_re, *r_ah_face_im, *r_ah_dread, *r_ah_top;
+    // Each cell's face logits z ([S][T][A], on 2^(−16) bits, before their largest is taken),
+    // written only by a logits read (`tower_forward`'s read 3, the meeting form's read).
+    int64_t *zout;
 };
 
 // -------------------------------------------------------------------------------------------
@@ -817,7 +822,7 @@ __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t oct
 }
 
 extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerLaw law, TowerFrame fr, uint32_t read) {
-    const uint32_t keep = read == 1, opening_ticks = read == 2;
+    const uint32_t keep = read == 1, opening_ticks = read == 2, logits = read == 3;
     const uint32_t s = blockIdx.x, tid = threadIdx.x, B = blockDim.x;
     const uint32_t A = law.alphabet, W = law.width, N = law.modes, F = law.contacts, L = law.levels,
                    T = law.cells;
@@ -2129,6 +2134,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         const int64_t zmax = block_max_signed(zm, red);
         uwide total = 0;
         for (uint32_t c = tid; c < A; c += B) {
+            if (logits) {
+                fr.zout[qc * A + c] = z[c];
+            }
             ms[c] = below_one((wide)z[c] - (wide)zmax, face_roots, law.face_digits);
             total += ms[c];
         }

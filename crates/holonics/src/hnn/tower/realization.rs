@@ -116,6 +116,16 @@ pub trait PassRealization {
     /// output, so a law the realization does not carry is refused at the run's start, never at its
     /// first section.
     fn admit(&self, tower: &Tower) -> Result<()>;
+
+    /// [agent-inferred, October 30] Every compared cell's face logits (the alphabet's entries on
+    /// `2^(−16)` bits, before their largest is taken), stream by stream in the faces' order, read
+    /// forward from the opening as a reread reads it. The read keeps nothing: neither slot's read
+    /// nor any stream's state changes (the meeting form's read, `meeting`'s module header). A
+    /// realization that does not read the logits refuses.
+    fn logits(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<Vec<i64>> {
+        let _ = (tower, opening, classes, targets);
+        Err(TowerError::Realization(format!("{} does not read the faces' logits", self.realization())))
+    }
 }
 
 /// One stream's forward as the host keeps it between calls: its continuing state, its face after
@@ -319,6 +329,25 @@ impl PassRealization for HostPass {
     }
 
     /// The host realizes every law the tower states.
+    fn logits(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<Vec<i64>> {
+        if opening.len() != classes.len() || targets.len() != classes.len() {
+            return Err(TowerError::Refused("a logits read reads one opening state and one comparison a stream"));
+        }
+        tower.admit_read(classes, targets)?;
+        let reaches = tower.reaches();
+        let streams: Vec<Vec<i64>> = opening
+            .par_iter()
+            .zip(classes.par_iter())
+            .zip(targets.par_iter())
+            .map(|((open, c), t)| {
+                let mut end = open.clone();
+                let cells = tower.forward(&mut end, c, &reaches)?;
+                Ok(cells.iter().zip(t).filter(|(_, t)| t.is_some()).flat_map(|(cell, _)| cell.z.iter().copied()).collect())
+            })
+            .collect::<Result<_>>()?;
+        Ok(streams.concat())
+    }
+
     fn admit(&self, _tower: &Tower) -> Result<()> {
         Ok(())
     }

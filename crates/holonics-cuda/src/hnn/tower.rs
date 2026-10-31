@@ -403,6 +403,7 @@ struct FrameWords {
     r_ah_face_im: u64,
     r_ah_dread: u64,
     r_ah_top: u64,
+    zout: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -686,6 +687,9 @@ struct Frame<'c> {
     ah_face: CardBuffer<'c, i64>,
     ah_dread: CardBuffer<'c, i64>,
     ah_top: CardBuffer<'c, i64>,
+    /// Each cell's face logits `z` (`[S][T][A]`, on `2^(−16)` bits, before their largest is
+    /// taken), written only by a logits read (`tower_forward`'s read 3).
+    zout: CardBuffer<'c, i64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
@@ -1177,6 +1181,7 @@ impl<'c> TowerCard<'c> {
             ah_face: card.alloc(q * hd * 2 * n)?,
             ah_dread: card.alloc(q * hd * w)?,
             ah_top: card.alloc(q * w * hdd)?,
+            zout: card.alloc(q * a)?,
             reach_offsets,
         });
         Ok(())
@@ -1355,6 +1360,7 @@ impl<'c> TowerCard<'c> {
             r_ah_face_im: r(33),
             r_ah_dread: r(34),
             r_ah_top: r(35),
+            zout: frame.zout.device_ptr(),
         }
     }
 
@@ -1463,7 +1469,7 @@ impl<'c> TowerCard<'c> {
     }
 
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
-    fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
+    fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Option<Slot>) -> Result<PassRead> {
         let law = tower.resident_law()?;
         Self::admits(&law)?;
         tower.admit_read(classes, targets)?;
@@ -1564,17 +1570,18 @@ impl<'c> TowerCard<'c> {
         }
         let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair), heading: hd };
         self.frame(shape).map_err(device)?;
-        if slot == Slot::OpeningTicks && (law.news.is_none() || !self.ticks_kept) {
+        if slot == Some(Slot::OpeningTicks) && (law.news.is_none() || !self.ticks_kept) {
             return Err(TowerError::Refused("a reread on the opening's ticks reads a news clock's opening read, its frame still resident"));
         }
         let (mut words, levels) = Self::law_words(&law, streams, cells);
-        let keep = slot == Slot::Opened;
-        // The forward's read: the opening (its temporaries kept), a reread, or a reread on the
-        // opening's ticks.
+        let keep = slot == Some(Slot::Opened);
+        // The forward's read: the opening (its temporaries kept), a reread, a reread on the
+        // opening's ticks, or a logits read (a reread whose faces' logits are written, no slot).
         let read = match slot {
-            Slot::Opened => 1u32,
-            Slot::Reread => 0,
-            Slot::OpeningTicks => 2,
+            Some(Slot::Opened) => 1u32,
+            Some(Slot::Reread) => 0,
+            Some(Slot::OpeningTicks) => 2,
+            None => 3,
         };
         {
             let frame = self.frame.as_ref().expect("the frame was just sized");
@@ -1851,7 +1858,9 @@ impl<'c> TowerCard<'c> {
                 })
                 .collect(),
         };
-        self.ends[slot_index(slot)] = Some(ends);
+        if let Some(slot) = slot {
+            self.ends[slot_index(slot)] = Some(ends);
+        }
         if keep {
             self.opened = Some((words, levels));
             self.opened_current = true;
@@ -2163,10 +2172,23 @@ impl PassRealization for TowerCard<'_> {
     fn forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let started = Instant::now();
         // Only a completed read is counted, so the timing reports passes the card carried.
-        let read = self.read_forward(tower, opening, classes, targets, slot)?;
+        let read = self.read_forward(tower, opening, classes, targets, Some(slot))?;
         self.times.forwards += 1;
         self.times.forward_ns += started.elapsed().as_nanos();
         Ok(read)
+    }
+
+    fn logits(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>]) -> Result<Vec<i64>> {
+        let started = Instant::now();
+        self.read_forward(tower, opening, classes, targets, None)?;
+        let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
+        let (cells, a) = (frame.shape.cells, frame.shape.alphabet);
+        let z = self.card.fetch(&frame.zout).map_err(device)?;
+        // The compared cells' rows, stream by stream in the faces' order.
+        let logits = targets.iter().enumerate().flat_map(|(s, t)| t.iter().enumerate().filter(|(_, t)| t.is_some()).flat_map(move |(i, _)| (s * cells + i) * a..(s * cells + i + 1) * a)).map(|at| z[at]).collect();
+        self.times.forwards += 1;
+        self.times.forward_ns += started.elapsed().as_nanos();
+        Ok(logits)
     }
 
     fn reverse(&mut self, _tower: &Tower, _opening: &[TowerState], _classes: &[&[usize]], _compared: Option<&[&[Option<usize>]]>) -> Result<Vec<i128>> {

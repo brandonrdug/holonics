@@ -59,6 +59,8 @@ struct Faces {
     /// The learners' declared reading of each refused step on the opening's ticks
     /// (`TowerLearner::refusal_ticks`).
     refusal_ticks: bool,
+    /// The learners' meeting form's law (`TowerLearner::meeting`).
+    meeting: bool,
 }
 
 /// The ring face a fixture joins: the level and mode it rides and the harmonics its readout reads.
@@ -121,6 +123,7 @@ fn learners(alphabet: usize, faces: Faces) -> (TowerLearner, TowerLearner) {
         open_heading(&mut learner);
     }
     learner.refusal_ticks = faces.refusal_ticks;
+    learner.meeting = faces.meeting;
     (learner.clone(), learner)
 }
 
@@ -389,7 +392,8 @@ fn join_pair(learner: &mut TowerLearner, forms: usize) {
 
 /// Host against card in lockstep: the opening read and its covector on the same material, then
 /// both learners take the section; `compared` holds every other place out of the comparison.
-fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, faces: Faces) {
+/// Returns the meeting form's trials the sections read.
+fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, faces: Faces) -> usize {
     let card = Card::open(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let (mut host, mut carded) = learners(alphabet, faces);
@@ -397,7 +401,7 @@ fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, ho
     let chunk = classes.len() / streams;
     let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
     let mut states_c = states_h.clone();
-    let mut deposits = 0;
+    let (mut deposits, mut trials) = (0, 0);
     for k in 0..sections {
         let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect();
         let masks: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p.iter().enumerate().map(|(i, &c)| (!holding || i % 2 == 0).then_some(c)).collect()).collect();
@@ -417,8 +421,10 @@ fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, ho
         assert_eq!(states_h, states_c, "section {k}: the continuing states");
         assert_eq!(host.to_text(), carded.to_text(), "section {k}: the learner");
         deposits += usize::from(receipt_h.deposited);
+        trials += receipt_h.meeting.len();
     }
     assert!(deposits > 0, "the passage deposits");
+    trials
 }
 
 #[test]
@@ -629,6 +635,46 @@ fn the_cards_reread_on_the_opening_ticks_is_the_hosts() {
         realized.carry(&candidate, &mut ends_c, &opening, Slot::OpeningTicks).expect("card carry");
         assert_eq!(ends_h, ends_c, "the ends on the opening's ticks");
         lockstep(11, 3, 9, 32, false, Faces { refusal_ticks: true, ..faces });
+    }
+}
+
+/// [agent-inferred, October 30] **The meeting form's read on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…` §17, acceptance 28): on
+/// three levels clocked from level 2 and at the race's declaration (six levels clocked from level
+/// 4), each with the passage, the packets and the heading, every compared cell's face logits read
+/// on the card are the host's, before and after an opening read, an uncompared place held; the
+/// logits read keeps no slot, so the opening read's carry is unchanged; and under the law 32
+/// sections are the host's, receipt for receipt, with trials among them.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_cards_meeting_read_is_the_hosts() {
+    let card = Card::open(0).expect("the card");
+    let clocked = [
+        Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() },
+        Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() },
+    ];
+    for faces in clocked {
+        let mut realized = TowerCard::open(&card).expect("the tower's image");
+        let (host, _) = learners(11, faces);
+        let (streams, section) = (3, 9);
+        let classes = passage(11, streams * (section + 1));
+        let chunk = classes.len() / streams;
+        let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk..s * chunk + section + 1]).collect();
+        let targets: Vec<Vec<Option<usize>>> = parts.iter().map(|p| p[1..].iter().enumerate().map(|(i, &c)| (i % 2 == 0).then_some(c)).collect()).collect();
+        let compared = targets.iter().flatten().flatten().count();
+        let opening: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
+        let mut reference = HostPass::default();
+        let before = reference.logits(&host.tower, &opening, &parts, &targets).expect("host logits");
+        assert_eq!(before.len(), compared * 11);
+        assert_eq!(realized.logits(&host.tower, &opening, &parts, &targets).expect("card logits"), before, "the logits before an opening read");
+        reference.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("host opening");
+        realized.forward(&host.tower, &opening, &parts, &targets, Slot::Opened).expect("card opening");
+        assert_eq!(realized.logits(&host.tower, &opening, &parts, &targets).expect("card logits"), before, "the logits after an opening read");
+        let (mut ends_h, mut ends_c) = (opening.clone(), opening.clone());
+        reference.carry(&host.tower, &mut ends_h, &opening, Slot::Opened).expect("host carry");
+        realized.carry(&host.tower, &mut ends_c, &opening, Slot::Opened).expect("card carry");
+        assert_eq!(ends_h, ends_c, "the opening read's ends beside a logits read");
+        assert!(lockstep(11, 3, 9, 32, false, Faces { meeting: true, ..faces }) > 0, "the law read no trial");
     }
 }
 
