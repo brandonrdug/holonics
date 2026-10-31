@@ -224,7 +224,6 @@ use rayon::prelude::*;
 pub mod body;
 pub mod duplex;
 pub mod growth;
-pub mod meeting;
 pub mod overture;
 pub mod participation;
 pub mod reading;
@@ -2642,9 +2641,6 @@ struct Cell {
     top_hat: Option<(Vec<i32>, i128)>,
     /// Under a mutual contact, the produced face through it, `y = J x` on `2^(−16)`.
     contact: Option<Vec<i64>>,
-    /// The face's base-2 logits on `2^(−16)` bits, before their largest is taken
-    /// ([`realization::PassRealization::logits`]).
-    z: Vec<i64>,
     face: TowerFace,
 }
 
@@ -3576,7 +3572,7 @@ impl Tower {
         if self.news.is_some() {
             state.open = Some(TowerFace { masses: masses.clone(), total });
         }
-        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, z, face: TowerFace { masses, total } })
+        Ok(Cell { levels, top: x, pair: pair.map(|c| c.to_vec()), ring: ring_face, ring_scale, ring_read, ring_after, ring_pair, top_hat, contact, face: TowerFace { masses, total } })
     }
 
     /// [agent-inferred, October 30] **A closed packet's read** ([`Tower::join_packets`]): the packet
@@ -5930,11 +5926,6 @@ pub struct TowerLearner {
     /// whole, its clocked levels ticking where the section's opening read ticked
     /// ([`Slot::OpeningTicks`], [`SectionReceipt::refused_on_ticks`]).
     pub refusal_ticks: bool,
-    /// [agent-inferred, October 30] The meeting form's law (the record's §17), a run's declared
-    /// law: at a section's first refused step each part's scale is chosen from the parts' meeting
-    /// form through the receiving face's metric ([`meeting`]), and a refused form step shrinks the
-    /// region without a new read. A section with no refused step steps as before.
-    pub meeting: bool,
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
@@ -5966,8 +5957,6 @@ pub struct SectionReceipt {
     /// change to the arrivals' code read whole on the ticks the section's opening read took (after
     /// minus before, on `2^(−20)` bits), beside its change on its own ticks in `refused`.
     pub refused_on_ticks: Vec<i64>,
-    /// Under the meeting form's law ([`TowerLearner::meeting`]), each of its trials in order.
-    pub meeting: Vec<meeting::MeetingReading>,
 }
 
 /// [agent-inferred, October 30] A clocked level's closure over a section's opening read
@@ -5985,7 +5974,7 @@ pub struct ClosureReading {
 impl TowerLearner {
     pub fn new(tower: Tower, rate_bits: u32) -> Self {
         let len = tower.theta.len();
-        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, meeting: false }
+        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false }
     }
 
     /// The swell and the reaches as one line: per level `x h r a` (faces, `2^(−16)`) and `push read
@@ -6221,7 +6210,7 @@ impl TowerLearner {
                 4
             }
         };
-        let (receipt, mut slot) = 'section: loop {
+        let (receipt, mut slot) = loop {
             let mut candidate = self.tower.clone();
             let mut moved = false;
             for &(start, len, grain) in &self.tower.layout.families {
@@ -6249,7 +6238,7 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                break 'section (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks, meeting: Vec::new() }, Slot::Opened);
+                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -6267,7 +6256,7 @@ impl TowerLearner {
                         opened = true;
                     }
                 }
-                break 'section (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks, meeting: Vec::new() }, Slot::Reread);
+                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Reread);
             }
             let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
             let closure_after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
@@ -6307,70 +6296,6 @@ impl TowerLearner {
                     *change = part_codes(&read.faces).iter().sum::<i64>() - code_before;
                 }
                 refused_parts.push(alone);
-            }
-            if self.meeting {
-                // [agent-inferred, October 30] The meeting form's law (the record's §17): the
-                // parts' logit changes read once, at the halving the section first refused, and
-                // each trial's scales solved from the form at its own halving.
-                let compared: Vec<usize> = targets.iter().flatten().flatten().copied().collect();
-                let opening_logits = realization.logits(&self.tower, &opening, classes, &targets)?;
-                let mut part_logits = Vec::with_capacity(meeting::PARTS);
-                for n in 0..meeting::PARTS {
-                    let part: Vec<i128> = step.iter().enumerate().map(|(i, &q)| if part_of(i) == n { q } else { 0 }).collect();
-                    // The founding's split is part of the rest, as the record's §13 reads it.
-                    let part_opens = if n == meeting::PARTS - 1 { opens.as_ref() } else { None };
-                    let (candidate, _) = self.tower.stepped(&part, halvings, &returns, part_opens, unit)?;
-                    part_logits.push(realization.logits(&candidate, &opening, classes, &targets)?);
-                }
-                let form = meeting::form(&self.tower, &opening_logits, &part_logits, &compared)?;
-                let (g_read, gram_read) = form.reading()?;
-                let mut readings = Vec::new();
-                for k in 0u32.. {
-                    let at = halvings + k;
-                    let (g, curvature) = form.model(k);
-                    let scales = meeting::released_scales(&meeting::box_minimum(&g, &curvature)?)?;
-                    let model = meeting::model_at(&g, &curvature, &meeting::scales_as_rat(&scales));
-                    let scaled: Vec<i128> = step.iter().enumerate().map(|(i, &q)| meeting::scaled(q, scales[part_of(i)])).collect::<Result<_>>()?;
-                    let scaled_unit = meeting::scaled(unit, scales[meeting::PARTS - 1])?;
-                    let (candidate, moved) = self.tower.stepped(&scaled, at, &returns, opens.as_ref(), scaled_unit)?;
-                    if !moved {
-                        let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                        break 'section (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings: at, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks, meeting: readings }, Slot::Opened);
-                    }
-                    let model_code = meeting::on_code_grain(&model)?;
-                    let mut reading = meeting::MeetingReading { halvings: at, g: g_read, gram: gram_read, scales, model: model_code, change: None, accepted: false };
-                    if !num_traits::Signed::is_negative(&model) {
-                        readings.push(reading);
-                        continue;
-                    }
-                    let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
-                    let faces_new = compared_faces(&reread)?;
-                    let parts_after = part_codes(&reread.faces);
-                    let code_after: i64 = parts_after.iter().sum();
-                    let change = code_after - code_before;
-                    reading.change = Some(change);
-                    // Accepted when the arrivals' faces fall exactly and the change is at most a
-                    // quarter of the model's: `4 Δ ≤ m` on the code's grain.
-                    let quarter = crate::ratio::Rat::from_integer(num_bigint::BigInt::from(4 * change as i128)) <= &model * crate::ratio::Rat::from_integer(num_bigint::BigInt::from(1i64 << READ_BITS));
-                    reading.accepted = quarter && fewer_bits(&faces_old, &faces_new);
-                    let accepted = reading.accepted;
-                    readings.push(reading);
-                    if accepted {
-                        let parts = parts_before.iter().copied().zip(parts_after).collect();
-                        self.tower = candidate;
-                        if let (split::Pairs::Founding(paired), Some(o)) = (&mut pairs, opens.take()) {
-                            if release(scaled_unit, at) != 0 {
-                                self.relift(o.level, o.pair)?;
-                                paired.levels[o.level][o.pair] = None;
-                                paired.founded.push(o);
-                                opened = true;
-                            }
-                        }
-                        break 'section (SectionReceipt { cells: arrivals, code_before, code_after, halvings: at, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks, meeting: readings }, Slot::Reread);
-                    }
-                    let closure_after: i64 = reread.closures.par_iter().map(|stream| stream.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum();
-                    refused.push((change, closure_after - closure_before));
-                }
             }
             halvings += 1;
         };
@@ -6503,7 +6428,7 @@ impl TowerLearner {
         if first.len() != tower.theta.len() || second.len() != tower.theta.len() {
             return refuse("moments of the wrong extent");
         }
-        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, meeting: false })
+        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false })
     }
 
     /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
@@ -6604,39 +6529,6 @@ impl Tower {
                 g[lv.move_im + k] = release(re * gi - im * gr, MOVE_BITS);
             }
         }
-    }
-
-    /// [agent-inferred, October 30] **The tower stepped by `step` released `halvings` coarser**,
-    /// as a section's certificate steps it: every material and face entry by its released step, a
-    /// dormant return's released step split between its parts, a pending founding's opening at
-    /// `unit` released, every move through its chart, then the projection. Returns the candidate and
-    /// whether anything moved. The meeting form's law steps its parts and its scaled steps here.
-    fn stepped(&self, step: &[i128], halvings: u32, returns: &[(usize, usize)], opens: Option<&split::FoundedSplit>, unit: i128) -> Result<(Tower, bool)> {
-        let mut candidate = self.clone();
-        let mut moved = false;
-        for &(start, len, grain) in &self.layout.families {
-            if grain == MOVE_BITS {
-                continue;
-            }
-            for i in start..start + len {
-                let released = release(step[i], halvings);
-                moved |= released != 0;
-                candidate.theta[i] = fit32(candidate.theta[i] as i128 - released, "a deposited parameter outgrew its 32-bit carrier")?;
-            }
-        }
-        for &(a, b) in returns {
-            let half = release(step[a], halvings).div_euclid(2);
-            candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
-            candidate.theta[b] = fit32(candidate.theta[b] as i128 - half, "a deposited parameter outgrew its 32-bit carrier")?;
-        }
-        if let Some(o) = opens {
-            let released = release(unit, halvings);
-            moved |= released != 0;
-            candidate.part_split(o.level, o.pair, &o.direction, o.sign, released)?;
-        }
-        moved |= candidate.move_by_chart(step, halvings)?;
-        candidate.project();
-        Ok((candidate, moved))
     }
 
     /// Every move stepped in its chart by `(Δν, Δφ)` released `halvings` coarser: `1 − ρ ← (1 − ρ)
@@ -9909,7 +9801,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new(), refused_on_ticks: Vec::new(), meeting: Vec::new() };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new(), refused_on_ticks: Vec::new() };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -10754,121 +10646,6 @@ mod tests {
         assert!(plain.refused_on_ticks.is_empty());
         assert_eq!(read.refused_on_ticks.len(), read.refused.len());
         assert_eq!((SectionReceipt { refused_on_ticks: Vec::new(), ..read }, read_tower, read_states), (plain, plain_tower, plain_states));
-    }
-
-    /// A symmetric integer form is positive semidefinite exactly: its symmetric elimination
-    /// meets no negative pivot, and a zero pivot only on a zero row.
-    fn semidefinite(form: &[[num_bigint::BigInt; meeting::PARTS]; meeting::PARTS]) -> bool {
-        use num_traits::Zero;
-        let mut a: Vec<Vec<crate::ratio::Rat>> = form.iter().map(|row| row.iter().map(|v| crate::ratio::Rat::from_integer(v.clone())).collect()).collect();
-        let n = a.len();
-        for k in 0..n {
-            if a[k][k] < crate::ratio::Rat::zero() {
-                return false;
-            }
-            if a[k][k].is_zero() {
-                if (k + 1..n).any(|j| !a[k][j].is_zero()) {
-                    return false;
-                }
-                continue;
-            }
-            for i in k + 1..n {
-                let f = &a[i][k] / &a[k][k];
-                for j in k + 1..n {
-                    let d = &f * &a[k][j];
-                    a[i][j] -= d;
-                }
-            }
-        }
-        true
-    }
-
-    /// [agent-inferred, October 30] **The meeting form's law** (the record's §17, acceptance 27):
-    /// the host's logits read is the face the forward compares (each compared row's masses
-    /// `2^(z − z_max)` and their total are its face), an uncompared place held; the form read from
-    /// five parts' logit changes is symmetric and positive semidefinite exactly; and under the law
-    /// a refused section reads the form, every trial whose model predicted no fall is not read
-    /// again, every trial read again predicted a fall, and the one accepted trial fell by at least
-    /// a quarter of its model, while the learner without the law reads no form.
-    #[test]
-    fn a_refused_step_meets_through_the_face_and_its_accepted_trial_falls_a_quarter_of_its_model() {
-        let classes = news_passage();
-        let mut joined = headed(3);
-        let k = keys(8192);
-        let [heading, descent] = joined.heading_families();
-        for (i, v) in descent.iter().cloned().flatten().enumerate() {
-            joined.theta[v] = i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 10;
-        }
-        let a = joined.declaration.alphabet;
-        let targets = vec![classes[1..31].iter().enumerate().map(|(i, &c)| (i % 2 == 0).then_some(c)).collect::<Vec<_>>()];
-        let compared: Vec<usize> = targets.iter().flatten().flatten().copied().collect();
-        let opening = vec![joined.rest()];
-        let mut pass = realization::HostPass::default();
-        let z = pass.logits(&joined, &opening, &[&classes[..31]], &targets).expect("logits");
-        let read = pass.forward(&joined, &opening, &[&classes[..31]], &targets, Slot::Opened).expect("opening");
-        let faces: Vec<(u128, u128)> = read.faces[0].iter().flatten().copied().collect();
-        assert_eq!(z.len(), compared.len() * a);
-        for ((row, &t), &(mass, total)) in z.chunks(a).zip(&compared).zip(&faces) {
-            let zmax = *row.iter().max().expect("a row");
-            let masses: Vec<u128> = row.iter().map(|&v| joined.exponential.below_one((v - zmax) as i128)).collect();
-            assert_eq!((masses[t], masses.iter().sum::<u128>()), (mass, total));
-        }
-        // Five towers, each moved along one family off the keys: the form of their logit changes.
-        let readout = joined.layout.readout..joined.layout.readout_bias;
-        let bias = joined.layout.readout_bias..joined.layout.readout_bias + a;
-        let families = [descent[0].clone(), heading[0].clone(), readout, bias, heading[1].clone()];
-        let parts: Vec<Vec<i64>> = families
-            .iter()
-            .enumerate()
-            .map(|(n, family)| {
-                let mut step = vec![0i128; joined.theta.len()];
-                for (j, i) in family.clone().enumerate() {
-                    step[i] = (i128::from(k[4096 + 97 * n + j % 389]) - 128) << 12;
-                }
-                let (moved, stepped) = joined.stepped(&step, 0, &[], None, 0).expect("a stepped tower");
-                assert!(stepped);
-                pass.logits(&moved, &opening, &[&classes[..31]], &targets).expect("logits")
-            })
-            .collect();
-        let form = meeting::form(&joined, &z, &parts, &compared).expect("the meeting form");
-        assert!((0..meeting::PARTS).all(|i| (0..meeting::PARTS).all(|j| form.gram[i][j] == form.gram[j][i])));
-        assert!(semidefinite(&form.gram), "the meeting form is not positive semidefinite");
-        assert!(form.g.iter().any(|&g| g != 0));
-        let run = |law: bool| {
-            let mut learner = TowerLearner::new(joined.clone(), 2);
-            learner.meeting = law;
-            let mut states = vec![learner.tower.rest()];
-            let receipt = learner.section(&mut states, &[&classes[..31]]).expect("section");
-            (receipt, learner.tower, states)
-        };
-        let (plain, _, _) = run(false);
-        assert!(!plain.refused.is_empty(), "the step at 2^(−2) was not refused");
-        assert!(plain.meeting.is_empty());
-        let (met, met_tower, _) = run(true);
-        assert!(!met.meeting.is_empty(), "a refused section read no meeting form");
-        let first = met.meeting[0].halvings;
-        for (n, trial) in met.meeting.iter().enumerate() {
-            assert_eq!(trial.halvings, first + n as u32);
-            assert!((0..meeting::PARTS).all(|i| trial.gram[i][i] >= 0 && (0..meeting::PARTS).all(|j| trial.gram[i][j] == trial.gram[j][i])));
-            assert!(trial.scales.iter().all(|&s| s <= 1 << meeting::SCALE_BITS));
-            match trial.change {
-                None => assert!(trial.model >= 0 && !trial.accepted, "{trial:?}"),
-                Some(change) => {
-                    assert!(trial.model <= 0, "{trial:?}");
-                    if trial.accepted {
-                        assert!(4 * change <= trial.model, "{trial:?}");
-                    }
-                }
-            }
-        }
-        assert_eq!(met.meeting.iter().filter(|t| t.accepted).count(), usize::from(met.deposited));
-        if met.deposited {
-            assert!(met.meeting.last().is_some_and(|t| t.accepted));
-            assert!(met.code_after <= met.code_before);
-            assert_ne!(met_tower.theta, joined.theta);
-        } else {
-            assert_eq!(met_tower.theta, joined.theta);
-        }
     }
 
     /// A declared hold of the heading's families keeps them as joined through a section that

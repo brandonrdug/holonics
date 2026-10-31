@@ -3260,15 +3260,6 @@ pub(super) fn roles_of(path: &str, sha: &str, bytes: usize) -> Result<Vec<u8>> {
 
 /// `x / 2^20` bits over `n` as thousandths, written `0.xxx`.
 /// A signed code on `2^(−20)` bits written in bits.
-/// A sum of `n` scales on `2^(−32)` read as their mean, to three places (none without a scale).
-fn scale_mean(sum: u128, n: usize) -> String {
-    if n == 0 {
-        return "none".into();
-    }
-    let milli = (sum * 1000 + ((n as u128) << 31)) / ((n as u128) << 32);
-    format!("{}.{:03}", milli / 1000, milli % 1000)
-}
-
 fn signed_bits(code: i64) -> String {
     format!("{}{}", if code < 0 { "-" } else { "" }, per(code.abs(), 1))
 }
@@ -3613,18 +3604,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         learner.refusal_ticks = true;
         println!("TOWER_REFUSAL_TICKS declared");
     }
-    // [agent-inferred, October 30] The meeting form's law (`TOWER_MEETING=1`, the record's §17):
-    // a refused step's five parts read once through the receiving face's metric at the halving the
-    // section first refused, their scales solved on the box, and each trial accepted only when the
-    // arrivals' faces fall and the change is at least a quarter of the model's. It costs six logits
-    // reads a refused section and a reread a trial.
-    if std::env::var("TOWER_MEETING").is_ok_and(|v| v == "1") {
-        if learner.tower.heading_families()[0].is_empty() {
-            return Err("TOWER_MEETING reads the heading's parts, and this tower has no heading".into());
-        }
-        learner.meeting = true;
-        println!("TOWER_MEETING declared");
-    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3659,10 +3638,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         // The window's refused steps read on the opening's ticks: how many rose on their own ticks
         // and on the opening's, and the changes on each.
         let mut refusal_ticks = (0usize, 0usize, 0i64, 0i64);
-        // The window's meeting forms: the forms read, the trials solved, the trials read again,
-        // the accepted ones, the model's and the actual change over the trials read, and each
-        // part's scale summed over the accepted trials.
-        let mut meetings = (0usize, 0usize, 0usize, 0usize, 0i64, 0i64, [0u128; 5]);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3800,21 +3775,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                     refusal_parts.1[n] += change;
                 }
             }
-            meetings.0 += usize::from(!receipt.meeting.is_empty());
-            for trial in &receipt.meeting {
-                meetings.1 += 1;
-                if let Some(change) = trial.change {
-                    meetings.2 += 1;
-                    meetings.4 += trial.model;
-                    meetings.5 += change;
-                }
-                if trial.accepted {
-                    meetings.3 += 1;
-                    for (sum, &scale) in meetings.6.iter_mut().zip(&trial.scales) {
-                        *sum += u128::from(scale);
-                    }
-                }
-            }
             if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
@@ -3859,27 +3819,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                         signed_bits(opening_change)
                     );
                     refusal_ticks = (0, 0, 0, 0);
-                }
-                if learner.meeting {
-                    let (forms, trials, read, accepted, model, change, scales) = meetings;
-                    let mean = |sum: u128| scale_mean(sum, accepted);
-                    println!(
-                        "TOWER_MEETING pass={} section={} forms={} trials={} read={} accepted={} model_bits={} change_bits={} scales descent={} read={} readout={} clocked={} rest={}",
-                        pass,
-                        k + 1,
-                        forms,
-                        trials,
-                        read,
-                        accepted,
-                        signed_bits(model),
-                        signed_bits(change),
-                        mean(scales[0]),
-                        mean(scales[1]),
-                        mean(scales[2]),
-                        mean(scales[3]),
-                        mean(scales[4])
-                    );
-                    meetings = (0, 0, 0, 0, 0, 0, [0; 5]);
                 }
                 refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());

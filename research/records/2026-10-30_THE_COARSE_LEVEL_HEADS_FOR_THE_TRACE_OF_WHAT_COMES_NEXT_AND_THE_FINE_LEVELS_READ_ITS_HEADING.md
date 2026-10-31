@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, fixed before its build (§17)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -1066,3 +1066,50 @@ at most one and the region only shrinks; the projection is fixed before launch);
 carried unrepaired into a new consumer* (this is the located cause's own law, and a section without
 a refusal is unchanged); *bits read as progress* (the arrivals are read beside the elapsed time,
 and the writing is shown before any longer race).
+
+**At the card (acceptance 27 and 28 passed, 29 failed; the law is retired).** On the host at
+80b6a66d2 the tower tests passed, 153 of 153, the law's own among them (acceptance 27). On the
+NVIDIA GeForce RTX 4080 SUPER at 80b6a66d2, alone on the card, the card tests passed, 45 of 45,
+the logits read and 32 sections under the law equal to the host's (acceptance 28; 60.3 s wall,
+peak resident set 1,160,656 KiB). The 256-section lap stopped at its 364 s deadline inside window
+8, after 224 sections, and is incomplete (wall 364.1 s, peak resident set 1,263,296 KiB); it was not
+relaunched. Its projection was wrong in its count: it took a38c1c63f's 197 refused sections, and
+under the law every section but one refused its whole step, so 256 sections project to
+`152.4 s + 256 × 1,070 ms = 426.3 s`; the cost a refused section, 1.08 s measured, was the
+projected 1,070 ms. Every window passed its own limit (window 7: 320.3 s against 370.2 s).
+
+| Window | Arrivals, bits a byte | a38c1c63f | Elapsed, s | a38c1c63f | Forms, trials, accepted | Model, bits | Actual, bits | Scales: descent, read, readout, clocked, rest |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 5.070 | 5.103 | 47.5 | 14.8 | 31, 32, 31 | −311,859 | −175,299 | 0.554, 0.303, 0.095, 0.111, 0.195 |
+| 2 | 4.133 | 3.901 | 93.4 | 25.9 | 32, 32, 32 | −33,120 | −33,369 | 0.074, 0.169, 0.120, 0.049, 0.431 |
+| 3 | 3.682 | 3.454 | 138.9 | 35.3 | 32, 32, 32 | −18,680 | −19,109 | 0.000, 0.385, 0.165, 0.055, 0.329 |
+| 4 | 3.489 | 3.165 | 184.4 | 46.2 | 32, 32, 32 | −11,679 | −12,129 | 0.050, 0.325, 0.159, 0.003, 0.203 |
+| 5 | 3.380 | 2.998 | 229.6 | 57.4 | 32, 32, 32 | −9,204 | −9,839 | 0.032, 0.155, 0.164, 0.000, 0.147 |
+| 6 | 3.298 | 2.872 | 275.0 | 69.3 | 32, 32, 32 | −8,346 | −9,117 | 0.014, 0.167, 0.167, 0.000, 0.129 |
+| 7 | 3.256 | 2.810 | 320.3 | 81.0 | 32, 32, 32 | −7,995 | −9,038 | 0.020, 0.160, 0.204, 0.000, 0.099 |
+
+The scales are each window's means over its accepted trials; the a38c1c63f columns are that lap's
+at the same section. At equal elapsed time the plain halving had finished its 256 sections at 2.721
+by 92.2 s, where the law stood at section 64 and 4.133.
+
+**What it settles.** The meeting form models a section's change: from window 2 on the model and
+the actual change agree in sign at every window and within 13% (the actual fall 1.008 to 1.130
+times the model's), and 223 of 224 sections were accepted at their first trial. What the form
+chooses is wrong for learning. Solved section by section, the scales drove the descent from
+0.554 to 0.020 and the clocked levels' material from 0.111 to 0.000, far below the plain law's
+uniform halving (197 halvings over a38c1c63f's 256 sections, every part moved at ½ or whole); with
+those parts nearly
+still, every whole step thereafter was refused, and the arrivals fell behind from window 2 on
+(3.256 against 2.810 at section 224) at 3.95 times the time. The parts the form starves are the
+heading's: a forecast pays in the sections after its span closes, and a section's own arrivals
+see none of that, so the section-local minimum charges the heading's step at full cost and credits
+it nothing. The halving keeps the parts in proportion and so keeps the forecast's material
+moving. A section of the arrivals is the wrong judge of a part's scale.
+
+By the rule fixed before the build (a lap at or above 2.721 retires the law; at section 224 it read
+3.256), the law is retired, its code removed (git history keeps it at 80b6a66d2), and the plain
+halving stands. The refusals are not what costs the heading its speed: under the halving each
+costs one reread and they end in the first lap (§15). The measured subject this leaves is the
+heading's cost against what it buys: at equal elapsed time C′'s arrivals lead, the heading's
+later laps cost 1.17 times C′'s pass time without a refused step (§15), and its closure still
+reads above flat at both clocked levels (§15), so the cost buys no forecast yet.
