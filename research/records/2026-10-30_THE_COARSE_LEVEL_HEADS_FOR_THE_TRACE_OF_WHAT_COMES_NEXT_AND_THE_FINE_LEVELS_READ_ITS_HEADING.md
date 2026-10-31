@@ -2565,9 +2565,11 @@ the packets, the heading and the credit.
 
 **The law.** Participation joins the working declaration at the clocked levels alone (`l ≥ F`), on
 their own ticks, carried across sections:
-- *a site is a clocked tick*, its charts read from the level's input at the tick, which is the packet's
-  read (the packet record §3), so a coarse site is the span's news, never the state the level already
-  holds;
+- *a site is a clocked tick*, its charts read from the passing current at the tick, as the October 29
+  law reads them (agent-inferred, at the build: the packet's read as a site's input is the radix
+  record's later item, and joining it here would change two things in one measurement; the passing
+  current at a clocked level carries the arrival and the fine levels' returns, not the level's own
+  state);
 - *its section is its own count* (128 of its ticks, reaching about 500 and 1,000 units at levels 4 and
   5 on the race's clock), carried with the modes;
 - *beside the heading*: the face reads the heading from the level's modes as before; participation's
@@ -2597,3 +2599,19 @@ not a window.
 63. The race: one lap each on units from the same founding, the flux on the continuation's first 256
     classes at least twice the unit declaration's, and the held-out read at equal elapsed time reported
     beside it, with the writing.
+
+**Toward forty minutes the bytes overtake** (16:39Z to 17:14Z, the unit declaration continued from
+its two-lap learner for 16 laps, 2,116.4 s against 2,120 s; laps 105.3 to 118.4 s). Held-out after
+laps 3 to 18 of units: 2.049, 2.009, 1.988, 1.966, 1.956, 1.940, 1.928, 1.920, 1.913, 1.904, 1.901,
+1.894, 1.894, 1.890, 1.883, 1.878 (GSM8K 1.813 at the last), the last at about 2,346 s of training.
+The byte declaration's continued every-level credit read 1.918 after 8 laps and about 1.865 at the
+same elapsed time (between its continued passes 8 and 9, §30). So the units' lead at equal time,
+0.13 bits a byte at four minutes, closes by about half an hour and reverses to about 0.013 by forty;
+lap for lap the bytes lead from about the third lap. The unit declaration spends its material's
+growth (690,342 entries against 553,473) on the encoding and the readout over 1,318 classes, and both
+declarations level near 1.85 to 1.88. **What it decides:** acceptance 60 holds as fixed (at the lap
+ends it was read at), and the working law for runs under half an hour is the unit declaration; toward
+an hour the two are level within a hundredth and the bytes lead, so the next race reads both. Two
+defects of the run are mine: readings run beside it on the card without the lock took peak VRAM to
+12,643 MiB against the 12 GB the card keeps for the race, and the state chosen for its writing was
+lap 12's (a sort on the state's name), not lap 18's.
