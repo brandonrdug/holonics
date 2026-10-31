@@ -2850,3 +2850,29 @@ paying says width is not what binds it, and no growth follows.
 69. The founding test read on the working learner's families at its latest lap, reported per family;
     then, only where it pays, the grown learner continued against the ungrown one at equal elapsed
     time, with the flux and the writing.
+
+## 41. Where the body grows: the pair contact joins the working declaration before its split
+
+[agent-inferred, October 31] **The founding law already has its contact.** The lawful growth of a
+contact field is the founded split (record `2026-10-30_THE_PAIR_CONTACT_IS_RACED_BEFORE_ITS_SPLIT_FOUNDS…`,
+§4, atlas `tower.pair-contact-founded-split`): a pair contact `v = a b` splits face for face into
+copies whose zero-sum difference founds a coordinate where the founding code pays, so the field
+widens contact by contact where its residual demands, never by a factor picked by hand. The rectifier
+has no such form (`split.rs`: its second derivative lives on its kink; its tie split,
+`code.rectifier-tie-split`, is a law without an owner). So the working declaration grows lawfully once
+its contacts are pair contacts. The pair contact raced well before: on the four-level tower it read
+1.804 against the rectifier's 1.877 at the hour, below it at every quarter mark; on C′ it read below C′
+at every lap but rose from its 13th lap three laps running in training and held out alike, a rise whose
+cause is not located (that record, §7). The recorded failure this could repeat is a located cause
+carried unrepaired into a new consumer: here the cause is unlocated, so the race below reads that rise
+where it appears, and the split does not join before it is read.
+
+**Acceptance, fixed before the build.**
+70. The card is the host's for the working declaration with pair contacts on units (32 sections of 24
+    streams, every learner equal).
+71. Three laps of the working declaration with pair contacts at 160 streams from C′'s founding keys,
+    beside the rectifying declaration's three laps at 160 streams (§39's `c39b`: 2.164, 2.063, 2.012 at
+    117.1, 230.7, 343.7 s), held out at each lap's end and at equal elapsed time, with the flux after
+    its last lap. Lower at equal elapsed time at the third lap end sends the pair contact into the
+    working declaration and its founded split next; otherwise the rectifier stays and the tie split's
+    owner is the next growth.

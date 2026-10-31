@@ -3361,6 +3361,13 @@ pub(super) fn train_units_race(args: &[String], realization: &mut dyn PassRealiz
     train_units_joined(args, false, false, ContactLaw::Rectifying, Some(Joined::PassagePacketsHeading), realization)
 }
 
+/// `train-two-ladder-stacked-news-heading-credited-every-level-pair-unit-tower`: the unit race's
+/// declaration with every contact the pair contact (record `2026-10-30_…`, §41), the contact the
+/// founded split grows.
+pub(super) fn train_units_pair_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeading), realization)
+}
+
 /// `train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower`: the unit
 /// race's declaration with participation joined at the clocked levels alone, on their own ticks
 /// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
