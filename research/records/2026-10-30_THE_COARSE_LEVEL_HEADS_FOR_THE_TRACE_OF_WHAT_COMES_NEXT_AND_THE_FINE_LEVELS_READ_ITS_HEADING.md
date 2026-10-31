@@ -1840,3 +1840,31 @@ suite passed, 46 of 46.
 that advances the credit, which runs its moments inside the forward's cell-by-cell scan; and its
 `tower_credit`. The next realization moves the moments out of the scan: the forward keeps each cell's
 move for the read a carry keeps, and a kernel of one thread a mode moves the moments in parallel.
+
+## 27. The credit's moments move beside the forward
+
+[agent-inferred, October 31] **The realization** (execution only). The read that advances the
+credit keeps, at each credited level, each cell's move, push and state in the frame's own buffers
+(and each cell's ticks, and the packet as the level above found it), and `tower_credit_moments`
+(one block a stream and credited level, one thread a mode, the cells in order) moves the per-mode
+moments by the move's sub-steps and writes each cell's turn and coefficients for `tower_credit`,
+both at the carry; the forward's cell-by-cell scan carries none of the credit's arithmetic. The
+forward is back to 618 bytes of spill stores (1,058 with the moments inside it) at 128 registers.
+
+**At the card** (08:06Z, binary `tower_pass-27a` against `tower_pass-26b`, alternated, the
+every-level credit's first 64 sections): one set of lines; section 64 at 22,610 and 22,640 ms
+against 24,429 and 24,448 ms (7.4% sooner), the forward's time 16.1 s against 18.6. The card suite
+passed, 46 of 46 (its credited parities compare every stream's fetched credit with the host's).
+
+**The race on it** (08:07Z to 08:20Z, one session beside the game; deadlines from each run's
+64-section read): C′'s two laps 310.1 s against 469 s, the clocked credit's lap 178.2 s against
+278 s, the every-level credit's 190.3 s against 298 s; peak VRAM 10,835 MiB with the game's.
+
+| at its lap's end | held-out (GSM8K) | elapsed | its lap over C′'s | C′ at the same elapsed time | lead |
+|---|---|---|---|---|---|
+| C′ | 2.390 (2.466), 2.200 (2.236) | 156.3 s, 309.6 s | | | |
+| clocked credit | 2.291 (2.328) | 177.7 s | 1.137 | 2.363 | 0.072 |
+| every-level credit | 2.270 (2.310) | 189.7 s | 1.214 | 2.349 | 0.079 |
+
+The every-level credit's lap now costs 1.068 times the clocked credit's (1.10 before §26–§27), and
+after a lap it leads C′ at equal elapsed time by more than the clocked credit does.

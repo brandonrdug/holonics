@@ -430,6 +430,7 @@ struct FrameWords {
     cr_x: u64,
     cr_rest: u64,
     cr_cov: u64,
+    cr_tick: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -728,6 +729,9 @@ struct Frame<'c> {
     cr_x: CardBuffer<'c, i32>,
     cr_rest: CardBuffer<'c, u32>,
     cr_cov: CardBuffer<'c, i64>,
+    /// Each cell's ticks at each credited level for the read that advances the credit
+    /// (`[S][T][CL]`, `tower_credit_moments`).
+    cr_tick: CardBuffer<'c, u32>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
@@ -1259,6 +1263,7 @@ impl<'c> TowerCard<'c> {
             cr_x: card.alloc(q * shape.credit * w)?,
             cr_rest: card.alloc(q * shape.credit)?,
             cr_cov: card.alloc(s * shape.credit * 2 * n * 2)?,
+            cr_tick: card.alloc(q * shape.credit)?,
             reach_offsets,
         });
         Ok(())
@@ -1446,6 +1451,7 @@ impl<'c> TowerCard<'c> {
             cr_x: frame.cr_x.device_ptr(),
             cr_rest: frame.cr_rest.device_ptr(),
             cr_cov: frame.cr_cov.device_ptr(),
+            cr_tick: frame.cr_tick.device_ptr(),
         }
     }
 
@@ -2464,6 +2470,10 @@ impl PassRealization for TowerCard<'_> {
             let credit = self.credit.as_ref().ok_or(TowerError::Refused("a credited carry reads the resident credit"))?;
             fw.cr_open = credit.open.device_ptr();
             fw.cr_next = credit.next.device_ptr();
+            // The per-mode moments over the read's cells, one thread a mode, then the material
+            // moments' closed form (record §27).
+            let mode_threads = words.modes.next_multiple_of(32).min(THREADS);
+            self.law_launch("tower_credit_moments", Dim3 { x: words.streams, y: words.credit, z: 1 }, mode_threads, 0, &words, &fw, None).map_err(device)?;
             self.law_launch("tower_credit", Dim3 { x: words.streams, y: words.credit, z: 1 }, THREADS, 32 * words.modes, &words, &fw, None).map_err(device)?;
             self.status()?;
         }
