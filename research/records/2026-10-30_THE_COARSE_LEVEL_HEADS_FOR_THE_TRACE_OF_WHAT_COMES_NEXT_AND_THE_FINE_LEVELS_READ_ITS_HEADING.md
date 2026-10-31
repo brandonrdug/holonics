@@ -3108,3 +3108,15 @@ law it implies; if they do not, the direction is the cause and the generalizatio
 77. The certificate's generalization (next section or probe, whichever the card's resident credit admits
     without disturbing it): a host test where a step lowers its own section's code and raises the
     passage's elsewhere and is halved or refused, and the card the host's over 32 sections with it.
+
+**Acceptance 76, as read: the rise is the step's size** (`g48*`, 481.0 s, rate `2^(−8)`). The pair
+learner's training code fell at every lap of 40 (2.814 to 1.143), where at `2^(−7)` it rose from lap 18
+and wandered to lap 33. Its held-out code levelled from lap 15 and rose a little (1.538 at lap 25, 1.556 at
+lap 40) while the training code kept falling: on 6,726 problems read forty times the learner fits its
+passage, and at `2^(−7)` the noisier steps crossed their plateau to 1.498. The receipt reads the other
+way: at lap 40 the half rate's question flux is 967.0 bits against 650.0, on the problem's words 35 of 128
+against 24, the first calculation from the question's numbers 11 of 115 against 2 of 117, exact at the
+equals 87 of 399 (met 85 of 260, never met 2 of 139) against 86 (79, 7). A lower held-out code and a
+learner that takes up its question less are not the same thing; bits a byte alone would have chosen the
+learner that hears the question less. **What it decides:** the run-away of §44 is to be read at the half
+rate before any certificate is widened (acceptance 77 waits on that read).
