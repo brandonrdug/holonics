@@ -2270,8 +2270,9 @@ reaches the force through the packets and the heading and comes back through the
 section's one certified step meets that loop's curvature, the certificate halves every family
 together, and the arrivals are starved, under a series whose terms grow as `D↓` opens and that
 costs 2.3 times the section's time before any gain. A motive inside the section is retired for
-this declaration, and its code is removed (it stands at `3451e27c6` for §29 and at the commit that
-records this section for §30). The working law stays the every-level credit with the face's read of
+this declaration, and its code is removed (it stands at
+[`3451e27c6`](https://github.com/brandonrdug/holonics/tree/3451e27c6) for §29 and
+[`9441a518e`](https://github.com/brandonrdug/holonics/tree/9441a518e) for §30). The working law stays the every-level credit with the face's read of
 the heading. A coarse field that steers the fine field without closing a loop inside the certified
 step is not derived here: holding the heading of the section's opening is the learner's partition
 deciding the forward law, which the lessons refuse (the release would read a different law at each

@@ -41,7 +41,7 @@ pub(super) const REGIONS: [&str; 4] = ["Q", "P", "N", "M"];
 /// The held-out reading: the frozen tower's code of `classes`, cut into `streams` contiguous
 /// parts, each read from rest; per region of `roles` (the coded class's region, the region of its
 /// first byte), on `2^(−20)` bits, with the bytes coded (`lengths`, each class's bytes).
-pub(super) fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize, section: usize, realization: &mut dyn PassRealization) -> Result<[(i64, usize); 4]> {
+fn held_out(tower: &Tower, classes: &[usize], lengths: &[u32], roles: &[u8], streams: usize, section: usize, realization: &mut dyn PassRealization) -> Result<[(i64, usize); 4]> {
     // Each part from rest, read through the declared realization (the card's route reads it on
     // the card) in windows of the training section.
     let chunk = classes.len().div_ceil(streams).max(1);
@@ -3409,9 +3409,6 @@ pub(super) enum Joined {
     /// reads its modes through its own heading material before each arrival, and the heading meets
     /// the trace of the arrivals its next tick closes.
     PassagePacketsHeading,
-    /// The heading with the motive ([`Tower::join_motive`]): the fine levels also read each clocked
-    /// level's heading before an arrival at the stream's opening (record §29).
-    PassagePacketsHeadingMotive,
     /// The pair contacts paired at the founding ([`TowerLearner::paired`]), each section founding
     /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
     /// learner (`PAIRED.<pass>`, `PAIRED`).
@@ -3516,12 +3513,12 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading | Joined::PassagePacketsHeadingMotive);
+        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading);
         if learner.tower.passage() != (packets || joined == Joined::Passage) || learner.tower.packets() != packets {
             return Err("the continued learner's passage or packets differ from the declared ones".into());
         }
-        if learner.tower.heading() != matches!(joined, Joined::PassagePacketsHeading | Joined::PassagePacketsHeadingMotive) || learner.tower.motive() != (joined == Joined::PassagePacketsHeadingMotive) {
-            return Err("the continued learner's heading or motive differs from the declared one".into());
+        if learner.tower.heading() != (joined == Joined::PassagePacketsHeading) {
+            return Err("the continued learner's heading differs from the declared one".into());
         }
         learner
     } else {
@@ -3565,16 +3562,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_packets().map_err(|e| e.to_string())?;
                 learner.join_heading().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
-            }
-            // A motive run also gives the stream's opening each clocked level's heading before an
-            // arrival, `D↓` at zero, so it opens on the heading run face for face
-            // ([`Tower::join_motive`]).
-            Joined::PassagePacketsHeadingMotive => {
-                learner.join_passage().map_err(|e| e.to_string())?;
-                learner.join_packets().map_err(|e| e.to_string())?;
-                learner.join_heading().map_err(|e| e.to_string())?;
-                learner.join_motive().map_err(|e| e.to_string())?;
-                println!("TOWER_PASSAGE first_clocked_level={} packets heading motive", learner.tower.news().map_or(0, |c| c.first()));
             }
             // A split run widens the contact field by two at the founding, every pair dormant
             // ([`TowerLearner::paired`]); the founding run carries their directions.
@@ -3841,10 +3828,6 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                     "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={rose} arrivals_change_bits={} closure_change_bits={change}",
                     pass, k + 1, refusals.0, refusals.1, signed_bits(refusals.3)
                 );
-                // The motive's series (record §29): the reverses this window read and their terms.
-                if let Some((reverses, terms)) = realization.series_read() {
-                    println!("TOWER_SERIES pass={} section={} reverses={reverses} terms={terms}", pass, k + 1);
-                }
                 if learner.refusal_parts {
                     let (rose, change) = refusal_parts;
                     println!(
