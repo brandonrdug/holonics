@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, fixed before its run (§18)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -1113,3 +1113,39 @@ costs one reread and they end in the first lap (§15). The measured subject this
 heading's cost against what it buys: at equal elapsed time C′'s arrivals lead, the heading's
 later laps cost 1.17 times C′'s pass time without a refused step (§15), and its closure still
 reads above flat at both clocked levels (§15), so the cost buys no forecast yet.
+
+## 18. Where the heading's time goes
+
+[agent-inferred, October 31] **The subject.** Lap for lap the heading reads below C′, but its later
+laps cost 1.17 times C′'s pass time without a refused step (§15), so at equal elapsed time C′'s
+arrivals lead; §17 retired the last step law and left the halving. Before the next law, the
+realization's own account names where that time goes (the hardware law: report the realization as
+it actually runs).
+
+**The reading.** Two runs on the card from C′'s founding, on the race's passage and keys, over the
+passage's first 64 sections (`TOWER_LAP_SECTIONS=64`): C′'s race, and the heading's at a38c1c63f's
+law. Each runs with `TOWER_PROFILE` set (`tower_pass train`: every launch timed alone, the card
+synchronized around it, each kernel entry's launches and summed time printed at the end) beside the
+`TOWER_CARD` line's forward and reverse times and the run's elapsed time. Read per section: each
+entry's time a launch and a section, the card's forward and reverse, and the remainder, which is the
+host's (the step, its moments and the certificate's comparison).
+
+30. Each profiled run's `TOWER_SECTION` lines at sections 32 and 64 are its unprofiled lap's (C′'s
+    packet-race lap 0 at c6ce14204, the heading's lap at a38c1c63f), and the heading's
+    `TOWER_REFUSALS` lines too, the times aside: the reading moves nothing.
+
+**What it decides**, fixed before the run. The heading's extra time a section over C′'s is split
+three ways: the entries the heading adds or widens (the forward's heading and closure reads,
+`tower_reverse_ahead`, `tower_reverse_heading`, the descent's and `C^→`'s outer sums), the refused
+sections' rereads, and the host's remainder. The largest names the next loop: the heading's kernels,
+the step law again, or the host's step over the heading's material. Lap 1's refusals inflate the
+second share over these 64 sections (73 halvings at a38c1c63f), so the split is read per launch and
+per unrefused section, which is what the later laps pay.
+
+The projection: each run's 64 sections at the heading's window bound, `2 × 18,781 ms = 37.6 s`, and
+its close measured at e8b9d9be2 (`106.8 s − 92.2 s = 14.6 s`), so `52.2 s`, the deadline 53 s each,
+two runs one after the other on the idle card. The profile's synchronizations are unmeasured; a run
+past its deadline is reported incomplete with its rate.
+
+Recorded failures this could repeat: *bits read as progress* (this reads time, beside the arrivals
+already measured); *a refusal answered with a larger limit* (the deadline is fixed before launch).

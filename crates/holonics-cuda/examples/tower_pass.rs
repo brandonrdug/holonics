@@ -37,6 +37,8 @@
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
+//!   With `TOWER_PROFILE` set, every launch is timed alone and each kernel entry's launches and
+//!   summed time are printed at the end (`TOWER_PROFILE` lines).
 //! - `tower_pass release complete-language release-tower-classes ARGS…`: the class release with
 //!   every prompt's read and every drawn class's step on the card, the prompts drawing together.
 //! - `tower_pass read complete-language read-tower-race ARGS…`: the race's readings of a rested
@@ -374,6 +376,13 @@ fn train(args: &[String]) -> Result<()> {
     println!("TOWER_COMMAND {}", args[1..].join(" "));
     let opened = Card::open(0)?;
     let mut card = TowerCard::open(&opened)?;
+    // [agent-inferred, October 31] A declared reading (`TOWER_PROFILE`): every launch timed alone,
+    // the card synchronized around it, and each entry's launches and summed time printed at the
+    // run's end (the record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`
+    // §18). It moves nothing the run prints but its times.
+    if std::env::var_os("TOWER_PROFILE").is_some() {
+        card.profile();
+    }
     let started = Instant::now();
     let result = exterior::run_tower_classes_with_realization(&args[1..], &mut card);
     let times = card.times();
@@ -385,6 +394,9 @@ fn train(args: &[String]) -> Result<()> {
         times.reverse_ns / 1_000_000,
         started.elapsed().as_millis()
     );
+    for (entry, calls, ns) in card.profiled() {
+        println!("TOWER_PROFILE entry={entry} launches={calls} ms={}", ns / 1_000_000);
+    }
     result
 }
 
