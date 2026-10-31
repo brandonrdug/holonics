@@ -2509,3 +2509,44 @@ repository prompts write symbol runs and file tables. Each release's code a unit
 lap for lap and at equal elapsed time. The units were founded on the GSM8K problems alone; units
 founded on the race's whole passage need host compute under Brandon's exception (the route refuses it
 without one) or a card realization of the founding.
+
+## 34. How much a prompt shapes what follows it
+
+[agent-inferred, October 31] **Why.** Brandon, reading the writing (paraphrased): it compresses and
+expresses real patterns, but it is not concentrated: it holds no prominent pattern over an extended
+stretch, and it rotates through what it learned whatever the prompt was. The race's reading of the
+flux a prompt drives into what follows it (`read-tower-race`, atlas
+`culture.question-answer-information`) reads that as a number: the continuation of each distinct prompt
+in the held-out passage (its first place there, to the next end letter) is coded after its own prompt
+and after each other one, and `I = L(after another) − L(after its own)` is the flux. It is now read on
+the continuation's opening classes too (16, 64 and 256), where a prompt's effect should show first.
+The race's six prompts are three distinct pairs: prompts 0 and 1 open repository text, prompt 2 a
+GSM8K problem.
+
+**Read** (the RTX 4080 SUPER, binary `tower_pass-34a` `4f3ccc4a…f0b`; receipts `flux-*.txt`), bits:
+
+| learner (held-out) | prompt 2's continuation after prompt 0, 1: first 16 / 64 / 256 / whole | prompt 0's after prompt 1, 2: whole | prompt 1's after prompt 0, 2: whole |
+|---|---|---|---|
+| plain four levels, lap 5 (2.004) | 11.2, 7.5 / 34.0, 20.5 / 125.3, 74.0 / 118.7, 67.6 | −6.4, 25.9 | 3.5, 10.3 |
+| the same with participation, lap 5 (2.033) | 26.7, 20.1 / 50.9, 41.0 / 142.8, 119.2 / 146.7, 141.0 | −3.5, 24.6 | 33.3, 44.6 |
+| every-level credit, 23 passes (1.852) | 17.6, 12.3 / 37.5, 25.0 / 72.3, 48.4 / 81.6, 49.8 | −19.7, 19.1 | 16.4, 20.7 |
+
+(The continuations are 4,724, 4,412 and 4,302 classes.)
+
+- **A prompt sets the genre, for a few hundred classes, and not its subject.** Between a repository
+  prompt and the GSM8K prompt the flux is tens to a hundred-odd bits, nearly all of it inside the
+  continuation's first 256 classes; between the two repository prompts it is a few bits or less, and
+  the wrong prompt sometimes codes the continuation better (−19.7 bits on the every-level learner). The
+  learner hears which kind of text it is in and forgets the prompt's particulars within about 256
+  classes, which is what the writing shows.
+- **Participation doubles the flux and costs.** The participating tower drives about 1.8 times the
+  plain tower's flux at the same lap (387 bits over the six pairs against 220), at 0.029 bits a byte
+  worse held out and 8.2 times the lap time (922 s against 113 s); the every-level learner, twenty
+  passes on, drives less than either (168 bits).
+
+**What it decides.** The flux on the continuation's opening is the reading the next law must move,
+beside the writing: concentration is the prompt's particulars held over the continuation, which none
+of the race's learners does past a few hundred classes. Participation is the field's law for reading
+back over the passage, and the working declaration refuses it beside the heading and the credit (their
+joint laws are owed); its cost as built (every level reading 128 sites at every arrival) is its
+blocker at equal elapsed time.

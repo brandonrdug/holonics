@@ -810,6 +810,26 @@ pub(crate) fn read_race_realized(args: &[String], realization: &mut dyn PassReal
         let others: Vec<String> = (0..prompts.len()).filter(|&q| q != a).filter_map(|q| code(a, q).map(|c| format!("{q}:{}", signed_bits(c - own)))).collect();
         println!("TOWER_RACE_FLUX prompt={a} follows_classes={} own_bits={} flux_bits_after_prompt {}", follow.len(), signed_bits(own), others.join(" "));
     }
+    // [agent-inferred, October 31] The flux read on the continuation's opening classes alone (16, 64
+    // and 256, a reading's partition): where a prompt's effect on what follows it should show first
+    // (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §34).
+    for head in [16usize, 64, 256] {
+        for (a, follow) in follows.iter().enumerate() {
+            let Some(follow) = follow.filter(|f| f.len() >= head) else { continue };
+            let opening = &follow[..head];
+            let mut by_prompt = Vec::with_capacity(prompts.len());
+            for prompt in &prompts {
+                let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+                let mut states = vec![tower.rest()];
+                let (faces, _) = tower.advance_realized(&mut states, &[&entered], realization).map_err(|e| e.to_string())?;
+                let (_, read) = tower.advance_realized(&mut states, &[opening], realization).map_err(|e| e.to_string())?;
+                by_prompt.push(faces[0].code(opening[0]) + read[0]);
+            }
+            let own = by_prompt[a];
+            let others: Vec<String> = (0..prompts.len()).filter(|&q| q != a).map(|q| format!("{q}:{}", signed_bits(by_prompt[q] - own))).collect();
+            println!("TOWER_RACE_FLUX_HEAD prompt={a} head={head} own_bits={} flux_bits_after_prompt {}", signed_bits(own), others.join(" "));
+        }
+    }
     println!("TOWER_RACE_DONE prompts={} streams={streams} section={section} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
     Ok(())
 }
