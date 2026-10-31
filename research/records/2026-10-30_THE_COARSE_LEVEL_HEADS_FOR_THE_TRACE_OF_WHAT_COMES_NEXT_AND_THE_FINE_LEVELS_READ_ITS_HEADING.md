@@ -2550,3 +2550,50 @@ of the race's learners does past a few hundred classes. Participation is the fie
 back over the passage, and the working declaration refuses it beside the heading and the credit (their
 joint laws are owed); its cost as built (every level reading 128 sites at every arrival) is its
 blocker at equal elapsed time.
+
+## 35. The clocked levels read back over their own ticks, in the working declaration
+
+[agent-inferred, October 31] **The cause, read from §34.** The race's learners hold a prompt's
+particulars for at most a few hundred classes: their only memory is their modes, and the levels whose
+modes hold longest (the clocked levels, 48 to 188 of their own ticks) hear packets and never read back
+over the passage. Participation is the field's law for reading back (each site's probe reads every
+admitted site through the modes' own turn and dissipation, the October 28 record), and its clocked form
+(the October 29 record §2: a level's sites are its own ticks, its section its own count of them,
+carried across the learner's sections) reaches several problems at the coarse levels. As raced it
+read at every level, 128 sites at every arrival, at 8.2 times the plain lap, and it is refused beside
+the packets, the heading and the credit.
+
+**The law.** Participation joins the working declaration at the clocked levels alone (`l ≥ F`), on
+their own ticks, carried across sections:
+- *a site is a clocked tick*, its charts read from the level's input at the tick, which is the packet's
+  read (the packet record §3), so a coarse site is the span's news, never the state the level already
+  holds;
+- *its section is its own count* (128 of its ticks, reaching about 500 and 1,000 units at levels 4 and
+  5 on the race's clock), carried with the modes;
+- *beside the heading*: the face reads the heading from the level's modes as before; participation's
+  current enters the level's contacts as it does without the heading, and nothing else changes;
+- *beside the credit* (declared held as given): the credit's moments carry each level's own
+  recurrence families through its moves, push and gate; what participation's current returns to the
+  level's moves through its frames returns inside the section alone, as the input a level hears does.
+
+The arrival levels read no sites, so the cost is two levels at about one arrival in four and one in
+eight.
+
+**The recorded failures these choices could repeat.** *An index of contexts counted as generation*:
+the sites are the open section's present terrain, released by the level's own count, never written to
+be looked up (October 29 §2, "not a store"). *A located cause carried unrepaired into a new consumer*:
+the participation race's cause (every level reading the same 128 classes, its heads collapsing onto
+one site) is repaired at its owner by the clock, and the arrival levels, whose reach the modes already
+cover, read none. *A design thought in the programming language*: the reach is the level's own news,
+not a window.
+
+**Acceptance, fixed before the build.**
+61. The tower tests pass; the clocked participation beside the packets, the heading and the credit
+    from level 0 reads face for face as without it while its read material is at zero; every family's
+    covector is the code difference with it opened; the card is the host's for 32 sections at the
+    race's declaration with it, on bytes and on units.
+62. The development read on units: 64 sections from C′'s founding beside §33's, with the flux on the
+    continuation's opening after it.
+63. The race: one lap each on units from the same founding, the flux on the continuation's first 256
+    classes at least twice the unit declaration's, and the held-out read at equal elapsed time reported
+    beside it, with the writing.
