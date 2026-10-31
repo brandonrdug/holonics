@@ -2123,3 +2123,97 @@ both windows, where the every-level credit refuses none after its first: every f
 about an eighth of its step, the arrivals trail by 0.77 bits a byte at section 64, and the forwards
 of the rereads and the series' terms (three a section in the first window, nearly five in the
 second, growing as `D↓` opens) cost 2.3 times the time.
+
+**The race (acceptance 51 failed, the motive's lap incomplete).** October 31, 15:10Z to 15:23Z, one
+lock beside the game, binary `tower_pass-29n` (`93f0a152…444b`), the card suite passed 47 of 47 at
+the race's head first. Deadlines from each development read: the every-level credit's lap 281 s, the
+motive's 608 s. The every-level credit's lap took 196.7 s and read its lines (held-out 2.270, GSM8K
+2.310, peak resident set 3,213,444 KiB); the motive's lap stopped at its deadline after section 608
+of 726 (exit 124, peak 3,214,468 KiB), so it left no learner, writing or cut read; peak VRAM 10,886
+MiB with the game's. The development read projected it from a window of three terms a section, and
+the terms grew to thirteen: the projection error is the series' growth, and the lap is not
+relaunched with a larger deadline.
+
+| after section | every-level: arrivals, elapsed | motive: arrivals, elapsed | motive's halvings that window | its series terms that window (32 reverses) |
+|---|---|---|---|---|
+| 32 | 5.043, 13.0 s | 5.326, 21.7 s | 102 | 97 |
+| 64 | 3.792, 21.5 s | 4.565, 46.4 s | 103 | 156 |
+| 128 | 3.086, 38.6 s | 3.757, 89.9 s | 58 | 160 |
+| 256 | 2.590, 72.6 s | 3.180, 185.2 s | 64 | 225 |
+| 384 | 2.345, 106.2 s | 2.895, 310.8 s | 90 | 328 |
+| 512 | 2.229, 139.8 s | 2.738, 460.7 s | 89 | 399 |
+| 608 | 2.191, 164.7 s | 2.658, 577.8 s | 90 | 416 |
+
+The motive reads above the every-level credit lap for lap at every window (by 0.28 to 0.77 bits a
+byte) at 1.7 to 3.5 times its elapsed time, under 1,584 halvings by section 608 against the
+every-level credit's 43. **What it decides**, by the rule fixed before the race: not below the
+every-level credit lap for lap, the read is retired as the working law, and the every-level credit
+stays it. The rule's reading of that outcome, that the heading carries nothing the fine levels can
+use, is not what was measured: the covector is exact and the arrivals were starved by the refused
+step, about 2.8 halvings a section throughout, while the loop's series grew from three terms a
+section to thirteen. The next loop's subject is that measurement, read first by parts.
+
+**The refused steps read by their parts** (15:24Z, the motive's first 64 sections under §13's
+declared reading, which moved nothing: the section lines are the development read's; 132.9 s
+against a 160 s deadline). The descent part holds both `D` and `D↓`.
+
+| window | refused | raised alone by: descents | read | readout | clocked | rest | summed change, bits: descents | read | readout | clocked | rest | whole step |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 102 | 50 | 56 | 26 | 51 | 88 | −123,526 | −60,941 | +328,458 | −130,802 | +1,102,313 | +3,824,986 |
+| 2 | 103 | 78 | 46 | 22 | 26 | 62 | +703,811 | +78,511 | −29,110 | −18,589 | +758,178 | +3,464,783 |
+
+At §13 the face's descent `D` alone lowered the arrivals at every window. Here, by the second window,
+the descents' step alone raises them at 78 of 103 refused steps, by 703,811 bits together: `D↓`'s own
+step overshoots. The rest (the encoding and the arrival levels) raises them alone too, and the whole
+step raises them 2.3 times the parts' summed rise, so the parts also meet through the loop.
+
+## 30. The heading drives the fine modes; it does not pump them
+
+[agent-inferred, October 31] **The cause, read from §29.** `x⁰` is what every arrival level's push,
+gate and turn read, and what the clocked levels' contacts hear as the passing current. Added there,
+the coarse field did two different things to the fine field: it drove its modes (through each
+level's push, `γ P x`), and it modulated their constitution, each cell's decay and turn through the
+gate (`|λ|^(c r)`, `r` the gate's ratio) and the turn, which §29's law never meant. In the objects
+these are different elements: a source drives a mode at its port, with power `⟨e, f⟩`; a
+modulation of the constitution is a pump, whose work is its own account (the parametron's pump is a
+periodic modulation of the constitution, certified by its monodromy). A body force in a fluid enters
+the momentum balance as a source; it does not change the viscosity. §29's lift pumped every fine
+mode's dissipation from a field that the fine field itself forms, a closed loop through the gate's
+exponential, and its own step overshot (the parts, above).
+
+**The law.** The heading drives: it enters each arrival level's push and nothing else.
+
+```text
+h_l ← λ_l(x_l) h_l + γ_l P_l (x_l + D↓ ĥ(t))     for l < F (the push reads the force beside the stream)
+q_l, s_l read x_l alone                           (the gate and the turn read the stream, not the force)
+x⁰_t = E(u_t)                                     (the stream opens on the arrival)
+```
+
+`D↓ ĥ` is the coarse field's effort in the stream's coordinates and each fine level's own port `P_l`
+converts it into its modes' drive, scaled by each mode's own coupling `γ_l = √(1 − |λ_l|²)` (a slow
+mode answers a force weakly; no scale is chosen). The clocked levels' push reads the packet, which
+carries the fine levels' motion, as before. The covector is the same series (§29), its source the
+force's covector: `δ(D↓ ĥ)_t = Σ_(l<F) P_lᵀ γ_l G_l(t)`, the push's input covector at each arrival
+level, in place of `δx⁰`.
+
+**The recorded failures these choices could repeat.** §12 and §17 (a scaled step starved levels):
+no family's step is scaled; the force's response is scaled by the modes' own `γ`, which the
+constitution already holds. §9 (an incomplete covector): the series carries the loop whole, as at
+§29. §29 itself (the step overshooting through the loop): the force no longer reaches the gate, the
+turn or the contacts; if the parts reading still finds `D↓`'s step overshooting alone, the next loop
+reads its step's width (the sum over `ĥ`'s width that a sign-coherent step adds), not a larger limit.
+
+**Acceptance, fixed before the build.**
+52. The tower tests pass; with `D↓` at zero the force reads face for face as the every-level
+    credited heading; with `D` and `D↓` opened every family's covector is the code difference and
+    the series cut at its first term misses it on the heading's read; the card is the host's
+    (the card suite, and the race declaration's parity at 24 streams over 32 sections).
+53. The development read, 64 sections from C′'s founding beside the every-level credit: the
+    refusals after the first window at most twice the every-level credit's plus §29's first window's
+    rate halved (the bar: at most 52 halvings in window 2), and the arrivals at section 64 at or
+    below §29's 4.565. With the refusals still about three a section, the force did not remove them,
+    and the next loop reads `D↓`'s step.
+54. With 53 passed, the race of §29's acceptance 51, the lap's deadline from this development read
+    with the series' growth measured over §29's lap (its window time rose 1.9 times from window 2
+    to window 19), against the every-level credit's 2.270 at equal elapsed time, the cut read and
+    the writing shown.
