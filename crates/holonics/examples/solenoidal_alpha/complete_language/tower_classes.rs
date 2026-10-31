@@ -22,12 +22,12 @@
 //! Nothing here is text-, image- or sound-specific: a medium is only the chart that wrote its
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
 use super::tower_train::{agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
-use holonics::receiver::release::agreeing_class;
+use holonics::receiver::release::{agreeing_class, KeyStream};
 use super::*;
 use holonics::hnn::tower::participation::ENTROPY_BITS;
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::READ_BITS;
-use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TurnLadder};
+use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TowerState, TurnLadder};
 use rayon::prelude::*;
 
 /// The held-out read's four exterior regions of a composed passage (`compose.py`'s roles).
@@ -453,6 +453,18 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
         let reads: Vec<&[usize]> = steps.iter().map(|s| &s[..]).collect();
         faces = tower.advance_realized(&mut states, &reads, realization).map_err(|e| e.to_string())?.0;
     }
+    // Each release's own code a class, read from the state its prompt left (record §31).
+    let mut opened = Vec::with_capacity(prompts.len());
+    for prompt in &prompts {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = vec![tower.rest()];
+        let (face, _) = tower.advance_realized(&mut state, &[&entered], realization).map_err(|e| e.to_string())?;
+        opened.push((state.remove(0), face[0].clone()));
+    }
+    let release_bits = release_codes(tower, &opened, &released, realization)?;
+    for (p, (r, bits)) in released.iter().zip(&release_bits).enumerate() {
+        println!("CLASSES_RELEASE_CODE prompt={p} released={} release_bits_a_class={}", r.len(), per(*bits, r.len().max(1)));
+    }
     let releases: Vec<(Vec<usize>, bool, i64)> = released.into_iter().zip(ended).zip(codes).map(|((r, e), c)| (r, e, c)).collect();
     let mut written = Vec::new();
     let mut rows = String::from("prompt\tprompt_classes\tprompt_bits_a_class\treleased\tended\toctets\n");
@@ -468,6 +480,89 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     write_new(&out.join("RELEASES.classes"), &written)?;
     write_new(&out.join("RELEASES.tsv"), rows.as_bytes())?;
     println!("CLASSES_RELEASE_DONE prompts={} agree={agree} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// The code a class of each prompt's release read from the state its prompt left (`−log₂ p̂` summed on
+/// `2^(−20)` bits over the released classes, the first read against the prompt's own face), through
+/// `realization`.
+fn release_codes(tower: &holonics::hnn::tower::Tower, opened: &[(TowerState, holonics::hnn::tower::TowerFace)], releases: &[Vec<usize>], realization: &mut dyn PassRealization) -> Result<Vec<i64>> {
+    let mut codes = Vec::with_capacity(releases.len());
+    for ((state, face), released) in opened.iter().zip(releases) {
+        let Some(&first) = released.first() else {
+            codes.push(0);
+            continue;
+        };
+        let mut state = vec![state.clone()];
+        let (_, read) = tower.advance_realized(&mut state, &[released], realization).map_err(|e| e.to_string())?;
+        codes.push(face.code(first) + read[0]);
+    }
+    Ok(codes)
+}
+
+/// The span release's declared key extent: 2^28 bytes, 2^25 keys of eight bytes, some 5.6 million a
+/// prompt over the race's six (agent-inferred: a span takes about two rounds of 320 candidates of
+/// some five draws each, about 3,200 keys, and a prompt some 256 spans).
+const KEY_BUDGET: usize = 1 << 28;
+
+/// [agent-inferred, October 31] `release-span-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS
+/// KEYS_SHA COUNT AGREE CANDIDATES OUT`: the span release (`Tower::release_spans`, record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §31): each prompt entered as
+/// the class release enters it, then spans to its first clocked level's next tick released when
+/// `AGREE` of `CANDIDATES` drawn together agree, to `COUNT` classes or the end letter. The keys are
+/// split into one contiguous stream a prompt. Writes `RELEASES.classes` and `RELEASES.tsv` (with the
+/// spans, their rounds, whether the prompt's keys ran out, and the release's code a class).
+pub(crate) fn release_span_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("release-span-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS KEYS_SHA COUNT AGREE CANDIDATES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let end = tower.declaration.alphabet - 1;
+    let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
+    let keys = pinned_read(&args[5], &args[6], KEY_BUDGET)?;
+    let (limit, agree, candidates) = (positive(&args[7])?, positive(&args[8])?, positive(&args[9])?);
+    let out = Path::new(&args[10]);
+    let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
+    if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
+        return Err("every prompt closes with the end letter".into());
+    }
+    let share = keys.len() / prompts.len() / 8 * 8;
+    if share == 0 {
+        return Err("fewer keys than one a prompt".into());
+    }
+    realization.admit(tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
+    std::fs::create_dir(out)?;
+    let mut opened = Vec::with_capacity(prompts.len());
+    for prompt in &prompts {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = vec![tower.rest()];
+        let (face, _) = tower.advance_realized(&mut state, &[&entered], realization).map_err(|e| e.to_string())?;
+        opened.push((state.remove(0), face[0].clone()));
+    }
+    let mut streams: Vec<KeyStream> = (0..prompts.len()).map(|p| KeyStream::new(keys[p * share..(p + 1) * share].to_vec(), 8).map_err(|e| format!("{e:?}"))).collect::<std::result::Result<_, String>>()?;
+    let releases = tower.release_spans(opened.clone(), &mut streams, limit, agree, candidates, end, realization).map_err(|e| e.to_string())?;
+    let released: Vec<Vec<usize>> = releases.iter().map(|r| r.released.clone()).collect();
+    let codes = release_codes(tower, &opened, &released, realization)?;
+    let mut written = Vec::new();
+    let mut rows = String::from("prompt	prompt_classes	released	ended	unfinished	spans	rounds	keys	release_bits_a_class	octets
+");
+    for (p, (r, code)) in releases.iter().zip(&codes).enumerate() {
+        for &c in &r.released {
+            written.extend_from_slice(&(c as u16).to_be_bytes());
+        }
+        let octets: Vec<u8> = r.released.iter().filter(|&&c| c < 256).map(|&c| c as u8).collect();
+        let shown: String = octets.iter().map(|&b| b.escape_ascii().to_string()).collect();
+        let rounds: u32 = r.rounds.iter().sum();
+        rows.push_str(&format!("{p}	{}	{}	{}	{}	{}	{rounds}	{}	{}	{shown}
+", prompts[p].len(), r.released.len(), r.ended, r.unfinished, r.rounds.len(), streams[p].keys_read(), per(*code, r.released.len().max(1))));
+        println!("CLASSES_SPAN_RELEASE prompt={p} released={} ended={} unfinished={} spans={} rounds={rounds} keys={} release_bits_a_class={}", r.released.len(), r.ended, r.unfinished, r.rounds.len(), streams[p].keys_read(), per(*code, r.released.len().max(1)));
+    }
+    write_new(&out.join("RELEASES.classes"), &written)?;
+    write_new(&out.join("RELEASES.tsv"), rows.as_bytes())?;
+    println!("CLASSES_SPAN_RELEASE_DONE prompts={} agree={agree} candidates={candidates} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
     Ok(())
 }
 

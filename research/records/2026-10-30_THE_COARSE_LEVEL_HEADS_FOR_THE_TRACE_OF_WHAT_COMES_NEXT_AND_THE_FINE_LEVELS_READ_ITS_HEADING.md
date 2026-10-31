@@ -2336,3 +2336,45 @@ they run out.
     = 2`, within a deadline fixed from a measured round: the writing shown whole beside the `k = 1`
     and `k = 2` class releases of the same learner, with the rounds a span took, the keys drawn and
     each release's code a class.
+
+**Built.** `Tower::release_spans` (`hnn::tower::realization`) draws every candidate of every stream
+together, one `advance_realized` call a class (a closed candidate reads the end letter and its state
+is discarded; its state and face at the close are kept), reads the first clocked level's ticks with
+the clock's own law (`NewsClock::ticks`, now public) on each drawn class's code under the face that
+drew it, and takes the groups of `agree` candidates in key order; the stream's keys are its own, so
+one candidate agreeing alone draws exactly the class release's keys. The route
+`release-span-tower-classes … COUNT AGREE CANDIDATES OUT` enters each prompt as the class release
+does, splits the declared keys into one stream a prompt (the keys' extent is declared, 2^28 bytes),
+and writes each release with its spans, their rounds, the keys drawn and its code a class
+(`release_codes`, the release read from the state its prompt left; the class release now prints the
+same reading). Acceptance 55 passed (`the_span_release_agrees_over_the_first_clocked_levels_span`;
+the tower tests 152 of 152).
+
+**At the card**, the measured round (beside C′'s continuation, binary `tower_pass-31b`, 128 MiB of
+keys from the host's `/dev/urandom`, `dc62532a…703e`): six prompts to 32 classes took 37.8 s, 395 card
+forwards of 1,920 streams (65 ms each), 4 to 10 spans a prompt (3 to 8 classes a span) in 1 to 5
+rounds a span, 7,006 to 54,106 keys a prompt.
+
+**Acceptance 56 passed** (16:00Z to 16:13Z beside C′'s continuation, deadline 1,600 s from the
+measured round's 1,210 s projection; 809.1 s, 9,966 card forwards of 1,920 streams in 430.4 s, peak
+resident set 671,000 KiB). Every prompt finished: four ran to the bound and two ended on the end
+letter (at 348 and 688 classes); 66 to 209 spans a prompt in 189 to 662 rounds (2.8 to 3.3 rounds a
+span), 347,203 to 1,178,719 keys a prompt. Each release's own code a class under the learner:
+
+| prompt | class release, agree 1 | class release, agree 2 | span release, agree 2 |
+|---|---|---|---|
+| 0 | 1.929 | 1.140 | 1.612 |
+| 1 | 2.250 | 0.990 | 1.377 |
+| 2 | 1.845 | 0.564 | 1.454 |
+| 3 | 1.963 | 1.165 | 1.497 (348 classes, ended) |
+| 4 | 1.791 | 1.085 | 1.624 |
+| 5 | 1.885 | 1.055 | 1.546 (688 classes, ended) |
+
+The writing was shown whole in the thread and stays outside the repository. Read beside the class
+releases: the span release keeps the class release's vocabulary (it invents words inside a span,
+where each class is still the face's own draw) and drops the agreement-2 class release's loops of
+the commonest phrase and its runs of spaces; two prompts closed on their own, one of them through a
+whole word problem's shape (question, working, answer line, end letter). Its sharpening is the
+span's: `p(s)²` over spans moves the release's code a class from about 1.9 to about 1.5 bits, where
+the class agreement moves it to about 1.0. Nothing in it computes, and the arithmetic in the
+writing is wrong at every mark.

@@ -2043,7 +2043,7 @@ impl NewsClock {
 
     /// Every level's ticks at an arrival carrying `code` from the open phase `news`, and the phase
     /// after it.
-    fn ticks(&self, levels: usize, news: u64, code: i64) -> Result<(Vec<u32>, u64)> {
+    pub fn ticks(&self, levels: usize, news: u64, code: i64) -> Result<(Vec<u32>, u64)> {
         let period = self.period(levels)?;
         if news >= period {
             return refuse("a news phase past its clock's period");
@@ -10603,6 +10603,63 @@ mod tests {
         tower.join_news(NewsClock::above(2, 2, 2).expect("a clock")).expect("joined");
         tower.join_packets().expect("joined");
         tower
+    }
+
+    /// [agent-inferred, October 31] **The span release** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §31, acceptance 55): on
+    /// four levels clocked from level 2 with the heading, two prompts: with one candidate and
+    /// `agree = 1` the span release is the class release for the same keys; with `agree = 2` every
+    /// released span is one that its group's two candidates drew, the release is the same for the
+    /// same keys, each span took at least one round, and a stream whose keys run out stops
+    /// unfinished. Refused without a news clock and with candidates not a multiple of `agree`.
+    #[test]
+    fn the_span_release_agrees_over_the_first_clocked_levels_span() {
+        use crate::receiver::release::{agreeing_class, KeyStream};
+        let tower = headed(4);
+        let end = tower.declaration.alphabet - 1;
+        let passage = news_passage();
+        let prompts: [&[usize]; 2] = [&passage[..9], &passage[20..33]];
+        let opened = |pass: &mut HostPass| -> Vec<(TowerState, TowerFace)> {
+            prompts
+                .iter()
+                .map(|p| {
+                    let mut state = vec![tower.rest()];
+                    let (faces, _) = tower.advance_realized(&mut state, &[p], pass).expect("prompt");
+                    (state.remove(0), faces[0].clone())
+                })
+                .collect()
+        };
+        let key_bytes = |i: usize, n: usize| keys(8 * n * (i + 1))[8 * n * i..].to_vec();
+        let streams = |n: usize| -> Vec<KeyStream> { (0..2).map(|i| KeyStream::new(key_bytes(i, n), 8).expect("keys")).collect() };
+        let limit = 24;
+        // The class release, a class at a time from each prompt's own keys.
+        let mut pass = HostPass::default();
+        let mut by_class: Vec<Vec<usize>> = Vec::new();
+        for (i, (state, face)) in opened(&mut pass).into_iter().enumerate() {
+            let (mut state, mut face) = (vec![state], face);
+            let mut ks = KeyStream::new(key_bytes(i, limit), 8).expect("keys");
+            let mut released = Vec::new();
+            while released.len() < limit {
+                let class = agreeing_class(&face.masses, 1, &ks.next_key().expect("a key")).expect("draw");
+                released.push(class);
+                if class == end {
+                    break;
+                }
+                face = tower.advance_realized(&mut state, &[&[class]], &mut pass).expect("step").0.remove(0);
+            }
+            by_class.push(released);
+        }
+        let one = tower.release_spans(opened(&mut pass), &mut streams(limit), limit, 1, 1, end, &mut pass).expect("spans");
+        assert_eq!(one.iter().map(|r| r.released.clone()).collect::<Vec<_>>(), by_class, "one candidate agreeing alone is the class release");
+        assert!(one.iter().all(|r| r.rounds.iter().all(|&n| n == 1)) && one.iter().any(|r| r.rounds.len() > 1), "spans of one round each, more than one span");
+        let two = tower.release_spans(opened(&mut pass), &mut streams(1 << 14), limit, 2, 8, end, &mut pass).expect("spans");
+        let again = tower.release_spans(opened(&mut pass), &mut streams(1 << 14), limit, 2, 8, end, &mut pass).expect("spans");
+        assert_eq!(two, again, "the same keys release the same spans");
+        assert!(two.iter().all(|r| !r.unfinished && !r.rounds.is_empty() && (r.ended || r.released.len() == limit)), "each stream released to its bound or its end");
+        let short = tower.release_spans(opened(&mut pass), &mut streams(5), limit, 2, 8, end, &mut pass).expect("spans");
+        assert!(short.iter().all(|r| r.unfinished), "a stream whose keys run out stops unfinished");
+        assert!(tower.release_spans(opened(&mut pass), &mut streams(limit), limit, 2, 3, end, &mut pass).is_err());
+        assert!(tiny_with(4, true).release_spans(Vec::new(), &mut [], limit, 1, 1, end, &mut pass).is_err());
     }
 
     /// [agent-inferred, October 30] **A clocked level hears the packet its clock closed** (record

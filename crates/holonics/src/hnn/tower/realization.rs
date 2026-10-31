@@ -28,6 +28,7 @@
 //! faces and its continuing states.
 use super::split::{PairedContacts, SplitRead};
 use super::*;
+use crate::receiver::release::{agreeing_class, KeyStream};
 
 /// Which forward of a section a read is: the opening read (whose temporaries the reverse reads),
 /// the certificate's reread under a candidate deposit, or a reread on the ticks the opening read
@@ -123,6 +124,16 @@ pub trait PassRealization {
     fn reread_closures(&mut self, on: bool) {
         let _ = on;
     }
+}
+
+/// One stream's span release ([`Tower::release_spans`]): the classes released, whether it drew the
+/// end letter, whether its keys ran out first, and the rounds each released span took.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct SpanRelease {
+    pub released: Vec<usize>,
+    pub ended: bool,
+    pub unfinished: bool,
+    pub rounds: Vec<u32>,
 }
 
 /// One stream's forward as the host keeps it between calls: its continuing state, its face after
@@ -679,6 +690,110 @@ impl Tower {
             a = b;
         }
         Ok((faces, codes))
+    }
+
+    /// [definition; agent-inferred, October 31] **The span release** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §31): each stream
+    /// releases the span its first clocked level's next tick closes once `agree` independent
+    /// candidates drew the same span. From the stream's state and face, `candidates` candidates each
+    /// draw class by class from the face (one key a draw from the stream's own keys, candidate by
+    /// candidate in order) until the first clocked level ticks on the drawn class's news, the end
+    /// letter is drawn or the stream's bound is reached; the candidates are taken in disjoint groups
+    /// of `agree` in order, and the first group whose spans are equal releases its span, so a released
+    /// span is an exact draw from `p(s)^agree / Σ p(s')^agree`. The stream continues from the span's
+    /// end; a round with no agreeing group releases nothing and the next round draws again. A stream
+    /// whose keys run out stops unfinished. With `agree = 1` and one candidate it is the class
+    /// release. Every candidate of every stream is read together through `realization` (a closed
+    /// candidate reads the end letter, its state discarded). Refused without a news clock, at a zero
+    /// `agree`, or with `candidates` not a positive multiple of it.
+    #[allow(clippy::too_many_arguments)]
+    pub fn release_spans(&self, openings: Vec<(TowerState, TowerFace)>, keys: &mut [KeyStream], limit: usize, agree: usize, candidates: usize, end: usize, realization: &mut dyn PassRealization) -> Result<Vec<SpanRelease>> {
+        let clock = self.news.ok_or(TowerError::Refused("the span release reads the first clocked level's ticks: without a news clock there are none"))?;
+        let (levels, first) = (self.declaration.levels, clock.first());
+        if agree == 0 || candidates == 0 || candidates % agree != 0 || first >= levels || keys.len() != openings.len() || end >= self.declaration.alphabet {
+            return Err(TowerError::Refused("a span release takes a positive agreement, candidates a multiple of it, a clocked level, one key stream a stream and the end letter in the alphabet"));
+        }
+        enum Candidate {
+            Open,
+            Closed(Box<(TowerState, TowerFace)>),
+            Dead,
+        }
+        let streams = openings.len();
+        let mut base = openings;
+        let mut out: Vec<SpanRelease> = (0..streams).map(|_| SpanRelease::default()).collect();
+        let mut tries = vec![0u32; streams];
+        loop {
+            let active: Vec<usize> = (0..streams).filter(|&i| !out[i].ended && !out[i].unfinished && out[i].released.len() < limit).collect();
+            if active.is_empty() {
+                return Ok(out);
+            }
+            let n = active.len() * candidates;
+            let owner = |c: usize| active[c / candidates];
+            let mut states: Vec<TowerState> = (0..n).map(|c| base[owner(c)].0.clone()).collect();
+            let mut faces: Vec<TowerFace> = (0..n).map(|c| base[owner(c)].1.clone()).collect();
+            let mut spans: Vec<Vec<usize>> = vec![Vec::new(); n];
+            let mut cands: Vec<Candidate> = (0..n).map(|_| Candidate::Open).collect();
+            let mut exhausted = vec![false; streams];
+            loop {
+                let mut reads = vec![end; n];
+                let mut closing = vec![false; n];
+                for c in 0..n {
+                    let i = owner(c);
+                    if !matches!(cands[c], Candidate::Open) {
+                        continue;
+                    }
+                    let Some(key) = keys[i].next_key() else {
+                        exhausted[i] = true;
+                        cands[c] = Candidate::Dead;
+                        continue;
+                    };
+                    let class = agreeing_class(&faces[c].masses, 1, &key).map_err(|_| TowerError::Refused("a face the draw refuses"))?;
+                    let (ticks, _) = clock.ticks(levels, states[c].news, faces[c].code(class))?;
+                    spans[c].push(class);
+                    closing[c] = class == end || ticks[first] > 0 || out[i].released.len() + spans[c].len() >= limit;
+                    reads[c] = class;
+                }
+                if !cands.iter().any(|c| matches!(c, Candidate::Open)) {
+                    break;
+                }
+                let steps: Vec<[usize; 1]> = reads.iter().map(|&r| [r]).collect();
+                let read: Vec<&[usize]> = steps.iter().map(|s| &s[..]).collect();
+                let (next, _) = self.advance_realized(&mut states, &read, realization)?;
+                for (c, face) in next.into_iter().enumerate() {
+                    if matches!(cands[c], Candidate::Open) {
+                        faces[c] = face;
+                        if closing[c] {
+                            cands[c] = Candidate::Closed(Box::new((states[c].clone(), faces[c].clone())));
+                        }
+                    }
+                }
+                if !cands.iter().any(|c| matches!(c, Candidate::Open)) {
+                    break;
+                }
+            }
+            for (a, &i) in active.iter().enumerate() {
+                if exhausted[i] {
+                    out[i].unfinished = true;
+                    continue;
+                }
+                tries[i] += 1;
+                let group = (0..candidates / agree).find(|&g| {
+                    let from = a * candidates + g * agree;
+                    spans[from..from + agree].windows(2).all(|w| w[0] == w[1])
+                });
+                if let Some(g) = group {
+                    let c = a * candidates + g * agree;
+                    let Candidate::Closed(end_state) = std::mem::replace(&mut cands[c], Candidate::Dead) else {
+                        return Err(TowerError::Refused("an agreeing span that did not close"));
+                    };
+                    out[i].released.extend_from_slice(&spans[c]);
+                    out[i].rounds.push(tries[i]);
+                    tries[i] = 0;
+                    out[i].ended = spans[c].last() == Some(&end);
+                    base[i] = *end_state;
+                }
+            }
+        }
     }
 
     /// One call of [`Tower::advance_realized`]: every stream's classes read from its state, within
