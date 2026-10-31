@@ -3045,3 +3045,22 @@ closures and 41,017,536 covector entries equal, every learner equal (268.2 s: ho
 2.031) in 146.0 s against the pair learner's 2.203 in 18.4 s: 7.9 times the lap (card forward 104.2 s of
 it), device peak 10,886 MiB. The 20 laps acceptance 75 reads are a stated long run, 2,944 s projected,
 deadline 3,000 s.
+
+**Acceptance 75 failed: the learner ran away at lap 13** (`g46*`, 2,273.0 s against 3,000 s; device
+peak 10,828 MiB). Through lap 12 the participating pair learner tracked the pair learner lap for lap
+(held out 1.602 at lap 10 against 1.598) and at lap 10 its first calculation took the question's numbers
+in 10 of 119 releases against the pair learner's 6 of 119, the first movement of that reading; its
+flux there was 351.0 against 384.6. At lap 13 the certificate began to refuse (9 a window, then 21,
+after none to one), the training code rose from 1.470 to 1.871 and the held-out code from 1.672 to
+1.935, and at lap 20 every reading had fallen (flux 78.8; on the problem's words 8; exact at the equals
+26 of 399; first calculation from the question 3 of 97). **The located place** (`TOWER_SWELL`, the
+largest magnitude of each level's carriers): at lap 13 level 1's state grew about seven times
+(10,567,904 to 65,349,968 and 75,786,219 grains) and its raw read about fifteen times (16,250,875 to
+252,741,798), the passing current into levels 1 to 4 about four times in two laps (3.0 to 13.5 million),
+and level 4's contact drive about five times. The passing current is the sum of every level's returns
+and nothing bounds it; the pair contact's return is a product of two drives, so it grows with the square
+of their scale and feeds back through that sum. The same run-away is the likeliest cause of C′'s rise
+with pair contacts from its 13th lap (October 30) and of the plateau the pair learner crossed at laps
+18 to 30 here; participation adds to the drives and tips it over. The next loop's subject is that place:
+what the contacts return into the passing current is bounded by passivity, proved for the pair contact,
+before any part joins beside it.
