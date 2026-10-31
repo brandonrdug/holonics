@@ -17,6 +17,18 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 31 (evening): participation at the clocked levels raced and set aside; the working learner
+continues; the capacity read.** Participation joined the working declaration at the clocked levels
+alone, on their own ticks (record §35–§36), exact host against card on bytes and units after a
+packet-tick routing defect was located, its sites' buffers held at its own levels (3.85 GB less at 320
+streams). Raced at 160 streams (the 320-stream frame with it passes the 12 GB the card keeps) it read
+2.170 against 2.164 in one lap at 3.1 times the time, the prompt's flux on the continuation's first 256
+classes 1.25 times the unit declaration's (bar 2, failed, §37); reaching 512 ticks raised it 1.37
+times, short of the fixed half again, so reach is not the cause (§38). The unit declaration continued
+to 30 laps reads 1.846 (GSM8K 1.778), about 0.003 a lap. The capacity read (width 128, 512 contacts,
+§39) is fixed and running; the transferred packet response the October 31 hardware review names is
+the next learning term.
+
 **October 31: the working declaration reads founded units, and the release agrees over the heading's
 span (card).** On the RTX 4080 SUPER the race's declaration (the stacked news clock, packets, the
 heading the face reads, and every level's credit across the section's edge) read in the October 23

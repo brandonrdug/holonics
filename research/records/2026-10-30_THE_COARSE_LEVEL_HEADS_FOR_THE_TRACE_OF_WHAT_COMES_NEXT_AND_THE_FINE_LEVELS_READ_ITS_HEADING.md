@@ -2801,3 +2801,52 @@ the held-out code.
     and the writing. The decision: a width that holds out lower at equal elapsed time and raises the
     flux sends the working law to it; lower code alone at equal time, without the flux, reads size as
     compression and not as concentration.
+
+**Acceptance 66 passed and 67 read; the read is withdrawn as a capacity test** (`c39*`). The card was
+the host's at the wider declaration (32 sections of 24 streams, 59,270,336 covector entries and every
+learner equal; material 1,852,198 entries). Its development read held out 2.426 in 43.5 s against
+width 64's 2.611 in 24.9 s, flux 255.5 against 250.5; one lap held out 2.111 in 208.6 s, where width
+64 read 2.164, 2.063 and 2.012 at its lap ends 117.1, 230.7 and 343.7 s (about 2.08 at 208.6 s
+between them, interpolated), and its flux on the first 256 classes was 299.8 against width 64's 540.8
+after its second lap and 545.2 after its third. Brandon (October 31) corrected the read itself: it
+compared two widths picked by hand and founded from nothing, while the framework's width is dynamic,
+widened at a declared crossing when what it carries outgrows it, and the repository's growth law
+(record `2026-10-29_THE_BODY_GROWS_BY_COPIES…`) widens a trained body by copies whose parts sum to
+what it learned, face for face. The read is the recorded failure of a design thought in the
+programming language (a fixed array width); it measures nothing about lawful widening. Its cause in
+the code: growth refuses the heading and the passage credit, so the working declaration could not
+grow, and the comparison fell back to fixed widths. §40 repairs that cause.
+
+## 40. The working learner grows: the heading's and the credit's lifts, and the crossing read from the founding law
+
+[agent-inferred, October 31] **The lifts.** Growth by `f` (`Tower::widened`) repeats every coordinate
+and splits every matrix over its column copies, so every sum the forward forms is the old one. The
+heading's read `C^→_l` (width by modes) splits as the reads do and its descent `D_l` (width by width)
+as a matrix the founding opens at zero, evenly; the ratio `r̂` of a repeated vector is the repeated
+ratio (its power is a mean), so each clocked level's heading is the old heading repeated and the face
+reads `D ĥ⁺` as before. The open traces are sums of encoded faces, repeated with the encoding. The
+closure is read and not learned (§11), so growth changes no forward sum or covector through it; its
+reading is reported over the grown width. The credit's moments are derivatives of a mode's state by
+one entry of its own families; a copy of mode `k` reads the copies of input row `j` exactly as `k`
+read `j`, so each grown moment is the old moment repeated over mode and row copies (not divided):
+`P'[(c, k), (c′, j)] = P[k, j]`, `A'[(c, k)] = A[k]`, and likewise `K`, `Q`, `W` and the packet's.
+The opening covector then meets them in the grown families exactly as before. A credit held resident
+on the card is fetched before the growth (its marks are refused, as at a save).
+
+**The crossing.** Growth is lawful where the width is outgrown, read by the founding law
+(`code.rank-one-founding`, `hnn.sparse-binding`): over a section, a family's covector `G` and second
+moment `V` found a new rank-one coordinate where `g²/(τ(1 + r)) > ln(1 + r)`, `g` its leading singular
+value and `r` its reach through `V`. The read before any growth is that test on the working learner's
+families at its latest lap: a family whose leading direction pays has outgrown its width there; none
+paying says width is not what binds it, and no growth follows.
+
+**Acceptance, fixed before the build.**
+68. Growth by two of the working declaration (packets, passage, heading, every-level credit): the
+    grown tower reads face for face with the old over a passage from an opening carrying the credit,
+    the heading's state and the clocked levels' packets; the grown state is the widened old state
+    after each class; the grown credit's opening meet equals the old credit's per old entry summed
+    over its copies; host tests, then the card the host's over 32 sections at the race's declaration
+    on units with the grown learner.
+69. The founding test read on the working learner's families at its latest lap, reported per family;
+    then, only where it pays, the grown learner continued against the ungrown one at equal elapsed
+    time, with the flux and the writing.

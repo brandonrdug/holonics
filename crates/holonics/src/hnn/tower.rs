@@ -2223,6 +2223,30 @@ impl LevelCredit {
         Self { push: vec![(0, 0); n * w], along: vec![(0, 0); n], around: vec![(0, 0); n], gate_bias: vec![(0, 0); g * n], gate: vec![(0, 0); g * n * w], packet: None, resident: None }
     }
 
+    /// [agent-inferred, October 31] **The credit widened** with its tower by `factor` (record
+    /// `2026-10-30_…`, §40): a moment is the derivative of a mode's state by one entry of its own
+    /// families, and a copy of mode `k` reads the copies of row `j` exactly as `k` read `j`, so each
+    /// grown moment is the old one repeated over the mode and row copies, not divided:
+    /// `P'[(c, k), (c′, j)] = P[k, j]`, `A'[(c, k)] = A[k]`, and so for `K`, `Q`, `W` and the packet's.
+    pub(crate) fn widened(&self, n: usize, w: usize, factor: usize) -> Self {
+        let rows = |m: &[(i64, i64)]| -> Vec<(i64, i64)> {
+            if m.is_empty() {
+                return Vec::new();
+            }
+            let row: Vec<Vec<(i64, i64)>> = (0..n).map(|k| m[k * w..(k + 1) * w].repeat(factor)).collect();
+            (0..factor).flat_map(|_| row.iter().flatten().copied()).collect()
+        };
+        Self {
+            push: rows(&self.push),
+            along: self.along.repeat(factor),
+            around: self.around.repeat(factor),
+            gate_bias: self.gate_bias.repeat(factor),
+            gate: rows(&self.gate),
+            packet: self.packet.as_ref().map(|p| Box::new(p.widened(n, w, factor))),
+            resident: self.resident,
+        }
+    }
+
     /// The credit of a level that carries none (below a news clock's first clocked level).
     fn empty() -> Self {
         Self { push: Vec::new(), along: Vec::new(), around: Vec::new(), gate_bias: Vec::new(), gate: Vec::new(), packet: None, resident: None }
@@ -9904,7 +9928,7 @@ mod tests {
     /// clocked from level 2, with packets; beside them participation from level 2 (founded, so its
     /// contact `W₁ᵃ` is zero, or opened as [`tiny_participating_of`] opens it); then the passage and
     /// the heading.
-    fn working(participating: Option<bool>) -> Tower {
+    pub(super) fn working(participating: Option<bool>) -> Tower {
         let mut tower = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Rectifying);
         tower.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
         tower.join_packets().expect("joined");
@@ -10455,7 +10479,7 @@ mod tests {
     }
 
     /// The passage the news clock's tests read: sixty-one classes over four.
-    fn news_passage() -> Vec<usize> {
+    pub(super) fn news_passage() -> Vec<usize> {
         (0..61).map(|i| (i * 7 + i / 3) % 4).collect()
     }
 
