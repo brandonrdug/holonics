@@ -1,17 +1,20 @@
 //! **The gated tower's training pass on the card** (`holonics_cuda::hnn::tower`; #404, #76).
 //!
 //! - `tower_pass parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS
-//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | pair | split]`:
+//!   SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]`:
 //!   founds the gated tower (rectifying, or with pair contacts when `pair`, `packets-pair` or `split` is; on both turn ladders) on the keys, its levels on the news
 //!   clock `NewsClock::above(NEWS_BITS, NEWS_RADIX, FIRST)` when one is named (`FIRST` 1 when it is
 //!   not; the passage needs a clock, the mutual contact none), with participation over `SECTION`
 //!   joined after it (`Tower::founded_participation`, one head a rung) when `participating` is, or with the
 //!   mutual contact joined at `β = 2^(−2)` (`Tower::join_mutual_contact`) when `mutual` is, or with
 //!   the passage joined last (`Tower::join_passage`) when `passage` is (and the packets after it,
-//!   `Tower::join_packets`, when `packets` or `packets-pair` is), and runs
+//!   `Tower::join_packets`, when `packets` or `packets-pair` is, and the heading after them,
+//!   `Tower::join_heading`, when `heading` is, every stream carrying the clocked levels' credit when
+//!   `heading-credited` is, `LevelCredit`), and runs
 //!   `SECTIONS` sections of the class passage (two bytes a class, big-endian,
 //!   alphabet 257) host against card in lockstep. Each section's opening read is compared face by
-//!   face and the whole summed covector entry by entry, then both learners take the section (the
+//!   face (and, under the heading, each clocked level's closure faces) and the whole summed covector
+//!   entry by entry, then both learners take the section (the
 //!   host's through `HostPass`, the card's through `TowerCard`) and their texts and continuing
 //!   states are compared. With `split`, both learners are paired (`TowerLearner::paired`, every
 //!   pair dormant), the opening's split read is compared beside the covector, and both take each
@@ -31,10 +34,12 @@
 //!   (`train-gated-tower-classes`, `train-scaled-tower-classes`, `train-two-ladder-tower-classes`,
 //!   `train-two-ladder-pair-tower-classes`, `train-two-ladder-split-tower-classes`,
 //!   `train-two-ladder-dormant-split-tower-classes`,
-//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, `train-two-ladder-stacked-news-packet-pair-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
+//!   `train-two-ladder-news-tower-classes`, `train-two-ladder-participating-tower-classes`, `train-two-ladder-news-participating-tower-classes`, `train-two-ladder-mutual-tower-classes`, `train-two-ladder-news-passage-tower-classes`, `train-two-ladder-stacked-news-passage-tower-classes`, `train-two-ladder-stacked-news-packet-tower-classes`, `train-two-ladder-stacked-news-packet-pair-tower-classes`, `train-two-ladder-stacked-news-heading-tower-classes`, `train-two-ladder-stacked-news-heading-credited-tower-classes`, or `train-unit-tower`, `train-unit-pumped-tower` or
 //!   `train-unit-pair-pumped-tower` on the founded units) with every section's forward and reverse on the
 //!   card; its saved learner is the host's (`TOWER_STATE`'s digest names it). A tower the card
 //!   does not carry is refused at its first section (`TowerCard::admits`), never read on the host.
+//!   With `TOWER_PROFILE` set, every launch is timed alone and each kernel entry's launches and
+//!   summed time are printed at the end (`TOWER_PROFILE` lines).
 //! - `tower_pass release complete-language release-tower-classes ARGS…`: the class release with
 //!   every prompt's read and every drawn class's step on the card, the prompts drawing together.
 //! - `tower_pass read complete-language read-tower-race ARGS…`: the race's readings of a rested
@@ -82,13 +87,54 @@ fn digest(bytes: &[u8]) -> Result<String> {
     Ok(digest)
 }
 
+const PARITY_USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split], each of packets, heading, heading-credited and heading-credited-every-level also with -participating, -pair or -split, or parity-units-founded UNITS UNITS_SHA TEXT TEXT_SHA KEYS KEYS_SHA ... (the founded units' classes in place of CLASSES)";
+
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | pair | split]";
     if args.len() < 12 {
+        return Err(PARITY_USAGE.into());
+    }
+    let bytes = pinned(&args[0], &args[1])?;
+    if bytes.len() % 2 != 0 {
+        return Err("a class file holds two bytes a class".into());
+    }
+    let classes: Vec<usize> = bytes.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as usize).collect();
+    parity_on(&classes, 257, &args[2..])
+}
+
+/// [agent-inferred, October 31] The founded lockstep on the founded units' classes (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35, acceptance 61): the
+/// units' alphabet and the text's classes in place of a class file, the rest as `parity`.
+fn parity_units_founded(args: &[String]) -> Result<()> {
+    if args.len() < 14 {
+        return Err(PARITY_USAGE.into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned(&args[0], &args[1])?)?).map_err(|e| e.to_string())?;
+    let classes: Vec<usize> = units.parse(&pinned(&args[2], &args[3])?).map_err(|e| e.to_string())?.into_iter().map(|u| u as usize).collect();
+    println!("TOWER_PARITY_UNITS units={} classes={}", units.len(), classes.len());
+    parity_on(&classes, units.len(), &args[4..])
+}
+
+/// The founded lockstep over `classes` of `alphabet`, `args` being `parity`'s from `KEYS` on.
+fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> {
+    const USAGE: &str = PARITY_USAGE;
+    if args.len() < 10 {
         return Err(USAGE.into());
     }
-    let word = args.last().filter(|w| w.parse::<u32>().is_err()).map(String::as_str);
-    let numbers = &args[12..args.len() - usize::from(word.is_some())];
+    let given = args.last().filter(|w| w.parse::<u32>().is_err()).map(String::as_str);
+    let numbers = &args[10..args.len() - usize::from(given.is_some())];
+    // `<word>-participating` (`packets`, `heading`, `heading-credited`, `heading-credited-every-level`)
+    // joins participation at the clocked levels after the packets and before the passage (record
+    // `2026-10-30_…`, §35).
+    let clocked_participation = given.is_some_and(|w| w.ends_with("-participating") && w != "participating");
+    let word = given.map(|w| if clocked_participation { w.trim_end_matches("-participating") } else { w });
+    // `<word>-pair` (`heading`, `heading-credited`, `heading-credited-every-level`) founds every contact
+    // as the pair contact (record `2026-10-30_…`, §41).
+    let pair_suffix = word.is_some_and(|w| w.ends_with("-pair") && w != "packets-pair");
+    let word = word.map(|w| if pair_suffix { w.trim_end_matches("-pair") } else { w });
+    // `<word>-split` pairs those pair contacts and reads each section's founding (record `2026-10-30_…`,
+    // §42).
+    let split_suffix = word.is_some_and(|w| w.ends_with("-split"));
+    let word = word.map(|w| if split_suffix { w.trim_end_matches("-split") } else { w });
     let clock = match numbers {
         [] => None,
         [bits, radix] => Some(NewsClock::new(bits.parse()?, radix.parse()?)?),
@@ -96,41 +142,40 @@ fn parity(args: &[String]) -> Result<()> {
         _ => return Err(USAGE.into()),
     };
     // `packets` joins the passage and then the packets (`Tower::join_packets`), the race's C′;
-    // `packets-pair` is C′ with every contact the pair contact.
-    let packets = word == Some("packets") || word == Some("packets-pair");
+    // `packets-pair` is C′ with every contact the pair contact; `heading` is C′ with the heading
+    // joined after the packets (`Tower::join_heading`), the race's H.
+    // `heading-credited` is the race's H with every stream carrying the clocked levels' credit.
+    let every_level = word == Some("heading-credited-every-level");
+    let credited = word == Some("heading-credited") || every_level;
+    let heading = word == Some("heading") || credited;
+    let packets = word == Some("packets") || word == Some("packets-pair") || heading;
     // `pair` founds every contact as the pair contact (`ContactLaw::Pair`), the race's
     // `train-two-ladder-pair-tower-classes`.
     // `split` founds the pair contacts and pairs them, every pair dormant
     // (`TowerLearner::paired`), the founded split's sections (`TowerLearner::section_founding`).
-    let split = word == Some("split");
-    let pair = word == Some("pair") || word == Some("packets-pair") || split;
+    let split = word == Some("split") || split_suffix;
+    let pair = word == Some("pair") || word == Some("packets-pair") || split || pair_suffix;
     let (participating, mutual, passage) = (word == Some("participating"), word == Some("mutual"), word == Some("passage") || packets);
     if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
     }
-    let bytes = pinned(&args[0], &args[1])?;
-    let keys = pinned(&args[2], &args[3])?;
-    if bytes.len() % 2 != 0 {
-        return Err("a class file holds two bytes a class".into());
-    }
-    let classes: Vec<usize> = bytes.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as usize).collect();
-    let alphabet = 257;
+    let keys = pinned(&args[0], &args[1])?;
     if classes.iter().any(|&c| c >= alphabet) {
         return Err("a class outside the declared alphabet".into());
     }
     let declaration = TowerDeclaration {
         alphabet,
-        width: count(&args[4])?,
-        modes: count(&args[5])?,
-        contacts: count(&args[6])?,
-        levels: count(&args[7])?,
+        width: count(&args[2])?,
+        modes: count(&args[3])?,
+        contacts: count(&args[4])?,
+        levels: count(&args[5])?,
         gated: true,
         turned: false,
         pumped: false,
         contact: if pair { ContactLaw::Pair } else { ContactLaw::Rectifying },
     };
-    let (streams, section, sections) = (count(&args[8])?, count(&args[9])?, count(&args[10])?);
-    let rate_bits: u32 = args[11].parse()?;
+    let (streams, section, sections) = (count(&args[6])?, count(&args[7])?, count(&args[8])?);
+    let rate_bits: u32 = args[9].parse()?;
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -148,13 +193,30 @@ fn parity(args: &[String]) -> Result<()> {
         tower.join_mutual_contact(2)?;
         println!("TOWER_MUTUAL_CONTACT shift=2");
     }
+    if clocked_participation {
+        let first = tower.news().map_or(0, |c| c.first());
+        tower.join_packets()?;
+        // The section and first level a run declares (`TOWER_PARTICIPATION_SECTION`,
+        // `TOWER_PARTICIPATION_FROM`; record `2026-10-30_…`, §44).
+        let pa_section = std::env::var("TOWER_PARTICIPATION_SECTION").ok().map(|v| v.parse::<usize>()).transpose()?.unwrap_or(section);
+        let pa_from = std::env::var("TOWER_PARTICIPATION_FROM").ok().map(|v| v.parse::<usize>()).transpose()?.unwrap_or(first);
+        let founded = tower.founded_participation(pa_section)?.from_level(pa_from);
+        println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
+        tower.join_participation(founded)?;
+    }
     if passage {
         tower.join_passage()?;
         println!("TOWER_PASSAGE first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
-    if packets {
+    if packets && !clocked_participation {
         tower.join_packets()?;
+    }
+    if packets {
         println!("TOWER_PACKETS first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
+    }
+    if heading {
+        tower.join_heading()?;
+        println!("TOWER_HEADING first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
@@ -167,7 +229,7 @@ fn parity(args: &[String]) -> Result<()> {
     } else {
         None
     };
-    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired)
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, paired, credited.then_some(if every_level { 0 } else { usize::MAX }))
 }
 
 fn parity_state(args: &[String]) -> Result<()> {
@@ -213,15 +275,20 @@ fn parity_from(state: &[u8], classes: &[usize], args: &[String]) -> Result<()> {
     };
     let mut host = host;
     let mut carded = TowerLearner::from_text(std::str::from_utf8(state)?)?;
-    lockstep(&mut host, &mut carded, classes, streams, section, sections, None)?;
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, None, None)?;
     println!("TOWER_PARITY_SHA sections={sections} whole_pass={} host={} card={}", sections == whole, digest(host.to_text().as_bytes())?, digest(carded.to_text().as_bytes())?);
     Ok(())
 }
 
 /// Host against card in lockstep over `sections` sections of the passage split into `streams`
 /// streams, every stream from rest; with `paired` (the host's directions, then the card's), each
-/// section's split read and founding too.
-fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>) -> Result<()> {
+/// section's split read and founding too; with `credit_from`, every stream from rest with its credit,
+/// the card's learner holding it resident (each section's direct read on a second realization,
+/// which uploads the host's), and its credit fetched to compare the states.
+#[allow(clippy::too_many_arguments)]
+fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize], streams: usize, section: usize, sections: usize, mut paired: Option<(PairedContacts, PairedContacts)>, credit_from: Option<usize>) -> Result<()> {
+    // `credit_from`: the first credited level, `usize::MAX` for the tower's own clocked levels.
+    let credited = credit_from.is_some();
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -231,11 +298,24 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     if std::env::var_os("TOWER_PROFILE").is_some() {
         card.profile();
     }
-    let mut states_h: Vec<TowerState> = (0..streams).map(|_| host.tower.rest()).collect();
+    let mut direct = TowerCard::open(&opened)?;
+    // [agent-inferred, October 31] A declared realization (`TOWER_FACE_GLOBAL`): both cards keep the
+    // alphabet's logits and face in the frame, the wide alphabet's path, read here against the host.
+    if std::env::var_os("TOWER_FACE_GLOBAL").is_some() {
+        card.force_face_global();
+        direct.force_face_global();
+    }
+    let mut states_h: Vec<TowerState> = (0..streams)
+        .map(|_| match credit_from {
+            None => host.tower.rest(),
+            Some(usize::MAX) => host.tower.rest_with_credit(),
+            Some(from) => host.tower.rest_with_credit_from(from),
+        })
+        .collect();
     let mut states_c = states_h.clone();
     let started = Instant::now();
     let (mut faces_all, mut faces_unequal, mut entries_all, mut entries_unequal, mut learners_unequal) = (0usize, 0usize, 0usize, 0usize, 0usize);
-    let (mut splits_unequal, mut admitted) = (0usize, 0usize);
+    let (mut splits_unequal, mut admitted, mut closures_all) = (0usize, 0usize, (0usize, 0usize));
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
     println!("TOWER_PARITY_OPEN material={} streams={streams} section={section} sections={sections} card={}", host.tower.theta.len(), opened.census().name);
     for k in 0..sections {
@@ -256,13 +336,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         // section.
         drop(reference);
         let t1 = Instant::now();
-        let read_c = card.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
+        let reading = if credited { &mut direct } else { &mut card };
+        let read_c = reading.forward(&host.tower, &states_h, &parts, &targets, Slot::Opened)?;
         let (g_c, split_c) = match &paired {
             Some((p, _)) => {
-                let (g, read) = card.reverse_split(&host.tower, &states_h, &parts, None, p)?;
+                let (g, read) = reading.reverse_split(&host.tower, &states_h, &parts, None, p)?;
                 (g, Some(read))
             }
-            None => (card.reverse(&host.tower, &states_h, &parts, None)?, None),
+            None => (reading.reverse(&host.tower, &states_h, &parts, None)?, None),
         };
         let split_equal = split_h == split_c;
         splits_unequal += usize::from(!split_equal);
@@ -274,8 +355,12 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         let g_unequal = g_h.iter().zip(&g_c).filter(|(a, b)| a != b).count() + g_h.len().abs_diff(g_c.len());
         let first = g_h.iter().zip(&g_c).position(|(a, b)| a != b);
         let swell_equal = read_h.swell == read_c.swell;
+        let closures_h: Vec<(u128, u128)> = read_h.closures.iter().flatten().flatten().copied().collect();
+        let closures_c: Vec<(u128, u128)> = read_c.closures.iter().flatten().flatten().copied().collect();
+        let closures_unequal = closures_h.iter().zip(&closures_c).filter(|(a, b)| a != b).count() + closures_h.len().abs_diff(closures_c.len());
         faces_all += faces_h.len();
         faces_unequal += unequal;
+        closures_all = (closures_all.0 + closures_h.len(), closures_all.1 + closures_unequal);
         entries_all += g_h.len();
         entries_unequal += g_unequal;
         // Both learners take the section.
@@ -307,14 +392,22 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
                 paired.as_ref().map_or(Ok(0), |(p, _)| p.parting(&host.tower))?
             );
         }
-        let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == states_c;
+        let fetched = if credited {
+            let mut fetched = states_c.clone();
+            card.fetch_credit(&carded.tower, &mut fetched)?;
+            fetched
+        } else {
+            states_c.clone()
+        };
+        let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == fetched;
         learners_unequal += usize::from(!learner_equal);
         host_ns += (t1 - t0).as_nanos() + (t4 - t3).as_nanos();
         card_ns += (t2 - t1).as_nanos() + (t5 - t4).as_nanos();
         println!(
-            "TOWER_PARITY section={} faces={} faces_unequal={unequal} codes_unequal={codes_unequal} swell_equal={swell_equal} gradient_entries={} gradient_unequal={g_unequal} first_unequal={first:?} deposited={} halvings={} learner_equal={learner_equal} host_pass_ms={} card_pass_ms={} host_section_ms={} card_section_ms={}",
+            "TOWER_PARITY section={} faces={} faces_unequal={unequal} codes_unequal={codes_unequal} closures={} closures_unequal={closures_unequal} swell_equal={swell_equal} gradient_entries={} gradient_unequal={g_unequal} first_unequal={first:?} deposited={} halvings={} learner_equal={learner_equal} host_pass_ms={} card_pass_ms={} host_section_ms={} card_section_ms={}",
             k + 1,
             faces_h.len(),
+            closures_h.len(),
             g_h.len(),
             receipt_h.deposited,
             receipt_h.halvings,
@@ -329,7 +422,9 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     }
     let times = card.times();
     println!(
-        "TOWER_PARITY_DONE sections={sections} faces={faces_all} faces_unequal={faces_unequal} gradient_entries={entries_all} gradient_unequal={entries_unequal} learners_unequal={learners_unequal} host_ms={} card_ms={} card_forwards={} card_forward_ms={} card_reverses={} card_reverse_ms={} elapsed_ms={}",
+        "TOWER_PARITY_DONE sections={sections} faces={faces_all} faces_unequal={faces_unequal} closures={} closures_unequal={} gradient_entries={entries_all} gradient_unequal={entries_unequal} learners_unequal={learners_unequal} host_ms={} card_ms={} card_forwards={} card_forward_ms={} card_reverses={} card_reverse_ms={} elapsed_ms={}",
+        closures_all.0,
+        closures_all.1,
         host_ns / 1_000_000,
         card_ns / 1_000_000,
         times.forwards,
@@ -359,6 +454,13 @@ fn train(args: &[String]) -> Result<()> {
     println!("TOWER_COMMAND {}", args[1..].join(" "));
     let opened = Card::open(0)?;
     let mut card = TowerCard::open(&opened)?;
+    // [agent-inferred, October 31] A declared reading (`TOWER_PROFILE`): every launch timed alone,
+    // the card synchronized around it, and each entry's launches and summed time printed at the
+    // run's end (the record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`
+    // §18). It moves nothing the run prints but its times.
+    if std::env::var_os("TOWER_PROFILE").is_some() {
+        card.profile();
+    }
     let started = Instant::now();
     let result = exterior::run_tower_classes_with_realization(&args[1..], &mut card);
     let times = card.times();
@@ -370,7 +472,36 @@ fn train(args: &[String]) -> Result<()> {
         times.reverse_ns / 1_000_000,
         started.elapsed().as_millis()
     );
+    for (entry, calls, ns) in card.profiled() {
+        println!("TOWER_PROFILE entry={entry} launches={calls} ms={}", ns / 1_000_000);
+    }
     result
+}
+
+/// [agent-inferred, October 31] `units-classes UNITS UNITS_SHA TEXT TEXT_SHA OUT`: the boundary codec
+/// for a unit release (record §33): `TEXT`'s bytes parsed in the founded `UNITS` as the unit tower
+/// parses them (`Units::parse`), written to `OUT` (create-new) as two big-endian bytes a class; and
+/// `units-text UNITS UNITS_SHA CLASSES CLASSES_SHA OUT`, a unit release's classes decoded to its bytes
+/// (`Units::decode`), the end letter's class read as the record separator it stands for.
+fn units_codec(args: &[String], decode: bool) -> Result<()> {
+    if args.len() != 5 {
+        return Err("units-classes|units-text UNITS UNITS_SHA INPUT INPUT_SHA OUT".into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned(&args[0], &args[1])?)?).map_err(|e| e.to_string())?;
+    let input = pinned(&args[2], &args[3])?;
+    let out: Vec<u8> = if decode {
+        let classes: Vec<u32> = input.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as u32).collect();
+        if classes.iter().any(|&c| c as usize >= units.len()) {
+            return Err("a class outside the founded units".into());
+        }
+        units.decode(&classes)
+    } else {
+        units.parse(&input).map_err(|e| e.to_string())?.into_iter().flat_map(|u| (u as u16).to_be_bytes()).collect()
+    };
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(&args[4])?;
+    file.write_all(&out)?;
+    println!("UNITS_CODEC units={} input_bytes={} output_bytes={} output_sha256={}", units.len(), input.len(), out.len(), digest(&out)?);
+    Ok(())
 }
 
 fn main() {
@@ -379,7 +510,10 @@ fn main() {
         Some("parity") => parity(&args[1..]),
         Some("parity-state") => parity_state(&args[1..]),
         Some("parity-units") => parity_units(&args[1..]),
+        Some("parity-units-founded") => parity_units_founded(&args[1..]),
         Some("train") | Some("release") | Some("read") => train(&args[1..]),
+        Some("units-classes") => units_codec(&args[1..], false),
+        Some("units-text") => units_codec(&args[1..], true),
         _ => Err("tower_pass parity …|parity-state …|parity-units …|train complete-language …|release complete-language …|read complete-language …".into()),
     };
     if let Err(error) = result {

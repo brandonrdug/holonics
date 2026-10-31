@@ -1,0 +1,3 @@
+TOWER_COMMAND release-span-tower-classes $ROOT/.local/wt/section-edge/.local/run/race/units/cont/STATE.15 eb59afd06e61d77836093d80c695f6e293d3a23c7ebfdc1cdc176f33555ab7b2 $ROOT/.local/wt/section-edge/.local/run/race/units/PROMPTS.units 8d7c42f15dbc0eaa03990e568e04e05f053ee0fe383b1f9ab690d70a8107450f $ROOT/.local/wt/section-edge/.local/run/race/span/KEYS_SPAN dc62532add8ad474bae69f088d8335b5d5314eb2ee5a92d9724e343d97d8703e 1024 2 320 $ROOT/.local/wt/section-edge/.local/run/race/units/span18
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+MEASURE lap=span-units-18 rc=-15 wall_s=923.1 peak_rss_kib=877276

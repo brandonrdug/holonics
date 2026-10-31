@@ -1,0 +1,151 @@
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+TOWER_TRAIN material=512513 streams=320 section=128 sections_a_pass=726 train_bytes=29744156 dev_bytes=913986
+TOWER_SECTION pass=0 section=32 bits_a_byte=2.065 deposits=32 halvings=1 elapsed_ms=9164
+TOWER_REFUSALS pass=0 section=32 refused=1 arrivals_rose=1 closure_rose=0 arrivals_change_bits=84.047 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=64 bits_a_byte=2.018 deposits=64 halvings=1 elapsed_ms=18188
+TOWER_REFUSALS pass=0 section=64 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=96 bits_a_byte=1.998 deposits=96 halvings=1 elapsed_ms=27386
+TOWER_REFUSALS pass=0 section=96 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=128 bits_a_byte=1.989 deposits=128 halvings=1 elapsed_ms=36520
+TOWER_REFUSALS pass=0 section=128 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=160 bits_a_byte=1.974 deposits=160 halvings=1 elapsed_ms=45722
+TOWER_REFUSALS pass=0 section=160 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=192 bits_a_byte=1.969 deposits=192 halvings=1 elapsed_ms=54956
+TOWER_REFUSALS pass=0 section=192 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=224 bits_a_byte=1.997 deposits=224 halvings=1 elapsed_ms=64146
+TOWER_REFUSALS pass=0 section=224 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=256 bits_a_byte=1.967 deposits=256 halvings=1 elapsed_ms=73349
+TOWER_REFUSALS pass=0 section=256 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=288 bits_a_byte=1.970 deposits=288 halvings=1 elapsed_ms=82553
+TOWER_REFUSALS pass=0 section=288 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=320 bits_a_byte=1.955 deposits=320 halvings=1 elapsed_ms=91760
+TOWER_REFUSALS pass=0 section=320 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=352 bits_a_byte=1.961 deposits=352 halvings=1 elapsed_ms=101000
+TOWER_REFUSALS pass=0 section=352 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=384 bits_a_byte=1.942 deposits=384 halvings=1 elapsed_ms=110856
+TOWER_REFUSALS pass=0 section=384 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=416 bits_a_byte=1.943 deposits=416 halvings=1 elapsed_ms=121200
+TOWER_REFUSALS pass=0 section=416 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=448 bits_a_byte=1.946 deposits=448 halvings=1 elapsed_ms=131594
+TOWER_REFUSALS pass=0 section=448 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=480 bits_a_byte=1.951 deposits=480 halvings=1 elapsed_ms=141995
+TOWER_REFUSALS pass=0 section=480 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=512 bits_a_byte=1.944 deposits=512 halvings=1 elapsed_ms=152402
+TOWER_REFUSALS pass=0 section=512 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=544 bits_a_byte=1.941 deposits=544 halvings=1 elapsed_ms=162791
+TOWER_REFUSALS pass=0 section=544 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=576 bits_a_byte=1.938 deposits=576 halvings=1 elapsed_ms=173227
+TOWER_REFUSALS pass=0 section=576 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=608 bits_a_byte=1.942 deposits=608 halvings=1 elapsed_ms=183556
+TOWER_REFUSALS pass=0 section=608 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=640 bits_a_byte=1.931 deposits=640 halvings=1 elapsed_ms=193901
+TOWER_REFUSALS pass=0 section=640 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=672 bits_a_byte=1.940 deposits=672 halvings=1 elapsed_ms=204262
+TOWER_REFUSALS pass=0 section=672 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=704 bits_a_byte=1.953 deposits=704 halvings=1 elapsed_ms=214676
+TOWER_REFUSALS pass=0 section=704 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=0 section=726 bits_a_byte=1.951 deposits=726 halvings=1 elapsed_ms=221801
+TOWER_REFUSALS pass=0 section=726 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 320 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 40960 blocks (one a cell) x 256 threads, the modes' scan 320 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.0 state_bytes=20145469 state_sha256=c743807435d0de0e095a7d488bee60e4216c11dea00e55b6530d35915f148794
+TOWER_PASS pass=0 train_bits_a_byte=1.965 dev_bits_a_byte=2.082 dev_regions gsm8k=2.086 strokes=0.000 cycles=0.000 words=2.080 deposits=726/726 pass_ms=224511 elapsed_ms=224571 train_code=61261351266227 dev_code=1995116791392 grain_bits=20
+TOWER_SECTION pass=1 section=32 bits_a_byte=1.984 deposits=32 halvings=0 elapsed_ms=235014
+TOWER_REFUSALS pass=1 section=32 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=64 bits_a_byte=1.923 deposits=64 halvings=0 elapsed_ms=245406
+TOWER_REFUSALS pass=1 section=64 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=96 bits_a_byte=1.910 deposits=96 halvings=0 elapsed_ms=255822
+TOWER_REFUSALS pass=1 section=96 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=128 bits_a_byte=1.904 deposits=128 halvings=0 elapsed_ms=265847
+TOWER_REFUSALS pass=1 section=128 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=160 bits_a_byte=1.891 deposits=160 halvings=0 elapsed_ms=274708
+TOWER_REFUSALS pass=1 section=160 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=192 bits_a_byte=1.898 deposits=192 halvings=0 elapsed_ms=283521
+TOWER_REFUSALS pass=1 section=192 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=224 bits_a_byte=1.923 deposits=224 halvings=0 elapsed_ms=292294
+TOWER_REFUSALS pass=1 section=224 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=256 bits_a_byte=1.894 deposits=256 halvings=0 elapsed_ms=301151
+TOWER_REFUSALS pass=1 section=256 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=288 bits_a_byte=1.897 deposits=288 halvings=0 elapsed_ms=310081
+TOWER_REFUSALS pass=1 section=288 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=320 bits_a_byte=1.882 deposits=320 halvings=0 elapsed_ms=319242
+TOWER_REFUSALS pass=1 section=320 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=352 bits_a_byte=1.893 deposits=352 halvings=0 elapsed_ms=328323
+TOWER_REFUSALS pass=1 section=352 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=384 bits_a_byte=1.879 deposits=384 halvings=0 elapsed_ms=337123
+TOWER_REFUSALS pass=1 section=384 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=416 bits_a_byte=1.877 deposits=416 halvings=0 elapsed_ms=345875
+TOWER_REFUSALS pass=1 section=416 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=448 bits_a_byte=1.885 deposits=448 halvings=0 elapsed_ms=354597
+TOWER_REFUSALS pass=1 section=448 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=480 bits_a_byte=1.894 deposits=480 halvings=0 elapsed_ms=363354
+TOWER_REFUSALS pass=1 section=480 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=512 bits_a_byte=1.885 deposits=512 halvings=0 elapsed_ms=372195
+TOWER_REFUSALS pass=1 section=512 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=544 bits_a_byte=1.875 deposits=544 halvings=0 elapsed_ms=381016
+TOWER_REFUSALS pass=1 section=544 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=576 bits_a_byte=1.869 deposits=576 halvings=0 elapsed_ms=389986
+TOWER_REFUSALS pass=1 section=576 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=608 bits_a_byte=1.890 deposits=608 halvings=0 elapsed_ms=399099
+TOWER_REFUSALS pass=1 section=608 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=640 bits_a_byte=1.878 deposits=640 halvings=0 elapsed_ms=407908
+TOWER_REFUSALS pass=1 section=640 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=672 bits_a_byte=1.885 deposits=672 halvings=0 elapsed_ms=417071
+TOWER_REFUSALS pass=1 section=672 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=704 bits_a_byte=1.896 deposits=704 halvings=0 elapsed_ms=426261
+TOWER_REFUSALS pass=1 section=704 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=1 section=726 bits_a_byte=1.894 deposits=726 halvings=0 elapsed_ms=432389
+TOWER_REFUSALS pass=1 section=726 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_REALIZATION pass=1 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 320 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 40960 blocks (one a cell) x 256 threads, the modes' scan 320 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.1 state_bytes=19873670 state_sha256=4317f07b0d727749e2e6a57123f30fa8ecdf79429eb5f3e62c35ca0218f1e08e
+TOWER_PASS pass=1 train_bits_a_byte=1.896 dev_bits_a_byte=2.042 dev_regions gsm8k=2.033 strokes=0.000 cycles=0.000 words=2.048 deposits=726/726 pass_ms=210176 elapsed_ms=434748 train_code=59116745293991 dev_code=1955866007255 grain_bits=20
+TOWER_SECTION pass=2 section=32 bits_a_byte=1.948 deposits=32 halvings=0 elapsed_ms=443597
+TOWER_REFUSALS pass=2 section=32 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=64 bits_a_byte=1.878 deposits=64 halvings=0 elapsed_ms=452614
+TOWER_REFUSALS pass=2 section=64 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=96 bits_a_byte=1.865 deposits=96 halvings=0 elapsed_ms=462035
+TOWER_REFUSALS pass=2 section=96 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=128 bits_a_byte=1.866 deposits=128 halvings=0 elapsed_ms=471273
+TOWER_REFUSALS pass=2 section=128 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=160 bits_a_byte=1.853 deposits=160 halvings=0 elapsed_ms=480038
+TOWER_REFUSALS pass=2 section=160 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=192 bits_a_byte=1.847 deposits=192 halvings=0 elapsed_ms=488819
+TOWER_REFUSALS pass=2 section=192 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=224 bits_a_byte=1.873 deposits=224 halvings=0 elapsed_ms=497807
+TOWER_REFUSALS pass=2 section=224 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=256 bits_a_byte=1.849 deposits=256 halvings=0 elapsed_ms=506801
+TOWER_REFUSALS pass=2 section=256 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=288 bits_a_byte=1.855 deposits=288 halvings=0 elapsed_ms=515694
+TOWER_REFUSALS pass=2 section=288 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=320 bits_a_byte=1.843 deposits=320 halvings=0 elapsed_ms=524494
+TOWER_REFUSALS pass=2 section=320 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=352 bits_a_byte=1.854 deposits=352 halvings=0 elapsed_ms=533263
+TOWER_REFUSALS pass=2 section=352 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=384 bits_a_byte=1.842 deposits=384 halvings=0 elapsed_ms=542054
+TOWER_REFUSALS pass=2 section=384 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=416 bits_a_byte=1.847 deposits=416 halvings=0 elapsed_ms=550914
+TOWER_REFUSALS pass=2 section=416 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=448 bits_a_byte=1.847 deposits=448 halvings=0 elapsed_ms=559693
+TOWER_REFUSALS pass=2 section=448 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=480 bits_a_byte=1.856 deposits=480 halvings=0 elapsed_ms=569213
+TOWER_REFUSALS pass=2 section=480 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=512 bits_a_byte=1.847 deposits=512 halvings=0 elapsed_ms=578832
+TOWER_REFUSALS pass=2 section=512 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=544 bits_a_byte=1.843 deposits=544 halvings=0 elapsed_ms=588164
+TOWER_REFUSALS pass=2 section=544 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=576 bits_a_byte=1.835 deposits=576 halvings=0 elapsed_ms=597441
+TOWER_REFUSALS pass=2 section=576 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=608 bits_a_byte=1.851 deposits=608 halvings=0 elapsed_ms=606290
+TOWER_REFUSALS pass=2 section=608 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=640 bits_a_byte=1.842 deposits=640 halvings=0 elapsed_ms=615030
+TOWER_REFUSALS pass=2 section=640 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=672 bits_a_byte=1.856 deposits=672 halvings=0 elapsed_ms=623786
+TOWER_REFUSALS pass=2 section=672 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=704 bits_a_byte=1.870 deposits=704 halvings=0 elapsed_ms=632564
+TOWER_REFUSALS pass=2 section=704 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_SECTION pass=2 section=726 bits_a_byte=1.858 deposits=726 halvings=0 elapsed_ms=638594
+TOWER_REFUSALS pass=2 section=726 refused=0 arrivals_rose=0 closure_rose=0 arrivals_change_bits=0.000 closure_change_bits=0.000
+TOWER_REALIZATION pass=2 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 320 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 40960 blocks (one a cell) x 256 threads, the modes' scan 320 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.2 state_bytes=19801359 state_sha256=30aa82a22af98be7caade2f9608545fdaf81aa79c710ccb1cb977ba8fade0707
+TOWER_PASS pass=2 train_bits_a_byte=1.858 dev_bits_a_byte=1.986 dev_regions gsm8k=1.959 strokes=0.000 cycles=0.000 words=2.008 deposits=726/726 pass_ms=206199 elapsed_ms=640948 train_code=57922476238207 dev_code=1903114722389 grain_bits=20
+TOWER_CARD forwards=4426 forward_ms=445841 reverses=2178 reverse_ms=152510 elapsed_ms=641113
+MEASURE lap=cprime rc=0 wall_s=641.4 peak_rss_kib=675192

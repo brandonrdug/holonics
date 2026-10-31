@@ -42,7 +42,7 @@ use crate::receiver::release::{agreeing_class, KeyStream};
 /// The bytes of one key: `k / 2^64`, as the class release draws.
 pub const KEY_BYTES: usize = 8;
 /// The lines of a state's text ([`TowerState::to_text`]).
-pub const STATE_LINES: usize = 9;
+pub const STATE_LINES: usize = 10;
 
 /// A current: its state at its last section's close and the classes it has heard since, the first
 /// the pending class; each with whether it is compared.
@@ -354,14 +354,15 @@ fn paired(v: &[i64]) -> Vec<(i64, i64)> {
 }
 
 impl TowerState {
-    /// [definition; agent-inferred, October 29] **The state as text**, nine lines: `state
+    /// [definition; agent-inferred, October 29] **The state as text**, ten lines: `state
     /// previous reversed news`, then the modes (level-major, `re im`), the ring, its hands, the
     /// strands, the credit (`-` when the stream carries none; per level its push, along, around,
     /// gate bias and gate moments), the open face (`-` without one; its total, then its masses),
     /// participation's open sections (`-` without participation; per level its site count, the
     /// frame, the met dissipation, the held current and each site's key, value and heads'
-    /// dissipation) and the open packets (`-` without packets; the levels the clock holds,
-    /// level-major, `re im`).
+    /// dissipation), the open packets (`-` without packets; the levels the clock holds,
+    /// level-major, `re im`) and the open traces (`-` without the heading; the levels the clock
+    /// holds, level-major).
     pub fn to_text(&self) -> String {
         let mut s = format!("state {} {} {}\n", self.previous, u8::from(self.reversed), self.news);
         let mut modes = Vec::new();
@@ -374,11 +375,17 @@ impl TowerState {
         s.push_str(&line("strands", self.strands.iter()));
         match &self.credit {
             None => s.push_str("credit -\n"),
+            // A credit a realization holds resident is not the host's to write: its text says so,
+            // and reading it back refuses.
+            Some(levels) if LevelCredit::residence(levels).is_some() => s.push_str("credit resident\n"),
             Some(levels) => {
-                let mut v = Vec::new();
+                // The first credited level leads the moments (the template a read restores them on).
+                let mut v = vec![levels.iter().position(LevelCredit::carried).unwrap_or(levels.len()) as i64];
                 for c in levels {
-                    for part in [&c.push, &c.along, &c.around, &c.gate_bias, &c.gate] {
-                        flatten(&mut v, part);
+                    for set in std::iter::once(c).chain(c.packet.as_deref()) {
+                        for part in set.parts() {
+                            flatten(&mut v, part);
+                        }
                     }
                 }
                 s.push_str(&line("credit", v));
@@ -415,6 +422,11 @@ impl TowerState {
             }
             s.push_str(&line("packets", v));
         }
+        if self.traces.is_empty() {
+            s.push_str("traces -\n");
+        } else {
+            s.push_str(&line("traces", self.traces.iter().flatten()));
+        }
         s
     }
 }
@@ -424,7 +436,7 @@ impl Tower {
     /// extent this tower's rested state gives it.
     pub fn state_from_text(&self, lines: &[&str]) -> Result<TowerState> {
         if lines.len() != STATE_LINES {
-            return refuse("a state's text is nine lines");
+            return refuse("a state's text is ten lines");
         }
         let d = &self.declaration;
         let rest = self.rest();
@@ -455,26 +467,28 @@ impl Tower {
         let strands = entries::<u32>(lines[4], "strands", rest.strands.len())?;
         let credit = match lines[5] {
             "credit -" => None,
+            "credit resident" => return refuse("a credit a realization held resident was written without its moments"),
             text => {
-                let template = self.rest_with_credit().credit.unwrap_or_default();
-                let shape = |c: &LevelCredit| [c.push.len(), c.along.len(), c.around.len(), c.gate_bias.len(), c.gate.len()];
-                let total: usize = template.iter().map(|c| 2 * shape(c).iter().sum::<usize>()).sum();
-                let v = entries::<i64>(text, "credit", total)?;
-                let mut at = 0;
-                let mut take = |n: usize| {
-                    let part = paired(&v[at..at + 2 * n]);
-                    at += 2 * n;
-                    part
+                let from = text.split(' ').nth(1).and_then(|w| w.parse::<usize>().ok()).filter(|&f| f <= self.declaration.levels).ok_or(TowerError::Refused("a credit's text leads with its first credited level"))?;
+                let mut template = self.rest_with_credit_from(from).credit.unwrap_or_default();
+                let sets = |c: &LevelCredit| 1 + usize::from(c.packet.is_some());
+                let total: usize = template.iter().map(|c| sets(c) * 2 * c.parts().iter().map(|p| p.len()).sum::<usize>()).sum();
+                let v = entries::<i64>(text, "credit", 1 + total)?;
+                let mut at = 1;
+                let mut fill = |set: &mut LevelCredit| {
+                    for part in set.parts_mut() {
+                        let n = part.len();
+                        *part = paired(&v[at..at + 2 * n]);
+                        at += 2 * n;
+                    }
                 };
-                Some(
-                    template
-                        .iter()
-                        .map(|c| {
-                            let [p, a, r, gb, g] = shape(c);
-                            LevelCredit { push: take(p), along: take(a), around: take(r), gate_bias: take(gb), gate: take(g) }
-                        })
-                        .collect(),
-                )
+                for c in &mut template {
+                    fill(c);
+                    if let Some(packet) = c.packet.as_deref_mut() {
+                        fill(packet);
+                    }
+                }
+                Some(template)
             }
         };
         let open = match lines[6] {
@@ -541,7 +555,24 @@ impl Tower {
             }
             _ => return refuse("open packets on a tower with packets alone"),
         };
-        Ok(TowerState { modes, previous, credit, ring, hands, strands, reversed, open, news, sites, packets })
+        let traces = match (lines[9], rest.traces.is_empty()) {
+            ("traces -", true) => Vec::new(),
+            (text, false) if text != "traces -" => {
+                let held: usize = rest.traces.iter().map(Vec::len).sum();
+                let v = entries::<i64>(text, "traces", held)?;
+                let mut at = 0;
+                rest.traces
+                    .iter()
+                    .map(|level| {
+                        let part = v[at..at + level.len()].to_vec();
+                        at += level.len();
+                        part
+                    })
+                    .collect()
+            }
+            _ => return refuse("open traces on a tower with the heading alone"),
+        };
+        Ok(TowerState { modes, previous, credit, ring, hands, strands, reversed, open, news, sites, packets, traces })
     }
 }
 

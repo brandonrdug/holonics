@@ -1,0 +1,6 @@
+OLD=1412c4efc65fdb3facf954c780f0245ac10cfe0c07d5708f0eb42fdf6f86d681 NEW=7ccad6ee6dcdc475bddff4a656ff656c470b8aa44e48bb6412450f1abce3f8e2
+NVIDIA_SMI before old: 9 %, 2820 MHz, 11501 MHz, 45, 65.62 W, P0 apps=0 at=2026-10-31T09:23:54Z
+RUN_END old rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=21352 MEASURE lap=old rc=0 wall_s=24.0 peak_rss_kib=3217304
+NVIDIA_SMI before new: 31 %, 2820 MHz, 11501 MHz, 50, 150.50 W, P0 apps=0 at=2026-10-31T09:24:18Z
+RUN_END new rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=21270 MEASURE lap=new rc=0 wall_s=23.8 peak_rss_kib=3213856
+VRAM_PEAK_MIB=10834

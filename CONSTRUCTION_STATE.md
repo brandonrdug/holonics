@@ -17,6 +17,34 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**October 31 (evening): participation at the clocked levels raced and set aside; the working learner
+continues; the capacity read.** Participation joined the working declaration at the clocked levels
+alone, on their own ticks (record §35–§36), exact host against card on bytes and units after a
+packet-tick routing defect was located, its sites' buffers held at its own levels (3.85 GB less at 320
+streams). Raced at 160 streams (the 320-stream frame with it passes the 12 GB the card keeps) it read
+2.170 against 2.164 in one lap at 3.1 times the time, the prompt's flux on the continuation's first 256
+classes 1.25 times the unit declaration's (bar 2, failed, §37); reaching 512 ticks raised it 1.37
+times, short of the fixed half again, so reach is not the cause (§38). The unit declaration continued
+to 30 laps reads 1.846 (GSM8K 1.778), about 0.003 a lap. The capacity read (width 128, 512 contacts,
+§39) is fixed and running; the transferred packet response the October 31 hardware review names is
+the next learning term.
+
+**October 31: the working declaration reads founded units, and the release agrees over the heading's
+span (card).** On the RTX 4080 SUPER the race's declaration (the stacked news clock, packets, the
+heading the face reads, and every level's credit across the section's edge) read in the October 23
+founded units (1,318) codes the held-out passage at 2.230 bits a byte after one lap (119.9 s) and
+2.111 after two (233.4 s), against the same declaration on bytes, 2.270 after its lap (196.7 s) and
+about 2.24 at 233 s; continued, the bytes overtake by about forty minutes (1.878 on units after 18 laps against about 1.865), so the unit declaration leads short runs and the two level toward an hour. On bytes the every-level credit levels
+near 1.85 after twenty-odd passes and C′ near 1.87. Two motives inside the section (the heading read
+by the fine levels' opening, then as a force through each arrival level's read) were built exactly on
+host and card and retired: the section's one certified step could not cross the loop they close
+(halved about three times a section). The release can agree over the span the first clocked level's
+next tick closes (`Tower::release_spans`), and on one stream the learner locks a repeating period in
+ten to twenty-five deposits and keeps it across a cold restart. The
+[record](research/records/2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT_AND_THE_FINE_LEVELS_READ_ITS_HEADING.md)
+§29–§33 holds the laws, the races and their receipts; the writing is shown in the thread and kept out
+of the repository.
+
 **October 29: Claude retakes the lead; participation is the next law (host and card).** Codex led
 alone on October 27 and 28. The [audit](research/records/2026-10-29_THE_CODEX_LEAD_OF_OCTOBER_27_AND_28_AUDITED_THE_THEORY_STAYS_THE_TEXT_SURFACES_ARE_WITHDRAWN_AND_PARTICIPATION_IS_NEXT.md)
 keeps its four theory records and its exact two-screw contact, which changes both participants and

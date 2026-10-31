@@ -444,11 +444,19 @@ impl Tower {
         if self.pair.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
             return refuse("the pairing's lift of a pair face, ring, rotor or strands is owed");
         }
-        if self.participation.is_some() || self.passage || self.mutual.is_some() {
-            return refuse("the pairing's lift of participation, the passage or the mutual contact is owed: each also drives or reads the contacts");
+        if self.participation.is_some() || self.mutual.is_some() {
+            return refuse("the pairing's lift of participation or the mutual contact is owed: each also drives or reads the contacts");
         }
         let d = TowerDeclaration { contacts: old.contacts.checked_mul(2).ok_or(TowerError::Refused("a paired extent outgrew its carrier"))?, ..old };
-        let layout = Layout::new(&d, 0, 0, 0, 0, None, false, None);
+        // [agent-inferred, October 31] The passage's `W₁ˣ` drives the contacts, so its rows repeat
+        // with each contact's copy as the drives' do; the heading reads the modes and the face reads
+        // it, so its families are kept (record `2026-10-30_THE_COARSE_LEVEL_HEADS…`, §42).
+        let layout = Layout::new(&d, 0, 0, 0, 0, None, false, self.heard_from());
+        let headed = if self.heading { self.news.map(|c| c.first()) } else { None };
+        let layout = match headed {
+            Some(first) => layout.with_heading(&d, first),
+            None => layout,
+        };
         let (w, f) = (old.width, old.contacts);
         let mut new = vec![0i32; layout.len];
         let mut from = vec![0usize; layout.len];
@@ -460,7 +468,7 @@ impl Tower {
         };
         let (ol, nl) = (&self.layout, &layout);
         keep(&mut new, &mut from, ol.encoding, nl.encoding, old.alphabet * w);
-        for (o, l) in ol.levels.iter().zip(&nl.levels) {
+        for (level, (o, l)) in ol.levels.iter().zip(&nl.levels).enumerate() {
             for (at, to, len) in [
                 (o.move_re, l.move_re, old.modes),
                 (o.move_im, l.move_im, old.modes),
@@ -480,8 +488,15 @@ impl Tower {
             ] {
                 keep(&mut new, &mut from, at, to, len);
             }
-            // The drives' rows and biases repeated, copy after copy.
-            for (at, to, len) in [(o.contact, l.contact, w), (o.contact_bias, l.contact_bias, 1), (o.pair, l.pair, w), (o.pair_bias, l.pair_bias, 1)] {
+            // The heading's read and descent kept, at the levels that carry it.
+            if headed.is_some_and(|first| level >= first) {
+                for (at, to, len) in [(o.heading_re, l.heading_re, w * old.modes), (o.heading_im, l.heading_im, w * old.modes), (o.descent, l.descent, w * w)] {
+                    keep(&mut new, &mut from, at, to, len);
+                }
+            }
+            // The drives' rows and biases repeated, copy after copy, and the passage's rows with them.
+            let heard = self.heard_from().is_some_and(|first| level >= first);
+            for (at, to, len) in [(o.contact, l.contact, w), (o.contact_bias, l.contact_bias, 1), (o.pair, l.pair, w), (o.pair_bias, l.pair_bias, 1), (o.passage, l.passage, if heard { w } else { 0 })] {
                 for c in 0..2 {
                     for e in 0..f {
                         for i in 0..len {
@@ -609,7 +624,8 @@ impl Tower {
         let (mut drives, mut returns) = (Vec::new(), Vec::new());
         for (l, lv) in self.layout.levels.iter().enumerate() {
             for e in (0..h).filter(|&e| of(l, e)) {
-                for (start, len) in [(lv.contact, w), (lv.contact_bias, 1), (lv.pair, w), (lv.pair_bias, 1)] {
+                let heard = self.heard_from().is_some_and(|first| l >= first);
+                for (start, len) in [(lv.contact, w), (lv.contact_bias, 1), (lv.pair, w), (lv.pair_bias, 1), (lv.passage, if heard { w } else { 0 })] {
                     drives.extend((0..len).map(|i| (start + e * len + i, start + (e + h) * len + i)));
                 }
                 returns.extend((0..w).map(|j| (lv.ret + j * f + e, lv.ret + j * f + e + h)));
@@ -633,7 +649,7 @@ impl TowerLearner {
         let first = from.iter().map(|&i| self.first[i]).collect();
         let second = from.iter().map(|&i| self.second[i]).collect();
         let paired = PairedContacts::opened(&tower)?;
-        Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new() }, paired))
+        Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false }, paired))
     }
 
     /// A founded pair's drives' moments re-lifted (the module header): each copy's covector is now
@@ -722,6 +738,48 @@ mod tests {
         }
         (0..n).map(|t| 2 * b[t] + if t >= 2 { b[t - 1] ^ b[t - 2] } else { 0 }).collect()
     }
+
+    /// [agent-inferred, October 31] **The working declaration paired** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS…`, §42, acceptance 72): pair contacts on four levels
+    /// clocked from level 2 with packets, passage and heading; paired, the tower reads face for face
+    /// and keeps the state class by class, the passage's rows repeated with each contact's copy and
+    /// the heading's families kept; a founding section runs from openings carrying the every-level
+    /// credit on the host's realization, and the dormant pairs' drive copies (the passage's among
+    /// them) stay equal after it.
+    #[test]
+    fn the_working_declaration_pairs_with_its_passage_and_heading() {
+        let mut tower = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Pair);
+        tower.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
+        tower.join_packets().expect("joined");
+        tower.join_passage().expect("joined");
+        // The passage's `W₁ˣ` opened away from zero so its copies carry a drive.
+        let k = super::super::tests::keys(8192);
+        let mut i = 0;
+        for lv in tower.layout.levels.clone().into_iter().skip(2) {
+            for v in &mut tower.theta[lv.passage..lv.passage + 16] {
+                *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) * 8;
+                i += 1;
+            }
+        }
+        tower.join_heading().expect("joined");
+        let paired = tower.paired().expect("paired");
+        assert!(paired.passage() && paired.heading());
+        let passage = super::super::tests::news_passage();
+        let (mut old, mut new) = (tower.rest(), paired.rest());
+        for &u in &passage {
+            assert_eq!(paired.advance(&mut new, u).expect("advanced"), tower.advance(&mut old, u).expect("advanced"));
+            assert_eq!(new, old);
+        }
+        let learner = TowerLearner::new(tower.clone(), 6);
+        let (mut paired_learner, mut directions) = learner.paired().expect("paired");
+        let mut states: Vec<TowerState> = (0..2).map(|_| paired_learner.tower.rest_with_credit_from(0)).collect();
+        let parts: Vec<&[usize]> = vec![&passage[..30], &passage[30..60]];
+        paired_learner.section_founding(&mut states, &parts, None, &mut HostPass::default(), &mut directions).expect("a founding section");
+        let t = &paired_learner.tower;
+        let (entries, _) = t.pair_entries(&|_, _| true).expect("entries");
+        assert!(entries.iter().any(|&(a, _)| t.layout.levels.iter().skip(2).any(|lv| (lv.passage..lv.passage + 2 * 4 * 4).contains(&a))), "the passage's rows are among the tied drives");
+    }
+
 
     /// A learner of the tiny pair tower after a few sections over the passage, so its covectors
     /// carry what the passage taught.

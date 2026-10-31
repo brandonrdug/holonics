@@ -12,7 +12,7 @@
 use super::*;
 use holonics::hnn::tower::realization::{HostPass, PassRealization};
 use holonics::hnn::tower::split::PairedContacts;
-use holonics::hnn::tower::{code_of, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
+use holonics::hnn::tower::{code_of, ClosureReading, ContactLaw, NewsClock, PairFace as ResidentPairFace, Tower, TowerDeclaration, TowerError, TowerFace, TowerLearner, TowerState, TurnLadder, COVECTOR_BITS, READ_BITS};
 use holonics::hnn::units::{Units, CODE_BITS};
 use holonics::receiver::coupling::coupling;
 use holonics::receiver::release::{agreeing_class, agreement_face};
@@ -3264,6 +3264,26 @@ fn signed_bits(code: i64) -> String {
     format!("{}{}", if code < 0 { "-" } else { "" }, per(code.abs(), 1))
 }
 
+/// A section's closure readings ([`ClosureReading`]) added to the window's, one entry a level.
+fn gather_closures(window: &mut Vec<(usize, usize, i64, i64)>, readings: &[ClosureReading]) {
+    for r in readings {
+        match window.iter_mut().find(|w| w.0 == r.level) {
+            Some(w) => (w.1, w.2, w.3) = (w.1 + r.ticks, w.2 + r.code, w.3 + r.flat),
+            None => window.push((r.level, r.ticks, r.code, r.flat)),
+        }
+    }
+}
+
+/// The window's closure per level: its ticks, the closure's code a tick and the flat menu's
+/// `log₂ |M|` a tick, in bits; the heading is located where the code falls below the flat.
+fn closure_line(window: &[(usize, usize, i64, i64)]) -> String {
+    window
+        .iter()
+        .map(|&(level, ticks, code, flat)| format!("level={level} ticks={ticks} code_bits_a_tick={} flat_bits_a_tick={}", per(code, ticks.max(1)), per(flat, ticks.max(1))))
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 pub(super) fn per(code: i64, n: usize) -> String {
     let milli = (code as i128 * 1000 + ((n as i128) << (READ_BITS - 1))) / ((n as i128) << READ_BITS);
     format!("{}.{:03}", milli / 1000, milli % 1000)
@@ -3329,6 +3349,44 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 /// `train-unit-pair-pumped-tower` the pumped tower whose contacts are pair contacts, which take the
 /// product of two modes' phases (record `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
 pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, turned, pumped, contact, None, realization)
+}
+
+/// [agent-inferred, October 31] `train-two-ladder-stacked-news-heading-credited-every-level-unit-tower
+/// UNITS …`: the race's working declaration (the stacked news clock, the passage, the packets, the
+/// heading and every level's credit, on both turn ladders) read in founded units, the passage's bytes
+/// parsed as `train-unit-tower` parses them (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §33).
+pub(super) fn train_units_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Rectifying, Some(Joined::PassagePacketsHeading), realization)
+}
+
+/// `train-two-ladder-stacked-news-heading-credited-every-level-pair-unit-tower`: the unit race's
+/// declaration with every contact the pair contact (record `2026-10-30_…`, §41), the contact the
+/// founded split grows.
+pub(super) fn train_units_pair_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeading), realization)
+}
+
+/// `train-two-ladder-stacked-news-heading-credited-every-level-split-unit-tower`: the pair unit race
+/// with its contacts paired at the founding and each section reading their founded split (record
+/// `2026-10-30_…`, §42): the field widens contact by contact where its code pays.
+pub(super) fn train_units_participating_pair_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsParticipationHeading), realization)
+}
+
+pub(super) fn train_units_split_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeadingSplit), realization)
+}
+
+/// `train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower`: the unit
+/// race's declaration with participation joined at the clocked levels alone, on their own ticks
+/// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+pub(super) fn train_units_participating_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Rectifying, Some(Joined::PassagePacketsParticipationHeading), realization)
+}
+
+fn train_units_joined(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, race: Option<Joined>, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 20 && args.len() != 22 {
         return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -3355,6 +3413,9 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
+    if let Some(joined) = race {
+        return fit(&args[9..], reading, true, false, false, Credit::From(0), contact, TurnLadder::Both, Some(super::tower_classes::race_stacked_news_clock()), joined, None, realization);
+    }
     fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, Joined::Nothing, None, realization)
 }
 
@@ -3385,6 +3446,14 @@ pub(super) enum Joined {
     /// The passage with the packets ([`Tower::join_packets`]): each clocked level's push, gate and
     /// turn hear the packet its clock closed.
     PassagePackets,
+    /// The passage and the packets with the heading ([`Tower::join_heading`]): each clocked level
+    /// reads its modes through its own heading material before each arrival, and the heading meets
+    /// the trace of the arrivals its next tick closes.
+    PassagePacketsHeading,
+    /// [`Joined::PassagePacketsHeading`] with participation at the clocked levels alone, on their
+    /// own ticks, joined after the packets and before the passage (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+    PassagePacketsParticipationHeading,
     /// The pair contacts paired at the founding ([`TowerLearner::paired`]), each section founding
     /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
     /// learner (`PAIRED.<pass>`, `PAIRED`).
@@ -3393,6 +3462,28 @@ pub(super) enum Joined {
     /// ([`TowerLearner::section_dormant`]): the copies deposit as one contact and nothing founds,
     /// the split race's control (the pair learner in the wider chart).
     DormantSplit,
+    /// [`Joined::PassagePacketsHeading`] with its pair contacts paired at the founding and every
+    /// section reading their founding ([`Joined::Split`]; record `2026-10-30_…`, §42).
+    PassagePacketsHeadingSplit,
+}
+
+/// [agent-inferred, October 31] A clocked participation's section, its level's own count of ticks
+/// (`TOWER_PARTICIPATION_SECTION`; the learner's section when undeclared): the reach of its sites
+/// before they are released (record `2026-10-30_…`, §38).
+pub(super) fn participation_section(section: usize) -> Result<usize> {
+    match std::env::var("TOWER_PARTICIPATION_SECTION") {
+        Ok(v) => Ok(v.parse::<usize>()?.max(1)),
+        Err(_) => Ok(section),
+    }
+}
+
+/// [agent-inferred, October 31] A clocked participation's first level (`TOWER_PARTICIPATION_FROM`;
+/// the clock's first clocked level when undeclared, record §35; from any level, §44).
+pub(super) fn participation_from(first: usize) -> Result<usize> {
+    match std::env::var("TOWER_PARTICIPATION_FROM") {
+        Ok(v) => Ok(v.parse::<usize>()?),
+        Err(_) => Ok(first),
+    }
 }
 
 /// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
@@ -3406,7 +3497,29 @@ pub(super) const MUTUAL_SHIFT: u32 = 2;
 /// (`hnn::tower::realization`; the host's own for every command but a card route's), which
 /// returns the host's bits.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: bool, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+/// [agent-inferred, October 31] Which levels a run's streams carry the passage credit at
+/// (`TowerState::credit`): none, the tower's own (the clocked levels under a news clock, every level
+/// without one; `Tower::rest_with_credit`), or every level from a declared one up
+/// (`Tower::rest_with_credit_from`, the record's §24).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Credit {
+    None,
+    Clocked,
+    From(usize),
+}
+
+impl From<bool> for Credit {
+    fn from(carried: bool) -> Self {
+        if carried {
+            Credit::Clocked
+        } else {
+            Credit::None
+        }
+    }
+}
+
+pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, pumped: bool, credit: impl Into<Credit>, contact: ContactLaw, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, looking: Option<&Looking>, realization: &mut dyn PassRealization) -> Result<()> {
+    let credit: Credit = credit.into();
     let started = Instant::now();
     let keys = pinned_read(&args[0], &args[1], READ_BUDGET as usize)?;
     let declaration = TowerDeclaration {
@@ -3426,14 +3539,15 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let rate_bits: u32 = args[9].parse()?;
     let out = Path::new(&args[10]);
     let classes = &reading.train;
-    let paired_run = matches!(joined, Joined::Split | Joined::DormantSplit);
+    let founding_split = matches!(joined, Joined::Split | Joined::PassagePacketsHeadingSplit);
+    let paired_run = founding_split || joined == Joined::DormantSplit;
     if paired_run && (looking.is_some() || contact != ContactLaw::Pair) {
         return Err("a split run trains the pair tower on its passage, without a look".into());
     }
-    if joined == Joined::Split && !realization.forms_split() {
+    if founding_split && !realization.forms_split() {
         return Err(format!("{} does not form the paired contacts' split read", realization.realization()).into());
     }
-    if (joined == Joined::Split && args.len() == 13) || (joined != Joined::Split && args.len() > 13) {
+    if (founding_split && args.len() == 13) || (!founding_split && args.len() > 13) {
         return Err("a founding split run continues with its learner and its paired directions; every other run with its learner alone".into());
     }
     if streams == 0 || section == 0 || classes.len() < streams * (section + 1) {
@@ -3452,7 +3566,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     let mut learner = if args.len() >= 13 {
         let from = pinned_read(&args[11], &args[12], STATE_BUDGET)?;
         let learner = TowerLearner::from_text(std::str::from_utf8(&from)?).map_err(|e| e.to_string())?;
-        if joined == Joined::Split {
+        if founding_split {
             let text = pinned_read(&args[13], &args[14], STATE_BUDGET)?;
             let directions = PairedContacts::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
             directions.admits(&learner.tower).map_err(|e| e.to_string())?;
@@ -3461,14 +3575,24 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.declaration != carried || learner.rate_bits != rate_bits || learner.tower.news() != news {
             return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
-        if learner.tower.participation().map(|p| p.section) != (joined == Joined::Participation).then_some(section) {
+        let first = news.map_or(0, |c| c.first());
+        let declared = match joined {
+            Joined::Participation => Some((section, 0)),
+            Joined::PassagePacketsParticipationHeading => Some((participation_section(section)?, participation_from(first)?)),
+            _ => None,
+        };
+        if learner.tower.participation().map(|p| (p.section, p.from)) != declared {
             return Err("the continued learner's participation differs from the declared one".into());
         }
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        if learner.tower.passage() != matches!(joined, Joined::Passage | Joined::PassagePackets) || learner.tower.packets() != (joined == Joined::PassagePackets) {
+        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading | Joined::PassagePacketsHeadingSplit);
+        if learner.tower.passage() != (packets || joined == Joined::Passage) || learner.tower.packets() != packets {
             return Err("the continued learner's passage or packets differ from the declared ones".into());
+        }
+        if learner.tower.heading() != matches!(joined, Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading | Joined::PassagePacketsHeadingSplit) {
+            return Err("the continued learner's heading differs from the declared one".into());
         }
         learner
     } else {
@@ -3505,8 +3629,41 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_packets().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={} packets", learner.tower.news().map_or(0, |c| c.first()));
             }
+            // A heading run also gives each clocked level its heading, `D` at zero, so it opens on
+            // the packet run face for face ([`Tower::join_heading`]).
+            Joined::PassagePacketsHeading => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_packets().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
+            }
+            // A participating heading run joins participation at the clocked levels after the
+            // packets (one head a founded rung, over its own count of their ticks), then the passage
+            // and the heading; `W₁ᵃ` at zero, so it opens on the heading run face for face.
+            Joined::PassagePacketsParticipationHeading => {
+                let first = learner.tower.news().map_or(0, |c| c.first());
+                learner.join_packets().map_err(|e| e.to_string())?;
+                let founded = learner.tower.founded_participation(participation_section(section)?).map_err(|e| e.to_string())?.from_level(participation_from(first)?);
+                println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
+                learner.join_participation(founded).map_err(|e| e.to_string())?;
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE first_clocked_level={first} packets participation heading");
+            }
             // A split run widens the contact field by two at the founding, every pair dormant
             // ([`TowerLearner::paired`]); the founding run carries their directions.
+            // A split heading run joins the passage, the packets and the heading, then pairs its
+            // contacts as a split run does.
+            Joined::PassagePacketsHeadingSplit => {
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_packets().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                let (widened, directions) = learner.paired().map_err(|e| e.to_string())?;
+                learner = widened;
+                println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
+                println!("TOWER_PAIRED contacts={} dormant={} founding=true", learner.tower.declaration.contacts, directions.dormant());
+                paired = Some(directions);
+            }
             Joined::Split | Joined::DormantSplit => {
                 let (widened, directions) = learner.paired().map_err(|e| e.to_string())?;
                 learner = widened;
@@ -3523,7 +3680,66 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     println!("TOWER_REALIZATION {}", realization.realization());
     std::fs::create_dir(out)?;
     let chunk = classes.len() / streams;
-    let sections_a_pass = (chunk - 1) / section;
+    // [agent-inferred, October 30] A lap may be declared as the passage's first sections
+    // (`TOWER_LAP_SECTIONS`): a partition of the pass whose time a smoke's deadline projects from
+    // a measured rate, the learner resting and read after them as after a whole pass.
+    let sections_a_pass = match std::env::var("TOWER_LAP_SECTIONS") {
+        Ok(v) => v.parse::<usize>()?.clamp(1, (chunk - 1) / section),
+        Err(_) => (chunk - 1) / section,
+    };
+    // [agent-inferred, October 31] The windows the run's lines are read over (`TOWER_WINDOW_SECTIONS`,
+    // 32 sections when undeclared): a reading's partition, which moves nothing the learner does.
+    let window_sections = match std::env::var("TOWER_WINDOW_SECTIONS") {
+        Ok(v) => v.parse::<usize>()?.max(1),
+        Err(_) => 32,
+    };
+    // [agent-inferred, October 30] A declared hold (`TOWER_HOLD`, `heading` and/or `descent`): the
+    // heading's read `C^→` or its descent `D` read and never deposited, a foil that separates which
+    // family's step the certificate refuses.
+    if let Ok(words) = std::env::var("TOWER_HOLD") {
+        let [heading, descent] = learner.tower.heading_families();
+        if heading.is_empty() {
+            return Err("TOWER_HOLD holds the heading's families, and this tower has no heading".into());
+        }
+        for word in words.split(',') {
+            match word {
+                "heading" => learner.held.extend(heading.iter().cloned()),
+                "descent" => learner.held.extend(descent.iter().cloned()),
+                _ => return Err(format!("TOWER_HOLD names heading or descent, not {word}").into()),
+            }
+        }
+        println!("TOWER_HOLD {words} entries={}", learner.held.iter().map(|r| r.len()).sum::<usize>());
+    }
+    // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_PARTS=1`): each refused step
+    // read again under each of its five parts alone, the descent, the heading's read, the
+    // readout, the clocked levels and the rest (the record's §13); it costs five forwards a
+    // refusal and moves nothing.
+    if std::env::var("TOWER_REFUSAL_PARTS").is_ok_and(|v| v == "1") {
+        if learner.tower.heading_families()[0].is_empty() {
+            return Err("TOWER_REFUSAL_PARTS reads the heading's parts, and this tower has no heading".into());
+        }
+        learner.refusal_parts = true;
+        println!("TOWER_REFUSAL_PARTS declared");
+    }
+    // [agent-inferred, October 30] A declared reading (`TOWER_REFUSAL_TICKS=1`): each refused step
+    // read again whole, its clocked levels ticking where the section's opening read ticked (the
+    // record's §16); it costs one forward a refusal and moves nothing.
+    // [agent-inferred, October 31] A declared reading (`TOWER_REFUSAL_CLOSURE`): each refused
+    // step's reread reads the closure too (§23); without it the closure is read once a section.
+    if std::env::var("TOWER_REFUSAL_CLOSURE").is_ok_and(|v| v == "1") {
+        if !learner.tower.heading() {
+            return Err("TOWER_REFUSAL_CLOSURE reads the heading's closure, and this tower has no heading".into());
+        }
+        learner.refusal_closure = true;
+        println!("TOWER_REFUSAL_CLOSURE declared");
+    }
+    if std::env::var("TOWER_REFUSAL_TICKS").is_ok_and(|v| v == "1") {
+        if learner.tower.news().is_none() {
+            return Err("TOWER_REFUSAL_TICKS reads the clocked levels' ticks, and this tower has no news clock".into());
+        }
+        learner.refusal_ticks = true;
+        println!("TOWER_REFUSAL_TICKS declared");
+    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3546,9 +3762,24 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     for pass in 0..passes {
         let pass_started = Instant::now();
         let mut states: Vec<TowerState> =
-            (0..streams).map(|_| if credit { learner.tower.rest_with_credit() } else { learner.tower.rest() }).collect();
+            (0..streams)
+                .map(|_| match credit {
+                    Credit::None => learner.tower.rest(),
+                    Credit::Clocked => learner.tower.rest_with_credit(),
+                    Credit::From(from) => learner.tower.rest_with_credit_from(from),
+                })
+                .collect();
         let (mut code, mut bytes, mut deposits, mut halvings) = (0i64, 0usize, 0usize, 0u32);
         let mut window = (0i64, 0usize);
+        // Under the heading, each clocked level's closure over the window: ticks, code, flat.
+        let mut closures: Vec<(usize, usize, i64, i64)> = Vec::new();
+        // The window's refused steps: how many, how many raised the arrivals' code and how many
+        // the closure's, and the changes they made.
+        let mut refusals = (0usize, 0usize, 0usize, 0i64, 0i64);
+        let mut refusal_parts = ([0usize; 5], [0i64; 5]);
+        // The window's refused steps read on the opening's ticks: how many rose on their own ticks
+        // and on the opening's, and the changes on each.
+        let mut refusal_ticks = (0usize, 0usize, 0i64, 0i64);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3673,13 +3904,72 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             window.1 += coded;
             deposits += receipt.deposited as usize;
             halvings += receipt.halvings;
-            if (k + 1) % 32 == 0 || k + 1 == sections_a_pass {
+            gather_closures(&mut closures, &receipt.closure);
+            for &(arrivals, closure) in &receipt.refused {
+                let closure = closure.unwrap_or(0);
+                refusals = (refusals.0 + 1, refusals.1 + usize::from(arrivals > 0), refusals.2 + usize::from(closure > 0), refusals.3 + arrivals, refusals.4 + closure);
+            }
+            for (&(own, _), &opening) in receipt.refused.iter().zip(&receipt.refused_on_ticks) {
+                refusal_ticks = (refusal_ticks.0 + usize::from(own > 0), refusal_ticks.1 + usize::from(opening > 0), refusal_ticks.2 + own, refusal_ticks.3 + opening);
+            }
+            for parts in &receipt.refused_parts {
+                for (n, &change) in parts.iter().enumerate() {
+                    refusal_parts.0[n] += usize::from(change > 0);
+                    refusal_parts.1[n] += change;
+                }
+            }
+            if (k + 1) % window_sections == 0 || k + 1 == sections_a_pass {
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
                     pass, k + 1, per(window.0, window.1), deposits, halvings, started.elapsed().as_millis()
                 );
+                if !closures.is_empty() {
+                    println!("TOWER_CLOSURE pass={} section={} {}", pass, k + 1, closure_line(&closures));
+                }
+                // A refused step's closure is read only under the declared reading (§23); without it
+                // its columns read `-`.
+                let (rose, change) = if learner.refusal_closure { (refusals.2.to_string(), signed_bits(refusals.4).to_string()) } else { ("-".into(), "-".into()) };
+                println!(
+                    "TOWER_REFUSALS pass={} section={} refused={} arrivals_rose={} closure_rose={rose} arrivals_change_bits={} closure_change_bits={change}",
+                    pass, k + 1, refusals.0, refusals.1, signed_bits(refusals.3)
+                );
+                if learner.refusal_parts {
+                    let (rose, change) = refusal_parts;
+                    println!(
+                        "TOWER_REFUSAL_PARTS pass={} section={} rose descent={} read={} readout={} clocked={} rest={} change_bits descent={} read={} readout={} clocked={} rest={}",
+                        pass,
+                        k + 1,
+                        rose[0],
+                        rose[1],
+                        rose[2],
+                        rose[3],
+                        rose[4],
+                        signed_bits(change[0]),
+                        signed_bits(change[1]),
+                        signed_bits(change[2]),
+                        signed_bits(change[3]),
+                        signed_bits(change[4])
+                    );
+                    refusal_parts = ([0; 5], [0; 5]);
+                }
+                if learner.refusal_ticks {
+                    let (own, opening, own_change, opening_change) = refusal_ticks;
+                    println!(
+                        "TOWER_REFUSAL_TICKS pass={} section={} refused={} rose_on_own_ticks={} rose_on_opening_ticks={} change_bits own={} opening={}",
+                        pass,
+                        k + 1,
+                        refusals.0,
+                        own,
+                        opening,
+                        signed_bits(own_change),
+                        signed_bits(opening_change)
+                    );
+                    refusal_ticks = (0, 0, 0, 0);
+                }
+                refusals = (0, 0, 0, 0, 0);
                 println!("TOWER_SWELL pass={} section={} {}", pass, k + 1, learner.swell_line());
                 window = (0, 0);
+                closures.clear();
             }
         }
         // Each pass's learner rests beside the run before the held-out read, so a run stopped at

@@ -106,7 +106,9 @@ impl Tower {
         let d = &self.declaration;
         let (w, n, f) = (d.width, d.modes, d.contacts);
         let charts = if self.participation.is_some() { 6 * n * w + 2 * w * n } else { 0 };
-        d.levels * factor * factor.saturating_sub(1) * (4 * n * w + f * w + charts)
+        // The heading's reads at the clocked levels, opened as the reads are (its descent at zero).
+        let headed = if self.heading { self.news.map_or(0, |c| d.levels - c.first()) } else { 0 };
+        d.levels * factor * factor.saturating_sub(1) * (4 * n * w + f * w + charts) + headed * factor * factor.saturating_sub(1) * 2 * w * n
     }
 
     fn grown(&self, factor: usize, keys: &[u8]) -> Result<(Self, Vec<(usize, bool)>)> {
@@ -123,10 +125,17 @@ impl Tower {
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
         let d = TowerDeclaration { width: grow(old.width)?, modes: grow(old.modes)?, contacts: grow(old.contacts)?, ..old };
         let participation = match &self.participation {
-            Some(p) => Some(ParticipationDeclaration::new(p.heads.repeat(factor), p.section, p.beta_shift)?),
+            Some(p) => Some(ParticipationDeclaration::new(p.heads.repeat(factor), p.section, p.beta_shift)?.from_level(p.from)),
             None => None,
         };
         let layout = Layout::new(&d, 0, 0, 0, 0, participation.as_ref(), false, self.heard_from());
+        // [agent-inferred, October 31] The heading's material follows every other part's (record
+        // `2026-10-30_…`, §40).
+        let headed = if self.heading { self.news.map(|c| c.first()) } else { None };
+        let layout = match headed {
+            Some(first) => layout.with_heading(&d, first),
+            None => layout,
+        };
         let mut g = Grower { old: &self.theta, new: vec![0; layout.len], from: vec![(0, true); layout.len], f: factor, keys, cursor: 0 };
         let (a, w, n, f) = (old.alphabet, old.width, old.modes, old.contacts);
         // The founding's scales in the grown declaration (`Tower::found_on`): the push and
@@ -182,6 +191,17 @@ impl Tower {
                 g.split(o.passage, l.passage, f, w, true, None)?;
             }
         }
+        // [agent-inferred, October 31] The heading (record `2026-10-30_…`, §40): its read `C^→`
+        // splits as the reads do, its descent `D` (opened at zero) evenly; the ratio of a repeated
+        // vector is the repeated ratio, so each clocked level's heading is the old one repeated and
+        // the face reads `D ĥ⁺` as before. The closure is read and not learned.
+        if let Some(first) = headed {
+            for (o, l) in ol.levels.iter().zip(&nl.levels).skip(first) {
+                g.split(o.heading_re, l.heading_re, w, n, true, read)?;
+                g.split(o.heading_im, l.heading_im, w, n, true, read)?;
+                g.split(o.descent, l.descent, w, w, true, None)?;
+            }
+        }
         let tower = Self { declaration: d, theta: g.new, participation, layout, ..self.clone() };
         Ok((tower, g.from))
     }
@@ -189,13 +209,16 @@ impl Tower {
     /// [definition; agent-inferred, October 29] **A stream's state widened** with this tower by
     /// `factor`: each level's modes repeated, one copy after another, its open packet with them, and
     /// participation's open section with them (frames, met dissipation, keys, values and the held current a mode, each
-    /// site's dissipation a head). Refused on a state that carries a passage credit, whose lift is
-    /// owed.
+    /// site's dissipation a head), the heading's open traces with the encoding, and the passage
+    /// credit's moments repeated over the mode and row copies ([`LevelCredit::widened`]). Refused on
+    /// a credit held resident by a realization, whose moments the host has not read.
     pub fn widen_state(&self, state: &TowerState, factor: usize) -> Result<TowerState> {
         let d = &self.declaration;
-        if state.credit.is_some() {
-            return refuse("the growth's lift of a passage credit is owed");
-        }
+        let credit = match &state.credit {
+            Some(c) if LevelCredit::residence(c).is_some() => return refuse("a resident credit is widened after its realization returns it"),
+            Some(c) => Some(c.iter().map(|l| l.widened(d.modes, d.width, factor)).collect()),
+            None => None,
+        };
         if state.modes.len() != d.levels || state.modes.iter().any(|m| m.len() != d.modes) || !state.ring.is_empty() || !state.strands.is_empty() {
             return refuse("a state of another tower");
         }
@@ -213,7 +236,8 @@ impl Tower {
             })
             .collect();
         let packets = state.packets.iter().map(|a| repeat(a)).collect();
-        Ok(TowerState { modes: state.modes.iter().map(|m| repeat(m)).collect(), sites, packets, ..state.clone() })
+        let traces = state.traces.iter().map(|t| t.repeat(factor)).collect();
+        Ok(TowerState { modes: state.modes.iter().map(|m| repeat(m)).collect(), sites, packets, traces, credit, ..state.clone() })
     }
 }
 
@@ -229,7 +253,7 @@ impl TowerLearner {
         let (f, f2) = (factor as i128, (factor * factor) as i128);
         let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
-        Ok(Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new() })
+        Ok(Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false })
     }
 }
 
@@ -258,6 +282,63 @@ mod tests {
                     assert_eq!(new, tower.widen_state(&old, factor).expect("widened"));
                 }
             }
+        }
+    }
+
+    /// [agent-inferred, October 31] **The working declaration grows** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §40, acceptance 68): four
+    /// levels clocked from level 2 with packets, passage and heading, from an opening carrying the
+    /// every-level credit, the packets and the heading's traces, grown by two and by three: the grown
+    /// tower reads face for face with the old and its state is the widened old state after each class;
+    /// the credit advanced over a part on the grown tower is the old credit advanced and widened; and
+    /// the grown covector from the widened opening, carried back through the growth (`Σ` over a
+    /// coordinate's copies, each split part weighing `1/f`), is the old covector.
+    #[test]
+    fn the_working_declaration_grows_with_its_heading_and_its_credit() {
+        let tower = super::super::tests::working(None);
+        let passage = super::super::tests::news_passage();
+        let reaches = tower.reaches();
+        let (prefix, classes) = (&passage[..=20], &passage[20..44]);
+        let rest = tower.rest_with_credit_from(0);
+        let mut opening = rest.clone();
+        let cells = tower.forward(&mut opening, prefix, &reaches).expect("forward");
+        tower.advance_credit(opening.credit.as_mut().expect("credit"), &rest, &cells, &reaches).expect("credit");
+        assert!(opening.traces.iter().any(|t| t.iter().any(|&v| v != 0)), "the opening carries open traces");
+        for factor in [2, 3] {
+            let (grown, from) = tower.grown(factor, &keys(1 << 18)).expect("grown");
+            let greaches = grown.reaches();
+            let wide = tower.widen_state(&opening, factor).expect("widened");
+            let (mut old, mut new) = (opening.clone(), wide.clone());
+            for &u in classes {
+                assert_eq!(grown.advance(&mut new, u).expect("advanced"), tower.advance(&mut old, u).expect("advanced"));
+                assert_eq!(new, tower.widen_state(&old, factor).expect("widened"));
+            }
+            let (mut so, mut sn) = (opening.clone(), wide.clone());
+            let co = tower.forward(&mut so, classes, &reaches).expect("forward");
+            let cn = grown.forward(&mut sn, classes, &greaches).expect("forward");
+            tower.advance_credit(so.credit.as_mut().expect("credit"), &opening, &co, &reaches).expect("credit");
+            grown.advance_credit(sn.credit.as_mut().expect("credit"), &wide, &cn, &greaches).expect("credit");
+            assert_eq!(sn.credit, tower.widen_state(&so, factor).expect("widened").credit, "the grown credit is the old credit widened");
+            let g_old = tower.reverse(&opening, &co, classes, None).expect("reverse");
+            let g_new = grown.reverse(&wide, &cn, classes, None).expect("reverse");
+            let mut copies = vec![0usize; g_old.len()];
+            for &(i, _) in &from {
+                copies[i] += 1;
+            }
+            let mut carried = vec![0i128; g_old.len()];
+            for (e, &(i, divided)) in from.iter().enumerate() {
+                // A repeated coordinate (f copies, one weight each); a split one (f² copies with its
+                // rows repeated, or the readout's f undivided columns) weighs 1/f a part.
+                let split = copies[i] == factor * factor || (copies[i] == factor && !divided);
+                carried[i] += if split { div_nearest(g_new[e], factor as i128) } else { g_new[e] };
+            }
+            let peak = g_old.iter().map(|v| v.abs()).max().unwrap_or(0);
+            let mut met = 0;
+            for (i, (&a, &b)) in g_old.iter().zip(&carried).enumerate() {
+                assert!((a - b).abs() * 64 <= a.abs().max(peak >> 12), "factor {factor}, entry {i}: old covector {a} against the grown one carried back {b}");
+                met += usize::from(a != 0);
+            }
+            assert!(met * 2 > g_old.len(), "most entries meet a covector: {met} of {}", g_old.len());
         }
     }
 
@@ -298,7 +379,11 @@ mod tests {
         let mut mutual = Tower::found(TowerDeclaration { alphabet: 4, width: 4, modes: 4, contacts: 4, levels: 2, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying }, &keys(4096)).expect("founded");
         mutual.join_mutual_contact(2).expect("joined");
         assert!(mutual.widened(2, &keys(1 << 16)).is_err(), "the mutual contact");
-        assert!(tower.widen_state(&tower.rest_with_credit(), 2).is_err(), "a carried credit");
+        // A carried credit is lifted (record `2026-10-30_…`, §40); one held resident by a
+        // realization is widened only once the realization returns its moments.
+        assert!(tower.widen_state(&tower.rest_with_credit(), 2).is_ok(), "a carried credit");
+        let resident = TowerState { credit: Some(LevelCredit::resident_mark(1, 0)), ..tower.rest() };
+        assert!(tower.widen_state(&resident, 2).is_err(), "a resident credit");
     }
 
     /// Acceptance 3 and 4: the grown learner carries the moments of the divided covector (the

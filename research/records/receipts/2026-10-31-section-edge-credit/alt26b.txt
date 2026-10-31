@@ -1,0 +1,9 @@
+OLD=f1838a95ecb3be1e5552efc9b1281c3fd29cf4689816c43c28633df4571af8eb NEW=f6959e34a60f8d40db35bea275391951bb260842ae40d85a752d594e9c9bc353
+NVIDIA_SMI before old1: 23 %, 210 MHz, 405 MHz, 42, 20.07 W, P8 at=2026-10-31T07:39:42Z
+RUN_END old1 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=24811 TOWER_CARD forwards=192 forward_ms=18558 reverses=64 reverse_ms=4868 elapsed_ms=27102 MEASURE lap=old1 rc=0 wall_s=27.6 peak_rss_kib=3214456
+NVIDIA_SMI before new1: 92 %, 2805 MHz, 11501 MHz, 51, 168.09 W, P2 at=2026-10-31T07:40:09Z
+RUN_END new1 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=24444 TOWER_CARD forwards=192 forward_ms=18637 reverses=64 reverse_ms=4870 elapsed_ms=26743 MEASURE lap=new1 rc=0 wall_s=38.1 peak_rss_kib=3269656
+NVIDIA_SMI before old2: 33 %, 2820 MHz, 11501 MHz, 52, 169.98 W, P0 at=2026-10-31T07:40:48Z
+RUN_END old2 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=24912 TOWER_CARD forwards=192 forward_ms=18579 reverses=64 reverse_ms=4857 elapsed_ms=27201 MEASURE lap=old2 rc=0 wall_s=27.6 peak_rss_kib=3212652
+NVIDIA_SMI before new2: 100 %, 2805 MHz, 11501 MHz, 54, 181.02 W, P2 at=2026-10-31T07:41:15Z
+RUN_END new2 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=24444 TOWER_CARD forwards=192 forward_ms=18646 reverses=64 reverse_ms=4883 elapsed_ms=26732 MEASURE lap=new2 rc=0 wall_s=27.2 peak_rss_kib=3216124

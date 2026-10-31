@@ -1,0 +1,6 @@
+BIN=e9b4dcb4adb528140dc7da781fbc61433ed0b85f6b69ace3e0199013ab103651
+NVIDIA_SMI before clocked: 21 %, 210 MHz, 405 MHz, 44, 21.82 W, P8 apps=0 at=2026-10-31T09:34:01Z
+RUN_END clocked rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.830 deposits=64 halvings=38 elapsed_ms=20131 MEASURE lap=clocked rc=0 wall_s=22.8 peak_rss_kib=1631496
+NVIDIA_SMI before every: 99 %, 2820 MHz, 11501 MHz, 50, 184.14 W, P2 apps=0 at=2026-10-31T09:34:23Z
+RUN_END every rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=22235 MEASURE lap=every rc=0 wall_s=24.8 peak_rss_kib=3213980
+VRAM_PEAK_MIB=10848

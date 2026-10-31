@@ -1,0 +1,10 @@
+TOWER_COMMAND train-two-ladder-stacked-news-heading-credited-every-level-pair-unit-tower $ROOT/.local/wt/section-edge/research/records/2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY_receipts/UNITS d0973c39ebf391bf1115322a2df8c42157036e96c3eca79c37c869d557a2782a $ROOT/.local/wt/section-edge/.local/run/race/units/TRAIN.bytes 60eb9909f38bc97882f57bf6c49c41d3550ba7ac47543bb28d3ee39ccd9265c0 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.bytes f8a708865f61cb3df771e70b8c18b692d4c9a124b1c15cba5be68c79c21762b4 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.roles 99716b831415bb4637fd66f4e0591837dfb2198bc472aa86dcc7b0e1535c616d $ROOT/.local/wt/race/.local/race/passage/KEYS2 d4a65962a1eb6f7e60332c049c630f5d3eca815a55d3c3256b9ec82efef48132 64 128 256 6 160 128 3 7 $ROOT/.local/wt/section-edge/.local/run/race/p41/lap-pair
+UNIT_READ units=1318 train_bytes=29744156 train_units=15108518 dev_bytes=913986 dev_units=412959
+TOWER_TRAIN material=790182 streams=160 section=128 sections_a_pass=737 train_bytes=29744156 dev_bytes=913986
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.227 deposits=32 halvings=50 elapsed_ms=9052
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.204 deposits=64 halvings=61 elapsed_ms=15499
+TOWER_PASS pass=0 train_bits_a_byte=2.283 dev_bits_a_byte=2.112 dev_regions Q=2.076 P=0.000 N=0.000 M=2.140 deposits=737/737 pass_ms=137940 elapsed_ms=137958 train_code=71133455952480 dev_code=2023389212436 grain_bits=20
+TOWER_PASS pass=1 train_bits_a_byte=1.900 dev_bits_a_byte=2.005 dev_regions Q=1.961 P=0.000 N=0.000 M=2.039 deposits=737/737 pass_ms=127637 elapsed_ms=265596 train_code=59203532219202 dev_code=1920638559217 grain_bits=20
+TOWER_PASS pass=2 train_bits_a_byte=1.828 dev_bits_a_byte=1.958 dev_regions Q=1.903 P=0.000 N=0.000 M=1.999 deposits=737/737 pass_ms=130286 elapsed_ms=395883 train_code=56963158977896 dev_code=1875477459046 grain_bits=20
+TOWER_CARD forwards=4555 forward_ms=199469 reverses=2211 reverse_ms=112638 elapsed_ms=398510
+MEASURE lap=lap-pair rc=0 wall_s=398.8 peak_rss_kib=1843104

@@ -1,0 +1,32 @@
+TOWER_COMMAND train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower $ROOT/.local/wt/section-edge/research/records/2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY_receipts/UNITS d0973c39ebf391bf1115322a2df8c42157036e96c3eca79c37c869d557a2782a $ROOT/.local/wt/section-edge/.local/run/race/units/TRAIN.bytes 60eb9909f38bc97882f57bf6c49c41d3550ba7ac47543bb28d3ee39ccd9265c0 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.bytes f8a708865f61cb3df771e70b8c18b692d4c9a124b1c15cba5be68c79c21762b4 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.roles 99716b831415bb4637fd66f4e0591837dfb2198bc472aa86dcc7b0e1535c616d $ROOT/.local/wt/race/.local/race/passage/KEYS2 d4a65962a1eb6f7e60332c049c630f5d3eca815a55d3c3256b9ec82efef48132 64 128 256 6 160 128 1 7 $ROOT/.local/wt/section-edge/.local/run/race/r35/lap-participating
+UNIT_READ units=1318 train_bytes=29744156 train_units=15108518 dev_bytes=913986 dev_units=412959
+TOWER_PARTICIPATION section=128 beta_shift=2 heads=[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8] from=4
+TOWER_TRAIN material=854214 streams=160 section=128 sections_a_pass=737 train_bytes=29744156 dev_bytes=913986
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.304 deposits=32 halvings=35 elapsed_ms=28154
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.298 deposits=64 halvings=39 elapsed_ms=46154
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.860 deposits=96 halvings=39 elapsed_ms=63073
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.654 deposits=128 halvings=39 elapsed_ms=79434
+TOWER_SECTION pass=0 section=160 bits_a_byte=2.506 deposits=160 halvings=39 elapsed_ms=96104
+TOWER_SECTION pass=0 section=192 bits_a_byte=2.406 deposits=192 halvings=39 elapsed_ms=112104
+TOWER_SECTION pass=0 section=224 bits_a_byte=2.360 deposits=224 halvings=39 elapsed_ms=127976
+TOWER_SECTION pass=0 section=256 bits_a_byte=2.303 deposits=256 halvings=39 elapsed_ms=143441
+TOWER_SECTION pass=0 section=288 bits_a_byte=2.250 deposits=288 halvings=39 elapsed_ms=158941
+TOWER_SECTION pass=0 section=320 bits_a_byte=2.225 deposits=320 halvings=39 elapsed_ms=174378
+TOWER_SECTION pass=0 section=352 bits_a_byte=2.174 deposits=352 halvings=39 elapsed_ms=189590
+TOWER_SECTION pass=0 section=384 bits_a_byte=2.188 deposits=384 halvings=39 elapsed_ms=204644
+TOWER_SECTION pass=0 section=416 bits_a_byte=2.166 deposits=416 halvings=39 elapsed_ms=219591
+TOWER_SECTION pass=0 section=448 bits_a_byte=2.139 deposits=448 halvings=39 elapsed_ms=234398
+TOWER_SECTION pass=0 section=480 bits_a_byte=2.110 deposits=480 halvings=39 elapsed_ms=249636
+TOWER_SECTION pass=0 section=512 bits_a_byte=2.124 deposits=512 halvings=39 elapsed_ms=265254
+TOWER_SECTION pass=0 section=544 bits_a_byte=2.105 deposits=544 halvings=39 elapsed_ms=280329
+TOWER_SECTION pass=0 section=576 bits_a_byte=2.086 deposits=576 halvings=39 elapsed_ms=294964
+TOWER_SECTION pass=0 section=608 bits_a_byte=2.079 deposits=608 halvings=39 elapsed_ms=309744
+TOWER_SECTION pass=0 section=640 bits_a_byte=2.054 deposits=640 halvings=39 elapsed_ms=324268
+TOWER_SECTION pass=0 section=672 bits_a_byte=2.049 deposits=672 halvings=39 elapsed_ms=339302
+TOWER_SECTION pass=0 section=704 bits_a_byte=2.057 deposits=704 halvings=39 elapsed_ms=354284
+TOWER_SECTION pass=0 section=736 bits_a_byte=2.048 deposits=736 halvings=39 elapsed_ms=369353
+TOWER_SECTION pass=0 section=737 bits_a_byte=2.046 deposits=737 halvings=39 elapsed_ms=369814
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 160 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 20480 blocks (one a cell) x 256 threads, the modes' scan 160 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread; participation's 16 heads one warp a head, the warps taking the heads in turn, in the forward's block and in its own reverse of 160 blocks (one a stream, its cells in order)
+TOWER_PASS pass=0 train_bits_a_byte=2.371 dev_bits_a_byte=2.170 dev_regions Q=2.152 P=0.000 N=0.000 M=2.184 deposits=737/737 pass_ms=374142 elapsed_ms=374152 train_code=73867356964303 dev_code=2078643296133 grain_bits=20
+TOWER_CARD forwards=1534 forward_ms=275453 reverses=737 reverse_ms=58776 elapsed_ms=376767
+MEASURE lap=lap-participating rc=0 wall_s=377.1 peak_rss_kib=2640920

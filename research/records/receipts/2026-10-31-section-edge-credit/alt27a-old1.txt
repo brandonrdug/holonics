@@ -1,0 +1,9 @@
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.043 deposits=32 halvings=41 elapsed_ms=15166
+TOWER_CLOSURE pass=0 section=32 level=4 ticks=808915 code_bits_a_tick=6.693 flat_bits_a_tick=6.331 level=5 ticks=412786 code_bits_a_tick=5.579 flat_bits_a_tick=5.361
+TOWER_REFUSALS pass=0 section=32 refused=41 arrivals_rose=41 closure_rose=- arrivals_change_bits=4044666.524 closure_change_bits=-
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=24429
+TOWER_CLOSURE pass=0 section=64 level=4 ticks=610069 code_bits_a_tick=6.251 flat_bits_a_tick=5.908 level=5 ticks=310490 code_bits_a_tick=5.141 flat_bits_a_tick=4.935
+TOWER_REFUSALS pass=0 section=64 refused=0 arrivals_rose=0 closure_rose=- arrivals_change_bits=0.000 closure_change_bits=-
+TOWER_PASS pass=0 train_bits_a_byte=4.417 dev_bits_a_byte=3.461 dev_regions gsm8k=3.494 strokes=0.000 cycles=0.000 words=3.436 deposits=64/64 pass_ms=26515 elapsed_ms=26525 train_code=12142460845425 dev_code=3315756567616 grain_bits=20
+TOWER_CARD forwards=192 forward_ms=18603 reverses=64 reverse_ms=4868 elapsed_ms=26735
+MEASURE lap=old1 rc=0 wall_s=27.2 peak_rss_kib=3215288

@@ -1,0 +1,15 @@
+BIN=1412c4efc65fdb3facf954c780f0245ac10cfe0c07d5708f0eb42fdf6f86d681
+NVIDIA_SMI before dev-cprime: 23 %, 210 MHz, 405 MHz, 43, 21.12 W, P8, 1061 MiB at=2026-10-31T07:50:28Z
+RUN_END dev-cprime passes=1 deadline_s=60 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=4.102 deposits=64 halvings=22 elapsed_ms=16518 MEASURE lap=dev-cprime rc=0 wall_s=18.8 peak_rss_kib=676200
+NVIDIA_SMI before dev-clocked: 100 %, 2820 MHz, 11501 MHz, 49, 189.70 W, P2, 1061 MiB at=2026-10-31T07:50:47Z
+RUN_END dev-clocked passes=1 deadline_s=60 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.830 deposits=64 halvings=38 elapsed_ms=19742 MEASURE lap=dev-clocked rc=0 wall_s=22.2 peak_rss_kib=1628352
+NVIDIA_SMI before dev-every: 83 %, 2805 MHz, 11501 MHz, 52, 173.85 W, P2, 1049 MiB at=2026-10-31T07:51:09Z
+RUN_END dev-every passes=1 deadline_s=60 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=21205 MEASURE lap=dev-every rc=0 wall_s=23.6 peak_rss_kib=3217264
+PROJECTION cprime two laps 469 s, clocked one lap 278 s, every one lap 298 s
+NVIDIA_SMI before cprime: 34 %, 2805 MHz, 11501 MHz, 53, 171.79 W, P0, 1049 MiB at=2026-10-31T07:51:33Z
+RUN_END cprime passes=2 deadline_s=469 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=4.102 deposits=64 halvings=22 elapsed_ms=15374 MEASURE lap=cprime rc=0 wall_s=310.1 peak_rss_kib=680268
+NVIDIA_SMI before clocked: 100 %, 2805 MHz, 11501 MHz, 56, 200.13 W, P2, 1049 MiB at=2026-10-31T07:56:43Z
+RUN_END clocked passes=1 deadline_s=278 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.830 deposits=64 halvings=38 elapsed_ms=19014 MEASURE lap=clocked rc=0 wall_s=178.2 peak_rss_kib=1630876
+NVIDIA_SMI before every: 82 %, 2805 MHz, 11501 MHz, 56, 189.90 W, P2, 1049 MiB at=2026-10-31T07:59:42Z
+RUN_END every passes=1 deadline_s=298 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=21167 MEASURE lap=every rc=0 wall_s=190.3 peak_rss_kib=3211352
+VRAM_PEAK_MIB=10835
