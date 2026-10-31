@@ -1780,3 +1780,43 @@ learns more from each pass of the data. At equal elapsed time the two are level 
 bought back by its time, so **the subject of the next loop is the every-level credit's cost**: what
 its six levels' sub-steps, sums and meetings cost a section beside the clocked credit's two, read by
 kernel.
+
+## 25. The forward keeps two streams a multiprocessor
+
+[agent-inferred, October 31] **Where the every-level credit's time goes** (`TOWER_PROFILE`, the
+clocked and every-level credits over the first 64 sections, 07:09Z; receipts `profile24-*.log`).
+Its 4.45 s over the clocked credit's split: `tower_forward` +2.49 s (about 24 ms on each forward that
+advances the credit), `tower_credit` +1.0 s (24.4 against 8.7 ms a launch), the host +0.9 s (its
+credit's opening upload). `ptxas` reads the forward at 255 registers a thread with the credit
+compiled in, where it held 128 before §22: 255 registers over 256 threads take the multiprocessor's
+whole register file, so one block of the forward runs on each where its shared memory (about 40 KB a
+block at the race's declaration) admits two, and the 320 streams run in four waves instead of two.
+The forward is one kernel for every route, so C′ and the uncredited heading ran at the same
+occupancy in every race since §22 (the comparisons stood, every run slower).
+
+**The realization** (execution only). `tower_forward` declares two blocks a multiprocessor
+(`__launch_bounds__(TOWER_THREADS, 2)`): 128 registers, the rest spilled (1,058 bytes stored, 4,624
+loaded, against 298 and 716 at 255).
+
+**At the card** (07:16Z, binary `f1838a95…f8eb` against `0da20022…546a`, alternated, the every-level
+credit's first 64 sections): the four runs print one set of lines; section 64 at 23,373 and 23,447 ms
+against 31,033 and 29,978 ms, 23% sooner, the forward's time 17.3 s against 25.6 and 24.7 s. The card
+suite passed, 46 of 46, in 16.5 s against 28.4.
+
+**The race on the capped forward** (07:18Z to 07:32Z, binary `f1838a95…f8eb`, one session beside
+the game): each run's 64-section read fixed its deadline (C′ 17,068 ms, the clocked credit 20,868,
+the every-level 23,282); C′'s two laps took 319.7 s against 484 s, the clocked credit's lap 187.0 s
+against 294 s, the every-level credit's 206.0 s against 326 s; peak VRAM 10,849 MiB with the game's.
+Every lap printed its earlier lines.
+
+| at its lap's end | held-out (GSM8K) | elapsed | its lap over C′'s | C′ at the same elapsed time | lead |
+|---|---|---|---|---|---|
+| C′ | 2.390 (2.466), 2.200 (2.236) | 161.4 s, 319.3 s | | | |
+| clocked credit | 2.291 (2.328) | 186.5 s | 1.155 | 2.360 | 0.069 |
+| every-level credit | 2.270 (2.310) | 205.5 s | 1.273 | 2.337 | 0.067 |
+
+The capped forward runs C′'s lap in 161 s where §21's idle card took 172 s. Both credits lead C′ at
+equal elapsed time by the same margin after a lap; the every-level credit's per-lap gain over the
+clocked one (0.021) is bought back by its 10% more time a lap, as in the hour-long race. Its excess
+is the subject: `tower_credit` at six levels (24.4 ms a launch) and the per-mode moments it moves in
+the forward's cell-by-cell scan.

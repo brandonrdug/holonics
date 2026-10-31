@@ -887,7 +887,9 @@ __device__ __forceinline__ unsigned char *carve(unsigned char *&at, uint64_t oct
     return p;
 }
 
-extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerLaw law, TowerFrame fr, uint32_t read) {
+// Two blocks a multiprocessor (record §25): the stage's shared memory admits two, and the credit's
+// arithmetic would otherwise take every register and halve the streams in flight.
+extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(TowerLaw law, TowerFrame fr, uint32_t read) {
     const uint32_t keep = read == 1, opening_ticks = read == 2;
     // The credit's advance (`tower_credit` sums it at the carry) and the closure's read.
     const bool advancing = law.credit && law.credit_advance;
