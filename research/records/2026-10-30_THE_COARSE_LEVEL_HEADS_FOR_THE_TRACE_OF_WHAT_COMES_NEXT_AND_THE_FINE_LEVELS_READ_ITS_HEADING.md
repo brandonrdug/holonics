@@ -1,7 +1,7 @@
 # The coarse level heads for the trace of what comes next, and the fine levels read its heading
 
 Refs #404 #406. Status: [the lens and the located cause; the law and its acceptance fixed before the
-build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, fixed before its run (§18)]. Claude (opus), design lead. Read beside
+build; agent-inferred, October 30; built on the host and the card, acceptance 1–6 passed; over 256 sections the heading located and the arrivals trailed C′ under a step refused about 2.8 times a section, which the holds located in the descent (§8); the face reads the heading, built on the host and the card, acceptance 7–9 passed and 10 missed by 0.008 bits a byte, the closure's pull on the arrivals' terrain located as the refusals' cause (§9); with the closure on the key alone the arrivals reached 2.755 against C′'s 2.740 and the closure stayed at flat, acceptance 13 missed on both halves (§10); the closure read and not learned, acceptance 14–16 passed: the arrivals reached 2.721 against C′'s 2.740 and led it at every window, under refusals still about level with the key-only lap's, which the holds located in the descent's step (§11); the descent stepping at the closure's scale failed acceptance 18 on every part and is retired, so the refusals come with the descent's read and not its step size (§12); each refused step read by its parts: the descent's and the read's steps alone lower the arrivals, every other family's raises them, and split in three no part alone carries the rise: the refusals are the parts' steps meeting (§13); over a whole lap the held-out read ended at 2.344 bits a byte against C′'s 2.390 and the arrivals read below C′'s at every window, acceptance 22 passed, under 573 refusals against C′'s 29 and 1.52 times its pass time (§14); over three laps it read below C′ lap for lap (2.344, 2.146, 2.072 against 2.390, 2.200, 2.082), acceptance 23 passed, its refusals the first lap's alone and each later lap 1.17 times C′'s, so at equal time C′ leads and the closure stays above flat (§15); each refused step read on the ticks its section opened with, acceptance 24–26 passed: every refused step rose as much on the opening's ticks as on its own, so the refusals are the parts meeting through the clocked levels' inputs (§16); the step's parts scaled by their meeting form through the receiving face's metric, acceptance 27–28 passed and 29 failed: the form modelled each section within 13% but its section-local scales starved the descent and the clocked levels, every whole step was then refused, and at section 224 the arrivals read 3.256 against the plain halving's 2.810 at 3.95 times the time, so the law is retired (§17); where the heading's time goes, read per kernel against C′'s, acceptance 30 passed: per unrefused section the heading's kernels carry its later laps' whole excess, 35.6 of 41.2 ms in the forward (§18); the heading held between its level's ticks, fixed before its build (§19)]. Claude (opus), design lead. Read beside
 [the packet record](2026-10-30_A_CLOCKED_LEVEL_HEARS_THE_PACKET_ITS_CLOCK_CLOSED_NOT_THE_STATE_ITS_OWN_MODES_ALREADY_HOLD.md)
 (whose clocked levels and packets are the race's base declaration, C′),
 [the Galois-gap record §12–13](2026-10-26_A_GALOIS_GAP_IS_A_MODES_MOMENTUM_AN_ORBITS_GAPS_MULTIPLY_TO_ITS_PRIME_AND_A_TIME_BOUNDARY_IS_THE_PUMPED_MODE.md#12-colourless-is-compressible-the-trace-the-tower-of-colours-and-the-quasicrystal)
@@ -1149,3 +1149,84 @@ past its deadline is reported incomplete with its rate.
 
 Recorded failures this could repeat: *bits read as progress* (this reads time, beside the arrivals
 already measured); *a refusal answered with a larger limit* (the deadline is fixed before launch).
+
+**The card's reading** (RTX 4080 SUPER, alone, 056b77d95, binary 243445dd…2c4d; card suite 44/44 at
+the head). Acceptance 30 passed: C′ read 5.498 and 4.102 at sections 32 and 64 (halvings 21 and
+22) and the heading 5.103 and 3.901 (halvings 53 and 73), with its two `TOWER_REFUSALS` lines equal
+to a38c1c63f's lap's, so the profile moved nothing. Each profiled run's elapsed time at section 64
+was below its unprofiled lap's (16,629 ms against 17,000; 24,706 against 25,079), so the profile's
+synchronizations cost nothing measurable beside launches of 60 to 80 ms.
+
+| over 64 sections | C′ launches | C′ ms | heading launches | heading ms |
+|---|---:|---:|---:|---:|
+| `tower_forward` | 173 | 10,956 | 224 | 18,170 |
+| the outer sums (`reduce`, `x32`, `x64`) | 6,272 | 1,934 | 7,040 | 2,072 |
+| the reverse (`contacts`, `dx`, `modes`, `packet`, `top`) | 1,344 | 2,330 | 1,344 | 2,321 |
+| `tower_reverse_ahead`, `tower_reverse_heading` | — | — | 192 | 216 |
+| `tower_encoding`, `tower_moves`, `tower_transpose` | 301 | 387 | 352 | 376 |
+| every kernel | | 15,607 | | 23,155 |
+| the run's elapsed time | | 18,657 | | 27,086 |
+| the host's remainder | | 3,050 | | 3,931 |
+
+A forward costs C′ 63.3 ms and the heading 81.1 ms a launch. Each run launches two forwards a
+section (the keep read and the certificate's read), one a refused step's reread and 23 at the close
+(`173 = 2·64 + 22 + 23`, `224 = 2·64 + 73 + 23`).
+
+**What it decides.** The heading's 8,429 ms over C′'s split three ways over these 64 sections:
+the refused sections' 51 rereads at the heading's forward, 4,137 ms; the heading's kernels, 3,412 ms
+(the dearer forward over the 173 launches both runs make, 3,078 ms, the two return kernels' 216 ms,
+the outer sums' 138 ms, and −20 ms among the rest); and the host's remainder, 881 ms, which carries
+the rereads' comparisons too. The rereads belong to the first lap (573, 5, 0 over three laps, §15),
+so per unrefused section, which the later laps pay, the split is the kernels' `2 × 17.8 + 3.4 + 2.2
+= 41.2 ms` against at most `881/64 = 13.8 ms` of host, and C′'s later laps cost 230.6 ms a section
+(`167,442 ms / 726`), whose 1.17 is 39.2 ms: the heading's kernels carry the later laps' whole
+excess, and `tower_forward` carries 35.6 ms of it. **The next loop is the forward's heading.**
+
+In the forward each clocked level reads its heading twice a cell, before the arrival for the
+closure and after the cell for the face, each read a `2W × N` contraction with three block
+reductions, and lifts it through the descent, a `W × W` contraction, once a cell. The level's own
+read, the same `2W × N` contraction, is held between its ticks (§19 says why the heading may be).
+
+## 19. The heading stands between its level's ticks
+
+[agent-inferred, October 31] **The law, unchanged.** The closure's heading before arrival `t+1` and
+the face's heading after cell `t` are one value: `ĥ_l(t+1) = r̂(Re(C^→_l h_l(t))) = ĥ⁺_l(t)`. Under
+the news clock a clocked level's state moves only at its ticks (an arrival that ticks the level no
+time moves nothing), so when level `l` does not tick at cell `t`, `h_l(t) = h_l(t−1)`, hence
+`ĥ⁺_l(t) = ĥ⁺_l(t−1)` and the descent's lift `D_l ĥ⁺_l(t) = D_l ĥ⁺_l(t−1)` (`D` moves only at the
+step, never inside a forward). The heading is a face of the level's modes and stands while they
+stand, as the level's own read does.
+
+**The realization.** `tower_forward` reads a clocked level's heading at the forward's opening and
+after each cell at which the level ticked, and holds its ratio, scale and maxima and the descent's
+lift between; the closure's heading before an arrival and the face's after a still cell are the
+held ones, and the face's carrier `fc` is released from the standing state as the read would release
+it. Every value the forward writes or keeps is the one it wrote before, bit for bit, since the
+arithmetic is exact; the host's reference and the reverse are unchanged. The fraction of arrivals
+that tick a level fell over a38c1c63f's lap from 62.5% at level 4 in the first window (819,467 of
+1,310,720 arrivals) to 38.8% in the fourth, and stood at about half that at level 5, so over the
+first 64 sections the per-cell heading work falls from two reads and a lift at each clocked level to
+about 0.55 and 0.28 of one read and one lift. If the reads and the lift carry about nine tenths of the
+forward's 17.8 ms excess and a lift costs about a third of a read (agent-inferred), the excess falls
+to about 5 ms a launch.
+
+31. The card suite passes at the head, its heading parity test among them (the card's heading is the
+    host's for thirty-two sections).
+32. A profiled heading run over the first 64 sections (`TOWER_LAP_SECTIONS=64`, `TOWER_PROFILE`)
+    prints a38c1c63f's lap's `TOWER_SECTION`, `TOWER_REFUSALS` and `TOWER_CLOSURE` lines at sections
+    32 and 64, digit for digit, the times aside.
+33. Its `tower_forward` costs at most 72.2 ms a launch over those sections, half its excess over C′'s
+    removed (81.1 ms at 056b77d95, C′ 63.3 ms).
+
+**What it decides**, fixed before the run. With 31–33 passed, the heading's later laps pay about C′'s
+forward, and the subject is the arrivals at equal elapsed time against C′. With 33 failed and 31–32
+passed, the forward's excess is not its repeated reads, and the next loop reads the forward's heading
+parts one by one.
+
+The projection: the suite at its bound of 136 s (45.5 s at 056b77d95), then the run's 64 sections at
+the heading's window bound with its close, `2 × 18,781 ms + 14.6 s = 52.2 s`, deadline 53 s (27.4 s
+at 056b77d95).
+
+Recorded failures this could repeat: *bits read as progress* (time is read beside lines that must not
+move); *a located cause carried unrepaired into a new consumer* (the hold is the one the forward
+already keeps for each still level's read, and the closure's and the face's headings share it).

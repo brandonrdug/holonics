@@ -896,6 +896,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     const uint32_t HD = law.heading;
     int64_t *tro = (int64_t *)carve(at, 8ull * HD * W);
     uint32_t *hc = (uint32_t *)carve(at, 4ull * HD);
+    // The heading each clocked level holds between its ticks (record §19): its ratio, its lift
+    // through the descent, and its face's maxima, scale and ratio maximum (`hh_v`); `hh` is 0 with
+    // nothing held, 1 with the ratio held, 2 with the lift held too.
+    int32_t *hh_rd = (int32_t *)carve(at, 4ull * HD * W);
+    int64_t *hh_lift = (int64_t *)carve(at, 8ull * HD * W);
+    uint64_t *hh_v = (uint64_t *)carve(at, 8ull * 4 * HD);
+    uint32_t *hh = (uint32_t *)carve(at, 4ull * HD);
     __shared__ uint32_t st;
     __shared__ int64_t scale_s;
     __shared__ wide ring_lam[4];
@@ -943,6 +950,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
     }
     for (uint32_t i = tid; i < HD; i += B) {
         hc[i] = 0;
+        hh[i] = 0;
     }
     for (uint32_t r = tid; r < R; r += B) {
         rg[2 * r] = fr.ring_open[((uint64_t)s * R + r) * 2];
@@ -1007,6 +1015,34 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         }
         __syncthreads();
         return hscale;
+    };
+    // The heading a clocked level holds (record §19): its state has not moved since the heading was
+    // read, so the ratio, scale and maxima stand, and its face is released from the standing state
+    // into `fc` as `heading_read` releases it; returns its scale.
+    const auto heading_held = [&](uint32_t l, uint32_t i, uint64_t &fre, uint64_t &fim) -> int64_t {
+        for (uint32_t k = tid; k < N; k += B) {
+            fc[k] = fit64(rel(h[(l * N + k) * 2], STATE_BITS - FACE_BITS), &st);
+            fc[N + k] = fit64(rel(h[(l * N + k) * 2 + 1], STATE_BITS - FACE_BITS), &st);
+        }
+        for (uint32_t j = tid; j < W; j += B) {
+            rd[j] = hh_rd[(uint64_t)i * W + j];
+        }
+        fre = hh_v[i * 4];
+        fim = hh_v[i * 4 + 1];
+        __syncthreads();
+        return (int64_t)hh_v[i * 4 + 2];
+    };
+    // Hold the heading `heading_read` has just read for the `i`th clocked level.
+    const auto heading_keep = [&](uint32_t i, uint64_t fre, uint64_t fim, int64_t hscale) {
+        for (uint32_t j = tid; j < W; j += B) {
+            hh_rd[(uint64_t)i * W + j] = rd[j];
+        }
+        if (tid == 0) {
+            hh_v[i * 4] = fre;
+            hh_v[i * 4 + 1] = fim;
+            hh_v[i * 4 + 2] = (uint64_t)hscale;
+            hh[i] = 1;
+        }
     };
     __syncthreads();
     for (uint32_t t = 0; t < T; t++) {
@@ -1115,12 +1151,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         // arrival's encoded face joins each clocked level's open trace, and a tick of the level
         // closes the trace, τ_l = r̂(o_l), rests it and lists the tick for the section's closure.
         // The heading's ratio and the trace are kept at every read (the closure reads them at the
-        // section's end).
+        // section's end). The heading before this arrival is the one the level held after the last
+        // cell (`ĥ_l(t) = ĥ⁺_l(t−1)`, record §19); it is read only at the forward's opening.
         for (uint32_t i = 0; i < HD; i++) {
             const uint32_t l = law.news_first + i;
             const uint64_t qh = qc * HD + i;
             uint64_t fre = 0, fim = 0;
-            heading_read(l, fre, fim);
+            if (hh[i] != 0) {
+                heading_held(l, i, fre, fim);
+            } else {
+                const int64_t hscale = heading_read(l, fre, fim);
+                heading_keep(i, fre, fim, hscale);
+            }
             for (uint32_t j = tid; j < W; j += B) {
                 fr.hd_read[qh * W + j] = rd[j];
             }
@@ -1995,24 +2037,45 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_forward(TowerL
         // The face reads each clocked level's heading after the arrival (`Tower::join_heading`):
         // ĥ⁺_l = r̂(Re(C^→_l h_l)) read from the level's modes after the cell, the heading it holds
         // for the arrival the face predicts, enters the top through its descent,
-        // x += D_l ĥ⁺_l on 2^(−40) released to 2^(−16), in level order.
+        // x += D_l ĥ⁺_l on 2^(−40) released to 2^(−16), in level order. A level the arrival ticked
+        // no time holds its heading and its lift as after its last tick (record §19).
         if (HD > 0) {
             for (uint32_t i = 0; i < HD; i++) {
                 const uint32_t l = law.news_first + i;
                 const TowerLevel lv = law.level[l];
                 const uint64_t qh = qc * HD + i;
+                const uint32_t held = law.news && tk[l] == 0 ? hh[i] : 0;
                 uint64_t fre = 0, fim = 0;
-                const int64_t hscale = heading_read(l, fre, fim);
-                uint64_t mx = 0;
-                for (uint32_t j = tid; j < W; j += B) {
-                    const uint64_t v = magnitude(rd[j]);
-                    mx = v > mx ? v : mx;
+                int64_t hscale;
+                if (held != 0) {
+                    hscale = heading_held(l, i, fre, fim);
+                } else {
+                    hscale = heading_read(l, fre, fim);
+                    heading_keep(i, fre, fim, hscale);
                 }
-                const uint64_t hmax = block_max(mx, red);
-                const bool n_d = narrow_terms(lv.heading_reach[2], hmax, W, &st);
-                for (uint32_t j = tid; j < W; j += B) {
-                    const int64_t lift = fit64(rel(dot(th + lv.descent + (uint64_t)j * W, 1, W, rd, n_d), MATERIAL_BITS), &st);
-                    x[j] = fit32((wide)x[j] + (wide)lift, &st);
+                uint64_t hmax;
+                if (held == 2) {
+                    hmax = hh_v[i * 4 + 3];
+                    for (uint32_t j = tid; j < W; j += B) {
+                        x[j] = fit32((wide)x[j] + (wide)hh_lift[(uint64_t)i * W + j], &st);
+                    }
+                } else {
+                    uint64_t mx = 0;
+                    for (uint32_t j = tid; j < W; j += B) {
+                        const uint64_t v = magnitude(rd[j]);
+                        mx = v > mx ? v : mx;
+                    }
+                    hmax = block_max(mx, red);
+                    const bool n_d = narrow_terms(lv.heading_reach[2], hmax, W, &st);
+                    for (uint32_t j = tid; j < W; j += B) {
+                        const int64_t lift = fit64(rel(dot(th + lv.descent + (uint64_t)j * W, 1, W, rd, n_d), MATERIAL_BITS), &st);
+                        hh_lift[(uint64_t)i * W + j] = lift;
+                        x[j] = fit32((wide)x[j] + (wide)lift, &st);
+                    }
+                    if (tid == 0) {
+                        hh_v[i * 4 + 3] = hmax;
+                        hh[i] = 2;
+                    }
                 }
                 if (keep) {
                     for (uint32_t j = tid; j < W; j += B) {
