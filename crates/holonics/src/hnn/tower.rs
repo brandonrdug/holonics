@@ -2255,6 +2255,14 @@ impl LevelCredit {
             _ => None,
         }
     }
+
+    /// Whether a stream's credit (not a realization's mark) holds every moment at zero, as
+    /// [`Tower::rest_with_credit_from`] opens it: a realization keeping it resident then zeroes its
+    /// words where they live instead of carrying them (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…` §28).
+    pub fn at_rest(credit: &[LevelCredit]) -> bool {
+        Self::residence(credit).is_none() && credit.iter().all(|c| std::iter::once(c).chain(c.packet.as_deref()).all(|set| set.parts().iter().all(|p| p.iter().all(|&m| m == (0, 0)))))
+    }
 }
 
 /// One cell's face: each class's mass `2^(z_a − z_max)` on `2^(−62)`, and their sum.
@@ -3104,11 +3112,15 @@ impl Tower {
         Ok(Some(v))
     }
 
-    /// The words of one stream's credit carried from level `from` ([`Tower::credit_words`]).
+    /// The words of one stream's credit carried from level `from` ([`Tower::credit_words`]): each
+    /// credited level's set, and its packet's where its moves carry one, each set's push, along,
+    /// around, gate bias and gate (`LevelCredit::rested`) as `(re, im)` pairs.
     pub fn credit_extent(&self, from: usize) -> usize {
-        let rest = self.rest_with_credit_from(from);
-        let credit = rest.credit.as_deref().unwrap_or_default();
-        credit.iter().filter(|c| c.carried()).flat_map(|c| std::iter::once(c).chain(c.packet.as_deref())).map(|c| 2 * c.parts().iter().map(|p| p.len()).sum::<usize>()).sum()
+        let d = &self.declaration;
+        let carries_packet = |l: usize| self.packet_from().is_some_and(|first| l + 1 >= first) && l + 1 < d.levels;
+        let g = usize::from(d.gated);
+        let set = 2 * (d.modes * d.width + 2 * d.modes + g * d.modes + g * d.modes * d.width);
+        (from.min(d.levels)..d.levels).map(|l| set * (1 + usize::from(carries_packet(l)))).sum()
     }
 
     /// A stream's credit carried from level `from`, restored from its words
@@ -10008,7 +10020,13 @@ mod tests {
         let words = tower.credit_words(&carried).expect("words").expect("a credit");
         assert_eq!(words.len(), tower.credit_extent(2));
         assert_eq!(Some(tower.credit_from_words(2, &words).expect("restored")), carried.credit);
+        // A rested credit is at rest and its words are all zero; a carried one is not.
+        let rested = tower.rest_with_credit_from(2);
+        assert!(LevelCredit::at_rest(rested.credit.as_deref().expect("a credit")));
+        assert!(tower.credit_words(&rested).expect("words").expect("a credit").iter().all(|&w| w == 0));
+        assert!(!LevelCredit::at_rest(carried.credit.as_deref().expect("a credit")) && words.iter().any(|&w| w != 0));
         let marked = TowerState { credit: Some(LevelCredit::resident_mark(7, 0)), ..carried.clone() };
+        assert!(!LevelCredit::at_rest(marked.credit.as_deref().expect("a mark")));
         let marked_text = marked.to_text();
         assert!(tower.credit_words(&marked).is_err() && tower.state_from_text(&marked_text.lines().collect::<Vec<_>>()).is_err());
         let cells = tower.forward(&mut carried.clone(), &classes[..4], &reaches).expect("forward");

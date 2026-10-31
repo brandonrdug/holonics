@@ -1580,12 +1580,17 @@ impl<'c> TowerCard<'c> {
             return Err(TowerError::Refused("the streams' credit is resident or uploaded, never both"));
         }
         let extent = tower.credit_extent(from);
-        let mut words = Vec::with_capacity(extent * opening.len());
-        for o in opening {
-            if o.credit.as_deref().and_then(|c| tower.credit_from_of(c)) != Some(from) {
-                return Err(TowerError::Refused("every stream's credit begins at the same level"));
+        if opening.iter().any(|o| o.credit.as_deref().and_then(|c| tower.credit_from_of(c)) != Some(from)) {
+            return Err(TowerError::Refused("every stream's credit begins at the same level"));
+        }
+        // Credits at rest are zeroed where they live (record §28); any other is carried as words.
+        let rested = opening.iter().all(|o| o.credit.as_deref().is_some_and(LevelCredit::at_rest));
+        let mut words = Vec::new();
+        if !rested {
+            words.reserve(extent * opening.len());
+            for o in opening {
+                words.extend(tower.credit_words(o)?.ok_or(TowerError::Refused("every stream carries a credit"))?);
             }
-            words.extend(tower.credit_words(o)?.ok_or(TowerError::Refused("every stream carries a credit"))?);
         }
         let streams = opening.len();
         if !self.credit.as_ref().is_some_and(|c| c.streams == streams && c.extent == extent) {
@@ -1597,7 +1602,11 @@ impl<'c> TowerCard<'c> {
         self.generations += 1;
         let credit = self.credit.as_mut().expect("allocated above");
         credit.from = from;
-        self.card.write(&credit.open, 0, &words).map_err(device)?;
+        if rested {
+            self.card.zero_octets(&credit.open, 0, streams * extent * std::mem::size_of::<i64>()).map_err(device)?;
+        } else {
+            self.card.write(&credit.open, 0, &words).map_err(device)?;
+        }
         credit.generation = generation;
         self.credit_pending = None;
         Ok(())

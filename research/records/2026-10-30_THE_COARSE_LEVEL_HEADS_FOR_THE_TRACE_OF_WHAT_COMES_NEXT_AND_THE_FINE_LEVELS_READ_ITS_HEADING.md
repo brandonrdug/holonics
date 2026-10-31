@@ -1939,6 +1939,33 @@ From section 32 to 64 the every-level credit now costs 1.05 times the clocked cr
 other excess is about 1.3 s once a run, building and uploading the rested credit on the host (the
 host's state for 320 streams, 687 MB of words).
 
+**The race on it** (09:48Z to 10:02Z, one session beside the game; deadlines from each run's
+64-section read: C′'s two laps 320.2 s against 457 s, the clocked credit's lap 175.0 s against
+277 s, the every-level credit's 185.4 s against 305 s; peak VRAM 10,848 MiB with the game's). Every
+run ended in §27's saved state, SHA-256 for SHA-256, so the race reads time only. C′'s first lap
+shared the host with a compile of mine for about its first 40 s (165.7 s against §27's 156.3 s,
+its second lap 154.0 s against 153.4), so C′ is read at §27's clean times:
+
+| at its lap's end | held-out (GSM8K) | elapsed (§27) | its lap over C′'s | C′ at the same elapsed time | lead |
+|---|---|---|---|---|---|
+| clocked credit | 2.291 (2.328) | 174.5 s (177.7) | 1.117 | 2.367 | 0.076 |
+| every-level credit | 2.270 (2.310) | 184.9 s (189.7) | 1.183 | 2.355 | 0.085 |
+
+The every-level credit's lap now costs 1.059 times the clocked credit's (1.068 at §27). Read
+against the clocked credit's second lap as §27's hour race timed it, scaled by this lap's 0.985,
+the every-level credit's lead over it at its lap's end is 0.011 (0.008 at §27).
+
+**The rested credit zeroed where it lives.** A pass opens every stream's credit at rest, and the
+card had taken it as 687 MB of zero words built on the host and carried across the bus. Now
+`LevelCredit::at_rest` reads that every moment is zero and `TowerCard::admit_credit` zeroes the
+resident credit on the card instead (a credit not at rest is carried as words, as before), and
+`Tower::credit_extent` counts the words from the declaration rather than building a rested state to
+count them. Its test reads a rested credit at rest with zero words, and a carried credit and a
+realization's mark not at rest. At the card (10:06Z, `tower_pass-29i` against `tower_pass-29`,
+alternated, the every-level route's first 64 sections): every run's section lines equal; section 64
+at 20,166 and 20,230 ms against 20,597 and 20,649 (419 to 431 ms sooner, the forward's first read
+carrying it); the card suite passed, 46 of 46.
+
 The receipts directory's run reads (§22 to §28) had been written as `.log`, which the repository
 ignores, so only its scripts were committed; they are committed with this section as `.txt`, their
 machine paths written `$ROOT`.
