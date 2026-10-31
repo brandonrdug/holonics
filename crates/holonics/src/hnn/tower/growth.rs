@@ -126,7 +126,7 @@ impl Tower {
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
         let d = TowerDeclaration { width: grow(old.width)?, modes: grow(old.modes)?, contacts: grow(old.contacts)?, ..old };
         let participation = match &self.participation {
-            Some(p) => Some(ParticipationDeclaration::new(p.heads.repeat(factor), p.section, p.beta_shift)?),
+            Some(p) => Some(ParticipationDeclaration::new(p.heads.repeat(factor), p.section, p.beta_shift)?.from_level(p.from)),
             None => None,
         };
         let layout = Layout::new(&d, 0, 0, 0, 0, participation.as_ref(), false, self.heard_from());

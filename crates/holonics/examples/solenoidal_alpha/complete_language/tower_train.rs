@@ -3349,7 +3349,7 @@ fn train_looking_or_not(args: &[String], gated: bool, turned: bool, pumped: bool
 /// `train-unit-pair-pumped-tower` the pumped tower whose contacts are pair contacts, which take the
 /// product of two modes' phases (record `2026-10-26_THE_GENERATOR_IS_THE_MODULATOR_…`).
 pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
-    train_units_joined(args, turned, pumped, contact, false, realization)
+    train_units_joined(args, turned, pumped, contact, None, realization)
 }
 
 /// [agent-inferred, October 31] `train-two-ladder-stacked-news-heading-credited-every-level-unit-tower
@@ -3358,10 +3358,17 @@ pub(super) fn train_units(args: &[String], turned: bool, pumped: bool, contact: 
 /// parsed as `train-unit-tower` parses them (record
 /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §33).
 pub(super) fn train_units_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
-    train_units_joined(args, false, false, ContactLaw::Rectifying, true, realization)
+    train_units_joined(args, false, false, ContactLaw::Rectifying, Some(Joined::PassagePacketsHeading), realization)
 }
 
-fn train_units_joined(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, race: bool, realization: &mut dyn PassRealization) -> Result<()> {
+/// `train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower`: the unit
+/// race's declaration with participation joined at the clocked levels alone, on their own ticks
+/// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+pub(super) fn train_units_participating_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Rectifying, Some(Joined::PassagePacketsParticipationHeading), realization)
+}
+
+fn train_units_joined(args: &[String], turned: bool, pumped: bool, contact: ContactLaw, race: Option<Joined>, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 20 && args.len() != 22 {
         return Err("train-unit-tower|train-unit-pumped-tower|train-unit-pair-pumped-tower UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA]".into());
     }
@@ -3388,8 +3395,8 @@ fn train_units_joined(args: &[String], turned: bool, pumped: bool, contact: Cont
         units.len(), train.len(), train_classes.len(), dev.len(), dev_classes.len()
     );
     let reading = Reading { train: train_classes, train_lengths, dev: dev_classes, dev_lengths, dev_roles, alphabet: units.len(), regions: REGIONS, train_compared: None };
-    if race {
-        return fit(&args[9..], reading, true, false, false, Credit::From(0), contact, TurnLadder::Both, Some(super::tower_classes::race_stacked_news_clock()), Joined::PassagePacketsHeading, None, realization);
+    if let Some(joined) = race {
+        return fit(&args[9..], reading, true, false, false, Credit::From(0), contact, TurnLadder::Both, Some(super::tower_classes::race_stacked_news_clock()), joined, None, realization);
     }
     fit(&args[9..], reading, true, turned, pumped, false, contact, TurnLadder::Fixed, None, Joined::Nothing, None, realization)
 }
@@ -3425,6 +3432,10 @@ pub(super) enum Joined {
     /// reads its modes through its own heading material before each arrival, and the heading meets
     /// the trace of the arrivals its next tick closes.
     PassagePacketsHeading,
+    /// [`Joined::PassagePacketsHeading`] with participation at the clocked levels alone, on their
+    /// own ticks, joined after the packets and before the passage (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+    PassagePacketsParticipationHeading,
     /// The pair contacts paired at the founding ([`TowerLearner::paired`]), each section founding
     /// their splits ([`TowerLearner::section_founding`]); the carried directions rest beside each
     /// learner (`PAIRED.<pass>`, `PAIRED`).
@@ -3523,17 +3534,23 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         if learner.tower.declaration != carried || learner.rate_bits != rate_bits || learner.tower.news() != news {
             return Err("the continued learner's declaration, rate or news clock differs from the declared one".into());
         }
-        if learner.tower.participation().map(|p| p.section) != (joined == Joined::Participation).then_some(section) {
+        let first = news.map_or(0, |c| c.first());
+        let declared = match joined {
+            Joined::Participation => Some((section, 0)),
+            Joined::PassagePacketsParticipationHeading => Some((section, first)),
+            _ => None,
+        };
+        if learner.tower.participation().map(|p| (p.section, p.from)) != declared {
             return Err("the continued learner's participation differs from the declared one".into());
         }
         if learner.tower.mutual_contact() != (joined == Joined::MutualContact).then_some(MUTUAL_SHIFT) {
             return Err("the continued learner's comparison differs from the declared one".into());
         }
-        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading);
+        let packets = matches!(joined, Joined::PassagePackets | Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading);
         if learner.tower.passage() != (packets || joined == Joined::Passage) || learner.tower.packets() != packets {
             return Err("the continued learner's passage or packets differ from the declared ones".into());
         }
-        if learner.tower.heading() != (joined == Joined::PassagePacketsHeading) {
+        if learner.tower.heading() != matches!(joined, Joined::PassagePacketsHeading | Joined::PassagePacketsParticipationHeading) {
             return Err("the continued learner's heading differs from the declared one".into());
         }
         learner
@@ -3578,6 +3595,19 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                 learner.join_packets().map_err(|e| e.to_string())?;
                 learner.join_heading().map_err(|e| e.to_string())?;
                 println!("TOWER_PASSAGE first_clocked_level={} packets heading", learner.tower.news().map_or(0, |c| c.first()));
+            }
+            // A participating heading run joins participation at the clocked levels after the
+            // packets (one head a founded rung, over its own count of their ticks), then the passage
+            // and the heading; `W₁ᵃ` at zero, so it opens on the heading run face for face.
+            Joined::PassagePacketsParticipationHeading => {
+                let first = learner.tower.news().map_or(0, |c| c.first());
+                learner.join_packets().map_err(|e| e.to_string())?;
+                let founded = learner.tower.founded_participation(section).map_err(|e| e.to_string())?.from_level(first);
+                println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
+                learner.join_participation(founded).map_err(|e| e.to_string())?;
+                learner.join_passage().map_err(|e| e.to_string())?;
+                learner.join_heading().map_err(|e| e.to_string())?;
+                println!("TOWER_PASSAGE first_clocked_level={first} packets participation heading");
             }
             // A split run widens the contact field by two at the founding, every pair dormant
             // ([`TowerLearner::paired`]); the founding run carries their directions.

@@ -172,7 +172,9 @@ struct TowerLaw {
     // The split read (`split = 0` without it): the pair contact's reverse keeps each contact's
     // covector δv at its product (`tower_reverse_contacts`), which `tower_split_read` reads
     // against each dormant pair's direction (`holonics::hnn::tower::split`).
-    uint32_t split, split_pad;
+    // `pa_from`: participation's first level (record `2026-10-30_…`, §35): the levels below it
+    // read no sites and carry none of its material.
+    uint32_t split, pa_from;
     // The heading (`heading = 0` without it; else the clocked levels L − F that carry one,
     // `Tower::join_heading`): each clocked level's heading after a cell enters the top through its
     // descent, the face reading it, and a tick's heading is paired with the traces of the stream's
@@ -965,7 +967,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
     const uint32_t P = law.participation != 0, HH = law.pa_heads;
     int64_t *pu = (int64_t *)carve(at, 8ull * 2 * N * P);
     int64_t *pl = (int64_t *)carve(at, 8ull * N * P);
-    int64_t *pcs = (int64_t *)carve(at, 8ull * 6 * N * P);
     int64_t *pfr = (int64_t *)carve(at, 8ull * 2 * N * P);
     int64_t *ppr = (int64_t *)carve(at, 8ull * 2 * N * P);
     int64_t *py = (int64_t *)carve(at, 8ull * 2 * N * P);
@@ -1018,7 +1019,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
         st = 0;
         for (uint32_t l = 0; l < L; l++) {
             tk[l] = 1;
-            pa_lead[l] = P ? fr.pa_open[(uint64_t)s * L + l] : 0;
+            pa_lead[l] = P && l >= law.pa_from ? fr.pa_open[(uint64_t)s * L + l] : 0;
             pa_members[l] = 0;
             if (HOLD) {
                 hready[l] = 0;
@@ -1581,7 +1582,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     ui = rel(ur * ti + ui * tr, MOVE_BITS);
                     ur = nr;
                 }
-                if (P) {
+                if (P && l >= law.pa_from) {
                     pu[2 * k] = (int64_t)ur;
                     pu[2 * k + 1] = (int64_t)ui;
                     pl[k] = held ? law.pa_held_log : fit64(rel(exponent, MOVE_BITS - FACE_BITS), &st);
@@ -1861,7 +1862,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
             // admits no site and reads the current held from the level's last site (record
             // `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
             uint64_t prmax = 0;
-            if (P) {
+            const bool PL = P && l >= law.pa_from;
+            if (PL) {
                 const uint32_t moves = tk[l];
                 int64_t *hold = fr.pa_hold + ((uint64_t)s * L + l) * 2 * N;
                 const uint32_t lead = pa_lead[l], members = pa_members[l], place = lead + members;
@@ -1871,12 +1873,6 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                         py[k] = hold[k];
                     }
                 } else {
-                for (uint32_t o = tid; o < 6 * N; o += B) {
-                    const uint32_t fam = o / N, k = o % N;
-                    const bool nar = narrow_terms(lv.pa_reach[fam], xmax, W, &st);
-                    pcs[o] = fit64(rel(dot(tt + lv.pa[fam] + k, N, W, x, nar), MATERIAL_BITS), &st);
-                }
-                __syncthreads();
                 // The cell's place in its section: after the sites the stream carried open into
                 // the call (until the level's section closes) and the sites admitted since, so a
                 // section read across calls runs on as one. The move acted `Δτ` times, so the
@@ -1905,8 +1901,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     pfr[2 * k + 1] = ni;
                     fr.pa_frame[(q * N + k) * 2] = nr;
                     fr.pa_frame[(q * N + k) * 2 + 1] = ni;
+                    // Each chart (probe, key, value; re, im) read from the input at its mode and
+                    // rotated by the frame where it is read, so no chart is staged in the block
+                    // (record `2026-10-30_…`, §35: beside the heading the block's surface holds it).
                     for (uint32_t c = 0; c < 3; c++) {
-                        const wide cr = pcs[(2 * c) * N + k], ci = pcs[(2 * c + 1) * N + k];
+                        const bool nar_r = narrow_terms(lv.pa_reach[2 * c], xmax, W, &st), nar_i = narrow_terms(lv.pa_reach[2 * c + 1], xmax, W, &st);
+                        const wide cr = fit64(rel(dot(tt + lv.pa[2 * c] + k, N, W, x, nar_r), MATERIAL_BITS), &st);
+                        const wide ci = fit64(rel(dot(tt + lv.pa[2 * c + 1] + k, N, W, x, nar_i), MATERIAL_BITS), &st);
                         const int64_t rr = fit64(rel((wide)nr * cr + (wide)ni * ci, MOVE_BITS), &st);
                         const int64_t ri = fit64(rel((wide)nr * ci - (wide)ni * cr, MOVE_BITS), &st);
                         if (c == 0) {
@@ -2075,7 +2076,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
             const bool n_p = law.contact != 0 && narrow_terms(lv.reach[10], rmax, W, &st);
             const bool n_sa = stranded && narrow_terms(law.strand_reach[0], smax, 6 * SR, &st);
             const bool n_sb = stranded && law.contact != 0 && narrow_terms(law.strand_reach[1], smax, 6 * SR, &st);
-            const bool n_pc = P && narrow_terms(lv.pa_reach[8], prmax, W, &st);
+            const bool n_pc = PL && narrow_terms(lv.pa_reach[8], prmax, W, &st);
             const bool hears = law.passage != 0 && l >= law.news_first;
             const bool n_x = hears && narrow_terms(lv.passage_reach, xmax, W, &st);
             m = 0;
@@ -2087,7 +2088,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                 if (stranded) {
                     a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + law.strand_contact + o, F, 6 * SR, sp, n_sa), MATERIAL_BITS), &st), &st);
                 }
-                if (P) {
+                if (PL) {
                     a64 = fit64((wide)a64 + (wide)fit64(rel(dot(tt + lv.pa[8] + o, F, W, prd, n_pc), MATERIAL_BITS), &st), &st);
                 }
                 // The passage: the contacts meet the current passing the level, W₁ˣ x released on
@@ -2762,8 +2763,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         }
     }
     // Participation's current: ∂r̂ᵃ = W₁ᵃᵀ δa, through its ratio, and the current's covector
-    // Cᵃ_reᵀ ∂rᵃ and Cᵃ_imᵀ (−∂rᵃ).
-    if (P) {
+    // Cᵃ_reᵀ ∂rᵃ and Cᵃ_imᵀ (−∂rᵃ), at the levels from its first.
+    if (P && l >= law.pa_from) {
         const bool n_pa = narrow_rows(lv.pa_reach[8], amax, F);
         for (uint32_t idx = tid; idx < G * W; idx += B) {
             const uint32_t g = idx / W, j = idx % W;
@@ -3252,7 +3253,7 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
             }
             // A participating level's turn also carries the transport's later sum (the participation's
             // reverse wrote it before this scan).
-            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS) + (law.pa_heads > 0 ? fr.pa_tturn[q * N + k] : 0);
+            const wide turning = rel((wide)mv[3] * gli - (wide)mv[4] * glr, MOVE_BITS) + (law.pa_heads > 0 && l >= law.pa_from ? fr.pa_tturn[q * N + k] : 0);
             around += turning;
             // The cell's unit: the founded one, turned by the cell's own turn when the level is.
             const wide cu_r = law.turned ? (wide)fr.units[(ql * N + k) * 2] : ur;
@@ -3295,7 +3296,7 @@ extern "C" __global__ void tower_reverse_modes(TowerLaw law, TowerFrame fr, uint
                 dq = fit64(rel(g_rho * GATE_REACH * f, COVECTOR_BITS + MOVE_BITS), &st);
                 // The transport's covector of log₂ ρ_t = c r ℓ: ∂/∂q = c ℓ ln 2 r (1 − r) and
                 // ∂/∂|λ| = c r/(|λ| ln 2), each on 2^(−30).
-                const wide met = law.pa_heads > 0 ? fr.pa_tlog[q * N + k] : 0;
+                const wide met = law.pa_heads > 0 && l >= law.pa_from ? fr.pa_tlog[q * N + k] : 0;
                 if (met != 0) {
                     const wide by_open = rel(rel(rel(log * (wide)law.ln2, MOVE_BITS) * open, MOVE_BITS) * (one - open), MOVE_BITS);
                     dq = fit64((wide)dq + rel(met * GATE_REACH * by_open, COVECTOR_BITS + MOVE_BITS), &st);
@@ -3354,7 +3355,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
     extern __shared__ __align__(16) unsigned char smem[];
     unsigned char *at = smem;
     const uint32_t own = 3 + law.turned + 2 * law.pumped;
-    const uint32_t fams = own + 6 * (law.participation != 0);
+    const uint32_t charted = law.participation != 0 && l >= law.pa_from;
+    const uint32_t fams = own + 6 * charted;
     int64_t *v = (int64_t *)carve(at, 8ull * fams * N);
     int64_t *back = (int64_t *)carve(at, 8ull * fams * W);
     uint64_t *red = (uint64_t *)carve(at, 8ull * 32);
@@ -3433,7 +3435,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         narrow[at_fam] = narrow_rows(lv.reach[9], r5, N);
         bases[at_fam++] = lv.pump_axis;
     }
-    if (law.participation) {
+    if (charted) {
         const uint64_t QL = (uint64_t)law.streams * law.cells * law.levels;
         for (uint32_t f = 0; f < 6; f++) {
             for (uint32_t k = tid; k < N; k += B) {
@@ -3450,17 +3452,27 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         back[o] = fit64(rel(sum, MATERIAL_BITS), &st);
     }
     __syncthreads();
+    // At a tick of a level that hears a packet its push, gate and turn read the packet, so their
+    // covectors return to the packet's read; participation's charts read the passing current, so
+    // theirs return to it (`Tower::reverse_joined`; record `2026-10-30_…`, §35).
     uint64_t mx = 0;
     for (uint32_t j = tid; j < W; j += B) {
         wide sum = heard ? 0 : (wide)fr.dx[q * W + j];
-        for (uint32_t fam = 0; fam < fams; fam++) {
+        for (uint32_t fam = 0; fam < own; fam++) {
             sum += back[fam * W + j];
         }
-        const int64_t v = fit64(sum, &st);
+        wide charts = 0;
+        for (uint32_t fam = own; fam < fams; fam++) {
+            charts += back[fam * W + j];
+        }
         if (heard) {
-            fr.pk_dx[(q * law.packets + (l - law.news_first)) * W + j] = v;
+            fr.pk_dx[(q * law.packets + (l - law.news_first)) * W + j] = fit64(sum, &st);
+            if (charted) {
+                fr.dx[q * W + j] = fit64((wide)fr.dx[q * W + j] + charts, &st);
+            }
             continue;
         }
+        const int64_t v = fit64(sum + charts, &st);
         fr.dx[q * W + j] = v;
         const uint64_t a = magnitude(v);
         mx = a > mx ? a : mx;
@@ -3929,6 +3941,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
 // The heads' friction covectors summed over the streams, one block a level.
 extern "C" __global__ void tower_pa_friction(TowerLaw law, TowerFrame fr) {
     const uint32_t l = blockIdx.x, L = law.levels, HH = law.pa_heads;
+    if (l < law.pa_from) {
+        return;
+    }
     const TowerLevel lv = law.level[l];
     for (uint32_t hh = threadIdx.x; hh < HH; hh += blockDim.x) {
         wide sum = 0;

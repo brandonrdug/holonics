@@ -1,0 +1,13 @@
+TOWER_PARITY section=1 faces=3072 faces_unequal=0 codes_unequal=0 closures=4560 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=0 first_unequal=None deposited=true halvings=0 learner_equal=true host_pass_ms=641 card_pass_ms=181 host_section_ms=756 card_section_ms=339
+TOWER_PARITY section=2 faces=3072 faces_unequal=0 codes_unequal=0 closures=4546 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=0 first_unequal=None deposited=true halvings=1 learner_equal=true host_pass_ms=560 card_pass_ms=244 host_section_ms=889 card_section_ms=490
+TOWER_PARITY section=3 faces=3072 faces_unequal=0 codes_unequal=0 closures=3124 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=0 first_unequal=None deposited=true halvings=1 learner_equal=true host_pass_ms=479 card_pass_ms=196 host_section_ms=775 card_section_ms=443
+TOWER_PARITY section=4 faces=3072 faces_unequal=0 codes_unequal=0 closures=3066 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=362302 first_unequal=Some(640) deposited=true halvings=3 learner_equal=false host_pass_ms=514 card_pass_ms=197 host_section_ms=1106 card_section_ms=680
+TOWER_PARITY_FIRST section=4 index=640 host=3735750 card=3747462
+TOWER_PARITY section=5 faces=3072 faces_unequal=0 codes_unequal=0 closures=3187 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=352367 first_unequal=Some(640) deposited=true halvings=3 learner_equal=false host_pass_ms=466 card_pass_ms=209 host_section_ms=1131 card_section_ms=754
+TOWER_PARITY_FIRST section=5 index=640 host=-2376086 card=-2377757
+TOWER_PARITY section=6 faces=3072 faces_unequal=0 codes_unequal=0 closures=3061 closures_unequal=0 swell_equal=true gradient_entries=717345 gradient_unequal=345179 first_unequal=Some(640) deposited=true halvings=1 learner_equal=false host_pass_ms=514 card_pass_ms=199 host_section_ms=824 card_section_ms=448
+TOWER_PARITY_FIRST section=6 index=640 host=1977903 card=1986082
+TOWER_PARITY_FIRST section=7 index=640 host=-9965742 card=-9984076
+TOWER_PARITY_FIRST section=8 index=640 host=-4002558 card=-3996119
+TOWER_PARITY_DONE sections=8 faces=24576 faces_unequal=0 closures=27527 closures_unequal=0 gradient_entries=5738760 gradient_unequal=1711392 learners_unequal=5 host_ms=11898 card_ms=6122 card_forwards=31 card_forward_ms=3972 card_reverses=8 card_reverse_ms=302 elapsed_ms=18723
+MEASURE lap=iso-heading-credited-every-level-participating rc=1 wall_s=19.3 peak_rss_kib=3751728

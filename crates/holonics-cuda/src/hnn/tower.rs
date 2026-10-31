@@ -226,9 +226,10 @@ struct LawWords {
     /// ([`Tower::join_packets`]).
     packets: u32,
     /// One when the reverse keeps each contact's covector for the paired contacts' split read
-    /// (`tower_split_read`, [`holonics::hnn::tower::split`]), else zero; and the words' padding.
+    /// (`tower_split_read`, [`holonics::hnn::tower::split`]), else zero; and participation's first
+    /// level (zero without it; record `2026-10-30_…`, §35).
     split: u32,
-    split_pad: u32,
+    pa_from: u32,
     /// The heading (`heading = 0` without it; else the clocked levels `L − F` that carry one) and
     /// the closure's shift `s` ([`Tower::join_heading`]).
     heading: u32,
@@ -874,8 +875,11 @@ impl<'c> TowerCard<'c> {
         if !d.gated {
             return refuse("the card carries the gated tower");
         }
-        if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || law.participation.is_some() || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
-            return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, participation, a rotor, a ring face or strands");
+        // Participation beside the heading reads back from the clocked levels up (record
+        // `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+        let below = law.participation.as_ref().is_some_and(|p| law.news.is_none_or(|c| p.from < c.first()));
+        if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || below || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
+            return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, participation below the clocked levels, a rotor, a ring face or strands");
         }
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
@@ -1023,6 +1027,7 @@ impl<'c> TowerCard<'c> {
             words.pa_section = p.section as u32;
             words.pa_beta = p.beta_shift;
             words.pa_held_log = law.held_log;
+            words.pa_from = p.from as u32;
             words.ln2 = law.ln2 as i64;
         }
         words.passage = u32::from(law.passage);
@@ -1094,7 +1099,7 @@ impl<'c> TowerCard<'c> {
             if d.contact != ContactLaw::Rectifying {
                 out.extend([lv.pair as u64, f, w]);
             }
-            if law.participation.is_some() {
+            if law.participation.as_ref().is_some_and(|p| l >= p.from) {
                 let p = &lv.participation;
                 for (offset, rows, cols) in [(p[0], n, w), (p[1], n, w), (p[2], n, w), (p[3], n, w), (p[4], n, w), (p[5], n, w), (p[6], w, n), (p[7], w, n), (p[8], f, w)] {
                     out.extend([offset as u64, rows, cols]);
@@ -1547,7 +1552,7 @@ impl<'c> TowerCard<'c> {
         let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
         let hold = usize::from(shape.news > 0 && shape.heads == 0);
         let a = a * (1 - shape.face_global);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l, 8 * pk * 2 * n, 4 * w * pkd, 4 * l * w * hold, 8 * 4 * l * hold, 4 * l * hold, 8 * shape.heading * w, 4 * shape.heading, 4 * shape.heading * w, 8 * shape.heading * w, 8 * 4 * shape.heading, 4 * shape.heading].iter().map(|&o| carve(o)).sum()
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l, 8 * pk * 2 * n, 4 * w * pkd, 4 * l * w * hold, 8 * 4 * l * hold, 4 * l * hold, 8 * shape.heading * w, 4 * shape.heading, 4 * shape.heading * w, 8 * shape.heading * w, 8 * 4 * shape.heading, 4 * shape.heading].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -1688,8 +1693,10 @@ impl<'c> TowerCard<'c> {
         };
         let credit_levels = match (credited, &law.news) {
             (0, _) => 0,
-            (c, Some(clock)) if c == streams && clock.first() < d.levels && law.participation.is_none() && credit_from < d.levels => d.levels - credit_from,
-            (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level, beside no participation")),
+            // Beside participation read back from the clocked levels up the credit is declared held as
+            // given (record `2026-10-30_…`, §35): its moments carry each level's own families.
+            (c, Some(clock)) if c == streams && clock.first() < d.levels && law.participation.as_ref().is_none_or(|p| p.from >= clock.first()) && credit_from < d.levels => d.levels - credit_from,
+            (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level, beside no participation below its clocked levels")),
             _ => return Err(TowerError::Refused("every stream carries a credit or none does")),
         };
         // Each stream's open packets: one a level from the clock's first clocked level up, of the
@@ -2138,7 +2145,7 @@ impl<'c> TowerCard<'c> {
             // Participation's return reads the current's covector the contacts wrote and writes the
             // chart covectors the level's `tower_reverse_dx` returns to the input, and the transport's
             // sums the modes' scan adds to each cell's turn and gate.
-            if shape.heads > 0 {
+            if shape.heads > 0 && level as u32 >= words.pa_from {
                 self.law_launch("tower_reverse_participation", Dim3::x(s as u32), THREADS, Self::participation_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
             }
             // The ring's reverse reads the level's read covector and returns its own to it and to
@@ -2269,7 +2276,7 @@ impl<'c> TowerCard<'c> {
             }
             // Participation: each chart takes its turned covector against the level's input, W₁ᵃ the
             // drives' covector against the ratio read, and the current's read ∂r̂ᵃ against y.
-            if law.participation != 0 {
+            if law.participation != 0 && level as u32 >= law.pa_from {
                 let ql = s as u64 * t as u64 * l;
                 for f_ in 0..6u64 {
                     out.push((family(at64(fw.pa_gchart, (lu * 6 + f_) * n), l * 6 * n, at32(fw.input, lu * w), l * w, at64(fw.r_pa_g, f_ * ql + lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pa[f_ as usize]), None), false));

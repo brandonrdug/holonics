@@ -472,8 +472,7 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
         for &c in released {
             written.extend_from_slice(&(c as u16).to_be_bytes());
         }
-        let octets: Vec<u8> = released.iter().filter(|&&c| c < 256).map(|&c| c as u8).collect();
-        let shown: String = octets.iter().map(|&b| b.escape_ascii().to_string()).collect();
+        let shown = shown_octets(released, tower.declaration.alphabet);
         rows.push_str(&format!("{p}\t{}\t{}\t{}\t{ended}\t{shown}\n", prompts[p].len(), per(*code, prompts[p].len()), released.len()));
         println!("CLASSES_RELEASE prompt={p} prompt_classes={} released={} ended={ended}", prompts[p].len(), released.len());
     }
@@ -569,8 +568,7 @@ pub(crate) fn release_span_realized(args: &[String], realization: &mut dyn PassR
         for &c in &r.released {
             written.extend_from_slice(&(c as u16).to_be_bytes());
         }
-        let octets: Vec<u8> = r.released.iter().filter(|&&c| c < 256).map(|&c| c as u8).collect();
-        let shown: String = octets.iter().map(|&b| b.escape_ascii().to_string()).collect();
+        let shown = shown_octets(&r.released, tower.declaration.alphabet);
         let rounds: u32 = r.rounds.iter().sum();
         rows.push_str(&format!("{p}	{}	{}	{}	{}	{}	{rounds}	{}	{}	{shown}
 ", prompts[p].len(), r.released.len(), r.ended, r.unfinished, r.rounds.len(), streams[p].keys_read(), per(*code, r.released.len().max(1))));
@@ -690,6 +688,17 @@ fn signed_bits(code: i64) -> String {
 /// The covector and the codes are read through `realization` (the card's route, `tower_pass read
 /// complete-language read-tower-race …`, reads them on the card); the participation at the prompts'
 /// openings and over the held-out opening is read on the host, as the release reads it.
+/// A release's octets, escaped, when the classes are the octets and the end letter; a wider
+/// alphabet's classes are founded units, which decode through their units (`tower_pass units-text`),
+/// so the column reads `-` there rather than dropping every founded piece (the hardware review of
+/// October 31).
+fn shown_octets(released: &[usize], alphabet: usize) -> String {
+    if alphabet > 257 {
+        return "-".into();
+    }
+    released.iter().filter(|&&c| c < 256).map(|&c| (c as u8).escape_ascii().to_string()).collect()
+}
+
 pub(super) fn read_race(args: &[String]) -> Result<()> {
     read_race_realized(args, &mut HostPass::default())
 }

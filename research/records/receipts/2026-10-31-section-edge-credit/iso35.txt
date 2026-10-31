@@ -1,0 +1,4 @@
+BIN=cf7346bda6e8b0cef407bc84bdf8f1c55ad4787ed73da6da86d69fd3b89aeb72 at=2026-10-31T17:48:36Z
+ISO heading-credited-every-level-participating rc=1 TOWER_PARITY_FIRST section=4 index=640 host=3735750 card=3747462 TOWER_PARITY_FIRST section=5 index=640 host=-2376086 card=-2377757 TOWER_PARITY_FIRST section=6 index=640 host=1977903 card=1986082 
+ISO heading-participating rc=1 TOWER_PARITY_FIRST section=4 index=640 host=4806778 card=4820181 TOWER_PARITY_FIRST section=5 index=640 host=-1681444 card=-1684160 TOWER_PARITY_FIRST section=6 index=640 host=910573 card=926859 
+ISO packets-participating rc=1 TOWER_PARITY_FIRST section=5 index=640 host=464573 card=464758 TOWER_PARITY_FIRST section=6 index=640 host=-2032957 card=-2032859 TOWER_PARITY_FIRST section=7 index=640 host=-9528441 card=-9536581 

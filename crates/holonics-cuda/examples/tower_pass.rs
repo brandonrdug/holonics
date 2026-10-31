@@ -87,13 +87,46 @@ fn digest(bytes: &[u8]) -> Result<String> {
     Ok(digest)
 }
 
+const PARITY_USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split], each of packets, heading, heading-credited and heading-credited-every-level also with -participating, or parity-units-founded UNITS UNITS_SHA TEXT TEXT_SHA KEYS KEYS_SHA ... (the founded units' classes in place of CLASSES)";
+
 fn parity(args: &[String]) -> Result<()> {
-    const USAGE: &str = "parity CLASSES CLASSES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION SECTIONS RATE_BITS [NEWS_BITS NEWS_RADIX [FIRST]] [participating | mutual | passage | packets | packets-pair | heading | heading-credited | heading-credited-every-level | pair | split]";
     if args.len() < 12 {
+        return Err(PARITY_USAGE.into());
+    }
+    let bytes = pinned(&args[0], &args[1])?;
+    if bytes.len() % 2 != 0 {
+        return Err("a class file holds two bytes a class".into());
+    }
+    let classes: Vec<usize> = bytes.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as usize).collect();
+    parity_on(&classes, 257, &args[2..])
+}
+
+/// [agent-inferred, October 31] The founded lockstep on the founded units' classes (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35, acceptance 61): the
+/// units' alphabet and the text's classes in place of a class file, the rest as `parity`.
+fn parity_units_founded(args: &[String]) -> Result<()> {
+    if args.len() < 14 {
+        return Err(PARITY_USAGE.into());
+    }
+    let units = Units::from_text(std::str::from_utf8(&pinned(&args[0], &args[1])?)?).map_err(|e| e.to_string())?;
+    let classes: Vec<usize> = units.parse(&pinned(&args[2], &args[3])?).map_err(|e| e.to_string())?.into_iter().map(|u| u as usize).collect();
+    println!("TOWER_PARITY_UNITS units={} classes={}", units.len(), classes.len());
+    parity_on(&classes, units.len(), &args[4..])
+}
+
+/// The founded lockstep over `classes` of `alphabet`, `args` being `parity`'s from `KEYS` on.
+fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> {
+    const USAGE: &str = PARITY_USAGE;
+    if args.len() < 10 {
         return Err(USAGE.into());
     }
-    let word = args.last().filter(|w| w.parse::<u32>().is_err()).map(String::as_str);
-    let numbers = &args[12..args.len() - usize::from(word.is_some())];
+    let given = args.last().filter(|w| w.parse::<u32>().is_err()).map(String::as_str);
+    let numbers = &args[10..args.len() - usize::from(given.is_some())];
+    // `<word>-participating` (`packets`, `heading`, `heading-credited`, `heading-credited-every-level`)
+    // joins participation at the clocked levels after the packets and before the passage (record
+    // `2026-10-30_…`, §35).
+    let clocked_participation = given.is_some_and(|w| w.ends_with("-participating") && w != "participating");
+    let word = given.map(|w| if clocked_participation { w.trim_end_matches("-participating") } else { w });
     let clock = match numbers {
         [] => None,
         [bits, radix] => Some(NewsClock::new(bits.parse()?, radix.parse()?)?),
@@ -118,29 +151,23 @@ fn parity(args: &[String]) -> Result<()> {
     if (word.is_some() && !(participating || mutual || passage || pair)) || (mutual && clock.is_some()) || (passage && clock.is_none()) {
         return Err(USAGE.into());
     }
-    let bytes = pinned(&args[0], &args[1])?;
-    let keys = pinned(&args[2], &args[3])?;
-    if bytes.len() % 2 != 0 {
-        return Err("a class file holds two bytes a class".into());
-    }
-    let classes: Vec<usize> = bytes.chunks(2).map(|b| u16::from_be_bytes([b[0], b[1]]) as usize).collect();
-    let alphabet = 257;
+    let keys = pinned(&args[0], &args[1])?;
     if classes.iter().any(|&c| c >= alphabet) {
         return Err("a class outside the declared alphabet".into());
     }
     let declaration = TowerDeclaration {
         alphabet,
-        width: count(&args[4])?,
-        modes: count(&args[5])?,
-        contacts: count(&args[6])?,
-        levels: count(&args[7])?,
+        width: count(&args[2])?,
+        modes: count(&args[3])?,
+        contacts: count(&args[4])?,
+        levels: count(&args[5])?,
         gated: true,
         turned: false,
         pumped: false,
         contact: if pair { ContactLaw::Pair } else { ContactLaw::Rectifying },
     };
-    let (streams, section, sections) = (count(&args[8])?, count(&args[9])?, count(&args[10])?);
-    let rate_bits: u32 = args[11].parse()?;
+    let (streams, section, sections) = (count(&args[6])?, count(&args[7])?, count(&args[8])?);
+    let rate_bits: u32 = args[9].parse()?;
     let chunk = classes.len() / streams;
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
@@ -158,12 +185,21 @@ fn parity(args: &[String]) -> Result<()> {
         tower.join_mutual_contact(2)?;
         println!("TOWER_MUTUAL_CONTACT shift=2");
     }
+    if clocked_participation {
+        let first = tower.news().map_or(0, |c| c.first());
+        tower.join_packets()?;
+        let founded = tower.founded_participation(section)?.from_level(first);
+        println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
+        tower.join_participation(founded)?;
+    }
     if passage {
         tower.join_passage()?;
         println!("TOWER_PASSAGE first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
-    if packets {
+    if packets && !clocked_participation {
         tower.join_packets()?;
+    }
+    if packets {
         println!("TOWER_PACKETS first_clocked_level={}", tower.news().map_or(0, |c| c.first()));
     }
     if heading {
@@ -181,7 +217,7 @@ fn parity(args: &[String]) -> Result<()> {
     } else {
         None
     };
-    lockstep(&mut host, &mut carded, &classes, streams, section, sections, paired, credited.then_some(if every_level { 0 } else { usize::MAX }))
+    lockstep(&mut host, &mut carded, classes, streams, section, sections, paired, credited.then_some(if every_level { 0 } else { usize::MAX }))
 }
 
 fn parity_state(args: &[String]) -> Result<()> {
@@ -462,6 +498,7 @@ fn main() {
         Some("parity") => parity(&args[1..]),
         Some("parity-state") => parity_state(&args[1..]),
         Some("parity-units") => parity_units(&args[1..]),
+        Some("parity-units-founded") => parity_units_founded(&args[1..]),
         Some("train") | Some("release") | Some("read") => train(&args[1..]),
         Some("units-classes") => units_codec(&args[1..], false),
         Some("units-text") => units_codec(&args[1..], true),

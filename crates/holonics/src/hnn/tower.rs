@@ -1903,7 +1903,7 @@ impl Layout {
         };
         // Participation's material follows every other part's, so joining it moves no family.
         if let Some(p) = participation {
-            for level in &mut levels {
+            for level in levels.iter_mut().skip(p.from) {
                 level.pa_probe_re = take(n * w, MATERIAL_BITS);
                 level.pa_probe_im = take(n * w, MATERIAL_BITS);
                 level.pa_key_re = take(n * w, MATERIAL_BITS);
@@ -3229,14 +3229,16 @@ impl Tower {
             let pair = if d.contact == ContactLaw::Rectifying { 0 } else { reach(&t[l.strand_pair..l.strand_pair + extent]) };
             [reach(&t[l.strand_contact..l.strand_contact + extent]), pair]
         });
-        let participation = if self.participation.is_none() {
-            Vec::new()
-        } else {
+        let participation = if let Some(p) = &self.participation {
             let (nw, wn, fw) = (d.modes * d.width, d.width * d.modes, d.contacts * d.width);
             self.layout
                 .levels
                 .iter()
-                .map(|lv| {
+                .enumerate()
+                .map(|(l, lv)| {
+                    if l < p.from {
+                        return [0; 9];
+                    }
                     [
                         reach(&t[lv.pa_probe_re..lv.pa_probe_re + nw]),
                         reach(&t[lv.pa_probe_im..lv.pa_probe_im + nw]),
@@ -3250,6 +3252,8 @@ impl Tower {
                     ]
                 })
                 .collect()
+        } else {
+            Vec::new()
         };
         let passage = if self.passage { self.layout.levels.iter().enumerate().map(|(l, lv)| if self.hears(l) { reach(&t[lv.passage..lv.passage + d.contacts * d.width]) } else { 0 }).collect() } else { Vec::new() };
         let heading = match self.heading_from() {
@@ -3535,7 +3539,7 @@ impl Tower {
             // `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
             let mut part_cell = None;
             let mut part_drive = None;
-            if let Some(p) = &self.participation {
+            if let Some(p) = self.participation.as_ref().filter(|p| l >= p.from) {
                 let pr = &reaches.participation[l];
                 let sites = &mut state.sites[l];
                 let (site, current) = if moves == 0 {
@@ -3963,9 +3967,10 @@ impl Tower {
         if self.rotor.is_some() && opening.credit.is_some() {
             return refuse("a credited opening under a rotor: the credit's moments through the step are owed");
         }
-        if self.participation.is_some() && opening.credit.is_some() {
-            return refuse("a credited opening beside participation: the credit's moments through its frames are owed");
-        }
+        // [agent-inferred, October 31] Beside participation the credit carries each level's own
+        // recurrence families as before; what participation's current returns to a level's moves through
+        // its frames returns inside the section alone, held as given across the edge as the input a
+        // level hears is (record §35).
         if opening.credit.as_deref().is_some_and(|c| LevelCredit::residence(c).is_some()) {
             return refuse("a credit resident on a realization is returned before the host reads it");
         }
@@ -4104,7 +4109,7 @@ impl Tower {
             // later sites that read it), and the current read's covectors, on 2^(−24). The sites
             // carried at the opening are read as constants, as the opening's modes are (record
             // `2026-10-29_A_COARSE_LEVELS_SITES_ARE_ITS_OWN_TICKS…`).
-            let participating = self.participation.as_ref();
+            let participating = self.participation.as_ref().filter(|p| l >= p.from);
             let span = if participating.is_some() { cells_n } else { 0 };
             let (mut pa_q, mut pa_k, mut pa_w) = (vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span], vec![vec![(0i128, 0i128); n]; span]);
             let (mut pa_dreads, mut pa_negs): (Vec<Vec<i64>>, Vec<Vec<i64>>) = (Vec::with_capacity(span), Vec::with_capacity(span));
@@ -5042,9 +5047,6 @@ impl Tower {
         if self.declaration.turned && ends.iter().any(|(_, end)| end.credit.is_some()) {
             return refuse("the passage credit does not carry a turned mode");
         }
-        if self.participation.is_some() && ends.iter().any(|(_, end)| end.credit.is_some()) {
-            return refuse("a credited stream beside participation: the credit's moments through its frames are owed");
-        }
         states.par_iter_mut().zip(ends.into_par_iter()).zip(opening.par_iter()).try_for_each(|((s, (cells, mut end)), open)| {
             if let Some(credit) = end.credit.as_mut() {
                 self.advance_credit(credit, open, &cells, reaches)?;
@@ -5303,7 +5305,9 @@ impl Tower {
             tower.admits_participation(&p)?;
             let heard = if passage { tower.news.map(|c| c.first()) } else { None };
             tower.layout = Layout::new(&declaration, tower.pair.as_ref().map_or(0, PairFace::forms), 0, 0, tower.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, heard);
-            if tower.theta.len() != tower.layout.len {
+            // Beside the heading (record `2026-10-30_…`, §35) its material follows, and the extent is
+            // read once it joins.
+            if !heading && tower.theta.len() != tower.layout.len {
                 return refuse("material of the wrong extent");
             }
             tower.participation = Some(p);
@@ -5513,8 +5517,10 @@ impl Tower {
         if self.mutual.is_some() {
             return refuse("participation beside a mutual contact is owed: its contacts' return is re-derived under the contact");
         }
-        if self.packets {
-            return refuse("packets beside participation are owed: its sites at the clocked levels are then the packets");
+        // Beside packets participation reads back at the clocked levels alone, whose sites are their own
+        // ticks (record §35); below them the packets' fine levels read none.
+        if self.packets && self.packet_from().is_some_and(|first| p.from < first) {
+            return refuse("participation beside packets reads back from the clock's first clocked level up");
         }
         Ok(())
     }
@@ -5603,7 +5609,7 @@ impl Tower {
         let (n, w) = (d.modes, d.width);
         let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, self.strands.as_ref().map_or(0, Strands::parts), Some(&p), false, None);
         self.theta.resize(layout.len, 0);
-        for lv in &layout.levels {
+        for lv in layout.levels.iter().skip(p.from) {
             for (to, from) in [(lv.pa_probe_re, lv.push_re), (lv.pa_probe_im, lv.push_im), (lv.pa_key_re, lv.push_re), (lv.pa_key_im, lv.push_im), (lv.pa_value_re, lv.push_re), (lv.pa_value_im, lv.push_im)] {
                 self.theta.copy_within(from..from + n * w, to);
             }
@@ -5743,12 +5749,15 @@ impl Tower {
         let Some(first) = self.packet_from() else {
             return refuse("the heading is closed at the packets' ticks: without packets no level closes a span");
         };
-        if self.participation.is_some() || self.mutual.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
-            return refuse("the heading beside participation, a mutual contact, a ring face, a rotor or strands is owed");
+        // [agent-inferred, October 31] Beside participation read back from the clocked levels up (record
+        // §35) the face reads the heading as before and participation's current enters the level's
+        // contacts as without it.
+        if self.participation.as_ref().is_some_and(|p| p.from < first) || self.mutual.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
+            return refuse("the heading beside participation below the clocked levels, a mutual contact, a ring face, a rotor or strands is owed");
         }
         let d = self.declaration;
         let wn = d.width * d.modes;
-        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, 0, None, false, self.heard_from()).with_heading(&d, first);
+        let layout = Layout::new(&d, self.pair.as_ref().map_or(0, PairFace::forms), 0, 0, 0, self.participation.as_ref(), false, self.heard_from()).with_heading(&d, first);
         self.theta.resize(layout.len, 0);
         for lv in &layout.levels[first..] {
             self.theta.copy_within(lv.read_re..lv.read_re + wn, lv.heading_re);
@@ -6801,7 +6810,7 @@ impl Tower {
     fn project(&mut self) {
         if let Some(p) = &self.participation {
             let heads = p.heads.len();
-            for lv in self.layout.levels.clone() {
+            for lv in self.layout.levels.clone().into_iter().skip(p.from) {
                 for v in &mut self.theta[lv.pa_friction..lv.pa_friction + heads] {
                     *v = (*v).max(0);
                 }
@@ -9486,7 +9495,8 @@ mod tests {
     }
 
     fn participation_families(tower: &Tower) -> Vec<usize> {
-        tower.layout.levels.iter().flat_map(|lv| [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im, lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction]).collect()
+        let from = tower.participation().map_or(0, |p| p.from);
+        tower.layout.levels.iter().skip(from).flat_map(|lv| [lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im, lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction]).collect()
     }
 
     #[test]
@@ -9888,6 +9898,189 @@ mod tests {
             }
             eprintln!("{contact:?} turned {turned} on {bits} bits: {} of {} families read", checked.len(), read.len());
         }
+    }
+
+    /// The race's working declaration in small: four gated levels of four modes on a four-bit clock
+    /// clocked from level 2, with packets; beside them participation from level 2 (founded, so its
+    /// contact `W₁ᵃ` is zero, or opened as [`tiny_participating_of`] opens it); then the passage and
+    /// the heading.
+    fn working(participating: Option<bool>) -> Tower {
+        let mut tower = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Rectifying);
+        tower.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
+        tower.join_packets().expect("joined");
+        if let Some(opened) = participating {
+            let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { tower.founded_participation(16).expect("declared") };
+            tower.join_participation(heads.from_level(2)).expect("joined");
+            if opened {
+                let k = keys(8192);
+                let mut i = 3000;
+                for lv in tower.layout.levels.clone().into_iter().skip(2) {
+                    for v in &mut tower.theta[lv.pa_contact..lv.pa_contact + 16] {
+                        *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) * 8;
+                        i += 1;
+                    }
+                    for v in &mut tower.theta[lv.pa_probe_re..lv.pa_key_im + 16] {
+                        *v *= 2;
+                    }
+                }
+            }
+        }
+        tower.join_passage().expect("joined");
+        tower.join_heading().expect("joined");
+        tower
+    }
+
+    /// The families of `joined` outside participation's, in layout order: the plain tower's, one for one.
+    fn shared_families(joined: &Tower) -> Vec<(usize, usize, u32)> {
+        let pa = participation_families(joined);
+        joined.layout.families.iter().copied().filter(|(start, len, _)| *len > 0 && !pa.contains(start)).collect()
+    }
+
+    /// [agent-inferred, October 31] **The clocked participation in the working declaration**
+    /// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35,
+    /// acceptance 61): beside the packets and the heading from level 2, with its contact `W₁ᵃ` at
+    /// zero, the tower reads face for face as without it from a carried every-level credit; its
+    /// families exist at the clocked levels alone and only `W₁ᵃ` meets a covector; every other
+    /// family's covector is the plain tower's; a learner's section with participation's families
+    /// held moves the rest as the plain learner does, the credit with it; the arrival levels hold
+    /// no sites; and the tower and its carried state restore from their text.
+    #[test]
+    fn the_clocked_participation_joins_the_working_declaration_at_the_clocked_levels() {
+        let plain = working(None);
+        let joined = working(Some(false));
+        let levels = &joined.layout.levels;
+        assert!(levels[..2].iter().all(|lv| [lv.pa_probe_re, lv.pa_contact, lv.pa_friction].iter().all(|&a| a == 0)));
+        assert!(levels[2..].iter().all(|lv| lv.pa_contact > 0));
+        let shared = shared_families(&joined);
+        let plain_families: Vec<(usize, usize, u32)> = plain.layout.families.iter().copied().filter(|(_, len, _)| *len > 0).collect();
+        assert_eq!(shared.len(), plain_families.len());
+        for (&(a, len, grain), &(b, plen, pgrain)) in shared.iter().zip(&plain_families) {
+            assert_eq!((len, grain), (plen, pgrain));
+            assert_eq!(&joined.theta[a..a + len], &plain.theta[b..b + plen], "family at {a} against {b}");
+        }
+        let classes = news_passage();
+        let (pr, jr) = (plain.reaches(), joined.reaches());
+        // A carried opening: the credit and the sites are both the prefix's.
+        let (mut po, mut jo) = (plain.rest_with_credit_from(0), joined.rest_with_credit_from(0));
+        let pc = plain.forward(&mut po, &classes[..=20], &pr).expect("forward");
+        let jc = joined.forward(&mut jo, &classes[..=20], &jr).expect("forward");
+        plain.advance_credit(po.credit.as_mut().expect("credit"), &plain.rest_with_credit_from(0), &pc, &pr).expect("credit");
+        joined.advance_credit(jo.credit.as_mut().expect("credit"), &joined.rest_with_credit_from(0), &jc, &jr).expect("credit");
+        assert!(jo.sites[..2].iter().all(|s| s.is_empty()) && jo.sites[2..].iter().all(|s| !s.is_empty()), "sites at the clocked levels alone");
+        assert_eq!(po.credit, jo.credit);
+        let part = &classes[20..];
+        let (mut ps, mut js) = (po.clone(), jo.clone());
+        let ca = plain.forward(&mut ps, part, &pr).expect("forward");
+        let cb = joined.forward(&mut js, part, &jr).expect("forward");
+        for (x, y) in ca.iter().zip(&cb) {
+            assert_eq!((&x.face.masses, x.face.total), (&y.face.masses, y.face.total));
+        }
+        assert_eq!(ps.modes, js.modes);
+        let ga = plain.reverse(&po, &ca, part, None).expect("reverse");
+        let gb = joined.reverse(&jo, &cb, part, None).expect("reverse");
+        for (&(a, len, _), &(b, _, _)) in shared.iter().zip(&plain_families) {
+            assert_eq!(&gb[a..a + len], &ga[b..b + len], "covector of the family at {a}");
+        }
+        // `W₁ᵃ`'s covector is the contacts' covector against the current's read, so it meets one at
+        // each clocked level whose contacts meet one (in this fixture level 3's, level 2's none).
+        let fw = joined.declaration.contacts * joined.declaration.width;
+        let reached = |g: &[i128], start: usize, len: usize| g[start..start + len].iter().any(|&v| v != 0);
+        let pa_contacts: Vec<usize> = levels[2..].iter().filter(|lv| reached(&gb, lv.contact, fw)).map(|lv| lv.pa_contact).collect();
+        assert!(!pa_contacts.is_empty(), "a clocked level's contacts meet a covector");
+        for &(start, len, _) in joined.layout.families.iter().filter(|(start, len, _)| *len > 0 && participation_families(&joined).contains(start)) {
+            assert_eq!(reached(&gb, start, len), pa_contacts.contains(&start), "family at {start}");
+        }
+        // Learner for learner from a carried every-level credit, participation's families held.
+        let mut lp = TowerLearner::new(plain.clone(), 6);
+        let mut lj = TowerLearner::new(joined.clone(), 6);
+        lj.held = participation_families(&joined).iter().filter_map(|&start| joined.layout.families.iter().find(|(s, len, _)| *s == start && *len > 0).map(|&(_, len, _)| start..start + len)).collect();
+        let (mut sp, mut sj) = (vec![po.clone()], vec![jo.clone()]);
+        lp.section(&mut sp, &[part]).expect("section");
+        lj.section(&mut sj, &[part]).expect("section");
+        for (&(a, len, _), &(b, _, _)) in shared.iter().zip(&plain_families) {
+            assert_eq!(&lj.tower.theta[a..a + len], &lp.tower.theta[b..b + len], "the family at {a} after the section");
+        }
+        assert_eq!(sp[0].modes, sj[0].modes);
+        assert_eq!(sp[0].credit, sj[0].credit);
+        // The text: the declaration names its first level, and the tower and the carried state restore.
+        let text = joined.to_text();
+        assert!(text.lines().any(|l| l.starts_with("participation ") && l.split_whitespace().last() == Some("2")), "{}", text.lines().find(|l| l.starts_with("participation ")).unwrap_or(""));
+        let restored = Tower::from_text(&text).expect("restored");
+        assert_eq!(restored.theta, joined.theta);
+        assert_eq!(restored.participation().map(|p| p.from), Some(2));
+        let state_text = sj[0].to_text();
+        assert_eq!(joined.state_from_text(&state_text.lines().collect::<Vec<_>>()).expect("restored"), sj[0]);
+        // Participation below the clocked levels stays refused beside the packets and the heading.
+        let mut below = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Rectifying);
+        below.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
+        below.join_packets().expect("joined");
+        assert!(below.clone().join_participation(ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared").from_level(1)).is_err());
+    }
+
+    /// [agent-inferred, October 31] **The clocked participation's covector in the working
+    /// declaration** (§35, acceptance 61): opened at the clocked levels beside the packets and the
+    /// heading, from an opening carrying the sites, every family read meets its code difference.
+    #[test]
+    fn the_working_participation_covector_matches_the_code_difference() {
+        let tower = working(Some(true));
+        let passage = news_passage();
+        let (prefix, classes) = (&passage[..=20], &passage[20..44]);
+        let mut opening = tower.rest();
+        tower.forward(&mut opening, prefix, &tower.reaches()).expect("forward");
+        assert!(opening.sites[2..].iter().all(|s| !s.is_empty()), "the opening carries open sites");
+        let mut s = opening.clone();
+        let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
+        let mut g = tower.reverse(&opening, &cells, classes, None).expect("reverse");
+        tower.to_step_grain(&mut g);
+        let from = |t: &Tower| {
+            let mut s = opening.clone();
+            t.read(&mut s, classes).expect("read")
+        };
+        let conducting = |t: &Tower| -> Vec<u32> {
+            let mut s = opening.clone();
+            let cells = t.forward(&mut s, classes, &t.reaches()).expect("forward");
+            cells.iter().flat_map(|c| c.levels.iter().flat_map(|l| l.drive.iter().map(|&a| u32::from(a > 0)).chain(std::iter::once(l.ticks)).collect::<Vec<_>>())).collect()
+        };
+        let base = conducting(&tower);
+        let base_code = from(&tower);
+        let pa = participation_families(&tower);
+        let read: Vec<usize> = pa.iter().copied().chain(tower.layout.levels.iter().flat_map(|lv| [lv.gate, lv.gate_bias, lv.move_re, lv.move_im, lv.push_re, lv.read_re])).collect();
+        let mut checked = Vec::new();
+        for &(start, len, grain) in tower.layout.families.iter().filter(|(start, len, _)| *len > 0 && read.contains(start)) {
+            let mut order: Vec<usize> = (start..start + len).collect();
+            order.sort_by_key(|&i| std::cmp::Reverse(g[i].abs()));
+            'parameter: for i in order {
+                let gi = g[i];
+                if gi.abs() < 1i128 << (STEP_BITS - 10) {
+                    break;
+                }
+                let mut numerics = Vec::new();
+                // Finer steps beside the clocked test's: the packet and the pairing curve the code
+                // within 2^(−8) of a read's material (level 1's read moved by 2^(−12) meets its covector).
+                'step: for h in [1i32 << (grain - 12), 1i32 << (grain - 10), 1i32 << (grain - 8), 1i32 << (grain - 7)] {
+                    let (mut moment, mut spread) = (0i128, 0i128);
+                    for k in (-8i32..=8).filter(|&k| k != 0) {
+                        let mut moved = tower.clone();
+                        moved.theta[i] += k * h;
+                        if conducting(&moved) != base {
+                            continue 'step;
+                        }
+                        moment += k as i128 * (from(&moved) - base_code) as i128;
+                        spread += (k * k) as i128;
+                    }
+                    numerics.push((moment << (STEP_BITS - READ_BITS)) * (1i128 << grain) / (h as i128 * spread));
+                }
+                if numerics.is_empty() {
+                    continue 'parameter;
+                }
+                assert!(numerics.iter().any(|numeric| (numeric - gi).abs() * 10 <= gi.abs()), "family at {start} grain {grain}, parameter {i}: covector {gi} against {numerics:?}");
+                checked.push(start);
+                break;
+            }
+        }
+        let pa_checked = checked.iter().filter(|s| pa.contains(s)).count();
+        eprintln!("{} of {} families read, {pa_checked} of participation's", checked.len(), read.len());
+        assert!(pa_checked >= 4, "participation's families met their code difference: {pa_checked}");
     }
 
     #[test]
