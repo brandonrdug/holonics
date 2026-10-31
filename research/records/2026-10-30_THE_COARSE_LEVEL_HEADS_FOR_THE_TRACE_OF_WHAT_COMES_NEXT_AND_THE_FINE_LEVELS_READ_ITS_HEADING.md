@@ -3133,3 +3133,17 @@ against a bar of twice the pair learner's). The first step's counts are a few in
 one draw each, so a difference of a few is within the read's spread; from here they are reported with it.
 **What it decides:** the working declaration on GSM8K is the pair contact at `2^(−8)`, without
 participation; the next read is that learner run longer, with the receipt every ten laps.
+
+**The working declaration on GSM8K to lap 80** (`g50*`, 514.2 s; pair contacts at `2^(−8)` from lap 40;
+each written read at four release draws, `GKEYS` and `GKEYS_b` to `_d`, each a SHA-256 counter stream).
+The training code fell at every lap (1.142 to 1.061) and the held-out code rose (1.554 at lap 41 to 1.623
+at lap 80): the learner fits its 6,726 problems. Its receipt at laps 50, 60, 70 and 80, each as the four
+draws' range (mean): on the problem's words 28–37 (33.0), 31–36 (34.2), 31–36 (33.5), 28–37 (31.2); the
+first calculation from the question's numbers 6–10 (7.2), 6–9 (8.2), 6–11 (8.8), 7–11 (9.0) of some 120;
+exact at the equals 88–95 (92.2), 78–97 (87.8), 96–108 (100.2), 95–100 (96.5) of 399, met 88.2, 85.2, 96.5
+and 92.0 of 260, never met 4.0, 2.5, 3.8 and 4.5 of 139; free calculations written 430.8, 391.0, 319.8 and
+274.2 (a sixth to a fifth exact); flux 878.3, 871.1, 1,071.0 and 701.9 bits. **The blockers, by their
+measurement:** the first step takes the question's numbers in some 7 to 9 of 120 releases against the
+references' 92 of 125, flat from lap 40; a calculation the learner never heard is written exactly in 2 to 5
+of 139, as the n-grams write it; more laps add recalled calculations and a higher held-out code. Neither
+blocker moved under more laps, participation, the split or the rate.
