@@ -22,7 +22,7 @@ span (card).** On the RTX 4080 SUPER the race's declaration (the stacked news cl
 heading the face reads, and every level's credit across the section's edge) read in the October 23
 founded units (1,318) codes the held-out passage at 2.230 bits a byte after one lap (119.9 s) and
 2.111 after two (233.4 s), against the same declaration on bytes, 2.270 after its lap (196.7 s) and
-about 2.24 at 233 s: the unit declaration is the working law. On bytes the every-level credit levels
+about 2.24 at 233 s; continued, the bytes overtake by about forty minutes (1.878 on units after 18 laps against about 1.865), so the unit declaration leads short runs and the two level toward an hour. On bytes the every-level credit levels
 near 1.85 after twenty-odd passes and C′ near 1.87. Two motives inside the section (the heading read
 by the fine levels' opening, then as a force through each arrival level's read) were built exactly on
 host and card and retired: the section's one certified step could not cross the loop they close
