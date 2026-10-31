@@ -1,0 +1,14 @@
+TOWER_COMMAND read-tower-race $ROOT/.local/wt/section-edge/.local/run/race/r35/lap-plain/STATE c59a602000e51c452648ec8b23c5a42b769d8750228bea5d30a6027326bd4ed6 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.units 435334a82c9ab4ff8e59213776c73f6754bd7a866419cdb4ec5eda8201da0583 $ROOT/.local/wt/section-edge/.local/run/race/units/PROMPTS.units 8d7c42f15dbc0eaa03990e568e04e05f053ee0fe383b1f9ab690d70a8107450f 24 128 $ROOT/.local/wt/section-edge/.local/run/race/r35/flux-plain
+TOWER_RACE_FLUX prompt=0 follows_classes=2217 own_bits=8527.950 flux_bits_after_prompt 1:-3.522 2:61.426
+TOWER_RACE_FLUX prompt=1 follows_classes=2436 own_bits=10077.117 flux_bits_after_prompt 0:6.335 2:29.058
+TOWER_RACE_FLUX prompt=2 follows_classes=1814 own_bits=10099.435 flux_bits_after_prompt 0:72.547 1:72.881
+TOWER_RACE_FLUX_HEAD prompt=0 head=16 own_bits=51.731 flux_bits_after_prompt 1:-2.096 2:15.162
+TOWER_RACE_FLUX_HEAD prompt=1 head=16 own_bits=52.678 flux_bits_after_prompt 0:1.378 2:2.011
+TOWER_RACE_FLUX_HEAD prompt=2 head=16 own_bits=113.468 flux_bits_after_prompt 0:24.988 1:22.570
+TOWER_RACE_FLUX_HEAD prompt=0 head=64 own_bits=210.447 flux_bits_after_prompt 1:-1.248 2:37.871
+TOWER_RACE_FLUX_HEAD prompt=1 head=64 own_bits=261.618 flux_bits_after_prompt 0:5.686 2:27.145
+TOWER_RACE_FLUX_HEAD prompt=2 head=64 own_bits=394.241 flux_bits_after_prompt 0:51.606 1:51.001
+TOWER_RACE_FLUX_HEAD prompt=0 head=256 own_bits=974.045 flux_bits_after_prompt 1:-2.793 2:59.531
+TOWER_RACE_FLUX_HEAD prompt=1 head=256 own_bits=1074.168 flux_bits_after_prompt 0:6.027 2:30.944
+TOWER_RACE_FLUX_HEAD prompt=2 head=256 own_bits=1621.283 flux_bits_after_prompt 0:74.207 1:74.630
+MEASURE lap=flux-plain rc=0 wall_s=27.5 peak_rss_kib=255700

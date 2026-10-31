@@ -2694,3 +2694,110 @@ the longest declared release (1,024 units) takes about 324 s. The agreement budg
 one cause the read leaves open; the release advances closed candidates and brings every class step
 through the host, so its next realization runs only the continuing candidates and keeps them on the
 card.
+
+## 37. The clocked participation raced: the prompt's flux rises 1.25 times at 3.1 times the time, acceptance 63 failed
+
+[measured, October 31, RTX 4080 SUPER under the lock, `tower_pass-35d`; both declarations at 160
+streams of 128 as §36 decides, from C′'s founding keys; receipts `u35*`, `r35*`.]
+
+**Acceptance 62 (the development read), as read.** Over the same 128 sections of 160 streams (the
+arrivals of §33's 64 sections of 320): the unit declaration held out 2.611 bits a byte in 24.9 s
+(27.8 s wall, device peak 6,648 MiB), the participating one 2.597 in 80.9 s (83.8 s wall, 9,796 MiB),
+3.25 times the time. Its card forward took 61.3 s against 14.5 s. The flux on the continuation's first
+256 classes, summed over the six ordered prompt pairs (`I = L(after another) − L(after its own)`):
+participating 154.4 bits, unit declaration 250.5, the unit declaration's lap-1 learner at 320 streams
+312.6. Early, with `W₁ᵃ` opened from zero, participation lowers the flux.
+
+**Acceptance 63 failed.** One lap each (737 sections): the participating declaration held out 2.170
+in 374.1 s (377.1 s wall against a 599 s projection, 0.63; device peak 10,030 MiB), the unit
+declaration 2.164 in 120.1 s (123.0 s against 183 s, 0.67; 6,758 MiB). At equal elapsed time the unit
+declaration has about three laps to the participating one's one. The flux on the first 256 classes:
+
+| Prompt pair (continuation of → after) | participating | unit declaration |
+|---|---|---|
+| 0 → 1 | −4.294 | −2.793 |
+| 0 → 2 | 61.674 | 59.531 |
+| 1 → 0 | 3.505 | 6.027 |
+| 1 → 2 | 24.316 | 30.944 |
+| 2 → 0 | 119.799 | 74.207 |
+| 2 → 1 | 98.889 | 74.630 |
+| sum | 303.9 | 242.5 |
+
+1.25 times against the bar of 2. The rise is the GSM8K prompt's continuation read after the two
+repository prompts (pairs 2 → 0 and 2 → 1, 70 bits together); between the repository prompts both
+stay near zero. The writing of both laps (class release, agree 1 and 2) was shown to Brandon whole; it
+is not committed (it derives from the passage). **The blocker, by its measurement:** participation at
+the clocked levels reads more of a prompt's genre, not its particulars, at 3.1 times the lap. Its reach
+is its section, 128 of the level's ticks, released at the close: about 146 and 256 units at levels 4
+and 5 from the founding and about 310 and 600 trained (§35's correction), against prompts of 1,729 to
+2,267 units, so from a prompt's end its opening is never a site. §38 reads that cause.
+
+## 38. The reach read: participation's section at 512 of its level's ticks
+
+[agent-inferred, October 31] **The question.** Does the participation of §35 hear a prompt's
+particulars when its sites can reach the prompt's opening? At the measured tick rates a section of
+512 ticks reaches about 600 and 1,000 units from the founding and about 1,250 and 2,400 trained, so at
+level 5 a trained section spans a whole prompt. The section is the level's own count (§35); only its
+count changes (`TOWER_PARTICIPATION_SECTION=512`), everything else as §37 read it.
+
+**Its cost, projected before the run.** A probe reads every site of its open section, so the sites
+read a tick grow about four times on average (about 256 against 64); §37's participating development
+read spent about 56 s more than the unit declaration's 24.9 s, so about 250 s (deadline 400 s). Its
+carried sites take 160 · 512 · 2 · 256 octets each for keys and values (about 336 MB each) at the
+participating levels alone, which §36's layout at participation's own levels (`pa_at`) leaves room
+for: that layout took its sites' buffers from every level to the participating ones, about 1.9 GB less
+at 160 streams and 3.85 GB less at 320.
+
+**Acceptance, fixed before the run.**
+64. The card is the host's with participation's sites at its own levels alone: 32 sections at 24
+    streams equal on bytes and on units at the declaration of §36, and the every-level participation
+    of October 29 equal on bytes.
+65. The development read with the section at 512, 128 sections of 160 streams from C′'s founding, then
+    the flux on the first 256 classes. The decision is fixed with it: at least twice the unit
+    declaration's 250.5 bits at the same sections, and positive between the repository prompts, sends
+    the lap race; above the 128-tick participation's 154.4 by half again but short of that makes reach
+    a cause and not the whole one; otherwise reach is not the cause and the section returns to 128.
+
+**Acceptance 64 passed** (`p36*`, `tower_pass-36a` `ad43f934…`): with the sites' buffers at
+participation's own levels, 32 sections of 24 streams equal on bytes (22,955,040 covector entries)
+and units (27,334,848), every learner equal, and the every-level participation (clock (8, 2), October
+29) equal on bytes (31,083,552 entries); the card suite 46 of 46. The byte read's card forward fell
+from 14.5 s to 8.7 s over the 32 sections with the smaller buffers.
+
+**Acceptance 65, as read: reach is not the cause** (`u38*`, `tower_pass-36b` `7f1409de…`). With the
+section at 512 the development read held out 2.630 bits a byte in 129.4 s (133.0 s wall against the
+250 s projected, 0.52; device peak 8,277 MiB), against 2.597 at 128 ticks and 2.611 for the unit
+declaration. The flux on the first 256 classes, summed over the six pairs, was 211.7 bits (0 → 1
+6.477, 0 → 2 58.892, 1 → 0 1.868, 1 → 2 34.962, 2 → 0 71.461, 2 → 1 38.060): 1.37 times the 128-tick
+participation's 154.4, short of the half again the decision asked, and 0.85 of the unit declaration's
+250.5. Between the repository prompts the flux turned positive (6.5 and 1.9 bits) but stays a few bits.
+By the decision fixed before the read, the section returns to 128 and the reach of the sites is not
+what keeps a prompt's particulars out of the continuation at this stage. What participation at the
+clocked levels does is read by §37: a little more genre at three times the lap. The next loop takes the
+review's leading term, the response a lower level's packet carries into the level above across the
+section's edge (the credit's located limitation, §35), with its law and acceptance fixed first.
+
+## 39. The capacity read: the unit declaration at width 128 and 512 contacts
+
+[agent-inferred, October 31] **The question.** The declarations of §27 to §37 level near 1.85 to 1.88
+bits a byte toward an hour and their writing holds no prompt's particulars. §34 named the learner's
+size as a lever without isolating it (the October 31 hardware review: neither data nor size had been
+isolated as the cause). This read changes the size alone: the unit declaration (§33, the working law)
+at width 128 with 512 contacts a level, the bank, levels, clock, packets, passage, heading and
+every-level credit as they are, against width 64 with 256 contacts, both at 160 streams (§36: the
+wider frame at 320 streams would pass the 12 GB the card keeps). The forward's block surface at the
+wider declaration is 44,384 bytes with the alphabet's face in the frame (under the 49,152 a block
+declares). Its founding reads more keys than the 2 MiB of `KEYS2`, so its keys are `KEYS8`: `KEYS2`
+followed by SHA-256 of `SHA-256(KEYS2)` and a 64-bit counter, block by block, to 8 MiB (SHA-256
+`01db1cf4…`), whose prefix founds the width-64 declaration exactly as `KEYS2` did. The recorded
+failure it could repeat is reading bits as progress: the read reports the flux and the writing beside
+the held-out code.
+
+**Acceptance, fixed before the run.**
+66. The card is the host's at the wider declaration on units: 32 sections of 24 streams equal.
+67. The development read, 128 sections of 160 streams from the founding, beside §37's width-64 read
+    (2.611 in 24.9 s), with its flux on the continuation's first 256 classes; then one lap, with the
+    held-out read at its lap's end against the width-64 declaration at equal elapsed time, the flux,
+    and the writing. The decision: a width that holds out lower at equal elapsed time and raises the
+    flux sends the working law to it; lower code alone at equal time, without the flux, reads size as
+    compression and not as concentration.

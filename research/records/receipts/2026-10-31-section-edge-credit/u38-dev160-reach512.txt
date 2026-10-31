@@ -1,0 +1,11 @@
+TOWER_COMMAND train-two-ladder-stacked-news-heading-credited-every-level-participating-unit-tower $ROOT/.local/wt/section-edge/research/records/2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH_CARRY_THE_TOWER_ABOVE_THE_BYTE_AND_THE_PASSAGE_CREDIT_DOES_NOT_PAY_receipts/UNITS d0973c39ebf391bf1115322a2df8c42157036e96c3eca79c37c869d557a2782a $ROOT/.local/wt/section-edge/.local/run/race/units/TRAIN.bytes 60eb9909f38bc97882f57bf6c49c41d3550ba7ac47543bb28d3ee39ccd9265c0 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.bytes f8a708865f61cb3df771e70b8c18b692d4c9a124b1c15cba5be68c79c21762b4 $ROOT/.local/wt/section-edge/.local/run/race/units/DEV.roles 99716b831415bb4637fd66f4e0591837dfb2198bc472aa86dcc7b0e1535c616d $ROOT/.local/wt/race/.local/race/passage/KEYS2 d4a65962a1eb6f7e60332c049c630f5d3eca815a55d3c3256b9ec82efef48132 64 128 256 6 160 128 1 7 $ROOT/.local/wt/section-edge/.local/run/race/u38/dev160-reach512
+UNIT_READ units=1318 train_bytes=29744156 train_units=15108518 dev_bytes=913986 dev_units=412959
+TOWER_PARTICIPATION section=512 beta_shift=2 heads=[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8] from=4
+TOWER_TRAIN material=854214 streams=160 section=128 sections_a_pass=128 train_bytes=29744156 dev_bytes=913986
+TOWER_SECTION pass=0 section=32 bits_a_byte=4.354 deposits=32 halvings=48 elapsed_ms=45303
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.383 deposits=64 halvings=52 elapsed_ms=72703
+TOWER_SECTION pass=0 section=96 bits_a_byte=2.904 deposits=96 halvings=52 elapsed_ms=97655
+TOWER_SECTION pass=0 section=128 bits_a_byte=2.679 deposits=128 halvings=52 elapsed_ms=122614
+TOWER_PASS pass=0 train_bits_a_byte=3.330 dev_bits_a_byte=2.630 dev_regions Q=2.589 P=0.000 N=0.000 M=2.661 deposits=128/128 pass_ms=129410 elapsed_ms=129435 train_code=17980956122429 dev_code=2519437936702 grain_bits=20
+TOWER_CARD forwards=329 forward_ms=94742 reverses=128 reverse_ms=21325 elapsed_ms=132493
+MEASURE lap=dev160-reach512 rc=0 wall_s=133.0 peak_rss_kib=3209256

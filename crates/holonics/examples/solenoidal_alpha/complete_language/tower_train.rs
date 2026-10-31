@@ -3446,6 +3446,16 @@ pub(super) enum Joined {
     DormantSplit,
 }
 
+/// [agent-inferred, October 31] A clocked participation's section, its level's own count of ticks
+/// (`TOWER_PARTICIPATION_SECTION`; the learner's section when undeclared): the reach of its sites
+/// before they are released (record `2026-10-30_…`, §38).
+fn participation_section(section: usize) -> Result<usize> {
+    match std::env::var("TOWER_PARTICIPATION_SECTION") {
+        Ok(v) => Ok(v.parse::<usize>()?.max(1)),
+        Err(_) => Ok(section),
+    }
+}
+
 /// [agent-inferred, October 29] The mutual contact's face scale `β = 2^(−2)`, the scale
 /// participation's pairing uses, so a founded encoding's `2⟨y, E⟩` spans a few bits of face (record
 /// `2026-10-29_MUTUAL_CONTACT_…`, §3).
@@ -3537,7 +3547,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let first = news.map_or(0, |c| c.first());
         let declared = match joined {
             Joined::Participation => Some((section, 0)),
-            Joined::PassagePacketsParticipationHeading => Some((section, first)),
+            Joined::PassagePacketsParticipationHeading => Some((participation_section(section)?, first)),
             _ => None,
         };
         if learner.tower.participation().map(|p| (p.section, p.from)) != declared {
@@ -3602,7 +3612,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             Joined::PassagePacketsParticipationHeading => {
                 let first = learner.tower.news().map_or(0, |c| c.first());
                 learner.join_packets().map_err(|e| e.to_string())?;
-                let founded = learner.tower.founded_participation(section).map_err(|e| e.to_string())?.from_level(first);
+                let founded = learner.tower.founded_participation(participation_section(section)?).map_err(|e| e.to_string())?.from_level(first);
                 println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
                 learner.join_participation(founded).map_err(|e| e.to_string())?;
                 learner.join_passage().map_err(|e| e.to_string())?;

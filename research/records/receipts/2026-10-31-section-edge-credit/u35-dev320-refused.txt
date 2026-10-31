@@ -1,0 +1,3 @@
+TOWER_PARTICIPATION section=128 beta_shift=2 heads=[8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8] from=4
+tower_pass: tower realization refused: the card: the CUDA driver refused: cuMemAlloc_v2: CUDA_ERROR_OUT_OF_MEMORY (2) [out of memory]
+MEASURE lap=unit-dev-participating rc=1 wall_s=3.7 peak_rss_kib=1735588

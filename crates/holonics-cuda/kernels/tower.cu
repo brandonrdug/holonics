@@ -463,6 +463,14 @@ __device__ __forceinline__ int64_t fit64(wide v, uint32_t *st) {
     return (int64_t)v;
 }
 
+// Participation's place for a cell's (or a carried site's) level index `ql = c L + l`: its sites'
+// buffers hold the levels from `pa_from` alone, `c (L − pa_from) + (l − pa_from)` (record
+// `2026-10-30_…`, §36: sized for every level they took the race's streams past the card).
+__device__ __forceinline__ uint64_t pa_at(const TowerLaw &law, uint64_t ql) {
+    const uint32_t L = law.levels, from = law.pa_from;
+    return ql / L * (L - from) + ql % L - from;
+}
+
 __device__ __forceinline__ int32_t fit32(wide v, uint32_t *st) {
     if (v > (wide)INT32_MAX || v < (wide)INT32_MIN) {
         atomicOr(st, TOWER_REFUSED_WORD32);
@@ -1899,8 +1907,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     *met = mt;
                     pfr[2 * k] = nr;
                     pfr[2 * k + 1] = ni;
-                    fr.pa_frame[(q * N + k) * 2] = nr;
-                    fr.pa_frame[(q * N + k) * 2 + 1] = ni;
+                    fr.pa_frame[(pa_at(law, q) * N + k) * 2] = nr;
+                    fr.pa_frame[(pa_at(law, q) * N + k) * 2 + 1] = ni;
                     // Each chart (probe, key, value; re, im) read from the input at its mode and
                     // rotated by the frame where it is read, so no chart is staged in the block
                     // (record `2026-10-30_…`, §35: beside the heading the block's surface holds it).
@@ -1914,7 +1922,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                             ppr[2 * k] = rr;
                             ppr[2 * k + 1] = ri;
                         } else {
-                            int64_t *dst = (c == 1 ? fr.pa_key : fr.pa_value) + (q * N + k) * 2;
+                            int64_t *dst = (c == 1 ? fr.pa_key : fr.pa_value) + (pa_at(law, q) * N + k) * 2;
                             dst[0] = rr;
                             dst[1] = ri;
                         }
@@ -1929,7 +1937,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                     }
                     const int64_t dis = fit64(div_nearest(sum, (wide)(to - from)), &st);
                     pdis[hh] = dis;
-                    fr.pa_diss[q * HH + hh] = dis;
+                    fr.pa_diss[pa_at(law, q) * HH + hh] = dis;
                 }
                 __syncthreads();
                 // Site j of the section: carried open into the call (j < lead) at its place, else
@@ -1952,10 +1960,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                         const int64_t *keys = carried ? fr.pa_open_key : fr.pa_key;
                         wide pairing = 0;
                         for (uint32_t k = from; k < to; k++) {
-                            const int64_t *kj = keys + (qj * N + k) * 2;
+                            const int64_t *kj = keys + (pa_at(law, qj) * N + k) * 2;
                             pairing += (wide)ppr[2 * k] * kj[0] + (wide)ppr[2 * k + 1] * kj[1];
                         }
-                        const wide met = (wide)pdis[hh] - (wide)(carried ? fr.pa_open_diss : fr.pa_diss)[qj * HH + hh];
+                        const wide met = (wide)pdis[hh] - (wide)(carried ? fr.pa_open_diss : fr.pa_diss)[pa_at(law, qj) * HH + hh];
                         const int64_t z = fit64(rel(pairing, FACE_BITS + law.pa_beta) - rel(friction * met, FACE_BITS), &st);
                         zrow[j] = z;
                         zm = z > zm ? z : zm;
@@ -1977,8 +1985,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                             const uint64_t qj = (carried ? row + j : site0 + member[j - lead]) * L + l;
                             const int64_t *values = carried ? fr.pa_open_value : fr.pa_value;
                             const wide e = (wide)erow[j];
-                            jr += e * values[(qj * N + k) * 2];
-                            ji += e * values[(qj * N + k) * 2 + 1];
+                            jr += e * values[(pa_at(law, qj) * N + k) * 2];
+                            ji += e * values[(pa_at(law, qj) * N + k) * 2 + 1];
                         }
                         jr = (wide)warp_sum((uwide)jr);
                         ji = (wide)warp_sum((uwide)ji);
@@ -2050,13 +2058,13 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS, 2) tower_forward(Tow
                 prmax = block_max(pm, red);
                 if (keep) {
                     for (uint32_t k = tid; k < N; k += B) {
-                        fr.pa_probe[(q * N + k) * 2] = moves == 0 ? 0 : ppr[2 * k];
-                        fr.pa_probe[(q * N + k) * 2 + 1] = moves == 0 ? 0 : ppr[2 * k + 1];
-                        fr.pa_current[q * 2 * N + k] = py[k];
-                        fr.pa_current[q * 2 * N + N + k] = py[N + k];
+                        fr.pa_probe[(pa_at(law, q) * N + k) * 2] = moves == 0 ? 0 : ppr[2 * k];
+                        fr.pa_probe[(pa_at(law, q) * N + k) * 2 + 1] = moves == 0 ? 0 : ppr[2 * k + 1];
+                        fr.pa_current[pa_at(law, q) * 2 * N + k] = py[k];
+                        fr.pa_current[pa_at(law, q) * 2 * N + N + k] = py[N + k];
                     }
                     for (uint32_t j = tid; j < W; j += B) {
-                        fr.pa_read[q * W + j] = prd[j];
+                        fr.pa_read[pa_at(law, q) * W + j] = prd[j];
                     }
                     if (tid == 0) {
                         fr.pa_scale[q] = pscale;
@@ -2783,18 +2791,18 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
         const int64_t pscale = fr.pa_scale[ql];
         uwide pdot = 0;
         for (uint32_t j = tid; j < W; j += B) {
-            pdot += (uwide)((wide)fr.pa_read[ql * W + j] * (wide)pdh[j]);
+            pdot += (uwide)((wide)fr.pa_read[pa_at(law, ql) * W + j] * (wide)pdh[j]);
         }
         const wide pmean = div_nearest((wide)block_sum(pdot, redw), (wide)W);
         uint64_t pm = 0;
         for (uint32_t j = tid; j < W; j += B) {
             int64_t v = 0;
             if (pscale != 0) {
-                const wide read = fr.pa_read[ql * W + j];
+                const wide read = fr.pa_read[pa_at(law, ql) * W + j];
                 v = fit64(div_nearest(((wide)pdh[j] - rel(pmean * read, 2 * FACE_BITS)) << FACE_BITS, pscale), &st);
             }
             pdra[j] = v;
-            fr.pa_dra[ql * W + j] = v;
+            fr.pa_dra[pa_at(law, ql) * W + j] = v;
             const uint64_t a = magnitude(v);
             pm = a > pm ? a : pm;
         }
@@ -2808,7 +2816,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_contac
             const uint32_t k = o % N;
             const bool im = o >= N;
             const wide sum = rel(dot(fr.theta + (im ? lv.pa[7] : lv.pa[6]) + k, N, W, pdra, im ? n_gb : n_ga), MATERIAL_BITS);
-            fr.pa_gy[ql * 2 * N + o] = fit64(im ? -sum : sum, &st);
+            fr.pa_gy[pa_at(law, ql) * 2 * N + o] = fit64(im ? -sum : sum, &st);
         }
         __syncthreads();
     }
@@ -3439,7 +3447,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_dx(Tow
         const uint64_t QL = (uint64_t)law.streams * law.cells * law.levels;
         for (uint32_t f = 0; f < 6; f++) {
             for (uint32_t k = tid; k < N; k += B) {
-                v[(own + f) * N + k] = fr.pa_gchart[(ql * 6 + f) * N + k];
+                v[(own + f) * N + k] = fr.pa_gchart[(pa_at(law, ql) * 6 + f) * N + k];
             }
             narrow[own + f] = narrow_rows(lv.pa_reach[f], fr.r_pa_g[f * QL + ql], N);
             bases[own + f] = lv.pa[f];
@@ -3714,9 +3722,9 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
         for (uint32_t step = 0; step < T; step++) {
             const uint32_t i = T - 1 - step;
             const uint64_t qi = (site0 + i) * L + l;
-            held += fr.pa_gy[qi * 2 * N + o];
+            held += fr.pa_gy[pa_at(law, qi) * 2 * N + o];
             if (!law.news || fr.ticks[qi] > 0) {
-                fr.pa_gy[qi * 2 * N + o] = fit64(held, &st);
+                fr.pa_gy[pa_at(law, qi) * 2 * N + o] = fit64(held, &st);
                 held = 0;
             }
         }
@@ -3737,8 +3745,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
             member[members] = i;
         }
         for (uint32_t k = tid; k < N; k += B) {
-            const wide ur = fr.pa_frame[(qi * N + k) * 2], ui = fr.pa_frame[(qi * N + k) * 2 + 1];
-            const wide gr = fr.pa_gy[qi * 2 * N + k], gi = fr.pa_gy[qi * 2 * N + N + k];
+            const wide ur = fr.pa_frame[(pa_at(law, qi) * N + k) * 2], ui = fr.pa_frame[(pa_at(law, qi) * N + k) * 2 + 1];
+            const wide gr = fr.pa_gy[pa_at(law, qi) * 2 * N + k], gi = fr.pa_gy[pa_at(law, qi) * 2 * N + N + k];
             gb[2 * k] = fit64(rel(ur * gr + ui * gi, MOVE_BITS), &st);
             gb[2 * k + 1] = fit64(rel(ur * gi - ui * gr, MOVE_BITS), &st);
         }
@@ -3751,7 +3759,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
             const uint32_t lane = tid & 31;
             const uint32_t from = fr.pa_heads[hh], to = fr.pa_heads[hh + 1];
             const wide friction = fr.theta[lv.pa[9] + hh];
-            const wide dis_i = fr.pa_diss[qi * HH + hh];
+            const wide dis_i = fr.pa_diss[pa_at(law, qi) * HH + hh];
             int64_t *zrow = fr.pa_z + ((uint64_t)s * HH + hh) * stride;
             uint64_t *erow = fr.pa_e + ((uint64_t)s * HH + hh) * stride;
             int64_t zm = INT64_MIN;
@@ -3762,10 +3770,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 const int64_t *diss = carried ? fr.pa_open_diss : fr.pa_diss;
                 wide pairing = 0;
                 for (uint32_t k = from; k < to; k++) {
-                    const int64_t *kj = keys + (qj * N + k) * 2;
-                    pairing += (wide)fr.pa_probe[(qi * N + k) * 2] * kj[0] + (wide)fr.pa_probe[(qi * N + k) * 2 + 1] * kj[1];
+                    const int64_t *kj = keys + (pa_at(law, qj) * N + k) * 2;
+                    pairing += (wide)fr.pa_probe[(pa_at(law, qi) * N + k) * 2] * kj[0] + (wide)fr.pa_probe[(pa_at(law, qi) * N + k) * 2 + 1] * kj[1];
                 }
-                const int64_t z = fit64(rel(pairing, scale_bits) - rel(friction * (dis_i - (wide)diss[qj * HH + hh]), FACE_BITS), &st);
+                const int64_t z = fit64(rel(pairing, scale_bits) - rel(friction * (dis_i - (wide)diss[pa_at(law, qj) * HH + hh]), FACE_BITS), &st);
                 zrow[j] = z;
                 zm = z > zm ? z : zm;
             }
@@ -3786,7 +3794,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 const int64_t *values = carried ? fr.pa_open_value : fr.pa_value;
                 wide dotv = 0;
                 for (uint32_t k = from; k < to; k++) {
-                    const int64_t *wj = values + (qj * N + k) * 2;
+                    const int64_t *wj = values + (pa_at(law, qj) * N + k) * 2;
                     dotv += (wide)wj[0] * gb[2 * k] + (wide)wj[1] * gb[2 * k + 1];
                 }
                 const int64_t ga = fit64(rel(dotv, FACE_BITS), &st);
@@ -3803,7 +3811,7 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 const wide e = erow[j];
                 const wide gz = rel((wide)law.ln2 * div_nearest(e * ((wide)zrow[j] - mean), mass), MOVE_BITS);
                 zrow[j] = fit64(gz, &st);
-                fsum += (uwide)(-rel(gz * (dis_i - (wide)(carried ? fr.pa_open_diss : fr.pa_diss)[qj * HH + hh]), FACE_BITS));
+                fsum += (uwide)(-rel(gz * (dis_i - (wide)(carried ? fr.pa_open_diss : fr.pa_diss)[pa_at(law, qj) * HH + hh]), FACE_BITS));
                 const wide shared = gz * friction;
                 if (!carried) {
                     gmet[(uint64_t)member[j - lead] * HH + hh] += shared;
@@ -3826,8 +3834,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 const uint32_t c = member[j - lead];
                 const wide gz = zrow[j], e = erow[j];
                 wide *kk = gk + ((uint64_t)c * N + k) * 2, *ww = gw + ((uint64_t)c * N + k) * 2;
-                kk[0] += fit64(rel(gz * fr.pa_probe[(qi * N + k) * 2], scale_bits), &st);
-                kk[1] += fit64(rel(gz * fr.pa_probe[(qi * N + k) * 2 + 1], scale_bits), &st);
+                kk[0] += fit64(rel(gz * fr.pa_probe[(pa_at(law, qi) * N + k) * 2], scale_bits), &st);
+                kk[1] += fit64(rel(gz * fr.pa_probe[(pa_at(law, qi) * N + k) * 2 + 1], scale_bits), &st);
                 ww[0] += fit64(div_nearest(e * gb[2 * k], mass), &st);
                 ww[1] += fit64(div_nearest(e * gb[2 * k + 1], mass), &st);
             }
@@ -3838,8 +3846,8 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                     const uint64_t qj = (carried ? row + j : site0 + member[j - lead]) * L + l;
                     const int64_t *keys = carried ? fr.pa_open_key : fr.pa_key;
                     const wide gz = zrow[j];
-                    ar += gz * keys[(qj * N + k) * 2];
-                    ai += gz * keys[(qj * N + k) * 2 + 1];
+                    ar += gz * keys[(pa_at(law, qj) * N + k) * 2];
+                    ai += gz * keys[(pa_at(law, qj) * N + k) * 2 + 1];
                 }
                 ar = (wide)warp_sum((uwide)ar);
                 ai = (wide)warp_sum((uwide)ai);
@@ -3867,14 +3875,14 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
         const bool site = mark[j] != 0;
         uint64_t mx[6] = {0, 0, 0, 0, 0, 0};
         for (uint32_t k = tid; k < N; k += B) {
-            const wide ur = site ? fr.pa_frame[(qj * N + k) * 2] : 0, ui = site ? fr.pa_frame[(qj * N + k) * 2 + 1] : 0;
+            const wide ur = site ? fr.pa_frame[(pa_at(law, qj) * N + k) * 2] : 0, ui = site ? fr.pa_frame[(pa_at(law, qj) * N + k) * 2 + 1] : 0;
             const wide *src[3] = {gq + ((uint64_t)j * N + k) * 2, gk + ((uint64_t)j * N + k) * 2, gw + ((uint64_t)j * N + k) * 2};
             for (uint32_t c = 0; c < 3; c++) {
                 const wide gr = src[c][0], gi = src[c][1];
                 const int64_t re = fit64(rel(ur * gr - ui * gi, MOVE_BITS), &st);
                 const int64_t im = fit64(rel(ur * gi + ui * gr, MOVE_BITS), &st);
-                fr.pa_gchart[(qj * 6 + 2 * c) * N + k] = re;
-                fr.pa_gchart[(qj * 6 + 2 * c + 1) * N + k] = im;
+                fr.pa_gchart[(pa_at(law, qj) * 6 + 2 * c) * N + k] = re;
+                fr.pa_gchart[(pa_at(law, qj) * 6 + 2 * c + 1) * N + k] = im;
                 const uint64_t a = magnitude(re), b = magnitude(im);
                 mx[2 * c] = a > mx[2 * c] ? a : mx[2 * c];
                 mx[2 * c + 1] = b > mx[2 * c + 1] ? b : mx[2 * c + 1];
@@ -3904,10 +3912,10 @@ extern "C" __global__ void __launch_bounds__(TOWER_THREADS) tower_reverse_partic
                 if (mark[i] == 2) {
                     after = 0;
                 }
-                const int64_t *pq = fr.pa_probe + (qi * N + k) * 2, *pk = fr.pa_key + (qi * N + k) * 2, *pw = fr.pa_value + (qi * N + k) * 2;
+                const int64_t *pq = fr.pa_probe + (pa_at(law, qi) * N + k) * 2, *pk = fr.pa_key + (pa_at(law, qi) * N + k) * 2, *pw = fr.pa_value + (pa_at(law, qi) * N + k) * 2;
                 const wide *cq = gq + ((uint64_t)i * N + k) * 2, *ck = gk + ((uint64_t)i * N + k) * 2, *cw = gw + ((uint64_t)i * N + k) * 2;
-                const wide yr = fr.pa_current[qi * 2 * N + k], yi = fr.pa_current[qi * 2 * N + N + k];
-                const wide gyr = fr.pa_gy[qi * 2 * N + k], gyi = fr.pa_gy[qi * 2 * N + N + k];
+                const wide yr = fr.pa_current[pa_at(law, qi) * 2 * N + k], yi = fr.pa_current[pa_at(law, qi) * 2 * N + N + k];
+                const wide gyr = fr.pa_gy[pa_at(law, qi) * 2 * N + k], gyi = fr.pa_gy[pa_at(law, qi) * 2 * N + N + k];
                 const wide phi = (cq[0] * pq[1] - cq[1] * pq[0]) + (ck[0] * pk[1] - ck[1] * pk[0]) + (cw[0] * pw[1] - cw[1] * pw[0]) - (gyr * yi - gyi * yr);
                 after += phi * ((wide)1 << (STATE_BITS - FACE_BITS));
             }
