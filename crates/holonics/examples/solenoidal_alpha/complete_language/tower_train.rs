@@ -3371,6 +3371,10 @@ pub(super) fn train_units_pair_race(args: &[String], realization: &mut dyn PassR
 /// `train-two-ladder-stacked-news-heading-credited-every-level-split-unit-tower`: the pair unit race
 /// with its contacts paired at the founding and each section reading their founded split (record
 /// `2026-10-30_…`, §42): the field widens contact by contact where its code pays.
+pub(super) fn train_units_participating_pair_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsParticipationHeading), realization)
+}
+
 pub(super) fn train_units_split_race(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
     train_units_joined(args, false, false, ContactLaw::Pair, Some(Joined::PassagePacketsHeadingSplit), realization)
 }
@@ -3466,10 +3470,19 @@ pub(super) enum Joined {
 /// [agent-inferred, October 31] A clocked participation's section, its level's own count of ticks
 /// (`TOWER_PARTICIPATION_SECTION`; the learner's section when undeclared): the reach of its sites
 /// before they are released (record `2026-10-30_…`, §38).
-fn participation_section(section: usize) -> Result<usize> {
+pub(super) fn participation_section(section: usize) -> Result<usize> {
     match std::env::var("TOWER_PARTICIPATION_SECTION") {
         Ok(v) => Ok(v.parse::<usize>()?.max(1)),
         Err(_) => Ok(section),
+    }
+}
+
+/// [agent-inferred, October 31] A clocked participation's first level (`TOWER_PARTICIPATION_FROM`;
+/// the clock's first clocked level when undeclared, record §35; from any level, §44).
+pub(super) fn participation_from(first: usize) -> Result<usize> {
+    match std::env::var("TOWER_PARTICIPATION_FROM") {
+        Ok(v) => Ok(v.parse::<usize>()?),
+        Err(_) => Ok(first),
     }
 }
 
@@ -3565,7 +3578,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         let first = news.map_or(0, |c| c.first());
         let declared = match joined {
             Joined::Participation => Some((section, 0)),
-            Joined::PassagePacketsParticipationHeading => Some((participation_section(section)?, first)),
+            Joined::PassagePacketsParticipationHeading => Some((participation_section(section)?, participation_from(first)?)),
             _ => None,
         };
         if learner.tower.participation().map(|p| (p.section, p.from)) != declared {
@@ -3630,7 +3643,7 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
             Joined::PassagePacketsParticipationHeading => {
                 let first = learner.tower.news().map_or(0, |c| c.first());
                 learner.join_packets().map_err(|e| e.to_string())?;
-                let founded = learner.tower.founded_participation(participation_section(section)?).map_err(|e| e.to_string())?.from_level(first);
+                let founded = learner.tower.founded_participation(participation_section(section)?).map_err(|e| e.to_string())?.from_level(participation_from(first)?);
                 println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
                 learner.join_participation(founded).map_err(|e| e.to_string())?;
                 learner.join_passage().map_err(|e| e.to_string())?;

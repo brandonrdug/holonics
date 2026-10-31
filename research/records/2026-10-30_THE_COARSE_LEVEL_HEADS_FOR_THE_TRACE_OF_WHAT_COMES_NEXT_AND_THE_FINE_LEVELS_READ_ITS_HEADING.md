@@ -2987,3 +2987,52 @@ held-out code fell; the rise C′ with pair contacts showed may be opening, and 
 **What it decides.** The pair contact is the working contact on GSM8K. The next loop's subject is the
 measured blocker: the first calculation almost never takes the question's numbers (6 of 122 against
 the references' 92 of 125), the question's particulars not reaching the answer's first step.
+
+## 44. The question's numbers into the answer's first step: participation from the arrival levels on GSM8K
+
+[agent-inferred, October 31] **The blocker, by its measurement** (§43): the first calculation takes the
+question's numbers in 6 of 122 releases against the references' 92 of 125, and a calculation the
+learner heard is written back in 70 of 260 against the 8-gram's 243. Both ask for a particular met
+about a hundred units earlier to be read back: on the held-out units a question is a median 79 units
+(90th percentile 136) and an answer's first calculation follows some 20 to 40 units into it. The modes
+hold such a particular only on their few long-memory modes; reading back a site is participation's
+law (the October 28 record). §37 to §38 read participation at the clocked levels against prompts of
+some 2,000 units, where no section reached; on GSM8K a section of the arrival levels' own ticks reaches
+a whole question.
+
+**The law.** Participation from level 0 (every level, as the October 29 clocked form), beside the
+packets, the passage, the heading and the every-level credit, which §35 refused below the clocked
+levels by choice, not by law: an arrival level hears no packet, so its sites' charts read the passing
+current as §35's do, and the credit is held as given as §35 declares. The section is 256 of a level's
+own ticks, so a level that ticks at every arrival keeps at least the question and the answer's opening
+open at most closes (the 90th percentile question and its first calculation within it; reach is §38's
+lesson, where it was not the cause on long prompts and is measured here on short ones).
+
+**Acceptance, fixed before the build.**
+74. The refusals lifted on host and card; the tower tests pass; the card is the host's on the GSM8K
+    units over 32 sections at the declaration with participation from level 0 (section 256) beside
+    packets, heading and every-level credit, with pair contacts.
+75. One lap's cost read, then 20 laps at 160 streams against §43's pair learner, with the receipt: the
+    first calculation from the question's numbers at least twice the pair learner's at lap 20 (at
+    least 12 of its first calculations), the question's flux into its answer above it, and the held-out
+    code at equal elapsed time reported beside both.
+
+**The pair learner to lap 40 on GSM8K** (`g44*`, 290.4 s for laps 21 to 40). Its training code rose
+from lap 18 and wandered between 1.338 and 1.389 for some twelve laps while the held-out code stood near
+1.55, then both fell together to 1.254 and 1.498 at lap 40 (question 1.655, prose 1.401, digits 1.969,
+calculations 0.715): the rise read in §43 was a plateau that the learner crossed, not a collapse. Its
+receipt at laps 30 and 40: the question's flux into its answer 517.1 and 650.0 bits; on the problem's
+words 17 and 24 of 128; free calculations exact 40 of 287 and 54 of 350; the first calculation from the
+question's numbers 4 of 116 and 2 of 117; exact at the equals 77 and 86 of 399 (met 72 and 79 of 260,
+never met 5 and 7 of 139). Forty laps of the pair contacts raise every reading but the first step's:
+the question's numbers still do not reach it.
+
+**§44 on the host.** The refusals of participation below the clocked levels beside the packets, the
+heading and the credit are lifted (host `admits_participation`, `join_heading`; card `admits`, the
+credit's admission). `the_participation_from_the_arrival_levels_covector_matches_the_code_difference`:
+from level 0 beside packets, passage and heading, 64 of 64 families meet their code difference (40 of
+them participation's); the clocked participation's test reads a participation from level 1 joining
+beside them; the tower suite 157 passed. `TOWER_PARTICIPATION_FROM` declares the first level for the
+trainer and the parity, and the route
+`train-two-ladder-stacked-news-heading-credited-every-level-participating-pair-unit-tower` joins it
+with pair contacts.

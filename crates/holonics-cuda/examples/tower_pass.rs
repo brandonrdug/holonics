@@ -196,7 +196,11 @@ fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> 
     if clocked_participation {
         let first = tower.news().map_or(0, |c| c.first());
         tower.join_packets()?;
-        let founded = tower.founded_participation(section)?.from_level(first);
+        // The section and first level a run declares (`TOWER_PARTICIPATION_SECTION`,
+        // `TOWER_PARTICIPATION_FROM`; record `2026-10-30_…`, §44).
+        let pa_section = std::env::var("TOWER_PARTICIPATION_SECTION").ok().map(|v| v.parse::<usize>()).transpose()?.unwrap_or(section);
+        let pa_from = std::env::var("TOWER_PARTICIPATION_FROM").ok().map(|v| v.parse::<usize>()).transpose()?.unwrap_or(first);
+        let founded = tower.founded_participation(pa_section)?.from_level(pa_from);
         println!("TOWER_PARTICIPATION section={} beta_shift={} heads={:?} from={}", founded.section, founded.beta_shift, founded.heads, founded.from);
         tower.join_participation(founded)?;
     }

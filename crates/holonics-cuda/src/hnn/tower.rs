@@ -878,11 +878,10 @@ impl<'c> TowerCard<'c> {
         if !d.gated {
             return refuse("the card carries the gated tower");
         }
-        // Participation beside the heading reads back from the clocked levels up (record
-        // `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
-        let below = law.participation.as_ref().is_some_and(|p| law.news.is_none_or(|c| p.from < c.first()));
-        if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || below || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
-            return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, participation below the clocked levels, a rotor, a ring face or strands");
+        // Participation beside the heading reads back from any level (record
+        // `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35 and §44).
+        if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
+            return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, a rotor, a ring face or strands");
         }
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
@@ -1700,8 +1699,8 @@ impl<'c> TowerCard<'c> {
             (0, _) => 0,
             // Beside participation read back from the clocked levels up the credit is declared held as
             // given (record `2026-10-30_…`, §35): its moments carry each level's own families.
-            (c, Some(clock)) if c == streams && clock.first() < d.levels && law.participation.as_ref().is_none_or(|p| p.from >= clock.first()) && credit_from < d.levels => d.levels - credit_from,
-            (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level, beside no participation below its clocked levels")),
+            (c, Some(clock)) if c == streams && clock.first() < d.levels && credit_from < d.levels => d.levels - credit_from,
+            (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level")),
             _ => return Err(TowerError::Refused("every stream carries a credit or none does")),
         };
         // Each stream's open packets: one a level from the clock's first clocked level up, of the

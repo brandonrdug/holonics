@@ -5541,11 +5541,9 @@ impl Tower {
         if self.mutual.is_some() {
             return refuse("participation beside a mutual contact is owed: its contacts' return is re-derived under the contact");
         }
-        // Beside packets participation reads back at the clocked levels alone, whose sites are their own
-        // ticks (record §35); below them the packets' fine levels read none.
-        if self.packets && self.packet_from().is_some_and(|first| p.from < first) {
-            return refuse("participation beside packets reads back from the clock's first clocked level up");
-        }
+        // [agent-inferred, October 31] Beside packets participation reads back at any level (record
+        // §44): an arrival level hears no packet, so its sites' charts read the passing current as a
+        // clocked level's do (§35).
         Ok(())
     }
 
@@ -5773,11 +5771,11 @@ impl Tower {
         let Some(first) = self.packet_from() else {
             return refuse("the heading is closed at the packets' ticks: without packets no level closes a span");
         };
-        // [agent-inferred, October 31] Beside participation read back from the clocked levels up (record
-        // §35) the face reads the heading as before and participation's current enters the level's
-        // contacts as without it.
-        if self.participation.as_ref().is_some_and(|p| p.from < first) || self.mutual.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
-            return refuse("the heading beside participation below the clocked levels, a mutual contact, a ring face, a rotor or strands is owed");
+        // [agent-inferred, October 31] Beside participation (record §35, from any level §44) the face
+        // reads the heading as before and participation's current enters the level's contacts as
+        // without it.
+        if self.mutual.is_some() || self.ring.is_some() || self.rotor.is_some() || self.strands.is_some() {
+            return refuse("the heading beside a mutual contact, a ring face, a rotor or strands is owed");
         }
         let d = self.declaration;
         let wn = d.width * d.modes;
@@ -9929,16 +9927,21 @@ mod tests {
     /// contact `W₁ᵃ` is zero, or opened as [`tiny_participating_of`] opens it); then the passage and
     /// the heading.
     pub(super) fn working(participating: Option<bool>) -> Tower {
+        working_from(participating, 2)
+    }
+
+    /// [`working`] with participation from level `from` (record §44: from any level).
+    pub(super) fn working_from(participating: Option<bool>, from: usize) -> Tower {
         let mut tower = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Rectifying);
         tower.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
         tower.join_packets().expect("joined");
         if let Some(opened) = participating {
             let heads = if opened { ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared") } else { tower.founded_participation(16).expect("declared") };
-            tower.join_participation(heads.from_level(2)).expect("joined");
+            tower.join_participation(heads.from_level(from)).expect("joined");
             if opened {
                 let k = keys(8192);
                 let mut i = 3000;
-                for lv in tower.layout.levels.clone().into_iter().skip(2) {
+                for lv in tower.layout.levels.clone().into_iter().skip(from) {
                     for v in &mut tower.theta[lv.pa_contact..lv.pa_contact + 16] {
                         *v = (i32::from_be_bytes([k[4 * i], k[4 * i + 1], k[4 * i + 2], k[4 * i + 3]]) >> 8) * 8;
                         i += 1;
@@ -10034,11 +10037,13 @@ mod tests {
         assert_eq!(restored.participation().map(|p| p.from), Some(2));
         let state_text = sj[0].to_text();
         assert_eq!(joined.state_from_text(&state_text.lines().collect::<Vec<_>>()).expect("restored"), sj[0]);
-        // Participation below the clocked levels stays refused beside the packets and the heading.
+        // Participation below the clocked levels joins beside the packets and the heading (record §44).
         let mut below = tiny_contacts(4, 4, 4, true, false, false, ContactLaw::Rectifying);
         below.join_news(NewsClock::above(4, 2, 2).expect("a clock")).expect("joined");
         below.join_packets().expect("joined");
-        assert!(below.clone().join_participation(ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared").from_level(1)).is_err());
+        below.join_participation(ParticipationDeclaration::new(vec![2, 2], 16, 0).expect("declared").from_level(1)).expect("joined");
+        below.join_passage().expect("joined");
+        below.join_heading().expect("joined");
     }
 
     /// [agent-inferred, October 31] **The clocked participation's covector in the working
@@ -10046,12 +10051,23 @@ mod tests {
     /// heading, from an opening carrying the sites, every family read meets its code difference.
     #[test]
     fn the_working_participation_covector_matches_the_code_difference() {
-        let tower = working(Some(true));
+        working_participation_covector(2);
+    }
+
+    /// [agent-inferred, October 31] Record §44, acceptance 74: participation from level 0 beside the
+    /// packets, the passage and the heading, every family meeting its code difference.
+    #[test]
+    fn the_participation_from_the_arrival_levels_covector_matches_the_code_difference() {
+        working_participation_covector(0);
+    }
+
+    fn working_participation_covector(from: usize) {
+        let tower = working_from(Some(true), from);
         let passage = news_passage();
         let (prefix, classes) = (&passage[..=20], &passage[20..44]);
         let mut opening = tower.rest();
         tower.forward(&mut opening, prefix, &tower.reaches()).expect("forward");
-        assert!(opening.sites[2..].iter().all(|s| !s.is_empty()), "the opening carries open sites");
+        assert!(opening.sites[from..].iter().all(|s| !s.is_empty()), "the opening carries open sites");
         let mut s = opening.clone();
         let cells = tower.forward(&mut s, classes, &tower.reaches()).expect("forward");
         let mut g = tower.reverse(&opening, &cells, classes, None).expect("reverse");
