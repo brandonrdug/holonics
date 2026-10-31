@@ -42,3 +42,11 @@ resume is available. The literal key read width and online baseline orders are e
 readings. The field's exact-bit constitution budget remains fixed and refusals are reported.
 
 Run synthetic partition/framing checks with `python3 -I tools/gsm8k/test_tools.py`.
+
+For the tower (record `research/records/2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT_AND_THE_FINE_LEVELS_READ_ITS_HEADING.md`, §43):
+`tower_passage.py TRAIN_JSONL PARTITION_JSON OUT_DIR` renders each problem `question` END `answer` END
+(END the record separator) with each byte's region (Q question, P prose, N digits outside the
+calculations, M the calculation markup), the written rules' texts and six development questions as
+flux prompts; `card_written.py prompts HELD` writes the free and calculation prompts for the card's
+release route (cut at the separator 0x1F, `TOWER_PROMPT_SEPARATOR=31`) and `card_written.py convert`
+turns its releases into the `FREE.tsv` and `MARKS.tsv` that `written_rules.py` reads.

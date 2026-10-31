@@ -397,10 +397,30 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     let limit = positive(&args[7])?;
     let agree = agreement(args.get(8))?;
     let out = Path::new(&args[9]);
-    let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
-    if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
-        return Err("every prompt closes with the end letter".into());
-    }
+    // [agent-inferred, October 31] A declared prompt separator (`TOWER_PROMPT_SEPARATOR`, a class
+    // the passage never holds): the prompts file is cut at it and each prompt is entered whole, so a
+    // prompt may close inside a passage (a GSM8K answer through a calculation's `=`; record
+    // `2026-10-30_…`, §43). Without it every prompt closes with the end letter.
+    let prompts: Vec<&[usize]> = match std::env::var("TOWER_PROMPT_SEPARATOR") {
+        Ok(v) => {
+            let separator = v.parse::<usize>()?;
+            if separator == end || separator >= tower.declaration.alphabet {
+                return Err("TOWER_PROMPT_SEPARATOR names the end letter or a class outside the alphabet".into());
+            }
+            let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == separator).map(|p| &p[..p.len() - 1]).collect();
+            if prompts.is_empty() || classes.last() != Some(&separator) || prompts.iter().any(|p| p.is_empty()) {
+                return Err("every prompt closes with the declared separator and holds a class".into());
+            }
+            prompts
+        }
+        Err(_) => {
+            let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
+            if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
+                return Err("every prompt closes with the end letter".into());
+            }
+            prompts
+        }
+    };
     let share = limit.checked_mul(8).ok_or("key extent overflow")?;
     if keys.len() < prompts.len() * share {
         return Err("fewer keys than the prompts' declared shares".into());

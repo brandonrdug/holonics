@@ -2913,3 +2913,42 @@ tests pass.
     with the foundings it certifies, the flux and the writing. The split founds a contact only where
     its code pays, so its acceptance is a lower held-out code at equal elapsed time with the contacts it
     founded; no growth at all is a reading of the law, not a failure of the build.
+
+## 43. GSM8K alone, and a receipt in place of a number
+
+[Brandon, October 31: start on GSM8K alone, since the repository corpus obscures the early learning
+dynamics; and the learning has been read by bits a byte alone, which he does not trust as its only
+measurement.] Both corrections are right, and the second names a defect of mine: from October 27 the
+race was judged by one held-out code, the prompt's flux joining only on October 31, against the laws'
+own form (a receipt is a field of readings over a partition, each region in its own frame and clock;
+no single scalar of progress; bits a byte is a limit reading of the ratio, its phase part absent). The
+GSM8K reads of October 23 to 26 had fallen away with the mixed passage.
+
+[agent-inferred] **The passage.** GSM8K's public training split (7,473 problems), partitioned by
+`tools/gsm8k/partition.py` (whole question groups by hash, about a tenth declared development; the
+test split is never read). Each problem is rendered `question \n answer` and closed by the end letter
+(the record separator, the founded units' unit 30); the training text is the training rows, the
+held-out text the development rows. Each byte carries its region as the October 23 roles do: Q the
+question with its line end, P the answer's prose, N the answer's digits outside the calculations, M the
+calculation markup `<<…>>` (the end letter with P).
+
+**The receipt, every lap** (each a reading at its own grain, none summed with another):
+- the held-out code by region (Q, P, N, M) at its lap's end and at equal elapsed time against the other
+  declaration, and the training code;
+- each clocked level's code on its own ticks (`TOWER_CLOSURE`) and its ticks an arrival;
+- the question's flux into its answer: for development problems, the answer's code after another
+  problem's question less after its own (`read-tower-race` with the questions as prompts), over the
+  answer's first 16, 64 and 256 classes;
+- the written rules (`tools/gsm8k/written_rules.py`, record of October 26) on releases for the first 128
+  development problems (a declared partition, fixed now): free releases from each question, and at each
+  calculation of the held-out answer a release from the question and the answer through its `=`; read
+  for staying on the problem's words, each written calculation's exactness, the first calculation's use
+  of the question's numbers, and the exact value at the equals, split by whether the training text holds
+  the calculation; with `ngram_release.py`'s exterior baseline read the same way beside it. The releases
+  run on the card's release route (`release-tower-classes`), the prompts batched as its streams; a
+  calculation's release is cut after its `>>` or line end, which the release's later units cannot
+  change.
+
+Nothing in the receipt enters the machine or selects a release. The declarations raced on it: the
+rectifying working declaration, its pair contacts, and the pair contacts with the founded split (§41,
+§42), from C′'s founding keys at 160 streams.
