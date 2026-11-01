@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{shares, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
+use holonics::hnn::tower::field::{shares, Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
 use holonics::hnn::tower::TowerFace;
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
@@ -334,18 +334,29 @@ pub(super) struct TrainRegion {
     pub unresolved: Vec<bool>,
     pub faces: Vec<Option<Shares>>,
     pub locked: Vec<bool>,
+    /// Each site's clock (§15.4) and each carried site's echo (§15.3), empty where none.
+    pub clock: Vec<u32>,
+    pub echo: Vec<Option<Echo>>,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new() }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), clock: Vec::new(), echo: Vec::new() }
     }
+}
+
+/// [agent-inferred, November 1] **The clock ring sets a declaration founds** (§15.4): one, the last head's
+/// set, where at least two turned sets stay on the strand's place (the helix and its moments keep two
+/// rings sets of place; with fewer the clock would take the place the helix reads). A run that reads
+/// the release's clock declares a head for it.
+pub(super) fn clocks_of(heads: usize, still: usize) -> usize {
+    usize::from(heads.saturating_sub(still) >= 3)
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, clock: &[], echo: &[] }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, clock: &region.clock, echo: &region.echo }
 }
 
 /// The regions as the field reads them.
@@ -373,7 +384,7 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 /// are read from.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut firsts: Vec<TrainRegion> = Vec::with_capacity(members.len());
-    let mut fronts: Vec<Option<Front>> = Vec::with_capacity(members.len());
+    let mut fronts: Vec<Option<(Front, usize)>> = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
@@ -387,7 +398,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Front(front) => {
                 classes.truncate(front.cut);
                 firsts.push(TrainRegion::plain(classes, front.open.clone()));
-                fronts.push(Some(front));
+                fronts.push(Some((front, q.len())));
             }
         }
     }
@@ -402,13 +413,19 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     .into_iter();
     let mut regions = Vec::with_capacity(firsts.len() + at.len());
     for (first, front) in firsts.into_iter().zip(fronts) {
-        let Some(front) = front else {
+        let Some((front, question)) = front else {
             regions.push(first);
             continue;
         };
-        let z = logits.next().ok_or("a front region's first read was not returned")?;
-        let (faces, locked) = front_faces(&learner.field, &front, &z)?;
-        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked };
+        let read = logits.next().ok_or("a front region's first read was not returned")?;
+        let (faces, locked) = front_faces(&learner.field, &front, &read.logits)?;
+        // [agent-inferred, November 1] Read 2's clock (§15.4, the rung supplying the count): the prefix's
+        // sites at the rung `r`, the question one sweep before them at `r + 1`, the band and past it at
+        // zero (just reached, or unreached). Its echoes (§15.3): each carried site's read-1 logits and
+        // the echo read 1 returned there, so read 2 meets its cavity field as the release does.
+        let clock: Vec<u32> = (0..front.cut).map(|t| if t < question { front.rung + 1 } else if t < front.front { front.rung } else { 0 }).collect();
+        let echo: Vec<Option<Echo>> = (0..front.cut).map(|t| faces[t].as_ref().and(read.logits.get(t).cloned().flatten()).map(|z| Echo { b: read.echo[t], logits: z })).collect();
+        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked, clock, echo };
         regions.push(first);
         regions.push(second);
     }
@@ -687,7 +704,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, clocks: clocks_of(heads, still) };
             FieldLearner::new(Field::found(declaration, &keys).map_err(|e| e.to_string())?, rate)
         }
     };

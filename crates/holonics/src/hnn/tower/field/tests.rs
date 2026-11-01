@@ -234,11 +234,9 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
         for (hi, row) in cell.rows.iter().enumerate() {
             let i = hi % classes.len();
             assert_eq!(row.len(), classes.len() - 1, "every site meets every other where the words are one class");
-            for li in 0..field.declaration.rows() {
-                let scaled: Vec<u128> = row.iter().map(|src| (src.p[li] as u128) << octave(i.abs_diff(src.j as usize))).collect();
-                let (low, high) = (*scaled.iter().min().unwrap(), *scaled.iter().max().unwrap());
-                assert!(high - low <= 1 << 10, "site {i} mode {li}: the terms differ by their octaves alone: {scaled:?}");
-            }
+            let scaled: Vec<u128> = row.iter().map(|src| (src.p as u128) << octave(i.abs_diff(src.j as usize))).collect();
+            let (low, high) = (*scaled.iter().min().unwrap(), *scaled.iter().max().unwrap());
+            assert!(high - low <= 1 << 10, "site {i}: the terms differ by their octaves alone: {scaled:?}");
         }
     }
     assert_eq!([1usize, 2, 3, 4, 5, 7, 8, 1000].map(octave), [0, 1, 1, 2, 2, 2, 3, 9]);
@@ -250,68 +248,35 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
     assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]), "a still field reads distance");
 }
 
-/// [definition; agent-inferred, November 1] **The memberships, the class lists and the support** (§2.5,
-/// §12, §15.2): a mode at its shell's centre is in its own shell alone, on its light cone it is in both
-/// shells at equal amplitude, and the amplitudes' squares are a partition of unity; a site is listed under
-/// every class its memberships hold, each class's definite sites first; a site's support is its near
-/// field and the definite sites sharing one of its classes past it, each site once at its canonical class,
-/// never itself, weighed by the overlap, which is symmetric and `1` for equal words (§14.1: directional).
+/// [definition; agent-inferred, November 1] **The class lists and the support** (§2.5, §12): each
+/// site's class is its unframed word's shells over the head's first `b` modes; the lists are a stable
+/// counting sort, each class's definite sites first; a site's support is its near field and the
+/// definite members of its class past it, each site once, never itself (§14.1: directional).
 #[test]
-fn the_classes_are_the_word_s_shells_and_the_support_shares_a_class() {
-    let band = band_bits(2);
-    let one = 1u64 << AMPLITUDE_BITS;
-    let centre = membership(1 << 16, 0, band);
-    assert_eq!((centre.own, centre.r_own, centre.r_across, centre.hold), (2, one, 0, 1 << HOLD_BITS), "a plate's centre is its own shell alone");
-    let cone = membership(1 << 16, 1 << 16, band);
-    assert_eq!((cone.own, cone.across, cone.hold), (1, 2, 0));
-    assert_eq!(cone.r_own, cone.r_across, "the cone holds both shells equally");
-    assert_eq!(membership(-(1 << 16), -(1 << 16), band).across, 0, "the bridge's across shell is the plate on its in-phase side");
-    for (re, im) in [(5i64, 3i64), (70_000, 65_000), (-40_000, 41_000), (12, -900), (0, 0), (1 << 20, -(1 << 19))] {
-        let m = membership(re, im, band);
-        let power = (m.r_own as u128).pow(2) + (m.r_across as u128).pow(2);
-        assert!(power.abs_diff(1u128 << (2 * AMPLITUDE_BITS)) <= 2 * one as u128, "a partition of unity at ({re}, {im}): {power}");
-        assert!(overlap(&[m, m], &[m, m]).abs_diff(1u128 << WEIGHT_BITS) <= 1 << 34, "equal words weigh one");
-    }
-    // A word crossing a seam: its overlap with a word fixed on one side moves continuously.
-    let fixed = [membership(60_000, 20_000, band)];
-    let mut last = None::<u128>;
-    for k in 0..=40i64 {
-        let moving = [membership(60_000 - 1_000 * k, 40_000, band)];
-        let w = overlap(&fixed, &moving);
-        assert_eq!(w, overlap(&moving, &fixed), "the weight is symmetric");
-        if let Some(prev) = last {
-            assert!(prev.abs_diff(w) <= 1u128 << (WEIGHT_BITS - 2), "step {k}: {prev} → {w}");
-        }
-        last = Some(w);
-    }
-    // Lists and support over sites at chosen phases, one address mode (b = 1).
-    let phases: [(i64, i64); 10] = [(9, 1), (-9, 1), (1, 9), (9, 8), (8, 9), (-9, 8), (9, -1), (2, 9), (-9, -2), (9, 9)];
-    let modes: Vec<Membership> = phases.iter().map(|&(re, im)| membership(re << 12, im << 12, band_bits(1))).collect();
-    let definite: Vec<bool> = (0..10).map(|t| t % 4 != 1).collect();
-    let lists = ClassLists::of(modes.clone(), 1, definite.clone(), 3);
-    for i in 0..10 {
-        let support: Vec<(usize, u128)> = lists.support(i).collect();
-        let mut places: Vec<usize> = support.iter().map(|&(j, _)| j).collect();
-        places.sort_unstable();
-        places.dedup();
-        assert_eq!(places.len(), support.len(), "each site once");
-        for j in 0..10 {
-            let shares = modes[i].shells().any(|s| modes[j].amplitude(s) > 0);
-            let meets = j != i && (i.abs_diff(j) < NEAR || (shares && definite[j] && overlap(&modes[i..=i], &modes[j..=j]) > 0));
-            assert_eq!(places.contains(&j), meets, "site {i} source {j}");
-            if let Some(&(_, w)) = support.iter().find(|&&(k, _)| k == j) {
-                assert_eq!(w, if i.abs_diff(j) < NEAR { 1u128 << WEIGHT_BITS } else { overlap(&modes[i..=i], &modes[j..=j]) });
-            }
+fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
+    let definite: Vec<bool> = (0..14).map(|t| t % 3 != 1).collect();
+    let lists = ClassLists::of(vec![2, 0, 2, 1, 0, 2, 3, 2, 0, 2, 2, 1, 0, 2], definite.clone(), 4);
+    assert_eq!(lists.off, vec![0, 2, 4, 6, 6, 10, 13, 14, 14]);
+    assert_eq!(lists.members, vec![8, 12, 1, 4, 3, 11, 0, 2, 5, 9, 7, 10, 13, 6]);
+    for i in 0..14 {
+        let support: Vec<usize> = lists.support(i).collect();
+        let mut sorted = support.clone();
+        sorted.sort_unstable();
+        sorted.dedup();
+        assert_eq!(sorted.len(), support.len(), "each site once");
+        assert!(!support.contains(&i));
+        for j in 0..14 {
+            let meets = j != i && (i.abs_diff(j) < NEAR || (lists.class[i] == lists.class[j] && definite[j]));
+            assert_eq!(support.contains(&j), meets, "site {i} source {j}");
         }
     }
-    // Only the plates radiate far: past the near field a site hears the definite members of its classes,
+    // Only the plates radiate far: past the near field a site hears the definite members of its class,
     // whatever its own state, and a soft or unreached source is heard by none.
-    let same = vec![membership(1 << 16, 0, 0); 20];
-    let lists = ClassLists::of(same, 1, (0..20).map(|t| t == 15).collect(), 3);
-    assert_eq!(lists.support(2).map(|(j, _)| j).collect::<Vec<_>>(), vec![1, 3, 0, 4, 5, 6, 7, 15]);
-    assert!(!lists.support(15).any(|(k, _)| k == 2) && !lists.support(2).any(|(k, _)| k == 12));
+    let lists = ClassLists::of(vec![1u32; 20], (0..20).map(|t| t == 15).collect(), 3);
+    assert_eq!(lists.support(2).collect::<Vec<_>>(), vec![1, 3, 0, 4, 5, 6, 7, 15]);
+    assert!(!lists.support(15).any(|k| k == 2) && !lists.support(2).any(|k| k == 12));
     assert_eq!([(2, 0), (-2, 1), (0, 0), (5, -5), (-5, 5), (6, 5), (-6, 5), (1, -2)].map(|(re, im)| shell(re, im)), [2, 0, 1, 1, 1, 2, 0, 1], "the plates where the in-phase part dominates, the bridge on and inside the light cone");
-    // The field's own memberships are its words' modes.
+    // The field's own classes are its words' shells.
     for still in [0usize, 1, 2] {
         let field = shaped(still);
         let d = field.declaration;
@@ -328,18 +293,18 @@ fn the_classes_are_the_word_s_shells_and_the_support_shares_a_class() {
             affine(&field.theta[l.q..l.q + m2 * d.width], reaches.q, d.width, &r, Some(&field.theta[l.q_bias..l.q_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut q).unwrap();
             let m = d.complex();
             for h in 0..d.heads {
-                let expected: Vec<Membership> = (0..d.class_trits()).map(|li| membership(q[h * d.modes + li], q[m + h * d.modes + li], band_bits(d.class_trits()))).collect();
-                assert_eq!((cell.classes[h].site(t).to_vec(), cell.classes[h].definite[t]), (expected, !OPEN[t]), "still {still} head {h} site {t}");
+                let class: u32 = (0..d.class_trits()).map(|li| 3u32.pow(li as u32) * shell(q[h * d.modes + li], q[m + h * d.modes + li])).sum();
+                assert_eq!((cell.classes[h].class[t], cell.classes[h].definite[t]), (class, !OPEN[t]), "still {still} head {h} site {t}");
             }
         }
     }
 }
 
-/// [definition; agent-inferred, November 1] **A mode's lock is greatest at the equal word** (§2.1, §12,
-/// §15.2): the score of every met pair is the lock of the receiver's mode against the source as it
-/// arrives ([`lock`]), which at a still head is never above the receiver's own `|a|²/2` and reaches it
-/// exactly at an equal word; and each mode row's shares (its sources' and its crowds') sum to its whole
-/// `2^63` to their rounding.
+/// [definition; agent-inferred, November 1] **A lock is greatest at the equal word** (§2.1, §12, §15.2):
+/// the score of every met pair is the lock of the receiver's modes against the source as it arrives
+/// ([`lock`]), which at a still head is never above the receiver's own `|a|²/2` and reaches it exactly
+/// at an equal word; and each row's shares (its sources' and its crowds') sum to its whole `2^63` to
+/// their rounding.
 #[test]
 fn a_mode_s_lock_is_greatest_at_the_equal_word() {
     for (a, b) in [((70_000i128, -3_000i128), (70_000i128, -3_000i128)), ((5, 9), (-4, 2)), ((60_000, 1), (120_000, 2))] {
@@ -356,11 +321,9 @@ fn a_mode_s_lock_is_greatest_at_the_equal_word() {
             for h in 0..d.heads {
                 for i in 0..sites {
                     let row = &cell.rows[h * sites + i];
-                    for li in 0..d.rows() {
-                        let total: i128 = row.iter().map(|src| src.p[li] as i128).sum::<i128>() + cell.crowds[h * sites + i].iter().map(|c| c.e[li] as i128).sum::<i128>();
-                        let terms = (row.len() + cell.crowds[h * sites + i].len()) as i128;
-                        assert!((total - (1i128 << SHARE_BITS)).abs() <= terms, "still {still} head {h} site {i} mode {li}: shares {total}");
-                    }
+                    let total: i128 = row.iter().map(|src| src.p as i128).sum::<i128>() + cell.crowds[h * sites + i].iter().map(|c| c.e as i128).sum::<i128>();
+                    let terms = (row.len() + cell.crowds[h * sites + i].len()) as i128;
+                    assert!((total - (1i128 << SHARE_BITS)).abs() <= terms, "still {still} head {h} site {i}: shares {total}");
                 }
             }
         }
@@ -905,7 +868,7 @@ fn no_site_meets_itself() {
         for cell in &pass.ticks {
             for (hi, row) in cell.rows.iter().enumerate() {
                 assert!(row.iter().all(|src| src.j as usize != hi % sites), "still {still} row {hi}");
-                assert!(row.iter().any(|src| src.p.iter().any(|&p| p > 0)), "some other site carries a share");
+                assert!(row.iter().any(|src| src.p > 0), "some other site carries a share");
             }
         }
     }
@@ -913,17 +876,17 @@ fn no_site_meets_itself() {
     assert!(shaped(1).faces(&Region { classes: &one, unresolved: &[true], faces: &[], locked: &[], clock: &[], echo: &[] }).is_err(), "a lone site has no site to meet");
 }
 
-/// The contact's gain covers the falloff, a mode at a time: the largest shift, negative where it
-/// amplifies, at which a mode of mean power locks its equal at `2⌈log₂ reach⌉` bits.
+/// The contact's gain covers the falloff: the largest shift, negative where it amplifies, at which a
+/// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
     let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, clocks: 0 }.score_shift();
-    assert_eq!(at(8, 2221), -5, "reading 8's declaration locks a mean mode's equal at 32 bits");
-    assert_eq!(at(16, 16), -3);
-    assert_eq!(at(8, 2), -1);
+    assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
+    assert_eq!(at(16, 16), 1);
+    assert_eq!(at(3, 16), -2);
     for (modes, reach) in [(8usize, 2221usize), (16, 16), (3, 16), (8, 2), (16, 1 << 20), (1, 1 << 20)] {
         let (beta, need) = (at(modes, reach), 2 * (u128::BITS - ((reach - 1) as u128).leading_zeros()).max(1) as u128);
-        let gained = |b: i32| if b >= 0 { 1u128 >> b } else { 1u128 << -b };
+        let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
     let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, clocks: 0 };
@@ -949,14 +912,14 @@ fn drawn_classes(seed: u64, sites: usize, alphabet: usize) -> Vec<usize> {
 /// on the mean over the head's modes.
 fn share(pass: &FieldPass, sites: usize, h: usize, i: usize, j: usize) -> u64 {
     let row = &pass.ticks[0].rows[h * sites + i];
-    let at: u128 = row.iter().find(|src| src.j as usize == j).map_or(0, |src| src.p.iter().map(|&p| p as u128).sum());
-    let total: u128 = row.iter().flat_map(|src| src.p.iter()).map(|&p| p as u128).sum();
+    let at: u128 = row.iter().find(|src| src.j as usize == j).map_or(0, |src| src.p as u128);
+    let total: u128 = row.iter().map(|src| src.p as u128).sum();
     (at << 20).div_euclid(total.max(1)) as u64
 }
 
-/// Mode `li`'s row as `(place, share)`.
-fn mode_row(row: &[Source], li: usize) -> Vec<(u32, u64)> {
-    row.iter().map(|src| (src.j, src.p[li])).collect()
+/// A row as `(place, share)`.
+fn as_pairs(row: &[Source]) -> Vec<(u32, u64)> {
+    row.iter().map(|src| (src.j, src.p)).collect()
 }
 
 /// The site carrying a row's peak (the lower site on a tie).
@@ -986,12 +949,9 @@ fn the_founded_contact_meets_the_site_whose_word_is_its_own() {
         let open = vec![false; sites];
         let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] }, true).unwrap();
         for h in 0..d.heads {
-            for li in 0..d.rows() {
-                let row = mode_row(&pass.ticks[0].rows[h * sites + i], li);
-                let far: Vec<(u32, u64)> = row.into_iter().filter(|&(k, _)| (k as usize).abs_diff(i) >= NEAR).collect();
-                met += usize::from(peak_of(&far) == j);
-                read += 1;
-            }
+            let far: Vec<(u32, u64)> = as_pairs(&pass.ticks[0].rows[h * sites + i]).into_iter().filter(|&(k, _)| (k as usize).abs_diff(i) >= NEAR).collect();
+            met += usize::from(peak_of(&far) == j);
+            read += 1;
         }
     }
     assert_eq!(met, read, "met {met} of {read}");
@@ -1033,7 +993,7 @@ fn founded_contact_shares_at_a_question_s_size() {
             let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] }, true).unwrap();
             for h in 0..d.still {
                 shares.push(share(&pass, sites, h, i, j));
-                peaks += (0..d.rows()).filter(|&li| peak_of(&mode_row(&pass.ticks[0].rows[h * sites + i], li)) == j).count();
+                peaks += usize::from(peak_of(&as_pairs(&pass.ticks[0].rows[h * sites + i])) == j);
             }
         }
         shares.sort_unstable();
@@ -1119,16 +1079,14 @@ fn closure_code(field: &Field, region: &Region) -> i64 {
         for h in (0..d.heads).filter(|&h| d.closes(tick, h)) {
             for i in (0..sites).filter(|&i| region.unresolved[i]) {
                 let row = &cell.rows[h * sites + i];
-                for li in 0..d.rows() {
-                    let held: u128 = row.iter().filter(|src| !region.unresolved[src.j as usize] && region.classes[src.j as usize] == region.classes[i]).map(|src| src.p[li] as u128).sum();
-                    if held > 0 {
-                        code += face(&[held, (1u128 << SHARE_BITS) - held]).unwrap().code(0);
-                    }
+                let held: u128 = row.iter().filter(|src| !region.unresolved[src.j as usize] && region.classes[src.j as usize] == region.classes[i]).map(|src| src.p as u128).sum();
+                if held > 0 {
+                    code += face(&[held, (1u128 << SHARE_BITS) - held]).unwrap().code(0);
                 }
             }
         }
     }
-    code / (d.copies() * d.rows()) as i64
+    code / d.copies() as i64
 }
 
 /// The closure's covector is its code's: the reverse with the closure less the reverse without it
@@ -1138,6 +1096,10 @@ fn closure_code(field: &Field, region: &Region) -> i64 {
 #[test]
 fn the_closure_s_covector_matches_its_code_s_difference() {
     let r = region();
+    // A probe whose `±δ` moves a site across a sheet changes the support, and the code jumps there
+    // (the address is sharp, §15.2's measurement): it is left out and counted.
+    let sheets = |field: &Field| -> Vec<Vec<u32>> { field.pass(&r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.class.clone())).collect() };
+    let mut seams = 0usize;
     for still in [1usize, 2] {
         let base = shaped(still);
         let draws = base.growth_draws(2);
@@ -1157,6 +1119,10 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
                     plus.theta[i] += delta;
                     let mut minus = field.clone();
                     minus.theta[i] -= delta;
+                    if sheets(&plus) != sheets(&field) || sheets(&minus) != sheets(&field) {
+                        seams += 1;
+                        continue;
+                    }
                     let measured = closure_code(&plus, &r) - closure_code(&minus, &r);
                     let predicted = (g[i] * 2 * delta as i128) >> (natural + grain - 20);
                     let tolerance = predicted.abs() / 8 + 64;
@@ -1167,6 +1133,7 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
             assert!(probed > 0, "still {still}: the closure reaches the charts");
         }
     }
+    assert!(seams < 8, "{seams} probes across a sheet");
 }
 
 /// Two numbers of two digits stand in a filler text, the first anywhere before the second; the
