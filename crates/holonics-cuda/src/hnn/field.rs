@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRealization, Region, STATE_BITS};
+use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace};
 
 use crate::cuda::{Dim3, Module};
@@ -41,6 +41,19 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
+/// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
+/// most twenty (`field_contact_l5` … `field_contact_l20`, 1,280 bits).
+const MIN_LIMBS: usize = 5;
+const MAX_LIMBS: usize = 20;
+/// The most modes a head's rows carry on the card (`MAXN` in `kernels/field.cu`).
+const MAX_MODES: usize = 16;
+/// Warps a contact or a reverse block carries (`CONTACT_ROWS`, `REV_ROWS` in `kernels/field.cu`).
+const CONTACT_ROWS: u64 = 4;
+const REV_ROWS: u64 = 4;
+/// The threads a moment scan's block carries (a power of two, `kernels/field_moment.cuh`).
+const MOMENT_BLOCK: u32 = 256;
+/// The most crowds a receiver hears, one lane each (`MAX_CROWD_SLOTS` in `kernels/field.cu`).
+const MAX_CROWD_SLOTS: usize = 32;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
 /// The device octets the runs keep to (the board's, the desktop included).
@@ -76,6 +89,8 @@ struct Words {
     digits: u32,
     t: u32,
     r: u32,
+    slots: u32,
+    clocks: u32,
     pairs: u64,
     ln2_lo: u64,
     ln2_hi: u64,
@@ -116,6 +131,7 @@ struct Words {
     region_eoff: u64,
     classes: u64,
     unresolved: u64,
+    definite: u64,
     mix_off: u64,
     mix_class: u64,
     mix_share: u64,
@@ -129,18 +145,79 @@ struct Words {
     class_off: u64,
     members: u64,
     e: u64,
-    mass: u64,
+    e_prev: u64,
     y: u64,
     pa: u64,
     pb: u64,
     pc: u64,
     bits: u64,
     face: u64,
+    amin: u64,
+    sw: u64,
+    sv: u64,
+    sc: u64,
+    ce: u64,
+    cv: u64,
+    cw: u64,
+    clock: u64,
+    moment: u64,
+    echo_has: u64,
+    echo_b: u64,
+    echo_logits: u64,
+    trips: u64,
+}
+
+/// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
+/// regions and the one ring slot a launch reads.
+#[repr(C)]
+#[derive(Clone, Copy, Default)]
+struct MomentWords {
+    r: u32,
+    t: u32,
+    region_off: u64,
+    site_region: u64,
+    site_pos: u64,
+    ring: u64,
+    n: u64,
+    ring_len: u64,
+    decay: u64,
+    dreach: u64,
+    ok: u64,
+    status: u64,
 }
 
 /// A kernel argument: the address of a value the launch copies.
 fn arg<T>(v: &mut T) -> *mut c_void {
     (v as *mut T).cast()
+}
+
+/// [definition; agent-inferred, November 1] **The crowds a receiver of a region of `sites` hears**
+/// (the dispersing field's §14.10, the host's `crowd_ranges`): two an octave `level ≥ 2` with
+/// `2^level < sites`, one on each side.
+pub fn crowd_slots(sites: usize) -> usize {
+    (2..usize::BITS).take_while(|&level| (1usize << level) < sites).count() * 2
+}
+
+/// [definition; agent-inferred, November 1] **The limbs a launch's rows need** (§14.11, §15.2: width is
+/// dynamic, never arbitrary): a row's carrier is as wide as the exponents its rows hold, `62` bits of face,
+/// `WEIGHT_BITS` of weight, `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
+/// row of the launch holds, the bits of the terms a row sums, `64 + ⌈log₂ reach⌉` of a value summed over the
+/// reach and the sign: [`FieldDeclaration::row_bits`] with the declaration's spread bound
+/// (`4n 2^(−β) + ⌊log₂ reach⌋ + 2`) replaced by the spread read. A spread past that bound is refused (the
+/// declaration's bound is where a row ends), and so is a carrier past the twenty limbs the card keeps.
+pub fn row_limbs(d: &FieldDeclaration, spread: u64) -> Result<usize> {
+    let beta = d.score_shift();
+    let gain = if beta >= 0 { (4 * d.modes as u64) >> beta } else { (4 * d.modes as u64) << -beta };
+    let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
+    if spread > bound {
+        return Err(TowerError::Refused("a contact row holds exponents past the declaration's bound (`row_bits`)"));
+    }
+    let need = d.row_bits() as u64 - bound + spread;
+    let limbs = (need.div_ceil(64) as usize).max(MIN_LIMBS);
+    if limbs > MAX_LIMBS {
+        return Err(TowerError::Refused("a contact row needs a carrier past the card's twenty limbs (1,280 bits)"));
+    }
+    Ok(limbs)
 }
 
 /// The card's time on the field: forwards (reads), returns, their wall time and the site pairs met.
@@ -173,13 +250,20 @@ struct Tick<'c> {
     vf: CardBuffer<'c, i64>,
     /// The framed word's powers `[h][t]`, the ratios `field_unit` reads it as.
     qscale: CardBuffer<'c, i128>,
-    /// The resonance classes `[h][t]`, each region's class offsets `[h][r][2^b + 1]` and members
+    /// The resonance classes `[h][t]`, each region's class offsets `[h][r][2·3^b + 1]` and members
     /// `[h][t]` (`field_classes`).
     cls: CardBuffer<'c, u32>,
     class_off: CardBuffer<'c, u32>,
     members: CardBuffer<'c, u32>,
     e: CardBuffer<'c, u64>,
-    mass: CardBuffer<'c, u64>,
+    /// The row's least whole bit `[h][t]` (`field_exposure`), each head's prefix sums of the definite
+    /// sites' unit words and values `[h][row][span]` and their counts `[h][row]`, and each receiver's
+    /// crowd shares `[h][t][slots]` (`row = site + region`, a region's `S + 1` rows).
+    amin: CardBuffer<'c, i64>,
+    sw: CardBuffer<'c, i128>,
+    sv: CardBuffer<'c, i128>,
+    sc: CardBuffer<'c, u64>,
+    ce: CardBuffer<'c, u64>,
     y: CardBuffer<'c, i64>,
     read2: CardBuffer<'c, i32>,
     scale2: CardBuffer<'c, i128>,
@@ -272,6 +356,11 @@ impl<'c> CardField<'c> {
 
     /// A launch with `shared` octets of the block's dynamic shared memory.
     fn launch_shared(&self, entry: &'static str, grid: u32, block: u32, shared: u32, params: &mut [*mut c_void]) -> Result<()> {
+        self.launch_grid(entry, Dim3::x(grid.max(1)), block, shared, params)
+    }
+
+    /// A launch over a grid of `grid` blocks of `block` threads and `shared` octets of dynamic shared memory.
+    fn launch_grid(&self, entry: &'static str, grid: Dim3, block: u32, shared: u32, params: &mut [*mut c_void]) -> Result<()> {
         self.card.current().map_err(device)?;
         let function = self.module.function(entry).map_err(|e| device(e.into()))?;
         let started = match &self.profile {
@@ -281,7 +370,7 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
-        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
+        function.launch_on_shared(self.card.stream(), grid, Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();
@@ -302,12 +391,17 @@ impl<'c> CardField<'c> {
         rows.div_ceil((THREADS / 32) as u64).clamp(1, 1 << 20) as u32
     }
 
+    /// A grid of blocks of `per_block` warps, one warp a row.
+    fn rows_grid(rows: u64, per_block: u64) -> u32 {
+        rows.div_ceil(per_block).clamp(1, 1 << 20) as u32
+    }
+
 
     /// Each region's faces (and their logits when `logits`) and, when `returning`, the covector
     /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
     /// region read ([`FieldRealization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
-    fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows)> {
+    fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
         let d = field.declaration;
         for region in regions {
             if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
@@ -324,6 +418,15 @@ impl<'c> CardField<'c> {
             }
             if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
                 return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
+            }
+            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
+                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
+            }
+            if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || region.clock.iter().any(|&c| c as usize >= d.reach))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
+                return Err(TowerError::Refused("a region's clocks or echoes that are not one a site, or a clock past the reach"));
+            }
+            if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
+                return Err(TowerError::Refused("an echo whose logits are not one a class"));
             }
         }
         let card = self.card;
@@ -357,8 +460,19 @@ impl<'c> CardField<'c> {
         let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
         let ring_n = self.timed(Kind::Copy, || card.upload(&ring_n)).map_err(device)?;
         let roots_card = self.timed(Kind::Copy, || card.upload(&roots)).map_err(device)?;
+        if d.contacts % 2 != 0 {
+            return Err(TowerError::Refused("a field's contacts are complex pairs (an even count)"));
+        }
         if 2 * d.modes as u32 > CONTACT_SPAN {
             return Err(TowerError::Refused("the card's contact carries a span of at most 32 entries (16 modes a head)"));
+        }
+        // The crowds' slots a receiver keeps (two an octave `2^level < reach`, from the octave of four).
+        if d.modes > MAX_MODES {
+            return Err(TowerError::Refused("the card's rows carry at most 16 modes a head"));
+        }
+        let slots = crowd_slots(d.reach);
+        if slots > MAX_CROWD_SLOTS {
+            return Err(TowerError::Refused("the declaration's reach holds more crowds than a warp keeps (32)"));
         }
         // The exponential's resident face: `2^digits` words, held beside the batches and counted
         // against the same budget.
@@ -385,6 +499,8 @@ impl<'c> CardField<'c> {
             m2: m2 as u32,
             span: (2 * n) as u32,
             digits: roots.len() as u32,
+            slots: slots as u32,
+            clocks: d.clocks as u32,
             ln2_lo: ln2 as u64,
             ln2_hi: (ln2 >> 64) as u64,
             theta: theta.device_ptr(),
@@ -427,8 +543,9 @@ impl<'c> CardField<'c> {
         words.face = face_ptr;
         let g = if returning { Some(self.timed(Kind::Alloc, || card.zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         // The batches: whole regions in order, each batch's every allocation within the budget.
-        // A landmark read stores one tick's weights beside a read's carriers.
-        let octets = |sites: usize| region_octets(&d, returning, sites) + if keep.is_some() { 8 * (heads * sites * sites) as u64 } else { 0 };
+        // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
+        // and its shares (the echo's round trips, §15.3).
+        let octets = |sites: usize| read_octets(&d, returning, logits, sites) + if keep.is_some() { 8 * (heads * sites * sites) as u64 } else { 0 };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
         let batches = batches(&lengths, &octets, self.budget - face_octets)?;
         if keep.is_some() && (regions.len() != 1 || returning) {
@@ -436,6 +553,7 @@ impl<'c> CardField<'c> {
         }
         let mut faces: Vec<Vec<Option<TowerFace>>> = Vec::with_capacity(regions.len());
         let mut read_logits: Vec<Vec<Option<Vec<i64>>>> = Vec::new();
+        let mut echoes: Vec<Vec<u64>> = Vec::new();
         let mut rows = Rows::new();
         for batch in batches {
             if batch.is_empty() {
@@ -444,10 +562,11 @@ impl<'c> CardField<'c> {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            let (f, z, r) = self.batch(field, &regions[batch], &mut words, g.as_ref(), logits, keep)?;
+            let (f, z, r, e) = self.batch(field, &regions[batch], &mut words, g.as_ref(), logits, keep)?;
             faces.extend(f);
             read_logits.extend(z);
             rows.extend(r);
+            echoes.extend(e);
         }
         let g = match g {
             Some(g) => self.timed(Kind::Copy, || card.fetch(&g)).map_err(device)?,
@@ -458,7 +577,7 @@ impl<'c> CardField<'c> {
             // A landmark read is a reading of a release's last state, counted apart.
             self.times.landmarks += 1;
             self.times.landmark_ns += started.elapsed().as_nanos();
-            return Ok((faces, read_logits, g, rows));
+            return Ok((faces, read_logits, g, rows, echoes));
         }
         self.times.pairs += met;
         if returning {
@@ -468,11 +587,13 @@ impl<'c> CardField<'c> {
             self.times.reads += 1;
             self.times.read_ns += started.elapsed().as_nanos();
         }
-        Ok((faces, read_logits, g, rows))
+        Ok((faces, read_logits, g, rows, echoes))
     }
 
     fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
+        let rows = sites + regions;
+        let slots = crowd_slots(d.reach);
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let classes = d.classes();
         let card = self.card;
@@ -489,15 +610,20 @@ impl<'c> CardField<'c> {
             class_off: alloc32(heads * regions * (2 * classes + 1))?,
             members: alloc32(heads * sites)?,
             // The weights are kept only for a return's reverse or the rows a landmark reads.
-            e: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
-            mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
+            // The shares are zeroed where the echo reads another tick's (a pair absent from a row reads zero).
+            e: self.timed(Kind::Alloc, || card.zeroed::<u64>(if stored { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
+            amin: alloc64(heads * sites)?,
+            sw: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sv: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sc: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * rows).max(1))).map_err(device)?,
+            ce: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * sites * slots).max(1) } else { 1 })).map_err(device)?,
             y: alloc64(sites * m2)?,
             read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
             scale2: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
-            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(1)).map_err(device)?,
+            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(4)).map_err(device)?,
         })
     }
 
@@ -505,11 +631,12 @@ impl<'c> CardField<'c> {
     /// `logits`), when `g` is given the reverse added into it, and with `keep` the still heads'
     /// last-tick weight rows of those sites (the batch's one region).
     #[allow(clippy::type_complexity)]
-    fn batch(&self, field: &Field, regions: &[Region], words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows)> {
+    fn batch(&self, field: &Field, regions: &[Region], words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
+        let span = 2 * n;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -517,6 +644,10 @@ impl<'c> CardField<'c> {
         let mut region_eoff = Vec::new();
         let mut classes = Vec::new();
         let mut unresolved = Vec::new();
+        // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
+        let mut definite = Vec::new();
+        // Each site's clock (§15.4) and echo (§15.3): its `B`, and its logits a class (zero where none).
+        let (mut clock, mut echo_has, mut echo_b, mut echo_logits) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         for (r, region) in regions.iter().enumerate() {
@@ -528,6 +659,21 @@ impl<'c> CardField<'c> {
                 site_pos.push(t as u32);
                 classes.push(region.classes[t] as u32);
                 unresolved.push(u8::from(region.unresolved[t]));
+                let carried = region.faces.get(t).and_then(Option::as_ref).is_some();
+                definite.push(u8::from((!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false)));
+                clock.push(region.clock.get(t).copied().unwrap_or(0));
+                match region.echo.get(t).and_then(Option::as_ref) {
+                    Some(e) => {
+                        echo_has.push(1u8);
+                        echo_b.push(e.b);
+                        echo_logits.extend_from_slice(&e.logits);
+                    }
+                    None => {
+                        echo_has.push(0u8);
+                        echo_b.push(0u64);
+                        echo_logits.extend(std::iter::repeat_n(0i64, a));
+                    }
+                }
                 for &(c, w) in region.faces.get(t).and_then(Option::as_ref).into_iter().flatten() {
                     mix_class.push(c);
                     mix_share.push(w);
@@ -545,6 +691,11 @@ impl<'c> CardField<'c> {
         let region_eoff_c = self.timed(Kind::Copy, || card.upload(&region_eoff)).map_err(device)?;
         let classes_c = self.timed(Kind::Copy, || card.upload(&classes)).map_err(device)?;
         let unresolved_c = self.timed(Kind::Copy, || card.upload(&unresolved)).map_err(device)?;
+        let definite_c = self.timed(Kind::Copy, || card.upload(&definite)).map_err(device)?;
+        let clock_c = self.timed(Kind::Copy, || card.upload(&clock)).map_err(device)?;
+        let echo_has_c = self.timed(Kind::Copy, || card.upload(&echo_has)).map_err(device)?;
+        let echo_b_c = self.timed(Kind::Copy, || card.upload(&echo_b)).map_err(device)?;
+        let echo_logits_c = self.timed(Kind::Copy, || card.upload(&echo_logits)).map_err(device)?;
         let mix_off_c = self.timed(Kind::Copy, || card.upload(&mix_off)).map_err(device)?;
         let mix_class_c = self.timed(Kind::Copy, || card.upload(&mix_class_up)).map_err(device)?;
         let mix_share_c = self.timed(Kind::Copy, || card.upload(&mix_share_up)).map_err(device)?;
@@ -559,15 +710,29 @@ impl<'c> CardField<'c> {
         words.region_eoff = region_eoff_c.device_ptr();
         words.classes = classes_c.device_ptr();
         words.unresolved = unresolved_c.device_ptr();
+        words.definite = definite_c.device_ptr();
+        words.clock = clock_c.device_ptr();
+        words.echo_has = echo_has_c.device_ptr();
+        words.echo_b = echo_b_c.device_ptr();
+        words.echo_logits = echo_logits_c.device_ptr();
         words.mix_off = mix_off_c.device_ptr();
         words.mix_class = mix_class_c.device_ptr();
         words.mix_share = mix_share_c.device_ptr();
         words.status = status.device_ptr();
         words.x = x.device_ptr();
         let returning = g.is_some();
-        // The weights are stored for a return's reverse, or for the rows `keep` reads.
-        let stored = returning || keep.is_some();
-        let ticks: Vec<Tick> = (0..if returning { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored)).collect::<Result<_>>()?;
+        // The shares are stored for a return's reverse, for the rows `keep` reads, and for a logits read's
+        // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
+        let stored = returning || keep.is_some() || logits;
+        let kept = returning || logits;
+        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored)).collect::<Result<_>>()?;
+        // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
+        let trips = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites.max(1))).map_err(device)?;
+        words.trips = trips.device_ptr();
+        // The site moments (§15.1), once for the pass, added into every tick's values.
+        let moment = self.timed(Kind::Alloc, || card.zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
+        words.moment = moment.device_ptr();
+        self.moments(field, words, regions.len(), sites)?;
         let set = |w: &mut Words, tick: &Tick| {
             w.qkv = tick.qkv.device_ptr();
             w.qf = tick.qf.device_ptr();
@@ -576,7 +741,11 @@ impl<'c> CardField<'c> {
             w.class_off = tick.class_off.device_ptr();
             w.members = tick.members.device_ptr();
             w.e = tick.e.device_ptr();
-            w.mass = tick.mass.device_ptr();
+            w.amin = tick.amin.device_ptr();
+            w.sw = tick.sw.device_ptr();
+            w.sv = tick.sv.device_ptr();
+            w.sc = tick.sc.device_ptr();
+            w.ce = tick.ce.device_ptr();
             w.y = tick.y.device_ptr();
             w.pa = tick.pa.device_ptr();
             w.pb = tick.pb.device_ptr();
@@ -584,32 +753,55 @@ impl<'c> CardField<'c> {
             w.bits = tick.bits.device_ptr();
         };
         let t64 = sites as u64;
-        let buckets = 8 * d.classes() as u32;
+        // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
+        let buckets = 4 * (2 * d.classes() as u32 + 32 * (1u32 << d.class_trits()) + 32);
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         for k in 0..d.ticks {
-            let tick = &ticks[if returning { k } else { 0 }];
+            let tick = &ticks[if kept { k } else { 0 }];
             set(words, tick);
             self.chart(words, words.x, &tick.read, &tick.scale, false)?;
             for (part, weight, bias, wmax) in [(0usize, words.q, words.q_bias, words.rq), (1, words.v, words.v_bias, words.rv)] {
                 let out = tick.qkv.device_ptr() + (part * m2 * 8) as u64;
                 self.affine("field_affine_x32", words, weight, bias, wmax, m2, dw, tick.read.device_ptr(), dw, out, 2 * m2, 0, false)?;
             }
-            card.zero_octets(&tick.bits, 0, 4).map_err(device)?;
+            // A value is linear in its site's moment (§15.1).
+            self.launch("field_moment_add", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words)])?;
+            card.zero_octets(&tick.bits, 0, 16).map_err(device)?;
             self.launch_shared("field_classes", (heads * regions.len()).clamp(1, 1 << 20) as u32, 32, buckets, &mut [arg(words)])?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut qs = tick.qscale.device_ptr();
             self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs)])?;
+            // The definite sites' prefix sums (§14.10), read by the contact's crowds.
+            self.launch("field_sums", Self::cells((heads * regions.len() * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
             let mut store = u32::from(stored);
             if keep.is_some() && k + 1 == d.ticks {
                 // The last tick's rows are read whole: the entries outside its support read zero.
                 card.zero_octets(&tick.e, 0, 8 * heads * pairs).map_err(device)?;
             }
-            self.launch("field_contact", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut store)])?;
+            // [definition; agent-inferred, November 1] **The series row's carrier is as wide as the exponents
+            // its rows hold** (§14.11, §15.2: width is dynamic, never arbitrary): the exposure reads each row's
+            // least whole bit and the widest spread any row of the launch holds, and the contact is launched
+            // with the limbs that spread needs, never past the declaration's bound (`row_bits`), where a row
+            // is refused.
+            let rows_per_block = CONTACT_ROWS;
+            self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
+            let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
+            if std::env::var_os("FIELD_SPREAD").is_some() {
+                eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(&d, spread).map_or(0, |l| l));
+            }
+            let limbs = row_limbs(&d, spread)?;
+            let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
+            self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
+            // The echo's round trips of this tick against the last (§15.3).
+            if logits && k > 0 {
+                words.e_prev = ticks[k - 1].e.device_ptr();
+                self.launch("field_echo_trips", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
+            }
             self.affine("field_affine_x64", words, words.out, words.out_bias, words.rout, dw, m2, tick.y.device_ptr(), m2, 0, dw, words.x, false)?;
             self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
             self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
             self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
-            self.launch("field_pair", Self::cells((sites * f) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
         }
         // The faces at the unresolved sites.
@@ -620,6 +812,11 @@ impl<'c> CardField<'c> {
         let totals = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
         self.affine("field_affine_x32", words, words.read, words.read_bias, words.rread, a, dw, fread.device_ptr(), dw, z.device_ptr(), a, 0, true)?;
+        // The cavity field (§15.3): a carried site's read less its own echo.
+        if echo_has.iter().any(|&h| h != 0) {
+            let mut zp = z.device_ptr();
+            self.launch("field_echo_apply", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut zp)])?;
+        }
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         if let Some(g) = g {
@@ -629,7 +826,7 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Copy, || card.fetch(&masses)).map_err(device)?;
         let totals = self.timed(Kind::Copy, || card.fetch(&totals)).map_err(device)?;
         let zs = if logits { self.timed(Kind::Copy, || card.fetch(&z)).map_err(device)? } else { Vec::new() };
-        // The kept rows: each named site's row of each still head at the last tick, with its mass.
+        // The kept rows: each named site's row of each still head at the last tick, with its shares.
         let mut rows = Rows::new();
         if let Some(keep) = keep {
             let tick = &ticks[ticks.len() - 1];
@@ -640,10 +837,20 @@ impl<'c> CardField<'c> {
                 let mut heads_rows = Vec::new();
                 for h in (0..heads).filter(|h| h % d.frames < d.still) {
                     let row = self.timed(Kind::Copy, || card.fetch_range(&tick.e, h * pairs + i * sites, sites)).map_err(device)?;
-                    let mass = self.timed(Kind::Copy, || card.fetch_range(&tick.mass, h * sites + i, 1)).map_err(device)?[0];
-                    heads_rows.push((row.into_iter().enumerate().filter(|&(_, e)| e != 0).map(|(j, e)| (j as u32, e)).collect(), mass));
+                    // A row's shares make its whole, `2^63` (§14.11): the host holds the same mass.
+                    heads_rows.push((row.into_iter().enumerate().filter(|&(_, e)| e != 0).map(|(j, e)| (j as u32, e)).collect(), 1u64 << SHARE_BITS));
                 }
                 rows.push(heads_rows);
+            }
+        }
+        // The echoes (§15.3): the round trips' mean over the heads and the consecutive ticks, to the nearest
+        // numerator (the host's `pass`).
+        let mut out_echo = Vec::new();
+        if logits {
+            let trips = self.timed(Kind::Copy, || card.fetch(&trips)).map_err(device)?;
+            let read = ((d.ticks.saturating_sub(1) * d.heads).max(1)) as u128;
+            for r in 0..regions.len() {
+                out_echo.push((region_off[r] as usize..region_off[r + 1] as usize).map(|t| ((trips[t] as u128 + read / 2) / read) as u64).collect());
             }
         }
         let (mut out, mut out_z) = (Vec::with_capacity(regions.len()), Vec::new());
@@ -654,7 +861,75 @@ impl<'c> CardField<'c> {
                 out_z.push(span.map(|t| (unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
             }
         }
-        Ok((out, out_z, rows))
+        Ok((out, out_z, rows, out_echo))
+    }
+
+    /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
+    /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]), every moment mode (a turned head that
+    /// is not a clock, each of its modes) in the same launches: the strands' encodings of each mode's ring
+    /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
+    /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
+    /// to a grid row), and placed at the unframed value's modes.
+    fn moments(&self, field: &Field, words: &Words, regions: usize, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let tm = d.moment_modes();
+        if tm == 0 {
+            return Ok(());
+        }
+        let (n, l, card) = (d.modes, field.layout(), self.card);
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
+        let (before, after, s) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
+        let (up, down) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
+        let (mut wsp, mut cmp) = (ws.device_ptr(), cmap.device_ptr());
+        let (mut bp, mut ap, mut sp, mut upp, mut dnp, mut none) = (before.device_ptr(), after.device_ptr(), s.device_ptr(), up.device_ptr(), down.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut zero32, mut stride, mut pre_stride) = (0u32, strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        let _ = n;
+        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
+        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp), arg(&mut stride), arg(&mut pre_stride)])?;
+        self.launch("field_moment_scatter_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut sp), arg(&mut cmp), arg(&mut tm32)])?;
+        let _ = &mut none;
+        Ok(())
+    }
+
+    /// The moment kernels' words for every moment mode, in the order of the moment index (`MomentWords` in
+    /// `kernels/field_moment.cuh`, an array of them), each mode's ring slot's resident phasors and skin and
+    /// its admission flags `ok[u][r]`; and the map from a moment mode to the unframed value's mode `h n + l`.
+    fn moment_modes(&self, field: &Field, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(CardBuffer<'c, u64>, CardBuffer<'c, u32>)> {
+        let d = field.declaration;
+        let (mut packed, mut cmap) = (Vec::new(), Vec::new());
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+            for li in 0..d.modes {
+                let slot = li * (d.frames - d.still) + h % d.frames - d.still;
+                let offset: usize = field.rings()[..slot].iter().map(|(_, ring)| ring.len()).sum();
+                let (period, ring) = &field.rings()[slot];
+                let u = d.moment_index(h) + li;
+                // `MomentWords`: `R, T` (two words of 32 bits), then the pointers and counts, 8 octets each.
+                packed.extend([
+                    regions as u64 | (sites as u64) << 32,
+                    words.region_off,
+                    words.site_region,
+                    words.site_pos,
+                    words.phasor + 16 * offset as u64,
+                    *period as u64,
+                    ring.len() as u64,
+                    words.decay + 8 * (slot * d.reach) as u64,
+                    d.reach as u64,
+                    ok.device_ptr() + (u * regions) as u64,
+                    words.status,
+                ]);
+                cmap.push((h * d.modes + li) as u32);
+            }
+        }
+        let card = self.card;
+        Ok((self.timed(Kind::Copy, || card.upload(&packed)).map_err(device)?, self.timed(Kind::Copy, || card.upload(&cmap)).map_err(device)?))
     }
 
     fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
@@ -713,10 +988,20 @@ impl<'c> CardField<'c> {
         let dmid = alloc64(sites * dw)?;
         let dy = alloc64(sites * m2)?;
         let dyh = alloc64(heads * sites * span)?;
-        let wr = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
-        let ds = self.timed(Kind::Alloc, || card.alloc::<i128>(pairs.max(1))).map_err(device)?;
+        // The contact's covector a pair, `|δs| < 2^dsbits` with `dsbits ≤ 53` (refused past it).
+        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>(pairs.max(1))).map_err(device)?;
+        // The crowds' difference arrays over the places `[site + region][span]`, for the values and for
+        // the word (§14.10).
+        let regions = words.r as usize;
+        let rows = sites + regions;
+        let cv = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cw = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        words.cv = cv.device_ptr();
+        words.cw = cw.device_ptr();
+        // The values' covector at the moment modes, summed over the ticks (§15.1).
+        let dm = self.timed(Kind::Alloc, || card.zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -731,7 +1016,12 @@ impl<'c> CardField<'c> {
             words.class_off = tick.class_off.device_ptr();
             words.members = tick.members.device_ptr();
             words.e = tick.e.device_ptr();
-            words.mass = tick.mass.device_ptr();
+            words.qkv = tick.qkv.device_ptr();
+            words.amin = tick.amin.device_ptr();
+            words.sw = tick.sw.device_ptr();
+            words.sv = tick.sv.device_ptr();
+            words.sc = tick.sc.device_ptr();
+            words.ce = tick.ce.device_ptr();
             words.pa = tick.pa.device_ptr();
             words.pb = tick.pb.device_ptr();
             words.pc = tick.pc.device_ptr();
@@ -740,7 +1030,7 @@ impl<'c> CardField<'c> {
             self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
             self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
             let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
-            self.launch("field_pair_back", Self::cells((sites * f) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+            self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
             self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
             self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
             self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;
@@ -756,13 +1046,18 @@ impl<'c> CardField<'c> {
             self.transposed(words, words.out, dw, m2, dmid.device_ptr(), dw, dy.device_ptr(), false, false)?;
             // The weights and the contact over each site's support, head by head: the rows' return
             // first, then the columns', which adds the word's second role into the same slots.
-            let (mut dyp, mut dyhp, mut wrp) = (dy.device_ptr(), dyh.device_ptr(), wr.device_ptr());
-            self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp), arg(&mut wrp)])?;
+            let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
+            self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
             for h in 0..heads {
+                // The crowds' difference arrays start empty a head (§14.10).
+                card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
+                card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
                 let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
-                self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
-                let (mut hh, mut wrp, mut dsp, mut dqp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
-                self.launch("field_contact_columns", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
+                self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+                let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
+                self.launch("field_contact_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
+                let (mut hh, mut dqp, mut dvp) = (h as u32, dq.device_ptr(), dv.device_ptr());
+                self.launch("field_spread", Self::cells((regions * span) as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dqp), arg(&mut dvp)])?;
             }
             let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
             self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
@@ -770,6 +1065,9 @@ impl<'c> CardField<'c> {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
             }
+            // The values' covector, summed over the ticks, for the moments (§15.1).
+            let (mut dvp, mut dmp) = (dv.device_ptr(), dm.device_ptr());
+            self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut dvp), arg(&mut dmp)])?;
             card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
             for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv)] {
                 self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
@@ -778,6 +1076,9 @@ impl<'c> CardField<'c> {
             }
             self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
         }
+        // The moments' return (§15.1): each moment mode's value covector, summed over the ticks, through the
+        // strands to the families (the host's `moments_return`).
+        self.moments_return(field, words, g, &dm, regions, sites)?;
         // The opening: each site's row of the encoding and its strand neighbours' rows of theirs (a
         // carried site's mixture by its shares), the entries partitioned by row once for each encoding
         // (a neighbour only within the site's region: the next site is the region's own when its place
@@ -807,13 +1108,44 @@ impl<'c> CardField<'c> {
         Ok(())
     }
 
+    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Field::moments_return`,
+    /// the released law of §15.1): every moment mode's covector `dm` at its value (fit to 64 bits), admitted by
+    /// the return's certificate, the prefix of the covector turned and released once a term, the return at
+    /// every site, and the strands' encodings' rows (or a carried site's classes by their shares) added into
+    /// `g`; all modes in the same launches.
+    fn moments_return(&self, field: &Field, words: &Words, g: &CardBuffer<'c, i128>, dm: &CardBuffer<'c, i128>, regions: usize, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let tm = d.moment_modes();
+        if tm == 0 {
+            return Ok(());
+        }
+        let (l, card) = (field.layout(), self.card);
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
+        let q = self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
+        let (d_before, d_after) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
+        let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm.device_ptr());
+        let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
+        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut none), arg(&mut stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_return_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride)])?;
+        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
+        Ok(())
+    }
+
     /// The batch's refusals, read off the card.
     fn status(&self, status: &CardBuffer<'c, u32>) -> Result<()> {
         let bits = self.timed(Kind::Copy, || self.card.fetch(status)).map_err(device)?[0];
         if bits == 0 {
             return Ok(());
         }
-        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier")];
+        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier"), (16, "a moment's strand outruns its resident ring or skin")];
         let named: Vec<&str> = names.iter().filter(|(b, _)| bits & b != 0).map(|(_, n)| *n).collect();
         Err(TowerError::Realization(format!("the card refused the field: {}", named.join("; "))))
     }
@@ -829,23 +1161,41 @@ impl<'c> CardField<'c> {
 /// batched release's per-site carriers took the board to 13,372 MiB; sized by its carriers too, the
 /// same release peaked at 11,256 MiB.
 pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
-    let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
-    let ticks_kept = if returning { d.ticks as u64 } else { 1 };
-    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 2 * 4 * h + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
-    let tick_fixed = tick_fixed_octets(d);
-    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
-    let mixture_site = 4 + 2 * 4 * a;
-    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 2 * 8 * m2 } else { 0 };
-    let (s, pairs) = (sites as u64, (sites * sites) as u64);
-    // The weights are kept only for a return.
-    let weights = if returning { h * 8 * pairs } else { 0 };
-    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + reverse_site) + if returning { 16 * pairs } else { 0 }
+    read_octets(d, returning, false, sites)
 }
 
-/// A kept tick's octets a region beside its sites': the carrier's width (one word) and the class
-/// offsets `H (2·3^b + 1)` words (each class's known members and the rest).
+/// [`region_octets`] for a read of `logits` too: a logits read keeps every tick and its shares (the echo's
+/// round trips of consecutive ticks, §15.3), as a return does.
+pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usize) -> u64 {
+    let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
+    let kept = returning || echo;
+    let ticks_kept = if kept { d.ticks as u64 } else { 1 };
+    // Per site a kept tick adds the row's least bit, its class and its place in the lists, its prefix sums'
+    // row (words and values on 128 bits, a count) and its crowd shares (`crowd_slots` words a head).
+    let slots = crowd_slots(d.reach) as u64;
+    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots;
+    let tick_fixed = tick_fixed_octets(d);
+    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
+    // A site's carried mixture, definite bit, clock, echo (a flag, `B` and logits) and the round trips.
+    let mixture_site = 5 + 2 * 4 * a + 4 + 9 + 8 * a + 16;
+    // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
+    // (112 octets a site), batched over the modes.
+    let tm = d.moment_modes() as u64;
+    let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
+    // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
+    // crowds' two difference arrays.
+    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    let (s, pairs) = (sites as u64, (sites * sites) as u64);
+    // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
+    let weights = if kept { h * 8 * pairs } else { 0 };
+    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site) + if returning { 8 * pairs } else { 0 }
+}
+
+/// A kept tick's octets a region beside its sites': the carrier's width (one word), the class
+/// offsets `H (2·3^b + 1)` words (each class's definite members and the rest) and the prefix sums'
+/// extra row (a region's `S + 1` rows, §14.10), which the reverse's difference arrays share.
 fn tick_fixed_octets(d: &FieldDeclaration) -> u64 {
-    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1)
+    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1) + (2 * 16 * 2 * d.modes as u64 + 8) * d.heads as u64 + 2 * 16 * 2 * d.modes as u64
 }
 
 /// An encoding's entries sorted by the row they opened on (`rows` holds each entry's row, site and
@@ -905,7 +1255,7 @@ pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) ->
 
 impl FieldRealization for CardField<'_> {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        let (faces, _, g, _) = self.run(field, regions, true, false, None)?;
+        let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))
     }
 
@@ -913,8 +1263,9 @@ impl FieldRealization for CardField<'_> {
         Ok(self.run(field, regions, false, false, None)?.0)
     }
 
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> {
-        Ok(self.run(field, regions, false, true, None)?.1)
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        let (_, logits, _, _, echo) = self.run(field, regions, false, true, None)?;
+        Ok(logits.into_iter().zip(echo).map(|(logits, echo)| FieldRead { logits, echo }).collect())
     }
 
     fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
@@ -938,7 +1289,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, clocks: 0 }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget
@@ -964,6 +1315,27 @@ mod tests {
         assert!(batches(&[], &|n| n as u64, 1).unwrap().is_empty());
     }
 
+    /// The carrier follows the spread read and is the declaration's `row_bits` at its bound: a row of the
+    /// widest spread the declaration allows needs exactly `row_bits`, one past it is refused.
+    #[test]
+    fn the_carrier_follows_the_spread_and_ends_at_the_declarations_bound() {
+        let d = declaration(32, 4, 32);
+        let beta = d.score_shift();
+        let gain = if beta >= 0 { (4 * d.modes as u64) >> beta } else { (4 * d.modes as u64) << -beta };
+        let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
+        assert_eq!(row_limbs(&d, bound).ok(), Some((d.row_bits() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
+        assert!(row_limbs(&d, bound + 1).is_err());
+        // A narrow row needs five limbs at least, and the carrier never narrows as the spread widens.
+        let mut last = 0;
+        for spread in (0..=bound).step_by(7) {
+            if let Ok(limbs) = row_limbs(&d, spread) {
+                assert!(limbs >= last.max(MIN_LIMBS));
+                last = limbs;
+            }
+        }
+        assert_eq!(row_limbs(&d, 0).unwrap(), MIN_LIMBS);
+    }
+
     /// A region's allocations count its weights, its contact's return on a return, and every site's
     /// carriers beside them: a release batch of 128 regions at the reach carries some 3 GB of them at
     /// the grown declaration, which the weights alone never counted.
@@ -971,9 +1343,9 @@ mod tests {
     fn a_regions_octets_count_its_carriers_beside_its_weights() {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
             let n = 1504u64;
-            // The weights are kept only for a return; each kept tick adds its carrier widths and class
-            // offsets.
-            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 16 * n * n } else { 0 };
+            // The shares (a word a pair) are kept only for a return, with the reverse's covector a pair on 64
+            // bits; each kept tick adds its carrier widths and class offsets.
+            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 8 * n * n } else { 0 };
             let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);
