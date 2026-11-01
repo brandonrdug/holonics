@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRealization, Region, STATE_BITS};
+use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRealization, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace};
 
 use crate::cuda::{Dim3, Module};
@@ -41,6 +41,12 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
+/// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value),
+/// at most eight (`field_contact_l5` … `field_contact_l8`).
+const MIN_LIMBS: usize = 5;
+const MAX_LIMBS: usize = 8;
+/// The most crowds a receiver hears, one lane each (`MAX_CROWD_SLOTS` in `kernels/field.cu`).
+const MAX_CROWD_SLOTS: usize = 32;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
 /// The device octets the runs keep to (the board's, the desktop included).
@@ -76,6 +82,8 @@ struct Words {
     digits: u32,
     t: u32,
     r: u32,
+    limbs: u32,
+    slots: u32,
     pairs: u64,
     ln2_lo: u64,
     ln2_hi: u64,
@@ -116,6 +124,7 @@ struct Words {
     region_eoff: u64,
     classes: u64,
     unresolved: u64,
+    definite: u64,
     mix_off: u64,
     mix_class: u64,
     mix_share: u64,
@@ -129,18 +138,33 @@ struct Words {
     class_off: u64,
     members: u64,
     e: u64,
-    mass: u64,
     y: u64,
     pa: u64,
     pb: u64,
     pc: u64,
     bits: u64,
     face: u64,
+    hold: u64,
+    holdm: u64,
+    sw: u64,
+    sv: u64,
+    sc: u64,
+    ce: u64,
+    lifts: u64,
+    cv: u64,
+    cw: u64,
 }
 
 /// A kernel argument: the address of a value the launch copies.
 fn arg<T>(v: &mut T) -> *mut c_void {
     (v as *mut T).cast()
+}
+
+/// [definition; agent-inferred, November 1] **The crowds a receiver of a region of `sites` hears**
+/// (the dispersing field's §14.10, the host's `crowd_ranges`): two an octave `level ≥ 2` with
+/// `2^level < sites`, one on each side.
+pub fn crowd_slots(sites: usize) -> usize {
+    (2..usize::BITS).take_while(|&level| (1usize << level) < sites).count() * 2
 }
 
 /// The card's time on the field: forwards (reads), returns, their wall time and the site pairs met.
@@ -179,7 +203,16 @@ struct Tick<'c> {
     class_off: CardBuffer<'c, u32>,
     members: CardBuffer<'c, u32>,
     e: CardBuffer<'c, u64>,
-    mass: CardBuffer<'c, u64>,
+    /// The holds `[h][t]` on `2^(−40)` and the mode that sets each (`hold` in `kernels/field.cu`), each
+    /// head's prefix sums of the definite sites' unit words and values `[h][row][span]` and their counts
+    /// `[h][row]`, and each receiver's crowd shares `[h][t][slots]` (`row = site + region`, a region's
+    /// `S + 1` rows).
+    hold: CardBuffer<'c, u64>,
+    holdm: CardBuffer<'c, u32>,
+    sw: CardBuffer<'c, i128>,
+    sv: CardBuffer<'c, i128>,
+    sc: CardBuffer<'c, u64>,
+    ce: CardBuffer<'c, u64>,
     y: CardBuffer<'c, i64>,
     read2: CardBuffer<'c, i32>,
     scale2: CardBuffer<'c, i128>,
@@ -325,6 +358,9 @@ impl<'c> CardField<'c> {
             if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
                 return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
             }
+            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
+                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
+            }
         }
         let card = self.card;
         let started = Instant::now();
@@ -360,6 +396,17 @@ impl<'c> CardField<'c> {
         if 2 * d.modes as u32 > CONTACT_SPAN {
             return Err(TowerError::Refused("the card's contact carries a span of at most 32 entries (16 modes a head)"));
         }
+        // The series row's carrier in limbs of 64 bits, read from the declaration's own bounds
+        // (`FieldDeclaration::row_bits`, §14.11), and the crowds' slots a receiver keeps (two an
+        // octave `2^level < reach`, from the octave of four).
+        let limbs = (d.row_bits() as usize).div_ceil(64).max(MIN_LIMBS);
+        if limbs > MAX_LIMBS {
+            return Err(TowerError::Refused("the declaration's series row is past the card's widest carrier (512 bits)"));
+        }
+        let slots = crowd_slots(d.reach);
+        if slots > MAX_CROWD_SLOTS {
+            return Err(TowerError::Refused("the declaration's reach holds more crowds than a warp keeps (32)"));
+        }
         // The exponential's resident face: `2^digits` words, held beside the batches and counted
         // against the same budget.
         let face_octets = Some(roots.len()).filter(|&digits| digits < 61).map(|digits| 8u64 << digits).filter(|&o| o < self.budget).ok_or(TowerError::Refused("the exponential's resident face passes the card's batch budget"))?;
@@ -385,6 +432,8 @@ impl<'c> CardField<'c> {
             m2: m2 as u32,
             span: (2 * n) as u32,
             digits: roots.len() as u32,
+            limbs: limbs as u32,
+            slots: slots as u32,
             ln2_lo: ln2 as u64,
             ln2_hi: (ln2 >> 64) as u64,
             theta: theta.device_ptr(),
@@ -473,6 +522,8 @@ impl<'c> CardField<'c> {
 
     fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
+        let rows = sites + regions;
+        let slots = crowd_slots(d.reach);
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let classes = d.classes();
         let card = self.card;
@@ -490,7 +541,12 @@ impl<'c> CardField<'c> {
             members: alloc32(heads * sites)?,
             // The weights are kept only for a return's reverse or the rows a landmark reads.
             e: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
-            mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
+            hold: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
+            holdm: alloc32(heads * sites)?,
+            sw: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sv: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sc: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * rows).max(1))).map_err(device)?,
+            ce: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * sites * slots).max(1) } else { 1 })).map_err(device)?,
             y: alloc64(sites * m2)?,
             read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
             scale2: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
@@ -510,6 +566,7 @@ impl<'c> CardField<'c> {
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
+        let span = 2 * n;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
@@ -517,6 +574,8 @@ impl<'c> CardField<'c> {
         let mut region_eoff = Vec::new();
         let mut classes = Vec::new();
         let mut unresolved = Vec::new();
+        // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
+        let mut definite = Vec::new();
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         for (r, region) in regions.iter().enumerate() {
@@ -528,6 +587,8 @@ impl<'c> CardField<'c> {
                 site_pos.push(t as u32);
                 classes.push(region.classes[t] as u32);
                 unresolved.push(u8::from(region.unresolved[t]));
+                let carried = region.faces.get(t).and_then(Option::as_ref).is_some();
+                definite.push(u8::from((!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false)));
                 for &(c, w) in region.faces.get(t).and_then(Option::as_ref).into_iter().flatten() {
                     mix_class.push(c);
                     mix_share.push(w);
@@ -545,6 +606,7 @@ impl<'c> CardField<'c> {
         let region_eoff_c = self.timed(Kind::Copy, || card.upload(&region_eoff)).map_err(device)?;
         let classes_c = self.timed(Kind::Copy, || card.upload(&classes)).map_err(device)?;
         let unresolved_c = self.timed(Kind::Copy, || card.upload(&unresolved)).map_err(device)?;
+        let definite_c = self.timed(Kind::Copy, || card.upload(&definite)).map_err(device)?;
         let mix_off_c = self.timed(Kind::Copy, || card.upload(&mix_off)).map_err(device)?;
         let mix_class_c = self.timed(Kind::Copy, || card.upload(&mix_class_up)).map_err(device)?;
         let mix_share_c = self.timed(Kind::Copy, || card.upload(&mix_share_up)).map_err(device)?;
@@ -559,6 +621,7 @@ impl<'c> CardField<'c> {
         words.region_eoff = region_eoff_c.device_ptr();
         words.classes = classes_c.device_ptr();
         words.unresolved = unresolved_c.device_ptr();
+        words.definite = definite_c.device_ptr();
         words.mix_off = mix_off_c.device_ptr();
         words.mix_class = mix_class_c.device_ptr();
         words.mix_share = mix_share_c.device_ptr();
@@ -576,7 +639,12 @@ impl<'c> CardField<'c> {
             w.class_off = tick.class_off.device_ptr();
             w.members = tick.members.device_ptr();
             w.e = tick.e.device_ptr();
-            w.mass = tick.mass.device_ptr();
+            w.hold = tick.hold.device_ptr();
+            w.holdm = tick.holdm.device_ptr();
+            w.sw = tick.sw.device_ptr();
+            w.sv = tick.sv.device_ptr();
+            w.sc = tick.sc.device_ptr();
+            w.ce = tick.ce.device_ptr();
             w.y = tick.y.device_ptr();
             w.pa = tick.pa.device_ptr();
             w.pb = tick.pb.device_ptr();
@@ -599,12 +667,20 @@ impl<'c> CardField<'c> {
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut qs = tick.qscale.device_ptr();
             self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs)])?;
+            // The definite sites' prefix sums (§14.10), read by the contact's crowds.
+            self.launch("field_sums", Self::cells((heads * regions.len() * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
             let mut store = u32::from(stored);
             if keep.is_some() && k + 1 == d.ticks {
                 // The last tick's rows are read whole: the entries outside its support read zero.
                 card.zero_octets(&tick.e, 0, 8 * heads * pairs).map_err(device)?;
             }
-            self.launch("field_contact", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut store)])?;
+            let contact = match words.limbs {
+                5 => "field_contact_l5",
+                6 => "field_contact_l6",
+                7 => "field_contact_l7",
+                _ => "field_contact_l8",
+            };
+            self.launch(contact, Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut store)])?;
             self.affine("field_affine_x64", words, words.out, words.out_bias, words.rout, dw, m2, tick.y.device_ptr(), m2, 0, dw, words.x, false)?;
             self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
             self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
@@ -640,8 +716,8 @@ impl<'c> CardField<'c> {
                 let mut heads_rows = Vec::new();
                 for h in (0..heads).filter(|h| h % d.frames < d.still) {
                     let row = self.timed(Kind::Copy, || card.fetch_range(&tick.e, h * pairs + i * sites, sites)).map_err(device)?;
-                    let mass = self.timed(Kind::Copy, || card.fetch_range(&tick.mass, h * sites + i, 1)).map_err(device)?[0];
-                    heads_rows.push((row.into_iter().enumerate().filter(|&(_, e)| e != 0).map(|(j, e)| (j as u32, e)).collect(), mass));
+                    // A row's shares make its whole, `2^63` (§14.11): the host holds the same mass.
+                    heads_rows.push((row.into_iter().enumerate().filter(|&(_, e)| e != 0).map(|(j, e)| (j as u32, e)).collect(), 1u64 << SHARE_BITS));
                 }
                 rows.push(heads_rows);
             }
@@ -713,10 +789,19 @@ impl<'c> CardField<'c> {
         let dmid = alloc64(sites * dw)?;
         let dy = alloc64(sites * m2)?;
         let dyh = alloc64(heads * sites * span)?;
-        let wr = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
         let ds = self.timed(Kind::Alloc, || card.alloc::<i128>(pairs.max(1))).map_err(device)?;
+        // The holds' covectors `[h][t]` (§14.2) and the crowds' difference arrays over the places
+        // `[site + region][span]`, for the values and for the word (§14.10).
+        let regions = words.r as usize;
+        let rows = sites + regions;
+        let lifts = self.timed(Kind::Alloc, || card.zeroed::<i128>((heads * sites).max(1))).map_err(device)?;
+        let cv = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cw = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        words.lifts = lifts.device_ptr();
+        words.cv = cv.device_ptr();
+        words.cw = cw.device_ptr();
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -731,7 +816,13 @@ impl<'c> CardField<'c> {
             words.class_off = tick.class_off.device_ptr();
             words.members = tick.members.device_ptr();
             words.e = tick.e.device_ptr();
-            words.mass = tick.mass.device_ptr();
+            words.qkv = tick.qkv.device_ptr();
+            words.hold = tick.hold.device_ptr();
+            words.holdm = tick.holdm.device_ptr();
+            words.sw = tick.sw.device_ptr();
+            words.sv = tick.sv.device_ptr();
+            words.sc = tick.sc.device_ptr();
+            words.ce = tick.ce.device_ptr();
             words.pa = tick.pa.device_ptr();
             words.pb = tick.pb.device_ptr();
             words.pc = tick.pc.device_ptr();
@@ -756,13 +847,19 @@ impl<'c> CardField<'c> {
             self.transposed(words, words.out, dw, m2, dmid.device_ptr(), dw, dy.device_ptr(), false, false)?;
             // The weights and the contact over each site's support, head by head: the rows' return
             // first, then the columns', which adds the word's second role into the same slots.
-            let (mut dyp, mut dyhp, mut wrp) = (dy.device_ptr(), dyh.device_ptr(), wr.device_ptr());
-            self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp), arg(&mut wrp)])?;
+            let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
+            self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
+            card.zero_octets(&lifts, 0, 16 * heads * sites).map_err(device)?;
             for h in 0..heads {
+                // The crowds' difference arrays start empty a head (§14.10).
+                card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
+                card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
                 let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
                 self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
-                let (mut hh, mut wrp, mut dsp, mut dqp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
-                self.launch("field_contact_columns", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
+                let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
+                self.launch("field_contact_columns", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
+                let (mut hh, mut dqp, mut dvp) = (h as u32, dq.device_ptr(), dv.device_ptr());
+                self.launch("field_spread", Self::cells((regions * span) as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dqp), arg(&mut dvp)])?;
             }
             let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
             self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
@@ -770,6 +867,9 @@ impl<'c> CardField<'c> {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
             }
+            // The holds return to the unframed word's mode that sets them (§14.2).
+            let mut dqp = dq.device_ptr();
+            self.launch("field_hold_back", Self::cells((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut dqp)])?;
             card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
             for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv)] {
                 self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
@@ -831,21 +931,26 @@ impl<'c> CardField<'c> {
 pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
     let ticks_kept = if returning { d.ticks as u64 } else { 1 };
-    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 2 * 4 * h + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
+    // Per site a kept tick adds its hold (a word and its mode), its prefix sums' row (words and values
+    // on 128 bits, a count) and its crowd shares (`crowd_slots` words a head).
+    let slots = crowd_slots(d.reach) as u64;
+    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 2 * 4 * h + (8 + 4) * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots;
     let tick_fixed = tick_fixed_octets(d);
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
-    let mixture_site = 4 + 2 * 4 * a;
-    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 2 * 8 * m2 } else { 0 };
+    let mixture_site = 5 + 2 * 4 * a;
+    // The reverse adds its covectors, the hold covectors `[h][t]` and the crowds' two difference arrays.
+    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * h + 2 * 16 * span } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The weights are kept only for a return.
     let weights = if returning { h * 8 * pairs } else { 0 };
     ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + reverse_site) + if returning { 16 * pairs } else { 0 }
 }
 
-/// A kept tick's octets a region beside its sites': the carrier's width (one word) and the class
-/// offsets `H (2·3^b + 1)` words (each class's known members and the rest).
+/// A kept tick's octets a region beside its sites': the carrier's width (one word), the class
+/// offsets `H (2·3^b + 1)` words (each class's definite members and the rest) and the prefix sums'
+/// extra row (a region's `S + 1` rows, §14.10), which the reverse's difference arrays share.
 fn tick_fixed_octets(d: &FieldDeclaration) -> u64 {
-    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1)
+    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1) + (2 * 16 * 2 * d.modes as u64 + 8) * d.heads as u64 + 2 * 16 * 2 * d.modes as u64
 }
 
 /// An encoding's entries sorted by the row they opened on (`rows` holds each entry's row, site and
