@@ -1099,7 +1099,7 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
     // A probe whose `±δ` moves a site across a sheet changes the support, and the code jumps there
     // (the address is sharp, §15.2's measurement): it is left out and counted.
     let sheets = |field: &Field| -> Vec<Vec<u32>> { field.pass(&r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.class.clone())).collect() };
-    let mut seams = 0usize;
+    let (mut seams, mut read) = (0usize, 0usize);
     for still in [1usize, 2] {
         let base = shaped(still);
         let draws = base.growth_draws(2);
@@ -1114,26 +1114,36 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
                 let mut entries: Vec<usize> = (start..start + len).collect();
                 entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
                 for &i in entries.iter().take(3).filter(|&&i| g[i] != 0) {
+                    // The central difference at `δ` and at `δ/2`: the closure's code is `−log₂` of a
+                    // holder share, curved enough that a step of `2^(−9)` can miss by its `δ²` term,
+                    // and the forward's releases put a noise of about a tenth on a step much smaller
+                    // (measured November 1: at the founded field's `b_bias` 3,326 at `δ` and 4,254 at
+                    // `δ/2` against 4,481 predicted, converging; at `q_bias` 13,474, 12,064, 14,632 and
+                    // 13,216 at `δ` to `δ/8` against 13,697, scattered). The covector agrees where
+                    // either step does.
                     let delta = 1i32 << (grain - 9);
-                    let mut plus = field.clone();
-                    plus.theta[i] += delta;
-                    let mut minus = field.clone();
-                    minus.theta[i] -= delta;
-                    if sheets(&plus) != sheets(&field) || sheets(&minus) != sheets(&field) {
+                    let central = |step: i32| -> Option<i64> {
+                        let (mut plus, mut minus) = (field.clone(), field.clone());
+                        plus.theta[i] += step;
+                        minus.theta[i] -= step;
+                        (sheets(&plus) == sheets(&field) && sheets(&minus) == sheets(&field)).then(|| closure_code(&plus, &r) - closure_code(&minus, &r))
+                    };
+                    let (Some(whole), Some(half)) = (central(delta), central(delta / 2)) else {
                         seams += 1;
                         continue;
-                    }
-                    let measured = closure_code(&plus, &r) - closure_code(&minus, &r);
+                    };
                     let predicted = (g[i] * 2 * delta as i128) >> (natural + grain - 20);
                     let tolerance = predicted.abs() / 8 + 64;
-                    assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} width {} family at {start} (grain {grain}) entry {i}: measured {measured}, predicted {predicted}", field.declaration.width);
+                    let agrees = |measured: i64| (measured as i128 - predicted).abs() <= tolerance;
+                    read += 1;
+                    assert!(agrees(whole) || agrees(2 * half), "still {still} width {} family at {start} (grain {grain}) entry {i}: measured {whole} at δ and {} at δ/2, predicted {predicted}", field.declaration.width, 2 * half);
                     probed += 1;
                 }
             }
             assert!(probed > 0, "still {still}: the closure reaches the charts");
         }
     }
-    assert!(seams < 8, "{seams} probes across a sheet");
+    assert!(read > 2 * seams, "read {read} probes, {seams} across a sheet");
 }
 
 /// Two numbers of two digits stand in a filler text, the first anywhere before the second; the

@@ -376,8 +376,8 @@ impl FieldDeclaration {
         if self.clocks > self.frames - self.still.min(self.frames) {
             return refuse("a field's clocks are among its turned ring sets");
         }
-        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.ticks == 0 {
-            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts and ticks");
+        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.contacts % 2 != 0 || self.ticks == 0 {
+            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts in complex pairs and ticks");
         }
         if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
             return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
@@ -1456,8 +1456,13 @@ impl Field {
             let rt = &cell.read2[t * dw..(t + 1) * dw];
             affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, rt, Some(&self.theta[l.a_bias..l.a_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.a[t * f..(t + 1) * f])?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.b[t * f..(t + 1) * f])?;
-            for e in t * f..(t + 1) * f {
-                cell.c[e] = fit64(release(cell.a[e] as i128 * cell.b[e] as i128, FACE_BITS))?;
+            // The complex product a contact (§15.1): contact `e < f/2` is `a_e + i a_(f/2+e)`, so two ring
+            // faces compose by adding their phases, `q(x + y) = q(x) q(y)`.
+            let (ac, bc, half) = (&cell.a[t * f..(t + 1) * f], &cell.b[t * f..(t + 1) * f], f / 2);
+            for e in 0..half {
+                let (ar, ai, br, bi) = (ac[e] as i128, ac[half + e] as i128, bc[e] as i128, bc[half + e] as i128);
+                cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
+                cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
             }
             affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &cell.c[t * f..(t + 1) * f], Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
             for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
@@ -1646,10 +1651,16 @@ impl Field {
             let mut dc = vec![0i64; f];
             for t in 0..sites {
                 transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc)?;
-                for e in 0..f {
-                    let at = t * f + e;
-                    da[at] = fit64(release(dc[e] as i128 * cell.b[at] as i128, FACE_BITS))?;
-                    db[at] = fit64(release(dc[e] as i128 * cell.a[at] as i128, FACE_BITS))?;
+                // `δa = conj(b) δc`, `δb = conj(a) δc` for the complex product.
+                let half = f / 2;
+                for e in 0..half {
+                    let (re, im) = (t * f + e, t * f + half + e);
+                    let (gr, gi) = (dc[e] as i128, dc[half + e] as i128);
+                    let (ar, ai, br, bi) = (cell.a[re] as i128, cell.a[im] as i128, cell.b[re] as i128, cell.b[im] as i128);
+                    da[re] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
+                    da[im] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
+                    db[re] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
+                    db[im] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
                 }
             }
             let das: Vec<&[i64]> = da.chunks_exact(f).collect();
@@ -2495,7 +2506,9 @@ impl Field {
         // imaginary part, copy `b`, mode `c`) at `part·M' + bM + c`; a contact's at `bf + e`.
         let face = |c: usize, j: usize| c * dw + j;
         let chart_row = |b: usize, r: usize| (r / m) * m2g + b * m + r % m;
-        let contact = |c: usize, e: usize| c * fc + e;
+        // A contact is a complex pair (`e`, `f/2 + e`, §15.1): copy `c` of its real part at `c f/2 + e`,
+        // of its imaginary part at `f'/2 + c f/2 + e`, so every copy keeps its pair.
+        let contact = |c: usize, e: usize| if e < fc / 2 { c * (fc / 2) + e } else { f * fc / 2 + c * (fc / 2) + e - fc / 2 };
         let kept = |_: usize, r: usize| r;
         split(ol.q, layout.q, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
         split(ol.v, layout.v, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
