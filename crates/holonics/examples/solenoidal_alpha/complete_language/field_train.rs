@@ -388,7 +388,7 @@ fn next_text(next: Option<FieldNext>) -> String {
 }
 
 /// `train-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION
-/// LAPS RATE OUT [FROM FROM_SHA]`: the field founded on the keys (or continued from a rested
+/// LAPS RATE LAP_MS GROWN_LAP_MS STOP_MS OUT [FROM FROM_SHA]`: the field founded on the keys (or continued from a rested
 /// learner), trained over `LAPS` laps of the training problems in sections of `SECTION` regions,
 /// each lap's sections in a keyed order. As many training problems as `DEV` holds are withheld
 /// ([`sections_of`]); after each lap the step the lap's last section deposited is read on them, the
@@ -396,9 +396,16 @@ fn next_text(next: Option<FieldNext>) -> String {
 /// codec is founded on the training passage and written as `OUT/CODEC`. After a lap whose withheld
 /// problems code no fewer bits a site than they did after the lap before, the body grows by copies
 /// (`FieldLearner::widened`) before the next.
+///
+/// [agent-inferred, November 1] **The run's bounds are its own.** `LAP_MS` bounds a lap before any
+/// growth and `GROWN_LAP_MS` one after (the projections' upper ends), `STOP_MS` the run from its
+/// start. At the first section that ends past either, the learner rests as `OUT/STATE.stopped`
+/// and the run stops, its partial evidence reported as incomplete (`FIELD_STOPPED`). Why: the
+/// second reading's bound was an outside watcher that stopped the trainer inside its first lap,
+/// so 336 sections of learning left no state and nothing could be released or read.
 pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if !(args.len() == 19 || args.len() == 21) {
-        return Err("train-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION LAPS RATE OUT [FROM FROM_SHA]".into());
+    if !(args.len() == 22 || args.len() == 24) {
+        return Err("train-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION LAPS RATE LAP_MS GROWN_LAP_MS STOP_MS OUT [FROM FROM_SHA]".into());
     }
     let started = std::time::Instant::now();
     let units = units_of(&args[1], &args[2])?;
@@ -407,7 +414,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
     let (width, heads, modes, still, contacts, ticks) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?, count(&args[12])?, positive(&args[13])?, positive(&args[14])?);
     let (section, laps, rate) = (positive(&args[15])?, count(&args[16])?, count(&args[17])? as u32);
-    let out = Path::new(&args[18]);
+    let (lap_ms, grown_lap_ms, stop_ms) = (positive(&args[18])? as u128, positive(&args[19])? as u128, positive(&args[20])? as u128);
+    let out = Path::new(&args[21]);
     std::fs::create_dir(out)?;
     let train_problems = problems_of(&train_text);
     let dev_problems = problems_of(&dev_text);
@@ -421,7 +429,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // The reach: the longest region the run reads, a question and the codec's answer extent (a
     // training region's tail never runs past it, and the release opens there).
     let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
-    let mut learner = match args.get(19..21) {
+    let mut learner = match args.get(22..24) {
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
@@ -470,6 +478,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
     let mut previous = (code, sites);
+    let mut grown = false;
     for lap in 0..laps {
         // The learner's own lap count keys the walk and the draws: a continued run moves on.
         let read = learner.laps;
@@ -501,6 +510,25 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 next_text(receipt.next),
                 section_start.elapsed().as_millis()
             );
+            let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
+            if over_lap || over_run {
+                // The pending step is judged on the withheld problems as a lap's last step is, so
+                // the stopped state carries no step its next regions have not read.
+                let (code, unseen_sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
+                write_new(&out.join("STATE.stopped"), learner.to_text().as_bytes())?;
+                println!(
+                    "FIELD_STOPPED lap={lap} sections={}/{} reason={} sites={sites} before={} after={} deposited={deposited} halvings={halvings} next_halved={held_down} next_refused={refused} lap_ms={} ms={}",
+                    n + 1,
+                    sections.len(),
+                    if over_lap { "lap" } else { "run" },
+                    bits(code_before, sites),
+                    bits(code_after, sites),
+                    lap_start.elapsed().as_millis(),
+                    started.elapsed().as_millis()
+                );
+                println!("FIELD_UNSEEN lap={lap} stopped code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
+                return Ok(());
+            }
         }
         learner.laps += 1;
         // The lap's last step is read on the withheld problems, which it was not fit on.
@@ -522,6 +550,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // the lap before left them, the body has spent its width and grows by two before the next.
         if (code as i128) * (previous.1 as i128) >= (previous.0 as i128) * (unseen_sites as i128) && lap + 1 < laps {
             learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
+            grown = true;
             let d = learner.field.declaration;
             println!("FIELD_GROW lap={lap} width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
         }
@@ -864,13 +893,19 @@ mod tests {
         let (passage, passage_sha) = put("TRAIN", train_text);
         let (held, held_sha) = put("HELD", held_text);
         let (key, key_sha) = put("KEYS", &keys);
-        let run = |out: &str, from: Option<(String, String)>| {
-            let mut args: Vec<String> = ["train-field", &units, &units_sha, &passage, &passage_sha, &held, &held_sha, &key, &key_sha, "8", "2", "3", "1", "4", "2", "2", "2", "4", out].iter().map(|s| s.to_string()).collect();
+        let bounded = |out: &str, stop_ms: &str, from: Option<(String, String)>| {
+            let mut args: Vec<String> = ["train-field", &units, &units_sha, &passage, &passage_sha, &held, &held_sha, &key, &key_sha, "8", "2", "3", "1", "4", "2", "2", "2", "4", "600000", "600000", stop_ms, out].iter().map(|s| s.to_string()).collect();
             if let Some((state, sha)) = from {
                 args.extend([state, sha]);
             }
             train(&args, &mut host())
         };
+        let run = |out: &str, from: Option<(String, String)>| bounded(out, "600000", from);
+        // A run past its own bound rests at the section it reached and writes no lap's state.
+        bounded(&at("S"), "1", None).expect("stopped");
+        assert!(dir.join("S/STATE.stopped").exists() && !dir.join("S/STATE.0").exists());
+        let stopped = std::fs::read(dir.join("S/STATE.stopped")).expect("stopped state");
+        assert!(FieldLearner::from_text(std::str::from_utf8(&stopped).unwrap()).is_ok());
         run(&at("A"), None).expect("train");
         let rested = std::fs::read(dir.join("A/STATE.1")).expect("rested");
         let codec = std::fs::read(dir.join("A/CODEC")).expect("codec");

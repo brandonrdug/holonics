@@ -293,8 +293,8 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     let lengths: Vec<usize> = order.iter().flat_map(|&s| region_lengths(&p.codec, &p.train, &p.sections[s], p.seed, &mut lengths_draw)).collect();
     let lap_pairs: u128 = lengths.iter().map(|&l| (d.heads * l * l) as u128).sum::<u128>() * d.ticks as u128;
     let lap_sites: usize = lengths.iter().sum();
-    let mut worst = (0u128, 1u128); // the largest ms a pair as (ns, pairs) of a section's read and return
-    let mut reads_worst = (0u128, 1u128);
+    let mut worst = (0u128, 1u128); // the largest ns a pair as (ns, pairs) of a section's reads and return
+    let mut read_worst = (0u128, 1u128); // the same of one read of the section's regions
     let mut draw = learner.laps * p.train.len() as u64;
     for (k, &s) in order.iter().take(sections).enumerate() {
         let mut rec = Recorder { inner: &mut *card, reads: Vec::new() };
@@ -308,18 +308,30 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
         if ns * worst.1 > worst.0 * pairs {
             worst = (ns, pairs);
         }
-        // A section's time over its reads' pairs (its return and each reread read its pairs once).
-        if ns * reads_worst.1 > reads_worst.0 * pairs * reads {
-            reads_worst = (ns, pairs * reads);
+        // One read of the section's regions alone: the held step's read on the next section and
+        // the certificate may each read them twice more than a step that stands at its size
+        // (`scaled`, the one bounded law of a step's size).
+        let t1 = std::time::Instant::now();
+        card.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        let read_ns = t1.elapsed().as_nanos();
+        if read_ns * read_worst.1 > read_worst.0 * pairs {
+            read_worst = (read_ns, pairs);
         }
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
-        println!("FIELD_TIME section={} length={length} pairs={pairs} reads={reads} halvings={} deposited={} ms={} ns_a_pair={}", k + 1, receipt.halvings, receipt.deposited, ms(ns), ns / pairs.max(1));
+        let next = receipt.next.map_or("-".to_string(), |n| format!("{}/{}", n.halvings, n.refused));
+        println!("FIELD_TIME section={} length={length} pairs={pairs} reads={reads} halvings={} deposited={} next={next} ms={} ns_a_pair={} read_ms={}", k + 1, receipt.halvings, receipt.deposited, ms(ns), ns / pairs.max(1), ms(read_ns));
     }
     let sections_lap = p.sections.len();
+    // The upper bound of a lap: every section at the worst measured section time a pair, and four
+    // more reads of it at the worst measured read time a pair (the most the held step's read and
+    // the certificate add to a section whose steps stand at their size; the second reading's
+    // projection lacked them).
     println!(
-        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} pairs={lap_pairs} worst_ns_a_section_pair={} projection_ms={} (the section's read, return and rereads at the worst measured time a pair)",
+        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} pairs={lap_pairs} worst_ns_a_section_pair={} worst_ns_a_read_pair={} at_size_ms={} projection_ms={} (every section's reads and return at the worst measured time a pair, and four more reads of it)",
         worst.0 / worst.1.max(1),
-        ms(lap_pairs * worst.0 / worst.1.max(1))
+        read_worst.0 / read_worst.1.max(1),
+        ms(lap_pairs * worst.0 / worst.1.max(1)),
+        ms(lap_pairs * worst.0 / worst.1.max(1) + 4 * lap_pairs * read_worst.0 / read_worst.1.max(1))
     );
     // The releases: the free releases of the opening held problems, read together and timed; the
     // projection reads every held problem's free release and one at each calculation's equals, each

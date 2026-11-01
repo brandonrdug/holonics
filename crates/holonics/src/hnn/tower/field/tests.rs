@@ -334,9 +334,48 @@ fn releases_read_together_are_each_problem_s_own() {
     }
 }
 
-/// A deposited step is held and read on the next section: where the material before it codes the
-/// next regions in fewer bits the step is halved or refused, so the material that stands never
-/// codes them higher than the material before the step; the held step crosses the learner's text.
+/// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
+/// step): the further halvings of the last size read and whether the step stands there.
+fn law_scale(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bool, regions: &[Region]) -> (u32, bool) {
+    let on = |field: &Field| compared(&regions.iter().map(|r| field.faces(r).unwrap()).collect::<Vec<_>>(), regions);
+    let stands = |new: &[(u128, u128)]| if strict { fewer_bits(old, new) } else { !fewer_bits(new, old) };
+    let at = |h: u32| stepped(base, step, h0 + h).unwrap();
+    let (full, moved) = at(0);
+    if !moved {
+        return (0, false);
+    }
+    if stands(&on(&full)) {
+        return (0, true);
+    }
+    let (half, moved) = at(1);
+    if !moved {
+        return (1, false);
+    }
+    if stands(&on(&half)) {
+        return (1, true);
+    }
+    let (e1, e2) = ((code_of(&on(&full)) - code_of(old)) as i128, (code_of(&on(&half)) - code_of(old)) as i128);
+    if e1 <= 0 || e2 <= 0 || 4 * e2 - e1 >= 0 {
+        return (1, false);
+    }
+    // The largest halving at or below the parabola's lowest point, μ* = (e1 − 4e2)/(4e1 − 8e2).
+    let h = (2u32..).find(|&h| (e1 - 4 * e2) << h >= 4 * e1 - 8 * e2).unwrap();
+    let (candidate, moved) = at(h);
+    (h, moved && stands(&on(&candidate)))
+}
+
+/// The read the law makes of a held step on `regions`, from the material before it
+/// ([`FieldLearner::next_scale`]): the further halvings and whether it is refused.
+fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32, bool) {
+    let old = compared(&regions.iter().map(|r| before.faces(r).unwrap()).collect::<Vec<_>>(), regions);
+    let (halvings, stands) = law_scale(before, step, h0, &old, false, regions);
+    (halvings, !stands)
+}
+
+/// A deposited step is held and read on the next section: the material that stands is the law's
+/// (the step at its size or half of it, or at the parabola's halving, or refused), it never codes
+/// the next regions higher than the material before the step, and the section's opening read is
+/// the standing material's; the held step crosses the learner's text.
 #[test]
 fn a_held_step_is_read_on_the_next_section() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
@@ -359,19 +398,12 @@ fn a_held_step_is_read_on_the_next_section() {
             let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions);
             let old = compared_on(&material);
             assert_eq!(next.change, code_of(&compared_on(&before.field)) - code_of(&old));
-            // The material that stands after the read: the material before the step where it was
-            // refused, else the step at its halvings; it codes the regions no higher than the
-            // material before the step, and one halving fewer coded them higher.
-            let at = held.halvings + next.halvings;
-            let standing = if next.refused { material.clone() } else { stepped(&material, &held.step, at).unwrap().0 };
-            if !next.refused {
-                assert!(!fewer_bits(&compared_on(&standing), &old), "the standing material codes the next regions no higher");
-            }
+            assert_eq!((next.halvings, next.refused), law_next(&material, &held.step, held.halvings, &regions));
+            let standing = if next.refused { material.clone() } else { stepped(&material, &held.step, held.halvings + next.halvings).unwrap().0 };
+            assert!(!fewer_bits(&compared_on(&standing), &old), "the standing material codes the next regions no higher");
             if next.halvings > 0 || next.refused {
                 halved += 1;
-                // The last halving that moved (a refusal ends at the first that moves nothing).
-                let last = at - 1;
-                assert!(fewer_bits(&compared_on(&stepped(&material, &held.step, last).unwrap().0), &old), "the halving before coded them higher");
+                assert!(fewer_bits(&compared_on(&before.field), &old), "the step at its size coded them higher");
             }
             // The section's opening read is the standing material's.
             assert_eq!(receipt.code_before, code_of(&compared_on(&standing)));
@@ -380,12 +412,14 @@ fn a_held_step_is_read_on_the_next_section() {
             assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
         }
     }
+    // On these sections the law stands steps at their size, at half, at the parabola's halving
+    // (five) and refuses others.
     assert!(read >= 4 && halved >= 1, "read {read} halved {halved}");
 }
 
-/// A held step that codes the next regions higher at every halving that still moves it is refused:
-/// the material before it stands, the opening read is that material's, and the read reports the
-/// halvings it tried, the last of which moved nothing.
+/// A held step that climbs the next regions' code is refused from two reads (its size and half
+/// of it), not halved until it moves nothing: the material before it stands and the opening read
+/// is that material's.
 #[test]
 fn a_step_that_codes_the_next_regions_higher_is_refused() {
     let material = shaped(1);
@@ -401,19 +435,70 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         learner.field = stepped(&material, &step, 0).unwrap().0;
         let climbed = compared_on(&learner.field);
         learner.held = Some(HeldStep { step: step.clone(), halvings: 0 });
-        let (faces, next) = learner.read_step_on(&regions, &mut HostField).unwrap();
+        let mut counted = Counted { reads: 0 };
+        let (faces, next) = learner.read_step_on(&regions, &mut counted).unwrap();
         let next = next.expect("a held step is read");
         assert!(next.refused, "k {k}: halvings {}", next.halvings);
+        assert_eq!((next.halvings, next.refused), law_next(&material, &step, 0, &regions));
+        assert!(counted.reads <= 4, "k {k}: {} reads", counted.reads);
         assert!(!learner.holds_step());
         assert_eq!(learner.field, material, "the material before the step stands");
         assert_eq!(faces, vec![material.faces(&regions[0]).unwrap()]);
         assert_eq!(next.change, code_of(&climbed) - code_of(&old));
         assert!(next.change > 0);
-        for h in 1..next.halvings {
-            let (candidate, moved) = stepped(&material, &step, h).unwrap();
-            assert!(moved && fewer_bits(&compared_on(&candidate), &old), "k {k}: halving {h} coded no higher");
+    }
+}
+
+/// The certificate reads its step's size by the same bounded law: a section deposits the step
+/// at the size the law stands it at on the section's own regions, strictly fewer bits, or none,
+/// and reads the regions at most three times for it after its opening read.
+#[test]
+fn the_certificate_reads_the_step_s_size_by_the_bounded_law() {
+    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = FieldLearner::new(field, 2);
+    let regions = [region()];
+    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions);
+    let (mut deposited, mut withheld) = (0, 0);
+    for k in 0..12 {
+        // The held step is read first; the certificate reads from the material that stands.
+        learner.held = None;
+        let opening = learner.field.clone();
+        let mut counted = Counted { reads: 0 };
+        let receipt = learner.section_realized(&regions, &mut counted).unwrap();
+        assert!(counted.reads <= 4, "section {k}: {} reads", counted.reads);
+        let mut step = vec![0i128; opening.theta.len()];
+        for &(start, len, grain) in opening.families() {
+            for i in start..start + len {
+                step[i] = deposit_step(learner.first[i], learner.second[i], grain, learner.rate_bits);
+            }
         }
-        assert!(!stepped(&material, &step, next.halvings).unwrap().1, "the refusal ends where the step moves nothing");
+        let old = compared_on(&opening);
+        assert_eq!((receipt.halvings, receipt.deposited), law_scale(&opening, &step, 0, &old, true, &regions), "section {k}");
+        if receipt.deposited {
+            deposited += 1;
+            assert_eq!(learner.field, stepped(&opening, &step, receipt.halvings).unwrap().0);
+            assert!(fewer_bits(&old, &compared_on(&learner.field)), "the deposit codes its section strictly fewer bits");
+        } else {
+            withheld += 1;
+            assert_eq!(learner.field, opening);
+        }
+    }
+    assert!(deposited >= 1, "deposited {deposited} withheld {withheld}");
+}
+
+/// The host realization, its reads counted.
+struct Counted {
+    reads: usize,
+}
+
+impl FieldRealization for Counted {
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        self.reads += 1;
+        field.read_and_return(regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        self.reads += 1;
+        field.read_faces(regions)
     }
 }
 

@@ -103,7 +103,9 @@ largest turned and still chart rows. The deposit is the tower's: the covector's 
 step at `2^(−k)`, halved until the section's own regions reread under it code strictly fewer bits
 (`fewer_bits`, exact cross products of the faces) or it moves nothing. The certified step is then
 held and read on the next section's regions, which it was not fit on (§11): where the stepped
-material codes them higher than the material before the step, it is halved again or refused.
+material codes them higher than the material before the step, it is read at half its size and, if
+that codes them higher too, at the halving the parabola through those two reads places lowest, or
+refused (§12).
 [agent-inferred] Each
 coordinate's moments open at its own first nonzero covector (`m = g`, `v = g²`) and move toward
 `g, g²` after it; a learner whose moments opened at the first section's mean would carry the
@@ -225,12 +227,13 @@ private read of whole releases).
    training tails meet every octave of their room; the commands train, rest, continue and release
    end to end. Since §11: the release orders by the question's news, not the share; problems
    released together are each problem's own release; a held step read on the next section leaves
-   material that codes it no higher than the material before the step, one halving fewer coded it
-   higher, and the section's opening read is the standing material's; a learner holding a step
+   the material the law decides (at its size, at half, at the parabola's halving, or refused), which
+   codes it no higher than the material before the step, and the section's opening read is the
+   standing material's; a learner holding a step
    does not widen, and the held step crosses the learner's text; the release's state resolves the
    ranked sites first and leaves one open; the withheld problems are in no section and are read
-   at the release's opening, the same regions every lap; a held step that codes the next regions
-   higher at every halving that moves it is refused and the material before it stands.
+   at the release's opening, the same regions every lap; a held step that climbs the next regions'
+   code is refused within four reads and the material before it stands.
 2. **Card parity.** The card's realization equals the host bit for bit (faces, codes, covector,
    learner) over 32 sections of GSM8K regions; its time per site is measured on the opening
    sections and projected before any learner run. [measured] Passed (acae723b6, receipts in
@@ -361,3 +364,71 @@ the held step, about 62 ms; a halving adds one read. A lap at A projects at abou
 
 The claim and its bar are unchanged: the first calculation from the question's numbers in at least
 24 of 128 releases, read on the same 15-minute reading. What follows each outcome is §8's.
+
+## 12. The second reading stopped in its first lap, on the held step's rereads
+
+[measured] The second reading (receipts in `…_receipts/reading-2/`, count-only; field_pass
+`2abf6f50…f5eb` at c846f15bc): the card's parity with every repaired read passed at A over 8
+sections and grown by two over 4, each with the withheld problems' read and batched releases
+(every read, face, covector, learner and release equal). time-field projected a lap at A at
+114.4 s, so the watcher's bound was 149 s a lap. It stopped the training inside its first lap,
+after 336 of 413 sections, at 150.0 s; no lap ended, so no state was written and nothing was
+released. The claim was not read.
+
+The cause, read from the 336 sections:
+
+| Reading | Value |
+|---|---|
+| Sections whose held step coded the next section higher | 131 of 334 read (7 of the first 49; 73 of the last 135) |
+| Rereads the halving took on them | 1,608; the step was refused on 26 |
+| Halvings at which the other 105 stood | 1 to 4 on 27, 5 or 6 on 2, 8 to 18 on 76 (12 or more, `2^(−12)` of its size or less, on 67) |
+| Time of those 131 sections | 101.1 s, against 49.0 s for the other 205 (239 ms each, inside the projection) |
+| The section's own code read before its deposit | 6.93 at the first, 3.3 to 3.5 by the last hundred |
+
+[agent-inferred] Two failures, both the lessons' own. The halving searched a step's size where its
+direction was the cause: a step that still codes the next regions higher at a twelfth halving
+raises their code to first order, and halving it further only shrinks it until rounding leaves
+nothing. And the projection timed eight opening sections, none of whose held steps coded the next
+section higher, so it never met the cost it was bounding: a run projected from a cost it did not
+read.
+
+The certificate carried the same search: a section's step was halved until it coded its own
+regions strictly fewer bits, and those halvings reached 9 to 18 on 14 of the 336 sections (16 on
+five, 18 on two). A located cause was repaired in one consumer and left in the other.
+
+**The repairs** (`scaled`, `FieldLearner::next_scale`, `FieldLearner::section_realized`,
+`field_train::train`, `field_parity::time`):
+- One law reads a step's size, for the held step on the next regions (no more bits) and for the
+  certificate on its own (strictly fewer bits). The step is read at its size and, where that does
+  not stand, at half its size. Where both code them higher, the excesses `e(1)`, `e(½)` over the material before the step
+  fix the parabola `e(μ) = aμ + bμ²` with `a = 4e(½) − e(1)`: with `a ≥ 0` the direction climbs
+  and the step is refused; with `a < 0` it is read once more at the largest halving at or below the
+  parabola's lowest point `μ* = −a/2b`, and stands there if it codes them no higher, else is
+  refused. For the held step at most four reads precede the opening read, and a refusal leaves
+  the material before the step, so the standing material still never codes the next regions
+  higher; the certificate makes at most three reads after the opening read, and a section whose
+  step stands at none of them deposits nothing. On the second reading's sections the held step's
+  halving took eight to nineteen rereads on 102 of the 131 steps (76 stood at eight or more
+  halvings, 26 were refused); the law decides each in at most two more reads.
+- The stepped material is read without its covector, and the opening read with the covector is
+  made once on the material that stands (a halved step's covector was read and discarded).
+- time-field times one more read of each timed section and projects a lap with every section's
+  reads and return at the worst measured time a pair and four more reads of it, the most the held
+  step's read and the certificate add to sections whose steps stood at their size: an upper bound
+  that holds whatever the steps do.
+- The training's bounds are its own. train-field takes the lap's bound before any growth and after
+  one, and the run's, and at the first section that ends past either it reads the pending step on
+  the withheld problems as a lap's end does, rests as `STATE.stopped` and stops (`FIELD_STOPPED`,
+  with the partial lap's code and its withheld read). The second reading's watcher stopped the
+  trainer from outside, so 336 sections of learning left no state; a stopped reading now releases
+  from where it stopped and is reported incomplete.
+
+Not adopted: lowering the rate. The tower's half-rate read (record of October 30, §45, acceptance
+76) traced its run-away to the step's size; here the harm is the direction on 102 of 131 sections,
+and the held step's read refuses exactly those, so the rate stays the founding's until a reading
+shows the refusals, not the rereads, are what holds the learner.
+
+The third reading's script is `…_receipts/reading-3/reading3.sh`, its bounds fixed from
+time-field's projections before launch.
+
+The claim and its bar are unchanged; the next reading is the same 15-minute reading.

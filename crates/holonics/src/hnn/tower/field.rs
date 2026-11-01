@@ -1174,8 +1174,9 @@ impl FieldRealization for HostField {
 
 /// [agent-inferred, November 1] A held step read on regions it was not fit on
 /// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
-/// code less the material's before the step, on `2^(−20)` bits), the further halvings the read
-/// took, and whether it refused the step.
+/// code less the material's before the step, on `2^(−20)` bits), the further halvings of the last
+/// size read ([`FieldLearner::next_scale`]: the step stands at them unless refused), and whether
+/// it refused the step.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FieldNext {
     pub change: i64,
@@ -1228,6 +1229,80 @@ fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> 
     Ok((candidate, moved))
 }
 
+/// What [`scaled`] read: the regions' code under the step at its size less `old`'s (on `2^(−20)`
+/// bits), the further halvings of the last size read, and the stepped material that stands with
+/// its faces (`None`: the step stands at no size read).
+struct Scaled {
+    change: i64,
+    halvings: u32,
+    standing: Option<(Field, Vec<Vec<Option<TowerFace>>>)>,
+}
+
+/// [definition; agent-inferred, November 1] **A step's size read in at most three reads**, the one
+/// law of the certificate ([`FieldLearner::section_realized`], `strict`: the stepped material must
+/// code the regions strictly fewer bits than `old`) and of the held step's read on the next
+/// regions ([`FieldLearner::next_scale`]: no more bits). The step `base − release(step, h0)` is
+/// read; where it stands, it stands. Otherwise it is read at half its size; where that stands, it
+/// stands halved. Otherwise the excess `e(μ)` of the regions' code over `old`'s at the step's
+/// fraction `μ` is read at `μ = 1` and `μ = ½`, and the parabola `e(μ) = aμ + bμ²` through them
+/// (`e(0) = 0`) has `a = 4e(½) − e(1)`, `b = 2e(1) − 4e(½)`: with `a ≥ 0` (or an excess the codes
+/// read at or below zero where the exact comparison did not stand) the step's direction raises the
+/// regions' code at every size the reads resolve, and it stands nowhere; with `a < 0` (then
+/// `b > 0`) the parabola is lowest at `μ* = −a/2b ≤ ¼`, and the step is read once more at the
+/// largest halving `2^(−h) ≤ μ*`, where the parabola is below zero, standing there or nowhere. A
+/// size that moves no entry stands nowhere.
+///
+/// Why bounded (the second reading, receipts `…_receipts/reading-2/`): halving until the step
+/// stood took 1,608 rereads of the next regions over 131 of 336 sections, 67 of the 105 halved
+/// steps standing only at `2^(−12)` of their size or less, and the certificate's own halvings
+/// reached 9 to 18 on 14 sections; their direction, not their size, raised the code, which the
+/// parabola reads from two reads where the halvings read it from a dozen.
+fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
+    let stands = |new: &[(u128, u128)]| if strict { fewer_bits(old, new) } else { !fewer_bits(new, old) };
+    let code_old = code_of(old);
+    let (full, moved) = stepped(base, step, h0)?;
+    if !moved {
+        return Ok(Scaled { change: 0, halvings: 0, standing: None });
+    }
+    let full_faces = realization.read_faces(&full, regions)?;
+    let at_full = compared(&full_faces, regions);
+    let change = code_of(&at_full) - code_old;
+    if stands(&at_full) {
+        return Ok(Scaled { change, halvings: 0, standing: Some((full, full_faces)) });
+    }
+    let nowhere = |halvings: u32| Scaled { change, halvings, standing: None };
+    let (half, moved) = stepped(base, step, h0 + 1)?;
+    if !moved {
+        return Ok(nowhere(1));
+    }
+    let half_faces = realization.read_faces(&half, regions)?;
+    let at_half = compared(&half_faces, regions);
+    if stands(&at_half) {
+        return Ok(Scaled { change, halvings: 1, standing: Some((half, half_faces)) });
+    }
+    // The parabola through the two excesses (on the codes' `2^(−20)` bits).
+    let (e1, e2) = (i128::from(change), i128::from(code_of(&at_half) - code_old));
+    let a = 4 * e2 - e1;
+    if e1 <= 0 || e2 <= 0 || a >= 0 {
+        return Ok(nowhere(1));
+    }
+    // `1/μ* = 2b/(−a) = (4e(1) − 8e(½))/(e(1) − 4e(½))`; `h` the least with `2^h ≥ 1/μ*`.
+    let (num, den) = (4 * e1 - 8 * e2, e1 - 4 * e2);
+    let mut h = 2u32;
+    while h < 127 && (den << h) < num {
+        h += 1;
+    }
+    let (candidate, moved) = stepped(base, step, h0 + h)?;
+    if !moved {
+        return Ok(nowhere(h));
+    }
+    let candidate_faces = realization.read_faces(&candidate, regions)?;
+    if stands(&compared(&candidate_faces, regions)) {
+        return Ok(Scaled { change, halvings: h, standing: Some((candidate, candidate_faces)) });
+    }
+    Ok(nowhere(h))
+}
+
 /// [definition; agent-inferred, November 1] **The field's learner**: the field, the covector's two
 /// moments and the step's rate `2^(−k)`. The deposit is the tower's ([`super::TowerLearner`]),
 /// with one difference: a coordinate's moments open at its own first nonzero covector (`m = g`,
@@ -1238,10 +1313,10 @@ fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> 
 ///
 /// **A step is held and read on the next regions** (the tower's acceptance 77,
 /// [`super::TowerLearner::next_section`], always declared here): a step certified on its own
-/// section is held, and the next section's regions are read under the material before it and under
-/// the stepped material; where the stepped material codes them higher the step is halved and read
-/// again against the material before it, until it codes them no higher (it stands, halved) or
-/// releases nothing (refused: the material before it stands). The moments stay as they moved. Why
+/// section is held, and the next section's regions are read under the material before it and its
+/// size read on them by the one bounded law of a step's size ([`scaled`]): it stands at its size,
+/// at half, or at the parabola's halving where it codes them no higher, or is refused (the
+/// material before it stands). The moments stay as they moved. Why
 /// (the first reading on the card, November 1): the certificate read only its own section, and
 /// the held-out answer code rose at the second lap and the third (5.38, 5.49, 6.18 bits a class)
 /// while the passage's own code fell every section; the tower had recorded this failure and its
@@ -1304,57 +1379,56 @@ impl FieldLearner {
     }
 
     /// The opening read of `regions` (with the covector when `returning`), after the held step,
-    /// if any, is read on them: the material before it read first, then the stepped material;
-    /// where the stepped material codes them higher, the step is halved against the material before
-    /// it, and the opening read is read again on the material that stands.
+    /// if any, is read on them ([`FieldLearner::next_scale`]): the material before it and the
+    /// stepped material read first, the material that stands decided, and the opening read read
+    /// on it (a read already made is not made again).
     fn open(&mut self, regions: &[Region], realization: &mut dyn FieldRealization, returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>, Option<FieldNext>)> {
-        let read = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>)> {
-            if returning {
-                let (faces, g) = realization.read_and_return(field, regions)?;
-                Ok((faces, Some(g)))
-            } else {
-                Ok((realization.read_faces(field, regions)?, None))
-            }
-        };
         let Some(held) = self.held.take() else {
-            let (faces, g) = read(&self.field, realization)?;
-            return Ok((faces, g, None));
+            return if returning {
+                let (faces, g) = realization.read_and_return(&self.field, regions)?;
+                Ok((faces, Some(g), None))
+            } else {
+                Ok((realization.read_faces(&self.field, regions)?, None, None))
+            };
         };
         let mut before = self.field.clone();
         for (slot, &q) in before.theta.iter_mut().zip(&held.step) {
             *slot = fit32(*slot as i128 + release(q, held.halvings), "a held step's material outgrew its 32-bit carrier")?;
         }
-        let old = compared(&realization.read_faces(&before, regions)?, regions);
-        let (faces, g) = read(&self.field, realization)?;
-        let stepped_faces = compared(&faces, regions);
-        let change = code_of(&stepped_faces) - code_of(&old);
-        if !fewer_bits(&stepped_faces, &old) {
-            return Ok((faces, g, Some(FieldNext { change, halvings: 0, refused: false })));
+        let (standing, faces, next) = Self::next_scale(&before, &held, regions, realization)?;
+        self.field = standing;
+        if returning {
+            let (faces, g) = realization.read_and_return(&self.field, regions)?;
+            return Ok((faces, Some(g), Some(next)));
         }
-        let mut halvings = held.halvings;
-        let refused = loop {
-            halvings += 1;
-            let (candidate, moved) = stepped(&before, &held.step, halvings)?;
-            if !moved {
-                break true;
-            }
-            let reread = compared(&realization.read_faces(&candidate, regions)?, regions);
-            if !fewer_bits(&reread, &old) {
-                self.field = candidate;
-                break false;
-            }
-        };
-        if refused {
-            self.field = before;
-        }
-        let (faces, g) = read(&self.field, realization)?;
-        Ok((faces, g, Some(FieldNext { change, halvings: halvings - held.halvings, refused })))
+        Ok((faces, None, Some(next)))
+    }
+
+    /// [definition; agent-inferred, November 1] **The held step read on regions it was not fit
+    /// on** (the tower's acceptance 77, `TowerLearner::next_section`): the regions are read under
+    /// the material before the step (`old`), and the step's size is read on them by [`scaled`]
+    /// against `old`, standing where it codes them no higher. A refused step leaves the material
+    /// before it, so the material that stands never codes the regions higher than `old`. At most
+    /// four reads of the regions are made before the opening read.
+    ///
+    /// Returns the material that stands, its faces, and the read.
+    #[allow(clippy::type_complexity)]
+    fn next_scale(before: &Field, held: &HeldStep, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<(Field, Vec<Vec<Option<TowerFace>>>, FieldNext)> {
+        let before_faces = realization.read_faces(before, regions)?;
+        let old = compared(&before_faces, regions);
+        let scale = scaled(before, &held.step, held.halvings, &old, false, regions, realization)?;
+        let next = FieldNext { change: scale.change, halvings: scale.halvings, refused: scale.standing.is_none() };
+        Ok(match scale.standing {
+            Some((field, faces)) => (field, faces, next),
+            None => (before.clone(), before_faces, next),
+        })
     }
 
     /// One section: the step the section before deposited read on its regions, then its regions
     /// read and returned on the material that stands, the moments moved, and the step deposited
-    /// where the regions reread under it code strictly fewer bits (the certificate halves it until
-    /// then, or until it moves nothing) and held for the next section.
+    /// at the size where the regions reread under it code strictly fewer bits ([`scaled`]: its
+    /// size, half, or the parabola's halving; none of them, no deposit) and held for the next
+    /// section.
     pub fn section(&mut self, regions: &[Region]) -> Result<FieldReceipt> {
         self.section_realized(regions, &mut HostField)
     }
@@ -1391,21 +1465,15 @@ impl FieldLearner {
                 step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
             }
         }
-        let mut halvings = 0u32;
-        loop {
-            let (candidate, moved) = stepped(&self.field, &step, halvings)?;
-            if !moved {
-                return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
-            }
-            let faces_new = compared(&realization.read_faces(&candidate, regions)?, regions);
-            if fewer_bits(&faces_old, &faces_new) {
-                let code_after = code_of(&faces_new);
-                self.field = candidate;
-                self.held = Some(HeldStep { step, halvings });
-                return Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next });
-            }
-            halvings += 1;
-        }
+        let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
+        let halvings = scale.halvings;
+        let Some((candidate, faces_new)) = scale.standing else {
+            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
+        };
+        let code_after = code_of(&compared(&faces_new, regions));
+        self.field = candidate;
+        self.held = Some(HeldStep { step, halvings });
+        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
     }
 
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
