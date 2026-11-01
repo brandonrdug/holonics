@@ -216,9 +216,10 @@ fn covector_matches_the_codes_difference() {
 
 /// [definition; agent-inferred, November 1] **The falloff is the medium's distance** (the
 /// dispersing field's §2.3): with every word zero (so every site shares one class and meets every
-/// other) a row's weight at `j` is `2^(40 − ⌊log₂ |i − j|⌋)` exactly, the octave of the distance
-/// and nothing else; so even a still field with its strand contacts silent reads the order of its
-/// classes.
+/// other, every source known) a row's terms differ by the octave of their distance and nothing else,
+/// `p_j 2^⌊log₂ |i − j|⌋` one value across the row's sources to the shares' rounding (§14.11: each term
+/// keeps its own exponent); so even a still field with its strand contacts silent reads the order of
+/// its classes.
 #[test]
 fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
     let mut field = silent_contacts(shaped(2));
@@ -233,9 +234,9 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
         for (hi, row) in cell.rows.iter().enumerate() {
             let i = hi % classes.len();
             assert_eq!(row.len(), classes.len() - 1, "every site meets every other where the words are one class");
-            for &(j, e) in row {
-                assert_eq!(e, 1u64 << (WEIGHT_BITS - octave(i.abs_diff(j as usize))), "site {i} source {j}");
-            }
+            let scaled: Vec<u128> = row.iter().map(|&(j, p)| (p as u128) << octave(i.abs_diff(j as usize))).collect();
+            let (low, high) = (*scaled.iter().min().unwrap(), *scaled.iter().max().unwrap());
+            assert!(high - low <= 1 << 10, "site {i}: the terms differ by their octaves alone: {scaled:?}");
         }
     }
     assert_eq!([1usize, 2, 3, 4, 5, 7, 8, 1000].map(octave), [0, 1, 1, 2, 2, 2, 3, 9]);
@@ -249,12 +250,12 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
 
 /// [definition; agent-inferred, November 1] **The class lists and the support** (§2.5, §12): each
 /// site's class is its unframed word's shells over the head's first `b` modes; the lists are a stable
-/// counting sort, each class's known sites first; a site's support is its near field and its class
-/// past it where it or the class-mate is known, each site once, never itself, and symmetric.
+/// counting sort, each class's definite sites first; a site's support is its near field and the
+/// definite members of its class past it, each site once, never itself (§14.1: directional).
 #[test]
 fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
-    let known: Vec<bool> = (0..14).map(|t| t % 3 != 1).collect();
-    let lists = ClassLists::of(vec![2, 0, 2, 1, 0, 2, 3, 2, 0, 2, 2, 1, 0, 2], known.clone(), 4);
+    let definite: Vec<bool> = (0..14).map(|t| t % 3 != 1).collect();
+    let lists = ClassLists::of(vec![2, 0, 2, 1, 0, 2, 3, 2, 0, 2, 2, 1, 0, 2], definite.clone(), 4);
     assert_eq!(lists.off, vec![0, 2, 4, 6, 6, 10, 13, 14, 14]);
     assert_eq!(lists.members, vec![8, 12, 1, 4, 3, 11, 0, 2, 5, 9, 7, 10, 13, 6]);
     for i in 0..14 {
@@ -265,16 +266,15 @@ fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
         assert_eq!(sorted.len(), support.len(), "each site once");
         assert!(!support.contains(&i));
         for j in 0..14 {
-            let meets = j != i && (i.abs_diff(j) < NEAR || (lists.class[i] == lists.class[j] && (known[i] || known[j])));
+            let meets = j != i && (i.abs_diff(j) < NEAR || (lists.class[i] == lists.class[j] && definite[j]));
             assert_eq!(support.contains(&j), meets, "site {i} source {j}");
-            assert_eq!(meets, lists.support(j).any(|k| k == i), "symmetric");
         }
     }
-    // Far contacts are bipartite: unknown class-mates past the near field never meet each other, and an
-    // unknown site meets its known class-mates wherever they stand.
+    // Only the plates radiate far: past the near field a site hears the definite members of its class,
+    // whatever its own state, and a soft or unreached source is heard by none.
     let lists = ClassLists::of(vec![1u32; 20], (0..20).map(|t| t == 15).collect(), 3);
     assert_eq!(lists.support(2).collect::<Vec<_>>(), vec![1, 3, 0, 4, 5, 6, 7, 15]);
-    assert!(lists.support(15).any(|k| k == 2) && !lists.support(2).any(|k| k == 12));
+    assert!(!lists.support(15).any(|k| k == 2) && !lists.support(2).any(|k| k == 12));
     assert_eq!([(2, 0), (-2, 1), (0, 0), (5, -5), (-5, 5), (6, 5), (-6, 5), (1, -2)].map(|(re, im)| shell(re, im)), [2, 0, 1, 1, 1, 2, 0, 1], "the plates where the in-phase part dominates, the bridge on and inside the light cone");
     // The field's own classes are its words' shells.
     for still in [0usize, 1, 2] {
@@ -294,7 +294,7 @@ fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
             let m = d.complex();
             for h in 0..d.heads {
                 let class: u32 = (0..d.class_trits()).map(|li| 3u32.pow(li as u32) * shell(q[h * d.modes + li], q[m + h * d.modes + li])).sum();
-                assert_eq!((cell.classes[h].class[t], cell.classes[h].known[t]), (class, !OPEN[t]), "still {still} head {h} site {t}");
+                assert_eq!((cell.classes[h].class[t], cell.classes[h].definite[t]), (class, !OPEN[t]), "still {still} head {h} site {t}");
             }
         }
     }
@@ -302,8 +302,8 @@ fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
 
 /// [definition; agent-inferred, November 1] **The one-word contact is reciprocal** (§2.1, §12): with
 /// `q = k` the score is the real part of a Hermitian form, carried by a skin decay of the pair's
-/// distance alone, so `z_ij = z_ji` exactly at every met pair of every head and tick, and each row's
-/// weights are `2^(z_ij − peak_i)` over its support.
+/// distance alone, so `z_ij = z_ji` exactly at every met pair of every head and tick; and each row's
+/// shares (its sources' and its crowds') sum to its whole `2^63` to their rounding.
 #[test]
 fn the_one_word_contact_is_reciprocal() {
     for still in [0usize, 1, 2] {
@@ -323,11 +323,12 @@ fn the_one_word_contact_is_reciprocal() {
                 };
                 for i in 0..sites {
                     let row = &cell.rows[h * sites + i];
-                    let peak = row.iter().map(|&(j, _)| z(i, j as usize)).max().unwrap();
-                    for &(j, e) in row {
+                    for &(j, _) in row {
                         assert_eq!(z(i, j as usize), z(j as usize, i), "still {still} head {h} pair {i} {j}");
-                        assert_eq!(e, release(field.exponential.below_one(z(i, j as usize) - peak) as i128, WEIGHT_BITS_FROM) as u64);
                     }
+                    let total: i128 = row.iter().map(|&(_, p)| p as i128).sum::<i128>() + cell.crowds[h * sites + i].iter().map(|c| c.e as i128).sum::<i128>();
+                    let terms = (row.len() + cell.crowds[h * sites + i].len()) as i128;
+                    assert!((total - (1i128 << SHARE_BITS)).abs() <= terms, "still {still} head {h} site {i}: shares {total}");
                 }
             }
         }
@@ -402,187 +403,106 @@ fn regions_sum_in_any_order() {
     assert_eq!(reversed, g);
 }
 
-/// The release the law makes of one problem, sweep by sweep (the doc of [`Field::release`]), read
-/// through `logits`: the opening reads every answer site open, the earliest resolved void bounds the
-/// answer and each content site opens at rest on its opening face; every sweep then moves each site's
-/// momentum and logits from the face read with every content site on its mixture over the content
-/// classes, the pump doubles after a sweep whose change fell below the last at its rung, a site locks
-/// where its top held a majority through the sweep, each sweep writes a site's trit, and the problem
-/// ends when every site is locked.
-fn law_release_with(field: &Field, question: &[usize], answer: usize, sweeps: usize, void: usize, logits: &mut dyn FnMut(&Region) -> Vec<Option<Vec<i64>>>) -> Released {
-    let a = field.declaration.alphabet;
-    let start = question.len();
-    let mut classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
-    let open: Vec<bool> = (0..classes.len()).map(|t| t >= start).collect();
-    let z = logits(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[] });
-    let end = (start..classes.len()).find(|&t| resolved(&field.tempered(z[t].as_ref().unwrap(), 1)) == Some(void));
-    if let Some(end) = end {
-        classes.truncate(end + 1);
-    }
-    let content = end.unwrap_or(classes.len());
-    let n = content - start;
-    let mut l: Vec<Vec<i64>> = (start..content).map(|t| z[t].clone().unwrap()).collect();
-    let mut m = vec![vec![0i64; a]; n];
-    let (mut locked, mut lock_sweep, mut trits, mut overturns) = (vec![None; n], vec![None; n], vec![Vec::new(); n], 0usize);
-    let (mut beta, mut swept, mut last, mut ridden) = (1u64, (1u64, 1usize), None, vec![(1u64, 1usize)]);
-    let mut faces: Vec<Option<Shares>> = vec![None; classes.len()];
-    for s in 0..n {
-        faces[start + s] = Some(shares(&field.content_face(&l[s], beta, void)));
-    }
-    for done in 1..sweeps {
-        if n == 0 || locked.iter().all(Option::is_some) {
-            break;
-        }
-        let open: Vec<bool> = (0..classes.len()).map(|t| t >= start && t < content).collect();
-        let z = logits(&Region { classes: &classes, unresolved: &open, faces: &faces, locked: &[] });
-        if swept.0 != beta {
-            swept = (beta, done);
-        }
-        let mut change = 0u64;
-        for s in 0..n {
-            let zt = z[start + s].as_ref().unwrap();
-            let before = field.content_face(&l[s], beta, void);
-            for c in 0..a {
-                m[s][c] = release(m[s][c] as i128, 1) as i64 + zt[c] - l[s][c];
-                l[s][c] += m[s][c];
-            }
-            let after = field.content_face(&l[s], beta, void);
-            change += moved(&shares(&before), &shares(&after), a);
-            let holds = resolved(&before) == Some(top(&before)) && resolved(&after) == Some(top(&after)) && top(&before) == top(&after);
-            locked[s] = if holds { locked[s].or(Some(beta)) } else { None };
-            lock_sweep[s] = if holds { lock_sweep[s].or(Some(done)) } else { None };
-            let trit = if holds { 1 } else if top(&before) != top(&after) { -1 } else { 0 };
-            trits[s].push(trit);
-            overturns += usize::from(trit < 0);
-        }
-        let all = locked.iter().all(Option::is_some);
-        if !all && last.is_some_and(|c| change < c) && beta < PUMP_TOP {
-            beta *= 2;
-            last = None;
-        } else {
-            last = Some(change);
-        }
-        match ridden.last_mut() {
-            Some((b, k)) if *b == beta => *k += 1,
-            _ => ridden.push((beta, 1)),
-        }
-        for s in 0..n {
-            faces[start + s] = Some(shares(&field.content_face(&l[s], beta, void)));
-        }
-    }
-    let joint = Joint { classes, start, content, logits: l, momentum: m, locked, lock_sweep, trits, overturns, faces, beta, swept, change: last, ridden, done: false };
-    joint.released(void)
+/// A logits read for a fixture: each unresolved site's face from `face(t, region)`.
+fn read_with(face: &dyn Fn(usize, &Region) -> Vec<i64>) -> impl Fn(&[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> + '_ {
+    move |rs: &[Region]| Ok(rs.iter().map(|r| (0..r.classes.len()).map(|t| r.unresolved[t].then(|| face(t, r))).collect()).collect())
 }
 
-fn law_release(field: &Field, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Released {
-    law_release_with(field, question, answer, sweeps, void, &mut |r| field.logits(r).unwrap())
-}
-
-/// The release is the law sweep by sweep, the same on every call, and never releases the void inside
-/// the extent.
+/// [definition; agent-inferred, November 1] **The front** (§14.3–§14.5) on a fixture whose sites read
+/// class 2 before the answer's eighth site and the void from it: the answer's first five sites are
+/// reached at the opening, beside the question, ride their momentum from rest on that face and lock at
+/// their own rungs; each lock reaches the sites within its near field at the next sweep; the extent is
+/// read where the front first locks the void (the eighth site), the sites past it leave, and every
+/// site inside it locks at class 2. Reached is distance from a definite surface, never sureness.
 #[test]
-fn the_release_is_the_pumped_law() {
-    let question = [1usize, 4, 0, 2];
-    for still in [0usize, 1] {
-        let field = shaped(still);
-        for sweeps in [1usize, 2, 3, 6, 24] {
-            let once = field.release(&question, 5, sweeps, 0).unwrap();
-            assert_eq!(once, law_release(&field, &question, 5, sweeps, 0), "still {still} sweeps {sweeps}");
-            assert_eq!(field.release(&question, 5, sweeps, 0).unwrap(), once);
-            assert!(once.sites.len() <= 5 && once.sites.iter().all(|&c| c != Some(0)));
-            assert_eq!(once.trits.iter().map(|t| t.iter().filter(|&&x| x < 0).count()).sum::<usize>(), once.free);
-        }
-    }
-}
-
-/// [definition; agent-inferred, November 1] **The momentum and the pump on a fixture** (§4): every
-/// open site reads one face `z⁰` at the opening and another `z` from then on, so with `μ = ½` its
-/// logits, opened at rest on `z⁰`, ride `z, z + Δ/2, z + Δ/4, z − Δ/8, …` (`Δ = z − z⁰`), a damped
-/// oscillation about `z` (`ℓ − z` steps by `[[0, ½], [−1, ½]]`); the change falls once the
-/// oscillation tempers, so the pump doubles; every site locks at its top class together, each lock's
-/// counter its runner-up, and the locks held through the last rung are its bound circulation.
-#[test]
-fn the_momentum_rides_through_and_the_pump_rises_as_the_change_tempers() {
+fn the_answer_grows_from_the_question_and_its_extent_is_read_at_the_front() {
     let field = shaped(1);
     let (void, question) = (0usize, [3usize, 1]);
-    let z0: Vec<i64> = vec![0, 3 << 16, 1 << 16, 1 << 16, 0];
-    let zt: Vec<i64> = vec![0, 2 << 16, 3 << 16, 1 << 16, 0];
-    let read = |r: &Region| -> Vec<Option<Vec<i64>>> { (0..r.classes.len()).map(|t| r.unresolved[t].then(|| if r.faces.is_empty() { z0.clone() } else { zt.clone() })).collect() };
+    let start = question.len();
+    let face = |t: usize, _: &Region| if t >= start + 7 { vec![3 << 16, 0, 0, 0, 0] } else { vec![0, 1 << 16, 3 << 16, 0, 0] };
     let mut seen = Vec::new();
-    let released = field.release_with(&[(&question, 3)], 16, void, &mut |rs| Ok(rs.iter().map(read).collect()), &mut |s| {
+    let released = field.release_with(&[(&question, 20)], 64, void, &mut read_with(&face), &mut |s| {
         seen.push(*s);
         true
     }).unwrap().remove(0);
-    assert_eq!(released, law_release_with(&field, &question, 3, 16, void, &mut |r| read(r)));
-    // The logits after k sweeps from rest on z⁰: z, then z + Δ/2, z + Δ/4, z − Δ/8 (each an exact
-    // halving), Δ = z − z⁰ = 2 at class 2.
-    let (mut l, mut m) = (z0.clone(), vec![0i64; 5]);
-    let mut rode = Vec::new();
-    for _ in 0..4 {
-        for c in 0..5 {
-            m[c] = release(m[c] as i128, 1) as i64 + zt[c] - l[c];
-            l[c] += m[c];
-        }
-        rode.push(l[2]);
-    }
-    assert_eq!(rode, vec![3 << 16, 4 << 16, 7 << 15, 11 << 14]);
-    assert_eq!(released.sites, vec![Some(2); 3], "every site locks at its top class");
-    assert_eq!(released.open, 0);
-    assert!(released.rungs.iter().all(|&b| b == released.rungs[0]), "they lock together, at one rung: {:?}", released.rungs);
-    assert!(released.counters.iter().all(|c| c.is_some_and(|(runner, margin)| runner == 1 && margin > 0)), "{:?}", released.counters);
-    assert_eq!(released.free, 3, "each site's top overturned once, at the first sweep");
-    assert!(released.trits.iter().all(|t| t[0] == -1 && *t.last().unwrap() == 1));
-    assert_eq!(seen.last().unwrap().live, 0);
+    assert_eq!(released.sites, vec![Some(2); 7], "{released:?}");
+    assert_eq!(released.extent.map(|(site, _, bound)| (site, bound)), Some((7, false)));
+    assert!(released.reached[..5].iter().all(|&r| r == Some(0)), "the first five beside the question: {:?}", released.reached);
+    assert!(released.reached.windows(2).all(|w| w[0] <= w[1]), "the front only grows outward");
+    assert!(released.reached[5..].iter().all(|&r| r > Some(0)), "the rest only once a lock reaches them");
+    assert!(released.lock_sweeps.iter().zip(&released.reached).all(|(l, r)| l > r), "a site moves only after it is reached");
+    assert!(seen.iter().all(|s| s.front <= 20) && seen.last().unwrap().live == 0);
+    // Determinism, and the release of k sweeps is the release stopped after k.
+    assert_eq!(field.release_with(&[(&question, 20)], 64, void, &mut read_with(&face), &mut |_| true).unwrap().remove(0), released);
 }
 
-/// A frustrated answer is reported, never forced: two sites each read as the other's opposite keep
-/// overturning, so they never lock, their free circulation counts every overturn, and they are
-/// released open; read as their own copies, they lock.
+/// No void locks: the front reaches the answer's bound, and the extent is the bound, said so.
 #[test]
-fn a_frustrated_answer_circulates_and_is_released_open() {
+fn an_extent_with_no_void_is_the_bound() {
     let field = shaped(1);
     let (void, question) = (0usize, [3usize, 1]);
-    // Each open answer site reads the top of the other answer site's mixture and answers the other
-    // class of {1, 2}; at the opening (nothing carried) both read 1; past them the void.
-    let flip = |r: &Region| -> Vec<Option<Vec<i64>>> {
-        (0..r.classes.len())
-            .map(|t| {
-                if !r.unresolved[t] {
-                    return None;
-                }
-                if t >= 4 {
-                    return Some(vec![9 << 16, 0, 0, 0, 0]);
-                }
-                let other = if t == 2 { 3 } else { 2 };
-                let top = r.faces.get(other).and_then(Option::as_ref).map(|f| f.iter().max_by_key(|&&(_, w)| w).unwrap().0);
-                Some(if top == Some(1) { vec![0, 0, 6 << 16, 0, 0] } else { vec![0, 6 << 16, 0, 0, 0] })
-            })
-            .collect()
-    };
-    let mut last = ReleaseSweep::default();
-    let released = field.release_with(&[(&question, 4)], 40, void, &mut |rs| Ok(rs.iter().map(flip).collect()), &mut |s| {
-        last = *s;
-        true
-    }).unwrap().remove(0);
-    assert_eq!(released, law_release_with(&field, &question, 4, 40, void, &mut |r| flip(r)));
-    assert_eq!((last.cut, last.cut_sites, last.done), (1, 2, 40), "{last:?}");
-    assert_eq!(released.sites, vec![None, None], "never forced into a class");
-    assert_eq!((released.open, released.bound), (2, 0), "{released:?}");
-    assert!(released.free >= 2 * 20, "{released:?}");
-    assert_eq!(last.live, 1);
-    let agree = |r: &Region| -> Vec<Option<Vec<i64>>> { (0..r.classes.len()).map(|t| r.unresolved[t].then(|| if t >= 4 { vec![9 << 16, 0, 0, 0, 0] } else { vec![0, 0, 6 << 16, 0, 0] })).collect() };
-    let released = field.release_with(&[(&question, 4)], 40, void, &mut |rs| Ok(rs.iter().map(agree).collect()), &mut |s| {
-        last = *s;
-        true
-    }).unwrap().remove(0);
-    assert_eq!((released.sites.clone(), released.open, released.free, last.live), (vec![Some(2), Some(2)], 0, 0, 0));
-    assert_eq!(released.bound, 2, "both locks held through the only rung");
+    let face = |_: usize, _: &Region| vec![0, 1 << 16, 3 << 16, 0, 0];
+    let released = field.release_with(&[(&question, 12)], 64, void, &mut read_with(&face), &mut |_| true).unwrap().remove(0);
+    assert_eq!(released.extent.map(|(site, _, bound)| (site, bound)), Some((12, true)));
+    assert_eq!(released.sites, vec![Some(2); 12]);
 }
 
-/// A site carried as a mixture of one class opens exactly as the site resolved to that class: the
-/// mixture of one row at the whole share is the row. A carried site holds nothing for the closure, and
-/// an unresolved site carried so is read beside the rest exactly as the region with that site's
-/// opening resolved reads them.
+/// [definition; agent-inferred, November 1] **Each site keeps its own clock** (§14.4): a site whose
+/// read flips with its neighbour's top never holds a majority through a sweep, so it never locks, its
+/// own pump holds where its change does not fall, its overturns are the free circulation, the front
+/// holds where nothing locks, and it is released open; read as its own copy, it locks.
+#[test]
+fn a_frustrated_site_holds_the_front_and_is_released_open() {
+    let field = shaped(1);
+    let (void, question) = (0usize, [3usize, 1]);
+    let start = question.len();
+    // The answer's first two sites each read the other's top and answer the other class of {1, 2}
+    // (on the unresolved row, the other reads as 1); every other site reads 2.
+    let flip = |t: usize, r: &Region| {
+        if t != start && t != start + 1 {
+            return vec![0, 0, 6 << 16, 0, 0];
+        }
+        let other = if t == start { start + 1 } else { start };
+        match r.faces.get(other).and_then(Option::as_ref).map(|f| f.iter().max_by_key(|&&(_, w)| w).unwrap().0) {
+            Some(1) => vec![0, 0, 6 << 16, 0, 0],
+            _ => vec![0, 6 << 16, 0, 0, 0],
+        }
+    };
+    let mut last = ReleaseSweep::default();
+    let released = field.release_with(&[(&question, 8)], 40, void, &mut read_with(&flip), &mut |s| {
+        last = *s;
+        true
+    }).unwrap().remove(0);
+    assert_eq!(released.sites[..2], [None, None], "never forced into a class: {released:?}");
+    assert!(released.free >= 10, "{released:?}");
+    assert_eq!(last.done, 40);
+    assert_eq!(released.trits[0].iter().filter(|&&t| t < 0).count() + released.trits[1..].iter().map(|t| t.iter().filter(|&&x| x < 0).count()).sum::<usize>(), released.free);
+}
+
+/// The release of `k` sweeps is the release its exterior stops after `k`.
+#[test]
+fn a_release_stopped_by_its_exterior_is_the_release_of_the_sweeps_it_ran() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
+    for k in 1..=4 {
+        let mut asked = Vec::new();
+        let stopped = field.release_realized(&problems, 9, 0, &mut HostField, &mut |s| {
+            asked.push(*s);
+            s.done < k
+        }).unwrap();
+        let ran = asked.last().unwrap().done;
+        assert!(ran <= k);
+        for (&(q, a), released) in problems.iter().zip(&stopped) {
+            assert_eq!(&field.release(q, a, ran, 0).unwrap(), released, "stopped after {ran} sweeps");
+        }
+    }
+}
+
+/// A site carried as a mixture of one class and locked opens and radiates exactly as the site resolved
+/// to that class: the mixture of one row at the whole share is the row, and a lock is definite. A
+/// carried site holds nothing for the closure, and an unresolved site carried so is read beside the
+/// rest exactly as the region with that site's opening resolved reads them.
 #[test]
 fn a_carried_face_of_one_class_opens_as_that_class() {
     for still in [0usize, 1, 2] {
@@ -591,14 +511,20 @@ fn a_carried_face_of_one_class_opens_as_that_class() {
         let mut carried: Vec<Option<Shares>> = vec![None; CLASSES.len()];
         carried[2] = Some(vec![(0, 1 << STATE_BITS)]);
         carried[5] = Some(vec![(3, 1 << STATE_BITS)]);
-        let as_faces = Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[] };
+        // Locked, a carried site is definite as a known one is (§14.1), so it is heard alike.
+        let mut locked = [false; 7];
+        locked[2] = true;
+        locked[5] = true;
+        let as_faces = Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &locked };
         assert_eq!(field.faces(&as_faces).unwrap(), field.faces(&r).unwrap(), "still {still}");
-        // An unresolved site carried as one class opens on it and is still read.
+        assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &locked }).is_err(), "a lock on a site that carries no face");
+        // An unresolved site carried as one class, locked, opens on it and is still read.
         let mut at_open = carried.clone();
         at_open[1] = Some(vec![(4, 1 << STATE_BITS)]);
+        locked[1] = true;
         let mut resolved_open = OPEN;
         resolved_open[1] = false;
-        let read = field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &at_open, locked: &[] }).unwrap();
+        let read = field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &at_open, locked: &locked }).unwrap();
         let resolved = field.faces(&Region { classes: &CLASSES, unresolved: &resolved_open, faces: &[], locked: &[] }).unwrap();
         assert!(read[1].is_some());
         for t in (0..CLASSES.len()).filter(|&t| t != 1) {
@@ -679,59 +605,6 @@ fn releases_read_together_are_each_problem_s_own() {
     for (&(q, a), released) in problems.iter().zip(&together) {
         assert_eq!(&field.release(q, a, 3, 0).unwrap(), released);
     }
-}
-
-/// The void bounds the answer once, at the opening: a read whose void resolves at every site past
-/// the fifth bounds the answer there, every later read is of the bounded region (five content sites
-/// and the boundary), and the content locks.
-#[test]
-fn the_extent_bounds_the_answer_at_the_opening() {
-    let field = shaped(1);
-    let (void, start, answer) = (0usize, 2usize, 9usize);
-    let question = [3usize, 1];
-    let mut lengths = Vec::new();
-    let mut read = |regions: &[Region]| -> Result<Vec<Vec<Option<Vec<i64>>>>> {
-        lengths.extend(regions.iter().map(|r| r.classes.len()));
-        Ok(regions.iter().map(|r| (0..r.classes.len()).map(|t| r.unresolved[t].then(|| if t >= start + 5 { vec![3 << 16, 0, 0, 0, 0] } else { vec![1 << 16, 0, 2 << 16, 0, 0] })).collect()).collect())
-    };
-    let mut last = ReleaseSweep::default();
-    let released = field.release_with(&[(&question, answer)], 64, void, &mut read, &mut |s| {
-        last = *s;
-        true
-    }).unwrap();
-    assert_eq!(released[0].sites, vec![Some(2); 5]);
-    assert_eq!((last.cut, last.cut_sites, last.live, last.open), (1, 5, 0, 0), "{last:?}");
-    assert_eq!(lengths[0], start + answer, "the opening reads the whole extent");
-    assert!(lengths[1..].iter().all(|&n| n == start + 6), "{lengths:?}");
-}
-
-/// The exterior that stops a release after `k` sweeps receives the release of `k` sweeps; it is
-/// asked before every sweep and once after the last, and every problem ends locked or reported with
-/// its open sites.
-#[test]
-fn a_release_stopped_by_its_exterior_is_the_release_of_the_sweeps_it_ran() {
-    let field = shaped(1);
-    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
-    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
-    for k in 1..=3 {
-        let mut asked = Vec::new();
-        let stopped = field.release_realized(&problems, 7, 0, &mut HostField, &mut |s| {
-            asked.push(*s);
-            s.done < k
-        }).unwrap();
-        let ran = asked.last().unwrap().done;
-        assert!(ran <= k);
-        for (&(q, a), released) in problems.iter().zip(&stopped) {
-            assert_eq!(&field.release(q, a, ran, 0).unwrap(), released, "stopped after {ran} sweeps");
-        }
-    }
-    let mut last = ReleaseSweep::default();
-    let all = field.release_realized(&problems, 64, 0, &mut HostField, &mut |s| {
-        last = *s;
-        true
-    }).unwrap();
-    assert_eq!(last.live, all.iter().filter(|r| r.open > 0).count(), "{last:?}");
-    assert_eq!(last.open, all.iter().map(|r| r.open).sum::<usize>());
 }
 
 /// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
@@ -990,8 +863,7 @@ fn the_founding_is_the_pair_s_likeness() {
     }
 }
 
-/// No site meets itself: no row's support holds its own site, and the peak of its row is read over
-/// the others (some other site carries the whole of the peak, `2^40` on `2^(−40)`).
+/// No site meets itself: no row's support holds its own site, and the row's shares are the others'.
 #[test]
 fn no_site_meets_itself() {
     for still in [0usize, 1, 2] {
@@ -1001,7 +873,7 @@ fn no_site_meets_itself() {
         for cell in &pass.ticks {
             for (hi, row) in cell.rows.iter().enumerate() {
                 assert!(row.iter().all(|&(j, _)| j as usize != hi % sites), "still {still} row {hi}");
-                assert_eq!(row.iter().map(|&(_, e)| e).max().unwrap(), 1u64 << WEIGHT_BITS, "the peak is another site's, at the weights' whole grain");
+                assert!(row.iter().any(|&(_, p)| p > 0), "some other site carries a share");
             }
         }
     }
