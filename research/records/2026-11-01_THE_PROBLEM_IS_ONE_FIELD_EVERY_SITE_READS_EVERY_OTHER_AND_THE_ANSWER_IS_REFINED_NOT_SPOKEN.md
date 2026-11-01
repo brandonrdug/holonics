@@ -1200,3 +1200,8 @@ release-state regions resolve the same order at the true classes. The next law f
   returns itself);
 - frustration, the part that does not close, is reported and kept open rather than forced;
 - training meets the same states.
+
+[definition; agent-inferred] **Superseded before it was built.** The joint state above still reread
+every site beside every other in one tick, which is the global pass of the contact, not a medium.
+The law that replaces the contact, the release and the release-state training is in
+[the dispersing field](2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP.md).
