@@ -766,3 +766,131 @@ beside it.
 Owner `hnn::tower::field` and `field.cu` (the grouped row); atlas rows with them. The grouped row's
 equality with the exact normalized exponential is owed to #410.
 
+
+## 15. Faces are kept whole: a site carries its moment, each mode keeps its own row, a read leaves its echo out, and the release's clock is read
+
+[definition; agent-inferred, November 1] Brandon's lens of the evening (paraphrased): a face is lock
+and key, the way a canyon's face is read for the rains that carved it without the whole history; a
+numeral's binary places are a face, a vector or matrix, and never one denominator; a byte or a token is
+a pointer into phases and modes, and inside the machine only that geometry moves; there is information
+in the temporal distribution and its gaps; and a falling code or an answer that lands now and then is no
+promise: the output must visibly reconfigure from general patterns, with similar problems handled
+alike. Read against the built field, four defects are real, and each breaks a law the repository
+already states. They are repaired in this build, before any run.
+
+### 15.1 A site carries its helical moment; its byte is only a pointer
+
+The field opens a site on its byte's row and its two neighbours' rows (§2.1), and its module says so:
+there is no clock between sites. The helical code says every Holon carries its phase-carried moment
+(`navigator.source-moment`, formal-checked in `Transport/SourceMoment`; `hnn.ring-moment-keys`). With
+the pointer alone a number is never a face: `48` is two rows, and `48` in the question and `48` in a
+calculation share nothing a contact can fit except byte against byte. The tower had the moment, and on
+the generated terrain it coded unseen results within 0.1 bits of seen ones (the October 23 terrain
+record); the field's own module names the cause it walked away from instead of repairing: the founded
+units spelled one number differently in two places.
+
+```text
+moment   s_t,m = Σ_(k ≤ t) ζ_m^(t−k) D_m(t−k) E_m(u_k)      a turned mode, ζ_m = e^(2πi/n_m), D_m its skin;
+                                                            the backward strand likewise over k ≥ t
+open     x⁰_t = the still word E(u_t) + E₋ + E₊ (§2.1), beside the moments s_t,m
+span     f_(i,j],m = s_j,m − ζ_m^(j−i) D_m(j−i) s_i,m = Σ_(i<k≤j) ζ_m^(j−k) D_m(j−k) E_m(u_k)
+```
+
+- The span's face does not depend on where the span stands (`D` is exponential, so the transport
+  composes). The same digits in the question and in a calculation have the same face under any
+  segmentation, which repairs the units' cause. No unit is authored or founded: a contact reads a span
+  through its two boundaries (Stokes, `⟨dȞ,H⟩ = ⟨Ȟ,∂H⟩`).
+- A head's value is linear in the moment (never normalized before it), so two heads' currents returned
+  with opposite signs through `O` form a span's face.
+- Superposing and filtering (Brandon's lens of 17:02): the moment is the superposition, every source
+  at its skin and none selected; the contact is the filter, the sparse binding. The field had only the
+  filter.
+- Exact: the moment's near part term by term, its far part through §14.10's octave crowds in the
+  absolute frame (prefix sums of `ζ^(−k) E(u_k)`, blurred at `D(2^ℓ)`); integer sums in any order.
+  The answer's moments are recomputed each sweep as its sites' mixtures change.
+- The pair contact is founded as the complex product per mode, `a_m b_m`, so two ring faces compose by
+  adding their phases: the one face law `q(x + y) = q(x) q(y)` for every additive character of the
+  rings. A sum's face can then form from its operands' faces wherever both arrive, and no operation is
+  named. The founding decides what learning can find (§19); the learned maps around it move it from
+  there.
+
+### 15.2 Each mode keeps its own face, its own row and its own hold
+
+The contact summed the modes' faces into one number a pair; one weight carried every mode's value; the
+row had one denominator; §14.2's hold was the minimum over the class's modes. Each is a reading
+collapsed into one number. Measured on the build (§14.9's fixtures): with the minimum hold the cue
+fixture coded 2.12 bits, 0.16 without it. One mode at its cone throttled every mode of the pair, and
+at the founding, where words stand at random phases, some mode nearly always sits near its cone, so far
+copies were never weighed and never learned.
+
+```text
+contact  z_ij,m = 2^(−β_i) D_m(|i−j|) Re(conj(w̃_im) w̃_jm) − ⌊log₂ |i−j|⌋       per mode
+row      y_i,m = conj(U_im) Σ_a 2^a N_a,m / Σ_a 2^a M_a,m                        §14.11, a row a mode
+hold     a far term of mode m carries λ_im λ_jm, its own distance from its own cone
+address  a site's class membership is split across each address mode's nearest cone, ½(1 + λ_l) on
+         its shell and ½(1 − λ_l) across; a far pair is weighed through c by √(μ_i(c) μ_j(c))
+```
+
+- The row is a face: a matrix over the mode and the power of two, the binary places read as its
+  coordinates. It crosses into the site's state once a mode, at the declared crossing, its remainder
+  carried.
+- A mode locked on a plate carries its source far while a bridge mode of the same pair stays near;
+  no mode throttles another.
+- The address stays the sparse one (`3^b` classes), and the far weight stays continuous across every
+  seam (cause 5's repair, now without the throttle): the membership is a partition of unity, and two
+  equal words meet at full weight wherever they stand (`Σ_c √(μ(c) μ(c)) = 1`).
+- Cost: the pairs met are unchanged; the exponentials are multiplied by the modes a head.
+
+### 15.3 A read leaves its own echo out
+
+The release reads every answer site at once through reciprocal contacts, so a site's face returns to it
+two ticks later. A symmetric network iterated synchronously settles only at fixed points or two-cycles
+(Goles and Olivos; Marcus and Westervelt for the analog case), and the crib's answer flipping whole every
+sweep (§13) is that two-cycle; the momentum only slows it. The cavity field removes it: the field a site
+feels leaves out what the site itself put there. Under parallel iteration on dense reciprocal couplings
+this is the Onsager reaction term (the TAP equations, approximate message passing), and the cavity is
+the method behind the Mézard–Parisi formula for diluted spin glasses, proved in openai/math, family 221.
+
+```text
+cavity   z_i^(k) ← z_i^(k) − B_i ℓ_i^(k−1)      B_i: the read's response at i to i's own soft face, through
+                                                its contacts and back (the round trip p_ij p_ji through the return)
+```
+
+`B_i`'s exact form is derived at the consumer and written beside it; training on the release's states
+(§14.6) reads the same cavity, so it meets what the release meets.
+
+### 15.4 The release's clock is read
+
+Each site's clock (the sweep the front reached it, the sweep it locked, its trits and the gaps between)
+went only into receipts. It enters the face as a turned ring set whose place is the site's own sweep
+count since it was reached: sites reached or locked together share phase, their gaps are read like
+distance, and the contact reads rhythm beside content. In training, §14.6's rung supplies the count.
+
+### 15.5 The reading shows similar problems side by side
+
+The reading's claim becomes the one Brandon asked for: the output reconfigures with its problem.
+- `tools/gsm8k_variants.py`, an exterior terrain generating its truth: in a held problem every question
+  number is replaced by another of its digit count, the solution's annotated calculations are
+  re-evaluated exactly in order, their results carried into later calculations and into the text, and
+  a variant with a fractional, negative or colliding number is refused. Only text reaches the machine;
+  the variants are held out like their originals and stay private.
+- **Claim, fixed before the run:** of the original releases' calculations that took an operand from the
+  question, the variant's release takes the variant's number in the same role in at least half.
+- **Shown whole:** three held problems, each beside two of its variants.
+- The crib check stays first (§7).
+
+### 15.6 Failures this could repeat
+
+- **Catered machinery.** The variants are exterior truth and never a receiver. The pair contact is
+  founded on the face law's product and is told no operation.
+- **Text as the exception.** The moment, the rows by mode, the cavity and the clock hold for any strand;
+  no numeral is named inside the field.
+- **A located cause carried unrepaired.** The units' spelling cause is repaired by spans read at their
+  boundaries, not avoided by bytes.
+- **A refusal answered with a larger limit.** The rows by mode multiply the exponentials by the modes a
+  head; the lap is measured before launch and its deadline fixed from that.
+
+Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
+and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
+boundary moments (from `moment_closed_form`), the per-mode row's equality with the exact normalized
+exponential, and the cavity's removal of the synchronous two-cycle.
