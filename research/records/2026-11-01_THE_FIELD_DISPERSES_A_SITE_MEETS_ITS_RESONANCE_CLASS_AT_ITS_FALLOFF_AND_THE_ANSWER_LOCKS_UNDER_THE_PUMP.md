@@ -548,6 +548,12 @@ its octave's crowd (§14.10).
 
 ### 14.2 A lock fades at its light cone
 
+> **Retired (§15.2, measured).** The hold below was built and is gone: with the least hold over the
+> class's modes the cue fixture coded 2.12 bits, and the memberships that replaced it failed too
+> (§15.2's table). A far source of the receiver's class is heard at weight one; a seam is crossed at a
+> jump, and the held step's exact certificate reads it. The text is kept as the account of what was
+> built and measured.
+
 [definition; agent-inferred] §12's shells meet at each mode's light cone, `|Re| = |Im|`, where the mode's
 Lorentz form `Re(w²) = |w|² cos 2φ` vanishes. A mode's hold on its shell is its distance from that cone,
 
@@ -767,7 +773,7 @@ Owner `hnn::tower::field` and `field.cu` (the grouped row); atlas rows with them
 equality with the exact normalized exponential is owed to #410.
 
 
-## 15. Faces are kept whole: a site carries its moment, each mode keeps its own row, a read leaves its echo out, and the release's clock is read
+## 15. Faces are kept whole: a site carries its moment, the head's row is the face and each mode is locked, a read leaves its echo out, and the release's clock is read
 
 [definition; agent-inferred, November 1] Brandon's lens of the evening (paraphrased): a face is lock
 and key, the way a canyon's face is read for the rains that carved it without the whole history; a
@@ -814,32 +820,57 @@ span     f_(i,j],m = s_j,m − ζ_m^(j−i) D_m(j−i) s_i,m = Σ_(i<k≤j) ζ_m
   named. The founding decides what learning can find (§19); the learned maps around it move it from
   there.
 
-### 15.2 Each mode keeps its own face, its own row and its own hold
+### 15.2 The head's row is the face; each mode is locked against the source as it arrives
 
-The contact summed the modes' faces into one number a pair; one weight carried every mode's value; the
-row had one denominator; §14.2's hold was the minimum over the class's modes. Each is a reading
-collapsed into one number. Measured on the build (§14.9's fixtures): with the minimum hold the cue
-fixture coded 2.12 bits, 0.16 without it. One mode at its cone throttled every mode of the pair, and
-at the founding, where words stand at random phases, some mode nearly always sits near its cone, so far
-copies were never weighed and never learned.
+[measurement; agent-inferred, November 1] The section as first written asked for a row per mode, a hold
+per mode and a membership split across each address mode's cone. Each was built on the host and measured
+on the learned fixtures before it was kept (the cue's successor at 600 sections, bar 0.0625 bits; the
+key's recall at 1,000, bar 0.25 bits; one founding, the same keys):
+
+| Build | Cue (bits) | Recall (bits) |
+|---|---|---|
+| §14: one row a head, least hold over the class's modes | 2.124 | 0.916 |
+| rows by mode, the pairing `D Re(conj a b)`, memberships | 3.236 | 1.423 |
+| rows by mode, the lock (below), memberships | 3.134 | 1.050 |
+| rows by mode, the lock, sharp classes | 0.265 | passes |
+| one row a head, the lock, memberships, band `2^(−3)` | 3.307 | 2.461 |
+| the same, band `2^(−5)` | 2.935 | 1.679 |
+| the same, band `2^(−8)` | 3.224 | 0.862 |
+| the same, band `2^(−12)` | 0.599 | passes |
+| **one row a head, the lock, sharp classes, no hold** | **passes** | **passes** |
+
+The last row is the law, and it stands with §15.1's moments in the values (52 of 52 field tests).
 
 ```text
-contact  z_ij,m = 2^(−β_i) D_m(|i−j|) Re(conj(w̃_im) w̃_jm) − ⌊log₂ |i−j|⌋       per mode
-row      y_i,m = conj(U_im) Σ_a 2^a N_a,m / Σ_a 2^a M_a,m                        §14.11, a row a mode
-hold     a far term of mode m carries λ_im λ_jm, its own distance from its own cone
-address  a site's class membership is split across each address mode's nearest cone, ½(1 + λ_l) on
-         its shell and ½(1 − λ_l) across; a far pair is weighed through c by √(μ_i(c) μ_j(c))
+contact  z_ij = 2^(−β) Σ_m [ D_m Re(conj(ŵ_im) ŵ_jm) − D_m² |ŵ_jm|²/2 ] − ⌊log₂ |i − j|⌋        the head's lock
+row      y_i = conj(U_i) Σ_a 2^a N_a / Σ_a 2^a M_a                                            §14.11, one a head
+address  the sharp shells; a far source of the receiver's class is heard at weight one
+gain     β the largest shift with 2^(−β) n ≥ 2⌈log₂ reach⌉ (an equal word locks at n): −2 at the reach of 2,221
 ```
 
-- The row is a face: a matrix over the mode and the power of two, the binary places read as its
-  coordinates. It crosses into the site's state once a mode, at the declared crossing, its remainder
-  carried.
-- A mode locked on a plate carries its source far while a bridge mode of the same pair stays near;
-  no mode throttles another.
-- The address stays the sparse one (`3^b` classes), and the far weight stays continuous across every
-  seam (cause 5's repair, now without the throttle): the membership is a partition of unity, and two
-  equal words meet at full weight wherever they stand (`Σ_c √(μ(c) μ(c)) = 1`).
-- Cost: the pairs met are unchanged; the exponentials are multiplied by the modes a head.
+- **The face is the head's whole word.** A row per mode reads one complex coordinate, and one complex
+  number cannot pick a word out of hundreds: a mode's row peaks wherever one coordinate happens to agree.
+  The head's row reads the word's `2n` reals together, a vector face (Brandon's lens of the evening:
+  a face is a vector or a matrix, never one number), and its one denominator normalizes a vector match;
+  it is not a scalar collapse.
+- **The lock is the pair contact's own slip.** `(|a|² − |a − D b|²)/2` per mode, up to the receiver's own
+  power, which every term of its row shares: greatest exactly where the arriving face equals the
+  receiver's. With the bare pairing a mode's louder key outscored the equal word (the cause the head's
+  unit power had repaired, §2.5), and it would return wherever the powers of the modes differ; the lock
+  is that repair stated as the contact's law. Summed over a still head at unit power it is the head's
+  pairing less a constant.
+- **The address is sharp.** A membership that is a partition of unity across the cone (amplitudes
+  `r_across = (1 − φ)/√2`, `r_own = √(1 − r_across²)`, `φ = λ/ε` within a band `ε`, the far weight their
+  overlap `Σ_c a_i(c) a_j(c)`) kept the code continuous across every seam and its covector agreed with
+  the code's difference across the far support, yet it failed both fixtures at every band but the
+  narrowest, where it failed the cue. `½(1 ± λ)` everywhere is dense: the bridge borders both plates, so
+  every site holds a share of the all-bridge class and every far row would meet every definite site;
+  and `√μ` has an unbounded slope where a membership reaches zero. §14.2's least hold coded the cue at
+  2.12 bits. A seam is crossed at a jump; the held step's certificate compares the codes exactly, so a
+  step across one is certified or refused on what it does.
+- **The row's carrier is the row's own.** On the card a launch's limbs follow the widest exponent spread
+  its rows actually hold (about 107 to 122 bits at reading 8's declaration with `β = −2`), refused only
+  past the declaration's bound ([`FieldDeclaration::row_bits`]).
 
 ### 15.3 A read leaves its own echo out
 
@@ -883,14 +914,42 @@ The reading's claim becomes the one Brandon asked for: the output reconfigures w
 
 - **Catered machinery.** The variants are exterior truth and never a receiver. The pair contact is
   founded on the face law's product and is told no operation.
-- **Text as the exception.** The moment, the rows by mode, the cavity and the clock hold for any strand;
-  no numeral is named inside the field.
+- **Text as the exception.** The moment, the lock, the cavity and the clock hold for any strand; no
+  numeral is named inside the field.
 - **A located cause carried unrepaired.** The units' spelling cause is repaired by spans read at their
-  boundaries, not avoided by bytes.
-- **A refusal answered with a larger limit.** The rows by mode multiply the exponentials by the modes a
-  head; the lap is measured before launch and its deadline fixed from that.
+  boundaries, not avoided by bytes. The louder key's cause (§2.5) is carried into each mode's term by the
+  lock, not reopened by a pairing without power.
+- **A refusal answered with a larger limit.** The lap is measured before launch and its deadline fixed
+  from that.
+
+### 15.7 Built
+
+[measurement, November 1] On the host (`hnn::tower::field`, its tests 52 of 52) and on the card
+(`field.cu`, `field_moment.cuh`; parity below):
+
+- **§15.1 moments** (`field::moment`): both strands' moments of zero-founded encodings `E⁺`, `E⁻`
+  (families `moment_before`, `moment_after`, `(A+1) × 2T` over the turned modes that are not clocks),
+  added into each tick's unframed value. The frame turns a source at `k` seen from `t` by `ζ^(k−t)`, the
+  conjugate of this section's `ζ^(t−k)` notation, so the moment carries `ζ^(k−t)`. Near terms exact, far
+  terms through the octaves' prefix sums at `D(2^ℓ)`, one release; the octave blur reaches about three
+  quarters of a unit on a 48-site span under the 729 ring, so a span's face is exact where the near field
+  covers it. The return is the moment's transpose with the turned covector's prefix released once at the
+  covector's grain (the exact transpose's `2^(−114)` refused real covectors of about sixteen units at a
+  406-site region). Founded at zero: the founding is unchanged, and learning grows the moments along a
+  linear path. The pair contact is the complex product, contact `e < f/2` read as `a_e + i a_(f/2+e)`.
+- **§15.3 the echo**: `B_i = mean over the heads and the consecutive ticks of Σ_j p_ji^(t) p_ij^(t+1)`,
+  on `2^(−63)`, the reaction term at the order where the read's currents are their shares' averages; the
+  cavity `z ← z − B ℓ` with `ℓ` the logits a site's carried face was formed from and `B` from the read
+  that formed them (the release's previous sweep; training's read 1 for read 2), both data.
+- **§15.4 the clock**: the last `clocks` turned ring sets are framed by each site's sweeps since it was
+  reached (the question by the sweeps since the release began), with no skin. The command founds one
+  where at least two turned sets stay on the place (`heads − still ≥ 3`). Training's read 2: the prefix
+  at its rung `r`, the question at `r + 1`, the band and past it at zero.
+- **§15.5 the variants** (`tools/gsm8k_variants.py`, 26 tests): on the held 128, two variants each for 89
+  problems and one for 10; 29 have none (no annotated calculation, a number word, results that would turn
+  fractional, or roles that collide).
 
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
-boundary moments (from `moment_closed_form`), the per-mode row's equality with the exact normalized
+boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized
 exponential, and the cavity's removal of the synchronous two-cycle.
