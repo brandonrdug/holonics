@@ -1113,6 +1113,27 @@ mod tests {
         assert!(batches(&[], &|n| n as u64, 1).unwrap().is_empty());
     }
 
+    /// The carrier follows the spread read and is the declaration's `row_bits` at its bound: a row of the
+    /// widest spread the declaration allows needs exactly `row_bits`, one past it is refused.
+    #[test]
+    fn the_carrier_follows_the_spread_and_ends_at_the_declarations_bound() {
+        let d = declaration(32, 4, 32);
+        let beta = d.score_shift();
+        let gain = if beta >= 0 { (4 * d.modes as u64) >> beta } else { (4 * d.modes as u64) << -beta };
+        let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
+        assert_eq!(row_limbs(&d, bound).ok(), Some((d.row_bits() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
+        assert!(row_limbs(&d, bound + 1).is_err());
+        // A narrow row needs five limbs at least, and the carrier never narrows as the spread widens.
+        let mut last = 0;
+        for spread in (0..=bound).step_by(7) {
+            if let Ok(limbs) = row_limbs(&d, spread) {
+                assert!(limbs >= last.max(MIN_LIMBS));
+                last = limbs;
+            }
+        }
+        assert_eq!(row_limbs(&d, 0).unwrap(), MIN_LIMBS);
+    }
+
     /// A region's allocations count its weights, its contact's return on a return, and every site's
     /// carriers beside them: a release batch of 128 regions at the reach carries some 3 GB of them at
     /// the grown declaration, which the weights alone never counted.
@@ -1120,9 +1141,10 @@ mod tests {
     fn a_regions_octets_count_its_carriers_beside_its_weights() {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
             let n = 1504u64;
-            // The weights are kept only for a return; each kept tick adds its carrier widths and class
-            // offsets.
-            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 16 * n * n } else { 0 };
+            // The shares (a word a pair and mode) are kept only for a return, with the reverse's covector a
+            // pair and mode on 64 bits; each kept tick adds its carrier widths and class offsets.
+            let modes = d.modes as u64;
+            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n * modes + 8 * n * n * modes } else { 0 };
             let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);

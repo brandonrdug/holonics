@@ -721,20 +721,27 @@ __device__ __forceinline__ uint32_t big_bits(const Big<L> &a) {
 }
 
 // `x << s` (bits shifted past the carrier are lost: the declaration's bound says there are none).
+//
+// [agent-inferred, November 1] The shift is branch-free: the lanes of a warp are the modes of a row, whose
+// terms stand at different whole bits, so a shift by a limb count chosen by a branch ran serially for each
+// distinct count (the first realization, measured in the profile: a contact at 14 limbs took 7 ms a launch).
+// The bits within a limb shift first (a funnel over the limbs), then the limbs move by the binary digits of
+// the count, each step a select.
 template <int L>
 __device__ __forceinline__ Big<L> big_shl(const Big<L> &x, uint32_t s) {
-    Big<L> r = big_zero<L>();
     const uint32_t q = s >> 6, b = s & 63;
+    Big<L> r;
+    r.v[0] = x.v[0] << b;
 #pragma unroll
-    for (int qq = 0; qq < L; qq++) {
-        if (q == (uint32_t)qq) {
+    for (int k = 1; k < L; k++) {
+        r.v[k] = (x.v[k] << b) | ((x.v[k - 1] >> 1) >> (63 - b));
+    }
 #pragma unroll
-            for (int k = qq; k < L; k++) {
-                const int kk = k - qq;
-                const int kp = kk > 0 ? kk - 1 : 0;
-                const uint64_t carry = kk > 0 ? ((x.v[kp] >> 1) >> (63 - b)) : 0;
-                r.v[k] = (x.v[kk] << b) | carry;
-            }
+    for (int step = 1; step < L; step <<= 1) {
+        const bool take = (q & (uint32_t)step) != 0;
+#pragma unroll
+        for (int k = L - 1; k >= 0; k--) {
+            r.v[k] = take ? (k >= step ? r.v[k - step] : (uint64_t)0) : r.v[k];
         }
     }
     return r;
