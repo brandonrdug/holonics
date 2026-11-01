@@ -689,12 +689,14 @@ everywhere, however faintly. Three laws of the build made the question's share v
 - **A wall, not a falloff.** Past the near field a source outside the receiver's class had weight
   exactly zero. A blank answer site has one class (the blank's), and most of the question lies
   outside it.
-- **The grain.** Weights stand on `2^(−40)` of a row's peak. The answer's own neighbours, a few sites
-  away, outscored a question site hundreds of sites back by more than that, so its weight was released
-  to exactly zero.
-- **Two hops a read.** A read has two ticks, so a disturbance crosses at most two contacts in it. Only
-  the answer's first few sites hold the question's last bytes in their near field, and their share,
-  averaged over a whole answer, sits below the printed thousandth.
+- **A fixed width at the row's peak.** Weights stood on `2^(−40)` of a row's peak, and a term below
+  that was released to nothing with no remainder kept. That is a hand-picked width and a max, which the
+  precision law forbids; §14.11 repairs it.
+- ~~**Two hops a read.**~~ Withdrawn: reach is not a count of ticks. The falloff is the matched-friction
+  ladder (`wave.matched-friction-reach`): a push crosses any distance `d` at its share `1/d` in one
+  contact, so a source's reach was cut by the wall alone. Ticks compose relations; they do not set
+  reach. Only the answer's first few sites hold the question's last bytes in their near field, and
+  their share, averaged over a whole answer, sits below the printed thousandth.
 
 The wall is not the medium's law. The skin effect says how a far source arrives: blurred, its fine
 rings decayed and its coarse modes whole. So past the near field each receiver also hears every
@@ -728,4 +730,39 @@ through its class and blurred through its crowd: resonance stands on top of the 
 Owner `hnn::tower::field` and `field.cu` (the crowds' prefix sums); atlas rows with them. The crowd's
 weight against the members' own (`|C| · 2^(mean score)` against `Σ 2^(score_j)`, which Jensen's
 inequality orders) is owed to #410.
+
+### 14.11 The row is a series: no term is released without its remainder
+
+[definition; agent-inferred, November 1] The contact's weights are the normalized exponential, whose
+denominator is the row's sum: the series the precision law names (numerators grouped over the
+denominators they share, softmax among them). The build stored each weight at a fixed `2^(−40)` of its
+row's peak and released every term below it to nothing. A hand-picked width and a max are the same
+error as a float: they cut the series at one width and lose the small terms without account. In
+reading 9 those small terms were the question.
+
+```text
+term      e_ij = 2^(z_ij),  z_ij = a_ij + f_ij,  a_ij its whole bits, 2^(f_ij) the exponential's face
+group     N_a = Σ_(j : a_ij = a) 2^(f_ij) ṽ_j,   M_a = Σ_(j : a_ij = a) 2^(f_ij)      (one group a power of two)
+row       y_i = Σ_a 2^a N_a / Σ_a 2^a M_a
+```
+
+- Each term keeps its own exponent. Terms are summed whole within their power of two; the groups are
+  combined with their carries in a carrier as wide as the exponents the row actually holds. The width
+  is the row's, read from its terms, never chosen.
+- Nothing is released before the current. The current is released once, at the precision of the
+  register it enters, and its remainder is carried with it (the residue of the row's one division), so
+  a source outscored by any number of bits still enters the row's sums.
+- No peak is subtracted. The groups need no max: the exponent is the term's own address in the
+  series.
+- Integer sums in any order, so any partition of the support, of the heads and of the card gives the
+  same bits.
+
+Every other fixed width in the field (faces `2^(−16)`, material `2^(−24)`, frames `2^(−30)`, the
+contact covector's `2^(−40)`, the skin decay's zero below `2^(−30)`, the pump's top) is read against the
+same law in the build's review: a width that releases a term with no remainder kept is repaired the
+same way; a width at a declared crossing, with its remainder carried, stands, with its reason written
+beside it.
+
+Owner `hnn::tower::field` and `field.cu` (the grouped row); atlas rows with them. The grouped row's
+equality with the exact normalized exponential is owed to #410.
 
