@@ -74,13 +74,55 @@ and new result, and the answer's role. One line goes to stdout: counts, never te
 `no_variant` counts variant slots (problem, variant) that wrote nothing. A line `DETAIL ...` of
 counts by refusal reason goes to stderr.
 
-Importable: `parse_problems`, `analyse`, `variant_of`, `write_passages`, `write_roles`.
+The reading of the claim (record section 15.5, fixed before reading 10):
+
+    python3 -I tools/gsm8k_variants.py claim ORIGINALS VARIANTS ROLES ORIG_DIR VAR_DIR
+    python3 -I tools/gsm8k_variants.py show ORIGINALS VARIANTS ROLES ORIG_DIR VAR_DIR OUT_FILE
+
+ORIGINALS is the held file, VARIANTS and ROLES the files this tool wrote from it (a path literally
+named `claim` or `show` is written `./claim`), ORIG_DIR and VAR_DIR release directories holding
+`FREE.tsv` as `tools/gsm8k/written_rules.py` reads it: one row a passage, in the order of ORIGINALS
+and of VARIANTS. Claim: across the original releases' calculations that took an operand from the
+question, the variant's release takes the variant's number in the same role in at least half.
+
+Definition. A release is its FREE.tsv row up to the first blank line. Its calculations are, in
+order, its `<<expression=c>>` markups whose expression is numerals, `.`, `+ - * /` and parentheses
+and whose `c` is a number: the calculations `written_rules.py` counts as `b_free_calculations`
+(this tool loads that file for `CALC`, `value`, `number`, `unescape` and `read_tsv`). The operands
+of a calculation are the numerals of its expression (the reading `c_from_question` makes), each a
+Fraction. Roles are the sidecar's: the digit runs of the question, never number words. For a
+variant with role k, original value o_k and new value n_k:
+- `of` counts each operand of the original release's calculation i whose value is o_k for some k,
+  once (an operand written twice counts twice);
+- `taken` counts those of them for which the variant's release has a calculation i with an operand
+  equal to n_k, under any operation; a missing calculation i counts as not taken.
+Totals sum over the variants, so an original with two variants enters twice. `share_millionths` is
+floor(taken * 1000000 / of), 0 when `of` is 0; the claim holds when 2 * taken >= of. `problems` is
+the number of distinct originals that have a variant, `calculations_original` their releases'
+calculations (each original once), `calculations_variant` the calculations of all the variants'
+releases. The sidecar must describe the files, or the tool stops: each variant's question reads,
+number by number, the sidecar's new value for the original question's number, and its answer line
+is the record's.
+
+    VARIANTS_CLAIM taken=N of=N share_millionths=N problems=N calculations_original=N calculations_variant=N
+    VARIANTS_CLAIM_PROBLEM index=N variant=N taken=N of=N      (one a variant)
+
+`show` writes to OUT_FILE (refused unless it lies under a `.local` directory: it holds private
+text) three held problems, each as its question and release followed by each of its two variants'
+question and release, verbatim. They are the first three indices that have two variants and whose
+original release has `of` above zero (a calculation that took a question number). Only counts
+reach stdout (`VARIANTS_SHOW shown=N indices=...`).
+
+Importable: `parse_problems`, `analyse`, `variant_of`, `write_passages`, `write_roles`,
+`release_calculations`, `claim_of`, `read_claim`, `show`.
 Standard library only; every value is a Fraction or an integer.
 """
 
 import argparse
 import hashlib
+import importlib.util
 import json
+import os
 import re
 import sys
 import time
@@ -91,6 +133,7 @@ from fractions import Fraction
 __all__ = [
     "Problem", "Variant", "Unusable", "parse_problems", "analyse", "variant_of",
     "write_passages", "write_roles", "number_tokens", "format_like", "main",
+    "release_calculations", "claim_of", "read_claim", "show",
 ]
 
 NUMBER = re.compile(r"\d+(?:,\d{3})*(?!\d)(?:\.\d+)?")
@@ -687,7 +730,155 @@ def write_roles(path, variants):
             f.write(json.dumps(v.record, sort_keys=True) + "\n")
 
 
+# ---------------------------------------------------------------- the reading of the claim
+
+
+_WRITTEN_RULES = None
+
+
+def _written_rules():
+    """`tools/gsm8k/written_rules.py`, loaded by its path (`-I` puts no directory on sys.path)."""
+    global _WRITTEN_RULES
+    if _WRITTEN_RULES is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "gsm8k", "written_rules.py")
+        spec = importlib.util.spec_from_file_location("gsm8k_written_rules", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _WRITTEN_RULES = module
+    return _WRITTEN_RULES
+
+
+def release_calculations(release):
+    """The operands (Fractions) of each calculation of a release (bytes), in order: the release is
+    its bytes up to the first blank line, a calculation a `<<expression=c>>` whose expression is
+    numerals, `.`, `+ - * /` and parentheses and whose `c` is a number, an operand a numeral."""
+    rules = _written_rules()
+    text = release.split(b"\n\n")[0].decode("utf-8", "replace")
+    out = []
+    for expression, c in rules.CALC.findall(text):
+        if rules.value(expression) is None or rules.number(c) is None:
+            continue
+        out.append([Fraction(t) for t in re.findall(r"\d*\.\d+|\d+", expression)])
+    return out
+
+
+def claim_of(original, variant, record):
+    """(taken, of) of one variant: `original` and `variant` are the calculations' operands of the
+    two releases (release_calculations), `record` the variant's line of the sidecar."""
+    new = {to_value(r["orig"]): to_value(r["new"]) for r in record["roles"]}
+    taken = total = 0
+    for i, operands in enumerate(original):
+        later = variant[i] if i < len(variant) else None
+        for operand in operands:
+            if operand in new:
+                total += 1
+                taken += later is not None and new[operand] in later
+    return taken, total
+
+
+def _read_releases(directory, count):
+    rules = _written_rules()
+    rows = rules.read_tsv(os.path.join(directory, "FREE.tsv"), 2)
+    if [int(r[0]) for r in rows] != list(range(count)):
+        raise SystemExit(f"{directory}/FREE.tsv does not hold one release a passage, in order")
+    return [rules.unescape(r[1]) for r in rows]
+
+
+def read_claim(originals, variants, roles, orig_dir, var_dir):
+    """Read the claim. Returns (problems, per, originals, variants, original releases, variant
+    releases): `problems` the distinct originals with a variant, `per` one dict a variant in the
+    sidecar's order (problem, variant, taken, of, the two calculation counts, its row n). Stops
+    (SystemExit) when the sidecar does not describe the files."""
+    with open(originals, encoding="utf-8") as f:
+        held = parse_problems(f.read())
+    with open(variants, encoding="utf-8") as f:
+        made = parse_problems(f.read())
+    with open(roles, encoding="utf-8") as f:
+        records = [json.loads(line) for line in f if line.strip()]
+    if len(records) != len(made):
+        raise SystemExit("the sidecar does not hold one line a variant")
+    originals_out = _read_releases(orig_dir, len(held))
+    variants_out = _read_releases(var_dir, len(made))
+    per = []
+    for n, (record, passage) in enumerate(zip(records, made)):
+        p = record["problem"]
+        if not 0 <= p < len(held):
+            raise SystemExit(f"variant {n}: the sidecar names a problem the originals do not hold")
+        new = {to_value(r["orig"]): to_value(r["new"]) for r in record["roles"]}
+        old_tokens = number_tokens(held[p].question)
+        new_tokens = number_tokens(passage.question)
+        if len(old_tokens) != len(new_tokens) or any(
+                new.get(to_value(a[2])) != to_value(b[2]) for a, b in zip(old_tokens, new_tokens)):
+            raise SystemExit(f"variant {n}: its question does not read as the sidecar's roles")
+        if passage.answer != record["answer"]["new"]:
+            raise SystemExit(f"variant {n}: its answer is not the sidecar's")
+        before = release_calculations(originals_out[p])
+        after = release_calculations(variants_out[n])
+        taken, total = claim_of(before, after, record)
+        per.append({"problem": p, "variant": record["variant"], "taken": taken, "of": total,
+                    "calculations_original": len(before), "calculations_variant": len(after),
+                    "n": n})
+    return len({row["problem"] for row in per}), per, held, made, originals_out, variants_out
+
+
+def show(originals, variants, roles, orig_dir, var_dir, out_file):
+    """Write three held problems with their two variants' releases, verbatim, to `out_file` (under
+    a `.local` directory). Returns the indices written."""
+    if ".local" not in os.path.abspath(out_file).split(os.sep)[:-1]:
+        raise SystemExit("the report holds private text: write it under a .local directory")
+    _, per, held, made, before, after = read_claim(originals, variants, roles, orig_dir, var_dir)
+    by_problem = {}
+    for row in per:
+        by_problem.setdefault(row["problem"], []).append(row)
+    chosen = [p for p in sorted(by_problem)
+              if len(by_problem[p]) == 2 and by_problem[p][0]["of"] > 0][:3]
+    out = []
+    for p in chosen:
+        out.append(f"=== problem {p} ===\n--- original question\n".encode())
+        out.append(held[p].question.encode("utf-8") + b"\n--- original release\n" + before[p] + b"\n")
+        for row in by_problem[p]:
+            n, v = row["n"], row["variant"]
+            out.append(f"--- variant {v} question\n".encode())
+            out.append(made[n].question.encode("utf-8") + f"\n--- variant {v} release\n".encode()
+                       + after[n] + b"\n")
+    with open(out_file, "wb") as f:
+        f.write(b"".join(out))
+    return chosen
+
+
+def claim_main(argv):
+    if len(argv) != 5:
+        raise SystemExit("usage: claim ORIGINALS VARIANTS ROLES ORIG_DIR VAR_DIR")
+    problems, per, *_ = read_claim(*argv)
+    taken = sum(r["taken"] for r in per)
+    total = sum(r["of"] for r in per)
+    first = {}
+    for r in per:
+        first.setdefault(r["problem"], r["calculations_original"])
+    share = taken * 1_000_000 // total if total else 0
+    print(f"VARIANTS_CLAIM taken={taken} of={total} share_millionths={share} problems={problems} "
+          f"calculations_original={sum(first.values())} "
+          f"calculations_variant={sum(r['calculations_variant'] for r in per)}")
+    for r in per:
+        print(f"VARIANTS_CLAIM_PROBLEM index={r['problem']} variant={r['variant']} "
+              f"taken={r['taken']} of={r['of']}")
+    return 0
+
+
+def show_main(argv):
+    if len(argv) != 6:
+        raise SystemExit("usage: show ORIGINALS VARIANTS ROLES ORIG_DIR VAR_DIR OUT_FILE")
+    chosen = show(*argv)
+    print(f"VARIANTS_SHOW shown={len(chosen)} indices={','.join(map(str, chosen))}")
+    return 0
+
+
 def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] == "claim":
+        return claim_main(argv[1:])
+    if argv and argv[0] == "show":
+        return show_main(argv[1:])
     ap = argparse.ArgumentParser(description="Variants of GSM8K problems with new numbers.")
     ap.add_argument("input")
     ap.add_argument("output")

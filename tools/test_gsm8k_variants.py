@@ -362,5 +362,186 @@ class Cli(unittest.TestCase):
         self.assertEqual(text, "")
 
 
+def add(a, b, name="Ann"):
+    return (f"{name} has {a} stickers and Bo has {b} stickers. How many do they have together?\n"
+            f"Together they have {a}+{b}=<<{a}+{b}={a + b}>>{a + b} stickers.\n#### {a + b}")
+
+
+def escaped(release):
+    """A release as the FREE.tsv of tools/gsm8k writes a field."""
+    return "".join("\\x7c" if b == 0x7C else chr(b).encode("unicode_escape").decode()
+                   if 32 <= b < 127 or b in (9, 10, 13) else f"\\x{b:02x}" for b in release)
+
+
+class ClaimFixture(unittest.TestCase):
+    """Two or more held problems, their variants through the tool, and releases written by the
+    test: the originals' releases and the variants' releases as two directories of FREE.tsv."""
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        self.root = self.dir.name
+
+    def path(self, *parts):
+        return os.path.join(self.root, *parts)
+
+    def make(self, problems, seed="5"):
+        with open(self.path("held.txt"), "w", encoding="utf-8") as f:
+            f.write("\n\n".join(problems) + "\n")
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+            g.main([self.path("held.txt"), self.path("variants.txt"), "--variants", "2", "--seed", seed])
+        with open(self.path("variants.txt.roles"), encoding="utf-8") as f:
+            self.records = [json.loads(line) for line in f]
+        self.assertEqual(len(self.records), 2 * len(problems))
+        return self.records
+
+    def new(self, n, k):
+        """The variant n's number for role k, as text."""
+        return self.records[n]["roles"][k]["new"]
+
+    def release_dir(self, name, releases):
+        os.makedirs(self.path(name))
+        with open(self.path(name, "FREE.tsv"), "w", encoding="latin-1") as f:
+            f.write("".join(f"{i}\t{escaped(r)}\n" for i, r in enumerate(releases)))
+        return self.path(name)
+
+    def claim(self, orig_releases, var_releases):
+        dirs = (self.release_dir("orig", orig_releases), self.release_dir("var", var_releases))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            g.main(["claim", self.path("held.txt"), self.path("variants.txt"),
+                    self.path("variants.txt.roles"), *dirs])
+        return out.getvalue().strip().split("\n")
+
+
+class ReleaseReading(unittest.TestCase):
+    def test_calculations_are_the_well_formed_markups_before_the_first_blank_line(self):
+        release = b"a <<1+2=3>>3 <<x=5>> <<4*5.5=22>>22 <<7-2=\n\n<<9+9=18>>"
+        self.assertEqual(g.release_calculations(release),
+                         [[Fraction(1), Fraction(2)], [Fraction(4), Fraction("5.5")]])
+        self.assertEqual(g.release_calculations(b"<<8*(2+1)=24>>24\n\n<<9+9=18>>"),
+                         [[Fraction(8), Fraction(2), Fraction(1)]])
+        self.assertEqual(g.release_calculations(b"no markup here"), [])
+
+    def test_claim_of_counts_a_role_taken_under_any_operation_and_not_a_shifted_one(self):
+        record = {"roles": [{"role": 0, "orig": "14", "new": "52"}, {"role": 1, "orig": "23", "new": "71"}]}
+        two = [[Fraction(14), Fraction(23)], [Fraction(14), Fraction(9)]]
+        # calculation 0 takes both new numbers by a product; calculation 1 is missing
+        self.assertEqual(g.claim_of(two, [[Fraction(52), Fraction(71)]], record), (3 - 1, 3))
+        # the new numbers one calculation late are not taken
+        self.assertEqual(g.claim_of(two, [[Fraction(2)], [Fraction(52), Fraction(71)]], record), (1, 3))
+        # the original's numbers copied are not taken
+        self.assertEqual(g.claim_of(two, [[Fraction(14), Fraction(23)], [Fraction(14)]], record), (0, 3))
+        # an operand that is no question number is not counted
+        self.assertEqual(g.claim_of([[Fraction(5), Fraction(6)]], [[Fraction(5)]], record), (0, 0))
+
+
+class Claim(ClaimFixture):
+    def build(self):
+        self.make([add(14, 23), add(31, 46, "Cy")])
+        n = self.new
+        # problem 0 (variants 0, 1): the original writes `14+23` and a calculation from no question number
+        original0 = b"Together <<14+23=37>>37 and <<37*2=74>>74."
+        # problem 1 (variants 2, 3): two calculations that take both numbers
+        original1 = b"<<31*46=1426>>1426 then <<46+31=77>>77"
+        variants = [
+            # a different operation from the original's, both numbers taken
+            f"<<{n(0, 0)}*{n(0, 1)}={int(n(0, 0)) * int(n(0, 1))}>>x".encode(),
+            # a malformed markup first (not a calculation), then the first number taken only
+            f"<<x=5>> <<{n(1, 0)}+5={int(n(1, 0)) + 5}>>".encode(),
+            # only calculation 0 is written: calculation 1 is missing
+            f"<<{n(2, 0)}*{n(2, 1)}={int(n(2, 0)) * int(n(2, 1))}>>".encode(),
+            # calculation 0 takes no question number, calculation 1 takes both
+            f"<<2*3=6>>6 <<{n(3, 1)}+{n(3, 0)}={int(n(3, 0)) + int(n(3, 1))}>>".encode(),
+        ]
+        return [original0, original1], variants
+
+    def test_the_summary_and_the_lines_a_variant(self):
+        originals, variants = self.build()
+        lines = self.claim(originals, variants)
+        self.assertEqual(
+            lines[0], "VARIANTS_CLAIM taken=7 of=12 share_millionths=583333 problems=2 "
+                      "calculations_original=4 calculations_variant=5")
+        self.assertEqual(lines[1:], [
+            "VARIANTS_CLAIM_PROBLEM index=0 variant=0 taken=2 of=2",
+            "VARIANTS_CLAIM_PROBLEM index=0 variant=1 taken=1 of=2",
+            "VARIANTS_CLAIM_PROBLEM index=1 variant=0 taken=2 of=4",
+            "VARIANTS_CLAIM_PROBLEM index=1 variant=1 taken=2 of=4",
+        ])
+
+    def test_no_operand_from_the_question_is_a_share_of_zero(self):
+        self.make([add(14, 23)])
+        lines = self.claim([b"<<2+2=4>>4"], [b"<<2+2=4>>4", b""])
+        self.assertEqual(lines[0], "VARIANTS_CLAIM taken=0 of=0 share_millionths=0 problems=1 "
+                                   "calculations_original=1 calculations_variant=1")
+
+    def test_the_sidecar_must_describe_the_files(self):
+        originals, variants = self.build()
+        with open(self.path("variants.txt.roles"), encoding="utf-8") as f:
+            records = [json.loads(line) for line in f]
+        records[1]["roles"][0]["new"] = "99"
+        with open(self.path("variants.txt.roles"), "w", encoding="utf-8") as f:
+            f.write("".join(json.dumps(r) + "\n" for r in records))
+        with self.assertRaises(SystemExit):
+            self.claim(originals, variants)
+
+    def test_a_release_directory_must_hold_one_row_a_passage(self):
+        originals, variants = self.build()
+        with self.assertRaises(SystemExit):
+            self.claim(originals, variants[:3])
+
+
+class Show(ClaimFixture):
+    def build(self):
+        self.make([add(14, 23), add(31, 46, "Cy"), add(52, 17, "Di"), add(28, 65, "Ed"),
+                   add(41, 12, "Flo")])
+        originals = [
+            b"<<2+2=4>>4",  # problem 0 takes no question number
+            b"<<31+46=77>>77\n\nafter a blank line",
+            b"<<17+52=69>>69\tand a tab",
+            b"<<28*65=1820>>1820",
+            b"<<41+12=53>>53",  # a fourth qualifying problem, not shown
+        ]
+        variants = [f"variant release {n}\n\nsecond paragraph \\ {n}".encode() for n in range(10)]
+        return originals, variants
+
+    def run_show(self, out_file):
+        originals, variants = self.build()
+        dirs = (self.release_dir("orig", originals), self.release_dir("var", variants))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            g.main(["show", self.path("held.txt"), self.path("variants.txt"),
+                    self.path("variants.txt.roles"), *dirs, out_file])
+        return out.getvalue().strip(), originals, variants
+
+    def test_three_problems_with_their_two_variants_verbatim(self):
+        out_file = self.path(".local", "report.txt")
+        os.makedirs(os.path.dirname(out_file))
+        line, originals, variants = self.run_show(out_file)
+        self.assertEqual(line, "VARIANTS_SHOW shown=3 indices=1,2,3")
+        with open(self.path("held.txt"), encoding="utf-8") as f:
+            held = g.parse_problems(f.read())
+        with open(self.path("variants.txt"), encoding="utf-8") as f:
+            made = g.parse_problems(f.read())
+        with open(out_file, "rb") as f:
+            data = f.read()
+        expected = b""
+        for p in (1, 2, 3):
+            expected += (f"=== problem {p} ===\n--- original question\n".encode()
+                         + held[p].question.encode() + b"\n--- original release\n"
+                         + originals[p] + b"\n")
+            for v in (0, 1):
+                n = 2 * p + v
+                expected += (f"--- variant {v} question\n".encode() + made[n].question.encode()
+                             + f"\n--- variant {v} release\n".encode() + variants[n] + b"\n")
+        self.assertEqual(data, expected)
+        self.assertNotIn(b"=== problem 0 ===", data)
+        self.assertNotIn(b"=== problem 4 ===", data)
+
+    def test_the_report_is_refused_outside_a_local_directory(self):
+        with self.assertRaises(SystemExit):
+            self.run_show(self.path("report.txt"))
+
+
 if __name__ == "__main__":
     unittest.main()
