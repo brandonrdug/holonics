@@ -116,7 +116,7 @@ impl FieldCodec {
 }
 
 /// A problem's question as its region opens it: the question, then the line it ends on.
-fn question_text(q: &[u8]) -> Vec<u8> {
+pub(super) fn question_text(q: &[u8]) -> Vec<u8> {
     let mut out = q.to_vec();
     out.push(b'\n');
     out
@@ -137,7 +137,7 @@ pub(super) fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
 }
 
 /// The exterior mask stream: an integer mixer of the key file's first word and a counter.
-fn mix(seed: u64, counter: u64) -> u64 {
+pub(super) fn mix(seed: u64, counter: u64) -> u64 {
     let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
     z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
     z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
@@ -147,7 +147,7 @@ fn mix(seed: u64, counter: u64) -> u64 {
 /// A region's completion mask (agent-inferred, November 1): with even odds the answer's sites
 /// (its void included) or the whole region's are open to the comparison, each unresolved with
 /// probability `τ`, `τ` drawn uniform on `(0, 1]` on `2^(−16)`; at least one site is unresolved.
-fn mask(seed: u64, draw: u64, question: usize, sites: usize) -> Vec<bool> {
+pub(super) fn mask(seed: u64, draw: u64, question: usize, sites: usize) -> Vec<bool> {
     let head = mix(seed, draw);
     let whole = head & 1 == 1;
     let tau = ((head >> 1) & 0xFFFF) + 1;
@@ -166,7 +166,7 @@ fn mask(seed: u64, draw: u64, question: usize, sites: usize) -> Vec<bool> {
 /// meets the long void regions of a release's first sweeps and the short ones of its last; on the
 /// GSM8K training passage this reads 1.86 times the sites² of a one-void tail (a uniform length
 /// would read 3.42 times).
-fn tail(seed: u64, draw: u64, room: usize) -> usize {
+pub(super) fn tail(seed: u64, draw: u64, room: usize) -> usize {
     let room = room.max(1);
     let octaves = u64::from(usize::BITS - room.leading_zeros());
     let k = (mix(seed, draw | 1 << 63) % octaves) as u32;
@@ -176,7 +176,7 @@ fn tail(seed: u64, draw: u64, room: usize) -> usize {
 }
 
 /// A problem's region classes: the question and its line, the answer, then `void` to `length`.
-fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
+pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
     let mut out: Vec<usize> = q.iter().chain(a).copied().collect();
     out.resize(length, codec.void());
     out

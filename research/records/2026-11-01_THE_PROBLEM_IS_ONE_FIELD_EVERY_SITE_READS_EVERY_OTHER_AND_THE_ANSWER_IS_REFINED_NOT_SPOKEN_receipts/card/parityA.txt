@@ -1,0 +1,43 @@
+FIELD_COMMAND parity-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 32 8 1 4 4
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=14190706688 total=16802250752 batch_budget=9199616000
+FIELD_PASSAGE train=6730 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=19546 grow=1
+FIELD_PARITY section=1 regions=16 length=1412 sites=4023 pairs=61127248 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4080 card_ms=181
+FIELD_PARITY section=2 regions=16 length=1325 sites=3800 pairs=71504464 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3838 card_ms=208
+FIELD_PARITY section=3 regions=16 length=1568 sites=4636 pairs=106898216 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=5622 card_ms=275
+FIELD_PARITY section=4 regions=16 length=1576 sites=8438 pairs=207867312 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=6445 card_ms=764
+FIELD_PARITY section=5 regions=16 length=1361 sites=2736 pairs=32247328 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3941 card_ms=98
+FIELD_PARITY section=6 regions=16 length=952 sites=3752 pairs=50182960 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=2065 card_ms=149
+FIELD_PARITY section=7 regions=16 length=1419 sites=5736 pairs=132771040 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4733 card_ms=387
+FIELD_PARITY section=8 regions=16 length=894 sites=4905 pairs=61592536 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=1933 card_ms=168
+FIELD_PARITY section=9 regions=16 length=1221 sites=3739 pairs=63670072 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3259 card_ms=165
+FIELD_PARITY section=10 regions=16 length=926 sites=5083 pairs=51698056 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=2048 card_ms=141
+FIELD_PARITY section=11 regions=16 length=1537 sites=5514 pairs=103829256 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=5552 card_ms=295
+FIELD_PARITY section=12 regions=16 length=1144 sites=4041 pairs=61845056 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=2786 card_ms=173
+FIELD_PARITY section=13 regions=16 length=1056 sites=5238 pairs=77259848 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=2786 card_ms=209
+FIELD_PARITY section=14 regions=16 length=1415 sites=4227 pairs=66892088 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4362 card_ms=205
+FIELD_PARITY section=15 regions=16 length=1696 sites=9222 pairs=192156904 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=7322 card_ms=626
+FIELD_PARITY section=16 regions=16 length=1430 sites=3923 pairs=91655768 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4548 card_ms=261
+FIELD_PARITY section=17 regions=16 length=874 sites=3942 pairs=62692680 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=1904 card_ms=168
+FIELD_PARITY section=18 regions=16 length=1340 sites=3467 pairs=37507560 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3721 card_ms=108
+FIELD_PARITY section=19 regions=16 length=939 sites=2685 pairs=23703120 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=1850 card_ms=74
+FIELD_PARITY section=20 regions=16 length=1448 sites=3183 pairs=64546008 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4480 card_ms=182
+FIELD_PARITY section=21 regions=16 length=1318 sites=5829 pairs=112636776 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4152 card_ms=296
+FIELD_PARITY section=22 regions=16 length=1378 sites=3207 pairs=50172336 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4057 card_ms=139
+FIELD_PARITY section=23 regions=16 length=1227 sites=4965 pairs=74639776 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3317 card_ms=208
+FIELD_PARITY section=24 regions=16 length=920 sites=2346 pairs=33210912 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=1799 card_ms=89
+FIELD_PARITY section=25 regions=16 length=615 sites=3278 pairs=21659512 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=905 card_ms=71
+FIELD_PARITY section=26 regions=16 length=1299 sites=4410 pairs=50753784 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=3627 card_ms=141
+FIELD_PARITY section=27 regions=16 length=1378 sites=6463 pairs=106050408 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4565 card_ms=285
+FIELD_PARITY section=28 regions=16 length=1365 sites=2593 pairs=34045576 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4130 card_ms=105
+FIELD_PARITY section=29 regions=16 length=949 sites=2970 pairs=38663952 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=2023 card_ms=110
+FIELD_PARITY section=30 regions=16 length=744 sites=3472 pairs=48324992 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=1442 card_ms=128
+FIELD_PARITY section=31 regions=16 length=1381 sites=3199 pairs=43244400 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=4076 card_ms=124
+FIELD_PARITY section=32 regions=16 length=1493 sites=7880 pairs=146805192 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=5091 card_ms=432
+FIELD_PARITY_RELEASE problem=0 question=278 released=1229 equal=true host_ms=6104 card_ms=32
+FIELD_PARITY_RELEASE problem=1 question=283 released=1229 equal=true host_ms=6130 card_ms=31
+FIELD_PARITY_RELEASE problem=2 question=175 released=1229 equal=true host_ms=5298 card_ms=29
+FIELD_PARITY_RELEASE problem=3 question=195 released=1229 equal=true host_ms=5446 card_ms=28
+FIELD_PARITY_DONE sections=32 reads=64 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=4 releases_unequal=0 host_ms=116475 card_ms=6977 elapsed_ms=146950
+FIELD_CARD reads=48 read_ms=1021 returns=32 return_ms=5957 pairs=5037508192 batches=80 peak_store=2078673120 elapsed_ms=146962
+MEASURE lap=parityA rc=0 wall_s=147.3 peak_rss_kib=2733480

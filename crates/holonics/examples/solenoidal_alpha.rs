@@ -115,6 +115,13 @@ pub fn run_field_with_realization(
 ) -> std::result::Result<(), Box<dyn Error>> {
     complete_language::run_field_realized(args, realization)
 }
+/// The field's card parity and timing (`parity-field`, `time-field`) against `card`.
+pub fn run_field_parity(
+    args: &[String],
+    card: &mut dyn holonics::hnn::tower::field::FieldRealization,
+) -> std::result::Result<(), Box<dyn Error>> {
+    complete_language::run_field_parity(args, card)
+}
 #[cfg(test)]
 pub fn code_checkpoint_native_bytes(path: &str) -> std::result::Result<Vec<u8>, Box<dyn Error>> {
     let (mut checkpoint, _) = Checkpoint::load(path, 64 * 1024 * 1024)?;

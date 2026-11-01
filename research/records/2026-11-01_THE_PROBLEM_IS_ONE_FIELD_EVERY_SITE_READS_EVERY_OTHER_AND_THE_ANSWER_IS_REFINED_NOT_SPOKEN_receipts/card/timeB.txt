@@ -1,0 +1,21 @@
+FIELD_COMMAND time-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 64 8 8 2 64 2 16 8 8 4 4
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=14207811584 total=16802250752 batch_budget=9216720896
+FIELD_PASSAGE train=6730 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_TIME_DECLARATION width=64 heads=8 modes=8 still=2 contacts=64 ticks=2 reach=2221 material=61498
+FIELD_TIME section=1 length=1412 pairs=122254496 reads=2 halvings=0 deposited=true ms=301 ns_a_pair=2
+FIELD_TIME section=2 length=1325 pairs=143008928 reads=2 halvings=0 deposited=true ms=325 ns_a_pair=2
+FIELD_TIME section=3 length=1568 pairs=213796432 reads=2 halvings=0 deposited=true ms=482 ns_a_pair=2
+FIELD_TIME section=4 length=1576 pairs=415734624 reads=2 halvings=0 deposited=true ms=1408 ns_a_pair=3
+FIELD_TIME section=5 length=1361 pairs=64494656 reads=2 halvings=0 deposited=true ms=176 ns_a_pair=2
+FIELD_TIME section=6 length=952 pairs=100365920 reads=2 halvings=0 deposited=true ms=245 ns_a_pair=2
+FIELD_TIME section=7 length=1419 pairs=265542080 reads=2 halvings=0 deposited=true ms=699 ns_a_pair=2
+FIELD_TIME section=8 length=894 pairs=123185072 reads=2 halvings=0 deposited=true ms=290 ns_a_pair=2
+FIELD_TIME_LAP sections=421 sites=4676581 pairs=62976813936 worst_ns_a_section_pair=3 projection_ms=213299 (the section's read, return and rereads at the worst measured time a pair)
+FIELD_TIME_RELEASE problem=0 question=278 released=1229 pairs_at_most=145347136 ms=54
+FIELD_TIME_RELEASE problem=1 question=283 released=1229 pairs_at_most=146313216 ms=54
+FIELD_TIME_RELEASE problem=2 question=175 released=1229 pairs_at_most=126157824 ms=48
+FIELD_TIME_RELEASE problem=3 question=195 released=1229 pairs_at_most=129777664 ms=48
+FIELD_TIME_RELEASES problems=128 releases=527 sweeps=4 pairs_at_most=74095501760 worst_ns_a_pair=0 projection_ms=28465
+FIELD_TIME_DONE elapsed_ms=4409
+FIELD_CARD reads=24 read_ms=710 returns=8 return_ms=3365 pairs=3444360256 batches=32 peak_store=3741611616 elapsed_ms=4412
+MEASURE lap=timeB rc=0 wall_s=4.6 peak_rss_kib=372304

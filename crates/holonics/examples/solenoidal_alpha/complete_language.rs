@@ -29,6 +29,8 @@ mod tower_body;
 mod written_coupling;
 #[path = "complete_language/field_train.rs"]
 mod field_train;
+#[path = "complete_language/field_parity.rs"]
+mod field_parity;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -883,6 +885,15 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("release-field") => field_train::release(args, realization),
         Some("release-field-text") => field_train::release_text(args, realization),
         _ => Err("a realized field command is train-field, release-field or release-field-text".into()),
+    }
+}
+/// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field
+/// against `card` on `train-field`'s sections, `time-field` reads the card alone and projects.
+pub(super) fn run_field_parity(args: &[String], card: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
+    match args.first().map(String::as_str) {
+        Some("parity-field") => field_parity::parity(args, card),
+        Some("time-field") => field_parity::time(args, card),
+        _ => Err("a field parity command is parity-field or time-field".into()),
     }
 }
 /// The tower commands with each section's forward and reverse through a declared realization
