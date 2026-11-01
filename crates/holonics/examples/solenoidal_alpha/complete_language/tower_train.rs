@@ -3740,6 +3740,13 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         learner.refusal_ticks = true;
         println!("TOWER_REFUSAL_TICKS declared");
     }
+    // [agent-inferred, November 1] A declared law (`TOWER_NEXT_SECTION=1`): each deposited step is
+    // read on the next section's opening and halved or refused where it raises that section's code
+    // ([`TowerLearner::next_section`], acceptance 77).
+    if std::env::var("TOWER_NEXT_SECTION").is_ok_and(|v| v == "1") {
+        learner.next_section = true;
+        println!("TOWER_NEXT_SECTION declared");
+    }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(
         "TOWER_TRAIN material={} streams={} section={} sections_a_pass={} train_bytes={} dev_bytes={}",
@@ -3780,6 +3787,9 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
         // The window's refused steps read on the opening's ticks: how many rose on their own ticks
         // and on the opening's, and the changes on each.
         let mut refusal_ticks = (0usize, 0usize, 0i64, 0i64);
+        // The window's steps read on their next section: how many, how many raised it, how many were
+        // halved and how many refused, and their summed change.
+        let mut nexts = (0usize, 0usize, 0usize, 0usize, 0i64);
         let mut sections_run = sections_a_pass;
         let (mut proposed, mut admitted) = (0usize, vec![0usize; learner.tower.declaration.levels]);
         if let Some(look) = looking {
@@ -3918,7 +3928,14 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
                     refusal_parts.1[n] += change;
                 }
             }
+            if let Some(n) = receipt.next {
+                nexts = (nexts.0 + 1, nexts.1 + usize::from(n.change > 0), nexts.2 + usize::from(!n.refused && n.halvings > 0), nexts.3 + usize::from(n.refused), nexts.4 + n.change);
+            }
             if (k + 1) % window_sections == 0 || k + 1 == sections_a_pass {
+                if learner.next_section {
+                    println!("TOWER_NEXT pass={} section={} read={} raised={} halved={} refused={} change_bits={}", pass, k + 1, nexts.0, nexts.1, nexts.2, nexts.3, signed_bits(nexts.4));
+                    nexts = (0, 0, 0, 0, 0);
+                }
                 println!(
                     "TOWER_SECTION pass={} section={} bits_a_byte={} deposits={} halvings={} elapsed_ms={}",
                     pass, k + 1, per(window.0, window.1), deposits, halvings, started.elapsed().as_millis()

@@ -6185,6 +6185,51 @@ pub struct TowerLearner {
     /// read once a section, on its opening read, and a refused step's reread reads it only under
     /// this reading ([`SectionReceipt::refused`]).
     pub refusal_closure: bool,
+    /// [agent-inferred, November 1] **The step read on the next section** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS…`, §45, acceptance 77), a declared law of the run never
+    /// written with the learner. The certificate admits a step that lowers its own section's code;
+    /// on a passage repeated each lap a step can lower its own section and raise the sections it did
+    /// not read (§44's run-away began so). Declared, a deposited step is held until the next section
+    /// opens and is read there before that section's own step: the next section's code under the
+    /// stepped material against under the material before the step, both read from the same opening
+    /// states (the ends this section carried under the step, the states the next section opens
+    /// on). Where the stepped material codes it higher the step is halved, as the certificate
+    /// halves, and read again against the material before it, until it codes it no higher or it
+    /// releases nothing and is refused (the material before it stands). The read is a declared
+    /// generalization of the certificate from the section the step was fit on to one it has not
+    /// met ([`SectionReceipt::next`]); it costs the next section one forward under the material
+    /// before the step, one a halving, and one more opening read where the step does not stand as
+    /// it was. The moments are the covector's running statistics and stay as they moved. A step
+    /// deposited on a pass's last section is read on the next pass's first, from rest; a learner
+    /// rested beside the run keeps the step its last section deposited. Refused on paired contacts,
+    /// whose founding is certified on the next section by its own test. A probe read from rest is
+    /// not used: the next section reads the passage the run is about to meet, from the states it
+    /// will meet it in, and on the card it is the same resident credit the certificate's rereads
+    /// read, so it disturbs nothing the run carries.
+    pub next_section: bool,
+    /// The step the last section deposited, held for the next section's read while
+    /// [`TowerLearner::next_section`] is declared.
+    pending: Option<PendingStep>,
+}
+
+/// [agent-inferred, November 1] A deposited step held for the next section's read: the material
+/// before it, the proposed step on each family's grain and the halvings it was certified at.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct PendingStep {
+    before: Tower,
+    step: Vec<i128>,
+    halvings: u32,
+}
+
+/// [agent-inferred, November 1] The section before's step read on this section's opening
+/// ([`TowerLearner::next_section`]): its change to this section's arrivals' code (the stepped
+/// material's code less the code under the material before the step, on `2^(−20)` bits), the
+/// further halvings the read took, and whether it refused the step.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct NextReading {
+    pub change: i64,
+    pub halvings: u32,
+    pub refused: bool,
 }
 
 /// A section's receipt: its code before and after (on `2^(−20)` bits), the halvings the
@@ -6217,6 +6262,9 @@ pub struct SectionReceipt {
     /// change to the arrivals' code read whole on the ticks the section's opening read took (after
     /// minus before, on `2^(−20)` bits), beside its change on its own ticks in `refused`.
     pub refused_on_ticks: Vec<i64>,
+    /// Under the learner's declared law ([`TowerLearner::next_section`]), the section before's step
+    /// read on this section's opening (`None` where no step was held).
+    pub next: Option<NextReading>,
 }
 
 /// [agent-inferred, October 30] A clocked level's closure over a section's opening read
@@ -6234,7 +6282,7 @@ pub struct ClosureReading {
 impl TowerLearner {
     pub fn new(tower: Tower, rate_bits: u32) -> Self {
         let len = tower.theta.len();
-        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false }
+        Self { tower, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false, next_section: false, pending: None }
     }
 
     /// The swell and the reaches as one line: per level `x h r a` (faces, `2^(−16)`) and `push read
@@ -6316,6 +6364,9 @@ impl TowerLearner {
         if compared.is_some_and(|m| m.len() != classes.len() || m.iter().zip(classes).any(|(m, c)| m.len() != c.len())) {
             return refuse("a comparison for each class of each stream");
         }
+        if self.next_section && !matches!(pairs, split::Pairs::Unpaired) {
+            return refuse("the step read on the next section is declared on unpaired contacts, whose founding has its own certificate");
+        }
         let target = |s: usize, i: usize| compared.map_or(Some(classes[s][i]), |m| m[s][i]);
         let targets: Vec<Vec<Option<usize>>> = classes.iter().enumerate().map(|(s, c)| (1..c.len()).map(|i| target(s, i)).collect()).collect();
         self.tower.admit_read(classes, &targets)?;
@@ -6326,7 +6377,15 @@ impl TowerLearner {
         let heading = self.tower.heading();
         let reread_closures = heading && self.refusal_closure;
         realization.reread_closures(reread_closures);
-        let read = realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?;
+        // The step the section before deposited is read on this opening before the section's own
+        // step ([`TowerLearner::next_section`]); the opening read is then the material's that stands.
+        let (read, next) = match self.pending.take() {
+            Some(pending) => {
+                let (read, next) = self.step_on_next(pending, &opening, classes, &targets, realization)?;
+                (read, Some(next))
+            }
+            None => (realization.forward(&self.tower, &opening, classes, &targets, Slot::Opened)?.admitted(&targets)?, None),
+        };
         self.swell.clone_from(&read.swell);
         if heading && read.closures.len() != classes.len() {
             return refuse("an opening read under the heading returns each stream's closure faces");
@@ -6471,25 +6530,7 @@ impl TowerLearner {
             }
         };
         let (receipt, mut slot) = loop {
-            let mut candidate = self.tower.clone();
-            let mut moved = false;
-            for &(start, len, grain) in &self.tower.layout.families {
-                if grain == MOVE_BITS {
-                    continue;
-                }
-                for i in start..start + len {
-                    let released = release(step[i], halvings);
-                    moved |= released != 0;
-                    candidate.theta[i] = fit32(candidate.theta[i] as i128 - released, "a deposited parameter outgrew its 32-bit carrier")?;
-                }
-            }
-            // The dormant return's released step split between its parts as the widening split the
-            // column: `s − ⌊s/2⌋` on the first, `⌊s/2⌋` on the second.
-            for &(a, b) in &returns {
-                let half = release(step[a], halvings).div_euclid(2);
-                candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
-                candidate.theta[b] = fit32(candidate.theta[b] as i128 - half, "a deposited parameter outgrew its 32-bit carrier")?;
-            }
+            let (mut candidate, mut moved) = self.tower.released_step(&step, &returns, halvings)?;
             if let Some(o) = &opens {
                 let released = release(unit, halvings);
                 moved |= released != 0;
@@ -6498,7 +6539,7 @@ impl TowerLearner {
             moved |= candidate.move_by_chart(&step, halvings)?;
             if !moved {
                 let parts = parts_before.iter().copied().zip(parts_before.iter().copied()).collect();
-                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Opened);
+                break (SectionReceipt { cells: arrivals, code_before, code_after: code_before, halvings, deposited: false, parts, closure, refused, refused_parts, refused_on_ticks, next }, Slot::Opened);
             }
             candidate.project();
             let reread = realization.forward(&candidate, &opening, classes, &targets, Slot::Reread)?.admitted(&targets)?;
@@ -6507,7 +6548,10 @@ impl TowerLearner {
                 let parts_after = part_codes(&reread.faces);
                 let code_after: i64 = parts_after.iter().sum();
                 let parts = parts_before.iter().copied().zip(parts_after).collect();
-                self.tower = candidate;
+                let before = std::mem::replace(&mut self.tower, candidate);
+                if self.next_section {
+                    self.pending = Some(PendingStep { before, step: step.clone(), halvings });
+                }
                 if let (split::Pairs::Founding(paired), Some(o)) = (&mut pairs, opens.take()) {
                     if release(unit, halvings) != 0 {
                         self.relift(o.level, o.pair)?;
@@ -6516,7 +6560,7 @@ impl TowerLearner {
                         opened = true;
                     }
                 }
-                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks }, Slot::Reread);
+                break (SectionReceipt { cells: arrivals, code_before, code_after, halvings, deposited: true, parts, closure, refused, refused_parts, refused_on_ticks, next }, Slot::Reread);
             }
             let arrivals_after: i64 = part_codes(&reread.faces).iter().sum();
             let closure_change = if reread_closures {
@@ -6595,6 +6639,43 @@ impl TowerLearner {
         }
         realization.carry(&self.tower, states, &opening, slot)?;
         Ok((receipt, founding))
+    }
+
+    /// [agent-inferred, November 1] The held step read on this section's opening
+    /// ([`TowerLearner::next_section`]): the material before the step read first (a reread), then
+    /// the stepped material as the opening read, both from `opening`; where the stepped material
+    /// codes the arrivals higher the step is halved and read again against the material before it
+    /// until it codes them no higher (it stands, halved) or releases nothing (refused: the material
+    /// before it stands), and the opening read is read again on the material that stands, the last
+    /// forward before the section's reverse.
+    fn step_on_next(&mut self, pending: PendingStep, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], realization: &mut dyn PassRealization) -> Result<(realization::PassRead, NextReading)> {
+        let faces = |r: &realization::PassRead| -> Vec<(u128, u128)> { r.faces.iter().flatten().flatten().copied().collect() };
+        let code = |r: &realization::PassRead| -> i64 { r.faces.par_iter().map(|cells| cells.iter().flatten().map(|&(m, t)| face_code(m, t)).sum::<i64>()).sum() };
+        let before = realization.forward(&pending.before, opening, classes, targets, Slot::Reread)?.admitted(targets)?;
+        let stepped = realization.forward(&self.tower, opening, classes, targets, Slot::Opened)?.admitted(targets)?;
+        let old = faces(&before);
+        let change = code(&stepped) - code(&before);
+        if !fewer_bits(&faces(&stepped), &old) {
+            return Ok((stepped, NextReading { change, halvings: 0, refused: false }));
+        }
+        let mut halvings = pending.halvings;
+        let refused = loop {
+            halvings += 1;
+            let (mut candidate, mut moved) = pending.before.released_step(&pending.step, &[], halvings)?;
+            moved |= candidate.move_by_chart(&pending.step, halvings)?;
+            if !moved {
+                self.tower = pending.before;
+                break true;
+            }
+            candidate.project();
+            let reread = realization.forward(&candidate, opening, classes, targets, Slot::Reread)?.admitted(targets)?;
+            if !fewer_bits(&faces(&reread), &old) {
+                self.tower = candidate;
+                break false;
+            }
+        };
+        let read = realization.forward(&self.tower, opening, classes, targets, Slot::Opened)?.admitted(targets)?;
+        Ok((read, NextReading { change, halvings: halvings - pending.halvings, refused }))
     }
 
     /// [definition; agent-inferred, October 25] **A founded family's moments, opened on the passage
@@ -6696,7 +6777,7 @@ impl TowerLearner {
         if first.len() != tower.theta.len() || second.len() != tower.theta.len() {
             return refuse("moments of the wrong extent");
         }
-        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false })
+        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false, next_section: false, pending: None })
     }
 
     /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
@@ -6797,6 +6878,33 @@ impl Tower {
                 g[lv.move_im + k] = release(re * gi - im * gr, MOVE_BITS);
             }
         }
+    }
+
+    /// [agent-inferred, November 1] A step released `halvings` coarser on this material, every
+    /// family but the moves on its grain, and each dormant pair's return split between its parts as
+    /// the widening split the column (`s − ⌊s/2⌋` on the first, `⌊s/2⌋` on the second); the moves
+    /// step after, in their chart ([`Tower::move_by_chart`]). Returns the stepped material and
+    /// whether any entry moved. The certificate's candidate and the next section's halvings
+    /// ([`TowerLearner::next_section`]) are both this release.
+    fn released_step(&self, step: &[i128], returns: &[(usize, usize)], halvings: u32) -> Result<(Tower, bool)> {
+        let mut candidate = self.clone();
+        let mut moved = false;
+        for &(start, len, grain) in &self.layout.families {
+            if grain == MOVE_BITS {
+                continue;
+            }
+            for i in start..start + len {
+                let released = release(step[i], halvings);
+                moved |= released != 0;
+                candidate.theta[i] = fit32(candidate.theta[i] as i128 - released, "a deposited parameter outgrew its 32-bit carrier")?;
+            }
+        }
+        for &(a, b) in returns {
+            let half = release(step[a], halvings).div_euclid(2);
+            candidate.theta[a] = fit32(candidate.theta[a] as i128 + half, "a deposited parameter outgrew its 32-bit carrier")?;
+            candidate.theta[b] = fit32(candidate.theta[b] as i128 - half, "a deposited parameter outgrew its 32-bit carrier")?;
+        }
+        Ok((candidate, moved))
     }
 
     /// Every move stepped in its chart by `(Δν, Δφ)` released `halvings` coarser: `1 − ρ ← (1 − ρ)
@@ -10416,7 +10524,7 @@ mod tests {
         let mut learner = TowerLearner::new(tower, 5);
         let passage: Vec<usize> = (0..4096).map(|i| [0, 1, 2, 1, 3][i % 5]).collect();
         let mut states = vec![learner.tower.rest(), learner.tower.rest()];
-        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new(), refused_on_ticks: Vec::new() };
+        let mut last = SectionReceipt { cells: 0, code_before: 0, code_after: 0, halvings: 0, deposited: false, parts: Vec::new(), closure: Vec::new(), refused: Vec::new(), refused_parts: Vec::new(), refused_on_ticks: Vec::new(), next: None };
         for section in 0..60 {
             let a = &passage[section * 32..section * 32 + 33];
             let b = &passage[2048 + section * 32..2048 + section * 32 + 33];
@@ -10432,6 +10540,45 @@ mod tests {
         }
         // Under a quarter of a bit a class (the flat face codes two bits).
         assert!(last.code_after * 4 < (last.cells as i64) << READ_BITS, "{last:?}");
+    }
+
+    /// [agent-inferred, November 1] **The step read on the next section** (record
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS…`, acceptance 77): a step fit on a section of `0 1 0 1 …`
+    /// lowers that section's code and raises the code of the next section, `0 2 0 2 …`, which it did
+    /// not read. Declared, the next section reads it against the material before it, from the same
+    /// opening states, and halves or refuses it, so that section opens on a material that codes it
+    /// lower than the full step does; the first section and its receipt are the plain learner's.
+    #[test]
+    fn a_step_that_raises_the_next_section_is_halved_or_refused() {
+        let declaration = TowerDeclaration { alphabet: 4, width: 8, modes: 4, contacts: 8, levels: 1, gated: true, turned: false, pumped: false, contact: ContactLaw::Rectifying };
+        let tower = Tower::found(declaration, &keys(4096)).expect("founded");
+        let first: Vec<usize> = (0..33).map(|i| [0, 1][i % 2]).collect();
+        let second: Vec<usize> = (0..33).map(|i| [0, 2][i % 2]).collect();
+        let mut plain = TowerLearner::new(tower.clone(), 2);
+        let mut read = TowerLearner::new(tower, 2);
+        read.next_section = true;
+        let (mut plain_states, mut read_states) = (vec![plain.tower.rest()], vec![read.tower.rest()]);
+        let a = plain.section(&mut plain_states, &[&first]).expect("section");
+        let b = read.section(&mut read_states, &[&first]).expect("section");
+        assert!(a.deposited && a.code_after < a.code_before, "the step lowers its own section's code: {a:?}");
+        assert_eq!((&a, &plain.tower, &plain_states), (&b, &read.tower, &read_states), "the first section is the plain learner's");
+        assert_eq!(b.next, None);
+        let a = plain.section(&mut plain_states, &[&second]).expect("section");
+        let b = read.section(&mut read_states, &[&second]).expect("section");
+        // The plain learner opens the second section on the full step, from the states the read
+        // opens on too: its opening code is the stepped material's.
+        let next = b.next.expect("the first section's step is read on the second");
+        assert!(next.change > 0, "the step raises the section it did not read: {next:?}");
+        assert!(next.refused || next.halvings > 0, "{next:?}");
+        // What stands codes the section no higher than the material before the step (the faces'
+        // rounding aside, one grain a face): the full step's opening code less its change.
+        assert!(a.code_before - b.code_before >= next.change - b.cells as i64, "{next:?} {} {}", a.code_before, b.code_before);
+        assert!(b.code_before < a.code_before, "the material that stands codes the second section lower: {} against {}", b.code_before, a.code_before);
+        // The second section's own step is held for the next read in turn; a section that its step
+        // does not raise keeps the step whole.
+        let c = read.section(&mut read_states, &[&second]).expect("section");
+        let held = c.next.expect("the second section's step is read on the third");
+        assert!(b.deposited && (held.change <= 0 || held.refused || held.halvings > 0), "{held:?}");
     }
 
     /// A place compared with nothing is the tower's own release re-entering what it reads.

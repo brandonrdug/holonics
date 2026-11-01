@@ -20,7 +20,8 @@
 //!   pair dormant), the opening's split read is compared beside the covector, and both take each
 //!   section by `TowerLearner::section_founding`, their foundings and directions compared too
 //!   (one `TOWER_PARITY_SPLIT` line a section). Prints one `TOWER_PARITY` line a section and
-//!   `TOWER_PARITY_DONE`.
+//!   `TOWER_PARITY_DONE`. With `TOWER_NEXT_SECTION=1` both learners read each deposited step on the
+//!   next section (`TowerLearner::next_section`), and `TOWER_PARITY_NEXT` counts those reads.
 //! - `tower_pass parity-state STATE STATE_SHA CLASSES CLASSES_SHA OCTETS STREAMS SECTION [SECTIONS]`:
 //!   the same lockstep from a saved learner (`TowerLearner::to_text`, any face the card carries,
 //!   the pair face among them) over a class passage of `OCTETS` (1 or 2, big-endian) bytes a class,
@@ -220,6 +221,13 @@ fn parity_on(classes: &[usize], alphabet: usize, args: &[String]) -> Result<()> 
     }
     let mut host = TowerLearner::new(tower.clone(), rate_bits);
     let mut carded = TowerLearner::new(tower, rate_bits);
+    // [agent-inferred, November 1] The step read on the next section, declared for both learners
+    // (`TOWER_NEXT_SECTION=1`; acceptance 77).
+    if std::env::var("TOWER_NEXT_SECTION").is_ok_and(|v| v == "1") {
+        host.next_section = true;
+        carded.next_section = true;
+        println!("TOWER_NEXT_SECTION declared");
+    }
     let paired = if split {
         let (h, ph) = host.paired()?;
         let (c, pc) = carded.paired()?;
@@ -317,6 +325,8 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     let (mut faces_all, mut faces_unequal, mut entries_all, mut entries_unequal, mut learners_unequal) = (0usize, 0usize, 0usize, 0usize, 0usize);
     let (mut splits_unequal, mut admitted, mut closures_all) = (0usize, 0usize, (0usize, 0usize));
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
+    // The steps read on their next section: read, raised, halved, refused.
+    let mut nexts = (0usize, 0usize, 0usize, 0usize);
     println!("TOWER_PARITY_OPEN material={} streams={streams} section={section} sections={sections} card={}", host.tower.theta.len(), opened.census().name);
     for k in 0..sections {
         let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect();
@@ -404,13 +414,14 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         host_ns += (t1 - t0).as_nanos() + (t4 - t3).as_nanos();
         card_ns += (t2 - t1).as_nanos() + (t5 - t4).as_nanos();
         println!(
-            "TOWER_PARITY section={} faces={} faces_unequal={unequal} codes_unequal={codes_unequal} closures={} closures_unequal={closures_unequal} swell_equal={swell_equal} gradient_entries={} gradient_unequal={g_unequal} first_unequal={first:?} deposited={} halvings={} learner_equal={learner_equal} host_pass_ms={} card_pass_ms={} host_section_ms={} card_section_ms={}",
+            "TOWER_PARITY section={} faces={} faces_unequal={unequal} codes_unequal={codes_unequal} closures={} closures_unequal={closures_unequal} swell_equal={swell_equal} gradient_entries={} gradient_unequal={g_unequal} first_unequal={first:?} deposited={} halvings={} next={:?} learner_equal={learner_equal} host_pass_ms={} card_pass_ms={} host_section_ms={} card_section_ms={}",
             k + 1,
             faces_h.len(),
             closures_h.len(),
             g_h.len(),
             receipt_h.deposited,
             receipt_h.halvings,
+            receipt_h.next,
             (t1 - t0).as_millis(),
             (t2 - t1).as_millis(),
             (t4 - t3).as_millis(),
@@ -419,6 +430,12 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
         if let Some(i) = first {
             println!("TOWER_PARITY_FIRST section={} index={i} host={} card={}", k + 1, g_h[i], g_c[i]);
         }
+        if let Some(n) = receipt_h.next {
+            nexts = (nexts.0 + 1, nexts.1 + usize::from(n.change > 0), nexts.2 + usize::from(!n.refused && n.halvings > 0), nexts.3 + usize::from(n.refused));
+        }
+    }
+    if host.next_section {
+        println!("TOWER_PARITY_NEXT sections={sections} read={} raised={} halved={} refused={}", nexts.0, nexts.1, nexts.2, nexts.3);
     }
     let times = card.times();
     println!(

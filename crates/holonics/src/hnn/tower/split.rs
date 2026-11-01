@@ -649,7 +649,7 @@ impl TowerLearner {
         let first = from.iter().map(|&i| self.first[i]).collect();
         let second = from.iter().map(|&i| self.second[i]).collect();
         let paired = PairedContacts::opened(&tower)?;
-        Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false }, paired))
+        Ok((Self { tower, first, second, opened: self.opened, rate_bits: self.rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false, next_section: self.next_section, pending: None }, paired))
     }
 
     /// A founded pair's drives' moments re-lifted (the module header): each copy's covector is now
