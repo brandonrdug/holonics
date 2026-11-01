@@ -58,8 +58,10 @@
 //! (the chart's law, `ratio_to_power`, over the head's `2n` reals), so the pairing of two words is
 //! `2n` times their cosine, a word's contact with an equal word is `2n`, the most any pair reaches,
 //! and a key fits its lock exactly where the two words agree. The contact's gain is the reach's:
-//! `β` is the largest shift with `2^(−β)·2n ≥ ⌈log₂ reach⌉`, so the contact of two equal words
-//! outweighs the region's other sites at the founding ([`FieldDeclaration::score_shift`]). Why the
+//! `β` is the largest shift with `2^(−β)·2n ≥ ⌈log₂ reach⌉`, so at the founding a word's
+//! counterpart outweighs the region's other sites together wherever their words stand orthogonal
+//! or opposed to it ([`FieldDeclaration::score_shift`]; the share is the gaps',
+//! `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`, so near-equal words share its weight). Why the
 //! unit power (measured November 1, at a GSM8K region's 450 sites and the seventh reading's
 //! declaration, founded on a mixed key stream): with the probe and key at the chart's scale alone,
 //! a site whose whole word recurs once peaked at its counterpart in 20 of 32 rows, its score 12
@@ -91,6 +93,20 @@
 //! comparison of the products of their faces, halved until it is certified or moves nothing; then
 //! held and read on the next section's regions, which it was not fit on, and halved again or
 //! refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
+//!
+//! [definition; agent-inferred, November 1] **The closure: a site's contact is compared with where
+//! the class it must receive stands** (§19). The face's covector reaches a pair's contact only
+//! through its weight (`δz_ij ∝ e_ij`), so a contact the founding did not weigh is never learned: a
+//! number told only by its order, sharing no word with the answer site, coded 6.6 bits after 300
+//! sections with the face alone. On a still ring set, at every tick, an unresolved site whose class
+//! resolved sites hold also reads its row as a copy face, the code of its class on the sites that
+//! hold it, `−log₂ Σ_(j holds) p_ij`, whose covector `δz_ij += p_ij − [j holds] e_ij/Σ_(k holds) e_ik`
+//! joins the face's on `2^(−40)` ([`FieldDeclaration::closes`]). It is zero on a row whose weight
+//! already lies on holders, so a class held at many sites is satisfied by any of them. Asking every
+//! holder alike pulled every masked byte toward every equal byte, and the crib failed under it.
+//! Every class is compared alike, no value is routed by it, and at a release no class is known, so
+//! it compares nothing there. Measured: the number told by order 6.6 → 0.40 bits at 24 sites; the
+//! crib probe 25 of 126 first calculations from the question, against 2 from another's.
 //!
 //! **Release.** The answer's sites open unresolved and the field is refined over at most `S`
 //! sweeps: each sweep reads every unresolved site's face and releases every site the field
@@ -179,8 +195,13 @@ impl FieldDeclaration {
     /// [definition; agent-inferred, November 1] **The contact's gain is the reach's**: a head's
     /// pairing of two equal words sums the `2n` squares of a probe at unit power, `2n` exactly, and a site
     /// must outweigh the `reach` sites it could meet, `⌈log₂ reach⌉` bits; `β` is the largest shift
-    /// with `2^(−β)·2n ≥ ⌈log₂ reach⌉` (zero where no shift keeps it), so the founded contact of a
-    /// word with its counterpart stands above the region's other sites (the module doc).
+    /// with `2^(−β)·2n ≥ ⌈log₂ reach⌉` (zero where no shift keeps it). What it bounds is the peak,
+    /// not the gaps: a counterpart's share is `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`, above
+    /// one half wherever every other word stands orthogonal or opposed to it (`z_j ≤ 0`, each gap at
+    /// least `⌈log₂ reach⌉` bits), and shared among words equal or near it, a plural fibre the
+    /// closure reads as one class (the sixth review, November 1, read this bound as a claim over
+    /// every region; measured at a question's size, the founded counterpart's share was 0.53 to
+    /// 0.86, `founded_contact_shares_at_a_question_s_size`).
     pub fn score_shift(&self) -> u32 {
         let reals = 2 * self.modes;
         let bits = (usize::BITS - self.reach.saturating_sub(1).leading_zeros()).max(1) as usize;
@@ -196,6 +217,16 @@ impl FieldDeclaration {
     /// wherever it stands) at every tick. See [`Field`]'s reverse.
     pub fn closes(&self, _tick: usize, head: usize) -> bool {
         head % self.frames < self.still
+    }
+
+    /// [definition; agent-inferred, November 1] **The heads of a ring set**, `H / frames`: the
+    /// closure's code at a head is read over its set's heads, `copies` of them, so a set compares
+    /// once however many heads growth has copied into it. Why: growth by copies keeps every face
+    /// (each copy's contact is its source's), so without it a grown field's closure would count each
+    /// set's code `factor` times while the faces' code stays one, and growth alone would move the
+    /// comparison toward the closure (the sixth review, November 1).
+    pub fn copies(&self) -> usize {
+        self.heads / self.frames
     }
 
     /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
@@ -932,8 +963,10 @@ impl Field {
                 // 2^(−40), each numerator summed whole over the row's one denominator.
                 // The closure (§19): on a still head at a closing tick, an unresolved site's row is
                 // also compared with where its class stands, the code of its class on the row's own
-                // copy face, `−log Σ_(j holds it) p_ij`: `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`.
+                // copy face, `−log Σ_(j holds it) p_ij`: `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`,
+                // over its ring set's `copies` heads.
                 let closing = closure && d.closes(tick, h);
+                let copies = d.copies() as i128;
                 for i in 0..sites {
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let dp: Vec<i128> = (0..sites).map(|j| dyi.iter().zip(&vh[j * span..(j + 1) * span]).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
@@ -946,7 +979,7 @@ impl Field {
                         let mut dz = release(ln2 * div_nearest(row[j] as i128 * (dp[j] - mean), denominator), MOVE_BITS);
                         if held > 0 {
                             let at = (row[j] as i128) << CONTACT_BITS;
-                            dz += div_nearest(at, denominator) - if holds(j) { div_nearest(at, held) } else { 0 };
+                            dz += div_nearest(at, denominator * copies) - if holds(j) { div_nearest(at, held * copies) } else { 0 };
                         }
                         ds[i * sites + j] = release(dz, beta);
                     }
@@ -1121,9 +1154,10 @@ impl Field {
     /// held answers of median 254) until its content reached the end, so every sweep read the whole
     /// extent and the free release stopped at its deadline with 82 of 128 answers open, their marks
     /// never read. At the opening nothing is released, so no void is read beside a released void
-    /// and the void's face at `t` is the field's `P(L ≤ t)`: the earliest `t` where it resolves
-    /// (`2 m_void > Σ m`) is the extent's median, the majority release of the one variable, read
-    /// once. The creep of §15 came from iterating that release against its own released voids,
+    /// and the void's face at `t` is the field's reading of `P(L ≤ t)`: the earliest `t` where it
+    /// resolves (`2 m_void > Σ m`) is the extent's median where those faces rise with `t`, as the
+    /// nested voids they are trained on do. Each face is read on its own and nothing binds them to
+    /// rise, so the cut is the earliest majority, read once and not revised. The creep of §15 came from iterating that release against its own released voids,
     /// which the front alone now does.
     ///
     /// Why the boundary follows the content (the fourth reading on the card, November 1): released

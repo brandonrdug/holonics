@@ -859,7 +859,8 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, uint32_t
         const uint64_t mass = w.mass[(uint64_t)h * w.T + g];
         // The closure (§19): on a still head at a closing tick, an unresolved site's row is also
         // compared with where its class stands, the code of its class on the row's own copy face:
-        // `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`.
+        // `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`, over its ring set's heads
+        // (`closes` is their count, zero where the head does not close).
         const bool open = closes != 0 && w.unresolved[first + i] != 0;
         const uint32_t cls = w.classes[first + i];
         wide weighted = 0;
@@ -878,7 +879,9 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, uint32_t
         // The holders' mass is a part of the row's, so it is a 64-bit divisor as the row's is.
         const wide holders = warp_sum(held);
         const Divisor by = divisor_of(mass);
-        const Divisor hb = divisor_of(holders > 0 ? (uint64_t)holders : 1);
+        const uint64_t copies = closes != 0 ? closes : 1;
+        const Divisor cb = divisor_of((uint64_t)fit64((wide)mass * (wide)copies, w.status));
+        const Divisor hb = divisor_of(holders > 0 ? (uint64_t)fit64(holders * (wide)copies, w.status) : 1);
         for (uint32_t c0 = 0; c0 == 0 || c0 < w.span; c0 += ROW_CHUNK) {
             wide sum[ROW_CHUNK];
 #pragma unroll
@@ -892,7 +895,7 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, uint32_t
                     if (holders > 0) {
                         const bool holds = j != i && w.unresolved[first + j] == 0 && w.classes[first + j] == cls;
                         const wide at = (wide)e[j] << CONTACT_BITS;
-                        dz += div_nearest_by(at, by) - (holds ? div_nearest_by(at, hb) : 0);
+                        dz += div_nearest_by(at, cb) - (holds ? div_nearest_by(at, hb) : 0);
                     }
                     dz = rel(dz, w.beta);
                     dsr[j] = dz;

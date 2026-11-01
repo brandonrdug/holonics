@@ -1049,6 +1049,66 @@ fn the_closure_compares_only_where_a_class_is_held() {
     }
 }
 
+/// The closure's own code (§19), on `2^(−20)` bits: at every tick and every head of a still ring
+/// set, each unresolved site's code of its class on its row's copy face, `−log₂ Σ_(j holds) p_ij`,
+/// read over its set's `copies` heads.
+fn closure_code(field: &Field, region: &Region) -> i64 {
+    let d = field.declaration;
+    let pass = field.pass(region, true).unwrap();
+    let sites = region.classes.len();
+    let mut code = 0i64;
+    for (tick, cell) in pass.ticks.iter().enumerate() {
+        for h in (0..d.heads).filter(|&h| d.closes(tick, h)) {
+            for i in (0..sites).filter(|&i| region.unresolved[i]) {
+                let row = &cell.e[(h * sites + i) * sites..(h * sites + i + 1) * sites];
+                let held: u128 = (0..sites).filter(|&j| j != i && !region.unresolved[j] && region.classes[j] == region.classes[i]).map(|j| row[j] as u128).sum();
+                if held > 0 {
+                    code += face(&[held, cell.mass[h * sites + i] as u128 - held]).unwrap().code(0);
+                }
+            }
+        }
+    }
+    code / d.copies() as i64
+}
+
+/// The closure's covector is its code's: the reverse with the closure less the reverse without it
+/// agrees with the closure's code's central difference (as the face's covector does with the face's
+/// code, [`covector_matches_the_codes_difference`]) on the entries of every family it reaches, on
+/// the founded declaration and grown by two, where each still ring set holds two copies.
+#[test]
+fn the_closure_s_covector_matches_its_code_s_difference() {
+    let r = region();
+    for still in [1usize, 2] {
+        let base = shaped(still);
+        let draws = base.growth_draws(2);
+        let grown = base.grown(2, &keys(draws)).unwrap().0;
+        assert_eq!(closure_code(&grown, &r), closure_code(&base, &r), "still {still}: a set compares once however many heads it holds");
+        for field in [base, grown] {
+            let (with, without) = (reversed_of(&field, &r), covector_of(&field, &r));
+            let g: Vec<i128> = with.iter().zip(&without).map(|(a, b)| a - b).collect();
+            let mut probed = 0;
+            for &(start, len, grain) in field.families() {
+                let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+                let mut entries: Vec<usize> = (start..start + len).collect();
+                entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+                for &i in entries.iter().take(3).filter(|&&i| g[i] != 0) {
+                    let delta = 1i32 << (grain - 9);
+                    let mut plus = field.clone();
+                    plus.theta[i] += delta;
+                    let mut minus = field.clone();
+                    minus.theta[i] -= delta;
+                    let measured = closure_code(&plus, &r) - closure_code(&minus, &r);
+                    let predicted = (g[i] * 2 * delta as i128) >> (natural + grain - 20);
+                    let tolerance = predicted.abs() / 8 + 64;
+                    assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} width {} family at {start} (grain {grain}) entry {i}: measured {measured}, predicted {predicted}", field.declaration.width);
+                    probed += 1;
+                }
+            }
+            assert!(probed > 0, "still {still}: the closure reaches the charts");
+        }
+    }
+}
+
 /// Two numbers of two digits stand in a filler text, the first anywhere before the second; the
 /// region ends with the marker `14` and two unresolved sites, the first number's digits. Nothing in
 /// a word tells the first number from the second: only their order does.

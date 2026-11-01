@@ -963,8 +963,9 @@ reading 8 waits; if it passes, reading 8 runs GSM8K on the same laws.
 
 [agent-inferred] **The Lean obligation** carried into #410: the unit-power contact's lock, that
 two words each at unit power over `2n` reals pair at most `2n`, with equality exactly when they are
-equal (Cauchy–Schwarz on the head's chart), and that `β` as derived makes two equal words outweigh
-every other site of a region within the reach.
+equal (Cauchy–Schwarz on the head's chart), and that with `β` as derived a word's counterpart
+outweighs a region's other sites together wherever their words stand orthogonal or opposed to it
+(its share is the gaps', `(1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`; amended after the sixth review, §19).
 
 Not adopted: a wider span or more still modes to raise the contact's signal (the width is the
 trained body's); a separate copy path or pointer to the question (a catered routine); a learned
@@ -1118,3 +1119,30 @@ Not adopted:
   compares);
 - a weight on the closure beside the face's (each is a code in bits, and their sum is the
   comparison).
+
+[agent-inferred] **The sixth review's points, weighed before reading 8** (an independent review of
+the field at the first closure's uncommitted form, November 1). Adopted:
+- *The closure's covector was not checked against its own code.* The reverse's law test compared
+  the face's covector alone. `the_closure_s_covector_matches_its_code_s_difference` now compares the
+  closure's part of the reverse with the central difference of `−log₂ Σ_(j holds) p_ij` summed over
+  ticks and still heads, on the founded and the grown field.
+- *Growth changed the closure's count.* Growth by copies keeps every face, but each copied still head
+  closed again, so a grown field compared each set's code `factor` times against one face code. The
+  closure is now read over its ring set's heads (`FieldDeclaration::copies`, `H/frames`): at the
+  founding (`H = frames`) its bits are unchanged, and the grown field's comparison is the old one
+  (the test fails by exactly the factor without it).
+- *`β` bounds the peak, not the gaps.* §18's "two equal words outweigh every other site" holds where
+  the other words stand orthogonal or opposed (`z_j ≤ 0`); in general the counterpart's share is
+  `(1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`, shared among near-equal words. The doc and §18's Lean
+  obligation read in that form.
+- *The void's cut is the median only where the void faces rise with `t`*; each is read alone, so the
+  cut is the earliest majority (doc).
+
+Already the law: the review's fibre comparison `−log₂ P_H` is the copy face above (its form was the
+uniform one that failed). Kept, with the reason: the certificate reads the face's code alone (a step
+stands where it lowers the code the release is judged by; the crib passed under it); the training
+regions resolve their sites at their own classes, not at the field's released ones (a change of the
+training law, the next subject if reading 8 shows the operands read and the composition not);
+the card's per-read uploads and allocations (a realization cost no measurement yet shows dominant);
+a continuing interior response, a joint-consistency reading and sparse execution (constructions
+with no measured failure pointing at them yet).
