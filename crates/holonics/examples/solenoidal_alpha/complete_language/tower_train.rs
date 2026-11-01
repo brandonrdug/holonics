@@ -3742,10 +3742,15 @@ pub(super) fn fit(args: &[String], reading: Reading, gated: bool, turned: bool, 
     }
     // [agent-inferred, November 1] A declared law (`TOWER_NEXT_SECTION=1`): each deposited step is
     // read on the next section's opening and halved or refused where it raises that section's code
-    // ([`TowerLearner::next_section`], acceptance 77).
-    if std::env::var("TOWER_NEXT_SECTION").is_ok_and(|v| v == "1") {
-        learner.next_section = true;
-        println!("TOWER_NEXT_SECTION declared");
+    // ([`TowerLearner::next_section`], acceptance 77). A continued learner carries the law and its
+    // held step in its text, so its declaration must be the run's.
+    let next_section = std::env::var("TOWER_NEXT_SECTION").is_ok_and(|v| v == "1");
+    if args.len() >= 13 && learner.next_section != next_section {
+        return Err("the continued learner's next-section law differs from the declared one".into());
+    }
+    learner.next_section = next_section;
+    if next_section {
+        println!("TOWER_NEXT_SECTION declared held_step={}", learner.holds_step());
     }
     let dev_bytes: usize = reading.dev_lengths.iter().map(|&n| n as usize).sum();
     println!(

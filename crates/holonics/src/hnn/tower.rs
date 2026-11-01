@@ -6186,8 +6186,8 @@ pub struct TowerLearner {
     /// this reading ([`SectionReceipt::refused`]).
     pub refusal_closure: bool,
     /// [agent-inferred, November 1] **The step read on the next section** (record
-    /// `2026-10-30_THE_COARSE_LEVEL_HEADS…`, §45, acceptance 77), a declared law of the run never
-    /// written with the learner. The certificate admits a step that lowers its own section's code;
+    /// `2026-10-30_THE_COARSE_LEVEL_HEADS…`, §45, acceptance 77), a declared law of the run, written
+    /// with the learner beside its held step ([`TowerLearner::to_text`]). The certificate admits a step that lowers its own section's code;
     /// on a passage repeated each lap a step can lower its own section and raise the sections it did
     /// not read (§44's run-away began so). Declared, a deposited step is held until the next section
     /// opens and is read there before that section's own step: the next section's code under the
@@ -6201,7 +6201,8 @@ pub struct TowerLearner {
     /// before the step, one a halving, and one more opening read where the step does not stand as
     /// it was. The moments are the covector's running statistics and stay as they moved. A step
     /// deposited on a pass's last section is read on the next pass's first, from rest; a learner
-    /// rested beside the run keeps the step its last section deposited. Refused on paired contacts,
+    /// rested beside the run carries the step its last section deposited, and a run continued from
+    /// it reads that step on its first section as the unbroken run does. Refused on paired contacts,
     /// whose founding is certified on the next section by its own test. A probe read from rest is
     /// not used: the next section reads the passage the run is about to meet, from the states it
     /// will meet it in, and on the card it is the same resident credit the certificate's rereads
@@ -6641,6 +6642,11 @@ impl TowerLearner {
         Ok((receipt, founding))
     }
 
+    /// Whether a deposited step is held for the next section's read ([`TowerLearner::next_section`]).
+    pub fn holds_step(&self) -> bool {
+        self.pending.is_some()
+    }
+
     /// [agent-inferred, November 1] The held step read on this section's opening
     /// ([`TowerLearner::next_section`]): the material before the step read first (a reread), then
     /// the stepped material as the opening read, both from `opening`; where the stepped material
@@ -6744,23 +6750,40 @@ impl TowerLearner {
         Ok(sections.len())
     }
 
-    /// The learner as text: the tower, then the moments.
+    /// The learner as text: the tower, then the moments; under the declared next-section law
+    /// ([`TowerLearner::next_section`]) a `next-section` line, with the held step after it when one
+    /// is held (its halvings on that line, then the step and the material before it), so a run
+    /// continued from the text reads that step on its next section as the unbroken run would.
     pub fn to_text(&self) -> String {
+        let join = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(" ");
         let mut s = self.tower.to_text();
         s.push_str(&format!("moments {} {}\n", self.rate_bits, self.opened as u8));
-        s.push_str(&self.first.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+        s.push_str(&join(&mut self.first.iter().map(|v| v.to_string())));
         s.push('\n');
-        s.push_str(&self.second.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+        s.push_str(&join(&mut self.second.iter().map(|v| v.to_string())));
         s.push('\n');
+        if self.next_section {
+            match &self.pending {
+                None => s.push_str("next-section -\n"),
+                Some(p) => {
+                    s.push_str(&format!("next-section {}\n", p.halvings));
+                    s.push_str(&join(&mut p.step.iter().map(|v| v.to_string())));
+                    s.push('\n');
+                    s.push_str(&join(&mut p.before.theta.iter().map(|v| v.to_string())));
+                    s.push('\n');
+                }
+            }
+        }
         s
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
         let lines: Vec<&str> = text.lines().collect();
         let n = Tower::text_lines(text);
-        if lines.len() != n + 3 {
+        if lines.len() < n + 3 {
             return refuse("a learner's text is its tower's lines and three of moments");
         }
+        let (lines, held) = lines.split_at(n + 3);
         let tower = Tower::from_text(&lines[..n].iter().map(|l| format!("{l}\n")).collect::<String>())?;
         let lines = &lines[n - 2..];
         let head: Vec<&str> = lines[2].split(' ').collect();
@@ -6777,7 +6800,27 @@ impl TowerLearner {
         if first.len() != tower.theta.len() || second.len() != tower.theta.len() {
             return refuse("moments of the wrong extent");
         }
-        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false, next_section: false, pending: None })
+        // The next-section law and its held step: the step moves only the material's entries
+        // (the law is refused beside a founding split or a dormant pair's return), so the material
+        // before it is the tower with its entries read back.
+        let (next_section, pending) = match held {
+            [] => (false, None),
+            [line] if *line == "next-section -" => (true, None),
+            [line, step, before] if line.starts_with("next-section ") => {
+                let halvings = line["next-section ".len()..].parse::<u32>().map_err(|_| TowerError::Refused("a held step's halvings that are not a count"))?;
+                let step = parse(step)?;
+                let theta = before
+                    .split(' ')
+                    .map(|s| s.parse::<i32>().map_err(|_| TowerError::Refused("a held step's material entry that is not a 32-bit integer")))
+                    .collect::<Result<Vec<i32>>>()?;
+                if step.len() != tower.theta.len() || theta.len() != tower.theta.len() {
+                    return refuse("a held step of the wrong extent");
+                }
+                (true, Some(PendingStep { before: Tower { theta, ..tower.clone() }, step, halvings }))
+            }
+            _ => return refuse("a learner's text after its moments is the next-section law and its held step, or nothing"),
+        };
+        Ok(Self { tower, first, second, opened, rate_bits, swell: Vec::new(), held: Vec::new(), refusal_parts: false, refusal_ticks: false, refusal_closure: false, next_section, pending })
     }
 
     /// The pair face joined to the learner's tower ([`Tower::join_pair_face`]), its families'
@@ -10574,11 +10617,21 @@ mod tests {
         // rounding aside, one grain a face): the full step's opening code less its change.
         assert!(a.code_before - b.code_before >= next.change - b.cells as i64, "{next:?} {} {}", a.code_before, b.code_before);
         assert!(b.code_before < a.code_before, "the material that stands codes the second section lower: {} against {}", b.code_before, a.code_before);
-        // The second section's own step is held for the next read in turn; a section that its step
-        // does not raise keeps the step whole.
+        // The second section's own step is held for the next read in turn, and the learner's text
+        // carries it: a learner restored from its text reads the third section as the unbroken
+        // learner does. A section that its step does not raise keeps the step whole.
+        assert!(b.deposited && read.holds_step());
+        let mut restored = TowerLearner::from_text(&read.to_text()).expect("restored");
+        assert!(restored.next_section && restored.pending == read.pending && restored.to_text() == read.to_text(), "the law and its held step survive the text");
+        let mut restored_states = read_states.clone();
         let c = read.section(&mut read_states, &[&second]).expect("section");
         let held = c.next.expect("the second section's step is read on the third");
-        assert!(b.deposited && (held.change <= 0 || held.refused || held.halvings > 0), "{held:?}");
+        assert!(held.change <= 0 || held.refused || held.halvings > 0, "{held:?}");
+        let r = restored.section(&mut restored_states, &[&second]).expect("section");
+        assert_eq!((&r, &restored.to_text(), &restored_states), (&c, &read.to_text(), &read_states));
+        // Without the law nothing follows the moments, and a text that declares it holds it.
+        assert!(!plain.to_text().contains("next-section"));
+        assert!(!TowerLearner::from_text(&plain.to_text()).expect("restored").next_section);
     }
 
     /// A place compared with nothing is the tower's own release re-entering what it reads.

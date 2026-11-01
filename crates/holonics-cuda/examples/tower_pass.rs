@@ -21,7 +21,8 @@
 //!   section by `TowerLearner::section_founding`, their foundings and directions compared too
 //!   (one `TOWER_PARITY_SPLIT` line a section). Prints one `TOWER_PARITY` line a section and
 //!   `TOWER_PARITY_DONE`. With `TOWER_NEXT_SECTION=1` both learners read each deposited step on the
-//!   next section (`TowerLearner::next_section`), and `TOWER_PARITY_NEXT` counts those reads.
+//!   next section (`TowerLearner::next_section`), and `TOWER_PARITY_NEXT` counts those reads; with
+//!   `TOWER_PARITY_RESTORE=k` both learners are read back from their text after section k.
 //! - `tower_pass parity-state STATE STATE_SHA CLASSES CLASSES_SHA OCTETS STREAMS SECTION [SECTIONS]`:
 //!   the same lockstep from a saved learner (`TowerLearner::to_text`, any face the card carries,
 //!   the pair face among them) over a class passage of `OCTETS` (1 or 2, big-endian) bytes a class,
@@ -327,6 +328,7 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
     // The steps read on their next section: read, raised, halved, refused.
     let mut nexts = (0usize, 0usize, 0usize, 0usize);
+    let restore_at = std::env::var("TOWER_PARITY_RESTORE").ok().map(|v| v.parse::<usize>()).transpose()?;
     println!("TOWER_PARITY_OPEN material={} streams={streams} section={section} sections={sections} card={}", host.tower.theta.len(), opened.census().name);
     for k in 0..sections {
         let parts: Vec<&[usize]> = (0..streams).map(|s| &classes[s * chunk + k * section..s * chunk + (k + 1) * section + 1]).collect();
@@ -410,6 +412,15 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
             states_c.clone()
         };
         let learner_equal = receipt_h == receipt_c && founding_h == founding_c && directions_equal && host.to_text() == carded.to_text() && states_h == fetched;
+        // [agent-inferred, November 1] A declared restore (`TOWER_PARITY_RESTORE=k`): after section k
+        // both learners are read back from their text, so the sections after it are read by learners
+        // restored as a continued run restores them (the next-section law's held step among them).
+        if restore_at == Some(k + 1) {
+            let held = host.holds_step();
+            *host = TowerLearner::from_text(&host.to_text())?;
+            *carded = TowerLearner::from_text(&carded.to_text())?;
+            println!("TOWER_PARITY_RESTORE section={} next_section={} held_step={held} restored_held_step={}", k + 1, host.next_section, host.holds_step());
+        }
         learners_unequal += usize::from(!learner_equal);
         host_ns += (t1 - t0).as_nanos() + (t4 - t3).as_nanos();
         card_ns += (t2 - t1).as_nanos() + (t5 - t4).as_nanos();
