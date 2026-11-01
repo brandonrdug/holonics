@@ -263,6 +263,15 @@ __device__ __forceinline__ uint64_t warp_max_u64(uint64_t v) {
 // -------------------------------------------------------------------------------------------
 // the batch
 
+// [definition; agent-inferred, November 1] **A mode's membership of its shells** (the host's
+// `Membership`, §15.2): the shell it is in (`own`), the shell across its nearest light cone (`across`),
+// the amplitudes `r_own`, `r_across` on `2^(−31)` and the hold `λ` on `2^(−40)`.
+struct Mem {
+    uint64_t hold;
+    uint32_t r_own, r_across;
+    uint32_t own, across;
+};
+
 // The batch's declaration, material, rings, regions and the tick's carriers. Every entry takes it by
 // value; a tick's launches set its carriers.
 struct FieldWords {
@@ -275,9 +284,9 @@ struct FieldWords {
     uint32_t dsbits;
     uint32_t M, M2, span, digits;
     uint32_t T, R;
-    // The series row's carrier in 64-bit limbs (`FieldDeclaration::row_bits()` rounded up) and the
-    // crowds' slots a receiver keeps (`2 (levels − 1)` for the reach).
-    uint32_t limbs, slots;
+    // The crowds' slots a receiver keeps (`2 (levels − 1)` for the reach) and the membership band
+    // `band_bits(b)` (`ε = 2^(−band)`, §15.2).
+    uint32_t slots, band;
     uint64_t E;
     // `ln 2` on `2^(−30)`, the weights' return reads it (two words of a signed 128-bit value).
     uint64_t ln2_lo, ln2_hi;
@@ -313,10 +322,9 @@ struct FieldWords {
     int64_t *x;
     int64_t *qkv;
     int64_t *qf, *vf;
-    // The tick's classes `[h][t]`, each region's class offsets `[h][r][2·3^b + 1]` (relative to its
-    // members; class `c`'s known members at `2c`, its others at `2c + 1`) and its members `[h][t]`
-    // (places within the region, ascending within each).
-    uint32_t *cls;
+    // The tick's class offsets a head and region `[h][r][2·3^b + 1]` (relative to its members; class `c`'s
+    // definite members at `2c`, its others at `2c + 1`) and its members `[h][t][2^b]` (places within the
+    // region, ascending within each class: a site is listed under every class it holds, §15.2).
     uint32_t *class_off;
     uint32_t *members;
     // The dense shares `p_ij` on `2^(−63)` (the support's entries only); while a row is read, its score.
@@ -327,17 +335,17 @@ struct FieldWords {
     // exponential's resident face.
     uint32_t *bits;
     const uint64_t *face;
-    // The tick's holds `[h][t]` on `2^(−40)` and the mode that sets each (`hold`), each head's prefix
-    // sums of the definite sites' unit words and values `[h][row][span]` and their counts `[h][row]`
-    // (`row = region_off[r] + r + t`, a region's `S + 1` rows, §14.10), and each receiver's crowd
-    // shares `[h][t][slots]`.
-    uint64_t *hold;
-    uint32_t *holdm;
+    // The tick's memberships `[h][t][b]` of its address modes' shells (`Mem`), the least whole bits of
+    // each mode's row `[h][t][n]` (read by the exposure), each head's prefix sums of the definite sites'
+    // unit words and values `[h][row][span]` and their counts `[h][row]` (`row = region_off[r] + r + t`,
+    // a region's `S + 1` rows, §14.10), and each receiver's crowd shares `[h][t][slots][n]`.
+    Mem *mem;
+    int64_t *amin;
     wide *sw, *sv;
     uint64_t *sc;
     uint64_t *ce;
-    // The reverse's scratch: each head's and site's hold covector `[h][t]` and the crowds' difference
-    // arrays over the places `[row][span]`.
+    // The reverse's scratch: each head's, site's and address mode's hold covector `[h][t][b]` and the
+    // crowds' difference arrays over the places `[row][span]`.
     wide *lifts, *cv, *cw;
 };
 
@@ -785,36 +793,6 @@ __device__ __forceinline__ Big<L> big_mul(const Coef &c, uint64_t m0, uint64_t m
     return r;
 }
 
-// `⌊(num + ⌊M/2⌋) / M⌋`, the nearest quotient (half away from zero on a magnitude), by the shift-and-
-// subtract long division over the quotient's bits; false where the quotient passes 64 bits.
-template <int L>
-__device__ bool big_div_nearest(Big<L> num, const Big<L> &M, uint64_t *quotient) {
-    Big<L> half = M;
-    big_shr1(half);
-    big_add(num, half);
-    const uint32_t nb = big_bits(num), mb = big_bits(M);
-    if (nb < mb) {
-        *quotient = 0;
-        return true;
-    }
-    const uint32_t diff = nb - mb;
-    if (diff > 63) {
-        return false;
-    }
-    Big<L> mm = big_shl(M, diff);
-    uint64_t q = 0;
-    for (int b = (int)diff; b >= 0; b--) {
-        Big<L> t;
-        if (big_sub(t, num, mm) == 0) {
-            num = t;
-            q |= (uint64_t)1 << b;
-        }
-        big_shr1(mm);
-    }
-    *quotient = q;
-    return true;
-}
-
 template <int L>
 __device__ __forceinline__ Big<L> shfl_big(const Big<L> &x, int o) {
     Big<L> r;
@@ -842,60 +820,259 @@ __device__ __forceinline__ void term_of(const FieldWords &w, int64_t z, int64_t 
 }
 
 // -------------------------------------------------------------------------------------------
-// the resonance classes, the holds, the crowds and the prefix sums
+// the exact division of a row's sums
+//
+// [definition; agent-inferred, November 1] **A row's divisor, formed once** (§14.11, §15.2): the mass
+// `M` normalized to the top of the carrier (`M 2^sh`, its top bit at `64 L − 1`) with the Möller and
+// Granlund reciprocal of its top limb (`Divisor`), so each quotient of that row is one limb: the
+// estimate `q̂ = ⌊(x_L 2^64 + x_(L−1)) / m_(L−1)⌋` from the top limbs of the normalized dividend is at
+// most two above the quotient (Knuth, algorithm D, one digit), corrected by the exact product `q̂ M`.
+// The shares of a row's terms (a division each) and its currents are this division, exact.
+template <int L>
+struct RowDiv {
+    Big<L> mn;
+    Big<L> half;
+    uint32_t sh, mbits;
+    Divisor top;
+};
 
-// [definition; agent-inferred, November 1] **The resonance classes, their lists and the holds** (the
-// dispersing field's §2.2, §6, §12 and §14.2; the host's `ClassLists::of` and `hold`): one block of one
-// warp a head and a region. Each site's class is `Σ_l 3^l σ_l` over the shells of its unframed word's
-// first `b` modes, listed under the key `2c` where it is definite (known or locked) and `2c + 1`
-// otherwise; the counts are summed in the block's buckets, read as offsets in order, and the members
-// placed by a stable counting sort, the region's sites in chunks of 32 in order, a lane its rank among
-// the earlier lanes of its class (`__match_any_sync`), so class `c`'s members stand in ascending place
-// exactly as the host lists them. Each site's hold is the least over those modes of `|re² − im²| /
-// (re² + im²)` on `2^(−40)`, the first mode that sets it kept beside it.
+template <int L>
+__device__ __forceinline__ RowDiv<L> rowdiv_of(const Big<L> &M) {
+    RowDiv<L> d;
+    d.mbits = big_bits(M);
+    d.sh = d.mbits == 0 ? 0 : 64 * L - d.mbits;
+    d.mn = big_shl(M, d.sh);
+    d.half = M;
+    big_shr1(d.half);
+    d.top = divisor_of(d.mbits == 0 ? ((uint64_t)1 << 63) : d.mn.v[L - 1]);
+    return d;
+}
+
+template <int L, int L2>
+__device__ __forceinline__ Big<L2> big_embed(const Big<L> &a) {
+    Big<L2> r = big_zero<L2>();
+#pragma unroll
+    for (int k = 0; k < L; k++) {
+        r.v[k] = a.v[k];
+    }
+    return r;
+}
+
+// `a · m` truncated to the carrier (the caller keeps it within).
+template <int L>
+__device__ __forceinline__ Big<L> big_mul_limb(const Big<L> &a, uint64_t m) {
+    Big<L> r;
+    uint64_t carry = 0;
+#pragma unroll
+    for (int k = 0; k < L; k++) {
+        const uwide t = (uwide)a.v[k] * (uwide)m + (uwide)carry;
+        r.v[k] = (uint64_t)t;
+        carry = (uint64_t)(t >> 64);
+    }
+    return r;
+}
+
+// `⌊(x + ⌊M/2⌋) / M⌋`, the nearest quotient on a magnitude, for a row's divisor; false where the quotient
+// passes `2^63 + 1` (the 64-bit carrier of what the row releases).
+template <int L>
+__device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient) {
+    big_add(x, d.half);
+    const uint32_t xb = big_bits(x);
+    if (xb < d.mbits) {
+        *quotient = 0;
+        return true;
+    }
+    if (xb > d.mbits + 63) {
+        return false;
+    }
+    Big<L + 1> xn = big_shl(big_embed<L, L + 1>(x), d.sh);
+    const uint64_t u1 = xn.v[L], u0 = xn.v[L - 1];
+    uint64_t qh;
+    if (u1 >= d.mn.v[L - 1]) {
+        qh = UINT64_MAX;
+    } else {
+        uint64_t rem;
+        qh = divide_word(u1, u0, d.top, &rem);
+    }
+    const Big<L + 1> mm = big_embed<L, L + 1>(d.mn);
+    Big<L + 1> prod = big_mul_limb(mm, qh);
+    Big<L + 1> t;
+    while (big_sub(t, xn, prod) != 0) {
+        qh -= 1;
+        Big<L + 1> next;
+        big_sub(next, prod, mm);
+        prod = next;
+    }
+    *quotient = qh;
+    return true;
+}
+
+// -------------------------------------------------------------------------------------------
+// memberships, the far weight and the class lists (§15.2)
+
+#define MAXB 8
+// The most classes a site holds, `2^b` at `b ≤ 7`.
+#define MAXCL 128
+#define AMPLITUDE_BITS 31
+#define WEIGHT_BITS 62
+// The most modes a head's row table carries (the card's span is at most 32 reals).
+#define MAXN 16
+// Warps (rows) a contact block carries.
+#define CONTACT_ROWS 4
+
+// `round(√(p / 2^shift))` exactly (the host's `sqrt_nearest`).
+__device__ __forceinline__ uwide sqrt_nearest(uwide p, uint32_t shift) {
+    uint32_t k;
+    if (shift % 2 == 0) {
+        k = shift / 2;
+    } else {
+        p = 2 * p;
+        k = (shift + 1) / 2;
+    }
+    return (isqrt128(4 * p) + ((uwide)1 << k)) >> (k + 1);
+}
+
+// The host's `membership`, in band `ε = 2^(−band)`.
+__device__ __forceinline__ Mem membership(int64_t re, int64_t im, uint32_t band) {
+    const wide r = re, i = im;
+    const wide rr = r * r, ii = i * i;
+    Mem m;
+    if (rr + ii == 0) {
+        m.hold = 0;
+    } else {
+        wide diff = rr - ii;
+        diff = diff < 0 ? -diff : diff;
+        m.hold = (uint64_t)div_nearest(diff << HOLD_BITS, rr + ii);
+    }
+    const uint64_t quadrature = mag64(im);
+    m.own = (re > 0 && mag64(re) > quadrature) ? 2u : (re < 0 && mag64(re) > quadrature) ? 0u : 1u;
+    m.across = m.own != 1 ? 1u : (re >= 0 ? 2u : 0u);
+    const uwide shifted = (uwide)m.hold << band;
+    const uwide one = (uwide)1 << HOLD_BITS;
+    const uwide gap = one - (shifted < one ? shifted : one);
+    if (gap == 0) {
+        m.r_across = 0;
+        m.r_own = (uint32_t)1 << AMPLITUDE_BITS;
+    } else {
+        const uwide ra = sqrt_nearest(gap * gap, 2 * HOLD_BITS - 2 * AMPLITUDE_BITS + 1);
+        m.r_across = (uint32_t)ra;
+        m.r_own = (uint32_t)sqrt_nearest(((uwide)1 << (2 * AMPLITUDE_BITS)) - ra * ra, 0);
+    }
+    return m;
+}
+
+// The mode's amplitude at shell `s` on `2^(−31)`.
+__device__ __forceinline__ uint64_t mem_amp(const Mem &m, uint32_t s) {
+    return s == m.own ? m.r_own : (s == m.across ? m.r_across : 0);
+}
+
+// One mode's overlap factor `BC = Σ_s r_a(s) r_b(s)` on `2^(−62)`.
+__device__ __forceinline__ uwide mem_factor(const Mem &a, const Mem &b) {
+    uwide f = (uwide)a.r_own * (uwide)mem_amp(b, a.own);
+    if (a.r_across > 0) {
+        f += (uwide)a.r_across * (uwide)mem_amp(b, a.across);
+    }
+    return f;
+}
+
+// A far pair's weight on `2^(−62)` (the host's `overlap`, the product over the modes ascending, released
+// to the nearest numerator after each) and the class it is counted at (`canonical`: at each mode the
+// least shell both are in, `Σ_l 3^l s_l`). Zero where some mode shares no shell, or the weight releases to
+// zero (the pair is not met).
+__device__ __forceinline__ uwide far_weight(const Mem *mi, const Mem *mj, uint32_t b, uint32_t *canon) {
+    uwide w = (uwide)1 << WEIGHT_BITS;
+    uint32_t c = 0, place = 1;
+    for (uint32_t l = 0; l < b; l++) {
+        const Mem &a = mi[l];
+        const Mem &bm = mj[l];
+        uint32_t s = UINT32_MAX;
+        if (mem_amp(bm, a.own) > 0) {
+            s = a.own;
+        }
+        if (a.r_across > 0 && mem_amp(bm, a.across) > 0 && a.across < s) {
+            s = a.across;
+        }
+        const uwide bc = mem_factor(a, bm);
+        if (s == UINT32_MAX || bc == 0) {
+            return 0;
+        }
+        c += place * s;
+        place *= 3;
+        w = (w * bc + ((uwide)1 << (WEIGHT_BITS - 1))) >> WEIGHT_BITS;
+    }
+    *canon = c;
+    return w;
+}
+
+// The number of classes a site holds, `2^k` for its `k` in-band modes, and the `q`-th of them.
+__device__ __forceinline__ uint32_t class_count(const Mem *m, uint32_t b) {
+    uint32_t k = 0;
+    for (uint32_t l = 0; l < b; l++) {
+        k += m[l].r_across > 0 ? 1 : 0;
+    }
+    return (uint32_t)1 << k;
+}
+
+__device__ __forceinline__ uint32_t class_at(const Mem *m, uint32_t b, uint32_t q) {
+    uint32_t c = 0, place = 1;
+    for (uint32_t l = 0; l < b; l++) {
+        uint32_t s = m[l].own;
+        if (m[l].r_across > 0) {
+            if (q & 1) {
+                s = m[l].across;
+            }
+            q >>= 1;
+        }
+        c += place * s;
+        place *= 3;
+    }
+    return c;
+}
+
+// -------------------------------------------------------------------------------------------
+// the resonance classes and their lists
+
+// [definition; agent-inferred, November 1] **The memberships, the resonance classes and their lists**
+// (the dispersing field's §2.2, §6, §12 and §15.2; the host's `membership`, `classes_of` and
+// `ClassLists::of`): one block of one warp a head and a region. Each site's memberships of its unframed
+// word's first `b` modes are computed in parallel; the counts of the entries `(site, class)` (a site is
+// listed under every class it holds, keyed `2c` where it is definite and `2c + 1` otherwise) are summed
+// in the block's buckets and read as offsets in order, and the members placed by a stable counting sort in
+// ascending place: the region's sites in chunks of 32, each lane's classes written to the block's
+// shared keys, and the keys read in lane order by the first lane, so class `c`'s members stand in
+// ascending place exactly as the host lists them.
 extern "C" __global__ void field_classes(FieldWords w) {
     extern __shared__ uint32_t buckets[];
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t classes = w.nclasses;
+    const uint32_t b = w.ctrits;
+    const uint32_t stride = (uint32_t)1 << b;
+    // The chunk's keys `[lane][q]`, each lane's count of them.
+    uint32_t *keys = buckets + 2 * classes;
+    uint32_t *nkeys = keys + 32 * stride;
     for (uint64_t u = blockIdx.x; u < (uint64_t)w.H * w.R; u += gridDim.x) {
         const uint32_t h = u / w.R, r = u % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        Mem *mem = w.mem + ((uint64_t)h * w.T + first) * b;
         for (uint32_t c = lane; c < 2 * classes; c += 32) {
             buckets[c] = 0;
         }
-        __syncwarp();
         for (uint32_t i = lane; i < sites; i += 32) {
             const uint64_t g = first + i;
-            const int64_t *word = w.qkv + g * 2 * w.M2 + h * w.n;
-            uint32_t c = 0;
-            for (uint32_t l = w.ctrits; l-- > 0;) {
-                // The mode's shell (`shell`): the sky plate 2, the ground plate 0, the bridge 1.
-                const int64_t re = word[l], im = word[w.M + l];
-                const uint64_t quadrature = mag64(im);
-                c = 3 * c + (re > 0 && mag64(re) > quadrature ? 2u : re < 0 && mag64(re) > quadrature ? 0u : 1u);
+            const int64_t *word = w.qkv + g * 2 * w.M2 + (uint64_t)h * w.n;
+            for (uint32_t l = 0; l < b; l++) {
+                mem[(uint64_t)i * b + l] = membership(word[l], word[w.M + l], w.band);
             }
-            // The hold (`hold`): the first mode of least `λ_l`, `λ_l = div_nearest(|re² − im²| 2^40, re² + im²)`.
-            uint64_t best = (uint64_t)1 << HOLD_BITS;
-            uint32_t best_l = 0;
-            for (uint32_t l = 0; l < w.ctrits; l++) {
-                const wide re = word[l], im = word[w.M + l];
-                const wide rr = re * re, ii = im * im;
-                uint64_t lambda = 0;
-                if (rr + ii != 0) {
-                    wide diff = rr - ii;
-                    diff = diff < 0 ? -diff : diff;
-                    lambda = (uint64_t)div_nearest(diff << HOLD_BITS, rr + ii);
-                }
-                if (lambda < best) {
-                    best = lambda;
-                    best_l = l;
-                }
+        }
+        __syncwarp();
+        for (uint32_t i = lane; i < sites; i += 32) {
+            const Mem *mi = mem + (uint64_t)i * b;
+            const uint32_t nc = class_count(mi, b);
+            const uint32_t def = definite_site(w, first + i) ? 0u : 1u;
+            for (uint32_t q = 0; q < nc; q++) {
+                atomicAdd(&buckets[2 * class_at(mi, b, q) + def], 1u);
             }
-            w.cls[(uint64_t)h * w.T + g] = c;
-            w.hold[(uint64_t)h * w.T + g] = best;
-            w.holdm[(uint64_t)h * w.T + g] = best_l;
-            atomicAdd(&buckets[2 * c + (definite_site(w, g) ? 0u : 1u)], 1u);
         }
         __syncwarp();
         uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
@@ -910,19 +1087,26 @@ extern "C" __global__ void field_classes(FieldWords w) {
             off[2 * classes] = at;
         }
         __syncwarp();
-        uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        uint32_t *members = w.members + ((uint64_t)h * w.T + first) * stride;
         for (uint32_t i0 = 0; i0 < sites; i0 += 32) {
             const uint32_t i = i0 + lane;
-            const bool live = i < sites;
-            const uint32_t c = live ? 2 * w.cls[(uint64_t)h * w.T + first + i] + (definite_site(w, first + i) ? 0u : 1u) : 0xFFFFFFFFu;
-            const uint32_t peers = __match_any_sync(0xFFFFFFFFu, c);
-            const uint32_t rank = __popc(peers & ((1u << lane) - 1u));
-            const uint32_t base = live ? buckets[c] : 0;
+            uint32_t nc = 0;
+            if (i < sites) {
+                const Mem *mi = mem + (uint64_t)i * b;
+                nc = class_count(mi, b);
+                const uint32_t def = definite_site(w, first + i) ? 0u : 1u;
+                for (uint32_t q = 0; q < nc; q++) {
+                    keys[lane * stride + q] = 2 * class_at(mi, b, q) + def;
+                }
+            }
+            nkeys[lane] = nc;
             __syncwarp();
-            if (live) {
-                members[base + rank] = i;
-                if (rank == 0) {
-                    buckets[c] = base + __popc(peers);
+            if (lane == 0) {
+                for (uint32_t s = 0; s < 32; s++) {
+                    for (uint32_t q = 0; q < nkeys[s]; q++) {
+                        const uint32_t key = keys[s * stride + q];
+                        members[buckets[key]++] = i0 + s;
+                    }
                 }
             }
             __syncwarp();
@@ -970,39 +1154,6 @@ extern "C" __global__ void field_sums(FieldWords w) {
     }
 }
 
-// Site `i`'s support entry `k` of its region (the host's `ClassLists::support`, §14.1): the near field
-// first (`k < NEAR_SLOTS`, the `NEAR − 1` places before and after it, nearest first), then the
-// DEFINITE run of its class past the near field. Returns the source's place, or `UINT32_MAX` where the
-// entry meets no site (a near place outside the region, or a member of the class inside the near field).
-__device__ __forceinline__ uint32_t support_at(const uint32_t *members, const uint32_t *off, uint32_t c, uint32_t i, uint32_t sites, uint32_t k) {
-    if (k < NEAR_SLOTS) {
-        const uint32_t d = k / 2 + 1;
-        if (k % 2 == 0) {
-            return i >= d ? i - d : UINT32_MAX;
-        }
-        return i + d < sites ? i + d : UINT32_MAX;
-    }
-    const uint32_t j = members[off[2 * c] + k - NEAR_SLOTS];
-    const uint32_t gap = j > i ? j - i : i - j;
-    return gap >= NEAR ? j : UINT32_MAX;
-}
-
-// A site's support length in entries (`NEAR_SLOTS` near places and the definite run of its class).
-__device__ __forceinline__ uint32_t support_len(const uint32_t *off, uint32_t c) {
-    return NEAR_SLOTS + off[2 * c + 1] - off[2 * c];
-}
-
-// Source `j`'s receiver entry `k`: the receivers that hear it. The near field, and where `j` is definite
-// every member of its class past the near field (the support is directional: `j ∈ S_i` exactly when
-// `j` is near `i`, or definite in `i`'s class).
-__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
-    return support_at(members, off, c, j, sites, k);
-}
-
-__device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, uint32_t c, bool definite) {
-    return NEAR_SLOTS + (definite ? off[2 * c + 2] - off[2 * c] : 0);
-}
-
 // Receiver `i`'s crowd `slot` in a region of `sites` (the host's `crowd_ranges`, §14.10): octave
 // `level = 2 + ⌊slot/2⌋`, the nearer side first (even slots before `i`, odd after), the places
 // `|i − j| ∈ [max(2^level, NEAR), 2^(level+1) − 1]` within the region. False where the crowd is absent.
@@ -1043,44 +1194,89 @@ __device__ __forceinline__ int64_t octave(uint32_t d) {
     return 31 - __clz(d);
 }
 
-// The contact's score of the word `wi` (at unit power, its `span` reals) with site `j`'s, each mode's
-// pairing carried by its skin decay across the gap in a turned head (released `46 + β` bits) or bare in
-// a still one (`16 + β`), less the falloff `⌊log₂ |i − j|⌋` bits on `2^(−16)` (§2.5, §12).
-__device__ __forceinline__ int64_t contact_score(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint32_t gap, bool narrow) {
-    wide s;
-    if (!still_head(w, h)) {
-        s = 0;
-        for (uint32_t l = 0; l < w.n; l++) {
-            s += decay_of(w, h, l, gap) * ((wide)wi[l] * (wide)wj[l] + (wide)wi[w.n + l] * (wide)wj[w.n + l]);
-        }
-        return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + MOVE_BITS) - ((wide)octave(gap) << FACE_BITS), w.status);
-    }
-    if (narrow) {
-        int64_t n = 0;
-        for (uint32_t c = 0; c < w.span; c++) {
-            n += (int64_t)(int32_t)wi[c] * (int64_t)(int32_t)wj[c];
-        }
-        s = n;
-    } else {
-        s = 0;
-        for (uint32_t c = 0; c < w.span; c++) {
-            s += (wide)wi[c] * (wide)wj[c];
-        }
-    }
-    return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta)) - ((wide)octave(gap) << FACE_BITS), w.status);
+// -------------------------------------------------------------------------------------------
+// a mode's lock
+
+__device__ __forceinline__ uint32_t wide_bits(wide v) {
+    const uwide m = (uwide)(v < 0 ? -v : v);
+    const uint64_t hi = (uint64_t)(m >> 64);
+    return hi != 0 ? 128 - __clzll((long long)hi) : (m == 0 ? 0 : 64 - __clzll((long long)(uint64_t)m));
 }
 
-// A crowd's score (§14.10): its mean word at the octave's falloff, `div_nearest(Σ_l D_l (ŵ_il W_l +
-// ŵ_i,n+l W_n+l), count 2^(16 + β + grain)) − level 2^16`, the words' sum `W` two reads of the prefix
-// sums.
-__device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level) {
-    wide score = 0;
-    for (uint32_t l = 0; l < w.n; l++) {
-        const wide d = decay_raw(w, h, l, (uint32_t)1 << level);
-        score += d * ((wide)wi[l] * (swhi[l] - swlo[l]) + (wide)wi[w.n + l] * (swhi[w.n + l] - swlo[w.n + l]));
+// `a · b` where it fits `i128` (the host's `checked_mul`).
+__device__ __forceinline__ bool mul_fits(wide a, wide b, wide *r) {
+    if (wide_bits(a) + wide_bits(b) <= 126) {
+        *r = a * b;
+        return true;
     }
-    const uint32_t bits = (uint32_t)((int32_t)FACE_BITS + w.beta) + (still_head(w, h) ? 0 : MOVE_BITS);
-    return fit64(div_nearest(score, (wide)count << bits) - ((wide)level << FACE_BITS), w.status);
+    const bool neg = (a < 0) != (b < 0);
+    const uwide ua = (uwide)(a < 0 ? -a : a), ub = (uwide)(b < 0 ? -b : b);
+    const uint64_t a0 = (uint64_t)ua, a1 = (uint64_t)(ua >> 64), b0 = (uint64_t)ub, b1 = (uint64_t)(ub >> 64);
+    const uwide p00 = (uwide)a0 * b0, p01 = (uwide)a0 * b1, p10 = (uwide)a1 * b0, p11 = (uwide)a1 * b1;
+    const uwide mid = (p00 >> 64) + (uint64_t)p01 + (uint64_t)p10;
+    const uwide lo = (uwide)(uint64_t)p00 | (mid << 64);
+    const uwide hi = p11 + (p01 >> 64) + (p10 >> 64) + (mid >> 64);
+    const uwide limit = neg ? ((uwide)1 << 127) : (((uwide)1 << 127) - 1);
+    if (hi != 0 || lo > limit) {
+        return false;
+    }
+    *r = neg ? (wide)(0 - lo) : (wide)lo;
+    return true;
+}
+
+__device__ __forceinline__ bool add_fits(wide a, wide b, wide *r) {
+    const wide s = (wide)((uwide)a + (uwide)b);
+    if ((a >= 0) == (b >= 0) && (s >= 0) != (a >= 0)) {
+        return false;
+    }
+    *r = s;
+    return true;
+}
+
+__device__ __forceinline__ bool sub_fits(wide a, wide b, wide *r) {
+    const wide s = (wide)((uwide)a - (uwide)b);
+    if ((a >= 0) != (b >= 0) && (s >= 0) != (a >= 0)) {
+        return false;
+    }
+    *r = s;
+    return true;
+}
+
+// [definition; agent-inferred, November 1] **A mode's lock against the source that arrives** (the host's
+// `lock`, §15.2): `2 count D Re(conj(a) b) 2^g − D² |b|²` for the receiver's mode `a` and a source's `b`
+// (a crowd's summed word over its `count`) carried by the skin `(D, g)`, every product and sum checked
+// against the 128-bit carrier (the status bit is the host's refusal).
+__device__ __forceinline__ wide lock_of(wide a0, wide a1, wide b0, wide b1, wide count, wide decay, uint32_t grain, uint32_t *st) {
+    wide pairing, power, result;
+    bool ok = add_fits(a0 * b0, a1 * b1, &pairing);
+    ok = ok && mul_fits(pairing, 2 * count * decay, &pairing);
+    ok = ok && mul_fits(pairing, (wide)1 << grain, &pairing);
+    ok = ok && add_fits(b0 * b0, b1 * b1, &power);
+    ok = ok && mul_fits(power, decay * decay, &power);
+    ok = ok && sub_fits(pairing, power, &result);
+    if (!ok) {
+        atomicOr(st, REFUSED_CARRIER);
+        return 0;
+    }
+    return result;
+}
+
+// Mode `m`'s score of the word `wi` (at unit power, its `span` reals) against site `j`'s across `gap`
+// sites: the lock carried by the skin, released `score_bits + 2g + 1` bits, less the falloff
+// `⌊log₂ gap⌋` bits on `2^(−16)` (§2.5, §12, §15.2).
+__device__ __forceinline__ int64_t pair_score(const FieldWords &w, uint32_t h, uint32_t m, const int64_t *wi, const int64_t *wj, uint32_t gap) {
+    const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
+    const wide s = lock_of(wi[m], wi[w.n + m], wj[m], wj[w.n + m], 1, decay_raw(w, h, m, gap), g, w.status);
+    return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1) - ((wide)octave(gap) << FACE_BITS), w.status);
+}
+
+// A crowd's score at mode `m` (§14.10, §15.2): the lock of its summed word `W` over its `count`, `div_nearest(lock,
+// count² 2^(score_bits + 2g + 1)) − level 2^16`, the words' sum two reads of the prefix sums.
+__device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, uint32_t m, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level) {
+    const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
+    const wide s = lock_of(wi[m], wi[w.n + m], swhi[m] - swlo[m], swhi[w.n + m] - swlo[w.n + m], (wide)count, decay_raw(w, h, m, (uint32_t)1 << level), g, w.status);
+    const uint32_t bits = (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1;
+    return fit64(div_nearest(s, (wide)(count * count) << bits) - ((wide)level << FACE_BITS), w.status);
 }
 
 // The lanes that carry one entry of the span, and the parts of a chunk each lane takes: a lane an
@@ -1098,30 +1294,108 @@ __device__ __forceinline__ wide parts_sum(wide v, uint32_t span, uint32_t parts)
     return (wide)u;
 }
 
-// [definition; agent-inferred, November 1] **The contact, the series row and the current over each
-// site's support** (`Field::tick`, §14.10, §14.11), one warp a head and a receiving site, the carrier
-// `L` limbs. Pass one: the scores of the support and of the receiver's crowds and their least whole
-// bits `a_0`. Pass two: each term `face · mult` shifted by `a − a_0` summed whole into the mass (the
-// lanes over the terms) and, times each value entry, into the numerators (the lanes over the span's
-// entries, a lane an entry and a part of the chunk), a far source's multiplier the product of both
-// ends' holds, a crowd's mass multiplier its count. The numerators are divided once by the mass, to the
-// nearest numerator, and returned to the receiver's frame. With `store`, the third pass forms each
-// term's share of the mass, once, on `2^(−63)`: the pair's at the region block's dense address `[i][j]`
-// (which held its score), a crowd's at `ce[h][t][slot]`. The pairs met are counted.
-#define CONTACT_ROWS 8
-template <int L>
-__device__ void contact_body(const FieldWords &w, uint32_t store) {
-    __shared__ uint64_t t0[CONTACT_ROWS][32], t1[CONTACT_ROWS][32], t2[CONTACT_ROWS][32];
-    __shared__ uint32_t ts[CONTACT_ROWS][32], tj[CONTACT_ROWS][32];
-    __shared__ uint32_t tlo[CONTACT_ROWS][32], thi[CONTACT_ROWS][32], tlv[CONTACT_ROWS][32];
-    __shared__ int64_t crz[CONTACT_ROWS][32];
+// -------------------------------------------------------------------------------------------
+// a row's entries
+
+// [definition; agent-inferred, November 1] **A receiver's row of entries** (the host's `ClassLists::support`
+// and, for a source's column, its receivers): the near field (`NEAR_SLOTS` places, nearest first) and
+// past it, for each class `c` the site holds, the members of its definite run (a column: of the whole
+// class, where the source is definite) that stand beyond the near field, are counted at this class
+// (`canonical`) and weigh something (`overlap`). The warp keeps the site's memberships and its classes
+// with the running offsets of their runs, and stages 32 entries at a time: a lane an entry.
+struct RowShared {
+    Mem mi[MAXB];
+    uint32_t cl[MAXCL];
+    uint32_t cum[MAXCL + 1];
+    uint32_t nc;
+    uint32_t stj[32];
+    uint64_t stw[32];
+};
+
+// The row of site `i` (head `h`, the region at `first`): its memberships and its classes' runs, the
+// run being the definite members (`columns` false) or, where the site is definite, every member of the
+// class (`columns` true). Returns the row's entry count.
+__device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint32_t h, uint64_t first, uint32_t i, const uint32_t *off, RowShared &rs, uint32_t lane, bool columns, bool definite) {
+    const uint32_t b = w.ctrits;
+    const Mem *mem = w.mem + ((uint64_t)h * w.T + first) * b;
+    if (lane < b) {
+        rs.mi[lane] = mem[(uint64_t)i * b + lane];
+    }
+    __syncwarp();
+    if (lane == 0) {
+        const uint32_t nc = class_count(rs.mi, b);
+        uint32_t at = 0;
+        rs.cum[0] = 0;
+        for (uint32_t q = 0; q < nc; q++) {
+            const uint32_t c = class_at(rs.mi, b, q);
+            rs.cl[q] = c;
+            at += columns ? (definite ? off[2 * c + 2] - off[2 * c] : 0) : off[2 * c + 1] - off[2 * c];
+            rs.cum[q + 1] = at;
+        }
+        rs.nc = nc;
+    }
+    __syncwarp();
+    return NEAR_SLOTS + rs.cum[rs.nc];
+}
+
+// Entry `e` of the row: its place and its weight on `2^(−62)` (`j = UINT32_MAX` where the entry meets
+// no site).
+__device__ __forceinline__ void row_entry(const FieldWords &w, uint32_t h, uint64_t first, uint32_t sites, uint32_t i, const RowShared &rs, const uint32_t *members, const uint32_t *off, uint32_t e, uint32_t K, uint32_t *jout, uint64_t *wout) {
+    uint32_t j = UINT32_MAX;
+    uint64_t wt = 0;
+    if (e < K) {
+        if (e < NEAR_SLOTS) {
+            const uint32_t d = e / 2 + 1;
+            if (e % 2 == 0) {
+                if (i >= d) {
+                    j = i - d;
+                }
+            } else if (i + d < sites) {
+                j = i + d;
+            }
+            wt = (uint64_t)1 << WEIGHT_BITS;
+        } else {
+            const uint32_t k = e - NEAR_SLOTS;
+            uint32_t q = 0;
+            while (k >= rs.cum[q + 1]) {
+                q++;
+            }
+            const uint32_t c = rs.cl[q];
+            const uint32_t jj = members[off[2 * c] + (k - rs.cum[q])];
+            const uint32_t gap = jj > i ? jj - i : i - jj;
+            if (gap >= NEAR) {
+                const Mem *mem = w.mem + ((uint64_t)h * w.T + first) * w.ctrits;
+                uint32_t canon = 0;
+                const uwide ww = far_weight(rs.mi, mem + (uint64_t)jj * w.ctrits, w.ctrits, &canon);
+                if (ww > 0 && canon == c) {
+                    j = jj;
+                    wt = (uint64_t)ww;
+                }
+            }
+        }
+    }
+    *jout = j;
+    *wout = wt;
+}
+
+// -------------------------------------------------------------------------------------------
+// the exposure and the contact
+
+// [definition; agent-inferred, November 1] **The row's exponents, read before its carrier is chosen**
+// (§14.11: width is dynamic, never arbitrary). One warp a head and a receiving site: each mode's least
+// whole bit `a_0` over its terms (the support's and the crowds'), kept in `amin[h][t][m]`, and the widest
+// spread `a − a_0` any of the row's modes holds, raised into `bits[1]`; the host reads the launch's widest
+// row and launches the contact with the carrier it needs.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(FieldWords w) {
+    __shared__ RowShared rss[CONTACT_ROWS];
+    __shared__ int64_t crz[CONTACT_ROWS][MAX_CROWD_SLOTS * MAXN];
     __shared__ uint64_t crn[CONTACT_ROWS][32];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
-    const uint32_t S = w.span;
-    const uint32_t classes = w.nclasses;
-    const bool narrow = w.bits[0] <= 31 && 2 * w.bits[0] + ceil_log2(S) <= 62;
+    RowShared &rs = rss[warp];
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const uint32_t parts = span_parts(S);
-    const uint32_t entry = lane % S, part = lane / S;
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
     const uint64_t rows = (uint64_t)w.H * w.T;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
@@ -1130,86 +1404,190 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
-        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *members = w.members + ((uint64_t)h * w.T + first) * ((uint32_t)1 << w.ctrits);
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
-        const uint32_t c = w.cls[(uint64_t)h * w.T + g];
-        const uint32_t K = support_len(off, c);
+        const uint32_t K = row_prepare(w, h, first, i, off, rs, lane, false, false);
+        const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *wi = words + (uint64_t)i * S;
+        const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
+        const wide *swp = w.sw + prow0 * S;
+        const uint64_t *scp = w.sc + prow0;
+        const uint32_t nslots = crowd_slots(sites);
+        // The crowds' counts, then their scores a mode.
+        {
+            uint64_t count = 0;
+            uint32_t lo, hi_, lv;
+            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+                count = scp[hi_ + 1] - scp[lo];
+            }
+            crn[warp][lane] = count;
+        }
+        __syncwarp();
+        for (uint32_t it = lane; it < nslots * n; it += 32) {
+            const uint32_t slot = it / n, mm = it % n;
+            if (crn[warp][slot] != 0) {
+                uint32_t lo, hi_, lv;
+                crowd_at(i, sites, slot, &lo, &hi_, &lv);
+                crz[warp][slot * n + mm] = crowd_score(w, h, mm, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, crn[warp][slot], lv);
+            }
+        }
+        __syncwarp();
+        int64_t amin = INT64_MAX, amax = INT64_MIN;
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            uint32_t j;
+            uint64_t wt;
+            row_entry(w, h, first, sites, i, rs, members, off, e0 + lane, K, &j, &wt);
+            rs.stj[lane] = j;
+            __syncwarp();
+            if (active) {
+                for (uint32_t jj = part; jj < 32; jj += parts) {
+                    const uint32_t jx = rs.stj[jj];
+                    if (jx == UINT32_MAX) {
+                        continue;
+                    }
+                    const int64_t a = pair_score(w, h, m, wi, words + (uint64_t)jx * S, jx > i ? jx - i : i - jx) >> FACE_BITS;
+                    amin = a < amin ? a : amin;
+                    amax = a > amax ? a : amax;
+                }
+            }
+            __syncwarp();
+        }
+        if (active) {
+            for (uint32_t jj = part; jj < nslots; jj += parts) {
+                if (crn[warp][jj] != 0) {
+                    const int64_t a = crz[warp][jj * n + m] >> FACE_BITS;
+                    amin = a < amin ? a : amin;
+                    amax = a > amax ? a : amax;
+                }
+            }
+        }
+        for (uint32_t o = S; parts > 1 && o < 32; o <<= 1) {
+            const int64_t omin = (int64_t)__shfl_xor_sync(0xFFFFFFFFu, (unsigned long long)amin, (int)o);
+            const int64_t omax = (int64_t)__shfl_xor_sync(0xFFFFFFFFu, (unsigned long long)amax, (int)o);
+            amin = omin < amin ? omin : amin;
+            amax = omax > amax ? omax : amax;
+        }
+        uint64_t spread = 0;
+        if (active && amin != INT64_MAX) {
+            spread = (uint64_t)(amax - amin);
+        } else {
+            amin = 0;
+        }
+        if (active && part == 0 && entry < n) {
+            w.amin[hg * n + entry] = amin;
+        }
+        spread = warp_max_u64(spread);
+        if (lane == 0) {
+            atomicMax(&w.bits[1], (uint32_t)(spread > 0xFFFFFFFFull ? 0xFFFFFFFFu : spread));
+        }
+    }
+}
+
+// [definition; agent-inferred, November 1] **The contact, each mode's series row and its current over
+// each site's support** (`Field::tick`, §14.10, §14.11, §15.2), one warp a head and a receiving site,
+// the carrier `L` limbs the exposure chose. A lane is an entry of the span (the real or the imaginary part
+// of one mode's value) and a part of the staged entries: the lanes of a mode each form its terms, `face ·
+// weight` shifted by `a − a_0` into the mode's mass and, times their value entry, into the numerators,
+// in the lock-scored order of `pair_score`, a crowd's mass multiplier its count and its value
+// multiplier one. The numerators are divided once by the mode's mass (`RowDiv`, the exact division to the
+// nearest numerator) and returned to the receiver's frame. With `store`, each term's share of its
+// mode's mass is formed once on `2^(−63)`: the pair's at the region block's dense address `[i][j][m]`
+// (which held its score), a crowd's at `ce[h][t][slot][m]`. The pairs met are counted.
+template <int L>
+__device__ void contact_body(const FieldWords &w, uint32_t store) {
+    __shared__ RowShared rss[CONTACT_ROWS];
+    __shared__ int64_t crz[CONTACT_ROWS][MAX_CROWD_SLOTS * MAXN];
+    __shared__ uint64_t crn[CONTACT_ROWS][32];
+    __shared__ uint32_t crlo[CONTACT_ROWS][32], crhi[CONTACT_ROWS][32], crlv[CONTACT_ROWS][32];
+    __shared__ int64_t shamin[CONTACT_ROWS][MAXN];
+    __shared__ RowDiv<L> rdv[CONTACT_ROWS][MAXN];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    RowShared &rs = rss[warp];
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+    const uint32_t parts = span_parts(S);
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    const uint64_t rows1 = (uint64_t)w.T + w.R;
+    for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint32_t h = hg / w.T;
+        const uint64_t g = hg % w.T;
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t *members = w.members + ((uint64_t)h * w.T + first) * ((uint32_t)1 << w.ctrits);
+        const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        const uint32_t K = row_prepare(w, h, first, i, off, rs, lane, false, false);
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *wi = words + (uint64_t)i * S;
-        const uint64_t *holds = w.hold + (uint64_t)h * w.T + first;
-        const uint64_t hi = holds[i];
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = crowd_slots(sites);
-        // Pass one: the least whole bits of the row's terms.
-        int64_t amin = INT64_MAX;
-        uint32_t met = 0;
-        for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, c, i, sites, k);
-            if (j != UINT32_MAX) {
-                const int64_t z = contact_score(w, h, wi, words + (uint64_t)j * S, j > i ? j - i : i - j, narrow);
-                const int64_t a = z >> FACE_BITS;
-                amin = a < amin ? a : amin;
-                met += 1;
-            }
-        }
+        // The crowds: counts and places, then each mode's score; the modes' least bits.
         {
             uint64_t count = 0;
-            int64_t z = 0;
-            uint32_t lo, hi_, lv;
+            uint32_t lo = 0, hi_ = 0, lv = 0;
             if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
                 count = scp[hi_ + 1] - scp[lo];
-                if (count != 0) {
-                    z = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv);
-                    const int64_t a = z >> FACE_BITS;
-                    amin = a < amin ? a : amin;
-                }
             }
-            crz[warp][lane] = z;
             crn[warp][lane] = count;
+            crlo[warp][lane] = lo;
+            crhi[warp][lane] = hi_;
+            crlv[warp][lane] = lv;
+            if (lane < n) {
+                shamin[warp][lane] = w.amin[hg * n + lane];
+            }
         }
-        amin = warp_min_signed(amin);
-        if (amin == INT64_MAX) {
-            amin = 0;
+        __syncwarp();
+        for (uint32_t it = lane; it < nslots * n; it += 32) {
+            const uint32_t slot = it / n, mm = it % n;
+            if (crn[warp][slot] != 0) {
+                crz[warp][slot * n + mm] = crowd_score(w, h, mm, wi, swp + (uint64_t)crlo[warp][slot] * S, swp + (uint64_t)(crhi[warp][slot] + 1) * S, crn[warp][slot], crlv[warp][slot]);
+            }
         }
-        // Pass two: the terms summed whole.
-        uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        __syncwarp();
+        const int64_t amin = shamin[warp][m];
+        uint64_t *erow = w.e + ((uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites) * n;
         Big<L> M = big_zero<L>();
         Big<L> N = big_zero<L>();
-        uint32_t negs = 0;
-        // The numerators of the chunk in the shared arrays (a pair's, or a crowd's when `crowd`).
-        const auto numerators = [&](bool crowd) {
-            if (part < parts) {
+        uint32_t negs = 0, met = 0;
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            uint32_t j;
+            uint64_t wt;
+            row_entry(w, h, first, sites, i, rs, members, off, e0 + lane, K, &j, &wt);
+            rs.stj[lane] = j;
+            rs.stw[lane] = wt;
+            met += j != UINT32_MAX ? 1 : 0;
+            __syncwarp();
+            if (active) {
                 for (uint32_t jj = part; jj < 32; jj += parts) {
-                    const uint32_t j = tj[warp][jj];
-                    if (j == UINT32_MAX) {
+                    const uint32_t jx = rs.stj[jj];
+                    if (jx == UINT32_MAX) {
                         continue;
                     }
-                    Coef cf;
-                    cf.c0 = t0[warp][jj];
-                    cf.c1 = t1[warp][jj];
-                    cf.c2 = t2[warp][jj];
-                    if ((cf.c0 | cf.c1 | cf.c2) == 0) {
-                        continue;
-                    }
-                    Big<L> p;
-                    bool neg;
-                    if (!crowd) {
-                        const uint32_t gap = j > i ? j - i : i - j;
-                        const wide v = carried(w, h, entry % w.n, gap, values[(uint64_t)j * S + entry]);
-                        neg = v < 0;
-                        p = big_mul<L, false>(cf, mag64((int64_t)v), 0);
+                    const uint32_t gap = jx > i ? jx - i : i - jx;
+                    const int64_t z = pair_score(w, h, m, wi, words + (uint64_t)jx * S, gap);
+                    int64_t a;
+                    uint64_t face;
+                    term_of(w, z, &a, &face);
+                    const int64_t sh = a - amin;
+                    uint32_t s = 0;
+                    if (sh >= (int64_t)(64 * L)) {
+                        atomicOr(w.status, REFUSED_CARRIER);
                     } else {
-                        const uint32_t lo = tlo[warp][jj], hi_ = thi[warp][jj], lv = tlv[warp][jj];
-                        const wide v = carried_wide(w, h, entry % w.n, (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
-                        neg = v < 0;
-                        const uwide m = (uwide)(neg ? -v : v);
-                        p = big_mul<L, true>(cf, (uint64_t)m, (uint64_t)(m >> 64));
+                        s = (uint32_t)sh;
                     }
-                    p = big_shl(p, ts[warp][jj]);
+                    const Coef cf = coef_of(face, (uwide)rs.stw[jj]);
+                    big_add(M, big_shl(big_of<L>(cf), s));
+                    if (store && entry < n) {
+                        erow[(uint64_t)jx * n + m] = (uint64_t)z;
+                    }
+                    const wide v = carried(w, h, m, gap, values[(uint64_t)jx * S + entry]);
+                    const bool neg = v < 0;
+                    Big<L> p = big_shl(big_mul<L, false>(cf, mag64((int64_t)v), 0), s);
                     if (neg) {
 #pragma unroll
                         for (int k = 0; k < L; k++) {
@@ -1220,160 +1598,147 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     big_add(N, p);
                 }
             }
-        };
-        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
-            const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, c, i, sites, k) : UINT32_MAX;
-            Coef cf = {0, 0, 0};
-            uint32_t s = 0;
-            if (j != UINT32_MAX) {
-                const uint32_t gap = j > i ? j - i : i - j;
-                const int64_t z = contact_score(w, h, wi, words + (uint64_t)j * S, gap, narrow);
+            __syncwarp();
+        }
+        // The crowds' terms: a crowd's mass multiplier is its count `2^62`, its value multiplier `2^62`.
+        if (active) {
+            for (uint32_t jj = part; jj < nslots; jj += parts) {
+                const uint64_t count = crn[warp][jj];
+                if (count == 0) {
+                    continue;
+                }
                 int64_t a;
                 uint64_t face;
-                term_of(w, z, &a, &face);
+                term_of(w, crz[warp][jj * n + m], &a, &face);
                 const int64_t sh = a - amin;
+                uint32_t s = 0;
                 if (sh >= (int64_t)(64 * L)) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 } else {
                     s = (uint32_t)sh;
                 }
-                const uwide mult = gap < NEAR ? ((uwide)1 << (2 * HOLD_BITS)) : (uwide)hi * (uwide)holds[j];
-                cf = coef_of(face, mult);
-                big_add(M, big_shl(big_of<L>(cf), s));
-                if (store) {
-                    erow[j] = (uint64_t)z;
+                big_add(M, big_shl(big_of<L>(coef_of(face, (uwide)count << WEIGHT_BITS)), s));
+                const Coef cv = coef_of(face, (uwide)1 << WEIGHT_BITS);
+                const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                const wide v = carried_wide(w, h, m, (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
+                const bool neg = v < 0;
+                const uwide mag = (uwide)(neg ? -v : v);
+                Big<L> p = big_shl(big_mul<L, true>(cv, (uint64_t)mag, (uint64_t)(mag >> 64)), s);
+                if (neg) {
+#pragma unroll
+                    for (int k = 0; k < L; k++) {
+                        p.v[k] = ~p.v[k];
+                    }
+                    negs += 1;
                 }
+                big_add(N, p);
             }
-            t0[warp][lane] = cf.c0;
-            t1[warp][lane] = cf.c1;
-            t2[warp][lane] = cf.c2;
-            ts[warp][lane] = s;
-            tj[warp][lane] = j;
-            __syncwarp();
-            numerators(false);
-            __syncwarp();
-        }
-        // The crowds' chunk: a crowd's value multiplier is `2^80`, its mass multiplier its count `2^80`.
-        {
-            const uint64_t count = crn[warp][lane];
-            Coef cf = {0, 0, 0};
-            uint32_t s = 0, slot = UINT32_MAX, lo = 0, hi_ = 0, lv = 0;
-            if (count != 0 && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
-                slot = lane;
-                int64_t a;
-                uint64_t face;
-                term_of(w, crz[warp][lane], &a, &face);
-                const int64_t sh = a - amin;
-                if (sh >= (int64_t)(64 * L)) {
-                    atomicOr(w.status, REFUSED_CARRIER);
-                } else {
-                    s = (uint32_t)sh;
-                }
-                big_add(M, big_shl(big_of<L>(coef_of(face, (uwide)count << (2 * HOLD_BITS))), s));
-                cf = coef_of(face, (uwide)1 << (2 * HOLD_BITS));
-            }
-            t0[warp][lane] = cf.c0;
-            t1[warp][lane] = cf.c1;
-            t2[warp][lane] = cf.c2;
-            ts[warp][lane] = s;
-            tj[warp][lane] = slot;
-            tlo[warp][lane] = lo;
-            thi[warp][lane] = hi_;
-            tlv[warp][lane] = lv;
-            __syncwarp();
-            numerators(true);
-            __syncwarp();
-        }
-        // The mass over the lanes; the numerators over the parts of each entry.
-        for (int o = 16; o > 0; o >>= 1) {
-            const Big<L> other = shfl_big(M, o);
-            big_add(M, other);
         }
         for (uint32_t o = S; parts > 1 && o < 32; o <<= 1) {
-            const Big<L> other = shfl_big(N, (int)o);
-            big_add(N, other);
+            const Big<L> om = shfl_big(M, (int)o);
+            big_add(M, om);
+            const Big<L> on = shfl_big(N, (int)o);
+            big_add(N, on);
             negs += __shfl_xor_sync(0xFFFFFFFFu, negs, (int)o);
         }
         met = (uint32_t)warp_sum_u64(met);
-        // The framed current's entry `entry`: the numerator over the mass, to the nearest numerator.
+        // The framed current's entry `entry`: the numerator over its mode's mass, to the nearest numerator.
         int64_t y = 0;
-        if (part == 0 && lane < S) {
+        if (active && part == 0) {
+            const RowDiv<L> rd = rowdiv_of(M);
             big_add_small(N, negs);
             const bool negative = (N.v[L - 1] >> 63) != 0;
             if (negative) {
                 big_negate(N);
             }
             uint64_t q = 0;
-            bool ok = big_div_nearest(N, M, &q);
+            bool ok = rowdiv_nearest(N, rd, &q);
             ok = ok && (negative ? q <= ((uint64_t)1 << 63) : q < ((uint64_t)1 << 63));
             if (ok) {
                 y = (int64_t)(negative ? (uint64_t)0 - q : q);
             } else {
                 atomicOr(w.status, REFUSED_WORD64);
             }
+            if (entry < n) {
+                rdv[warp][entry] = rd;
+            }
         }
-        const int64_t yi = __shfl_sync(0xFFFFFFFFu, y, (lane + w.n) % 32);
+        const int64_t yi = __shfl_sync(0xFFFFFFFFu, y, (lane + n) % 32);
         if (lane == 0) {
             atomicAdd(w.met, (unsigned long long)met);
         }
-        if (lane < w.n) {
+        if (lane < n) {
             wide ur, ui;
             frame_of(w, i, h, lane, &ur, &ui);
-            const uint32_t m = h * w.n + lane;
-            w.y[g * w.M2 + m] = fit64(rel(ur * (wide)y + ui * (wide)yi, MOVE_BITS), w.status);
-            w.y[g * w.M2 + w.M + m] = fit64(rel(ur * (wide)yi - ui * (wide)y, MOVE_BITS), w.status);
+            const uint32_t mc = h * n + lane;
+            w.y[g * w.M2 + mc] = fit64(rel(ur * (wide)y + ui * (wide)yi, MOVE_BITS), w.status);
+            w.y[g * w.M2 + w.M + mc] = fit64(rel(ur * (wide)yi - ui * (wide)y, MOVE_BITS), w.status);
         }
-        // Pass three: each term's share of the mass, formed once.
+        __syncwarp();
+        // Pass three: each term's share of its mode's mass, once, an item a (term, mode).
         if (store) {
-            for (uint32_t k = lane; k < K; k += 32) {
-                const uint32_t j = support_at(members, off, c, i, sites, k);
-                if (j != UINT32_MAX) {
-                    const uint32_t gap = j > i ? j - i : i - j;
+            for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+                uint32_t j;
+                uint64_t wt;
+                row_entry(w, h, first, sites, i, rs, members, off, e0 + lane, K, &j, &wt);
+                rs.stj[lane] = j;
+                rs.stw[lane] = wt;
+                __syncwarp();
+                for (uint32_t it = lane; it < 32 * n; it += 32) {
+                    const uint32_t jj = it / n, mm = it % n;
+                    const uint32_t jx = rs.stj[jj];
+                    if (jx == UINT32_MAX) {
+                        continue;
+                    }
                     int64_t a;
                     uint64_t face;
-                    term_of(w, (int64_t)erow[j], &a, &face);
-                    const int64_t sh = a - amin;
-                    const uwide mult = gap < NEAR ? ((uwide)1 << (2 * HOLD_BITS)) : (uwide)hi * (uwide)holds[j];
-                    const Big<L> x = big_shl(big_of<L>(coef_of(face, mult)), (uint32_t)sh + SHARE_BITS);
+                    term_of(w, (int64_t)erow[(uint64_t)jx * n + mm], &a, &face);
+                    const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)rs.stw[jj])), (uint32_t)(a - shamin[warp][mm]) + SHARE_BITS);
                     uint64_t p = 0;
-                    if (!big_div_nearest(x, M, &p)) {
+                    if (!rowdiv_nearest(x, rdv[warp][mm], &p)) {
                         p = UINT64_MAX;
                     }
-                    erow[j] = p;
+                    erow[(uint64_t)jx * n + mm] = p;
                 }
+                __syncwarp();
             }
-            uint64_t p = 0;
-            uint32_t lo, hi_, lv;
-            if (lane < w.slots && crn[warp][lane] != 0 && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
-                int64_t a;
-                uint64_t face;
-                term_of(w, crz[warp][lane], &a, &face);
-                const int64_t sh = a - amin;
-                const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)crn[warp][lane] << (2 * HOLD_BITS))), (uint32_t)sh + SHARE_BITS);
-                if (!big_div_nearest(x, M, &p)) {
-                    p = UINT64_MAX;
+            for (uint32_t it = lane; it < nslots * n; it += 32) {
+                const uint32_t slot = it / n, mm = it % n;
+                uint64_t p = 0;
+                if (crn[warp][slot] != 0) {
+                    int64_t a;
+                    uint64_t face;
+                    term_of(w, crz[warp][slot * n + mm], &a, &face);
+                    const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)crn[warp][slot] << WEIGHT_BITS)), (uint32_t)(a - shamin[warp][mm]) + SHARE_BITS);
+                    if (!rowdiv_nearest(x, rdv[warp][mm], &p)) {
+                        p = UINT64_MAX;
+                    }
                 }
-            }
-            if (lane < w.slots) {
-                w.ce[hg * w.slots + lane] = p;
+                w.ce[(hg * w.slots + slot) * n + mm] = p;
             }
         }
+        __syncwarp();
     }
 }
 
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l5(FieldWords w, uint32_t store) {
-    contact_body<5>(w, store);
-}
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l6(FieldWords w, uint32_t store) {
-    contact_body<6>(w, store);
-}
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l7(FieldWords w, uint32_t store) {
-    contact_body<7>(w, store);
-}
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l8(FieldWords w, uint32_t store) {
-    contact_body<8>(w, store);
-}
+#define CONTACT_ENTRY(LL) \
+    extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l##LL(FieldWords w, uint32_t store) { contact_body<LL>(w, store); }
+CONTACT_ENTRY(5)
+CONTACT_ENTRY(6)
+CONTACT_ENTRY(7)
+CONTACT_ENTRY(8)
+CONTACT_ENTRY(9)
+CONTACT_ENTRY(10)
+CONTACT_ENTRY(11)
+CONTACT_ENTRY(12)
+CONTACT_ENTRY(13)
+CONTACT_ENTRY(14)
+CONTACT_ENTRY(15)
+CONTACT_ENTRY(16)
+CONTACT_ENTRY(17)
+CONTACT_ENTRY(18)
+CONTACT_ENTRY(19)
+CONTACT_ENTRY(20)
 
 // The pair contact's product `c = release(a ⊙ b, 16)`.
 extern "C" __global__ void field_pair(FieldWords w) {
@@ -1525,260 +1890,350 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
     return v * ((wide)1 << -beta);
 }
 
-// [definition; agent-inferred, November 1] **The contact's return over one head's rows**, one warp a
-// receiving site `i` (`Field::returned`, §14.2, §14.10, §14.11). Over its support, `δp_ij = ⟨δỹ_i, D ṽ_j⟩`,
-// and for each crowd the same against its decayed mean value; the mean `μ_i = release(Σ p δp, 63)` over
-// the pairs and the crowds; `δz = release(ln2 release(p (δp − μ), 63), 30)` and the closure's comparison
-// (the holders are the known same-class pairs of an unresolved receiver at a closing tick), `δs =
-// gained(δz, β)` held at the region block's dense address for the columns; a far pair's share without
-// one end's hold, `p/λ`, returns the same comparison to that end's hold covector (`lifts`, summed with
-// the ring's atomic step); and the word's row return `release(Σ δs D ŵ_j + Σ_C div_nearest(δs_C D W_C,
-// |C|), 32)` written to its framed chart slot. A crowd's share of the values and of the word is spread
-// over its members by the difference arrays `cv`, `cw` over the places.
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_rows(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, wide *ds, int64_t *dq) {
-    __shared__ wide dss[CONTACT_ROWS][32];
-    __shared__ uint32_t js[CONTACT_ROWS][32];
-    __shared__ wide dpcs[CONTACT_ROWS][32];
-    __shared__ wide dsks[CONTACT_ROWS][32];
-    __shared__ uint64_t cnts[CONTACT_ROWS][32];
-    __shared__ Divisor cdivs[CONTACT_ROWS][32];
+// [definition; agent-inferred, November 1] **A far weight's return to the holds** (the host's
+// `overlap_return`, §15.2): with `E = ∂L/∂ln w` on `2^(−40)`, each end's in-band mode `l` receives `E ·
+// (∂BC_l/∂λ_l) / BC_l`, `∂BC_l/∂λ_l = Σ_s r_other(s) ∂r(s)/∂λ`, the slopes `up = r_across 2^(−31+...)·fall /
+// r_own` at the end's own shell and `down = −fall` across (`fall = √(2^(62 + 2 band) / 2)` nearest). The
+// receiver's end is summed in `lift_i` (registers), the source's added to `lifts_j` by the ring's atomic
+// step; a product past the carrier is refused.
+__device__ __forceinline__ void overlap_return(const FieldWords &w, wide e, const Mem *mi, const Mem *mj, wide fall, wide *lift_i, wide *lifts_j) {
+    const uint32_t b = w.ctrits;
+#pragma unroll
+    for (uint32_t l = 0; l < MAXB; l++) {
+        if (l >= b) {
+            break;
+        }
+        const wide bc = (wide)mem_factor(mi[l], mj[l]);
+#pragma unroll
+        for (int end = 0; end < 2; end++) {
+            const Mem &a = end == 0 ? mi[l] : mj[l];
+            const Mem &o = end == 0 ? mj[l] : mi[l];
+            if (a.r_across == 0) {
+                continue;
+            }
+            const wide up = div_nearest((wide)a.r_across * fall, (wide)a.r_own);
+            const wide dbc = up * (wide)mem_amp(o, a.own) + (-fall) * (wide)mem_amp(o, a.across);
+            if (wide_bits(e) + wide_bits(dbc) > 126) {
+                atomicOr(w.status, REFUSED_CARRIER);
+                continue;
+            }
+            const wide v = div_nearest(e * dbc, bc);
+            if (end == 0) {
+                lift_i[l] += v;
+            } else {
+                add_wide(lifts_j + l, v);
+            }
+        }
+    }
+}
+
+// [definition; agent-inferred, November 1] **The contact's return over one head's rows, a mode at a
+// time**, one warp a receiving site `i` (`Field::returned`, §14.2, §14.10, §14.11, §15.2). Over its
+// support and each mode `m`, `δp_k,m = ⟨δỹ_im, D_m ṽ_km⟩` (a crowd's the same against its decayed mean
+// value), the mode's mean `μ_m = release(Σ p_k,m δp_k,m, 63)`, `δz = release(ln2 release(p (δp − μ),
+// 63), 30)` and the closure's comparison (the holders are the known same-class pairs of an unresolved
+// receiver at a closing tick, over the ring set's heads and the head's modes), `δs = gained(δz, β)` held
+// at the region block's dense address `[i][j][m]` for the columns. A far pair's weight multiplies every
+// mode's term, so its covector `E = Σ_m p (δp − μ) + closure` returns through `overlap_return` to both
+// ends' holds. The word's row return `release(Σ δs D ŵ_j + Σ_C div_nearest(δs_C D W_C, |C|), 32)` is
+// written to the framed chart slot; a crowd's share of the values and of the word (its lock's key role)
+// spreads over its members by the difference arrays `cv`, `cw`. A lane is a pair for the modes' sums and
+// the staged `δs`, and an entry of the span for the row's return.
+#define REV_ROWS 2
+template <int N>
+__device__ void rows_body(const FieldWords &w, uint32_t h, uint32_t closes, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+    __shared__ RowShared rss[REV_ROWS];
+    __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS * N];
+    __shared__ int64_t dsks[REV_ROWS][MAX_CROWD_SLOTS * N];
+    __shared__ int64_t dss[REV_ROWS][32 * N];
+    __shared__ uint64_t cnts[REV_ROWS][32];
+    __shared__ uint32_t crlo[REV_ROWS][32], crhi[REV_ROWS][32], crlv[REV_ROWS][32];
+    __shared__ Divisor cdiv[REV_ROWS][32], cdiv2[REV_ROWS][32];
+    __shared__ wide means[REV_ROWS][N], holderss[REV_ROWS][N];
+    __shared__ Divisor hbs[REV_ROWS][N];
+    __shared__ uint32_t hbig[REV_ROWS][N];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
-    const uint32_t S = w.span;
-    const uint32_t classes = w.nclasses;
+    RowShared &rs = rss[warp];
+    const uint32_t S = w.span, n = N, classes = w.nclasses, b = w.ctrits;
     const uint32_t parts = span_parts(S);
-    const uint32_t entry = lane % S, part = lane / S;
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     const bool still = still_head(w, h);
     const uint64_t rows1 = (uint64_t)w.T + w.R;
+    const wide fall = (wide)sqrt_nearest((uwide)1 << (2 * AMPLITUDE_BITS + 2 * w.band), 1);
+    // The ring set's heads and modes a closure compares over (once).
+    const uint64_t copies = closes != 0 ? (uint64_t)closes * n : 1;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint64_t hg = (uint64_t)h * w.T + g;
         const uint32_t r = w.site_region[g];
         const uint32_t i = w.site_pos[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *members = w.members + ((uint64_t)h * w.T + first) * ((uint32_t)1 << b);
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
-        const uint32_t c = w.cls[(uint64_t)h * w.T + g];
-        const uint32_t K = support_len(off, c);
-        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
-        wide *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
-        const int64_t *dyi = dyh + ((uint64_t)h * w.T + g) * S;
+        const uint32_t K = row_prepare(w, h, first, i, off, rs, lane, false, false);
+        const uint64_t pairs0 = (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        const uint64_t *ebase = w.e + pairs0 * N;
+        int64_t *dsr = ds + (w.region_eoff[r] + (uint64_t)i * sites) * N;
+        const int64_t *dyi = dyh + hg * S;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
-        const uint64_t *holds_l = w.hold + (uint64_t)h * w.T + first;
+        const Mem *memh = w.mem + ((uint64_t)h * w.T + first) * b;
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = crowd_slots(sites);
         // The closure (§19), over the support's pairs: on a still head at a closing tick, an unresolved
-        // site's row is also compared with where its class stands among the sites it meets
-        // (`closes` is the ring set's head count, zero where the head does not close). A carried site
+        // site's rows are also compared with where its class stands among the sites it meets. A carried site
         // holds nothing.
         const bool open = closes != 0 && w.unresolved[g] != 0;
         const uint32_t cls = w.classes[g];
         const auto holds = [&](uint32_t j) { return w.unresolved[first + j] == 0 && w.mix_off[first + j] == w.mix_off[first + j + 1] && w.classes[first + j] == cls; };
-        // Pass A: δp over the pairs, held in the dense return; the weighted sum and the holders' share.
-        wide weighted = 0;
-        wide held = 0;
-        for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, c, i, sites, k);
-            if (j == UINT32_MAX) {
-                continue;
-            }
-            const int64_t *vj = values + (uint64_t)j * S;
-            const uint32_t gap = j > i ? j - i : i - j;
-            wide dp = 0;
-            for (uint32_t x = 0; x < S; x++) {
-                dp += (wide)dyi[x] * carried(w, h, x % w.n, gap, vj[x]);
-            }
-            dsr[j] = dp;
-            weighted += (wide)e[j] * dp;
-            held += (open && holds(j)) ? (wide)e[j] : 0;
-        }
-        // The crowds: δp against the decayed mean value, `div_nearest(Σ_x δỹ_x D V_x, |C|)`.
+        // The crowds: counts, places and their divisors.
         {
             uint64_t count = 0;
-            wide dpc = 0;
-            uint32_t lo, hi_, lv;
+            uint32_t lo = 0, hi_ = 0, lv = 0;
             if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
                 count = scp[hi_ + 1] - scp[lo];
-                if (count != 0) {
-                    wide sum = 0;
-                    for (uint32_t x = 0; x < S; x++) {
-                        sum += (wide)dyi[x] * carried_wide(w, h, x % w.n, (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
-                    }
-                    cdivs[warp][lane] = divisor_of(count);
-                    dpc = div_nearest_by(sum, cdivs[warp][lane]);
-                    weighted += (wide)w.ce[(uint64_t)h * w.T * w.slots + g * w.slots + lane] * dpc;
-                }
             }
             cnts[warp][lane] = count;
-            dpcs[warp][lane] = dpc;
+            crlo[warp][lane] = lo;
+            crhi[warp][lane] = hi_;
+            crlv[warp][lane] = lv;
+            if (count != 0) {
+                cdiv[warp][lane] = divisor_of(count);
+                cdiv2[warp][lane] = divisor_of(count * count);
+            }
         }
         __syncwarp();
-        const wide mean = rel(warp_sum(weighted), SHARE_BITS);
-        const wide holders = warp_sum(held);
-        const uint64_t copies = closes != 0 ? closes : 1;
-        // `div_nearest(p 2^40, copies 2^63)` is two nested floors: `⌊(⌊(x + k/2)/2^63⌋)/copies⌋`.
-        const bool hbig = holders > 0 && (uwide)holders * (uwide)copies > (uwide)UINT64_MAX;
-        const Divisor hb = divisor_of(holders > 0 && !hbig ? (uint64_t)((uwide)holders * (uwide)copies) : 1);
-        const wide hcopies = holders * (wide)copies;
-        const wide cln2 = (wide)copies * ln2;
-        const Divisor cl = divisor_of((uint64_t)cln2);
-        const auto compare = [&](wide p, wide dpk, bool holder) -> wide {
+        // Pass A: the modes' weighted sums and holders' shares over the pairs and the crowds.
+        wide weighted[N], held[N];
+#pragma unroll
+        for (int k = 0; k < N; k++) {
+            weighted[k] = 0;
+            held[k] = 0;
+        }
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            uint32_t j;
+            uint64_t wt;
+            row_entry(w, h, first, sites, i, rs, members, off, e0 + lane, K, &j, &wt);
+            rs.stj[lane] = j;
+            rs.stw[lane] = wt;
+            if (j != UINT32_MAX) {
+                const uint32_t gap = j > i ? j - i : i - j;
+                const int64_t *vj = values + (uint64_t)j * S;
+                const bool holder = open && holds(j);
+#pragma unroll
+                for (int k = 0; k < N; k++) {
+                    const wide p = (wide)ebase[(uint64_t)j * N + k];
+                    const wide dp = (wide)dyi[k] * carried(w, h, k, gap, vj[k]) + (wide)dyi[N + k] * carried(w, h, k, gap, vj[N + k]);
+                    weighted[k] += p * dp;
+                    held[k] += holder ? p : 0;
+                }
+            }
+        }
+        if (cnts[warp][lane] != 0) {
+            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
+#pragma unroll
+            for (int k = 0; k < N; k++) {
+                const wide sum = (wide)dyi[k] * carried_wide(w, h, k, (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + k] - svp[(uint64_t)lo * S + k]) + (wide)dyi[N + k] * carried_wide(w, h, k, (uint32_t)1 << lv, svp[(uint64_t)(hi_ + 1) * S + N + k] - svp[(uint64_t)lo * S + N + k]);
+                const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
+                dpcs[warp][lane * N + k] = dpc;
+                weighted[k] += (wide)w.ce[(hg * w.slots + lane) * N + k] * dpc;
+            }
+        }
+#pragma unroll
+        for (int k = 0; k < N; k++) {
+            const wide mean = rel(warp_sum(weighted[k]), SHARE_BITS);
+            const wide hd = warp_sum(held[k]);
+            if (lane == 0) {
+                means[warp][k] = mean;
+                holderss[warp][k] = hd;
+                const bool big = hd > 0 && (uwide)hd * (uwide)copies > (uwide)UINT64_MAX;
+                hbig[warp][k] = big ? 1 : 0;
+                hbs[warp][k] = divisor_of(hd > 0 && !big ? (uint64_t)((uwide)hd * (uwide)copies) : 1);
+            }
+        }
+        __syncwarp();
+        const Divisor cl = divisor_of((uint64_t)((wide)copies * ln2));
+        // The mode's comparison of a term `p` (its covector `dpk`): the face's, and the closure's.
+        const auto compare = [&](uint32_t k, wide p, wide dpk, bool holder) -> wide {
+            const wide mean = means[warp][k], hd = holderss[warp][k];
             wide dz = rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
-            if (holders > 0) {
+            if (hd > 0) {
                 const wide at = p << CONTACT_BITS;
-                const wide a = (wide)(((uint64_t)((at + ((wide)copies << 62)) >> 63)) / copies);
-                dz += a - (holder ? (hbig ? div_nearest(at, hcopies) : div_nearest_by(at, hb)) : 0);
+                const wide a = (wide)((uint64_t)((at + ((wide)copies << 62)) >> 63) / copies);
+                dz += a - (holder ? (hbig[warp][k] ? div_nearest(at, hd * (wide)copies) : div_nearest_by(at, hbs[warp][k])) : 0);
             }
             return dz;
         };
-        // A far pair's lift at one end: the pair's share without that end's hold, `r = div_nearest(p
-        // 2^40, λ)`, times the same comparison (§14.2).
-        const auto lift = [&](wide rr, wide dpk, bool holder) -> wide {
-            wide gg = rel(rr * (dpk - mean), SHARE_BITS);
-            if (holders > 0) {
-                gg += div_nearest_by(rr << (CONTACT_BITS + MOVE_BITS - SHARE_BITS), cl) - (holder ? div_nearest(rr << (CONTACT_BITS + MOVE_BITS), hcopies * ln2) : 0);
-            }
-            return gg;
-        };
-        const uint64_t lam_i = holds_l[i];
-        const Divisor li = divisor_of(lam_i > 0 ? lam_i : 1);
-        wide lift_i = 0;
-        // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the
-        // word is read with the lanes over the span's entries.
+        // Pass B: δs over the pairs, and the row's return from the staged δs.
+        wide lift_i[MAXB];
+#pragma unroll
+        for (int l = 0; l < MAXB; l++) {
+            lift_i[l] = 0;
+        }
         wide sum = 0;
-        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
-            const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, c, i, sites, k) : UINT32_MAX;
-            wide dz = 0;
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            uint32_t j;
+            uint64_t wt;
+            row_entry(w, h, first, sites, i, rs, members, off, e0 + lane, K, &j, &wt);
+            rs.stj[lane] = j;
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
-                const wide p = (wide)e[j];
-                const wide dpj = dsr[j];
+                const int64_t *vj = values + (uint64_t)j * S;
                 const bool holder = holds(j);
-                dz = compare(p, dpj, holder);
-                if (gap >= NEAR) {
-                    const uint64_t lam_j = holds_l[j];
-                    if (lam_i > 0) {
-                        lift_i += lift(div_nearest_by(p << HOLD_BITS, li), dpj, holder);
+                wide byw = 0;
+#pragma unroll
+                for (int k = 0; k < N; k++) {
+                    const wide p = (wide)ebase[(uint64_t)j * N + k];
+                    const wide dp = (wide)dyi[k] * carried(w, h, k, gap, vj[k]) + (wide)dyi[N + k] * carried(w, h, k, gap, vj[N + k]);
+                    if (gap >= NEAR) {
+                        const wide mean = means[warp][k], hd = holderss[warp][k];
+                        wide gg = rel(p * (dp - mean), SHARE_BITS);
+                        if (hd > 0) {
+                            gg += div_nearest_by(p << (CONTACT_BITS + MOVE_BITS - SHARE_BITS), cl) - (holder ? div_nearest(p << (CONTACT_BITS + MOVE_BITS), hd * (wide)copies * ln2) : 0);
+                        }
+                        byw += gg;
                     }
-                    if (lam_j > 0) {
-                        add_wide(w.lifts + (uint64_t)h * w.T + first + j, lift(div_nearest(p << HOLD_BITS, (wide)lam_j), dpj, holder));
+                    const wide dsv = gained(compare(k, p, dp, holder), w.beta, w.status);
+                    if ((dsv < 0 ? -dsv : dsv) >> w.dsbits != 0) {
+                        atomicOr(w.status, REFUSED_CARRIER);
                     }
+                    dsr[(uint64_t)j * N + k] = (int64_t)dsv;
+                    dss[warp][lane * N + k] = (int64_t)dsv;
                 }
-                dz = gained(dz, w.beta, w.status);
-                if ((dz < 0 ? -dz : dz) >> w.dsbits != 0) {
-                    atomicOr(w.status, REFUSED_CARRIER);
+                if (gap >= NEAR && byw != 0) {
+                    overlap_return(w, byw, rs.mi, memh + (uint64_t)j * b, fall, lift_i, w.lifts + (hg - i + j) * b);
                 }
-                dsr[j] = dz;
             }
-            dss[warp][lane] = dz;
-            js[warp][lane] = j;
             __syncwarp();
-            if (part < parts) {
+            if (active) {
                 for (uint32_t jj = part; jj < 32; jj += parts) {
-                    const uint32_t j = js[warp][jj];
-                    if (j != UINT32_MAX) {
-                        const wide term = dss[warp][jj] * (wide)words[(uint64_t)j * S + entry];
-                        sum += still ? term : term * decay_of(w, h, entry % w.n, j > i ? j - i : i - j);
+                    const uint32_t jx = rs.stj[jj];
+                    if (jx != UINT32_MAX) {
+                        sum += (wide)dss[warp][jj * N + m] * decay_raw(w, h, m, jx > i ? jx - i : i - jx) * (wide)words[(uint64_t)jx * S + entry];
                     }
                 }
             }
             __syncwarp();
         }
-        lift_i = warp_sum(lift_i);
-        if (lane == 0 && lift_i != 0) {
-            add_wide(w.lifts + (uint64_t)h * w.T + g, lift_i);
-        }
-        // The crowds' δs, then their share of the word's row return and of the values' and the word's
-        // member returns through the difference arrays.
-        {
-            wide dsk = 0;
-            if (cnts[warp][lane] != 0) {
-                dsk = gained(compare((wide)w.ce[(uint64_t)h * w.T * w.slots + g * w.slots + lane], dpcs[warp][lane], false), w.beta, w.status);
-                if ((dsk < 0 ? -dsk : dsk) >> w.dsbits != 0) {
-                    atomicOr(w.status, REFUSED_CARRIER);
+#pragma unroll
+        for (int l = 0; l < MAXB; l++) {
+            if ((uint32_t)l < b) {
+                const wide v = warp_sum(lift_i[l]);
+                if (lane == 0 && v != 0) {
+                    add_wide(w.lifts + hg * b + l, v);
                 }
             }
-            dsks[warp][lane] = dsk;
+        }
+        // The crowds' δs, then their share of the row's return and of the values' and the word's member
+        // returns through the difference arrays.
+        if (cnts[warp][lane] != 0) {
+#pragma unroll
+            for (int k = 0; k < N; k++) {
+                const wide dsv = gained(compare(k, (wide)w.ce[(hg * w.slots + lane) * N + k], dpcs[warp][lane * N + k], false), w.beta, w.status);
+                if ((dsv < 0 ? -dsv : dsv) >> w.dsbits != 0) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                }
+                dsks[warp][lane * N + k] = (int64_t)dsv;
+            }
         }
         __syncwarp();
-        if (part < parts) {
+        if (active) {
+            const uint32_t g0 = still ? 0 : MOVE_BITS;
             for (uint32_t jj = part; jj < nslots; jj += parts) {
-                if (cnts[warp][jj] == 0) {
+                const uint64_t count = cnts[warp][jj];
+                if (count == 0) {
                     continue;
                 }
-                uint32_t lo, hi_, lv;
-                crowd_at(i, sites, jj, &lo, &hi_, &lv);
-                const uint32_t l = entry % w.n;
-                const wide d = decay_raw(w, h, l, (uint32_t)1 << lv);
-                const Divisor &dv = cdivs[warp][jj];
-                const wide dsk = dsks[warp][jj];
-                sum += div_nearest_by(dsk * d * (swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry]), dv);
-                const wide pw = div_nearest_by(dsk * d * (wide)words[(uint64_t)i * S + entry], dv);
+                const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                const wide d = decay_raw(w, h, m, (uint32_t)1 << lv);
+                const wide dsk = dsks[warp][jj * N + m];
+                const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
+                sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
+                const wide pw = div_nearest_by(dsk * (((d * (wide)words[(uint64_t)i * S + entry] * (wide)count) << g0) - d * d * wsum), cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
-                const wide pv = div_nearest_by((wide)w.ce[(uint64_t)h * w.T * w.slots + g * w.slots + jj] * carried(w, h, l, (uint32_t)1 << lv, dyi[entry]), dv);
+                const wide pv = div_nearest_by((wide)w.ce[(hg * w.slots + jj) * N + m] * carried(w, h, m, (uint32_t)1 << lv, dyi[entry]), cdiv[warp][jj]);
                 add_wide(w.cv + (first + r + lo) * S + entry, pv);
                 add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
             }
         }
-        sum = parts_sum(part < parts ? sum : 0, S, parts);
+        sum = parts_sum(active ? sum : 0, S, parts);
         if (lane < S) {
-            const uint32_t m = h * w.n + lane % w.n;
-            dq[g * w.M2 + (lane < w.n ? m : w.M + m)] = fit64(rel(sum, CONTACT_BACK + (still ? 0 : MOVE_BITS)), w.status);
+            const uint32_t mc = h * w.n + lane % w.n;
+            dq[g * w.M2 + (lane < w.n ? mc : w.M + mc)] = fit64(rel(sum, CONTACT_BACK + (still ? 0 : MOVE_BITS)), w.status);
         }
+        __syncwarp();
     }
 }
 
-// [definition; agent-inferred, November 1] **The word's column return and the values' over one head**
-// (`Field::returned`), one warp a source site `j` over its receivers (the support is directional: `j`
-// is heard by its near field and, where `j` is definite, by every member of its class):
-// `δw̃_j += release(Σ_i δs_ij D w̃_i, 32)` added to the rows' return in its framed chart slot, and
-// `δṽ_j = release(Σ_i p_ij D δỹ_i, 63)`, the lanes over the span's entries (a lane an entry and a part
-// of the receivers), `p_ij` and `δs_ij` read at the region block's dense address `[i][j]`.
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_columns(FieldWords w, uint32_t h, const int64_t *dyh, const wide *ds, int64_t *dq, int64_t *dv) {
-    const uint32_t lane = threadIdx.x & 31;
-    const uint32_t S = w.span;
-    const uint32_t classes = w.nclasses;
+#define ROWS_ENTRY(NN) \
+    extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows_n##NN(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, int64_t *ds, int64_t *dq) { rows_body<NN>(w, h, closes, dyh, ds, dq); }
+ROWS_ENTRY(2)
+ROWS_ENTRY(4)
+ROWS_ENTRY(8)
+
+// [definition; agent-inferred, November 1] **The word's column return and the values' over one head, a
+// mode at a time** (`Field::returned`, §15.2), one warp a source site `j` over its receivers (the support is
+// directional: `j` is heard by its near field and, where `j` is definite, by every site sharing a class
+// with it that counts the pair there): `δw̃_j += release(Σ_i δs_ij,m ((D_m q_i) 2^g − D_m² q_j), 32 + g)`
+// added to the rows' return in its framed chart slot (the key role of the lock), and `δṽ_j = release(Σ_i
+// p_ij,m D_m δỹ_i, 63)`, the lanes over the span's entries (a lane an entry and a part of the receivers),
+// `p_ij,m` and `δs_ij,m` read at the region block's dense address `[i][j][m]`.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_columns(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds, int64_t *dq, int64_t *dv) {
+    __shared__ RowShared rss[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    RowShared &rs = rss[warp];
+    const uint32_t S = w.span, n = w.n, classes = w.nclasses, b = w.ctrits;
     const uint32_t parts = span_parts(S);
-    const uint32_t entry = lane % S, part = lane / S;
+    const bool active = lane < S * parts;
+    const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+    const bool still = still_head(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t r = w.site_region[g];
         const uint32_t j = w.site_pos[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        const uint32_t *members = w.members + ((uint64_t)h * w.T + first) * ((uint32_t)1 << b);
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
-        const uint32_t c = w.cls[(uint64_t)h * w.T + g];
-        const uint32_t K = receiver_len(off, c, definite_site(w, g));
-        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
-        const wide *dsc = ds + w.region_eoff[r] + j;
+        const uint32_t K = row_prepare(w, h, first, j, off, rs, lane, true, definite_site(w, g));
+        const uint64_t *e = w.e + ((uint64_t)h * w.E + w.region_eoff[r]) * n;
+        const int64_t *dsb = ds + w.region_eoff[r] * n;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *dyr = dyh + ((uint64_t)h * w.T + first) * S;
         wide sk = 0, sv = 0;
-        const bool still = still_head(w, h);
-        if (part < parts) {
-            for (uint32_t k = part; k < K; k += parts) {
-                const uint32_t i = receiver_at(members, off, c, j, sites, k);
-                if (i == UINT32_MAX) {
-                    continue;
+        for (uint32_t e0 = 0; e0 < K; e0 += 32) {
+            uint32_t i;
+            uint64_t wt;
+            row_entry(w, h, first, sites, j, rs, members, off, e0 + lane, K, &i, &wt);
+            rs.stj[lane] = i;
+            __syncwarp();
+            if (active) {
+                for (uint32_t jj = part; jj < 32; jj += parts) {
+                    const uint32_t ix = rs.stj[jj];
+                    if (ix == UINT32_MAX) {
+                        continue;
+                    }
+                    const uint32_t gap = j > ix ? j - ix : ix - j;
+                    const wide dec = decay_raw(w, h, m, gap);
+                    const uint64_t at = ((uint64_t)ix * sites + j) * n + m;
+                    sk += (wide)dsb[at] * (((dec * (wide)words[(uint64_t)ix * S + entry]) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry]);
+                    sv += (wide)e[at] * carried(w, h, m, gap, dyr[(uint64_t)ix * S + entry]);
                 }
-                const uint64_t at = (uint64_t)i * sites;
-                const uint32_t gap = j > i ? j - i : i - j;
-                const wide term = dsc[at] * (wide)words[(uint64_t)i * S + entry];
-                sk += still ? term : term * decay_of(w, h, entry % w.n, gap);
-                sv += (wide)e[at] * carried(w, h, entry % w.n, gap, dyr[(uint64_t)i * S + entry]);
             }
+            __syncwarp();
         }
-        sk = parts_sum(part < parts ? sk : 0, S, parts);
-        sv = parts_sum(part < parts ? sv : 0, S, parts);
+        sk = parts_sum(active ? sk : 0, S, parts);
+        sv = parts_sum(active ? sv : 0, S, parts);
         if (lane < S) {
-            const uint32_t m = h * w.n + lane % w.n;
-            const uint64_t slot = g * w.M2 + (lane < w.n ? m : w.M + m);
-            dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + (still ? 0 : MOVE_BITS)), w.status);
+            const uint32_t mc = h * n + lane % n;
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + (still ? 0 : MOVE_BITS) + g0), w.status);
             dv[slot] = fit64(rel(sv, SHARE_BITS), w.status);
         }
     }
@@ -1786,12 +2241,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
 
 // The crowds' members' share (§14.10): the difference arrays `cv`, `cw` summed over the places (the
 // host's `spread`), added at the definite sites only, each released as its own sum:
-// `dv = fit64(dv + release(Σ cv, 63))`, `dq = fit64(dq + release(Σ cw, 32))`. One thread an entry of the
-// span and a region, each over its region's sites in order.
+// `dv = fit64(dv + release(Σ cv, 63))`, `dq = fit64(dq + release(Σ cw, 32 + g))`. One thread an entry of
+// the span and a region, each over its region's sites in order.
 extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, int64_t *dv) {
-    const uint64_t rows1 = (uint64_t)w.T + w.R;
-    (void)rows1;
     const bool still = still_head(w, h);
+    const uint32_t g0 = still ? 0 : MOVE_BITS;
     for (uint64_t u = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; u < (uint64_t)w.R * w.span; u += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = u / w.span, x = u % w.span;
         const uint64_t first = w.region_off[r];
@@ -1804,7 +2258,7 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
             if (definite_site(w, first + t)) {
                 const uint32_t m = h * w.n + x % w.n;
                 const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
-                dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + (still ? 0 : MOVE_BITS)), w.status);
+                dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + g0 + g0), w.status);
                 dv[slot] = fit64((wide)dv[slot] + rel(runv, SHARE_BITS), w.status);
             }
         }
@@ -1826,35 +2280,30 @@ extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
 }
 
 // [definition; agent-inferred, November 1] **A hold's return to its mode** (the host's `hold_return`,
-// §14.2): with `N = re² − im²`, `D = re² + im²`, `s = sign N`, a hold covector `G` on `2^(−40)` returns
-// `div_nearest(±4 s G re im², D²)` on the covector's `2^(−24)`, added at the unframed word's mode that
-// sets the hold (its slots `h n + l` and `M + h n + l`). A product past its carrier is refused. One
-// thread a head and a site.
+// §14.2, §15.2): with `N = re² − im²`, `D = re² + im²`, `s = sign N`, a hold covector `G` on `2^(−40)`
+// returns `div_nearest(±4 s G re im², D²)` on the covector's `2^(−24)`, added at the unframed word's
+// address mode that holds it (its slots `h n + l` and `M + h n + l`). A product past its carrier is
+// refused. One thread a head, a site and an address mode.
 extern "C" __global__ void field_hold_back(FieldWords w, int64_t *dq) {
-    const uint64_t cells = (uint64_t)w.H * w.T;
+    const uint64_t cells = (uint64_t)w.H * w.T * w.ctrits;
     for (uint64_t u = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; u < cells; u += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t h = u / w.T;
-        const uint64_t t = u % w.T;
-        const uint64_t lambda = w.hold[u];
         const wide gg = w.lifts[u];
-        if (gg == 0 || lambda == 0) {
+        if (gg == 0) {
             continue;
         }
-        const uint32_t l = w.holdm[u];
+        const uint32_t l = u % w.ctrits;
+        const uint64_t ht = u / w.ctrits;
+        const uint32_t h = ht / w.T;
+        const uint64_t t = ht % w.T;
         const uint32_t c = h * w.n + l;
         const wide re = w.qkv[t * 2 * w.M2 + c], im = w.qkv[t * 2 * w.M2 + w.M + c];
         const wide rr = re * re, ii = im * im;
         const wide d = rr + ii;
         const wide sign = (rr - ii) > 0 ? 1 : ((rr - ii) < 0 ? -1 : 0);
-        const auto bits = [](wide v) -> uint32_t {
-            const uwide m = (uwide)(v < 0 ? -v : v);
-            const uint64_t hi = (uint64_t)(m >> 64);
-            return hi != 0 ? 128 - __clzll((long long)hi) : (m == 0 ? 0 : 64 - __clzll((long long)(uint64_t)m));
-        };
         if (sign == 0) {
             continue;
         }
-        if (2 * bits(d) > 126 || bits(gg) + max(bits(re) + bits(ii), bits(im) + bits(rr)) + 3 > 126) {
+        if (2 * wide_bits(d) > 126 || wide_bits(gg) + max(wide_bits(re) + wide_bits(ii), wide_bits(im) + wide_bits(rr)) + 3 > 126) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
