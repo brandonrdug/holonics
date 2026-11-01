@@ -1146,3 +1146,57 @@ training law, the next subject if reading 8 shows the operands read and the comp
 the card's per-read uploads and allocations (a realization cost no measurement yet shows dominant);
 a continuing interior response, a joint-consistency reading and sparse execution (constructions
 with no measured failure pointing at them yet).
+
+## 20. The eighth reading: the question tells the answer's words, and the release commits the commonest byte first
+
+[measured] **The eighth reading** (`…_receipts/reading-8/`, count-only; 16:45 to 16:57 UTC, 709 s of
+a 900 s bound). GSM8K on §19's laws, reading 7's declaration, data and keys. The card equals the host
+on one section and the withheld read, without growth (52.2 s, projected 55, with one release) and
+with one (75.7 s, projected 85; each still set holding two copies). The training ran 8 laps of 51.0
+to 53.9 s in 429 s (a ninth was held: 99 s left against `P_A` 121 s); 342 to 396 of 413 sections
+deposited a lap, with 95 to 208 halvings (reading 7: 400 to 413, 2 to 121).
+
+| Lap | `context` digits | `foil` digits | `context` text | `foil` text |
+|---|---|---|---|---|
+| 0 | 4.279 | 4.280 | 3.883 | 3.887 |
+| 3 | 3.130 | 3.143 | 2.681 | 2.729 |
+| 5 | 2.933 | 2.957 | 2.368 | 2.471 |
+| 7 | 2.845 | 2.873 | 2.160 | 2.303 |
+
+The question tells the held answers' text 0.143 bits a byte after 8 laps (reading 7: 0.002 after 11)
+and their digits 0.028 (0.021).
+
+| The claim | Value |
+|---|---|
+| The first calculation from the question's numbers | 0 of 128 (bar 24), `c_foil = 0`; one first calculation written |
+| The free release | stopped at its 138 s deadline after 268 sweeps, 127 of 128 open; the marks never read |
+
+[measured] **Why the release did not end.** The void's cut at the first sweep left about 516 answer
+sites a problem (91,220 cut of 128 × 1,229). After it the field resolved few sites: 7,176 releases
+by majority against 25,310 by news, about one site a problem a sweep, at about 520 ms a sweep (2.9
+reads of the batch). The free set needed about 500 sweeps; `time-field` projected 73 s from 16. The
+three texts released in full (700 sweeps, 9 s) are runs of the commonest bytes (`the`, `2`) with
+fragments of markup.
+
+[definition; agent-inferred] **The lens, Brandon, November 1: the hierarchy is not most-certain
+first.** A release that commits where the field is surest and builds on it answers by the most
+familiar pattern (shown `√4 = 2`, a child following it answers `√−4` wrongly). The problem is a
+Rubik's object: a move at one place contorts every coupled place, through contacts that boost and
+turn. The order in which the field decomposes an answer is a gradient it surfs, not a fixed order
+of commitments. Progress in it is not a falling code. **Frustration** is the state where local
+faces cannot all hold at once, and nothing measures improvement there. The answer "clicks" when the
+faces align, as a key fits its lock (`{lock, key} = {problem, solution}`). It is not when one site
+grows certain.
+
+Read on this owner: the release commits a class where its face holds a majority and otherwise the
+one site with the most news, and every committed class is fixed ground for every later read, refined
+a part at a time. That is a commitment order by certainty, and the eighth reading shows its failure
+in content (the commonest byte committed first) and in time (one site a sweep). The training's
+release-state regions resolve the same order at the true classes. The next law follows from the lens:
+- every answer site keeps its face as its state, not a committed class;
+- all of them are reread together each sweep beside each other's faces, so a change anywhere moves
+  every coupled site in the same tick;
+- the boundary is released only where the joint field closes (each face, read through the others,
+  returns itself);
+- frustration, the part that does not close, is reported and kept open rather than forced;
+- training meets the same states.

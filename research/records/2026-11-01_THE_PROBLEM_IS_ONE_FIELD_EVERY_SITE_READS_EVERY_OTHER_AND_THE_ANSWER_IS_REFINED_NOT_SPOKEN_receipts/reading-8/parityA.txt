@@ -1,0 +1,10 @@
+FIELD_COMMAND parity-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 1 8 1 1 4
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15219163136 total=16802250752 batch_budget=10228072448
+FIELD_PASSAGE train=6602 withheld=128 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=27418 grow=1
+FIELD_PARITY section=1 withheld=false regions=16 length=1408 sites=4395 pairs=48532016 reads=4 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true host_ms=4016 card_ms=85
+FIELD_PARITY section=2 withheld=true regions=512 length=1522 sites=0 pairs=2611997696 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=-1061544050/0/false learner_equal=true host_ms=32168 card_ms=1121
+FIELD_PARITY_RELEASE problem=0 question=278 released=1 equal=true host_ms=13012
+FIELD_PARITY_DONE sections=2 reads=6 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=36 host_ms=36185 card_ms=1207 elapsed_ms=50797
+FIELD_CARD reads=15 read_ms=1113 returns=1 return_ms=48 pairs=5542810384 batches=16 peak_store=2682354528 elapsed_ms=50876
+MEASURE lap=r8 rc=0 wall_s=52.2 peak_rss_kib=1597232

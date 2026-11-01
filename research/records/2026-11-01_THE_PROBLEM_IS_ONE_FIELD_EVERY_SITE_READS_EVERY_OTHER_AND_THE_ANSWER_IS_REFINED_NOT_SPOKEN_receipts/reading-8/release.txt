@@ -1,0 +1,401 @@
+FIELD_COMMAND release-field $ROOT/.local/wt/field-card/.local/run/reading-8/train/STATE.7 74dca1e8ff3359134aa8c033802d9a1c4b831eed11a67072da27410f32956884 $ROOT/.local/wt/field-card/.local/run/reading-8/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa 128 1229 138000 $ROOT/.local/wt/field-card/.local/run/reading-8/release
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15145107456 total=16802250752 batch_budget=10154016768
+FIELD_RELEASE_SWEEP set=free done=0 live=128 open=128 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=9
+FIELD_RELEASE_SWEEP set=free done=1 live=128 open=128 resolved=128 by_news=0 revised=0 unsettled=0 cut=128 cut_sites=91220 ms=374
+FIELD_RELEASE_SWEEP set=free done=2 live=128 open=128 resolved=128 by_news=128 revised=0 unsettled=0 cut=128 cut_sites=91220 ms=784
+FIELD_RELEASE_SWEEP set=free done=3 live=128 open=128 resolved=256 by_news=128 revised=0 unsettled=0 cut=128 cut_sites=91220 ms=971
+FIELD_RELEASE_SWEEP set=free done=4 live=128 open=128 resolved=357 by_news=155 revised=0 unsettled=0 cut=128 cut_sites=91220 ms=1206
+FIELD_RELEASE_SWEEP set=free done=5 live=128 open=128 resolved=357 by_news=283 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=1791
+FIELD_RELEASE_SWEEP set=free done=6 live=128 open=128 resolved=357 by_news=411 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=2376
+FIELD_RELEASE_SWEEP set=free done=7 live=128 open=128 resolved=358 by_news=538 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=2961
+FIELD_RELEASE_SWEEP set=free done=8 live=128 open=128 resolved=359 by_news=665 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=3515
+FIELD_RELEASE_SWEEP set=free done=9 live=128 open=128 resolved=359 by_news=793 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=4106
+FIELD_RELEASE_SWEEP set=free done=10 live=128 open=128 resolved=359 by_news=921 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=4689
+FIELD_RELEASE_SWEEP set=free done=11 live=128 open=128 resolved=361 by_news=1047 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=5275
+FIELD_RELEASE_SWEEP set=free done=12 live=128 open=128 resolved=368 by_news=1169 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=5848
+FIELD_RELEASE_SWEEP set=free done=13 live=128 open=128 resolved=374 by_news=1292 revised=1 unsettled=0 cut=128 cut_sites=91220 ms=6423
+FIELD_RELEASE_SWEEP set=free done=14 live=128 open=128 resolved=383 by_news=1416 revised=2 unsettled=0 cut=128 cut_sites=91220 ms=6999
+FIELD_RELEASE_SWEEP set=free done=15 live=128 open=128 resolved=395 by_news=1533 revised=2 unsettled=0 cut=128 cut_sites=91220 ms=7569
+FIELD_RELEASE_SWEEP set=free done=16 live=128 open=128 resolved=411 by_news=1647 revised=2 unsettled=0 cut=128 cut_sites=91220 ms=8131
+FIELD_RELEASE_SWEEP set=free done=17 live=128 open=128 resolved=431 by_news=1763 revised=3 unsettled=0 cut=128 cut_sites=91220 ms=8696
+FIELD_RELEASE_SWEEP set=free done=18 live=128 open=128 resolved=470 by_news=1873 revised=4 unsettled=0 cut=128 cut_sites=91220 ms=9251
+FIELD_RELEASE_SWEEP set=free done=19 live=128 open=128 resolved=510 by_news=1979 revised=4 unsettled=0 cut=128 cut_sites=91220 ms=9799
+FIELD_RELEASE_SWEEP set=free done=20 live=128 open=128 resolved=572 by_news=2076 revised=5 unsettled=0 cut=128 cut_sites=91220 ms=10333
+FIELD_RELEASE_SWEEP set=free done=21 live=128 open=128 resolved=624 by_news=2175 revised=6 unsettled=0 cut=128 cut_sites=91220 ms=10867
+FIELD_RELEASE_SWEEP set=free done=22 live=128 open=128 resolved=674 by_news=2273 revised=6 unsettled=0 cut=128 cut_sites=91220 ms=11405
+FIELD_RELEASE_SWEEP set=free done=23 live=128 open=128 resolved=744 by_news=2367 revised=9 unsettled=0 cut=128 cut_sites=91220 ms=11938
+FIELD_RELEASE_SWEEP set=free done=24 live=128 open=128 resolved=807 by_news=2460 revised=12 unsettled=0 cut=128 cut_sites=91220 ms=12465
+FIELD_RELEASE_SWEEP set=free done=25 live=128 open=128 resolved=889 by_news=2546 revised=13 unsettled=0 cut=128 cut_sites=91220 ms=12984
+FIELD_RELEASE_SWEEP set=free done=26 live=128 open=128 resolved=974 by_news=2624 revised=15 unsettled=0 cut=128 cut_sites=91220 ms=13486
+FIELD_RELEASE_SWEEP set=free done=27 live=128 open=128 resolved=1052 by_news=2707 revised=17 unsettled=0 cut=128 cut_sites=91220 ms=13996
+FIELD_RELEASE_SWEEP set=free done=28 live=128 open=128 resolved=1127 by_news=2791 revised=21 unsettled=0 cut=128 cut_sites=91220 ms=14509
+FIELD_RELEASE_SWEEP set=free done=29 live=128 open=128 resolved=1204 by_news=2878 revised=23 unsettled=0 cut=128 cut_sites=91220 ms=15025
+FIELD_RELEASE_SWEEP set=free done=30 live=128 open=128 resolved=1313 by_news=2953 revised=27 unsettled=0 cut=128 cut_sites=91220 ms=15511
+FIELD_RELEASE_SWEEP set=free done=31 live=128 open=128 resolved=1406 by_news=3036 revised=30 unsettled=0 cut=128 cut_sites=91220 ms=16020
+FIELD_RELEASE_SWEEP set=free done=32 live=128 open=128 resolved=1490 by_news=3117 revised=33 unsettled=0 cut=128 cut_sites=91220 ms=16527
+FIELD_RELEASE_SWEEP set=free done=33 live=128 open=128 resolved=1586 by_news=3195 revised=33 unsettled=0 cut=128 cut_sites=91220 ms=17031
+FIELD_RELEASE_SWEEP set=free done=34 live=128 open=128 resolved=1665 by_news=3285 revised=37 unsettled=0 cut=128 cut_sites=91220 ms=17548
+FIELD_RELEASE_SWEEP set=free done=35 live=128 open=128 resolved=1754 by_news=3373 revised=39 unsettled=0 cut=128 cut_sites=91220 ms=18060
+FIELD_RELEASE_SWEEP set=free done=36 live=128 open=128 resolved=1834 by_news=3463 revised=43 unsettled=0 cut=128 cut_sites=91220 ms=18573
+FIELD_RELEASE_SWEEP set=free done=37 live=128 open=128 resolved=1920 by_news=3554 revised=50 unsettled=0 cut=128 cut_sites=91220 ms=19097
+FIELD_RELEASE_SWEEP set=free done=38 live=128 open=128 resolved=1995 by_news=3646 revised=54 unsettled=0 cut=128 cut_sites=91220 ms=19620
+FIELD_RELEASE_SWEEP set=free done=39 live=128 open=128 resolved=2076 by_news=3738 revised=56 unsettled=0 cut=128 cut_sites=91220 ms=20142
+FIELD_RELEASE_SWEEP set=free done=40 live=128 open=128 resolved=2147 by_news=3832 revised=61 unsettled=0 cut=128 cut_sites=91220 ms=20663
+FIELD_RELEASE_SWEEP set=free done=41 live=128 open=128 resolved=2221 by_news=3927 revised=66 unsettled=0 cut=128 cut_sites=91220 ms=21183
+FIELD_RELEASE_SWEEP set=free done=42 live=128 open=128 resolved=2307 by_news=4021 revised=67 unsettled=0 cut=128 cut_sites=91220 ms=21705
+FIELD_RELEASE_SWEEP set=free done=43 live=128 open=128 resolved=2415 by_news=4120 revised=74 unsettled=0 cut=128 cut_sites=91220 ms=22236
+FIELD_RELEASE_SWEEP set=free done=44 live=128 open=128 resolved=2518 by_news=4226 revised=79 unsettled=0 cut=128 cut_sites=91220 ms=22781
+FIELD_RELEASE_SWEEP set=free done=45 live=128 open=128 resolved=2580 by_news=4319 revised=83 unsettled=0 cut=128 cut_sites=91220 ms=23316
+FIELD_RELEASE_SWEEP set=free done=46 live=128 open=128 resolved=2630 by_news=4414 revised=84 unsettled=0 cut=128 cut_sites=91220 ms=23857
+FIELD_RELEASE_SWEEP set=free done=47 live=128 open=128 resolved=2674 by_news=4510 revised=89 unsettled=0 cut=128 cut_sites=91220 ms=24398
+FIELD_RELEASE_SWEEP set=free done=48 live=128 open=127 resolved=2711 by_news=4611 revised=94 unsettled=0 cut=128 cut_sites=91220 ms=24942
+FIELD_RELEASE_SWEEP set=free done=49 live=128 open=127 resolved=2761 by_news=4703 revised=98 unsettled=0 cut=128 cut_sites=91220 ms=25474
+FIELD_RELEASE_SWEEP set=free done=50 live=128 open=127 resolved=2820 by_news=4791 revised=106 unsettled=0 cut=128 cut_sites=91220 ms=25993
+FIELD_RELEASE_SWEEP set=free done=51 live=128 open=127 resolved=2876 by_news=4885 revised=112 unsettled=0 cut=128 cut_sites=91220 ms=26523
+FIELD_RELEASE_SWEEP set=free done=52 live=128 open=127 resolved=2931 by_news=4976 revised=114 unsettled=0 cut=128 cut_sites=91220 ms=27040
+FIELD_RELEASE_SWEEP set=free done=53 live=128 open=127 resolved=2968 by_news=5072 revised=122 unsettled=0 cut=128 cut_sites=91220 ms=27560
+FIELD_RELEASE_SWEEP set=free done=54 live=128 open=127 resolved=2998 by_news=5174 revised=126 unsettled=0 cut=128 cut_sites=91220 ms=28094
+FIELD_RELEASE_SWEEP set=free done=55 live=127 open=127 resolved=3036 by_news=5273 revised=130 unsettled=1 cut=128 cut_sites=91220 ms=28630
+FIELD_RELEASE_SWEEP set=free done=56 live=127 open=127 resolved=3066 by_news=5381 revised=134 unsettled=1 cut=128 cut_sites=91220 ms=29178
+FIELD_RELEASE_SWEEP set=free done=57 live=127 open=127 resolved=3091 by_news=5487 revised=143 unsettled=1 cut=128 cut_sites=91220 ms=29720
+FIELD_RELEASE_SWEEP set=free done=58 live=127 open=127 resolved=3119 by_news=5594 revised=151 unsettled=1 cut=128 cut_sites=91220 ms=30264
+FIELD_RELEASE_SWEEP set=free done=59 live=127 open=127 resolved=3148 by_news=5696 revised=158 unsettled=1 cut=128 cut_sites=91220 ms=30795
+FIELD_RELEASE_SWEEP set=free done=60 live=127 open=127 resolved=3173 by_news=5803 revised=161 unsettled=1 cut=128 cut_sites=91220 ms=31337
+FIELD_RELEASE_SWEEP set=free done=61 live=127 open=127 resolved=3193 by_news=5915 revised=165 unsettled=1 cut=128 cut_sites=91220 ms=31889
+FIELD_RELEASE_SWEEP set=free done=62 live=127 open=127 resolved=3221 by_news=6023 revised=166 unsettled=1 cut=128 cut_sites=91220 ms=32434
+FIELD_RELEASE_SWEEP set=free done=63 live=127 open=127 resolved=3240 by_news=6133 revised=171 unsettled=1 cut=128 cut_sites=91220 ms=32987
+FIELD_RELEASE_SWEEP set=free done=64 live=127 open=127 resolved=3254 by_news=6247 revised=177 unsettled=1 cut=128 cut_sites=91220 ms=33542
+FIELD_RELEASE_SWEEP set=free done=65 live=127 open=127 resolved=3273 by_news=6361 revised=180 unsettled=1 cut=128 cut_sites=91220 ms=34107
+FIELD_RELEASE_SWEEP set=free done=66 live=127 open=127 resolved=3294 by_news=6471 revised=183 unsettled=1 cut=128 cut_sites=91220 ms=34659
+FIELD_RELEASE_SWEEP set=free done=67 live=127 open=127 resolved=3320 by_news=6579 revised=187 unsettled=1 cut=128 cut_sites=91220 ms=35207
+FIELD_RELEASE_SWEEP set=free done=68 live=127 open=127 resolved=3351 by_news=6688 revised=191 unsettled=1 cut=128 cut_sites=91220 ms=35758
+FIELD_RELEASE_SWEEP set=free done=69 live=127 open=127 resolved=3376 by_news=6797 revised=197 unsettled=1 cut=128 cut_sites=91220 ms=36309
+FIELD_RELEASE_SWEEP set=free done=70 live=127 open=127 resolved=3395 by_news=6908 revised=198 unsettled=1 cut=128 cut_sites=91220 ms=36858
+FIELD_RELEASE_SWEEP set=free done=71 live=127 open=127 resolved=3419 by_news=7013 revised=201 unsettled=1 cut=128 cut_sites=91220 ms=37397
+FIELD_RELEASE_SWEEP set=free done=72 live=127 open=127 resolved=3444 by_news=7124 revised=205 unsettled=1 cut=128 cut_sites=91220 ms=37949
+FIELD_RELEASE_SWEEP set=free done=73 live=127 open=127 resolved=3467 by_news=7232 revised=213 unsettled=1 cut=128 cut_sites=91220 ms=38502
+FIELD_RELEASE_SWEEP set=free done=74 live=127 open=127 resolved=3492 by_news=7343 revised=218 unsettled=1 cut=128 cut_sites=91220 ms=39056
+FIELD_RELEASE_SWEEP set=free done=75 live=127 open=127 resolved=3509 by_news=7454 revised=225 unsettled=1 cut=128 cut_sites=91220 ms=39612
+FIELD_RELEASE_SWEEP set=free done=76 live=127 open=127 resolved=3526 by_news=7567 revised=227 unsettled=1 cut=128 cut_sites=91220 ms=40171
+FIELD_RELEASE_SWEEP set=free done=77 live=127 open=127 resolved=3542 by_news=7684 revised=238 unsettled=1 cut=128 cut_sites=91220 ms=40736
+FIELD_RELEASE_SWEEP set=free done=78 live=127 open=127 resolved=3565 by_news=7792 revised=241 unsettled=1 cut=128 cut_sites=91220 ms=41280
+FIELD_RELEASE_SWEEP set=free done=79 live=127 open=127 resolved=3582 by_news=7903 revised=244 unsettled=1 cut=128 cut_sites=91220 ms=41822
+FIELD_RELEASE_SWEEP set=free done=80 live=127 open=127 resolved=3604 by_news=8011 revised=248 unsettled=1 cut=128 cut_sites=91220 ms=42363
+FIELD_RELEASE_SWEEP set=free done=81 live=127 open=127 resolved=3628 by_news=8121 revised=252 unsettled=1 cut=128 cut_sites=91220 ms=42905
+FIELD_RELEASE_SWEEP set=free done=82 live=127 open=127 resolved=3656 by_news=8229 revised=255 unsettled=1 cut=128 cut_sites=91220 ms=43464
+FIELD_RELEASE_SWEEP set=free done=83 live=127 open=127 resolved=3679 by_news=8339 revised=258 unsettled=1 cut=128 cut_sites=91220 ms=44019
+FIELD_RELEASE_SWEEP set=free done=84 live=127 open=127 resolved=3709 by_news=8443 revised=262 unsettled=1 cut=128 cut_sites=91220 ms=44559
+FIELD_RELEASE_SWEEP set=free done=85 live=127 open=127 resolved=3729 by_news=8554 revised=263 unsettled=1 cut=128 cut_sites=91220 ms=45102
+FIELD_RELEASE_SWEEP set=free done=86 live=127 open=127 resolved=3746 by_news=8665 revised=266 unsettled=1 cut=128 cut_sites=91220 ms=45645
+FIELD_RELEASE_SWEEP set=free done=87 live=127 open=127 resolved=3765 by_news=8773 revised=269 unsettled=1 cut=128 cut_sites=91220 ms=46192
+FIELD_RELEASE_SWEEP set=free done=88 live=127 open=127 resolved=3782 by_news=8887 revised=272 unsettled=1 cut=128 cut_sites=91220 ms=46747
+FIELD_RELEASE_SWEEP set=free done=89 live=127 open=127 resolved=3797 by_news=9002 revised=277 unsettled=1 cut=128 cut_sites=91220 ms=47300
+FIELD_RELEASE_SWEEP set=free done=90 live=127 open=127 resolved=3820 by_news=9110 revised=279 unsettled=1 cut=128 cut_sites=91220 ms=47843
+FIELD_RELEASE_SWEEP set=free done=91 live=127 open=127 resolved=3847 by_news=9219 revised=282 unsettled=1 cut=128 cut_sites=91220 ms=48395
+FIELD_RELEASE_SWEEP set=free done=92 live=127 open=127 resolved=3861 by_news=9335 revised=284 unsettled=1 cut=128 cut_sites=91220 ms=48949
+FIELD_RELEASE_SWEEP set=free done=93 live=127 open=127 resolved=3875 by_news=9448 revised=286 unsettled=1 cut=128 cut_sites=91220 ms=49499
+FIELD_RELEASE_SWEEP set=free done=94 live=127 open=127 resolved=3894 by_news=9561 revised=291 unsettled=1 cut=128 cut_sites=91220 ms=50042
+FIELD_RELEASE_SWEEP set=free done=95 live=127 open=127 resolved=3913 by_news=9671 revised=297 unsettled=1 cut=128 cut_sites=91220 ms=50581
+FIELD_RELEASE_SWEEP set=free done=96 live=127 open=127 resolved=3940 by_news=9778 revised=301 unsettled=1 cut=128 cut_sites=91220 ms=51126
+FIELD_RELEASE_SWEEP set=free done=97 live=127 open=127 resolved=3959 by_news=9888 revised=303 unsettled=1 cut=128 cut_sites=91220 ms=51670
+FIELD_RELEASE_SWEEP set=free done=98 live=127 open=127 resolved=3974 by_news=10004 revised=305 unsettled=1 cut=128 cut_sites=91220 ms=52222
+FIELD_RELEASE_SWEEP set=free done=99 live=127 open=127 resolved=3996 by_news=10112 revised=311 unsettled=1 cut=128 cut_sites=91220 ms=52760
+FIELD_RELEASE_SWEEP set=free done=100 live=127 open=127 resolved=4013 by_news=10222 revised=316 unsettled=1 cut=128 cut_sites=91220 ms=53297
+FIELD_RELEASE_SWEEP set=free done=101 live=127 open=127 resolved=4041 by_news=10327 revised=324 unsettled=1 cut=128 cut_sites=91220 ms=53833
+FIELD_RELEASE_SWEEP set=free done=102 live=127 open=127 resolved=4057 by_news=10440 revised=325 unsettled=1 cut=128 cut_sites=91220 ms=54379
+FIELD_RELEASE_SWEEP set=free done=103 live=127 open=127 resolved=4081 by_news=10549 revised=330 unsettled=1 cut=128 cut_sites=91220 ms=54918
+FIELD_RELEASE_SWEEP set=free done=104 live=127 open=127 resolved=4108 by_news=10655 revised=335 unsettled=1 cut=128 cut_sites=91220 ms=55445
+FIELD_RELEASE_SWEEP set=free done=105 live=127 open=127 resolved=4131 by_news=10764 revised=337 unsettled=1 cut=128 cut_sites=91220 ms=55982
+FIELD_RELEASE_SWEEP set=free done=106 live=127 open=127 resolved=4154 by_news=10873 revised=339 unsettled=1 cut=128 cut_sites=91220 ms=56525
+FIELD_RELEASE_SWEEP set=free done=107 live=127 open=127 resolved=4176 by_news=10980 revised=341 unsettled=1 cut=128 cut_sites=91220 ms=57069
+FIELD_RELEASE_SWEEP set=free done=108 live=127 open=127 resolved=4195 by_news=11093 revised=346 unsettled=1 cut=128 cut_sites=91220 ms=57615
+FIELD_RELEASE_SWEEP set=free done=109 live=127 open=127 resolved=4213 by_news=11209 revised=350 unsettled=1 cut=128 cut_sites=91220 ms=58161
+FIELD_RELEASE_SWEEP set=free done=110 live=127 open=127 resolved=4229 by_news=11323 revised=352 unsettled=1 cut=128 cut_sites=91220 ms=58713
+FIELD_RELEASE_SWEEP set=free done=111 live=127 open=127 resolved=4243 by_news=11439 revised=353 unsettled=1 cut=128 cut_sites=91220 ms=59268
+FIELD_RELEASE_SWEEP set=free done=112 live=127 open=127 resolved=4261 by_news=11552 revised=356 unsettled=1 cut=128 cut_sites=91220 ms=59808
+FIELD_RELEASE_SWEEP set=free done=113 live=127 open=127 resolved=4278 by_news=11664 revised=357 unsettled=1 cut=128 cut_sites=91220 ms=60352
+FIELD_RELEASE_SWEEP set=free done=114 live=127 open=127 resolved=4294 by_news=11777 revised=359 unsettled=1 cut=128 cut_sites=91220 ms=60897
+FIELD_RELEASE_SWEEP set=free done=115 live=127 open=127 resolved=4317 by_news=11886 revised=363 unsettled=1 cut=128 cut_sites=91220 ms=61431
+FIELD_RELEASE_SWEEP set=free done=116 live=127 open=127 resolved=4338 by_news=11994 revised=365 unsettled=1 cut=128 cut_sites=91220 ms=61969
+FIELD_RELEASE_SWEEP set=free done=117 live=127 open=127 resolved=4362 by_news=12101 revised=370 unsettled=1 cut=128 cut_sites=91220 ms=62508
+FIELD_RELEASE_SWEEP set=free done=118 live=127 open=127 resolved=4381 by_news=12210 revised=370 unsettled=1 cut=128 cut_sites=91220 ms=63049
+FIELD_RELEASE_SWEEP set=free done=119 live=127 open=127 resolved=4401 by_news=12319 revised=376 unsettled=1 cut=128 cut_sites=91220 ms=63581
+FIELD_RELEASE_SWEEP set=free done=120 live=127 open=127 resolved=4422 by_news=12426 revised=381 unsettled=1 cut=128 cut_sites=91220 ms=64116
+FIELD_RELEASE_SWEEP set=free done=121 live=127 open=127 resolved=4434 by_news=12541 revised=385 unsettled=1 cut=128 cut_sites=91220 ms=64665
+FIELD_RELEASE_SWEEP set=free done=122 live=127 open=127 resolved=4458 by_news=12650 revised=388 unsettled=1 cut=128 cut_sites=91220 ms=65211
+FIELD_RELEASE_SWEEP set=free done=123 live=127 open=127 resolved=4476 by_news=12760 revised=391 unsettled=1 cut=128 cut_sites=91220 ms=65751
+FIELD_RELEASE_SWEEP set=free done=124 live=127 open=127 resolved=4501 by_news=12868 revised=394 unsettled=1 cut=128 cut_sites=91220 ms=66282
+FIELD_RELEASE_SWEEP set=free done=125 live=127 open=127 resolved=4517 by_news=12980 revised=395 unsettled=1 cut=128 cut_sites=91220 ms=66816
+FIELD_RELEASE_SWEEP set=free done=126 live=127 open=127 resolved=4536 by_news=13089 revised=398 unsettled=1 cut=128 cut_sites=91220 ms=67348
+FIELD_RELEASE_SWEEP set=free done=127 live=127 open=127 resolved=4555 by_news=13198 revised=398 unsettled=1 cut=128 cut_sites=91220 ms=67879
+FIELD_RELEASE_SWEEP set=free done=128 live=127 open=127 resolved=4572 by_news=13310 revised=399 unsettled=1 cut=128 cut_sites=91220 ms=68416
+FIELD_RELEASE_SWEEP set=free done=129 live=127 open=127 resolved=4594 by_news=13421 revised=402 unsettled=1 cut=128 cut_sites=91220 ms=68944
+FIELD_RELEASE_SWEEP set=free done=130 live=127 open=127 resolved=4614 by_news=13531 revised=403 unsettled=1 cut=128 cut_sites=91220 ms=69474
+FIELD_RELEASE_SWEEP set=free done=131 live=127 open=127 resolved=4646 by_news=13635 revised=405 unsettled=1 cut=128 cut_sites=91220 ms=69970
+FIELD_RELEASE_SWEEP set=free done=132 live=127 open=127 resolved=4675 by_news=13741 revised=410 unsettled=1 cut=128 cut_sites=91220 ms=70464
+FIELD_RELEASE_SWEEP set=free done=133 live=127 open=127 resolved=4701 by_news=13847 revised=414 unsettled=1 cut=128 cut_sites=91220 ms=70958
+FIELD_RELEASE_SWEEP set=free done=134 live=127 open=127 resolved=4726 by_news=13956 revised=422 unsettled=1 cut=128 cut_sites=91220 ms=71456
+FIELD_RELEASE_SWEEP set=free done=135 live=127 open=127 resolved=4744 by_news=14071 revised=423 unsettled=1 cut=128 cut_sites=91220 ms=71961
+FIELD_RELEASE_SWEEP set=free done=136 live=127 open=127 resolved=4766 by_news=14184 revised=425 unsettled=1 cut=128 cut_sites=91220 ms=72465
+FIELD_RELEASE_SWEEP set=free done=137 live=127 open=127 resolved=4794 by_news=14289 revised=429 unsettled=1 cut=128 cut_sites=91220 ms=72954
+FIELD_RELEASE_SWEEP set=free done=138 live=127 open=127 resolved=4821 by_news=14396 revised=431 unsettled=1 cut=128 cut_sites=91220 ms=73454
+FIELD_RELEASE_SWEEP set=free done=139 live=127 open=127 resolved=4837 by_news=14508 revised=433 unsettled=1 cut=128 cut_sites=91220 ms=73959
+FIELD_RELEASE_SWEEP set=free done=140 live=127 open=127 resolved=4857 by_news=14618 revised=435 unsettled=1 cut=128 cut_sites=91220 ms=74462
+FIELD_RELEASE_SWEEP set=free done=141 live=127 open=127 resolved=4875 by_news=14728 revised=438 unsettled=1 cut=128 cut_sites=91220 ms=74960
+FIELD_RELEASE_SWEEP set=free done=142 live=127 open=127 resolved=4895 by_news=14839 revised=439 unsettled=1 cut=128 cut_sites=91220 ms=75462
+FIELD_RELEASE_SWEEP set=free done=143 live=127 open=127 resolved=4920 by_news=14945 revised=443 unsettled=1 cut=128 cut_sites=91220 ms=75959
+FIELD_RELEASE_SWEEP set=free done=144 live=127 open=127 resolved=4947 by_news=15049 revised=447 unsettled=1 cut=128 cut_sites=91220 ms=76458
+FIELD_RELEASE_SWEEP set=free done=145 live=127 open=127 resolved=4972 by_news=15153 revised=449 unsettled=1 cut=128 cut_sites=91220 ms=76952
+FIELD_RELEASE_SWEEP set=free done=146 live=127 open=127 resolved=4996 by_news=15257 revised=452 unsettled=1 cut=128 cut_sites=91220 ms=77439
+FIELD_RELEASE_SWEEP set=free done=147 live=127 open=127 resolved=5022 by_news=15361 revised=457 unsettled=1 cut=128 cut_sites=91220 ms=77927
+FIELD_RELEASE_SWEEP set=free done=148 live=127 open=127 resolved=5053 by_news=15465 revised=459 unsettled=1 cut=128 cut_sites=91220 ms=78417
+FIELD_RELEASE_SWEEP set=free done=149 live=127 open=127 resolved=5073 by_news=15576 revised=462 unsettled=1 cut=128 cut_sites=91220 ms=78954
+FIELD_RELEASE_SWEEP set=free done=150 live=127 open=127 resolved=5090 by_news=15687 revised=464 unsettled=1 cut=128 cut_sites=91220 ms=79494
+FIELD_RELEASE_SWEEP set=free done=151 live=127 open=127 resolved=5101 by_news=15804 revised=465 unsettled=1 cut=128 cut_sites=91220 ms=80032
+FIELD_RELEASE_SWEEP set=free done=152 live=127 open=127 resolved=5120 by_news=15915 revised=468 unsettled=1 cut=128 cut_sites=91220 ms=80568
+FIELD_RELEASE_SWEEP set=free done=153 live=127 open=127 resolved=5140 by_news=16026 revised=471 unsettled=1 cut=128 cut_sites=91220 ms=81097
+FIELD_RELEASE_SWEEP set=free done=154 live=127 open=127 resolved=5155 by_news=16139 revised=473 unsettled=1 cut=128 cut_sites=91220 ms=81632
+FIELD_RELEASE_SWEEP set=free done=155 live=127 open=127 resolved=5175 by_news=16250 revised=478 unsettled=1 cut=128 cut_sites=91220 ms=82152
+FIELD_RELEASE_SWEEP set=free done=156 live=127 open=127 resolved=5203 by_news=16359 revised=483 unsettled=1 cut=128 cut_sites=91220 ms=82670
+FIELD_RELEASE_SWEEP set=free done=157 live=127 open=127 resolved=5224 by_news=16469 revised=488 unsettled=1 cut=128 cut_sites=91220 ms=83190
+FIELD_RELEASE_SWEEP set=free done=158 live=127 open=127 resolved=5247 by_news=16575 revised=491 unsettled=1 cut=128 cut_sites=91220 ms=83708
+FIELD_RELEASE_SWEEP set=free done=159 live=127 open=127 resolved=5271 by_news=16679 revised=492 unsettled=1 cut=128 cut_sites=91220 ms=84224
+FIELD_RELEASE_SWEEP set=free done=160 live=127 open=127 resolved=5297 by_news=16787 revised=495 unsettled=1 cut=128 cut_sites=91220 ms=84739
+FIELD_RELEASE_SWEEP set=free done=161 live=127 open=127 resolved=5329 by_news=16892 revised=498 unsettled=1 cut=128 cut_sites=91220 ms=85247
+FIELD_RELEASE_SWEEP set=free done=162 live=127 open=127 resolved=5352 by_news=17004 revised=504 unsettled=1 cut=128 cut_sites=91220 ms=85780
+FIELD_RELEASE_SWEEP set=free done=163 live=127 open=127 resolved=5370 by_news=17116 revised=509 unsettled=1 cut=128 cut_sites=91220 ms=86310
+FIELD_RELEASE_SWEEP set=free done=164 live=127 open=127 resolved=5397 by_news=17222 revised=511 unsettled=1 cut=128 cut_sites=91220 ms=86831
+FIELD_RELEASE_SWEEP set=free done=165 live=127 open=127 resolved=5421 by_news=17330 revised=514 unsettled=1 cut=128 cut_sites=91220 ms=87361
+FIELD_RELEASE_SWEEP set=free done=166 live=127 open=127 resolved=5443 by_news=17437 revised=519 unsettled=1 cut=128 cut_sites=91220 ms=87901
+FIELD_RELEASE_SWEEP set=free done=167 live=127 open=127 resolved=5473 by_news=17539 revised=520 unsettled=1 cut=128 cut_sites=91220 ms=88414
+FIELD_RELEASE_SWEEP set=free done=168 live=127 open=127 resolved=5489 by_news=17651 revised=521 unsettled=1 cut=128 cut_sites=91220 ms=88948
+FIELD_RELEASE_SWEEP set=free done=169 live=127 open=127 resolved=5518 by_news=17752 revised=523 unsettled=1 cut=128 cut_sites=91220 ms=89456
+FIELD_RELEASE_SWEEP set=free done=170 live=127 open=127 resolved=5551 by_news=17855 revised=525 unsettled=1 cut=128 cut_sites=91220 ms=89973
+FIELD_RELEASE_SWEEP set=free done=171 live=127 open=127 resolved=5583 by_news=17960 revised=525 unsettled=1 cut=128 cut_sites=91220 ms=90495
+FIELD_RELEASE_SWEEP set=free done=172 live=127 open=127 resolved=5614 by_news=18064 revised=530 unsettled=1 cut=128 cut_sites=91220 ms=91010
+FIELD_RELEASE_SWEEP set=free done=173 live=127 open=127 resolved=5644 by_news=18170 revised=532 unsettled=1 cut=128 cut_sites=91220 ms=91526
+FIELD_RELEASE_SWEEP set=free done=174 live=127 open=127 resolved=5669 by_news=18279 revised=537 unsettled=1 cut=128 cut_sites=91220 ms=92051
+FIELD_RELEASE_SWEEP set=free done=175 live=127 open=127 resolved=5691 by_news=18389 revised=540 unsettled=1 cut=128 cut_sites=91220 ms=92576
+FIELD_RELEASE_SWEEP set=free done=176 live=127 open=127 resolved=5719 by_news=18494 revised=546 unsettled=1 cut=128 cut_sites=91220 ms=93107
+FIELD_RELEASE_SWEEP set=free done=177 live=127 open=127 resolved=5742 by_news=18604 revised=547 unsettled=1 cut=128 cut_sites=91220 ms=93640
+FIELD_RELEASE_SWEEP set=free done=178 live=127 open=127 resolved=5765 by_news=18710 revised=550 unsettled=1 cut=128 cut_sites=91220 ms=94166
+FIELD_RELEASE_SWEEP set=free done=179 live=127 open=127 resolved=5790 by_news=18815 revised=553 unsettled=1 cut=128 cut_sites=91220 ms=94690
+FIELD_RELEASE_SWEEP set=free done=180 live=127 open=127 resolved=5814 by_news=18921 revised=559 unsettled=1 cut=128 cut_sites=91220 ms=95214
+FIELD_RELEASE_SWEEP set=free done=181 live=127 open=127 resolved=5844 by_news=19027 revised=567 unsettled=1 cut=128 cut_sites=91220 ms=95736
+FIELD_RELEASE_SWEEP set=free done=182 live=127 open=127 resolved=5878 by_news=19127 revised=568 unsettled=1 cut=128 cut_sites=91220 ms=96246
+FIELD_RELEASE_SWEEP set=free done=183 live=127 open=127 resolved=5891 by_news=19242 revised=571 unsettled=1 cut=128 cut_sites=91220 ms=96779
+FIELD_RELEASE_SWEEP set=free done=184 live=127 open=127 resolved=5911 by_news=19352 revised=575 unsettled=1 cut=128 cut_sites=91220 ms=97301
+FIELD_RELEASE_SWEEP set=free done=185 live=127 open=127 resolved=5936 by_news=19458 revised=578 unsettled=1 cut=128 cut_sites=91220 ms=97805
+FIELD_RELEASE_SWEEP set=free done=186 live=127 open=127 resolved=5962 by_news=19567 revised=581 unsettled=1 cut=128 cut_sites=91220 ms=98311
+FIELD_RELEASE_SWEEP set=free done=187 live=127 open=127 resolved=5989 by_news=19677 revised=583 unsettled=1 cut=128 cut_sites=91220 ms=98826
+FIELD_RELEASE_SWEEP set=free done=188 live=127 open=127 resolved=6005 by_news=19794 revised=585 unsettled=1 cut=128 cut_sites=91220 ms=99354
+FIELD_RELEASE_SWEEP set=free done=189 live=127 open=127 resolved=6035 by_news=19899 revised=587 unsettled=1 cut=128 cut_sites=91220 ms=99860
+FIELD_RELEASE_SWEEP set=free done=190 live=127 open=127 resolved=6064 by_news=20004 revised=590 unsettled=1 cut=128 cut_sites=91220 ms=100368
+FIELD_RELEASE_SWEEP set=free done=191 live=127 open=127 resolved=6086 by_news=20119 revised=591 unsettled=1 cut=128 cut_sites=91220 ms=100887
+FIELD_RELEASE_SWEEP set=free done=192 live=127 open=127 resolved=6113 by_news=20223 revised=597 unsettled=1 cut=128 cut_sites=91220 ms=101392
+FIELD_RELEASE_SWEEP set=free done=193 live=127 open=127 resolved=6133 by_news=20333 revised=603 unsettled=1 cut=128 cut_sites=91220 ms=101912
+FIELD_RELEASE_SWEEP set=free done=194 live=127 open=127 resolved=6154 by_news=20443 revised=606 unsettled=1 cut=128 cut_sites=91220 ms=102432
+FIELD_RELEASE_SWEEP set=free done=195 live=127 open=127 resolved=6179 by_news=20554 revised=612 unsettled=1 cut=128 cut_sites=91220 ms=102956
+FIELD_RELEASE_SWEEP set=free done=196 live=127 open=127 resolved=6205 by_news=20659 revised=612 unsettled=1 cut=128 cut_sites=91220 ms=103465
+FIELD_RELEASE_SWEEP set=free done=197 live=127 open=127 resolved=6232 by_news=20762 revised=616 unsettled=1 cut=128 cut_sites=91220 ms=103979
+FIELD_RELEASE_SWEEP set=free done=198 live=127 open=127 resolved=6255 by_news=20874 revised=618 unsettled=1 cut=128 cut_sites=91220 ms=104501
+FIELD_RELEASE_SWEEP set=free done=199 live=127 open=127 resolved=6280 by_news=20982 revised=620 unsettled=1 cut=128 cut_sites=91220 ms=105018
+FIELD_RELEASE_SWEEP set=free done=200 live=127 open=127 resolved=6303 by_news=21089 revised=629 unsettled=1 cut=128 cut_sites=91220 ms=105536
+FIELD_RELEASE_SWEEP set=free done=201 live=127 open=127 resolved=6327 by_news=21193 revised=629 unsettled=1 cut=128 cut_sites=91220 ms=106045
+FIELD_RELEASE_SWEEP set=free done=202 live=127 open=127 resolved=6342 by_news=21305 revised=637 unsettled=1 cut=128 cut_sites=91220 ms=106570
+FIELD_RELEASE_SWEEP set=free done=203 live=127 open=127 resolved=6354 by_news=21421 revised=641 unsettled=1 cut=128 cut_sites=91220 ms=107092
+FIELD_RELEASE_SWEEP set=free done=204 live=127 open=127 resolved=6368 by_news=21536 revised=644 unsettled=1 cut=128 cut_sites=91220 ms=107617
+FIELD_RELEASE_SWEEP set=free done=205 live=127 open=127 resolved=6389 by_news=21645 revised=648 unsettled=1 cut=128 cut_sites=91220 ms=108138
+FIELD_RELEASE_SWEEP set=free done=206 live=127 open=127 resolved=6408 by_news=21757 revised=649 unsettled=1 cut=128 cut_sites=91220 ms=108659
+FIELD_RELEASE_SWEEP set=free done=207 live=127 open=127 resolved=6436 by_news=21860 revised=655 unsettled=1 cut=128 cut_sites=91220 ms=109163
+FIELD_RELEASE_SWEEP set=free done=208 live=127 open=127 resolved=6456 by_news=21970 revised=660 unsettled=1 cut=128 cut_sites=91220 ms=109681
+FIELD_RELEASE_SWEEP set=free done=209 live=127 open=127 resolved=6485 by_news=22073 revised=663 unsettled=1 cut=128 cut_sites=91220 ms=110187
+FIELD_RELEASE_SWEEP set=free done=210 live=127 open=127 resolved=6506 by_news=22181 revised=664 unsettled=1 cut=128 cut_sites=91220 ms=110703
+FIELD_RELEASE_SWEEP set=free done=211 live=127 open=127 resolved=6516 by_news=22298 revised=664 unsettled=1 cut=128 cut_sites=91220 ms=111229
+FIELD_RELEASE_SWEEP set=free done=212 live=127 open=127 resolved=6533 by_news=22409 revised=664 unsettled=1 cut=128 cut_sites=91220 ms=111742
+FIELD_RELEASE_SWEEP set=free done=213 live=127 open=127 resolved=6550 by_news=22523 revised=668 unsettled=1 cut=128 cut_sites=91220 ms=112257
+FIELD_RELEASE_SWEEP set=free done=214 live=127 open=127 resolved=6576 by_news=22628 revised=669 unsettled=1 cut=128 cut_sites=91220 ms=112760
+FIELD_RELEASE_SWEEP set=free done=215 live=127 open=127 resolved=6606 by_news=22737 revised=669 unsettled=1 cut=128 cut_sites=91220 ms=113268
+FIELD_RELEASE_SWEEP set=free done=216 live=127 open=127 resolved=6633 by_news=22842 revised=674 unsettled=1 cut=128 cut_sites=91220 ms=113772
+FIELD_RELEASE_SWEEP set=free done=217 live=127 open=127 resolved=6655 by_news=22951 revised=679 unsettled=1 cut=128 cut_sites=91220 ms=114277
+FIELD_RELEASE_SWEEP set=free done=218 live=127 open=127 resolved=6681 by_news=23056 revised=683 unsettled=1 cut=128 cut_sites=91220 ms=114771
+FIELD_RELEASE_SWEEP set=free done=219 live=127 open=127 resolved=6712 by_news=23155 revised=688 unsettled=1 cut=128 cut_sites=91220 ms=115256
+FIELD_RELEASE_SWEEP set=free done=220 live=127 open=127 resolved=6745 by_news=23262 revised=692 unsettled=1 cut=128 cut_sites=91220 ms=115755
+FIELD_RELEASE_SWEEP set=free done=221 live=127 open=127 resolved=6789 by_news=23362 revised=699 unsettled=1 cut=128 cut_sites=91220 ms=116248
+FIELD_RELEASE_SWEEP set=free done=222 live=127 open=127 resolved=6826 by_news=23469 revised=702 unsettled=1 cut=128 cut_sites=91220 ms=116749
+FIELD_RELEASE_SWEEP set=free done=223 live=127 open=127 resolved=6852 by_news=23578 revised=706 unsettled=1 cut=128 cut_sites=91220 ms=117258
+FIELD_RELEASE_SWEEP set=free done=224 live=127 open=127 resolved=6875 by_news=23686 revised=708 unsettled=1 cut=128 cut_sites=91220 ms=117772
+FIELD_RELEASE_SWEEP set=free done=225 live=127 open=127 resolved=6894 by_news=23794 revised=712 unsettled=1 cut=128 cut_sites=91220 ms=118278
+FIELD_RELEASE_SWEEP set=free done=226 live=127 open=127 resolved=6913 by_news=23902 revised=717 unsettled=1 cut=128 cut_sites=91220 ms=118787
+FIELD_RELEASE_SWEEP set=free done=227 live=127 open=127 resolved=6927 by_news=24016 revised=719 unsettled=1 cut=128 cut_sites=91220 ms=119310
+FIELD_RELEASE_SWEEP set=free done=228 live=127 open=127 resolved=6947 by_news=24124 revised=725 unsettled=1 cut=128 cut_sites=91220 ms=119825
+FIELD_RELEASE_SWEEP set=free done=229 live=127 open=127 resolved=6973 by_news=24227 revised=731 unsettled=1 cut=128 cut_sites=91220 ms=120336
+FIELD_RELEASE_SWEEP set=free done=230 live=127 open=127 resolved=6992 by_news=24336 revised=737 unsettled=1 cut=128 cut_sites=91220 ms=120858
+FIELD_RELEASE_SWEEP set=free done=231 live=127 open=127 resolved=7009 by_news=24447 revised=739 unsettled=1 cut=128 cut_sites=91220 ms=121378
+FIELD_RELEASE_SWEEP set=free done=232 live=127 open=127 resolved=7021 by_news=24562 revised=744 unsettled=1 cut=128 cut_sites=91220 ms=121913
+FIELD_RELEASE_SWEEP set=free done=233 live=127 open=127 resolved=7044 by_news=24667 revised=749 unsettled=1 cut=128 cut_sites=91220 ms=122419
+FIELD_RELEASE_SWEEP set=free done=234 live=127 open=127 resolved=7072 by_news=24772 revised=754 unsettled=1 cut=128 cut_sites=91220 ms=122929
+FIELD_RELEASE_SWEEP set=free done=235 live=127 open=127 resolved=7094 by_news=24878 revised=757 unsettled=1 cut=128 cut_sites=91220 ms=123443
+FIELD_RELEASE_SWEEP set=free done=236 live=127 open=127 resolved=7121 by_news=24981 revised=761 unsettled=1 cut=128 cut_sites=91220 ms=123947
+FIELD_RELEASE_SWEEP set=free done=237 live=127 open=127 resolved=7142 by_news=25089 revised=761 unsettled=1 cut=128 cut_sites=91220 ms=124459
+FIELD_RELEASE_SWEEP set=free done=238 live=127 open=127 resolved=7162 by_news=25197 revised=762 unsettled=1 cut=128 cut_sites=91220 ms=124969
+FIELD_RELEASE_SWEEP set=free done=239 live=127 open=127 resolved=7176 by_news=25310 revised=765 unsettled=1 cut=128 cut_sites=91220 ms=125481
+FIELD_RELEASE_SWEEP set=free done=240 live=127 open=127 resolved=7196 by_news=25420 revised=768 unsettled=1 cut=128 cut_sites=91220 ms=125991
+FIELD_RELEASE_SWEEP set=free done=241 live=127 open=127 resolved=7215 by_news=25529 revised=771 unsettled=1 cut=128 cut_sites=91220 ms=126502
+FIELD_RELEASE_SWEEP set=free done=242 live=127 open=127 resolved=7238 by_news=25634 revised=778 unsettled=1 cut=128 cut_sites=91220 ms=127011
+FIELD_RELEASE_SWEEP set=free done=243 live=127 open=127 resolved=7259 by_news=25743 revised=779 unsettled=1 cut=128 cut_sites=91220 ms=127525
+FIELD_RELEASE_SWEEP set=free done=244 live=127 open=127 resolved=7276 by_news=25856 revised=784 unsettled=1 cut=128 cut_sites=91220 ms=128042
+FIELD_RELEASE_SWEEP set=free done=245 live=127 open=127 resolved=7306 by_news=25960 revised=788 unsettled=1 cut=128 cut_sites=91220 ms=128549
+FIELD_RELEASE_SWEEP set=free done=246 live=127 open=127 resolved=7329 by_news=26066 revised=791 unsettled=1 cut=128 cut_sites=91220 ms=129061
+FIELD_RELEASE_SWEEP set=free done=247 live=127 open=127 resolved=7356 by_news=26169 revised=795 unsettled=1 cut=128 cut_sites=91220 ms=129564
+FIELD_RELEASE_SWEEP set=free done=248 live=127 open=127 resolved=7378 by_news=26277 revised=796 unsettled=1 cut=128 cut_sites=91220 ms=130066
+FIELD_RELEASE_SWEEP set=free done=249 live=127 open=127 resolved=7402 by_news=26384 revised=800 unsettled=1 cut=128 cut_sites=91220 ms=130578
+FIELD_RELEASE_SWEEP set=free done=250 live=127 open=127 resolved=7428 by_news=26487 revised=805 unsettled=1 cut=128 cut_sites=91220 ms=131083
+FIELD_RELEASE_SWEEP set=free done=251 live=127 open=127 resolved=7459 by_news=26588 revised=807 unsettled=1 cut=128 cut_sites=91220 ms=131584
+FIELD_RELEASE_SWEEP set=free done=252 live=127 open=127 resolved=7488 by_news=26692 revised=811 unsettled=1 cut=128 cut_sites=91220 ms=132086
+FIELD_RELEASE_SWEEP set=free done=253 live=127 open=127 resolved=7512 by_news=26796 revised=815 unsettled=1 cut=128 cut_sites=91220 ms=132586
+FIELD_RELEASE_SWEEP set=free done=254 live=127 open=127 resolved=7530 by_news=26905 revised=817 unsettled=1 cut=128 cut_sites=91220 ms=133092
+FIELD_RELEASE_SWEEP set=free done=255 live=127 open=127 resolved=7548 by_news=27015 revised=821 unsettled=1 cut=128 cut_sites=91220 ms=133601
+FIELD_RELEASE_SWEEP set=free done=256 live=127 open=127 resolved=7567 by_news=27127 revised=822 unsettled=1 cut=128 cut_sites=91220 ms=134100
+FIELD_RELEASE_SWEEP set=free done=257 live=127 open=127 resolved=7591 by_news=27233 revised=826 unsettled=1 cut=128 cut_sites=91220 ms=134605
+FIELD_RELEASE_SWEEP set=free done=258 live=127 open=127 resolved=7611 by_news=27341 revised=830 unsettled=1 cut=128 cut_sites=91220 ms=135118
+FIELD_RELEASE_SWEEP set=free done=259 live=127 open=127 resolved=7633 by_news=27446 revised=832 unsettled=1 cut=128 cut_sites=91220 ms=135624
+FIELD_RELEASE_SWEEP set=free done=260 live=127 open=127 resolved=7644 by_news=27562 revised=837 unsettled=1 cut=128 cut_sites=91220 ms=136145
+FIELD_RELEASE_SWEEP set=free done=261 live=127 open=127 resolved=7659 by_news=27676 revised=839 unsettled=1 cut=128 cut_sites=91220 ms=136664
+FIELD_RELEASE_SWEEP set=free done=262 live=127 open=127 resolved=7679 by_news=27783 revised=841 unsettled=1 cut=128 cut_sites=91220 ms=137172
+FIELD_RELEASE_SWEEP set=free done=263 live=127 open=127 resolved=7698 by_news=27893 revised=847 unsettled=1 cut=128 cut_sites=91220 ms=137675
+FIELD_RELEASE_SWEEP set=free done=264 live=127 open=127 resolved=7717 by_news=28003 revised=849 unsettled=1 cut=128 cut_sites=91220 ms=138176
+FIELD_RELEASE_SWEEP set=free done=264 live=127 open=127 resolved=7717 by_news=28003 revised=849 unsettled=1 cut=128 cut_sites=91220 ms=138176
+FIELD_RELEASE_ONE problem=0 released=6 held=379 lambda=6 friction=373 total_ms=138177
+FIELD_RELEASE_ONE problem=1 released=22 held=179 lambda=15 friction=171 total_ms=138177
+FIELD_RELEASE_ONE problem=2 released=6 held=192 lambda=6 friction=186 total_ms=138177
+FIELD_RELEASE_ONE problem=3 released=6 held=90 lambda=4 friction=88 total_ms=138177
+FIELD_RELEASE_ONE problem=4 released=4 held=295 lambda=3 friction=293 total_ms=138177
+FIELD_RELEASE_ONE problem=5 released=27 held=465 lambda=26 friction=440 total_ms=138177
+FIELD_RELEASE_ONE problem=6 released=3 held=381 lambda=3 friction=378 total_ms=138177
+FIELD_RELEASE_ONE problem=7 released=3 held=237 lambda=2 friction=236 total_ms=138177
+FIELD_RELEASE_ONE problem=8 released=9 held=231 lambda=8 friction=224 total_ms=138177
+FIELD_RELEASE_ONE problem=9 released=3 held=400 lambda=3 friction=397 total_ms=138177
+FIELD_RELEASE_ONE problem=10 released=59 held=405 lambda=46 friction=372 total_ms=138177
+FIELD_RELEASE_ONE problem=11 released=3 held=265 lambda=3 friction=262 total_ms=138177
+FIELD_RELEASE_ONE problem=12 released=33 held=290 lambda=30 friction=263 total_ms=138177
+FIELD_RELEASE_ONE problem=13 released=6 held=188 lambda=6 friction=182 total_ms=138177
+FIELD_RELEASE_ONE problem=14 released=4 held=305 lambda=4 friction=301 total_ms=138177
+FIELD_RELEASE_ONE problem=15 released=10 held=518 lambda=10 friction=508 total_ms=138177
+FIELD_RELEASE_ONE problem=16 released=7 held=87 lambda=6 friction=82 total_ms=138177
+FIELD_RELEASE_ONE problem=17 released=5 held=186 lambda=3 friction=185 total_ms=138177
+FIELD_RELEASE_ONE problem=18 released=21 held=112 lambda=14 friction=105 total_ms=138177
+FIELD_RELEASE_ONE problem=19 released=3 held=472 lambda=3 friction=469 total_ms=138177
+FIELD_RELEASE_ONE problem=20 released=12 held=428 lambda=12 friction=416 total_ms=138177
+FIELD_RELEASE_ONE problem=21 released=7 held=262 lambda=7 friction=255 total_ms=138177
+FIELD_RELEASE_ONE problem=22 released=30 held=99 lambda=20 friction=89 total_ms=138177
+FIELD_RELEASE_ONE problem=23 released=5 held=405 lambda=5 friction=400 total_ms=138177
+FIELD_RELEASE_ONE problem=24 released=7 held=263 lambda=6 friction=258 total_ms=138177
+FIELD_RELEASE_ONE problem=25 released=13 held=402 lambda=12 friction=391 total_ms=138177
+FIELD_RELEASE_ONE problem=26 released=4 held=165 lambda=4 friction=161 total_ms=138177
+FIELD_RELEASE_ONE problem=27 released=23 held=310 lambda=20 friction=293 total_ms=138177
+FIELD_RELEASE_ONE problem=28 released=3 held=192 lambda=3 friction=189 total_ms=138177
+FIELD_RELEASE_ONE problem=29 released=4 held=288 lambda=4 friction=284 total_ms=138177
+FIELD_RELEASE_ONE problem=30 released=19 held=384 lambda=18 friction=367 total_ms=138177
+FIELD_RELEASE_ONE problem=31 released=12 held=101 lambda=12 friction=89 total_ms=138177
+FIELD_RELEASE_ONE problem=32 released=10 held=307 lambda=8 friction=301 total_ms=138177
+FIELD_RELEASE_ONE problem=33 released=6 held=196 lambda=5 friction=192 total_ms=138177
+FIELD_RELEASE_ONE problem=34 released=5 held=258 lambda=4 friction=255 total_ms=138178
+FIELD_RELEASE_ONE problem=35 released=9 held=346 lambda=9 friction=337 total_ms=138178
+FIELD_RELEASE_ONE problem=36 released=39 held=204 lambda=31 friction=181 total_ms=138178
+FIELD_RELEASE_ONE problem=37 released=6 held=308 lambda=5 friction=304 total_ms=138178
+FIELD_RELEASE_ONE problem=38 released=15 held=378 lambda=14 friction=365 total_ms=138178
+FIELD_RELEASE_ONE problem=39 released=4 held=701 lambda=4 friction=697 total_ms=138178
+FIELD_RELEASE_ONE problem=40 released=6 held=546 lambda=6 friction=540 total_ms=138178
+FIELD_RELEASE_ONE problem=41 released=755 held=271 lambda=68 friction=890 total_ms=138179
+FIELD_RELEASE_ONE problem=42 released=6 held=236 lambda=5 friction=232 total_ms=138179
+FIELD_RELEASE_ONE problem=43 released=35 held=121 lambda=21 friction=114 total_ms=138179
+FIELD_RELEASE_ONE problem=44 released=17 held=157 lambda=15 friction=144 total_ms=138179
+FIELD_RELEASE_ONE problem=45 released=9 held=115 lambda=8 friction=108 total_ms=138179
+FIELD_RELEASE_ONE problem=46 released=3 held=209 lambda=2 friction=208 total_ms=138179
+FIELD_RELEASE_ONE problem=47 released=4 held=254 lambda=3 friction=252 total_ms=138179
+FIELD_RELEASE_ONE problem=48 released=3 held=105 lambda=2 friction=104 total_ms=138179
+FIELD_RELEASE_ONE problem=49 released=44 held=435 lambda=38 friction=403 total_ms=138179
+FIELD_RELEASE_ONE problem=50 released=13 held=115 lambda=12 friction=104 total_ms=138179
+FIELD_RELEASE_ONE problem=51 released=7 held=270 lambda=7 friction=263 total_ms=138179
+FIELD_RELEASE_ONE problem=52 released=23 held=300 lambda=22 friction=279 total_ms=138179
+FIELD_RELEASE_ONE problem=53 released=3 held=172 lambda=3 friction=169 total_ms=138179
+FIELD_RELEASE_ONE problem=54 released=14 held=91 lambda=11 friction=83 total_ms=138179
+FIELD_RELEASE_ONE problem=55 released=13 held=259 lambda=12 friction=248 total_ms=138179
+FIELD_RELEASE_ONE problem=56 released=5 held=503 lambda=5 friction=498 total_ms=138179
+FIELD_RELEASE_ONE problem=57 released=6 held=148 lambda=5 friction=144 total_ms=138179
+FIELD_RELEASE_ONE problem=58 released=6 held=559 lambda=6 friction=553 total_ms=138179
+FIELD_RELEASE_ONE problem=59 released=4 held=172 lambda=3 friction=170 total_ms=138179
+FIELD_RELEASE_ONE problem=60 released=3 held=311 lambda=3 friction=308 total_ms=138179
+FIELD_RELEASE_ONE problem=61 released=3 held=171 lambda=2 friction=170 total_ms=138179
+FIELD_RELEASE_ONE problem=62 released=41 held=211 lambda=33 friction=186 total_ms=138179
+FIELD_RELEASE_ONE problem=63 released=4 held=517 lambda=3 friction=515 total_ms=138179
+FIELD_RELEASE_ONE problem=64 released=9 held=231 lambda=9 friction=222 total_ms=138179
+FIELD_RELEASE_ONE problem=65 released=8 held=356 lambda=7 friction=350 total_ms=138179
+FIELD_RELEASE_ONE problem=66 released=5 held=329 lambda=5 friction=324 total_ms=138179
+FIELD_RELEASE_ONE problem=67 released=8 held=397 lambda=8 friction=389 total_ms=138179
+FIELD_RELEASE_ONE problem=68 released=6 held=217 lambda=5 friction=213 total_ms=138179
+FIELD_RELEASE_ONE problem=69 released=4 held=410 lambda=4 friction=406 total_ms=138179
+FIELD_RELEASE_ONE problem=70 released=3 held=145 lambda=3 friction=142 total_ms=138179
+FIELD_RELEASE_ONE problem=71 released=4 held=237 lambda=4 friction=233 total_ms=138179
+FIELD_RELEASE_ONE problem=72 released=4 held=244 lambda=3 friction=242 total_ms=138179
+FIELD_RELEASE_ONE problem=73 released=6 held=252 lambda=5 friction=248 total_ms=138179
+FIELD_RELEASE_ONE problem=74 released=4 held=122 lambda=4 friction=118 total_ms=138180
+FIELD_RELEASE_ONE problem=75 released=27 held=94 lambda=13 friction=95 total_ms=138180
+FIELD_RELEASE_ONE problem=76 released=42 held=165 lambda=26 friction=155 total_ms=138180
+FIELD_RELEASE_ONE problem=77 released=8 held=203 lambda=6 friction=199 total_ms=138180
+FIELD_RELEASE_ONE problem=78 released=4 held=564 lambda=4 friction=560 total_ms=138180
+FIELD_RELEASE_ONE problem=79 released=10 held=246 lambda=9 friction=238 total_ms=138180
+FIELD_RELEASE_ONE problem=80 released=8 held=302 lambda=8 friction=294 total_ms=138180
+FIELD_RELEASE_ONE problem=81 released=30 held=204 lambda=20 friction=194 total_ms=138180
+FIELD_RELEASE_ONE problem=82 released=8 held=452 lambda=7 friction=446 total_ms=138180
+FIELD_RELEASE_ONE problem=83 released=6 held=195 lambda=6 friction=189 total_ms=138180
+FIELD_RELEASE_ONE problem=84 released=4 held=299 lambda=4 friction=295 total_ms=138180
+FIELD_RELEASE_ONE problem=85 released=4 held=321 lambda=4 friction=317 total_ms=138180
+FIELD_RELEASE_ONE problem=86 released=8 held=241 lambda=7 friction=235 total_ms=138180
+FIELD_RELEASE_ONE problem=87 released=7 held=174 lambda=6 friction=169 total_ms=138180
+FIELD_RELEASE_ONE problem=88 released=42 held=282 lambda=37 friction=250 total_ms=138180
+FIELD_RELEASE_ONE problem=89 released=9 held=501 lambda=9 friction=492 total_ms=138180
+FIELD_RELEASE_ONE problem=90 released=15 held=394 lambda=15 friction=379 total_ms=138180
+FIELD_RELEASE_ONE problem=91 released=5 held=229 lambda=4 friction=226 total_ms=138180
+FIELD_RELEASE_ONE problem=92 released=34 held=384 lambda=29 friction=360 total_ms=138180
+FIELD_RELEASE_ONE problem=93 released=6 held=320 lambda=5 friction=316 total_ms=138180
+FIELD_RELEASE_ONE problem=94 released=5 held=279 lambda=5 friction=274 total_ms=138180
+FIELD_RELEASE_ONE problem=95 released=68 held=195 lambda=40 friction=183 total_ms=138180
+FIELD_RELEASE_ONE problem=96 released=6 held=584 lambda=6 friction=578 total_ms=138180
+FIELD_RELEASE_ONE problem=97 released=8 held=415 lambda=7 friction=409 total_ms=138180
+FIELD_RELEASE_ONE problem=98 released=3 held=463 lambda=3 friction=460 total_ms=138180
+FIELD_RELEASE_ONE problem=99 released=8 held=308 lambda=7 friction=302 total_ms=138180
+FIELD_RELEASE_ONE problem=100 released=19 held=292 lambda=19 friction=273 total_ms=138180
+FIELD_RELEASE_ONE problem=101 released=13 held=223 lambda=12 friction=212 total_ms=138180
+FIELD_RELEASE_ONE problem=102 released=9 held=227 lambda=9 friction=218 total_ms=138180
+FIELD_RELEASE_ONE problem=103 released=12 held=136 lambda=10 friction=128 total_ms=138180
+FIELD_RELEASE_ONE problem=104 released=5 held=217 lambda=5 friction=212 total_ms=138180
+FIELD_RELEASE_ONE problem=105 released=5 held=165 lambda=4 friction=162 total_ms=138180
+FIELD_RELEASE_ONE problem=106 released=4 held=67 lambda=3 friction=65 total_ms=138180
+FIELD_RELEASE_ONE problem=107 released=10 held=191 lambda=9 friction=183 total_ms=138180
+FIELD_RELEASE_ONE problem=108 released=10 held=279 lambda=9 friction=271 total_ms=138180
+FIELD_RELEASE_ONE problem=109 released=3 held=134 lambda=3 friction=131 total_ms=138181
+FIELD_RELEASE_ONE problem=110 released=6 held=486 lambda=6 friction=480 total_ms=138181
+FIELD_RELEASE_ONE problem=111 released=33 held=329 lambda=30 friction=302 total_ms=138181
+FIELD_RELEASE_ONE problem=112 released=10 held=81 lambda=7 friction=77 total_ms=138181
+FIELD_RELEASE_ONE problem=113 released=3 held=135 lambda=3 friction=132 total_ms=138181
+FIELD_RELEASE_ONE problem=114 released=22 held=242 lambda=20 friction=224 total_ms=138181
+FIELD_RELEASE_ONE problem=115 released=3 held=191 lambda=3 friction=188 total_ms=138181
+FIELD_RELEASE_ONE problem=116 released=4 held=524 lambda=4 friction=520 total_ms=138181
+FIELD_RELEASE_ONE problem=117 released=19 held=249 lambda=17 friction=234 total_ms=138181
+FIELD_RELEASE_ONE problem=118 released=5 held=159 lambda=4 friction=156 total_ms=138181
+FIELD_RELEASE_ONE problem=119 released=5 held=475 lambda=5 friction=470 total_ms=138181
+FIELD_RELEASE_ONE problem=120 released=13 held=250 lambda=12 friction=239 total_ms=138181
+FIELD_RELEASE_ONE problem=121 released=11 held=418 lambda=11 friction=407 total_ms=138181
+FIELD_RELEASE_ONE problem=122 released=4 held=82 lambda=3 friction=80 total_ms=138181
+FIELD_RELEASE_ONE problem=123 released=4 held=214 lambda=4 friction=210 total_ms=138181
+FIELD_RELEASE_ONE problem=124 released=3 held=439 lambda=3 friction=436 total_ms=138181
+FIELD_RELEASE_ONE problem=125 released=22 held=284 lambda=17 friction=272 total_ms=138181
+FIELD_RELEASE_ONE problem=126 released=8 held=203 lambda=8 friction=195 total_ms=138181
+FIELD_RELEASE_ONE problem=127 released=9 held=95 lambda=8 friction=88 total_ms=138181
+FIELD_RELEASE_SWEEP set=marks done=0 live=399 open=399 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=138189
+FIELD_RELEASE_SWEEP set=marks done=0 live=399 open=399 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=138189
+FIELD_RELEASE free=128 marks=399 withheld=0 refused=0 sweeps=1229 stop_ms=138000 free_sweeps=264 free_open=127 free_stopped=true marks_sweeps=0 marks_open=399 marks_stopped=true released=2210 held=35463 lambda=1291 friction=35091 ms=138190
+FIELD_CARD reads=787 read_ms=128754 returns=0 return_ms=0 pairs=704612699312 batches=787 peak_store=1352103100 elapsed_ms=138190
+MEASURE lap=r8 rc=0 wall_s=138.4 peak_rss_kib=731688
