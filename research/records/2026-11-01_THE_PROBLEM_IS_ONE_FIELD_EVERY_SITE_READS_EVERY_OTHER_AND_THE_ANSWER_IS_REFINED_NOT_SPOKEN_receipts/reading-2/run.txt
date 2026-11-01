@@ -1,0 +1,4 @@
+BIN=2abf6f502455f71b08a507008f41f7c36592b81cc8a2921799c41be50de4f5eb at=2026-11-01T06:31:04Z board=1103 MiB laps=4 train_s=660 a_ms=149000 b_ms=267000 release_s=150 text_s=60
+TRAIN_END rc=143 EARLY_STOP lap=0 grown=False bound_ms=149000 FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15376842752 total=16802250752 batch_budget=10385752064 FIELD_UNSEEN lap=-1 code=6.931 sites=63816 next=- ms=1173 
+NO_STATE
+BOARD_PEAK_MIB 6200 baseline=1103 (read from the run's samples: the script exits at NO_STATE before printing it)

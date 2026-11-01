@@ -1,0 +1,18 @@
+FIELD_COMMAND time-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 8 8 4 16
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15328018432 total=16802250752 batch_budget=10336927744
+FIELD_PASSAGE train=6602 withheld=128 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_TIME_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 reach=2221 material=19546
+FIELD_TIME section=1 length=1408 pairs=48532016 reads=4 halvings=0 deposited=true ms=158 ns_a_pair=3
+FIELD_TIME section=2 length=1365 pairs=63158384 reads=5 halvings=0 deposited=true ms=215 ns_a_pair=3
+FIELD_TIME section=3 length=1469 pairs=110021008 reads=5 halvings=0 deposited=true ms=343 ns_a_pair=3
+FIELD_TIME section=4 length=1020 pairs=29112032 reads=5 halvings=0 deposited=true ms=107 ns_a_pair=3
+FIELD_TIME section=5 length=1235 pairs=81147128 reads=5 halvings=0 deposited=true ms=272 ns_a_pair=3
+FIELD_TIME section=6 length=1222 pairs=102133056 reads=5 halvings=0 deposited=true ms=318 ns_a_pair=3
+FIELD_TIME section=7 length=1503 pairs=111287160 reads=5 halvings=0 deposited=true ms=390 ns_a_pair=3
+FIELD_TIME section=8 length=767 pairs=41176800 reads=5 halvings=0 deposited=true ms=147 ns_a_pair=3
+FIELD_TIME_LAP sections=413 sites=4600652 pairs=31013808880 worst_ns_a_section_pair=3 projection_ms=114402 (the section's read, return and rereads at the worst measured time a pair)
+FIELD_TIME_RELEASE problems=4 released=4916 pairs_at_most=2190383360 ms=709
+FIELD_TIME_RELEASES problems=128 releases=527 sweeps=16 pairs_at_most=296382007040 worst_ns_a_pair=0 projection_ms=96021
+FIELD_TIME_DONE elapsed_ms=2920
+FIELD_CARD reads=63 read_ms=1389 returns=8 return_ms=1189 pairs=4610303024 batches=71 peak_store=1112871600 elapsed_ms=2923
+MEASURE lap=timeA3 rc=0 wall_s=3.3 peak_rss_kib=351744
