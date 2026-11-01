@@ -34,6 +34,8 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
+/// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
+const OUTER_TILE: u64 = 64;
 /// The device octets the runs keep to (the board's, the desktop included).
 const BOARD_CEILING: u64 = 12 << 30;
 /// Octets kept free beside a batch's counted allocations for the driver, the material and the
@@ -260,6 +262,12 @@ impl<'c> CardField<'c> {
     /// A grid striding `rows` with one warp a row.
     fn warps(rows: u64) -> u32 {
         rows.div_ceil((THREADS / 32) as u64).clamp(1, 1 << 20) as u32
+    }
+
+    /// A grid striding `sites` with one block every 32 sites (a lane a site, the block's warps
+    /// sharing its sums).
+    fn blocks_of_32(sites: u64) -> u32 {
+        sites.div_ceil(32).clamp(1, 1 << 20) as u32
     }
 
     /// Each region's faces and, when `returning`, the covector over the regions.
@@ -543,7 +551,7 @@ impl<'c> CardField<'c> {
         }
         let entries = rows as u64 * if x != 0 { cols as u64 } else { 1 };
         let entry = if x64 { "field_outer_x64" } else { "field_outer_x32" };
-        self.launch(entry, Self::cells(entries), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u)])
+        self.launch(entry, Self::cells(entries * (words.t as u64).div_ceil(OUTER_TILE)), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u)])
     }
 
     fn ratio_adjoint(&self, words: &mut Words, read: u64, scale: u64, cov: u64, base: u64, dst: u64, only_unresolved: bool) -> Result<()> {
@@ -616,7 +624,7 @@ impl<'c> CardField<'c> {
                 let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
                 self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
                 let (mut hh, mut wrp, mut dsp, mut dkp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dk.device_ptr(), dv.device_ptr());
-                self.launch("field_contact_columns", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dkp), arg(&mut dvp)])?;
+                self.launch("field_contact_columns", Self::blocks_of_32(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dkp), arg(&mut dvp)])?;
             }
             for chart in [&dq, &dk, &dv] {
                 let mut cp = chart.device_ptr();
@@ -646,10 +654,26 @@ impl<'c> CardField<'c> {
             rows_sites[filled[row] as usize] = t as u32;
             filled[row] += 1;
         }
-        let rows_off_c = self.timed(Kind::Copy, || card.upload(&rows_off)).map_err(device)?;
+        // Each row's sites cut into segments of at most `OUTER_TILE`, one thread a segment and a
+        // column.
+        let mut segments: Vec<u32> = Vec::new();
+        for row in 0..=a {
+            let (from, to) = (rows_off[row], rows_off[row + 1]);
+            let mut at = from;
+            while at < to {
+                let end = to.min(at + OUTER_TILE as u32);
+                segments.extend([row as u32, at, end]);
+                at = end;
+            }
+        }
+        let count = (segments.len() / 3) as u32;
+        if count == 0 {
+            return Ok(());
+        }
         let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
-        let (mut gp, mut dxp, mut rop, mut rsp) = (g.device_ptr(), dx.device_ptr(), rows_off_c.device_ptr(), rows_sites_c.device_ptr());
-        self.launch("field_encoding", Self::cells(((a + 1) * dw) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rop), arg(&mut rsp)])?;
+        let segments_c = self.timed(Kind::Copy, || card.upload(&segments)).map_err(device)?;
+        let (mut gp, mut dxp, mut rsp, mut sgp, mut count) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), segments_c.device_ptr(), count);
+        self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut sgp), arg(&mut count)])?;
         Ok(())
     }
 

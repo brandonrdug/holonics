@@ -268,7 +268,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let mut releases_unequal = 0usize;
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
     let t0 = std::time::Instant::now();
-    let carded = card_learner.field.release_realized(&questions, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
+    let carded = card_learner.field.release_realized(&questions, sweeps, p.codec.void(), card, &mut |_| true).map_err(|e| e.to_string())?;
     let card_release_ms = ms(t0.elapsed().as_nanos());
     for (i, (&(q, open), carded)) in questions.iter().zip(&carded).enumerate() {
         let t0 = std::time::Instant::now();
@@ -372,18 +372,19 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
     let mut counted = Counted { inner: &mut *card, pairs: 0 };
     let t0 = std::time::Instant::now();
-    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), &mut counted).map_err(|e| e.to_string())?;
+    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), &mut counted, &mut |_| true).map_err(|e| e.to_string())?;
     let ns = t0.elapsed().as_nanos();
     let pairs: u128 = questions.iter().map(|&(q, open)| release_pairs(d.heads, d.ticks, sweeps, q.len() + open)).sum();
     let release_worst = (ns, counted.pairs.max(1));
     println!("FIELD_TIME_RELEASE problems={} released={} pairs_at_most={pairs} pairs_read={} ms={}", questions.len(), released.iter().map(Vec::len).sum::<usize>(), counted.pairs, ms(ns));
     let held_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let held_problems = problems_of(&held_text);
-    let mut held_pairs = 0u128;
+    // One sweep of each set at most (both its reads, every region at its full length).
+    let (mut free_pairs, mut marks_pairs) = (0u128, 0u128);
     let mut held_releases = 0usize;
     for (question, answer) in &held_problems {
         let q = p.codec.encode(&question_text(question)).map_err(|e| e.to_string())?;
-        held_pairs += release_pairs(d.heads, d.ticks, sweeps, q.len() + p.codec.answer);
+        free_pairs += release_pairs(d.heads, d.ticks, 1, q.len() + p.codec.answer);
         held_releases += 1;
         // Each calculation's equals: the question and the answer through it, the rest opened.
         let mut at = 0usize;
@@ -392,17 +393,24 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
             if let Some(eq) = answer[at + off..close].iter().position(|&b| b == b'=') {
                 let prefix = p.codec.encode(&answer[..at + off + eq + 1]).map_err(|e| e.to_string())?.len();
                 let open = p.codec.answer.saturating_sub(prefix).max(1);
-                held_pairs += release_pairs(d.heads, d.ticks, sweeps, q.len() + prefix + open);
+                marks_pairs += release_pairs(d.heads, d.ticks, 1, q.len() + prefix + open);
                 held_releases += 1;
             }
             at = close.max(at + off + 2);
         }
     }
+    // A sweep's time at most, each set's: a release's deadline is fixed from it (the sweeps that fit),
+    // since the sweeps a release runs are the field's (every sweep releases at least a site of each
+    // open problem, most where the field resolves many).
+    let at_worst = |pairs: u128| ms(pairs * release_worst.0 / release_worst.1.max(1));
+    let held_pairs = sweeps as u128 * (free_pairs + marks_pairs);
     println!(
-        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} pairs_at_most={held_pairs} ps_a_pair={} projection_ms={}",
+        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} pairs_at_most={held_pairs} ps_a_pair={} free_sweep_ms={} marks_sweep_ms={} projection_ms={}",
         held_problems.len(),
         1000 * release_worst.0 / release_worst.1.max(1),
-        ms(held_pairs * release_worst.0 / release_worst.1.max(1))
+        at_worst(free_pairs),
+        at_worst(marks_pairs),
+        at_worst(held_pairs)
     );
     println!("FIELD_TIME_DONE elapsed_ms={}", started.elapsed().as_millis());
     Ok(())

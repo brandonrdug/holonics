@@ -59,6 +59,78 @@ __device__ __forceinline__ wide div_nearest(wide x, wide k) {
     return x >= 0 ? n / k : -(n / k);
 }
 
+// [agent-inferred, November 1] **An exact quotient by an invariant divisor.** A contact row's
+// return divides one product a pair by the row's mass; a 128-bit division is a long software routine
+// on the card, so the divisor is read once a row as its normalized form `d = k 2^s` and reciprocal
+// `v = ⌊(2^128 − 1)/d⌋ − 2^64` (Möller and Granlund, "Improved division by invariant integers",
+// 2011, Algorithm 4), and each division is two of its steps: the quotient is the integer `⌊n/k⌋`,
+// whatever the route, so the bits are `div_nearest`'s.
+struct Divisor {
+    uint64_t k, d, v;
+    uint32_t s;
+};
+
+__device__ __forceinline__ Divisor divisor_of(uint64_t k) {
+    Divisor q;
+    q.k = k;
+    q.s = (uint32_t)__clzll((long long)k);
+    q.d = k << q.s;
+    // ⌊(2^128 − 1)/d⌋ − 2^64 = ⌊((2^64 − 1 − d) 2^64 + 2^64 − 1)/d⌋, below 2^64 since d ≥ 2^63.
+    q.v = (uint64_t)((((uwide)(~q.d)) << 64 | (uwide)UINT64_MAX) / (uwide)q.d);
+    return q;
+}
+
+// `⌊(u1 2^64 + u0)/d⌋` and its remainder, `u1 < d`, `d` normalized (Algorithm 4).
+__device__ __forceinline__ uint64_t divide_word(uint64_t u1, uint64_t u0, const Divisor &q, uint64_t *rem) {
+    const uwide p = (uwide)q.v * (uwide)u1 + (((uwide)u1 << 64) | (uwide)u0);
+    uint64_t q1 = (uint64_t)(p >> 64) + 1;
+    const uint64_t q0 = (uint64_t)p;
+    uint64_t r = u0 - q1 * q.d;
+    if (r > q0) {
+        q1 -= 1;
+        r += q.d;
+    }
+    if (r >= q.d) {
+        q1 += 1;
+        r -= q.d;
+    }
+    *rem = r;
+    return q1;
+}
+
+// `⌊n/k⌋` for a 128-bit `n`.
+__device__ __forceinline__ uwide divide_by(uwide n, const Divisor &q) {
+    const uint64_t nh = (uint64_t)(n >> 64), nl = (uint64_t)n;
+    uint64_t n2 = 0, n1 = nh, n0 = nl;
+    if (q.s != 0) {
+        n2 = nh >> (64 - q.s);
+        n1 = (nh << q.s) | (nl >> (64 - q.s));
+        n0 = nl << q.s;
+    }
+    uint64_t r;
+    const uint64_t qh = divide_word(n2, n1, q, &r);
+    const uint64_t ql = divide_word(r, n0, q, &r);
+    return ((uwide)qh << 64) | (uwide)ql;
+}
+
+// `div_nearest(x, k)` by a read divisor.
+__device__ __forceinline__ wide div_nearest_by(wide x, const Divisor &q) {
+    const uwide n = (uwide)(x >= 0 ? x : -x) + (uwide)(q.k / 2);
+    const wide quotient = (wide)divide_by(n, q);
+    return x >= 0 ? quotient : -quotient;
+}
+
+// The ring sum's atomic step on `Z/2^128` (the host's wrapping `i128` sum): the low word added
+// atomically, and the high word with the low word's carry, so any order of additions leaves the same
+// 128 bits.
+__device__ __forceinline__ void add_wide(wide *at, wide v) {
+    unsigned long long *word = (unsigned long long *)at;
+    const unsigned long long lo = (unsigned long long)(uint64_t)v;
+    const unsigned long long hi = (unsigned long long)(uint64_t)((uwide)v >> 64);
+    const unsigned long long old = atomicAdd(word, lo);
+    atomicAdd(word + 1, hi + (old + lo < old ? 1ull : 0ull));
+}
+
 __device__ __forceinline__ int64_t fit64(wide v, uint32_t *st) {
     if (v > (wide)INT64_MAX || v < (wide)INT64_MIN) {
         atomicOr(st, REFUSED_WORD64);
@@ -328,6 +400,7 @@ extern "C" __global__ void field_frame(FieldWords w) {
 // its lanes over the region's sites, in three passes: the scores and their peak (each score held in
 // its weight's slot), the weights `release(2^(z − peak), 22)` and their mass, then the current's
 // numerators `Σ_j e_ij ṽ_j`, divided once by the mass and returned to the receiver's frame.
+#define MODE_CHUNK 8
 extern "C" __global__ void field_contact(FieldWords w) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
@@ -354,35 +427,60 @@ extern "C" __global__ void field_contact(FieldWords w) {
             peak = z > peak ? z : peak;
         }
         peak = warp_max_signed(peak);
-        uint64_t mass = 0;
-        for (uint32_t j = lane; j < sites; j += 32) {
-            const int64_t z = (int64_t)e[j];
-            const uint64_t ej = (uint64_t)rel((wide)below_one((wide)z - (wide)peak, w.roots, w.digits), WEIGHT_BITS_FROM);
-            e[j] = ej;
-            mass += ej;
-        }
-        mass = warp_sum_u64(mass);
-        if (lane == 0) {
-            w.mass[(uint64_t)h * w.T + g] = mass;
-        }
+        // [agent-inferred, November 1] The weights, their mass and the current's numerators for the
+        // first `MODE_CHUNK` modes in one pass (the numerators need the mass only at their division),
+        // further modes a chunk at a time from the held weights. (The first realization read every
+        // weight back once for each mode.)
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * w.span;
-        for (uint32_t li = 0; li < w.n; li++) {
-            wide sr = 0, si = 0;
-            for (uint32_t j = lane; j < sites; j += 32) {
-                const wide ej = (wide)e[j];
-                sr += ej * (wide)values[(uint64_t)j * w.span + li];
-                si += ej * (wide)values[(uint64_t)j * w.span + w.n + li];
+        uint64_t mass = 0;
+        for (uint32_t l0 = 0; l0 == 0 || l0 < w.n; l0 += MODE_CHUNK) {
+            wide sr[MODE_CHUNK], si[MODE_CHUNK];
+#pragma unroll
+            for (uint32_t k = 0; k < MODE_CHUNK; k++) {
+                sr[k] = 0;
+                si[k] = 0;
             }
-            sr = warp_sum(sr);
-            si = warp_sum(si);
-            if (lane == 0) {
-                const wide yr = fit64(div_nearest(sr, (wide)mass), w.status);
-                const wide yi = fit64(div_nearest(si, (wide)mass), w.status);
-                wide ur, ui;
-                frame_of(w, i, h, li, &ur, &ui);
-                const uint32_t m = h * w.n + li;
-                w.y[g * w.M2 + m] = fit64(rel(ur * yr + ui * yi, MOVE_BITS), w.status);
-                w.y[g * w.M2 + w.M + m] = fit64(rel(ur * yi - ui * yr, MOVE_BITS), w.status);
+            for (uint32_t j = lane; j < sites; j += 32) {
+                uint64_t ej;
+                if (l0 == 0) {
+                    const int64_t z = (int64_t)e[j];
+                    ej = (uint64_t)rel((wide)below_one((wide)z - (wide)peak, w.roots, w.digits), WEIGHT_BITS_FROM);
+                    e[j] = ej;
+                    mass += ej;
+                } else {
+                    ej = e[j];
+                }
+                const int64_t *vj = values + (uint64_t)j * w.span;
+#pragma unroll
+                for (uint32_t k = 0; k < MODE_CHUNK; k++) {
+                    if (l0 + k < w.n) {
+                        sr[k] += (wide)ej * (wide)vj[l0 + k];
+                        si[k] += (wide)ej * (wide)vj[w.n + l0 + k];
+                    }
+                }
+            }
+            if (l0 == 0) {
+                mass = warp_sum_u64(mass);
+                if (lane == 0) {
+                    w.mass[(uint64_t)h * w.T + g] = mass;
+                }
+            }
+#pragma unroll
+            for (uint32_t k = 0; k < MODE_CHUNK; k++) {
+                if (l0 + k < w.n) {
+                    const wide nr = warp_sum(sr[k]);
+                    const wide ni = warp_sum(si[k]);
+                    if (lane == 0) {
+                        const uint32_t li = l0 + k;
+                        const wide yr = fit64(div_nearest(nr, (wide)mass), w.status);
+                        const wide yi = fit64(div_nearest(ni, (wide)mass), w.status);
+                        wide ur, ui;
+                        frame_of(w, i, h, li, &ur, &ui);
+                        const uint32_t m = h * w.n + li;
+                        w.y[g * w.M2 + m] = fit64(rel(ur * yr + ui * yi, MOVE_BITS), w.status);
+                        w.y[g * w.M2 + w.M + m] = fit64(rel(ur * yi - ui * yr, MOVE_BITS), w.status);
+                    }
+                }
             }
         }
     }
@@ -539,9 +637,17 @@ extern "C" __global__ void field_current_back(FieldWords w, const int64_t *dy, i
 // mean `μ_i = div_nearest(Σ_j e_ij δp_ij, mass_i)`, `δs_ij = release(release(ln2 div_nearest(e_ij
 // (δp_ij − μ_i), mass_i), 30), β)` held for the keys' return, and the probe's return
 // `δq̃_i = release(Σ_j δs_ij k̃_j, 32)` written to its framed chart slot.
+//
+// [agent-inferred, November 1] Two passes over the row's keys: the first holds `δp_ij` and sums the
+// mean; the second turns each into `δs_ij` (the mass read once as a divisor, `divide_by`) and adds
+// it into the probe's return for the span's first `ROW_CHUNK` entries at once, the rest read back
+// from `δs` a chunk at a time. (The first realization divided a pair by a 128-bit software division
+// and read `δs` once for every entry of the span.)
+#define ROW_CHUNK 8
 extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, wide *ds, int64_t *dq) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += warps) {
         const uint32_t r = w.site_region[g];
         const uint32_t i = w.site_pos[g];
@@ -551,7 +657,8 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const in
         wide *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *dyi = dyh + ((uint64_t)h * w.T + g) * w.span;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * w.span;
-        const wide mass = w.mass[(uint64_t)h * w.T + g];
+        const int64_t *keys = w.kf + ((uint64_t)h * w.T + first) * w.span;
+        const uint64_t mass = w.mass[(uint64_t)h * w.T + g];
         wide weighted = 0;
         for (uint32_t j = lane; j < sites; j += 32) {
             const int64_t *vj = values + (uint64_t)j * w.span;
@@ -562,57 +669,120 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const in
             dsr[j] = dp;
             weighted += (wide)e[j] * dp;
         }
-        const wide mean = div_nearest(warp_sum(weighted), mass);
-        for (uint32_t j = lane; j < sites; j += 32) {
-            const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
-            const wide dz = rel(ln2 * div_nearest((wide)e[j] * (dsr[j] - mean), mass), MOVE_BITS);
-            dsr[j] = rel(dz, w.beta);
-        }
-        __syncwarp();
-        const int64_t *keys = w.kf + ((uint64_t)h * w.T + first) * w.span;
-        for (uint32_t c = 0; c < w.span; c++) {
-            wide s = 0;
-            for (uint32_t j = lane; j < sites; j += 32) {
-                s += dsr[j] * (wide)keys[(uint64_t)j * w.span + c];
+        const wide mean = div_nearest(warp_sum(weighted), (wide)mass);
+        const Divisor by = divisor_of(mass);
+        for (uint32_t c0 = 0; c0 == 0 || c0 < w.span; c0 += ROW_CHUNK) {
+            wide sum[ROW_CHUNK];
+#pragma unroll
+            for (uint32_t k = 0; k < ROW_CHUNK; k++) {
+                sum[k] = 0;
             }
-            s = warp_sum(s);
-            if (lane == 0) {
-                const uint32_t m = h * w.n + c % w.n;
-                dq[g * w.M2 + (c < w.n ? m : w.M + m)] = fit64(rel(s, CONTACT_BACK), w.status);
+            for (uint32_t j = lane; j < sites; j += 32) {
+                wide dz;
+                if (c0 == 0) {
+                    dz = rel(rel(ln2 * div_nearest_by((wide)e[j] * (dsr[j] - mean), by), MOVE_BITS), w.beta);
+                    dsr[j] = dz;
+                } else {
+                    dz = dsr[j];
+                }
+                const int64_t *kj = keys + (uint64_t)j * w.span + c0;
+#pragma unroll
+                for (uint32_t k = 0; k < ROW_CHUNK; k++) {
+                    if (c0 + k < w.span) {
+                        sum[k] += dz * (wide)kj[k];
+                    }
+                }
+            }
+#pragma unroll
+            for (uint32_t k = 0; k < ROW_CHUNK; k++) {
+                if (c0 + k < w.span) {
+                    const wide s = warp_sum(sum[k]);
+                    if (lane == 0) {
+                        const uint32_t c = c0 + k;
+                        const uint32_t m = h * w.n + c % w.n;
+                        dq[g * w.M2 + (c < w.n ? m : w.M + m)] = fit64(rel(s, CONTACT_BACK), w.status);
+                    }
+                }
             }
         }
     }
 }
 
-// The keys' and values' return over one head's columns, one warp a source site `j`, its lanes over the
-// receivers: `δk̃_j = release(Σ_i δs_ij q̃_i, 32)`, `δṽ_j = release(Σ_i e_ij w_i, 70)`.
+// The keys' and values' return over one head's columns: `δk̃_j = release(Σ_i δs_ij q̃_i, 32)`,
+// `δṽ_j = release(Σ_i e_ij w_i, 70)`.
+//
+// [agent-inferred, November 1] A block takes 32 consecutive source sites `j`, one a lane, and its
+// warps split the receivers `i` between them; a lane reads `e_ij` and `δs_ij` along the row `i`, so a
+// warp's reads are one run of the store (the first realization read a column with its lanes over
+// `i`, 32 rows apart, once for every entry of the span). The warps' partial sums meet in shared
+// memory, a chunk of the span at a time. Integer sums: the host's bits in any order.
+#define COLUMN_CHUNK 4
+#define COLUMN_SLICES 8
 extern "C" __global__ void field_contact_columns(FieldWords w, uint32_t h, const int64_t *wr, const wide *ds, int64_t *dk, int64_t *dv) {
+    __shared__ wide part[COLUMN_SLICES][2 * COLUMN_CHUNK][32];
     const uint32_t lane = threadIdx.x & 31;
-    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
-    for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += warps) {
-        const uint32_t r = w.site_region[g];
-        const uint32_t j = w.site_pos[g];
-        const uint64_t first = w.region_off[r];
-        const uint32_t sites = w.region_off[r + 1] - first;
-        const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r];
-        const wide *dsr = ds + w.region_eoff[r];
+    const uint32_t slice = threadIdx.x >> 5;
+    const uint32_t slices = blockDim.x >> 5;
+    for (uint64_t base = (uint64_t)blockIdx.x * 32; base < w.T; base += (uint64_t)gridDim.x * 32) {
+        const uint64_t g = base + lane;
+        uint32_t sites = 0, j = 0;
+        uint64_t first = 0, eoff = 0;
+        if (g < w.T) {
+            const uint32_t r = w.site_region[g];
+            j = w.site_pos[g];
+            first = w.region_off[r];
+            sites = w.region_off[r + 1] - (uint32_t)first;
+            eoff = w.region_eoff[r];
+        }
+        const uint64_t *e = w.e + (uint64_t)h * w.E + eoff + j;
+        const wide *dsr = ds + eoff + j;
         const int64_t *probes = w.qf + ((uint64_t)h * w.T + first) * w.span;
         const int64_t *wh = wr + ((uint64_t)h * w.T + first) * w.span;
-        for (uint32_t c = 0; c < w.span; c++) {
-            wide sk = 0, sv = 0;
-            for (uint32_t i = lane; i < sites; i += 32) {
-                const uint64_t at = (uint64_t)i * sites + j;
-                sk += dsr[at] * (wide)probes[(uint64_t)i * w.span + c];
-                sv += (wide)e[at] * (wide)wh[(uint64_t)i * w.span + c];
+        for (uint32_t c0 = 0; c0 < w.span; c0 += COLUMN_CHUNK) {
+            wide sk[COLUMN_CHUNK], sv[COLUMN_CHUNK];
+#pragma unroll
+            for (uint32_t k = 0; k < COLUMN_CHUNK; k++) {
+                sk[k] = 0;
+                sv[k] = 0;
             }
-            sk = warp_sum(sk);
-            sv = warp_sum(sv);
-            if (lane == 0) {
-                const uint32_t m = h * w.n + c % w.n;
-                const uint64_t slot = g * w.M2 + (c < w.n ? m : w.M + m);
-                dk[slot] = fit64(rel(sk, CONTACT_BACK), w.status);
-                dv[slot] = fit64(rel(sv, CARRIED_BITS), w.status);
+            for (uint32_t i = slice; i < sites; i += slices) {
+                const uint64_t at = (uint64_t)i * sites;
+                const wide d = dsr[at];
+                const wide ew = (wide)e[at];
+                const int64_t *pi = probes + (uint64_t)i * w.span + c0;
+                const int64_t *wi = wh + (uint64_t)i * w.span + c0;
+#pragma unroll
+                for (uint32_t k = 0; k < COLUMN_CHUNK; k++) {
+                    if (c0 + k < w.span) {
+                        sk[k] += d * (wide)pi[k];
+                        sv[k] += ew * (wide)wi[k];
+                    }
+                }
             }
+#pragma unroll
+            for (uint32_t k = 0; k < COLUMN_CHUNK; k++) {
+                part[slice][k][lane] = sk[k];
+                part[slice][COLUMN_CHUNK + k][lane] = sv[k];
+            }
+            __syncthreads();
+            if (slice == 0 && g < w.T) {
+#pragma unroll
+                for (uint32_t k = 0; k < COLUMN_CHUNK; k++) {
+                    if (c0 + k < w.span) {
+                        uwide tk = 0, tv = 0;
+                        for (uint32_t p = 0; p < slices; p++) {
+                            tk += (uwide)part[p][k][lane];
+                            tv += (uwide)part[p][COLUMN_CHUNK + k][lane];
+                        }
+                        const uint32_t c = c0 + k;
+                        const uint32_t m = h * w.n + c % w.n;
+                        const uint64_t slot = g * w.M2 + (c < w.n ? m : w.M + m);
+                        dk[slot] = fit64(rel((wide)tk, CONTACT_BACK), w.status);
+                        dv[slot] = fit64(rel((wide)tv, CARRIED_BITS), w.status);
+                    }
+                }
+            }
+            __syncthreads();
         }
     }
 }
@@ -631,22 +801,34 @@ extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
     }
 }
 
-// A family's covector `g[o][i] += Σ_t y_t[o] x_t[i]` over the batch's sites (`outer_sum`), one thread
-// an entry; with no `x`, the bias `g[o] += Σ_t y_t[o]`. An integer sum: the host's bits in any order.
+// A family's covector `g[o][i] += Σ_t y_t[o] x_t[i]` over the batch's sites (`outer_sum`); with no
+// `x`, the bias `g[o] += Σ_t y_t[o]`. An integer sum: the host's bits in any order.
+//
+// [agent-inferred, November 1] One thread an entry and a tile of `OUTER_TILE` sites, its partial
+// added to the entry by the ring's atomic step (`add_wide`). (The first realization gave one thread
+// an entry and every site of the batch, so a bias of 32 entries was summed by 32 threads over
+// thousands of sites each.)
+#define OUTER_TILE 64
 template <typename X>
 __device__ void outer(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved) {
     const uint64_t entries = (uint64_t)rows * (x ? cols : 1);
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t o = x ? c / cols : c, i = x ? c % cols : 0;
+    const uint64_t tiles = ((uint64_t)w.T + OUTER_TILE - 1) / OUTER_TILE;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, tile = c / entries;
+        const uint64_t o = x ? entry / cols : entry, i = x ? entry % cols : 0;
+        const uint64_t from = tile * OUTER_TILE;
+        const uint64_t to = from + OUTER_TILE < w.T ? from + OUTER_TILE : w.T;
         wide sum = 0;
-        for (uint64_t t = 0; t < w.T; t++) {
+        for (uint64_t t = from; t < to; t++) {
             if (only_unresolved && !w.unresolved[t]) {
                 continue;
             }
             const wide yv = y[t * y_stride + o];
             sum += x ? yv * (wide)x[t * x_stride + i] : yv;
         }
-        g[at + c] += sum;
+        if (sum != 0) {
+            add_wide(g + at + entry, sum);
+        }
     }
 }
 
@@ -723,16 +905,22 @@ extern "C" __global__ void field_outer_bound_x64(FieldWords w, uint32_t rows, ui
     outer_bound<int64_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved);
 }
 
-// The encoding's covector: each row's `Σ_t dx_t` over the sites that opened on it (`rows_sites`, a
-// partition of the batch's sites by row, offsets `rows_off`).
-extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *dx, const uint32_t *rows_off, const uint32_t *rows_sites) {
-    const uint64_t entries = (uint64_t)(w.A + 1) * w.D;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t row = c / w.D, i = c % w.D;
+// The encoding's covector: each row's `Σ_t dx_t` over the sites that opened on it, the sites sorted by
+// row (`rows_sites`) and cut into segments of at most `OUTER_TILE` sites of one row (`segments`, each
+// its row, first and end in `rows_sites`), one thread a segment and a column, its partial added by
+// the ring's atomic step. (The first realization gave the unresolved row's column one thread over
+// every unresolved site.)
+extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *dx, const uint32_t *rows_sites, const uint32_t *segments, uint32_t count) {
+    const uint64_t cells = (uint64_t)count * w.D;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t segment = c / w.D, i = c % w.D;
+        const uint32_t row = segments[3 * segment];
         wide sum = 0;
-        for (uint32_t k = rows_off[row]; k < rows_off[row + 1]; k++) {
+        for (uint32_t k = segments[3 * segment + 1]; k < segments[3 * segment + 2]; k++) {
             sum += dx[(uint64_t)rows_sites[k] * w.D + i];
         }
-        g[w.enc + c] += sum;
+        if (sum != 0) {
+            add_wide(g + w.enc + (uint64_t)row * w.D + i, sum);
+        }
     }
 }

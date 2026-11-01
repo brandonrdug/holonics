@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{by_news, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, HostField, Region};
+use holonics::hnn::tower::field::{by_news, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, HostField, Region, ReleaseSweep};
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -701,10 +701,12 @@ fn row(file: &mut std::fs::File, text: &str) -> Result<()> {
     Ok(())
 }
 
-/// `release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS OUT`:
-/// for each of the first `COUNT` held problems the field releases the answer from the question
-/// alone (the codec's answer sites, refined over `SWEEPS` sweeps) and, at each of its
-/// calculations, the continuation past the answer written through that calculation's `=`. It writes
+/// `release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS
+/// OUT`: for each of the first `COUNT` held problems the field releases the answer from the question
+/// alone (the codec's answer sites, refined over at most `SWEEPS` sweeps) and, at each of its
+/// calculations, the continuation past the answer written through that calculation's `=`. The free
+/// releases are refined first and the marks after them, each sweep only while the command is inside
+/// `STOP_MS` ([`within`]): a set stopped there is returned as released and counted open. It writes
 /// `OUT/FREE.tsv` and `OUT/MARKS.tsv` as `card_written.py convert` writes them for
 /// `written_rules.py` (a calculation's release is cut after its first `>>`), and `OUT/COUPLING.tsv`,
 /// each free release's coupling read against the held answer at the class face. The free releases
@@ -715,8 +717,8 @@ fn row(file: &mut std::fs::File, text: &str) -> Result<()> {
 /// calculation inside its units (the October 27 review's located cause), so its marks are withheld
 /// and counted.
 pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 12 {
-        return Err("release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS OUT".into());
+    if args.len() != 13 {
+        return Err("release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -724,14 +726,15 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
     let bytes = units.merges().is_empty();
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps) = (count(&args[9])?, positive(&args[10])?);
-    let out = Path::new(&args[11]);
+    let (limit, sweeps, stop_ms) = (count(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
+    let out = Path::new(&args[12]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
     let held = &held[..limit.min(held.len())];
     // The free releases: each question alone, the codec's answer sites open.
     let free_requests: Vec<std::result::Result<(Vec<usize>, usize), String>> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect();
-    let free = release_requests(field, &free_requests, sweeps, codec.void(), realization)?;
+    let mut free_last = ReleaseSweep::default();
+    let free = release_requests(field, &free_requests, sweeps, codec.void(), realization, &mut within("free", started, stop_ms, &mut free_last))?;
     let mut free_file = rows_file(&out.join("FREE.tsv"), "")?;
     let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\treleased\theld\tlambda\tfriction\tplateaus\tlongest\tlag\n")?;
     let (mut sum_h, mut sum_t, mut sum_lambda, mut sum_friction, mut refused, mut withheld) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
@@ -772,7 +775,8 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
             mark_requests.push(opening(&codec, field, question, &answer[..at]));
         }
     }
-    let marks = release_requests(field, &mark_requests, sweeps, codec.void(), realization)?;
+    let mut marks_last = ReleaseSweep::default();
+    let marks = release_requests(field, &mark_requests, sweeps, codec.void(), realization, &mut within("marks", started, stop_ms, &mut marks_last))?;
     let mut marks_file = rows_file(&out.join("MARKS.tsv"), "")?;
     for (&(i, j, expression), released) in marks_at.iter().zip(&marks) {
         let mut r = match released {
@@ -789,12 +793,31 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         row(&mut marks_file, &format!("{i}\t{j}\t{}\t{}\n", escaped(expression), escaped(&r)))?;
     }
     println!(
-        "FIELD_RELEASE free={} marks={} withheld={withheld} refused={refused} sweeps={sweeps} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
+        "FIELD_RELEASE free={} marks={} withheld={withheld} refused={refused} sweeps={sweeps} stop_ms={stop_ms} free_sweeps={} free_open={} free_stopped={} marks_sweeps={} marks_open={} marks_stopped={} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
         held.len(),
         marks_at.len(),
+        free_last.done,
+        free_last.live,
+        free_last.live > 0 && free_last.done < sweeps,
+        marks_last.done,
+        marks_last.live,
+        marks_last.live > 0 && marks_last.done < sweeps,
         started.elapsed().as_millis()
     );
     Ok(())
+}
+
+/// [agent-inferred, November 1] **A release's exterior**: one line a sweep, the sweep run while the
+/// command is inside `stop_ms` (fixed before launch from the run's projection, never raised), and the
+/// last report kept in `last`. A set that ends with problems open after fewer sweeps than its bound
+/// was stopped here (the release ends no other way with problems open).
+fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
+    move |sweep| {
+        let ms = started.elapsed().as_millis();
+        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} resolved={} by_news={} ms={ms}", sweep.done, sweep.live, sweep.resolved, sweep.by_news);
+        *last = *sweep;
+        ms < stop_ms
+    }
 }
 
 /// A release's opening: the question's classes and its written prefix, and the answer sites left
@@ -814,16 +837,16 @@ fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) ->
 /// The releases of every admitted opening read together; a refused opening keeps its refusal. A
 /// refused batch is released again one problem at a time (each release is its own region's, so
 /// each is the batch's own), and a problem's refusal is that problem's alone.
-fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<std::result::Result<Vec<usize>, String>>> {
+fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<std::result::Result<Vec<usize>, String>>> {
     let admitted: Vec<(&[usize], usize)> = requests.iter().filter_map(|r| r.as_ref().ok().map(|(q, open)| (q.as_slice(), *open))).collect();
     let released: Vec<std::result::Result<Vec<usize>, String>> = if admitted.is_empty() {
         Vec::new()
     } else {
-        match field.release_realized(&admitted, sweeps, void, realization) {
+        match field.release_realized(&admitted, sweeps, void, realization, &mut *sweep) {
             Ok(all) => all.into_iter().map(Ok).collect(),
             Err(why) => {
                 println!("FIELD_RELEASE_BATCH_REFUSED problems={} why={why}", admitted.len());
-                admitted.iter().map(|&one| field.release_realized(&[one], sweeps, void, realization).map(|mut r| r.remove(0)).map_err(|e| e.to_string())).collect()
+                admitted.iter().map(|&one| field.release_realized(&[one], sweeps, void, realization, &mut *sweep).map(|mut r| r.remove(0)).map_err(|e| e.to_string())).collect()
             }
         }
     };
@@ -834,21 +857,24 @@ fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, 
     }).collect())
 }
 
-/// `release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS`:
-/// each of the first `COUNT` held questions and the answer the field releases for it, whole (a
-/// private read: never committed; the held answer is not printed beside it).
+/// `release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS
+/// STOP_MS`: each of the first `COUNT` held questions and the answer the field releases for it,
+/// whole, its sweeps inside `STOP_MS` (a private read: never committed; the held answer is not
+/// printed beside it).
 pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 11 {
-        return Err("release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS".into());
+    if args.len() != 12 {
+        return Err("release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS".into());
     }
+    let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps) = (count(&args[9])?, positive(&args[10])?);
+    let (limit, sweeps, stop_ms) = (count(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
     let held = &held[..limit.min(held.len())];
     let requests: Vec<_> = held.iter().map(|(question, _)| opening(&codec, &learner.field, question, b"")).collect();
-    let released = release_requests(&learner.field, &requests, sweeps, codec.void(), realization)?;
+    let mut last = ReleaseSweep::default();
+    let released = release_requests(&learner.field, &requests, sweeps, codec.void(), realization, &mut within("text", started, stop_ms, &mut last))?;
     for (i, ((question, _), released)) in held.iter().zip(released).enumerate() {
         let answer = match released {
             Ok(classes) => String::from_utf8_lossy(&codec.decode(&classes)).into_owned(),
@@ -856,6 +882,7 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
         };
         println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i}\n{answer}\n", String::from_utf8_lossy(question));
     }
+    println!("FIELD_RELEASE_TEXT problems={} sweeps={} open={} stopped={} ms={}", held.len(), last.done, last.live, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
     Ok(())
 }
 
@@ -959,9 +986,10 @@ mod tests {
         assert!(dir.join("B/STATE.1").exists());
         let state_sha = sha256(&rested).unwrap();
         let codec_sha = sha256(&codec).unwrap();
-        let args: Vec<String> = ["release-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", &at("R")].iter().map(|s| s.to_string()).collect();
+        let args: Vec<String> = ["release-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", "600000", &at("R")].iter().map(|s| s.to_string()).collect();
         release(&args, &mut host()).expect("release");
-        let read = |name: &str| String::from_utf8(std::fs::read(dir.join("R").join(name)).expect("read")).unwrap();
+        let read_in = |run: &str, name: &str| String::from_utf8(std::fs::read(dir.join(run).join(name)).expect("read")).unwrap();
+        let read = |name: &str| read_in("R", name);
         assert_eq!(read("FREE.tsv").lines().count(), 2);
         assert_eq!(read("MARKS.tsv").lines().count(), 2, "one calculation a held problem");
         let coupling = read("COUPLING.tsv");
@@ -971,7 +999,13 @@ mod tests {
             assert_eq!(cells[1] + cells[2], 2 * cells[3] + cells[4], "F* = |H| + |T| - 2 lambda");
         }
         assert!(release(&args, &mut host()).is_err(), "a release's directory is never written over");
-        let text: Vec<String> = ["release-field-text", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "1", "2"].iter().map(|s| s.to_string()).collect();
+        // A release stopped at its deadline still writes a row a problem.
+        let mut stopped = args.clone();
+        stopped[11] = "1".to_string();
+        stopped[12] = at("Q");
+        release(&stopped, &mut host()).expect("stopped release");
+        assert_eq!(read_in("Q", "FREE.tsv").lines().count(), 2);
+        let text: Vec<String> = ["release-field-text", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "1", "2", "600000"].iter().map(|s| s.to_string()).collect();
         release_text(&text, &mut host()).expect("release text");
         let _ = std::fs::remove_dir_all(&dir);
     }

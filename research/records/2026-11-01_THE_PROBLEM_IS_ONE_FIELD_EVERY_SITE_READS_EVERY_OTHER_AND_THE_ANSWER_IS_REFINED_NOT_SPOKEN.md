@@ -515,3 +515,66 @@ declared clock), where a pair's arithmetic is a few hundred integer operations; 
 the weights down a column, `sites` words apart. The profile of where the card's time goes is the
 next loop's subject, before the next reading.
 
+
+## 14. Before the fourth reading: the card's passes, its memory and the release's end
+
+[agent-inferred, November 1] The review of §13's three owed items, made before any further run.
+
+**The card's passes** (`kernels/field.cu`; each restructure is stated where it lives). Every
+change keeps the host's bits: the sums are integer sums on `Z/2^128`, so any order and any
+partition of them give the same 128 bits, and the one division changed in form is the exact
+integer quotient.
+- The contact's forward computes each weight, its mass and the numerators of eight modes in one
+  pass over the row (the first realization read every weight back once for each mode).
+- The contact's return of a row divides its pairs by the row's mass as an invariant divisor
+  (Möller and Granlund 2011, Algorithm 4: the normalized divisor and its reciprocal read once a
+  row, two word steps a quotient), where each pair ran a 128-bit software division; it sums eight
+  entries of the span in one pass. The quotient routine agrees with the plain `⌊n/k⌋` rounded to
+  the nearest on 300,000 drawn and the edge operands (a host check of the same steps).
+- The keys' and values' return reads the weights along rows: a block takes 32 consecutive source
+  sites, a lane each, and its eight warps split the receivers, so a warp's reads are one run of
+  the store; the warps' partial sums meet in shared memory. The first realization read a column,
+  its lanes 32 rows apart, once for every entry of the span.
+- A covector entry is summed by one thread a tile of 64 sites, its partial added by the ring's
+  atomic step (two 64-bit atomics with the low word's carry); the encoding's rows are cut into
+  segments of 64 sites the same way. The first realization gave a bias of 32 entries to 32
+  threads over every site of the batch, and the unresolved row's column to one thread.
+- Compiled for `sm_89` (NVRTC, then `ptxas -v`), no pass spills: 122, 96, 72, 40 and 32
+  registers; the columns' pass holds 32 KiB of shared memory. Parity and time on the card are
+  owed before the reading.
+
+**The memory** (the card session's commit `802baa8b5`, receipts `card-memory/`). The batch budget
+counted a region's weights and contact returns (its pairs) and left every carrier sized by the
+batch's sites to a 1 GiB margin; a batch of short regions holds tens of thousands of sites at
+about 35 KB a site with two kept ticks, and the board reached 13,372 MiB against the 12 GiB the
+runs keep to. `region_octets` counts everything a region allocates and `batches` plans whole
+regions within the budget: reading 3's release from its own state then peaked at 11,256 MiB, its
+releases byte-identical, and both parities stayed equal.
+
+**The profile** (commit `857495f53`, receipts `card-profile/`; Nsight is not installed on the
+card's host, so every launch, copy and allocation was timed alone with the stream drained). On a
+training section at A, the kernels are 75% of the wall and the contact family 72% of the
+kernels' time: the forward 3.7 ms a launch, the keys' and values' return 5.1 ms (its column
+reads), the rows' return 1.4 ms, the covector sums 14 ms over 30 launches. On a release, the
+forward contact is 86% of the kernels' time, and the host a third of the wall (about 7 ms a read:
+the regions rebuilt and the material, rings and roots uploaded again each read). These are the
+first realization's passes; the rewrite above is aimed at exactly them, and its time is owed.
+
+**The release's end.** Under §13's release a sweep releases at least one site of every open
+problem and more where the field resolves them, so a release given `S = 16` sweeps could stop
+sixteen sites into an answer whose first calculation sits a median 59 bytes in: the reading's
+claim was out of its reach by construction. The release's sweeps are now bounded by the codec's
+open answer sites, where every release ends, and its time by its exterior: `ReleaseSweep` is
+asked before every sweep and the commands answer from their deadline (`STOP_MS`), fixed before
+launch from time-field's projection of one sweep of each set (`free_sweep_ms`, `marks_sweep_ms`).
+The free releases run first; a set stopped at the deadline is returned as released and counted
+open. Each sweep's line reports the sites released by resolution and by news, which reads whether
+the field resolves many sites a sweep once a few stand (a site's three neighbours on each side
+coded the withheld answers at 3.53 bits in the third reading) or only the one the news releases.
+
+The fourth reading's bounds (`reading-4/reading4.sh`): the lap bounds as the third reading's,
+from time-field's projections; `TEXT_S = 60`; the release keeps at least 1.3 times 128 free sweeps
+(`free_sweep_ms` of the widest state the run can reach), the sweeps that release 128 sites of
+every answer, past the first calculation's 90th percentile of 110 bytes, if only the news releases
+them; two laps only where that release fits beside them, and every second left to 870 s goes to
+the release.

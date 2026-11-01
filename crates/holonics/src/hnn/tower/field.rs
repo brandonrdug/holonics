@@ -47,12 +47,14 @@
 //! held and read on the next section's regions, which it was not fit on, and halved again or
 //! refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
 //!
-//! **Release.** The answer's sites open unresolved and the field is refined over `S` sweeps: each
-//! sweep reads every unresolved site's face twice, with the question and with the question's sites
-//! unresolved, and releases the `⌈r/(S − s)⌉` sites whose top class carries the most news (the
-//! question's share of its certainty, [`by_news`]) at width zero, and holds the rest. A site
-//! released as the void class ends the answer, and the sites past it leave the region. The
-//! released sites are present terrain for the next sweep. A class is never spoken in order.
+//! **Release.** The answer's sites open unresolved and the field is refined over at most `S`
+//! sweeps: each sweep reads every unresolved site's face and releases every site the field
+//! resolves (its top class outweighs every other together); where it resolves none, the face is
+//! read again with the question's sites unresolved and the one site whose top class carries the
+//! most news ([`by_news`]) is released. A site released as the void class ends the answer, and the
+//! sites past it leave the region. The released sites are present terrain for the next sweep. A
+//! class is never spoken in order. Every sweep releases a site of every open problem, so `S` at the
+//! answer's open sites lets every release end; the exterior bounds its time ([`ReleaseSweep`]).
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
 //! material on `2^(−24)`; frames on `2^(−30)`; Gibbs weights on `2^(−40)` relative to their row's
@@ -917,8 +919,9 @@ impl Field {
     /// is read in one call (a region's faces do not depend on the regions read beside it, so the
     /// releases are each problem's own). `problems` are each question's classes and its answer's
     /// open sites.
-    pub fn release_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<usize>>> {
-        self.release_with(problems, sweeps, void, &mut |regions| realization.read_faces(self, regions))
+    /// `sweep` is asked before every sweep whether it runs ([`ReleaseSweep`]).
+    pub fn release_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<Vec<usize>>> {
+        self.release_with(problems, sweeps, void, &mut |regions| realization.read_faces(self, regions), sweep)
     }
 
     /// **The release by refinement** ([definition; agent-inferred, November 1]): the region of the
@@ -941,10 +944,10 @@ impl Field {
     /// released it is their context. Released only where the field resolves it, a site waits for
     /// the sites that inform it.
     pub fn release(&self, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Result<Vec<usize>> {
-        Ok(self.release_with(&[(question, answer)], sweeps, void, &mut |regions| self.read_faces(regions))?.remove(0))
+        Ok(self.release_with(&[(question, answer)], sweeps, void, &mut |regions| self.read_faces(regions), &mut |_| true)?.remove(0))
     }
 
-    fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>) -> Result<Vec<Vec<usize>>> {
+    fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, answer)| answer == 0) {
             return refuse("a release needs a sweep, an answer site and a void class in the alphabet");
         }
@@ -958,21 +961,28 @@ impl Field {
                 (classes, unresolved, start)
             })
             .collect();
-        for _ in 0..sweeps {
-            let live: Vec<usize> = (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u)).collect();
-            if live.is_empty() {
+        let open = |states: &[(Vec<usize>, Vec<bool>, usize)]| -> Vec<usize> { (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u)).collect() };
+        let mut progress = ReleaseSweep::default();
+        for done in 0..sweeps {
+            let live = open(&states);
+            progress.done = done;
+            progress.live = live.len();
+            if live.is_empty() || !sweep(&progress) {
                 break;
             }
+            progress.done = done + 1;
             let faces = {
                 let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
                 read(&views)?
             };
             // The sites the field resolves: the top class outweighs every other together.
             let mut released: Vec<Vec<(usize, usize)>> = faces.iter().map(|faces| faces.iter().enumerate().filter_map(|(t, face)| face.as_ref().and_then(|f| resolved(f).map(|c| (t, c)))).collect()).collect();
+            progress.resolved += released.iter().map(Vec::len).sum::<usize>();
             // Where it resolves none, the prior read: the question's sites unresolved, so a face
             // reads only the place the question spans and the answer released so far; the site
             // the question tells most about is released.
             let unsure: Vec<usize> = (0..live.len()).filter(|&j| released[j].is_empty()).collect();
+            progress.by_news += unsure.len();
             if !unsure.is_empty() {
                 let priors: Vec<Vec<bool>> = unsure.iter().map(|&j| states[live[j]].1.iter().enumerate().map(|(t, &u)| u || t < states[live[j]].2).collect()).collect();
                 let prior_views: Vec<Region> = unsure.iter().zip(&priors).map(|(&j, p)| Region { classes: &states[live[j]].0, unresolved: p }).collect();
@@ -997,6 +1007,9 @@ impl Field {
                 }
             }
         }
+        // The closing report: the sweeps run and the problems left open.
+        progress.live = open(&states).len();
+        sweep(&progress);
         // The answer as released: up to its first site still unresolved.
         Ok(states
             .into_iter()
@@ -1022,6 +1035,20 @@ impl Field {
         }
         Ok(Self::with_theta(d, theta))
     }
+}
+
+/// [agent-inferred, November 1] **A release's sweeps as its exterior reads them**: asked before
+/// every sweep, `done` sweeps run, `live` problems still open, and the sites released so far by
+/// resolution (`resolved`) and by news (`by_news`, one a problem whose sweep resolved none); its
+/// answer decides whether the sweep runs. Asked once more after the last sweep, its answer unread.
+/// The release reads no clock: the exterior that holds the run's projected deadline stops it there
+/// (the waiting standard), and the answers are returned as released.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ReleaseSweep {
+    pub done: usize,
+    pub live: usize,
+    pub resolved: usize,
+    pub by_news: usize,
 }
 
 /// [definition; agent-inferred, November 1] **The release's order is the news a site's top class

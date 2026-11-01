@@ -382,10 +382,44 @@ fn releases_read_together_are_each_problem_s_own() {
     let field = shaped(1);
     let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
-    let together = field.release_realized(&problems, 3, 0, &mut HostField).unwrap();
+    let together = field.release_realized(&problems, 3, 0, &mut HostField, &mut |_| true).unwrap();
     for (&(q, a), released) in problems.iter().zip(&together) {
         assert_eq!(&field.release(q, a, 3, 0).unwrap(), released);
     }
+}
+
+/// The exterior that stops a release after `k` sweeps receives the release of `k` sweeps; it is
+/// asked before every sweep and once after the last, every sweep releases a site of every open
+/// problem, and a release given its open sites as sweeps ends every problem.
+#[test]
+fn a_release_stopped_by_its_exterior_is_the_release_of_the_sweeps_it_ran() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
+    for k in 1..=3 {
+        let mut asked = Vec::new();
+        let stopped = field.release_realized(&problems, 7, 0, &mut HostField, &mut |s| {
+            asked.push(*s);
+            s.done < k
+        }).unwrap();
+        let ran = asked.last().unwrap().done;
+        assert!(ran <= k);
+        for (&(q, a), released) in problems.iter().zip(&stopped) {
+            assert_eq!(&field.release(q, a, ran, 0).unwrap(), released, "stopped after {ran} sweeps");
+        }
+        for pair in asked.windows(2) {
+            let (before, after) = (pair[0], pair[1]);
+            if after.done > before.done {
+                assert!(after.resolved + after.by_news >= before.resolved + before.by_news + before.live, "a sweep releases a site of every open problem");
+            }
+        }
+    }
+    let mut last = ReleaseSweep::default();
+    field.release_realized(&problems, 7, 0, &mut HostField, &mut |s| {
+        last = *s;
+        true
+    }).unwrap();
+    assert_eq!(last.live, 0, "sweeps at the open sites end every problem");
 }
 
 /// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
