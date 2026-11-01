@@ -205,13 +205,17 @@ private read of whole releases).
    end to end.
 2. **Card parity.** The card's realization equals the host bit for bit (faces, codes, covector,
    learner) over 32 sections of GSM8K regions; its time per site is measured on the opening
-   sections and projected before any learner run.
-3. **The reading** (the bytes, the 125 held problems the route reads, a run projected and bounded
+   sections and projected before any learner run. [measured] Passed (acae723b6, receipts in
+   `…_receipts/card/`): at D 32, H 4, n 8, still 2, f 32, K 2, 32 sections of 16 regions, 64 reads
+   and 4 releases equal, and the same grown by two; 2.4 to 3.8 ns a site pair, a lap of the
+   passage projected at 110 s and 213 s grown, card 7.0 s against host 116.5 s on the parity.
+3. **The reading** (the bytes, the 128 held problems the field reads, a run projected and bounded
    at 15 minutes on the card): the held-out answer code beside the written rules (the first
    calculation from the question's numbers; met and never-met calculations right at the equals)
    and the coupling read. **The claim**: the first calculation from the question's numbers in at
-   least 24 of 125 releases, twice the route's best (5 to 11). Until it passes, what the run
-   measured is reported, not a completion.
+   least 24 of 128 releases, twice the route's best (5 to 11 of about 125). Until it passes, what
+   the run measured is reported, not a completion. (The held file holds 128 problems and every one
+   passes the answer filter; the route's readings counted about 125. The bar stays 24.)
 
 **What follows each outcome.** If the copy reading passes, the field is the route's generation
 and the next loop is never-met arithmetic (the carry). If it fails with the held-out code falling,
