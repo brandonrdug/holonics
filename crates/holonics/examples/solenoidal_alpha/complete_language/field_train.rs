@@ -259,12 +259,16 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its
 /// answer and a keyed void tail) and its shape ([`shape`]). The step the learner holds is read first
-/// on the section's masked regions and its second sweeps' first reads, which it was not fit on, so
-/// the second sweeps' mixtures are read from the material that stands after it (one more read of
-/// those regions, through `realization`); the held step's read is returned. Why that order (the
-/// build's review, November 1): read under the stepped material before its read, a refused step left
-/// read 2 carrying mixtures of a material that no longer stood, and the step was read on regions it
-/// had partly formed.
+/// on the section's masked regions, which it was not fit on (on the second sweeps' first reads only
+/// where the section has no masked region), so the second sweeps' mixtures are read from the material
+/// that stands after it (one more read of those regions, through `realization`); the held step's read
+/// is returned. Why that order (the build's review, November 1): read under the stepped material
+/// before its read, a refused step left read 2 carrying mixtures of a material that no longer stood,
+/// and the step was read on regions it had partly formed. Why the masked regions (the crib probe of
+/// November 1): read on the masked regions and the second sweeps' first reads together, the step was
+/// judged on the release's opening, every answer site on the unresolved row, a state training never
+/// compares, and 205 of 248 held steps were refused in the second lap while the withheld problems'
+/// code stood still at 4.55 bits.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
     let mut states: Vec<(usize, usize)> = Vec::new();
@@ -284,7 +288,13 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     for &(k, q) in &states {
         regions[k].1 = (0..regions[k].0.len()).map(|t| t >= q).collect();
     }
-    let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
+    let next = if learner.holds_step() {
+        let masked: Vec<Region> = views_of(&regions).into_iter().enumerate().filter(|(k, _)| !states.iter().any(|&(s, _)| s == *k)).map(|(_, r)| r).collect();
+        let on = if masked.is_empty() { views_of(&regions) } else { masked };
+        learner.read_step_on(&on, realization).map_err(|e| e.to_string())?.1
+    } else {
+        None
+    };
     if states.is_empty() {
         return Ok((regions, next));
     }

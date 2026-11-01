@@ -503,3 +503,16 @@ Located causes, each the next loop's subject:
    one class and meets the same question sites; the falloff and the skin set them apart only by their
    distances, the void is never resolved at the opening, and on GSM8K every interior site locked at the
    commonest byte.
+
+[measured] **The crib probe again, with the held step read on the masked regions** (cause 1 repaired;
+receipts `…_receipts/crib10/`, ran 168 s of 900): 0 first calculations again. The withheld code fell
+further, 6.01 → 5.88 → 4.91 → 4.34 → 4.27 bits over ten laps (one growth after the first), the context
+read to 4.29, but the certificate stopped depositing: 235, 237, 166, 45, 21, 4, 2, 16, 8 and 0 of 248
+sections, each later section standing nowhere after its halvings (about one a section). The release
+locked every answer whole at rung 4 within 8 sweeps, each the question's `<` and then 52 `#`.
+
+5. **The certificate stalls on the shells' seams** (a cause located from this run, not yet tested): the
+   resonance classes are piecewise constant in the material, so a step moves sites across shells and
+   changes the support; the covector reads within one support, and the step's direction stops lowering
+   the code a section reads (a section's step stood nowhere 248 times in the tenth lap). The covector's
+   own test leaves such probes out; the learner meets them at every step.

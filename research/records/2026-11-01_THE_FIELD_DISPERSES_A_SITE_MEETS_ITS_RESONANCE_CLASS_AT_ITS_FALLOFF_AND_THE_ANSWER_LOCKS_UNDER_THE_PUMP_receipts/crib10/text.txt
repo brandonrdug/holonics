@@ -1,0 +1,29 @@
+FIELD_COMMAND release-field-text $ROOT/.local/wt/field-card/.local/run/dispersing/crib10/train/STATE.9 8229a73613d436ca960ac47fe93447feda3988aee944cd4850713eeaf3e06906 $ROOT/.local/wt/field-card/.local/run/dispersing/crib10/train/CODEC 0a26b3281ea9122b4325faa976006aa43011836f064dbaef389e0df32fe8789d $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab 3 53 20000
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15148908544 total=16802250752 batch_budget=10157817856
+FIELD_RELEASE_SWEEP set=text done=0 live=3 locked=0 open=0 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=10
+FIELD_RELEASE_SWEEP set=text done=1 live=3 locked=0 open=159 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=13
+FIELD_RELEASE_SWEEP set=text done=2 live=3 locked=0 open=159 rung=1 change=15955072 holding=0 soft=3 overturned=156 free=156 cut=0 cut_sites=0 ms=18
+FIELD_RELEASE_SWEEP set=text done=3 live=3 locked=0 open=159 rung=2 change=2044648 holding=0 soft=154 overturned=5 free=161 cut=0 cut_sites=0 ms=22
+FIELD_RELEASE_SWEEP set=text done=4 live=3 locked=0 open=159 rung=2 change=1254966 holding=0 soft=159 overturned=0 free=161 cut=0 cut_sites=0 ms=26
+FIELD_RELEASE_SWEEP set=text done=5 live=3 locked=0 open=159 rung=2 change=1900056 holding=0 soft=156 overturned=3 free=164 cut=0 cut_sites=0 ms=30
+FIELD_RELEASE_SWEEP set=text done=6 live=3 locked=0 open=159 rung=4 change=847058 holding=0 soft=159 overturned=0 free=164 cut=0 cut_sites=0 ms=34
+FIELD_RELEASE_SWEEP set=text done=7 live=3 locked=19 open=140 rung=4 change=2576008 holding=19 soft=140 overturned=0 free=164 cut=0 cut_sites=0 ms=38
+FIELD_RELEASE_SWEEP set=text done=8 live=0 locked=159 open=0 rung=4 change=3078029 holding=159 soft=0 overturned=0 free=164 cut=0 cut_sites=0 ms=42
+FIELD_PROMPT 0
+hamu lova rixogi hapepe 171 muvamu haxo xoyi pewe hahaza ha rideki ri yiloki mu tuza zacu cuso baba ri mutu na mu ricumu 367 muzaza yi bagipe we cuweso lohade fedegi xotucu loba vamu felova ha 304 lona fegijo ba pe vava cusotu ki murimu ri sogi pepe joyi tuki ki nasocu tuvaza kiyi kitutu giwe wesoza xoxo xoki cuweyi va loxo kiba na vakimu ki ri na vawena?
+FIELD_ANSWER 0 sites=53 open=0 free_circulation=55 bound_circulation=7 lock_margin_bits_quartiles=0/2/2/2/3 rungs=4:53 ridden=1:2,2:3,4:3
+<####################################################
+
+FIELD_PROMPT 1
+mu vawepe debacu ritu haza dexojo xogi gi zaweso muha pexo fegi deyi 379 jobaba dekiza ba sojo tujo ki ki gibaki tubari xoxo deba cu kigixo navaso weba riso so kigi xolo xojoba ba yihana cuki curi ha hazagi jorimu tuki halo deyiyi ri va gibayi deso kiyiza valotu cu gitumu vava na navava tu vadeva va tude tu hapewe ripe 665 we sogi hahalo baha yilofe tuvalo vababa jori ri sogi mu ha so xo jo?
+FIELD_ANSWER 1 sites=53 open=0 free_circulation=54 bound_circulation=4 lock_margin_bits_quartiles=0/2/2/2/3 rungs=4:53 ridden=1:2,2:3,4:3
+<####################################################
+
+FIELD_PROMPT 2
+ha cude va va zava 55 gi wemu lonayi sonagi tu za xozafe kiba lo mumu gituna rijo yiriri va ba femu gisona fe ri vadede yiyi tuna tuha va mu weyicu yiri de fe so yi bacuba lonacu cude culo so gigipe we va hahaha bafe riso tu 1 riki we badeba peperi 29 deba mu bamu ba zaxoba logi tu ba jo vajoza tuba baha jo za kisoyi gi cuvaba peba turife?
+FIELD_ANSWER 2 sites=53 open=0 free_circulation=55 bound_circulation=8 lock_margin_bits_quartiles=0/2/2/2/3 rungs=4:53 ridden=1:2,2:3,4:3
+<####################################################
+
+FIELD_RELEASE_TEXT problems=3 sweeps=8 live=0 open=0 rung=4 stopped=false ms=42
+FIELD_CARD reads=8 read_ms=22 returns=0 return_ms=0 pairs=20313622 batches=8 peak_store=11707620 landmarks=0 landmark_ms=0 elapsed_ms=42
+MEASURE lap=crib10 rc=0 wall_s=0.3 peak_rss_kib=190832
