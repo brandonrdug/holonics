@@ -578,3 +578,89 @@ from time-field's projections; `TEXT_S = 60`; the release keeps at least 1.3 tim
 every answer, past the first calculation's 90th percentile of 110 bytes, if only the news releases
 them; two laps only where that release fits beside them, and every second left to 870 s goes to
 the release.
+
+
+## 15. The fourth reading: every answer ended where its void crept, and one lap fit
+
+[measured] The fourth reading (receipts in `…_receipts/reading-4/`, count-only; field_pass
+`c8ba33c2…5b1` at 75df5e3f1): the card's parity with the bounded law passed at A and grown by two
+(`parityA6`, `parityB6`). time-field projected a lap at 216 s at A and 407 s at B, so the reading
+trained one lap (`LAPS 1`, the trainer's bound 226 s) and reserved 554 s for the release.
+
+| Reading | Value |
+|---|---|
+| The lap | 413 sections in 82.8 s (117.1 s in the third reading); 394 deposited; the sections' code 3.823 before their steps, 3.792 after, the third reading's bits |
+| The withheld answers read beside their neighbours | 6.931 bits a site at the founding, 4.534 after the lap (36,763 sites: the answer and its first void) |
+| The held answers | at the opening 5.341 (digits 5.765, text 5.258); beside their neighbours 4.548 (digits 4.815, text 4.496); the training answers' own tables 3.459 at one byte of context, 1.983 at four |
+| The card | 2,287 reads in 55.6 s, 413 returns in 27.9 s (68 ms each, 157 ms in the third reading), 1.90·10¹¹ pairs in 86.1 s |
+| The profile of a section | the forward contact 38 of the kernels' 73 ms (3.8 ms a launch); the rows' return 10 ms, the columns' 8 ms, the affine reads 9 ms |
+| The release | 128 free releases in 81 sweeps and 399 marks in 85, none stopped; 289 reads in 35.0 s, 9.2·10¹⁰ pairs; 36 s of the 554 s reserved |
+| The board | 11,299 MiB at its peak, within the 12 GiB |
+| The claim | the first calculation from the question's numbers in 0 of 128 |
+
+Every free release ended at its void after 7 to 54 sites (3,491 sites over 128 answers, mean
+27.3) against held answers of median 254; at the 399 calculations' equals 372 releases had
+written no number and 9 were unfinished, and the 18 numbers were all `0`.
+
+[agent-inferred] Two causes, the first a defect of the release's law, the second of its bounds.
+
+1. **The void crept.** Released as an ordinary class, the void is the one variable whose classes
+   nest: a void at `t` implies a void at every later site. A released void at `t + 1` says the
+   answer's extent `L` is at most `t`, and given that the void at `t` is likely by `1 − h(t)`, `h`
+   the hazard of `L` at `t`, small wherever `L` is spread. So each released void made the void
+   before it resolve by majority, and the answer's open sites before it, which alone could stop it,
+   were not yet standing. A release by marginal majority, iterated on a nested boundary, moves the
+   boundary toward the least extent the field admits, whatever the field has learned. The first
+   sweep of the free set resolved 108,272 of its 157,312 open sites (128 answers of 1,229), most of
+   them past any answer's end, and the answers closed around the few content sites standing.
+2. **One lap, because the release was reserved twenty times its cost.** The release's reservation
+   came from `free_sweep_ms` at the widest state and the codec's whole extent of sweeps; it ran in
+   36 s of 554. The lap's time was bound by the forward contact, untiled: a warp a row read every
+   key and value of its region from global memory, so each was read once for every row, and ran
+   the exponential's root-product loop for every pair.
+
+**The repairs.**
+- **The boundary follows the content** (`Field::release_with`, test
+  `the_void_follows_the_released_content`). The void is released only at the answer's first open
+  site, every answer site before it released, by resolution or by the news (whose order is then
+  searched for the first admitted site, and the first open site is always admitted, so a sweep
+  still releases a site of every open problem). No void is ever read beside another released
+  void, so the boundary is read against the content alone. The host's bounded tests pass (22).
+- **The card's forward contact reads tiles** (`field_contact`, `kernels/field.cu`). A block holds
+  eight consecutive receiving rows of one region, a warp a row; the keys and values of 32 source
+  sites are loaded once into shared memory, transposed with a stride of 33, and every row of the
+  block reads them. The row is read in two passes, its peak and then its scores, weights, mass and
+  numerators recomputed, so no partial sum is rounded at a peak that later moves; a lane holds one
+  entry of the span. The weights are stored only where a return's reverse reads them.
+- **The exponential's resident face** (`field_exponential`, `below_one_face`): the face of
+  `2^(−x)` below one is computed once a run by the same root-product loop, `2^digits` words (65,536
+  at the reading's declaration, counted against the batch budget), and each pair reads it by one
+  lookup and a shift. A table built by the navigator's own loop at its declared grain is its
+  resident face, not an authored table.
+- **Carriers as wide as their terms** (the precision law: width is dynamic). The frame raises the
+  binary lengths of the tick's largest framed probe, key and value (`bits`, zeroed each tick). Where
+  `q_b, k_b ≤ 31` and `q_b + k_b + ⌈log₂ span⌉ ≤ 62` a score is summed in 64-bit integers from
+  32-bit products; where `v_b ≤ 31` and `21 + v_b + ⌈log₂ sites⌉ ≤ 62` the numerators are two 64-bit
+  sums over the weight's 20-bit halves, joined in 128 bits. Otherwise the 128-bit path runs. Both
+  are integer sums, so they give the host's bits in any order. `ptxas -v` for `sm_89`: the contact
+  64 registers, no spills.
+- **The release's bounds** (`reading-5/reading5.sh`). The reading holds 900 s. The release takes
+  300 s (agent-inferred: under the boundary law a release reads its whole opening extent until its
+  content reaches its end, so its sweeps cost the opening's and their count is the trained field's
+  own, which no founding read projects), the text 30 s, the starts 30 s, and training the rest,
+  540 s, as `⌊540 000 / P_A⌋` whole laps at the projection's upper end.
+
+An adversarial review of the change before any run (a Sonnet reviewer, read-only) rebuilt the
+face with the card's loop and compared it with the host's `below_one` on 201,000 arguments (the
+edges among them), emulated the narrow sums and their join for every even span to 32 and region
+sizes from 1 to 257, checked the shared carve-up against `contact_shared`, the barriers and the
+boundary law's progress (the first open site is always admitted, so no release stalls), and found
+these equal. It found one stale test (`a_regions_octets_count_its_carriers_beside_its_weights`
+still charged weights to a read), now corrected; the weight's split is derived from the declared
+grain (`WEIGHT_HALF`, checked at compile time). The card crate's host tests link only where the
+card's driver is, so they run with the parity checks.
+
+Not adopted yet: the rows' and columns' returns in the same tiles and narrow carriers (18 of 73 ms
+a section), and the certificate's repeated reads of one section (about 5.5 reads a section). The
+fifth reading is `reading-5/checks.sh` (parity at A and B, the profile, time-field), then
+`reading5.sh` from the two time logs.

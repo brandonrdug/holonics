@@ -34,6 +34,14 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
+/// The receiving rows a block of the contact reads together, a warp a row (`CONTACT_ROWS` in
+/// `kernels/field.cu`).
+const CONTACT_ROWS: usize = 8;
+/// The keys a contact tile holds and its padded stride (`KEY_TILE`, `TILE_PAD`).
+const KEY_TILE: u32 = 32;
+const TILE_PAD: u32 = 33;
+/// The widest span the contact's lanes carry (a lane an entry of the span).
+const CONTACT_SPAN: u32 = 32;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
 const OUTER_TILE: u64 = 64;
 /// The device octets the runs keep to (the board's, the desktop included).
@@ -117,6 +125,8 @@ struct Words {
     pa: u64,
     pb: u64,
     pc: u64,
+    bits: u64,
+    face: u64,
 }
 
 /// A kernel argument: the address of a value the launch copies.
@@ -155,6 +165,8 @@ struct Tick<'c> {
     pa: CardBuffer<'c, i64>,
     pb: CardBuffer<'c, i64>,
     pc: CardBuffer<'c, i64>,
+    /// The tick's carrier widths: the binary lengths of its largest framed probe, key and value.
+    bits: CardBuffer<'c, u32>,
 }
 
 /// What a profiled call's time is charged to.
@@ -234,6 +246,11 @@ impl<'c> CardField<'c> {
     }
 
     fn launch(&self, entry: &'static str, grid: u32, block: u32, params: &mut [*mut c_void]) -> Result<()> {
+        self.launch_shared(entry, grid, block, 0, params)
+    }
+
+    /// A launch with `shared` octets of the block's dynamic shared memory.
+    fn launch_shared(&self, entry: &'static str, grid: u32, block: u32, shared: u32, params: &mut [*mut c_void]) -> Result<()> {
         self.card.current().map_err(device)?;
         let function = self.module.function(entry).map_err(|e| device(e.into()))?;
         let started = match &self.profile {
@@ -243,7 +260,7 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
-        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, 0, params).map_err(|e| device(e.into()))?;
+        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();
@@ -309,6 +326,13 @@ impl<'c> CardField<'c> {
         let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
         let ring_n = self.timed(Kind::Copy, || card.upload(&ring_n)).map_err(device)?;
         let roots_card = self.timed(Kind::Copy, || card.upload(&roots)).map_err(device)?;
+        if 2 * d.modes as u32 > CONTACT_SPAN {
+            return Err(TowerError::Refused("the card's contact carries a span of at most 32 entries (16 modes a head)"));
+        }
+        // The exponential's resident face: `2^digits` words, held beside the batches and counted
+        // against the same budget.
+        let face_octets = Some(roots.len()).filter(|&digits| digits < 61).map(|digits| 8u64 << digits).filter(|&o| o < self.budget).ok_or(TowerError::Refused("the exponential's resident face passes the card's batch budget"))?;
+        let face = self.timed(Kind::Alloc, || card.alloc::<u64>(1usize << roots.len())).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
@@ -360,11 +384,15 @@ impl<'c> CardField<'c> {
             roots: roots_card.device_ptr(),
             ..Words::default()
         };
+        // The exponential's resident face, read once by its own loop on the card.
+        let mut face_ptr = face.device_ptr();
+        self.launch("field_exponential", Self::cells(1u64 << roots.len()), THREADS, &mut [arg(&mut words), arg(&mut face_ptr)])?;
+        words.face = face_ptr;
         let g = if returning { Some(self.timed(Kind::Alloc, || card.zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         // The batches: whole regions in order, each batch's every allocation within the budget.
         let octets = |sites: usize| region_octets(&d, returning, sites);
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
-        let batches = batches(&lengths, &octets, self.budget)?;
+        let batches = batches(&lengths, &octets, self.budget - face_octets)?;
         let mut faces: Vec<Vec<Option<TowerFace>>> = Vec::with_capacity(regions.len());
         for batch in batches {
             if batch.is_empty() {
@@ -391,7 +419,7 @@ impl<'c> CardField<'c> {
         Ok((faces, g))
     }
 
-    fn tick(&self, sites: usize, pairs: usize, field: &Field) -> Result<Tick<'c>> {
+    fn tick(&self, sites: usize, pairs: usize, field: &Field, returning: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let card = self.card;
@@ -403,7 +431,8 @@ impl<'c> CardField<'c> {
             qf: alloc64(heads * sites * span)?,
             kf: alloc64(heads * sites * span)?,
             vf: alloc64(heads * sites * span)?,
-            e: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * pairs).max(1))).map_err(device)?,
+            // The weights are kept only for a return's reverse.
+            e: self.timed(Kind::Alloc, || card.alloc::<u64>(if returning { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
             mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
             y: alloc64(sites * m2)?,
             read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
@@ -411,6 +440,7 @@ impl<'c> CardField<'c> {
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
+            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(3)).map_err(device)?,
         })
     }
 
@@ -462,7 +492,10 @@ impl<'c> CardField<'c> {
         words.status = status.device_ptr();
         words.x = x.device_ptr();
         let returning = g.is_some();
-        let ticks: Vec<Tick> = (0..if returning { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, field)).collect::<Result<_>>()?;
+        let ticks: Vec<Tick> = (0..if returning { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, field, returning)).collect::<Result<_>>()?;
+        // The contact's row groups: `CONTACT_ROWS` consecutive receiving sites of one region each.
+        let groups: Vec<u32> = (0..regions.len()).flat_map(|r| (region_off[r]..region_off[r + 1]).step_by(CONTACT_ROWS)).collect();
+        let groups_c = self.timed(Kind::Copy, || card.upload(&groups)).map_err(device)?;
         let set = |w: &mut Words, tick: &Tick| {
             w.qkv = tick.qkv.device_ptr();
             w.qf = tick.qf.device_ptr();
@@ -474,6 +507,7 @@ impl<'c> CardField<'c> {
             w.pa = tick.pa.device_ptr();
             w.pb = tick.pb.device_ptr();
             w.pc = tick.pc.device_ptr();
+            w.bits = tick.bits.device_ptr();
         };
         let t64 = sites as u64;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
@@ -485,8 +519,11 @@ impl<'c> CardField<'c> {
                 let out = tick.qkv.device_ptr() + (part * m2 * 8) as u64;
                 self.affine("field_affine_x32", words, weight, bias, wmax, m2, dw, tick.read.device_ptr(), dw, out, 3 * m2, 0, false)?;
             }
+            card.zero_octets(&tick.bits, 0, 12).map_err(device)?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
-            self.launch("field_contact", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words)])?;
+            let (mut groups_ptr, mut count, mut store) = (groups_c.device_ptr(), groups.len() as u32, u32::from(returning));
+            let blocks = (heads as u64 * groups.len() as u64).clamp(1, 1 << 20) as u32;
+            self.launch_shared("field_contact", blocks, (CONTACT_ROWS * 32) as u32, contact_shared(2 * n as u32), &mut [arg(words), arg(&mut groups_ptr), arg(&mut count), arg(&mut store)])?;
             self.affine("field_affine_x64", words, words.out, words.out_bias, words.rout, dw, m2, tick.y.device_ptr(), m2, 0, dw, words.x, false)?;
             self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
             self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
@@ -703,7 +740,18 @@ pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
     let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 3 * 8 * m2 } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
-    ticks_kept * (h * 8 * pairs + s * tick_site) + s * (face_site + reverse_site) + if returning { 16 * pairs } else { 0 }
+    // The weights are kept only for a return; the contact's row groups are one word every
+    // `CONTACT_ROWS` sites.
+    let weights = if returning { h * 8 * pairs } else { 0 };
+    ticks_kept * (weights + s * tick_site + 12) + s * (face_site + reverse_site) + 4 * s.div_ceil(CONTACT_ROWS as u64) + if returning { 16 * pairs } else { 0 }
+}
+
+/// The contact block's dynamic shared octets for a span of `span` entries (`CONTACT_SHARED` in
+/// `kernels/field.cu`): the tile's keys and values, transposed and padded, the rows' probes, the
+/// tile's weights, the lanes' numerators and the rows' currents.
+fn contact_shared(span: u32) -> u32 {
+    let rows = CONTACT_ROWS as u32;
+    2 * 8 * span * TILE_PAD + 8 * rows * span + 8 * rows * KEY_TILE + 16 * rows * 32 + 16 * rows * span
 }
 
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
@@ -776,17 +824,21 @@ mod tests {
     #[test]
     fn a_regions_octets_count_its_carriers_beside_its_weights() {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
-            let n = 1500u64;
-            let weights = |returning: bool| (if returning { d.ticks as u64 } else { 1 }) * d.heads as u64 * 8 * n * n + if returning { 16 * n * n } else { 0 };
+            // A whole number of the contact's row groups (`CONTACT_ROWS`), so a group's word grows by site.
+            let n = 1504u64;
+            // The weights are kept only for a return; each kept tick adds its three carrier widths.
+            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 16 * n * n } else { 0 };
+            let fixed = |returning: bool| 12 * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);
-                assert!(all > weights(returning));
+                assert!(all > weights(returning) + fixed(returning));
                 // The carriers grow by site, the weights by pair.
-                assert_eq!(region_octets(&d, returning, 2 * n as usize) - 4 * weights(returning), 2 * (all - weights(returning)));
+                let carriers = all - weights(returning) - fixed(returning);
+                assert_eq!(region_octets(&d, returning, 2 * n as usize) - 4 * weights(returning) - fixed(returning), 2 * carriers);
             }
         }
         let grown = declaration(64, 8, 64);
-        let carriers = 128 * 1500 * (region_octets(&grown, false, 1) - grown.heads as u64 * 8);
+        let carriers = 128 * 1504 * (region_octets(&grown, false, 1) - 12 - 4);
         assert!(carriers > 1 << 30, "{carriers}");
     }
 }

@@ -8,9 +8,10 @@
 // and a site, and a region's pairs are its own block of the weight store (`region_eoff`). Every
 // product's remainder below its grain is released to the nearest numerator (`rel`) and every sum is an
 // integer sum, so a row read by 32 lanes, a covector summed over sites or a sum over regions gives the
-// host's bits whatever the order. A contact row is read in three passes over its keys (the peak, the
-// weights and their mass, the current's numerators): an online rescaling would round each partial sum
-// at a peak that later moves, and the bits would follow the tile order.
+// host's bits whatever the order. A contact row is read in two passes over its keys (the peak; then
+// the weights, their mass and the current's numerators) and divided once by its mass: an online
+// rescaling would round each partial sum at a peak that later moves, and the bits would follow the
+// tile order.
 
 #include <stdint.h>
 
@@ -23,6 +24,11 @@ typedef unsigned __int128 uwide;
 #define COVECTOR_BITS 24
 #define UNIT_BITS 62
 #define WEIGHT_BITS_FROM 22
+// A weight's grain below its row's peak (the host's `WEIGHT_BITS`), and the half a narrow value sum
+// splits it at: `e ≤ 2^WEIGHT_BITS` is `2^WEIGHT_HALF e_h + e_l` with `e_h ≤ 2^WEIGHT_HALF`.
+#define WEIGHT_BITS (UNIT_BITS - WEIGHT_BITS_FROM)
+#define WEIGHT_HALF (WEIGHT_BITS / 2)
+static_assert(WEIGHT_BITS % 2 == 0 && WEIGHT_HALF < 31, "a weight splits into two halves of a 32-bit product");
 #define CARRIED_BITS 70
 #define CONTACT_BACK 32
 
@@ -37,7 +43,7 @@ typedef unsigned __int128 uwide;
 // [agent-inferred, November 1] The field's image restates the release, the nearest quotient, the
 // carriers' refusals, the root and the exponential's face that `tower.cu` carries, so the tower's
 // image, read to parity on its own declarations, is left as it was; both are the host's law (`release`,
-// `div_nearest`, `fit64`, `fit32`, `u128::isqrt`, `Exponential::below_one`), and each image's parity
+// `div_nearest`, `fit64`, `fit32`, `u128::isqrt`, `Exponential::below_one` through its resident face), and each image's parity
 // against the host reads that equality.
 
 // `x` released `bits` coarser, to the nearest numerator, half away from zero (`release`).
@@ -169,30 +175,27 @@ __device__ uwide isqrt128(uwide n) {
     return res;
 }
 
-// `2^(x / 2^X)` for `x ≤ 0` on `2^(−62)`, at least one grain (`Exponential::below_one`).
-__device__ uint64_t below_one(wide x, const uint64_t *roots, uint32_t digits) {
+// `below_one` read through the exponential's resident face (`field_exponential`): the same split into
+// whole and fraction, the same shift.
+__device__ __forceinline__ uint64_t below_one_face(wide x, const uint64_t *face, uint32_t digits) {
     const wide m = -x;
     const wide whole = m >> digits;
-    const wide frac = m & (((wide)1 << digits) - 1);
-    wide shift;
-    wide rest;
-    if (frac == 0) {
-        shift = whole;
-        rest = 0;
-    } else {
-        shift = whole + 1;
-        rest = ((wide)1 << digits) - frac;
-    }
-    uint64_t value = (uint64_t)1 << UNIT_BITS;
-    for (uint32_t i = 0; i < digits; i++) {
-        if (rest & ((wide)1 << (digits - 1 - i))) {
-            const uint64_t lo = value * roots[i];
-            const uint64_t hi = __umul64hi(value, roots[i]);
-            value = (hi << (64 - UNIT_BITS)) | (lo >> UNIT_BITS);
-        }
-    }
+    const uint64_t frac = (uint64_t)(m & (((wide)1 << digits) - 1));
+    const wide shift = frac == 0 ? whole : whole + 1;
+    const uint64_t rest = frac == 0 ? 0 : ((uint64_t)1 << digits) - frac;
+    const uint64_t value = face[rest];
     const uint64_t shifted = shift >= 64 ? 0 : value >> (uint32_t)shift;
     return shifted == 0 ? 1 : shifted;
+}
+
+// The binary length of a magnitude (`0` for zero).
+__device__ __forceinline__ uint32_t bit_length(uint64_t m) {
+    return m == 0 ? 0 : 64 - __clzll((long long)m);
+}
+
+// `⌈log₂ x⌉` (`0` for `x ≤ 1`).
+__device__ __forceinline__ uint32_t ceil_log2(uint64_t x) {
+    return x <= 1 ? 0 : 64 - __clzll((long long)(x - 1));
 }
 
 __device__ __forceinline__ uwide shfl_wide(uwide v, int o) {
@@ -269,6 +272,10 @@ struct FieldWords {
     uint64_t *mass;
     int64_t *y;
     int64_t *pa, *pb, *pc;
+    // The tick's magnitudes (the binary lengths of the largest framed probe, key and value, written
+    // by the frame) and the exponential's resident face.
+    uint32_t *bits;
+    const uint64_t *face;
 };
 
 __device__ __forceinline__ void frame_of(const FieldWords &w, uint32_t t, uint32_t h, uint32_t l, wide *ur, wide *ui) {
@@ -281,6 +288,26 @@ __device__ __forceinline__ void frame_of(const FieldWords &w, uint32_t t, uint32
     const uint64_t at = w.ring_off[slot] + t % w.ring_n[slot];
     *ur = w.phasor[2 * at];
     *ui = w.phasor[2 * at + 1];
+}
+
+// [agent-inferred, November 1] **The exponential's resident face**: `face[rest]` is the product of the
+// roots `below_one` multiplies for the binary digits of `rest`, each `rest` of the `2^digits` read by
+// the same loop on the card, so a weight read through the face is `below_one`'s bits exactly (a
+// navigator's resident face at its declared grain, never a table of answers). It replaces up to
+// `digits` dependent 64-bit products a pair by one read of `2^digits` words (512 KiB at 16 digits).
+extern "C" __global__ void field_exponential(FieldWords w, uint64_t *face) {
+    const uint64_t cells = (uint64_t)1 << w.digits;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        uint64_t value = (uint64_t)1 << UNIT_BITS;
+        for (uint32_t i = 0; i < w.digits; i++) {
+            if (c & ((uint64_t)1 << (w.digits - 1 - i))) {
+                const uint64_t lo = value * w.roots[i];
+                const uint64_t hi = __umul64hi(value, w.roots[i]);
+                value = (hi << (64 - UNIT_BITS)) | (lo >> UNIT_BITS);
+            }
+        }
+        face[c] = value;
+    }
 }
 
 // A site's opening face `x⁰`: its class's row of the encoding, or the unresolved row.
@@ -372,9 +399,11 @@ extern "C" __global__ void field_affine_x64(FieldWords w, uint64_t weight, uint6
 }
 
 // The frame, by head: `q̃ = U ⊙ q` and so for the keys and values, `[h][t][2n]` real parts then
-// imaginary, each product released to `2^(−16)`.
+// imaginary, each product released to `2^(−16)`; the binary lengths of the largest framed probe, key
+// and value are raised into `bits` (zeroed before the launch), the carriers' widths the contact reads.
 extern "C" __global__ void field_frame(FieldWords w) {
     const uint64_t cells = (uint64_t)w.H * w.T * w.n;
+    uint32_t qb = 0, kb = 0, vb = 0;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t li = c % w.n;
         const uint64_t t = (c / w.n) % w.T;
@@ -387,100 +416,180 @@ extern "C" __global__ void field_frame(FieldWords w) {
         const wide qr = qkv[m], qi = qkv[w.M + m];
         const wide kr = qkv[w.M2 + m], ki = qkv[w.M2 + w.M + m];
         const wide vr = qkv[2 * w.M2 + m], vi = qkv[2 * w.M2 + w.M + m];
-        w.qf[at + li] = fit64(rel(ur * qr - ui * qi, MOVE_BITS), w.status);
-        w.qf[at + w.n + li] = fit64(rel(ui * qr + ur * qi, MOVE_BITS), w.status);
-        w.kf[at + li] = fit64(rel(ur * kr - ui * ki, MOVE_BITS), w.status);
-        w.kf[at + w.n + li] = fit64(rel(ui * kr + ur * ki, MOVE_BITS), w.status);
-        w.vf[at + li] = fit64(rel(ur * vr - ui * vi, MOVE_BITS), w.status);
-        w.vf[at + w.n + li] = fit64(rel(ui * vr + ur * vi, MOVE_BITS), w.status);
+        const int64_t q0 = fit64(rel(ur * qr - ui * qi, MOVE_BITS), w.status), q1 = fit64(rel(ui * qr + ur * qi, MOVE_BITS), w.status);
+        const int64_t k0 = fit64(rel(ur * kr - ui * ki, MOVE_BITS), w.status), k1 = fit64(rel(ui * kr + ur * ki, MOVE_BITS), w.status);
+        const int64_t v0 = fit64(rel(ur * vr - ui * vi, MOVE_BITS), w.status), v1 = fit64(rel(ui * vr + ur * vi, MOVE_BITS), w.status);
+        w.qf[at + li] = q0;
+        w.qf[at + w.n + li] = q1;
+        w.kf[at + li] = k0;
+        w.kf[at + w.n + li] = k1;
+        w.vf[at + li] = v0;
+        w.vf[at + w.n + li] = v1;
+        qb = max(qb, bit_length(mag64(q0) | mag64(q1)));
+        kb = max(kb, bit_length(mag64(k0) | mag64(k1)));
+        vb = max(vb, bit_length(mag64(v0) | mag64(v1)));
+    }
+    qb = (uint32_t)warp_max_u64(qb);
+    kb = (uint32_t)warp_max_u64(kb);
+    vb = (uint32_t)warp_max_u64(vb);
+    if ((threadIdx.x & 31) == 0) {
+        atomicMax(&w.bits[0], qb);
+        atomicMax(&w.bits[1], kb);
+        atomicMax(&w.bits[2], vb);
     }
 }
 
-// The contact, the weights and the current of one row (a head and a receiving site), one warp a row,
-// its lanes over the region's sites, in three passes: the scores and their peak (each score held in
-// its weight's slot), the weights `release(2^(z − peak), 22)` and their mass, then the current's
-// numerators `Σ_j e_ij ṽ_j`, divided once by the mass and returned to the receiver's frame.
-#define MODE_CHUNK 8
-extern "C" __global__ void field_contact(FieldWords w) {
-    const uint32_t lane = threadIdx.x & 31;
-    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
-    const uint64_t rows = (uint64_t)w.H * w.T;
-    for (uint64_t row = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; row < rows; row += warps) {
-        const uint32_t h = row / w.T;
-        const uint64_t g = row % w.T;
-        const uint32_t r = w.site_region[g];
-        const uint32_t i = w.site_pos[g];
+// The contact, the weights and the current of the rows of one head, a block of `CONTACT_ROWS`
+// consecutive receiving sites of one region (a warp a row), its keys and values read a tile of
+// `KEY_TILE` sites at a time into the block's shared memory, so each key and value crosses from the
+// card's memory once a block instead of once a row. Two passes over the keys: the scores and their
+// peak; then each score again, its weight `release(2^(z − peak), 22)` through the exponential's
+// resident face, the mass and the current's numerators `Σ_j e_ij ṽ_j`. The numerators are then
+// divided once by the mass and returned to the receiver's frame. The weights are stored
+// only when a return will read them (`store`).
+//
+// [agent-inferred, November 1] **The carriers' widths follow their terms** (the precision law: a
+// carrier widens at a declared crossing). The frame wrote the binary lengths of the largest framed
+// probe, key and value. Where a score's `2n` products and their sum fit 62 bits, the score is summed
+// in 64 bits from 32-bit products; a weight `e ≤ 2^40` is read as `2^20 e_h + e_l` (`e_h ≤ 2^20`,
+// `e_l < 2^20`), and where a row's `S` products of a part with a value fit 62 bits, the two parts'
+// numerators are summed in 64 bits and joined as `2^20 N_h + N_l` on 128. Otherwise every sum is on
+// 128 bits. The integers are the same either way, so the bits are the host's whatever the widths.
+// In the second pass a lane holds one weight; the warp then sums a tile's `KEY_TILE` products for
+// each of the span's entries, a lane an entry (two lanes an entry when the span is at most 16, each
+// half of the tile), so a lane carries one numerator and not `2n`.
+#define CONTACT_ROWS 8
+#define KEY_TILE 32
+#define TILE_PAD 33
+
+// The score `release(Σ_c q_c k_jc, 16 + β)` of the warp's probe (`q`, shared) and the tile's key
+// `lane` (`kt`, transposed).
+__device__ __forceinline__ int64_t contact_score(const FieldWords &w, const int64_t *q, const int64_t *kt, uint32_t lane, bool narrow) {
+    if (narrow) {
+        int64_t s = 0;
+        for (uint32_t c = 0; c < w.span; c++) {
+            s += (int64_t)(int32_t)q[c] * (int64_t)(int32_t)kt[c * TILE_PAD + lane];
+        }
+        return fit64(rel((wide)s, FACE_BITS + w.beta), w.status);
+    }
+    wide s = 0;
+    for (uint32_t c = 0; c < w.span; c++) {
+        s += (wide)q[c] * (wide)kt[c * TILE_PAD + lane];
+    }
+    return fit64(rel(s, FACE_BITS + w.beta), w.status);
+}
+
+// The block's dynamic shared memory, in order (the host's `contact_shared` counts its octets): the
+// tile's keys and values, transposed and padded (`[span][TILE_PAD]` each), the rows' probes
+// (`[CONTACT_ROWS][span]`), the tile's weights (`[CONTACT_ROWS][KEY_TILE]`), the lanes' numerators
+// (`[CONTACT_ROWS][32]`, 128 bits) and the rows' currents (`[CONTACT_ROWS][span]`, 128 bits).
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 4) field_contact(FieldWords w, const uint32_t *groups, uint32_t count, uint32_t store) {
+    extern __shared__ __align__(16) unsigned char shared[];
+    const uint32_t S = w.span;
+    int64_t *kt = (int64_t *)shared;
+    int64_t *vt = kt + S * TILE_PAD;
+    int64_t *qs = vt + S * TILE_PAD;
+    uint64_t *es = (uint64_t *)(qs + CONTACT_ROWS * S);
+    wide *red = (wide *)(es + CONTACT_ROWS * KEY_TILE);
+    wide *ys = red + CONTACT_ROWS * 32;
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+    const bool narrow_score = w.bits[0] <= 31 && w.bits[1] <= 31 && w.bits[0] + w.bits[1] + ceil_log2(S) <= 62;
+    // A lane's entry of the span and its part of the tile.
+    const uint32_t parts = S <= 16 ? 32 / S : 1;
+    const uint32_t entry = lane % S, part = lane / S;
+    const uint64_t blocks = (uint64_t)w.H * count;
+    for (uint64_t u = blockIdx.x; u < blocks; u += gridDim.x) {
+        const uint32_t h = u / count;
+        const uint64_t g0 = groups[u % count];
+        const uint32_t r = w.site_region[g0];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - first;
-        uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
-        const int64_t *qi = w.qf + ((uint64_t)h * w.T + g) * w.span;
-        const int64_t *keys = w.kf + ((uint64_t)h * w.T + first) * w.span;
+        const uint32_t i = w.site_pos[g0] + warp;
+        const bool live = i < sites;
+        const uint64_t g = first + i;
+        const int64_t *keys = w.kf + ((uint64_t)h * w.T + first) * S;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        const bool narrow_values = w.bits[2] <= 31 && WEIGHT_HALF + 1 + w.bits[2] + ceil_log2(sites) <= 62;
+        __syncthreads();
+        for (uint32_t c = lane; c < S; c += 32) {
+            qs[warp * S + c] = live ? w.qf[((uint64_t)h * w.T + g) * S + c] : 0;
+        }
+        // The scores and their peak.
         int64_t peak = INT64_MIN;
-        for (uint32_t j = lane; j < sites; j += 32) {
-            const int64_t *kj = keys + (uint64_t)j * w.span;
-            wide s = 0;
-            for (uint32_t c = 0; c < w.span; c++) {
-                s += (wide)qi[c] * (wide)kj[c];
+        for (uint32_t j0 = 0; j0 < sites; j0 += KEY_TILE) {
+            __syncthreads();
+            for (uint32_t x = threadIdx.x; x < KEY_TILE * S; x += blockDim.x) {
+                const uint32_t jj = x / S, c = x % S;
+                kt[c * TILE_PAD + jj] = j0 + jj < sites ? keys[(uint64_t)(j0 + jj) * S + c] : 0;
             }
-            const int64_t z = fit64(rel(s, FACE_BITS + w.beta), w.status);
-            e[j] = (uint64_t)z;
-            peak = z > peak ? z : peak;
+            __syncthreads();
+            if (live && j0 + lane < sites) {
+                const int64_t z = contact_score(w, qs + warp * S, kt, lane, narrow_score);
+                peak = z > peak ? z : peak;
+            }
         }
         peak = warp_max_signed(peak);
-        // [agent-inferred, November 1] The weights, their mass and the current's numerators for the
-        // first `MODE_CHUNK` modes in one pass (the numerators need the mass only at their division),
-        // further modes a chunk at a time from the held weights. (The first realization read every
-        // weight back once for each mode.)
-        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * w.span;
+        // The weights, their mass and the numerators.
+        uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         uint64_t mass = 0;
-        for (uint32_t l0 = 0; l0 == 0 || l0 < w.n; l0 += MODE_CHUNK) {
-            wide sr[MODE_CHUNK], si[MODE_CHUNK];
-#pragma unroll
-            for (uint32_t k = 0; k < MODE_CHUNK; k++) {
-                sr[k] = 0;
-                si[k] = 0;
+        int64_t nh = 0, nl = 0;
+        wide nw = 0;
+        for (uint32_t j0 = 0; j0 < sites; j0 += KEY_TILE) {
+            __syncthreads();
+            for (uint32_t x = threadIdx.x; x < KEY_TILE * S; x += blockDim.x) {
+                const uint32_t jj = x / S, c = x % S;
+                const bool in = j0 + jj < sites;
+                kt[c * TILE_PAD + jj] = in ? keys[(uint64_t)(j0 + jj) * S + c] : 0;
+                vt[c * TILE_PAD + jj] = in ? values[(uint64_t)(j0 + jj) * S + c] : 0;
             }
-            for (uint32_t j = lane; j < sites; j += 32) {
-                uint64_t ej;
-                if (l0 == 0) {
-                    const int64_t z = (int64_t)e[j];
-                    ej = (uint64_t)rel((wide)below_one((wide)z - (wide)peak, w.roots, w.digits), WEIGHT_BITS_FROM);
-                    e[j] = ej;
-                    mass += ej;
-                } else {
-                    ej = e[j];
+            __syncthreads();
+            uint64_t ej = 0;
+            if (live && j0 + lane < sites) {
+                const int64_t z = contact_score(w, qs + warp * S, kt, lane, narrow_score);
+                ej = (uint64_t)rel((wide)below_one_face((wide)z - (wide)peak, w.face, w.digits), WEIGHT_BITS_FROM);
+                mass += ej;
+                if (store) {
+                    erow[j0 + lane] = ej;
                 }
-                const int64_t *vj = values + (uint64_t)j * w.span;
-#pragma unroll
-                for (uint32_t k = 0; k < MODE_CHUNK; k++) {
-                    if (l0 + k < w.n) {
-                        sr[k] += (wide)ej * (wide)vj[l0 + k];
-                        si[k] += (wide)ej * (wide)vj[w.n + l0 + k];
+            }
+            es[warp * KEY_TILE + lane] = ej;
+            __syncwarp();
+            if (part < parts) {
+                for (uint32_t jj = part; jj < KEY_TILE; jj += parts) {
+                    const uint64_t e = es[warp * KEY_TILE + jj];
+                    const int64_t v = vt[entry * TILE_PAD + jj];
+                    if (narrow_values) {
+                        nh += (int64_t)(int32_t)(e >> WEIGHT_HALF) * (int64_t)(int32_t)v;
+                        nl += (int64_t)(int32_t)(e & (((uint64_t)1 << WEIGHT_HALF) - 1)) * (int64_t)(int32_t)v;
+                    } else {
+                        nw += (wide)e * (wide)v;
                     }
                 }
             }
-            if (l0 == 0) {
-                mass = warp_sum_u64(mass);
-                if (lane == 0) {
-                    w.mass[(uint64_t)h * w.T + g] = mass;
-                }
+            __syncwarp();
+        }
+        mass = warp_sum_u64(mass);
+        red[warp * 32 + lane] = part < parts ? (narrow_values ? ((wide)nh << WEIGHT_HALF) + (wide)nl : nw) : 0;
+        __syncwarp();
+        if (lane < S) {
+            wide numerator = 0;
+            for (uint32_t p = 0; p < parts; p++) {
+                numerator += red[warp * 32 + p * S + lane];
             }
-#pragma unroll
-            for (uint32_t k = 0; k < MODE_CHUNK; k++) {
-                if (l0 + k < w.n) {
-                    const wide nr = warp_sum(sr[k]);
-                    const wide ni = warp_sum(si[k]);
-                    if (lane == 0) {
-                        const uint32_t li = l0 + k;
-                        const wide yr = fit64(div_nearest(nr, (wide)mass), w.status);
-                        const wide yi = fit64(div_nearest(ni, (wide)mass), w.status);
-                        wide ur, ui;
-                        frame_of(w, i, h, li, &ur, &ui);
-                        const uint32_t m = h * w.n + li;
-                        w.y[g * w.M2 + m] = fit64(rel(ur * yr + ui * yi, MOVE_BITS), w.status);
-                        w.y[g * w.M2 + w.M + m] = fit64(rel(ur * yi - ui * yr, MOVE_BITS), w.status);
-                    }
-                }
+            ys[warp * S + lane] = live ? (wide)fit64(div_nearest(numerator, (wide)mass), w.status) : 0;
+        }
+        __syncwarp();
+        if (live) {
+            if (lane == 0) {
+                w.mass[(uint64_t)h * w.T + g] = mass;
+            }
+            if (lane < w.n) {
+                const wide yr = ys[warp * S + lane], yi = ys[warp * S + w.n + lane];
+                wide ur, ui;
+                frame_of(w, i, h, lane, &ur, &ui);
+                const uint32_t m = h * w.n + lane;
+                w.y[g * w.M2 + m] = fit64(rel(ur * yr + ui * yi, MOVE_BITS), w.status);
+                w.y[g * w.M2 + w.M + m] = fit64(rel(ur * yi - ui * yr, MOVE_BITS), w.status);
             }
         }
     }
@@ -511,7 +620,7 @@ extern "C" __global__ void field_face(FieldWords w, const int64_t *z, uint64_t *
         peak = warp_max_signed(peak);
         wide total = 0;
         for (uint32_t c = lane; c < w.A; c += 32) {
-            const uint64_t m = below_one((wide)zt[c] - (wide)peak, w.roots, w.digits);
+            const uint64_t m = below_one_face((wide)zt[c] - (wide)peak, w.face, w.digits);
             masses[t * w.A + c] = m;
             total += (wide)m;
         }
