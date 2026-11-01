@@ -1,0 +1,10 @@
+# The card profile of the field at A (D 32, H 4, n 8, still 2, f 32, K 2), November 1, RTX 4080 SUPER, under the card's lock.
+# Nsight Systems (nsys) and Nsight Compute (ncu) are not installed on this machine (cuda 13.4.3 carries compute-sanitizer
+# only); no system package was installed. In their place:
+# 1. per-launch timing: FIELD_PROFILE=1 field_pass time … (CardField::profile: every launch, transfer and allocation timed
+#    alone, the stream drained before each), and the same runs plain:
+bash prof.sh      # fp.sh prof-section / prof-release / plain-section / plain-release (time-field 32 4 8 2 32 2 16 1 8 {0|4} 16)
+# 2. registers, spills, local memory and shared memory per kernel:
+nvcc -cubin -O3 --std=c++20 -arch=sm_89 -Xptxas -v kernels/field.cu -o field.cubin     # -> ptxas.txt
+# 3. the static instruction mix:
+cuobjdump -sass field.cubin                                                            # -> sass-mix.txt

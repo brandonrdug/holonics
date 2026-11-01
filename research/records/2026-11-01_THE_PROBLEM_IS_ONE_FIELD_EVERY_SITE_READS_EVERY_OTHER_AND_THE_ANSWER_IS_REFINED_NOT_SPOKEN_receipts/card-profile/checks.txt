@@ -1,0 +1,4 @@
+BIN=158ad8d1834b5c76af587d3243891ac1d29154d8d2c77ee76cf7f9848c76a58d at=2026-11-01T08:06:50Z 1120 MiB
+END prof-parity rc=0 board_peak_mib=11261 baseline=1120 FIELD_PARITY_DONE sections=3 reads=12 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=4 releases_unequal=0 card_release_ms=52 host_ms=46249 card_ms=2038 elapsed_ms=59358 FIELD_CARD reads=18 read_ms=1764 returns=2 return_ms=230 pairs=5848085088 batches=22 peak_store=10340967104 elapsed_ms=59367 MEASURE lap=prof-parity rc=0 wall_s=59.7 peak_rss_kib=1949904 
+GATE_EXIT 0
+40

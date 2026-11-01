@@ -1,0 +1,38 @@
+The field's card work at A (D 32, H 4, n 8, still 2, f 32, K 2), November 1, RTX 4080 SUPER (80 SMs), under the lock.
+Nsight Systems and Nsight Compute are not installed here; the split below is the run's own per-launch timing
+(FIELD_PROFILE: every launch, transfer and allocation timed alone after the stream drains, so launch-to-launch
+gaps are charged to the host), the registers and spills from ptxas, the theoretical occupancy from them, and a
+static SASS mix. Achieved occupancy, issue-slot use, throughput as a share of peak and stall reasons need ncu and
+are not measured.
+
+A training section (time-field's first: 16 regions, length 1,408, 48.5 M pairs, 4 reads: its read and return,
+the release-state rereads and the certificate's reread); profiled 162 ms (plain 149 ms):
+  kernels 122 ms (75%), copies 9 ms (73 transfers, 6%), allocations 4 ms (136, 2%), host ~27 ms (17%)
+  contact (forward)        10 launches   37 ms   3.7 ms a launch   70 regs  theoretical occupancy 50%
+  contact_columns (rev.)    8 launches   40 ms   5.1 ms a launch   56 regs  66.7%
+  contact_rows (rev.)       8 launches   11 ms   1.4 ms a launch   56 regs  66.7%
+  outer_x32 + outer_x64    30 launches   14 ms   0.47-0.75 ms      40 regs  100%
+  affine_x32 + affine_x64  75 launches    9 ms   0.13-0.18 ms      40-42 regs 100%
+  the rest (chart, frame, pair, face, transposed, ratio adjoint, unframe, open, encoding, bounds) under 5 ms together
+  the contact family: 88 of 122 kernel ms (72%)
+
+A release batch (4 held problems, 16 sweeps, two reads a sweep: 32 reads, 2.19 G pairs), the profiled run less
+the section alone; profiled 752 ms (plain 725 ms):
+  kernels ~458 ms (61%), copies ~35 ms (448 transfers, 5%), allocations ~21 ms (672, 3%), host ~238 ms (32%)
+  contact (forward)        64 launches  393 ms   6.1 ms a launch (86% of the release's kernel time)
+  affine                  480 launches   50 ms
+  chart                   160 launches   12 ms
+  the host's 238 ms is ~7 ms a read: the sweep's lock order (exact cross products), the regions rebuilt, and each
+  read's run() setup (material, rings and roots uploaded again on every call; the copies above include them)
+
+Registers and spills (ptxas, sm_89): no kernel spills (0 bytes spill stores and loads, 0 stack frame); registers
+12-70 a thread; shared memory 512 bytes only in the outer bounds.
+
+Static instruction mix (cuobjdump -sass): the integer law emulates 128-bit products and sums on 32-bit units:
+  contact: 3,376 instructions, IMAD 830, IMAD.WIDE 319, IADD3.X 285 (carries), IADD3 431, SHF 169, SHFL 61
+  contact_rows: 2,552 (IMAD 609, IMAD.WIDE 230, IADD3.X 249); contact_columns: 1,040 (IMAD 296, IMAD.WIDE 118, IADD3.X 119)
+  128-bit division (div_nearest, rel's paths) compiles to called subroutines (60 call sites in contact, 40 in each of
+  rows and columns); the compiler's integer division uses MUFU.RCP (72 in the image), FMUL, FSEL and F2I as a
+  reciprocal estimate inside an exact integer quotient (no value is stored or returned in floating point).
+
+Board peak in the parity check of this build: 11,261 MiB (the 12 GB ceiling held).

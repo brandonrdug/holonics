@@ -1,0 +1,34 @@
+FIELD_COMMAND time-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 1 8 0 16
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15360327680 total=16802250752 batch_budget=10369236992
+FIELD_PASSAGE train=6602 withheld=128 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_TIME_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 reach=2221 material=19546
+FIELD_TIME section=1 length=1408 pairs=48532016 reads=4 halvings=0 deposited=true next=- ms=162 ns_a_pair=3 read_ms=20
+FIELD_TIME_LAP sections=413 sites=4600652 pairs=31013808880 end_pairs=16548474264 worst_ps_a_section_pair=3347 worst_ps_a_read_pair=427 at_size_ms=103809 projection_ms=163852 (every section's reads and return at the worst measured time a pair, four more reads of it, and the lap's end)
+FIELD_TIME_RELEASE problems=0 released=0 pairs_at_most=0 pairs_read=0 ms=0
+FIELD_TIME_RELEASES problems=128 releases=527 sweeps=16 pairs_at_most=296382007040 ps_a_pair=591000 projection_ms=175161766
+FIELD_TIME_DONE elapsed_ms=439
+FIELD_CARD reads=4 read_ms=71 returns=1 return_ms=103 pairs=185663088 batches=5 peak_store=646235232 elapsed_ms=442
+FIELD_PROFILE entry=field_add launches=2 ms=0 us_a_launch=19
+FIELD_PROFILE entry=field_affine_x32 launches=55 ms=6 us_a_launch=126
+FIELD_PROFILE entry=field_affine_x64 launches=20 ms=3 us_a_launch=180
+FIELD_PROFILE entry=field_chart launches=25 ms=1 us_a_launch=60
+FIELD_PROFILE entry=field_contact launches=10 ms=37 us_a_launch=3701
+FIELD_PROFILE entry=field_contact_columns launches=8 ms=40 us_a_launch=5065
+FIELD_PROFILE entry=field_contact_rows launches=8 ms=11 us_a_launch=1426
+FIELD_PROFILE entry=field_current_back launches=2 ms=0 us_a_launch=266
+FIELD_PROFILE entry=field_encoding launches=1 ms=0 us_a_launch=235
+FIELD_PROFILE entry=field_face launches=5 ms=0 us_a_launch=53
+FIELD_PROFILE entry=field_face_covector launches=1 ms=0 us_a_launch=48
+FIELD_PROFILE entry=field_frame launches=10 ms=0 us_a_launch=69
+FIELD_PROFILE entry=field_open launches=5 ms=0 us_a_launch=43
+FIELD_PROFILE entry=field_outer_bound_x32 launches=11 ms=1 us_a_launch=99
+FIELD_PROFILE entry=field_outer_bound_x64 launches=4 ms=0 us_a_launch=77
+FIELD_PROFILE entry=field_outer_x32 launches=26 ms=12 us_a_launch=474
+FIELD_PROFILE entry=field_outer_x64 launches=4 ms=2 us_a_launch=748
+FIELD_PROFILE entry=field_pair launches=10 ms=0 us_a_launch=44
+FIELD_PROFILE entry=field_pair_back launches=2 ms=0 us_a_launch=38
+FIELD_PROFILE entry=field_ratio_adjoint launches=5 ms=0 us_a_launch=39
+FIELD_PROFILE entry=field_transposed launches=15 ms=1 us_a_launch=98
+FIELD_PROFILE entry=field_unframe launches=6 ms=0 us_a_launch=46
+FIELD_PROFILE_SPLIT kernels_ms=122 copies=73 copies_ms=9 allocations=136 allocations_ms=4 elapsed_ms=442
+MEASURE lap=prof-section rc=0 wall_s=0.9 peak_rss_kib=308036

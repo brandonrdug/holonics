@@ -9,7 +9,8 @@
 //!   `release-field-text ARGS…`: the commands with every read and return on the card.
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs read and the
-//! largest batch's allocations, and the card's free memory at the open and its batch budget.
+//! largest batch's allocations, and the card's free memory at the open and its batch budget; with
+//! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]
@@ -29,6 +30,11 @@ fn run(args: &[String]) -> Result<()> {
     println!("FIELD_COMMAND {}", rest[1..].join(" "));
     let opened = Card::open(0)?;
     let mut card = CardField::open(&opened)?;
+    // [agent-inferred, November 1] A declared reading (`FIELD_PROFILE`): every launch, transfer and
+    // allocation timed alone (`CardField::profile`), printed at the end as `FIELD_PROFILE` lines.
+    if std::env::var_os("FIELD_PROFILE").is_some() {
+        card.profile();
+    }
     let memory = opened.census().memory;
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
     let started = Instant::now();
@@ -49,6 +55,21 @@ fn run(args: &[String]) -> Result<()> {
         t.peak_store,
         started.elapsed().as_millis()
     );
+    if let Some(p) = card.profiled() {
+        let kernels: u128 = p.kernels.values().map(|v| v.1).sum();
+        for (entry, (calls, ns)) in &p.kernels {
+            println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1));
+        }
+        println!(
+            "FIELD_PROFILE_SPLIT kernels_ms={} copies={} copies_ms={} allocations={} allocations_ms={} elapsed_ms={}",
+            kernels / 1_000_000,
+            p.copies.0,
+            p.copies.1 / 1_000_000,
+            p.allocations.0,
+            p.allocations.1 / 1_000_000,
+            started.elapsed().as_millis()
+        );
+    }
     result
 }
 

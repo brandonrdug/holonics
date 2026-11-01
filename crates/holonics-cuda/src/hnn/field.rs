@@ -155,12 +155,31 @@ struct Tick<'c> {
     pc: CardBuffer<'c, i64>,
 }
 
+/// What a profiled call's time is charged to.
+#[derive(Clone, Copy)]
+enum Kind {
+    Copy,
+    Alloc,
+}
+
+/// [agent-inferred, November 1] A declared reading (`CardField::profile`): every launch timed alone,
+/// the card synchronized before and after it, by entry; every transfer and allocation timed after the
+/// card's stream has drained, so a run's wall time splits into kernels, copies, allocations and the
+/// host's own work. It moves nothing the field computes.
+#[derive(Clone, Debug, Default)]
+pub struct FieldProfile {
+    pub kernels: std::collections::BTreeMap<&'static str, (u64, u128)>,
+    pub copies: (u64, u128),
+    pub allocations: (u64, u128),
+}
+
 /// **The field on the card**: its image, the card it runs on and the octets a batch may take.
 pub struct CardField<'c> {
     card: &'c Card,
     module: Module,
     budget: u64,
     times: FieldTimes,
+    profile: Option<std::cell::RefCell<FieldProfile>>,
 }
 
 impl<'c> CardField<'c> {
@@ -173,7 +192,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -185,10 +204,52 @@ impl<'c> CardField<'c> {
         self.times
     }
 
+    /// Time every launch, transfer and allocation from here on ([`FieldProfile`]).
+    pub fn profile(&mut self) {
+        self.profile = Some(Default::default());
+    }
+
+    /// The profile read so far, when profiled.
+    pub fn profiled(&self) -> Option<FieldProfile> {
+        self.profile.as_ref().map(|p| p.borrow().clone())
+    }
+
+    /// A transfer or an allocation, timed after the stream drains when profiled.
+    fn timed<T>(&self, kind: Kind, f: impl FnOnce() -> T) -> T {
+        let Some(profile) = &self.profile else { return f() };
+        let _ = self.card.synchronize();
+        let started = Instant::now();
+        let out = f();
+        let ns = started.elapsed().as_nanos();
+        let mut p = profile.borrow_mut();
+        let slot = match kind {
+            Kind::Copy => &mut p.copies,
+            Kind::Alloc => &mut p.allocations,
+        };
+        slot.0 += 1;
+        slot.1 += ns;
+        out
+    }
+
     fn launch(&self, entry: &'static str, grid: u32, block: u32, params: &mut [*mut c_void]) -> Result<()> {
         self.card.current().map_err(device)?;
         let function = self.module.function(entry).map_err(|e| device(e.into()))?;
-        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, 0, params).map_err(|e| device(e.into()))
+        let started = match &self.profile {
+            Some(_) => {
+                self.card.synchronize().map_err(device)?;
+                Some(Instant::now())
+            }
+            None => None,
+        };
+        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, 0, params).map_err(|e| device(e.into()))?;
+        if let (Some(profile), Some(started)) = (&self.profile, started) {
+            self.card.synchronize().map_err(device)?;
+            let mut p = profile.borrow_mut();
+            let slot = p.kernels.entry(entry).or_insert((0, 0));
+            slot.0 += 1;
+            slot.1 += started.elapsed().as_nanos();
+        }
+        Ok(())
     }
 
     /// A grid striding `cells` with one thread a cell.
@@ -218,7 +279,7 @@ impl<'c> CardField<'c> {
         let card = self.card;
         let started = Instant::now();
         let l = field.layout();
-        let theta = card.upload(&field.theta).map_err(device)?;
+        let theta = self.timed(Kind::Copy, || card.upload(&field.theta)).map_err(device)?;
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();
         let mut phasor = Vec::new();
@@ -236,10 +297,10 @@ impl<'c> CardField<'c> {
             ring_n.push(1);
         }
         let roots: Vec<u64> = field.exponential().roots().iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
-        let phasor = card.upload(&phasor).map_err(device)?;
-        let ring_off = card.upload(&ring_off).map_err(device)?;
-        let ring_n = card.upload(&ring_n).map_err(device)?;
-        let roots_card = card.upload(&roots).map_err(device)?;
+        let phasor = self.timed(Kind::Copy, || card.upload(&phasor)).map_err(device)?;
+        let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
+        let ring_n = self.timed(Kind::Copy, || card.upload(&ring_n)).map_err(device)?;
+        let roots_card = self.timed(Kind::Copy, || card.upload(&roots)).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
@@ -291,7 +352,7 @@ impl<'c> CardField<'c> {
             roots: roots_card.device_ptr(),
             ..Words::default()
         };
-        let g = if returning { Some(card.zeroed::<i128>(l.len).map_err(device)?) } else { None };
+        let g = if returning { Some(self.timed(Kind::Alloc, || card.zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         // The batches: whole regions in order, each batch's every allocation within the budget.
         let octets = |sites: usize| region_octets(&d, returning, sites);
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
@@ -307,7 +368,7 @@ impl<'c> CardField<'c> {
             faces.extend(self.batch(field, &regions[batch], &mut words, g.as_ref())?);
         }
         let g = match g {
-            Some(g) => card.fetch(&g).map_err(device)?,
+            Some(g) => self.timed(Kind::Copy, || card.fetch(&g)).map_err(device)?,
             None => Vec::new(),
         };
         let pairs: u128 = regions.iter().map(|r| (heads * r.classes.len() * r.classes.len()) as u128).sum::<u128>() * d.ticks as u128;
@@ -326,19 +387,19 @@ impl<'c> CardField<'c> {
         let d = field.declaration;
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let card = self.card;
-        let alloc64 = |len: usize| card.alloc::<i64>(len.max(1)).map_err(device);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
         Ok(Tick {
-            read: card.alloc::<i32>((sites * dw).max(1)).map_err(device)?,
-            scale: card.alloc::<i128>(sites.max(1)).map_err(device)?,
+            read: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
+            scale: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
             qkv: alloc64(sites * 3 * m2)?,
             qf: alloc64(heads * sites * span)?,
             kf: alloc64(heads * sites * span)?,
             vf: alloc64(heads * sites * span)?,
-            e: card.alloc::<u64>((heads * pairs).max(1)).map_err(device)?,
-            mass: card.alloc::<u64>((heads * sites).max(1)).map_err(device)?,
+            e: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * pairs).max(1))).map_err(device)?,
+            mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
             y: alloc64(sites * m2)?,
-            read2: card.alloc::<i32>((sites * dw).max(1)).map_err(device)?,
-            scale2: card.alloc::<i128>(sites.max(1)).map_err(device)?,
+            read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
+            scale2: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
@@ -373,14 +434,14 @@ impl<'c> CardField<'c> {
             region_off.push(site_region.len() as u32);
         }
         let sites = site_region.len();
-        let site_region_c = card.upload(&site_region).map_err(device)?;
-        let site_pos_c = card.upload(&site_pos).map_err(device)?;
-        let region_off_c = card.upload(&region_off).map_err(device)?;
-        let region_eoff_c = card.upload(&region_eoff).map_err(device)?;
-        let classes_c = card.upload(&classes).map_err(device)?;
-        let unresolved_c = card.upload(&unresolved).map_err(device)?;
-        let status = card.zeroed::<u32>(1).map_err(device)?;
-        let x = card.alloc::<i64>(sites * dw).map_err(device)?;
+        let site_region_c = self.timed(Kind::Copy, || card.upload(&site_region)).map_err(device)?;
+        let site_pos_c = self.timed(Kind::Copy, || card.upload(&site_pos)).map_err(device)?;
+        let region_off_c = self.timed(Kind::Copy, || card.upload(&region_off)).map_err(device)?;
+        let region_eoff_c = self.timed(Kind::Copy, || card.upload(&region_eoff)).map_err(device)?;
+        let classes_c = self.timed(Kind::Copy, || card.upload(&classes)).map_err(device)?;
+        let unresolved_c = self.timed(Kind::Copy, || card.upload(&unresolved)).map_err(device)?;
+        let status = self.timed(Kind::Alloc, || card.zeroed::<u32>(1)).map_err(device)?;
+        let x = self.timed(Kind::Alloc, || card.alloc::<i64>(sites * dw)).map_err(device)?;
         words.t = sites as u32;
         words.r = regions.len() as u32;
         words.pairs = pairs as u64;
@@ -426,11 +487,11 @@ impl<'c> CardField<'c> {
             self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
         }
         // The faces at the unresolved sites.
-        let fread = card.alloc::<i32>(sites * dw).map_err(device)?;
-        let fscale = card.zeroed::<i128>(sites).map_err(device)?;
-        let z = card.alloc::<i64>(sites * a).map_err(device)?;
-        let masses = card.alloc::<u64>(sites * a).map_err(device)?;
-        let totals = card.zeroed::<i128>(sites).map_err(device)?;
+        let fread = self.timed(Kind::Alloc, || card.alloc::<i32>(sites * dw)).map_err(device)?;
+        let fscale = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites)).map_err(device)?;
+        let z = self.timed(Kind::Alloc, || card.alloc::<i64>(sites * a)).map_err(device)?;
+        let masses = self.timed(Kind::Alloc, || card.alloc::<u64>(sites * a)).map_err(device)?;
+        let totals = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
         self.affine("field_affine_x32", words, words.read, words.read_bias, words.rread, a, dw, fread.device_ptr(), dw, z.device_ptr(), a, 0, true)?;
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
@@ -439,8 +500,8 @@ impl<'c> CardField<'c> {
             self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, sites, pairs)?;
         }
         self.status(&status)?;
-        let masses = card.fetch(&masses).map_err(device)?;
-        let totals = card.fetch(&totals).map_err(device)?;
+        let masses = self.timed(Kind::Copy, || card.fetch(&masses)).map_err(device)?;
+        let totals = self.timed(Kind::Copy, || card.fetch(&totals)).map_err(device)?;
         let mut out = Vec::with_capacity(regions.len());
         for r in 0..regions.len() {
             let mut faces = Vec::with_capacity((region_off[r + 1] - region_off[r]) as usize);
@@ -496,7 +557,7 @@ impl<'c> CardField<'c> {
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let (m2, span) = (2 * m, 2 * n);
-        let alloc64 = |len: usize| card.alloc::<i64>(len.max(1)).map_err(device);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
         let dz = alloc64(sites * a)?;
         let dx = alloc64(sites * dw)?;
         let dr = alloc64(sites * dw)?;
@@ -512,7 +573,7 @@ impl<'c> CardField<'c> {
         let dq = alloc64(sites * m2)?;
         let dk = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
-        let ds = card.alloc::<i128>(pairs.max(1)).map_err(device)?;
+        let ds = self.timed(Kind::Alloc, || card.alloc::<i128>(pairs.max(1))).map_err(device)?;
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -585,8 +646,8 @@ impl<'c> CardField<'c> {
             rows_sites[filled[row] as usize] = t as u32;
             filled[row] += 1;
         }
-        let rows_off_c = card.upload(&rows_off).map_err(device)?;
-        let rows_sites_c = card.upload(&rows_sites).map_err(device)?;
+        let rows_off_c = self.timed(Kind::Copy, || card.upload(&rows_off)).map_err(device)?;
+        let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
         let (mut gp, mut dxp, mut rop, mut rsp) = (g.device_ptr(), dx.device_ptr(), rows_off_c.device_ptr(), rows_sites_c.device_ptr());
         self.launch("field_encoding", Self::cells(((a + 1) * dw) as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rop), arg(&mut rsp)])?;
         Ok(())
@@ -594,7 +655,7 @@ impl<'c> CardField<'c> {
 
     /// The batch's refusals, read off the card.
     fn status(&self, status: &CardBuffer<'c, u32>) -> Result<()> {
-        let bits = self.card.fetch(status).map_err(device)?[0];
+        let bits = self.timed(Kind::Copy, || self.card.fetch(status)).map_err(device)?[0];
         if bits == 0 {
             return Ok(());
         }
