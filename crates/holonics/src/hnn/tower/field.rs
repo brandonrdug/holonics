@@ -51,9 +51,11 @@
 //! sweeps: each sweep reads every unresolved site's face and releases every site the field
 //! resolves (its top class outweighs every other together); where it resolves none, the face is
 //! read again with the question's sites unresolved and the one site whose top class carries the
-//! most news ([`by_news`]) is released. The void is the answer's boundary and follows its
-//! content: it is released only at the answer's first open site, every answer site before it
-//! released, and it ends the answer (the sites past it leave the region). The released sites are
+//! most news ([`by_news`]) is released. The void is the answer's boundary, one nested variable
+//! (a void at `t` implies the void past `t`): its extent is read once, at the opening, where the
+//! earliest site whose void the field resolves is released and the sites past it leave the region;
+//! after the opening the void is released only at the answer's first open site, every answer site
+//! before it released, and it ends the answer. The released sites are
 //! present terrain for the next sweep. A class is never spoken in order. Every sweep releases a
 //! site of every open problem, so `S` at the answer's open sites lets every release end; the
 //! exterior bounds its time ([`ReleaseSweep`]).
@@ -932,11 +934,22 @@ impl Field {
     /// resolves: whose top class outweighs every other class together (`2 m_c > Σ m`). When it
     /// resolves none, the face is read again with the question's sites unresolved (the released
     /// answer sites kept) and the one site whose top class carries the most news ([`by_news`]) is
-    /// released, so a sweep always releases at least one site. The `void` is the answer's boundary
-    /// and follows its content: a site whose top class is the void is released only when it is the
-    /// answer's first open site (every answer site before it released), and every site after it
-    /// then leaves the region (the answer has ended). Returns the answer as released: its classes
-    /// up to its first site still unresolved after the last sweep, or through its void.
+    /// released, so a sweep always releases at least one site. The `void` is the answer's boundary,
+    /// one nested variable: at the opening, the earliest site whose void the field resolves is
+    /// released and every site past it leaves the region; after it, a site whose top class is the
+    /// void is released only when it is the answer's first open site (every answer site before it
+    /// released), and it ends the answer. Returns the answer as released: its classes up to its
+    /// first site still unresolved after the last sweep, or through its void.
+    ///
+    /// Why the extent is read at the opening (the fifth reading, November 1): with the void
+    /// released only at the front, every region kept the codec's whole extent (1,229 sites against
+    /// held answers of median 254) until its content reached the end, so every sweep read the whole
+    /// extent and the free release stopped at its deadline with 82 of 128 answers open, their marks
+    /// never read. At the opening nothing is released, so no void is read beside a released void
+    /// and the void's face at `t` is the field's `P(L ≤ t)`: the earliest `t` where it resolves
+    /// (`2 m_void > Σ m`) is the extent's median, the majority release of the one variable, read
+    /// once. The creep of §15 came from iterating that release against its own released voids,
+    /// which the front alone now does.
     ///
     /// Why the boundary follows the content (the fourth reading on the card, November 1): released
     /// as an ordinary class, the void crept. A released void at `t + 1` says the answer's extent `L`
@@ -990,10 +1003,23 @@ impl Field {
                 let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
                 read(&views)?
             };
-            // Each open problem's first open answer site: the one site where its boundary, the
-            // void, may be released (every answer site before it released).
+            // Each open problem's first open answer site: after the opening, the one site where its
+            // boundary, the void, may be released (every answer site before it released).
             let first: Vec<usize> = live.iter().map(|&k| (states[k].2..states[k].1.len()).find(|&t| states[k].1[t]).unwrap_or(states[k].1.len())).collect();
-            let admitted = |j: usize, (t, c): (usize, usize)| c != void || t == first[j];
+            // At the opening, the extent: the earliest site whose void the field resolves.
+            let extent: Vec<Option<usize>> = if done == 0 {
+                faces.iter().map(|faces| faces.iter().enumerate().find_map(|(t, face)| face.as_ref().and_then(|f| resolved(f)).filter(|&c| c == void).map(|_| t))).collect()
+            } else {
+                vec![None; live.len()]
+            };
+            for (&k, end) in live.iter().zip(&extent) {
+                if let Some(end) = end {
+                    progress.cut += 1;
+                    progress.cut_sites += end - states[k].2;
+                }
+            }
+            // A site past the extent leaves with the region, so it is not released.
+            let admitted = |j: usize, (t, c): (usize, usize)| (c != void || t == first[j] || extent[j] == Some(t)) && extent[j].is_none_or(|e| t <= e);
             // The sites the field resolves: the top class outweighs every other together.
             let mut released: Vec<Vec<(usize, usize)>> = faces.iter().enumerate().map(|(j, faces)| faces.iter().enumerate().filter_map(|(t, face)| face.as_ref().and_then(|f| resolved(f).map(|c| (t, c)))).filter(|&tc| admitted(j, tc)).collect()).collect();
             progress.resolved += released.iter().map(Vec::len).sum::<usize>();
@@ -1017,8 +1043,7 @@ impl Field {
                     classes[t] = top;
                     unresolved[t] = false;
                 }
-                // The answer ends at its released void, and the region with it: the sites past it
-                // leave (no answer site before it is open).
+                // The region ends at its released void: the sites past it leave.
                 if let Some(end) = (*start..classes.len()).find(|&t| !unresolved[t] && classes[t] == void) {
                     classes.truncate(end + 1);
                     unresolved.truncate(end + 1);
@@ -1067,6 +1092,9 @@ pub struct ReleaseSweep {
     pub live: usize,
     pub resolved: usize,
     pub by_news: usize,
+    /// The problems whose extent the opening read bounded, and those extents' answer sites.
+    pub cut: usize,
+    pub cut_sites: usize,
 }
 
 /// [definition; agent-inferred, November 1] **The release's order is the news a site's top class

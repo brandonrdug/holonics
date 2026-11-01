@@ -448,6 +448,16 @@ fn next_text(next: Option<FieldNext>) -> String {
 /// and the run stops, its partial evidence reported as incomplete (`FIELD_STOPPED`). Why: the
 /// second reading's bound was an outside watcher that stopped the trainer inside its first lap,
 /// so 336 sections of learning left no state and nothing could be released or read.
+///
+/// [agent-inferred, November 1] **A lap starts only while the time left holds its bound.** `LAPS`
+/// is a count bound; before each lap after the first, the run continues only if the elapsed time
+/// plus that lap's projected bound stays within `STOP_MS`, and otherwise it ends at the last
+/// rested lap (`FIELD_LAPS_HELD`). The body grows at most once in a run, because the run carries
+/// only the two projections (before and after one growth); a second growth is held and the run
+/// ends there (`FIELD_GROW_HELD`), and the keys are checked to cover that one growth before any
+/// lap runs. Why: the fifth reading sized its laps from its time, so `LAPS` and the time bound
+/// were the same number read twice, and a lap that could not finish would only have stopped the run
+/// with its partial step.
 pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if !(args.len() == 22 || args.len() == 24) {
         return Err("train-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION LAPS RATE LAP_MS GROWN_LAP_MS STOP_MS OUT [FROM FROM_SHA]".into());
@@ -488,17 +498,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     if learner.field.declaration.reach < reach {
         return Err(format!("a continued learner whose reach ({}) is shorter than the passages' regions ({reach})", learner.field.declaration.reach).into());
     }
-    // The masks and tails read the key file's last word; every growth this run could make reads
-    // the key file's front past the founding, and must not reach it.
+    // The masks and tails read the key file's last word; the one growth this run can make (its
+    // projections are of the declaration and of it grown once) reads the key file's front past
+    // the founding, and must not reach it.
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    {
-        let (mut declaration, mut drawn) = (learner.field.declaration, learner.drawn);
-        for _ in 1..laps {
-            drawn += 4 * declaration.growth_draws(2);
-            declaration = declaration.grown(2).map_err(|e| e.to_string())?;
-        }
+    if laps > 1 {
+        let drawn = learner.drawn + 4 * learner.field.declaration.growth_draws(2);
         if drawn + 8 > keys.len() {
-            return Err(format!("a key file of {} bytes, and {} laps may grow the body to read {drawn} before its last word", keys.len(), laps).into());
+            return Err(format!("a key file of {} bytes, and a growth would read {drawn} before its last word", keys.len()).into());
         }
     }
     // Sections of problems of like length, and the withheld problems (as many as the held read's).
@@ -525,6 +532,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut previous = (code, sites);
     let mut grown = false;
     for lap in 0..laps {
+        // A lap starts only where the time left holds its bound: no lap is begun that its own
+        // projection says could pass the run's deadline.
+        let bound = if grown { grown_lap_ms } else { lap_ms };
+        let elapsed = started.elapsed().as_millis();
+        if lap > 0 && elapsed + bound > stop_ms {
+            println!("FIELD_LAPS_HELD lap={lap} reason=time left={} bound={bound} ms={elapsed}", stop_ms.saturating_sub(elapsed));
+            break;
+        }
         // The learner's own lap count keys the walk and the draws: a continued run moves on.
         let read = learner.laps;
         let mut draw = read * train_set.len() as u64;
@@ -594,6 +609,12 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.
         if (code as i128) * (previous.1 as i128) >= (previous.0 as i128) * (unseen_sites as i128) && lap + 1 < laps {
+            if grown {
+                // A second growth has no projection in this run: the run rests at its last lap and
+                // the next run projects the declaration grown again.
+                println!("FIELD_GROW_HELD lap={lap} reason=a second growth has no projection ms={}", started.elapsed().as_millis());
+                break;
+            }
             learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
             grown = true;
             let d = learner.field.declaration;
@@ -814,7 +835,7 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
 fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
     move |sweep| {
         let ms = started.elapsed().as_millis();
-        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} resolved={} by_news={} ms={ms}", sweep.done, sweep.live, sweep.resolved, sweep.by_news);
+        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} resolved={} by_news={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.resolved, sweep.by_news, sweep.cut, sweep.cut_sites);
         *last = *sweep;
         ms < stop_ms
     }
@@ -972,7 +993,8 @@ mod tests {
             }
             train(&args, &mut host())
         };
-        let run = |out: &str, from: Option<(String, String)>| bounded(out, "600000", from);
+        // The run holds two laps of its bound, so the second lap starts.
+        let run = |out: &str, from: Option<(String, String)>| bounded(out, "1200000", from);
         // A run past its own bound rests at the section it reached and writes no lap's state.
         bounded(&at("S"), "1", None).expect("stopped");
         assert!(dir.join("S/STATE.stopped").exists() && !dir.join("S/STATE.0").exists());

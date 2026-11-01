@@ -237,17 +237,23 @@ fn law_release(field: &Field, question: &[usize], answer: usize, sweeps: usize, 
     let start = question.len();
     let mut classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
     let mut open: Vec<bool> = (0..classes.len()).map(|t| t >= start).collect();
-    for _ in 0..sweeps {
+    for sweep in 0..sweeps {
         if !open.iter().any(|&u| u) {
             break;
         }
         let first = (start..open.len()).find(|&t| open[t]).unwrap();
         let faces = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
+        // At the opening, the earliest site whose void resolves bounds the answer.
+        let extent = if sweep == 0 {
+            faces.iter().enumerate().find(|(_, face)| face.as_ref().is_some_and(|f| f.rank_top() == void && 2 * f.masses[void] > f.total)).map(|(t, _)| t)
+        } else {
+            None
+        };
         let mut released: Vec<(usize, usize)> = Vec::new();
         for (t, face) in faces.iter().enumerate() {
             if let Some(face) = face {
                 let top = face.rank_top();
-                if 2 * face.masses[top] > face.total && (top != void || t == first) {
+                if 2 * face.masses[top] > face.total && (top != void || t == first || Some(t) == extent) && extent.is_none_or(|e| t <= e) {
                     released.push((t, top));
                 }
             }
@@ -255,7 +261,7 @@ fn law_release(field: &Field, question: &[usize], answer: usize, sweeps: usize, 
         if released.is_empty() {
             let prior_open: Vec<bool> = open.iter().enumerate().map(|(t, &u)| u || t < start).collect();
             let prior = field.faces(&Region { classes: &classes, unresolved: &prior_open }).unwrap();
-            released.push(by_news(&faces, &prior).unwrap().into_iter().find(|&(t, c)| c != void || t == first).unwrap());
+            released.push(by_news(&faces, &prior).unwrap().into_iter().find(|&(t, c)| c != void || t == first || Some(t) == extent).unwrap());
         }
         for (t, c) in released {
             classes[t] = c;
@@ -390,12 +396,13 @@ fn releases_read_together_are_each_problem_s_own() {
     }
 }
 
-/// The void is the answer's boundary and follows its content. A read whose void resolves at a site
-/// next to a released void (the hazard of an extent: given `L ≤ t`, `L < t` is likely), and at
-/// every site past the fifth, while no content site resolves, would, released as an ordinary
-/// class, creep from the fifth site to the first and release nothing; held to the answer's first
-/// open site, the void waits for the content and the release is the five content sites, then its
-/// void.
+/// The void is the answer's boundary, one nested variable. A read whose void resolves at every
+/// site past the fifth, and at a site next to a released void (the hazard of an extent: given
+/// `L ≤ t`, `L < t` is likely), while no content site resolves, would, released as an ordinary
+/// class, creep from the fifth site to the first and release nothing. Read once at the opening,
+/// the extent is the fifth site: the region is cut there, every later read is of the bounded
+/// region, the void creeps only where it is the first open site, and the release is four content
+/// sites, then its void.
 #[test]
 fn the_void_follows_the_released_content() {
     let field = shaped(1);
@@ -423,13 +430,20 @@ fn the_void_follows_the_released_content() {
             .collect())
     };
     let mut asked = Vec::new();
-    let released = field.release_with(&[(&question, answer)], answer + 1, void, &mut read, &mut |s| {
+    let mut lengths = Vec::new();
+    let mut counted = |regions: &[Region]| {
+        lengths.extend(regions.iter().map(|r| r.classes.len()));
+        read(regions)
+    };
+    let released = field.release_with(&[(&question, answer)], answer + 1, void, &mut counted, &mut |s| {
         asked.push(*s);
         true
     }).unwrap();
-    assert_eq!(released, vec![vec![2, 2, 2, 2, 2, void]]);
+    assert_eq!(released, vec![vec![2, 2, 2, 2, void]]);
     let last = asked.last().unwrap();
-    assert_eq!((last.live, last.resolved, last.by_news), (0, 1, 5), "five content sites by news, then the void resolved at the first open site");
+    assert_eq!((last.live, last.resolved, last.by_news, last.cut, last.cut_sites), (0, 2, 4, 1, 5), "the extent at the opening, four content sites by news, then the void at the first open site");
+    assert_eq!(lengths[0], start + answer, "the opening reads the whole extent");
+    assert!(lengths[1..].iter().all(|&n| n == start + 6), "every later read is of the bounded region: {lengths:?}");
 }
 
 /// The exterior that stops a release after `k` sweeps receives the release of `k` sweeps; it is

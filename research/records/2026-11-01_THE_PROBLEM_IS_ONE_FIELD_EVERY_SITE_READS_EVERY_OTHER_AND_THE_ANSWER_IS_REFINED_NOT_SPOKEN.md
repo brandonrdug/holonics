@@ -664,3 +664,72 @@ Not adopted yet: the rows' and columns' returns in the same tiles and narrow car
 a section), and the certificate's repeated reads of one section (about 5.5 reads a section). The
 fifth reading is `reading-5/checks.sh` (parity at A and B, the profile, time-field), then
 `reading5.sh` from the two time logs.
+
+## 16. The fifth reading: the text around the answer was learned, its digits not yet, and the release ran out of time
+
+[measured] The fifth reading (receipts in `…_receipts/reading-5/`, count-only; field_pass
+`99c8820e…993e78` at d5cc328ce): the card's parity with the host passed at A and grown by two
+(`parityA7`, `parityB7`). The tiled contact ran at 1.26 ms a launch (3.81 ms in the fourth reading);
+the columns' return 1.04 ms, the rows' 1.15 ms. time-field projected a lap at 96.7 s at A and
+183.4 s at B, so the reading trained `⌊540 000 / 96 682⌋ = 5` laps and reserved 300 s for the release.
+
+| Reading | Value |
+|---|---|
+| The laps | five, 48.9 to 49.8 s each (82.8 s in the fourth reading); 394, 405, 408, 411 and 413 of 413 sections deposited; the sections' code after their steps 3.792, 3.477, 3.374, 3.172, 3.096 |
+| The withheld answers read beside their neighbours | 4.534, 4.192, 3.560, 3.082, 2.895 bits a site (36,763 sites) |
+| The held answers beside their neighbours | 4.548, 4.178, 3.553, 3.071, 2.885; their digits 4.815, 4.263, 4.021, 3.684, 3.464; the text 4.496 to 2.772 |
+| The held answers at the opening (the question alone) | 5.341, 5.467, 5.743, 5.731, 5.233; the digits 5.765 to 6.017 |
+| The card in training | 11,826 reads in 123.7 s, 2,065 returns in 115.7 s, 9.49·10¹¹ pairs in 250.0 s; the largest store 3.02 GB |
+| The release | the free set 590 sweeps in 300 s (509 ms a sweep) and stopped at its deadline with 82 of 128 open; the marks never ran (399 open); 1,180 reads, 2.17·10¹² pairs |
+| The board | 4,319 MiB at its peak |
+| The claim | the first calculation from the question's numbers in 0 of 128 (five calculations written, three of them right sums, none from the question) |
+
+Of the 82 open answers, 77 had released only their first 1 to 16 sites, in order, while sites
+further on were released; of the 46 that ended, 34 ran the whole 1,229-site extent, about 96% of
+it zeros. The three text answers ran to their end in 942 sweeps and read as GSM8K's text around
+calculations: words, `<<`, `=`, `>>`, `####`, with numbers that do not come from the question.
+
+[agent-inferred] Three causes.
+
+1. **The digits are not yet read from the question.** Beside their neighbours the held answers'
+   digits reached the one-byte table (3.464 against 3.459) and fell every lap (by 0.55, 0.24, 0.34
+   and 0.22 bits); the text fell below it (2.772). Read from the question alone the answers did not
+   fall (5.341 to 5.233). The field has learned the answer's text and its local order, but no digit
+   is yet read from where the question holds it, so no number written can come from the question.
+   The training had not finished: every withheld read fell at every lap, by 0.19 bits at the last.
+2. **The front stalled behind released content.** The release admits every content site and,
+   where none resolves, the site of the most news, wherever it is. Content far from the front
+   resolved first (a zero beside a zero), each released site made its neighbours resolve, and the
+   front, whose read is the spread of a real answer, never resolved and was never the most news.
+   The void is released only at the front (§15), so an answer whose front stalled kept its whole
+   extent and filled it with the commonest content.
+3. **Every sweep read the whole extent.** A region kept its question and all 1,229 answer sites
+   until its front reached its void, so each sweep cost the opening's, 509 ms, and the free set
+   reached its deadline after 590 sweeps.
+
+**The repairs.**
+- **The extent is read once, at the opening** (`Field::release_with`, test
+  `the_void_follows_the_released_content`). The void is one nested variable: the void at `t` holds
+  exactly when the extent `L ≤ t`, so its face at `t` is `P(L ≤ t)`, monotone in `t`, and the
+  earliest site whose void resolves (`2·m_void > total`) is where `P(L ≤ t)` first passes one half,
+  the median extent the field reads from the question. At the opening that site's void is
+  released and the sites past it leave the region unreleased; it is read once, from the question with every
+  answer site open, so no released void is read beside another (§15's creep cannot start). After
+  the opening the void is released only at the front, as before. An answer whose void resolves
+  nowhere at the opening keeps its extent until its front reaches the void. Every later sweep reads
+  the question and the extent only; `ReleaseSweep` counts the problems cut (`cut`) and their extents
+  (`cut_sites`).
+- **A lap starts only while the time left holds its bound** (`field_train::train`). `LAPS` is a
+  count bound; before each lap after the first the trainer continues only if the elapsed time plus
+  that lap's projected bound stays within the run's (`FIELD_LAPS_HELD`). The body grows at most once
+  a run, because a run carries two projections, before and after one growth (`FIELD_GROW_HELD`),
+  and the keys are checked to cover that growth before any lap runs.
+- **The sixth reading continues the fifth's learner** (`reading-6/reading6.sh`): from `STATE.4`,
+  600 s of training (about ten more laps at the fifth reading's longest lap, 50.3 s with its reads),
+  240 s of release, 30 s of text, the same 900 s. The kernels did not change, so the fifth reading's
+  parity and projections stand. The release's deadline was not raised: its law changed, and the
+  partition of the 900 s moved toward the read that had not finished.
+
+Not adopted yet: a strictly front-first release (it is a pass a site again); release in blocks;
+open sites carrying their previous faces into the next sweep (self-conditioning); revising released
+sites; the returns in tiles and narrow carriers.
