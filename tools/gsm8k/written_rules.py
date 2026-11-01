@@ -71,7 +71,11 @@ The rules, fixed before any release was read:
 - (b) markup: each `<<expression=c>>` in the answer whose expression is numerals, `.`, `+ - * /`
   and parentheses is right when `c` is its exact value (rationals throughout).
 - (c) operands from the question: the answer's first such calculation takes every operand from the
-  numerals the question writes, or from the values of the number words in `NUMBER_WORDS`.
+  numerals the question writes, or from the values of the number words in `NUMBER_WORDS`. Its
+  foil, `c_foil` at the line's end (added November 1, after the field's sixth reading wrote its
+  first calculations from a few common values): the same first calculation read against the next
+  problem's question (the last against the first's), so a release that writes common numbers
+  whatever it is asked counts as often there as on its own question.
 - (b) at the equals: at each calculation of a held-out answer, the release written after its `=`
   is right when the bytes before its first `>>` are the expression's exact value; a release
   without `>>` is unfinished and not right. A calculation is met when the training text holds the
@@ -171,9 +175,10 @@ def read_tsv(path, columns):
 
 
 def free_reads(problems, answers, common):
-    on = calcs = right = firsts = from_question = 0
-    for (q, _), answer in zip(problems, answers):
+    on = calcs = right = firsts = from_question = foil = 0
+    for i, ((q, _), answer) in enumerate(zip(problems, answers)):
         question = q.decode("utf-8", "replace")
+        other = problems[(i + 1) % len(problems)][0].decode("utf-8", "replace")
         text = answer.split(b"\n\n")[0].decode("utf-8", "replace")
         content = {w for w in WORD.findall(question.lower()) if len(w) >= 4 and w not in common}
         on += bool(content & set(WORD.findall(text.lower())))
@@ -190,7 +195,8 @@ def free_reads(problems, answers, common):
             firsts += 1
             operands = [Fraction(t) for t in re.findall(r"\d*\.\d+|\d+", first)]
             from_question += all(o in question_numbers(question) for o in operands)
-    return on, calcs, right, firsts, from_question
+            foil += all(o in question_numbers(other) for o in operands)
+    return on, calcs, right, firsts, from_question, foil
 
 
 def mark_reads(problems, marks, train):
@@ -386,7 +392,7 @@ def main():
                 raise SystemExit(f"{d}/FREE.tsv does not hold one release a problem in order")
             answers = [unescape(r[1]) for r in free]
             marks = read_tsv(f"{d}/MARKS.tsv", 4)
-        on, calcs, right, firsts, from_question = free_reads(problems, answers, common)
+        on, calcs, right, firsts, from_question, foil = free_reads(problems, answers, common)
         line = (
             f"WRITTEN dir={d} problems={len(problems)} a_on_problem={on} b_free_calculations={calcs} "
             f"b_free_right={right} c_first_calculations={firsts} c_from_question={from_question}"
@@ -400,7 +406,7 @@ def main():
                 f" b_equals={r}/{n} met={seen['met'][1]}/{seen['met'][0]} "
                 f"never_met={seen['never'][1]}/{seen['never'][0]} binary {ops}"
             )
-        print(line)
+        print(f"{line} c_foil={foil}")
         if rings and marks is not None:
             print(f"RINGS dir={d} " + rings_line(each))
         if gaps and marks is not None:

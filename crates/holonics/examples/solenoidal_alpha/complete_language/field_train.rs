@@ -292,15 +292,16 @@ pub(super) fn walk(seed: u64, read: u64, sections: usize) -> Vec<usize> {
 pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 
 /// The held-out read: at the release's own opening (the region the question and the codec's
-/// answer extent, every answer site unresolved at once) and with each site's neighbours resolved
-/// ([`context_regions`], the region the question, the answer and its first void), the field's code
-/// over the answer's classes and its first void (its digits' and its text's apart), on `2^(−20)`
-/// bits, beside each one's count: `[opening, opening digits, opening text, context, context
-/// digits, context text]`. A reading only: no decision of the run reads it.
-fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 6]> {
+/// answer extent, every answer site unresolved at once), with each site's neighbours resolved
+/// ([`context_regions`], the region the question, the answer and its first void), and the same
+/// beside another problem's question (the foil, [`held_regions`]), the field's code over the
+/// answer's classes and its first void (its digits' and its text's apart), on `2^(−20)` bits,
+/// beside each one's count: `[opening, opening digits, opening text, context, context digits,
+/// context text, foil, foil digits, foil text]`. A reading only: no decision of the run reads it.
+fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 9]> {
     let regions = held_regions(codec, problems);
     let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u }).collect();
-    let mut out = [(0i64, 0usize); 6];
+    let mut out = [(0i64, 0usize); 9];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
         for ((region, faces), &(_, _, base)) in chunk.iter().zip(faces).zip(parts) {
@@ -338,8 +339,18 @@ pub(super) fn context_regions(void: usize, q: &[usize], a: &[usize], length: usi
     (0..CONTEXT).map(|r| (classes.clone(), (0..length).map(|t| t >= q.len() && t < end && (t - q.len()) % CONTEXT == r).collect())).collect()
 }
 
-/// The held-out read's regions ([`held_out`]): each problem's opening (base 0) and its
-/// [`CONTEXT`] parts read with their neighbours (base 3).
+/// The held-out read's regions ([`held_out`]): each problem's opening (base 0), its [`CONTEXT`]
+/// parts read with their neighbours (base 3), and the same parts beside the next problem's
+/// question (base 6; the last problem beside the first's).
+///
+/// [agent-inferred, November 1] Why the foil: the sixth reading's answers beside their neighbours
+/// coded their digits below the bytes' own table (2.776 bits against 3.46), while the release
+/// wrote the commonest numbers and the answers read from the question alone did not fall (5.16 to
+/// 5.70). A neighbour inside the answer carries much of a digit (the result after `>>` repeats
+/// the one before it), so the context read cannot say whether the question is read at all. The
+/// same answer read beside another problem's question codes no more bits than beside its own
+/// unless the field reads its own question: the difference, foil minus context, is what the
+/// question tells the answer beyond its neighbours.
 pub(super) fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
     let mut regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
         .iter()
@@ -350,6 +361,11 @@ pub(super) fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<
         })
         .collect();
     regions.extend(problems.iter().flat_map(|(q, a, _)| context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 3))));
+    let n = problems.len();
+    regions.extend((0..n).flat_map(|i| {
+        let ((_, a, _), (q, _, _)) = (&problems[i], &problems[(i + 1) % n]);
+        context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 6))
+    }));
     regions
 }
 
@@ -402,9 +418,9 @@ fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Proble
     Ok((code, sites, next))
 }
 
-fn held_text(held: &[(i64, usize); 6]) -> String {
+fn held_text(held: &[(i64, usize); 9]) -> String {
     format!(
-        "answer={} digits={} text={} classes={} context={} context_digits={} context_text={} context_classes={}",
+        "answer={} digits={} text={} classes={} context={} context_digits={} context_text={} context_classes={} foil={} foil_digits={} foil_text={}",
         bits(held[0].0, held[0].1),
         bits(held[1].0, held[1].1),
         bits(held[2].0, held[2].1),
@@ -412,7 +428,10 @@ fn held_text(held: &[(i64, usize); 6]) -> String {
         bits(held[3].0, held[3].1),
         bits(held[4].0, held[4].1),
         bits(held[5].0, held[5].1),
-        held[3].1
+        held[3].1,
+        bits(held[6].0, held[6].1),
+        bits(held[7].0, held[7].1),
+        bits(held[8].0, held[8].1)
     )
 }
 
@@ -1091,6 +1110,27 @@ mod tests {
 
     /// The withheld problems are read with their neighbours, over the same sites every lap: each
     /// answer site and its first void once, in one of four parts, with every other site resolved.
+    #[test]
+    fn the_held_foil_reads_each_answer_beside_the_next_question() {
+        let text: [(&[u8], &[u8]); 3] = [(b"Ann has 3 pens.", b"<<3+1=4>>4\n#### 4"), (b"Bo has 12 cups and 5 more.", b"<<12+5=17>>17\n#### 17"), (b"Cy has 7.", b"#### 7")];
+        let raw: Vec<(Vec<u8>, Vec<u8>)> = text.iter().map(|(q, a)| (q.to_vec(), a.to_vec())).collect();
+        let codec = FieldCodec::found(Units::bytes(), &raw).unwrap();
+        let problems: Problems = raw.iter().map(|(q, a)| (codec.encode(&question_text(q)).unwrap(), codec.encode(a).unwrap(), a.len())).collect();
+        let regions = held_regions(&codec, &problems);
+        assert_eq!(regions.len(), 3 + 2 * 3 * CONTEXT);
+        for (i, parts) in regions.iter().filter(|r| r.2 == 6).collect::<Vec<_>>().chunks(CONTEXT).enumerate() {
+            let (q, a) = (&problems[(i + 1) % 3].0, &problems[i].1);
+            let own = regions.iter().filter(|r| r.2 == 3).nth(i * CONTEXT).unwrap();
+            for part in parts {
+                assert_eq!(&part.0[..q.len()], &q[..], "the next problem's question");
+                assert_eq!(&part.0[q.len()..q.len() + a.len()], &a[..], "the problem's own answer");
+                assert!(part.1[..q.len()].iter().all(|&u| !u), "the question resolved");
+            }
+            let open = |r: &(Vec<usize>, Vec<bool>, usize), start: usize| r.1[start..].to_vec();
+            assert_eq!(open(parts[0], q.len()), open(own, problems[i].0.len()), "the answer's sites read as in its own context");
+        }
+    }
+
     #[test]
     fn the_withheld_problems_read_each_answer_site_once_beside_its_neighbours() {
         let problems: Problems = (0..5usize).map(|i| (vec![1; 3 + i], vec![2; 1 + i], 1 + i)).collect();
