@@ -5,20 +5,22 @@
 //! `parity-field` founds the field as `train-field` does (and widens it by `GROW` when `GROW > 1`)
 //! and has two learners, one through the host ([`HostField`]) and one through the card, each form
 //! and take the first `SECTIONS` sections of its next lap exactly as `train-field` does (the keyed
-//! walk, tails and shapes, the second sweep's mixtures read from its own field), then read its held
-//! step on the withheld problems as a lap's end does. Every read each makes (the masks' reads, the
-//! held step's reads, the section's read and return, and each of the certificate's rereads) is
-//! compared face for face (each unresolved site's masses and total) and covector entry for entry,
-//! and the regions and the learners' texts after each section; then the field releases the first
-//! `RELEASES` held problems through both, `SWEEPS` sweeps each, the card's read together, each
-//! release compared whole (its sites, lock rungs, rungs ridden, circulation and last mixtures).
+//! walk, tails and shapes, the front regions' read 2 carrying faces read from its own field and
+//! their locks), then read its held step on the withheld problems as a lap's end does. Every read
+//! each makes (the masks' reads, the held step's reads, the section's read and return, and each of the
+//! certificate's rereads) is compared face for face (each unresolved site's masses and total) and
+//! covector entry for entry, and the regions and the learners' texts after each section; then the
+//! field releases the first `RELEASES` held problems through both, `SWEEPS` sweeps each, the card's
+//! read together, each release compared whole (its sites, the sweep each was reached and locked, the
+//! extent's reading, lock rungs, rungs ridden, circulation and last mixtures).
 //! `time-field` reads the card alone over the opening sections and the opening releases and
-//! projects a lap and a release of the held problems from the measured upper time a site pair.
+//! projects a lap from the measured upper time a site pair, and the held problems' releases from that
+//! time and the sweeps the front's measured speed gives.
 
-use super::field_train::{held_regions, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
+use super::field_train::{extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, ReleaseSweep};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
@@ -64,7 +66,7 @@ impl Passage {
     /// problems' read with their neighbours (the held step then read by the caller).
     fn regions(&self, members: &[usize], draw: &mut u64, withheld: bool, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
         if withheld {
-            return Ok((unseen_regions(&self.codec, &self.train, &self.unseen, self.seed).into_iter().map(|(c, u)| (c, u, Vec::new())).collect(), None));
+            return Ok((unseen_regions(&self.codec, &self.train, &self.unseen, self.seed).into_iter().map(|(c, u)| TrainRegion::plain(c, u)).collect(), None));
         }
         section_regions(&self.codec, &self.train, members, self.seed, draw, learner, realization)
     }
@@ -284,9 +286,9 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         reads_all += calls;
         faces_unequal += faces;
         entries_unequal += entries;
-        // The landmarks of a section's first region (a masked or second-sweep region, its last four
-        // sites against its first half), read on both.
-        let marks_equal = match host_views.first() {
+        // The landmarks of a section's first region that carries a lock (else its first region; a
+        // masked, read-1 or read-2 region, its last four sites against its first half), read on both.
+        let marks_equal = match host_views.iter().find(|r| r.locked.iter().any(|&l| l)).or(host_views.first()) {
             Some(r) if !end => {
                 let n = r.classes.len();
                 let sites: Vec<usize> = (n.saturating_sub(4)..n).collect();
@@ -320,12 +322,23 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         let host = host_learner.field.release(q, open, sweeps, p.codec.void()).map_err(|e| e.to_string())?;
         // The landmarks of every content site, read from the last state on both.
         let unresolved: Vec<bool> = host.faces.iter().map(Option::is_some).collect();
-        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &[] };
+        let locked = locks_of(&host);
+        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &locked };
         let sites: Vec<usize> = (host.start..host.start + host.sites.len()).collect();
         let marks_equal = sites.is_empty() || host_learner.field.landmarks(&region, q.len(), &sites, 3).map_err(|e| e.to_string())? == card.read_landmarks(&card_learner.field, &region, q.len(), &sites, 3).map_err(|e| e.to_string())?;
         let equal = &host == carded && marks_equal;
         releases_unequal += usize::from(!equal);
-        println!("FIELD_PARITY_RELEASE problem={i} question={} released={} open={} free={} bound={} equal={equal} landmarks_equal={marks_equal} host_ms={}", q.len(), host.sites.len(), host.open, host.free, host.bound, ms(t0.elapsed().as_nanos()));
+        println!(
+            "FIELD_PARITY_RELEASE problem={i} question={} released={} reached={} open={} extent={} free={} bound={} equal={equal} landmarks_equal={marks_equal} host_ms={}",
+            q.len(),
+            host.sites.len(),
+            host.reached.iter().flatten().count(),
+            host.open,
+            extent_text(host.extent),
+            host.free,
+            host.bound,
+            ms(t0.elapsed().as_nanos())
+        );
     }
     println!(
         "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
@@ -351,7 +364,16 @@ fn release_rows(heads: usize, ticks: usize, sweeps: usize, sites: usize) -> u128
 /// SECTIONS RATE RELEASES SWEEPS`: the card alone over the opening sections of the founded field's
 /// first lap and its opening free releases; each section's and release's time and site pairs, and the
 /// lap and the held problems' releases (free and at each calculation's equals) projected from the
-/// largest time a site pair measured.
+/// largest time a site pair measured. [definition; agent-inferred, November 1] **The release's sweeps
+/// are the front's** (the dispersing field's §14.9): a release's front moves at most five sites a
+/// sweep and only where a site has locked, so the sweeps a release runs are not a bound chosen but
+/// its answer's extent over the front's speed. The speed of an opening release is the sites its front
+/// reached over the sweeps it ran (a release that ended, up to the sweep of its last lock or its
+/// extent's reading; one that did not, all it ran), the void site where it locked on the void counted
+/// among the sites, and the projection takes the slowest of them, the upper end: `⌈A · sweeps /
+/// reached⌉` sweeps for the codec's answer extent `A`. Why the slowest and not the mean: the deadline
+/// is the projection's upper end, and a release past it is reported incomplete, never run again with
+/// more.
 pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 20 {
         return Err("time-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION SECTIONS RATE RELEASES SWEEPS".into());
@@ -426,18 +448,48 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     println!("FIELD_TIME_PAIRS lap_met_pairs={} met_pairs_a_row_millis={} all_pairs={all_pairs}", lap_pairs * met_worst.0 / met_worst.1.max(1), 1000 * met_worst.0 / met_worst.1.max(1));
     // The releases: the free releases of the opening held problems, read together and timed, and
     // the pairs they read counted; the projection reads every held problem's free release and one at
-    // each calculation's equals, each at most the full region every sweep, at the time a pair the
-    // opening releases measured on the pairs they read. (The third reading's projection divided by
-    // the pairs a release reads at most; a founded field that releases its void at once reads few,
-    // so its time a pair, and the projection from it, came out a sixth of the one it bounded.)
+    // each calculation's equals, each at most the full region every sweep for the sweeps the front's
+    // measured speed gives, at the time a pair the opening releases measured on the pairs they read.
+    // (The third reading's projection divided by the pairs a release reads at most; a founded field
+    // that releases its void at once reads few, so its time a pair, and the projection from it, came
+    // out a sixth of the one it bounded.)
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
     let mut counted = Counted { inner: &mut *card, rows: 0 };
+    let mut last = ReleaseSweep::default();
     let t0 = std::time::Instant::now();
-    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), &mut counted, &mut |_| true).map_err(|e| e.to_string())?;
+    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), &mut counted, &mut |sweep| {
+        last = *sweep;
+        true
+    });
+    let released = released.map_err(|e| e.to_string())?;
     let ns = t0.elapsed().as_nanos();
     let pairs: u128 = questions.iter().map(|&(q, open)| release_rows(d.heads, d.ticks, sweeps, q.len() + open)).sum();
     let release_worst = (ns, counted.rows.max(1));
-    println!("FIELD_TIME_RELEASE problems={} released={} open={} rows_at_most={pairs} rows_read={} ms={}", questions.len(), released.iter().map(|r| r.sites.len()).sum::<usize>(), released.iter().map(|r| r.open).sum::<usize>(), counted.rows, ms(ns));
+    // The front's speed on each opening release: the sites its front reached over the sweeps it ran.
+    let answer = p.codec.answer as u128;
+    let speeds: Vec<(u128, u128)> = released
+        .iter()
+        .map(|r| {
+            let reached = r.reached.iter().flatten().count() + usize::from(matches!(r.extent, Some((_, _, false))));
+            let ended = r.open == 0 && r.extent.is_some();
+            let ran = if ended { r.lock_sweeps.iter().flatten().copied().chain(r.extent.map(|(_, sweep, _)| sweep)).max().map_or(1, |s| s + 1) } else { last.done.max(1) };
+            (reached.max(1) as u128, ran as u128)
+        })
+        .collect();
+    let projected = speeds.iter().map(|&(reached, ran)| (answer * ran).div_ceil(reached)).max().unwrap_or(sweeps as u128).max(1);
+    let slowest = speeds.iter().map(|&(reached, ran)| 1000 * reached / ran).min().unwrap_or(0);
+    println!(
+        "FIELD_TIME_RELEASE problems={} released={} reached={} open={} sweeps_run={} front={} ended={} rows_at_most={pairs} rows_read={} ms={}",
+        questions.len(),
+        released.iter().map(|r| r.sites.len()).sum::<usize>(),
+        released.iter().map(|r| r.reached.iter().flatten().count()).sum::<usize>(),
+        released.iter().map(|r| r.open).sum::<usize>(),
+        last.done,
+        last.front,
+        released.iter().filter(|r| r.open == 0 && r.extent.is_some()).count(),
+        counted.rows,
+        ms(ns)
+    );
     let held_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let held_problems = problems_of(&held_text);
     // One sweep of each set at most (both its reads, every region at its full length).
@@ -460,13 +512,13 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
             at = close.max(at + off + 2);
         }
     }
-    // A sweep's time at most, each set's: a release's deadline is fixed from it (the sweeps that fit),
-    // since the sweeps a release runs are the field's (every sweep releases at least a site of each
-    // open problem, most where the field resolves many).
+    // A sweep's time at most, each set's, at the projected sweeps: a release's deadline is fixed from
+    // them. The rows are the full region every sweep, an upper bound (a sweep reads the question, the
+    // reached sites and five past the front); the time a row is the opening releases' measured one.
     let at_worst = |pairs: u128| ms(pairs * release_worst.0 / release_worst.1.max(1));
-    let held_pairs = sweeps as u128 * (free_pairs + marks_pairs);
+    let held_pairs = projected * (free_pairs + marks_pairs);
     println!(
-        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} rows_at_most={held_pairs} ps_a_row={} free_sweep_ms={} marks_sweep_ms={} projection_ms={}",
+        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} answer={answer} front_sites_a_sweep_millis={slowest} projected_sweeps={projected} rows_at_most={held_pairs} ps_a_row={} free_sweep_ms={} marks_sweep_ms={} projection_ms={}",
         held_problems.len(),
         1000 * release_worst.0 / release_worst.1.max(1),
         at_worst(free_pairs),
