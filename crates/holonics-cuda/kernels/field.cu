@@ -1531,32 +1531,88 @@ CONTACT_ENTRY(20)
 
 #include "field_moment.cuh"
 
+// [definition; agent-inferred, November 1] **The moment modes are batched** (§15.1): a launch carries every
+// moment mode of the batch, `blockIdx.y` (or the quotient of the thread's cell) naming the mode `u`, whose
+// ring slot, skin and admission flags are `ws[u]` (`MomentWords`, one per mode), and whose strands, prefix
+// sums and results stand at the mode's stride in one array each. The bodies are `field_moment.cuh`'s
+// (`moment_admit_regions`, `moment_prefix_regions`, `moment_site_exact`, `moment_return_site`), so a mode's
+// bits are the single-mode launch's; only the launch is shared (the saving: a batch's launches no longer
+// grow with its moment modes).
+
 // Site `t`'s strand encoding of the moment mode `idx` (the real part, then the imaginary `T` on): its
 // class's row of the family at `base` (`2T` wide), the unresolved row, or its carried mixture `release(
-// Σ_a w_a E(a), 16)` (the host's `strand_row`). `out[t]` is the pair.
-extern "C" __global__ void field_moment_strands(FieldWords w, uint64_t base, uint32_t tm, uint32_t idx, int64_t *out) {
-    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+// Σ_a w_a E(a), 16)` (the host's `strand_row`).
+__device__ __forceinline__ int64_t moment_strand(const FieldWords &w, uint64_t base, uint32_t tm, uint32_t idx, uint64_t t, uint32_t part) {
+    const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+    const uint32_t col = part == 0 ? idx : tm + idx;
+    if (from == to) {
+        return w.theta[base + row_of(w, t) * 2 * tm + col];
+    }
+    wide sum = 0;
+    for (uint32_t k = from; k < to; k++) {
+        sum += (wide)w.mix_share[k] * (wide)w.theta[base + (uint64_t)w.mix_class[k] * 2 * tm + col];
+    }
+    return (int64_t)rel(sum, FACE_BITS);
+}
+
+// Every moment mode's strands, `before[u][t]` and `after[u][t]` (pairs of 64 bits, `2T` a mode).
+extern "C" __global__ void field_moment_strands_all(FieldWords w, uint64_t base_before, uint64_t base_after, uint32_t tm, int64_t *before, int64_t *after) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c % w.T;
+        const uint32_t u = c / w.T;
         for (uint32_t part = 0; part < 2; part++) {
-            const uint32_t col = part == 0 ? idx : tm + idx;
-            if (from == to) {
-                out[2 * t + part] = w.theta[base + row_of(w, t) * 2 * tm + col];
-            } else {
-                wide sum = 0;
-                for (uint32_t k = from; k < to; k++) {
-                    sum += (wide)w.mix_share[k] * (wide)w.theta[base + (uint64_t)w.mix_class[k] * 2 * tm + col];
-                }
-                out[2 * t + part] = (int64_t)rel(sum, FACE_BITS);
-            }
+            before[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_before, tm, u, t, part);
+            after[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_after, tm, u, t, part);
         }
     }
 }
 
-// The moment mode's moments (`T` pairs on `2^(−16)`) placed at the unframed value's mode `c`.
-extern "C" __global__ void field_moment_scatter(FieldWords w, const int64_t *s, uint32_t c) {
-    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
-        w.moment[t * w.M2 + c] = s[2 * t];
-        w.moment[t * w.M2 + w.M + c] = s[2 * t + 1];
+// Every moment mode's admission (the forward's: `x` = before, `y` = after; the return's, `returning`: `x` the
+// covector, `y` null). Grid `(regions, modes)`, dynamic shared memory `3 · blockDim.x · 16`.
+extern "C" __global__ void field_moment_admit_all(const MomentWords *ws, const int64_t *x, const int64_t *y, uint64_t stride, uint32_t returning) {
+    moment_admit_regions(ws[blockIdx.y], x + (uint64_t)blockIdx.y * stride, y ? y + (uint64_t)blockIdx.y * stride : nullptr, returning != 0);
+}
+
+// Every moment mode's prefix sums of a strand (`released`: the return's `Q`, else the forward's exact `P`).
+// Grid `(regions, modes)`, dynamic shared memory `blockDim.x · 32`.
+extern "C" __global__ void field_moment_prefix_all(const MomentWords *ws, const int64_t *x, wide *pre, uint64_t stride, uint64_t pre_stride, uint32_t released) {
+    moment_prefix_regions(ws[blockIdx.y], x + (uint64_t)blockIdx.y * stride, pre + (uint64_t)blockIdx.y * pre_stride, released != 0);
+}
+
+// Every moment mode's moments `s[u][t]` (the body of `field_moment`). Grid `(cells, modes)`.
+extern "C" __global__ void field_moment_all(const MomentWords *ws, const int64_t *before, const int64_t *after, const wide *up, const wide *down, int64_t *s, uint64_t stride, uint64_t pre_stride) {
+    const uint32_t u = blockIdx.y;
+    const MomentWords &w = ws[u];
+    before += (uint64_t)u * stride;
+    after += (uint64_t)u * stride;
+    s += (uint64_t)u * stride;
+    up += (uint64_t)u * pre_stride;
+    down += (uint64_t)u * pre_stride;
+    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = w.site_region[g], t = w.site_pos[g];
+        if (!w.ok[r]) {
+            s[2 * g] = 0;
+            s[2 * g + 1] = 0;
+            continue;
+        }
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        MomentGauss v;
+        if (!moment_site_exact(before + 2 * first, after + 2 * first, up + 2 * (first + r), down + 2 * (first + r), w.ring, w.n, w.ring_len, w.decay, sites, t, &v)) {
+            atomicOr(w.status, MOMENT_REFUSED_SHAPE);
+        }
+        s[2 * g] = fit64(rel(v.re, MOMENT_COEFFICIENT_BITS), w.status);
+        s[2 * g + 1] = fit64(rel(v.im, MOMENT_COEFFICIENT_BITS), w.status);
+    }
+}
+
+// Every moment mode's moments placed at the unframed value's mode `cmap[u]` (`h n + l` of its head and mode).
+extern "C" __global__ void field_moment_scatter_all(FieldWords w, const int64_t *s, const uint32_t *cmap, uint32_t tm) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c % w.T;
+        const uint32_t u = c / w.T;
+        w.moment[t * w.M2 + cmap[u]] = s[(uint64_t)u * 2 * w.T + 2 * t];
+        w.moment[t * w.M2 + w.M + cmap[u]] = s[(uint64_t)u * 2 * w.T + 2 * t + 1];
     }
 }
 
@@ -1578,31 +1634,67 @@ extern "C" __global__ void field_moment_accumulate(FieldWords w, const int64_t *
     }
 }
 
-// The moment mode `c`'s covector as 64-bit pairs (`fit64`, the host's refusal), `T` of them.
-extern "C" __global__ void field_moment_ds(FieldWords w, const wide *dm, uint32_t c, int64_t *ds) {
-    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
-        ds[2 * t] = fit64(dm[t * w.M2 + c], w.status);
-        ds[2 * t + 1] = fit64(dm[t * w.M2 + w.M + c], w.status);
+// Every moment mode's covector as 64-bit pairs (`fit64`, the host's refusal), `ds[u][t]`.
+extern "C" __global__ void field_moment_ds_all(FieldWords w, const wide *dm, const uint32_t *cmap, uint32_t tm, int64_t *ds) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c % w.T;
+        const uint32_t u = c / w.T;
+        ds[(uint64_t)u * 2 * w.T + 2 * t] = fit64(dm[t * w.M2 + cmap[u]], w.status);
+        ds[(uint64_t)u * 2 * w.T + 2 * t + 1] = fit64(dm[t * w.M2 + w.M + cmap[u]], w.status);
     }
 }
 
-// The strand's return (`Field::strand_return`) of one moment mode: `d[t]` (a pair of 128 bits on
+// Every moment mode's return (the body of `field_moment_return`): `d_before[u][t]`, `d_after[u][t]`.
+// Grid `(cells, modes)`.
+extern "C" __global__ void field_moment_return_all(const MomentWords *ws, const int64_t *ds, const wide *q, wide *d_before, wide *d_after, uint64_t stride, uint64_t pre_stride) {
+    const uint32_t u = blockIdx.y;
+    const MomentWords &w = ws[u];
+    ds += (uint64_t)u * stride;
+    d_before += (uint64_t)u * stride;
+    d_after += (uint64_t)u * stride;
+    q += (uint64_t)u * pre_stride;
+    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = w.site_region[g], k = w.site_pos[g];
+        if (!w.ok[r]) {
+            d_before[2 * g] = d_before[2 * g + 1] = d_after[2 * g] = d_after[2 * g + 1] = 0;
+            continue;
+        }
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        MomentGauss plus, minus;
+        if (!moment_return_site(ds + 2 * first, q + 2 * (first + r), w.ring, w.n, w.ring_len, w.decay, sites, k, &plus, &minus)) {
+            atomicOr(w.status, MOMENT_REFUSED_SHAPE);
+        }
+        d_before[2 * g] = rel(plus.re, MOMENT_RETURN_RELEASE_BITS);
+        d_before[2 * g + 1] = rel(plus.im, MOMENT_RETURN_RELEASE_BITS);
+        d_after[2 * g] = rel(minus.re, MOMENT_RETURN_RELEASE_BITS);
+        d_after[2 * g + 1] = rel(minus.im, MOMENT_RETURN_RELEASE_BITS);
+    }
+}
+
+// The strands' return (`Field::strand_return`) of every moment mode: `d[u][t]` (a pair of 128 bits on
 // `2^(−24)`) into site `t`'s row of the family at `base` (`2T` wide), or each carried class's row by its
 // share, `release(w d, 16)`; added into `g`.
-extern "C" __global__ void field_moment_strand_return(FieldWords w, uint64_t base, uint32_t tm, uint32_t idx, const wide *d, wide *g) {
-    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+extern "C" __global__ void field_moment_strand_return_all(FieldWords w, uint64_t base_before, uint64_t base_after, uint32_t tm, const wide *d_before, const wide *d_after, wide *g) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < (uint64_t)w.T * tm; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c % w.T;
+        const uint32_t u = c / w.T;
         const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
-        for (uint32_t part = 0; part < 2; part++) {
-            const uint32_t col = part == 0 ? idx : tm + idx;
-            const wide v = d[2 * t + part];
-            if (v == 0) {
-                continue;
-            }
-            if (from == to) {
-                add_wide(g + base + row_of(w, t) * 2 * tm + col, v);
-            } else {
-                for (uint32_t k = from; k < to; k++) {
-                    add_wide(g + base + (uint64_t)w.mix_class[k] * 2 * tm + col, rel((wide)w.mix_share[k] * v, FACE_BITS));
+        for (uint32_t side = 0; side < 2; side++) {
+            const uint64_t base = side == 0 ? base_before : base_after;
+            const wide *d = side == 0 ? d_before : d_after;
+            for (uint32_t part = 0; part < 2; part++) {
+                const uint32_t col = part == 0 ? u : tm + u;
+                const wide v = d[(uint64_t)u * 2 * w.T + 2 * t + part];
+                if (v == 0) {
+                    continue;
+                }
+                if (from == to) {
+                    add_wide(g + base + row_of(w, t) * 2 * tm + col, v);
+                } else {
+                    for (uint32_t k = from; k < to; k++) {
+                        add_wide(g + base + (uint64_t)w.mix_class[k] * 2 * tm + col, rel((wide)w.mix_share[k] * v, FACE_BITS));
+                    }
                 }
             }
         }

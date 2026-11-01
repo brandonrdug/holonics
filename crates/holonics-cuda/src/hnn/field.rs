@@ -356,6 +356,11 @@ impl<'c> CardField<'c> {
 
     /// A launch with `shared` octets of the block's dynamic shared memory.
     fn launch_shared(&self, entry: &'static str, grid: u32, block: u32, shared: u32, params: &mut [*mut c_void]) -> Result<()> {
+        self.launch_grid(entry, Dim3::x(grid.max(1)), block, shared, params)
+    }
+
+    /// A launch over a grid of `grid` blocks of `block` threads and `shared` octets of dynamic shared memory.
+    fn launch_grid(&self, entry: &'static str, grid: Dim3, block: u32, shared: u32, params: &mut [*mut c_void]) -> Result<()> {
         self.card.current().map_err(device)?;
         let function = self.module.function(entry).map_err(|e| device(e.into()))?;
         let started = match &self.profile {
@@ -365,7 +370,7 @@ impl<'c> CardField<'c> {
             }
             None => None,
         };
-        function.launch_on_shared(self.card.stream(), Dim3::x(grid.max(1)), Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
+        function.launch_on_shared(self.card.stream(), grid, Dim3 { x: block, y: 1, z: 1 }, shared, params).map_err(|e| device(e.into()))?;
         if let (Some(profile), Some(started)) = (&self.profile, started) {
             self.card.synchronize().map_err(device)?;
             let mut p = profile.borrow_mut();
@@ -860,63 +865,71 @@ impl<'c> CardField<'c> {
     }
 
     /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
-    /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]): for each moment mode (a turned head
-    /// that is not a clock, each of its modes) the strands' encodings of its ring slot, gathered at every
-    /// site (`field_moment_strands`), admitted by the l1 certificate, scanned to the prefix sums and read
-    /// at every site (`kernels/field_moment.cuh`), and placed at the unframed value's mode.
+    /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]), every moment mode (a turned head that
+    /// is not a clock, each of its modes) in the same launches: the strands' encodings of each mode's ring
+    /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
+    /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
+    /// to a grid row), and placed at the unframed value's modes.
     fn moments(&self, field: &Field, words: &Words, regions: usize, sites: usize) -> Result<()> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {
             return Ok(());
         }
-        let (n, l) = (d.modes, field.layout());
-        let card = self.card;
-        let (before, after, s) = (self.timed(Kind::Alloc, || card.alloc::<i64>(2 * sites)).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i64>(2 * sites)).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i64>(2 * sites)).map_err(device)?);
-        let (up, down) = (self.timed(Kind::Alloc, || card.alloc::<i128>(2 * (sites + regions))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>(2 * (sites + regions))).map_err(device)?);
-        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; regions.max(1)])).map_err(device)?;
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-            for li in 0..n {
-                let idx = (d.moment_index(h) + li) as u32;
-                let mut mw = self.moment_words(field, words, regions, sites, h, li, &ok);
-                let (mut w_base, mut tm32, mut idx32) = (l.moment_before as u64, tm as u32, idx);
-                let (mut bp, mut ap, mut sp, mut upp, mut dnp) = (before.device_ptr(), after.device_ptr(), s.device_ptr(), up.device_ptr(), down.device_ptr());
-                let mut w2 = *words;
-                self.launch("field_moment_strands", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut w_base), arg(&mut tm32), arg(&mut idx32), arg(&mut bp)])?;
-                let mut w_base = l.moment_after as u64;
-                self.launch("field_moment_strands", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut w_base), arg(&mut tm32), arg(&mut idx32), arg(&mut ap)])?;
-                self.launch_shared("field_moment_admit", regions.max(1) as u32, MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut mw), arg(&mut bp), arg(&mut ap)])?;
-                self.launch_shared("field_moment_prefix", regions.max(1) as u32, MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut mw), arg(&mut bp), arg(&mut upp)])?;
-                self.launch_shared("field_moment_prefix", regions.max(1) as u32, MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut mw), arg(&mut ap), arg(&mut dnp)])?;
-                self.launch("field_moment", Self::cells(sites as u64), THREADS, &mut [arg(&mut mw), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp)])?;
-                let mut c = (h * n + li) as u32;
-                self.launch("field_moment_scatter", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut sp), arg(&mut c)])?;
-            }
-        }
+        let (n, l, card) = (d.modes, field.layout(), self.card);
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
+        let (before, after, s) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
+        let (up, down) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
+        let (mut wsp, mut cmp) = (ws.device_ptr(), cmap.device_ptr());
+        let (mut bp, mut ap, mut sp, mut upp, mut dnp, mut none) = (before.device_ptr(), after.device_ptr(), s.device_ptr(), up.device_ptr(), down.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut zero32, mut stride, mut pre_stride) = (0u32, strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        let _ = n;
+        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
+        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp), arg(&mut stride), arg(&mut pre_stride)])?;
+        self.launch("field_moment_scatter_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut sp), arg(&mut cmp), arg(&mut tm32)])?;
+        let _ = &mut none;
         Ok(())
     }
 
-    /// The moment kernels' words for head `h`'s mode `li` (its ring slot's resident phasors and skin).
-    #[allow(clippy::too_many_arguments)]
-    fn moment_words(&self, field: &Field, words: &Words, regions: usize, sites: usize, h: usize, li: usize, ok: &CardBuffer<'c, u8>) -> MomentWords {
+    /// The moment kernels' words for every moment mode, in the order of the moment index (`MomentWords` in
+    /// `kernels/field_moment.cuh`, an array of them), each mode's ring slot's resident phasors and skin and
+    /// its admission flags `ok[u][r]`; and the map from a moment mode to the unframed value's mode `h n + l`.
+    fn moment_modes(&self, field: &Field, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(CardBuffer<'c, u64>, CardBuffer<'c, u32>)> {
         let d = field.declaration;
-        let slot = li * (d.frames - d.still) + h % d.frames - d.still;
-        let offset: usize = field.rings()[..slot].iter().map(|(_, ring)| ring.len()).sum();
-        let (period, ring) = &field.rings()[slot];
-        MomentWords {
-            r: regions as u32,
-            t: sites as u32,
-            region_off: words.region_off,
-            site_region: words.site_region,
-            site_pos: words.site_pos,
-            ring: words.phasor + 16 * offset as u64,
-            n: *period as u64,
-            ring_len: ring.len() as u64,
-            decay: words.decay + 8 * (slot * d.reach) as u64,
-            dreach: d.reach as u64,
-            ok: ok.device_ptr(),
-            status: words.status,
+        let (mut packed, mut cmap) = (Vec::new(), Vec::new());
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+            for li in 0..d.modes {
+                let slot = li * (d.frames - d.still) + h % d.frames - d.still;
+                let offset: usize = field.rings()[..slot].iter().map(|(_, ring)| ring.len()).sum();
+                let (period, ring) = &field.rings()[slot];
+                let u = d.moment_index(h) + li;
+                // `MomentWords`: `R, T` (two words of 32 bits), then the pointers and counts, 8 octets each.
+                packed.extend([
+                    regions as u64 | (sites as u64) << 32,
+                    words.region_off,
+                    words.site_region,
+                    words.site_pos,
+                    words.phasor + 16 * offset as u64,
+                    *period as u64,
+                    ring.len() as u64,
+                    words.decay + 8 * (slot * d.reach) as u64,
+                    d.reach as u64,
+                    ok.device_ptr() + (u * regions) as u64,
+                    words.status,
+                ]);
+                cmap.push((h * d.modes + li) as u32);
+            }
         }
+        let card = self.card;
+        Ok((self.timed(Kind::Copy, || card.upload(&packed)).map_err(device)?, self.timed(Kind::Copy, || card.upload(&cmap)).map_err(device)?))
     }
 
     fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
@@ -1095,38 +1108,34 @@ impl<'c> CardField<'c> {
         Ok(())
     }
 
-    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Field::moments_return`):
-    /// for each moment mode the covector `dm` at its value (fit to 64 bits, admitted by the l1
-    /// certificate), the prefix sums of its phases, the transpose at every site and the strands' encodings'
-    /// rows (or a carried site's classes by their shares) added into `g`.
+    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Field::moments_return`,
+    /// the released law of §15.1): every moment mode's covector `dm` at its value (fit to 64 bits), admitted by
+    /// the return's certificate, the prefix of the covector turned and released once a term, the return at
+    /// every site, and the strands' encodings' rows (or a carried site's classes by their shares) added into
+    /// `g`; all modes in the same launches.
     fn moments_return(&self, field: &Field, words: &Words, g: &CardBuffer<'c, i128>, dm: &CardBuffer<'c, i128>, regions: usize, sites: usize) -> Result<()> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {
             return Ok(());
         }
-        let (n, l, card) = (d.modes, field.layout(), self.card);
-        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>(2 * sites)).map_err(device)?;
-        let q = self.timed(Kind::Alloc, || card.alloc::<i128>(2 * (sites + regions))).map_err(device)?;
-        let (d_before, d_after) = (self.timed(Kind::Alloc, || card.alloc::<i128>(2 * sites)).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>(2 * sites)).map_err(device)?);
-        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; regions.max(1)])).map_err(device)?;
-        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-            for li in 0..n {
-                let (c, idx) = ((h * n + li) as u32, (d.moment_index(h) + li) as u32);
-                let mut mw = self.moment_words(field, words, regions, sites, h, li, &ok);
-                let mut w2 = *words;
-                let (mut dmp, mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (dm.device_ptr(), ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
-                let (mut cc, mut tm32, mut idx32) = (c, tm as u32, idx);
-                self.launch("field_moment_ds", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cc), arg(&mut dsp)])?;
-                self.launch_shared("field_moment_admit", regions.max(1) as u32, MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut mw), arg(&mut dsp), arg(&mut none)])?;
-                self.launch_shared("field_moment_prefix", regions.max(1) as u32, MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut mw), arg(&mut dsp), arg(&mut qp)])?;
-                self.launch("field_moment_return", Self::cells(sites as u64), THREADS, &mut [arg(&mut mw), arg(&mut dsp), arg(&mut qp), arg(&mut dbp), arg(&mut dap)])?;
-                let mut base = l.moment_before as u64;
-                self.launch("field_moment_strand_return", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut base), arg(&mut tm32), arg(&mut idx32), arg(&mut dbp), arg(&mut gp)])?;
-                let mut base = l.moment_after as u64;
-                self.launch("field_moment_strand_return", Self::cells(sites as u64), THREADS, &mut [arg(&mut w2), arg(&mut base), arg(&mut tm32), arg(&mut idx32), arg(&mut dap), arg(&mut gp)])?;
-            }
-        }
+        let (l, card) = (field.layout(), self.card);
+        let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
+        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
+        let q = self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
+        let (d_before, d_after) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
+        let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm.device_ptr());
+        let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
+        let (mut w2, mut base_b, mut base_a, mut tm32) = (*words, l.moment_before as u64, l.moment_after as u64, tm as u32);
+        let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
+        let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
+        self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
+        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut none), arg(&mut stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_return_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride)])?;
+        self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
         Ok(())
     }
 
@@ -1169,11 +1178,13 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
     // A site's carried mixture, definite bit, clock, echo (a flag, `B` and logits) and the round trips.
     let mixture_site = 5 + 2 * 4 * a + 4 + 9 + 8 * a + 16;
-    // The moments: the pass's values `[t][2M]`, the strands, their moments, prefix sums and admission.
-    let moment_site = if d.moment_modes() > 0 { 8 * m2 + 6 * 16 + 4 * 16 } else { 0 };
+    // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
+    // (112 octets a site), batched over the modes.
+    let tm = d.moment_modes() as u64;
+    let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
     // crowds' two difference arrays.
-    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + if d.moment_modes() > 0 { 80 } else { 0 } } else { 0 };
+    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = if kept { h * 8 * pairs } else { 0 };
