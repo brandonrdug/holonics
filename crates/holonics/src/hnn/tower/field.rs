@@ -172,7 +172,7 @@ use rayon::prelude::*;
 
 /// [agent-inferred, November 1] **The hold's face** on `2^(−40)` (§14.2): a ratio of integer faces,
 /// attained at its declared grain as the exponential's mantissa is at `2^(−62)`.
-const HOLD_BITS: u32 = 40;
+pub const HOLD_BITS: u32 = 40;
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
 /// once, by one division of the exact series, for the return; the declared crossing into the step,
 /// whose own release is to the material's grain.
@@ -226,19 +226,20 @@ impl FieldDeclaration {
         (usize::BITS - self.reach.saturating_sub(1).leading_zeros()).max(1) as usize
     }
 
-    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff** (the
-    /// dispersing field's §2.5): a head's pairing of two equal words sums the `2n` squares of a word
-    /// at unit power, `2n` exactly; an equal word at the farthest reach pays `⌊log₂ reach⌋` bits of
-    /// falloff and must still outweigh the rest of its support together, at most another
-    /// `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must amplify, with
-    /// `2^(−β)·2n ≥ 2⌈log₂ reach⌉`. At reading 8's declaration (`2n = 16`, reach 2,221) it is
-    /// `−1`: an equal word pairs at 32 bits and its falloff at the reach is 11. What it bounds is the
-    /// peak, not the gaps: a counterpart's share is `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`,
-    /// shared among words equal or near it, a plural fibre the closure reads as one class. The bound
-    /// is a still head's: a turned head carries the pairing by its skin decay, `Σ_l D_l |ŵ_l|² < 2n`
-    /// past no distance, so its far counterparts are heard more faintly by design (§12).
+    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff, a mode at a
+    /// time** (the dispersing field's §2.5 and §15.2): each mode keeps its own row, so a mode's pairing
+    /// of two equal words is its own power, `|ŵ_m|²`, which a head's word at unit power over its `2n`
+    /// reals holds at `2` on the mean over its `n` modes; an equal word at the farthest reach pays
+    /// `⌊log₂ reach⌋` bits of falloff and must still outweigh the rest of its support together, at
+    /// most another `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must amplify, with
+    /// `2^(−β)·2 ≥ 2⌈log₂ reach⌉`: `−4` at reading 8's reach of 2,221 (a mode of mean power pairs its
+    /// equal at 32 bits; the falloff at the reach is 11). What it bounds is the mean mode's peak: a
+    /// louder mode is heard sharper, a silent one is near flat over its support. A turned mode
+    /// carries the pairing by its skin decay, so its far counterparts are heard more faintly by design
+    /// (§12). Why the mode's own power (§15.2): the head's sum over its modes was one number a pair, so
+    /// one mode's agreement could not be heard apart from the rest.
     pub fn score_shift(&self) -> i32 {
-        let (reals, need) = (2 * self.modes as u128, 2 * self.reach_bits() as u128);
+        let (reals, need) = (2u128, 2 * self.reach_bits() as u128);
         let mut beta = 0i32;
         if reals >= need {
             while (reals >> (beta + 1)) >= need {
@@ -276,20 +277,21 @@ impl FieldDeclaration {
         (126 - MOVE_BITS - 31).saturating_sub(self.reach_bits() as u32)
     }
 
-    /// [definition; agent-inferred, November 1] **A series row's carrier**, read from the declaration's
-    /// own bounds (§14.11), never chosen: a score is at most the gain times `2n` at unit power above
-    /// zero and that plus the falloff at the reach below it, so a row's whole bits spread over
-    /// `2·2^(−β)·2n + ⌊log₂ reach⌋ + 2`; a term's face is 62 bits and its multiplier 80 (the two holds,
-    /// or a crowd's `2^80`) and `⌈log₂ reach⌉` more for a crowd's count; a row holds at most the reach
-    /// and two crowds an octave, `⌈log₂⌉` of that; a value is at most a 64-bit carrier summed over the
-    /// reach. The width widens only where the declaration does (growth, a declared crossing), and no row
-    /// passes it. Owed to #410 with the grouped row's equality.
+    /// [definition; agent-inferred, November 1] **A series row's bound**, read from the declaration's
+    /// own bounds (§14.11, §15.2), never chosen: a mode's score is at most the gain times `2n` (a head's
+    /// whole power in one mode) above zero and that plus the falloff at the reach below it, so a row's
+    /// whole bits spread over `2·2^(−β)·2n + ⌊log₂ reach⌋ + 2`; a term's face is 62 bits and its
+    /// multiplier 62 (a far source's weight, [`WEIGHT_BITS`]) and `⌈log₂ reach⌉` more for a crowd's
+    /// count; a row holds at most the reach and two crowds an octave, `⌈log₂⌉` of that; a value is at
+    /// most a 64-bit carrier summed over the reach. A realization's carrier is as wide as the exponents
+    /// a row actually holds and never past this bound; a row past it is refused. Owed to #410 with the
+    /// grouped row's equality.
     pub fn row_bits(&self) -> u32 {
         let reach_bits = self.reach_bits() as u32;
         let gain = if self.score_shift() >= 0 { (2 * self.modes as u32) >> self.score_shift() } else { (2 * self.modes as u32) << -self.score_shift() };
         let spread = 2 * gain + (usize::BITS - 1 - self.reach.leading_zeros()) + 2;
         let terms = (usize::BITS - (self.reach + 2 * reach_bits as usize).leading_zeros()) as u32;
-        62 + 2 * HOLD_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
+        62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
     }
 
     /// The classes a head reads, `3^b`.
@@ -572,13 +574,9 @@ struct TickCell {
     qscale: Vec<i128>,
     /// Each head's resonance classes and their lists ([`ClassLists`]).
     classes: Vec<ClassLists>,
-    /// Each head's and receiving site's support with each source's share of the row's mass on
-    /// `2^(−63)` ([`SeriesRow`]), `[h][i]` as `(j, p_ij)` (a far source held by both ends, §14.2), and
-    /// each row's mass, the shares' whole `2^63`.
-    rows: Vec<Vec<(u32, u64)>>,
-    mass: Vec<u64>,
-    /// Each head's and site's hold `λ` on `2^(−40)` and the mode that sets it `[h][t]` ([`hold`]).
-    holds: Vec<(u64, u32)>,
+    /// Each head's and receiving site's support `[h][i]`, each source with its weight and each mode's
+    /// share of its row ([`Source`]).
+    rows: Vec<Vec<Source>>,
     /// Each head's and receiving site's crowds `[h][i]` and each head's prefix sums of the definite
     /// words and values ([`Sums`], §14.10).
     crowds: Vec<Vec<Crowd>>,
@@ -593,57 +591,76 @@ struct TickCell {
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
-/// dispersing field's §2.2, §6 and §12): each site's class `B_h(t) = Σ_l 3^l (s_l + 1)`, `s_l` the
-/// shell trit of its unframed word's mode `l` ([`shell`]), and the lists by one stable counting sort: class `c`'s members are
-/// the definite sites first (known or locked, §14.1), then the rest, each in ascending place, class
-/// `c`'s definite members `members[off[2c]..off[2c + 1]]` and its others `members[off[2c + 1]..off[2c +
-/// 2]]`. The card lists them alike.
+/// dispersing field's §2.2, §6, §12 and §15.2): each site's memberships of its unframed word's first `b`
+/// modes' shells ([`membership`]), and the lists by one stable counting sort over every class a site
+/// holds ([`classes_of`]): class `c`'s members are the definite sites first (known or locked, §14.1),
+/// then the rest, each in ascending place, class `c`'s definite members `members[off[2c]..off[2c + 1]]`
+/// and its others `members[off[2c + 1]..off[2c + 2]]`. The card lists them alike.
 ///
 /// [definition; agent-inferred, November 1] **Only the plates radiate far** (the dispersing field's
 /// §14.1): past the near field a source is heard only where it is definite, known (the question, or the
 /// truth in a training region) or locked (a foil); a soft or unreached site is heard only in its near
-/// field. The support is directional: a receiver of any state reads the definite run of its class. No
+/// field. The support is directional: a receiver of any state reads the definite runs of its classes. No
 /// clique can form, since unresolved and soft sources are never met far. (This replaces the build's
 /// bipartite rule, under which an open answer site met the question only through the class of the
 /// unresolved row or of a near-flat mixture: on GSM8K the class of the space.)
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ClassLists {
-    pub class: Vec<u32>,
+    /// Each site's memberships, `modes[t · b + l]`.
+    pub modes: Vec<Membership>,
+    pub trits: usize,
     pub definite: Vec<bool>,
     pub off: Vec<u32>,
     pub members: Vec<u32>,
 }
 
 impl ClassLists {
-    /// The lists of the classes `class` over `buckets` classes, each class's `definite` sites first.
-    pub fn of(class: Vec<u32>, definite: Vec<bool>, buckets: usize) -> Self {
-        let key = |t: usize| 2 * class[t] as usize + usize::from(!definite[t]);
+    /// The lists of the sites' memberships (`b = trits` a site) over `buckets` classes, each class's
+    /// `definite` sites first.
+    pub fn of(modes: Vec<Membership>, trits: usize, definite: Vec<bool>, buckets: usize) -> Self {
+        let sites = definite.len();
+        let entries: Vec<(usize, u32)> = (0..sites).flat_map(|t| classes_of(&modes[t * trits..(t + 1) * trits]).into_iter().map(move |c| (t, c))).collect();
+        let key = |&(t, c): &(usize, u32)| 2 * c as usize + usize::from(!definite[t]);
         let mut off = vec![0u32; 2 * buckets + 1];
-        for t in 0..class.len() {
-            off[key(t) + 1] += 1;
+        for e in &entries {
+            off[key(e) + 1] += 1;
         }
         for k in 0..2 * buckets {
             off[k + 1] += off[k];
         }
         let mut filled = off.clone();
-        let mut members = vec![0u32; class.len()];
-        for t in 0..class.len() {
-            members[filled[key(t)] as usize] = t as u32;
-            filled[key(t)] += 1;
+        let mut members = vec![0u32; entries.len()];
+        for e in &entries {
+            members[filled[key(e)] as usize] = e.0 as u32;
+            filled[key(e)] += 1;
         }
-        Self { class, definite, off, members }
+        Self { modes, trits, definite, off, members }
     }
 
-    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1): its near field
-    /// (`0 < |i − j| < NEAR`, nearest first, before then after) and the definite members of its class
-    /// past the near field (in ascending place), each site once. The support is directional: `j` is
-    /// heard far by every class-mate where `j` is definite, and by none where it is not.
-    pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
-        let sites = self.class.len();
-        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
-        let c = 2 * self.class[i] as usize;
-        let members = &self.members[self.off[c] as usize..self.off[c + 1] as usize];
-        near.chain(members.iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR))
+    /// Site `t`'s memberships.
+    pub fn site(&self, t: usize) -> &[Membership] {
+        &self.modes[t * self.trits..(t + 1) * self.trits]
+    }
+
+    /// Site `t`'s primary class, `Σ_l 3^l own_l`.
+    pub fn class(&self, t: usize) -> u32 {
+        self.site(t).iter().rev().fold(0, |c, m| 3 * c + m.own as u32)
+    }
+
+    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.2): its near
+    /// field (`0 < |i − j| < NEAR`, nearest first, before then after) at weight `1` (`2^62` on
+    /// [`WEIGHT_BITS`]), and past the near field the definite members of each of its classes, each pair
+    /// counted once, at its [`canonical`] class, with its [`overlap`]. The support is directional: `j` is
+    /// heard far by every site sharing one of its classes where `j` is definite, and by none where it is
+    /// not.
+    pub fn support(&self, i: usize) -> impl Iterator<Item = (usize, u128)> + '_ {
+        let sites = self.definite.len();
+        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().map(|j| (j, 1u128 << WEIGHT_BITS));
+        let far = classes_of(self.site(i)).into_iter().flat_map(move |c| {
+            let run = &self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize];
+            run.iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR && canonical(self.site(i), self.site(j)) == Some(c)).map(move |j| (j, overlap(self.site(i), self.site(j)))).filter(|&(_, w)| w > 0)
+        });
+        near.chain(far)
     }
 }
 
@@ -661,21 +678,149 @@ pub fn shell(re: i64, im: i64) -> u32 {
     }
 }
 
-/// [definition; agent-inferred, November 1] **A site's hold on its shells** (the dispersing field's
-/// §14.2): each class mode's distance from its light cone, `λ_m = |Re(w_m²)| / |w_m|² =
-/// |re² − im²| / (re² + im²)` on `2^(−40)` (`1` at a shell's centre, pure in phase or pure quadrature;
-/// `0` on the cone, and for a silent mode), and the least over the class's modes, with the first mode
-/// that sets it. A far contact is weighted by both ends' holds, so a word crossing a seam leaves its
-/// class with weight falling to zero and enters the next from zero.
-pub fn hold(modes: impl Iterator<Item = (i64, i64)>) -> (u64, u32) {
-    modes
-        .enumerate()
-        .map(|(l, (re, im))| {
-            let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
-            let lambda = if rr + ii == 0 { 0 } else { div_nearest((rr - ii).abs() << HOLD_BITS, rr + ii) as u64 };
-            (lambda, l as u32)
-        })
-        .fold((1u64 << HOLD_BITS, 0u32), |best, (lambda, l)| if lambda < best.0 { (lambda, l) } else { best })
+/// [definition; agent-inferred, November 1] **A mode's membership of its shells** (the dispersing
+/// field's §15.2, which replaced §14.2's least hold over the class's modes): the mode's hold, its
+/// distance from its light cone `λ = |Re(w²)| / |w|² = |re² − im²| / (re² + im²)` on `2^(−40)` (`1`
+/// at a shell's centre, `0` on the cone and for a silent mode), splits the mode between its own shell
+/// and the shell across its nearest cone (a plate's is the bridge; the bridge's is the plate on its
+/// in-phase side). Within the band `φ = λ / ε < 1` beside the cone ([`band_bits`]) it is in both, as
+/// amplitudes whose squares are a partition of unity, `r_across = (1 − φ)/√2`, `r_own = √(1 − r_across²)`
+/// on `2^(−31)` (the square root's face attained to the nearest numerator, [`sqrt_nearest`]); past the
+/// band it is in its own shell alone, `r_own = 1`. At the cone the two shells hold it equally, so a
+/// word crossing a seam moves between them continuously, and a class's members are heard through
+/// [`overlap`] at full weight wherever two equal words stand.
+///
+/// Why the amplitudes and the band, not §15.2's `½(1 ± λ)` everywhere (measured on its law, November
+/// 1): the bridge borders both plates, so with a membership that leaves no mode wholly in one shell
+/// every site holds a share of the all-bridge class and every pair would meet, the whole region's
+/// definite sources in every far row; and the weight's `√μ` has an unbounded slope where a membership
+/// falls to zero, so its covector would be unbounded at every shell's centre. The squared form keeps
+/// the amplitude linear in `φ`, and the band keeps a mode near its shell's centre in one shell.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Membership {
+    pub own: u8,
+    pub across: u8,
+    pub r_own: u64,
+    pub r_across: u64,
+    pub hold: u64,
+}
+
+/// [agent-inferred, November 1] **The membership's band** `ε = 2^(−k)`, `k = ⌈log₂ b⌉` over a head's `b`
+/// address modes: at the founding's random phases a mode's hold falls below `ε` with probability
+/// `(2/π) arcsin ε ≤ ε`, so over its `b` modes a site expects fewer than one crossing (`b ε ≤ 1`), its
+/// classes stay about two, and the pairs a row meets stay about the hard address's.
+pub fn band_bits(trits: usize) -> u32 {
+    usize::BITS - trits.max(1).saturating_sub(1).leading_zeros()
+}
+
+/// `round(√(p / 2^shift))` exactly (half away from zero), for `p < 2^125`: `⌊(⌊√(4p')⌋ + 2^k) / 2^(k+1)⌋`
+/// with `p / 2^shift = p' / 2^(2k)`.
+pub fn sqrt_nearest(p: u128, shift: u32) -> u128 {
+    let (p, k) = if shift % 2 == 0 { (p, shift / 2) } else { (2 * p, shift.div_ceil(2)) };
+    ((4 * p).isqrt() + (1u128 << k)) >> (k + 1)
+}
+
+/// The amplitudes' grain, `2^(−31)`: two of them multiply into the weight's `2^(−62)`.
+pub const AMPLITUDE_BITS: u32 = 31;
+/// A far source's weight, `2^(−62)` ([`overlap`]); the near field's and a crowd's is `1` exactly.
+pub const WEIGHT_BITS: u32 = 62;
+
+/// A mode's membership ([`Membership`]) in band `ε = 2^(−band)`.
+pub fn membership(re: i64, im: i64, band: u32) -> Membership {
+    let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+    let hold = if rr + ii == 0 { 0 } else { div_nearest((rr - ii).abs() << HOLD_BITS, rr + ii) as u64 };
+    let own = shell(re, im) as u8;
+    let across = if own != 1 { 1 } else if re >= 0 { 2 } else { 0 };
+    let gap = (1u128 << HOLD_BITS) - ((hold as u128) << band).min(1u128 << HOLD_BITS);
+    let r_across = sqrt_nearest(gap * gap, 2 * HOLD_BITS - 2 * AMPLITUDE_BITS + 1) as u64;
+    let r_own = sqrt_nearest((1u128 << (2 * AMPLITUDE_BITS)) - (r_across as u128).pow(2), 0) as u64;
+    Membership { own, across, r_own, r_across, hold }
+}
+
+impl Membership {
+    /// The mode's amplitude at shell `s` on `2^(−31)`.
+    pub fn amplitude(&self, s: u8) -> u64 {
+        if s == self.own { self.r_own } else if s == self.across { self.r_across } else { 0 }
+    }
+
+    /// The shells the mode is in (its own, and the one across its cone within the band).
+    pub fn shells(&self) -> impl Iterator<Item = u8> {
+        std::iter::once(self.own).chain((self.r_across > 0).then_some(self.across))
+    }
+
+    /// `∂r/∂λ` at the mode's own shell and across it, on `2^(−31)` a unit of hold: `r_across = (1 −
+    /// λ/ε)/√2` falls at `2^band/√2` within the band, `r_own = √(1 − r_across²)` rises at `r_across ·
+    /// 2^band/√2 / r_own`; past the band both are zero.
+    pub fn slopes(&self, band: u32) -> (i128, i128) {
+        if self.r_across == 0 {
+            return (0, 0);
+        }
+        let fall = sqrt_nearest(1u128 << (2 * AMPLITUDE_BITS + 2 * band), 1) as i128;
+        (div_nearest(self.r_across as i128 * fall, self.r_own as i128), -fall)
+    }
+}
+
+/// [definition; agent-inferred, November 1] **A far pair's weight** (§15.2): the overlap of the two
+/// sites' class amplitudes, `w_ij = Σ_c a_i(c) a_j(c) = Π_l Σ_s r_il(s) r_jl(s)` over the head's address
+/// modes (the Bhattacharyya coefficient of the memberships, `Σ_c √(μ_i(c) μ_j(c))`), on `2^(−62)`, each
+/// mode's factor `BC_l` on `2^(−62)` and the product released to the nearest numerator after each mode, in
+/// ascending mode. Two equal words weigh `1` up to the faces' attainment; a pair that shares no shell at a
+/// mode weighs zero and is not met.
+pub fn overlap(i: &[Membership], j: &[Membership]) -> u128 {
+    let mut w = 1u128 << WEIGHT_BITS;
+    for (a, b) in i.iter().zip(j) {
+        let bc = factor(a, b);
+        if bc == 0 {
+            return 0;
+        }
+        w = (w * bc + (1u128 << (WEIGHT_BITS - 1))) >> WEIGHT_BITS;
+    }
+    w
+}
+
+/// One mode's overlap factor `BC = Σ_s r_i(s) r_j(s)` on `2^(−62)`.
+pub fn factor(a: &Membership, b: &Membership) -> u128 {
+    a.shells().map(|s| a.amplitude(s) as u128 * b.amplitude(s) as u128).sum()
+}
+
+/// The class a far pair is counted at (each pair once, §15.2): at each address mode the least shell both
+/// are in; `None` where some mode shares none.
+pub fn canonical(i: &[Membership], j: &[Membership]) -> Option<u32> {
+    i.iter().zip(j).rev().try_fold(0u32, |c, (a, b)| a.shells().filter(|&s| b.amplitude(s) > 0).min().map(|s| 3 * c + s as u32))
+}
+
+/// Every class a site's memberships hold (each address mode's own shell, and the one across within the
+/// band), the primary (every mode's own) first.
+pub fn classes_of(modes: &[Membership]) -> Vec<u32> {
+    let mut out = vec![0u32];
+    for (l, m) in modes.iter().enumerate() {
+        let place = 3u32.pow(l as u32);
+        out = out.iter().flat_map(|&c| m.shells().map(move |s| c + place * s as u32)).collect();
+    }
+    out
+}
+
+/// [definition; agent-inferred, November 1] **A far pair's weight returned to its holds**: with `E =
+/// ∂L/∂ln w` on `2^(−40)`, each end's in-band mode `l` receives `∂L/∂λ_l = E · (∂BC_l/∂λ_l) / BC_l`,
+/// `∂BC_l/∂λ_l = Σ_s r_other(s) ∂r(s)/∂λ` ([`Membership::slopes`]), on `2^(−40)`, added into `lifts`
+/// (`[l]` of each end). A product past its carrier is refused.
+pub fn overlap_return(e: i128, i: &[Membership], j: &[Membership], band: u32, lift_i: &mut [i128], lift_j: &mut [i128]) -> Result<()> {
+    for (l, (a, b)) in i.iter().zip(j).enumerate() {
+        let bc = factor(a, b) as i128;
+        for (end, other, lift) in [(a, b, &mut *lift_i), (b, a, &mut *lift_j)] {
+            let (up, down) = end.slopes(band);
+            if up == 0 && down == 0 {
+                continue;
+            }
+            let dbc = up * other.amplitude(end.own) as i128 + down * other.amplitude(end.across) as i128;
+            let bits = |v: i128| 128 - v.unsigned_abs().leading_zeros();
+            if bits(e) + bits(dbc) > 126 {
+                return refuse("a far weight's return past its carrier");
+            }
+            lift[l] += div_nearest(e * dbc, bc);
+        }
+    }
+    Ok(())
 }
 
 /// [definition; agent-inferred, November 1] **A hold's return to its mode** (§14.2): with `N = re² −
@@ -701,11 +846,11 @@ fn decayed((decay, grain): (i128, u32), v: i64) -> i128 {
 }
 
 /// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
-/// §14.11): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ` its multiplier on
-/// `2^(−80)`: `2^80` in the near field, the two holds of a far source, a crowd's count `· 2^80` in the
-/// mass with `2^80` against its value sum) keeps its own exponent; the terms are summed whole, shifted
-/// from the row's least exponent, in a carrier as wide as the declaration bounds
-/// ([`FieldDeclaration::row_bits`]); the current `ỹ = Σ e v / Σ e` is released once, to the nearest
+/// §14.11; a row a mode, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
+/// its multiplier on `2^(−62)`: `2^62` in the near field, a far source's weight, a crowd's count `· 2^62`
+/// in the mass with `2^62` against its value sum) keeps its own exponent; the terms are summed whole,
+/// shifted from the row's least exponent, in a carrier as wide as the row's own exponents need (never
+/// past [`FieldDeclaration::row_bits`]); the current `ỹ = Σ e v / Σ e` is released once, to the nearest
 /// numerator on the value's grain; and each term's share of the mass is formed once on `2^(−63)`. No
 /// peak is subtracted and no term is released before the current: a source outscored by any number of
 /// bits still enters the sums. Integer sums, so any order gives the same bits.
@@ -750,15 +895,25 @@ impl SeriesRow {
 
 /// [definition; agent-inferred, November 1] **An octave's crowd** heard by a receiver (§14.10): the
 /// definite sources at places `lo..=hi` (one side, `⌊log₂ |i − j|⌋ = level`, `|i − j| ≥ NEAR`), their
-/// count, the crowd's score and its weight `|C| 2^(z − peak)` on `2^(−40)`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+/// count, and each mode's score and share of its row on `2^(−63)` (§15.2).
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Crowd {
     pub lo: usize,
     pub hi: usize,
     pub level: u32,
     pub count: u64,
-    pub z: i64,
-    pub e: u64,
+    pub z: Vec<i64>,
+    pub e: Vec<u64>,
+}
+
+/// [definition; agent-inferred, November 1] **A met source** of a receiver's rows (§15.2): its place,
+/// its weight on `2^(−62)` (`1` in the near field, the [`overlap`] of a far one) and each mode's share of
+/// its mode's row on `2^(−63)`.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Source {
+    pub j: u32,
+    pub w: u128,
+    pub p: Vec<u64>,
 }
 
 /// The crowds' ranges of receiver `i` in a region of `sites`: each octave `level ≥ 2` with
@@ -1118,16 +1273,16 @@ impl Field {
             affine(&self.theta[l.q..l.q + m2 * dw], reaches.q, dw, rt, Some(&self.theta[l.q_bias..l.q_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut q[t * m2..(t + 1) * m2])?;
             affine(&self.theta[l.v..l.v + m2 * dw], reaches.v, dw, rt, Some(&self.theta[l.v_bias..l.v_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut v[t * m2..(t + 1) * m2])?;
         }
-        // The resonance classes: the unframed word's shells, head by head (§12).
+        // The resonance classes: the unframed word's memberships of its shells, head by head (§12,
+        // §15.2).
+        let band = band_bits(trits);
         cell.classes = (0..heads)
             .map(|h| {
-                let class = (0..sites).map(|t| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(q[t * m2 + h * n + li], q[t * m2 + m + h * n + li]))).collect();
-                ClassLists::of(class, definite.to_vec(), buckets)
+                let modes = (0..sites).flat_map(|t| (0..trits).map(move |li| (t, li))).map(|(t, li)| membership(q[t * m2 + h * n + li], q[t * m2 + m + h * n + li], band)).collect();
+                ClassLists::of(modes, trits, definite.to_vec(), buckets)
             })
             .collect();
         cell.word = q.clone();
-        // Each site's hold on its shells, head by head (§14.2).
-        cell.holds = (0..heads).flat_map(|h| (0..sites).map(move |t| (h, t))).map(|(h, t)| hold((0..trits).map(|li| (q[t * m2 + h * n + li], q[t * m2 + m + h * n + li])))).collect();
         // The frame, by head: [h][t][2n], real parts then imaginary.
         let span = 2 * n;
         cell.q = vec![0i64; heads * sites * span];
@@ -1160,16 +1315,15 @@ impl Field {
             }
             cell.qscale[hs] = s;
         }
-        // The contact and the current over each site's support, head by head (§2.5, §14.10, §14.11):
-        // `z_ij = 2^(−β) Σ_m D_m(|i − j|) Re(conj(ŵ_im) ŵ_jm) − ⌊log₂ |i − j|⌋` on `2^(−16)` bits for
-        // a met source, and for each octave's crowd of definite sources its mean word at the octave's
-        // falloff. The row is a series ([`SeriesRow`]): each term `2^z` times its multiplier (a far
-        // source's two holds, a crowd's count) keeps its own exponent, the terms are summed whole, and
-        // the current `ỹ_i = Σ_k e_k v_k / Σ_k e_k` is released once; each term's share of the row's
-        // mass is formed once for the return. The current returns to the receiving site's own frame,
-        // `y_i = conj(U_i) ỹ_i`.
+        // The contact and the current over each site's support, head by head and mode by mode (§2.5,
+        // §14.10, §14.11, §15.2): `z_ij,m = 2^(−β) D_m(|i − j|) Re(conj(ŵ_im) ŵ_jm) − ⌊log₂ |i − j|⌋` on
+        // `2^(−16)` bits for a met source, and for each octave's crowd of definite sources its mean word
+        // at the octave's falloff. Each mode's row is its own series ([`SeriesRow`]): each term `2^z`
+        // times its multiplier (a far source's weight [`overlap`], a crowd's count) keeps its own
+        // exponent, the terms are summed whole, and the mode's current `ỹ_im = Σ_k e_k,m ṽ_km / Σ_k e_k,m`
+        // is released once; each term's share of its mode's row is formed once for the return. The
+        // current returns to the receiving site's own frame, `y_im = conj(U_im) ỹ_im`.
         cell.rows = Vec::with_capacity(heads * sites);
-        cell.mass = vec![1u64 << SHARE_BITS; heads * sites];
         cell.y = vec![0i64; sites * m2];
         let score_bits = (FACE_BITS as i32 + beta) as u32;
         cell.crowds = Vec::with_capacity(heads * sites);
@@ -1179,22 +1333,21 @@ impl Field {
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
                 let wi = &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span];
-                let hi = cell.holds[h * sites + i].0 as u128;
-                let mut series = SeriesRow::new(span);
-                let mut row: Vec<(u32, u64)> = Vec::new();
-                for j in lists.support(i) {
+                let mut series: Vec<SeriesRow> = (0..n).map(|_| SeriesRow::new(2)).collect();
+                let mut row: Vec<Source> = Vec::new();
+                for (j, w) in lists.support(i) {
                     let wj = &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
-                    // Each mode's pairing carried by its skin decay across the pair's distance,
-                    // released once (a still head's `D = 1` reads the bare pairing exactly).
+                    let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                    // Each mode's pairing carried by its skin decay across the pair's distance, released
+                    // once (a still head's `D = 1` reads the bare pairing exactly).
                     let d = i.abs_diff(j);
-                    let grain = self.decay(h, 0, d).1;
-                    let s: i128 = (0..n).map(|l| self.decay(h, l, d).0 * (wi[l] as i128 * wj[l] as i128 + wi[n + l] as i128 * wj[n + l] as i128)).sum();
-                    let z = fit64(release(s, score_bits + grain) - ((octave(d) as i128) << FACE_BITS))?;
-                    // A far source is held by both ends (§14.2); the near field without the holds.
-                    let mult = if d < NEAR { 1u128 << (2 * HOLD_BITS) } else { hi * cell.holds[h * sites + j].0 as u128 };
-                    let value: Vec<i128> = (0..span).map(|r| decayed(self.decay(h, r % n, d), cell.v[(h * sites + j) * span + r])).collect();
-                    series.push(self.face(z), mult, mult, &value);
-                    row.push((j as u32, 0));
+                    for li in 0..n {
+                        let decay = self.decay(h, li, d);
+                        let s = decay.0 * (wi[li] as i128 * wj[li] as i128 + wi[n + li] as i128 * wj[n + li] as i128);
+                        let z = fit64(release(s, score_bits + decay.1) - ((octave(d) as i128) << FACE_BITS))?;
+                        series[li].push(self.face(z), w, w, &[decayed(decay, vj[li]), decayed(decay, vj[n + li])]);
+                    }
+                    row.push(Source { j: j as u32, w, p: vec![0; n] });
                 }
                 // The far field blurred (§14.10): each octave's crowd of definite sources on each side,
                 // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
@@ -1206,24 +1359,28 @@ impl Field {
                         continue;
                     }
                     let word = sums.words(lo, hi_);
-                    let (decay, grain) = (|l: usize| self.decay(h, l, 1 << level), self.decay(h, 0, 1 << level).1);
-                    let score: i128 = (0..n).map(|l| decay(l).0 * (wi[l] as i128 * word[l] + wi[n + l] as i128 * word[n + l])).sum();
-                    let z = fit64(div_nearest(score, (count as i128) << (score_bits + grain)) - ((level as i128) << FACE_BITS))?;
-                    let value: Vec<i128> = (0..span).map(|r| decayed_wide(self.decay(h, r % n, 1 << level), sums.value(lo, hi_, r))).collect();
-                    series.push(self.face(z), (count as u128) << (2 * HOLD_BITS), 1u128 << (2 * HOLD_BITS), &value);
-                    crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0 });
+                    let mut zs = Vec::with_capacity(n);
+                    for li in 0..n {
+                        let decay = self.decay(h, li, 1 << level);
+                        let score = decay.0 * (wi[li] as i128 * word[li] + wi[n + li] as i128 * word[n + li]);
+                        let z = fit64(div_nearest(score, (count as i128) << (score_bits + decay.1)) - ((level as i128) << FACE_BITS))?;
+                        let value = [decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li))];
+                        series[li].push(self.face(z), (count as u128) << WEIGHT_BITS, 1u128 << WEIGHT_BITS, &value);
+                        zs.push(z);
+                    }
+                    crowds.push(Crowd { lo, hi: hi_, level, count, z: zs, e: vec![0; n] });
                 }
-                let (framed, shares) = series.release();
-                for (k, entry) in row.iter_mut().enumerate() {
-                    entry.1 = shares[k];
-                }
-                for (c, &share) in crowds.iter_mut().zip(&shares[row.len()..]) {
-                    c.e = share;
-                }
-                for li in 0..n {
+                for (li, mode) in series.iter().enumerate() {
+                    let (framed, shares) = mode.release();
+                    for (src, &share) in row.iter_mut().zip(&shares) {
+                        src.p[li] = share;
+                    }
+                    for (c, &share) in crowds.iter_mut().zip(&shares[row.len()..]) {
+                        c.e[li] = share;
+                    }
                     let (ur, ui) = self.frame(i, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
-                    let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
+                    let (yr, yi) = (fit64(framed[0])? as i128, fit64(framed[1])? as i128);
                     let c = h * n + li;
                     cell.y[i * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
                     cell.y[i * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
@@ -1469,11 +1626,13 @@ impl Field {
             for t in 0..sites {
                 transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, dms[t], MATERIAL_BITS, &mut dy[t * m2..(t + 1) * m2])?;
             }
-            // The weights and the contact over each site's support, head by head.
+            // The weights and the contact over each site's support, head by head and mode by mode.
             let mut dq = vec![0i64; sites * m2];
             let mut dv = vec![0i64; sites * m2];
-            // Each head's and site's hold covector `∂L/∂λ` on `2^(−40)` (§14.2).
-            let mut lifts = vec![0i128; heads * sites];
+            // Each head's, site's and address mode's hold covector `∂L/∂λ` on `2^(−40)` (§15.2).
+            let trits = d.class_trits();
+            let band = band_bits(trits);
+            let mut lifts = vec![0i128; heads * sites * trits];
             let mut dyh = vec![0i64; sites * span];
             for h in 0..heads {
                 // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
@@ -1490,23 +1649,25 @@ impl Field {
                 let rows = &cell.rows[h * sites..(h + 1) * sites];
                 let crowds = &cell.crowds[h * sites..(h + 1) * sites];
                 let sums = &cell.sums[h];
+                let lists = &cell.classes[h];
                 let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
                 let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
                 let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
-                // The values' return: `δṽ_j = Σ_(i: j∈S_i) p_ij D(|i − j|) δỹ_i` with each term's share
-                // `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over its
-                // members, `p_C/|C|` each, through a difference array over the places.
+                // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
+                // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
+                // its members, `p_C/|C|` each, through a difference array over the places.
                 let mut sv = vec![0i128; sites * span];
                 let mut crowd_v = vec![0i128; (sites + 1) * span];
                 for i in 0..sites {
-                    for &(j, p) in &rows[i] {
+                    for src in &rows[i] {
+                        let j = src.j as usize;
                         for r in 0..span {
-                            sv[j as usize * span + r] += p as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), dyh[i * span + r]);
+                            sv[j * span + r] += src.p[r % n] as i128 * decayed(self.decay(h, r % n, i.abs_diff(j)), dyh[i * span + r]);
                         }
                     }
                     for c in &crowds[i] {
                         for r in 0..span {
-                            let part = div_nearest(c.e as i128 * decayed(self.decay(h, r % n, 1 << c.level), dyh[i * span + r]), c.count as i128);
+                            let part = div_nearest(c.e[r % n] as i128 * decayed(self.decay(h, r % n, 1 << c.level), dyh[i * span + r]), c.count as i128);
                             crowd_v[c.lo * span + r] += part;
                             crowd_v[(c.hi + 1) * span + r] -= part;
                         }
@@ -1524,83 +1685,106 @@ impl Field {
                         }
                     }
                 }
-                // δz_k = ln 2 · p_k (δp_k − μ), δp_k = ⟨δỹ_i, D v_k⟩ on 2^(−40) (a crowd's value its
-                // decayed mean), μ = Σ_k p_k δp_k; the falloff is the medium's constant and returns
-                // nothing. The closure (§19), over the support's sources: on a still head at a closing
-                // tick, an unresolved site's row is also compared with where its class stands among the
-                // sites it meets: `δz_k += p_k − [k holds it] p_k/Σ_(holds) p`, over its ring set's
-                // `copies` heads. Then `δs = 2^(−β) δz`. A far source's term also returns to both ends'
-                // holds (§14.2): its share without one end's hold, `p/λ`, times the same comparison.
+                // Each mode's row returns alone: `δz_k,m = ln 2 · p_k,m (δp_k,m − μ_m)`, `δp_k,m =
+                // ⟨δỹ_im, D_m ṽ_km⟩` on 2^(−40) (a crowd's value its decayed mean), `μ_m = Σ_k p_k,m δp_k,m`;
+                // the falloff is the medium's constant and returns nothing. The closure (§19), over the
+                // support's sources: on a still head at a closing tick, an unresolved site's mode row is
+                // also compared with where its class stands among the sites it meets: `δz_k,m += p_k,m −
+                // [k holds it] p_k,m/Σ_(holds) p_m`, over its ring set's `copies` heads and the head's `n`
+                // modes (a set compares once). Then `δs = 2^(−β) δz`. A far source's weight multiplies every
+                // mode's term of the pair, so `∂L/∂ln w_ij = Σ_m (p_k,m (δp_k,m − μ_m) + the closure's
+                // part / ln 2)` returns through [`overlap_return`] to both ends' holds.
                 let closing = closure && d.closes(tick, h);
-                let copies = d.copies() as i128;
+                let copies = (d.copies() * n) as i128;
                 let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 for i in 0..sites {
                     let (row, crowd) = (&rows[i], &crowds[i]);
                     let dyi = &dyh[i * span..(i + 1) * span];
-                    let dp: Vec<i128> = row.iter().map(|&(j, _)| (0..span).map(|r| dyi[r] as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), vh[j as usize * span + r])).sum()).collect();
-                    let dpc: Vec<i128> = crowd.iter().map(|c| div_nearest((0..span).map(|r| dyi[r] as i128 * decayed_wide(self.decay(h, r % n, 1 << c.level), sums.value(c.lo, c.hi, r))).sum(), c.count as i128)).collect();
-                    let mean = release(row.iter().zip(&dp).map(|(&(_, p), &dpj)| p as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e as i128 * dpj).sum::<i128>(), SHARE_BITS);
                     let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
-                    let held: i128 = if closing && region.unresolved[i] { row.iter().filter(|&&(j, _)| holds(j as usize)).map(|&(_, p)| p as i128).sum() } else { 0 };
-                    let compare = |p: i128, dpk: i128, holder: bool| -> i128 {
-                        let mut dz = release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
-                        if held > 0 {
-                            dz += div_nearest(p << CONTACT_BITS, copies << SHARE_BITS) - if holder { div_nearest(p << CONTACT_BITS, held * copies) } else { 0 };
-                        }
-                        dz
-                    };
-                    let mut out = Vec::with_capacity(row.len());
-                    for (&(j, p), &dpj) in row.iter().zip(&dp) {
-                        let dz = compare(p as i128, dpj, holds(j as usize));
-                        if i.abs_diff(j as usize) >= NEAR {
-                            let lift = |r: i128| -> i128 {
-                                let mut g = release(r * (dpj - mean), SHARE_BITS);
-                                if held > 0 {
-                                    g += div_nearest(r << (CONTACT_BITS + MOVE_BITS - SHARE_BITS), copies * ln2) - if holds(j as usize) { div_nearest(r << (CONTACT_BITS + MOVE_BITS), held * copies * ln2) } else { 0 };
-                                }
-                                g
-                            };
-                            for end in [i, j as usize] {
-                                let lambda = cell.holds[h * sites + end].0 as i128;
-                                if lambda > 0 {
-                                    lifts[h * sites + end] += lift(div_nearest((p as i128) << HOLD_BITS, lambda));
-                                }
+                    let mut out = vec![0i128; row.len() * n];
+                    let mut outc = vec![0i128; crowd.len() * n];
+                    let mut by_weight = vec![0i128; row.len()];
+                    for li in 0..n {
+                        let pair = |r: usize, v: (i128, i128)| dyi[r] as i128 * v.0 + dyi[n + r] as i128 * v.1;
+                        let dp: Vec<i128> = row
+                            .iter()
+                            .map(|src| {
+                                let (decay, j) = (self.decay(h, li, i.abs_diff(src.j as usize)), src.j as usize);
+                                pair(li, (decayed(decay, vh[j * span + li]), decayed(decay, vh[j * span + n + li])))
+                            })
+                            .collect();
+                        let dpc: Vec<i128> = crowd
+                            .iter()
+                            .map(|c| {
+                                let decay = self.decay(h, li, 1 << c.level);
+                                div_nearest(pair(li, (decayed_wide(decay, sums.value(c.lo, c.hi, li)), decayed_wide(decay, sums.value(c.lo, c.hi, n + li)))), c.count as i128)
+                            })
+                            .collect();
+                        let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p[li] as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e[li] as i128 * dpj).sum::<i128>(), SHARE_BITS);
+                        let held: i128 = if closing && region.unresolved[i] { row.iter().filter(|src| holds(src.j as usize)).map(|src| src.p[li] as i128).sum() } else { 0 };
+                        let compare = |p: i128, dpk: i128, holder: bool| -> i128 {
+                            let mut dz = release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
+                            if held > 0 {
+                                dz += div_nearest(p << CONTACT_BITS, copies << SHARE_BITS) - if holder { div_nearest(p << CONTACT_BITS, held * copies) } else { 0 };
                             }
+                            dz
+                        };
+                        for (k, (src, &dpj)) in row.iter().zip(&dp).enumerate() {
+                            let (p, holder) = (src.p[li] as i128, holds(src.j as usize));
+                            if i.abs_diff(src.j as usize) >= NEAR {
+                                let mut g = release(p * (dpj - mean), SHARE_BITS);
+                                if held > 0 {
+                                    g += div_nearest(p << (CONTACT_BITS + MOVE_BITS - SHARE_BITS), copies * ln2) - if holder { div_nearest(p << (CONTACT_BITS + MOVE_BITS), held * copies * ln2) } else { 0 };
+                                }
+                                by_weight[k] += g;
+                            }
+                            let dsij = gained(compare(p, dpj, holder), beta)?;
+                            if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
+                                return refuse("a contact's covector past its return's carrier");
+                            }
+                            out[k * n + li] = dsij;
                         }
-                        let dsij = gained(dz, beta)?;
-                        if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
-                            return refuse("a contact's covector past its return's carrier");
+                        for (k, (c, &dpj)) in crowd.iter().zip(&dpc).enumerate() {
+                            let dsij = gained(compare(c.e[li] as i128, dpj, false), beta)?;
+                            if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
+                                return refuse("a contact's covector past its return's carrier");
+                            }
+                            outc[k * n + li] = dsij;
                         }
-                        out.push(dsij);
                     }
-                    let mut outc = Vec::with_capacity(crowd.len());
-                    for (c, &dpj) in crowd.iter().zip(&dpc) {
-                        let dsij = gained(compare(c.e as i128, dpj, false), beta)?;
-                        if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
-                            return refuse("a contact's covector past its return's carrier");
+                    // The far weights' return to both ends' holds.
+                    for (src, &e) in row.iter().zip(&by_weight) {
+                        if e == 0 {
+                            continue;
                         }
-                        outc.push(dsij);
+                        let j = src.j as usize;
+                        let (mut at_i, mut at_j) = (vec![0i128; trits], vec![0i128; trits]);
+                        overlap_return(e, lists.site(i), lists.site(j), band, &mut at_i, &mut at_j)?;
+                        for l in 0..trits {
+                            lifts[(h * sites + i) * trits + l] += at_i[l];
+                            lifts[(h * sites + j) * trits + l] += at_j[l];
+                        }
                     }
                     ds.push(out);
                     dsc.push(outc);
                 }
-                // The one word is both the probe and the key, so it returns both roles:
-                // `δw̃_i = Σ_(j∈S_i) δs_ij D(|i − j|) w̃_j + Σ_(i ∈ S_j) δs_ji D(|i − j|) w̃_j`, and a
-                // crowd's `δs_C D w̄/|C|` to its receiver and `δs_C D w̃_i/|C|` to each member; each sum
-                // released to 2^(−24).
+                // The one word is both the probe and the key, so it returns both roles, mode by mode:
+                // `δw̃_im = Σ_(j∈S_i) δs_ij,m D_m(|i − j|) w̃_jm + Σ_(i ∈ S_j) δs_ji,m D_m(|i − j|) w̃_jm`, and
+                // a crowd's `δs_C,m D_m w̄_m/|C|` to its receiver and `δs_C,m D_m w̃_im/|C|` to each member;
+                // each sum released to 2^(−24).
                 let mut col = vec![0i128; sites * span];
                 let mut crowd_w = vec![0i128; (sites + 1) * span];
                 for i in 0..sites {
-                    for (&(j, _), &dsij) in rows[i].iter().zip(&ds[i]) {
-                        let d = i.abs_diff(j as usize);
+                    for (k, src) in rows[i].iter().enumerate() {
+                        let (j, dd) = (src.j as usize, i.abs_diff(src.j as usize));
                         for r in 0..span {
-                            col[j as usize * span + r] += dsij * self.decay(h, r % n, d).0 * qh[i * span + r] as i128;
+                            col[j * span + r] += ds[i][k * n + r % n] * self.decay(h, r % n, dd).0 * qh[i * span + r] as i128;
                         }
                     }
-                    for (c, &dsk) in crowds[i].iter().zip(&dsc[i]) {
+                    for (k, c) in crowds[i].iter().enumerate() {
                         for r in 0..span {
-                            let part = div_nearest(dsk * self.decay(h, r % n, 1 << c.level).0 * qh[i * span + r] as i128, c.count as i128);
+                            let part = div_nearest(dsc[i][k * n + r % n] * self.decay(h, r % n, 1 << c.level).0 * qh[i * span + r] as i128, c.count as i128);
                             crowd_w[c.lo * span + r] += part;
                             crowd_w[(c.hi + 1) * span + r] -= part;
                         }
@@ -1608,8 +1792,8 @@ impl Field {
                 }
                 for i in 0..sites {
                     for r in 0..span {
-                        let sq: i128 = rows[i].iter().zip(&ds[i]).map(|(&(j, _), &dsij)| dsij * self.decay(h, r % n, i.abs_diff(j as usize)).0 * qh[j as usize * span + r] as i128).sum::<i128>()
-                            + crowds[i].iter().zip(&dsc[i]).map(|(c, &dsk)| div_nearest(dsk * self.decay(h, r % n, 1 << c.level).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
+                        let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k * n + r % n] * self.decay(h, r % n, i.abs_diff(src.j as usize)).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
+                            + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k * n + r % n] * self.decay(h, r % n, 1 << c.level).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
@@ -1646,18 +1830,19 @@ impl Field {
                     }
                 }
             }
-            // The holds return to the unframed word's mode that sets them ([`hold_return`]).
+            // The holds return to their unframed modes ([`hold_return`]).
             for h in 0..heads {
                 for t in 0..sites {
-                    let (lambda, l) = cell.holds[h * sites + t];
-                    let g = lifts[h * sites + t];
-                    if g == 0 || lambda == 0 {
-                        continue;
+                    for l in 0..trits {
+                        let g = lifts[(h * sites + t) * trits + l];
+                        if g == 0 {
+                            continue;
+                        }
+                        let c = h * n + l;
+                        let (dre, dim) = hold_return(g, cell.word[t * m2 + c], cell.word[t * m2 + m + c])?;
+                        dq[t * m2 + c] = fit64(dq[t * m2 + c] as i128 + dre)?;
+                        dq[t * m2 + m + c] = fit64(dq[t * m2 + m + c] as i128 + dim)?;
                     }
-                    let c = h * n + l as usize;
-                    let (dre, dim) = hold_return(g, cell.word[t * m2 + c], cell.word[t * m2 + m + c])?;
-                    dq[t * m2 + c] = fit64(dq[t * m2 + c] as i128 + dre)?;
-                    dq[t * m2 + m + c] = fit64(dq[t * m2 + m + c] as i128 + dim)?;
                 }
             }
             let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
@@ -1937,7 +2122,10 @@ impl Field {
         if sites.iter().any(|&i| i >= n) || question > n {
             return refuse("a landmark site outside its region");
         }
-        let rows = sites.iter().map(|&i| (0..d.heads).filter(|h| h % d.frames < d.still).map(|h| (cell.rows[h * n + i].clone(), cell.mass[h * n + i])).collect()).collect::<Vec<Vec<_>>>();
+        let rows = sites
+            .iter()
+            .map(|&i| (0..d.heads).filter(|h| h % d.frames < d.still).flat_map(|h| (0..d.modes).map(move |li| (h, li))).map(|(h, li)| (cell.rows[h * n + i].iter().map(|src| (src.j, src.p[li])).collect(), 1u64 << SHARE_BITS)).collect())
+            .collect::<Vec<Vec<_>>>();
         Ok(landmarks_of(&rows, question, count))
     }
 
