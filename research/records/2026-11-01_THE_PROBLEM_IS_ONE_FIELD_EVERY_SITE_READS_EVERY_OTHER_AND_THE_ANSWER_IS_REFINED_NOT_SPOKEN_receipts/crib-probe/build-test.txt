@@ -1,0 +1,7 @@
+( PATH=/opt/cuda/bin:$PATH timeout 1200 cargo build --release -p holonics-cud)  138.46s user 3.36s system 314% cpu 45.068 total
+rc=0
+test hnn::field::tests::a_regions_octets_count_its_carriers_beside_its_weights ... ok
+test hnn::field::tests::batches_cover_the_regions_in_order_within_the_budget ... ok
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s
+( PATH=/opt/cuda/bin:$PATH timeout 900 cargo test -p holonics-cuda --lib ; )  56.40s user 6.88s system 198% cpu 31.850 total
+rc=0
