@@ -60,7 +60,16 @@ fn region() -> Region<'static> {
     Region { classes: &CLASSES, unresolved: &OPEN }
 }
 
+/// The code's own covector (the face's comparison alone, without the closure's).
 fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
+    let pass = field.pass(region, true).unwrap();
+    let mut g = vec![0i128; field.theta.len()];
+    field.returned(region, &pass, &mut g, false).unwrap();
+    g
+}
+
+/// The learner's covector of one region (the reverse, with the closure's comparison).
+fn reversed_of(field: &Field, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.theta.len()];
     field.reverse(region, &pass, &mut g).unwrap();
@@ -268,8 +277,8 @@ fn regions_sum_in_any_order() {
     let second_open = [true, false, false, true, true, false, false];
     let regions = [region(), Region { classes: &second_classes, unresolved: &second_open }];
     let (_, g) = field.read_and_return(&regions).unwrap();
-    let a = covector_of(&field, &regions[0]);
-    let b = covector_of(&field, &regions[1]);
+    let a = reversed_of(&field, &regions[0]);
+    let b = reversed_of(&field, &regions[1]);
     let summed: Vec<i128> = a.iter().zip(&b).map(|(x, y)| x + y).collect();
     assert_eq!(g, summed);
     let (_, reversed) = field.read_and_return(&[regions[1], regions[0]]).unwrap();
@@ -1011,4 +1020,145 @@ fn the_contact_finds_a_cue_s_successor() {
     }
     let held = code(&learner);
     assert!(held < 1 << 16, "the held successor codes {} millibits", held * 1000 >> 20);
+}
+
+/// Without a holder (no resolved site holds an unresolved site's class) or without a still ring
+/// set, the closure compares nothing and the reverse is the code's own covector, bit for bit; with
+/// one, the closure's comparison joins it (§19).
+#[test]
+fn the_closure_compares_only_where_a_class_is_held() {
+    let returned = |field: &Field, region: &Region, closure: bool| -> Vec<i128> {
+        let pass = field.pass(region, true).unwrap();
+        let mut g = vec![0i128; field.theta.len()];
+        field.returned(region, &pass, &mut g, closure).unwrap();
+        g
+    };
+    let unheld_classes = [1usize, 4, 0, 2, 3, 3, 1];
+    let unheld_open = [false, true, false, true, false, false, false];
+    let unheld = Region { classes: &unheld_classes, unresolved: &unheld_open };
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        assert_eq!(returned(&field, &unheld, true), returned(&field, &unheld, false), "still {still}: no class is held");
+        let held = region();
+        let (with, without) = (returned(&field, &held, true), returned(&field, &held, false));
+        if still == 0 {
+            assert_eq!(with, without, "no still ring set compares");
+        } else {
+            assert_ne!(with, without, "still {still}: a held class is compared");
+        }
+    }
+}
+
+/// Two numbers of two digits stand in a filler text, the first anywhere before the second; the
+/// region ends with the marker `14` and two unresolved sites, the first number's digits. Nothing in
+/// a word tells the first number from the second: only their order does.
+fn order_problem(seed: u64, n: usize) -> Vec<usize> {
+    let mut next = mixer(seed);
+    let mut classes: Vec<usize> = (0..n - 3).map(|_| (next() % 4) as usize).collect();
+    let mut digits: Vec<usize> = (4..14).collect();
+    for i in (1..10).rev() {
+        digits.swap(i, (next() % (i as u64 + 1)) as usize);
+    }
+    let room = n - 3 - 1;
+    let (p, q) = loop {
+        let a = (next() % room as u64) as usize;
+        let b = (next() % room as u64) as usize;
+        if a + 3 <= b {
+            break (a, b);
+        }
+    };
+    classes[p] = digits[0];
+    classes[p + 1] = digits[1];
+    classes[q] = digits[2];
+    classes[q + 1] = digits[3];
+    classes.extend([14, digits[0], digits[1]]);
+    classes
+}
+
+/// [measured] The closure locates a number told only by its order: the answer's sites have no word
+/// that any site of the text shares, so the face's covector reaches the first number only through
+/// a contact the founding did not make; the closure's comparison reaches it wherever it stands.
+#[test]
+#[ignore]
+fn the_closure_locates_a_number_told_by_order() {
+    let var = |k: &str, d: usize| std::env::var(k).ok().map(|v| v.parse().unwrap()).unwrap_or(d);
+    let (n, sections) = (var("ORDER_SITES", 24), var("ORDER_SECTIONS", 300) as u64);
+    let d = FieldDeclaration { alphabet: 15, width: 16, heads: 4, modes: 4, still: 2, contacts: 16, ticks: 2, frames: 4, reach: n };
+    let mut learner = FieldLearner::new(Field::found(d, &keys(1 << 18)).unwrap(), 6);
+    let open: Vec<bool> = (0..n).map(|t| t + 2 >= n).collect();
+    let code = |field: &Field| -> i64 { (0..64u64).map(|i| field.code(&Region { classes: &order_problem(1_000_000 + i, n), unresolved: &open }).unwrap().0).sum::<i64>() / 64 };
+    let started = std::time::Instant::now();
+    for s in 0..sections {
+        let problems: Vec<Vec<usize>> = (0..16).map(|i| order_problem(s * 16 + i, n)).collect();
+        let regions: Vec<Region> = problems.iter().map(|c| Region { classes: c, unresolved: &open }).collect();
+        learner.section(&regions).unwrap();
+        if s % 50 == 49 {
+            eprintln!("ORDER s={} held={} millibits ms={}", s + 1, code(&learner.field) * 1000 >> 20, started.elapsed().as_millis());
+        }
+    }
+}
+
+/// Three numbers of two digits, drawn with repetition, the first before the second and the second
+/// before the third, in a filler text; the region ends with the marker `14` and the first number's
+/// digits. A digit of the answer stands wherever it recurs, so its class has plural holders.
+fn repeated_order_problem(seed: u64, n: usize) -> Vec<usize> {
+    let mut next = mixer(seed);
+    let mut classes: Vec<usize> = (0..n - 3).map(|_| (next() % 4) as usize).collect();
+    let digits: Vec<usize> = (0..6).map(|_| 4 + (next() % 10) as usize).collect();
+    let room = n - 3 - 1;
+    let (p, q, r) = loop {
+        let a = (next() % room as u64) as usize;
+        let b = (next() % room as u64) as usize;
+        let c = (next() % room as u64) as usize;
+        if a + 3 <= b && b + 3 <= c {
+            break (a, b, c);
+        }
+    };
+    for (k, &at) in [p, q, r].iter().enumerate() {
+        classes[at] = digits[2 * k];
+        classes[at + 1] = digits[2 * k + 1];
+    }
+    classes.extend([14, digits[0], digits[1]]);
+    classes
+}
+
+/// [measured] The closure locates a number among its repeated digits under the crib's completion
+/// mask: with even odds a region's answer alone is open, or every site at a rate `τ` uniform on
+/// `(0, 1]`, so most open sites' classes stand at many sites. The comparison is the code of the class
+/// on the row's own copy face, so a row on any holder is settled and the rows of the many-held
+/// classes stop pushing (24 sites, 1,200 sections: 0.54 bits against 0.70 when every holder is
+/// asked for alike, 5.57 without the closure).
+#[test]
+#[ignore]
+fn the_closure_locates_a_number_among_repeated_digits() {
+    let var = |k: &str, d: usize| std::env::var(k).ok().map(|v| v.parse().unwrap()).unwrap_or(d);
+    let (n, sections) = (var("ORDER_SITES", 24), var("ORDER_SECTIONS", 1200) as u64);
+    let d = FieldDeclaration { alphabet: 15, width: 16, heads: 4, modes: 4, still: 2, contacts: 16, ticks: 2, frames: 4, reach: n };
+    let mut learner = FieldLearner::new(Field::found(d, &keys(1 << 18)).unwrap(), 6);
+    let answer: Vec<bool> = (0..n).map(|t| t + 2 >= n).collect();
+    let code = |field: &Field| -> i64 { (0..64u64).map(|i| field.code(&Region { classes: &repeated_order_problem(1_000_000 + i, n), unresolved: &answer }).unwrap().0).sum::<i64>() / 64 };
+    let started = std::time::Instant::now();
+    for s in 0..sections {
+        let problems: Vec<Vec<usize>> = (0..16).map(|i| repeated_order_problem(s * 16 + i, n)).collect();
+        let opens: Vec<Vec<bool>> = (0..16u64)
+            .map(|i| {
+                let mut next = mixer((s * 16 + i) ^ 0x5151);
+                let head = next();
+                if head & 1 == 0 {
+                    return answer.clone();
+                }
+                let tau = (head >> 1) % 65536 + 1;
+                let mut open: Vec<bool> = (0..n).map(|_| next() % 65536 < tau).collect();
+                if !open.iter().any(|&u| u) {
+                    open[n - 1] = true;
+                }
+                open
+            })
+            .collect();
+        let regions: Vec<Region> = problems.iter().zip(&opens).map(|(c, o)| Region { classes: c, unresolved: o }).collect();
+        learner.section(&regions).unwrap();
+        if s % 100 == 99 {
+            eprintln!("REPEATED s={} held={} millibits ms={}", s + 1, code(&learner.field) * 1000 >> 20, started.elapsed().as_millis());
+        }
+    }
 }

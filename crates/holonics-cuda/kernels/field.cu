@@ -31,6 +31,8 @@ typedef unsigned __int128 uwide;
 static_assert(WEIGHT_BITS % 2 == 0 && WEIGHT_HALF < 31, "a weight splits into two halves of a 32-bit product");
 #define CARRIED_BITS 70
 #define CONTACT_BACK 32
+// The contact's covector grain, `δz` on `2^(−40)` (the host's `CONTACT_BITS`).
+#define CONTACT_BITS 40
 
 #define REFUSED_CARRIER 1u
 #define REFUSED_WORD64 2u
@@ -840,7 +842,7 @@ extern "C" __global__ void field_current_back(FieldWords w, const int64_t *dy, i
 // from `δs` a chunk at a time. (The first realization divided a pair by a 128-bit software division
 // and read `δs` once for every entry of the span.)
 #define ROW_CHUNK 8
-extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, wide *ds, int64_t *dq) {
+extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, wide *ds, int64_t *dq) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
@@ -855,7 +857,13 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const in
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * w.span;
         const int64_t *keys = w.kf + ((uint64_t)h * w.T + first) * w.span;
         const uint64_t mass = w.mass[(uint64_t)h * w.T + g];
+        // The closure (§19): on a still head at a closing tick, an unresolved site's row is also
+        // compared with where its class stands, the code of its class on the row's own copy face:
+        // `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`.
+        const bool open = closes != 0 && w.unresolved[first + i] != 0;
+        const uint32_t cls = w.classes[first + i];
         wide weighted = 0;
+        wide held = 0;
         for (uint32_t j = lane; j < sites; j += 32) {
             const int64_t *vj = values + (uint64_t)j * w.span;
             wide dp = 0;
@@ -864,9 +872,13 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const in
             }
             dsr[j] = dp;
             weighted += (wide)e[j] * dp;
+            held += (open && j != i && w.unresolved[first + j] == 0 && w.classes[first + j] == cls) ? (wide)e[j] : 0;
         }
         const wide mean = div_nearest(warp_sum(weighted), (wide)mass);
+        // The holders' mass is a part of the row's, so it is a 64-bit divisor as the row's is.
+        const wide holders = warp_sum(held);
         const Divisor by = divisor_of(mass);
+        const Divisor hb = divisor_of(holders > 0 ? (uint64_t)holders : 1);
         for (uint32_t c0 = 0; c0 == 0 || c0 < w.span; c0 += ROW_CHUNK) {
             wide sum[ROW_CHUNK];
 #pragma unroll
@@ -876,7 +888,13 @@ extern "C" __global__ void field_contact_rows(FieldWords w, uint32_t h, const in
             for (uint32_t j = lane; j < sites; j += 32) {
                 wide dz;
                 if (c0 == 0) {
-                    dz = rel(rel(ln2 * div_nearest_by((wide)e[j] * (dsr[j] - mean), by), MOVE_BITS), w.beta);
+                    dz = rel(ln2 * div_nearest_by((wide)e[j] * (dsr[j] - mean), by), MOVE_BITS);
+                    if (holders > 0) {
+                        const bool holds = j != i && w.unresolved[first + j] == 0 && w.classes[first + j] == cls;
+                        const wide at = (wide)e[j] << CONTACT_BITS;
+                        dz += div_nearest_by(at, by) - (holds ? div_nearest_by(at, hb) : 0);
+                    }
+                    dz = rel(dz, w.beta);
                     dsr[j] = dz;
                 } else {
                     dz = dsr[j];

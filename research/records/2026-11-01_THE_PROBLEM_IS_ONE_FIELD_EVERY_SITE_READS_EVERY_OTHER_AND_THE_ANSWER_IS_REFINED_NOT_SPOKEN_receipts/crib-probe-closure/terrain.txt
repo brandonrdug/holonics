@@ -1,0 +1,4 @@
+FIELD_COMMAND crib-terrain 20261101 4096 128 $ROOT/.local/wt/field-card/.local/run/crib/TRAIN.txt $ROOT/.local/wt/field-card/.local/run/crib/HELD.txt
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15370092544 total=16802250752 batch_budget=10379001856
+CRIB_TERRAIN seed=20261101 train=4096 dev=128
+FIELD_CARD reads=0 read_ms=0 returns=0 return_ms=0 pairs=0 batches=0 peak_store=0 elapsed_ms=18

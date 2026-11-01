@@ -191,6 +191,13 @@ impl FieldDeclaration {
         beta
     }
 
+    /// [definition; agent-inferred, November 1] **Where the closure compares** (§19): a head of a
+    /// still ring set (it reads words at any distance, so the site that holds a class is met
+    /// wherever it stands) at every tick. See [`Field`]'s reverse.
+    pub fn closes(&self, _tick: usize, head: usize) -> bool {
+        head % self.frames < self.still
+    }
+
     /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
     /// rows of every class (their unresolved rows open at zero), the probe chart (the key chart is
     /// founded equal to it), the value chart and both pair drives.
@@ -781,6 +788,12 @@ impl Field {
     /// on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's
     /// `Σ δz x` on `2^(−40)`).
     fn reverse(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
+        self.returned(region, pass, g, true)
+    }
+
+    /// The reverse, with the closure's comparison (§19) or the face's alone: the face's alone is
+    /// the code's own covector, which the reverse's law tests read against the code's difference.
+    fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128], closure: bool) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
         let m2 = 2 * m;
@@ -814,7 +827,7 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + a * dw], dw, &ys, &xs)?;
         }
-        for cell in pass.ticks.iter().rev() {
+        for (tick, cell) in pass.ticks.iter().enumerate().rev() {
             // The pair contact: x_out = x_mid + W_c c + b_c.
             let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
             for dxt in &dxs {
@@ -917,14 +930,24 @@ impl Field {
                 }
                 // δz_ij = ln 2 · (e_ij/Σe)(δp_ij − Σ_k (e_ik/Σe) δp_ik), δp_ij = ⟨δỹ_i, ṽ_j⟩ on
                 // 2^(−40), each numerator summed whole over the row's one denominator.
+                // The closure (§19): on a still head at a closing tick, an unresolved site's row is
+                // also compared with where its class stands, the code of its class on the row's own
+                // copy face, `−log Σ_(j holds it) p_ij`: `δz_ij += p_ij − [j holds it] e_ij/Σ_(k holds it) e_ik`.
+                let closing = closure && d.closes(tick, h);
                 for i in 0..sites {
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let dp: Vec<i128> = (0..sites).map(|j| dyi.iter().zip(&vh[j * span..(j + 1) * span]).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
                     let row = &e[i * sites..(i + 1) * sites];
                     let denominator = mass[i] as i128;
                     let mean = div_nearest(row.iter().zip(&dp).map(|(&ej, &dpj)| ej as i128 * dpj).sum(), denominator);
+                    let holds = |j: usize| j != i && !region.unresolved[j] && region.classes[j] == region.classes[i];
+                    let held: i128 = if closing && region.unresolved[i] { (0..sites).filter(|&j| holds(j)).map(|j| row[j] as i128).sum() } else { 0 };
                     for j in 0..sites {
-                        let dz = release(ln2 * div_nearest(row[j] as i128 * (dp[j] - mean), denominator), MOVE_BITS);
+                        let mut dz = release(ln2 * div_nearest(row[j] as i128 * (dp[j] - mean), denominator), MOVE_BITS);
+                        if held > 0 {
+                            let at = (row[j] as i128) << CONTACT_BITS;
+                            dz += div_nearest(at, denominator) - if holds(j) { div_nearest(at, held) } else { 0 };
+                        }
                         ds[i * sites + j] = release(dz, beta);
                     }
                 }

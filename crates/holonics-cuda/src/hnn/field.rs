@@ -637,7 +637,7 @@ impl<'c> CardField<'c> {
         self.outer(words, g, words.read, a, dw, dz.device_ptr(), a, fread.device_ptr(), dw, false, true)?;
         self.transposed(words, words.read, a, dw, dz.device_ptr(), a, dr.device_ptr(), false, true)?;
         self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
-        for tick in ticks.iter().rev() {
+        for (at, tick) in ticks.iter().enumerate().rev() {
             words.qf = tick.qf.device_ptr();
             words.kf = tick.kf.device_ptr();
             words.vf = tick.vf.device_ptr();
@@ -669,8 +669,8 @@ impl<'c> CardField<'c> {
             let (mut dyp, mut dyhp, mut wrp) = (dy.device_ptr(), dyh.device_ptr(), wr.device_ptr());
             self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp), arg(&mut wrp)])?;
             for h in 0..heads {
-                let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
-                self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+                let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, field.declaration.closes(at, h) as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
+                self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
                 let (mut hh, mut wrp, mut dsp, mut dkp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dk.device_ptr(), dv.device_ptr());
                 self.launch("field_contact_columns", Self::blocks_of_32(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dkp), arg(&mut dvp)])?;
             }

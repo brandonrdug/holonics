@@ -1,0 +1,19 @@
+FIELD_COMMAND parity-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-weighted/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $ROOT/.local/wt/field-card/.local/run/crib-weighted/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 8 8 2 4 8
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=14109769728 total=16802250752 batch_budget=9118679040
+FIELD_PASSAGE train=3968 withheld=128 held=128 held_read=128 alphabet=44 answer=53 reach=484
+FIELD_PARITY_DECLARATION width=64 heads=8 modes=8 still=2 contacts=64 ticks=2 frames=4 reach=484 rate=9 material=57196 grow=2
+FIELD_PARITY section=1 withheld=false regions=16 length=372 sites=1763 pairs=33574080 reads=4 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true host_ms=1066 card_ms=60
+FIELD_PARITY section=2 withheld=false regions=16 length=391 sites=950 pairs=37094464 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-29284518/0/false learner_equal=true host_ms=1900 card_ms=93
+FIELD_PARITY section=3 withheld=false regions=16 length=303 sites=1059 pairs=22744624 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-36203549/0/false learner_equal=true host_ms=1183 card_ms=65
+FIELD_PARITY section=4 withheld=false regions=16 length=429 sites=1504 pairs=46622144 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-67369113/0/false learner_equal=true host_ms=2447 card_ms=109
+FIELD_PARITY section=5 withheld=false regions=16 length=365 sites=1565 pairs=31470416 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-114838295/0/false learner_equal=true host_ms=1675 card_ms=84
+FIELD_PARITY section=6 withheld=false regions=16 length=358 sites=1597 pairs=28276992 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-71722326/0/false learner_equal=true host_ms=1480 card_ms=77
+FIELD_PARITY section=7 withheld=false regions=16 length=330 sites=1170 pairs=24841152 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-114842342/0/false learner_equal=true host_ms=1312 card_ms=70
+FIELD_PARITY section=8 withheld=false regions=16 length=302 sites=1368 pairs=20125600 reads=6 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-128901308/0/false learner_equal=true host_ms=1062 card_ms=67
+FIELD_PARITY section=9 withheld=true regions=512 length=444 sites=0 pairs=1038848640 reads=3 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=423155021/1/true learner_equal=true host_ms=19089 card_ms=866
+FIELD_PARITY_RELEASE problem=0 question=358 released=1 equal=true host_ms=4807
+FIELD_PARITY_RELEASE problem=1 question=395 released=1 equal=true host_ms=5675
+FIELD_PARITY_RELEASE problem=2 question=342 released=1 equal=true host_ms=4643
+FIELD_PARITY_RELEASE problem=3 question=341 released=3 equal=true host_ms=4426
+FIELD_PARITY_DONE sections=9 reads=49 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=4 releases_unequal=0 card_release_ms=81 host_ms=31218 card_ms=1494 elapsed_ms=52566
+FIELD_CARD reads=65 read_ms=1257 returns=8 return_ms=267 pairs=4564363024 batches=73 peak_store=1999307968 elapsed_ms=52567

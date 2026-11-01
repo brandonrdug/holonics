@@ -1,0 +1,14 @@
+REPEATED s=100 held=6910 millibits ms=881
+REPEATED s=200 held=6682 millibits ms=1801
+REPEATED s=300 held=6679 millibits ms=2704
+REPEATED s=400 held=6404 millibits ms=3632
+REPEATED s=500 held=5565 millibits ms=4453
+REPEATED s=600 held=4084 millibits ms=5278
+REPEATED s=700 held=2948 millibits ms=6127
+REPEATED s=800 held=1886 millibits ms=6916
+REPEATED s=900 held=1245 millibits ms=7735
+REPEATED s=1000 held=751 millibits ms=8562
+REPEATED s=1100 held=658 millibits ms=9379
+REPEATED s=1200 held=535 millibits ms=10303
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2013 filtered out; finished in 10.31s
+RUSAGE rc=0 wall_ms=10317 peak_rss_kib=11556 user_s=63 sys_s=1

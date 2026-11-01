@@ -1,0 +1,568 @@
+# Host fixture runs at 24 sites (alphabet 15, width 16, heads 4, modes 4, still 2 of 4 ring sets,
+# contacts 16, ticks 2; 16 regions a section; held code of the answer's two sites over 64 held
+# problems, millibits) under a temporary, uncommitted switch of the closure's law: law 0 none,
+# law 1 every holder asked for alike (`p_ij − [j holds]/holders`), law 2 the row's copy face
+# (`p_ij − [j holds] e_ij/Σ_(k holds) e_ik`, the committed law). plural=0: two numbers of distinct
+# digits (unique holders); plural=1: three numbers of digits drawn with repetition (plural holders).
+# mask=m: each text site also open with odds m/16. long-L-M: law L, plural=1, mask=M, 1,200 sections.
+# mix-L-P: law L, plural=P, the crib's mask mix (even odds: the answer alone, or every site at τ
+# uniform on (0, 1]), 1,200 sections. rate8-L: law L, plural=1, the mix, rate 2^(−8), 2,400 sections
+# (all others at 2^(−6)). ms is wall time at 2 to 6 threads a run beside the others.
+law=0 plural=0 mask=0 SCRATCH s=50 held=6661 millibits ms=1351
+law=0 plural=0 mask=0 SCRATCH s=100 held=6615 millibits ms=2734
+law=0 plural=0 mask=0 SCRATCH s=150 held=6760 millibits ms=4094
+law=0 plural=0 mask=0 SCRATCH s=200 held=6798 millibits ms=5439
+law=0 plural=0 mask=0 SCRATCH s=250 held=6626 millibits ms=6723
+law=0 plural=0 mask=0 SCRATCH s=300 held=6598 millibits ms=7907
+law=0 plural=1 mask=0 SCRATCH s=50 held=6872 millibits ms=1363
+law=0 plural=1 mask=0 SCRATCH s=100 held=6548 millibits ms=2780
+law=0 plural=1 mask=0 SCRATCH s=150 held=6331 millibits ms=4133
+law=0 plural=1 mask=0 SCRATCH s=200 held=6178 millibits ms=5634
+law=0 plural=1 mask=0 SCRATCH s=250 held=5772 millibits ms=6960
+law=0 plural=1 mask=0 SCRATCH s=300 held=5764 millibits ms=8107
+law=0 plural=1 mask=4 SCRATCH s=50 held=6934 millibits ms=1430
+law=0 plural=1 mask=4 SCRATCH s=100 held=6756 millibits ms=2884
+law=0 plural=1 mask=4 SCRATCH s=150 held=6689 millibits ms=4372
+law=0 plural=1 mask=4 SCRATCH s=200 held=6676 millibits ms=5891
+law=0 plural=1 mask=4 SCRATCH s=250 held=6662 millibits ms=7324
+law=0 plural=1 mask=4 SCRATCH s=300 held=6639 millibits ms=8416
+law=1 plural=0 mask=0 SCRATCH s=50 held=6636 millibits ms=1270
+law=1 plural=0 mask=0 SCRATCH s=100 held=6486 millibits ms=2580
+law=1 plural=0 mask=0 SCRATCH s=150 held=5246 millibits ms=3895
+law=1 plural=0 mask=0 SCRATCH s=200 held=2610 millibits ms=5263
+law=1 plural=0 mask=0 SCRATCH s=250 held=981 millibits ms=6605
+law=1 plural=0 mask=0 SCRATCH s=300 held=404 millibits ms=7824
+law=1 plural=1 mask=0 SCRATCH s=50 held=6801 millibits ms=1403
+law=1 plural=1 mask=0 SCRATCH s=100 held=6565 millibits ms=2762
+law=1 plural=1 mask=0 SCRATCH s=150 held=5719 millibits ms=4129
+law=1 plural=1 mask=0 SCRATCH s=200 held=3646 millibits ms=5489
+law=1 plural=1 mask=0 SCRATCH s=250 held=2127 millibits ms=6836
+law=1 plural=1 mask=0 SCRATCH s=300 held=961 millibits ms=8064
+law=1 plural=1 mask=4 SCRATCH s=50 held=7347 millibits ms=1277
+law=1 plural=1 mask=4 SCRATCH s=100 held=7347 millibits ms=2299
+law=1 plural=1 mask=4 SCRATCH s=150 held=7347 millibits ms=3313
+law=1 plural=1 mask=4 SCRATCH s=200 held=7347 millibits ms=4356
+law=1 plural=1 mask=4 SCRATCH s=250 held=7347 millibits ms=5408
+law=1 plural=1 mask=4 SCRATCH s=300 held=7347 millibits ms=6424
+law=2 plural=0 mask=0 SCRATCH s=50 held=6636 millibits ms=1346
+law=2 plural=0 mask=0 SCRATCH s=100 held=6486 millibits ms=2687
+law=2 plural=0 mask=0 SCRATCH s=150 held=5246 millibits ms=4000
+law=2 plural=0 mask=0 SCRATCH s=200 held=2610 millibits ms=5366
+law=2 plural=0 mask=0 SCRATCH s=250 held=981 millibits ms=6701
+law=2 plural=0 mask=0 SCRATCH s=300 held=404 millibits ms=7921
+law=2 plural=1 mask=0 SCRATCH s=50 held=6739 millibits ms=1400
+law=2 plural=1 mask=0 SCRATCH s=100 held=6571 millibits ms=2800
+law=2 plural=1 mask=0 SCRATCH s=150 held=5784 millibits ms=4163
+law=2 plural=1 mask=0 SCRATCH s=200 held=2922 millibits ms=5475
+law=2 plural=1 mask=0 SCRATCH s=250 held=884 millibits ms=6780
+law=2 plural=1 mask=0 SCRATCH s=300 held=348 millibits ms=8006
+law=2 plural=1 mask=4 SCRATCH s=50 held=7181 millibits ms=1403
+law=2 plural=1 mask=4 SCRATCH s=100 held=6901 millibits ms=2789
+law=2 plural=1 mask=4 SCRATCH s=150 held=6761 millibits ms=4328
+law=2 plural=1 mask=4 SCRATCH s=200 held=6691 millibits ms=6021
+law=2 plural=1 mask=4 SCRATCH s=250 held=6676 millibits ms=7461
+law=2 plural=1 mask=4 SCRATCH s=300 held=6663 millibits ms=8544
+long-0-2 law=0 mask=2 SCRATCH s=50 held=6892 millibits ms=1571
+long-0-2 law=0 mask=2 SCRATCH s=100 held=6825 millibits ms=3153
+long-0-2 law=0 mask=2 SCRATCH s=150 held=6630 millibits ms=4721
+long-0-2 law=0 mask=2 SCRATCH s=200 held=6388 millibits ms=6541
+long-0-2 law=0 mask=2 SCRATCH s=250 held=6332 millibits ms=8317
+long-0-2 law=0 mask=2 SCRATCH s=300 held=6237 millibits ms=9844
+long-0-2 law=0 mask=2 SCRATCH s=350 held=5998 millibits ms=11419
+long-0-2 law=0 mask=2 SCRATCH s=400 held=6181 millibits ms=12917
+long-0-2 law=0 mask=2 SCRATCH s=450 held=5804 millibits ms=14481
+long-0-2 law=0 mask=2 SCRATCH s=500 held=6037 millibits ms=15986
+long-0-2 law=0 mask=2 SCRATCH s=550 held=5770 millibits ms=17549
+long-0-2 law=0 mask=2 SCRATCH s=600 held=5270 millibits ms=19090
+long-0-2 law=0 mask=2 SCRATCH s=650 held=5030 millibits ms=20688
+long-0-2 law=0 mask=2 SCRATCH s=700 held=5009 millibits ms=22254
+long-0-2 law=0 mask=2 SCRATCH s=750 held=4244 millibits ms=23823
+long-0-2 law=0 mask=2 SCRATCH s=800 held=3253 millibits ms=25327
+long-0-2 law=0 mask=2 SCRATCH s=850 held=2606 millibits ms=26865
+long-0-2 law=0 mask=2 SCRATCH s=900 held=1713 millibits ms=28423
+long-0-2 law=0 mask=2 SCRATCH s=950 held=1775 millibits ms=29996
+long-0-2 law=0 mask=2 SCRATCH s=1000 held=1010 millibits ms=31560
+long-0-2 law=0 mask=2 SCRATCH s=1050 held=640 millibits ms=33093
+long-0-2 law=0 mask=2 SCRATCH s=1100 held=792 millibits ms=34444
+long-0-2 law=0 mask=2 SCRATCH s=1150 held=400 millibits ms=35756
+long-0-2 law=0 mask=2 SCRATCH s=1200 held=330 millibits ms=37176
+long-0-4 law=0 mask=4 SCRATCH s=50 held=6934 millibits ms=1543
+long-0-4 law=0 mask=4 SCRATCH s=100 held=6756 millibits ms=3074
+long-0-4 law=0 mask=4 SCRATCH s=150 held=6689 millibits ms=4631
+long-0-4 law=0 mask=4 SCRATCH s=200 held=6676 millibits ms=6397
+long-0-4 law=0 mask=4 SCRATCH s=250 held=6662 millibits ms=8250
+long-0-4 law=0 mask=4 SCRATCH s=300 held=6639 millibits ms=9661
+long-0-4 law=0 mask=4 SCRATCH s=350 held=6650 millibits ms=11096
+long-0-4 law=0 mask=4 SCRATCH s=400 held=6668 millibits ms=12603
+long-0-4 law=0 mask=4 SCRATCH s=450 held=6541 millibits ms=14165
+long-0-4 law=0 mask=4 SCRATCH s=500 held=6426 millibits ms=15750
+long-0-4 law=0 mask=4 SCRATCH s=550 held=6541 millibits ms=17311
+long-0-4 law=0 mask=4 SCRATCH s=600 held=6481 millibits ms=18869
+long-0-4 law=0 mask=4 SCRATCH s=650 held=6426 millibits ms=20509
+long-0-4 law=0 mask=4 SCRATCH s=700 held=6338 millibits ms=22092
+long-0-4 law=0 mask=4 SCRATCH s=750 held=6347 millibits ms=23718
+long-0-4 law=0 mask=4 SCRATCH s=800 held=6369 millibits ms=25243
+long-0-4 law=0 mask=4 SCRATCH s=850 held=6380 millibits ms=26830
+long-0-4 law=0 mask=4 SCRATCH s=900 held=6280 millibits ms=28481
+long-0-4 law=0 mask=4 SCRATCH s=950 held=6289 millibits ms=30125
+long-0-4 law=0 mask=4 SCRATCH s=1000 held=6185 millibits ms=31676
+long-0-4 law=0 mask=4 SCRATCH s=1050 held=6059 millibits ms=33138
+long-0-4 law=0 mask=4 SCRATCH s=1100 held=6094 millibits ms=34599
+long-0-4 law=0 mask=4 SCRATCH s=1150 held=6323 millibits ms=35907
+long-0-4 law=0 mask=4 SCRATCH s=1200 held=6048 millibits ms=37184
+long-0-8 law=0 mask=8 SCRATCH s=50 held=7240 millibits ms=1594
+long-0-8 law=0 mask=8 SCRATCH s=100 held=6834 millibits ms=3182
+long-0-8 law=0 mask=8 SCRATCH s=150 held=6725 millibits ms=4788
+long-0-8 law=0 mask=8 SCRATCH s=200 held=6716 millibits ms=6650
+long-0-8 law=0 mask=8 SCRATCH s=250 held=6708 millibits ms=8488
+long-0-8 law=0 mask=8 SCRATCH s=300 held=6695 millibits ms=10176
+long-0-8 law=0 mask=8 SCRATCH s=350 held=6706 millibits ms=11897
+long-0-8 law=0 mask=8 SCRATCH s=400 held=6669 millibits ms=13652
+long-0-8 law=0 mask=8 SCRATCH s=450 held=6657 millibits ms=15430
+long-0-8 law=0 mask=8 SCRATCH s=500 held=6626 millibits ms=17086
+long-0-8 law=0 mask=8 SCRATCH s=550 held=6677 millibits ms=18728
+long-0-8 law=0 mask=8 SCRATCH s=600 held=6654 millibits ms=20417
+long-0-8 law=0 mask=8 SCRATCH s=650 held=6662 millibits ms=22047
+long-0-8 law=0 mask=8 SCRATCH s=700 held=6637 millibits ms=23690
+long-0-8 law=0 mask=8 SCRATCH s=750 held=6660 millibits ms=25274
+long-0-8 law=0 mask=8 SCRATCH s=800 held=6688 millibits ms=26939
+long-0-8 law=0 mask=8 SCRATCH s=850 held=6661 millibits ms=28558
+long-0-8 law=0 mask=8 SCRATCH s=900 held=6697 millibits ms=30227
+long-0-8 law=0 mask=8 SCRATCH s=950 held=6669 millibits ms=31781
+long-0-8 law=0 mask=8 SCRATCH s=1000 held=6641 millibits ms=33323
+long-0-8 law=0 mask=8 SCRATCH s=1050 held=6670 millibits ms=34692
+long-0-8 law=0 mask=8 SCRATCH s=1100 held=6702 millibits ms=36042
+long-0-8 law=0 mask=8 SCRATCH s=1150 held=6669 millibits ms=37322
+long-0-8 law=0 mask=8 SCRATCH s=1200 held=6687 millibits ms=38520
+long-1-2 law=1 mask=2 SCRATCH s=50 held=6979 millibits ms=1446
+long-1-2 law=1 mask=2 SCRATCH s=100 held=6703 millibits ms=3019
+long-1-2 law=1 mask=2 SCRATCH s=150 held=6637 millibits ms=4620
+long-1-2 law=1 mask=2 SCRATCH s=200 held=6484 millibits ms=6348
+long-1-2 law=1 mask=2 SCRATCH s=250 held=6124 millibits ms=8022
+long-1-2 law=1 mask=2 SCRATCH s=300 held=5227 millibits ms=9496
+long-1-2 law=1 mask=2 SCRATCH s=350 held=4291 millibits ms=11059
+long-1-2 law=1 mask=2 SCRATCH s=400 held=3789 millibits ms=12566
+long-1-2 law=1 mask=2 SCRATCH s=450 held=2679 millibits ms=14082
+long-1-2 law=1 mask=2 SCRATCH s=500 held=1884 millibits ms=15596
+long-1-2 law=1 mask=2 SCRATCH s=550 held=1435 millibits ms=17161
+long-1-2 law=1 mask=2 SCRATCH s=600 held=937 millibits ms=18670
+long-1-2 law=1 mask=2 SCRATCH s=650 held=1023 millibits ms=20231
+long-1-2 law=1 mask=2 SCRATCH s=700 held=596 millibits ms=21807
+long-1-2 law=1 mask=2 SCRATCH s=750 held=782 millibits ms=23324
+long-1-2 law=1 mask=2 SCRATCH s=800 held=589 millibits ms=24848
+long-1-2 law=1 mask=2 SCRATCH s=850 held=318 millibits ms=26385
+long-1-2 law=1 mask=2 SCRATCH s=900 held=511 millibits ms=27943
+long-1-2 law=1 mask=2 SCRATCH s=950 held=817 millibits ms=29523
+long-1-2 law=1 mask=2 SCRATCH s=1000 held=361 millibits ms=31095
+long-1-2 law=1 mask=2 SCRATCH s=1050 held=229 millibits ms=32571
+long-1-2 law=1 mask=2 SCRATCH s=1100 held=708 millibits ms=34046
+long-1-2 law=1 mask=2 SCRATCH s=1150 held=349 millibits ms=35518
+long-1-2 law=1 mask=2 SCRATCH s=1200 held=339 millibits ms=37022
+long-1-4 law=1 mask=4 SCRATCH s=50 held=7347 millibits ms=1365
+long-1-4 law=1 mask=4 SCRATCH s=100 held=7347 millibits ms=2460
+long-1-4 law=1 mask=4 SCRATCH s=150 held=7347 millibits ms=3536
+long-1-4 law=1 mask=4 SCRATCH s=200 held=7347 millibits ms=4635
+long-1-4 law=1 mask=4 SCRATCH s=250 held=7347 millibits ms=5859
+long-1-4 law=1 mask=4 SCRATCH s=300 held=7347 millibits ms=6997
+long-1-4 law=1 mask=4 SCRATCH s=350 held=7347 millibits ms=8224
+long-1-4 law=1 mask=4 SCRATCH s=400 held=7347 millibits ms=9324
+long-1-4 law=1 mask=4 SCRATCH s=450 held=7347 millibits ms=10426
+long-1-4 law=1 mask=4 SCRATCH s=500 held=7347 millibits ms=11456
+long-1-4 law=1 mask=4 SCRATCH s=550 held=7363 millibits ms=12614
+long-1-4 law=1 mask=4 SCRATCH s=600 held=7363 millibits ms=13685
+long-1-4 law=1 mask=4 SCRATCH s=650 held=7363 millibits ms=14704
+long-1-4 law=1 mask=4 SCRATCH s=700 held=7363 millibits ms=15764
+long-1-4 law=1 mask=4 SCRATCH s=750 held=7363 millibits ms=16860
+long-1-4 law=1 mask=4 SCRATCH s=800 held=6819 millibits ms=18207
+long-1-4 law=1 mask=4 SCRATCH s=850 held=6701 millibits ms=19830
+long-1-4 law=1 mask=4 SCRATCH s=900 held=6710 millibits ms=21556
+long-1-4 law=1 mask=4 SCRATCH s=950 held=6665 millibits ms=23188
+long-1-4 law=1 mask=4 SCRATCH s=1000 held=6635 millibits ms=24833
+long-1-4 law=1 mask=4 SCRATCH s=1050 held=6642 millibits ms=26458
+long-1-4 law=1 mask=4 SCRATCH s=1100 held=6552 millibits ms=28097
+long-1-4 law=1 mask=4 SCRATCH s=1150 held=6344 millibits ms=29761
+long-1-4 law=1 mask=4 SCRATCH s=1200 held=5972 millibits ms=31397
+long-1-8 law=1 mask=8 SCRATCH s=50 held=8644 millibits ms=1492
+long-1-8 law=1 mask=8 SCRATCH s=100 held=7281 millibits ms=3225
+long-1-8 law=1 mask=8 SCRATCH s=150 held=6762 millibits ms=4828
+long-1-8 law=1 mask=8 SCRATCH s=200 held=6733 millibits ms=6822
+long-1-8 law=1 mask=8 SCRATCH s=250 held=6710 millibits ms=8653
+long-1-8 law=1 mask=8 SCRATCH s=300 held=6708 millibits ms=9839
+long-1-8 law=1 mask=8 SCRATCH s=350 held=6685 millibits ms=11550
+long-1-8 law=1 mask=8 SCRATCH s=400 held=6684 millibits ms=13203
+long-1-8 law=1 mask=8 SCRATCH s=450 held=6665 millibits ms=14745
+long-1-8 law=1 mask=8 SCRATCH s=500 held=6635 millibits ms=16458
+long-1-8 law=1 mask=8 SCRATCH s=550 held=6684 millibits ms=18019
+long-1-8 law=1 mask=8 SCRATCH s=600 held=6658 millibits ms=19562
+long-1-8 law=1 mask=8 SCRATCH s=650 held=6658 millibits ms=20634
+long-1-8 law=1 mask=8 SCRATCH s=700 held=6658 millibits ms=21746
+long-1-8 law=1 mask=8 SCRATCH s=750 held=6658 millibits ms=22854
+long-1-8 law=1 mask=8 SCRATCH s=800 held=6658 millibits ms=23954
+long-1-8 law=1 mask=8 SCRATCH s=850 held=6658 millibits ms=25065
+long-1-8 law=1 mask=8 SCRATCH s=900 held=6658 millibits ms=26176
+long-1-8 law=1 mask=8 SCRATCH s=950 held=6658 millibits ms=27267
+long-1-8 law=1 mask=8 SCRATCH s=1000 held=6658 millibits ms=28369
+long-1-8 law=1 mask=8 SCRATCH s=1050 held=6658 millibits ms=29524
+long-1-8 law=1 mask=8 SCRATCH s=1100 held=6707 millibits ms=30962
+long-1-8 law=1 mask=8 SCRATCH s=1150 held=6697 millibits ms=32558
+long-1-8 law=1 mask=8 SCRATCH s=1200 held=6693 millibits ms=34016
+long-2-2 law=2 mask=2 SCRATCH s=50 held=6988 millibits ms=1469
+long-2-2 law=2 mask=2 SCRATCH s=100 held=6775 millibits ms=3032
+long-2-2 law=2 mask=2 SCRATCH s=150 held=6673 millibits ms=4589
+long-2-2 law=2 mask=2 SCRATCH s=200 held=6640 millibits ms=6311
+long-2-2 law=2 mask=2 SCRATCH s=250 held=6551 millibits ms=8024
+long-2-2 law=2 mask=2 SCRATCH s=300 held=6252 millibits ms=9489
+long-2-2 law=2 mask=2 SCRATCH s=350 held=5681 millibits ms=10911
+long-2-2 law=2 mask=2 SCRATCH s=400 held=4860 millibits ms=12407
+long-2-2 law=2 mask=2 SCRATCH s=450 held=4124 millibits ms=13908
+long-2-2 law=2 mask=2 SCRATCH s=500 held=3171 millibits ms=15368
+long-2-2 law=2 mask=2 SCRATCH s=550 held=2907 millibits ms=16876
+long-2-2 law=2 mask=2 SCRATCH s=600 held=2007 millibits ms=18386
+long-2-2 law=2 mask=2 SCRATCH s=650 held=1388 millibits ms=19950
+long-2-2 law=2 mask=2 SCRATCH s=700 held=940 millibits ms=21502
+long-2-2 law=2 mask=2 SCRATCH s=750 held=799 millibits ms=23076
+long-2-2 law=2 mask=2 SCRATCH s=800 held=536 millibits ms=24647
+long-2-2 law=2 mask=2 SCRATCH s=850 held=578 millibits ms=26201
+long-2-2 law=2 mask=2 SCRATCH s=900 held=531 millibits ms=27761
+long-2-2 law=2 mask=2 SCRATCH s=950 held=970 millibits ms=29340
+long-2-2 law=2 mask=2 SCRATCH s=1000 held=370 millibits ms=30889
+long-2-2 law=2 mask=2 SCRATCH s=1050 held=367 millibits ms=32365
+long-2-2 law=2 mask=2 SCRATCH s=1100 held=553 millibits ms=33804
+long-2-2 law=2 mask=2 SCRATCH s=1150 held=296 millibits ms=35276
+long-2-2 law=2 mask=2 SCRATCH s=1200 held=386 millibits ms=36796
+long-2-4 law=2 mask=4 SCRATCH s=50 held=7181 millibits ms=1481
+long-2-4 law=2 mask=4 SCRATCH s=100 held=6901 millibits ms=3062
+long-2-4 law=2 mask=4 SCRATCH s=150 held=6761 millibits ms=4744
+long-2-4 law=2 mask=4 SCRATCH s=200 held=6691 millibits ms=6729
+long-2-4 law=2 mask=4 SCRATCH s=250 held=6676 millibits ms=8510
+long-2-4 law=2 mask=4 SCRATCH s=300 held=6663 millibits ms=10003
+long-2-4 law=2 mask=4 SCRATCH s=350 held=6673 millibits ms=11598
+long-2-4 law=2 mask=4 SCRATCH s=400 held=6670 millibits ms=13174
+long-2-4 law=2 mask=4 SCRATCH s=450 held=6620 millibits ms=14803
+long-2-4 law=2 mask=4 SCRATCH s=500 held=6570 millibits ms=16395
+long-2-4 law=2 mask=4 SCRATCH s=550 held=6529 millibits ms=17920
+long-2-4 law=2 mask=4 SCRATCH s=600 held=6402 millibits ms=19541
+long-2-4 law=2 mask=4 SCRATCH s=650 held=6121 millibits ms=21100
+long-2-4 law=2 mask=4 SCRATCH s=700 held=5691 millibits ms=22713
+long-2-4 law=2 mask=4 SCRATCH s=750 held=5386 millibits ms=24389
+long-2-4 law=2 mask=4 SCRATCH s=800 held=4893 millibits ms=26115
+long-2-4 law=2 mask=4 SCRATCH s=850 held=4702 millibits ms=27717
+long-2-4 law=2 mask=4 SCRATCH s=900 held=4077 millibits ms=29356
+long-2-4 law=2 mask=4 SCRATCH s=950 held=3888 millibits ms=30999
+long-2-4 law=2 mask=4 SCRATCH s=1000 held=3612 millibits ms=32603
+long-2-4 law=2 mask=4 SCRATCH s=1050 held=3238 millibits ms=34133
+long-2-4 law=2 mask=4 SCRATCH s=1100 held=2987 millibits ms=35688
+long-2-4 law=2 mask=4 SCRATCH s=1150 held=3209 millibits ms=37137
+long-2-4 law=2 mask=4 SCRATCH s=1200 held=2712 millibits ms=38358
+long-2-8 law=2 mask=8 SCRATCH s=50 held=9067 millibits ms=1578
+long-2-8 law=2 mask=8 SCRATCH s=100 held=7078 millibits ms=3043
+long-2-8 law=2 mask=8 SCRATCH s=150 held=6763 millibits ms=4588
+long-2-8 law=2 mask=8 SCRATCH s=200 held=6713 millibits ms=6436
+long-2-8 law=2 mask=8 SCRATCH s=250 held=6694 millibits ms=8295
+long-2-8 law=2 mask=8 SCRATCH s=300 held=6684 millibits ms=9906
+long-2-8 law=2 mask=8 SCRATCH s=350 held=6659 millibits ms=11541
+long-2-8 law=2 mask=8 SCRATCH s=400 held=6666 millibits ms=13165
+long-2-8 law=2 mask=8 SCRATCH s=450 held=6675 millibits ms=14722
+long-2-8 law=2 mask=8 SCRATCH s=500 held=6621 millibits ms=16276
+long-2-8 law=2 mask=8 SCRATCH s=550 held=6677 millibits ms=17919
+long-2-8 law=2 mask=8 SCRATCH s=600 held=6631 millibits ms=19584
+long-2-8 law=2 mask=8 SCRATCH s=650 held=6622 millibits ms=21268
+long-2-8 law=2 mask=8 SCRATCH s=700 held=6635 millibits ms=22862
+long-2-8 law=2 mask=8 SCRATCH s=750 held=6632 millibits ms=24509
+long-2-8 law=2 mask=8 SCRATCH s=800 held=6652 millibits ms=26285
+long-2-8 law=2 mask=8 SCRATCH s=850 held=6590 millibits ms=27750
+long-2-8 law=2 mask=8 SCRATCH s=900 held=6587 millibits ms=28932
+long-2-8 law=2 mask=8 SCRATCH s=950 held=6587 millibits ms=30073
+long-2-8 law=2 mask=8 SCRATCH s=1000 held=6597 millibits ms=31623
+long-2-8 law=2 mask=8 SCRATCH s=1050 held=6633 millibits ms=33228
+long-2-8 law=2 mask=8 SCRATCH s=1100 held=6639 millibits ms=34758
+long-2-8 law=2 mask=8 SCRATCH s=1150 held=6645 millibits ms=36455
+long-2-8 law=2 mask=8 SCRATCH s=1200 held=6575 millibits ms=37732
+mix-0-0 SCRATCH s=50 held=7029 millibits ms=907
+mix-0-0 SCRATCH s=100 held=6740 millibits ms=1797
+mix-0-0 SCRATCH s=150 held=6830 millibits ms=2716
+mix-0-0 SCRATCH s=200 held=6797 millibits ms=3623
+mix-0-0 SCRATCH s=250 held=6668 millibits ms=4552
+mix-0-0 SCRATCH s=300 held=6642 millibits ms=5463
+mix-0-0 SCRATCH s=350 held=6657 millibits ms=6364
+mix-0-0 SCRATCH s=400 held=6635 millibits ms=7311
+mix-0-0 SCRATCH s=450 held=6664 millibits ms=8246
+mix-0-0 SCRATCH s=500 held=6584 millibits ms=9183
+mix-0-0 SCRATCH s=550 held=6463 millibits ms=10113
+mix-0-0 SCRATCH s=600 held=6410 millibits ms=11061
+mix-0-0 SCRATCH s=650 held=6006 millibits ms=11997
+mix-0-0 SCRATCH s=700 held=5956 millibits ms=12956
+mix-0-0 SCRATCH s=750 held=5650 millibits ms=13907
+mix-0-0 SCRATCH s=800 held=5426 millibits ms=14866
+mix-0-0 SCRATCH s=850 held=4980 millibits ms=15790
+mix-0-0 SCRATCH s=900 held=5052 millibits ms=16713
+mix-0-0 SCRATCH s=950 held=4741 millibits ms=17660
+mix-0-0 SCRATCH s=1000 held=4289 millibits ms=18595
+mix-0-0 SCRATCH s=1050 held=4125 millibits ms=19519
+mix-0-0 SCRATCH s=1100 held=3823 millibits ms=20454
+mix-0-0 SCRATCH s=1150 held=3677 millibits ms=21377
+mix-0-0 SCRATCH s=1200 held=3257 millibits ms=22312
+mix-0-1 SCRATCH s=50 held=7136 millibits ms=891
+mix-0-1 SCRATCH s=100 held=6793 millibits ms=1791
+mix-0-1 SCRATCH s=150 held=6678 millibits ms=2711
+mix-0-1 SCRATCH s=200 held=6730 millibits ms=3631
+mix-0-1 SCRATCH s=250 held=6737 millibits ms=4566
+mix-0-1 SCRATCH s=300 held=6748 millibits ms=5472
+mix-0-1 SCRATCH s=350 held=6666 millibits ms=6431
+mix-0-1 SCRATCH s=400 held=6655 millibits ms=7357
+mix-0-1 SCRATCH s=450 held=6639 millibits ms=8259
+mix-0-1 SCRATCH s=500 held=6612 millibits ms=9191
+mix-0-1 SCRATCH s=550 held=6716 millibits ms=10148
+mix-0-1 SCRATCH s=600 held=6635 millibits ms=11089
+mix-0-1 SCRATCH s=650 held=6581 millibits ms=12020
+mix-0-1 SCRATCH s=700 held=6485 millibits ms=12925
+mix-0-1 SCRATCH s=750 held=6470 millibits ms=13865
+mix-0-1 SCRATCH s=800 held=6318 millibits ms=14823
+mix-0-1 SCRATCH s=850 held=6137 millibits ms=15775
+mix-0-1 SCRATCH s=900 held=6105 millibits ms=16755
+mix-0-1 SCRATCH s=950 held=6067 millibits ms=17710
+mix-0-1 SCRATCH s=1000 held=5950 millibits ms=18645
+mix-0-1 SCRATCH s=1050 held=5961 millibits ms=19571
+mix-0-1 SCRATCH s=1100 held=5823 millibits ms=20522
+mix-0-1 SCRATCH s=1150 held=5390 millibits ms=21482
+mix-0-1 SCRATCH s=1200 held=5571 millibits ms=22397
+mix-1-0 SCRATCH s=50 held=6959 millibits ms=845
+mix-1-0 SCRATCH s=100 held=6762 millibits ms=1775
+mix-1-0 SCRATCH s=150 held=6834 millibits ms=2697
+mix-1-0 SCRATCH s=200 held=6629 millibits ms=3631
+mix-1-0 SCRATCH s=250 held=6489 millibits ms=4536
+mix-1-0 SCRATCH s=300 held=6257 millibits ms=5489
+mix-1-0 SCRATCH s=350 held=5907 millibits ms=6425
+mix-1-0 SCRATCH s=400 held=5300 millibits ms=7372
+mix-1-0 SCRATCH s=450 held=4634 millibits ms=8305
+mix-1-0 SCRATCH s=500 held=3769 millibits ms=9231
+mix-1-0 SCRATCH s=550 held=2855 millibits ms=10133
+mix-1-0 SCRATCH s=600 held=1963 millibits ms=11067
+mix-1-0 SCRATCH s=650 held=1464 millibits ms=12033
+mix-1-0 SCRATCH s=700 held=1111 millibits ms=12963
+mix-1-0 SCRATCH s=750 held=863 millibits ms=13898
+mix-1-0 SCRATCH s=800 held=577 millibits ms=14822
+mix-1-0 SCRATCH s=850 held=446 millibits ms=15793
+mix-1-0 SCRATCH s=900 held=486 millibits ms=16734
+mix-1-0 SCRATCH s=950 held=373 millibits ms=17692
+mix-1-0 SCRATCH s=1000 held=309 millibits ms=18672
+mix-1-0 SCRATCH s=1050 held=227 millibits ms=19623
+mix-1-0 SCRATCH s=1100 held=356 millibits ms=20543
+mix-1-0 SCRATCH s=1150 held=226 millibits ms=21519
+mix-1-0 SCRATCH s=1200 held=207 millibits ms=22450
+mix-1-1 SCRATCH s=50 held=7922 millibits ms=896
+mix-1-1 SCRATCH s=100 held=6905 millibits ms=1811
+mix-1-1 SCRATCH s=150 held=6752 millibits ms=2744
+mix-1-1 SCRATCH s=200 held=6687 millibits ms=3698
+mix-1-1 SCRATCH s=250 held=6605 millibits ms=4622
+mix-1-1 SCRATCH s=300 held=6519 millibits ms=5536
+mix-1-1 SCRATCH s=350 held=6343 millibits ms=6572
+mix-1-1 SCRATCH s=400 held=6292 millibits ms=7588
+mix-1-1 SCRATCH s=450 held=6175 millibits ms=8518
+mix-1-1 SCRATCH s=500 held=5678 millibits ms=9497
+mix-1-1 SCRATCH s=550 held=5466 millibits ms=10491
+mix-1-1 SCRATCH s=600 held=4922 millibits ms=11456
+mix-1-1 SCRATCH s=650 held=4032 millibits ms=12400
+mix-1-1 SCRATCH s=700 held=3392 millibits ms=13367
+mix-1-1 SCRATCH s=750 held=2803 millibits ms=14386
+mix-1-1 SCRATCH s=800 held=2624 millibits ms=15382
+mix-1-1 SCRATCH s=850 held=2010 millibits ms=16378
+mix-1-1 SCRATCH s=900 held=1566 millibits ms=17374
+mix-1-1 SCRATCH s=950 held=1227 millibits ms=18356
+mix-1-1 SCRATCH s=1000 held=855 millibits ms=19355
+mix-1-1 SCRATCH s=1050 held=871 millibits ms=20366
+mix-1-1 SCRATCH s=1100 held=724 millibits ms=21342
+mix-1-1 SCRATCH s=1150 held=648 millibits ms=22300
+mix-1-1 SCRATCH s=1200 held=696 millibits ms=22950
+mix-2-0 SCRATCH s=50 held=7110 millibits ms=903
+mix-2-0 SCRATCH s=100 held=6982 millibits ms=1824
+mix-2-0 SCRATCH s=150 held=6935 millibits ms=2730
+mix-2-0 SCRATCH s=200 held=6656 millibits ms=3640
+mix-2-0 SCRATCH s=250 held=6455 millibits ms=4586
+mix-2-0 SCRATCH s=300 held=6324 millibits ms=5521
+mix-2-0 SCRATCH s=350 held=6044 millibits ms=6414
+mix-2-0 SCRATCH s=400 held=5420 millibits ms=7330
+mix-2-0 SCRATCH s=450 held=4791 millibits ms=8271
+mix-2-0 SCRATCH s=500 held=3990 millibits ms=9189
+mix-2-0 SCRATCH s=550 held=3072 millibits ms=10135
+mix-2-0 SCRATCH s=600 held=2626 millibits ms=11091
+mix-2-0 SCRATCH s=650 held=1922 millibits ms=12083
+mix-2-0 SCRATCH s=700 held=1545 millibits ms=13059
+mix-2-0 SCRATCH s=750 held=1207 millibits ms=14000
+mix-2-0 SCRATCH s=800 held=1033 millibits ms=14969
+mix-2-0 SCRATCH s=850 held=808 millibits ms=15970
+mix-2-0 SCRATCH s=900 held=756 millibits ms=16899
+mix-2-0 SCRATCH s=950 held=534 millibits ms=17842
+mix-2-0 SCRATCH s=1000 held=519 millibits ms=18810
+mix-2-0 SCRATCH s=1050 held=383 millibits ms=19772
+mix-2-0 SCRATCH s=1100 held=435 millibits ms=20747
+mix-2-0 SCRATCH s=1150 held=308 millibits ms=21769
+mix-2-0 SCRATCH s=1200 held=347 millibits ms=22625
+mix-2-1 SCRATCH s=50 held=7676 millibits ms=879
+mix-2-1 SCRATCH s=100 held=6910 millibits ms=1764
+mix-2-1 SCRATCH s=150 held=6755 millibits ms=2676
+mix-2-1 SCRATCH s=200 held=6682 millibits ms=3599
+mix-2-1 SCRATCH s=250 held=6679 millibits ms=4515
+mix-2-1 SCRATCH s=300 held=6679 millibits ms=5422
+mix-2-1 SCRATCH s=350 held=6528 millibits ms=6354
+mix-2-1 SCRATCH s=400 held=6404 millibits ms=7313
+mix-2-1 SCRATCH s=450 held=6331 millibits ms=8278
+mix-2-1 SCRATCH s=500 held=5565 millibits ms=9199
+mix-2-1 SCRATCH s=550 held=4816 millibits ms=10125
+mix-2-1 SCRATCH s=600 held=4084 millibits ms=11058
+mix-2-1 SCRATCH s=650 held=3204 millibits ms=12036
+mix-2-1 SCRATCH s=700 held=2948 millibits ms=12972
+mix-2-1 SCRATCH s=750 held=2385 millibits ms=13975
+mix-2-1 SCRATCH s=800 held=1886 millibits ms=14938
+mix-2-1 SCRATCH s=850 held=1552 millibits ms=15889
+mix-2-1 SCRATCH s=900 held=1245 millibits ms=16857
+mix-2-1 SCRATCH s=950 held=1085 millibits ms=17778
+mix-2-1 SCRATCH s=1000 held=751 millibits ms=18710
+mix-2-1 SCRATCH s=1050 held=712 millibits ms=19649
+mix-2-1 SCRATCH s=1100 held=658 millibits ms=20575
+mix-2-1 SCRATCH s=1150 held=630 millibits ms=21515
+mix-2-1 SCRATCH s=1200 held=535 millibits ms=22459
+rate8-0 SCRATCH s=50 held=7219 millibits ms=544
+rate8-0 SCRATCH s=100 held=6931 millibits ms=1083
+rate8-0 SCRATCH s=150 held=6800 millibits ms=1638
+rate8-0 SCRATCH s=200 held=6772 millibits ms=2200
+rate8-0 SCRATCH s=250 held=6745 millibits ms=2790
+rate8-0 SCRATCH s=300 held=6736 millibits ms=3386
+rate8-0 SCRATCH s=350 held=6728 millibits ms=3991
+rate8-0 SCRATCH s=400 held=6704 millibits ms=4564
+rate8-0 SCRATCH s=450 held=6707 millibits ms=5141
+rate8-0 SCRATCH s=500 held=6677 millibits ms=5721
+rate8-0 SCRATCH s=550 held=6674 millibits ms=6304
+rate8-0 SCRATCH s=600 held=6673 millibits ms=6879
+rate8-0 SCRATCH s=650 held=6681 millibits ms=7480
+rate8-0 SCRATCH s=700 held=6663 millibits ms=8066
+rate8-0 SCRATCH s=750 held=6660 millibits ms=8660
+rate8-0 SCRATCH s=800 held=6667 millibits ms=9251
+rate8-0 SCRATCH s=850 held=6662 millibits ms=9864
+rate8-0 SCRATCH s=900 held=6670 millibits ms=10469
+rate8-0 SCRATCH s=950 held=6665 millibits ms=11052
+rate8-0 SCRATCH s=1000 held=6662 millibits ms=11630
+rate8-0 SCRATCH s=1050 held=6690 millibits ms=12208
+rate8-0 SCRATCH s=1100 held=6711 millibits ms=12839
+rate8-0 SCRATCH s=1150 held=6666 millibits ms=13416
+rate8-0 SCRATCH s=1200 held=6646 millibits ms=14002
+rate8-0 SCRATCH s=1250 held=6642 millibits ms=14607
+rate8-0 SCRATCH s=1300 held=6665 millibits ms=15210
+rate8-0 SCRATCH s=1350 held=6652 millibits ms=15820
+rate8-0 SCRATCH s=1400 held=6639 millibits ms=16406
+rate8-0 SCRATCH s=1450 held=6653 millibits ms=16996
+rate8-0 SCRATCH s=1500 held=6629 millibits ms=17604
+rate8-0 SCRATCH s=1550 held=6650 millibits ms=18205
+rate8-0 SCRATCH s=1600 held=6615 millibits ms=18797
+rate8-0 SCRATCH s=1650 held=6650 millibits ms=19387
+rate8-0 SCRATCH s=1700 held=6611 millibits ms=19966
+rate8-0 SCRATCH s=1750 held=6584 millibits ms=20546
+rate8-0 SCRATCH s=1800 held=6611 millibits ms=21129
+rate8-0 SCRATCH s=1850 held=6565 millibits ms=21730
+rate8-0 SCRATCH s=1900 held=6547 millibits ms=22308
+rate8-0 SCRATCH s=1950 held=6557 millibits ms=22902
+rate8-0 SCRATCH s=2000 held=6532 millibits ms=23503
+rate8-0 SCRATCH s=2050 held=6515 millibits ms=24095
+rate8-0 SCRATCH s=2100 held=6506 millibits ms=24711
+rate8-0 SCRATCH s=2150 held=6478 millibits ms=25312
+rate8-0 SCRATCH s=2200 held=6456 millibits ms=25898
+rate8-0 SCRATCH s=2250 held=6378 millibits ms=26491
+rate8-0 SCRATCH s=2300 held=6407 millibits ms=27077
+rate8-0 SCRATCH s=2350 held=6364 millibits ms=27668
+rate8-0 SCRATCH s=2400 held=6233 millibits ms=28163
+rate8-1 SCRATCH s=50 held=8435 millibits ms=528
+rate8-1 SCRATCH s=100 held=7991 millibits ms=1082
+rate8-1 SCRATCH s=150 held=6992 millibits ms=1624
+rate8-1 SCRATCH s=200 held=6903 millibits ms=2199
+rate8-1 SCRATCH s=250 held=6838 millibits ms=2779
+rate8-1 SCRATCH s=300 held=6791 millibits ms=3343
+rate8-1 SCRATCH s=350 held=6770 millibits ms=3913
+rate8-1 SCRATCH s=400 held=6715 millibits ms=4480
+rate8-1 SCRATCH s=450 held=6680 millibits ms=5044
+rate8-1 SCRATCH s=500 held=6623 millibits ms=5627
+rate8-1 SCRATCH s=550 held=6594 millibits ms=6205
+rate8-1 SCRATCH s=600 held=6553 millibits ms=6787
+rate8-1 SCRATCH s=650 held=6516 millibits ms=7371
+rate8-1 SCRATCH s=700 held=6455 millibits ms=7951
+rate8-1 SCRATCH s=750 held=6408 millibits ms=8529
+rate8-1 SCRATCH s=800 held=6243 millibits ms=9105
+rate8-1 SCRATCH s=850 held=6113 millibits ms=9691
+rate8-1 SCRATCH s=900 held=5895 millibits ms=10277
+rate8-1 SCRATCH s=950 held=5801 millibits ms=10858
+rate8-1 SCRATCH s=1000 held=5352 millibits ms=11441
+rate8-1 SCRATCH s=1050 held=5238 millibits ms=12028
+rate8-1 SCRATCH s=1100 held=4957 millibits ms=12605
+rate8-1 SCRATCH s=1150 held=4915 millibits ms=13218
+rate8-1 SCRATCH s=1200 held=4638 millibits ms=13828
+rate8-1 SCRATCH s=1250 held=4440 millibits ms=14400
+rate8-1 SCRATCH s=1300 held=4245 millibits ms=15004
+rate8-1 SCRATCH s=1350 held=3932 millibits ms=15616
+rate8-1 SCRATCH s=1400 held=3783 millibits ms=16204
+rate8-1 SCRATCH s=1450 held=3637 millibits ms=16790
+rate8-1 SCRATCH s=1500 held=3366 millibits ms=17381
+rate8-1 SCRATCH s=1550 held=3218 millibits ms=17961
+rate8-1 SCRATCH s=1600 held=2891 millibits ms=18544
+rate8-1 SCRATCH s=1650 held=2748 millibits ms=19133
+rate8-1 SCRATCH s=1700 held=2632 millibits ms=19709
+rate8-1 SCRATCH s=1750 held=2326 millibits ms=20334
+rate8-1 SCRATCH s=1800 held=2120 millibits ms=20936
+rate8-1 SCRATCH s=1850 held=2076 millibits ms=21528
+rate8-1 SCRATCH s=1900 held=1902 millibits ms=22128
+rate8-1 SCRATCH s=1950 held=1788 millibits ms=22718
+rate8-1 SCRATCH s=2000 held=1814 millibits ms=23332
+rate8-1 SCRATCH s=2050 held=1478 millibits ms=23924
+rate8-1 SCRATCH s=2100 held=1437 millibits ms=24504
+rate8-1 SCRATCH s=2150 held=1249 millibits ms=25103
+rate8-1 SCRATCH s=2200 held=1232 millibits ms=25686
+rate8-1 SCRATCH s=2250 held=1161 millibits ms=26289
+rate8-1 SCRATCH s=2300 held=1064 millibits ms=26883
+rate8-1 SCRATCH s=2350 held=995 millibits ms=27483
+rate8-1 SCRATCH s=2400 held=898 millibits ms=28033
+rate8-2 SCRATCH s=50 held=7908 millibits ms=522
+rate8-2 SCRATCH s=100 held=7190 millibits ms=1065
+rate8-2 SCRATCH s=150 held=7000 millibits ms=1620
+rate8-2 SCRATCH s=200 held=6891 millibits ms=2192
+rate8-2 SCRATCH s=250 held=6835 millibits ms=2778
+rate8-2 SCRATCH s=300 held=6785 millibits ms=3346
+rate8-2 SCRATCH s=350 held=6763 millibits ms=3927
+rate8-2 SCRATCH s=400 held=6709 millibits ms=4493
+rate8-2 SCRATCH s=450 held=6698 millibits ms=5056
+rate8-2 SCRATCH s=500 held=6646 millibits ms=5617
+rate8-2 SCRATCH s=550 held=6599 millibits ms=6180
+rate8-2 SCRATCH s=600 held=6599 millibits ms=6742
+rate8-2 SCRATCH s=650 held=6588 millibits ms=7313
+rate8-2 SCRATCH s=700 held=6546 millibits ms=7885
+rate8-2 SCRATCH s=750 held=6520 millibits ms=8480
+rate8-2 SCRATCH s=800 held=6454 millibits ms=9061
+rate8-2 SCRATCH s=850 held=6415 millibits ms=9634
+rate8-2 SCRATCH s=900 held=6311 millibits ms=10221
+rate8-2 SCRATCH s=950 held=6152 millibits ms=10799
+rate8-2 SCRATCH s=1000 held=5779 millibits ms=11360
+rate8-2 SCRATCH s=1050 held=5613 millibits ms=11933
+rate8-2 SCRATCH s=1100 held=5404 millibits ms=12519
+rate8-2 SCRATCH s=1150 held=5212 millibits ms=13128
+rate8-2 SCRATCH s=1200 held=4834 millibits ms=13703
+rate8-2 SCRATCH s=1250 held=4675 millibits ms=14285
+rate8-2 SCRATCH s=1300 held=4397 millibits ms=14881
+rate8-2 SCRATCH s=1350 held=3996 millibits ms=15463
+rate8-2 SCRATCH s=1400 held=3804 millibits ms=16036
+rate8-2 SCRATCH s=1450 held=3557 millibits ms=16633
+rate8-2 SCRATCH s=1500 held=3305 millibits ms=17219
+rate8-2 SCRATCH s=1550 held=3120 millibits ms=17820
+rate8-2 SCRATCH s=1600 held=2696 millibits ms=18401
+rate8-2 SCRATCH s=1650 held=2508 millibits ms=18968
+rate8-2 SCRATCH s=1700 held=2234 millibits ms=19547
+rate8-2 SCRATCH s=1750 held=2037 millibits ms=20122
+rate8-2 SCRATCH s=1800 held=1794 millibits ms=20705
+rate8-2 SCRATCH s=1850 held=1572 millibits ms=21305
+rate8-2 SCRATCH s=1900 held=1465 millibits ms=21876
+rate8-2 SCRATCH s=1950 held=1398 millibits ms=22458
+rate8-2 SCRATCH s=2000 held=1324 millibits ms=23062
+rate8-2 SCRATCH s=2050 held=1138 millibits ms=23645
+rate8-2 SCRATCH s=2100 held=996 millibits ms=24221
+rate8-2 SCRATCH s=2150 held=866 millibits ms=24814
+rate8-2 SCRATCH s=2200 held=830 millibits ms=25395
+rate8-2 SCRATCH s=2250 held=763 millibits ms=25998
+rate8-2 SCRATCH s=2300 held=707 millibits ms=26570
+rate8-2 SCRATCH s=2350 held=604 millibits ms=27156
+rate8-2 SCRATCH s=2400 held=537 millibits ms=27765
