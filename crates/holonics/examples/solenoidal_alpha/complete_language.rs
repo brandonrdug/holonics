@@ -27,6 +27,8 @@ mod duplex_train;
 mod tower_body;
 #[path = "complete_language/written_coupling.rs"]
 mod written_coupling;
+#[path = "complete_language/field_train.rs"]
+mod field_train;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -792,6 +794,9 @@ pub(super) fn run_with_execution(
         Some("train-pair-linear-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::PairLinear),
         Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, true, holonics::hnn::tower::ContactLaw::Rectifying),
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
+        Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
+        Some("release-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::release(args, &mut field_train::host()),
+        Some("release-field-text") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::release_text(args, &mut field_train::host()),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, &mut holonics::hnn::tower::realization::HostPass::default()),
@@ -868,6 +873,16 @@ pub(super) fn run_with_execution(
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
+    }
+}
+/// The field's commands (`hnn::tower::field`) with every read and return through a declared
+/// realization (`holonics-cuda` passes the card's).
+pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
+    match args.first().map(String::as_str) {
+        Some("train-field") => field_train::train(args, realization),
+        Some("release-field") => field_train::release(args, realization),
+        Some("release-field-text") => field_train::release_text(args, realization),
+        _ => Err("a realized field command is train-field, release-field or release-field-text".into()),
     }
 }
 /// The tower commands with each section's forward and reverse through a declared realization

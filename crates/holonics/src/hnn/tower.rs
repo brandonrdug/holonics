@@ -227,6 +227,7 @@ use rayon::prelude::*;
 
 pub mod body;
 pub mod duplex;
+pub mod field;
 pub mod growth;
 pub mod overture;
 pub mod participation;
