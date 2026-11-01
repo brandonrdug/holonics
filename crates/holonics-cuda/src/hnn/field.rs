@@ -455,6 +455,9 @@ impl<'c> CardField<'c> {
         let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
         let ring_n = self.timed(Kind::Copy, || card.upload(&ring_n)).map_err(device)?;
         let roots_card = self.timed(Kind::Copy, || card.upload(&roots)).map_err(device)?;
+        if d.contacts % 2 != 0 {
+            return Err(TowerError::Refused("a field's contacts are complex pairs (an even count)"));
+        }
         if 2 * d.modes as u32 > CONTACT_SPAN {
             return Err(TowerError::Refused("the card's contact carries a span of at most 32 entries (16 modes a head)"));
         }
@@ -793,7 +796,7 @@ impl<'c> CardField<'c> {
             self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
             self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
             self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
-            self.launch("field_pair", Self::cells((sites * f) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
         }
         // The faces at the unresolved sites.
@@ -1014,7 +1017,7 @@ impl<'c> CardField<'c> {
             self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
             self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
             let (mut dcp, mut dap, mut dbp) = (dc.device_ptr(), da.device_ptr(), db.device_ptr());
-            self.launch("field_pair_back", Self::cells((sites * f) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
+            self.launch("field_pair_back", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp)])?;
             self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
             self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
             self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;

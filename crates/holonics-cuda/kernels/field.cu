@@ -1657,11 +1657,20 @@ extern "C" __global__ void field_echo_apply(FieldWords w, int64_t *z) {
 }
 
 
-// The pair contact's product `c = release(a ⊙ b, 16)`.
+// [definition; agent-inferred, November 1] **The pair contact is a complex product** (§15.1; the host's
+// `tick`): contact `e < f/2` is `a_e + i a_(f/2+e)`, so `c = a b` as complex numbers, each part released to
+// `2^(−16)`: `c_re = release(ar br − ai bi, 16)`, `c_im = release(ar bi + ai br, 16)`. Two ring faces then
+// compose by adding their phases. One thread a site and a pair of contacts; `f` is even (the host admits no
+// other declaration).
 extern "C" __global__ void field_pair(FieldWords w) {
-    const uint64_t cells = (uint64_t)w.T * w.f;
+    const uint32_t half = w.f / 2;
+    const uint64_t cells = (uint64_t)w.T * half;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        w.pc[c] = fit64(rel((wide)w.pa[c] * (wide)w.pb[c], FACE_BITS), w.status);
+        const uint64_t t = c / half, e = c % half;
+        const uint64_t re = t * w.f + e, im = re + half;
+        const wide ar = w.pa[re], ai = w.pa[im], br = w.pb[re], bi = w.pb[im];
+        w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
+        w.pc[im] = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
     }
 }
 
@@ -1759,12 +1768,21 @@ extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read
     }
 }
 
-// The pair contact's return: `da = release(dc ⊙ b, 16)`, `db = release(dc ⊙ a, 16)`.
+// The complex product's return (the host's `returned`): `δa = conj(b) δc`, `δb = conj(a) δc`, each part
+// released to `2^(−16)`: `δa_re = release(br gr + bi gi, 16)`, `δa_im = release(br gi − bi gr, 16)`, and so
+// for `δb` against `a`.
 extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db) {
-    const uint64_t cells = (uint64_t)w.T * w.f;
+    const uint32_t half = w.f / 2;
+    const uint64_t cells = (uint64_t)w.T * half;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        da[c] = fit64(rel((wide)dc[c] * (wide)w.pb[c], FACE_BITS), w.status);
-        db[c] = fit64(rel((wide)dc[c] * (wide)w.pa[c], FACE_BITS), w.status);
+        const uint64_t t = c / half, e = c % half;
+        const uint64_t re = t * w.f + e, im = re + half;
+        const wide gr = dc[re], gi = dc[im];
+        const wide ar = w.pa[re], ai = w.pa[im], br = w.pb[re], bi = w.pb[im];
+        da[re] = fit64(rel(br * gr + bi * gi, FACE_BITS), w.status);
+        da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
+        db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
+        db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
     }
 }
 
