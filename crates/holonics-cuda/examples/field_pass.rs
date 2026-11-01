@@ -6,7 +6,8 @@
 //! - `field_pass time complete-language time-field ARGS…`: the card alone on the opening sections and
 //!   releases, and a lap and the held problems' releases projected from them.
 //! - `field_pass train complete-language train-field ARGS…`, `release-field ARGS…` and
-//!   `release-field-text ARGS…`: the commands with every read and return on the card.
+//!   `release-field-text ARGS…`: the commands with every read and return on the card;
+//!   `crib-terrain ARGS…` writes the crib terrain's passages and reads nothing on the card.
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs read and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with

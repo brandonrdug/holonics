@@ -278,13 +278,16 @@ struct FieldWords {
     const uint64_t *face;
 };
 
+// The frame of local mode `l` of head `h` at site `t`: the identity in a head of a still ring set
+// (`h mod frames < still`), the mode's ring in a turned one (slot `l (frames − still) + set − still`).
 __device__ __forceinline__ void frame_of(const FieldWords &w, uint32_t t, uint32_t h, uint32_t l, wide *ur, wide *ui) {
-    if (l < w.still) {
+    const uint32_t set = h % w.frames;
+    if (set < w.still) {
         *ur = (wide)1 << MOVE_BITS;
         *ui = 0;
         return;
     }
-    const uint32_t slot = (l - w.still) * w.frames + h % w.frames;
+    const uint32_t slot = l * (w.frames - w.still) + set - w.still;
     const uint64_t at = w.ring_off[slot] + t % w.ring_n[slot];
     *ur = w.phasor[2 * at];
     *ui = w.phasor[2 * at + 1];
@@ -413,11 +416,12 @@ extern "C" __global__ void field_affine_x64(FieldWords w, uint64_t weight, uint6
 }
 
 // The frame, by head: `q̃ = U ⊙ q` and so for the keys and values, `[h][t][2n]` real parts then
-// imaginary, each product released to `2^(−16)`; the binary lengths of the largest framed probe, key
-// and value are raised into `bits` (zeroed before the launch), the carriers' widths the contact reads.
+// imaginary, each product released to `2^(−16)`; the binary length of the largest framed value is
+// raised into `bits[2]` (zeroed before the launch), a carrier's width the contact reads (the probe's
+// and the key's are raised by `field_unit`, which reads them at unit power).
 extern "C" __global__ void field_frame(FieldWords w) {
     const uint64_t cells = (uint64_t)w.H * w.T * w.n;
-    uint32_t qb = 0, kb = 0, vb = 0;
+    uint32_t vb = 0;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t li = c % w.n;
         const uint64_t t = (c / w.n) % w.T;
@@ -439,17 +443,83 @@ extern "C" __global__ void field_frame(FieldWords w) {
         w.kf[at + w.n + li] = k1;
         w.vf[at + li] = v0;
         w.vf[at + w.n + li] = v1;
-        qb = max(qb, bit_length(mag64(q0) | mag64(q1)));
-        kb = max(kb, bit_length(mag64(k0) | mag64(k1)));
         vb = max(vb, bit_length(mag64(v0) | mag64(v1)));
+    }
+    vb = (uint32_t)warp_max_u64(vb);
+    if ((threadIdx.x & 31) == 0) {
+        atomicMax(&w.bits[2], vb);
+    }
+}
+
+// [agent-inferred, November 1] **The contact pairs words at unit power** (`Field::tick`): each head's
+// framed probe and key read in place as a ratio to its own power over the head's `2n` reals
+// (`ratio_to_power`, on `2^(−16)`), their powers kept for the return; one warp a head and a site
+// (`[h][t]`). The binary lengths of the largest unit probe and key are raised into `bits[0]`,
+// `bits[1]`.
+extern "C" __global__ void field_unit(FieldWords w, wide *qscale, wide *kscale) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    uint32_t qb = 0, kb = 0;
+    for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
+        for (uint32_t part = 0; part < 2; part++) {
+            int64_t *c = (part == 0 ? w.qf : w.kf) + hs * w.span;
+            wide power = 0;
+            for (uint32_t i = lane; i < w.span; i += 32) {
+                power += (wide)c[i] * (wide)c[i];
+            }
+            power = warp_sum(power);
+            const wide s = (wide)isqrt128((uwide)(power / (wide)w.span));
+            uint32_t b = 0;
+            for (uint32_t i = lane; i < w.span; i += 32) {
+                const int64_t r = s == 0 ? 0 : (int64_t)fit32(div_nearest((wide)c[i] << FACE_BITS, s), w.status);
+                c[i] = r;
+                b = max(b, bit_length(mag64(r)));
+            }
+            if (part == 0) {
+                qb = max(qb, b);
+            } else {
+                kb = max(kb, b);
+            }
+            if (lane == 0) {
+                (part == 0 ? qscale : kscale)[hs] = s;
+            }
+        }
     }
     qb = (uint32_t)warp_max_u64(qb);
     kb = (uint32_t)warp_max_u64(kb);
-    vb = (uint32_t)warp_max_u64(vb);
-    if ((threadIdx.x & 31) == 0) {
+    if (lane == 0) {
         atomicMax(&w.bits[0], qb);
         atomicMax(&w.bits[1], kb);
-        atomicMax(&w.bits[2], vb);
+    }
+}
+
+// The return through the probe's and the key's unit power (`ratio_adjoint`), in place on their
+// framed charts' covectors `[t][2M]` (head `h`'s slots `h n + l` and `M + h n + l`):
+// `δq̃ = (δq̂ − q̂ ⟨q̂, δq̂⟩/2n) / ‖q̃‖_rms`; one warp a head and a site.
+extern "C" __global__ void field_unit_back(FieldWords w, const wide *qscale, const wide *kscale, int64_t *dq, int64_t *dk) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
+        const uint32_t h = hs / w.T;
+        const uint64_t t = hs % w.T;
+        for (uint32_t part = 0; part < 2; part++) {
+            const int64_t *rt = (part == 0 ? w.qf : w.kf) + hs * w.span;
+            int64_t *chart = part == 0 ? dq : dk;
+            const wide s = (part == 0 ? qscale : kscale)[hs];
+            wide dot = 0;
+            for (uint32_t c = lane; c < w.span; c += 32) {
+                const uint64_t slot = t * w.M2 + (c < w.n ? h * w.n + c : w.M + h * w.n + c - w.n);
+                dot += (wide)rt[c] * (wide)chart[slot];
+            }
+            dot = warp_sum(dot);
+            const wide mean = div_nearest(dot, (wide)w.span);
+            for (uint32_t c = lane; c < w.span; c += 32) {
+                const uint64_t slot = t * w.M2 + (c < w.n ? h * w.n + c : w.M + h * w.n + c - w.n);
+                chart[slot] = s == 0 ? 0 : fit64(div_nearest(((wide)chart[slot] - rel(mean * (wide)rt[c], 2 * FACE_BITS)) << FACE_BITS, s), w.status);
+            }
+        }
     }
 }
 
@@ -460,7 +530,8 @@ extern "C" __global__ void field_frame(FieldWords w) {
 // peak; then each score again, its weight `release(2^(z − peak), 22)` through the exponential's
 // resident face, the mass and the current's numerators `Σ_j e_ij ṽ_j`. The numerators are then
 // divided once by the mass and returned to the receiver's frame. The weights are stored
-// only when a return will read them (`store`).
+// only when a return will read them (`store`). No site meets itself: the peak is read over the
+// other sites and the receiver's own weight is zero (stored as zero, so the return reads it so).
 //
 // [agent-inferred, November 1] **The carriers' widths follow their terms** (the precision law: a
 // carrier widens at a declared crossing). The frame wrote the binary lengths of the largest framed
@@ -537,7 +608,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 4) field_contact
                 kt[c * TILE_PAD + jj] = j0 + jj < sites ? keys[(uint64_t)(j0 + jj) * S + c] : 0;
             }
             __syncthreads();
-            if (live && j0 + lane < sites) {
+            if (live && j0 + lane < sites && j0 + lane != i) {
                 const int64_t z = contact_score(w, qs + warp * S, kt, lane, narrow_score);
                 peak = z > peak ? z : peak;
             }
@@ -559,9 +630,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 4) field_contact
             __syncthreads();
             uint64_t ej = 0;
             if (live && j0 + lane < sites) {
-                const int64_t z = contact_score(w, qs + warp * S, kt, lane, narrow_score);
-                ej = (uint64_t)rel((wide)below_one_face((wide)z - (wide)peak, w.face, w.digits), WEIGHT_BITS_FROM);
-                mass += ej;
+                if (j0 + lane != i) {
+                    const int64_t z = contact_score(w, qs + warp * S, kt, lane, narrow_score);
+                    ej = (uint64_t)rel((wide)below_one_face((wide)z - (wide)peak, w.face, w.digits), WEIGHT_BITS_FROM);
+                    mass += ej;
+                }
                 if (store) {
                     erow[j0 + lane] = ej;
                 }

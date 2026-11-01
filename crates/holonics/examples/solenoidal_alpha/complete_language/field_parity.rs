@@ -292,10 +292,10 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
 }
 
 /// The site pairs a release reads at most: every sweep reads the question and the open answer
-/// once with the question and, where no site resolves, once more without it (a region released
-/// short of its void reads fewer).
+/// once with the question, where no site resolves once more without it, and once more with a part
+/// of its released sites open (the refinement; a region released short of its void reads fewer).
 fn release_pairs(heads: usize, ticks: usize, sweeps: usize, sites: usize) -> u128 {
-    (2 * heads * ticks * sweeps) as u128 * (sites * sites) as u128
+    (3 * heads * ticks * sweeps) as u128 * (sites * sites) as u128
 }
 
 /// `time-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION

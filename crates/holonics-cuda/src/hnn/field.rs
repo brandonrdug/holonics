@@ -159,6 +159,9 @@ struct Tick<'c> {
     qf: CardBuffer<'c, i64>,
     kf: CardBuffer<'c, i64>,
     vf: CardBuffer<'c, i64>,
+    /// The framed probe's and key's powers `[h][t]`, the ratios `field_unit` reads them as.
+    qscale: CardBuffer<'c, i128>,
+    kscale: CardBuffer<'c, i128>,
     e: CardBuffer<'c, u64>,
     mass: CardBuffer<'c, u64>,
     y: CardBuffer<'c, i64>,
@@ -293,8 +296,8 @@ impl<'c> CardField<'c> {
     fn run(&mut self, field: &Field, regions: &[Region], returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let d = field.declaration;
         for region in regions {
-            if region.classes.len() != region.unresolved.len() || region.classes.is_empty() {
-                return Err(TowerError::Refused("a region needs one class and one resolution a site"));
+            if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+                return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
             }
             if region.classes.len() > d.reach {
                 return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
@@ -435,6 +438,8 @@ impl<'c> CardField<'c> {
             qf: alloc64(heads * sites * span)?,
             kf: alloc64(heads * sites * span)?,
             vf: alloc64(heads * sites * span)?,
+            qscale: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * sites).max(1))).map_err(device)?,
+            kscale: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * sites).max(1))).map_err(device)?,
             // The weights are kept only for a return's reverse.
             e: self.timed(Kind::Alloc, || card.alloc::<u64>(if returning { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
             mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
@@ -525,6 +530,8 @@ impl<'c> CardField<'c> {
             }
             card.zero_octets(&tick.bits, 0, 12).map_err(device)?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
+            let (mut qs, mut ks) = (tick.qscale.device_ptr(), tick.kscale.device_ptr());
+            self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut ks)])?;
             let (mut groups_ptr, mut count, mut store) = (groups_c.device_ptr(), groups.len() as u32, u32::from(returning));
             let blocks = (heads as u64 * groups.len() as u64).clamp(1, 1 << 20) as u32;
             self.launch_shared("field_contact", blocks, (CONTACT_ROWS * 32) as u32, contact_shared(2 * n as u32), &mut [arg(words), arg(&mut groups_ptr), arg(&mut count), arg(&mut store)])?;
@@ -667,6 +674,8 @@ impl<'c> CardField<'c> {
                 let (mut hh, mut wrp, mut dsp, mut dkp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dk.device_ptr(), dv.device_ptr());
                 self.launch("field_contact_columns", Self::blocks_of_32(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dkp), arg(&mut dvp)])?;
             }
+            let (mut qs, mut ks, mut dqp, mut dkp) = (tick.qscale.device_ptr(), tick.kscale.device_ptr(), dq.device_ptr(), dk.device_ptr());
+            self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut ks), arg(&mut dqp), arg(&mut dkp)])?;
             for chart in [&dq, &dk, &dv] {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
@@ -714,7 +723,7 @@ impl<'c> CardField<'c> {
 
 /// [agent-inferred, November 1] **Everything a region of `sites` sites allocates in a batch**
 /// ([`CardField::batch`], `tick`, `reverse`): each kept tick's carriers (the chart's read and scale,
-/// the three charts and their framed copies, the masses, the current, the pair contact's read, scale
+/// the three charts and their framed copies, the probe's and key's powers, the masses, the current, the pair contact's read, scale
 /// and drives) and its weights `H·S²`, the opening's and the face's carriers, and on a return the
 /// reverse's per-site covectors and the contact's return `δs` (`S²` on 128 bits). Measured November 1:
 /// sized by the weights and the contact's return alone, a batched release's per-site carriers took the
@@ -722,7 +731,7 @@ impl<'c> CardField<'c> {
 pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
     let ticks_kept = if returning { d.ticks as u64 } else { 1 };
-    let tick_site = 4 * dw + 16 + 8 * 3 * m2 + 3 * 8 * h * span + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
+    let tick_site = 4 * dw + 16 + 8 * 3 * m2 + 3 * 8 * h * span + 2 * 16 * h + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
     let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 3 * 8 * m2 } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);

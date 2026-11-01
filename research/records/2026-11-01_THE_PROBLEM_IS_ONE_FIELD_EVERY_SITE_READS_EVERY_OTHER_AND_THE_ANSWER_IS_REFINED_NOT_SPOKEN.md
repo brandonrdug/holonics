@@ -824,3 +824,139 @@ their own question against another's (`context` against `foil`) at every lap.
 Not adopted: a wider word than one neighbour each side (the second tick composes one more); a
 separate copy path or pointer (a catered routine); a schedule that withholds the answer's
 neighbours to force the question's read (the release states already hold the opening).
+
+## 18. The seventh reading: the question was still not read, and the four parts the machine lacked
+
+[measured] The seventh reading (receipts in `…_receipts/reading-7/`, count-only) founded the field
+under §17's opening on the same declaration, keys and data and trained it eleven laps in 529 s, then
+released the 128 held problems and read them by the written rules.
+
+| Reading | Value |
+|---|---|
+| The training | 11 laps of 413 sections, 400 to 413 deposited a lap, about 130 held steps refused a lap; the withheld problems' code 6.931 → 2.025 bits a site |
+| The held answers beside their neighbours | `context` 3.887 → 2.009 bits a byte, its digits 4.058 → 2.612 |
+| The same beside the next problem's question | `foil` 3.887 → 2.014, its digits 4.059 → 2.633 |
+| The release | completed, the free set in 30 s and the marks in 103 s of 240 s; released lengths 271 to 367 bytes, median 315 (held 254) |
+| The claim | the first calculation from the question's numbers in 3 of 128 (bar 24), against `c_foil = 4`; right values at 6 of 399 marked equals |
+
+**The question is still not read.** The strand contacts let the field learn its answers' own text
+faster than §17's opening (context 2.009 against the sixth reading's 2.264 after a similar time),
+but the question told the held digits 0.021 bits after eleven laps, and the first calculation drew
+on the question's numbers no more often than on another problem's. The answers' numbers were the
+commonest (`10` 171 times of 357 written).
+
+[agent-inferred] **Four parts the machine lacked**, found by reading the law against what the
+copy needs (a GSM8K operand stands a median of 190 bytes before the answer site that writes it):
+
+1. **The contact did not concentrate.** A site finds its counterpart only where their contact
+   stands above the region's other sites. The charts `Q` and `K` were founded independently, so a
+   word's contact with its equal was a random pairing; the strand encodings `E₋`, `E₊` opened at
+   zero, so at the founding no site had a word to be found by; `β` was set to bring the contact's
+   spread to one bit, while finding one site among 450 needs about nine; a head mixed its still
+   and turned modes, whose phase-scattered sum is as large as the still modes' at any distance
+   past their finest rings; and a probe's and a key's power varied with their words, so a louder key
+   outscored the equal one. Each site gathered the region's average.
+2. **A site met itself.** Its own word is always its best match, so a concentrated contact would
+   read itself before any other site.
+3. **The founding's draws were not tested at a question's size.** The fixtures' key stream (a
+   counter's squares and Weyl steps) drew the founding's rows along one lattice, so in the tests
+   every founded word was nearly every other: a word's contact with its equal scored about 70
+   against the region's 80 to 90 at 450 sites. The tests therefore could not see the first part.
+4. **The release spoke each site once.** A released site was never revised, so a digit released
+   before the sites that inform it stood whatever the field read afterward.
+
+**The laws** (`Field::found`, `Field::tick`, `Field::release_with`, the card's kernels):
+
+- *The contact is founded as the pair's likeness*: `K = Q` at the founding, and `E`, `E₋`, `E₊`
+  each a keyed draw with its unresolved row at zero (a site whose class has not arrived has no word
+  to be met by, only a probe).
+- *The still and turned modes are whole ring sets*: head `h` belongs to set `h mod frames`, and a
+  set below `still` is still in every mode, so a still head compares words at any distance with
+  nothing turned beside them.
+- *No site meets itself*: `e_ii = 0`, the peak read over the others; a region needs two sites.
+- *The contact pairs words at unit power*: within its head the framed probe and key are each read
+  as a ratio to their own power over the head's `2n` reals (the chart's own law), so a word's
+  contact with an equal word is `2n`, the most any pair reaches, and a key fits its lock exactly
+  where the two words agree. The return reads the ratio's adjoint before the frame is undone.
+- *The gain is the reach's*: `β` is the largest shift with `2^(−β)·2n ≥ ⌈log₂ reach⌉`, so two
+  equal words outweigh every other site of the longest region (`β = 0` at GSM8K's reach of 2,221
+  and `2n = 16`).
+- *The release refines*: after each sweep's releases, one part of the released answer sites (every
+  fourth from the answer's first; the void, the boundary, excepted) is read again open with the
+  rest as it stands, and a site whose face now resolves another class takes it. A problem refines
+  while it has an open site and until its four parts are reread with no change. A sweep reads at
+  most three times (the faces, the question-open prior where nothing resolves, the reread).
+
+[measured] **The founded contact at a question's size** (host, before any learning;
+`founded_contact_shares_at_a_question_s_size` and a removed scratch fixture of the same shape: a
+region of 450 sites drawn over 122 classes, the seventh reading's declaration, a site's whole word
+written once more 340 sites before it, both still heads):
+
+| The founding | Rows peaking at the counterpart | The counterpart against the region |
+|---|---|---|
+| The fixtures' former key stream, charts at their own scale | 4 of 32; 1 of 16 | a score of about 70 against the region's 80 to 90; a median share of the row's weight under 0.01 |
+| A mixed key stream, charts at their own scale | 20 of 32 | a score of 12 to 31 against the next site's 9 to 22 |
+| A mixed key stream, probe and key at unit power | 16 of 16 | the score `2n = 16`, the most any pair reaches; a share of 0.53 to 0.86 of the row's weight |
+
+At its own scale a probe's power varies with its word (a sum of `2n` squares), so a louder key
+outscored the equal one; at unit power the equal word is the maximum by Cauchy–Schwarz. The founding
+meets a whole word; what it meets by part of one is what learning has to concentrate: an open site
+whose two neighbours recur around one site peaks there in 10 of 16 rows (shares up to 0.66), one
+whose left neighbour alone recurs in 3 of 16. The law's test is
+`the_founded_contact_meets_the_site_whose_word_is_its_own` (every row of 16 regions of 48 sites).
+
+[measured] **The cue's successor** (host, debug build, `…_receipts/unit-contact/`). §17's
+permutation probe (ten words, the separator, a cue and the word that followed it; 3.17 bits
+without the copy) had not formed within 2,000 sections under either opening. Under §18's laws, on
+the same declaration (width 16, two heads of four modes, 16 contacts, two ticks, 16 regions a
+section, the held code the mean over 64 withheld problems):
+
+| Sections | §17 (rates `2^(−6)`, `2^(−9)`) | Rate `2^(−6)`, two still sets | `2^(−6)`, one | `2^(−8)`, one |
+|---|---|---|---|---|
+| 0 | | 3.459 | 3.459 | 3.459 |
+| 200 | | 0.204 | 1.019 | 0.784 |
+| 400 | | 0.017 | 0.061 | 0.122 |
+| 600 | | 0.006 | 0.021 | 0.046 |
+| 1,000 | | 0.001 | 0.005 | 0.013 |
+| 2,000 | 3.31, 3.28 | 0.000 | 0.000 | 0.001 |
+
+At `2^(−8)` 1,996 of 2,000 sections deposited; at `2^(−6)` with two still sets 592 of the first 600
+and 1,992 of 2,000. The copy is learned exactly, at the slow rate the GSM8K learner uses too. The law's test is
+`the_contact_finds_a_cue_s_successor` (under 0.0625 bits after 600 sections at `2^(−6)`, two still
+sets); the recall test (`the_strand_contacts_let_a_value_be_recalled_by_its_key`) holds under the
+new laws.
+
+[measured] **The crib terrain** (`crib-terrain SEED TRAIN DEV OUT_TRAIN OUT_DEV`, an exterior
+generator: no model reads). The probes above copy across a dozen sites; a GSM8K operand stands a
+median of 190 bytes before the answer that writes it. The crib terrain puts the copy at that
+distance and makes it the only thing to learn: a question of 48 to 79 words, each one to three
+syllables of twenty (meaningless, so no word predicts a number), with two or three numbers of one to
+three digits at drawn places, then `?`; the answer sums them in the question's order in GSM8K's
+markup (`<<a+b=c>>c`, a line a sum, then `#### total`). The answer's operands are read from the
+question and from nowhere else. At seed 20261101 over 2,000 problems the questions are 211 to 427
+bytes (median 312), and the first calculation's operands stand 55, 182 and 300 bytes before the
+answer site that writes them (the tenth, fiftieth and ninetieth percentiles), 69.5% of them past 127.
+
+[agent-inferred] **The crib probe** (`…_receipts/crib-probe/probe.sh`) runs on the card under
+reading 7's declaration, key file, section and rate, with only the terrain changed: the key file's
+bytes (a degenerate stream would found every word alike); the card against the host on the
+terrain's sections, without and with one growth (a stop at the first unequal read ends the probe);
+the lap's projection; 300 s of training from the founding; the release of 128 held problems in
+150 s, and three releases' text in 30 s; then the written rules against the terrain's own passages.
+It holds 900 s at most, every bound fixed in the script before launch. Its acceptance, fixed
+here: **the question is read** when the first calculation takes its operands from the question's
+numbers in at least 24 of 128 held releases (the claim's bar) and more often than from the next
+problem's question (`c_from_question` against `c_foil`), with the held answers' code lower beside
+their own question than beside another's. If it fails, its failure is the next loop's subject and
+reading 8 waits; if it passes, reading 8 runs GSM8K on the same laws.
+
+[agent-inferred] **The Lean obligation** carried into #410: the unit-power contact's lock, that
+two words each at unit power over `2n` reals pair at most `2n`, with equality exactly when they are
+equal (Cauchy–Schwarz on the head's chart), and that `β` as derived makes two equal words outweigh
+every other site of a region within the reach.
+
+Not adopted: a wider span or more still modes to raise the contact's signal (the width is the
+trained body's); a separate copy path or pointer to the question (a catered routine); a learned
+temperature beside `β` (the gain is the reach's, derived); revising the void (the boundary follows
+the content, §16); a crib terrain whose answers write anything but GSM8K's markup (the probe reads
+the copy the claim needs, not another task).

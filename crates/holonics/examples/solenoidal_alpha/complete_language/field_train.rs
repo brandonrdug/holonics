@@ -837,10 +837,10 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         held.len(),
         marks_at.len(),
         free_last.done,
-        free_last.live,
+        free_last.open,
         free_last.live > 0 && free_last.done < sweeps,
         marks_last.done,
-        marks_last.live,
+        marks_last.open,
         marks_last.live > 0 && marks_last.done < sweeps,
         started.elapsed().as_millis()
     );
@@ -854,7 +854,7 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
 fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
     move |sweep| {
         let ms = started.elapsed().as_millis();
-        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} resolved={} by_news={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.resolved, sweep.by_news, sweep.cut, sweep.cut_sites);
+        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} open={} resolved={} by_news={} revised={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.open, sweep.resolved, sweep.by_news, sweep.revised, sweep.cut, sweep.cut_sites);
         *last = *sweep;
         ms < stop_ms
     }
@@ -922,7 +922,7 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
         };
         println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i}\n{answer}\n", String::from_utf8_lossy(question));
     }
-    println!("FIELD_RELEASE_TEXT problems={} sweeps={} open={} stopped={} ms={}", held.len(), last.done, last.live, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
+    println!("FIELD_RELEASE_TEXT problems={} sweeps={} open={} stopped={} ms={}", held.len(), last.done, last.open, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
     Ok(())
 }
 
@@ -1152,4 +1152,90 @@ mod tests {
             assert!(read.iter().enumerate().all(|(t, &n)| n == usize::from(t >= q.len() && t <= q.len() + a.len())), "each answer site and its void once");
         }
     }
+}
+
+/// [agent-inferred, November 1] **The crib terrain**: `crib-terrain SEED TRAIN DEV OUT_TRAIN
+/// OUT_DEV` writes two passages in the GSM8K passage form (a question line, its answer lines, a
+/// blank line) whose answers are read from their questions and nowhere else. A question is 48 to 79
+/// words of one to three syllables drawn from twenty, with two or three whole numbers of one to
+/// three digits at distinct word places; its answer sums them in the order the question writes
+/// them, one calculation a sum (`<<a+b=s>>s`, then `<<s+c=t>>t`), and ends `#### total`. The words
+/// carry nothing the answer needs, so the answer's first calculation is drawn from the question's
+/// numbers only where the field reads them across the question, a median of about 180 bytes back
+/// (GSM8K's 190). The terrain writes its truth with an exact routine; the field meets only its
+/// classes, as it meets GSM8K's. Why (the seventh reading, November 1): the question told the held
+/// answers' digits 0.021 bits on GSM8K, where the operands are both far and few, so whether the
+/// field can read a number across a question at all is read here first, where nothing else in the
+/// passage can stand in for it. The draws are the exterior mixer's ([`mix`]) of `SEED` and the
+/// problem's index, the held passage's indices past `2^40`.
+pub(super) fn crib_terrain(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("crib-terrain SEED TRAIN DEV OUT_TRAIN OUT_DEV".into());
+    }
+    let seed: u64 = args[1].parse()?;
+    let (train, dev) = (positive(&args[2])?, positive(&args[3])?);
+    for (path, count, base) in [(&args[4], train, 0u64), (&args[5], dev, 1u64 << 40)] {
+        let mut text = Vec::new();
+        for i in 0..count as u64 {
+            let (q, a) = crib_problem(seed, base + i);
+            text.extend(q);
+            text.push(b'\n');
+            text.extend(a);
+            text.extend(b"\n\n");
+        }
+        write_new(Path::new(path.as_str()), &text)?;
+    }
+    println!("CRIB_TERRAIN seed={seed} train={train} dev={dev}");
+    Ok(())
+}
+
+fn crib_problem(seed: u64, problem: u64) -> (Vec<u8>, Vec<u8>) {
+    const SYLLABLES: [&[u8]; 20] = [b"ba", b"de", b"ki", b"lo", b"mu", b"na", b"pe", b"ri", b"so", b"tu", b"va", b"we", b"xo", b"yi", b"za", b"ha", b"fe", b"gi", b"jo", b"cu"];
+    let mut drawn = 0u64;
+    let mut draw = |m: u64| {
+        drawn += 1;
+        mix(seed, problem << 16 | drawn) % m
+    };
+    let words = 48 + draw(32) as usize;
+    let count = 2 + draw(2) as usize;
+    let mut values = Vec::with_capacity(count);
+    for _ in 0..count {
+        let low = 10u64.pow(draw(3) as u32);
+        values.push(low + draw(9 * low));
+    }
+    let mut places: Vec<usize> = Vec::with_capacity(count);
+    while places.len() < count {
+        let place = draw(words as u64) as usize;
+        if !places.contains(&place) {
+            places.push(place);
+        }
+    }
+    places.sort_unstable();
+    let mut question = Vec::new();
+    let mut next = 0usize;
+    for w in 0..words {
+        if w > 0 {
+            question.push(b' ');
+        }
+        if next < count && places[next] == w {
+            question.extend(values[next].to_string().bytes());
+            next += 1;
+        } else {
+            for _ in 0..1 + draw(3) {
+                question.extend_from_slice(SYLLABLES[draw(20) as usize]);
+            }
+        }
+    }
+    question.push(b'?');
+    let mut answer = Vec::new();
+    let mut total = values[0];
+    for (j, &v) in values.iter().enumerate().skip(1) {
+        if j > 1 {
+            answer.push(b'\n');
+        }
+        answer.extend(format!("<<{total}+{v}={}>>{}", total + v, total + v).bytes());
+        total += v;
+    }
+    answer.extend(format!("\n#### {total}").bytes());
+    (question, answer)
 }

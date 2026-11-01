@@ -13,18 +13,20 @@
 //!
 //! **The object.** A problem is one relatively complete region: its question's sites are resolved
 //! (their classes arrived), its answer's are unresolved (a held operand, the encoding's last row).
-//! Each site carries a face `x_t` on `2^(−16)` and is framed by its place: a mode `m` of a head
-//! carries the ring phasor `U_(t,m) = e^(2πi (t mod n_m)/n_m)`, `n_m` a closure of the solenoid's
-//! dyadic or triadic tower ([`ring_periods`]: each ring reads the finer ring's residue and its
-//! whole winding, and the top rings span the region), or `U = 1` (the still modes, which read
-//! content without place). One constitution `F_Θ` is iterated `K` ticks, `x^(k+1) = F_Θ(x^k)`:
+//! Each site carries a face `x_t` on `2^(−16)` and is framed by its place. The heads come in ring
+//! sets: a **still** set's modes carry `U = 1` and read a site's content wherever it stands (the
+//! word), a **turned** set's mode `m` carries the ring phasor `U_(t,m) = e^(2πi (t mod n_m)/n_m)`,
+//! `n_m` a closure of the solenoid's dyadic or triadic tower ([`ring_periods`]: each ring reads the
+//! finer ring's residue and its whole winding, and the top rings span the region), and reads
+//! content with its place (the helix). One constitution `F_Θ` is iterated `K` ticks,
+//! `x^(k+1) = F_Θ(x^k)`:
 //!
 //! ```text
 //! open       x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)),   u = ∗ where a site is unresolved
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   q_t = Q r̂_t + b_q,   k_t = K r̂_t + b_k,   v_t = V r̂_t + b_v
 //! frame      q̃_t = U_t ⊙ q_t,   k̃_t = U_t ⊙ k_t,   ṽ_t = U_t ⊙ v_t       complex modes, by head
-//! contact    z_ij = 2^(−β) Σ_(m∈h) Re(conj(q̃_im) k̃_jm)                   every pair of sites, both ways
-//! weights    e_ij = 2^(z_ij − max_j z_ij)                                 the Gibbs face, in bits
+//! contact    z_ij = 2^(−β) Σ_(m∈h) Re(conj(q̃_im) k̃_jm)                   every pair of two sites, both ways
+//! weights    e_ij = 2^(z_ij − max_(j≠i) z_ij),  e_ii = 0                  the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_j e_ij ṽ_j / Σ_j e_ij,   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a ⊙ b) + b_c
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
@@ -33,7 +35,7 @@
 //! [definition; agent-inferred, November 1] **The opening carries the site's strand contacts.** A
 //! site is a ring of the strand, joined to the sites before and after it by pair contacts, so its
 //! opening face is its own class's row with its two neighbours' rows of the contact encodings
-//! `E₋` and `E₊` (founded at zero: the founded field opens as before and the contacts are learned).
+//! `E₋` and `E₊` (founded with the encoding since the seventh reading, below).
 //! The face of a site is then its word, the address the navigator reads it by: two sites whose
 //! neighbours agree meet through their charts in one tick, so a site can find, anywhere in the
 //! region, the site whose word continues its own, and gather what stands there. Why (the sixth
@@ -42,6 +44,36 @@
 //! the question; with only its own class at the opening, a site's word reaches its charts only
 //! through a first tick's contact with its neighbours, and finding a site by its word is then a
 //! composition of two learned contacts, which thirteen laps did not form.
+//!
+//! [definition; agent-inferred, November 1] **The contact concentrates from the founding: a site
+//! meets the sites whose word is its own.** A contact is between two sites, so no site meets
+//! itself (`e_ii = 0`; a lone site's slip with itself is zero and carries nothing). The contact is
+//! founded as the pair's likeness (`K = Q` at the founding, so `Re(conj(q_i) q_j)` peaks where the
+//! two words agree), the strand contacts are founded with the encoding (each row a keyed draw, so
+//! every site has a word from the founding), and a site whose class has not arrived opens on
+//! nothing (the unresolved rows of `E`, `E₋`, `E₊` founded at zero: it has no word to be met by,
+//! only a probe). The still and turned modes are separate ring sets: a still set compares words at
+//! any distance, a turned set compares them with their place. **The contact pairs words at unit
+//! power**: within its head the framed probe and key are each read as a ratio to their own power
+//! (the chart's law, `ratio_to_power`, over the head's `2n` reals), so the pairing of two words is
+//! `2n` times their cosine, a word's contact with an equal word is `2n`, the most any pair reaches,
+//! and a key fits its lock exactly where the two words agree. The contact's gain is the reach's:
+//! `β` is the largest shift with `2^(−β)·2n ≥ ⌈log₂ reach⌉`, so the contact of two equal words
+//! outweighs the region's other sites at the founding ([`FieldDeclaration::score_shift`]). Why the
+//! unit power (measured November 1, at a GSM8K region's 450 sites and the seventh reading's
+//! declaration, founded on a mixed key stream): with the probe and key at the chart's scale alone,
+//! a site whose whole word recurs once peaked at its counterpart in 20 of 32 rows, its score 12
+//! to 31 against the region's next 9 to 22: a probe's power varies with its word (a sum of `2n`
+//! squares), so a louder key outscored the equal one. Why the concentration (the seventh reading, November 1): with the strand
+//! contacts learned from zero, the charts founded independently, the still modes two of a head's
+//! eight and `β` chosen to bring the contact's spread to one bit, a site's contact with any other
+//! was about one bit against the four hundred sites of a GSM8K region, so each site gathered the
+//! region's average: after eleven laps the held answers coded 2.009 bits a byte beside their
+//! neighbours and the question told their digits 0.021 bits. Within a head the turned modes' sum
+//! is a phase-scattered term as large as the still modes' at any distance past their finest
+//! rings, so a word could not be found far from its reader there either. Founded alike and
+//! concentrated, the crib (a site's counterpart, wherever it stands) is met from the first section;
+//! learning then turns the readout and returns onto what the contact already gathers.
 //!
 //! The pairing `Re(conj(q̃_i) k̃_j) = Re(conj(q_i) U_i^* U_j k_j)` turns mode `m` by
 //! `2π (j − i)/n_m`: a turned mode reads the relative place modulo its ring, a still mode reads the
@@ -68,8 +100,10 @@
 //! (a void at `t` implies the void past `t`): its extent is read once, at the opening, where the
 //! earliest site whose void the field resolves is released and the sites past it leave the region;
 //! after the opening the void is released only at the answer's first open site, every answer site
-//! before it released, and it ends the answer. The released sites are
-//! present terrain for the next sweep. A class is never spoken in order. Every sweep releases a
+//! before it released, and it ends the answer. The released sites are present terrain for the next
+//! sweep, and are themselves refined: each sweep one part of them (every fourth) is read again with
+//! itself open and the rest as it stands, and a site the field now resolves to another class takes
+//! it, until every part is reread with no change. A class is never spoken in order. Every sweep releases a
 //! site of every open problem, so `S` at the answer's open sites lets every release end; the
 //! exterior bounds its time ([`ReleaseSweep`]).
 //!
@@ -107,14 +141,20 @@ const CONTACT_BITS: u32 = 40;
 /// The release's order key, `p̂(top)` times the news in bits, on `2^(−40)`: the code's `2^(−20)`
 /// bits carried `2^(−20)` further by the share.
 const NEWS_BITS: u32 = 20;
+/// The refinement's parts (agent-inferred, November 1): a released site is reread with its own part
+/// open and the three released sites on each side of it in place, the reach a byte's own context
+/// needs (the held read's parts, `CONTEXT` in the exterior), so every released site is reread once
+/// every four sweeps.
+const REFINE_PARTS: usize = 4;
 
 /// [definition; agent-inferred, November 1] **The field's declared law**: an alphabet of `A`
 /// classes (the face's; the encoding carries one more row, the unresolved operand), a face width
-/// `D`, `H` heads of `n` complex modes each (the first `still` of every head unframed, the rest on
-/// the solenoid's rings, [`ring_periods`]), `f` pair contacts and `K` ticks of the one
-/// constitution; `frames`, the founding's heads, whose ring sets every grown head copies; and
-/// `reach`, the most sites a region may span (the terrain's extent, read from the passages the
-/// field will meet), which the rings' coarsest closures cover.
+/// `D`, `H` heads of `n` complex modes each, `f` pair contacts and `K` ticks of the one
+/// constitution; `frames`, the founding's heads, whose ring sets every grown head copies (head `h`
+/// is of set `h mod frames`), the first `still` of them still (every mode unframed, reading the
+/// word) and the rest turned (every mode on the solenoid's rings, [`ring_periods`]); and `reach`,
+/// the most sites a region may span (the terrain's extent, read from the passages the field will
+/// meet), which the rings' coarsest closures cover.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct FieldDeclaration {
     pub alphabet: usize,
@@ -134,20 +174,27 @@ impl FieldDeclaration {
         self.heads * self.modes
     }
 
-    /// The contact's scale `β` (agent-inferred): a head's pairing sums `2n` products of reads at
-    /// unit power, so its spread is `√(2n)`; `2^(−β)` with `β = ⌈½ ⌈log₂ 2n⌉⌉` brings it to about
-    /// one bit (`β = 2` at `n = 8`).
+    /// [definition; agent-inferred, November 1] **The contact's gain is the reach's**: a head's
+    /// pairing of two equal words sums the `2n` squares of a probe at unit power, `2n` exactly, and a site
+    /// must outweigh the `reach` sites it could meet, `⌈log₂ reach⌉` bits; `β` is the largest shift
+    /// with `2^(−β)·2n ≥ ⌈log₂ reach⌉` (zero where no shift keeps it), so the founded contact of a
+    /// word with its counterpart stands above the region's other sites (the module doc).
     pub fn score_shift(&self) -> u32 {
         let reals = 2 * self.modes;
-        let bits = usize::BITS - (reals - 1).leading_zeros();
-        bits.div_ceil(2)
+        let bits = (usize::BITS - self.reach.saturating_sub(1).leading_zeros()).max(1) as usize;
+        let mut beta = 0u32;
+        while (reals >> (beta + 1)) >= bits {
+            beta += 1;
+        }
+        beta
     }
 
-    /// The key draws the founding reads, four bytes a draw: the encoding, the three charts and
-    /// both pair drives.
+    /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
+    /// rows of every class (their unresolved rows open at zero), the probe chart (the key chart is
+    /// founded equal to it), the value chart and both pair drives.
     pub fn founding_draws(&self) -> usize {
         let m2 = 2 * self.complex();
-        (self.alphabet + 1) * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width
+        3 * self.alphabet * self.width + 2 * m2 * self.width + 2 * self.contacts * self.width
     }
 
     /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
@@ -162,30 +209,30 @@ impl FieldDeclaration {
         Ok(Self { width: grow(self.width)?, heads: grow(self.heads)?, contacts: grow(self.contacts)?, ..*self })
     }
 
-    /// The turned slots: `frames · (n − still)`, slot `(l − still) · frames + g` the ring of local
-    /// mode `l` in every head of ring set `g`.
+    /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
+    /// of local mode `l` in every head of turned ring set `g`.
     pub fn turned_slots(&self) -> usize {
-        self.frames * (self.modes - self.still)
+        (self.frames - self.still) * self.modes
     }
 
     fn admit(&self) -> Result<()> {
-        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.still > self.modes || self.contacts == 0 || self.ticks == 0 {
-            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts and ticks, and no more still modes than a head has");
+        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.ticks == 0 {
+            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts and ticks");
         }
-        if self.frames == 0 || self.heads % self.frames != 0 || self.reach == 0 {
-            return refuse("a field's ring sets divide its heads and its reach spans a site");
+        if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
+            return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
         }
         Ok(())
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v2 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v3 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v2" {
-            return refuse("a field's head line that is not hnn-field-v2");
+        if words.len() != 10 || words[0] != "hnn-field-v3" {
+            return refuse("a field's head line that is not hnn-field-v3");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
@@ -277,8 +324,8 @@ fn tower(p: usize, reach: usize) -> Vec<usize> {
 /// residue). The slots take `⌈S/2⌉` rings of the dyadic tower and `⌊S/2⌋` of the triadic, each
 /// spread evenly from the finest to the top (a lone slot takes the top; more slots than closures
 /// cycle the tower), merged in ascending period. Slot `s` of [`FieldDeclaration::turned_slots`]
-/// is ring set `s mod frames`'s local mode `still + s / frames`, so every ring set spans fine to
-/// coarse. Two sites that agree modulo every ring are at least the top dyadic closure apart,
+/// is turned ring set `still + s mod (frames − still)`'s local mode `s / (frames − still)`, so every
+/// turned set spans fine to coarse. Two sites that agree modulo every ring are at least the top dyadic closure apart,
 /// beyond the reach: no two sites of an admitted region share every frame.
 ///
 /// (The prime powers `2, 3, 4, 5, 7, 8, …` of the first draft closed every ring within a few
@@ -347,10 +394,14 @@ pub struct Region<'a> {
 struct TickCell {
     read: Vec<i32>,
     scale: Vec<i128>,
-    /// Framed charts and values by head: `[h][t][2n]`, the real parts then the imaginary.
+    /// Framed charts and values by head: `[h][t][2n]`, the real parts then the imaginary; the
+    /// probe and the key each as a ratio to its own power within its head (on `2^(−16)`), their
+    /// powers `[h][t]` beside them.
     q: Vec<i64>,
     k: Vec<i64>,
     v: Vec<i64>,
+    qscale: Vec<i128>,
+    kscale: Vec<i128>,
     /// Gibbs weights `[h][i][j]` on `2^(−40)` of their row's peak, and each row's mass `[h][i]`:
     /// the numerators and their shared denominator.
     e: Vec<u64>,
@@ -389,10 +440,13 @@ struct Reaches {
 impl Field {
     /// **The founding configuration** (agent-inferred, November 1), read from a declared exterior
     /// key stream (four bytes a key, a signed 32-bit integer read as a uniform draw on `[−1, 1)`):
-    /// the encoding uniform on `[−1, 1)`; the charts `Q, K, V` and both pair drives `W_a, W_b`
-    /// uniform on `±√(3/D)`, so each read of a unit-power face opens at unit power; the current's
-    /// return `O`, the contact's return `W_c`, the readout and every bias at zero, so the field
-    /// opens on the flat face and each tick on the identity.
+    /// the encoding and both strand contacts uniform on `[−1, 1)` at every class, their unresolved
+    /// rows at zero (a site whose class has not arrived carries no word); the probe chart `Q`, the
+    /// value chart `V` and both pair drives `W_a, W_b` uniform on `±√(3/D)`, so each read of a
+    /// unit-power face opens at unit power, and the key chart `K = Q` (the contact founded as the
+    /// pair's likeness, the module doc); the current's return `O`, the contact's return `W_c`, the
+    /// readout and every bias at zero, so the field opens on the flat face and each tick on the
+    /// identity.
     pub fn found(declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
         declaration.admit()?;
         let layout = FieldLayout::new(&declaration);
@@ -414,12 +468,15 @@ impl Field {
         let (dw, a) = (declaration.width, declaration.alphabet);
         let m2 = 2 * declaration.complex();
         let f = declaration.contacts;
-        uniform(&mut theta[layout.enc..layout.enc + (a + 1) * dw], 1, 1, FACE_BITS)?;
+        for start in [layout.enc, layout.before, layout.after] {
+            uniform(&mut theta[start..start + a * dw], 1, 1, FACE_BITS)?;
+        }
         // √(3/D) as (√3·2^16)/(√D·2^16), each square root on 2^(−16).
         let (three, dd) = chart_scale(dw);
-        for start in [layout.q, layout.k, layout.v] {
+        for start in [layout.q, layout.v] {
             uniform(&mut theta[start..start + m2 * dw], three, dd, MATERIAL_BITS)?;
         }
+        theta.copy_within(layout.q..layout.q + m2 * dw, layout.k);
         for start in [layout.a, layout.b] {
             uniform(&mut theta[start..start + f * dw], three, dd, MATERIAL_BITS)?;
         }
@@ -459,13 +516,15 @@ impl Field {
         ln2_face()
     }
 
-    /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`.
+    /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`: the identity in a head of
+    /// a still ring set, the mode's ring in a turned one.
     fn frame(&self, t: usize, h: usize, l: usize) -> (i64, i64) {
         let d = &self.declaration;
-        if l < d.still {
+        let set = h % d.frames;
+        if set < d.still {
             return (1i64 << MOVE_BITS, 0);
         }
-        let (n, ring) = &self.rings[(l - d.still) * d.frames + h % d.frames];
+        let (n, ring) = &self.rings[l * (d.frames - d.still) + set - d.still];
         ring[t % n]
     }
 
@@ -477,8 +536,8 @@ impl Field {
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
-        if region.classes.len() != region.unresolved.len() || region.classes.is_empty() {
-            return refuse("a region needs one class and one resolution a site");
+        if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+            return refuse("a region needs one class and one resolution a site, and two sites to meet");
         }
         if region.classes.len() > self.declaration.reach {
             return refuse("a region past the field's reach, where its frames would repeat");
@@ -568,10 +627,26 @@ impl Field {
                 }
             }
         }
-        // The contact, the weights and the current, head by head. The current gathers each
-        // site's framed value, `ỹ_i = Σ_j e_ij ṽ_j / Σ_j e_ij` (the numerators summed whole over
-        // their shared denominator, one release), and returns it to the receiving site's own frame,
-        // `y_i = conj(U_i) ỹ_i`: the moment carries each source's place relative to its receiver.
+        // The contact pairs words at unit power: each head's framed probe and key read as ratios to
+        // their own power (`ratio_to_power` over the head's `2n` reals), so a word's contact with
+        // itself is `2n`, the most any pair reaches, and a pair's is `2n` times its cosine.
+        cell.qscale = vec![0i128; heads * sites];
+        cell.kscale = vec![0i128; heads * sites];
+        for hs in 0..heads * sites {
+            for (chart, scales) in [(&mut cell.q, &mut cell.qscale), (&mut cell.k, &mut cell.kscale)] {
+                let slice = &mut chart[hs * span..(hs + 1) * span];
+                let (r, s) = ratio_to_power(slice)?;
+                for (slot, v) in slice.iter_mut().zip(r) {
+                    *slot = v as i64;
+                }
+                scales[hs] = s;
+            }
+        }
+        // The contact, the weights and the current, head by head. The current gathers each other
+        // site's framed value, `ỹ_i = Σ_(j≠i) e_ij ṽ_j / Σ_(j≠i) e_ij` (the numerators summed whole
+        // over their shared denominator, one release), and returns it to the receiving site's own
+        // frame, `y_i = conj(U_i) ỹ_i`: the moment carries each source's place relative to its
+        // receiver. No site meets itself: its weight is zero and the peak is read over the others.
         cell.e = vec![0u64; heads * sites * sites];
         cell.mass = vec![0u64; heads * sites];
         cell.y = vec![0i64; sites * m2];
@@ -584,10 +659,10 @@ impl Field {
                     let s: i128 = qi.iter().zip(kj).map(|(&a, &b)| a as i128 * b as i128).sum();
                     *zj = fit64(release(s, FACE_BITS + beta))?;
                 }
-                let peak = *z.iter().max().unwrap_or(&0);
+                let peak = z.iter().enumerate().filter(|&(j, _)| j != i).map(|(_, &zj)| zj).max().unwrap_or(0);
                 let row = &mut cell.e[(h * sites + i) * sites..(h * sites + i + 1) * sites];
-                for (ej, &zj) in row.iter_mut().zip(z.iter()) {
-                    *ej = release(self.exponential.below_one(zj as i128 - peak as i128) as i128, WEIGHT_BITS_FROM) as u64;
+                for (j, (ej, &zj)) in row.iter_mut().zip(z.iter()).enumerate() {
+                    *ej = if j == i { 0 } else { release(self.exponential.below_one(zj as i128 - peak as i128) as i128, WEIGHT_BITS_FROM) as u64 };
                 }
                 let mass: u64 = row.iter().sum();
                 cell.mass[h * sites + i] = mass;
@@ -870,6 +945,22 @@ impl Field {
                     }
                 }
             }
+            // The probe's and the key's return through their ratios to their own power, head by
+            // head: `δq̃ = (δq̂ − q̂ ⟨q̂, δq̂⟩/2n) / ‖q̃‖_rms` (`ratio_adjoint`), still in the framed chart.
+            for h in 0..heads {
+                for t in 0..sites {
+                    let at = (h * sites + t) * span;
+                    let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
+                    for (chart, read, scales) in [(&mut dq, &cell.q, &cell.qscale), (&mut dk, &cell.k, &cell.kscale)] {
+                        let unit: Vec<i32> = read[at..at + span].iter().map(|&v| v as i32).collect();
+                        let cov: Vec<i64> = (0..span).map(|r| chart[slot(r)]).collect();
+                        let back = ratio_adjoint(&unit, scales[h * sites + t], &cov)?;
+                        for (r, b) in back.into_iter().enumerate() {
+                            chart[slot(r)] = b;
+                        }
+                    }
+                }
+            }
             // Undo the frame: δq = conj(U) δq̃, and so for the keys and the values.
             for t in 0..sites {
                 for c in 0..m {
@@ -979,6 +1070,19 @@ impl Field {
     /// released), and it ends the answer. Returns the answer as released: its classes up to its
     /// first site still unresolved after the last sweep, or through its void.
     ///
+    /// **A released site is refined, not spoken.** After each sweep's releases, one part of the
+    /// released answer sites (every [`REFINE_PARTS`]-th from the answer's first) is read again with
+    /// those sites open and every other site as it stands, and a site whose face there resolves
+    /// another class takes it (the void, the boundary, is neither revised nor revised into). A
+    /// problem keeps refining after its last site is released until every part has been reread
+    /// with no change. Why (the seventh reading, November 1): released sites were final, so a site
+    /// released before the sites that inform it, or beside a neighbour released in the same sweep,
+    /// was the terrain of every later sweep however the field read it afterwards; runs of one class
+    /// grew where each release made its neighbour's lock (two of the three held releases shown were
+    /// `0` for more than two hundred sites). The completion read a site is trained on is its face
+    /// with the others in place, so rereading a released site with itself open asks the field the
+    /// question it learned to answer, against the answer as it now stands.
+    ///
     /// Why the extent is read at the opening (the fifth reading, November 1): with the void
     /// released only at the front, every region kept the codec's whole extent (1,229 sites against
     /// held answers of median 254) until its content reached the end, so every sweep read the whole
@@ -1027,16 +1131,21 @@ impl Field {
                 (classes, unresolved, start)
             })
             .collect();
-        let open = |states: &[(Vec<usize>, Vec<bool>, usize)]| -> Vec<usize> { (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u)).collect() };
+        // A problem refines while it has an open site, or until every part of its released sites
+        // has been reread since its last change (`quiet`).
+        let mut quiet = vec![0usize; states.len()];
+        let refining = |states: &[(Vec<usize>, Vec<bool>, usize)], quiet: &[usize]| -> Vec<usize> { (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u) || quiet[k] < REFINE_PARTS).collect() };
         let mut progress = ReleaseSweep::default();
         for done in 0..sweeps {
-            let live = open(&states);
+            let refine = refining(&states, &quiet);
             progress.done = done;
-            progress.live = live.len();
-            if live.is_empty() || !sweep(&progress) {
+            progress.live = refine.len();
+            progress.open = refine.iter().filter(|&&k| states[k].1.iter().any(|&u| u)).count();
+            if refine.is_empty() || !sweep(&progress) {
                 break;
             }
             progress.done = done + 1;
+            let live: Vec<usize> = refine.iter().copied().filter(|&k| states[k].1.iter().any(|&u| u)).collect();
             let faces = {
                 let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
                 read(&views)?
@@ -1081,15 +1190,61 @@ impl Field {
                     classes[t] = top;
                     unresolved[t] = false;
                 }
+                if !released.is_empty() {
+                    quiet[k] = 0;
+                }
                 // The region ends at its released void: the sites past it leave.
                 if let Some(end) = (*start..classes.len()).find(|&t| !unresolved[t] && classes[t] == void) {
                     classes.truncate(end + 1);
                     unresolved.truncate(end + 1);
                 }
             }
+            // The refinement: one part of the released answer sites (every `REFINE_PARTS`-th from
+            // the answer's first) is read again with those sites open and the rest as it stands, and
+            // a site whose face now resolves another class takes it. The void, the answer's boundary,
+            // is neither revised nor revised into.
+            let part = done % REFINE_PARTS;
+            let reread: Vec<(usize, Vec<bool>)> = refine
+                .iter()
+                .filter_map(|&k| {
+                    let (classes, unresolved, start) = &states[k];
+                    let open: Vec<bool> = (0..classes.len()).map(|t| unresolved[t] || (t >= *start && (t - start) % REFINE_PARTS == part && classes[t] != void)).collect();
+                    open.iter().zip(unresolved).any(|(&o, &u)| o && !u).then_some((k, open))
+                })
+                .collect();
+            let reread_faces = {
+                let views: Vec<Region> = reread.iter().map(|(k, open)| Region { classes: &states[*k].0, unresolved: open }).collect();
+                if views.is_empty() { Vec::new() } else { read(&views)? }
+            };
+            let mut changed: Vec<usize> = Vec::new();
+            for ((k, open), faces) in reread.iter().zip(&reread_faces) {
+                let (classes, unresolved, _) = &mut states[*k];
+                let mut revised = 0usize;
+                for t in 0..classes.len() {
+                    if !open[t] || unresolved[t] {
+                        continue;
+                    }
+                    if let Some(c) = faces[t].as_ref().and_then(resolved).filter(|&c| c != void && c != classes[t]) {
+                        classes[t] = c;
+                        revised += 1;
+                    }
+                }
+                progress.revised += revised;
+                if revised > 0 {
+                    changed.push(*k);
+                }
+            }
+            for &k in &refine {
+                if changed.contains(&k) {
+                    quiet[k] = 0;
+                } else if !states[k].1.iter().any(|&u| u) {
+                    quiet[k] += 1;
+                }
+            }
         }
-        // The closing report: the sweeps run and the problems left open.
-        progress.live = open(&states).len();
+        // The closing report: the sweeps run and the problems left refining.
+        progress.live = refining(&states, &quiet).len();
+        progress.open = states.iter().filter(|s| s.1.iter().any(|&u| u)).count();
         sweep(&progress);
         // The answer as released: up to its first site still unresolved.
         Ok(states
@@ -1119,8 +1274,11 @@ impl Field {
 }
 
 /// [agent-inferred, November 1] **A release's sweeps as its exterior reads them**: asked before
-/// every sweep, `done` sweeps run, `live` problems still open, and the sites released so far by
-/// resolution (`resolved`) and by news (`by_news`, one a problem whose sweep resolved none); its
+/// every sweep, `done` sweeps run, `live` problems still refining (an open site, or a part of its
+/// released sites not yet reread since its last change) and `open` of them with an answer site
+/// still unresolved, the sites released so far by resolution
+/// (`resolved`) and by news (`by_news`, one a problem whose sweep resolved none) and the released
+/// sites revised (`revised`); its
 /// answer decides whether the sweep runs. Asked once more after the last sweep, its answer unread.
 /// The release reads no clock: the exterior that holds the run's projected deadline stops it there
 /// (the waiting standard), and the answers are returned as released.
@@ -1128,11 +1286,14 @@ impl Field {
 pub struct ReleaseSweep {
     pub done: usize,
     pub live: usize,
+    pub open: usize,
     pub resolved: usize,
     pub by_news: usize,
     /// The problems whose extent the opening read bounded, and those extents' answer sites.
     pub cut: usize,
     pub cut_sites: usize,
+    /// The released sites the refinement revised.
+    pub revised: usize,
 }
 
 /// [definition; agent-inferred, November 1] **The release's order is the news a site's top class
