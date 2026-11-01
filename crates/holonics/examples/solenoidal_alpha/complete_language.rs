@@ -915,14 +915,21 @@ pub(super) fn run_tower_classes_realized(args: &[String], realization: &mut dyn 
     }
 }
 
-/// [project-postulate, October 27] Every command of this route learns, reads, founds or releases on
-/// the host, which is model compute: it runs only under Brandon's own exception or as the parity
+/// [project-postulate, October 27] Every command of this route but `read-written-coupling` (an
+/// exterior reading of released text) learns, reads, founds or releases on the host, which is model
+/// compute: it runs only under Brandon's own exception or as the parity
 /// reference that checks a card run (the guide's "GPU first, and the design fixes the workload").
 /// `HOLONICS_HOST_EXCEPTION` names the manifest that says which ([`host_exception`]); without it,
 /// or with a manifest that does not name this run, the command is refused before it reads
 /// anything, and with it the run's first line names its device and the manifest's SHA-256. Card
 /// runs go through `holonics-cuda`'s `tower_pass`, which never enters here.
 pub(super) fn run(args: &[String]) -> Result<()> {
+    // [agent-inferred, November 1] The written coupling reads released text against the held-out
+    // text (`written_coupling`): it reads no learner and computes no model, so it is the exterior
+    // reading the receipt needs, not the model compute the exception guards.
+    if args.first().map(String::as_str) == Some("read-written-coupling") {
+        return written_coupling::read(args);
+    }
     let path = std::env::var("HOLONICS_HOST_EXCEPTION").unwrap_or_default();
     if path.trim().is_empty() {
         return Err("complete-language on the host is model compute: it runs only under Brandon's exception or as a card run's parity reference, whose manifest HOLONICS_HOST_EXCEPTION names; a learner runs on the card through holonics-cuda's tower_pass".into());
