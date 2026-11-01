@@ -50,3 +50,9 @@ calculations, M the calculation markup), the written rules' texts and six develo
 flux prompts; `card_written.py prompts HELD` writes the free and calculation prompts for the card's
 release route (cut at the separator 0x1F, `TOWER_PROMPT_SEPARATOR=31`) and `card_written.py convert`
 turns its releases into the `FREE.tsv` and `MARKS.tsv` that `written_rules.py` reads.
+`copy_roles.py DEV_BYTES OUT_ROLES` writes the held-out passage's copy partition as a roles file for the
+trainer (0 question, 1 other answer bytes, 2 answer digits of a numeral the question writes, 3 of one it does
+not; the trainer prints them as Q/P/N/M, so N reads "digits the question writes" and M "digits it does not").
+The `complete_language` example's host route `read-written-coupling HELD HELD_SHA DIR` reads each free release in
+`DIR/FREE.tsv` for its least-friction coupling with the held-out answer (`receiver::coupling`: `λ`, `F*`, plateaus),
+in the bytes and in the numerals, beside its contact with its own and the next question, and writes `DIR/COUPLING.tsv`.

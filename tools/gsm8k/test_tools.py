@@ -1,4 +1,5 @@
 """Synthetic exterior-contract tests; no dataset or model is required."""
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -206,6 +207,64 @@ class ExteriorTools(unittest.TestCase):
             part, energy = rings.cells(path, places, 1, 2, (1, 2))[0]
             self.assertEqual(part, [({"numeral": 1}, [3 * one, 4 * one]), ({"numeral": 2}, [0, 0])])
             self.assertEqual(energy, [({"numeral": 1}, [25 * one * one]), ({"numeral": 2}, [0])])
+
+    def test_copy_roles_partition_the_answer_digits_by_what_the_question_writes(self):
+        spec = importlib.util.spec_from_file_location("copy_roles", TOOLS / "copy_roles.py")
+        copy = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(copy)
+        END = b"\x1e"
+        # Each problem as (bytes, role) runs in the passage's order. Problem one's question writes
+        # 125 and 3.5; its answer writes 12 (the question writes 125, not 12), 125, 3.5 whole, 3 (a
+        # part of 3.5, not the numeral), 4.50 and the digits of a calculation. Problem two's question
+        # writes 12 only: its 12 is copied, its 125 (which problem one's question writes) is not.
+        runs = [
+            (b"Ann has 125 pears and 3.5 kg of figs", 0), (END, 0),
+            (b"Of ", 1), (b"12", 3), (b" take ", 1), (b"125", 2), (b", ", 1), (b"3", 2), (b".", 1), (b"5", 2),
+            (b" kg, ", 1), (b"3", 3), (b" or ", 1), (b"4", 3), (b".", 1), (b"50", 3), (b" <<", 1), (b"2", 3),
+            (b"*", 1), (b"3", 3), (b"=", 1), (b"6", 3), (b">> #### ", 1), (b"7", 3), (END, 1),
+            (b"Bob has 12 pens.", 0), (END, 0),
+            (b"12", 2), (b" and ", 1), (b"125", 3), (b" + ", 1), (b"1", 3), (b" = ", 1), (b"13", 3), (b" #### ", 1),
+            (b"13", 3), (b".", 1), (END, 1),
+        ]
+        passage = b"".join(t for t, _ in runs)
+        expected = b"".join(bytes([r]) * len(t) for t, r in runs)
+        self.assertEqual(copy.roles_of(passage), expected)
+        # Counted by hand: questions 37 and 17 bytes; the answers' non-digit bytes 36 and 19; their
+        # copied digits 5 and 2; their other digits 10 and 8.
+        self.assertEqual([expected.count(k) for k in range(4)], [54, 55, 7, 18])
+        # A decimal is one numeral: the question's `3.5` is copied whole and its `3` is not; `12` is
+        # not the question's `12.5`.
+        self.assertEqual(copy.roles_of(b"x 3.5" + END + b"3.5 3 35" + END),
+                         bytes([0] * 6) + bytes([2, 1, 2, 1, 3, 1, 3, 3, 1]))
+        self.assertEqual(copy.roles_of(b"n 12.5" + END + b"12 12.5" + END),
+                         bytes([0] * 7) + bytes([3, 3, 1, 2, 2, 1, 2, 1]))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, out = root / "DEV.bytes", root / "DEV.roles"
+            source.write_bytes(passage)
+            line = run("copy_roles.py", source, out).strip()
+            self.assertEqual(out.read_bytes(), expected)
+            digest = hashlib.sha256(expected).hexdigest()
+            self.assertEqual(line, f"COPY_ROLES length={len(expected)} sha256={digest} role0=54 role1=55 role2=7 role3=18")
+
+            def refused(name, data, reason):
+                (root / name).write_bytes(data)
+                result = subprocess.run([sys.executable, "-I", str(TOOLS / "copy_roles.py"), root / name, root / f"{name}.roles"],
+                                        capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0, name)
+                self.assertIn(reason, result.stderr, name)
+                self.assertFalse((root / f"{name}.roles").exists(), name)
+
+            # An odd count of END bytes and a passage that does not end with END are refused and
+            # nothing is written; an existing roles file is never overwritten.
+            refused("odd", b"q" + END + b"a" + END + b"q" + END, "odd count")
+            refused("open", b"q" + END + b"a", "does not end with END")
+            refused("empty", b"", "does not end with END")
+            again = subprocess.run([sys.executable, "-I", str(TOOLS / "copy_roles.py"), source, out], capture_output=True, text=True)
+            self.assertNotEqual(again.returncode, 0)
+            self.assertIn("never overwritten", again.stderr)
+            self.assertEqual(out.read_bytes(), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

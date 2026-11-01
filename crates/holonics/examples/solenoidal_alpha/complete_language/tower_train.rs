@@ -4117,7 +4117,7 @@ fn release(args: &[String], units: Option<&Units>) -> Result<()> {
 
 /// The problems of a held text: each a question line and its answer lines, the problems separated
 /// by a blank line (the text as `tools/gsm8k` frames it). Each problem keeps its last line end.
-fn problems_of(text: &[u8]) -> Vec<&[u8]> {
+pub(super) fn problems_of(text: &[u8]) -> Vec<&[u8]> {
     let mut problems = Vec::new();
     let (mut start, mut i) = (0, 0);
     while i + 1 < text.len() {
