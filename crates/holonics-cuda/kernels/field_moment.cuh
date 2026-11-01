@@ -1,6 +1,7 @@
 // The field's site moment on the card (`holonics::hnn::tower::field::moment`, record
 // `2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP`,
-// §15.1): bit for bit the host's `moment_exact`, `moments`, `moment_return_exact` and `moments_return`.
+// §15.1): bit for bit the host's `moment_exact`, `moments`, `moment_return_exact` and `moments_return`
+// (the return is the released law of `moment.rs`, not the exact transpose).
 //
 // Included by `field.cu` AFTER its integer prelude (`wide`, `uwide`, `rel`, `fit64`, `mag64`,
 // `REFUSED_CARRIER`, `NEAR`, `FACE_BITS`, `MOVE_BITS`, `COVECTOR_BITS`), which it reuses and does not
@@ -26,31 +27,44 @@
 // up 30; a far term `D · conj(ζ^t) · P` is on `2^(−106)`), summed as integers (any order, any
 // partition, the same bits), and released once to `2^(−16)`: `rel(s, 90)`, nearest, half away from zero.
 //
-// **The return** is the exact transpose of that integer map: multiplication by a Gaussian integer
-// `W` has the real transpose multiplication by `conj(W)`, so with `δs` on `2^(−24)`
+// **The return** is the forward map's transpose with the turned covector released once a term. The
+// exact transpose (multiplication by a Gaussian integer `W` transposes to multiplication by `conj(W)`)
+// carries `conj(W) δs` on `2^(−114)`, and a covector's components reach tens of units (the value
+// covector summed over the ticks at a 406-site crib region had l1 `2^28.1`), so its carrier
+// `(S + 1) · 2^91 · l1(δs) < 2^127` admits only about `2^27.3`. A released reverse is the field's norm
+// (every reverse product is released at its grain): the far part's prefix is of the covector turned and
+// released once, one declared crossing a term at the covector's own grain. With `δs` on `2^(−24)`:
 //
-//   δE⁺_k = rel( Σ_(t ≥ k, t−k < NEAR) conj(ζ^(k−t)) D(t−k) δs_t 2^30
-//              + conj(ζ^k) Σ_(right octaves (lo,hi,ℓ) of k) D(2^ℓ) Σ_(t=lo..hi) ζ^t δs_t , 90 )
-//   δE⁻_k = rel( the same over t ≤ k and the left octaves of k , 90 )
+//   r_u   = rel(ζ^u δs_u, 30)                                        on 2^(−24)
+//   Q[j]  = Σ_(u<j) r_u                                              on 2^(−24)
+//   Δ⁺_k  = Σ_(t ≥ k, t−k < NEAR) conj(ζ^(k−t)) D(t−k) δs_t
+//         + conj(ζ^k) Σ_(right octaves (lo,hi,ℓ) of k) D(2^ℓ) (Q[hi+1] − Q[lo])        on 2^(−84)
+//   Δ⁻_k  = the same over t ≤ k and the left octaves of k
+//   δE±_k = rel(Δ±_k, 60)                                            on 2^(−24)
 //
 // (`t` is in the right octave ℓ of `k` exactly when `k` is in the left octave ℓ of `t`; the single
-// prefix sum `Q[j] = Σ_(u<j) ζ^u δs_u` on `2^(−54)` serves both). The unreleased return is on `2^(−114)`.
+// released prefix `Q` serves both). The near term has no shift up 30. The forward stays exact.
 //
-// **The carrier.** The l1 certificate `(S+1) · max(D̂,1) · R · max(R, 2^30) · Ê < 2^127` (`D̂` the
-// largest decay over `d < S`, `R` the largest l1 of the resident ring, `Ê` the largest l1 of the
-// input, `moment_certificate`) keeps every term and every partial sum of every order inside a signed
-// 128-bit word. It is a property of the exact inputs alone, so the card refuses the same regions as
-// the host (`field_moment_admit`): a refused region's outputs are zero and `REFUSED_CARRIER` is set.
-// A region whose shape the law cannot read (`n = 0`, `ring_len < min(n, S)`, `dreach < S`) is refused
-// with `MOMENT_REFUSED_SHAPE`.
+// **The carrier.** Forward: the l1 certificate `(S+1) · max(D̂,1) · R · max(R, 2^30) · Ê < 2^127` (`D̂`
+// the largest decay over `d < S`, `R` the largest l1 of the resident ring, `Ê` the largest l1 of an
+// encoding, `moment_certificate`) keeps every term and every partial sum of every order inside a signed
+// 128-bit word. Return: `max(D̂,1) · R · (NEAR · G + S · (⌊R G / 2^30⌋ + 1)) < 2^127` (`G` the largest l1
+// of a covector entry, `moment_return_certificate`): the turned term has l1 at most `R G`, the released
+// term `⌊R G / 2^30⌋ + 1`, a range sum of the prefix at most `S` of them, a near term `D̂ R G`, and the
+// far sources of a side are disjoint; with the founded rings it is below `2^61 (NEAR + 3 S) G`, so l1(δs)
+// up to about `2^66 / (NEAR + 3 S)` is admitted (`2^55.7` at 406 sites). Both are properties of the
+// exact inputs alone, so the card refuses the same regions as the host (`field_moment_admit`,
+// `field_moment_return_admit`): a refused region's outputs are zero and `REFUSED_CARRIER` is set. A region
+// whose shape the law cannot read (`n = 0`, `ring_len < min(n, S)`, `dreach < S`) is refused with
+// `MOMENT_REFUSED_SHAPE`.
 //
 // **The launch** (one ring slot a launch; the driver sets `ring`, `n`, `ring_len`, `decay`, `dreach`):
 //   forward   admit(before, after) → prefix(before → up) → prefix(after → down) → moment
-//   return    admit(ds, null)      → prefix(ds → q)                            → moment_return
-// `field_moment_admit` and `field_moment_prefix` run one block a region (a power-of-two block of
-// threads); `field_moment` and `field_moment_return` one thread a site. The prefix and extent
-// kernels take `blockDim.x` threads and the dynamic shared memory stated on each; the `wide` arrays
-// are 16-byte aligned. Integer sums: the scan's partition (chunks of a region, in any number) changes no bit.
+//   return    return_admit(ds)     → return_prefix(ds → q)                      → moment_return
+// `field_moment_admit`, `field_moment_return_admit` and the two prefix kernels run one block a region (a
+// power-of-two block of threads); `field_moment` and `field_moment_return` one thread a site. The kernels
+// take `blockDim.x` threads and the dynamic shared memory stated on each; the `wide` arrays are 16-byte
+// aligned. Integer sums: the scan's partition (chunks of a region, in any number) changes no bit.
 
 #pragma once
 
@@ -62,8 +76,12 @@
 #endif
 
 static_assert(MOVE_BITS == 30 && FACE_BITS == 16 && COVECTOR_BITS == 24, "the moment's grains are the host's");
-// The coefficient's grain, three faces on `2^(−30)` (`COEFFICIENT_BITS`): a moment or a return is released this many bits.
+// The coefficient's grain, three faces on `2^(−30)` (`COEFFICIENT_BITS`): a moment is released this many bits.
 #define MOMENT_COEFFICIENT_BITS (3 * MOVE_BITS)
+// The return's grain, two faces on `2^(−30)` and a covector on `2^(−24)`: `2^(−84)`, released this many
+// bits to the covector's own grain (the host's `RETURN_RELEASE_BITS`).
+#define MOMENT_RETURN_BITS (2 * MOVE_BITS + COVECTOR_BITS)
+#define MOMENT_RETURN_RELEASE_BITS (MOMENT_RETURN_BITS - COVECTOR_BITS)
 
 // A Gaussian integer.
 struct MomentGauss {
@@ -145,9 +163,10 @@ __host__ __device__ __forceinline__ MomentGauss moment_near(MomentGauss z, wide 
     return mg_scale(mg_scale(mg_mul(z, x), decay), (wide)1 << MOVE_BITS);
 }
 
-// The transpose of a near term, `conj(ζ) D x 2^30` (a covector on `2^(−24)` gives `2^(−114)`).
+// A near term of the return, `conj(ζ) D x`: two faces and a covector on `2^(−24)`, so on `2^(−84)`, with
+// no shift up.
 __host__ __device__ __forceinline__ MomentGauss moment_near_back(MomentGauss z, wide decay, MomentGauss x) {
-    return mg_scale(mg_scale(mg_mul_conj(z, x), decay), (wide)1 << MOVE_BITS);
+    return mg_scale(mg_mul_conj(z, x), decay);
 }
 
 // The octave `level ≥ 2` of place `i` in a region of `sites`, on its left (`right = false`: the places
@@ -208,8 +227,9 @@ __host__ __device__ __forceinline__ bool moment_site_exact(const int64_t *before
     return ok;
 }
 
-// The unreleased return of the site at place `k` on `2^(−114)`: `plus = Δ⁺_k`, `minus = Δ⁻_k`, `ds` the
-// region's covector (`sites` int64 pairs on `2^(−24)`), `q` its prefix sums `Σ_(u<j) ζ^u δs_u`.
+// The unreleased return of the site at place `k` on `2^(−84)`: `plus = Δ⁺_k`, `minus = Δ⁻_k`, `ds` the
+// region's covector (`sites` int64 pairs on `2^(−24)`), `q` the prefix sums of its turned, released
+// terms `Σ_(u<j) rel(ζ^u δs_u, 30)` on `2^(−24)`.
 __host__ __device__ __forceinline__ bool moment_return_site(const int64_t *ds, const wide *q, const int64_t *ring, uint64_t n, uint64_t ring_len, const int64_t *decay, uint32_t sites, uint32_t k, MomentGauss *plus, MomentGauss *minus) {
     MomentGauss p = mg_make(0, 0), m = mg_make(0, 0);
     bool ok = true;
@@ -263,6 +283,19 @@ __host__ __device__ __forceinline__ void moment_offset_chunk(uint32_t lo, uint32
     }
 }
 
+// The same scan of the covector turned and released once a term to its own grain: `out[k + 1] = Σ_(lo ≤ u
+// ≤ k) rel(ζ^u x_u, 30)` on `2^(−24)`, the chunk's total returned (device only: `rel` is).
+__device__ __forceinline__ MomentGauss moment_scan_chunk_released(const int64_t *ring, uint64_t n, const int64_t *x, uint32_t lo, uint32_t hi, wide *out) {
+    MomentGauss running = mg_make(0, 0);
+    for (uint32_t k = lo; k < hi; ++k) {
+        const MomentGauss turned = mg_mul(moment_absolute(ring, n, k), mg_load(x, k));
+        running = mg_add(running, mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)));
+        out[2 * (uint64_t)(k + 1)] = running.re;
+        out[2 * (uint64_t)(k + 1) + 1] = running.im;
+    }
+    return running;
+}
+
 // `a · b < 2^128`: the product and false, or true on overflow (the host's `checked_mul` on `u128`).
 __host__ __device__ __forceinline__ bool moment_mul_overflows(uwide a, uwide b, uwide *product) {
     const uint64_t ah = (uint64_t)(a >> 64), bh = (uint64_t)(b >> 64);
@@ -300,6 +333,25 @@ __host__ __device__ __forceinline__ bool moment_certificate(uwide sites, uwide r
     return bound < ((uwide)1 << 127);
 }
 
+// [definition; agent-inferred, November 1] **The return's l1 certificate** (the host's
+// `return_certificate`): `max(decay_max, 1) · ring_l1 · (NEAR · input_l1 + sites · (⌊ring_l1 · input_l1 /
+// 2^30⌋ + 1)) < 2^127`, the products formed in that order and an overflow of one a refusal.
+__host__ __device__ __forceinline__ bool moment_return_certificate(uwide sites, uwide ring_l1, uwide decay_max, uwide input_l1) {
+    uwide turned, released, product, inner, bound;
+    if (moment_mul_overflows(ring_l1, input_l1, &turned)) {
+        return false;
+    }
+    released = (turned >> MOVE_BITS) + 1;
+    if (moment_mul_overflows((uwide)NEAR, input_l1, &product) || moment_mul_overflows(sites, released, &inner) || inner + product < inner) {
+        return false;
+    }
+    inner += product;
+    if (moment_mul_overflows(decay_max > 1 ? decay_max : 1, ring_l1, &product) || moment_mul_overflows(product, inner, &bound)) {
+        return false;
+    }
+    return bound < ((uwide)1 << 127);
+}
+
 // The batch's regions and the ring slot one launch reads.
 struct MomentWords {
     uint32_t R, T;
@@ -312,7 +364,7 @@ struct MomentWords {
     uint64_t n, ring_len;
     const int64_t *decay;
     uint64_t dreach;
-    uint8_t *ok;                  // R: 1 where `field_moment_admit` admitted the region
+    uint8_t *ok;                  // R: 1 where `field_moment_admit` / `field_moment_return_admit` admitted the region
     uint32_t *status;             // the batch's status word
 };
 
@@ -324,11 +376,11 @@ __device__ __forceinline__ uwide moment_max(uwide a, uwide b) {
     return a > b ? a : b;
 }
 
-// A region's admission: the certificate on its inputs `x` (and `y` where not null: the two strands of
-// the forward), and the shape the law reads. One block a region, `blockDim.x` a power of two; dynamic
-// shared memory `3 · blockDim.x · sizeof(uwide)`. Writes `w.ok[r]`; a refusal sets `REFUSED_CARRIER`
-// (the certificate) or `MOMENT_REFUSED_SHAPE` in `w.status`.
-extern "C" __global__ void field_moment_admit(MomentWords w, const int64_t *x, const int64_t *y) {
+// A region's admission, by the forward certificate (`returning = false`: `x`, `y` the two strands) or the
+// return's (`returning = true`: `x` the covector, `y` null), and the shape the law reads. One block a
+// region, `blockDim.x` a power of two; dynamic shared memory `3 · blockDim.x · sizeof(uwide)`. Writes
+// `w.ok[r]`; a refusal sets `REFUSED_CARRIER` (the certificate) or `MOMENT_REFUSED_SHAPE` in `w.status`.
+__device__ __forceinline__ void moment_admit_regions(const MomentWords &w, const int64_t *x, const int64_t *y, bool returning) {
     extern __shared__ __align__(16) unsigned char moment_shared[];
     uwide *peak = (uwide *)moment_shared;
     const uint32_t B = blockDim.x;
@@ -364,7 +416,7 @@ extern "C" __global__ void field_moment_admit(MomentWords w, const int64_t *x, c
             __syncthreads();
         }
         if (threadIdx.x == 0) {
-            const bool admitted = shape && moment_certificate(sites, peak[2 * B], peak[B], peak[0]);
+            const bool admitted = shape && (returning ? moment_return_certificate(sites, peak[2 * B], peak[B], peak[0]) : moment_certificate(sites, peak[2 * B], peak[B], peak[0]));
             w.ok[r] = admitted ? 1 : 0;
             if (!shape) {
                 atomicOr(w.status, MOMENT_REFUSED_SHAPE);
@@ -376,12 +428,25 @@ extern "C" __global__ void field_moment_admit(MomentWords w, const int64_t *x, c
     }
 }
 
-// The prefix sums `P[j] = Σ_(k<j) ζ^k x_k` of a strand `x` (`T` int64 pairs), region by region, into
-// `pre` (`T + R` entries of two `wide`: region `r`'s `sites + 1` entries start at entry `first + r`).
-// Each thread scans a chunk of the region; the chunks' totals are summed once and the offsets added:
-// integer sums, so the partition changes no bit. One block a region; dynamic shared memory
-// `blockDim.x · sizeof(MomentGauss)`. A refused region's entries are left unwritten (never read).
-extern "C" __global__ void field_moment_prefix(MomentWords w, const int64_t *x, wide *pre) {
+// The forward's admission: the strands `x` = `before`, `y` = `after`, by the forward certificate. Dynamic
+// shared memory `3 · blockDim.x · sizeof(uwide)`.
+extern "C" __global__ void field_moment_admit(MomentWords w, const int64_t *x, const int64_t *y) {
+    moment_admit_regions(w, x, y, false);
+}
+
+// The return's admission: the covector `ds`, by the return's certificate. Dynamic shared memory `3 ·
+// blockDim.x · sizeof(uwide)`.
+extern "C" __global__ void field_moment_return_admit(MomentWords w, const int64_t *ds) {
+    moment_admit_regions(w, ds, nullptr, true);
+}
+
+// The prefix sums of a strand `x` (`T` int64 pairs), region by region, into `pre` (`T + R` entries of two
+// `wide`: region `r`'s `sites + 1` entries start at entry `first + r`): `P[j] = Σ_(k<j) ζ^k x_k` exact
+// (`released = false`), or `Q[j] = Σ_(k<j) rel(ζ^k x_k, 30)` (`released = true`, the covector's). Each
+// thread scans a chunk of the region; the chunks' totals are summed once and the offsets added: integer
+// sums, so the partition changes no bit. One block a region; dynamic shared memory `blockDim.x ·
+// sizeof(MomentGauss)`. A refused region's entries are left unwritten (never read).
+__device__ __forceinline__ void moment_prefix_regions(const MomentWords &w, const int64_t *x, wide *pre, bool released) {
     extern __shared__ __align__(16) unsigned char moment_shared[];
     MomentGauss *totals = (MomentGauss *)moment_shared;
     const uint32_t B = blockDim.x;
@@ -400,7 +465,7 @@ extern "C" __global__ void field_moment_prefix(MomentWords w, const int64_t *x, 
             out[0] = 0;
             out[1] = 0;
         }
-        totals[threadIdx.x] = moment_scan_chunk(w.ring, w.n, strand, lo, hi, out);
+        totals[threadIdx.x] = released ? moment_scan_chunk_released(w.ring, w.n, strand, lo, hi, out) : moment_scan_chunk(w.ring, w.n, strand, lo, hi, out);
         __syncthreads();
         if (threadIdx.x == 0) {
             MomentGauss running = mg_make(0, 0);
@@ -414,6 +479,17 @@ extern "C" __global__ void field_moment_prefix(MomentWords w, const int64_t *x, 
         moment_offset_chunk(lo, hi, totals[threadIdx.x], out);
         __syncthreads();
     }
+}
+
+// The forward's prefix sums `P[j] = Σ_(k<j) ζ^k x_k`, exact on `2^(−46)`.
+extern "C" __global__ void field_moment_prefix(MomentWords w, const int64_t *x, wide *pre) {
+    moment_prefix_regions(w, x, pre, false);
+}
+
+// The return's prefix `Q[j] = Σ_(k<j) rel(ζ^k δs_k, 30)` of the covector turned and released once a term,
+// on `2^(−24)`.
+extern "C" __global__ void field_moment_return_prefix(MomentWords w, const int64_t *ds, wide *q) {
+    moment_prefix_regions(w, ds, q, true);
 }
 
 // The moments `s_t` on `2^(−16)` (`T` int64 pairs): the unreleased `S_t` released once, `rel(S, 90)`.
@@ -438,8 +514,8 @@ extern "C" __global__ void field_moment(MomentWords w, const int64_t *before, co
 }
 
 // The moments' return on `2^(−24)` (`T` pairs of `wide` each): `δE⁺` into `d_before`, `δE⁻` into
-// `d_after`, the unreleased return released once, `rel(Δ, 90)`. One thread a site; stored, not added.
-// A refused region's return is zero.
+// `d_after`, the unreleased return on `2^(−84)` released once, `rel(Δ, 60)`. One thread a site; stored,
+// not added. A refused region's return is zero.
 extern "C" __global__ void field_moment_return(MomentWords w, const int64_t *ds, const wide *q, wide *d_before, wide *d_after) {
     for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = w.site_region[g], k = w.site_pos[g];
@@ -453,9 +529,9 @@ extern "C" __global__ void field_moment_return(MomentWords w, const int64_t *ds,
         if (!moment_return_site(ds + 2 * first, q + 2 * (first + r), w.ring, w.n, w.ring_len, w.decay, sites, k, &plus, &minus)) {
             atomicOr(w.status, MOMENT_REFUSED_SHAPE);
         }
-        d_before[2 * g] = rel(plus.re, MOMENT_COEFFICIENT_BITS);
-        d_before[2 * g + 1] = rel(plus.im, MOMENT_COEFFICIENT_BITS);
-        d_after[2 * g] = rel(minus.re, MOMENT_COEFFICIENT_BITS);
-        d_after[2 * g + 1] = rel(minus.im, MOMENT_COEFFICIENT_BITS);
+        d_before[2 * g] = rel(plus.re, MOMENT_RETURN_RELEASE_BITS);
+        d_before[2 * g + 1] = rel(plus.im, MOMENT_RETURN_RELEASE_BITS);
+        d_after[2 * g] = rel(minus.re, MOMENT_RETURN_RELEASE_BITS);
+        d_after[2 * g + 1] = rel(minus.im, MOMENT_RETURN_RELEASE_BITS);
     }
 }
