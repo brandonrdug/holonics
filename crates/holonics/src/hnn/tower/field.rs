@@ -43,13 +43,16 @@
 //! The covector `p̂ − q` returns exactly through the `K` ticks (the operands that produced each
 //! carrier, held from the forward). The deposit is the tower's: the covector's two moments, the
 //! step `m/(√v + 2^(−32))` at `2^(−k)`, certified on the section's own regions by an exact
-//! comparison of the products of their faces, halved until it is certified or moves nothing.
+//! comparison of the products of their faces, halved until it is certified or moves nothing; then
+//! held and read on the next section's regions, which it was not fit on, and halved again or
+//! refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
 //!
 //! **Release.** The answer's sites open unresolved and the field is refined over `S` sweeps: each
-//! sweep reads every unresolved site's face, releases the `⌈r/(S − s)⌉` most locked (top mass
-//! share, compared exactly by cross products) at width zero, and holds the rest. A site released
-//! as the void class ends the answer, and the sites past it leave the region. The released sites
-//! are present terrain for the next sweep. A class is never spoken in order.
+//! sweep reads every unresolved site's face twice, with the question and with the question's sites
+//! unresolved, and releases the `⌈r/(S − s)⌉` sites whose top class carries the most news (the
+//! question's share of its certainty, [`by_news`]) at width zero, and holds the rest. A site
+//! released as the void class ends the answer, and the sites past it leave the region. The
+//! released sites are present terrain for the next sweep. A class is never spoken in order.
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
 //! material on `2^(−24)`; frames on `2^(−30)`; Gibbs weights on `2^(−40)` relative to their row's
@@ -70,7 +73,6 @@
 
 use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
-use num_bigint::BigUint;
 use rayon::prelude::*;
 
 /// The Gibbs weights' grain relative to their row's peak, `e_ij` on `2^(−40)` (the exponential's
@@ -83,6 +85,9 @@ const SHARE_BITS: u32 = 30;
 const WEIGHT_BITS_FROM: u32 = 62 - WEIGHT_BITS;
 /// The contact covector's grain, `2^(−40)` (`δz` and `δs`).
 const CONTACT_BITS: u32 = 40;
+/// The release's order key, `p̂(top)` times the news in bits, on `2^(−40)`: the code's `2^(−20)`
+/// bits carried `2^(−20)` further by the share.
+const NEWS_BITS: u32 = 20;
 
 /// [definition; agent-inferred, November 1] **The field's declared law**: an alphabet of `A`
 /// classes (the face's; the encoding carries one more row, the unresolved operand), a face width
@@ -908,62 +913,71 @@ impl Field {
         regions.par_iter().map(|r| self.faces(r)).collect()
     }
 
-    /// [`Field::release`] on a declared realization.
-    pub fn release_realized(&self, question: &[usize], answer: usize, sweeps: usize, void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<usize>> {
-        self.release_with(question, answer, sweeps, void, &mut |region| Ok(realization.read_faces(self, &[region])?.remove(0)))
+    /// [`Field::release`] of many problems at once on a declared realization: every problem's sweep
+    /// is read in one call (a region's faces do not depend on the regions read beside it, so the
+    /// releases are each problem's own). `problems` are each question's classes and its answer's
+    /// open sites.
+    pub fn release_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<usize>>> {
+        self.release_with(problems, sweeps, void, &mut |regions| realization.read_faces(self, regions))
     }
 
     /// **The release by refinement** ([definition; agent-inferred, November 1]): the region of the
     /// `question`'s resolved sites and `answer` unresolved sites is refined over `sweeps` sweeps.
-    /// Sweep `s` reads every unresolved site's face and releases the `⌈r/(S − s)⌉` most locked
-    /// (the top class's share of its face, compared by exact cross products; a tie takes the
-    /// earlier site) at their top class (a tie takes the lower class); every site after the earliest
-    /// released `void` leaves the region (the answer has ended). Returns the answer's classes, ending
-    /// at its void when one was released.
+    /// Sweep `s` reads every unresolved site's face, and again with the question's sites unresolved
+    /// (the released answer sites kept), and releases the `⌈r/(S − s)⌉` sites whose top class
+    /// carries the most news ([`by_news`]) at their top class (a tie takes the lower class); every
+    /// site after the earliest released `void` leaves the region (the answer has ended). Returns the
+    /// answer's classes, ending at its void when one was released.
     pub fn release(&self, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Result<Vec<usize>> {
-        self.release_with(question, answer, sweeps, void, &mut |region| self.faces(&region))
+        Ok(self.release_with(&[(question, answer)], sweeps, void, &mut |regions| self.read_faces(regions))?.remove(0))
     }
 
-    fn release_with(&self, question: &[usize], answer: usize, sweeps: usize, void: usize, read: &mut dyn FnMut(Region) -> Result<Vec<Option<TowerFace>>>) -> Result<Vec<usize>> {
-        if sweeps == 0 || answer == 0 || void >= self.declaration.alphabet {
+    fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>) -> Result<Vec<Vec<usize>>> {
+        if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, answer)| answer == 0) {
             return refuse("a release needs a sweep, an answer site and a void class in the alphabet");
         }
-        let start = question.len();
-        let mut classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
-        let mut unresolved: Vec<bool> = std::iter::repeat_n(false, start).chain(std::iter::repeat_n(true, answer)).collect();
+        // Each problem's region: its classes, its unresolved sites and its answer's first site.
+        let mut states: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
+            .iter()
+            .map(|&(question, answer)| {
+                let start = question.len();
+                let classes = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
+                let unresolved = std::iter::repeat_n(false, start).chain(std::iter::repeat_n(true, answer)).collect();
+                (classes, unresolved, start)
+            })
+            .collect();
         for s in 0..sweeps {
-            let remaining = unresolved.iter().filter(|&&u| u).count();
-            if remaining == 0 {
+            let live: Vec<usize> = (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u)).collect();
+            if live.is_empty() {
                 break;
             }
-            let faces = read(Region { classes: &classes, unresolved: &unresolved })?;
-            let mut open: Vec<(usize, usize, u128, u128)> = Vec::with_capacity(remaining);
-            for (t, face) in faces.iter().enumerate() {
-                let Some(face) = face else { continue };
-                let (top, &mass) = face.masses.iter().enumerate().fold((0usize, &0u128), |best, (c, mass)| if *mass > *best.1 { (c, mass) } else { best });
-                open.push((t, top, mass, face.total));
-            }
-            // Most locked first: a larger share m/T first, the earlier site on an exact tie.
-            open.sort_by(|x, y| {
-                let left = BigUint::from(y.2) * BigUint::from(x.3);
-                let right = BigUint::from(x.2) * BigUint::from(y.3);
-                left.cmp(&right).then(x.0.cmp(&y.0))
-            });
-            let take = remaining.div_ceil(sweeps - s);
-            for &(t, top, _, _) in open.iter().take(take) {
-                classes[t] = top;
-                unresolved[t] = false;
-            }
-            // The answer ends at its earliest released void, and the region with it: the sites past
-            // it leave, so the next sweep reads a region one site past its answer, as a training
-            // region is read (agent-inferred, November 1: a release opened at the longest training
-            // answer would otherwise carry its void tail through every sweep).
-            if let Some(end) = (start..classes.len()).find(|&t| !unresolved[t] && classes[t] == void) {
-                classes.truncate(end + 1);
-                unresolved.truncate(end + 1);
+            // The prior read: the question's sites unresolved, so a face reads only the place the
+            // question spans and the answer released so far.
+            let priors: Vec<Vec<bool>> = live.iter().map(|&k| states[k].1.iter().enumerate().map(|(t, &u)| u || t < states[k].2).collect()).collect();
+            let (faces, prior) = {
+                let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
+                let prior_views: Vec<Region> = live.iter().zip(&priors).map(|(&k, p)| Region { classes: &states[k].0, unresolved: p }).collect();
+                (read(&views)?, read(&prior_views)?)
+            };
+            for ((&k, faces), prior) in live.iter().zip(&faces).zip(&prior) {
+                let (classes, unresolved, start) = &mut states[k];
+                let remaining = unresolved.iter().filter(|&&u| u).count();
+                let take = remaining.div_ceil(sweeps - s);
+                for &(t, top) in by_news(faces, prior)?.iter().take(take) {
+                    classes[t] = top;
+                    unresolved[t] = false;
+                }
+                // The answer ends at its earliest released void, and the region with it: the sites
+                // past it leave, so the next sweep reads a region one site past its answer, as a
+                // training region is read (agent-inferred, November 1: a release opened at the
+                // longest training answer would otherwise carry its void tail through every sweep).
+                if let Some(end) = (*start..classes.len()).find(|&t| !unresolved[t] && classes[t] == void) {
+                    classes.truncate(end + 1);
+                    unresolved.truncate(end + 1);
+                }
             }
         }
-        Ok(classes[start..].to_vec())
+        Ok(states.into_iter().map(|(classes, _, start)| classes[start..].to_vec()).collect())
     }
 
     /// The field as text: its head line, then its material on one line.
@@ -985,6 +999,42 @@ impl Field {
 
 /// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square
 /// roots on `2^(−16)`.
+/// [definition; agent-inferred, November 1] **The release's order is the news a site's top class
+/// carries** (the record's §11). `faces` are a region's faces with its question resolved and
+/// `prior` the same region's with the question's sites unresolved: the prior face reads what the
+/// field predicts from the place alone and the answer released so far. A site's top class `c`
+/// (the lower class on a tie) carries the news `ν = (−log₂ p̄(c)) − (−log₂ p̂(c))`, the bits the
+/// question tells about it, the perceived difference that what the field already predicts cancels;
+/// its key is `p̂(c) ν` (the expected news of releasing it), on `2^(−40)` bits. Returns each open
+/// site and its top class, the largest key first, the earlier site on a tie.
+///
+/// Why (the first reading on the card, November 1): released by the top class's share, the field
+/// released its commonest classes first, a space, `e` and the void wherever the place alone
+/// predicted them, and each release made the next likelier; 228 of 396 written values were `10`,
+/// no release used its problem's words, and releases ended a median 71 classes into a held answer
+/// of 254. The share counts certainty the question did not supply. The news counts only what the
+/// question supplies, so a void the place alone predicts, or a space the released words around it
+/// predict, is released after the classes the question decides.
+pub fn by_news(faces: &[Option<TowerFace>], prior: &[Option<TowerFace>]) -> Result<Vec<(usize, usize)>> {
+    let mut open: Vec<(i128, usize, usize)> = Vec::new();
+    for (t, face) in faces.iter().enumerate() {
+        let Some(face) = face else { continue };
+        let Some(base) = prior.get(t).and_then(Option::as_ref) else {
+            return refuse("a release's prior read has no face at an open site");
+        };
+        if base.masses.len() != face.masses.len() || face.total == 0 {
+            return refuse("a release's two faces of one site over different alphabets");
+        }
+        let (top, &mass) = face.masses.iter().enumerate().fold((0usize, &0u128), |best, (c, mass)| if *mass > *best.1 { (c, mass) } else { best });
+        let news = i128::from(face_code(base.masses[top], base.total)) - i128::from(face_code(mass, face.total));
+        let total = i128::try_from(face.total).map_err(|_| TowerError::Refused("a face's total outgrew its 128-bit carrier"))?;
+        let scaled = i128::try_from(mass).ok().and_then(|m| m.checked_mul(news)).and_then(|v| v.checked_mul(1i128 << NEWS_BITS)).ok_or(TowerError::Refused("a release's news outgrew its 128-bit carrier"))?;
+        open.push((div_nearest(scaled, total), t, top));
+    }
+    open.sort_by(|x, y| y.0.cmp(&x.0).then(x.1.cmp(&y.1)));
+    Ok(open.into_iter().map(|(_, t, top)| (t, top)).collect())
+}
+
 fn chart_scale(width: usize) -> (u128, u128) {
     ((3u128 << 32).isqrt(), ((width as u128) << 32).isqrt())
 }
@@ -1122,8 +1172,20 @@ impl FieldRealization for HostField {
     }
 }
 
+/// [agent-inferred, November 1] A held step read on regions it was not fit on
+/// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
+/// code less the material's before the step, on `2^(−20)` bits), the further halvings the read
+/// took, and whether it refused the step.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct FieldNext {
+    pub change: i64,
+    pub halvings: u32,
+    pub refused: bool,
+}
+
 /// A section's receipt: its unresolved sites, its code before and after (on `2^(−20)` bits), the
-/// halvings the certificate took, and whether a step was deposited.
+/// halvings the certificate took, whether a step was deposited, and the read of the step the
+/// section before deposited on this section's regions.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FieldReceipt {
     pub sites: usize,
@@ -1131,6 +1193,39 @@ pub struct FieldReceipt {
     pub code_after: i64,
     pub halvings: u32,
     pub deposited: bool,
+    pub next: Option<FieldNext>,
+}
+
+/// A deposited step held for the next regions' read: the proposed step on each family's grain and
+/// the halvings it was certified at. The material before it is the material less nothing: the
+/// deposit subtracted `release(step, halvings)` from each entry, so adding it back is exact.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct HeldStep {
+    step: Vec<i128>,
+    halvings: u32,
+}
+
+/// Each unresolved site's face read at its class, the faces the certificates compare.
+fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Vec<(u128, u128)> {
+    faces.iter().zip(regions).flat_map(|(f, r)| f.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total)))).collect()
+}
+
+fn code_of(pairs: &[(u128, u128)]) -> i64 {
+    pairs.par_iter().map(|&(m, t)| face_code(m, t)).sum()
+}
+
+/// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
+fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> {
+    let mut candidate = base.clone();
+    let mut moved = false;
+    for (slot, &q) in candidate.theta.iter_mut().zip(step) {
+        let s = release(q, halvings);
+        if s != 0 {
+            moved = true;
+            *slot = fit32(*slot as i128 - s, "a deposited parameter outgrew its 32-bit carrier")?;
+        }
+    }
+    Ok((candidate, moved))
 }
 
 /// [definition; agent-inferred, November 1] **The field's learner**: the field, the covector's two
@@ -1140,6 +1235,17 @@ pub struct FieldReceipt {
 /// so the charts' covectors first arrive sections later; moments opened from zero would step them
 /// two to four times the declared rate until the second moment caught up (the review of
 /// November 1).
+///
+/// **A step is held and read on the next regions** (the tower's acceptance 77,
+/// [`super::TowerLearner::next_section`], always declared here): a step certified on its own
+/// section is held, and the next section's regions are read under the material before it and under
+/// the stepped material; where the stepped material codes them higher the step is halved and read
+/// again against the material before it, until it codes them no higher (it stands, halved) or
+/// releases nothing (refused: the material before it stands). The moments stay as they moved. Why
+/// (the first reading on the card, November 1): the certificate read only its own section, and
+/// the held-out answer code rose at the second lap and the third (5.38, 5.49, 6.18 bits a class)
+/// while the passage's own code fell every section; the tower had recorded this failure and its
+/// repair, and the field was built without it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLearner {
     pub field: Field,
@@ -1151,6 +1257,7 @@ pub struct FieldLearner {
     /// The laps the learner has read (an exterior walk's count, so a continued run keeps its
     /// keyed masks and order moving rather than replaying the first lap's).
     pub laps: u64,
+    held: Option<HeldStep>,
 }
 
 impl FieldLearner {
@@ -1159,7 +1266,12 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.theta.len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0 }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None }
+    }
+
+    /// Whether a deposited step is held for the next regions' read.
+    pub fn holds_step(&self) -> bool {
+        self.held.is_some()
     }
 
     /// [definition; agent-inferred, November 1] **The learner widened** ([`Field::grown`]), its
@@ -1169,7 +1281,11 @@ impl FieldLearner {
     /// coordinate carries `m/f` and `v/f²`, the readout `m` and `v`, and opens on the old
     /// normalized step. Each copy then steps as the old coordinate did, and the `f` copies of a
     /// sum move together, so the rate falls by `⌈log₂ f⌉` bits: the field's step stays the old one.
+    /// A learner holding a step is refused: the step is read first ([`FieldLearner::read_step_on`]).
     pub fn widened(&self, factor: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner widens after its held step is read");
+        }
         let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the growth draws"))?;
         let (field, from) = self.field.grown(factor, rest)?;
         let (f, f2) = (factor as i128, (factor * factor) as i128);
@@ -1177,25 +1293,78 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None })
     }
 
-    /// One section: its regions read and returned on the standing material, the moments moved, and
-    /// the step deposited where the regions reread under it code strictly fewer bits (the
-    /// certificate halves it until then, or until it moves nothing).
+    /// The held step read on `regions` without a deposit: the faces of `regions` under the
+    /// material that stands after the read, and the read (`None` when no step was held).
+    pub fn read_step_on(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<FieldNext>)> {
+        let (faces, _, next) = self.open(regions, realization, false)?;
+        Ok((faces, next))
+    }
+
+    /// The opening read of `regions` (with the covector when `returning`), after the held step,
+    /// if any, is read on them: the material before it read first, then the stepped material;
+    /// where the stepped material codes them higher, the step is halved against the material before
+    /// it, and the opening read is read again on the material that stands.
+    fn open(&mut self, regions: &[Region], realization: &mut dyn FieldRealization, returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>, Option<FieldNext>)> {
+        let read = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>)> {
+            if returning {
+                let (faces, g) = realization.read_and_return(field, regions)?;
+                Ok((faces, Some(g)))
+            } else {
+                Ok((realization.read_faces(field, regions)?, None))
+            }
+        };
+        let Some(held) = self.held.take() else {
+            let (faces, g) = read(&self.field, realization)?;
+            return Ok((faces, g, None));
+        };
+        let mut before = self.field.clone();
+        for (slot, &q) in before.theta.iter_mut().zip(&held.step) {
+            *slot = fit32(*slot as i128 + release(q, held.halvings), "a held step's material outgrew its 32-bit carrier")?;
+        }
+        let old = compared(&realization.read_faces(&before, regions)?, regions);
+        let (faces, g) = read(&self.field, realization)?;
+        let stepped_faces = compared(&faces, regions);
+        let change = code_of(&stepped_faces) - code_of(&old);
+        if !fewer_bits(&stepped_faces, &old) {
+            return Ok((faces, g, Some(FieldNext { change, halvings: 0, refused: false })));
+        }
+        let mut halvings = held.halvings;
+        let refused = loop {
+            halvings += 1;
+            let (candidate, moved) = stepped(&before, &held.step, halvings)?;
+            if !moved {
+                break true;
+            }
+            let reread = compared(&realization.read_faces(&candidate, regions)?, regions);
+            if !fewer_bits(&reread, &old) {
+                self.field = candidate;
+                break false;
+            }
+        };
+        if refused {
+            self.field = before;
+        }
+        let (faces, g) = read(&self.field, realization)?;
+        Ok((faces, g, Some(FieldNext { change, halvings: halvings - held.halvings, refused })))
+    }
+
+    /// One section: the step the section before deposited read on its regions, then its regions
+    /// read and returned on the material that stands, the moments moved, and the step deposited
+    /// where the regions reread under it code strictly fewer bits (the certificate halves it until
+    /// then, or until it moves nothing) and held for the next section.
     pub fn section(&mut self, regions: &[Region]) -> Result<FieldReceipt> {
         self.section_realized(regions, &mut HostField)
     }
 
     /// [`FieldLearner::section`] on a declared realization of the field's read and return; the
-    /// moments, the step and the certificate's decision stay on the host.
+    /// moments, the step and the certificates' decisions stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
-        let (faces, mut g) = realization.read_and_return(&self.field, regions)?;
-        let compared = |faces: &[Vec<Option<TowerFace>>]| -> Vec<(u128, u128)> {
-            faces.iter().zip(regions).flat_map(|(f, r)| f.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total)))).collect()
-        };
-        let code_of = |pairs: &[(u128, u128)]| -> i64 { pairs.par_iter().map(|&(m, t)| face_code(m, t)).sum() };
-        let faces_old = compared(&faces);
+        let (faces, g, next) = self.open(regions, realization, true)?;
+        let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        let faces_old = compared(&faces, regions);
         let code_before = code_of(&faces_old);
         let sites = faces_old.len();
         if sites == 0 {
@@ -1224,40 +1393,37 @@ impl FieldLearner {
         }
         let mut halvings = 0u32;
         loop {
-            let mut candidate = self.field.clone();
-            let mut moved = false;
-            for (slot, &q) in candidate.theta.iter_mut().zip(&step) {
-                let s = release(q, halvings);
-                if s != 0 {
-                    moved = true;
-                    *slot = fit32(*slot as i128 - s, "a deposited parameter outgrew its 32-bit carrier")?;
-                }
-            }
+            let (candidate, moved) = stepped(&self.field, &step, halvings)?;
             if !moved {
-                return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false });
+                return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
             }
-            let reread = realization.read_faces(&candidate, regions)?;
-            let faces_new = compared(&reread);
+            let faces_new = compared(&realization.read_faces(&candidate, regions)?, regions);
             if fewer_bits(&faces_old, &faces_new) {
                 let code_after = code_of(&faces_new);
                 self.field = candidate;
-                return Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true });
+                self.held = Some(HeldStep { step, halvings });
+                return Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next });
             }
             halvings += 1;
         }
     }
 
-    /// The learner as text: its head line, the field, then each moment on one line.
+    /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
+    /// moment on one line, then the held step on one line when one is held.
     pub fn to_text(&self) -> String {
         let join = |v: &[i128]| v.iter().map(i128::to_string).collect::<Vec<_>>().join(" ");
-        format!("hnn-field-learner-v2 {} {} {}\n{}{}\n{}\n", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+        let (held, step) = match &self.held {
+            Some(h) => (h.halvings.to_string(), format!("{}\n", join(&h.step))),
+            None => ("-".to_string(), String::new()),
+        };
+        format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        if head.len() != 4 || head[0] != "hnn-field-learner-v2" {
-            return refuse("a learner's head line that is not hnn-field-learner-v2");
+        if head.len() != 5 || head[0] != "hnn-field-learner-v3" {
+            return refuse("a learner's head line that is not hnn-field-learner-v3");
         }
         let rate_bits = head[1].parse::<u32>().map_err(|_| TowerError::Refused("a learner's rate that is not a count"))?;
         let drawn = head[2].parse::<usize>().map_err(|_| TowerError::Refused("a learner's drawn keys that are not a count"))?;
@@ -1269,7 +1435,18 @@ impl FieldLearner {
         if first.len() != field.theta.len() || second.len() != field.theta.len() {
             return refuse("a learner's moments that are not its field's length");
         }
-        Ok(Self { field, first, second, rate_bits, drawn, laps })
+        let held = match head[4] {
+            "-" => None,
+            h => {
+                let halvings = h.parse::<u32>().map_err(|_| TowerError::Refused("a learner's held halvings that are not a count"))?;
+                let step = read_numbers::<i128>(lines.next())?;
+                if step.len() != field.theta.len() {
+                    return refuse("a learner's held step that is not its field's length");
+                }
+                Some(HeldStep { step, halvings })
+            }
+        };
+        Ok(Self { field, first, second, rate_bits, drawn, laps, held })
     }
 }
 

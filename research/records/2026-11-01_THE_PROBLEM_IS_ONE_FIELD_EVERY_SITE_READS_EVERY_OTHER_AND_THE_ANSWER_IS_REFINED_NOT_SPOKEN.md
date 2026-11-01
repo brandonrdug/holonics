@@ -101,16 +101,23 @@ frames     δq, δk, δv = conj(U) ⊙ δq̃, δk̃, δṽ
 checked against the code's central difference on the largest entries of every family and on the
 largest turned and still chart rows. The deposit is the tower's: the covector's two moments, the
 step at `2^(−k)`, halved until the section's own regions reread under it code strictly fewer bits
-(`fewer_bits`, exact cross products of the faces) or it moves nothing. [agent-inferred] Each
+(`fewer_bits`, exact cross products of the faces) or it moves nothing. The certified step is then
+held and read on the next section's regions, which it was not fit on (§11): where the stepped
+material codes them higher than the material before the step, it is halved again or refused.
+[agent-inferred] Each
 coordinate's moments open at its own first nonzero covector (`m = g`, `v = g²`) and move toward
 `g, g²` after it; a learner whose moments opened at the first section's mean would carry the
 first section's coordinates that read nothing as zero for every later one.
 
-[agent-inferred] **The masks** come from an exterior keyed stream: with even odds the answer's
-sites (its void included) or the whole region's are open, each unresolved with probability `τ`
-drawn uniform on `(0, 1]` at `2^(−16)`, at least one site. The answer-only half is the release's
-own situation at every stage of its refinement; the whole-region half lets the question's language
-be learned by the same law. They choose what is compared, never what is deposited.
+[agent-inferred] **The masks** come from an exterior keyed stream. With even odds a region takes the
+whole-region mask, each site unresolved with probability `τ` drawn uniform on `(0, 1]` at
+`2^(−16)` (at least one site), or the release's own state at `ρ` drawn uniform on `[0, 1)` at
+`2^(−16)`: every answer site open but the first `⌊ρ r⌋` in the release's order (§4), read from the
+field's faces with every answer site open, with the question and without it. The second half meets
+the state a release opens on and the states its sweeps pass through; the whole-region half lets
+the question's language be learned by the same law. They choose what is compared, never what is
+deposited. (The first draft's answer-only half opened each answer site with probability `τ`, so it
+almost never met a release's states; §11.)
 
 [agent-inferred] **A training region takes the release's shapes.** The release opens the answer
 at the training answers' longest extent `A` and the region shrinks as voids are released, so a
@@ -124,14 +131,20 @@ the answer and its first void.
 ## 4. The release is refinement
 
 The answer's sites open unresolved (the training answers' longest extent plus its void). Over `S`
-sweeps, sweep `s` reads every unresolved face and releases the `⌈r_s/(S − s)⌉` most locked sites
-(the top class's share of its face, compared by exact cross products; a tie takes the earlier site,
-then the lower class) at their top class. The answer ends at the earliest released void and the
+sweeps, sweep `s` reads every unresolved face twice, with the question and with the question's
+sites unresolved (the released answer kept), and releases the `⌈r_s/(S − s)⌉` sites whose top class
+carries the most news (`by_news`): the key is `p̂(c) ν` with `ν = (−log₂ p̄(c)) − (−log₂ p̂(c))`, the
+bits the question tells the site about its top class `c` beyond what the place and the released
+answer already tell, compared exactly; a tie takes the earlier site, a top-class tie the lower
+class. The answer ends at the earliest released void and the
 sites past it leave the region, so the next sweep reads the region one site past its answer, as a
 training region is read ([agent-inferred]: opened at the longest training answer, 1,228 bytes
 against a held median of 270, the void tail would otherwise be carried through every sweep). The
 released sites are terrain for the next sweep. No class is spoken in order, and a site is released
-where the field is surest, wherever it stands.
+where the question tells it most, wherever it stands. Many problems are released together, one
+read of every problem a sweep; a region's faces do not depend on the regions read beside it, so
+each release is the problem's own. (The first draft released where the field was surest, by the
+top class's share; §11.)
 
 ## 5. Width is the trained body's
 
@@ -144,9 +157,12 @@ lift to `m/f`, `v/f²` (the readout's kept). Head `bH + h` keeps ring set `h mod
 copy of a head reads place on its parent's rings; the frames and the reach are kept. The step's
 rate bits rise by `⌈log₂ f⌉`: the lifted moments make each copy's step the parent's, and `f`
 copies of it would move the old face `f` times as far, so the first certified deposit on the grown
-body moves it no further than the old body's would have. The trainer grows the body by two after a lap whose code
-a site, read before each section's deposit, is not below the lap before's: the body has spent its
-width. No width is a dial past the founding's.
+body moves it no further than the old body's would have. The trainer withholds as many training
+problems as the held file holds (keyed, never in a section) and reads them after each lap at the
+release's states; the lap's last held step is read on them first. It grows the body by two after a
+lap that leaves them coding no fewer bits a site than the lap before left them: the body has spent
+its width. No width is a dial past the founding's. (The first draft read the passage's own code,
+which fell every lap; §11.)
 
 ## 6. The codec is the bytes
 
@@ -180,13 +196,15 @@ parallel extent is problems × sites × heads, against the scan's streams.
   covector and learner; the time per site is measured on the opening sections and projected before
   any learner run.
 
-`release-field` writes each problem's rows as its release returns, so a stopped run keeps what it
-read; a release the field refuses (a region past the reach, a carrier outgrown) is written as
-refused and counted, never skipped.
+`release-field` releases every held problem together, a sweep of all of them in one read, then
+every calculation's continuation together, and writes each set's rows as it returns (a stopped run
+keeps the free releases once they are read); a release the field refuses (a unit the codec never
+met, a region past the reach) is written as refused and counted, never skipped.
 
 Commands (`complete-language`, `hnn::tower::field` through `field_train`): `train-field` (founded
-or continued learner, sections of like-length problems, a keyed walk each lap, the held-out read
-after each lap, the growth rule), `release-field` (each held problem's release from the question
+or continued learner, sections of like-length problems with the withheld problems apart, a keyed
+walk each lap, the held step read on the withheld problems and the held-out read after each lap,
+the growth rule), `release-field` (each held problem's release from the question
 alone and at each calculation's equals, written for `written_rules.py` as `FREE.tsv` and
 `MARKS.tsv`, and each free release's coupling read in `COUPLING.tsv`), `release-field-text` (a
 private read of whole releases).
@@ -202,7 +220,12 @@ private read of whole releases).
    void and its region is cut past it; the grown field reads the old faces by two and by three, the
    draws counted are the draws read, and its learner lifts the moments and parts its copies; the
    training tails meet every octave of their room; the commands train, rest, continue and release
-   end to end.
+   end to end. Since §11: the release orders by the question's news, not the share; problems
+   released together are each problem's own release; a held step read on the next section leaves
+   material that codes it no higher than the material before the step, one halving fewer coded it
+   higher, and the section's opening read is the standing material's; a learner holding a step
+   does not widen, and the held step crosses the learner's text; the release's state resolves the
+   ranked sites first and leaves one open; the withheld problems are in no section.
 2. **Card parity.** The card's realization equals the host bit for bit (faces, codes, covector,
    learner) over 32 sections of GSM8K regions; its time per site is measured on the opening
    sections and projected before any learner run. [measured] Passed (acae723b6, receipts in
@@ -231,7 +254,8 @@ receipts (halvings, deposits) are the next loop's subject.
   of text, image, acoustic and motor input alike, and nothing names a digit.
 - **Bits read as progress.** The claim is a written-rule reading; bits are reported beside it.
 - **Seen material graded as unseen.** The held problems never enter a section.
-- **An uncertified deposition step.** Every deposit is certified on its own regions.
+- **An uncertified deposition step.** Every deposit is certified on its own regions, then read on
+  the next section's regions, which it was not fit on (§11).
 - **A located cause carried unrepaired.** The welded codec and the 128-site reach are not carried
   into the field.
 - **A store.** Nothing is written to be looked up: every site reads every other site's own face
@@ -271,3 +295,64 @@ Read and not adopted:
   fragments.
 - *"Residue and whole winding" as an overclaim.* It was one on the prime powers; on the towers a
   ring `p^(k+1)` reads ring `p^k`'s residue and its whole winding, so the claim now holds as worded.
+
+## 11. The first reading failed, and the four causes it located
+
+[measured] The first reading (receipts in `…_receipts/reading-1/`, counts only; the card on B-PC,
+an RTX 4080 SUPER): the field at declaration A (D 32, H 4, n 8, still 2, f 32, K 2; 19,546 values)
+trained 4 laps of the 6,730 training problems in sections of 16 at rate 8 in 383 s, then released
+the 128 held problems at `S = 16` in 28 s.
+
+| Reading | Value |
+|---|---|
+| First calculation from the question's numbers (the claim: at least 24 of 128) | 1 of 128: **failed** |
+| Right at the equals | 17 of 399 (16 of 260 met, 1 of 139 never met) |
+| Values written at the equals | 396, of which 228 are `10`; 10 distinct values |
+| Released length | mean 70 classes, held answers' 277 |
+| Releases using the problem's own words | 0 of 128 |
+| Held answer's code at the release's opening, by lap | 5.38, 5.49, 6.18, 5.22 bits a class (flat 6.93; digits above 6.3) |
+| The passage's own code, read before each deposit | 3.43, 2.83, 2.72, 2.64 bits a class |
+| Deposits | 420 of 421 sections, then 421 of 421 each lap; the body never grew |
+
+Each cause below is located from those receipts, not inferred from the outcome alone.
+
+1. **Training rarely met the release's states.** The answer-only half opened each answer site with
+   probability `τ`, so nearly every compared site had most of its neighbours resolved; a release
+   opens with every answer site unresolved and passes through states where the sites it released
+   are resolved and the rest open. Read at the release's opening the held answer coded 5.2 bits a
+   class against the passage's 2.6, worse than the bytes' own frequencies.
+2. **The release by share released what the place alone predicted.** The top class's share counts
+   certainty the question did not supply: a space, `e` and the void, which the place predicts
+   anywhere, were released first, and each made the next likelier. The void ended releases a median
+   71 classes into answers whose median is 254, and the equals wrote `10` in 228 of 396.
+3. **The certificate read only its own section.** The held answer's code rose at the second lap and
+   the third while the passage's own code fell every section. The tower had recorded this failure
+   and its repair (acceptance 77, `TowerLearner::next_section`); the field was built without it: a
+   located cause carried unrepaired into a new consumer, the lessons' fourth failure.
+4. **Growth read seen code.** It grew when the passage's code, read before each deposit, stopped
+   falling; that code fell every lap while the held code rose, so the body never grew.
+
+The repairs, built and tested on the host before any card run:
+
+| Cause | Repair | Owner |
+|---|---|---|
+| 1 | Half the training regions take the release's state at a keyed `ρ` (§3): every answer site open but the first `⌊ρ r⌋` in the release's order, read from the field's whole-open faces with and without the question. | `field_train::{shape, released_state, section_regions}` |
+| 2 | The release orders by the news the question gives each site's top class, `p̂(c) ν` (§4): a class the place and the released answer already predict carries no news and is released after the classes the question decides. | `field::by_news`, `Field::release_realized` |
+| 3 | A certified step is held and read on the next section's regions; where it codes them higher it is halved against the material before it, or refused. The lap's last step is read on the withheld problems. The learner's text carries a held step (`hnn-field-learner-v3`). | `FieldLearner::{open, read_step_on, section_realized}` |
+| 4 | As many training problems as the held file holds are withheld (keyed, in no section); growth reads their release-state code after each lap (§5). The held file stays a reading only. | `field_train::{sections_of, unseen_read, train}` |
+
+[agent-inferred] **What the repairs cost.** Reading 1 measured a section's read at 31 ms and its
+return at 191 ms (1,846 reads in 56.7 s, 1,684 returns in 322.3 s). A section now adds two reads of
+its release-state half (one section's read between them) and one read under the material before
+the held step, about 62 ms; a halving adds one read. A lap at A projects at about 1.3 times reading
+1's, 125 s against 96 s. A release reads twice a sweep, every problem's sweep in one read.
+
+**Read and not adopted.**
+- *Releasing the answer in blocks from its start* (semi-autoregressive refinement). It would author
+  an order into a release that has none; the void's early release, which blocks are used elsewhere
+  to stop, is the place's prediction, and the news cancels exactly that.
+- *Reopening released sites of low certainty.* A released site is terrain at width zero; a release
+  that withdrew its own terrain would make the sweep count no longer the refinement's measure.
+
+The claim and its bar are unchanged: the first calculation from the question's numbers in at least
+24 of 128 releases, read on the same 15-minute reading. What follows each outcome is §8's.

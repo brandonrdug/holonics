@@ -282,6 +282,8 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
         learner.section(&[region()]).unwrap();
     }
     let stream = keys(1 << 16);
+    assert!(learner.holds_step() && learner.widened(2, &stream).is_err(), "a held step is read before the body widens");
+    learner.read_step_on(&[region()], &mut HostField).unwrap();
     let grown = learner.widened(2, &stream).unwrap();
     assert_eq!(grown.drawn, learner.drawn + 4 * learner.field.growth_draws(2));
     let l = grown.field.layout().clone();
@@ -298,6 +300,86 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
     let w = next.field.declaration.width / 2;
     let parted = (0..=next.field.declaration.alphabet).any(|row| (0..w).any(|j| next.field.theta[l.enc + row * 2 * w + j] != next.field.theta[l.enc + row * 2 * w + w + j]));
     assert!(parted, "the copies part under learning");
+}
+
+fn face(masses: &[u128]) -> Option<TowerFace> {
+    Some(TowerFace { masses: masses.to_vec(), total: masses.iter().sum() })
+}
+
+/// The release's order is the news the question gives a site's top class, not the top class's
+/// share: a site the place alone predicts as surely is released last, however sure it is.
+#[test]
+fn the_release_orders_by_the_question_s_news() {
+    let faces = [None, face(&[1, 9]), face(&[6, 4]), face(&[1, 3]), face(&[5, 5])];
+    let prior = [face(&[1, 1]), face(&[1, 9]), face(&[1, 1]), face(&[1, 1]), face(&[1, 1])];
+    // Site 1 is the surest (0.9) but the place alone predicts it as surely: no news. Site 2 carries
+    // 0.6 of log₂(0.6/0.5), site 3 0.75 of log₂(0.75/0.5), site 4 none (a tie takes class 0).
+    let order = by_news(&faces, &prior).unwrap();
+    assert_eq!(order, vec![(3, 1), (2, 0), (1, 1), (4, 0)]);
+    // A site the question makes less sure of its top class than the place does comes last.
+    let doubted = [face(&[7, 3]), face(&[2, 1])];
+    assert_eq!(by_news(&doubted, &[face(&[9, 1]), face(&[1, 1])]).unwrap(), vec![(1, 0), (0, 0)]);
+    assert!(by_news(&faces, &[None, None, None, None, None]).is_err(), "an open site needs its prior face");
+}
+
+/// Problems released together are each problem's own release.
+#[test]
+fn releases_read_together_are_each_problem_s_own() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
+    let together = field.release_realized(&problems, 3, 0, &mut HostField).unwrap();
+    for (&(q, a), released) in problems.iter().zip(&together) {
+        assert_eq!(&field.release(q, a, 3, 0).unwrap(), released);
+    }
+}
+
+/// A deposited step is held and read on the next section: where the material before it codes the
+/// next regions in fewer bits the step is halved or refused, so the material that stands never
+/// codes them higher than the material before the step; the held step crosses the learner's text.
+#[test]
+fn a_held_step_is_read_on_the_next_section() {
+    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = FieldLearner::new(field, 2);
+    let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
+    let second_open = [true, false, false, true, true, false, false];
+    let second = Region { classes: &second_classes, unresolved: &second_open };
+    let (mut read, mut halved) = (0, 0);
+    for k in 0..12 {
+        let before = learner.clone();
+        let regions = if k % 2 == 0 { [region()] } else { [second] };
+        let receipt = learner.section(&regions).unwrap();
+        assert_eq!(receipt.next.is_some(), before.holds_step());
+        if let (Some(next), Some(held)) = (receipt.next, before.held.as_ref()) {
+            read += 1;
+            let mut material = before.field.clone();
+            for (slot, &q) in material.theta.iter_mut().zip(&held.step) {
+                *slot += release(q, held.halvings) as i32;
+            }
+            let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions);
+            let old = compared_on(&material);
+            assert_eq!(next.change, code_of(&compared_on(&before.field)) - code_of(&old));
+            // The material that stands after the read: the material before the step where it was
+            // refused, else the step at its halvings; it codes the regions no higher than the
+            // material before the step, and one halving fewer coded them higher.
+            let at = held.halvings + next.halvings;
+            let standing = if next.refused { material.clone() } else { stepped(&material, &held.step, at).unwrap().0 };
+            if !next.refused {
+                assert!(!fewer_bits(&compared_on(&standing), &old), "the standing material codes the next regions no higher");
+            }
+            if next.halvings > 0 || next.refused {
+                halved += 1;
+                let last = if next.refused { at } else { at - 1 };
+                assert!(fewer_bits(&compared_on(&stepped(&material, &held.step, last).unwrap().0), &old), "the halving before coded them higher");
+            }
+            // The section's opening read is the standing material's.
+            assert_eq!(receipt.code_before, code_of(&compared_on(&standing)));
+        }
+        if learner.holds_step() {
+            assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
+        }
+    }
+    assert!(read >= 4 && halved >= 1, "read {read} halved {halved}");
 }
 
 trait Top {

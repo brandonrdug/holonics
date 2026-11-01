@@ -2,27 +2,28 @@
 //! sections `train-field` forms (record `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, §7 and §8's acceptance
 //! 2).
 //!
-//! `parity-field` founds the field as `train-field` does (and widens it by `GROW` when `GROW > 1`),
-//! forms the first `SECTIONS` sections of the learner's next lap exactly as `train-field` forms them
-//! (the keyed walk, tails and masks), and has two learners take each: one through the host
-//! ([`HostField`]), one through the card. Every read each makes (the section's read and return, and
-//! each of the certificate's rereads) is compared face for face (each unresolved site's masses and
-//! total) and covector entry for entry, and the learners' texts after each section; then the field
-//! releases the first `RELEASES` held problems through both, `SWEEPS` sweeps each. `time-field`
-//! reads the card alone over the opening sections and the opening releases and projects a lap and a
-//! release of the held problems from the measured upper time a site pair.
+//! `parity-field` founds the field as `train-field` does (and widens it by `GROW` when `GROW > 1`)
+//! and has two learners, one through the host ([`HostField`]) and one through the card, each form
+//! and take the first `SECTIONS` sections of its next lap exactly as `train-field` does (the keyed
+//! walk, tails and shapes, the release-state masks read from its own field), then read its held
+//! step on the withheld problems as a lap's end does. Every read each makes (the masks' reads, the
+//! held step's reads, the section's read and return, and each of the certificate's rereads) is
+//! compared face for face (each unresolved site's masses and total) and covector entry for entry,
+//! and the regions and the learners' texts after each section; then the field releases the first
+//! `RELEASES` held problems through both, `SWEEPS` sweeps each, the card's read together.
+//! `time-field` reads the card alone over the opening sections and the opening releases and
+//! projects a lap and a release of the held problems from the measured upper time a site pair.
 
-use super::field_train::{mask, mix, problems_of, question_text, region_classes, tail, units_of, FieldCodec};
+use super::field_train::{problems_of, question_text, region_lengths, section_regions, sections_of, units_of, walk, FieldCodec, Problems, UNSEEN_DRAW};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldRealization, HostField, Region};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldRealization, FieldReceipt, HostField, Region};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
-type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
-
 /// The training passage as `train-field` reads it: the codec, the encoded training and held problems,
-/// the reach, the keys and the mask stream's seed, and the sections of like length.
+/// the reach, the keys and the mask stream's seed, the sections of like length and the withheld
+/// problems.
 struct Passage {
     codec: FieldCodec,
     train: Problems,
@@ -31,6 +32,7 @@ struct Passage {
     keys: Vec<u8>,
     seed: u64,
     sections: Vec<Vec<usize>>,
+    unseen: Vec<usize>,
 }
 
 /// `UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA` and the section's regions, as
@@ -50,34 +52,16 @@ fn passage(args: &[String], section: usize) -> Result<Passage> {
     let held: Problems = encode(&held_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
     let reach = train.iter().chain(&held).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    let mut order: Vec<usize> = (0..train.len()).collect();
-    order.sort_by_key(|&i| (train[i].0.len() + train[i].1.len(), i));
-    let sections = order.chunks(section).map(|c| c.to_vec()).collect();
-    println!("FIELD_PASSAGE train={} held={} held_read={} alphabet={} answer={} reach={}", train.len(), held_problems.len(), held.len(), codec.alphabet(), codec.answer, reach);
-    Ok(Passage { codec, train, held, reach, keys, seed, sections })
+    let (sections, unseen) = sections_of(&train, section, held.len(), seed);
+    println!("FIELD_PASSAGE train={} withheld={} held={} held_read={} alphabet={} answer={} reach={}", train.len() - unseen.len(), unseen.len(), held_problems.len(), held.len(), codec.alphabet(), codec.answer, reach);
+    Ok(Passage { codec, train, held, reach, keys, seed, sections, unseen })
 }
 
 impl Passage {
-    /// The first `take` sections of the lap a learner that has read `read` laps meets, in its keyed
-    /// walk, each region's classes and mask exactly as `train-field` draws them.
-    fn lap(&self, read: u64, take: usize) -> Vec<Vec<(Vec<usize>, Vec<bool>)>> {
-        let mut draw = read * self.train.len() as u64;
-        let mut walk: Vec<usize> = (0..self.sections.len()).collect();
-        walk.sort_by_key(|&s| (mix(self.seed, (read << 40) ^ s as u64), s));
-        walk.iter()
-            .take(take)
-            .map(|&s| {
-                self.sections[s]
-                    .iter()
-                    .map(|&i| {
-                        let (q, a, _) = &self.train[i];
-                        draw += 1;
-                        let length = q.len() + a.len() + tail(self.seed, draw, self.codec.answer - a.len());
-                        (region_classes(&self.codec, q, a, length), mask(self.seed, draw, q.len(), length))
-                    })
-                    .collect()
-            })
-            .collect()
+    /// Section `s`'s regions as `train-field` forms them from `draw` on, read from `learner`'s field
+    /// through `realization` (or the withheld problems' at the release's states).
+    fn regions(&self, members: &[usize], draw: &mut u64, released: bool, learner: &FieldLearner, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
+        section_regions(&self.codec, &self.train, members, self.seed, draw, released, &learner.field, realization)
     }
 
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
@@ -179,23 +163,45 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len());
     let mut host_learner = founded.clone();
     let mut card_learner = founded;
-    let lap = p.lap(host_learner.laps, sections);
+    let order = walk(p.seed, host_learner.laps, p.sections.len());
+    let mut draw = host_learner.laps * p.train.len() as u64;
     let (mut reads_unequal, mut faces_unequal, mut entries_unequal, mut learners_unequal, mut reads_all) = (0usize, 0usize, 0usize, 0usize, 0usize);
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
-    for (k, section) in lap.iter().enumerate() {
-        let views: Vec<Region> = section.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
-        let pairs: usize = views.iter().map(|r| d.heads * r.classes.len() * r.classes.len()).sum::<usize>() * d.ticks;
+    // The sections, then the withheld problems as a lap's end reads them.
+    let steps: Vec<(usize, bool)> = order.iter().take(sections).map(|&s| (s, false)).chain(std::iter::once((usize::MAX, true))).collect();
+    for (k, &(s, end)) in steps.iter().enumerate() {
+        let members = if end { &p.unseen } else { &p.sections[s] };
         let mut host = HostField;
         let mut host_rec = Recorder { inner: &mut host, reads: Vec::new() };
+        let (mut host_draw, mut card_draw) = if end { (UNSEEN_DRAW, UNSEEN_DRAW) } else { (draw, draw) };
         let t0 = std::time::Instant::now();
-        let receipt_h = host_learner.section_realized(&views, &mut host_rec).map_err(|e| e.to_string())?;
+        let host_regions = p.regions(members, &mut host_draw, end, &host_learner, &mut host_rec)?;
+        let host_views: Vec<Region> = host_regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+        let receipt_h = if end {
+            let (_, next) = host_learner.read_step_on(&host_views, &mut host_rec).map_err(|e| e.to_string())?;
+            FieldReceipt { next, ..FieldReceipt::default() }
+        } else {
+            host_learner.section_realized(&host_views, &mut host_rec).map_err(|e| e.to_string())?
+        };
         let t1 = std::time::Instant::now();
         let mut card_rec = Recorder { inner: &mut *card, reads: Vec::new() };
-        let receipt_c = card_learner.section_realized(&views, &mut card_rec).map_err(|e| e.to_string())?;
+        let card_regions = p.regions(members, &mut card_draw, end, &card_learner, &mut card_rec)?;
+        let card_views: Vec<Region> = card_regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+        let receipt_c = if end {
+            let (_, next) = card_learner.read_step_on(&card_views, &mut card_rec).map_err(|e| e.to_string())?;
+            FieldReceipt { next, ..FieldReceipt::default() }
+        } else {
+            card_learner.section_realized(&card_views, &mut card_rec).map_err(|e| e.to_string())?
+        };
         let t2 = std::time::Instant::now();
+        if !end {
+            draw = host_draw;
+        }
         host_ns += (t1 - t0).as_nanos();
         card_ns += (t2 - t1).as_nanos();
-        let mut first = None;
+        let views = &host_views;
+        let pairs: usize = views.iter().map(|r| d.heads * r.classes.len() * r.classes.len()).sum::<usize>() * d.ticks;
+        let mut first = if host_regions == card_regions { None } else { Some("the regions differ".to_string()) };
         let (mut faces, mut entries) = (0usize, 0usize);
         let calls = host_rec.reads.len().max(card_rec.reads.len());
         if host_rec.reads.len() != card_rec.reads.len() {
@@ -215,11 +221,12 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         reads_all += calls;
         faces_unequal += faces;
         entries_unequal += entries;
-        let learner_equal = receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text();
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text();
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
+        let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} regions={} length={length} sites={} pairs={pairs} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} learner_equal={learner_equal} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} pairs={pairs} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
@@ -231,19 +238,20 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         );
     }
     let mut releases_unequal = 0usize;
-    for (i, (q, _, _)) in p.held.iter().take(releases).enumerate() {
+    let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
+    let t0 = std::time::Instant::now();
+    let carded = card_learner.field.release_realized(&questions, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
+    let card_release_ms = ms(t0.elapsed().as_nanos());
+    for (i, (&(q, open), carded)) in questions.iter().zip(&carded).enumerate() {
         let t0 = std::time::Instant::now();
-        let host = host_learner.field.release(q, p.codec.answer, sweeps, p.codec.void()).map_err(|e| e.to_string())?;
-        let t1 = std::time::Instant::now();
-        let carded = card_learner.field.release_realized(q, p.codec.answer, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
-        let t2 = std::time::Instant::now();
-        let equal = host == carded;
+        let host = host_learner.field.release(q, open, sweeps, p.codec.void()).map_err(|e| e.to_string())?;
+        let equal = &host == carded;
         releases_unequal += usize::from(!equal);
-        println!("FIELD_PARITY_RELEASE problem={i} question={} released={} equal={equal} host_ms={} card_ms={}", q.len(), host.len(), ms((t1 - t0).as_nanos()), ms((t2 - t1).as_nanos()));
+        println!("FIELD_PARITY_RELEASE problem={i} question={} released={} equal={equal} host_ms={}", q.len(), host.len(), ms(t0.elapsed().as_nanos()));
     }
     println!(
-        "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} host_ms={} card_ms={} elapsed_ms={}",
-        lap.len(),
+        "FIELD_PARITY_DONE sections={} reads={reads_all} reads_unequal={reads_unequal} faces_unequal={faces_unequal} covector_unequal={entries_unequal} learners_unequal={learners_unequal} releases={} releases_unequal={releases_unequal} card_release_ms={card_release_ms} host_ms={} card_ms={} elapsed_ms={}",
+        steps.len(),
         releases.min(p.held.len()),
         ms(host_ns),
         ms(card_ns),
@@ -255,10 +263,10 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     Ok(())
 }
 
-/// The site pairs a release reads at most: every sweep over the question and the open answer (a
-/// region released short of its void reads fewer).
+/// The site pairs a release reads at most: every sweep reads the question and the open answer
+/// twice, with the question and without it (a region released short of its void reads fewer).
 fn release_pairs(heads: usize, ticks: usize, sweeps: usize, sites: usize) -> u128 {
-    (heads * ticks * sweeps) as u128 * (sites * sites) as u128
+    (2 * heads * ticks * sweeps) as u128 * (sites * sites) as u128
 }
 
 /// `time-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION
@@ -277,16 +285,20 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     let d = learner.field.declaration;
     println!("FIELD_TIME_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} reach={} material={}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.reach, learner.field.theta.len());
     // The whole lap's site pairs (one read and return a section), from the regions' lengths.
-    let whole = p.lap(learner.laps, p.sections.len());
-    let lap_pairs: u128 = whole.iter().flat_map(|s| s.iter()).map(|(c, _)| (d.heads * c.len() * c.len()) as u128).sum::<u128>() * d.ticks as u128;
-    let lap_sites: usize = whole.iter().flat_map(|s| s.iter()).map(|(c, _)| c.len()).sum();
+    let order = walk(p.seed, learner.laps, p.sections.len());
+    let mut lengths_draw = learner.laps * p.train.len() as u64;
+    let lengths: Vec<usize> = order.iter().flat_map(|&s| region_lengths(&p.codec, &p.train, &p.sections[s], p.seed, &mut lengths_draw)).collect();
+    let lap_pairs: u128 = lengths.iter().map(|&l| (d.heads * l * l) as u128).sum::<u128>() * d.ticks as u128;
+    let lap_sites: usize = lengths.iter().sum();
     let mut worst = (0u128, 1u128); // the largest ms a pair as (ns, pairs) of a section's read and return
     let mut reads_worst = (0u128, 1u128);
-    for (k, section) in whole.iter().take(sections).enumerate() {
-        let views: Vec<Region> = section.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
-        let pairs: u128 = views.iter().map(|r| (d.heads * r.classes.len() * r.classes.len()) as u128).sum::<u128>() * d.ticks as u128;
+    let mut draw = learner.laps * p.train.len() as u64;
+    for (k, &s) in order.iter().take(sections).enumerate() {
         let mut rec = Recorder { inner: &mut *card, reads: Vec::new() };
         let t0 = std::time::Instant::now();
+        let regions = p.regions(&p.sections[s], &mut draw, false, &learner, &mut rec)?;
+        let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+        let pairs: u128 = views.iter().map(|r| (d.heads * r.classes.len() * r.classes.len()) as u128).sum::<u128>() * d.ticks as u128;
         let receipt = learner.section_realized(&views, &mut rec).map_err(|e| e.to_string())?;
         let ns = t0.elapsed().as_nanos();
         let reads = rec.reads.len() as u128;
@@ -306,19 +318,16 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
         worst.0 / worst.1.max(1),
         ms(lap_pairs * worst.0 / worst.1.max(1))
     );
-    // The releases: the free release of the opening held problems, timed; the projection reads every
-    // held problem's free release and one at each calculation's equals, each at most the full region.
-    let mut release_worst = (0u128, 1u128);
-    for (i, (q, _, _)) in p.held.iter().take(releases).enumerate() {
-        let t0 = std::time::Instant::now();
-        let released = learner.field.release_realized(q, p.codec.answer, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
-        let ns = t0.elapsed().as_nanos();
-        let pairs = release_pairs(d.heads, d.ticks, sweeps, q.len() + p.codec.answer);
-        if ns * release_worst.1 > release_worst.0 * pairs {
-            release_worst = (ns, pairs);
-        }
-        println!("FIELD_TIME_RELEASE problem={i} question={} released={} pairs_at_most={pairs} ms={}", q.len(), released.len(), ms(ns));
-    }
+    // The releases: the free releases of the opening held problems, read together and timed; the
+    // projection reads every held problem's free release and one at each calculation's equals, each
+    // at most the full region, at the time a pair the opening releases measured.
+    let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
+    let t0 = std::time::Instant::now();
+    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
+    let ns = t0.elapsed().as_nanos();
+    let pairs: u128 = questions.iter().map(|&(q, open)| release_pairs(d.heads, d.ticks, sweeps, q.len() + open)).sum();
+    let release_worst = (ns, pairs.max(1));
+    println!("FIELD_TIME_RELEASE problems={} released={} pairs_at_most={pairs} ms={}", questions.len(), released.iter().map(Vec::len).sum::<usize>(), ms(ns));
     let held_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let held_problems = problems_of(&held_text);
     let mut held_pairs = 0u128;
