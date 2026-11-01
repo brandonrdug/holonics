@@ -25,6 +25,17 @@ fn shaped(still: usize) -> Field {
     field
 }
 
+/// The field with its strand contacts silent (`E₋ = E₊ = 0`, as founded): a site opens on its own
+/// class alone.
+fn silent_contacts(mut field: Field) -> Field {
+    let rows = (field.declaration.alphabet + 1) * field.declaration.width;
+    let l = field.layout.clone();
+    for start in [l.before, l.after] {
+        field.theta[start..start + rows].iter_mut().for_each(|v| *v = 0);
+    }
+    field
+}
+
 const CLASSES: [usize; 7] = [1, 4, 0, 2, 2, 3, 1];
 const OPEN: [bool; 7] = [false, true, false, true, false, false, true];
 
@@ -58,12 +69,12 @@ fn a_region_past_the_reach_is_refused() {
     assert!(field.faces(&Region { classes: &classes[..16], unresolved: &open[..16] }).is_ok());
 }
 
-/// With flat weights (no chart reads), a still field's current is the same at every site, and a
-/// framed field's carries each site's place: the moment is phase-carried.
+/// With flat weights (no chart reads) and silent strand contacts, a still field's current is the
+/// same at every site, and a framed field's carries each site's place: the moment is phase-carried.
 #[test]
 fn the_current_carries_place_when_the_weights_are_flat() {
     for (still, framed) in [(3usize, false), (1, true)] {
-        let mut field = shaped(still);
+        let mut field = silent_contacts(shaped(still));
         let l = field.layout.clone();
         let m2 = 2 * field.declaration.complex();
         let dw = field.declaration.width;
@@ -163,11 +174,12 @@ fn covector_matches_the_codes_difference() {
     }
 }
 
-/// Without frames (every mode still), a site's face depends on the region's classes, not their
-/// order: permuting the sites permutes the faces exactly, bit for bit.
+/// Without frames (every mode still) and with the strand contacts silent, a site's face depends on
+/// the region's classes, not their order: permuting the sites permutes the faces exactly, bit for
+/// bit.
 #[test]
 fn still_field_is_order_free() {
-    let field = shaped(3);
+    let field = silent_contacts(shaped(3));
     let faces = field.faces(&region()).unwrap();
     let order = [3usize, 0, 6, 1, 5, 2, 4];
     let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
@@ -176,6 +188,19 @@ fn still_field_is_order_free() {
     for (n, &t) in order.iter().enumerate() {
         assert_eq!(permuted[n], faces[t]);
     }
+}
+
+/// The strand contacts read the word: with every mode still, the same classes in another order
+/// read differently once a site opens with its neighbours.
+#[test]
+fn the_strand_contacts_read_order_without_frames() {
+    let field = shaped(3);
+    let faces = field.faces(&region()).unwrap();
+    let order = [3usize, 0, 6, 1, 5, 2, 4];
+    let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
+    let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
+    let permuted = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
+    assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]));
 }
 
 /// The frames make place matter: the same classes in another order read differently.
@@ -191,11 +216,14 @@ fn framed_field_reads_place() {
 }
 
 /// The learner's deposits are certified: each deposited section codes its own regions in fewer
-/// bits, and over a few sections the regions' code falls from the founding's.
+/// bits, and over a few sections the regions' code falls from the founding's. (At the rate `2^(−4)`
+/// the opening's three encodings step together and, from the second section, both the full and the
+/// half step raise the code, so every later step is refused; at `2^(−5)` to `2^(−8)` all twelve
+/// deposit, measured November 1.)
 #[test]
 fn certified_deposits_lower_the_code() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 4);
+    let mut learner = FieldLearner::new(field, 6);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
     let regions = [region(), Region { classes: &second_classes, unresolved: &second_open }];
@@ -657,3 +685,50 @@ impl Top for TowerFace {
         (0..self.masses.len()).find(|&c| self.rank(c) == 0).unwrap()
     }
 }
+
+/// Four pairs, their keys distinct in `0..8` and their values in `8..16`, then one of the keys and
+/// its value unresolved.
+fn recall_problem(seed: u64) -> Vec<usize> {
+    let mut state = seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ 0xD1B5_4A32_D192_ED03;
+    let mut next = move || {
+        state = state.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = state;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    };
+    let mut keys: Vec<usize> = (0..8).collect();
+    for i in (1..8).rev() {
+        keys.swap(i, (next() % (i as u64 + 1)) as usize);
+    }
+    let mut classes = Vec::new();
+    for &key in &keys[..4] {
+        classes.extend([key, 8 + (next() % 8) as usize]);
+    }
+    let j = (next() % 4) as usize;
+    classes.extend([keys[j], classes[2 * j + 1]]);
+    classes
+}
+
+/// The strand contacts let a value be found by its key: a site opens with the word before it, so the
+/// unresolved value meets the value site whose key is its own in one contact, and the field learns
+/// the recall. Measured November 1 at this declaration and rate (§17 of the field's record): held
+/// codes 0.020 bits at 1,000 sections and 0.000 at 2,000; the same field opened on its own class
+/// alone stayed at 2.09 bits after 2,000 sections, the code of knowing only which values are present.
+#[test]
+fn the_strand_contacts_let_a_value_be_recalled_by_its_key() {
+    let d = FieldDeclaration { alphabet: 16, width: 16, heads: 2, modes: 4, still: 2, contacts: 16, ticks: 2, frames: 2, reach: 16 };
+    let mut learner = FieldLearner::new(Field::found(d, &keys(1 << 18)).unwrap(), 6);
+    let open: Vec<bool> = (0..10).map(|t| t == 9).collect();
+    let code = |learner: &FieldLearner| -> i64 {
+        (0..64u64).map(|i| learner.field.code(&Region { classes: &recall_problem(1_000_000 + i), unresolved: &open }).unwrap().0).sum::<i64>() / 64
+    };
+    for s in 0..1000u64 {
+        let problems: Vec<Vec<usize>> = (0..16).map(|i| recall_problem(s * 16 + i)).collect();
+        let regions: Vec<Region> = problems.iter().map(|c| Region { classes: c, unresolved: &open }).collect();
+        learner.section(&regions).unwrap();
+    }
+    let held = code(&learner);
+    assert!(held < 1 << 18, "the held recall codes {} millibits", held * 1000 >> 20);
+}
+

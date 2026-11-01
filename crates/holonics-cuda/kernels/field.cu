@@ -250,7 +250,7 @@ struct FieldWords {
     // `ln 2` on `2^(−30)`, the weights' return reads it (two words of a signed 128-bit value).
     uint64_t ln2_lo, ln2_hi;
     const int32_t *theta;
-    uint64_t enc, q, q_bias, k, k_bias, v, v_bias, out, out_bias, a, a_bias, b, b_bias, w, w_bias, read, read_bias;
+    uint64_t enc, enc_before, enc_after, q, q_bias, k, k_bias, v, v_bias, out, out_bias, a, a_bias, b, b_bias, w, w_bias, read, read_bias;
     uint64_t rq, rk, rv, rout, ra, rb, rw, rread;
     const int64_t *phasor;
     const uint64_t *ring_off;
@@ -310,13 +310,27 @@ extern "C" __global__ void field_exponential(FieldWords w, uint64_t *face) {
     }
 }
 
-// A site's opening face `x⁰`: its class's row of the encoding, or the unresolved row.
+// A site's encoding row: its class, or the unresolved row.
+__device__ __forceinline__ uint64_t row_of(const FieldWords &w, uint64_t t) {
+    return w.unresolved[t] ? w.A : w.classes[t];
+}
+
+// A site's opening face `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))`: its row of the encoding with its
+// strand neighbours' rows of theirs, a neighbour only within the site's own region (a site at its
+// region's first place has none before it; the next site is the region's own when its place is not
+// the first).
 extern "C" __global__ void field_open(FieldWords w) {
     const uint64_t cells = (uint64_t)w.T * w.D;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
-        const uint64_t row = w.unresolved[t] ? w.A : w.classes[t];
-        w.x[c] = w.theta[w.enc + row * w.D + i];
+        int64_t x = w.theta[w.enc + row_of(w, t) * w.D + i];
+        if (w.site_pos[t] > 0) {
+            x += w.theta[w.enc_before + row_of(w, t - 1) * w.D + i];
+        }
+        if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
+            x += w.theta[w.enc_after + row_of(w, t + 1) * w.D + i];
+        }
+        w.x[c] = x;
     }
 }
 
@@ -1014,12 +1028,13 @@ extern "C" __global__ void field_outer_bound_x64(FieldWords w, uint32_t rows, ui
     outer_bound<int64_t>(w, rows, cols, y, y_stride, x, x_stride, only_unresolved);
 }
 
-// The encoding's covector: each row's `Σ_t dx_t` over the sites that opened on it, the sites sorted by
-// row (`rows_sites`) and cut into segments of at most `OUTER_TILE` sites of one row (`segments`, each
-// its row, first and end in `rows_sites`), one thread a segment and a column, its partial added by
-// the ring's atomic step. (The first realization gave the unresolved row's column one thread over
-// every unresolved site.)
-extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *dx, const uint32_t *rows_sites, const uint32_t *segments, uint32_t count) {
+// An encoding's covector: each row's `Σ_t dx_t` over the sites that opened on it (`E`'s by their own
+// class, `E₋`'s by the site before them, `E₊`'s by the site after; one launch each, `base` the
+// encoding's offset), the sites sorted by row (`rows_sites`) and cut into segments of at most
+// `OUTER_TILE` sites of one row (`segments`, each its row, first and end in `rows_sites`), one thread
+// a segment and a column, its partial added by the ring's atomic step. (The first realization gave
+// the unresolved row's column one thread over every unresolved site.)
+extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *dx, const uint32_t *rows_sites, const uint32_t *segments, uint32_t count, uint64_t base) {
     const uint64_t cells = (uint64_t)count * w.D;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t segment = c / w.D, i = c % w.D;
@@ -1029,7 +1044,7 @@ extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *
             sum += dx[(uint64_t)rows_sites[k] * w.D + i];
         }
         if (sum != 0) {
-            add_wide(g + w.enc + (uint64_t)row * w.D + i, sum);
+            add_wide(g + base + (uint64_t)row * w.D + i, sum);
         }
     }
 }

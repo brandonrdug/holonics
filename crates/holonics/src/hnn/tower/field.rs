@@ -20,7 +20,7 @@
 //! content without place). One constitution `F_Θ` is iterated `K` ticks, `x^(k+1) = F_Θ(x^k)`:
 //!
 //! ```text
-//! open       x⁰_t = E(u_t), or E(∗) where t is unresolved
+//! open       x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)),   u = ∗ where a site is unresolved
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   q_t = Q r̂_t + b_q,   k_t = K r̂_t + b_k,   v_t = V r̂_t + b_v
 //! frame      q̃_t = U_t ⊙ q_t,   k̃_t = U_t ⊙ k_t,   ṽ_t = U_t ⊙ v_t       complex modes, by head
 //! contact    z_ij = 2^(−β) Σ_(m∈h) Re(conj(q̃_im) k̃_jm)                   every pair of sites, both ways
@@ -29,6 +29,19 @@
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a ⊙ b) + b_c
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
 //! ```
+//!
+//! [definition; agent-inferred, November 1] **The opening carries the site's strand contacts.** A
+//! site is a ring of the strand, joined to the sites before and after it by pair contacts, so its
+//! opening face is its own class's row with its two neighbours' rows of the contact encodings
+//! `E₋` and `E₊` (founded at zero: the founded field opens as before and the contacts are learned).
+//! The face of a site is then its word, the address the navigator reads it by: two sites whose
+//! neighbours agree meet through their charts in one tick, so a site can find, anywhere in the
+//! region, the site whose word continues its own, and gather what stands there. Why (the sixth
+//! reading, November 1): after thirteen laps the held answers coded within 0.01 bits a digit
+//! alike beside their own question and beside another problem's, so the field read nothing of
+//! the question; with only its own class at the opening, a site's word reaches its charts only
+//! through a first tick's contact with its neighbours, and finding a site by its word is then a
+//! composition of two learned contacts, which thirteen laps did not form.
 //!
 //! The pairing `Re(conj(q̃_i) k̃_j) = Re(conj(q_i) U_i^* U_j k_j)` turns mode `m` by
 //! `2π (j − i)/n_m`: a turned mode reads the relative place modulo its ring, a still mode reads the
@@ -186,6 +199,8 @@ impl FieldDeclaration {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLayout {
     pub enc: usize,
+    pub before: usize,
+    pub after: usize,
     pub q: usize,
     pub q_bias: usize,
     pub k: usize,
@@ -217,6 +232,8 @@ impl FieldLayout {
             at - len
         };
         let enc = push((a + 1) * dw, FACE_BITS);
+        let before = push((a + 1) * dw, FACE_BITS);
+        let after = push((a + 1) * dw, FACE_BITS);
         let q = push(m2 * dw, MATERIAL_BITS);
         let q_bias = push(m2, FACE_BITS);
         let k = push(m2 * dw, MATERIAL_BITS);
@@ -233,7 +250,7 @@ impl FieldLayout {
         let w_bias = push(dw, FACE_BITS);
         let read = push(a * dw, MATERIAL_BITS);
         let read_bias = push(a, FACE_BITS);
-        Self { enc, q, q_bias, k, k_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, len: at, families }
+        Self { enc, before, after, q, q_bias, k, k_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, len: at, families }
     }
 }
 
@@ -472,16 +489,30 @@ impl Field {
         Ok(())
     }
 
-    /// The region's opening faces `x⁰`.
+    /// A site's encoding row: its class, or the unresolved row.
+    fn row(&self, region: &Region, t: usize) -> usize {
+        if region.unresolved[t] { self.declaration.alphabet } else { region.classes[t] }
+    }
+
+    /// The region's opening faces `x⁰`: each site's row of the encoding with its strand
+    /// neighbours' rows of their own encodings, `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` (a
+    /// region's first site has no site before it, its last none after).
     fn open(&self, region: &Region) -> Vec<i64> {
         let dw = self.declaration.width;
-        let unresolved_row = self.declaration.alphabet;
-        let mut x = vec![0i64; region.classes.len() * dw];
+        let sites = region.classes.len();
+        let mut x = vec![0i64; sites * dw];
         for (t, xt) in x.chunks_exact_mut(dw).enumerate() {
-            let row = if region.unresolved[t] { unresolved_row } else { region.classes[t] };
-            let start = self.layout.enc + row * dw;
-            for (slot, &e) in xt.iter_mut().zip(&self.theta[start..start + dw]) {
-                *slot = e as i64;
+            let mut rows = vec![self.layout.enc + self.row(region, t) * dw];
+            if t > 0 {
+                rows.push(self.layout.before + self.row(region, t - 1) * dw);
+            }
+            if t + 1 < sites {
+                rows.push(self.layout.after + self.row(region, t + 1) * dw);
+            }
+            for start in rows {
+                for (slot, &e) in xt.iter_mut().zip(&self.theta[start..start + dw]) {
+                    *slot += e as i64;
+                }
             }
         }
         x
@@ -874,12 +905,19 @@ impl Field {
                 }
             }
         }
-        // The opening: each site's row of the encoding.
+        // The opening: each site's row of the encoding and its neighbours' rows of theirs.
         for t in 0..sites {
-            let row = if region.unresolved[t] { a } else { region.classes[t] };
-            let start = l.enc + row * dw;
-            for i in 0..dw {
-                g[start + i] += dx[t * dw + i] as i128;
+            let mut rows = vec![l.enc + self.row(region, t) * dw];
+            if t > 0 {
+                rows.push(l.before + self.row(region, t - 1) * dw);
+            }
+            if t + 1 < sites {
+                rows.push(l.after + self.row(region, t + 1) * dw);
+            }
+            for start in rows {
+                for i in 0..dw {
+                    g[start + i] += dx[t * dw + i] as i128;
+                }
             }
         }
         Ok(())
@@ -1235,6 +1273,8 @@ impl Field {
         };
         for row in 0..=a {
             repeat(ol.enc + row * dw, layout.enc + row * dw2, dw, f, &face, true);
+            repeat(ol.before + row * dw, layout.before + row * dw2, dw, f, &face, true);
+            repeat(ol.after + row * dw, layout.after + row * dw2, dw, f, &face, true);
         }
         repeat(ol.q_bias, layout.q_bias, 2 * m, f, &chart_row, true);
         repeat(ol.k_bias, layout.k_bias, 2 * m, f, &chart_row, true);

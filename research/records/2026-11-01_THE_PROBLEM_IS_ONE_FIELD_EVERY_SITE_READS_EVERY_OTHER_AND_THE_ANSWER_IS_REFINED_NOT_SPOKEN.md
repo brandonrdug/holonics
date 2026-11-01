@@ -733,3 +733,94 @@ calculations: words, `<<`, `=`, `>>`, `####`, with numbers that do not come from
 Not adopted yet: a strictly front-first release (it is a pass a site again); release in blocks;
 open sites carrying their previous faces into the next sweep (self-conditioning); revising released
 sites; the returns in tiles and narrow carriers.
+
+## 17. The sixth reading: the answers took GSM8K's shape, and the question was not read
+
+[measured] The sixth reading (receipts in `…_receipts/reading-6/`, count-only) continued the fifth's
+learner from `STATE.4` under §16's repairs: eight more laps, six at width 32, one growth to width 64
+and two more, then the release and the written rules on the same 128 held problems.
+
+| Reading | Value |
+|---|---|
+| The release | completed for the first time: every free answer ended at its own end mark (the free set 44 s, the marked places 158 s, of 240 s); the extent read at the opening cut all 128 regions (37,988 sites past their extents) |
+| The released lengths | 98 to 336 bytes, median 268 (the held answers' median 254) |
+| The held answers beside their neighbours | 2.885 → 2.264 bits a site; the digits 3.464 → 2.776, below the one-byte table (3.46) |
+| The held answers at the opening (the question alone) | 5.16 to 5.70 throughout, never falling |
+| The claim | the first calculation from the question's numbers in 15 of 128 (bar 24), of 110 releases that wrote one; right values at 9 of 399 marked equals |
+| What was written | sentences, `<<a op b=c>>c` calculations and a closing `#### n`; the numbers in them the commonest (`10` written 171 times of 356, 14 distinct values) |
+
+**The question is not read.** A first calculation counts when its operands occur in the question,
+so a field that writes common numbers passes it by coincidence at some rate. f8fe73d39 adds the
+claim's foil (`c_foil`: the same releases read against the next problem's question) and a held read
+of each answer beside the next problem's question (`foil`, `foil_digits`). On the sixth reading's
+release `c_from_question = 15` against `c_foil = 14`. On six rested learners, from the fifth
+reading's first to the sixth's last (`foil.sh`, `foil.txt`), the held answers code alike beside
+their own question and beside another's: within 0.003 bits a site, and within 0.010 bits a digit
+(3.464 against 3.474 on the fifth reading's last learner, 2.776 against 2.784 on the sixth's). The
+gap did not grow over eight laps while every other read fell. Everything the field learned is the
+answer's own text and local order; nothing of it is read from the question.
+
+[agent-inferred] **Why.** Reading a number from the question is finding, in the question, the site
+whose word continues the answer's: the digit after a `1` that stands where the answer's `1` stands.
+The field opened each site on its own class alone (`x⁰_t = E(u_t)`), so a site's word, its
+neighbours, reached its charts only after a first tick's contact had gathered them. Finding a site
+by its word was then a composition of two learned contacts, the first tick's gathering of each
+site's neighbour and the second tick's match on what it gathered, which in the language of
+attention is the induction circuit two layers form. Thirteen laps did not form it.
+
+**The repair: the opening carries the site's strand contacts** (`Field::open`, the module doc). A
+site is a ring of the strand joined by pair contacts to the sites before and after it, and its face
+is its word, the address it is read by (the elementary objects: a source word is its address). The
+opening is
+
+```text
+x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)),   u = ∗ at an unresolved site
+```
+
+with no neighbour past a region's ends, and `E₋`, `E₊` founded at zero (the founded field opens as
+before; the founding's key draws are unchanged). A key then carries the word before it from the
+opening, so a query meets the site whose word continues its own in one contact. Growth repeats `E₋`
+and `E₊` as it repeats `E`. The card opens each site with its neighbours only within its region and
+returns each encoding's covector over its own partition of the sites by the row they opened on.
+
+[measured] **The probes** (host, debug build, `…_receipts/strand-contacts/`). A field of width 16,
+two heads of four modes (two still), 16 contacts and two ticks, founded on the same keys, read
+the last site of small regions unresolved, 16 regions a section, its held code the mean over 64
+withheld regions; the strand-contact opening against the opening on the site's own class alone:
+
+| Probe | Opening on its own class | Strand contacts |
+|---|---|---|
+| The last word equals the one before it (12 words of 10; 500 sections, rate `2^(−8)`) | 0.914 bits | 0.077 bits |
+| Four key–value pairs, then a key and its value unresolved (keys of 8, values of 8; 2 bits knowing only which values are present, 0 recalled); 2,000 sections | 2.088 bits (rate `2^(−8)`, four still modes) | 0.075 (rate `2^(−8)`), 0.130 (four still modes), 0.000 (rate `2^(−6)`, 0.020 at 1,000 sections) |
+| A permutation of ten words, the separator, a cue and its successor (3.17 bits without the copy); 2,000 sections, rates `2^(−6)` and `2^(−9)` | 3.30, 3.31 | 3.31, 3.28 |
+
+On its own class the field learned the neighbour by place, slowly, and never recalled by content:
+it stayed at the code of the values present. With the strand contacts the recall formed in one
+transition (2.43 → 0.33 → 0.02 bits over sections 400 to 1,000 at `2^(−6)`), and the neighbour is
+read at the opening. The permutation probe formed in neither within 2,000 sections; there the cue
+must be matched among ten successors at once, a narrower key at width 16. The recall is kept as
+the law's test (`the_strand_contacts_let_a_value_be_recalled_by_its_key`: under 0.25 bits after
+1,000 sections at `2^(−6)`).
+
+[measured] The rate decides whether a step stands at all. At `2^(−4)` the probes stalled from
+their first sections (the permutation at 3.34 bits after 600 sections, both openings), and the
+certificate's own test (`certified_deposits_lower_the_code`, two fixed regions) deposited once in
+twelve sections: after the first step both the full and the half step raised the code, the
+parabola through them had no minimum, and the step was refused; the moments still read a step of
+the same size the next section, so every later section was refused alike. At `2^(−5)` to `2^(−8)`
+all twelve deposited, and the test now runs at `2^(−6)`. A refused step that does not shrink is a
+stall at any rate too large for the field; the GSM8K learner at `2^(−8)` deposited 394 to 413 of
+413 sections a lap, so it does not stall there.
+
+[agent-inferred] **The seventh reading founds afresh.** A learner saved before the law has no
+contact encodings, and its text is refused by length (an old save is a superseded prototype). The
+seventh reading founds the field on the same declaration and keys, trains within the same 900 s
+(projected about twelve laps, as many as the fifth and sixth readings together), and changes only
+the opening: the rate stays `2^(−8)`, under which the sixth reading deposited 394 to 413 of 413
+sections with few halvings; the probe's faster rate is untested at the GSM8K width. Its readings
+are the claim against its foil (`c_from_question` against `c_foil`) and the held answers' code beside
+their own question against another's (`context` against `foil`) at every lap.
+
+Not adopted: a wider word than one neighbour each side (the second tick composes one more); a
+separate copy path or pointer (a catered routine); a schedule that withholds the answer's
+neighbours to force the question's read (the release states already hold the opening).

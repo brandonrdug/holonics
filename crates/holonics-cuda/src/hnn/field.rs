@@ -79,6 +79,8 @@ struct Words {
     ln2_hi: u64,
     theta: u64,
     enc: u64,
+    enc_before: u64,
+    enc_after: u64,
     q: u64,
     q_bias: u64,
     k: u64,
@@ -354,6 +356,8 @@ impl<'c> CardField<'c> {
             ln2_hi: (ln2 >> 64) as u64,
             theta: theta.device_ptr(),
             enc: l.enc as u64,
+            enc_before: l.before as u64,
+            enc_after: l.after as u64,
             q: l.q as u64,
             q_bias: l.q_bias as u64,
             k: l.k as u64,
@@ -542,7 +546,7 @@ impl<'c> CardField<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         if let Some(g) = g {
-            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, sites, pairs)?;
+            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, sites, pairs)?;
         }
         self.status(&status)?;
         let masses = self.timed(Kind::Copy, || card.fetch(&masses)).map_err(device)?;
@@ -597,7 +601,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], sites: usize, pairs: usize) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], sites: usize, pairs: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -675,42 +679,24 @@ impl<'c> CardField<'c> {
             }
             self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
         }
-        // The opening: each site's row of the encoding, the sites partitioned by row.
-        let mut rows_off = vec![0u32; a + 2];
-        for (t, &c) in classes.iter().enumerate() {
-            let row = if unresolved[t] != 0 { a } else { c as usize };
-            rows_off[row + 1] += 1;
-        }
-        for row in 0..=a {
-            rows_off[row + 1] += rows_off[row];
-        }
-        let mut filled = rows_off.clone();
-        let mut rows_sites = vec![0u32; sites];
-        for (t, &c) in classes.iter().enumerate() {
-            let row = if unresolved[t] != 0 { a } else { c as usize };
-            rows_sites[filled[row] as usize] = t as u32;
-            filled[row] += 1;
-        }
-        // Each row's sites cut into segments of at most `OUTER_TILE`, one thread a segment and a
-        // column.
-        let mut segments: Vec<u32> = Vec::new();
-        for row in 0..=a {
-            let (from, to) = (rows_off[row], rows_off[row + 1]);
-            let mut at = from;
-            while at < to {
-                let end = to.min(at + OUTER_TILE as u32);
-                segments.extend([row as u32, at, end]);
-                at = end;
+        // The opening: each site's row of the encoding and its strand neighbours' rows of theirs, the
+        // sites partitioned by row once for each encoding (a neighbour only within the site's region:
+        // the next site is the region's own when its place is not the first).
+        let row = |t: usize| if unresolved[t] != 0 { a } else { classes[t] as usize };
+        let own: Vec<(usize, u32)> = (0..sites).map(|t| (row(t), t as u32)).collect();
+        let before: Vec<(usize, u32)> = (0..sites).filter(|&t| site_pos[t] > 0).map(|t| (row(t - 1), t as u32)).collect();
+        let after: Vec<(usize, u32)> = (0..sites).filter(|&t| t + 1 < sites && site_pos[t + 1] > 0).map(|t| (row(t + 1), t as u32)).collect();
+        for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
+            let (rows_sites, segments) = encoding_partition(&rows, a + 1);
+            let count = (segments.len() / 3) as u32;
+            if count == 0 {
+                continue;
             }
+            let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
+            let segments_c = self.timed(Kind::Copy, || card.upload(&segments)).map_err(device)?;
+            let (mut gp, mut dxp, mut rsp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), segments_c.device_ptr(), count, base);
+            self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
         }
-        let count = (segments.len() / 3) as u32;
-        if count == 0 {
-            return Ok(());
-        }
-        let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
-        let segments_c = self.timed(Kind::Copy, || card.upload(&segments)).map_err(device)?;
-        let (mut gp, mut dxp, mut rsp, mut sgp, mut count) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), segments_c.device_ptr(), count);
-        self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut sgp), arg(&mut count)])?;
         Ok(())
     }
 
@@ -752,6 +738,36 @@ pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64
 fn contact_shared(span: u32) -> u32 {
     let rows = CONTACT_ROWS as u32;
     2 * 8 * span * TILE_PAD + 8 * rows * span + 8 * rows * KEY_TILE + 16 * rows * 32 + 16 * rows * span
+}
+
+/// An encoding's sites sorted by the row they opened on (`rows` holds each site's row and index, `rows_n`
+/// the encoding's rows), and each row's sites cut into segments of at most `OUTER_TILE` (each its row,
+/// first and end in the sorted sites): one thread a segment and a column.
+fn encoding_partition(rows: &[(usize, u32)], rows_n: usize) -> (Vec<u32>, Vec<u32>) {
+    let mut rows_off = vec![0u32; rows_n + 1];
+    for &(row, _) in rows {
+        rows_off[row + 1] += 1;
+    }
+    for row in 0..rows_n {
+        rows_off[row + 1] += rows_off[row];
+    }
+    let mut filled = rows_off.clone();
+    let mut rows_sites = vec![0u32; rows.len()];
+    for &(row, t) in rows {
+        rows_sites[filled[row] as usize] = t;
+        filled[row] += 1;
+    }
+    let mut segments: Vec<u32> = Vec::new();
+    for row in 0..rows_n {
+        let (from, to) = (rows_off[row], rows_off[row + 1]);
+        let mut at = from;
+        while at < to {
+            let end = to.min(at + OUTER_TILE as u32);
+            segments.extend([row as u32, at, end]);
+            at = end;
+        }
+    }
+    (rows_sites, segments)
 }
 
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
