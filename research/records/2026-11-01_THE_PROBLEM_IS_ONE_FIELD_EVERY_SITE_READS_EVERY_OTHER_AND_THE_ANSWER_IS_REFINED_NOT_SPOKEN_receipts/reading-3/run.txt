@@ -1,0 +1,6 @@
+BIN=4f89e62bdd90f8e1af780befd18d80a894c6e00c4b6e5d07183299ff7c2bdffb at=2026-11-01T07:21:58Z board=1119 MiB laps=1 train_s=251 a_ms=241000 b_ms=446000 release_s=125 text_s=60
+TRAIN_END rc=0 FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15360983040 total=16802250752 batch_budget=10369892352 FIELD_UNSEEN lap=-1 code=6.931 sites=63816 next=- ms=1209 FIELD_LAP lap=0 read=1 sites=1909616 before=3.823 after=3.792 deposited=394/413 halvings=74 next_halved=35 next_refused=128 ms=117070 FIELD_UNSEEN lap=0 code=3.534 sites=63816 next_change=5551353441 next_halvings=1 next_refused=true ms=118279 FIELD_CARD reads=2270 read_ms=51605 returns=413 return_ms=64695 pairs=176968680064 batches=2683 peak_store=4495401536 elapsed_ms=118946 
+RELEASE_FROM STATE.0
+RELEASE_END rc=0 FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15361114112 total=16802250752 batch_budget=10370023424 FIELD_RELEASE free=128 marks=399 withheld=0 refused=0 sweeps=16 released=28709 held=35463 lambda=5821 friction=52530 ms=29601 FIELD_CARD reads=64 read_ms=28425 returns=0 return_ms=0 pairs=74552625344 batches=68 peak_store=10349323552 elapsed_ms=29611  refused=0 batch_refused=0
+TEXT_END rc=0
+BOARD_PEAK_MIB 13372 baseline=1119
