@@ -854,7 +854,7 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
 fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
     move |sweep| {
         let ms = started.elapsed().as_millis();
-        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} open={} resolved={} by_news={} revised={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.open, sweep.resolved, sweep.by_news, sweep.revised, sweep.cut, sweep.cut_sites);
+        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} open={} resolved={} by_news={} revised={} unsettled={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.open, sweep.resolved, sweep.by_news, sweep.revised, sweep.unsettled, sweep.cut, sweep.cut_sites);
         *last = *sweep;
         ms < stop_ms
     }

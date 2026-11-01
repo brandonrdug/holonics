@@ -103,7 +103,9 @@
 //! before it released, and it ends the answer. The released sites are present terrain for the next
 //! sweep, and are themselves refined: each sweep one part of them (every fourth) is read again with
 //! itself open and the rest as it stands, and a site the field now resolves to another class takes
-//! it, until every part is reread with no change. A class is never spoken in order. Every sweep releases a
+//! it. Once the answer is wholly released it refines in rounds, each part reread once, until a
+//! round revises nothing or no fewer sites than the round before. A class is never spoken in
+//! order. Every sweep releases a
 //! site of every open problem, so `S` at the answer's open sites lets every release end; the
 //! exterior bounds its time ([`ReleaseSweep`]).
 //!
@@ -1074,8 +1076,16 @@ impl Field {
     /// released answer sites (every [`REFINE_PARTS`]-th from the answer's first) is read again with
     /// those sites open and every other site as it stands, and a site whose face there resolves
     /// another class takes it (the void, the boundary, is neither revised nor revised into). A
-    /// problem keeps refining after its last site is released until every part has been reread
-    /// with no change. Why (the seventh reading, November 1): released sites were final, so a site
+    /// problem whose every answer site is released refines in rounds of [`REFINE_PARTS`] sweeps,
+    /// each part reread once, and ends at the round that revises nothing (the fixed point) or no
+    /// fewer sites than the round before (the refinement no longer settles: the parts revise each
+    /// other in a cycle, which more rounds would only repeat; [`ReleaseSweep::unsettled`]). The
+    /// revisions of successive rounds then fall strictly to the last, so a released answer refines
+    /// at most one round more than its first round's revisions, within the answer's own length.
+    /// Why the settling (the review of §18, November 1): with a problem ending only at a round of no
+    /// change, two parts that revise each other back and forth would refine until the release's
+    /// sweeps or its time ran out, and spend the release's time on the cycle. Why the refinement
+    /// (the seventh reading, November 1): released sites were final, so a site
     /// released before the sites that inform it, or beside a neighbour released in the same sweep,
     /// was the terrain of every later sweep however the field read it afterwards; runs of one class
     /// grew where each release made its neighbour's lock (two of the three held releases shown were
@@ -1131,13 +1141,13 @@ impl Field {
                 (classes, unresolved, start)
             })
             .collect();
-        // A problem refines while it has an open site, or until every part of its released sites
-        // has been reread since its last change (`quiet`).
-        let mut quiet = vec![0usize; states.len()];
-        let refining = |states: &[(Vec<usize>, Vec<bool>, usize)], quiet: &[usize]| -> Vec<usize> { (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u) || quiet[k] < REFINE_PARTS).collect() };
+        // A problem refines while it has an open site, and once closed until a round of every
+        // part's reread settles it (`rounds`, `refinement_ends`).
+        let mut rounds = vec![Settling::opening(); states.len()];
+        let refining = |states: &[(Vec<usize>, Vec<bool>, usize)], rounds: &[Settling]| -> Vec<usize> { (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u) || !rounds[k].ended).collect() };
         let mut progress = ReleaseSweep::default();
         for done in 0..sweeps {
-            let refine = refining(&states, &quiet);
+            let refine = refining(&states, &rounds);
             progress.done = done;
             progress.live = refine.len();
             progress.open = refine.iter().filter(|&&k| states[k].1.iter().any(|&u| u)).count();
@@ -1148,7 +1158,7 @@ impl Field {
             let live: Vec<usize> = refine.iter().copied().filter(|&k| states[k].1.iter().any(|&u| u)).collect();
             let faces = {
                 let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
-                read(&views)?
+                if views.is_empty() { Vec::new() } else { read(&views)? }
             };
             // Each open problem's first open answer site: after the opening, the one site where its
             // boundary, the void, may be released (every answer site before it released).
@@ -1190,9 +1200,6 @@ impl Field {
                     classes[t] = top;
                     unresolved[t] = false;
                 }
-                if !released.is_empty() {
-                    quiet[k] = 0;
-                }
                 // The region ends at its released void: the sites past it leave.
                 if let Some(end) = (*start..classes.len()).find(|&t| !unresolved[t] && classes[t] == void) {
                     classes.truncate(end + 1);
@@ -1216,7 +1223,7 @@ impl Field {
                 let views: Vec<Region> = reread.iter().map(|(k, open)| Region { classes: &states[*k].0, unresolved: open }).collect();
                 if views.is_empty() { Vec::new() } else { read(&views)? }
             };
-            let mut changed: Vec<usize> = Vec::new();
+            let mut changed: Vec<(usize, usize)> = Vec::new();
             for ((k, open), faces) in reread.iter().zip(&reread_faces) {
                 let (classes, unresolved, _) = &mut states[*k];
                 let mut revised = 0usize;
@@ -1230,20 +1237,31 @@ impl Field {
                     }
                 }
                 progress.revised += revised;
-                if revised > 0 {
-                    changed.push(*k);
-                }
+                changed.push((*k, revised));
             }
+            // The rounds of a closed problem: every part reread once a round, counted from the
+            // sweep its last open site closed.
             for &k in &refine {
-                if changed.contains(&k) {
-                    quiet[k] = 0;
-                } else if !states[k].1.iter().any(|&u| u) {
-                    quiet[k] += 1;
+                let revised = changed.iter().find(|&&(j, _)| j == k).map_or(0, |&(_, n)| n);
+                let round = &mut rounds[k];
+                if states[k].1.iter().any(|&u| u) {
+                    *round = Settling::opening();
+                    continue;
+                }
+                round.sweeps += 1;
+                round.revised += revised;
+                if round.sweeps == REFINE_PARTS {
+                    if refinement_ends(round.revised, round.before) {
+                        round.ended = true;
+                        progress.unsettled += usize::from(round.revised > 0);
+                    } else {
+                        *round = Settling { before: Some(round.revised), ..Settling::opening() };
+                    }
                 }
             }
         }
         // The closing report: the sweeps run and the problems left refining.
-        progress.live = refining(&states, &quiet).len();
+        progress.live = refining(&states, &rounds).len();
         progress.open = states.iter().filter(|s| s.1.iter().any(|&u| u)).count();
         sweep(&progress);
         // The answer as released: up to its first site still unresolved.
@@ -1294,6 +1312,33 @@ pub struct ReleaseSweep {
     pub cut_sites: usize,
     /// The released sites the refinement revised.
     pub revised: usize,
+    /// The released answers whose refinement ended unsettled: a round revised no fewer sites than
+    /// the one before.
+    pub unsettled: usize,
+}
+
+/// A closed problem's refinement round: the sweeps and revisions of the round in course, the
+/// revisions of the round before, and whether the refinement has ended.
+#[derive(Clone, Copy, Debug)]
+struct Settling {
+    sweeps: usize,
+    revised: usize,
+    before: Option<usize>,
+    ended: bool,
+}
+
+impl Settling {
+    fn opening() -> Self {
+        Self { sweeps: 0, revised: 0, before: None, ended: false }
+    }
+}
+
+/// [definition; agent-inferred, November 1] **A released answer refines while it settles**: a round
+/// of every part's reread ends the refinement when it revised nothing (the fixed point) or no fewer
+/// sites than the round before (`before`), so the rounds' revisions fall strictly and the
+/// refinement ends within one round more than its first round's revisions ([`Field::release_with`]).
+fn refinement_ends(revised: usize, before: Option<usize>) -> bool {
+    revised == 0 || before.is_some_and(|b| revised >= b)
 }
 
 /// [definition; agent-inferred, November 1] **The release's order is the news a site's top class

@@ -51,7 +51,7 @@ TRAIN_S=300; RELEASE_S=150; TEXT_S=30
 LAPS=$((TRAIN_S * 1000 / PA)); [ $LAPS -ge 1 ] || { echo "NO_LAP_FITS P_A=$PA"; kill $SMI; exit 1; }
 echo "TIME $(grep -E 'FIELD_TIME_LAP|FIELD_TIME_RELEASES' $O/time.log | tr '\n' ' ') P_A=$PA P_B=$PB laps=$LAPS"
 rm -rf $O/train
-timeout $((TRAIN_S + 30)) $BIN train complete-language train-field $T $DECL 16 $LAPS 8 $PA $PB $((TRAIN_S * 1000)) $O/train > $O/train.log 2>&1
+timeout $((TRAIN_S + 30)) $BIN train complete-language train-field $T $DECL $LAPS 8 $PA $PB $((TRAIN_S * 1000)) $O/train > $O/train.log 2>&1
 echo "TRAIN_END rc=$? $(grep -E 'FIELD_DECLARATION|FIELD_LAP|FIELD_UNSEEN|FIELD_HELD|FIELD_GROW|FIELD_STOPPED|FIELD_CARD|rror|refused' $O/train.log | grep -v FIELD_SECTION | tr '\n' ' ' | cut -c1-12000)"
 if [ -e $O/train/STATE.stopped ]; then S=STATE.stopped; else S=$(ls $O/train | grep -E '^STATE\.[0-9]+$' | sort -t. -k2 -n | tail -1); fi
 [ -n "$S" ] || { echo "NO_STATE"; kill $SMI; exit 1; }

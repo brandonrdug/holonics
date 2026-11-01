@@ -884,8 +884,19 @@ copy needs (a GSM8K operand stands a median of 190 bytes before the answer site 
 - *The release refines*: after each sweep's releases, one part of the released answer sites (every
   fourth from the answer's first; the void, the boundary, excepted) is read again open with the
   rest as it stands, and a site whose face now resolves another class takes it. A problem refines
-  while it has an open site and until its four parts are reread with no change. A sweep reads at
-  most three times (the faces, the question-open prior where nothing resolves, the reread).
+  while it has an open site; once wholly released it refines in rounds, each of its four parts
+  reread once, and ends at the round that revises nothing or no fewer sites than the round before
+  (the parts revising each other in a cycle; counted as `unsettled`), so a released answer refines
+  at most one round more than its first round's revisions. A sweep reads at most three times (the
+  faces, the question-open prior where nothing resolves, the reread).
+
+[agent-inferred] **The review before the probe.** An independent read of the change against the
+host and the card found the probe's training command one argument long (it would have stopped
+after parity, with no state to release), and a refinement that ended only at a round of no change,
+so two parts revising each other back and forth would have spent the release's time on the cycle;
+both are repaired above (`the_refinement_ends_where_it_stops_settling`). It found the ring sets,
+the self-exclusion, the unit power and its adjoint, the founding's draws, `β` and the release's
+boundary equal on the host and the card. A read of no open problem is no longer sent to the card.
 
 [measured] **The founded contact at a question's size** (host, before any learning;
 `founded_contact_shares_at_a_question_s_size` and a removed scratch fixture of the same shape: a

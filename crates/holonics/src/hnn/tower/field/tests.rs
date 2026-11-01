@@ -280,7 +280,8 @@ fn regions_sum_in_any_order() {
 /// sites the field resolves, or the one with the most news, until the void or the last sweep; the
 /// void only at the answer's first open site; and after each sweep's releases, the refinement of one
 /// part of the released answer sites (every [`REFINE_PARTS`]-th), read with that part open and
-/// revised where the field now resolves another class, until every part is reread unchanged.
+/// revised where the field now resolves another class; once every answer site is released, in
+/// rounds of every part's reread, until a round revises nothing or no fewer sites than the one before.
 fn law_release(field: &Field, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Vec<usize> {
     law_release_counted(field, question, answer, sweeps, void).0
 }
@@ -290,10 +291,11 @@ fn law_release_counted(field: &Field, question: &[usize], answer: usize, sweeps:
     let start = question.len();
     let mut classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
     let mut open: Vec<bool> = (0..classes.len()).map(|t| t >= start).collect();
-    let mut quiet = 0usize;
+    // The closed answer's round: its sweeps, its revisions and the round before's.
+    let (mut round, mut round_revised, mut before, mut ended) = (0usize, 0usize, None::<usize>, false);
     let mut revisions = 0usize;
     for sweep in 0..sweeps {
-        if !open.iter().any(|&u| u) && quiet >= REFINE_PARTS {
+        if !open.iter().any(|&u| u) && ended {
             break;
         }
         if open.iter().any(|&u| u) {
@@ -323,7 +325,6 @@ fn law_release_counted(field: &Field, question: &[usize], answer: usize, sweeps:
                 classes[t] = c;
                 open[t] = false;
             }
-            quiet = 0;
             if let Some(end) = (start..classes.len()).find(|&t| !open[t] && classes[t] == void) {
                 classes.truncate(end + 1);
                 open.truncate(end + 1);
@@ -348,10 +349,18 @@ fn law_release_counted(field: &Field, question: &[usize], answer: usize, sweeps:
             }
         }
         revisions += revised;
-        if revised > 0 {
-            quiet = 0;
-        } else if !open.iter().any(|&u| u) {
-            quiet += 1;
+        if open.iter().any(|&u| u) {
+            (round, round_revised, before) = (0, 0, None);
+        } else {
+            round += 1;
+            round_revised += revised;
+            if round == REFINE_PARTS {
+                if round_revised == 0 || before.is_some_and(|b| round_revised >= b) {
+                    ended = true;
+                } else {
+                    (round, round_revised, before) = (0, 0, Some(round_revised));
+                }
+            }
         }
     }
     let end = (start..classes.len()).find(|&t| open[t]).unwrap_or(classes.len());
@@ -396,6 +405,30 @@ fn a_face_resolves_only_a_majority() {
     assert_eq!(resolved(&TowerFace { masses: vec![5, 3, 2], total: 10 }), None, "half is not more than half");
     assert_eq!(resolved(&TowerFace { masses: vec![1, 4, 4], total: 9 }), None);
     assert_eq!(resolved(&TowerFace { masses: vec![1, 9, 1], total: 11 }), Some(1));
+}
+
+/// A released answer refines while it settles: a round ends the refinement when it revises nothing
+/// or no fewer sites than the round before, so any sequence of rounds ends within one round more
+/// than the first round's revisions, a cycle of revisions at its second round.
+#[test]
+fn the_refinement_ends_where_it_stops_settling() {
+    assert!(refinement_ends(0, None));
+    assert!(!refinement_ends(3, None));
+    assert!(!refinement_ends(2, Some(3)));
+    assert!(refinement_ends(3, Some(3)), "a round that revises as many as the last is a cycle");
+    assert!(refinement_ends(4, Some(3)));
+    for rounds in [vec![2usize, 2, 2, 2, 2], vec![5, 4, 3, 2, 1, 0, 7], vec![1, 0], vec![3, 1, 2, 0], vec![9; 20]] {
+        let mut before = None;
+        let mut ran = 0usize;
+        for &revised in &rounds {
+            ran += 1;
+            if refinement_ends(revised, before) {
+                break;
+            }
+            before = Some(revised);
+        }
+        assert!(ran <= rounds[0] + 1, "{rounds:?} ran {ran}");
+    }
 }
 
 /// The grown field reads the old faces exactly, on the framed and the still field, by two and
