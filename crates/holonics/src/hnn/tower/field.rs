@@ -227,19 +227,19 @@ impl FieldDeclaration {
     }
 
     /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff, a mode at a
-    /// time** (the dispersing field's §2.5 and §15.2): each mode keeps its own row, so a mode's pairing
-    /// of two equal words is its own power, `|ŵ_m|²`, which a head's word at unit power over its `2n`
-    /// reals holds at `2` on the mean over its `n` modes; an equal word at the farthest reach pays
-    /// `⌊log₂ reach⌋` bits of falloff and must still outweigh the rest of its support together, at
-    /// most another `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must amplify, with
-    /// `2^(−β)·2 ≥ 2⌈log₂ reach⌉`: `−4` at reading 8's reach of 2,221 (a mode of mean power pairs its
-    /// equal at 32 bits; the falloff at the reach is 11). What it bounds is the mean mode's peak: a
-    /// louder mode is heard sharper, a silent one is near flat over its support. A turned mode
-    /// carries the pairing by its skin decay, so its far counterparts are heard more faintly by design
-    /// (§12). Why the mode's own power (§15.2): the head's sum over its modes was one number a pair, so
-    /// one mode's agreement could not be heard apart from the rest.
+    /// time** (the dispersing field's §2.5 and §15.2): each mode keeps its own row, scored by its lock
+    /// ([`lock`]), whose value at an equal word is half the mode's power, `|ŵ_m|²/2`, which a head's word
+    /// at unit power over its `2n` reals holds at `1` on the mean over its `n` modes; an equal word at the
+    /// farthest reach pays `⌊log₂ reach⌋` bits of falloff and must still outweigh the rest of its support
+    /// together, at most another `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must
+    /// amplify, with `2^(−β) ≥ 2⌈log₂ reach⌉`: `−5` at reading 8's reach of 2,221 (a mode of mean power
+    /// locks its equal at 32 bits; the falloff at the reach is 11). What it bounds is the mean mode's
+    /// peak: a louder mode is heard sharper, a silent one is near flat over its support. A turned mode
+    /// carries the lock by its skin decay, so its far counterparts are heard more faintly by design
+    /// (§12). Why the mode's own row (§15.2): the head's sum over its modes was one number a pair, so one
+    /// mode's agreement could not be heard apart from the rest.
     pub fn score_shift(&self) -> i32 {
-        let (reals, need) = (2u128, 2 * self.reach_bits() as u128);
+        let (reals, need) = (1u128, 2 * self.reach_bits() as u128);
         let mut beta = 0i32;
         if reals >= need {
             while (reals >> (beta + 1)) >= need {
@@ -278,18 +278,18 @@ impl FieldDeclaration {
     }
 
     /// [definition; agent-inferred, November 1] **A series row's bound**, read from the declaration's
-    /// own bounds (§14.11, §15.2), never chosen: a mode's score is at most the gain times `2n` (a head's
-    /// whole power in one mode) above zero and that plus the falloff at the reach below it, so a row's
-    /// whole bits spread over `2·2^(−β)·2n + ⌊log₂ reach⌋ + 2`; a term's face is 62 bits and its
-    /// multiplier 62 (a far source's weight, [`WEIGHT_BITS`]) and `⌈log₂ reach⌉` more for a crowd's
-    /// count; a row holds at most the reach and two crowds an octave, `⌈log₂⌉` of that; a value is at
-    /// most a 64-bit carrier summed over the reach. A realization's carrier is as wide as the exponents
-    /// a row actually holds and never past this bound; a row past it is refused. Owed to #410 with the
-    /// grouped row's equality.
+    /// own bounds (§14.11, §15.2), never chosen: a mode's lock is at most `2^(−β)·n` above zero (half a
+    /// head's whole power in one mode, `|ŵ|² ≤ 2n`) and at most `2^(−β)·3n` below it (`|a||b| + |b|²/2`),
+    /// and the falloff at the reach below that, so a row's whole bits spread over `2^(−β)·4n +
+    /// ⌊log₂ reach⌋ + 2`; a term's face is 62 bits and its multiplier 62 (a far source's weight,
+    /// [`WEIGHT_BITS`]) and `⌈log₂ reach⌉` more for a crowd's count; a row holds at most the reach and two
+    /// crowds an octave, `⌈log₂⌉` of that; a value is at most a 64-bit carrier summed over the reach. A
+    /// realization's carrier is as wide as the exponents a row actually holds and never past this bound;
+    /// a row past it is refused. Owed to #410 with the grouped row's equality.
     pub fn row_bits(&self) -> u32 {
         let reach_bits = self.reach_bits() as u32;
-        let gain = if self.score_shift() >= 0 { (2 * self.modes as u32) >> self.score_shift() } else { (2 * self.modes as u32) << -self.score_shift() };
-        let spread = 2 * gain + (usize::BITS - 1 - self.reach.leading_zeros()) + 2;
+        let gain = if self.score_shift() >= 0 { (4 * self.modes as u32) >> self.score_shift() } else { (4 * self.modes as u32) << -self.score_shift() };
+        let spread = gain + (usize::BITS - 1 - self.reach.leading_zeros()) + 2;
         let terms = (usize::BITS - (self.reach + 2 * reach_bits as usize).leading_zeros()) as u32;
         62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
     }
@@ -839,6 +839,25 @@ pub fn hold_return(g: i128, re: i64, im: i64) -> Result<(i128, i128)> {
     Ok((div_nearest(4 * s * g * re * ii, d * d), div_nearest(-4 * s * g * im * rr, d * d)))
 }
 
+/// [definition; agent-inferred, November 1] **A mode's lock against the source that arrives** (§15.2):
+/// with the receiver's mode `a` and a source `b` (a crowd's summed word over its `count`) carried by the
+/// skin `(D, g)`, the receiver's power less its slip against the arriving face, `(|a|² − |a − D b|²)/2 =
+/// D Re(conj(a) b) − D²|b|²/2` up to the receiver's own `|a|²/2`, which every term of its row shares and
+/// so leaves its shares unchanged; returned as the integer `2·count·D·Re(conj(a) b)·2^g − D²|b|²` on
+/// `2^(−(2g + 32))` (over `2 count²` for a crowd). It is greatest exactly where the arriving face equals
+/// the receiver's: a key fits its lock where the two words agree, mode by mode. Why not the pairing alone
+/// (`D Re(conj(a) b)`, §15.2's first statement): a mode's power is not held to one, so a louder key would
+/// outscore the equal one in its mode's row, the cause the head's unit power repaired (the module doc,
+/// measured November 1: the equal word peaked in 20 of 32 rows), returned mode by mode. The lock is the
+/// pair contact's own slip, `Q = ⟨Δ|Δ⟩` with `Δ = a − D b`; summed over a still head's modes at unit power
+/// it is the head's pairing less a constant.
+fn lock(a: (i128, i128), b: (i128, i128), count: i128, (decay, grain): (i128, u32)) -> Result<i128> {
+    let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+    let pairing = carried((a.0 * b.0).checked_add(a.1 * b.1).and_then(|p| p.checked_mul(2 * count * decay)).and_then(|p| p.checked_mul(1i128 << grain)))?;
+    let power = carried((b.0 * b.0).checked_add(b.1 * b.1).and_then(|p| p.checked_mul(decay * decay)))?;
+    carried(pairing.checked_sub(power))
+}
+
 /// A value carried across a pair by its skin decay `(D, grain)`: `release(D v, grain)` (a still
 /// head's `(1, 0)` is the value itself).
 fn decayed((decay, grain): (i128, u32), v: i64) -> i128 {
@@ -1343,8 +1362,8 @@ impl Field {
                     let d = i.abs_diff(j);
                     for li in 0..n {
                         let decay = self.decay(h, li, d);
-                        let s = decay.0 * (wi[li] as i128 * wj[li] as i128 + wi[n + li] as i128 * wj[n + li] as i128);
-                        let z = fit64(release(s, score_bits + decay.1) - ((octave(d) as i128) << FACE_BITS))?;
+                        let s = lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?;
+                        let z = fit64(release(s, score_bits + 2 * decay.1 + 1) - ((octave(d) as i128) << FACE_BITS))?;
                         series[li].push(self.face(z), w, w, &[decayed(decay, vj[li]), decayed(decay, vj[n + li])]);
                     }
                     row.push(Source { j: j as u32, w, p: vec![0; n] });
@@ -1362,8 +1381,8 @@ impl Field {
                     let mut zs = Vec::with_capacity(n);
                     for li in 0..n {
                         let decay = self.decay(h, li, 1 << level);
-                        let score = decay.0 * (wi[li] as i128 * word[li] + wi[n + li] as i128 * word[n + li]);
-                        let z = fit64(div_nearest(score, (count as i128) << (score_bits + decay.1)) - ((level as i128) << FACE_BITS))?;
+                        let score = lock((wi[li] as i128, wi[n + li] as i128), (word[li], word[n + li]), count as i128, decay)?;
+                        let z = fit64(div_nearest(score, ((count * count) as i128) << (score_bits + 2 * decay.1 + 1)) - ((level as i128) << FACE_BITS))?;
                         let value = [decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li))];
                         series[li].push(self.face(z), (count as u128) << WEIGHT_BITS, 1u128 << WEIGHT_BITS, &value);
                         zs.push(z);
@@ -1779,12 +1798,15 @@ impl Field {
                     for (k, src) in rows[i].iter().enumerate() {
                         let (j, dd) = (src.j as usize, i.abs_diff(src.j as usize));
                         for r in 0..span {
-                            col[j * span + r] += ds[i][k * n + r % n] * self.decay(h, r % n, dd).0 * qh[i * span + r] as i128;
+                            let (dec, g) = self.decay(h, r % n, dd);
+                            col[j * span + r] += ds[i][k * n + r % n] * (((dec * qh[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128);
                         }
                     }
                     for (k, c) in crowds[i].iter().enumerate() {
                         for r in 0..span {
-                            let part = div_nearest(dsc[i][k * n + r % n] * self.decay(h, r % n, 1 << c.level).0 * qh[i * span + r] as i128, c.count as i128);
+                            let (dec, g) = self.decay(h, r % n, 1 << c.level);
+                            let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
+                            let part = div_nearest(dsc[i][k * n + r % n] * (((dec * qh[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean), (c.count * c.count) as i128);
                             crowd_w[c.lo * span + r] += part;
                             crowd_w[(c.hi + 1) * span + r] -= part;
                         }
@@ -1797,9 +1819,9 @@ impl Field {
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
-                        dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
+                        dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back + self.decay(h, 0, 0).1))?;
                         if definite[i] {
-                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread(&crowd_w, i, r), back))?;
+                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread(&crowd_w, i, r), back + self.decay(h, 0, 0).1))?;
                         }
                     }
                 }
