@@ -1,0 +1,1 @@
+WRITTEN dir=$ROOT/.local/wt/field-card/.local/run/dispersing/reading9/release problems=128 a_on_problem=0 b_free_calculations=0 b_free_right=0 c_first_calculations=0 c_from_question=0 b_equals=0/399 met=0/260 never_met=0/139 binary +=0/74 -=0/74 *=0/149 /=0/46 c_foil=0

@@ -1,0 +1,74 @@
+FIELD_COMMAND release-field-text $ROOT/.local/wt/field-card/.local/run/dispersing/crib9/train/STATE.2 3f2601fd5c8db2bb8029144927e8b46085bc9bbc01f576fd2d2805229192d1ae $ROOT/.local/wt/field-card/.local/run/dispersing/crib9/train/CODEC 0a26b3281ea9122b4325faa976006aa43011836f064dbaef389e0df32fe8789d $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab 3 53 20000
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15291973632 total=16802250752 batch_budget=10300882944
+FIELD_RELEASE_SWEEP set=text done=0 live=3 locked=0 open=0 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=9
+FIELD_RELEASE_SWEEP set=text done=1 live=3 locked=0 open=159 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=13
+FIELD_RELEASE_SWEEP set=text done=2 live=3 locked=0 open=159 rung=1 change=15562951 holding=0 soft=3 overturned=156 free=156 cut=0 cut_sites=0 ms=18
+FIELD_RELEASE_SWEEP set=text done=3 live=3 locked=0 open=159 rung=2 change=2746968 holding=0 soft=156 overturned=3 free=159 cut=0 cut_sites=0 ms=22
+FIELD_RELEASE_SWEEP set=text done=4 live=3 locked=0 open=159 rung=2 change=890719 holding=0 soft=159 overturned=0 free=159 cut=0 cut_sites=0 ms=26
+FIELD_RELEASE_SWEEP set=text done=5 live=3 locked=0 open=159 rung=2 change=2262838 holding=0 soft=156 overturned=3 free=162 cut=0 cut_sites=0 ms=30
+FIELD_RELEASE_SWEEP set=text done=6 live=3 locked=0 open=159 rung=4 change=931590 holding=0 soft=159 overturned=0 free=162 cut=0 cut_sites=0 ms=34
+FIELD_RELEASE_SWEEP set=text done=7 live=3 locked=0 open=159 rung=4 change=3054941 holding=0 soft=159 overturned=0 free=162 cut=0 cut_sites=0 ms=38
+FIELD_RELEASE_SWEEP set=text done=8 live=3 locked=156 open=3 rung=4 change=3399712 holding=156 soft=0 overturned=3 free=165 cut=0 cut_sites=0 ms=42
+FIELD_RELEASE_SWEEP set=text done=9 live=3 locked=156 open=3 rung=8 change=1965327 holding=156 soft=3 overturned=0 free=165 cut=0 cut_sites=0 ms=46
+FIELD_RELEASE_SWEEP set=text done=10 live=3 locked=6 open=153 rung=8 change=19982611 holding=6 soft=0 overturned=153 free=318 cut=0 cut_sites=0 ms=50
+FIELD_RELEASE_SWEEP set=text done=11 live=3 locked=6 open=153 rung=8 change=20003162 holding=6 soft=0 overturned=153 free=471 cut=0 cut_sites=0 ms=54
+FIELD_RELEASE_SWEEP set=text done=12 live=3 locked=147 open=12 rung=16 change=7487061 holding=147 soft=3 overturned=9 free=480 cut=0 cut_sites=0 ms=58
+FIELD_RELEASE_SWEEP set=text done=13 live=3 locked=17 open=142 rung=16 change=17905655 holding=17 soft=1 overturned=141 free=621 cut=0 cut_sites=0 ms=62
+FIELD_RELEASE_SWEEP set=text done=14 live=3 locked=5 open=154 rung=16 change=20045890 holding=5 soft=0 overturned=154 free=775 cut=0 cut_sites=0 ms=66
+FIELD_RELEASE_SWEEP set=text done=15 live=3 locked=5 open=154 rung=16 change=20180374 holding=5 soft=0 overturned=154 free=929 cut=0 cut_sites=0 ms=70
+FIELD_RELEASE_SWEEP set=text done=16 live=2 locked=104 open=2 rung=32 change=424981 holding=157 soft=2 overturned=0 free=929 cut=0 cut_sites=0 ms=74
+FIELD_RELEASE_SWEEP set=text done=17 live=2 locked=6 open=100 rung=32 change=13293588 holding=6 soft=0 overturned=100 free=1029 cut=0 cut_sites=0 ms=76
+FIELD_RELEASE_SWEEP set=text done=18 live=2 locked=4 open=102 rung=32 change=13446708 holding=4 soft=0 overturned=102 free=1131 cut=0 cut_sites=0 ms=79
+FIELD_RELEASE_SWEEP set=text done=19 live=2 locked=103 open=3 rung=64 change=396917 holding=103 soft=0 overturned=3 free=1134 cut=0 cut_sites=0 ms=82
+FIELD_RELEASE_SWEEP set=text done=20 live=2 locked=1 open=105 rung=64 change=13761900 holding=1 soft=0 overturned=105 free=1239 cut=0 cut_sites=0 ms=84
+FIELD_RELEASE_SWEEP set=text done=21 live=2 locked=1 open=105 rung=128 change=13761921 holding=1 soft=0 overturned=105 free=1344 cut=0 cut_sites=0 ms=86
+FIELD_RELEASE_SWEEP set=text done=22 live=2 locked=101 open=5 rung=128 change=618947 holding=101 soft=0 overturned=5 free=1349 cut=0 cut_sites=0 ms=89
+FIELD_RELEASE_SWEEP set=text done=23 live=2 locked=6 open=100 rung=128 change=13107208 holding=6 soft=0 overturned=100 free=1449 cut=0 cut_sites=0 ms=91
+FIELD_RELEASE_SWEEP set=text done=24 live=2 locked=5 open=101 rung=256 change=13238280 holding=5 soft=0 overturned=101 free=1550 cut=0 cut_sites=0 ms=94
+FIELD_RELEASE_SWEEP set=text done=25 live=2 locked=101 open=5 rung=256 change=655360 holding=101 soft=0 overturned=5 free=1555 cut=0 cut_sites=0 ms=97
+FIELD_RELEASE_SWEEP set=text done=26 live=2 locked=7 open=99 rung=256 change=12977072 holding=7 soft=0 overturned=99 free=1654 cut=0 cut_sites=0 ms=99
+FIELD_RELEASE_SWEEP set=text done=27 live=2 locked=7 open=99 rung=256 change=12977082 holding=7 soft=0 overturned=99 free=1753 cut=0 cut_sites=0 ms=102
+FIELD_RELEASE_SWEEP set=text done=28 live=2 locked=94 open=12 rung=512 change=1563134 holding=94 soft=0 overturned=12 free=1765 cut=0 cut_sites=0 ms=105
+FIELD_RELEASE_SWEEP set=text done=29 live=2 locked=11 open=95 rung=512 change=12451536 holding=11 soft=0 overturned=95 free=1860 cut=0 cut_sites=0 ms=107
+FIELD_RELEASE_SWEEP set=text done=30 live=2 locked=10 open=96 rung=512 change=12581910 holding=10 soft=0 overturned=96 free=1956 cut=0 cut_sites=0 ms=110
+FIELD_RELEASE_SWEEP set=text done=31 live=2 locked=98 open=8 rung=1024 change=1048596 holding=98 soft=0 overturned=8 free=1964 cut=0 cut_sites=0 ms=112
+FIELD_RELEASE_SWEEP set=text done=32 live=2 locked=15 open=91 rung=1024 change=11927552 holding=15 soft=0 overturned=91 free=2055 cut=0 cut_sites=0 ms=115
+FIELD_RELEASE_SWEEP set=text done=33 live=2 locked=9 open=97 rung=1024 change=12713984 holding=9 soft=0 overturned=97 free=2152 cut=0 cut_sites=0 ms=117
+FIELD_RELEASE_SWEEP set=text done=34 live=2 locked=94 open=12 rung=2048 change=1572864 holding=94 soft=0 overturned=12 free=2164 cut=0 cut_sites=0 ms=120
+FIELD_RELEASE_SWEEP set=text done=35 live=2 locked=14 open=92 rung=2048 change=12058624 holding=14 soft=0 overturned=92 free=2256 cut=0 cut_sites=0 ms=122
+FIELD_RELEASE_SWEEP set=text done=36 live=2 locked=21 open=85 rung=4096 change=11141120 holding=21 soft=0 overturned=85 free=2341 cut=0 cut_sites=0 ms=124
+FIELD_RELEASE_SWEEP set=text done=37 live=2 locked=96 open=10 rung=4096 change=1310720 holding=96 soft=0 overturned=10 free=2351 cut=0 cut_sites=0 ms=127
+FIELD_RELEASE_SWEEP set=text done=38 live=2 locked=17 open=89 rung=4096 change=11665408 holding=17 soft=0 overturned=89 free=2440 cut=0 cut_sites=0 ms=130
+FIELD_RELEASE_SWEEP set=text done=39 live=2 locked=17 open=89 rung=8192 change=11665408 holding=17 soft=0 overturned=89 free=2529 cut=0 cut_sites=0 ms=132
+FIELD_RELEASE_SWEEP set=text done=40 live=2 locked=95 open=11 rung=8192 change=1441792 holding=95 soft=0 overturned=11 free=2540 cut=0 cut_sites=0 ms=134
+FIELD_RELEASE_SWEEP set=text done=41 live=2 locked=21 open=85 rung=8192 change=11141122 holding=21 soft=0 overturned=85 free=2625 cut=0 cut_sites=0 ms=137
+FIELD_RELEASE_SWEEP set=text done=42 live=2 locked=21 open=85 rung=16384 change=11141122 holding=21 soft=0 overturned=85 free=2710 cut=0 cut_sites=0 ms=139
+FIELD_RELEASE_SWEEP set=text done=43 live=2 locked=94 open=12 rung=16384 change=1572864 holding=94 soft=0 overturned=12 free=2722 cut=0 cut_sites=0 ms=141
+FIELD_RELEASE_SWEEP set=text done=44 live=2 locked=21 open=85 rung=16384 change=11141120 holding=21 soft=0 overturned=85 free=2807 cut=0 cut_sites=0 ms=144
+FIELD_RELEASE_SWEEP set=text done=45 live=2 locked=19 open=87 rung=16384 change=11403264 holding=19 soft=0 overturned=87 free=2894 cut=0 cut_sites=0 ms=146
+FIELD_RELEASE_SWEEP set=text done=46 live=2 locked=90 open=16 rung=32768 change=2097152 holding=90 soft=0 overturned=16 free=2910 cut=0 cut_sites=0 ms=148
+FIELD_RELEASE_SWEEP set=text done=47 live=2 locked=26 open=80 rung=32768 change=10485760 holding=26 soft=0 overturned=80 free=2990 cut=0 cut_sites=0 ms=150
+FIELD_RELEASE_SWEEP set=text done=48 live=2 locked=23 open=83 rung=32768 change=10878976 holding=23 soft=0 overturned=83 free=3073 cut=0 cut_sites=0 ms=153
+FIELD_RELEASE_SWEEP set=text done=49 live=2 locked=92 open=14 rung=65536 change=1835008 holding=92 soft=0 overturned=14 free=3087 cut=0 cut_sites=0 ms=155
+FIELD_RELEASE_SWEEP set=text done=50 live=2 locked=33 open=73 rung=65536 change=9568256 holding=33 soft=0 overturned=73 free=3160 cut=0 cut_sites=0 ms=157
+FIELD_RELEASE_SWEEP set=text done=51 live=2 locked=29 open=77 rung=65536 change=10092544 holding=29 soft=0 overturned=77 free=3237 cut=0 cut_sites=0 ms=160
+FIELD_RELEASE_SWEEP set=text done=52 live=2 locked=84 open=22 rung=131072 change=2883584 holding=84 soft=0 overturned=22 free=3259 cut=0 cut_sites=0 ms=162
+FIELD_RELEASE_SWEEP set=text done=53 live=2 locked=88 open=71 rung=131072 change=9306112 holding=35 soft=0 overturned=71 free=3330 cut=0 cut_sites=0 ms=164
+FIELD_PROMPT 0
+hamu lova rixogi hapepe 171 muvamu haxo xoyi pewe hahaza ha rideki ri yiloki mu tuza zacu cuso baba ri mutu na mu ricumu 367 muzaza yi bagipe we cuweso lohade fedegi xotucu loba vamu felova ha 304 lona fegijo ba pe vava cusotu ki murimu ri sogi pepe joyi tuki ki nasocu tuvaza kiyi kitutu giwe wesoza xoxo xoki cuweyi va loxo kiba na vakimu ki ri na vawena?
+FIELD_ANSWER 0 sites=53 open=34 free_circulation=1532 bound_circulation=19 lock_margin_bits_quartiles=8674/58498/84582/95888/167204 rungs=16384:3,32768:4,65536:5,131072:7 ridden=1:2,2:3,4:3,8:3,16:4,32:3,64:3,128:2,256:4,512:3,1024:3,2048:2,4096:3,8192:4,16384:3,32768:3,65536:3,131072:2
+░ba░ >i#░░░░░░░░░░░░░░░░░░░░░░░░░░░░░##░░░ i#i##i#i#i
+
+FIELD_PROMPT 1
+mu vawepe debacu ritu haza dexojo xogi gi zaweso muha pexo fegi deyi 379 jobaba dekiza ba sojo tujo ki ki gibaki tubari xoxo deba cu kigixo navaso weba riso so kigi xolo xojoba ba yihana cuki curi ha hazagi jorimu tuki halo deyiyi ri va gibayi deso kiyiza valotu cu gitumu vava na navava tu vadeva va tude tu hapewe ripe 665 we sogi hahalo baha yilofe tuvalo vababa jori ri sogi mu ha so xo jo?
+FIELD_ANSWER 1 sites=53 open=0 free_circulation=311 bound_circulation=1 lock_margin_bits_quartiles=6/11/11/12/16 rungs=8:1,16:52 ridden=1:2,2:3,4:3,8:3,16:5
+####################################################e
+
+FIELD_PROMPT 2
+ha cude va va zava 55 gi wemu lonayi sonagi tu za xozafe kiba lo mumu gituna rijo yiriri va ba femu gisona fe ri vadede yiyi tuna tuha va mu weyicu yiri de fe so yi bacuba lonacu cude culo so gigipe we va hahaha bafe riso tu 1 riki we badeba peperi 29 deba mu bamu ba zaxoba logi tu ba jo vajoza tuba baha jo za kisoyi gi cuvaba peba turife?
+FIELD_ANSWER 2 sites=53 open=37 free_circulation=1487 bound_circulation=16 lock_margin_bits_quartiles=9150/53206/81394/114192/232616 rungs=128:1,256:1,2048:3,4096:1,8192:1,65536:3,131072:6 ridden=1:2,2:3,4:3,8:3,16:4,32:3,64:2,128:4,256:3,512:3,1024:3,2048:2,4096:4,8192:2,16384:4,32768:3,65536:3,131072:2
+#░░░░░░░░░░░░░░░░░░░░░░░░░░░░░##░i░##░░i░##░░░#i#i#i 
+
+FIELD_RELEASE_TEXT problems=3 sweeps=53 live=2 open=71 rung=131072 stopped=false ms=164
+FIELD_CARD reads=53 read_ms=115 returns=0 return_ms=0 pairs=98349530 batches=53 peak_store=11707620 landmarks=0 landmark_ms=0 elapsed_ms=165
+MEASURE lap=crib9 rc=0 wall_s=0.4 peak_rss_kib=191788

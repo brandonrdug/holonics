@@ -1,0 +1,145 @@
+FIELD_COMMAND release-field $ROOT/.local/wt/field-card/.local/run/dispersing/reading9/train/STATE.2 a9f080ea9fe74cebca2e808fa4df2366ee2d589f9b256a686304347d1fb9d0df $ROOT/.local/wt/field-card/.local/run/dispersing/reading9/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa 128 1229 130000 $ROOT/.local/wt/field-card/.local/run/dispersing/reading9/release
+FIELD_RELEASE_SWEEP set=free done=0 live=128 locked=0 open=0 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=15
+FIELD_RELEASE_SWEEP set=free done=1 live=128 locked=0 open=157312 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=2086
+FIELD_RELEASE_SWEEP set=free done=2 live=128 locked=0 open=157312 rung=1 change=360395969 holding=0 soft=157312 overturned=0 free=0 cut=0 cut_sites=0 ms=4867
+FIELD_RELEASE_SWEEP set=free done=3 live=128 locked=0 open=157312 rung=2 change=184156123 holding=0 soft=157312 overturned=0 free=0 cut=0 cut_sites=0 ms=7713
+FIELD_RELEASE_SWEEP set=free done=4 live=128 locked=157184 open=128 rung=2 change=120562833 holding=157184 soft=128 overturned=0 free=0 cut=0 cut_sites=0 ms=10413
+FIELD_RELEASE_SWEEP set=free done=5 live=128 locked=157184 open=128 rung=2 change=131812288 holding=157184 soft=128 overturned=0 free=0 cut=0 cut_sites=0 ms=13028
+FIELD_RELEASE_SWEEP set=free done=6 live=128 locked=157184 open=128 rung=4 change=82799808 holding=157184 soft=128 overturned=0 free=0 cut=0 cut_sites=0 ms=15652
+FIELD_RELEASE_SWEEP set=free done=7 live=0 locked=157312 open=0 rung=4 change=152280972 holding=157312 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=18168
+FIELD_RELEASE_ONE_RECEIPT problem=0 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=1 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=2 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=3 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=4 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=5 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=6 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=7 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=8 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=9 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=10 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=11 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=12 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=13 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=14 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=15 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=16 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=17 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=18 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=19 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=20 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=21 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=22 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=23 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=24 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=25 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=26 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=27 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=28 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=29 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=30 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=31 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=32 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=33 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=34 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=35 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=36 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=37 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=38 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=39 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=40 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=41 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=42 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=43 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=44 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=45 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=46 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=47 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=48 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=49 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=50 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=51 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=52 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=53 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=54 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=55 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=56 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=57 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=58 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=59 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=60 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=61 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=62 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=63 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=64 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=65 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=66 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=67 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=68 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=69 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=70 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=71 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=72 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=73 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=74 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=75 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=76 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=77 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=78 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=79 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=80 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=81 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=82 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=83 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=84 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=85 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=86 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=87 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=88 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=89 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=90 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=91 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=92 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=93 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=94 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=95 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=96 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=97 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=98 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=99 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=100 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=101 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=102 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=103 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=104 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=105 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=106 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=107 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=108 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=109 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=110 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=111 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=112 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=113 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=114 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=115 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=116 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=117 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=118 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=119 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=120 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=121 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=122 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=123 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=124 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=125 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=126 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_ONE_RECEIPT problem=127 sites=1229 open=0 free_circulation=0 bound_circulation=1229 lock_margin_bits_quartiles=4/4/4/4/4 rungs=2:1228,4:1 ridden=1:2,2:3,4:2
+FIELD_RELEASE_RECEIPTS problems=128 locked_whole=128 open_sites=0 free_circulation=0 bound_circulation=157312 lock_margin_bits_quartiles=4/4/4/4/4 lock_rungs=2:157184,4:128 landmark_problems=0 landmark_digits=0 landmark_on_question_digit=0 landmark_same_class=0 landmark_ms=0
+FIELD_RELEASE_SWEEP set=marks done=0 live=399 locked=0 open=0 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=18320
+FIELD_RELEASE_SWEEP set=marks done=1 live=399 locked=0 open=419804 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=24960
+FIELD_RELEASE_SWEEP set=marks done=2 live=399 locked=0 open=419804 rung=1 change=945716113 holding=0 soft=419804 overturned=0 free=0 cut=0 cut_sites=0 ms=33549
+FIELD_RELEASE_SWEEP set=marks done=3 live=399 locked=0 open=419804 rung=2 change=482822567 holding=0 soft=419804 overturned=0 free=0 cut=0 cut_sites=0 ms=42620
+FIELD_RELEASE_SWEEP set=marks done=4 live=0 locked=419804 open=0 rung=2 change=329310979 holding=419804 soft=0 overturned=0 free=0 cut=0 cut_sites=0 ms=50882
+FIELD_RELEASE free=128 marks=399 withheld=0 refused=0 sweeps=1229 stop_ms=130000 free_sweeps=7 free_live=0 free_open=0 free_rung=4 free_stopped=false marks_sweeps=4 marks_live=0 marks_open=0 marks_rung=2 marks_stopped=false released=157312 held=35463 lambda=5809 friction=181157 ms=50941
+FIELD_CARD reads=11 read_ms=14399 returns=0 return_ms=0 pairs=23340829964 batches=11 peak_store=6626940756 landmarks=0 landmark_ms=0 elapsed_ms=50968

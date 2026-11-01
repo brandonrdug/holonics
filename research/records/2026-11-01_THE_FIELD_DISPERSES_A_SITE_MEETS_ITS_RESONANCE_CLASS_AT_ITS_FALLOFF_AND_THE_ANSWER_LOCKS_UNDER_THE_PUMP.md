@@ -460,3 +460,46 @@ merge faces that fill loops are the algebraic cycles the compression keeps.
 Of the winding guide's objects this adds the **cell holonomy** to what the build touches (the bound
 circulation is a loop's fixed charge) and keeps the **tower thread** attached (the skin decay is each
 ring's own reach on the tower).
+
+## 13. The crib probe and the ninth reading failed: the field learns slower, and the release locks the commonest byte
+
+[measured] Both runs at commit `66d1539d1` on the RTX 4080 SUPER under the card lock, reading 8's
+declaration, keys, section and rate; receipts `…_receipts/crib9/` and `…_receipts/reading9/`
+(count-only; the crib's texts are synthetic).
+
+- **Parity** held at both widths before each run (crib: 9 reads a width and 4 releases; GSM8K: one
+  section, the withheld read and 4 releases; every face, covector, learner and release equal).
+- **The crib probe** (deadline 900 s, ran 73 s): 0 of 0 first calculations written (bar 24 of 126). The
+  learner's withheld code went 5.46 → 4.54 → 4.55 → 4.55 bits over three laps, the second growth was
+  held and the run ended; the context read 4.56 bits (§19's law: 2.88 after two laps, 1.93 after
+  ten). 205 of 248 held steps were refused in the second lap. The release never resolved a void at the
+  opening (no extent cut); 73 of 128 answers locked whole, 55 ended with 2,090 open sites, and from
+  sweep 10 the open sites overturned every sweep (free circulation 108,128).
+- **Reading 9** (deadline 900 s, ran 309 s): 0 of 0 first calculations (bar 24 of 128). Three laps
+  (57, 59 and 93 s, the third grown), the withheld code 5.61 → 5.62 → 5.44 bits (reading 8: 3.94, 3.26,
+  2.98), the context read 5.46 (reading 8: 3.26 after two laps). The release never resolved a void at
+  the opening, and every one of the 128 answers locked whole within 7 sweeps at rung 2, all 1,229 sites
+  at the space byte, each lock's margin 4 bits (bound circulation 157,312, free 0). The three held
+  releases shown were 1,229 spaces each.
+- **Pairs.** One read of every section of a GSM8K lap meets 4.46 × 10⁹ pairs, projected from the opening
+  sections (every site against every other: 31.0 × 10⁹), but the lap took 57 s against reading 8's
+  48.8 s: the support's gather costs more a pair than the tiled all-pairs contact did.
+
+Located causes, each the next loop's subject:
+
+1. **The held step was judged on the opening.** The build read the held step on the next section's
+   masked regions and its second sweeps' first reads, every answer site on the unresolved row, a state
+   training never compares; 205 of 248 steps were refused in the crib's second lap and its withheld code
+   stood still. Repaired in the next build: the step is read on the masked regions.
+2. **Training's signal halved.** Half the regions are second sweeps, every answer site open on a soft
+   mixture of a near-flat read-1 face, so half the compared sites carry little of the answer's own
+   context; the passage's own code fell 4.74 → 4.27 bits a lap on GSM8K against reading 8's 3.94 → 3.30.
+3. **The release meets states training never compares.** Training reads the second sweep at `β = 1`;
+   once the pump sharpens the mixtures toward the field's own tops (not the masks' true classes), the
+   faces flip together: on the crib every site locked at sweep 8, the pump doubled, and the whole answer
+   overturned at sweep 10 and kept overturning. §5's argument that later sweeps lie between the masks
+   and the second sweep fails where the tops are wrong.
+4. **The opening's interior is one state.** Every interior answer site opens on one word, so it shares
+   one class and meets the same question sites; the falloff and the skin set them apart only by their
+   distances, the void is never resolved at the opening, and on GSM8K every interior site locked at the
+   commonest byte.

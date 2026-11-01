@@ -1,0 +1,16 @@
+FIELD_COMMAND train-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 6 8 82224 328896 510000 $ROOT/.local/wt/field-card/.local/run/dispersing/reading9/train
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=25306
+FIELD_HELD lap=-1 answer=6.931 digits=6.931 text=6.931 classes=35591 context=6.931 context_digits=6.931 context_text=6.931 context_classes=35591 foil=6.931 foil_digits=6.931 foil_text=6.931 ms=780
+FIELD_UNSEEN lap=-1 code=6.931 sites=36763 next=- ms=1141
+FIELD_LAP lap=0 read=1 sites=2678906 before=4.742 after=4.718 deposited=352/413 halvings=71 next_halved=3 next_refused=187 ms=56802
+FIELD_UNSEEN lap=0 code=5.609 sites=36763 next=- ms=57944
+FIELD_HELD lap=0 answer=5.647 digits=6.487 text=5.483 classes=35591 context=5.629 context_digits=6.462 context_text=5.466 context_classes=35591 foil=5.629 foil_digits=6.462 foil_text=5.466 ms=58882
+FIELD_LAP lap=1 read=2 sites=2690700 before=4.271 after=4.265 deposited=320/413 halvings=98 next_halved=3 next_refused=150 ms=58924
+FIELD_UNSEEN lap=1 code=5.619 sites=36763 next_change=-503016314 next_halvings=0 next_refused=false ms=117807
+FIELD_HELD lap=1 answer=5.698 digits=6.618 text=5.518 classes=35591 context=5.640 context_digits=6.530 context_text=5.466 context_classes=35591 foil=5.640 foil_digits=6.530 foil_text=5.466 ms=118706
+FIELD_GROW lap=1 width=64 heads=8 contacts=64 rate=9 material=68922 ms=118710
+FIELD_LAP lap=2 read=3 sites=2617580 before=4.258 after=4.242 deposited=325/413 halvings=124 next_halved=13 next_refused=145 ms=92885
+FIELD_UNSEEN lap=2 code=5.442 sites=36763 next=- ms=211595
+FIELD_HELD lap=2 answer=5.485 digits=6.338 text=5.319 classes=35591 context=5.456 context_digits=6.304 context_text=5.290 context_classes=35591 foil=5.456 foil_digits=6.304 foil_text=5.290 ms=213252
+FIELD_LAPS_HELD lap=3 reason=time left=296748 bound=328896 ms=213252
+FIELD_CARD reads=5339 read_ms=92300 returns=1239 return_ms=74619 pairs=194587235594 batches=6578 peak_store=5170981256 landmarks=0 landmark_ms=0 elapsed_ms=213254
