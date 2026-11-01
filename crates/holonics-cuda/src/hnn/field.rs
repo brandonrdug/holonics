@@ -1,22 +1,27 @@
-//! **The field's card realization** (`holonics::hnn::tower::field`, #404, #407; record
+//! **The field's card realization** (`holonics::hnn::tower::field`, #404, #407; records
 //! `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`,
-//! §7).
+//! §7, and `2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP`,
+//! §6).
 //!
 //! [definition; agent-inferred, November 1] `CardField` implements [`FieldRealization`]: a section's
 //! regions read forward through the `K` ticks of the one constitution and returned exactly, and the
 //! certificate's rereads, bit for bit the host's [`holonics::hnn::tower::field::HostField`]
 //! (`kernels/field.cu`). The work is laid out as the field is: a site is its global index in a
 //! batch of regions, each region keeping its own length (no region is padded to another's), a
-//! contact row is a head and a receiving site (one warp a row, its lanes over the region's sites), and
-//! a region's weights `e_ij` are its own block of the weight store. The material, the regions'
-//! classes and resolutions cross to the card; the faces of the unresolved sites and the covector
-//! cross back. Every tick's carriers stay on the card through the reverse.
+//! contact row is a head and a receiving site (one warp a row, its lanes over the site's support:
+//! its near field and its resonance class, listed on the card each tick by a stable counting sort),
+//! and a region's weights `e_ij` are its own block of the weight store, written and read only on the
+//! support. The material, the regions' classes, resolutions and carried mixtures cross to the card;
+//! the faces (or the logits) of the unresolved sites and the covector cross back. Every tick's
+//! carriers stay on the card through the reverse.
 //!
-//! [agent-inferred, November 1] **Memory: the weights are kept, the regions batched by the card's
-//! measured memory.** A region of `S` sites holds `H·S²` weights on `u64` a tick, and the reverse
-//! reads them twice (the values' and the contact's returns), so they are kept through the reverse
-//! rather than recomputed (a recompute would rerun every row's exponentials in two more passes);
-//! the contact's return `δs_ij` is held for one head at a time (`S²` on 128 bits). A section's
+//! [agent-inferred, November 1] **Memory: the weights are kept at their dense address, the regions
+//! batched by the card's measured memory.** A region of `S` sites reserves `H·S²` weights on `u64` a
+//! kept tick, the address `[i][j]` a column's return reads `e_ij` at without an index; only the
+//! support's entries are written and read, so the time follows the pairs met, and the reservation
+//! is the most a region's classes can ask (every site of one class). The reverse reads them twice
+//! (the values' and the contact's returns), so they are kept rather than recomputed; the contact's
+//! return `δs_ij` is held for one head at a time (`S²` on 128 bits). A section's
 //! regions are read in batches whose every allocation (the weights, the contact's return and each
 //! site's carriers) fits the batch budget, the card's free memory at the open less a margin for the
 //! driver, never past the 12 GB the runs keep to.
@@ -25,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldRealization, Region};
+use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRealization, Region, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace};
 
 use crate::cuda::{Dim3, Module};
@@ -34,12 +39,6 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
-/// The receiving rows a block of the contact reads together, a warp a row (`CONTACT_ROWS` in
-/// `kernels/field.cu`).
-const CONTACT_ROWS: usize = 8;
-/// The keys a contact tile holds and its padded stride (`KEY_TILE`, `TILE_PAD`).
-const KEY_TILE: u32 = 32;
-const TILE_PAD: u32 = 33;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The sites a thread of a covector sum takes (`OUTER_TILE` in `kernels/field.cu`).
@@ -67,7 +66,10 @@ struct Words {
     f: u32,
     a: u32,
     frames: u32,
-    beta: u32,
+    beta: i32,
+    ctrits: u32,
+    nclasses: u32,
+    dsbits: u32,
     m: u32,
     m2: u32,
     span: u32,
@@ -83,8 +85,6 @@ struct Words {
     enc_after: u64,
     q: u64,
     q_bias: u64,
-    k: u64,
-    k_bias: u64,
     v: u64,
     v_bias: u64,
     out: u64,
@@ -98,7 +98,6 @@ struct Words {
     read: u64,
     read_bias: u64,
     rq: u64,
-    rk: u64,
     rv: u64,
     rout: u64,
     ra: u64,
@@ -108,6 +107,8 @@ struct Words {
     phasor: u64,
     ring_off: u64,
     ring_n: u64,
+    decay: u64,
+    dreach: u64,
     roots: u64,
     site_region: u64,
     site_pos: u64,
@@ -115,12 +116,18 @@ struct Words {
     region_eoff: u64,
     classes: u64,
     unresolved: u64,
+    mix_off: u64,
+    mix_class: u64,
+    mix_share: u64,
     status: u64,
+    met: u64,
     x: u64,
     qkv: u64,
     qf: u64,
-    kf: u64,
     vf: u64,
+    cls: u64,
+    class_off: u64,
+    members: u64,
     e: u64,
     mass: u64,
     y: u64,
@@ -136,32 +143,41 @@ fn arg<T>(v: &mut T) -> *mut c_void {
     (v as *mut T).cast()
 }
 
-/// The card's time on the field: forwards (reads), returns, their wall time and the site pairs read.
+/// The card's time on the field: forwards (reads), returns, their wall time and the site pairs met.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FieldTimes {
     pub reads: u64,
     pub read_ns: u128,
     pub returns: u64,
     pub return_ns: u128,
-    /// The site pairs `Σ H S²` over every tick of every read.
+    /// The site pairs the contact met, `Σ |S_i^h|` over every row, head and tick of every read
+    /// (counted on the card).
     pub pairs: u128,
     pub batches: u64,
     /// The largest batch's counted allocations (weights, contact return and per-site carriers), in
     /// octets.
     pub peak_store: u64,
+    /// The landmark reads ([`FieldRealization::read_landmarks`]) and their wall time, apart from the
+    /// reads and pairs above.
+    pub landmarks: u64,
+    pub landmark_ns: u128,
 }
 
 /// One tick's carriers on the card.
 struct Tick<'c> {
     read: CardBuffer<'c, i32>,
     scale: CardBuffer<'c, i128>,
+    /// The word and the value, `[t][2·2M]`.
     qkv: CardBuffer<'c, i64>,
     qf: CardBuffer<'c, i64>,
-    kf: CardBuffer<'c, i64>,
     vf: CardBuffer<'c, i64>,
-    /// The framed probe's and key's powers `[h][t]`, the ratios `field_unit` reads them as.
+    /// The framed word's powers `[h][t]`, the ratios `field_unit` reads it as.
     qscale: CardBuffer<'c, i128>,
-    kscale: CardBuffer<'c, i128>,
+    /// The resonance classes `[h][t]`, each region's class offsets `[h][r][2^b + 1]` and members
+    /// `[h][t]` (`field_classes`).
+    cls: CardBuffer<'c, u32>,
+    class_off: CardBuffer<'c, u32>,
+    members: CardBuffer<'c, u32>,
     e: CardBuffer<'c, u64>,
     mass: CardBuffer<'c, u64>,
     y: CardBuffer<'c, i64>,
@@ -170,7 +186,7 @@ struct Tick<'c> {
     pa: CardBuffer<'c, i64>,
     pb: CardBuffer<'c, i64>,
     pc: CardBuffer<'c, i64>,
-    /// The tick's carrier widths: the binary lengths of its largest framed probe, key and value.
+    /// The tick's carrier width: the binary length of its largest unit word.
     bits: CardBuffer<'c, u32>,
 }
 
@@ -286,14 +302,12 @@ impl<'c> CardField<'c> {
         rows.div_ceil((THREADS / 32) as u64).clamp(1, 1 << 20) as u32
     }
 
-    /// A grid striding `sites` with one block every 32 sites (a lane a site, the block's warps
-    /// sharing its sums).
-    fn blocks_of_32(sites: u64) -> u32 {
-        sites.div_ceil(32).clamp(1, 1 << 20) as u32
-    }
 
-    /// Each region's faces and, when `returning`, the covector over the regions.
-    fn run(&mut self, field: &Field, regions: &[Region], returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+    /// Each region's faces (and their logits when `logits`) and, when `returning`, the covector
+    /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
+    /// region read ([`FieldRealization::read_landmarks`]).
+    #[allow(clippy::type_complexity)]
+    fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows)> {
         let d = field.declaration;
         for region in regions {
             if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
@@ -304,6 +318,12 @@ impl<'c> CardField<'c> {
             }
             if region.classes.iter().any(|&c| c >= d.alphabet) {
                 return Err(TowerError::Refused("a region's class outside the field's alphabet"));
+            }
+            if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's carried faces that are not one a site"));
+            }
+            if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
+                return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
             }
         }
         let card = self.card;
@@ -326,6 +346,12 @@ impl<'c> CardField<'c> {
             ring_off.push(0);
             ring_n.push(1);
         }
+        // The skin decays, `[slot][d]` with stride the reach (one word where no slot is turned).
+        let mut decay: Vec<i64> = field.decays().iter().flatten().copied().collect();
+        if decay.is_empty() {
+            decay.push(0);
+        }
+        let decay_card = self.timed(Kind::Copy, || card.upload(&decay)).map_err(device)?;
         let roots: Vec<u64> = field.exponential().roots().iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
         let phasor = self.timed(Kind::Copy, || card.upload(&phasor)).map_err(device)?;
         let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
@@ -338,6 +364,7 @@ impl<'c> CardField<'c> {
         // against the same budget.
         let face_octets = Some(roots.len()).filter(|&digits| digits < 61).map(|digits| 8u64 << digits).filter(|&o| o < self.budget).ok_or(TowerError::Refused("the exponential's resident face passes the card's batch budget"))?;
         let face = self.timed(Kind::Alloc, || card.alloc::<u64>(1usize << roots.len())).map_err(device)?;
+        let met = self.timed(Kind::Alloc, || card.zeroed::<u64>(1)).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
@@ -351,6 +378,9 @@ impl<'c> CardField<'c> {
             a: a as u32,
             frames: d.frames as u32,
             beta: d.score_shift(),
+            ctrits: d.class_trits() as u32,
+            nclasses: d.classes() as u32,
+            dsbits: d.contact_return_bits(),
             m: m as u32,
             m2: m2 as u32,
             span: (2 * n) as u32,
@@ -363,8 +393,6 @@ impl<'c> CardField<'c> {
             enc_after: l.after as u64,
             q: l.q as u64,
             q_bias: l.q_bias as u64,
-            k: l.k as u64,
-            k_bias: l.k_bias as u64,
             v: l.v as u64,
             v_bias: l.v_bias as u64,
             out: l.out as u64,
@@ -378,7 +406,6 @@ impl<'c> CardField<'c> {
             read: l.read as u64,
             read_bias: l.read_bias as u64,
             rq: reach(l.q, m2 * dw),
-            rk: reach(l.k, m2 * dw),
             rv: reach(l.v, m2 * dw),
             rout: reach(l.out, dw * m2),
             ra: reach(l.a, f * dw),
@@ -388,7 +415,10 @@ impl<'c> CardField<'c> {
             phasor: phasor.device_ptr(),
             ring_off: ring_off.device_ptr(),
             ring_n: ring_n.device_ptr(),
+            decay: decay_card.device_ptr(),
+            dreach: d.reach as u64,
             roots: roots_card.device_ptr(),
+            met: met.device_ptr(),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card.
@@ -397,10 +427,16 @@ impl<'c> CardField<'c> {
         words.face = face_ptr;
         let g = if returning { Some(self.timed(Kind::Alloc, || card.zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         // The batches: whole regions in order, each batch's every allocation within the budget.
-        let octets = |sites: usize| region_octets(&d, returning, sites);
+        // A landmark read stores one tick's weights beside a read's carriers.
+        let octets = |sites: usize| region_octets(&d, returning, sites) + if keep.is_some() { 8 * (heads * sites * sites) as u64 } else { 0 };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
         let batches = batches(&lengths, &octets, self.budget - face_octets)?;
+        if keep.is_some() && (regions.len() != 1 || returning) {
+            return Err(TowerError::Refused("the weight rows are read from one region's forward"));
+        }
         let mut faces: Vec<Vec<Option<TowerFace>>> = Vec::with_capacity(regions.len());
+        let mut read_logits: Vec<Vec<Option<Vec<i64>>>> = Vec::new();
+        let mut rows = Rows::new();
         for batch in batches {
             if batch.is_empty() {
                 continue;
@@ -408,14 +444,23 @@ impl<'c> CardField<'c> {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            faces.extend(self.batch(field, &regions[batch], &mut words, g.as_ref())?);
+            let (f, z, r) = self.batch(field, &regions[batch], &mut words, g.as_ref(), logits, keep)?;
+            faces.extend(f);
+            read_logits.extend(z);
+            rows.extend(r);
         }
         let g = match g {
             Some(g) => self.timed(Kind::Copy, || card.fetch(&g)).map_err(device)?,
             None => Vec::new(),
         };
-        let pairs: u128 = regions.iter().map(|r| (heads * r.classes.len() * r.classes.len()) as u128).sum::<u128>() * d.ticks as u128;
-        self.times.pairs += pairs;
+        let met = self.timed(Kind::Copy, || card.fetch(&met)).map_err(device)?[0] as u128;
+        if keep.is_some() {
+            // A landmark read is a reading of a release's last state, counted apart.
+            self.times.landmarks += 1;
+            self.times.landmark_ns += started.elapsed().as_nanos();
+            return Ok((faces, read_logits, g, rows));
+        }
+        self.times.pairs += met;
         if returning {
             self.times.returns += 1;
             self.times.return_ns += started.elapsed().as_nanos();
@@ -423,25 +468,28 @@ impl<'c> CardField<'c> {
             self.times.reads += 1;
             self.times.read_ns += started.elapsed().as_nanos();
         }
-        Ok((faces, g))
+        Ok((faces, read_logits, g, rows))
     }
 
-    fn tick(&self, sites: usize, pairs: usize, field: &Field, returning: bool) -> Result<Tick<'c>> {
+    fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
+        let classes = d.classes();
         let card = self.card;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
+        let alloc32 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<u32>(len.max(1))).map_err(device);
         Ok(Tick {
             read: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
             scale: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
-            qkv: alloc64(sites * 3 * m2)?,
+            qkv: alloc64(sites * 2 * m2)?,
             qf: alloc64(heads * sites * span)?,
-            kf: alloc64(heads * sites * span)?,
             vf: alloc64(heads * sites * span)?,
             qscale: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * sites).max(1))).map_err(device)?,
-            kscale: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * sites).max(1))).map_err(device)?,
-            // The weights are kept only for a return's reverse.
-            e: self.timed(Kind::Alloc, || card.alloc::<u64>(if returning { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
+            cls: alloc32(heads * sites)?,
+            class_off: alloc32(heads * regions * (2 * classes + 1))?,
+            members: alloc32(heads * sites)?,
+            // The weights are kept only for a return's reverse or the rows a landmark reads.
+            e: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
             mass: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * sites).max(1))).map_err(device)?,
             y: alloc64(sites * m2)?,
             read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
@@ -449,24 +497,27 @@ impl<'c> CardField<'c> {
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
-            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(3)).map_err(device)?,
+            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(1)).map_err(device)?,
         })
     }
 
-    /// One batch of regions: the forward, each unresolved site's face, and when `g` is given the
-    /// reverse added into it.
-    fn batch(&self, field: &Field, regions: &[Region], words: &mut Words, g: Option<&CardBuffer<'c, i128>>) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    /// One batch of regions: the forward, each unresolved site's face (and its logits when
+    /// `logits`), when `g` is given the reverse added into it, and with `keep` the still heads'
+    /// last-tick weight rows of those sites (the batch's one region).
+    #[allow(clippy::type_complexity)]
+    fn batch(&self, field: &Field, regions: &[Region], words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows)> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
-        // The batch's sites, region by region.
+        // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
         let mut site_pos = Vec::new();
         let mut region_off = vec![0u32];
         let mut region_eoff = Vec::new();
         let mut classes = Vec::new();
         let mut unresolved = Vec::new();
+        let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         for (r, region) in regions.iter().enumerate() {
             let s = region.classes.len();
@@ -477,16 +528,26 @@ impl<'c> CardField<'c> {
                 site_pos.push(t as u32);
                 classes.push(region.classes[t] as u32);
                 unresolved.push(u8::from(region.unresolved[t]));
+                for &(c, w) in region.faces.get(t).and_then(Option::as_ref).into_iter().flatten() {
+                    mix_class.push(c);
+                    mix_share.push(w);
+                }
+                mix_off.push(mix_class.len() as u32);
             }
             region_off.push(site_region.len() as u32);
         }
         let sites = site_region.len();
+        // A batch with no carried site still uploads one word, so every buffer has an address.
+        let (mix_class_up, mix_share_up) = if mix_class.is_empty() { (vec![0u32], vec![0u32]) } else { (mix_class.clone(), mix_share.clone()) };
         let site_region_c = self.timed(Kind::Copy, || card.upload(&site_region)).map_err(device)?;
         let site_pos_c = self.timed(Kind::Copy, || card.upload(&site_pos)).map_err(device)?;
         let region_off_c = self.timed(Kind::Copy, || card.upload(&region_off)).map_err(device)?;
         let region_eoff_c = self.timed(Kind::Copy, || card.upload(&region_eoff)).map_err(device)?;
         let classes_c = self.timed(Kind::Copy, || card.upload(&classes)).map_err(device)?;
         let unresolved_c = self.timed(Kind::Copy, || card.upload(&unresolved)).map_err(device)?;
+        let mix_off_c = self.timed(Kind::Copy, || card.upload(&mix_off)).map_err(device)?;
+        let mix_class_c = self.timed(Kind::Copy, || card.upload(&mix_class_up)).map_err(device)?;
+        let mix_share_c = self.timed(Kind::Copy, || card.upload(&mix_share_up)).map_err(device)?;
         let status = self.timed(Kind::Alloc, || card.zeroed::<u32>(1)).map_err(device)?;
         let x = self.timed(Kind::Alloc, || card.alloc::<i64>(sites * dw)).map_err(device)?;
         words.t = sites as u32;
@@ -498,18 +559,22 @@ impl<'c> CardField<'c> {
         words.region_eoff = region_eoff_c.device_ptr();
         words.classes = classes_c.device_ptr();
         words.unresolved = unresolved_c.device_ptr();
+        words.mix_off = mix_off_c.device_ptr();
+        words.mix_class = mix_class_c.device_ptr();
+        words.mix_share = mix_share_c.device_ptr();
         words.status = status.device_ptr();
         words.x = x.device_ptr();
         let returning = g.is_some();
-        let ticks: Vec<Tick> = (0..if returning { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, field, returning)).collect::<Result<_>>()?;
-        // The contact's row groups: `CONTACT_ROWS` consecutive receiving sites of one region each.
-        let groups: Vec<u32> = (0..regions.len()).flat_map(|r| (region_off[r]..region_off[r + 1]).step_by(CONTACT_ROWS)).collect();
-        let groups_c = self.timed(Kind::Copy, || card.upload(&groups)).map_err(device)?;
+        // The weights are stored for a return's reverse, or for the rows `keep` reads.
+        let stored = returning || keep.is_some();
+        let ticks: Vec<Tick> = (0..if returning { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored)).collect::<Result<_>>()?;
         let set = |w: &mut Words, tick: &Tick| {
             w.qkv = tick.qkv.device_ptr();
             w.qf = tick.qf.device_ptr();
-            w.kf = tick.kf.device_ptr();
             w.vf = tick.vf.device_ptr();
+            w.cls = tick.cls.device_ptr();
+            w.class_off = tick.class_off.device_ptr();
+            w.members = tick.members.device_ptr();
             w.e = tick.e.device_ptr();
             w.mass = tick.mass.device_ptr();
             w.y = tick.y.device_ptr();
@@ -519,22 +584,27 @@ impl<'c> CardField<'c> {
             w.bits = tick.bits.device_ptr();
         };
         let t64 = sites as u64;
+        let buckets = 8 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         for k in 0..d.ticks {
             let tick = &ticks[if returning { k } else { 0 }];
             set(words, tick);
             self.chart(words, words.x, &tick.read, &tick.scale, false)?;
-            for (part, weight, bias, wmax) in [(0usize, words.q, words.q_bias, words.rq), (1, words.k, words.k_bias, words.rk), (2, words.v, words.v_bias, words.rv)] {
+            for (part, weight, bias, wmax) in [(0usize, words.q, words.q_bias, words.rq), (1, words.v, words.v_bias, words.rv)] {
                 let out = tick.qkv.device_ptr() + (part * m2 * 8) as u64;
-                self.affine("field_affine_x32", words, weight, bias, wmax, m2, dw, tick.read.device_ptr(), dw, out, 3 * m2, 0, false)?;
+                self.affine("field_affine_x32", words, weight, bias, wmax, m2, dw, tick.read.device_ptr(), dw, out, 2 * m2, 0, false)?;
             }
-            card.zero_octets(&tick.bits, 0, 12).map_err(device)?;
+            card.zero_octets(&tick.bits, 0, 4).map_err(device)?;
+            self.launch_shared("field_classes", (heads * regions.len()).clamp(1, 1 << 20) as u32, 32, buckets, &mut [arg(words)])?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
-            let (mut qs, mut ks) = (tick.qscale.device_ptr(), tick.kscale.device_ptr());
-            self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut ks)])?;
-            let (mut groups_ptr, mut count, mut store) = (groups_c.device_ptr(), groups.len() as u32, u32::from(returning));
-            let blocks = (heads as u64 * groups.len() as u64).clamp(1, 1 << 20) as u32;
-            self.launch_shared("field_contact", blocks, (CONTACT_ROWS * 32) as u32, contact_shared(2 * n as u32), &mut [arg(words), arg(&mut groups_ptr), arg(&mut count), arg(&mut store)])?;
+            let mut qs = tick.qscale.device_ptr();
+            self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs)])?;
+            let mut store = u32::from(stored);
+            if keep.is_some() && k + 1 == d.ticks {
+                // The last tick's rows are read whole: the entries outside its support read zero.
+                card.zero_octets(&tick.e, 0, 8 * heads * pairs).map_err(device)?;
+            }
+            self.launch("field_contact", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut store)])?;
             self.affine("field_affine_x64", words, words.out, words.out_bias, words.rout, dw, m2, tick.y.device_ptr(), m2, 0, dw, words.x, false)?;
             self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
             self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
@@ -553,20 +623,38 @@ impl<'c> CardField<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         if let Some(g) = g {
-            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, sites, pairs)?;
+            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, sites, pairs)?;
         }
         self.status(&status)?;
         let masses = self.timed(Kind::Copy, || card.fetch(&masses)).map_err(device)?;
         let totals = self.timed(Kind::Copy, || card.fetch(&totals)).map_err(device)?;
-        let mut out = Vec::with_capacity(regions.len());
-        for r in 0..regions.len() {
-            let mut faces = Vec::with_capacity((region_off[r + 1] - region_off[r]) as usize);
-            for t in region_off[r] as usize..region_off[r + 1] as usize {
-                faces.push((unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 }));
+        let zs = if logits { self.timed(Kind::Copy, || card.fetch(&z)).map_err(device)? } else { Vec::new() };
+        // The kept rows: each named site's row of each still head at the last tick, with its mass.
+        let mut rows = Rows::new();
+        if let Some(keep) = keep {
+            let tick = &ticks[ticks.len() - 1];
+            for &i in keep {
+                if i >= sites {
+                    return Err(TowerError::Refused("a landmark site outside its region"));
+                }
+                let mut heads_rows = Vec::new();
+                for h in (0..heads).filter(|h| h % d.frames < d.still) {
+                    let row = self.timed(Kind::Copy, || card.fetch_range(&tick.e, h * pairs + i * sites, sites)).map_err(device)?;
+                    let mass = self.timed(Kind::Copy, || card.fetch_range(&tick.mass, h * sites + i, 1)).map_err(device)?[0];
+                    heads_rows.push((row.into_iter().enumerate().filter(|&(_, e)| e != 0).map(|(j, e)| (j as u32, e)).collect(), mass));
+                }
+                rows.push(heads_rows);
             }
-            out.push(faces);
         }
-        Ok(out)
+        let (mut out, mut out_z) = (Vec::with_capacity(regions.len()), Vec::new());
+        for r in 0..regions.len() {
+            let span = region_off[r] as usize..region_off[r + 1] as usize;
+            out.push(span.clone().map(|t| (unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 })).collect());
+            if logits {
+                out_z.push(span.map(|t| (unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
+            }
+        }
+        Ok((out, out_z, rows))
     }
 
     fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
@@ -608,7 +696,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], sites: usize, pairs: usize) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], sites: usize, pairs: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -627,7 +715,6 @@ impl<'c> CardField<'c> {
         let dyh = alloc64(heads * sites * span)?;
         let wr = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
-        let dk = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
         let ds = self.timed(Kind::Alloc, || card.alloc::<i128>(pairs.max(1))).map_err(device)?;
         // The face.
@@ -639,8 +726,10 @@ impl<'c> CardField<'c> {
         self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
         for (at, tick) in ticks.iter().enumerate().rev() {
             words.qf = tick.qf.device_ptr();
-            words.kf = tick.kf.device_ptr();
             words.vf = tick.vf.device_ptr();
+            words.cls = tick.cls.device_ptr();
+            words.class_off = tick.class_off.device_ptr();
+            words.members = tick.members.device_ptr();
             words.e = tick.e.device_ptr();
             words.mass = tick.mass.device_ptr();
             words.pa = tick.pa.device_ptr();
@@ -665,46 +754,55 @@ impl<'c> CardField<'c> {
             self.outer(words, g, words.out_bias, dw, 0, dmid.device_ptr(), dw, 0, 0, false, false)?;
             self.outer(words, g, words.out, dw, m2, dmid.device_ptr(), dw, tick.y.device_ptr(), m2, true, false)?;
             self.transposed(words, words.out, dw, m2, dmid.device_ptr(), dw, dy.device_ptr(), false, false)?;
-            // The weights and the contact, head by head.
+            // The weights and the contact over each site's support, head by head: the rows' return
+            // first, then the columns', which adds the word's second role into the same slots.
             let (mut dyp, mut dyhp, mut wrp) = (dy.device_ptr(), dyh.device_ptr(), wr.device_ptr());
             self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp), arg(&mut wrp)])?;
             for h in 0..heads {
                 let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
                 self.launch("field_contact_rows", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
-                let (mut hh, mut wrp, mut dsp, mut dkp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dk.device_ptr(), dv.device_ptr());
-                self.launch("field_contact_columns", Self::blocks_of_32(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dkp), arg(&mut dvp)])?;
+                let (mut hh, mut wrp, mut dsp, mut dqp, mut dvp) = (h as u32, wr.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
+                self.launch("field_contact_columns", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut hh), arg(&mut wrp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
             }
-            let (mut qs, mut ks, mut dqp, mut dkp) = (tick.qscale.device_ptr(), tick.kscale.device_ptr(), dq.device_ptr(), dk.device_ptr());
-            self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut ks), arg(&mut dqp), arg(&mut dkp)])?;
-            for chart in [&dq, &dk, &dv] {
+            let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
+            self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
+            for chart in [&dq, &dv] {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
             }
             card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
-            for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.k, words.k_bias, &dk), (words.v, words.v_bias, &dv)] {
+            for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv)] {
                 self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
                 self.outer(words, g, bias, m2, 0, chart.device_ptr(), m2, 0, 0, false, false)?;
                 self.transposed(words, weight, m2, dw, chart.device_ptr(), m2, dr.device_ptr(), true, false)?;
             }
             self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
         }
-        // The opening: each site's row of the encoding and its strand neighbours' rows of theirs, the
-        // sites partitioned by row once for each encoding (a neighbour only within the site's region:
-        // the next site is the region's own when its place is not the first).
-        let row = |t: usize| if unresolved[t] != 0 { a } else { classes[t] as usize };
-        let own: Vec<(usize, u32)> = (0..sites).map(|t| (row(t), t as u32)).collect();
-        let before: Vec<(usize, u32)> = (0..sites).filter(|&t| site_pos[t] > 0).map(|t| (row(t - 1), t as u32)).collect();
-        let after: Vec<(usize, u32)> = (0..sites).filter(|&t| t + 1 < sites && site_pos[t + 1] > 0).map(|t| (row(t + 1), t as u32)).collect();
+        // The opening: each site's row of the encoding and its strand neighbours' rows of theirs (a
+        // carried site's mixture by its shares), the entries partitioned by row once for each encoding
+        // (a neighbour only within the site's region: the next site is the region's own when its place
+        // is not the first). A plain row is a share of `2^16`.
+        let terms = |s: usize, t: u32| -> Vec<(usize, u32, u32)> {
+            let (from, to) = (mix_off[s] as usize, mix_off[s + 1] as usize);
+            if from == to {
+                return vec![(if unresolved[s] != 0 { a } else { classes[s] as usize }, t, 1 << STATE_BITS)];
+            }
+            (from..to).map(|k| (mix_class[k] as usize, t, mix_share[k])).collect()
+        };
+        let own: Vec<(usize, u32, u32)> = (0..sites).flat_map(|t| terms(t, t as u32)).collect();
+        let before: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| site_pos[t] > 0).flat_map(|t| terms(t - 1, t as u32)).collect();
+        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
         for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
-            let (rows_sites, segments) = encoding_partition(&rows, a + 1);
+            let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
             let count = (segments.len() / 3) as u32;
             if count == 0 {
                 continue;
             }
             let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
+            let rows_shares_c = self.timed(Kind::Copy, || card.upload(&rows_shares)).map_err(device)?;
             let segments_c = self.timed(Kind::Copy, || card.upload(&segments)).map_err(device)?;
-            let (mut gp, mut dxp, mut rsp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), segments_c.device_ptr(), count, base);
-            self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
+            let (mut gp, mut dxp, mut rsp, mut rwp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), rows_shares_c.device_ptr(), segments_c.device_ptr(), count, base);
+            self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut rwp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
         }
         Ok(())
     }
@@ -723,38 +821,39 @@ impl<'c> CardField<'c> {
 
 /// [agent-inferred, November 1] **Everything a region of `sites` sites allocates in a batch**
 /// ([`CardField::batch`], `tick`, `reverse`): each kept tick's carriers (the chart's read and scale,
-/// the three charts and their framed copies, the probe's and key's powers, the masses, the current, the pair contact's read, scale
-/// and drives) and its weights `H·S²`, the opening's and the face's carriers, and on a return the
-/// reverse's per-site covectors and the contact's return `δs` (`S²` on 128 bits). Measured November 1:
-/// sized by the weights and the contact's return alone, a batched release's per-site carriers took the
-/// board to 13,372 MiB; sized by this, the same release peaked at 11,256 MiB.
+/// the word and the value and their framed copies, the word's powers, the classes and members, the
+/// masses, the current, the pair contact's read, scale and drives), its class offsets and its weights
+/// `H·S²` (their dense reservation), the opening's carried mixtures at most one share a class, the
+/// face's carriers, and on a return the reverse's per-site covectors and the contact's return `δs`
+/// (`S²` on 128 bits). Measured November 1: sized by the weights and the contact's return alone, a
+/// batched release's per-site carriers took the board to 13,372 MiB; sized by its carriers too, the
+/// same release peaked at 11,256 MiB.
 pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
     let ticks_kept = if returning { d.ticks as u64 } else { 1 };
-    let tick_site = 4 * dw + 16 + 8 * 3 * m2 + 3 * 8 * h * span + 2 * 16 * h + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
+    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 2 * 4 * h + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
+    let tick_fixed = tick_fixed_octets(d);
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
-    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 3 * 8 * m2 } else { 0 };
+    let mixture_site = 4 + 2 * 4 * a;
+    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 2 * 8 * m2 } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
-    // The weights are kept only for a return; the contact's row groups are one word every
-    // `CONTACT_ROWS` sites.
+    // The weights are kept only for a return.
     let weights = if returning { h * 8 * pairs } else { 0 };
-    ticks_kept * (weights + s * tick_site + 12) + s * (face_site + reverse_site) + 4 * s.div_ceil(CONTACT_ROWS as u64) + if returning { 16 * pairs } else { 0 }
+    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + reverse_site) + if returning { 16 * pairs } else { 0 }
 }
 
-/// The contact block's dynamic shared octets for a span of `span` entries (`CONTACT_SHARED` in
-/// `kernels/field.cu`): the tile's keys and values, transposed and padded, the rows' probes, the
-/// tile's weights, the lanes' numerators and the rows' currents.
-fn contact_shared(span: u32) -> u32 {
-    let rows = CONTACT_ROWS as u32;
-    2 * 8 * span * TILE_PAD + 8 * rows * span + 8 * rows * KEY_TILE + 16 * rows * 32 + 16 * rows * span
+/// A kept tick's octets a region beside its sites': the carrier's width (one word) and the class
+/// offsets `H (2·3^b + 1)` words (each class's known members and the rest).
+fn tick_fixed_octets(d: &FieldDeclaration) -> u64 {
+    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1)
 }
 
-/// An encoding's sites sorted by the row they opened on (`rows` holds each site's row and index, `rows_n`
-/// the encoding's rows), and each row's sites cut into segments of at most `OUTER_TILE` (each its row,
-/// first and end in the sorted sites): one thread a segment and a column.
-fn encoding_partition(rows: &[(usize, u32)], rows_n: usize) -> (Vec<u32>, Vec<u32>) {
+/// An encoding's entries sorted by the row they opened on (`rows` holds each entry's row, site and
+/// share, `rows_n` the encoding's rows), and each row's entries cut into segments of at most
+/// `OUTER_TILE` (each its row, first and end in the sorted entries): one thread a segment and a column.
+fn encoding_partition(rows: &[(usize, u32, u32)], rows_n: usize) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let mut rows_off = vec![0u32; rows_n + 1];
-    for &(row, _) in rows {
+    for &(row, _, _) in rows {
         rows_off[row + 1] += 1;
     }
     for row in 0..rows_n {
@@ -762,8 +861,10 @@ fn encoding_partition(rows: &[(usize, u32)], rows_n: usize) -> (Vec<u32>, Vec<u3
     }
     let mut filled = rows_off.clone();
     let mut rows_sites = vec![0u32; rows.len()];
-    for &(row, t) in rows {
+    let mut rows_shares = vec![0u32; rows.len()];
+    for &(row, t, w) in rows {
         rows_sites[filled[row] as usize] = t;
+        rows_shares[filled[row] as usize] = w;
         filled[row] += 1;
     }
     let mut segments: Vec<u32> = Vec::new();
@@ -776,7 +877,7 @@ fn encoding_partition(rows: &[(usize, u32)], rows_n: usize) -> (Vec<u32>, Vec<u3
             at = end;
         }
     }
-    (rows_sites, segments)
+    (rows_sites, rows_shares, segments)
 }
 
 /// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
@@ -804,13 +905,33 @@ pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) ->
 
 impl FieldRealization for CardField<'_> {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        self.run(field, regions, true)
+        let (faces, _, g, _) = self.run(field, regions, true, false, None)?;
+        Ok((faces, g))
     }
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
-        Ok(self.run(field, regions, false)?.0)
+        Ok(self.run(field, regions, false, false, None)?.0)
+    }
+
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> {
+        Ok(self.run(field, regions, false, true, None)?.1)
+    }
+
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+        if question > region.classes.len() {
+            return Err(TowerError::Refused("a landmark site outside its region"));
+        }
+        let rows = self.run(field, std::slice::from_ref(region), false, false, Some(sites))?.3;
+        Ok(landmarks_of(&rows, question, count))
+    }
+
+    fn met_pairs(&self) -> Option<u128> {
+        Some(self.times.pairs)
     }
 }
+
+/// Each kept site's still heads' rows: the met sources with their weights, and the row's mass.
+type Rows = Vec<Vec<(Vec<(u32, u64)>, u64)>>;
 
 #[cfg(test)]
 mod tests {
@@ -849,11 +970,11 @@ mod tests {
     #[test]
     fn a_regions_octets_count_its_carriers_beside_its_weights() {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
-            // A whole number of the contact's row groups (`CONTACT_ROWS`), so a group's word grows by site.
             let n = 1504u64;
-            // The weights are kept only for a return; each kept tick adds its three carrier widths.
+            // The weights are kept only for a return; each kept tick adds its carrier widths and class
+            // offsets.
             let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 16 * n * n } else { 0 };
-            let fixed = |returning: bool| 12 * if returning { d.ticks as u64 } else { 1 };
+            let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);
                 assert!(all > weights(returning) + fixed(returning));
@@ -863,7 +984,7 @@ mod tests {
             }
         }
         let grown = declaration(64, 8, 64);
-        let carriers = 128 * 1504 * (region_octets(&grown, false, 1) - 12 - 4);
+        let carriers = 128 * 1504 * (region_octets(&grown, false, 1) - tick_fixed_octets(&grown));
         assert!(carriers > 1 << 30, "{carriers}");
     }
 }

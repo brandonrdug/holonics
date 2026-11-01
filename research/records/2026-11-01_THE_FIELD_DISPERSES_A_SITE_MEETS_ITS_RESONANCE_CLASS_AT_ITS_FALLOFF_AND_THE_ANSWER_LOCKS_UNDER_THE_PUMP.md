@@ -62,7 +62,7 @@ Hermitian form either way. That is the medium's own law: the contact that admits
 friction that dissipates it, and a passive contact is symmetric. Direction comes from the value
 `v_t`, which stays its own chart, and from each receiver's own normalization.
 
-### 2.2 The resonance class: the word's half-turn sheets
+### 2.2 The resonance class: the word's half-turn sheets (superseded by §12's shells)
 
 [definition; agent-inferred] A head's unframed word locks into `b` half-turn sheets: the signs of
 the in-phase (real) parts of its first `b` modes, a zero counted on the positive sheet. The sheets
@@ -286,3 +286,177 @@ Owed to #410:
 - the matched momentum at one sweep.
 
 No theorem is claimed for the pump's settling.
+
+## 10. Built
+
+[definition; agent-inferred, November 1] The build, before any run (Brandon's rule: no run of an
+incomplete machine), with one review of the whole diff whose findings it repaired. What each law
+became, where the design left a choice:
+
+- **One word** (`q = k`): the key chart and its bias leave the material (`hnn-field-v4`, a learner
+  `hnn-field-learner-v4`; older saves are superseded prototypes). The word returns both roles,
+  `δŵ_i = Σ_(j∈S_i) δs_ij ŵ_j + Σ_(j∈S_i) δs_ji ŵ_j`, each sum released on its own.
+- **Classes and support** (`ClassLists`, `NEAR`): the support is the near field and the class past
+  it, each site once, never itself, symmetric; the card lists the classes by a stable counting sort
+  (`field_classes`, a lane's rank among the earlier lanes of its class) and visits only the support.
+  The weights and the contact's return keep the region block's dense address `[i][j]` on the card,
+  written and read only on the support, so a column's return finds `e_ij` without an index; the time
+  follows the pairs met, the reservation stays the most a region's classes can ask.
+- **Far contacts are bipartite** (`ClassLists`): past the near field two class-mates meet only where
+  at least one of them is known (resolved, carrying no mixture). The first review found that every
+  unresolved site whose neighbours are unresolved opens on one face and so one word; with one word for
+  lock and key they met each other at the most any pair reaches, the release's opening a clique of its
+  whole extent (about `A²` pairs a head a tick) gathering the unresolved row above the question.
+  Stripping every unresolved site of its class left the cue's successor at 2.23 bits and the key's
+  recall at 1.52 (an open site's word is its crib address); stripping only the sites that open on
+  nothing broke the clique but, the second review found, left the opening's interior hearing only its
+  near field: the contact is translation-invariant, so every interior site had one state, the extent
+  was read at the region's two ends, and the first sweep's equal mixtures rebuilt the clique. Met only
+  by known class-mates, an unknown site still reads the question at its falloff, and unknown sites meet
+  each other through the near field and hop by hop. The lists keep each class's known members first,
+  so an unknown site's far support is one run.
+- **The gain** is signed (`score_shift` → `i32`); a negative `β` doubles the contact's covector
+  exactly.
+- **The mixture opening** applies at any carried site, resolved or not; a carried site holds no class
+  for the closure. Its return is `release(w_a δx, 16)` to each class row, the shares data. An empty
+  carried face is refused on both realizations.
+- **The release reads logits** (`FieldRealization::read_logits`): the card returns each open site's
+  readout `z_t`, and the host moves the state. A content site opens at rest on its opening face
+  (`ℓ = z⁰`, `m = 0`), so the pump is the only temperature (the review: stepping from `ℓ = 0` gave
+  the first mixtures a hidden sharpness of about `1.5×`). Inside the extent the void is no class
+  (`Field::content_face`): the extent is one nested variable read once, and a content site free to
+  lock at the void cut every locked site after it (the old creep, through the neighbours' `E(void)`
+  mixtures). The change `Σ|Δp|` is read at the sweep's own `β` on both sides, and compared only within
+  one rung (after a doubling the comparison starts again). A site is locked where its top class held
+  a majority at `β` at the sweep's start and at its end; it unlocks where that fails (no site is
+  fixed). The pump's top rung is `2^22` (`PUMP_TOP`: one numerator of logit then weighs 64 bits, past
+  the exponential's `2^(−62)` grain). An open site is written as a NUL in `FREE.tsv` (no codec class
+  writes it, so a calculation through it is never read as written) and as `░` in the text shown.
+- **The landmarks** are read through the realization (`read_landmarks`; on the card, the last tick's
+  weight rows of the named sites, the entries outside the support read zero), and ranked by one law
+  (`landmarks_of`); nothing drives the release from them.
+- **Training's second sweep** replaces `Shape::Released` with even odds against the masks. Its read 1
+  gives the extent as the release reads it (`Field::extent`), so the region is cut where the release's
+  is, and read 2 carries each content site's read-1 face over the content classes. The learner's held
+  step is read first, on the masked regions and the read-1 regions, so the mixtures come from the
+  material that stands (the review: read before the held step's read, a refused step left read 2
+  carrying mixtures of a material that no longer stood, and the step was read on regions it had
+  partly formed).
+- **The projection** reads the pairs the card meets (`met_pairs`) beside the site rows; a lap's real
+  cost follows the learned classes, so a lap past its bound stops the run (its partial evidence
+  reported as incomplete), never a raised bound.
+- **Owed**: the falloff reads the strand's distance `|i − j|` (a sound or motor strand is one); the
+  graph distance of a two-dimensional region (an image) is owed with that codec.
+
+Measured on the host while building (the field's tests):
+
+- The founded contact: an equal word 30 sites away outweighed every site past the near field in 32 of
+  32 rows; it held the whole row's peak in 31 (a near site out-scored it once: the near field is heard
+  at every frequency).
+- The learned fixtures learn more slowly than under the all-pairs contact, a regression measured, not
+  hidden: the cue's successor 0.083 bits at 600 sections (0.006 under all pairs, a bar of 0.0625); the
+  key's recall 0.557 bits at 1,000 (0.020 under all pairs, a bar of 0.25; 0.295 with two sheet bits
+  before the shells). Their bars are now read against knowing only which classes are present (`log₂ 9`
+  and 2.09 bits): below a quarter of a bit and below a third of 2.09 bits. The review named this the
+  recorded failure of a bar moved to fit; the laws that slow them (the falloff, the near field, the
+  shells) are Brandon's lens and the record's, so the slower learning is reported as their cost.
+- The covector's central difference crosses a seam where `±δ` moves a site across a shell: the classes
+  are locks, piecewise constant, so those probes are left out and counted; a region of 26 sites reads
+  the class contacts past the near field and the closure over far holders.
+
+The card against the host on the crib terrain (the runs' receipts, §13): every read, logits read,
+face, covector entry, learner text, release and landmark equal at both widths.
+
+## 11. The three papers of Brandon's lens, joined
+
+[agent-inferred, November 1] Brandon gave three papers with the correction this record answers. Each
+is joined to the owner it touches; none changes a law above.
+
+- **Boudourides, "Consensus and persistent harmonic edge circulation in a Hodge-theoretic model of
+  networked information flow" (arXiv:2608.15397).** Node values move by the edges' imbalance,
+  `ẋ = −d₀*u`; edge flow is forced by node disagreement and dissipated by the Hodge Laplacian,
+  `u̇ = −βΔ₁u + d₀x`. The nodes reach consensus, and the edge flow settles at its initial harmonic
+  projection: circulation on a cycle no face fills never drains; filling it with a 2-cell moves it to
+  the coexact sector, where `d₁*d₁` dissipates it; linear damping drains every flow, nonselectively.
+  On the exact sector each mode is `ä + βμȧ + μa = 0`, a damped second-order consensus. Joins: the
+  release's momentum is that damped second-order step (§4); the circulation receipt reads the
+  harmonic sector, a loop of contacts no assignment satisfies; the merge's 2-cell (§3) is the face
+  that drains it. The selective drain is the merge, not the momentum's friction.
+- **Gao, Shaikh, Kissinger, "Graphical Algebraic Geometry" (arXiv:2605.13993).** A diagrammatic
+  language complete for commutative algebras and affine varieties, generated by copy and delete (a
+  comonoid), add and zero, multiply and one (monoids), and scalars, with bialgebra and distributive
+  laws; a closed diagram is a counting constraint problem (#CSP), and over `𝔽₂` a SAT network. Joins:
+  the families of §3 are these generators read as contacts: copy is a still head's class contact
+  (fan-out), merge is the pair contact `a ⊙ b` with the current's sum (fan-in, multiply and add),
+  scale is a gain. They transfer because every polynomial constraint network, in any ecology, is
+  composed of the same generators; frustration is a closed diagram no assignment satisfies.
+- **Liu, Liu, Zhang, Fu, Tang, "Hyper-derivative algebraic geometry codes via local expansions"
+  (arXiv:2609.18098).** Codes evaluated through the local expansions of functions at rational places
+  (their jets), weighed by the NRT poset metric (a column weighs by the depth of its first nonzero
+  coefficient), whose duals, read through the residue theorem, reverse the expansion's order; their
+  asymptotics are read on function-field towers. Joins: the octave falloff is a weight of the same
+  kind, a distance read by its order rather than its magnitude (§2.3); the residue duality's reversal
+  is the helical code's pairing `σ̄(w) = σ(w)ᴿ`; local expansions are the series the exact law stores.
+
+Owed to #410 with the rest of §9: the release's step as the exact-sector mode of a damped consensus.
+
+## 12. Shells, the skin and the foil
+
+[definition; agent-inferred, November 1] Brandon's lens of the same evening (shells, relativity,
+Bessel functions, the skin effect, barycentric coordinates, the foil) changes three laws and the
+release's receipts. Each is built and checked against the card (parity at both widths).
+
+**The skin phasor.** A diffusive medium carries spatial period `n` with one e-fold of decay a radian
+of turn: the skin effect, `J ∝ e^(−(1+i)x/δ)`, in a wire the Bessel function of a complex argument
+(the Kelvin functions). So a turned mode of ring period `n_m` carries a pair `d = j − i` apart by
+`e^(−2π|d|/n_m) e^(2πi d/n_m)`, not by the bare turn:
+
+```text
+contact    z_ij = 2^(−β) Σ_m D_m(|i−j|) Re(conj(ŵ_im) ŵ_jm) − ⌊log₂ |i − j|⌋,   D_m(d) = e^(−2π d/n_m)
+current    ỹ_i = Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / mass_i
+```
+
+A still mode's period is infinite and it does not decay. The decay is a resident face per turned slot
+and distance on the frames' `2^(−30)`, read from the exponential's face (`skin_decay`); below the grain
+it is zero, so the finest ring is heard within eight sites while the top ring and the word reach the
+whole region: fine place is heard only near, the blur of far sources the first design lacked. The
+decay depends on the distance alone, so the contact stays reciprocal.
+
+**The shells** (superseding §2.2's half-turn sheets). A class digit is a trit, not a bit. On mode `m` of the unframed word: the sky plate
+(`+1`) where `Re > |Im|`, the ground plate (`−1`) where `Re < −|Im|`, the bridge (`0`) where
+`|Re| ≤ |Im|`. The plates are where the in-phase part dominates (the mode locks and boosts), the bridge
+where the quadrature dominates (it turns). `|Re| = |Im|` is the mode's light cone, the null set of its
+Lorentz form `Re(w²)`, and lies on the bridge. The class is `Σ_m 3^m (trit_m + 1)` over the first
+`b = min(n, ⌈½ log₃ reach⌉)` modes: 4 trits and 81 classes at reading 8's reach. The counting sort is
+unchanged apart from the key.
+
+**The falloff's provenance.** A strand wound on rings is a tube surface, two-dimensional, so a source
+spreads as the Hankel function: amplitude `1/√d`, power `1/d`. That is the `⌊log₂ d⌋` bits of §2.3.
+
+**The foil.** A lock is a foil, not a fact: a counterfactual surface the rest of the field is read
+against, its counter kept in the medium as the opposite charge on the other plate (a hydrofoil or an
+airfoil: the counter exists in the medium, and the charges cannot disobey the constraint that binds
+the plates). Here the counter cannot vanish: the exponential's face never releases a class's mass to
+nothing, so every lock carries its runner-up at a finite margin, however high the pump. Locked sites
+keep moving under their momentum. The release's receipts become:
+
+- a trit a site a sweep: `+1` it holds its lock, `0` it is soft (on the bridge), `−1` its top class was
+  overturned this sweep;
+- each locked site's counter: its runner-up class and the lock's margin over it at the final `β`,
+  `β (ℓ_top − ℓ_runner)` bits;
+- the free circulation: the `−1` trits, overturns, which are frustration;
+- the bound circulation: the locked sites whose lock held through the whole last rung, the foil's lift
+  fixed by its constraint (as the Kutta condition fixes an airfoil's circulation).
+
+**The reading.** The pump's `β` is the release's only time: a normalization, not a clock. A soft site
+is a barycentric point in the simplex of its classes, and the current a barycentric combination of
+what a site hears. A click, sites locking together, is a merge face filling a loop of contacts: the
+tube closing into an egg. The geometry is affine: the encoding sends a barycentric point of the
+class simplex to its affine image, the mixture opening `Σ_a p(a) E(a)`, and the word is an affine
+chart of the face, so placement (the shells, spectral: which modes lock on which plate) and navigation
+(the current, a barycentric combination carried by the skin) are read in one affine geometry, and the
+merge faces that fill loops are the algebraic cycles the compression keeps.
+
+Of the winding guide's objects this adds the **cell holonomy** to what the build touches (the bound
+circulation is a loop's fixed charge) and keeps the **tower thread** attached (the skin decay is each
+ring's own reach on the tower).

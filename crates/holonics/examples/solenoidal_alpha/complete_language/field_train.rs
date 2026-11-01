@@ -24,7 +24,8 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{by_news, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, HostField, Region, ReleaseSweep};
+use holonics::hnn::tower::field::{shares, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares};
+use holonics::hnn::tower::TowerFace;
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -90,6 +91,22 @@ impl FieldCodec {
         out
     }
 
+    /// [agent-inferred, November 1] A released answer's bytes, each open site written as `open`
+    /// (the release never forces an open site into a class), each site's first byte offset beside
+    /// it.
+    pub(super) fn decode_open(&self, sites: &[Option<usize>], open: &[u8]) -> (Vec<u8>, Vec<usize>) {
+        let (mut out, mut at) = (Vec::new(), Vec::with_capacity(sites.len()));
+        for site in sites {
+            at.push(out.len());
+            match site {
+                Some(c) if *c < self.void() => out.extend_from_slice(self.units.piece(self.used[*c] as usize)),
+                Some(_) => break,
+                None => out.extend_from_slice(open),
+            }
+        }
+        (out, at)
+    }
+
     /// Whether a class's unit is all digits (an exterior read: the held-out code is split by it).
     pub(super) fn is_digit(&self, class: usize) -> bool {
         class < self.void() && self.units.piece(self.used[class] as usize).iter().all(u8::is_ascii_digit)
@@ -147,26 +164,26 @@ pub(super) fn mix(seed: u64, counter: u64) -> u64 {
 /// The encoded problems: each question's classes, its answer's and the answer's bytes.
 pub(super) type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
 
-/// A region's shape: a keyed completion mask over the whole region, or the release's state at a
-/// keyed fraction `ρ` on `2^(−16)` (its mask is read from the field, [`released_state`]).
+/// A region's shape: a keyed completion mask over the whole region, or the release's second sweep
+/// ([`second_sweep`], its mixtures read from the field, [`section_regions`]).
 pub(super) enum Shape {
     Masked(Vec<bool>),
-    Released(u64),
+    Second,
 }
 
 /// [agent-inferred, November 1] A region's shape: with even odds the whole region's sites, each
 /// unresolved with probability `τ` (`τ` uniform on `(0, 1]` on `2^(−16)`, at least one site
-/// unresolved), or the release's own state at `ρ` uniform on `[0, 1)` on `2^(−16)`. The second is
-/// the repair of the first reading: its answer-only half unresolved each answer site with
-/// probability `τ`, so the field almost never met the state a release opens on (every answer site
-/// unresolved, its question resolved), nor the states its sweeps pass through (the sites with the
-/// most news resolved); read there, the held answer coded 5.2 bits a class against the training
-/// passage's 2.6, worse than the bytes' own frequencies.
+/// unresolved), or the release's second sweep. Why the second (the dispersing field's §5): it is the
+/// first state a release meets after its opening and the farthest from the masks; later sweeps
+/// sharpen the mixtures toward the classes the masks show, so they lie between the two states
+/// training reads. The shape it replaces resolved the answer's sites at their true classes in the
+/// order the question told most about first, so any other release met states the field never
+/// trained on.
 pub(super) fn shape(seed: u64, draw: u64, sites: usize) -> Shape {
     let head = mix(seed, draw);
     let low = (head >> 1) & 0xFFFF;
     if head & 1 == 0 {
-        return Shape::Released(low);
+        return Shape::Second;
     }
     let tau = low + 1;
     let mut out: Vec<bool> = (0..sites).map(|t| (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
@@ -176,19 +193,25 @@ pub(super) fn shape(seed: u64, draw: u64, sites: usize) -> Shape {
     Shape::Masked(out)
 }
 
-/// [agent-inferred, November 1] **The release's state at `ρ`**: every site from `question` on
-/// unresolved but the first `⌊ρ r⌋` of `ranked` (the answer's `r` sites in the release's order,
-/// read from the field's faces with every answer site open, [`by_news`]), which are resolved at
-/// their own classes. `ρ < 1` leaves at least one site compared. The release's sweep `s` resolves
-/// about `s/S` of its sites, so a uniform `ρ` meets its sweeps alike; the order is the first
-/// sweep's (a release reorders as its sites are released, at a read a sweep).
-pub(super) fn released_state(ranked: &[(usize, usize)], rho: u64, question: usize, sites: usize) -> Vec<bool> {
-    let mut out: Vec<bool> = (0..sites).map(|t| t >= question).collect();
-    let resolved = ((u128::from(rho) * (sites - question) as u128) >> 16) as usize;
-    for &(t, _) in ranked.iter().take(resolved) {
-        out[t] = false;
+/// [definition; agent-inferred, November 1] **The release's second sweep** (the dispersing field's
+/// §5): read 1 opens every site from `question` on, on the unresolved row, as the release opens, and
+/// its logits (`logits`) give the extent as the release reads it ([`Field::extent`]): the region is
+/// cut one site past the earliest resolved void, that site resolved at the void. Read 2 opens each
+/// content site on the mixture of its read-1 face at `β = 1` over every class but the void
+/// ([`Field::content_face`], as the release carries it), held as data with no covector through it,
+/// and reads and compares them all at their own classes. The covector of read 2 reaches the encodings
+/// through the mixture, `E(a)` weighted by `p(a)`. Why the cut (the build's review, November 1): a
+/// release's sweeps run on the cut region, so a second sweep without it was a state no release meets.
+pub(super) fn second_sweep(field: &Field, classes: &mut Vec<usize>, logits: &[Option<Vec<i64>>], question: usize, void: usize) -> (Vec<bool>, Vec<Option<Shares>>) {
+    let end = field.extent(logits, question, void);
+    if let Some(end) = end {
+        classes.truncate(end + 1);
+        classes[end] = void;
     }
-    out
+    let content = end.unwrap_or(classes.len());
+    let open: Vec<bool> = (0..classes.len()).map(|t| t >= question && t < content).collect();
+    let carried = (0..classes.len()).map(|t| if open[t] { logits[t].as_ref().map(|z| shares(&field.content_face(z, 1, void))) } else { None }).collect();
+    (open, carried)
 }
 
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
@@ -226,41 +249,55 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
         .collect()
 }
 
+/// A training region: its classes, its open sites and its carried faces (empty where none).
+pub(super) type TrainRegion = (Vec<usize>, Vec<bool>, Vec<Option<Shares>>);
+
+/// The regions as the field reads them.
+pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
+    regions.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: f }).collect()
+}
+
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its
-/// answer and a keyed void tail) and its shape ([`shape`]); the release-state regions' masks are
-/// read from `field` with every answer site open, with the question and without it (two reads of
-/// the section, through `realization`), and ranked by their news.
-pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, field: &Field, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
-    let mut regions: Vec<(Vec<usize>, Vec<bool>)> = Vec::with_capacity(members.len());
-    let mut states: Vec<(usize, u64, usize)> = Vec::new();
+/// answer and a keyed void tail) and its shape ([`shape`]). The step the learner holds is read first
+/// on the section's masked regions and its second sweeps' first reads, which it was not fit on, so
+/// the second sweeps' mixtures are read from the material that stands after it (one more read of
+/// those regions, through `realization`); the held step's read is returned. Why that order (the
+/// build's review, November 1): read under the stepped material before its read, a refused step left
+/// read 2 carrying mixtures of a material that no longer stood, and the step was read on regions it
+/// had partly formed.
+pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
+    let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
+    let mut states: Vec<(usize, usize)> = Vec::new();
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
         let classes = region_classes(codec, q, a, length);
         match shape(seed, *draw, length) {
-            Shape::Masked(mask) => regions.push((classes, mask)),
-            Shape::Released(rho) => {
-                states.push((regions.len(), rho, q.len()));
-                regions.push((classes, Vec::new()));
+            Shape::Masked(mask) => regions.push((classes, mask, Vec::new())),
+            Shape::Second => {
+                states.push((regions.len(), q.len()));
+                regions.push((classes, Vec::new(), Vec::new()));
             }
         }
     }
+    for &(k, q) in &states {
+        regions[k].1 = (0..regions[k].0.len()).map(|t| t >= q).collect();
+    }
+    let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     if states.is_empty() {
-        return Ok(regions);
+        return Ok((regions, next));
     }
-    let opened: Vec<Vec<bool>> = states.iter().map(|&(k, _, q)| (0..regions[k].0.len()).map(|t| t >= q).collect()).collect();
-    let blind: Vec<Vec<bool>> = states.iter().map(|&(k, _, _)| vec![true; regions[k].0.len()]).collect();
-    let (faces, prior) = {
-        let views: Vec<Region> = states.iter().zip(&opened).map(|(&(k, _, _), u)| Region { classes: &regions[k].0, unresolved: u }).collect();
-        let blind_views: Vec<Region> = states.iter().zip(&blind).map(|(&(k, _, _), u)| Region { classes: &regions[k].0, unresolved: u }).collect();
-        (realization.read_faces(field, &views).map_err(|e| e.to_string())?, realization.read_faces(field, &blind_views).map_err(|e| e.to_string())?)
+    let logits = {
+        let views: Vec<Region> = states.iter().map(|&(k, _)| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[] }).collect();
+        realization.read_logits(&learner.field, &views).map_err(|e| e.to_string())?
     };
-    for ((&(k, rho, q), faces), prior) in states.iter().zip(&faces).zip(&prior) {
-        let ranked = by_news(faces, prior).map_err(|e| e.to_string())?;
-        regions[k].1 = released_state(&ranked, rho, q, regions[k].0.len());
+    for (&(k, q), logits) in states.iter().zip(&logits) {
+        let mut classes = std::mem::take(&mut regions[k].0);
+        let (open, carried) = second_sweep(&learner.field, &mut classes, logits, q, codec.void());
+        regions[k] = (classes, open, carried);
     }
-    Ok(regions)
+    Ok((regions, next))
 }
 
 /// [agent-inferred, November 1] **The training passage's sections and its withheld problems**:
@@ -300,7 +337,7 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// context text, foil, foil digits, foil text]`. A reading only: no decision of the run reads it.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 9]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[] }).collect();
     let mut out = [(0i64, 0usize); 9];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
@@ -404,7 +441,7 @@ fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: 
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
     let regions = unseen_regions(codec, problems, unseen, seed);
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[] }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
     for (faces, region) in faces.iter().zip(&views) {
@@ -566,10 +603,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let lap_start = std::time::Instant::now();
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
-            let regions = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &learner.field, realization)?;
-            let length = regions.iter().map(|(c, _)| c.len()).max().unwrap_or(0);
-            let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+            let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
+            let length = regions.iter().map(|(c, _, _)| c.len()).max().unwrap_or(0);
+            let views = views_of(&regions);
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+            let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
             code_after += receipt.code_after;
             sites += receipt.sites;
@@ -777,21 +815,39 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
     let free = release_requests(field, &free_requests, sweeps, codec.void(), realization, &mut within("free", started, stop_ms, &mut free_last))?;
     let mut free_file = rows_file(&out.join("FREE.tsv"), "")?;
     let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\treleased\theld\tlambda\tfriction\tplateaus\tlongest\tlag\n")?;
+    let mut landmarks_file = rows_file(&out.join("LANDMARKS.tsv"), "problem\tsite\tbyte\tlandmark\tlandmark_byte\tshare\n")?;
     let (mut sum_h, mut sum_t, mut sum_lambda, mut sum_friction, mut refused, mut withheld) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
+    let (mut open_sites, mut free_circulation, mut bound, mut locked_whole) = (0usize, 0usize, 0usize, 0usize);
+    let mut margins: Vec<i64> = Vec::new();
+    let mut rungs: std::collections::BTreeMap<u64, usize> = std::collections::BTreeMap::new();
+    let mut landmark = LandmarkCount::default();
     let mut read_ok = vec![false; held.len()];
-    for (i, ((_, answer), released)) in held.iter().zip(&free).enumerate() {
-        let h: Vec<usize> = match released {
-            Ok(classes) => {
+    for (i, (((_, answer), released), request)) in held.iter().zip(&free).zip(&free_requests).enumerate() {
+        let (h, text) = match released {
+            Ok(r) => {
                 read_ok[i] = true;
-                classes.iter().copied().take_while(|&c| c < codec.void()).collect()
+                open_sites += r.open;
+                free_circulation += r.free;
+                bound += r.bound;
+                margins.extend(r.counters.iter().flatten().map(|&(_, margin)| margin));
+                locked_whole += usize::from(r.open == 0);
+                for &rung in r.rungs.iter().filter(|&&b| b > 0) {
+                    *rungs.entry(rung).or_insert(0) += 1;
+                }
+                let (text, at) = codec.decode_open(&r.sites, OPEN_SITE);
+                if let Ok((q, _)) = request {
+                    landmark.read(field, &codec, r, q.len(), &text, &at, i, &mut landmarks_file, realization)?;
+                }
+                println!("FIELD_RELEASE_ONE_RECEIPT problem={i} {}", receipt_text(r));
+                (r.classes_or(usize::MAX), text)
             }
             Err(why) => {
                 println!("FIELD_RELEASE_REFUSED problem={i} why={why}");
                 refused += 1;
-                Vec::new()
+                (Vec::new(), Vec::new())
             }
         };
-        row(&mut free_file, &format!("{i}\t{}\n", escaped(&codec.decode(&h))))?;
+        row(&mut free_file, &format!("{i}\t{}\n", escaped(&text)))?;
         let t = codec.encode(answer).unwrap_or_default();
         let c = coupling(&h, &t);
         let longest = c.plateaus.iter().copied().max_by_key(|&(run, lag)| (run, std::cmp::Reverse(lag.unsigned_abs()))).unwrap_or((0, 0));
@@ -802,6 +858,18 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         sum_friction += c.friction;
         println!("FIELD_RELEASE_ONE problem={i} released={} held={} lambda={} friction={} total_ms={}", h.len(), t.len(), c.lambda, c.friction, started.elapsed().as_millis());
     }
+    let lock_rungs: Vec<String> = rungs.iter().map(|(b, n)| format!("{b}:{n}")).collect();
+    println!(
+        "FIELD_RELEASE_RECEIPTS problems={} locked_whole={locked_whole} open_sites={open_sites} free_circulation={free_circulation} bound_circulation={bound} lock_margin_bits_quartiles={} lock_rungs={} landmark_problems={} landmark_digits={} landmark_on_question_digit={} landmark_same_class={} landmark_ms={}",
+        held.len(),
+        quartiles(&mut margins),
+        if lock_rungs.is_empty() { "-".to_string() } else { lock_rungs.join(",") },
+        landmark.problems,
+        landmark.digits,
+        landmark.on_digit,
+        landmark.same,
+        landmark.ns / 1_000_000
+    );
     // The marks: each calculation's continuation past the answer written through its equals.
     let mut marks_at: Vec<(usize, usize, &[u8])> = Vec::new();
     let mut mark_requests = Vec::new();
@@ -820,7 +888,7 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
     let mut marks_file = rows_file(&out.join("MARKS.tsv"), "")?;
     for (&(i, j, expression), released) in marks_at.iter().zip(&marks) {
         let mut r = match released {
-            Ok(continued) => codec.decode(continued),
+            Ok(continued) => codec.decode_open(&continued.sites, OPEN_SITE).0,
             Err(why) => {
                 println!("FIELD_RELEASE_REFUSED problem={i} mark={j} why={why}");
                 refused += 1;
@@ -833,18 +901,105 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         row(&mut marks_file, &format!("{i}\t{j}\t{}\t{}\n", escaped(expression), escaped(&r)))?;
     }
     println!(
-        "FIELD_RELEASE free={} marks={} withheld={withheld} refused={refused} sweeps={sweeps} stop_ms={stop_ms} free_sweeps={} free_open={} free_stopped={} marks_sweeps={} marks_open={} marks_stopped={} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
+        "FIELD_RELEASE free={} marks={} withheld={withheld} refused={refused} sweeps={sweeps} stop_ms={stop_ms} free_sweeps={} free_live={} free_open={} free_rung={} free_stopped={} marks_sweeps={} marks_live={} marks_open={} marks_rung={} marks_stopped={} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
         held.len(),
         marks_at.len(),
         free_last.done,
+        free_last.live,
         free_last.open,
+        free_last.rung,
         free_last.live > 0 && free_last.done < sweeps,
         marks_last.done,
+        marks_last.live,
         marks_last.open,
+        marks_last.rung,
         marks_last.live > 0 && marks_last.done < sweeps,
         started.elapsed().as_millis()
     );
     Ok(())
+}
+
+/// [agent-inferred, November 1] An open site as a release writes it: one byte no codec class
+/// writes (a NUL), so a calculation through an open site is never read as written.
+const OPEN_SITE: &[u8] = b"\0";
+
+/// The lock rungs of a release's sites as `β:count`, ascending (`-` where none locked).
+fn rung_text(rungs: &[u64]) -> String {
+    let mut count: std::collections::BTreeMap<u64, usize> = std::collections::BTreeMap::new();
+    for &r in rungs.iter().filter(|&&r| r > 0) {
+        *count.entry(r).or_insert(0) += 1;
+    }
+    if count.is_empty() {
+        return "-".into();
+    }
+    count.iter().map(|(b, n)| format!("{b}:{n}")).collect::<Vec<_>>().join(",")
+}
+
+/// A release's receipt as one line: its sites and open sites, its free and bound circulation, the
+/// quartiles of its locks' margins over their counters (in bits), its lock rungs and the sweeps
+/// ridden at each rung.
+fn receipt_text(r: &Released) -> String {
+    let mut margins: Vec<i64> = r.counters.iter().flatten().map(|&(_, m)| m).collect();
+    format!("sites={} open={} free_circulation={} bound_circulation={} lock_margin_bits_quartiles={} rungs={} ridden={}", r.sites.len(), r.open, r.free, r.bound, quartiles(&mut margins), rung_text(&r.rungs), ridden_text(&r.ridden))
+}
+
+/// The least, the quartiles and the most of margins on `2^(−16)` bits, each in whole bits (`-` where
+/// none).
+fn quartiles(margins: &mut [i64]) -> String {
+    if margins.is_empty() {
+        return "-".into();
+    }
+    margins.sort_unstable();
+    let at = |q: usize| margins[(q * (margins.len() - 1)) / 4] >> 16;
+    format!("{}/{}/{}/{}/{}", at(0), at(1), at(2), at(3), at(4))
+}
+
+/// The sweeps ridden at each rung as `β:sweeps`.
+fn ridden_text(ridden: &[(u64, usize)]) -> String {
+    ridden.iter().map(|(b, n)| format!("{b}:{n}")).collect::<Vec<_>>().join(",")
+}
+
+/// [definition; agent-inferred, November 1] **The landmarks' counts** (the dispersing field's §3
+/// receipt): over the free releases whose answer writes a first calculation `<<…>>`, each digit site
+/// of it and the question site carrying the most weight in its still heads' currents
+/// ([`Field::landmarks`]); counted are those sites, those whose landmark is a question digit, and
+/// those whose landmark holds the site's own class. Each row goes to `LANDMARKS.tsv` (private: it
+/// carries the problem's bytes). Read through the realization (on the card, its rows), timed.
+#[derive(Default)]
+struct LandmarkCount {
+    problems: usize,
+    digits: usize,
+    on_digit: usize,
+    same: usize,
+    ns: u128,
+}
+
+impl LandmarkCount {
+    #[allow(clippy::too_many_arguments)]
+    fn read(&mut self, field: &Field, codec: &FieldCodec, r: &Released, question: usize, text: &[u8], at: &[usize], problem: usize, file: &mut std::fs::File, realization: &mut dyn FieldRealization) -> Result<()> {
+        let Some(open) = text.windows(2).position(|w| w == b"<<") else { return Ok(()) };
+        let Some(close) = text[open..].windows(2).position(|w| w == b">>").map(|c| open + c) else { return Ok(()) };
+        let sites: Vec<usize> = (0..r.sites.len()).filter(|&s| at[s] >= open + 2 && at[s] < close && r.sites[s].is_some_and(|c| codec.is_digit(c))).collect();
+        if sites.is_empty() {
+            return Ok(());
+        }
+        let started = std::time::Instant::now();
+        let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
+        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces };
+        let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
+        self.ns += started.elapsed().as_nanos();
+        self.problems += 1;
+        for (&s, mark) in sites.iter().zip(&marks) {
+            self.digits += 1;
+            let class = r.sites[s].unwrap_or(usize::MAX);
+            let Some(&(j, share)) = mark.first() else { continue };
+            self.on_digit += usize::from(codec.is_digit(r.classes[j]));
+            self.same += usize::from(r.classes[j] == class);
+            let byte = |c: usize| escaped(&codec.decode(&[c]));
+            row(file, &format!("{problem}\t{s}\t{}\t{j}\t{}\t{share}\n", byte(class), byte(r.classes[j])))?;
+        }
+        Ok(())
+    }
 }
 
 /// [agent-inferred, November 1] **A release's exterior**: one line a sweep, the sweep run while the
@@ -854,7 +1009,10 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
 fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
     move |sweep| {
         let ms = started.elapsed().as_millis();
-        println!("FIELD_RELEASE_SWEEP set={set} done={} live={} open={} resolved={} by_news={} revised={} unsettled={} cut={} cut_sites={} ms={ms}", sweep.done, sweep.live, sweep.open, sweep.resolved, sweep.by_news, sweep.revised, sweep.unsettled, sweep.cut, sweep.cut_sites);
+        println!(
+            "FIELD_RELEASE_SWEEP set={set} done={} live={} locked={} open={} rung={} change={} holding={} soft={} overturned={} free={} cut={} cut_sites={} ms={ms}",
+            sweep.done, sweep.live, sweep.locked, sweep.open, sweep.rung, sweep.change, sweep.holding, sweep.soft, sweep.overturned, sweep.free, sweep.cut, sweep.cut_sites
+        );
         *last = *sweep;
         ms < stop_ms
     }
@@ -877,9 +1035,9 @@ fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) ->
 /// The releases of every admitted opening read together; a refused opening keeps its refusal. A
 /// refused batch is released again one problem at a time (each release is its own region's, so
 /// each is the batch's own), and a problem's refusal is that problem's alone.
-fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<std::result::Result<Vec<usize>, String>>> {
+fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<std::result::Result<Released, String>>> {
     let admitted: Vec<(&[usize], usize)> = requests.iter().filter_map(|r| r.as_ref().ok().map(|(q, open)| (q.as_slice(), *open))).collect();
-    let released: Vec<std::result::Result<Vec<usize>, String>> = if admitted.is_empty() {
+    let released: Vec<std::result::Result<Released, String>> = if admitted.is_empty() {
         Vec::new()
     } else {
         match field.release_realized(&admitted, sweeps, void, realization, &mut *sweep) {
@@ -916,13 +1074,13 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
     let mut last = ReleaseSweep::default();
     let released = release_requests(&learner.field, &requests, sweeps, codec.void(), realization, &mut within("text", started, stop_ms, &mut last))?;
     for (i, ((question, _), released)) in held.iter().zip(released).enumerate() {
-        let answer = match released {
-            Ok(classes) => String::from_utf8_lossy(&codec.decode(&classes)).into_owned(),
-            Err(why) => format!("(refused: {why})"),
+        let (answer, receipt) = match released {
+            Ok(r) => (String::from_utf8_lossy(&codec.decode_open(&r.sites, "\u{2591}".as_bytes()).0).into_owned(), receipt_text(&r)),
+            Err(why) => (format!("(refused: {why})"), "refused".into()),
         };
-        println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i}\n{answer}\n", String::from_utf8_lossy(question));
+        println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i} {receipt}\n{answer}\n", String::from_utf8_lossy(question));
     }
-    println!("FIELD_RELEASE_TEXT problems={} sweeps={} open={} stopped={} ms={}", held.len(), last.done, last.open, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
+    println!("FIELD_RELEASE_TEXT problems={} sweeps={} live={} open={} rung={} stopped={} ms={}", held.len(), last.done, last.live, last.open, last.rung, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
     Ok(())
 }
 
@@ -1066,7 +1224,7 @@ mod tests {
 
     #[test]
     fn shapes_open_a_site_and_meet_both_halves() {
-        let (mut masked, mut released) = (0, 0);
+        let (mut masked, mut second) = (0, 0);
         for draw in 0..64 {
             match shape(7, draw, 12) {
                 Shape::Masked(m) => {
@@ -1074,24 +1232,41 @@ mod tests {
                     assert_eq!(m.len(), 12);
                     masked += 1;
                 }
-                Shape::Released(rho) => {
-                    assert!(rho < 1 << 16);
-                    released += 1;
-                }
+                Shape::Second => second += 1,
             }
         }
-        assert!(masked > 16 && released > 16, "{masked} {released}");
+        assert!(masked > 16 && second > 16, "{masked} {second}");
     }
 
-    /// The release's state resolves the ranked sites first and always leaves an answer site open.
+    /// The release's second sweep: the extent cut where read 1's void resolves, that site resolved
+    /// at the void and the sites past it gone; every content site open and carried as its read-1 face
+    /// at `β = 1` over every class but the void, the question resolved and carried as nothing.
     #[test]
-    fn the_release_state_resolves_the_news_first() {
-        let ranked = [(7usize, 0usize), (4, 1), (5, 2), (6, 0)];
-        assert_eq!(released_state(&ranked, 0, 4, 8), vec![false, false, false, false, true, true, true, true]);
-        assert_eq!(released_state(&ranked, 1 << 15, 4, 8), vec![false, false, false, false, false, true, true, false]);
-        let most = released_state(&ranked, (1 << 16) - 1, 4, 8);
-        assert_eq!(most.iter().filter(|&&u| u).count(), 1);
-        assert!(most[6]);
+    fn the_second_sweep_is_cut_at_the_extent_and_carries_the_content_s_first_read() {
+        let d = FieldDeclaration { alphabet: 3, width: 4, heads: 1, modes: 1, still: 1, contacts: 1, ticks: 1, frames: 1, reach: 8 };
+        let field = Field::found(d, &(0..1u64 << 10).flat_map(|i| mix(3, i).to_be_bytes()).collect::<Vec<_>>()).unwrap();
+        let z = |l: [i64; 3]| Some(l.iter().map(|&v| v << 16).collect::<Vec<i64>>());
+        let logits = vec![None, None, z([0, 1, 0]), z([1, 0, 0]), z([0, 2, 3]), z([3, 0, 0]), z([4, 0, 0])];
+        let mut classes = vec![1usize, 2, 1, 2, 0, 0, 0];
+        let (open, carried) = second_sweep(&field, &mut classes, &logits, 2, 0);
+        assert_eq!(classes, vec![1, 2, 1, 2, 0, 0], "cut one site past the first resolved void, at the void");
+        assert_eq!(open, vec![false, false, true, true, true, false]);
+        assert!(carried[..2].iter().all(Option::is_none) && carried[5].is_none());
+        assert_eq!(carried[2], Some(vec![(1, 43691), (2, 21845)]), "the void left out of a content site's mixture");
+        assert_eq!(carried[3], Some(vec![(1, 32768), (2, 32768)]));
+        assert_eq!(carried[4], Some(vec![(1, 21845), (2, 43691)]));
+    }
+
+    /// An open site is written as the one byte no class writes, and the answer ends at its first
+    /// locked void.
+    #[test]
+    fn a_release_writes_its_open_sites_open() {
+        let problems = vec![(b"Q?".to_vec(), b"ab".to_vec())];
+        let codec = FieldCodec::found(Units::bytes(), &problems).unwrap();
+        let [a, b] = [codec.encode(b"a").unwrap()[0], codec.encode(b"b").unwrap()[0]];
+        let (text, at) = codec.decode_open(&[Some(a), None, Some(b), Some(codec.void()), Some(a)], OPEN_SITE);
+        assert_eq!(text, b"a\0b");
+        assert_eq!(at, vec![0, 1, 2, 3]);
     }
 
     /// The withheld problems are never in a section, and every other problem is in one.

@@ -9,7 +9,7 @@
 //!   `release-field-text ARGS…`: the commands with every read and return on the card;
 //!   `crib-terrain ARGS…` writes the crib terrain's passages and reads nothing on the card.
 //!
-//! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs read and the
+//! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs met, the landmark reads and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with
 //! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
@@ -46,7 +46,7 @@ fn run(args: &[String]) -> Result<()> {
     };
     let t = card.times();
     println!(
-        "FIELD_CARD reads={} read_ms={} returns={} return_ms={} pairs={} batches={} peak_store={} elapsed_ms={}",
+        "FIELD_CARD reads={} read_ms={} returns={} return_ms={} pairs={} batches={} peak_store={} landmarks={} landmark_ms={} elapsed_ms={}",
         t.reads,
         t.read_ns / 1_000_000,
         t.returns,
@@ -54,6 +54,8 @@ fn run(args: &[String]) -> Result<()> {
         t.pairs,
         t.batches,
         t.peak_store,
+        t.landmarks,
+        t.landmark_ns / 1_000_000,
         started.elapsed().as_millis()
     );
     if let Some(p) = card.profiled() {

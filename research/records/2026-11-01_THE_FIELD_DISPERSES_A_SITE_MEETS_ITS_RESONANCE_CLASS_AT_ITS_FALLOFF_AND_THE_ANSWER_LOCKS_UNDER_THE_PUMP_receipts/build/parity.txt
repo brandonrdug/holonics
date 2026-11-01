@@ -1,0 +1,13 @@
+# The card against the host after the build (crib terrain, seed 20261101; reading 8's declaration D 32, H 4, n 8,
+# still 2, f 32, K 2, SECTION 16, RATE 8), on the RTX 4080 SUPER under $ROOT/.local/gpu.lock, before any run:
+#   field_pass parity complete-language parity-field UNITS0 TRAIN HELD KEYS8 32 4 8 2 32 2 16 8 8 GROW 8 40
+# 8 sections and the withheld read; 8 held releases of at most 40 sweeps compared whole (sites, rungs, counters,
+# trits, receipts, last mixtures) with their landmarks; one masked or second-sweep region's landmarks a section.
+GROW=1
+FIELD_PARITY_DONE sections=9 reads=41 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=8 releases_unequal=0 card_release_ms=46 host_ms=4067 card_ms=564 elapsed_ms=7306
+FIELD_CARD reads=42 read_ms=452 returns=8 return_ms=99 pairs=423794602 batches=66 peak_store=944524352 landmarks=16 landmark_ms=50 elapsed_ms=7307
+MEASURE lap=smoke rc=0 wall_s=8.6 peak_rss_kib=612564
+GROW=2
+FIELD_PARITY_DONE sections=9 reads=41 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=8 releases_unequal=0 card_release_ms=60 host_ms=8117 card_ms=1091 elapsed_ms=13963
+FIELD_CARD reads=41 read_ms=906 returns=8 return_ms=176 pairs=838942764 batches=65 peak_store=1683500096 landmarks=16 landmark_ms=87 elapsed_ms=13964
+MEASURE lap=smoke rc=0 wall_s=14.2 peak_rss_kib=790888
