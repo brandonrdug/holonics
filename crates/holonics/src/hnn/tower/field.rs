@@ -3032,5 +3032,7 @@ impl FieldLearner {
     }
 }
 
+pub mod moment;
+
 #[cfg(test)]
 mod tests;
