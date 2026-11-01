@@ -369,7 +369,8 @@ fn a_held_step_is_read_on_the_next_section() {
             }
             if next.halvings > 0 || next.refused {
                 halved += 1;
-                let last = if next.refused { at } else { at - 1 };
+                // The last halving that moved (a refusal ends at the first that moves nothing).
+                let last = at - 1;
                 assert!(fewer_bits(&compared_on(&stepped(&material, &held.step, last).unwrap().0), &old), "the halving before coded them higher");
             }
             // The section's opening read is the standing material's.
@@ -380,6 +381,40 @@ fn a_held_step_is_read_on_the_next_section() {
         }
     }
     assert!(read >= 4 && halved >= 1, "read {read} halved {halved}");
+}
+
+/// A held step that codes the next regions higher at every halving that still moves it is refused:
+/// the material before it stands, the opening read is that material's, and the read reports the
+/// halvings it tried, the last of which moved nothing.
+#[test]
+fn a_step_that_codes_the_next_regions_higher_is_refused() {
+    let material = shaped(1);
+    let regions = [region()];
+    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions);
+    let old = compared_on(&material);
+    // The covector is the code's gradient (a deposit subtracts the step), so the step that moved
+    // the material to `material + sign(g) 2^k` climbed it; held, it is the negated sign.
+    let g = covector_of(&material, &regions[0]);
+    for k in [0u32, 3, 6] {
+        let step: Vec<i128> = g.iter().map(|&v| -(v.signum() << k)).collect();
+        let mut learner = FieldLearner::new(material.clone(), 2);
+        learner.field = stepped(&material, &step, 0).unwrap().0;
+        let climbed = compared_on(&learner.field);
+        learner.held = Some(HeldStep { step: step.clone(), halvings: 0 });
+        let (faces, next) = learner.read_step_on(&regions, &mut HostField).unwrap();
+        let next = next.expect("a held step is read");
+        assert!(next.refused, "k {k}: halvings {}", next.halvings);
+        assert!(!learner.holds_step());
+        assert_eq!(learner.field, material, "the material before the step stands");
+        assert_eq!(faces, vec![material.faces(&regions[0]).unwrap()]);
+        assert_eq!(next.change, code_of(&climbed) - code_of(&old));
+        assert!(next.change > 0);
+        for h in 1..next.halvings {
+            let (candidate, moved) = stepped(&material, &step, h).unwrap();
+            assert!(moved && fewer_bits(&compared_on(&candidate), &old), "k {k}: halving {h} coded no higher");
+        }
+        assert!(!stepped(&material, &step, next.halvings).unwrap().1, "the refusal ends where the step moves nothing");
+    }
 }
 
 trait Top {

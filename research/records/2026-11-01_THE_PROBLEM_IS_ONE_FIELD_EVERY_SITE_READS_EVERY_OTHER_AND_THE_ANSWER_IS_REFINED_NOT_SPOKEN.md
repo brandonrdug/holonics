@@ -159,9 +159,12 @@ rate bits rise by `⌈log₂ f⌉`: the lifted moments make each copy's step the
 copies of it would move the old face `f` times as far, so the first certified deposit on the grown
 body moves it no further than the old body's would have. The trainer withholds as many training
 problems as the held file holds (keyed, never in a section) and reads them after each lap at the
-release's states; the lap's last held step is read on them first. It grows the body by two after a
-lap that leaves them coding no fewer bits a site than the lap before left them: the body has spent
-its width. No width is a dial past the founding's. (The first draft read the passage's own code,
+release's opening, every answer site and a keyed void tail unresolved, the same regions and sites
+every lap; the lap's last held step is read on them first. It grows the body by two after a lap
+that leaves them coding no fewer bits a site than the lap before left them: the body has spent its
+width. (Not at the release's states at `ρ`: their resolved sites are the first in the field's own
+news order, so a site the field learns leaves the compared set, and code a site would compare a
+different set of sites each lap.) No width is a dial past the founding's. (The first draft read the passage's own code,
 which fell every lap; §11.)
 
 ## 6. The codec is the bytes
@@ -225,7 +228,9 @@ private read of whole releases).
    material that codes it no higher than the material before the step, one halving fewer coded it
    higher, and the section's opening read is the standing material's; a learner holding a step
    does not widen, and the held step crosses the learner's text; the release's state resolves the
-   ranked sites first and leaves one open; the withheld problems are in no section.
+   ranked sites first and leaves one open; the withheld problems are in no section and are read
+   at the release's opening, the same regions every lap; a held step that codes the next regions
+   higher at every halving that moves it is refused and the material before it stands.
 2. **Card parity.** The card's realization equals the host bit for bit (faces, codes, covector,
    learner) over 32 sections of GSM8K regions; its time per site is measured on the opening
    sections and projected before any learner run. [measured] Passed (acae723b6, receipts in
@@ -339,7 +344,7 @@ The repairs, built and tested on the host before any card run:
 | 1 | Half the training regions take the release's state at a keyed `ρ` (§3): every answer site open but the first `⌊ρ r⌋` in the release's order, read from the field's whole-open faces with and without the question. | `field_train::{shape, released_state, section_regions}` |
 | 2 | The release orders by the news the question gives each site's top class, `p̂(c) ν` (§4): a class the place and the released answer already predict carries no news and is released after the classes the question decides. | `field::by_news`, `Field::release_realized` |
 | 3 | A certified step is held and read on the next section's regions; where it codes them higher it is halved against the material before it, or refused. The lap's last step is read on the withheld problems. The learner's text carries a held step (`hnn-field-learner-v3`). | `FieldLearner::{open, read_step_on, section_realized}` |
-| 4 | As many training problems as the held file holds are withheld (keyed, in no section); growth reads their release-state code after each lap (§5). The held file stays a reading only. | `field_train::{sections_of, unseen_read, train}` |
+| 4 | As many training problems as the held file holds are withheld (keyed, in no section); growth reads their code at the release's opening after each lap, the same sites every lap (§5). The held file stays a reading only. | `field_train::{sections_of, unseen_regions, unseen_read, train}` |
 
 [agent-inferred] **What the repairs cost.** Reading 1 measured a section's read at 31 ms and its
 return at 191 ms (1,846 reads in 56.7 s, 1,684 returns in 322.3 s). A section now adds two reads of

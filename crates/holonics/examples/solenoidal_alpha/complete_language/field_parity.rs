@@ -14,7 +14,7 @@
 //! `time-field` reads the card alone over the opening sections and the opening releases and
 //! projects a lap and a release of the held problems from the measured upper time a site pair.
 
-use super::field_train::{problems_of, question_text, region_lengths, section_regions, sections_of, units_of, walk, FieldCodec, Problems, UNSEEN_DRAW};
+use super::field_train::{problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, walk, FieldCodec, Problems};
 use super::tower_train::{count, positive};
 use super::*;
 use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldRealization, FieldReceipt, HostField, Region};
@@ -58,10 +58,13 @@ fn passage(args: &[String], section: usize) -> Result<Passage> {
 }
 
 impl Passage {
-    /// Section `s`'s regions as `train-field` forms them from `draw` on, read from `learner`'s field
-    /// through `realization` (or the withheld problems' at the release's states).
-    fn regions(&self, members: &[usize], draw: &mut u64, released: bool, learner: &FieldLearner, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
-        section_regions(&self.codec, &self.train, members, self.seed, draw, released, &learner.field, realization)
+    /// A section's regions as `train-field` forms them from `draw` on, read from `learner`'s field
+    /// through `realization`; with `withheld`, the withheld problems' at the release's opening.
+    fn regions(&self, members: &[usize], draw: &mut u64, withheld: bool, learner: &FieldLearner, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
+        if withheld {
+            return Ok(unseen_regions(&self.codec, &self.train, &self.unseen, self.seed));
+        }
+        section_regions(&self.codec, &self.train, members, self.seed, draw, &learner.field, realization)
     }
 
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
@@ -173,7 +176,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         let members = if end { &p.unseen } else { &p.sections[s] };
         let mut host = HostField;
         let mut host_rec = Recorder { inner: &mut host, reads: Vec::new() };
-        let (mut host_draw, mut card_draw) = if end { (UNSEEN_DRAW, UNSEEN_DRAW) } else { (draw, draw) };
+        let (mut host_draw, mut card_draw) = (draw, draw);
         let t0 = std::time::Instant::now();
         let host_regions = p.regions(members, &mut host_draw, end, &host_learner, &mut host_rec)?;
         let host_views: Vec<Region> = host_regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();

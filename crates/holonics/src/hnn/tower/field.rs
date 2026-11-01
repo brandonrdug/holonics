@@ -997,8 +997,6 @@ impl Field {
     }
 }
 
-/// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square
-/// roots on `2^(−16)`.
 /// [definition; agent-inferred, November 1] **The release's order is the news a site's top class
 /// carries** (the record's §11). `faces` are a region's faces with its question resolved and
 /// `prior` the same region's with the question's sites unresolved: the prior face reads what the
@@ -1035,6 +1033,8 @@ pub fn by_news(faces: &[Option<TowerFace>], prior: &[Option<TowerFace>]) -> Resu
     Ok(open.into_iter().map(|(_, t, top)| (t, top)).collect())
 }
 
+/// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square
+/// roots on `2^(−16)`.
 fn chart_scale(width: usize) -> (u128, u128) {
     ((3u128 << 32).isqrt(), ((width as u128) << 32).isqrt())
 }

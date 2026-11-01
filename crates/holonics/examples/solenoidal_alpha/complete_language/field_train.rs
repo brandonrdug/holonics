@@ -161,11 +161,11 @@ pub(super) enum Shape {
 /// probability `τ`, so the field almost never met the state a release opens on (every answer site
 /// unresolved, its question resolved), nor the states its sweeps pass through (the sites with the
 /// most news resolved); read there, the held answer coded 5.2 bits a class against the training
-/// passage's 2.6, worse than the bytes' own frequencies. `released` forces the second.
-pub(super) fn shape(seed: u64, draw: u64, sites: usize, released: bool) -> Shape {
+/// passage's 2.6, worse than the bytes' own frequencies.
+pub(super) fn shape(seed: u64, draw: u64, sites: usize) -> Shape {
     let head = mix(seed, draw);
     let low = (head >> 1) & 0xFFFF;
-    if released || head & 1 == 0 {
+    if head & 1 == 0 {
         return Shape::Released(low);
     }
     let tau = low + 1;
@@ -230,7 +230,7 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 /// answer and a keyed void tail) and its shape ([`shape`]); the release-state regions' masks are
 /// read from `field` with every answer site open, with the question and without it (two reads of
 /// the section, through `realization`), and ranked by their news.
-pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, released: bool, field: &Field, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
+pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, field: &Field, realization: &mut dyn FieldRealization) -> Result<Vec<(Vec<usize>, Vec<bool>)>> {
     let mut regions: Vec<(Vec<usize>, Vec<bool>)> = Vec::with_capacity(members.len());
     let mut states: Vec<(usize, u64, usize)> = Vec::new();
     for &i in members {
@@ -238,7 +238,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         *draw += 1;
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
         let classes = region_classes(codec, q, a, length);
-        match shape(seed, *draw, length, released) {
+        match shape(seed, *draw, length) {
             Shape::Masked(mask) => regions.push((classes, mask)),
             Shape::Released(rho) => {
                 states.push((regions.len(), rho, q.len()));
@@ -264,9 +264,9 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
 }
 
 /// [agent-inferred, November 1] **The training passage's sections and its withheld problems**:
-/// `withheld` problems, the first in a keyed order, are never trained on; their release-state code
-/// is the run's own unseen read, the step a lap's last section holds is read on them, and the body
-/// grows on it ([`train`]). The rest are sorted by length and cut into sections of `section`.
+/// `withheld` problems, the first in a keyed order, are never trained on; their code at the
+/// release's opening is the run's own unseen read ([`unseen_regions`]), the step a lap's last
+/// section holds is read on them, and the body grows on it ([`train`]). The rest are sorted by length and cut into sections of `section`.
 /// Why: the first reading's growth read the passage's own code, read before each deposit, which
 /// fell every lap while the held answer's rose, so the body never grew; and the held problems are
 /// the reading's, which no decision of the run may read.
@@ -324,12 +324,39 @@ fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization:
     Ok(out)
 }
 
-/// The withheld problems' regions at the release's states, formed on the learner's standing
-/// material; the step it holds is read on them, and their code under the material that stands
-/// is returned with its sites and the step's read.
-fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
+/// [agent-inferred, November 1] **The withheld problems' regions at the release's opening**: each
+/// problem's question resolved, then its answer and a keyed void tail all unresolved, the draws
+/// from [`UNSEEN_DRAW`] on, so every lap reads the same regions over the same sites. Why not the
+/// release's states at `ρ`: their resolved sites are the first in the field's own news order, so
+/// as the field learns a site it leaves the compared set, and a growth that compares code a site
+/// across laps would read a different set of sites each lap (and a mask formed before the held step
+/// is read would come from material the read may refuse). The opening is the state a release
+/// starts from, and the sections meet the states it passes through.
+pub(super) fn unseen_regions(codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64) -> Vec<(Vec<usize>, Vec<bool>)> {
+    unseen_regions_with(codec.answer, codec.void(), problems, unseen, seed)
+}
+
+/// [`unseen_regions`] at the codec's answer extent `answer` and void class `void`.
+fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: &[usize], seed: u64) -> Vec<(Vec<usize>, Vec<bool>)> {
     let mut draw = UNSEEN_DRAW;
-    let regions = section_regions(codec, problems, unseen, seed, &mut draw, true, &learner.field, realization)?;
+    unseen
+        .iter()
+        .map(|&i| {
+            let (q, a, _) = &problems[i];
+            draw += 1;
+            let length = q.len() + a.len() + tail(seed, draw, answer - a.len());
+            let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
+            classes.resize(length, void);
+            (classes, (0..length).map(|t| t >= q.len()).collect())
+        })
+        .collect()
+}
+
+/// The withheld problems at the release's opening ([`unseen_regions`]): the step the learner
+/// holds is read on them, and their code under the material that stands is returned with its
+/// sites and the step's read.
+fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
+    let regions = unseen_regions(codec, problems, unseen, seed);
     let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
@@ -451,7 +478,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let lap_start = std::time::Instant::now();
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
-            let regions = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, false, &learner.field, realization)?;
+            let regions = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &learner.field, realization)?;
             let length = regions.iter().map(|(c, _)| c.len()).max().unwrap_or(0);
             let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
@@ -710,12 +737,25 @@ fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) ->
     Ok((q, open))
 }
 
-/// The releases of every admitted opening read together; a refused opening keeps its refusal.
+/// The releases of every admitted opening read together; a refused opening keeps its refusal. A
+/// refused batch is released again one problem at a time (each release is its own region's, so
+/// each is the batch's own), and a problem's refusal is that problem's alone.
 fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization) -> Result<Vec<std::result::Result<Vec<usize>, String>>> {
     let admitted: Vec<(&[usize], usize)> = requests.iter().filter_map(|r| r.as_ref().ok().map(|(q, open)| (q.as_slice(), *open))).collect();
-    let mut released = if admitted.is_empty() { Vec::new() } else { field.release_realized(&admitted, sweeps, void, realization).map_err(|e| e.to_string())? }.into_iter();
+    let released: Vec<std::result::Result<Vec<usize>, String>> = if admitted.is_empty() {
+        Vec::new()
+    } else {
+        match field.release_realized(&admitted, sweeps, void, realization) {
+            Ok(all) => all.into_iter().map(Ok).collect(),
+            Err(why) => {
+                println!("FIELD_RELEASE_BATCH_REFUSED problems={} why={why}", admitted.len());
+                admitted.iter().map(|&one| field.release_realized(&[one], sweeps, void, realization).map(|mut r| r.remove(0)).map_err(|e| e.to_string())).collect()
+            }
+        }
+    };
+    let mut released = released.into_iter();
     Ok(requests.iter().map(|r| match r {
-        Ok(_) => released.next().ok_or_else(|| "a release the batch did not return".to_string()),
+        Ok(_) => released.next().unwrap_or_else(|| Err("a release the batch did not return".to_string())),
         Err(why) => Err(why.clone()),
     }).collect())
 }
@@ -873,7 +913,7 @@ mod tests {
     fn shapes_open_a_site_and_meet_both_halves() {
         let (mut masked, mut released) = (0, 0);
         for draw in 0..64 {
-            match shape(7, draw, 12, false) {
+            match shape(7, draw, 12) {
                 Shape::Masked(m) => {
                     assert!(m.iter().any(|&u| u));
                     assert_eq!(m.len(), 12);
@@ -884,7 +924,6 @@ mod tests {
                     released += 1;
                 }
             }
-            assert!(matches!(shape(7, draw, 12, true), Shape::Released(_)));
         }
         assert!(masked > 16 && released > 16, "{masked} {released}");
     }
@@ -912,5 +951,20 @@ mod tests {
         trained.sort_unstable();
         assert_eq!(trained, (0..40).collect::<Vec<_>>());
         assert_eq!(sections_of(&problems, 6, 9, 11).1, unseen, "keyed, not drawn afresh");
+    }
+
+    /// The withheld problems are read at the release's opening, over the same sites every lap.
+    #[test]
+    fn the_withheld_problems_open_every_answer_site() {
+        let problems: Problems = (0..5usize).map(|i| (vec![1; 3 + i], vec![2; 1 + i], 1 + i)).collect();
+        let codec_answer = 9;
+        let regions = unseen_regions_with(codec_answer, 0, &problems, &[1, 3], 5);
+        assert_eq!(regions, unseen_regions_with(codec_answer, 0, &problems, &[1, 3], 5), "keyed, not drawn afresh");
+        for ((classes, open), &i) in regions.iter().zip(&[1usize, 3]) {
+            let (q, a, _) = &problems[i];
+            assert!(classes.len() > q.len() + a.len() && classes.len() <= q.len() + codec_answer);
+            assert_eq!(&classes[..q.len()], &q[..]);
+            assert!(open.iter().enumerate().all(|(t, &u)| u == (t >= q.len())));
+        }
     }
 }
