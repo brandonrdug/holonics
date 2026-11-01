@@ -254,7 +254,7 @@ pub(super) type TrainRegion = (Vec<usize>, Vec<bool>, Vec<Option<Shares>>);
 
 /// The regions as the field reads them.
 pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
-    regions.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: f }).collect()
+    regions.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: f, locked: &[] }).collect()
 }
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its
@@ -299,7 +299,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         return Ok((regions, next));
     }
     let logits = {
-        let views: Vec<Region> = states.iter().map(|&(k, _)| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[] }).collect();
+        let views: Vec<Region> = states.iter().map(|&(k, _)| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[], locked: &[] }).collect();
         realization.read_logits(&learner.field, &views).map_err(|e| e.to_string())?
     };
     for (&(k, q), logits) in states.iter().zip(&logits) {
@@ -347,7 +347,7 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// context text, foil, foil digits, foil text]`. A reading only: no decision of the run reads it.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 9]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
     let mut out = [(0i64, 0usize); 9];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
@@ -451,7 +451,7 @@ fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: 
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
     let regions = unseen_regions(codec, problems, unseen, seed);
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
     for (faces, region) in faces.iter().zip(&views) {
@@ -995,7 +995,7 @@ impl LandmarkCount {
         }
         let started = std::time::Instant::now();
         let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
-        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces };
+        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &[] };
         let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
         self.ns += started.elapsed().as_nanos();
         self.problems += 1;
@@ -1020,8 +1020,8 @@ fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'
     move |sweep| {
         let ms = started.elapsed().as_millis();
         println!(
-            "FIELD_RELEASE_SWEEP set={set} done={} live={} locked={} open={} rung={} change={} holding={} soft={} overturned={} free={} cut={} cut_sites={} ms={ms}",
-            sweep.done, sweep.live, sweep.locked, sweep.open, sweep.rung, sweep.change, sweep.holding, sweep.soft, sweep.overturned, sweep.free, sweep.cut, sweep.cut_sites
+            "FIELD_RELEASE_SWEEP set={set} done={} live={} reached={} front={} locked={} open={} rung={} change={} holding={} soft={} overturned={} free={} ms={ms}",
+            sweep.done, sweep.live, sweep.reached, sweep.front, sweep.locked, sweep.open, sweep.rung, sweep.change, sweep.holding, sweep.soft, sweep.overturned, sweep.free
         );
         *last = *sweep;
         ms < stop_ms

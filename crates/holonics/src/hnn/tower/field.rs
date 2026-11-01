@@ -29,7 +29,8 @@
 //!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   w_t = W r̂_t + b_w,   v_t = V r̂_t + b_v       one word a head: q = k
 //! classes    B_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of w_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
-//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j : |i − j| ≥ 6, B_h(j) = B_h(i), i or j known }   bipartite far
+//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j : |i − j| ≥ 6, B_h(j) = B_h(i), j definite }   only plates radiate far
+//! hold       λ(w) = min over the class's b modes of |Re(w_m²)| / |w_m|²         a lock fades at its light cone
 //! frame      w̃_t = U_t ⊙ w_t,   ṽ_t = U_t ⊙ v_t                                complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
 //! contact    z_ij = 2^(−β) Σ_m D_m(|i−j|) Re(conj(w̃_im) w̃_jm) − ⌊log₂ |i − j|⌋   j ∈ S_i^h; reciprocal
@@ -169,14 +170,13 @@ use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, 
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
-/// The Gibbs weights' grain relative to their row's peak, `e_ij` on `2^(−40)` (the exponential's
-/// `2^(−62)` face released; a pair below `2^(−40)` of its row's peak weighs nothing).
-const WEIGHT_BITS: u32 = 40;
-/// The reverse's per-site return of a row's denominator carries `2^(−30)` past the covector's
-/// grain (the precision the first draft's shares carried), so the sum over sites releases once.
-const SHARE_BITS: u32 = 30;
-/// The exponential's face is on `2^(−62)`; the weights keep `2^(−40)` of it.
-const WEIGHT_BITS_FROM: u32 = 62 - WEIGHT_BITS;
+/// [agent-inferred, November 1] **The hold's face** on `2^(−40)` (§14.2): a ratio of integer faces,
+/// attained at its declared grain as the exponential's mantissa is at `2^(−62)`.
+const HOLD_BITS: u32 = 40;
+/// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
+/// once, by one division of the exact series, for the return; the declared crossing into the step,
+/// whose own release is to the material's grain.
+pub const SHARE_BITS: u32 = 63;
 /// The contact covector's grain, `2^(−40)` (`δz` and `δs`).
 const CONTACT_BITS: u32 = 40;
 /// A face carried as a site's state, each class's share on `2^(−16)` ([`shares`]); its opening
@@ -274,6 +274,22 @@ impl FieldDeclaration {
     /// is refused, on the host and the card alike.
     pub fn contact_return_bits(&self) -> u32 {
         (126 - MOVE_BITS - 31).saturating_sub(self.reach_bits() as u32)
+    }
+
+    /// [definition; agent-inferred, November 1] **A series row's carrier**, read from the declaration's
+    /// own bounds (§14.11), never chosen: a score is at most the gain times `2n` at unit power above
+    /// zero and that plus the falloff at the reach below it, so a row's whole bits spread over
+    /// `2·2^(−β)·2n + ⌊log₂ reach⌋ + 2`; a term's face is 62 bits and its multiplier 80 (the two holds,
+    /// or a crowd's `2^80`) and `⌈log₂ reach⌉` more for a crowd's count; a row holds at most the reach
+    /// and two crowds an octave, `⌈log₂⌉` of that; a value is at most a 64-bit carrier summed over the
+    /// reach. The width widens only where the declaration does (growth, a declared crossing), and no row
+    /// passes it. Owed to #410 with the grouped row's equality.
+    pub fn row_bits(&self) -> u32 {
+        let reach_bits = self.reach_bits() as u32;
+        let gain = if self.score_shift() >= 0 { (2 * self.modes as u32) >> self.score_shift() } else { (2 * self.modes as u32) << -self.score_shift() };
+        let spread = 2 * gain + (usize::BITS - 1 - self.reach.leading_zeros()) + 2;
+        let terms = (usize::BITS - (self.reach + 2 * reach_bits as usize).leading_zeros()) as u32;
+        62 + 2 * HOLD_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
     }
 
     /// The classes a head reads, `3^b`.
@@ -509,14 +525,17 @@ pub struct Field {
 /// a face (`faces[t]`, its classes' shares on `2^(−16)`, [`shares`]) opens on the mixture of its
 /// classes' rows, `Σ_a w_a E(a)`, and so for its strand neighbours' rows (`E₋`, `E₊`), and holds no
 /// class for the closure; an unresolved site carried so is read and compared there (the release's
-/// sweeps and the training's second read, the dispersing field's §4 and §5). An unresolved site not
-/// carried opens on the encoding's last row; a resolved one on its class's. `faces` is empty where
-/// no site is carried so.
+/// sweeps and training's front regions, the dispersing field's §4, §14.3 and §14.6). An unresolved
+/// site not carried opens on the encoding's last row; a resolved one on its class's. `faces` is empty
+/// where no site is carried so. A carried site may be `locked` (a foil): with the known sites
+/// (resolved, carrying nothing) it is definite (§14.1), and only definite sources are heard past the
+/// near field. `locked` is empty where no site is locked.
 #[derive(Clone, Copy, Debug)]
 pub struct Region<'a> {
     pub classes: &'a [usize],
     pub unresolved: &'a [bool],
     pub faces: &'a [Option<Shares>],
+    pub locked: &'a [bool],
 }
 
 /// A face carried as a site's state: each class with its share on `2^(−16)` ([`shares`]).
@@ -544,6 +563,8 @@ pub fn shares(face: &TowerFace) -> Shares {
 struct TickCell {
     read: Vec<i32>,
     scale: Vec<i128>,
+    /// The unframed word `[t][2M]` (the hold reads it).
+    word: Vec<i64>,
     /// The framed words and values by head: `[h][t][2n]`, the real parts then the imaginary; the
     /// word as a ratio to its own power within its head (on `2^(−16)`), its powers `[h][t]` beside it.
     q: Vec<i64>,
@@ -551,11 +572,17 @@ struct TickCell {
     qscale: Vec<i128>,
     /// Each head's resonance classes and their lists ([`ClassLists`]).
     classes: Vec<ClassLists>,
-    /// Each head's and receiving site's support with its Gibbs weights on `2^(−40)` of the row's
-    /// peak, `[h][i]` as `(j, e_ij)`, and each row's mass `[h][i]`: the numerators and their shared
-    /// denominator.
+    /// Each head's and receiving site's support with each source's share of the row's mass on
+    /// `2^(−63)` ([`SeriesRow`]), `[h][i]` as `(j, p_ij)` (a far source held by both ends, §14.2), and
+    /// each row's mass, the shares' whole `2^63`.
     rows: Vec<Vec<(u32, u64)>>,
     mass: Vec<u64>,
+    /// Each head's and site's hold `λ` on `2^(−40)` and the mode that sets it `[h][t]` ([`hold`]).
+    holds: Vec<(u64, u32)>,
+    /// Each head's and receiving site's crowds `[h][i]` and each head's prefix sums of the definite
+    /// words and values ([`Sums`], §14.10).
+    crowds: Vec<Vec<Crowd>>,
+    sums: Vec<Sums>,
     /// The current `[t][2M]`, back in each site's own frame.
     y: Vec<i64>,
     read2: Vec<i32>,
@@ -568,33 +595,29 @@ struct TickCell {
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
 /// dispersing field's §2.2, §6 and §12): each site's class `B_h(t) = Σ_l 3^l (s_l + 1)`, `s_l` the
 /// shell trit of its unframed word's mode `l` ([`shell`]), and the lists by one stable counting sort: class `c`'s members are
-/// the known sites first (resolved and carrying no mixture: their class arrived), then the rest, each in
-/// ascending place, class `c`'s known members `members[off[2c]..off[2c + 1]]` and its others
-/// `members[off[2c + 1]..off[2c + 2]]`. The card lists them alike.
+/// the definite sites first (known or locked, §14.1), then the rest, each in ascending place, class
+/// `c`'s definite members `members[off[2c]..off[2c + 1]]` and its others `members[off[2c + 1]..off[2c +
+/// 2]]`. The card lists them alike.
 ///
-/// [definition; agent-inferred, November 1] **Far contacts are bipartite**: past the near field two
-/// class-mates meet only where at least one of them is known. Why (the build's two reviews, November
-/// 1): every site whose class has not arrived and whose neighbours are unresolved opens on one face
-/// and so one word; with one word for lock and key they shared every class and met each other at the
-/// most any pair reaches, the release's opening a clique of its whole extent (about `A²` pairs a head a
-/// tick) gathering the unresolved row above the question, and at the first sweep their equal mixtures
-/// did the same. Stripping those sites of every class broke the clique but left them hearing only their
-/// near field, so the opening's interior could not read the question and the extent was read at the
-/// region's two ends. Met only by known class-mates, an unknown site still reads the question (its word
-/// is its crib address, and its class-mates there are met at their falloff), while unknown sites meet
-/// each other through the near field and hop by hop, as the medium disperses.
+/// [definition; agent-inferred, November 1] **Only the plates radiate far** (the dispersing field's
+/// §14.1): past the near field a source is heard only where it is definite, known (the question, or the
+/// truth in a training region) or locked (a foil); a soft or unreached site is heard only in its near
+/// field. The support is directional: a receiver of any state reads the definite run of its class. No
+/// clique can form, since unresolved and soft sources are never met far. (This replaces the build's
+/// bipartite rule, under which an open answer site met the question only through the class of the
+/// unresolved row or of a near-flat mixture: on GSM8K the class of the space.)
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ClassLists {
     pub class: Vec<u32>,
-    pub known: Vec<bool>,
+    pub definite: Vec<bool>,
     pub off: Vec<u32>,
     pub members: Vec<u32>,
 }
 
 impl ClassLists {
-    /// The lists of the classes `class` over `buckets` classes, each class's `known` sites first.
-    pub fn of(class: Vec<u32>, known: Vec<bool>, buckets: usize) -> Self {
-        let key = |t: usize| 2 * class[t] as usize + usize::from(!known[t]);
+    /// The lists of the classes `class` over `buckets` classes, each class's `definite` sites first.
+    pub fn of(class: Vec<u32>, definite: Vec<bool>, buckets: usize) -> Self {
+        let key = |t: usize| 2 * class[t] as usize + usize::from(!definite[t]);
         let mut off = vec![0u32; 2 * buckets + 1];
         for t in 0..class.len() {
             off[key(t) + 1] += 1;
@@ -608,20 +631,18 @@ impl ClassLists {
             members[filled[key(t)] as usize] = t as u32;
             filled[key(t)] += 1;
         }
-        Self { class, known, off, members }
+        Self { class, definite, off, members }
     }
 
-    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5): its near field
-    /// (`0 < |i − j| < NEAR`, nearest first, before then after) and the members of its class past the
-    /// near field that it may meet (every member where `i` is known, the known ones where it is not;
-    /// known first, each in ascending place), each site once. The support is symmetric: `j` is in
-    /// `i`'s exactly when `i` is in `j`'s.
+    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1): its near field
+    /// (`0 < |i − j| < NEAR`, nearest first, before then after) and the definite members of its class
+    /// past the near field (in ascending place), each site once. The support is directional: `j` is
+    /// heard far by every class-mate where `j` is definite, and by none where it is not.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
         let c = 2 * self.class[i] as usize;
-        let end = if self.known[i] { c + 2 } else { c + 1 };
-        let members = &self.members[self.off[c] as usize..self.off[end] as usize];
+        let members = &self.members[self.off[c] as usize..self.off[c + 1] as usize];
         near.chain(members.iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR))
     }
 }
@@ -640,10 +661,168 @@ pub fn shell(re: i64, im: i64) -> u32 {
     }
 }
 
+/// [definition; agent-inferred, November 1] **A site's hold on its shells** (the dispersing field's
+/// §14.2): each class mode's distance from its light cone, `λ_m = |Re(w_m²)| / |w_m|² =
+/// |re² − im²| / (re² + im²)` on `2^(−40)` (`1` at a shell's centre, pure in phase or pure quadrature;
+/// `0` on the cone, and for a silent mode), and the least over the class's modes, with the first mode
+/// that sets it. A far contact is weighted by both ends' holds, so a word crossing a seam leaves its
+/// class with weight falling to zero and enters the next from zero.
+pub fn hold(modes: impl Iterator<Item = (i64, i64)>) -> (u64, u32) {
+    modes
+        .enumerate()
+        .map(|(l, (re, im))| {
+            let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+            let lambda = if rr + ii == 0 { 0 } else { div_nearest((rr - ii).abs() << HOLD_BITS, rr + ii) as u64 };
+            (lambda, l as u32)
+        })
+        .fold((1u64 << HOLD_BITS, 0u32), |best, (lambda, l)| if lambda < best.0 { (lambda, l) } else { best })
+}
+
+/// [definition; agent-inferred, November 1] **A hold's return to its mode** (§14.2): with `N = re² −
+/// im²`, `D = re² + im²`, `s = sign N`, the hold `λ = s N/D` has `∂λ/∂re = 4 s re im²/D²` and
+/// `∂λ/∂im = −4 s im re²/D²`; a covector `G` of the hold on `2^(−40)` returns `div_nearest(±4 s G re
+/// im², D²)` on the covector's `2^(−24)` (the word on `2^(−16)`). A product past its carrier is refused.
+pub fn hold_return(g: i128, re: i64, im: i64) -> Result<(i128, i128)> {
+    let (re, im) = (re as i128, im as i128);
+    let (rr, ii) = (re * re, im * im);
+    let d = rr + ii;
+    let s = (rr - ii).signum();
+    let bits = |v: i128| 128 - v.unsigned_abs().leading_zeros();
+    if s == 0 || 2 * bits(d) > 126 || bits(g) + (bits(re) + bits(ii)).max(bits(im) + bits(rr)) + 3 > 126 {
+        return if s == 0 { Ok((0, 0)) } else { refuse("a hold's return past its carrier") };
+    }
+    Ok((div_nearest(4 * s * g * re * ii, d * d), div_nearest(-4 * s * g * im * rr, d * d)))
+}
+
 /// A value carried across a pair by its skin decay `(D, grain)`: `release(D v, grain)` (a still
 /// head's `(1, 0)` is the value itself).
 fn decayed((decay, grain): (i128, u32), v: i64) -> i128 {
     release(decay * v as i128, grain)
+}
+
+/// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
+/// §14.11): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ` its multiplier on
+/// `2^(−80)`: `2^80` in the near field, the two holds of a far source, a crowd's count `· 2^80` in the
+/// mass with `2^80` against its value sum) keeps its own exponent; the terms are summed whole, shifted
+/// from the row's least exponent, in a carrier as wide as the declaration bounds
+/// ([`FieldDeclaration::row_bits`]); the current `ỹ = Σ e v / Σ e` is released once, to the nearest
+/// numerator on the value's grain; and each term's share of the mass is formed once on `2^(−63)`. No
+/// peak is subtracted and no term is released before the current: a source outscored by any number of
+/// bits still enters the sums. Integer sums, so any order gives the same bits.
+pub struct SeriesRow {
+    span: usize,
+    terms: Vec<(i64, u128, u128, u128, Vec<i128>)>,
+}
+
+impl SeriesRow {
+    pub fn new(span: usize) -> Self {
+        Self { span, terms: Vec::new() }
+    }
+
+    /// A term: its score's `(a, face)`, its mass multiplier, its value multiplier and its values.
+    pub fn push(&mut self, (a, face): (i64, u128), mass: u128, value_mult: u128, value: &[i128]) {
+        self.terms.push((a, face, mass, value_mult, value.to_vec()));
+    }
+
+    /// The released current (each value entry `div_nearest(Σ 2^(a − a₀) face μ_v v, Σ 2^(a − a₀) face
+    /// μ)`) and each term's share `div_nearest(2^(a − a₀) face μ 2^63, Σ …)`.
+    pub fn release(&self) -> (Vec<i128>, Vec<u64>) {
+        use num_bigint::BigInt;
+        let a0 = self.terms.iter().map(|t| t.0).min().unwrap_or(0);
+        let mass_of = |t: &(i64, u128, u128, u128, Vec<i128>)| (BigInt::from(t.1) * BigInt::from(t.2)) << ((t.0 - a0) as usize);
+        let mass: BigInt = self.terms.iter().map(mass_of).sum();
+        let nearest = |x: BigInt| -> BigInt {
+            let half: BigInt = &mass / 2;
+            let negative = x < BigInt::from(0);
+            let q: BigInt = (if negative { -x } else { x } + half) / &mass;
+            if negative { -q } else { q }
+        };
+        let current = (0..self.span)
+            .map(|r| {
+                let sum: BigInt = self.terms.iter().map(|t| ((BigInt::from(t.1) * BigInt::from(t.3)) << ((t.0 - a0) as usize)) * BigInt::from(t.4[r])).sum();
+                i128::try_from(nearest(sum)).unwrap_or(0)
+            })
+            .collect();
+        let shares = self.terms.iter().map(|t| u64::try_from(nearest(mass_of(t) << SHARE_BITS as usize)).unwrap_or(u64::MAX)).collect();
+        (current, shares)
+    }
+}
+
+/// [definition; agent-inferred, November 1] **An octave's crowd** heard by a receiver (§14.10): the
+/// definite sources at places `lo..=hi` (one side, `⌊log₂ |i − j|⌋ = level`, `|i − j| ≥ NEAR`), their
+/// count, the crowd's score and its weight `|C| 2^(z − peak)` on `2^(−40)`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Crowd {
+    pub lo: usize,
+    pub hi: usize,
+    pub level: u32,
+    pub count: u64,
+    pub z: i64,
+    pub e: u64,
+}
+
+/// The crowds' ranges of receiver `i` in a region of `sites`: each octave `level ≥ 2` with
+/// `2^level < sites`, on each side, the places `|i − j| ∈ [max(2^level, NEAR), 2^(level+1) − 1]`
+/// within the region, the nearer side first.
+pub fn crowd_ranges(i: usize, sites: usize) -> Vec<(usize, usize, u32)> {
+    let mut out = Vec::new();
+    let mut level = 2u32;
+    while (1usize << level) < sites {
+        let (near, far) = ((1usize << level).max(NEAR), (1usize << (level + 1)) - 1);
+        if i >= near {
+            out.push((i.saturating_sub(far), i - near, level));
+        }
+        if i + near < sites {
+            out.push((i + near, (i + far).min(sites - 1), level));
+        }
+        level += 1;
+    }
+    out
+}
+
+/// [definition; agent-inferred, November 1] **The definite words' and values' prefix sums** over a
+/// region, one head (§14.10): `words[t]`, `values[t]` the sums of the definite sites' framed unit words
+/// and framed values before place `t` (the span's entries), `counts[t]` their number, so a crowd's sums
+/// are two reads.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Sums {
+    pub words: Vec<i128>,
+    pub values: Vec<i128>,
+    pub counts: Vec<u64>,
+    pub span: usize,
+}
+
+impl Sums {
+    pub fn of(words: &[i64], values: &[i64], definite: &[bool], span: usize) -> Self {
+        let sites = definite.len();
+        let (mut w, mut v, mut c) = (vec![0i128; (sites + 1) * span], vec![0i128; (sites + 1) * span], vec![0u64; sites + 1]);
+        for t in 0..sites {
+            for r in 0..span {
+                let on = i128::from(definite[t]);
+                w[(t + 1) * span + r] = w[t * span + r] + on * words[t * span + r] as i128;
+                v[(t + 1) * span + r] = v[t * span + r] + on * values[t * span + r] as i128;
+            }
+            c[t + 1] = c[t] + u64::from(definite[t]);
+        }
+        Self { words: w, values: v, counts: c, span }
+    }
+
+    fn count(&self, lo: usize, hi: usize) -> u64 {
+        self.counts[hi + 1] - self.counts[lo]
+    }
+
+    fn words(&self, lo: usize, hi: usize) -> Vec<i128> {
+        (0..self.span).map(|r| self.words[(hi + 1) * self.span + r] - self.words[lo * self.span + r]).collect()
+    }
+
+    fn value(&self, lo: usize, hi: usize, r: usize) -> i128 {
+        self.values[(hi + 1) * self.span + r] - self.values[lo * self.span + r]
+    }
+}
+
+/// A wide value carried by a skin decay `(D, grain)`: `release(D v, grain)`.
+fn decayed_wide((decay, grain): (i128, u32), v: i128) -> i128 {
+    release(decay * v, grain)
 }
 
 /// `⌊log₂ d⌋` for `d ≥ 1`, the falloff's octave in bits (§2.3).
@@ -781,6 +960,13 @@ impl Field {
         &self.exponential
     }
 
+    /// [definition; agent-inferred, November 1] **A score's term** (§14.11): `2^z` for `z` on
+    /// `2^(−16)` bits, as its whole bits `a = ⌊z⌋` and its fraction's face `2^(f − 1)` on `2^(−62)`
+    /// (in `[2^61, 2^62)`), so a term is `face · 2^(a − 61)` and keeps its own exponent.
+    pub fn face(&self, z: i64) -> (i64, u128) {
+        (z >> FACE_BITS, self.exponential.below_one((z & ((1 << FACE_BITS) - 1)) as i128 - (1i128 << FACE_BITS)))
+    }
+
     /// `ln 2` on `2^(−30)`, the weights' return reads it.
     pub fn ln2(&self) -> i128 {
         ln2_face()
@@ -823,7 +1009,16 @@ impl Field {
                 return refuse("a carried face that is empty, or whose class is outside the alphabet or share past one");
             }
         }
+        if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && Self::carried(region, t).is_none())) {
+            return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
+        }
         Ok(())
+    }
+
+    /// [definition; agent-inferred, November 1] **A definite site** (§14.1): known (resolved and
+    /// carrying no mixture) or locked (a foil). Only definite sources are heard past the near field.
+    fn definite(region: &Region, t: usize) -> bool {
+        (!region.unresolved[t] && Self::carried(region, t).is_none()) || region.locked.get(t).copied().unwrap_or(false)
     }
 
     /// The face a site is carried as, if any.
@@ -899,7 +1094,7 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], known: &[bool], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    fn tick(&self, x: &mut [i64], definite: &[bool], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -927,9 +1122,12 @@ impl Field {
         cell.classes = (0..heads)
             .map(|h| {
                 let class = (0..sites).map(|t| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(q[t * m2 + h * n + li], q[t * m2 + m + h * n + li]))).collect();
-                ClassLists::of(class, known.to_vec(), buckets)
+                ClassLists::of(class, definite.to_vec(), buckets)
             })
             .collect();
+        cell.word = q.clone();
+        // Each site's hold on its shells, head by head (§14.2).
+        cell.holds = (0..heads).flat_map(|h| (0..sites).map(move |t| (h, t))).map(|(h, t)| hold((0..trits).map(|li| (q[t * m2 + h * n + li], q[t * m2 + m + h * n + li])))).collect();
         // The frame, by head: [h][t][2n], real parts then imaginary.
         let span = 2 * n;
         cell.q = vec![0i64; heads * sites * span];
@@ -962,52 +1160,78 @@ impl Field {
             }
             cell.qscale[hs] = s;
         }
-        // The contact, the weights and the current over each site's support, head by head (§2.5):
-        // `z_ij = 2^(−β) Re(conj(w̃_i) w̃_j) − ⌊log₂ |i − j|⌋` on `2^(−16)` bits, `e_ij = 2^(z_ij −
-        // peak)` zero outside the support, and the current gathers each met site's framed value,
-        // `ỹ_i = Σ_(j∈S_i) e_ij ṽ_j / Σ_(j∈S_i) e_ij` (the numerators summed whole over their shared
-        // denominator, one release), returned to the receiving site's own frame, `y_i = conj(U_i) ỹ_i`.
+        // The contact and the current over each site's support, head by head (§2.5, §14.10, §14.11):
+        // `z_ij = 2^(−β) Σ_m D_m(|i − j|) Re(conj(ŵ_im) ŵ_jm) − ⌊log₂ |i − j|⌋` on `2^(−16)` bits for
+        // a met source, and for each octave's crowd of definite sources its mean word at the octave's
+        // falloff. The row is a series ([`SeriesRow`]): each term `2^z` times its multiplier (a far
+        // source's two holds, a crowd's count) keeps its own exponent, the terms are summed whole, and
+        // the current `ỹ_i = Σ_k e_k v_k / Σ_k e_k` is released once; each term's share of the row's
+        // mass is formed once for the return. The current returns to the receiving site's own frame,
+        // `y_i = conj(U_i) ỹ_i`.
         cell.rows = Vec::with_capacity(heads * sites);
-        cell.mass = vec![0u64; heads * sites];
+        cell.mass = vec![1u64 << SHARE_BITS; heads * sites];
         cell.y = vec![0i64; sites * m2];
         let score_bits = (FACE_BITS as i32 + beta) as u32;
+        cell.crowds = Vec::with_capacity(heads * sites);
+        cell.sums = Vec::with_capacity(heads);
         for h in 0..heads {
             let lists = &cell.classes[h];
+            let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
                 let wi = &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span];
-                let mut row: Vec<(u32, i64)> = Vec::new();
+                let hi = cell.holds[h * sites + i].0 as u128;
+                let mut series = SeriesRow::new(span);
+                let mut row: Vec<(u32, u64)> = Vec::new();
                 for j in lists.support(i) {
                     let wj = &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
                     // Each mode's pairing carried by its skin decay across the pair's distance,
-                    // `Σ_l D_l(|i − j|) Re(conj(ŵ_il) ŵ_jl)`, released once (a still head's `D = 1`
-                    // reads the bare pairing exactly).
+                    // released once (a still head's `D = 1` reads the bare pairing exactly).
                     let d = i.abs_diff(j);
                     let grain = self.decay(h, 0, d).1;
                     let s: i128 = (0..n).map(|l| self.decay(h, l, d).0 * (wi[l] as i128 * wj[l] as i128 + wi[n + l] as i128 * wj[n + l] as i128)).sum();
-                    let z = release(s, score_bits + grain) - ((octave(d) as i128) << FACE_BITS);
-                    row.push((j as u32, fit64(z)?));
+                    let z = fit64(release(s, score_bits + grain) - ((octave(d) as i128) << FACE_BITS))?;
+                    // A far source is held by both ends (§14.2); the near field without the holds.
+                    let mult = if d < NEAR { 1u128 << (2 * HOLD_BITS) } else { hi * cell.holds[h * sites + j].0 as u128 };
+                    let value: Vec<i128> = (0..span).map(|r| decayed(self.decay(h, r % n, d), cell.v[(h * sites + j) * span + r])).collect();
+                    series.push(self.face(z), mult, mult, &value);
+                    row.push((j as u32, 0));
                 }
-                let peak = row.iter().map(|&(_, z)| z).max().ok_or(TowerError::Refused("a site with no support"))?;
-                let row: Vec<(u32, u64)> = row.into_iter().map(|(j, z)| (j, release(self.exponential.below_one(z as i128 - peak as i128) as i128, WEIGHT_BITS_FROM) as u64)).collect();
-                let mass: u64 = row.iter().map(|&(_, e)| e).sum();
-                cell.mass[h * sites + i] = mass;
-                // The current's relative transport carries the skin decay too: each source's framed
-                // value decayed across its distance, `release(D_l ṽ_j, 30)`, then weighed.
-                let mut framed = vec![0i64; span];
-                for (r, slot) in framed.iter_mut().enumerate() {
-                    let sum: i128 = row.iter().map(|&(j, e)| e as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), cell.v[(h * sites + j as usize) * span + r])).sum();
-                    *slot = fit64(div_nearest(sum, mass as i128))?;
+                // The far field blurred (§14.10): each octave's crowd of definite sources on each side,
+                // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
+                // term is its decayed value sum, its mass term `|C|` times its face.
+                let mut crowds: Vec<Crowd> = Vec::new();
+                for (lo, hi_, level) in crowd_ranges(i, sites) {
+                    let count = sums.count(lo, hi_);
+                    if count == 0 {
+                        continue;
+                    }
+                    let word = sums.words(lo, hi_);
+                    let (decay, grain) = (|l: usize| self.decay(h, l, 1 << level), self.decay(h, 0, 1 << level).1);
+                    let score: i128 = (0..n).map(|l| decay(l).0 * (wi[l] as i128 * word[l] + wi[n + l] as i128 * word[n + l])).sum();
+                    let z = fit64(div_nearest(score, (count as i128) << (score_bits + grain)) - ((level as i128) << FACE_BITS))?;
+                    let value: Vec<i128> = (0..span).map(|r| decayed_wide(self.decay(h, r % n, 1 << level), sums.value(lo, hi_, r))).collect();
+                    series.push(self.face(z), (count as u128) << (2 * HOLD_BITS), 1u128 << (2 * HOLD_BITS), &value);
+                    crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0 });
+                }
+                let (framed, shares) = series.release();
+                for (k, entry) in row.iter_mut().enumerate() {
+                    entry.1 = shares[k];
+                }
+                for (c, &share) in crowds.iter_mut().zip(&shares[row.len()..]) {
+                    c.e = share;
                 }
                 for li in 0..n {
                     let (ur, ui) = self.frame(i, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
-                    let (yr, yi) = (framed[li] as i128, framed[n + li] as i128);
+                    let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
                     let c = h * n + li;
                     cell.y[i * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
                     cell.y[i * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
                 }
                 cell.rows.push(row);
+                cell.crowds.push(crowds);
             }
+            cell.sums.push(sums);
         }
         let mut o = vec![0i64; dw];
         for t in 0..sites {
@@ -1050,11 +1274,11 @@ impl Field {
         let dw = d.width;
         let reaches = self.reaches();
         let mut x = self.open(region);
-        let known: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] && Self::carried(region, t).is_none()).collect();
+        let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let mut out = FieldPass::default();
         for _ in 0..d.ticks {
             let mut cell = TickCell::default();
-            self.tick(&mut x, &known, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &reaches, &mut cell)?;
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
             if keep {
                 out.ticks.push(cell);
@@ -1166,6 +1390,7 @@ impl Field {
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
+        let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
         // The face.
         let mut dx = vec![0i64; sites * dw];
         {
@@ -1247,9 +1472,9 @@ impl Field {
             // The weights and the contact over each site's support, head by head.
             let mut dq = vec![0i64; sites * m2];
             let mut dv = vec![0i64; sites * m2];
+            // Each head's and site's hold covector `∂L/∂λ` on `2^(−40)` (§14.2).
+            let mut lifts = vec![0i128; heads * sites];
             let mut dyh = vec![0i64; sites * span];
-            let mut w = vec![0i64; sites * span];
-            let carried = WEIGHT_BITS + SHARE_BITS;
             for h in 0..heads {
                 // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
                 for t in 0..sites {
@@ -1263,57 +1488,85 @@ impl Field {
                     }
                 }
                 let rows = &cell.rows[h * sites..(h + 1) * sites];
-                let mass = &cell.mass[h * sites..(h + 1) * sites];
+                let crowds = &cell.crowds[h * sites..(h + 1) * sites];
+                let sums = &cell.sums[h];
                 let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
                 let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
-                // δṽ_j = Σ_(i: j∈S_i) (e_ij / Σ_k e_ik) δỹ_i: each receiver's covector over its row's
-                // denominator, carried 2^(−30) finer, then one integer sum over the receivers that
-                // meet `j` (the support is symmetric, so they are `j`'s own support).
-                for i in 0..sites {
-                    for r in 0..span {
-                        let scaled = (dyh[i * span + r] as i128).checked_mul(1i128 << carried).ok_or(TowerError::Refused("a current's covector outgrew its 128-bit carrier"))?;
-                        w[i * span + r] = fit64(div_nearest(scaled, mass[i] as i128))?;
-                    }
-                }
+                let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
+                // The values' return: `δṽ_j = Σ_(i: j∈S_i) p_ij D(|i − j|) δỹ_i` with each term's share
+                // `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over its
+                // members, `p_C/|C|` each, through a difference array over the places.
                 let mut sv = vec![0i128; sites * span];
-                for (i, row) in rows.iter().enumerate() {
-                    for &(j, e) in row {
+                let mut crowd_v = vec![0i128; (sites + 1) * span];
+                for i in 0..sites {
+                    for &(j, p) in &rows[i] {
                         for r in 0..span {
-                            sv[j as usize * span + r] += e as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), w[i * span + r]);
+                            sv[j as usize * span + r] += p as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), dyh[i * span + r]);
+                        }
+                    }
+                    for c in &crowds[i] {
+                        for r in 0..span {
+                            let part = div_nearest(c.e as i128 * decayed(self.decay(h, r % n, 1 << c.level), dyh[i * span + r]), c.count as i128);
+                            crowd_v[c.lo * span + r] += part;
+                            crowd_v[(c.hi + 1) * span + r] -= part;
                         }
                     }
                 }
+                let spread = |diff: &[i128], t: usize, r: usize| -> i128 { (0..=t).map(|u| diff[u * span + r]).sum() };
                 for j in 0..sites {
                     for r in 0..span {
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
-                        dv[j * m2 + if r < n { c } else { m + c }] = fit64(release(sv[j * span + r], carried))?;
+                        let slot = j * m2 + if r < n { c } else { m + c };
+                        dv[slot] = fit64(release(sv[j * span + r], SHARE_BITS))?;
+                        if definite[j] {
+                            dv[slot] = fit64(dv[slot] as i128 + release(spread(&crowd_v, j, r), SHARE_BITS))?;
+                        }
                     }
                 }
-                // δz_ij = ln 2 · (e_ij/Σe)(δp_ij − Σ_k (e_ik/Σe) δp_ik), δp_ij = ⟨δỹ_i, ṽ_j⟩ on
-                // 2^(−40), each numerator summed whole over the row's one denominator; the falloff is
-                // the medium's constant and returns nothing.
-                // The closure (§19), over the support: on a still head at a closing tick, an
-                // unresolved site's row is also compared with where its class stands among the sites
-                // it meets, the code of its class on the row's own copy face, `−log Σ_(j∈S_i holds it)
-                // p_ij`: `δz_ij += p_ij − [j holds it] e_ij/Σ_(k∈S_i holds it) e_ik`, over its ring
-                // set's `copies` heads. Then `δs = 2^(−β) δz`.
+                // δz_k = ln 2 · p_k (δp_k − μ), δp_k = ⟨δỹ_i, D v_k⟩ on 2^(−40) (a crowd's value its
+                // decayed mean), μ = Σ_k p_k δp_k; the falloff is the medium's constant and returns
+                // nothing. The closure (§19), over the support's sources: on a still head at a closing
+                // tick, an unresolved site's row is also compared with where its class stands among the
+                // sites it meets: `δz_k += p_k − [k holds it] p_k/Σ_(holds) p`, over its ring set's
+                // `copies` heads. Then `δs = 2^(−β) δz`. A far source's term also returns to both ends'
+                // holds (§14.2): its share without one end's hold, `p/λ`, times the same comparison.
                 let closing = closure && d.closes(tick, h);
                 let copies = d.copies() as i128;
                 let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
-                for (i, row) in rows.iter().enumerate() {
+                let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
+                for i in 0..sites {
+                    let (row, crowd) = (&rows[i], &crowds[i]);
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let dp: Vec<i128> = row.iter().map(|&(j, _)| (0..span).map(|r| dyi[r] as i128 * decayed(self.decay(h, r % n, i.abs_diff(j as usize)), vh[j as usize * span + r])).sum()).collect();
-                    let denominator = mass[i] as i128;
-                    let mean = div_nearest(row.iter().zip(&dp).map(|(&(_, ej), &dpj)| ej as i128 * dpj).sum(), denominator);
+                    let dpc: Vec<i128> = crowd.iter().map(|c| div_nearest((0..span).map(|r| dyi[r] as i128 * decayed_wide(self.decay(h, r % n, 1 << c.level), sums.value(c.lo, c.hi, r))).sum(), c.count as i128)).collect();
+                    let mean = release(row.iter().zip(&dp).map(|(&(_, p), &dpj)| p as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e as i128 * dpj).sum::<i128>(), SHARE_BITS);
                     let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
-                    let held: i128 = if closing && region.unresolved[i] { row.iter().filter(|&&(j, _)| holds(j as usize)).map(|&(_, e)| e as i128).sum() } else { 0 };
-                    let mut out = Vec::with_capacity(row.len());
-                    for (&(j, e), &dpj) in row.iter().zip(&dp) {
-                        let mut dz = release(ln2 * div_nearest(e as i128 * (dpj - mean), denominator), MOVE_BITS);
+                    let held: i128 = if closing && region.unresolved[i] { row.iter().filter(|&&(j, _)| holds(j as usize)).map(|&(_, p)| p as i128).sum() } else { 0 };
+                    let compare = |p: i128, dpk: i128, holder: bool| -> i128 {
+                        let mut dz = release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
                         if held > 0 {
-                            let at = (e as i128) << CONTACT_BITS;
-                            dz += div_nearest(at, denominator * copies) - if holds(j as usize) { div_nearest(at, held * copies) } else { 0 };
+                            dz += div_nearest(p << CONTACT_BITS, copies << SHARE_BITS) - if holder { div_nearest(p << CONTACT_BITS, held * copies) } else { 0 };
+                        }
+                        dz
+                    };
+                    let mut out = Vec::with_capacity(row.len());
+                    for (&(j, p), &dpj) in row.iter().zip(&dp) {
+                        let dz = compare(p as i128, dpj, holds(j as usize));
+                        if i.abs_diff(j as usize) >= NEAR {
+                            let lift = |r: i128| -> i128 {
+                                let mut g = release(r * (dpj - mean), SHARE_BITS);
+                                if held > 0 {
+                                    g += div_nearest(r << (CONTACT_BITS + MOVE_BITS - SHARE_BITS), copies * ln2) - if holds(j as usize) { div_nearest(r << (CONTACT_BITS + MOVE_BITS), held * copies * ln2) } else { 0 };
+                                }
+                                g
+                            };
+                            for end in [i, j as usize] {
+                                let lambda = cell.holds[h * sites + end].0 as i128;
+                                if lambda > 0 {
+                                    lifts[h * sites + end] += lift(div_nearest((p as i128) << HOLD_BITS, lambda));
+                                }
+                            }
                         }
                         let dsij = gained(dz, beta)?;
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
@@ -1321,28 +1574,49 @@ impl Field {
                         }
                         out.push(dsij);
                     }
+                    let mut outc = Vec::with_capacity(crowd.len());
+                    for (c, &dpj) in crowd.iter().zip(&dpc) {
+                        let dsij = gained(compare(c.e as i128, dpj, false), beta)?;
+                        if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
+                            return refuse("a contact's covector past its return's carrier");
+                        }
+                        outc.push(dsij);
+                    }
                     ds.push(out);
+                    dsc.push(outc);
                 }
                 // The one word is both the probe and the key, so it returns both roles:
-                // `δw̃_i = Σ_(j∈S_i) δs_ij D(|i − j|) w̃_j + Σ_(j: i∈S_j) δs_ji D(|i − j|) w̃_j`, each
-                // sum released from 2^(−86) to 2^(−24).
-                let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
+                // `δw̃_i = Σ_(j∈S_i) δs_ij D(|i − j|) w̃_j + Σ_(i ∈ S_j) δs_ji D(|i − j|) w̃_j`, and a
+                // crowd's `δs_C D w̄/|C|` to its receiver and `δs_C D w̃_i/|C|` to each member; each sum
+                // released to 2^(−24).
                 let mut col = vec![0i128; sites * span];
-                for (i, (row, dsi)) in rows.iter().zip(&ds).enumerate() {
-                    for (&(j, _), &dsij) in row.iter().zip(dsi) {
+                let mut crowd_w = vec![0i128; (sites + 1) * span];
+                for i in 0..sites {
+                    for (&(j, _), &dsij) in rows[i].iter().zip(&ds[i]) {
                         let d = i.abs_diff(j as usize);
                         for r in 0..span {
                             col[j as usize * span + r] += dsij * self.decay(h, r % n, d).0 * qh[i * span + r] as i128;
                         }
                     }
+                    for (c, &dsk) in crowds[i].iter().zip(&dsc[i]) {
+                        for r in 0..span {
+                            let part = div_nearest(dsk * self.decay(h, r % n, 1 << c.level).0 * qh[i * span + r] as i128, c.count as i128);
+                            crowd_w[c.lo * span + r] += part;
+                            crowd_w[(c.hi + 1) * span + r] -= part;
+                        }
+                    }
                 }
-                for (i, (row, dsi)) in rows.iter().zip(&ds).enumerate() {
+                for i in 0..sites {
                     for r in 0..span {
-                        let sq: i128 = row.iter().zip(dsi).map(|(&(j, _), &dsij)| dsij * self.decay(h, r % n, i.abs_diff(j as usize)).0 * qh[j as usize * span + r] as i128).sum();
+                        let sq: i128 = rows[i].iter().zip(&ds[i]).map(|(&(j, _), &dsij)| dsij * self.decay(h, r % n, i.abs_diff(j as usize)).0 * qh[j as usize * span + r] as i128).sum::<i128>()
+                            + crowds[i].iter().zip(&dsc[i]).map(|(c, &dsk)| div_nearest(dsk * self.decay(h, r % n, 1 << c.level).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
                         dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
+                        if definite[i] {
+                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread(&crowd_w, i, r), back))?;
+                        }
                     }
                 }
             }
@@ -1370,6 +1644,20 @@ impl Field {
                         chart[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
                         chart[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
                     }
+                }
+            }
+            // The holds return to the unframed word's mode that sets them ([`hold_return`]).
+            for h in 0..heads {
+                for t in 0..sites {
+                    let (lambda, l) = cell.holds[h * sites + t];
+                    let g = lifts[h * sites + t];
+                    if g == 0 || lambda == 0 {
+                        continue;
+                    }
+                    let c = h * n + l as usize;
+                    let (dre, dim) = hold_return(g, cell.word[t * m2 + c], cell.word[t * m2 + m + c])?;
+                    dq[t * m2 + c] = fit64(dq[t * m2 + c] as i128 + dre)?;
+                    dq[t * m2 + m + c] = fit64(dq[t * m2 + m + c] as i128 + dim)?;
                 }
             }
             let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
@@ -1452,44 +1740,44 @@ impl Field {
         self.release_with(problems, sweeps, void, &mut |regions| realization.read_logits(self, regions), sweep)
     }
 
-    /// [definition; agent-inferred, November 1] **The release: the answer locks jointly under the
-    /// pump** (the dispersing field's §4). The region of the `question`'s resolved sites and `answer`
-    /// open sites opens with every answer site on the unresolved row; the earliest site whose void
-    /// the field resolves (`2 m_void > Σ m` at `β = 1`) bounds the answer, read once, and the sites
-    /// past it leave the region (one nested variable, read once: the void's creep stays repaired).
-    /// From then on every answer site carries a soft face, logits `ℓ_t` with a momentum `m_t` (both
-    /// on `2^(−16)`, at rest on the opening's face, `ℓ = z⁰`, `m = 0`), and opens on the mixture of its
-    /// face tempered at the problem's pump `β` over every class but the void ([`Field::content_face`]:
-    /// the extent is read once), `Σ_a p_t(a) E(a)` with its strand rows alike. A sweep reads every site's
-    /// face `z_t` with every open site on its mixture, all at once, and each open site moves:
+    /// [definition; agent-inferred, November 1] **The release: the answer grows from what has settled,
+    /// each site keeps its own clock** (the dispersing field's §4 and §14.3–§14.5). The region is the
+    /// `question`'s known sites and at most `answer` open sites. An open site is **reached** once a
+    /// definite site (known, or locked) lies in its near field, and stays reached: the answer's first
+    /// five sites are reached at the first sweep, beside the question, and each lock reaches the sites
+    /// within its near field at the next. An unreached site carries the unresolved row, is not moved and
+    /// cannot lock; a sweep reads the question, the reached sites and the five sites past the front, and
+    /// nothing further. A site reached at a sweep opens at rest on the face it read there on the
+    /// unresolved row (`ℓ = z⁰`, `m = 0`); every later sweep it carries the mixture of its face tempered
+    /// at its own pump `β_t`, `Σ_a p_t(a) E(a)` with its strand rows alike, locked sites marked (a lock
+    /// is a foil, heard far), and moves:
     ///
     /// ```text
     /// momentum   m_t ← ½ m_t + (z_t − ℓ_t)        one exact halving, released to the nearest numerator
     /// face       ℓ_t ← ℓ_t + m_t
-    /// tempered   p_t(a) = 2^(β ℓ_t(a)) / Σ_b 2^(β ℓ_t(b))
+    /// tempered   p_t(a) = 2^(β_t ℓ_t(a)) / Σ_b 2^(β_t ℓ_t(b))
     /// ```
     ///
     /// With `z` held, the error steps as `[[0, μ], [−1, μ]]`, `|λ|² = μ = ½`: a damped oscillation,
-    /// the matched friction of a push carried across one sweep (`ρ² = L/(L + 1)` at `L = 1`), not a
-    /// greedy step. **The pump**: `β` opens at 1, the face as trained, and doubles after a sweep whose
-    /// total change `Σ_t Σ_a |Δp_t(a)|` (read at the sweep's own `β`, on the shares' `2^(−16)`) fell
-    /// below the sweep's before it at the same rung: the activity tempered. Where it did not fall the coupled sites
-    /// cannot all hold at once (frustration), and `β` holds while the state rides on its momentum. No
-    /// site is fixed and no order is imposed. `β` stops doubling at [`PUMP_TOP`], where one numerator
-    /// of logit already weighs 64 bits, past the exponential's `2^(−62)` grain. **Lock**: a site is
-    /// locked when its top class holds a majority at `β` (`2 m_top > Σ m`) at the sweep's start and
-    /// at its end; sites that lock at one rung lock together (a click). **The end**: when every open
-    /// site of a problem is locked, or its sweeps or its exterior end. The answer is released whole:
-    /// every site of the extent, a locked site at its class and an unlocked one shown open (`None`),
-    /// never forced into a class ([`Released`]).
+    /// the matched friction of a push carried across one sweep. **Each site's pump**: `β_t` opens at 1
+    /// and doubles after a sweep whose own change `Σ_a |Δp_t(a)|` (read at its own `β_t` on both sides,
+    /// on the shares' `2^(−16)`) fell below its change the sweep before at the same rung; a site whose
+    /// change did not fall holds its `β_t` and rides its momentum (frustration). `β_t` stops doubling at
+    /// [`PUMP_TOP`]. **Lock**: a site is locked where its top class held a majority at its own `β_t`
+    /// (`2 m_top > Σ m`) at the sweep's start and at its end, and unlocks where that fails. **The
+    /// extent** is read once, at the first reached site (the earliest place) that locks on the void:
+    /// the sites after it leave the region, that site is the resolved void, and inside the extent the
+    /// void is no class ([`Field::content_face`]); if the front reaches the bound with no void locked,
+    /// the extent is the bound, and the receipt says so. **The end**: when every reached site is locked
+    /// and the extent is read, or at the sweeps or the exterior. The answer is released whole: a locked
+    /// site at its class, every other site shown open (`None`), never forced into a class
+    /// ([`Released`]).
     ///
-    /// Why no certainty order (the eighth reading and Brandon's lens, November 1): the release before
-    /// it committed the site the field was surest of, and each committed class was fixed ground for
-    /// every later read, so the answers released in full were runs of the commonest bytes; and it
-    /// reread every site beside every other in one tick, the global pass of the contact. Here every
-    /// site stays soft until the pump locks them together, a change at one site moves every site it
-    /// meets in the same sweep at its falloff, and the answer either settles as one or keeps
-    /// circulating, visibly (the receipts of [`Released`]).
+    /// Why the front (§14): the release before it put every answer site where nothing definite reached
+    /// it and cooled them all at one temperature, so on GSM8K every interior site locked the space byte
+    /// at the third sweep and the void was never read. Reached is distance from a definite surface,
+    /// never a site's own sureness, so it is propagation and not a certainty order; every reached site
+    /// keeps moving and can be overturned.
     pub fn release(&self, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Result<Released> {
         Ok(self.release_with(&[(question, answer)], sweeps, void, &mut |regions| self.read_logits(regions), &mut |_| true)?.remove(0))
     }
@@ -1497,6 +1785,15 @@ impl Field {
     /// Each region's unresolved sites' logits, read in parallel.
     pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> {
         regions.par_iter().map(|r| self.logits(r)).collect()
+    }
+
+    /// A site's face at its pump: over every class before the extent is read, over every class but the
+    /// void after it.
+    fn site_face(&self, logits: &[i64], beta: u64, void: Option<usize>) -> TowerFace {
+        match void {
+            Some(void) => self.content_face(logits, beta, void),
+            None => self.tempered(logits, beta),
+        }
     }
 
     fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>>, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<Released>> {
@@ -1508,7 +1805,7 @@ impl Field {
             .iter()
             .map(|&(question, answer)| {
                 let classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
-                Joint::new(classes, question.len())
+                Joint::new(classes, question.len(), a)
             })
             .collect();
         let mut progress = ReleaseSweep::default();
@@ -1516,104 +1813,115 @@ impl Field {
             let live: Vec<usize> = (0..joint.len()).filter(|&k| !joint[k].done).collect();
             progress.done = done;
             progress.live = live.len();
-            progress.locked = live.iter().map(|&k| joint[k].locked.iter().filter(|l| l.is_some()).count()).sum();
-            progress.open = live.iter().map(|&k| joint[k].locked.iter().filter(|l| l.is_none()).count()).sum();
-            progress.rung = live.iter().map(|&k| joint[k].beta).max().unwrap_or(0);
+            progress.reached = live.iter().map(|&k| joint[k].reached_count()).sum();
+            progress.front = live.iter().map(|&k| joint[k].front() - joint[k].start).max().unwrap_or(0);
+            progress.locked = live.iter().map(|&k| joint[k].sites.iter().filter(|s| s.locked.is_some()).count()).sum();
+            progress.open = live.iter().map(|&k| joint[k].content - joint[k].start).sum::<usize>() - progress.locked;
+            progress.rung = live.iter().flat_map(|&k| joint[k].sites.iter().map(|s| s.beta)).max().unwrap_or(0);
             progress.free = joint.iter().map(|p| p.overturns).sum();
             if live.is_empty() || !sweep(&progress) {
                 break;
             }
             progress.done = done + 1;
-            let opens: Vec<Vec<bool>> = live.iter().map(|&k| (0..joint[k].classes.len()).map(|t| t >= joint[k].start && t < joint[k].content).collect()).collect();
+            // The views: the question, the reached sites and the five past the front.
+            let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void))).collect();
             let logits = {
-                let faces: &[Option<Shares>] = &[];
-                let views: Vec<Region> = live.iter().zip(&opens).map(|(&k, u)| Region { classes: &joint[k].classes, unresolved: u, faces: if done == 0 { faces } else { &joint[k].faces } }).collect();
-                read(&views)?
+                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked }).collect();
+                read(&regions)?
             };
             (progress.change, progress.holding, progress.soft, progress.overturned) = (0, 0, 0, 0);
-            for (&k, z) in live.iter().zip(&logits) {
-                let p = &mut joint[k];
-                if done == 0 {
-                    // The opening: the extent bounds the answer, read once; each content site's state
-                    // opens at rest on its opening face (`ℓ = z⁰`, `m = 0`), so the pump is the only
-                    // temperature.
-                    let end = self.extent(&z[..p.content], p.start, void);
-                    if let Some(end) = end {
-                        progress.cut += 1;
-                        progress.cut_sites += end - p.start;
-                        p.classes.truncate(end + 1);
-                        p.content = end;
-                    }
-                    p.faces = vec![None; p.classes.len()];
-                    let opened = p.content - p.start;
-                    p.logits = (p.start..p.content).map(|t| z[t].clone().ok_or(TowerError::Refused("a release's opening read has no face at an open site"))).collect::<Result<_>>()?;
-                    p.momentum = vec![vec![0; a]; opened];
-                    p.locked = vec![None; opened];
-                    p.lock_sweep = vec![None; opened];
-                    p.trits = vec![Vec::new(); opened];
-                } else {
-                    if p.swept.0 != p.beta {
-                        p.swept = (p.beta, done);
-                    }
-                    let mut change = 0u64;
-                    for s in 0..p.content - p.start {
-                        let zt = z[p.start + s].as_ref().ok_or(TowerError::Refused("a release's read has no face at an open site"))?;
-                        let before = self.content_face(&p.logits[s], p.beta, void);
-                        for c in 0..a {
-                            let m = release(p.momentum[s][c] as i128, MOMENTUM_HALVING) + zt[c] as i128 - p.logits[s][c] as i128;
-                            p.momentum[s][c] = fit64(m)?;
-                            p.logits[s][c] = fit64(p.logits[s][c] as i128 + m)?;
-                        }
-                        let after = self.content_face(&p.logits[s], p.beta, void);
-                        change += moved(&shares(&before), &shares(&after), a);
-                        let (top_before, top_after) = (top(&before), top(&after));
-                        let holds = resolved(&before) == Some(top_before) && resolved(&after) == Some(top_after) && top_before == top_after;
-                        p.locked[s] = if holds { p.locked[s].or(Some(p.beta)) } else { None };
-                        p.lock_sweep[s] = if holds { p.lock_sweep[s].or(Some(done)) } else { None };
-                        // The sweep's trit: `+1` the site holds its lock, `−1` its top class was
-                        // overturned (free circulation), `0` soft, on the bridge.
-                        let trit = if holds {
-                            1
-                        } else if top_after != top_before {
-                            -1
-                        } else {
-                            0
-                        };
-                        p.trits[s].push(trit);
-                        p.overturns += usize::from(trit < 0);
-                        progress.holding += usize::from(trit > 0);
-                        progress.overturned += usize::from(trit < 0);
-                        progress.soft += usize::from(trit == 0);
-                    }
-                    progress.change += change;
-                    p.done = p.locked.iter().all(Option::is_some);
-                    // The pump: one octave after a sweep whose change fell below the sweep's before it
-                    // at the same rung, so each rung compares its own changes.
-                    if !p.done && p.change.is_some_and(|c| change < c) && p.beta < PUMP_TOP {
-                        p.beta *= 2;
-                        p.change = None;
-                    } else {
-                        p.change = Some(change);
-                    }
-                }
-                match p.ridden.last_mut() {
-                    Some((beta, n)) if *beta == p.beta => *n += 1,
-                    _ => p.ridden.push((p.beta, 1)),
-                }
-                p.done = p.content == p.start || p.done;
+            for ((k, _), z) in views.iter().zip(&logits) {
+                let p = &mut joint[*k];
+                let content_void = p.extent.is_some().then_some(void);
+                // Every site reached before this sweep moves at its own pump.
                 for s in 0..p.content - p.start {
-                    p.faces[p.start + s] = Some(shares(&self.content_face(&p.logits[s], p.beta, void)));
+                    if !p.sites[s].reached.is_some_and(|r| r < done) {
+                        continue;
+                    }
+                    let zt = z[p.start + s].as_ref().ok_or(TowerError::Refused("a release's read has no face at a reached site"))?;
+                    let site = &mut p.sites[s];
+                    if site.swept.0 != site.beta {
+                        site.swept = (site.beta, done);
+                    }
+                    let before = self.site_face(&site.logits, site.beta, content_void);
+                    for c in 0..a {
+                        let m = release(site.momentum[c] as i128, MOMENTUM_HALVING) + zt[c] as i128 - site.logits[c] as i128;
+                        site.momentum[c] = fit64(m)?;
+                        site.logits[c] = fit64(site.logits[c] as i128 + m)?;
+                    }
+                    let after = self.site_face(&site.logits, site.beta, content_void);
+                    let change = moved(&shares(&before), &shares(&after), a);
+                    progress.change += change;
+                    let (top_before, top_after) = (top(&before), top(&after));
+                    let holds = resolved(&before) == Some(top_before) && resolved(&after) == Some(top_after) && top_before == top_after;
+                    site.locked = if holds { site.locked.or(Some(site.beta)) } else { None };
+                    site.lock_sweep = if holds { site.lock_sweep.or(Some(done)) } else { None };
+                    // The sweep's trit: `+1` it holds its lock, `−1` its top was overturned (free
+                    // circulation), `0` soft, on the bridge.
+                    let trit = if holds {
+                        1
+                    } else if top_after != top_before {
+                        -1
+                    } else {
+                        0
+                    };
+                    site.trits.push(trit);
+                    p.overturns += usize::from(trit < 0);
+                    progress.holding += usize::from(trit > 0);
+                    progress.overturned += usize::from(trit < 0);
+                    progress.soft += usize::from(trit == 0);
+                    *p.ridden.entry(site.beta).or_insert(0) += 1;
+                    // Its own pump: one octave after its change fell below the last at its rung.
+                    if site.change_before.is_some_and(|c| change < c) && site.beta < PUMP_TOP {
+                        site.beta *= 2;
+                        site.change_before = None;
+                    } else {
+                        site.change_before = Some(change);
+                    }
                 }
+                // The extent: the earliest reached site locked on the void, read once.
+                if p.extent.is_none() {
+                    let at = (0..p.content - p.start).find(|&s| p.sites[s].locked.is_some() && top(&self.tempered(&p.sites[s].logits, p.sites[s].beta)) == void);
+                    if let Some(s) = at {
+                        p.extent = Some((s, done, false));
+                        p.content = p.start + s;
+                        p.classes.truncate(p.content + 1);
+                        p.sites.truncate(s);
+                    }
+                }
+                // The front: an unreached site with a definite site in its near field is reached, and
+                // opens at rest on the face it read on the unresolved row.
+                loop {
+                    let front = p.front();
+                    if front >= p.content {
+                        break;
+                    }
+                    let definite = |t: usize| t < p.start || (t == p.content && p.extent.is_some()) || (t >= p.start && t < p.content && p.sites[t - p.start].locked.is_some());
+                    if !(front.saturating_sub(NEAR - 1)..(front + NEAR).min(p.classes.len())).any(|j| j != front && definite(j)) {
+                        break;
+                    }
+                    let Some(zt) = z.get(front).and_then(Option::as_ref) else { break };
+                    let site = &mut p.sites[front - p.start];
+                    site.reached = Some(done);
+                    site.logits = zt.clone();
+                    site.swept = (1, done + 1);
+                }
+                if p.extent.is_none() && p.front() >= p.content {
+                    p.extent = Some((p.content - p.start, done, true));
+                }
+                p.done = p.extent.is_some() && p.sites.iter().all(|s| s.reached.is_some() && s.locked.is_some());
             }
         }
-        // The closing report: the sweeps run and the sites still open.
+        // The closing report over every problem.
         progress.live = joint.iter().filter(|p| !p.done).count();
-        progress.locked = joint.iter().map(|p| p.locked.iter().filter(|l| l.is_some()).count()).sum();
-        progress.open = joint.iter().map(|p| p.locked.iter().filter(|l| l.is_none()).count()).sum();
-        progress.rung = joint.iter().map(|p| p.beta).max().unwrap_or(0);
+        progress.reached = joint.iter().map(Joint::reached_count).sum();
+        progress.front = joint.iter().map(|p| p.front() - p.start).max().unwrap_or(0);
+        progress.locked = joint.iter().map(|p| p.sites.iter().filter(|s| s.locked.is_some()).count()).sum();
+        progress.open = joint.iter().map(|p| p.content - p.start).sum::<usize>() - progress.locked;
+        progress.rung = joint.iter().flat_map(|p| p.sites.iter().map(|s| s.beta)).max().unwrap_or(0);
         progress.free = joint.iter().map(|p| p.overturns).sum();
         sweep(&progress);
-        Ok(joint.into_iter().map(|p| p.released(void)).collect())
+        Ok(joint.into_iter().map(|p| p.released(self, void)).collect())
     }
 
     /// [definition; agent-inferred, November 1] **The landmarks** (the dispersing field's §3
@@ -1677,18 +1985,20 @@ pub fn landmarks_of(rows: &[Vec<(Vec<(u32, u64)>, u64)>], question: usize, count
 pub const PUMP_TOP: u64 = 1 << (FACE_BITS + 6);
 
 /// [agent-inferred, November 1] **A release's sweeps as its exterior reads them**: asked before
-/// every sweep, `done` sweeps run, `live` problems not yet locked whole, the `locked` and `open`
-/// answer sites of the live problems, the highest `rung` (`β`) among them, the total `change` of the
-/// last sweep and its trits (`holding` their locks, `soft`, `overturned`), the free circulation so
-/// far (`free`, every overturn of every problem), and `cut`, `cut_sites` the problems whose extent
-/// the opening bounded and those extents' answer sites; its answer decides whether the sweep runs. Asked once more after the last sweep, its
-/// answer unread, over every problem. The release reads no clock: the exterior that holds the run's
-/// projected deadline stops it there (the waiting standard), and the answers are returned as the
-/// field carries them.
+/// every sweep, `done` sweeps run, `live` problems not yet ended, the `reached` sites of the live
+/// problems and the farthest `front` (answer sites from the question), their `locked` and `open`
+/// answer sites, the highest site `rung` (`β_t`) among them, the total `change` of the last sweep and
+/// its trits (`holding` their locks, `soft`, `overturned`), and the free circulation so far (`free`,
+/// every overturn of every problem); its answer decides whether the sweep runs. Asked once more after
+/// the last sweep, its answer unread, over every problem. The release reads no clock: the exterior
+/// that holds the run's projected deadline stops it there (the waiting standard), and the answers
+/// are returned as the field carries them.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ReleaseSweep {
     pub done: usize,
     pub live: usize,
+    pub reached: usize,
+    pub front: usize,
     pub locked: usize,
     pub open: usize,
     pub rung: u64,
@@ -1697,23 +2007,24 @@ pub struct ReleaseSweep {
     pub soft: usize,
     pub overturned: usize,
     pub free: usize,
-    pub cut: usize,
-    pub cut_sites: usize,
 }
 
 /// [definition; agent-inferred, November 1] **A released answer and its receipts** (the dispersing
-/// field's §4 and §12): each answer site of the extent read at the opening, its class where it locked
-/// and `None` where it is still open; the rung (`β`) each site locked at (`0` where open); each
-/// locked site's counter, the foil's opposite plate (its runner-up class and the lock's margin over
-/// it at the final `β`, `β (ℓ_top − ℓ_runner)` on `2^(−16)` bits); each site's trit a sweep (`+1`
-/// holding its lock, `0` soft, `−1` overturned); the sweeps ridden at each rung in ascending order; the
-/// free circulation (every overturn, frustration) and the bound circulation (the locked sites whose
-/// lock held through the whole last rung, the foil's lift fixed by its constraint); the sites still
-/// open; and the region's last state (its classes and the mixtures its open sites carried), which the
-/// landmarks read.
+/// field's §4, §12 and §14.9): each answer site of the extent, its class where it locked and `None`
+/// where it is still open (reached or not); each site's sweep reached, sweep its lock began and its
+/// own rung (`β_t`) at that lock (`0` where open); each locked site's counter, the foil's opposite
+/// plate (its runner-up class and the lock's margin over it at its own `β_t`, `β_t (ℓ_top −
+/// ℓ_runner)` on `2^(−16)` bits); each site's trit a sweep (`+1` holding its lock, `0` soft, `−1`
+/// overturned); the site-sweeps ridden at each rung in ascending order; the free circulation (every
+/// overturn, frustration) and the bound circulation (the locked sites whose lock held through the whole
+/// last rung each swept); the sites still open; the extent's reading (its site from the answer's
+/// first, its sweep, and whether it is the bound, no void having locked); and the region's last state
+/// (its classes and the mixtures its reached sites carried), which the landmarks read.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Released {
     pub sites: Vec<Option<usize>>,
+    pub reached: Vec<Option<usize>>,
+    pub lock_sweeps: Vec<Option<usize>>,
     pub rungs: Vec<u64>,
     pub counters: Vec<Option<(usize, i64)>>,
     pub trits: Vec<Vec<i8>>,
@@ -1721,6 +2032,7 @@ pub struct Released {
     pub free: usize,
     pub bound: usize,
     pub open: usize,
+    pub extent: Option<(usize, usize, bool)>,
     pub classes: Vec<usize>,
     pub faces: Vec<Option<Shares>>,
     pub start: usize,
@@ -1733,63 +2045,121 @@ impl Released {
     }
 }
 
+/// An answer site's state in a release: the sweep it was reached (`None` while it is not), its
+/// logits and momentum, its own pump and its change the sweep before at its rung, the last rung it
+/// swept with that rung's first sweep, its lock (the rung it began at) and the sweep it began, and its
+/// trits.
+#[derive(Clone, Debug)]
+struct Site {
+    reached: Option<usize>,
+    logits: Vec<i64>,
+    momentum: Vec<i64>,
+    beta: u64,
+    change_before: Option<u64>,
+    swept: (u64, usize),
+    locked: Option<u64>,
+    lock_sweep: Option<usize>,
+    trits: Vec<i8>,
+}
+
 /// A problem's field in a release: its classes (the question's, then the answer's sites, whose
-/// classes the release ignores), its answer's first site and the end of its content (the boundary),
-/// each open site's logits, momentum, lock rung and the sweep its lock began, its trits, the
-/// overturns, the region's carried mixtures, the pump, the last rung swept with its first sweep, the
-/// last sweep's change at the rung, the sweeps ridden at each rung, and whether every open site has
-/// locked.
+/// classes the release ignores), its answer's first site and the end of its content, each answer
+/// site's state, the extent's reading (site, sweep, whether it is the bound), the overturns, the
+/// site-sweeps ridden at each rung, and whether it has ended.
 struct Joint {
     classes: Vec<usize>,
     start: usize,
     content: usize,
-    logits: Vec<Vec<i64>>,
-    momentum: Vec<Vec<i64>>,
-    locked: Vec<Option<u64>>,
-    lock_sweep: Vec<Option<usize>>,
-    trits: Vec<Vec<i8>>,
+    sites: Vec<Site>,
+    extent: Option<(usize, usize, bool)>,
     overturns: usize,
-    faces: Vec<Option<Shares>>,
-    beta: u64,
-    swept: (u64, usize),
-    change: Option<u64>,
-    ridden: Vec<(u64, usize)>,
+    ridden: std::collections::BTreeMap<u64, usize>,
     done: bool,
 }
 
+/// What a sweep reads of a problem: the region's end (the question, the reached sites and the five
+/// past the front, or the extent's boundary), each site's resolution, carried face and lock.
+struct View {
+    end: usize,
+    unresolved: Vec<bool>,
+    faces: Vec<Option<Shares>>,
+    locked: Vec<bool>,
+}
+
 impl Joint {
-    fn new(classes: Vec<usize>, start: usize) -> Self {
+    fn new(classes: Vec<usize>, start: usize, alphabet: usize) -> Self {
         let content = classes.len();
-        Self { classes, start, content, logits: Vec::new(), momentum: Vec::new(), locked: Vec::new(), lock_sweep: Vec::new(), trits: Vec::new(), overturns: 0, faces: Vec::new(), beta: 1, swept: (1, 1), change: None, ridden: Vec::new(), done: false }
+        let site = Site { reached: None, logits: vec![0; alphabet], momentum: vec![0; alphabet], beta: 1, change_before: None, swept: (1, 1), locked: None, lock_sweep: None, trits: Vec::new() };
+        Self { classes, start, content, sites: vec![site; content - start], extent: None, overturns: 0, ridden: Default::default(), done: false }
     }
 
-    fn released(self, void: usize) -> Released {
+    /// The first unreached answer site (the content's end where every site is reached).
+    fn front(&self) -> usize {
+        self.start + self.sites.iter().position(|s| s.reached.is_none()).unwrap_or(self.sites.len())
+    }
+
+    fn reached_count(&self) -> usize {
+        self.sites.iter().filter(|s| s.reached.is_some()).count()
+    }
+
+    /// The sweep's view (§14.3, §14.7): the question known; each reached site carrying its face at its
+    /// own pump (over the content classes once the extent is read) and its lock; the five sites past the
+    /// front on the unresolved row; after the extent, its boundary the resolved void.
+    fn view(&self, field: &Field, void: usize) -> View {
+        let content_void = self.extent.is_some().then_some(void);
+        let end = (self.front() + NEAR - 1).min(self.classes.len());
+        let mut unresolved = vec![false; end];
+        let mut faces = vec![None; end];
+        let mut locked = vec![false; end];
+        for t in self.start..end.min(self.content) {
+            unresolved[t] = true;
+            let site = &self.sites[t - self.start];
+            if site.reached.is_some() {
+                faces[t] = Some(shares(&field.site_face(&site.logits, site.beta, content_void)));
+                locked[t] = site.locked.is_some();
+            }
+        }
+        View { end, unresolved, faces, locked }
+    }
+
+    fn released(self, field: &Field, void: usize) -> Released {
         // The top and the runner-up among the content classes (the lower class on a tie).
-        let best = |l: &[i64], skip: Option<usize>| l.iter().enumerate().filter(|&(c, _)| c != void && Some(c) != skip).fold((0usize, i64::MIN), |b, (c, &v)| if v > b.1 { (c, v) } else { b });
-        // The receipts read the last rung swept (a doubling after the last sweep was never swept).
-        let (beta, rung_sweep) = self.swept;
+        let skip_void = self.extent.is_some();
+        let best = |l: &[i64], skip: Option<usize>| l.iter().enumerate().filter(|&(c, _)| !(skip_void && c == void) && Some(c) != skip).fold((0usize, i64::MIN), |b, (c, &v)| if v > b.1 { (c, v) } else { b });
         Released {
-            sites: self.logits.iter().zip(&self.locked).map(|(l, lock)| lock.map(|_| best(l, None).0)).collect(),
-            rungs: self.locked.iter().map(|l| l.unwrap_or(0)).collect(),
+            sites: self.sites.iter().map(|s| s.locked.map(|_| best(&s.logits, None).0)).collect(),
+            reached: self.sites.iter().map(|s| s.reached).collect(),
+            lock_sweeps: self.sites.iter().map(|s| s.lock_sweep).collect(),
+            rungs: self.sites.iter().map(|s| s.locked.unwrap_or(0)).collect(),
             counters: self
-                .logits
+                .sites
                 .iter()
-                .zip(&self.locked)
-                .map(|(l, lock)| {
-                    lock.map(|_| {
-                        let (top, high) = best(l, None);
-                        let (runner, low) = best(l, Some(top));
-                        (runner, (beta as i64).saturating_mul(high.saturating_sub(low)))
+                .map(|s| {
+                    s.locked.map(|_| {
+                        let (top, high) = best(&s.logits, None);
+                        let (runner, low) = best(&s.logits, Some(top));
+                        (runner, (s.swept.0 as i64).saturating_mul(high.saturating_sub(low)))
                     })
                 })
                 .collect(),
-            trits: self.trits,
-            ridden: self.ridden,
+            trits: self.sites.iter().map(|s| s.trits.clone()).collect(),
+            ridden: self.ridden.into_iter().collect(),
             free: self.overturns,
-            bound: self.lock_sweep.iter().filter(|s| s.is_some_and(|s| s <= rung_sweep)).count(),
-            open: self.locked.iter().filter(|l| l.is_none()).count(),
+            bound: self.sites.iter().filter(|s| s.lock_sweep.is_some_and(|l| l <= s.swept.1)).count(),
+            open: self.sites.iter().filter(|s| s.locked.is_none()).count(),
+            extent: self.extent,
+            faces: {
+                let content_void = skip_void.then_some(void);
+                let mut faces = vec![None; self.classes.len()];
+                for (t, face) in faces.iter_mut().enumerate().take(self.content).skip(self.start) {
+                    let s = &self.sites[t - self.start];
+                    if s.reached.is_some() {
+                        *face = Some(shares(&field.site_face(&s.logits, s.beta, content_void)));
+                    }
+                }
+                faces
+            },
             classes: self.classes,
-            faces: self.faces,
             start: self.start,
         }
     }

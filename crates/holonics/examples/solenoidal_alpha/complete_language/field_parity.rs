@@ -320,7 +320,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         let host = host_learner.field.release(q, open, sweeps, p.codec.void()).map_err(|e| e.to_string())?;
         // The landmarks of every content site, read from the last state on both.
         let unresolved: Vec<bool> = host.faces.iter().map(Option::is_some).collect();
-        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces };
+        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &[] };
         let sites: Vec<usize> = (host.start..host.start + host.sites.len()).collect();
         let marks_equal = sites.is_empty() || host_learner.field.landmarks(&region, q.len(), &sites, 3).map_err(|e| e.to_string())? == card.read_landmarks(&card_learner.field, &region, q.len(), &sites, 3).map_err(|e| e.to_string())?;
         let equal = &host == carded && marks_equal;
