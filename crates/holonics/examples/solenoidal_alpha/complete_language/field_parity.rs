@@ -17,10 +17,10 @@
 //! projects a lap from the measured upper time a site pair, and the held problems' releases from that
 //! time and the sweeps the front's measured speed gives.
 
-use super::field_train::{extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
+use super::field_train::{clocks_of, extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, ReleaseSweep};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HostField, Region, ReleaseSweep};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
@@ -74,7 +74,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, clocks: clocks_of(heads, still) };
         Ok(FieldLearner::new(Field::found(declaration, &self.keys).map_err(|e| e.to_string())?, rate))
     }
 }
@@ -84,7 +84,7 @@ impl Passage {
 struct Recorder<'a> {
     inner: &'a mut dyn FieldRealization,
     reads: Vec<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>)>,
-    logits: Vec<Vec<Vec<Option<Vec<i64>>>>>,
+    logits: Vec<Vec<FieldRead>>,
 }
 
 impl FieldRealization for Recorder<'_> {
@@ -98,7 +98,7 @@ impl FieldRealization for Recorder<'_> {
         self.reads.push((faces.clone(), None));
         Ok(faces)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<Vec<Option<Vec<i64>>>>, TowerError> {
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<FieldRead>, TowerError> {
         let logits = self.inner.read_logits(field, regions)?;
         self.logits.push(logits.clone());
         Ok(logits)
@@ -135,7 +135,7 @@ impl FieldRealization for Counted<'_> {
         self.count(field, regions);
         self.inner.read_faces(field, regions)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<Vec<Option<Vec<i64>>>>, TowerError> {
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<FieldRead>, TowerError> {
         self.count(field, regions);
         self.inner.read_logits(field, regions)
     }
@@ -323,7 +323,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         // The landmarks of every content site, read from the last state on both.
         let unresolved: Vec<bool> = host.faces.iter().map(Option::is_some).collect();
         let locked = locks_of(&host);
-        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &locked };
+        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &locked, clock: &[], echo: &[] };
         let sites: Vec<usize> = (host.start..host.start + host.sites.len()).collect();
         let marks_equal = sites.is_empty() || host_learner.field.landmarks(&region, q.len(), &sites, 3).map_err(|e| e.to_string())? == card.read_landmarks(&card_learner.field, &region, q.len(), &sites, 3).map_err(|e| e.to_string())?;
         let equal = &host == carded && marks_equal;

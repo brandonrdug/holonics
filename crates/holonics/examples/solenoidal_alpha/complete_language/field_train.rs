@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{shares, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
+use holonics::hnn::tower::field::{shares, Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
 use holonics::hnn::tower::TowerFace;
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
@@ -334,18 +334,29 @@ pub(super) struct TrainRegion {
     pub unresolved: Vec<bool>,
     pub faces: Vec<Option<Shares>>,
     pub locked: Vec<bool>,
+    /// Each site's clock (§15.4) and each carried site's echo (§15.3), empty where none.
+    pub clock: Vec<u32>,
+    pub echo: Vec<Option<Echo>>,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new() }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), clock: Vec::new(), echo: Vec::new() }
     }
+}
+
+/// [agent-inferred, November 1] **The clock ring sets a declaration founds** (§15.4): one, the last head's
+/// set, where at least two turned sets stay on the strand's place (the helix and its moments keep two
+/// rings sets of place; with fewer the clock would take the place the helix reads). A run that reads
+/// the release's clock declares a head for it.
+pub(super) fn clocks_of(heads: usize, still: usize) -> usize {
+    usize::from(heads.saturating_sub(still) >= 3)
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, clock: &region.clock, echo: &region.echo }
 }
 
 /// The regions as the field reads them.
@@ -373,7 +384,7 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 /// are read from.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut firsts: Vec<TrainRegion> = Vec::with_capacity(members.len());
-    let mut fronts: Vec<Option<Front>> = Vec::with_capacity(members.len());
+    let mut fronts: Vec<Option<(Front, usize)>> = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
@@ -387,7 +398,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Front(front) => {
                 classes.truncate(front.cut);
                 firsts.push(TrainRegion::plain(classes, front.open.clone()));
-                fronts.push(Some(front));
+                fronts.push(Some((front, q.len())));
             }
         }
     }
@@ -402,13 +413,19 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
     .into_iter();
     let mut regions = Vec::with_capacity(firsts.len() + at.len());
     for (first, front) in firsts.into_iter().zip(fronts) {
-        let Some(front) = front else {
+        let Some((front, question)) = front else {
             regions.push(first);
             continue;
         };
-        let z = logits.next().ok_or("a front region's first read was not returned")?;
-        let (faces, locked) = front_faces(&learner.field, &front, &z)?;
-        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked };
+        let read = logits.next().ok_or("a front region's first read was not returned")?;
+        let (faces, locked) = front_faces(&learner.field, &front, &read.logits)?;
+        // [agent-inferred, November 1] Read 2's clock (§15.4, the rung supplying the count): the prefix's
+        // sites at the rung `r`, the question one sweep before them at `r + 1`, the band and past it at
+        // zero (just reached, or unreached). Its echoes (§15.3): each carried site's read-1 logits and
+        // the echo read 1 returned there, so read 2 meets its cavity field as the release does.
+        let clock: Vec<u32> = (0..front.cut).map(|t| if t < question { front.rung + 1 } else if t < front.front { front.rung } else { 0 }).collect();
+        let echo: Vec<Option<Echo>> = (0..front.cut).map(|t| faces[t].as_ref().and(read.logits.get(t).cloned().flatten()).map(|z| Echo { b: read.echo[t], logits: z })).collect();
+        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked, clock, echo };
         regions.push(first);
         regions.push(second);
     }
@@ -452,7 +469,7 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// context text, foil, foil digits, foil text]`. A reading only: no decision of the run reads it.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 9]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
     let mut out = [(0i64, 0usize); 9];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
@@ -556,7 +573,7 @@ fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: 
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
     let regions = unseen_regions(codec, problems, unseen, seed);
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
     for (faces, region) in faces.iter().zip(&views) {
@@ -687,7 +704,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, clocks: clocks_of(heads, still) };
             FieldLearner::new(Field::found(declaration, &keys).map_err(|e| e.to_string())?, rate)
         }
     };
@@ -1232,7 +1249,7 @@ impl LandmarkCount {
         let started = std::time::Instant::now();
         let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
         let locked = locks_of(r);
-        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked };
+        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked, clock: &[], echo: &[] };
         let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
         self.ns += started.elapsed().as_nanos();
         self.problems += 1;
