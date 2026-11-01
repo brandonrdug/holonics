@@ -30,19 +30,21 @@
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   w_t = W r̂_t + b_w,   v_t = V r̂_t + b_v       one word a head: q = k
 //! classes    B_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of w_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
 //! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j : |i − j| ≥ 6, B_h(j) = B_h(i), j definite }   only plates radiate far
-//! hold       λ(w) = min over the class's b modes of |Re(w_m²)| / |w_m|²         a lock fades at its light cone
 //! frame      w̃_t = U_t ⊙ w_t,   ṽ_t = U_t ⊙ v_t                                complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
-//! contact    z_ij = 2^(−β) Σ_m D_m(|i−j|) Re(conj(w̃_im) w̃_jm) − ⌊log₂ |i − j|⌋   j ∈ S_i^h; reciprocal
+//! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
+//! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(w̃_im) w̃_jm) − D_m² |w̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij − max_(j∈S_i) z_ij),  zero outside S_i^h           the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij,   x ← x + O y + b_o
-//! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a ⊙ b) + b_c
+//! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
 //! ```
 //!
 //! [definition; agent-inferred, November 1] **The field disperses** (the dispersing field's record,
 //! §2). One word a head is both the probe and the key, so a key fits its lock exactly where the two
-//! words agree and the contact is reciprocal (`z_ij = z_ji`, the real part of a Hermitian form). A
+//! words agree: the contact is the receiver's lock against the source as it arrives (§15.2, [`lock`]),
+//! whose pairing part is the real part of a Hermitian form and whose power part keeps a louder key from
+//! outscoring the equal one. A
 //! head's unframed word sits in `b` shells, a trit a mode (§12: the sky plate, the ground plate or
 //! the bridge between them, split by the mode's light cone), read as an address: two sites meet
 //! through the head only where they share its class or stand in each other's near field
@@ -136,32 +138,31 @@
 //! it compares nothing there. Measured: the number told by order 6.6 → 0.40 bits at 24 sites; the
 //! crib probe 25 of 126 first calculations from the question, against 2 from another's.
 //!
-//! **Release: the answer locks jointly under the pump** ([`Field::release`], the dispersing field's
-//! §4). The opening reads every answer site open; the earliest site whose void the field resolves
-//! bounds the answer, read once. From then on every answer site carries a soft face, logits with a
-//! momentum `μ = ½`, and opens on its tempered mixture; every sweep reads them all at once, the pump
-//! `β` doubles only after a sweep whose total change fell, and a site locks where its top class held
-//! a majority at `β` through the sweep. The answer is released whole: locked sites at their classes,
-//! unlocked ones shown open, with its receipts ([`Released`]): the lock rungs, each lock's counter
-//! (a lock is a foil, read against its runner-up), a trit a site a sweep, and the free and bound
-//! circulation.
-//! **Training meets the release's own states**: beside the completion masks, the release's second
-//! sweep (every answer site open on its read-1 mixture at `β = 1`, held as data).
+//! **Release: the answer grows from what has settled** ([`Field::release`], the dispersing field's
+//! §14): a site is reached once a definite site stands in its near field, then carries a soft face,
+//! logits with a momentum `μ = ½`, read every sweep at its own pump `β_t`, its cavity field (§15.3: the
+//! read less its own echo) and its clock (§15.4: the sweeps since it was reached); it locks where its top
+//! class holds a majority at its `β_t` through the sweep, and the extent is read where the front first
+//! locks the void. The answer is released whole: locked sites at their classes, unlocked ones shown
+//! open, with its receipts ([`Released`]).
+//! **Training meets the release's own states**: beside the completion masks, front regions (§14.6), whose
+//! read 2 carries read 1's faces at a rung with their echoes and clocks.
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
-//! material on `2^(−24)`; frames on `2^(−30)`; Gibbs weights on `2^(−40)` relative to their row's
-//! peak, the numerators summed whole over the row's one denominator; covectors on `2^(−24)`, the
-//! contact's on `2^(−40)`. Every product's
+//! material on `2^(−24)`; frames and skins on `2^(−30)`; each row an exact series of its terms'
+//! exponential faces on `2^(−62)` (§14.11, [`SeriesRow`]), its current released once and its shares
+//! on `2^(−63)`; covectors on `2^(−24)`, the contact's on `2^(−40)`. Every product's
 //! remainder below its grain is released to the nearest numerator and every sum is an integer
 //! sum, so the sites, heads and regions summed in any order give the same bits: the host and any
 //! partition of the card agree bit for bit.
 //!
 //! [definition] The computational object is the helical pair interaction: a site meets its support
-//! through its framed modes' reciprocal contact `Re(conj(w̃_i) w̃_j)` at its falloff, the ring
+//! through its framed modes' lock at its falloff, the ring
 //! phasors carry the helix (a tower's residues are each finer ring's residue with its whole winding),
-//! and the pair contact `a ⊙ b` is the bilinear contact between two reads of one site (the merge).
+//! and the pair contact `a · b` (complex, so two ring faces compose by adding their phases) is the
+//! bilinear contact between two reads of one site (the merge).
 //! Of the winding guide's six general objects it touches the **helix** (the ring phasors, the
-//! carry), the **pair** (reciprocal site contacts and the bilinear merge), **faces and placement**
+//! carry), the **pair** (site contacts as locks and the bilinear merge), **faces and placement**
 //! (the shells as addresses, the Gibbs face, the release's lock) and the **tube** (the `K` ticks and
 //! the release's sweeps); the **cell holonomy** (the release's circulation receipt) and the **tower
 //! thread** (the octave falloff) stay attached.
@@ -170,9 +171,6 @@ use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, 
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
-
-/// [agent-inferred, November 1] **The hold's face** on `2^(−40)` (§14.2): a ratio of integer faces,
-/// attained at its declared grain as the exponential's mantissa is at `2^(−62)`.
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
 /// once, by one division of the exact series, for the return; the declared crossing into the step,
 /// whose own release is to the material's grain.
@@ -584,7 +582,7 @@ pub struct Region<'a> {
 }
 
 /// [definition; agent-inferred, November 1] **A read leaves its own echo out** (the dispersing field's
-/// §15.3): a site carried as a face is read through reciprocal contacts, so its face returns to it a
+/// §15.3): a site carried as a face is read through contacts both ways, so its face returns to it a
 /// round trip later; the read it meets is its cavity field, `z ← z − B ℓ`, with `ℓ` the logits its
 /// carried face was formed from and `B` its echo on `2^(−63)`, the round trip's share read on the read
 /// that formed `ℓ` ([`FieldRead::echo`]). Both are data: no covector passes through them.
@@ -632,7 +630,7 @@ pub fn shares(face: &TowerFace) -> Shares {
 struct TickCell {
     read: Vec<i32>,
     scale: Vec<i128>,
-    /// The unframed word `[t][2M]` (the hold reads it).
+    /// The unframed word `[t][2M]`.
     word: Vec<i64>,
     /// The framed words and values by head: `[h][t][2n]`, the real parts then the imaginary; the
     /// word as a ratio to its own power within its head (on `2^(−16)`), its powers `[h][t]` beside it.

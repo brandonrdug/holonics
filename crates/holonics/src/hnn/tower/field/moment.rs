@@ -38,7 +38,7 @@
 //! and any partition give the same bits; `s_t` is released once to `2^(−16)`, to the nearest
 //! numerator (`release(·, 90)`). Equivalently the unreleased moment is
 //! `S_t = Σ_(k,±) W_(t,k) E±_k` with `W` an exact Gaussian integer on `2^(−90)`
-//! (`ζ^(k−t) D 2^30` near, `D(2^ℓ) conj(ζ^t) ζ^k` far), which is what the adjoint transposes.
+//! (`ζ^(k−t) D 2^30` near, `D(2^ℓ) conj(ζ^t) ζ^k` far), which the return transposes.
 //!
 //! **The carrier.** The l1 norm of a Gaussian integer is `|re| + |im|`; it is submultiplicative.
 //! With `R` the largest l1 of the resident ring, `D̂` the largest decay (at least 1) and `Ê` the
@@ -50,28 +50,65 @@
 //! card refuses the same strands). With the founded rings (every phasor within a few grains of unit
 //! modulus, so l1 below `2^31` and `R · max(R, 2^30) < 2^62`) and `D̂ ≤ 2^30` the bound is below
 //! `(S + 1) · 2^92 · Ê`. For the encodings, components below `2^17` (l1 below `2^18`) give
-//! `(S + 1) · 2^110`: every strand of fewer than `2^17 − 1` sites is admitted. For the covector of
-//! the return, `(S + 1) · l1(δs) < 2^35`: at the reach of reading 8 (2,221 sites) components below
-//! about `2^22` on `2^(−24)` (a quarter of a unit) are admitted, one past it is refused, as the
-//! contact's return is (`FieldDeclaration::contact_return_bits`). Every product and sum is also
-//! checked, so a bound mis-derived is a refusal and never a wrapped bit.
+//! `(S + 1) · 2^110`: every strand of fewer than `2^17 − 1` sites is admitted. Every product and sum
+//! is also checked, so a bound mis-derived is a refusal and never a wrapped bit.
 //!
-//! **The adjoint** is the exact transpose of that integer map (the covector law: the paired adjoint
-//! uses the operands that produced the forward). Multiplication by a Gaussian integer `W` is a real
-//! `2 × 2` matrix whose transpose is multiplication by `conj(W)`, so with `δs` on `2^(−24)`
+//! **The return** is the forward map's transpose, with the turned covector released once a term. The
+//! exact transpose (multiplication by a Gaussian integer `W` transposes to multiplication by
+//! `conj(W)`) carries `conj(W) δs` on `2^(−114)`, and a covector's components reach tens of units
+//! (the value covector summed over the ticks at a 406-site crib region had l1 `2^28.1`, about 16
+//! units on `2^(−24)`), so its carrier is `(S + 1) · 2^91 · l1(δs) < 2^127`, which admits only about
+//! `2^27.3`: training refused at its second section. A released reverse is the field's norm (every
+//! reverse product of the field is released at its grain), so the far part's turned covector is
+//! released once a term, at the covector's own grain: one declared crossing a term, its rounding the
+//! only error of the return. With `δs` on `2^(−24)`:
 //!
 //! ```text
-//! δE⁺_k = release( Σ_(t ≥ k, t−k < NEAR) conj(ζ^(k−t)) D(t−k) δs_t 2^30  +  conj(ζ^k) Σ_ℓ D(2^ℓ) Σ_(t ∈ right octave ℓ of k) ζ^t δs_t , 90 )
-//! δE⁻_k = release( Σ_(t ≤ k, k−t < NEAR) conj(ζ^(k−t)) D(k−t) δs_t 2^30  +  conj(ζ^k) Σ_ℓ D(2^ℓ) Σ_(t ∈ left octave ℓ of k) ζ^t δs_t , 90 )
+//! r_u    = release(ζ^u δs_u, 30)                                      on 2^(−24)    the turned covector, once
+//! Q[j]   = Σ_(u<j) r_u                                                on 2^(−24)    exact sums of released terms
+//! Δ⁺_k   = Σ_(t ≥ k, t−k < NEAR) conj(ζ^(k−t)) D(t−k) δs_t
+//!        + conj(ζ^k) Σ_ℓ D(2^ℓ) (Q[hi+1] − Q[lo])  over the right octaves (lo,hi,ℓ) of k       on 2^(−84)
+//! Δ⁻_k   = the same over t ≤ k (near) and the left octaves of k
+//! δE±_k  = release(Δ±_k, 60)                                          on 2^(−24)
 //! ```
 //!
-//! The octaves of the transpose are the same `crowd_ranges`: the forward strand reads `k` from the
-//! left octave of `t` (`t − 2^(ℓ+1) + 1 ≤ k ≤ t − max(2^ℓ, NEAR)`, clipped at 0), which is
+//! The near term is `conj(ζ^(k−t)) D δs` on `2^(−30−30−24) = 2^(−84)` (no shift up 30); the far term
+//! `conj(ζ^k) · D(2^ℓ) · (Q[hi+1] − Q[lo])` is on `2^(−30−30−24) = 2^(−84)` too. `RETURN_BITS = 84`,
+//! released 60 bits to the covector's grain. The forward stays exact.
+//!
+//! The octaves of the return are the same `crowd_ranges`: the forward strand reads `k` from the left
+//! octave of `t` (`t − 2^(ℓ+1) + 1 ≤ k ≤ t − max(2^ℓ, NEAR)`, clipped at 0), which is
 //! `max(2^ℓ, NEAR) ≤ t − k ≤ 2^(ℓ+1) − 1` with `t < S`, that is `t` in the right octave `ℓ` of `k`
 //! (`k + max(2^ℓ, NEAR) ≤ t ≤ min(k + 2^(ℓ+1) − 1, S − 1)`), and the backward strand mirrors it. So
-//! `δE⁺_k` reads the right octaves of `k` and `δE⁻_k` its left octaves, from the single prefix sum
-//! `Q[j] = Σ_(u<j) ζ^u δs_u` (exact, on `2^(−54)`). The identity tested on the unreleased
-//! integers is `Σ_t Re(conj(δs_t) S_t) = Σ_k Re(conj(Δ⁺_k) E⁺_k) + Re(conj(Δ⁻_k) E⁻_k)`.
+//! `δE⁺_k` reads the right octaves of `k` and `δE⁻_k` its left octaves, from the single prefix `Q`.
+//!
+//! **The return's pairing.** Let `Δ̃±` be the exact transpose on `2^(−114)`. Then
+//! `Δ̂±_k − Δ̃±_k / 2^30 = conj(ζ^k) Σ_ℓ D(2^ℓ) Σ_(t ∈ octave ℓ) ε_t` with `ε_t = r_t − ζ^t δs_t / 2^30`,
+//! both components of `ε_t` at most `½`, so `l1(ε_t) ≤ 1`, and the exact transpose pairs exactly,
+//! `Σ_t Re(conj(δs_t) S_t) = Σ_k Re(conj(Δ̃⁺_k) E⁺_k) + Re(conj(Δ̃⁻_k) E⁻_k)`, hence
+//!
+//! ```text
+//! | Σ_t Re(conj(δs_t) S_t) − 2^30 Σ_k [Re(conj(Δ⁺_k) E⁺_k) + Re(conj(Δ⁻_k) E⁻_k)] |
+//!     ≤ 2^30 Σ_k [ l1(ζ^k) (Σ_(far t>k) D(2^ℓ_(t,k))) ‖E⁺_k‖∞ + l1(ζ^k) (Σ_(far t<k) D(2^ℓ_(t,k))) ‖E⁻_k‖∞ ]
+//! ```
+//!
+//! (`Re(conj(e) E) ≤ l1(e) ‖E‖∞`). It is an equality where no release rounds (no far pair, `S ≤ NEAR`;
+//! or a stationary ring, whose turned covector `2^30 δs` releases exactly).
+//!
+//! **The return's carrier** (`return_certificate`, again a property of the exact inputs alone). With
+//! `G` the largest l1 of a covector entry: the turned term `ζ^u δs_u` has l1 at most `R G`, the
+//! released term `T = ⌊R G / 2^30⌋ + 1` (each component at most `|x| / 2^30 + ½`); an entry of `Q` and
+//! a range sum of it at most `S T`; a near term at most `D̂ R G`; a far term `D̂ R S_range T`; the far
+//! sources of one side are disjoint and the near terms at most `NEAR` a side, so every partial sum of
+//! every order has l1 at most
+//!
+//! ```text
+//! K = max(D̂, 1) · R · ( NEAR · G + S · ( ⌊R G / 2^30⌋ + 1 ) )  <  2^127
+//! ```
+//!
+//! With the founded rings (`R < 2^31`) and `D̂ ≤ 2^30`, `K < 2^61 (NEAR + 3 S) G` (for `G ≥ 1`; about
+//! `(S + 2 NEAR) 2^61 G`), so covectors of l1 up to about `2^66 / (NEAR + 3 S)` are admitted: `2^55.7`
+//! at 406 sites, `2^53.3` at the reach of reading 8 (2,221 sites).
 //!
 //! **The span's face.** For `i < j`, `f_(i,j] = s⁺_j − ζ^(i−j) D(j−i) s⁺_i` (with `s⁺` the forward
 //! strand's part: a strand with `after = 0`) reads the sources `i < k ≤ j` between the two
@@ -90,12 +127,15 @@ use crate::hnn::tower::{fit64, refuse, Result, COVECTOR_BITS, FACE_BITS, MOVE_BI
 type Gauss = (i128, i128);
 
 /// The coefficient's grain, three faces on `2^(−30)` (`ζ`, `ζ`, `D`; or `ζ`, `D` and the shift of
-/// 30): `W` is on `2^(−90)`, and a moment or a return is released this many bits.
+/// 30): `W` is on `2^(−90)`, and a moment is released this many bits.
 pub const COEFFICIENT_BITS: u32 = 3 * MOVE_BITS;
 /// The unreleased moment's grain, `2^(−106)`: `W` times an encoding on `2^(−16)`.
 pub const MOMENT_BITS: u32 = COEFFICIENT_BITS + FACE_BITS;
-/// The unreleased return's grain, `2^(−114)`: `conj(W)` times a covector on `2^(−24)`.
-pub const RETURN_BITS: u32 = COEFFICIENT_BITS + COVECTOR_BITS;
+/// The unreleased return's grain, `2^(−84)`: `conj(ζ) D` (two faces on `2^(−30)`) times a covector on
+/// `2^(−24)`, with the far part's prefix of the turned covector released to `2^(−24)`.
+pub const RETURN_BITS: u32 = 2 * MOVE_BITS + COVECTOR_BITS;
+/// The bits the return is released: to the covector's own grain `2^(−24)`.
+pub const RETURN_RELEASE_BITS: u32 = RETURN_BITS - COVECTOR_BITS;
 
 const CARRIER: &str = "a moment's term outgrew its 128-bit carrier";
 
@@ -175,6 +215,22 @@ pub fn certificate(sites: u128, ring_l1: u128, decay_max: u128, input_l1: u128) 
     bound < 1u128 << 127
 }
 
+/// [definition; agent-inferred, November 1] **The return's l1 certificate** (module doc): a covector
+/// of largest l1 `input_l1` over a strand of `sites` places is admitted when
+/// `max(decay_max, 1) · ring_l1 · (NEAR · input_l1 + sites · (⌊ring_l1 · input_l1 / 2^30⌋ + 1)) < 2^127`,
+/// the products formed in that order and an overflow of one a refusal. A term released once at the
+/// covector's grain adds one grain of l1 to the turned term's `R G / 2^30`, and the far part's sources
+/// are disjoint, so the bound is linear in the strand. A property of the exact inputs alone, as
+/// [`certificate`] is.
+pub fn return_certificate(sites: u128, ring_l1: u128, decay_max: u128, input_l1: u128) -> bool {
+    let bound = (|| {
+        let released = (ring_l1.checked_mul(input_l1)? >> MOVE_BITS) + 1;
+        let inner = (NEAR as u128).checked_mul(input_l1)?.checked_add(sites.checked_mul(released)?)?;
+        decay_max.max(1).checked_mul(ring_l1)?.checked_mul(inner)
+    })();
+    matches!(bound, Some(b) if b < 1u128 << 127)
+}
+
 /// The resident faces of one ring slot over a strand of `sites` places, validated.
 struct Law<'a> {
     ring: &'a [(i64, i64)],
@@ -211,6 +267,15 @@ impl<'a> Law<'a> {
             Ok(())
         } else {
             refuse("a strand past the l1 certificate of its 128-bit carrier")
+        }
+    }
+
+    /// The return's l1 certificate for covectors of largest l1 `input_l1`.
+    fn certify_return(&self, input_l1: u128) -> Result<()> {
+        if return_certificate(self.sites as u128, self.ring_l1, self.decay_max, input_l1) {
+            Ok(())
+        } else {
+            refuse("a covector past the l1 certificate of the return's 128-bit carrier")
         }
     }
 
@@ -260,9 +325,24 @@ fn near(zeta: Gauss, decay: i128, x: Gauss) -> Result<Gauss> {
     cshift(cscale(cmul(zeta, x)?, decay)?, MOVE_BITS)
 }
 
-/// The transpose of a near term, `conj(ζ) D x 2^30` (a covector on `2^(−24)` gives `2^(−114)`).
+/// A near term of the return, `conj(ζ) D x`: two faces on `2^(−30)` and a covector on `2^(−24)`, so
+/// on `2^(−84)`, with no shift up (the return is released, not the exact transpose on `2^(−114)`).
 fn near_back(zeta: Gauss, decay: i128, x: Gauss) -> Result<Gauss> {
-    cshift(cscale(cmul_conj(zeta, x)?, decay)?, MOVE_BITS)
+    cscale(cmul_conj(zeta, x)?, decay)
+}
+
+/// `Q[j] = Σ_(u<j) release(ζ^u x_u, 30)`: the prefix of the turned covector, released once a term to
+/// the covector's own grain `2^(−24)` (exact integer sums of released terms).
+fn released_prefix(law: &Law, x: &[(i64, i64)]) -> Result<Vec<Gauss>> {
+    let mut out = Vec::with_capacity(x.len() + 1);
+    let mut sum = (0i128, 0i128);
+    out.push(sum);
+    for (k, &e) in x.iter().enumerate() {
+        let (re, im) = cmul(law.absolute(k), wide(e))?;
+        sum = cadd(sum, (release(re, MOVE_BITS), release(im, MOVE_BITS)))?;
+        out.push(sum);
+    }
+    Ok(out)
 }
 
 /// The largest l1 of a set of inputs.
@@ -313,16 +393,16 @@ pub fn moments(before: &[(i64, i64)], after: &[(i64, i64)], ring: &[(i64, i64)],
 }
 
 /// [definition; agent-inferred, November 1] **The moments' return, unreleased**: `(Δ⁺, Δ⁻)` on
-/// `2^(−114)`, the exact transpose of [`moment_exact`]'s integer map applied to `ds = δs` on
-/// `2^(−24)` (module doc).
+/// `2^(−84)` for `ds = δs` on `2^(−24)` (module doc): the near terms exact, the far part's turned
+/// covector released once a term to `2^(−24)`, every sum an integer sum.
 pub fn moment_return_exact(ds: &[(i64, i64)], ring: &[(i64, i64)], n: usize, decay: &[i64]) -> Result<(Vec<(i128, i128)>, Vec<(i128, i128)>)> {
     let sites = ds.len();
     if sites == 0 {
         return Ok((Vec::new(), Vec::new()));
     }
     let law = Law::new(sites, ring, n, decay)?;
-    law.certify(extent([ds]))?;
-    let q = prefix(&law, ds)?;
+    law.certify_return(extent([ds]))?;
+    let q = released_prefix(&law, ds)?;
     let (mut plus, mut minus) = (Vec::with_capacity(sites), Vec::with_capacity(sites));
     for k in 0..sites {
         let (mut p, mut m) = ((0i128, 0i128), (0i128, 0i128));
@@ -348,11 +428,11 @@ pub fn moment_return_exact(ds: &[(i64, i64)], ring: &[(i64, i64)], n: usize, dec
     Ok((plus, minus))
 }
 
-/// **The moments' return** `(δE⁺, δE⁻)` on `2^(−24)`: [`moment_return_exact`] released once, to the
-/// nearest numerator (the covector's carrier is wide, `i128`, as the field's).
+/// **The moments' return** `(δE⁺, δE⁻)` on `2^(−24)`: [`moment_return_exact`] released once, 60 bits, to
+/// the nearest numerator (the covector's carrier is wide, `i128`, as the field's).
 pub fn moments_return(ds: &[(i64, i64)], ring: &[(i64, i64)], n: usize, decay: &[i64]) -> Result<(Vec<(i128, i128)>, Vec<(i128, i128)>)> {
     let (plus, minus) = moment_return_exact(ds, ring, n, decay)?;
-    let released = |v: Vec<Gauss>| -> Vec<Gauss> { v.into_iter().map(|(re, im)| (release(re, COEFFICIENT_BITS), release(im, COEFFICIENT_BITS))).collect() };
+    let released = |v: Vec<Gauss>| -> Vec<Gauss> { v.into_iter().map(|(re, im)| (release(re, RETURN_RELEASE_BITS), release(im, RETURN_RELEASE_BITS))).collect() };
     Ok((released(plus), released(minus)))
 }
 

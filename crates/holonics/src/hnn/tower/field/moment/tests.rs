@@ -121,10 +121,30 @@ fn direct(slot: &Slot, before: &[(i64, i64)], after: &[(i64, i64)]) -> Vec<G> {
         .collect()
 }
 
-/// `Δ±_k = Σ conj(W_(t,k)) δs_t` over `t ≥ k` (plus) and `t ≤ k` (minus): `O(S²)`.
+/// The released return from its definition, unreleased on `2^(−84)`: `O(S²)`. The turned covector is
+/// released once a term, `r_t = release(ζ^t δs_t, 30)`; a pair within `NEAR` meets as
+/// `conj(ζ^(k−t)) D(|t−k|) δs_t`, a far pair as `conj(ζ^k) (D(2^ℓ) r_t)`, `ℓ = ⌊log₂ |t − k|⌋`. Plus sums
+/// `t ≥ k`, minus `t ≤ k`; the octaves are by the distance alone.
 fn direct_return(slot: &Slot, ds: &[(i64, i64)]) -> (Vec<G>, Vec<G>) {
     let sites = ds.len();
-    let sum = |k: usize, ts: &mut dyn Iterator<Item = usize>| ts.fold((0i128, 0i128), |a, t| gadd(a, gmul(gconj(coefficient(slot, t, k)), gwide(ds[t]))));
+    let turned: Vec<G> = (0..sites)
+        .map(|t| {
+            let p = gmul(slot.phase(t as i64), gwide(ds[t]));
+            (release(p.0, MOVE_BITS), release(p.1, MOVE_BITS))
+        })
+        .collect();
+    let term = |k: usize, t: usize| -> G {
+        let d = t.abs_diff(k);
+        if d < NEAR {
+            let c = gmul(gconj(slot.phase(k as i64 - t as i64)), gwide(ds[t]));
+            let s = slot.decay[d] as i128;
+            (c.0 * s, c.1 * s)
+        } else {
+            let s = slot.decay[1usize << d.ilog2()] as i128;
+            gmul(gconj(slot.phase(k as i64)), (turned[t].0 * s, turned[t].1 * s))
+        }
+    };
+    let sum = |k: usize, ts: &mut dyn Iterator<Item = usize>| ts.fold((0i128, 0i128), |a, t| gadd(a, term(k, t)));
     let plus = (0..sites).map(|k| sum(k, &mut (k..sites))).collect();
     let minus = (0..sites).map(|k| sum(k, &mut (0..=k))).collect();
     (plus, minus)
@@ -255,32 +275,125 @@ fn pairings(before: &[(i64, i64)], after: &[(i64, i64)], ds: &[(i64, i64)], mome
     (left, right)
 }
 
-/// The return is the exact transpose of the forward's integer map: on the unreleased grains the
-/// pairing `⟨δs, S(E)⟩ = ⟨Δ(δs), E⟩` is an equality of integers (grain `2^(−130)` both sides), and the
-/// return equals the direct sum of the conjugate coefficients, bit for bit, released too.
+/// The released return equals the direct `O(S²)` sum of the same released law, bit for bit,
+/// unreleased (`2^(−84)`) and released (60 bits to `2^(−24)`), on every slot, with covectors to the
+/// size the return's certificate admits (components below `2^24` and `2^40`).
 #[test]
-fn the_return_is_the_exact_transpose_of_the_moments() {
+fn the_return_equals_its_released_law_bit_for_bit() {
     let mut next = mixer(17);
+    let mut checked = 0usize;
     for slot in all_slots() {
         let reach = slot.decay.len();
         for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
-            // Small operands, and full-size ones (encodings below 2^17, covectors below 2^24, which
-            // the l1 certificate admits to the reach: `(S + 1) · l1(δs) < 2^35`).
-            for (e_bound, d_bound) in [(8i64, 8i64), (1 << 17, 1 << 24)] {
+            for d_bound in [8i64, 1 << 24, 1 << 40] {
+                let ds = strand(&mut next, sites, d_bound);
+                let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+                let (want_plus, want_minus) = direct_return(&slot, &ds);
+                assert_eq!((&plus, &minus), (&want_plus, &want_minus), "n {} S {sites} bound {d_bound}", slot.n);
+                let (rp, rm) = moments_return(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+                assert_eq!((rp, rm), (released(&want_plus, RETURN_RELEASE_BITS), released(&want_minus, RETURN_RELEASE_BITS)), "n {} S {sites}", slot.n);
+                checked += sites;
+            }
+        }
+    }
+    assert!(checked > 3000);
+}
+
+/// The bound on the pairing's rounding discrepancy (module doc), from the definitions:
+/// `2^30 Σ_k [ l1(ζ^k) (Σ_(far t>k) D(2^ℓ)) ‖E⁺_k‖∞ + l1(ζ^k) (Σ_(far t<k) D(2^ℓ)) ‖E⁻_k‖∞ ]`.
+fn pairing_bound(slot: &Slot, before: &[(i64, i64)], after: &[(i64, i64)]) -> BigInt {
+    let sites = before.len();
+    let sup = |p: (i64, i64)| p.0.unsigned_abs().max(p.1.unsigned_abs()) as i128;
+    let mut total = BigInt::from(0);
+    for k in 0..sites {
+        let z = slot.phase(k as i64);
+        let l1 = z.0.abs() + z.1.abs();
+        let (mut above, mut below) = (0i128, 0i128);
+        for t in 0..sites {
+            let d = t.abs_diff(k);
+            if d >= NEAR {
+                let decay = slot.decay[1usize << d.ilog2()] as i128;
+                if t > k {
+                    above += decay;
+                } else {
+                    below += decay;
+                }
+            }
+        }
+        total += BigInt::from(l1) * (BigInt::from(above) * sup(before[k]) + BigInt::from(below) * sup(after[k]));
+    }
+    total << MOVE_BITS as usize
+}
+
+/// The released return pairs with the moments to the rounding of its releases, and the discrepancy is
+/// real: `| ⟨δs, S(E)⟩ − 2^30 ⟨Δ(δs), E⟩ |` (grain `2^(−130)`, integers) is within `pairing_bound`, zero
+/// where no far pair rounds (`S ≤ NEAR`) and nonzero somewhere else.
+#[test]
+fn the_return_pairs_with_the_moments_within_the_release_rounding() {
+    let mut next = mixer(18);
+    let mut seen = 0usize;
+    for slot in all_slots() {
+        let reach = slot.decay.len();
+        for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
+            for (e_bound, d_bound) in [(8i64, 8i64), (1 << 17, 1 << 24), (1 << 17, 1 << 40)] {
                 let (before, after) = (strand(&mut next, sites, e_bound), strand(&mut next, sites, e_bound));
                 let ds = strand(&mut next, sites, d_bound);
                 let moment = moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay).unwrap();
                 let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
                 let (left, right) = pairings(&before, &after, &ds, &moment, &plus, &minus);
-                assert_eq!(left, right, "n {} S {sites} bound {e_bound}", slot.n);
+                let diff = &left - (right << MOVE_BITS as usize);
+                let bound = pairing_bound(&slot, &before, &after);
+                assert!(babs(&diff) <= bound, "n {} S {sites} bounds {e_bound} {d_bound}: {diff} against {bound}", slot.n);
+                if sites <= NEAR {
+                    assert_eq!(diff, BigInt::from(0), "no far pair, no rounding: n {} S {sites}", slot.n);
+                    assert_eq!(bound, BigInt::from(0));
+                } else if diff != BigInt::from(0) {
+                    seen += 1;
+                }
                 assert!(sites < 2 || left != BigInt::from(0), "a vanishing pairing proves nothing");
-                let (want_plus, want_minus) = direct_return(&slot, &ds);
-                assert_eq!((&plus, &minus), (&want_plus, &want_minus), "n {} S {sites}", slot.n);
-                let (rp, rm) = moments_return(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
-                assert_eq!((rp, rm), (released(&want_plus, COEFFICIENT_BITS), released(&want_minus, COEFFICIENT_BITS)), "n {} S {sites}", slot.n);
             }
         }
     }
+    assert!(seen > 20, "the release's rounding was seen {seen} times");
+}
+
+/// A stationary slot turns the covector by `2^30` exactly, so its release rounds nothing and the
+/// return is the exact transpose scaled: the pairing is an equality of integers at any strand length.
+#[test]
+fn a_stationary_slot_pairs_exactly() {
+    let ring = [(1i64 << MOVE_BITS, 0i64)];
+    let decay = vec![1i64 << MOVE_BITS; 300];
+    let mut next = mixer(21);
+    for sites in [7usize, 64, 129, 300] {
+        let (before, after) = (strand(&mut next, sites, 1 << 17), strand(&mut next, sites, 1 << 17));
+        let ds = strand(&mut next, sites, 1 << 40);
+        let moment = moment_exact(&before, &after, &ring, 1, &decay).unwrap();
+        let (plus, minus) = moment_return_exact(&ds, &ring, 1, &decay).unwrap();
+        let (left, right) = pairings(&before, &after, &ds, &moment, &plus, &minus);
+        assert_eq!(left, right << MOVE_BITS as usize, "S {sites}");
+        assert!(left != BigInt::from(0));
+    }
+}
+
+/// The crib region's covector: 406 sites, l1 up to `2^28` (16 units on `2^(−24)`), which the exact
+/// transpose's certificate refused on the founded ring and the released return admits, bit for bit
+/// the direct sum of its law.
+#[test]
+fn a_crib_regions_covector_is_admitted() {
+    let slot = slots(512, 6).into_iter().find(|s| s.n == 729).unwrap();
+    let mut next = mixer(25);
+    let sites = 406;
+    let ds = strand(&mut next, sites, 1 << 27);
+    let l1_of = |p: &(i64, i64)| p.0.unsigned_abs() as u128 + p.1.unsigned_abs() as u128;
+    let g = ds.iter().map(l1_of).max().unwrap();
+    let r = slot.ring.iter().map(l1_of).max().unwrap();
+    let d = slot.decay[..sites].iter().map(|d| d.unsigned_abs() as u128).max().unwrap();
+    assert!(g > 1 << 27, "a covector of l1 beyond 2^27");
+    assert!(!certificate(sites as u128, r, d, g), "the exact transpose's carrier refuses it");
+    assert!(return_certificate(sites as u128, r, d, g));
+    let (plus, minus) = moments_return(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+    let (want_plus, want_minus) = direct_return(&slot, &ds);
+    assert_eq!((plus, minus), (released(&want_plus, RETURN_RELEASE_BITS), released(&want_minus, RETURN_RELEASE_BITS)));
 }
 
 /// Moments are linear in the encodings (the integer map has no rounding before its one release).
@@ -528,6 +641,31 @@ fn the_certificate_is_the_l1_bound() {
     assert!(!certificate(10, u128::MAX, d, e));
 }
 
+/// The return's certificate is `max(D̂, 1) R (NEAR G + S (⌊R G / 2^30⌋ + 1)) < 2^127`, linear in the
+/// strand: for `R = 2^31`, `D̂ = 2^30` it is `2^61 (6 G + S (2 G + 1))`.
+#[test]
+fn the_return_certificate_is_the_released_bound() {
+    let (r, d) = (1u128 << 31, 1u128 << 30);
+    // At the crib region's 406 sites: 2^61 (818 G + 406) < 2^127 up to G = 2^56.
+    assert!(return_certificate(406, r, d, 1 << 56));
+    assert!(!return_certificate(406, r, d, 1 << 57));
+    // At the reach of reading 8, 2221 sites: 2^61 (4448 G + 2221), up to G = 2^53.
+    assert!(return_certificate(2221, r, d, 1 << 53));
+    assert!(!return_certificate(2221, r, d, 1 << 54));
+    // The crib region's l1 of 2^28.1, which the exact transpose's carrier refuses (about 2^27.3).
+    let g = 285_000_000u128;
+    assert!(return_certificate(406, (1 << 30) + (1 << 29), d, g));
+    assert!(!certificate(406, (1 << 30) + (1 << 29), d, g));
+    // Zero decay or covector is admitted, saturation is a refusal.
+    assert!(return_certificate(1 << 20, r, 0, 0));
+    // The released term's grain: even a zero covector releases to l1 at most 1 a source (the +1).
+    assert!(!return_certificate(1 << 96, 1 << 31, 1, 0));
+    assert!(return_certificate((1 << 96) - 1, 1 << 31, 1, 0));
+    assert!(!return_certificate(u128::MAX, r, d, 1));
+    assert!(!return_certificate(10, u128::MAX, d, 1 << 20));
+    assert!(!return_certificate(10, r, d, u128::MAX));
+}
+
 /// A strand at the certificate's edge, all terms aligned, is carried exactly (the bound is
 /// sufficient, never a wrap), and one past it is refused.
 #[test]
@@ -547,15 +685,20 @@ fn the_certificate_admits_the_largest_aligned_strand_and_refuses_one_past_it() {
     let huge = vec![(1i64 << 60, 1i64 << 60); sites];
     assert_eq!(moments(&huge, &huge, &ring, 1, &decay), Err(TowerError::Refused("a strand past the l1 certificate of its 128-bit carrier")));
     assert!(moments_return(&huge, &ring, 1, &decay).is_err());
-    // A covector of 2^30 on 2^(−24) (64.0) over 300 sites is past it: (S + 1) l1(δs) = 301 · 2^31 > 2^35.
+    // A covector of 2^30 on 2^(−24) (64.0) is admitted: the released return's carrier is linear in the
+    // strand, and a stationary slot hears the plain sum, exactly.
     let loud = vec![(1i64 << 30, 1i64 << 30); sites];
-    assert!(moments_return(&loud, &ring, 1, &decay).is_err());
-    // Components below 2^24 (1.0) are carried exactly: every site hears the plain sum.
-    let quiet = vec![((1i64 << 24) - 1, (1i64 << 24) - 1); sites];
-    let (plus, minus) = moments_return(&quiet, &ring, 1, &decay).unwrap();
+    let (plus, minus) = moments_return(&loud, &ring, 1, &decay).unwrap();
     for k in 0..sites {
-        assert_eq!(plus[k], (((sites - k) as i128) * ((1i128 << 24) - 1), ((sites - k) as i128) * ((1i128 << 24) - 1)));
-        assert_eq!(minus[k], (((k + 1) as i128) * ((1i128 << 24) - 1), ((k + 1) as i128) * ((1i128 << 24) - 1)));
+        let hear = |count: usize| ((count as i128) << 30, (count as i128) << 30);
+        assert_eq!((plus[k], minus[k]), (hear(sites - k), hear(k + 1)));
+    }
+    // Components below 2^50 (about 10^8 units) are too; the 2^60 covector above is refused.
+    let louder = vec![((1i64 << 50) - 1, (1i64 << 50) - 1); sites];
+    let (plus, minus) = moments_return(&louder, &ring, 1, &decay).unwrap();
+    let unit = (1i128 << 50) - 1;
+    for k in 0..sites {
+        assert_eq!((plus[k], minus[k]), (((sites - k) as i128 * unit, (sites - k) as i128 * unit), ((k + 1) as i128 * unit, (k + 1) as i128 * unit)));
     }
 }
 
