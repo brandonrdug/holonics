@@ -11,8 +11,16 @@
 //! and in its calculation, so the field would meet one number as other words; a byte is the same
 //! class wherever it is written. The codec is exterior: the field meets only classes.
 //!
-//! The mask draws are an exterior keyed stream (the key file's first word seeds an integer
-//! mixer): they choose which sites a section compares, never what the field deposits.
+//! The mask and tail draws are an exterior keyed stream (the key file's last word seeds an integer
+//! mixer, apart from every founding and growth draw read from its front): they choose which sites
+//! a section compares and how far its region runs past the answer, never what the field deposits.
+//!
+//! [agent-inferred, November 1] **A region carries no word of where its answer ends.** The release
+//! opens the answer at the training passage's longest extent and the region shrinks as voids are
+//! released, so a training region runs past its answer by a keyed tail (see [`tail`]) and the
+//! held-out read opens at the release's own extent. A region whose length ended one site past its
+//! answer, as the first draft's did, told the field the answer's end, and the release could never
+//! meet that region (the review of November 1).
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
@@ -152,6 +160,21 @@ fn mask(seed: u64, draw: u64, question: usize, sites: usize) -> Vec<bool> {
     out
 }
 
+/// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
+/// codec's answer extent less the answer's: an octave `k` of the room drawn uniform, then a length
+/// uniform in `[2^k, min(2^(k+1) − 1, room)]`. Every octave of tail is met alike, so the field
+/// meets the long void regions of a release's first sweeps and the short ones of its last; on the
+/// GSM8K training passage this reads 1.86 times the sites² of a one-void tail (a uniform length
+/// would read 3.42 times).
+fn tail(seed: u64, draw: u64, room: usize) -> usize {
+    let room = room.max(1);
+    let octaves = u64::from(usize::BITS - room.leading_zeros());
+    let k = (mix(seed, draw | 1 << 63) % octaves) as u32;
+    let low = 1usize << k;
+    let high = ((1usize << (k + 1)) - 1).min(room);
+    low + (mix(seed, draw | 3 << 62) as usize) % (high - low + 1)
+}
+
 /// A problem's region classes: the question and its line, the answer, then `void` to `length`.
 fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
     let mut out: Vec<usize> = q.iter().chain(a).copied().collect();
@@ -159,24 +182,25 @@ fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -
     out
 }
 
-/// The held-out read: every answer site (and its void) unresolved at once, the field's code of
-/// the answer's classes, its digits' and its text's, on `2^(−20)` bits, beside each one's count
-/// and the answer's bytes.
+/// The held-out read at the release's own opening: the region is the question and the codec's
+/// answer extent, every answer site unresolved at once, and the field's code is read over the
+/// answer's classes and its first void (its digits' and its text's apart), on `2^(−20)` bits,
+/// beside each one's count.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &[(Vec<usize>, Vec<usize>, usize)], realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
-    let regions: Vec<(Vec<usize>, Vec<bool>)> = problems
+    let regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
         .iter()
         .map(|(q, a, _)| {
-            let classes = region_classes(codec, q, a, q.len() + a.len() + 1);
+            let classes = region_classes(codec, q, a, q.len() + codec.answer);
             let open = (0..classes.len()).map(|t| t >= q.len()).collect();
-            (classes, open)
+            (classes, open, q.len() + a.len() + 1)
         })
         .collect();
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u }).collect();
     let mut out = [(0i64, 0usize); 3];
-    for chunk in views.chunks(64) {
+    for (chunk, ends) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
-        for (region, faces) in chunk.iter().zip(faces) {
-            for (face, &class) in faces.iter().zip(region.classes) {
+        for ((region, faces), &(_, _, end)) in chunk.iter().zip(faces).zip(ends) {
+            for (face, &class) in faces.iter().zip(region.classes).take(end) {
                 if let Some(face) = face {
                     let code = face.code(class);
                     out[0].0 += code;
@@ -229,53 +253,77 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     };
     let train_set = encode(&train_problems)?;
     let dev_set: Vec<_> = encode(&dev_problems)?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    // The reach: the longest region the run reads, a question and the codec's answer extent (a
+    // training region's tail never runs past it, and the release opens there).
+    let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
     let mut learner = match args.get(19..21) {
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks };
+            // The founding's heads are its ring sets; the reach is the passages'.
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach };
             FieldLearner::new(Field::found(declaration, &keys).map_err(|e| e.to_string())?, rate)
         }
     };
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a continued learner whose alphabet is not the codec's".into());
     }
-    let seed = u64::from_be_bytes(keys.get(..8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    // Sections of problems of like length, padded with void past the section's longest by one.
+    if learner.field.declaration.reach < reach {
+        return Err(format!("a continued learner whose reach ({}) is shorter than the passages' regions ({reach})", learner.field.declaration.reach).into());
+    }
+    // The masks and tails read the key file's last word; every growth this run could make reads
+    // the key file's front past the founding, and must not reach it.
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    {
+        let (mut declaration, mut drawn) = (learner.field.declaration, learner.drawn);
+        for _ in 1..laps {
+            drawn += 4 * declaration.growth_draws(2);
+            declaration = declaration.grown(2).map_err(|e| e.to_string())?;
+        }
+        if drawn + 8 > keys.len() {
+            return Err(format!("a key file of {} bytes, and {} laps may grow the body to read {drawn} before its last word", keys.len(), laps).into());
+        }
+    }
+    // Sections of problems of like length.
     let mut order: Vec<usize> = (0..train_set.len()).collect();
     order.sort_by_key(|&i| (train_set[i].0.len() + train_set[i].1.len(), i));
     let sections: Vec<Vec<usize>> = order.chunks(section).map(|c| c.to_vec()).collect();
-    let sites_total: usize = sections.iter().map(|s| s.len() * (s.iter().map(|&i| train_set[i].0.len() + train_set[i].1.len()).max().unwrap_or(0) + 1)).sum();
     println!(
-        "FIELD_DECLARATION alphabet={} width={width} heads={heads} modes={modes} still={still} contacts={contacts} ticks={ticks} section={section} rate={} answer={} train={} dev={} sections={} sites_a_lap={sites_total} material={}",
+        "FIELD_DECLARATION alphabet={} width={width} heads={heads} modes={modes} still={still} contacts={contacts} ticks={ticks} frames={} reach={} section={section} rate={} answer={} train={} dev={} sections={} laps_read={} material={}",
         codec.alphabet(),
+        learner.field.declaration.frames,
+        learner.field.declaration.reach,
         learner.rate_bits,
         codec.answer,
         train_set.len(),
         dev_set.len(),
         sections.len(),
+        learner.laps,
         learner.field.theta.len()
     );
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 answer={} digits={} text={} classes={} ms={}", bits(held[0].0, held[0].1), bits(held[1].0, held[1].1), bits(held[2].0, held[2].1), held[0].1, started.elapsed().as_millis());
-    let mut draw = 0u64;
     // The previous lap's code read before each section's deposit, and its sites.
     let mut previous: Option<(i64, usize)> = None;
     for lap in 0..laps {
+        // The learner's own lap count keys the walk and the draws: a continued run moves on.
+        let read = learner.laps;
+        let mut draw = read * train_set.len() as u64;
         let mut walk: Vec<usize> = (0..sections.len()).collect();
-        walk.sort_by_key(|&s| (mix(seed, ((lap as u64) << 40) ^ s as u64), s));
+        walk.sort_by_key(|&s| (mix(seed, (read << 40) ^ s as u64), s));
         let (mut code_before, mut code_after, mut sites, mut deposited, mut halvings) = (0i64, 0i64, 0usize, 0usize, 0u64);
         let lap_start = std::time::Instant::now();
         for (n, &s) in walk.iter().enumerate() {
             let members = &sections[s];
-            let length = members.iter().map(|&i| train_set[i].0.len() + train_set[i].1.len()).max().unwrap_or(0) + 1;
             let regions: Vec<(Vec<usize>, Vec<bool>)> = members
                 .iter()
                 .map(|&i| {
                     let (q, a, _) = &train_set[i];
                     draw += 1;
+                    let length = q.len() + a.len() + tail(seed, draw, codec.answer - a.len());
                     (region_classes(&codec, q, a, length), mask(seed, draw, q.len(), length))
                 })
                 .collect();
+            let length = regions.iter().map(|(c, _)| c.len()).max().unwrap_or(0);
             let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u }).collect();
             let section_start = std::time::Instant::now();
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
@@ -294,8 +342,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 section_start.elapsed().as_millis()
             );
         }
+        learner.laps += 1;
         write_new(&out.join(format!("STATE.{lap}")), learner.to_text().as_bytes())?;
-        println!("FIELD_LAP lap={lap} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} ms={}", bits(code_before, sites), bits(code_after, sites), sections.len(), lap_start.elapsed().as_millis());
+        println!("FIELD_LAP lap={lap} read={} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} ms={}", learner.laps, bits(code_before, sites), bits(code_after, sites), sections.len(), lap_start.elapsed().as_millis());
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} answer={} digits={} text={} classes={} ms={}", bits(held[0].0, held[0].1), bits(held[1].0, held[1].1), bits(held[2].0, held[2].1), held[0].1, started.elapsed().as_millis());
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
@@ -305,7 +354,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             if (code_before as i128) * (n as i128) >= (code as i128) * (sites as i128) && lap + 1 < laps {
                 learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
                 let d = learner.field.declaration;
-                println!("FIELD_GROW lap={lap} width={} heads={} contacts={} material={} ms={}", d.width, d.heads, d.contacts, learner.field.theta.len(), started.elapsed().as_millis());
+                println!("FIELD_GROW lap={lap} width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
             }
         }
         previous = Some((code_before, sites));
@@ -396,13 +445,32 @@ fn coupling(h: &[usize], t: &[usize]) -> Coupling {
     Coupling { lambda, friction: n + m - 2 * lambda, plateaus }
 }
 
+/// A file opened create-new, written a row at a time so a stopped run keeps what it read.
+fn rows_file(path: &Path, head: &str) -> Result<std::fs::File> {
+    use std::io::Write;
+    let mut file = std::fs::OpenOptions::new().write(true).create_new(true).open(path)?;
+    file.write_all(head.as_bytes())?;
+    Ok(file)
+}
+
+fn row(file: &mut std::fs::File, text: &str) -> Result<()> {
+    use std::io::Write;
+    file.write_all(text.as_bytes())?;
+    Ok(())
+}
+
 /// `release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS OUT`:
 /// for each of the first `COUNT` held problems the field releases the answer from the question
 /// alone (the codec's answer sites, refined over `SWEEPS` sweeps) and, at each of its
 /// calculations, the continuation past the answer written through that calculation's `=`. It writes
 /// `OUT/FREE.tsv` and `OUT/MARKS.tsv` as `card_written.py convert` writes them for
 /// `written_rules.py` (a calculation's release is cut after its first `>>`), and `OUT/COUPLING.tsv`,
-/// each free release's coupling read against the held answer at the class face.
+/// each free release's coupling read against the held answer at the class face. Each problem's
+/// rows are written as it is read, with one line of progress, so a run stopped at its deadline
+/// keeps every problem it finished. A problem the field cannot read (a unit the codec never met, a
+/// region past the reach) is written empty and counted, never skipped. The marks are written for
+/// the bytes alone: a founded-units codec would cut a calculation inside its units (the October 27
+/// review's located cause), so its marks are withheld and counted.
 pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 12 {
         return Err("release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS OUT".into());
@@ -410,6 +478,7 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
     let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let units = units_of(&args[5], &args[6])?;
+    let bytes = units.merges().is_empty();
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let (limit, sweeps) = (count(&args[9])?, positive(&args[10])?);
@@ -423,35 +492,54 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         q.extend(&written);
         field.release_realized(&q, open, sweeps, codec.void(), realization).map_err(|e| e.to_string().into())
     };
-    let (mut free_rows, mut mark_rows, mut couplings) = (String::new(), String::new(), String::from("problem\treleased\theld\tlambda\tfriction\tplateaus\tlongest\tlag\n"));
-    let (mut sum_h, mut sum_t, mut sum_lambda, mut sum_friction, mut marks) = (0usize, 0usize, 0usize, 0usize, 0usize);
+    let mut free = rows_file(&out.join("FREE.tsv"), "")?;
+    let mut marks_file = rows_file(&out.join("MARKS.tsv"), "")?;
+    let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\treleased\theld\tlambda\tfriction\tplateaus\tlongest\tlag\n")?;
+    let (mut sum_h, mut sum_t, mut sum_lambda, mut sum_friction, mut marks, mut refused, mut withheld) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
     for (i, (question, answer)) in held.iter().take(limit).enumerate() {
-        let released = release_one(question, b"")?;
-        let h: Vec<usize> = released.iter().copied().take_while(|&c| c < codec.void()).collect();
-        free_rows.push_str(&format!("{i}\t{}\n", escaped(&codec.decode(&h))));
-        let t = codec.encode(answer)?;
+        let one = std::time::Instant::now();
+        let (h, read) = match release_one(question, b"") {
+            Ok(released) => (released.iter().copied().take_while(|&c| c < codec.void()).collect::<Vec<usize>>(), true),
+            Err(why) => {
+                println!("FIELD_RELEASE_REFUSED problem={i} why={why}");
+                refused += 1;
+                (Vec::new(), false)
+            }
+        };
+        row(&mut free, &format!("{i}\t{}\n", escaped(&codec.decode(&h))))?;
+        let t = codec.encode(answer).unwrap_or_default();
         let c = coupling(&h, &t);
         let longest = c.plateaus.iter().copied().max_by_key(|&(run, lag)| (run, std::cmp::Reverse(lag.unsigned_abs()))).unwrap_or((0, 0));
-        couplings.push_str(&format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", h.len(), t.len(), c.lambda, c.friction, c.plateaus.len(), longest.0, longest.1));
+        row(&mut couplings, &format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", h.len(), t.len(), c.lambda, c.friction, c.plateaus.len(), longest.0, longest.1))?;
         sum_h += h.len();
         sum_t += t.len();
         sum_lambda += c.lambda;
         sum_friction += c.friction;
+        let mut problem_marks = 0usize;
         for (j, (expression, at)) in calculations_of(answer).into_iter().enumerate() {
-            let continued = release_one(question, &answer[..at])?;
-            let mut r = codec.decode(&continued);
+            if !bytes || !read {
+                withheld += 1;
+                continue;
+            }
+            let mut r = match release_one(question, &answer[..at]) {
+                Ok(continued) => codec.decode(&continued),
+                Err(why) => {
+                    println!("FIELD_RELEASE_REFUSED problem={i} mark={j} why={why}");
+                    refused += 1;
+                    Vec::new()
+                }
+            };
             if let Some(cut) = r.windows(2).position(|w| w == b">>") {
                 r.truncate(cut + 2);
             }
-            mark_rows.push_str(&format!("{i}\t{j}\t{}\t{}\n", escaped(expression), escaped(&r)));
-            marks += 1;
+            row(&mut marks_file, &format!("{i}\t{j}\t{}\t{}\n", escaped(expression), escaped(&r)))?;
+            problem_marks += 1;
         }
+        marks += problem_marks;
+        println!("FIELD_RELEASE_ONE problem={i} released={} held={} lambda={} friction={} marks={problem_marks} ms={} total_ms={}", h.len(), t.len(), c.lambda, c.friction, one.elapsed().as_millis(), started.elapsed().as_millis());
     }
-    write_new(&out.join("FREE.tsv"), free_rows.as_bytes())?;
-    write_new(&out.join("MARKS.tsv"), mark_rows.as_bytes())?;
-    write_new(&out.join("COUPLING.tsv"), couplings.as_bytes())?;
     println!(
-        "FIELD_RELEASE free={} marks={marks} sweeps={sweeps} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
+        "FIELD_RELEASE free={} marks={marks} withheld={withheld} refused={refused} sweeps={sweeps} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} ms={}",
         held.len().min(limit),
         started.elapsed().as_millis()
     );
@@ -471,9 +559,12 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let (limit, sweeps) = (count(&args[9])?, positive(&args[10])?);
     for (i, (question, _)) in held.iter().take(limit).enumerate() {
-        let q = codec.encode(&question_text(question))?;
-        let released = learner.field.release_realized(&q, codec.answer, sweeps, codec.void(), realization).map_err(|e| e.to_string())?;
-        println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i}\n{}\n", String::from_utf8_lossy(question), String::from_utf8_lossy(&codec.decode(&released)));
+        let released = codec.encode(&question_text(question)).and_then(|q| learner.field.release_realized(&q, codec.answer, sweeps, codec.void(), realization).map_err(|e| e.to_string().into()));
+        let answer = match released {
+            Ok(classes) => String::from_utf8_lossy(&codec.decode(&classes)).into_owned(),
+            Err(why) => format!("(refused: {why})"),
+        };
+        println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i}\n{answer}\n", String::from_utf8_lossy(question));
     }
     Ok(())
 }
@@ -587,6 +678,19 @@ mod tests {
         let text: Vec<String> = ["release-field-text", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "1", "2"].iter().map(|s| s.to_string()).collect();
         release_text(&text, &mut host()).expect("release text");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn tails_meet_every_octave_within_their_room() {
+        let room = 100usize;
+        let mut octaves = [false; 7];
+        for draw in 0..512 {
+            let t = tail(9, draw, room);
+            assert!((1..=room).contains(&t));
+            octaves[(usize::BITS - 1 - t.leading_zeros()) as usize] = true;
+        }
+        assert!(octaves.iter().all(|&o| o));
+        assert_eq!(tail(9, 3, 1), 1);
     }
 
     #[test]

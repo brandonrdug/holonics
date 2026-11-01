@@ -14,24 +14,27 @@
 //! **The object.** A problem is one relatively complete region: its question's sites are resolved
 //! (their classes arrived), its answer's are unresolved (a held operand, the encoding's last row).
 //! Each site carries a face `x_t` on `2^(−16)` and is framed by its place: a mode `m` of a head
-//! carries the ring phasor `U_(t,m) = e^(2πi (t mod n_m)/n_m)`, `n_m` a prime power (the turned
-//! modes; the CRT of coprime closures names a site's place), or `U = 1` (the still modes, which
-//! read content without place). One constitution `F_Θ` is iterated `K` ticks, `x^(k+1) = F_Θ(x^k)`:
+//! carries the ring phasor `U_(t,m) = e^(2πi (t mod n_m)/n_m)`, `n_m` a closure of the solenoid's
+//! dyadic or triadic tower ([`ring_periods`]: each ring reads the finer ring's residue and its
+//! whole winding, and the top rings span the region), or `U = 1` (the still modes, which read
+//! content without place). One constitution `F_Θ` is iterated `K` ticks, `x^(k+1) = F_Θ(x^k)`:
 //!
 //! ```text
 //! open       x⁰_t = E(u_t), or E(∗) where t is unresolved
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   q_t = Q r̂_t + b_q,   k_t = K r̂_t + b_k,   v_t = V r̂_t + b_v
-//! frame      q̃_t = U_t ⊙ q_t,   k̃_t = U_t ⊙ k_t                          complex modes, by head
+//! frame      q̃_t = U_t ⊙ q_t,   k̃_t = U_t ⊙ k_t,   ṽ_t = U_t ⊙ v_t       complex modes, by head
 //! contact    z_ij = 2^(−β) Σ_(m∈h) Re(conj(q̃_im) k̃_jm)                   every pair of sites, both ways
-//! weights    e_ij = 2^(z_ij − max_j z_ij),   p_ij = e_ij / Σ_j e_ij      the Gibbs face, in bits
-//! current    y_i = Σ_j p_ij v_j,   x ← x + O y + b_o
+//! weights    e_ij = 2^(z_ij − max_j z_ij)                                 the Gibbs face, in bits
+//! current    y_i = conj(U_i) ⊙ Σ_j e_ij ṽ_j / Σ_j e_ij,   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a ⊙ b) + b_c
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
 //! ```
 //!
 //! The pairing `Re(conj(q̃_i) k̃_j) = Re(conj(q_i) U_i^* U_j k_j)` turns mode `m` by
 //! `2π (j − i)/n_m`: a turned mode reads the relative place modulo its ring, a still mode reads the
-//! contents alone, at any distance. There is no clock between sites and no carry across problems:
+//! contents alone, at any distance. The current is the phase-carried moment
+//! `y_i = Σ_j p_ij U_i^* U_j v_j`: what a site gathers carries where each source stood relative
+//! to it, so place is content after the read, not only the choice of what is read. There is no clock between sites and no carry across problems:
 //! the region is the whole terrain the constitution meets, so the transferred response a scan's
 //! carried state would owe is absent by construction.
 //!
@@ -45,19 +48,20 @@
 //! **Release.** The answer's sites open unresolved and the field is refined over `S` sweeps: each
 //! sweep reads every unresolved site's face, releases the `⌈r/(S − s)⌉` most locked (top mass
 //! share, compared exactly by cross products) at width zero, and holds the rest. A site released
-//! as the void class ends the answer: every site after the earliest released void is void. The
-//! released sites are present terrain for the next sweep. A class is never spoken in order.
+//! as the void class ends the answer, and the sites past it leave the region. The released sites
+//! are present terrain for the next sweep. A class is never spoken in order.
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
-//! material on `2^(−24)`; frames and weights' shares on `2^(−30)`; Gibbs weights on `2^(−62)`
-//! relative to their peak; covectors on `2^(−24)`, the contact's on `2^(−40)`. Every product's
+//! material on `2^(−24)`; frames on `2^(−30)`; Gibbs weights on `2^(−40)` relative to their row's
+//! peak, the numerators summed whole over the row's one denominator; covectors on `2^(−24)`, the
+//! contact's on `2^(−40)`. Every product's
 //! remainder below its grain is released to the nearest numerator and every sum is an integer
 //! sum, so the sites, heads and regions summed in any order give the same bits: the host and any
 //! partition of the card agree bit for bit.
 //!
 //! [definition] The computational object is the helical pair interaction: every pair of sites
 //! meets through its framed modes' contact `Re(conj(q̃_i) k̃_j)`, the ring phasors carry the helix
-//! (residue and whole winding modulo each closure), and the pair contact `a ⊙ b` is the
+//! (a tower's residues are each finer ring's residue with its whole winding), and the pair contact `a ⊙ b` is the
 //! bilinear contact between two reads of one site. Of the winding guide's six general objects it
 //! touches the **helix** (the ring phasors), the **pair** (site contacts and the bilinear
 //! contact), **faces and placement** (the Gibbs face, the release by lock) and the **tube** (the
@@ -69,15 +73,24 @@ use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use num_bigint::BigUint;
 use rayon::prelude::*;
 
-/// The weights' shares, `p_ij` on `2^(−30)`.
+/// The Gibbs weights' grain relative to their row's peak, `e_ij` on `2^(−40)` (the exponential's
+/// `2^(−62)` face released; a pair below `2^(−40)` of its row's peak weighs nothing).
+const WEIGHT_BITS: u32 = 40;
+/// The reverse's per-site return of a row's denominator carries `2^(−30)` past the covector's
+/// grain (the precision the first draft's shares carried), so the sum over sites releases once.
 const SHARE_BITS: u32 = 30;
+/// The exponential's face is on `2^(−62)`; the weights keep `2^(−40)` of it.
+const WEIGHT_BITS_FROM: u32 = 62 - WEIGHT_BITS;
 /// The contact covector's grain, `2^(−40)` (`δz` and `δs`).
 const CONTACT_BITS: u32 = 40;
 
 /// [definition; agent-inferred, November 1] **The field's declared law**: an alphabet of `A`
 /// classes (the face's; the encoding carries one more row, the unresolved operand), a face width
 /// `D`, `H` heads of `n` complex modes each (the first `still` of every head unframed, the rest on
-/// the prime-power rings), `f` pair contacts and `K` ticks of the one constitution.
+/// the solenoid's rings, [`ring_periods`]), `f` pair contacts and `K` ticks of the one
+/// constitution; `frames`, the founding's heads, whose ring sets every grown head copies; and
+/// `reach`, the most sites a region may span (the terrain's extent, read from the passages the
+/// field will meet), which the rings' coarsest closures cover.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct FieldDeclaration {
     pub alphabet: usize,
@@ -87,6 +100,8 @@ pub struct FieldDeclaration {
     pub still: usize,
     pub contacts: usize,
     pub ticks: usize,
+    pub frames: usize,
+    pub reach: usize,
 }
 
 impl FieldDeclaration {
@@ -111,31 +126,45 @@ impl FieldDeclaration {
         (self.alphabet + 1) * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width
     }
 
-    /// The declaration grown by `factor`: width, heads and contacts (a head's modes and its
-    /// frames are kept).
+    /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
+    pub fn growth_draws(&self, factor: usize) -> usize {
+        factor * factor.saturating_sub(1) * self.width * (3 * 2 * self.complex() + 2 * self.contacts)
+    }
+
+    /// The declaration grown by `factor`: width, heads and contacts (a head's modes, its ring set,
+    /// the ring sets and the reach are kept).
     pub fn grown(&self, factor: usize) -> Result<Self> {
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
         Ok(Self { width: grow(self.width)?, heads: grow(self.heads)?, contacts: grow(self.contacts)?, ..*self })
+    }
+
+    /// The turned slots: `frames · (n − still)`, slot `(l − still) · frames + g` the ring of local
+    /// mode `l` in every head of ring set `g`.
+    pub fn turned_slots(&self) -> usize {
+        self.frames * (self.modes - self.still)
     }
 
     fn admit(&self) -> Result<()> {
         if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.still > self.modes || self.contacts == 0 || self.ticks == 0 {
             return refuse("a field needs two classes, a nonempty width, heads, modes, contacts and ticks, and no more still modes than a head has");
         }
+        if self.frames == 0 || self.heads % self.frames != 0 || self.reach == 0 {
+            return refuse("a field's ring sets divide its heads and its reach spans a site");
+        }
         Ok(())
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v1 {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks)
+        format!("hnn-field-v2 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 8 || words[0] != "hnn-field-v1" {
-            return refuse("a field's head line that is not hnn-field-v1");
+        if words.len() != 10 || words[0] != "hnn-field-v2" {
+            return refuse("a field's head line that is not hnn-field-v2");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
         d.admit()?;
         Ok(d)
     }
@@ -197,35 +226,48 @@ impl FieldLayout {
     }
 }
 
-/// Whether `v ≥ 2` is a prime power.
-fn prime_power(v: usize) -> bool {
-    let mut p = 2usize;
-    while p * p <= v && v % p != 0 {
-        p += 1;
+/// A prime's tower of closures from `p` to the first power that spans `reach` sites.
+fn tower(p: usize, reach: usize) -> Vec<usize> {
+    let mut out = vec![p];
+    while let Some(&top) = out.last() {
+        if top >= reach {
+            break;
+        }
+        match top.checked_mul(p) {
+            Some(next) => out.push(next),
+            None => break,
+        }
     }
-    if v % p != 0 {
-        return true;
-    }
-    let mut w = v;
-    while w % p == 0 {
-        w /= p;
-    }
-    w == 1
+    out
 }
 
-/// [agent-inferred, November 1] The turned modes' ring periods: the prime powers in ascending order
-/// (`2, 3, 4, 5, 7, 8, 9, 11, 13, 16, …`), one a turned mode of each head. A prime's powers are its
-/// own closures refined; coprime closures meet once per residue pair modulo their product, so the
-/// rings together name a site's place past any region a GSM8K problem fills.
-pub fn ring_periods(count: usize) -> Vec<usize> {
-    let mut out = Vec::with_capacity(count);
-    let mut v = 2usize;
-    while out.len() < count {
-        if prime_power(v) {
-            out.push(v);
-        }
-        v += 1;
-    }
+/// [definition; agent-inferred, November 1] **The turned slots' ring periods**: the solenoid's two
+/// coprime towers, the dyadic `2, 4, 8, …` and the triadic `3, 9, 27, …`, each from its finest
+/// closure to the first that spans the reach. A tower's ring `p^(k+1)` reads the residue of ring
+/// `p^k` and its whole winding, so a tower read together is a place's residue and its windings at
+/// every scale, and its top ring turns less than once across any region (a distance, not only a
+/// residue). The slots take `⌈S/2⌉` rings of the dyadic tower and `⌊S/2⌋` of the triadic, each
+/// spread evenly from the finest to the top (a lone slot takes the top; more slots than closures
+/// cycle the tower), merged in ascending period. Slot `s` of [`FieldDeclaration::turned_slots`]
+/// is ring set `s mod frames`'s local mode `still + s / frames`, so every ring set spans fine to
+/// coarse. Two sites that agree modulo every ring are at least the top dyadic closure apart,
+/// beyond the reach: no two sites of an admitted region share every frame.
+///
+/// (The prime powers `2, 3, 4, 5, 7, 8, …` of the first draft closed every ring within a few
+/// tens of sites and aliased sites `lcm` apart, 840 for six rings: the review of November 1.)
+pub fn ring_periods(slots: usize, reach: usize) -> Vec<usize> {
+    let sample = |tower: &[usize], count: usize| -> Vec<usize> {
+        (0..count)
+            .map(|k| match count {
+                1 => tower[tower.len() - 1],
+                _ if count <= tower.len() => tower[k * (tower.len() - 1) / (count - 1)],
+                _ => tower[k % tower.len()],
+            })
+            .collect()
+    };
+    let mut out = sample(&tower(2, reach), slots.div_ceil(2));
+    out.extend(sample(&tower(3, reach), slots / 2));
+    out.sort_unstable();
     out
 }
 
@@ -257,7 +299,8 @@ pub struct Field {
     pub declaration: FieldDeclaration,
     pub theta: Vec<i32>,
     layout: FieldLayout,
-    /// Each turned slot's period and its ring's phasors on `2^(−30)`.
+    /// Each turned slot's period and its ring's phasors on `2^(−30)` (the residues a region within
+    /// the reach reads).
     rings: Vec<(usize, Vec<(i64, i64)>)>,
     exponential: Exponential,
 }
@@ -280,9 +323,11 @@ struct TickCell {
     q: Vec<i64>,
     k: Vec<i64>,
     v: Vec<i64>,
-    /// Shares `[h][i][j]` on `2^(−30)`.
-    p: Vec<i64>,
-    /// The current `[t][2M]`.
+    /// Gibbs weights `[h][i][j]` on `2^(−40)` of their row's peak, and each row's mass `[h][i]`:
+    /// the numerators and their shared denominator.
+    e: Vec<u64>,
+    mass: Vec<u64>,
+    /// The current `[t][2M]`, back in each site's own frame.
     y: Vec<i64>,
     read2: Vec<i32>,
     scale2: Vec<i128>,
@@ -356,7 +401,7 @@ impl Field {
     fn with_theta(declaration: FieldDeclaration, theta: Vec<i32>) -> Self {
         let layout = FieldLayout::new(&declaration);
         let pi = half_turn(MOVE_BITS + 16);
-        let rings = ring_periods(declaration.modes - declaration.still).into_iter().map(|n| (n, (0..n).map(|r| ring_phasor(r, n, pi)).collect())).collect();
+        let rings = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         Self { declaration, theta, layout, rings, exponential: Exponential::new(FACE_BITS) }
     }
 
@@ -386,12 +431,13 @@ impl Field {
         ln2_face()
     }
 
-    /// The frame of local mode `l` of a head at site `t`, on `2^(−30)`.
-    fn frame(&self, t: usize, l: usize) -> (i64, i64) {
-        if l < self.declaration.still {
+    /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`.
+    fn frame(&self, t: usize, h: usize, l: usize) -> (i64, i64) {
+        let d = &self.declaration;
+        if l < d.still {
             return (1i64 << MOVE_BITS, 0);
         }
-        let (n, ring) = &self.rings[l - self.declaration.still];
+        let (n, ring) = &self.rings[(l - d.still) * d.frames + h % d.frames];
         ring[t % n]
     }
 
@@ -405,6 +451,9 @@ impl Field {
     fn admit_region(&self, region: &Region) -> Result<()> {
         if region.classes.len() != region.unresolved.len() || region.classes.is_empty() {
             return refuse("a region needs one class and one resolution a site");
+        }
+        if region.classes.len() > self.declaration.reach {
+            return refuse("a region past the field's reach, where its frames would repeat");
         }
         if region.classes.iter().any(|&c| c >= self.declaration.alphabet) {
             return refuse("a region's class outside the field's alphabet");
@@ -463,21 +512,26 @@ impl Field {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(t, li);
+                    let (ur, ui) = self.frame(t, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (q[t * m2 + c] as i128, q[t * m2 + m + c] as i128);
                     let (kr, ki) = (k[t * m2 + c] as i128, k[t * m2 + m + c] as i128);
                     cell.q[at + li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
                     cell.q[at + n + li] = fit64(release(ui * qr + ur * qi, MOVE_BITS))?;
+                    let (vr, vi) = (v[t * m2 + c] as i128, v[t * m2 + m + c] as i128);
                     cell.k[at + li] = fit64(release(ur * kr - ui * ki, MOVE_BITS))?;
                     cell.k[at + n + li] = fit64(release(ui * kr + ur * ki, MOVE_BITS))?;
-                    cell.v[at + li] = v[t * m2 + c];
-                    cell.v[at + n + li] = v[t * m2 + m + c];
+                    cell.v[at + li] = fit64(release(ur * vr - ui * vi, MOVE_BITS))?;
+                    cell.v[at + n + li] = fit64(release(ui * vr + ur * vi, MOVE_BITS))?;
                 }
             }
         }
-        // The contact, the weights and the current, head by head.
-        cell.p = vec![0i64; heads * sites * sites];
+        // The contact, the weights and the current, head by head. The current gathers each
+        // site's framed value, `ỹ_i = Σ_j e_ij ṽ_j / Σ_j e_ij` (the numerators summed whole over
+        // their shared denominator, one release), and returns it to the receiving site's own frame,
+        // `y_i = conj(U_i) ỹ_i`: the moment carries each source's place relative to its receiver.
+        cell.e = vec![0u64; heads * sites * sites];
+        cell.mass = vec![0u64; heads * sites];
         cell.y = vec![0i64; sites * m2];
         let mut z = vec![0i64; sites];
         for h in 0..heads {
@@ -489,20 +543,27 @@ impl Field {
                     *zj = fit64(release(s, FACE_BITS + beta))?;
                 }
                 let peak = *z.iter().max().unwrap_or(&0);
-                let e: Vec<u128> = z.iter().map(|&zj| self.exponential.below_one(zj as i128 - peak as i128)).collect();
-                let mass: u128 = e.iter().sum();
-                let row = &mut cell.p[(h * sites + i) * sites..(h * sites + i + 1) * sites];
-                for (pj, &ej) in row.iter_mut().zip(&e) {
-                    *pj = (((ej << SHARE_BITS) + mass / 2) / mass) as i64;
+                let row = &mut cell.e[(h * sites + i) * sites..(h * sites + i + 1) * sites];
+                for (ej, &zj) in row.iter_mut().zip(z.iter()) {
+                    *ej = release(self.exponential.below_one(zj as i128 - peak as i128) as i128, WEIGHT_BITS_FROM) as u64;
                 }
-                for r in 0..span {
+                let mass: u64 = row.iter().sum();
+                cell.mass[h * sites + i] = mass;
+                let mut framed = vec![0i64; span];
+                for (r, slot) in framed.iter_mut().enumerate() {
                     let mut sum = 0i128;
-                    for (j, &pj) in row.iter().enumerate() {
-                        sum += pj as i128 * cell.v[(h * sites + j) * span + r] as i128;
+                    for (j, &ej) in row.iter().enumerate() {
+                        sum += ej as i128 * cell.v[(h * sites + j) * span + r] as i128;
                     }
-                    let c = h * n + r % n;
-                    let slot = if r < n { c } else { m + c };
-                    cell.y[i * m2 + slot] = fit64(release(sum, SHARE_BITS))?;
+                    *slot = fit64(div_nearest(sum, mass as i128))?;
+                }
+                for li in 0..n {
+                    let (ur, ui) = self.frame(i, h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    let (yr, yi) = (framed[li] as i128, framed[n + li] as i128);
+                    let c = h * n + li;
+                    cell.y[i * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
+                    cell.y[i * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
                 }
             }
         }
@@ -696,37 +757,55 @@ impl Field {
             let mut dk = vec![0i64; sites * m2];
             let mut dv = vec![0i64; sites * m2];
             let mut dyh = vec![0i64; sites * span];
+            let mut w = vec![0i64; sites * span];
             let mut ds = vec![0i128; sites * sites];
+            let carried = WEIGHT_BITS + SHARE_BITS;
             for h in 0..heads {
+                // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
                 for t in 0..sites {
-                    for r in 0..span {
-                        let c = h * n + r % n;
-                        dyh[t * span + r] = dy[t * m2 + if r < n { c } else { m + c }];
+                    for li in 0..n {
+                        let c = h * n + li;
+                        let (ur, ui) = self.frame(t, h, li);
+                        let (ur, ui) = (ur as i128, ui as i128);
+                        let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
+                        dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
+                        dyh[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
                     }
                 }
-                let p = &cell.p[h * sites * sites..(h + 1) * sites * sites];
+                let e = &cell.e[h * sites * sites..(h + 1) * sites * sites];
+                let mass = &cell.mass[h * sites..(h + 1) * sites];
                 let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
                 let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
                 let kh = &cell.k[h * sites * span..(h + 1) * sites * span];
-                // δv_j = Σ_i p_ij δy_i.
+                // δṽ_j = Σ_i (e_ij / Σ_k e_ik) δỹ_i: each receiver's covector over its row's
+                // denominator, carried 2^(−30) finer, then one integer sum over receivers.
+                for i in 0..sites {
+                    for r in 0..span {
+                        let scaled = (dyh[i * span + r] as i128).checked_mul(1i128 << carried).ok_or(TowerError::Refused("a current's covector outgrew its 128-bit carrier"))?;
+                        w[i * span + r] = fit64(div_nearest(scaled, mass[i] as i128))?;
+                    }
+                }
                 for j in 0..sites {
                     for r in 0..span {
                         let mut sum = 0i128;
                         for i in 0..sites {
-                            sum += p[i * sites + j] as i128 * dyh[i * span + r] as i128;
+                            sum += e[i * sites + j] as i128 * w[i * span + r] as i128;
                         }
+                        // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
-                        dv[j * m2 + if r < n { c } else { m + c }] = fit64(release(sum, SHARE_BITS))?;
+                        dv[j * m2 + if r < n { c } else { m + c }] = fit64(release(sum, carried))?;
                     }
                 }
-                // δz_ij = ln 2 · p_ij (δp_ij − Σ_k p_ik δp_ik), δp_ij = ⟨δy_i, v_j⟩ on 2^(−40).
+                // δz_ij = ln 2 · (e_ij/Σe)(δp_ij − Σ_k (e_ik/Σe) δp_ik), δp_ij = ⟨δỹ_i, ṽ_j⟩ on
+                // 2^(−40), each numerator summed whole over the row's one denominator.
                 for i in 0..sites {
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let dp: Vec<i128> = (0..sites).map(|j| dyi.iter().zip(&vh[j * span..(j + 1) * span]).map(|(&a, &b)| a as i128 * b as i128).sum()).collect();
-                    let row = &p[i * sites..(i + 1) * sites];
-                    let mean = release(row.iter().zip(&dp).map(|(&pj, &dpj)| pj as i128 * dpj).sum(), SHARE_BITS);
+                    let row = &e[i * sites..(i + 1) * sites];
+                    let denominator = mass[i] as i128;
+                    let mean = div_nearest(row.iter().zip(&dp).map(|(&ej, &dpj)| ej as i128 * dpj).sum(), denominator);
                     for j in 0..sites {
-                        let dz = release(ln2 * release(row[j] as i128 * (dp[j] - mean), SHARE_BITS), SHARE_BITS);
+                        let dz = release(ln2 * div_nearest(row[j] as i128 * (dp[j] - mean), denominator), MOVE_BITS);
                         ds[i * sites + j] = release(dz, beta);
                     }
                 }
@@ -749,12 +828,12 @@ impl Field {
                     }
                 }
             }
-            // Undo the frame: δq = conj(U) δq̃.
+            // Undo the frame: δq = conj(U) δq̃, and so for the keys and the values.
             for t in 0..sites {
                 for c in 0..m {
-                    let (ur, ui) = self.frame(t, c % n);
+                    let (ur, ui) = self.frame(t, c / n, c % n);
                     let (ur, ui) = (ur as i128, ui as i128);
-                    for chart in [&mut dq, &mut dk] {
+                    for chart in [&mut dq, &mut dk, &mut dv] {
                         let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
                         chart[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
                         chart[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
@@ -915,8 +994,7 @@ impl Field {
     /// copy's entry of every family the founding opens away from zero (the charts and the pair
     /// drives).
     pub fn growth_draws(&self, factor: usize) -> usize {
-        let d = &self.declaration;
-        factor * factor.saturating_sub(1) * d.width * (3 * 2 * d.complex() + 2 * d.contacts)
+        self.declaration.growth_draws(factor)
     }
 
     /// [definition; agent-inferred, November 1] **The field widened by `factor`**, by the tower's
@@ -1056,16 +1134,23 @@ pub struct FieldReceipt {
 }
 
 /// [definition; agent-inferred, November 1] **The field's learner**: the field, the covector's two
-/// moments and the step's rate `2^(−k)`. The deposit is the tower's ([`super::TowerLearner`]).
+/// moments and the step's rate `2^(−k)`. The deposit is the tower's ([`super::TowerLearner`]),
+/// with one difference: a coordinate's moments open at its own first nonzero covector (`m = g`,
+/// `v = g²`), not at the section the learner first read. The returns and the readout open at zero,
+/// so the charts' covectors first arrive sections later; moments opened from zero would step them
+/// two to four times the declared rate until the second moment caught up (the review of
+/// November 1).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FieldLearner {
     pub field: Field,
     first: Vec<i128>,
     second: Vec<i128>,
-    opened: bool,
     pub rate_bits: u32,
     /// The founding key bytes read so far: the founding's, then each growth's.
     pub drawn: usize,
+    /// The laps the learner has read (an exterior walk's count, so a continued run keeps its
+    /// keyed masks and order moving rather than replaying the first lap's).
+    pub laps: u64,
 }
 
 impl FieldLearner {
@@ -1074,7 +1159,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.theta.len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], opened: false, rate_bits, drawn }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0 }
     }
 
     /// [definition; agent-inferred, November 1] **The learner widened** ([`Field::grown`]), its
@@ -1082,7 +1167,8 @@ impl FieldLearner {
     /// lifted as the tower's are: split evenly, each grown coordinate's covector at the growth
     /// point is the old one divided among its `f` copies and the readout's the old one, so a grown
     /// coordinate carries `m/f` and `v/f²`, the readout `m` and `v`, and opens on the old
-    /// normalized step.
+    /// normalized step. Each copy then steps as the old coordinate did, and the `f` copies of a
+    /// sum move together, so the rate falls by `⌈log₂ f⌉` bits: the field's step stays the old one.
     pub fn widened(&self, factor: usize, keys: &[u8]) -> Result<Self> {
         let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the growth draws"))?;
         let (field, from) = self.field.grown(factor, rest)?;
@@ -1090,7 +1176,8 @@ impl FieldLearner {
         let first = from.iter().map(|&(i, divided)| if divided { div_nearest(self.first[i], f) } else { self.first[i] }).collect();
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
-        Ok(Self { field, first, second, opened: self.opened, rate_bits: self.rate_bits, drawn })
+        let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps })
     }
 
     /// One section: its regions read and returned on the standing material, the moments moved, and
@@ -1119,13 +1206,12 @@ impl FieldLearner {
                 *v = on_step_grain(grain, *v);
             }
         }
-        if !self.opened {
-            self.first.clone_from(&g);
-            self.second = g.iter().map(|v| v.checked_mul(*v).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))).collect::<Result<_>>()?;
-            self.opened = true;
-        } else {
-            for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
-                let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
+            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
+            if *m == 0 && *v == 0 {
+                // A coordinate opens at its own first nonzero covector.
+                (*m, *v) = (*gv, square);
+            } else {
                 *m = toward(*m, *gv, FIRST_RATE);
                 *v = toward(*v, square, SECOND_RATE);
             }
@@ -1164,22 +1250,18 @@ impl FieldLearner {
     /// The learner as text: its head line, the field, then each moment on one line.
     pub fn to_text(&self) -> String {
         let join = |v: &[i128]| v.iter().map(i128::to_string).collect::<Vec<_>>().join(" ");
-        format!("hnn-field-learner-v1 {} {} {}\n{}{}\n{}\n", self.rate_bits, u8::from(self.opened), self.drawn, self.field.to_text(), join(&self.first), join(&self.second))
+        format!("hnn-field-learner-v2 {} {} {}\n{}{}\n{}\n", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
         let mut lines = text.lines();
         let head: Vec<&str> = lines.next().unwrap_or("").split(' ').collect();
-        if head.len() != 4 || head[0] != "hnn-field-learner-v1" {
-            return refuse("a learner's head line that is not hnn-field-learner-v1");
+        if head.len() != 4 || head[0] != "hnn-field-learner-v2" {
+            return refuse("a learner's head line that is not hnn-field-learner-v2");
         }
         let rate_bits = head[1].parse::<u32>().map_err(|_| TowerError::Refused("a learner's rate that is not a count"))?;
-        let opened = match head[2] {
-            "0" => false,
-            "1" => true,
-            _ => return refuse("a learner's opening that is neither 0 nor 1"),
-        };
-        let drawn = head[3].parse::<usize>().map_err(|_| TowerError::Refused("a learner's drawn keys that are not a count"))?;
+        let drawn = head[2].parse::<usize>().map_err(|_| TowerError::Refused("a learner's drawn keys that are not a count"))?;
+        let laps = head[3].parse::<u64>().map_err(|_| TowerError::Refused("a learner's laps that are not a count"))?;
         let field_text = format!("{}\n{}\n", lines.next().unwrap_or(""), lines.next().unwrap_or(""));
         let field = Field::from_text(&field_text)?;
         let first = read_numbers::<i128>(lines.next())?;
@@ -1187,7 +1269,7 @@ impl FieldLearner {
         if first.len() != field.theta.len() || second.len() != field.theta.len() {
             return refuse("a learner's moments that are not its field's length");
         }
-        Ok(Self { field, first, second, opened, rate_bits, drawn })
+        Ok(Self { field, first, second, rate_bits, drawn, laps })
     }
 }
 

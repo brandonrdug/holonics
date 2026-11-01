@@ -6,7 +6,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -40,8 +40,45 @@ fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
 }
 
 #[test]
-fn ring_periods_are_the_prime_powers() {
-    assert_eq!(ring_periods(10), vec![2, 3, 4, 5, 7, 8, 9, 11, 13, 16]);
+fn ring_periods_sample_both_towers_to_the_reach() {
+    assert_eq!(ring_periods(4, 16), vec![2, 3, 16, 27]);
+    assert_eq!(ring_periods(1, 100), vec![128]);
+    assert_eq!(ring_periods(8, 1000), vec![2, 3, 16, 27, 128, 243, 1024, 2187]);
+    // More slots than closures cycle the towers.
+    assert_eq!(ring_periods(6, 4), vec![2, 2, 3, 3, 4, 9]);
+}
+
+/// A region past the reach is refused: its sites would repeat every frame.
+#[test]
+fn a_region_past_the_reach_is_refused() {
+    let field = shaped(1);
+    let classes = [1usize; 17];
+    let open = [true; 17];
+    assert!(field.faces(&Region { classes: &classes, unresolved: &open }).is_err());
+    assert!(field.faces(&Region { classes: &classes[..16], unresolved: &open[..16] }).is_ok());
+}
+
+/// With flat weights (no chart reads), a still field's current is the same at every site, and a
+/// framed field's carries each site's place: the moment is phase-carried.
+#[test]
+fn the_current_carries_place_when_the_weights_are_flat() {
+    for (still, framed) in [(3usize, false), (1, true)] {
+        let mut field = shaped(still);
+        let l = field.layout.clone();
+        let m2 = 2 * field.declaration.complex();
+        let dw = field.declaration.width;
+        for start in [l.q, l.k] {
+            field.theta[start..start + m2 * dw].iter_mut().for_each(|v| *v = 0);
+        }
+        for start in [l.q_bias, l.k_bias] {
+            field.theta[start..start + m2].iter_mut().for_each(|v| *v = 0);
+        }
+        let classes = [2usize; 6];
+        let open = [true; 6];
+        let faces = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
+        let alike = faces.iter().all(|f| f == &faces[0]);
+        assert_eq!(alike, !framed, "still {still}");
+    }
 }
 
 #[test]
@@ -84,8 +121,9 @@ fn text_restores_exactly() {
     assert_eq!(back, learner);
 }
 
-/// The covector agrees with the code's central difference on every family: the entry of each
-/// family with the largest covector is moved by `±δ` and the code's change is compared with the
+/// The covector agrees with the code's central difference on every family: the three entries of
+/// each family with the largest covectors, and in the charts the largest on a turned mode's row
+/// and on a still mode's, are each moved by `±δ` and the code's change is compared with the
 /// covector's prediction, `g · 2δ · 2^(20 − natural − grain)` on `2^(−20)` bits.
 #[test]
 fn covector_matches_the_codes_difference() {
@@ -93,9 +131,20 @@ fn covector_matches_the_codes_difference() {
         let field = shaped(still);
         let r = region();
         let g = covector_of(&field, &r);
+        let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
+        let l = field.layout.clone();
         for &(start, len, grain) in field.families() {
             let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
-            let i = (start..start + len).max_by_key(|&i| g[i].unsigned_abs()).unwrap();
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            let mut probed: Vec<usize> = entries.iter().copied().take(3).collect();
+            if [l.q, l.k, l.v].contains(&start) {
+                // A chart row is (real or imaginary part, mode c); mode c's local slot is c mod n.
+                let turned = |i: usize| ((i - start) / dw) % m % n >= field.declaration.still;
+                probed.extend(entries.iter().copied().find(|&i| turned(i)));
+                probed.extend(entries.iter().copied().find(|&i| !turned(i)));
+            }
+            for i in probed {
             if g[i] == 0 {
                 continue;
             }
@@ -109,6 +158,7 @@ fn covector_matches_the_codes_difference() {
             let predicted = (g[i] * 2 * delta as i128) >> shift;
             let tolerance = predicted.abs() / 8 + 64;
             assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i}: measured {measured}, predicted {predicted}");
+            }
         }
     }
 }
