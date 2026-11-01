@@ -922,12 +922,24 @@ impl Field {
     }
 
     /// **The release by refinement** ([definition; agent-inferred, November 1]): the region of the
-    /// `question`'s resolved sites and `answer` unresolved sites is refined over `sweeps` sweeps.
-    /// Sweep `s` reads every unresolved site's face, and again with the question's sites unresolved
-    /// (the released answer sites kept), and releases the `⌈r/(S − s)⌉` sites whose top class
-    /// carries the most news ([`by_news`]) at their top class (a tie takes the lower class); every
-    /// site after the earliest released `void` leaves the region (the answer has ended). Returns the
-    /// answer's classes, ending at its void when one was released.
+    /// `question`'s resolved sites and `answer` unresolved sites is refined over at most `sweeps`
+    /// sweeps. Sweep `s` reads every unresolved site's face and releases every site the field
+    /// resolves: whose top class outweighs every other class together (`2 m_c > Σ m`). When it
+    /// resolves none, the face is read again with the question's sites unresolved (the released
+    /// answer sites kept) and the one site whose top class carries the most news ([`by_news`]) is
+    /// released, so a sweep always releases at least one site. Every site after the earliest
+    /// released `void` leaves the region (the answer has ended). Returns the answer as released:
+    /// its classes up to its first site still unresolved after the last sweep, or through its void.
+    ///
+    /// Why (the third reading on the card, November 1): a sweep released `⌈r/(S − s)⌉` sites
+    /// whether the field resolved them or not, 77 of the 1,229 open sites at the first sweep, each
+    /// with no answer site resolved beside it. There the field's face is near the bytes' own table
+    /// (the held answers coded at 5.34 bits a byte; the training answers' byte table codes them at
+    /// 5.05), whose top class is the space, so 125 of 128 releases were spaces alone. An answer's
+    /// bytes are written by their neighbours (four bytes before a site code it at 1.98 bits on the
+    /// same table's terms): a site released before its neighbours pays the difference, and once
+    /// released it is their context. Released only where the field resolves it, a site waits for
+    /// the sites that inform it.
     pub fn release(&self, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Result<Vec<usize>> {
         Ok(self.release_with(&[(question, answer)], sweeps, void, &mut |regions| self.read_faces(regions))?.remove(0))
     }
@@ -946,24 +958,32 @@ impl Field {
                 (classes, unresolved, start)
             })
             .collect();
-        for s in 0..sweeps {
+        for _ in 0..sweeps {
             let live: Vec<usize> = (0..states.len()).filter(|&k| states[k].1.iter().any(|&u| u)).collect();
             if live.is_empty() {
                 break;
             }
-            // The prior read: the question's sites unresolved, so a face reads only the place the
-            // question spans and the answer released so far.
-            let priors: Vec<Vec<bool>> = live.iter().map(|&k| states[k].1.iter().enumerate().map(|(t, &u)| u || t < states[k].2).collect()).collect();
-            let (faces, prior) = {
+            let faces = {
                 let views: Vec<Region> = live.iter().map(|&k| Region { classes: &states[k].0, unresolved: &states[k].1 }).collect();
-                let prior_views: Vec<Region> = live.iter().zip(&priors).map(|(&k, p)| Region { classes: &states[k].0, unresolved: p }).collect();
-                (read(&views)?, read(&prior_views)?)
+                read(&views)?
             };
-            for ((&k, faces), prior) in live.iter().zip(&faces).zip(&prior) {
+            // The sites the field resolves: the top class outweighs every other together.
+            let mut released: Vec<Vec<(usize, usize)>> = faces.iter().map(|faces| faces.iter().enumerate().filter_map(|(t, face)| face.as_ref().and_then(|f| resolved(f).map(|c| (t, c)))).collect()).collect();
+            // Where it resolves none, the prior read: the question's sites unresolved, so a face
+            // reads only the place the question spans and the answer released so far; the site
+            // the question tells most about is released.
+            let unsure: Vec<usize> = (0..live.len()).filter(|&j| released[j].is_empty()).collect();
+            if !unsure.is_empty() {
+                let priors: Vec<Vec<bool>> = unsure.iter().map(|&j| states[live[j]].1.iter().enumerate().map(|(t, &u)| u || t < states[live[j]].2).collect()).collect();
+                let prior_views: Vec<Region> = unsure.iter().zip(&priors).map(|(&j, p)| Region { classes: &states[live[j]].0, unresolved: p }).collect();
+                let prior = read(&prior_views)?;
+                for (&j, prior) in unsure.iter().zip(&prior) {
+                    released[j].extend(by_news(&faces[j], prior)?.into_iter().take(1));
+                }
+            }
+            for (&k, released) in live.iter().zip(&released) {
                 let (classes, unresolved, start) = &mut states[k];
-                let remaining = unresolved.iter().filter(|&&u| u).count();
-                let take = remaining.div_ceil(sweeps - s);
-                for &(t, top) in by_news(faces, prior)?.iter().take(take) {
+                for &(t, top) in released {
                     classes[t] = top;
                     unresolved[t] = false;
                 }
@@ -977,7 +997,14 @@ impl Field {
                 }
             }
         }
-        Ok(states.into_iter().map(|(classes, _, start)| classes[start..].to_vec()).collect())
+        // The answer as released: up to its first site still unresolved.
+        Ok(states
+            .into_iter()
+            .map(|(classes, unresolved, start)| {
+                let end = (start..classes.len()).find(|&t| unresolved[t]).unwrap_or(classes.len());
+                classes[start..end].to_vec()
+            })
+            .collect())
     }
 
     /// The field as text: its head line, then its material on one line.
@@ -1031,6 +1058,13 @@ pub fn by_news(faces: &[Option<TowerFace>], prior: &[Option<TowerFace>]) -> Resu
     }
     open.sort_by(|x, y| y.0.cmp(&x.0).then(x.1.cmp(&y.1)));
     Ok(open.into_iter().map(|(_, t, top)| (t, top)).collect())
+}
+
+/// The class a face resolves: its top class when that class's mass outweighs every other class's
+/// together (`2 m_c > Σ m`), so the release is likelier right than wrong ([`Field::release`]).
+fn resolved(face: &TowerFace) -> Option<usize> {
+    let (top, &mass) = face.masses.iter().enumerate().fold((0usize, &0u128), |best, (c, mass)| if *mass > *best.1 { (c, mass) } else { best });
+    (mass.checked_mul(2)? > face.total).then_some(top)
 }
 
 /// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square

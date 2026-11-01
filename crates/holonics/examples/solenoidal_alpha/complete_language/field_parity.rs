@@ -14,7 +14,7 @@
 //! `time-field` reads the card alone over the opening sections and the opening releases and
 //! projects a lap and a release of the held problems from the measured upper time a site pair.
 
-use super::field_train::{problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, walk, FieldCodec, Problems};
+use super::field_train::{held_regions, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, walk, FieldCodec, Problems};
 use super::tower_train::{count, positive};
 use super::*;
 use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldRealization, FieldReceipt, HostField, Region};
@@ -91,6 +91,31 @@ impl FieldRealization for Recorder<'_> {
         let faces = self.inner.read_faces(field, regions)?;
         self.reads.push((faces.clone(), None));
         Ok(faces)
+    }
+}
+
+/// A realization that counts the site pairs it reads: a region's sites squared, times the heads
+/// and the ticks, every call (what the card's `pairs=` counts).
+struct Counted<'a> {
+    inner: &'a mut dyn FieldRealization,
+    pairs: u128,
+}
+
+impl Counted<'_> {
+    fn count(&mut self, field: &Field, regions: &[Region]) {
+        let d = field.declaration;
+        self.pairs += regions.iter().map(|r| (r.classes.len() * r.classes.len()) as u128).sum::<u128>() * (d.heads * d.ticks) as u128;
+    }
+}
+
+impl FieldRealization for Counted<'_> {
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>), TowerError> {
+        self.count(field, regions);
+        self.inner.read_and_return(field, regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<Vec<Option<TowerFace>>>, TowerError> {
+        self.count(field, regions);
+        self.inner.read_faces(field, regions)
     }
 }
 
@@ -267,7 +292,8 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
 }
 
 /// The site pairs a release reads at most: every sweep reads the question and the open answer
-/// twice, with the question and without it (a region released short of its void reads fewer).
+/// once with the question and, where no site resolves, once more without it (a region released
+/// short of its void reads fewer).
 fn release_pairs(heads: usize, ticks: usize, sweeps: usize, sites: usize) -> u128 {
     (2 * heads * ticks * sweeps) as u128 * (sites * sites) as u128
 }
@@ -322,27 +348,35 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
         println!("FIELD_TIME section={} length={length} pairs={pairs} reads={reads} halvings={} deposited={} next={next} ms={} ns_a_pair={} read_ms={}", k + 1, receipt.halvings, receipt.deposited, ms(ns), ns / pairs.max(1), ms(read_ns));
     }
     let sections_lap = p.sections.len();
-    // The upper bound of a lap: every section at the worst measured section time a pair, and four
-    // more reads of it at the worst measured read time a pair (the most the held step's read and
-    // the certificate add to a section whose steps stand at their size; the second reading's
-    // projection lacked them).
+    // The lap's end: the held step read on the withheld problems (its opening read and at most four
+    // more, `scaled`) and the held-out read, each region read with its neighbours (§13).
+    let square = |lengths: &mut dyn Iterator<Item = usize>| -> u128 { lengths.map(|l| (l * l) as u128).sum::<u128>() * (d.heads * d.ticks) as u128 };
+    let end_pairs = 5 * square(&mut unseen_regions(&p.codec, &p.train, &p.unseen, p.seed).iter().map(|(c, _)| c.len())) + square(&mut held_regions(&p.codec, &p.held).iter().map(|(c, _, _)| c.len()));
+    // The upper bound of a lap: every section at the worst measured section time a pair, four more
+    // reads of it at the worst measured read time a pair (the most the held step's read and the
+    // certificate add to a section whose steps stand at their size; the second reading's projection
+    // lacked them), and the lap's end at the same read time a pair.
     println!(
-        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} pairs={lap_pairs} worst_ns_a_section_pair={} worst_ns_a_read_pair={} at_size_ms={} projection_ms={} (every section's reads and return at the worst measured time a pair, and four more reads of it)",
-        worst.0 / worst.1.max(1),
-        read_worst.0 / read_worst.1.max(1),
+        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} pairs={lap_pairs} end_pairs={end_pairs} worst_ps_a_section_pair={} worst_ps_a_read_pair={} at_size_ms={} projection_ms={} (every section's reads and return at the worst measured time a pair, four more reads of it, and the lap's end)",
+        1000 * worst.0 / worst.1.max(1),
+        1000 * read_worst.0 / read_worst.1.max(1),
         ms(lap_pairs * worst.0 / worst.1.max(1)),
-        ms(lap_pairs * worst.0 / worst.1.max(1) + 4 * lap_pairs * read_worst.0 / read_worst.1.max(1))
+        ms(lap_pairs * worst.0 / worst.1.max(1) + (4 * lap_pairs + end_pairs) * read_worst.0 / read_worst.1.max(1))
     );
-    // The releases: the free releases of the opening held problems, read together and timed; the
-    // projection reads every held problem's free release and one at each calculation's equals, each
-    // at most the full region, at the time a pair the opening releases measured.
+    // The releases: the free releases of the opening held problems, read together and timed, and
+    // the pairs they read counted; the projection reads every held problem's free release and one at
+    // each calculation's equals, each at most the full region every sweep, at the time a pair the
+    // opening releases measured on the pairs they read. (The third reading's projection divided by
+    // the pairs a release reads at most; a founded field that releases its void at once reads few,
+    // so its time a pair, and the projection from it, came out a sixth of the one it bounded.)
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
+    let mut counted = Counted { inner: &mut *card, pairs: 0 };
     let t0 = std::time::Instant::now();
-    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), card).map_err(|e| e.to_string())?;
+    let released = learner.field.release_realized(&questions, sweeps, p.codec.void(), &mut counted).map_err(|e| e.to_string())?;
     let ns = t0.elapsed().as_nanos();
     let pairs: u128 = questions.iter().map(|&(q, open)| release_pairs(d.heads, d.ticks, sweeps, q.len() + open)).sum();
-    let release_worst = (ns, pairs.max(1));
-    println!("FIELD_TIME_RELEASE problems={} released={} pairs_at_most={pairs} ms={}", questions.len(), released.iter().map(Vec::len).sum::<usize>(), ms(ns));
+    let release_worst = (ns, counted.pairs.max(1));
+    println!("FIELD_TIME_RELEASE problems={} released={} pairs_at_most={pairs} pairs_read={} ms={}", questions.len(), released.iter().map(Vec::len).sum::<usize>(), counted.pairs, ms(ns));
     let held_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let held_problems = problems_of(&held_text);
     let mut held_pairs = 0u128;
@@ -365,9 +399,9 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
         }
     }
     println!(
-        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} pairs_at_most={held_pairs} worst_ns_a_pair={} projection_ms={}",
+        "FIELD_TIME_RELEASES problems={} releases={held_releases} sweeps={sweeps} pairs_at_most={held_pairs} ps_a_pair={} projection_ms={}",
         held_problems.len(),
-        release_worst.0 / release_worst.1.max(1),
+        1000 * release_worst.0 / release_worst.1.max(1),
         ms(held_pairs * release_worst.0 / release_worst.1.max(1))
     );
     println!("FIELD_TIME_DONE elapsed_ms={}", started.elapsed().as_millis());

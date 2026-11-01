@@ -291,30 +291,27 @@ pub(super) fn walk(seed: u64, read: u64, sections: usize) -> Vec<usize> {
 /// training draw, a lap's count times the passage's).
 pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 
-/// The held-out read at the release's own opening: the region is the question and the codec's
-/// answer extent, every answer site unresolved at once, and the field's code is read over the
-/// answer's classes and its first void (its digits' and its text's apart), on `2^(−20)` bits,
-/// beside each one's count. A reading only: no decision of the run reads it.
-fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
-    let regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
-        .iter()
-        .map(|(q, a, _)| {
-            let classes = region_classes(codec, q, a, q.len() + codec.answer);
-            let open = (0..classes.len()).map(|t| t >= q.len()).collect();
-            (classes, open, q.len() + a.len() + 1)
-        })
-        .collect();
+/// The held-out read: at the release's own opening (the region the question and the codec's
+/// answer extent, every answer site unresolved at once) and with each site's neighbours resolved
+/// ([`context_regions`], the region the question, the answer and its first void), the field's code
+/// over the answer's classes and its first void (its digits' and its text's apart), on `2^(−20)`
+/// bits, beside each one's count: `[opening, opening digits, opening text, context, context
+/// digits, context text]`. A reading only: no decision of the run reads it.
+fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 6]> {
+    let regions = held_regions(codec, problems);
     let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u }).collect();
-    let mut out = [(0i64, 0usize); 3];
-    for (chunk, ends) in views.chunks(64).zip(regions.chunks(64)) {
+    let mut out = [(0i64, 0usize); 6];
+    for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
-        for ((region, faces), &(_, _, end)) in chunk.iter().zip(faces).zip(ends) {
+        for ((region, faces), &(_, _, base)) in chunk.iter().zip(faces).zip(parts) {
+            // The opening read counts the answer's sites through its first void.
+            let end = if base == 0 { region.classes.iter().enumerate().skip_while(|&(t, _)| !region.unresolved[t]).find(|&(_, &c)| c == codec.void()).map_or(region.classes.len(), |(t, _)| t + 1) } else { region.classes.len() };
             for (face, &class) in faces.iter().zip(region.classes).take(end) {
                 if let Some(face) = face {
                     let code = face.code(class);
-                    out[0].0 += code;
-                    out[0].1 += 1;
-                    let part = if codec.is_digit(class) { 1 } else { 2 };
+                    out[base].0 += code;
+                    out[base].1 += 1;
+                    let part = base + if codec.is_digit(class) { 1 } else { 2 };
                     out[part].0 += code;
                     out[part].1 += 1;
                 }
@@ -324,35 +321,69 @@ fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization:
     Ok(out)
 }
 
-/// [agent-inferred, November 1] **The withheld problems' regions at the release's opening**: each
-/// problem's question resolved, then its answer and a keyed void tail all unresolved, the draws
-/// from [`UNSEEN_DRAW`] on, so every lap reads the same regions over the same sites. Why not the
-/// release's states at `ρ`: their resolved sites are the first in the field's own news order, so
-/// as the field learns a site it leaves the compared set, and a growth that compares code a site
-/// across laps would read a different set of sites each lap (and a mask formed before the held step
-/// is read would come from material the read may refuse). The opening is the state a release
-/// starts from, and the sections meet the states it passes through.
+/// [agent-inferred, November 1] **An answer read with its neighbours**: one problem's region (its
+/// question, answer and `length − |q| − |a|` voids) read in [`CONTEXT`] parts, the answer's sites
+/// and its first void at `t ≡ r (mod CONTEXT)` (counted from the answer's first site) unresolved in
+/// part `r` and every other site resolved, so each is read once with the three sites before it and
+/// after it resolved. Why (the third reading, November 1): the opening read, every answer site
+/// unresolved at once, reads what the question and the place tell a site, whose floor sits near
+/// the bytes' own table (the held answers coded at 5.34 bits a byte after a lap; the training
+/// answers' byte table codes them at 5.05), so it could not show what the field learned from an
+/// answer's own bytes (four bytes before a site code it at 1.98 bits on the same terms), which is
+/// what a release that commits only what the field resolves runs on.
+pub(super) fn context_regions(void: usize, q: &[usize], a: &[usize], length: usize) -> Vec<(Vec<usize>, Vec<bool>)> {
+    let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
+    classes.resize(length, void);
+    let end = q.len() + a.len() + 1;
+    (0..CONTEXT).map(|r| (classes.clone(), (0..length).map(|t| t >= q.len() && t < end && (t - q.len()) % CONTEXT == r).collect())).collect()
+}
+
+/// The held-out read's regions ([`held_out`]): each problem's opening (base 0) and its
+/// [`CONTEXT`] parts read with their neighbours (base 3).
+pub(super) fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
+    let mut regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
+        .iter()
+        .map(|(q, a, _)| {
+            let classes = region_classes(codec, q, a, q.len() + codec.answer);
+            let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+            (classes, open, 0)
+        })
+        .collect();
+    regions.extend(problems.iter().flat_map(|(q, a, _)| context_regions(codec.void(), q, a, q.len() + a.len() + 1).into_iter().map(|(c, u)| (c, u, 3))));
+    regions
+}
+
+/// The parts of [`context_regions`]: a site read with the `CONTEXT − 1` sites on each side of it
+/// resolved (agent-inferred: the reach the bytes' own table needs to code a site at its
+/// four-byte-context rate, from either side).
+pub(super) const CONTEXT: usize = 4;
+
+/// [agent-inferred, November 1] **The withheld problems' regions, read with their neighbours**
+/// ([`context_regions`]): each problem's question, its answer and a keyed void tail (the draws from
+/// [`UNSEEN_DRAW`] on), so every lap reads the same regions over the same sites. Why not the
+/// release's states at `ρ`: their resolved sites are the first in the field's own news order, so as
+/// the field learns a site it leaves the compared set, and a growth that compares code a site
+/// across laps would read a different set of sites each lap. Why not the release's opening (the
+/// third reading): its code sits near the bytes' table whatever the field learns of an answer's
+/// bytes, so the growth compared readings that could not fall.
 pub(super) fn unseen_regions(codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64) -> Vec<(Vec<usize>, Vec<bool>)> {
     unseen_regions_with(codec.answer, codec.void(), problems, unseen, seed)
 }
 
-/// [`unseen_regions`] at the codec's answer extent `answer` and void class `void`.
 fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: &[usize], seed: u64) -> Vec<(Vec<usize>, Vec<bool>)> {
     let mut draw = UNSEEN_DRAW;
     unseen
         .iter()
-        .map(|&i| {
+        .flat_map(|&i| {
             let (q, a, _) = &problems[i];
             draw += 1;
             let length = q.len() + a.len() + tail(seed, draw, answer - a.len());
-            let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
-            classes.resize(length, void);
-            (classes, (0..length).map(|t| t >= q.len()).collect())
+            context_regions(void, q, a, length)
         })
         .collect()
 }
 
-/// The withheld problems at the release's opening ([`unseen_regions`]): the step the learner
+/// The withheld problems read with their neighbours ([`unseen_regions`]): the step the learner
 /// holds is read on them, and their code under the material that stands is returned with its
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
@@ -369,6 +400,20 @@ fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Proble
         }
     }
     Ok((code, sites, next))
+}
+
+fn held_text(held: &[(i64, usize); 6]) -> String {
+    format!(
+        "answer={} digits={} text={} classes={} context={} context_digits={} context_text={} context_classes={}",
+        bits(held[0].0, held[0].1),
+        bits(held[1].0, held[1].1),
+        bits(held[2].0, held[2].1),
+        held[0].1,
+        bits(held[3].0, held[3].1),
+        bits(held[4].0, held[4].1),
+        bits(held[5].0, held[5].1),
+        held[3].1
+    )
 }
 
 fn bits(code: i64, n: usize) -> String {
@@ -473,7 +518,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.field.theta.len()
     );
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
-    println!("FIELD_HELD lap=-1 answer={} digits={} text={} classes={} ms={}", bits(held[0].0, held[0].1), bits(held[1].0, held[1].1), bits(held[2].0, held[2].1), held[0].1, started.elapsed().as_millis());
+    println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
     // The withheld problems' code after the lap before (at the opening, before any lap).
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
@@ -544,7 +589,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         );
         println!("FIELD_UNSEEN lap={lap} code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
-        println!("FIELD_HELD lap={lap} answer={} digits={} text={} classes={} ms={}", bits(held[0].0, held[0].1), bits(held[1].0, held[1].1), bits(held[2].0, held[2].1), held[0].1, started.elapsed().as_millis());
+        println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.
@@ -988,18 +1033,27 @@ mod tests {
         assert_eq!(sections_of(&problems, 6, 9, 11).1, unseen, "keyed, not drawn afresh");
     }
 
-    /// The withheld problems are read at the release's opening, over the same sites every lap.
+    /// The withheld problems are read with their neighbours, over the same sites every lap: each
+    /// answer site and its first void once, in one of four parts, with every other site resolved.
     #[test]
-    fn the_withheld_problems_open_every_answer_site() {
+    fn the_withheld_problems_read_each_answer_site_once_beside_its_neighbours() {
         let problems: Problems = (0..5usize).map(|i| (vec![1; 3 + i], vec![2; 1 + i], 1 + i)).collect();
         let codec_answer = 9;
         let regions = unseen_regions_with(codec_answer, 0, &problems, &[1, 3], 5);
         assert_eq!(regions, unseen_regions_with(codec_answer, 0, &problems, &[1, 3], 5), "keyed, not drawn afresh");
-        for ((classes, open), &i) in regions.iter().zip(&[1usize, 3]) {
+        assert_eq!(regions.len(), 2 * CONTEXT);
+        for (parts, &i) in regions.chunks(CONTEXT).zip(&[1usize, 3]) {
             let (q, a, _) = &problems[i];
-            assert!(classes.len() > q.len() + a.len() && classes.len() <= q.len() + codec_answer);
-            assert_eq!(&classes[..q.len()], &q[..]);
-            assert!(open.iter().enumerate().all(|(t, &u)| u == (t >= q.len())));
+            let mut read = vec![0usize; parts[0].0.len()];
+            for (classes, open) in parts {
+                assert!(classes.len() > q.len() + a.len() && classes.len() <= q.len() + codec_answer);
+                assert_eq!(&classes[..q.len()], &q[..]);
+                assert_eq!(&classes[q.len()..q.len() + a.len()], &a[..]);
+                for (t, &u) in open.iter().enumerate() {
+                    read[t] += usize::from(u);
+                }
+            }
+            assert!(read.iter().enumerate().all(|(t, &n)| n == usize::from(t >= q.len() && t <= q.len() + a.len())), "each answer site and its void once");
         }
     }
 }

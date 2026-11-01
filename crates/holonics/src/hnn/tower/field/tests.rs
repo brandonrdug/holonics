@@ -230,28 +230,82 @@ fn regions_sum_in_any_order() {
     assert_eq!(reversed, g);
 }
 
-/// The release refines the answer over its sweeps and ends it at the first void.
-#[test]
-fn release_refines_and_ends_at_void() {
-    let field = shaped(1);
-    let question = [1usize, 4, 0, 2];
-    let once = field.release(&question, 5, 3, 0).unwrap();
-    assert!(once.len() <= 5 && !once.is_empty());
-    assert_eq!(field.release(&question, 5, 3, 0).unwrap(), once);
-    // The release ends at its first void: none before its last site, and the region leaves past it.
-    assert!(once[..once.len() - 1].iter().all(|&c| c != 0));
-    assert!(once.len() == 5 || once[once.len() - 1] == 0);
-    // One sweep releases every site at its own face's top class.
-    let whole = field.release(&question, 5, 1, 0).unwrap();
-    let classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(0, 5)).collect();
-    let open: Vec<bool> = std::iter::repeat_n(false, 4).chain(std::iter::repeat_n(true, 5)).collect();
-    let faces = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
-    let tops: Vec<usize> = faces[4..].iter().map(|f| f.as_ref().unwrap().rank_top()).collect();
-    let mut expected = tops.clone();
-    if let Some(first) = tops.iter().position(|&c| c == 0) {
-        expected.truncate(first + 1);
+/// The release the law makes of one problem, sweep by sweep (the doc of [`Field::release`]): the
+/// sites the field resolves, or the one with the most news, until the void or the last sweep.
+fn law_release(field: &Field, question: &[usize], answer: usize, sweeps: usize, void: usize) -> Vec<usize> {
+    let start = question.len();
+    let mut classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(void, answer)).collect();
+    let mut open: Vec<bool> = (0..classes.len()).map(|t| t >= start).collect();
+    for _ in 0..sweeps {
+        if !open.iter().any(|&u| u) {
+            break;
+        }
+        let faces = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
+        let mut released: Vec<(usize, usize)> = Vec::new();
+        for (t, face) in faces.iter().enumerate() {
+            if let Some(face) = face {
+                let top = face.rank_top();
+                if 2 * face.masses[top] > face.total {
+                    released.push((t, top));
+                }
+            }
+        }
+        if released.is_empty() {
+            let prior_open: Vec<bool> = open.iter().enumerate().map(|(t, &u)| u || t < start).collect();
+            let prior = field.faces(&Region { classes: &classes, unresolved: &prior_open }).unwrap();
+            released.push(by_news(&faces, &prior).unwrap()[0]);
+        }
+        for (t, c) in released {
+            classes[t] = c;
+            open[t] = false;
+        }
+        if let Some(end) = (start..classes.len()).find(|&t| !open[t] && classes[t] == void) {
+            classes.truncate(end + 1);
+            open.truncate(end + 1);
+        }
     }
-    assert_eq!(whole, expected);
+    let end = (start..classes.len()).find(|&t| open[t]).unwrap_or(classes.len());
+    classes[start..end].to_vec()
+}
+
+/// The release commits only the sites the field resolves (or, resolving none, the one the question
+/// tells most about), so a sweep never commits a site against the field's own read; it is the law's
+/// sweep by sweep, ends at its first void, and stops at its first site still unresolved.
+#[test]
+fn the_release_commits_only_what_the_field_resolves() {
+    let question = [1usize, 4, 0, 2];
+    for still in [0usize, 1] {
+        let field = shaped(still);
+        for sweeps in [1usize, 2, 3, 6] {
+            let once = field.release(&question, 5, sweeps, 0).unwrap();
+            assert_eq!(once, law_release(&field, &question, 5, sweeps, 0), "still {still} sweeps {sweeps}");
+            assert_eq!(field.release(&question, 5, sweeps, 0).unwrap(), once);
+            assert!(once.len() <= 5);
+            // The answer ends at its first void: none before its last site.
+            assert!(once.iter().rev().skip(1).all(|&c| c != 0));
+        }
+        // One sweep from the opening releases at least one site, and only sites the opening
+        // read resolves or the single site of the most news.
+        let classes: Vec<usize> = question.iter().copied().chain(std::iter::repeat_n(0, 5)).collect();
+        let open: Vec<bool> = std::iter::repeat_n(false, 4).chain(std::iter::repeat_n(true, 5)).collect();
+        let faces = field.faces(&Region { classes: &classes, unresolved: &open }).unwrap();
+        let resolved_sites: Vec<usize> = (4..9).filter(|&t| faces[t].as_ref().is_some_and(|f| 2 * f.masses[f.rank_top()] > f.total)).collect();
+        let one = law_release(&field, &question, 5, 1, 0);
+        if resolved_sites.is_empty() {
+            assert!(one.len() <= 1, "resolving none, one sweep releases one site");
+        } else {
+            assert!(one.len() <= resolved_sites.len() + 1);
+        }
+    }
+}
+
+/// A face resolves its top class only when the class outweighs every other together.
+#[test]
+fn a_face_resolves_only_a_majority() {
+    assert_eq!(resolved(&TowerFace { masses: vec![6, 3, 2], total: 11 }), Some(0));
+    assert_eq!(resolved(&TowerFace { masses: vec![5, 3, 2], total: 10 }), None, "half is not more than half");
+    assert_eq!(resolved(&TowerFace { masses: vec![1, 4, 4], total: 9 }), None);
+    assert_eq!(resolved(&TowerFace { masses: vec![1, 9, 1], total: 11 }), Some(1));
 }
 
 /// The grown field reads the old faces exactly, on the framed and the still field, by two and

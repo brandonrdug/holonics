@@ -432,3 +432,86 @@ The third reading's script is `…_receipts/reading-3/reading3.sh`, its bounds f
 time-field's projections before launch.
 
 The claim and its bar are unchanged; the next reading is the same 15-minute reading.
+
+## 13. The third reading wrote the commonest byte at every site
+
+[measured] The third reading (receipts in `…_receipts/reading-3/`, count-only; field_pass
+`4f89e62b…bdffb` at 8982ff68b): the card's parity with the bounded law passed at A over 8 sections
+and grown by two over 4 (48 and 24 reads, every face, covector, learner and release equal).
+time-field projected a lap at 184.8 s at A and 343.0 s at B and the 527 held releases at 96.1 s
+from A's founding; two laps did not fit the 870 s reading, so it trained one lap (`LAPS 1`, the
+trainer's bound 241 s, the release's 125 s).
+
+| Reading | Value |
+|---|---|
+| The lap | 413 sections in 117.1 s; 394 deposited; the sections' code 3.823 before their steps, 3.792 after |
+| The certificate | read at its size on 368 sections, at one halving on 34, at three to five on 11; 19 deposited nothing (`scaled` decided every one in at most three reads after the opening) |
+| The held step on the next section (393 read) | stood at its size on 230, at one to seven halvings on 35; refused on 128 (125 at the first halving, where `a ≥ 0`) |
+| The withheld problems at the release's opening | 6.931 bits a site at the founding, 3.534 after the lap |
+| The held answers at the release's opening | 6.931 at the founding, 5.342 after the lap (digits 5.767, text 5.259) |
+| The card | 2,270 reads in 51.6 s (22.7 ms each), 413 returns in 64.7 s (157 ms each), 1.77·10¹¹ site pairs in 118.9 s: 0.67 ns a pair |
+| The release | 128 problems, S = 16, 64 reads in 29.6 s, 7.46·10¹⁰ pairs (0.38 ns a pair) |
+| The board | 13,372 MiB at its peak, over the 12 GiB the card's runs keep to: the release's batches were sized from the card's free memory (10.37·10⁹ bytes), not from the bound |
+| The claim | the first calculation from the question's numbers in 0 of 128 |
+
+Every released site of the 128 free releases was a space. At the 399 calculations' equals, 366
+releases were unfinished and the 27 that wrote a number wrote `0`.
+
+The training answers' own byte tables, the floors a reading compares against (bits a byte, each
+class read from the classes before it in the same answer; in-sample, so the longer contexts sit
+below what any learner reaches on unseen answers):
+
+| Context | 0 | place | 1 | 2 | 3 | 4 | 6 |
+|---|---|---|---|---|---|---|---|
+| Bits a byte | 5.045 | 5.008 | 3.459 | 2.693 | 2.215 | 1.983 | 1.956 |
+
+The space is the commonest class, 16.4% of the answers' bytes.
+
+[agent-inferred] Two failures, both the lessons' own.
+
+1. **The release forced a quota where the field had nothing to say.** From the all-open state it
+   released `⌈r/(S − s)⌉` sites a sweep, 77 of 1,229 at the first. There every open site reads the
+   question and its place alone, and after one lap that face codes the held answers at 5.34 bits a
+   byte, just above the bytes' own table (5.05) whose top class is the space. A site's top class
+   was the space nearly everywhere, the news key ranked spaces as readily as anything, and each
+   released space made its neighbours' spaces likelier. The answer's information lies in its
+   neighbouring bytes (four before a site code it at 1.98 bits), and a quota released a twelfth
+   of the answer before any neighbour stood: the first reading's `10`, written at 228 of 396
+   equals, was the same failure with the commonest number.
+2. **The held read and the growth's withheld read sat at the release's opening.** That opening's
+   code has the bytes' table, given the question and the place, as its floor, so it could not show
+   what the field learned of an answer's own bytes; the growth compared readings that could not
+   fall, and a reading at 5.34 was read as the field's state.
+
+**The repairs** (`Field::release`, `resolved`, `field_train::context_regions`, `held_out`,
+`unseen_regions`, `field_parity::time`):
+- **Release by resolution.** A sweep releases every open site whose top class outweighs every
+  other class together (`2 m_c > Σ m`), so a release is likelier right than wrong; where no site of
+  a problem resolves, it releases the one site the question tells most (the news key, read once
+  more with the question unresolved). A site waits for the sites that inform it, and each released
+  site is their terrain. The release returns the answer through its first site still unresolved.
+  A sweep makes at most two reads, as before.
+- **The answer read with its neighbours.** The withheld problems (the growth's read) and the held
+  answers are read in `CONTEXT = 4` parts: in part `r`, the answer's sites and its first void at
+  `t ≡ r (mod 4)` from the answer's first site are unresolved and every other site resolved, so each
+  site is read once with the three sites on each side of it standing, the terms a release that
+  commits only what the field resolves runs on. The held read keeps the opening beside it
+  (`FIELD_HELD … context= context_digits= context_text=`).
+- **The projections read what they bound.** time-field's lap adds the lap's end (the held step's
+  five reads of the withheld problems and the held read, now four and five times their regions)
+  at the worst measured read time a pair, where the third reading's script allowed ten seconds.
+  The release's time a pair divides by the pairs the timed releases read (counted, as the card
+  counts them) instead of the pairs a release reads at most: the founded field at B released its
+  void at once, read few pairs, and its projection (17.4 s) came out a sixth of A's.
+
+The memory bound is owed: the release's batches are to be sized from the 12 GiB the card's runs
+keep to.
+
+The binding constraint is the card's throughput. A lap of a 19,546-entry field took 117 s, a lap
+is 413 steps, and a fifteen-minute reading holds about seven of them. At 0.67 ns a pair the card
+spends about 17,000 lane-clocks on a pair (10,240 lanes at about 2.5 GHz; agent-inferred from the
+declared clock), where a pair's arithmetic is a few hundred integer operations; the contact row stores every weight
+`e_ij` (8 bytes a pair) and reads it once for each of the `n` values, and the keys' return reads
+the weights down a column, `sites` words apart. The profile of where the card's time goes is the
+next loop's subject, before the next reading.
+
