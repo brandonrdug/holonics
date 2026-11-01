@@ -17,14 +17,15 @@
 //! reads them twice (the values' and the contact's returns), so they are kept through the reverse
 //! rather than recomputed (a recompute would rerun every row's exponentials in two more passes);
 //! the contact's return `δs_ij` is held for one head at a time (`S²` on 128 bits). A section's
-//! regions are read in batches whose weight and contact stores fit the batch budget, the card's free
-//! memory at the open less what the run keeps beside it, never past the 12 GB the runs keep to.
+//! regions are read in batches whose every allocation (the weights, the contact's return and each
+//! site's carriers) fits the batch budget, the card's free memory at the open less a margin for the
+//! driver, never past the 12 GB the runs keep to.
 //! Batches sum their covectors on the card (integer sums: any batching gives the same bits).
 
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{Field, FieldRealization, Region};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldRealization, Region};
 use holonics::hnn::tower::{TowerError, TowerFace};
 
 use crate::cuda::{Dim3, Module};
@@ -35,7 +36,8 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
 /// The device octets the runs keep to (the board's, the desktop included).
 const BOARD_CEILING: u64 = 12 << 30;
-/// Octets kept free beside a batch for its per-site carriers and the driver.
+/// Octets kept free beside a batch's counted allocations for the driver, the material and the
+/// allocator's grain.
 const MARGIN: u64 = 1 << 30;
 
 type Result<T> = std::result::Result<T, TowerError>;
@@ -130,7 +132,8 @@ pub struct FieldTimes {
     /// The site pairs `Σ H S²` over every tick of every read.
     pub pairs: u128,
     pub batches: u64,
-    /// The largest batch's weight and contact stores, in octets.
+    /// The largest batch's counted allocations (weights, contact return and per-site carriers), in
+    /// octets.
     pub peak_store: u64,
 }
 
@@ -289,34 +292,16 @@ impl<'c> CardField<'c> {
             ..Words::default()
         };
         let g = if returning { Some(card.zeroed::<i128>(l.len).map_err(device)?) } else { None };
-        // The batches: whole regions in order, each batch's stores within the budget.
-        let ticks_kept = if returning { d.ticks } else { 1 };
-        let store = |s: usize| -> u64 {
-            let pairs = (s * s) as u64;
-            (ticks_kept * heads) as u64 * 8 * pairs + if returning { 16 * pairs } else { 0 }
-        };
-        let mut batches: Vec<std::ops::Range<usize>> = Vec::new();
-        let mut from = 0usize;
-        let mut taken = 0u64;
-        for (i, region) in regions.iter().enumerate() {
-            let need = store(region.classes.len());
-            if need > self.budget {
-                return Err(TowerError::Realization(format!("a region of {} sites needs {need} octets of weights, past the card's batch budget of {}", region.classes.len(), self.budget)));
-            }
-            if taken + need > self.budget {
-                batches.push(from..i);
-                from = i;
-                taken = 0;
-            }
-            taken += need;
-        }
-        batches.push(from..regions.len());
+        // The batches: whole regions in order, each batch's every allocation within the budget.
+        let octets = |sites: usize| region_octets(&d, returning, sites);
+        let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
+        let batches = batches(&lengths, &octets, self.budget)?;
         let mut faces: Vec<Vec<Option<TowerFace>>> = Vec::with_capacity(regions.len());
         for batch in batches {
             if batch.is_empty() {
                 continue;
             }
-            let peak = regions[batch.clone()].iter().map(|r| store(r.classes.len())).sum::<u64>();
+            let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
             faces.extend(self.batch(field, &regions[batch], &mut words, g.as_ref())?);
@@ -619,6 +604,46 @@ impl<'c> CardField<'c> {
     }
 }
 
+/// [agent-inferred, November 1] **Everything a region of `sites` sites allocates in a batch**
+/// ([`CardField::batch`], `tick`, `reverse`): each kept tick's carriers (the chart's read and scale,
+/// the three charts and their framed copies, the masses, the current, the pair contact's read, scale
+/// and drives) and its weights `H·S²`, the opening's and the face's carriers, and on a return the
+/// reverse's per-site covectors and the contact's return `δs` (`S²` on 128 bits). Measured November 1:
+/// sized by the weights and the contact's return alone, a batched release's per-site carriers took the
+/// board to 13,372 MiB; sized by this, the same release peaked at 11,256 MiB.
+pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize) -> u64 {
+    let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
+    let ticks_kept = if returning { d.ticks as u64 } else { 1 };
+    let tick_site = 4 * dw + 16 + 8 * 3 * m2 + 3 * 8 * h * span + 8 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f;
+    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
+    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 2 * 8 * h * span + 3 * 8 * m2 } else { 0 };
+    let (s, pairs) = (sites as u64, (sites * sites) as u64);
+    ticks_kept * (h * 8 * pairs + s * tick_site) + s * (face_site + reverse_site) + if returning { 16 * pairs } else { 0 }
+}
+
+/// The batches of whole regions, in order, each batch's allocations within `budget`; a region whose
+/// allocations alone pass the budget is refused.
+pub fn batches(lengths: &[usize], octets: &dyn Fn(usize) -> u64, budget: u64) -> Result<Vec<std::ops::Range<usize>>> {
+    let mut out = Vec::new();
+    let (mut from, mut taken) = (0usize, 0u64);
+    for (i, &n) in lengths.iter().enumerate() {
+        let need = octets(n);
+        if need > budget {
+            return Err(TowerError::Realization(format!("a region of {n} sites needs {need} octets, past the card's batch budget of {budget}")));
+        }
+        if taken + need > budget {
+            out.push(from..i);
+            from = i;
+            taken = 0;
+        }
+        taken += need;
+    }
+    if from < lengths.len() {
+        out.push(from..lengths.len());
+    }
+    Ok(out)
+}
+
 impl FieldRealization for CardField<'_> {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         self.run(field, regions, true)
@@ -626,5 +651,57 @@ impl FieldRealization for CardField<'_> {
 
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         Ok(self.run(field, regions, false)?.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221 }
+    }
+
+    /// Every region is in one batch, in order, each batch within the budget; a region past the budget
+    /// alone is refused.
+    #[test]
+    fn batches_cover_the_regions_in_order_within_the_budget() {
+        let d = declaration(32, 4, 32);
+        let lengths = [1412, 300, 2221, 64, 900, 1229, 1229, 77];
+        for returning in [false, true] {
+            let octets = |n: usize| region_octets(&d, returning, n);
+            let budget = octets(2221) + octets(900);
+            let plan = batches(&lengths, &octets, budget).unwrap();
+            assert_eq!(plan.first().unwrap().start, 0);
+            assert_eq!(plan.last().unwrap().end, lengths.len());
+            for w in plan.windows(2) {
+                assert_eq!(w[0].end, w[1].start);
+            }
+            for b in &plan {
+                assert!(!b.is_empty() && lengths[b.clone()].iter().map(|&n| octets(n)).sum::<u64>() <= budget);
+            }
+            assert!(batches(&lengths, &octets, octets(2221) - 1).is_err());
+        }
+        assert!(batches(&[], &|n| n as u64, 1).unwrap().is_empty());
+    }
+
+    /// A region's allocations count its weights, its contact's return on a return, and every site's
+    /// carriers beside them: a release batch of 128 regions at the reach carries some 3 GB of them at
+    /// the grown declaration, which the weights alone never counted.
+    #[test]
+    fn a_regions_octets_count_its_carriers_beside_its_weights() {
+        for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
+            let n = 1500u64;
+            let weights = |returning: bool| (if returning { d.ticks as u64 } else { 1 }) * d.heads as u64 * 8 * n * n + if returning { 16 * n * n } else { 0 };
+            for returning in [false, true] {
+                let all = region_octets(&d, returning, n as usize);
+                assert!(all > weights(returning));
+                // The carriers grow by site, the weights by pair.
+                assert_eq!(region_octets(&d, returning, 2 * n as usize) - 4 * weights(returning), 2 * (all - weights(returning)));
+            }
+        }
+        let grown = declaration(64, 8, 64);
+        let carriers = 128 * 1500 * (region_octets(&grown, false, 1) - grown.heads as u64 * 8);
+        assert!(carriers > 1 << 30, "{carriers}");
     }
 }

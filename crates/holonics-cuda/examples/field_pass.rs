@@ -9,7 +9,7 @@
 //!   `release-field-text ARGS…`: the commands with every read and return on the card.
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs read and the
-//! largest batch's stores, and the card's free memory at the open and its batch budget.
+//! largest batch's allocations, and the card's free memory at the open and its batch budget.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 #[path = "../../holonics/examples/solenoidal_alpha.rs"]

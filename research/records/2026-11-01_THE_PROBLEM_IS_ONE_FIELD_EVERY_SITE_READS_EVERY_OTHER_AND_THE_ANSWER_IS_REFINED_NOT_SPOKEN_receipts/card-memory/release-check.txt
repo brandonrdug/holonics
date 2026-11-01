@@ -1,0 +1,4 @@
+FIELD_COMMAND release-field $ROOT/.local/wt/field-card/.local/run/reading-3/train/STATE.0 dc1775d10d219b6b01c892009c3f1a0d212202b0c0973e1a7747033bb46d48a5 $ROOT/.local/wt/field-card/.local/run/reading-3/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa 128 16 $ROOT/.local/wt/field-card/.local/run/fix5/release
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15358033920 total=16802250752 batch_budget=10366943232
+FIELD_RELEASE free=128 marks=399 withheld=0 refused=0 sweeps=16 released=28709 held=35463 lambda=5821 friction=52530 ms=27194
+FIELD_CARD reads=64 read_ms=26086 returns=0 return_ms=0 pairs=74552625344 batches=72 peak_store=10341500864 elapsed_ms=27194
