@@ -971,3 +971,150 @@ trained body's); a separate copy path or pointer to the question (a catered rout
 temperature beside `β` (the gain is the reach's, derived); revising the void (the boundary follows
 the content, §16); a crib terrain whose answers write anything but GSM8K's markup (the probe reads
 the copy the claim needs, not another task).
+
+## 19. The crib probe failed, then passed: the field learns no copy the founding did not weigh, and the closure compares the contact with where the answer's class stands
+
+[measured] **The crib probe under §18** (`…_receipts/crib-probe/`, on the card, every step inside
+its bound). The card equals the host on nine sections without and with one growth. The probe trained
+14 laps of 248 sections in 149 s, released the 128 held problems in 4.6 s, and read them by the
+written rules.
+
+| Reading | Value |
+|---|---|
+| The training | withheld code 5.459 → 1.742 bits a site |
+| The held answers beside their own question | `context` 1.738 bits a site; digits 3.305, text 0.075 |
+| The same beside the next problem's question | `foil` 1.744; digits 3.309, text 0.083 |
+| The claim | the first calculation from the question's numbers in 4 of 103 (bar 24), `c_foil = 0` |
+
+The answers' markup was learned to 0.075 bits a site; their digits were told 0.004 bits more by
+their own question than by another's. The acceptance fails at its first count.
+
+[measured] **What the field learns to copy** (host law runs, release build, one thread each; the
+debugging builds are not kept). The declaration is width 32, four heads of eight modes, still 2 of 4
+ring sets, 32 contacts and two ticks, at 96 sites a region and rate `2^(−8)`. A section is 16
+regions; the held code is the mean over 64 withheld problems; the filler is words of a fixed
+vocabulary, as the crib's syllables are.
+
+| The copy | What tells the source | Held code (bits a problem), first read → last |
+|---|---|---|
+| The far successor (one answer digit open; its predecessor resolved) | the resolved digit's equal word stands in the text | 3.480 → 0.051 at 375 sections; 3.485 → 0.154 at 300 sections and 192 sites |
+| The same, founded hotter (`β = 2`) | the same | 3.480 → 3.316 at 375 |
+| The same, trained under the τ-mask alone | the same | 4.185 → 3.552 at 500 |
+| The marked number (both digits open) | a marker word before the number, the same word before the answer | 6.810 → 3.068 at 400 |
+| The first of two numbers (both digits open) | only its order | 6.821 → 6.378 at 400 |
+| The same, with a learned metric founded at `2^(−1)`, `2^(−2)` | only its order | 6.095, 6.425 at 400 |
+
+[derived] **The cause.** The face's covector reaches the contact of a pair `(i, j)` only through its
+weight `e_ij`: `δz_ij = ln 2 · e_ij (δp_ij − μ_i)/mass_i`. A copy is learned where the founding
+already makes the source stand above the region:
+- a recurring whole word (the far successor), learned exactly;
+- a marker shared by the source's neighbour and the answer's, learned about half.
+
+A number told by its order shares no word with the answer site, so its contact opens at the
+region's average weight. The covector it receives is no larger than any other site's, and nothing
+separates it from the other number's. A crib operand is told by its order (the question's first
+number is the first operand), so no operand was copied. Reach is not the blocker (192 sites learn);
+the τ-mask only dilutes; a hotter founding or a learned gain spreads the contact further.
+
+[definition; agent-inferred] **The closure** (`Field::reverse`, `FieldDeclaration::closes`, the
+card's `field_contact_rows`). On a head of a still ring set, at every tick, an unresolved site `i`
+whose class `u_i` is held by resolved sites `j ≠ i` also reads its row as a **copy face**: the code of
+its class on the sites that hold it, `−log₂ Σ_(j holds) p_ij` with `p_ij = e_ij/mass_i`. Its
+covector in the contact,
+
+`δz_ij += p_ij − [j holds] e_ij / Σ_(k holds) e_ik`,
+
+is added on `2^(−40)` before the release by `β`. The base-2 Gibbs face's `ln 2` cancels against the
+bit, so the term is exactly `p − t` with `t` the row's own weight renormalized over the holders. It
+is zero on a row whose weight already lies on holders. With a single holder it is `p_ij − [j holds]`.
+
+This is the declared comparison of the learning law, read on the contact's own distribution: the
+Bombe's pairwise loop closure, a site's key located from where the class it must receive already
+stands. It is not a copy path. No value is routed, written or selected by it, and the face still
+reads its class through the contact the field forms. At a release no unresolved class is known, so
+the closure compares nothing there; only the probe's and the key's charts have moved. The field reads
+raw bytes (`founded-units-v1 0`), every class is compared alike (letters, spaces, markup, voids and
+digits), and nothing in it knows a number. The certificate reads the face's code alone, so a step
+stands only where it lowers the code the field is judged by.
+
+It closes on the still ring sets only. A still head reads words at any distance, so a holder is
+reached wherever it stands; a turned head's phase locates by relative place, and the source's place
+changes from problem to problem. The crib's acceptance counts a first calculation whose operands are
+among the question's numbers in any order (`written_rules.py`, `free_reads`).
+
+[measured] **The first form failed: every holder asked for alike.** The first closure asked the row
+for every holder equally, `p_ij − [j holds]/H_i`. On the number told by order (unique holders) it is
+the copy face's law bit for bit, and it learned. In the crib's training, almost every masked site has
+many holders (every space, letter, void or repeated digit), so it pulled every row toward all equal
+bytes at once. Its probe (`…_receipts/crib-probe-closure/`) trained 11 laps; halvings rose from about
+35 a lap to 187 in the first lap. At lap 10 the answers' text coded 0.316 bits, against 0.114 before
+the closure, and the question told the digits 0.007 bits. The claim was 1 of 60 first calculations
+from the question, `c_foil = 1`.
+
+[measured] **The closure's laws on the host** (`…_receipts/closure-law/`;
+`the_closure_locates_a_number_told_by_order`, `the_closure_locates_a_number_among_repeated_digits`).
+The declaration is alphabet 15, width 16, four heads of four modes, still 2 of 4, 16 contacts, two
+ticks, 16 regions a section, rate `2^(−6)` unless named. The comparisons of the three laws used a
+temporary switch, which is not committed; the committed law reproduces the copy face's numbers
+exactly.
+
+| The copy (24 sites unless named) | No closure | Every holder alike | Copy face |
+|---|---|---|---|
+| Order-told, unique holders, 300 sections | 6.60 | 0.40 | 0.40 (bit for bit) |
+| The same at 96 sites | 6.62 | 1.254 | 1.254 |
+| Three numbers, digits repeated, 300 sections | 5.76 | 0.96 | 0.35 |
+| The same, 4 of 16 text sites masked, 1,200 sections | 6.05 | 5.97 (frozen to about section 600) | 2.71 |
+| The same, the crib's mask mix, 1,200 sections | 5.57 | 0.70 | 0.54 |
+| The same at the crib's rate `2^(−8)`, 2,400 sections | 6.23 | 0.90 | 0.54 |
+
+With 8 of 16 text sites masked nothing learned in 1,200 sections under any law: the copy's sources
+are masked as often as its target.
+
+[measured] **The crib probe under the copy face** (`…_receipts/crib-probe-weighted/`, 16:09 to
+16:18 UTC, 530 s against a projected 695 s, 0.76). The card equals the host on nine sections
+without and with one growth. The training ran 600 s, set from what the law runs needed: the first
+closure probe trained only 2,728 sections (11 laps from `P_A`, which projected 1.8 times the measured
+lap), and the copy forms after about 2,000 sections even at 24 sites at rate `2^(−8)`. Here it ran 36
+laps of 248 sections (about 11.5 s a lap); the field grew at lap 35 to width 64, eight heads, 64
+contacts and rate `2^(−9)`; a second growth was held at lap 36 (no projection), ending training.
+The release of the 128 held problems took 6.9 s, none left open.
+
+| Lap | `context` digits | `foil` digits | `context` text | `foil` text |
+|---|---|---|---|---|
+| 9 | 3.447 | 3.468 | 0.336 | 0.338 |
+| 20 | 2.876 | 3.052 | 0.205 | 0.208 |
+| 30 | 2.006 | 2.534 | 0.149 | 0.153 |
+| 34 | 1.687 | 2.351 | 0.108 | 0.111 |
+| 36 | 1.735 | 2.325 | 0.102 | 0.107 |
+
+| The claim | Value |
+|---|---|
+| The first calculation from the question's numbers | 25 of 126 (bar 24), `c_foil = 2` |
+| The held answers' code beside their own question against another's | 0.943 against 1.249 bits a site |
+| Not this acceptance | 0 of 189 free calculations right; 1 of 200 marked equals |
+
+**The acceptance fixed in §18 passes**: the question is read. The sums are not: the operands are
+copied (whole numbers or their fragments), and the arithmetic between them is not yet learned. The
+three releases' text, beside their questions' numbers:
+
+| Question's numbers | Released answer |
+|---|---|
+| 171, 367, 304 | `<<3+7+32=100>>10` / `<<10+104=100>>100` / `#### 100` |
+| 379, 665 | `<<665+5=105>>105` / `<<665+39=15>>>15` / `#### 105` |
+| 55, 1, 29 | `<<1+295=55>>>555` / `#### 555` |
+
+Reading 8 runs GSM8K on these laws.
+
+[agent-inferred] **The Lean obligation** carried into #410: the closure's covector is the logit
+gradient, in bits, of `−log₂ Σ_(j holds) p_ij` under the base-2 Gibbs face, and it vanishes on any
+row whose weight lies on holders.
+
+Not adopted:
+- every holder asked for alike (measured above: it fails under plural holders);
+- the closure on turned heads (their phase locates by relative place, which changes from problem to
+  problem);
+- a hotter founding or a learned temperature (measured above: both spread the contact);
+- a copy path that writes a holder's value into the answer (a catered routine; the closure only
+  compares);
+- a weight on the closure beside the face's (each is a code in bits, and their sum is the
+  comparison).
