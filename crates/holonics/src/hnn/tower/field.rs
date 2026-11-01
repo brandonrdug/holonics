@@ -213,6 +213,9 @@ pub struct FieldDeclaration {
     pub ticks: usize,
     pub frames: usize,
     pub reach: usize,
+    /// The ring sets that are clocks (§15.4): the last `clocks` of the turned sets, framed by each
+    /// site's own sweep count instead of its place.
+    pub clocks: usize,
 }
 
 impl FieldDeclaration {
@@ -239,7 +242,7 @@ impl FieldDeclaration {
     /// (§12). Why the mode's own row (§15.2): the head's sum over its modes was one number a pair, so one
     /// mode's agreement could not be heard apart from the rest.
     pub fn score_shift(&self) -> i32 {
-        let (reals, need) = (1u128, 2 * self.reach_bits() as u128);
+        let (reals, need) = ((self.modes / self.rows()) as u128 * if probe("FIELD_PAIRING") { 2 } else { 1 }, 2 * self.reach_bits() as u128);
         let mut beta = 0i32;
         if reals >= need {
             while (reals >> (beta + 1)) >= need {
@@ -294,6 +297,12 @@ impl FieldDeclaration {
         62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
     }
 
+    /// [definition; agent-inferred, November 1] **A head's rows**: each row reads `n / rows` of the
+    /// head's modes as one face. ROWS_PROBE
+    pub fn rows(&self) -> usize {
+        if probe("FIELD_ROWS_BY_MODE") { self.modes } else { 1 }
+    }
+
     /// The classes a head reads, `3^b`.
     pub fn classes(&self) -> usize {
         3usize.pow(self.class_trits() as u32)
@@ -342,7 +351,20 @@ impl FieldDeclaration {
         (self.frames - self.still) * self.modes
     }
 
+    /// [definition; agent-inferred, November 1] **A clock ring set** (the dispersing field's §15.4): head
+    /// `h` is of one where its set is among the last `clocks`. Its modes are turned by each site's own
+    /// sweep count since the site was reached (the release's clock; in training §14.6's rung), not by
+    /// its place, so sites reached or locked together share phase, their gaps are read as phase like
+    /// place is, and the contact reads rhythm beside content. A clock carries no skin: the sweeps are
+    /// not a medium a field crosses, and the place's falloff still charges the pair.
+    pub fn is_clock(&self, h: usize) -> bool {
+        h % self.frames >= self.frames - self.clocks
+    }
+
     fn admit(&self) -> Result<()> {
+        if self.clocks > self.frames - self.still.min(self.frames) {
+            return refuse("a field's clocks are among its turned ring sets");
+        }
         if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.ticks == 0 {
             return refuse("a field needs two classes, a nonempty width, heads, modes, contacts and ticks");
         }
@@ -358,16 +380,16 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v4 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v5 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v4" {
-            return refuse("a field's head line that is not hnn-field-v4");
+        if words.len() != 11 || words[0] != "hnn-field-v5" {
+            return refuse("a field's head line that is not hnn-field-v5");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, clocks: n(words[10])? };
         d.admit()?;
         Ok(d)
     }
@@ -538,6 +560,34 @@ pub struct Region<'a> {
     pub unresolved: &'a [bool],
     pub faces: &'a [Option<Shares>],
     pub locked: &'a [bool],
+    /// Each site's clock (§15.4), the sweeps since it was reached; empty where every site's is zero.
+    pub clock: &'a [u32],
+    /// Each carried site's echo (§15.3, [`Echo`]); empty where no site carries one.
+    pub echo: &'a [Option<Echo>],
+}
+
+/// [definition; agent-inferred, November 1] **A read leaves its own echo out** (the dispersing field's
+/// §15.3): a site carried as a face is read through reciprocal contacts, so its face returns to it a
+/// round trip later; the read it meets is its cavity field, `z ← z − B ℓ`, with `ℓ` the logits its
+/// carried face was formed from and `B` its echo on `2^(−63)`, the round trip's share read on the read
+/// that formed `ℓ` ([`FieldRead::echo`]). Both are data: no covector passes through them.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Echo {
+    pub b: u64,
+    pub logits: Vec<i64>,
+}
+
+/// [definition; agent-inferred, November 1] **A read's logits and its echoes** (§15.3): each unresolved
+/// site's readout logits on `2^(−16)` bits (its cavity field where it carries an [`Echo`]) and every
+/// site's echo `B_i` on `2^(−63)`: the mean over the head's rows and the consecutive ticks of the round
+/// trip `Σ_j p_ji^(t) p_ij^(t+1)`, `j` reading `i` at one tick and `i` reading `j` at the next. That is
+/// the reaction term of the cavity method (TAP's Onsager term, `Σ_j J_ij J_ji` at the order where the
+/// read's currents are their shares' averages, the material's gains at the founding's identity): the
+/// share of a site's own signal the contacts return to it within one read.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct FieldRead {
+    pub logits: Vec<Option<Vec<i64>>>,
+    pub echo: Vec<u64>,
 }
 
 /// A face carried as a site's state: each class with its share on `2^(−16)` ([`shares`]).
@@ -710,6 +760,9 @@ pub struct Membership {
 /// `(2/π) arcsin ε ≤ ε`, so over its `b` modes a site expects fewer than one crossing (`b ε ≤ 1`), its
 /// classes stay about two, and the pairs a row meets stay about the hard address's.
 pub fn band_bits(trits: usize) -> u32 {
+    if probe("FIELD_HARD") {
+        return HOLD_BITS;
+    }
     usize::BITS - trits.max(1).saturating_sub(1).leading_zeros()
 }
 
@@ -839,6 +892,11 @@ pub fn hold_return(g: i128, re: i64, im: i64) -> Result<(i128, i128)> {
     Ok((div_nearest(4 * s * g * re * ii, d * d), div_nearest(-4 * s * g * im * rr, d * d)))
 }
 
+/// PROBE: a measurement switch, removed before the build lands.
+fn probe(name: &str) -> bool {
+    std::env::var(name).is_ok()
+}
+
 /// [definition; agent-inferred, November 1] **A mode's lock against the source that arrives** (§15.2):
 /// with the receiver's mode `a` and a source `b` (a crowd's summed word over its `count`) carried by the
 /// skin `(D, g)`, the receiver's power less its slip against the arriving face, `(|a|² − |a − D b|²)/2 =
@@ -854,7 +912,7 @@ pub fn hold_return(g: i128, re: i64, im: i64) -> Result<(i128, i128)> {
 fn lock(a: (i128, i128), b: (i128, i128), count: i128, (decay, grain): (i128, u32)) -> Result<i128> {
     let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
     let pairing = carried((a.0 * b.0).checked_add(a.1 * b.1).and_then(|p| p.checked_mul(2 * count * decay)).and_then(|p| p.checked_mul(1i128 << grain)))?;
-    let power = carried((b.0 * b.0).checked_add(b.1 * b.1).and_then(|p| p.checked_mul(decay * decay)))?;
+    let power = if probe("FIELD_PAIRING") { 0 } else { carried((b.0 * b.0).checked_add(b.1 * b.1).and_then(|p| p.checked_mul(decay * decay)))? };
     carried(pairing.checked_sub(power))
 }
 
@@ -1026,6 +1084,22 @@ struct FieldPass {
     logits: Vec<Option<Vec<i64>>>,
     /// The site pairs the contact met, `Σ_(h, tick, i) |S_i^h|`.
     pairs: u64,
+    /// Each site's echo on `2^(−63)` ([`FieldRead`]).
+    echo: Vec<u64>,
+}
+
+/// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
+/// product released to `2^(−63)`, added into `trips`.
+fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: usize, trips: &mut [u128]) {
+    for (hi, row) in after.iter().enumerate() {
+        let (h, i) = (hi / sites, hi % sites);
+        for src in row {
+            let Some(back) = before[h * sites + src.j as usize].iter().find(|b| b.j as usize == i) else { continue };
+            for (&p, &q) in src.p.iter().zip(&back.p) {
+                trips[i] += (p as u128 * q as u128 + (1u128 << (SHARE_BITS - 1))) >> SHARE_BITS;
+            }
+        }
+    }
 }
 
 /// Each family's `max |w|`, read once a pass.
@@ -1107,7 +1181,7 @@ impl Field {
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
         let set = h % dd.frames;
-        if set < dd.still {
+        if set < dd.still || dd.is_clock(h) {
             return (1, 0);
         }
         (self.decays[l * (dd.frames - dd.still) + set - dd.still][d] as i128, MOVE_BITS)
@@ -1148,14 +1222,15 @@ impl Field {
 
     /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`: the identity in a head of
     /// a still ring set, the mode's ring in a turned one.
-    fn frame(&self, t: usize, h: usize, l: usize) -> (i64, i64) {
+    fn frame(&self, t: usize, tau: u32, h: usize, l: usize) -> (i64, i64) {
         let d = &self.declaration;
         let set = h % d.frames;
         if set < d.still {
             return (1i64 << MOVE_BITS, 0);
         }
         let (n, ring) = &self.rings[l * (d.frames - d.still) + set - d.still];
-        ring[t % n]
+        let place = if d.is_clock(h) { tau as usize } else { t };
+        ring[place % n]
     }
 
     fn reaches(&self) -> Reaches {
@@ -1183,6 +1258,12 @@ impl Field {
                 return refuse("a carried face that is empty, or whose class is outside the alphabet or share past one");
             }
         }
+        if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || region.clock.iter().any(|&c| c as usize >= self.declaration.reach))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
+            return refuse("a region's clocks or echoes that are not one a site, or a clock past the reach");
+        }
+        if region.echo.iter().flatten().any(|e| e.logits.len() != self.declaration.alphabet) {
+            return refuse("an echo whose logits are not one a class");
+        }
         if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && Self::carried(region, t).is_none())) {
             return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
         }
@@ -1193,6 +1274,11 @@ impl Field {
     /// carrying no mixture) or locked (a foil). Only definite sources are heard past the near field.
     fn definite(region: &Region, t: usize) -> bool {
         (!region.unresolved[t] && Self::carried(region, t).is_none()) || region.locked.get(t).copied().unwrap_or(false)
+    }
+
+    /// Each site's clock (§15.4), zero where the region declares none.
+    fn clock(region: &Region) -> Vec<u32> {
+        if region.clock.is_empty() { vec![0; region.classes.len()] } else { region.clock.to_vec() }
     }
 
     /// The face a site is carried as, if any.
@@ -1268,7 +1354,7 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], definite: &[bool], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    fn tick(&self, x: &mut [i64], definite: &[bool], clock: &[u32], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -1311,7 +1397,7 @@ impl Field {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(t, h, li);
+                    let (ur, ui) = self.frame(t, clock[t], h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (q[t * m2 + c] as i128, q[t * m2 + m + c] as i128);
                     let (vr, vi) = (v[t * m2 + c] as i128, v[t * m2 + m + c] as i128);
@@ -1345,6 +1431,7 @@ impl Field {
         cell.rows = Vec::with_capacity(heads * sites);
         cell.y = vec![0i64; sites * m2];
         let score_bits = (FACE_BITS as i32 + beta) as u32;
+        let (rows, g) = (d.rows(), n / d.rows());
         cell.crowds = Vec::with_capacity(heads * sites);
         cell.sums = Vec::with_capacity(heads);
         for h in 0..heads {
@@ -1352,21 +1439,28 @@ impl Field {
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
                 let wi = &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span];
-                let mut series: Vec<SeriesRow> = (0..n).map(|_| SeriesRow::new(2)).collect();
+                let mut series: Vec<SeriesRow> = (0..rows).map(|_| SeriesRow::new(2 * g)).collect();
                 let mut row: Vec<Source> = Vec::new();
                 for (j, w) in lists.support(i) {
                     let wj = &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
                     let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
-                    // Each mode's pairing carried by its skin decay across the pair's distance, released
-                    // once (a still head's `D = 1` reads the bare pairing exactly).
+                    // Each row's lock over its modes, each mode carried by its skin decay across the
+                    // pair's distance, summed whole and released once (a still head's `D = 1` reads the
+                    // bare lock exactly).
                     let d = i.abs_diff(j);
-                    for li in 0..n {
-                        let decay = self.decay(h, li, d);
-                        let s = lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?;
-                        let z = fit64(release(s, score_bits + 2 * decay.1 + 1) - ((octave(d) as i128) << FACE_BITS))?;
-                        series[li].push(self.face(z), w, w, &[decayed(decay, vj[li]), decayed(decay, vj[n + li])]);
+                    for (r, mode) in series.iter_mut().enumerate() {
+                        let mut s = 0i128;
+                        let mut value = vec![0i128; 2 * g];
+                        for k in 0..g {
+                            let li = r * g + k;
+                            let decay = self.decay(h, li, d);
+                            s = s.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?).ok_or(TowerError::Refused("a lock past its 128-bit carrier"))?;
+                            (value[k], value[g + k]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
+                        }
+                        let z = fit64(release(s, score_bits + 2 * self.decay(h, 0, d).1 + 1) - ((octave(d) as i128) << FACE_BITS))?;
+                        mode.push(self.face(z), w, w, &value);
                     }
-                    row.push(Source { j: j as u32, w, p: vec![0; n] });
+                    row.push(Source { j: j as u32, w, p: vec![0; rows] });
                 }
                 // The far field blurred (§14.10): each octave's crowd of definite sources on each side,
                 // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
@@ -1378,31 +1472,39 @@ impl Field {
                         continue;
                     }
                     let word = sums.words(lo, hi_);
-                    let mut zs = Vec::with_capacity(n);
-                    for li in 0..n {
-                        let decay = self.decay(h, li, 1 << level);
-                        let score = lock((wi[li] as i128, wi[n + li] as i128), (word[li], word[n + li]), count as i128, decay)?;
-                        let z = fit64(div_nearest(score, ((count * count) as i128) << (score_bits + 2 * decay.1 + 1)) - ((level as i128) << FACE_BITS))?;
-                        let value = [decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li))];
-                        series[li].push(self.face(z), (count as u128) << WEIGHT_BITS, 1u128 << WEIGHT_BITS, &value);
+                    let mut zs = Vec::with_capacity(rows);
+                    for (r, mode) in series.iter_mut().enumerate() {
+                        let mut score = 0i128;
+                        let mut value = vec![0i128; 2 * g];
+                        for k in 0..g {
+                            let li = r * g + k;
+                            let decay = self.decay(h, li, 1 << level);
+                            score = score.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (word[li], word[n + li]), count as i128, decay)?).ok_or(TowerError::Refused("a lock past its 128-bit carrier"))?;
+                            (value[k], value[g + k]) = (decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li)));
+                        }
+                        let z = fit64(div_nearest(score, ((count * count) as i128) << (score_bits + 2 * self.decay(h, 0, 1 << level).1 + 1)) - ((level as i128) << FACE_BITS))?;
+                        mode.push(self.face(z), (count as u128) << WEIGHT_BITS, 1u128 << WEIGHT_BITS, &value);
                         zs.push(z);
                     }
-                    crowds.push(Crowd { lo, hi: hi_, level, count, z: zs, e: vec![0; n] });
+                    crowds.push(Crowd { lo, hi: hi_, level, count, z: zs, e: vec![0; rows] });
                 }
-                for (li, mode) in series.iter().enumerate() {
+                for (r, mode) in series.iter().enumerate() {
                     let (framed, shares) = mode.release();
                     for (src, &share) in row.iter_mut().zip(&shares) {
-                        src.p[li] = share;
+                        src.p[r] = share;
                     }
                     for (c, &share) in crowds.iter_mut().zip(&shares[row.len()..]) {
-                        c.e[li] = share;
+                        c.e[r] = share;
                     }
-                    let (ur, ui) = self.frame(i, h, li);
-                    let (ur, ui) = (ur as i128, ui as i128);
-                    let (yr, yi) = (fit64(framed[0])? as i128, fit64(framed[1])? as i128);
-                    let c = h * n + li;
-                    cell.y[i * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
-                    cell.y[i * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
+                    for k in 0..g {
+                        let li = r * g + k;
+                        let (ur, ui) = self.frame(i, clock[i], h, li);
+                        let (ur, ui) = (ur as i128, ui as i128);
+                        let (yr, yi) = (fit64(framed[k])? as i128, fit64(framed[g + k])? as i128);
+                        let c = h * n + li;
+                        cell.y[i * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
+                        cell.y[i * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
+                    }
                 }
                 cell.rows.push(row);
                 cell.crowds.push(crowds);
@@ -1451,16 +1553,25 @@ impl Field {
         let reaches = self.reaches();
         let mut x = self.open(region);
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
+        let clock = Self::clock(region);
         let mut out = FieldPass::default();
+        let sites = region.classes.len();
+        let mut trips = vec![0u128; sites];
+        let mut before: Option<Vec<Vec<Source>>> = None;
         for _ in 0..d.ticks {
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &clock, &reaches, &mut cell)?;
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
+            if let Some(prev) = &before {
+                round_trips(prev, &cell.rows, sites, &mut trips);
+            }
+            before = Some(if keep { cell.rows.clone() } else { std::mem::take(&mut cell.rows) });
             if keep {
                 out.ticks.push(cell);
             }
         }
-        let sites = region.classes.len();
+        let read = (d.ticks.saturating_sub(1) * d.heads * d.rows()).max(1) as u128;
+        out.echo = trips.iter().map(|&t| ((t + read / 2) / read) as u64).collect();
         out.read = vec![0i32; sites * dw];
         out.scale = vec![0i128; sites];
         out.faces = vec![None; sites];
@@ -1473,6 +1584,12 @@ impl Field {
             }
             let (r, s) = ratio_to_power(&x[t * dw..(t + 1) * dw])?;
             affine(&self.theta[l.read..l.read + d.alphabet * dw], reaches.read, dw, &r, Some(&self.theta[l.read_bias..l.read_bias + d.alphabet]), MATERIAL_BITS, MATERIAL_BITS, &mut z)?;
+            // The cavity field (§15.3): the read less its own echo, data from the read that formed it.
+            if let Some(Some(echo)) = region.echo.get(t) {
+                for (zc, &lc) in z.iter_mut().zip(&echo.logits) {
+                    *zc = fit64(*zc as i128 - release(echo.b as i128 * lc as i128, SHARE_BITS))?;
+                }
+            }
             out.faces[t] = Some(self.tempered(&z, 1));
             out.logits[t] = Some(z.clone());
             out.read[t * dw..(t + 1) * dw].copy_from_slice(&r);
@@ -1562,11 +1679,13 @@ impl Field {
         let l = &self.layout;
         let reaches = self.reaches();
         let beta = d.score_shift();
+        let (nrows, gm) = (d.rows(), n / d.rows());
         let ln2 = ln2_face();
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let clock = Self::clock(region);
         // The face.
         let mut dx = vec![0i64; sites * dw];
         {
@@ -1658,7 +1777,7 @@ impl Field {
                 for t in 0..sites {
                     for li in 0..n {
                         let c = h * n + li;
-                        let (ur, ui) = self.frame(t, h, li);
+                        let (ur, ui) = self.frame(t, clock[t], h, li);
                         let (ur, ui) = (ur as i128, ui as i128);
                         let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
                         dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
@@ -1681,12 +1800,12 @@ impl Field {
                     for src in &rows[i] {
                         let j = src.j as usize;
                         for r in 0..span {
-                            sv[j * span + r] += src.p[r % n] as i128 * decayed(self.decay(h, r % n, i.abs_diff(j)), dyh[i * span + r]);
+                            sv[j * span + r] += src.p[(r % n) / gm] as i128 * decayed(self.decay(h, r % n, i.abs_diff(j)), dyh[i * span + r]);
                         }
                     }
                     for c in &crowds[i] {
                         for r in 0..span {
-                            let part = div_nearest(c.e[r % n] as i128 * decayed(self.decay(h, r % n, 1 << c.level), dyh[i * span + r]), c.count as i128);
+                            let part = div_nearest(c.e[(r % n) / gm] as i128 * decayed(self.decay(h, r % n, 1 << c.level), dyh[i * span + r]), c.count as i128);
                             crowd_v[c.lo * span + r] += part;
                             crowd_v[(c.hi + 1) * span + r] -= part;
                         }
@@ -1714,30 +1833,30 @@ impl Field {
                 // mode's term of the pair, so `∂L/∂ln w_ij = Σ_m (p_k,m (δp_k,m − μ_m) + the closure's
                 // part / ln 2)` returns through [`overlap_return`] to both ends' holds.
                 let closing = closure && d.closes(tick, h);
-                let copies = (d.copies() * n) as i128;
+                let copies = (d.copies() * nrows) as i128;
                 let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 for i in 0..sites {
                     let (row, crowd) = (&rows[i], &crowds[i]);
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
-                    let mut out = vec![0i128; row.len() * n];
-                    let mut outc = vec![0i128; crowd.len() * n];
+                    let mut out = vec![0i128; row.len() * nrows];
+                    let mut outc = vec![0i128; crowd.len() * nrows];
                     let mut by_weight = vec![0i128; row.len()];
-                    for li in 0..n {
-                        let pair = |r: usize, v: (i128, i128)| dyi[r] as i128 * v.0 + dyi[n + r] as i128 * v.1;
+                    for li in 0..nrows {
+                        let modes = li * gm..(li + 1) * gm;
                         let dp: Vec<i128> = row
                             .iter()
                             .map(|src| {
-                                let (decay, j) = (self.decay(h, li, i.abs_diff(src.j as usize)), src.j as usize);
-                                pair(li, (decayed(decay, vh[j * span + li]), decayed(decay, vh[j * span + n + li])))
+                                let (d, j) = (i.abs_diff(src.j as usize), src.j as usize);
+                                modes.clone().map(|l| { let decay = self.decay(h, l, d); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
                             })
                             .collect();
                         let dpc: Vec<i128> = crowd
                             .iter()
                             .map(|c| {
-                                let decay = self.decay(h, li, 1 << c.level);
-                                div_nearest(pair(li, (decayed_wide(decay, sums.value(c.lo, c.hi, li)), decayed_wide(decay, sums.value(c.lo, c.hi, n + li)))), c.count as i128)
+                                let pairs: i128 = modes.clone().map(|l| { let decay = self.decay(h, l, 1 << c.level); dyi[l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, l)) + dyi[n + l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, n + l)) }).sum();
+                                div_nearest(pairs, c.count as i128)
                             })
                             .collect();
                         let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p[li] as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e[li] as i128 * dpj).sum::<i128>(), SHARE_BITS);
@@ -1762,14 +1881,14 @@ impl Field {
                             if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                                 return refuse("a contact's covector past its return's carrier");
                             }
-                            out[k * n + li] = dsij;
+                            out[k * nrows + li] = dsij;
                         }
                         for (k, (c, &dpj)) in crowd.iter().zip(&dpc).enumerate() {
                             let dsij = gained(compare(c.e[li] as i128, dpj, false), beta)?;
                             if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                                 return refuse("a contact's covector past its return's carrier");
                             }
-                            outc[k * n + li] = dsij;
+                            outc[k * nrows + li] = dsij;
                         }
                     }
                     // The far weights' return to both ends' holds.
@@ -1799,14 +1918,14 @@ impl Field {
                         let (j, dd) = (src.j as usize, i.abs_diff(src.j as usize));
                         for r in 0..span {
                             let (dec, g) = self.decay(h, r % n, dd);
-                            col[j * span + r] += ds[i][k * n + r % n] * (((dec * qh[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128);
+                            col[j * span + r] += ds[i][k * nrows + (r % n) / gm] * (((dec * qh[i * span + r] as i128) << g) - if probe("FIELD_PAIRING") { 0 } else { dec * dec * qh[j * span + r] as i128 });
                         }
                     }
                     for (k, c) in crowds[i].iter().enumerate() {
                         for r in 0..span {
                             let (dec, g) = self.decay(h, r % n, 1 << c.level);
                             let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
-                            let part = div_nearest(dsc[i][k * n + r % n] * (((dec * qh[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean), (c.count * c.count) as i128);
+                            let part = div_nearest(dsc[i][k * nrows + (r % n) / gm] * (((dec * qh[i * span + r] as i128 * c.count as i128) << g) - if probe("FIELD_PAIRING") { 0 } else { dec * dec * mean }), (c.count * c.count) as i128);
                             crowd_w[c.lo * span + r] += part;
                             crowd_w[(c.hi + 1) * span + r] -= part;
                         }
@@ -1814,8 +1933,8 @@ impl Field {
                 }
                 for i in 0..sites {
                     for r in 0..span {
-                        let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k * n + r % n] * self.decay(h, r % n, i.abs_diff(src.j as usize)).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
-                            + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k * n + r % n] * self.decay(h, r % n, 1 << c.level).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
+                        let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k * nrows + (r % n) / gm] * self.decay(h, r % n, i.abs_diff(src.j as usize)).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
+                            + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k * nrows + (r % n) / gm] * self.decay(h, r % n, 1 << c.level).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
@@ -1843,7 +1962,7 @@ impl Field {
             // Undo the frame: δw = conj(U) δw̃, and so for the values.
             for t in 0..sites {
                 for c in 0..m {
-                    let (ur, ui) = self.frame(t, c / n, c % n);
+                    let (ur, ui) = self.frame(t, clock[t], c / n, c % n);
                     let (ur, ui) = (ur as i128, ui as i128);
                     for chart in [&mut dq, &mut dv] {
                         let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
@@ -1990,8 +2109,8 @@ impl Field {
     }
 
     /// Each region's unresolved sites' logits, read in parallel.
-    pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> {
-        regions.par_iter().map(|r| self.logits(r)).collect()
+    pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        regions.par_iter().map(|r| self.pass(r, false).map(|p| FieldRead { logits: p.logits, echo: p.echo })).collect()
     }
 
     /// A site's face at its pump: over every class before the extent is read, over every class but the
@@ -2003,7 +2122,7 @@ impl Field {
         }
     }
 
-    fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>>, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<Released>> {
+    fn release_with(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, read: &mut dyn FnMut(&[Region]) -> Result<Vec<FieldRead>>, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<Released>> {
         let a = self.declaration.alphabet;
         if sweeps == 0 || void >= a || problems.iter().any(|&(_, answer)| answer == 0) {
             return refuse("a release needs a sweep, an answer site and a void class in the alphabet");
@@ -2031,13 +2150,14 @@ impl Field {
             }
             progress.done = done + 1;
             // The views: the question, the reached sites and the five past the front.
-            let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void))).collect();
-            let logits = {
-                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked }).collect();
+            let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void, done))).collect();
+            let reads = {
+                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, clock: &v.clock, echo: &v.echo }).collect();
                 read(&regions)?
             };
+            let logits: Vec<&Vec<Option<Vec<i64>>>> = reads.iter().map(|r| &r.logits).collect();
             (progress.change, progress.holding, progress.soft, progress.overturned) = (0, 0, 0, 0);
-            for ((k, _), z) in views.iter().zip(&logits) {
+            for (((k, _), z), fresh) in views.iter().zip(&logits).zip(&reads) {
                 let p = &mut joint[*k];
                 let content_void = p.extent.is_some().then_some(void);
                 // Every site reached before this sweep moves at its own pump.
@@ -2056,6 +2176,7 @@ impl Field {
                         site.momentum[c] = fit64(m)?;
                         site.logits[c] = fit64(site.logits[c] as i128 + m)?;
                     }
+                    site.echo = fresh.echo[p.start + s];
                     let after = self.site_face(&site.logits, site.beta, content_void);
                     let change = moved(&shares(&before), &shares(&after), a);
                     progress.change += change;
@@ -2111,6 +2232,7 @@ impl Field {
                     let site = &mut p.sites[front - p.start];
                     site.reached = Some(done);
                     site.logits = zt.clone();
+                    site.echo = fresh.echo[front];
                     site.swept = (1, done + 1);
                 }
                 if p.extent.is_none() && p.front() >= p.content {
@@ -2146,7 +2268,7 @@ impl Field {
         }
         let rows = sites
             .iter()
-            .map(|&i| (0..d.heads).filter(|h| h % d.frames < d.still).flat_map(|h| (0..d.modes).map(move |li| (h, li))).map(|(h, li)| (cell.rows[h * n + i].iter().map(|src| (src.j, src.p[li])).collect(), 1u64 << SHARE_BITS)).collect())
+            .map(|&i| (0..d.heads).filter(|h| h % d.frames < d.still).flat_map(|h| (0..d.rows()).map(move |li| (h, li))).map(|(h, li)| (cell.rows[h * n + i].iter().map(|src| (src.j, src.p[li])).collect(), 1u64 << SHARE_BITS)).collect())
             .collect::<Vec<Vec<_>>>();
         Ok(landmarks_of(&rows, question, count))
     }
@@ -2270,6 +2392,8 @@ struct Site {
     locked: Option<u64>,
     lock_sweep: Option<usize>,
     trits: Vec<i8>,
+    /// Its echo on `2^(−63)` from the read that formed its logits (§15.3).
+    echo: u64,
 }
 
 /// A problem's field in a release: its classes (the question's, then the answer's sites, whose
@@ -2294,12 +2418,14 @@ struct View {
     unresolved: Vec<bool>,
     faces: Vec<Option<Shares>>,
     locked: Vec<bool>,
+    clock: Vec<u32>,
+    echo: Vec<Option<Echo>>,
 }
 
 impl Joint {
     fn new(classes: Vec<usize>, start: usize, alphabet: usize) -> Self {
         let content = classes.len();
-        let site = Site { reached: None, logits: vec![0; alphabet], momentum: vec![0; alphabet], beta: 1, change_before: None, swept: (1, 1), locked: None, lock_sweep: None, trits: Vec::new() };
+        let site = Site { reached: None, logits: vec![0; alphabet], momentum: vec![0; alphabet], beta: 1, change_before: None, swept: (1, 1), locked: None, lock_sweep: None, trits: Vec::new(), echo: 0 };
         Self { classes, start, content, sites: vec![site; content - start], extent: None, overturns: 0, ridden: Default::default(), done: false }
     }
 
@@ -2315,21 +2441,29 @@ impl Joint {
     /// The sweep's view (§14.3, §14.7): the question known; each reached site carrying its face at its
     /// own pump (over the content classes once the extent is read) and its lock; the five sites past the
     /// front on the unresolved row; after the extent, its boundary the resolved void.
-    fn view(&self, field: &Field, void: usize) -> View {
+    /// The view read at sweep `done`: the question (its clock the sweeps since the release began), the
+    /// reached sites (each carrying its face, its echo and its clock, the sweeps since it was reached,
+    /// §15.3–§15.4) and the five sites past the front.
+    fn view(&self, field: &Field, void: usize, done: usize) -> View {
         let content_void = self.extent.is_some().then_some(void);
         let end = (self.front() + NEAR - 1).min(self.classes.len());
         let mut unresolved = vec![false; end];
         let mut faces = vec![None; end];
         let mut locked = vec![false; end];
+        let mut clock = vec![0u32; end];
+        let mut echo = vec![None; end];
+        clock[..self.start.min(end)].iter_mut().for_each(|c| *c = done as u32);
         for t in self.start..end.min(self.content) {
             unresolved[t] = true;
             let site = &self.sites[t - self.start];
-            if site.reached.is_some() {
+            if let Some(r) = site.reached {
                 faces[t] = Some(shares(&field.site_face(&site.logits, site.beta, content_void)));
                 locked[t] = site.locked.is_some();
+                clock[t] = (done - r) as u32;
+                echo[t] = Some(Echo { b: site.echo, logits: site.logits.clone() });
             }
         }
-        View { end, unresolved, faces, locked }
+        View { end, unresolved, faces, locked, clock, echo }
     }
 
     fn released(self, field: &Field, void: usize) -> Released {
@@ -2523,7 +2657,7 @@ pub trait FieldRealization {
     fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
     /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>>;
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>>;
     /// The landmarks of `sites` in `region` ([`Field::landmarks`]), a reading of its last tick.
     fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>>;
     /// The site pairs the realization's contact has met so far, where it counts them.
@@ -2544,7 +2678,7 @@ impl FieldRealization for HostField {
     fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         field.read_faces(regions)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<Vec<i64>>>>> {
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
         field.read_logits(regions)
     }
     fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {

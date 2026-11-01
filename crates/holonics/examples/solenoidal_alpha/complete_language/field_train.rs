@@ -345,7 +345,7 @@ impl TrainRegion {
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, clock: &[], echo: &[] }
 }
 
 /// The regions as the field reads them.
@@ -452,7 +452,7 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// context text, foil, foil digits, foil text]`. A reading only: no decision of the run reads it.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 9]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
     let mut out = [(0i64, 0usize); 9];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
@@ -556,7 +556,7 @@ fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: 
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
     let regions = unseen_regions(codec, problems, unseen, seed);
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
     for (faces, region) in faces.iter().zip(&views) {
@@ -1232,7 +1232,7 @@ impl LandmarkCount {
         let started = std::time::Instant::now();
         let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
         let locked = locks_of(r);
-        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked };
+        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked, clock: &[], echo: &[] };
         let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
         self.ns += started.elapsed().as_nanos();
         self.problems += 1;
