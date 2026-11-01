@@ -516,3 +516,165 @@ locked every answer whole at rung 4 within 8 sweeps, each the question's `<` and
    changes the support; the covector reads within one support, and the step's direction stops lowering
    the code a section reads (a section's step stood nowhere 248 times in the tenth lap). The covector's
    own test leaves such probes out; the learner meets them at every step.
+
+## 14. The front of the definite: the answer grows from what has settled, each site keeps its own clock, and a lock fades at its light cone
+
+[definition; agent-inferred, November 1] §13's causes 2–5 are laws, settled here before any further
+run; cause 1 is a repaired bug. One fault underlies causes 3 and 4 and reading 9's unread question
+(its held answer coded 5.629 bits with its question and 5.629 with a foil's): the release and training
+both put answer sites where nothing definite reaches them, and one temperature for the whole answer
+cooled them there. Cause 5 is the shells' hard edge (§14.2). This section supersedes §4's pump, §5's
+second sweep, §10's bipartite far rule and §10's restated fixture bars, and grades §12's shells; the
+rest of §2–§12 stands.
+
+### 14.1 Only the plates radiate far
+
+[definition; agent-inferred] Past the near field a source is heard only where it is definite: known
+(the question, or the truth in a training region) or locked (a foil). A soft site, on the bridge, is
+heard only in its near field, and so is an unreached site (`∗`). The support becomes directional:
+
+```text
+S_i^h = { j : 0 < |i − j| < 6 }  ∪  { j : |i − j| ≥ 6, B_h(j) = B_h(i), j known or locked }
+```
+
+A mode on a plate is in phase and radiates; on the bridge it turns, and its field is reactive, held
+near its source as an antenna's near field is, decaying like the skin's. The contact score stays
+reciprocal (§2.1); only which sources are heard far changes, so a receiver of any state (`∗`, soft,
+locked) reads the definite sources of its class. No clique can form: `∗` and soft sources are never met
+far. Under §10's rule an open answer site met the question only through the class of `∗` or of a
+near-flat mixture, which on GSM8K is the class of the space: reading 9's answer read the question's
+spaces and nothing else.
+
+### 14.2 A lock fades at its light cone
+
+[definition; agent-inferred] §12's shells meet at each mode's light cone, `|Re| = |Im|`, where the mode's
+Lorentz form `Re(w²) = |w|² cos 2φ` vanishes. A mode's hold on its shell is its distance from that cone,
+
+```text
+λ_m(w) = |Re(w_m²)| / |w_m|²  ∈ [0, 1]        (1 at a shell's centre, pure in phase or pure quadrature; 0 on the cone)
+λ(w)   = min over the class's b modes of λ_m(w)
+```
+
+and a far contact through a class is weighted by both ends' holds:
+
+```text
+e_ij = 2^(z_ij − max_(j∈S_i) z_ij) · λ(w_i) λ(w_j)        |i − j| ≥ 6, j ∈ S_i
+```
+
+The near field is heard without it, at every frequency. A site whose word crosses a seam leaves its old
+class with weight falling to zero and enters the new one from zero, so the code a section reads is
+continuous in the material across every seam, and the covector carries the term through `λ`. That is
+cause 5's repair: a held step's direction describes the step it takes, and the covector's test reads
+every probe, the seams included (a probe straddling a seam crosses only the kink at zero weight, and is
+counted). The hold is exact: a ratio of integer faces, released on the weights' `2^(−40)` grain. It also
+pulls each word toward the centre of its shell, where its far contacts are loudest, which is the lock
+growing firm as it learns. A word on its cone is heard only in its near field: the bridge's own
+reading.
+
+### 14.3 The front
+
+[definition; agent-inferred] An open answer site is **reached** once a known or locked site lies in
+its near field, and once reached it stays reached. An unreached site carries `∗`, the unresolved row
+the masks show; it is not moved and cannot lock. A reached site opens at rest on its opening face
+(`ℓ = z⁰`, `m = 0`) and moves every sweep by §4's momentum. So the answer grows out of the question:
+the answer's first five sites, beside the question, are reached at the first sweep, and each lock reaches the sites within its
+near field at the next. The front moves at most five sites a sweep, and only where something has
+locked; a frustrated stretch holds it until the stretch settles. Every reached site keeps moving and
+can be overturned (a foil), and nothing behind the front is fixed.
+
+This is propagation, not a certainty order. A site is reached by its distance from a definite
+surface, never by its own sureness, and the site the field is surest of has no precedence. Cause 4 is
+removed at its root: no site moves before something definite reaches it, so no interior site can lock
+the prior (the space on GSM8K; on the crib's rerun, `#` after the question's `<`).
+
+### 14.4 Each site keeps its own clock
+
+[definition; agent-inferred] The pump is per site. A reached site's `β_t` starts at 1 and doubles after
+a sweep in which its own change `Σ_a |Δp_t(a)|` fell below its change the sweep before, compared
+within its own rung. A site whose change did not fall holds its `β` and rides its momentum: that is
+frustration. A site is locked where its top class held a majority at its own `β` through the sweep;
+it unlocks where that fails. A site near the moving front keeps changing as its neighbours are
+reached, so it cools only after its near field settles. Each site's time is the normalization of what
+has reached it (§12's relativity reading); there is no global temperature. §4's pump (one `β` per
+problem, doubling on the problem's total change) is retired: on GSM8K it cooled the whole interior at
+the third sweep, before anything had reached it.
+
+The release ends for a problem when every reached site is locked and the extent is read, or at its
+sweeps or its time; sites still open are shown open.
+
+### 14.5 The extent is read where the front first locks the void
+
+[definition; agent-inferred] The void is a class at reached sites until the extent is read. The
+extent is read once, at the first reached site that locks on the void; the sites after it resolve to
+the void, and inside the extent the void is no class (§10's law, its reading moved from the opening,
+where on both runs it never resolved, to the front). If the front reaches the answer's bound with no
+void locked, the extent is the bound, and the receipt says so.
+
+### 14.6 Training meets the front
+
+[definition; agent-inferred] §5's second-sweep regions are replaced by **front regions**, at even
+odds with the completion masks. For a training answer of extent `A`, a keyed front `f ∈ [0, A]` and a
+keyed rung `r` over the pump's rungs:
+
+```text
+read 1    the question known; answer sites before f: a keyed subset open on ∗ at the masks'
+          densities, the rest the truth; the band [f, f + 5) open on ∗; past it ∗ (unreached)
+read 2    the prefix's open sites carry their read-1 faces at β = 2^r, locked where the top holds a
+          majority at that β (so they radiate far); the band carries its read-1 faces at β = 1
+          (soft, heard near); past it ∗
+compared  read 1 and read 2 at the prefix's open sites and the band, against the truth; the band may
+          hold the true end, so the void is learned at the front
+```
+
+The carried mixtures are data with no covector through them; read 2's covector reaches the encodings
+through them as now.
+
+- Cause 2: read 1 has the prefix's truth around it, so its faces are informed, not near flat.
+- Cause 3: read 2 shows the field its own sharpened tops at every rung of the pump and compares each
+  against the truth, so a wrong top is learned as a foil to overturn.
+- Cause 1: the held step is read on the next section's regions as training compares them (masks and
+  front reads), never on the release's opening.
+
+### 14.7 The card
+
+- The release reads the question, the reached sites and the five sites past the front. No site reads
+  an unreached site past its near field, so the region read a sweep grows with the answer.
+- Each class lists its definite members first (the counting sort's key gains the definite bit), and a
+  receiver reads its class's definite run contiguously, as tiles of class runs. Reading 9's lap met
+  4.46 × 10⁹ pairs in 57 s against reading 8's 31.0 × 10⁹ in 48.8 s: the gather cost more a pair than
+  the tiled all-pairs pass, and the time must follow the pairs met.
+- The per-site `β` is a shift, the reached and locked marks are bits, the front and the extent are site
+  indices. Host and card agree bit for bit.
+
+### 14.8 The fixtures' bars
+
+The learned fixtures' bars return to their original values: 0.0625 bits for the cue's successor at
+600 sections, 0.25 for the key's recall at 1,000. §10's restatement against class-presence baselines
+is withdrawn as a bar moved to fit. Each fixture is read again under the whole build. One that misses
+is reported with its measurement and its cause located before any GSM8K run, never restated and
+never given more sections.
+
+### 14.9 Acceptance, receipts and owners
+
+The bars are §7's, unchanged. The release receipt adds the reached count and the front a sweep, and
+per problem the sweep each site was reached and locked, its own rung at its lock, and the extent's
+reading (site and sweep). The held step's refusals are read per lap. A run's projection takes the
+release's sweeps from the front's measured speed over the answer's bound, and its deadline is fixed
+once.
+
+Owners: `hnn::tower::field` (the directional support, the fading lock, the front, the per-site pump, the extent at
+the front, the front regions), `field.cu` (the definite bit in the class lists, the holds on the far
+weights, the region cut at the front) and `field_train.rs` (the front regions, the receipts); their atlas rows change in the same
+commit.
+
+The recorded failures this could repeat (§8 carries over):
+- **A certainty order**: refused; reached is distance from a definite surface, and every reached site
+  moves.
+- **An authored routine**: none; the front is the near field's propagation, the far rule the shells'
+  own reading.
+- **Text as the exception**: the near field and the front are the complex's; on an image or a
+  sound the same rule reads graph distance.
+- **A bar moved to fit**: §14.8 withdraws one.
+
+Owed to #410: the front's monotone growth; the far weight's continuity across a seam; a site's own pump as the exact-sector mode of a damped
+consensus with a local clock.
