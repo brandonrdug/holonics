@@ -1,0 +1,4 @@
+PROF r1-prof rc=0 TOWER_CARD forwards=118 forward_ms=7569 reverses=32 reverse_ms=5776 elapsed_ms=15264 MEASURE lap=r1-prof rc=0 wall_s=15.6 peak_rss_kib=1586012 
+PROF r2-prof rc=0 TOWER_CARD forwards=111 forward_ms=72259 reverses=32 reverse_ms=9959 elapsed_ms=85144 MEASURE lap=r2-prof rc=0 wall_s=85.4 peak_rss_kib=2043788 
+PROF r1-plain rc=0 TOWER_CARD forwards=118 forward_ms=5712 reverses=32 reverse_ms=1618 elapsed_ms=8950 MEASURE lap=r1-plain rc=0 wall_s=9.3 peak_rss_kib=1590508 
+PROF r2-plain rc=0 TOWER_CARD forwards=111 forward_ms=18013 reverses=32 reverse_ms=2964 elapsed_ms=23656 MEASURE lap=r2-plain rc=0 wall_s=24.0 peak_rss_kib=2062648 

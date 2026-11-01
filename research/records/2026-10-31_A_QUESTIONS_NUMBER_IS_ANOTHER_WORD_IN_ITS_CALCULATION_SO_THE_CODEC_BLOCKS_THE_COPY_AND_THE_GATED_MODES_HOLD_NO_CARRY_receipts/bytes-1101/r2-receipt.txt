@@ -1,0 +1,27 @@
+TOWER_PASS pass=0 train_bits_a_byte=3.062 dev_bits_a_byte=2.346 dev_regions Q=2.452 P=2.108 N=3.268 M=2.910 deposits=171/171 pass_ms=76103 elapsed_ms=76118
+TOWER_PASS pass=1 train_bits_a_byte=2.111 dev_bits_a_byte=1.999 dev_regions Q=2.118 P=1.770 N=2.901 M=2.404 deposits=171/171 pass_ms=65290 elapsed_ms=141411
+TOWER_PASS pass=2 train_bits_a_byte=1.868 dev_bits_a_byte=1.846 dev_regions Q=1.972 P=1.613 N=2.786 M=2.216 deposits=171/171 pass_ms=65776 elapsed_ms=207190
+TOWER_PASS pass=3 train_bits_a_byte=1.740 dev_bits_a_byte=1.773 dev_regions Q=1.903 P=1.559 N=2.579 M=2.037 deposits=171/171 pass_ms=66110 elapsed_ms=273303
+TOWER_PASS pass=4 train_bits_a_byte=1.671 dev_bits_a_byte=1.708 dev_regions Q=1.850 P=1.497 N=2.403 M=1.905 deposits=171/171 pass_ms=66850 elapsed_ms=340155
+== lap 5
+FLUX six questions whole answers summed = 162.8 bits
+WRITTEN dir=r2-written-5-GKEYS problems=128 a_on_problem=5 b_free_calculations=303 b_free_right=13 c_first_calculations=123 c_from_question=5 b_equals=25/399 met=19/260 never_met=6/139 binary +=3/74 -=2/74 *=15/149 /=5/46
+CARRY dir=r2-written-5-GKEYS never_met=6/139 never_by_op +=1/35 -=2/32 *=3/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=0 wrong_tens_neither=3 wrong_not_whole=1
+GKEYS WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=35167 lambda=12494 friction=45642 plateaus=19474 longest=16 question_own=10967 question_next=10808
+GKEYS WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2501 lambda=343 friction=4786 plateaus=870 longest=5 question_own=117 question_next=121
+WRITTEN dir=r2-written-5-GKEYS_b problems=128 a_on_problem=5 b_free_calculations=287 b_free_right=11 c_first_calculations=121 c_from_question=5 b_equals=16/399 met=14/260 never_met=2/139 binary +=1/74 -=3/74 *=10/149 /=2/46
+CARRY dir=r2-written-5-GKEYS_b never_met=2/139 never_by_op +=0/35 -=0/32 *=1/28 /=1/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=2 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS_b WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=34002 lambda=12075 friction=45315 plateaus=18323 longest=17 question_own=10669 question_next=10521
+GKEYS_b WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2378 lambda=332 friction=4685 plateaus=882 longest=4 question_own=117 question_next=82
+WRITTEN dir=r2-written-5-GKEYS_c problems=128 a_on_problem=8 b_free_calculations=298 b_free_right=9 c_first_calculations=126 c_from_question=6 b_equals=15/399 met=12/260 never_met=3/139 binary +=1/74 -=3/74 *=9/149 /=1/46
+CARRY dir=r2-written-5-GKEYS_c never_met=3/139 never_by_op +=0/35 -=1/32 *=0/28 /=1/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=0 wrong_tens_neither=3 wrong_not_whole=1
+GKEYS_c WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=36069 lambda=12509 friction=46514 plateaus=19991 longest=18 question_own=11129 question_next=10867
+GKEYS_c WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2458 lambda=360 friction=4709 plateaus=904 longest=3 question_own=125 question_next=111
+Traceback (most recent call last):
+  File "$ROOT/.local/wt/bytes-1101/tools/gsm8k/card_written.py", line 79, in <module>
+    marks = releases(dmarks)
+  File "$ROOT/.local/wt/bytes-1101/tools/gsm8k/card_written.py", line 68, in releases
+    data = open(f"{d}/RELEASES.classes", "rb").read(); cls = struct.unpack(">%dH" % (len(data) // 2), data)
+           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '$ROOT/.local/wt/section-edge/.local/run/race/bytes-1101/r2-MARKS-5-GKEYS_d/RELEASES.classes'
+CONVERT failed 5 GKEYS_d

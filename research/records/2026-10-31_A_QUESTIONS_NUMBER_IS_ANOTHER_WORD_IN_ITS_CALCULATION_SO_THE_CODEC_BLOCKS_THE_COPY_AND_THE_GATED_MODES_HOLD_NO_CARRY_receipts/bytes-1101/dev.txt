@@ -1,0 +1,10 @@
+BIN=3dade728a151c15d3f1de4019beea71228622b726dd9aff8564fe5c823e0cc49 UNITS=b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 ROUTE=train-two-ladder-stacked-news-heading-credited-every-level-pair-unit-tower LAPS=1 LIMIT=180 ENV= NVIDIA_SMI 86 %, 1402 MiB at=2026-11-01T00:53:55Z
+RUN_END r1dev rc=0 TOWER_CARD forwards=405 forward_ms=17027 reverses=171 reverse_ms=8235 elapsed_ms=31670 MEASURE lap=r1dev rc=0 wall_s=32.0 peak_rss_kib=1609040 
+VRAM_PEAK_MIB r1dev=6826 baseline=1402
+BIN=3dade728a151c15d3f1de4019beea71228622b726dd9aff8564fe5c823e0cc49 UNITS=b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 ROUTE=train-two-ladder-stacked-news-heading-credited-every-level-participating-pair-unit-tower LAPS=1 LIMIT=180 ENV=-E TOWER_PARTICIPATION_FROM=4 -E TOWER_PARTICIPATION_SECTION=128 -E TOWER_LAP_SECTIONS=48 NVIDIA_SMI 9 %, 1408 MiB at=2026-11-01T00:54:28Z
+RUN_END r2dev rc=0 TOWER_CARD forwards=146 forward_ms=21417 reverses=48 reverse_ms=3940 elapsed_ms=29143 MEASURE lap=r2dev rc=0 wall_s=29.5 peak_rss_kib=2066060 
+VRAM_PEAK_MIB r2dev=8090 baseline=1408
+B77=6dfe6d13b642977bf7d14c7ca593208d1b49a928f64483ff3383a61902b3a0dc at=2026-11-01T00:54:58Z
+PARITY77 units rc=0 TOWER_PARITY_NEXT sections=32 read=31 raised=16 halved=16 refused=0 TOWER_PARITY_DONE sections=32 faces=98304 faces_unequal=0 closures=147984 closures_unequal=0 gradient_entries=25285824 gradient_unequal=0 learners_unequal=0 host_ms=35207 card_ms=10906 card_forwards=159 card_forward_ms=6902 card_reverses=32 card_reverse_ms=434 elapsed_ms=52324 MEASURE lap=parity77-units rc=0 wall_s=53.1 peak_rss_kib=3377000 
+PARITY77 bytes rc=1 MEASURE lap=parity77-bytes rc=1 wall_s=4.2 peak_rss_kib=2802208 
+SUITE77 rc=0 test result: ok. 46 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.47s MEASURE lap=suite77 rc=0 wall_s=49.6 peak_rss_kib=1155860 

@@ -1,0 +1,108 @@
+== lap 10: training 1.503 held-out 1.606 (Q 1.761 P 1.409 N 2.122 M 1.688) elapsed 283.6 s; flux 278.5
+  on_problem: 7–17 (11.75)
+  free_calcs: 294–308 (302.25)
+  free_right: 8–18 (11.50)
+  first_calcs: 115–120 (117.50)
+  first_from_question: 2–5 (4.25)
+  equals: 18–19 (18.50)
+  met: 14–16 (14.75) of 260
+  never: 2–5 (3.75) of 139
+  never+: 0–1 (0.75) of 35
+  never-: 0–0 (0.00) of 32
+  never*: 0–2 (1.00) of 28
+  never/: 0–1 (0.75) of 6
+  carry_n: 4–4 (4.00)
+  carry_right: 0–0 (0.00)
+  carry_tens_right: 0–0 (0.00)
+  carry_tens_without: 0–2 (1.00)
+  carry_tens_neither: 2–4 (3.00)
+  carry_not_whole: 0–0 (0.00)
+  bytes_lambda: 11688–12445 (12053.50)
+  bytes_friction: 42685–44154 (43508.25)
+  bytes_question_contact: 162–436 (314.50)
+  numerals_lambda: 262–298 (279.50)
+  numerals_friction: 4873–4978 (4909.25)
+  numerals_question_contact: 0–19 (11.25)
+  numerals_own: 94–101 (98.00)
+  numerals_next: 80–98 (86.75)
+== lap 20: training 1.365 held-out 1.532 (Q 1.697 P 1.341 N 1.985 M 1.520) elapsed 564.4 s; flux 275.5
+  on_problem: 13–21 (16.50)
+  free_calcs: 335–360 (345.75)
+  free_right: 23–31 (27.00)
+  first_calcs: 120–122 (121.25)
+  first_from_question: 1–6 (4.25)
+  equals: 40–50 (46.00)
+  met: 38–46 (42.50) of 260
+  never: 2–4 (3.50) of 139
+  never+: 0–2 (1.00) of 35
+  never-: 0–0 (0.00) of 32
+  never*: 1–2 (1.75) of 28
+  never/: 0–0 (0.00) of 6
+  carry_n: 4–4 (4.00)
+  carry_right: 0–0 (0.00)
+  carry_tens_right: 0–1 (0.25)
+  carry_tens_without: 0–2 (0.75)
+  carry_tens_neither: 2–4 (3.00)
+  carry_not_whole: 0–0 (0.00)
+  bytes_lambda: 13309–13514 (13390.50)
+  bytes_friction: 46384–47988 (47206.50)
+  bytes_question_contact: 226–401 (303.25)
+  numerals_lambda: 313–357 (336.50)
+  numerals_friction: 5212–5367 (5273.00)
+  numerals_question_contact: -11–29 (10.00)
+  numerals_own: 115–122 (117.50)
+  numerals_next: 93–126 (107.50)
+== lap 30: training 1.381 held-out 1.512 (Q 1.682 P 1.326 N 1.935 M 1.453) elapsed 842.4 s; flux 454.3
+  on_problem: 9–19 (13.00)
+  free_calcs: 317–361 (337.50)
+  free_right: 46–55 (50.50)
+  first_calcs: 122–126 (124.50)
+  first_from_question: 4–8 (6.50)
+  equals: 63–83 (70.50)
+  met: 58–74 (64.50) of 260
+  never: 4–9 (6.00) of 139
+  never+: 0–3 (1.00) of 35
+  never-: 0–1 (0.75) of 32
+  never*: 3–5 (3.50) of 28
+  never/: 0–1 (0.50) of 6
+  carry_n: 4–4 (4.00)
+  carry_right: 0–0 (0.00)
+  carry_tens_right: 0–0 (0.00)
+  carry_tens_without: 0–3 (1.00)
+  carry_tens_neither: 1–4 (3.00)
+  carry_not_whole: 0–0 (0.00)
+  bytes_lambda: 11825–12603 (12265.50)
+  bytes_friction: 40967–44110 (42150.50)
+  bytes_question_contact: 232–495 (357.00)
+  numerals_lambda: 333–381 (361.00)
+  numerals_friction: 4750–5006 (4892.25)
+  numerals_question_contact: 16–38 (23.00)
+  numerals_own: 111–122 (117.00)
+  numerals_next: 84–103 (94.00)
+== lap 40: training 1.307 held-out 1.485 (Q 1.662 P 1.293 N 1.940 M 1.399) elapsed 1120.6 s; flux 628.8
+  on_problem: 15–24 (20.00)
+  free_calcs: 348–381 (363.25)
+  free_right: 76–93 (84.75)
+  first_calcs: 121–127 (124.75)
+  first_from_question: 8–14 (11.00)
+  equals: 86–102 (92.00)
+  met: 79–89 (84.50) of 260
+  never: 5–13 (7.50) of 139
+  never+: 0–1 (0.50) of 35
+  never-: 0–3 (1.25) of 32
+  never*: 3–6 (4.50) of 28
+  never/: 0–1 (0.25) of 6
+  carry_n: 4–4 (4.00)
+  carry_right: 0–0 (0.00)
+  carry_tens_right: 0–1 (0.25)
+  carry_tens_without: 0–2 (1.00)
+  carry_tens_neither: 1–3 (2.25)
+  carry_not_whole: 0–1 (0.50)
+  bytes_lambda: 12904–13535 (13223.75)
+  bytes_friction: 44058–44816 (44569.75)
+  bytes_question_contact: 284–587 (415.00)
+  numerals_lambda: 398–419 (409.50)
+  numerals_friction: 4895–5081 (4962.75)
+  numerals_question_contact: 17–25 (20.75)
+  numerals_own: 119–139 (128.25)
+  numerals_next: 101–117 (107.50)

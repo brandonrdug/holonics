@@ -1,0 +1,27 @@
+== lap 5: training 1.671 held-out 1.708 (Q 1.850 P 1.497 N 2.403 M 1.905) elapsed 340.2 s; flux 162.8
+  on_problem: 5–8 (6.00)
+  free_calcs: 287–303 (296.00)
+  free_right: 9–13 (11.00)
+  first_calcs: 121–126 (123.33)
+  first_from_question: 5–6 (5.33)
+  equals: 15–25 (18.67)
+  met: 12–19 (15.00) of 260
+  never: 2–6 (3.67) of 139
+  never+: 0–1 (0.33) of 35
+  never-: 0–2 (1.00) of 32
+  never*: 0–3 (1.33) of 28
+  never/: 0–1 (0.67) of 6
+  carry_n: 4–4 (4.00)
+  carry_right: 0–0 (0.00)
+  carry_tens_right: 0–0 (0.00)
+  carry_tens_without: 0–2 (0.67)
+  carry_tens_neither: 2–3 (2.67)
+  carry_not_whole: 0–1 (0.67)
+  bytes_lambda: 12075–12509 (12359.33)
+  bytes_friction: 45315–46514 (45823.67)
+  bytes_question_contact: 148–262 (189.67)
+  numerals_lambda: 332–360 (345.00)
+  numerals_friction: 4685–4786 (4726.67)
+  numerals_question_contact: -4–35 (15.00)
+  numerals_own: 117–125 (119.67)
+  numerals_next: 82–121 (104.67)

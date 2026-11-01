@@ -1,0 +1,7 @@
+BIN=3dade728a151c15d3f1de4019beea71228622b726dd9aff8564fe5c823e0cc49 UNITS=b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 ROUTE=train-two-ladder-stacked-news-heading-credited-every-level-participating-pair-unit-tower LAPS=40 LIMIT=4450 ENV=-E TOWER_PARTICIPATION_FROM=4 -E TOWER_PARTICIPATION_SECTION=128 NVIDIA_SMI 42 %, 1901 MiB at=2026-11-01T01:53:28Z
+RUN_END r2 rc=241 MEASURE lap=r2 rc=-15 wall_s=351.3 peak_rss_kib=2060108  
+VRAM_PEAK_MIB r2=8761 baseline=1901
+RECEIPT lap 10 absent
+RECEIPT lap 20 absent
+RECEIPT lap 30 absent
+RECEIPT lap 40 absent

@@ -1,0 +1,10 @@
+TOWER_PARITY_UNITS units=256 classes=3521442
+TOWER_PASSAGE first_clocked_level=4
+TOWER_PACKETS first_clocked_level=4
+TOWER_HEADING first_clocked_level=4
+TOWER_NEXT_SECTION declared
+TOWER_PARITY_OPEN material=653184 streams=24 section=128 sections=32 card=NVIDIA GeForce RTX 4080 SUPER
+TOWER_PARITY section=1 faces=3072 faces_unequal=0 codes_unequal=0 closures=4560 closures_unequal=0 swell_equal=true gradient_entries=653184 gradient_unequal=0 first_unequal=None deposited=true halvings=0 next=None learner_equal=true host_pass_ms=278 card_pass_ms=61 host_section_ms=340 card_section_ms=134
+TOWER_PARITY section=2 faces=3072 faces_unequal=0 codes_unequal=0 closures=3679 closures_unequal=0 swell_equal=true gradient_entries=653184 gradient_unequal=0 first_unequal=None deposited=true halvings=9 next=Some(NextReading { change: -4995413667, halvings: 0, refused: false }) learner_equal=true host_pass_ms=219 card_pass_ms=76 host_section_ms=1168 card_section_ms=501
+tower_pass: tower refused: the residual stream outgrew its 32-bit carrier
+MEASURE lap=parity77-bytes rc=1 wall_s=4.2 peak_rss_kib=2802208
