@@ -543,7 +543,8 @@ reciprocal (§2.1); only which sources are heard far changes, so a receiver of a
 locked) reads the definite sources of its class. No clique can form: `∗` and soft sources are never met
 far. Under §10's rule an open answer site met the question only through the class of `∗` or of a
 near-flat mixture, which on GSM8K is the class of the space: reading 9's answer read the question's
-spaces and nothing else.
+spaces and nothing else. A definite source outside a receiver's class is still heard, blurred, through
+its octave's crowd (§14.10).
 
 ### 14.2 A lock fades at its light cone
 
@@ -678,3 +679,53 @@ The recorded failures this could repeat (§8 carries over):
 
 Owed to #410: the front's monotone growth; the far weight's continuity across a seam; a site's own pump as the exact-sector mode of a damped
 consensus with a local clock.
+
+### 14.10 The far field arrives blurred; no definite source is walled off
+
+[definition; agent-inferred, November 1] Reading 9's held answer coded 5.629 bits a byte beside its
+own question and 5.629 beside a foil's, equal at every lap to the reading's printed thousandth. In a
+dispersing medium every source reaches every site at its falloff, so a disturbance anywhere shows
+everywhere, however faintly. Three laws of the build made the question's share vanish instead:
+- **A wall, not a falloff.** Past the near field a source outside the receiver's class had weight
+  exactly zero. A blank answer site has one class (the blank's), and most of the question lies
+  outside it.
+- **The grain.** Weights stand on `2^(−40)` of a row's peak. The answer's own neighbours, a few sites
+  away, outscored a question site hundreds of sites back by more than that, so its weight was released
+  to exactly zero.
+- **Two hops a read.** A read has two ticks, so a disturbance crosses at most two contacts in it. Only
+  the answer's first few sites hold the question's last bytes in their near field, and their share,
+  averaged over a whole answer, sits below the printed thousandth.
+
+The wall is not the medium's law. The skin effect says how a far source arrives: blurred, its fine
+rings decayed and its coarse modes whole. So past the near field each receiver also hears every
+definite source through its octave's crowd, on each side:
+
+```text
+crowd       C_ℓ^±(i) = { j definite : ⌊log₂|i − j|⌋ = ℓ, |i − j| ≥ 6, j on side ± of i }
+word        w̄ = Σ_(j∈C) ŵ_j D(2^ℓ)          value   v̄ = Σ_(j∈C) ṽ_j D(2^ℓ)
+contact     z_(iC) = 2^(−β) Re(conj(ŵ_i) w̄) / |C| − ℓ
+weight      e_(iC) = |C| · 2^(z_(iC) − max)       (with the row's sources, one peak)
+current     ỹ_i += e_(iC) v̄ / |C|,   normalized with the row
+```
+
+`D(2^ℓ)` is the skin phasor at the octave's near edge (§12): still modes whole, a turned mode decayed
+and turned by its ring, below the grain absent. The crowd is heard as `|C|` sources at the mean of
+their words, each at the octave's falloff, which is the octave balance of §2.3: about `2^ℓ` sites at
+`2^(−ℓ)` each, heard together about as loud as one near site. A class-mate is heard both sharply
+through its class and blurred through its crowd: resonance stands on top of the background.
+
+- Every definite source now has a path into every site of its region and a share of every receiver's
+  covector, which reaches each crowd member through the sums. Learning can find a far source no class
+  yet meets: the founding's limit (a copy learned only where the founding already weighs its source)
+  is lifted by the blur.
+- Whether a far source is loud enough is the field's to learn through the scores, not a wall's to
+  forbid. The grain still releases a crowd outscored by more than forty bits.
+- The cost is a prefix sum of the definite words and values a head a tick, and two crowds an octave
+  a receiver: `O(N log N)`, against the class runs' pairs. Integer sums, so host and card agree bit for
+  bit.
+- Unreached and soft sites stay out of the crowds (§14.1): only plates radiate far.
+
+Owner `hnn::tower::field` and `field.cu` (the crowds' prefix sums); atlas rows with them. The crowd's
+weight against the members' own (`|C| · 2^(mean score)` against `Σ 2^(score_j)`, which Jensen's
+inequality orders) is owed to #410.
+
