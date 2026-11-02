@@ -1635,6 +1635,26 @@ skin reads the variation `σ = Σ|κ|`, which a sign does not cancel, so the let
 and decay the comb's modes to nothing. A direction that is a gauge of the copy menu is not a gauge of the field: the
 skin breaks it, and so does every reader's absolute turn (the unreached bytes at 1).
 
+[definition; agent-inferred, November 2; the coordinator's decision] **A loop closes the transport's whole ratio**, not
+only its turn. The field's transport between a receiver and its source is `ζ^Δτ e^(−2π|Δσ|/n)`; its logarithm has a turn
+part `Δτ` and a skin part `|Δσ| = Σ_(j,i] |κ|`, and one stationary transport is one complex multiplier for all its
+edges, so a loop closes in both (the ratio law: a comparison without its modulus part is as incomplete as one without
+its phase part). A loop's row `r` reads both: `Σ r_x κ_x = 0` and `Σ r_x |κ_x| = 0`; copied bytes cancel in both, so the
+digits stay unreached. After the turn's propagation, the forced loops' skin rows run to a fixpoint: where one side of a
+row is zero on `S` (every byte there pinned at 0), the bytes of its other side are pinned, `S ← S ∩ {κ_x = 0}`; a row
+live on both sides is not solved, and is counted.
+
+[measurement, November 2] The skin pins the 25 letters the between-texts hold (all but `q`) in one step, `S` from 22
+to 17 dimensions; no forced loop is live on both sides. **Published: every digit byte at 1; every byte of the
+between-texts at 0 (the letters, the space, `+`); the unreached bytes at 1 (`?`, `\n`, `<`, `>`, `=`, `#`, `q`); no byte
+off 0 and 1.** Under it, the 252 fronts with the witness's readers: **91 of 252 at `T = 16`** (the digit clock 213),
+**112 of 252 at `T = 128`** (252); codes 8.1 and 15.5 bits. Every lost front (132 at 16, 140 at 128) holds only unreached
+bytes ticking in its copy's span (`\n`, `<`, `?`), no letter; the copy's skin distance is a median of 10 ticks (most
+13) against the digit clock's 1 to 8. The unreached bytes, at their current rate of 1, add the question's closing `?`,
+the answer's `<<` and a line break to every copy's span: each copy of one calculation is shifted alike, so the loops
+still close, but the witness's readers (the anchor's window, the comb's offset and the rest) were set at the digit
+clock's absolute turns and skins, and read the shifted ones wrong. Not patched.
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:

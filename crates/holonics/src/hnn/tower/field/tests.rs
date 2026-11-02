@@ -2477,8 +2477,37 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
         forcing.extend(forced_now.iter().cloned());
         steps.push(format!("forced{}:{}", forced_now.len(), basis(&forcing).len()));
     };
-    let b = basis(&forcing);
+    let mut b = basis(&forcing);
     eprintln!("DEFINITE propagation steps={} dimension={} satisfied={satisfied} cutting={} empty={} silent={silent}", steps.join(","), b.len(), cutting.len(), empty.len());
+    // The skin (§16.16, the coordinator's): a loop closes the transport's whole ratio, `ζ^Δτ e^(−2π|Δσ|/n)`, so a forced
+    // loop's row closes its skin too, `Σ r_x |κ_x| = 0`. Where one side of the row is zero on `S` (every byte there
+    // pinned at 0), the bytes of its other side are pinned, `S ← S ∩ {κ_x = 0}`; a row live on both sides is not
+    // solved, and is counted.
+    if std::env::var_os("DEFINITE_SKIN").is_some() {
+        let loops_forced: Vec<Vec<i64>> = forcing.clone();
+        let mut skin_steps = Vec::new();
+        let both_live = loop {
+            let zero_on_s = |x: usize| b.iter().all(|v| v[x] == rat(0));
+            let (mut pins, mut live) = (std::collections::BTreeSet::new(), 0usize);
+            for row in &loops_forced {
+                let (pos, neg): (Vec<usize>, Vec<usize>) = ((0..bytes).filter(|&x| row[x] > 0).collect(), (0..bytes).filter(|&x| row[x] < 0).collect());
+                let (pos_dead, neg_dead) = (pos.iter().all(|&x| zero_on_s(x)), neg.iter().all(|&x| zero_on_s(x)));
+                match (pos_dead, neg_dead) {
+                    (true, false) => pins.extend(neg.iter().copied().filter(|&x| !zero_on_s(x))),
+                    (false, true) => pins.extend(pos.iter().copied().filter(|&x| !zero_on_s(x))),
+                    (false, false) => live += 1,
+                    (true, true) => {}
+                }
+            }
+            if pins.is_empty() {
+                break live;
+            }
+            skin_steps.push(format!("pinned{}:{}", pins.len(), pins.iter().map(|&x| WITNESS_BYTES[x] as char).collect::<String>()));
+            forcing.extend(pins.iter().map(|&x| (0..bytes).map(|k| i64::from(k == x)).collect::<Vec<i64>>()));
+            b = basis(&forcing);
+        };
+        eprintln!("DEFINITE skin steps={:?} dimension={} forced_loops_live_on_both_sides={both_live}", skin_steps, b.len());
+    }
     if !cutting.is_empty() {
         let live: Vec<usize> = cutting.iter().map(|c| c.1).collect();
         eprintln!("DEFINITE cutting_regions live_loops {}", quantiles(live));
