@@ -1706,6 +1706,28 @@ the digit clock (the copy stands 5 ticks further, so its readers' covector is so
 at the copy's head and is silent at the founding, coupled to the rows as before; the basin is still narrow. Receipt:
 `_receipts/law16/witness_card_published.txt`.
 
+[measurement, November 2; the coordinator's read, before any decision] **The directions the location leaves free.** The
+seam's rates (`?`, `\n`, `<`, the open receiver's unresolved row) are, like the digits, directions the complete menu does
+not reach: `N`, the fibre's coordinates the projection held at the founding 1. Read on the card under the published
+clock at `T = 16`, on 1,026 of the crib's training operand fronts only (`FIELD_WITNESS_SEAM`, 29 s): the covector on
+head 3's rates restricted to `N`, as the descent `−δc` per class (the class's sites among the fronts):
+
+| class | at the rebuilt readers (541 of 1,026 faces, 2.677 bits) | at the founding's readers (220, 12.164 bits) |
+|---|---|---|
+| open row (1,026) | **−3.0·10^15** | +3.7·10^15 |
+| `<` (2,052) | **−1.9·10^15** | +9.3·10^15 |
+| `?` (1,026) | **−9.7·10^14** | +2.9·10^15 |
+| `\n` (1,026) | **−9.7·10^14** | +4.6·10^15 |
+| digits | mixed, mostly up: `8` +2.9·10^14, `9` +2.0·10^14, `6` +1.3·10^14, `5` +1.2·10^14, `0` +1.2·10^14, `2` +1.0·10^14, `4` +3.4·10^13, `7` −5.8·10^13, `3` −7.1·10^13, `1` −9.3·10^13 | all up but `6` (−2.5·10^15), `7` largest (+9.6·10^16), `3` +1.2·10^16, `0` +9.7·10^15 |
+
+At the rebuilt readers every seam rate descends toward 0, the four largest entries of `N`; the digits move a seventh to
+a twentieth as far, with mixed signs and mostly up, none toward 0 as a class. At the founding's readers the signs turn:
+the seam rises and the digits rise strongly. A read-only step along `−P_N δc` from the rebuilt readers' covector (its
+largest entry `2^(−10)` and `2^(−6)` of a unit; not deposited): the training fronts' code **rises** 0.005 and 0.068 bits
+a front, and the held fronts' faces go from 277 to **278** and **281** of 515 (the rates at the larger step: the open row
+−0.016, `<` −0.011, `?` and `\n` −0.006, the digits within ±0.001). The first-order descent does not lower the training
+code at these sizes. Receipt: `_receipts/law16/witness_seam.txt`.
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:

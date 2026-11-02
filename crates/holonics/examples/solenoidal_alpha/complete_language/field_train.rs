@@ -2111,7 +2111,7 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
         step[at] = delta;
     }
     let (code_m, _, g3) = covector(&moved, realization)?;
-    let ranges: Vec<std::ops::Range<usize>> = std::iter::once(pace3).chain(readers).collect();
+    let ranges: Vec<std::ops::Range<usize>> = std::iter::once(pace3).chain(readers.iter().cloned()).collect();
     let back: Vec<i128> = gather(&step, &ranges).into_iter().map(|v| -v).collect();
     let descent3: Vec<i128> = gather(&g3, &ranges).into_iter().map(|v| -v).collect();
     println!("FIELD_WITNESS_BASIN moved_code_bits={} cosine_back={}", bits(code_m), cosine(&descent3, &back));
@@ -2126,8 +2126,99 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
         let descent: Vec<String> = (0..declaration.heads).map(|h| format!("{h}:{}/{}", -g4[l.temper + 2 * h], -g4[l.temper + 2 * h + 1])).collect();
         println!("FIELD_WITNESS_TEMPER at={name} faces_right={right} code_bits={} descent_on_log_t_class/listen={}", bits(code), descent.join(","));
     }
+    // [measurement; the coordinator's read, November 2] The directions the location leaves free (`FIELD_WITNESS_SEAM`, under
+    // the published clock): `N`, head 3's rates at every class the located menu did not pin (the digits, the unreached
+    // bytes, the unresolved row). Read on the training problems' operand fronts only: the covector restricted to `N`
+    // per class at the rebuilt readers and at the founding's, then a read-only step along `−P_N δc` at `2^(−10)` and
+    // `2^(−6)` of a unit (its largest entry), the code's change on the training fronts and the faces on the held ones.
+    if published && std::env::var_os("FIELD_WITNESS_SEAM").is_some() {
+        let mut train_reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+        for (q, a, _) in &train_set {
+            if train_reads.len() >= 1024 {
+                break;
+            }
+            let (qb, ab) = (codec.decode(q), codec.decode(a));
+            let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+            let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+            let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
+            let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
+            if runs < 2 || la == 0 || lb == 0 {
+                continue;
+            }
+            for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
+                let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
+                let mut unresolved = vec![false; classes.len()];
+                *unresolved.last_mut().unwrap() = true;
+                train_reads.push((classes, unresolved));
+            }
+        }
+        let train_views: Vec<Region> = train_reads.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+        let covector_on = |field: &Field, regions: &[Region], realization: &mut dyn FieldRealization| -> Result<(i64, usize, Vec<i128>)> {
+            let mut g = vec![0i128; field.theta.len()];
+            let (mut code, mut right) = (0i64, 0usize);
+            for chunk in regions.chunks(64) {
+                let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
+                for (region, faces) in chunk.iter().zip(&faces) {
+                    let last = region.classes.len() - 1;
+                    if let Some(face) = &faces[last] {
+                        code += face.code(region.classes[last]);
+                        right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
+                    }
+                }
+                for (acc, v) in g.iter_mut().zip(part) {
+                    *acc += v;
+                }
+            }
+            Ok((code, right, g))
+        };
+        let a_ = declaration.alphabet;
+        let row3 = l.pace + (a_ + 1);
+        let in_n = |c: usize| c == a_ || { let b = codec.decode(&[c]); !(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0])) };
+        let mut seen = vec![0usize; a_ + 1];
+        for (classes, unresolved) in &train_reads {
+            for (t, &c) in classes.iter().enumerate() {
+                seen[if unresolved[t] { a_ } else { c }] += 1;
+            }
+        }
+        let n: Vec<usize> = (0..=a_).filter(|&c| in_n(c) && seen[c] > 0).collect();
+        let name = |c: usize| if c == a_ { "open".to_string() } else { format!("{:?}", String::from_utf8_lossy(&codec.decode(&[c]))) };
+        let train_sites = train_views.len().max(1) as i128;
+        let tbits = |c: i64| { let x = c as i128 * 1000 / train_sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
+        let mut founding_readers = witness.clone();
+        for r in &readers {
+            founding_readers.theta[r.clone()].copy_from_slice(&founding.theta[r.clone()]);
+        }
+        let mut rebuilt_g = Vec::new();
+        for (label, field) in [("rebuilt_readers", &witness), ("founding_readers", &founding_readers)] {
+            let (code, right, g) = covector_on(field, &train_views, realization)?;
+            let shown: Vec<String> = n.iter().map(|&c| format!("{}:{}", name(c), -g[row3 + c])).collect();
+            println!("FIELD_WITNESS_SEAM at={label} training_fronts={} faces_right={right} code_bits={} descent_on_rate_by_class(sites)={}", train_views.len(), tbits(code), shown.iter().zip(&n).map(|(s, &c)| format!("{s}({})", seen[c])).collect::<Vec<_>>().join(" "));
+            if label == "rebuilt_readers" {
+                rebuilt_g = g;
+            }
+        }
+        let (code0, _, _) = covector_on(&witness, &train_views, realization)?;
+        let largest = n.iter().map(|&c| rebuilt_g[row3 + c].unsigned_abs()).max().unwrap_or(0).max(1) as i128;
+        for size in [10u32, 6] {
+            let mut moved = witness.clone();
+            for &c in &n {
+                let delta = div_nearest_i(-rebuilt_g[row3 + c] << (24 - size), largest);
+                moved.theta[row3 + c] = i32::try_from(moved.theta[row3 + c] as i128 + delta).map_err(|_| "a stepped rate outside 32 bits")?;
+            }
+            let (code_t, _, _) = covector_on(&moved, &train_views, realization)?;
+            let (_, held_right, _) = covector_on(&moved, &views, realization)?;
+            let rates: Vec<String> = n.iter().map(|&c| format!("{}:{}", name(c), (moved.theta[row3 + c] as i128 * 1000) >> 24)).collect();
+            println!("FIELD_WITNESS_SEAM step=2^-{size} training_code_change_bits={} held_faces_right={held_right}/{} rates_millis={}", tbits(code_t - code0), views.len(), rates.join(" "));
+        }
+    }
     println!("FIELD_WITNESS_DONE ms={}", started.elapsed().as_millis());
     Ok(())
+}
+
+/// `num / den` to the nearest integer (an exact reading's rounding).
+fn div_nearest_i(num: i128, den: i128) -> i128 {
+    let (q, r) = (num.div_euclid(den), num.rem_euclid(den));
+    if 2 * r >= den { q + 1 } else { q }
 }
 
 /// `log₂ x` in thousandths of a bit, `x ≥ 1`: the whole bits by the leading zeros and sixteen fraction bits by

@@ -1,0 +1,19 @@
+BIN=ab46e3953524c1b95f91a61143f669b30dd5138a535c65c2b707516ac0b81a88
+FIELD_COMMAND witness-field <root>/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 <root>/.local/wt/field-card/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 <root>/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab <root>/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 3
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15271067648 total=16802250752 batch_budget=10279976960
+FIELD_WITNESS_CLOCK published anchor_shift_ticks={5: 4096} chosen=5 comb_ticks=-1
+FIELD_WITNESS_READ operand_digits=515 witness_faces_right=277 witness_code_bits=2.826 founding_faces_right=0 founding_code_bits=5.459 ms=2386
+FIELD_WITNESS_CLOCK not_read under=published (the clock is located by loop closure, not descended)
+FIELD_WITNESS_READERS head=0 cosine_to_witness=7611
+FIELD_WITNESS_READERS head=3 cosine_to_witness=43368
+FIELD_WITNESS_ANCHOR head=3 opposing=50717 near_silent=48060 aligned=62765 silent_driven_to_oppose=8652 silent_driven_to_align=39408 digit_sources=3294
+FIELD_WITNESS_BASIN moved_code_bits=36.271 cosine_back=34481
+FIELD_WITNESS_TEMPER at=witness_t4 faces_right=126 code_bits=8.701 descent_on_log_t_class/listen=0:-393894890652/152197286124,1:0/0,2:0/0,3:159800618596415/2737484438056983,4:0/0
+FIELD_WITNESS_TEMPER at=founding faces_right=0 code_bits=5.459 descent_on_log_t_class/listen=0:0/0,1:0/0,2:0/0,3:0/0,4:0/0
+FIELD_WITNESS_SEAM at=rebuilt_readers training_fronts=1026 faces_right=541 code_bits=2.677 descent_on_rate_by_class(sites)="\n":-971593260335104(1026) "0":123012726128640(341) "1":-92514166505472(785) "2":102556760539136(801) "3":-70863226142720(668) "4":33894154764288(781) "5":124450581446656(781) "6":131145833775104(711) "7":-58165486485504(793) "8":286002122326016(702) "9":201001040936960(774) "<":-1943187726598144(2052) "?":-971592446443520(1026) open:-2988810323623936(1026)
+FIELD_WITNESS_SEAM at=founding_readers training_fronts=1026 faces_right=220 code_bits=12.164 descent_on_rate_by_class(sites)="\n":4606415982821376(1026) "0":9674794325573632(341) "1":2005573305499648(785) "2":132588669370368(801) "3":12408907136303104(668) "4":2842967182737408(781) "5":855301109841920(781) "6":-2458245160960000(711) "7":95736108436226048(793) "8":769884039086080(702) "9":1197422031011840(774) "<":9314124649267200(2052) "?":2888310137618432(1026) open:3650179334733824(1026)
+FIELD_WITNESS_SEAM step=2^-10 training_code_change_bits=0.005 held_faces_right=278/515 rates_millis="\n":-1 "0":0 "1":-1 "2":0 "3":-1 "4":0 "5":0 "6":0 "7":-1 "8":0 "9":0 "<":-1 "?":-1 open:-1
+FIELD_WITNESS_SEAM step=2^-6 training_code_change_bits=0.068 held_faces_right=281/515 rates_millis="\n":-6 "0":0 "1":-1 "2":0 "3":-1 "4":0 "5":0 "6":0 "7":-1 "8":1 "9":1 "<":-11 "?":-6 open:-16
+FIELD_WITNESS_DONE ms=28463
+FIELD_CARD reads=0 read_ms=0 returns=157 return_ms=28180 pairs=12666981193 batches=157 peak_store=2981287224 landmarks=0 landmark_ms=0 elapsed_ms=28464
+MEASURE lap=witness rc=0 wall_s=29.0 peak_rss_kib=259676
