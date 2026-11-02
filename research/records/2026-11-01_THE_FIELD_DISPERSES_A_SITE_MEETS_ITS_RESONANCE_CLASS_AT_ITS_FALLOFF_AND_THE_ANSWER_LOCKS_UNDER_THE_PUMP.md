@@ -1551,14 +1551,36 @@ rest of `a`, `+` and the head of `b` in the answer. A copy preserves its digits,
 every true loop, and the loop reads only `κ(text between) = κ(+)`. Under the key law, a region's candidates are the
 union of its loops' hyperplanes; each region's union holds its digit-free true loop, so each holds the whole family
 of digit rates, and so does their intersection. The fibre is plural in the ten digit bytes' rates, nine directions
-beyond the clock's scale: **the per-byte location cannot publish them**, and by hnn::keys's semantics a plural fibre
-is not published. The coincidental closures would tie the rates only if they were hypothesized true together, and they
-are not copies. Physically the copies are indifferent: a clock ticking 1 at `3` and 2 at `7` closes every copy loop.
+beyond the clock's scale. [correction, November 2, the coordinator's] They are not a plural fibre in hnn::keys's
+sense but a gauge of the copy menu: moving a digit rate keeps every true loop closed, and no menu separates a key from
+its gauge image (`compression::keys`, `fibre_gauge_truth`); keys.rs publishes a fibre that is one gauge orbit at its
+gauge-fixed member, and falls back only where it holds several orbits. The coincidental closures would tie the rates
+only if they were hypothesized true together, and they are not copies. Physically the copies are indifferent: a clock ticking 1 at `3` and 2 at `7` closes every copy loop.
 What the rates change is the readers' discrimination (§16.12: a neighbour one digit away stands one of its rates away).
 
 [correction, November 2] §16.15's location reached the digit clock on the witness's encodings, whose first two
-dimensions are a digit sheet set by hand: the grouping came from those encodings, not from the data. On per-byte ports
-it does not come out.
+dimensions are a digit sheet set by hand: the grouping came from those encodings, not from the data.
+
+[definition; agent-inferred, November 2; the coordinator's decision, a declared symmetry-breaking convention beside
+keys.rs's `S(p₀) = 0`, not a finding] **The published member is the current configuration projected onto the fibre**
+in the port metric (independent codec cells: the identity). The loop rows are homogeneous in `κ`, so the fibre is a
+linear space `L` with a basis `B`, and `κ_pub = B(BᵀB)⁻¹Bᵀ κ_cur`, exactly; on a direction no row reaches the rate
+keeps its current value (deposition changes a constitution only where a covector reached it, and a closing row's
+coefficient is zero on every class it cancels). At the first boundary `κ_cur ≡ 1`, so the digits would keep 1 and every
+byte the rows pin go to 0, with no class named; at later boundaries `κ_cur` is the clock published before (D1).
+
+**The fibre is computed, not derived, by propagation** (the union a region holds explodes in this chart): `S` opens as
+the intersection of the hyperplanes of regions with exactly one loop; a region with a loop whose hyperplane holds `S`
+is satisfied; a region with one live loop is forced, `S ← S ∩ H`; to a fixpoint. A region left with several live loops
+none holding `S` cuts it into pieces, and the fibre is plural: the current configuration stands, the pieces are
+reported, no tie-break. With no region of exactly one loop, that is reported with the loops' distribution, and nothing
+is picked.
+
+[measurement, November 2] `the_byte_clock_is_located_by_propagation` (tests.rs, the same 256 regions and menu on per-byte
+ports, 2.1 s): **no region has exactly one loop**. Loops a region: one region with 15, every other with 16 or more
+(median 315, most 1,833). `S` opens at all 44 bytes and stays there: 2 regions satisfied (each holds a loop whose row
+is zero), 254 cutting, none forced, none empty. The propagation has nothing to start from, and nothing is published:
+the crib's alignment admits far more candidate copies a region than the one or two true ones, so every region cuts.
 
 ### 16.17 The diff read against itself
 

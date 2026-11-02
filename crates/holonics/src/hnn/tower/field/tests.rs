@@ -2207,3 +2207,115 @@ fn the_clock_is_located_by_loop_closure_on_the_crib() {
     }
     eprintln!("LOCATE class_sheet regions_with_a_closing_loop_free_of_every_digit={free_regions}/{} closing_loops_that_tie_digit_rates={tying}", reads.len());
 }
+
+/// The crib's alignment menu on per-byte ports (§16.15, §16.16): for each training region of `count` drawn from
+/// `seed`, every loop of two maximal equal-class runs between its answer and its question, as its row of class
+/// counts (the gap `(j₁, i₁]` less the gap `(j₂, i₂]`), a loop closing exactly where `Σ_b κ[b] row[b] = 0`. Zero rows
+/// are kept (they close at every clock).
+fn crib_byte_menu(seed: u64, count: usize) -> Vec<Vec<Vec<i64>>> {
+    let mut next = mixer(seed);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    (0..count)
+        .map(|_| {
+            let (q, a) = crib_like(&mut next);
+            let classes: Vec<usize> = q.iter().chain(&a).map(|&b| to_class(b)).collect();
+            let ql = q.len();
+            let mut runs = Vec::new();
+            for i in ql..classes.len() {
+                for j in 0..ql {
+                    let continues = i > ql && j > 0 && classes[i - 1] == classes[j - 1];
+                    if classes[i] == classes[j] && !continues {
+                        runs.push((i, j));
+                    }
+                }
+            }
+            let mut rows = Vec::new();
+            for (k, &e1) in runs.iter().enumerate() {
+                for &e2 in &runs[k + 1..] {
+                    if (e1.0 < e2.0) == (e1.1 < e2.1) && e1.0 != e2.0 && e1.1 != e2.1 {
+                        let (e1, e2) = if e1.0 < e2.0 { (e1, e2) } else { (e2, e1) };
+                        let mut row = vec![0i64; WITNESS_BYTES.len()];
+                        for t in e1.1 + 1..=e1.0 {
+                            row[classes[t]] += 1;
+                        }
+                        for t in e2.1 + 1..=e2.0 {
+                            row[classes[t]] -= 1;
+                        }
+                        rows.push(row);
+                    }
+                }
+            }
+            rows
+        })
+        .collect()
+}
+
+/// [agent-inferred, November 2] **The byte clock located by propagation** (§16.16, the coordinator's rule): in the
+/// rate chart `κ[b]` on per-byte ports a loop row is homogeneous, so the fibre is a linear space `S`. `S` opens as
+/// the intersection of the hyperplanes of regions with exactly one loop; a region with a loop whose hyperplane holds
+/// `S` is satisfied; a region with one live loop (its hyperplane meets `S` beyond zero) is forced, `S ← S ∩ H`; to a
+/// fixpoint. A region left with several live loops none holding `S` cuts it into pieces: the fibre is plural, and
+/// nothing is published. Run with `--ignored --nocapture`.
+#[test]
+#[ignore]
+fn the_byte_clock_is_located_by_propagation() {
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::Rat;
+    use num_bigint::BigInt;
+    let menu = crib_byte_menu(0x7A11, 256);
+    let bytes = WITNESS_BYTES.len();
+    let rat = |v: i64| Rat::from_integer(BigInt::from(v));
+    let mut histogram: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
+    for rows in &menu {
+        *histogram.entry(rows.len().min(16)).or_insert(0) += 1;
+    }
+    eprintln!("PROPAGATE loops_per_region(16 = 16 or more)={:?}", histogram);
+    // `S` as the kernel of its forcing rows (all bytes when none).
+    let mut forcing: Vec<Vec<i64>> = Vec::new();
+    let basis = |forcing: &[Vec<i64>]| -> Vec<Vec<Rat>> {
+        if forcing.is_empty() {
+            return (0..bytes).map(|b| (0..bytes).map(|k| rat(i64::from(k == b))).collect()).collect();
+        }
+        ExactRatMatrix::new(forcing.iter().map(|r| r.iter().map(|&v| rat(v)).collect()).collect()).unwrap().kernel_basis().unwrap()
+    };
+    let pairs = |row: &[i64], b: &[Rat]| -> Rat { row.iter().zip(b).map(|(&v, x)| rat(v) * x.clone()).sum() };
+    for rows in &menu {
+        if rows.len() == 1 && rows[0].iter().any(|&v| v != 0) {
+            forcing.push(rows[0].clone());
+        }
+    }
+    let mut steps = vec![format!("open:{}", basis(&forcing).len())];
+    let (mut satisfied, mut cutting, mut dead) = (0usize, Vec::new(), Vec::new());
+    loop {
+        let b = basis(&forcing);
+        let (mut forced_now, mut sat, mut cut, mut empty) = (Vec::new(), 0usize, Vec::new(), Vec::new());
+        for (k, rows) in menu.iter().enumerate() {
+            // A row holds `S` where it pairs to zero with every basis vector; it meets `S` beyond zero where it holds
+            // it or `S` has two dimensions or more.
+            let holds = |row: &Vec<i64>| b.iter().all(|v| pairs(row, v) == rat(0));
+            if rows.iter().any(holds) {
+                sat += 1;
+                continue;
+            }
+            let live: Vec<&Vec<i64>> = rows.iter().filter(|row| b.len() >= 2 || holds(row)).collect();
+            match live.len() {
+                0 => empty.push(k),
+                1 => forced_now.push(live[0].clone()),
+                n => cut.push((k, n)),
+            }
+        }
+        if !empty.is_empty() || forced_now.is_empty() {
+            (satisfied, cutting, dead) = (sat, cut, empty);
+            break;
+        }
+        forcing.extend(forced_now.iter().cloned());
+        steps.push(format!("forced{}:{}", forced_now.len(), basis(&forcing).len()));
+    }
+    let b = basis(&forcing);
+    eprintln!("PROPAGATE steps={} dimension={} satisfied={satisfied} cutting={} empty={}", steps.join(","), b.len(), cutting.len(), dead.len());
+    if !cutting.is_empty() {
+        let mut live: Vec<usize> = cutting.iter().map(|c| c.1).collect();
+        live.sort_unstable();
+        eprintln!("PROPAGATE cutting_regions_live_loops min={} median={} max={}", live[0], live[live.len() / 2], live[live.len() - 1]);
+    }
+}
