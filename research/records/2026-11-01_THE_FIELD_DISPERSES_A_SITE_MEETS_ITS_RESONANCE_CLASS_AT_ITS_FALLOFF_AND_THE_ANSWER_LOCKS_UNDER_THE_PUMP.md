@@ -1070,6 +1070,19 @@ The rule grew when a lap left the withheld code no lower than the lap before, fr
 that raises the code from where the width began has not spent the width but harmed it, and growing copies
 the harm. It now grows only once the code has fallen at the width.
 
+### 15.11 The held step is read on the admitted future
+
+[definition; agent-inferred, November 2] A section's step was certified on its own regions and held
+against the next section's training regions: masks opening a fraction `τ ∈ (0, 1]` of a region and fronts
+with a long unreached tail. The crib is judged on context regions (the question known, one answer site in
+four open, its neighbours known) and on the release's front, and the withheld problems the growth reads are
+context regions. A step that harms those was accepted unseen, and under the open listener this matters more,
+since a listener's support is the definite sites and training's masks and the readings differ exactly in
+how many sites are definite. Each section's held read now also reads its problems as context regions (one
+part of `CONTEXT` a problem, keyed by its draw), read for the held step only and never fit: a step that codes
+the whole held read higher is halved or refused, as before. The crib run's per-lap withheld code is the
+measurement of whether lap 0 still harms.
+
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
 boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized

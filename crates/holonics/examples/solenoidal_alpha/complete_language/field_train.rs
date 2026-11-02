@@ -385,10 +385,17 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut firsts: Vec<TrainRegion> = Vec::with_capacity(members.len());
     let mut fronts: Vec<Option<(Front, usize)>> = Vec::with_capacity(members.len());
+    let mut contexts: Vec<TrainRegion> = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
+        // [agent-inferred, November 2] The held read meets the admitted future (§15.11): each problem
+        // also as a context region (the question known, one in `CONTEXT` answer sites open, its
+        // neighbours known), the shape the withheld problems and the crib's reading are judged on, one
+        // part a problem keyed by its draw. Read for the held step only, never fit.
+        let (cc, cu) = context_regions(codec.void(), q, a, length).swap_remove((*draw as usize) % CONTEXT);
+        contexts.push(TrainRegion::plain(cc, cu));
         let mut classes = region_classes(codec, q, a, length);
         match shape(seed, *draw, q.len(), length, a.len() + 1) {
             Shape::Masked(mask) => {
@@ -402,7 +409,12 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             }
         }
     }
-    let next = if learner.holds_step() { learner.read_step_on(&views_of(&firsts), realization).map_err(|e| e.to_string())?.1 } else { None };
+    let next = if learner.holds_step() {
+        let held: Vec<TrainRegion> = firsts.iter().cloned().chain(contexts).collect();
+        learner.read_step_on(&views_of(&held), realization).map_err(|e| e.to_string())?.1
+    } else {
+        None
+    };
     let at: Vec<usize> = (0..firsts.len()).filter(|&k| fronts[k].is_some()).collect();
     let mut logits = if at.is_empty() {
         Vec::new()
@@ -1614,7 +1626,7 @@ mod tests {
     /// locked however sharp, the known site carrying nothing.
     #[test]
     fn read_2_carries_the_prefix_at_its_rung_locked_and_the_band_soft() {
-        let d = FieldDeclaration { alphabet: 3, width: 4, heads: 1, modes: 1, still: 1, contacts: 1, ticks: 1, frames: 1, reach: 8 };
+        let d = FieldDeclaration { alphabet: 3, width: 4, heads: 1, modes: 1, still: 1, contacts: 2, ticks: 1, frames: 1, reach: 8, clocks: 0 };
         let field = Field::found(d, &(0..1u64 << 10).flat_map(|i| mix(3, i).to_be_bytes()).collect::<Vec<_>>()).unwrap();
         let z = |l: [i64; 3]| Some(l.iter().map(|&v| v << 16).collect::<Vec<i64>>());
         let logits = vec![None, None, z([0, 1, 0]), z([2, 2, 0]), z([0, 5, 0]), z([1, 1, 0]), z([0, 0, 0])];
@@ -1648,7 +1660,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, clocks: 0 };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
