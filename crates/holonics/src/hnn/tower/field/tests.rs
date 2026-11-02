@@ -2021,3 +2021,160 @@ fn the_completed_witness_reads_the_copied_digit() {
     assert!(!verdicts[1], "at κ ≡ 1 the completed witness fails");
 }
 
+
+/// [agent-inferred, November 2] **The clock located by loop closure** (§16.15): on the crib's training regions alone
+/// (the question and answer whole, a draw apart from the 252 fronts'), the menu is the crib's alignment, every maximal
+/// run of equal classes between an answer site and a question site (the class contact, read from the region, no key),
+/// each run one copy hypothesis entered at its first edge `(i ← j)`, whose turn is `Δτ = (i − j) + c·X(j, i]`. Two runs
+/// of one region close a loop where their turns agree, linear in `c`. The own sheet's rate (`c` on the encoding's
+/// first dimension alone) is pruned by intersection over the regions, `fibre(loop :: menu) = fibre(menu) ∩
+/// {closes}` (a region's candidates are every value any of its loops gives; a region with a loop that closes at every
+/// value prunes nothing); then the full rows of the loops that close there are the exact affine fibre
+/// (`ExactRatMatrix::preimage_fibre`), which must hold the digit clock and not `κ ≡ 1`. Run with `--ignored
+/// --nocapture`; it prints the pruning curve and the fibre.
+#[test]
+#[ignore]
+fn the_clock_is_located_by_loop_closure_on_the_crib() {
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::Rat;
+    use num_bigint::BigInt;
+    use std::collections::BTreeSet;
+    let mut next = mixer(0x7A11);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    let mut regions: Vec<(Vec<usize>, usize)> = Vec::new();
+    let mut reach = 0usize;
+    for _ in 0..256 {
+        let (q, a) = crib_like(&mut next);
+        reach = reach.max(q.len() + a.len());
+        regions.push((q.iter().chain(&a).map(|&b| to_class(b)).collect(), q.len()));
+    }
+    let field = witness_field_read(reach.max(452), 3, true, Some(16));
+    let (dw, one) = (field.declaration.width, 1i64 << FACE_BITS);
+    // Each region's runs (first edges) and its prefix sums of the opening, on the encoding's unit.
+    struct Read { prefix: Vec<Vec<i64>>, runs: Vec<(usize, usize)> }
+    let reads: Vec<Read> = regions
+        .par_iter()
+        .map(|(classes, ql)| {
+            let unresolved = vec![false; classes.len()];
+            let x0 = field.opening(&Region { classes, unresolved: &unresolved, faces: &[], locked: &[], clock: &[], echo: &[] }).unwrap();
+            let mut prefix = vec![vec![0i64; dw]; classes.len() + 1];
+            for t in 0..classes.len() {
+                for d in 0..dw {
+                    prefix[t + 1][d] = prefix[t][d] + x0[t * dw + d];
+                }
+            }
+            let mut runs = Vec::new();
+            for i in *ql..classes.len() {
+                for j in 0..*ql {
+                    let continues = i > *ql && j > 0 && classes[i - 1] == classes[j - 1];
+                    if classes[i] == classes[j] && !continues {
+                        runs.push((i, j));
+                    }
+                }
+            }
+            Read { prefix, runs }
+        })
+        .collect();
+    // The span `(j, i]`'s sum on dimension `d`, in the encoding's unit (exact here: the witness's encodings are whole
+    // units but the identity's turn, which is read as its exact ratio).
+    let span = |r: &Read, (i, j): (usize, usize), d: usize| Rat::new(BigInt::from(r.prefix[i + 1][d] - r.prefix[j + 1][d]), BigInt::from(one));
+    let loops = |r: &Read| -> Vec<((usize, usize), (usize, usize))> {
+        let mut out = Vec::new();
+        for (a, &e1) in r.runs.iter().enumerate() {
+            for &e2 in &r.runs[a + 1..] {
+                if (e1.0 < e2.0) == (e1.1 < e2.1) && e1.0 != e2.0 && e1.1 != e2.1 {
+                    out.push(if e1.0 < e2.0 { (e1, e2) } else { (e2, e1) });
+                }
+            }
+        }
+        out
+    };
+    // The own sheet's rate: `c₀ (F₁ − F₂) = n₂ − n₁` a loop.
+    let mut fibre: Option<BTreeSet<Rat>> = None;
+    let (mut silent, mut curve) = (0usize, Vec::new());
+    for (k, r) in reads.iter().enumerate() {
+        let mut candidates = BTreeSet::new();
+        let mut universal = false;
+        for (e1, e2) in loops(r) {
+            let (f1, f2) = (span(r, e1, 0), span(r, e2, 0));
+            let (n1, n2) = (e1.0 as i64 - e1.1 as i64, e2.0 as i64 - e2.1 as i64);
+            if f1 == f2 {
+                universal |= n1 == n2;
+            } else {
+                candidates.insert(Rat::from_integer(BigInt::from(n2 - n1)) / (f1 - f2));
+            }
+        }
+        if universal {
+            silent += 1;
+        } else {
+            fibre = Some(match fibre {
+                None => candidates,
+                Some(f) => f.intersection(&candidates).cloned().collect(),
+            });
+        }
+        if [1usize, 8, 64, reads.len()].contains(&(k + 1)) {
+            curve.push(format!("{}:{}", k + 1, fibre.as_ref().map_or("all".to_string(), |f| f.len().to_string())));
+        }
+        if fibre.as_ref().is_some_and(|f| f.is_empty()) {
+            let shortest = loops(r).into_iter().min_by_key(|(e1, e2)| (e2.0 - e1.1) as i64).map(|(e1, e2)| format!("{e1:?}-{e2:?}"));
+            eprintln!("LOCATE empty at region {} (runs {}, loops {}), its shortest loop {shortest:?}", k + 1, r.runs.len(), loops(r).len());
+            break;
+        }
+    }
+    let located: Vec<Rat> = fibre.clone().unwrap_or_default().into_iter().collect();
+    eprintln!("LOCATE own_sheet pruning={} silent_regions={silent} located={:?}", curve.join(","), located.iter().map(|v| v.to_string()).collect::<Vec<_>>());
+    assert_eq!(located, vec![Rat::from_integer(BigInt::from(-1))], "the own sheet's rate is the digit clock's");
+    // The full rows of the loops that close at the located rate.
+    let c0 = located[0].clone();
+    let (mut rows, mut target, mut regions_closing) = (Vec::new(), Vec::new(), 0usize);
+    for r in &reads {
+        let mut closed = false;
+        for (e1, e2) in loops(r) {
+            let (n1, n2) = (e1.0 as i64 - e1.1 as i64, e2.0 as i64 - e2.1 as i64);
+            if c0.clone() * (span(r, e1, 0) - span(r, e2, 0)) == Rat::from_integer(BigInt::from(n2 - n1)) {
+                rows.push((0..dw).map(|d| span(r, e1, d) - span(r, e2, d)).collect::<Vec<Rat>>());
+                target.push(Rat::from_integer(BigInt::from(n2 - n1)));
+                closed = true;
+            }
+        }
+        regions_closing += usize::from(closed);
+    }
+    let a = ExactRatMatrix::new(rows.clone()).unwrap();
+    let solved = a.preimage_fibre(&target).unwrap();
+    let digit_clock: Vec<Rat> = (0..dw).map(|d| Rat::from_integer(BigInt::from(if d == 0 { -1 } else { 0 }))).collect();
+    let zero = vec![Rat::from_integer(BigInt::from(0)); dw];
+    let holds = |c: &[Rat]| a.apply(c).unwrap() == target;
+    let (dimension, particular) = solved.as_ref().map_or((None, None), |(p, radical)| (Some(radical.len()), Some(p.clone())));
+    eprintln!("LOCATE fibre rows={} regions_closing={regions_closing}/{} dimension={dimension:?} digit_clock_in={} byte_clock_in={} particular={:?}", rows.len(), reads.len(), holds(&digit_clock), holds(&zero), particular.map(|p| p.iter().enumerate().filter(|(_, v)| **v != zero[0]).map(|(d, v)| format!("{d}:{v}")).collect::<Vec<_>>()));
+    if let Some((_, radical)) = &solved {
+        for (k, r) in radical.iter().enumerate() {
+            eprintln!("LOCATE radical {k} {:?}", r.iter().enumerate().filter(|(_, v)| **v != zero[0]).map(|(d, v)| format!("{d}:{v}")).collect::<Vec<_>>());
+        }
+    }
+    assert!(solved.is_some() && holds(&digit_clock) && !holds(&zero), "the fibre holds the digit clock and not the byte clock");
+    // Publication (hnn::keys's convention, the gauge fixed at the least port the menu visits): every radical direction
+    // is either unread by the training sites or moves the rate at the least visited port with a nonzero rate; the member
+    // published is the particular with that port's rate one.
+    let (particular, radical) = solved.unwrap();
+    let rate = |c: &[Rat], r: &Read, t: usize| Rat::from_integer(BigInt::from(1)) + (0..dw).map(|d| c[d].clone() * Rat::new(BigInt::from(r.prefix[t + 1][d] - r.prefix[t][d]), BigInt::from(one))).sum::<Rat>();
+    let mut visited: BTreeSet<usize> = BTreeSet::new();
+    for (r, (classes, _)) in reads.iter().zip(&regions) {
+        for (e1, e2) in loops(r) {
+            let (n1, n2) = (e1.0 as i64 - e1.1 as i64, e2.0 as i64 - e2.1 as i64);
+            if c0.clone() * (span(r, e1, 0) - span(r, e2, 0)) == Rat::from_integer(BigInt::from(n2 - n1)) {
+                visited.extend([classes[e1.0], classes[e2.0]]);
+            }
+        }
+    }
+    // The least visited port with a nonzero rate, read at one of its sites.
+    let port = visited.iter().copied().find(|&c| reads.iter().zip(&regions).any(|(r, (classes, _))| (1..classes.len() - 1).any(|t| classes[t] == c && rate(&particular, r, t) != zero[0]))).unwrap();
+    let (r0, t0) = reads.iter().zip(&regions).find_map(|(r, (classes, _))| (1..classes.len() - 1).find(|&t| classes[t] == port).map(|t| (r, t))).unwrap();
+    let unit = rate(&particular, r0, t0);
+    let unread = radical.iter().filter(|dir| reads.iter().zip(&regions).all(|(r, (classes, _))| (0..classes.len()).all(|t| (0..dw).map(|d| dir[d].clone() * Rat::from_integer(BigInt::from(r.prefix[t + 1][d] - r.prefix[t][d]))).sum::<Rat>() == zero[0]))).count();
+    eprintln!("LOCATE published port={:?} unit={unit} radical={} unread_by_training={unread}", WITNESS_BYTES[port] as char, radical.len());
+    assert_eq!(unit, Rat::from_integer(BigInt::from(1)), "the particular already reads one at the least port");
+    // The published pace on `2^(−24)` is the witness's own row.
+    let published: Vec<i32> = particular.iter().map(|v| i32::try_from((v.clone() * Rat::from_integer(BigInt::from(1i64 << MATERIAL_BITS))).to_integer()).unwrap()).collect();
+    let l = field.layout.clone();
+    assert_eq!(published, field.theta[l.pace + dw..l.pace + 2 * dw].to_vec(), "the located pace is the witness's clock, bit for bit");
+}

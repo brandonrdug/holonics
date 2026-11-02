@@ -1462,7 +1462,77 @@ founding. The basin is narrow: a step of `2^(−10)` a unit costs 24 bits, so th
 material, and descent cannot be expected to find it from far. The next subject is (i): why the clock's covector at the
 byte clock, under readers tuned to a digit clock, points away.
 
-### 16.15 The diff read against itself
+### 16.15 The clock is a key: it is located by loop closure, and the readers and temperatures descend
+
+[decision; the coordinator's, November 2, from §16.14] The clock is a key, and a key is located by loop closure, not
+by descent (CLAUDE.md, "learning is locating keys", the Bombe literal); read (i) and the isolated basin are what
+descent on a key looks like, and read (ii) says the readers descend once the clock is given. So the pace is located
+by loop closure and the readers and `log₂ T` descend by the covector: two existing laws, each on its own object.
+
+[derivation; agent-inferred, November 2] **The mapping, stated at the consumer.** The turn menu's ports read
+`S(v) = S(u) + c` (`compression::keys::TurnMenu`); here `S = τ_h`. An edge `(i ← j)`, a receiver `i` and a source `j`
+of one region, has the turn `Δτ_ij = Σ_(j<k≤i) κ(k) = n_ij + c·X_ij` with `n_ij = i − j` and `X_ij = Σ_(j<k≤i) x⁰_k`
+on the encoding's unit (exact where the encodings are whole multiples of it, as the witness's are; elsewhere the
+pace's release at `2^(−24)` is the face of the linear form). A copy is one stationary transport: its edges share one
+turn `θ` (§16.3: a number travels by its strand, so every operand digit of one calculation is `D_q − 1` ticks from its
+source, §16.12). Two edges of one copy close a loop, `c·(X_1 − X_2) = n_2 − n_1`, linear in `c`; a menu's loops cut
+the pace's fibre as an exact affine set, read by the existing owner `ExactRatMatrix::affine_fibre`
+(`holon/restriction/fibre.rs`), its radical the clock's gauge: `κ`'s scale (the encodings hold a constant feature,
+so `λκ` is reachable, `θ ↦ λθ`) and the encoding's null directions (features whose sums are equal on every span).
+
+**The missing terms, between those owners and the pace:**
+1. *The pace's loop form*: edge `(i ← j)` to `(n_ij, X_ij)`, two edges to the row `(X_1 − X_2, n_2 − n_1)`, stacked
+   for `affine_fibre`. TurnMenu reads a turn in `ℤ/d` shared by every edge with injective images, and PairLocation one
+   turn menu per byte distance `δ`; neither reads a turn that is a linear form in an unknown key.
+2. *The menu's admission under an unknown clock*: PairLocation admits every station pair at every byte distance, and
+   at the located distance every edge is true by the terrain's law. A copy's edges stand at no one byte distance, so
+   the hypothesis PairLocation enumerates has no finite analog here; it is replaced by the crib's alignment (the
+   Bombe's crib dragging): a receiver run of the answer and a source run of the question with equal classes (the
+   field's own class contact, read from the region alone, no key), each run's edges one hypothesis of one copy. A
+   loop pairs two runs' edges; a false alignment shows as a loop that does not close with the others.
+
+**The location, by intersection** (the coordinator's correction: no vote): a region's candidates are every value any
+of its loops gives, true and spurious alike, and the located value is their intersection over the regions,
+`fibre(loop :: menu) = fibre(menu) ∩ {closes}`; a region holding a loop that closes at every value prunes nothing; an
+empty intersection is reported with its region's shortest loop, and a plural one stays plural (hnn::keys's
+publication semantics). The second calculation's loops do not close at the first's turn (its copy stands `2 l_c`
+ticks further) and cost nothing: they only add candidates within their own region. The own sheet's rate first (`c`
+on the encoding's first dimension alone, the class receiver's sheet), then the full rows of the loops that close
+there, through `ExactRatMatrix::preimage_fibre`; the gauge fixed by hnn::keys's convention, at the least port the
+menu visits: the published member reads a rate of one there.
+
+**The witness, its acceptance fixed before the read** (the coordinator's, with its second item corrected from "252 at
+`T = 16`", which §16.12's bound refuses even to the exact digit clock): on the crib's training regions alone, the
+located pace's fibre contains the digit clock up to its gauge and excludes `κ ≡ 1`; with the located pace and the
+witness's readers, the faces are the digit-clock witness's at `T = 16` (213 of 252, front by front) and 252 of 252 at
+`T = 128`. Only then the coupling reads under the located clock (the readers' descent, `log₂ T`), and only then a run.
+
+[measurement, November 2] `the_clock_is_located_by_loop_closure_on_the_crib` (tests.rs; 256 training regions of the
+crib's law, a draw apart from the 252 fronts', the witness's encodings; 9.6 s):
+- the own sheet's pruning curve, the intersection's size after 1, 8, 64 and 256 regions: **85, 4, 1, 1**; located
+  `c₀ = −1`, the digit clock's (100 regions held a loop closing at every value and pruned nothing);
+- the full fibre: 7,413 rows from the loops closing there, every region contributing (256 of 256); dimension 27; its
+  particular is `c = −e₀` exactly, the digit clock; `κ ≡ 1` is not in it;
+- the radical: 25 directions no training site reads (the unused dimensions, the open row's, which no definite site
+  carries) and 2 that move only the digits' rate (`e₁`, and `e₃ + e₅ − e₀` on every site with a left neighbour): the
+  clock's scale, one orbit on the sites the menu reads;
+- published at the least visited port, the class `0`, at a rate of one: the published pace is the witness's row bit
+  for bit, so with the witness's readers its faces are the digit-clock witness's, 213 of 252 at `T = 16` and 252 of 252
+  at `T = 128` (§16.13's receipt). Both items pass.
+
+The coupling reads under the located clock are therefore §16.14's (ii) and (iv), taken with that clock: the readers
+descend toward the witness on head 3 (+0.160), and `log₂ T` rises at the copy's head and is silent at the founding.
+
+[agent-inferred, November 2] **What the run's location meets.** The witness's encodings are whole units on a few
+dimensions, so the digit clock is a linear form of them. The run's encodings are the founding's keyed draws, dense
+over 32 dimensions, and a site's opening is its class's row plus its neighbours' rows: the digit indicator is a linear
+form of them only if 44 classes' three rows admit one `c` (132 constraints on 32 coordinates), which a generic draw
+does not. There the full rows of a plural menu have no exact common member, and the own sheet has no first dimension
+to restrict to; the run's location needs the loops' intersection over the full rows, with the clock read on the class
+sheet its encoding carries.
+
+
+### 16.16 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
 - **The card's row carrier.** A contact row is carried on at most twenty limbs (1,280 bits); at the witness's
@@ -1478,7 +1548,7 @@ byte clock, under readers tuned to a digit clock, points away.
 - **The readings on context parts** are mis-clocked under a digit clock; `FIELD_HELD` keeps them, labelled, and the
   operand rows are read at fronts (`FIELD_PEAKS_OPERAND`).
 
-### 16.16 Failures this could repeat
+### 16.17 Failures this could repeat
 
 - An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
   digit, and the digit clock is a material row the deposition moves.
