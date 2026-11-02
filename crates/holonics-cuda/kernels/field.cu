@@ -59,6 +59,8 @@ typedef unsigned __int128 uwide;
 #define REFUSED_WORD64 2u
 #define REFUSED_WORD32 4u
 #define REFUSED_SHIFT 8u
+// The moments' shape (`MOMENT_REFUSED_SHAPE`, 16u) is the next bit; a contact's key return past its carrier:
+#define REFUSED_KEY 32u
 
 // -------------------------------------------------------------------------------------------
 // the host's integer law
@@ -277,7 +279,7 @@ struct FieldWords {
     uint32_t T, R;
     // The crowds' slots a receiver keeps (`2 (levels − 1)` for the reach) and the clock ring sets
     // (the last `clocks` of the turned sets, §15.4).
-    uint32_t slots, clocks;
+    uint32_t slots, clocks, band;
     uint64_t E;
     // `ln 2` on `2^(−30)`, the weights' return reads it (two words of a signed 128-bit value).
     uint64_t ln2_lo, ln2_hi;
@@ -319,6 +321,13 @@ struct FieldWords {
     uint32_t *cls;
     uint32_t *class_off;
     uint32_t *members;
+    // Each receiver's probed classes (§15.2's multi-probe): their number `pn[h][t]` and the classes
+    // `pcls[h][t][2^b − 1]`, and the receivers that probe each class: offsets `poff[h][r][3^b + 1]` and
+    // members `pmem[h][t]` (places within the region, ascending within each class).
+    uint32_t *pn;
+    uint32_t *pcls;
+    uint32_t *poff;
+    uint32_t *pmem;
     // The dense shares `p_ij` on `2^(−63)` (the support's entries only); while a row is read, its score.
     // `e_prev` is the previous tick's (the echo's round trip, §15.3).
     uint64_t *e;
@@ -922,44 +931,91 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // the resonance classes and their lists
 
 #define WEIGHT_BITS 62
+// The most address modes a head's class carries, and the most classes a receiver probes (`2^b − 1`).
+#define MAX_CLASS_TRITS 7
+#define MAX_PROBES 127
 // Warps (rows) a contact block carries.
 #define CONTACT_ROWS 4
 
-// [definition; agent-inferred, November 1] **The resonance classes and their lists** (the dispersing
-// field's §2.2, §6 and §12; the host's `ClassLists::of`): one block of one warp a head and a region.
-// Each site's class is `Σ_l 3^l σ_l` over the shells of its unframed word's first `b` modes (the sharp
-// address: §15.2's memberships were measured and retired), listed under the key `2c` where it is
-// definite (known or locked) and `2c + 1` otherwise; the counts are summed in the block's buckets, read
-// as offsets in order, and the members placed by a stable counting sort, the region's sites in chunks of
-// 32 in order, a lane its rank among the earlier lanes of its class (`__match_any_sync`), so class `c`'s
-// members stand in ascending place exactly as the host lists them.
+// A receiver's probes across its seams (the host's `probes`, §15.2): for each address mode whose word lies
+// within the band `ε = 2^(−band)` of its light cone, `|re² − im²| 2^band < re² + im²` exactly, the shell
+// across that cone (a plate's is the bridge, the bridge's the plate on its in-phase side), and the classes
+// every non-empty combination of those crossings reaches. Returns the receiver's own class, the probed
+// classes in `out` (their number returned), none of them its own.
+__device__ __forceinline__ uint32_t probe_classes(const int64_t *word, uint32_t M, uint32_t b, uint32_t band, uint32_t *own_out, uint32_t *out) {
+    uint32_t own = 0, place = 1, cmask = 0;
+    int32_t delta[MAX_CLASS_TRITS];
+    for (uint32_t l = 0; l < b; l++) {
+        const int64_t re = word[l], im = word[M + l];
+        const uint64_t quadrature = mag64(im);
+        const uint32_t s = (re > 0 && mag64(re) > quadrature) ? 2u : (re < 0 && mag64(re) > quadrature) ? 0u : 1u;
+        own += place * s;
+        const wide rr = (wide)re * (wide)re, ii = (wide)im * (wide)im;
+        const wide diff = rr - ii;
+        const uwide mag = (uwide)(diff < 0 ? -diff : diff);
+        const bool near_cone = rr + ii > 0 && (mag << band) < (uwide)(rr + ii);
+        const uint32_t across = s != 1 ? 1u : (re >= 0 ? 2u : 0u);
+        if (near_cone) {
+            cmask |= (uint32_t)1 << l;
+            delta[l] = (int32_t)place * ((int32_t)across - (int32_t)s);
+        }
+        place *= 3;
+    }
+    uint32_t count = 0;
+    for (uint32_t sub = cmask; sub != 0; sub = (sub - 1) & cmask) {
+        int32_t c = (int32_t)own;
+        for (uint32_t l = 0; l < b; l++) {
+            if (sub & ((uint32_t)1 << l)) {
+                c += delta[l];
+            }
+        }
+        out[count++] = (uint32_t)c;
+    }
+    *own_out = own;
+    return count;
+}
+
+// [definition; agent-inferred, November 1] **The resonance classes, the probes and their lists** (the
+// dispersing field's §2.2, §6, §12 and §15.2; the host's `ClassLists::of` and `probes`): one block of one
+// warp a head and a region. Each site's class is `Σ_l 3^l σ_l` over the shells of its unframed word's first
+// `b` modes (the sharp address: §15.2's memberships were measured and retired), listed under the key `2c`
+// where it is definite (known or locked) and `2c + 1` otherwise; its probed classes (`probe_classes`) are
+// kept beside it and counted by class. The counts are summed in the block's buckets, read as offsets in
+// order, and the members placed by a stable counting sort, the region's sites in chunks of 32 in order, a
+// lane its rank among the earlier lanes of its class (`__match_any_sync`), so class `c`'s members stand in
+// ascending place exactly as the host lists them; the receivers that probe each class follow, in any order.
 extern "C" __global__ void field_classes(FieldWords w) {
     extern __shared__ uint32_t buckets[];
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t classes = w.nclasses;
+    const uint32_t b = w.ctrits;
+    const uint32_t pstride = ((uint32_t)1 << b) - 1;
+    uint32_t *pbuckets = buckets + 2 * classes;
     for (uint64_t u = blockIdx.x; u < (uint64_t)w.H * w.R; u += gridDim.x) {
         const uint32_t h = u / w.R, r = u % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        for (uint32_t c = lane; c < 2 * classes; c += 32) {
+        for (uint32_t c = lane; c < 3 * classes; c += 32) {
             buckets[c] = 0;
         }
         __syncwarp();
         for (uint32_t i = lane; i < sites; i += 32) {
             const uint64_t g = first + i;
+            const uint64_t hg = (uint64_t)h * w.T + g;
             const int64_t *word = w.qkv + g * 2 * w.M2 + (uint64_t)h * w.n;
-            uint32_t c = 0;
-            for (uint32_t l = w.ctrits; l-- > 0;) {
-                // The mode's shell (`shell`): the sky plate 2, the ground plate 0, the bridge 1.
-                const int64_t re = word[l], im = word[w.M + l];
-                const uint64_t quadrature = mag64(im);
-                c = 3 * c + (re > 0 && mag64(re) > quadrature ? 2u : re < 0 && mag64(re) > quadrature ? 0u : 1u);
+            uint32_t c, probed[MAX_PROBES];
+            const uint32_t count = probe_classes(word, w.M, b, w.band, &c, probed);
+            w.cls[hg] = c;
+            w.pn[hg] = count;
+            for (uint32_t k = 0; k < count; k++) {
+                w.pcls[hg * pstride + k] = probed[k];
+                atomicAdd(&pbuckets[probed[k]], 1u);
             }
-            w.cls[(uint64_t)h * w.T + g] = c;
             atomicAdd(&buckets[2 * c + (definite_site(w, g) ? 0u : 1u)], 1u);
         }
         __syncwarp();
         uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+        uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
         if (lane == 0) {
             uint32_t at = 0;
             for (uint32_t c = 0; c < 2 * classes; c++) {
@@ -969,9 +1025,18 @@ extern "C" __global__ void field_classes(FieldWords w) {
                 at += n;
             }
             off[2 * classes] = at;
+            at = 0;
+            for (uint32_t c = 0; c < classes; c++) {
+                const uint32_t n = pbuckets[c];
+                poff[c] = at;
+                pbuckets[c] = at;
+                at += n;
+            }
+            poff[classes] = at;
         }
         __syncwarp();
         uint32_t *members = w.members + (uint64_t)h * w.T + first;
+        uint32_t *pmem = w.pmem + ((uint64_t)h * w.T + first) * pstride;
         for (uint32_t i0 = 0; i0 < sites; i0 += 32) {
             const uint32_t i = i0 + lane;
             const bool live = i < sites;
@@ -987,6 +1052,14 @@ extern "C" __global__ void field_classes(FieldWords w) {
                 }
             }
             __syncwarp();
+        }
+        // The probers of each class (every receiver that probes it), placed by a shared counter: their order
+        // within a class is the atomic's, and every consumer sums over them (an exact integer sum, in any order).
+        for (uint32_t i = lane; i < sites; i += 32) {
+            const uint64_t hg = (uint64_t)h * w.T + first + i;
+            for (uint32_t k = 0; k < w.pn[hg]; k++) {
+                pmem[atomicAdd(&pbuckets[w.pcls[hg * pstride + k]], 1u)] = i;
+            }
         }
         __syncwarp();
     }
@@ -1031,11 +1104,44 @@ extern "C" __global__ void field_sums(FieldWords w) {
     }
 }
 
-// Site `i`'s support entry `k` of its region (the host's `ClassLists::support`, §14.1): the near field
-// first (`k < NEAR_SLOTS`, the `NEAR − 1` places before and after it, nearest first), then the DEFINITE
-// run of its class past the near field. Returns the source's place, or `UINT32_MAX` where the entry
-// meets no site (a near place outside the region, or a member of the class inside the near field).
-__device__ __forceinline__ uint32_t support_at(const uint32_t *members, const uint32_t *off, uint32_t c, uint32_t i, uint32_t sites, uint32_t k) {
+// [definition; agent-inferred, November 1] **A receiver's runs** (the host's `ClassLists::support`, §14.1 and
+// §15.2): its own class and its probed classes, whose definite runs it reads past the near field. The
+// warp keeps the classes and the running offsets of their runs in shared memory; an entry of the support
+// is one of the near field's `NEAR_SLOTS` places or an entry of a run, found by the offsets.
+struct RowCls {
+    uint32_t nc;
+    uint32_t cl[MAX_PROBES + 1];
+    uint32_t cum[MAX_PROBES + 2];
+};
+
+// Prepare the warp's row `hg` (head `h`, batch site `g`): its classes and their runs' offsets, and return the
+// support's length in entries. Called by every lane of the warp.
+__device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg, const uint32_t *off, RowCls &rc, uint32_t lane) {
+    __syncwarp();
+    if (lane == 0) {
+        const uint32_t pstride = ((uint32_t)1 << w.ctrits) - 1;
+        const uint32_t probes = w.pn[hg];
+        rc.nc = 1 + probes;
+        rc.cl[0] = w.cls[hg];
+        for (uint32_t k = 0; k < probes; k++) {
+            rc.cl[1 + k] = w.pcls[hg * pstride + k];
+        }
+        uint32_t at = 0;
+        rc.cum[0] = 0;
+        for (uint32_t q = 0; q < rc.nc; q++) {
+            at += off[2 * rc.cl[q] + 1] - off[2 * rc.cl[q]];
+            rc.cum[q + 1] = at;
+        }
+    }
+    __syncwarp();
+    return NEAR_SLOTS + rc.cum[rc.nc];
+}
+
+// Site `i`'s support entry `k` of its region: the near field first (`k < NEAR_SLOTS`, the `NEAR − 1` places
+// before and after it, nearest first), then the DEFINITE runs of its own class and its probed classes past
+// the near field. Returns the source's place, or `UINT32_MAX` where the entry meets no site (a near place
+// outside the region, or a member inside the near field).
+__device__ __forceinline__ uint32_t support_at(const uint32_t *members, const uint32_t *off, const RowCls &rc, uint32_t i, uint32_t sites, uint32_t k) {
     if (k < NEAR_SLOTS) {
         const uint32_t d = k / 2 + 1;
         if (k % 2 == 0) {
@@ -1043,25 +1149,36 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
         }
         return i + d < sites ? i + d : UINT32_MAX;
     }
-    const uint32_t j = members[off[2 * c] + k - NEAR_SLOTS];
+    const uint32_t e = k - NEAR_SLOTS;
+    uint32_t q = 0;
+    while (e >= rc.cum[q + 1]) {
+        q++;
+    }
+    const uint32_t j = members[off[2 * rc.cl[q]] + (e - rc.cum[q])];
     const uint32_t gap = j > i ? j - i : i - j;
     return gap >= NEAR ? j : UINT32_MAX;
 }
 
-// A site's support length in entries (`NEAR_SLOTS` near places and the definite run of its class).
-__device__ __forceinline__ uint32_t support_len(const uint32_t *off, uint32_t c) {
-    return NEAR_SLOTS + off[2 * c + 1] - off[2 * c];
-}
-
 // Source `j`'s receiver entry `k`: the near field, and where `j` is definite every member of its class
-// past the near field (the support is directional: `j ∈ S_i` exactly when `j` is near `i`, or definite in
-// `i`'s class).
-__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
-    return support_at(members, off, c, j, sites, k);
+// past the near field and every receiver that probes its class (the support is directional: `j ∈ S_i`
+// exactly when `j` is near `i`, or definite in `i`'s class or in one `i` probes).
+__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, const uint32_t *pmem, const uint32_t *poff, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
+    if (k < NEAR_SLOTS) {
+        const uint32_t d = k / 2 + 1;
+        if (k % 2 == 0) {
+            return j >= d ? j - d : UINT32_MAX;
+        }
+        return j + d < sites ? j + d : UINT32_MAX;
+    }
+    const uint32_t e = k - NEAR_SLOTS;
+    const uint32_t own = off[2 * c + 2] - off[2 * c];
+    const uint32_t i = e < own ? members[off[2 * c] + e] : pmem[poff[c] + (e - own)];
+    const uint32_t gap = j > i ? j - i : i - j;
+    return gap >= NEAR ? i : UINT32_MAX;
 }
 
-__device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, uint32_t c, bool definite) {
-    return NEAR_SLOTS + (definite ? off[2 * c + 2] - off[2 * c] : 0);
+__device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, const uint32_t *poff, uint32_t c, bool definite) {
+    return NEAR_SLOTS + (definite ? off[2 * c + 2] - off[2 * c] + poff[c + 1] - poff[c] : 0);
 }
 
 // Receiver `i`'s crowd `slot` in a region of `sites` (the host's `crowd_ranges`, §14.10): octave
@@ -1171,6 +1288,17 @@ __device__ __forceinline__ wide lock_of(wide a0, wide a1, wide b0, wide b1, wide
     return result;
 }
 
+// [agent-inferred, November 1] **A source site's lock, the words on 32 bits** (`lock_of` with `count = 1`): the
+// contact's words are the unit words `field_unit` fits to 32 bits (`fit32`, refused past them), so each
+// product of two is below `2^62`, a pairing or a power below `2^63`, the skin `D ≤ 2^30`, the grain
+// `g ≤ 30`, and `pairing · 2D · 2^g < 2^125`, `power · D² < 2^123` stand inside the 128-bit carrier: none of
+// `lock_of`'s checks can fail, and the value is the same integer, formed from 64-bit products.
+__device__ __forceinline__ wide lock_pair(int64_t a0, int64_t a1, int64_t b0, int64_t b1, uint64_t decay, uint32_t grain) {
+    const wide pairing = (wide)(a0 * b0) + (wide)(a1 * b1);
+    const wide power = (wide)(b0 * b0) + (wide)(b1 * b1);
+    return ((pairing * (wide)(2 * decay)) << grain) - power * (wide)(decay * decay);
+}
+
 // The head's score of the word `wi` (at unit power, its `span` reals) against site `j`'s across `gap`
 // sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
 // `score_bits + 2g + 1` bits, less the falloff `⌊log₂ gap⌋` bits on `2^(−16)` (§2.5, §12, §15.2).
@@ -1178,7 +1306,7 @@ __device__ __forceinline__ int64_t pair_score(const FieldWords &w, uint32_t h, c
     const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
-        const wide lk = lock_of(wi[l], wi[w.n + l], wj[l], wj[w.n + l], 1, decay_raw(w, h, l, gap), g, w.status);
+        const wide lk = lock_pair(wi[l], wi[w.n + l], wj[l], wj[w.n + l], (uint64_t)decay_raw(w, h, l, gap), g);
         if (!add_fits(s, lk, &s)) {
             atomicOr(w.status, REFUSED_CARRIER);
         }
@@ -1227,7 +1355,8 @@ __device__ __forceinline__ wide parts_sum(wide v, uint32_t span, uint32_t parts)
 // `amin[h][t]`, and the spread `a − a_0` the row holds, raised into `bits[1]`; the host reads the
 // launch's widest row and launches the contact with the carrier it needs.
 extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(FieldWords w) {
-    const uint32_t lane = threadIdx.x & 31;
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, classes = w.nclasses;
     const uint64_t rows = (uint64_t)w.H * w.T;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
@@ -1240,18 +1369,23 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(F
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
-        const uint32_t K = support_len(off, c);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *wi = words + (uint64_t)i * S;
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = crowd_slots(sites);
+        // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
+        // them there (a score is computed once; the entries outside the support are never read).
+        uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t amin = INT64_MAX, amax = INT64_MIN;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, c, i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j != UINT32_MAX) {
-                const int64_t a = pair_score(w, h, wi, words + (uint64_t)j * S, j > i ? j - i : i - j) >> FACE_BITS;
+                const int64_t z = pair_score(w, h, wi, words + (uint64_t)j * S, j > i ? j - i : i - j);
+                erow[j] = (uint64_t)z;
+                const int64_t a = z >> FACE_BITS;
                 amin = a < amin ? a : amin;
                 amax = a > amax ? a : amax;
             }
@@ -1294,6 +1428,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
     __shared__ uint32_t stj[CONTACT_ROWS][32], sts[CONTACT_ROWS][32];
     __shared__ uint64_t st0[CONTACT_ROWS][32], st1[CONTACT_ROWS][32], st2[CONTACT_ROWS][32];
     __shared__ uint32_t crlo[CONTACT_ROWS][32], crhi[CONTACT_ROWS][32], crlv[CONTACT_ROWS][32];
+    __shared__ RowCls rcs[CONTACT_ROWS];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const uint32_t parts = span_parts(S);
@@ -1310,7 +1445,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
-        const uint32_t K = support_len(off, c);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *wi = words + (uint64_t)i * S;
@@ -1364,11 +1499,12 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         };
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, c, i, sites, k) : UINT32_MAX;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
             Coef cf = {0, 0, 0};
             uint32_t s = 0;
             if (j != UINT32_MAX) {
-                const int64_t z = pair_score(w, h, wi, words + (uint64_t)j * S, j > i ? j - i : i - j);
+                // The score the exposure kept (a pair's score is computed once).
+                const int64_t z = (int64_t)erow[j];
                 int64_t a;
                 uint64_t face;
                 term_of(w, z, &a, &face);
@@ -1380,9 +1516,6 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 }
                 cf = coef_of(face, (uwide)1 << WEIGHT_BITS);
                 big_add(M, big_shl(big_of<L>(cf), s));
-                if (store) {
-                    erow[j] = (uint64_t)z;
-                }
                 met += 1;
             }
             st0[warp][lane] = cf.c0;
@@ -1472,7 +1605,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         // Pass three: each term's share of the row's mass, once, a lane a term.
         if (store) {
             for (uint32_t k = lane; k < K; k += 32) {
-                const uint32_t j = support_at(members, off, c, i, sites, k);
+                const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
                 if (j != UINT32_MAX) {
                     int64_t a;
                     uint64_t face;
@@ -1706,7 +1839,8 @@ extern "C" __global__ void field_moment_strand_return_all(FieldWords w, uint64_t
 // sources, `p_ji^(t−1)` read at the previous tick's dense address (zero where `i` was not in `j`'s row),
 // added into `trips[i]` over the heads. One warp a head and a receiving site.
 extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_echo_trips(FieldWords w) {
-    const uint32_t lane = threadIdx.x & 31;
+    __shared__ RowCls rcs[CONTACT_ROWS];
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t classes = w.nclasses;
     const uint64_t rows = (uint64_t)w.H * w.T;
     for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
@@ -1718,11 +1852,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_echo_trips
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
-        const uint32_t K = support_len(off, c);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const uint64_t base = (uint64_t)h * w.E + w.region_eoff[r];
         uwide sum = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, c, i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j != UINT32_MAX) {
                 const uwide p = w.e[base + (uint64_t)i * sites + j], back = w.e_prev[base + (uint64_t)j * sites + i];
                 sum += (p * back + ((uwide)1 << (SHARE_BITS - 1))) >> SHARE_BITS;
@@ -1937,6 +2071,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
     __shared__ uint64_t cnts[REV_ROWS][32];
     __shared__ uint32_t crlo[REV_ROWS][32], crhi[REV_ROWS][32], crlv[REV_ROWS][32];
     __shared__ Divisor cdiv[REV_ROWS][32], cdiv2[REV_ROWS][32];
+    __shared__ RowCls rcs[REV_ROWS];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const uint32_t parts = span_parts(S);
@@ -1955,7 +2090,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
-        const uint32_t K = support_len(off, c);
+        const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *dyi = dyh + hg * S;
@@ -2001,7 +2136,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
         // Pass A: the weighted sum of the pairs' and crowds' covectors, and the holders' share.
         wide weighted = 0, held = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, c, i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j == UINT32_MAX) {
                 continue;
             }
@@ -2040,12 +2175,12 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
         wide sum = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, c, i, sites, k) : UINT32_MAX;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
                 wide dz = gained(compare((wide)e[j], pair_dp(j, gap), holds(j)), w.beta, w.status);
-                if ((dz < 0 ? -dz : dz) >> w.dsbits != 0) {
+                if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
                 dsv = (int64_t)dz;
@@ -2068,7 +2203,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
         // returns through the difference arrays.
         if (cnts[warp][lane] != 0) {
             const wide dz = gained(compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane], false), w.beta, w.status);
-            if ((dz < 0 ? -dz : dz) >> w.dsbits != 0) {
+            if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                 atomicOr(w.status, REFUSED_CARRIER);
             }
             dsks[warp][lane] = (int64_t)dz;
@@ -2085,7 +2220,13 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
                 const wide dsk = dsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 sum += div_nearest_by(dsk * d * wsum, cdiv[warp][jj]);
-                const wide pw = div_nearest_by(dsk * (((d * (wide)words[(uint64_t)i * S + entry] * (wide)count) << g0) - d * d * wsum), cdiv2[warp][jj]);
+                // The key's bracket released by the skin's bits once, its product by the covector checked.
+                const wide bracket = rel(((d * (wide)words[(uint64_t)i * S + entry] * (wide)count) << g0) - d * d * wsum, g0);
+                wide prod = 0;
+                if (!mul_fits(dsk, bracket, &prod)) {
+                    atomicOr(w.status, REFUSED_KEY);
+                }
+                const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
                 const wide pv = div_nearest_by((wide)w.ce[hg * w.slots + jj] * carried(w, h, m, (uint32_t)1 << lv, dyi[entry]), cdiv[warp][jj]);
@@ -2124,7 +2265,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[(uint64_t)h * w.T + g];
-        const uint32_t K = receiver_len(off, c, definite_site(w, g));
+        const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
+        const uint32_t *pmem = w.pmem + (uint64_t)h * w.T * (((uint32_t)1 << w.ctrits) - 1) + first * (((uint32_t)1 << w.ctrits) - 1);
+        const uint32_t K = receiver_len(off, poff, c, definite_site(w, g));
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
         const int64_t *dsc = ds + w.region_eoff[r] + j;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
@@ -2132,14 +2275,15 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         wide sk = 0, sv = 0;
         if (part < parts) {
             for (uint32_t k = part; k < K; k += parts) {
-                const uint32_t i = receiver_at(members, off, c, j, sites, k);
+                const uint32_t i = receiver_at(members, off, pmem, poff, c, j, sites, k);
                 if (i == UINT32_MAX) {
                     continue;
                 }
                 const uint64_t at = (uint64_t)i * sites;
                 const uint32_t gap = j > i ? j - i : i - j;
                 const wide dec = decay_raw(w, h, m, gap);
-                sk += (wide)dsc[at] * (((dec * (wide)words[(uint64_t)i * S + entry]) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry]);
+                // The key's bracket released by the skin's bits once (the probe's grain), then by the covector.
+                sk += (wide)dsc[at] * rel(((dec * (wide)words[(uint64_t)i * S + entry]) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry], g0);
                 sv += (wide)e[at] * carried(w, h, m, gap, dyr[(uint64_t)i * S + entry]);
             }
         }
@@ -2148,7 +2292,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         if (lane < S) {
             const uint32_t mc = h * n + lane % n;
             const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
-            dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0 + g0), w.status);
+            dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0), w.status);
             dv[slot] = fit64(rel(sv, SHARE_BITS), w.status);
         }
     }
@@ -2173,7 +2317,7 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
             if (definite_site(w, first + t)) {
                 const uint32_t m = h * w.n + x % w.n;
                 const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
-                dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + g0 + g0), w.status);
+                dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + g0), w.status);
                 dv[slot] = fit64((wide)dv[slot] + rel(runv, SHARE_BITS), w.status);
             }
         }
