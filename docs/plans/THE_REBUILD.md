@@ -88,6 +88,13 @@ S6, and source phase and a useful output come before cold restore.
   committed change, on 0279
   ([the medium-of-joints record](../../research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md)
   §7).
+- **November 2: Athena's comparison and readings come before its next run**
+  ([the review](../../research/records/2026-11-02_THE_COMPARISON_IS_THE_COUPLINGS_FREE_ENERGY_THE_QUESTION_IS_READ_BY_A_JOINT_CODE_AND_THE_RELEASE_RUNS_THE_TRAINING_CLOCK_BACKWARDS.md)).
+  Within step 8 (#404) the order is #602 (the weighted joint code and the question's information as
+  a series), then #601 (the coupling comparison on host and card, its witness, then the run under the
+  review's §5), with #603 (the library put on the learner's path or retired) beside them on disjoint
+  owners. The review's §4 advises against the pending 90-minute run: its mark reads the copier's
+  channel.
 
 #### U0. Consolidate (no new law) — carried out September 28
 

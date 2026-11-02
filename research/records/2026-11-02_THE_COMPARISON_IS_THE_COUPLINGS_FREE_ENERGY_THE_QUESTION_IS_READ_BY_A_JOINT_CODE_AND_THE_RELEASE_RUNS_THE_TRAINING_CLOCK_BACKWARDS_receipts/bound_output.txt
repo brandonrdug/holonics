@@ -1,0 +1,12 @@
+held-out problems 1495  answer bytes 432270
+class            share   bits/byte(class)  contribution to the all-byte mean
+  restated_digit   0.1480    2.4239           0.3586
+  restated_word    0.3085    0.7164           0.2210
+  glue             0.3121    0.4481           0.1399
+  qonly_word       0.1164    0.8543           0.0994
+  new_word         0.1011    0.4918           0.0497
+  new_digit        0.0080    2.5064           0.0200
+  qonly_digit      0.0060    2.5296           0.0151
+  all              1.0000    0.9038
+  qonly+new contribution  0.1843 bits per answer byte
+exit 0 ms 27793
