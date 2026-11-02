@@ -29,13 +29,13 @@
 //!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   w_t = W r̂_t + b_w,   v_t = V r̂_t + b_v       one word a head: q = k
 //! classes    B_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of w_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
-//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j : |i − j| ≥ 6, B_h(j) = B_h(i), j definite }   only plates radiate far
+//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j far, definite : B_h(j) ∈ {B_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
 //! frame      w̃_t = U_t ⊙ w_t,   ṽ_t = U_t ⊙ v_t                                complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
 //! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(w̃_im) w̃_jm) − D_m² |w̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
-//! weights    e_ij = 2^(z_ij − max_(j∈S_i) z_ij),  zero outside S_i^h           the Gibbs face, in bits
-//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij,   x ← x + O y + b_o
+//! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
+//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
 //! ```
@@ -229,18 +229,16 @@ impl FieldDeclaration {
         (usize::BITS - self.reach.saturating_sub(1).leading_zeros()).max(1) as usize
     }
 
-    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff, a mode at a
-    /// time** (the dispersing field's §2.5 and §15.2): each mode keeps its own row, scored by its lock
-    /// ([`lock`]), whose value at an equal word is half the mode's power, `|ŵ_m|²/2`, which a head's word
-    /// at unit power over its `2n` reals holds at `1` on the mean over its `n` modes; an equal word at the
-    /// farthest reach pays `⌊log₂ reach⌋` bits of falloff and must still outweigh the rest of its support
-    /// together, at most another `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must
-    /// amplify, with `2^(−β) ≥ 2⌈log₂ reach⌉`: `−5` at reading 8's reach of 2,221 (a mode of mean power
-    /// locks its equal at 32 bits; the falloff at the reach is 11). What it bounds is the mean mode's
-    /// peak: a louder mode is heard sharper, a silent one is near flat over its support. A turned mode
-    /// carries the lock by its skin decay, so its far counterparts are heard more faintly by design
-    /// (§12). Why the mode's own row (§15.2): the head's sum over its modes was one number a pair, so one
-    /// mode's agreement could not be heard apart from the rest.
+    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff** (the
+    /// dispersing field's §2.5 and §15.2): the head's row is scored by its modes' locks ([`lock`]),
+    /// whose sum at an equal word is half the word's power, `Σ_m |ŵ_m|²/2 = n` at unit power over its
+    /// `2n` reals; an equal word at the farthest reach pays `⌊log₂ reach⌋` bits of falloff and must still
+    /// outweigh the rest of its support together, at most another `⌈log₂ reach⌉` bits. `β` is the
+    /// largest shift, negative where it must amplify, with `2^(−β) n ≥ 2⌈log₂ reach⌉`: `−2` at reading
+    /// 8's declaration (`n = 8`, reach 2,221: an equal word locks at 32 bits; the falloff at the reach is
+    /// 11). What it bounds is the peak, not the gaps: near-equal words share its weight, a plural fibre
+    /// the closure reads as one class. A turned head carries the lock by its skin decay, so its far
+    /// counterparts are heard more faintly by design (§12).
     pub fn score_shift(&self) -> i32 {
         let (reals, need) = (self.modes as u128, 2 * self.reach_bits() as u128);
         let mut beta = 0i32;
@@ -723,16 +721,24 @@ impl ClassLists {
         self
     }
 
-    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1): its near field
-    /// (`0 < |i − j| < NEAR`, nearest first, before then after) and the definite members of its class
-    /// past the near field (in ascending place), each site once. The support is directional: `j` is
-    /// heard far by every class-mate where `j` is definite, and by none where it is not.
+    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.9): its near
+    /// field (`0 < |i − j| < NEAR`, nearest first, before then after) and, past it, the definite sites
+    /// it hears sharply, each site once: a definite receiver the definite members of its class and of
+    /// the classes it probes across its seams, an open receiver (not definite) every definite site. The
+    /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
-        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied());
+        let open = !self.definite[i];
+        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
-        near.chain(far)
+        let listened = (0..sites).filter(move |&j| open && self.definite[j] && j.abs_diff(i) >= NEAR);
+        near.chain(far).chain(listened)
+    }
+
+    /// Whether receiver `i` listens to every definite site (it is open, §15.9).
+    pub fn listens(&self, i: usize) -> bool {
+        !self.definite[i]
     }
 }
 
@@ -814,7 +820,7 @@ fn decayed((decay, grain): (i128, u32), v: i64) -> i128 {
 }
 
 /// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
-/// §14.11; a row a mode, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
+/// §14.11; one row a head, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
 /// its multiplier on `2^(−62)`: `2^62` in the near field, a far source's weight, a crowd's count `· 2^62`
 /// in the mass with `2^62` against its value sum) keeps its own exponent; the terms are summed whole,
 /// shifted from the row's least exponent, in a carrier as wide as the row's own exponents need (never
@@ -1445,7 +1451,8 @@ impl Field {
                 // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
                 // term is its decayed value sum, its mass term `|C|` times its face.
                 let mut crowds: Vec<Crowd> = Vec::new();
-                for (lo, hi_, level) in crowd_ranges(i, sites) {
+                // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
+                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|_| !lists.listens(i)) {
                     let count = sums.count(lo, hi_);
                     if count == 0 {
                         continue;

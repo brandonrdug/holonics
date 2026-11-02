@@ -762,6 +762,33 @@ def release_calculations(release):
     return out
 
 
+def release_written(release):
+    """Each calculation of a release (as release_calculations reads them) as (operands, exact value
+    of its expression, its written result)."""
+    rules = _written_rules()
+    text = release.split(b"\n\n")[0].decode("utf-8", "replace")
+    out = []
+    for expression, c in rules.CALC.findall(text):
+        exact, written = rules.value(expression), rules.number(c)
+        if exact is None or written is None:
+            continue
+        out.append(([Fraction(t) for t in re.findall(r"\d*\.\d+|\d+", expression)], exact, written))
+    return out
+
+
+def computed_of(release, numbers):
+    """(right, of) of one release beside the claim (record §15.5): of its calculations with an operand
+    among `numbers` (its own question's numbers), how many write their expression's exact value at the
+    equals. A reading, not a bar: it shows whether a release computes with the numbers it takes,
+    which the claim, reading operands alone, does not witness."""
+    right = total = 0
+    for operands, exact, written in release_written(release):
+        if any(o in numbers for o in operands):
+            total += 1
+            right += exact == written
+    return right, total
+
+
 def claim_of(original, variant, record):
     """(taken, of) of one variant: `original` and `variant` are the calculations' operands of the
     two releases (release_calculations), `record` the variant's line of the sidecar."""
@@ -815,8 +842,11 @@ def read_claim(originals, variants, roles, orig_dir, var_dir):
         before = release_calculations(originals_out[p])
         after = release_calculations(variants_out[n])
         taken, total = claim_of(before, after, record)
+        right_v, of_v = computed_of(variants_out[n], set(new.values()))
+        right_o, of_o = computed_of(originals_out[p], set(new.keys()))
         per.append({"problem": p, "variant": record["variant"], "taken": taken, "of": total,
                     "calculations_original": len(before), "calculations_variant": len(after),
+                    "computed_variant": (right_v, of_v), "computed_original": (right_o, of_o),
                     "n": n})
     return len({row["problem"] for row in per}), per, held, made, originals_out, variants_out
 
@@ -859,6 +889,13 @@ def claim_main(argv):
     print(f"VARIANTS_CLAIM taken={taken} of={total} share_millionths={share} problems={problems} "
           f"calculations_original={sum(first.values())} "
           f"calculations_variant={sum(r['calculations_variant'] for r in per)}")
+    originals_once = {}
+    for r in per:
+        originals_once.setdefault(r["problem"], r["computed_original"])
+    print(f"VARIANTS_COMPUTED variant_right={sum(r['computed_variant'][0] for r in per)} "
+          f"variant_of={sum(r['computed_variant'][1] for r in per)} "
+          f"original_right={sum(c[0] for c in originals_once.values())} "
+          f"original_of={sum(c[1] for c in originals_once.values())}")
     for r in per:
         print(f"VARIANTS_CLAIM_PROBLEM index={r['problem']} variant={r['variant']} "
               f"taken={r['taken']} of={r['of']}")

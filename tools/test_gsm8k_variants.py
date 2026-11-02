@@ -462,7 +462,8 @@ class Claim(ClaimFixture):
         self.assertEqual(
             lines[0], "VARIANTS_CLAIM taken=7 of=12 share_millionths=583333 problems=2 "
                       "calculations_original=4 calculations_variant=5")
-        self.assertEqual(lines[1:], [
+        self.assertEqual(lines[1], "VARIANTS_COMPUTED variant_right=4 variant_of=4 original_right=3 original_of=3")
+        self.assertEqual(lines[2:], [
             "VARIANTS_CLAIM_PROBLEM index=0 variant=0 taken=2 of=2",
             "VARIANTS_CLAIM_PROBLEM index=0 variant=1 taken=1 of=2",
             "VARIANTS_CLAIM_PROBLEM index=1 variant=0 taken=2 of=4",
@@ -541,6 +542,14 @@ class Show(ClaimFixture):
     def test_the_report_is_refused_outside_a_local_directory(self):
         with self.assertRaises(SystemExit):
             self.run_show(self.path("report.txt"))
+
+
+class ComputedReading(unittest.TestCase):
+    def test_computed_counts_right_calculations_with_the_question_numbers(self):
+        release = b"a <<3+4=7>>7 then <<7*2=15>>15 then <<5*5=25>>25\n\nrest"
+        self.assertEqual(g.computed_of(release, {Fraction(3), Fraction(7)}), (1, 2))
+        self.assertEqual(g.computed_of(release, {Fraction(5)}), (1, 1))
+        self.assertEqual(g.computed_of(release, set()), (0, 0))
 
 
 if __name__ == "__main__":
