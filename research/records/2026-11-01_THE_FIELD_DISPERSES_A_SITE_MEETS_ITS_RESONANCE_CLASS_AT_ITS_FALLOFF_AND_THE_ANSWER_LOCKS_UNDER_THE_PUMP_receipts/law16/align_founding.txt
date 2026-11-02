@@ -1,0 +1,8 @@
+FIELD_ALIGN_FOUNDING pace_and_word_covector_nonzero=1024
+FIELD_ALIGN_READ regions=24 sites=8549 ms=173
+FIELD_ALIGN_PACE head=2 digit_sites=259 other_sites=6478 mean_digits=0 mean_others=0 gap_millionths_of_rms=0
+FIELD_ALIGN_PACE head=3 digit_sites=259 other_sites=6478 mean_digits=0 mean_others=0 gap_millionths_of_rms=0
+FIELD_ALIGN_ANCHOR head=2 mode=5 anchors=24 opposing=192 near_silent=6196 aligned=90 silent_driven_to_oppose=0 silent_driven_to_align=0 digit_sources=246
+FIELD_ALIGN_ANCHOR head=3 mode=5 anchors=24 opposing=138 near_silent=6258 aligned=82 silent_driven_to_oppose=0 silent_driven_to_align=0 digit_sources=246
+FIELD_ALIGN_DONE ms=191
+MEASURE lap=align rc=0 wall_s=0.6 peak_rss_kib=254292

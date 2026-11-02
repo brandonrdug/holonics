@@ -419,6 +419,16 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         }
     }
     let next = if learner.holds_step() {
+        // [measurement; agent-inferred, November 2] With `FIELD_HELD_KINDS`, the held step is also read on each kind of
+        // region alone, on clones (the training-shaped and the front-shaped), so a refusal is read by the kind that
+        // refused it (`FIELD_HELD_KINDS change=…/…`); the step that stands is the joint read's, as without it.
+        if std::env::var_os("FIELD_HELD_KINDS").is_some() {
+            let mut by = |regions: &[TrainRegion]| -> Result<String> {
+                let mut probe = learner.clone();
+                Ok(probe.read_step_on(&views_of(regions), realization).map_err(|e| e.to_string())?.1.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused)))
+            };
+            println!("FIELD_HELD_KINDS training={} fronts={}", by(&firsts)?, by(&held_fronts)?);
+        }
         let held: Vec<TrainRegion> = firsts.iter().cloned().chain(held_fronts).collect();
         learner.read_step_on(&views_of(&held), realization).map_err(|e| e.to_string())?.1
     } else {
@@ -823,6 +833,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
     held_rows_text(&learner.field, &codec, &dev_set, realization, -1)?;
+    let founding_gaps = pace_text(&learner.field, &codec, &dev_set, -1)?;
     // The withheld problems' code after the lap before (at the opening, before any lap).
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
@@ -908,6 +919,20 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
         held_rows_text(&learner.field, &codec, &dev_set, realization, lap as i64)?;
+        let gaps = pace_text(&learner.field, &codec, &dev_set, lap as i64)?;
+        // [agent-inferred, November 2; fixed with the run's declaration] **The early stop** (§16): after nine laps, a run
+        // whose paced heads' clocks have not moved toward a digit clock (no head's gap `κ̄ at digits − κ̄ inside words`
+        // above its founding's) and whose held question effect is at or below the foil's stops, and is reported
+        // incomplete with its clocks by lap. Why: the founding's route to the clock was weak and could not say why
+        // (§16.10); nine laps that move neither the clock nor the question's effect read the obstacle.
+        let effect = (held[6].0 as i128 * held[3].1 as i128) - (held[3].0 as i128 * held[6].1 as i128);
+        if lap + 1 >= EARLY_STOP_LAPS && !gaps.iter().any(|&(h, g)| founding_gaps.iter().any(|&(fh, fg)| fh == h && g > fg)) && effect <= 0 {
+            println!("FIELD_STOPPED_EARLY lap={lap} reason=no clock moved toward a digit clock and the question tells the answer no more than the foil ms={}", started.elapsed().as_millis());
+            break;
+        }
+        if std::env::var_os("FIELD_PEAKS_EACH_LAP").is_some() {
+            peaks_text(&learner.field, &codec, &dev_set, realization, &lap.to_string())?;
+        }
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.
@@ -932,6 +957,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     }
     Ok(())
 }
+
+/// The laps after which the early stop reads the clocks and the question's effect (§16).
+const EARLY_STOP_LAPS: usize = 9;
 
 /// What a lap's withheld read decides of the body's width ([`growth`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1519,6 +1547,42 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 2] **How far each paced head's clock is from a digit clock** (§16): over the
+/// held problems' regions (the question and its answer, every site definite), the mean rate `κ` at the digits and at
+/// the sites inside words (a letter after a letter), in millionths of a tick, by head (`FIELD_PACE`). A digit clock
+/// reads one and zero. Material arithmetic only (the rate reads the opening face).
+fn pace_text(field: &Field, codec: &FieldCodec, problems: &Problems, lap: i64) -> Result<Vec<(usize, i128)>> {
+    let d = field.declaration;
+    let mut acc: std::collections::BTreeMap<usize, (i128, u64, i128, u64)> = std::collections::BTreeMap::new();
+    for (q, a, _) in problems.iter().take(32) {
+        let classes: Vec<usize> = q.iter().chain(a).copied().collect();
+        let open = vec![false; classes.len()];
+        let region = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
+        let bytes = codec.decode(&classes);
+        for (h, kappa) in field.pace_rates(&region).map_err(|e| e.to_string())? {
+            let e = acc.entry(h).or_default();
+            for (t, &k) in kappa.iter().enumerate() {
+                let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
+                if codec.is_digit(classes[t]) {
+                    e.0 += k as i128;
+                    e.1 += 1;
+                } else if t > 0 && letter(t) && letter(t - 1) {
+                    e.2 += k as i128;
+                    e.3 += 1;
+                }
+            }
+        }
+    }
+    let _ = d;
+    let mut gaps = Vec::new();
+    for (h, (sd, nd, sw, nw)) in acc {
+        let mean = |s: i128, n: u64| (s * 1_000_000 >> 24) / n.max(1) as i128;
+        println!("FIELD_PACE lap={lap} head={h} digits={nd} kappa_digits={} inside_words={nw} kappa_inside_words={} gap={}", mean(sd, nd), mean(sw, nw), mean(sd, nd) - mean(sw, nw));
+        gaps.push((h, mean(sd, nd) - mean(sw, nw)));
+    }
+    Ok(gaps)
+}
+
 /// [measurement; agent-inferred, November 2] **The held answer rows' concentration on the question, over rested
 /// learners** (`peaks-field CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA STATE STATE_SHA [STATE STATE_SHA …]`):
 /// for each state, read through the declared realization with no deposit, the held problems' context regions
@@ -1529,6 +1593,74 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
 /// as that operand). Each with its chance (`*_flat`, the share a row spread evenly over the question would put
 /// there). Then each head's temperatures (`FIELD_TEMPER`, on `2^(−24)`). Millionths and bits are the reading's
 /// chart. A reading only: nothing is deposited and no state is written.
+/// [measurement; agent-inferred, November 2] **The copy's rows at the release's fronts** (§16): for each held problem and
+/// each digit of its first calculation's two operands (`<<a+b=`), the front region (the question and the answer before
+/// the digit definite, the digit and every later site open through the answer's first void) read by
+/// [`FieldRealization::read_row_peaks`], the digit's own row per tick and head: whether its largest question share is
+/// on the same digit of the question's number (`top_site_right`), its share of the question (`top_share`), its spread
+/// in thousandths of a bit (`spread_bits`, flat `flat_bits`), and whether its top is a digit (`top_digit`), in
+/// millionths of the rows (`FIELD_PEAKS_OPERAND`). A reading only.
+fn peaks_text(field: &Field, codec: &FieldCodec, held: &Problems, realization: &mut dyn FieldRealization, lap: &str) -> Result<()> {
+    let started = std::time::Instant::now();
+    let d = field.declaration;
+    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
+    // Each operand digit's front: (classes, open, question length, receiver, right source).
+    let mut reads: Vec<(Vec<usize>, Vec<bool>, usize, usize, usize)> = Vec::new();
+    for (q, a, _) in held {
+        let (qb, ab) = (codec.decode(q), codec.decode(a));
+        let runs: Vec<(usize, usize)> = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).map(|t| (t, qb[t..].iter().take_while(|b| b.is_ascii_digit()).count())).collect();
+        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+        let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
+        if runs.len() < 2 || la == 0 || lb == 0 || runs[0].1 != la || runs[1].1 != lb {
+            continue;
+        }
+        let digits: Vec<(usize, usize)> = (0..la).map(|k| (open + 2 + k, runs[0].0 + k)).chain((0..lb).map(|k| (open + 3 + la + k, runs[1].0 + k))).collect();
+        for (offset, source) in digits {
+            let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
+            classes.push(codec.void());
+            let at = q.len() + offset;
+            let open_sites: Vec<bool> = (0..classes.len()).map(|t| t >= at).collect();
+            reads.push((classes, open_sites, q.len(), at, source));
+        }
+    }
+    // [tick · heads + head]: rows, Σ top/question (millionths), Σ spread (thousandths of a bit), Σ flat, Σ top a digit,
+    // Σ top the right site.
+    let mut acc = vec![[0i128; 6]; d.ticks * d.heads];
+    for chunk in reads.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(c, u, _, _, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+        let questions: Vec<usize> = chunk.iter().map(|r| r.2).collect();
+        let peaks = realization.read_row_peaks(field, &views, &questions, &digit).map_err(|e| e.to_string())?;
+        let mut rows = peaks.iter();
+        for (classes, open, question, at, source) in chunk {
+            let count = open.iter().filter(|&&u| u).count();
+            for _ in 0..d.ticks * d.heads * count {
+                let peak = rows.next().ok_or("a read's peaks that are fewer than its rows")?;
+                if peak.site as usize != *at {
+                    continue;
+                }
+                let cell = &mut acc[peak.tick as usize * d.heads + peak.head as usize];
+                let qm = peak.question;
+                cell[0] += 1;
+                cell[1] += if qm == 0 { 0 } else { (peak.top as u128 * 1_000_000 / qm) as i128 };
+                cell[2] += if peak.collision == 0 { 0 } else { (2 * log2_milli(qm) - log2_milli(peak.collision) - 63_000) as i128 };
+                cell[3] += log2_milli(*question as u128) as i128;
+                cell[4] += i128::from(peak.top_site != u32::MAX && digit[classes[peak.top_site as usize]]);
+                cell[5] += i128::from(peak.top_site as usize == *source);
+            }
+        }
+    }
+    for tick in 0..d.ticks {
+        for head in 0..d.heads {
+            let a = acc[tick * d.heads + head];
+            let rows = a[0].max(1);
+            println!("FIELD_PEAKS_OPERAND lap={lap} tick={tick} head={head} rows={} top_share={} spread_millibits={} flat_millibits={} top_digit={} top_site_right={}", a[0], a[1] / rows, a[2] / rows, a[3] / rows, a[4] * 1_000_000 / rows, a[5] * 1_000_000 / rows);
+        }
+    }
+    println!("FIELD_PEAKS_READ lap={lap} reads={} ms={}", reads.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 pub(super) fn peaks_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() < 9 || (args.len() - 7) % 2 != 0 {
         return Err("peaks-field CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA STATE STATE_SHA [STATE STATE_SHA ...]".into());
@@ -1547,101 +1679,374 @@ pub(super) fn peaks_field(args: &[String], realization: &mut dyn FieldRealizatio
         .into_iter()
         .filter(|(_, a, _)| a.len() < codec.answer)
         .collect();
-    let regions = held_regions(&codec, &held);
-    let n = held.len();
-    let parts: Vec<(Vec<usize>, Vec<bool>)> = regions.iter().skip(n).take(n * CONTEXT).map(|(c, u, _)| (c.clone(), u.clone())).collect();
-    let questions: Vec<usize> = held.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
-    // Each answer site's role: its target's class, and where its operand digit's right source is.
-    let mut operand: Vec<std::collections::BTreeMap<usize, usize>> = Vec::with_capacity(n);
-    for (q, a, _) in &held {
-        let (qb, ab) = (codec.decode(q), codec.decode(a));
-        let mut at = std::collections::BTreeMap::new();
-        if let Some(open) = ab.windows(2).position(|w| w == b"<<") {
-            let digits = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
-            let text = &ab[open + 2..open + 2 + digits];
-            let runs: Vec<usize> = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).collect();
-            if let Some(&start) = runs.iter().find(|&&s| qb[s..].iter().take_while(|b| b.is_ascii_digit()).count() == digits && &qb[s..s + digits] == text) {
-                for k in 0..digits {
-                    at.insert(q.len() + open + 2 + k, start + k);
-                }
-            }
-        }
-        operand.push(at);
-    }
-    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
-    println!("FIELD_PEAKS_READ problems={n} regions={} operand_sites={}", parts.len(), operand.iter().map(|m| m.len()).sum::<usize>());
     for pair in args[7..].chunks(2) {
         let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&pair[0], &pair[1], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-        let field = &learner.field;
         let lap = Path::new(&pair[0]).extension().and_then(|e| e.to_str()).unwrap_or("-").to_string();
-        let d = field.declaration;
-        // [set][tick · heads + head]: rows, Σ top/question, Σ spread, Σ flat spread, Σ top-is-digit, Σ digit share,
-        // Σ digit flat, Σ top class right, Σ right share, Σ right flat, Σ top site right.
-        let mut acc = vec![[0i128; 11]; 3 * d.ticks * d.heads];
-        let views: Vec<Region> = parts.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
-        let read_start = std::time::Instant::now();
-        for (k, (chunk, asks)) in views.chunks(64).zip(questions.chunks(64)).enumerate() {
-            let peaks = realization.read_row_peaks(field, chunk, asks, &digit).map_err(|e| e.to_string())?;
-            let mut rows = peaks.iter();
-            for (r, region) in chunk.iter().enumerate() {
-                let problem = (k * 64 + r) / CONTEXT;
-                let question = asks[r];
-                let qc = &region.classes[..question];
-                let open = region.unresolved.iter().filter(|&&u| u).count();
-                for _ in 0..d.ticks * d.heads * open {
-                    let peak = rows.next().ok_or("a held read's peaks that are fewer than its rows")?;
-                    let i = peak.site as usize;
-                    let own = region.classes[i];
-                    let cell = peak.tick as usize * d.heads + peak.head as usize;
-                    let q = peak.question;
-                    let ratio = |a: u128, b: u128| if b == 0 { 0 } else { (a * 1_000_000 / b) as i128 };
-                    let flat_right = ratio(qc.iter().filter(|&&c| c == own).count() as u128, question.max(1) as u128);
-                    let flat_digit = ratio(qc.iter().filter(|&&c| digit[c]).count() as u128, question.max(1) as u128);
-                    let top_class = (peak.top_site != u32::MAX).then(|| region.classes[peak.top_site as usize]);
-                    let row = [
-                        1,
-                        ratio(peak.top as u128, q),
-                        if peak.collision > 0 { (2 * log2_milli(q) - log2_milli(peak.collision) - 63_000) as i128 } else { 0 },
-                        log2_milli(question.max(1) as u128) as i128,
-                        i128::from(top_class.is_some_and(|c| digit[c])),
-                        ratio(peak.digits, q),
-                        flat_digit,
-                        i128::from(top_class == Some(own)),
-                        ratio(peak.right, q),
-                        flat_right,
-                        i128::from(operand[problem].get(&i) == Some(&(peak.top_site as usize))),
-                    ];
-                    let sets = [true, digit[own], operand[problem].contains_key(&i)];
-                    for (set, &inside) in sets.iter().enumerate() {
-                        if inside {
-                            for (a, v) in acc[set * d.ticks * d.heads + cell].iter_mut().zip(row) {
-                                *a += v;
-                            }
-                        }
-                    }
-                }
-            }
+        peaks_text(&learner.field, &codec, &held, realization, &lap)?;
+        for head in 0..learner.field.declaration.heads {
+            println!("FIELD_TEMPER lap={lap} head={head} class={} listen={}", learner.field.temper(head, false), learner.field.temper(head, true));
         }
-        let read_ms = read_start.elapsed().as_millis();
-        // Means over a set's rows: shares in millionths (the flags as millionths of rows), bits in thousandths.
-        let m = |v: i128, rows: i128, flag: bool| (if flag { v * 1_000_000 } else { v }) / rows.max(1);
-        let b = |v: i128, rows: i128| { let x = v / rows.max(1); format!("{}{}.{:03}", if x < 0 { "-" } else { "" }, x.abs() / 1000, x.abs() % 1000) };
-        for (set, name) in ["FIELD_PEAKS", "FIELD_PEAKS_DIGIT", "FIELD_PEAKS_OPERAND"].iter().enumerate() {
-            for tick in 0..d.ticks {
-                for head in 0..d.heads {
-                    let a = acc[set * d.ticks * d.heads + tick * d.heads + head];
-                    println!(
-                        "{name} lap={lap} tick={tick} head={head} rows={} top_share={} spread_bits={} flat_bits={} top_digit={} digit_share={} digit_flat={} top_class_right={} right_share={} right_flat={} top_site_right={}",
-                        a[0], m(a[1], a[0], false), b(a[2], a[0]), b(a[3], a[0]), m(a[4], a[0], true), m(a[5], a[0], false), m(a[6], a[0], false), m(a[7], a[0], true), m(a[8], a[0], false), m(a[9], a[0], false), m(a[10], a[0], true)
-                    );
-                }
-            }
-        }
-        for head in 0..d.heads {
-            println!("FIELD_TEMPER lap={lap} head={head} class={} listen={} width={} heads={}", field.temper(head, false), field.temper(head, true), d.width, d.heads);
-        }
-        println!("FIELD_PEAKS_LAP lap={lap} read_ms={read_ms} ms={}", started.elapsed().as_millis());
+        println!("FIELD_PEAKS_LAP lap={lap} ms={}", started.elapsed().as_millis());
     }
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 2] **The founding's route to the clock and the anchor** (`align-field UNITS
+/// UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION`, §16): the learner founded as
+/// `train-field` founds it, its first section's regions drawn as its first lap draws them, read and returned once
+/// through the declared realization (no deposit), then two readings of that covector against the material:
+/// - `FIELD_ALIGN_PACE`: each paced head's rate change along the descent at digits against elsewhere (a digit clock's
+///   route lowers the others' against the digits': `gap = mean elsewhere − mean at digits < 0`, in millionths of the
+///   change's root mean square);
+/// - `FIELD_ALIGN_ANCHOR`: at each region's first operand digit after `<<`, each paced head's period-81 mode, the
+///   definite non-digit keys against that site's probe ([`Field::anchor_census`]): opposing, near-silent, aligned, and
+///   the near-silent ones the descent drives to oppose or to align.
+pub(super) fn align(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 16 {
+        return Err("align-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA D H n STILL f K SECTION".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let dev_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let (width, heads, modes, still, contacts, ticks) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?, count(&args[12])?, positive(&args[13])?, positive(&args[14])?);
+    let section = positive(&args[15])?;
+    let train_problems = problems_of(&train_text);
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&problems_of(&dev_text))?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
+    let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, clocks: clocks_of(heads, still) };
+    let mut learner = FieldLearner::new(Field::found(declaration, &keys).map_err(|e| e.to_string())?, 8);
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let (sections, _) = sections_of(&train_set, section, dev_set.len(), seed);
+    let first = walk(seed, 0, sections.len())[0];
+    let mut draw = 0u64;
+    let (regions, _) = section_regions(&codec, &train_set, &sections[first], seed, &mut draw, &mut learner, realization)?;
+    let mut views = views_of(&regions);
+    let (_, mut g) = realization.read_and_return(&learner.field, &views).map_err(|e| e.to_string())?;
+    let founding_nonzero = g[learner.field.layout().pace..].iter().filter(|&&v| v != 0).count() + g[learner.field.layout().q..learner.field.layout().q_bias].iter().filter(|&&v| v != 0).count();
+    println!("FIELD_ALIGN_FOUNDING pace_and_word_covector_nonzero={founding_nonzero}");
+    // [agent-inferred, November 2] The founding holds the readout at zero, so no covector reaches the word charts or
+    // the paces until the readout moves; with `AFTER_FIRST=1` the run's own first section is deposited (nothing is
+    // saved) and the read is of the second section's covector, the first that reaches them.
+    let regions_next;
+    if std::env::var_os("AFTER_FIRST").is_some() {
+        learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+        let second = walk(seed, 0, sections.len())[1];
+        regions_next = section_regions(&codec, &train_set, &sections[second], seed, &mut draw, &mut learner, realization)?.0;
+        views = views_of(&regions_next);
+        g = realization.read_and_return(&learner.field, &views).map_err(|e| e.to_string())?.1;
+        println!("FIELD_ALIGN_AFTER_FIRST pace_and_word_covector_nonzero={}", g[learner.field.layout().pace..].iter().filter(|&&v| v != 0).count() + g[learner.field.layout().q..learner.field.layout().q_bias].iter().filter(|&&v| v != 0).count());
+    }
+    let field = &learner.field;
+    let d = field.declaration;
+    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
+    let lt = codec.encode(b"<").map_err(|e| e.to_string())?[0];
+    println!("FIELD_ALIGN_READ regions={} sites={} ms={}", views.len(), views.iter().map(|r| r.classes.len()).sum::<usize>(), started.elapsed().as_millis());
+    let mut route: std::collections::BTreeMap<usize, (u64, u64, i128, i128, i128)> = std::collections::BTreeMap::new();
+    for r in &views {
+        for (h, nd, no, sd, so, sq) in field.pace_route(r, &g, &digit).map_err(|e| e.to_string())? {
+            let e = route.entry(h).or_default();
+            e.0 += nd;
+            e.1 += no;
+            e.2 += sd;
+            e.3 += so;
+            e.4 += sq;
+        }
+    }
+    for (h, (nd, no, sd, so, sq)) in route {
+        let rms = ((sq / (nd + no).max(1) as i128).max(1) as u128).isqrt() as i128;
+        let (md, mo) = (sd / nd.max(1) as i128, so / no.max(1) as i128);
+        println!("FIELD_ALIGN_PACE head={h} digit_sites={nd} other_sites={no} mean_digits={md} mean_others={mo} gap_millionths_of_rms={}", (mo - md) * 1_000_000 / rms);
+    }
+    for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+        let Some(l) = (0..d.modes).find(|&l| field.rings()[l * (d.frames - d.still) + h % d.frames - d.still].0 == 81) else { continue };
+        let mut total = [0u64; 6];
+        let mut anchors = 0u64;
+        for r in &views {
+            let Some(t) = (0..r.classes.len().saturating_sub(2)).find(|&t| r.classes[t] == lt && r.classes[t + 1] == lt) else { continue };
+            let a0 = t + 2;
+            if a0 >= r.classes.len() || !digit[r.classes[a0]] {
+                continue;
+            }
+            anchors += 1;
+            for (acc, v) in total.iter_mut().zip(field.anchor_census(r, a0, h, l, &digit, &g).map_err(|e| e.to_string())?) {
+                *acc += v;
+            }
+        }
+        println!("FIELD_ALIGN_ANCHOR head={h} mode={l} anchors={anchors} opposing={} near_silent={} aligned={} silent_driven_to_oppose={} silent_driven_to_align={} digit_sources={}", total[0], total[1], total[2], total[3], total[4], total[5]);
+    }
+    println!("FIELD_ALIGN_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [agent-inferred, November 2] **The §16 witness on the crib's codec, completed with a readout** (a reading's
+/// fixture, never a learner's): tests.rs's hand-set clock and copy on the crib declaration, and the copy's current
+/// carrying the source digit's identity `e^(2πi d/10)` on head 3's coarsest mode (period 729, which turns little over
+/// the clock distances the copy reads), written to the face's dimensions 20 and 21 and read by the readout, so the
+/// code at an operand digit falls when the copy holds. Returns the field and the witness's parts: the clock's entries
+/// (the pace rows) and the readers' (the word and probe charts and their biases).
+fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) -> Result<Field> {
+    let mut field = Field::found(declaration, keys).map_err(|e| e.to_string())?;
+    field.theta.iter_mut().for_each(|v| *v = 0);
+    let d = declaration;
+    let (dw, n, m) = (d.width, d.modes, d.complex());
+    let m2 = 2 * m;
+    let l = field.layout().clone();
+    let alphabet = codec.alphabet();
+    let face_one = 1i64 << 16;
+    let one = 1i64 << 24;
+    let lt = codec.encode(b"<").map_err(|e| e.to_string())?[0];
+    // A turn of `num/den` (the clock's grain, to the nearest point of `2^(−24)`).
+    let face = |field: &Field, num: i128, den: i128| field.turn_face(((num << 25) / den + (num << 25).signum()) / 2, 1);
+    let times = |g: i64, part: i64| ((g as i128 * part as i128 + (1 << 29)) >> 30) as i64;
+    let root = |k: u128| ((k << 48).isqrt()) as i64;
+    let set = |field: &mut Field, at: usize, v: i64| -> Result<()> {
+        field.theta[at] = i32::try_from(v).map_err(|_| "a witness entry outside 32 bits")?;
+        Ok(())
+    };
+    for c in 0..=alphabet {
+        let digit = c < alphabet && codec.is_digit(c);
+        set(&mut field, l.enc + c * dw + usize::from(digit), face_one)?;
+        if c == alphabet {
+            set(&mut field, l.enc + c * dw + 4, face_one)?;
+        }
+        if digit {
+            let value = codec.decode(&[c])[0] - b'0';
+            let (re, im) = face(&field, value as i128, 10);
+            set(&mut field, l.enc + c * dw + 7, re >> 14)?;
+            set(&mut field, l.enc + c * dw + 8, im >> 14)?;
+        }
+        set(&mut field, l.before + c * dw + if c == lt { 3 } else { 5 }, face_one)?;
+        set(&mut field, l.after + c * dw + 6, face_one)?;
+    }
+    // Head 3 (pace 1): the digit clock.
+    set(&mut field, l.pace + dw, -one)?;
+    let turned = |field: &mut Field, chart: usize, c: usize, from: (usize, usize), g: i64, theta: (i64, i64)| -> Result<()> {
+        let (gc, gs) = (times(g, theta.0), times(g, theta.1));
+        set(field, chart + c * dw + from.0, gc)?;
+        set(field, chart + c * dw + from.1, -gs)?;
+        set(field, chart + (m + c) * dw + from.0, gs)?;
+        set(field, chart + (m + c) * dw + from.1, gc)
+    };
+    let psi = face(&field, -27, 100);
+    let anchor = 64 * one;
+    let (c16, c32, c81, c729, c0, c1) = (3 * n + 3, 3 * n + 4, 3 * n + 5, 3 * n + 7, 0usize, 1usize);
+    set(&mut field, l.q + c16 * dw + 1, root(3))?;
+    set(&mut field, l.q + c32 * dw + 1, root(12))?;
+    set(&mut field, l.q + c81 * dw + 1, one)?;
+    set(&mut field, l.q + c81 * dw + 3, times(anchor / 2, psi.0))?;
+    set(&mut field, l.q + c81 * dw, times(-anchor, psi.0))?;
+    set(&mut field, l.q + (m + c81) * dw + 3, times(anchor / 2, psi.1))?;
+    set(&mut field, l.q + (m + c81) * dw, times(-anchor, psi.1))?;
+    set(&mut field, l.probe + c81 * dw + 3, times(anchor, psi.0))?;
+    set(&mut field, l.probe + (m + c81) * dw + 3, times(anchor, psi.1))?;
+    let (f2, fm2) = (face(&field, 2, 25), face(&field, -2, 25));
+    turned(&mut field, l.probe, c16, (12, 13), one, f2)?;
+    turned(&mut field, l.probe, c32, (16, 17), one, fm2)?;
+    set(&mut field, l.v + c16 * dw + 1, one)?;
+    set(&mut field, l.v + c32 * dw + 1, one)?;
+    set(&mut field, l.v + c729 * dw + 7, one)?;
+    set(&mut field, l.v + (m + c729) * dw + 8, one)?;
+    set(&mut field, l.out + 10 * m2 + c16, 64 * one)?;
+    set(&mut field, l.out + 11 * m2 + m + c16, 64 * one)?;
+    set(&mut field, l.out + 14 * m2 + c32, 32 * one)?;
+    set(&mut field, l.out + 15 * m2 + m + c32, 32 * one)?;
+    set(&mut field, l.out + 20 * m2 + c729, 16 * one)?;
+    set(&mut field, l.out + 21 * m2 + m + c729, 16 * one)?;
+    set(&mut field, l.q + c0 * dw + 1, one)?;
+    set(&mut field, l.q + (m + c0) * dw + 3, one)?;
+    set(&mut field, l.probe_bias + c0, face_one)?;
+    set(&mut field, l.probe_bias + m + c0, face_one)?;
+    for (c, from, to) in [(c0, (10usize, 11usize), (12usize, 13usize)), (c1, (14, 15), (16, 17))] {
+        set(&mut field, l.v + c * dw + from.0, one)?;
+        set(&mut field, l.v + (m + c) * dw + from.1, one)?;
+        set(&mut field, l.out + to.0 * m2 + c, one)?;
+        set(&mut field, l.out + to.1 * m2 + m + c, one)?;
+    }
+    // The readout: a digit class reads the identity's turn at its own value, a non-digit is held down.
+    for c in 0..alphabet {
+        if codec.is_digit(c) {
+            let value = codec.decode(&[c])[0] - b'0';
+            let (re, im) = face(&field, value as i128, 10);
+            set(&mut field, l.read + c * dw + 20, times(32 * one, re))?;
+            set(&mut field, l.read + c * dw + 21, times(32 * one, im))?;
+        } else {
+            set(&mut field, l.read_bias + c, -32 * face_one)?;
+        }
+    }
+    // The temperature the card's row carrier holds (`FIELD_WITNESS_HOT`, 32 by default: at tests.rs's 127 a row's
+    // exponents span past the card's twenty limbs).
+    let hot = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(32) * one;
+    set(&mut field, l.temper + 2 * 3, hot)?;
+    set(&mut field, l.temper + 2 * 3 + 1, hot)?;
+    set(&mut field, l.temper + 1, hot)?;
+    Ok(field)
+}
+
+/// `⟨a, b⟩ / (|a| |b|)` in millionths over the entries `range` (exact integer sums, a reading's chart).
+fn cosine(a: &[i128], b: &[i128]) -> i128 {
+    use num_bigint::BigInt;
+    let dot = a.iter().zip(b).fold(BigInt::from(0), |s, (&x, &y)| s + BigInt::from(x) * BigInt::from(y));
+    let na = a.iter().fold(BigInt::from(0), |s, &x| s + BigInt::from(x) * BigInt::from(x));
+    let nb = b.iter().fold(BigInt::from(0), |s, &x| s + BigInt::from(x) * BigInt::from(x));
+    let den = (na * nb).sqrt();
+    if den == BigInt::from(0) {
+        return 0;
+    }
+    i128::try_from((dot * BigInt::from(1_000_000)) / den).unwrap_or(0)
+}
+
+/// [measurement; agent-inferred, November 2] **Whether descent couples the clock and its readers** (`witness-field
+/// UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA K`, §16.10): the witness completed with a readout
+/// ([`witness_on`]) on the crib declaration at `K` ticks, read at every first-calculation operand digit of the held
+/// problems, each a front cut at the digit (the digit the region's last site, open), the faces' covector (no closure)
+/// off the declared realization: the witness's code there beside the founding's, then (i) the readers kept and the
+/// clock zeroed, (ii) the clock kept and the readers the founding's, (iii) the witness moved a small keyed step on
+/// both; each reported as the descent's cosine with the way to the witness, in millionths.
+pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 10 {
+        return Err("witness-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA K".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let train_text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let dev_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
+    let ticks = positive(&args[9])?;
+    let train_problems = problems_of(&train_text);
+    let codec = FieldCodec::found(units, &train_problems)?;
+    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
+        problems.iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
+    };
+    let train_set = encode(&train_problems)?;
+    let dev_set: Problems = encode(&problems_of(&dev_text))?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
+    let declaration = FieldDeclaration { alphabet: codec.alphabet(), width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: clocks_of(5, 2) };
+    let witness = witness_on(&codec, declaration, &keys)?;
+    let founding = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
+    // The reads: each operand digit's front cut at the digit.
+    let mut reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for (q, a, _) in &dev_set {
+        let (qb, ab) = (codec.decode(q), codec.decode(a));
+        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+        let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
+        let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
+        if runs < 2 || la == 0 || lb == 0 {
+            continue;
+        }
+        for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
+            let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
+            let mut unresolved = vec![false; classes.len()];
+            *unresolved.last_mut().unwrap() = true;
+            reads.push((classes, unresolved));
+        }
+    }
+    let views: Vec<Region> = reads.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+    let covector = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(i64, Vec<i128>)> {
+        let mut g = vec![0i128; field.theta.len()];
+        let mut code = 0i64;
+        for chunk in views.chunks(64) {
+            let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
+            for (region, faces) in chunk.iter().zip(&faces) {
+                let last = region.classes.len() - 1;
+                if let Some(face) = &faces[last] {
+                    code += face.code(region.classes[last]);
+                }
+            }
+            for (acc, v) in g.iter_mut().zip(part) {
+                *acc += v;
+            }
+        }
+        Ok((code, g))
+    };
+    let l = witness.layout().clone();
+    let (dw, m) = (declaration.width, declaration.complex());
+    let pace3 = l.pace + dw..l.pace + 2 * dw;
+    let readers: Vec<std::ops::Range<usize>> = vec![l.q..l.q + 2 * m * dw, l.q_bias..l.q_bias + 2 * m, l.probe..l.probe + 2 * m * dw, l.probe_bias..l.probe_bias + 2 * m];
+    let gather = |v: &[i128], ranges: &[std::ops::Range<usize>]| -> Vec<i128> { ranges.iter().flat_map(|r| v[r.clone()].iter().copied()).collect() };
+    let theta = |f: &Field| -> Vec<i128> { f.theta.iter().map(|&x| x as i128).collect() };
+    let (code_w, _) = covector(&witness, realization)?;
+    let (code_f, _) = covector(&founding, realization)?;
+    let sites = views.len().max(1) as i128;
+    let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
+    println!("FIELD_WITNESS_READ operand_digits={} witness_code_bits={} founding_code_bits={} ms={}", views.len(), bits(code_w), bits(code_f), started.elapsed().as_millis());
+    // (i) the readers kept, the clock zeroed.
+    let mut no_clock = witness.clone();
+    no_clock.theta[l.pace..].iter_mut().for_each(|v| *v = 0);
+    let (_, g1) = covector(&no_clock, realization)?;
+    let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
+    let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
+    let mut route: (i128, u64, i128, u64, i128) = (0, 0, 0, 0, 0);
+    for region in &views {
+        let bytes = codec.decode(region.classes);
+        let x0 = no_clock.opening(region).map_err(|e| e.to_string())?;
+        for t in 0..region.classes.len() - 1 {
+            let dk: i128 = descent1.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&gc, &x)| (gc * x as i128) >> 16).sum();
+            route.4 += dk * dk;
+            let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
+            if codec.is_digit(region.classes[t]) {
+                route.0 += dk;
+                route.1 += 1;
+            } else if t > 0 && letter(t) && letter(t - 1) {
+                route.2 += dk;
+                route.3 += 1;
+            }
+        }
+    }
+    let rms = ((route.4 / (route.1 + route.3).max(1) as i128).max(1) as u128).isqrt() as i128;
+    let gap = (route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * 1_000_000 / rms;
+    println!("FIELD_WITNESS_CLOCK head=3 cosine_to_witness={} gap_digits_less_inside_words_of_rms={gap}", cosine(&descent1, &toward1));
+    // (ii) the clock kept, the readers the founding's.
+    let mut no_readers = witness.clone();
+    for r in &readers {
+        no_readers.theta[r.clone()].copy_from_slice(&founding.theta[r.clone()]);
+    }
+    let (_, g2) = covector(&no_readers, realization)?;
+    for h in [0usize, 3] {
+        let n = declaration.modes;
+        let rows: Vec<std::ops::Range<usize>> = (0..n).flat_map(|li| [h * n + li, m + h * n + li]).flat_map(|o| [l.q + o * dw..l.q + (o + 1) * dw, l.q_bias + o..l.q_bias + o + 1, l.probe + o * dw..l.probe + (o + 1) * dw, l.probe_bias + o..l.probe_bias + o + 1]).collect();
+        let descent: Vec<i128> = gather(&g2, &rows).into_iter().map(|v| -v).collect();
+        let toward: Vec<i128> = gather(&theta(&witness), &rows).iter().zip(gather(&theta(&founding), &rows)).map(|(&w, f)| w - f).collect();
+        println!("FIELD_WITNESS_READERS head={h} cosine_to_witness={}", cosine(&descent, &toward));
+    }
+    let lt = codec.encode(b"<").map_err(|e| e.to_string())?[0];
+    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
+    let mut census = [0u64; 6];
+    for region in &views {
+        let Some(t) = (0..region.classes.len().saturating_sub(2)).find(|&t| region.classes[t] == lt && region.classes[t + 1] == lt) else { continue };
+        if t + 2 >= region.classes.len() {
+            continue;
+        }
+        for (acc, v) in census.iter_mut().zip(no_readers.anchor_census(region, t + 2, 3, 5, &digit, &g2).map_err(|e| e.to_string())?) {
+            *acc += v;
+        }
+    }
+    println!("FIELD_WITNESS_ANCHOR head=3 opposing={} near_silent={} aligned={} silent_driven_to_oppose={} silent_driven_to_align={} digit_sources={}", census[0], census[1], census[2], census[3], census[4], census[5]);
+    // (iii) the witness moved a small keyed step on the clock and the readers.
+    let mut moved = witness.clone();
+    let mut step = vec![0i128; witness.theta.len()];
+    let entries: Vec<usize> = std::iter::once(pace3.clone()).chain(readers.iter().cloned()).flatten().collect();
+    let tail = keys.len().saturating_sub(4 * entries.len() + 8);
+    for (k, &at) in entries.iter().enumerate() {
+        let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+        // A step of about one part in 2^10 of the material's unit (`2^14` on `2^(−24)`), signed by the key.
+        let delta = (i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 18) as i128;
+        moved.theta[at] = i32::try_from(moved.theta[at] as i128 + delta).map_err(|_| "a moved entry outside 32 bits")?;
+        step[at] = delta;
+    }
+    let (code_m, g3) = covector(&moved, realization)?;
+    let ranges: Vec<std::ops::Range<usize>> = std::iter::once(pace3).chain(readers).collect();
+    let back: Vec<i128> = gather(&step, &ranges).into_iter().map(|v| -v).collect();
+    let descent3: Vec<i128> = gather(&g3, &ranges).into_iter().map(|v| -v).collect();
+    println!("FIELD_WITNESS_BASIN moved_code_bits={} cosine_back={}", bits(code_m), cosine(&descent3, &back));
+    println!("FIELD_WITNESS_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 

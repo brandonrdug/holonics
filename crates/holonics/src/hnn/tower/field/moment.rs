@@ -139,6 +139,9 @@ pub const RETURN_RELEASE_BITS: u32 = RETURN_BITS - COVECTOR_BITS;
 
 const CARRIER: &str = "a moment's term outgrew its 128-bit carrier";
 
+/// The l1 bound of a paced strand's faces (§16): a unit turn's face on `2^(−30)` has l1 at most `√2 (2^30 + 1)`.
+pub const PACED_L1: u128 = 1 << 31;
+
 fn carried(x: Option<i128>) -> Result<i128> {
     match x {
         Some(v) => Ok(v),
@@ -275,13 +278,10 @@ impl<'a> Law<'a> {
             if pace.tau.len() != sites || pace.sigma.len() != sites {
                 return refuse("a strand's clock that is not one a place");
             }
-            // Every face the paced strand reads: each place's own and each near difference's.
-            for t in 0..sites {
-                ring_l1 = ring_l1.max(l1((pace.turn)(pace.tau[t] as i128)));
-                for k in t.saturating_sub(NEAR - 1)..(t + NEAR).min(sites) {
-                    ring_l1 = ring_l1.max(l1((pace.turn)(pace.tau[k] as i128 - pace.tau[t] as i128)));
-                }
-            }
+            // [agent-inferred, November 2] Every face a paced strand reads is a unit turn's face on `2^(−30)`, whose
+            // l1 is at most `√2 (2^30 + 1) < 2^31`: the certificate reads that bound rather than the faces, so it
+            // stays a property of the slot alone (the card reads the same bound).
+            ring_l1 = ring_l1.max(PACED_L1);
         }
         let decay_max = decay[..sites].iter().map(|d| d.unsigned_abs() as u128).max().unwrap_or(0);
         Ok(Self { ring, n, decay, sites, ring_l1, decay_max, pace })

@@ -1379,6 +1379,140 @@ impl Field {
         (z >> FACE_BITS, self.exponential.below_one((z & ((1 << FACE_BITS) - 1)) as i128 - (1i128 << FACE_BITS)))
     }
 
+    /// [measurement] The rates of a region's paced heads (§16): their least and greatest `κ` on `2^(−24)`, a reading
+    /// for the receipts (`None` where the field reads no pace).
+    pub fn pace_range(&self, region: &Region) -> Result<Option<(i64, i64)>> {
+        self.admit_region(region)?;
+        let paces = self.paces(&self.open(region))?;
+        let all = paces.kappa.iter().flatten().copied();
+        Ok(all.clone().min().zip(all.max()))
+    }
+
+    /// [measurement; agent-inferred, November 2] **The founding's route to a clock** (§16): for each paced head, the
+    /// first-order change of its rate along the descent of a covector `g` (`Δκ_t = ⟨−δc_h, x⁰_t⟩`, the material's
+    /// covector grain times the face's released 16 bits), summed over the region's resolved sites by whether their class is a digit:
+    /// `(head, digit sites, other sites, Σ Δκ at digits, Σ Δκ elsewhere, Σ Δκ²)`. A digit clock's route lowers the
+    /// rate at the other sites against the digits'. A reading of the material and a returned covector only.
+    pub fn pace_route(&self, region: &Region, g: &[i128], digit: &[bool]) -> Result<Vec<(usize, u64, u64, i128, i128, i128)>> {
+        self.admit_region(region)?;
+        let d = &self.declaration;
+        let dw = d.width;
+        let x0 = self.open(region);
+        let mut out = Vec::new();
+        for (p, h) in (0..d.heads).filter(|&h| d.carries_moment(h)).enumerate() {
+            let row = &g[self.layout.pace + p * dw..self.layout.pace + (p + 1) * dw];
+            let (mut nd, mut no, mut sd, mut so, mut sq) = (0u64, 0u64, 0i128, 0i128, 0i128);
+            for t in (0..region.classes.len()).filter(|&t| !region.unresolved[t] && Self::carried(region, t).is_none()) {
+                let dk: i128 = -row.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&gc, &x)| release(gc * x as i128, 16)).sum::<i128>();
+                sq += dk * dk;
+                if digit.get(region.classes[t]).copied().unwrap_or(false) {
+                    nd += 1;
+                    sd += dk;
+                } else {
+                    no += 1;
+                    so += dk;
+                }
+            }
+            out.push((h, nd, no, sd, so, sq));
+        }
+        Ok(out)
+    }
+
+    /// [measurement; agent-inferred, November 2] **The anchor's mode at the founding** (§16.5's consequence for
+    /// learning): at tick 1, the anchor site `anchor`'s probe on head `h`'s local mode `l` (its listener chart where
+    /// it is open, its word where definite, framed and at unit power within its head) against every definite
+    /// non-digit source's key on that mode, each mode's lock `2D Re(conj(p) k̃) − D²|k̃|²` at the pair's skin;
+    /// classified against `ε`, the mean magnitude of the digit sources' locks (a decayed digit match): opposing
+    /// (`< −ε`), near-silent (`|s| ≤ ε`) or aligned (`> ε`); and for each the sign of the lock's first-order change
+    /// along the descent of `g` on the word chart's two rows of that mode (`< 0`: driven to oppose). Returns
+    /// `[opposing, silent, aligned, silent driven to oppose, silent driven to align, digits]`. A reading only.
+    pub fn anchor_census(&self, region: &Region, anchor: usize, h: usize, l: usize, digit: &[bool], g: &[i128]) -> Result<[u64; 6]> {
+        self.admit_region(region)?;
+        let d = &self.declaration;
+        let (dw, n, m) = (d.width, d.modes, d.complex());
+        let m2 = 2 * m;
+        let sites = region.classes.len();
+        let x0 = self.open(region);
+        let paces = self.paces(&x0)?;
+        let reads: Vec<Vec<i32>> = x0.chunks_exact(dw).map(|x| ratio_to_power(x).map(|r| r.0)).collect::<Result<_>>()?;
+        let reaches = self.reaches();
+        let word = |chart: usize, bias: usize, reach_c: u64, t: usize| -> Result<Vec<i64>> {
+            let mut out = vec![0i64; m2];
+            affine(&self.theta[chart..chart + m2 * dw], reach_c, dw, &reads[t], Some(&self.theta[bias..bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut out)?;
+            // The head's framed span at unit power.
+            let mut span = vec![0i64; 2 * n];
+            for li in 0..n {
+                let (ur, ui) = self.frame(&paces, t, 0, h, li);
+                let (qr, qi) = (out[h * n + li] as i128, out[m + h * n + li] as i128);
+                span[li] = fit64(release(ur as i128 * qr - ui as i128 * qi, MOVE_BITS))?;
+                span[n + li] = fit64(release(ui as i128 * qr + ur as i128 * qi, MOVE_BITS))?;
+            }
+            Ok(ratio_to_power(&span)?.0.into_iter().map(|v| v as i64).collect())
+        };
+        let open_anchor = region.unresolved[anchor];
+        let probe = if open_anchor { word(self.layout.probe, self.layout.probe_bias, reaches.probe, anchor)? } else { word(self.layout.q, self.layout.q_bias, reaches.q, anchor)? };
+        let (pr, pi) = (probe[l] as i128, probe[n + l] as i128);
+        let lock_at = |k: &[i64], j: usize| -> Result<i128> { lock((pr, pi), (k[l] as i128, k[n + l] as i128), 1, self.pair_decay(&paces, h, l, anchor, j)) };
+        let (mut digit_mag, mut digits) = (0i128, 0u64);
+        let mut others: Vec<(i128, i128)> = Vec::new();
+        for j in (0..sites).filter(|&j| j != anchor && Self::definite(region, j)) {
+            let k = word(self.layout.q, self.layout.q_bias, reaches.q, j)?;
+            let s_j = lock_at(&k, j)?;
+            if digit.get(region.classes[j]).copied().unwrap_or(false) {
+                digit_mag += s_j.abs();
+                digits += 1;
+                continue;
+            }
+            // The descent's change of this key on the mode's two rows (the first order, before the frame and the
+            // power: the frame is a turn and the sign of the pairing's change is read through it).
+            let rows = [h * n + l, m + h * n + l];
+            let dq: Vec<i128> = rows.iter().map(|&o| -(g[self.layout.q + o * dw..self.layout.q + (o + 1) * dw].iter().zip(&reads[j]).map(|(&gc, &r)| gc * r as i128).sum::<i128>() + g[self.layout.q_bias + o])).collect();
+            let (ur, ui) = self.frame(&paces, j, 0, h, l);
+            let (fr, fi) = (ur as i128 * dq[0] - ui as i128 * dq[1], ui as i128 * dq[0] + ur as i128 * dq[1]);
+            let change = (pr * (fr >> 30) + pi * (fi >> 30)).signum();
+            others.push((s_j, change));
+        }
+        let eps = if digits == 0 { 0 } else { digit_mag / digits as i128 };
+        let mut out = [0u64; 6];
+        for (s_j, change) in others {
+            if s_j < -eps {
+                out[0] += 1;
+            } else if s_j > eps {
+                out[2] += 1;
+            } else {
+                out[1] += 1;
+                out[3] += u64::from(change < 0);
+                out[4] += u64::from(change > 0);
+            }
+        }
+        out[5] = digits;
+        Ok(out)
+    }
+
+    /// [measurement] A region's opening faces `x⁰` (`[t][D]` on `2^(−16)`), a reading for the receipts.
+    pub fn opening(&self, region: &Region) -> Result<Vec<i64>> {
+        self.admit_region(region)?;
+        Ok(self.open(region))
+    }
+
+    /// [measurement] Each paced head's rates `κ` over a region on `2^(−24)` (§16), a reading for the receipts.
+    pub fn pace_rates(&self, region: &Region) -> Result<Vec<(usize, Vec<i64>)>> {
+        self.admit_region(region)?;
+        let paces = self.paces(&self.open(region))?;
+        Ok((0..self.declaration.heads).filter_map(|h| paces.row[h].map(|p| (h, paces.kappa[p].clone()))).collect())
+    }
+
+    /// The turn's face `e^(2πi ρ/n)` on `2^(−30)` at a clock `ρ` on `2^(−24)` ([`turn_phasor`]), for a reading's or a
+    /// fixture's hand-set charts.
+    pub fn turn_face(&self, rho: i128, n: usize) -> (i64, i64) {
+        turn_phasor(rho, n, self.pi)
+    }
+
+    /// The half turn on `2^(−46)`, the turn's faces' navigator (§16; the card reads it).
+    pub fn half_turn(&self) -> i128 {
+        self.pi
+    }
+
     /// `ln 2` on `2^(−30)`, the weights' return reads it.
     pub fn ln2(&self) -> i128 {
         ln2_face()

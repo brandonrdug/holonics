@@ -1,0 +1,14 @@
+== hot 32
+FIELD_WITNESS_READ operand_digits=515 witness_code_bits=36.334 founding_code_bits=5.459 ms=3408
+FIELD_WITNESS_CLOCK head=3 cosine_to_witness=-606611 gap_digits_less_inside_words_of_rms=-324711
+field_pass: tower realization refused: the card refused the field: a sum outgrew its 128-bit carrier
+MEASURE lap=witness rc=1 wall_s=7.8 peak_rss_kib=255748
+== hot 16
+FIELD_WITNESS_READ operand_digits=515 witness_code_bits=36.062 founding_code_bits=5.459 ms=2460
+FIELD_WITNESS_CLOCK head=3 cosine_to_witness=-567538 gap_digits_less_inside_words_of_rms=-21400013584727198000000
+FIELD_WITNESS_READERS head=0 cosine_to_witness=632
+FIELD_WITNESS_READERS head=3 cosine_to_witness=-6990
+FIELD_WITNESS_ANCHOR head=3 opposing=53823 near_silent=31929 aligned=75790 silent_driven_to_oppose=7707 silent_driven_to_align=24222 digit_sources=3294
+FIELD_WITNESS_BASIN moved_code_bits=24.646 cosine_back=33736
+FIELD_WITNESS_DONE ms=8023
+MEASURE lap=witness rc=0 wall_s=8.4 peak_rss_kib=256740

@@ -887,6 +887,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("release-field-text") => field_train::release_text(args, realization),
         Some("crib-terrain") => field_train::crib_terrain(args),
         Some("peaks-field") => field_train::peaks_field(args, realization),
+        Some("align-field") => field_train::align(args, realization),
+        Some("witness-field") => field_train::witness_field_cmd(args, realization),
         _ => Err("a realized field command is train-field, release-field, release-field-text, peaks-field or crib-terrain".into()),
     }
 }

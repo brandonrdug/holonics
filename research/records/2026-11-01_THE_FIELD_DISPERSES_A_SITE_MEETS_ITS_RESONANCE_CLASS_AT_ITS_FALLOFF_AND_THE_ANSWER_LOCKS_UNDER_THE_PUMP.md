@@ -1265,24 +1265,84 @@ learns it.
 lap 9 of 27 when its second growth came due. A second growth is now held and the laps go on at that width
 ([`growth`] in `field_train.rs`, with its test), so the run's workload is its laps.
 
-### 16.8 Where it stands
+### 16.8 The card realizes the clocks
 
-[measurement, November 2] Built on the host: the pace law, its covector, growth, the held step on fronts, the
-growth hold, `held_peaks` (host and card, bit-equal on every section the parity read: 8 at width 32, 4 at width
-64, both stopped by the smoke's 120 s guard before the withheld section), the witness and the pace's covector
-test. The card does not yet realize the pace: its frames and skins are the byte place's, so it is the founding's
-field bit for bit and its covector lacks `δc`. Before any run the card realizes the clocks (κ, τ, σ, the turn and
-skin series, the moments, `δτ`, `δσ`, `δc`), its parity is read at both widths, and the founding's covector is read
-against the witness's solution, head by head. Receipts: `_receipts/crib13` (the run, its ten states' reads) and
-`_receipts/law16` (the witness, the reading's parity).
+[definition; agent-inferred, November 2] `field.cu` realizes the pace bit for bit: the rates, clocks and variations
+as exact scans a region and head (`field_paces`), the frames at the clock by the turn's series (`field_pframes`,
+`turn_dev`), every pair's and crowd's skin from its variation (`skin_ij`, the resident decay at a whole variation
+and the series through the exponential's face between), the paced moments (admission at the faces' bound
+`PACED_L1 = 2^31`, the paced prefixes, the near terms at `ζ^(τ_k − τ_t) D(σ)`, the far return from the skinned
+prefixes), the moments' clock covector, and the frames', the current's and the skins' returns into `δτ` and `δσ`,
+then `δκ`, `δc` and `δx⁰`. A plain region reads the resident faces, so the founding is today's card bit for bit.
 
-### 16.9 Failures this could repeat
+[measurement, November 2] Parity, host against card (forward, covector, learner, the held rows, the peaks, the
+open return): at the founding's learning, 5 sections at width 32 (the withheld section and both releases
+included) and 4 at width 64, every one equal, the pace moving off zero from the second section (256 entries);
+with the pace drawn far from the founding (`FIELD_PARITY_PACE`), every section equal at both widths:
+
+| width | draw | κ | sections and withheld | releases |
+|---|---|---|---|---|
+| 32 | `>> 10` | −0.14 to 2.40 | equal | 2 of 2 equal |
+| 32 | `>> 8` | −3.55 to 6.61 | equal | 2 of 2 equal |
+| 64 | `>> 10` | −1.49 to 2.64 | equal | 2 of 2 equal |
+| 64 | `>> 8` | −8.97 to 7.57 | equal | not read (the 180 s guard) |
+
+### 16.9 The founding's route to the clock
+
+[measurement, November 2] At the founding the covector reaches neither the paces nor the paced heads' word rows:
+the readout is founded at zero, so no covector reaches a chart until the readout moves (`align-field`, card, crib13's
+declaration at `K = 3`). After the run's own first section (nothing saved), the second section's covector:
+
+| head | rate's route: gap (elsewhere − digits) / rms | anchor mode: opposing / near-silent / aligned | near-silent driven to oppose / align |
+|---|---|---|---|
+| 2 | −0.047 (weakly toward a digit clock) | 570 / 7429 / 465 | 3700 / 3729 |
+| 3 | +0.469 (away) | 593 / 7387 / 484 | 3784 / 3603 |
+
+The route exists on one head and is weak; the anchor's mode is near-silent for 88 % of the non-digit keys and the
+descent reaches them with no net drive. A clock helps only the charts that read its phase and those charts only
+help with a clock, so descent on either half alone may see little: whether descent couples the clock and its
+readers is read before any run (§16.10).
+
+### 16.10 Whether descent couples the clock and its readers
+
+[definition; agent-inferred, November 2; the coordinator's decision, fixed before the read] Three reads, no learning,
+the covectors off the card, on the witness completed with a readout (the copy's current carries the source digit's
+identity on its coarsest mode, which the readout reads, so the code at an operand digit falls when the copy holds):
+(i) the witness's readers with `c = 0`, the covector on `c` per paced head (its gap at digits against inside words,
+as a share of its root mean square, and its cosine with the witness's `c`); (ii) the witness's clock with the
+founding's readers, the covector on the readers (its cosine with the witness's less the founding's) and the anchor
+census's drive; (iii) the witness moved a small random step on `c` and the readers, the covector's cosine with the
+step's reverse. The run launches only if (i) and (ii) both pull toward the witness, a clear positive sign on at least
+one head each, and (iii) points back; otherwise the obstacle is this section's, and the next subject.
+
+[definition; agent-inferred, November 2; fixed into the run's declaration] **The early stop.** After nine laps, a run
+whose paced heads' clocks have not moved toward a digit clock (no head's gap `κ̄ at digits − κ̄ inside words` above
+its founding's) and whose held question effect is at or below the foil's stops, reported incomplete with its clocks
+by lap (`FIELD_PACE`, `FIELD_STOPPED_EARLY`).
+
+### 16.11 The diff read against itself
+
+[agent-inferred, November 2] Read adversarially before the run:
+- **The card's row carrier.** A contact row is carried on at most twenty limbs (1,280 bits); at the witness's
+  temperature of 127 a row's exponents span past it and the card refuses (at 32 a 128-bit sum overflows; at 16 it
+  reads). The host's bound is `row_bits`, about 4,100 bits at that temperature. A learned temperature that grows that
+  far would be refused on the card, not carried: a realization limit to widen at a declared crossing before
+  temperatures reach it (crib13's rose from 1.0 to 1.1 in ten laps).
+- **The skin's cost.** Off the plain pace a pair's skin is a series read through the exponential's face, one 128-bit
+  division a pair and mode: the parity's card time rose about 1.5 times at width 32.
+- **The founding's readout at zero** keeps every chart's and pace's covector at zero until the readout moves (§16.9).
+- **The paced certificate** reads the faces' l1 bound `2^31` in place of the faces, the same on both realizations.
+- **The readings on context parts** are mis-clocked under a digit clock; `FIELD_HELD` keeps them, labelled, and the
+  operand rows are read at fronts (`FIELD_PEAKS_OPERAND`).
+
+### 16.12 Failures this could repeat
 
 - An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
   digit, and the digit clock is a material row the deposition moves.
 - Text run on its codec's grain as the exception: the clock is the navigator's own; in sound it would tick at
   onsets, in images at edges, in motor at a gait's phase.
-- A located cause carried unrepaired: the context parts' mis-clock is repaired in the acceptance, not carried.
+- A located cause carried unrepaired: the acceptance no longer reads the mis-clocked context parts (it reads
+  fronts); the context read stays in the receipts, labelled with its mis-clock.
 - A refusal answered with a larger limit: `K = 3` follows from the law of §16.3, not from a raised budget.
 
 Owed to #410: the clock is additive over the strand's concatenation, `τ(uv) = τ(u) + τ(v)` shifted, a homomorphism to

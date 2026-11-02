@@ -188,6 +188,19 @@ struct Words {
     probe: u64,
     probe_bias: u64,
     rprobe: u64,
+    // The turned heads' own clocks (§16, `FieldWords`' tail, field for field).
+    paced: u32,
+    pace_at: u64,
+    pi_lo: u64,
+    pi_hi: u64,
+    kappa: u64,
+    tau: u64,
+    sigma: u64,
+    plain: u64,
+    pframe: u64,
+    gtau: u64,
+    gsig: u64,
+    cds: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -788,6 +801,10 @@ impl<'c> CardField<'c> {
             probe: l.probe as u64,
             probe_bias: l.probe_bias as u64,
             rprobe: reach(l.probe, m2 * dw),
+            paced: d.paced_heads() as u32,
+            pace_at: l.pace as u64,
+            pi_lo: field.half_turn() as u64,
+            pi_hi: (field.half_turn() >> 64) as u64,
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card.
@@ -1039,7 +1056,18 @@ impl<'c> CardField<'c> {
         // A listener's probe chart of the read, once a tick (§15.12), framed and put at unit power by head.
         let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
         words.pr = pr.device_ptr();
-        self.moments(field, words, regions.len(), sites)?;
+        // The turned heads' clocks (§16): their rates, clocks, variations and plainness `[p][t]`, `[p][r]`, and frames.
+        let paced = d.paced_heads();
+        let kappa = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
+        let tau = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
+        let sigma = self.timed(Kind::Alloc, || self.take::<i64>((paced * sites).max(1))).map_err(device)?;
+        let plain = self.timed(Kind::Alloc, || self.take::<u8>((paced * regions.len()).max(1))).map_err(device)?;
+        let pframe = self.timed(Kind::Alloc, || self.take::<i64>((2 * paced * sites * n).max(1))).map_err(device)?;
+        words.kappa = kappa.device_ptr();
+        words.tau = tau.device_ptr();
+        words.sigma = sigma.device_ptr();
+        words.plain = plain.device_ptr();
+        words.pframe = pframe.device_ptr();
         let set = |w: &mut Words, tick: &Tick| {
             w.qkv = tick.qkv.device_ptr();
             w.qf = tick.qf.device_ptr();
@@ -1072,6 +1100,12 @@ impl<'c> CardField<'c> {
         // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
         let buckets = 4 * 3 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
+        if paced > 0 {
+            let mut x0 = words.x;
+            self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words), arg(&mut x0)])?;
+            self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
+        }
+        self.moments(field, words, regions.len(), sites)?;
         self.mark("batch_setup");
         for k in 0..d.ticks {
             let tick = &ticks[if kept { k } else { 0 }];
@@ -1262,10 +1296,13 @@ impl<'c> CardField<'c> {
         let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
         let _ = n;
         self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
-        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
-        self.launch_grid("field_moment_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp), arg(&mut stride), arg(&mut pre_stride)])?;
+        // The paced kernels read a mode's region by the paced law where its pace is not plain, by the slot's own
+        // elsewhere (the same bits there, §16).
+        let mut fw = *words;
+        self.launch_grid("field_moment_admit_paced_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sp), arg(&mut stride), arg(&mut pre_stride)])?;
         self.launch("field_moment_scatter_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut sp), arg(&mut cmp), arg(&mut tm32)])?;
         let _ = &mut none;
         Ok(())
@@ -1380,6 +1417,16 @@ impl<'c> CardField<'c> {
         words.cw = cw.device_ptr();
         // The values' covector at the moment modes, summed over the ticks (§15.1).
         let dm = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+        // The clocks' covectors `[p][t]` (§16), the crowds' contact covectors the skins' return reads, and the probe
+        // chart's unframed read a tick (the frames' return turns it).
+        let paced = d.paced_heads();
+        let gtau = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+        let gsig = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+        let cds = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((heads * sites * words.slots as usize).max(1))).map_err(device)?;
+        let pr_back = alloc64(sites * m2)?;
+        words.gtau = gtau.device_ptr();
+        words.gsig = gsig.device_ptr();
+        words.cds = cds.device_ptr();
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -1435,6 +1482,10 @@ impl<'c> CardField<'c> {
             // first, then the columns', which adds the word's second role into the same slots.
             let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
             self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
+            if paced > 0 {
+                let (mut dyp, mut yp) = (dy.device_ptr(), tick.y.device_ptr());
+                self.launch("field_pace_current_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut yp)])?;
+            }
             card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
             for h in 0..heads {
                 // The crowds' difference arrays start empty a head (§14.10).
@@ -1442,6 +1493,11 @@ impl<'c> CardField<'c> {
                 card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
                 let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if self.closure.get() && field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
                 self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+                if d.carries_moment(h) {
+                    // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
+                    let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
+                    self.launch("field_pace_skin_back", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp)])?;
+                }
                 let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
                 self.launch("field_contact_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
                 let (mut hh, mut dqp, mut dvp) = (h as u32, dq.device_ptr(), dv.device_ptr());
@@ -1455,6 +1511,12 @@ impl<'c> CardField<'c> {
             for chart in [&dq, &dv, &dp] {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
+            }
+            if paced > 0 {
+                // The frames' return to the clocks (§16): the unframed word and value of the tick, its probe read again.
+                self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr_back.device_ptr(), m2, 0, false)?;
+                let (mut dqp, mut dvp, mut dpp, mut qkvp, mut prp) = (dq.device_ptr(), dv.device_ptr(), dp.device_ptr(), tick.qkv.device_ptr(), pr_back.device_ptr());
+                self.launch("field_pace_frame_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dqp), arg(&mut dvp), arg(&mut dpp), arg(&mut qkvp), arg(&mut prp)])?;
             }
             // The values' covector, summed over the ticks, for the moments (§15.1).
             let (mut dvp, mut dmp) = (dv.device_ptr(), dm.device_ptr());
@@ -1470,6 +1532,19 @@ impl<'c> CardField<'c> {
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks, through the
         // strands to the families (the host's `moments_return`).
         self.moments_return(field, words, g, &dm, regions, sites)?;
+        // The clocks return to their paces (§16): `δκ` by suffix sums, `δc += Σ x⁰ δκ`, `δx⁰ += release(c δκ, 24)`, the
+        // opening read again into scratch.
+        if paced > 0 {
+            let x0 = alloc64(sites * dw)?;
+            let mut w0 = *words;
+            w0.x = x0.device_ptr();
+            self.launch("field_open", Self::cells((sites * dw) as u64), THREADS, &mut [arg(&mut w0)])?;
+            let dkappa = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+            let (mut dkp, mut x0p, mut gp, mut dxp) = (dkappa.device_ptr(), x0.device_ptr(), g.device_ptr(), dx.device_ptr());
+            self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
+            self.launch("field_pace_c_back", Self::cells((paced * dw) as u64), THREADS, &mut [arg(words), arg(&mut x0p), arg(&mut dkp), arg(&mut gp)])?;
+            self.launch("field_pace_x_back", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dxp)])?;
+        }
         // The opening: each site's row of the encoding and its strand neighbours' rows of theirs (a
         // carried site's mixture by its shares), the entries partitioned by row once for each encoding
         // (a neighbour only within the site's region: the next site is the region's own when its place
@@ -1523,10 +1598,28 @@ impl<'c> CardField<'c> {
         let (mut one32, mut stride, mut pre_stride) = (1u32, strand, prefix);
         let grid = |x: usize| Dim3 { x: x.max(1) as u32, y: tm as u32, z: 1 };
         self.launch("field_moment_ds_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut dmp), arg(&mut cmp), arg(&mut tm32), arg(&mut dsp)])?;
-        self.launch_grid("field_moment_admit_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut none), arg(&mut stride), arg(&mut one32)])?;
-        self.launch_grid("field_moment_prefix_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
-        self.launch_grid("field_moment_return_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut dsp), arg(&mut qp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride)])?;
+        // The paced law where a mode's pace is not plain (§16): the admission with the faces' bound, the released
+        // prefix of the turned covector, each receiver's far octave at its own skin (the skinned prefixes), the return.
+        let mut fw = *words;
+        self.launch_grid("field_moment_admit_paced_all", grid(regions), MOMENT_BLOCK, 3 * MOMENT_BLOCK * 16, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut none), arg(&mut stride), arg(&mut one32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut stride), arg(&mut pre_stride), arg(&mut one32)])?;
+        let levels = (2u32..).take_while(|&lv| (1usize << lv) < d.reach).count() as u32;
+        let sk_stride = (2 * levels as usize * 2 * (sites + regions)) as u64;
+        let sk = self.timed(Kind::Alloc, || self.take::<i128>((tm * sk_stride as usize).max(1))).map_err(device)?;
+        let (mut skp, mut sk_stride_a, mut levels_a) = (sk.device_ptr(), sk_stride, levels);
+        if levels > 0 {
+            self.launch("field_moment_skinned_all", Self::cells((tm * regions * 2 * levels as usize) as u64), THREADS, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut skp), arg(&mut stride), arg(&mut sk_stride_a), arg(&mut levels_a), arg(&mut tm32)])?;
+        }
+        self.launch_grid("field_moment_return_paced_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut dsp), arg(&mut qp), arg(&mut skp), arg(&mut dbp), arg(&mut dap), arg(&mut stride), arg(&mut pre_stride), arg(&mut sk_stride_a)])?;
         self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
+        // The moments' clock covector (§16, `moment::pace_return`): the strands and their paced prefixes read again.
+        let (before, after) = (self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?);
+        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let (mut bp, mut ap, mut upp, mut dnp, mut zero32) = (before.device_ptr(), after.device_ptr(), up.device_ptr(), down.device_ptr(), 0u32);
+        self.launch("field_moment_strands_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut bp), arg(&mut ap)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut upp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_prefix_paced_all", grid(regions), MOMENT_BLOCK, MOMENT_BLOCK * 32, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut ap), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride), arg(&mut zero32)])?;
+        self.launch_grid("field_moment_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
         Ok(())
     }
 

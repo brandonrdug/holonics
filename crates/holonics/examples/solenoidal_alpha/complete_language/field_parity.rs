@@ -236,6 +236,18 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     if grow > 1 {
         founded = founded.widened(grow, &p.keys).map_err(|e| e.to_string())?;
     }
+    // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
+    // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
+    // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.
+    if let Some(shift) = std::env::var("FIELD_PARITY_PACE").ok().and_then(|v| v.parse::<u32>().ok()) {
+        let (start, len) = (founded.field.layout().pace, founded.field.theta.len() - founded.field.layout().pace);
+        let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for the pace's draws")?;
+        for k in 0..len {
+            let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
+            founded.field.theta[start + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        println!("FIELD_PARITY_PACE shift={shift} entries={len}");
+    }
     let d = founded.field.declaration;
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len());
     let mut host_learner = founded.clone();
@@ -345,13 +357,15 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} peaks_equal={peaks_equal} open_equal={open_equal} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} peaks_equal={peaks_equal} open_equal={open_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
             first.unwrap_or_else(|| "-".into()),
             receipt_h.deposited,
             receipt_h.halvings,
+            host_learner.field.theta[host_learner.field.layout().pace..].iter().filter(|&&v| v != 0).count(),
+            host_views.first().and_then(|r| host_learner.field.pace_range(r).ok().flatten()).map_or("-".to_string(), |(lo, hi)| format!("{}..{}", (lo as i128 * 1000) >> 24, (hi as i128 * 1000) >> 24)),
             ms((t1 - t0).as_nanos()),
             ms((t2 - t1).as_nanos())
         );
