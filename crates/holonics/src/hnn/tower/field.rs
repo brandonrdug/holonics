@@ -25,14 +25,15 @@
 //! `x^(k+1) = F_Θ(x^k)`:
 //!
 //! ```text
-//! open       x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)),   u = ∗ where a site is unresolved; a carried
-//!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
+//! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k) at a turned mode              a site carries its moment (§15.1)
+//! open       x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b_s,   u = ∗ where a site is unresolved; a carried
+//!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows   it opens on its moment (§16.22)
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   k_t = W_k r̂_t + b_k,   p_t = W_p r̂_t + b_p,   v_t = V r̂_t + b_v   a key and a probe a head
 //! classes    K_h(t), P'_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of k_t's, p_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
 //! support    S_i^h = { j keyed : 0 < |i − j| < 6 } ∪ { j far, definite : K_h(j) ∈ {P'_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
 //! frame      k̃_t = U_t ⊙ k_t,   p̃_t = U_t ⊙ p_t,   ṽ_t = U_t ⊙ v_t              complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
-//! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t, p_t += s_t at a turned mode   a site carries its moment (§15.1, §16.20)
+//! values     v_t += s_t, p_t += s_t at a turned mode                         linear in the moment (§15.1, §16.20)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
@@ -73,6 +74,18 @@
 //! the question; with only its own class at the opening, a site's word reaches its charts only
 //! through a first tick's contact with its neighbours, and finding a site by its word is then a
 //! composition of two learned contacts, which thirteen laps did not form.
+//!
+//! [definition; agent-inferred, November 2, §16.22] **A site opens on its moment.** The source enters as phase-carried
+//! moments (the retention law), and the opening's three rows are only the moment's three nearest terms: a site
+//! whose face held its own byte and its two neighbours' could be found by its key, at any head, only as that
+//! trigram, so a question site could not be told by the word or the passage it stands in. Its whole moment now
+//! enters its face through the chart `C` (`D × 2M`, a read of the turned modes' moments, drawn at the founding; the
+//! moment encodings open at zero, so the founding's faces are as before), and every chart (key, probe and value, still
+//! heads and turned alike) reads it: fine rings carry the word a site stands in, coarse rings the passage. Why (§16.21,
+//! measured on §16.20's run): the far current an answer row gathered changed by a third of itself between its own
+//! question and a foil, enough to move the code 0.680 bits a site were it aligned with the code's covector, and the
+//! face used 0.000039 of it: a share-weighted sum of trigram faces carries which bytes the question holds, not what
+//! the answer site asks for.
 //!
 //! [definition; agent-inferred, November 2, §16.19] **A receiver's probe meets the sources' keys, and the
 //! founding makes neither the other.** A contact is between two sites, so no site meets itself (`e_ii =
@@ -328,10 +341,10 @@ impl FieldDeclaration {
 
     /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
     /// rows of every class (their unresolved rows open at zero), the key chart, the value chart, both
-    /// pair drives and the probe chart.
+    /// pair drives, the probe chart and the moment's chart into the face at the modes that carry a moment.
     pub fn founding_draws(&self) -> usize {
         let m2 = 2 * self.complex();
-        3 * self.alphabet * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width
+        3 * self.alphabet * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width + 2 * self.moment_modes() * self.width
     }
 
     /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
@@ -390,13 +403,13 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v9 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v10 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v9" {
-            return refuse("a field's head line that is not hnn-field-v9");
+        if words.len() != 10 || words[0] != "hnn-field-v10" {
+            return refuse("a field's head line that is not hnn-field-v10");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
@@ -441,6 +454,11 @@ pub struct FieldLayout {
     /// through one row `c_h` of `D` a turned head (`[pace index][D]`, the index its moment
     /// index over the modes), on the material's grain; founded at zero, so the clock is the strand's own place.
     pub pace: usize,
+    /// The moment's chart into the face and its bias (§16.22): `x⁰_t += C s_t + b`, `C` of `D × 2M` reading a site's
+    /// moments `[t][2M]` (real parts then imaginary). A still mode carries no moment, so its column reads zero, its
+    /// covector is zero, and it is founded at zero and stays there.
+    pub moment_face: usize,
+    pub moment_face_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -479,7 +497,9 @@ impl FieldLayout {
         let probe_bias = push(m2, FACE_BITS);
         // The paces (§16.16): one rate a class (and the unresolved row) a paced head, on the class sheet.
         let pace = push(d.paced_heads() * (a + 1), MATERIAL_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, len: at, families }
+        let moment_face = push(dw * m2, MATERIAL_BITS);
+        let moment_face_bias = push(dw, FACE_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, len: at, families }
     }
 }
 
@@ -1176,6 +1196,8 @@ struct FieldPass {
     echo: Vec<u64>,
     /// The turned heads' clocks over the region (§16, Law 1).
     paces: Paces,
+    /// The region's moments `[t][2M]` (§15.1), which the opening reads (§16.22).
+    moment: Vec<i64>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -1200,6 +1222,7 @@ struct Reaches {
     b: u64,
     w: u64,
     read: u64,
+    moment_face: u64,
 }
 
 impl Field {
@@ -1209,7 +1232,8 @@ impl Field {
     /// rows at zero (a site whose class has not arrived carries no word); the key chart `W_k`, the
     /// value chart `V`, both pair drives `W_a, W_b` and the probe chart `W_p` uniform on `±√(3/D)`,
     /// each its own keyed draw, so each read of a unit-power face opens at unit power and a probe is
-    /// founded apart from the key it meets (the module doc); the current's return `O`, the contact's return `W_c`, the
+    /// founded apart from the key it meets (the module doc); the moment's chart into the face `C` uniform on `±√(3/2T)`
+    /// at the turned modes (§16.22), drawn last; the current's return `O`, the contact's return `W_c`, the
     /// readout and every bias at zero, so the field opens on the flat face and each tick on the
     /// identity.
     pub fn found(declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
@@ -1249,6 +1273,23 @@ impl Field {
         // November 2): a probe equal to its key meets, from the founding, the sites whose word is its own, and so
         // the crowned contact was handed to the field rather than located by it.
         uniform(&mut theta[layout.probe..layout.probe + m2 * dw], three, dd, MATERIAL_BITS)?;
+        // [agent-inferred, November 2, §16.22] The moment's chart into the face is a read of the moments, drawn last (so
+        // every earlier draw stands) at `±√(3/2T)` over its `2T` moment reals, so a moment at unit power opens a unit-power
+        // term; a still mode's column carries no moment and opens at zero. The moment encodings open at zero, so the
+        // founding's faces are as before, and the chart gives the encodings a covector from the face's first deposit.
+        let tm = declaration.moment_modes();
+        if tm > 0 {
+            let (three_m, dd_m) = chart_scale(2 * tm);
+            let n = declaration.modes;
+            let carries: Vec<bool> = (0..m2).map(|k| declaration.carries_moment((k % declaration.complex()) / n)).collect();
+            for o in 0..dw {
+                for (k, &on) in carries.iter().enumerate() {
+                    if on {
+                        uniform(&mut theta[layout.moment_face + o * m2 + k..layout.moment_face + o * m2 + k + 1], three_m, dd_m, MATERIAL_BITS)?;
+                    }
+                }
+            }
+        }
         // The temperatures open at their derived gains (§15.10), `T = 2^(−β)`, held as `log₂ T = −β` (§16.12).
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
@@ -1452,7 +1493,9 @@ impl Field {
     /// [measurement] A region's opening faces `x⁰` (`[t][D]` on `2^(−16)`), a reading for the receipts.
     pub fn opening(&self, region: &Region) -> Result<Vec<i64>> {
         self.admit_region(region)?;
-        Ok(self.open(region))
+        let paces = self.paces(region)?;
+        let moment = self.moments_of(region, &paces)?;
+        self.open(region, &moment)
     }
 
     /// [measurement] Each paced head's rates `κ` over a region on `2^(−24)` (§16), a reading for the receipts.
@@ -1499,7 +1542,7 @@ impl Field {
         let (dw, m2, f, a) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts, self.declaration.alphabet);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, a * dw) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, a * dw), moment_face: r(l.moment_face, dw * m2) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -1714,13 +1757,17 @@ impl Field {
     }
 
     /// The region's opening faces `x⁰`: each site's row of the encoding with its strand
-    /// neighbours' rows of their own encodings, `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` (a
-    /// region's first site has no site before it, its last none after).
-    fn open(&self, region: &Region) -> Vec<i64> {
-        let dw = self.declaration.width;
+    /// neighbours' rows of their own encodings and its moment read through its chart,
+    /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
+    /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Field::moments_of`]).
+    fn open(&self, region: &Region, moment: &[i64]) -> Result<Vec<i64>> {
+        let d = &self.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
         let l = &self.layout;
+        let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
         let mut x = vec![0i64; sites * dw];
+        let mut term = vec![0i64; dw];
         for (t, xt) in x.chunks_exact_mut(dw).enumerate() {
             self.opening_term(region, l.enc, t, xt);
             if t > 0 {
@@ -1729,8 +1776,12 @@ impl Field {
             if t + 1 < sites {
                 self.opening_term(region, l.after, t + 1, xt);
             }
+            affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
+            for (slot, &v) in xt.iter_mut().zip(&term) {
+                *slot = fit64(*slot as i128 + v as i128)?;
+            }
         }
-        x
+        Ok(x)
     }
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
@@ -1972,9 +2023,9 @@ impl Field {
         let d = &self.declaration;
         let dw = d.width;
         let reaches = self.reaches();
-        let mut x = self.open(region);
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
+        let mut x = self.open(region, &moment)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         let mut out = FieldPass::default();
@@ -1996,6 +2047,7 @@ impl Field {
         let read = (d.ticks.saturating_sub(1) * d.heads).max(1) as u128;
         out.echo = trips.iter().map(|&t| ((t + read / 2) / read) as u64).collect();
         out.paces = paces;
+        out.moment = moment;
         out.read = vec![0i32; sites * dw];
         out.scale = vec![0i128; sites];
         out.faces = vec![None; sites];
@@ -2667,6 +2719,24 @@ impl Field {
                 }
             }
         }
+        // The moment's chart into the face (§16.22): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`, and the moments'
+        // covector `δs_t += Cᵀ δx⁰_t`, joined to the values' and the probes' before the strands' return.
+        {
+            let (mf, mfb) = (l.moment_face, l.moment_face_bias);
+            let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
+            let ss: Vec<&[i64]> = pass.moment.chunks_exact(m2).collect();
+            outer_sum(&mut g[mf..mf + dw * m2], m2, &dxs, &ss)?;
+            let mut back = vec![0i64; m2];
+            for t in 0..sites {
+                for (o, &v) in dxs[t].iter().enumerate() {
+                    g[mfb + o] += v as i128;
+                }
+                transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxs[t], MATERIAL_BITS, &mut back)?;
+                for (slot, &b) in dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
+                    *slot += b as i128;
+                }
+            }
+        }
         // The moments: each value's covector at a moment mode returns through the strands (§15.1).
         let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n)).collect();
         for (k, slot) in dm.iter_mut().enumerate() {
@@ -3313,6 +3383,10 @@ impl Field {
         split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.w, layout.w, dw, fc, f, &face, f * fc, &contact, None, true)?;
         split(ol.read, layout.read, a, dw, 1, &kept, dw2, &face, None, false)?;
+        // The moment's chart into the face (§16.22) reads the moments as the current's return reads the current: every
+        // copy of a head carries its source's moment whole (below), so each entry is split evenly over its column's
+        // copies and its rows repeated, and the grown opening is the old one exactly.
+        split(ol.moment_face, layout.moment_face, dw, 2 * m, f, &face, 2 * m2g, &chart_row, None, true)?;
         // The paces (§16.16): each copy of a turned head reads its source's rates whole, a class's rate being no
         // face coordinate, so every copy's clock is its source's exactly.
         let paced: Vec<usize> = (0..old.heads).filter(|&h| old.carries_moment(h)).collect();
@@ -3349,6 +3423,7 @@ impl Field {
         repeat(ol.b_bias, layout.b_bias, fc, f, &contact, true);
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
+        repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
         // The moment encodings (§15.1): every copy of a head carries its source's moment whole, as it
         // carries its value (each copy's value is its source's); the current's return is parted, so
         // a copy's covector arrives divided and its step's moments are lifted divided, as `v_bias`'s.

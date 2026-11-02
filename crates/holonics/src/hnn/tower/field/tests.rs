@@ -345,7 +345,7 @@ fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
         let d = field.declaration;
         let pass = field.pass(&region(), true).unwrap();
         let sites = CLASSES.len();
-        let x = field.open(&region());
+        let x = field.opening(&region()).unwrap();
         let cell = &pass.ticks[0];
         let l = &field.layout;
         let m2 = 2 * d.complex();
@@ -848,7 +848,17 @@ fn the_founding_draws_the_key_and_the_probe_apart() {
     let (key, probe) = (&field.theta[l.q..l.q + m2 * dw], &field.theta[l.probe..l.probe + m2 * dw]);
     assert!(key.iter().any(|&v| v != 0) && probe.iter().any(|&v| v != 0));
     assert_ne!(key, probe, "the probe is not the key");
-    assert_eq!(4 * field.declaration.founding_draws(), 4 * (3 * a * dw + 3 * m2 * dw + 2 * field.declaration.contacts * dw));
+    let tm = field.declaration.moment_modes();
+    assert_eq!(4 * field.declaration.founding_draws(), 4 * (3 * a * dw + 3 * m2 * dw + 2 * field.declaration.contacts * dw + 2 * tm * dw));
+    let stream = keys(field.declaration.founding_draws());
+    assert_eq!(Field::found(tiny_declaration(1), &stream).unwrap(), field, "the draws counted are the draws read");
+    assert!(Field::found(tiny_declaration(1), &stream[..stream.len() - 1]).is_err());
+    // The moment's chart into the face (§16.22): drawn at the modes that carry a moment, zero at a still mode's.
+    let (m, n) = (field.declaration.complex(), field.declaration.modes);
+    for k in 0..m2 {
+        let column: Vec<i32> = (0..dw).map(|o| field.theta[l.moment_face + o * m2 + k]).collect();
+        assert_eq!(column.iter().any(|&v| v != 0), field.declaration.carries_moment((k % m) / n), "column {k}");
+    }
     for start in [l.enc, l.before, l.after] {
         for row in 0..a {
             assert!(field.theta[start + row * dw..start + (row + 1) * dw].iter().any(|&v| v != 0), "class {row} has a word");
@@ -1136,4 +1146,42 @@ fn the_covector_s_far_share_is_zero_at_the_founding_and_read_where_the_returns_m
     assert_eq!(shares.len(), shaped.declaration.heads);
     assert!(shares.iter().all(|&[near, _]| near > 0), "{shares:?}");
     assert!(shares.iter().any(|&[_, far]| far > 0), "{shares:?}");
+}
+
+/// The field with its moment's chart into the face and its bias silent (the opening before §16.22).
+fn silent_moment_face(mut field: Field) -> Field {
+    let (dw, m2) = (field.declaration.width, 2 * field.declaration.complex());
+    let l = field.layout.clone();
+    field.theta[l.moment_face..l.moment_face + dw * m2].iter_mut().for_each(|v| *v = 0);
+    field.theta[l.moment_face_bias..l.moment_face_bias + dw].iter_mut().for_each(|v| *v = 0);
+    field
+}
+
+/// [definition; agent-inferred, November 2, §16.22] **A site opens on its moment**: two sites whose own class and both
+/// neighbours' agree open on one face where the moment's chart is silent, and apart where it reads their moments, which
+/// differ past the trigram (the word each stands in); a field with no turned mode has no moment and opens them alike.
+/// At the founding the moment encodings are zero, so the chart adds nothing: the faces are as before.
+#[test]
+fn a_site_opens_on_its_moment() {
+    const WORDS: [usize; 11] = [1, 1, 2, 3, 4, 0, 0, 2, 3, 4, 1];
+    const KNOWN: [bool; 11] = [false; 11];
+    let r = Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[] };
+    let (a, b) = (3usize, 8usize);
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        let dw = field.declaration.width;
+        let x = field.opening(&r).unwrap();
+        let y = silent_moment_face(field.clone()).opening(&r).unwrap();
+        assert_eq!(y[a * dw..(a + 1) * dw], y[b * dw..(b + 1) * dw], "still {still}: the trigram alone opens one face");
+        if field.declaration.moment_modes() > 0 {
+            assert_ne!(x[a * dw..(a + 1) * dw], x[b * dw..(b + 1) * dw], "still {still}: the moment opens them apart");
+        } else {
+            assert_eq!(x[a * dw..(a + 1) * dw], x[b * dw..(b + 1) * dw], "still {still}: no turned mode, no moment");
+        }
+    }
+    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let silent = silent_moment_face(field.clone());
+    assert_ne!(field, silent, "the chart is drawn at the founding");
+    assert_eq!(field.opening(&r).unwrap(), silent.opening(&r).unwrap());
+    assert_eq!(field.faces(&region()).unwrap(), silent.faces(&region()).unwrap());
 }
