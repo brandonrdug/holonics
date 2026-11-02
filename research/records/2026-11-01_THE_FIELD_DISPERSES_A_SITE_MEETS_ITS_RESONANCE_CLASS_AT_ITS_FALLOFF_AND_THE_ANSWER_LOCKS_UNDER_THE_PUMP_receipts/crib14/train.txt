@@ -1,0 +1,753 @@
+FIELD_DECLARATION alphabet=44 width=32 heads=5 modes=8 still=2 contacts=32 ticks=3 frames=5 reach=484 section=16 rate=8 answer=53 train=3968 withheld=128 dev=128 sections=248 laps_read=0 material=22432
+FIELD_HELD lap=-1 answer=5.459432 digits=5.459432 text=5.459432 classes=4470 context=5.459432 context_digits=5.459432 context_text=5.459432 context_classes=4470 foil=5.459432 foil_digits=5.459432 foil_text=5.459432 question=0.000000 question_digits=0.000000 question_text=0.000000 ms=599
+FIELD_PACE lap=-1 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=1000000 gap=0
+FIELD_PACE lap=-1 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=1000000 gap=0
+FIELD_UNSEEN lap=-1 code=5.459 sites=4319 next=- ms=1170
+FIELD_LAP lap=0 read=1 sites=408396 before=3.981 after=3.969 deposited=212/248 halvings=272 next_halved=32 next_refused=36 ms=28098
+FIELD_UNSEEN lap=0 code=4.000 sites=4319 next_change=2823433 next_halvings=1 next_refused=true ms=29296
+FIELD_HELD lap=0 answer=4.189088 digits=4.430896 text=3.932335 classes=4470 context=4.000912 context_digits=4.392854 context_text=3.584745 context_classes=4470 foil=4.000579 foil_digits=4.392666 foil_text=3.584258 question=-0.000333 question_digits=-0.000188 question_text=-0.000487 ms=29812
+FIELD_PACE lap=0 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=1000000 gap=0
+FIELD_PACE lap=0 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=1000000 gap=0
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=0 rows=515 top_share=181089 spread_millibits=4256 flat_millibits=8290 top_digit=67961 top_site_right=34951
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=1 rows=515 top_share=205014 spread_millibits=4079 flat_millibits=8290 top_digit=50485 top_site_right=25242
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=2 rows=515 top_share=103566 spread_millibits=5630 flat_millibits=8290 top_digit=40776 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=3 rows=515 top_share=185084 spread_millibits=5140 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=4 rows=515 top_share=419937 spread_millibits=2251 flat_millibits=8290 top_digit=64077 top_site_right=52427
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=0 rows=515 top_share=345357 spread_millibits=2833 flat_millibits=8290 top_digit=48543 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=1 rows=515 top_share=319719 spread_millibits=2918 flat_millibits=8290 top_digit=81553 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=2 rows=515 top_share=132608 spread_millibits=5250 flat_millibits=8290 top_digit=15533 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=3 rows=515 top_share=15938 spread_millibits=7822 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=4 rows=515 top_share=467666 spread_millibits=1922 flat_millibits=8290 top_digit=9708 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=0 tick=2 head=0 rows=515 top_share=291049 spread_millibits=2869 flat_millibits=8290 top_digit=137864 top_site_right=44660
+FIELD_PEAKS_OPERAND lap=0 tick=2 head=1 rows=515 top_share=280672 spread_millibits=2858 flat_millibits=8290 top_digit=200000 top_site_right=40776
+FIELD_PEAKS_OPERAND lap=0 tick=2 head=2 rows=515 top_share=108887 spread_millibits=5598 flat_millibits=8290 top_digit=19417 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=0 tick=2 head=3 rows=515 top_share=17302 spread_millibits=7733 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=2 head=4 rows=515 top_share=539645 spread_millibits=1500 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_BOUNDARY lap=0 log2_t_millis_class/listen=0:1751/-34,1:1838/-33,2:1843/211,3:1652/207,4:1869/376 held_operand_faces=0/515 held_operand_code_bits=4.389 descent_on_log_t=0:-60881120647/1345533049462,1:-205773019416/513922897176,2:49990157141/-916778702115,3:133262909250/585947007458,4:-37197045552/-513431030846 readers_cosine_to_witness=3:22077,0:-4619 witness_faces_at_learned_t=88/515 code_bits=12.126 ms=1176
+FIELD_CLOCK lap=1 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1942
+FIELD_LAP lap=1 read=2 sites=394356 before=3.308 after=3.301 deposited=183/248 halvings=264 next_halved=52 next_refused=48 ms=28887
+FIELD_UNSEEN lap=1 code=3.554 sites=4319 next=- ms=62510
+FIELD_HELD lap=1 answer=4.018445 digits=4.441912 text=3.568804 classes=4470 context=3.610106 context_digits=4.318677 context_text=2.857739 context_classes=4470 foil=3.609420 foil_digits=4.319013 foil_text=2.855968 question=-0.000686 question_digits=0.000336 question_text=-0.001770 ms=63136
+FIELD_PACE lap=1 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=1 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=0 rows=515 top_share=247362 spread_millibits=3714 flat_millibits=8290 top_digit=62135 top_site_right=27184
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=1 rows=515 top_share=265488 spread_millibits=3618 flat_millibits=8290 top_digit=64077 top_site_right=25242
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=2 rows=515 top_share=147565 spread_millibits=4563 flat_millibits=8290 top_digit=25242 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=3 rows=515 top_share=642175 spread_millibits=1345 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=4 rows=515 top_share=442334 spread_millibits=2168 flat_millibits=8290 top_digit=67961 top_site_right=56310
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=0 rows=515 top_share=381095 spread_millibits=2231 flat_millibits=8290 top_digit=234951 top_site_right=52427
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=1 rows=515 top_share=344308 spread_millibits=2369 flat_millibits=8290 top_digit=359223 top_site_right=87378
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=2 rows=515 top_share=273508 spread_millibits=3542 flat_millibits=8290 top_digit=19417 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=3 rows=515 top_share=412727 spread_millibits=2689 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=4 rows=515 top_share=633013 spread_millibits=1212 flat_millibits=8290 top_digit=13592 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=1 tick=2 head=0 rows=515 top_share=329508 spread_millibits=2385 flat_millibits=8290 top_digit=314563 top_site_right=83495
+FIELD_PEAKS_OPERAND lap=1 tick=2 head=1 rows=515 top_share=304094 spread_millibits=2464 flat_millibits=8290 top_digit=427184 top_site_right=120388
+FIELD_PEAKS_OPERAND lap=1 tick=2 head=2 rows=515 top_share=278203 spread_millibits=3488 flat_millibits=8290 top_digit=17475 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=1 tick=2 head=3 rows=515 top_share=319291 spread_millibits=3390 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=2 head=4 rows=515 top_share=735386 spread_millibits=818 flat_millibits=8290 top_digit=3883 top_site_right=0
+FIELD_BOUNDARY lap=1 log2_t_millis_class/listen=0:1612/-25,1:1742/-23,2:1606/265,3:1578/211,4:1804/365 held_operand_faces=2/515 held_operand_code_bits=4.281 descent_on_log_t=0:135751104501/3106208659642,1:-538001941401/2741010415653,2:-925044523/1539553827504,3:790231766025/2024477429057,4:-67984195099/-183397429457 readers_cosine_to_witness=3:19296,0:-6866 witness_faces_at_learned_t=88/515 code_bits=12.135 ms=1307
+FIELD_CLOCK lap=2 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1952
+FIELD_LAP lap=2 read=3 sites=410155 before=3.192 after=3.190 deposited=78/248 halvings=319 next_halved=20 next_refused=18 ms=25727
+FIELD_UNSEEN lap=2 code=3.376 sites=4319 next_change=-16295063 next_halvings=0 next_refused=false ms=92923
+FIELD_HELD lap=2 answer=4.046267 digits=4.489787 text=3.575333 classes=4470 context=3.438868 context_digits=4.270988 context_text=2.555316 context_classes=4470 foil=3.437744 foil_digits=4.270957 foil_text=2.553032 question=-0.001123 question_digits=-0.000030 question_text=-0.002284 ms=93532
+FIELD_PACE lap=2 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=2 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=0 rows=515 top_share=275466 spread_millibits=3491 flat_millibits=8290 top_digit=67961 top_site_right=27184
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=1 rows=515 top_share=308349 spread_millibits=3280 flat_millibits=8290 top_digit=62135 top_site_right=25242
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=2 rows=515 top_share=141967 spread_millibits=4616 flat_millibits=8290 top_digit=23300 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=3 rows=515 top_share=615309 spread_millibits=1477 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=4 rows=515 top_share=433106 spread_millibits=2215 flat_millibits=8290 top_digit=71844 top_site_right=58252
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=0 rows=515 top_share=276692 spread_millibits=2694 flat_millibits=8290 top_digit=603883 top_site_right=174757
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=1 rows=515 top_share=281111 spread_millibits=2655 flat_millibits=8290 top_digit=708737 top_site_right=242718
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=2 rows=515 top_share=187512 spread_millibits=4377 flat_millibits=8290 top_digit=21359 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=3 rows=515 top_share=424328 spread_millibits=2615 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=4 rows=515 top_share=589504 spread_millibits=1424 flat_millibits=8290 top_digit=5825 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=2 tick=2 head=0 rows=515 top_share=267623 spread_millibits=2659 flat_millibits=8290 top_digit=776699 top_site_right=211650
+FIELD_PEAKS_OPERAND lap=2 tick=2 head=1 rows=515 top_share=274126 spread_millibits=2595 flat_millibits=8290 top_digit=862135 top_site_right=266019
+FIELD_PEAKS_OPERAND lap=2 tick=2 head=2 rows=515 top_share=179804 spread_millibits=4507 flat_millibits=8290 top_digit=19417 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=2 tick=2 head=3 rows=515 top_share=414298 spread_millibits=2659 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=2 head=4 rows=515 top_share=691651 spread_millibits=996 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_BOUNDARY lap=2 log2_t_millis_class/listen=0:1555/-19,1:1694/-16,2:1538/259,3:1544/215,4:1786/353 held_operand_faces=1/515 held_operand_code_bits=4.279 descent_on_log_t=0:-480472906868/13324529234915,1:-1683599253245/7889464847332,2:-1899997261521/4894795655054,3:1878892083879/9910522106386,4:9256819159/-1224615093852 readers_cosine_to_witness=3:26015,0:-9579 witness_faces_at_learned_t=87/515 code_bits=12.136 ms=1293
+FIELD_CLOCK lap=3 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1955
+FIELD_LAP lap=3 read=4 sites=410105 before=3.096 after=3.090 deposited=242/248 halvings=224 next_halved=99 next_refused=77 ms=33899
+FIELD_UNSEEN lap=3 code=2.999 sites=4319 next_change=-7002344 next_halvings=0 next_refused=false ms=131465
+FIELD_HELD lap=3 answer=4.084457 digits=4.439464 text=3.707507 classes=4470 context=3.064283 context_digits=4.101607 context_text=1.962843 context_classes=4470 foil=3.062930 foil_digits=4.101866 foil_text=1.959778 question=-0.001353 question_digits=0.000259 question_text=-0.003065 ms=132108
+FIELD_PACE lap=3 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=3 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=0 rows=515 top_share=249832 spread_millibits=3618 flat_millibits=8290 top_digit=93203 top_site_right=33009
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=1 rows=515 top_share=320859 spread_millibits=3133 flat_millibits=8290 top_digit=81553 top_site_right=29126
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=2 rows=515 top_share=132604 spread_millibits=4696 flat_millibits=8290 top_digit=27184 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=3 rows=515 top_share=718015 spread_millibits=1020 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=4 rows=515 top_share=399318 spread_millibits=2374 flat_millibits=8290 top_digit=58252 top_site_right=50485
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=0 rows=515 top_share=302677 spread_millibits=2468 flat_millibits=8290 top_digit=965048 top_site_right=316504
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=1 rows=515 top_share=316947 spread_millibits=2393 flat_millibits=8290 top_digit=961165 top_site_right=359223
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=2 rows=515 top_share=162763 spread_millibits=4629 flat_millibits=8290 top_digit=31067 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=3 rows=515 top_share=561550 spread_millibits=1842 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=4 rows=515 top_share=568349 spread_millibits=1475 flat_millibits=8290 top_digit=25242 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=3 tick=2 head=0 rows=515 top_share=312753 spread_millibits=2344 flat_millibits=8290 top_digit=990291 top_site_right=349514
+FIELD_PEAKS_OPERAND lap=3 tick=2 head=1 rows=515 top_share=326176 spread_millibits=2285 flat_millibits=8290 top_digit=992233 top_site_right=363106
+FIELD_PEAKS_OPERAND lap=3 tick=2 head=2 rows=515 top_share=137268 spread_millibits=5025 flat_millibits=8290 top_digit=25242 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=3 tick=2 head=3 rows=515 top_share=395924 spread_millibits=2928 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=2 head=4 rows=515 top_share=729767 spread_millibits=837 flat_millibits=8290 top_digit=5825 top_site_right=0
+FIELD_BOUNDARY lap=3 log2_t_millis_class/listen=0:1433/3,1:1592/7,2:1381/244,3:1474/216,4:1702/336 held_operand_faces=25/515 held_operand_code_bits=4.021 descent_on_log_t=0:-1443344269978/-3670660862002,1:-2532274264838/-6889648865,2:-485066484009/3441213854566,3:3020082306357/24026161355509,4:563324791538/-109735046513 readers_cosine_to_witness=3:23706,0:109 witness_faces_at_learned_t=87/515 code_bits=12.131 ms=1355
+FIELD_CLOCK lap=4 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1956
+FIELD_LAP lap=4 read=5 sites=397634 before=3.048 after=3.043 deposited=243/248 halvings=365 next_halved=91 next_refused=73 ms=35192
+FIELD_UNSEEN lap=4 code=2.860 sites=4319 next_change=-53937956 next_halvings=0 next_refused=false ms=171447
+FIELD_HELD lap=4 answer=4.080340 digits=4.537269 text=3.595168 classes=4470 context=2.922336 context_digits=4.061104 context_text=1.713182 context_classes=4470 foil=2.922126 foil_digits=4.062098 foil_text=1.711694 question=-0.000210 question_digits=0.000994 question_text=-0.001488 ms=172072
+FIELD_PACE lap=4 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=4 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=0 rows=515 top_share=243936 spread_millibits=3621 flat_millibits=8290 top_digit=126213 top_site_right=48543
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=1 rows=515 top_share=328457 spread_millibits=3057 flat_millibits=8290 top_digit=93203 top_site_right=36893
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=2 rows=515 top_share=128160 spread_millibits=4730 flat_millibits=8290 top_digit=31067 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=3 rows=515 top_share=822517 spread_millibits=583 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=4 rows=515 top_share=348515 spread_millibits=2663 flat_millibits=8290 top_digit=64077 top_site_right=50485
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=0 rows=515 top_share=345129 spread_millibits=2195 flat_millibits=8290 top_digit=994174 top_site_right=384466
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=1 rows=515 top_share=351140 spread_millibits=2188 flat_millibits=8290 top_digit=996116 top_site_right=419417
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=2 rows=515 top_share=214040 spread_millibits=4161 flat_millibits=8290 top_digit=38834 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=3 rows=515 top_share=633126 spread_millibits=1485 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=4 rows=515 top_share=463829 spread_millibits=1966 flat_millibits=8290 top_digit=48543 top_site_right=21359
+FIELD_PEAKS_OPERAND lap=4 tick=2 head=0 rows=515 top_share=344983 spread_millibits=2149 flat_millibits=8290 top_digit=1000000 top_site_right=407766
+FIELD_PEAKS_OPERAND lap=4 tick=2 head=1 rows=515 top_share=345570 spread_millibits=2147 flat_millibits=8290 top_digit=1000000 top_site_right=423300
+FIELD_PEAKS_OPERAND lap=4 tick=2 head=2 rows=515 top_share=177621 spread_millibits=4624 flat_millibits=8290 top_digit=29126 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=4 tick=2 head=3 rows=515 top_share=346575 spread_millibits=3337 flat_millibits=8290 top_digit=3883 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=2 head=4 rows=515 top_share=644788 spread_millibits=1177 flat_millibits=8290 top_digit=29126 top_site_right=5825
+FIELD_BOUNDARY lap=4 log2_t_millis_class/listen=0:1327/29,1:1486/33,2:1247/244,3:1431/230,4:1641/329 held_operand_faces=31/515 held_operand_code_bits=3.821 descent_on_log_t=0:-76658455934/-6390538421691,1:-1357104549898/-4515256909102,2:782016635072/1273862309136,3:1109778524936/21124680855357,4:-537370278817/971170647580 readers_cosine_to_witness=3:26720,0:-1225 witness_faces_at_learned_t=88/515 code_bits=12.112 ms=1330
+FIELD_CLOCK lap=5 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1957
+FIELD_LAP lap=5 read=6 sites=406937 before=2.992 after=2.986 deposited=237/248 halvings=414 next_halved=95 next_refused=79 ms=35295
+FIELD_UNSEEN lap=5 code=2.759 sites=4319 next_change=5849648 next_halvings=1 next_refused=true ms=211478
+FIELD_HELD lap=5 answer=4.284679 digits=4.958474 text=3.569238 classes=4470 context=2.814698 context_digits=4.073134 context_text=1.478480 context_classes=4470 foil=2.814391 foil_digits=4.073511 foil_text=1.477446 question=-0.000307 question_digits=0.000377 question_text=-0.001034 ms=212110
+FIELD_PACE lap=5 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=5 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=0 rows=515 top_share=248024 spread_millibits=3558 flat_millibits=8290 top_digit=132038 top_site_right=48543
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=1 rows=515 top_share=335407 spread_millibits=2966 flat_millibits=8290 top_digit=99029 top_site_right=38834
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=2 rows=515 top_share=129591 spread_millibits=4720 flat_millibits=8290 top_digit=29126 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=3 rows=515 top_share=780312 spread_millibits=735 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=4 rows=515 top_share=312865 spread_millibits=2887 flat_millibits=8290 top_digit=60194 top_site_right=50485
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=0 rows=515 top_share=333783 spread_millibits=2222 flat_millibits=8290 top_digit=998058 top_site_right=438834
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=1 rows=515 top_share=346912 spread_millibits=2190 flat_millibits=8290 top_digit=996116 top_site_right=454368
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=2 rows=515 top_share=190729 spread_millibits=4392 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=3 rows=515 top_share=523045 spread_millibits=2066 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=4 rows=515 top_share=416561 spread_millibits=2211 flat_millibits=8290 top_digit=50485 top_site_right=23300
+FIELD_PEAKS_OPERAND lap=5 tick=2 head=0 rows=515 top_share=349156 spread_millibits=2122 flat_millibits=8290 top_digit=1000000 top_site_right=440776
+FIELD_PEAKS_OPERAND lap=5 tick=2 head=1 rows=515 top_share=355848 spread_millibits=2105 flat_millibits=8290 top_digit=1000000 top_site_right=454368
+FIELD_PEAKS_OPERAND lap=5 tick=2 head=2 rows=515 top_share=151466 spread_millibits=4900 flat_millibits=8290 top_digit=29126 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=5 tick=2 head=3 rows=515 top_share=248552 spread_millibits=4054 flat_millibits=8290 top_digit=1941 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=2 head=4 rows=515 top_share=619371 spread_millibits=1281 flat_millibits=8290 top_digit=31067 top_site_right=7766
+FIELD_BOUNDARY lap=5 log2_t_millis_class/listen=0:1244/55,1:1404/60,2:1162/241,3:1425/241,4:1590/314 held_operand_faces=6/515 held_operand_code_bits=3.851 descent_on_log_t=0:-15925728833/-10621957030032,1:-1986448665269/-2850758703596,2:1624876033275/3626730277476,3:218143988781/26286624523561,4:-1728354529145/2099597682278 readers_cosine_to_witness=3:21468,0:-1580 witness_faces_at_learned_t=89/515 code_bits=12.077 ms=1193
+FIELD_CLOCK lap=6 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1970
+FIELD_LAP lap=6 read=7 sites=406984 before=2.961 after=2.956 deposited=232/248 halvings=518 next_halved=76 next_refused=85 ms=37590
+FIELD_UNSEEN lap=6 code=2.709 sites=4319 next_change=30205138 next_halvings=3 next_refused=false ms=253826
+FIELD_HELD lap=6 answer=3.999323 digits=4.543121 text=3.421914 classes=4470 context=2.755267 context_digits=4.047581 context_text=1.383078 context_classes=4470 foil=2.755410 foil_digits=4.047904 foil_text=1.383030 question=0.000143 question_digits=0.000322 question_text=-0.000048 ms=254525
+FIELD_PACE lap=6 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=6 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=0 rows=515 top_share=249781 spread_millibits=3523 flat_millibits=8290 top_digit=149514 top_site_right=54368
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=1 rows=515 top_share=329799 spread_millibits=2985 flat_millibits=8290 top_digit=122330 top_site_right=48543
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=2 rows=515 top_share=129578 spread_millibits=4728 flat_millibits=8290 top_digit=31067 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=3 rows=515 top_share=817597 spread_millibits=597 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=4 rows=515 top_share=292483 spread_millibits=3039 flat_millibits=8290 top_digit=54368 top_site_right=46601
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=0 rows=515 top_share=358103 spread_millibits=2105 flat_millibits=8290 top_digit=1000000 top_site_right=473786
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=1 rows=515 top_share=363364 spread_millibits=2107 flat_millibits=8290 top_digit=1000000 top_site_right=514563
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=2 rows=515 top_share=212970 spread_millibits=4181 flat_millibits=8290 top_digit=42718 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=3 rows=515 top_share=546616 spread_millibits=1962 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=4 rows=515 top_share=400048 spread_millibits=2289 flat_millibits=8290 top_digit=48543 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=6 tick=2 head=0 rows=515 top_share=381844 spread_millibits=1994 flat_millibits=8290 top_digit=1000000 top_site_right=497087
+FIELD_PEAKS_OPERAND lap=6 tick=2 head=1 rows=515 top_share=379064 spread_millibits=2006 flat_millibits=8290 top_digit=1000000 top_site_right=504854
+FIELD_PEAKS_OPERAND lap=6 tick=2 head=2 rows=515 top_share=167561 spread_millibits=4730 flat_millibits=8290 top_digit=27184 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=6 tick=2 head=3 rows=515 top_share=209786 spread_millibits=4476 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=2 head=4 rows=515 top_share=599331 spread_millibits=1384 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_BOUNDARY lap=6 log2_t_millis_class/listen=0:1191/80,1:1351/86,2:1105/239,3:1410/246,4:1560/295 held_operand_faces=31/515 held_operand_code_bits=3.751 descent_on_log_t=0:-233371527353/-6404459540073,1:-840755158798/-2430534131273,2:1245839488253/1737740736384,3:-779565091060/19921992075700,4:-645508289739/1595037957880 readers_cosine_to_witness=3:16269,0:-3390 witness_faces_at_learned_t=89/515 code_bits=12.051 ms=1426
+FIELD_CLOCK lap=7 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1945
+FIELD_LAP lap=7 read=8 sites=402191 before=2.941 after=2.938 deposited=226/248 halvings=543 next_halved=76 next_refused=88 ms=35676
+FIELD_UNSEEN lap=7 code=2.660 sites=4319 next_change=-16285553 next_halvings=0 next_refused=false ms=294487
+FIELD_HELD lap=7 answer=4.209957 digits=4.305777 text=4.108214 classes=4470 context=2.713112 context_digits=3.960282 context_text=1.388856 context_classes=4470 foil=2.713788 foil_digits=3.960818 foil_text=1.389680 question=0.000676 question_digits=0.000536 question_text=0.000824 ms=295105
+FIELD_PACE lap=7 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=7 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=0 rows=515 top_share=253443 spread_millibits=3495 flat_millibits=8290 top_digit=176699 top_site_right=62135
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=1 rows=515 top_share=329369 spread_millibits=2982 flat_millibits=8290 top_digit=139805 top_site_right=52427
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=2 rows=515 top_share=129343 spread_millibits=4732 flat_millibits=8290 top_digit=33009 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=3 rows=515 top_share=855840 spread_millibits=463 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=4 rows=515 top_share=277992 spread_millibits=3154 flat_millibits=8290 top_digit=54368 top_site_right=46601
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=0 rows=515 top_share=361109 spread_millibits=2087 flat_millibits=8290 top_digit=1000000 top_site_right=479611
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=1 rows=515 top_share=370590 spread_millibits=2056 flat_millibits=8290 top_digit=1000000 top_site_right=510679
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=2 rows=515 top_share=194150 spread_millibits=4378 flat_millibits=8290 top_digit=46601 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=3 rows=515 top_share=616310 spread_millibits=1570 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=4 rows=515 top_share=371260 spread_millibits=2465 flat_millibits=8290 top_digit=54368 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=7 tick=2 head=0 rows=515 top_share=377840 spread_millibits=2013 flat_millibits=8290 top_digit=1000000 top_site_right=460194
+FIELD_PEAKS_OPERAND lap=7 tick=2 head=1 rows=515 top_share=379152 spread_millibits=2000 flat_millibits=8290 top_digit=1000000 top_site_right=500970
+FIELD_PEAKS_OPERAND lap=7 tick=2 head=2 rows=515 top_share=147666 spread_millibits=4969 flat_millibits=8290 top_digit=27184 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=7 tick=2 head=3 rows=515 top_share=253028 spread_millibits=4086 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=2 head=4 rows=515 top_share=583623 spread_millibits=1462 flat_millibits=8290 top_digit=48543 top_site_right=9708
+FIELD_BOUNDARY lap=7 log2_t_millis_class/listen=0:1147/105,1:1307/113,2:1060/238,3:1395/252,4:1540/283 held_operand_faces=22/515 held_operand_code_bits=3.788 descent_on_log_t=0:-369127339902/-4757755009806,1:-1066721337011/-396764834637,2:1347300344994/4873057143475,3:-7164365038/23194780326412,4:-950220849873/2966689639861 readers_cosine_to_witness=3:5227,0:-3424 witness_faces_at_learned_t=90/515 code_bits=12.027 ms=1309
+FIELD_CLOCK lap=8 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1969
+FIELD_LAP lap=8 read=9 sites=391157 before=2.911 after=2.905 deposited=228/248 halvings=571 next_halved=70 next_refused=80 ms=35526
+FIELD_UNSEEN lap=8 code=2.593 sites=4319 next_change=-20774746 next_halvings=0 next_refused=false ms=334714
+FIELD_HELD lap=8 answer=4.117973 digits=4.214239 text=4.015756 classes=4470 context=2.640134 context_digits=3.936311 context_text=1.263842 context_classes=4470 foil=2.641163 foil_digits=3.937516 foil_text=1.264684 question=0.001029 question_digits=0.001205 question_text=0.000842 ms=335338
+FIELD_PACE lap=8 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=8 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=0 rows=515 top_share=259049 spread_millibits=3408 flat_millibits=8290 top_digit=229126 top_site_right=75728
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=1 rows=515 top_share=332053 spread_millibits=2915 flat_millibits=8290 top_digit=182524 top_site_right=67961
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=2 rows=515 top_share=130580 spread_millibits=4715 flat_millibits=8290 top_digit=34951 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=3 rows=515 top_share=857078 spread_millibits=465 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=4 rows=515 top_share=266819 spread_millibits=3248 flat_millibits=8290 top_digit=52427 top_site_right=46601
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=0 rows=515 top_share=376706 spread_millibits=2040 flat_millibits=8290 top_digit=1000000 top_site_right=467961
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=1 rows=515 top_share=381313 spread_millibits=2030 flat_millibits=8290 top_digit=1000000 top_site_right=489320
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=2 rows=515 top_share=235910 spread_millibits=3945 flat_millibits=8290 top_digit=54368 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=3 rows=515 top_share=625388 spread_millibits=1507 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=4 rows=515 top_share=334026 spread_millibits=2646 flat_millibits=8290 top_digit=69902 top_site_right=23300
+FIELD_PEAKS_OPERAND lap=8 tick=2 head=0 rows=515 top_share=388390 spread_millibits=1961 flat_millibits=8290 top_digit=1000000 top_site_right=500970
+FIELD_PEAKS_OPERAND lap=8 tick=2 head=1 rows=515 top_share=382946 spread_millibits=1986 flat_millibits=8290 top_digit=1000000 top_site_right=504854
+FIELD_PEAKS_OPERAND lap=8 tick=2 head=2 rows=515 top_share=204246 spread_millibits=4294 flat_millibits=8290 top_digit=33009 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=8 tick=2 head=3 rows=515 top_share=239543 spread_millibits=4128 flat_millibits=8290 top_digit=3883 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=2 head=4 rows=515 top_share=474880 spread_millibits=1972 flat_millibits=8290 top_digit=75728 top_site_right=11650
+FIELD_BOUNDARY lap=8 log2_t_millis_class/listen=0:1082/153,1:1233/161,2:991/239,3:1382/263,4:1519/262 held_operand_faces=37/515 held_operand_code_bits=3.708 descent_on_log_t=0:-267285687883/-4880041827336,1:-429536158892/821725847232,2:965489636038/3553218593825,3:-1698306271283/16236321744470,4:-191081072161/1674379749084 readers_cosine_to_witness=3:-16165,0:-3375 witness_faces_at_learned_t=91/515 code_bits=11.978 ms=1403
+FIELD_CLOCK lap=9 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1952
+FIELD_LAP lap=9 read=10 sites=399997 before=2.896 after=2.890 deposited=232/248 halvings=482 next_halved=78 next_refused=84 ms=35434
+FIELD_UNSEEN lap=9 code=2.556 sites=4319 next_change=-11176402 next_halvings=0 next_refused=false ms=374949
+FIELD_HELD lap=9 answer=4.065249 digits=4.332738 text=3.781227 classes=4470 context=2.602170 context_digits=3.926936 context_text=1.195522 context_classes=4470 foil=2.603216 foil_digits=3.927880 foil_text=1.196677 question=0.001046 question_digits=0.000944 question_text=0.001155 ms=375577
+FIELD_PACE lap=9 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=9 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=0 rows=515 top_share=254975 spread_millibits=3402 flat_millibits=8290 top_digit=347572 top_site_right=104854
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=1 rows=515 top_share=315367 spread_millibits=2970 flat_millibits=8290 top_digit=308737 top_site_right=110679
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=2 rows=515 top_share=132770 spread_millibits=4690 flat_millibits=8290 top_digit=36893 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=3 rows=515 top_share=802000 spread_millibits=682 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=4 rows=515 top_share=250431 spread_millibits=3386 flat_millibits=8290 top_digit=48543 top_site_right=42718
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=0 rows=515 top_share=379573 spread_millibits=2015 flat_millibits=8290 top_digit=1000000 top_site_right=570873
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=1 rows=515 top_share=391010 spread_millibits=1979 flat_millibits=8290 top_digit=1000000 top_site_right=576699
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=2 rows=515 top_share=210376 spread_millibits=4180 flat_millibits=8290 top_digit=52427 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=3 rows=515 top_share=650428 spread_millibits=1363 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=4 rows=515 top_share=339172 spread_millibits=2657 flat_millibits=8290 top_digit=58252 top_site_right=13592
+FIELD_PEAKS_OPERAND lap=9 tick=2 head=0 rows=515 top_share=382545 spread_millibits=1992 flat_millibits=8290 top_digit=1000000 top_site_right=504854
+FIELD_PEAKS_OPERAND lap=9 tick=2 head=1 rows=515 top_share=385129 spread_millibits=1985 flat_millibits=8290 top_digit=1000000 top_site_right=539805
+FIELD_PEAKS_OPERAND lap=9 tick=2 head=2 rows=515 top_share=172843 spread_millibits=4648 flat_millibits=8290 top_digit=34951 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=9 tick=2 head=3 rows=515 top_share=277080 spread_millibits=3660 flat_millibits=8290 top_digit=1941 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=2 head=4 rows=515 top_share=536091 spread_millibits=1747 flat_millibits=8290 top_digit=40776 top_site_right=3883
+FIELD_BOUNDARY lap=9 log2_t_millis_class/listen=0:996/213,1:1149/224,2:906/241,3:1358/275,4:1498/238 held_operand_faces=35/515 held_operand_code_bits=3.715 descent_on_log_t=0:-246028718826/-3329503251359,1:-611126388360/2783509276278,2:1501359551118/4443730808217,3:-2032450621799/18599038368679,4:14598081307/2588849205119 readers_cosine_to_witness=3:-20077,0:-5669 witness_faces_at_learned_t=91/515 code_bits=11.927 ms=1455
+FIELD_CLOCK lap=10 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1989
+FIELD_LAP lap=10 read=11 sites=408011 before=2.891 after=2.887 deposited=218/248 halvings=647 next_halved=64 next_refused=72 ms=33711
+FIELD_UNSEEN lap=10 code=2.527 sites=4319 next_change=-11478516 next_halvings=0 next_refused=false ms=413577
+FIELD_HELD lap=10 answer=3.869260 digits=4.302157 text=3.409607 classes=4470 context=2.564240 context_digits=3.968456 context_text=1.073231 context_classes=4470 foil=2.566015 foil_digits=3.969991 foil_text=1.075262 question=0.001776 question_digits=0.001535 question_text=0.002031 ms=414179
+FIELD_PACE lap=10 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=10 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=10 tick=0 head=0 rows=515 top_share=277846 spread_millibits=3216 flat_millibits=8290 top_digit=355339 top_site_right=118446
+FIELD_PEAKS_OPERAND lap=10 tick=0 head=1 rows=515 top_share=336467 spread_millibits=2811 flat_millibits=8290 top_digit=322330 top_site_right=106796
+FIELD_PEAKS_OPERAND lap=10 tick=0 head=2 rows=515 top_share=134153 spread_millibits=4677 flat_millibits=8290 top_digit=36893 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=10 tick=0 head=3 rows=515 top_share=822954 spread_millibits=601 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=10 tick=0 head=4 rows=515 top_share=238535 spread_millibits=3489 flat_millibits=8290 top_digit=44660 top_site_right=38834
+FIELD_PEAKS_OPERAND lap=10 tick=1 head=0 rows=515 top_share=408591 spread_millibits=1891 flat_millibits=8290 top_digit=1000000 top_site_right=580582
+FIELD_PEAKS_OPERAND lap=10 tick=1 head=1 rows=515 top_share=420967 spread_millibits=1845 flat_millibits=8290 top_digit=1000000 top_site_right=594174
+FIELD_PEAKS_OPERAND lap=10 tick=1 head=2 rows=515 top_share=233795 spread_millibits=3954 flat_millibits=8290 top_digit=60194 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=10 tick=1 head=3 rows=515 top_share=742465 spread_millibits=936 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=10 tick=1 head=4 rows=515 top_share=341273 spread_millibits=2642 flat_millibits=8290 top_digit=60194 top_site_right=15533
+FIELD_PEAKS_OPERAND lap=10 tick=2 head=0 rows=515 top_share=420500 spread_millibits=1832 flat_millibits=8290 top_digit=1000000 top_site_right=533980
+FIELD_PEAKS_OPERAND lap=10 tick=2 head=1 rows=515 top_share=426451 spread_millibits=1813 flat_millibits=8290 top_digit=1000000 top_site_right=563106
+FIELD_PEAKS_OPERAND lap=10 tick=2 head=2 rows=515 top_share=202460 spread_millibits=4318 flat_millibits=8290 top_digit=33009 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=10 tick=2 head=3 rows=515 top_share=362004 spread_millibits=3055 flat_millibits=8290 top_digit=1941 top_site_right=0
+FIELD_PEAKS_OPERAND lap=10 tick=2 head=4 rows=515 top_share=464036 spread_millibits=2045 flat_millibits=8290 top_digit=71844 top_site_right=9708
+FIELD_BOUNDARY lap=10 log2_t_millis_class/listen=0:951/256,1:1101/269,2:860/243,3:1340/281,4:1483/225 held_operand_faces=36/515 held_operand_code_bits=3.744 descent_on_log_t=0:-242611825580/-2708781960917,1:-575785477732/4426700354463,2:1359917945572/5485616978020,3:-2290753154603/15000906083027,4:258714528259/2950360728974 readers_cosine_to_witness=3:-6498,0:-6929 witness_faces_at_learned_t=91/515 code_bits=11.900 ms=1279
+FIELD_CLOCK lap=11 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1984
+FIELD_LAP lap=11 read=12 sites=399289 before=2.901 after=2.896 deposited=239/248 halvings=570 next_halved=80 next_refused=79 ms=37994
+FIELD_UNSEEN lap=11 code=2.482 sites=4319 next_change=-3425492 next_halvings=0 next_refused=false ms=456242
+FIELD_HELD lap=11 answer=3.938793 digits=4.183566 text=3.678891 classes=4470 context=2.515734 context_digits=3.892244 context_text=1.054146 context_classes=4470 foil=2.517817 foil_digits=3.894067 foil_text=1.056503 question=0.002082 question_digits=0.001823 question_text=0.002357 ms=456934
+FIELD_PACE lap=11 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=11 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=11 tick=0 head=0 rows=515 top_share=303802 spread_millibits=3014 flat_millibits=8290 top_digit=456310 top_site_right=147572
+FIELD_PEAKS_OPERAND lap=11 tick=0 head=1 rows=515 top_share=358870 spread_millibits=2627 flat_millibits=8290 top_digit=415533 top_site_right=133980
+FIELD_PEAKS_OPERAND lap=11 tick=0 head=2 rows=515 top_share=135238 spread_millibits=4668 flat_millibits=8290 top_digit=38834 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=11 tick=0 head=3 rows=515 top_share=807904 spread_millibits=664 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=11 tick=0 head=4 rows=515 top_share=232404 spread_millibits=3551 flat_millibits=8290 top_digit=44660 top_site_right=36893
+FIELD_PEAKS_OPERAND lap=11 tick=1 head=0 rows=515 top_share=431980 spread_millibits=1800 flat_millibits=8290 top_digit=1000000 top_site_right=601941
+FIELD_PEAKS_OPERAND lap=11 tick=1 head=1 rows=515 top_share=440488 spread_millibits=1767 flat_millibits=8290 top_digit=1000000 top_site_right=611650
+FIELD_PEAKS_OPERAND lap=11 tick=1 head=2 rows=515 top_share=227496 spread_millibits=4024 flat_millibits=8290 top_digit=48543 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=11 tick=1 head=3 rows=515 top_share=729708 spread_millibits=992 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=11 tick=1 head=4 rows=515 top_share=330354 spread_millibits=2697 flat_millibits=8290 top_digit=69902 top_site_right=15533
+FIELD_PEAKS_OPERAND lap=11 tick=2 head=0 rows=515 top_share=444099 spread_millibits=1751 flat_millibits=8290 top_digit=1000000 top_site_right=559223
+FIELD_PEAKS_OPERAND lap=11 tick=2 head=1 rows=515 top_share=445727 spread_millibits=1746 flat_millibits=8290 top_digit=1000000 top_site_right=584466
+FIELD_PEAKS_OPERAND lap=11 tick=2 head=2 rows=515 top_share=205238 spread_millibits=4311 flat_millibits=8290 top_digit=21359 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=11 tick=2 head=3 rows=515 top_share=332802 spread_millibits=3233 flat_millibits=8290 top_digit=5825 top_site_right=0
+FIELD_PEAKS_OPERAND lap=11 tick=2 head=4 rows=515 top_share=482851 spread_millibits=1994 flat_millibits=8290 top_digit=69902 top_site_right=9708
+FIELD_BOUNDARY lap=11 log2_t_millis_class/listen=0:895/310,1:1044/324,2:804/244,3:1325/289,4:1477/205 held_operand_faces=38/515 held_operand_code_bits=3.705 descent_on_log_t=0:-150623824141/-3762553201516,1:-566762448415/5345947960010,2:1178240483960/5282985502183,3:-2500540903225/14904167650347,4:233683231291/3535155169631 readers_cosine_to_witness=3:-3118,0:-6314 witness_faces_at_learned_t=94/515 code_bits=11.864 ms=1375
+FIELD_CLOCK lap=12 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1978
+FIELD_LAP lap=12 read=13 sites=406841 before=2.903 after=2.899 deposited=212/248 halvings=575 next_halved=61 next_refused=88 ms=35578
+FIELD_UNSEEN lap=12 code=2.476 sites=4319 next_change=14605442 next_halvings=1 next_refused=true ms=496728
+FIELD_HELD lap=12 answer=3.887566 digits=4.307155 text=3.442044 classes=4470 context=2.507158 context_digits=3.923386 context_text=1.003395 context_classes=4470 foil=2.509811 foil_digits=3.925940 foil_text=1.006153 question=0.002653 question_digits=0.002554 question_text=0.002758 ms=497315
+FIELD_PACE lap=12 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=12 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=12 tick=0 head=0 rows=515 top_share=312246 spread_millibits=2958 flat_millibits=8290 top_digit=489320 top_site_right=157281
+FIELD_PEAKS_OPERAND lap=12 tick=0 head=1 rows=515 top_share=360843 spread_millibits=2612 flat_millibits=8290 top_digit=466019 top_site_right=149514
+FIELD_PEAKS_OPERAND lap=12 tick=0 head=2 rows=515 top_share=136115 spread_millibits=4655 flat_millibits=8290 top_digit=38834 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=12 tick=0 head=3 rows=515 top_share=783195 spread_millibits=765 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=12 tick=0 head=4 rows=515 top_share=224205 spread_millibits=3624 flat_millibits=8290 top_digit=40776 top_site_right=33009
+FIELD_PEAKS_OPERAND lap=12 tick=1 head=0 rows=515 top_share=441456 spread_millibits=1773 flat_millibits=8290 top_digit=1000000 top_site_right=609708
+FIELD_PEAKS_OPERAND lap=12 tick=1 head=1 rows=515 top_share=449628 spread_millibits=1741 flat_millibits=8290 top_digit=1000000 top_site_right=613592
+FIELD_PEAKS_OPERAND lap=12 tick=1 head=2 rows=515 top_share=242756 spread_millibits=3867 flat_millibits=8290 top_digit=50485 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=12 tick=1 head=3 rows=515 top_share=722577 spread_millibits=1012 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=12 tick=1 head=4 rows=515 top_share=330635 spread_millibits=2712 flat_millibits=8290 top_digit=54368 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=12 tick=2 head=0 rows=515 top_share=458908 spread_millibits=1699 flat_millibits=8290 top_digit=1000000 top_site_right=559223
+FIELD_PEAKS_OPERAND lap=12 tick=2 head=1 rows=515 top_share=459581 spread_millibits=1698 flat_millibits=8290 top_digit=1000000 top_site_right=578640
+FIELD_PEAKS_OPERAND lap=12 tick=2 head=2 rows=515 top_share=223767 spread_millibits=4107 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=12 tick=2 head=3 rows=515 top_share=336510 spread_millibits=3125 flat_millibits=8290 top_digit=7766 top_site_right=0
+FIELD_PEAKS_OPERAND lap=12 tick=2 head=4 rows=515 top_share=471452 spread_millibits=2046 flat_millibits=8290 top_digit=58252 top_site_right=5825
+FIELD_BOUNDARY lap=12 log2_t_millis_class/listen=0:858/347,1:1004/361,2:771/245,3:1318/295,4:1473/194 held_operand_faces=36/515 held_operand_code_bits=3.735 descent_on_log_t=0:-125122917136/-3672465483358,1:-736016714083/7088456102909,2:1499821389031/5634355729861,3:-2771982336497/15186876697653,4:300800311276/4752175015967 readers_cosine_to_witness=3:-4945,0:-8051 witness_faces_at_learned_t=94/515 code_bits=11.842 ms=1414
+FIELD_CLOCK lap=13 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1965
+FIELD_LAP lap=13 read=14 sites=388621 before=2.857 after=2.854 deposited=175/248 halvings=545 next_halved=50 next_refused=75 ms=30927
+FIELD_UNSEEN lap=13 code=2.449 sites=4319 next=- ms=532400
+FIELD_HELD lap=13 answer=3.842025 digits=4.277971 text=3.379135 classes=4470 context=2.482267 context_digits=3.865452 context_text=1.013589 context_classes=4470 foil=2.484881 foil_digits=3.867963 foil_text=1.016314 question=0.002614 question_digits=0.002510 question_text=0.002725 ms=532994
+FIELD_PACE lap=13 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=13 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=13 tick=0 head=0 rows=515 top_share=335907 spread_millibits=2796 flat_millibits=8290 top_digit=520388 top_site_right=170873
+FIELD_PEAKS_OPERAND lap=13 tick=0 head=1 rows=515 top_share=377937 spread_millibits=2491 flat_millibits=8290 top_digit=508737 top_site_right=161165
+FIELD_PEAKS_OPERAND lap=13 tick=0 head=2 rows=515 top_share=136727 spread_millibits=4649 flat_millibits=8290 top_digit=38834 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=13 tick=0 head=3 rows=515 top_share=801924 spread_millibits=693 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=13 tick=0 head=4 rows=515 top_share=220793 spread_millibits=3666 flat_millibits=8290 top_digit=34951 top_site_right=27184
+FIELD_PEAKS_OPERAND lap=13 tick=1 head=0 rows=515 top_share=453945 spread_millibits=1723 flat_millibits=8290 top_digit=1000000 top_site_right=607766
+FIELD_PEAKS_OPERAND lap=13 tick=1 head=1 rows=515 top_share=462209 spread_millibits=1688 flat_millibits=8290 top_digit=1000000 top_site_right=619417
+FIELD_PEAKS_OPERAND lap=13 tick=1 head=2 rows=515 top_share=238908 spread_millibits=3893 flat_millibits=8290 top_digit=50485 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=13 tick=1 head=3 rows=515 top_share=734717 spread_millibits=958 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=13 tick=1 head=4 rows=515 top_share=330284 spread_millibits=2719 flat_millibits=8290 top_digit=52427 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=13 tick=2 head=0 rows=515 top_share=468992 spread_millibits=1662 flat_millibits=8290 top_digit=1000000 top_site_right=568932
+FIELD_PEAKS_OPERAND lap=13 tick=2 head=1 rows=515 top_share=472238 spread_millibits=1653 flat_millibits=8290 top_digit=1000000 top_site_right=603883
+FIELD_PEAKS_OPERAND lap=13 tick=2 head=2 rows=515 top_share=219750 spread_millibits=4130 flat_millibits=8290 top_digit=27184 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=13 tick=2 head=3 rows=515 top_share=327486 spread_millibits=3197 flat_millibits=8290 top_digit=3883 top_site_right=0
+FIELD_PEAKS_OPERAND lap=13 tick=2 head=4 rows=515 top_share=453640 spread_millibits=2145 flat_millibits=8290 top_digit=50485 top_site_right=5825
+FIELD_BOUNDARY lap=13 log2_t_millis_class/listen=0:835/375,1:977/390,2:748/245,3:1308/301,4:1469/184 held_operand_faces=36/515 held_operand_code_bits=3.712 descent_on_log_t=0:-56340005103/-2982713825387,1:-751451349580/6304742090562,2:1292602015742/6680885111643,3:-2623954585116/14310364029316,4:265323893601/5002214899394 readers_cosine_to_witness=3:-5144,0:-7782 witness_faces_at_learned_t=94/515 code_bits=11.828 ms=1274
+FIELD_CLOCK lap=14 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=2011
+FIELD_LAP lap=14 read=15 sites=405382 before=2.889 after=2.887 deposited=74/248 halvings=327 next_halved=22 next_refused=32 ms=25524
+FIELD_UNSEEN lap=14 code=2.436 sites=4319 next=- ms=562574
+FIELD_HELD lap=14 answer=3.917714 digits=4.281154 text=3.531811 classes=4470 context=2.476421 context_digits=3.840591 context_text=1.027935 context_classes=4470 foil=2.479333 foil_digits=3.842980 foil_text=1.031400 question=0.002911 question_digits=0.002389 question_text=0.003465 ms=563159
+FIELD_PACE lap=14 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=14 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=14 tick=0 head=0 rows=515 top_share=333187 spread_millibits=2823 flat_millibits=8290 top_digit=526213 top_site_right=176699
+FIELD_PEAKS_OPERAND lap=14 tick=0 head=1 rows=515 top_share=374304 spread_millibits=2520 flat_millibits=8290 top_digit=477669 top_site_right=157281
+FIELD_PEAKS_OPERAND lap=14 tick=0 head=2 rows=515 top_share=138797 spread_millibits=4621 flat_millibits=8290 top_digit=40776 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=14 tick=0 head=3 rows=515 top_share=806333 spread_millibits=671 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=14 tick=0 head=4 rows=515 top_share=217818 spread_millibits=3694 flat_millibits=8290 top_digit=33009 top_site_right=25242
+FIELD_PEAKS_OPERAND lap=14 tick=1 head=0 rows=515 top_share=445028 spread_millibits=1757 flat_millibits=8290 top_digit=1000000 top_site_right=576699
+FIELD_PEAKS_OPERAND lap=14 tick=1 head=1 rows=515 top_share=452534 spread_millibits=1727 flat_millibits=8290 top_digit=1000000 top_site_right=586407
+FIELD_PEAKS_OPERAND lap=14 tick=1 head=2 rows=515 top_share=256497 spread_millibits=3755 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=14 tick=1 head=3 rows=515 top_share=640921 spread_millibits=1406 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=14 tick=1 head=4 rows=515 top_share=304536 spread_millibits=2904 flat_millibits=8290 top_digit=42718 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=14 tick=2 head=0 rows=515 top_share=458358 spread_millibits=1709 flat_millibits=8290 top_digit=1000000 top_site_right=565048
+FIELD_PEAKS_OPERAND lap=14 tick=2 head=1 rows=515 top_share=460956 spread_millibits=1705 flat_millibits=8290 top_digit=1000000 top_site_right=586407
+FIELD_PEAKS_OPERAND lap=14 tick=2 head=2 rows=515 top_share=235390 spread_millibits=3995 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=14 tick=2 head=3 rows=515 top_share=241937 spread_millibits=4027 flat_millibits=8290 top_digit=19417 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=14 tick=2 head=4 rows=515 top_share=430368 spread_millibits=2309 flat_millibits=8290 top_digit=38834 top_site_right=5825
+FIELD_BOUNDARY lap=14 log2_t_millis_class/listen=0:822/390,1:963/405,2:736/245,3:1306/304,4:1467/183 held_operand_faces=37/515 held_operand_code_bits=3.691 descent_on_log_t=0:-210576695591/-2779400419686,1:-699595380359/7111016695372,2:891509204900/6325813243121,3:-2476567113401/14768501072803,4:314643960240/4378069720255 readers_cosine_to_witness=3:6683,0:-8850 witness_faces_at_learned_t=94/515 code_bits=11.819 ms=1314
+FIELD_CLOCK lap=15 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1979
+FIELD_LAP lap=15 read=16 sites=400344 before=2.845 after=2.841 deposited=206/248 halvings=532 next_halved=64 next_refused=74 ms=32400
+FIELD_UNSEEN lap=15 code=2.424 sites=4319 next_change=29403447 next_halvings=1 next_refused=true ms=599704
+FIELD_HELD lap=15 answer=3.877205 digits=4.173321 text=3.562786 classes=4470 context=2.459534 context_digits=3.851294 context_text=0.981752 context_classes=4470 foil=2.462904 foil_digits=3.854724 foil_text=0.985059 question=0.003371 question_digits=0.003430 question_text=0.003307 ms=600295
+FIELD_PACE lap=15 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=15 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=15 tick=0 head=0 rows=515 top_share=357928 spread_millibits=2653 flat_millibits=8290 top_digit=594174 top_site_right=205825
+FIELD_PEAKS_OPERAND lap=15 tick=0 head=1 rows=515 top_share=386464 spread_millibits=2427 flat_millibits=8290 top_digit=580582 top_site_right=196116
+FIELD_PEAKS_OPERAND lap=15 tick=0 head=2 rows=515 top_share=139957 spread_millibits=4622 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=15 tick=0 head=3 rows=515 top_share=822708 spread_millibits=604 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=15 tick=0 head=4 rows=515 top_share=216378 spread_millibits=3716 flat_millibits=8290 top_digit=33009 top_site_right=25242
+FIELD_PEAKS_OPERAND lap=15 tick=1 head=0 rows=515 top_share=461158 spread_millibits=1694 flat_millibits=8290 top_digit=1000000 top_site_right=636893
+FIELD_PEAKS_OPERAND lap=15 tick=1 head=1 rows=515 top_share=470900 spread_millibits=1654 flat_millibits=8290 top_digit=1000000 top_site_right=654368
+FIELD_PEAKS_OPERAND lap=15 tick=1 head=2 rows=515 top_share=209138 spread_millibits=4182 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=15 tick=1 head=3 rows=515 top_share=767326 spread_millibits=827 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=15 tick=1 head=4 rows=515 top_share=338130 spread_millibits=2680 flat_millibits=8290 top_digit=52427 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=15 tick=2 head=0 rows=515 top_share=471884 spread_millibits=1647 flat_millibits=8290 top_digit=1000000 top_site_right=588349
+FIELD_PEAKS_OPERAND lap=15 tick=2 head=1 rows=515 top_share=476343 spread_millibits=1638 flat_millibits=8290 top_digit=1000000 top_site_right=636893
+FIELD_PEAKS_OPERAND lap=15 tick=2 head=2 rows=515 top_share=186610 spread_millibits=4495 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=15 tick=2 head=3 rows=515 top_share=376175 spread_millibits=2926 flat_millibits=8290 top_digit=5825 top_site_right=0
+FIELD_PEAKS_OPERAND lap=15 tick=2 head=4 rows=515 top_share=454124 spread_millibits=2154 flat_millibits=8290 top_digit=42718 top_site_right=3883
+FIELD_BOUNDARY lap=15 log2_t_millis_class/listen=0:769/428,1:907/443,2:682/246,3:1300/312,4:1460/172 held_operand_faces=37/515 held_operand_code_bits=3.716 descent_on_log_t=0:-72268665958/-2689636939878,1:-1093753569117/6781379696760,2:1323213083079/5736449358832,3:-2466693786845/13818488119707,4:386040545450/5306029578036 readers_cosine_to_witness=3:-7090,0:-9970 witness_faces_at_learned_t=94/515 code_bits=11.801 ms=1441
+FIELD_CLOCK lap=16 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1966
+FIELD_LAP lap=16 read=17 sites=396480 before=2.847 after=2.843 deposited=230/248 halvings=496 next_halved=86 next_refused=100 ms=35879
+FIELD_UNSEEN lap=16 code=2.373 sites=4319 next=- ms=640398
+FIELD_HELD lap=16 answer=3.998584 digits=4.047851 text=3.946271 classes=4470 context=2.408828 context_digits=3.762737 context_text=0.971236 context_classes=4470 foil=2.412009 foil_digits=3.765527 foil_text=0.974833 question=0.003181 question_digits=0.002790 question_text=0.003597 ms=641017
+FIELD_PACE lap=16 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=16 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=16 tick=0 head=0 rows=515 top_share=374635 spread_millibits=2544 flat_millibits=8290 top_digit=594174 top_site_right=215533
+FIELD_PEAKS_OPERAND lap=16 tick=0 head=1 rows=515 top_share=400887 spread_millibits=2331 flat_millibits=8290 top_digit=600000 top_site_right=203883
+FIELD_PEAKS_OPERAND lap=16 tick=0 head=2 rows=515 top_share=140913 spread_millibits=4613 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=16 tick=0 head=3 rows=515 top_share=835167 spread_millibits=559 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=16 tick=0 head=4 rows=515 top_share=211976 spread_millibits=3765 flat_millibits=8290 top_digit=29126 top_site_right=23300
+FIELD_PEAKS_OPERAND lap=16 tick=1 head=0 rows=515 top_share=467824 spread_millibits=1661 flat_millibits=8290 top_digit=1000000 top_site_right=613592
+FIELD_PEAKS_OPERAND lap=16 tick=1 head=1 rows=515 top_share=476854 spread_millibits=1626 flat_millibits=8290 top_digit=1000000 top_site_right=627184
+FIELD_PEAKS_OPERAND lap=16 tick=1 head=2 rows=515 top_share=251410 spread_millibits=3775 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=16 tick=1 head=3 rows=515 top_share=791469 spread_millibits=731 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=16 tick=1 head=4 rows=515 top_share=360901 spread_millibits=2533 flat_millibits=8290 top_digit=46601 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=16 tick=2 head=0 rows=515 top_share=469881 spread_millibits=1637 flat_millibits=8290 top_digit=1000000 top_site_right=586407
+FIELD_PEAKS_OPERAND lap=16 tick=2 head=1 rows=515 top_share=473235 spread_millibits=1635 flat_millibits=8290 top_digit=1000000 top_site_right=623300
+FIELD_PEAKS_OPERAND lap=16 tick=2 head=2 rows=515 top_share=239019 spread_millibits=3947 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=16 tick=2 head=3 rows=515 top_share=367635 spread_millibits=2976 flat_millibits=8290 top_digit=31067 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=16 tick=2 head=4 rows=515 top_share=480640 spread_millibits=2002 flat_millibits=8290 top_digit=36893 top_site_right=5825
+FIELD_BOUNDARY lap=16 log2_t_millis_class/listen=0:734/466,1:870/481,2:655/247,3:1289/320,4:1457/159 held_operand_faces=37/515 held_operand_code_bits=3.692 descent_on_log_t=0:226756723765/-2683921997999,1:-947673661407/12558342810302,2:1428255032000/6950486266711,3:-2633059546986/12700222538647,4:279051895674/4440498937545 readers_cosine_to_witness=3:10232,0:-6622 witness_faces_at_learned_t=96/515 code_bits=11.789 ms=1520
+FIELD_CLOCK lap=17 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1989
+FIELD_LAP lap=17 read=18 sites=403595 before=2.820 after=2.816 deposited=223/248 halvings=596 next_halved=75 next_refused=73 ms=36569
+FIELD_UNSEEN lap=17 code=2.377 sites=4319 next_change=157438 next_halvings=1 next_refused=false ms=681982
+FIELD_HELD lap=17 answer=3.915663 digits=4.244874 text=3.566105 classes=4470 context=2.409743 context_digits=3.825603 context_text=0.906371 context_classes=4470 foil=2.413144 foil_digits=3.828860 foil_text=0.909924 question=0.003401 question_digits=0.003257 question_text=0.003553 ms=682613
+FIELD_PACE lap=17 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=17 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=17 tick=0 head=0 rows=515 top_share=397268 spread_millibits=2414 flat_millibits=8290 top_digit=609708 top_site_right=227184
+FIELD_PEAKS_OPERAND lap=17 tick=0 head=1 rows=515 top_share=415550 spread_millibits=2254 flat_millibits=8290 top_digit=605825 top_site_right=209708
+FIELD_PEAKS_OPERAND lap=17 tick=0 head=2 rows=515 top_share=142151 spread_millibits=4597 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=17 tick=0 head=3 rows=515 top_share=797417 spread_millibits=701 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=17 tick=0 head=4 rows=515 top_share=206223 spread_millibits=3828 flat_millibits=8290 top_digit=25242 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=17 tick=1 head=0 rows=515 top_share=480930 spread_millibits=1624 flat_millibits=8290 top_digit=998058 top_site_right=640776
+FIELD_PEAKS_OPERAND lap=17 tick=1 head=1 rows=515 top_share=489728 spread_millibits=1587 flat_millibits=8290 top_digit=1000000 top_site_right=683495
+FIELD_PEAKS_OPERAND lap=17 tick=1 head=2 rows=515 top_share=224042 spread_millibits=3999 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=17 tick=1 head=3 rows=515 top_share=763435 spread_millibits=846 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=17 tick=1 head=4 rows=515 top_share=348946 spread_millibits=2611 flat_millibits=8290 top_digit=38834 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=17 tick=2 head=0 rows=515 top_share=494554 spread_millibits=1566 flat_millibits=8290 top_digit=1000000 top_site_right=623300
+FIELD_PEAKS_OPERAND lap=17 tick=2 head=1 rows=515 top_share=498680 spread_millibits=1558 flat_millibits=8290 top_digit=1000000 top_site_right=646601
+FIELD_PEAKS_OPERAND lap=17 tick=2 head=2 rows=515 top_share=206061 spread_millibits=4235 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=17 tick=2 head=3 rows=515 top_share=377638 spread_millibits=2827 flat_millibits=8290 top_digit=31067 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=17 tick=2 head=4 rows=515 top_share=466999 spread_millibits=2049 flat_millibits=8290 top_digit=31067 top_site_right=5825
+FIELD_BOUNDARY lap=17 log2_t_millis_class/listen=0:696/504,1:836/519,2:619/251,3:1278/327,4:1443/148 held_operand_faces=36/515 held_operand_code_bits=3.763 descent_on_log_t=0:268392944849/-5258054958629,1:-1280875096549/9385651601967,2:2033883986550/6687173091950,3:-3253097713679/16793707948203,4:527176114498/6478157131679 readers_cosine_to_witness=3:-2074,0:-9900 witness_faces_at_learned_t=96/515 code_bits=11.779 ms=1363
+FIELD_GROW lap=17 width=64 heads=10 contacts=64 rate=9 material=71444 ms=684788
+FIELD_CLOCK lap=18 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1993
+FIELD_LAP lap=18 read=19 sites=403090 before=2.823 after=2.819 deposited=225/248 halvings=538 next_halved=91 next_refused=61 ms=82152
+FIELD_UNSEEN lap=18 code=2.343 sites=4319 next_change=4827885 next_halvings=1 next_refused=true ms=768935
+FIELD_HELD lap=18 answer=3.987112 digits=4.260190 text=3.697156 classes=4470 context=2.374042 context_digits=3.786177 context_text=0.874625 context_classes=4470 foil=2.377907 foil_digits=3.789913 foil_text=0.878627 question=0.003865 question_digits=0.003736 question_text=0.004002 ms=770331
+FIELD_PACE lap=18 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=18 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=18 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=18 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=0 rows=515 top_share=412885 spread_millibits=2306 flat_millibits=8290 top_digit=650485 top_site_right=252427
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=1 rows=515 top_share=424139 spread_millibits=2190 flat_millibits=8290 top_digit=623300 top_site_right=223300
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=2 rows=515 top_share=143257 spread_millibits=4584 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=3 rows=515 top_share=844571 spread_millibits=520 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=4 rows=515 top_share=198569 spread_millibits=3922 flat_millibits=8290 top_digit=25242 top_site_right=21359
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=5 rows=515 top_share=410709 spread_millibits=2324 flat_millibits=8290 top_digit=654368 top_site_right=258252
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=6 rows=515 top_share=424827 spread_millibits=2187 flat_millibits=8290 top_digit=619417 top_site_right=217475
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=7 rows=515 top_share=144658 spread_millibits=4571 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=8 rows=515 top_share=839683 spread_millibits=539 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=18 tick=0 head=9 rows=515 top_share=199511 spread_millibits=3913 flat_millibits=8290 top_digit=27184 top_site_right=23300
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=0 rows=515 top_share=483167 spread_millibits=1619 flat_millibits=8290 top_digit=1000000 top_site_right=634951
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=1 rows=515 top_share=486683 spread_millibits=1607 flat_millibits=8290 top_digit=1000000 top_site_right=650485
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=2 rows=515 top_share=250970 spread_millibits=3767 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=3 rows=515 top_share=794241 spread_millibits=716 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=4 rows=515 top_share=310544 spread_millibits=2832 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=5 rows=515 top_share=484346 spread_millibits=1612 flat_millibits=8290 top_digit=1000000 top_site_right=634951
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=6 rows=515 top_share=491743 spread_millibits=1586 flat_millibits=8290 top_digit=1000000 top_site_right=654368
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=7 rows=515 top_share=239476 spread_millibits=3848 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=8 rows=515 top_share=805976 spread_millibits=671 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=18 tick=1 head=9 rows=515 top_share=321534 spread_millibits=2778 flat_millibits=8290 top_digit=38834 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=0 rows=515 top_share=502560 spread_millibits=1538 flat_millibits=8290 top_digit=1000000 top_site_right=605825
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=1 rows=515 top_share=491431 spread_millibits=1580 flat_millibits=8290 top_digit=1000000 top_site_right=644660
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=2 rows=515 top_share=229824 spread_millibits=4007 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=3 rows=515 top_share=379204 spread_millibits=2710 flat_millibits=8290 top_digit=29126 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=4 rows=515 top_share=377108 spread_millibits=2517 flat_millibits=8290 top_digit=40776 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=5 rows=515 top_share=497905 spread_millibits=1551 flat_millibits=8290 top_digit=1000000 top_site_right=603883
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=6 rows=515 top_share=498457 spread_millibits=1554 flat_millibits=8290 top_digit=1000000 top_site_right=648543
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=7 rows=515 top_share=217709 spread_millibits=4108 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=8 rows=515 top_share=406823 spread_millibits=2585 flat_millibits=8290 top_digit=21359 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=18 tick=2 head=9 rows=515 top_share=384582 spread_millibits=2475 flat_millibits=8290 top_digit=40776 top_site_right=7766
+FIELD_BOUNDARY lap=18 log2_t_millis_class/listen=0:673/517,1:812/533,2:593/252,3:1269/334,4:1438/142,5:673/518,6:812/530,7:593/252,8:1270/334,9:1438/142 held_operand_faces=37/515 held_operand_code_bits=3.723 descent_on_log_t=0:132324996798/-1420163087441,1:-602940650432/6798350799514,2:929499270211/3308797305306,3:-1564476113097/7302935500505,4:277607430424/2421010832078,5:128690190704/-1421867526083,6:-591428710209/6514728195733,7:908354603760/3195801526139,8:-1573616586290/7428812499979,9:283664471472/2612966575664 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2373
+FIELD_CLOCK lap=19 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1986
+FIELD_LAP lap=19 read=20 sites=400159 before=2.805 after=2.801 deposited=193/248 halvings=550 next_halved=69 next_refused=61 ms=83002
+FIELD_UNSEEN lap=19 code=2.322 sites=4319 next_change=151854483 next_halvings=1 next_refused=true ms=859602
+FIELD_HELD lap=19 answer=3.851555 digits=4.027172 text=3.665082 classes=4470 context=2.355872 context_digits=3.734597 context_text=0.891931 context_classes=4470 foil=2.359782 foil_digits=3.738505 foil_text=0.895842 question=0.003910 question_digits=0.003908 question_text=0.003911 ms=861108
+FIELD_PACE lap=19 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=19 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=19 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=19 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=0 rows=515 top_share=420518 spread_millibits=2267 flat_millibits=8290 top_digit=650485 top_site_right=258252
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=1 rows=515 top_share=427181 spread_millibits=2184 flat_millibits=8290 top_digit=654368 top_site_right=242718
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=2 rows=515 top_share=142734 spread_millibits=4585 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=3 rows=515 top_share=840348 spread_millibits=537 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=4 rows=515 top_share=200360 spread_millibits=3898 flat_millibits=8290 top_digit=21359 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=5 rows=515 top_share=417274 spread_millibits=2296 flat_millibits=8290 top_digit=656310 top_site_right=260194
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=6 rows=515 top_share=430506 spread_millibits=2165 flat_millibits=8290 top_digit=658252 top_site_right=242718
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=7 rows=515 top_share=144794 spread_millibits=4567 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=8 rows=515 top_share=831971 spread_millibits=569 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=19 tick=0 head=9 rows=515 top_share=200912 spread_millibits=3892 flat_millibits=8290 top_digit=25242 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=0 rows=515 top_share=500300 spread_millibits=1553 flat_millibits=8290 top_digit=1000000 top_site_right=640776
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=1 rows=515 top_share=506450 spread_millibits=1531 flat_millibits=8290 top_digit=1000000 top_site_right=673786
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=2 rows=515 top_share=257378 spread_millibits=3708 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=3 rows=515 top_share=775414 spread_millibits=787 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=4 rows=515 top_share=319724 spread_millibits=2798 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=5 rows=515 top_share=505162 spread_millibits=1531 flat_millibits=8290 top_digit=1000000 top_site_right=640776
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=6 rows=515 top_share=508574 spread_millibits=1519 flat_millibits=8290 top_digit=1000000 top_site_right=683495
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=7 rows=515 top_share=252931 spread_millibits=3717 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=8 rows=515 top_share=788179 spread_millibits=738 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=19 tick=1 head=9 rows=515 top_share=324581 spread_millibits=2783 flat_millibits=8290 top_digit=36893 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=0 rows=515 top_share=516995 spread_millibits=1485 flat_millibits=8290 top_digit=1000000 top_site_right=629126
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=1 rows=515 top_share=509672 spread_millibits=1514 flat_millibits=8290 top_digit=1000000 top_site_right=623300
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=2 rows=515 top_share=238584 spread_millibits=3933 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=3 rows=515 top_share=352536 spread_millibits=2833 flat_millibits=8290 top_digit=33009 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=4 rows=515 top_share=382147 spread_millibits=2489 flat_millibits=8290 top_digit=46601 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=5 rows=515 top_share=515220 spread_millibits=1488 flat_millibits=8290 top_digit=1000000 top_site_right=615533
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=6 rows=515 top_share=510755 spread_millibits=1508 flat_millibits=8290 top_digit=1000000 top_site_right=656310
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=7 rows=515 top_share=239168 spread_millibits=3905 flat_millibits=8290 top_digit=15533 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=8 rows=515 top_share=379392 spread_millibits=2720 flat_millibits=8290 top_digit=19417 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=19 tick=2 head=9 rows=515 top_share=390517 spread_millibits=2459 flat_millibits=8290 top_digit=36893 top_site_right=7766
+FIELD_BOUNDARY lap=19 log2_t_millis_class/listen=0:653/536,1:791/552,2:574/254,3:1265/337,4:1440/138,5:654/536,6:792/548,7:573/254,8:1266/337,9:1440/138 held_operand_faces=37/515 held_operand_code_bits=3.684 descent_on_log_t=0:79569263531/-1453282292857,1:-583418826430/6443935005944,2:635880589208/3667007203350,3:-1637841377241/7163541714906,4:257383737654/2430739551083,5:88019214058/-1720640895351,6:-589925862410/6144775120735,7:609344860895/3508706544976,8:-1639421329216/7278152165244,9:255800025320/2977386011550 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2379
+FIELD_CLOCK lap=20 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1995
+FIELD_LAP lap=20 read=21 sites=407268 before=2.829 after=2.825 deposited=216/248 halvings=607 next_halved=77 next_refused=85 ms=81669
+FIELD_UNSEEN lap=20 code=2.311 sites=4319 next_change=99435166 next_halvings=1 next_refused=true ms=949163
+FIELD_HELD lap=20 answer=3.896962 digits=4.035353 text=3.750018 classes=4470 context=2.339029 context_digits=3.768037 context_text=0.821696 context_classes=4470 foil=2.343224 foil_digits=3.772212 foil_text=0.825912 question=0.004195 question_digits=0.004175 question_text=0.004217 ms=950524
+FIELD_PACE lap=20 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=20 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=20 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=20 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=0 rows=515 top_share=430275 spread_millibits=2205 flat_millibits=8290 top_digit=658252 top_site_right=264077
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=1 rows=515 top_share=432959 spread_millibits=2150 flat_millibits=8290 top_digit=660194 top_site_right=246601
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=2 rows=515 top_share=143639 spread_millibits=4574 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=3 rows=515 top_share=848524 spread_millibits=506 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=4 rows=515 top_share=198264 spread_millibits=3920 flat_millibits=8290 top_digit=21359 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=5 rows=515 top_share=430124 spread_millibits=2215 flat_millibits=8290 top_digit=662135 top_site_right=262135
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=6 rows=515 top_share=435942 spread_millibits=2133 flat_millibits=8290 top_digit=664077 top_site_right=246601
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=7 rows=515 top_share=146046 spread_millibits=4554 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=8 rows=515 top_share=836862 spread_millibits=550 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=20 tick=0 head=9 rows=515 top_share=199338 spread_millibits=3909 flat_millibits=8290 top_digit=21359 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=0 rows=515 top_share=493281 spread_millibits=1577 flat_millibits=8290 top_digit=1000000 top_site_right=652427
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=1 rows=515 top_share=496351 spread_millibits=1564 flat_millibits=8290 top_digit=1000000 top_site_right=675728
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=2 rows=515 top_share=270078 spread_millibits=3619 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=3 rows=515 top_share=800611 spread_millibits=683 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=4 rows=515 top_share=321942 spread_millibits=2771 flat_millibits=8290 top_digit=46601 top_site_right=13592
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=5 rows=515 top_share=495979 spread_millibits=1565 flat_millibits=8290 top_digit=1000000 top_site_right=650485
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=6 rows=515 top_share=501619 spread_millibits=1543 flat_millibits=8290 top_digit=1000000 top_site_right=683495
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=7 rows=515 top_share=266321 spread_millibits=3625 flat_millibits=8290 top_digit=38834 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=8 rows=515 top_share=810203 spread_millibits=648 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=20 tick=1 head=9 rows=515 top_share=332741 spread_millibits=2716 flat_millibits=8290 top_digit=34951 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=0 rows=515 top_share=512549 spread_millibits=1503 flat_millibits=8290 top_digit=1000000 top_site_right=636893
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=1 rows=515 top_share=500627 spread_millibits=1547 flat_millibits=8290 top_digit=1000000 top_site_right=648543
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=2 rows=515 top_share=255595 spread_millibits=3789 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=3 rows=515 top_share=392639 spread_millibits=2478 flat_millibits=8290 top_digit=34951 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=4 rows=515 top_share=378318 spread_millibits=2503 flat_millibits=8290 top_digit=40776 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=5 rows=515 top_share=507540 spread_millibits=1516 flat_millibits=8290 top_digit=1000000 top_site_right=625242
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=6 rows=515 top_share=505733 spread_millibits=1528 flat_millibits=8290 top_digit=1000000 top_site_right=667961
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=7 rows=515 top_share=257130 spread_millibits=3759 flat_millibits=8290 top_digit=13592 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=8 rows=515 top_share=411897 spread_millibits=2410 flat_millibits=8290 top_digit=19417 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=20 tick=2 head=9 rows=515 top_share=398348 spread_millibits=2409 flat_millibits=8290 top_digit=29126 top_site_right=7766
+FIELD_BOUNDARY lap=20 log2_t_millis_class/listen=0:638/553,1:776/569,2:559/254,3:1262/340,4:1440/133,5:639/553,6:776/565,7:558/255,8:1262/339,9:1439/133 held_operand_faces=36/515 held_operand_code_bits=3.713 descent_on_log_t=0:42823497339/-1968390909956,1:-649968533807/7484369846313,2:708096959072/3230435290517,3:-1928226409764/7155462740637,4:336013172628/2575835736857,5:73395212425/-2374344916796,6:-652675548189/7022408810236,7:664706709071/3078036017144,8:-1946152974474/7520129463042,9:318406941745/3469963779776 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2195
+FIELD_CLOCK lap=21 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1986
+FIELD_LAP lap=21 read=22 sites=402229 before=2.828 after=2.824 deposited=216/248 halvings=608 next_halved=69 next_refused=73 ms=79486
+FIELD_UNSEEN lap=21 code=2.294 sites=4319 next_change=-1689928 next_halvings=0 next_refused=false ms=1035985
+FIELD_HELD lap=21 answer=3.797347 digits=4.141151 text=3.432294 classes=4470 context=2.322191 context_digits=3.727297 context_text=0.830238 context_classes=4470 foil=2.326276 foil_digits=3.731555 foil_text=0.834138 question=0.004085 question_digits=0.004258 question_text=0.003900 ms=1037472
+FIELD_PACE lap=21 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=21 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=21 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=21 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=0 rows=515 top_share=430860 spread_millibits=2208 flat_millibits=8290 top_digit=660194 top_site_right=258252
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=1 rows=515 top_share=427679 spread_millibits=2190 flat_millibits=8290 top_digit=660194 top_site_right=244660
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=2 rows=515 top_share=143413 spread_millibits=4577 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=3 rows=515 top_share=871961 spread_millibits=418 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=4 rows=515 top_share=197496 spread_millibits=3932 flat_millibits=8290 top_digit=19417 top_site_right=15533
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=5 rows=515 top_share=430710 spread_millibits=2221 flat_millibits=8290 top_digit=658252 top_site_right=264077
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=6 rows=515 top_share=427482 spread_millibits=2194 flat_millibits=8290 top_digit=662135 top_site_right=246601
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=7 rows=515 top_share=146577 spread_millibits=4552 flat_millibits=8290 top_digit=46601 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=8 rows=515 top_share=858558 spread_millibits=468 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=0 head=9 rows=515 top_share=198379 spread_millibits=3923 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=0 rows=515 top_share=500571 spread_millibits=1552 flat_millibits=8290 top_digit=1000000 top_site_right=654368
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=1 rows=515 top_share=502612 spread_millibits=1539 flat_millibits=8290 top_digit=1000000 top_site_right=679611
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=2 rows=515 top_share=273775 spread_millibits=3590 flat_millibits=8290 top_digit=36893 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=3 rows=515 top_share=823227 spread_millibits=589 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=4 rows=515 top_share=325142 spread_millibits=2758 flat_millibits=8290 top_digit=40776 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=5 rows=515 top_share=503654 spread_millibits=1535 flat_millibits=8290 top_digit=1000000 top_site_right=656310
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=6 rows=515 top_share=508995 spread_millibits=1514 flat_millibits=8290 top_digit=1000000 top_site_right=689320
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=7 rows=515 top_share=276823 spread_millibits=3532 flat_millibits=8290 top_digit=38834 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=8 rows=515 top_share=834585 spread_millibits=553 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=1 head=9 rows=515 top_share=338938 spread_millibits=2690 flat_millibits=8290 top_digit=31067 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=0 rows=515 top_share=525521 spread_millibits=1454 flat_millibits=8290 top_digit=1000000 top_site_right=652427
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=1 rows=515 top_share=511163 spread_millibits=1503 flat_millibits=8290 top_digit=1000000 top_site_right=669902
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=2 rows=515 top_share=257586 spread_millibits=3769 flat_millibits=8290 top_digit=15533 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=3 rows=515 top_share=438952 spread_millibits=2127 flat_millibits=8290 top_digit=19417 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=4 rows=515 top_share=388683 spread_millibits=2425 flat_millibits=8290 top_digit=33009 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=5 rows=515 top_share=520972 spread_millibits=1466 flat_millibits=8290 top_digit=1000000 top_site_right=644660
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=6 rows=515 top_share=514285 spread_millibits=1491 flat_millibits=8290 top_digit=1000000 top_site_right=689320
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=7 rows=515 top_share=272145 spread_millibits=3619 flat_millibits=8290 top_digit=13592 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=8 rows=515 top_share=454276 spread_millibits=2105 flat_millibits=8290 top_digit=11650 top_site_right=0
+FIELD_PEAKS_OPERAND lap=21 tick=2 head=9 rows=515 top_share=417795 spread_millibits=2308 flat_millibits=8290 top_digit=27184 top_site_right=7766
+FIELD_BOUNDARY lap=21 log2_t_millis_class/listen=0:620/571,1:758/586,2:543/256,3:1256/345,4:1438/128,5:621/571,6:758/582,7:542/256,8:1257/344,9:1439/127 held_operand_faces=37/515 held_operand_code_bits=3.713 descent_on_log_t=0:85467025405/-2332108234784,1:-684555050941/7865973648042,2:804701478541/3787076543213,3:-1844768421696/7807611179145,4:324196792605/2523767761545,5:124047444468/-2781149271828,6:-679450529282/7579987109039,7:738547266498/3606120794950,8:-1882380404116/8247040408981,9:303173024600/4021861019365 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2155
+FIELD_CLOCK lap=22 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1999
+FIELD_LAP lap=22 read=23 sites=398028 before=2.823 after=2.819 deposited=213/248 halvings=656 next_halved=69 next_refused=71 ms=81329
+FIELD_UNSEEN lap=22 code=2.271 sites=4319 next_change=2896621 next_halvings=1 next_refused=true ms=1124813
+FIELD_HELD lap=22 answer=3.960402 digits=4.078559 text=3.834941 classes=4470 context=2.305066 context_digits=3.707033 context_text=0.816445 context_classes=4470 foil=2.309267 foil_digits=3.711005 foil_text=0.820889 question=0.004201 question_digits=0.003972 question_text=0.004444 ms=1126199
+FIELD_PACE lap=22 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=22 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=22 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=22 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=0 rows=515 top_share=445527 spread_millibits=2112 flat_millibits=8290 top_digit=679611 top_site_right=269902
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=1 rows=515 top_share=441992 spread_millibits=2104 flat_millibits=8290 top_digit=679611 top_site_right=260194
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=2 rows=515 top_share=144709 spread_millibits=4556 flat_millibits=8290 top_digit=40776 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=3 rows=515 top_share=891752 spread_millibits=348 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=4 rows=515 top_share=194491 spread_millibits=3972 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=5 rows=515 top_share=448243 spread_millibits=2107 flat_millibits=8290 top_digit=687378 top_site_right=271844
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=6 rows=515 top_share=445142 spread_millibits=2082 flat_millibits=8290 top_digit=685436 top_site_right=264077
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=7 rows=515 top_share=148443 spread_millibits=4529 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=8 rows=515 top_share=876679 spread_millibits=402 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=0 head=9 rows=515 top_share=195651 spread_millibits=3959 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=0 rows=515 top_share=498079 spread_millibits=1555 flat_millibits=8290 top_digit=1000000 top_site_right=671844
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=1 rows=515 top_share=502125 spread_millibits=1541 flat_millibits=8290 top_digit=1000000 top_site_right=673786
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=2 rows=515 top_share=292851 spread_millibits=3436 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=3 rows=515 top_share=831013 spread_millibits=567 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=4 rows=515 top_share=306112 spread_millibits=2886 flat_millibits=8290 top_digit=40776 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=5 rows=515 top_share=504140 spread_millibits=1531 flat_millibits=8290 top_digit=1000000 top_site_right=652427
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=6 rows=515 top_share=507645 spread_millibits=1519 flat_millibits=8290 top_digit=1000000 top_site_right=691262
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=7 rows=515 top_share=279880 spread_millibits=3495 flat_millibits=8290 top_digit=40776 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=8 rows=515 top_share=834306 spread_millibits=560 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=1 head=9 rows=515 top_share=322433 spread_millibits=2794 flat_millibits=8290 top_digit=31067 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=0 rows=515 top_share=519006 spread_millibits=1478 flat_millibits=8290 top_digit=1000000 top_site_right=638834
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=1 rows=515 top_share=504808 spread_millibits=1529 flat_millibits=8290 top_digit=1000000 top_site_right=660194
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=2 rows=515 top_share=273777 spread_millibits=3633 flat_millibits=8290 top_digit=17475 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=3 rows=515 top_share=406979 spread_millibits=2377 flat_millibits=8290 top_digit=23300 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=4 rows=515 top_share=358576 spread_millibits=2641 flat_millibits=8290 top_digit=44660 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=5 rows=515 top_share=517118 spread_millibits=1481 flat_millibits=8290 top_digit=1000000 top_site_right=646601
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=6 rows=515 top_share=508689 spread_millibits=1514 flat_millibits=8290 top_digit=1000000 top_site_right=675728
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=7 rows=515 top_share=271754 spread_millibits=3625 flat_millibits=8290 top_digit=15533 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=8 rows=515 top_share=410368 spread_millibits=2447 flat_millibits=8290 top_digit=13592 top_site_right=0
+FIELD_PEAKS_OPERAND lap=22 tick=2 head=9 rows=515 top_share=387943 spread_millibits=2491 flat_millibits=8290 top_digit=27184 top_site_right=5825
+FIELD_BOUNDARY lap=22 log2_t_millis_class/listen=0:603/583,1:740/599,2:525/257,3:1252/349,4:1438/126,5:604/584,6:740/594,7:523/258,8:1253/348,9:1439/126 held_operand_faces=37/515 held_operand_code_bits=3.723 descent_on_log_t=0:191954689897/-2277564623407,1:-778339984079/9440464191047,2:730165611675/4343225802086,3:-2023690808924/6817072239555,4:375774783586/2608872224328,5:222910736165/-2713391127831,6:-790719163615/8823920475895,7:661036522259/4005126481154,8:-2061087173035/7337225099103,9:340528694848/4655501770147 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2215
+FIELD_CLOCK lap=23 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1997
+FIELD_LAP lap=23 read=24 sites=401473 before=2.769 after=2.766 deposited=215/248 halvings=583 next_halved=68 next_refused=79 ms=79434
+FIELD_UNSEEN lap=23 code=2.260 sites=4319 next_change=-4357822 next_halvings=0 next_refused=false ms=1211656
+FIELD_HELD lap=23 answer=3.949157 digits=4.178577 text=3.705557 classes=4470 context=2.290605 context_digits=3.702297 context_text=0.791660 context_classes=4470 foil=2.295258 foil_digits=3.706896 foil_text=0.796369 question=0.004652 question_digits=0.004599 question_text=0.004708 ms=1213108
+FIELD_PACE lap=23 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=23 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=23 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=23 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=0 rows=515 top_share=446214 spread_millibits=2112 flat_millibits=8290 top_digit=667961 top_site_right=266019
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=1 rows=515 top_share=439319 spread_millibits=2118 flat_millibits=8290 top_digit=667961 top_site_right=252427
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=2 rows=515 top_share=142622 spread_millibits=4580 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=3 rows=515 top_share=890873 spread_millibits=349 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=4 rows=515 top_share=192659 spread_millibits=3991 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=5 rows=515 top_share=450576 spread_millibits=2100 flat_millibits=8290 top_digit=667961 top_site_right=258252
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=6 rows=515 top_share=442723 spread_millibits=2095 flat_millibits=8290 top_digit=673786 top_site_right=258252
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=7 rows=515 top_share=146809 spread_millibits=4553 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=8 rows=515 top_share=872180 spread_millibits=416 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=0 head=9 rows=515 top_share=193753 spread_millibits=3979 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=0 rows=515 top_share=508766 spread_millibits=1521 flat_millibits=8290 top_digit=1000000 top_site_right=666019
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=1 rows=515 top_share=512096 spread_millibits=1509 flat_millibits=8290 top_digit=1000000 top_site_right=669902
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=2 rows=515 top_share=292514 spread_millibits=3435 flat_millibits=8290 top_digit=36893 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=3 rows=515 top_share=829933 spread_millibits=567 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=4 rows=515 top_share=310184 spread_millibits=2862 flat_millibits=8290 top_digit=40776 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=5 rows=515 top_share=514623 spread_millibits=1498 flat_millibits=8290 top_digit=1000000 top_site_right=660194
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=6 rows=515 top_share=518235 spread_millibits=1484 flat_millibits=8290 top_digit=1000000 top_site_right=687378
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=7 rows=515 top_share=282774 spread_millibits=3467 flat_millibits=8290 top_digit=33009 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=8 rows=515 top_share=838195 spread_millibits=544 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=1 head=9 rows=515 top_share=322707 spread_millibits=2789 flat_millibits=8290 top_digit=31067 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=0 rows=515 top_share=533375 spread_millibits=1431 flat_millibits=8290 top_digit=1000000 top_site_right=644660
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=1 rows=515 top_share=516396 spread_millibits=1488 flat_millibits=8290 top_digit=1000000 top_site_right=654368
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=2 rows=515 top_share=272101 spread_millibits=3643 flat_millibits=8290 top_digit=15533 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=3 rows=515 top_share=420155 spread_millibits=2247 flat_millibits=8290 top_digit=23300 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=4 rows=515 top_share=355810 spread_millibits=2640 flat_millibits=8290 top_digit=44660 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=5 rows=515 top_share=528246 spread_millibits=1442 flat_millibits=8290 top_digit=1000000 top_site_right=646601
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=6 rows=515 top_share=519239 spread_millibits=1478 flat_millibits=8290 top_digit=1000000 top_site_right=681553
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=7 rows=515 top_share=275369 spread_millibits=3589 flat_millibits=8290 top_digit=9708 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=8 rows=515 top_share=429121 spread_millibits=2288 flat_millibits=8290 top_digit=13592 top_site_right=0
+FIELD_PEAKS_OPERAND lap=23 tick=2 head=9 rows=515 top_share=387452 spread_millibits=2481 flat_millibits=8290 top_digit=23300 top_site_right=5825
+FIELD_BOUNDARY lap=23 log2_t_millis_class/listen=0:592/598,1:728/614,2:512/258,3:1249/352,4:1439/122,5:593/599,6:729/609,7:510/259,8:1250/351,9:1440/122 held_operand_faces=37/515 held_operand_code_bits=3.716 descent_on_log_t=0:81469452728/-2333121753908,1:-793800946063/9099598076487,2:714351208995/4532852371138,3:-2134251062964/7163459619224,4:318412109076/2885342463737,5:113818272451/-2898296768973,6:-795089168739/8086585366292,7:667416816818/4181694766466,8:-2171951830077/7769516718570,9:282119539556/5625347330653 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2150
+FIELD_CLOCK lap=24 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=2022
+FIELD_LAP lap=24 read=25 sites=400709 before=2.797 after=2.792 deposited=229/248 halvings=589 next_halved=82 next_refused=80 ms=81094
+FIELD_UNSEEN lap=24 code=2.238 sites=4319 next_change=-4469051 next_halvings=0 next_refused=false ms=1300159
+FIELD_HELD lap=24 answer=3.926869 digits=4.058989 text=3.786584 classes=4470 context=2.269170 context_digits=3.658386 context_text=0.794088 context_classes=4470 foil=2.274128 foil_digits=3.663369 foil_text=0.799020 question=0.004958 question_digits=0.004983 question_text=0.004931 ms=1301604
+FIELD_PACE lap=24 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=24 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=24 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=24 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=0 rows=515 top_share=453971 spread_millibits=2068 flat_millibits=8290 top_digit=693203 top_site_right=277669
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=1 rows=515 top_share=444019 spread_millibits=2097 flat_millibits=8290 top_digit=695145 top_site_right=281553
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=2 rows=515 top_share=142417 spread_millibits=4577 flat_millibits=8290 top_digit=40776 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=3 rows=515 top_share=913818 spread_millibits=270 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=4 rows=515 top_share=190323 spread_millibits=4026 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=5 rows=515 top_share=459022 spread_millibits=2048 flat_millibits=8290 top_digit=687378 top_site_right=275728
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=6 rows=515 top_share=448950 spread_millibits=2068 flat_millibits=8290 top_digit=697087 top_site_right=269902
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=7 rows=515 top_share=147428 spread_millibits=4548 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=8 rows=515 top_share=890267 spread_millibits=351 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=0 head=9 rows=515 top_share=190759 spread_millibits=4020 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=0 rows=515 top_share=507708 spread_millibits=1519 flat_millibits=8290 top_digit=1000000 top_site_right=671844
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=1 rows=515 top_share=513501 spread_millibits=1503 flat_millibits=8290 top_digit=1000000 top_site_right=673786
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=2 rows=515 top_share=293461 spread_millibits=3430 flat_millibits=8290 top_digit=36893 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=3 rows=515 top_share=856531 spread_millibits=473 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=4 rows=515 top_share=313072 spread_millibits=2847 flat_millibits=8290 top_digit=44660 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=5 rows=515 top_share=515629 spread_millibits=1487 flat_millibits=8290 top_digit=1000000 top_site_right=664077
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=6 rows=515 top_share=518965 spread_millibits=1481 flat_millibits=8290 top_digit=1000000 top_site_right=699029
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=7 rows=515 top_share=283151 spread_millibits=3454 flat_millibits=8290 top_digit=33009 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=8 rows=515 top_share=857757 spread_millibits=475 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=1 head=9 rows=515 top_share=320688 spread_millibits=2802 flat_millibits=8290 top_digit=31067 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=0 rows=515 top_share=523483 spread_millibits=1459 flat_millibits=8290 top_digit=1000000 top_site_right=666019
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=1 rows=515 top_share=509520 spread_millibits=1511 flat_millibits=8290 top_digit=1000000 top_site_right=687378
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=2 rows=515 top_share=273770 spread_millibits=3635 flat_millibits=8290 top_digit=13592 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=3 rows=515 top_share=435922 spread_millibits=2178 flat_millibits=8290 top_digit=23300 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=4 rows=515 top_share=345598 spread_millibits=2692 flat_millibits=8290 top_digit=46601 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=5 rows=515 top_share=523618 spread_millibits=1456 flat_millibits=8290 top_digit=1000000 top_site_right=671844
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=6 rows=515 top_share=512214 spread_millibits=1501 flat_millibits=8290 top_digit=1000000 top_site_right=706796
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=7 rows=515 top_share=282132 spread_millibits=3530 flat_millibits=8290 top_digit=9708 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=8 rows=515 top_share=439296 spread_millibits=2254 flat_millibits=8290 top_digit=9708 top_site_right=0
+FIELD_PEAKS_OPERAND lap=24 tick=2 head=9 rows=515 top_share=376472 spread_millibits=2543 flat_millibits=8290 top_digit=25242 top_site_right=5825
+FIELD_BOUNDARY lap=24 log2_t_millis_class/listen=0:573/615,1:708/630,2:492/259,3:1249/357,4:1439/116,5:574/616,6:709/624,7:489/262,8:1250/355,9:1440/116 held_operand_faces=37/515 held_operand_code_bits=3.674 descent_on_log_t=0:177410937276/-1586693328100,1:-779668712742/10919547076581,2:858092192184/3428712141371,3:-1914258694080/6153217277192,4:415280324779/1903192935576,5:198339444910/-2058737395540,6:-770863365949/9346099074863,7:789121583187/2994601460013,8:-1966853198885/7048621697619,9:381869840605/4671770193794 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2154
+FIELD_CLOCK lap=25 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=2004
+FIELD_LAP lap=25 read=26 sites=392692 before=2.803 after=2.798 deposited=237/248 halvings=504 next_halved=79 next_refused=88 ms=81638
+FIELD_UNSEEN lap=25 code=2.238 sites=4319 next_change=-2718823 next_halvings=0 next_refused=false ms=1389213
+FIELD_HELD lap=25 answer=3.904628 digits=4.251486 text=3.536331 classes=4470 context=2.263479 context_digits=3.693619 context_text=0.744944 context_classes=4470 foil=2.268317 foil_digits=3.698417 foil_text=0.749824 question=0.004838 question_digits=0.004799 question_text=0.004880 ms=1390662
+FIELD_PACE lap=25 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=25 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=25 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=25 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=0 rows=515 top_share=465211 spread_millibits=2011 flat_millibits=8290 top_digit=683495 top_site_right=275728
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=1 rows=515 top_share=451390 spread_millibits=2062 flat_millibits=8290 top_digit=673786 top_site_right=269902
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=2 rows=515 top_share=143088 spread_millibits=4565 flat_millibits=8290 top_digit=42718 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=3 rows=515 top_share=916653 spread_millibits=260 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=4 rows=515 top_share=187118 spread_millibits=4061 flat_millibits=8290 top_digit=19417 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=5 rows=515 top_share=471731 spread_millibits=1986 flat_millibits=8290 top_digit=666019 top_site_right=271844
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=6 rows=515 top_share=458096 spread_millibits=2021 flat_millibits=8290 top_digit=681553 top_site_right=267961
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=7 rows=515 top_share=148676 spread_millibits=4541 flat_millibits=8290 top_digit=40776 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=8 rows=515 top_share=881845 spread_millibits=381 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=25 tick=0 head=9 rows=515 top_share=186922 spread_millibits=4064 flat_millibits=8290 top_digit=21359 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=0 rows=515 top_share=522370 spread_millibits=1475 flat_millibits=8290 top_digit=1000000 top_site_right=677669
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=1 rows=515 top_share=532485 spread_millibits=1445 flat_millibits=8290 top_digit=1000000 top_site_right=671844
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=2 rows=515 top_share=315741 spread_millibits=3239 flat_millibits=8290 top_digit=31067 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=3 rows=515 top_share=858138 spread_millibits=469 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=4 rows=515 top_share=330602 spread_millibits=2761 flat_millibits=8290 top_digit=50485 top_site_right=13592
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=5 rows=515 top_share=532111 spread_millibits=1433 flat_millibits=8290 top_digit=1000000 top_site_right=666019
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=6 rows=515 top_share=535222 spread_millibits=1432 flat_millibits=8290 top_digit=1000000 top_site_right=689320
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=7 rows=515 top_share=295949 spread_millibits=3330 flat_millibits=8290 top_digit=33009 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=8 rows=515 top_share=865201 spread_millibits=451 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=25 tick=1 head=9 rows=515 top_share=324130 spread_millibits=2797 flat_millibits=8290 top_digit=31067 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=0 rows=515 top_share=548023 spread_millibits=1385 flat_millibits=8290 top_digit=1000000 top_site_right=648543
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=1 rows=515 top_share=541441 spread_millibits=1408 flat_millibits=8290 top_digit=1000000 top_site_right=646601
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=2 rows=515 top_share=291322 spread_millibits=3475 flat_millibits=8290 top_digit=13592 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=3 rows=515 top_share=412351 spread_millibits=2309 flat_millibits=8290 top_digit=40776 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=4 rows=515 top_share=357563 spread_millibits=2605 flat_millibits=8290 top_digit=46601 top_site_right=11650
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=5 rows=515 top_share=550657 spread_millibits=1368 flat_millibits=8290 top_digit=1000000 top_site_right=654368
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=6 rows=515 top_share=537238 spread_millibits=1423 flat_millibits=8290 top_digit=1000000 top_site_right=667961
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=7 rows=515 top_share=289872 spread_millibits=3449 flat_millibits=8290 top_digit=9708 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=8 rows=515 top_share=437105 spread_millibits=2304 flat_millibits=8290 top_digit=15533 top_site_right=1941
+FIELD_PEAKS_OPERAND lap=25 tick=2 head=9 rows=515 top_share=390984 spread_millibits=2450 flat_millibits=8290 top_digit=25242 top_site_right=7766
+FIELD_BOUNDARY lap=25 log2_t_millis_class/listen=0:553/628,1:688/647,2:470/261,3:1242/362,4:1437/111,5:554/631,6:690/639,7:467/265,8:1244/358,9:1440/112 held_operand_faces=36/515 held_operand_code_bits=3.745 descent_on_log_t=0:171658653090/-1072395513949,1:-982531777062/11102921061900,2:977689828718/4283339490294,3:-2060991744316/6880259935195,4:419418035026/2400449945448,5:224034052666/-2075371657952,6:-1010239053715/9546446587714,7:902359035839/3642877676192,8:-2145301075575/8166794804741,9:412255274601/6214245322366 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2148
+FIELD_CLOCK lap=26 regions=3968 forced=2798 satisfied=2798 cutting=0 empty=0 silent=1170 dimension=17 skin_pinned=25 both_live=0 published=true at_one="\\n#0123456789<=>?" at_zero=" +abcdefghijklmnoprstuvwxyz" other="" ms=1988
+FIELD_LAP lap=26 read=27 sites=390527 before=2.773 after=2.768 deposited=222/248 halvings=536 next_halved=71 next_refused=83 ms=82003
+FIELD_UNSEEN lap=26 code=2.213 sites=4319 next_change=29019859 next_halvings=1 next_refused=true ms=1478589
+FIELD_HELD lap=26 answer=3.856613 digits=3.986015 text=3.719212 classes=4470 context=2.236272 context_digits=3.665163 context_text=0.719063 context_classes=4470 foil=2.241365 foil_digits=3.670631 foil_text=0.723759 question=0.005094 question_digits=0.005468 question_text=0.004696 ms=1480032
+FIELD_PACE lap=26 head=2 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=26 head=3 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=26 head=7 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PACE lap=26 head=8 digits=713 kappa_digits=1000000 inside_words=5822 kappa_inside_words=0 gap=1000000
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=0 rows=515 top_share=475835 spread_millibits=1936 flat_millibits=8290 top_digit=679611 top_site_right=277669
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=1 rows=515 top_share=466393 spread_millibits=1961 flat_millibits=8290 top_digit=677669 top_site_right=264077
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=2 rows=515 top_share=140653 spread_millibits=4589 flat_millibits=8290 top_digit=40776 top_site_right=7766
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=3 rows=515 top_share=922875 spread_millibits=238 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=4 rows=515 top_share=185569 spread_millibits=4079 flat_millibits=8290 top_digit=21359 top_site_right=17475
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=5 rows=515 top_share=488267 spread_millibits=1880 flat_millibits=8290 top_digit=667961 top_site_right=273786
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=6 rows=515 top_share=471850 spread_millibits=1927 flat_millibits=8290 top_digit=681553 top_site_right=266019
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=7 rows=515 top_share=152767 spread_millibits=4509 flat_millibits=8290 top_digit=42718 top_site_right=9708
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=8 rows=515 top_share=882828 spread_millibits=374 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=0 head=9 rows=515 top_share=186127 spread_millibits=4076 flat_millibits=8290 top_digit=21359 top_site_right=19417
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=0 rows=515 top_share=522383 spread_millibits=1475 flat_millibits=8290 top_digit=1000000 top_site_right=675728
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=1 rows=515 top_share=533033 spread_millibits=1442 flat_millibits=8290 top_digit=1000000 top_site_right=675728
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=2 rows=515 top_share=294476 spread_millibits=3418 flat_millibits=8290 top_digit=31067 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=3 rows=515 top_share=865325 spread_millibits=439 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=4 rows=515 top_share=344030 spread_millibits=2657 flat_millibits=8290 top_digit=50485 top_site_right=15533
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=5 rows=515 top_share=534367 spread_millibits=1425 flat_millibits=8290 top_digit=1000000 top_site_right=664077
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=6 rows=515 top_share=540618 spread_millibits=1414 flat_millibits=8290 top_digit=1000000 top_site_right=700970
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=7 rows=515 top_share=282599 spread_millibits=3450 flat_millibits=8290 top_digit=25242 top_site_right=5825
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=8 rows=515 top_share=865832 spread_millibits=447 flat_millibits=8290 top_digit=0 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=1 head=9 rows=515 top_share=318899 spread_millibits=2815 flat_millibits=8290 top_digit=33009 top_site_right=13592
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=0 rows=515 top_share=544914 spread_millibits=1393 flat_millibits=8290 top_digit=1000000 top_site_right=652427
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=1 rows=515 top_share=536960 spread_millibits=1424 flat_millibits=8290 top_digit=1000000 top_site_right=658252
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=2 rows=515 top_share=273715 spread_millibits=3636 flat_millibits=8290 top_digit=11650 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=3 rows=515 top_share=431027 spread_millibits=2172 flat_millibits=8290 top_digit=23300 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=4 rows=515 top_share=363417 spread_millibits=2541 flat_millibits=8290 top_digit=46601 top_site_right=13592
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=5 rows=515 top_share=551711 spread_millibits=1368 flat_millibits=8290 top_digit=1000000 top_site_right=662135
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=6 rows=515 top_share=540503 spread_millibits=1411 flat_millibits=8290 top_digit=1000000 top_site_right=687378
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=7 rows=515 top_share=276044 spread_millibits=3581 flat_millibits=8290 top_digit=9708 top_site_right=3883
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=8 rows=515 top_share=433888 spread_millibits=2312 flat_millibits=8290 top_digit=9708 top_site_right=0
+FIELD_PEAKS_OPERAND lap=26 tick=2 head=9 rows=515 top_share=379222 spread_millibits=2487 flat_millibits=8290 top_digit=27184 top_site_right=7766
+FIELD_BOUNDARY lap=26 log2_t_millis_class/listen=0:532/644,1:668/663,2:453/262,3:1241/369,4:1442/105,5:533/647,6:669/655,7:447/269,8:1241/363,9:1447/108 held_operand_faces=36/515 held_operand_code_bits=3.751 descent_on_log_t=0:188766467931/-1209788353591,1:-1100002688935/12512305086000,2:1145826121623/4984820669395,3:-2150327376786/7578553669364,4:453123719811/1914598768091,5:247241228453/-2986518035241,6:-1120808431863/10044968517728,7:1062434057479/4385808950468,8:-2322063959138/9097821750710,9:469024890478/6030139090340 readers_cosine_to_witness=not_read(grown) witness_faces_at_learned_t=not_read(grown) ms=2448
+MEASURE lap=crib14 rc=0 wall_s=1484.8 peak_rss_kib=381916

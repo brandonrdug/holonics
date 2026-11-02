@@ -847,6 +847,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // never moves it.
     let located = std::env::var("FIELD_CLOCK").is_ok_and(|v| v == "located");
     learner.located = located;
+    let (witness, fronts) = if located { (Some(published_witness(&codec, learner.field.declaration, &keys, &train_set)?), operand_fronts(&codec, &dev_set)) } else { (None, Vec::new()) };
     for lap in 0..laps {
         if located && lap > 0 {
             let clock_start = std::time::Instant::now();
@@ -965,8 +966,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             println!("FIELD_STOPPED_EARLY lap={lap} reason=no clock moved toward a digit clock and the question tells the answer no more than the foil ms={}", started.elapsed().as_millis());
             break;
         }
-        if std::env::var_os("FIELD_PEAKS_EACH_LAP").is_some() {
+        if std::env::var_os("FIELD_PEAKS_EACH_LAP").is_some() || located {
             peaks_text(&learner.field, &codec, &dev_set, realization, &lap.to_string())?;
+        }
+        if let Some(w) = &witness {
+            boundary_text(&learner.field, w, &fronts, realization, lap)?;
         }
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
@@ -990,6 +994,113 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         }
         previous = (code, unseen_sites);
     }
+    Ok(())
+}
+
+/// [agent-inferred, November 2] **The witness under the published clock** (§16.16): its readers moved by the clock's
+/// own distances read on the training problems (the anchor's distance from the question's first digit stands past
+/// the digit clock's by the sites between that the published clock ticks and the digit clock does not, and the open
+/// receiver's row, unreached at 1; the comb by the receiver's own rate, one tick, in the host's sense, −1).
+fn published_witness(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8], train_set: &Problems) -> Result<Field> {
+    let mut shifts: std::collections::BTreeMap<i128, usize> = std::collections::BTreeMap::new();
+    for (q, a, _) in train_set {
+        let (qb, ab) = (codec.decode(q), codec.decode(a));
+        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+        let Some(first) = (0..qb.len()).find(|&t| qb[t].is_ascii_digit()) else { continue };
+        let ticks = |c: usize| -> (i128, i128) {
+            let b = codec.decode(&[c]);
+            (i128::from(codec.is_digit(c)), i128::from(!(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0]))))
+        };
+        let shift: i128 = q[first + 1..].iter().chain(&a[..open + 2]).map(|&c| { let (d, p) = ticks(c); p - d }).sum::<i128>() + 1;
+        *shifts.entry(shift).or_insert(0) += 1;
+    }
+    let anchor = *shifts.iter().max_by_key(|e| *e.1).map(|e| e.0).unwrap_or(&0);
+    println!("FIELD_WITNESS_CLOCK published anchor_shift_ticks={shifts:?} chosen={anchor} comb_ticks=-1");
+    witness_on_readers(codec, declaration, keys, Some(PUBLISHED_PINNED), (anchor, -1))
+}
+
+/// The held problems' first-calculation operand fronts, each cut at the digit (the digit the region's last site,
+/// open), as `witness-field` reads them.
+fn operand_fronts(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>)> {
+    let mut reads = Vec::new();
+    for (q, a, _) in problems {
+        let (qb, ab) = (codec.decode(q), codec.decode(a));
+        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+        let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
+        let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
+        if runs < 2 || la == 0 || lb == 0 {
+            continue;
+        }
+        for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
+            let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
+            let mut unresolved = vec![false; classes.len()];
+            *unresolved.last_mut().unwrap() = true;
+            reads.push((classes, unresolved));
+        }
+    }
+    reads
+}
+
+/// [agent-inferred, November 2; the run's declared receipts, §16.16] **A lap boundary's receipts**: each head's and
+/// kind's `log₂ T`; on the held operand fronts, (iv) the descent on each `log₂ T` and (ii) the readers' descent's cosine
+/// with the way to the witness's readers (heads 3 and 0, where the learner's shape is the witness's); and the witness's
+/// faces and code on those fronts at the learner's temperatures.
+fn boundary_text(field: &Field, witness: &Field, fronts: &[(Vec<usize>, Vec<bool>)], realization: &mut dyn FieldRealization, lap: usize) -> Result<()> {
+    let started = std::time::Instant::now();
+    let d = field.declaration;
+    let l = field.layout().clone();
+    let logs: Vec<String> = (0..d.heads).map(|h| format!("{h}:{}/{}", (field.theta[l.temper + 2 * h] as i64 * 1000) >> 24, (field.theta[l.temper + 2 * h + 1] as i64 * 1000) >> 24)).collect();
+    let views: Vec<Region> = fronts.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+    let mut g = vec![0i128; field.theta.len()];
+    let (mut code, mut right) = (0i64, 0usize);
+    for chunk in views.chunks(64) {
+        let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
+        for (region, faces) in chunk.iter().zip(&faces) {
+            let last = region.classes.len() - 1;
+            if let Some(face) = &faces[last] {
+                code += face.code(region.classes[last]);
+                right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
+            }
+        }
+        for (acc, v) in g.iter_mut().zip(part) {
+            *acc += v;
+        }
+    }
+    let sites = views.len().max(1) as i128;
+    let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
+    let descent_t: Vec<String> = (0..d.heads).map(|h| format!("{h}:{}/{}", -g[l.temper + 2 * h], -g[l.temper + 2 * h + 1])).collect();
+    let same = witness.theta.len() == field.theta.len() && witness.declaration == d;
+    let (mut readers, mut witness_faces) = (String::from("not_read(grown)"), String::from("not_read(grown)"));
+    if same {
+        let (m, dw, n) = (d.complex(), d.width, d.modes);
+        let cosines: Vec<String> = [3usize, 0]
+            .iter()
+            .map(|&h| {
+                let rows: Vec<std::ops::Range<usize>> = (0..n).flat_map(|li| [h * n + li, m + h * n + li]).flat_map(|o| [l.q + o * dw..l.q + (o + 1) * dw, l.q_bias + o..l.q_bias + o + 1, l.probe + o * dw..l.probe + (o + 1) * dw, l.probe_bias + o..l.probe_bias + o + 1]).collect();
+                let descent: Vec<i128> = rows.iter().flat_map(|r| g[r.clone()].iter().map(|&v| -v)).collect();
+                let toward: Vec<i128> = rows.iter().flat_map(|r| r.clone().map(|i| witness.theta[i] as i128 - field.theta[i] as i128)).collect();
+                format!("{h}:{}", cosine(&descent, &toward))
+            })
+            .collect();
+        readers = cosines.join(",");
+        let mut learned = witness.clone();
+        learned.theta[l.temper..l.temper + 2 * d.heads].copy_from_slice(&field.theta[l.temper..l.temper + 2 * d.heads]);
+        let mut wcode = 0i64;
+        let mut wright = 0usize;
+        for chunk in views.chunks(64) {
+            let faces = realization.read_faces(&learned, chunk).map_err(|e| e.to_string())?;
+            for (region, faces) in chunk.iter().zip(&faces) {
+                let last = region.classes.len() - 1;
+                if let Some(face) = &faces[last] {
+                    wcode += face.code(region.classes[last]);
+                    wright += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
+                }
+            }
+        }
+        witness_faces = format!("{wright}/{} code_bits={}", views.len(), bits(wcode));
+    }
+    println!("FIELD_BOUNDARY lap={lap} log2_t_millis_class/listen={} held_operand_faces={right}/{} held_operand_code_bits={} descent_on_log_t={} readers_cosine_to_witness={readers} witness_faces_at_learned_t={witness_faces} ms={}", logs.join(","), views.len(), bits(code), descent_t.join(","), started.elapsed().as_millis());
     Ok(())
 }
 
@@ -2002,28 +2113,7 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     // does not (and the open receiver's row, unreached at 1); the comb by the receiver's own rate, one tick, in the
     // sense the host's training fronts read (−1).
     let published = std::env::var("FIELD_WITNESS_CLOCK").is_ok_and(|v| v == "published");
-    let witness = if published {
-        let mut shifts: std::collections::BTreeMap<i128, usize> = std::collections::BTreeMap::new();
-        for (q, a, _) in &train_set {
-            let (qb, ab) = (codec.decode(q), codec.decode(a));
-            let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
-            let Some(first) = (0..qb.len()).find(|&t| qb[t].is_ascii_digit()) else { continue };
-            let ticks = |c: usize| -> (i128, i128) {
-                let b = codec.decode(&[c]);
-                let digit = i128::from(codec.is_digit(c));
-                let pub_rate = i128::from(!(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0])));
-                (digit, pub_rate)
-            };
-            let span = q[first + 1..].iter().chain(&a[..open + 2]);
-            let shift: i128 = span.map(|&c| { let (d, p) = ticks(c); p - d }).sum::<i128>() + 1;
-            *shifts.entry(shift).or_insert(0) += 1;
-        }
-        let anchor = *shifts.iter().max_by_key(|e| *e.1).map(|e| e.0).unwrap_or(&0);
-        println!("FIELD_WITNESS_CLOCK published anchor_shift_ticks={shifts:?} chosen={anchor} comb_ticks=-1");
-        witness_on_readers(&codec, declaration, &keys, Some(PUBLISHED_PINNED), (anchor, -1))?
-    } else {
-        witness_on(&codec, declaration, &keys)?
-    };
+    let witness = if published { published_witness(&codec, declaration, &keys, &train_set)? } else { witness_on(&codec, declaration, &keys)? };
     let founding = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
     // The reads: each operand digit's front cut at the digit.
     let mut reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();

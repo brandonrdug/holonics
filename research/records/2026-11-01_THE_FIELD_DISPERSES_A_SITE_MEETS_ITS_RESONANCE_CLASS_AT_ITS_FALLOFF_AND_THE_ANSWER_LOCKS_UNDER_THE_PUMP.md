@@ -1768,6 +1768,24 @@ learned temperature, and the releases whole. **The projection**: from the measur
 Every end of it passes the 15 minutes the coordinator allowed, so the run is **not launched**; the projection goes to
 the coordinator.
 
+[measurement, November 2] **crib14, as declared** (launched 16:09Z on Brandon's go past the 15 minutes, the deadline
+75 minutes; receipts `_receipts/crib14/`): the 27 laps in 24.8 min (26 to 38 s a lap at width 32; the body grew to
+width 64 after lap 17, then 79 to 83 s a lap, every lap inside its 108.8 s bound); the release 26 s; the board's peak
+11.6 GB. The early stop did not fire after lap 9: both paced heads' clocks stood at the published digit clock (gap
+1.000 from the founding's 0) and the held question effect was +0.0010 bits, above its foil. The clock was published
+identically at all 26 boundaries (dimension 17, 25 pinned, none cutting, 2.0 s each). The withheld code 5.459, 4.000
+(lap 0), 2.593 (lap 8), 2.213 (lap 26); the held answer 3.857 bits, the question effect +0.0051 bits at the end. The held
+operand fronts' faces 0, 2, 1, 25, …, 37 of 515 by lap 8 and about 37 to the end; the witness's faces at the learned
+temperatures 88 to 96 of 515 (until the growth; not read after it). Head 3's class `log₂ T` fell from 1.652 to 1.241 and
+its listener's rose from 0.207 to 0.369, while the held fronts' covector (iv) asked to raise both; at the last tick of
+lap 26 the still head 0's rows topped on a digit at every operand front and on the right source at 65 % of them, and
+head 3's on a digit at 2 % and on the right source at none (held peaks).
+
+**The acceptance fails**: the release wrote 22 first calculations, **6 of 126 from the question** (the bar 24), its
+foil 5. The releases are a field of `1`s: `<<1+1+1=1=1>>>11` and its neighbours, the operator and the brackets in
+place, every digit a `1`. The located clock stood; the copy did not form: head 3 never copied, and its temperatures
+moved away from the sharpness §16.12 requires.
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
