@@ -1036,6 +1036,40 @@ every-pair. Its slower learning is not the lock (the pairing alone: 2.806 at 300
 merge: 5.039), every receiver's listening (2.850) or the falloff (none: 3.944); its cause is open. The
 fixture's reading at 300 sections misses the every-pair field's 0.40; that is reported here as measured.
 
+### 15.10 The lock's temperature is deposited; growth waits for a fall
+
+[measurement, November 2] The crib run with the open listener (`…_receipts/crib12/`) rested after three
+laps: its first lap raised the withheld code from 5.459 to 5.912 bits a site, the growth rule read that as
+a spent width and grew at lap 0, and at the grown width 240 of 248 steps were refused; a second growth had
+no projection, and the run rested. The release wrote no calculation.
+
+[definition; agent-inferred, November 2] **The lock's sharpness is part of the constitution.** The words
+are held at unit power (§2.5), so the gain `2^(−β)` was the contact's fixed temperature, nothing learned
+could sharpen or soften it, and one temperature served supports of very different size (a class receiver
+about ten near sources and its class-mates, a listener about four hundred definite sites). Each head now
+carries two temperatures, one for each kind of receiver, a material family deposited like any other
+(`z = T · S − ⌊log₂ d⌋`, `S` the lock at unit gain; `δT = Σ δz · S`, `δs = T δz`). The class receiver's
+opens at its equal-word guarantee (`2^(−β)`, `β = −2`); the listener's at the largest `g` with
+`g² · 2n ≤ (⌊log₂ reach⌋ − 1)²`, so the lock's random spread over a listener's support (`σ = g √(2n)`, two
+unrelated words at unit power) stays within the falloff's own span over the support's octaves while an
+equal word still leads (its lock `2n g` above the mean, the random maximum over `N` about `σ √(2 ln N)`,
+below it while `N < e^n`): `g = 1` at the crib's reach of 484 with `n = 8` (`σ = 4` bits against a span of 7;
+an equal word's lead over the maximum of 400 about 2 bits). The listener's opening at the all-pairs
+field's flat gain (`+2`) was built first and refuted: the cue coded 2.018 bits.
+
+[measurement, November 2] The hypothesis this answered, that a listener's founding row peaks on the
+loudest of four hundred unrelated far words and drowns its near field, is refuted by its own fixture
+(`a_listener_s_founding_row_keeps_its_near_field`, 420 sites, no recurring word, 40 open): at the founding
+the near field holds 0.818 of an open listener's row and the loudest far source 0.005 at the listener's
+temperature, and 0.836 and 0.018 at the class receiver's. The crib run's first-lap rise is therefore not
+the founding's; its cause is open. The fixtures with the temperatures: the cue 0.007 bits, the recall
+0.001.
+
+[definition; agent-inferred, November 2] **Growth waits until the withheld code has fallen at its width.**
+The rule grew when a lap left the withheld code no lower than the lap before, from the founding on; a lap
+that raises the code from where the width began has not spent the width but harmed it, and growing copies
+the harm. It now grows only once the code has fallen at the width.
+
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
 boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized

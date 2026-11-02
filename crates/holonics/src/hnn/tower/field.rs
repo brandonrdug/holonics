@@ -254,6 +254,37 @@ impl FieldDeclaration {
         beta
     }
 
+    /// [definition; agent-inferred, November 2] **A listener's opening temperature** (§15.10): the
+    /// largest gain `g = 2^(−β)` with `g² · 2n ≤ (⌊log₂ reach⌋ − 1)²`, so the lock's random spread over a
+    /// listener's support, `σ = g √(2n)` bits (two unrelated words at unit power pair at a sum of `2n`
+    /// products of unit variance), stays within the falloff's own span over the support's octaves, from
+    /// the near field's to the reach's: the random maximum of a few hundred unrelated far words does not
+    /// drown the near field, while an equal word, where one exists, still leads it (its lock stands
+    /// `2n g` above the mean, the random maximum over `N` sources about `σ √(2 ln N)`, below it while `N
+    /// < e^n`). `0` at the crib's reach of 484 with `n = 8` (`g = 1`, `σ = 4` against a span of 7 bits; the
+    /// equal word's lead over the maximum of 400, `16 − 13.8`, about 2 bits), `−1` at reading 8's 2,221. Why
+    /// not the class receiver's `−2` (an equal word at 32 bits): that guarantee is for a support of
+    /// class-mates, where an equal word is expected; a listener hears every definite site, and at that gain
+    /// its founding row peaked on the random maximum, about 54 bits above the mean, and drowned the near
+    /// field (the crib run of November 2, whose first lap raised the withheld code from 5.459 to 5.912
+    /// bits). The temperature is deposited from there ([`Field::temper`]).
+    pub fn listen_shift(&self) -> i32 {
+        let span = (usize::BITS - 1 - self.reach.leading_zeros()).saturating_sub(1).max(1) as u128;
+        let reals = 2 * self.modes as u128;
+        let mut beta = 0i32;
+        if reals <= span * span {
+            while reals << (2 * (1 - beta)) <= span * span {
+                beta -= 1;
+            }
+        } else {
+            while reals > (span * span) << (2 * (beta + 1)) {
+                beta += 1;
+            }
+            beta += 1;
+        }
+        beta
+    }
+
     /// [definition; agent-inferred, November 1] **The resonance classes' shells** (the dispersing
     /// field's §12): each of a head's first `b` modes is a trit of its unframed word, the sky plate
     /// (`Re > |Im|`, the in-phase part dominates: the mode locks and boosts), the ground plate
@@ -432,6 +463,9 @@ pub struct FieldLayout {
     /// moment ([`FieldDeclaration::moment_modes`]), real parts then imaginary; founded at zero.
     pub moment_before: usize,
     pub moment_after: usize,
+    /// The locks' temperatures (§15.10), one a head and receiver kind, `[h][kind]` (kind 0 a class
+    /// receiver, 1 a listener), on the material's grain.
+    pub temper: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -465,7 +499,8 @@ impl FieldLayout {
         let read_bias = push(a, FACE_BITS);
         let moment_before = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
         let moment_after = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, len: at, families }
+        let temper = push(2 * d.heads, MATERIAL_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, len: at, families }
     }
 }
 
@@ -878,6 +913,8 @@ pub struct Crowd {
     pub count: u64,
     pub z: i64,
     pub e: u64,
+    /// Its lock at unit gain on `2^(−16)` (before the temperature, §15.10).
+    pub s: i64,
 }
 
 /// [measurement] Rows read by where their mass lies ([`Field::row_shares`]): `[0]` the open receivers,
@@ -898,6 +935,8 @@ pub struct RowShares {
 pub struct Source {
     pub j: u32,
     pub p: u64,
+    /// Its lock at unit gain on `2^(−16)` (before the temperature, §15.10).
+    pub s: i64,
 }
 
 /// The crowds' ranges of receiver `i` in a region of `sites`: each octave `level ≥ 2` with
@@ -969,15 +1008,6 @@ pub fn octave(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }
 
-/// `v · 2^(−β)`: released `β` bits where the gain shifts down, an exact doubling `−β` times where it
-/// amplifies.
-fn gained(v: i128, beta: i32) -> Result<i128> {
-    if beta >= 0 {
-        Ok(release(v, beta as u32))
-    } else {
-        v.checked_mul(1i128 << -beta).ok_or(TowerError::Refused("a gained covector outgrew its 128-bit carrier"))
-    }
-}
 
 /// A region's forward: each tick's temporaries (held when the reverse will read them), the last
 /// read, and each unresolved site's face.
@@ -1060,7 +1090,31 @@ impl Field {
         for start in [layout.a, layout.b] {
             uniform(&mut theta[start..start + f * dw], three, dd, MATERIAL_BITS)?;
         }
+        // The temperatures open at their derived gains (§15.10): `2^(−β)` on the material's grain.
+        for h in 0..declaration.heads {
+            for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
+                theta[layout.temper + 2 * h + kind] = fit32(1i128 << (MATERIAL_BITS as i32 - beta), "a founded temperature outgrew its 32-bit carrier")?;
+            }
+        }
         Ok(Self::with_theta(declaration, theta))
+    }
+
+    /// A head's temperature for a receiver of `kind` (0 a class receiver, 1 a listener) on `2^(−24)`.
+    pub fn temper(&self, h: usize, listens: bool) -> i128 {
+        self.theta[self.layout.temper + 2 * h + usize::from(listens)] as i128
+    }
+
+    /// [definition; agent-inferred, November 2] **A row's bound as the material stands** (§14.11,
+    /// §15.10): [`FieldDeclaration::row_bits`] with the gain read from the largest temperature the
+    /// material holds, since the temperatures are deposited.
+    pub fn row_bits(&self) -> u32 {
+        let d = &self.declaration;
+        let top = (0..2 * d.heads).map(|k| self.theta[self.layout.temper + k].unsigned_abs() as u128).max().unwrap_or(0);
+        let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u32 + 1;
+        let reach_bits = d.reach_bits() as u32;
+        let spread = gain + (usize::BITS - 1 - d.reach.leading_zeros()) + 2;
+        let terms = (usize::BITS - (d.reach + 2 * reach_bits as usize).leading_zeros()) as u32;
+        62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
     }
 
     fn with_theta(declaration: FieldDeclaration, theta: Vec<i32>) -> Self {
@@ -1358,7 +1412,6 @@ impl Field {
         let m2 = 2 * m;
         let sites = x.len() / dw;
         let l = &self.layout;
-        let beta = d.score_shift();
         let (trits, buckets) = (d.class_trits(), d.classes());
         // The chart.
         cell.read = Vec::with_capacity(sites * dw);
@@ -1431,7 +1484,6 @@ impl Field {
         // `y_i = conj(U_i) ỹ_i`.
         cell.rows = Vec::with_capacity(heads * sites);
         cell.y = vec![0i64; sites * m2];
-        let score_bits = (FACE_BITS as i32 + beta) as u32;
         let one = 1u128 << WEIGHT_BITS;
         let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         cell.crowds = Vec::with_capacity(heads * sites);
@@ -1441,6 +1493,8 @@ impl Field {
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
                 let wi = &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span];
+                // The lock's temperature for this receiver's kind (§15.10).
+                let temper = self.temper(h, lists.listens(i));
                 let mut series = SeriesRow::new(span);
                 let mut row: Vec<Source> = Vec::new();
                 for j in lists.support(i) {
@@ -1456,9 +1510,10 @@ impl Field {
                         s = carried(s.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?))?;
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
                     }
-                    let z = fit64(release(s, score_bits + 2 * self.decay(h, 0, d).1 + 1) - ((octave(d) as i128) << FACE_BITS))?;
+                    let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, d).1 + 1))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((octave(d) as i128) << FACE_BITS))?;
                     series.push(self.face(z), one, one, &value);
-                    row.push(Source { j: j as u32, p: 0 });
+                    row.push(Source { j: j as u32, p: 0, s: base });
                 }
                 // The far field blurred (§14.10): each octave's crowd of definite sources on each side,
                 // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
@@ -1478,9 +1533,10 @@ impl Field {
                         score = carried(score.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (word[li], word[n + li]), count as i128, decay)?))?;
                         (value[li], value[n + li]) = (decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li)));
                     }
-                    let z = fit64(div_nearest(score, ((count * count) as i128) << (score_bits + 2 * self.decay(h, 0, 1 << level).1 + 1)) - ((level as i128) << FACE_BITS))?;
+                    let base = fit64(div_nearest(score, ((count * count) as i128) << (FACE_BITS + 2 * self.decay(h, 0, 1 << level).1 + 1)))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((level as i128) << FACE_BITS))?;
                     series.push(self.face(z), (count as u128) << WEIGHT_BITS, one, &value);
-                    crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0 });
+                    crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0, s: base });
                 }
                 let (framed, shares) = series.release();
                 for (src, &share) in row.iter_mut().zip(&shares) {
@@ -1703,7 +1759,6 @@ impl Field {
         let sites = region.classes.len();
         let l = &self.layout;
         let reaches = self.reaches();
-        let beta = d.score_shift();
         let ln2 = ln2_face();
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
@@ -1873,6 +1928,8 @@ impl Field {
                     let (row, crowd) = (&rows[i], &crowds[i]);
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
+                    let kind = usize::from(cell.classes[h].listens(i));
+                    let temper = self.temper(h, kind == 1);
                     let dp: Vec<i128> = row
                         .iter()
                         .map(|src| {
@@ -1898,7 +1955,9 @@ impl Field {
                     };
                     let mut out = Vec::with_capacity(row.len());
                     for (src, &dpj) in row.iter().zip(&dp) {
-                        let dsij = gained(compare(src.p as i128, dpj, holds(src.j as usize)), beta)?;
+                        let dz = compare(src.p as i128, dpj, holds(src.j as usize));
+                        g[l.temper + 2 * h + kind] += release(dz * src.s as i128, FACE_BITS);
+                        let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                             return refuse("a contact's covector past its return's carrier");
                         }
@@ -1906,7 +1965,9 @@ impl Field {
                     }
                     let mut outc = Vec::with_capacity(crowd.len());
                     for (c, &dpj) in crowd.iter().zip(&dpc) {
-                        let dsij = gained(compare(c.e as i128, dpj, false), beta)?;
+                        let dz = compare(c.e as i128, dpj, false);
+                        g[l.temper + 2 * h + kind] += release(dz * c.s as i128, FACE_BITS);
+                        let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                             return refuse("a contact's covector past its return's carrier");
                         }
@@ -2666,6 +2727,17 @@ impl Field {
                             }
                         }
                     }
+                }
+            }
+        }
+        // The temperatures (§15.10): every copy of a head keeps its source's, its step state divided as
+        // its covector arrives over the parted return.
+        for b in 0..f {
+            for h in 0..old.heads {
+                for kind in 0..2 {
+                    let (from_at, to_at) = (ol.temper + 2 * h + kind, layout.temper + 2 * (b * old.heads + h) + kind);
+                    new[to_at] = self.theta[from_at];
+                    from[to_at] = (from_at, true);
                 }
             }
         }

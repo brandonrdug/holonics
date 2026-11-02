@@ -70,6 +70,27 @@ fn unstraddled(grain: u32, straddles: &dyn Fn(i32) -> bool) -> Option<(i32, u32)
     (0..=STRADDLE_HALVINGS).map(|h| (1i32 << (grain - 9 - h), h)).find(|&(delta, _)| !straddles(delta))
 }
 
+/// The most doublings of a probe's step that lift a quiet entry's predicted difference above the
+/// rounding floor (`2^(grain − 9)` up to `2^(grain − 5)`): an entry whose code moves less than the
+/// forward's releases at `2^(grain − 9)` is read where its difference stands above them (measured
+/// November 2: a listener's temperature, `−55` predicted against `44` measured at `2^(grain − 9)`, read
+/// `−876` against `−860` at `2^(grain − 5)`).
+const QUIET_DOUBLINGS: u32 = 4;
+
+/// The probe's step: from `2^(grain − 9)`, doubled while the predicted difference `predict(δ)` stays
+/// under four floors and no seam is crossed, then halved off a seam ([`unstraddled`]); with its
+/// halvings (a doubling counts as none).
+fn probe_step(grain: u32, predict: &dyn Fn(i32) -> i128, straddles: &dyn Fn(i32) -> bool) -> Option<(i32, u32)> {
+    let mut up = 0u32;
+    while up < QUIET_DOUBLINGS && predict(1i32 << (grain - 9 + up)).abs() < 256 && !straddles(1i32 << (grain - 9 + up + 1)) {
+        up += 1;
+    }
+    if up > 0 {
+        return Some((1i32 << (grain - 9 + up), 0));
+    }
+    unstraddled(grain, straddles)
+}
+
 /// The code's own covector (the face's comparison alone, without the closure's).
 fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
@@ -209,7 +230,8 @@ fn covector_matches_the_codes_difference() {
                 minus.theta[i] -= delta;
                 sheets(&plus, &r) != sheets(&field, &r) || sheets(&minus, &r) != sheets(&field, &r)
             };
-            let Some((delta, h)) = unstraddled(grain, &straddles) else {
+            let shift = natural + grain - 20;
+            let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
                 seams += 1;
                 continue;
             };
@@ -220,7 +242,6 @@ fn covector_matches_the_codes_difference() {
             minus.theta[i] -= delta;
             read += 1;
             let measured = plus.code(&r).unwrap().0 - minus.code(&r).unwrap().0;
-            let shift = natural + grain - 20;
             let predicted = (g[i] * 2 * delta as i128) >> shift;
             let tolerance = predicted.abs() / 8 + (64 << h);
             assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
@@ -231,9 +252,10 @@ fn covector_matches_the_codes_difference() {
     // edge (the receivers' probes across their seams, §15.2's multi-probe, add a jump at each band
     // edge), halving `h ≤ STRADDLE_HALVINGS` times; one still straddling at the smallest step stands on
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
-    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`. Measured November 1: the
-    // face's 346 probes, the closure's 192 and the far support's 220 are every one read, after 100,
-    // 146 and 125 halvings in all, none on a seam.
+    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
+    // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // none on a seam.
     eprintln!("COVECTOR_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
 }
@@ -1182,9 +1204,10 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
     // edge (the receivers' probes across their seams, §15.2's multi-probe, add a jump at each band
     // edge), halving `h ≤ STRADDLE_HALVINGS` times; one still straddling at the smallest step stands on
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
-    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`. Measured November 1: the
-    // face's 346 probes, the closure's 192 and the far support's 220 are every one read, after 100,
-    // 146 and 125 halvings in all, none on a seam.
+    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
+    // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // none on a seam.
     eprintln!("CLOSURE_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
 }
@@ -1367,7 +1390,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
                         minus.theta[i] -= delta;
                         sheets(&plus) != sheets(&field) || sheets(&minus) != sheets(&field)
                     };
-                    let Some((delta, h)) = unstraddled(grain, &straddles) else {
+                    let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> (natural + grain - 20), &straddles) else {
                         seams += 1;
                         continue;
                     };
@@ -1390,9 +1413,10 @@ fn the_covector_matches_the_code_across_the_far_support() {
     // edge (the receivers' probes across their seams, §15.2's multi-probe, add a jump at each band
     // edge), halving `h ≤ STRADDLE_HALVINGS` times; one still straddling at the smallest step stands on
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
-    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`. Measured November 1: the
-    // face's 346 probes, the closure's 192 and the far support's 220 are every one read, after 100,
-    // 146 and 125 halvings in all, none on a seam.
+    // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
+    // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // none on a seam.
     eprintln!("FAR_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
 }
@@ -1471,4 +1495,48 @@ fn the_cue_over_foundings() {
         })
         .collect();
     eprintln!("CUE_FOUNDINGS millibits={:?}", codes.iter().map(|c| c * 1000 >> 20).collect::<Vec<_>>());
+}
+
+
+/// [definition; agent-inferred, November 2] **A listener's founding row keeps its near field** (§15.10):
+/// on a crib-sized region (420 sites, no word recurring, the last 40 open), at the founding, an open
+/// receiver's row puts more of its mass on its near field than on its loudest far source, on the mean
+/// over its rows, at the listener's own temperature. [measurement] It holds at the class receiver's
+/// temperature too (`−2`: the near field 0.836 of a row, the loudest far source 0.018, against 0.818 and
+/// 0.005 at the listener's): the founding does not drown the near field, so the crib run's first-lap
+/// rise is not the founding's (the record's §15.10).
+#[test]
+fn a_listener_s_founding_row_keeps_its_near_field() {
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, clocks: 1 };
+    assert_eq!((d.score_shift(), d.listen_shift()), (-2, 0));
+    let sites = 420;
+    let classes = drawn_classes(7, sites, d.alphabet);
+    let open: Vec<bool> = (0..sites).map(|t| t >= sites - 40).collect();
+    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
+    let read = |field: &Field| -> (u128, u128) {
+        let pass = field.pass(&r, true).unwrap();
+        let (mut near, mut peak) = (0u128, 0u128);
+        for cell in &pass.ticks {
+            for (hi, row) in cell.rows.iter().enumerate() {
+                let i = hi % sites;
+                if !open[i] {
+                    continue;
+                }
+                near += row.iter().filter(|s| (s.j as usize).abs_diff(i) < NEAR).map(|s| s.p as u128).sum::<u128>();
+                peak += row.iter().filter(|s| (s.j as usize).abs_diff(i) >= NEAR).map(|s| s.p as u128).max().unwrap_or(0);
+            }
+        }
+        (near, peak)
+    };
+    let field = Field::found(d, &keys(1 << 20)).unwrap();
+    let (near, peak) = read(&field);
+    eprintln!("LISTENER_FOUNDING near={} far_peak={} (millionths of a row on the mean)", (near * 1_000_000 >> SHARE_BITS) / 400, (peak * 1_000_000 >> SHARE_BITS) / 400);
+    assert!(near > peak, "the near field holds more of a listener's row than its loudest far source");
+    let mut hot = field.clone();
+    for h in 0..d.heads {
+        hot.theta[hot.layout.temper + 2 * h + 1] = hot.theta[hot.layout.temper + 2 * h];
+    }
+    let (near, peak) = read(&hot);
+    eprintln!("LISTENER_AT_CLASS_GAIN near={} far_peak={}", (near * 1_000_000 >> SHARE_BITS) / 400, (peak * 1_000_000 >> SHARE_BITS) / 400);
+    assert!(near > peak, "and at the class receiver's");
 }
