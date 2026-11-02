@@ -1,0 +1,15 @@
+# The parity's standard check (section 16.19): training sections whole, a declared sample of 8 withheld problems, one release.
+# GSM8K (UNITS0, TRAIN.txt, HELD128.txt, KEYS8), D 32 H 4 n 8 still 2 f 32 K 2, section 16, rate 8; RTX 4080 SUPER under .local/gpu.lock.
+# Projection at most 155 s (sections 1-3 host 79.7 s, 32 withheld regions at most 20 s, a release and the passage at most 55 s); deadline 240 s.
+BIN=e4d5bc614648fa69a2e00d286e64f9ad59505dc438a84c5280e9178ed08d05d0 board=1110 MiB sections=3 grow=1 releases=1 pace=founding
+FIELD_COMMAND parity-field <root>/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 <root>/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 <root>/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa <root>/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 3 8 1 1 40 8
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15370551296 total=16802250752 batch_budget=10379460608
+FIELD_PASSAGE train=6602 withheld=128 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=35544 grow=1 withheld_read=8
+FIELD_PARITY section=1 withheld=false regions=24 length=1408 sites=3760 rows=82080 reads=3 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true pace_nonzero=0 kappa=1000..1000 host_ms=8816 card_ms=78
+FIELD_PARITY section=2 withheld=false regions=27 length=941 sites=3536 rows=85216 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-77744715/0/false learner_equal=true rows_equal=true pace_nonzero=0 kappa=1000..1000 host_ms=15167 card_ms=116
+FIELD_PARITY section=3 withheld=false regions=24 length=1052 sites=5131 rows=138928 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-1224517979/0/false learner_equal=true rows_equal=true pace_nonzero=246 kappa=996..1003 host_ms=51282 card_ms=247
+FIELD_PARITY section=4 withheld=true regions=32 length=1431 sites=0 rows=163744 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=-507937111/0/false learner_equal=true rows_equal=true pace_nonzero=246 kappa=996..1003 host_ms=14509 card_ms=68
+FIELD_PARITY_DONE sections=4 reads=15 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=100 host_ms=89775 card_ms=512 elapsed_ms=138127
+FIELD_CARD reads=56 read_ms=439 returns=3 return_ms=170 pairs=222653490 batches=63 peak_store=2536507476 landmarks=4 landmark_ms=61 elapsed_ms=138129
+MEASURE lap=parity rc=0 wall_s=138.8 peak_rss_kib=2338516
