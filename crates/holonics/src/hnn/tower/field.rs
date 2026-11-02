@@ -429,13 +429,13 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v6 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
+        format!("hnn-field-v7 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 11 || words[0] != "hnn-field-v6" {
-            return refuse("a field's head line that is not hnn-field-v6");
+        if words.len() != 11 || words[0] != "hnn-field-v7" {
+            return refuse("a field's head line that is not hnn-field-v7");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, clocks: n(words[10])? };
@@ -584,6 +584,46 @@ pub(crate) fn skin_of(s: i128, n: usize, pi: i128, exponential: &Exponential) ->
     release(exponential.below_one(-bits) as i128, 62 - MOVE_BITS) as i64
 }
 
+/// The grain of `ln 2`'s face ([`ln2_face`]), `2^(−30)`.
+const LN2_FACE_BITS: u32 = 30;
+
+/// The temperature's carrier in its chart: `⌈log₂ T⌉ ≤ 7`, the reach its additive chart held on 32 bits, and
+/// `T ≥ 2^(−23)`, above the material's grain.
+const TEMPER_TOP: i128 = 7;
+
+/// [definition; agent-inferred, November 2] **A temperature is a scale, carried in the ratio law's logarithmic
+/// chart** (§16.12, §15.10): the material holds `ℓ = log₂ T` on `2^(−24)`, so a step multiplies the temperature
+/// (`ℓ = log R`, the ratio of two scales), and the lock's sharpness moves by octaves however far it has come. `T =
+/// 2^c · 2^(ℓ − c)` with `c = ⌈ℓ⌉`, the fraction read through the exponential's navigator at `ℓ`'s own grain
+/// (`fine`, whose first sixteen roots are the resident face's), released to `2^(−24)`; no partition of `ℓ` hides
+/// beneath its step. Past its carrier (`c > 7` or `c < −23`)
+/// a temperature is refused, never clipped. Why: in the additive chart a step moved `T` by the same amount at 1 as at
+/// 100, so crib13's learned temperatures moved about ±10 % in ten laps where the copy needs them 4 to 12 times
+/// higher (§16.12).
+pub(crate) fn temperature_of(ell: i32, fine: &Exponential) -> Result<i128> {
+    let c = temper_octave(ell)?;
+    let face = fine.below_one(ell as i128 - (c << MATERIAL_BITS));
+    Ok(release(face as i128, (62 - MATERIAL_BITS as i128 - c) as u32))
+}
+
+/// A temperature's ceiling octave `c = ⌈ℓ⌉` from its logarithm on `2^(−24)`, refused past the carrier.
+fn temper_octave(ell: i32) -> Result<i128> {
+    let c = (ell as i128 + (1i128 << MATERIAL_BITS) - 1) >> MATERIAL_BITS;
+    if c > TEMPER_TOP || c < 1 - MATERIAL_BITS as i128 {
+        return refuse("a temperature past its carrier (2^(−23) to 2^7)");
+    }
+    Ok(c)
+}
+
+/// [definition; agent-inferred, November 2] **A row's temperature covector in its own chart** (§16.12): the row's
+/// `δT = Σ release(δz S, 16)` over its sources and crowds, carried into `ℓ = log₂ T` as `δℓ = δT T ln 2`, on the same
+/// scale: `release(δT · release(T ln 2, 30), 24)`, one a receiver's row, so the rows' covectors sum in any order to
+/// the same bits (the card's `temper_chain`).
+fn temperature_chain(temper: i128, dt: i128) -> Result<i128> {
+    let rate = release(temper * ln2_face(), LN2_FACE_BITS);
+    Ok(release(dt.checked_mul(rate).ok_or(TowerError::Refused("a temperature's covector past its 128-bit carrier"))?, MATERIAL_BITS))
+}
+
 /// The refusal of a clock's covector past its 128-bit carrier.
 const PACE_RETURN: &str = "a clock's covector past its 128-bit carrier";
 
@@ -669,6 +709,9 @@ pub struct Field {
     /// reach ([`skin_decay`]).
     decays: Vec<Vec<i64>>,
     exponential: Exponential,
+    /// The exponential's navigator at the material's grain (`2^(−24)`), the temperatures' face (§16.12): its
+    /// first sixteen roots are [`Field::exponential`]'s.
+    fine: Exponential,
     /// The half turn on `2^(−46)`, the turn's faces' navigator.
     pi: i128,
 }
@@ -1216,31 +1259,50 @@ impl Field {
         let (wq, pq) = (layout.q, layout.probe);
         let chart: Vec<i32> = theta[wq..wq + m2 * dw].to_vec();
         theta[pq..pq + m2 * dw].copy_from_slice(&chart);
-        // The temperatures open at their derived gains (§15.10): `2^(−β)` on the material's grain.
+        // The temperatures open at their derived gains (§15.10), `T = 2^(−β)`, held as `log₂ T = −β` (§16.12).
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
-                theta[layout.temper + 2 * h + kind] = fit32(1i128 << (MATERIAL_BITS as i32 - beta), "a founded temperature outgrew its 32-bit carrier")?;
+                theta[layout.temper + 2 * h + kind] = fit32((-beta as i128) << MATERIAL_BITS, "a founded temperature outgrew its 32-bit carrier")?;
             }
         }
         Ok(Self::with_theta(declaration, theta))
     }
 
-    /// A head's temperature for a receiver of `kind` (0 a class receiver, 1 a listener) on `2^(−24)`.
-    pub fn temper(&self, h: usize, listens: bool) -> i128 {
-        self.theta[self.layout.temper + 2 * h + usize::from(listens)] as i128
+    /// A head's temperature for a receiver of `kind` (0 a class receiver, 1 a listener) on `2^(−24)`, read from
+    /// its logarithm ([`temperature_of`]).
+    pub fn temper(&self, h: usize, listens: bool) -> Result<i128> {
+        temperature_of(self.theta[self.layout.temper + 2 * h + usize::from(listens)], &self.fine)
+    }
+
+    /// Every head's two temperatures on `2^(−24)`, `[h][kind]` flat, refused past their carrier: the reference the
+    /// card's own face (`temper_of` in `field.cu`) is checked against.
+    pub fn temperatures(&self) -> Result<Vec<i128>> {
+        (0..2 * self.declaration.heads).map(|k| temperature_of(self.theta[self.layout.temper + k], &self.fine)).collect()
+    }
+
+
+    /// [definition; agent-inferred, November 2] **A row's gain bound from its temperatures' octaves** (§16.12): `4n T
+    /// + 1` bits with `T ≤ 2^c`, `c` the largest `⌈log₂ T⌉` the material holds, read from `ℓ` alone (no face), so the
+    /// card's launch shape needs nothing of the forward; equal to the exact gain at a whole octave (the founding's).
+    pub fn row_gain(&self) -> Result<u64> {
+        let mut top = i128::MIN;
+        for k in 0..2 * self.declaration.heads {
+            top = top.max(temper_octave(self.theta[self.layout.temper + k])?);
+        }
+        let reals = 4 * self.declaration.modes as u64;
+        Ok(if top >= 0 { reals << top } else { reals >> -top } + 1)
     }
 
     /// [definition; agent-inferred, November 2] **A row's bound as the material stands** (§14.11,
     /// §15.10): [`FieldDeclaration::row_bits`] with the gain read from the largest temperature the
     /// material holds, since the temperatures are deposited.
-    pub fn row_bits(&self) -> u32 {
+    pub fn row_bits(&self) -> Result<u32> {
         let d = &self.declaration;
-        let top = (0..2 * d.heads).map(|k| self.theta[self.layout.temper + k].unsigned_abs() as u128).max().unwrap_or(0);
-        let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u32 + 1;
+        let gain = self.row_gain()? as u32;
         let reach_bits = d.reach_bits() as u32;
         let spread = gain + (usize::BITS - 1 - d.reach.leading_zeros()) + 2;
         let terms = (usize::BITS - (d.reach + 2 * reach_bits as usize).leading_zeros()) as u32;
-        62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1
+        Ok(62 + WEIGHT_BITS + reach_bits + spread + terms + 64 + reach_bits + 1)
     }
 
     fn with_theta(declaration: FieldDeclaration, theta: Vec<i32>) -> Self {
@@ -1249,7 +1311,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, pi }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -1370,6 +1432,12 @@ impl Field {
     /// The exponential's resident face (the Gibbs weights' navigator).
     pub fn exponential(&self) -> &Exponential {
         &self.exponential
+    }
+
+    /// The temperatures' exponential at the material's grain (§16.12), whose roots past the sixteenth the card
+    /// multiplies after its resident face.
+    pub fn fine_exponential(&self) -> &Exponential {
+        &self.fine
     }
 
     /// [definition; agent-inferred, November 1] **A score's term** (§14.11): `2^z` for `z` on
@@ -1902,7 +1970,7 @@ impl Field {
                 // A listener probes with its own word (§15.12); a class receiver's probe is its word.
                 let wi = if lists.listens(i) { &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span] } else { &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span] };
                 // The lock's temperature for this receiver's kind (§15.10).
-                let temper = self.temper(h, lists.listens(i));
+                let temper = self.temper(h, lists.listens(i))?;
                 let mut series = SeriesRow::new(span);
                 let mut row: Vec<Source> = Vec::new();
                 for j in lists.support(i) {
@@ -2466,7 +2534,7 @@ impl Field {
                     let dyi = &dyh[i * span..(i + 1) * span];
                     let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
                     let kind = usize::from(cell.classes[h].listens(i));
-                    let temper = self.temper(h, kind == 1);
+                    let temper = self.temper(h, kind == 1)?;
                     let dp: Vec<i128> = row
                         .iter()
                         .map(|src| {
@@ -2491,9 +2559,10 @@ impl Field {
                         dz
                     };
                     let mut out = Vec::with_capacity(row.len());
+                    let mut dt = 0i128;
                     for (src, &dpj) in row.iter().zip(&dp) {
                         let dz = compare(src.p as i128, dpj, holds(src.j as usize));
-                        g[l.temper + 2 * h + kind] += release(dz * src.s as i128, FACE_BITS);
+                        dt += release(dz * src.s as i128, FACE_BITS);
                         let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                             return refuse("a contact's covector past its return's carrier");
@@ -2503,13 +2572,15 @@ impl Field {
                     let mut outc = Vec::with_capacity(crowd.len());
                     for (c, &dpj) in crowd.iter().zip(&dpc) {
                         let dz = compare(c.e as i128, dpj, false);
-                        g[l.temper + 2 * h + kind] += release(dz * c.s as i128, FACE_BITS);
+                        dt += release(dz * c.s as i128, FACE_BITS);
                         let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
                             return refuse("a contact's covector past its return's carrier");
                         }
                         outc.push(dsij);
                     }
+                    // Into the temperature's own chart (§16.12), the row's.
+                    g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
                     ds.push(out);
                     dsc.push(outc);
                 }

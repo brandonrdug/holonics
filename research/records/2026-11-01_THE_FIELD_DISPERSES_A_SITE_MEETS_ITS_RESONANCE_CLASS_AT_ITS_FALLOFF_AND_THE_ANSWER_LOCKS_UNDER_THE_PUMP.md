@@ -1312,8 +1312,11 @@ identity on its coarsest mode, which the readout reads, so the code at an operan
 as a share of its root mean square, and its cosine with the witness's `c`); (ii) the witness's clock with the
 founding's readers, the covector on the readers (its cosine with the witness's less the founding's) and the anchor
 census's drive; (iii) the witness moved a small random step on `c` and the readers, the covector's cosine with the
-step's reverse. The run launches only if (i) and (ii) both pull toward the witness, a clear positive sign on at least
-one head each, and (iii) points back; otherwise the obstacle is this section's, and the next subject.
+step's reverse; (iv) (the coordinator's, November 2, §16.13) the descent on each head's and kind's `log₂ T` at the
+witness with its temperatures at 4, and at the founding: if it rises at the witness and falls at the founding, the
+temperature is coupled to the rows as the clock is. The run launches only if (i) and (ii) both pull toward the
+witness, a clear positive sign on at least one head each, and (iii) points back; otherwise the obstacle is this
+section's, and the next subject.
 
 [definition; agent-inferred, November 2; fixed into the run's declaration] **The early stop.** After nine laps, a run
 whose paced heads' clocks have not moved toward a digit clock (no head's gap `κ̄ at digits − κ̄ inside words` above
@@ -1402,7 +1405,64 @@ deposit is read, the law written, its covector tested and ported, and §16.10's 
 temperature must pass the card's row carrier, the carrier widens at a declared crossing (the precision law's dynamic
 width), built only when the temperature's law shows it is needed.
 
-### 16.13 The diff read against itself
+### 16.13 A temperature is carried in its logarithm
+
+[definition; agent-inferred, November 2] §15.10 deposited each head's two temperatures in the additive chart: the
+material held `T` on `2^(−24)`, the return read `δT = Σ δz S`, and the learner's normalized step moved `T` by about
+`2^(−k)` of a unit a section at any `T`, so a temperature moved as far at 1 as at 100 (crib13: about ±10 % in ten
+laps). A temperature is a scale, the ratio of a lock's sharpness to the bits it is read in, so it is carried in the
+ratio law's logarithmic chart: the material holds `ℓ = log₂ T` on `2^(−24)` and a step multiplies `T` by
+`2^(Δℓ)` (`temperature_of` in `field.rs`): `T = 2^c · 2^(ℓ − c)`, `c = ⌈ℓ⌉`, the fraction read through the
+exponential's resident face at `ℓ`'s `2^(−16)` (the bits the face resolves, the score's own grain) and released to
+`2^(−24)`. The chain is `δℓ = δT · T ln 2`, carried a receiver's row at a time (`temperature_chain`,
+`release(δT_row · release(T ln 2, 30), 24)`), so the rows' covectors still sum in any order to the same bits. The card
+reads `T` from `ℓ` through its own resident face and carries the chain in its reverse (`temper_of`, `temper_chain`
+in `field.cu`); the host's `temperature_of` and `Field::temperatures` are the reference its parity reads, and no part
+of the card's forward or return runs on the host. A row's carrier bound reads the temperatures' ceiling octaves
+(`Field::row_gain`, `T ≤ 2^⌈ℓ⌉`), from `ℓ` alone. The founding's gains are whole
+octaves (`ℓ = −β`: 2 for a class receiver, 0 for a listener at the crib's reach), so the founding reads as before.
+The carrier keeps the additive chart's reach on 32 bits, `2^(−23) ≤ T ≤ 2^7`; past it a temperature is refused,
+never clipped. The field's text head is `hnn-field-v7`: a v6 state held `T`, not its logarithm.
+
+[measurement, November 2] The completed witness under the chart (`T` held as `ℓ`; 128, 16, 8 and 4): at 128 faces
+252 of 252, code 0.299 bits, 64 of 64 whole; its `κ ≡ 1` sibling 35 of 252 at 12.82 bits; at 16, 8 and 4 the same
+counts as the additive chart's at those temperatures (213, 143, 101 faces). Receipt:
+`_receipts/law16/completed_witness_logt.txt`.
+
+The chart changes the step's size, not its sign: whether descent raises the temperature is §16.10's fourth read,
+(iv), the covector on `ℓ` per head and kind at the witness with its temperatures at 4, and at the founding.
+
+### 16.14 The coupling read on the card: the clock's descent points away
+
+[measurement, November 2] The log chart on the card, against the host (`parity-field`, crib13's declaration at width
+32, `K = 2`): five sections and the withheld section bit for bit (faces, covector, learner, held rows, peaks, open
+return), the temperatures moving off their whole octaves from the first deposit; the releases were not read inside
+the 180 s guard (incomplete there). The host's field tests, 60 of 60 (the temperature's covector read by a fitted
+slope over 17 reads, since one temperature moves every score of a region at once and a single difference stands
+near the code's rounding, about ±50 a read; at the larger steps a single difference agrees, e.g. 712 against 647,
+−821 against −899, 946 against 900). Receipts: `_receipts/law16/parity_logt.txt`, `witness_card_t16.txt`.
+
+[measurement, November 2] §16.10's reads on the card (`witness-field`, the crib codec and declaration at `K = 3`, the
+515 first-calculation operand digits of the held problems, each a front cut at the digit; 10.6 s):
+
+| read | result |
+|---|---|
+| the witness at `T = 16` | faces 447 of 515, code 0.742 bits (the founding: none, 5.459) |
+| (i) the readers kept, `c = 0`: the clock's descent | cosine with the witness's `c` **−0.579**; the rate at digits less inside words, −0.293 of its root mean square |
+| (ii) the clock kept, the founding's readers: the readers' descent | head 3 **+0.160**, head 0 −0.0001 |
+| (iii) a keyed step of `2^(−10)` of a unit on the clock and readers | code 24.6 bits; the descent's cosine with the way back **+0.033** |
+| (iv) `log₂ T`'s descent at the witness with `T = 4` | head 3 raises both (class +7.8·10^14, listener +2.4·10^14 on the covector's scale); head 0's class lowers (−2.5·10^11), its listener raises (+2.7·10^11); faces 239, code 2.863 bits |
+| (iv) at the founding | zero at every head and kind: the readout is founded at zero (§16.9) |
+
+[decision; the rule fixed before the read] (ii) pulls toward the witness on head 3 and (iii) points back, weakly, but
+(i) points away: from a byte clock, with the witness's own readers, descent on the clock moves it from the digit clock,
+as crib13's head 3 did at its founding (§16.9, +0.469 away). **The run does not launch.** (iv) shows the temperature
+coupled to the rows as the clock is: it rises at the copy's head where the copy holds and has no covector at the
+founding. The basin is narrow: a step of `2^(−10)` a unit costs 24 bits, so the witness is an isolated point of the
+material, and descent cannot be expected to find it from far. The next subject is (i): why the clock's covector at the
+byte clock, under readers tuned to a digit clock, points away.
+
+### 16.15 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
 - **The card's row carrier.** A contact row is carried on at most twenty limbs (1,280 bits); at the witness's
@@ -1418,7 +1478,7 @@ width), built only when the temperature's law shows it is needed.
 - **The readings on context parts** are mis-clocked under a digit clock; `FIELD_HELD` keeps them, labelled, and the
   operand rows are read at fronts (`FIELD_PEAKS_OPERAND`).
 
-### 16.14 Failures this could repeat
+### 16.16 Failures this could repeat
 
 - An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
   digit, and the digit clock is a material row the deposition moves.

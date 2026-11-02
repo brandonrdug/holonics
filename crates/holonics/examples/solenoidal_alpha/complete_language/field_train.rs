@@ -1684,7 +1684,7 @@ pub(super) fn peaks_field(args: &[String], realization: &mut dyn FieldRealizatio
         let lap = Path::new(&pair[0]).extension().and_then(|e| e.to_str()).unwrap_or("-").to_string();
         peaks_text(&learner.field, &codec, &held, realization, &lap)?;
         for head in 0..learner.field.declaration.heads {
-            println!("FIELD_TEMPER lap={lap} head={head} class={} listen={}", learner.field.temper(head, false), learner.field.temper(head, true));
+            println!("FIELD_TEMPER lap={lap} head={head} class={} listen={}", learner.field.temper(head, false).map_err(|e| e.to_string())?, learner.field.temper(head, true).map_err(|e| e.to_string())?);
         }
         println!("FIELD_PEAKS_LAP lap={lap} ms={}", started.elapsed().as_millis());
     }
@@ -1888,7 +1888,12 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
     }
     // The temperature (`FIELD_WITNESS_HOT`, 16 by default, the card's: at 32 a lock passes its 128-bit carrier, at
     // tests.rs's 127 a row's exponents span past the card's twenty limbs; each refuses, never clipped).
-    let hot = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(16) * one;
+    // The temperatures are held as their logarithms (§16.12), so `FIELD_WITNESS_HOT` is a power of two.
+    let t = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(16);
+    if t <= 0 || t & (t - 1) != 0 {
+        return Err("FIELD_WITNESS_HOT is a power of two".into());
+    }
+    let hot = t.trailing_zeros() as i64 * one;
     set(&mut field, l.temper + 2 * 3, hot)?;
     set(&mut field, l.temper + 2 * 3 + 1, hot)?;
     set(&mut field, l.temper + 1, hot)?;
@@ -1914,8 +1919,10 @@ fn cosine(a: &[i128], b: &[i128]) -> i128 {
 /// problems, each a front cut at the digit (the digit the region's last site, open), the faces' covector (no closure)
 /// off the declared realization: the witness's code there beside the founding's, then (i) the readers kept and the
 /// clock zeroed, (ii) the clock kept and the readers the founding's, (iii) the witness moved a small keyed step on
-/// both; each reported as the descent's cosine with the way to the witness, in millionths.
+/// both; each reported as the descent's cosine with the way to the witness, in millionths; and (iv) the descent on
+/// each head's `log₂ T` at the witness with its temperatures at 4, and at the founding.
 pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use num_bigint::BigInt;
     if args.len() != 10 {
         return Err("witness-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA K".into());
     }
@@ -1991,13 +1998,14 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let (_, _, g1) = covector(&no_clock, realization)?;
     let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
     let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
-    let mut route: (i128, u64, i128, u64, i128) = (0, 0, 0, 0, 0);
+    // The rate's route: digits' and inside words' sums and counts, and the squares' sum (exact, unbounded).
+    let mut route: (i128, u64, i128, u64, BigInt) = (0, 0, 0, 0, BigInt::from(0));
     for region in &views {
         let bytes = codec.decode(region.classes);
         let x0 = no_clock.opening(region).map_err(|e| e.to_string())?;
         for t in 0..region.classes.len() - 1 {
             let dk: i128 = descent1.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&gc, &x)| (gc * x as i128) >> 16).sum();
-            route.4 += dk * dk;
+            route.4 += BigInt::from(dk) * BigInt::from(dk);
             let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
             if codec.is_digit(region.classes[t]) {
                 route.0 += dk;
@@ -2008,8 +2016,8 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
             }
         }
     }
-    let rms = ((route.4 / (route.1 + route.3).max(1) as i128).max(1) as u128).isqrt() as i128;
-    let gap = (route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * 1_000_000 / rms;
+    let rms = (&route.4 / BigInt::from((route.1 + route.3).max(1))).sqrt().max(BigInt::from(1));
+    let gap = (BigInt::from(route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * BigInt::from(1_000_000)) / rms;
     println!("FIELD_WITNESS_CLOCK head=3 cosine_to_witness={} gap_digits_less_inside_words_of_rms={gap}", cosine(&descent1, &toward1));
     // (ii) the clock kept, the readers the founding's.
     let mut no_readers = witness.clone();
@@ -2054,6 +2062,17 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let back: Vec<i128> = gather(&step, &ranges).into_iter().map(|v| -v).collect();
     let descent3: Vec<i128> = gather(&g3, &ranges).into_iter().map(|v| -v).collect();
     println!("FIELD_WITNESS_BASIN moved_code_bits={} cosine_back={}", bits(code_m), cosine(&descent3, &back));
+    // (iv) the temperatures' covector in their own chart (`log₂ T`, §16.12), at the witness's charts and clock with
+    // its temperatures at 4 (`ℓ = 2`), and at the founding: whether descent raises each head's and kind's `ℓ`.
+    let mut cool = witness.clone();
+    for at in [l.temper + 2 * 3, l.temper + 2 * 3 + 1, l.temper + 1] {
+        cool.theta[at] = 2 << 24;
+    }
+    for (name, field) in [("witness_t4", &cool), ("founding", &founding)] {
+        let (code, right, g4) = covector(field, realization)?;
+        let descent: Vec<String> = (0..declaration.heads).map(|h| format!("{h}:{}/{}", -g4[l.temper + 2 * h], -g4[l.temper + 2 * h + 1])).collect();
+        println!("FIELD_WITNESS_TEMPER at={name} faces_right={right} code_bits={} descent_on_log_t_class/listen={}", bits(code), descent.join(","));
+    }
     println!("FIELD_WITNESS_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }

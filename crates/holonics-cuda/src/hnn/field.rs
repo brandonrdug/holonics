@@ -178,6 +178,7 @@ struct Words {
     olist: u64,
     ostart: u64,
     temper_at: u64,
+    fine_roots: u64,
     gcov: u64,
     sb: u64,
     pr: u64,
@@ -238,19 +239,18 @@ pub fn crowd_slots(sites: usize) -> usize {
 /// dynamic, never arbitrary): a row's carrier is as wide as the exponents its rows hold, `62` bits of face,
 /// `WEIGHT_BITS` of weight, `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
 /// row of the launch holds, the bits of the terms a row sums, `64 + ⌈log₂ reach⌉` of a value summed over the
-/// reach and the sign: [`Field::row_bits`] (its gain read from the largest temperature the material holds,
-/// §15.10) with its spread bound (`4n |T| 2^(−24) + 1 + ⌊log₂ reach⌋ + 2`) replaced by the spread read. A spread
+/// reach and the sign: [`Field::row_bits`] (its gain read from the largest temperature's octave the material
+/// holds, [`Field::row_gain`], §15.10, §16.12) with its spread bound (`4n 2^c + 1 + ⌊log₂ reach⌋ + 2`) replaced by
+/// the spread read. A spread
 /// past that bound is refused (the bound is where a row ends), and so is a carrier past the twenty limbs the
 /// card keeps.
 pub fn row_limbs(field: &Field, spread: u64) -> Result<usize> {
     let d = &field.declaration;
-    let top = field.theta[field.layout().temper..field.layout().temper + 2 * d.heads].iter().map(|v| v.unsigned_abs() as u128).max().unwrap_or(0);
-    let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u64 + 1;
-    let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
+    let bound = field.row_gain()? + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
     if spread > bound {
         return Err(TowerError::Refused("a contact row holds exponents past the declaration's bound (`row_bits`)"));
     }
-    let need = field.row_bits() as u64 - bound + spread;
+    let need = field.row_bits()? as u64 - bound + spread;
     let limbs = (need.div_ceil(64) as usize).max(MIN_LIMBS);
     if limbs > MAX_LIMBS {
         return Err(TowerError::Refused("a contact row needs a carrier past the card's twenty limbs (1,280 bits)"));
@@ -718,6 +718,9 @@ impl<'c> CardField<'c> {
         let mut pack = Packed::default();
         let (theta_at, decay_at, phasor_at, ring_off_at, ring_n_at, roots_at) = (pack.put(&field.theta), pack.put(&decay), pack.put(&phasor), pack.put(&ring_off), pack.put(&ring_n), pack.put(&roots));
         let decay_t_at = pack.put(&decay_t);
+        // The temperatures' fine roots, past the resident face's sixteen (§16.12).
+        let fine: Vec<u64> = field.fine_exponential().roots()[roots.len()..].iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
+        let fine_at = pack.put(&fine);
         let run_pack = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
         let run_base = run_pack.device_ptr();
         if d.contacts % 2 != 0 {
@@ -798,6 +801,7 @@ impl<'c> CardField<'c> {
             roots: run_base + roots_at,
             met: met.device_ptr(),
             temper_at: l.temper as u64,
+            fine_roots: run_base + fine_at,
             probe: l.probe as u64,
             probe_bias: l.probe_bias as u64,
             rprobe: reach(l.probe, m2 * dw),
@@ -1629,7 +1633,7 @@ impl<'c> CardField<'c> {
         if bits == 0 {
             return Ok(());
         }
-        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier"), (16, "a moment's strand outruns its resident ring or skin")];
+        let names = [(1, "a sum outgrew its 128-bit carrier"), (2, "a released value outgrew its 64-bit carrier"), (4, "a released value outgrew its 32-bit carrier"), (8, "a current's covector outgrew its 128-bit carrier"), (16, "a moment's strand outruns its resident ring or skin"), (32, "a contact's key return outgrew its carrier"), (64, "a temperature past its carrier (2^(−23) to 2^7)")];
         let named: Vec<&str> = names.iter().filter(|(b, _)| bits & b != 0).map(|(_, n)| *n).collect();
         Err(TowerError::Realization(format!("the card refused the field: {}", named.join("; "))))
     }
@@ -1847,10 +1851,8 @@ mod tests {
         let field = Field::found(d, &keys).unwrap();
         // The gain is read from the largest temperature the material holds (§15.10).
         let l = field.layout();
-        let top = field.theta[l.temper..l.temper + 2 * d.heads].iter().map(|v| v.unsigned_abs() as u128).max().unwrap();
-        let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u64 + 1;
-        let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
-        assert_eq!(row_limbs(&field, bound).ok(), Some((field.row_bits() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
+        let bound = field.row_gain().unwrap() + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
+        assert_eq!(row_limbs(&field, bound).ok(), Some((field.row_bits().unwrap() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
         assert!(row_limbs(&field, bound + 1).is_err());
         // A narrow row needs five limbs at least, and the carrier never narrows as the spread widens.
         let mut last = 0;

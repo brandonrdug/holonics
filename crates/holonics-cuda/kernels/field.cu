@@ -61,6 +61,11 @@ typedef unsigned __int128 uwide;
 #define REFUSED_SHIFT 8u
 // The moments' shape (`MOMENT_REFUSED_SHAPE`, 16u) is the next bit; a contact's key return past its carrier:
 #define REFUSED_KEY 32u
+// A temperature past its carrier in its chart (§16.12: `⌈log₂ T⌉ ≤ 7`, `T ≥ 2^(−23)`).
+#define REFUSED_TEMPER 64u
+// The temperature's carrier and `ln 2`'s grain (`TEMPER_TOP`, `LN2_FACE_BITS` in `field.rs`).
+#define TEMPER_TOP 7
+#define LN2_FACE_BITS 30
 
 // -------------------------------------------------------------------------------------------
 // the host's integer law
@@ -370,10 +375,12 @@ struct FieldWords {
     const uint32_t *dstart;
     const uint32_t *olist;
     const uint32_t *ostart;
-    // The locks' temperatures (§15.10): the material's `temper` family (`theta[temper_at + 2 h + kind]`, kind 0 a
+    // The locks' temperatures (§15.10): the material's `temper` family (`theta[temper_at + 2 h + kind]` holds `log₂ T`, kind 0 a
     // class receiver, 1 a listener, on `2^(−24)`), the covector buffer the reverse adds their covectors to, and,
     // on a return, the pairs' locks at unit gain `S` (`sb`, at the dense address, a tick's).
     uint64_t temper_at;
+    // The temperatures' fine roots (§16.12): the exponential's roots 17 to 24 on `2^(−62)` (`Field::fine_exponential`).
+    const uint64_t *fine_roots;
     wide *gcov;
     int64_t *sb;
     // A listener's probe (§15.12): its chart of the read `pr` `[t][2M]`, framed and at unit power by head `pq`
@@ -1560,11 +1567,46 @@ __device__ __forceinline__ wide lock_pair(int64_t a0, int64_t a1, int64_t b0, in
     return ((pairing * (wide)(2 * decay)) << grain) - power * (wide)(decay * decay);
 }
 
-// [definition; agent-inferred, November 2] **The temperature of a head's locks** (§15.10): the receiver's head
-// and kind entry of the material (`temper`, on `2^(−24)`), and a score `z = release(T S, 24) − falloff` from the
-// lock at unit gain `S` (on `2^(−16)`).
+// [definition; agent-inferred, November 2] **The temperature of a head's locks** (§15.10, §16.12, `temperature_of`):
+// the material holds `ℓ = log₂ T` at the receiver's head and kind entry (`temper`, on `2^(−24)`), and `T = 2^c ·
+// 2^(ℓ − c)`, `c = ⌈ℓ⌉`, the fraction read through the exponential's resident face at `ℓ`'s `2^(−16)`, released to
+// `2^(−24)`; past its carrier it is refused. A score is `z = release(T S, 24) − falloff` from the lock at unit gain
+// `S` (on `2^(−16)`).
 __device__ __forceinline__ wide temper_of(const FieldWords &w, uint32_t h, bool listens) {
-    return (wide)w.theta[w.temper_at + 2 * h + (listens ? 1 : 0)];
+    const wide l = (wide)w.theta[w.temper_at + 2 * h + (listens ? 1 : 0)];
+    const wide c = (l + ((wide)1 << MATERIAL_BITS) - 1) >> MATERIAL_BITS;
+    if (c > TEMPER_TOP || c < 1 - (wide)MATERIAL_BITS) {
+        atomicOr(w.status, REFUSED_TEMPER);
+        return 0;
+    }
+    // `below_one` at the material's grain (`Field::fine_exponential`): the fraction's rest, its sixteen high digits
+    // through the resident face (the first sixteen roots, in their order), then the eight fine roots after them.
+    const uint64_t frac = (uint64_t)(c * ((wide)1 << MATERIAL_BITS) - l);
+    const uint64_t rest = frac == 0 ? 0 : ((uint64_t)1 << MATERIAL_BITS) - frac;
+    uint64_t value = w.face[rest >> (MATERIAL_BITS - FACE_BITS)];
+    for (uint32_t i = 0; i < MATERIAL_BITS - FACE_BITS; i++) {
+        if (rest & ((uint64_t)1 << (MATERIAL_BITS - FACE_BITS - 1 - i))) {
+            const uint64_t lo = value * w.fine_roots[i];
+            const uint64_t hi = __umul64hi(value, w.fine_roots[i]);
+            value = (hi << (64 - UNIT_BITS)) | (lo >> UNIT_BITS);
+        }
+    }
+    const uint64_t shifted = frac == 0 ? value : value >> 1;
+    const uint64_t face = shifted == 0 ? 1 : shifted;
+    return rel((wide)face, (unsigned)(UNIT_BITS - MATERIAL_BITS - c));
+}
+
+// [definition; agent-inferred, November 2] **A row's temperature covector in its own chart** (§16.12,
+// `temperature_chain`): the row's `δT = Σ release(δz S, 16)`, carried into `ℓ = log₂ T` as `δℓ = release(δT ·
+// release(T ln 2, 30), 24)`, so the rows' covectors sum in any order to the same bits.
+__device__ __forceinline__ wide temper_chain(const FieldWords &w, wide temper, wide dt) {
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    wide carried;
+    if (!mul_fits(dt, rel(temper * ln2, LN2_FACE_BITS), &carried)) {
+        atomicOr(w.status, REFUSED_CARRIER);
+        return 0;
+    }
+    return rel(carried, MATERIAL_BITS);
 }
 
 __device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int64_t base, uint32_t octave_of) {
@@ -2739,7 +2781,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         }
         tacc = warp_sum(tacc);
         if (lane == 0 && tacc != 0) {
-            add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), tacc);
+            // Into the temperature's own chart (§16.12): `δℓ = release(δT · release(T ln 2, 30), 24)`, the row's.
+            add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), temper_chain(w, temper, tacc));
         }
         __syncwarp();
         if (active) {

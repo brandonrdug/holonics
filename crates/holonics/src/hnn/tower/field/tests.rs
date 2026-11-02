@@ -241,7 +241,15 @@ fn covector_matches_the_codes_difference() {
             let mut minus = field.clone();
             minus.theta[i] -= delta;
             read += 1;
-            let measured = plus.code(&r).unwrap().0 - minus.code(&r).unwrap().0;
+            // A temperature moves every row's every score at once, so one difference stands near the code's own
+            // rounding (about ±50 a read, §16.13): its slope is fitted over 17 reads in `±δ`, as the pace's is.
+            let measured = if start == l.temper {
+                let at = |k: i32| { let mut f = field.clone(); f.theta[i] += k * (delta / 8); f.code(&r).unwrap().0 as i128 };
+                let weighted: i128 = (-8..=8).map(|k| k as i128 * at(k)).sum();
+                div_nearest(16 * weighted, 408) as i64
+            } else {
+                plus.code(&r).unwrap().0 - minus.code(&r).unwrap().0
+            };
             let predicted = (g[i] * 2 * delta as i128) >> shift;
             let tolerance = predicted.abs() / 8 + (64 << h);
             assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
@@ -1756,13 +1764,16 @@ fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>)
         let c243 = 3 * n + 6;
         set(&mut field, l.q + c243 * dw, anchor);
         set(&mut field, l.probe_bias + c243, (face_one as i64) >> 6);
-        let hot = t * one;
+        // The temperatures are held as their logarithms (§16.12): `T` a power of two.
+        assert!(t > 0 && t & (t - 1) == 0, "a witness temperature that is a power of two");
+        let hot = (t.trailing_zeros() as i64) * one;
         set(&mut field, l.temper + 2 * 3, hot);
         set(&mut field, l.temper + 2 * 3 + 1, hot);
         set(&mut field, l.temper + 1, hot);
         return field;
     }
-    let hot = 127 * one;
+    // `T = 128`, held as `log₂ T = 7`.
+    let hot = 7 * one;
     set(&mut field, l.temper + 2 * 3, hot);
     set(&mut field, l.temper + 2 * 3 + 1, hot);
     set(&mut field, l.temper + 1, hot);
@@ -1942,7 +1953,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
 /// [agent-inferred, November 2] **The completed witness** (§16.6, §16.10): at every operand digit's front (the
 /// question and the answer cut at the digit, the digit open) the face's top class is the question's digit, 252 of 252,
 /// and its code there is below the founding's 5.46 bits; the same field at `κ ≡ 1` fails that assertion. Read at the
-/// witness's temperature (127) and, as measurements, at 16, 8 and 4 (crib13's learned temperatures reached 3.91):
+/// witness's temperature (128) and, as measurements, at 16, 8 and 4 (crib13's learned temperatures reached 3.91):
 /// faces, code, the problems whose first calculation is whole, and the faces by the copy's clock distance. Run with
 /// `--ignored --nocapture`.
 #[test]
@@ -1987,7 +1998,7 @@ fn the_completed_witness_reads_the_copied_digit() {
     };
     const FOUNDING_MILLIBITS: i64 = 5460;
     let mut verdicts = Vec::new();
-    for (hot, paced) in [(127i64, true), (127, false), (16, true), (8, true), (4, true)] {
+    for (hot, paced) in [(128i64, true), (128, false), (16, true), (8, true), (4, true)] {
         let started = std::time::Instant::now();
         let out = read(&witness_field_read(reach, 3, paced, Some(hot)));
         let n = out.len();
@@ -2009,3 +2020,4 @@ fn the_completed_witness_reads_the_copied_digit() {
     assert!(verdicts[0], "at the witness's temperature every operand digit's face is the question's digit, below the founding's code");
     assert!(!verdicts[1], "at κ ≡ 1 the completed witness fails");
 }
+
