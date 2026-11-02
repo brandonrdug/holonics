@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, Region, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldPeak, HeldRows, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -457,6 +457,10 @@ pub struct CardField<'c> {
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current]` summed.
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
+    /// A held read's answer rows by their concentration on the question (a reading for the receipts): the
+    /// regions' answer starts and the digit classes while it is read, and the rows read, region by region.
+    held_peaks: std::cell::RefCell<Option<(Vec<usize>, Vec<u8>)>>,
+    peak_rows: std::cell::RefCell<Vec<HeldPeak>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -471,7 +475,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), closure: std::cell::Cell::new(true), held_questions: Default::default(), held_cells: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), closure: std::cell::Cell::new(true), held_questions: Default::default(), held_cells: Default::default(), held_peaks: Default::default(), peak_rows: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1143,6 +1147,32 @@ impl<'c> CardField<'c> {
                 *t += c;
             }
         }
+        // A held read's answer rows by their concentration on the question (a reading for the receipts).
+        if let Some((questions, digit)) = self.held_peaks.borrow().as_ref() {
+            let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
+            let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
+            let digit_c = self.timed(Kind::Copy, || self.take_up(digit)).map_err(device)?;
+            let mut cells = Vec::with_capacity(ticks.len());
+            for tick in ticks.iter() {
+                set(words, tick);
+                let out = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * 6)).map_err(device)?;
+                let (mut sp, mut dp, mut op) = (starts_c.device_ptr(), digit_c.device_ptr(), out.device_ptr());
+                self.launch("field_held_peaks", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut dp), arg(&mut op)])?;
+                cells.push(self.timed(Kind::Copy, || self.card.fetch_range(&*out, 0, heads * sites * 6)).map_err(device)?);
+            }
+            let mut rows = self.peak_rows.borrow_mut();
+            for (r, region) in regions.iter().enumerate() {
+                let first = region_off[r] as usize;
+                for (k, cell) in cells.iter().enumerate() {
+                    for h in 0..heads {
+                        for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                            let c = &cell[(h * sites + first + t) * 6..][..6];
+                            rows.push(HeldPeak { tick: k as u32, head: h as u32, site: t as u32, question: c[0] as u128, collision: c[1] as u128, top: c[2] as u64, top_site: c[3] as u32, digits: c[4] as u128, right: c[5] as u128 });
+                        }
+                    }
+                }
+            }
+        }
         // The faces at the unresolved sites.
         let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
         let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
@@ -1665,6 +1695,19 @@ impl FieldRealization for CardField<'_> {
         let (heads, ticks) = (field.declaration.heads, field.declaration.ticks);
         let cells = if cells.is_empty() { vec![0i128; ticks * heads * 5] } else { cells };
         Ok(cells.chunks_exact(5).map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4] }).collect())
+    }
+
+    fn read_row_peaks(&mut self, field: &Field, regions: &[Region], questions: &[usize], digit: &[bool]) -> Result<Vec<HeldPeak>> {
+        if regions.len() != questions.len() || digit.len() != field.declaration.alphabet {
+            return Err(TowerError::Refused("a held read's answer starts that are not one a region, or digit classes not one a class"));
+        }
+        // The shares of every tick are kept (a logits read keeps them), and read once each by `field_held_peaks`.
+        *self.held_peaks.borrow_mut() = Some((questions.to_vec(), digit.iter().map(|&b| u8::from(b)).collect()));
+        self.peak_rows.borrow_mut().clear();
+        let read = self.run(field, regions, false, true, None);
+        *self.held_peaks.borrow_mut() = None;
+        read?;
+        Ok(std::mem::take(&mut *self.peak_rows.borrow_mut()))
     }
 }
 

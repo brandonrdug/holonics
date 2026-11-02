@@ -1,0 +1,21 @@
+WITNESS one_pass_ms=3292 reads=252 reach=451
+WITNESS paced right=252/252 margin_bits min=7.065 p05=7.930 p10=9.001 p25=10.455 median=12.486 p75=28.886 max=63.000 anchor_definite=188/188 anchor_open=64/64
+WITNESS paced digits=2 reads=14 right=14 margin_min_millibits=9009 anchor_right=14
+WITNESS paced digits=3 reads=26 right=26 margin_min_millibits=14862 anchor_right=26
+WITNESS paced digits=4 reads=42 right=42 margin_min_millibits=14333 anchor_right=42
+WITNESS paced digits=5 reads=44 right=44 margin_min_millibits=12343 anchor_right=44
+WITNESS paced digits=6 reads=60 right=60 margin_min_millibits=10455 anchor_right=60
+WITNESS paced digits=7 reads=32 right=32 margin_min_millibits=9001 anchor_right=32
+WITNESS paced digits=8 reads=22 right=22 margin_min_millibits=7918 anchor_right=22
+WITNESS paced digits=9 reads=12 right=12 margin_min_millibits=7065 anchor_right=12
+WITNESS paced ms=66711
+WITNESS plain right=7/252 margin_bits min=-63.000 p05=-62.038 p10=-62.038 p25=-62.038 median=-2.941 p75=-1.941 max=3.865 anchor_definite=0/188 anchor_open=0/64
+WITNESS plain digits=2 reads=14 right=1 margin_min_millibits=-62038 anchor_right=0
+WITNESS plain digits=3 reads=26 right=1 margin_min_millibits=-62038 anchor_right=0
+WITNESS plain digits=4 reads=42 right=4 margin_min_millibits=-62038 anchor_right=0
+WITNESS plain digits=5 reads=44 right=1 margin_min_millibits=-62280 anchor_right=0
+WITNESS plain digits=6 reads=60 right=0 margin_min_millibits=-63000 anchor_right=0
+WITNESS plain digits=7 reads=32 right=0 margin_min_millibits=-63000 anchor_right=0
+WITNESS plain digits=8 reads=22 right=0 margin_min_millibits=-62038 anchor_right=0
+WITNESS plain digits=9 reads=12 right=0 margin_min_millibits=-62038 anchor_right=0
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2045 filtered out; finished in 133.94s

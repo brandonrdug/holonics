@@ -171,6 +171,9 @@ pub(super) enum Shape {
     Front(Front),
 }
 
+/// [agent-inferred, November 2] The key of a held read's front (`draw | 7·2^59`, §16.4).
+const HELD_FRONT_KEY: u64 = 7 << 59;
+
 /// [agent-inferred, November 1] The key of a front region's front `f` (`draw | 2^62`).
 const FRONT_KEY: u64 = 1 << 62;
 
@@ -385,17 +388,23 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut firsts: Vec<TrainRegion> = Vec::with_capacity(members.len());
     let mut fronts: Vec<Option<(Front, usize)>> = Vec::with_capacity(members.len());
-    let mut contexts: Vec<TrainRegion> = Vec::with_capacity(members.len());
+    let mut held_fronts: Vec<TrainRegion> = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
-        // [agent-inferred, November 2] The held read meets the admitted future (§15.11): each problem
-        // also as a context region (the question known, one in `CONTEXT` answer sites open, its
-        // neighbours known), the shape the withheld problems and the crib's reading are judged on, one
-        // part a problem keyed by its draw. Read for the held step only, never fit.
-        let (cc, cu) = context_regions(codec.void(), q, a, length).swap_remove((*draw as usize) % CONTEXT);
-        contexts.push(TrainRegion::plain(cc, cu));
+        // [agent-inferred, November 2] The held read meets the admitted future (§15.11, §16.4): each problem
+        // also as the release reads it, the question and the answer before a keyed front definite and every
+        // site from the front through the answer's first void open, one front a problem keyed by its draw.
+        // Read for the held step only, never fit. Why not the context parts (one answer site in four open,
+        // the November 2 choice): an open site ticks by the face it carries (§16.2), so a digit clock reads a
+        // part's earlier open digits as stopped and its clock is off by their count, while at the release's
+        // front every earlier site is definite.
+        let front = (mix(seed, *draw | HELD_FRONT_KEY) % (a.len() as u64 + 1)) as usize;
+        let mut cc: Vec<usize> = q.iter().chain(a).copied().collect();
+        cc.push(codec.void());
+        let cu: Vec<bool> = (0..cc.len()).map(|t| t >= q.len() + front).collect();
+        held_fronts.push(TrainRegion::plain(cc, cu));
         let mut classes = region_classes(codec, q, a, length);
         match shape(seed, *draw, q.len(), length, a.len() + 1) {
             Shape::Masked(mask) => {
@@ -410,7 +419,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         }
     }
     let next = if learner.holds_step() {
-        let held: Vec<TrainRegion> = firsts.iter().cloned().chain(contexts).collect();
+        let held: Vec<TrainRegion> = firsts.iter().cloned().chain(held_fronts).collect();
         learner.read_step_on(&views_of(&held), realization).map_err(|e| e.to_string())?.1
     } else {
         None
@@ -740,8 +749,8 @@ fn next_text(next: Option<FieldNext>) -> String {
 /// is a count bound; before each lap after the first, the run continues only if the elapsed time
 /// plus that lap's projected bound stays within `STOP_MS`, and otherwise it ends at the last
 /// rested lap (`FIELD_LAPS_HELD`). The body grows at most once in a run, because the run carries
-/// only the two projections (before and after one growth); a second growth is held and the run
-/// ends there (`FIELD_GROW_HELD`), and the keys are checked to cover that one growth before any
+/// only the two projections (before and after one growth); a second growth is held and the laps
+/// go on at that width (`FIELD_GROW_HELD`, [`growth`]), and the keys are checked to cover that one growth before any
 /// lap runs. Why: the fifth reading sized its laps from its time, so `LAPS` and the time bound
 /// were the same number read twice, and a lap that could not finish would only have stopped the run
 /// with its partial step.
@@ -908,22 +917,41 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // raised the code from 5.459 to 5.912 bits, and its grown body refused 240 of 248 steps).
         let fell = (code as i128) * (previous.1 as i128) < (previous.0 as i128) * (unseen_sites as i128);
         fallen |= fell;
-        if !fell && fallen && lap + 1 < laps {
-            if grown {
-                // A second growth has no projection in this run: the run rests at its last lap and
-                // the next run projects the declaration grown again.
-                println!("FIELD_GROW_HELD lap={lap} reason=a second growth has no projection ms={}", started.elapsed().as_millis());
-                break;
+        match growth(fell, fallen, grown, lap, laps) {
+            Growth::Widen => {
+                learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
+                grown = true;
+                fallen = false;
+                let d = learner.field.declaration;
+                println!("FIELD_GROW lap={lap} width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
             }
-            learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
-            grown = true;
-            fallen = false;
-            let d = learner.field.declaration;
-            println!("FIELD_GROW lap={lap} width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
+            Growth::Held => println!("FIELD_GROW_HELD lap={lap} reason=a second growth has no projection; the laps go on at this width ms={}", started.elapsed().as_millis()),
+            Growth::None => {}
         }
         previous = (code, unseen_sites);
     }
     Ok(())
+}
+
+/// What a lap's withheld read decides of the body's width ([`growth`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum Growth {
+    Widen,
+    Held,
+    None,
+}
+
+/// [agent-inferred, November 2] **A lap's growth**: after a lap whose withheld code did not fall, once it has
+/// fallen at this width and a lap remains, the body widens if it has not grown in this run, and otherwise the
+/// growth is held and the laps go on at this width. Why: the run carries the projections of its declaration and
+/// of one growth, so a second has no projection; crib13 ended at lap 9 of 27 when its second growth came due,
+/// which cut the workload the design fixed (the run's laps) for a growth the run could not project.
+pub(super) fn growth(fell: bool, fallen: bool, grown: bool, lap: usize, laps: usize) -> Growth {
+    match (!fell && fallen && lap + 1 < laps, grown) {
+        (false, _) => Growth::None,
+        (true, false) => Growth::Widen,
+        (true, true) => Growth::Held,
+    }
 }
 
 /// The bytes a release writes, escaped as `card_written.py` writes them.
@@ -1491,6 +1519,152 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 2] **The held answer rows' concentration on the question, over rested
+/// learners** (`peaks-field CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA STATE STATE_SHA [STATE STATE_SHA …]`):
+/// for each state, read through the declared realization with no deposit, the held problems' context regions
+/// (base 3 of [`held_regions`], the answer starting at the question's end) by [`FieldRealization::read_row_peaks`],
+/// summed per tick and head over three sets of the open answer sites: every one (`FIELD_PEAKS`), those whose
+/// target is a digit (`FIELD_PEAKS_DIGIT`), and the first calculation's first operand (`FIELD_PEAKS_OPERAND`: the
+/// digits after the answer's first `<<`, whose right source is the same digit of the first question number written
+/// as that operand). Each with its chance (`*_flat`, the share a row spread evenly over the question would put
+/// there). Then each head's temperatures (`FIELD_TEMPER`, on `2^(−24)`). Millionths and bits are the reading's
+/// chart. A reading only: nothing is deposited and no state is written.
+pub(super) fn peaks_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() < 9 || (args.len() - 7) % 2 != 0 {
+        return Err("peaks-field CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA STATE STATE_SHA [STATE STATE_SHA ...]".into());
+    }
+    let started = std::time::Instant::now();
+    let units = units_of(&args[3], &args[4])?;
+    if !units.merges().is_empty() {
+        return Err("peaks-field reads an operand's digits as bytes: a codec of byte units".into());
+    }
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], CODEC_BUDGET)?)?, units)?;
+    let held_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let held: Problems = problems_of(&held_text)
+        .iter()
+        .map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len())))
+        .collect::<std::result::Result<Vec<_>, String>>()?
+        .into_iter()
+        .filter(|(_, a, _)| a.len() < codec.answer)
+        .collect();
+    let regions = held_regions(&codec, &held);
+    let n = held.len();
+    let parts: Vec<(Vec<usize>, Vec<bool>)> = regions.iter().skip(n).take(n * CONTEXT).map(|(c, u, _)| (c.clone(), u.clone())).collect();
+    let questions: Vec<usize> = held.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
+    // Each answer site's role: its target's class, and where its operand digit's right source is.
+    let mut operand: Vec<std::collections::BTreeMap<usize, usize>> = Vec::with_capacity(n);
+    for (q, a, _) in &held {
+        let (qb, ab) = (codec.decode(q), codec.decode(a));
+        let mut at = std::collections::BTreeMap::new();
+        if let Some(open) = ab.windows(2).position(|w| w == b"<<") {
+            let digits = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+            let text = &ab[open + 2..open + 2 + digits];
+            let runs: Vec<usize> = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).collect();
+            if let Some(&start) = runs.iter().find(|&&s| qb[s..].iter().take_while(|b| b.is_ascii_digit()).count() == digits && &qb[s..s + digits] == text) {
+                for k in 0..digits {
+                    at.insert(q.len() + open + 2 + k, start + k);
+                }
+            }
+        }
+        operand.push(at);
+    }
+    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
+    println!("FIELD_PEAKS_READ problems={n} regions={} operand_sites={}", parts.len(), operand.iter().map(|m| m.len()).sum::<usize>());
+    for pair in args[7..].chunks(2) {
+        let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&pair[0], &pair[1], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+        let field = &learner.field;
+        let lap = Path::new(&pair[0]).extension().and_then(|e| e.to_str()).unwrap_or("-").to_string();
+        let d = field.declaration;
+        // [set][tick · heads + head]: rows, Σ top/question, Σ spread, Σ flat spread, Σ top-is-digit, Σ digit share,
+        // Σ digit flat, Σ top class right, Σ right share, Σ right flat, Σ top site right.
+        let mut acc = vec![[0i128; 11]; 3 * d.ticks * d.heads];
+        let views: Vec<Region> = parts.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+        let read_start = std::time::Instant::now();
+        for (k, (chunk, asks)) in views.chunks(64).zip(questions.chunks(64)).enumerate() {
+            let peaks = realization.read_row_peaks(field, chunk, asks, &digit).map_err(|e| e.to_string())?;
+            let mut rows = peaks.iter();
+            for (r, region) in chunk.iter().enumerate() {
+                let problem = (k * 64 + r) / CONTEXT;
+                let question = asks[r];
+                let qc = &region.classes[..question];
+                let open = region.unresolved.iter().filter(|&&u| u).count();
+                for _ in 0..d.ticks * d.heads * open {
+                    let peak = rows.next().ok_or("a held read's peaks that are fewer than its rows")?;
+                    let i = peak.site as usize;
+                    let own = region.classes[i];
+                    let cell = peak.tick as usize * d.heads + peak.head as usize;
+                    let q = peak.question;
+                    let ratio = |a: u128, b: u128| if b == 0 { 0 } else { (a * 1_000_000 / b) as i128 };
+                    let flat_right = ratio(qc.iter().filter(|&&c| c == own).count() as u128, question.max(1) as u128);
+                    let flat_digit = ratio(qc.iter().filter(|&&c| digit[c]).count() as u128, question.max(1) as u128);
+                    let top_class = (peak.top_site != u32::MAX).then(|| region.classes[peak.top_site as usize]);
+                    let row = [
+                        1,
+                        ratio(peak.top as u128, q),
+                        if peak.collision > 0 { (2 * log2_milli(q) - log2_milli(peak.collision) - 63_000) as i128 } else { 0 },
+                        log2_milli(question.max(1) as u128) as i128,
+                        i128::from(top_class.is_some_and(|c| digit[c])),
+                        ratio(peak.digits, q),
+                        flat_digit,
+                        i128::from(top_class == Some(own)),
+                        ratio(peak.right, q),
+                        flat_right,
+                        i128::from(operand[problem].get(&i) == Some(&(peak.top_site as usize))),
+                    ];
+                    let sets = [true, digit[own], operand[problem].contains_key(&i)];
+                    for (set, &inside) in sets.iter().enumerate() {
+                        if inside {
+                            for (a, v) in acc[set * d.ticks * d.heads + cell].iter_mut().zip(row) {
+                                *a += v;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let read_ms = read_start.elapsed().as_millis();
+        // Means over a set's rows: shares in millionths (the flags as millionths of rows), bits in thousandths.
+        let m = |v: i128, rows: i128, flag: bool| (if flag { v * 1_000_000 } else { v }) / rows.max(1);
+        let b = |v: i128, rows: i128| { let x = v / rows.max(1); format!("{}{}.{:03}", if x < 0 { "-" } else { "" }, x.abs() / 1000, x.abs() % 1000) };
+        for (set, name) in ["FIELD_PEAKS", "FIELD_PEAKS_DIGIT", "FIELD_PEAKS_OPERAND"].iter().enumerate() {
+            for tick in 0..d.ticks {
+                for head in 0..d.heads {
+                    let a = acc[set * d.ticks * d.heads + tick * d.heads + head];
+                    println!(
+                        "{name} lap={lap} tick={tick} head={head} rows={} top_share={} spread_bits={} flat_bits={} top_digit={} digit_share={} digit_flat={} top_class_right={} right_share={} right_flat={} top_site_right={}",
+                        a[0], m(a[1], a[0], false), b(a[2], a[0]), b(a[3], a[0]), m(a[4], a[0], true), m(a[5], a[0], false), m(a[6], a[0], false), m(a[7], a[0], true), m(a[8], a[0], false), m(a[9], a[0], false), m(a[10], a[0], true)
+                    );
+                }
+            }
+        }
+        for head in 0..d.heads {
+            println!("FIELD_TEMPER lap={lap} head={head} class={} listen={} width={} heads={}", field.temper(head, false), field.temper(head, true), d.width, d.heads);
+        }
+        println!("FIELD_PEAKS_LAP lap={lap} read_ms={read_ms} ms={}", started.elapsed().as_millis());
+    }
+    Ok(())
+}
+
+/// `log₂ x` in thousandths of a bit, `x ≥ 1`: the whole bits by the leading zeros and sixteen fraction bits by
+/// squaring the mantissa on `2^(−62)` (a reading's chart, exact integers).
+pub(super) fn log2_milli(x: u128) -> i64 {
+    if x == 0 {
+        return 0;
+    }
+    let whole = 127 - x.leading_zeros() as i64;
+    let mut m: u128 = if whole >= 62 { x >> (whole - 62) } else { x << (62 - whole) };
+    let mut frac = 0i64;
+    for _ in 0..16 {
+        m = (m * m) >> 62;
+        frac <<= 1;
+        if m >= 1u128 << 63 {
+            m >>= 1;
+            frac |= 1;
+        }
+    }
+    whole * 1000 + ((frac * 1000 + (1 << 15)) >> 16)
+}
+
 /// The host realization, for the dispatcher.
 pub(super) fn host() -> HostField {
     HostField
@@ -1513,6 +1687,18 @@ mod tests {
         let back = FieldCodec::from_text(&codec.to_text(), Units::bytes()).unwrap();
         assert_eq!((back.used.clone(), back.answer), (codec.used.clone(), codec.answer));
         assert_eq!(codec.answer, codec.encode(&problems[0].1).unwrap().len() + 1);
+    }
+
+    /// A flat lap widens once the code has fallen at this width; a second growth is held and the laps go on;
+    /// a falling lap, a lap before any fall, and the last lap never grow.
+    #[test]
+    fn a_second_growth_is_held_and_the_laps_go_on() {
+        assert_eq!(growth(false, true, false, 1, 27), Growth::Widen);
+        assert_eq!(growth(false, true, true, 9, 27), Growth::Held);
+        assert_eq!(growth(true, true, true, 9, 27), Growth::None);
+        assert_eq!(growth(false, false, false, 0, 27), Growth::None);
+        assert_eq!(growth(false, true, false, 26, 27), Growth::None);
+        assert_eq!(growth(false, true, true, 26, 27), Growth::None);
     }
 
     #[test]

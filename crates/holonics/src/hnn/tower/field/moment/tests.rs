@@ -181,7 +181,7 @@ fn the_ring_is_closed_under_conjugation() {
 #[test]
 fn near_phases_equal_the_full_ring_wherever_the_ring_is_truncated() {
     for slot in all_slots() {
-        let law = Law::new(12, &slot.ring, slot.n, &slot.decay).unwrap();
+        let law = Law::new(12, &slot.ring, slot.n, &slot.decay, None).unwrap();
         for r in -(NEAR as i64 - 1)..=(NEAR as i64 - 1) {
             assert_eq!(law.zeta(r).unwrap(), slot.phase(r), "n {} r {r}", slot.n);
         }
@@ -228,10 +228,10 @@ fn the_moments_equal_the_direct_sum_bit_for_bit() {
         let reach = slot.decay.len();
         for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
             let (before, after) = (strand(&mut next, sites, 1 << 17), strand(&mut next, sites, 1 << 17));
-            let exact = moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay).unwrap();
+            let exact = moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap();
             let want = direct(&slot, &before, &after);
             assert_eq!(exact, want, "n {} S {sites}", slot.n);
-            let got = moments(&before, &after, &slot.ring, slot.n, &slot.decay).unwrap();
+            let got = moments(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap();
             let want_released: Vec<(i64, i64)> = released(&want, COEFFICIENT_BITS).into_iter().map(|(a, b)| (a as i64, b as i64)).collect();
             assert_eq!(got, want_released, "n {} S {sites}", slot.n);
             checked += sites;
@@ -250,7 +250,7 @@ fn a_stationary_slot_sums_every_source_once() {
     let mut next = mixer(13);
     for sites in [1usize, 3, 6, 7, 20, 64, 129, 300] {
         let (before, after) = (strand(&mut next, sites, 1 << 17), strand(&mut next, sites, 1 << 17));
-        let got = moments(&before, &after, &ring, 1, &decay).unwrap();
+        let got = moments(&before, &after, &ring, 1, &decay, None).unwrap();
         for t in 0..sites {
             let mut want = (0i64, 0i64);
             for k in 0..sites {
@@ -287,10 +287,10 @@ fn the_return_equals_its_released_law_bit_for_bit() {
         for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
             for d_bound in [8i64, 1 << 24, 1 << 40] {
                 let ds = strand(&mut next, sites, d_bound);
-                let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+                let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay, None).unwrap();
                 let (want_plus, want_minus) = direct_return(&slot, &ds);
                 assert_eq!((&plus, &minus), (&want_plus, &want_minus), "n {} S {sites} bound {d_bound}", slot.n);
-                let (rp, rm) = moments_return(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+                let (rp, rm) = moments_return(&ds, &slot.ring, slot.n, &slot.decay, None).unwrap();
                 assert_eq!((rp, rm), (released(&want_plus, RETURN_RELEASE_BITS), released(&want_minus, RETURN_RELEASE_BITS)), "n {} S {sites}", slot.n);
                 checked += sites;
             }
@@ -338,8 +338,8 @@ fn the_return_pairs_with_the_moments_within_the_release_rounding() {
             for (e_bound, d_bound) in [(8i64, 8i64), (1 << 17, 1 << 24), (1 << 17, 1 << 40)] {
                 let (before, after) = (strand(&mut next, sites, e_bound), strand(&mut next, sites, e_bound));
                 let ds = strand(&mut next, sites, d_bound);
-                let moment = moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay).unwrap();
-                let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+                let moment = moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap();
+                let (plus, minus) = moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay, None).unwrap();
                 let (left, right) = pairings(&before, &after, &ds, &moment, &plus, &minus);
                 let diff = &left - (right << MOVE_BITS as usize);
                 let bound = pairing_bound(&slot, &before, &after);
@@ -367,8 +367,8 @@ fn a_stationary_slot_pairs_exactly() {
     for sites in [7usize, 64, 129, 300] {
         let (before, after) = (strand(&mut next, sites, 1 << 17), strand(&mut next, sites, 1 << 17));
         let ds = strand(&mut next, sites, 1 << 40);
-        let moment = moment_exact(&before, &after, &ring, 1, &decay).unwrap();
-        let (plus, minus) = moment_return_exact(&ds, &ring, 1, &decay).unwrap();
+        let moment = moment_exact(&before, &after, &ring, 1, &decay, None).unwrap();
+        let (plus, minus) = moment_return_exact(&ds, &ring, 1, &decay, None).unwrap();
         let (left, right) = pairings(&before, &after, &ds, &moment, &plus, &minus);
         assert_eq!(left, right << MOVE_BITS as usize, "S {sites}");
         assert!(left != BigInt::from(0));
@@ -391,7 +391,7 @@ fn a_crib_regions_covector_is_admitted() {
     assert!(g > 1 << 27, "a covector of l1 beyond 2^27");
     assert!(!certificate(sites as u128, r, d, g), "the exact transpose's carrier refuses it");
     assert!(return_certificate(sites as u128, r, d, g));
-    let (plus, minus) = moments_return(&ds, &slot.ring, slot.n, &slot.decay).unwrap();
+    let (plus, minus) = moments_return(&ds, &slot.ring, slot.n, &slot.decay, None).unwrap();
     let (want_plus, want_minus) = direct_return(&slot, &ds);
     assert_eq!((plus, minus), (released(&want_plus, RETURN_RELEASE_BITS), released(&want_minus, RETURN_RELEASE_BITS)));
 }
@@ -405,8 +405,8 @@ fn the_unreleased_moment_is_linear() {
     let (a0, a1) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16));
     let (b0, b1) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16));
     let sum = |x: &[(i64, i64)], y: &[(i64, i64)]| x.iter().zip(y).map(|(p, q)| (p.0 + q.0, p.1 + q.1)).collect::<Vec<_>>();
-    let (sa, sb) = (moment_exact(&a0, &a1, &slot.ring, slot.n, &slot.decay).unwrap(), moment_exact(&b0, &b1, &slot.ring, slot.n, &slot.decay).unwrap());
-    let both = moment_exact(&sum(&a0, &b0), &sum(&a1, &b1), &slot.ring, slot.n, &slot.decay).unwrap();
+    let (sa, sb) = (moment_exact(&a0, &a1, &slot.ring, slot.n, &slot.decay, None).unwrap(), moment_exact(&b0, &b1, &slot.ring, slot.n, &slot.decay, None).unwrap());
+    let both = moment_exact(&sum(&a0, &b0), &sum(&a1, &b1), &slot.ring, slot.n, &slot.decay, None).unwrap();
     let want: Vec<G> = sa.iter().zip(&sb).map(|(&p, &q)| gadd(p, q)).collect();
     assert_eq!(both, want);
 }
@@ -419,7 +419,7 @@ fn a_site_meets_itself_on_both_strands() {
         let mut after = vec![(0i64, 0i64); 4];
         before[2] = (1000, -2000);
         after[2] = (30, 70);
-        let got = moments(&before, &after, &slot.ring, slot.n, &slot.decay).unwrap();
+        let got = moments(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap();
         assert_eq!(got[2], (1030, -1930), "n {}", slot.n);
     }
 }
@@ -438,10 +438,10 @@ fn the_near_field_does_not_depend_on_where_the_span_stands() {
     let mut next = mixer(23);
     for slot in slots(300, 6) {
         let (a_before, a_after) = (strand(&mut next, NEAR, 1 << 17), strand(&mut next, NEAR, 1 << 17));
-        let at_origin = moments(&a_before, &a_after, &slot.ring, slot.n, &slot.decay).unwrap();
+        let at_origin = moments(&a_before, &a_after, &slot.ring, slot.n, &slot.decay, None).unwrap();
         for tau in [1usize, 5, 6, 7, 64, 100, 211, 294] {
             let (b_before, b_after) = (embedded(&a_before, tau, 300), embedded(&a_after, tau, 300));
-            let shifted = moments(&b_before, &b_after, &slot.ring, slot.n, &slot.decay).unwrap();
+            let shifted = moments(&b_before, &b_after, &slot.ring, slot.n, &slot.decay, None).unwrap();
             assert_eq!(&shifted[tau..tau + NEAR], &at_origin[..], "n {} tau {tau}", slot.n);
         }
     }
@@ -472,7 +472,7 @@ fn a_shifted_strand_moves_its_moment_only_by_the_attained_faces() {
         let l1_of = |p: (i64, i64)| p.0.abs() as i128 + p.1.abs() as i128;
         for tau in [3usize, 64, 100, 240] {
             let (b_before, b_after) = (embedded(&a_before, tau, 300), embedded(&a_after, tau, 300));
-            let shifted = moment_exact(&b_before, &b_after, &slot.ring, slot.n, &slot.decay).unwrap();
+            let shifted = moment_exact(&b_before, &b_after, &slot.ring, slot.n, &slot.decay, None).unwrap();
             for t in 0..sites {
                 let mut bound = 0i128;
                 for k in 0..sites {
@@ -519,13 +519,13 @@ fn the_span_face_reads_the_sources_between_its_boundaries_exactly() {
     let zero = vec![(0i64, 0i64); NEAR];
     for _ in 0..8 {
         let before = strand(&mut next, NEAR, 1 << 17);
-        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
-        let at_released = moments(&before, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
+        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
+        let at_released = moments(&before, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
         for i in 0..NEAR {
             for j in i + 1..NEAR {
                 let mut masked = before.clone();
                 masked[..=i].iter_mut().for_each(|p| *p = (0, 0));
-                let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
+                let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
                 let z = {
                     let p = slot.phase(i as i64 - j as i64);
                     let s = slot.decay[j - i] as i128;
@@ -558,12 +558,12 @@ fn the_span_face_on_the_founded_rings_deviates_by_exactly_the_blur() {
     let mut worst = 0i128;
     for slot in slots(300, 6) {
         let before = strand(&mut next, 48, 1 << 17);
-        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
-        let at_released = moments(&before, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
+        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
+        let at_released = moments(&before, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
         for (i, j) in [(0usize, 1usize), (3, 8), (10, 11), (10, 30), (20, 47), (30, 40), (46, 47), (5, 47)] {
             let mut masked = before.clone();
             masked[..=i].iter_mut().for_each(|p| *p = (0, 0));
-            let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
+            let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
             let z = {
                 let p = slot.phase(i as i64 - j as i64);
                 let s = slot.decay[j - i] as i128;
@@ -615,8 +615,8 @@ fn a_source_past_the_skin_is_not_misread() {
         before[i - 7..=i].iter_mut().for_each(|p| *p = (0, 0));
         let mut masked = before.clone();
         masked[..=i].iter_mut().for_each(|p| *p = (0, 0));
-        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
-        let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay).unwrap();
+        let at = moment_exact(&before, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
+        let between = moment_exact(&masked, &zero, &slot.ring, slot.n, &slot.decay, None).unwrap();
         let p = slot.phase(i as i64 - j as i64);
         let s = slot.decay[j - i] as i128;
         assert_eq!(at[i], (0, 0), "i {i}");
@@ -676,26 +676,26 @@ fn the_certificate_admits_the_largest_aligned_strand_and_refuses_one_past_it() {
     // Components below 2^17 (l1 below 2^18).
     let big = (1i64 << 17) - 1;
     let before = vec![(big, big); sites];
-    let got = moments(&before, &before, &ring, 1, &decay).unwrap();
+    let got = moments(&before, &before, &ring, 1, &decay, None).unwrap();
     for (t, &g) in got.iter().enumerate() {
         let count = (t + 1 + (sites - t)) as i64;
         assert_eq!(g, (count * big, count * big));
     }
     // Encodings of 2^60: l1 2^61 past the carrier at this ring and decay.
     let huge = vec![(1i64 << 60, 1i64 << 60); sites];
-    assert_eq!(moments(&huge, &huge, &ring, 1, &decay), Err(TowerError::Refused("a strand past the l1 certificate of its 128-bit carrier")));
-    assert!(moments_return(&huge, &ring, 1, &decay).is_err());
+    assert_eq!(moments(&huge, &huge, &ring, 1, &decay, None), Err(TowerError::Refused("a strand past the l1 certificate of its 128-bit carrier")));
+    assert!(moments_return(&huge, &ring, 1, &decay, None).is_err());
     // A covector of 2^30 on 2^(−24) (64.0) is admitted: the released return's carrier is linear in the
     // strand, and a stationary slot hears the plain sum, exactly.
     let loud = vec![(1i64 << 30, 1i64 << 30); sites];
-    let (plus, minus) = moments_return(&loud, &ring, 1, &decay).unwrap();
+    let (plus, minus) = moments_return(&loud, &ring, 1, &decay, None).unwrap();
     for k in 0..sites {
         let hear = |count: usize| ((count as i128) << 30, (count as i128) << 30);
         assert_eq!((plus[k], minus[k]), (hear(sites - k), hear(k + 1)));
     }
     // Components below 2^50 (about 10^8 units) are too; the 2^60 covector above is refused.
     let louder = vec![((1i64 << 50) - 1, (1i64 << 50) - 1); sites];
-    let (plus, minus) = moments_return(&louder, &ring, 1, &decay).unwrap();
+    let (plus, minus) = moments_return(&louder, &ring, 1, &decay, None).unwrap();
     let unit = (1i128 << 50) - 1;
     for k in 0..sites {
         assert_eq!((plus[k], minus[k]), (((sites - k) as i128 * unit, (sites - k) as i128 * unit), ((k + 1) as i128 * unit, (k + 1) as i128 * unit)));
@@ -706,16 +706,129 @@ fn the_certificate_admits_the_largest_aligned_strand_and_refuses_one_past_it() {
 fn malformed_strands_are_refused() {
     let slot = slots(16, 4).into_iter().find(|s| s.n == 27).unwrap();
     let e = vec![(1i64, 1i64); 8];
-    assert!(moments(&e, &e[..7], &slot.ring, slot.n, &slot.decay).is_err(), "unequal strands");
-    assert!(moments(&e, &e, &slot.ring, 0, &slot.decay).is_err(), "period zero");
-    assert!(moments(&e, &e, &slot.ring[..4], slot.n, &slot.decay).is_err(), "ring shorter than the places");
-    assert!(moments(&e, &e, &slot.ring, slot.n, &slot.decay[..7]).is_err(), "skin shorter than the strand");
-    assert!(moments_return(&e, &slot.ring[..4], slot.n, &slot.decay).is_err());
-    assert!(moments_return(&e, &slot.ring, slot.n, &slot.decay[..7]).is_err());
+    assert!(moments(&e, &e[..7], &slot.ring, slot.n, &slot.decay, None).is_err(), "unequal strands");
+    assert!(moments(&e, &e, &slot.ring, 0, &slot.decay, None).is_err(), "period zero");
+    assert!(moments(&e, &e, &slot.ring[..4], slot.n, &slot.decay, None).is_err(), "ring shorter than the places");
+    assert!(moments(&e, &e, &slot.ring, slot.n, &slot.decay[..7], None).is_err(), "skin shorter than the strand");
+    assert!(moments_return(&e, &slot.ring[..4], slot.n, &slot.decay, None).is_err());
+    assert!(moments_return(&e, &slot.ring, slot.n, &slot.decay[..7], None).is_err());
     // A short ring is enough where the period is shorter than the strand.
     let two = slots(16, 4).into_iter().find(|s| s.n == 2).unwrap();
-    assert!(moments(&e, &e, &two.ring, 2, &two.decay).is_ok());
+    assert!(moments(&e, &e, &two.ring, 2, &two.decay, None).is_ok());
     // No strand, no moment.
-    assert_eq!(moments(&[], &[], &[], 0, &[]), Ok(Vec::new()));
-    assert_eq!(moments_return(&[], &[], 0, &[]), Ok((Vec::new(), Vec::new())));
+    assert_eq!(moments(&[], &[], &[], 0, &[], None), Ok(Vec::new()));
+    assert_eq!(moments_return(&[], &[], 0, &[], None), Ok((Vec::new(), Vec::new())));
+}
+
+/// A paced strand's faces from a founded field's slot: the turn and skin at any clock (§16, Law 1).
+struct Paced {
+    n: usize,
+    ring: Vec<(i64, i64)>,
+    decay: Vec<i64>,
+    pi: i128,
+    exponential: crate::hnn::keyed_modes::Exponential,
+}
+
+fn paced_slots(reach: usize, modes: usize) -> Vec<Paced> {
+    let declaration = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, clocks: 0 };
+    let mut next = mixer(7);
+    let keys: Vec<u8> = (0..1usize << 14).flat_map(|_| next().to_be_bytes()).collect();
+    let field = Field::found(declaration, &keys).unwrap();
+    let pi = half_turn(MOVE_BITS + 16);
+    field.rings().iter().zip(field.decays()).map(|((n, ring), decay)| Paced { n: *n, ring: ring.clone(), decay: decay.clone(), pi, exponential: field.exponential().clone() }).collect()
+}
+
+/// A clock of `sites` places whose rates are drawn from `rates` (on `2^(−24)`): `(τ, σ)`, `τ_0 = σ_0 = 0`.
+fn clock_of(next: &mut impl FnMut() -> u64, sites: usize, rates: &[i64]) -> (Vec<i64>, Vec<i64>) {
+    let (mut tau, mut sigma) = (vec![0i64], vec![0i64]);
+    for _ in 1..sites {
+        let k = rates[(next() % rates.len() as u64) as usize];
+        tau.push(tau.last().unwrap() + k);
+        sigma.push(sigma.last().unwrap() + k.abs());
+    }
+    tau.truncate(sites);
+    sigma.truncate(sites);
+    (tau, sigma)
+}
+
+/// A strand paced at its own places (`τ_t = σ_t = t`) is the byte place's moment and return, bit for bit,
+/// on every slot and length: the founding reads today's field.
+#[test]
+fn a_strand_paced_at_its_own_places_is_the_byte_moment() {
+    let mut next = mixer(29);
+    for slot in paced_slots(16, 4).into_iter().chain(paced_slots(300, 6)) {
+        let reach = slot.decay.len();
+        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
+            let places: Vec<i64> = (0..sites as i64).map(|t| t << crate::hnn::tower::field::PACE_BITS).collect();
+            let pace = Pace { tau: &places, sigma: &places, turn: &turn, skin: &skin };
+            let (before, after, ds) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 24));
+            assert_eq!(moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, Some(&pace)).unwrap(), moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap(), "n {} S {sites}", slot.n);
+            assert_eq!(moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay, Some(&pace)).unwrap(), moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay, None).unwrap(), "n {} S {sites}", slot.n);
+        }
+    }
+}
+
+/// A paced strand's moment and return equal their definitions summed directly over every pair, bit for bit:
+/// near `ζ^(τ_k − τ_t) e^(−2π|σ_t − σ_k|/n) 2^30`, far `e^(−2π|σ_t − σ_(t±2^ℓ)|/n) conj(ζ^(τ_t)) ζ^(τ_k)` (the
+/// octave's skin at the receiver's place `2^ℓ` away on the source's side), and the return their transpose with
+/// the far turned covector `release(ζ^(τ_t) δs_t, 30)` once a term; with rates that stop, run backward and are
+/// fractional, so the clock is no byte place.
+#[test]
+fn a_paced_strand_equals_its_definition_bit_for_bit() {
+    let mut next = mixer(31);
+    let one = 1i64 << crate::hnn::tower::field::PACE_BITS;
+    let rates = [0, one, one, 2 * one, -one / 2, one / 3, 5 * one / 7];
+    let mut checked = 0usize;
+    for slot in paced_slots(300, 6) {
+        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        for &sites in LENGTHS.iter().filter(|&&s| s <= 100) {
+            let (tau, sigma) = clock_of(&mut next, sites, &rates);
+            let pace = Pace { tau: &tau, sigma: &sigma, turn: &turn, skin: &skin };
+            let face = |r: i128| -> G { let (a, b) = turn(r); (a as i128, b as i128) };
+            let w = |t: usize, k: usize| -> G {
+                let d = t.abs_diff(k);
+                if d < NEAR {
+                    let z = face(tau[k] as i128 - tau[t] as i128);
+                    let s = (skin(sigma[t] as i128 - sigma[k] as i128) as i128) << MOVE_BITS;
+                    (z.0 * s, z.1 * s)
+                } else {
+                    let level = d.ilog2();
+                    let edge = if k > t { t + (1 << level) } else { t - (1 << level) };
+                    let c = gmul(gconj(face(tau[t] as i128)), face(tau[k] as i128));
+                    let s = skin(sigma[t] as i128 - sigma[edge] as i128) as i128;
+                    (c.0 * s, c.1 * s)
+                }
+            };
+            let (before, after, ds) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 24));
+            let want: Vec<G> = (0..sites)
+                .map(|t| (0..sites).fold((0i128, 0i128), |s, k| {
+                    let s = if k <= t { gadd(s, gmul(w(t, k), gwide(before[k]))) } else { s };
+                    if k >= t { gadd(s, gmul(w(t, k), gwide(after[k]))) } else { s }
+                }))
+                .collect();
+            assert_eq!(moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, Some(&pace)).unwrap(), want, "n {} S {sites}", slot.n);
+            let turned: Vec<G> = (0..sites).map(|t| { let p = gmul(face(tau[t] as i128), gwide(ds[t])); (release(p.0, MOVE_BITS), release(p.1, MOVE_BITS)) }).collect();
+            let term = |k: usize, t: usize| -> G {
+                let d = t.abs_diff(k);
+                if d < NEAR {
+                    let c = gmul(gconj(face(tau[k] as i128 - tau[t] as i128)), gwide(ds[t]));
+                    let s = skin(sigma[t] as i128 - sigma[k] as i128) as i128;
+                    (c.0 * s, c.1 * s)
+                } else {
+                    let level = d.ilog2();
+                    let edge = if k > t { t + (1 << level) } else { t - (1 << level) };
+                    let s = skin(sigma[t] as i128 - sigma[edge] as i128) as i128;
+                    gmul(gconj(face(tau[k] as i128)), (turned[t].0 * s, turned[t].1 * s))
+                }
+            };
+            let plus: Vec<G> = (0..sites).map(|k| (k..sites).fold((0i128, 0i128), |a, t| gadd(a, term(k, t)))).collect();
+            let minus: Vec<G> = (0..sites).map(|k| (0..=k).fold((0i128, 0i128), |a, t| gadd(a, term(k, t)))).collect();
+            assert_eq!(moment_return_exact(&ds, &slot.ring, slot.n, &slot.decay, Some(&pace)).unwrap(), (plus, minus), "n {} S {sites}", slot.n);
+            checked += sites;
+        }
+    }
+    assert!(checked > 1000);
 }

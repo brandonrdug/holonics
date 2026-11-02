@@ -254,7 +254,8 @@ fn covector_matches_the_codes_difference() {
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
     // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
     // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
-    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all (the far
+    // support read by its fitted window and with the paces, §16: 264 read after 344 halvings),
     // none on a seam.
     eprintln!("COVECTOR_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
@@ -1206,7 +1207,8 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
     // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
     // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
-    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all (the far
+    // support read by its fitted window and with the paces, §16: 264 read after 344 halvings),
     // none on a seam.
     eprintln!("CLOSURE_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
@@ -1395,27 +1397,31 @@ fn the_covector_matches_the_code_across_the_far_support() {
                         continue;
                     };
                     halvings += h;
-                    let (mut plus, mut minus) = (field.clone(), field.clone());
-                    plus.theta[i] += delta;
-                    minus.theta[i] -= delta;
-                    read += 1;
                     let code = |f: &Field| f.code(&r).unwrap().0 + if closure { closure_code(f, &r) } else { 0 };
-                    let measured = code(&plus) - code(&minus);
-                    let predicted = (g[i] * 2 * delta as i128) >> (natural + grain - 20);
-                    let tolerance = predicted.abs() / 8 + (64 << h);
-                    // Read again at half the step where the first read misses: the integer forward's
-                    // releases can jump at one step that no seam marks (measured November 2: the
-                    // listener's probe chart read 191 against 328 at `2^(grain − 9)`, and 631 against 656
-                    // and 144 against 164 at the steps beside it).
-                    let agrees = |m: i64, p: i128| (m as i128 - p).abs() <= p.abs() / 8 + (64 << h);
-                    let half = || {
-                        let (mut plus, mut minus) = (field.clone(), field.clone());
-                        plus.theta[i] += delta / 2;
-                        minus.theta[i] -= delta / 2;
-                        2 * (code(&plus) - code(&minus))
+                    // [agent-inferred, November 2] The slope through a wide window: a line fitted to 17 reads at
+                    // `k δ/2`, `k = −8..8` (`±4δ`), read as its change over `2δ`, `4 Σ k c_k / Σ k²`; a window that
+                    // crosses a sheet at any read is left out. Why: the integer forward's releases jump at steps no
+                    // seam marks, and the paced field (§16) jumps more often, so one central difference cannot
+                    // resolve the slope at the narrow step (measured: a q-chart entry under a random pace read
+                    // −357 and −187 against −509 and −255 at `±2^15` and `±2^14`, a line over `±2^14` −383.5 and over
+                    // `±2^16` −475.3, over `±2^18` −509.0; at a zero pace −476.1, −513.9 and −542.7 against −543).
+                    // A window that crosses a sheet is halved (each halving counted as the step's are), up to
+                    // `STRADDLE_HALVINGS`; one that still crosses stands on a seam.
+                    let points: Vec<i32> = (-8..=8).collect();
+                    let moved = |k: i32, step: i32| { let mut f = field.clone(); f.theta[i] += k * (step / 2); f };
+                    let Some(w) = (0..=STRADDLE_HALVINGS).find(|&w| (delta >> w) >= 2 && points.iter().all(|&k| sheets(&moved(k, delta >> w)) == sheets(&field))) else {
+                        seams += 1;
+                        continue;
                     };
-                    let _ = tolerance;
-                    assert!(agrees(measured, predicted) || agrees(half(), predicted), "still {still} closure {closure} family at {start} entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+                    let (step, h) = (delta >> w, h + w);
+                    halvings += w;
+                    read += 1;
+                    let weighted: i128 = points.iter().map(|&k| k as i128 * code(&moved(k, step)) as i128).sum();
+                    let squares: i128 = points.iter().map(|&k| (k * k) as i128).sum();
+                    let measured = div_nearest(4 * weighted, squares) as i64;
+                    let predicted = (g[i] * 2 * step as i128) >> (natural + grain - 20);
+                    let agrees = |m: i64, p: i128| (m as i128 - p).abs() <= p.abs() / 8 + (64 << h);
+                    assert!(agrees(measured, predicted), "still {still} closure {closure} family at {start} entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
                 }
             }
         }
@@ -1427,7 +1433,8 @@ fn the_covector_matches_the_code_across_the_far_support() {
     // a seam and is counted apart. The tolerance's floor is the code's rounding, `64` on 2^(−20) bits,
     // which stands while the difference falls by `2^h`, so it is `64 · 2^h`; a quiet entry's step is
     // first doubled above the floor ([`probe_step`]). Measured November 2: the face's 364 probes, the
-    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all,
+    // closure's 204 and the far support's 232 are every one read, after 26, 0 and 137 halvings in all (the far
+    // support read by its fitted window and with the paces, §16: 264 read after 344 halvings),
     // none on a seam.
     eprintln!("FAR_PROBES read={read} halvings={halvings} on_a_seam={seams}");
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
@@ -1551,4 +1558,346 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
     let (near, peak) = read(&hot);
     eprintln!("LISTENER_AT_CLASS_GAIN near={} far_peak={}", (near * 1_000_000 >> SHARE_BITS) / 400, (peak * 1_000_000 >> SHARE_BITS) / 400);
     assert!(near > peak, "and at the class receiver's");
+}
+
+
+/// The crib terrain's law as `crib_problem` writes it (the example's `field_train.rs`): 48 to 79 words of one to
+/// three syllables, two or three numbers of one to three digits at distinct word places, and the answer's
+/// calculations in order, `<<a+b=s>>s`, then `<<s+c=t>>t` for a third, and `#### total`. The draws here are the
+/// fixture's own mixer, so the problems are the crib's kind, not its instances.
+fn crib_like(next: &mut impl FnMut() -> u64) -> (Vec<u8>, Vec<u8>) {
+    const SYLLABLES: [&[u8]; 20] = [b"ba", b"de", b"ki", b"lo", b"mu", b"na", b"pe", b"ri", b"so", b"tu", b"va", b"we", b"xo", b"yi", b"za", b"ha", b"fe", b"gi", b"jo", b"cu"];
+    let mut draw = |m: u64| next() % m;
+    let words = 48 + draw(32) as usize;
+    let count = 2 + draw(2) as usize;
+    let values: Vec<u64> = (0..count).map(|_| { let low = 10u64.pow(draw(3) as u32); low + draw(9 * low) }).collect();
+    let mut places: Vec<usize> = Vec::new();
+    while places.len() < count {
+        let place = draw(words as u64) as usize;
+        if !places.contains(&place) {
+            places.push(place);
+        }
+    }
+    places.sort_unstable();
+    let (mut question, mut next_number) = (Vec::new(), 0usize);
+    for w in 0..words {
+        if w > 0 {
+            question.push(b' ');
+        }
+        if next_number < count && places[next_number] == w {
+            question.extend(values[next_number].to_string().bytes());
+            next_number += 1;
+        } else {
+            for _ in 0..1 + draw(3) {
+                question.extend_from_slice(SYLLABLES[draw(20) as usize]);
+            }
+        }
+    }
+    question.extend_from_slice(b"?\n");
+    let (mut answer, mut total) = (Vec::new(), values[0]);
+    for (j, &v) in values.iter().enumerate().skip(1) {
+        if j > 1 {
+            answer.push(b'\n');
+        }
+        answer.extend(format!("<<{total}+{v}={}>>{}", total + v, total + v).bytes());
+        total += v;
+    }
+    answer.extend(format!("\n#### {total}").bytes());
+    (question, answer)
+}
+
+/// `log₂ x` in thousandths of a bit, `x ≥ 1` (a reading's chart, exact integers: the whole bits by the leading
+/// zeros, sixteen fraction bits by squaring the mantissa on `2^(−62)`).
+fn log2_milli(x: u128) -> i64 {
+    if x == 0 {
+        return 0;
+    }
+    let whole = 127 - x.leading_zeros() as i64;
+    let mut m: u128 = if whole >= 62 { x >> (whole - 62) } else { x << (62 - whole) };
+    let mut frac = 0i64;
+    for _ in 0..16 {
+        m = (m * m) >> 62;
+        frac <<= 1;
+        if m >= 1u128 << 63 {
+            m >>= 1;
+            frac |= 1;
+        }
+    }
+    whole * 1000 + ((frac * 1000 + (1 << 15)) >> 16)
+}
+
+/// The witness's byte classes: the crib's bytes, then the void.
+const WITNESS_BYTES: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789 ?\n<>+=#";
+
+/// [agent-inferred, November 2] **The paced field set by hand to copy the first calculation** (§16's witness): the
+/// crib declaration (D 32, H 5, n 8, two still sets, a sweep clock, f 32) at `ticks` ticks, every family zero but:
+/// - the encodings, one unit dimension a family: own class `0` a non-digit (and the unresolved row, with `4`), `1` a
+///   digit; the left neighbour `3` where it is `<`, `5` otherwise; the right neighbour `6`;
+/// - head 3's pace `c[0] = −1` (where `paced`): `κ = 1` at a digit, `0` elsewhere (an open site's face carries no
+///   digit), so `τ` counts the digits before a site; at `κ ≡ 1` the field is today's;
+/// - head 3 (turned, its mode 3 of period 16 and mode 5 of period 81): the key of a digit is `1` on both modes; the
+///   anchor's word (a digit after `<`, `A e^(iψ) (read₃ − read₀)`) adds `A e^(iψ)` on mode 5, and a listener's
+///   probe there is `A e^(iψ)` read from its left neighbour's `<`: the earliest digit wins inside the window
+///   `bΔτ + ψ ∈ (−π/2, −π/4)`, where the skin's turn makes the score rise with `Δτ`; its value carries `1` on mode
+///   3, so the anchor's current is `D ζ^(τ_j − τ_a0)` there, written to `x` at dimensions 10 and 11;
+/// - head 0 (still): the key `read₁ + i read₃` and a listener's probe `1 + i` find the anchor (a digit after `<`)
+///   among every definite site; its value reads dimensions 10 and 11, its current written to 12 and 13;
+/// - a listener's probe on head 3's mode 3 reads 12 and 13 turned by `e^(−iπ/8)`: the copy's clock distance from
+///   the anchor's, `τ_j − τ_i = τ_(j*) − τ_a0 + 1`, at the skin's peak (`e^(bu) cos(bu + π/4)` at `u = 0`).
+fn witness_field(reach: usize, ticks: usize, paced: bool) -> Field {
+    let alphabet = WITNESS_BYTES.len() + 1;
+    let d = FieldDeclaration { alphabet, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: 1 };
+    let mut field = Field::found(d, &keys(1 << 17)).unwrap();
+    field.theta.iter_mut().for_each(|v| *v = 0);
+    let (dw, n, m) = (d.width, d.modes, d.complex());
+    let m2 = 2 * m;
+    let l = field.layout.clone();
+    let face_one = 1i32 << FACE_BITS;
+    let one = 1i64 << MATERIAL_BITS;
+    // A turn's face `e^(2πi num/den)` on `2^(−30)` (the field's own series), and a material coefficient `g` (on
+    // `2^(−24)`) times one of its parts.
+    let pi = half_turn(MOVE_BITS + 16);
+    let face = |num: i128, den: i128| turn_phasor(div_nearest(num << PACE_BITS, den), 1, pi);
+    let times = |g: i64, part: i64| release(g as i128 * part as i128, MOVE_BITS) as i64;
+    let root = |k: u128| ((k << (2 * MATERIAL_BITS)).isqrt()) as i64;
+    let digit = |c: usize| c < WITNESS_BYTES.len() && WITNESS_BYTES[c].is_ascii_digit();
+    for c in 0..=alphabet {
+        let own = if c == alphabet { 0 } else if digit(c) { 1 } else { 0 };
+        field.theta[l.enc + c * dw + own] = face_one;
+        if c == alphabet {
+            field.theta[l.enc + c * dw + 4] = face_one;
+        }
+        let left = if c < WITNESS_BYTES.len() && WITNESS_BYTES[c] == b'<' { 3 } else { 5 };
+        field.theta[l.before + c * dw + left] = face_one;
+        field.theta[l.after + c * dw + 6] = face_one;
+    }
+    if paced {
+        field.theta[l.pace + dw] = -(1i32 << MATERIAL_BITS);
+    }
+    let set = |field: &mut Field, at: usize, v: i64| field.theta[at] = i32::try_from(v).unwrap();
+    // A complex coefficient `g e^(iθ)` (`θ` a face) from input dimensions `(re, im)` into chart row pair `(c, m + c)`.
+    let turned = |field: &mut Field, chart: usize, c: usize, from: (usize, usize), g: i64, theta: (i64, i64)| {
+        let (gc, gs) = (times(g, theta.0), times(g, theta.1));
+        set(field, chart + c * dw + from.0, gc);
+        set(field, chart + c * dw + from.1, -gs);
+        set(field, chart + (m + c) * dw + from.0, gs);
+        set(field, chart + (m + c) * dw + from.1, gc);
+    };
+    // The anchor's window `ψ = −27/100` of a turn (`−1.696` rad) and its strength `A = 64`.
+    let (psi, anchor) = (face(-27, 100), 64 * one);
+    let (c16, c32, c81, c0, c1) = (3 * n + 3, 3 * n + 4, 3 * n + 5, 0usize, 1usize);
+    // Head 3's word: a digit's key on the copy's comb (period 16 power 3, period 32 power 12) and the anchor's
+    // mode (period 81, power 1); on mode 5 the anchor's term `A e^(iψ) (read₃/2 − read₀)`: `A/2 e^(iψ)` at a digit
+    // after `<`, zero at a digit elsewhere, `−A/2 e^(iψ)` at the `<` after `<` and `−A e^(iψ)` at any other
+    // non-digit, a ratio of one site's own reads; so every definite site but a digit opposes the anchor, and no
+    // source is silent (a silent key scores zero against every probe, above a decayed match).
+    set(&mut field, l.q + c16 * dw + 1, root(3));
+    set(&mut field, l.q + c32 * dw + 1, root(12));
+    set(&mut field, l.q + c81 * dw + 1, one);
+    set(&mut field, l.q + c81 * dw + 3, times(anchor / 2, psi.0));
+    set(&mut field, l.q + c81 * dw, times(-anchor, psi.0));
+    set(&mut field, l.q + (m + c81) * dw + 3, times(anchor / 2, psi.1));
+    set(&mut field, l.q + (m + c81) * dw, times(-anchor, psi.1));
+    // A listener's probe: the anchor from a `<` on its left; the copy's two channels turned by `2/25` and `−2/25` of
+    // a turn (the period-16 offset `b − 0.1` and the period-32 offset `b − 0.7` rad, rounded to the turn's fifths
+    // of a tenth).
+    set(&mut field, l.probe + c81 * dw + 3, times(anchor, psi.0));
+    set(&mut field, l.probe + (m + c81) * dw + 3, times(anchor, psi.1));
+    turned(&mut field, l.probe, c16, (12, 13), one, face(2, 25));
+    turned(&mut field, l.probe, c32, (16, 17), one, face(-2, 25));
+    // Head 3's value: a digit's `1` on the comb; the anchor's current to dimensions 10–11 (period 16) and 14–15
+    // (period 32), the second at half the gain.
+    set(&mut field, l.v + c16 * dw + 1, one);
+    set(&mut field, l.v + c32 * dw + 1, one);
+    set(&mut field, l.out + 10 * m2 + c16, 64 * one);
+    set(&mut field, l.out + 11 * m2 + m + c16, 64 * one);
+    set(&mut field, l.out + 14 * m2 + c32, 32 * one);
+    set(&mut field, l.out + 15 * m2 + m + c32, 32 * one);
+    // Head 0 (still): the anchor's key `read₁ + i read₃`, a listener's probe `1 + i`; its values the anchor's two
+    // channels, its current to 12–13 and 16–17.
+    set(&mut field, l.q + c0 * dw + 1, one);
+    set(&mut field, l.q + (m + c0) * dw + 3, one);
+    set(&mut field, l.probe_bias + c0, face_one as i64);
+    set(&mut field, l.probe_bias + m + c0, face_one as i64);
+    for (c, from, to) in [(c0, (10, 11), (12, 13)), (c1, (14, 15), (16, 17))] {
+        set(&mut field, l.v + c * dw + from.0, one);
+        set(&mut field, l.v + (m + c) * dw + from.1, one);
+        set(&mut field, l.out + to.0 * m2 + c, one);
+        set(&mut field, l.out + to.1 * m2 + m + c, one);
+    }
+    let hot = 127 * one;
+    set(&mut field, l.temper + 2 * 3, hot);
+    set(&mut field, l.temper + 2 * 3 + 1, hot);
+    set(&mut field, l.temper + 1, hot);
+    field
+}
+
+/// One witness read: for each problem and each digit of the first calculation's two operands, the front region
+/// (the question and the answer before the digit resolved, the digit and every later site open) and head 3's row
+/// at the last tick at that digit (head 3's): whether its largest share is on the same digit of the question's number, and
+/// the bits by which the right source leads the next (negative: by which it trails the top); and the anchor's own
+/// row at the first tick, read as the receiver it is at that front (open at its own digit, definite and a class
+/// receiver on its word at every later one): whether its largest share is on the question's first digit.
+/// `(right, margin in thousandths of a bit, anchor right, anchor definite, digits in the question)` a read, in
+/// parallel over the reads.
+fn witness_read(field: &Field, problems: &[(Vec<usize>, Vec<usize>, Vec<(usize, usize)>)], length: usize) -> Vec<(bool, i64, bool, bool, usize)> {
+    let void = WITNESS_BYTES.len();
+    let reads: Vec<(usize, usize, usize)> = problems.iter().enumerate().flat_map(|(p, (_, _, ops))| ops.iter().map(move |&(o, s)| (p, o, s))).collect();
+    reads
+        .par_iter()
+        .map(|&(p, offset, source)| {
+            let (q, a, operands) = &problems[p];
+            let mut classes: Vec<usize> = q.iter().chain(a.iter()).copied().collect();
+            classes.resize(length, void);
+            let at = q.len() + offset;
+            let open: Vec<bool> = (0..length).map(|t| t >= at).collect();
+            let region = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
+            let pass = field.pass(&region, true).unwrap();
+            let row = &pass.ticks.last().unwrap().rows[3 * length + at];
+            let top = row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).unwrap();
+            let share = |j: usize| row.iter().find(|s| s.j as usize == j).map_or(0, |s| s.p);
+            let next = row.iter().filter(|s| s.j as usize != source).map(|s| s.p).max().unwrap_or(0);
+            let ok = top.j as usize == source;
+            let bits = |a: u64, b: u64| log2_milli(a.max(1) as u128) - log2_milli(b.max(1) as u128);
+            let margin = if ok { bits(share(source), next) } else { -bits(top.p, share(source)) };
+            let a0 = q.len() + operands[0].0;
+            let anchor_row = &pass.ticks[0].rows[3 * length + a0];
+            let anchor_top = anchor_row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).map_or(usize::MAX, |s| s.j as usize);
+            let digits = q.iter().filter(|&&c| WITNESS_BYTES.get(c).is_some_and(u8::is_ascii_digit)).count();
+            (ok, margin, anchor_top == operands[0].1, !open[a0], digits)
+        })
+        .collect()
+}
+
+/// [agent-inferred, November 2] **The witness** (§16): the paced field, set by hand and with no learning, copies
+/// every digit of the first calculation's two operands from the question at the crib's size, its largest share at
+/// the last of three ticks on the same digit of the same number; the same field at `κ ≡ 1` (today's) does not.
+/// The terrain keeps what a 24-site fixture lacks: regions of 240 to 560 sites, repeated digit values, two to nine
+/// digits in a question, the answer's own earlier digits at a small clock distance, and the byte falloff, which
+/// charges the earlier (right) number more than a later one. Run with `--ignored --nocapture`; it prints the
+/// margins (the right source's lead over the next, in bits; negative where it trails the top).
+#[test]
+#[ignore]
+fn the_witness_copies_the_first_calculation_by_its_clock() {
+    let mut next = mixer(0x0C1B);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    let mut problems = Vec::new();
+    let mut longest = 0usize;
+    for _ in 0..64 {
+        let (q, a) = crib_like(&mut next);
+        // The first calculation `<<a+b=`: each operand digit's answer offset and its source in the question.
+        let runs: Vec<(usize, usize)> = {
+            let mut out = Vec::new();
+            let mut t = 0;
+            while t < q.len() {
+                if q[t].is_ascii_digit() {
+                    let s = t;
+                    while t < q.len() && q[t].is_ascii_digit() {
+                        t += 1;
+                    }
+                    out.push((s, t - s));
+                } else {
+                    t += 1;
+                }
+            }
+            out
+        };
+        let (la, lb) = (runs[0].1, runs[1].1);
+        let mut operands: Vec<(usize, usize)> = (0..la).map(|k| (2 + k, runs[0].0 + k)).collect();
+        operands.extend((0..lb).map(|k| (2 + la + 1 + k, runs[1].0 + k)));
+        assert!(operands.iter().all(|&(o, s)| a[o] == q[s]), "the operands copy the question's first two numbers");
+        longest = longest.max(q.len() + a.len() + 1);
+        problems.push((q.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), a.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), operands));
+    }
+    let reach = longest;
+    assert!(reach > 256 && reach <= 512, "the crib's rings: a reach of {reach}");
+    let paced = witness_field(reach, 3, true);
+    {
+        let (q, a, ops) = &problems[0];
+        let mut classes: Vec<usize> = q.iter().chain(a.iter()).copied().collect();
+        classes.resize(reach, WITNESS_BYTES.len());
+        let open: Vec<bool> = (0..reach).map(|t| t >= q.len() + ops[0].0).collect();
+        let started = std::time::Instant::now();
+        paced.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] }, true).unwrap();
+        eprintln!("WITNESS one_pass_ms={} reads={} reach={reach}", started.elapsed().as_millis(), problems.iter().map(|p| p.2.len()).sum::<usize>());
+    }
+    let periods: Vec<usize> = [3usize, 5].iter().map(|&l| paced.rings()[paced.slot(3, l)].0).collect();
+    assert_eq!(periods, vec![16, 81], "head 3's modes 3 and 5");
+    let report = |name: &str, out: &[(bool, i64, bool, bool, usize)]| -> (usize, usize) {
+        let right = out.iter().filter(|r| r.0).count();
+        let mut margins: Vec<i64> = out.iter().map(|r| r.1).collect();
+        margins.sort_unstable();
+        let at = |percent: usize| { let x = margins[(margins.len() - 1) * percent / 100]; format!("{}{}.{:03}", if x < 0 { "-" } else { "" }, x.abs() / 1000, x.abs() % 1000) };
+        let (definite, anchored) = (out.iter().filter(|r| r.3).count(), out.iter().filter(|r| r.3 && r.2).count());
+        let (open, anchored_open) = (out.iter().filter(|r| !r.3).count(), out.iter().filter(|r| !r.3 && r.2).count());
+        eprintln!("WITNESS {name} right={right}/{} margin_bits min={} p05={} p10={} p25={} median={} p75={} max={} anchor_definite={anchored}/{definite} anchor_open={anchored_open}/{open}", out.len(), at(0), at(5), at(10), at(25), at(50), at(75), at(100));
+        for dq in 2..=9 {
+            let of: Vec<&(bool, i64, bool, bool, usize)> = out.iter().filter(|r| r.4 == dq).collect();
+            if !of.is_empty() {
+                let lowest = of.iter().map(|r| r.1).min().unwrap();
+                eprintln!("WITNESS {name} digits={dq} reads={} right={} margin_min_millibits={lowest} anchor_right={}", of.len(), of.iter().filter(|r| r.0).count(), of.iter().filter(|r| r.2).count());
+            }
+        }
+        (right, out.len())
+    };
+    let started = std::time::Instant::now();
+    let (right, read) = report("paced", &witness_read(&paced, &problems, reach));
+    eprintln!("WITNESS paced ms={}", started.elapsed().as_millis());
+    let plain = witness_field(reach, 3, false);
+    let (right_plain, read_plain) = report("plain", &witness_read(&plain, &problems, reach));
+    assert_eq!(right, read, "every operand digit's row tops on its source");
+    assert!(right_plain < read_plain, "at κ ≡ 1 the field does not copy the calculation");
+}
+
+/// [agent-inferred, November 2] **The pace's covector against its code** (§16, Law 1): on the shaped field (every
+/// family drawn, the paces too, so the clocks run off the byte place at fractional, stopping and fast rates), on the
+/// plain region and a long far-support region, each paced head's three largest pace entries are read by the slope
+/// of the code over two windows, `±4δ` and `±8δ` (17 reads each, a line fitted), and both agree with the covector's
+/// prediction within the far-support test's tolerance. A window that crosses a sheet is halved as there.
+#[test]
+fn the_pace_covector_matches_the_code_at_two_steps() {
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().collect())).collect() };
+    let long: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let long_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
+    let (mut read, mut seams) = (0usize, 0usize);
+    for still in [0usize, 1] {
+        let mut d = tiny_declaration(still);
+        d.reach = 32;
+        let mut field = Field::found(d, &keys(1 << 14)).unwrap();
+        let stream = keys(1 << 15);
+        for (k, v) in field.theta.iter_mut().enumerate() {
+            let word = &stream[4 * k..4 * k + 4];
+            let grain = field.layout.families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&k)).unwrap().2;
+            *v = (((i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64) << grain) >> 32) as i32;
+        }
+        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], clock: &[], echo: &[] }] {
+            let pass = field.pass(&r, true).unwrap();
+            assert!(pass.paces.plain.iter().all(|&p| !p), "the shaped clocks are no byte place");
+            let g = covector_of(&field, &r);
+            let (start, len) = (field.layout.pace, field.layout.pace + d.paced_heads() * d.width);
+            let mut entries: Vec<usize> = (start..len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for &i in entries.iter().take(3).filter(|&&i| g[i] != 0) {
+                let grain = MATERIAL_BITS;
+                let base = sheets(&field, &r);
+                let moved = |k: i32, step: i32| { let mut f = field.clone(); f.theta[i] += k * (step / 2); f };
+                for (window, delta0) in [(4, 1i32 << (grain - 9)), (8, 1i32 << (grain - 9))] {
+                    let points: Vec<i32> = (-8..=8).collect();
+                    let Some(w) = (0..=STRADDLE_HALVINGS).find(|&w| points.iter().all(|&k| sheets(&moved(k * window / 4, delta0 >> w), &r) == base)) else {
+                        seams += 1;
+                        continue;
+                    };
+                    let step = (delta0 >> w) * window / 4;
+                    let weighted: i128 = points.iter().map(|&k| k as i128 * moved(k, step).code(&r).unwrap().0 as i128).sum();
+                    let squares: i128 = points.iter().map(|&k| (k * k) as i128).sum();
+                    let measured = div_nearest(4 * weighted, squares);
+                    let predicted = (g[i] * 2 * step as i128) >> (40 + grain - 20);
+                    assert!((measured - predicted).abs() <= predicted.abs() / 8 + (64 << w), "still {still} pace entry {i} window ±{window}δ at {w} halvings: measured {measured}, predicted {predicted}");
+                    read += 1;
+                }
+            }
+        }
+    }
+    eprintln!("PACE_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 16 && 8 * seams <= read, "read {read}, {seams} on a seam");
 }

@@ -2779,6 +2779,72 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
     }
 }
 
+// [measurement; agent-inferred, November 2] **A held answer row's concentration on the question** (the host's
+// `Field::held_peaks`): one warp a head and an unresolved site, over a kept tick's shares at the dense address: the
+// question group's mass (a definite site before the region's answer start `qstart[r]`), its collision sum
+// `Σ release(p², 63)`, its largest share and that source's place (the smallest place at a tie; `~0` where the row
+// meets no question source), and its mass on sources whose class is a digit (`digit[c]`) and on those whose class
+// is the site's own. Six words a row at `out[(h · T + g) · 6]`.
+extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart, const uint8_t *digit, wide *out) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint32_t h = hg / w.T;
+        const uint64_t g = hg % w.T;
+        if (!w.unresolved[g]) {
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t question = qstart[r] < sites ? qstart[r] : sites, own = w.classes[g];
+        const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        wide q = 0, coll = 0, dig = 0, right = 0;
+        uint64_t top = 0;
+        uint32_t at = 0xffffffffu;
+        for (uint32_t j = lane; j < question; j += 32) {
+            const uint64_t p = erow[j];
+            if (p == 0 || !definite_site(w, first + j)) {
+                continue;
+            }
+            q += (wide)p;
+            coll += rel((wide)p * (wide)p, SHARE_BITS);
+            const uint32_t c = w.classes[first + j];
+            if (digit[c]) {
+                dig += (wide)p;
+            }
+            if (c == own) {
+                right += (wide)p;
+            }
+            if (p > top || (p == top && j < at)) {
+                top = p;
+                at = j;
+            }
+        }
+        q = warp_sum(q);
+        coll = warp_sum(coll);
+        dig = warp_sum(dig);
+        right = warp_sum(right);
+        for (int o = 16; o > 0; o >>= 1) {
+            const uint64_t pt = __shfl_xor_sync(0xffffffffu, top, o);
+            const uint32_t pa = __shfl_xor_sync(0xffffffffu, at, o);
+            if (pt > top || (pt == top && pa < at)) {
+                top = pt;
+                at = pa;
+            }
+        }
+        if (lane == 0) {
+            wide *cell = out + hg * 6;
+            cell[0] = q;
+            cell[1] = coll;
+            cell[2] = (wide)top;
+            cell[3] = (wide)at;
+            cell[4] = dig;
+            cell[5] = right;
+        }
+    }
+}
+
 // Undo the frame on a chart's covector: `δq = conj(U) ⊙ δq̃` (`[t][2M]`).
 extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
     const uint64_t cells = (uint64_t)w.T * w.M;

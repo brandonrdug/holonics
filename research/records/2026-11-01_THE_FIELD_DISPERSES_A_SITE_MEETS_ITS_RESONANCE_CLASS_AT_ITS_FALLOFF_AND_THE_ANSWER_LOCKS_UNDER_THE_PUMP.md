@@ -1109,3 +1109,182 @@ Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_lang
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
 boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized
 exponential, and the cavity's removal of the synchronous two-cycle.
+
+## 16. A turned head keeps its navigator's own clock: the copy is one relative phase along the answer strand
+
+### 16.1 What crib13 measured
+
+[measurement, November 2] crib13 (the field of §15.9 to §15.12 on the card, the crib terrain, 27 laps fixed)
+rested after 10 laps when its second growth came due (§16.7), its release wrote no calculation (bar 24 of 126),
+and its held read's question effect was −0.00085 bits. Its ten rested learners read on the card with no deposit
+(`peaks-field`, [`FieldRealization::read_row_peaks`], 5 s), at the 258 first-operand digit rows of the 128 held
+problems' context parts, tick 1:
+
+| | lap 0 | lap 9, best head |
+|---|---|---|
+| spread over the question (flat 8.29 bits) | 0.98 to 7.9 bits | 2.0 to 2.5 bits |
+| share on digits (flat 0.018) | 0.02 to 0.03 | 0.78 |
+| top source a digit | at most 2 % | 79 % |
+| top source the right class | at most 1.6 % | 26 % |
+| top source the right site | 1.6 % | 20.5 % |
+
+Within the digits the rows sat at chance (right share over digit share 0.29 against 0.27 flat): they sharpened
+onto digits over the laps and never onto the digit asked for. The class temperatures fell about 10 % over the
+laps and the listeners' rose about 13 % (16.05M to 18.23M on `2^(−24)`, head 0).
+
+[agent-inferred, November 2; the coordinator's diagnosis] The field's only place was the codec's byte index (the
+turned rings `ζ_m^(t mod n_m)`, the moment's `ζ^(k−t)`, the falloff). The crib asks for the first and second of
+two or three numbers written at random word places in a 240 to 560 site question: an ordinal among the strand's
+numbers, which no byte phase carries (the first number's byte distance from the answer ranges over hundreds of
+sites). The fixtures passed because at 24 sites with distinct digits an absolute place suffices. This repeated
+two recorded lessons, the codec's grain read as time and a design thought in offsets, and broke the guide's time
+law: no privileged clock.
+
+### 16.2 Law 1: a turned head's clock is its navigator's own
+
+[definition; agent-inferred, November 2] Each turned ring set that is not a clock (a head that carries a moment)
+reads a pace, one material row `c_h` of `D` ([`FieldLayout::pace`], founded at zero):
+
+```text
+κ_h(t) = 1 + release(⟨c_h, x⁰_t⟩, 16)          on 2^(−24), x⁰ the opening face
+τ_h(t) = Σ_(0<k≤t) κ_h(k),  σ_h(t) = Σ_(0<k≤t) |κ_h(k)|      exact prefix sums, τ(0) = σ(0) = 0
+U_(t,m) = ζ_m^(τ_h(t))                          the resident ring at a whole τ, its series between (turn_phasor)
+D_m(i, j) = e^(−2π |σ_h(i) − σ_h(j)| / n_m)     the skin follows the turn (skin_of)
+```
+
+The frame and the moment read `τ` in place of the byte place (the near term `ζ^(τ_k − τ_t) D(σ)`, the far octave at
+the receiver's skin to the place `2^ℓ` away on its side); the falloff and the near field keep the strand's byte
+distance. At `c = 0` every rate is `1` exactly, the pace is plain, and the field is today's bit for bit: a plain
+pace takes the resident faces, and a strand paced at its own places gives the byte moment and return bit for bit
+(the moment's tests). The step into site `k` is ticked by site `k`'s own face.
+
+[definition; agent-inferred, November 2] **An open site ticks by the face it carries.** The rate reads the site's
+opening face, whose own term at an open site is its carried mixture of class rows by their shares, or the
+unresolved row where it carries none. A clock that reads digits therefore ticks by an open site's expected digit
+when it carries a face, and by the unresolved row's pairing with `c` when it carries none (zero for the witness's
+digit clock, §16.6).
+
+[agent-inferred, November 2; the coordinator accepted both] Two corrections to the design as briefed:
+1. **A digit clock, not a numeral-start clock.** `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))` is additive over the
+   sites, so `⟨c, x⁰⟩` cannot express "a digit after a non-digit" (an AND). A digit clock can (`κ = 1` at a digit,
+   `0` elsewhere): the answer's copied digits then meet their sources at one clock distance, the question's digit
+   count less one at a front, for every digit of both operands.
+2. **The skin follows the turn.** "One e-fold a radian of turn" with `τ` turning the ring makes the skin
+   `e^(−2π|Δσ|/n)`, the byte distance's at `κ ≡ 1`; with the byte distance kept, any clock mode would vanish at the
+   crib's distances (`e^(−2π·300/81) ≈ 0`). The variation `σ = Σ|κ|` keeps the skin multiplicative along the strand
+   where a rate runs backward.
+
+[definition; agent-inferred, November 2] **The covector.** The clocks return through every place they enter:
+`δτ_t += b Re(conj(δw) i w)` for the word, the value and the probe (unframed charts), `δτ_i −= b Re(conj(δy) i y)` for
+the current's return to the receiver's frame, each pair's and crowd's skin `δσ ∓= sgn b D E` with `E = 2^40 ∂/∂D`
+from its value (`p Re(conj(δỹ) ṽ)`) and its lock (`δs (2 P 2^g − 2 D Q)` over the lock's grains), and the moments'
+`pace_return` (`∂s_t/∂τ_t = −i b s_t`, `∂s_t/∂τ_k = i b W_tk E_k`, each skin at its two ends). Then
+`δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t`, `δc += Σ_k δκ_k x⁰_k` and `δx⁰_k += release(c δκ_k, 24)`: `O(N·D)` a head.
+A growth parts each pace row over its face's copies, so `⟨c', x⁰'⟩ = ⟨c, x⁰⟩` exactly.
+
+[measurement, November 2] The field's tests 60 of 60, six ignored (the tower's 217): the covector tests read the pace family
+beside the others; the pace's own test reads each paced head's three largest entries by a fitted slope over
+`±4δ` and `±8δ` on clocks that stop, run fast and run fractionally, 24 reads, none on a seam. The far-support
+test reads its slope by a line fitted to 17 reads over `±4δ`: one central difference could not resolve it at the
+narrow step on a paced field (a q-chart entry read −357 and −187 against −509 and −255 at `±2^15` and `±2^14`, a
+line over `±2^14` −383.5, over `±2^16` −475.3, over `±2^18` −509.0; at a zero pace −476.1, −513.9 and −542.7
+against −543), and 264 probes read so after 344 halvings, none on a seam, within the tolerance it had.
+
+### 16.3 Law 2 and the ticks: a number travels by its strand
+
+[definition; agent-inferred, November 2] The first operand's first digit (the anchor) locates the earliest digit
+at tick 1, and its current carries that source's phase relative to its own, `ζ^(τ_(j*) − τ_a0)` on each mode it
+reads. At a front (the question and the answer before the receiver definite, the receiver open, so it ticks zero),
+the copy's source for every later digit of both operands stands at `τ_src − τ_i = τ_(j*) − τ_a0 + 1`: the anchor's
+phase times one constant turn. The receiver reads the anchor's current through a still head, where it arrives
+unturned (through a paced head the relative frame would add `len(a) + k`), and its probe on the paced head carries
+it at the next tick.
+
+[definition; agent-inferred, November 2] **The ticks the copy needs.** `K = 1 + 1 + 1 + h`: the anchor's find, the
+relay's read, the probe that carries it, and `h` relay hops. An open receiver hears every definite site, far
+included (§15.9), so it reads the anchor directly at any distance: `h = 0` and `K = 3` for every operand digit, at
+any operand length the terrain declares (GSM8K's longer numbers too). A relay through class receivers alone would
+need `h = ⌈(s − 5)/5⌉` hops for an operand span of `s` sites past the near reach of 5. crib13's field had `K = 2`,
+which cannot carry the anchor's phase into any later digit's probe; the run's declaration is `K = 3` by this law.
+
+### 16.4 The admitted future is the front
+
+[definition; agent-inferred, November 2] §15.11 read the held step on context parts (one answer site in four open).
+An open site ticks by its face, so in a part each earlier open digit stops the digit clock and shifts a later
+receiver's `τ` by one: at `b₁` of `a = 123` the shift is 2, not the front's uniform 1. The release reads fronts,
+and the bar reads the release, so the held step is now read on front-shaped regions (each problem's question and
+its answer before a keyed front definite, every site from the front through the answer's first void open). The
+held read's context parts stay in the receipts (`FIELD_HELD`) as a measurement, mis-clocked by the earlier open
+digits of their part.
+
+### 16.5 The matching lock
+
+[definition; agent-inferred, November 2] **A silent key scores zero, above a decayed match.** Per mode the lock is
+`|p|² − |p − D k̃|²`: a receiver scores a source by how near its decayed framed key comes to its probe. A source with
+no key scores `0` against every probe; a far source's best score is small (its `D` is), so a far source wins only
+where every nearer source scores below it, the silent ones included. Every source a receiver must not find must
+therefore oppose its probe. Consequence for learning: the keys of the sites an anchor must pass over (every
+non-digit on the anchor's mode) have to be driven to oppose its probe; the covector drives them only where the
+anchor's comparison reaches them.
+
+[definition; agent-inferred, November 2] **A key's power where the probe does not read is a cost**, `−D² |k|²` a
+mode: two functions in one head, read by different probes, interfere unless each keeps little power where the
+other probes. **One mode cannot select an exact clock distance** across the crib's `Δτ ∈ [1, 9]`: the power term
+moves its peak by `D`, so the best single-mode phase leaves a worst-case margin of about 0 bits; two periods (16
+and 32) fed by the same head's current reach a worst of 4.0 bits in the chart's model after the falloff's charge
+(measured 7.07, §16.6). The copy's comb and the anchor's search therefore share one head (the channel must come
+from the head whose row found the source), with the anchor's mode at a power of 1 in 16.
+
+### 16.6 The witness
+
+[measurement; agent-inferred, November 2] `the_witness_copies_the_first_calculation_by_its_clock` (tests.rs, set by
+hand, no learning, the crib declaration D 32, H 5, n 8 at `K = 3`): 64 problems of the crib's law (`crib_like`:
+regions of up to 451 sites, two or three numbers of one to three digits at random word places, repeated digits,
+two to nine digits a question), every digit of the first calculation's two operands read at its front. Head 3
+(paced, the digit clock) carries the anchor on its period-81 mode (window `bΔτ + ψ ∈ (−π/2, −π/4)`, `ψ = −27/100`
+of a turn, where the skin makes the score rise with `Δτ`) and the copy's comb on its periods 16 and 32; head 0
+(still) relays the anchor's two channels; the anchor's key is a ratio of the site's own reads, so a read's scale
+moves none of it.
+
+- **The copy:** 252 of 252 rows put their largest share on the same digit of the question's number. The margin
+  over the next source, in bits: min 7.07, p05 7.93, p10 9.00, p25 10.46, median 12.49, p75 28.89; its minimum by
+  the question's digit count 2 to 9: 9.0, 14.9, 14.3, and on to 7.07 at nine.
+- **The anchor, read as the receiver it is at each front:** 188 of 188 where it is definite (a class receiver
+  probing with its word) and 64 of 64 where it is open.
+- **At `κ ≡ 1`** (today's field, the same charts): 7 of 252, no anchor.
+
+The sibling shows that in this construction the clock carries the copy. The general claim, that no setting of a
+byte clock carries "the first number" at random places, rests on the derivation of §16.1: its byte distance from
+the answer differs from problem to problem, so no fixed relative byte phase, skin or falloff selects it. The
+witness shows the design can represent the relation at the terrain's size; only the run can show that the field
+learns it.
+
+### 16.7 Growth is held, the laps go on
+
+[agent-inferred, November 2] A run carries the projections of its declaration and of one growth; crib13 ended at
+lap 9 of 27 when its second growth came due. A second growth is now held and the laps go on at that width
+([`growth`] in `field_train.rs`, with its test), so the run's workload is its laps.
+
+### 16.8 Where it stands
+
+[measurement, November 2] Built on the host: the pace law, its covector, growth, the held step on fronts, the
+growth hold, `held_peaks` (host and card, bit-equal on every section the parity read: 8 at width 32, 4 at width
+64, both stopped by the smoke's 120 s guard before the withheld section), the witness and the pace's covector
+test. The card does not yet realize the pace: its frames and skins are the byte place's, so it is the founding's
+field bit for bit and its covector lacks `δc`. Before any run the card realizes the clocks (κ, τ, σ, the turn and
+skin series, the moments, `δτ`, `δσ`, `δc`), its parity is read at both widths, and the founding's covector is read
+against the witness's solution, head by head. Receipts: `_receipts/crib13` (the run, its ten states' reads) and
+`_receipts/law16` (the witness, the reading's parity).
+
+### 16.9 Failures this could repeat
+
+- An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
+  digit, and the digit clock is a material row the deposition moves.
+- Text run on its codec's grain as the exception: the clock is the navigator's own; in sound it would tick at
+  onsets, in images at edges, in motor at a gait's phase.
+- A located cause carried unrepaired: the context parts' mis-clock is repaired in the acceptance, not carried.
+- A refusal answered with a larger limit: `K = 3` follows from the law of §16.3, not from a raised budget.
+
+Owed to #410: the clock is additive over the strand's concatenation, `τ(uv) = τ(u) + τ(v)` shifted, a homomorphism to
+the circle (`U = ζ^τ`, `U(a + b) = U(a) U(b)`), and the contact through it depends only on `τ(j) − τ(i)`
+(`Re(conj(U_i w_i) U_j w_j) = Re(conj(w_i) w_j ζ^(τ_j − τ_i))`).
