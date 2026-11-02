@@ -1061,6 +1061,26 @@ pub struct HeldRows {
     pub far_rows: u64,
 }
 
+/// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (§16.21,
+/// [`Field::row_currents`]): one row (a tick, a head and an unresolved site), its framed current's part from the
+/// question past the near field (`far`, the definite sites before the answer start at `|i − j| ≥ NEAR`) and its part
+/// from the near field (`near`, every source at `|i − j| < NEAR`) and from every other source (`rest`: the answer's own
+/// sites past the near field and any site after the answer start), each `Σ release(p D ṽ_j, 63)` entry by entry on the
+/// value's grain over the head's `2n` reals, so `far + near + rest` is the row's current; the row's largest share on `2^(−63)`; and, where read with its return,
+/// the code's covector of the row's framed current `δỹ` (the reverse's, on the covector's grain). Region-level groups
+/// only: no source is paired with a receiver by its class.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct RowCurrent {
+    pub tick: u32,
+    pub head: u32,
+    pub site: u32,
+    pub far: Vec<i128>,
+    pub near: Vec<i128>,
+    pub rest: Vec<i128>,
+    pub top: u64,
+    pub covector: Vec<i64>,
+}
+
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Source {
@@ -2091,9 +2111,47 @@ impl Field {
         for region in regions {
             let pass = self.pass(region, true)?;
             let mut g = vec![0i128; self.theta.len()];
-            self.returned_with(region, &pass, &mut g, Some(&mut out))?;
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
+    }
+
+    /// [measurement; agent-inferred, November 2] **The held answer rows' currents by where they come from**
+    /// ([`RowCurrent`], §16.21): for each tick, head and unresolved site of `region` in that order, the framed current's
+    /// part from the question past the near field (definite sites before `question`) and from the near field, the
+    /// row's largest share and, with `returning`, the code's covector of the row's framed current. A reading only.
+    pub fn row_currents(&self, region: &Region, question: usize, returning: bool) -> Result<Vec<RowCurrent>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let (heads, n, span) = (d.heads, d.modes, 2 * d.modes);
+        let mut covectors: Vec<Vec<i64>> = Vec::new();
+        if returning {
+            let mut g = vec![0i128; self.theta.len()];
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors))?;
+            covectors.reverse();
+        }
+        let mut out = Vec::new();
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                for i in (0..sites).filter(|&i| region.unresolved[i]) {
+                    let (mut far, mut near, mut rest) = (vec![0i128; span], vec![0i128; span], vec![0i128; span]);
+                    let mut top = 0u64;
+                    for src in &cell.rows[h * sites + i] {
+                        let j = src.j as usize;
+                        top = top.max(src.p);
+                        let gap = i.abs_diff(j);
+                        let into = if gap < NEAR { &mut near } else if Self::definite(region, j) && j < question { &mut far } else { &mut rest };
+                        let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                        for (x, slot) in into.iter_mut().enumerate() {
+                            *slot += release(src.p as i128 * decayed(self.pair_decay(&pass.paces, h, x % n, i, j), vj[x]), SHARE_BITS);
+                        }
+                    }
+                    let covector = covectors.get(tick).map(|c| c[(h * sites + i) * span..(h * sites + i + 1) * span].to_vec()).unwrap_or_default();
+                    out.push(RowCurrent { tick: tick as u32, head: h as u32, site: i as u32, far, near, rest, top, covector });
+                }
+            }
+        }
+        Ok(out)
     }
 
     /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
@@ -2179,12 +2237,12 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None)
+        self.returned_with(region, pass, g, None, None)
     }
 
     /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>) -> Result<()> {
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
         let m2 = 2 * m;
@@ -2291,6 +2349,10 @@ impl Field {
             let mut dv = vec![0i64; sites * m2];
             let mut dp = vec![0i64; sites * m2];
             let mut dyh = vec![0i64; sites * span];
+            // The current's covectors of this tick `[h][t][2n]`, where read ([`Field::row_currents`]).
+            if let Some(c) = currents.as_deref_mut() {
+                c.push(vec![0i64; heads * sites * span]);
+            }
             for h in 0..heads {
                 // A paced head's current returns to the receiver's frame `y = conj(U) ỹ`, turned by `τ_i`:
                 // `δτ_i −= b Re(conj(δy_i) i y_i)` (§16).
@@ -2314,6 +2376,10 @@ impl Field {
                         dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
                         dyh[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
                     }
+                }
+                if let Some(c) = currents.as_deref_mut() {
+                    let last = c.last_mut().expect("pushed above");
+                    last[h * sites * span..(h + 1) * sites * span].copy_from_slice(&dyh);
                 }
                 let rows = &cell.rows[h * sites..(h + 1) * sites];
                 let crowds = &cell.crowds[h * sites..(h + 1) * sites];
@@ -3350,6 +3416,11 @@ pub trait FieldRealization {
     fn read_covector_shares(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<[u128; 2]>> {
         refuse("a realization that cannot read its covector's shares")
     }
+    /// The held answer rows' currents by where they come from, region by region ([`Field::row_currents`]; each region's
+    /// answer start in `questions`), a reading.
+    fn read_row_currents(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize], _returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+        refuse("a realization that cannot read its rows' currents")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3375,6 +3446,9 @@ impl FieldRealization for HostField {
     }
     fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
         field.covector_shares(regions)
+    }
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+        regions.iter().zip(questions).map(|(r, &q)| field.row_currents(r, q, returning)).collect()
     }
 }
 

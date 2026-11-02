@@ -1,0 +1,110 @@
+# Section 16.21: H6's value and readout sides, read only, on section 16.20's STATE.2 (sha in FIELD_COMMAND), RTX 4080 SUPER under .local/gpu.lock.
+# Projections: sampled parity 180 s (deadline 240 s), measured 207.5 s (1.15); currents-field 30 s (upper 120 s, deadline 180 s), measured 6.2 s (0.21).
+# Binary sha 37afebcda94db8a57e41f7c0935e74e5cb968f80034c5b539f35ab470b053c76.
+## parity (sampled: 3 sections, 8 withheld problems, 1 release)
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15307440128 total=16802250752 batch_budget=10316349440
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=35544 grow=1 withheld_read=8
+FIELD_PARITY section=1 withheld=false regions=24 length=1408 sites=3760 rows=82080 reads=3 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=0 kappa=1000..1000 host_ms=8128 card_ms=84
+FIELD_PARITY section=2 withheld=false regions=27 length=941 sites=3536 rows=85216 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-77744715/0/false learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=0 kappa=1000..1000 host_ms=12933 card_ms=108
+FIELD_PARITY section=3 withheld=false regions=24 length=1052 sites=5131 rows=138928 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-1232683056/0/false learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=996..996 host_ms=42706 card_ms=251
+FIELD_PARITY section=4 withheld=true regions=32 length=1431 sites=0 rows=163744 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=-512271363/0/false learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=996..1003 host_ms=21049 card_ms=90
+FIELD_PARITY_RELEASE problem=0 question=278 released=1229 reached=5 open=1229 extent=- free=79 bound=0 equal=true landmarks_equal=true host_ms=19493
+FIELD_PARITY_DONE sections=4 reads=15 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=104 host_ms=84817 card_ms=535 elapsed_ms=195612
+FIELD_CARD reads=56 read_ms=471 returns=11 return_ms=373 pairs=235432867 batches=71 peak_store=2536507476 landmarks=4 landmark_ms=70 elapsed_ms=195613
+MEASURE lap=parity rc=0 wall_s=207.5 peak_rss_kib=2463848
+## currents-field
+FIELD_COMMAND currents-field <root>/.local/wt/far-contact/.local/run/2026-11-02-field20/train/STATE.2 1a792277269f667b26d9a5314c15da93bd5e683ee3c66dc2fb73c5ddbb4e57ff <root>/.local/wt/far-contact/.local/run/2026-11-02-field20/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 <root>/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 <root>/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa <root>/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15290073088 total=16802250752 batch_budget=10298982400
+FIELD_CURRENTS_SETTING head=0 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.9848 log2_ratio=-0.0152
+FIELD_CURRENTS_SETTING head=0 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.8589 log2_ratio=0.1411
+FIELD_CURRENTS_SETTING head=1 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.8009 log2_ratio=-0.1991
+FIELD_CURRENTS_SETTING head=1 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-1.1180 log2_ratio=-0.1180
+FIELD_CURRENTS_SETTING head=2 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.6864 log2_ratio=-0.3136
+FIELD_CURRENTS_SETTING head=2 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.5511 log2_ratio=0.4489
+FIELD_CURRENTS_SETTING head=3 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.2696 log2_ratio=-0.7304
+FIELD_CURRENTS_SETTING head=3 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.6076 log2_ratio=0.3924
+FIELD_CURRENTS_READ problems=128 parts=512 answer_sites=35591 ms=5852
+FIELD_CURRENTS_CHANGE tick=0 head=0 rows=35591 silent=0 change_over_current_milli=274/385/538 far_over_near_milli=165/344/741 far_over_row_milli=77/123/197 directions_milli=2571 of=16
+FIELD_CURRENTS_GAIN tick=0 head=0 far_bits_a_site=-0.000051 near_bits_a_site=0.000046 rest_bits_a_site=0.000025
+FIELD_CURRENTS_TOP tick=0 head=0 rows=35591 top_share_micro=110371/163592/241543
+FIELD_CURRENTS_CHANGE tick=0 head=1 rows=35591 silent=0 change_over_current_milli=279/392/539 far_over_near_milli=143/270/509 far_over_row_milli=72/114/181 directions_milli=1951 of=16
+FIELD_CURRENTS_GAIN tick=0 head=1 far_bits_a_site=-0.000080 near_bits_a_site=-0.000003 rest_bits_a_site=0.000065
+FIELD_CURRENTS_TOP tick=0 head=1 rows=35591 top_share_micro=100509/141548/213075
+FIELD_CURRENTS_CHANGE tick=0 head=2 rows=35591 silent=0 change_over_current_milli=191/340/586 far_over_near_milli=56/429/2693 far_over_row_milli=30/68/138 directions_milli=2214 of=16
+FIELD_CURRENTS_GAIN tick=0 head=2 far_bits_a_site=0.000190 near_bits_a_site=-0.001452 rest_bits_a_site=0.000145
+FIELD_CURRENTS_TOP tick=0 head=2 rows=35591 top_share_micro=60821/109037/185511
+FIELD_CURRENTS_CHANGE tick=0 head=3 rows=35591 silent=0 change_over_current_milli=260/383/524 far_over_near_milli=39/89/225 far_over_row_milli=30/56/106 directions_milli=3913 of=16
+FIELD_CURRENTS_GAIN tick=0 head=3 far_bits_a_site=-0.000010 near_bits_a_site=0.001955 rest_bits_a_site=-0.000134
+FIELD_CURRENTS_TOP tick=0 head=3 rows=35591 top_share_micro=96030/180918/291836
+FIELD_CURRENTS_CHANGE tick=1 head=0 rows=35591 silent=0 change_over_current_milli=264/356/496 far_over_near_milli=188/371/733 far_over_row_milli=96/155/247 directions_milli=2599 of=16
+FIELD_CURRENTS_GAIN tick=1 head=0 far_bits_a_site=-0.000028 near_bits_a_site=0.000006 rest_bits_a_site=-0.000005
+FIELD_CURRENTS_TOP tick=1 head=0 rows=35591 top_share_micro=75559/109709/158126
+FIELD_CURRENTS_CHANGE tick=1 head=1 rows=35591 silent=0 change_over_current_milli=242/386/643 far_over_near_milli=48/200/385 far_over_row_milli=22/93/159 directions_milli=2107 of=16
+FIELD_CURRENTS_GAIN tick=1 head=1 far_bits_a_site=-0.000082 near_bits_a_site=0.000033 rest_bits_a_site=0.000038
+FIELD_CURRENTS_TOP tick=1 head=1 rows=35591 top_share_micro=107012/141963/189853
+FIELD_CURRENTS_CHANGE tick=1 head=2 rows=35591 silent=0 change_over_current_milli=165/318/559 far_over_near_milli=1145/3905/12004 far_over_row_milli=218/342/473 directions_milli=2302 of=16
+FIELD_CURRENTS_GAIN tick=1 head=2 far_bits_a_site=0.000087 near_bits_a_site=-0.000644 rest_bits_a_site=-0.000055
+FIELD_CURRENTS_TOP tick=1 head=2 rows=35591 top_share_micro=20814/38668/75983
+FIELD_CURRENTS_CHANGE tick=1 head=3 rows=35591 silent=0 change_over_current_milli=239/335/481 far_over_near_milli=93/190/361 far_over_row_milli=59/97/151 directions_milli=3369 of=16
+FIELD_CURRENTS_GAIN tick=1 head=3 far_bits_a_site=0.000014 near_bits_a_site=0.000185 rest_bits_a_site=-0.000047
+FIELD_CURRENTS_TOP tick=1 head=3 rows=35591 top_share_micro=64480/110691/202821
+FIELD_CURRENTS_GAIN_TICK tick=0 far_bits_a_site=0.000047 near_bits_a_site=0.000547 rest_bits_a_site=0.000102
+FIELD_CURRENTS_GAIN_TICK tick=1 far_bits_a_site=-0.000008 near_bits_a_site=-0.000418 rest_bits_a_site=-0.000069
+FIELD_CURRENTS_CODE sites=35591 own_bits_a_site=2.829326 foil_bits_a_site=2.828564 foil_less_own=-0.000761
+FIELD_CURRENTS_DONE ms=5903
+FIELD_CARD reads=16 read_ms=954 returns=16 return_ms=4773 pairs=843594756 batches=32 peak_store=4691651120 landmarks=0 landmark_ms=0 elapsed_ms=5904
+MEASURE lap=currents rc=0 wall_s=6.2 peak_rss_kib=482564
+## currents-field with the bound (binary sha 14ba81bfee54413f1dd0c5510c1bcbffc029dbb70945e21fbb9d17da9167b30a; projection 6.2 s measured, deadline 60 s)
+FIELD_COMMAND currents-field <root>/.local/wt/far-contact/.local/run/2026-11-02-field20/train/STATE.2 1a792277269f667b26d9a5314c15da93bd5e683ee3c66dc2fb73c5ddbb4e57ff <root>/.local/wt/far-contact/.local/run/2026-11-02-field20/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 <root>/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 <root>/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa <root>/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15311437824 total=16802250752 batch_budget=10320347136
+FIELD_CURRENTS_SETTING head=0 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.9848 log2_ratio=-0.0152
+FIELD_CURRENTS_SETTING head=0 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.8589 log2_ratio=0.1411
+FIELD_CURRENTS_SETTING head=1 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.8009 log2_ratio=-0.1991
+FIELD_CURRENTS_SETTING head=1 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-1.1180 log2_ratio=-0.1180
+FIELD_CURRENTS_SETTING head=2 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.6864 log2_ratio=-0.3136
+FIELD_CURRENTS_SETTING head=2 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.5511 log2_ratio=0.4489
+FIELD_CURRENTS_SETTING head=3 receiver=class log2_temperature_founded=2.0000 log2_temperature_learned=1.2696 log2_ratio=-0.7304
+FIELD_CURRENTS_SETTING head=3 receiver=listener log2_temperature_founded=-1.0000 log2_temperature_learned=-0.6076 log2_ratio=0.3924
+FIELD_CURRENTS_READ problems=128 parts=512 answer_sites=35591 ms=6104
+FIELD_CURRENTS_CHANGE tick=0 head=0 rows=35591 silent=0 change_over_current_milli=274/385/538 far_over_near_milli=165/344/741 far_over_row_milli=77/123/197 directions_milli=2571 of=16
+FIELD_CURRENTS_GAIN tick=0 head=0 far_bits_a_site=-0.000051 near_bits_a_site=0.000046 rest_bits_a_site=0.000025 far_bound=0.025491 near_bound=0.006470 rest_bound=0.009376
+FIELD_CURRENTS_TOP tick=0 head=0 rows=35591 top_share_micro=110371/163592/241543
+FIELD_CURRENTS_CHANGE tick=0 head=1 rows=35591 silent=0 change_over_current_milli=279/392/539 far_over_near_milli=143/270/509 far_over_row_milli=72/114/181 directions_milli=1951 of=16
+FIELD_CURRENTS_GAIN tick=0 head=1 far_bits_a_site=-0.000080 near_bits_a_site=-0.000003 rest_bits_a_site=0.000065 far_bound=0.018475 near_bound=0.005555 rest_bound=0.006264
+FIELD_CURRENTS_TOP tick=0 head=1 rows=35591 top_share_micro=100509/141548/213075
+FIELD_CURRENTS_CHANGE tick=0 head=2 rows=35591 silent=0 change_over_current_milli=191/340/586 far_over_near_milli=56/429/2693 far_over_row_milli=30/68/138 directions_milli=2214 of=16
+FIELD_CURRENTS_GAIN tick=0 head=2 far_bits_a_site=0.000190 near_bits_a_site=-0.001452 rest_bits_a_site=0.000145 far_bound=0.186059 near_bound=1.859197 rest_bound=1.954809
+FIELD_CURRENTS_TOP tick=0 head=2 rows=35591 top_share_micro=60821/109037/185511
+FIELD_CURRENTS_CHANGE tick=0 head=3 rows=35591 silent=0 change_over_current_milli=260/383/524 far_over_near_milli=39/89/225 far_over_row_milli=30/56/106 directions_milli=3913 of=16
+FIELD_CURRENTS_GAIN tick=0 head=3 far_bits_a_site=-0.000010 near_bits_a_site=0.001955 rest_bits_a_site=-0.000134 far_bound=0.101365 near_bound=2.757836 rest_bound=0.613358
+FIELD_CURRENTS_TOP tick=0 head=3 rows=35591 top_share_micro=96030/180918/291836
+FIELD_CURRENTS_CHANGE tick=1 head=0 rows=35591 silent=0 change_over_current_milli=264/356/496 far_over_near_milli=188/371/733 far_over_row_milli=96/155/247 directions_milli=2599 of=16
+FIELD_CURRENTS_GAIN tick=1 head=0 far_bits_a_site=-0.000028 near_bits_a_site=0.000006 rest_bits_a_site=-0.000005 far_bound=0.012698 near_bound=0.007706 rest_bound=0.007940
+FIELD_CURRENTS_TOP tick=1 head=0 rows=35591 top_share_micro=75559/109709/158126
+FIELD_CURRENTS_CHANGE tick=1 head=1 rows=35591 silent=0 change_over_current_milli=242/386/643 far_over_near_milli=48/200/385 far_over_row_milli=22/93/159 directions_milli=2107 of=16
+FIELD_CURRENTS_GAIN tick=1 head=1 far_bits_a_site=-0.000082 near_bits_a_site=0.000033 rest_bits_a_site=0.000038 far_bound=0.009144 near_bound=0.008730 rest_bound=0.007063
+FIELD_CURRENTS_TOP tick=1 head=1 rows=35591 top_share_micro=107012/141963/189853
+FIELD_CURRENTS_CHANGE tick=1 head=2 rows=35591 silent=0 change_over_current_milli=165/318/559 far_over_near_milli=1145/3905/12004 far_over_row_milli=218/342/473 directions_milli=2302 of=16
+FIELD_CURRENTS_GAIN tick=1 head=2 far_bits_a_site=0.000087 near_bits_a_site=-0.000644 rest_bits_a_site=-0.000055 far_bound=0.257909 near_bound=0.297558 rest_bound=0.574096
+FIELD_CURRENTS_TOP tick=1 head=2 rows=35591 top_share_micro=20814/38668/75983
+FIELD_CURRENTS_CHANGE tick=1 head=3 rows=35591 silent=0 change_over_current_milli=239/335/481 far_over_near_milli=93/190/361 far_over_row_milli=59/97/151 directions_milli=3369 of=16
+FIELD_CURRENTS_GAIN tick=1 head=3 far_bits_a_site=0.000014 near_bits_a_site=0.000185 rest_bits_a_site=-0.000047 far_bound=0.068437 near_bound=1.069171 rest_bound=0.333101
+FIELD_CURRENTS_TOP tick=1 head=3 rows=35591 top_share_micro=64480/110691/202821
+FIELD_CURRENTS_GAIN_TICK tick=0 far_bits_a_site=0.000047 near_bits_a_site=0.000547 rest_bits_a_site=0.000102
+FIELD_CURRENTS_GAIN_TICK tick=1 far_bits_a_site=-0.000008 near_bits_a_site=-0.000418 rest_bits_a_site=-0.000069
+FIELD_CURRENTS_CODE sites=35591 own_bits_a_site=2.829326 foil_bits_a_site=2.828564 foil_less_own=-0.000761
+FIELD_CURRENTS_DONE ms=6158
+FIELD_CARD reads=16 read_ms=981 returns=16 return_ms=4967 pairs=843594756 batches=32 peak_store=4691651120 landmarks=0 landmark_ms=0 elapsed_ms=6158
+MEASURE lap=currents rc=0 wall_s=6.6 peak_rss_kib=483836
+## verification: field tests, example tests, gate
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 24.96s
+test result: ok. 56 passed; 0 failed; 0 ignored; 0 measured; 1980 filtered out; finished in 106.39s
+build rc=0 wall_s=52.286811726
+parity rc=0 4 currents_equal_true 0 currents_equal_false
+currents rc=0 board=1199 MiB
+field_tests rc=0 wall_s=154.274599456
+example_tests rc=0 wall_s=56.930845990
+gate rc=0 wall_s=185.339190632
+build_bound rc=0 wall_s=20.763018744
+currents_bound rc=0
+gate_bound rc=0 wall_s=174.132711575

@@ -2057,3 +2057,67 @@ concentrate on it, most of the contact covector reaches far pairs), and the answ
 question than beside another's. The question's content reaches the answer site and is not made to bear on its code: the
 next loop's subject is what the far current carries and how the face reads it (the value's and the readout's side of H6),
 read before any further run.
+
+### 16.21 What the far current carries and how the face reads it (H6's value and readout sides)
+
+[measurement, November 2] Read only, on §16.20's STATE.2, through the card (RTX 4080 SUPER under the lock), with the
+founding of KEYS8 beside it: the 128 held problems in their 4 parts each, read with their neighbours beside their own
+question and beside the next problem's (the foil), 35,591 answer rows a head and tick, each foil row paired with the own
+row at the same answer offset ([`Field::row_currents`], the card's `field_row_currents`, `currents-field`). The code
+reproduces lap 2's: own 2.829326, foil 2.828564, foil less own −0.000761 bits a site. A row's current is split into
+`F` (from the question past the near field), `N` (the near field) and `R` (every other source), `Y = F + N + R`.
+
+**1. What a question site carries** (from the source, `Field::tick`): at tick 0 its value is `V r̂(x⁰) + b_v`, `x⁰` the
+site's trigram face, with its moment at the turned modes; at tick 1 the value reads `x¹`, which adds one hop through
+`O y⁰` and the merge. The far current an answer row gathers is a share-weighted sum of question trigram faces at tick 0
+and of trigram faces plus one hop at tick 1.
+
+**2. How problem-specific the far current is.** Quartiles of `‖F_own − F_foil‖ / ‖F_own‖`, medians of `‖F‖ / ‖Y‖` and
+`‖F‖ / ‖N‖`, and the participation ratio `(tr C)² / tr C²` of the problems' mean `F_own` (out of 16 reals), no row
+without a far current:
+
+| tick | head | change / current | F / Y | F / N | directions |
+|---|---|---|---|---|---|
+| 0 | 0 | 0.274 / 0.385 / 0.538 | 0.123 | 0.344 | 2.571 |
+| 0 | 1 | 0.279 / 0.392 / 0.539 | 0.114 | 0.270 | 1.951 |
+| 0 | 2 | 0.191 / 0.340 / 0.586 | 0.068 | 0.429 | 2.214 |
+| 0 | 3 | 0.260 / 0.383 / 0.524 | 0.056 | 0.089 | 3.913 |
+| 1 | 0 | 0.264 / 0.356 / 0.496 | 0.155 | 0.371 | 2.599 |
+| 1 | 1 | 0.242 / 0.386 / 0.643 | 0.093 | 0.200 | 2.107 |
+| 1 | 2 | 0.165 / 0.318 / 0.559 | 0.342 | 3.905 | 2.302 |
+| 1 | 3 | 0.239 / 0.335 / 0.481 | 0.097 | 0.190 | 3.369 |
+
+**3. How the face reads it.** The face's gain on each part of the own-to-foil change, `Σ ½⟨δỹ_own + δỹ_foil, Δ⟩`
+(`δỹ` the code's covector of the row's framed current, in bits since the face's mass is `2^z`), beside its bound
+`Σ ½‖δỹ_own + δỹ_foil‖ ‖Δ‖`, in bits a site:
+
+| tick | head | far gain | far bound | near gain | near bound | rest gain | rest bound |
+|---|---|---|---|---|---|---|---|
+| 0 | 0 | −0.000051 | 0.025491 | +0.000046 | 0.006470 | +0.000025 | 0.009376 |
+| 0 | 1 | −0.000080 | 0.018475 | −0.000003 | 0.005555 | +0.000065 | 0.006264 |
+| 0 | 2 | +0.000190 | 0.186059 | −0.001452 | 1.859197 | +0.000145 | 1.954809 |
+| 0 | 3 | −0.000010 | 0.101365 | +0.001955 | 2.757836 | −0.000134 | 0.613358 |
+| 1 | 0 | −0.000028 | 0.012698 | +0.000006 | 0.007706 | −0.000005 | 0.007940 |
+| 1 | 1 | −0.000082 | 0.009144 | +0.000033 | 0.008730 | +0.000038 | 0.007063 |
+| 1 | 2 | +0.000087 | 0.257909 | −0.000644 | 0.297558 | −0.000055 | 0.574096 |
+| 1 | 3 | +0.000014 | 0.068437 | +0.000185 | 1.069171 | −0.000047 | 0.333101 |
+
+Summed over heads: tick 0 far +0.000047, near +0.000547, rest +0.000102; tick 1 far −0.000008, near −0.000418, rest
+−0.000069. The far gain summed over heads and ticks is +0.000039 bits a site against a far bound of 0.680; on each head
+and tick the far gain is 0.01 % to 0.9 % of its bound.
+
+**4. Learned settings.** Each head's `log₂ T`, founded and after lap 2 (class receivers founded at 2, listeners at −1),
+and the median of each answer row's largest share (tick 0 / tick 1):
+
+| head | class `log₂ T` | listener `log₂ T` | largest share, median |
+|---|---|---|---|
+| 0 | 1.9848 | −0.8589 | 0.164 / 0.110 |
+| 1 | 1.8009 | −1.1180 | 0.142 / 0.142 |
+| 2 | 1.6864 | −0.5511 | 0.109 / 0.039 |
+| 3 | 1.2696 | −0.6076 | 0.181 / 0.111 |
+
+Verification: the sampled card parity (3 sections, 8 withheld problems, one release) equal at every step, the row
+currents and their covectors host against card included (`currents_equal`), 207.5 s against 180 s projected (1.15);
+`currents-field` 6.2 s and, with the bound, 6.6 s against 30 s projected (0.21, 0.22), the card's batch store at
+4.69 GB and host RSS at 0.48 GB; the field's tests 56 of 56, the run example's field tests 18 of 18, the gate clean
+(185 s, and 174 s after the bound). Receipts: `_receipts/law21/receipts.txt`.

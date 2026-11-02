@@ -885,7 +885,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("train-field") => field_train::train(args, realization),
         Some("release-field") => field_train::release(args, realization),
         Some("release-field-text") => field_train::release_text(args, realization),
-        _ => Err("a realized field command is train-field, release-field or release-field-text".into()),
+        Some("currents-field") => field_train::currents_field(args, realization),
+        _ => Err("a realized field command is train-field, release-field, release-field-text or currents-field".into()),
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field

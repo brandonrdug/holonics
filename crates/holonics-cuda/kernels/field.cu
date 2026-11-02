@@ -3039,6 +3039,72 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
     }
 }
 
+// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (the host's
+// `Field::row_currents`, §16.21): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
+// the framed current's part from the question past the near field (a definite site before `qstart[r]` at `|i − j| ≥
+// NEAR`) and from the near field (every source at `|i − j| < NEAR`), each entry `Σ release(p D ṽ_j, 63)` over the head's
+// `S` reals, and the row's largest share. `far[(h T + g) S + x]`, `near` alike, `top[h T + g]`.
+#define ROW_CURRENT_SPAN 32
+extern "C" __global__ void field_row_currents(FieldWords w, const uint32_t *qstart, wide *far, wide *near, wide *rest, uint64_t *top) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n;
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint32_t h = hg / w.T;
+        const uint64_t g = hg % w.T;
+        if (!w.unresolved[g] || S > ROW_CURRENT_SPAN) {
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t question = qstart[r];
+        const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        wide f[ROW_CURRENT_SPAN], m[ROW_CURRENT_SPAN], o[ROW_CURRENT_SPAN];
+        for (uint32_t x = 0; x < S; x++) {
+            f[x] = 0;
+            m[x] = 0;
+            o[x] = 0;
+        }
+        int64_t best = 0;
+        for (uint32_t j = lane; j < sites; j += 32) {
+            const wide p = (wide)erow[j];
+            if (p == 0) {
+                continue;
+            }
+            best = (int64_t)p > best ? (int64_t)p : best;
+            const uint32_t gap = j > i ? j - i : i - j;
+            const bool is_near = gap < NEAR;
+            const bool is_far = !is_near && definite_site(w, first + j) && j < question;
+            for (uint32_t x = 0; x < S; x++) {
+                const wide v = rel(p * carried_ij(w, h, x % n, g, first + j, gap, values[(uint64_t)j * S + x]), SHARE_BITS);
+                if (is_near) {
+                    m[x] += v;
+                } else if (is_far) {
+                    f[x] += v;
+                } else {
+                    o[x] += v;
+                }
+            }
+        }
+        for (uint32_t x = 0; x < S; x++) {
+            f[x] = warp_sum(f[x]);
+            m[x] = warp_sum(m[x]);
+            o[x] = warp_sum(o[x]);
+        }
+        best = warp_max_signed(best);
+        if (lane == 0) {
+            for (uint32_t x = 0; x < S; x++) {
+                far[hg * S + x] = f[x];
+                near[hg * S + x] = m[x];
+                rest[hg * S + x] = o[x];
+            }
+            top[hg] = (uint64_t)best;
+        }
+    }
+}
+
 // Undo the frame on a chart's covector: `δq = conj(U) ⊙ δq̃` (`[t][2M]`).
 extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
     const uint64_t cells = (uint64_t)w.T * w.M;

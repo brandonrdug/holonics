@@ -20,7 +20,7 @@
 use super::field_train::{extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldRows, HostField, Region, ReleaseSweep};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldRows, HostField, Region, ReleaseSweep, RowCurrent};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
@@ -115,6 +115,9 @@ impl FieldRealization for Recorder<'_> {
     fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<[u128; 2]>, TowerError> {
         self.inner.read_covector_shares(field, regions)
     }
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> std::result::Result<Vec<Vec<RowCurrent>>, TowerError> {
+        self.inner.read_row_currents(field, regions, questions, returning)
+    }
 }
 
 /// A realization that counts the site rows it reads: a region's sites, times the heads and the
@@ -158,6 +161,10 @@ impl FieldRealization for Counted<'_> {
     fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<[u128; 2]>, TowerError> {
         self.count(field, regions);
         self.inner.read_covector_shares(field, regions)
+    }
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> std::result::Result<Vec<Vec<RowCurrent>>, TowerError> {
+        self.count(field, regions);
+        self.inner.read_row_currents(field, regions, questions, returning)
     }
 }
 
@@ -340,12 +347,20 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             let some = &host_views[..host_views.len().min(6)];
             some.is_empty() || host_learner.field.covector_shares(some).map_err(|e| e.to_string())? == card.read_covector_shares(&card_learner.field, some).map_err(|e| e.to_string())?
         };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && shares_equal;
+        // The held rows' currents by where they come from, with their covectors (§16.21), on the section's first two
+        // regions, host against card.
+        let currents_equal = {
+            let some = &host_views[..host_views.len().min(2)];
+            let questions: Vec<usize> = some.iter().map(|r| r.unresolved.iter().position(|&u| u).unwrap_or(r.classes.len())).collect();
+            let host: Vec<Vec<RowCurrent>> = some.iter().zip(&questions).map(|(r, &q)| host_learner.field.row_currents(r, q, true)).collect::<std::result::Result<_, _>>().map_err(|e| e.to_string())?;
+            some.is_empty() || host == card.read_row_currents(&card_learner.field, some, &questions, true).map_err(|e| e.to_string())?
+        };
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && shares_equal && currents_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} shares_equal={shares_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,

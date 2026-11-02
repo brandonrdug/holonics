@@ -1450,6 +1450,218 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 2] **`currents-field`**: H6's value side and readout side (§16.21), a reading
+/// of `STATE` on the held problems read with their neighbours beside their own question (base 1 of [`held_regions`])
+/// and beside the next problem's (base 2, the foil), through the realization, with the founding of `KEYS` beside it.
+/// For each tick and head, over the answer rows (each unresolved answer site of a part, the foil's row paired with the
+/// own row at the same answer offset):
+/// - `FIELD_CURRENTS_CHANGE`: the quartiles of `‖F_own − F_foil‖ / ‖F_own‖`, `F` the row's current from the question
+///   past the near field ([`RowCurrent`]), of `‖F_own‖ / ‖N_own‖` (`N` the near field's) and of `‖F_own‖ / ‖Y_own‖`
+///   (`Y = F + N + R` the row's whole current, `R` its other sources'), in thousandths, rows with no far current
+///   counted apart; and how many independent directions the problems' far currents span, the
+///   participation ratio `(tr C)² / tr C²` of the centred second moment `C` of each problem's mean `F_own` (the means
+///   on `2^(−32)`), in thousandths.
+/// - `FIELD_CURRENTS_GAIN`: the face's gain on each part of the change, `Σ ½⟨δỹ_own + δỹ_foil, F_foil − F_own⟩`
+///   and the same through `N` and through `R`, each beside its bound `Σ ½‖δỹ_own + δỹ_foil‖ ‖Δ‖` (the gain were the
+///   change aligned with the covector), `δỹ` the code's covector of the row's framed current (the face's mass `2^z`, so the
+///   covector is in bits), in millionths of a bit an answer site, beside the code itself, foil less own
+///   (`FIELD_CURRENTS_CODE`).
+/// - `FIELD_CURRENTS_TOP`: the quartiles of each row's largest share, in millionths.
+///
+/// And each head's two temperatures `log₂ T` (class receiver and listener) against the founding's
+/// (`FIELD_CURRENTS_SETTING`). Region-level groups only: no source is paired with a receiver by its class. A reading
+/// only.
+pub(super) fn currents_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::RowCurrent;
+    if args.len() != 11 {
+        return Err("currents-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA KEYS KEYS_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let d = field.declaration;
+    let founded = Field::found(d, &pinned_read(&args[9], &args[10], READ_BUDGET as usize)?).map_err(|e| e.to_string())?;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let held: Problems = held.iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+    let held: Problems = held.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let n = held.len();
+    let (heads, span) = (d.heads, 2 * d.modes);
+    let keys = d.ticks * heads;
+    // The settings: each head's temperatures, learned against founded, `log₂ T` on 2^(−24) to four places.
+    let log2 = |ell: i32| -> String {
+        let v = (ell as i128 * 10_000) >> holonics::hnn::tower::MATERIAL_BITS;
+        format!("{}{}.{:04}", if v < 0 { "-" } else { "" }, v.abs() / 10_000, v.abs() % 10_000)
+    };
+    let layout = field.layout();
+    for h in 0..heads {
+        for (kind, name) in [(0usize, "class"), (1, "listener")] {
+            let (l0, l1) = (founded.theta[layout.temper + 2 * h + kind], field.theta[layout.temper + 2 * h + kind]);
+            println!("FIELD_CURRENTS_SETTING head={h} receiver={name} log2_temperature_founded={} log2_temperature_learned={} log2_ratio={}", log2(l0), log2(l1), log2(l1 - l0));
+        }
+    }
+    let regions = held_regions(&codec, &held);
+    let view = |k: usize| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[], locked: &[], echo: &[] };
+    let own: Vec<Region> = (n..n + n * CONTEXT).map(view).collect();
+    let foil: Vec<Region> = (n + n * CONTEXT..n + 2 * n * CONTEXT).map(view).collect();
+    let q_own: Vec<usize> = held.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
+    let q_foil: Vec<usize> = (0..n).flat_map(|i| std::iter::repeat_n(held[(i + 1) % n].0.len(), CONTEXT)).collect();
+    // Per key (tick, head): the change ratios as (‖ΔF‖², ‖F‖²), the far-to-near as (‖F‖², ‖N‖²), the rows with no far
+    // current, each problem's sum of F and its rows, the two gains (twice, on 2^(−40) bits), and the tops.
+    let mut change: Vec<Vec<(u128, u128)>> = vec![Vec::new(); keys];
+    let mut far_near: Vec<Vec<(u128, u128)>> = vec![Vec::new(); keys];
+    let mut far_row: Vec<Vec<(u128, u128)>> = vec![Vec::new(); keys];
+    let mut silent = vec![0u64; keys];
+    let mut sums: Vec<Vec<(Vec<i128>, u64)>> = vec![vec![(vec![0i128; span], 0u64); n]; keys];
+    let (mut gain_far, mut gain_near, mut gain_rest) = (vec![0i128; keys], vec![0i128; keys], vec![0i128; keys]);
+    let mut bound: Vec<[i128; 3]> = vec![[0i128; 3]; keys];
+    let mut tops: Vec<Vec<u64>> = vec![Vec::new(); keys];
+    let (mut code_own, mut code_foil, mut sites) = (0i64, 0i64, 0usize);
+    let square = |v: &[i128]| -> u128 { v.iter().map(|&x| (x * x) as u128).sum() };
+    let chunk = 16 * CONTEXT;
+    for at in (0..own.len()).step_by(chunk) {
+        let end = (at + chunk).min(own.len());
+        let rows_own = realization.read_row_currents(field, &own[at..end], &q_own[at..end], true).map_err(|e| e.to_string())?;
+        let rows_foil = realization.read_row_currents(field, &foil[at..end], &q_foil[at..end], true).map_err(|e| e.to_string())?;
+        let faces_own = realization.read_faces(field, &own[at..end]).map_err(|e| e.to_string())?;
+        let faces_foil = realization.read_faces(field, &foil[at..end]).map_err(|e| e.to_string())?;
+        for r in 0..end - at {
+            let (k, problem) = (at + r, (at + r) / CONTEXT);
+            for (face, &class) in faces_own[r].iter().zip(own[k].classes) {
+                if let Some(face) = face {
+                    code_own += face.code(class);
+                    sites += 1;
+                }
+            }
+            for (face, &class) in faces_foil[r].iter().zip(foil[k].classes) {
+                code_foil += face.as_ref().map_or(0, |f| f.code(class));
+            }
+            if rows_own[r].len() != rows_foil[r].len() {
+                return Err("an own and a foil part whose answer rows differ".into());
+            }
+            for (a, b) in rows_own[r].iter().zip(&rows_foil[r]) {
+                let RowCurrent { tick, head, site, .. } = *a;
+                if (tick, head) != (b.tick, b.head) || site as usize - q_own[k] != b.site as usize - q_foil[k] {
+                    return Err("an own and a foil row at different answer places".into());
+                }
+                let key = tick as usize * heads + head as usize;
+                let df: Vec<i128> = b.far.iter().zip(&a.far).map(|(&y, &x)| y - x).collect();
+                let dn: Vec<i128> = b.near.iter().zip(&a.near).map(|(&y, &x)| y - x).collect();
+                let dr: Vec<i128> = b.rest.iter().zip(&a.rest).map(|(&y, &x)| y - x).collect();
+                let whole: Vec<i128> = (0..span).map(|x| a.far[x] + a.near[x] + a.rest[x]).collect();
+                let (cur, near) = (square(&a.far), square(&a.near));
+                if cur == 0 {
+                    silent[key] += 1;
+                } else {
+                    change[key].push((square(&df), cur));
+                }
+                far_near[key].push((cur, near));
+                far_row[key].push((cur, square(&whole)));
+                let (sum, rows) = &mut sums[key][problem];
+                for (s, &x) in sum.iter_mut().zip(&a.far) {
+                    *s += x;
+                }
+                *rows += 1;
+                let mut cc = 0u128;
+                for x in 0..span.min(a.covector.len()).min(b.covector.len()) {
+                    let c = a.covector[x] as i128 + b.covector[x] as i128;
+                    cc += (c * c) as u128;
+                    gain_far[key] += c * df[x];
+                    gain_near[key] += c * dn[x];
+                    gain_rest[key] += c * dr[x];
+                }
+                for (slot, delta) in bound[key].iter_mut().zip([&df, &dn, &dr]) {
+                    *slot += (cc * square(delta)).isqrt() as i128;
+                }
+                tops[key].push(a.top);
+            }
+        }
+    }
+    println!("FIELD_CURRENTS_READ problems={n} parts={} answer_sites={sites} ms={}", own.len(), started.elapsed().as_millis());
+    // The quartiles of √(num/den) in thousandths, ordered exactly by cross products (a zero denominator last).
+    let quartiles = |mut v: Vec<(u128, u128)>| -> String {
+        if v.is_empty() {
+            return "-/-/-".into();
+        }
+        v.sort_by(|&(a, b), &(c, e)| (a * e).cmp(&(c * b)).then(b.cmp(&e)));
+        let at = |k: usize| {
+            let (num, den) = v[(v.len() * k / 4).min(v.len() - 1)];
+            if den == 0 { "inf".to_string() } else { ((num * 1_000_000 / den).isqrt()).to_string() }
+        };
+        format!("{}/{}/{}", at(1), at(2), at(3))
+    };
+    let micro = |num: i128, den: i128| -> String {
+        if den == 0 {
+            return "-".into();
+        }
+        let m = num * 1_000_000 / den;
+        format!("{}{}.{:06}", if m < 0 { "-" } else { "" }, m.abs() / 1_000_000, m.abs() % 1_000_000)
+    };
+    let (mut tick_far, mut tick_near, mut tick_rest) = (vec![0i128; d.ticks], vec![0i128; d.ticks], vec![0i128; d.ticks]);
+    for tick in 0..d.ticks {
+        for head in 0..heads {
+            let key = tick * heads + head;
+            // The problems' mean far currents on 2^(−32) (each sum shifted 16 bits before its division), centred
+            // without division (P m_i − Σ m), and their second moment.
+            let means: Vec<Vec<i128>> = sums[key].iter().filter(|(_, rows)| *rows > 0).map(|(s, rows)| s.iter().map(|&x| (x << 16) / *rows as i128).collect()).collect();
+            let directions = if means.len() < 2 {
+                "-".to_string()
+            } else {
+                let p = means.len() as i128;
+                let total: Vec<i128> = (0..span).map(|x| means.iter().map(|m| m[x]).sum()).collect();
+                let centred: Vec<Vec<num_bigint::BigInt>> = means.iter().map(|m| (0..span).map(|x| num_bigint::BigInt::from(p * m[x] - total[x])).collect()).collect();
+                let mut c = vec![num_bigint::BigInt::from(0); span * span];
+                for x in &centred {
+                    for a in 0..span {
+                        for b in 0..span {
+                            c[a * span + b] += &x[a] * &x[b];
+                        }
+                    }
+                }
+                let trace: num_bigint::BigInt = (0..span).map(|a| c[a * span + a].clone()).sum();
+                let frob: num_bigint::BigInt = c.iter().map(|v| v * v).sum();
+                if frob == num_bigint::BigInt::from(0) { "-".to_string() } else { (&trace * &trace * num_bigint::BigInt::from(1000) / frob).to_string() }
+            };
+            let rows = far_near[key].len() as u64;
+            println!(
+                "FIELD_CURRENTS_CHANGE tick={tick} head={head} rows={rows} silent={} change_over_current_milli={} far_over_near_milli={} far_over_row_milli={} directions_milli={directions} of={span}",
+                silent[key],
+                quartiles(change[key].clone()),
+                quartiles(far_near[key].clone()),
+                quartiles(far_row[key].clone()),
+            );
+            // The gains, twice on 2^(−40) bits, halved at the print, a site.
+            let den = (sites as i128) << 41;
+            println!(
+                "FIELD_CURRENTS_GAIN tick={tick} head={head} far_bits_a_site={} near_bits_a_site={} rest_bits_a_site={} far_bound={} near_bound={} rest_bound={}",
+                micro(gain_far[key], den),
+                micro(gain_near[key], den),
+                micro(gain_rest[key], den),
+                micro(bound[key][0], den),
+                micro(bound[key][1], den),
+                micro(bound[key][2], den)
+            );
+            tick_far[tick] += gain_far[key];
+            tick_near[tick] += gain_near[key];
+            tick_rest[tick] += gain_rest[key];
+            let mut top = tops[key].clone();
+            top.sort_unstable();
+            let q = |k: usize| top.get((top.len() * k / 4).min(top.len().saturating_sub(1))).map_or("-".to_string(), |&t| ((t as u128 * 1_000_000) >> 63).to_string());
+            println!("FIELD_CURRENTS_TOP tick={tick} head={head} rows={} top_share_micro={}/{}/{}", top.len(), q(1), q(2), q(3));
+        }
+    }
+    let den = (sites as i128) << 41;
+    for tick in 0..d.ticks {
+        println!("FIELD_CURRENTS_GAIN_TICK tick={tick} far_bits_a_site={} near_bits_a_site={} rest_bits_a_site={}", micro(tick_far[tick], den), micro(tick_near[tick], den), micro(tick_rest[tick], den));
+    }
+    // The code itself on 2^(−20) bits a site: foil less own is the question's effect.
+    let site_den = (sites as i128) << 20;
+    println!("FIELD_CURRENTS_CODE sites={sites} own_bits_a_site={} foil_bits_a_site={} foil_less_own={}", micro(code_own as i128, site_den), micro(code_foil as i128, site_den), micro(code_foil as i128 - code_own as i128, site_den));
+    println!("FIELD_CURRENTS_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// The host realization, for the dispatcher.
 pub(super) fn host() -> HostField {
     HostField
