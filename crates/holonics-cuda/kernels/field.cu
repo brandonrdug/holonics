@@ -355,6 +355,14 @@ struct FieldWords {
     const uint64_t *echo_b;
     const int64_t *echo_logits;
     wide *trips;
+    // The unit words on 32 bits `[h][t][span]` (what `field_unit` fits them to), and the skins `[h][d][n]` on
+    // 32 bits (`D ≤ 2^30`; a still head's the exact 1): the exposure reads a source's whole row as four vector
+    // loads, and its skins as two.
+    int32_t *qf32;
+    const uint32_t *decay_t;
+    // The reverse's pair covectors `⟨δỹ_i, D ṽ_j⟩` at the region block's dense address (one head's, each head's
+    // rows computing them once for both of their passes).
+    wide *dpb;
 };
 
 // The frame of local mode `l` of head `h` at the batch's site `g`: the identity in a head of a still ring
@@ -599,6 +607,7 @@ extern "C" __global__ void field_unit(FieldWords w, wide *qscale) {
         for (uint32_t i = lane; i < w.span; i += 32) {
             const int64_t r = s == 0 ? 0 : (int64_t)fit32(div_nearest((wide)c[i] << FACE_BITS, s), w.status);
             c[i] = r;
+            w.qf32[hs * w.span + i] = (int32_t)r;
             qb = max(qb, bit_length(mag64(r)));
         }
         if (lane == 0) {
@@ -931,6 +940,13 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // the resonance classes and their lists
 
 #define WEIGHT_BITS 62
+// The contact carriers up to this many limbs add each numerator term where it stands (`add_window`); wider ones
+// (rare: a row spread past 512 bits) shift and complement it whole.
+#define WINDOW_LIMBS 8
+// Blocks a multiprocessor keeps resident (the register file shared among them): 8 blocks of 4 warps.
+#define CONTACT_MIN_BLOCKS 8
+// The block of `field_spread` (a region a block).
+#define SPREAD_THREADS 256
 // The most address modes a head's class carries, and the most classes a receiver probes (`2^b − 1`).
 #define MAX_CLASS_TRITS 7
 #define MAX_PROBES 127
@@ -1314,6 +1330,46 @@ __device__ __forceinline__ int64_t pair_score(const FieldWords &w, uint32_t h, c
     return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1) - ((wide)octave(gap) << FACE_BITS), w.status);
 }
 
+// [agent-inferred, November 1] **The pair score of a head of eight modes, from the vector rows** (`pair_score`
+// for `n = 8`, the same integers): the source's row of sixteen 32-bit words as four `int4` loads (the lanes of
+// a warp read different rows, so each load is a gather of one line a lane: sixteen 8-octet loads were
+// sixteen such gathers, and the skins another eight), its skins `[h][gap][8]` as two `uint4`.
+__device__ __forceinline__ int64_t pair_score8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t site, uint32_t gap) {
+    const bool still = still_head(w, h);
+    const uint32_t g = still ? 0 : MOVE_BITS;
+    int32_t b[16];
+#pragma unroll
+    for (int q = 0; q < 4; q++) {
+        const int4 t = row[q];
+        b[4 * q] = t.x;
+        b[4 * q + 1] = t.y;
+        b[4 * q + 2] = t.z;
+        b[4 * q + 3] = t.w;
+    }
+    uint32_t dec[8];
+    if (still) {
+#pragma unroll
+        for (int l = 0; l < 8; l++) {
+            dec[l] = 1;
+        }
+    } else {
+        const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
+        const uint4 d0 = d4[0], d1 = d4[1];
+        dec[0] = d0.x; dec[1] = d0.y; dec[2] = d0.z; dec[3] = d0.w;
+        dec[4] = d1.x; dec[5] = d1.y; dec[6] = d1.z; dec[7] = d1.w;
+    }
+    wide s = 0;
+#pragma unroll
+    for (int l = 0; l < 8; l++) {
+        const wide lk = lock_pair(a[l], a[8 + l], b[l], b[8 + l], (uint64_t)dec[l], g);
+        if (!add_fits(s, lk, &s)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+        }
+    }
+    (void)site;
+    return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1) - ((wide)octave(gap) << FACE_BITS), w.status);
+}
+
 // A crowd's score (§14.10, §15.2): the head's locks against its summed word `W` over its `count`,
 // `div_nearest(Σ_l lock_l, count² 2^(score_bits + 2g + 1)) − level 2^16`, the words' sum two reads of the
 // prefix sums.
@@ -1354,7 +1410,7 @@ __device__ __forceinline__ wide parts_sum(wide v, uint32_t span, uint32_t parts)
 // entry: the row's least whole bit `a_0` over its terms (the support's and the crowds'), kept in
 // `amin[h][t]`, and the spread `a − a_0` the row holds, raised into `bits[1]`; the host reads the
 // launch's widest row and launches the contact with the carrier it needs.
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(FieldWords w) {
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposure(FieldWords w) {
     __shared__ RowCls rcs[CONTACT_ROWS];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, classes = w.nclasses;
@@ -1380,10 +1436,24 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(F
         // them there (a score is computed once; the entries outside the support are never read).
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t amin = INT64_MAX, amax = INT64_MIN;
+        const bool eight = w.n == 8;
+        int32_t ai[16];
+        const int4 *rows32 = reinterpret_cast<const int4 *>(w.qf32 + ((uint64_t)h * w.T + first) * 16);
+        if (eight) {
+#pragma unroll
+            for (int q = 0; q < 4; q++) {
+                const int4 t = rows32[(uint64_t)i * 4 + q];
+                ai[4 * q] = t.x;
+                ai[4 * q + 1] = t.y;
+                ai[4 * q + 2] = t.z;
+                ai[4 * q + 3] = t.w;
+            }
+        }
         for (uint32_t k = lane; k < K; k += 32) {
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j != UINT32_MAX) {
-                const int64_t z = pair_score(w, h, wi, words + (uint64_t)j * S, j > i ? j - i : i - j);
+                const uint32_t gap = j > i ? j - i : i - j;
+                const int64_t z = eight ? pair_score8(w, h, ai, rows32 + (uint64_t)j * 4, j, gap) : pair_score(w, h, wi, words + (uint64_t)j * S, gap);
                 erow[j] = (uint64_t)z;
                 const int64_t a = z >> FACE_BITS;
                 amin = a < amin ? a : amin;
@@ -1410,6 +1480,56 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_exposure(F
             atomicMax(&w.bits[1], (uint32_t)(spread > 0xFFFFFFFFull ? 0xFFFFFFFFu : spread));
         }
     }
+}
+
+// [definition; agent-inferred, November 1] **The numerators' terms are summed by the limb they stand at**
+// (`face · |v| · 2^(62 + s)`, `62 + s = 64 q + b`): the term's shifted face (`face << b`, two limbs, formed once
+// a term) times the value's magnitude is three limbs standing at limb `q`. A lane takes the chunk's terms in
+// the order of their `q` (the lanes rank them by `q` with ballots), sums those of one `q` as signed numbers of
+// four limbs (a negative term as its two's complement, `~x + 1`, its sign limb all ones: `-x 2^(64 q) = (-x)
+// 2^(64 q)`), and adds each such sum to the row's numerator once, at limb `q`, the carry rippled up the rest and
+// nothing below `q` touched. The sums are the old shift-and-complement's modulo `2^(64 L)` (integer sums, in
+// any order), without its `+1` counted apart.
+template <int L, int Q>
+__device__ __forceinline__ void add_window(Big<L> &N, uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t ext) {
+    uint64_t carry = 0;
+#pragma unroll
+    for (int k = Q; k < L; k++) {
+        const int d = k - Q;
+        const uint64_t a = d == 0 ? a0 : d == 1 ? a1 : d == 2 ? a2 : d == 3 ? a3 : ext;
+        const uint64_t s1 = N.v[k] + a;
+        const uint64_t c1 = s1 < a ? 1 : 0;
+        const uint64_t s2 = s1 + carry;
+        const uint64_t c2 = s2 < s1 ? 1 : 0;
+        N.v[k] = s2;
+        carry = c1 | c2;
+    }
+}
+
+template <int L, int Q>
+__device__ __forceinline__ void add_window_at(Big<L> &N, uint32_t q, uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t ext) {
+    if (q == (uint32_t)Q) {
+        add_window<L, Q>(N, a0, a1, a2, a3, ext);
+        return;
+    }
+    if constexpr (Q + 1 < L) {
+        add_window_at<L, Q + 1>(N, q, a0, a1, a2, a3, ext);
+    }
+}
+
+// A value carried across `d` sites by its skin decay on 64 bits (`carried`, whose result is below `2^63` in
+// magnitude: `D ≤ 2^30`): `release(D v, 30)` from the 64-bit halves of the product, half away from zero.
+__device__ __forceinline__ int64_t carry_d(uint64_t D, int64_t v) {
+    const bool neg = v < 0;
+    const uint64_t m = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+    const uint64_t lo = m * D + ((uint64_t)1 << (MOVE_BITS - 1));
+    const uint64_t hi = __umul64hi(m, D) + (lo < ((uint64_t)1 << (MOVE_BITS - 1)) ? 1 : 0);
+    const uint64_t r = (lo >> MOVE_BITS) | (hi << (64 - MOVE_BITS));
+    return neg ? -(int64_t)r : (int64_t)r;
+}
+
+__device__ __forceinline__ int64_t carried_s(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d, int64_t v) {
+    return still_head(w, h) ? v : carry_d((uint64_t)decay_of(w, h, l, d), v);
 }
 
 // [definition; agent-inferred, November 1] **The contact, the series row and the current over each
@@ -1460,9 +1580,71 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         Big<L> N = big_zero<L>();
         uint32_t negs = 0, met = 0;
         // The numerators of a staged term: the lanes of an entry add their part of it.
-        const auto numerators = [&](bool crowd) {
+        const bool still_h = still_head(w, h);
+        const auto numerators = [&](bool crowd, uint32_t nvalid) {
             if (!active) {
                 return;
+            }
+            if constexpr (L <= WINDOW_LIMBS) {
+                if (!crowd) {
+                    // The chunk's terms by limb (`stj`, `sts`, `st0`, `st1` ranked), those of one limb summed.
+                    uwide ulo = 0, uhi = 0;
+                    uint32_t cq = 0xFFFFFFFFu;
+                    // Two terms at a time: their values, skins and products are independent, so the loads and the
+                    // multiplications of both are in flight together; they are then added in rank order.
+                    const auto product = [&](uint32_t pos, uwide *xlo, uwide *xhi, uint32_t *negative) {
+                        const uint32_t j = stj[warp][pos];
+                        const uint32_t gap = j > i ? j - i : i - j;
+                        const int64_t raw = values[(uint64_t)j * S + entry];
+                        // (a head of eight modes reads its skin from the vector table: the eight modes of a gap stand together)
+                        const int64_t v = w.n == 8 ? (still_h ? raw : carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw)) : carried_s(w, h, m, gap, raw);
+                        const bool neg = v < 0;
+                        const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+                        const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
+                        const uwide mid = (uwide)st1[warp][pos] * (uwide)mag + (lo >> 64);
+                        const uwide mask = neg ? ~(uwide)0 : 0;
+                        *xlo = ((mid << 64) | (uwide)(uint64_t)lo) ^ mask;
+                        *xhi = (uwide)(uint64_t)(mid >> 64) ^ mask;
+                        *negative = neg ? 1u : 0u;
+                    };
+                    const auto accumulate = [&](uint32_t pos, uwide xlo, uwide xhi, uint32_t neg) {
+                        const uint32_t q = sts[warp][pos];
+                        if (q != cq) {
+                            if (cq != 0xFFFFFFFFu) {
+                                const uint64_t top = (uint64_t)(uhi >> 64);
+                                add_window_at<L, 0>(N, cq, (uint64_t)ulo, (uint64_t)(ulo >> 64), (uint64_t)uhi, top, (top >> 63) != 0 ? ~(uint64_t)0 : 0);
+                            }
+                            cq = q;
+                            ulo = 0;
+                            uhi = 0;
+                        }
+                        const uwide t1 = ulo + xlo;
+                        const uwide t2 = t1 + (uwide)neg;
+                        const uint64_t carry = (t1 < xlo) | (t2 < t1);
+                        ulo = t2;
+                        uhi += xhi + (uwide)carry;
+                    };
+                    uint32_t pos = part;
+                    for (; pos + parts < nvalid; pos += 2 * parts) {
+                        uwide alo, ahi, blo, bhi;
+                        uint32_t an, bn;
+                        product(pos, &alo, &ahi, &an);
+                        product(pos + parts, &blo, &bhi, &bn);
+                        accumulate(pos, alo, ahi, an);
+                        accumulate(pos + parts, blo, bhi, bn);
+                    }
+                    if (pos < nvalid) {
+                        uwide alo, ahi;
+                        uint32_t an;
+                        product(pos, &alo, &ahi, &an);
+                        accumulate(pos, alo, ahi, an);
+                    }
+                    if (cq != 0xFFFFFFFFu) {
+                        const uint64_t top = (uint64_t)(uhi >> 64);
+                        add_window_at<L, 0>(N, cq, (uint64_t)ulo, (uint64_t)(ulo >> 64), (uint64_t)uhi, top, (top >> 63) != 0 ? ~(uint64_t)0 : 0);
+                    }
+                    return;
+                }
             }
             for (uint32_t jj = part; jj < 32; jj += parts) {
                 const uint32_t j = stj[warp][jj];
@@ -1502,11 +1684,11 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
             Coef cf = {0, 0, 0};
             uint32_t s = 0;
+            uint64_t face = 0;
             if (j != UINT32_MAX) {
                 // The score the exposure kept (a pair's score is computed once).
                 const int64_t z = (int64_t)erow[j];
                 int64_t a;
-                uint64_t face;
                 term_of(w, z, &a, &face);
                 const int64_t sh = a - amin;
                 if (sh >= (int64_t)(64 * L)) {
@@ -1518,13 +1700,36 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 big_add(M, big_shl(big_of<L>(cf), s));
                 met += 1;
             }
-            st0[warp][lane] = cf.c0;
-            st1[warp][lane] = cf.c1;
-            st2[warp][lane] = cf.c2;
-            sts[warp][lane] = s;
-            stj[warp][lane] = j;
+            uint32_t nvalid = 32;
+            if constexpr (L <= WINDOW_LIMBS) {
+                // The numerators add `face |v| 2^(62 + s)` by the limb `q` it stands at: the lanes rank their
+                // terms by `q` (ballots), and stage the face shifted by its bits within the limb in that order.
+                const uint32_t t = s + WEIGHT_BITS, b = t & 63;
+                const uint32_t key = (j != UINT32_MAX && (t >> 6) < (uint32_t)L) ? (t >> 6) : 0xFFFFFFFFu;
+                const uint32_t below = lane == 0 ? 0u : 0xFFFFFFFFu >> (32 - lane);
+                uint32_t rank = 0;
+                nvalid = 0;
+#pragma unroll
+                for (int c = 0; c < L; c++) {
+                    const uint32_t mk = __ballot_sync(0xFFFFFFFFu, key == (uint32_t)c);
+                    rank += (key > (uint32_t)c ? __popc(mk) : 0) + (key == (uint32_t)c ? __popc(mk & below) : 0);
+                    nvalid += __popc(mk);
+                }
+                if (key != 0xFFFFFFFFu) {
+                    st0[warp][rank] = face << b;
+                    st1[warp][rank] = b == 0 ? 0 : face >> (64 - b);
+                    sts[warp][rank] = key;
+                    stj[warp][rank] = j;
+                }
+            } else {
+                st0[warp][lane] = cf.c0;
+                st1[warp][lane] = cf.c1;
+                st2[warp][lane] = cf.c2;
+                sts[warp][lane] = s;
+                stj[warp][lane] = j;
+            }
             __syncwarp();
-            numerators(false);
+            numerators(false, nvalid);
             __syncwarp();
         }
         // The crowds' chunk: a crowd's value multiplier is `2^62`, its mass multiplier its count `2^62`.
@@ -1558,7 +1763,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             crhi[warp][lane] = hi_;
             crlv[warp][lane] = lv;
             __syncwarp();
-            numerators(true);
+            numerators(true, 32);
             __syncwarp();
         }
         // The mass over the lanes; the numerators over the parts of each entry.
@@ -1641,7 +1846,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
 }
 
 #define CONTACT_ENTRY(LL) \
-    extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_l##LL(FieldWords w, uint32_t store) { contact_body<LL>(w, store); }
+    extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOCKS) field_contact_l##LL(FieldWords w, uint32_t store) { contact_body<LL>(w, store); }
 CONTACT_ENTRY(5)
 CONTACT_ENTRY(6)
 CONTACT_ENTRY(7)
@@ -2063,7 +2268,7 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // `cw`. A lane is a pair for the row's sums and the staged `δs`, and an entry of the span for the row's
 // return.
 #define REV_ROWS 4
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, int64_t *ds, int64_t *dq) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
@@ -2093,6 +2298,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         int64_t *dsr = ds + w.region_eoff[r] + (uint64_t)i * sites;
+        wide *dpr = w.dpb + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *dyi = dyh + hg * S;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
@@ -2113,6 +2319,33 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
             wide dp = 0;
             for (uint32_t x = 0; x < S; x++) {
                 dp += (wide)dyi[x] * carried(w, h, x % n, gap, vj[x]);
+            }
+            return dp;
+        };
+        // The same for a head of eight modes, from vector rows: the source's sixteen values as eight 16-octet loads
+        // and its skins as two (`pair_score8`).
+        const bool eight = w.n == 8;
+        const bool still_h = still_head(w, h);
+        const auto pair_dp8 = [&](uint32_t j, uint32_t gap) -> wide {
+            const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
+            uint32_t dec[8];
+            if (still_h) {
+#pragma unroll
+                for (int l = 0; l < 8; l++) {
+                    dec[l] = 1;
+                }
+            } else {
+                const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
+                const uint4 d0 = d4[0], d1 = d4[1];
+                dec[0] = d0.x; dec[1] = d0.y; dec[2] = d0.z; dec[3] = d0.w;
+                dec[4] = d1.x; dec[5] = d1.y; dec[6] = d1.z; dec[7] = d1.w;
+            }
+            wide dp = 0;
+#pragma unroll
+            for (int q = 0; q < 8; q++) {
+                const longlong2 t = v2[q];
+                dp += (wide)dyi[2 * q] * (wide)(still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
+                dp += (wide)dyi[2 * q + 1] * (wide)(still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
             }
             return dp;
         };
@@ -2141,7 +2374,10 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
                 continue;
             }
             const wide p = (wide)e[j];
-            weighted += p * pair_dp(j, j > i ? j - i : i - j);
+            const uint32_t gap = j > i ? j - i : i - j;
+            const wide dpj = eight ? pair_dp8(j, gap) : pair_dp(j, gap);
+            dpr[j] = dpj;
+            weighted += p * dpj;
             held += (open && holds(j)) ? p : 0;
         }
         if (cnts[warp][lane] != 0) {
@@ -2179,7 +2415,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32) field_contact_rows(F
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
-                wide dz = gained(compare((wide)e[j], pair_dp(j, gap), holds(j)), w.beta, w.status);
+                wide dz = gained(compare((wide)e[j], dpr[j], holds(j)), w.beta, w.status);
                 if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
@@ -2303,24 +2539,51 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
 // `dv = fit64(dv + release(Σ cv, 63))`, `dq = fit64(dq + release(Σ cw, 32 + 2g))`. One thread an entry of
 // the span and a region, each over its region's sites in order.
 extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, int64_t *dv) {
+    // A block a region: the span's entries across the block's threads, a thread's chunk of the region's sites
+    // (`blockDim / span` chunks) summed, the chunks' sums scanned, and each chunk's prefix walked again to the
+    // outputs. The prefix sums are exact integers (the ring `Z/2^128`), so any chunking gives the same bits.
+    __shared__ wide psv[SPREAD_THREADS], psw[SPREAD_THREADS];
     const bool still = still_head(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
-    for (uint64_t u = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; u < (uint64_t)w.R * w.span; u += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t r = u / w.span, x = u % w.span;
+    const uint32_t S = w.span;
+    const uint32_t nchunk = blockDim.x / S;
+    const uint32_t x = threadIdx.x % S, ck = threadIdx.x / S;
+    const bool live = ck < nchunk;
+    for (uint32_t r = blockIdx.x; r < w.R; r += gridDim.x) {
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        wide runv = 0, runw = 0;
-        for (uint32_t t = 0; t < sites; t++) {
-            const uint64_t row = first + r + t;
-            runv += w.cv[row * w.span + x];
-            runw += w.cw[row * w.span + x];
-            if (definite_site(w, first + t)) {
-                const uint32_t m = h * w.n + x % w.n;
-                const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
-                dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + g0), w.status);
-                dv[slot] = fit64((wide)dv[slot] + rel(runv, SHARE_BITS), w.status);
+        const uint32_t len = (sites + nchunk - 1) / nchunk;
+        const uint32_t lo = ck * len, hi = min(sites, lo + len);
+        wide sv = 0, sw = 0;
+        if (live) {
+            for (uint32_t t = lo; t < hi; t++) {
+                const uint64_t row = first + r + t;
+                sv += w.cv[row * S + x];
+                sw += w.cw[row * S + x];
+            }
+            psv[threadIdx.x] = sv;
+            psw[threadIdx.x] = sw;
+        }
+        __syncthreads();
+        if (live) {
+            wide runv = 0, runw = 0;
+            for (uint32_t c = 0; c < ck; c++) {
+                runv += psv[c * S + x];
+                runw += psw[c * S + x];
+            }
+            for (uint32_t t = lo; t < hi; t++) {
+                const uint64_t row = first + r + t;
+                runv += w.cv[row * S + x];
+                runw += w.cw[row * S + x];
+                if (definite_site(w, first + t)) {
+                    const uint32_t m = h * w.n + x % w.n;
+                    const uint64_t slot = (first + t) * w.M2 + (x < w.n ? m : w.M + m);
+                    dq[slot] = fit64((wide)dq[slot] + rel(runw, CONTACT_BACK + g0), w.status);
+                    dv[slot] = fit64((wide)dv[slot] + rel(runv, SHARE_BITS), w.status);
+                }
             }
         }
+        __syncthreads();
     }
 }
 
