@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, Region, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -451,6 +451,12 @@ pub struct CardField<'c> {
     times: FieldTimes,
     profile: Option<std::cell::RefCell<FieldProfile>>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
+    /// Whether a return carries the closure's comparison (§19); off only for [`FieldRealization::read_and_return_open`].
+    closure: std::cell::Cell<bool>,
+    /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
+    /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current]` summed.
+    held_questions: std::cell::RefCell<Option<Vec<usize>>>,
+    held_cells: std::cell::RefCell<Vec<i128>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -465,7 +471,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), closure: std::cell::Cell::new(true), held_questions: Default::default(), held_cells: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -809,7 +815,7 @@ impl<'c> CardField<'c> {
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
             self.mark("run_setup");
-            let (f, z, r, e) = self.batch(field, &regions[batch], &mut words, g.as_deref(), logits, keep)?;
+            let (f, z, r, e) = self.batch(field, &regions[batch.clone()], batch.start, &mut words, g.as_deref(), logits, keep)?;
             self.mark("batch_drop_and_collect");
             faces.extend(f);
             read_logits.extend(z);
@@ -890,7 +896,7 @@ impl<'c> CardField<'c> {
     /// `logits`), when `g` is given the reverse added into it, and with `keep` the still heads'
     /// last-tick weight rows of those sites (the batch's one region).
     #[allow(clippy::type_complexity)]
-    fn batch(&self, field: &Field, regions: &[Region], words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+    fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -1117,6 +1123,25 @@ impl<'c> CardField<'c> {
             self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
             self.mark("tick_launch_post");
+        }
+        // A held read's rows by where their mass lies (a reading for the receipts): each kept tick's shares.
+        if let Some(questions) = self.held_questions.borrow().as_ref() {
+            let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
+            let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
+            let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 5)).map_err(device)?;
+            for (k, tick) in ticks.iter().enumerate() {
+                set(words, tick);
+                let (mut sp, mut tk, mut ap) = (starts_c.device_ptr(), k as u32, acc.device_ptr());
+                self.launch("field_held_rows", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut tk), arg(&mut ap)])?;
+            }
+            let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*acc, 0, d.ticks * heads * 5)).map_err(device)?;
+            let mut total = self.held_cells.borrow_mut();
+            if total.is_empty() {
+                total.resize(cells.len(), 0);
+            }
+            for (t, c) in total.iter_mut().zip(cells) {
+                *t += c;
+            }
         }
         // The faces at the unresolved sites.
         let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
@@ -1385,7 +1410,7 @@ impl<'c> CardField<'c> {
                 // The crowds' difference arrays start empty a head (§14.10).
                 card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
                 card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
-                let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
+                let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if self.closure.get() && field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
                 self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
                 let (mut hh, mut dyhp, mut dsp, mut dqp, mut dvp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), dv.device_ptr());
                 self.launch("field_contact_columns", Self::rows_grid(sites as u64, CONTACT_ROWS), (CONTACT_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut dvp)])?;
@@ -1616,6 +1641,30 @@ impl FieldRealization for CardField<'_> {
 
     fn met_pairs(&self) -> Option<u128> {
         Some(self.times.pairs)
+    }
+
+    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        self.closure.set(false);
+        let read = self.run(field, regions, true, false, None);
+        self.closure.set(true);
+        let (faces, _, g, _, _) = read?;
+        Ok((faces, g))
+    }
+
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        if regions.len() != questions.len() {
+            return Err(TowerError::Refused("a held read's answer starts that are not one a region"));
+        }
+        // The shares of every tick are kept (a logits read keeps them), and read once each by `field_held_rows`.
+        *self.held_questions.borrow_mut() = Some(questions.to_vec());
+        self.held_cells.borrow_mut().clear();
+        let read = self.run(field, regions, false, true, None);
+        *self.held_questions.borrow_mut() = None;
+        read?;
+        let cells = std::mem::take(&mut *self.held_cells.borrow_mut());
+        let (heads, ticks) = (field.declaration.heads, field.declaration.ticks);
+        let cells = if cells.is_empty() { vec![0i128; ticks * heads * 5] } else { cells };
+        Ok(cells.chunks_exact(5).map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4] }).collect())
     }
 }
 

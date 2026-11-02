@@ -20,7 +20,7 @@
 use super::field_train::{clocks_of, extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HostField, Region, ReleaseSweep};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldRows, HostField, Region, ReleaseSweep};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
@@ -109,6 +109,12 @@ impl FieldRealization for Recorder<'_> {
     fn met_pairs(&self) -> Option<u128> {
         self.inner.met_pairs()
     }
+    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>), TowerError> {
+        self.inner.read_and_return_open(field, regions)
+    }
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
+        self.inner.read_row_shares(field, regions, questions)
+    }
 }
 
 /// A realization that counts the site rows it reads: a region's sites, times the heads and the
@@ -144,6 +150,14 @@ impl FieldRealization for Counted<'_> {
     }
     fn met_pairs(&self) -> Option<u128> {
         self.inner.met_pairs()
+    }
+    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>), TowerError> {
+        self.count(field, regions);
+        self.inner.read_and_return_open(field, regions)
+    }
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
+        self.count(field, regions);
+        self.inner.read_row_shares(field, regions, questions)
     }
 }
 
@@ -296,12 +310,28 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             }
             _ => true,
         };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal;
+        // The rows by where their mass lies (a reading for the receipts), the section's first regions read on both
+        // with the answer start at each region's first open site: bit for bit.
+        let rows_equal = {
+            let some = &host_views[..host_views.len().min(6)];
+            let questions: Vec<usize> = some.iter().map(|r| r.unresolved.iter().position(|&u| u).unwrap_or(r.classes.len())).collect();
+            some.is_empty() || host_learner.field.held_rows_all(some, &questions).map_err(|e| e.to_string())? == card.read_row_shares(&card_learner.field, some, &questions).map_err(|e| e.to_string())?
+        };
+        // The same regions returned without the closure (the face's covector alone), host against card.
+        let open_equal = {
+            let some = &host_views[..host_views.len().min(6)];
+            end || some.is_empty() || {
+                let h = host_learner.field.read_and_return_with(some, false).map_err(|e| e.to_string())?;
+                let c = card.read_and_return_open(&card_learner.field, some).map_err(|e| e.to_string())?;
+                h == c
+            }
+        };
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && open_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} open_equal={open_equal} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,

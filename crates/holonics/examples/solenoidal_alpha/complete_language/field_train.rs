@@ -24,7 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{shares, Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
+use holonics::hnn::tower::field::{shares, Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
 use holonics::hnn::tower::TowerFace;
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
@@ -503,6 +503,65 @@ fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization:
     Ok(out)
 }
 
+/// [measurement; agent-inferred, November 2] **The held answer sites' rows by where their mass lies**
+/// ([`FieldRealization::read_row_shares`]), read on the held read's context regions (each problem's
+/// [`CONTEXT`] parts, base 3 of [`held_regions`], the answer starting at the question's end): for each head and
+/// tick, over the unresolved answer sites, the millionths of a row's mass on the question group (definite
+/// sites before the answer), on the soft near field (the near sources that are not definite) and on the rest,
+/// and the current's part from the question group per row (on the value's grain). A reading only: nothing in
+/// the run reads it.
+fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization, lap: i64) -> Result<()> {
+    let started = std::time::Instant::now();
+    let regions = held_regions(codec, problems);
+    let n = problems.len();
+    let views: Vec<Region> = regions.iter().skip(n).take(n * CONTEXT).map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
+    let questions: Vec<usize> = problems.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
+    let d = field.declaration;
+    let mut total = vec![HeldRows::default(); d.ticks * d.heads];
+    for (chunk, asks) in views.chunks(64).zip(questions.chunks(64)) {
+        for (acc, one) in total.iter_mut().zip(realization.read_row_shares(field, chunk, asks).map_err(|e| e.to_string())?) {
+            acc.rows += one.rows;
+            acc.question += one.question;
+            acc.soft_near += one.soft_near;
+            acc.other += one.other;
+            acc.question_current += one.question_current;
+        }
+    }
+    let share = |v: u128, rows: u64| (v * 1_000_000 >> 63) / rows.max(1) as u128;
+    println!("FIELD_ROWS_HELD_READ lap={lap} regions={} ms={}", views.len(), started.elapsed().as_millis());
+    for tick in 0..d.ticks {
+        for head in 0..d.heads {
+            let r = total[tick * d.heads + head];
+            println!(
+                "FIELD_ROWS_HELD lap={lap} head={head} tick={tick} rows={} question_share={} soft_near_share={} other_share={} question_current={}",
+                r.rows,
+                share(r.question, r.rows),
+                share(r.soft_near, r.rows),
+                share(r.other, r.rows),
+                r.question_current / r.rows.max(1) as i128
+            );
+        }
+    }
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 2] **The closure against the face** (§19): a section's covector with
+/// the closure's comparison and without it ([`FieldRealization::read_and_return_open`]) on the same material, the
+/// closure's part their difference; `dot = ⟨face, closure⟩`, `face_norm = ⟨face, face⟩`, `closure_norm =
+/// ⟨closure, closure⟩`, exact integer sums. One extra return of the lap's first section, read only.
+fn covectors_text(field: &Field, views: &[Region], realization: &mut dyn FieldRealization, lap: u64) -> Result<()> {
+    use num_bigint::BigInt;
+    let started = std::time::Instant::now();
+    let (_, full) = realization.read_and_return(field, views).map_err(|e| e.to_string())?;
+    let (_, face) = realization.read_and_return_open(field, views).map_err(|e| e.to_string())?;
+    let closure: Vec<i128> = full.iter().zip(&face).map(|(a, b)| a - b).collect();
+    let dot = |a: &[i128], b: &[i128]| a.iter().zip(b).fold(BigInt::from(0), |s, (&x, &y)| s + BigInt::from(x) * BigInt::from(y));
+    let (nf, nc, no) = (face.iter().filter(|&&x| x != 0).count(), closure.iter().filter(|&&x| x != 0).count(), face.iter().zip(&closure).filter(|(a, b)| **a != 0 && **b != 0).count());
+    println!("FIELD_COVECTORS_COUNTS lap={lap} entries={} face_nonzero={nf} closure_nonzero={nc} overlap={no}", face.len());
+    println!("FIELD_COVECTORS lap={lap} dot={} face_norm={} closure_norm={} ms={}", dot(&face, &closure), dot(&face, &face), dot(&closure, &closure), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [agent-inferred, November 1] **An answer read with its neighbours**: one problem's region (its
 /// question, answer and `length − |q| − |a|` voids) read in [`CONTEXT`] parts, the answer's sites
 /// and its first void at `t ≡ r (mod CONTEXT)` (counted from the answer's first site) unresolved in
@@ -754,6 +813,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     );
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
+    held_rows_text(&learner.field, &codec, &dev_set, realization, -1)?;
     // The withheld problems' code after the lap before (at the opening, before any lap).
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
@@ -779,6 +839,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
+            if n == 0 {
+                covectors_text(&learner.field, &views, realization, lap as u64)?;
+            }
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
@@ -835,6 +898,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         println!("FIELD_UNSEEN lap={lap} code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
+        held_rows_text(&learner.field, &codec, &dev_set, realization, lap as i64)?;
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.

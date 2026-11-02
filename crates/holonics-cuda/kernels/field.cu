@@ -2716,6 +2716,69 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
     }
 }
 
+// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** (the host's
+// `Field::held_rows`): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
+// the rows, the shares of the question group (a definite site before the region's answer start `qstart[r]`), of
+// the near field's sources that are not definite, and of the rest (with the crowds'), and the question group's
+// current `Σ release(p Σ_x |D ṽ_x|, 63)`. The five sums of a cell `[tick · H + h]` are added to `acc` (exact integers).
+extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart, uint32_t tick, wide *acc) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint32_t S = w.span, n = w.n;
+    const uint64_t rows = (uint64_t)w.H * w.T;
+    for (uint64_t hg = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hg < rows; hg += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
+        const uint32_t h = hg / w.T;
+        const uint64_t g = hg % w.T;
+        if (!w.unresolved[g]) {
+            continue;
+        }
+        const uint32_t r = w.site_region[g];
+        const uint64_t first = w.region_off[r];
+        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        const uint32_t question = qstart[r];
+        const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
+        wide q = 0, soft = 0, other = 0, cur = 0;
+        for (uint32_t j = lane; j < sites; j += 32) {
+            const wide p = (wide)erow[j];
+            if (p == 0) {
+                continue;
+            }
+            const uint32_t gap = j > i ? j - i : i - j;
+            const bool definite = definite_site(w, first + j);
+            if (definite && j < question) {
+                q += p;
+                wide current = 0;
+                for (uint32_t x = 0; x < S; x++) {
+                    const wide v = carried(w, h, x % n, gap, values[(uint64_t)j * S + x]);
+                    current += v < 0 ? -v : v;
+                }
+                cur += rel(p * current, SHARE_BITS);
+            } else if (gap < NEAR && !definite) {
+                soft += p;
+            } else {
+                other += p;
+            }
+        }
+        if (definite_site(w, g)) {
+            for (uint32_t slot = lane; slot < crowd_slots(sites); slot += 32) {
+                other += (wide)w.ce[hg * w.slots + slot];
+            }
+        }
+        q = warp_sum(q);
+        soft = warp_sum(soft);
+        other = warp_sum(other);
+        cur = warp_sum(cur);
+        if (lane == 0) {
+            wide *cell = acc + ((uint64_t)tick * w.H + h) * 5;
+            add_wide(cell, 1);
+            add_wide(cell + 1, q);
+            add_wide(cell + 2, soft);
+            add_wide(cell + 3, other);
+            add_wide(cell + 4, cur);
+        }
+    }
+}
+
 // Undo the frame on a chart's covector: `δq = conj(U) ⊙ δq̃` (`[t][2M]`).
 extern "C" __global__ void field_unframe(FieldWords w, int64_t *chart) {
     const uint64_t cells = (uint64_t)w.T * w.M;

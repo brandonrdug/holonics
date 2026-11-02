@@ -939,6 +939,23 @@ pub struct RowShares {
     pub peak: [u128; 2],
 }
 
+/// [measurement; agent-inferred, November 2] **A held read's rows at the answer sites by where their mass
+/// lies** ([`Field::held_rows`]), one cell a tick and head, over the unresolved sites of the regions read:
+/// the rows, and the shares (on `2^(−63)`, summed) of the sources of three groups: `question`, the definite
+/// sites before the region's answer start; `soft_near`, the near field's sources that are not definite
+/// (unresolved or soft answer neighbours); `other`, everything else (the far definite sites, the near
+/// definite sites at or past the answer start, the crowds). `question_current` is the current's part from the
+/// question group, `Σ p · Σ_x |D ṽ_x|` over its sources (each source's `release(p Σ_x |D ṽ_x|, 63)`, on the
+/// value's grain).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HeldRows {
+    pub rows: u64,
+    pub question: u128,
+    pub soft_near: u128,
+    pub other: u128,
+    pub question_current: i128,
+}
+
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Source {
@@ -1728,6 +1745,60 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** ([`HeldRows`]):
+    /// for each tick and head (`[tick · heads + head]`), over the region's unresolved sites, the shares of
+    /// the question group (definite sites before `question`), of the soft near field and of the rest, and the
+    /// current's part from the question group. A reading only: nothing in the law reads it.
+    pub fn held_rows(&self, region: &Region, question: usize) -> Result<Vec<HeldRows>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let (heads, n, span) = (d.heads, d.modes, 2 * d.modes);
+        let mut out = vec![HeldRows::default(); d.ticks * heads];
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                let acc = &mut out[tick * heads + h];
+                for i in (0..sites).filter(|&i| region.unresolved[i]) {
+                    acc.rows += 1;
+                    let hi = h * sites + i;
+                    for src in &cell.rows[hi] {
+                        let j = src.j as usize;
+                        let definite = Self::definite(region, j);
+                        if definite && j < question {
+                            acc.question += src.p as u128;
+                            let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                            let current: i128 = (0..span).map(|x| decayed(self.decay(h, x % n, i.abs_diff(j)), vj[x]).abs()).sum();
+                            acc.question_current += release(src.p as i128 * current, SHARE_BITS);
+                        } else if i.abs_diff(j) < NEAR && !definite {
+                            acc.soft_near += src.p as u128;
+                        } else {
+                            acc.other += src.p as u128;
+                        }
+                    }
+                    acc.other += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
+    pub fn held_rows_all(&self, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        if regions.len() != questions.len() {
+            return refuse("a held read's answer starts that are not one a region");
+        }
+        let mut out = vec![HeldRows::default(); self.declaration.ticks * self.declaration.heads];
+        for (region, &question) in regions.iter().zip(questions) {
+            for (acc, one) in out.iter_mut().zip(self.held_rows(region, question)?) {
+                acc.rows += one.rows;
+                acc.question += one.question;
+                acc.soft_near += one.soft_near;
+                acc.other += one.other;
+                acc.question_current += one.question_current;
+            }
+        }
+        Ok(out)
+    }
+
     /// Each unresolved site's readout logits over the region, on `2^(−16)` bits (`None` at a
     /// resolved site): the face at `β = 1` is [`Field::tempered`] of them.
     pub fn logits(&self, region: &Region) -> Result<Vec<Option<Vec<i64>>>> {
@@ -2167,6 +2238,12 @@ impl Field {
 
     /// Each region's faces and the covector over the regions, summed in any order to the same bits.
     pub fn read_and_return(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        self.read_and_return_with(regions, true)
+    }
+
+    /// [`Field::read_and_return`] with the closure's comparison (§19) or without it: the face's covector alone
+    /// (`closure = false`).
+    pub fn read_and_return_with(&self, regions: &[Region], closure: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let len = self.layout.len;
         let (mut faces, g) = regions
             .par_iter()
@@ -2175,7 +2252,7 @@ impl Field {
                 || (Vec::new(), vec![0i128; len]),
                 |(mut faces, mut g), (n, region)| -> Result<_> {
                     let pass = self.pass(region, true)?;
-                    self.reverse(region, &pass, &mut g)?;
+                    self.returned(region, &pass, &mut g, closure)?;
                     faces.push((n, pass.faces));
                     Ok((faces, g))
                 },
@@ -2840,6 +2917,16 @@ pub trait FieldRealization {
     fn met_pairs(&self) -> Option<u128> {
         None
     }
+    /// [`FieldRealization::read_and_return`] without the closure's comparison: the face's covector alone
+    /// ([`Field::read_and_return_with`]), a reading for the receipts.
+    fn read_and_return_open(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        refuse("a realization that cannot return without the closure")
+    }
+    /// A held read's rows by where their mass lies, summed over `regions` ([`Field::held_rows_all`]; each region's
+    /// answer start in `questions`), a reading for the receipts.
+    fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
+        refuse("a realization that cannot read its rows' shares")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -2859,6 +2946,12 @@ impl FieldRealization for HostField {
     }
     fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         field.landmarks(region, question, sites, count)
+    }
+    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        field.read_and_return_with(regions, false)
+    }
+    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+        field.held_rows_all(regions, questions)
     }
 }
 
