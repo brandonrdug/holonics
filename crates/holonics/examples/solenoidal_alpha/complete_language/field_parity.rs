@@ -246,7 +246,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,
     // fast, stopping and backward rates) and the parity reads the series between whole places on both realizations.
     if let Some(shift) = std::env::var("FIELD_PARITY_PACE").ok().and_then(|v| v.parse::<u32>().ok()) {
-        let (start, len) = (founded.field.layout().pace, founded.field.theta.len() - founded.field.layout().pace);
+        let (start, len) = (founded.field.layout().pace, founded.field.layout().moment_face - founded.field.layout().pace);
         let tail = p.keys.len().checked_sub(4 * len + 8).ok_or("a key file too short for the pace's draws")?;
         for k in 0..len {
             let word = &p.keys[tail + 4 * k..tail + 4 * k + 4];
@@ -367,7 +367,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             first.unwrap_or_else(|| "-".into()),
             receipt_h.deposited,
             receipt_h.halvings,
-            host_learner.field.theta[host_learner.field.layout().pace..].iter().filter(|&&v| v != 0).count(),
+            { let l = host_learner.field.layout(); host_learner.field.theta[l.pace..l.moment_face].iter().filter(|&&v| v != 0).count() },
             host_views.first().and_then(|r| host_learner.field.pace_range(r).ok().flatten()).map_or("-".to_string(), |(lo, hi)| format!("{}..{}", (lo as i128 * 1000) >> 24, (hi as i128 * 1000) >> 24)),
             ms((t1 - t0).as_nanos()),
             ms((t2 - t1).as_nanos())

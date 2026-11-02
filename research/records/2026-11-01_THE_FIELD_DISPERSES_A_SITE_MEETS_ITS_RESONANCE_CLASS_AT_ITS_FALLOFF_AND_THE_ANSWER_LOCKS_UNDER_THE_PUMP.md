@@ -2121,3 +2121,81 @@ currents and their covectors host against card included (`currents_equal`), 207.
 `currents-field` 6.2 s and, with the bound, 6.6 s against 30 s projected (0.21, 0.22), the card's batch store at
 4.69 GB and host RSS at 0.48 GB; the field's tests 56 of 56, the run example's field tests 18 of 18, the gate clean
 (185 s, and 174 s after the bound). Receipts: `_receipts/law21/receipts.txt`.
+
+### 16.22 A site opens on its moment
+
+[definition; agent-inferred, November 2] §16.21 read what the far current carries and how the face reads it: the current
+an answer row gathers from the question changes by about a third of itself between its own question and a foil, enough
+to move the code 0.680 bits a site were the change aligned with the code's covector, and the face used 0.000039 of it
+(0.01 % to 0.9 % on every head and tick). The change is there and points nowhere the answer site asks for. Read in the
+source, the cause is the opening.
+- **A site opened on the moment's three nearest terms.** `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1))`: every chart (key,
+  probe, value) reads `r̂(x)`, so at tick 0 a question site is found by its trigram alone, and at tick 1 by its trigram
+  and one hop. Its moment (§15.1) entered only the values and probes of the turned heads, never a key.
+- **The still heads never saw it.** A turned mode's lock is carried by its skin (`D_m(d) = e^(−2πd/n_m)`): at the
+  median answer-to-question distance of 306 sites only the rings of 729 and above hear (§16.20, H3), and those
+  rotate by relative place. The heads that compare content at any distance are the still heads, and their keys and
+  probes were trigrams. So a far contact could fit an answer site to a question site only by three bytes, and the
+  current a listener gathered over 77 to 148 effective sources was a share-weighted sum of trigram faces: which bytes
+  the question holds, about alike for every answer site of a problem, and not what a site asks for.
+
+The retention law says the source enters as phase-carried moments, `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`, and §15.1 already said
+a site carries its moment and its byte is only a pointer; the opening kept the pointer and three terms of the moment.
+**A site opens on its moment**:
+
+```text
+open     x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b_s, 24)     s_t the site's moments [2M], §15.1
+```
+
+- `C` (`D × 2M` on `2^(−24)`) reads a site's moments into its face, `b_s` its bias. Every chart then reads the moment:
+  fine rings carry the word a site stands in, coarse rings the passage, so a still head's key tells a question site by
+  its word and its probe asks with the answer site's own, and a value carries what reached its place. The three nearest
+  terms keep their own encodings (each a full row of the face).
+- **Founding.** `C` is a keyed draw on `±√(3/2T)` over its `2T` moment reals (a moment at unit power opens a unit-power
+  term), drawn after every other draw so those stand; a still mode carries no moment, so its column opens at zero, its
+  covector is zero and it stays zero. The moment encodings open at zero, so the founding's faces are the trigram's
+  exactly (a test reads it), and the chart gives the encodings a covector from the face's first deposit, where before
+  it waited on the return `O` and the contact.
+- **Return.** `δC += Σ_t δx⁰_t s_tᵀ`, `δb_s += Σ_t δx⁰_t`, and `δs_t += Cᵀ δx⁰_t` joins the values' and the probes'
+  covector before the strands' return (`moments_return`), so the moments' covector is the sum over every chart that
+  reads them.
+- **Growth.** `C` reads the moments as `O` reads the current: every copy of a head carries its source's moment whole,
+  so each entry is split evenly over its column's copies and its rows are repeated; the grown field reads the old faces
+  exactly.
+- **The card.** The same law through the kernels the field already has: `field_affine_x64` after the moments (the
+  host's `Field::open`), and in the reverse `field_outer_x64`, the bias's outer sum and `field_transposed` into the
+  moments' covector. No kernel is new. The state's head line is `hnn-field-v10`; a `v9` state is a superseded prototype.
+
+Why the opening and not a deeper question. A question relaxed for more ticks would compose its sites hop by hop, but
+every tick reads `r̂(x)`, and a key that is a trigram at tick 0 is a trigram plus what one tick's learned return wrote
+at tick 1; the moment gives every chart, at every tick, the word and passage a site stands in from the strand itself,
+with no learned hop between. In language models the same structure is the key that carries its predecessors' content,
+with which a single layer finds a site by the word it continues (Olsson et al., 2022, the smeared key). Here it is the
+helical moment, which the theory already carries, read where the keys are made.
+
+Failures this could repeat, checked:
+- **Catered machinery.** `C` is a chart of the field's own moment; it names no task, no byte and no operation, and
+  pairs no answer site with a question site. What the keys and probes agree on is what learning makes them agree on
+  (§16.19).
+- **Text as the exception.** The moment holds for any strand: image rows, acoustic samples and motor words open on
+  theirs alike.
+- **A located cause carried unrepaired.** §15.1 located the units' spelling cause and repaired it in the values; the
+  keys kept it. It is now repaired where the keys are made.
+- **Bits read as progress.** The run's claim is the question's effect against the foil, fixed before launch, and its
+  releases are shown whole.
+
+Owners `hnn::tower::field` (`FieldLayout::moment_face`, `Field::open`, `Field::found`, `Field::grown`,
+`returned_with`), the card's `CardField` (`moment_face`, the batch and its reverse), with the atlas rows
+`tower.field-one-region`, `tower.field-moment` and `tower.field-growth-by-copies`. Owed to #410: the opening's moment
+term as the helical code's face read through a chart, beside `Transport/SourceMoment`.
+
+[measurement, November 2] After the change: the gate clean (266 s); the field's tests 57 of 57, with
+`a_site_opens_on_its_moment` (two sites with one trigram open on one face where the chart is silent and apart where it
+reads their moments; the founding's openings and faces equal to the silent chart's) and the founding's draws counted
+and read at the moment's chart; the run example's field tests 18 of 18. The sampled card parity (reading 9's
+declaration, 3 sections, 8 withheld problems, one release of 40 sweeps): every read, face, covector, learner, row,
+share, current and release equal, in 195.9 s against 210 s projected (0.93; host 93.3 s, card 0.53 s), peak resident set
+2.2 GB, the card's batch store at 2.54 GB. The material is 37,624 entries (35,544 before). The receipt's `pace_nonzero`
+counted the material from the paces to its end, so it took in the moment's chart and its bias appended after them
+(1,024 drawn entries, then 32 once the bias moved: 1,024, 1,056 and 1,302 against 0, 0 and 246 before); the paces
+themselves moved as before, and the count now reads the pace family alone. Receipt: `_receipts/law22/parity.txt`.

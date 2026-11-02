@@ -223,6 +223,15 @@ struct MomentWords {
 }
 
 /// A kernel argument: the address of a value the launch copies.
+/// The moment's chart into the face (§16.22, [`holonics::hnn::tower::field::FieldLayout::moment_face`]): its offset in
+/// the material, its bias's, and its reach `max |C|` (the affine's carrier bound).
+fn moment_face(field: &Field) -> (u64, u64, u64) {
+    let (l, d) = (field.layout(), field.declaration);
+    let len = d.width * 2 * d.complex();
+    let reach = field.theta[l.moment_face..l.moment_face + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
+    (l.moment_face as u64, l.moment_face_bias as u64, reach)
+}
+
 fn arg<T>(v: &mut T) -> *mut c_void {
     (v as *mut T).cast()
 }
@@ -1106,6 +1115,9 @@ impl<'c> CardField<'c> {
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
         self.moments(field, words, regions.len(), sites)?;
+        // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
+        let (mface, mface_bias, rmface) = moment_face(field);
+        self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         self.mark("batch_setup");
         for k in 0..d.ticks {
             let tick = &ticks[if kept { k } else { 0 }];
@@ -1573,6 +1585,14 @@ impl<'c> CardField<'c> {
             }
             self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
         }
+        // The moment's chart into the face (§16.22, the host's `returned_with`): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`,
+        // and the moments' covector `δs_t += Cᵀ δx⁰_t` (formed in `dq`, free past the ticks) joined to the values' and probes'.
+        let (mface, mface_bias, _) = moment_face(field);
+        self.outer(words, g, mface_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, false)?;
+        self.outer(words, g, mface, dw, m2, dx.device_ptr(), dw, words.moment, m2, true, false)?;
+        self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
+        let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
+        self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks, through the
         // strands to the families (the host's `moments_return`).
         self.moments_return(field, words, g, &dm, regions, sites)?;
