@@ -2103,8 +2103,8 @@ without a far current:
 | 1 | 3 | +0.000014 | 0.068437 | +0.000185 | 1.069171 | −0.000047 | 0.333101 |
 
 Summed over heads: tick 0 far +0.000047, near +0.000547, rest +0.000102; tick 1 far −0.000008, near −0.000418, rest
-−0.000069. The far gain summed over heads and ticks is +0.000039 bits a site against a far bound of 0.678; on each head
-and tick the far gain is 0.03 % to 0.9 % of its bound.
+−0.000069. The far gain summed over heads and ticks is +0.000039 bits a site against a far bound of 0.680; on each head
+and tick the far gain is 0.01 % to 0.9 % of its bound.
 
 **4. Learned settings.** Each head's `log₂ T`, founded and after lap 2 (class receivers founded at 2, listeners at −1),
 and the median of each answer row's largest share (tick 0 / tick 1):
