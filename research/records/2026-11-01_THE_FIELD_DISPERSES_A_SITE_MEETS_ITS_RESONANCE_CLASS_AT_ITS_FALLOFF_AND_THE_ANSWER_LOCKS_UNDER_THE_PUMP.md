@@ -2029,3 +2029,31 @@ contact covector's grain; the far share `far / (near + far)` is the part of the 
 receives. A run reads it on a section's own regions before its step, at sections 1, 2, 4, 8 and 16 and at each lap's
 first (`FIELD_COVECTOR_SHARE`). It is zero at the founding (a test reads it so). The sampled card parity reads it host
 against card on each section's first regions (`shares_equal`): equal at every step in 182 s.
+
+[measurement, November 2] **The run after the three changes: the field hears the question and still learns nothing from
+it.** GSM8K on the card (commit `3fb8595c4`, reading 9's declaration, UNITS0, TRAIN.txt, HELD128.txt, KEYS8; 27 laps
+declared, STOP_MS 70 min inside Brandon's hard stop of 90 minutes; RTX 4080 SUPER under the lock, 24 host threads). The
+claim, fixed before launch: held answers code at least 0.1 bits a byte lower beside their own question than beside a foil.
+It failed, and the run stopped early after lap 2 (the declared third lap). By lap, the context code (an answer site read
+with its neighbours, beside its own question), the foil's and the question's effect, in bits a byte:
+
+| lap | lap s | context | foil | effect | withheld | covector's far share (heads 0–3, millionths) |
+|---|---|---|---|---|---|---|
+| 0 | 105 | 4.314174 | 4.315055 | +0.000881 | 4.317 | 709k–805k at sections 4 to 16 |
+| 1 | 112 | 3.246255 | 3.245105 | −0.001149 | 3.259 | 799k, 731k, 684k, 620k at lap 1's first |
+| 2 | 112 | 2.829326 | 2.828564 | −0.000762 | 2.845 | 796k, 768k, 676k, 576k at lap 2's first |
+
+The opening rows held the far question at 998,044 to 999,910 millionths on every head and lap; the still heads' effective
+far sources fell from 224 at the founding to 120 and 191 after lap 0 and 77 and 97 after lap 1 (95 and 148 after lap 2),
+the turned heads' stayed at 211 to 223. The release of STATE.2 (148 problems: the 128 held and 20 training mates for
+display, 1,000 sweeps, 469 s against its 15 minutes) locked no problem whole and read no extent: 11,286 sites reached and
+2,563 locked, 179,329 shown open; the 128 held releases wrote 2,290 bytes, 1,869 of them spaces (the rest `h`, `T`, `<`,
+`e`), every content site open. Device line: the card's batch store peaked at 8.21 GB (training) and 2.20 GB (release),
+host RSS at 0.75 GB and 0.81 GB; the lap ran 112 s against the 95 s projected (1.18) and under its 244 s bound. The
+releases are private (`.local/run/2026-11-02-field20/`, never committed). Receipt: `_receipts/law20/run/receipts.txt`.
+
+What it says: the silent-neighbour and random-lock causes are gone (the answer rows hear the question, the still heads
+concentrate on it, most of the contact covector reaches far pairs), and the answer still codes no better beside its own
+question than beside another's. The question's content reaches the answer site and is not made to bear on its code: the
+next loop's subject is what the far current carries and how the face reads it (the value's and the readout's side of H6),
+read before any further run.
