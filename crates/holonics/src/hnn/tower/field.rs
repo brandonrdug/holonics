@@ -880,6 +880,19 @@ pub struct Crowd {
     pub e: u64,
 }
 
+/// [measurement] Rows read by where their mass lies ([`Field::row_shares`]): `[0]` the open receivers,
+/// `[1]` the definite ones.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RowShares {
+    pub rows: [u64; 2],
+    pub far_sources: [u64; 2],
+    pub near: [u128; 2],
+    pub far: [u128; 2],
+    pub crowd: [u128; 2],
+    /// Each row's largest share summed (its peak), on `2^(−63)`.
+    pub peak: [u128; 2],
+}
+
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Source {
@@ -1585,6 +1598,34 @@ impl Field {
     /// Each unresolved site's face over the region (`None` at a resolved site).
     pub fn faces(&self, region: &Region) -> Result<Vec<Option<TowerFace>>> {
         Ok(self.pass(region, false)?.faces)
+    }
+
+    /// [measurement] **A region's rows read by where their mass lies** (§15.9's reading): over every
+    /// tick, head and receiver, open receivers (`[0]`) and definite ones (`[1]`) apart: the rows, the far
+    /// sources they meet, and the mass of their shares (on `2^(−63)`) on the near field, on far sources
+    /// and on crowds.
+    pub fn row_shares(&self, region: &Region) -> Result<RowShares> {
+        let pass = self.pass(region, true)?;
+        let sites = region.classes.len();
+        let mut out = RowShares::default();
+        for cell in &pass.ticks {
+            for (hi, row) in cell.rows.iter().enumerate() {
+                let i = hi % sites;
+                let k = usize::from(Self::definite(region, i));
+                out.rows[k] += 1;
+                for src in row {
+                    if (src.j as usize).abs_diff(i) < NEAR {
+                        out.near[k] += src.p as u128;
+                    } else {
+                        out.far[k] += src.p as u128;
+                        out.far_sources[k] += 1;
+                    }
+                }
+                out.crowd[k] += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                out.peak[k] += row.iter().map(|src| src.p).chain(cell.crowds[hi].iter().map(|c| c.e)).max().unwrap_or(0) as u128;
+            }
+        }
+        Ok(out)
     }
 
     /// Each unresolved site's readout logits over the region, on `2^(−16)` bits (`None` at a

@@ -747,6 +747,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
     let mut previous = (code, sites);
     let mut grown = false;
+    let mut fallen = false;
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
         // projection says could pass the run's deadline.
@@ -825,7 +826,13 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.
-        if (code as i128) * (previous.1 as i128) >= (previous.0 as i128) * (unseen_sites as i128) && lap + 1 < laps {
+        // [agent-inferred, November 2] Only once the withheld code has fallen at this width: a lap
+        // that raises it from where the width began has not spent the width but harmed it, and
+        // growing then copies the harm (the crib run of November 2 grew at lap 0 after its first lap
+        // raised the code from 5.459 to 5.912 bits, and its grown body refused 240 of 248 steps).
+        let fell = (code as i128) * (previous.1 as i128) < (previous.0 as i128) * (unseen_sites as i128);
+        fallen |= fell;
+        if !fell && fallen && lap + 1 < laps {
             if grown {
                 // A second growth has no projection in this run: the run rests at its last lap and
                 // the next run projects the declaration grown again.
@@ -834,6 +841,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             }
             learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
             grown = true;
+            fallen = false;
             let d = learner.field.declaration;
             println!("FIELD_GROW lap={lap} width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
         }
@@ -1345,6 +1353,65 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
         println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i} {receipt}\n{answer}\n", String::from_utf8_lossy(question));
     }
     println!("FIELD_RELEASE_TEXT problems={} sweeps={} live={} reached={} front={} open={} rung={} stopped={} ms={}", held.len(), last.done, last.live, last.reached, last.front, last.open, last.rung, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
+/// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
+/// neighbours (`unseen_regions`), training's masked regions and front regions' read 1 (`shape`), each
+/// set over the first `COUNT` training problems. With `KEYS`, the field is founded from the state's
+/// declaration on those keys (the founding); else the state is read as it stands.
+pub(super) fn rows_field(args: &[String]) -> Result<()> {
+    if args.len() != 11 && args.len() != 13 {
+        return Err("rows-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA TRAIN TRAIN_SHA COUNT SEED [KEYS KEYS_SHA]".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = match args.get(11..13) {
+        Some([keys, sha]) => Field::found(learner.field.declaration, &pinned_read(keys, sha, READ_BUDGET as usize)?).map_err(|e| e.to_string())?,
+        _ => learner.field,
+    };
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let train = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (count_n, seed) = (count(&args[9])?, args[10].parse::<u64>().map_err(|_| "a seed that is not a number")?);
+    let encoded: Problems = train.iter().take(count_n).map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>()?;
+    let encoded: Problems = encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
+    let all: Vec<usize> = (0..encoded.len()).collect();
+    let withheld: Vec<(Vec<usize>, Vec<bool>)> = unseen_regions(&codec, &encoded, &all, seed);
+    let (mut masked, mut fronts) = (Vec::new(), Vec::new());
+    let mut draw = 0u64;
+    for (q, a, _) in &encoded {
+        draw += 1;
+        let length = q.len() + a.len() + tail(seed, draw, codec.answer - a.len());
+        let mut classes = region_classes(&codec, q, a, length);
+        match shape(seed, draw, q.len(), length, a.len() + 1) {
+            Shape::Masked(mask) => masked.push((classes, mask)),
+            Shape::Front(front) => {
+                classes.truncate(front.cut);
+                fronts.push((classes, front.open.clone()));
+            }
+        }
+    }
+    for (name, set) in [("withheld", &withheld), ("masked", &masked), ("front_read1", &fronts)] {
+        let mut total = holonics::hnn::tower::field::RowShares::default();
+        for (classes, open) in set.iter() {
+            let r = field.row_shares(&Region { classes, unresolved: open, faces: &[], locked: &[], clock: &[], echo: &[] }).map_err(|e| e.to_string())?;
+            for k in 0..2 {
+                total.rows[k] += r.rows[k];
+                total.far_sources[k] += r.far_sources[k];
+                total.near[k] += r.near[k];
+                total.far[k] += r.far[k];
+                total.crowd[k] += r.crowd[k];
+                total.peak[k] += r.peak[k];
+            }
+        }
+        let share = |v: u128, k: usize| if total.rows[k] == 0 { 0 } else { (v * 1_000_000 >> 63) / total.rows[k] as u128 };
+        for (k, kind) in [(0usize, "open"), (1, "definite")] {
+            println!("FIELD_ROWS set={name} receivers={kind} regions={} rows={} far_sources_a_row={} near_millionths={} far_millionths={} crowd_millionths={} peak_millionths={}", set.len(), total.rows[k], total.far_sources[k] / total.rows[k].max(1), share(total.near[k], k), share(total.far[k], k), share(total.crowd[k], k), share(total.peak[k], k));
+        }
+    }
+    println!("FIELD_ROWS_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
