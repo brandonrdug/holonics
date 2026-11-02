@@ -1054,15 +1054,19 @@ opens at its equal-word guarantee (`2^(−β)`, `β = −2`); the listener's at 
 unrelated words at unit power) stays within the falloff's own span over the support's octaves while an
 equal word still leads (its lock `2n g` above the mean, the random maximum over `N` about `σ √(2 ln N)`,
 below it while `N < e^n`): `g = 1` at the crib's reach of 484 with `n = 8` (`σ = 4` bits against a span of 7;
-an equal word's lead over the maximum of 400 about 2 bits). The listener's opening at the all-pairs
-field's flat gain (`+2`) was built first and refuted: the cue coded 2.018 bits.
+an equal word's lead over the maximum of 400 about 2 bits). A listener opening at `+2` was built first and
+refuted: the cue coded 2.018 bits. [correction, November 2, from the review of 04:23] `+2` was taken for the
+gain of the field whose every site read every other, which passed the crib; that field (`0bf600eaa`) used a
+gain shift of `0` at this declaration, held its probe and key at unit power within a head, and kept separate
+learned probe and key charts, where this field ties them into one word. The `+2` run was an experiment, not
+that control.
 
 [measurement, November 2] The hypothesis this answered, that a listener's founding row peaks on the
 loudest of four hundred unrelated far words and drowns its near field, is refuted by its own fixture
 (`a_listener_s_founding_row_keeps_its_near_field`, 420 sites, no recurring word, 40 open): at the founding
 the near field holds 0.818 of an open listener's row and the loudest far source 0.005 at the listener's
-temperature, and 0.836 and 0.018 at the class receiver's. The crib run's first-lap rise is therefore not
-the founding's; its cause is open. The fixtures with the temperatures: the cue 0.007 bits, the recall
+temperature, and 0.836 and 0.018 at the class receiver's. That refutes the story on this fixture; it does
+not read the crib's own masks and fronts or the state after lap 0, so the first-lap rise's cause is open. The fixtures with the temperatures: the cue 0.007 bits, the recall
 0.001.
 
 [definition; agent-inferred, November 2] **Growth waits until the withheld code has fallen at its width.**
@@ -1082,6 +1086,24 @@ how many sites are definite. Each section's held read now also reads its problem
 part of `CONTEXT` a problem, keyed by its draw), read for the held step only and never fit: a step that codes
 the whole held read higher is halved or refused, as before. The crib run's per-lap withheld code is the
 measurement of whether lap 0 still harms.
+
+### 15.12 A lock is its key's foil, not its copy: a listener probes with its own chart
+
+[definition; agent-inferred, November 2] One word a head was both the probe and the key (§2.1), so a
+receiver's lock had to equal the key it fits: a source was found only where the two words resembled each
+other. That serves a cue (an equal word recurs) and fails a number wanted by its order, whose source shares
+no word with the answer site that asks for it. The field that passed the crib kept separate probe and key
+charts (the review of November 2's correction of §15.10). Read through Brandon's lens, a lock is its key's
+foil, related to it by a learned chart, not its copy. A listener (an open receiver, §15.9) now probes with
+its own chart `P` of the same read (framed and at unit power within its head as the word is), and its
+sources answer with their word; a class receiver's probe stays its word, since its support is the class its
+word names. `P` opens as the word chart itself, so the founding reads as before, and learning moves the
+probe apart from the key where a receiver asks for what does not resemble it. Growth splits `P` as it splits
+the word chart.
+
+[measurement, November 2] The number told by order: 1.148 bits at 300 sections, 0.412 at 350, 0.195 at
+400 and 0.046 at 600 (3.568, 2.674, 1.792 and 0.558 with the probe tied to the word; 0.40 at 300 under the
+field whose every site read every other). The cue 0.007, the recall 0.001; the field's tests 57 of 57.
 
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
