@@ -1,0 +1,369 @@
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15393161216 total=16802250752 batch_budget=10402070528
+FIELD_RELEASE_SWEEP set=free done=0 live=128 reached=0 front=0 locked=0 open=6784 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 ms=14
+FIELD_RELEASE_SWEEP set=free done=1 live=128 reached=640 front=5 locked=0 open=6784 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 ms=123
+FIELD_RELEASE_SWEEP set=free done=2 live=128 reached=640 front=5 locked=0 open=6784 rung=1 change=5640422 holding=0 soft=130 overturned=510 free=510 ms=246
+FIELD_RELEASE_SWEEP set=free done=3 live=128 reached=640 front=5 locked=0 open=6784 rung=2 change=1600576 holding=0 soft=640 overturned=0 free=510 ms=365
+FIELD_RELEASE_SWEEP set=free done=4 live=128 reached=640 front=5 locked=0 open=6784 rung=2 change=4802377 holding=0 soft=629 overturned=11 free=521 ms=489
+FIELD_RELEASE_SWEEP set=free done=5 live=128 reached=640 front=5 locked=0 open=6784 rung=4 change=2223319 holding=0 soft=528 overturned=112 free=633 ms=610
+FIELD_RELEASE_SWEEP set=free done=6 live=128 reached=641 front=6 locked=1 open=6783 rung=4 change=2542981 holding=1 soft=555 overturned=84 free=717 ms=730
+FIELD_RELEASE_SWEEP set=free done=7 live=128 reached=688 front=6 locked=48 open=6736 rung=8 change=2750696 holding=48 soft=553 overturned=40 free=757 ms=852
+FIELD_RELEASE_SWEEP set=free done=8 live=128 reached=880 front=9 locked=238 open=6546 rung=8 change=7643637 holding=238 soft=403 overturned=47 free=804 ms=975
+FIELD_RELEASE_SWEEP set=free done=9 live=128 reached=990 front=10 locked=347 open=6437 rung=16 change=9412735 holding=347 soft=361 overturned=172 free=976 ms=1097
+FIELD_RELEASE_SWEEP set=free done=10 live=128 reached=1249 front=10 locked=526 open=6258 rung=16 change=8787994 holding=526 soft=362 overturned=102 free=1078 ms=1221
+FIELD_RELEASE_SWEEP set=free done=11 live=128 reached=1279 front=10 locked=587 open=6197 rung=32 change=7210701 holding=587 soft=424 overturned=238 free=1316 ms=1352
+FIELD_RELEASE_SWEEP set=free done=12 live=128 reached=1281 front=11 locked=639 open=6145 rung=32 change=5741999 holding=639 soft=617 overturned=23 free=1339 ms=1482
+FIELD_RELEASE_SWEEP set=free done=13 live=128 reached=1281 front=11 locked=641 open=6143 rung=64 change=2605839 holding=641 soft=530 overturned=110 free=1449 ms=1610
+FIELD_RELEASE_SWEEP set=free done=14 live=128 reached=1325 front=11 locked=685 open=6099 rung=64 change=3420489 holding=685 soft=518 overturned=78 free=1527 ms=1735
+FIELD_RELEASE_SWEEP set=free done=15 live=128 reached=1349 front=12 locked=703 open=6081 rung=64 change=2352652 holding=703 soft=454 overturned=168 free=1695 ms=1861
+FIELD_RELEASE_SWEEP set=free done=16 live=128 reached=1530 front=14 locked=875 open=5909 rung=64 change=6033236 holding=875 soft=434 overturned=40 free=1735 ms=1987
+FIELD_RELEASE_SWEEP set=free done=17 live=128 reached=1590 front=14 locked=937 open=5847 rung=64 change=7089678 holding=937 soft=392 overturned=201 free=1936 ms=2119
+FIELD_RELEASE_SWEEP set=free done=18 live=128 reached=1699 front=15 locked=1038 open=5746 rung=64 change=7122007 holding=1038 soft=471 overturned=81 free=2017 ms=2248
+FIELD_RELEASE_SWEEP set=free done=19 live=128 reached=1864 front=15 locked=1187 open=5597 rung=64 change=7417226 holding=1187 soft=371 overturned=141 free=2158 ms=2379
+FIELD_RELEASE_SWEEP set=free done=20 live=128 reached=1906 front=16 locked=1260 open=5524 rung=64 change=6756843 holding=1260 soft=433 overturned=171 free=2329 ms=2514
+FIELD_RELEASE_SWEEP set=free done=21 live=128 reached=1938 front=16 locked=1294 open=5490 rung=64 change=4591520 holding=1294 soft=475 overturned=137 free=2466 ms=2651
+FIELD_RELEASE_SWEEP set=free done=22 live=128 reached=1952 front=16 locked=1311 open=5473 rung=64 change=3402072 holding=1311 soft=403 overturned=224 free=2690 ms=2785
+FIELD_RELEASE_SWEEP set=free done=23 live=128 reached=1985 front=17 locked=1344 open=5440 rung=64 change=3161022 holding=1344 soft=512 overturned=96 free=2786 ms=2922
+FIELD_RELEASE_SWEEP set=free done=24 live=128 reached=2065 front=19 locked=1421 open=5363 rung=64 change=3829064 holding=1421 soft=451 overturned=113 free=2899 ms=3056
+FIELD_RELEASE_SWEEP set=free done=25 live=128 reached=2188 front=19 locked=1539 open=5245 rung=64 change=5278101 holding=1539 soft=374 overturned=152 free=3051 ms=3198
+FIELD_RELEASE_SWEEP set=free done=26 live=128 reached=2262 front=20 locked=1616 open=5168 rung=64 change=6559034 holding=1616 soft=459 overturned=113 free=3164 ms=3336
+FIELD_RELEASE_SWEEP set=free done=27 live=128 reached=2338 front=20 locked=1684 open=5100 rung=64 change=5828229 holding=1684 soft=419 overturned=159 free=3323 ms=3479
+FIELD_RELEASE_SWEEP set=free done=28 live=128 reached=2468 front=21 locked=1798 open=4986 rung=64 change=5990250 holding=1798 soft=391 overturned=149 free=3472 ms=3621
+FIELD_RELEASE_SWEEP set=free done=29 live=128 reached=2540 front=21 locked=1890 open=4894 rung=64 change=6579822 holding=1890 soft=441 overturned=137 free=3609 ms=3768
+FIELD_RELEASE_SWEEP set=free done=30 live=128 reached=2569 front=22 locked=1927 open=4857 rung=64 change=5378096 holding=1927 soft=411 overturned=202 free=3811 ms=3913
+FIELD_RELEASE_SWEEP set=free done=31 live=128 reached=2605 front=22 locked=1963 open=4821 rung=64 change=3974164 holding=1963 soft=432 overturned=174 free=3985 ms=4059
+FIELD_RELEASE_SWEEP set=free done=32 live=128 reached=2660 front=23 locked=2018 open=4766 rung=64 change=3833267 holding=2018 soft=468 overturned=119 free=4104 ms=4200
+FIELD_RELEASE_SWEEP set=free done=33 live=128 reached=2737 front=24 locked=2097 open=4687 rung=64 change=4107613 holding=2097 soft=456 overturned=107 free=4211 ms=4342
+FIELD_RELEASE_SWEEP set=free done=34 live=128 reached=2828 front=24 locked=2178 open=4606 rung=64 change=4736247 holding=2178 soft=405 overturned=154 free=4365 ms=4490
+FIELD_RELEASE_SWEEP set=free done=35 live=128 reached=2887 front=25 locked=2242 open=4542 rung=64 change=5344620 holding=2242 soft=456 overturned=130 free=4495 ms=4636
+FIELD_RELEASE_SWEEP set=free done=36 live=128 reached=2958 front=26 locked=2314 open=4470 rung=64 change=5294517 holding=2314 soft=441 overturned=132 free=4627 ms=4779
+FIELD_RELEASE_SWEEP set=free done=37 live=128 reached=3066 front=26 locked=2408 open=4376 rung=64 change=5327834 holding=2408 soft=419 overturned=131 free=4758 ms=4924
+FIELD_RELEASE_SWEEP set=free done=38 live=128 reached=3125 front=26 locked=2499 open=4115 rung=64 change=5734821 holding=2504 soft=411 overturned=151 free=4909 ms=5073
+FIELD_RELEASE_SWEEP set=free done=39 live=124 reached=3094 front=27 locked=2476 open=4062 rung=64 change=5137310 holding=2552 soft=441 overturned=132 free=5041 ms=5221
+FIELD_RELEASE_SWEEP set=free done=40 live=124 reached=3136 front=28 locked=2519 open=4019 rung=64 change=4279608 holding=2519 soft=459 overturned=116 free=5157 ms=5364
+FIELD_RELEASE_SWEEP set=free done=41 live=124 reached=3183 front=28 locked=2571 open=3935 rung=64 change=3989523 holding=2572 soft=474 overturned=90 free=5247 ms=5508
+FIELD_RELEASE_SWEEP set=free done=42 live=122 reached=3214 front=29 locked=2607 open=3825 rung=64 change=3815190 holding=2649 soft=455 overturned=79 free=5326 ms=5653
+FIELD_RELEASE_SWEEP set=free done=43 live=121 reached=3256 front=29 locked=2650 open=3763 rung=64 change=4207702 holding=2669 soft=470 overturned=75 free=5401 ms=5793
+FIELD_RELEASE_SWEEP set=free done=44 live=121 reached=3299 front=30 locked=2694 open=3719 rung=64 change=4348664 holding=2694 soft=464 overturned=98 free=5499 ms=5937
+FIELD_RELEASE_SWEEP set=free done=45 live=121 reached=3366 front=30 locked=2761 open=3652 rung=64 change=4304857 holding=2761 soft=452 overturned=86 free=5585 ms=6081
+FIELD_RELEASE_SWEEP set=free done=46 live=121 reached=3401 front=30 locked=2812 open=3427 rung=64 change=4326782 holding=2818 soft=474 overturned=74 free=5659 ms=6223
+FIELD_RELEASE_SWEEP set=free done=47 live=116 reached=3362 front=31 locked=2784 open=3335 rung=64 change=4800641 holding=2904 soft=413 overturned=84 free=5743 ms=6365
+FIELD_RELEASE_SWEEP set=free done=48 live=116 reached=3418 front=32 locked=2842 open=3277 rung=64 change=4653055 holding=2842 soft=434 overturned=86 free=5829 ms=6504
+FIELD_RELEASE_SWEEP set=free done=49 live=116 reached=3460 front=32 locked=2888 open=3202 rung=64 change=4243687 holding=2889 soft=445 overturned=84 free=5913 ms=6642
+FIELD_RELEASE_SWEEP set=free done=50 live=114 reached=3449 front=33 locked=2891 open=3066 rung=64 change=3792785 holding=2942 soft=464 overturned=54 free=5967 ms=6780
+FIELD_RELEASE_SWEEP set=free done=51 live=112 reached=3449 front=33 locked=2900 open=2953 rung=64 change=3755115 holding=2952 soft=430 overturned=67 free=6034 ms=6917
+FIELD_RELEASE_SWEEP set=free done=52 live=111 reached=3462 front=34 locked=2927 open=2822 rung=128 change=3901159 holding=2956 soft=440 overturned=53 free=6087 ms=7051
+FIELD_RELEASE_SWEEP set=free done=53 live=106 reached=3877 front=34 locked=3358 open=2690 rung=128 change=3803660 holding=2982 soft=434 overturned=46 free=6133 ms=7183
+FIELD_RELEASE_ONE_RECEIPT problem=0 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=6/16/26/37/52 extent=- free_circulation=49 bound_circulation=27 lock_margin_bits_quartiles=3/25/33/39/56 rungs=4:2,8:23,16:2 ridden=1:69,2:79,4:68,8:72,16:56,32:484,64:89
+FIELD_RELEASE_ONE problem=0 released=53 held=46 lambda=4 friction=91 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=1 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/9/18/32/50 lock_sweep_quartiles=7/15/27/38/50 extent=- free_circulation=54 bound_circulation=25 lock_margin_bits_quartiles=9/27/34/42/76 rungs=8:23,16:2 ridden=1:66,2:72,4:70,8:84,16:59,32:298,64:258
+FIELD_RELEASE_ONE problem=1 released=53 held=30 lambda=2 friction=79 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=2 sites=28 open=2 reached=28 locked=26 reach_sweep_quartiles=0/7/15/30/42 lock_sweep_quartiles=6/15/24/34/49 extent=28@52:void free_circulation=39 bound_circulation=26 lock_margin_bits_quartiles=9/31/37/42/52 rungs=4:5,8:21 ridden=1:68,2:79,4:75,8:74,16:97,32:525,64:41
+FIELD_RELEASE_ONE problem=2 released=28 held=36 lambda=4 friction=56 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=3 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/9/18/33/48 lock_sweep_quartiles=7/15/27/36/48 extent=- free_circulation=51 bound_circulation=25 lock_margin_bits_quartiles=10/29/36/43/57 rungs=8:19,16:6 ridden=1:69,2:78,4:68,8:64,16:59,32:353,64:215
+FIELD_RELEASE_ONE problem=3 released=53 held=40 lambda=4 friction=85 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=4 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/15/27/40/52 extent=- free_circulation=54 bound_circulation=27 lock_margin_bits_quartiles=1/27/34/40/75 rungs=4:1,8:24,16:2 ridden=1:69,2:78,4:70,8:73,16:54,32:405,64:172
+FIELD_RELEASE_ONE problem=4 released=53 held=40 lambda=4 friction=85 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=5 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/37/51 lock_sweep_quartiles=6/15/26/38/51 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=2/25/34/42/59 rungs=4:5,8:21,16:2 ridden=1:73,2:72,4:81,8:72,16:64,32:487,64:112
+FIELD_RELEASE_ONE problem=5 released=53 held=40 lambda=4 friction=85 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=6 sites=26 open=1 reached=26 locked=25 reach_sweep_quartiles=0/7/18/27/39 lock_sweep_quartiles=7/15/27/37/51 extent=26@50:void free_circulation=63 bound_circulation=25 lock_margin_bits_quartiles=4/32/42/48/77 rungs=4:2,8:23 ridden=1:64,2:76,4:71,8:78,16:52,32:416,64:153
+FIELD_RELEASE_ONE problem=6 released=26 held=44 lambda=4 friction=62 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=7 sites=26 open=0 reached=26 locked=26 reach_sweep_quartiles=0/7/17/27/40 lock_sweep_quartiles=6/15/25/36/52 extent=26@52:void free_circulation=41 bound_circulation=26 lock_margin_bits_quartiles=2/33/38/47/60 rungs=4:2,8:22,16:2 ridden=1:65,2:77,4:79,8:70,16:59,32:449,64:131
+FIELD_RELEASE_ONE problem=7 released=26 held=39 lambda=4 friction=57 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=8 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/8/16/28/38 lock_sweep_quartiles=8/16/25/37/49 extent=24@48:void free_circulation=37 bound_circulation=23 lock_margin_bits_quartiles=0/29/36/48/72 rungs=4:2,8:19,16:3 ridden=1:63,2:64,4:73,8:71,16:53,32:356,64:121
+FIELD_RELEASE_ONE problem=8 released=24 held=21 lambda=2 friction=41 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=9 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/35/52 lock_sweep_quartiles=6/15/25/37/52 extent=- free_circulation=43 bound_circulation=27 lock_margin_bits_quartiles=1/25/34/40/56 rungs=4:4,8:23,16:1 ridden=1:71,2:76,4:72,8:76,16:57,32:502,64:99
+FIELD_RELEASE_ONE problem=9 released=53 held=43 lambda=4 friction=88 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=10 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/34/51 lock_sweep_quartiles=7/15/24/37/51 extent=- free_circulation=51 bound_circulation=26 lock_margin_bits_quartiles=2/25/32/40/77 rungs=4:1,8:24,16:1 ridden=1:68,2:78,4:72,8:76,16:59,32:418,64:145
+FIELD_RELEASE_ONE problem=10 released=53 held=43 lambda=4 friction=88 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=11 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/37/52 lock_sweep_quartiles=6/15/28/38/52 extent=- free_circulation=45 bound_circulation=26 lock_margin_bits_quartiles=1/26/32/36/51 rungs=4:4,8:21,16:2 ridden=1:67,2:74,4:72,8:80,16:54,32:451,64:113
+FIELD_RELEASE_ONE problem=11 released=53 held=44 lambda=4 friction=89 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=12 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/22/36/52 lock_sweep_quartiles=6/15/26/38/52 extent=- free_circulation=43 bound_circulation=28 lock_margin_bits_quartiles=2/23/33/40/56 rungs=4:3,8:24,16:1 ridden=1:69,2:80,4:73,8:74,16:57,32:471,64:124
+FIELD_RELEASE_ONE problem=12 released=53 held=42 lambda=4 friction=87 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=13 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/34/50 lock_sweep_quartiles=6/15/25/35/50 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=5/26/33/42/50 rungs=4:4,8:23,16:1 ridden=1:76,2:71,4:76,8:74,16:68,32:541,64:76
+FIELD_RELEASE_ONE problem=13 released=53 held=21 lambda=2 friction=70 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=14 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/9/20/31/50 lock_sweep_quartiles=7/16/28/38/50 extent=- free_circulation=47 bound_circulation=25 lock_margin_bits_quartiles=4/28/32/39/53 rungs=8:22,16:3 ridden=1:65,2:72,4:67,8:83,16:55,32:389,64:160
+FIELD_RELEASE_ONE problem=14 released=53 held=26 lambda=2 friction=75 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=15 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/21/36/51 lock_sweep_quartiles=7/16/27/38/51 extent=- free_circulation=53 bound_circulation=27 lock_margin_bits_quartiles=5/25/31/39/50 rungs=4:4,8:21,16:2 ridden=1:70,2:72,4:73,8:80,16:58,32:508,64:67
+FIELD_RELEASE_ONE problem=15 released=53 held=26 lambda=2 friction=75 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=16 sites=25 open=0 reached=25 locked=25 reach_sweep_quartiles=0/8/18/28/39 lock_sweep_quartiles=7/16/26/37/50 extent=25@49:void free_circulation=42 bound_circulation=24 lock_margin_bits_quartiles=2/30/37/44/61 rungs=4:3,8:21,16:1 ridden=1:61,2:70,4:75,8:72,16:52,32:435,64:80
+FIELD_RELEASE_ONE problem=16 released=25 held=35 lambda=4 friction=52 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=17 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/9/21/35/51 lock_sweep_quartiles=7/16/26/39/51 extent=- free_circulation=46 bound_circulation=24 lock_margin_bits_quartiles=4/29/33/44/66 rungs=8:20,16:4,32:1 ridden=1:62,2:70,4:65,8:78,16:58,32:231,64:307,128:1
+FIELD_RELEASE_ONE problem=17 released=53 held=36 lambda=4 friction=81 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=18 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/36/52 lock_sweep_quartiles=7/15/27/39/52 extent=- free_circulation=48 bound_circulation=27 lock_margin_bits_quartiles=2/25/33/39/77 rungs=4:2,8:24,16:2 ridden=1:73,2:72,4:76,8:71,16:60,32:410,64:168
+FIELD_RELEASE_ONE problem=18 released=53 held=35 lambda=4 friction=80 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=19 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/34/52 lock_sweep_quartiles=6/15/25/37/52 extent=- free_circulation=42 bound_circulation=28 lock_margin_bits_quartiles=1/27/35/42/58 rungs=4:7,8:20,16:1 ridden=1:71,2:82,4:79,8:66,16:60,32:476,64:125
+FIELD_RELEASE_ONE problem=19 released=53 held=43 lambda=4 friction=88 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=20 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/22/35/51 lock_sweep_quartiles=7/16/25/37/51 extent=- free_circulation=45 bound_circulation=26 lock_margin_bits_quartiles=5/28/33/37/72 rungs=4:2,8:19,16:5 ridden=1:64,2:67,4:77,8:72,16:56,32:322,64:243
+FIELD_RELEASE_ONE problem=20 released=53 held=21 lambda=2 friction=70 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=21 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/37/52 lock_sweep_quartiles=6/15/26/37/52 extent=- free_circulation=51 bound_circulation=26 lock_margin_bits_quartiles=1/24/34/39/56 rungs=4:3,8:21,16:3 ridden=1:66,2:79,4:74,8:74,16:63,32:463,64:103
+FIELD_RELEASE_ONE problem=21 released=53 held=21 lambda=2 friction=70 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=22 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/23/34/50 lock_sweep_quartiles=7/15/24/38/50 extent=- free_circulation=47 bound_circulation=26 lock_margin_bits_quartiles=4/25/32/39/76 rungs=4:1,8:24,16:1 ridden=1:70,2:74,4:78,8:71,16:57,32:414,64:151
+FIELD_RELEASE_ONE problem=22 released=53 held=45 lambda=4 friction=90 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=23 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/36/50 lock_sweep_quartiles=6/15/27/37/50 extent=- free_circulation=43 bound_circulation=28 lock_margin_bits_quartiles=7/24/32/37/49 rungs=4:3,8:22,16:3 ridden=1:71,2:78,4:74,8:78,16:60,32:543,64:55
+FIELD_RELEASE_ONE problem=23 released=53 held=25 lambda=2 friction=74 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=24 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/33/51 lock_sweep_quartiles=7/15/24/36/51 extent=- free_circulation=54 bound_circulation=26 lock_margin_bits_quartiles=2/27/32/39/74 rungs=8:22,16:4 ridden=1:70,2:74,4:66,8:73,16:56,32:421,64:157
+FIELD_RELEASE_ONE problem=24 released=53 held=27 lambda=2 friction=76 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=25 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/50 lock_sweep_quartiles=7/15/27/37/50 extent=- free_circulation=46 bound_circulation=27 lock_margin_bits_quartiles=5/25/33/39/55 rungs=4:3,8:23,16:1 ridden=1:72,2:76,4:78,8:68,16:100,32:409,64:128
+FIELD_RELEASE_ONE problem=25 released=53 held=44 lambda=4 friction=89 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=26 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/51 lock_sweep_quartiles=6/15/25/37/51 extent=- free_circulation=42 bound_circulation=28 lock_margin_bits_quartiles=5/26/33/41/58 rungs=4:5,8:21,16:2 ridden=1:75,2:78,4:75,8:73,16:68,32:498,64:108
+FIELD_RELEASE_ONE problem=26 released=53 held=21 lambda=2 friction=70 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=27 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/51 lock_sweep_quartiles=7/15/26/36/51 extent=- free_circulation=56 bound_circulation=27 lock_margin_bits_quartiles=2/26/32/40/78 rungs=4:1,8:23,16:3 ridden=1:70,2:80,4:74,8:72,16:55,32:435,64:148
+FIELD_RELEASE_ONE problem=27 released=53 held=25 lambda=2 friction=74 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=28 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/23/34/50 lock_sweep_quartiles=7/15/24/38/50 extent=- free_circulation=47 bound_circulation=26 lock_margin_bits_quartiles=4/25/32/39/77 rungs=4:1,8:24,16:1 ridden=1:70,2:74,4:78,8:70,16:58,32:413,64:152
+FIELD_RELEASE_ONE problem=28 released=53 held=17 lambda=2 friction=66 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=29 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/24/37/52 lock_sweep_quartiles=7/15/28/38/52 extent=- free_circulation=56 bound_circulation=25 lock_margin_bits_quartiles=1/27/32/37/53 rungs=8:23,16:3 ridden=1:64,2:71,4:72,8:68,16:59,32:381,64:175
+FIELD_RELEASE_ONE problem=29 released=53 held=26 lambda=2 friction=75 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=30 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/8/19/36/51 lock_sweep_quartiles=7/16/26/38/51 extent=- free_circulation=54 bound_circulation=25 lock_margin_bits_quartiles=4/27/34/37/68 rungs=8:21,16:4 ridden=1:63,2:71,4:70,8:68,16:58,32:354,64:205
+FIELD_RELEASE_ONE problem=30 released=53 held=25 lambda=2 friction=74 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=31 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/10/20/37/51 lock_sweep_quartiles=9/18/29/41/51 extent=- free_circulation=50 bound_circulation=25 lock_margin_bits_quartiles=3/27/33/44/64 rungs=4:1,8:19,16:5 ridden=1:66,2:71,4:69,8:76,16:53,32:260,64:243
+FIELD_RELEASE_ONE problem=31 released=53 held=26 lambda=2 friction=75 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=32 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/9/18/27 lock_sweep_quartiles=7/11/19/27/38 extent=19@37:void free_circulation=43 bound_circulation=19 lock_margin_bits_quartiles=2/29/36/49/74 rungs=8:18,16:1 ridden=1:50,2:52,4:55,8:55,16:38,32:176,64:94
+FIELD_RELEASE_ONE problem=32 released=19 held=44 lambda=4 friction=55 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=33 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/7/24/34/50 lock_sweep_quartiles=7/15/25/37/50 extent=- free_circulation=43 bound_circulation=28 lock_margin_bits_quartiles=5/23/30/39/43 rungs=4:9,8:19 ridden=1:71,2:80,4:83,8:73,16:105,32:514,64:41
+FIELD_RELEASE_ONE problem=33 released=53 held=42 lambda=4 friction=87 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=34 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/9/22/35/52 lock_sweep_quartiles=6/17/27/38/52 extent=- free_circulation=37 bound_circulation=28 lock_margin_bits_quartiles=0/24/33/39/53 rungs=4:5,8:22,16:2 ridden=1:70,2:78,4:73,8:68,16:57,32:529,64:88
+FIELD_RELEASE_ONE problem=34 released=53 held=30 lambda=2 friction=79 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=35 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/7/15/27/36 lock_sweep_quartiles=7/15/25/36/46 extent=24@45:void free_circulation=46 bound_circulation=23 lock_margin_bits_quartiles=0/32/45/55/78 rungs=8:19,16:5 ridden=1:62,2:61,4:66,8:61,16:56,32:226,64:194
+FIELD_RELEASE_ONE problem=35 released=24 held=21 lambda=2 friction=41 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=36 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/21/35/51 lock_sweep_quartiles=6/15/26/37/51 extent=- free_circulation=47 bound_circulation=26 lock_margin_bits_quartiles=9/28/35/39/53 rungs=4:4,8:20,16:1,32:1 ridden=1:66,2:76,4:67,8:75,16:61,32:448,64:133
+FIELD_RELEASE_ONE problem=36 released=53 held=35 lambda=4 friction=80 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=37 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/51 lock_sweep_quartiles=6/15/25/37/51 extent=- free_circulation=50 bound_circulation=28 lock_margin_bits_quartiles=5/24/34/42/63 rungs=4:5,8:21,16:2 ridden=1:76,2:77,4:75,8:73,16:110,32:479,64:85
+FIELD_RELEASE_ONE problem=37 released=53 held=30 lambda=2 friction=79 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=38 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/36/51 lock_sweep_quartiles=6/15/27/36/51 extent=- free_circulation=44 bound_circulation=27 lock_margin_bits_quartiles=4/26/36/41/60 rungs=4:4,8:21,16:2 ridden=1:68,2:82,4:76,8:68,16:52,32:443,64:140
+FIELD_RELEASE_ONE problem=38 released=53 held=25 lambda=2 friction=74 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=39 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/51 lock_sweep_quartiles=7/15/25/37/51 extent=- free_circulation=51 bound_circulation=27 lock_margin_bits_quartiles=2/24/33/37/72 rungs=4:2,8:23,16:2 ridden=1:68,2:75,4:78,8:76,16:54,32:406,64:176
+FIELD_RELEASE_ONE problem=39 released=53 held=45 lambda=4 friction=90 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=40 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/9/22/37/52 lock_sweep_quartiles=6/16/28/38/52 extent=- free_circulation=55 bound_circulation=27 lock_margin_bits_quartiles=0/25/32/39/58 rungs=4:4,8:20,16:3 ridden=1:68,2:83,4:73,8:70,16:55,32:433,64:130
+FIELD_RELEASE_ONE problem=40 released=53 held=20 lambda=2 friction=69 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=41 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/9/18/27 lock_sweep_quartiles=7/11/19/27/38 extent=19@37:void free_circulation=44 bound_circulation=19 lock_margin_bits_quartiles=3/29/43/50/74 rungs=8:18,16:1 ridden=1:50,2:52,4:55,8:56,16:40,32:165,64:102
+FIELD_RELEASE_ONE problem=41 released=19 held=43 lambda=4 friction=54 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=42 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/24/36/51 lock_sweep_quartiles=8/16/28/37/51 extent=- free_circulation=59 bound_circulation=26 lock_margin_bits_quartiles=4/28/31/39/74 rungs=4:1,8:25 ridden=1:68,2:71,4:75,8:83,16:53,32:394,64:156
+FIELD_RELEASE_ONE problem=42 released=53 held=50 lambda=4 friction=95 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=43 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/9/18/27 lock_sweep_quartiles=7/11/19/27/38 extent=19@37:void free_circulation=45 bound_circulation=19 lock_margin_bits_quartiles=3/29/35/48/72 rungs=8:18,16:1 ridden=1:50,2:52,4:55,8:55,16:38,32:176,64:94
+FIELD_RELEASE_ONE problem=43 released=19 held=26 lambda=2 friction=41 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=44 sites=28 open=0 reached=28 locked=28 reach_sweep_quartiles=0/7/17/29/40 lock_sweep_quartiles=6/15/25/38/52 extent=28@51:void free_circulation=42 bound_circulation=26 lock_margin_bits_quartiles=2/32/41/52/62 rungs=4:6,8:21,16:1 ridden=1:68,2:75,4:82,8:75,16:63,32:467,64:135
+FIELD_RELEASE_ONE problem=44 released=28 held=20 lambda=2 friction=44 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=45 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=7/15/27/37/52 extent=- free_circulation=57 bound_circulation=27 lock_margin_bits_quartiles=1/27/33/38/73 rungs=8:25,16:2 ridden=1:70,2:75,4:70,8:77,16:58,32:407,64:168
+FIELD_RELEASE_ONE problem=45 released=53 held=25 lambda=2 friction=74 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=46 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/37/51 lock_sweep_quartiles=7/15/26/39/51 extent=- free_circulation=49 bound_circulation=26 lock_margin_bits_quartiles=3/26/33/41/72 rungs=4:1,8:21,16:4 ridden=1:67,2:65,4:75,8:74,16:53,32:324,64:238
+FIELD_RELEASE_ONE problem=46 released=53 held=36 lambda=4 friction=81 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=47 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/6/15/25/35 lock_sweep_quartiles=6/13/25/34/46 extent=24@45:void free_circulation=41 bound_circulation=23 lock_margin_bits_quartiles=0/27/38/47/64 rungs=4:5,8:19 ridden=1:62,2:71,4:64,8:67,16:51,32:393,64:52
+FIELD_RELEASE_ONE problem=47 released=24 held=21 lambda=2 friction=41 total_ms=7195
+FIELD_RELEASE_ONE_RECEIPT problem=48 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=7/15/27/36/52 extent=- free_circulation=62 bound_circulation=26 lock_margin_bits_quartiles=0/27/31/39/75 rungs=4:1,8:23,16:3 ridden=1:69,2:76,4:70,8:77,16:62,32:407,64:162
+FIELD_RELEASE_ONE problem=48 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=49 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/9/23/36/52 lock_sweep_quartiles=6/15/26/39/52 extent=- free_circulation=48 bound_circulation=29 lock_margin_bits_quartiles=3/24/32/40/56 rungs=4:5,8:23,16:1 ridden=1:75,2:74,4:79,8:78,16:62,32:498,64:112
+FIELD_RELEASE_ONE problem=49 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=50 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/23/34/50 lock_sweep_quartiles=7/15/24/35/50 extent=- free_circulation=44 bound_circulation=26 lock_margin_bits_quartiles=4/26/33/40/79 rungs=4:1,8:22,16:3 ridden=1:72,2:71,4:79,8:73,16:58,32:447,64:135
+FIELD_RELEASE_ONE problem=50 released=53 held=30 lambda=2 friction=79 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=51 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/38/52 lock_sweep_quartiles=8/16/28/39/52 extent=- free_circulation=50 bound_circulation=26 lock_margin_bits_quartiles=1/23/31/37/73 rungs=4:1,8:23,16:3 ridden=1:68,2:76,4:68,8:79,16:53,32:415,64:138
+FIELD_RELEASE_ONE problem=51 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=52 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/8/23/34/51 lock_sweep_quartiles=5/15/25/39/51 extent=- free_circulation=37 bound_circulation=28 lock_margin_bits_quartiles=2/25/33/40/48 rungs=4:6,8:22 ridden=1:74,2:80,4:78,8:73,16:100,32:494,64:72
+FIELD_RELEASE_ONE problem=52 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=53 sites=25 open=1 reached=25 locked=24 reach_sweep_quartiles=0/8/17/30/42 lock_sweep_quartiles=7/14/26/38/51 extent=25@52:void free_circulation=48 bound_circulation=24 lock_margin_bits_quartiles=11/30/38/54/75 rungs=8:20,16:4 ridden=1:62,2:71,4:64,8:78,16:52,32:396,64:142
+FIELD_RELEASE_ONE problem=53 released=25 held=40 lambda=4 friction=57 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=54 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=8/16/27/37/52 extent=- free_circulation=42 bound_circulation=25 lock_margin_bits_quartiles=1/24/32/38/73 rungs=4:1,8:21,16:4 ridden=1:69,2:71,4:72,8:73,16:54,32:405,64:149
+FIELD_RELEASE_ONE problem=54 released=53 held=42 lambda=4 friction=87 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=55 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/7/22/35/52 lock_sweep_quartiles=6/17/25/40/52 extent=- free_circulation=43 bound_circulation=29 lock_margin_bits_quartiles=1/26/32/41/71 rungs=4:7,8:21,16:1 ridden=1:72,2:78,4:81,8:70,16:102,32:493,64:91
+FIELD_RELEASE_ONE problem=55 released=53 held=44 lambda=4 friction=89 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=56 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/36/51 lock_sweep_quartiles=8/16/27/36/51 extent=- free_circulation=54 bound_circulation=26 lock_margin_bits_quartiles=1/27/34/38/73 rungs=4:1,8:23,16:2 ridden=1:70,2:74,4:73,8:73,16:58,32:384,64:175
+FIELD_RELEASE_ONE problem=56 released=53 held=43 lambda=4 friction=88 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=57 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/15/27/37/52 extent=- free_circulation=54 bound_circulation=27 lock_margin_bits_quartiles=0/26/31/38/72 rungs=4:1,8:24,16:2 ridden=1:70,2:73,4:71,8:81,16:59,32:407,64:159
+FIELD_RELEASE_ONE problem=57 released=53 held=40 lambda=4 friction=85 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=58 sites=27 open=0 reached=27 locked=27 reach_sweep_quartiles=0/7/17/27/41 lock_sweep_quartiles=7/15/25/37/52 extent=27@51:void free_circulation=45 bound_circulation=27 lock_margin_bits_quartiles=0/31/38/49/77 rungs=4:1,8:25,16:1 ridden=1:68,2:72,4:76,8:74,16:58,32:438,64:148
+FIELD_RELEASE_ONE problem=58 released=27 held=25 lambda=2 friction=48 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=59 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/51 lock_sweep_quartiles=7/15/26/37/51 extent=- free_circulation=52 bound_circulation=27 lock_margin_bits_quartiles=2/27/34/40/76 rungs=4:1,8:23,16:3 ridden=1:70,2:80,4:77,8:72,16:56,32:397,64:182
+FIELD_RELEASE_ONE problem=59 released=53 held=42 lambda=4 friction=87 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=60 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/10/19/28 lock_sweep_quartiles=7/10/19/29/41 extent=19@37:void free_circulation=41 bound_circulation=18 lock_margin_bits_quartiles=2/27/35/36/51 rungs=4:1,8:16,16:2 ridden=1:47,2:52,4:52,8:57,16:44,32:293,64:23
+FIELD_RELEASE_ONE problem=60 released=19 held=47 lambda=4 friction=58 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=61 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=6/16/25/35/52 extent=- free_circulation=38 bound_circulation=26 lock_margin_bits_quartiles=1/25/33/38/53 rungs=4:4,8:20,16:2 ridden=1:67,2:72,4:85,8:69,16:55,32:461,64:96
+FIELD_RELEASE_ONE problem=61 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=62 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/9/21/37/52 lock_sweep_quartiles=6/14/27/37/52 extent=- free_circulation=47 bound_circulation=26 lock_margin_bits_quartiles=1/28/32/39/82 rungs=4:4,8:22,16:1 ridden=1:66,2:77,4:70,8:75,16:55,32:405,64:181
+FIELD_RELEASE_ONE problem=62 released=53 held=42 lambda=4 friction=87 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=63 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/9/23/36/52 lock_sweep_quartiles=6/15/26/39/52 extent=- free_circulation=47 bound_circulation=28 lock_margin_bits_quartiles=3/28/37/43/61 rungs=4:6,8:20,16:3 ridden=1:70,2:78,4:80,8:74,16:65,32:472,64:133
+FIELD_RELEASE_ONE problem=63 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=64 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/36/50 lock_sweep_quartiles=6/15/27/38/50 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=3/24/33/38/50 rungs=4:4,8:22,16:1,32:1 ridden=1:71,2:80,4:75,8:72,16:60,32:528,64:69
+FIELD_RELEASE_ONE problem=64 released=53 held=41 lambda=4 friction=86 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=65 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/51 lock_sweep_quartiles=7/15/27/38/51 extent=- free_circulation=47 bound_circulation=27 lock_margin_bits_quartiles=4/25/33/39/78 rungs=4:2,8:24,16:1 ridden=1:68,2:74,4:78,8:73,16:62,32:412,64:164
+FIELD_RELEASE_ONE problem=65 released=53 held=35 lambda=4 friction=80 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=66 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/35/51 lock_sweep_quartiles=6/15/26/36/51 extent=- free_circulation=46 bound_circulation=27 lock_margin_bits_quartiles=1/26/33/40/58 rungs=4:6,8:20,16:2 ridden=1:73,2:80,4:75,8:73,16:63,32:501,64:97
+FIELD_RELEASE_ONE problem=66 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=67 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/20/36/49 lock_sweep_quartiles=6/15/27/37/49 extent=- free_circulation=53 bound_circulation=27 lock_margin_bits_quartiles=6/24/33/40/50 rungs=4:3,8:23,16:1 ridden=1:69,2:75,4:78,8:73,16:63,32:515,64:74
+FIELD_RELEASE_ONE problem=67 released=53 held=36 lambda=4 friction=81 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=68 sites=25 open=0 reached=25 locked=25 reach_sweep_quartiles=0/7/17/27/38 lock_sweep_quartiles=6/14/26/37/50 extent=25@49:void free_circulation=52 bound_circulation=25 lock_margin_bits_quartiles=3/33/45/52/78 rungs=4:2,8:20,16:3 ridden=1:61,2:71,4:69,8:72,16:56,32:340,64:190
+FIELD_RELEASE_ONE problem=68 released=25 held=20 lambda=2 friction=41 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=69 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=7/15/27/36/52 extent=- free_circulation=56 bound_circulation=27 lock_margin_bits_quartiles=1/26/31/38/73 rungs=8:23,16:4 ridden=1:68,2:77,4:67,8:73,16:58,32:421,64:158
+FIELD_RELEASE_ONE problem=69 released=53 held=35 lambda=4 friction=80 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=70 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/9/23/36/52 lock_sweep_quartiles=6/15/26/39/52 extent=- free_circulation=41 bound_circulation=28 lock_margin_bits_quartiles=3/26/37/42/60 rungs=4:6,8:20,16:3 ridden=1:71,2:76,4:81,8:75,16:65,32:498,64:106
+FIELD_RELEASE_ONE problem=70 released=53 held=40 lambda=4 friction=85 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=71 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/50 lock_sweep_quartiles=7/15/26/37/50 extent=- free_circulation=42 bound_circulation=27 lock_margin_bits_quartiles=5/28/34/41/78 rungs=4:1,8:25,16:1 ridden=1:71,2:72,4:80,8:75,16:58,32:396,64:182
+FIELD_RELEASE_ONE problem=71 released=53 held=35 lambda=4 friction=80 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=72 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/52 lock_sweep_quartiles=7/15/27/36/52 extent=- free_circulation=39 bound_circulation=26 lock_margin_bits_quartiles=1/26/34/39/75 rungs=8:25,16:2 ridden=1:70,2:73,4:68,8:76,16:59,32:389,64:188
+FIELD_RELEASE_ONE problem=72 released=53 held=44 lambda=4 friction=89 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=73 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/7/15/27/36 lock_sweep_quartiles=7/15/25/36/46 extent=24@45:void free_circulation=48 bound_circulation=23 lock_margin_bits_quartiles=0/31/44/54/77 rungs=8:19,16:5 ridden=1:62,2:61,4:67,8:62,16:51,32:229,64:194
+FIELD_RELEASE_ONE problem=73 released=24 held=44 lambda=4 friction=60 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=74 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/36/51 lock_sweep_quartiles=6/15/27/37/51 extent=- free_circulation=49 bound_circulation=27 lock_margin_bits_quartiles=4/26/33/38/55 rungs=4:4,8:22,16:1 ridden=1:66,2:79,4:76,8:72,16:57,32:486,64:96
+FIELD_RELEASE_ONE problem=74 released=53 held=40 lambda=4 friction=85 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=75 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/23/35/52 lock_sweep_quartiles=7/15/26/36/52 extent=- free_circulation=51 bound_circulation=26 lock_margin_bits_quartiles=0/27/33/42/73 rungs=4:2,8:23,16:1 ridden=1:67,2:72,4:77,8:74,16:52,32:349,64:223
+FIELD_RELEASE_ONE problem=75 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=76 sites=26 open=0 reached=26 locked=26 reach_sweep_quartiles=0/7/18/27/39 lock_sweep_quartiles=7/15/27/37/52 extent=26@51:void free_circulation=60 bound_circulation=25 lock_margin_bits_quartiles=3/30/39/49/77 rungs=4:2,8:23,16:1 ridden=1:66,2:73,4:74,8:76,16:58,32:415,64:153
+FIELD_RELEASE_ONE problem=76 released=26 held=42 lambda=4 friction=60 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=77 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/34/51 lock_sweep_quartiles=6/15/25/35/51 extent=- free_circulation=47 bound_circulation=28 lock_margin_bits_quartiles=5/25/34/42/59 rungs=4:5,8:20,16:3 ridden=1:73,2:74,4:77,8:75,16:64,32:510,64:107
+FIELD_RELEASE_ONE problem=77 released=53 held=36 lambda=4 friction=81 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=78 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/51 lock_sweep_quartiles=7/15/27/38/51 extent=- free_circulation=45 bound_circulation=27 lock_margin_bits_quartiles=5/26/32/39/79 rungs=4:2,8:22,16:3 ridden=1:70,2:74,4:77,8:66,16:60,32:435,64:136
+FIELD_RELEASE_ONE problem=78 released=53 held=30 lambda=2 friction=79 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=79 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/36/52 lock_sweep_quartiles=6/15/27/39/52 extent=- free_circulation=46 bound_circulation=27 lock_margin_bits_quartiles=1/26/33/39/54 rungs=4:4,8:24 ridden=1:68,2:79,4:74,8:78,16:56,32:451,64:138
+FIELD_RELEASE_ONE problem=79 released=53 held=44 lambda=4 friction=89 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=80 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/9/18/27 lock_sweep_quartiles=7/11/19/27/38 extent=19@37:void free_circulation=42 bound_circulation=19 lock_margin_bits_quartiles=2/29/42/50/73 rungs=8:18,16:1 ridden=1:49,2:52,4:55,8:55,16:38,32:166,64:104
+FIELD_RELEASE_ONE problem=80 released=19 held=31 lambda=4 friction=42 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=81 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/22/36/50 lock_sweep_quartiles=7/16/26/36/50 extent=- free_circulation=51 bound_circulation=26 lock_margin_bits_quartiles=4/27/30/35/48 rungs=4:2,8:20,16:4 ridden=1:66,2:78,4:77,8:72,16:53,32:486,64:76
+FIELD_RELEASE_ONE problem=81 released=53 held=30 lambda=2 friction=79 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=82 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/15/27/37/52 extent=- free_circulation=58 bound_circulation=27 lock_margin_bits_quartiles=1/26/32/39/75 rungs=8:25,16:2 ridden=1:70,2:75,4:65,8:76,16:54,32:418,64:163
+FIELD_RELEASE_ONE problem=82 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=83 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/7/15/27/36 lock_sweep_quartiles=7/15/25/36/49 extent=24@45:void free_circulation=50 bound_circulation=23 lock_margin_bits_quartiles=1/31/45/54/76 rungs=8:18,16:6 ridden=1:62,2:61,4:66,8:62,16:56,32:258,64:233
+FIELD_RELEASE_ONE problem=83 released=24 held=22 lambda=2 friction=42 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=84 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/52 lock_sweep_quartiles=7/15/27/36/52 extent=- free_circulation=44 bound_circulation=26 lock_margin_bits_quartiles=1/26/33/39/77 rungs=8:25,16:2 ridden=1:70,2:73,4:68,8:75,16:59,32:410,64:168
+FIELD_RELEASE_ONE problem=84 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=85 sites=21 open=0 reached=21 locked=21 reach_sweep_quartiles=0/7/14/22/30 lock_sweep_quartiles=7/14/22/30/41 extent=21@40:void free_circulation=43 bound_circulation=21 lock_margin_bits_quartiles=3/33/36/53/63 rungs=8:19,16:2 ridden=1:51,2:55,4:54,8:66,16:43,32:247,64:75
+FIELD_RELEASE_ONE problem=85 released=21 held=21 lambda=2 friction=38 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=86 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/51 lock_sweep_quartiles=6/15/25/39/51 extent=- free_circulation=46 bound_circulation=28 lock_margin_bits_quartiles=2/22/32/41/59 rungs=4:5,8:23 ridden=1:72,2:79,4:81,8:73,16:61,32:515,64:86
+FIELD_RELEASE_ONE problem=86 released=53 held=43 lambda=4 friction=88 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=87 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/37/52 lock_sweep_quartiles=6/15/27/41/52 extent=- free_circulation=47 bound_circulation=27 lock_margin_bits_quartiles=1/26/33/39/56 rungs=4:4,8:21,16:3 ridden=1:68,2:76,4:78,8:69,16:61,32:460,64:120
+FIELD_RELEASE_ONE problem=87 released=53 held=21 lambda=2 friction=70 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=88 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/36/51 lock_sweep_quartiles=6/15/27/37/51 extent=- free_circulation=58 bound_circulation=26 lock_margin_bits_quartiles=4/29/37/41/55 rungs=4:4,8:19,16:4 ridden=1:67,2:77,4:79,8:64,16:64,32:411,64:165
+FIELD_RELEASE_ONE problem=88 released=53 held=26 lambda=2 friction=75 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=89 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/23/36/51 lock_sweep_quartiles=7/15/27/37/51 extent=- free_circulation=44 bound_circulation=25 lock_margin_bits_quartiles=2/26/32/37/68 rungs=8:25,16:1 ridden=1:65,2:71,4:75,8:71,16:54,32:375,64:202
+FIELD_RELEASE_ONE problem=89 released=53 held=26 lambda=2 friction=75 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=90 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/35/52 lock_sweep_quartiles=7/16/26/36/52 extent=- free_circulation=50 bound_circulation=25 lock_margin_bits_quartiles=1/26/33/38/72 rungs=4:1,8:24,16:1 ridden=1:64,2:76,4:69,8:76,16:52,32:387,64:175
+FIELD_RELEASE_ONE problem=90 released=53 held=35 lambda=4 friction=80 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=91 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/20/36/50 lock_sweep_quartiles=6/15/27/38/50 extent=- free_circulation=43 bound_circulation=26 lock_margin_bits_quartiles=6/25/35/39/49 rungs=4:3,8:22,16:2 ridden=1:69,2:72,4:80,8:75,16:59,32:523,64:67
+FIELD_RELEASE_ONE problem=91 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=92 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/35/51 lock_sweep_quartiles=7/15/27/37/51 extent=- free_circulation=57 bound_circulation=27 lock_margin_bits_quartiles=2/27/34/39/75 rungs=8:25,16:2 ridden=1:71,2:75,4:69,8:76,16:56,32:408,64:171
+FIELD_RELEASE_ONE problem=92 released=53 held=43 lambda=4 friction=88 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=93 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/36/52 lock_sweep_quartiles=8/16/28/37/52 extent=- free_circulation=55 bound_circulation=26 lock_margin_bits_quartiles=3/27/34/39/74 rungs=4:1,8:24,16:1 ridden=1:66,2:72,4:80,8:73,16:54,32:378,64:175
+FIELD_RELEASE_ONE problem=93 released=53 held=52 lambda=4 friction=97 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=94 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/36/51 lock_sweep_quartiles=6/15/27/37/51 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=3/25/34/38/50 rungs=4:4,8:22,16:2 ridden=1:70,2:74,4:82,8:73,16:57,32:523,64:77
+FIELD_RELEASE_ONE problem=94 released=53 held=36 lambda=4 friction=81 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=95 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/9/19/34/51 lock_sweep_quartiles=8/18/30/40/51 extent=- free_circulation=52 bound_circulation=25 lock_margin_bits_quartiles=2/28/35/38/69 rungs=4:3,8:19,16:3 ridden=1:66,2:71,4:68,8:82,16:52,32:348,64:171
+FIELD_RELEASE_ONE problem=95 released=53 held=26 lambda=2 friction=75 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=96 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/8/17/28/39 lock_sweep_quartiles=8/15/26/38/52 extent=24@49:void free_circulation=40 bound_circulation=24 lock_margin_bits_quartiles=2/35/42/50/60 rungs=4:2,8:18,16:4 ridden=1:60,2:67,4:64,8:75,16:51,32:353,64:182
+FIELD_RELEASE_ONE problem=96 released=24 held=40 lambda=4 friction=56 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=97 sites=53 open=28 reached=30 locked=25 reach_sweep_quartiles=0/10/20/34/51 lock_sweep_quartiles=8/17/29/38/51 extent=- free_circulation=53 bound_circulation=25 lock_margin_bits_quartiles=3/28/33/37/53 rungs=4:2,8:19,16:4 ridden=1:63,2:71,4:69,8:82,16:52,32:362,64:164
+FIELD_RELEASE_ONE problem=97 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=98 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/52 lock_sweep_quartiles=7/15/27/37/52 extent=- free_circulation=49 bound_circulation=27 lock_margin_bits_quartiles=1/26/34/41/75 rungs=4:2,8:23,16:2 ridden=1:69,2:75,4:74,8:72,16:53,32:373,64:203
+FIELD_RELEASE_ONE problem=98 released=53 held=26 lambda=2 friction=75 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=99 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/15/27/37/52 extent=- free_circulation=57 bound_circulation=27 lock_margin_bits_quartiles=1/26/31/39/75 rungs=4:1,8:24,16:2 ridden=1:69,2:76,4:69,8:75,16:55,32:412,64:165
+FIELD_RELEASE_ONE problem=99 released=53 held=25 lambda=2 friction=74 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=100 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/24/34/52 lock_sweep_quartiles=6/15/25/36/52 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=1/26/34/39/56 rungs=4:4,8:20,16:4 ridden=1:70,2:81,4:73,8:69,16:62,32:503,64:95
+FIELD_RELEASE_ONE problem=100 released=53 held=44 lambda=4 friction=89 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=101 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=8/16/28/37/52 extent=- free_circulation=45 bound_circulation=27 lock_margin_bits_quartiles=2/26/34/39/76 rungs=4:2,8:23,16:2 ridden=1:70,2:67,4:78,8:78,16:58,32:388,64:169
+FIELD_RELEASE_ONE problem=101 released=53 held=48 lambda=4 friction=93 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=102 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/21/36/50 lock_sweep_quartiles=7/16/27/37/50 extent=- free_circulation=49 bound_circulation=26 lock_margin_bits_quartiles=5/25/32/39/49 rungs=4:4,8:22 ridden=1:67,2:79,4:75,8:74,16:54,32:536,64:31
+FIELD_RELEASE_ONE problem=102 released=53 held=43 lambda=4 friction=88 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=103 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/15/27/38/52 extent=- free_circulation=55 bound_circulation=26 lock_margin_bits_quartiles=1/24/32/39/74 rungs=8:26,16:1 ridden=1:67,2:73,4:73,8:74,16:57,32:403,64:165
+FIELD_RELEASE_ONE problem=103 released=53 held=35 lambda=4 friction=80 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=104 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/36/51 lock_sweep_quartiles=7/15/25/36/51 extent=- free_circulation=51 bound_circulation=26 lock_margin_bits_quartiles=5/27/32/39/75 rungs=8:25,16:1 ridden=1:68,2:72,4:67,8:78,16:57,32:400,64:170
+FIELD_RELEASE_ONE problem=104 released=53 held=30 lambda=2 friction=79 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=105 sites=26 open=0 reached=26 locked=26 reach_sweep_quartiles=0/7/16/27/40 lock_sweep_quartiles=6/16/26/36/51 extent=26@50:void free_circulation=49 bound_circulation=25 lock_margin_bits_quartiles=0/32/38/46/60 rungs=4:2,8:23,16:1 ridden=1:66,2:72,4:77,8:67,16:55,32:421,64:121
+FIELD_RELEASE_ONE problem=105 released=26 held=25 lambda=2 friction=47 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=106 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/25/35/52 lock_sweep_quartiles=6/15/26/36/52 extent=- free_circulation=51 bound_circulation=28 lock_margin_bits_quartiles=1/23/31/39/59 rungs=4:5,8:23 ridden=1:70,2:80,4:78,8:72,16:100,32:482,64:69
+FIELD_RELEASE_ONE problem=106 released=53 held=27 lambda=2 friction=76 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=107 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/9/24/38/52 lock_sweep_quartiles=8/16/28/38/52 extent=- free_circulation=53 bound_circulation=26 lock_margin_bits_quartiles=1/27/32/38/73 rungs=4:1,8:24,16:2 ridden=1:69,2:72,4:73,8:84,16:51,32:381,64:166
+FIELD_RELEASE_ONE problem=107 released=53 held=22 lambda=2 friction=71 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=108 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/52 lock_sweep_quartiles=7/15/26/40/52 extent=- free_circulation=53 bound_circulation=28 lock_margin_bits_quartiles=1/26/34/41/79 rungs=4:1,8:26,16:1 ridden=1:70,2:74,4:78,8:76,16:56,32:394,64:186
+FIELD_RELEASE_ONE problem=108 released=53 held=30 lambda=2 friction=79 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=109 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/51 lock_sweep_quartiles=7/15/26/36/51 extent=- free_circulation=49 bound_circulation=27 lock_margin_bits_quartiles=3/26/33/40/78 rungs=4:1,8:24,16:2 ridden=1:72,2:74,4:76,8:72,16:57,32:435,64:150
+FIELD_RELEASE_ONE problem=109 released=53 held=43 lambda=4 friction=88 total_ms=7196
+FIELD_RELEASE_ONE_RECEIPT problem=110 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/35/50 lock_sweep_quartiles=6/16/25/36/50 extent=- free_circulation=49 bound_circulation=26 lock_margin_bits_quartiles=5/26/33/38/56 rungs=4:2,8:21,16:3 ridden=1:70,2:72,4:79,8:70,16:57,32:480,64:83
+FIELD_RELEASE_ONE problem=110 released=53 held=40 lambda=4 friction=85 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=111 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/24/36/51 lock_sweep_quartiles=8/16/28/37/51 extent=- free_circulation=56 bound_circulation=26 lock_margin_bits_quartiles=5/28/31/38/74 rungs=4:1,8:25 ridden=1:68,2:71,4:78,8:84,16:55,32:390,64:154
+FIELD_RELEASE_ONE problem=111 released=53 held=40 lambda=4 friction=85 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=112 sites=53 open=29 reached=29 locked=24 reach_sweep_quartiles=0/9/20/34/52 lock_sweep_quartiles=7/14/24/37/52 extent=- free_circulation=48 bound_circulation=23 lock_margin_bits_quartiles=0/27/32/38/52 rungs=8:20,16:4 ridden=1:59,2:79,4:66,8:73,16:55,32:322,64:216
+FIELD_RELEASE_ONE problem=112 released=53 held=34 lambda=4 friction=79 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=113 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/7/15/27/36 lock_sweep_quartiles=7/15/25/36/46 extent=24@45:void free_circulation=44 bound_circulation=23 lock_margin_bits_quartiles=0/31/43/54/78 rungs=8:19,16:5 ridden=1:62,2:61,4:66,8:60,16:54,32:249,64:174
+FIELD_RELEASE_ONE problem=113 released=24 held=25 lambda=2 friction=45 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=114 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/33/51 lock_sweep_quartiles=7/15/24/36/51 extent=- free_circulation=54 bound_circulation=26 lock_margin_bits_quartiles=2/25/32/39/76 rungs=4:1,8:21,16:4 ridden=1:70,2:73,4:72,8:77,16:59,32:431,64:136
+FIELD_RELEASE_ONE problem=114 released=53 held=44 lambda=4 friction=89 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=115 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/22/36/52 lock_sweep_quartiles=6/15/26/38/52 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=1/24/33/39/56 rungs=4:3,8:25 ridden=1:70,2:81,4:73,8:72,16:56,32:473,64:125
+FIELD_RELEASE_ONE problem=115 released=53 held=43 lambda=4 friction=88 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=116 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/36/50 lock_sweep_quartiles=7/15/27/37/50 extent=- free_circulation=43 bound_circulation=27 lock_margin_bits_quartiles=3/28/34/40/75 rungs=4:1,8:25,16:1 ridden=1:69,2:72,4:75,8:80,16:60,32:363,64:205
+FIELD_RELEASE_ONE problem=116 released=53 held=48 lambda=4 friction=93 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=117 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=7/16/26/37/52 extent=- free_circulation=48 bound_circulation=25 lock_margin_bits_quartiles=1/25/31/39/74 rungs=4:2,8:22,16:2 ridden=1:67,2:78,4:67,8:70,16:51,32:413,64:141
+FIELD_RELEASE_ONE problem=117 released=53 held=25 lambda=2 friction=74 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=118 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/22/35/50 lock_sweep_quartiles=6/15/26/36/50 extent=- free_circulation=47 bound_circulation=27 lock_margin_bits_quartiles=2/28/33/38/54 rungs=4:3,8:22,16:2 ridden=1:70,2:79,4:76,8:65,16:55,32:472,64:120
+FIELD_RELEASE_ONE problem=118 released=53 held=50 lambda=4 friction=95 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=119 sites=53 open=27 reached=31 locked=26 reach_sweep_quartiles=0/9/23/34/51 lock_sweep_quartiles=7/15/25/36/51 extent=- free_circulation=50 bound_circulation=26 lock_margin_bits_quartiles=2/28/31/39/74 rungs=8:21,16:5 ridden=1:72,2:70,4:70,8:65,16:60,32:386,64:195
+FIELD_RELEASE_ONE problem=119 released=53 held=51 lambda=4 friction=96 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=120 sites=19 open=0 reached=19 locked=19 reach_sweep_quartiles=0/0/10/20/30 lock_sweep_quartiles=8/10/20/30/42 extent=19@41:void free_circulation=41 bound_circulation=18 lock_margin_bits_quartiles=0/30/35/47/57 rungs=4:2,8:16,16:1 ridden=1:50,2:56,4:56,8:71,16:41,32:246,64:63
+FIELD_RELEASE_ONE problem=120 released=19 held=36 lambda=4 friction=47 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=121 sites=24 open=0 reached=24 locked=24 reach_sweep_quartiles=0/7/15/27/36 lock_sweep_quartiles=7/15/25/36/46 extent=24@45:void free_circulation=48 bound_circulation=23 lock_margin_bits_quartiles=0/31/45/54/77 rungs=8:19,16:5 ridden=1:62,2:61,4:66,8:61,16:53,32:231,64:192
+FIELD_RELEASE_ONE problem=121 released=24 held=43 lambda=4 friction=59 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=122 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/9/22/37/52 lock_sweep_quartiles=7/16/28/39/52 extent=- free_circulation=50 bound_circulation=27 lock_margin_bits_quartiles=1/28/32/38/77 rungs=8:26,16:1 ridden=1:66,2:71,4:75,8:81,16:61,32:336,64:224
+FIELD_RELEASE_ONE problem=122 released=53 held=32 lambda=4 friction=77 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=123 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/24/37/52 lock_sweep_quartiles=6/16/27/37/52 extent=- free_circulation=53 bound_circulation=26 lock_margin_bits_quartiles=1/25/33/38/54 rungs=4:2,8:23,16:2 ridden=1:70,2:74,4:75,8:71,16:54,32:468,64:101
+FIELD_RELEASE_ONE problem=123 released=53 held=39 lambda=4 friction=84 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=124 sites=53 open=26 reached=32 locked=27 reach_sweep_quartiles=0/8/23/35/52 lock_sweep_quartiles=7/15/27/36/52 extent=- free_circulation=37 bound_circulation=26 lock_margin_bits_quartiles=1/27/34/39/74 rungs=4:1,8:24,16:2 ridden=1:69,2:74,4:72,8:73,16:58,32:370,64:207
+FIELD_RELEASE_ONE problem=124 released=53 held=44 lambda=4 friction=89 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=125 sites=53 open=24 reached=34 locked=29 reach_sweep_quartiles=0/9/23/36/51 lock_sweep_quartiles=6/15/26/39/51 extent=- free_circulation=49 bound_circulation=29 lock_margin_bits_quartiles=3/25/34/42/59 rungs=4:5,8:24 ridden=1:75,2:75,4:76,8:76,16:66,32:503,64:110
+FIELD_RELEASE_ONE problem=125 released=53 held=45 lambda=4 friction=90 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=126 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/51 lock_sweep_quartiles=6/15/25/37/51 extent=- free_circulation=44 bound_circulation=28 lock_margin_bits_quartiles=5/27/34/42/60 rungs=4:5,8:21,16:2 ridden=1:75,2:78,4:75,8:72,16:68,32:497,64:110
+FIELD_RELEASE_ONE problem=126 released=53 held=41 lambda=4 friction=86 total_ms=7197
+FIELD_RELEASE_ONE_RECEIPT problem=127 sites=53 open=25 reached=33 locked=28 reach_sweep_quartiles=0/9/23/37/52 lock_sweep_quartiles=6/15/27/37/52 extent=- free_circulation=48 bound_circulation=27 lock_margin_bits_quartiles=1/24/32/37/49 rungs=4:3,8:24,16:1 ridden=1:68,2:71,4:79,8:82,16:55,32:539,64:67
+FIELD_RELEASE_ONE problem=127 released=53 held=49 lambda=4 friction=94 total_ms=7197
+FIELD_RELEASE_RECEIPTS problems=128 locked_whole=22 open_sites=2690 free_circulation=6133 bound_circulation=3315 reached=3877 locked=3358 reach_sweep_quartiles=0/8/21/35/52 lock_sweep_quartiles=5/15/26/38/52 extents_void=25 extents_bound=0 extents_unread=103 extent_site_quartiles=19/21/24/26/28 extent_sweep_quartiles=37/41/45/50/52 lock_margin_bits_quartiles=0/27/34/41/82 lock_rungs=4:286,8:2800,16:269,32:3 landmark_problems=0 landmark_digits=0 landmark_on_question_digit=0 landmark_same_class=0 landmark_ms=0
+FIELD_RELEASE_SWEEP set=marks done=0 live=200 reached=0 front=0 locked=0 open=7802 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 ms=7200
+FIELD_RELEASE_SWEEP set=marks done=1 live=200 reached=1000 front=5 locked=0 open=7802 rung=1 change=0 holding=0 soft=0 overturned=0 free=0 ms=7506
+FIELD_RELEASE_SWEEP set=marks done=2 live=200 reached=1000 front=5 locked=0 open=7802 rung=1 change=8964042 holding=0 soft=174 overturned=826 free=826 ms=7700
+FIELD_RELEASE_SWEEP set=marks done=3 live=200 reached=1000 front=5 locked=0 open=7802 rung=2 change=2042261 holding=0 soft=785 overturned=215 free=1041 ms=7895
+FIELD_RELEASE_SWEEP set=marks done=4 live=200 reached=1000 front=5 locked=0 open=7802 rung=2 change=7595086 holding=0 soft=701 overturned=299 free=1340 ms=8087
+FIELD_RELEASE_SWEEP set=marks done=5 live=200 reached=1000 front=5 locked=0 open=7802 rung=4 change=3423463 holding=0 soft=750 overturned=250 free=1590 ms=8281
+FIELD_RELEASE_SWEEP set=marks done=6 live=200 reached=1000 front=5 locked=0 open=7802 rung=4 change=2275470 holding=0 soft=787 overturned=213 free=1803 ms=8474
+FIELD_RELEASE_SWEEP set=marks done=7 live=200 reached=1000 front=5 locked=0 open=7802 rung=8 change=3325559 holding=0 soft=839 overturned=161 free=1964 ms=8666
+FIELD_RELEASE_SWEEP set=marks done=8 live=200 reached=1000 front=5 locked=0 open=7802 rung=8 change=3190377 holding=0 soft=875 overturned=125 free=2089 ms=8858
+FIELD_RELEASE_SWEEP set=marks done=9 live=200 reached=1053 front=9 locked=42 open=7760 rung=16 change=4489943 holding=42 soft=889 overturned=69 free=2158 ms=9053
+FIELD_RELEASE_SWEEP set=marks done=10 live=200 reached=1327 front=10 locked=204 open=7598 rung=16 change=7665334 holding=204 soft=772 overturned=77 free=2235 ms=9247
+FIELD_RELEASE_SWEEP set=marks done=11 live=200 reached=1412 front=10 locked=436 open=6344 rung=32 change=17026124 holding=501 soft=538 overturned=288 free=2523 ms=9444
+FIELD_RELEASE_SWEEP set=marks done=12 live=162 reached=1361 front=10 locked=596 open=5441 rung=32 change=15578180 holding=660 soft=540 overturned=212 free=2735 ms=9641
+FIELD_RELEASE_SWEEP set=marks done=13 live=148 reached=1362 front=10 locked=645 open=5290 rung=64 change=8111191 holding=673 soft=476 overturned=212 free=2947 ms=9869
+FIELD_RELEASE_SWEEP set=marks done=14 live=137 reached=1331 front=10 locked=656 open=5157 rung=64 change=4990713 holding=680 soft=417 overturned=265 free=3212 ms=10016
+FIELD_RELEASE_SWEEP set=marks done=15 live=133 reached=1322 front=10 locked=654 open=5150 rung=64 change=2935477 holding=663 soft=483 overturned=185 free=3397 ms=10204
+FIELD_RELEASE_SWEEP set=marks done=16 live=133 reached=1324 front=11 locked=657 open=5147 rung=64 change=3103826 holding=657 soft=505 overturned=160 free=3557 ms=10357
+FIELD_RELEASE_SWEEP set=marks done=17 live=132 reached=1363 front=13 locked=695 open=5107 rung=128 change=3407544 holding=697 soft=479 overturned=148 free=3705 ms=10490
+FIELD_RELEASE_SWEEP set=marks done=18 live=131 reached=1430 front=15 locked=769 open=5006 rung=128 change=5882692 holding=771 soft=483 overturned=109 free=3814 ms=10621
+FIELD_RELEASE_SWEEP set=marks done=19 live=131 reached=1578 front=15 locked=918 open=4857 rung=256 change=7289258 holding=918 soft=389 overturned=123 free=3937 ms=10752
+FIELD_RELEASE_SWEEP set=marks done=20 live=130 reached=1695 front=15 locked=1040 open=4685 rung=256 change=8226646 holding=1046 soft=405 overturned=127 free=4064 ms=10886
+FIELD_RELEASE_SWEEP set=marks done=21 live=128 reached=1820 front=15 locked=1173 open=4502 rung=256 change=7462591 holding=1187 soft=392 overturned=116 free=4180 ms=11020
+FIELD_RELEASE_SWEEP set=marks done=22 live=126 reached=1840 front=15 locked=1212 open=4333 rung=256 change=6510628 holding=1231 soft=399 overturned=190 free=4370 ms=11157
+FIELD_RELEASE_SWEEP set=marks done=23 live=125 reached=1859 front=16 locked=1235 open=4277 rung=256 change=4373170 holding=1245 soft=440 overturned=155 free=4525 ms=11292
+FIELD_RELEASE_SWEEP set=marks done=24 live=124 reached=1863 front=16 locked=1242 open=4263 rung=256 change=2706412 holding=1249 soft=425 overturned=185 free=4710 ms=11421
+FIELD_RELEASE_SWEEP set=marks done=25 live=124 reached=1894 front=16 locked=1277 open=4211 rung=256 change=3016714 holding=1278 soft=465 overturned=120 free=4830 ms=11553
+FIELD_RELEASE_SWEEP set=marks done=26 live=123 reached=1920 front=18 locked=1304 open=4175 rung=512 change=2725515 holding=1313 soft=472 overturned=109 free=4939 ms=11683
+FIELD_RELEASE_SWEEP set=marks done=27 live=123 reached=1988 front=19 locked=1373 open=4106 rung=512 change=3506858 holding=1373 soft=434 overturned=113 free=5052 ms=11813
+FIELD_RELEASE_SWEEP set=marks done=28 live=123 reached=2059 front=20 locked=1438 open=4041 rung=1024 change=4153216 holding=1438 soft=427 overturned=123 free=5175 ms=11945
+FIELD_RELEASE_SWEEP set=marks done=29 live=123 reached=2133 front=20 locked=1510 open=3969 rung=1024 change=4835681 holding=1510 soft=473 overturned=76 free=5251 ms=12078
+FIELD_RELEASE_SWEEP set=marks done=30 live=123 reached=2230 front=20 locked=1602 open=3877 rung=1024 change=5344290 holding=1602 soft=421 overturned=110 free=5361 ms=12209
+FIELD_RELEASE_SWEEP set=marks done=31 live=121 reached=2239 front=20 locked=1636 open=3690 rung=1024 change=5782449 holding=1667 soft=436 overturned=127 free=5488 ms=12340
+FIELD_RELEASE_SWEEP set=marks done=32 live=119 reached=2307 front=21 locked=1700 open=3570 rung=1024 change=5736195 holding=1727 soft=394 overturned=118 free=5606 ms=12474
+FIELD_RELEASE_SWEEP set=marks done=33 live=118 reached=2343 front=22 locked=1751 open=3505 rung=1024 change=5476124 holding=1765 soft=413 overturned=129 free=5735 ms=12608
+FIELD_RELEASE_SWEEP set=marks done=34 live=118 reached=2377 front=22 locked=1789 open=3435 rung=1024 change=4405734 holding=1790 soft=468 overturned=85 free=5820 ms=12741
+FIELD_RELEASE_SWEEP set=marks done=35 live=117 reached=2405 front=22 locked=1820 open=3390 rung=1024 change=3392546 holding=1834 soft=472 overturned=71 free=5891 ms=12876
+FIELD_RELEASE_SWEEP set=marks done=36 live=117 reached=2465 front=23 locked=1880 open=3330 rung=1024 change=3533603 holding=1880 soft=450 overturned=75 free=5966 ms=13008
+FIELD_RELEASE_SWEEP set=marks done=37 live=117 reached=2523 front=25 locked=1936 open=3274 rung=1024 change=3739131 holding=1936 soft=468 overturned=61 free=6027 ms=13139
+FIELD_RELEASE_SWEEP set=marks done=38 live=117 reached=2584 front=25 locked=2001 open=3182 rung=1024 change=3981442 holding=2002 soft=457 overturned=64 free=6091 ms=13273
+FIELD_RELEASE_SWEEP set=marks done=39 live=116 reached=2607 front=25 locked=2034 open=3077 rung=1024 change=3909481 holding=2054 soft=473 overturned=57 free=6148 ms=13406
+FIELD_RELEASE_SWEEP set=marks done=40 live=114 reached=2593 front=25 locked=2053 open=2808 rung=1024 change=3899712 holding=2097 soft=456 overturned=54 free=6202 ms=13538
+FIELD_RELEASE_SWEEP set=marks done=41 live=108 reached=2527 front=26 locked=2002 open=2698 rung=1024 change=4110165 holding=2114 soft=405 overturned=74 free=6276 ms=13670
+FIELD_RELEASE_SWEEP set=marks done=42 live=106 reached=2519 front=27 locked=2004 open=2607 rung=1024 change=3720986 holding=2044 soft=424 overturned=59 free=6335 ms=13796
+FIELD_RELEASE_SWEEP set=marks done=43 live=102 reached=2485 front=27 locked=1982 open=2500 rung=1024 change=3454250 holding=2059 soft=397 overturned=63 free=6398 ms=13920
+FIELD_RELEASE_SWEEP set=marks done=44 live=100 reached=2485 front=27 locked=2000 open=2345 rung=1024 change=3753157 holding=2041 soft=388 overturned=56 free=6454 ms=14042
+FIELD_RELEASE_SWEEP set=marks done=45 live=97 reached=2446 front=28 locked=1987 open=2152 rung=1024 change=3382486 holding=2052 soft=376 overturned=57 free=6511 ms=14159
+FIELD_RELEASE_SWEEP set=marks done=46 live=90 reached=2335 front=28 locked=1893 open=2059 rung=1024 change=3204904 holding=2035 soft=359 overturned=52 free=6563 ms=14274
+FIELD_RELEASE_SWEEP set=marks done=47 live=88 reached=2329 front=29 locked=1893 open=1997 rung=2048 change=2950294 holding=1934 soft=350 overturned=51 free=6614 ms=14539
+FIELD_RELEASE_SWEEP set=marks done=48 live=87 reached=2355 front=30 locked=1928 open=1885 rung=2048 change=3187588 holding=1951 soft=335 overturned=43 free=6657 ms=14641
+FIELD_RELEASE_SWEEP set=marks done=49 live=85 reached=2339 front=30 locked=1922 open=1823 rung=2048 change=3321400 holding=1967 soft=331 overturned=57 free=6714 ms=14744
+FIELD_RELEASE_SWEEP set=marks done=50 live=84 reached=2361 front=31 locked=1945 open=1779 rung=2048 change=3171193 holding=1966 soft=338 overturned=35 free=6749 ms=14844
+FIELD_RELEASE_SWEEP set=marks done=51 live=83 reached=2375 front=31 locked=1964 open=1714 rung=2048 change=3098167 holding=1988 soft=326 overturned=47 free=6796 ms=14945
+FIELD_RELEASE_SWEEP set=marks done=52 live=82 reached=2371 front=31 locked=1965 open=1667 rung=2048 change=2800911 holding=1990 soft=343 overturned=42 free=6838 ms=15046
+FIELD_RELEASE_SWEEP set=marks done=53 live=81 reached=3301 front=32 locked=2900 open=1604 rung=2048 change=2427652 holding=2008 soft=327 overturned=36 free=6874 ms=15143
+FIELD_RELEASE free=128 marks=200 withheld=0 refused=0 sweeps=53 stop_ms=90000 free_sweeps=53 free_live=106 free_reached=3877 free_front=34 free_open=2690 free_rung=128 free_stopped=false marks_sweeps=53 marks_live=81 marks_reached=3301 marks_front=32 marks_open=1604 marks_rung=2048 marks_stopped=false released=6048 held=4342 lambda=400 friction=9590 ms=15152
+FIELD_CARD reads=106 read_ms=13111 returns=0 return_ms=0 pairs=10633151193 batches=106 peak_store=6457576686 landmarks=0 landmark_ms=0 elapsed_ms=15153
+MEASURE lap=crib12 rc=0 wall_s=15.5 peak_rss_kib=354692
