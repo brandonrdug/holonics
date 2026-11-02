@@ -4,15 +4,12 @@ The scripts partition and frame passages for the listener. Dataset content, keys
 remain exterior. No generation is graded against the answer key's numeric answers or scored on its
 delimiter pattern.
 
-The written-rule reads (`written_rules.py`) read a release on all held-out problems by rules fixed
-before the read: whether it stays on the problem's words, whether each calculation it writes is the
-exact value of its own expression, and whether its first calculation takes the question's numbers;
-and, at each calculation of a held-out answer, whether the value written after its `=` is that
-expression's exact value. None reads the answer key, none selects a release, and nothing they read
-enters the machine. `ngram_release.py` writes an exterior n-gram baseline's releases for the same
-reads. The rules and their reason are in
-`research/records/2026-10-26_THE_HELD_OUT_PROBLEMS_ARE_READ_BY_WRITTEN_RULES_AND_THE_MARKUP_IS_WRITTEN_AT_ITS_EQUALS.md`.
-With `pair` the rules compare two releases calculation by calculation at the equals.
+[retired, November 2] The written-rule reads (`written_rules.py`, with `card_written.py` writing their inputs),
+the copy partition (`copy_roles.py`), the calculation roles (`calc_roles.py`) and the numeral-ring probe
+(`numeral_rings.py`) paired answer numerals with the question's, counted copied numbers or labelled calculation
+roles as a reading's acceptance: the numeral matcher's exterior (antipattern record, instance 4). With them went
+their n-gram baseline (`ngram_release.py`) and the variants' copy claim (`tools/gsm8k_variants.py`, which counted
+the question's numbers taken into a variant's calculations). Git history keeps them.
 `digit_units.py` writes a cause-test foil of the founded units with every digit-bearing unit removed;
 it is never the product
 (`research/records/2026-10-26_THE_SECOND_LAP_WRITES_BACK_225_OF_1572_HEARD_CALCULATIONS_SO_THE_DIGIT_UNITS_ARE_TESTED_AS_THE_CAUSE.md`).
@@ -47,12 +44,7 @@ For the tower (record `research/records/2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_TH
 `tower_passage.py TRAIN_JSONL PARTITION_JSON OUT_DIR` renders each problem `question` END `answer` END
 (END the record separator) with each byte's region (Q question, P prose, N digits outside the
 calculations, M the calculation markup), the written rules' texts and six development questions as
-flux prompts; `card_written.py prompts HELD` writes the free and calculation prompts for the card's
-release route (cut at the separator 0x1F, `TOWER_PROMPT_SEPARATOR=31`) and `card_written.py convert`
-turns its releases into the `FREE.tsv` and `MARKS.tsv` that `written_rules.py` reads.
-`copy_roles.py DEV_BYTES OUT_ROLES` writes the held-out passage's copy partition as a roles file for the
-trainer (0 question, 1 other answer bytes, 2 answer digits of a numeral the question writes, 3 of one it does
-not; the trainer prints them as Q/P/N/M, so N reads "digits the question writes" and M "digits it does not").
+flux prompts.
 The `complete_language` example's host route `read-written-coupling HELD HELD_SHA DIR` reads each free release in
 `DIR/FREE.tsv` for its least-friction coupling with the held-out answer (`receiver::coupling`: `λ`, `F*`, plateaus),
 in the bytes and in the numerals, beside its contact with its own and the next question, and writes `DIR/COUPLING.tsv`.

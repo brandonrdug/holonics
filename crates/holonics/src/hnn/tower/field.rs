@@ -27,13 +27,13 @@
 //! ```text
 //! open       x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)),   u = ∗ where a site is unresolved; a carried
 //!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
-//! chart      r̂_t = x_t / ‖x_t‖_rms,   w_t = W r̂_t + b_w,   v_t = V r̂_t + b_v       one word a head: q = k
-//! classes    B_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of w_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
-//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j far, definite : B_h(j) ∈ {B_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
-//! frame      w̃_t = U_t ⊙ w_t,   ṽ_t = U_t ⊙ v_t                                complex modes, by head
+//! chart      r̂_t = x_t / ‖x_t‖_rms,   k_t = W_k r̂_t + b_k,   p_t = W_p r̂_t + b_p,   v_t = V r̂_t + b_v   a key and a probe a head
+//! classes    K_h(t), P'_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of k_t's, p_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
+//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j far, definite : K_h(j) ∈ {P'_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
+//! frame      k̃_t = U_t ⊙ k_t,   p̃_t = U_t ⊙ p_t,   ṽ_t = U_t ⊙ v_t              complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
 //! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
-//! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(w̃_im) w̃_jm) − D_m² |w̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
+//! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
@@ -41,13 +41,13 @@
 //! ```
 //!
 //! [definition; agent-inferred, November 1] **The field disperses** (the dispersing field's record,
-//! §2). One word a head is both the probe and the key, so a key fits its lock exactly where the two
-//! words agree: the contact is the receiver's lock against the source as it arrives (§15.2, [`lock`]),
+//! §2). Each head reads a receiver's probe against each source's key, so a key fits its lock exactly
+//! where the two agree: the contact is the receiver's lock against the source as it arrives (§15.2, [`lock`]),
 //! whose pairing part is the real part of a Hermitian form and whose power part keeps a louder key from
 //! outscoring the equal one. A
-//! head's unframed word sits in `b` shells, a trit a mode (§12: the sky plate, the ground plate or
-//! the bridge between them, split by the mode's light cone), read as an address: two sites meet
-//! through the head only where they share its class or stand in each other's near field
+//! head's unframed key and probe each sit in `b` shells, a trit a mode (§12: the sky plate, the ground
+//! plate or the bridge between them, split by the mode's light cone), read as an address: a receiver
+//! meets a source through the head only where its probe's class is the source's key's or they stand in each other's near field
 //! (`0 < |i − j| < lcm(2, 3)`, the solenoid's finest joint closure, [`NEAR`]). A source `d` sites
 //! away pays `⌊log₂ d⌋` bits, the octave ladder of matched frictions read in bits, the power a wave
 //! spreading on the strand's ring-wound tube surface (two dimensions, amplitude `1/√d`) carries, and
@@ -74,40 +74,39 @@
 //! through a first tick's contact with its neighbours, and finding a site by its word is then a
 //! composition of two learned contacts, which thirteen laps did not form.
 //!
-//! [definition; agent-inferred, November 1] **The contact concentrates from the founding: a site
-//! meets the sites whose word is its own.** A contact is between two sites, so no site meets
-//! itself (`e_ii = 0`; a lone site's slip with itself is zero and carries nothing). The contact is
-//! founded as the pair's likeness (one word for the probe and the key, so `Re(conj(w_i) w_j)` peaks
-//! where the two words agree), the strand contacts are founded with the encoding (each row a keyed draw, so
-//! every site has a word from the founding), and a site whose class has not arrived opens on
-//! nothing (the unresolved rows of `E`, `E₋`, `E₊` founded at zero: it has no word to be met by,
-//! only a probe). The still and turned modes are separate ring sets: a still set compares words at
-//! any distance, a turned set compares them with their place. **The contact pairs words at unit
-//! power**: within its head the framed word is read as a ratio to its own power (the chart's law,
-//! `ratio_to_power`, over the head's `2n` reals), so the pairing of two words is `2n` times their
-//! cosine, a word's contact with an equal word is `2n`, the most any pair reaches, and a key fits its
-//! lock exactly where the two words agree. The contact's gain covers the falloff: `β` is the largest
-//! shift, negative where it amplifies, with `2^(−β)·2n ≥ 2⌈log₂ reach⌉`, so in a still head a word's
-//! counterpart at the reach still outweighs the rest of its support together wherever their words
-//! stand orthogonal or opposed to it (a turned head carries it by its skin decay, fainter with
-//! distance) ([`FieldDeclaration::score_shift`]; the share is the gaps',
-//! `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`, so near-equal words share its weight). Why the
-//! unit power (measured November 1, at a GSM8K region's 450 sites and the seventh reading's
-//! declaration, founded on a mixed key stream): with the probe and key at the chart's scale alone,
-//! a site whose whole word recurs once peaked at its counterpart in 20 of 32 rows, its score 12
-//! to 31 against the region's next 9 to 22: a probe's power varies with its word (a sum of `2n`
-//! squares), so a louder key outscored the equal one. Why the concentration (the seventh reading, November 1): with the strand
-//! contacts learned from zero, the charts founded independently, the still modes two of a head's
-//! eight and `β` chosen to bring the contact's spread to one bit, a site's contact with any other
-//! was about one bit against the four hundred sites of a GSM8K region, so each site gathered the
-//! region's average: after eleven laps the held answers coded 2.009 bits a byte beside their
-//! neighbours and the question told their digits 0.021 bits. Within a head the turned modes' sum
-//! is a phase-scattered term as large as the still modes' at any distance past their finest
-//! rings, so a word could not be found far from its reader there either. Founded alike and
-//! concentrated, the crib (a site's counterpart, wherever it stands) is met from the first section;
-//! learning then turns the readout and returns onto what the contact already gathers.
+//! [definition; agent-inferred, November 2, §16.19] **A receiver's probe meets the sources' keys, and the
+//! founding makes neither the other.** A contact is between two sites, so no site meets itself (`e_ii =
+//! 0`; a lone site's slip with itself is zero and carries nothing). Every head has a key chart and a probe
+//! chart, founded as independent keyed draws, and every receiver probes with its own probe, a definite site
+//! as an open one; a site is listed in its key's class and reads the classes of its probe. The strand
+//! contacts are founded with the encoding (each row a keyed draw, so every site has a word from the
+//! founding), and a site whose class has not arrived opens on nothing (the unresolved rows of `E`, `E₋`,
+//! `E₊` founded at zero: it has no key to be met by, only a probe). The still and turned modes are separate
+//! ring sets: a still set compares a probe and a key at any distance, a turned set compares them with
+//! their place. **The contact pairs at unit power**: within its head each framed probe and key is read as a
+//! ratio to its own power (the chart's law, `ratio_to_power`, over the head's `2n` reals), so the pairing
+//! of a probe and a key is `2n` times their cosine, at most `2n` where they are equal, and a key fits its
+//! lock exactly where the two agree. The contact's gain covers the falloff: `β` is the largest shift,
+//! negative where it amplifies, with `2^(−β)·2n ≥ 2⌈log₂ reach⌉`, so in a still head a key that fits the
+//! probe at the reach still outweighs the rest of its support together wherever their keys stand
+//! orthogonal or opposed to it (a turned head carries it by its skin decay, fainter with distance)
+//! ([`FieldDeclaration::score_shift`]; the share is the gaps', `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`,
+//! so near-equal keys share its weight). Why the unit power (measured November 1, at a GSM8K region's 450
+//! sites and the seventh reading's declaration, founded on a mixed key stream): with the probe and key at
+//! the chart's scale alone, a site whose whole word recurs once peaked at its counterpart in 20 of 32 rows,
+//! its score 12 to 31 against the region's next 9 to 22: a probe's power varies with its word (a sum of
+//! `2n` squares), so a louder key outscored the equal one.
 //!
-//! The pairing `Re(conj(w̃_i) w̃_j) = Re(conj(w_i) U_i^* U_j w_j)` turns mode `m` by
+//! [retired, November 2, §16.19] **The concentration from the founding**, one word a head (the probe and
+//! the key at once, `q = k`), founded as the pair's likeness so that `Re(conj(w_i) w_j)` peaked where two
+//! sites' words agreed and a site met the sites whose word was its own from the first section. Why it went
+//! (the seventh reading had chosen it after the independent charts gathered the region's average: 2.009
+//! bits a byte beside the neighbours after eleven laps, the question telling the digits 0.021 bits): a
+//! contact concentrated on a site's counterpart wherever it stands is the crib handed to the field, the
+//! copier's third recurrence (the antipattern record's instance 4), and not a contact the field located.
+//! What the field meets is now what its learning makes its probes and keys agree on.
+//!
+//! The pairing `Re(conj(p̃_i) k̃_j) = Re(conj(p_i) U_i^* U_j k_j)` turns mode `m` by
 //! `2π (j − i)/n_m`: a turned mode reads the relative place modulo its ring, a still mode reads the
 //! contents alone, at any distance its class reaches. The current is the phase-carried moment
 //! `y_i = Σ_(j∈S_i) p_ij U_i^* U_j v_j`: what a site gathers carries where each source stood relative
@@ -130,13 +129,16 @@
 //!
 //! **Release: the answer grows from what has settled** ([`Field::release`], the dispersing field's
 //! §14): a site is reached once a definite site stands in its near field, then carries a soft face,
-//! logits with a momentum `μ = ½`, read every sweep at its own pump `β_t`, its cavity field (§15.3: the
-//! read less its own echo) and its clock (§15.4: the sweeps since it was reached); it locks where its top
-//! class holds a majority at its `β_t` through the sweep, and the extent is read where the front first
+//! logits with a momentum `μ = ½`, read every sweep at its own pump `β_t` and its cavity field (§15.3: the
+//! read less its own echo); it locks where its top class holds a majority of the field's own face (`β = 1`)
+//! through the sweep (§16.19), and the extent is read where the front first
 //! locks the void. The answer is released whole: locked sites at their classes, unlocked ones shown
 //! open, with its receipts ([`Released`]).
 //! **Training meets the release's own states**: beside the completion masks, front regions (§14.6), whose
-//! read 2 carries read 1's faces at a rung with their echoes and clocks.
+//! read 2 carries read 1's faces at a rung with their echoes.
+//!
+//! [retired, November 2, §16.19] The clock ring sets (§15.4), turned by each site's sweep count since it was
+//! reached (in training, the rung): the release's writing order fed into the law as phase.
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
 //! material on `2^(−24)`; frames and skins on `2^(−30)`; each row an exact series of its terms'
@@ -203,9 +205,6 @@ pub struct FieldDeclaration {
     pub ticks: usize,
     pub frames: usize,
     pub reach: usize,
-    /// The ring sets that are clocks (§15.4): the last `clocks` of the turned sets, framed by each
-    /// site's own sweep count instead of its place.
-    pub clocks: usize,
 }
 
 impl FieldDeclaration {
@@ -325,11 +324,11 @@ impl FieldDeclaration {
     }
 
     /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
-    /// rows of every class (their unresolved rows open at zero), the word chart, the value chart and
-    /// both pair drives.
+    /// rows of every class (their unresolved rows open at zero), the key chart, the value chart, both
+    /// pair drives and the probe chart.
     pub fn founding_draws(&self) -> usize {
         let m2 = 2 * self.complex();
-        3 * self.alphabet * self.width + 2 * m2 * self.width + 2 * self.contacts * self.width
+        3 * self.alphabet * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width
     }
 
     /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
@@ -351,19 +350,18 @@ impl FieldDeclaration {
     }
 
     /// [definition; agent-inferred, November 1] **The modes that carry a moment** (§15.1): every mode of
-    /// a turned ring set that is not a clock, `T = H (frames − still − clocks)/frames · n`, numbered by
-    /// head then mode. A still mode has no skin to bound its sum and a clock's place is no strand.
+    /// a turned ring set, `T = H (frames − still)/frames · n`, numbered by head then mode. A still mode has no
+    /// skin to bound its sum.
     pub fn moment_modes(&self) -> usize {
         (0..self.heads).filter(|&h| self.carries_moment(h)).count() * self.modes
     }
 
-    /// Whether head `h`'s modes carry a moment: a turned ring set that is not a clock.
+    /// Whether head `h`'s modes carry a moment: a turned ring set.
     pub fn carries_moment(&self, h: usize) -> bool {
-        h % self.frames >= self.still && !self.is_clock(h)
+        h % self.frames >= self.still
     }
 
-    /// The heads that read a pace (§16, Law 1): the turned ring sets that are not clocks, the heads that
-    /// carry a moment.
+    /// The heads that read a pace (§16, Law 1): the turned ring sets, the heads that carry a moment.
     pub fn paced_heads(&self) -> usize {
         (0..self.heads).filter(|&h| self.carries_moment(h)).count()
     }
@@ -373,20 +371,7 @@ impl FieldDeclaration {
         (0..h).filter(|&k| self.carries_moment(k)).count() * self.modes
     }
 
-    /// [definition; agent-inferred, November 1] **A clock ring set** (the dispersing field's §15.4): head
-    /// `h` is of one where its set is among the last `clocks`. Its modes are turned by each site's own
-    /// sweep count since the site was reached (the release's clock; in training §14.6's rung), not by
-    /// its place, so sites reached or locked together share phase, their gaps are read as phase like
-    /// place is, and the contact reads rhythm beside content. A clock carries no skin: the sweeps are
-    /// not a medium a field crosses, and the place's falloff still charges the pair.
-    pub fn is_clock(&self, h: usize) -> bool {
-        h % self.frames >= self.frames - self.clocks
-    }
-
     fn admit(&self) -> Result<()> {
-        if self.clocks > self.frames - self.still.min(self.frames) {
-            return refuse("a field's clocks are among its turned ring sets");
-        }
         if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.contacts % 2 != 0 || self.ticks == 0 {
             return refuse("a field needs two classes, a nonempty width, heads, modes, contacts in complex pairs and ticks");
         }
@@ -402,16 +387,16 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v8 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
+        format!("hnn-field-v9 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 11 || words[0] != "hnn-field-v8" {
-            return refuse("a field's head line that is not hnn-field-v8");
+        if words.len() != 10 || words[0] != "hnn-field-v9" {
+            return refuse("a field's head line that is not hnn-field-v9");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, clocks: n(words[10])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
         d.admit()?;
         Ok(d)
     }
@@ -445,12 +430,12 @@ pub struct FieldLayout {
     /// The locks' temperatures (§15.10), one a head and receiver kind, `[h][kind]` (kind 0 a class
     /// receiver, 1 a listener), on the material's grain.
     pub temper: usize,
-    /// A listener's probe chart and its bias (§15.12): an open receiver probes with its own word, its
-    /// sources answer with theirs.
+    /// The probe chart and its bias (§16.19): every receiver probes with its own probe, its sources
+    /// answer with their keys (the chart `q`).
     pub probe: usize,
     pub probe_bias: usize,
     /// A turned head's pace (§16, Law 1): its clock's rate `κ_h(t) = 1 + ⟨c_h, x⁰_t⟩` reads the opening face
-    /// through one row `c_h` of `D` a turned head that is not a clock (`[pace index][D]`, the index its moment
+    /// through one row `c_h` of `D` a turned head (`[pace index][D]`, the index its moment
     /// index over the modes), on the material's grain; founded at zero, so the clock is the strand's own place.
     pub pace: usize,
     pub len: usize,
@@ -706,8 +691,6 @@ pub struct Region<'a> {
     pub unresolved: &'a [bool],
     pub faces: &'a [Option<Shares>],
     pub locked: &'a [bool],
-    /// Each site's clock (§15.4), the sweeps since it was reached; empty where every site's is zero.
-    pub clock: &'a [u32],
     /// Each carried site's echo (§15.3, [`Echo`]); empty where no site carries one.
     pub echo: &'a [Option<Echo>],
 }
@@ -761,16 +744,16 @@ pub fn shares(face: &TowerFace) -> Shares {
 struct TickCell {
     read: Vec<i32>,
     scale: Vec<i128>,
-    /// The unframed word `[t][2M]`, and the unframed value and probe (the clock's covector reads them, §16).
+    /// The unframed key word `[t][2M]`, and the unframed value and probe (the clock's covector reads them, §16).
     word: Vec<i64>,
     vword: Vec<i64>,
     probe: Vec<i64>,
-    /// The framed words and values by head: `[h][t][2n]`, the real parts then the imaginary; the
-    /// word as a ratio to its own power within its head (on `2^(−16)`), its powers `[h][t]` beside it.
+    /// The framed keys and values by head: `[h][t][2n]`, the real parts then the imaginary; the
+    /// key as a ratio to its own power within its head (on `2^(−16)`), its powers `[h][t]` beside it.
     q: Vec<i64>,
     v: Vec<i64>,
     qscale: Vec<i128>,
-    /// A listener's probe, framed and at unit power by head (`[h][t][2n]`), and its powers (§15.12).
+    /// Every receiver's probe, framed and at unit power by head (`[h][t][2n]`), and its powers (§16.19).
     pq: Vec<i64>,
     pscale: Vec<i128>,
     /// Each head's resonance classes and their lists ([`ClassLists`]).
@@ -816,10 +799,14 @@ struct TickCell {
 /// §15.2's `½(1 ± λ)` everywhere would give every site a share of the all-bridge class (the bridge
 /// borders both plates), so every far row would be dense. §14.2's least hold had coded the cue at 2.12
 /// bits. A seam is crossed at a jump; the held step's certificate reads the code exactly, so a step
-/// across one is certified or refused on what it does.
+/// across one is certified or refused on what it does. (The cue and recall fixtures these reads used are
+/// retired as copy-shaped acceptances, §16.19; the reads stand as history.)
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct ClassLists {
+    /// Each site's class as a source, read from its key word: the class whose run lists it.
     pub class: Vec<u32>,
+    /// Each receiver's own probed class, read from its probe word (§16.19).
+    pub probe_class: Vec<u32>,
     pub definite: Vec<bool>,
     pub off: Vec<u32>,
     pub members: Vec<u32>,
@@ -845,25 +832,27 @@ impl ClassLists {
             filled[key(t)] += 1;
         }
         let probes = vec![Vec::new(); class.len()];
-        Self { class, definite, off, members, probes }
+        let probe_class = class.clone();
+        Self { class, probe_class, definite, off, members, probes }
     }
 
-    /// The lists with each receiver's other probed classes.
-    pub fn probed(mut self, probes: Vec<Vec<u32>>) -> Self {
+    /// The lists with each receiver's own probed class and its other probed classes.
+    pub fn probing(mut self, probe_class: Vec<u32>, probes: Vec<Vec<u32>>) -> Self {
+        self.probe_class = probe_class;
         self.probes = probes;
         self
     }
 
     /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.9): its near
     /// field (`0 < |i − j| < NEAR`, nearest first, before then after) and, past it, the definite sites
-    /// it hears sharply, each site once: a definite receiver the definite members of its class and of
-    /// the classes it probes across its seams, an open receiver (not definite) every definite site. The
+    /// it hears sharply, each site once: a definite receiver the definite members of its probe's class
+    /// and of the classes it probes across its seams, an open receiver (not definite) every definite site. The
     /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
         let open = !self.definite[i];
-        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
+        let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
         let listened = (0..sites).filter(move |&j| open && self.definite[j] && j.abs_diff(i) >= NEAR);
         near.chain(far).chain(listened)
@@ -885,7 +874,9 @@ impl ClassLists {
 /// 5 of its 64 problems, where the successor's earlier site shared the reader's class in at most one
 /// of its four head and tick rows and was heard only blurred through its octave's crowd; with the
 /// probes it codes 0.022 bits, and over six further foundings 0.026 to 0.060 bits (0.021 to 0.212
-/// without), every one inside the fixture's bar of 0.0625.
+/// without), every one inside the fixture's bar of 0.0625. (That fixture is retired, a far-copy recall met
+/// only through the founding's equal-word concentration; under the honest founding it coded 3.312 bits at
+/// 600 sections, §16.19.)
 pub fn probes(modes: impl Iterator<Item = (i64, i64)>, band: u32) -> Vec<u32> {
     let mut out = vec![0u32];
     let mut own = 0u32;
@@ -1045,25 +1036,6 @@ pub struct HeldRows {
     pub question_current: i128,
 }
 
-/// [measurement; agent-inferred, November 2] **A held answer row's concentration on the question**
-/// ([`Field::held_peaks`]): one row (a tick, a head and an unresolved site) over its question sources (the
-/// definite sites before the region's answer start): their mass `Σ p`, its collision sum `Σ release(p², 63)`
-/// (so `2 log₂ question − log₂ collision − 63` is the row's spread over the question in bits, its Rényi-2
-/// entropy), the largest share and its place (the smallest place at a tie; `u32::MAX` where the row meets no
-/// question source), and the mass on sources whose class is a digit. Shares on `2^(−63)`. A reading only: nothing
-/// in the law reads it. (Its mass on the site's own class, the right source, is retired with the copy face, §16.19.)
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct HeldPeak {
-    pub tick: u32,
-    pub head: u32,
-    pub site: u32,
-    pub question: u128,
-    pub collision: u128,
-    pub top: u64,
-    pub top_site: u32,
-    pub digits: u128,
-}
-
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Source {
@@ -1189,10 +1161,10 @@ impl Field {
     /// **The founding configuration** (agent-inferred, November 1), read from a declared exterior
     /// key stream (four bytes a key, a signed 32-bit integer read as a uniform draw on `[−1, 1)`):
     /// the encoding and both strand contacts uniform on `[−1, 1)` at every class, their unresolved
-    /// rows at zero (a site whose class has not arrived carries no word); the word chart `W` (the
-    /// probe and the key at once, the contact founded as the pair's likeness, the module doc), the
-    /// value chart `V` and both pair drives `W_a, W_b` uniform on `±√(3/D)`, so each read of a
-    /// unit-power face opens at unit power; the current's return `O`, the contact's return `W_c`, the
+    /// rows at zero (a site whose class has not arrived carries no word); the key chart `W_k`, the
+    /// value chart `V`, both pair drives `W_a, W_b` and the probe chart `W_p` uniform on `±√(3/D)`,
+    /// each its own keyed draw, so each read of a unit-power face opens at unit power and a probe is
+    /// founded apart from the key it meets (the module doc); the current's return `O`, the contact's return `W_c`, the
     /// readout and every bias at zero, so the field opens on the flat face and each tick on the
     /// identity.
     pub fn found(declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
@@ -1227,11 +1199,11 @@ impl Field {
         for start in [layout.a, layout.b] {
             uniform(&mut theta[start..start + f * dw], three, dd, MATERIAL_BITS)?;
         }
-        // A listener's probe opens as the word itself (§15.12): the founding reads as before, and learning
-        // moves the probe apart from the key where a receiver asks for what does not resemble it.
-        let (wq, pq) = (layout.q, layout.probe);
-        let chart: Vec<i32> = theta[wq..wq + m2 * dw].to_vec();
-        theta[pq..pq + m2 * dw].copy_from_slice(&chart);
+        // [agent-inferred, November 2, §16.19] Every receiver's probe is its own keyed draw, after the key's, the value's
+        // and the pair drives' (so their draws stand as before). Why not the key itself (the founding until
+        // November 2): a probe equal to its key meets, from the founding, the sites whose word is its own, and so
+        // the crowned contact was handed to the field rather than located by it.
+        uniform(&mut theta[layout.probe..layout.probe + m2 * dw], three, dd, MATERIAL_BITS)?;
         // The temperatures open at their derived gains (§15.10), `T = 2^(−β)`, held as `log₂ T = −β` (§16.12).
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
@@ -1301,7 +1273,7 @@ impl Field {
     fn decay(&self, h: usize, l: usize, d: usize) -> (i128, u32) {
         let dd = &self.declaration;
         let set = h % dd.frames;
-        if set < dd.still || dd.is_clock(h) {
+        if set < dd.still {
             return (1, 0);
         }
         (self.decays[l * (dd.frames - dd.still) + set - dd.still][d] as i128, MOVE_BITS)
@@ -1309,7 +1281,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **The skin across a pair** (§16, Law 1): local mode `l` of head
     /// `h` between sites `i` and `j`, `e^(−2π |σ_h(i) − σ_h(j)|/n)` on a head that reads a pace (its byte distance's
-    /// [`Field::decay`] where the pace is plain), the exact `1` on a still head or a clock.
+    /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
     fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
@@ -1432,106 +1404,6 @@ impl Field {
         Ok(all.clone().min().zip(all.max()))
     }
 
-    /// [measurement; agent-inferred, November 2] **The founding's route to a clock** (§16): for each paced head, the
-    /// first-order change of its rate along the descent of a covector `g` (`Δκ_t = ⟨−δc_h, x⁰_t⟩`, the material's
-    /// covector grain times the face's released 16 bits), summed over the region's resolved sites by whether their class is a digit:
-    /// `(head, digit sites, other sites, Σ Δκ at digits, Σ Δκ elsewhere, Σ Δκ²)`. A digit clock's route lowers the
-    /// rate at the other sites against the digits'. A reading of the material and a returned covector only.
-    pub fn pace_route(&self, region: &Region, g: &[i128], digit: &[bool]) -> Result<Vec<(usize, u64, u64, i128, i128, i128)>> {
-        self.admit_region(region)?;
-        let d = &self.declaration;
-        let width = d.alphabet + 1;
-        let mut out = Vec::new();
-        for (p, h) in (0..d.heads).filter(|&h| d.carries_moment(h)).enumerate() {
-            let row = &g[self.layout.pace + p * width..self.layout.pace + (p + 1) * width];
-            let (mut nd, mut no, mut sd, mut so, mut sq) = (0u64, 0u64, 0i128, 0i128, 0i128);
-            for t in (0..region.classes.len()).filter(|&t| !region.unresolved[t] && Self::carried(region, t).is_none()) {
-                let dk: i128 = -row[region.classes[t]];
-                sq += dk * dk;
-                if digit.get(region.classes[t]).copied().unwrap_or(false) {
-                    nd += 1;
-                    sd += dk;
-                } else {
-                    no += 1;
-                    so += dk;
-                }
-            }
-            out.push((h, nd, no, sd, so, sq));
-        }
-        Ok(out)
-    }
-
-    /// [measurement; agent-inferred, November 2] **The anchor's mode at the founding** (§16.5's consequence for
-    /// learning): at tick 1, the anchor site `anchor`'s probe on head `h`'s local mode `l` (its listener chart where
-    /// it is open, its word where definite, framed and at unit power within its head) against every definite
-    /// non-digit source's key on that mode, each mode's lock `2D Re(conj(p) k̃) − D²|k̃|²` at the pair's skin;
-    /// classified against `ε`, the mean magnitude of the digit sources' locks (a decayed digit match): opposing
-    /// (`< −ε`), near-silent (`|s| ≤ ε`) or aligned (`> ε`); and for each the sign of the lock's first-order change
-    /// along the descent of `g` on the word chart's two rows of that mode (`< 0`: driven to oppose). Returns
-    /// `[opposing, silent, aligned, silent driven to oppose, silent driven to align, digits]`. A reading only.
-    pub fn anchor_census(&self, region: &Region, anchor: usize, h: usize, l: usize, digit: &[bool], g: &[i128]) -> Result<[u64; 6]> {
-        self.admit_region(region)?;
-        let d = &self.declaration;
-        let (dw, n, m) = (d.width, d.modes, d.complex());
-        let m2 = 2 * m;
-        let sites = region.classes.len();
-        let x0 = self.open(region);
-        let paces = self.paces(region)?;
-        let reads: Vec<Vec<i32>> = x0.chunks_exact(dw).map(|x| ratio_to_power(x).map(|r| r.0)).collect::<Result<_>>()?;
-        let reaches = self.reaches();
-        let word = |chart: usize, bias: usize, reach_c: u64, t: usize| -> Result<Vec<i64>> {
-            let mut out = vec![0i64; m2];
-            affine(&self.theta[chart..chart + m2 * dw], reach_c, dw, &reads[t], Some(&self.theta[bias..bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut out)?;
-            // The head's framed span at unit power.
-            let mut span = vec![0i64; 2 * n];
-            for li in 0..n {
-                let (ur, ui) = self.frame(&paces, t, 0, h, li);
-                let (qr, qi) = (out[h * n + li] as i128, out[m + h * n + li] as i128);
-                span[li] = fit64(release(ur as i128 * qr - ui as i128 * qi, MOVE_BITS))?;
-                span[n + li] = fit64(release(ui as i128 * qr + ur as i128 * qi, MOVE_BITS))?;
-            }
-            Ok(ratio_to_power(&span)?.0.into_iter().map(|v| v as i64).collect())
-        };
-        let open_anchor = region.unresolved[anchor];
-        let probe = if open_anchor { word(self.layout.probe, self.layout.probe_bias, reaches.probe, anchor)? } else { word(self.layout.q, self.layout.q_bias, reaches.q, anchor)? };
-        let (pr, pi) = (probe[l] as i128, probe[n + l] as i128);
-        let lock_at = |k: &[i64], j: usize| -> Result<i128> { lock((pr, pi), (k[l] as i128, k[n + l] as i128), 1, self.pair_decay(&paces, h, l, anchor, j)) };
-        let (mut digit_mag, mut digits) = (0i128, 0u64);
-        let mut others: Vec<(i128, i128)> = Vec::new();
-        for j in (0..sites).filter(|&j| j != anchor && Self::definite(region, j)) {
-            let k = word(self.layout.q, self.layout.q_bias, reaches.q, j)?;
-            let s_j = lock_at(&k, j)?;
-            if digit.get(region.classes[j]).copied().unwrap_or(false) {
-                digit_mag += s_j.abs();
-                digits += 1;
-                continue;
-            }
-            // The descent's change of this key on the mode's two rows (the first order, before the frame and the
-            // power: the frame is a turn and the sign of the pairing's change is read through it).
-            let rows = [h * n + l, m + h * n + l];
-            let dq: Vec<i128> = rows.iter().map(|&o| -(g[self.layout.q + o * dw..self.layout.q + (o + 1) * dw].iter().zip(&reads[j]).map(|(&gc, &r)| gc * r as i128).sum::<i128>() + g[self.layout.q_bias + o])).collect();
-            let (ur, ui) = self.frame(&paces, j, 0, h, l);
-            let (fr, fi) = (ur as i128 * dq[0] - ui as i128 * dq[1], ui as i128 * dq[0] + ur as i128 * dq[1]);
-            let change = (pr * (fr >> 30) + pi * (fi >> 30)).signum();
-            others.push((s_j, change));
-        }
-        let eps = if digits == 0 { 0 } else { digit_mag / digits as i128 };
-        let mut out = [0u64; 6];
-        for (s_j, change) in others {
-            if s_j < -eps {
-                out[0] += 1;
-            } else if s_j > eps {
-                out[2] += 1;
-            } else {
-                out[1] += 1;
-                out[3] += u64::from(change < 0);
-                out[4] += u64::from(change > 0);
-            }
-        }
-        out[5] = digits;
-        Ok(out)
-    }
-
     /// [measurement] A region's opening faces `x⁰` (`[t][D]` on `2^(−16)`), a reading for the receipts.
     pub fn opening(&self, region: &Region) -> Result<Vec<i64>> {
         self.admit_region(region)?;
@@ -1563,7 +1435,7 @@ impl Field {
 
     /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`: the identity in a head of
     /// a still ring set, the mode's ring in a turned one.
-    fn frame(&self, paces: &Paces, t: usize, tau: u32, h: usize, l: usize) -> (i64, i64) {
+    fn frame(&self, paces: &Paces, t: usize, h: usize, l: usize) -> (i64, i64) {
         let d = &self.declaration;
         let set = h % d.frames;
         if set < d.still {
@@ -1571,9 +1443,6 @@ impl Field {
         }
         let slot = l * (d.frames - d.still) + set - d.still;
         let (n, ring) = &self.rings[slot];
-        if d.is_clock(h) {
-            return ring[tau as usize % n];
-        }
         // A turned head's frame is its own clock's (§16, Law 1): the byte place where its pace is plain.
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] => self.turn(slot, paces.tau[p][t] as i128),
@@ -1606,8 +1475,8 @@ impl Field {
                 return refuse("a carried face that is empty, or whose class is outside the alphabet or share past one");
             }
         }
-        if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || (self.declaration.clocks > 0 && region.clock.iter().any(|&c| c as usize >= self.declaration.reach)))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
-            return refuse("a region's clocks or echoes that are not one a site, or a clock past the reach");
+        if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+            return refuse("a region's echoes that are not one a site");
         }
         if region.echo.iter().flatten().any(|e| e.logits.len() != self.declaration.alphabet) {
             return refuse("an echo whose logits are not one a class");
@@ -1622,11 +1491,6 @@ impl Field {
     /// carrying no mixture) or locked (a foil). Only definite sources are heard past the near field.
     fn definite(region: &Region, t: usize) -> bool {
         (!region.unresolved[t] && Self::carried(region, t).is_none()) || region.locked.get(t).copied().unwrap_or(false)
-    }
-
-    /// Each site's clock (§15.4), zero where the region declares none.
-    fn clock(region: &Region) -> Vec<u32> {
-        if region.clock.is_empty() { vec![0; region.classes.len()] } else { region.clock.to_vec() }
     }
 
     /// The face a site is carried as, if any.
@@ -1826,7 +1690,7 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], definite: &[bool], clock: &[u32], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    fn tick(&self, x: &mut [i64], definite: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -1841,7 +1705,7 @@ impl Field {
             cell.read.extend_from_slice(&r);
             cell.scale.push(s);
         }
-        // One word a head, the probe and the key at once (`q = k`, §2.1), and the value.
+        // The key word a head, and the value.
         let mut q = vec![0i64; sites * m2];
         let mut v = vec![0i64; sites * m2];
         for t in 0..sites {
@@ -1853,18 +1717,22 @@ impl Field {
                 *vv = fit64(*vv as i128 + mv as i128)?;
             }
         }
-        // A listener's probe (§15.12): its own chart of the same read.
+        // Every receiver's probe (§16.19): its own chart of the same read.
         let mut pr = vec![0i64; sites * m2];
         for t in 0..sites {
             let rt = &cell.read[t * dw..(t + 1) * dw];
             affine(&self.theta[l.probe..l.probe + m2 * dw], reaches.probe, dw, rt, Some(&self.theta[l.probe_bias..l.probe_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut pr[t * m2..(t + 1) * m2])?;
         }
-        // The resonance classes: the unframed word's shells, head by head (§12).
+        // The resonance classes, head by head (§12, §16.19): a source's the shells of its unframed key word (the
+        // class it is met in), a receiver's the shells of its unframed probe word and the classes it probes
+        // across their seams (the classes it meets).
+        let class_of = |word: &[i64], t: usize, h: usize| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(word[t * m2 + h * n + li], word[t * m2 + m + h * n + li]));
         cell.classes = (0..heads)
             .map(|h| {
-                let class = (0..sites).map(|t| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(q[t * m2 + h * n + li], q[t * m2 + m + h * n + li]))).collect();
-                let probed = (0..sites).map(|t| probes((0..trits).map(|li| (q[t * m2 + h * n + li], q[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists::of(class, definite.to_vec(), buckets).probed(probed)
+                let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
+                let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
+                let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
+                ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed)
             })
             .collect();
         cell.word = q.clone();
@@ -1879,7 +1747,7 @@ impl Field {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(paces, t, clock[t], h, li);
+                    let (ur, ui) = self.frame(paces, t, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (q[t * m2 + c] as i128, q[t * m2 + m + c] as i128);
                     let (vr, vi) = (v[t * m2 + c] as i128, v[t * m2 + m + c] as i128);
@@ -1910,7 +1778,7 @@ impl Field {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(paces, t, clock[t], h, li);
+                    let (ur, ui) = self.frame(paces, t, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (pr[t * m2 + c] as i128, pr[t * m2 + m + c] as i128);
                     cell.pq[at + li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
@@ -1942,8 +1810,8 @@ impl Field {
             let lists = &cell.classes[h];
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
-                // A listener probes with its own word (§15.12); a class receiver's probe is its word.
-                let wi = if lists.listens(i) { &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span] } else { &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span] };
+                // Every receiver probes with its own probe word (§16.19), against each source's key.
+                let wi = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
                 // The lock's temperature for this receiver's kind (§15.10).
                 let temper = self.temper(h, lists.listens(i))?;
                 let mut series = SeriesRow::new(span);
@@ -1997,7 +1865,7 @@ impl Field {
                     c.e = share;
                 }
                 for li in 0..n {
-                    let (ur, ui) = self.frame(paces, i, clock[i], h, li);
+                    let (ur, ui) = self.frame(paces, i, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
                     let c = h * n + li;
@@ -2058,14 +1926,13 @@ impl Field {
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
-        let clock = Self::clock(region);
         let mut out = FieldPass::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
         let mut before: Option<Vec<Vec<Source>>> = None;
         for _ in 0..d.ticks {
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &clock, &paces, &moment, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &paces, &moment, &reaches, &mut cell)?;
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
@@ -2173,54 +2040,6 @@ impl Field {
         Ok(out)
     }
 
-    /// [measurement; agent-inferred, November 2] **A held read's answer rows by their concentration on the
-    /// question** ([`HeldPeak`]): for each tick, head and unresolved site in that order, the row's question mass,
-    /// collision sum, largest share and its place, and its mass on digit classes (`digit[c]`). A reading only:
-    /// nothing in the law reads it.
-    pub fn held_peaks(&self, region: &Region, question: usize, digit: &[bool]) -> Result<Vec<HeldPeak>> {
-        let pass = self.pass(region, true)?;
-        let sites = region.classes.len();
-        let mut out = Vec::new();
-        for (tick, cell) in pass.ticks.iter().enumerate() {
-            for h in 0..self.declaration.heads {
-                for i in (0..sites).filter(|&i| region.unresolved[i]) {
-                    let mut peak = HeldPeak { tick: tick as u32, head: h as u32, site: i as u32, question: 0, collision: 0, top: 0, top_site: u32::MAX, digits: 0 };
-                    for src in &cell.rows[h * sites + i] {
-                        let j = src.j as usize;
-                        if src.p == 0 || j >= question || !Self::definite(region, j) {
-                            continue;
-                        }
-                        let p = src.p as u128;
-                        peak.question += p;
-                        peak.collision += release(src.p as i128 * src.p as i128, SHARE_BITS) as u128;
-                        let c = region.classes[j];
-                        if digit.get(c).copied().unwrap_or(false) {
-                            peak.digits += p;
-                        }
-                        if src.p > peak.top || (src.p == peak.top && src.j < peak.top_site) {
-                            peak.top = src.p;
-                            peak.top_site = src.j;
-                        }
-                    }
-                    out.push(peak);
-                }
-            }
-        }
-        Ok(out)
-    }
-
-    /// [`Field::held_peaks`] of each of `regions` in turn (each with its own answer start `questions[r]`).
-    pub fn held_peaks_all(&self, regions: &[Region], questions: &[usize], digit: &[bool]) -> Result<Vec<HeldPeak>> {
-        if regions.len() != questions.len() {
-            return refuse("a held read's answer starts that are not one a region");
-        }
-        let mut out = Vec::new();
-        for (region, &question) in regions.iter().zip(questions) {
-            out.extend(self.held_peaks(region, question, digit)?);
-        }
-        Ok(out)
-    }
-
     /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
     pub fn held_rows_all(&self, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         if regions.len() != questions.len() {
@@ -2297,14 +2116,9 @@ impl Field {
         Ok((code, count))
     }
 
-    /// The exact reverse of [`Field::pass`] against each unresolved site's class, added into `g`
-    /// on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's
-    /// `Σ δz x` on `2^(−40)`).
-    fn reverse(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned(region, pass, g)
-    }
-
-    /// The reverse: the code's own covector, which the reverse's law tests read against the code's difference.
+    /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
+    /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
+    /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
@@ -2318,7 +2132,6 @@ impl Field {
             return refuse("a reverse reads a forward that held every tick");
         }
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
-        let clock = Self::clock(region);
         let paces = &pass.paces;
         // The clocks' covectors (§16, Law 1): `[pace index][t]`, `2^24 ∂/∂τ_t` and `2^24 ∂/∂σ_t` on `2^(−24)`.
         let paced = paces.kappa.len();
@@ -2430,7 +2243,7 @@ impl Field {
                 for t in 0..sites {
                     for li in 0..n {
                         let c = h * n + li;
-                        let (ur, ui) = self.frame(paces, t, clock[t], h, li);
+                        let (ur, ui) = self.frame(paces, t, h, li);
                         let (ur, ui) = (ur as i128, ui as i128);
                         let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
                         dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
@@ -2443,9 +2256,8 @@ impl Field {
                 let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
                 let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
                 let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
-                let lists = &cell.classes[h];
-                // A receiver's probe: a listener's own, a class receiver's word (§15.12).
-                let probe_of = |i: usize, r: usize| -> i64 { if lists.listens(i) { ph[i * span + r] } else { qh[i * span + r] } };
+                // A receiver's probe word (§16.19).
+                let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
                 let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
                 // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
                 // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
@@ -2578,7 +2390,7 @@ impl Field {
                                 let (vr, vi) = (sums.value(c.lo, c.hi, l), sums.value(c.lo, c.hi, n + l));
                                 let inner = dyh[i * span + l] as i128 * vr + dyh[i * span + n + l] as i128 * vi;
                                 let value = div_nearest(release(c.e as i128 * inner, SHARE_BITS), count);
-                                let (wr, wi) = (qh[i * span + l] as i128, qh[i * span + n + l] as i128);
+                                let (wr, wi) = (ph[i * span + l] as i128, ph[i * span + n + l] as i128);
                                 let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
                                 let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
                                 let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
@@ -2589,10 +2401,10 @@ impl Field {
                         }
                     }
                 }
-                // The one word is both the probe and the key, so it returns both roles through each mode's
-                // lock ([`lock`]): as the probe `δw̃_i += Σ_(j∈S_i) δs_ij D(|i − j|) w̃_j`, as the key
-                // `δw̃_j += Σ_(i: j∈S_i) δs_ij (D w̃_i − D² w̃_j)`, and a crowd's `δs_C D w̄/|C|` to its receiver
-                // and `δs_C (D w̃_i/|C| − D² w̄/|C|²)` to each member; each sum released to 2^(−24).
+                // Each mode's lock ([`lock`]) returns to its two words: to the receiver's probe
+                // `δp̃_i += Σ_(j∈S_i) δs_ij D(|i − j|) k̃_j`, to each source's key `δk̃_j += Σ_(i: j∈S_i) δs_ij (D p̃_i − D² k̃_j)`,
+                // and a crowd's `δs_C D k̄/|C|` to its receiver's probe and `δs_C (D p̃_i/|C| − D² k̄/|C|²)` to each
+                // member's key; each sum released to 2^(−24).
                 let mut col = vec![0i128; sites * span];
                 let mut crowd_w = vec![0i128; (sites + 1) * span];
                 for i in 0..sites {
@@ -2610,7 +2422,7 @@ impl Field {
                         for r in 0..span {
                             let (dec, g) = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
                             let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
-                            let bracket = release(((dec * qh[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
+                            let bracket = release(((dec * ph[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
                             let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
                             crowd_w[c.lo * span + r] += part;
                             crowd_w[(c.hi + 1) * span + r] -= part;
@@ -2625,12 +2437,8 @@ impl Field {
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
-                        if lists.listens(i) {
-                            dp[i * m2 + slot] = fit64(release(sq, back))?;
-                            dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
-                        } else {
-                            dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
-                        }
+                        dp[i * m2 + slot] = fit64(release(sq, back))?;
+                        dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
                         if definite[i] {
                             dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
                         }
@@ -2651,7 +2459,7 @@ impl Field {
                     }
                 }
             }
-            // The probe's return through its own power, alike (§15.12).
+            // The probe's return through its own power, alike (§16.19).
             for h in 0..heads {
                 for t in 0..sites {
                     let at = (h * sites + t) * span;
@@ -2670,7 +2478,7 @@ impl Field {
             // Undo the frame: δw = conj(U) δw̃, and so for the values.
             for t in 0..sites {
                 for c in 0..m {
-                    let (ur, ui) = self.frame(paces, t, clock[t], c / n, c % n);
+                    let (ur, ui) = self.frame(paces, t, c / n, c % n);
                     let (ur, ui) = (ur as i128, ui as i128);
                     for chart in [&mut dq, &mut dv, &mut dp] {
                         let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
@@ -2902,9 +2710,9 @@ impl Field {
             }
             progress.done = done + 1;
             // The views: the question, the reached sites and the five past the front.
-            let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void, done))).collect();
+            let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void))).collect();
             let reads = {
-                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, clock: &v.clock, echo: &v.echo }).collect();
+                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, echo: &v.echo }).collect();
                 read(&regions)?
             };
             let logits: Vec<&Vec<Option<Vec<i64>>>> = reads.iter().map(|r| &r.logits).collect();
@@ -3122,8 +2930,6 @@ pub struct Released {
     pub extent: Option<(usize, usize, bool)>,
     pub classes: Vec<usize>,
     pub faces: Vec<Option<Shares>>,
-    /// Each reached site's own face at `β = 1` (§16.19), the lock's reading: how sure the field itself is.
-    pub own: Vec<Option<Shares>>,
     pub start: usize,
 }
 
@@ -3175,7 +2981,6 @@ struct View {
     unresolved: Vec<bool>,
     faces: Vec<Option<Shares>>,
     locked: Vec<bool>,
-    clock: Vec<u32>,
     echo: Vec<Option<Echo>>,
 }
 
@@ -3198,29 +3003,24 @@ impl Joint {
     /// The sweep's view (§14.3, §14.7): the question known; each reached site carrying its face at its
     /// own pump (over the content classes once the extent is read) and its lock; the five sites past the
     /// front on the unresolved row; after the extent, its boundary the resolved void.
-    /// The view read at sweep `done`: the question (its clock the sweeps since the release began), the
-    /// reached sites (each carrying its face, its echo and its clock, the sweeps since it was reached,
-    /// §15.3–§15.4) and the five sites past the front.
-    fn view(&self, field: &Field, void: usize, done: usize) -> View {
+    /// The question, the reached sites (each carrying its face and its echo, §15.3) and the five sites past the front.
+    fn view(&self, field: &Field, void: usize) -> View {
         let content_void = self.extent.is_some().then_some(void);
         let end = (self.front() + NEAR - 1).min(self.classes.len());
         let mut unresolved = vec![false; end];
         let mut faces = vec![None; end];
         let mut locked = vec![false; end];
-        let mut clock = vec![0u32; end];
         let mut echo = vec![None; end];
-        clock[..self.start.min(end)].iter_mut().for_each(|c| *c = done as u32);
         for t in self.start..end.min(self.content) {
             unresolved[t] = true;
             let site = &self.sites[t - self.start];
-            if let Some(r) = site.reached {
+            if site.reached.is_some() {
                 faces[t] = Some(shares(&field.site_face(&site.logits, site.beta, content_void)));
                 locked[t] = site.locked.is_some();
-                clock[t] = (done - r) as u32;
                 echo[t] = Some(Echo { b: site.echo, logits: site.logits.clone() });
             }
         }
-        View { end, unresolved, faces, locked, clock, echo }
+        View { end, unresolved, faces, locked, echo }
     }
 
     fn released(self, field: &Field, void: usize) -> Released {
@@ -3259,17 +3059,6 @@ impl Joint {
                     }
                 }
                 faces
-            },
-            own: {
-                let content_void = skip_void.then_some(void);
-                let mut own = vec![None; self.classes.len()];
-                for (t, face) in own.iter_mut().enumerate().take(self.content).skip(self.start) {
-                    let s = &self.sites[t - self.start];
-                    if s.reached.is_some() {
-                        *face = Some(shares(&field.site_face(&s.logits, 1, content_void)));
-                    }
-                }
-                own
             },
             classes: self.classes,
             start: self.start,
@@ -3486,11 +3275,6 @@ pub trait FieldRealization {
     fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
         refuse("a realization that cannot read its rows' shares")
     }
-    /// A held read's answer rows by their concentration on the question, region by region
-    /// ([`Field::held_peaks_all`]), a reading for the receipts.
-    fn read_row_peaks(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize], _digit: &[bool]) -> Result<Vec<HeldPeak>> {
-        refuse("a realization that cannot read its rows' peaks")
-    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3513,9 +3297,6 @@ impl FieldRealization for HostField {
     }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         field.held_rows_all(regions, questions)
-    }
-    fn read_row_peaks(&mut self, field: &Field, regions: &[Region], questions: &[usize], digit: &[bool]) -> Result<Vec<HeldPeak>> {
-        field.held_peaks_all(regions, questions, digit)
     }
 }
 

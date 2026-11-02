@@ -369,7 +369,7 @@ pub(super) fn read_tower_pair(args: &[String]) -> Result<()> {
 /// order (`TOWER_PAIR_COMPARISON`). Record
 /// `2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md`
 /// §6 and §7: a coefficient multiplies the entry's face, so what a contact hears of a mode is this
-/// weight times the mode's loudness (`numeral_rings.py scale`), and of a strand's face, at amplitude
+/// weight times the mode's loudness, and of a strand's face, at amplitude
 /// one, this weight. An exterior reading; the tower is not moved.
 pub(super) fn read_tower_pair_modes(args: &[String]) -> Result<()> {
     if args.len() != 3 {
@@ -4263,8 +4263,7 @@ fn written_release(tower: &Tower, units: &Units, prompt: &[u8], keys: &mut KeySt
 /// rest, so each problem and each calculation is read alone, as the John prompt is. Problem `i`
 /// draws from its own window of the key file, `BYTES + MARK_CAP · (the most calculations a problem
 /// writes)` eight-byte keys: the free release from the window's start, the calculations after its
-/// first `BYTES`. The fields are escaped as [`field`] writes them. Nothing here grades: the rules
-/// are read outside the machine (`tools/gsm8k/written_rules.py`).
+/// first `BYTES`. The fields are escaped as [`field`] writes them. Nothing here grades.
 pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-unit-tower-written UNITS UNITS_SHA STATE STATE_SHA HELD HELD_SHA KEYS KEYS_SHA BYTES AGREE MARK_AGREE MARK_CAP OUT".into());
@@ -4386,8 +4385,8 @@ pub(super) fn read_unit_written(args: &[String]) -> Result<()> {
 /// bytes increasing. After the unit that holds a place's byte steps, `OUT` (create-new) receives,
 /// little-endian, the place's line in `PLACES` (`u32`) and every level's carried modes (`levels` ×
 /// `modes` × (re, im) `i64`, the state's own grain): the record `read-tower-classes-at` writes, with
-/// no top face. An exterior reading of what the frozen tower holds where an observer looks
-/// (`tools/gsm8k/numeral_rings.py`); nothing in it enters the tower.
+/// no top face. An exterior reading of what the frozen tower holds where an observer looks; nothing in it
+/// enters the tower. (Its reader, the numeral-ring probe, is retired, November 2.)
 pub(super) fn read_unit_at(args: &[String]) -> Result<()> {
     if args.len() != 10 {
         return Err("read-unit-tower-at UNITS UNITS_SHA STATE STATE_SHA TEXT TEXT_SHA PLACES PLACES_SHA OUT".into());

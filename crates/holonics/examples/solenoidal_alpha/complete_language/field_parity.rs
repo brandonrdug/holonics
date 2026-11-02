@@ -17,10 +17,10 @@
 //! projects a lap from the measured upper time a site pair, and the held problems' releases from that
 //! time and the sweeps the front's measured speed gives.
 
-use super::field_train::{clocks_of, extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
+use super::field_train::{extent_text, held_regions, locks_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
-use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldPeak, HeldRows, HostField, Region, ReleaseSweep};
+use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldRows, HostField, Region, ReleaseSweep};
 use holonics::hnn::tower::{TowerError, TowerFace};
 use rayon::prelude::*;
 
@@ -74,7 +74,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, clocks: clocks_of(heads, still) };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach };
         Ok(FieldLearner::new(Field::found(declaration, &self.keys).map_err(|e| e.to_string())?, rate))
     }
 }
@@ -111,9 +111,6 @@ impl FieldRealization for Recorder<'_> {
     }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.inner.read_row_shares(field, regions, questions)
-    }
-    fn read_row_peaks(&mut self, field: &Field, regions: &[Region], questions: &[usize], digit: &[bool]) -> std::result::Result<Vec<HeldPeak>, TowerError> {
-        self.inner.read_row_peaks(field, regions, questions, digit)
     }
 }
 
@@ -154,10 +151,6 @@ impl FieldRealization for Counted<'_> {
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.count(field, regions);
         self.inner.read_row_shares(field, regions, questions)
-    }
-    fn read_row_peaks(&mut self, field: &Field, regions: &[Region], questions: &[usize], digit: &[bool]) -> std::result::Result<Vec<HeldPeak>, TowerError> {
-        self.count(field, regions);
-        self.inner.read_row_peaks(field, regions, questions, digit)
     }
 }
 
@@ -329,19 +322,12 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             let questions: Vec<usize> = some.iter().map(|r| r.unresolved.iter().position(|&u| u).unwrap_or(r.classes.len())).collect();
             some.is_empty() || host_learner.field.held_rows_all(some, &questions).map_err(|e| e.to_string())? == card.read_row_shares(&card_learner.field, some, &questions).map_err(|e| e.to_string())?
         };
-        // The same regions' answer rows by their concentration on the question, host against card.
-        let peaks_equal = {
-            let some = &host_views[..host_views.len().min(6)];
-            let questions: Vec<usize> = some.iter().map(|r| r.unresolved.iter().position(|&u| u).unwrap_or(r.classes.len())).collect();
-            let digit: Vec<bool> = (0..host_learner.field.declaration.alphabet).map(|c| p.codec.is_digit(c)).collect();
-            some.is_empty() || host_learner.field.held_peaks_all(some, &questions, &digit).map_err(|e| e.to_string())? == card.read_row_peaks(&card_learner.field, some, &questions, &digit).map_err(|e| e.to_string())?
-        };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && peaks_equal;
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} peaks_equal={peaks_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
@@ -365,7 +351,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         // The landmarks of every content site, read from the last state on both.
         let unresolved: Vec<bool> = host.faces.iter().map(Option::is_some).collect();
         let locked = locks_of(&host);
-        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &locked, clock: &[], echo: &[] };
+        let region = Region { classes: &host.classes, unresolved: &unresolved, faces: &host.faces, locked: &locked, echo: &[] };
         let sites: Vec<usize> = (host.start..host.start + host.sites.len()).collect();
         let marks_equal = sites.is_empty() || host_learner.field.landmarks(&region, q.len(), &sites, 3).map_err(|e| e.to_string())? == card.read_landmarks(&card_learner.field, &region, q.len(), &sites, 3).map_err(|e| e.to_string())?;
         let equal = &host == carded && marks_equal;

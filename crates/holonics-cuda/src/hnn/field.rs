@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldPeak, HeldRows, Region, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -90,7 +90,6 @@ struct Words {
     t: u32,
     r: u32,
     slots: u32,
-    clocks: u32,
     band: u32,
     pairs: u64,
     ln2_lo: u64,
@@ -164,7 +163,6 @@ struct Words {
     ce: u64,
     cv: u64,
     cw: u64,
-    clock: u64,
     moment: u64,
     echo_has: u64,
     echo_b: u64,
@@ -287,8 +285,8 @@ struct Tick<'c> {
     qf: Pooled<'c, i64>,
     /// The unit words on 32 bits `[h][t][span]` (`field_unit` writes them beside `qf`).
     qf32: Pooled<'c, i32>,
-    /// A listener's probe framed and at unit power by head (`[h][t][span]`, and on 32 bits) with its powers
-    /// `[h][t]` (§15.12).
+    /// Every receiver's probe framed and at unit power by head (`[h][t][span]`, and on 32 bits) with its powers
+    /// `[h][t]` (§16.19).
     pq: Pooled<'c, i64>,
     pq32: Pooled<'c, i32>,
     pscale: Pooled<'c, i128>,
@@ -468,10 +466,6 @@ pub struct CardField<'c> {
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current]` summed.
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
-    /// A held read's answer rows by their concentration on the question (a reading for the receipts): the
-    /// regions' answer starts and the digit classes while it is read, and the rows read, region by region.
-    held_peaks: std::cell::RefCell<Option<(Vec<usize>, Vec<u8>)>>,
-    peak_rows: std::cell::RefCell<Vec<HeldPeak>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -486,7 +480,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), held_cells: Default::default(), held_peaks: Default::default(), peak_rows: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), held_cells: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -658,8 +652,8 @@ impl<'c> CardField<'c> {
             if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
                 return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
             }
-            if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || region.clock.iter().any(|&c| c as usize >= d.reach))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
-                return Err(TowerError::Refused("a region's clocks or echoes that are not one a site, or a clock past the reach"));
+            if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's echoes that are not one a site"));
             }
             if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
                 return Err(TowerError::Refused("an echo whose logits are not one a class"));
@@ -691,15 +685,15 @@ impl<'c> CardField<'c> {
             decay.push(0);
         }
 
-        // The skins `[h][d][n]` on 32 bits for the exposure's vector loads (eight modes a head; a still or clock head's
-        // is the exact 1).
+        // The skins `[h][d][n]` on 32 bits for the exposure's vector loads (eight modes a head; a still head's is the
+        // exact 1).
         let mut decay_t: Vec<u32> = Vec::new();
         if d.modes == 8 {
             let (frames, still_sets, reach) = (d.frames, d.still, d.reach);
             let per_set = frames - still_sets;
             for h in 0..d.heads {
                 let set = h % frames;
-                let not_turned = set < still_sets || set >= frames - d.clocks;
+                let not_turned = set < still_sets;
                 for gap in 0..reach {
                     for l in 0..8usize {
                         let v = if not_turned { 1 } else { decay[(l * per_set + set - still_sets) * reach + gap] };
@@ -761,7 +755,6 @@ impl<'c> CardField<'c> {
             span: (2 * n) as u32,
             digits: roots.len() as u32,
             slots: slots as u32,
-            clocks: d.clocks as u32,
             band: band_bits(d.class_trits()),
             ln2_lo: ln2 as u64,
             ln2_hi: (ln2 >> 64) as u64,
@@ -873,7 +866,8 @@ impl<'c> CardField<'c> {
         let slots = crowd_slots(d.reach);
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let classes = d.classes();
-        let probe_stride = (1usize << d.class_trits()) - 1;
+        // A receiver's probed classes: its probe's own and the `2^b − 1` across its seams (§16.19).
+        let probe_stride = 1usize << d.class_trits();
         let card = self.card;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
@@ -934,8 +928,8 @@ impl<'c> CardField<'c> {
         let mut unresolved = Vec::new();
         // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
         let mut definite = Vec::new();
-        // Each site's clock (§15.4) and echo (§15.3): its `B`, and its logits a class (zero where none).
-        let (mut clock, mut echo_has, mut echo_b, mut echo_logits) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        // Each site's echo (§15.3): its `B`, and its logits a class (zero where none).
+        let (mut echo_has, mut echo_b, mut echo_logits) = (Vec::new(), Vec::new(), Vec::new());
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
@@ -961,7 +955,6 @@ impl<'c> CardField<'c> {
                 } else {
                     olist.push(t as u32);
                 }
-                clock.push(region.clock.get(t).copied().unwrap_or(0));
                 match region.echo.get(t).and_then(Option::as_ref) {
                     Some(e) => {
                         echo_has.push(1u8);
@@ -1008,7 +1001,6 @@ impl<'c> CardField<'c> {
         let classes_at = pack.put(&classes);
         let unresolved_at = pack.put(&unresolved);
         let definite_at = pack.put(&definite);
-        let clock_at = pack.put(&clock);
         let echo_has_at = pack.put(&echo_has);
         let echo_b_at = pack.put(&echo_b);
         let echo_logits_at = pack.put(&echo_logits);
@@ -1030,7 +1022,6 @@ impl<'c> CardField<'c> {
         words.classes = base + classes_at;
         words.unresolved = base + unresolved_at;
         words.definite = base + definite_at;
-        words.clock = base + clock_at;
         words.echo_has = base + echo_has_at;
         words.echo_b = base + echo_b_at;
         words.echo_logits = base + echo_logits_at;
@@ -1055,7 +1046,7 @@ impl<'c> CardField<'c> {
         // The site moments (§15.1), once for the pass, added into every tick's values.
         let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         words.moment = moment.device_ptr();
-        // A listener's probe chart of the read, once a tick (§15.12), framed and put at unit power by head.
+        // Every receiver's probe chart of the read, once a tick (§16.19), framed and put at unit power by head.
         let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
         words.pr = pr.device_ptr();
         // The turned heads' clocks (§16): their rates, clocks, variations and plainness `[p][t]`, `[p][r]`, and frames.
@@ -1119,11 +1110,12 @@ impl<'c> CardField<'c> {
             // A value is linear in its site's moment (§15.1).
             self.launch("field_moment_add", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words)])?;
             card.zero_octets(&tick.bits, 0, 16).map_err(device)?;
+            // Every receiver's probe (§16.19), before the classes: a receiver's probed classes are its probe's.
+            self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr.device_ptr(), m2, 0, false)?;
             self.launch_shared("field_classes", (heads * regions.len()).clamp(1, 1 << 20) as u32, 32, buckets, &mut [arg(words)])?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut qs = tick.qscale.device_ptr();
             self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs)])?;
-            self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr.device_ptr(), m2, 0, false)?;
             self.launch("field_frame_probe", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut ps = tick.pscale.device_ptr();
             self.launch("field_unit_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps)])?;
@@ -1180,32 +1172,6 @@ impl<'c> CardField<'c> {
             }
             for (t, c) in total.iter_mut().zip(cells) {
                 *t += c;
-            }
-        }
-        // A held read's answer rows by their concentration on the question (a reading for the receipts).
-        if let Some((questions, digit)) = self.held_peaks.borrow().as_ref() {
-            let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
-            let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
-            let digit_c = self.timed(Kind::Copy, || self.take_up(digit)).map_err(device)?;
-            let mut cells = Vec::with_capacity(ticks.len());
-            for tick in ticks.iter() {
-                set(words, tick);
-                let out = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * 5)).map_err(device)?;
-                let (mut sp, mut dp, mut op) = (starts_c.device_ptr(), digit_c.device_ptr(), out.device_ptr());
-                self.launch("field_held_peaks", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut dp), arg(&mut op)])?;
-                cells.push(self.timed(Kind::Copy, || self.card.fetch_range(&*out, 0, heads * sites * 5)).map_err(device)?);
-            }
-            let mut rows = self.peak_rows.borrow_mut();
-            for (r, region) in regions.iter().enumerate() {
-                let first = region_off[r] as usize;
-                for (k, cell) in cells.iter().enumerate() {
-                    for h in 0..heads {
-                        for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
-                            let c = &cell[(h * sites + first + t) * 5..][..5];
-                            rows.push(HeldPeak { tick: k as u32, head: h as u32, site: t as u32, question: c[0] as u128, collision: c[1] as u128, top: c[2] as u64, top_site: c[3] as u32, digits: c[4] as u128 });
-                        }
-                    }
-                }
             }
         }
         // The faces at the unresolved sites.
@@ -1273,7 +1239,7 @@ impl<'c> CardField<'c> {
 
     /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
     /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]), every moment mode (a turned head that
-    /// is not a clock, each of its modes) in the same launches: the strands' encodings of each mode's ring
+    /// is turned, each of its modes) in the same launches: the strands' encodings of each mode's ring
     /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
     /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
     /// to a grid row), and placed at the unframed value's modes.
@@ -1400,7 +1366,7 @@ impl<'c> CardField<'c> {
         let dyh = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
-        // A listener's probe role, its own chart's covector (§15.12).
+        // The probe role, its own chart's covector (§16.19).
         let dp = alloc64(sites * m2)?;
         words.dp = dp.device_ptr();
         // The contact's covector a pair, `|δs| < 2^dsbits` with `dsbits ≤ 63` (refused past it).
@@ -1506,7 +1472,7 @@ impl<'c> CardField<'c> {
             }
             let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
             self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
-            // The probe's return through its own power, alike (§15.12).
+            // The probe's return through its own power, alike (§16.19).
             let (mut ps, mut dpp) = (tick.pscale.device_ptr(), dp.device_ptr());
             self.launch("field_unit_back_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps), arg(&mut dpp)])?;
             for chart in [&dq, &dv, &dp] {
@@ -1654,12 +1620,12 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // row (words and values on 128 bits, a count) and its crowd shares (`crowd_slots` words a head).
     let slots = crowd_slots(d.reach) as u64;
     // A receiver's probes: their number, their classes, and its place among the probers of each (`2^b − 1`).
-    let probe_site = 4 * h * (1 + 2 * ((1u64 << d.class_trits()) - 1));
+    let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
-    // A site's carried mixture, definite bit, clock, echo (a flag, `B` and logits) and the round trips.
-    let mixture_site = 5 + 2 * 4 * a + 4 + 9 + 8 * a + 16;
+    // A site's carried mixture, definite bit, echo (a flag, `B` and logits) and the round trips.
+    let mixture_site = 5 + 2 * 4 * a + 9 + 8 * a + 16;
     // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
     // (112 octets a site), batched over the modes.
     let tm = d.moment_modes() as u64;
@@ -1778,18 +1744,6 @@ impl FieldRealization for CardField<'_> {
         Ok(cells.chunks_exact(5).map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4] }).collect())
     }
 
-    fn read_row_peaks(&mut self, field: &Field, regions: &[Region], questions: &[usize], digit: &[bool]) -> Result<Vec<HeldPeak>> {
-        if regions.len() != questions.len() || digit.len() != field.declaration.alphabet {
-            return Err(TowerError::Refused("a held read's answer starts that are not one a region, or digit classes not one a class"));
-        }
-        // The shares of every tick are kept (a logits read keeps them), and read once each by `field_held_peaks`.
-        *self.held_peaks.borrow_mut() = Some((questions.to_vec(), digit.iter().map(|&b| u8::from(b)).collect()));
-        self.peak_rows.borrow_mut().clear();
-        let read = self.run(field, regions, false, true, None);
-        *self.held_peaks.borrow_mut() = None;
-        read?;
-        Ok(std::mem::take(&mut *self.peak_rows.borrow_mut()))
-    }
 }
 
 /// Each kept site's still heads' rows: the met sources with their weights, and the row's mass.
@@ -1800,7 +1754,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, clocks: 0 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221 }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

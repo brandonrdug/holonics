@@ -1846,7 +1846,7 @@ at its end; the extent's void test reads the same face; the pump tempers the car
 the lock (`Field::release_with`). Why: the lock read the face at the site's own `β_t`, which doubles whenever the site's
 change falls, up to `PUMP_TOP`, so any lead however slight became a majority, a crown by annealing: crib14's release
 wrote 983 `1`s among its 1,007 digits. A site the field itself does not hold to one class stays open and is shown open.
-`Released::own` reports each reached site's `β = 1` face. The card's release runs the same `release_with` (only its
+The card's release runs the same `release_with` (only its
 reads are realized), so the lock is one law on both. STATE.26 is not re-released: it was trained with the copy face.
 
 [measurement, November 2] After the retirement: the gate clean; the field's tests 58 of 58 (the held-step fixture read
@@ -1854,3 +1854,79 @@ over 24 sections, since with the face's covector alone its first 12 stand every 
 remaining law, crib13's declaration at width 32, every read equal: at the founding 5 sections and the withheld section
 (the pace moving off `κ ≡ 1` from section 3 by its own covector), and with every rate drawn far 3 sections and the
 withheld section, both runs whole. Receipt: `_receipts/law16/parity_retired.txt`.
+
+[decision; November 2, the coordinator's verdicts on the audit of what still hands the machine task structure] Each
+verdict with its reason, by the audit's item:
+- 1, the release's region (the question's definite sites and the answer's open sites): kept; it is the situated relation
+  generation starts from, not a solution routine.
+- 2, the front (a site reached within the near field of a definite site): kept; settled sites radiate, so the answer grows
+  from what has settled.
+- 3, the void and the extent: kept; the codec's void is a class of the passage, and the extent is read where the field
+  locks it.
+- 4 and 5, an open receiver hearing every definite site, and a temperature a receiver kind: kept; they are the reception
+  law's two roles, not a reading of the task.
+- 6, the clock ring sets (`FieldDeclaration::clocks`, `is_clock`, `Field::clock`, `Region::clock`, the card's `clocks`
+  and `clock` words and `frame_of`'s clock, read 2's rung clock, `clocks_of`): retired; they fed the release's writing
+  order into the law as phase. The state's head line is `hnn-field-v9`; a `v8` state is a superseded prototype.
+- 7, the carried faces, locks and echoes: kept; they are the release's own state read as the field reads it.
+- 8, the landmarks: kept; their reading in `release-field` now counts every written answer site, the first
+  calculation's digit filter and the landmarks on a question digit retired with item 15's byte kinds.
+- 9, the held peaks' digit mass, `Field::pace_route` and `Field::anchor_census`: retired; they named the codec's digits
+  and the retired witness's anchor. With `peaks_text` gone (item 16) the held peaks had no consumer and went whole
+  (`HeldPeak`, `Field::held_peaks{,_all}`, `FieldRealization::read_row_peaks`, the card's `field_held_peaks`).
+  `held_rows_all`'s question share is kept.
+- 10, training regions shaped as the release: kept; the field meets the states it will be read in.
+- 11, read 2's annealed lock (`front_faces`): retired; the prefix locks where the `β = 1` face holds a majority, as the
+  release does, and the carried face stays tempered at the rung.
+- 12, the held fronts: kept; the held step is read where the release reads.
+- 13, the void tail: kept; every octave of tail is met alike.
+- 14, the early stop's digit-clock condition: retired; after nine laps a run stops only where the question tells the held
+  answer no more than the foil does.
+- 15, the held read's digits/text split (`FieldCodec::is_digit`): retired; the codec's byte kind was a partition beside
+  the field's own. The answer, context and foil codes and the question's effect are kept.
+- 16, 17 and 18, `peaks_text` and `peaks-field`, `align` and `align-field`, `FIELD_RELEASE_OWN` with its `<<` parse and
+  `Released::own`: retired, copy-shaped readers. With the written rules gone (item 21) the release's marks (each held
+  calculation's continuation past its `=`, `MARKS.tsv`) had no reader and went too. The coupling receipts are kept.
+- 19, the opening (the question, a written prefix, the codec's answer sites): kept.
+- 20, the crib terrain (`crib-terrain`, `crib_problem`): retired; GSM8K only from here.
+- 21, the exterior tools: `written_rules.py` deleted (it graded a release by whether its first calculation took the
+  question's numbers: the first-calculation-copied acceptance); `copy_roles.py` deleted (it pairs answer numerals with
+  the question's); `calc_roles.py` deleted (it labels each calculation result's digits by whether its expression was
+  met, a calculation-role partition for an acceptance read); `numeral_rings.py` deleted (it labels places by numeral and
+  by `<<a±b=`'s operands and result, and grades a probe that names them); `card_written.py` deleted (it cut the held
+  answers at each `=` into prompts for the written rules, its only reader); `digit_units.py` kept (a cause-test foil
+  founding with the digit-bearing units removed, never the product; it pairs nothing, counts no copy and labels no
+  calculation). Two more loaded the written rules and went with them: `ngram_release.py` (their n-gram baseline) and
+  `tools/gsm8k_variants.py` with its tests (its claim counted the question's numbers taken into a variant's
+  calculations).
+- 22, the founding's concentration (one word a head, `q = k`): retired. Every head founds a key chart and a probe chart
+  as independent keyed draws (the probe drawn after the key, the value and the pair drives, so their draws stand); every
+  receiver probes with its own probe, a definite site as an open one; a source is listed in its key's class and a
+  receiver reads its probe's classes and those across its probe's seams; `score_shift` is unchanged. Why: a contact
+  concentrated on a site's counterpart wherever it stands is the crib handed to the field; what the field meets is now
+  what its learning makes its probes and keys agree on. The module doc's passage is rewritten (`hnn::tower::field`).
+
+[decision; November 2, the coordinator's decision] **The far-copy fixtures are retired.** A fixture whose target is a byte
+standing elsewhere in the region is a copy-shaped acceptance (the antipattern record's guard), and these were met only
+through the founded equal-word matcher. Their last reads under the honest founding (item 22), each its fixture's own
+declaration and sections, run on the host as the field's tests:
+- the cue's successor (`cue_problem`, `the_contact_finds_a_cue_s_successor`, with the measurements `where_the_cue_is_read_from`
+  and `the_cue_over_foundings`): 3.312 bits at 600 sections, against the bar of 0.0625 it met only under `q = k`
+  (the words present alone code it at about `log₂ 9 = 3.17`), read twice;
+- the value recalled by its key (`recall_problem`, `the_strand_contacts_let_a_value_be_recalled_by_its_key`): 0.002 bits
+  at 1,000 sections (its strand contacts give the open value and the value site the same left neighbour);
+- the number told by its order went with the witnesses (`order_problem`) and was not read under the honest founding.
+The concentration's own tests went with it (`the_founded_contact_meets_the_site_whose_word_is_its_own`,
+`founded_contact_shares_at_a_question_s_size`); the founding's test now reads the key and the probe drawn apart. The
+capability these stood in for is read from now on by the question's effect against the foil on GSM8K's held problems; no
+copy-shaped fixture replaces them.
+
+[measurement, November 2] After the verdicts: the gate clean; the field's tests 55 of 55, the run example's field
+tests 18 of 18 and the GSM8K tools' 2 of 2. Read 2's prefix on the toy learner's six sections locks no site under the
+`β = 1` lock (49 fronts, 0 locks); the lock itself is read by the read-2 unit test. Card parity on GSM8K (the crib
+terrain retired), reading 9's data, keys and declaration (D 32, H 4, n 8, still 2, f 32, K 2, section 16, rate 8), every
+read, face, covector, learner and release equal, both runs whole: at the founding 5 sections, the withheld read (512
+regions) and 2 releases of 40 sweeps in 355 s (projected at most 455 s, 0.78 of it; host 284 s, card 2.7 s); with every
+rate drawn far (`FIELD_PARITY_PACE=8`) 3 sections, the withheld read and 2 releases in 337 s (projected at most 425 s,
+0.79; host 265 s, card 2.7 s); peak resident set 3.5 GB, the card's largest batch store 8.3 GB under its 12 GB. A GSM8K
+section costs the host about 110 times the card's time (8,874 ms against 88). Receipt: `_receipts/law16/parity_verdicts.txt`.

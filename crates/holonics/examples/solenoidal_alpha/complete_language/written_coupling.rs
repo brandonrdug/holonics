@@ -4,12 +4,11 @@
 //! enters the learning machine or selects a release, and no float is stored or computed. The
 //! repository's success test reads the contact of a release `H` with its target `T`
 //! ([`holonics::receiver::coupling`]): `λ` is the greatest number of equal, strictly order-consistent
-//! contacts and the friction `F* = |H| + |T| − 2λ`. The written rules
-//! (`tools/gsm8k/written_rules.py`) read a release's calculations at the equals; this reads the whole
-//! answer's contact, so a receipt is not the bits of a code alone.
+//! contacts and the friction `F* = |H| + |T| − 2λ`. It reads the whole answer's contact, so a receipt
+//! is not the bits of a code alone.
 //!
 //! `read-written-coupling HELD HELD_SHA DIR` reads, pinned by its SHA-256, the held-out text `HELD`
-//! as `written_rules.py` splits it (problems separated by a blank line, each a question line and its
+//! split into problems (separated by a blank line, each a question line and its
 //! answer lines) and `DIR/FREE.tsv` as it parses it (one line a release: the problem's index and the
 //! release's bytes escaped as `read-unit-tower-written` writes them, tab-separated; a line without
 //! two fields is refused). FREE.tsv may hold releases for some of the problems, indices rising; the
@@ -34,8 +33,8 @@
 //! [definition; agent-inferred, October 31] Two choices the task left to the reading. `T` drops the
 //! line end that closes a problem, because a release that copies its answer and then the blank line
 //! is cut to exactly `T` and must read `F* = 0`; with the closing line end in `T` a perfect copy
-//! would read `F* = 1`. A `FREE.tsv` may hold releases for some of the problems (`written_rules.py`
-//! requires all), so a partial read of a run is read as it stands; indices must still rise.
+//! would read `F* = 1`. A `FREE.tsv` may hold releases for some of the problems, so a partial read of
+//! a run is read as it stands; indices must still rise.
 //!
 //! Recorded failures this reading cannot repeat: it is read only after the release is written, so no
 //! release is chosen by it; and a code's bits, or a copied passage, are not progress by themselves:
@@ -83,7 +82,7 @@ fn question_and_answer(problem: &[u8]) -> (&[u8], &[u8]) {
 }
 
 /// The bytes a `FREE.tsv` field escapes: `\\`, `\'`, `\"`, `\t`, `\n`, `\r` and `\xNN`, as
-/// `read-lines` and `tools/gsm8k/card_written.py` write them. Any other escape is refused.
+/// `read-lines` and `release-field` write them. Any other escape is refused.
 fn unescape(field: &[u8]) -> Result<Vec<u8>> {
     let hex = |b: u8| (b as char).to_digit(16).map(|d| d as u8);
     let mut out = Vec::with_capacity(field.len());
