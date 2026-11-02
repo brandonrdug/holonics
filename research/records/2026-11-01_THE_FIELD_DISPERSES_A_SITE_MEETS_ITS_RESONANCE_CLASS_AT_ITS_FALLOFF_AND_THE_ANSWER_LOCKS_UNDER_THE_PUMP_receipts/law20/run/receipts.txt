@@ -1,0 +1,124 @@
+# Section 16.20's GSM8K run under a 90-minute hard stop, commit 3fb8595c4, RTX 4080 SUPER under .local/gpu.lock, 24 host threads.
+# Projection: a lap about 95 s (upper 244 s); partition train 70 min, release 15 min (1,000 sweeps), text 5 min, outer 5,400 s.
+FIELD_RUN start=2026-11-02T20:31:27Z bin=ab97d298eb7db3dab3574ea02e764bc02601dcda3905dc2dafbbaee9f695af60 commit=3fb8595c4 board=1212 MiB
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15263727616 total=16802250752 batch_budget=10272636928
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=35544
+FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=1062
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=0 rows=157312 question_far_share=999389 question_near_share=610 soft_near_share=0 other_share=0 question_current=809026 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=0 rows=157312 question_far_share=999417 question_near_share=582 soft_near_share=0 other_share=0 question_current=817207 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=0 rows=157312 question_far_share=999579 question_near_share=420 soft_near_share=0 other_share=0 question_current=52131 far_rows=157312 far_effective_sources=225.34
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=0 rows=157312 question_far_share=999495 question_near_share=504 soft_near_share=0 other_share=0 question_current=77227 far_rows=157312 far_effective_sources=225.20
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=1 rows=157312 question_far_share=999389 question_near_share=610 soft_near_share=0 other_share=0 question_current=809026 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=1 rows=157312 question_far_share=999417 question_near_share=582 soft_near_share=0 other_share=0 question_current=817207 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=1 rows=157312 question_far_share=999579 question_near_share=420 soft_near_share=0 other_share=0 question_current=52131 far_rows=157312 far_effective_sources=225.34
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=1 rows=157312 question_far_share=999495 question_near_share=504 soft_near_share=0 other_share=0 question_current=77227 far_rows=157312 far_effective_sources=225.20
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=0 rows=35591 question_far_share=138704 question_near_share=1188 soft_near_share=0 other_share=860107 question_current=113366 far_rows=35591 far_effective_sources=69.81
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=0 rows=35591 question_far_share=134688 question_near_share=1380 soft_near_share=0 other_share=863931 question_current=111481 far_rows=35591 far_effective_sources=67.98
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=0 rows=35591 question_far_share=201931 question_near_share=997 soft_near_share=0 other_share=797070 question_current=26024 far_rows=35591 far_effective_sources=206.05
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=0 rows=35591 question_far_share=212037 question_near_share=1088 soft_near_share=0 other_share=786873 question_current=35936 far_rows=35591 far_effective_sources=190.67
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=1 rows=35591 question_far_share=138704 question_near_share=1188 soft_near_share=0 other_share=860107 question_current=113366 far_rows=35591 far_effective_sources=69.81
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=1 rows=35591 question_far_share=134688 question_near_share=1380 soft_near_share=0 other_share=863931 question_current=111481 far_rows=35591 far_effective_sources=67.98
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=1 rows=35591 question_far_share=201931 question_near_share=997 soft_near_share=0 other_share=797070 question_current=26024 far_rows=35591 far_effective_sources=206.05
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=1 rows=35591 question_far_share=212037 question_near_share=1088 soft_near_share=0 other_share=786873 question_current=35936 far_rows=35591 far_effective_sources=190.67
+FIELD_UNSEEN lap=-1 code=6.931 sites=36763 next=- ms=2919
+FIELD_COVECTOR_SHARE lap=0 section=1 head=0 near=0 far=0 far_share=0 ms=42
+FIELD_COVECTOR_SHARE lap=0 section=1 head=1 near=0 far=0 far_share=0 ms=42
+FIELD_COVECTOR_SHARE lap=0 section=1 head=2 near=0 far=0 far_share=0 ms=42
+FIELD_COVECTOR_SHARE lap=0 section=1 head=3 near=0 far=0 far_share=0 ms=42
+FIELD_COVECTOR_SHARE lap=0 section=2 head=0 near=0 far=0 far_share=0 ms=36
+FIELD_COVECTOR_SHARE lap=0 section=2 head=1 near=0 far=0 far_share=0 ms=36
+FIELD_COVECTOR_SHARE lap=0 section=2 head=2 near=0 far=0 far_share=0 ms=36
+FIELD_COVECTOR_SHARE lap=0 section=2 head=3 near=0 far=0 far_share=0 ms=36
+FIELD_COVECTOR_SHARE lap=0 section=4 head=0 near=1962956281081 far=4777516792684 far_share=708780 ms=35
+FIELD_COVECTOR_SHARE lap=0 section=4 head=1 near=2181667116153 far=5014750836192 far_share=696839 ms=35
+FIELD_COVECTOR_SHARE lap=0 section=4 head=2 near=1406134384794 far=2971785231555 far_share=678812 ms=35
+FIELD_COVECTOR_SHARE lap=0 section=4 head=3 near=1586698870187 far=3166628897165 far_share=666191 ms=35
+FIELD_COVECTOR_SHARE lap=0 section=8 head=0 near=354213979134 far=999746741335 far_share=738386 ms=67
+FIELD_COVECTOR_SHARE lap=0 section=8 head=1 near=458715370349 far=1342917835059 far_share=745389 ms=67
+FIELD_COVECTOR_SHARE lap=0 section=8 head=2 near=512021503286 far=1551929969744 far_share=751921 ms=67
+FIELD_COVECTOR_SHARE lap=0 section=8 head=3 near=529532473970 far=1514922162526 far_share=740990 ms=67
+FIELD_COVECTOR_SHARE lap=0 section=16 head=0 near=1115957652810 far=4606879147292 far_share=804999 ms=84
+FIELD_COVECTOR_SHARE lap=0 section=16 head=1 near=1567366677581 far=4821117061707 far_share=754657 ms=84
+FIELD_COVECTOR_SHARE lap=0 section=16 head=2 near=4204314598570 far=17008151752639 far_share=801799 ms=84
+FIELD_COVECTOR_SHARE lap=0 section=16 head=3 near=2933491986536 far=10222321362160 far_share=777019 ms=84
+FIELD_LAP lap=0 read=1 sites=1637262 before=4.122 after=4.097 deposited=407/413 halvings=102 next_halved=21 next_refused=272 ms=104569
+FIELD_UNSEEN lap=0 code=4.317 sites=36763 next_change=-349095781 next_halvings=0 next_refused=false ms=107488
+FIELD_HELD lap=0 answer=5.152578 classes=35591 context=4.314174 context_classes=35591 foil=4.315055 question=0.000881 ms=109011
+FIELD_ROWS_HELD lap=0 set=opening head=0 tick=0 rows=157312 question_far_share=998942 question_near_share=1057 soft_near_share=0 other_share=0 question_current=921232 far_rows=157312 far_effective_sources=22.78
+FIELD_ROWS_HELD lap=0 set=opening head=1 tick=0 rows=157312 question_far_share=999275 question_near_share=724 soft_near_share=0 other_share=0 question_current=1188890 far_rows=157312 far_effective_sources=82.16
+FIELD_ROWS_HELD lap=0 set=opening head=2 tick=0 rows=157312 question_far_share=998363 question_near_share=1636 soft_near_share=0 other_share=0 question_current=508306 far_rows=157312 far_effective_sources=210.36
+FIELD_ROWS_HELD lap=0 set=opening head=3 tick=0 rows=157312 question_far_share=997808 question_near_share=2191 soft_near_share=0 other_share=0 question_current=588959 far_rows=157312 far_effective_sources=195.40
+FIELD_ROWS_HELD lap=0 set=opening head=0 tick=1 rows=157312 question_far_share=999101 question_near_share=898 soft_near_share=0 other_share=0 question_current=745113 far_rows=157312 far_effective_sources=120.26
+FIELD_ROWS_HELD lap=0 set=opening head=1 tick=1 rows=157312 question_far_share=999298 question_near_share=701 soft_near_share=0 other_share=0 question_current=938565 far_rows=157312 far_effective_sources=191.07
+FIELD_ROWS_HELD lap=0 set=opening head=2 tick=1 rows=157312 question_far_share=999910 question_near_share=89 soft_near_share=0 other_share=0 question_current=483859 far_rows=157312 far_effective_sources=223.08
+FIELD_ROWS_HELD lap=0 set=opening head=3 tick=1 rows=157312 question_far_share=999684 question_near_share=315 soft_near_share=0 other_share=0 question_current=607328 far_rows=157312 far_effective_sources=214.17
+FIELD_ROWS_HELD lap=0 set=context head=0 tick=0 rows=35591 question_far_share=135052 question_near_share=3840 soft_near_share=0 other_share=861106 question_current=164718 far_rows=35591 far_effective_sources=45.27
+FIELD_ROWS_HELD lap=0 set=context head=1 tick=0 rows=35591 question_far_share=128461 question_near_share=1453 soft_near_share=0 other_share=870085 question_current=141892 far_rows=35591 far_effective_sources=75.53
+FIELD_ROWS_HELD lap=0 set=context head=2 tick=0 rows=35591 question_far_share=72098 question_near_share=2366 soft_near_share=0 other_share=925534 question_current=118275 far_rows=35591 far_effective_sources=179.39
+FIELD_ROWS_HELD lap=0 set=context head=3 tick=0 rows=35591 question_far_share=161174 question_near_share=4993 soft_near_share=0 other_share=833832 question_current=240994 far_rows=35591 far_effective_sources=202.66
+FIELD_ROWS_HELD lap=0 set=context head=0 tick=1 rows=35591 question_far_share=266450 question_near_share=1904 soft_near_share=0 other_share=731645 question_current=196124 far_rows=35591 far_effective_sources=95.04
+FIELD_ROWS_HELD lap=0 set=context head=1 tick=1 rows=35591 question_far_share=128457 question_near_share=1723 soft_near_share=0 other_share=869819 question_current=131764 far_rows=35591 far_effective_sources=127.82
+FIELD_ROWS_HELD lap=0 set=context head=2 tick=1 rows=35591 question_far_share=347866 question_near_share=148 soft_near_share=0 other_share=651984 question_current=427252 far_rows=35591 far_effective_sources=225.83
+FIELD_ROWS_HELD lap=0 set=context head=3 tick=1 rows=35591 question_far_share=199746 question_near_share=674 soft_near_share=0 other_share=799578 question_current=270034 far_rows=35591 far_effective_sources=246.94
+FIELD_COVECTOR_SHARE lap=1 section=414 head=0 near=23438847183979 far=93333823860926 far_share=799277 ms=50
+FIELD_COVECTOR_SHARE lap=1 section=414 head=1 near=16518222671663 far=44944146644949 far_share=731246 ms=50
+FIELD_COVECTOR_SHARE lap=1 section=414 head=2 near=117413854756104 far=253756062646642 far_share=683665 ms=50
+FIELD_COVECTOR_SHARE lap=1 section=414 head=3 near=130006676672122 far=212335334492905 far_share=620243 ms=50
+FIELD_LAP lap=1 read=2 sites=1695098 before=3.575 after=3.562 deposited=407/413 halvings=100 next_halved=107 next_refused=181 ms=112457
+FIELD_UNSEEN lap=1 code=3.259 sites=36763 next_change=-40028317 next_halvings=0 next_refused=false ms=223218
+FIELD_HELD lap=1 answer=5.081398 classes=35591 context=3.246255 context_classes=35591 foil=3.245105 question=-0.001149 ms=224784
+FIELD_ROWS_HELD lap=1 set=opening head=0 tick=0 rows=157312 question_far_share=998861 question_near_share=1138 soft_near_share=0 other_share=0 question_current=842963 far_rows=157312 far_effective_sources=53.38
+FIELD_ROWS_HELD lap=1 set=opening head=1 tick=0 rows=157312 question_far_share=999528 question_near_share=471 soft_near_share=0 other_share=0 question_current=1036228 far_rows=157312 far_effective_sources=106.71
+FIELD_ROWS_HELD lap=1 set=opening head=2 tick=0 rows=157312 question_far_share=998484 question_near_share=1515 soft_near_share=0 other_share=0 question_current=232922 far_rows=157312 far_effective_sources=217.90
+FIELD_ROWS_HELD lap=1 set=opening head=3 tick=0 rows=157312 question_far_share=998480 question_near_share=1519 soft_near_share=0 other_share=0 question_current=304487 far_rows=157312 far_effective_sources=215.45
+FIELD_ROWS_HELD lap=1 set=opening head=0 tick=1 rows=157312 question_far_share=999048 question_near_share=951 soft_near_share=0 other_share=0 question_current=789094 far_rows=157312 far_effective_sources=77.24
+FIELD_ROWS_HELD lap=1 set=opening head=1 tick=1 rows=157312 question_far_share=999780 question_near_share=219 soft_near_share=0 other_share=0 question_current=971386 far_rows=157312 far_effective_sources=96.61
+FIELD_ROWS_HELD lap=1 set=opening head=2 tick=1 rows=157312 question_far_share=999436 question_near_share=563 soft_near_share=0 other_share=0 question_current=217080 far_rows=157312 far_effective_sources=219.84
+FIELD_ROWS_HELD lap=1 set=opening head=3 tick=1 rows=157312 question_far_share=999138 question_near_share=861 soft_near_share=0 other_share=0 question_current=273976 far_rows=157312 far_effective_sources=214.89
+FIELD_ROWS_HELD lap=1 set=context head=0 tick=0 rows=35591 question_far_share=147503 question_near_share=3760 soft_near_share=0 other_share=848736 question_current=156037 far_rows=35591 far_effective_sources=53.91
+FIELD_ROWS_HELD lap=1 set=context head=1 tick=0 rows=35591 question_far_share=132303 question_near_share=1060 soft_near_share=0 other_share=866636 question_current=130024 far_rows=35591 far_effective_sources=80.07
+FIELD_ROWS_HELD lap=1 set=context head=2 tick=0 rows=35591 question_far_share=146095 question_near_share=4085 soft_near_share=0 other_share=849819 question_current=96963 far_rows=35591 far_effective_sources=207.14
+FIELD_ROWS_HELD lap=1 set=context head=3 tick=0 rows=35591 question_far_share=161793 question_near_share=2490 soft_near_share=0 other_share=835715 question_current=62026 far_rows=35591 far_effective_sources=205.48
+FIELD_ROWS_HELD lap=1 set=context head=0 tick=1 rows=35591 question_far_share=202777 question_near_share=2833 soft_near_share=0 other_share=794389 question_current=164563 far_rows=35591 far_effective_sources=82.21
+FIELD_ROWS_HELD lap=1 set=context head=1 tick=1 rows=35591 question_far_share=110557 question_near_share=768 soft_near_share=0 other_share=888673 question_current=102541 far_rows=35591 far_effective_sources=103.58
+FIELD_ROWS_HELD lap=1 set=context head=2 tick=1 rows=35591 question_far_share=324046 question_near_share=1717 soft_near_share=0 other_share=674235 question_current=194050 far_rows=35591 far_effective_sources=231.47
+FIELD_ROWS_HELD lap=1 set=context head=3 tick=1 rows=35591 question_far_share=214865 question_near_share=1636 soft_near_share=0 other_share=783498 question_current=80561 far_rows=35591 far_effective_sources=217.63
+FIELD_COVECTOR_SHARE lap=2 section=827 head=0 near=57513677066282 far=224634371273216 far_share=796157 ms=48
+FIELD_COVECTOR_SHARE lap=2 section=827 head=1 near=52979023189343 far=175374286040698 far_share=767995 ms=48
+FIELD_COVECTOR_SHARE lap=2 section=827 head=2 near=162052284577239 far=337635233483231 far_share=675692 ms=48
+FIELD_COVECTOR_SHARE lap=2 section=827 head=3 near=270190823532142 far=366412867907858 far_share=575574 ms=48
+FIELD_LAP lap=2 read=3 sites=1648744 before=3.429 after=3.417 deposited=408/413 halvings=136 next_halved=122 next_refused=188 ms=111921
+FIELD_UNSEEN lap=2 code=2.845 sites=36763 next_change=25627971 next_halvings=1 next_refused=false ms=338486
+FIELD_HELD lap=2 answer=5.085005 classes=35591 context=2.829326 context_classes=35591 foil=2.828564 question=-0.000762 ms=339977
+FIELD_ROWS_HELD lap=2 set=opening head=0 tick=0 rows=157312 question_far_share=998942 question_near_share=1057 soft_near_share=0 other_share=0 question_current=821468 far_rows=157312 far_effective_sources=61.47
+FIELD_ROWS_HELD lap=2 set=opening head=1 tick=0 rows=157312 question_far_share=999455 question_near_share=544 soft_near_share=0 other_share=0 question_current=1000017 far_rows=157312 far_effective_sources=102.73
+FIELD_ROWS_HELD lap=2 set=opening head=2 tick=0 rows=157312 question_far_share=997940 question_near_share=2059 soft_near_share=0 other_share=0 question_current=131637 far_rows=157312 far_effective_sources=215.11
+FIELD_ROWS_HELD lap=2 set=opening head=3 tick=0 rows=157312 question_far_share=998381 question_near_share=1618 soft_near_share=0 other_share=0 question_current=203995 far_rows=157312 far_effective_sources=218.06
+FIELD_ROWS_HELD lap=2 set=opening head=0 tick=1 rows=157312 question_far_share=999151 question_near_share=848 soft_near_share=0 other_share=0 question_current=784652 far_rows=157312 far_effective_sources=94.75
+FIELD_ROWS_HELD lap=2 set=opening head=1 tick=1 rows=157312 question_far_share=999633 question_near_share=366 soft_near_share=0 other_share=0 question_current=874445 far_rows=157312 far_effective_sources=148.38
+FIELD_ROWS_HELD lap=2 set=opening head=2 tick=1 rows=157312 question_far_share=998820 question_near_share=1179 soft_near_share=0 other_share=0 question_current=122897 far_rows=157312 far_effective_sources=216.97
+FIELD_ROWS_HELD lap=2 set=opening head=3 tick=1 rows=157312 question_far_share=998044 question_near_share=1955 soft_near_share=0 other_share=0 question_current=178156 far_rows=157312 far_effective_sources=221.78
+FIELD_ROWS_HELD lap=2 set=context head=0 tick=0 rows=35591 question_far_share=144170 question_near_share=3351 soft_near_share=0 other_share=852478 question_current=147020 far_rows=35591 far_effective_sources=57.93
+FIELD_ROWS_HELD lap=2 set=context head=1 tick=0 rows=35591 question_far_share=134798 question_near_share=1068 soft_near_share=0 other_share=864133 question_current=126738 far_rows=35591 far_effective_sources=82.04
+FIELD_ROWS_HELD lap=2 set=context head=2 tick=0 rows=35591 question_far_share=142785 question_near_share=2793 soft_near_share=0 other_share=854421 question_current=74044 far_rows=35591 far_effective_sources=202.11
+FIELD_ROWS_HELD lap=2 set=context head=3 tick=0 rows=35591 question_far_share=133362 question_near_share=2090 soft_near_share=0 other_share=864547 question_current=51148 far_rows=35591 far_effective_sources=201.91
+FIELD_ROWS_HELD lap=2 set=context head=0 tick=1 rows=35591 question_far_share=169400 question_near_share=2686 soft_near_share=0 other_share=827913 question_current=138337 far_rows=35591 far_effective_sources=107.09
+FIELD_ROWS_HELD lap=2 set=context head=1 tick=1 rows=35591 question_far_share=113935 question_near_share=789 soft_near_share=0 other_share=885274 question_current=100008 far_rows=35591 far_effective_sources=98.34
+FIELD_ROWS_HELD lap=2 set=context head=2 tick=1 rows=35591 question_far_share=384085 question_near_share=1640 soft_near_share=0 other_share=614274 question_current=183922 far_rows=35591 far_effective_sources=225.75
+FIELD_ROWS_HELD lap=2 set=context head=3 tick=1 rows=35591 question_far_share=160046 question_near_share=3261 soft_near_share=0 other_share=836692 question_current=65525 far_rows=35591 far_effective_sources=212.52
+FIELD_STOPPED_EARLY lap=2 reason=the question tells the answer no more than the foil ms=341729
+FIELD_CARD reads=6339 read_ms=192584 returns=1246 return_ms=133003 pairs=106591890619 batches=7601 peak_store=8210329952 landmarks=0 landmark_ms=0 elapsed_ms=341731
+MEASURE lap=train rc=0 wall_s=342.2 peak_rss_kib=745920
+FIELD_RUN train_end at_s=342 board=1138 MiB
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15341125632 total=16802250752 batch_budget=10350034944
+FIELD_RELEASE_RECEIPTS problems=148 locked_whole=0 open_sites=179329 free_circulation=307053 bound_circulation=1538 reached=11286 locked=2563 reach_sweep_quartiles=0/23/63/145/606 lock_sweep_quartiles=3/35/88/234/999 extents_void=0 extents_bound=0 extents_unread=148 extent_site_quartiles=- extent_sweep_quartiles=- lock_margin_bits_quartiles=18/36/41/53/144881 lock_rungs=1:21,2:315,4:849,8:566,16:562,32:114,64:77,128:34,256:12,512:6,1024:2,2048:2,16384:2,32768:1 landmark_problems=148 landmark_sites=2563 landmark_same_class=574 landmark_ms=1297
+FIELD_RELEASE free=148 refused=0 sweeps=1000 stop_ms=900000 free_sweeps=1000 free_live=148 free_reached=11286 free_front=419 free_open=179329 free_rung=4194304 free_stopped=false released=181892 held=39190 lambda=2324 friction=216434 ms=468955
+FIELD_CARD reads=1000 read_ms=106079 returns=0 return_ms=0 pairs=28097661929 batches=1148 peak_store=2199924098 landmarks=148 landmark_ms=1292 elapsed_ms=468956
+MEASURE lap=release rc=0 wall_s=469.4 peak_rss_kib=814120
+FIELD_RUN release_end at_s=811
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15383986176 total=16802250752 batch_budget=10392895488
+FIELD_RELEASE_TEXT problems=6 sweeps=1000 live=6 reached=383 front=150 open=7292 rung=4194304 stopped=false ms=18386
+FIELD_CARD reads=1000 read_ms=5595 returns=0 return_ms=0 pairs=947876898 batches=1000 peak_store=82805202 landmarks=0 landmark_ms=0 elapsed_ms=18386
+MEASURE lap=text rc=0 wall_s=18.7 peak_rss_kib=230756
+FIELD_RUN exit at_s=830 board=1168 MiB
+FIELD_RUN outer rc=0

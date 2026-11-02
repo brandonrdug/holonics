@@ -890,9 +890,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
         held_rows_text(&learner.field, &codec, &dev_set, realization, lap as i64)?;
-        // [agent-inferred, November 2; fixed with the run's declaration] **The early stop** (§16): after nine laps, a run
-        // whose held question effect is at or below the foil's stops, and is reported incomplete. Why: nine laps that
-        // leave the answer told no more by its own question than by another's read the obstacle (§16.19).
+        // [agent-inferred, November 2; fixed with the run's declaration] **The early stop** (§16, §16.20): from the third
+        // lap on, a run whose held question effect is at or below the foil's stops, and is reported incomplete. Why: the
+        // §16.20 run's claim is the question's effect, and three laps that leave the answer told no more by its own
+        // question than by another's read the obstacle (§16.19 declared nine before the far contact was repaired).
         // [retired, November 2, §16.19] Its second condition, no paced head's clock moved toward a digit clock: a clock
         // read at the codec's digits was the numeral matcher's target.
         let effect = (held[2].0 as i128 * held[1].1 as i128) - (held[1].0 as i128 * held[2].1 as i128);
@@ -926,7 +927,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
 }
 
 /// The laps after which the early stop reads the question's effect (§16).
-const EARLY_STOP_LAPS: usize = 9;
+const EARLY_STOP_LAPS: usize = 3;
 
 /// What a lap's withheld read decides of the body's width ([`growth`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
