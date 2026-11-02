@@ -2672,3 +2672,28 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
         }
     }
 }
+
+/// [agent-inferred, November 2] **The class clock's owner publishes the witness test's clock** (§16.16,
+/// [`super::locate::locate_class_clock`]): on the 256 training regions of [`the_byte_clock_is_located_over_the_definite_menu`]
+/// (the band-paired definite menu, the turn's propagation, the skin's closure, the founding `κ ≡ 1` projected), the
+/// owner the run calls publishes, rate for rate, what that test published: every digit byte at 1, the letters the
+/// between-texts hold, the space and `+` at 0, and the bytes no closing row reaches at their founding 1.
+#[test]
+fn the_class_clock_owner_publishes_the_witness_clock() {
+    use crate::ratio::Rat;
+    use num_bigint::BigInt;
+    let mut next = mixer(0x7A11);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    let regions: Vec<(Vec<usize>, usize)> = (0..256)
+        .map(|_| {
+            let (q, a) = crib_like(&mut next);
+            (q.iter().chain(&a).map(|&b| to_class(b)).collect(), q.len())
+        })
+        .collect();
+    let classes = WITNESS_BYTES.len();
+    let one = Rat::from_integer(BigInt::from(1));
+    let located = super::locate::locate_class_clock(&regions, classes, NEAR - 1, &vec![one.clone(); classes]).unwrap();
+    let expected: Vec<Rat> = WITNESS_BYTES.iter().map(|&b| Rat::from_integer(BigInt::from(i64::from(!(b.is_ascii_lowercase() && b != b'q' || b == b' ' || b == b'+'))))).collect();
+    assert_eq!((located.cutting, located.empty, located.dimension, located.skin_pinned.len()), (0, 0, 17, 25));
+    assert_eq!(located.published, Some(expected), "the owner publishes the witness test's clock");
+}

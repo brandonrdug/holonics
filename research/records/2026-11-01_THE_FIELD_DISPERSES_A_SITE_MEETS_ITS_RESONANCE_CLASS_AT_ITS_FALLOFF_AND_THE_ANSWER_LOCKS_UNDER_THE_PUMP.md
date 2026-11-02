@@ -1728,6 +1728,44 @@ a front, and the held fronts' faces go from 277 to **278** and **281** of 515 (t
 −0.016, `<` −0.011, `?` and `\n` −0.006, the digits within ±0.001). The first-order descent does not lower the training
 code at these sizes. Receipt: `_receipts/law16/witness_seam.txt`.
 
+[decision; the coordinator's, November 2, from the read above] **`N` is not deposited.** The free directions stay at
+the founding, so the seam's rates stay at 1, and the run carries the seam's cost openly. The reasons, all from the
+read: the location cannot reach `N`; the covector restricted to `N` does not descend the training code at either step;
+and its seam components turn sign between the founding's readers and the copying ones, so early in a run it would push
+the seam away from 0. The readers and `log₂ T` stay on the covector, the clock on location. The witness's standing is
+representability with its sharpness stated: 252 of 252 at `T = 128`, 118 of 252 at `T = 16`; the run's question is
+whether `log₂ T` rises to where copies sharpen.
+
+[definition; agent-inferred, November 2] **The machine, complete.** The location's owner is
+`hnn::tower::field::locate::locate_class_clock` (the band-paired definite menu, the turn's propagation, the skin's
+closure, the projection's publication; [`the_class_clock_owner_publishes_the_witness_clock`] holds it, rate for rate,
+to the witness test's published clock on its 256 regions). `FieldLearner::located` keeps the pace family off the
+deposit (its step is zero): the clock is a key. `train-field` with `FIELD_CLOCK=located` runs lap 0 on the founding
+clock (`κ ≡ 1`), and at every later boundary locates the clock from every training problem seen (the withheld and held
+problems never feed it, D1), publishes it by projecting the current clock (the free directions `N` keep their rates),
+sets it on every paced head, and prints `FIELD_CLOCK` (the regions, forced, satisfied, cutting, empty, silent, the
+fibre's dimension, the bytes the skin pinned, and the published rates: the bytes at 1, at 0, and any other value).
+
+[measurement, November 2] **The projection's read** (card, crib13's corpus and size, `K = 3`, `crib14_time.sh`;
+receipts `_receipts/crib14t/`): the time read's upper lap projection **108.8 s** (68.3 s at size); two laps of the
+located run: lap 0 **29.8 s**, lap 1 **32.5 s**; the boundary's location **2.0 s**, publishing on the crib's 3,968 seen
+training problems exactly the witness's clock (at 1: the digits, `\n`, `#`, `<`, `=`, `>`, `?`; at 0: the letters but
+`q`, the space, `+`; no other value; 2,798 forced regions, every non-silent region satisfied, none cutting, dimension
+17, 25 pinned by the skin); the lap-end reads about 1.6 s; the withheld code 5.459, 4.000, 3.554 bits; the held
+question effect −0.0003 and −0.0007 bits (below its foil). Peak resident set 338 MB.
+
+**The run's declaration** (written before any launch): one crib run on the card, crib13's corpus and size (3,968
+training problems, 128 withheld, 128 held; D 32, H 5, n 8, f 32, section 16, rate 8), `K = 3`, 27 laps, `FIELD_CLOCK=
+located`, the early stop after lap 9 as §16.10 declares it; the card lock held, at most 12 GB of the card's memory; a
+learned temperature that outgrows the card's carrier refuses with its site and lap, never clipped. Acceptance, fixed:
+at least 24 of 126 first calculations from the question, above its foil. Receipts at each lap boundary: the published
+clock (`FIELD_CLOCK`), `held_peaks`, `log₂ T` per head, reads (ii) and (iv), the faces on the 252 held fronts at the
+learned temperature, and the releases whole. **The projection**: from the measured laps, 27 × (32.5 + 2.0 + 1.6) s ≈
+16.3 min before the boundary receipts, the 252-front host read about 50 s a boundary (≈ 22 min more), the release about
+47 s; from the time read's upper bound, 27 × 108.8 s ≈ 49 min; a growth to width 64 would multiply the laps after it.
+Every end of it passes the 15 minutes the coordinator allowed, so the run is **not launched**; the projection goes to
+the coordinator.
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:

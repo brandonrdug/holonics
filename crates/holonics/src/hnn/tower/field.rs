@@ -3719,6 +3719,10 @@ pub struct FieldLearner {
     /// keyed masks and order moving rather than replaying the first lap's).
     pub laps: u64,
     held: Option<HeldStep>,
+    /// [definition; agent-inferred, November 2] **The clock is a key** (§16.15, §16.16): where `located`, the pace
+    /// family is located by loop closure at lap boundaries ([`locate::locate_class_clock`]) and the deposit never
+    /// moves it (its step is zero); the readers and the temperatures descend. A run's declaration, not its state.
+    pub located: bool,
 }
 
 impl FieldLearner {
@@ -3727,7 +3731,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.theta.len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, located: false }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -3754,7 +3758,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, located: self.located })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -3846,9 +3850,12 @@ impl FieldLearner {
             }
         }
         let mut step = vec![0i128; g.len()];
+        let pace = self.field.layout.pace..self.field.layout.pace + self.field.declaration.paced_heads() * (self.field.declaration.alphabet + 1);
         for &(start, len, grain) in self.field.families() {
             for i in start..start + len {
-                step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                if !(self.located && pace.contains(&i)) {
+                    step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
+                }
             }
         }
         let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
@@ -3900,10 +3907,11 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, drawn, laps, held })
+        Ok(Self { field, first, second, rate_bits, drawn, laps, held, located: false })
     }
 }
 
+pub mod locate;
 pub mod moment;
 
 #[cfg(test)]

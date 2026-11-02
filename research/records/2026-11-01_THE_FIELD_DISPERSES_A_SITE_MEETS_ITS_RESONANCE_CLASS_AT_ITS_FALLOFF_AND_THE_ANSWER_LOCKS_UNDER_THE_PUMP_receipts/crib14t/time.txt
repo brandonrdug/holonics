@@ -1,0 +1,3 @@
+FIELD_TIME_LAP sections=248 sites=2016526 rows=30247890 end_rows=19592820 context_rows=30247890 worst_ps_a_section_row=2223984 worst_ps_a_read_row=242884 at_size_ms=67270 context_ms=7346 projection_ms=108763 (every section's reads and return at the worst measured time a site row, four more reads of it, the held step's context read, and the lap's end)
+FIELD_TIME_RELEASES problems=128 releases=328 sweeps=64 answer=53 front_sites_a_sweep_millis=929 projected_sweeps=57 rows_at_most=102906090 ps_a_row=461276 free_sweep_ms=325 marks_sweep_ms=507 projection_ms=47468
+MEASURE lap=crib14t rc=0 wall_s=4.5 peak_rss_kib=273436

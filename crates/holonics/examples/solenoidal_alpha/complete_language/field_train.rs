@@ -840,7 +840,42 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut previous = (code, sites);
     let mut grown = false;
     let mut fallen = false;
+    // [agent-inferred, November 2] The clock located by loop closure (`FIELD_CLOCK=located`, §16.15–§16.16): the pace is a
+    // key; lap 0 runs on the founding clock (`κ ≡ 1`), and at every later boundary the clock is located from every
+    // training region seen so far (the withheld and held problems never feed it, D1), published by projecting the
+    // current clock onto the fibre (the free directions keep their rates), and set on every paced head; the deposit
+    // never moves it.
+    let located = std::env::var("FIELD_CLOCK").is_ok_and(|v| v == "located");
+    learner.located = located;
     for lap in 0..laps {
+        if located && lap > 0 {
+            let clock_start = std::time::Instant::now();
+            let withheld: std::collections::BTreeSet<usize> = unseen.iter().copied().collect();
+            let seen: Vec<(Vec<usize>, usize)> = train_set.iter().enumerate().filter(|(k, _)| !withheld.contains(k)).map(|(_, (q, a, _))| (q.iter().chain(a).copied().collect(), q.len())).collect();
+            let a_ = learner.field.declaration.alphabet;
+            let (pace, paced) = (learner.field.layout().pace, learner.field.declaration.paced_heads());
+            let unit = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(1i64 << 24));
+            let current: Vec<holonics::ratio::Rat> = (0..a_).map(|c| holonics::ratio::Rat::from_integer(num_bigint::BigInt::from((1i64 << 24) + learner.field.theta[pace + c] as i64)) / unit.clone()).collect();
+            let clock = holonics::hnn::tower::field::locate::locate_class_clock(&seen, a_, holonics::hnn::tower::field::NEAR - 1, &current).map_err(|e| e.to_string())?;
+            let shown = |pick: &dyn Fn(&holonics::ratio::Rat) -> bool| -> String {
+                clock.published.as_ref().map_or(String::new(), |k| (0..a_).filter(|&c| pick(&k[c])).map(|c| String::from_utf8_lossy(&codec.decode(&[c])).escape_debug().to_string()).collect::<Vec<_>>().join(""))
+            };
+            let one = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(1));
+            let zero = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(0));
+            println!(
+                "FIELD_CLOCK lap={lap} regions={} forced={} satisfied={} cutting={} empty={} silent={} dimension={} skin_pinned={} both_live={} published={} at_one={:?} at_zero={:?} other={:?} ms={}",
+                seen.len(), clock.forcing, clock.satisfied, clock.cutting, clock.empty, clock.silent, clock.dimension, clock.skin_pinned.len(), clock.both_live, clock.published.is_some(),
+                shown(&|k| *k == one), shown(&|k| *k == zero), shown(&|k| *k != one && *k != zero), clock_start.elapsed().as_millis()
+            );
+            if let Some(kappa) = &clock.published {
+                for h in 0..paced {
+                    for c in 0..a_ {
+                        let rate = ((kappa[c].clone() - one.clone()) * unit.clone()).round().to_integer();
+                        learner.field.theta[pace + h * (a_ + 1) + c] = i32::try_from(rate).map_err(|_| "a published rate outside 32 bits")?;
+                    }
+                }
+            }
+        }
         // A lap starts only where the time left holds its bound: no lap is begun that its own
         // projection says could pass the run's deadline.
         let bound = if grown { grown_lap_ms } else { lap_ms };
