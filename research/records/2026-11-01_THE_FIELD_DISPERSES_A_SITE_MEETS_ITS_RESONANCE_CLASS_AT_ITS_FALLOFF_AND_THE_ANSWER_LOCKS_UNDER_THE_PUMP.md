@@ -962,14 +962,18 @@ measurements run apart) and on the card (`field.cu`, `field_moment.cuh`; parity 
   reached (the question by the sweeps since the release began), with no skin. The command founds one
   where at least two turned sets stay on the place (`heads − still ≥ 3`). Training's read 2: the prefix
   at its rung `r`, the question at `r + 1`, the band and past it at zero.
-- **§15.5 the variants** (`tools/gsm8k_variants.py`, 34 tests): on the held 128, two variants each for 89
+- **§15.5 the variants** (`tools/gsm8k_variants.py`, 35 tests): on the held 128, two variants each for 89
   problems and one for 10; 29 have none (no annotated calculation, a number word, results that would turn
   fractional, or roles that collide). Its `claim` reads the claim at a variant's calculation `i` by
   operand value, and `show` writes the three problems beside their variants under `.local/` only. What the
   claim does not witness (the lesson of October 9, 12): a release that copies the variant's question
   number into calculation `i` takes it whatever the arithmetic, so a release that copies without
-  computing passes; the claim reads reconfiguration with the problem, never a calculation's value, which
-  the written rules read beside it.
+  computing passes; the claim reads reconfiguration with the problem, never a calculation's value. So
+  reading 10's receipts carry a second reading beside it, fixed here before the run and not a bar: of
+  the variant releases' calculations with an operand among the variant's question numbers, how many
+  write their expression's exact value at the equals, beside the same count on the originals' releases
+  with the originals' numbers (`VARIANTS_COMPUTED`). It reads whether anything is computed rather than
+  copied.
 - **The review's repairs.** The key's bracket `D ŵ_i − D² ŵ_j` is released by the skin's bits before it
   meets its covector, and its products are checked against the carrier and refused (it had stood 30 bits
   above the guard, and host and card wrapped alike); growth lifts the moment encodings' step state divided,
