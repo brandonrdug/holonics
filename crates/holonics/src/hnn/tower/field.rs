@@ -175,6 +175,8 @@ use rayon::prelude::*;
 /// once, by one division of the exact series, for the return; the declared crossing into the step,
 /// whose own release is to the material's grain.
 pub const SHARE_BITS: u32 = 63;
+/// A key's return past its 128-bit carrier, refused on the host and the card alike.
+const KEY_RETURN: &str = "a contact's key return past its 128-bit carrier";
 /// The contact covector's grain, `2^(−40)` (`δz` and `δs`).
 const CONTACT_BITS: u32 = 40;
 /// A face carried as a site's state, each class's share on `2^(−16)` ([`shares`]); its opening
@@ -270,12 +272,15 @@ impl FieldDeclaration {
         self.modes.min(k)
     }
 
-    /// [agent-inferred, November 1] **The contact's return carrier**: the word's return sums
-    /// `δs D ŵ` over a support of at most the reach (`D ≤ 2^30`, `ŵ` on 32 bits), so a contact
-    /// covector `|δs| < 2^(126 − 30 − 31 − ⌈log₂ reach⌉)` keeps every sum inside 128 bits; one past it
-    /// is refused, on the host and the card alike.
+    /// [agent-inferred, November 1] **The contact's return carrier**: the word's return sums, as the
+    /// probe, `δs D ŵ` (`D ≤ 2^30`, `ŵ` on 32 bits) and, as the key, `δs (D ŵ_i − D² ŵ_j/2^g)`, the
+    /// lock's bracket released once by the skin's bits (two terms of at most `2^61`), over a support
+    /// of at most the reach, so a contact covector `|δs| < 2^(126 − 62 − ⌈log₂ reach⌉)` keeps every
+    /// sum inside 128 bits; one past it is refused. A crowd's member part multiplies its bracket by the
+    /// crowd's count before the division by its square, so its product is checked and refused past
+    /// the carrier ([`KEY_RETURN`]), on the host and the card alike.
     pub fn contact_return_bits(&self) -> u32 {
-        (126 - MOVE_BITS - 31).saturating_sub(self.reach_bits() as u32)
+        (126 - 2 * MOVE_BITS - 2).saturating_sub(self.reach_bits() as u32)
     }
 
     /// [definition; agent-inferred, November 1] **A series row's bound**, read from the declaration's
@@ -687,6 +692,8 @@ pub struct ClassLists {
     pub definite: Vec<bool>,
     pub off: Vec<u32>,
     pub members: Vec<u32>,
+    /// Each receiver's other probed classes (§15.2's multi-probe, [`probes`]), empty where none.
+    pub probes: Vec<Vec<u32>>,
 }
 
 impl ClassLists {
@@ -706,7 +713,14 @@ impl ClassLists {
             members[filled[key(t)] as usize] = t as u32;
             filled[key(t)] += 1;
         }
-        Self { class, definite, off, members }
+        let probes = vec![Vec::new(); class.len()];
+        Self { class, definite, off, members, probes }
+    }
+
+    /// The lists with each receiver's other probed classes.
+    pub fn probed(mut self, probes: Vec<Vec<u32>>) -> Self {
+        self.probes = probes;
+        self
     }
 
     /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1): its near field
@@ -716,10 +730,45 @@ impl ClassLists {
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
-        let c = 2 * self.class[i] as usize;
-        let members = &self.members[self.off[c] as usize..self.off[c + 1] as usize];
-        near.chain(members.iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR))
+        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied());
+        let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
+        near.chain(far)
     }
+}
+
+/// [definition; agent-inferred, November 1] **A receiver's probes across its seams** (§15.2's
+/// multi-probe): for each address mode whose word lies within the band `ε = 2^(−k)` of its light cone,
+/// `|re² − im²| 2^k < re² + im²` exactly, the shell across that cone (a plate's is the bridge, the
+/// bridge's the plate on its in-phase side), and the classes every combination of those crossings
+/// reaches, the receiver's own excluded. Sources stay in their own class alone and enter a probed
+/// run at their full score: nothing is weighted by membership, the lock decides. Why (measured
+/// November 1): with the sharp address the cue fixture's held successor codes 0.177 bits, 80 % of it in
+/// 5 of its 64 problems, where the successor's earlier site shared the reader's class in at most one
+/// of its four head and tick rows and was heard only blurred through its octave's crowd; with the
+/// probes it codes 0.022 bits, and over six further foundings 0.026 to 0.060 bits (0.021 to 0.212
+/// without), every one inside the fixture's bar of 0.0625.
+pub fn probes(modes: impl Iterator<Item = (i64, i64)>, band: u32) -> Vec<u32> {
+    let mut out = vec![0u32];
+    let mut own = 0u32;
+    for (l, (re, im)) in modes.enumerate() {
+        let place = 3u32.pow(l as u32);
+        let s = shell(re, im);
+        own += place * s;
+        let (rr, ii) = (re as i128 * re as i128, im as i128 * im as i128);
+        let near_cone = rr + ii > 0 && ((rr - ii).abs() << band) < rr + ii;
+        let across = if s != 1 { 1 } else if re >= 0 { 2 } else { 0 };
+        out = out.iter().flat_map(|&c| std::iter::once(c + place * s).chain(near_cone.then_some(c + place * across))).collect();
+    }
+    out.retain(|&c| c != own);
+    out
+}
+
+/// [agent-inferred, November 1] **The probes' band** `ε = 2^(−k)`, `k = ⌈log₂ b⌉` over a head's `b`
+/// address modes: at the founding's random phases a mode lies within `ε` of its cone with probability
+/// `(2/π) arcsin ε ≤ ε`, so over its `b` modes a receiver expects fewer than one crossing (`b ε ≤ 1`)
+/// and reads about two runs.
+pub fn band_bits(trits: usize) -> u32 {
+    usize::BITS - trits.max(1).saturating_sub(1).leading_zeros()
 }
 
 /// [definition; agent-inferred, November 1] **A mode's shell** (§12) as its class digit `s + 1`:
@@ -1095,7 +1144,7 @@ impl Field {
                 return refuse("a carried face that is empty, or whose class is outside the alphabet or share past one");
             }
         }
-        if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || region.clock.iter().any(|&c| c as usize >= self.declaration.reach))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
+        if (!region.clock.is_empty() && (region.clock.len() != region.classes.len() || (self.declaration.clocks > 0 && region.clock.iter().any(|&c| c as usize >= self.declaration.reach)))) || (!region.echo.is_empty() && region.echo.len() != region.classes.len()) {
             return refuse("a region's clocks or echoes that are not one a site, or a clock past the reach");
         }
         if region.echo.iter().flatten().any(|e| e.logits.len() != self.declaration.alphabet) {
@@ -1316,7 +1365,8 @@ impl Field {
         cell.classes = (0..heads)
             .map(|h| {
                 let class = (0..sites).map(|t| (0..trits).rev().fold(0u32, |c, li| 3 * c + shell(q[t * m2 + h * n + li], q[t * m2 + m + h * n + li]))).collect();
-                ClassLists::of(class, definite.to_vec(), buckets)
+                let probed = (0..sites).map(|t| probes((0..trits).map(|li| (q[t * m2 + h * n + li], q[t * m2 + m + h * n + li])), band_bits(trits))).collect();
+                ClassLists::of(class, definite.to_vec(), buckets).probed(probed)
             })
             .collect();
         cell.word = q.clone();
@@ -1739,7 +1789,17 @@ impl Field {
                         }
                     }
                 }
-                let spread = |diff: &[i128], t: usize, r: usize| -> i128 { (0..=t).map(|u| diff[u * span + r]).sum() };
+                // A difference array's running prefix over the places (`[t][r]`).
+                let prefixed = |diff: &[i128]| -> Vec<i128> {
+                    let mut out = diff[..sites * span].to_vec();
+                    for t in 1..sites {
+                        for r in 0..span {
+                            out[t * span + r] += out[(t - 1) * span + r];
+                        }
+                    }
+                    out
+                };
+                let spread_v = prefixed(&crowd_v);
                 for j in 0..sites {
                     for r in 0..span {
                         // Held in the framed chart until the frame is undone below.
@@ -1747,7 +1807,7 @@ impl Field {
                         let slot = j * m2 + if r < n { c } else { m + c };
                         dv[slot] = fit64(release(sv[j * span + r], SHARE_BITS))?;
                         if definite[j] {
-                            dv[slot] = fit64(dv[slot] as i128 + release(spread(&crowd_v, j, r), SHARE_BITS))?;
+                            dv[slot] = fit64(dv[slot] as i128 + release(spread_v[j * span + r], SHARE_BITS))?;
                         }
                     }
                 }
@@ -1818,19 +1878,24 @@ impl Field {
                         let (j, dd) = (src.j as usize, i.abs_diff(src.j as usize));
                         for r in 0..span {
                             let (dec, g) = self.decay(h, r % n, dd);
-                            col[j * span + r] += ds[i][k] * (((dec * qh[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128);
+                            // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
+                            // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
+                            let bracket = release(((dec * qh[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
+                            col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
                         }
                     }
                     for (k, c) in crowds[i].iter().enumerate() {
                         for r in 0..span {
                             let (dec, g) = self.decay(h, r % n, 1 << c.level);
                             let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
-                            let part = div_nearest(dsc[i][k] * (((dec * qh[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean), (c.count * c.count) as i128);
+                            let bracket = release(((dec * qh[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
+                            let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
                             crowd_w[c.lo * span + r] += part;
                             crowd_w[(c.hi + 1) * span + r] -= part;
                         }
                     }
                 }
+                let spread_w = prefixed(&crowd_w);
                 for i in 0..sites {
                     for r in 0..span {
                         let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * self.decay(h, r % n, i.abs_diff(src.j as usize)).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
@@ -1838,9 +1903,9 @@ impl Field {
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
-                        dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back + self.decay(h, 0, 0).1))?;
+                        dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
                         if definite[i] {
-                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread(&crowd_w, i, r), back + self.decay(h, 0, 0).1))?;
+                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
                         }
                     }
                 }
@@ -2537,7 +2602,8 @@ impl Field {
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
         // The moment encodings (§15.1): every copy of a head carries its source's moment whole, as it
-        // carries its value (each copy's value is its source's, and the current's return is parted).
+        // carries its value (each copy's value is its source's); the current's return is parted, so
+        // a copy's covector arrives divided and its step's moments are lifted divided, as `v_bias`'s.
         let (t_old, t_new, n) = (old.moment_modes(), d.moment_modes(), old.modes);
         for (old_base, new_base) in [(ol.moment_before, layout.moment_before), (ol.moment_after, layout.moment_after)] {
             for row in 0..=a {
@@ -2548,7 +2614,7 @@ impl Field {
                             for part in 0..2 {
                                 let (from_at, to_at) = (old_base + row * 2 * t_old + part * t_old + oi, new_base + row * 2 * t_new + part * t_new + ni);
                                 new[to_at] = self.theta[from_at];
-                                from[to_at] = (from_at, false);
+                                from[to_at] = (from_at, true);
                             }
                         }
                     }
