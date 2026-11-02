@@ -17,6 +17,24 @@ Since October 8 Claude leads the construction and Epime coordinates and reviews 
 
 ## Current construction
 
+**November 1–2: Athena alpha is the GSM8K field, and the review puts its comparison and readings
+first (card).** Since November 1 Athena alpha runs as one field per GSM8K problem
+(`hnn::tower::field`, its card realization bit-equal to the host): the question's sites are known, the
+answer's are open, and the answer is refined and released whole
+([the one-field record](research/records/2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN.md),
+[the dispersing record](research/records/2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP.md) to §16.22).
+The field20 run coded held answers from 4.31 to 2.83 bits a byte in three laps, but no better beside
+its own question than beside a foil (+0.0009, −0.0011 and −0.0008 bits), and its releases locked only
+spaces and a starting "T"/"Th". PR #600 (a site opens on its whole moment, host and card) is open. The
+November 2 [review](research/records/2026-11-02_THE_COMPARISON_IS_THE_COUPLINGS_FREE_ENERGY_THE_QUESTION_IS_READ_BY_A_JOINT_CODE_AND_THE_RELEASE_RUNS_THE_TRAINING_CLOCK_BACKWARDS.md)
+reads the cause in the comparison, not the opening. The code counts a lock only at the same place, so
+the face learns the place-wise marginal over phrasings (the commonest bytes of the training answers
+spell "The t" and then a space at 60 of the first 64 places). The context read sees the question only
+where the answer does not restate itself, at most about 0.18 bits a byte. The reported codes are
+pseudo-likelihoods. Its design makes the comparison the coupling's free energy, whose zero-temperature
+face is the October 19 lock test; reads the question by a weighted joint code; and runs the release on
+the training clock backwards. #601, #602 and #603 carry it, with the acceptance fixed in its §5.
+
 **October 31 (evening): participation at the clocked levels raced and set aside; the working learner
 continues; the capacity read.** Participation joined the working declaration at the clocked levels
 alone, on their own ticks (record §35–§36), exact host against card on bytes and units after a

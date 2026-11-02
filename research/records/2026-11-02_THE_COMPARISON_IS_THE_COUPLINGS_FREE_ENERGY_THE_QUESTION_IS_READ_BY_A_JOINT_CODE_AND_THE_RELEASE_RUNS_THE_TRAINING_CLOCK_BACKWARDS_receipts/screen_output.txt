@@ -1,0 +1,22 @@
+problems 7473  answer bytes 2150033  open bytes over the four parts 2150033
+context read (each open byte with its neighbours resolved):
+  glue               668392   0.3109
+  restated           980579   0.4561
+  restated_digit     320741   0.1492
+  restated_word      659838   0.3069
+  qonly              266042   0.1237
+  qonly_digit         13421   0.0062
+  qonly_word         252621   0.1175
+  new                235020   0.1093
+  new_digit           17257   0.0080
+  new_word           217763   0.1013
+  problems where no open byte is restated only in the question: 30
+joint left-to-right reading (each answer byte once):
+  joint_glue                 668392   0.3109
+  joint_repeat               745738   0.3468
+  joint_first_in_q           411723   0.1915
+  joint_first_in_q_digit      38410   0.0179
+  joint_first_in_q_word      373313   0.1736
+  joint_first_new            324180   0.1508
+  joint_first_new_digit       65182   0.0303
+  joint_first_new_word       258998   0.1205

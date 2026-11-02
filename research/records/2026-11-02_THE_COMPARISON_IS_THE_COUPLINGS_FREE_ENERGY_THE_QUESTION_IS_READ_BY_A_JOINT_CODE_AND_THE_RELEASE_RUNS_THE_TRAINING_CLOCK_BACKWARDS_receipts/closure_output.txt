@@ -1,0 +1,166 @@
+modules reached 120 of 355; lines reached 155269, not reached 156119
+  hnn::tests                   reached     874   not reached   36906
+  hnn::constitution            reached   19984   not reached   15483
+  hnn::reference               reached    9173   not reached   17360
+  compression                  reached   12206   not reached   12579
+  hnn::tower                   reached   15465   not reached    7844
+  receiver                     reached    7106   not reached   12634
+  hnn::word                    reached   13808   not reached    2286
+  holon                        reached   10097   not reached    5422
+  ratio                        reached   11808   not reached    2182
+  physics                      reached       0   not reached   10343
+  holarchy                     reached     786   not reached    9416
+  hnn::receiving               reached    4310   not reached    4078
+  hnn::physical                reached    4007   not reached    4086
+  hnn::prediction              reached    6136   not reached    1030
+  hnn::ring                    reached    5564   not reached    1215
+  geometry                     reached    2670   not reached    3277
+  hnn::moment                  reached    3506   not reached    1656
+  aeon                         reached    2086   not reached    2691
+  hnn::field                   reached    3881   not reached     140
+  hnn::paired                  reached    1316   not reached    2299
+  hnn::encoding                reached    2530   not reached     156
+  hnn::port                    reached    2339   not reached       0
+  hnn::phase_family            reached    2133   not reached       0
+  hnn::propagation             reached    1856   not reached     121
+  hnn::chart                   reached    1620   not reached       0
+  navigator                    reached    1594   not reached       0
+  hnn::section_lock            reached       0   not reached    1248
+  hnn::founding                reached    1234   not reached       0
+  hnn::keyed_modes             reached    1068   not reached       0
+  hnn::ratio                   reached     995   not reached       0
+  hnn::contact                 reached     839   not reached       0
+  hnn::overture                reached       0   not reached     826
+  hnn::pending                 reached     714   not reached       0
+  hnn::keys                    reached     683   not reached       0
+  hnn                          reached     676   not reached       0
+  hnn::retention               reached     626   not reached       0
+  hnn::units                   reached     534   not reached       0
+  hnn::wave                    reached       0   not reached     518
+  hnn::dynamic_section         reached     469   not reached       0
+  hnn::executed                reached     371   not reached       0
+  exterior_guards              reached       0   not reached     265
+  hnn::realization             reached     142   not reached       0
+  hnn::state_text              reached      63   not reached       0
+  (lib)                        reached       0   not reached      58
+reached modules:
+   aeon 174
+   aeon::epoch 496
+   aeon::groupoid 720
+   aeon::reading 696
+   compression 139
+   compression::cost 500
+   compression::keys 565
+   compression::keys::duplex 1494
+   compression::keys::repair 611
+   compression::keys::transport 1578
+   compression::landmark::context 7070
+   compression::landmark::context::baseline 249
+   geometry 31
+   geometry::complex 848
+   geometry::screw 598
+   geometry::spatial 371
+   geometry::swing 238
+   geometry::transport_scan 314
+   geometry::winding 270
+   hnn 676
+   hnn::chart 1620
+   hnn::constitution 16480
+   hnn::constitution::epoch 3504
+   hnn::contact 839
+   hnn::dynamic_section 469
+   hnn::encoding 1466
+   hnn::encoding::observed 875
+   hnn::encoding::placement 189
+   hnn::executed 371
+   hnn::field 3235
+   hnn::field::founding_tests 646
+   hnn::founding 1234
+   hnn::keyed_modes 1068
+   hnn::keys 683
+   hnn::moment 3506
+   hnn::paired 1316
+   hnn::pending 714
+   hnn::phase_family 2133
+   hnn::physical 329
+   hnn::physical::action 2773
+   hnn::physical::action::contextual 500
+   hnn::physical::communication 405
+   hnn::port 2339
+   hnn::prediction 4376
+   hnn::prediction::charted 1760
+   hnn::propagation 1856
+   hnn::ratio 995
+   hnn::realization 142
+   hnn::receiving 2945
+   hnn::receiving::cells 363
+   hnn::receiving::native_current 216
+   hnn::receiving::reuse_work 294
+   hnn::receiving::single_grain 492
+   hnn::reference 6550
+   hnn::reference::comparison 801
+   hnn::reference::passage 948
+   hnn::reference::prepared_input 503
+   hnn::reference::prepared_input::codec 371
+   hnn::retention 626
+   hnn::ring 5108
+   hnn::ring::modes 456
+   hnn::state_text 63
+   hnn::tests 35
+   hnn::tests::learning 274
+   hnn::tests::support 565
+   hnn::tower 11661
+   hnn::tower::field 3804
+   hnn::units 534
+   hnn::word 3860
+   hnn::word::action 1282
+   hnn::word::column 632
+   hnn::word::continuation 2888
+   hnn::word::finite_gain 498
+   hnn::word::linear 100
+   hnn::word::material_ray 1417
+   hnn::word::material_ray::rounding 650
+   hnn::word::native_execution 35
+   hnn::word::native_prediction 931
+   hnn::word::scan 246
+   hnn::word::trajectory 220
+   hnn::word::variation 835
+   hnn::word::work 214
+   holarchy 579
+   holarchy::terrain 207
+   holon 947
+   holon::contact 1365
+   holon::contact::menu 320
+   holon::deposition 1092
+   holon::dirac 829
+   holon::element 277
+   holon::law 583
+   holon::parametron 984
+   holon::port 329
+   holon::restriction 526
+   holon::restriction::tower 2845
+   navigator 707
+   navigator::address 511
+   navigator::trace 376
+   ratio 211
+   ratio::algebraic 1579
+   ratio::disk 876
+   ratio::exponentiated 570
+   ratio::gaussian 177
+   ratio::linear 1509
+   ratio::linear::inertia 713
+   ratio::linear::prime_image 1548
+   ratio::linear::vector 628
+   ratio::polynomial 2262
+   ratio::primality 93
+   ratio::ring 239
+   ratio::ring::section 74
+   ratio::surprisal 1067
+   ratio::work 262
+   receiver 34
+   receiver::face 1417
+   receiver::population 2370
+   receiver::population::port 915
+   receiver::receipt 484
+   receiver::reception 902
+   receiver::release 984
