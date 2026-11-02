@@ -173,6 +173,10 @@ struct Words {
     qf32: u64,
     decay_t: u64,
     dpb: u64,
+    dlist: u64,
+    dstart: u64,
+    olist: u64,
+    ostart: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -876,17 +880,28 @@ impl<'c> CardField<'c> {
         let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
+        // Each region's definite sites and its open ones, by place (§15.9: an open receiver hears every definite
+        // site, and a definite source is heard by every open one).
+        let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
         for (r, region) in regions.iter().enumerate() {
             let s = region.classes.len();
             region_eoff.push(pairs as u64);
             pairs += s * s;
+            dstart.push(dlist.len() as u32);
+            ostart.push(olist.len() as u32);
             for t in 0..s {
                 site_region.push(r as u32);
                 site_pos.push(t as u32);
                 classes.push(region.classes[t] as u32);
                 unresolved.push(u8::from(region.unresolved[t]));
                 let carried = region.faces.get(t).and_then(Option::as_ref).is_some();
-                definite.push(u8::from((!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false)));
+                let is_definite = (!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false);
+                definite.push(u8::from(is_definite));
+                if is_definite {
+                    dlist.push(t as u32);
+                } else {
+                    olist.push(t as u32);
+                }
                 clock.push(region.clock.get(t).copied().unwrap_or(0));
                 match region.echo.get(t).and_then(Option::as_ref) {
                     Some(e) => {
@@ -912,6 +927,14 @@ impl<'c> CardField<'c> {
             region_off.push(site_region.len() as u32);
         }
         let sites = site_region.len();
+        dstart.push(dlist.len() as u32);
+        ostart.push(olist.len() as u32);
+        if dlist.is_empty() {
+            dlist.push(0);
+        }
+        if olist.is_empty() {
+            olist.push(0);
+        }
         if echo_logits.is_empty() {
             echo_logits.push(0i64);
         }
@@ -933,6 +956,7 @@ impl<'c> CardField<'c> {
         let mix_off_at = pack.put(&mix_off);
         let mix_class_at = pack.put(&mix_class_up);
         let mix_share_at = pack.put(&mix_share_up);
+        let (dlist_at, dstart_at, olist_at, ostart_at) = (pack.put(&dlist), pack.put(&dstart), pack.put(&olist), pack.put(&ostart));
         let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
         let base = tables.device_ptr();
         let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
@@ -954,6 +978,10 @@ impl<'c> CardField<'c> {
         words.mix_off = base + mix_off_at;
         words.mix_class = base + mix_class_at;
         words.mix_share = base + mix_share_at;
+        words.dlist = base + dlist_at;
+        words.dstart = base + dstart_at;
+        words.olist = base + olist_at;
+        words.ostart = base + ostart_at;
         words.status = status.device_ptr();
         words.x = x.device_ptr();
         let returning = g.is_some();

@@ -363,6 +363,13 @@ struct FieldWords {
     // The reverse's pair covectors `⟨δỹ_i, D ṽ_j⟩` at the region block's dense address (one head's, each head's
     // rows computing them once for both of their passes).
     wide *dpb;
+    // A region's definite sites' places and its open ones' (head-independent, ascending), `dlist[dstart[r] ..
+    // dstart[r + 1]]` and `olist[ostart[r] .. ostart[r + 1]]` (§15.9: an open receiver hears every definite site, and
+    // a definite source is heard by every open one).
+    const uint32_t *dlist;
+    const uint32_t *dstart;
+    const uint32_t *olist;
+    const uint32_t *ostart;
 };
 
 // The frame of local mode `l` of head `h` at the batch's site `g`: the identity in a head of a still ring
@@ -1020,7 +1027,11 @@ extern "C" __global__ void field_classes(FieldWords w) {
             const uint64_t hg = (uint64_t)h * w.T + g;
             const int64_t *word = w.qkv + g * 2 * w.M2 + (uint64_t)h * w.n;
             uint32_t c, probed[MAX_PROBES];
-            const uint32_t count = probe_classes(word, w.M, b, w.band, &c, probed);
+            // (an open site reads no probe, §15.9: its probes are not kept, nor listed among the probers)
+            uint32_t count = probe_classes(word, w.M, b, w.band, &c, probed);
+            if (!definite_site(w, g)) {
+                count = 0;
+            }
             w.cls[hg] = c;
             w.pn[hg] = count;
             for (uint32_t k = 0; k < count; k++) {
@@ -1125,6 +1136,11 @@ extern "C" __global__ void field_sums(FieldWords w) {
 // warp keeps the classes and the running offsets of their runs in shared memory; an entry of the support
 // is one of the near field's `NEAR_SLOTS` places or an entry of a run, found by the offsets.
 struct RowCls {
+    // An open receiver (not definite) reads past the near field every definite site of its region, at the full
+    // lock, and no class run, probe or crowd (§15.9): `dl` them and `ndef` their number.
+    uint32_t open;
+    uint32_t ndef;
+    const uint32_t *dl;
     uint32_t nc;
     uint32_t cl[MAX_PROBES + 1];
     uint32_t cum[MAX_PROBES + 2];
@@ -1135,9 +1151,14 @@ struct RowCls {
 __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg, const uint32_t *off, RowCls &rc, uint32_t lane) {
     __syncwarp();
     if (lane == 0) {
+        const uint64_t g = hg % w.T;
+        const uint32_t r = w.site_region[g];
+        rc.open = definite_site(w, g) ? 0 : 1;
+        rc.ndef = w.dstart[r + 1] - w.dstart[r];
+        rc.dl = w.dlist + w.dstart[r];
         const uint32_t pstride = ((uint32_t)1 << w.ctrits) - 1;
-        const uint32_t probes = w.pn[hg];
-        rc.nc = 1 + probes;
+        const uint32_t probes = rc.open ? 0 : w.pn[hg];
+        rc.nc = rc.open ? 0 : 1 + probes;
         rc.cl[0] = w.cls[hg];
         for (uint32_t k = 0; k < probes; k++) {
             rc.cl[1 + k] = w.pcls[hg * pstride + k];
@@ -1150,7 +1171,7 @@ __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg
         }
     }
     __syncwarp();
-    return NEAR_SLOTS + rc.cum[rc.nc];
+    return NEAR_SLOTS + (rc.open ? rc.ndef : rc.cum[rc.nc]);
 }
 
 // Site `i`'s support entry `k` of its region: the near field first (`k < NEAR_SLOTS`, the `NEAR − 1` places
@@ -1166,6 +1187,11 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
         return i + d < sites ? i + d : UINT32_MAX;
     }
     const uint32_t e = k - NEAR_SLOTS;
+    if (rc.open) {
+        const uint32_t j = rc.dl[e];
+        const uint32_t gap = j > i ? j - i : i - j;
+        return gap >= NEAR ? j : UINT32_MAX;
+    }
     uint32_t q = 0;
     while (e >= rc.cum[q + 1]) {
         q++;
@@ -1175,10 +1201,11 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
     return gap >= NEAR ? j : UINT32_MAX;
 }
 
-// Source `j`'s receiver entry `k`: the near field, and where `j` is definite every member of its class
-// past the near field and every receiver that probes its class (the support is directional: `j ∈ S_i`
-// exactly when `j` is near `i`, or definite in `i`'s class or in one `i` probes).
-__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, const uint32_t *pmem, const uint32_t *poff, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
+// Source `j`'s receiver entry `k`: the near field, and where `j` is definite every definite receiver whose
+// support holds it past the near field (the definite members of its class, and the receivers that probe its
+// class) and every open site of the region (§15.9: an open receiver hears every definite site). The support is
+// directional: `j` is in `S_i` exactly when `j` is near `i`, or definite and heard by `i`.
+__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, const uint32_t *pmem, const uint32_t *poff, const uint32_t *olist, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
     if (k < NEAR_SLOTS) {
         const uint32_t d = k / 2 + 1;
         if (k % 2 == 0) {
@@ -1187,14 +1214,15 @@ __device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const u
         return j + d < sites ? j + d : UINT32_MAX;
     }
     const uint32_t e = k - NEAR_SLOTS;
-    const uint32_t own = off[2 * c + 2] - off[2 * c];
-    const uint32_t i = e < own ? members[off[2 * c] + e] : pmem[poff[c] + (e - own)];
+    const uint32_t own = off[2 * c + 1] - off[2 * c];
+    const uint32_t probed = poff[c + 1] - poff[c];
+    const uint32_t i = e < own ? members[off[2 * c] + e] : e < own + probed ? pmem[poff[c] + (e - own)] : olist[e - own - probed];
     const uint32_t gap = j > i ? j - i : i - j;
     return gap >= NEAR ? i : UINT32_MAX;
 }
 
-__device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, const uint32_t *poff, uint32_t c, bool definite) {
-    return NEAR_SLOTS + (definite ? off[2 * c + 2] - off[2 * c] + poff[c + 1] - poff[c] : 0);
+__device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, const uint32_t *poff, uint32_t nopen, uint32_t c, bool definite) {
+    return NEAR_SLOTS + (definite ? off[2 * c + 1] - off[2 * c] + poff[c + 1] - poff[c] + nopen : 0);
 }
 
 // Receiver `i`'s crowd `slot` in a region of `sites` (the host's `crowd_ranges`, §14.10): octave
@@ -1431,7 +1459,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
         // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
         // them there (a score is computed once; the entries outside the support are never read).
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
@@ -1573,7 +1601,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
         const int64_t amin = w.amin[hg];
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         Big<L> M = big_zero<L>();
@@ -2306,7 +2334,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
         // The closure (§19), over the support's pairs: on a still head at a closing tick, an unresolved
         // site's row is also compared with where its class stands among the sites it meets (`closes` is the
         // ring set's head count, zero where the head does not close). A carried site holds nothing.
@@ -2503,7 +2531,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         const uint32_t c = w.cls[(uint64_t)h * w.T + g];
         const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
         const uint32_t *pmem = w.pmem + (uint64_t)h * w.T * (((uint32_t)1 << w.ctrits) - 1) + first * (((uint32_t)1 << w.ctrits) - 1);
-        const uint32_t K = receiver_len(off, poff, c, definite_site(w, g));
+        const uint32_t *olist = w.olist + w.ostart[r];
+        const uint32_t K = receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r], c, definite_site(w, g));
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
         const int64_t *dsc = ds + w.region_eoff[r] + j;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
@@ -2511,7 +2540,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         wide sk = 0, sv = 0;
         if (part < parts) {
             for (uint32_t k = part; k < K; k += parts) {
-                const uint32_t i = receiver_at(members, off, pmem, poff, c, j, sites, k);
+                const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
                 if (i == UINT32_MAX) {
                     continue;
                 }
