@@ -1,0 +1,24 @@
+# Founding-only reads after the three law changes (section 16.20), same declaration and data, train-field with LAPS = 0, on the card.
+FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=1126
+FIELD_ROWS_HELD_READ lap=-1 set=opening regions=128 ms=932
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=0 rows=157312 question_far_share=999389 question_near_share=610 soft_near_share=0 other_share=0 question_current=809026 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=0 rows=157312 question_far_share=999417 question_near_share=582 soft_near_share=0 other_share=0 question_current=817207 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=0 rows=157312 question_far_share=999579 question_near_share=420 soft_near_share=0 other_share=0 question_current=52131 far_rows=157312 far_effective_sources=225.34
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=0 rows=157312 question_far_share=999495 question_near_share=504 soft_near_share=0 other_share=0 question_current=77227 far_rows=157312 far_effective_sources=225.20
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=1 rows=157312 question_far_share=999389 question_near_share=610 soft_near_share=0 other_share=0 question_current=809026 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=1 rows=157312 question_far_share=999417 question_near_share=582 soft_near_share=0 other_share=0 question_current=817207 far_rows=157312 far_effective_sources=224.05
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=1 rows=157312 question_far_share=999579 question_near_share=420 soft_near_share=0 other_share=0 question_current=52131 far_rows=157312 far_effective_sources=225.34
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=1 rows=157312 question_far_share=999495 question_near_share=504 soft_near_share=0 other_share=0 question_current=77227 far_rows=157312 far_effective_sources=225.20
+FIELD_ROWS_HELD_READ lap=-1 set=context regions=512 ms=418
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=0 rows=35591 question_far_share=138704 question_near_share=1188 soft_near_share=0 other_share=860107 question_current=113366 far_rows=35591 far_effective_sources=69.81
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=0 rows=35591 question_far_share=134688 question_near_share=1380 soft_near_share=0 other_share=863931 question_current=111481 far_rows=35591 far_effective_sources=67.98
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=0 rows=35591 question_far_share=201931 question_near_share=997 soft_near_share=0 other_share=797070 question_current=26024 far_rows=35591 far_effective_sources=206.05
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=0 rows=35591 question_far_share=212037 question_near_share=1088 soft_near_share=0 other_share=786873 question_current=35936 far_rows=35591 far_effective_sources=190.67
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=1 rows=35591 question_far_share=138704 question_near_share=1188 soft_near_share=0 other_share=860107 question_current=113366 far_rows=35591 far_effective_sources=69.81
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=1 rows=35591 question_far_share=134688 question_near_share=1380 soft_near_share=0 other_share=863931 question_current=111481 far_rows=35591 far_effective_sources=67.98
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=1 rows=35591 question_far_share=201931 question_near_share=997 soft_near_share=0 other_share=797070 question_current=26024 far_rows=35591 far_effective_sources=206.05
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=1 rows=35591 question_far_share=212037 question_near_share=1088 soft_near_share=0 other_share=786873 question_current=35936 far_rows=35591 far_effective_sources=190.67
+MEASURE lap=founding rc=0 wall_s=3.4 peak_rss_kib=602896
+# The sampled parity on that binary (3 sections, 8 withheld, 1 release; deadline 240 s):
+FIELD_PARITY_DONE sections=4 reads=15 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=109 host_ms=80060 card_ms=513 elapsed_ms=130453
+MEASURE lap=parity rc=0 wall_s=142.5 peak_rss_kib=2494044

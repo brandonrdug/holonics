@@ -1,0 +1,25 @@
+# Founding-only reads (section 16.20), train-field with LAPS = 0 (no deposit), before the law changes, on the card (RTX 4080 SUPER, .local/gpu.lock).
+# GSM8K: UNITS0, TRAIN.txt, HELD128.txt, KEYS8; D 32, H 4, n 8, still 2, f 32, K 2, section 16, rate 8. Projection: about 20 s, deadline 120 s.
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=35544
+FIELD_ROWS_HELD_READ lap=-1 set=opening regions=128 ms=849
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=0 rows=157312 question_far_share=132 question_near_share=14 soft_near_share=999852 other_share=0 question_current=137 far_rows=157312 far_effective_sources=223.90
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=0 rows=157312 question_far_share=77 question_near_share=4 soft_near_share=999917 other_share=0 question_current=60 far_rows=157312 far_effective_sources=223.91
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=0 rows=157312 question_far_share=83810 question_near_share=122 soft_near_share=916067 other_share=0 question_current=5473 far_rows=157312 far_effective_sources=218.66
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=0 rows=157312 question_far_share=68711 question_near_share=124 soft_near_share=931164 other_share=0 question_current=6023 far_rows=157312 far_effective_sources=211.35
+FIELD_ROWS_HELD lap=-1 set=opening head=0 tick=1 rows=157312 question_far_share=132 question_near_share=14 soft_near_share=999852 other_share=0 question_current=137 far_rows=157312 far_effective_sources=223.90
+FIELD_ROWS_HELD lap=-1 set=opening head=1 tick=1 rows=157312 question_far_share=77 question_near_share=4 soft_near_share=999917 other_share=0 question_current=60 far_rows=157312 far_effective_sources=223.91
+FIELD_ROWS_HELD lap=-1 set=opening head=2 tick=1 rows=157312 question_far_share=83810 question_near_share=122 soft_near_share=916067 other_share=0 question_current=5473 far_rows=157312 far_effective_sources=218.66
+FIELD_ROWS_HELD lap=-1 set=opening head=3 tick=1 rows=157312 question_far_share=68711 question_near_share=124 soft_near_share=931164 other_share=0 question_current=6023 far_rows=157312 far_effective_sources=211.35
+FIELD_ROWS_HELD_READ lap=-1 set=context regions=512 ms=365
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=0 rows=35591 question_far_share=211032 question_near_share=659 soft_near_share=22836 other_share=765472 question_current=173241 far_rows=35591 far_effective_sources=5.78
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=0 rows=35591 question_far_share=205168 question_near_share=955 soft_near_share=29445 other_share=764429 question_current=170315 far_rows=35591 far_effective_sources=5.63
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=0 rows=35591 question_far_share=223317 question_near_share=807 soft_near_share=23701 other_share=752172 question_current=28560 far_rows=35591 far_effective_sources=122.82
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=0 rows=35591 question_far_share=249138 question_near_share=1004 soft_near_share=19267 other_share=730589 question_current=41894 far_rows=35591 far_effective_sources=83.73
+FIELD_ROWS_HELD lap=-1 set=context head=0 tick=1 rows=35591 question_far_share=211032 question_near_share=659 soft_near_share=22836 other_share=765472 question_current=173241 far_rows=35591 far_effective_sources=5.78
+FIELD_ROWS_HELD lap=-1 set=context head=1 tick=1 rows=35591 question_far_share=205168 question_near_share=955 soft_near_share=29445 other_share=764429 question_current=170315 far_rows=35591 far_effective_sources=5.63
+FIELD_ROWS_HELD lap=-1 set=context head=2 tick=1 rows=35591 question_far_share=223317 question_near_share=807 soft_near_share=23701 other_share=752172 question_current=28560 far_rows=35591 far_effective_sources=122.82
+FIELD_ROWS_HELD lap=-1 set=context head=3 tick=1 rows=35591 question_far_share=249138 question_near_share=1004 soft_near_share=19267 other_share=730589 question_current=41894 far_rows=35591 far_effective_sources=83.73
+MEASURE lap=founding rc=0 wall_s=3.2 peak_rss_kib=607296
+# The sampled parity on that binary (3 sections, 8 withheld, 1 release; deadline 240 s):
+FIELD_PARITY_DONE sections=4 reads=15 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=97 host_ms=107407 card_ms=482 elapsed_ms=156099
+MEASURE lap=parity rc=0 wall_s=169.9 peak_rss_kib=2598400

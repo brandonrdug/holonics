@@ -127,7 +127,8 @@ fn a_region_past_the_reach_is_refused() {
 }
 
 /// With flat weights (no chart reads) and silent strand contacts, a still field's current is the
-/// same at every site, and a framed field's carries each site's place: the moment is phase-carried.
+/// same at every site, and a framed field's carries each site's place: the moment is phase-carried. Every
+/// site carries the same face, so each is keyed and every site a source (§16.20).
 #[test]
 fn the_current_carries_place_when_the_weights_are_flat() {
     for (still, framed) in [(2usize, false), (1, true)] {
@@ -139,7 +140,8 @@ fn the_current_carries_place_when_the_weights_are_flat() {
         field.theta[l.q_bias..l.q_bias + m2].iter_mut().for_each(|v| *v = 0);
         let classes = [2usize; 6];
         let open = [true; 6];
-        let faces = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[] }).unwrap();
+        let carried: Vec<Option<Shares>> = vec![Some(vec![(2, 1 << STATE_BITS)]); 6];
+        let faces = field.faces(&Region { classes: &classes, unresolved: &open, faces: &carried, locked: &[], echo: &[] }).unwrap();
         let alike = faces.iter().all(|f| f == &faces[0]);
         assert_eq!(alike, !framed, "still {still}");
     }
@@ -1018,20 +1020,22 @@ fn the_covector_matches_the_code_across_the_far_support() {
 }
 
 
-/// [definition; agent-inferred, November 2] **A listener's founding row keeps its near field** (§15.10):
-/// on a crib-sized region (420 sites, no word recurring, the last 40 open), at the founding, an open
-/// receiver's row puts more of its mass on its near field than on its loudest far source, on the mean
-/// over its rows, at the listener's own temperature. [measurement] It holds at the class receiver's
-/// temperature too (`−2`: the near field 0.836 of a row, the loudest far source 0.018, against 0.818 and
-/// 0.005 at the listener's): on this fixture the founding does not drown the near field (the record's
-/// §15.10).
+/// [definition; agent-inferred, November 2] **A listener's founding row keeps its near field** (§15.10, §16.20):
+/// on a crib-sized region (420 sites, no word recurring, every other site of the last 40 open, so each open
+/// site's near field holds keyed sites: a site with no key is no source, §16.20), at the founding, an open
+/// receiver's row puts more of its mass on its near field than on its loudest far source, on the mean over
+/// its rows, at the listener's own temperature (`β = 2` at this reach, §16.20). [measurement, November 2] The
+/// test prints it beside the class receiver's gain (`−2`), where the loudest far source outweighs the keyed near
+/// field (0.40 of a row against 0.14; at the listener's 0.035 against 0.30), the reason a listener's gain is its
+/// own. (The record's §15.10 read both before §16.20 at `β = 0` on a contiguous open block: the near field 0.818
+/// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
     let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484 };
-    assert_eq!((d.score_shift(), d.listen_shift()), (-2, 0));
+    assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
-    let open: Vec<bool> = (0..sites).map(|t| t >= sites - 40).collect();
+    let open: Vec<bool> = (0..sites).map(|t| t >= sites - 40 && t % 2 == 0).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[] };
     let read = |field: &Field| -> (u128, u128) {
         let pass = field.pass(&r, true).unwrap();
@@ -1050,15 +1054,14 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
     };
     let field = Field::found(d, &keys(1 << 20)).unwrap();
     let (near, peak) = read(&field);
-    eprintln!("LISTENER_FOUNDING near={} far_peak={} (millionths of a row on the mean)", (near * 1_000_000 >> SHARE_BITS) / 400, (peak * 1_000_000 >> SHARE_BITS) / 400);
+    eprintln!("LISTENER_FOUNDING near={} far_peak={} (millionths of a row on the mean)", (near * 1_000_000 >> SHARE_BITS) / 200, (peak * 1_000_000 >> SHARE_BITS) / 200);
     assert!(near > peak, "the near field holds more of a listener's row than its loudest far source");
     let mut hot = field.clone();
     for h in 0..d.heads {
         hot.theta[hot.layout.temper + 2 * h + 1] = hot.theta[hot.layout.temper + 2 * h];
     }
     let (near, peak) = read(&hot);
-    eprintln!("LISTENER_AT_CLASS_GAIN near={} far_peak={}", (near * 1_000_000 >> SHARE_BITS) / 400, (peak * 1_000_000 >> SHARE_BITS) / 400);
-    assert!(near > peak, "and at the class receiver's");
+    eprintln!("LISTENER_AT_CLASS_GAIN near={} far_peak={}", (near * 1_000_000 >> SHARE_BITS) / 200, (peak * 1_000_000 >> SHARE_BITS) / 200);
 }
 
 

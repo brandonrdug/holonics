@@ -1371,7 +1371,17 @@ struct RowCls {
     uint32_t nc;
     uint32_t cl[MAX_PROBES + 1];
     uint32_t cum[MAX_PROBES + 2];
+    // The region's resolutions and carried mixtures from its first site: a near place is a source only where it
+    // is keyed, known or carrying a face (§16.20).
+    const uint8_t *unres;
+    const uint32_t *mixo;
 };
+
+// A keyed site (§16.20): known, or carrying a face. A site that carries neither has no word to be met by and is
+// no receiver's source, its near field's included.
+__device__ __forceinline__ bool keyed_site(const FieldWords &w, uint64_t g) {
+    return w.unresolved[g] == 0 || w.mix_off[g] != w.mix_off[g + 1];
+}
 
 // Prepare the warp's row `hg` (head `h`, batch site `g`): its classes and their runs' offsets, and return the
 // support's length in entries. Called by every lane of the warp.
@@ -1383,6 +1393,8 @@ __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg
         rc.open = definite_site(w, g) ? 0 : 1;
         rc.ndef = w.dstart[r + 1] - w.dstart[r];
         rc.dl = w.dlist + w.dstart[r];
+        rc.unres = w.unresolved + w.region_off[r];
+        rc.mixo = w.mix_off + w.region_off[r];
         const uint32_t pstride = probe_stride(w);
         rc.nc = rc.open ? 0 : w.pn[hg];
         for (uint32_t k = 0; k < rc.nc; k++) {
@@ -1400,16 +1412,14 @@ __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg
 }
 
 // Site `i`'s support entry `k` of its region: the near field first (`k < NEAR_SLOTS`, the `NEAR − 1` places
-// before and after it, nearest first), then the DEFINITE runs of its probe's class and its probed classes past
+// before and after it, nearest first, each only where it is keyed, §16.20), then the DEFINITE runs of its probe's class and its probed classes past
 // the near field. Returns the source's place, or `UINT32_MAX` where the entry meets no site (a near place
 // outside the region, or a member inside the near field).
 __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const uint32_t *off, const RowCls &rc, uint32_t i, uint32_t sites, uint32_t k) {
     if (k < NEAR_SLOTS) {
         const uint32_t d = k / 2 + 1;
-        if (k % 2 == 0) {
-            return i >= d ? i - d : UINT32_MAX;
-        }
-        return i + d < sites ? i + d : UINT32_MAX;
+        const uint32_t j = k % 2 == 0 ? (i >= d ? i - d : UINT32_MAX) : (i + d < sites ? i + d : UINT32_MAX);
+        return j != UINT32_MAX && (rc.unres[j] == 0 || rc.mixo[j] != rc.mixo[j + 1]) ? j : UINT32_MAX;
     }
     const uint32_t e = k - NEAR_SLOTS;
     if (rc.open) {
@@ -2094,10 +2104,18 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             negs += __shfl_xor_sync(0xFFFFFFFFu, negs, (int)o);
         }
         met = (uint32_t)warp_sum_u64(met);
-        // The framed current's entry `entry`: the numerator over the row's mass, to the nearest numerator.
-        const RowDiv<L> rd = rowdiv_of(M);
+        // The framed current's entry `entry`: the numerator over the row's mass, to the nearest numerator. A row whose
+        // support holds no keyed source (§16.20) has no mass and gathers nothing: its current is zero and no share is
+        // formed (the host's `SeriesRow::release`).
+        const bool empty = big_bits(M) == 0;
+        Big<L> Md = M;
+        if (empty) {
+            Md = big_zero<L>();
+            Md.v[0] = 1;
+        }
+        const RowDiv<L> rd = rowdiv_of(Md);
         int64_t y = 0;
-        if (active && part == 0) {
+        if (active && part == 0 && !empty) {
             big_add_small(N, negs);
             const bool negative = (N.v[L - 1] >> 63) != 0;
             if (negative) {
@@ -2281,7 +2299,16 @@ extern "C" __global__ void field_moment_add(FieldWords w) {
     }
 }
 
-// The values' covector summed over the ticks: `dm += dv` (`[t][2M]`, 128 bits).
+// [definition; §16.20] A receiver asks with what has reached its place: its probe `[t][2M]` reads its moment at the
+// turned modes, the moment its value carries (the host's `Field::tick`), `p += moment`, checked.
+extern "C" __global__ void field_moment_add_probe(FieldWords w, int64_t *pr) {
+    const uint64_t cells = (uint64_t)w.T * w.M2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        pr[c] = fit64((wide)pr[c] + (wide)w.moment[c], w.status);
+    }
+}
+
+// The values' covector summed over the ticks: `dm += dv` (`[t][2M]`, 128 bits); the probes' alike (§16.20).
 extern "C" __global__ void field_moment_accumulate(FieldWords w, const int64_t *dv, wide *dm) {
     const uint64_t cells = (uint64_t)w.T * w.M2;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
@@ -2827,7 +2854,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
         const uint32_t *pmem = w.pmem + ((uint64_t)h * w.T + first) * probe_stride(w);
         const uint32_t *olist = w.olist + w.ostart[r];
-        const uint32_t K = receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r], c, definite_site(w, g));
+        // A source with no key is in no receiver's support (§16.20).
+        const uint32_t K = keyed_site(w, g) ? receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r], c, definite_site(w, g)) : 0;
         const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
         const int64_t *dsc = ds + w.region_eoff[r] + j;
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
@@ -2917,7 +2945,9 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
 // `Field::held_rows`): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
 // the rows, the shares of the question group (a definite site before the region's answer start `qstart[r]`), of
 // the near field's sources that are not definite, and of the rest (with the crowds'), and the question group's
-// current `Σ release(p Σ_x |D ṽ_x|, 63)`. The five sums of a cell `[tick · H + h]` are added to `acc` (exact integers).
+// current `Σ release(p Σ_x |D ṽ_x|, 63)`; the question's far part (past the near field), and where its collision
+// `C = Σ release(p², 63)` is positive the row's effective count `((Σ p)² >> 55) / C` on `2^(−8)` and the row counted.
+// The eight sums of a cell `[tick · H + h]` are added to `acc` (exact integers).
 extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart, uint32_t tick, wide *acc) {
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n;
@@ -2934,7 +2964,7 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
         const uint32_t question = qstart[r];
         const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
-        wide q = 0, soft = 0, other = 0, cur = 0;
+        wide q = 0, soft = 0, other = 0, cur = 0, far = 0, coll = 0;
         for (uint32_t j = lane; j < sites; j += 32) {
             const wide p = (wide)erow[j];
             if (p == 0) {
@@ -2944,6 +2974,10 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
             const bool definite = definite_site(w, first + j);
             if (definite && j < question) {
                 q += p;
+                if (gap >= NEAR) {
+                    far += p;
+                    coll += rel(p * p, SHARE_BITS);
+                }
                 wide current = 0;
                 for (uint32_t x = 0; x < S; x++) {
                     const wide v = carried_ij(w, h, x % n, g, first + j, gap, values[(uint64_t)j * S + x]);
@@ -2965,13 +2999,21 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
         soft = warp_sum(soft);
         other = warp_sum(other);
         cur = warp_sum(cur);
+        far = warp_sum(far);
+        coll = warp_sum(coll);
         if (lane == 0) {
-            wide *cell = acc + ((uint64_t)tick * w.H + h) * 5;
+            wide *cell = acc + ((uint64_t)tick * w.H + h) * 8;
             add_wide(cell, 1);
             add_wide(cell + 1, q);
             add_wide(cell + 2, soft);
             add_wide(cell + 3, other);
             add_wide(cell + 4, cur);
+            add_wide(cell + 5, far);
+            if (coll > 0) {
+                const uwide f = (uwide)far;
+                add_wide(cell + 6, (wide)(((f * f) >> (SHARE_BITS - 8)) / (uwide)coll));
+                add_wide(cell + 7, 1);
+            }
         }
     }
 }
