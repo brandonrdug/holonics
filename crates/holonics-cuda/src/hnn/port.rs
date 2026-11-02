@@ -463,6 +463,12 @@ pub struct Mounted<'c> {
     arrived: Option<Arrived<'c>>,
     source_return_frontier: BTreeMap<usize, usize>,
     released_bits: u64,
+    /// [definition] The observed epoch's receiver ingress clock, the reference's
+    /// `Resident::observed_epoch_ingress` (#76): the admitted receiver's ring and the ticks it has
+    /// passed since the epoch opened, founded at `(ring, 0)` where one receiver of aperture one is
+    /// admitted, advanced by that ring's ticks at every ingest, saved and restored with the state,
+    /// and counted in its bits.
+    observed_epoch_ingress: Option<(usize, u64)>,
     stop: Option<BudgetStop>,
     tally: ChartTally,
     wall: WallTimes,
@@ -547,11 +553,15 @@ impl<'c> Mounted<'c> {
             }),
         };
         let passage = ResidentPassage::new(&self.field, &self.constitution, parts)?;
-        Ok(self
+        let state = self
             .constitution
             .continuing_state(ring)?
             .with_carry(self.carried.as_ref().map(|c| c.host.clone()))
-            .with_resident_passage(passage))
+            .with_resident_passage(passage);
+        match self.observed_epoch_ingress {
+            Some((receiver, ticks)) => state.with_receiver_ingress_ticks(receiver, ticks),
+            None => Ok(state),
+        }
     }
 
     /// What crossed the bus through this resident's port (exterior; [`Traffic`]).
@@ -606,11 +616,15 @@ impl<'c> Mounted<'c> {
             .carried
             .as_ref()
             .map_or(0, |carry| carry_bits(&carry.host));
+        let receiver_clock = self.observed_epoch_ingress.map_or(1, |(ring, ticks)| {
+            BigInt::from(ring).bits() + BigInt::from(ticks).bits() + 2
+        }) + 1;
         lift + moments
             + carried
             + pending
             + staged
             + arrived
+            + receiver_clock
             + self.constitution.exact_bits()
             + self.store.bits()
     }
@@ -1168,6 +1182,7 @@ impl<'c> Resident<'c> {
                 .cloned()
                 .map(|c| CardCarry::restored(self.card, field, c).map(Rc::new))
                 .transpose()?;
+            resident.observed_epoch_ingress = state.receiver_ingress_ticks();
             return Ok(resident);
         };
         let passage = ResidentPassage::from_text(field, &constitution, text)?.into_parts();
@@ -1231,6 +1246,7 @@ impl<'c> Resident<'c> {
             closed: passage.aeon.closed,
         };
         resident.ledger = EnclosedLedger::resumed(passage.balance);
+        resident.observed_epoch_ingress = state.receiver_ingress_ticks();
         Ok(resident)
     }
 
@@ -1275,6 +1291,10 @@ impl<'c> Resident<'c> {
                 .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
                 .collect::<Result<Vec<_>, _>>()?,
         };
+        let observed_epoch_ingress = match admitted.as_slice() {
+            [phases] if phases.aperture() == 1 => Some((phases.ring(), 0)),
+            _ => None,
+        };
         let publication = Publication::publish(self.card, Loci::of(field, &constitution)?, None)?;
         // The receiving parametron's tree mirrored on the card, with room for a window's overlay
         // and a re-read's (`A − 1` deposits past the population).
@@ -1318,6 +1338,7 @@ impl<'c> Resident<'c> {
             arrived: None,
             source_return_frontier: BTreeMap::new(),
             released_bits: 0,
+            observed_epoch_ingress,
             stop: None,
             tally: ChartTally::new(field),
             wall: WallTimes::default(),
@@ -1838,6 +1859,16 @@ impl<'c> ExecutionPort for Resident<'c> {
             resident.aeon.awaiting = true;
         }
         let n = open.host.cells();
+        if let Some((ring, count)) = resident.observed_epoch_ingress {
+            let passed = *ticks.get(ring).ok_or(HnnError::RingOutside {
+                ring,
+                rings: ticks.len(),
+            })?;
+            resident.observed_epoch_ingress = Some((
+                ring,
+                count.checked_add(passed).ok_or(HnnError::CountOverflow)?,
+            ));
+        }
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
             moment_bits: open.host.dense_bits(),
