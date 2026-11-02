@@ -376,6 +376,15 @@ struct FieldWords {
     uint64_t temper_at;
     wide *gcov;
     int64_t *sb;
+    // A listener's probe (§15.12): its chart of the read `pr` `[t][2M]`, framed and at unit power by head `pq`
+    // `[h][t][span]` (and on 32 bits, `pq32`) with its powers `pscale` `[h][t]`; the reverse's covector of it `dp`.
+    int64_t *pr;
+    int64_t *pq;
+    int32_t *pq32;
+    wide *pscale;
+    int64_t *dp;
+    // (the probe chart's family offsets and reach, read by the launches)
+    uint64_t probe, probe_bias, rprobe;
 };
 
 // The frame of local mode `l` of head `h` at the batch's site `g`: the identity in a head of a still ring
@@ -600,17 +609,35 @@ extern "C" __global__ void field_frame(FieldWords w) {
     }
 }
 
+// A listener's probe framed alike (§15.12): `pr[t][0..2M]` into `pq[h][t][2n]`, each product released to `2^(−16)`.
+extern "C" __global__ void field_frame_probe(FieldWords w) {
+    const uint64_t cells = (uint64_t)w.H * w.T * w.n;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t li = c % w.n;
+        const uint64_t t = (c / w.n) % w.T;
+        const uint32_t h = c / ((uint64_t)w.n * w.T);
+        const uint32_t m = h * w.n + li;
+        wide ur, ui;
+        frame_of(w, t, h, li, &ur, &ui);
+        const uint64_t at = ((uint64_t)h * w.T + t) * w.span;
+        const int64_t *pv = w.pr + t * w.M2;
+        const wide qr = pv[m], qi = pv[w.M + m];
+        w.pq[at + li] = fit64(rel(ur * qr - ui * qi, MOVE_BITS), w.status);
+        w.pq[at + w.n + li] = fit64(rel(ui * qr + ur * qi, MOVE_BITS), w.status);
+    }
+}
+
 // [agent-inferred, November 1] **The contact pairs words at unit power** (`Field::tick`): each head's
 // framed word read in place as a ratio to its own power over the head's `2n` reals (`ratio_to_power`,
 // on `2^(−16)`), its power kept for the return; one warp a head and a site (`[h][t]`). The binary
 // length of the largest unit word is raised into `bits[0]`.
-extern "C" __global__ void field_unit(FieldWords w, wide *qscale) {
+__device__ __forceinline__ void unit_body(const FieldWords &w, int64_t *base, int32_t *base32, wide *qscale, bool track) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
     const uint64_t rows = (uint64_t)w.H * w.T;
     uint32_t qb = 0;
     for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
-        int64_t *c = w.qf + hs * w.span;
+        int64_t *c = base + hs * w.span;
         wide power = 0;
         for (uint32_t i = lane; i < w.span; i += 32) {
             power += (wide)c[i] * (wide)c[i];
@@ -620,7 +647,7 @@ extern "C" __global__ void field_unit(FieldWords w, wide *qscale) {
         for (uint32_t i = lane; i < w.span; i += 32) {
             const int64_t r = s == 0 ? 0 : (int64_t)fit32(div_nearest((wide)c[i] << FACE_BITS, s), w.status);
             c[i] = r;
-            w.qf32[hs * w.span + i] = (int32_t)r;
+            base32[hs * w.span + i] = (int32_t)r;
             qb = max(qb, bit_length(mag64(r)));
         }
         if (lane == 0) {
@@ -628,22 +655,31 @@ extern "C" __global__ void field_unit(FieldWords w, wide *qscale) {
         }
     }
     qb = (uint32_t)warp_max_u64(qb);
-    if (lane == 0) {
+    if (track && lane == 0) {
         atomicMax(&w.bits[0], qb);
     }
+}
+
+extern "C" __global__ void field_unit(FieldWords w, wide *qscale) {
+    unit_body(w, w.qf, w.qf32, qscale, true);
+}
+
+// A listener's probe at unit power alike (§15.12), its powers in `pscale`.
+extern "C" __global__ void field_unit_probe(FieldWords w, wide *pscale) {
+    unit_body(w, w.pq, w.pq32, pscale, false);
 }
 
 // The return through the word's unit power (`ratio_adjoint`), in place on its framed chart's covector
 // `[t][2M]` (head `h`'s slots `h n + l` and `M + h n + l`): `δw̃ = (δŵ − ŵ ⟨ŵ, δŵ⟩/2n) / ‖w̃‖_rms`;
 // one warp a head and a site.
-extern "C" __global__ void field_unit_back(FieldWords w, const wide *qscale, int64_t *dq) {
+__device__ __forceinline__ void unit_back_body(const FieldWords &w, const int64_t *unit, const wide *qscale, int64_t *dq) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
     const uint64_t rows = (uint64_t)w.H * w.T;
     for (uint64_t hs = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; hs < rows; hs += warps) {
         const uint32_t h = hs / w.T;
         const uint64_t t = hs % w.T;
-        const int64_t *rt = w.qf + hs * w.span;
+        const int64_t *rt = unit + hs * w.span;
         const wide s = qscale[hs];
         wide dot = 0;
         for (uint32_t c = lane; c < w.span; c += 32) {
@@ -657,6 +693,15 @@ extern "C" __global__ void field_unit_back(FieldWords w, const wide *qscale, int
             dq[slot] = s == 0 ? 0 : fit64(div_nearest(((wide)dq[slot] - rel(mean * (wide)rt[c], 2 * FACE_BITS)) << FACE_BITS, s), w.status);
         }
     }
+}
+
+extern "C" __global__ void field_unit_back(FieldWords w, const wide *qscale, int64_t *dq) {
+    unit_back_body(w, w.qf, qscale, dq);
+}
+
+// The probe's return through its own power, alike (§15.12).
+extern "C" __global__ void field_unit_back_probe(FieldWords w, const wide *pscale, int64_t *dp) {
+    unit_back_body(w, w.pq, pscale, dp);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1476,7 +1521,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
         const uint32_t c = w.cls[hg];
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
-        const int64_t *wi = words + (uint64_t)i * S;
+        // A listener probes with its own word (§15.12); a class receiver's probe is its word. Sources answer with theirs.
+        const int64_t *wi = rcs[warp].open ? w.pq + ((uint64_t)h * w.T + g) * S : words + (uint64_t)i * S;
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
@@ -1491,10 +1537,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
         const bool eight = w.n == 8;
         int32_t ai[16];
         const int4 *rows32 = reinterpret_cast<const int4 *>(w.qf32 + ((uint64_t)h * w.T + first) * 16);
+        const int4 *probe32 = reinterpret_cast<const int4 *>(rcs[warp].open ? w.pq32 + ((uint64_t)h * w.T + g) * 16 : w.qf32 + ((uint64_t)h * w.T + g) * 16);
         if (eight) {
 #pragma unroll
             for (int q = 0; q < 4; q++) {
-                const int4 t = rows32[(uint64_t)i * 4 + q];
+                const int4 t = probe32[q];
                 ai[4 * q] = t.x;
                 ai[4 * q + 1] = t.y;
                 ai[4 * q + 2] = t.z;
@@ -2544,7 +2591,15 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         sum = parts_sum(active ? sum : 0, S, parts);
         if (lane < S) {
             const uint32_t mc = h * n + lane % n;
-            dq[g * w.M2 + (lane < n ? mc : w.M + mc)] = fit64(rel(sum, CONTACT_BACK + g0), w.status);
+            const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+            const int64_t probe_role = fit64(rel(sum, CONTACT_BACK + g0), w.status);
+            if (rcs[warp].open) {
+                // A listener's probe role goes to its own chart's covector (§15.12), the key role (the columns) to the word's.
+                w.dp[slot] = probe_role;
+                dq[slot] = 0;
+            } else {
+                dq[slot] = probe_role;
+            }
         }
         __syncwarp();
     }
@@ -2591,7 +2646,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 const uint32_t gap = j > i ? j - i : i - j;
                 const wide dec = decay_raw(w, h, m, gap);
                 // The key's bracket released by the skin's bits once (the probe's grain), then by the covector.
-                sk += (wide)dsc[at] * rel(((dec * (wide)words[(uint64_t)i * S + entry]) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry], g0);
+                // The receiver's probe: a listener's own, a class receiver's word (§15.12).
+                const int64_t probe_i = definite_site(w, first + i) ? words[(uint64_t)i * S + entry] : w.pq[((uint64_t)h * w.T + first + i) * S + entry];
+                sk += (wide)dsc[at] * rel(((dec * (wide)probe_i) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry], g0);
                 sv += (wide)e[at] * carried(w, h, m, gap, dyr[(uint64_t)i * S + entry]);
             }
         }

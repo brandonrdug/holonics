@@ -180,6 +180,14 @@ struct Words {
     temper_at: u64,
     gcov: u64,
     sb: u64,
+    pr: u64,
+    pq: u64,
+    pq32: u64,
+    pscale: u64,
+    dp: u64,
+    probe: u64,
+    probe_bias: u64,
+    rprobe: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -266,6 +274,11 @@ struct Tick<'c> {
     qf: Pooled<'c, i64>,
     /// The unit words on 32 bits `[h][t][span]` (`field_unit` writes them beside `qf`).
     qf32: Pooled<'c, i32>,
+    /// A listener's probe framed and at unit power by head (`[h][t][span]`, and on 32 bits) with its powers
+    /// `[h][t]` (§15.12).
+    pq: Pooled<'c, i64>,
+    pq32: Pooled<'c, i32>,
+    pscale: Pooled<'c, i128>,
     vf: Pooled<'c, i64>,
     /// The framed word's powers `[h][t]`, the ratios `field_unit` reads it as.
     qscale: Pooled<'c, i128>,
@@ -762,6 +775,9 @@ impl<'c> CardField<'c> {
             roots: run_base + roots_at,
             met: met.device_ptr(),
             temper_at: l.temper as u64,
+            probe: l.probe as u64,
+            probe_bias: l.probe_bias as u64,
+            rprobe: reach(l.probe, m2 * dw),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card.
@@ -838,6 +854,9 @@ impl<'c> CardField<'c> {
             qkv: alloc64(sites * 2 * m2)?,
             qf: alloc64(heads * sites * span)?,
             qf32: self.take::<i32>(heads * sites * span).map_err(device)?,
+            pq: alloc64(heads * sites * span)?,
+            pq32: self.take::<i32>(heads * sites * span).map_err(device)?,
+            pscale: self.take::<i128>((heads * sites).max(1)).map_err(device)?,
             vf: alloc64(heads * sites * span)?,
             qscale: self.timed(Kind::Alloc, || self.take::<i128>((heads * sites).max(1))).map_err(device)?,
             cls: alloc32(heads * sites)?,
@@ -1007,11 +1026,17 @@ impl<'c> CardField<'c> {
         // The site moments (§15.1), once for the pass, added into every tick's values.
         let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         words.moment = moment.device_ptr();
+        // A listener's probe chart of the read, once a tick (§15.12), framed and put at unit power by head.
+        let pr = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
+        words.pr = pr.device_ptr();
         self.moments(field, words, regions.len(), sites)?;
         let set = |w: &mut Words, tick: &Tick| {
             w.qkv = tick.qkv.device_ptr();
             w.qf = tick.qf.device_ptr();
             w.qf32 = tick.qf32.device_ptr();
+            w.pq = tick.pq.device_ptr();
+            w.pq32 = tick.pq32.device_ptr();
+            w.pscale = tick.pscale.device_ptr();
             w.vf = tick.vf.device_ptr();
             w.cls = tick.cls.device_ptr();
             w.class_off = tick.class_off.device_ptr();
@@ -1053,6 +1078,10 @@ impl<'c> CardField<'c> {
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut qs = tick.qscale.device_ptr();
             self.launch("field_unit", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs)])?;
+            self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr.device_ptr(), m2, 0, false)?;
+            self.launch("field_frame_probe", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
+            let mut ps = tick.pscale.device_ptr();
+            self.launch("field_unit_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps)])?;
             // The definite sites' prefix sums (§14.10), read by the contact's crowds.
             self.launch("field_sums", Self::cells((heads * regions.len() * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
             let mut store = u32::from(stored);
@@ -1278,6 +1307,9 @@ impl<'c> CardField<'c> {
         let dyh = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
+        // A listener's probe role, its own chart's covector (§15.12).
+        let dp = alloc64(sites * m2)?;
+        words.dp = dp.device_ptr();
         // The contact's covector a pair, `|δs| < 2^dsbits` with `dsbits ≤ 63` (refused past it).
         let ds = self.timed(Kind::Alloc, || self.take::<i64>(pairs.max(1))).map_err(device)?;
         // The pair covectors `⟨δỹ_i, D ṽ_j⟩` the rows compute once for both passes, on 128 bits.
@@ -1303,6 +1335,9 @@ impl<'c> CardField<'c> {
         for (at, tick) in ticks.iter().enumerate().rev() {
             words.qf = tick.qf.device_ptr();
             words.qf32 = tick.qf32.device_ptr();
+            words.pq = tick.pq.device_ptr();
+            words.pq32 = tick.pq32.device_ptr();
+            words.pscale = tick.pscale.device_ptr();
             words.vf = tick.vf.device_ptr();
             words.cls = tick.cls.device_ptr();
             words.class_off = tick.class_off.device_ptr();
@@ -1345,6 +1380,7 @@ impl<'c> CardField<'c> {
             // first, then the columns', which adds the word's second role into the same slots.
             let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
             self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
+            card.zero_octets(&dp, 0, 8 * sites * m2).map_err(device)?;
             for h in 0..heads {
                 // The crowds' difference arrays start empty a head (§14.10).
                 card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
@@ -1358,7 +1394,10 @@ impl<'c> CardField<'c> {
             }
             let (mut qs, mut dqp) = (tick.qscale.device_ptr(), dq.device_ptr());
             self.launch("field_unit_back", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut qs), arg(&mut dqp)])?;
-            for chart in [&dq, &dv] {
+            // The probe's return through its own power, alike (§15.12).
+            let (mut ps, mut dpp) = (tick.pscale.device_ptr(), dp.device_ptr());
+            self.launch("field_unit_back_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps), arg(&mut dpp)])?;
+            for chart in [&dq, &dv, &dp] {
                 let mut cp = chart.device_ptr();
                 self.launch("field_unframe", Self::cells((sites * m) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
             }
@@ -1366,7 +1405,7 @@ impl<'c> CardField<'c> {
             let (mut dvp, mut dmp) = (dv.device_ptr(), dm.device_ptr());
             self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut dvp), arg(&mut dmp)])?;
             card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
-            for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv)] {
+            for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv), (words.probe, words.probe_bias, &dp)] {
                 self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
                 self.outer(words, g, bias, m2, 0, chart.device_ptr(), m2, 0, 0, false, false)?;
                 self.transposed(words, weight, m2, dw, chart.device_ptr(), m2, dr.device_ptr(), true, false)?;
@@ -1472,7 +1511,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let slots = crowd_slots(d.reach) as u64;
     // A receiver's probes: their number, their classes, and its place among the probers of each (`2^b − 1`).
     let probe_site = 4 * h * (1 + 2 * ((1u64 << d.class_trits()) - 1));
-    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span;
+    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
     // A site's carried mixture, definite bit, clock, echo (a flag, `B` and logits) and the round trips.
@@ -1483,11 +1522,11 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let moment_site = if tm > 0 { 8 * m2 + 112 * tm } else { 0 };
     // The reverse adds its covectors, the values' sum over the ticks and the moments' return, and the
     // crowds' two difference arrays.
-    let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    let reverse_site = if returning { 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
-    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site) + if returning { 24 * pairs } else { 0 }
+    ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site + 8 * m2) + if returning { 24 * pairs } else { 0 }
 }
 
 /// A kept tick's octets a region beside its sites': the carrier's width (one word), the class
