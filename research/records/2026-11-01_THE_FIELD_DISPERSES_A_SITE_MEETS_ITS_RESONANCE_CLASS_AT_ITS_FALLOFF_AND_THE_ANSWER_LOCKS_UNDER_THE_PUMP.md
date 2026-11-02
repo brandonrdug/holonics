@@ -1683,7 +1683,9 @@ copy its sharpness, not its closure.
 [measurement, November 2] **The card realizes the class sheet's pace bit for bit** (`parity-field`, crib13's declaration
 at width 32, `K = 2`): under the published clock on the codec's classes (`FIELD_PARITY_CLOCK`, 27 of 44 classes at 0,
 each read by its byte), 5 sections equal (faces, covector, learner, held rows, peaks, open return; the rates moving
-from the first deposit, `κ` from 0 to 1.010; the withheld section not reached inside the 180 s guard); at the founding,
+from the first deposit, `κ` from 0 to 1.010; the withheld section not reached inside the 180 s guard, then read alone
+after one section, its deadline the 15-minute cap from a lower bound alone: **equal** in every read, host 28.5 s, card
+0.32 s, wall 44.5 s, `_receipts/law16/parity_withheld.txt`); at the founding,
 5 sections and the withheld section equal; with every rate drawn far (`FIELD_PARITY_PACE=8`, `κ` 0.51 to 1.49), 3
 sections and the withheld section equal, the run whole. Receipt: `_receipts/law16/parity_class.txt`.
 
