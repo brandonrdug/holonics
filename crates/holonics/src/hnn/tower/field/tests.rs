@@ -2319,3 +2319,152 @@ fn the_byte_clock_is_located_by_propagation() {
         eprintln!("PROPAGATE cutting_regions_live_loops min={} median={} max={}", live[0], live[live.len() / 2], live[live.len() - 1]);
     }
 }
+
+/// One region's definite menu (§16.16, the coordinator's admission): its maximal equal-class runs between the answer
+/// and the question `(i, j, length)`, a run admitted only where its string occurs exactly once in the question and
+/// exactly once in the answer (a maximal unique match: a plural edge is an unlocated choice, never a menu edge); and
+/// the loops of two admitted runs, order-consistent with distinct ends, as rows of class counts.
+struct DefiniteMenu {
+    runs: usize,
+    admitted: Vec<(usize, usize, usize)>,
+    rows: Vec<Vec<i64>>,
+}
+
+fn definite_menu(classes: &[usize], ql: usize) -> DefiniteMenu {
+    let occurs = |s: &[usize], within: &[usize]| within.windows(s.len()).filter(|w| *w == s).count();
+    let (question, answer) = (&classes[..ql], &classes[ql..]);
+    let (mut runs, mut admitted) = (0usize, Vec::new());
+    for i in ql..classes.len() {
+        for j in 0..ql {
+            let continues = i > ql && j > 0 && classes[i - 1] == classes[j - 1];
+            if classes[i] != classes[j] || continues {
+                continue;
+            }
+            let mut length = 1;
+            while i + length < classes.len() && j + length < ql && classes[i + length] == classes[j + length] {
+                length += 1;
+            }
+            runs += 1;
+            let s = &classes[i..i + length];
+            if occurs(s, question) == 1 && occurs(s, answer) == 1 {
+                admitted.push((i, j, length));
+            }
+        }
+    }
+    let mut rows = Vec::new();
+    for (k, &(i1, j1, _)) in admitted.iter().enumerate() {
+        for &(i2, j2, _) in &admitted[k + 1..] {
+            if (i1 < i2) == (j1 < j2) && i1 != i2 && j1 != j2 {
+                let ((i1, j1), (i2, j2)) = if i1 < i2 { ((i1, j1), (i2, j2)) } else { ((i2, j2), (i1, j1)) };
+                let mut row = vec![0i64; WITNESS_BYTES.len()];
+                for t in j1 + 1..=i1 {
+                    row[classes[t]] += 1;
+                }
+                for t in j2 + 1..=i2 {
+                    row[classes[t]] -= 1;
+                }
+                rows.push(row);
+            }
+        }
+    }
+    DefiniteMenu { runs, admitted, rows }
+}
+
+/// [agent-inferred, November 2] **The byte clock located by propagation over the definite menu** (§16.16): as
+/// [`the_byte_clock_is_located_by_propagation`], the menu admitting only maximal unique matches. A listener check, read
+/// from each region's own calculation text and never fed back: on how many regions the admitted runs hold both of the
+/// first calculation's operand copies. Run with `--ignored --nocapture`.
+#[test]
+#[ignore]
+fn the_byte_clock_is_located_over_the_definite_menu() {
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::Rat;
+    use num_bigint::BigInt;
+    let mut next = mixer(0x7A11);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    let bytes = WITNESS_BYTES.len();
+    let mut menus = Vec::new();
+    let (mut holds_both, mut forcing_true, mut forcing_regions) = (0usize, 0usize, 0usize);
+    for _ in 0..256 {
+        let (q, a) = crib_like(&mut next);
+        let classes: Vec<usize> = q.iter().chain(&a).map(|&b| to_class(b)).collect();
+        let menu = definite_menu(&classes, q.len());
+        // The listener check: the first calculation's operands, `<<a+b=`, against the question's first two numbers.
+        let first: Vec<usize> = (0..q.len()).filter(|&t| q[t].is_ascii_digit() && (t == 0 || !q[t - 1].is_ascii_digit())).collect();
+        let la = a[2..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let lb = a[3 + la..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let copy = |o: usize, src: usize, len: usize| menu.admitted.iter().any(|&(i, j, l)| i == q.len() + o && j == src && l >= len);
+        let both = copy(2, first[0], la) && copy(3 + la, first[1], lb);
+        holds_both += usize::from(both);
+        if menu.rows.len() == 1 {
+            // The listener's reading of a forcing region: whether its one loop is the first calculation's, and the
+            // digit bytes its row carries (zero on a true copy loop).
+            let digit_bytes: i64 = menu.rows[0].iter().enumerate().filter(|(c, _)| WITNESS_BYTES[*c].is_ascii_digit()).map(|(_, v)| v.abs()).sum();
+            forcing_true += usize::from(both && digit_bytes == 0);
+            forcing_regions += 1;
+        }
+        menus.push(menu);
+    }
+    let quantiles = |mut v: Vec<usize>| { v.sort_unstable(); format!("min={} p25={} median={} p75={} max={}", v[0], v[v.len() / 4], v[v.len() / 2], v[3 * v.len() / 4], v[v.len() - 1]) };
+    let single = menus.iter().filter(|m| m.rows.len() == 1).count();
+    eprintln!("DEFINITE listener single_loop_regions_whose_loop_is_the_first_calculation's={forcing_true}/{forcing_regions}");
+    eprintln!("DEFINITE runs_per_region {}", quantiles(menus.iter().map(|m| m.runs).collect()));
+    eprintln!("DEFINITE admitted_per_region {}", quantiles(menus.iter().map(|m| m.admitted.len()).collect()));
+    eprintln!("DEFINITE loops_per_region {} regions_with_exactly_one_loop={single} silent(fewer_than_two_admitted)={} listener_both_operand_copies_admitted={holds_both}/{}", quantiles(menus.iter().map(|m| m.rows.len()).collect()), menus.iter().filter(|m| m.admitted.len() < 2).count(), menus.len());
+    let rat = |v: i64| Rat::from_integer(BigInt::from(v));
+    let basis = |forcing: &[Vec<i64>]| -> Vec<Vec<Rat>> {
+        if forcing.is_empty() {
+            return (0..bytes).map(|b| (0..bytes).map(|k| rat(i64::from(k == b))).collect()).collect();
+        }
+        ExactRatMatrix::new(forcing.iter().map(|r| r.iter().map(|&v| rat(v)).collect()).collect()).unwrap().kernel_basis().unwrap()
+    };
+    let pairs = |row: &[i64], b: &[Rat]| -> Rat { row.iter().zip(b).map(|(&v, x)| rat(v) * x.clone()).sum() };
+    let mut forcing: Vec<Vec<i64>> = menus.iter().filter(|m| m.rows.len() == 1 && m.rows[0].iter().any(|&v| v != 0)).map(|m| m.rows[0].clone()).collect();
+    let mut steps = vec![format!("open:{}", basis(&forcing).len())];
+    let (satisfied, cutting, empty, silent) = loop {
+        let b = basis(&forcing);
+        let (mut forced_now, mut sat, mut cut, mut empty, mut silent) = (Vec::new(), 0usize, Vec::new(), Vec::new(), 0usize);
+        for (k, m) in menus.iter().enumerate() {
+            if m.rows.is_empty() {
+                silent += 1;
+                continue;
+            }
+            let holds = |row: &Vec<i64>| b.iter().all(|v| pairs(row, v) == rat(0));
+            if m.rows.iter().any(holds) {
+                sat += 1;
+                continue;
+            }
+            let live: Vec<&Vec<i64>> = m.rows.iter().filter(|row| b.len() >= 2 || holds(row)).collect();
+            match live.len() {
+                0 => empty.push(k),
+                1 => forced_now.push(live[0].clone()),
+                n => cut.push((k, n)),
+            }
+        }
+        if !empty.is_empty() || forced_now.is_empty() {
+            break (sat, cut, empty, silent);
+        }
+        forcing.extend(forced_now.iter().cloned());
+        steps.push(format!("forced{}:{}", forced_now.len(), basis(&forcing).len()));
+    };
+    let b = basis(&forcing);
+    eprintln!("DEFINITE propagation steps={} dimension={} satisfied={satisfied} cutting={} empty={} silent={silent}", steps.join(","), b.len(), cutting.len(), empty.len());
+    if !cutting.is_empty() {
+        let live: Vec<usize> = cutting.iter().map(|c| c.1).collect();
+        eprintln!("DEFINITE cutting_regions live_loops {}", quantiles(live));
+    }
+    for &k in &empty {
+        let shortest = menus[k].rows.iter().min_by_key(|r| r.iter().map(|v| v.abs()).sum::<i64>()).unwrap();
+        eprintln!("DEFINITE empty region {k}: its shortest loop row {:?}", shortest.iter().enumerate().filter(|(_, v)| **v != 0).map(|(c, v)| format!("{:?}:{v}", WITNESS_BYTES[c] as char)).collect::<Vec<_>>());
+    }
+    if cutting.is_empty() && empty.is_empty() {
+        // Published: the founding clock `κ ≡ 1` projected onto `S`, `B(BᵀB)⁻¹Bᵀ 1`.
+        let m = b.len();
+        let gram = ExactRatMatrix::new((0..m).map(|x| (0..m).map(|y| b[x].iter().zip(&b[y]).map(|(p, q)| p.clone() * q.clone()).sum()).collect()).collect()).unwrap();
+        let rhs: Vec<Rat> = (0..m).map(|x| b[x].iter().cloned().sum()).collect();
+        let (w, _) = gram.preimage_fibre(&rhs).unwrap().unwrap();
+        let kappa: Vec<Rat> = (0..bytes).map(|c| (0..m).map(|x| w[x].clone() * b[x][c].clone()).sum()).collect();
+        let shown: Vec<String> = (0..bytes).map(|c| format!("{:?}:{}", WITNESS_BYTES[c] as char, kappa[c])).collect();
+        eprintln!("DEFINITE published {}", shown.join(" "));
+    }
+}

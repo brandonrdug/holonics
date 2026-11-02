@@ -1582,6 +1582,29 @@ ports, 2.1 s): **no region has exactly one loop**. Loops a region: one region wi
 is zero), 254 cutting, none forced, none empty. The propagation has nothing to start from, and nothing is published:
 the crib's alignment admits far more candidate copies a region than the one or two true ones, so every region cuts.
 
+[definition; agent-inferred, November 2; the coordinator's decision] **The menu admits only definite edges**: a
+maximal equal-class run whose string occurs exactly once in the question and exactly once in the answer, a maximal
+unique match. A run that occurs at several places is a plural edge, an unlocated choice, so by hnn::keys's semantics not
+a menu edge. Uniqueness is read from the region alone: no key, no length threshold, no named class. Loops pair two
+admitted runs as before; a region with fewer than two admitted runs is silent.
+
+[measurement, November 2] `the_byte_clock_is_located_over_the_definite_menu` (tests.rs, the same 256 regions, 0.2 s):
+runs a region 53 to 112 (median 76), admitted 1 to 4 (median 3), loops 0 to 5 (median 3); **60 regions with exactly
+one loop**, 7 with fewer than two admitted runs; the listener check (each region's own calculation text, never fed
+back): both of the first calculation's operand copies are admitted on 188 of 256. The propagation: `S` opens at
+dimension 9 from the 60 forcing regions and stands there, 246 satisfied, none cutting, none empty, 10 silent: one
+piece. Its published member (`κ ≡ 1` projected): **every digit byte, the space and `+` at 0**, the letters at
+fractions between −2/3 and 2/3 (`a` −2/3, `b` 2/3, `c` 1/2, `e` −3/5, …, `q` 1), `?` 83/151, `<` −46/151, `=` 77/151.
+Not a digit clock, and not a clock that copies (with every digit at 0 an operand's digits share one clock place).
+
+[measurement, November 2] **Why: most forcing regions force a loop the key does not close.** Of the 60 single-loop
+regions, the listener reads 15 whose one loop is the first calculation's two operand copies (a row with no digit byte);
+the other 45 pair copies of two calculations (the first operand with the third number's copy in the second calculation,
+which stands `2 l_s` ticks further) or a run of the total's line (` 4`). Both are definite edges, and the first kind are
+true copies; but a loop closes only between copies of one stationary transport, and these join two. Forcing them pins
+the digits' rates to zero. The propagation's premise, that every region's candidates hold the key, fails on those 45:
+their one loop excludes it, and the propagation cannot see that (the remaining `S` is not empty).
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
