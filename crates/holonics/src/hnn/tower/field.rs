@@ -34,8 +34,8 @@
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
 //! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(w̃_im) w̃_jm) − D_m² |w̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
-//! weights    e_ij = 2^(z_ij − max_(j∈S_i) z_ij),  zero outside S_i^h           the Gibbs face, in bits
-//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij,   x ← x + O y + b_o
+//! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
+//! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
 //! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
 //! ```
@@ -229,18 +229,16 @@ impl FieldDeclaration {
         (usize::BITS - self.reach.saturating_sub(1).leading_zeros()).max(1) as usize
     }
 
-    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff, a mode at a
-    /// time** (the dispersing field's §2.5 and §15.2): each mode keeps its own row, scored by its lock
-    /// ([`lock`]), whose value at an equal word is half the mode's power, `|ŵ_m|²/2`, which a head's word
-    /// at unit power over its `2n` reals holds at `1` on the mean over its `n` modes; an equal word at the
-    /// farthest reach pays `⌊log₂ reach⌋` bits of falloff and must still outweigh the rest of its support
-    /// together, at most another `⌈log₂ reach⌉` bits. `β` is the largest shift, negative where it must
-    /// amplify, with `2^(−β) ≥ 2⌈log₂ reach⌉`: `−5` at reading 8's reach of 2,221 (a mode of mean power
-    /// locks its equal at 32 bits; the falloff at the reach is 11). What it bounds is the mean mode's
-    /// peak: a louder mode is heard sharper, a silent one is near flat over its support. A turned mode
-    /// carries the lock by its skin decay, so its far counterparts are heard more faintly by design
-    /// (§12). Why the mode's own row (§15.2): the head's sum over its modes was one number a pair, so one
-    /// mode's agreement could not be heard apart from the rest.
+    /// [definition; agent-inferred, November 1] **The contact's gain covers the falloff** (the
+    /// dispersing field's §2.5 and §15.2): the head's row is scored by its modes' locks ([`lock`]),
+    /// whose sum at an equal word is half the word's power, `Σ_m |ŵ_m|²/2 = n` at unit power over its
+    /// `2n` reals; an equal word at the farthest reach pays `⌊log₂ reach⌋` bits of falloff and must still
+    /// outweigh the rest of its support together, at most another `⌈log₂ reach⌉` bits. `β` is the
+    /// largest shift, negative where it must amplify, with `2^(−β) n ≥ 2⌈log₂ reach⌉`: `−2` at reading
+    /// 8's declaration (`n = 8`, reach 2,221: an equal word locks at 32 bits; the falloff at the reach is
+    /// 11). What it bounds is the peak, not the gaps: near-equal words share its weight, a plural fibre
+    /// the closure reads as one class. A turned head carries the lock by its skin decay, so its far
+    /// counterparts are heard more faintly by design (§12).
     pub fn score_shift(&self) -> i32 {
         let (reals, need) = (self.modes as u128, 2 * self.reach_bits() as u128);
         let mut beta = 0i32;
@@ -814,7 +812,7 @@ fn decayed((decay, grain): (i128, u32), v: i64) -> i128 {
 }
 
 /// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
-/// §14.11; a row a mode, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
+/// §14.11; one row a head, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
 /// its multiplier on `2^(−62)`: `2^62` in the near field, a far source's weight, a crowd's count `· 2^62`
 /// in the mass with `2^62` against its value sum) keeps its own exponent; the terms are summed whole,
 /// shifted from the row's least exponent, in a carrier as wide as the row's own exponents need (never
