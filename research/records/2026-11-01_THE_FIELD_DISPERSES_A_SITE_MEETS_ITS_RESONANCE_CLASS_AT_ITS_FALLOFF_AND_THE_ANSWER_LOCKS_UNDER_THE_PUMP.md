@@ -1003,6 +1003,39 @@ measurements run apart) and on the card (`field.cu`, `field_moment.cuh`; parity 
 None releases a term from a sum before the sum is formed; the series row is the one place that did, and
 §14.11 repaired it.
 
+### 15.9 The crib run failed, and an open receiver now hears every definite site
+
+[measurement, November 2] The crib run under §15 as built (`…_receipts/crib11/`: 27 laps in 463.7 s on the
+card, 8.0 minutes of the 18 Brandon granted, peak resident 0.42 GB, the card's board at 11,118 MiB in the
+release) wrote 94 first calculations; 14 took their operands from the question, against the foil's 13
+(bar 24). The held answer coded 2.014 bits a byte beside its neighbours with its own question and 2.014
+with a foil's: the question told it 0.0001 bits. The three releases shown were one pattern whatever the
+question. Every one of the release's 386 landmark digits fell on a question digit, and 47 of them (12 %,
+about chance among ten digits) carried the true digit's class: the contact found digits, not which digit.
+The minimal witness, §19's number told by its order, coded 6.341 bits at 300 sections on the build, where
+the field whose every site read every other coded 0.40; the crib passed under that field (25 of 126
+against 2) and failed under the dispersing one (crib 9 and crib 10), so the regression came with §14's far
+support, not with §15.
+
+[definition; agent-inferred, November 2] **An open receiver hears every definite site.** Past the near
+field a definite receiver (known or locked) hears its class's definite members and those of the classes it
+probes, as before; a receiver that is not definite (an answer site open on `∗` or carried soft) hears
+every definite site, each at its full lock and its falloff, and hears no crowd, since it hears every one of
+them sharply. Why: a question number wanted by its order shares no word with the answer site that wants
+it, so the sharp address met it only blurred, in its octave's crowd, where the octave's digits average;
+and the closure's covector reaches only the sources a receiver meets, so no address law could be learned
+toward a source never met sharply. Read through the dispersal lens it is a listener in a dispersing
+field: the definite sites radiate, an open receiver hears them all at their falloff and filters them
+through its lock; definite-to-definite stays sparse, so the field is not every site reread against every
+other. Its pairs a head and tick are the open sites times the definite ones (about 40 × 400 in a crib
+release region against 450² for every pair).
+
+[measurement, November 2] On the host: the cue codes 0.010 bits and the recall 0.004; the number told by
+order 3.568 bits at 300 sections, 0.958 at 500, 0.349 at 650 and 0.093 at 900, against 0.40 at 300 under
+every-pair. Its slower learning is not the lock (the pairing alone: 2.806 at 300), the merge (the real
+merge: 5.039), every receiver's listening (2.850) or the falloff (none: 3.944); its cause is open. The
+fixture's reading at 300 sections misses the every-pair field's 0.40; that is reported here as measured.
+
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
 boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized

@@ -290,15 +290,19 @@ fn the_classes_are_the_word_s_sheets_and_the_support_is_symmetric() {
         assert_eq!(sorted.len(), support.len(), "each site once");
         assert!(!support.contains(&i));
         for j in 0..14 {
-            let meets = j != i && (i.abs_diff(j) < NEAR || (lists.class[i] == lists.class[j] && definite[j]));
+            // A definite receiver hears its class's definite members far; an open one every definite site (§15.9).
+            let meets = j != i && (i.abs_diff(j) < NEAR || (definite[j] && (!definite[i] || lists.class[i] == lists.class[j])));
             assert_eq!(support.contains(&j), meets, "site {i} source {j}");
         }
     }
-    // Only the plates radiate far: past the near field a site hears the definite members of its class,
-    // whatever its own state, and a soft or unreached source is heard by none.
+    // Only the plates radiate far: past the near field an open site hears every definite site, a
+    // definite one the definite members of its class, and a soft or unreached source is heard by none.
     let lists = ClassLists::of(vec![1u32; 20], (0..20).map(|t| t == 15).collect(), 3);
     assert_eq!(lists.support(2).collect::<Vec<_>>(), vec![1, 3, 0, 4, 5, 6, 7, 15]);
     assert!(!lists.support(15).any(|k| k == 2) && !lists.support(2).any(|k| k == 12));
+    let lists = ClassLists::of(vec![1, 2, 1, 2, 1, 2, 1, 2, 1, 2], vec![true, true, false, true, true, true, true, true, true, true], 3);
+    assert_eq!(lists.support(2).filter(|&j| j.abs_diff(2) >= NEAR).collect::<Vec<_>>(), vec![8, 9], "an open site hears every definite site far");
+    assert_eq!(lists.support(3).filter(|&j| j.abs_diff(3) >= NEAR).collect::<Vec<_>>(), vec![9], "a definite one its class's");
     assert_eq!([(2, 0), (-2, 1), (0, 0), (5, -5), (-5, 5), (6, 5), (-6, 5), (1, -2)].map(|(re, im)| shell(re, im)), [2, 0, 1, 1, 1, 2, 0, 1], "the plates where the in-phase part dominates, the bridge on and inside the light cone");
     // The field's own classes are its words' shells.
     for still in [0usize, 1, 2] {
@@ -1159,7 +1163,12 @@ fn the_closure_s_covector_matches_its_code_s_difference() {
                     halvings += h;
                     let (whole, half) = (central(delta).unwrap(), central(delta / 2).unwrap());
                     let predicted = (g[i] * 2 * delta as i128) >> (natural + grain - 20);
-                    let tolerance = predicted.abs() / 8 + (64 << h);
+                    // The closure's code is `−log₂` of a holder share, which magnifies the forward's
+                    // releases: its rounding floor is about 512 on 2^(−20) bits (measured November 1 at
+                    // the founded field's `b_bias` read at the last of two ticks: its differences at
+                    // steps 2^(−13) to 2^(−16) scatter by ±560 around a signal under 400, while at
+                    // 2^(−9) it reads −6,023 against −5,922 predicted).
+                    let tolerance = predicted.abs() / 8 + (512 << h);
                     let agrees = |measured: i64| (measured as i128 - predicted).abs() <= tolerance;
                     read += 1;
                     assert!(agrees(whole) || agrees(2 * half), "still {still} width {} family at {start} (grain {grain}) entry {i}: measured {whole} at δ and {} at δ/2 ({h} halvings), predicted {predicted}", field.declaration.width, 2 * half);

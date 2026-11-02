@@ -29,7 +29,7 @@
 //!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   w_t = W r̂_t + b_w,   v_t = V r̂_t + b_v       one word a head: q = k
 //! classes    B_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of w_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
-//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j : |i − j| ≥ 6, B_h(j) = B_h(i), j definite }   only plates radiate far
+//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j far, definite : B_h(j) ∈ {B_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
 //! frame      w̃_t = U_t ⊙ w_t,   ṽ_t = U_t ⊙ v_t                                complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
 //! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
@@ -721,16 +721,24 @@ impl ClassLists {
         self
     }
 
-    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1): its near field
-    /// (`0 < |i − j| < NEAR`, nearest first, before then after) and the definite members of its class
-    /// past the near field (in ascending place), each site once. The support is directional: `j` is
-    /// heard far by every class-mate where `j` is definite, and by none where it is not.
+    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.9): its near
+    /// field (`0 < |i − j| < NEAR`, nearest first, before then after) and, past it, the definite sites
+    /// it hears sharply, each site once: a definite receiver the definite members of its class and of
+    /// the classes it probes across its seams, an open receiver (not definite) every definite site. The
+    /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
-        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied());
+        let open = !self.definite[i];
+        let runs = std::iter::once(self.class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
-        near.chain(far)
+        let listened = (0..sites).filter(move |&j| open && self.definite[j] && j.abs_diff(i) >= NEAR);
+        near.chain(far).chain(listened)
+    }
+
+    /// Whether receiver `i` listens to every definite site (it is open, §15.9).
+    pub fn listens(&self, i: usize) -> bool {
+        !self.definite[i]
     }
 }
 
@@ -1443,7 +1451,8 @@ impl Field {
                 // heard as `|C|` sources at the mean of their words at the octave's falloff; its value
                 // term is its decayed value sum, its mass term `|C|` times its face.
                 let mut crowds: Vec<Crowd> = Vec::new();
-                for (lo, hi_, level) in crowd_ranges(i, sites) {
+                // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
+                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|_| !lists.listens(i)) {
                     let count = sums.count(lo, hi_);
                     if count == 0 {
                         continue;
