@@ -1,5 +1,6 @@
-# Section 16.20's GSM8K run (Brandon: "Run now, hard-stop at 90 minutes"), commit 3fb8595c4, RTX 4080 SUPER under .local/gpu.lock, 24 host threads.
+# Section 16.20's GSM8K run under a 90-minute hard stop, commit 3fb8595c4, RTX 4080 SUPER under .local/gpu.lock, 24 host threads.
 # Projection: a lap about 95 s (upper 244 s); partition train 70 min, release 15 min (1,000 sweeps), text 5 min, outer 5,400 s.
+FIELD_RUN start=2026-11-02T20:31:27Z bin=ab97d298eb7db3dab3574ea02e764bc02601dcda3905dc2dafbbaee9f695af60 commit=3fb8595c4 board=1212 MiB
 FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15263727616 total=16802250752 batch_budget=10272636928
 FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=35544
 FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=1062
@@ -108,23 +109,16 @@ FIELD_ROWS_HELD lap=2 set=context head=3 tick=1 rows=35591 question_far_share=16
 FIELD_STOPPED_EARLY lap=2 reason=the question tells the answer no more than the foil ms=341729
 FIELD_CARD reads=6339 read_ms=192584 returns=1246 return_ms=133003 pairs=106591890619 batches=7601 peak_store=8210329952 landmarks=0 landmark_ms=0 elapsed_ms=341731
 MEASURE lap=train rc=0 wall_s=342.2 peak_rss_kib=745920
-FIELD_RUN start=2026-11-02T20:31:27Z bin=ab97d298eb7db3dab3574ea02e764bc02601dcda3905dc2dafbbaee9f695af60 commit=3fb8595c4 board=1212 MiB
 FIELD_RUN train_end at_s=342 board=1138 MiB
-FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15341125632 total=16802250752 batch_budget=10350034944
-FIELD_CARD reads=1000 read_ms=106079 returns=0 return_ms=0 pairs=28097661929 batches=1148 peak_store=2199924098 landmarks=148 landmark_ms=1292 elapsed_ms=468956
-MEASURE lap=release rc=0 wall_s=469.4 peak_rss_kib=814120
-FIELD_RUN release_end at_s=811
-FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15383986176 total=16802250752 batch_budget=10392895488
-FIELD_CARD reads=1000 read_ms=5595 returns=0 return_ms=0 pairs=947876898 batches=1000 peak_store=82805202 landmarks=0 landmark_ms=0 elapsed_ms=18386
-MEASURE lap=text rc=0 wall_s=18.7 peak_rss_kib=230756
-FIELD_RUN exit at_s=830 board=1168 MiB
-FIELD_RUN outer rc=0
-FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15383986176 total=16802250752 batch_budget=10392895488
-FIELD_RELEASE_TEXT problems=6 sweeps=1000 live=6 reached=383 front=150 open=7292 rung=4194304 stopped=false ms=18386
-FIELD_CARD reads=1000 read_ms=5595 returns=0 return_ms=0 pairs=947876898 batches=1000 peak_store=82805202 landmarks=0 landmark_ms=0 elapsed_ms=18386
-MEASURE lap=text rc=0 wall_s=18.7 peak_rss_kib=230756
 FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15341125632 total=16802250752 batch_budget=10350034944
 FIELD_RELEASE_RECEIPTS problems=148 locked_whole=0 open_sites=179329 free_circulation=307053 bound_circulation=1538 reached=11286 locked=2563 reach_sweep_quartiles=0/23/63/145/606 lock_sweep_quartiles=3/35/88/234/999 extents_void=0 extents_bound=0 extents_unread=148 extent_site_quartiles=- extent_sweep_quartiles=- lock_margin_bits_quartiles=18/36/41/53/144881 lock_rungs=1:21,2:315,4:849,8:566,16:562,32:114,64:77,128:34,256:12,512:6,1024:2,2048:2,16384:2,32768:1 landmark_problems=148 landmark_sites=2563 landmark_same_class=574 landmark_ms=1297
 FIELD_RELEASE free=148 refused=0 sweeps=1000 stop_ms=900000 free_sweeps=1000 free_live=148 free_reached=11286 free_front=419 free_open=179329 free_rung=4194304 free_stopped=false released=181892 held=39190 lambda=2324 friction=216434 ms=468955
 FIELD_CARD reads=1000 read_ms=106079 returns=0 return_ms=0 pairs=28097661929 batches=1148 peak_store=2199924098 landmarks=148 landmark_ms=1292 elapsed_ms=468956
 MEASURE lap=release rc=0 wall_s=469.4 peak_rss_kib=814120
+FIELD_RUN release_end at_s=811
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15383986176 total=16802250752 batch_budget=10392895488
+FIELD_RELEASE_TEXT problems=6 sweeps=1000 live=6 reached=383 front=150 open=7292 rung=4194304 stopped=false ms=18386
+FIELD_CARD reads=1000 read_ms=5595 returns=0 return_ms=0 pairs=947876898 batches=1000 peak_store=82805202 landmarks=0 landmark_ms=0 elapsed_ms=18386
+MEASURE lap=text rc=0 wall_s=18.7 peak_rss_kib=230756
+FIELD_RUN exit at_s=830 board=1168 MiB
+FIELD_RUN outer rc=0
