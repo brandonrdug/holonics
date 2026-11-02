@@ -361,7 +361,7 @@ impl FieldDeclaration {
 
     /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
     pub fn growth_draws(&self, factor: usize) -> usize {
-        factor * factor.saturating_sub(1) * self.width * (2 * 2 * self.complex() + 2 * self.contacts)
+        factor * factor.saturating_sub(1) * self.width * (3 * 2 * self.complex() + 2 * self.contacts)
     }
 
     /// The declaration grown by `factor`: width, heads and contacts (a head's modes, its ring set,
@@ -466,6 +466,10 @@ pub struct FieldLayout {
     /// The locks' temperatures (§15.10), one a head and receiver kind, `[h][kind]` (kind 0 a class
     /// receiver, 1 a listener), on the material's grain.
     pub temper: usize,
+    /// A listener's probe chart and its bias (§15.12): an open receiver probes with its own word, its
+    /// sources answer with theirs.
+    pub probe: usize,
+    pub probe_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -500,7 +504,9 @@ impl FieldLayout {
         let moment_before = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
         let moment_after = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
         let temper = push(2 * d.heads, MATERIAL_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, len: at, families }
+        let probe = push(m2 * dw, MATERIAL_BITS);
+        let probe_bias = push(m2, FACE_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, len: at, families }
     }
 }
 
@@ -675,6 +681,9 @@ struct TickCell {
     q: Vec<i64>,
     v: Vec<i64>,
     qscale: Vec<i128>,
+    /// A listener's probe, framed and at unit power by head (`[h][t][2n]`), and its powers (§15.12).
+    pq: Vec<i64>,
+    pscale: Vec<i128>,
     /// Each head's resonance classes and their lists ([`ClassLists`]).
     classes: Vec<ClassLists>,
     /// Each head's and receiving site's support `[h][i]`, each source with its weight and each mode's
@@ -1039,6 +1048,7 @@ fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: usize, trip
 
 /// Each family's `max |w|`, read once a pass.
 struct Reaches {
+    probe: u64,
     q: u64,
     v: u64,
     out: u64,
@@ -1090,6 +1100,11 @@ impl Field {
         for start in [layout.a, layout.b] {
             uniform(&mut theta[start..start + f * dw], three, dd, MATERIAL_BITS)?;
         }
+        // A listener's probe opens as the word itself (§15.12): the founding reads as before, and learning
+        // moves the probe apart from the key where a receiver asks for what does not resemble it.
+        let (wq, pq) = (layout.q, layout.probe);
+        let chart: Vec<i32> = theta[wq..wq + m2 * dw].to_vec();
+        theta[pq..pq + m2 * dw].copy_from_slice(&chart);
         // The temperatures open at their derived gains (§15.10): `2^(−β)` on the material's grain.
         for h in 0..declaration.heads {
             for (kind, beta) in [(0usize, declaration.score_shift()), (1, declaration.listen_shift())] {
@@ -1196,7 +1211,7 @@ impl Field {
         let (dw, m2, f, a) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts, self.declaration.alphabet);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, a * dw) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, a * dw) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -1433,6 +1448,12 @@ impl Field {
                 *vv = fit64(*vv as i128 + mv as i128)?;
             }
         }
+        // A listener's probe (§15.12): its own chart of the same read.
+        let mut pr = vec![0i64; sites * m2];
+        for t in 0..sites {
+            let rt = &cell.read[t * dw..(t + 1) * dw];
+            affine(&self.theta[l.probe..l.probe + m2 * dw], reaches.probe, dw, rt, Some(&self.theta[l.probe_bias..l.probe_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut pr[t * m2..(t + 1) * m2])?;
+        }
         // The resonance classes: the unframed word's shells, head by head (§12).
         cell.classes = (0..heads)
             .map(|h| {
@@ -1474,6 +1495,28 @@ impl Field {
             }
             cell.qscale[hs] = s;
         }
+        // The probe framed and at unit power alike.
+        cell.pq = vec![0i64; heads * sites * span];
+        cell.pscale = vec![0i128; heads * sites];
+        for h in 0..heads {
+            for t in 0..sites {
+                let at = (h * sites + t) * span;
+                for li in 0..n {
+                    let c = h * n + li;
+                    let (ur, ui) = self.frame(t, clock[t], h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    let (qr, qi) = (pr[t * m2 + c] as i128, pr[t * m2 + m + c] as i128);
+                    cell.pq[at + li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
+                    cell.pq[at + n + li] = fit64(release(ui * qr + ur * qi, MOVE_BITS))?;
+                }
+                let slice = &mut cell.pq[at..at + span];
+                let (r, s) = ratio_to_power(slice)?;
+                for (slot, v) in slice.iter_mut().zip(r) {
+                    *slot = v as i64;
+                }
+                cell.pscale[h * sites + t] = s;
+            }
+        }
         // The contact and the current over each site's support, head by head (§2.5, §14.10, §14.11,
         // §15.2): `z_ij = 2^(−β) Σ_m lock_m(ŵ_i, ŵ_j) − ⌊log₂ |i − j|⌋` on `2^(−16)` bits for a met source
         // (each mode's [`lock`] carried by its skin decay), and for each octave's crowd of definite
@@ -1492,7 +1535,8 @@ impl Field {
             let lists = &cell.classes[h];
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             for i in 0..sites {
-                let wi = &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span];
+                // A listener probes with its own word (§15.12); a class receiver's probe is its word.
+                let wi = if lists.listens(i) { &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span] } else { &cell.q[(h * sites + i) * span..(h * sites + i + 1) * span] };
                 // The lock's temperature for this receiver's kind (§15.10).
                 let temper = self.temper(h, lists.listens(i));
                 let mut series = SeriesRow::new(span);
@@ -1853,6 +1897,7 @@ impl Field {
             // The weights and the contact over each site's support, head by head.
             let mut dq = vec![0i64; sites * m2];
             let mut dv = vec![0i64; sites * m2];
+            let mut dp = vec![0i64; sites * m2];
             let mut dyh = vec![0i64; sites * span];
             for h in 0..heads {
                 // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
@@ -1871,6 +1916,10 @@ impl Field {
                 let sums = &cell.sums[h];
                 let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
                 let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
+                let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
+                let lists = &cell.classes[h];
+                // A receiver's probe: a listener's own, a class receiver's word (§15.12).
+                let probe_of = |i: usize, r: usize| -> i64 { if lists.listens(i) { ph[i * span + r] } else { qh[i * span + r] } };
                 let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
                 // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
                 // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
@@ -1989,7 +2038,7 @@ impl Field {
                             let (dec, g) = self.decay(h, r % n, dd);
                             // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
                             // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
-                            let bracket = release(((dec * qh[i * span + r] as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
+                            let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
                             col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
                         }
                     }
@@ -2012,7 +2061,12 @@ impl Field {
                         // Held in the framed chart until the frame is undone below.
                         let c = h * n + r % n;
                         let slot = if r < n { c } else { m + c };
-                        dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
+                        if lists.listens(i) {
+                            dp[i * m2 + slot] = fit64(release(sq, back))?;
+                            dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
+                        } else {
+                            dq[i * m2 + slot] = fit64(fit64(release(sq, back))? as i128 + release(col[i * span + r], back))?;
+                        }
                         if definite[i] {
                             dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
                         }
@@ -2033,12 +2087,28 @@ impl Field {
                     }
                 }
             }
+            // The probe's return through its own power, alike (§15.12).
+            for h in 0..heads {
+                for t in 0..sites {
+                    let at = (h * sites + t) * span;
+                    let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
+                    let unit: Vec<i32> = cell.pq[at..at + span].iter().map(|&v| v as i32).collect();
+                    let cov: Vec<i64> = (0..span).map(|r| dp[slot(r)]).collect();
+                    if cov.iter().all(|&c| c == 0) {
+                        continue;
+                    }
+                    let back = ratio_adjoint(&unit, cell.pscale[h * sites + t], &cov)?;
+                    for (r, b) in back.into_iter().enumerate() {
+                        dp[slot(r)] = b;
+                    }
+                }
+            }
             // Undo the frame: δw = conj(U) δw̃, and so for the values.
             for t in 0..sites {
                 for c in 0..m {
                     let (ur, ui) = self.frame(t, clock[t], c / n, c % n);
                     let (ur, ui) = (ur as i128, ui as i128);
-                    for chart in [&mut dq, &mut dv] {
+                    for chart in [&mut dq, &mut dv, &mut dp] {
                         let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
                         chart[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
                         chart[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
@@ -2051,7 +2121,7 @@ impl Field {
             }
             let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
             let mut dr_all = vec![0i64; sites * dw];
-            for (w, bias, reach_w, dfam) in [(l.q, l.q_bias, reaches.q, &dq), (l.v, l.v_bias, reaches.v, &dv)] {
+            for (w, bias, reach_w, dfam) in [(l.q, l.q_bias, reaches.q, &dq), (l.v, l.v_bias, reaches.v, &dv), (l.probe, l.probe_bias, reaches.probe, &dp)] {
                 let rows: Vec<&[i64]> = dfam.chunks_exact(m2).collect();
                 outer_sum(&mut g[w..w + m2 * dw], dw, &rows, &reads)?;
                 let mut back = vec![0i64; dw];
@@ -2684,6 +2754,7 @@ impl Field {
         let kept = |_: usize, r: usize| r;
         split(ol.q, layout.q, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
         split(ol.v, layout.v, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
+        split(ol.probe, layout.probe, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
         split(ol.out, layout.out, dw, 2 * m, f, &face, 2 * m2g, &chart_row, None, true)?;
         split(ol.a, layout.a, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
@@ -2705,6 +2776,7 @@ impl Field {
         }
         repeat(ol.q_bias, layout.q_bias, 2 * m, f, &chart_row, true);
         repeat(ol.v_bias, layout.v_bias, 2 * m, f, &chart_row, true);
+        repeat(ol.probe_bias, layout.probe_bias, 2 * m, f, &chart_row, true);
         repeat(ol.out_bias, layout.out_bias, dw, f, &face, true);
         repeat(ol.a_bias, layout.a_bias, fc, f, &contact, true);
         repeat(ol.b_bias, layout.b_bias, fc, f, &contact, true);

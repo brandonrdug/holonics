@@ -1087,6 +1087,24 @@ part of `CONTEXT` a problem, keyed by its draw), read for the held step only and
 the whole held read higher is halved or refused, as before. The crib run's per-lap withheld code is the
 measurement of whether lap 0 still harms.
 
+### 15.12 A lock is its key's foil, not its copy: a listener probes with its own chart
+
+[definition; agent-inferred, November 2] One word a head was both the probe and the key (§2.1), so a
+receiver's lock had to equal the key it fits: a source was found only where the two words resembled each
+other. That serves a cue (an equal word recurs) and fails a number wanted by its order, whose source shares
+no word with the answer site that asks for it. The field that passed the crib kept separate probe and key
+charts (the review of November 2's correction of §15.10). Read through Brandon's lens, a lock is its key's
+foil, related to it by a learned chart, not its copy. A listener (an open receiver, §15.9) now probes with
+its own chart `P` of the same read (framed and at unit power within its head as the word is), and its
+sources answer with their word; a class receiver's probe stays its word, since its support is the class its
+word names. `P` opens as the word chart itself, so the founding reads as before, and learning moves the
+probe apart from the key where a receiver asks for what does not resemble it. Growth splits `P` as it splits
+the word chart.
+
+[measurement, November 2] The number told by order: 1.148 bits at 300 sections, 0.412 at 350, 0.195 at
+400 and 0.046 at 600 (3.568, 2.674, 1.792 and 0.558 with the probe tied to the word; 0.40 at 300 under the
+field whose every site read every other). The cue 0.007, the recall 0.001; the field's tests 57 of 57.
+
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
 boundary moments (from `moment_closed_form`), the head row's equality with the exact normalized
