@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, Region, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, RowCurrent, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -468,6 +468,11 @@ pub struct CardField<'c> {
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
     /// [measurement, §16.20] While a covector's shares are read, `[h][near, far]` summed over the batches.
     covector_shares: std::cell::RefCell<Option<Vec<i128>>>,
+    /// [measurement, §16.21] While the held rows' currents are read: the regions' answer starts, the rows read region by
+    /// region, and the batch's current covectors a tick `[h][t][2n]` where read with a return.
+    row_questions: std::cell::RefCell<Option<Vec<usize>>>,
+    row_out: std::cell::RefCell<Vec<Vec<RowCurrent>>>,
+    row_cov: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
@@ -483,7 +488,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), held_cells: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1180,6 +1185,34 @@ impl<'c> CardField<'c> {
                 *t += c;
             }
         }
+        // The held rows' currents by where they come from (a reading, §16.21): each kept tick's shares.
+        if let Some(questions) = self.row_questions.borrow().as_ref() {
+            let span = 2 * n;
+            let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
+            let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
+            for (k, tick) in ticks.iter().enumerate() {
+                set(words, tick);
+                let far = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * span)).map_err(device)?;
+                let near = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * span)).map_err(device)?;
+                let rest = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * span)).map_err(device)?;
+                let top = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(heads * sites)).map_err(device)?;
+                let (mut sp, mut fp, mut np, mut rp, mut tp) = (starts_c.device_ptr(), far.device_ptr(), near.device_ptr(), rest.device_ptr(), top.device_ptr());
+                self.launch("field_row_currents", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut fp), arg(&mut np), arg(&mut rp), arg(&mut tp)])?;
+                let (fv, nv) = (self.card.fetch_range(&*far, 0, heads * sites * span).map_err(device)?, self.card.fetch_range(&*near, 0, heads * sites * span).map_err(device)?);
+                let rv = self.card.fetch_range(&*rest, 0, heads * sites * span).map_err(device)?;
+                let tv = self.card.fetch_range(&*top, 0, heads * sites).map_err(device)?;
+                let mut out = self.row_out.borrow_mut();
+                for (r, region) in regions.iter().enumerate() {
+                    let first = region_off[r] as usize;
+                    for h in 0..heads {
+                        for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                            let at = (h * sites + first + t) * span;
+                            out[at_region + r].push(RowCurrent { tick: k as u32, head: h as u32, site: t as u32, far: fv[at..at + span].to_vec(), near: nv[at..at + span].to_vec(), rest: rv[at..at + span].to_vec(), top: tv[h * sites + first + t], covector: Vec::new() });
+                        }
+                    }
+                }
+            }
+        }
         // The faces at the unresolved sites.
         let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
         let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
@@ -1203,7 +1236,22 @@ impl<'c> CardField<'c> {
                 false => None,
             };
             words.dsshare = shares.as_ref().map_or(0, |b| b.device_ptr());
+            // The held rows' current covectors, where read (§16.21).
+            if self.row_questions.borrow().is_some() {
+                *self.row_cov.borrow_mut() = Some(vec![Vec::new(); ticks.len()]);
+            }
             self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, sites, pairs)?;
+            if let Some(cov) = self.row_cov.borrow_mut().take() {
+                let span = 2 * n;
+                let mut out = self.row_out.borrow_mut();
+                for (r, _) in regions.iter().enumerate() {
+                    let first = region_off[r] as usize;
+                    for row in out[at_region + r].iter_mut() {
+                        let at = (row.head as usize * sites + first + row.site as usize) * span;
+                        row.covector = cov[row.tick as usize][at..at + span].to_vec();
+                    }
+                }
+            }
             if let Some(buffer) = shares {
                 let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*buffer, 0, 2 * heads)).map_err(device)?;
                 if let Some(total) = self.covector_shares.borrow_mut().as_mut() {
@@ -1470,6 +1518,10 @@ impl<'c> CardField<'c> {
             // first, then the columns', which adds the word's second role into the same slots.
             let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
             self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
+            // The current's covector of this tick, where the held rows' currents are read (§16.21).
+            if let Some(cov) = self.row_cov.borrow_mut().as_mut() {
+                cov[at] = self.timed(Kind::Copy, || self.card.fetch_range(&dyh, 0, heads * sites * span)).map_err(device)?;
+            }
             if paced > 0 {
                 let (mut dyp, mut yp) = (dy.device_ptr(), tick.y.device_ptr());
                 self.launch("field_pace_current_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut yp)])?;
@@ -1751,6 +1803,19 @@ impl FieldRealization for CardField<'_> {
 
     fn met_pairs(&self) -> Option<u128> {
         Some(self.times.pairs)
+    }
+
+    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+        if regions.len() != questions.len() {
+            return Err(TowerError::Refused("a held read's answer starts that are not one a region"));
+        }
+        *self.row_questions.borrow_mut() = Some(questions.to_vec());
+        *self.row_out.borrow_mut() = vec![Vec::new(); regions.len()];
+        let read = self.run(field, regions, returning, true, None);
+        *self.row_questions.borrow_mut() = None;
+        *self.row_cov.borrow_mut() = None;
+        read?;
+        Ok(std::mem::take(&mut *self.row_out.borrow_mut()))
     }
 
     fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
