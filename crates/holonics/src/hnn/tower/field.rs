@@ -29,10 +29,10 @@
 //!            site opens on its mixture Σ_a p(a) E(a), and so for its strand rows
 //! chart      r̂_t = x_t / ‖x_t‖_rms,   k_t = W_k r̂_t + b_k,   p_t = W_p r̂_t + b_p,   v_t = V r̂_t + b_v   a key and a probe a head
 //! classes    K_h(t), P'_h(t) = Σ_l 3^l σ_l, σ_l ∈ {0, 1, 2} the shell of k_t's, p_t's mode l   first b = min(n, ⌈½ log₃ reach⌉)
-//! support    S_i^h = { j : 0 < |i − j| < 6 } ∪ { j far, definite : K_h(j) ∈ {P'_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
+//! support    S_i^h = { j keyed : 0 < |i − j| < 6 } ∪ { j far, definite : K_h(j) ∈ {P'_h(i)} ∪ P_h(i) } for a definite i, every definite j far for an open i
 //! frame      k̃_t = U_t ⊙ k_t,   p̃_t = U_t ⊙ p_t,   ṽ_t = U_t ⊙ v_t              complex modes, by head
 //! skin       D_m(d) = e^(−2π d/n_m) on a turned mode's ring, 1 on a still one    one e-fold a radian
-//! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t at a turned mode     a site carries its moment (§15.1)
+//! moment     s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k), v_t += s_t, p_t += s_t at a turned mode   a site carries its moment (§15.1, §16.20)
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
@@ -81,7 +81,10 @@
 //! as an open one; a site is listed in its key's class and reads the classes of its probe. The strand
 //! contacts are founded with the encoding (each row a keyed draw, so every site has a word from the
 //! founding), and a site whose class has not arrived opens on nothing (the unresolved rows of `E`, `E₋`,
-//! `E₊` founded at zero: it has no key to be met by, only a probe). The still and turned modes are separate
+//! `E₊` founded at zero: it has no key to be met by, only a probe). [§16.20] So it is no source: a site that is
+//! unresolved and carries no face leaves every receiver's support, its near field's included (the lock would score
+//! its silent key above every real one), and every receiver's probe reads its helical moment at the turned modes,
+//! so an open site asks with what its strand has brought to its place. The still and turned modes are separate
 //! ring sets: a still set compares a probe and a key at any distance, a turned set compares them with
 //! their place. **The contact pairs at unit power**: within its head each framed probe and key is read as a
 //! ratio to its own power (the chart's law, `ratio_to_power`, over the head's `2n` reals), so the pairing
@@ -243,33 +246,33 @@ impl FieldDeclaration {
         beta
     }
 
-    /// [definition; agent-inferred, November 2] **A listener's opening temperature** (§15.10): the
-    /// largest gain `g = 2^(−β)` with `g² · 2n ≤ (⌊log₂ reach⌋ − 1)²`, so the lock's random spread over a
-    /// listener's support, `σ = g √(2n)` bits (two unrelated words at unit power pair at a sum of `2n`
-    /// products of unit variance), stays within the falloff's own span over the support's octaves, from
-    /// the near field's to the reach's: the random maximum of a few hundred unrelated far words does not
-    /// drown the near field, while an equal word, where one exists, still leads it (its lock stands
-    /// `2n g` above the mean, the random maximum over `N` sources about `σ √(2 ln N)`, below it while `N
-    /// < e^n`). `0` at the crib's reach of 484 with `n = 8` (`g = 1`, `σ = 4` against a span of 7 bits; the
-    /// equal word's lead over the maximum of 400, `16 − 13.8`, about 2 bits), `−1` at reading 8's 2,221. Why
-    /// not the class receiver's `−2` (an equal word at 32 bits): that guarantee is for a support of
-    /// class-mates, where an equal word is expected; a listener hears every definite site, and at that gain
-    /// its founding row peaked on the random maximum, about 54 bits above the mean, and drowned the near
-    /// field (the crib run of November 2, whose first lap raised the withheld code from 5.459 to 5.912
-    /// bits). The temperature is deposited from there ([`Field::temper`]).
+    /// [definition; agent-inferred, November 2] **A listener's opening temperature** (§15.10, §16.20): the
+    /// largest gain `g = 2^(−β)` at which the random maximum of the lock over a listener's support stays within
+    /// the falloff's own span over the support's octaves, `span = ⌊log₂ reach⌋ − 1`, from the near field's to the
+    /// reach's: two unrelated words at unit power pair at a sum of `2n` products of unit variance, so the lock's
+    /// spread is `σ = g √(2n)` bits and the maximum over `N` sources stands about `σ √(2 ln N)` above the mean;
+    /// the gain holds `g² · 2n · 2 ln N ≤ span²` with `N` the reach, read exactly through `ln N ≤ ⌈log₂ N⌉ ln 2`
+    /// and `ln 2`'s face rounded up (`(ln2_face + 1) 2^(−30)`). `β = 1` (`g = ½`) at reading 8's reach of 2,221
+    /// with `n = 8`, `β = 2` at 484. Why not the spread alone (`g² 2n ≤ span²`, the criterion until November 2,
+    /// `g = 2` at 2,221): its stated intent was that the random maximum of a few hundred unrelated far words
+    /// not drown the near field, and the spread bounds the mean, not the maximum: at `g = 2` the founding's far
+    /// mass at GSM8K's answer sites stood on 5.7 random sources of about 220 (Rényi-2 count, §16.20). Why not the
+    /// class receiver's `−2`: that guarantee is for a support of class-mates, where an equal word is expected;
+    /// a listener hears every definite site. The temperature is deposited from there ([`Field::temper`]).
     pub fn listen_shift(&self) -> i32 {
         let span = (usize::BITS - 1 - self.reach.leading_zeros()).saturating_sub(1).max(1) as u128;
-        let reals = 2 * self.modes as u128;
+        // `g² · 2n · 2 ln N` with `ln N ≤ ⌈log₂ N⌉ ln 2`, on `2^(−30)`, against `span²` on `2^(−30)`.
+        let need = 4 * self.modes as u128 * self.reach_bits() as u128 * (ln2_face() as u128 + 1);
+        let holds = |beta: i32| if beta >= 0 { need <= (span * span) << (LN2_FACE_BITS + 2 * beta as u32) } else { need << (2 * beta.unsigned_abs()) <= (span * span) << LN2_FACE_BITS };
         let mut beta = 0i32;
-        if reals <= span * span {
-            while reals << (2 * (1 - beta)) <= span * span {
+        if holds(beta) {
+            while holds(beta - 1) {
                 beta -= 1;
             }
         } else {
-            while reals > (span * span) << (2 * (beta + 1)) {
+            while !holds(beta) {
                 beta += 1;
             }
-            beta += 1;
         }
         beta
     }
@@ -808,6 +811,9 @@ pub struct ClassLists {
     /// Each receiver's own probed class, read from its probe word (§16.19).
     pub probe_class: Vec<u32>,
     pub definite: Vec<bool>,
+    /// Each site's key: known, or carrying a face (§16.20). A site that carries neither has no word to be met
+    /// by and is no receiver's source, its near field's included.
+    pub keyed: Vec<bool>,
     pub off: Vec<u32>,
     pub members: Vec<u32>,
     /// Each receiver's other probed classes (§15.2's multi-probe, [`probes`]), empty where none.
@@ -833,7 +839,14 @@ impl ClassLists {
         }
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
-        Self { class, probe_class, definite, off, members, probes }
+        let keyed = vec![true; class.len()];
+        Self { class, probe_class, definite, keyed, off, members, probes }
+    }
+
+    /// The lists with each site's key (§16.20): the sources a near field holds.
+    pub fn keyed(mut self, keyed: Vec<bool>) -> Self {
+        self.keyed = keyed;
+        self
     }
 
     /// The lists with each receiver's own probed class and its other probed classes.
@@ -843,14 +856,14 @@ impl ClassLists {
         self
     }
 
-    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.9): its near
-    /// field (`0 < |i − j| < NEAR`, nearest first, before then after) and, past it, the definite sites
+    /// [definition; agent-inferred, November 1] **Site `i`'s support** (§2.5, §14.1, §15.9, §16.20): its near
+    /// field's keyed sites (`0 < |i − j| < NEAR`, nearest first, before then after) and, past it, the definite sites
     /// it hears sharply, each site once: a definite receiver the definite members of its probe's class
     /// and of the classes it probes across its seams, an open receiver (not definite) every definite site. The
     /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
-        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten();
+        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j]);
         let open = !self.definite[i];
         let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
@@ -971,6 +984,10 @@ impl SeriesRow {
     /// μ)`) and each term's share `div_nearest(2^(a − a₀) face μ 2^63, Σ …)`.
     pub fn release(&self) -> (Vec<i128>, Vec<u64>) {
         use num_bigint::BigInt;
+        // A receiver whose support holds no keyed source (§16.20) gathers nothing.
+        if self.terms.is_empty() {
+            return (vec![0; self.span], Vec::new());
+        }
         let a0 = self.terms.iter().map(|t| t.0).min().unwrap_or(0);
         let mass_of = |t: &(i64, u128, u128, u128, Vec<i128>)| (BigInt::from(t.1) * BigInt::from(t.2)) << ((t.0 - a0) as usize);
         let mass: BigInt = self.terms.iter().map(mass_of).sum();
@@ -1027,6 +1044,11 @@ pub struct RowShares {
 /// definite sites at or past the answer start, the crowds). `question_current` is the current's part from the
 /// question group, `Σ p · Σ_x |D ṽ_x|` over its sources (each source's `release(p Σ_x |D ṽ_x|, 63)`, on the
 /// value's grain).
+/// [measurement; agent-inferred, November 2] The question's far part (§16.19's far-contact review): `question_far`, the
+/// shares of the question sources past the near field (`|i − j| ≥ NEAR`); per row its collision
+/// `C = Σ release(p², 63)` over them, and where `C > 0` its effective count of far sources, the Rényi-2 count
+/// `(Σ p)² / Σ p²` (a lower bound of `2^H`), on `2^(−8)`, summed in `far_effective` over the `far_rows` rows
+/// counted. Region-level groups only: no source is paired with a receiver by its class.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct HeldRows {
     pub rows: u64,
@@ -1034,6 +1056,9 @@ pub struct HeldRows {
     pub soft_near: u128,
     pub other: u128,
     pub question_current: i128,
+    pub question_far: u128,
+    pub far_effective: u128,
+    pub far_rows: u64,
 }
 
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
@@ -1690,7 +1715,7 @@ impl Field {
 
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
-    fn tick(&self, x: &mut [i64], definite: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
+    fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -1722,6 +1747,11 @@ impl Field {
         for t in 0..sites {
             let rt = &cell.read[t * dw..(t + 1) * dw];
             affine(&self.theta[l.probe..l.probe + m2 * dw], reaches.probe, dw, rt, Some(&self.theta[l.probe_bias..l.probe_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut pr[t * m2..(t + 1) * m2])?;
+            // [definition; §16.20] A receiver asks with what has reached its place: its probe reads its moment at the
+            // turned modes, the moment its value carries (§15.1), so an open site probes by its strand's sources.
+            for (pp, &mv) in pr[t * m2..(t + 1) * m2].iter_mut().zip(&moment[t * m2..(t + 1) * m2]) {
+                *pp = fit64(*pp as i128 + mv as i128)?;
+            }
         }
         // The resonance classes, head by head (§12, §16.19): a source's the shells of its unframed key word (the
         // class it is met in), a receiver's the shells of its unframed probe word and the classes it probes
@@ -1732,7 +1762,7 @@ impl Field {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed)
+                ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec())
             })
             .collect();
         cell.word = q.clone();
@@ -1926,13 +1956,14 @@ impl Field {
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
+        let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         let mut out = FieldPass::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
         let mut before: Option<Vec<Vec<Source>>> = None;
         for _ in 0..d.ticks {
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &paces, &moment, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, &paces, &moment, &reaches, &mut cell)?;
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
@@ -2019,11 +2050,16 @@ impl Field {
                 for i in (0..sites).filter(|&i| region.unresolved[i]) {
                     acc.rows += 1;
                     let hi = h * sites + i;
+                    let (mut far, mut collision) = (0u128, 0u128);
                     for src in &cell.rows[hi] {
                         let j = src.j as usize;
                         let definite = Self::definite(region, j);
                         if definite && j < question {
                             acc.question += src.p as u128;
+                            if i.abs_diff(j) >= NEAR {
+                                far += src.p as u128;
+                                collision += release(src.p as i128 * src.p as i128, SHARE_BITS) as u128;
+                            }
                             let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
                             let current: i128 = (0..span).map(|x| decayed(self.pair_decay(&pass.paces, h, x % n, i, j), vj[x]).abs()).sum();
                             acc.question_current += release(src.p as i128 * current, SHARE_BITS);
@@ -2034,6 +2070,11 @@ impl Field {
                         }
                     }
                     acc.other += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                    acc.question_far += far;
+                    if collision > 0 {
+                        acc.far_effective += ((far * far) >> (SHARE_BITS - 8)) / collision;
+                        acc.far_rows += 1;
+                    }
                 }
             }
         }
@@ -2053,6 +2094,9 @@ impl Field {
                 acc.soft_near += one.soft_near;
                 acc.other += one.other;
                 acc.question_current += one.question_current;
+                acc.question_far += one.question_far;
+                acc.far_effective += one.far_effective;
+                acc.far_rows += one.far_rows;
             }
         }
         Ok(out)
@@ -2503,9 +2547,9 @@ impl Field {
                     }
                 }
             }
-            // The values' covector at the moment modes, summed over the ticks (§15.1).
-            for (slot, &v) in dm.iter_mut().zip(&dv) {
-                *slot += v as i128;
+            // The values' and the probes' covectors at the moment modes, summed over the ticks (§15.1, §16.20).
+            for ((slot, &v), &p) in dm.iter_mut().zip(&dv).zip(&dp) {
+                *slot += v as i128 + p as i128;
             }
             let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
             let mut dr_all = vec![0i64; sites * dw];

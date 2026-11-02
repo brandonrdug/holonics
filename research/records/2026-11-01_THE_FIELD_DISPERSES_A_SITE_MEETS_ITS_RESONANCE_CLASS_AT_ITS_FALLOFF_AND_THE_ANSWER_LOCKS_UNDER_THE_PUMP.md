@@ -1941,3 +1941,83 @@ runs only when a kernel changes, and then once. [measurement] At 3 sections, 8 w
 release of 40 sweeps, every read, face, covector, learner and release equal in 139 s (projected at most 155 s, 0.90 of
 it; host 90 s, of it the withheld sample 14.5 s against the whole read's 156 s; card 0.5 s). Receipt:
 `_receipts/law16/parity_sample.txt`.
+
+### 16.20 Why the question barely changes the answer: silent keys, a random far lock, an open site that asks nothing
+
+[measurement, November 2] The real question beat a foil by 0.005 bits (crib14), earlier readings by 0.01 and 0.021, and
+under the honest founding the far-recall fixture coded 3.312 bits at 600 sections: the field had never learned a far
+contact on its own. Before any run, the path from a question site to an open answer site was traced in the code (training's
+masked and front regions, the release), and the founding was read on the card with no deposit (`train-field` at `LAPS = 0`,
+GSM8K, reading 9's declaration: D 32, H 4 with two still and two turned heads, n 8, K 2, reach 2,221), through the
+row reading extended for it ([`HeldRows`]: the question's far part past `NEAR`, its per-row Rényi-2 effective count
+`(Σ p)² / Σ p²`, region-level groups only). Per head at answer sites, millionths of a row; ticks 0 and 1 equal in every
+cell:
+
+| set | heads | far question | near question | open near field | rest | far effective sources |
+|---|---|---|---|---|---|---|
+| opening (the release's first read, 128 problems, every answer site open) | still | 132, 77 | 14, 4 | 999,852, 999,917 | 0 | 224 |
+| | turned | 83,810, 68,711 | 122, 124 | 916,067, 931,164 | 0 | 219, 211 |
+| context (one answer site in four open, neighbours resolved) | still | 211,032, 205,168 | 659, 955 | 22,836, 29,445 | 765,472, 764,429 | 5.8, 5.6 |
+| | turned | 223,317, 249,138 | 807, 1,004 | 23,701, 19,267 | 752,172, 730,589 | 123, 84 |
+
+Receipt: `_receipts/law20/founding_reads.txt` (with the sampled parity of that binary, equal in 170 s). The verdicts:
+- H1, every open site opens on one shared row: confirmed, and stronger. The unresolved rows of `E`, `E₋`, `E₊` are founded at
+  zero and `ratio_to_power(0)` is zero with a zero adjoint, so an open site whose neighbours are open opens on the zero
+  vector: no probe, no key, no covector; once `E(∗)` moves, every such site shares one vector.
+- N1 (not listed), the lock prefers silent keys: `|p|² − |p − D k|²` scores a zero key at 0 and a unit-power key against a
+  silent probe at `−D² |k|²`, `−16` bits at the founding's listen gain of 2, so every silent open neighbour outscored every
+  question key by about 16 bits and its octave: 99.99 % of the opening rows on the still heads. The module's own definition
+  says such a site "has no word to be met by, only a probe".
+- H2, the falloff spreads the far mass thin: half confirmed. `⌊log₂ d⌋` balances the count of sources an octave holds
+  (`2^ℓ` sources at `2^(−ℓ)` each), so in aggregate the far field is not starved (the question holds 21 to 25 % of the
+  context rows). But the listen gain of 2 at reach 2,221 bounded the lock's spread `σ = g √(2n) = 8` by the falloff's span
+  of 10 while the random maximum stands `σ √(2 ln N)`, about 27 bits, above the mean: the still heads' far mass sat on 5.7
+  random sources of about 220 (spread refuted), the turned heads' on 84 to 123 (confirmed). A far pair's covector is
+  proportional to its share by the law (`δz = ln 2 · p (δp − μ)`).
+- H3, the skin silences fine rings far: confirmed. The turned periods are 2, 3, 4, 9, 16, 27, 32, 81, 128, 243, 256, 729,
+  1,024, 2,187, 4,096 and 6,561; at the median answer-to-question distance on the held problems, 306 sites (quartiles 196
+  and 445), `D ≥ 1/16` only at 729 and above (5 of 16 turned modes: 2 of one head's 8, 3 of the other's), periods to 128 at
+  or below `2^(−21)`; with the 16 still modes, 21 of 32 hear it.
+- H4, the learner refuses a forming contact: refuted as a gate on the contact. The certificate admits or halves the whole
+  step; crib14 deposited 74 to 243 of 248 sections a lap (about 85 %), about 2.2 halvings a section, 18 to 100 held steps
+  refused a lap. No contact is refused apart from its step.
+- N2 (not listed), the contact's covector is zero at the founding: `R`, `O` and `W_c` are founded at zero, so
+  `δx^K = Rᵀ δz = 0` and `δy = Oᵀ δx = 0`; the probe and the key learn only after `R`, then `O`, have moved.
+- H5, the question pays only where nothing nearer does: confirmed by the code. A masked region draws every site, the
+  question's included, unresolved at the density `τ ∈ (0, 1]`; a front region opens the prefix at `τ` and five sites past
+  the front; the near answer bytes take 73 to 77 % of the context rows against the question's 21 to 25 %.
+- H6, the current survives to the face: confirmed at the founding, where `O` and `W_c` are zero, so the current reaches
+  neither `x` nor the face and tick 2 reads tick 1 exactly (measured). Past the founding it enters the residual stream
+  `x ← x + O y` with nothing that cancels it between ticks; its strength is a learned-state read.
+- N3 (not listed): where `x = 0` the chart's adjoint is zero, so the unresolved rows learn only at open sites with a
+  definite neighbour.
+
+[decision; November 2, the coordinator's decisions, host and card alike, each with parity]
+- N1 adopted: **a source with no key leaves every receiver's support**, its near field's included (a site that is
+  unresolved and carries no face; the release's carried sites keep theirs; [`ClassLists::support`], the card's
+  `support_at` and its column return). A receiver whose support holds no keyed source gathers nothing
+  ([`SeriesRow::release`], the card's contact division). Why: the module's definition, and the opening rows' 99.99 %.
+- H2 adopted: **the listener's gain bounds the random maximum**, `g² · 2n · 2 ln N ≤ span²` with `N` the reach, read through
+  `ln N ≤ ⌈log₂ N⌉ ln 2` and `ln 2`'s face rounded up ([`FieldDeclaration::listen_shift`]): `g = ½` at 2,221, `¼` at 484.
+  Why: its stated intent, and the founding's lock on 5.7 random sources of 220.
+- H1, the coordinator's law choice: **every receiver's probe reads its helical moment** at the turned modes, the moment its
+  value already carries (§15.1), and the probe's covector returns through the moments with the value's. One rule for
+  every site by its state. Why: the source enters as phase-carried moments (the retention law), so a receiver asks with
+  what has reached its place; without it an open site asks nothing and every interior open site reads one flat average of
+  the question (224 effective sources). Within `K = 2`: at tick 1 the turned heads probe by place and received content, so
+  `x` differs per site; at tick 2 the still heads probe the question by content. No key changes: a site is met only once its
+  class or a carried face exists.
+- N2: the identity founding stays (the residual law); a run reads the far pairs' share of the probe and key covector after
+  the first deposits, at sections 1, 2, 4, 8 and 16 and then each lap.
+- H3 and H5: no change. The turned heads are place heads (§12); the question's effect against the foil stays the declared
+  read.
+
+[measurement, November 2] After the three changes, the same founding read on the card (`_receipts/law20/founding_reads_after.txt`):
+the opening rows put 999,389 to 999,579 millionths on the far question and nothing on silent neighbours (against 77 to
+83,810 before), spread over 224 to 225 effective sources on every head, since an open site's moment is zero until its
+moment encodings, founded at zero, move; on the context rows the still heads' far mass spreads over 68 to 70 effective
+sources (5.6 to 5.8 before) and the turned heads' over 191 to 206, the question holding 13 to 21 % of each row; ticks 0
+and 1 still read alike (`O = 0`). The gate clean; the field's tests 55 of 55 (the flat-weights fixture carries a face at
+every site, so each is a source; the listener's founding row is read on keyed near fields at its own gain, `β = 2` at
+484, and printed beside the class receiver's, where the loudest far source now outweighs the near field); the run
+example's field tests 18 of 18; the sampled card parity (3 sections, 8 withheld problems, one release) equal in 142 s.

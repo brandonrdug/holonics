@@ -463,7 +463,7 @@ pub struct CardField<'c> {
     profile: Option<std::cell::RefCell<FieldProfile>>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
-    /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current]` summed.
+    /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current, question_far, far_effective, far_rows]` summed.
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
@@ -1112,6 +1112,9 @@ impl<'c> CardField<'c> {
             card.zero_octets(&tick.bits, 0, 16).map_err(device)?;
             // Every receiver's probe (§16.19), before the classes: a receiver's probed classes are its probe's.
             self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr.device_ptr(), m2, 0, false)?;
+            // Its probe reads its moment, as its value does (§16.20).
+            let mut prp = pr.device_ptr();
+            self.launch("field_moment_add_probe", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut prp)])?;
             self.launch_shared("field_classes", (heads * regions.len()).clamp(1, 1 << 20) as u32, 32, buckets, &mut [arg(words)])?;
             self.launch("field_frame", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words)])?;
             let mut qs = tick.qscale.device_ptr();
@@ -1159,13 +1162,13 @@ impl<'c> CardField<'c> {
         if let Some(questions) = self.held_questions.borrow().as_ref() {
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
             let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
-            let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 5)).map_err(device)?;
+            let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 8)).map_err(device)?;
             for (k, tick) in ticks.iter().enumerate() {
                 set(words, tick);
                 let (mut sp, mut tk, mut ap) = (starts_c.device_ptr(), k as u32, acc.device_ptr());
                 self.launch("field_held_rows", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut tk), arg(&mut ap)])?;
             }
-            let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*acc, 0, d.ticks * heads * 5)).map_err(device)?;
+            let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*acc, 0, d.ticks * heads * 8)).map_err(device)?;
             let mut total = self.held_cells.borrow_mut();
             if total.is_empty() {
                 total.resize(cells.len(), 0);
@@ -1482,12 +1485,16 @@ impl<'c> CardField<'c> {
             if paced > 0 {
                 // The frames' return to the clocks (§16): the unframed word and value of the tick, its probe read again.
                 self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr_back.device_ptr(), m2, 0, false)?;
+                let mut prb = pr_back.device_ptr();
+                self.launch("field_moment_add_probe", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut prb)])?;
                 let (mut dqp, mut dvp, mut dpp, mut qkvp, mut prp) = (dq.device_ptr(), dv.device_ptr(), dp.device_ptr(), tick.qkv.device_ptr(), pr_back.device_ptr());
                 self.launch("field_pace_frame_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dqp), arg(&mut dvp), arg(&mut dpp), arg(&mut qkvp), arg(&mut prp)])?;
             }
-            // The values' covector, summed over the ticks, for the moments (§15.1).
-            let (mut dvp, mut dmp) = (dv.device_ptr(), dm.device_ptr());
-            self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut dvp), arg(&mut dmp)])?;
+            // The values' and the probes' covectors, summed over the ticks, for the moments (§15.1, §16.20).
+            for chart in [&dv, &dp] {
+                let (mut cp, mut dmp) = (chart.device_ptr(), dm.device_ptr());
+                self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+            }
             card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
             for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv), (words.probe, words.probe_bias, &dp)] {
                 self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
@@ -1740,8 +1747,11 @@ impl FieldRealization for CardField<'_> {
         read?;
         let cells = std::mem::take(&mut *self.held_cells.borrow_mut());
         let (heads, ticks) = (field.declaration.heads, field.declaration.ticks);
-        let cells = if cells.is_empty() { vec![0i128; ticks * heads * 5] } else { cells };
-        Ok(cells.chunks_exact(5).map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4] }).collect())
+        let cells = if cells.is_empty() { vec![0i128; ticks * heads * 8] } else { cells };
+        Ok(cells
+            .chunks_exact(8)
+            .map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4], question_far: c[5] as u128, far_effective: c[6] as u128, far_rows: c[7] as u64 })
+            .collect())
     }
 
 }

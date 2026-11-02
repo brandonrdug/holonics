@@ -505,42 +505,56 @@ fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization:
 }
 
 /// [measurement; agent-inferred, November 2] **The held answer sites' rows by where their mass lies**
-/// ([`FieldRealization::read_row_shares`]), read on the held read's context regions (each problem's
-/// [`CONTEXT`] parts, base 1 of [`held_regions`], the answer starting at the question's end): for each head and
-/// tick, over the unresolved answer sites, the millionths of a row's mass on the question group (definite
-/// sites before the answer), on the soft near field (the near sources that are not definite) and on the rest,
-/// and the current's part from the question group per row (on the value's grain). A reading only: nothing in
-/// the run reads it.
+/// ([`FieldRealization::read_row_shares`]), on two sets of the held problems' regions: `opening`, the release's first
+/// read (base 0 of [`held_regions`]: the question definite and every answer site open), and `context`, the held
+/// read's (base 1: one answer site in [`CONTEXT`] open, its neighbours resolved). For each head and tick, over the
+/// unresolved answer sites, the millionths of a row's mass on the question past the near field (`question_far`),
+/// on the question within it (`question_near`), on the soft near field and on the rest; the current's part from the
+/// question per row (on the value's grain); and the far question's mean effective count of sources over the rows
+/// that hear it, `(Σ p)² / Σ p²` (§16.19's far-contact review). Region-level groups only. A reading only: nothing
+/// in the run reads it.
 fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization, lap: i64) -> Result<()> {
-    let started = std::time::Instant::now();
     let regions = held_regions(codec, problems);
     let n = problems.len();
-    let views: Vec<Region> = regions.iter().skip(n).take(n * CONTEXT).map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[] }).collect();
-    let questions: Vec<usize> = problems.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
     let d = field.declaration;
-    let mut total = vec![HeldRows::default(); d.ticks * d.heads];
-    for (chunk, asks) in views.chunks(64).zip(questions.chunks(64)) {
-        for (acc, one) in total.iter_mut().zip(realization.read_row_shares(field, chunk, asks).map_err(|e| e.to_string())?) {
-            acc.rows += one.rows;
-            acc.question += one.question;
-            acc.soft_near += one.soft_near;
-            acc.other += one.other;
-            acc.question_current += one.question_current;
+    let sets: [(&str, usize, usize, usize); 2] = [("opening", 0, n, 1), ("context", n, n * CONTEXT, CONTEXT)];
+    for (set, skip, take, parts) in sets {
+        let started = std::time::Instant::now();
+        let views: Vec<Region> = regions.iter().skip(skip).take(take).map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[] }).collect();
+        let questions: Vec<usize> = problems.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), parts)).collect();
+        let mut total = vec![HeldRows::default(); d.ticks * d.heads];
+        for (chunk, asks) in views.chunks(64).zip(questions.chunks(64)) {
+            for (acc, one) in total.iter_mut().zip(realization.read_row_shares(field, chunk, asks).map_err(|e| e.to_string())?) {
+                acc.rows += one.rows;
+                acc.question += one.question;
+                acc.soft_near += one.soft_near;
+                acc.other += one.other;
+                acc.question_current += one.question_current;
+                acc.question_far += one.question_far;
+                acc.far_effective += one.far_effective;
+                acc.far_rows += one.far_rows;
+            }
         }
-    }
-    let share = |v: u128, rows: u64| (v * 1_000_000 >> 63) / rows.max(1) as u128;
-    println!("FIELD_ROWS_HELD_READ lap={lap} regions={} ms={}", views.len(), started.elapsed().as_millis());
-    for tick in 0..d.ticks {
-        for head in 0..d.heads {
-            let r = total[tick * d.heads + head];
-            println!(
-                "FIELD_ROWS_HELD lap={lap} head={head} tick={tick} rows={} question_share={} soft_near_share={} other_share={} question_current={}",
-                r.rows,
-                share(r.question, r.rows),
-                share(r.soft_near, r.rows),
-                share(r.other, r.rows),
-                r.question_current / r.rows.max(1) as i128
-            );
+        let share = |v: u128, rows: u64| (v * 1_000_000 >> 63) / rows.max(1) as u128;
+        println!("FIELD_ROWS_HELD_READ lap={lap} set={set} regions={} ms={}", views.len(), started.elapsed().as_millis());
+        for tick in 0..d.ticks {
+            for head in 0..d.heads {
+                let r = total[tick * d.heads + head];
+                // The mean effective count on 2^(−8), to hundredths.
+                let effective = (r.far_effective * 100 / 256) / r.far_rows.max(1) as u128;
+                println!(
+                    "FIELD_ROWS_HELD lap={lap} set={set} head={head} tick={tick} rows={} question_far_share={} question_near_share={} soft_near_share={} other_share={} question_current={} far_rows={} far_effective_sources={}.{:02}",
+                    r.rows,
+                    share(r.question_far, r.rows),
+                    share(r.question - r.question_far, r.rows),
+                    share(r.soft_near, r.rows),
+                    share(r.other, r.rows),
+                    r.question_current / r.rows.max(1) as i128,
+                    r.far_rows,
+                    effective / 100,
+                    effective % 100
+                );
+            }
         }
     }
     Ok(())
