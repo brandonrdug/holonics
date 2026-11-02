@@ -564,23 +564,6 @@ fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realiz
     Ok(())
 }
 
-/// [measurement; agent-inferred, November 2] **The closure against the face** (§19): a section's covector with
-/// the closure's comparison and without it ([`FieldRealization::read_and_return_open`]) on the same material, the
-/// closure's part their difference; `dot = ⟨face, closure⟩`, `face_norm = ⟨face, face⟩`, `closure_norm =
-/// ⟨closure, closure⟩`, exact integer sums. One extra return of the lap's first section, read only.
-fn covectors_text(field: &Field, views: &[Region], realization: &mut dyn FieldRealization, lap: u64) -> Result<()> {
-    use num_bigint::BigInt;
-    let started = std::time::Instant::now();
-    let (_, full) = realization.read_and_return(field, views).map_err(|e| e.to_string())?;
-    let (_, face) = realization.read_and_return_open(field, views).map_err(|e| e.to_string())?;
-    let closure: Vec<i128> = full.iter().zip(&face).map(|(a, b)| a - b).collect();
-    let dot = |a: &[i128], b: &[i128]| a.iter().zip(b).fold(BigInt::from(0), |s, (&x, &y)| s + BigInt::from(x) * BigInt::from(y));
-    let (nf, nc, no) = (face.iter().filter(|&&x| x != 0).count(), closure.iter().filter(|&&x| x != 0).count(), face.iter().zip(&closure).filter(|(a, b)| **a != 0 && **b != 0).count());
-    println!("FIELD_COVECTORS_COUNTS lap={lap} entries={} face_nonzero={nf} closure_nonzero={nc} overlap={no}", face.len());
-    println!("FIELD_COVECTORS lap={lap} dot={} face_norm={} closure_norm={} ms={}", dot(&face, &closure), dot(&face, &face), dot(&closure, &closure), started.elapsed().as_millis());
-    Ok(())
-}
-
 /// [agent-inferred, November 1] **An answer read with its neighbours**: one problem's region (its
 /// question, answer and `length − |q| − |a|` voids) read in [`CONTEXT`] parts, the answer's sites
 /// and its first void at `t ≡ r (mod CONTEXT)` (counted from the answer's first site) unresolved in
@@ -840,43 +823,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut previous = (code, sites);
     let mut grown = false;
     let mut fallen = false;
-    // [agent-inferred, November 2] The clock located by loop closure (`FIELD_CLOCK=located`, §16.15–§16.16): the pace is a
-    // key; lap 0 runs on the founding clock (`κ ≡ 1`), and at every later boundary the clock is located from every
-    // training region seen so far (the withheld and held problems never feed it, D1), published by projecting the
-    // current clock onto the fibre (the free directions keep their rates), and set on every paced head; the deposit
-    // never moves it.
-    let located = std::env::var("FIELD_CLOCK").is_ok_and(|v| v == "located");
-    learner.located = located;
-    let (witness, fronts) = if located { (Some(published_witness(&codec, learner.field.declaration, &keys, &train_set)?), operand_fronts(&codec, &dev_set)) } else { (None, Vec::new()) };
     for lap in 0..laps {
-        if located && lap > 0 {
-            let clock_start = std::time::Instant::now();
-            let withheld: std::collections::BTreeSet<usize> = unseen.iter().copied().collect();
-            let seen: Vec<(Vec<usize>, usize)> = train_set.iter().enumerate().filter(|(k, _)| !withheld.contains(k)).map(|(_, (q, a, _))| (q.iter().chain(a).copied().collect(), q.len())).collect();
-            let a_ = learner.field.declaration.alphabet;
-            let (pace, paced) = (learner.field.layout().pace, learner.field.declaration.paced_heads());
-            let unit = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(1i64 << 24));
-            let current: Vec<holonics::ratio::Rat> = (0..a_).map(|c| holonics::ratio::Rat::from_integer(num_bigint::BigInt::from((1i64 << 24) + learner.field.theta[pace + c] as i64)) / unit.clone()).collect();
-            let clock = holonics::hnn::tower::field::locate::locate_class_clock(&seen, a_, holonics::hnn::tower::field::NEAR - 1, &current).map_err(|e| e.to_string())?;
-            let shown = |pick: &dyn Fn(&holonics::ratio::Rat) -> bool| -> String {
-                clock.published.as_ref().map_or(String::new(), |k| (0..a_).filter(|&c| pick(&k[c])).map(|c| String::from_utf8_lossy(&codec.decode(&[c])).escape_debug().to_string()).collect::<Vec<_>>().join(""))
-            };
-            let one = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(1));
-            let zero = holonics::ratio::Rat::from_integer(num_bigint::BigInt::from(0));
-            println!(
-                "FIELD_CLOCK lap={lap} regions={} forced={} satisfied={} cutting={} empty={} silent={} dimension={} skin_pinned={} both_live={} published={} at_one={:?} at_zero={:?} other={:?} ms={}",
-                seen.len(), clock.forcing, clock.satisfied, clock.cutting, clock.empty, clock.silent, clock.dimension, clock.skin_pinned.len(), clock.both_live, clock.published.is_some(),
-                shown(&|k| *k == one), shown(&|k| *k == zero), shown(&|k| *k != one && *k != zero), clock_start.elapsed().as_millis()
-            );
-            if let Some(kappa) = &clock.published {
-                for h in 0..paced {
-                    for c in 0..a_ {
-                        let rate = ((kappa[c].clone() - one.clone()) * unit.clone()).round().to_integer();
-                        learner.field.theta[pace + h * (a_ + 1) + c] = i32::try_from(rate).map_err(|_| "a published rate outside 32 bits")?;
-                    }
-                }
-            }
-        }
         // A lap starts only where the time left holds its bound: no lap is begun that its own
         // projection says could pass the run's deadline.
         let bound = if grown { grown_lap_ms } else { lap_ms };
@@ -895,9 +842,6 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
-            if n == 0 {
-                covectors_text(&learner.field, &views, realization, lap as u64)?;
-            }
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
@@ -966,11 +910,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             println!("FIELD_STOPPED_EARLY lap={lap} reason=no clock moved toward a digit clock and the question tells the answer no more than the foil ms={}", started.elapsed().as_millis());
             break;
         }
-        if std::env::var_os("FIELD_PEAKS_EACH_LAP").is_some() || located {
+        if std::env::var_os("FIELD_PEAKS_EACH_LAP").is_some() {
             peaks_text(&learner.field, &codec, &dev_set, realization, &lap.to_string())?;
-        }
-        if let Some(w) = &witness {
-            boundary_text(&learner.field, w, &fronts, realization, lap)?;
         }
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
@@ -994,113 +935,6 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         }
         previous = (code, unseen_sites);
     }
-    Ok(())
-}
-
-/// [agent-inferred, November 2] **The witness under the published clock** (§16.16): its readers moved by the clock's
-/// own distances read on the training problems (the anchor's distance from the question's first digit stands past
-/// the digit clock's by the sites between that the published clock ticks and the digit clock does not, and the open
-/// receiver's row, unreached at 1; the comb by the receiver's own rate, one tick, in the host's sense, −1).
-fn published_witness(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8], train_set: &Problems) -> Result<Field> {
-    let mut shifts: std::collections::BTreeMap<i128, usize> = std::collections::BTreeMap::new();
-    for (q, a, _) in train_set {
-        let (qb, ab) = (codec.decode(q), codec.decode(a));
-        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
-        let Some(first) = (0..qb.len()).find(|&t| qb[t].is_ascii_digit()) else { continue };
-        let ticks = |c: usize| -> (i128, i128) {
-            let b = codec.decode(&[c]);
-            (i128::from(codec.is_digit(c)), i128::from(!(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0]))))
-        };
-        let shift: i128 = q[first + 1..].iter().chain(&a[..open + 2]).map(|&c| { let (d, p) = ticks(c); p - d }).sum::<i128>() + 1;
-        *shifts.entry(shift).or_insert(0) += 1;
-    }
-    let anchor = *shifts.iter().max_by_key(|e| *e.1).map(|e| e.0).unwrap_or(&0);
-    println!("FIELD_WITNESS_CLOCK published anchor_shift_ticks={shifts:?} chosen={anchor} comb_ticks=-1");
-    witness_on_readers(codec, declaration, keys, Some(PUBLISHED_PINNED), (anchor, -1))
-}
-
-/// The held problems' first-calculation operand fronts, each cut at the digit (the digit the region's last site,
-/// open), as `witness-field` reads them.
-fn operand_fronts(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>)> {
-    let mut reads = Vec::new();
-    for (q, a, _) in problems {
-        let (qb, ab) = (codec.decode(q), codec.decode(a));
-        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
-        let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
-        let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
-        let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
-        if runs < 2 || la == 0 || lb == 0 {
-            continue;
-        }
-        for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
-            let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
-            let mut unresolved = vec![false; classes.len()];
-            *unresolved.last_mut().unwrap() = true;
-            reads.push((classes, unresolved));
-        }
-    }
-    reads
-}
-
-/// [agent-inferred, November 2; the run's declared receipts, §16.16] **A lap boundary's receipts**: each head's and
-/// kind's `log₂ T`; on the held operand fronts, (iv) the descent on each `log₂ T` and (ii) the readers' descent's cosine
-/// with the way to the witness's readers (heads 3 and 0, where the learner's shape is the witness's); and the witness's
-/// faces and code on those fronts at the learner's temperatures.
-fn boundary_text(field: &Field, witness: &Field, fronts: &[(Vec<usize>, Vec<bool>)], realization: &mut dyn FieldRealization, lap: usize) -> Result<()> {
-    let started = std::time::Instant::now();
-    let d = field.declaration;
-    let l = field.layout().clone();
-    let logs: Vec<String> = (0..d.heads).map(|h| format!("{h}:{}/{}", (field.theta[l.temper + 2 * h] as i64 * 1000) >> 24, (field.theta[l.temper + 2 * h + 1] as i64 * 1000) >> 24)).collect();
-    let views: Vec<Region> = fronts.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
-    let mut g = vec![0i128; field.theta.len()];
-    let (mut code, mut right) = (0i64, 0usize);
-    for chunk in views.chunks(64) {
-        let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
-        for (region, faces) in chunk.iter().zip(&faces) {
-            let last = region.classes.len() - 1;
-            if let Some(face) = &faces[last] {
-                code += face.code(region.classes[last]);
-                right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
-            }
-        }
-        for (acc, v) in g.iter_mut().zip(part) {
-            *acc += v;
-        }
-    }
-    let sites = views.len().max(1) as i128;
-    let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
-    let descent_t: Vec<String> = (0..d.heads).map(|h| format!("{h}:{}/{}", -g[l.temper + 2 * h], -g[l.temper + 2 * h + 1])).collect();
-    let same = witness.theta.len() == field.theta.len() && witness.declaration == d;
-    let (mut readers, mut witness_faces) = (String::from("not_read(grown)"), String::from("not_read(grown)"));
-    if same {
-        let (m, dw, n) = (d.complex(), d.width, d.modes);
-        let cosines: Vec<String> = [3usize, 0]
-            .iter()
-            .map(|&h| {
-                let rows: Vec<std::ops::Range<usize>> = (0..n).flat_map(|li| [h * n + li, m + h * n + li]).flat_map(|o| [l.q + o * dw..l.q + (o + 1) * dw, l.q_bias + o..l.q_bias + o + 1, l.probe + o * dw..l.probe + (o + 1) * dw, l.probe_bias + o..l.probe_bias + o + 1]).collect();
-                let descent: Vec<i128> = rows.iter().flat_map(|r| g[r.clone()].iter().map(|&v| -v)).collect();
-                let toward: Vec<i128> = rows.iter().flat_map(|r| r.clone().map(|i| witness.theta[i] as i128 - field.theta[i] as i128)).collect();
-                format!("{h}:{}", cosine(&descent, &toward))
-            })
-            .collect();
-        readers = cosines.join(",");
-        let mut learned = witness.clone();
-        learned.theta[l.temper..l.temper + 2 * d.heads].copy_from_slice(&field.theta[l.temper..l.temper + 2 * d.heads]);
-        let mut wcode = 0i64;
-        let mut wright = 0usize;
-        for chunk in views.chunks(64) {
-            let faces = realization.read_faces(&learned, chunk).map_err(|e| e.to_string())?;
-            for (region, faces) in chunk.iter().zip(&faces) {
-                let last = region.classes.len() - 1;
-                if let Some(face) = &faces[last] {
-                    wcode += face.code(region.classes[last]);
-                    wright += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
-                }
-            }
-        }
-        witness_faces = format!("{wright}/{} code_bits={}", views.len(), bits(wcode));
-    }
-    println!("FIELD_BOUNDARY lap={lap} log2_t_millis_class/listen={} held_operand_faces={right}/{} held_operand_code_bits={} descent_on_log_t={} readers_cosine_to_witness={readers} witness_faces_at_learned_t={witness_faces} ms={}", logs.join(","), views.len(), bits(code), descent_t.join(","), started.elapsed().as_millis());
     Ok(())
 }
 
@@ -1276,10 +1110,28 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
     let mut rungs: std::collections::BTreeMap<u64, usize> = std::collections::BTreeMap::new();
     let mut landmark = LandmarkCount::default();
     let mut read_ok = vec![false; held.len()];
+    // [measurement; agent-inferred, November 2] §16.19's receipts: the locked answer sites, the digits written by byte,
+    // and at each held answer's first-calculation operand site the field's own top share at `β = 1` (the lock's reading).
+    let (mut locked_sites, mut digits_written, mut own_shares) = (0usize, [0usize; 10], Vec::<u32>::new());
     for (i, (((_, answer), released), request)) in held.iter().zip(&free).zip(&free_requests).enumerate() {
         let (h, text) = match released {
             Ok(r) => {
                 read_ok[i] = true;
+                locked_sites += r.sites.iter().filter(|s| s.is_some()).count();
+                for c in r.sites.iter().flatten() {
+                    if let Some(&b) = codec.decode(&[*c]).first().filter(|b| b.is_ascii_digit()) {
+                        digits_written[(b - b'0') as usize] += 1;
+                    }
+                }
+                if let Some(open) = answer.windows(2).position(|w| w == b"<<") {
+                    let la = answer[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
+                    let lb = answer.get(open + 3 + la..).map_or(0, |rest| rest.iter().take_while(|b| b.is_ascii_digit()).count());
+                    for o in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
+                        if let Some(Some(own)) = r.own.get(r.start + o) {
+                            own_shares.push(own.iter().map(|&(_, w)| w).max().unwrap_or(0));
+                        }
+                    }
+                }
                 open_sites += r.open;
                 free_circulation += r.free;
                 bound += r.bound;
@@ -1314,6 +1166,12 @@ pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -
         println!("FIELD_RELEASE_ONE problem={i} released={} held={} lambda={} friction={} total_ms={}", h.len(), t.len(), c.lambda, c.friction, started.elapsed().as_millis());
     }
     let lock_rungs: Vec<String> = rungs.iter().map(|(b, n)| format!("{b}:{n}")).collect();
+    own_shares.sort_unstable();
+    let q = |k: usize| own_shares.get((own_shares.len().saturating_sub(1)) * k / 4).map_or(0, |&w| (w as u64 * 1000) >> 16);
+    println!(
+        "FIELD_RELEASE_OWN locked_sites={locked_sites} open_sites={open_sites} digits_written_0..9={digits_written:?} operand_sites_read={} own_top_share_millis_quartiles={}/{}/{}/{}/{} above_half={}",
+        own_shares.len(), q(0), q(1), q(2), q(3), q(4), own_shares.iter().filter(|&&w| w > 1 << 15).count()
+    );
     println!(
         "FIELD_RELEASE_RECEIPTS problems={} locked_whole={locked_whole} open_sites={open_sites} free_circulation={free_circulation} bound_circulation={bound} {} lock_margin_bits_quartiles={} lock_rungs={} landmark_problems={} landmark_digits={} landmark_on_question_digit={} landmark_same_class={} landmark_ms={}",
         held.len(),
@@ -1931,141 +1789,6 @@ pub(super) fn align(args: &[String], realization: &mut dyn FieldRealization) -> 
     Ok(())
 }
 
-/// [agent-inferred, November 2] **The §16 witness on the crib's codec, completed with a readout** (a reading's
-/// fixture, never a learner's): tests.rs's hand-set clock and copy on the crib declaration, and the copy's current
-/// carrying the source digit's identity `e^(2πi d/10)` on head 3's coarsest mode (period 729, which turns little over
-/// the clock distances the copy reads), written to the face's dimensions 20 and 21 and read by the readout, so the
-/// code at an operand digit falls when the copy holds. Returns the field and the witness's parts: the clock's entries
-/// (the pace rows) and the readers' (the word and probe charts and their biases).
-fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) -> Result<Field> {
-    witness_on_readers(codec, declaration, keys, None, (0, 0))
-}
-
-/// The published clock's pinned bytes (§16.16's receipt: the letters the between-texts hold, the space, `+`).
-const PUBLISHED_PINNED: &[u8] = b"abcdefghijklmnoprstuvwxyz +";
-
-/// [`witness_on`] under a given clock and with its readers transported by `(anchor, comb)` ticks (tests.rs's
-/// `witness_field_readers`): `clock` `Some` sets head 3's rates on the class sheet to the published clock (0 at each
-/// class whose one byte the located menu pinned, 1 elsewhere, the unresolved row unreached at 1).
-fn witness_on_readers(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8], clock: Option<&[u8]>, (anchor_ticks, comb_ticks): (i128, i128)) -> Result<Field> {
-    let mut field = Field::found(declaration, keys).map_err(|e| e.to_string())?;
-    field.theta.iter_mut().for_each(|v| *v = 0);
-    let d = declaration;
-    let (dw, n, m) = (d.width, d.modes, d.complex());
-    let m2 = 2 * m;
-    let l = field.layout().clone();
-    let alphabet = codec.alphabet();
-    let face_one = 1i64 << 16;
-    let one = 1i64 << 24;
-    let lt = codec.encode(b"<").map_err(|e| e.to_string())?[0];
-    // A turn of `num/den` (the clock's grain, to the nearest point of `2^(−24)`).
-    let face = |field: &Field, num: i128, den: i128| field.turn_face(((num << 25) / den + (num << 25).signum()) / 2, 1);
-    let times = |g: i64, part: i64| ((g as i128 * part as i128 + (1 << 29)) >> 30) as i64;
-    let root = |k: u128| ((k << 48).isqrt()) as i64;
-    let set = |field: &mut Field, at: usize, v: i64| -> Result<()> {
-        field.theta[at] = i32::try_from(v).map_err(|_| "a witness entry outside 32 bits")?;
-        Ok(())
-    };
-    for c in 0..=alphabet {
-        let digit = c < alphabet && codec.is_digit(c);
-        set(&mut field, l.enc + c * dw + usize::from(digit), face_one)?;
-        if c == alphabet {
-            set(&mut field, l.enc + c * dw + 4, face_one)?;
-        }
-        if digit {
-            let value = codec.decode(&[c])[0] - b'0';
-            let (re, im) = face(&field, value as i128, 10);
-            set(&mut field, l.enc + c * dw + 7, re >> 14)?;
-            set(&mut field, l.enc + c * dw + 8, im >> 14)?;
-        }
-        set(&mut field, l.before + c * dw + if c == lt { 3 } else { 5 }, face_one)?;
-        set(&mut field, l.after + c * dw + 6, face_one)?;
-    }
-    // Head 3 (pace row 1) on the class sheet (§16.16): a digit class's rate 1, every other class's and the unresolved
-    // row's 0 (the hand-set witness; the codec names its digits here and nowhere in the field).
-    let rates = alphabet + 1;
-    for c in 0..=alphabet {
-        let zero = match clock {
-            None => c == alphabet || !codec.is_digit(c),
-            Some(pinned) => c < alphabet && { let b = codec.decode(&[c]); b.len() == 1 && pinned.contains(&b[0]) },
-        };
-        if zero {
-            set(&mut field, l.pace + rates + c, -one)?;
-        }
-    }
-    let turned = |field: &mut Field, chart: usize, c: usize, from: (usize, usize), g: i64, theta: (i64, i64)| -> Result<()> {
-        let (gc, gs) = (times(g, theta.0), times(g, theta.1));
-        set(field, chart + c * dw + from.0, gc)?;
-        set(field, chart + c * dw + from.1, -gs)?;
-        set(field, chart + (m + c) * dw + from.0, gs)?;
-        set(field, chart + (m + c) * dw + from.1, gc)
-    };
-    let psi = face(&field, -27 * 81 - 100 * anchor_ticks, 8100);
-    let anchor = 64 * one;
-    let (c16, c32, c81, c729, c0, c1) = (3 * n + 3, 3 * n + 4, 3 * n + 5, 3 * n + 7, 0usize, 1usize);
-    set(&mut field, l.q + c16 * dw + 1, root(3))?;
-    set(&mut field, l.q + c32 * dw + 1, root(12))?;
-    set(&mut field, l.q + c81 * dw + 1, one)?;
-    set(&mut field, l.q + c81 * dw + 3, times(anchor / 2, psi.0))?;
-    set(&mut field, l.q + c81 * dw, times(-anchor, psi.0))?;
-    set(&mut field, l.q + (m + c81) * dw + 3, times(anchor / 2, psi.1))?;
-    set(&mut field, l.q + (m + c81) * dw, times(-anchor, psi.1))?;
-    set(&mut field, l.probe + c81 * dw + 3, times(anchor, psi.0))?;
-    set(&mut field, l.probe + (m + c81) * dw + 3, times(anchor, psi.1))?;
-    let (f2, fm2) = (face(&field, 32 + 25 * comb_ticks, 400), face(&field, -64 + 25 * comb_ticks, 800));
-    turned(&mut field, l.probe, c16, (12, 13), one, f2)?;
-    turned(&mut field, l.probe, c32, (16, 17), one, fm2)?;
-    set(&mut field, l.v + c16 * dw + 1, one)?;
-    set(&mut field, l.v + c32 * dw + 1, one)?;
-    set(&mut field, l.v + c729 * dw + 7, one)?;
-    set(&mut field, l.v + (m + c729) * dw + 8, one)?;
-    set(&mut field, l.out + 10 * m2 + c16, 64 * one)?;
-    set(&mut field, l.out + 11 * m2 + m + c16, 64 * one)?;
-    set(&mut field, l.out + 14 * m2 + c32, 32 * one)?;
-    set(&mut field, l.out + 15 * m2 + m + c32, 32 * one)?;
-    set(&mut field, l.out + 20 * m2 + c729, 16 * one)?;
-    set(&mut field, l.out + 21 * m2 + m + c729, 16 * one)?;
-    set(&mut field, l.q + c0 * dw + 1, one)?;
-    set(&mut field, l.q + (m + c0) * dw + 3, one)?;
-    set(&mut field, l.probe_bias + c0, face_one)?;
-    set(&mut field, l.probe_bias + m + c0, face_one)?;
-    for (c, from, to) in [(c0, (10usize, 11usize), (12usize, 13usize)), (c1, (14, 15), (16, 17))] {
-        set(&mut field, l.v + c * dw + from.0, one)?;
-        set(&mut field, l.v + (m + c) * dw + from.1, one)?;
-        set(&mut field, l.out + to.0 * m2 + c, one)?;
-        set(&mut field, l.out + to.1 * m2 + m + c, one)?;
-    }
-    // The copy's rest (tests.rs's completed witness): before the anchor's channel arrives a receiver's probe is its
-    // bias alone, on head 3's mode 6, where every non-digit's key stands at the anchor's strength, so the copy's
-    // first ticks rest on a site that carries no digit.
-    let c243 = 3 * n + 6;
-    set(&mut field, l.q + c243 * dw, anchor)?;
-    set(&mut field, l.probe_bias + c243, face_one >> 6)?;
-    // The readout: a digit class reads the identity's turn at its own value, a non-digit is held down.
-    for c in 0..alphabet {
-        if codec.is_digit(c) {
-            let value = codec.decode(&[c])[0] - b'0';
-            let (re, im) = face(&field, value as i128, 10);
-            set(&mut field, l.read + c * dw + 20, times(32 * one, re))?;
-            set(&mut field, l.read + c * dw + 21, times(32 * one, im))?;
-        } else {
-            set(&mut field, l.read_bias + c, -32 * face_one)?;
-        }
-    }
-    // The temperature (`FIELD_WITNESS_HOT`, 16 by default, the card's: at 32 a lock passes its 128-bit carrier, at
-    // tests.rs's 127 a row's exponents span past the card's twenty limbs; each refuses, never clipped).
-    // The temperatures are held as their logarithms (§16.12), so `FIELD_WITNESS_HOT` is a power of two.
-    let t = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(16);
-    if t <= 0 || t & (t - 1) != 0 {
-        return Err("FIELD_WITNESS_HOT is a power of two".into());
-    }
-    let hot = t.trailing_zeros() as i64 * one;
-    set(&mut field, l.temper + 2 * 3, hot)?;
-    set(&mut field, l.temper + 2 * 3 + 1, hot)?;
-    set(&mut field, l.temper + 1, hot)?;
-    Ok(field)
-}
-
 /// `⟨a, b⟩ / (|a| |b|)` in millionths over the entries `range` (exact integer sums, a reading's chart).
 fn cosine(a: &[i128], b: &[i128]) -> i128 {
     use num_bigint::BigInt;
@@ -2077,273 +1800,6 @@ fn cosine(a: &[i128], b: &[i128]) -> i128 {
         return 0;
     }
     i128::try_from((dot * BigInt::from(1_000_000)) / den).unwrap_or(0)
-}
-
-/// [measurement; agent-inferred, November 2] **Whether descent couples the clock and its readers** (`witness-field
-/// UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA K`, §16.10): the witness completed with a readout
-/// ([`witness_on`]) on the crib declaration at `K` ticks, read at every first-calculation operand digit of the held
-/// problems, each a front cut at the digit (the digit the region's last site, open), the faces' covector (no closure)
-/// off the declared realization: the witness's code there beside the founding's, then (i) the readers kept and the
-/// clock zeroed, (ii) the clock kept and the readers the founding's, (iii) the witness moved a small keyed step on
-/// both; each reported as the descent's cosine with the way to the witness, in millionths; and (iv) the descent on
-/// each head's `log₂ T` at the witness with its temperatures at 4, and at the founding.
-pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    use num_bigint::BigInt;
-    if args.len() != 10 {
-        return Err("witness-field UNITS UNITS_SHA TRAIN TRAIN_SHA DEV DEV_SHA KEYS KEYS_SHA K".into());
-    }
-    let started = std::time::Instant::now();
-    let units = units_of(&args[1], &args[2])?;
-    let train_text = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
-    let dev_text = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
-    let keys = pinned_read(&args[7], &args[8], READ_BUDGET as usize)?;
-    let ticks = positive(&args[9])?;
-    let train_problems = problems_of(&train_text);
-    let codec = FieldCodec::found(units, &train_problems)?;
-    let encode = |problems: &[(Vec<u8>, Vec<u8>)]| -> Result<Problems> {
-        problems.iter().map(|(q, a)| Ok((codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?, a.len()))).collect::<std::result::Result<Vec<_>, String>>().map_err(|e| e.into())
-    };
-    let train_set = encode(&train_problems)?;
-    let dev_set: Problems = encode(&problems_of(&dev_text))?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
-    let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
-    let declaration = FieldDeclaration { alphabet: codec.alphabet(), width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: clocks_of(5, 2) };
-    // [agent-inferred, November 2] Under the published clock (`FIELD_WITNESS_CLOCK=published`, §16.16) the readers move by
-    // the clock's own distances, read on the training problems: the anchor's distance from the question's first
-    // digit stands past the digit clock's by the sites between that the published clock ticks and the digit clock
-    // does not (and the open receiver's row, unreached at 1); the comb by the receiver's own rate, one tick, in the
-    // sense the host's training fronts read (−1).
-    let published = std::env::var("FIELD_WITNESS_CLOCK").is_ok_and(|v| v == "published");
-    let witness = if published { published_witness(&codec, declaration, &keys, &train_set)? } else { witness_on(&codec, declaration, &keys)? };
-    let founding = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
-    // The reads: each operand digit's front cut at the digit.
-    let mut reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
-    for (q, a, _) in &dev_set {
-        let (qb, ab) = (codec.decode(q), codec.decode(a));
-        let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
-        let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
-        let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
-        let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
-        if runs < 2 || la == 0 || lb == 0 {
-            continue;
-        }
-        for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
-            let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
-            let mut unresolved = vec![false; classes.len()];
-            *unresolved.last_mut().unwrap() = true;
-            reads.push((classes, unresolved));
-        }
-    }
-    let views: Vec<Region> = reads.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
-    // `(code, faces whose top class is the digit, covector)`.
-    let covector = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(i64, usize, Vec<i128>)> {
-        let mut g = vec![0i128; field.theta.len()];
-        let (mut code, mut right) = (0i64, 0usize);
-        for chunk in views.chunks(64) {
-            let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
-            for (region, faces) in chunk.iter().zip(&faces) {
-                let last = region.classes.len() - 1;
-                if let Some(face) = &faces[last] {
-                    code += face.code(region.classes[last]);
-                    right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
-                }
-            }
-            for (acc, v) in g.iter_mut().zip(part) {
-                *acc += v;
-            }
-        }
-        Ok((code, right, g))
-    };
-    let l = witness.layout().clone();
-    let (dw, m) = (declaration.width, declaration.complex());
-    let rates = declaration.alphabet + 1;
-    let pace3 = l.pace + rates..l.pace + 2 * rates;
-    let readers: Vec<std::ops::Range<usize>> = vec![l.q..l.q + 2 * m * dw, l.q_bias..l.q_bias + 2 * m, l.probe..l.probe + 2 * m * dw, l.probe_bias..l.probe_bias + 2 * m];
-    let gather = |v: &[i128], ranges: &[std::ops::Range<usize>]| -> Vec<i128> { ranges.iter().flat_map(|r| v[r.clone()].iter().copied()).collect() };
-    let theta = |f: &Field| -> Vec<i128> { f.theta.iter().map(|&x| x as i128).collect() };
-    let (code_w, right_w, _) = covector(&witness, realization)?;
-    let (code_f, right_f, _) = covector(&founding, realization)?;
-    let sites = views.len().max(1) as i128;
-    let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
-    println!("FIELD_WITNESS_READ operand_digits={} witness_faces_right={right_w} witness_code_bits={} founding_faces_right={right_f} founding_code_bits={} ms={}", views.len(), bits(code_w), bits(code_f), started.elapsed().as_millis());
-    // (i) the readers kept, the clock zeroed (not read under the published clock: the clock is located, §16.15).
-    if published {
-        println!("FIELD_WITNESS_CLOCK not_read under=published (the clock is located by loop closure, not descended)");
-    } else {
-    // (i) the readers kept, the clock zeroed.
-        let mut no_clock = witness.clone();
-        no_clock.theta[l.pace..].iter_mut().for_each(|v| *v = 0);
-        let (_, _, g1) = covector(&no_clock, realization)?;
-        let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
-        let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
-        // The rate's route: digits' and inside words' sums and counts, and the squares' sum (exact, unbounded).
-        let mut route: (i128, u64, i128, u64, BigInt) = (0, 0, 0, 0, BigInt::from(0));
-        for region in &views {
-            let bytes = codec.decode(region.classes);
-            for t in 0..region.classes.len() - 1 {
-                // A definite site's rate moves by its class's entry (the class sheet, §16.16).
-                let dk: i128 = descent1[region.classes[t]];
-                route.4 += BigInt::from(dk) * BigInt::from(dk);
-                let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
-                if codec.is_digit(region.classes[t]) {
-                    route.0 += dk;
-                    route.1 += 1;
-                } else if t > 0 && letter(t) && letter(t - 1) {
-                    route.2 += dk;
-                    route.3 += 1;
-                }
-            }
-        }
-        let rms = (&route.4 / BigInt::from((route.1 + route.3).max(1))).sqrt().max(BigInt::from(1));
-        let gap = (BigInt::from(route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * BigInt::from(1_000_000)) / rms;
-        println!("FIELD_WITNESS_CLOCK head=3 cosine_to_witness={} gap_digits_less_inside_words_of_rms={gap}", cosine(&descent1, &toward1));
-    }
-    // (ii) the clock kept, the readers the founding's.
-    let mut no_readers = witness.clone();
-    for r in &readers {
-        no_readers.theta[r.clone()].copy_from_slice(&founding.theta[r.clone()]);
-    }
-    let (_, _, g2) = covector(&no_readers, realization)?;
-    for h in [0usize, 3] {
-        let n = declaration.modes;
-        let rows: Vec<std::ops::Range<usize>> = (0..n).flat_map(|li| [h * n + li, m + h * n + li]).flat_map(|o| [l.q + o * dw..l.q + (o + 1) * dw, l.q_bias + o..l.q_bias + o + 1, l.probe + o * dw..l.probe + (o + 1) * dw, l.probe_bias + o..l.probe_bias + o + 1]).collect();
-        let descent: Vec<i128> = gather(&g2, &rows).into_iter().map(|v| -v).collect();
-        let toward: Vec<i128> = gather(&theta(&witness), &rows).iter().zip(gather(&theta(&founding), &rows)).map(|(&w, f)| w - f).collect();
-        println!("FIELD_WITNESS_READERS head={h} cosine_to_witness={}", cosine(&descent, &toward));
-    }
-    let lt = codec.encode(b"<").map_err(|e| e.to_string())?[0];
-    let digit: Vec<bool> = (0..codec.alphabet()).map(|c| codec.is_digit(c)).collect();
-    let mut census = [0u64; 6];
-    for region in &views {
-        let Some(t) = (0..region.classes.len().saturating_sub(2)).find(|&t| region.classes[t] == lt && region.classes[t + 1] == lt) else { continue };
-        if t + 2 >= region.classes.len() {
-            continue;
-        }
-        for (acc, v) in census.iter_mut().zip(no_readers.anchor_census(region, t + 2, 3, 5, &digit, &g2).map_err(|e| e.to_string())?) {
-            *acc += v;
-        }
-    }
-    println!("FIELD_WITNESS_ANCHOR head=3 opposing={} near_silent={} aligned={} silent_driven_to_oppose={} silent_driven_to_align={} digit_sources={}", census[0], census[1], census[2], census[3], census[4], census[5]);
-    // (iii) the witness moved a small keyed step on the clock and the readers.
-    let mut moved = witness.clone();
-    let mut step = vec![0i128; witness.theta.len()];
-    let entries: Vec<usize> = std::iter::once(pace3.clone()).chain(readers.iter().cloned()).flatten().collect();
-    let tail = keys.len().saturating_sub(4 * entries.len() + 8);
-    for (k, &at) in entries.iter().enumerate() {
-        let word = &keys[tail + 4 * k..tail + 4 * k + 4];
-        // A step of about one part in 2^10 of the material's unit (`2^14` on `2^(−24)`), signed by the key.
-        let delta = (i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 18) as i128;
-        moved.theta[at] = i32::try_from(moved.theta[at] as i128 + delta).map_err(|_| "a moved entry outside 32 bits")?;
-        step[at] = delta;
-    }
-    let (code_m, _, g3) = covector(&moved, realization)?;
-    let ranges: Vec<std::ops::Range<usize>> = std::iter::once(pace3).chain(readers.iter().cloned()).collect();
-    let back: Vec<i128> = gather(&step, &ranges).into_iter().map(|v| -v).collect();
-    let descent3: Vec<i128> = gather(&g3, &ranges).into_iter().map(|v| -v).collect();
-    println!("FIELD_WITNESS_BASIN moved_code_bits={} cosine_back={}", bits(code_m), cosine(&descent3, &back));
-    // (iv) the temperatures' covector in their own chart (`log₂ T`, §16.12), at the witness's charts and clock with
-    // its temperatures at 4 (`ℓ = 2`), and at the founding: whether descent raises each head's and kind's `ℓ`.
-    let mut cool = witness.clone();
-    for at in [l.temper + 2 * 3, l.temper + 2 * 3 + 1, l.temper + 1] {
-        cool.theta[at] = 2 << 24;
-    }
-    for (name, field) in [("witness_t4", &cool), ("founding", &founding)] {
-        let (code, right, g4) = covector(field, realization)?;
-        let descent: Vec<String> = (0..declaration.heads).map(|h| format!("{h}:{}/{}", -g4[l.temper + 2 * h], -g4[l.temper + 2 * h + 1])).collect();
-        println!("FIELD_WITNESS_TEMPER at={name} faces_right={right} code_bits={} descent_on_log_t_class/listen={}", bits(code), descent.join(","));
-    }
-    // [measurement; the coordinator's read, November 2] The directions the location leaves free (`FIELD_WITNESS_SEAM`, under
-    // the published clock): `N`, head 3's rates at every class the located menu did not pin (the digits, the unreached
-    // bytes, the unresolved row). Read on the training problems' operand fronts only: the covector restricted to `N`
-    // per class at the rebuilt readers and at the founding's, then a read-only step along `−P_N δc` at `2^(−10)` and
-    // `2^(−6)` of a unit (its largest entry), the code's change on the training fronts and the faces on the held ones.
-    if published && std::env::var_os("FIELD_WITNESS_SEAM").is_some() {
-        let mut train_reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
-        for (q, a, _) in &train_set {
-            if train_reads.len() >= 1024 {
-                break;
-            }
-            let (qb, ab) = (codec.decode(q), codec.decode(a));
-            let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
-            let la = ab[open + 2..].iter().take_while(|b| b.is_ascii_digit()).count();
-            let lb = ab.get(open + 3 + la..).map_or(0, |r| r.iter().take_while(|b| b.is_ascii_digit()).count());
-            let runs = (0..qb.len()).filter(|&t| qb[t].is_ascii_digit() && (t == 0 || !qb[t - 1].is_ascii_digit())).count();
-            if runs < 2 || la == 0 || lb == 0 {
-                continue;
-            }
-            for offset in (open + 2..open + 2 + la).chain(open + 3 + la..open + 3 + la + lb) {
-                let classes: Vec<usize> = q.iter().chain(&a[..=offset]).copied().collect();
-                let mut unresolved = vec![false; classes.len()];
-                *unresolved.last_mut().unwrap() = true;
-                train_reads.push((classes, unresolved));
-            }
-        }
-        let train_views: Vec<Region> = train_reads.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
-        let covector_on = |field: &Field, regions: &[Region], realization: &mut dyn FieldRealization| -> Result<(i64, usize, Vec<i128>)> {
-            let mut g = vec![0i128; field.theta.len()];
-            let (mut code, mut right) = (0i64, 0usize);
-            for chunk in regions.chunks(64) {
-                let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
-                for (region, faces) in chunk.iter().zip(&faces) {
-                    let last = region.classes.len() - 1;
-                    if let Some(face) = &faces[last] {
-                        code += face.code(region.classes[last]);
-                        right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
-                    }
-                }
-                for (acc, v) in g.iter_mut().zip(part) {
-                    *acc += v;
-                }
-            }
-            Ok((code, right, g))
-        };
-        let a_ = declaration.alphabet;
-        let row3 = l.pace + (a_ + 1);
-        let in_n = |c: usize| c == a_ || { let b = codec.decode(&[c]); !(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0])) };
-        let mut seen = vec![0usize; a_ + 1];
-        for (classes, unresolved) in &train_reads {
-            for (t, &c) in classes.iter().enumerate() {
-                seen[if unresolved[t] { a_ } else { c }] += 1;
-            }
-        }
-        let n: Vec<usize> = (0..=a_).filter(|&c| in_n(c) && seen[c] > 0).collect();
-        let name = |c: usize| if c == a_ { "open".to_string() } else { format!("{:?}", String::from_utf8_lossy(&codec.decode(&[c]))) };
-        let train_sites = train_views.len().max(1) as i128;
-        let tbits = |c: i64| { let x = c as i128 * 1000 / train_sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
-        let mut founding_readers = witness.clone();
-        for r in &readers {
-            founding_readers.theta[r.clone()].copy_from_slice(&founding.theta[r.clone()]);
-        }
-        let mut rebuilt_g = Vec::new();
-        for (label, field) in [("rebuilt_readers", &witness), ("founding_readers", &founding_readers)] {
-            let (code, right, g) = covector_on(field, &train_views, realization)?;
-            let shown: Vec<String> = n.iter().map(|&c| format!("{}:{}", name(c), -g[row3 + c])).collect();
-            println!("FIELD_WITNESS_SEAM at={label} training_fronts={} faces_right={right} code_bits={} descent_on_rate_by_class(sites)={}", train_views.len(), tbits(code), shown.iter().zip(&n).map(|(s, &c)| format!("{s}({})", seen[c])).collect::<Vec<_>>().join(" "));
-            if label == "rebuilt_readers" {
-                rebuilt_g = g;
-            }
-        }
-        let (code0, _, _) = covector_on(&witness, &train_views, realization)?;
-        let largest = n.iter().map(|&c| rebuilt_g[row3 + c].unsigned_abs()).max().unwrap_or(0).max(1) as i128;
-        for size in [10u32, 6] {
-            let mut moved = witness.clone();
-            for &c in &n {
-                let delta = div_nearest_i(-rebuilt_g[row3 + c] << (24 - size), largest);
-                moved.theta[row3 + c] = i32::try_from(moved.theta[row3 + c] as i128 + delta).map_err(|_| "a stepped rate outside 32 bits")?;
-            }
-            let (code_t, _, _) = covector_on(&moved, &train_views, realization)?;
-            let (_, held_right, _) = covector_on(&moved, &views, realization)?;
-            let rates: Vec<String> = n.iter().map(|&c| format!("{}:{}", name(c), (moved.theta[row3 + c] as i128 * 1000) >> 24)).collect();
-            println!("FIELD_WITNESS_SEAM step=2^-{size} training_code_change_bits={} held_faces_right={held_right}/{} rates_millis={}", tbits(code_t - code0), views.len(), rates.join(" "));
-        }
-    }
-    println!("FIELD_WITNESS_DONE ms={}", started.elapsed().as_millis());
-    Ok(())
-}
-
-/// `num / den` to the nearest integer (an exact reading's rounding).
-fn div_nearest_i(num: i128, den: i128) -> i128 {
-    let (q, r) = (num.div_euclid(den), num.rem_euclid(den));
-    if 2 * r >= den { q + 1 } else { q }
 }
 
 /// `log₂ x` in thousandths of a bit, `x ≥ 1`: the whole bits by the leading zeros and sixteen fraction bits by

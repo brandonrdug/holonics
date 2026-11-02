@@ -2576,16 +2576,15 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // [definition; agent-inferred, November 1] **The contact's return over one head's rows**, one warp a
 // receiving site `i` (`Field::returned`, §14.2, §14.10, §14.11, §15.2). Over its support,
 // `δp_k = ⟨δỹ_i, D ṽ_k⟩` (a crowd's the same against its decayed mean value), the row's mean `μ =
-// release(Σ p δp, 63)`, `δz = release(ln2 release(p (δp − μ), 63), 30)` and the closure's comparison (the
-// holders are the known same-class pairs of an unresolved receiver at a closing tick, over the ring set's
-// heads), `δs = gained(δz, β)` held at the region block's dense address `[i][j]` for the columns. The
+// release(Σ p δp, 63)`, `δz = release(ln2 release(p (δp − μ), 63), 30)` (the closure retired, §16.19),
+// `δs = gained(δz, β)` held at the region block's dense address `[i][j]` for the columns. The
 // word's row return (the probe role of the lock) `release(Σ δs D ŵ_j + Σ_C div_nearest(δs_C D W_C,
 // |C|), 32)` is written to the framed chart slot; a crowd's share of the values and of the word (the key
 // role: `δs_C (D ŵ_i |C| 2^g − D² W_C) / |C|²`) spreads over its members by the difference arrays `cv`,
 // `cw`. A lane is a pair for the row's sums and the staged `δs`, and an entry of the span for the row's
 // return.
 #define REV_ROWS 4
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, uint32_t closes, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
     __shared__ uint32_t stj[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
@@ -2626,12 +2625,6 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
-        // The closure (§19), over the support's pairs: on a still head at a closing tick, an unresolved
-        // site's row is also compared with where its class stands among the sites it meets (`closes` is the
-        // ring set's head count, zero where the head does not close). A carried site holds nothing.
-        const bool open = closes != 0 && w.unresolved[g] != 0;
-        const uint32_t cls = w.classes[g];
-        const auto holds = [&](uint32_t j) { return w.unresolved[first + j] == 0 && w.mix_off[first + j] == w.mix_off[first + j + 1] && w.classes[first + j] == cls; };
         // The pair's covector `⟨δỹ_i, D ṽ_j⟩` on `2^(−40)`.
         const auto pair_dp = [&](uint32_t j, uint32_t gap) -> wide {
             const int64_t *vj = values + (uint64_t)j * S;
@@ -2690,8 +2683,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             }
         }
         __syncwarp();
-        // Pass A: the weighted sum of the pairs' and crowds' covectors, and the holders' share.
-        wide weighted = 0, held = 0;
+        // Pass A: the weighted sum of the pairs' and crowds' covectors.
+        wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j == UINT32_MAX) {
@@ -2702,7 +2695,6 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             const wide dpj = eight ? pair_dp8(j, gap) : pair_dp(j, gap);
             dpr[j] = dpj;
             weighted += p * dpj;
-            held += (open && holds(j)) ? p : 0;
         }
         if (cnts[warp][lane] != 0) {
             const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
@@ -2715,21 +2707,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
         }
         const wide mean = rel(warp_sum(weighted), SHARE_BITS);
-        const wide holders = warp_sum(held);
-        const uint64_t copies = closes != 0 ? closes : 1;
-        // `div_nearest(p 2^40, copies 2^63)` is two nested floors: `⌊(⌊(x + k/2)/2^63⌋)/copies⌋`.
-        const bool hbig = holders > 0 && (uwide)holders * (uwide)copies > (uwide)UINT64_MAX;
-        const Divisor hb = divisor_of(holders > 0 && !hbig ? (uint64_t)((uwide)holders * (uwide)copies) : 1);
-        // The comparison of a term `p` (its covector `dpk`): the face's, and the closure's.
-        const auto compare = [&](wide p, wide dpk, bool holder) -> wide {
-            wide dz = rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
-            if (holders > 0) {
-                const wide at = p << CONTACT_BITS;
-                const wide a = (wide)(((uint64_t)((at + ((wide)copies << 62)) >> 63)) / copies);
-                dz += a - (holder ? (hbig ? div_nearest(at, holders * (wide)copies) : div_nearest_by(at, hb)) : 0);
-            }
-            return dz;
-        };
+        // The comparison of a term `p` (its covector `dpk`): the face's.
+        const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS); };
         // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the word is
         // read with the lanes over the span's entries (the probe role: `δs D ŵ_j`).
         wide sum = 0;
@@ -2741,7 +2720,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
-                const wide dzj = compare((wide)e[j], dpr[j], holds(j));
+                const wide dzj = compare((wide)e[j], dpr[j]);
                 tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
                 const wide dz = rel(temper * dzj, MATERIAL_BITS);
                 if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
@@ -2766,7 +2745,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // The crowds' δs, then their share of the row's return and of the values' and the word's member
         // returns through the difference arrays.
         if (cnts[warp][lane] != 0) {
-            const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane], false);
+            const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane]);
             const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
             const int64_t cs = crowd_base(w, h, words + (uint64_t)i * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > i);
             tacc += rel(dzc * (wide)cs, FACE_BITS);
@@ -3005,8 +2984,8 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
 // `Field::held_peaks`): one warp a head and an unresolved site, over a kept tick's shares at the dense address: the
 // question group's mass (a definite site before the region's answer start `qstart[r]`), its collision sum
 // `Σ release(p², 63)`, its largest share and that source's place (the smallest place at a tie; `~0` where the row
-// meets no question source), and its mass on sources whose class is a digit (`digit[c]`) and on those whose class
-// is the site's own. Six words a row at `out[(h · T + g) · 6]`.
+// meets no question source), and its mass on sources whose class is a digit (`digit[c]`). Five words a row at
+// `out[(h · T + g) · 5]`.
 extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart, const uint8_t *digit, wide *out) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t rows = (uint64_t)w.H * w.T;
@@ -3019,9 +2998,9 @@ extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
-        const uint32_t question = qstart[r] < sites ? qstart[r] : sites, own = w.classes[g];
+        const uint32_t question = qstart[r] < sites ? qstart[r] : sites;
         const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
-        wide q = 0, coll = 0, dig = 0, right = 0;
+        wide q = 0, coll = 0, dig = 0;
         uint64_t top = 0;
         uint32_t at = 0xffffffffu;
         for (uint32_t j = lane; j < question; j += 32) {
@@ -3035,9 +3014,6 @@ extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart
             if (digit[c]) {
                 dig += (wide)p;
             }
-            if (c == own) {
-                right += (wide)p;
-            }
             if (p > top || (p == top && j < at)) {
                 top = p;
                 at = j;
@@ -3046,7 +3022,6 @@ extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart
         q = warp_sum(q);
         coll = warp_sum(coll);
         dig = warp_sum(dig);
-        right = warp_sum(right);
         for (int o = 16; o > 0; o >>= 1) {
             const uint64_t pt = __shfl_xor_sync(0xffffffffu, top, o);
             const uint32_t pa = __shfl_xor_sync(0xffffffffu, at, o);
@@ -3056,13 +3031,12 @@ extern "C" __global__ void field_held_peaks(FieldWords w, const uint32_t *qstart
             }
         }
         if (lane == 0) {
-            wide *cell = out + hg * 6;
+            wide *cell = out + hg * 5;
             cell[0] = q;
             cell[1] = coll;
             cell[2] = (wide)top;
             cell[3] = (wide)at;
             cell[4] = dig;
-            cell[5] = right;
         }
     }
 }

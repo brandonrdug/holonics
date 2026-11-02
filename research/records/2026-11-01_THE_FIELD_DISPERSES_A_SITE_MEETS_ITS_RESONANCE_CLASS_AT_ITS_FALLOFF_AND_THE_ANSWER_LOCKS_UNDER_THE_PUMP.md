@@ -1818,3 +1818,39 @@ moved away from the sharpness §16.12 requires.
 Owed to #410: the clock is additive over the strand's concatenation, `τ(uv) = τ(u) + τ(v)` shifted, a homomorphism to
 the circle (`U = ζ^τ`, `U(a + b) = U(a) U(b)`), and the contact through it depends only on `τ(j) − τ(i)`
 (`Re(conj(U_i w_i) U_j w_j) = Re(conj(w_i) w_j ζ^(τ_j − τ_i))`).
+
+### 16.19 The crib line is retired; the release locks on the field's own face
+
+[decision; November 2] The whole crib line was a numeral matcher handed to the machine: the third recurrence of the
+copier (the antipattern record, item 4), laundered by the word "crib" as the store was by "key" on October 26. Retired
+by explicit deletion, host and card alike:
+- the clock's location from string alignments: `field::locate` (`definite_menu`, its loops, `locate_class_clock`),
+  `FieldLearner::located`, `FIELD_CLOCK=located` and the lap-boundary publication (§16.15, §16.16);
+- the closure's copy face (§19): `FieldDeclaration::closes` and `copies`, the holders' term `δz_ij += p_ij − [j holds]
+  p_ij/Σ_holds p` on the host and in `field_contact_rows`, the closure flag, `Field::read_and_return_with` and
+  `FieldRealization::read_and_return_open`, the run's `FIELD_COVECTORS` read and the parity's open return;
+- the copy-shaped tests and readers: the hand-set digit-clock witnesses (`witness_field*`, the completed witness, the
+  card's `witness-field` with its readers, published clock, seam read and boundary receipts), the clock-location tests,
+  the closure's tests and fixtures;
+- the held peaks' right-source read (`HeldPeak::right`, host and card);
+- the crib's first-calculation count as a run's acceptance (crib13's and crib14's declarations stand as history);
+- the half-built per-head card read (a local scratch branch, deleted unpushed).
+The per-class pace stays as a navigator of the field's own kind: `κ = 1 + c[class]`, opening at `κ ≡ 1`, deposited by
+the covector like every other parameter. The atlas rows of the retired owners are deleted (`tower.field-pace-location`,
+`tower.field-class-clock`, `tower.field-copy-sharpness`) or amended (`tower.field-completion-covector`,
+`tower.field-pace`, `tower.field-matching-lock`).
+
+[definition; November 2, the coordinator's decision] **The release locks on the field's own face.** A site locks
+where its top class holds a majority of the untempered face (`ℓ_t` at `β = 1`, `2 m_top > Σ m`) at the sweep's start and
+at its end; the extent's void test reads the same face; the pump tempers the carried mixture and moves the face, never
+the lock (`Field::release_with`). Why: the lock read the face at the site's own `β_t`, which doubles whenever the site's
+change falls, up to `PUMP_TOP`, so any lead however slight became a majority, a crown by annealing: crib14's release
+wrote 983 `1`s among its 1,007 digits. A site the field itself does not hold to one class stays open and is shown open.
+`Released::own` reports each reached site's `β = 1` face. The card's release runs the same `release_with` (only its
+reads are realized), so the lock is one law on both. STATE.26 is not re-released: it was trained with the copy face.
+
+[measurement, November 2] After the retirement: the gate clean; the field's tests 58 of 58 (the held-step fixture read
+over 24 sections, since with the face's covector alone its first 12 stand every step at its size); card parity on the
+remaining law, crib13's declaration at width 32, every read equal: at the founding 5 sections and the withheld section
+(the pace moving off `κ ≡ 1` from section 3 by its own covector), and with every rate drawn far 3 sections and the
+withheld section, both runs whole. Receipt: `_receipts/law16/parity_retired.txt`.

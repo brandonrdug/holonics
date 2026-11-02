@@ -109,9 +109,6 @@ impl FieldRealization for Recorder<'_> {
     fn met_pairs(&self) -> Option<u128> {
         self.inner.met_pairs()
     }
-    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>), TowerError> {
-        self.inner.read_and_return_open(field, regions)
-    }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.inner.read_row_shares(field, regions, questions)
     }
@@ -153,10 +150,6 @@ impl FieldRealization for Counted<'_> {
     }
     fn met_pairs(&self) -> Option<u128> {
         self.inner.met_pairs()
-    }
-    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>), TowerError> {
-        self.count(field, regions);
-        self.inner.read_and_return_open(field, regions)
     }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.count(field, regions);
@@ -247,25 +240,6 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             founded.field.theta[start + k] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
         }
         println!("FIELD_PARITY_PACE shift={shift} entries={len}");
-    }
-    // [agent-inferred, November 2] The published clock (§16.16's receipt, `FIELD_PARITY_CLOCK=1`): every paced head's rate
-    // 0 at the bytes the located menu pinned (the letters but `q`, the space, `+`) and 1 at every other class, each
-    // codec class read by its byte; a class of more than one byte, or of none, is unreached and keeps 1.
-    if std::env::var_os("FIELD_PARITY_CLOCK").is_some() {
-        const PINNED: &[u8] = b"abcdefghijklmnoprstuvwxyz +";
-        let (start, a) = (founded.field.layout().pace, founded.field.declaration.alphabet);
-        let paced = founded.field.declaration.paced_heads();
-        let mut zero = 0usize;
-        for c in 0..a {
-            let bytes = p.codec.decode(&[c]);
-            if bytes.len() == 1 && PINNED.contains(&bytes[0]) {
-                zero += 1;
-                for h in 0..paced {
-                    founded.field.theta[start + h * (a + 1) + c] = -(1i32 << 24);
-                }
-            }
-        }
-        println!("FIELD_PARITY_CLOCK classes_at_zero={zero} of {a} paced_heads={paced}");
     }
     let d = founded.field.declaration;
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len());
@@ -362,21 +336,12 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             let digit: Vec<bool> = (0..host_learner.field.declaration.alphabet).map(|c| p.codec.is_digit(c)).collect();
             some.is_empty() || host_learner.field.held_peaks_all(some, &questions, &digit).map_err(|e| e.to_string())? == card.read_row_peaks(&card_learner.field, some, &questions, &digit).map_err(|e| e.to_string())?
         };
-        // The same regions returned without the closure (the face's covector alone), host against card.
-        let open_equal = {
-            let some = &host_views[..host_views.len().min(6)];
-            end || some.is_empty() || {
-                let h = host_learner.field.read_and_return_with(some, false).map_err(|e| e.to_string())?;
-                let c = card.read_and_return_open(&card_learner.field, some).map_err(|e| e.to_string())?;
-                h == c
-            }
-        };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && peaks_equal && open_equal;
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && peaks_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} peaks_equal={peaks_equal} open_equal={open_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} peaks_equal={peaks_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,

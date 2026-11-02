@@ -464,8 +464,6 @@ pub struct CardField<'c> {
     times: FieldTimes,
     profile: Option<std::cell::RefCell<FieldProfile>>,
     pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
-    /// Whether a return carries the closure's comparison (§19); off only for [`FieldRealization::read_and_return_open`].
-    closure: std::cell::Cell<bool>,
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current]` summed.
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
@@ -488,7 +486,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), closure: std::cell::Cell::new(true), held_questions: Default::default(), held_cells: Default::default(), held_peaks: Default::default(), peak_rows: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), held_cells: Default::default(), held_peaks: Default::default(), peak_rows: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1192,10 +1190,10 @@ impl<'c> CardField<'c> {
             let mut cells = Vec::with_capacity(ticks.len());
             for tick in ticks.iter() {
                 set(words, tick);
-                let out = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * 6)).map_err(device)?;
+                let out = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(heads * sites * 5)).map_err(device)?;
                 let (mut sp, mut dp, mut op) = (starts_c.device_ptr(), digit_c.device_ptr(), out.device_ptr());
                 self.launch("field_held_peaks", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut dp), arg(&mut op)])?;
-                cells.push(self.timed(Kind::Copy, || self.card.fetch_range(&*out, 0, heads * sites * 6)).map_err(device)?);
+                cells.push(self.timed(Kind::Copy, || self.card.fetch_range(&*out, 0, heads * sites * 5)).map_err(device)?);
             }
             let mut rows = self.peak_rows.borrow_mut();
             for (r, region) in regions.iter().enumerate() {
@@ -1203,8 +1201,8 @@ impl<'c> CardField<'c> {
                 for (k, cell) in cells.iter().enumerate() {
                     for h in 0..heads {
                         for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
-                            let c = &cell[(h * sites + first + t) * 6..][..6];
-                            rows.push(HeldPeak { tick: k as u32, head: h as u32, site: t as u32, question: c[0] as u128, collision: c[1] as u128, top: c[2] as u64, top_site: c[3] as u32, digits: c[4] as u128, right: c[5] as u128 });
+                            let c = &cell[(h * sites + first + t) * 5..][..5];
+                            rows.push(HeldPeak { tick: k as u32, head: h as u32, site: t as u32, question: c[0] as u128, collision: c[1] as u128, top: c[2] as u64, top_site: c[3] as u32, digits: c[4] as u128 });
                         }
                     }
                 }
@@ -1494,8 +1492,8 @@ impl<'c> CardField<'c> {
                 // The crowds' difference arrays start empty a head (§14.10).
                 card.zero_octets(&cv, 0, 16 * rows * span).map_err(device)?;
                 card.zero_octets(&cw, 0, 16 * rows * span).map_err(device)?;
-                let (mut hh, mut closes, mut dyhp, mut dsp, mut dqp) = (h as u32, if self.closure.get() && field.declaration.closes(at, h) { field.declaration.copies() as u32 } else { 0 }, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
-                self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut closes), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+                let (mut hh, mut dyhp, mut dsp, mut dqp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr());
+                self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
                 if d.carries_moment(h) {
                     // The head's skins return to its variation (§16), from the pairs' and crowds' covectors just formed.
                     let (mut hh, mut dyhp, mut dsp) = (h as u32, dyh.device_ptr(), ds.device_ptr());
@@ -1762,14 +1760,6 @@ impl FieldRealization for CardField<'_> {
 
     fn met_pairs(&self) -> Option<u128> {
         Some(self.times.pairs)
-    }
-
-    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        self.closure.set(false);
-        let read = self.run(field, regions, true, false, None);
-        self.closure.set(true);
-        let (faces, _, g, _, _) = read?;
-        Ok((faces, g))
     }
 
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {

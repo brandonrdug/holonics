@@ -124,19 +124,9 @@
 //! held and read on the next section's regions, which it was not fit on, and halved again or
 //! refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
 //!
-//! [definition; agent-inferred, November 1] **The closure: a site's contact is compared with where
-//! the class it must receive stands** (§19). The face's covector reaches a pair's contact only
-//! through its weight (`δz_ij ∝ e_ij`), so a contact the founding did not weigh is never learned: a
-//! number told only by its order, sharing no word with the answer site, coded 6.6 bits after 300
-//! sections with the face alone. On a still ring set, at every tick, an unresolved site whose class
-//! resolved sites in its support hold also reads its row as a copy face, the code of its class on the
-//! sites that hold it, `−log₂ Σ_(j∈S_i holds) p_ij`, whose covector `δz_ij += p_ij − [j holds] e_ij/Σ_(k holds) e_ik`
-//! joins the face's on `2^(−40)` ([`FieldDeclaration::closes`]). It is zero on a row whose weight
-//! already lies on holders, so a class held at many sites is satisfied by any of them. Asking every
-//! holder alike pulled every masked byte toward every equal byte, and the crib failed under it.
-//! Every class is compared alike, no value is routed by it, and at a release no class is known, so
-//! it compares nothing there. Measured: the number told by order 6.6 → 0.40 bits at 24 sites; the
-//! crib probe 25 of 126 first calculations from the question, against 2 from another's.
+//! [retired, November 2, §16.19] The closure (§19), a copy face read at a still ring set on the class an unresolved site
+//! must receive among the sites that hold it, was a matcher handed to the machine and is retired: the reverse reads the
+//! face alone.
 //!
 //! **Release: the answer grows from what has settled** ([`Field::release`], the dispersing field's
 //! §14): a site is reached once a definite site stands in its near field, then carries a soft face,
@@ -332,23 +322,6 @@ impl FieldDeclaration {
     /// The classes a head reads, `3^b`.
     pub fn classes(&self) -> usize {
         3usize.pow(self.class_trits() as u32)
-    }
-
-    /// [definition; agent-inferred, November 1] **Where the closure compares** (§19): a head of a
-    /// still ring set (it reads words at any distance, so the site that holds a class is met
-    /// wherever it stands) at every tick. See [`Field`]'s reverse.
-    pub fn closes(&self, _tick: usize, head: usize) -> bool {
-        head % self.frames < self.still
-    }
-
-    /// [definition; agent-inferred, November 1] **The heads of a ring set**, `H / frames`: the
-    /// closure's code at a head is read over its set's heads, `copies` of them, so a set compares
-    /// once however many heads growth has copied into it. Why: growth by copies keeps every face
-    /// (each copy's contact is its source's), so without it a grown field's closure would count each
-    /// set's code `factor` times while the faces' code stays one, and growth alone would move the
-    /// comparison toward the closure (the sixth review, November 1).
-    pub fn copies(&self) -> usize {
-        self.heads / self.frames
     }
 
     /// The key draws the founding reads, four bytes a draw: the encoding and the strand contacts'
@@ -1077,8 +1050,8 @@ pub struct HeldRows {
 /// definite sites before the region's answer start): their mass `Σ p`, its collision sum `Σ release(p², 63)`
 /// (so `2 log₂ question − log₂ collision − 63` is the row's spread over the question in bits, its Rényi-2
 /// entropy), the largest share and its place (the smallest place at a tie; `u32::MAX` where the row meets no
-/// question source), and the mass on sources whose class is a digit and on those whose class is the site's own
-/// (its target in a held read). Shares on `2^(−63)`. A reading only: nothing in the law reads it.
+/// question source), and the mass on sources whose class is a digit. Shares on `2^(−63)`. A reading only: nothing
+/// in the law reads it. (Its mass on the site's own class, the right source, is retired with the copy face, §16.19.)
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct HeldPeak {
     pub tick: u32,
@@ -1089,7 +1062,6 @@ pub struct HeldPeak {
     pub top: u64,
     pub top_site: u32,
     pub digits: u128,
-    pub right: u128,
 }
 
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
@@ -1383,8 +1355,9 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **The turned heads' clocks over a region** ([`Paces`]), read on the
     /// class sheet (§16.16): a site's rate is its own class's, `κ = 1 + c_h[u_t]` on `2^(−24)` (the unresolved row's
-    /// at an open site, a carried face's mixture `release(Σ_a w_a c_h[a], 16)`), one located rate a codec cell, a
-    /// navigator's resident face beside `E(u)`. The neighbours' rows of the opening do not enter: a copy's turn is
+    /// at an open site, a carried face's mixture `release(Σ_a w_a c_h[a], 16)`), one rate a codec cell, a navigator's
+    /// resident face beside `E(u)`, opening at `κ ≡ 1` and deposited by the covector like every other parameter
+    /// (§16.19). The neighbours' rows of the opening do not enter: a copy's turn is
     /// the sum of its span's rates, and the loop law reads only the span's classes.
     fn paces(&self, region: &Region) -> Result<Paces> {
         let d = &self.declaration;
@@ -2202,8 +2175,8 @@ impl Field {
 
     /// [measurement; agent-inferred, November 2] **A held read's answer rows by their concentration on the
     /// question** ([`HeldPeak`]): for each tick, head and unresolved site in that order, the row's question mass,
-    /// collision sum, largest share and its place, and its mass on digit classes (`digit[c]`) and on the site's
-    /// own class. A reading only: nothing in the law reads it.
+    /// collision sum, largest share and its place, and its mass on digit classes (`digit[c]`). A reading only:
+    /// nothing in the law reads it.
     pub fn held_peaks(&self, region: &Region, question: usize, digit: &[bool]) -> Result<Vec<HeldPeak>> {
         let pass = self.pass(region, true)?;
         let sites = region.classes.len();
@@ -2211,8 +2184,7 @@ impl Field {
         for (tick, cell) in pass.ticks.iter().enumerate() {
             for h in 0..self.declaration.heads {
                 for i in (0..sites).filter(|&i| region.unresolved[i]) {
-                    let own = region.classes[i];
-                    let mut peak = HeldPeak { tick: tick as u32, head: h as u32, site: i as u32, question: 0, collision: 0, top: 0, top_site: u32::MAX, digits: 0, right: 0 };
+                    let mut peak = HeldPeak { tick: tick as u32, head: h as u32, site: i as u32, question: 0, collision: 0, top: 0, top_site: u32::MAX, digits: 0 };
                     for src in &cell.rows[h * sites + i] {
                         let j = src.j as usize;
                         if src.p == 0 || j >= question || !Self::definite(region, j) {
@@ -2224,9 +2196,6 @@ impl Field {
                         let c = region.classes[j];
                         if digit.get(c).copied().unwrap_or(false) {
                             peak.digits += p;
-                        }
-                        if c == own {
-                            peak.right += p;
                         }
                         if src.p > peak.top || (src.p == peak.top && src.j < peak.top_site) {
                             peak.top = src.p;
@@ -2332,12 +2301,11 @@ impl Field {
     /// on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's
     /// `Σ δz x` on `2^(−40)`).
     fn reverse(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned(region, pass, g, true)
+        self.returned(region, pass, g)
     }
 
-    /// The reverse, with the closure's comparison (§19) or the face's alone: the face's alone is
-    /// the code's own covector, which the reverse's law tests read against the code's difference.
-    fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128], closure: bool) -> Result<()> {
+    /// The reverse: the code's own covector, which the reverse's law tests read against the code's difference.
+    fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
         let m2 = 2 * m;
@@ -2377,7 +2345,7 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + a * dw], dw, &ys, &xs)?;
         }
-        for (tick, cell) in pass.ticks.iter().enumerate().rev() {
+        for cell in pass.ticks.iter().rev() {
             // The pair contact: x_out = x_mid + W_c c + b_c.
             let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
             for dxt in &dxs {
@@ -2522,19 +2490,13 @@ impl Field {
                     }
                 }
                 // `δz_k = ln 2 · p_k (δp_k − μ)`, `δp_k = ⟨δỹ_i, D ṽ_k⟩` on 2^(−40) (a crowd's value its decayed
-                // mean), `μ = Σ_k p_k δp_k`; the falloff is the medium's constant and returns nothing. The
-                // closure (§19), over the support's sources: on a still head at a closing tick, an
-                // unresolved site's row is also compared with where its class stands among the sites it
-                // meets: `δz_k += p_k − [k holds it] p_k/Σ_(holds) p`, over its ring set's `copies` heads.
-                // Then `δs = 2^(−β) δz`.
-                let closing = closure && d.closes(tick, h);
-                let copies = d.copies() as i128;
+                // mean), `μ = Σ_k p_k δp_k`; the falloff is the medium's constant and returns nothing. Then
+                // `δs = 2^(−β) δz`.
                 let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
                 for i in 0..sites {
                     let (row, crowd) = (&rows[i], &crowds[i]);
                     let dyi = &dyh[i * span..(i + 1) * span];
-                    let holds = |j: usize| j != i && !region.unresolved[j] && Self::carried(region, j).is_none() && region.classes[j] == region.classes[i];
                     let kind = usize::from(cell.classes[h].listens(i));
                     let temper = self.temper(h, kind == 1)?;
                     let dp: Vec<i128> = row
@@ -2552,18 +2514,11 @@ impl Field {
                         })
                         .collect();
                     let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e as i128 * dpj).sum::<i128>(), SHARE_BITS);
-                    let held: i128 = if closing && region.unresolved[i] { row.iter().filter(|src| holds(src.j as usize)).map(|src| src.p as i128).sum() } else { 0 };
-                    let compare = |p: i128, dpk: i128, holder: bool| -> i128 {
-                        let mut dz = release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS);
-                        if held > 0 {
-                            dz += div_nearest(p << CONTACT_BITS, copies << SHARE_BITS) - if holder { div_nearest(p << CONTACT_BITS, held * copies) } else { 0 };
-                        }
-                        dz
-                    };
+                    let compare = |p: i128, dpk: i128| -> i128 { release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS) };
                     let mut out = Vec::with_capacity(row.len());
                     let mut dt = 0i128;
                     for (src, &dpj) in row.iter().zip(&dp) {
-                        let dz = compare(src.p as i128, dpj, holds(src.j as usize));
+                        let dz = compare(src.p as i128, dpj);
                         dt += release(dz * src.s as i128, FACE_BITS);
                         let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
@@ -2573,7 +2528,7 @@ impl Field {
                     }
                     let mut outc = Vec::with_capacity(crowd.len());
                     for (c, &dpj) in crowd.iter().zip(&dpc) {
-                        let dz = compare(c.e as i128, dpj, false);
+                        let dz = compare(c.e as i128, dpj);
                         dt += release(dz * c.s as i128, FACE_BITS);
                         let dsij = release(temper * dz, MATERIAL_BITS);
                         if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
@@ -2819,12 +2774,6 @@ impl Field {
 
     /// Each region's faces and the covector over the regions, summed in any order to the same bits.
     pub fn read_and_return(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        self.read_and_return_with(regions, true)
-    }
-
-    /// [`Field::read_and_return`] with the closure's comparison (§19) or without it: the face's covector alone
-    /// (`closure = false`).
-    pub fn read_and_return_with(&self, regions: &[Region], closure: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let len = self.layout.len;
         let (mut faces, g) = regions
             .par_iter()
@@ -2833,7 +2782,7 @@ impl Field {
                 || (Vec::new(), vec![0i128; len]),
                 |(mut faces, mut g), (n, region)| -> Result<_> {
                     let pass = self.pass(region, true)?;
-                    self.returned(region, &pass, &mut g, closure)?;
+                    self.returned(region, &pass, &mut g)?;
                     faces.push((n, pass.faces));
                     Ok((faces, g))
                 },
@@ -2888,9 +2837,13 @@ impl Field {
     /// and doubles after a sweep whose own change `Σ_a |Δp_t(a)|` (read at its own `β_t` on both sides,
     /// on the shares' `2^(−16)`) fell below its change the sweep before at the same rung; a site whose
     /// change did not fall holds its `β_t` and rides its momentum (frustration). `β_t` stops doubling at
-    /// [`PUMP_TOP`]. **Lock**: a site is locked where its top class held a majority at its own `β_t`
-    /// (`2 m_top > Σ m`) at the sweep's start and at its end, and unlocks where that fails. **The
-    /// extent** is read once, at the first reached site (the earliest place) that locks on the void:
+    /// [`PUMP_TOP`]. **Lock** (§16.19): a site is locked where its top class holds a majority of the field's own
+    /// face, the untempered `ℓ_t` at `β = 1` (`2 m_top > Σ m`), at the sweep's start and at its end, and unlocks
+    /// where that fails; the pump tempers the carried mixture and moves the face, never the lock. Why: read at the
+    /// site's own `β_t`, which doubles whenever its change falls, any lead however slight became a majority (a crown
+    /// by annealing): crib14 wrote 983 `1`s among its 1,007 digits. A site the field itself does not hold to one
+    /// class stays open and is shown open. **The extent** is read once, at the first reached site (the earliest
+    /// place) that locks on the void (its `β = 1` face's top):
     /// the sites after it leave the region, that site is the resolved void, and inside the extent the
     /// void is no class ([`Field::content_face`]); if the front reaches the bound with no void locked,
     /// the extent is the bound, and the receipt says so. **The end**: when every reached site is locked
@@ -2970,6 +2923,7 @@ impl Field {
                         site.swept = (site.beta, done);
                     }
                     let before = self.site_face(&site.logits, site.beta, content_void);
+                    let own_before = self.site_face(&site.logits, 1, content_void);
                     for c in 0..a {
                         let m = release(site.momentum[c] as i128, MOMENTUM_HALVING) + zt[c] as i128 - site.logits[c] as i128;
                         site.momentum[c] = fit64(m)?;
@@ -2980,7 +2934,9 @@ impl Field {
                     let change = moved(&shares(&before), &shares(&after), a);
                     progress.change += change;
                     let (top_before, top_after) = (top(&before), top(&after));
-                    let holds = resolved(&before) == Some(top_before) && resolved(&after) == Some(top_after) && top_before == top_after;
+                    // The lock reads the field's own face, `β = 1` (§16.19): a majority there at the sweep's start and end.
+                    let own_after = self.site_face(&site.logits, 1, content_void);
+                    let holds = resolved(&own_before).is_some_and(|c| resolved(&own_after) == Some(c));
                     site.locked = if holds { site.locked.or(Some(site.beta)) } else { None };
                     site.lock_sweep = if holds { site.lock_sweep.or(Some(done)) } else { None };
                     // The sweep's trit: `+1` it holds its lock, `−1` its top was overturned (free
@@ -3008,7 +2964,7 @@ impl Field {
                 }
                 // The extent: the earliest reached site locked on the void, read once.
                 if p.extent.is_none() {
-                    let at = (0..p.content - p.start).find(|&s| p.sites[s].locked.is_some() && top(&self.tempered(&p.sites[s].logits, p.sites[s].beta)) == void);
+                    let at = (0..p.content - p.start).find(|&s| p.sites[s].locked.is_some() && top(&self.tempered(&p.sites[s].logits, 1)) == void);
                     if let Some(s) = at {
                         p.extent = Some((s, done, false));
                         p.content = p.start + s;
@@ -3166,6 +3122,8 @@ pub struct Released {
     pub extent: Option<(usize, usize, bool)>,
     pub classes: Vec<usize>,
     pub faces: Vec<Option<Shares>>,
+    /// Each reached site's own face at `β = 1` (§16.19), the lock's reading: how sure the field itself is.
+    pub own: Vec<Option<Shares>>,
     pub start: usize,
 }
 
@@ -3301,6 +3259,17 @@ impl Joint {
                     }
                 }
                 faces
+            },
+            own: {
+                let content_void = skip_void.then_some(void);
+                let mut own = vec![None; self.classes.len()];
+                for (t, face) in own.iter_mut().enumerate().take(self.content).skip(self.start) {
+                    let s = &self.sites[t - self.start];
+                    if s.reached.is_some() {
+                        *face = Some(shares(&field.site_face(&s.logits, 1, content_void)));
+                    }
+                }
+                own
             },
             classes: self.classes,
             start: self.start,
@@ -3512,11 +3481,6 @@ pub trait FieldRealization {
     fn met_pairs(&self) -> Option<u128> {
         None
     }
-    /// [`FieldRealization::read_and_return`] without the closure's comparison: the face's covector alone
-    /// ([`Field::read_and_return_with`]), a reading for the receipts.
-    fn read_and_return_open(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        refuse("a realization that cannot return without the closure")
-    }
     /// A held read's rows by where their mass lies, summed over `regions` ([`Field::held_rows_all`]; each region's
     /// answer start in `questions`), a reading for the receipts.
     fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
@@ -3546,9 +3510,6 @@ impl FieldRealization for HostField {
     }
     fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         field.landmarks(region, question, sites, count)
-    }
-    fn read_and_return_open(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        field.read_and_return_with(regions, false)
     }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         field.held_rows_all(regions, questions)
@@ -3719,10 +3680,6 @@ pub struct FieldLearner {
     /// keyed masks and order moving rather than replaying the first lap's).
     pub laps: u64,
     held: Option<HeldStep>,
-    /// [definition; agent-inferred, November 2] **The clock is a key** (§16.15, §16.16): where `located`, the pace
-    /// family is located by loop closure at lap boundaries ([`locate::locate_class_clock`]) and the deposit never
-    /// moves it (its step is zero); the readers and the temperatures descend. A run's declaration, not its state.
-    pub located: bool,
 }
 
 impl FieldLearner {
@@ -3731,7 +3688,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.theta.len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, located: false }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -3758,7 +3715,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, located: self.located })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -3850,12 +3807,9 @@ impl FieldLearner {
             }
         }
         let mut step = vec![0i128; g.len()];
-        let pace = self.field.layout.pace..self.field.layout.pace + self.field.declaration.paced_heads() * (self.field.declaration.alphabet + 1);
         for &(start, len, grain) in self.field.families() {
             for i in start..start + len {
-                if !(self.located && pace.contains(&i)) {
-                    step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
-                }
+                step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
             }
         }
         let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
@@ -3907,11 +3861,10 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, drawn, laps, held, located: false })
+        Ok(Self { field, first, second, rate_bits, drawn, laps, held })
     }
 }
 
-pub mod locate;
 pub mod moment;
 
 #[cfg(test)]
