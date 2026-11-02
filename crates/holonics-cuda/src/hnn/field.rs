@@ -200,6 +200,7 @@ struct Words {
     gtau: u64,
     gsig: u64,
     cds: u64,
+    dsshare: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -465,6 +466,8 @@ pub struct CardField<'c> {
     /// A held read's rows by where their mass lies (a reading for the receipts): the regions' answer starts
     /// while it is read, and the cells `[tick · heads + head][rows, question, soft_near, other, current, question_far, far_effective, far_rows]` summed.
     held_questions: std::cell::RefCell<Option<Vec<usize>>>,
+    /// [measurement, §16.20] While a covector's shares are read, `[h][near, far]` summed over the batches.
+    covector_shares: std::cell::RefCell<Option<Vec<i128>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
@@ -480,7 +483,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), held_cells: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), held_cells: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1194,7 +1197,22 @@ impl<'c> CardField<'c> {
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("face_launch");
         if let Some(g) = g {
+            // The covector's magnitude near and far, where read (§16.20).
+            let shares = match self.covector_shares.borrow().is_some() {
+                true => Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(2 * heads)).map_err(device)?),
+                false => None,
+            };
+            words.dsshare = shares.as_ref().map_or(0, |b| b.device_ptr());
             self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, sites, pairs)?;
+            if let Some(buffer) = shares {
+                let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*buffer, 0, 2 * heads)).map_err(device)?;
+                if let Some(total) = self.covector_shares.borrow_mut().as_mut() {
+                    for (t, c) in total.iter_mut().zip(cells) {
+                        *t += c;
+                    }
+                }
+            }
+            words.dsshare = 0;
         }
         self.mark("reverse_launch");
         self.status(&status)?;
@@ -1733,6 +1751,14 @@ impl FieldRealization for CardField<'_> {
 
     fn met_pairs(&self) -> Option<u128> {
         Some(self.times.pairs)
+    }
+
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        *self.covector_shares.borrow_mut() = Some(vec![0i128; 2 * field.declaration.heads]);
+        let read = self.run(field, regions, true, false, None);
+        let total = self.covector_shares.borrow_mut().take().unwrap_or_default();
+        read?;
+        Ok(total.chunks_exact(2).map(|c| [c[0] as u128, c[1] as u128]).collect())
     }
 
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {

@@ -2081,6 +2081,21 @@ impl Field {
         Ok(out)
     }
 
+    /// [measurement; agent-inferred, November 2] **The contact covector by where its pairs lie** (§16.20): over
+    /// `regions` read and returned, for each head `[near, far]`, `Σ |δs_ij|` over the near pairs (`|i − j| < NEAR`)
+    /// and over the far pairs and the crowds, on the contact covector's grain. The far share, `far / (near + far)`, is
+    /// the part of the probes' and keys' learning a far contact receives. A reading only.
+    pub fn covector_shares(&self, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        let heads = self.declaration.heads;
+        let mut out = vec![0u128; 2 * heads];
+        for region in regions {
+            let pass = self.pass(region, true)?;
+            let mut g = vec![0i128; self.theta.len()];
+            self.returned_with(region, &pass, &mut g, Some(&mut out))?;
+        }
+        Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
+    }
+
     /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
     pub fn held_rows_all(&self, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         if regions.len() != questions.len() {
@@ -2164,6 +2179,12 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
+        self.returned_with(region, pass, g, None)
+    }
+
+    /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
+    /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
         let m2 = 2 * m;
@@ -2394,6 +2415,12 @@ impl Field {
                     }
                     // Into the temperature's own chart (§16.12), the row's.
                     g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
+                    if let Some(sh) = shares.as_deref_mut() {
+                        for (src, &v) in row.iter().zip(&out) {
+                            sh[2 * h + usize::from(i.abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();
+                        }
+                        sh[2 * h + 1] += outc.iter().map(|v| v.unsigned_abs()).sum::<u128>();
+                    }
                     ds.push(out);
                     dsc.push(outc);
                 }
@@ -3319,6 +3346,10 @@ pub trait FieldRealization {
     fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
         refuse("a realization that cannot read its rows' shares")
     }
+    /// The contact covector by where its pairs lie over `regions` ([`Field::covector_shares`]), a reading.
+    fn read_covector_shares(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        refuse("a realization that cannot read its covector's shares")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3341,6 +3372,9 @@ impl FieldRealization for HostField {
     }
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         field.held_rows_all(regions, questions)
+    }
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+        field.covector_shares(regions)
     }
 }
 

@@ -1120,3 +1120,20 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
 }
 
 
+
+/// [measurement] **The contact covector by where its pairs lie** (§16.20): at the founding it is zero (the readout
+/// and the current's return stand at zero, so no covector reaches a contact); on the shaped field every family is
+/// drawn, so a head's near and far pairs carry covector, and the reading sums each pair's `|δs|` once.
+#[test]
+fn the_covector_s_far_share_is_zero_at_the_founding_and_read_where_the_returns_move() {
+    let founded = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let open: Vec<bool> = (0..14).map(|t| t % 3 == 1).collect();
+    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[] };
+    assert!(founded.covector_shares(&[r]).unwrap().iter().all(|&[near, far]| near == 0 && far == 0));
+    let shaped = shaped(1);
+    let shares = shaped.covector_shares(&[r]).unwrap();
+    assert_eq!(shares.len(), shaped.declaration.heads);
+    assert!(shares.iter().all(|&[near, _]| near > 0), "{shares:?}");
+    assert!(shares.iter().any(|&[_, far]| far > 0), "{shares:?}");
+}

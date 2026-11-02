@@ -2021,3 +2021,11 @@ and 1 still read alike (`O = 0`). The gate clean; the field's tests 55 of 55 (th
 every site, so each is a source; the listener's founding row is read on keyed near fields at its own gain, `β = 2` at
 484, and printed beside the class receiver's, where the loudest far source now outweighs the near field); the run
 example's field tests 18 of 18; the sampled card parity (3 sections, 8 withheld problems, one release) equal in 142 s.
+
+[definition; agent-inferred, November 2] **The far pairs' share of the contact covector** (N2's read,
+[`Field::covector_shares`], the card's `dsshare` in `field_contact_rows`): over a set of regions read and returned,
+for each head, `Σ |δs_ij|` over the near pairs (`|i − j| < NEAR`) and over the far pairs and the crowds, on the
+contact covector's grain; the far share `far / (near + far)` is the part of the probes' and keys' learning a far contact
+receives. A run reads it on a section's own regions before its step, at sections 1, 2, 4, 8 and 16 and at each lap's
+first (`FIELD_COVECTOR_SHARE`). It is zero at the founding (a test reads it so). The sampled card parity reads it host
+against card on each section's first regions (`shares_equal`): equal at every step in 182 s.
