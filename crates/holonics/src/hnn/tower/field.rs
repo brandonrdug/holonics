@@ -429,13 +429,13 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v7 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
+        format!("hnn-field-v8 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.clocks)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 11 || words[0] != "hnn-field-v7" {
-            return refuse("a field's head line that is not hnn-field-v7");
+        if words.len() != 11 || words[0] != "hnn-field-v8" {
+            return refuse("a field's head line that is not hnn-field-v8");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, clocks: n(words[10])? };
@@ -516,7 +516,8 @@ impl FieldLayout {
         let temper = push(2 * d.heads, MATERIAL_BITS);
         let probe = push(m2 * dw, MATERIAL_BITS);
         let probe_bias = push(m2, FACE_BITS);
-        let pace = push(d.paced_heads() * dw, MATERIAL_BITS);
+        // The paces (§16.16): one rate a class (and the unresolved row) a paced head, on the class sheet.
+        let pace = push(d.paced_heads() * (a + 1), MATERIAL_BITS);
         Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, len: at, families }
     }
 }
@@ -1380,23 +1381,25 @@ impl Field {
         turn_phasor(rho, *n, self.pi)
     }
 
-    /// [definition; agent-inferred, November 2] **The turned heads' clocks over a region** ([`Paces`]) from its
-    /// opening faces `x⁰` (`[t][D]` on `2^(−16)`): `κ = 1 + release(⟨c_h, x⁰_t⟩, 16)` on `2^(−24)`.
-    fn paces(&self, x0: &[i64]) -> Result<Paces> {
+    /// [definition; agent-inferred, November 2] **The turned heads' clocks over a region** ([`Paces`]), read on the
+    /// class sheet (§16.16): a site's rate is its own class's, `κ = 1 + c_h[u_t]` on `2^(−24)` (the unresolved row's
+    /// at an open site, a carried face's mixture `release(Σ_a w_a c_h[a], 16)`), one located rate a codec cell, a
+    /// navigator's resident face beside `E(u)`. The neighbours' rows of the opening do not enter: a copy's turn is
+    /// the sum of its span's rates, and the loop law reads only the span's classes.
+    fn paces(&self, region: &Region) -> Result<Paces> {
         let d = &self.declaration;
-        let dw = d.width;
-        let sites = x0.len() / dw;
+        let sites = region.classes.len();
+        let width = d.alphabet + 1;
         let one = 1i128 << PACE_BITS;
         let mut out = Paces { row: vec![None; d.heads], ..Default::default() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
             let p = out.kappa.len();
             out.row[h] = Some(p);
-            let c = &self.theta[self.layout.pace + p * dw..self.layout.pace + (p + 1) * dw];
+            let base = self.layout.pace + p * width;
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                let dot: i128 = c.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&w, &x)| w as i128 * x as i128).sum();
-                let k = one + release(dot, FACE_BITS);
+                let k = one + self.strand_row(region, base, 1, t)[0] as i128;
                 if t > 0 {
                     clock += k;
                     variation += k.abs();
@@ -1451,7 +1454,7 @@ impl Field {
     /// for the receipts (`None` where the field reads no pace).
     pub fn pace_range(&self, region: &Region) -> Result<Option<(i64, i64)>> {
         self.admit_region(region)?;
-        let paces = self.paces(&self.open(region))?;
+        let paces = self.paces(region)?;
         let all = paces.kappa.iter().flatten().copied();
         Ok(all.clone().min().zip(all.max()))
     }
@@ -1464,14 +1467,13 @@ impl Field {
     pub fn pace_route(&self, region: &Region, g: &[i128], digit: &[bool]) -> Result<Vec<(usize, u64, u64, i128, i128, i128)>> {
         self.admit_region(region)?;
         let d = &self.declaration;
-        let dw = d.width;
-        let x0 = self.open(region);
+        let width = d.alphabet + 1;
         let mut out = Vec::new();
         for (p, h) in (0..d.heads).filter(|&h| d.carries_moment(h)).enumerate() {
-            let row = &g[self.layout.pace + p * dw..self.layout.pace + (p + 1) * dw];
+            let row = &g[self.layout.pace + p * width..self.layout.pace + (p + 1) * width];
             let (mut nd, mut no, mut sd, mut so, mut sq) = (0u64, 0u64, 0i128, 0i128, 0i128);
             for t in (0..region.classes.len()).filter(|&t| !region.unresolved[t] && Self::carried(region, t).is_none()) {
-                let dk: i128 = -row.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&gc, &x)| release(gc * x as i128, 16)).sum::<i128>();
+                let dk: i128 = -row[region.classes[t]];
                 sq += dk * dk;
                 if digit.get(region.classes[t]).copied().unwrap_or(false) {
                     nd += 1;
@@ -1501,7 +1503,7 @@ impl Field {
         let m2 = 2 * m;
         let sites = region.classes.len();
         let x0 = self.open(region);
-        let paces = self.paces(&x0)?;
+        let paces = self.paces(region)?;
         let reads: Vec<Vec<i32>> = x0.chunks_exact(dw).map(|x| ratio_to_power(x).map(|r| r.0)).collect::<Result<_>>()?;
         let reaches = self.reaches();
         let word = |chart: usize, bias: usize, reach_c: u64, t: usize| -> Result<Vec<i64>> {
@@ -1566,7 +1568,7 @@ impl Field {
     /// [measurement] Each paced head's rates `κ` over a region on `2^(−24)` (§16), a reading for the receipts.
     pub fn pace_rates(&self, region: &Region) -> Result<Vec<(usize, Vec<i64>)>> {
         self.admit_region(region)?;
-        let paces = self.paces(&self.open(region))?;
+        let paces = self.paces(region)?;
         Ok((0..self.declaration.heads).filter_map(|h| paces.row[h].map(|p| (h, paces.kappa[p].clone()))).collect())
     }
 
@@ -2080,7 +2082,7 @@ impl Field {
         let dw = d.width;
         let reaches = self.reaches();
         let mut x = self.open(region);
-        let paces = self.paces(&x)?;
+        let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let clock = Self::clock(region);
@@ -2774,12 +2776,13 @@ impl Field {
         }
         self.moments_return(region, paces, &dm, g, &mut gtau, &mut gsig)?;
         // The clocks return to their paces (§16): `τ_t = Σ_(0<k≤t) κ_k`, `σ_t = Σ_(0<k≤t) |κ_k|`, so
-        // `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t`; `κ_k = 1 + ⟨c, x⁰_k⟩` gives `δc += Σ_k δκ_k x⁰_k` (on the
-        // material's covector grain, `2^(−24)` times `2^(−16)`) and `δx⁰_k += release(c δκ_k, 24)`.
+        // `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t`; on the class sheet (§16.16) `κ_k = 1 + c[u_k]` gives
+        // `δc[u] += Σ_(k: u_k = u) δκ_k`, a carried face's classes by their shares, on the material's covector grain
+        // (`2^(−24)` times the opening's `2^(−16)`, a whole class's share `2^16`). The opening takes nothing.
         if paced > 0 {
-            let x0 = self.open(region);
+            let width = d.alphabet + 1;
             for p in 0..paced {
-                let row = l.pace + p * dw;
+                let base = l.pace + p * width;
                 let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
                 for k in (1..sites).rev() {
                     tail_tau += gtau[p][k];
@@ -2788,9 +2791,13 @@ impl Field {
                     if dk == 0 {
                         continue;
                     }
-                    for i in 0..dw {
-                        g[row + i] += x0[k * dw + i] as i128 * dk;
-                        dx[k * dw + i] = fit64(dx[k * dw + i] as i128 + release(self.theta[row + i] as i128 * dk, PACE_BITS))?;
+                    match Self::carried(region, k) {
+                        None => g[base + self.row(region, k)] += dk << STATE_BITS,
+                        Some(face) => {
+                            for &(c, w) in face {
+                                g[base + c as usize] += dk * w as i128;
+                            }
+                        }
                     }
                 }
             }
@@ -3411,11 +3418,20 @@ impl Field {
         split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.w, layout.w, dw, fc, f, &face, f * fc, &contact, None, true)?;
         split(ol.read, layout.read, a, dw, 1, &kept, dw2, &face, None, false)?;
-        // The paces (§16, Law 1): each copy of a turned head reads its source's pace, its row parted over the
-        // face's copies (a face coordinate is copied whole into each of its `f`), so `⟨c', x⁰'⟩ = ⟨c, x⁰⟩` exactly.
+        // The paces (§16.16): each copy of a turned head reads its source's rates whole, a class's rate being no
+        // face coordinate, so every copy's clock is its source's exactly.
         let paced: Vec<usize> = (0..old.heads).filter(|&h| old.carries_moment(h)).collect();
         let pace_row = |b: usize, r: usize| d.moment_index(b * old.heads + paced[r]) / d.modes;
-        split(ol.pace, layout.pace, paced.len(), dw, f, &pace_row, dw2, &face, None, true)?;
+        let rates = old.alphabet + 1;
+        for b in 0..f {
+            for r in 0..paced.len() {
+                for u in 0..rates {
+                    let (from_at, to_at) = (ol.pace + r * rates + u, layout.pace + pace_row(b, r) * rates + u);
+                    new[to_at] = self.theta[from_at];
+                    from[to_at] = (from_at, false);
+                }
+            }
+        }
         // Vector families: each entry's copies.
         let mut repeat = |old_at: usize, new_at: usize, len: usize, copies: usize, index: &dyn Fn(usize, usize) -> usize, divided: bool| {
             for c in 0..copies {

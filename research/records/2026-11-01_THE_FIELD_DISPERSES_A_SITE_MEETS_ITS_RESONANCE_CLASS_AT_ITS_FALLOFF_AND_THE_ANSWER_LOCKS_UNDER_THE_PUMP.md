@@ -1605,6 +1605,36 @@ true copies; but a loop closes only between copies of one stationary transport, 
 the digits' rates to zero. The propagation's premise, that every region's candidates hold the key, fails on those 45:
 their one loop excludes it, and the propagation cannot see that (the remaining `S` is not empty).
 
+[definition; agent-inferred, November 2; the coordinator's decision] **Two definite runs pair into a loop only when one
+front band holds both answer targets**: their nearest edges in the answer stand fewer than the band's extent apart
+(§14.6's band `[f, f + 5)`, `NEAR − 1`). A front's read releases one band under one clock state, so the copies one band
+releases are read at one lag, one stationary transport; copies in different bands can stand at different lags (the
+second calculation's, `2 l_s` further) and are not looped. The field's own band: no new constant, no key, no class.
+
+[measurement, November 2] With the band: 188 regions with exactly one loop, and **the listener reads every one as the
+first calculation's two operand copies** (188 of 188; no false loop forces); the propagation opens `S` at dimension 22
+and stands: 188 satisfied, none cutting, none empty, 68 silent. Published (`κ ≡ 1` projected): **every digit byte at
+1**, the space and `+` at 0, the bytes no closing row reaches at 1 (`?`, `\n`, `<`, `>`, `=`, `#`, and `q`, which no
+syllable holds); the letters at fractions, a consonant at minus its syllable's vowel (`a` −2/3 with `b`, `h`, `n`,
+`v`, `z` at 2/3; `e`, `i`, `o` −3/5; `u` −1/2): the crib's words are consonant-vowel syllables, so the rows pin each
+syllable's sum, not its letters, and five vowel directions stay in the fibre.
+
+[definition; agent-inferred, November 2] **The pace on the class sheet is built on the host** (`Field::paces`): the
+layout's pace family is one rate a class and the unresolved row a paced head; `κ_t = 1 + c_h[u_t]` (a carried face's
+mixture by its shares); the return `δc[u] += Σ_(k: u_k = u) δκ_k`, the opening taking nothing; growth copies a turned
+head's rates whole; the text head is `hnn-field-v8`. The card still realizes the previous chart's pace (`x⁰`'s rows):
+its port and parity follow the coordinator's next go.
+
+[measurement, November 2] **The witness under the published clock fails** (the 252 fronts, the witness's readers, head
+3's rates the published `κ − 1` at the material's grain, the unresolved row unreached at 1): faces **35 of 252 at `T =
+16`** (the digit clock 213) and **32 of 252 at `T = 128`** (the digit clock 252); codes 15.9 and 18.7 bits. Of the 220
+fronts lost at 128, 219 hold ticking letters in their copy's span, one only the unreached bytes (`\n`, `<`, `?`). The
+cause is the skin: the copy's skin distance `|σ(receiver) − σ(source)|` is a median of 106 ticks (most 183) against the
+digit clock's 1 to 8. The menu's gauge keeps every loop's `τ` closed (a syllable's signed rates sum to zero), but the
+skin reads the variation `σ = Σ|κ|`, which a sign does not cancel, so the letters' ±3/5 add up over a question's words
+and decay the comb's modes to nothing. A direction that is a gauge of the copy menu is not a gauge of the field: the
+skin breaks it, and so does every reader's absolute turn (the unreached bytes at 1).
+
 ### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:

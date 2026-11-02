@@ -1687,7 +1687,14 @@ fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>)
         field.theta[l.after + c * dw + 6] = face_one;
     }
     if paced {
-        field.theta[l.pace + dw] = -(1i32 << MATERIAL_BITS);
+        // Head 3 (pace row 1) on the class sheet (§16.16): a digit's rate 1, every other class's and the unresolved
+        // row's 0 (set by hand in this witness; the located clock is read in its own test).
+        let rates = alphabet + 1;
+        for c in 0..=alphabet {
+            if !digit(c) {
+                field.theta[l.pace + rates + c] = -(1i32 << MATERIAL_BITS);
+            }
+        }
     }
     let set = |field: &mut Field, at: usize, v: i64| field.theta[at] = i32::try_from(v).unwrap();
     // A complex coefficient `g e^(iθ)` (`θ` a face) from input dimensions `(re, im)` into chart row pair `(c, m + c)`.
@@ -1922,7 +1929,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
             let pass = field.pass(&r, true).unwrap();
             assert!(pass.paces.plain.iter().all(|&p| !p), "the shaped clocks are no byte place");
             let g = covector_of(&field, &r);
-            let (start, len) = (field.layout.pace, field.layout.pace + d.paced_heads() * d.width);
+            let (start, len) = (field.layout.pace, field.layout.pace + d.paced_heads() * (d.alphabet + 1));
             let mut entries: Vec<usize> = (start..len).collect();
             entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
             for &i in entries.iter().take(3).filter(|&&i| g[i] != 0) {
@@ -1950,15 +1957,10 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
     assert!(read >= 16 && 8 * seams <= read, "read {read}, {seams} on a seam");
 }
 
-/// [agent-inferred, November 2] **The completed witness** (§16.6, §16.10): at every operand digit's front (the
-/// question and the answer cut at the digit, the digit open) the face's top class is the question's digit, 252 of 252,
-/// and its code there is below the founding's 5.46 bits; the same field at `κ ≡ 1` fails that assertion. Read at the
-/// witness's temperature (128) and, as measurements, at 16, 8 and 4 (crib13's learned temperatures reached 3.91):
-/// faces, code, the problems whose first calculation is whole, and the faces by the copy's clock distance. Run with
-/// `--ignored --nocapture`.
-#[test]
-#[ignore]
-fn the_completed_witness_reads_the_copied_digit() {
+/// The completed witness's problems (64 of the crib's law, the fixture's mixer): each problem's question and answer
+/// classes and its first calculation's operand digits `(answer offset, question source)`, and the reach they need.
+#[allow(clippy::type_complexity)]
+fn witness_fronts() -> (Vec<(Vec<usize>, Vec<usize>, Vec<(usize, usize)>)>, usize) {
     let mut next = mixer(0x0C1B);
     let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
     let mut problems = Vec::new();
@@ -1973,29 +1975,45 @@ fn the_completed_witness_reads_the_copied_digit() {
         reach = reach.max(q.len() + a.len() + 1);
         problems.push((q.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), a.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), ops));
     }
-    // Each read `(problem, rows on the source, face on the digit, code on 2^(−20) bits, the copy's clock distance
-    // |σ₃(receiver) − σ₃(source)| on 2^(−24))`.
-    let read = |field: &Field| -> Vec<(usize, bool, bool, i64, i64)> {
-        problems
-            .par_iter()
-            .enumerate()
-            .flat_map(|(p, (q, a, ops))| ops.par_iter().map(move |&(o, src)| (p, q, a, o, src)))
-            .map(|(p, q, a, o, src)| {
-                let classes: Vec<usize> = q.iter().chain(&a[..=o]).copied().collect();
-                let mut open = vec![false; classes.len()];
-                *open.last_mut().unwrap() = true;
-                let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
-                let pass = field.pass(&r, true).unwrap();
-                let at = classes.len() - 1;
-                let row = &pass.ticks.last().unwrap().rows[3 * classes.len() + at];
-                let top = row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).unwrap().j as usize;
-                let face = pass.faces[at].as_ref().unwrap();
-                let best = (0..face.masses.len()).max_by_key(|&c| face.masses[c]).unwrap();
-                let distance = pass.paces.row[3].map_or(0, |k| (pass.paces.sigma[k][at] - pass.paces.sigma[k][src]).abs());
-                (p, top == src, best == classes[at], face.code(classes[at]), distance)
-            })
-            .collect()
-    };
+    (problems, reach)
+}
+
+/// The completed witness's read at every front (the question and the answer cut at an operand digit, the digit open):
+/// each `(problem, rows on the source, face on the digit, code on 2^(−20) bits, the copy's clock distance
+/// |σ₃(receiver) − σ₃(source)| on 2^(−24))`.
+fn completed_read(field: &Field, problems: &[(Vec<usize>, Vec<usize>, Vec<(usize, usize)>)]) -> Vec<(usize, bool, bool, i64, i64)> {
+    problems
+        .par_iter()
+        .enumerate()
+        .flat_map(|(p, (q, a, ops))| ops.par_iter().map(move |&(o, src)| (p, q, a, o, src)))
+        .map(|(p, q, a, o, src)| {
+            let classes: Vec<usize> = q.iter().chain(&a[..=o]).copied().collect();
+            let mut open = vec![false; classes.len()];
+            *open.last_mut().unwrap() = true;
+            let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
+            let pass = field.pass(&r, true).unwrap();
+            let at = classes.len() - 1;
+            let row = &pass.ticks.last().unwrap().rows[3 * classes.len() + at];
+            let top = row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).unwrap().j as usize;
+            let face = pass.faces[at].as_ref().unwrap();
+            let best = (0..face.masses.len()).max_by_key(|&c| face.masses[c]).unwrap();
+            let distance = pass.paces.row[3].map_or(0, |k| (pass.paces.sigma[k][at] - pass.paces.sigma[k][src]).abs());
+            (p, top == src, best == classes[at], face.code(classes[at]), distance)
+        })
+        .collect()
+}
+
+/// [agent-inferred, November 2] **The completed witness** (§16.6, §16.10): at every operand digit's front (the
+/// question and the answer cut at the digit, the digit open) the face's top class is the question's digit, 252 of 252,
+/// and its code there is below the founding's 5.46 bits; the same field at `κ ≡ 1` fails that assertion. Read at the
+/// witness's temperature (128) and, as measurements, at 16, 8 and 4 (crib13's learned temperatures reached 3.91):
+/// faces, code, the problems whose first calculation is whole, and the faces by the copy's clock distance. Run with
+/// `--ignored --nocapture`.
+#[test]
+#[ignore]
+fn the_completed_witness_reads_the_copied_digit() {
+    let (problems, reach) = witness_fronts();
+    let read = |field: &Field| completed_read(field, &problems);
     const FOUNDING_MILLIBITS: i64 = 5460;
     let mut verdicts = Vec::new();
     for (hot, paced) in [(128i64, true), (128, false), (16, true), (8, true), (4, true)] {
@@ -2173,10 +2191,8 @@ fn the_clock_is_located_by_loop_closure_on_the_crib() {
     let unread = radical.iter().filter(|dir| reads.iter().zip(&regions).all(|(r, (classes, _))| (0..classes.len()).all(|t| (0..dw).map(|d| dir[d].clone() * Rat::from_integer(BigInt::from(r.prefix[t + 1][d] - r.prefix[t][d]))).sum::<Rat>() == zero[0]))).count();
     eprintln!("LOCATE published port={:?} unit={unit} radical={} unread_by_training={unread}", WITNESS_BYTES[port] as char, radical.len());
     assert_eq!(unit, Rat::from_integer(BigInt::from(1)), "the particular already reads one at the least port");
-    // The published pace on `2^(−24)` is the witness's own row.
-    let published: Vec<i32> = particular.iter().map(|v| i32::try_from((v.clone() * Rat::from_integer(BigInt::from(1i64 << MATERIAL_BITS))).to_integer()).unwrap()).collect();
-    let l = field.layout.clone();
-    assert_eq!(published, field.theta[l.pace + dw..l.pace + 2 * dw].to_vec(), "the located pace is the witness's clock, bit for bit");
+    // (The pace then read `x⁰`'s dimensions, and the published row was the witness's own, bit for bit; the pace is now
+    // read on the class sheet, §16.16.)
     // [measurement] The same menu read on the class sheet, `κ = 1 + c[class]`: a loop's row is its gaps' class counts.
     // Regions holding a loop that closes under the digit clock and whose row has no digit class (every digit cancels):
     // each such region's candidates hold the whole family of digit rates, so the intersection does too.
@@ -2330,7 +2346,7 @@ struct DefiniteMenu {
     rows: Vec<Vec<i64>>,
 }
 
-fn definite_menu(classes: &[usize], ql: usize) -> DefiniteMenu {
+fn definite_menu(classes: &[usize], ql: usize, band: Option<usize>) -> DefiniteMenu {
     let occurs = |s: &[usize], within: &[usize]| within.windows(s.len()).filter(|w| *w == s).count();
     let (question, answer) = (&classes[..ql], &classes[ql..]);
     let (mut runs, mut admitted) = (0usize, Vec::new());
@@ -2352,8 +2368,14 @@ fn definite_menu(classes: &[usize], ql: usize) -> DefiniteMenu {
         }
     }
     let mut rows = Vec::new();
-    for (k, &(i1, j1, _)) in admitted.iter().enumerate() {
-        for &(i2, j2, _) in &admitted[k + 1..] {
+    for (k, &(i1, j1, l1)) in admitted.iter().enumerate() {
+        for &(i2, j2, l2) in &admitted[k + 1..] {
+            // One front band holds both answer targets (§14.6's band `[f, f + 5)`): their nearest edges stand fewer
+            // than its extent apart.
+            let apart = if i1 < i2 { i2 - (i1 + l1 - 1) } else { i1 - (i2 + l2 - 1) };
+            if band.is_some_and(|b| apart >= b) {
+                continue;
+            }
             if (i1 < i2) == (j1 < j2) && i1 != i2 && j1 != j2 {
                 let ((i1, j1), (i2, j2)) = if i1 < i2 { ((i1, j1), (i2, j2)) } else { ((i2, j2), (i1, j1)) };
                 let mut row = vec![0i64; WITNESS_BYTES.len()];
@@ -2388,7 +2410,7 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
     for _ in 0..256 {
         let (q, a) = crib_like(&mut next);
         let classes: Vec<usize> = q.iter().chain(&a).map(|&b| to_class(b)).collect();
-        let menu = definite_menu(&classes, q.len());
+        let menu = definite_menu(&classes, q.len(), std::env::var_os("DEFINITE_BAND").map(|_| NEAR - 1));
         // The listener check: the first calculation's operands, `<<a+b=`, against the question's first two numbers.
         let first: Vec<usize> = (0..q.len()).filter(|&t| q[t].is_ascii_digit() && (t == 0 || !q[t - 1].is_ascii_digit())).collect();
         let la = a[2..].iter().take_while(|b| b.is_ascii_digit()).count();
@@ -2402,6 +2424,14 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
             let digit_bytes: i64 = menu.rows[0].iter().enumerate().filter(|(c, _)| WITNESS_BYTES[*c].is_ascii_digit()).map(|(_, v)| v.abs()).sum();
             forcing_true += usize::from(both && digit_bytes == 0);
             forcing_regions += 1;
+            if !(both && digit_bytes == 0) {
+                // The answer's parts, from its own text (the listener's reading): the first calculation's operands and
+                // result, and everything after it.
+                let s1 = 4 + la + lb;
+                let part = |i: usize| { let o = i - q.len(); if (2..2 + la).contains(&o) { "a" } else if (3 + la..3 + la + lb).contains(&o) { "b" } else if o >= s1 && o < a.len() && a[s1..=o].iter().all(|b| b.is_ascii_digit()) { "result" } else if o < s1 { "calc1" } else { "later" } };
+                let kinds: Vec<String> = menu.admitted.iter().map(|&(i, _, l)| format!("{}:{:?}", part(i), String::from_utf8_lossy(&classes[i..i + l].iter().map(|&c| WITNESS_BYTES[c]).collect::<Vec<u8>>()))).collect();
+                eprintln!("DEFINITE false_forcing digit_weight={digit_bytes} runs={kinds:?}");
+            }
         }
         menus.push(menu);
     }
@@ -2466,5 +2496,51 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
         let kappa: Vec<Rat> = (0..bytes).map(|c| (0..m).map(|x| w[x].clone() * b[x][c].clone()).sum()).collect();
         let shown: Vec<String> = (0..bytes).map(|c| format!("{:?}:{}", WITNESS_BYTES[c] as char, kappa[c])).collect();
         eprintln!("DEFINITE published {}", shown.join(" "));
+        if std::env::var_os("DEFINITE_WITNESS").is_some() {
+            // The witness under the published clock: head 3's rates `c[b] = κ_pub[b] − 1` on `2^(−24)` (a fraction's
+            // face at the material's grain, to the nearest), the unresolved row unreached, at its current `κ = 1`.
+            let grain = Rat::from_integer(BigInt::from(1i64 << MATERIAL_BITS));
+            let rates: Vec<i32> = kappa.iter().map(|k| i32::try_from(((k.clone() - rat(1)) * grain.clone()).round().to_integer()).unwrap()).collect();
+            let (problems, reach) = witness_fronts();
+            for hot in [16i64, 128] {
+                let digit_clock = witness_field_read(reach, 3, true, Some(hot));
+                let mut located = digit_clock.clone();
+                let base = located.layout.pace + (located.declaration.alphabet + 1);
+                for (c, &r) in rates.iter().enumerate() {
+                    located.theta[base + c] = r;
+                }
+                located.theta[base + located.declaration.alphabet] = 0;
+                let (reference, read) = (completed_read(&digit_clock, &problems), completed_read(&located, &problems));
+                let faces = |out: &[(usize, bool, bool, i64, i64)]| out.iter().filter(|r| r.2).count();
+                let same = reference.iter().zip(&read).filter(|(a, b)| a.2 == b.2).count();
+                eprintln!("DEFINITE witness hot={hot} located_faces={}/{} digit_clock_faces={} same_front_by_front={same} located_code_millibits={}", faces(&read), read.len(), faces(&reference), read.iter().map(|r| r.3).sum::<i64>() * 1000 / read.len() as i64 >> 20);
+                // Each front the located clock loses: the bytes in its copy's span that tick though no row pinned
+                // them at zero, with their rates.
+                let (mut k, mut lost, mut lost_unreached_only, mut lost_letters) = (0usize, 0usize, 0usize, 0usize);
+                for (p, (q, a, ops)) in problems.iter().enumerate() {
+                    for &(o, src) in ops {
+                        let (r0, r1) = (&reference[k], &read[k]);
+                        k += 1;
+                        if r0.2 && !r1.2 {
+                            let span: Vec<usize> = q.iter().chain(&a[..=o]).copied().collect::<Vec<_>>()[src + 1..].to_vec();
+                            let mut ticking: Vec<(char, String)> = span.iter().filter(|&&c| c < bytes && !WITNESS_BYTES[c].is_ascii_digit() && kappa[c] != rat(0)).map(|&c| (WITNESS_BYTES[c] as char, kappa[c].to_string())).collect();
+                            ticking.sort();
+                            ticking.dedup();
+                            lost += 1;
+                            let letters = ticking.iter().any(|(c, _)| c.is_ascii_alphabetic() && *c != 'q');
+                            lost_letters += usize::from(letters);
+                            lost_unreached_only += usize::from(!letters);
+                            if p < 2 {
+                                eprintln!("DEFINITE lost hot={hot} problem={p} offset={o} ticking_in_span={ticking:?}");
+                            }
+                        }
+                    }
+                }
+                // The copy's skin variation at the fronts, `|σ₃(receiver) − σ₃(source)|` in clock ticks, under each clock.
+                let mut spread: Vec<i64> = read.iter().map(|r| r.4 >> MATERIAL_BITS).collect();
+                spread.sort_unstable();
+                eprintln!("DEFINITE lost_summary hot={hot} lost={lost} with_letters_ticking={lost_letters} only_unreached_bytes_ticking={lost_unreached_only} located_skin_distance median={} max={} (the digit clock's: 1 to 8)", spread[spread.len() / 2], spread[spread.len() - 1]);
+            }
+        }
     }
 }

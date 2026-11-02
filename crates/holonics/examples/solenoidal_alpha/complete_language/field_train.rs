@@ -1825,8 +1825,14 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
         set(&mut field, l.before + c * dw + if c == lt { 3 } else { 5 }, face_one)?;
         set(&mut field, l.after + c * dw + 6, face_one)?;
     }
-    // Head 3 (pace 1): the digit clock.
-    set(&mut field, l.pace + dw, -one)?;
+    // Head 3 (pace row 1) on the class sheet (§16.16): a digit class's rate 1, every other class's and the unresolved
+    // row's 0 (the hand-set witness; the codec names its digits here and nowhere in the field).
+    let rates = alphabet + 1;
+    for c in 0..=alphabet {
+        if c == alphabet || !codec.is_digit(c) {
+            set(&mut field, l.pace + rates + c, -one)?;
+        }
+    }
     let turned = |field: &mut Field, chart: usize, c: usize, from: (usize, usize), g: i64, theta: (i64, i64)| -> Result<()> {
         let (gc, gs) = (times(g, theta.0), times(g, theta.1));
         set(field, chart + c * dw + from.0, gc)?;
@@ -1983,7 +1989,8 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     };
     let l = witness.layout().clone();
     let (dw, m) = (declaration.width, declaration.complex());
-    let pace3 = l.pace + dw..l.pace + 2 * dw;
+    let rates = declaration.alphabet + 1;
+    let pace3 = l.pace + rates..l.pace + 2 * rates;
     let readers: Vec<std::ops::Range<usize>> = vec![l.q..l.q + 2 * m * dw, l.q_bias..l.q_bias + 2 * m, l.probe..l.probe + 2 * m * dw, l.probe_bias..l.probe_bias + 2 * m];
     let gather = |v: &[i128], ranges: &[std::ops::Range<usize>]| -> Vec<i128> { ranges.iter().flat_map(|r| v[r.clone()].iter().copied()).collect() };
     let theta = |f: &Field| -> Vec<i128> { f.theta.iter().map(|&x| x as i128).collect() };
@@ -2002,9 +2009,9 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let mut route: (i128, u64, i128, u64, BigInt) = (0, 0, 0, 0, BigInt::from(0));
     for region in &views {
         let bytes = codec.decode(region.classes);
-        let x0 = no_clock.opening(region).map_err(|e| e.to_string())?;
         for t in 0..region.classes.len() - 1 {
-            let dk: i128 = descent1.iter().zip(&x0[t * dw..(t + 1) * dw]).map(|(&gc, &x)| (gc * x as i128) >> 16).sum();
+            // A definite site's rate moves by its class's entry (the class sheet, §16.16).
+            let dk: i128 = descent1[region.classes[t]];
             route.4 += BigInt::from(dk) * BigInt::from(dk);
             let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
             if codec.is_digit(region.classes[t]) {
