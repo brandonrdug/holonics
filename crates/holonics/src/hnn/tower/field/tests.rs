@@ -1645,6 +1645,13 @@ const WITNESS_BYTES: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789 ?\n<>+=#";
 /// - a listener's probe on head 3's mode 3 reads 12 and 13 turned by `e^(−iπ/8)`: the copy's clock distance from
 ///   the anchor's, `τ_j − τ_i = τ_(j*) − τ_a0 + 1`, at the skin's peak (`e^(bu) cos(bu + π/4)` at `u = 0`).
 fn witness_field(reach: usize, ticks: usize, paced: bool) -> Field {
+    witness_field_read(reach, ticks, paced, None)
+}
+
+/// [`witness_field`], with a readout where `hot` names the temperature (§16.10's completed witness): the copy's current
+/// carries the source digit's identity `e^(2πi d/10)` on head 3's period-729 mode, written to dimensions 20 and 21, and
+/// a digit class reads its own turn there, a non-digit held down.
+fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>) -> Field {
     let alphabet = WITNESS_BYTES.len() + 1;
     let d = FieldDeclaration { alphabet, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: 1 };
     let mut field = Field::found(d, &keys(1 << 17)).unwrap();
@@ -1724,6 +1731,36 @@ fn witness_field(reach: usize, ticks: usize, paced: bool) -> Field {
         set(&mut field, l.v + (m + c) * dw + from.1, one);
         set(&mut field, l.out + to.0 * m2 + c, one);
         set(&mut field, l.out + to.1 * m2 + m + c, one);
+    }
+    if let Some(t) = hot {
+        let c729 = 3 * n + 7;
+        for c in 0..WITNESS_BYTES.len() {
+            if WITNESS_BYTES[c].is_ascii_digit() {
+                let (re, im) = face((WITNESS_BYTES[c] - b'0') as i128, 10);
+                field.theta[l.enc + c * dw + 7] = (re >> 14) as i32;
+                field.theta[l.enc + c * dw + 8] = (im >> 14) as i32;
+                set(&mut field, l.read + c * dw + 20, times(32 * one, re));
+                set(&mut field, l.read + c * dw + 21, times(32 * one, im));
+            } else {
+                set(&mut field, l.read_bias + c, -32 * (face_one as i64));
+            }
+        }
+        set(&mut field, l.read_bias + WITNESS_BYTES.len(), -32 * (face_one as i64));
+        set(&mut field, l.v + c729 * dw + 7, one);
+        set(&mut field, l.v + (m + c729) * dw + 8, one);
+        set(&mut field, l.out + 20 * m2 + c729, 16 * one);
+        set(&mut field, l.out + 21 * m2 + m + c729, 16 * one);
+        // The copy's rest (§16.10): before the anchor's channel arrives a receiver's probe is its bias alone, on head
+        // 3's mode 6 (period 243), where every non-digit's key stands (read from its own non-digit read), so the copy's
+        // first ticks rest on a site that carries no digit; once the channel arrives it outweighs the bias.
+        let c243 = 3 * n + 6;
+        set(&mut field, l.q + c243 * dw, anchor);
+        set(&mut field, l.probe_bias + c243, (face_one as i64) >> 6);
+        let hot = t * one;
+        set(&mut field, l.temper + 2 * 3, hot);
+        set(&mut field, l.temper + 2 * 3 + 1, hot);
+        set(&mut field, l.temper + 1, hot);
+        return field;
     }
     let hot = 127 * one;
     set(&mut field, l.temper + 2 * 3, hot);
@@ -1900,4 +1937,75 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
     }
     eprintln!("PACE_PROBES read={read} on_a_seam={seams}");
     assert!(read >= 16 && 8 * seams <= read, "read {read}, {seams} on a seam");
+}
+
+/// [agent-inferred, November 2] **The completed witness** (§16.6, §16.10): at every operand digit's front (the
+/// question and the answer cut at the digit, the digit open) the face's top class is the question's digit, 252 of 252,
+/// and its code there is below the founding's 5.46 bits; the same field at `κ ≡ 1` fails that assertion. Read at the
+/// witness's temperature (127) and, as measurements, at 16, 8 and 4 (crib13's learned temperatures reached 3.91):
+/// faces, code, the problems whose first calculation is whole, and the faces by the copy's clock distance. Run with
+/// `--ignored --nocapture`.
+#[test]
+#[ignore]
+fn the_completed_witness_reads_the_copied_digit() {
+    let mut next = mixer(0x0C1B);
+    let to_class = |b: u8| WITNESS_BYTES.iter().position(|&w| w == b).unwrap();
+    let mut problems = Vec::new();
+    let mut reach = 0usize;
+    for _ in 0..64 {
+        let (q, a) = crib_like(&mut next);
+        let first: Vec<usize> = (0..q.len()).filter(|&t| q[t].is_ascii_digit() && (t == 0 || !q[t - 1].is_ascii_digit())).collect();
+        let la = a[2..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let lb = a[3 + la..].iter().take_while(|b| b.is_ascii_digit()).count();
+        let ops: Vec<(usize, usize)> = (0..la).map(|k| (2 + k, first[0] + k)).chain((0..lb).map(|k| (3 + la + k, first[1] + k))).collect();
+        assert!(ops.iter().all(|&(o, src)| a[o] == q[src]), "the operands copy the question's first two numbers");
+        reach = reach.max(q.len() + a.len() + 1);
+        problems.push((q.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), a.iter().map(|&b| to_class(b)).collect::<Vec<_>>(), ops));
+    }
+    // Each read `(problem, rows on the source, face on the digit, code on 2^(−20) bits, the copy's clock distance
+    // |σ₃(receiver) − σ₃(source)| on 2^(−24))`.
+    let read = |field: &Field| -> Vec<(usize, bool, bool, i64, i64)> {
+        problems
+            .par_iter()
+            .enumerate()
+            .flat_map(|(p, (q, a, ops))| ops.par_iter().map(move |&(o, src)| (p, q, a, o, src)))
+            .map(|(p, q, a, o, src)| {
+                let classes: Vec<usize> = q.iter().chain(&a[..=o]).copied().collect();
+                let mut open = vec![false; classes.len()];
+                *open.last_mut().unwrap() = true;
+                let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] };
+                let pass = field.pass(&r, true).unwrap();
+                let at = classes.len() - 1;
+                let row = &pass.ticks.last().unwrap().rows[3 * classes.len() + at];
+                let top = row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).unwrap().j as usize;
+                let face = pass.faces[at].as_ref().unwrap();
+                let best = (0..face.masses.len()).max_by_key(|&c| face.masses[c]).unwrap();
+                let distance = pass.paces.row[3].map_or(0, |k| (pass.paces.sigma[k][at] - pass.paces.sigma[k][src]).abs());
+                (p, top == src, best == classes[at], face.code(classes[at]), distance)
+            })
+            .collect()
+    };
+    const FOUNDING_MILLIBITS: i64 = 5460;
+    let mut verdicts = Vec::new();
+    for (hot, paced) in [(127i64, true), (127, false), (16, true), (8, true), (4, true)] {
+        let started = std::time::Instant::now();
+        let out = read(&witness_field_read(reach, 3, paced, Some(hot)));
+        let n = out.len();
+        let (rows, faces) = (out.iter().filter(|r| r.1).count(), out.iter().filter(|r| r.2).count());
+        let code = out.iter().map(|r| r.3).sum::<i64>() * 1000 / n as i64 >> 20;
+        // The first calculation whole: every digit of `a` and `b` right, a problem.
+        let whole = (0..problems.len()).filter(|&p| out.iter().filter(|r| r.0 == p).all(|r| r.2)).count();
+        // Faces by the copy's clock distance, in the clock's whole ticks.
+        let mut by: std::collections::BTreeMap<i64, (usize, usize)> = std::collections::BTreeMap::new();
+        for r in &out {
+            let e = by.entry(r.4 >> PACE_BITS).or_insert((0, 0));
+            e.0 += 1;
+            e.1 += usize::from(r.2);
+        }
+        let by: Vec<String> = by.iter().map(|(d, (k, right))| format!("{d}:{right}/{k}")).collect();
+        eprintln!("COMPLETED hot={hot} paced={paced} reach={reach} reads={n} rows_right={rows} faces_right={faces} code_millibits={code} first_calculations_whole={whole}/{} faces_by_clock_distance={} ms={}", problems.len(), by.join(","), started.elapsed().as_millis());
+        verdicts.push(faces == n && code < FOUNDING_MILLIBITS);
+    }
+    assert!(verdicts[0], "at the witness's temperature every operand digit's face is the question's digit, below the founding's code");
+    assert!(!verdicts[1], "at κ ≡ 1 the completed witness fails");
 }

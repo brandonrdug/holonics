@@ -1320,14 +1320,97 @@ whose paced heads' clocks have not moved toward a digit clock (no head's gap `κ
 its founding's) and whose held question effect is at or below the foil's stops, reported incomplete with its clocks
 by lap (`FIELD_PACE`, `FIELD_STOPPED_EARLY`).
 
-### 16.11 The diff read against itself
+### 16.11 The completed witness: the copy rests until its channel arrives
+
+[measurement; agent-inferred, November 2] `the_completed_witness_reads_the_copied_digit` (tests.rs, set by hand, no
+learning, §16.6's terrain and declaration at `K = 3`) completes the witness with a readout: the copy's value carries
+the source digit's identity `e^(2πi d/10)` on head 3's period-729 mode, written to dimensions 20 and 21, and a digit
+class reads its own turn there (a non-digit held down). Its acceptance, fixed before the read: at every operand
+digit's front (the question and the answer cut at the digit, the digit open) the face's top class is the question's
+digit, 252 of 252, its code there below the founding's 5.46 bits, and the `κ ≡ 1` sibling fails the same assertion.
+
+**The first completion failed on the faces while its rows passed** (93 of 93 rows on the source, 33 of 93 faces,
+35 bits). The cause, read tick by tick: the copy's channel is a chain of three contacts (head 3's anchor current at
+tick 0, head 0's relay at tick 1, head 3's probe at tick 2), so before tick 2 a receiver's probe is its bias alone and
+its row tops on whatever source scores best on keys alone (the digit one before its source). A face reads `x` after
+the `K` ticks, the sum of every tick's current: no lock or release law picks a tick inside a pass (the release's
+momentum and pump act across sweeps; a pass's temperature is the same at every tick). And tick 0's current was about
+70 times the later ticks': the chart reads a source at unit power, `r̂_j = x_j/‖x_j‖`, and once the channel's
+currents (gains 64 and 32) land in a digit's `x` its identity's share of that power falls about 70 times. So the
+wrong identity of the first two ticks outweighed the right one.
+
+**The rest.** On head 3's mode 6 (period 243) every non-digit's key stands at the anchor's strength (from its own
+non-digit read) and a listener's probe has a small bias there (`2^(−6)`). Before the channel arrives the probe is
+that bias alone at unit power, so the copy rests on a non-digit, which carries no identity; once the channel arrives
+it outweighs the bias. These are coefficients of the word and probe families, which the deposition moves; no
+operator was added. At unit strength the rest did nothing (33 of 93): a key is read at unit power over its head, so
+beside the anchor's term the rest's share of a non-digit key was `2^(−6)`.
+
+[measurement, November 2] The 252 reads at each temperature (host, the hand-set witness, no learning: a check of the
+law's reference, not a learner run; 16 threads, about 48 s a read of 252 against a projection of 50 s, 241 s for the
+five under a 1,200 s guard, a resident set of about 1.6 GB):
+
+| T | rows on the source | faces right | code (bits) | first calculations whole | faces by clock distance 1, 2, …, 8 |
+|---|---|---|---|---|---|
+| 127 | 252 | 252 | 0.299 | 64 of 64 | 14/14, 26/26, 42/42, 44/44, 60/60, 32/32, 22/22, 12/12 |
+| 16 | 247 | 213 | 0.730 | 39 of 64 | 11/14, 26/26, 42/42, 36/44, 52/60, 24/32, 13/22, 9/12 |
+| 8 | 208 | 143 | 1.600 | 11 of 64 | 10/14, 20/26, 28/42, 27/44, 33/60, 15/32, 6/22, 4/12 |
+| 4 | 143 | 101 | 2.913 | 8 of 64 | 10/14, 19/26, 23/42, 21/44, 19/60, 7/32, 2/22, 0/12 |
+| 127, `κ ≡ 1` | 4 | 35 | 12.899 | 0 of 64 | (no digit clock: the distances are bytes) |
+
+The acceptance passes at 127, and its sibling fails. "Whole" is a problem whose first calculation has every digit of
+both operands right, the bar's own unit (the crib's 24 of 126 is about 19 %). Receipt:
+`_receipts/law16/completed_witness.txt`.
+
+### 16.12 The skin bounds a copy's sharpness by its clock distance
+
+[derivation; agent-inferred, November 2] A turned mode of period `n` carries a pair's lock by its skin
+`D(u) = e^(−bu)`, `b = 2π/n`, at the pair's clock distance `u = |σ(i) − σ(j)|`, and turns the key by `ζ^u = e^(ibu)`.
+The receiver's exponent for a source at distance `u` is, on the head's modes `m`,
+
+```text
+z(u) = T Σ_m [ |p_m||k_m| e^(−b_m u) cos(b_m u + φ_m) − e^(−2 b_m u) |k_m|²/2 ]        (bits)
+```
+
+with the words at unit power over the head (`Σ_m |p_m|² = Σ_m |k_m|² = 2n_head`). A copy selects one source, so its
+source sits at a maximum of `z` over the sources' distances, and a neighbour one tick away trails it by the curvature,
+`z(u₀) − z(u₀ ± 1) ≈ −½ z''(u₀)`, to second order. Mode by mode,
+`|d²/du² e^(−bu) cos(bu + φ)| = 2b² e^(−bu) |sin(bu + φ)| ≤ 2b² e^(−bu) ≤ 8/(e² u²)` (the most at `b = 2/u`,
+a period `n = πu`), and the penalty term's curvature `−2b² e^(−2bu)|k|²` only flattens the maximum. So
+
+```text
+lead over a neighbour one tick away  ≤  4 T Σ_m |p_m||k_m| / (e² u₀²)  ≤  8 n_head T / (e² u₀²)   bits
+```
+
+whatever the periods: a copy sharpens with its temperature and blunts as the square of its clock distance. (The
+first statement sent to the coordinator, about `T/(eΔτ)`, read the first-order slope; at a maximum the slope is zero
+and the curvature governs.) In the clock's own units the copy's distance is the digits between its source and its
+receiver: with `κ = 1` at a digit and `0` elsewhere, an operand digit's receiver is `D_q − 1` ticks from its source,
+its question's digit count less one, 1 to 8 here (read off every read; the `10 to 30` first sent was an error).
+
+[measurement, November 2] The table of §16.11 reads the law: below 127 the faces fall with the clock distance at every
+temperature (at 4, from 10 of 14 at distance 1 to none of 12 at 8), and the shortest distance falls too where the
+comb's periods (16 and 32) stand far from the sharpest period `πu` (11 of 14 at distance 1 at 16). The copy
+discriminates by its curvature, which no period escapes, so a temperature is what sharpens it.
+
+[decision; the coordinator's rule, fixed before the read] crib13's learned temperatures topped out at 3.91 (class)
+and 1.28 (listener), and moved about ±10 % in ten laps. The witness clears the bar's 19 % a problem only at `T ≥ 16`
+(39 of 64; 11 of 64 at 8, 8 of 64 at 4), so the run would need learning to raise its temperatures 4 to 12 times
+(from 3.91 and 1.28 to 16) within 27 laps. **The crib run does not launch.** The next subject is the temperature's chart: a temperature is a
+scale, so its deposit belongs to the logarithmic chart of the ratio law (`ℓ = log R`, a step multiplies it); §15.10's
+deposit is read, the law written, its covector tested and ported, and §16.10's reads are then taken. Where a learned
+temperature must pass the card's row carrier, the carrier widens at a declared crossing (the precision law's dynamic
+width), built only when the temperature's law shows it is needed.
+
+### 16.13 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
 - **The card's row carrier.** A contact row is carried on at most twenty limbs (1,280 bits); at the witness's
   temperature of 127 a row's exponents span past it and the card refuses (at 32 a 128-bit sum overflows; at 16 it
-  reads). The host's bound is `row_bits`, about 4,100 bits at that temperature. A learned temperature that grows that
-  far would be refused on the card, not carried: a realization limit to widen at a declared crossing before
-  temperatures reach it (crib13's rose from 1.0 to 1.1 in ten laps).
+  reads). The host's bound is `row_bits`, about 4,100 bits at that temperature. A run's declaration states it: a
+  learned temperature that outgrows the card's carrier mid-run refuses with its site and lap, reported, never
+  clipped. crib13's largest learned temperatures were 3.91 (class) and 1.28 (listener), under the 32 where the card's
+  first carrier refuses. Refusal is not the end state: the carrier widens at a declared crossing (§16.12).
 - **The skin's cost.** Off the plain pace a pair's skin is a series read through the exponential's face, one 128-bit
   division a pair and mode: the parity's card time rose about 1.5 times at width 32.
 - **The founding's readout at zero** keeps every chart's and pace's covector at zero until the readout moves (§16.9).
@@ -1335,7 +1418,7 @@ by lap (`FIELD_PACE`, `FIELD_STOPPED_EARLY`).
 - **The readings on context parts** are mis-clocked under a digit clock; `FIELD_HELD` keeps them, labelled, and the
   operand rows are read at fronts (`FIELD_PEAKS_OPERAND`).
 
-### 16.12 Failures this could repeat
+### 16.14 Failures this could repeat
 
 - An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
   digit, and the digit clock is a material row the deposition moves.
@@ -1344,6 +1427,9 @@ by lap (`FIELD_PACE`, `FIELD_STOPPED_EARLY`).
 - A located cause carried unrepaired: the acceptance no longer reads the mis-clocked context parts (it reads
   fronts); the context read stays in the receipts, labelled with its mis-clock.
 - A refusal answered with a larger limit: `K = 3` follows from the law of §16.3, not from a raised budget.
+- Bits read as progress, a proxy counted for the release: the witness first passed on its rows (93 of 93) while
+  its released bytes failed (33 of 93); its acceptance is now the released byte at every operand front, the code and
+  the sibling (§16.11), and the run waits on the temperature the faces need (§16.12), not on the rows.
 
 Owed to #410: the clock is additive over the strand's concatenation, `τ(uv) = τ(u) + τ(v)` shifted, a homomorphism to
 the circle (`U = ζ^τ`, `U(a + b) = U(a) U(b)`), and the contact through it depends only on `τ(j) − τ(i)`

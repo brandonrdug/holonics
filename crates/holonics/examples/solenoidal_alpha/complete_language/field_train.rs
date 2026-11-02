@@ -1869,6 +1869,12 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
         set(&mut field, l.out + to.0 * m2 + c, one)?;
         set(&mut field, l.out + to.1 * m2 + m + c, one)?;
     }
+    // The copy's rest (tests.rs's completed witness): before the anchor's channel arrives a receiver's probe is its
+    // bias alone, on head 3's mode 6, where every non-digit's key stands at the anchor's strength, so the copy's
+    // first ticks rest on a site that carries no digit.
+    let c243 = 3 * n + 6;
+    set(&mut field, l.q + c243 * dw, anchor)?;
+    set(&mut field, l.probe_bias + c243, face_one >> 6)?;
     // The readout: a digit class reads the identity's turn at its own value, a non-digit is held down.
     for c in 0..alphabet {
         if codec.is_digit(c) {
@@ -1880,9 +1886,9 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
             set(&mut field, l.read_bias + c, -32 * face_one)?;
         }
     }
-    // The temperature the card's row carrier holds (`FIELD_WITNESS_HOT`, 32 by default: at tests.rs's 127 a row's
-    // exponents span past the card's twenty limbs).
-    let hot = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(32) * one;
+    // The temperature (`FIELD_WITNESS_HOT`, 16 by default, the card's: at 32 a lock passes its 128-bit carrier, at
+    // tests.rs's 127 a row's exponents span past the card's twenty limbs; each refuses, never clipped).
+    let hot = std::env::var("FIELD_WITNESS_HOT").ok().and_then(|v| v.parse::<i64>().ok()).unwrap_or(16) * one;
     set(&mut field, l.temper + 2 * 3, hot)?;
     set(&mut field, l.temper + 2 * 3 + 1, hot)?;
     set(&mut field, l.temper + 1, hot)?;
@@ -1949,22 +1955,24 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
         }
     }
     let views: Vec<Region> = reads.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], clock: &[], echo: &[] }).collect();
-    let covector = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(i64, Vec<i128>)> {
+    // `(code, faces whose top class is the digit, covector)`.
+    let covector = |field: &Field, realization: &mut dyn FieldRealization| -> Result<(i64, usize, Vec<i128>)> {
         let mut g = vec![0i128; field.theta.len()];
-        let mut code = 0i64;
+        let (mut code, mut right) = (0i64, 0usize);
         for chunk in views.chunks(64) {
             let (faces, part) = realization.read_and_return_open(field, chunk).map_err(|e| e.to_string())?;
             for (region, faces) in chunk.iter().zip(&faces) {
                 let last = region.classes.len() - 1;
                 if let Some(face) = &faces[last] {
                     code += face.code(region.classes[last]);
+                    right += usize::from((0..face.masses.len()).max_by_key(|&c| face.masses[c]) == Some(region.classes[last]));
                 }
             }
             for (acc, v) in g.iter_mut().zip(part) {
                 *acc += v;
             }
         }
-        Ok((code, g))
+        Ok((code, right, g))
     };
     let l = witness.layout().clone();
     let (dw, m) = (declaration.width, declaration.complex());
@@ -1972,15 +1980,15 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let readers: Vec<std::ops::Range<usize>> = vec![l.q..l.q + 2 * m * dw, l.q_bias..l.q_bias + 2 * m, l.probe..l.probe + 2 * m * dw, l.probe_bias..l.probe_bias + 2 * m];
     let gather = |v: &[i128], ranges: &[std::ops::Range<usize>]| -> Vec<i128> { ranges.iter().flat_map(|r| v[r.clone()].iter().copied()).collect() };
     let theta = |f: &Field| -> Vec<i128> { f.theta.iter().map(|&x| x as i128).collect() };
-    let (code_w, _) = covector(&witness, realization)?;
-    let (code_f, _) = covector(&founding, realization)?;
+    let (code_w, right_w, _) = covector(&witness, realization)?;
+    let (code_f, right_f, _) = covector(&founding, realization)?;
     let sites = views.len().max(1) as i128;
     let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
-    println!("FIELD_WITNESS_READ operand_digits={} witness_code_bits={} founding_code_bits={} ms={}", views.len(), bits(code_w), bits(code_f), started.elapsed().as_millis());
+    println!("FIELD_WITNESS_READ operand_digits={} witness_faces_right={right_w} witness_code_bits={} founding_faces_right={right_f} founding_code_bits={} ms={}", views.len(), bits(code_w), bits(code_f), started.elapsed().as_millis());
     // (i) the readers kept, the clock zeroed.
     let mut no_clock = witness.clone();
     no_clock.theta[l.pace..].iter_mut().for_each(|v| *v = 0);
-    let (_, g1) = covector(&no_clock, realization)?;
+    let (_, _, g1) = covector(&no_clock, realization)?;
     let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
     let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
     let mut route: (i128, u64, i128, u64, i128) = (0, 0, 0, 0, 0);
@@ -2008,7 +2016,7 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     for r in &readers {
         no_readers.theta[r.clone()].copy_from_slice(&founding.theta[r.clone()]);
     }
-    let (_, g2) = covector(&no_readers, realization)?;
+    let (_, _, g2) = covector(&no_readers, realization)?;
     for h in [0usize, 3] {
         let n = declaration.modes;
         let rows: Vec<std::ops::Range<usize>> = (0..n).flat_map(|li| [h * n + li, m + h * n + li]).flat_map(|o| [l.q + o * dw..l.q + (o + 1) * dw, l.q_bias + o..l.q_bias + o + 1, l.probe + o * dw..l.probe + (o + 1) * dw, l.probe_bias + o..l.probe_bias + o + 1]).collect();
@@ -2041,7 +2049,7 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
         moved.theta[at] = i32::try_from(moved.theta[at] as i128 + delta).map_err(|_| "a moved entry outside 32 bits")?;
         step[at] = delta;
     }
-    let (code_m, g3) = covector(&moved, realization)?;
+    let (code_m, _, g3) = covector(&moved, realization)?;
     let ranges: Vec<std::ops::Range<usize>> = std::iter::once(pace3).chain(readers).collect();
     let back: Vec<i128> = gather(&step, &ranges).into_iter().map(|v| -v).collect();
     let descent3: Vec<i128> = gather(&g3, &ranges).into_iter().map(|v| -v).collect();
