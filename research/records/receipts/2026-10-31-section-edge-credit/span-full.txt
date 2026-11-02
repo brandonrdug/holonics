@@ -1,0 +1,12 @@
+# §31's span release, six prompts to 1,024 classes, agree 2, 320 candidates; projection from the 32-class read beside C′'s continuation: 37.8 s x 32 = 1,210 s, deadline 1,600 s
+TOWER_COMMAND release-span-tower-classes race/cont2/every/lap0/STATE.2 803e432db844c2e581c280391c7e090805181894851a4eb25f95d6d6635f6eb1 $ROOT/.local/wt/race/.local/race/passage/PROMPTS.classes b45cf44ee3a5dd6b84e4b76c23cbab77e1816b1a903b4e7d394c445f9b6b7e3b race/span/KEYS_SPAN dc62532add8ad474bae69f088d8335b5d5314eb2ee5a92d9724e343d97d8703e 1024 2 320 race/span/full
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+CLASSES_SPAN_RELEASE prompt=0 released=1024 ended=false unfinished=false spans=207 rounds=627 keys=1094347 release_bits_a_class=1.612
+CLASSES_SPAN_RELEASE prompt=1 released=1024 ended=false unfinished=false spans=177 rounds=519 keys=963728 release_bits_a_class=1.377
+CLASSES_SPAN_RELEASE prompt=2 released=1024 ended=false unfinished=false spans=187 rounds=561 keys=1058934 release_bits_a_class=1.454
+CLASSES_SPAN_RELEASE prompt=3 released=348 ended=true unfinished=false spans=66 rounds=189 keys=347203 release_bits_a_class=1.497
+CLASSES_SPAN_RELEASE prompt=4 released=1024 ended=false unfinished=false spans=209 rounds=662 keys=1178719 release_bits_a_class=1.624
+CLASSES_SPAN_RELEASE prompt=5 released=688 ended=true unfinished=false spans=134 rounds=437 keys=774891 release_bits_a_class=1.546
+CLASSES_SPAN_RELEASE_DONE prompts=6 agree=2 candidates=320 elapsed_ms=808781
+TOWER_CARD forwards=9966 forward_ms=430409 reverses=0 reverse_ms=0 elapsed_ms=808811
+MEASURE lap=span1024 rc=0 wall_s=809.1 peak_rss_kib=671000

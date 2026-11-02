@@ -22,12 +22,12 @@
 //! Nothing here is text-, image- or sound-specific: a medium is only the chart that wrote its
 //! classes, and a numeral is the same class whether it names a digit image or ends a GSM8K answer.
 use super::tower_train::{agreement, count, fit, per, positive, roles_of, Joined, Reading, STATE_BUDGET};
-use holonics::receiver::release::agreeing_class;
+use holonics::receiver::release::{agreeing_class, KeyStream};
 use super::*;
 use holonics::hnn::tower::participation::ENTROPY_BITS;
 use holonics::hnn::tower::realization::{HostPass, PassRealization, Slot};
 use holonics::hnn::tower::READ_BITS;
-use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TurnLadder};
+use holonics::hnn::tower::{ContactLaw, NewsClock, TowerLearner, TowerState, TurnLadder};
 use rayon::prelude::*;
 
 /// The held-out read's four exterior regions of a composed passage (`compose.py`'s roles).
@@ -111,6 +111,29 @@ pub(crate) fn train_packet_realized(args: &[String], news: NewsClock, realizatio
     train_joined(args, false, false, false, TurnLadder::Both, Some(news), Joined::PassagePackets, ContactLaw::Rectifying, realization)
 }
 
+/// `train-two-ladder-stacked-news-heading-tower-classes`: [`train_packet_realized`] (the race's
+/// C′) with the heading joined after the packets, so each clocked level reads its modes through
+/// its own heading before each arrival and the heading meets the trace of the arrivals its next
+/// tick closes (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §4).
+pub(crate) fn train_heading_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, false, false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeading, ContactLaw::Rectifying, realization)
+}
+
+/// `train-two-ladder-stacked-news-heading-credited-tower-classes`: [`train_heading_realized`] with
+/// every stream carrying the clocked levels' credit across its sections' edges (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §22).
+pub(crate) fn train_heading_credited_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, true, false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeading, ContactLaw::Rectifying, realization)
+}
+
+/// `train-two-ladder-stacked-news-heading-credited-every-level-tower-classes`:
+/// [`train_heading_credited_realized`] with every level's credit carried, the arrival levels' and
+/// the packet the last of them carries among it (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §24).
+pub(crate) fn train_heading_credited_every_level_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    train_joined(args, super::tower_train::Credit::From(0), false, false, TurnLadder::Both, Some(race_stacked_news_clock()), Joined::PassagePacketsHeading, ContactLaw::Rectifying, realization)
+}
+
 /// `train-two-ladder-stacked-news-packet-pair-tower-classes`: [`train_packet_realized`] (the race's
 /// C′) with every contact the pair contact, founded on the same draws (record
 /// `2026-10-30_THE_PAIR_CONTACT_IS_RACED…`, §3 acceptance 4).
@@ -145,9 +168,9 @@ pub(crate) fn train_mutual_realized(args: &[String], realization: &mut dyn PassR
 }
 
 #[allow(clippy::too_many_arguments)]
-fn train_joined(args: &[String], credit: bool, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
+fn train_joined(args: &[String], credit: impl Into<super::tower_train::Credit>, targets: bool, turned: bool, ladder: TurnLadder, news: Option<NewsClock>, joined: Joined, contact: ContactLaw, realization: &mut dyn PassRealization) -> Result<()> {
     if args.len() != 19 && args.len() != 21 && !(joined == Joined::Split && args.len() == 23) {
-        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes|train-two-ladder-split-tower-classes|train-two-ladder-dormant-split-tower-classes|train-two-ladder-stacked-news-packet-pair-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]".into());
+        return Err("train-gated-tower-classes|train-credited-tower-classes|train-target-tower-classes|train-turned-tower-classes|train-scaled-tower-classes|train-two-ladder-tower-classes|train-two-ladder-news-tower-classes|train-two-ladder-participating-tower-classes|train-two-ladder-news-participating-tower-classes|train-two-ladder-mutual-tower-classes|train-two-ladder-split-tower-classes|train-two-ladder-dormant-split-tower-classes|train-two-ladder-stacked-news-packet-pair-tower-classes|train-two-ladder-stacked-news-heading-tower-classes|train-two-ladder-stacked-news-heading-credited-tower-classes|train-two-ladder-stacked-news-heading-credited-every-level-tower-classes ALPHABET TRAIN TRAIN_SHA DEV DEV_SHA DEV_ROLES DEV_ROLES_SHA KEYS KEYS_SHA WIDTH MODES CONTACTS LEVELS STREAMS SECTION PASSES RATE_BITS OUT [FROM FROM_SHA [PAIRED PAIRED_SHA]]".into());
     }
     let alphabet = count(&args[1])?;
     let train = classes_of(&pinned_read(&args[2], &args[3], READ_BUDGET as usize)?, alphabet)?;
@@ -368,16 +391,36 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
     let started = std::time::Instant::now();
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
-    let end = tower.declaration.alphabet - 1;
+    let end = end_class(tower.declaration.alphabet)?;
     let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let limit = positive(&args[7])?;
     let agree = agreement(args.get(8))?;
     let out = Path::new(&args[9]);
-    let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
-    if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
-        return Err("every prompt closes with the end letter".into());
-    }
+    // [agent-inferred, October 31] A declared prompt separator (`TOWER_PROMPT_SEPARATOR`, a class
+    // the passage never holds): the prompts file is cut at it and each prompt is entered whole, so a
+    // prompt may close inside a passage (a GSM8K answer through a calculation's `=`; record
+    // `2026-10-30_…`, §43). Without it every prompt closes with the end letter.
+    let prompts: Vec<&[usize]> = match std::env::var("TOWER_PROMPT_SEPARATOR") {
+        Ok(v) => {
+            let separator = v.parse::<usize>()?;
+            if separator == end || separator >= tower.declaration.alphabet {
+                return Err("TOWER_PROMPT_SEPARATOR names the end letter or a class outside the alphabet".into());
+            }
+            let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == separator).map(|p| &p[..p.len() - 1]).collect();
+            if prompts.is_empty() || classes.last() != Some(&separator) || prompts.iter().any(|p| p.is_empty()) {
+                return Err("every prompt closes with the declared separator and holds a class".into());
+            }
+            prompts
+        }
+        Err(_) => {
+            let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
+            if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
+                return Err("every prompt closes with the end letter".into());
+            }
+            prompts
+        }
+    };
     let share = limit.checked_mul(8).ok_or("key extent overflow")?;
     if keys.len() < prompts.len() * share {
         return Err("fewer keys than the prompts' declared shares".into());
@@ -430,6 +473,18 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
         let reads: Vec<&[usize]> = steps.iter().map(|s| &s[..]).collect();
         faces = tower.advance_realized(&mut states, &reads, realization).map_err(|e| e.to_string())?.0;
     }
+    // Each release's own code a class, read from the state its prompt left (record §31).
+    let mut opened = Vec::with_capacity(prompts.len());
+    for prompt in &prompts {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = vec![tower.rest()];
+        let (face, _) = tower.advance_realized(&mut state, &[&entered], realization).map_err(|e| e.to_string())?;
+        opened.push((state.remove(0), face[0].clone()));
+    }
+    let release_bits = release_codes(tower, &opened, &released, realization)?;
+    for (p, (r, bits)) in released.iter().zip(&release_bits).enumerate() {
+        println!("CLASSES_RELEASE_CODE prompt={p} released={} release_bits_a_class={}", r.len(), per(*bits, r.len().max(1)));
+    }
     let releases: Vec<(Vec<usize>, bool, i64)> = released.into_iter().zip(ended).zip(codes).map(|((r, e), c)| (r, e, c)).collect();
     let mut written = Vec::new();
     let mut rows = String::from("prompt\tprompt_classes\tprompt_bits_a_class\treleased\tended\toctets\n");
@@ -437,14 +492,111 @@ pub(crate) fn release_realized(args: &[String], realization: &mut dyn PassRealiz
         for &c in released {
             written.extend_from_slice(&(c as u16).to_be_bytes());
         }
-        let octets: Vec<u8> = released.iter().filter(|&&c| c < 256).map(|&c| c as u8).collect();
-        let shown: String = octets.iter().map(|&b| b.escape_ascii().to_string()).collect();
+        let shown = shown_octets(released, tower.declaration.alphabet);
         rows.push_str(&format!("{p}\t{}\t{}\t{}\t{ended}\t{shown}\n", prompts[p].len(), per(*code, prompts[p].len()), released.len()));
         println!("CLASSES_RELEASE prompt={p} prompt_classes={} released={} ended={ended}", prompts[p].len(), released.len());
     }
     write_new(&out.join("RELEASES.classes"), &written)?;
     write_new(&out.join("RELEASES.tsv"), rows.as_bytes())?;
     println!("CLASSES_RELEASE_DONE prompts={} agree={agree} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [agent-inferred, October 31] The end letter's class: the alphabet's last, or the class the boundary
+/// codec declares in `TOWER_END_CLASS` (a unit release, whose end letter is the record separator's unit,
+/// record §33).
+fn end_class(alphabet: usize) -> Result<usize> {
+    match std::env::var("TOWER_END_CLASS") {
+        Ok(v) => {
+            let end = v.parse::<usize>()?;
+            if end >= alphabet {
+                return Err("TOWER_END_CLASS names a class outside the alphabet".into());
+            }
+            Ok(end)
+        }
+        Err(_) => Ok(alphabet - 1),
+    }
+}
+
+/// The code a class of each prompt's release read from the state its prompt left (`−log₂ p̂` summed on
+/// `2^(−20)` bits over the released classes, the first read against the prompt's own face), through
+/// `realization`.
+fn release_codes(tower: &holonics::hnn::tower::Tower, opened: &[(TowerState, holonics::hnn::tower::TowerFace)], releases: &[Vec<usize>], realization: &mut dyn PassRealization) -> Result<Vec<i64>> {
+    let mut codes = Vec::with_capacity(releases.len());
+    for ((state, face), released) in opened.iter().zip(releases) {
+        let Some(&first) = released.first() else {
+            codes.push(0);
+            continue;
+        };
+        let mut state = vec![state.clone()];
+        let (_, read) = tower.advance_realized(&mut state, &[released], realization).map_err(|e| e.to_string())?;
+        codes.push(face.code(first) + read[0]);
+    }
+    Ok(codes)
+}
+
+/// The span release's declared key extent: 2^28 bytes, 2^25 keys of eight bytes, some 5.6 million a
+/// prompt over the race's six (agent-inferred: a span takes about two rounds of 320 candidates of
+/// some five draws each, about 3,200 keys, and a prompt some 256 spans).
+const KEY_BUDGET: usize = 1 << 28;
+
+/// [agent-inferred, October 31] `release-span-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS
+/// KEYS_SHA COUNT AGREE CANDIDATES OUT`: the span release (`Tower::release_spans`, record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §31): each prompt entered as
+/// the class release enters it, then spans to its first clocked level's next tick released when
+/// `AGREE` of `CANDIDATES` drawn together agree, to `COUNT` classes or the end letter. The keys are
+/// split into one contiguous stream a prompt. Writes `RELEASES.classes` and `RELEASES.tsv` (with the
+/// spans, their rounds, whether the prompt's keys ran out, and the release's code a class).
+pub(crate) fn release_span_realized(args: &[String], realization: &mut dyn PassRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("release-span-tower-classes STATE STATE_SHA PROMPTS PROMPTS_SHA KEYS KEYS_SHA COUNT AGREE CANDIDATES OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let tower = &learner.tower;
+    let end = end_class(tower.declaration.alphabet)?;
+    let classes = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, tower.declaration.alphabet)?;
+    let keys = pinned_read(&args[5], &args[6], KEY_BUDGET)?;
+    let (limit, agree, candidates) = (positive(&args[7])?, positive(&args[8])?, positive(&args[9])?);
+    let out = Path::new(&args[10]);
+    let prompts: Vec<&[usize]> = classes.split_inclusive(|&c| c == end).collect();
+    if prompts.is_empty() || prompts.iter().any(|p| p.last() != Some(&end)) {
+        return Err("every prompt closes with the end letter".into());
+    }
+    let share = keys.len() / prompts.len() / 8 * 8;
+    if share == 0 {
+        return Err("fewer keys than one a prompt".into());
+    }
+    realization.admit(tower).map_err(|e| e.to_string())?;
+    println!("TOWER_REALIZATION {}", realization.realization());
+    std::fs::create_dir(out)?;
+    let mut opened = Vec::with_capacity(prompts.len());
+    for prompt in &prompts {
+        let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+        let mut state = vec![tower.rest()];
+        let (face, _) = tower.advance_realized(&mut state, &[&entered], realization).map_err(|e| e.to_string())?;
+        opened.push((state.remove(0), face[0].clone()));
+    }
+    let mut streams: Vec<KeyStream> = (0..prompts.len()).map(|p| KeyStream::new(keys[p * share..(p + 1) * share].to_vec(), 8).map_err(|e| format!("{e:?}"))).collect::<std::result::Result<_, String>>()?;
+    let releases = tower.release_spans(opened.clone(), &mut streams, limit, agree, candidates, end, realization).map_err(|e| e.to_string())?;
+    let released: Vec<Vec<usize>> = releases.iter().map(|r| r.released.clone()).collect();
+    let codes = release_codes(tower, &opened, &released, realization)?;
+    let mut written = Vec::new();
+    let mut rows = String::from("prompt	prompt_classes	released	ended	unfinished	spans	rounds	keys	release_bits_a_class	octets
+");
+    for (p, (r, code)) in releases.iter().zip(&codes).enumerate() {
+        for &c in &r.released {
+            written.extend_from_slice(&(c as u16).to_be_bytes());
+        }
+        let shown = shown_octets(&r.released, tower.declaration.alphabet);
+        let rounds: u32 = r.rounds.iter().sum();
+        rows.push_str(&format!("{p}	{}	{}	{}	{}	{}	{rounds}	{}	{}	{shown}
+", prompts[p].len(), r.released.len(), r.ended, r.unfinished, r.rounds.len(), streams[p].keys_read(), per(*code, r.released.len().max(1))));
+        println!("CLASSES_SPAN_RELEASE prompt={p} released={} ended={} unfinished={} spans={} rounds={rounds} keys={} release_bits_a_class={}", r.released.len(), r.ended, r.unfinished, r.rounds.len(), streams[p].keys_read(), per(*code, r.released.len().max(1)));
+    }
+    write_new(&out.join("RELEASES.classes"), &written)?;
+    write_new(&out.join("RELEASES.tsv"), rows.as_bytes())?;
+    println!("CLASSES_SPAN_RELEASE_DONE prompts={} agree={agree} candidates={candidates} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
     Ok(())
 }
 
@@ -556,6 +708,17 @@ fn signed_bits(code: i64) -> String {
 /// The covector and the codes are read through `realization` (the card's route, `tower_pass read
 /// complete-language read-tower-race …`, reads them on the card); the participation at the prompts'
 /// openings and over the held-out opening is read on the host, as the release reads it.
+/// A release's octets, escaped, when the classes are the octets and the end letter; a wider
+/// alphabet's classes are founded units, which decode through their units (`tower_pass units-text`),
+/// so the column reads `-` there rather than dropping every founded piece (the hardware review of
+/// October 31).
+fn shown_octets(released: &[usize], alphabet: usize) -> String {
+    if alphabet > 257 {
+        return "-".into();
+    }
+    released.iter().filter(|&&c| c < 256).map(|&c| (c as u8).escape_ascii().to_string()).collect()
+}
+
 pub(super) fn read_race(args: &[String]) -> Result<()> {
     read_race_realized(args, &mut HostPass::default())
 }
@@ -569,7 +732,7 @@ pub(crate) fn read_race_realized(args: &[String], realization: &mut dyn PassReal
     let learner = TowerLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let tower = &learner.tower;
     let alphabet = tower.declaration.alphabet;
-    let end = alphabet - 1;
+    let end = end_class(alphabet)?;
     let dev = classes_of(&pinned_read(&args[3], &args[4], READ_BUDGET as usize)?, alphabet)?;
     let prompts_classes = classes_of(&pinned_read(&args[5], &args[6], READ_BUDGET as usize)?, alphabet)?;
     let streams = positive(&args[7])?;
@@ -675,6 +838,26 @@ pub(crate) fn read_race_realized(args: &[String], realization: &mut dyn PassReal
         let own = code(a, a).unwrap_or(0);
         let others: Vec<String> = (0..prompts.len()).filter(|&q| q != a).filter_map(|q| code(a, q).map(|c| format!("{q}:{}", signed_bits(c - own)))).collect();
         println!("TOWER_RACE_FLUX prompt={a} follows_classes={} own_bits={} flux_bits_after_prompt {}", follow.len(), signed_bits(own), others.join(" "));
+    }
+    // [agent-inferred, October 31] The flux read on the continuation's opening classes alone (16, 64
+    // and 256, a reading's partition): where a prompt's effect on what follows it should show first
+    // (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §34).
+    for head in [16usize, 64, 256] {
+        for (a, follow) in follows.iter().enumerate() {
+            let Some(follow) = follow.filter(|f| f.len() >= head) else { continue };
+            let opening = &follow[..head];
+            let mut by_prompt = Vec::with_capacity(prompts.len());
+            for prompt in &prompts {
+                let entered: Vec<usize> = std::iter::once(end).chain(prompt.iter().copied()).collect();
+                let mut states = vec![tower.rest()];
+                let (faces, _) = tower.advance_realized(&mut states, &[&entered], realization).map_err(|e| e.to_string())?;
+                let (_, read) = tower.advance_realized(&mut states, &[opening], realization).map_err(|e| e.to_string())?;
+                by_prompt.push(faces[0].code(opening[0]) + read[0]);
+            }
+            let own = by_prompt[a];
+            let others: Vec<String> = (0..prompts.len()).filter(|&q| q != a).map(|q| format!("{q}:{}", signed_bits(by_prompt[q] - own))).collect();
+            println!("TOWER_RACE_FLUX_HEAD prompt={a} head={head} own_bits={} flux_bits_after_prompt {}", signed_bits(own), others.join(" "));
+        }
     }
     println!("TOWER_RACE_DONE prompts={} streams={streams} section={section} elapsed_ms={}", prompts.len(), started.elapsed().as_millis());
     Ok(())

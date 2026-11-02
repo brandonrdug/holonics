@@ -1,0 +1,22 @@
+BIN=b052a35563fe958658f800148a4330ab615d3fc741b4e445b9730d215c26b049 FROM=608804370f7b5667e241319ce09a57d8ca14b842f2b08a069f91f17a50ba46d8 at=2026-10-31T14:13:48Z
+NVIDIA_SMI before: 27 %, 210 MHz, 44, 20.41 W, 1082 MiB
+RUN_END every rc=0 MEASURE lap=every rc=0 wall_s=2970.0 peak_rss_kib=3321088
+TOWER_PASS pass=0 train_bits_a_byte=1.832 dev_bits_a_byte=2.001 dev_regions gsm8k=1.961 strokes=0.000 cycles=0.000 words=2.033 deposits=726/726 pass_ms=186972 elapsed_ms=187050 train_code=57122395177101 dev_code=1917418496553 grain_bits=20
+TOWER_PASS pass=1 train_bits_a_byte=1.811 dev_bits_a_byte=1.959 dev_regions gsm8k=1.920 strokes=0.000 cycles=0.000 words=1.989 deposits=726/726 pass_ms=188837 elapsed_ms=375888 train_code=56472986654100 dev_code=1877147340574 grain_bits=20
+TOWER_PASS pass=2 train_bits_a_byte=1.794 dev_bits_a_byte=1.934 dev_regions gsm8k=1.893 strokes=0.000 cycles=0.000 words=1.966 deposits=726/726 pass_ms=189021 elapsed_ms=564910 train_code=55947641715022 dev_code=1853322614611 grain_bits=20
+TOWER_PASS pass=3 train_bits_a_byte=1.782 dev_bits_a_byte=1.918 dev_regions gsm8k=1.872 strokes=0.000 cycles=0.000 words=1.953 deposits=726/726 pass_ms=189183 elapsed_ms=754094 train_code=55558483364146 dev_code=1837096644891 grain_bits=20
+TOWER_PASS pass=4 train_bits_a_byte=1.772 dev_bits_a_byte=1.911 dev_regions gsm8k=1.867 strokes=0.000 cycles=0.000 words=1.944 deposits=726/726 pass_ms=188563 elapsed_ms=942658 train_code=55252650341393 dev_code=1830558684111 grain_bits=20
+TOWER_PASS pass=5 train_bits_a_byte=1.764 dev_bits_a_byte=1.924 dev_regions gsm8k=1.887 strokes=0.000 cycles=0.000 words=1.952 deposits=726/726 pass_ms=188628 elapsed_ms=1131287 train_code=54995718565567 dev_code=1843117258873 grain_bits=20
+TOWER_PASS pass=6 train_bits_a_byte=1.756 dev_bits_a_byte=1.906 dev_regions gsm8k=1.864 strokes=0.000 cycles=0.000 words=1.938 deposits=726/726 pass_ms=189320 elapsed_ms=1320608 train_code=54751610899369 dev_code=1825690070491 grain_bits=20
+TOWER_PASS pass=7 train_bits_a_byte=1.750 dev_bits_a_byte=1.895 dev_regions gsm8k=1.846 strokes=0.000 cycles=0.000 words=1.932 deposits=726/726 pass_ms=188766 elapsed_ms=1509375 train_code=54578396127732 dev_code=1815107006010 grain_bits=20
+TOWER_PASS pass=8 train_bits_a_byte=1.745 dev_bits_a_byte=1.883 dev_regions gsm8k=1.841 strokes=0.000 cycles=0.000 words=1.916 deposits=726/726 pass_ms=189123 elapsed_ms=1698499 train_code=54413422573261 dev_code=1804202385175 grain_bits=20
+TOWER_PASS pass=9 train_bits_a_byte=1.739 dev_bits_a_byte=1.878 dev_regions gsm8k=1.824 strokes=0.000 cycles=0.000 words=1.919 deposits=726/726 pass_ms=189267 elapsed_ms=1887767 train_code=54234549621288 dev_code=1799168137507 grain_bits=20
+TOWER_PASS pass=10 train_bits_a_byte=1.733 dev_bits_a_byte=1.865 dev_regions gsm8k=1.817 strokes=0.000 cycles=0.000 words=1.903 deposits=726/726 pass_ms=187575 elapsed_ms=2075343 train_code=54032717307656 dev_code=1787200990676 grain_bits=20
+TOWER_PASS pass=11 train_bits_a_byte=1.729 dev_bits_a_byte=1.867 dev_regions gsm8k=1.809 strokes=0.000 cycles=0.000 words=1.912 deposits=726/726 pass_ms=188178 elapsed_ms=2263522 train_code=53916552950184 dev_code=1788657327039 grain_bits=20
+TOWER_PASS pass=12 train_bits_a_byte=1.724 dev_bits_a_byte=1.857 dev_regions gsm8k=1.804 strokes=0.000 cycles=0.000 words=1.897 deposits=726/726 pass_ms=176465 elapsed_ms=2439987 train_code=53758834220024 dev_code=1778635589180 grain_bits=20
+TOWER_PASS pass=13 train_bits_a_byte=1.720 dev_bits_a_byte=1.862 dev_regions gsm8k=1.806 strokes=0.000 cycles=0.000 words=1.905 deposits=726/726 pass_ms=176454 elapsed_ms=2616443 train_code=53629553298709 dev_code=1783760142158 grain_bits=20
+TOWER_PASS pass=14 train_bits_a_byte=1.717 dev_bits_a_byte=1.852 dev_regions gsm8k=1.796 strokes=0.000 cycles=0.000 words=1.895 deposits=726/726 pass_ms=176388 elapsed_ms=2792832 train_code=53536592634345 dev_code=1774305583298 grain_bits=20
+TOWER_PASS pass=15 train_bits_a_byte=1.713 dev_bits_a_byte=1.852 dev_regions gsm8k=1.795 strokes=0.000 cycles=0.000 words=1.896 deposits=726/726 pass_ms=176385 elapsed_ms=2969218 train_code=53426274154678 dev_code=1774347374465 grain_bits=20
+RELEASE from STATE.15 summed_elapsed_ms=3708555
+RELEASE_END 15 rc=0 MEASURE lap=release15 rc=0 wall_s=7.3 peak_rss_kib=254732
+VRAM_PEAK_MIB=10888

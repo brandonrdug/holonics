@@ -1,0 +1,14 @@
+CLASSES_RELEASE_CODE prompt=0 released=61 release_bits_a_class=4.088
+CLASSES_RELEASE_CODE prompt=1 released=1024 release_bits_a_class=4.520
+CLASSES_RELEASE_CODE prompt=2 released=279 release_bits_a_class=4.415
+CLASSES_RELEASE_CODE prompt=3 released=189 release_bits_a_class=4.511
+CLASSES_RELEASE_CODE prompt=4 released=607 release_bits_a_class=5.354
+CLASSES_RELEASE_CODE prompt=5 released=1024 release_bits_a_class=4.667
+CLASSES_RELEASE prompt=0 prompt_classes=2010 released=61 ended=true
+CLASSES_RELEASE prompt=1 prompt_classes=2010 released=1024 ended=false
+CLASSES_RELEASE prompt=2 prompt_classes=2267 released=279 ended=true
+CLASSES_RELEASE prompt=3 prompt_classes=2267 released=189 ended=true
+CLASSES_RELEASE prompt=4 prompt_classes=1729 released=607 ended=true
+CLASSES_RELEASE prompt=5 prompt_classes=1729 released=1024 ended=false
+CLASSES_RELEASE_DONE prompts=6 agree=1 elapsed_ms=9173
+MEASURE lap=release1-plain rc=0 wall_s=9.4 peak_rss_kib=255956

@@ -1,0 +1,14 @@
+FIELD_COMMAND parity-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 4 8 2 2 4
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15335227392 total=16802250752 batch_budget=10344136704
+FIELD_PASSAGE train=6602 withheld=128 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_PARITY_DECLARATION width=64 heads=8 modes=8 still=2 contacts=64 ticks=2 frames=4 reach=2221 rate=9 material=61498 grow=2
+FIELD_PARITY section=1 withheld=false regions=16 length=1408 sites=4395 pairs=97064032 reads=4 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true host_ms=10213 card_ms=274
+FIELD_PARITY section=2 withheld=false regions=16 length=1365 sites=4041 pairs=126316768 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-671987236/0/false learner_equal=true host_ms=15490 card_ms=416
+FIELD_PARITY section=3 withheld=false regions=16 length=1469 sites=5129 pairs=220042016 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-782586234/0/false learner_equal=true host_ms=19313 card_ms=678
+FIELD_PARITY section=4 withheld=false regions=16 length=1020 sites=2596 pairs=58224064 reads=5 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=-462299792/0/false learner_equal=true host_ms=8429 card_ms=197
+FIELD_PARITY section=5 withheld=true regions=128 length=1522 sites=0 pairs=1305998848 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=-10978778552/0/false learner_equal=true host_ms=19404 card_ms=930
+FIELD_PARITY_RELEASE problem=0 question=278 released=1229 equal=true host_ms=23438
+FIELD_PARITY_RELEASE problem=1 question=283 released=1229 equal=true host_ms=23796
+FIELD_PARITY_DONE sections=5 reads=21 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=2 releases_unequal=0 card_release_ms=190 host_ms=72851 card_ms=2497 elapsed_ms=123134
+FIELD_CARD reads=25 read_ms=1666 returns=4 return_ms=904 pairs=5217407968 batches=29 peak_store=5223995392 elapsed_ms=123137
+MEASURE lap=parityB3 rc=0 wall_s=123.6 peak_rss_kib=2763216

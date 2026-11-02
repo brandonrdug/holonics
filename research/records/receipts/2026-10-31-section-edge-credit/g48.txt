@@ -1,0 +1,4 @@
+BIN=dd87fde31cc8e39933740982057ccbcf6fc6470eb06e43a1db920215fad3cbe8 at=2026-10-31T21:58:49Z
+RUN_END pair8 rc=0 TOWER_CARD forwards=5544 forward_ms=245524 reverses=2600 reverse_ms=129013 elapsed_ms=480652 MEASURE lap=pair8 rc=0 wall_s=481.0 peak_rss_kib=1652264 
+RECEIPT lap 20 done
+RECEIPT lap 40 done

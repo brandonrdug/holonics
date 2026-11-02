@@ -103,6 +103,65 @@ impl Tower {
             .collect()
     }
 
+    /// [agent-inferred, October 30] **Each level's slowest mode**, `min_k max(1, 1 − |λ_k|)` on
+    /// `2^(−30)`: its span `1/(1 − |λ|)` is `2^30` over this, in the level's own ticks.
+    pub fn slowest_distances(&self) -> Vec<i128> {
+        self.layout
+            .levels
+            .iter()
+            .map(|lv| (0..self.declaration.modes).map(|k| ((1i128 << MOVE_BITS) - modulus_and_gamma(self.theta[lv.move_re + k] as i128, self.theta[lv.move_im + k] as i128).0).max(1)).min().unwrap_or(1))
+            .collect()
+    }
+
+    /// [agent-inferred, October 30] **The material's families by name**, as the learner's layout
+    /// places them: each family's level (`None` for the encoding and the faces the levels share),
+    /// its name (a material and its bias share one) and its range, in order. A reading splits a
+    /// covector by these; it decides nothing.
+    pub fn named_families(&self) -> Vec<(Option<usize>, &'static str, std::ops::Range<usize>)> {
+        let ly = &self.layout;
+        let shared = |start: usize| -> Option<&'static str> {
+            match start {
+                s if s == ly.encoding => Some("encoding"),
+                s if s == ly.readout || s == ly.readout_bias => Some("readout"),
+                s if s == ly.pair_readout || s == ly.pair_encoding => Some("pair_face"),
+                s if s == ly.ring_readout || s == ly.ring_factors => Some("ring_face"),
+                s if s == ly.strand_contact || s == ly.strand_pair => Some("strands"),
+                _ => None,
+            }
+        };
+        let level = |lv: &LevelLayout, start: usize| -> Option<&'static str> {
+            let named: [(&[usize], &'static str); 13] = [
+                (&[lv.move_re, lv.move_im], "moves"),
+                (&[lv.push_re, lv.push_im], "push"),
+                (&[lv.read_re, lv.read_im], "read"),
+                (&[lv.contact, lv.contact_bias, lv.pair, lv.pair_bias], "contacts"),
+                (&[lv.ret, lv.ret_bias], "return"),
+                (&[lv.gate, lv.gate_bias], "gate"),
+                (&[lv.turn, lv.turn_bias], "turn"),
+                (&[lv.pump, lv.pump_bias, lv.pump_axis, lv.pump_axis_bias], "pump"),
+                (&[lv.pa_probe_re, lv.pa_probe_im, lv.pa_key_re, lv.pa_key_im, lv.pa_value_re, lv.pa_value_im], "participation_charts"),
+                (&[lv.pa_read_re, lv.pa_read_im, lv.pa_contact, lv.pa_friction], "participation_read"),
+                (&[lv.passage], "passage"),
+                (&[lv.heading_re, lv.heading_im], "heading"),
+                (&[lv.descent], "descent"),
+            ];
+            named.iter().find(|(starts, _)| starts.contains(&start)).map(|&(_, name)| name)
+        };
+        ly.families
+            .iter()
+            .filter(|&&(_, len, _)| len > 0)
+            .map(|&(start, len, _)| {
+                // An absent family's start reads 0, the encoding's start, so the encoding is named
+                // first and a level's names only off it.
+                let at = if start == ly.encoding { None } else { ly.levels.iter().enumerate().find_map(|(l, lv)| level(lv, start).map(|name| (l, name))) };
+                match at {
+                    Some((l, name)) => (Some(l), name, start..start + len),
+                    None => (None, shared(start).unwrap_or("unnamed"), start..start + len),
+                }
+            })
+            .collect()
+    }
+
     /// [agent-inferred, October 29] **Each participating level's bridge `W₁ᵃ` beside its contacts**:
     /// the join's and the contacts' sums of squared entries and largest entries, on the material's
     /// grain. `None` without participation.

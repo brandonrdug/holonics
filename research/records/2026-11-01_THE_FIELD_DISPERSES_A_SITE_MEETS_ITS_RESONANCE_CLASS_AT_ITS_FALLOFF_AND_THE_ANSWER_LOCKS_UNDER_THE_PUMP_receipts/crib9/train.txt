@@ -1,0 +1,16 @@
+FIELD_COMMAND train-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 22 8 20043 80172 450000 $ROOT/.local/wt/field-card/.local/run/dispersing/crib9/train
+FIELD_DECLARATION alphabet=44 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=484 section=16 rate=8 answer=53 train=3968 withheld=128 dev=128 sections=248 laps_read=0 material=15244
+FIELD_HELD lap=-1 answer=5.459 digits=5.459 text=5.459 classes=4470 context=5.459 context_digits=5.459 context_text=5.459 context_classes=4470 foil=5.459 foil_digits=5.459 foil_text=5.459 ms=287
+FIELD_UNSEEN lap=-1 code=5.459 sites=4319 next=- ms=365
+FIELD_LAP lap=0 read=1 sites=435714 before=4.565 after=4.553 deposited=220/248 halvings=132 next_halved=23 next_refused=92 ms=10160
+FIELD_UNSEEN lap=0 code=4.544 sites=4319 next_change=44299207 next_halvings=1 next_refused=true ms=10526
+FIELD_HELD lap=0 answer=6.967 digits=7.380 text=6.528 classes=4470 context=4.561 context_digits=4.942 context_text=4.157 context_classes=4470 foil=4.561 foil_digits=4.942 foil_text=4.156 ms=10795
+FIELD_LAP lap=1 read=2 sites=422559 before=3.987 after=3.981 deposited=207/248 halvings=846 next_halved=1 next_refused=205 ms=12330
+FIELD_UNSEEN lap=1 code=4.551 sites=4319 next_change=86001793 next_halvings=1 next_refused=true ms=23126
+FIELD_HELD lap=1 answer=7.053 digits=7.464 text=6.618 classes=4470 context=4.568 context_digits=4.951 context_text=4.160 context_classes=4470 foil=4.567 foil_digits=4.951 foil_text=4.160 ms=23395
+FIELD_GROW lap=1 width=64 heads=8 contacts=64 rate=9 material=48876 ms=23396
+FIELD_LAP lap=2 read=3 sites=435528 before=3.980 after=3.973 deposited=238/248 halvings=859 next_halved=1 next_refused=236 ms=23362
+FIELD_UNSEEN lap=2 code=4.553 sites=4319 next_change=78320103 next_halvings=1 next_refused=true ms=46759
+FIELD_HELD lap=2 answer=7.087 digits=7.498 text=6.651 classes=4470 context=4.570 context_digits=4.954 context_text=4.162 context_classes=4470 foil=4.570 foil_digits=4.954 foil_text=4.161 ms=47332
+FIELD_GROW_HELD lap=2 reason=a second growth has no projection ms=47332
+FIELD_CARD reads=4504 read_ms=29935 returns=744 return_ms=13343 pairs=36985509530 batches=5248 peak_store=1683500096 landmarks=0 landmark_ms=0 elapsed_ms=47334

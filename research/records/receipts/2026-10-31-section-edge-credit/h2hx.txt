@@ -1,0 +1,6 @@
+BIN=0da20022b4f6294e5b4fd253f8a922a569e0aff47f0bb19f19026fadb06d546a
+NVIDIA_SMI before every: 24 %, 210 MHz, 405 MHz, 44, 21.92 W, P8, 1062 MiB at=2026-10-31T06:44:41Z
+RUN_END every passes=3 deadline_s=810 rc=0 MEASURE lap=every rc=0 wall_s=741.8 peak_rss_kib=4002856
+NVIDIA_SMI before clocked: 100 %, 2805 MHz, 11501 MHz, 55, 137.65 W, P2, 1046 MiB at=2026-10-31T06:57:03Z
+RUN_END clocked passes=3 deadline_s=765 rc=0 MEASURE lap=clocked rc=0 wall_s=665.7 peak_rss_kib=2023196
+VRAM_PEAK_MIB=10882

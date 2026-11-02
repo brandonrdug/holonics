@@ -1,0 +1,32 @@
+WRITTEN dir=reading-6/release problems=128 a_on_problem=0 b_free_calculations=353 b_free_right=39 c_first_calculations=110 c_from_question=15 b_equals=9/399 met=8/260 never_met=1/139 binary +=1/74 -=0/74 *=2/149 /=3/46
+GAPS dir=reading-6/release set=all n=399 right=9 wrong=390 unfinished=33 not_number=10 unread=0 numbers=347
+GAP_SIZE dir=reading-6/release set=all n=347 x2=92 x10=227 tenth=3 opposite_sign=0 smaller=256 larger=91 digits=159 foil_digits=150/343
+GAP_LEAD dir=reading-6/release set=all n=309 lead=78 foil_lead=74/306 lead_length=37 foil_lead_length=31/306 one_digit=79 foil_one_digit=67/306
+GAP_RINGS dir=reading-6/release set=all n=340 mod9=28 foil9=24/336 mod10=116 foil10=106/336 mod11=24 foil11=23/336 mod7=39 foil7=46/336 mod13=17 foil13=23/336
+GAP_FROM dir=reading-6/release set=all n=347 heard_result=344 operand=27 other_operation=21/299
+GAP_WRITES dir=reading-6/release set=all written=356 distinct=14 top10=352 commonest=10:171:4
+GAP_LENGTH dir=reading-6/release set=all 1=0/82 2=9/209 3=0/82 4=0/20 5+=0/6
+GAPS dir=reading-6/release set=met n=260 right=8 wrong=252 unfinished=16 not_number=9 unread=0 numbers=227
+GAP_SIZE dir=reading-6/release set=met n=227 x2=76 x10=167 tenth=3 opposite_sign=0 smaller=153 larger=74 digits=115 foil_digits=104/222
+GAP_LEAD dir=reading-6/release set=met n=206 lead=55 foil_lead=48/201 lead_length=32 foil_lead_length=24/201 one_digit=69 foil_one_digit=55/201
+GAP_RINGS dir=reading-6/release set=met n=226 mod9=15 foil9=14/221 mod10=72 foil10=59/221 mod11=14 foil11=14/221 mod7=21 foil7=24/221 mod13=8 foil13=10/221
+GAP_FROM dir=reading-6/release set=met n=227 heard_result=226 operand=18 other_operation=20/215
+GAP_WRITES dir=reading-6/release set=met written=235 distinct=12 top10=233 commonest=10:100:3
+GAP_LENGTH dir=reading-6/release set=met 1=0/66 2=8/151 3=0/39 4=0/4 5+=0/0
+GAPS dir=reading-6/release set=never n=139 right=1 wrong=138 unfinished=17 not_number=1 unread=0 numbers=120
+GAP_SIZE dir=reading-6/release set=never n=120 x2=16 x10=60 tenth=0 opposite_sign=0 smaller=103 larger=17 digits=44 foil_digits=50/119
+GAP_LEAD dir=reading-6/release set=never n=103 lead=23 foil_lead=22/103 lead_length=5 foil_lead_length=6/103 one_digit=10 foil_one_digit=15/103
+GAP_RINGS dir=reading-6/release set=never n=114 mod9=13 foil9=16/113 mod10=44 foil10=41/113 mod11=10 foil11=10/113 mod7=18 foil7=15/113 mod13=9 foil13=7/113
+GAP_FROM dir=reading-6/release set=never n=120 heard_result=118 operand=9 other_operation=1/84
+GAP_WRITES dir=reading-6/release set=never written=121 distinct=11 top10=120 commonest=10:71:1
+GAP_LENGTH dir=reading-6/release set=never 1=0/16 2=1/58 3=0/43 4=0/16 5+=0/6
+CARRY dir=reading-6/release never_met=1/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=1
+COUPLING problems=128
+  released: sum=32954 mean=257.45 min=98 q25=257 median=268 q75=283 max=336
+  held: sum=35463 mean=277.05 min=67 q25=188 median=254 q75=379 max=701
+  lambda: sum=10604 mean=82.84 min=15 q25=46 median=76 q75=116 max=164
+  friction: sum=47209 mean=368.82 min=111 q25=284 median=354 q75=431 max=909
+  plateaus: sum=110274 mean=861.52 min=35 q25=130 median=195 q75=445 max=9924
+  longest: sum=816 mean=6.38 min=2 q25=5 median=6 q75=7 max=13
+  lag: sum=2720 mean=21.25 min=-190 q25=-16 median=7 q75=62 max=400
+  lambda/held: mean=0.321 median=0.321

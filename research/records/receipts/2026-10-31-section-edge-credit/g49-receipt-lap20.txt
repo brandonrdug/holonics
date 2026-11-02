@@ -1,0 +1,19 @@
+TOWER_RACE_FLUX prompt=0 follows_classes=145 own_bits=409.010 flux_bits_after_prompt 1:35.859 2:26.023 3:30.179 4:30.604 5:32.307
+TOWER_RACE_FLUX prompt=1 follows_classes=72 own_bits=194.199 flux_bits_after_prompt 0:37.943 2:21.299 3:34.310 4:6.031 5:15.136
+TOWER_RACE_FLUX prompt=2 follows_classes=79 own_bits=312.370 flux_bits_after_prompt 0:21.869 1:30.950 3:20.734 4:19.279 5:13.135
+TOWER_RACE_FLUX prompt=3 follows_classes=44 own_bits=289.139 flux_bits_after_prompt 0:33.007 1:21.669 2:27.334 4:20.014 5:32.916
+TOWER_RACE_FLUX prompt=4 follows_classes=126 own_bits=438.420 flux_bits_after_prompt 0:51.093 1:23.316 2:30.998 3:30.999 5:19.924
+TOWER_RACE_FLUX prompt=5 follows_classes=179 own_bits=519.078 flux_bits_after_prompt 0:32.995 1:31.933 2:9.451 3:32.782 4:15.496
+TOWER_RACE_FLUX_HEAD prompt=0 head=16 own_bits=33.891 flux_bits_after_prompt 1:-1.425 2:1.141 3:-1.260 4:1.847 5:1.480
+TOWER_RACE_FLUX_HEAD prompt=1 head=16 own_bits=62.726 flux_bits_after_prompt 0:30.605 2:22.670 3:27.086 4:8.393 5:19.104
+TOWER_RACE_FLUX_HEAD prompt=2 head=16 own_bits=86.143 flux_bits_after_prompt 0:11.376 1:17.547 3:11.112 4:12.111 5:8.094
+TOWER_RACE_FLUX_HEAD prompt=3 head=16 own_bits=68.824 flux_bits_after_prompt 0:7.492 1:4.048 2:6.080 4:3.668 5:7.164
+TOWER_RACE_FLUX_HEAD prompt=4 head=16 own_bits=53.050 flux_bits_after_prompt 0:11.762 1:10.448 2:16.524 3:15.960 5:10.806
+TOWER_RACE_FLUX_HEAD prompt=5 head=16 own_bits=56.832 flux_bits_after_prompt 0:22.114 1:17.665 2:13.222 3:27.662 4:10.285
+TOWER_RACE_FLUX_HEAD prompt=0 head=64 own_bits=185.078 flux_bits_after_prompt 1:31.562 2:25.215 3:27.825 4:32.398 5:31.267
+TOWER_RACE_FLUX_HEAD prompt=1 head=64 own_bits=188.462 flux_bits_after_prompt 0:38.454 2:22.883 3:35.077 4:6.345 5:15.504
+TOWER_RACE_FLUX_HEAD prompt=2 head=64 own_bits=256.330 flux_bits_after_prompt 0:20.400 1:24.597 3:18.694 4:14.606 5:10.986
+TOWER_RACE_FLUX_HEAD prompt=4 head=64 own_bits=205.690 flux_bits_after_prompt 0:32.014 1:17.883 2:28.077 3:23.544 5:15.955
+TOWER_RACE_FLUX_HEAD prompt=5 head=64 own_bits=209.174 flux_bits_after_prompt 0:35.006 1:36.436 2:23.905 3:44.396 4:17.184
+MEASURE lap=flux-19 rc=0 wall_s=16.0 peak_rss_kib=470696
+WRITTEN dir=.local/run/race/g49/written-pa0-19 problems=128 a_on_problem=21 b_free_calculations=434 b_free_right=61 c_first_calculations=120 c_from_question=5 b_equals=83/399 met=76/260 never_met=7/139 binary +=4/74 -=5/74 *=53/149 /=16/46

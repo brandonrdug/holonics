@@ -1,0 +1,8 @@
+ORDER s=50 held=6823 millibits ms=6968
+ORDER s=100 held=6703 millibits ms=13608
+ORDER s=150 held=6519 millibits ms=20063
+ORDER s=200 held=6360 millibits ms=26441
+ORDER s=250 held=3209 millibits ms=32605
+ORDER s=300 held=1254 millibits ms=40217
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2013 filtered out; finished in 40.23s
+RUSAGE rc=0 wall_ms=40262 peak_rss_kib=15784 user_s=155 sys_s=0

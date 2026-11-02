@@ -1,0 +1,37 @@
+FIELD_COMMAND train-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 27 8 16292 65168 450000 $ROOT/.local/wt/field-card/.local/run/dispersing/crib10/train
+FIELD_DECLARATION alphabet=44 width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=484 section=16 rate=8 answer=53 train=3968 withheld=128 dev=128 sections=248 laps_read=0 material=15244
+FIELD_HELD lap=-1 answer=5.459 digits=5.459 text=5.459 classes=4470 context=5.459 context_digits=5.459 context_text=5.459 context_classes=4470 foil=5.459 foil_digits=5.459 foil_text=5.459 ms=295
+FIELD_UNSEEN lap=-1 code=5.459 sites=4319 next=- ms=374
+FIELD_LAP lap=0 read=1 sites=435714 before=4.951 after=4.943 deposited=235/248 halvings=25 next_halved=6 next_refused=188 ms=8823
+FIELD_UNSEEN lap=0 code=6.007 sites=4319 next_change=-347665578 next_halvings=0 next_refused=false ms=9197
+FIELD_HELD lap=0 answer=6.061 digits=6.421 text=5.679 classes=4470 context=6.011 context_digits=6.371 context_text=5.628 context_classes=4470 foil=6.011 foil_digits=6.371 foil_text=5.628 ms=9497
+FIELD_GROW lap=0 width=64 heads=8 contacts=64 rate=9 material=48876 ms=9498
+FIELD_LAP lap=1 read=2 sites=422559 before=4.945 after=4.938 deposited=237/248 halvings=24 next_halved=4 next_refused=230 ms=16170
+FIELD_UNSEEN lap=1 code=5.881 sites=4319 next_change=-427452490 next_halvings=0 next_refused=false ms=25669
+FIELD_HELD lap=1 answer=5.942 digits=6.315 text=5.546 classes=4470 context=5.885 context_digits=6.259 context_text=5.488 context_classes=4470 foil=5.885 foil_digits=6.259 foil_text=5.488 ms=26296
+FIELD_LAP lap=2 read=3 sites=435528 before=4.683 after=4.675 deposited=166/248 halvings=300 next_halved=12 next_refused=129 ms=16563
+FIELD_UNSEEN lap=2 code=4.913 sites=4319 next_change=-307410848 next_halvings=0 next_refused=false ms=42859
+FIELD_HELD lap=2 answer=6.831 digits=7.185 text=6.456 classes=4470 context=4.926 context_digits=5.222 context_text=4.610 context_classes=4470 foil=4.926 foil_digits=5.222 foil_text=4.610 ms=43427
+FIELD_LAP lap=3 read=4 sites=436131 before=3.827 after=3.824 deposited=45/248 halvings=268 next_halved=5 next_refused=4 ms=13932
+FIELD_UNSEEN lap=3 code=4.339 sites=4319 next=- ms=57360
+FIELD_HELD lap=3 answer=6.863 digits=7.276 text=6.425 classes=4470 context=4.357 context_digits=4.790 context_text=3.898 context_classes=4470 foil=4.357 foil_digits=4.790 foil_text=3.898 ms=57912
+FIELD_LAP lap=4 read=5 sites=423817 before=3.773 after=3.773 deposited=21/248 halvings=289 next_halved=5 next_refused=3 ms=14092
+FIELD_UNSEEN lap=4 code=4.299 sites=4319 next=- ms=72004
+FIELD_HELD lap=4 answer=7.356 digits=7.763 text=6.924 classes=4470 context=4.318 context_digits=4.748 context_text=3.863 context_classes=4470 foil=4.318 foil_digits=4.748 foil_text=3.862 ms=72563
+FIELD_LAP lap=5 read=6 sites=432553 before=3.749 after=3.748 deposited=4/248 halvings=257 next_halved=0 next_refused=0 ms=14173
+FIELD_UNSEEN lap=5 code=4.289 sites=4319 next=- ms=86736
+FIELD_HELD lap=5 answer=6.750 digits=7.142 text=6.333 classes=4470 context=4.307 context_digits=4.740 context_text=3.847 context_classes=4470 foil=4.307 foil_digits=4.740 foil_text=3.847 ms=87288
+FIELD_LAP lap=6 read=7 sites=433908 before=3.744 after=3.744 deposited=2/248 halvings=252 next_halved=0 next_refused=1 ms=13589
+FIELD_UNSEEN lap=6 code=4.289 sites=4319 next=- ms=100878
+FIELD_HELD lap=6 answer=6.583 digits=6.989 text=6.151 classes=4470 context=4.307 context_digits=4.740 context_text=3.847 context_classes=4470 foil=4.307 foil_digits=4.740 foil_text=3.846 ms=101437
+FIELD_LAP lap=7 read=8 sites=430422 before=3.723 after=3.723 deposited=16/248 halvings=287 next_halved=5 next_refused=3 ms=13794
+FIELD_UNSEEN lap=7 code=4.269 sites=4319 next=- ms=115232
+FIELD_HELD lap=7 answer=6.636 digits=7.055 text=6.191 classes=4470 context=4.287 context_digits=4.738 context_text=3.807 context_classes=4470 foil=4.287 foil_digits=4.738 foil_text=3.807 ms=115785
+FIELD_LAP lap=8 read=9 sites=419849 before=3.691 after=3.691 deposited=8/248 halvings=279 next_halved=1 next_refused=3 ms=13865
+FIELD_UNSEEN lap=8 code=4.268 sites=4319 next=- ms=129651
+FIELD_HELD lap=8 answer=6.530 digits=6.944 text=6.091 classes=4470 context=4.286 context_digits=4.738 context_text=3.806 context_classes=4470 foil=4.286 foil_digits=4.738 foil_text=3.806 ms=130212
+FIELD_LAP lap=9 read=10 sites=426865 before=3.689 after=3.689 deposited=0/248 halvings=248 next_halved=0 next_refused=0 ms=13668
+FIELD_UNSEEN lap=9 code=4.268 sites=4319 next=- ms=143881
+FIELD_HELD lap=9 answer=6.530 digits=6.944 text=6.091 classes=4470 context=4.286 context_digits=4.738 context_text=3.806 context_classes=4470 foil=4.286 foil_digits=4.738 foil_text=3.806 ms=144449
+FIELD_GROW_HELD lap=9 reason=a second growth has no projection ms=144449
+FIELD_CARD reads=9272 read_ms=70994 returns=2480 return_ms=61138 pairs=96077246174 batches=11752 peak_store=1683500096 landmarks=0 landmark_ms=0 elapsed_ms=144451

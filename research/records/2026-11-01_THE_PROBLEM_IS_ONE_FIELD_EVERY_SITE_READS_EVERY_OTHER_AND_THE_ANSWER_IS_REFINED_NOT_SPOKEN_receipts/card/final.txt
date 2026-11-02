@@ -1,0 +1,13 @@
+FIELD_COMMAND parity-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/TRAIN.txt 050b94f367625ad2c533bb3af53c730ea6d12e140a080a6a3def9ffdc0de3b95 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 4 8 2 2 4
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=13914865664 total=16802250752 batch_budget=8923774976
+FIELD_PASSAGE train=6730 held=128 held_read=128 alphabet=122 answer=1229 reach=2221
+FIELD_PARITY_DECLARATION width=64 heads=8 modes=8 still=2 contacts=64 ticks=2 frames=4 reach=2221 rate=9 material=61498 grow=2
+FIELD_PARITY section=1 regions=16 length=1412 sites=4023 pairs=122254496 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=8774 card_ms=366
+FIELD_PARITY section=2 regions=16 length=1325 sites=3800 pairs=143008928 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=8021 card_ms=373
+FIELD_PARITY section=3 regions=16 length=1568 sites=4636 pairs=213796432 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=11755 card_ms=556
+FIELD_PARITY section=4 regions=16 length=1576 sites=8438 pairs=415734624 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 learner_equal=true host_ms=12689 card_ms=1563
+FIELD_PARITY_RELEASE problem=0 question=278 released=1229 equal=true host_ms=12660 card_ms=64
+FIELD_PARITY_RELEASE problem=1 question=283 released=1229 equal=true host_ms=12757 card_ms=61
+FIELD_PARITY_DONE sections=4 reads=8 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=2 releases_unequal=0 host_ms=41240 card_ms=2859 elapsed_ms=69942
+FIELD_CARD reads=12 read_ms=449 returns=4 return_ms=2504 pairs=2081249312 batches=16 peak_store=3741611616 elapsed_ms=69946
+MEASURE lap=final rc=0 wall_s=70.2 peak_rss_kib=4630932

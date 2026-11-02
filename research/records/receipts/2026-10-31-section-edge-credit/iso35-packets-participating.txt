@@ -1,0 +1,12 @@
+TOWER_PARITY section=1 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=0 first_unequal=None deposited=true halvings=0 learner_equal=true host_pass_ms=716 card_pass_ms=148 host_section_ms=723 card_section_ms=223
+TOWER_PARITY section=2 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=0 first_unequal=None deposited=true halvings=0 learner_equal=true host_pass_ms=641 card_pass_ms=172 host_section_ms=800 card_section_ms=252
+TOWER_PARITY section=3 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=0 first_unequal=None deposited=true halvings=1 learner_equal=true host_pass_ms=480 card_pass_ms=133 host_section_ms=693 card_section_ms=345
+TOWER_PARITY section=4 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=0 first_unequal=None deposited=true halvings=1 learner_equal=true host_pass_ms=534 card_pass_ms=126 host_section_ms=801 card_section_ms=334
+TOWER_PARITY section=5 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=224855 first_unequal=Some(640) deposited=true halvings=3 learner_equal=false host_pass_ms=609 card_pass_ms=134 host_section_ms=1125 card_section_ms=521
+TOWER_PARITY_FIRST section=5 index=640 host=464573 card=464758
+TOWER_PARITY section=6 faces=3072 faces_unequal=0 codes_unequal=0 closures=0 closures_unequal=0 swell_equal=true gradient_entries=676385 gradient_unequal=219340 first_unequal=Some(640) deposited=true halvings=0 learner_equal=false host_pass_ms=526 card_pass_ms=133 host_section_ms=635 card_section_ms=239
+TOWER_PARITY_FIRST section=6 index=640 host=-2032957 card=-2032859
+TOWER_PARITY_FIRST section=7 index=640 host=-9528441 card=-9536581
+TOWER_PARITY_FIRST section=8 index=640 host=-1570290 card=-1522152
+TOWER_PARITY_DONE sections=8 faces=24576 faces_unequal=0 closures=0 closures_unequal=0 gradient_entries=5411080 gradient_unequal=999972 learners_unequal=4 host_ms=11564 card_ms=4108 card_forwards=35 card_forward_ms=3340 card_reverses=16 card_reverse_ms=587 elapsed_ms=16194
+MEASURE lap=iso-packets-participating rc=1 wall_s=16.7 peak_rss_kib=2307196

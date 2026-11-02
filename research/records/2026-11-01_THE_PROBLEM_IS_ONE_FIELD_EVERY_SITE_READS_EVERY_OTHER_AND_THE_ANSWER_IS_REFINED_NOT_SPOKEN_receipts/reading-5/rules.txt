@@ -1,0 +1,32 @@
+WRITTEN dir=reading-5/release problems=128 a_on_problem=0 b_free_calculations=5 b_free_right=3 c_first_calculations=5 c_from_question=0 b_equals=0/399 met=0/260 never_met=0/139 binary +=0/74 -=0/74 *=0/149 /=0/46
+GAPS dir=reading-5/release set=all n=399 right=0 wrong=399 unfinished=399 not_number=0 unread=0 numbers=0
+GAP_SIZE dir=reading-5/release set=all n=0 x2=0 x10=0 tenth=0 opposite_sign=0 smaller=0 larger=0 digits=0 foil_digits=0/0
+GAP_LEAD dir=reading-5/release set=all n=0 lead=0 foil_lead=0/0 lead_length=0 foil_lead_length=0/0 one_digit=0 foil_one_digit=0/0
+GAP_RINGS dir=reading-5/release set=all n=0 mod9=0 foil9=0/0 mod10=0 foil10=0/0 mod11=0 foil11=0/0 mod7=0 foil7=0/0 mod13=0 foil13=0/0
+GAP_FROM dir=reading-5/release set=all n=0 heard_result=0 operand=0 other_operation=0/0
+GAP_WRITES dir=reading-5/release set=all written=0 distinct=0 top10=0 commonest=-
+GAP_LENGTH dir=reading-5/release set=all 1=0/82 2=0/209 3=0/82 4=0/20 5+=0/6
+GAPS dir=reading-5/release set=met n=260 right=0 wrong=260 unfinished=260 not_number=0 unread=0 numbers=0
+GAP_SIZE dir=reading-5/release set=met n=0 x2=0 x10=0 tenth=0 opposite_sign=0 smaller=0 larger=0 digits=0 foil_digits=0/0
+GAP_LEAD dir=reading-5/release set=met n=0 lead=0 foil_lead=0/0 lead_length=0 foil_lead_length=0/0 one_digit=0 foil_one_digit=0/0
+GAP_RINGS dir=reading-5/release set=met n=0 mod9=0 foil9=0/0 mod10=0 foil10=0/0 mod11=0 foil11=0/0 mod7=0 foil7=0/0 mod13=0 foil13=0/0
+GAP_FROM dir=reading-5/release set=met n=0 heard_result=0 operand=0 other_operation=0/0
+GAP_WRITES dir=reading-5/release set=met written=0 distinct=0 top10=0 commonest=-
+GAP_LENGTH dir=reading-5/release set=met 1=0/66 2=0/151 3=0/39 4=0/4 5+=0/0
+GAPS dir=reading-5/release set=never n=139 right=0 wrong=139 unfinished=139 not_number=0 unread=0 numbers=0
+GAP_SIZE dir=reading-5/release set=never n=0 x2=0 x10=0 tenth=0 opposite_sign=0 smaller=0 larger=0 digits=0 foil_digits=0/0
+GAP_LEAD dir=reading-5/release set=never n=0 lead=0 foil_lead=0/0 lead_length=0 foil_lead_length=0/0 one_digit=0 foil_one_digit=0/0
+GAP_RINGS dir=reading-5/release set=never n=0 mod9=0 foil9=0/0 mod10=0 foil10=0/0 mod11=0 foil11=0/0 mod7=0 foil7=0/0 mod13=0 foil13=0/0
+GAP_FROM dir=reading-5/release set=never n=0 heard_result=0 operand=0 other_operation=0/0
+GAP_WRITES dir=reading-5/release set=never written=0 distinct=0 top10=0 commonest=-
+GAP_LENGTH dir=reading-5/release set=never 1=0/16 2=0/58 3=0/43 4=0/16 5+=0/6
+CARRY dir=reading-5/release never_met=0/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=0 wrong_tens_neither=0 wrong_not_whole=4
+COUPLING problems=128
+  released: sum=50868 mean=397.41 min=1 q25=3 median=6 q75=1229 max=1229
+  held: sum=35463 mean=277.05 min=67 q25=188 median=254 q75=379 max=701
+  lambda: sum=3439 mean=26.87 min=0 q25=3 median=6 q75=38 max=231
+  friction: sum=79453 mean=620.73 min=79 q25=234 median=379 q75=1303 max=1614
+  plateaus: sum=101524 mean=793.16 min=0 q25=23 median=85 q75=639 max=13146
+  longest: sum=403 mean=3.15 min=0 q25=2 median=3 q75=4 max=8
+  lag: sum=-2222 mean=-17.36 min=-1117 q25=-26 median=6 q75=59 max=307
+  lambda/held: mean=0.097 median=0.030

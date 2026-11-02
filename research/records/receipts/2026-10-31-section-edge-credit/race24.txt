@@ -1,0 +1,9 @@
+BIN=0da20022b4f6294e5b4fd253f8a922a569e0aff47f0bb19f19026fadb06d546a
+NVIDIA_SMI before dev64: 35 %, 405 MHz, 810 MHz, 49, 26.42 W, P5, 1069 MiB at=2026-10-31T06:15:23Z
+RUN_END dev64 passes=1 deadline_s=60 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=33585 MEASURE lap=dev64 rc=0 wall_s=37.2 peak_rss_kib=3213552
+PROJECTION every-level lap: T64=33585 ms -> deadline 467 s
+NVIDIA_SMI before cprime: 100 %, 2805 MHz, 11501 MHz, 52, 129.65 W, P2, 1070 MiB at=2026-10-31T06:16:00Z
+RUN_END cprime passes=2 deadline_s=560 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=4.102 deposits=64 halvings=22 elapsed_ms=22053 MEASURE lap=cprime rc=0 wall_s=427.9 peak_rss_kib=693548
+NVIDIA_SMI before every: 100 %, 2805 MHz, 11501 MHz, 55, 143.66 W, P2, 1054 MiB at=2026-10-31T06:23:08Z
+RUN_END every passes=1 deadline_s=467 rc=0 TOWER_SECTION pass=0 section=64 bits_a_byte=3.792 deposits=64 halvings=41 elapsed_ms=31775 MEASURE lap=every rc=0 wall_s=274.5 peak_rss_kib=3216884
+VRAM_PEAK_MIB=10856

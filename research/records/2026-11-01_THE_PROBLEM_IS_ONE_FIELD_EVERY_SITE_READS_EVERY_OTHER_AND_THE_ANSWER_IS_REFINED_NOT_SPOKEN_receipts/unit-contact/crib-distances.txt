@@ -1,0 +1,2 @@
+question bytes median 312.0 min 211 max 427
+first calc operand distance median 182.0 q10 55 q90 300 frac>127 0.69525

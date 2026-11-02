@@ -1,0 +1,11 @@
+TOWER_COMMAND release-tower-classes $ROOT/.local/wt/section-edge/.local/run/race/units/race/STATE.1 81b04559aa854cc28f427565e542bf7cc35a51f4ea3131a4e64ebfcad0472deb $ROOT/.local/wt/section-edge/.local/run/race/units/PROMPTS.units 8d7c42f15dbc0eaa03990e568e04e05f053ee0fe383b1f9ab690d70a8107450f $ROOT/.local/wt/race/.local/race/passage/RELEASE_KEYS 9e358671eb6968c1f4b624611b41de7fed4ede5fc1af9532a8d9db36f3c9b739 1024 1 $ROOT/.local/wt/section-edge/.local/run/race/units/release1
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+CLASSES_RELEASE_CODE prompt=0 released=1024 release_bits_a_class=4.342
+CLASSES_RELEASE_CODE prompt=1 released=1024 release_bits_a_class=4.655
+CLASSES_RELEASE_CODE prompt=2 released=152 release_bits_a_class=3.215
+CLASSES_RELEASE_CODE prompt=3 released=259 release_bits_a_class=4.349
+CLASSES_RELEASE_CODE prompt=4 released=1024 release_bits_a_class=5.008
+CLASSES_RELEASE_CODE prompt=5 released=1024 release_bits_a_class=5.080
+CLASSES_RELEASE_DONE prompts=6 agree=1 elapsed_ms=10168
+TOWER_CARD forwards=1041 forward_ms=9726 reverses=0 reverse_ms=0 elapsed_ms=10168
+MEASURE lap=release1 rc=0 wall_s=10.4 peak_rss_kib=252516

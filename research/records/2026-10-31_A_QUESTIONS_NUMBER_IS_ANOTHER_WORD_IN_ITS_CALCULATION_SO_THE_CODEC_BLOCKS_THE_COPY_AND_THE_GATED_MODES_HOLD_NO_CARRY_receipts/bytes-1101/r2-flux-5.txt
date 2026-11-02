@@ -1,0 +1,80 @@
+TOWER_COMMAND read-tower-race $ROOT/.local/wt/section-edge/.local/run/race/bytes-1101/r2/STATE.4 2690b2ff5d2ba384843f4c81089ce6ab0ab203372cab23ec9e5904ff49f7d14b $ROOT/.local/wt/section-edge/.local/run/gsm8k/DEV.units.u0 a2a61ee7451b2d8c1f59640244f2d8059e8c874e876f3311aaaa6e5d833dd050 $ROOT/.local/wt/section-edge/.local/run/gsm8k/PROMPTS6.units.u0 c54b2a088062e7f8f6ece592139218d4f154a0952eb534b5f9f13be173051200 24 128 $ROOT/.local/wt/section-edge/.local/run/race/bytes-1101/r2-flux-5
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+TOWER_RACE_FRICTIONS level=0 memory_classes:modes 2^8:2 2^7:9 2^6:8 2^5:15 2^4:14 2^3:17 2^2:24 2^1:24 2^0:15
+TOWER_RACE_FRICTIONS level=1 memory_classes:modes 2^8:11 2^7:6 2^6:8 2^5:10 2^4:11 2^3:17 2^2:20 2^1:36 2^0:9
+TOWER_RACE_FRICTIONS level=2 memory_classes:modes 2^8:3 2^7:13 2^6:11 2^5:12 2^4:8 2^3:23 2^2:23 2^1:29 2^0:6
+TOWER_RACE_FRICTIONS level=3 memory_classes:modes 2^8:6 2^7:14 2^6:10 2^5:13 2^4:16 2^3:19 2^2:22 2^1:22 2^0:6
+TOWER_RACE_FRICTIONS level=4 memory_classes:modes 2^8:16 2^7:15 2^6:17 2^5:16 2^4:15 2^3:17 2^2:16 2^1:16
+TOWER_RACE_FRICTIONS level=5 memory_classes:modes 2^8:16 2^7:16 2^6:16 2^5:16 2^4:16 2^3:16 2^2:16 2^1:16
+TOWER_RACE_BRIDGE level=0 rms_thousandths_of_contacts=12 bridge_largest=160746 contacts_largest=11842855 entries=16384
+TOWER_RACE_BRIDGE level=1 rms_thousandths_of_contacts=12 bridge_largest=160746 contacts_largest=11855948 entries=16384
+TOWER_RACE_BRIDGE level=2 rms_thousandths_of_contacts=12 bridge_largest=160746 contacts_largest=9652901 entries=16384
+TOWER_RACE_BRIDGE level=3 rms_thousandths_of_contacts=12 bridge_largest=160746 contacts_largest=10355312 entries=16384
+TOWER_RACE_BRIDGE level=4 rms_thousandths_of_contacts=135 bridge_largest=2310259 contacts_largest=6992454 entries=16384
+TOWER_RACE_BRIDGE level=5 rms_thousandths_of_contacts=77 bridge_largest=1539537 contacts_largest=6814714 entries=16384
+CLASSES_PARTICIPATION prompt=0 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=0 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=0 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=0 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=0 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=0 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=1 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=2 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=3 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=4 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=0 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=1 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=2 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=3 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=4 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+CLASSES_PARTICIPATION prompt=5 level=5 sites=0 heads=0 entropy_millibits=0 top(back:classes:thousandths) 
+TOWER_RACE_SHARE level=0 head:modes:entropy_millibits:sites:score_thousandths 0:8:-:0:- 1:8:-:0:667 2:8:-:0:- 3:8:-:0:667 4:8:-:0:667 5:8:-:0:667 6:8:-:0:667 7:8:-:0:667 8:8:-:0:667 9:8:-:0:667 10:8:-:0:667 11:8:-:0:667 12:8:-:0:667 13:8:-:0:667 14:8:-:0:667 15:8:-:0:667
+TOWER_RACE_SHARE level=1 head:modes:entropy_millibits:sites:score_thousandths 0:8:-:0:- 1:8:-:0:667 2:8:-:0:- 3:8:-:0:667 4:8:-:0:667 5:8:-:0:667 6:8:-:0:667 7:8:-:0:667 8:8:-:0:667 9:8:-:0:667 10:8:-:0:667 11:8:-:0:667 12:8:-:0:667 13:8:-:0:667 14:8:-:0:667 15:8:-:0:667
+TOWER_RACE_SHARE level=2 head:modes:entropy_millibits:sites:score_thousandths 0:8:-:0:- 1:8:-:0:667 2:8:-:0:- 3:8:-:0:667 4:8:-:0:667 5:8:-:0:667 6:8:-:0:667 7:8:-:0:667 8:8:-:0:667 9:8:-:0:667 10:8:-:0:667 11:8:-:0:667 12:8:-:0:667 13:8:-:0:667 14:8:-:0:667 15:8:-:0:667
+TOWER_RACE_SHARE level=3 head:modes:entropy_millibits:sites:score_thousandths 0:8:-:0:- 1:8:-:0:667 2:8:-:0:- 3:8:-:0:667 4:8:-:0:667 5:8:-:0:667 6:8:-:0:667 7:8:-:0:667 8:8:-:0:667 9:8:-:0:667 10:8:-:0:667 11:8:-:0:667 12:8:-:0:667 13:8:-:0:667 14:8:-:0:667 15:8:-:0:667
+TOWER_RACE_SHARE level=4 head:modes:entropy_millibits:sites:score_thousandths 0:8:16:685:449 1:8:14:685:840 2:8:14:685:810 3:8:20:685:542 4:8:22:685:689 5:8:11:685:796 6:8:12:685:612 7:8:13:685:900 8:8:18:685:979 9:8:5:685:160 10:8:19:685:955 11:8:16:685:222 12:8:11:685:657 13:8:18:685:660 14:8:20:685:941 15:8:24:685:822
+TOWER_RACE_SHARE level=5 head:modes:entropy_millibits:sites:score_thousandths 0:8:10:350:668 1:8:13:350:318 2:8:30:350:938 3:8:22:350:938 4:8:14:350:719 5:8:15:350:956 6:8:15:350:845 7:8:7:350:443 8:8:18:350:941 9:8:23:350:989 10:8:26:350:792 11:8:14:350:457 12:8:26:350:738 13:8:28:350:936 14:8:4:350:813 15:8:18:350:754
+TOWER_RACE_FLUX prompt=0 follows_classes=380 own_bits=531.526 flux_bits_after_prompt 1:3.634 2:0.602 3:4.355 4:5.227 5:6.482
+TOWER_RACE_FLUX prompt=1 follows_classes=180 own_bits=253.364 flux_bits_after_prompt 0:10.016 2:0.757 3:6.232 4:3.056 5:1.630
+TOWER_RACE_FLUX prompt=2 follows_classes=193 own_bits=372.725 flux_bits_after_prompt 0:8.754 1:1.887 3:-2.521 4:7.297 5:3.255
+TOWER_RACE_FLUX prompt=3 follows_classes=91 own_bits=302.439 flux_bits_after_prompt 0:9.107 1:10.857 2:12.225 4:11.995 5:15.066
+TOWER_RACE_FLUX prompt=4 follows_classes=296 own_bits=488.900 flux_bits_after_prompt 0:9.991 1:2.666 2:7.405 3:5.665 5:3.892
+TOWER_RACE_FLUX prompt=5 follows_classes=466 own_bits=604.452 flux_bits_after_prompt 0:2.567 1:1.239 2:4.818 3:6.895 4:-2.210
+TOWER_RACE_FLUX_HEAD prompt=0 head=16 own_bits=20.292 flux_bits_after_prompt 1:1.193 2:0.180 3:3.205 4:6.936 5:2.355
+TOWER_RACE_FLUX_HEAD prompt=1 head=16 own_bits=34.888 flux_bits_after_prompt 0:2.605 2:0.713 3:3.513 4:2.518 5:0.099
+TOWER_RACE_FLUX_HEAD prompt=2 head=16 own_bits=26.749 flux_bits_after_prompt 0:4.116 1:1.135 3:0.578 4:5.572 5:2.446
+TOWER_RACE_FLUX_HEAD prompt=3 head=16 own_bits=59.256 flux_bits_after_prompt 0:2.678 1:2.843 2:3.763 4:1.322 5:3.653
+TOWER_RACE_FLUX_HEAD prompt=4 head=16 own_bits=43.388 flux_bits_after_prompt 0:1.429 1:1.299 2:-1.198 3:-5.793 5:2.810
+TOWER_RACE_FLUX_HEAD prompt=5 head=16 own_bits=29.111 flux_bits_after_prompt 0:1.129 1:2.073 2:0.736 3:-1.300 4:0.130
+TOWER_RACE_FLUX_HEAD prompt=0 head=64 own_bits=80.040 flux_bits_after_prompt 1:1.521 2:1.345 3:4.469 4:6.916 5:4.089
+TOWER_RACE_FLUX_HEAD prompt=1 head=64 own_bits=98.526 flux_bits_after_prompt 0:10.668 2:0.849 3:6.537 4:2.390 5:2.728
+TOWER_RACE_FLUX_HEAD prompt=2 head=64 own_bits=130.839 flux_bits_after_prompt 0:7.729 1:2.816 3:-1.120 4:8.272 5:4.130
+TOWER_RACE_FLUX_HEAD prompt=3 head=64 own_bits=217.743 flux_bits_after_prompt 0:7.510 1:12.423 2:11.017 4:11.067 5:13.228
+TOWER_RACE_FLUX_HEAD prompt=4 head=64 own_bits=125.418 flux_bits_after_prompt 0:5.058 1:-1.493 2:2.667 3:-2.971 5:2.461
+TOWER_RACE_FLUX_HEAD prompt=5 head=64 own_bits=112.432 flux_bits_after_prompt 0:1.041 1:0.233 2:3.112 3:0.865 4:-3.680
+TOWER_RACE_FLUX_HEAD prompt=0 head=256 own_bits=374.542 flux_bits_after_prompt 1:4.201 2:1.459 3:3.652 4:4.800 5:6.549
+TOWER_RACE_FLUX_HEAD prompt=4 head=256 own_bits=443.776 flux_bits_after_prompt 0:10.255 1:3.133 2:8.334 3:6.217 5:4.405
+TOWER_RACE_FLUX_HEAD prompt=5 head=256 own_bits=349.795 flux_bits_after_prompt 0:0.872 1:0.959 2:4.852 3:5.058 4:-3.875
+TOWER_RACE_DONE prompts=6 streams=24 section=128 elapsed_ms=17781
+TOWER_CARD forwards=514 forward_ms=17151 reverses=1 reverse_ms=19 elapsed_ms=17781
+MEASURE lap=flux-5 rc=0 wall_s=18.1 peak_rss_kib=275160

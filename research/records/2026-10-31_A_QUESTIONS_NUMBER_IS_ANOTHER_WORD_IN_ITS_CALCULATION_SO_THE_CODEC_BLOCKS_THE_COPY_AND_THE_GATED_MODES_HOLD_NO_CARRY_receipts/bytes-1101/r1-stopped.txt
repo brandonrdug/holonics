@@ -1,0 +1,8 @@
+PARITY77 bytes5 rc=0 TOWER_PARITY_NEXT sections=32 read=31 raised=10 halved=10 refused=0 TOWER_PARITY_DONE sections=32 faces=98304 faces_unequal=0 closures=80614 closures_unequal=0 gradient_entries=20901888 gradient_unequal=0 learners_unequal=0 host_ms=33318 card_ms=11766 card_forwards=229 card_forward_ms=8293 card_reverses=32 card_reverse_ms=386 elapsed_ms=49736 MEASURE lap=parity77-bytes5 rc=0 wall_s=50.2 peak_rss_kib=2993036 
+BIN=3dade728a151c15d3f1de4019beea71228622b726dd9aff8564fe5c823e0cc49 UNITS=b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 ROUTE=train-two-ladder-stacked-news-heading-credited-every-level-pair-unit-tower LAPS=40 LIMIT=1380 ENV= NVIDIA_SMI 94 %, 1402 MiB at=2026-11-01T00:57:52Z
+RUN_END r1 rc=241 MEASURE lap=r1 rc=-15 wall_s=32.0 peak_rss_kib=1602520  EARLY_STOP lap 1 pass_ms=31553 bound=31500
+VRAM_PEAK_MIB r1=6812 baseline=1402
+RECEIPT lap 10 absent
+RECEIPT lap 20 absent
+RECEIPT lap 30 absent
+RECEIPT lap 40 absent

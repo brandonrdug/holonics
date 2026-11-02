@@ -1,0 +1,11 @@
+TOWER_COMMAND release-tower-classes race/cont2/every/lap0/STATE.2 803e432db844c2e581c280391c7e090805181894851a4eb25f95d6d6635f6eb1 $ROOT/.local/wt/race/.local/race/passage/PROMPTS.classes b45cf44ee3a5dd6b84e4b76c23cbab77e1816b1a903b4e7d394c445f9b6b7e3b $ROOT/.local/wt/race/.local/race/passage/RELEASE_KEYS 9e358671eb6968c1f4b624611b41de7fed4ede5fc1af9532a8d9db36f3c9b739 1024 2 race/agree/b2
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+CLASSES_RELEASE_CODE prompt=0 released=1024 release_bits_a_class=1.140
+CLASSES_RELEASE_CODE prompt=1 released=1024 release_bits_a_class=0.990
+CLASSES_RELEASE_CODE prompt=2 released=1024 release_bits_a_class=0.564
+CLASSES_RELEASE_CODE prompt=3 released=1024 release_bits_a_class=1.165
+CLASSES_RELEASE_CODE prompt=4 released=1024 release_bits_a_class=1.085
+CLASSES_RELEASE_CODE prompt=5 released=1024 release_bits_a_class=1.055
+CLASSES_RELEASE_DONE prompts=6 agree=2 elapsed_ms=32950
+TOWER_CARD forwards=1041 forward_ms=32617 reverses=0 reverse_ms=0 elapsed_ms=32950
+MEASURE lap=agree2 rc=0 wall_s=33.1 peak_rss_kib=232096

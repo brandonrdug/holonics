@@ -30,7 +30,11 @@
 //! residues and orientation heard from the arriving class's word, one thread a ring, through the
 //! strands' resident table, their faces read off the rings' resident faces at their level's
 //! contacts beside `r̂`, and their materials' covectors `δa ⊗ s`, `δb ⊗ s` summed by the outer
-//! sums; the faces carry none), no passage credit, any number of levels (each level's words
+//! sums; the faces carry none), with or without the clocked levels' passage credit under a news
+//! clock (`LevelCredit`: resident between sections in [`ResidentCredit`], each credited level's
+//! moments taking its moves' sub-steps in the forward, its material moments summed in closed form by
+//! `tower_credit`, and at the opening the carried modes' and packet's covectors met in the modes'
+//! scan and `tower_credit_meet`), any number of levels (each level's words
 //! resident on the card, which the law's parameter words address), streams of one section length, with
 //! or without the pair face (its values resident on the card beside the material, read at each
 //! cell's pair of the class before and the class arriving) and with or without the ring face (its
@@ -47,8 +51,13 @@
 //! from its last tick, the faces unchanged; and with the packets, `Tower::join_packets`, each
 //! clocked level carries its open packet through the fine level's moves, hears its read at a tick
 //! as the input of its push, gate and turn, and returns the read's covector to the fine level's read
-//! and scan, `tower_reverse_packet`). Any other is refused before a launch ([`TowerCard::admits`]),
-//! never run on a partial law.
+//! and scan, `tower_reverse_packet`; and with the heading, `Tower::join_heading`, each clocked level
+//! reads its heading from its modes before the arrival for its closure and after it for the face,
+//! which reads it through the descent, carries the open trace of its span and closes it at a tick,
+//! the section's closure is read at the forward's end (read, not learned), and the face's
+//! covector returns through the descent to the heading after each cell and the read covector of
+//! the cell's own state, `tower_reverse_ahead` and `tower_reverse_heading`). Any other is refused before a
+//! launch ([`TowerCard::admits`]), never run on a partial law.
 //!
 //! # The realizations (hardware law)
 //!
@@ -57,13 +66,17 @@
 //! | `tower_transpose` | a grid striding one matrix family (`grid.y` the family) | one material entry | — |
 //! | `tower_forward` | one stream (the cells in order: each state moves from the one before) | one output of each stage of a cell: the pair face's lift, a strands' ring (its three residues heard byte by byte, then their faces), a push or gate logit, a mode's move, a ring rank's advance and face, a read, a contact, a return part, a class's face (with its pair read and the ring's pair read); 256 threads | the stage's outputs (`o ≡ t`), within each its row's weights (a contact both its drives under the pair law; the return's contacts in `256/W` groups; a ring rank its factors) |
 //! | `tower_reverse_top`, `tower_reverse_contacts`, `tower_reverse_dx` | one cell of one stream | one output of each stage (the ring's readout covector, its face's and each rank's read covector among them); 256 threads | the stage's outputs, within each its column's weights |
+//! | `tower_reverse_ahead` | one cell of one stream | one coordinate of `Dᵀ δx` at each clocked level, then one of its ratio's adjoint | the top's covector against a column of the descent |
 //! | `tower_reverse_packet` | one cell of one stream, at a level that hears a packet | one coordinate of the packet read's covector, then one of the packet's | the read's coordinates, then a mode's column of the fine level's read |
+//! | `tower_reverse_heading` | one stream of one clocked level | one coordinate of the read covector | the stream's cells in order |
 //! | `tower_reverse_modes` | one stream of one level (under a rotor, exactly one thread a mode, the block exchanging each step's covector through shared memory) | one mode | the stream's cells in reverse order (the scan) |
 //! | `tower_reverse_ring` | one stream | one ring rank's scan step, then one face coordinate, then one factor entry | the stream's cells in reverse order, every rank's scan carried together; a coordinate the ranks in their order |
 //! | `tower_outer_x32`, `tower_outer_x64` | a tile of 16 rows × 64 columns of one family's covector (the pair face's readout and lift, the ring's readout and the strands' materials among them) | four outputs of one column | every stream, its cells in chunks of 32 staged in shared memory |
 //! | `tower_ring_factors` | a grid striding the ring's factors | one factor entry | the streams |
 //! | `tower_encoding` | one class | one face coordinate | every cell, summing where its class arrived |
 //! | `tower_moves` | one level | one mode | the streams |
+//! | `tower_credit` | one stream of one credited level (`grid.y`) | one mode for the turns after each cell and the rows, then one entry of the material moments | the stream's cells in reverse order, then its cells |
+//! | `tower_credit_meet` | a grid striding a credited level's push, gate and gate-bias entries (`grid.y` the level) | one entry | the streams and the level's two sets |
 //! | `tower_pair_biases` (the foil's) | a grid striding each level's two bias covectors | one bias entry | every cell |
 //! | `tower_split_read` (the paired contacts' split read) | one dormant pair of one level (`grid.y` the level) | one cell of a chunk of the block's width, then one output of the turned sum in `256/W` groups | every stream's cells, a chunk at a time |
 use core::ffi::c_void;
@@ -72,7 +85,7 @@ use std::time::Instant;
 use holonics::hnn::tower::participation::LevelSites;
 use holonics::hnn::tower::realization::{PassRead, PassRealization, ResidentLaw, Slot};
 use holonics::hnn::tower::split::{PairRead, PairedContacts, SplitRead};
-use holonics::hnn::tower::{ContactLaw, Tower, TowerError, TowerFace, TowerState};
+use holonics::hnn::tower::{ContactLaw, LevelCredit, Tower, TowerError, TowerFace, TowerState};
 
 use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
@@ -129,6 +142,12 @@ struct LevelWords {
     /// A clocked level's section `B r^(l−F)` on `2^(−20)` bits (unread below the clock's first
     /// clocked level and without a clock; [`NewsClock`]).
     section: u64,
+    /// The heading's read `C^→` (re, im), its descent `D` and their reaches (zero without it and
+    /// below the clock's first clocked level; [`Tower::join_heading`]).
+    heading_re: u64,
+    heading_im: u64,
+    descent: u64,
+    heading_reach: [u64; 3],
 }
 
 /// The law's words (`TowerLaw`).
@@ -207,9 +226,28 @@ struct LawWords {
     /// ([`Tower::join_packets`]).
     packets: u32,
     /// One when the reverse keeps each contact's covector for the paired contacts' split read
-    /// (`tower_split_read`, [`holonics::hnn::tower::split`]), else zero; and the words' padding.
+    /// (`tower_split_read`, [`holonics::hnn::tower::split`]), else zero; and participation's first
+    /// level (zero without it; record `2026-10-30_…`, §35).
     split: u32,
-    split_pad: u32,
+    pa_from: u32,
+    /// The heading (`heading = 0` without it; else the clocked levels `L − F` that carry one) and
+    /// the closure's shift `s` ([`Tower::join_heading`]).
+    heading: u32,
+    heading_shift: u32,
+    /// The clocked levels' credit (`credit = 0` without it; else the credited levels `L − F`) and
+    /// whether each credited level below the top carries its packet's moments
+    /// ([`holonics::hnn::tower::LevelCredit`]).
+    credit: u32,
+    credit_packet: u32,
+    /// Whether this forward reads the heading's closure (the opening read, or a reread under the
+    /// declared reading) and whether it advances the credit (the read a carry keeps).
+    closure: u32,
+    credit_advance: u32,
+    /// The first credited level ([`Tower::rest_with_credit_from`]).
+    credit_from: u32,
+    /// One when the forward keeps each stream's logits and face over the alphabet in the frame
+    /// rather than its shared surface (`Shape::face_global`).
+    face_global: u32,
 }
 
 /// The section's buffers as the kernels address them (`TowerFrame`).
@@ -368,6 +406,36 @@ struct FrameWords {
     split_dv: u64,
     split_dir: u64,
     split_out: u64,
+    tr_open: u64,
+    tr_ends: u64,
+    hd_read: u64,
+    tr_read: u64,
+    hd_list: u64,
+    hd_count: u64,
+    hd_close: u64,
+    hd_g: u64,
+    ah_read: u64,
+    ah_scale: u64,
+    ah_face: u64,
+    ah_dread: u64,
+    ah_top: u64,
+    r_ah_read: u64,
+    r_ah_face_re: u64,
+    r_ah_face_im: u64,
+    r_ah_dread: u64,
+    r_ah_top: u64,
+    cr_open: u64,
+    cr_next: u64,
+    cr_turn: u64,
+    cr_push: u64,
+    cr_gate: u64,
+    cr_pgate: u64,
+    cr_x: u64,
+    cr_rest: u64,
+    cr_cov: u64,
+    cr_tick: u64,
+    face_z: u64,
+    face_ms: u64,
 }
 
 /// One family's outer sum (`TowerOuter`).
@@ -445,6 +513,19 @@ struct Shape {
     /// One under the pair contact, whose reverse can form the paired contacts' split read, else
     /// zero.
     split: usize,
+    /// The clocked levels that carry a heading (zero without it).
+    heading: usize,
+    /// The credited levels (zero when the streams carry no credit), and those among them whose
+    /// moves carry a packet.
+    credit: usize,
+    credit_packets: usize,
+    /// [agent-inferred, October 31] One when the forward's shared surface with the alphabet's logits
+    /// and face in it would pass the card's block (a wide alphabet: the founded units, record §33),
+    /// so each stream's logits and face are kept in the frame instead; the same values either way.
+    face_global: usize,
+    /// [agent-inferred, October 31] The levels participation reads at, `L − pa_from` (zero without
+    /// it): its sites' buffers hold those levels alone (record `2026-10-30_…`, §36).
+    pa_levels: usize,
 }
 
 impl Shape {
@@ -605,11 +686,12 @@ struct Frame<'c> {
     /// empty without it).
     contact_y: CardBuffer<'c, i64>,
     contact_gy: CardBuffer<'c, i64>,
-    /// The packets (each empty without them): each stream's open packets from the first clocked
-    /// level up (`[S][L − F][N][2]`) and its closing ones; each cell's packet as its level finds it
-    /// (`[S][T][L][N][2]`), its ratio read and scale at a tick (`[S][T][L][W]`, `[S][T][L]`), its
-    /// face (re block, im block, `[S][T][L][2N]`); the reverse's covector of the ratio read, its
-    /// adjoint (`[S][T][L][W]` each) and the packet's covector at a tick (`[S][T][L][2N]`).
+    /// The packets (each empty without them; `PK = L − F`, the levels that hear one): each
+    /// stream's open packets from the first clocked level up (`[S][PK][N][2]`) and its closing
+    /// ones; each cell's packet as its level finds it (`[S][T][PK][N][2]`), its ratio read and
+    /// scale at a tick (`[S][T][PK][W]`, `[S][T][PK]`), its face (re block, im block,
+    /// `[S][T][PK][2N]`); the reverse's covector of the ratio read, its adjoint (`[S][T][PK][W]`
+    /// each) and the packet's covector at a tick (`[S][T][PK][2N]`).
     pk_open: CardBuffer<'c, i64>,
     pk_ends: CardBuffer<'c, i64>,
     pk_state: CardBuffer<'c, i64>,
@@ -625,6 +707,46 @@ struct Frame<'c> {
     split_dv: CardBuffer<'c, i64>,
     split_dir: CardBuffer<'c, i32>,
     split_out: CardBuffer<'c, i128>,
+    /// The heading (each empty without it; `HD = L − F`, the levels that carry one): each
+    /// stream's open trace before its first cell and after its last (`[S][HD][W]`); each cell's
+    /// heading read before its arrival, which the closure reads (`[S][T][HD][W]`); each trace's
+    /// ratio read at a tick (`[S][T][HD][W]`); each stream's ticks a level in the section, their
+    /// count and each tick's closure (`[S][HD][T]`, `[S][HD]`, `[S][HD][T][4]`: `e_jj`, the
+    /// total's two words, `z_max`); and the closure's scratch (`[S][T]`).
+    tr_open: CardBuffer<'c, i64>,
+    tr_ends: CardBuffer<'c, i64>,
+    hd_read: CardBuffer<'c, i32>,
+    tr_read: CardBuffer<'c, i32>,
+    hd_list: CardBuffer<'c, u32>,
+    hd_count: CardBuffer<'c, u32>,
+    hd_close: CardBuffer<'c, u64>,
+    hd_g: CardBuffer<'c, i64>,
+    /// The heading after each cell, which the face reads through the descent (each empty without
+    /// the heading): its ratio read and scale (`[S][T][HD][W]`, `[S][T][HD]`) and the face it read
+    /// (`[S][T][HD][2N]`); the reverse's covector of its raw read (`[S][T][HD][W]`) and the top's
+    /// covector it was read against (`[S][T][W]`).
+    ah_read: CardBuffer<'c, i32>,
+    ah_scale: CardBuffer<'c, i64>,
+    ah_face: CardBuffer<'c, i64>,
+    ah_dread: CardBuffer<'c, i64>,
+    ah_top: CardBuffer<'c, i64>,
+    /// The clocked levels' credit's scratch (each empty without it; `CL` the credited levels): each
+    /// cell's turn, push, gate and packet-gate coefficients (`[S][T][CL][N][2]` each), the input the
+    /// push and gate read (`[S][T][CL][W]`), whether the carried packet rested (`[S][T][CL]`), and the
+    /// reverse's opening covectors (`[S][CL][2][N][2]`).
+    cr_turn: CardBuffer<'c, i64>,
+    cr_push: CardBuffer<'c, i64>,
+    cr_gate: CardBuffer<'c, i64>,
+    cr_pgate: CardBuffer<'c, i64>,
+    cr_x: CardBuffer<'c, i32>,
+    cr_rest: CardBuffer<'c, u32>,
+    cr_cov: CardBuffer<'c, i64>,
+    /// Each cell's ticks at each credited level for the read that advances the credit
+    /// (`[S][T][CL]`, `tower_credit_moments`).
+    cr_tick: CardBuffer<'c, u32>,
+    /// Each stream's logits and face over the alphabet (empty unless `face_global`).
+    face_z: CardBuffer<'c, i64>,
+    face_ms: CardBuffer<'c, u64>,
     /// The reaches' slices of `reaches`, in `FrameWords`' order: input, face re, face im, read,
     /// conduct (each `Q·L`), top (`Q`), dz (`Q`), dy, da, dread, gre, gim, dq (each `Q·L`), then
     /// the pair face read, the bottom covector `δx⁰` and the ring's pair read (each `Q`), then the
@@ -632,8 +754,27 @@ struct Frame<'c> {
     /// drive's covector `δb`, then the strands' faces at their level (each `Q·L`), then
     /// participation's ratio read, current (re, im) and `∂r̂ᵃ` (each `Q·L`) and its six chart
     /// covectors (`6·Q·L`), then the mutual contact's `G_y` (`Q`), then the packets' ratio read,
-    /// face (re, im) and the read's adjoint (each `Q·L`).
-    reach_offsets: [usize; 31],
+    /// face (re, im) and the read's adjoint (each `Q·L`), then the heading's after each cell: the
+    /// ratio, the face (re, im) and the read's adjoint (each `Q·HD`, `[HD][S][T]`) and the top's
+    /// covector (`Q`).
+    reach_offsets: [usize; 36],
+}
+
+/// [agent-inferred, October 31] **The streams' credit resident on the card** (record
+/// `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §22): each stream's credit at
+/// the next opening (`open`, its words `Tower::credit_words`) and the credit each kept read advanced it
+/// to (`next`, one a slot), outside the frame, so a frame sized for another read keeps it. The host's
+/// states hold a mark of it (`LevelCredit::resident_mark`), which [`TowerCard::fetch_credit`] returns.
+struct ResidentCredit<'c> {
+    streams: usize,
+    /// The first credited level and one stream's words.
+    from: usize,
+    extent: usize,
+    generation: u64,
+    open: CardBuffer<'c, i64>,
+    /// The advance of the read a carry keeps (one: an opening read advances only when its carry
+    /// asks, after any reread, `TowerCard::carry`).
+    next: CardBuffer<'c, i64>,
 }
 
 /// [definition] **The card's realization of the section's pass** (module header).
@@ -646,8 +787,28 @@ pub struct TowerCard<'c> {
     opened: Option<(LawWords, Vec<LevelWords>)>,
     /// Whether the frame's material is still the opening read's (a reread uploads its candidate).
     opened_current: bool,
+    /// Whether the frame holds an opening read's ticks under a news clock, which a reread on them
+    /// ([`Slot::OpeningTicks`]) reads; a frame sized again holds none.
+    ticks_kept: bool,
     ends: [Option<Vec<TowerState>>; 2],
+    /// The streams' credit, when the learner's streams carry one.
+    credit: Option<ResidentCredit<'c>>,
+    /// The generation the next resident credit takes (a mark of an older one is refused).
+    generations: u64,
+    /// [agent-inferred, October 31] The read whose credit advance waits for its carry (its slot and
+    /// its law's words): `tower_credit` sums the material moments only for the read a carry keeps,
+    /// and an opening read advances none unless a carry asks for it (record §23).
+    credit_pending: Option<(usize, LawWords)>,
+    /// The opening read's classes and targets, which a carry of the opening reads again to advance
+    /// its credit; and whether the next opening read advances it.
+    opened_reads: Option<(Vec<Vec<usize>>, Vec<Vec<Option<usize>>>)>,
+    force_advance: bool,
+    /// Whether a reread reads the heading's closure ([`PassRealization::reread_closures`]).
+    reread_closures: bool,
     times: TowerCardTimes,
+    /// Whether the forward keeps the alphabet's logits and face in the frame at any alphabet
+    /// ([`TowerCard::force_face_global`]).
+    face_global_forced: bool,
     /// When set, each launch is waited on and timed by its entry (a measurement aid: it
     /// serializes the card's stream).
     profile: Option<std::cell::RefCell<std::collections::BTreeMap<&'static str, (u64, u128)>>>,
@@ -662,10 +823,17 @@ pub struct TowerCardTimes {
     pub reverse_ns: u128,
 }
 
+/// `tower_credit`'s shared bytes (record §28): the whole section's turns, and the staged chunk's
+/// rows (six words a cell of a warp's mode) and inputs (`CREDIT_CELLS` cells).
+fn credit_shared(words: &LawWords) -> u32 {
+    const CREDIT_CELLS: u32 = 32;
+    32 * words.modes + 48 * CREDIT_CELLS * (THREADS / 32) + 4 * CREDIT_CELLS * words.width
+}
+
 fn slot_index(slot: Slot) -> usize {
     match slot {
         Slot::Opened => 0,
-        Slot::Reread => 1,
+        Slot::Reread | Slot::OpeningTicks => 1,
     }
 }
 
@@ -679,12 +847,19 @@ impl<'c> TowerCard<'c> {
     pub fn open(card: &'c Card) -> std::result::Result<Self, DeviceError> {
         card.current()?;
         let module = Module::load_ptx(IMAGE)?;
-        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ends: [None, None], times: TowerCardTimes::default(), profile: None })
+        Ok(Self { card, module, frame: None, opened: None, opened_current: false, ticks_kept: false, ends: [None, None], credit: None, generations: 0, credit_pending: None, opened_reads: None, force_advance: false, reread_closures: false, times: TowerCardTimes::default(), face_global_forced: false, profile: None })
     }
 
     /// Time every launch by its entry from here on (each launch waited on before and after).
     pub fn profile(&mut self) {
         self.profile = Some(Default::default());
+    }
+
+    /// [agent-inferred, October 31] A declared realization: the forward keeps each stream's logits and
+    /// face over the alphabet in the frame whatever its shared surface could carry (`Shape::face_global`),
+    /// so a parity at a narrow alphabet reads the wide alphabet's path. It changes no value.
+    pub fn force_face_global(&mut self) {
+        self.face_global_forced = true;
     }
 
     /// Each entry's launches and their summed wall time, when profiled.
@@ -702,6 +877,11 @@ impl<'c> TowerCard<'c> {
         let refuse = |why: &'static str| Err(TowerError::Refused(why));
         if !d.gated {
             return refuse("the card carries the gated tower");
+        }
+        // Participation beside the heading reads back from any level (record
+        // `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35 and §44).
+        if law.heading.is_some_and(|shift| !law.packets || law.mutual.is_some() || law.rotor.is_some() || law.ring.is_some() || law.strands.is_some() || shift > 32) {
+            return refuse("the card closes a heading at the packets' ticks, never beside a mutual contact, a rotor, a ring face or strands");
         }
         if law.mutual.is_some() && (law.rotor.is_some() || law.news.is_some() || law.pair.is_some() || law.ring.is_some() || law.strands.is_some() || law.participation.is_some()) {
             return refuse("the card carries a mutual contact alone at the comparison, never beside a rotor, a news clock, a pair or ring face, strands or participation");
@@ -849,10 +1029,15 @@ impl<'c> TowerCard<'c> {
             words.pa_section = p.section as u32;
             words.pa_beta = p.beta_shift;
             words.pa_held_log = law.held_log;
+            words.pa_from = p.from as u32;
             words.ln2 = law.ln2 as i64;
         }
         words.passage = u32::from(law.passage);
         words.packets = if law.packets { law.news.map_or(0, |c| (d.levels - c.first()) as u32) } else { 0 };
+        if let (Some(shift), Some(clock)) = (law.heading, &law.news) {
+            words.heading = (d.levels - clock.first()) as u32;
+            words.heading_shift = shift;
+        }
         if let Some(b) = law.mutual {
             words.mutual = 1;
             words.mutual_shift = b;
@@ -888,6 +1073,10 @@ impl<'c> TowerCard<'c> {
                 passage: lv.passage as u64,
                 passage_reach: lv.passage_reach,
                 section: law.news.filter(|c| l >= c.first()).map_or(0, |c| c.section(l).expect("admitted")),
+                heading_re: lv.heading_re as u64,
+                heading_im: lv.heading_im as u64,
+                descent: lv.descent as u64,
+                heading_reach: lv.heading_reaches,
             })
             .collect();
         (words, levels)
@@ -912,7 +1101,7 @@ impl<'c> TowerCard<'c> {
             if d.contact != ContactLaw::Rectifying {
                 out.extend([lv.pair as u64, f, w]);
             }
-            if law.participation.is_some() {
+            if law.participation.as_ref().is_some_and(|p| l >= p.from) {
                 let p = &lv.participation;
                 for (offset, rows, cols) in [(p[0], n, w), (p[1], n, w), (p[2], n, w), (p[3], n, w), (p[4], n, w), (p[5], n, w), (p[6], w, n), (p[7], w, n), (p[8], f, w)] {
                     out.extend([offset as u64, rows, cols]);
@@ -920,6 +1109,9 @@ impl<'c> TowerCard<'c> {
             }
             if l >= heard {
                 out.extend([lv.passage as u64, f, w]);
+            }
+            if law.heading.is_some() && law.news.is_some_and(|c| l >= c.first()) {
+                out.extend([lv.heading_re as u64, w, n, lv.heading_im as u64, w, n]);
             }
         }
         if let Some(strands) = &law.strands {
@@ -937,6 +1129,9 @@ impl<'c> TowerCard<'c> {
             return Ok(());
         }
         self.frame = None;
+        self.ticks_kept = false;
+        // A frame sized again holds no read's credit advance.
+        self.credit_pending = None;
         let card = self.card;
         let Shape { alphabet: a, width: w, modes: n, contacts: f, levels: l, len, streams: s, cells: t, forms: k, ranks: r, ring_moves: m, turned, news, pumped, moving, paired, foil, strand_rings: sr, strand_table, .. } = shape;
         let stranded = usize::from(sr > 0);
@@ -945,10 +1140,13 @@ impl<'c> TowerCard<'c> {
         let q = s * t;
         let ql = q * l;
         let (heads, sec, pa, carried) = (shape.heads, shape.section, usize::from(shape.heads > 0), shape.carried);
+        // Participation's sites at its own levels alone (`pa_at`, record `2026-10-30_…`, §36).
+        let (lpa, qa) = (shape.pa_levels, q * shape.pa_levels);
         let mutual = shape.mutual;
         let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
-        let mut reach_offsets = [0usize; 31];
-        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd];
+        let (hd, hdd) = (shape.heading, usize::from(shape.heading > 0));
+        let mut reach_offsets = [0usize; 36];
+        let extents = [ql, ql, ql, ql, ql, q, q, ql, ql, ql, ql, ql, ql, q, q, q, ql * turned, ql * pumped, ql * pumped, ql * paired, ql * stranded, ql * pa, ql * pa, ql * pa, ql * pa, 6 * ql * pa, q * mutual, ql * pkd, ql * pkd, ql * pkd, ql * pkd, q * hd, q * hd, q * hd, q * hd, q * hdd];
         let mut at = 0;
         for (slot, extent) in reach_offsets.iter_mut().zip(extents) {
             *slot = at;
@@ -958,7 +1156,7 @@ impl<'c> TowerCard<'c> {
             shape,
             theta: card.alloc(len)?,
             theta_t: card.alloc(len)?,
-            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa) * l + shape.passage + stranded * (1 + paired)))?,
+            families: card.alloc(3 * (1 + (7 + turned + 2 * pumped + paired + 9 * pa) * l + shape.passage + 2 * hd + stranded * (1 + paired)))?,
             gates: card.alloc(l * n * 4)?,
             roots: card.alloc(64)?,
             classes: card.alloc(s * (t + 1))?,
@@ -1036,32 +1234,32 @@ impl<'c> TowerCard<'c> {
             strand_ends: card.alloc(s * (3 * sr + 1) * stranded)?,
             strand_faces: card.alloc(q * 6 * sr)?,
             pa_heads: card.alloc((heads + 1) * pa)?,
-            pa_probe: card.alloc(ql * n * 2 * pa)?,
-            pa_key: card.alloc(ql * n * 2 * pa)?,
-            pa_value: card.alloc(ql * n * 2 * pa)?,
-            pa_frame: card.alloc(ql * n * 2 * pa)?,
-            pa_diss: card.alloc(ql * heads)?,
-            pa_current: card.alloc(ql * 2 * n * pa)?,
-            pa_read: card.alloc(ql * w * pa)?,
+            pa_probe: card.alloc(qa * n * 2)?,
+            pa_key: card.alloc(qa * n * 2)?,
+            pa_value: card.alloc(qa * n * 2)?,
+            pa_frame: card.alloc(qa * n * 2)?,
+            pa_diss: card.alloc(qa * heads)?,
+            pa_current: card.alloc(qa * 2 * n)?,
+            pa_read: card.alloc(qa * w)?,
             pa_scale: card.alloc(ql * pa)?,
             pa_run: card.alloc(s * l * n * 2 * pa)?,
             pa_met: card.alloc(s * l * n * pa)?,
             pa_z: card.alloc(s * heads * t.max(sec) * pa)?,
             pa_e: card.alloc(s * heads * t.max(sec) * pa)?,
-            pa_dra: card.alloc(ql * w * pa)?,
-            pa_gy: card.alloc(ql * 2 * n * pa)?,
+            pa_dra: card.alloc(qa * w)?,
+            pa_gy: card.alloc(qa * 2 * n)?,
             pa_gq: card.alloc(q * n * 2 * pa)?,
             pa_gk: card.alloc(q * n * 2 * pa)?,
             pa_gw: card.alloc(q * n * 2 * pa)?,
-            pa_gchart: card.alloc(ql * 6 * n * pa)?,
+            pa_gchart: card.alloc(qa * 6 * n)?,
             pa_gfric: card.alloc(s * l * heads)?,
             pa_gmet: card.alloc(q * heads)?,
             pa_tturn: card.alloc(q * n * pa)?,
             pa_tlog: card.alloc(q * n * pa)?,
             pa_open: card.alloc(s * l * pa)?,
-            pa_open_key: card.alloc(s * sec * l * n * 2 * carried)?,
-            pa_open_value: card.alloc(s * sec * l * n * 2 * carried)?,
-            pa_open_diss: card.alloc(s * sec * l * heads * carried)?,
+            pa_open_key: card.alloc(s * sec * lpa * n * 2 * carried)?,
+            pa_open_value: card.alloc(s * sec * lpa * n * 2 * carried)?,
+            pa_open_diss: card.alloc(s * sec * lpa * heads * carried)?,
             pa_hold: card.alloc(s * l * 2 * n * pa)?,
             pa_sect: card.alloc(s * l * 2 * pa)?,
             pa_member: card.alloc(s * l * sec * pa)?,
@@ -1070,16 +1268,41 @@ impl<'c> TowerCard<'c> {
             contact_gy: card.alloc(q * w * mutual)?,
             pk_open: card.alloc(s * pk * n * 2)?,
             pk_ends: card.alloc(s * pk * n * 2)?,
-            pk_state: card.alloc(ql * n * 2 * pkd)?,
-            pk_read: card.alloc(ql * w * pkd)?,
-            pk_scale: card.alloc(ql * pkd)?,
-            pk_face: card.alloc(ql * 2 * n * pkd)?,
-            pk_dx: card.alloc(ql * w * pkd)?,
-            pk_dread: card.alloc(ql * w * pkd)?,
-            pk_cov: card.alloc(ql * 2 * n * pkd)?,
-            split_dv: card.alloc(ql * f * shape.split)?,
-            split_dir: card.alloc(l * (f / 2) * w * shape.split)?,
-            split_out: card.alloc(l * (f / 2) * (2 + w) * shape.split)?,
+            pk_state: card.alloc(q * pk * n * 2)?,
+            pk_read: card.alloc(q * pk * w)?,
+            pk_scale: card.alloc(q * pk)?,
+            pk_face: card.alloc(q * pk * 2 * n)?,
+            pk_dx: card.alloc(q * pk * w)?,
+            pk_dread: card.alloc(q * pk * w)?,
+            pk_cov: card.alloc(q * pk * 2 * n)?,
+            // The split read's buffers are sized at the first split read (`TowerCard::reverse_split`):
+            // a pair contact's tower that never reads one holds none.
+            split_dv: card.alloc(0)?,
+            split_dir: card.alloc(0)?,
+            split_out: card.alloc(0)?,
+            tr_open: card.alloc(s * hd * w)?,
+            tr_ends: card.alloc(s * hd * w)?,
+            hd_read: card.alloc(q * hd * w)?,
+            tr_read: card.alloc(q * hd * w)?,
+            hd_list: card.alloc(s * hd * t)?,
+            hd_count: card.alloc(s * hd)?,
+            hd_close: card.alloc(s * hd * t * 4)?,
+            hd_g: card.alloc(q * hdd)?,
+            ah_read: card.alloc(q * hd * w)?,
+            ah_scale: card.alloc(q * hd)?,
+            ah_face: card.alloc(q * hd * 2 * n)?,
+            ah_dread: card.alloc(q * hd * w)?,
+            ah_top: card.alloc(q * w * hdd)?,
+            cr_turn: card.alloc(q * shape.credit * n * 2)?,
+            cr_push: card.alloc(q * shape.credit * n * 2)?,
+            cr_gate: card.alloc(q * shape.credit * n * 2)?,
+            cr_pgate: card.alloc(q * shape.credit_packets * n * 2)?,
+            cr_x: card.alloc(q * shape.credit * w)?,
+            cr_rest: card.alloc(q * shape.credit)?,
+            cr_cov: card.alloc(s * shape.credit * 2 * n * 2)?,
+            cr_tick: card.alloc(q * shape.credit)?,
+            face_z: card.alloc(s * a * shape.face_global)?,
+            face_ms: card.alloc(s * a * shape.face_global)?,
             reach_offsets,
         });
         Ok(())
@@ -1240,6 +1463,36 @@ impl<'c> TowerCard<'c> {
             split_dv: frame.split_dv.device_ptr(),
             split_dir: frame.split_dir.device_ptr(),
             split_out: frame.split_out.device_ptr(),
+            tr_open: frame.tr_open.device_ptr(),
+            tr_ends: frame.tr_ends.device_ptr(),
+            hd_read: frame.hd_read.device_ptr(),
+            tr_read: frame.tr_read.device_ptr(),
+            hd_list: frame.hd_list.device_ptr(),
+            hd_count: frame.hd_count.device_ptr(),
+            hd_close: frame.hd_close.device_ptr(),
+            hd_g: frame.hd_g.device_ptr(),
+            ah_read: frame.ah_read.device_ptr(),
+            ah_scale: frame.ah_scale.device_ptr(),
+            ah_face: frame.ah_face.device_ptr(),
+            ah_dread: frame.ah_dread.device_ptr(),
+            ah_top: frame.ah_top.device_ptr(),
+            r_ah_read: r(31),
+            r_ah_face_re: r(32),
+            r_ah_face_im: r(33),
+            r_ah_dread: r(34),
+            r_ah_top: r(35),
+            cr_open: 0,
+            cr_next: 0,
+            cr_turn: frame.cr_turn.device_ptr(),
+            cr_push: frame.cr_push.device_ptr(),
+            cr_gate: frame.cr_gate.device_ptr(),
+            cr_pgate: frame.cr_pgate.device_ptr(),
+            cr_x: frame.cr_x.device_ptr(),
+            cr_rest: frame.cr_rest.device_ptr(),
+            cr_cov: frame.cr_cov.device_ptr(),
+            cr_tick: frame.cr_tick.device_ptr(),
+            face_z: frame.face_z.device_ptr(),
+            face_ms: frame.face_ms.device_ptr(),
         }
     }
 
@@ -1297,10 +1550,13 @@ impl<'c> TowerCard<'c> {
         let ringed = usize::from(r > 0);
         let g = (THREADS as usize / w).max(1);
         let p = usize::from(shape.heads > 0);
-        // The packets and a still level's held read (under a news clock without participation).
+        // The packets, a still level's held read (under a news clock without participation), the
+        // heading's open traces and tick counts, and the heading each clocked level holds between
+        // its ticks (its ratio, lift, maxima and hold, record §19).
         let (pk, pkd) = (shape.packets, usize::from(shape.packets > 0));
         let hold = usize::from(shape.news > 0 && shape.heads == 0);
-        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 6 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l, 8 * pk * 2 * n, 4 * w * pkd, 4 * l * w * hold, 8 * 4 * l * hold, 4 * l * hold].iter().map(|&o| carve(o)).sum()
+        let a = a * (1 - shape.face_global);
+        [16 * g * w, 16 * 32, 8 * l * 2 * n, 8 * (3 + shape.turned + 2 * shape.pumped) * n, 8 * 2 * n, 8 * 2 * w, 8 * w, 8 * a, 8 * a, 8 * 32, 4 * w, 4 * w, 4 * w, 4 * f, 4 * f, 4 * k, 16 * 2 * r, 4 * r, 8 * 2 * n * ringed, 4 * k2, 4 * w * ringed, 4 * kp, 8 * 2 * shape.moving, 4 * 3 * shape.strand_rings, 4 * 6 * shape.strand_rings, 8 * 2 * n * p, 8 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * 2 * n * p, 8 * w * p, 4 * w * p, 8 * shape.heads * p, 8 * w * shape.mutual, 4 * l, 4 * l, 4 * l, 8 * 4 * l, 8 * pk * 2 * n, 4 * w * pkd, 4 * l * w * hold, 8 * 4 * l * hold, 4 * l * hold, 8 * shape.heading * w, 4 * shape.heading, 4 * shape.heading * w, 8 * shape.heading * w, 8 * 4 * shape.heading, 4 * shape.heading].iter().map(|&o| carve(o)).sum()
     }
 
     fn top_shared(shape: &Shape) -> usize {
@@ -1338,11 +1594,75 @@ impl<'c> TowerCard<'c> {
         [8 * 2 * shape.modes, 16 * 32, 8 * 32].iter().map(|&o| carve(o)).sum()
     }
 
+    fn ahead_shared(shape: &Shape) -> usize {
+        [16 * 32, 8 * 32, 8 * shape.width, 8 * shape.width].iter().map(|&o| carve(o)).sum()
+    }
+
     fn packet_shared(shape: &Shape) -> usize {
         [16 * 32, 8 * 32, 8 * shape.width].iter().map(|&o| carve(o)).sum()
     }
 
     /// The forward of every stream (`tower_forward`), keeping its temporaries when opened.
+    /// [agent-inferred, October 31] The streams' credit at a read's opening made resident: marks of
+    /// the present resident credit (each its own stream's), or values, uploaded as a new one.
+    fn admit_credit(&mut self, tower: &Tower, opening: &[TowerState], from: usize) -> Result<()> {
+        let marks: Vec<Option<(u64, usize)>> = opening.iter().map(|o| o.credit.as_deref().and_then(LevelCredit::residence)).collect();
+        if marks.iter().all(Option::is_some) {
+            let fits = self.credit.as_ref().is_some_and(|c| c.streams == opening.len() && marks.iter().enumerate().all(|(s, m)| *m == Some((c.generation, s))));
+            return if fits { Ok(()) } else { Err(TowerError::Refused("a resident credit's marks of another generation or stream")) };
+        }
+        if marks.iter().any(Option::is_some) {
+            return Err(TowerError::Refused("the streams' credit is resident or uploaded, never both"));
+        }
+        let extent = tower.credit_extent(from);
+        if opening.iter().any(|o| o.credit.as_deref().and_then(|c| tower.credit_from_of(c)) != Some(from)) {
+            return Err(TowerError::Refused("every stream's credit begins at the same level"));
+        }
+        // Credits at rest are zeroed where they live (record §28); any other is carried as words.
+        let rested = opening.iter().all(|o| o.credit.as_deref().is_some_and(LevelCredit::at_rest));
+        let mut words = Vec::new();
+        if !rested {
+            words.reserve(extent * opening.len());
+            for o in opening {
+                words.extend(tower.credit_words(o)?.ok_or(TowerError::Refused("every stream carries a credit"))?);
+            }
+        }
+        let streams = opening.len();
+        if !self.credit.as_ref().is_some_and(|c| c.streams == streams && c.extent == extent) {
+            self.credit = None;
+            let card = self.card;
+            self.credit = Some(ResidentCredit { streams, from, extent, generation: 0, open: card.alloc(streams * extent).map_err(device)?, next: card.alloc(streams * extent).map_err(device)? });
+        }
+        let generation = self.generations;
+        self.generations += 1;
+        let credit = self.credit.as_mut().expect("allocated above");
+        credit.from = from;
+        if rested {
+            self.card.zero_octets(&credit.open, 0, streams * extent * std::mem::size_of::<i64>()).map_err(device)?;
+        } else {
+            self.card.write(&credit.open, 0, &words).map_err(device)?;
+        }
+        credit.generation = generation;
+        self.credit_pending = None;
+        Ok(())
+    }
+
+    /// [agent-inferred, October 31] **The streams' resident credit returned to the host**: each
+    /// state holding a mark of the present credit takes its moments back (a receipt or a parity
+    /// reads them; a learner's sections never need to).
+    pub fn fetch_credit(&mut self, tower: &Tower, states: &mut [TowerState]) -> Result<()> {
+        let credit = self.credit.as_ref().ok_or(TowerError::Refused("no credit is resident on the card"))?;
+        let marked = states.len() == credit.streams && states.iter().enumerate().all(|(s, o)| o.credit.as_deref().and_then(LevelCredit::residence) == Some((credit.generation, s)));
+        if !marked {
+            return Err(TowerError::Refused("a fetch reads the streams marked with the present resident credit"));
+        }
+        let words = self.card.fetch(&credit.open).map_err(device)?;
+        for (s, state) in states.iter_mut().enumerate() {
+            state.credit = Some(tower.credit_from_words(credit.from, &words[s * credit.extent..(s + 1) * credit.extent])?);
+        }
+        Ok(())
+    }
+
     fn read_forward(&mut self, tower: &Tower, opening: &[TowerState], classes: &[&[usize]], targets: &[Vec<Option<usize>>], slot: Slot) -> Result<PassRead> {
         let law = tower.resident_law()?;
         Self::admits(&law)?;
@@ -1362,10 +1682,27 @@ impl<'c> TowerCard<'c> {
             Some(st) => o.strands.len() == 3 * st.rings && o.strands.iter().enumerate().all(|(j, &r)| i64::from(r) < i64::from(st.table[8 + 3 * (j % st.rings)])),
         };
         if opening.len() != streams
-            || opening.iter().any(|o| o.credit.is_some() || o.ring.len() != ranks || o.hands.len() != ranks || !below(o) || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
+            || opening.iter().any(|o| o.ring.len() != ranks || o.hands.len() != ranks || !below(o) || o.modes.len() != d.levels || o.modes.iter().any(|m| m.len() != d.modes) || o.previous > d.alphabet)
         {
-            return Err(TowerError::Refused("the card opens on uncredited states of the declared bank, each ring rank with its value and hand, and each strand's residue below its ring's modulus"));
+            return Err(TowerError::Refused("the card opens on states of the declared bank, each ring rank with its value and hand, and each strand's residue below its ring's modulus"));
         }
+        // The streams' credit ([`ResidentCredit`]): none, or every stream's, at the levels a news
+        // clock holds (`LevelCredit`); held resident since the last carry, or its values uploaded.
+        let credited = opening.iter().filter(|o| o.credit.is_some()).count();
+        // The first credited level: the resident credit's for its marks, else every stream's own.
+        let credit_from = match opening.first().and_then(|o| o.credit.as_deref()) {
+            None => d.levels,
+            Some(c) if LevelCredit::residence(c).is_some() => self.credit.as_ref().map_or(d.levels, |r| r.from),
+            Some(c) => tower.credit_from_of(c).ok_or(TowerError::Refused("a stream's credit of another tower's levels"))?,
+        };
+        let credit_levels = match (credited, &law.news) {
+            (0, _) => 0,
+            // Beside participation read back from the clocked levels up the credit is declared held as
+            // given (record `2026-10-30_…`, §35): its moments carry each level's own families.
+            (c, Some(clock)) if c == streams && clock.first() < d.levels && credit_from < d.levels => d.levels - credit_from,
+            (c, _) if c == streams => return Err(TowerError::Refused("the card carries the credit under a news clock that holds a level")),
+            _ => return Err(TowerError::Refused("every stream carries a credit or none does")),
+        };
         // Each stream's open packets: one a level from the clock's first clocked level up, of the
         // bank's modes, none below it; none without the packets ([`Tower::join_packets`]).
         let packet_from = if law.packets { law.news.map(|c| c.first()) } else { None };
@@ -1376,6 +1713,17 @@ impl<'c> TowerCard<'c> {
         if !opening.iter().all(packeted) {
             return Err(TowerError::Refused("the card opens each stream's packets on the levels that hear one, of the bank's modes"));
         }
+        // Each stream's open traces: one a level from the clock's first clocked level up, of the
+        // face's width, none below it; none without the heading ([`Tower::join_heading`]).
+        let heading_from = law.heading.and(law.news.map(|c| c.first()));
+        let traced = |o: &TowerState| match heading_from {
+            None => o.traces.is_empty(),
+            Some(first) => o.traces.len() == d.levels && o.traces.iter().enumerate().all(|(l, tr)| tr.len() == if l >= first { d.width } else { 0 }),
+        };
+        if !opening.iter().all(traced) {
+            return Err(TowerError::Refused("the card opens each stream's traces on the levels that carry a heading, of the face's width"));
+        }
+        let hd = heading_from.map_or(0, |first| d.levels - first);
         // The news clock's open face and phase, each mass within the face's total and a 64-bit
         // word (the forward's own faces are), the phase below the clock's period.
         let news_open: Vec<u64> = match &law.news {
@@ -1431,10 +1779,41 @@ impl<'c> TowerCard<'c> {
                 return Err(TowerError::Refused("the card carries each level's open section of the bank's modes and heads, short of its close"));
             }
         }
-        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair) };
+        let shape = Shape { alphabet: d.alphabet, width: d.width, modes: d.modes, contacts: d.contacts, levels: d.levels, len: law.len, streams, cells, forms, ranks, harmonics, ring_moves, turned: usize::from(d.turned), news: usize::from(law.news.is_some()), pumped: usize::from(d.pumped), moving: law.rotor.as_ref().map_or(0, |r| r.moving), paired: usize::from(d.contact != ContactLaw::Rectifying), foil: usize::from(d.contact == ContactLaw::PairLinear), strand_rings, strand_table: law.strands.as_ref().map_or(0, |st| st.table.len()), heads: law.participation.as_ref().map_or(0, |p| p.heads.len()), section: law.participation.as_ref().map_or(0, |p| p.section), carried: usize::from(carried.iter().flatten().any(|&n0| n0 > 0)), mutual: usize::from(law.mutual.is_some()), passage: if law.passage { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, packets: if law.packets { law.news.map_or(0, |c| d.levels - c.first()) } else { 0 }, split: usize::from(d.contact == ContactLaw::Pair), heading: hd, credit: credit_levels, credit_packets: if credit_levels > 0 && law.packets { (credit_from..d.levels).filter(|&l| law.news.is_some_and(|c| l + 1 >= c.first()) && l + 1 < d.levels).count() } else { 0 }, face_global: 0, pa_levels: law.participation.as_ref().map_or(0, |p| d.levels - p.from) };
+        let shape = Shape { face_global: usize::from(self.face_global_forced || Self::forward_shared(&shape) > self.card.census().shared_per_block as usize), ..shape };
         self.frame(shape).map_err(device)?;
+        if slot == Slot::OpeningTicks && (law.news.is_none() || !self.ticks_kept) {
+            return Err(TowerError::Refused("a reread on the opening's ticks reads a news clock's opening read, its frame still resident"));
+        }
         let (mut words, levels) = Self::law_words(&law, streams, cells);
+        words.face_global = shape.face_global as u32;
         let keep = slot == Slot::Opened;
+        // The closure is read on the opening read, and on a reread only under the declared reading.
+        let read_closure = hd > 0 && (keep || self.reread_closures);
+        words.closure = u32::from(read_closure);
+        // The credit advances in the reads a carry may keep: a reread, or an opening read a carry
+        // asked for (`TowerCard::carry`); its material moments wait for the carry.
+        let advance = credit_levels > 0 && (!keep || self.force_advance);
+        if credit_levels == 0 {
+            self.credit_pending = None;
+        }
+        if credit_levels > 0 {
+            self.admit_credit(tower, opening, credit_from)?;
+            words.credit = credit_levels as u32;
+            words.credit_packet = u32::from(law.packets);
+            words.credit_advance = u32::from(advance);
+            words.credit_from = credit_from as u32;
+            if keep && !self.force_advance {
+                self.opened_reads = Some((classes.iter().map(|c| c.to_vec()).collect(), targets.to_vec()));
+            }
+        }
+        // The forward's read: the opening (its temporaries kept), a reread, or a reread on the
+        // opening's ticks.
+        let read = match slot {
+            Slot::Opened => 1u32,
+            Slot::Reread => 0,
+            Slot::OpeningTicks => 2,
+        };
         {
             let frame = self.frame.as_ref().expect("the frame was just sized");
             let card = self.card;
@@ -1499,35 +1878,39 @@ impl<'c> TowerCard<'c> {
                 let open: Vec<i64> = opening.iter().flat_map(|o| o.packets.iter().flatten().flat_map(|&(re, im)| [re, im])).collect();
                 card.write(&frame.pk_open, 0, &open).map_err(device)?;
             }
+            if hd > 0 {
+                let open: Vec<i64> = opening.iter().flat_map(|o| o.traces.iter().flatten().copied()).collect();
+                card.write(&frame.tr_open, 0, &open).map_err(device)?;
+            }
             if let Some(p) = &law.participation {
                 let starts: Vec<u32> = std::iter::once(0).chain(p.heads.iter().scan(0u32, |at, &h| {
                     *at += h as u32;
                     Some(*at)
                 })).collect();
                 card.write(&frame.pa_heads, 0, &starts).map_err(device)?;
-                // Each stream's open sites at each level at their places ([S][section][L], a level's
-                // places past its own count unread), its running frames and met dissipation, which
-                // the forward resumes from (a section at rest opens from rest), and its held currents
-                // (re block, im block).
-                let (n, l_, h) = (d.modes, d.levels, p.heads.len());
+                // Each stream's open sites at each participating level at their places
+                // ([S][section][L − pa_from], a level's places past its own count unread), its running
+                // frames and met dissipation, which the forward resumes from (a section at rest opens
+                // from rest), and its held currents (re block, im block).
+                let (n, l_, h, lpa) = (d.modes, d.levels, p.heads.len(), d.levels - p.from);
                 let counts: Vec<u32> = carried.iter().flat_map(|c| (0..l_).map(|l| c.get(l).map_or(0, |&n0| n0 as u32))).collect();
                 card.write(&frame.pa_open, 0, &counts).map_err(device)?;
                 let mut held = vec![0i64; streams * l_ * 2 * n];
                 for (s, o) in opening.iter().enumerate().filter(|(_, o)| !o.sites.is_empty()) {
                     let n0 = o.sites.iter().map(LevelSites::len).max().unwrap_or(0);
                     if n0 > 0 {
-                        let (mut keys, mut values, mut diss) = (vec![0i64; n0 * l_ * n * 2], vec![0i64; n0 * l_ * n * 2], vec![0i64; n0 * l_ * h]);
-                        for (l, sites) in o.sites.iter().enumerate() {
+                        let (mut keys, mut values, mut diss) = (vec![0i64; n0 * lpa * n * 2], vec![0i64; n0 * lpa * n * 2], vec![0i64; n0 * lpa * h]);
+                        for (l, sites) in o.sites.iter().enumerate().skip(p.from) {
                             for j in 0..sites.len() {
-                                let at = j * l_ + l;
+                                let at = j * lpa + l - p.from;
                                 keys[at * n * 2..(at + 1) * n * 2].copy_from_slice(&sites.keys[j].iter().flat_map(|&(re, im)| [re, im]).collect::<Vec<_>>());
                                 values[at * n * 2..(at + 1) * n * 2].copy_from_slice(&sites.values[j].iter().flat_map(|&(re, im)| [re, im]).collect::<Vec<_>>());
                                 diss[at * h..(at + 1) * h].copy_from_slice(&sites.dissipation[j]);
                             }
                         }
-                        card.write(&frame.pa_open_key, s * p.section * l_ * n * 2, &keys).map_err(device)?;
-                        card.write(&frame.pa_open_value, s * p.section * l_ * n * 2, &values).map_err(device)?;
-                        card.write(&frame.pa_open_diss, s * p.section * l_ * h, &diss).map_err(device)?;
+                        card.write(&frame.pa_open_key, s * p.section * lpa * n * 2, &keys).map_err(device)?;
+                        card.write(&frame.pa_open_value, s * p.section * lpa * n * 2, &values).map_err(device)?;
+                        card.write(&frame.pa_open_diss, s * p.section * lpa * h, &diss).map_err(device)?;
                     }
                     let run: Vec<i64> = o.sites.iter().flat_map(|sites| sites.frame.iter().flat_map(|&(re, im)| [re, im])).collect();
                     let met: Vec<i64> = o.sites.iter().flat_map(|sites| sites.met.iter().copied()).collect();
@@ -1547,10 +1930,18 @@ impl<'c> TowerCard<'c> {
             if keep {
                 card.zero_octets(&frame.swell, 0, 8 * 4 * d.levels).map_err(device)?;
             }
-            let fw = Self::frame_words(frame);
+            let mut fw = Self::frame_words(frame);
+            if let Some(credit) = self.credit.as_ref().filter(|_| advance) {
+                fw.cr_open = credit.open.device_ptr();
+                fw.cr_next = credit.next.device_ptr();
+            }
             let blocks = (law.len as u32).div_ceil(THREADS).clamp(1, 1024);
             self.law_launch("tower_transpose", Dim3 { x: blocks, y: words.families, z: 1 }, THREADS, 0, &words, &fw, None).map_err(device)?;
-            self.law_launch("tower_forward", Dim3::x(streams as u32), THREADS, Self::forward_shared(&shape) as u32, &words, &fw, Some(keep as u32)).map_err(device)?;
+            self.law_launch("tower_forward", Dim3::x(streams as u32), THREADS, Self::forward_shared(&shape) as u32, &words, &fw, Some(read)).map_err(device)?;
+            // The credit's material moments wait for the carry of this read (`tower_credit`).
+            if advance {
+                self.credit_pending = Some((slot_index(slot), words));
+            }
         }
         self.status()?;
         let frame = self.frame.as_ref().expect("the frame was just sized");
@@ -1561,6 +1952,8 @@ impl<'c> TowerCard<'c> {
         let news_ends = if law.news.is_some() { self.card.fetch(&frame.news_ends).map_err(device)? } else { Vec::new() };
         let strand_ends = if strand_rings > 0 { self.card.fetch(&frame.strand_ends).map_err(device)? } else { Vec::new() };
         let packet_ends = if packet_from.is_some() { self.card.fetch(&frame.pk_ends).map_err(device)? } else { Vec::new() };
+        let trace_ends = if hd > 0 { self.card.fetch(&frame.tr_ends).map_err(device)? } else { Vec::new() };
+        let (counts, closed) = if read_closure { (self.card.fetch(&frame.hd_count).map_err(device)?, self.card.fetch(&frame.hd_close).map_err(device)?) } else { (Vec::new(), Vec::new()) };
         // Each level's section at the read's end, as the host's state carries it: its carried sites
         // still read and the sites admitted since (a section that closed rests), with its running
         // frames, met dissipation and, under a news clock, its held current.
@@ -1580,6 +1973,7 @@ impl<'c> TowerCard<'c> {
                     if law.news.is_some() { self.card.fetch(&frame.pa_hold).map_err(device)? } else { Vec::new() },
                     p.heads.len(),
                     p.section,
+                    p.from,
                 ))
             }
             None => None,
@@ -1614,7 +2008,7 @@ impl<'c> TowerCard<'c> {
                 // Participation's sites at each level: released when its section closes, the
                 // opening's carried on with the sites admitted since while it is open; the held
                 // current carried under a news clock.
-                if let Some((sect, member, keys, values, diss, run, met, hold, heads, section)) = sections.as_ref() {
+                if let Some((sect, member, keys, values, diss, run, met, hold, heads, section, from)) = sections.as_ref() {
                     let (n, l_) = (d.modes, d.levels);
                     let phasor = |v: &[i64], at: usize| (v[2 * at], v[2 * at + 1]);
                     let opened = std::mem::take(&mut state.sites);
@@ -1636,7 +2030,7 @@ impl<'c> TowerCard<'c> {
                             sites.frame = (0..n).map(|k| phasor(run, (s * l_ + l) * n + k)).collect();
                             sites.met = (0..n).map(|k| met[(s * l_ + l) * n + k]).collect();
                             for &t in &member[(s * l_ + l) * section..(s * l_ + l) * section + members] {
-                                let q = (s * cells + t as usize) * l_ + l;
+                                let q = (s * cells + t as usize) * (l_ - from) + l - from;
                                 sites.keys.push((0..n).map(|k| phasor(keys, q * n + k)).collect());
                                 sites.values.push((0..n).map(|k| phasor(values, q * n + k)).collect());
                                 sites.dissipation.push(diss[q * heads..(q + 1) * heads].to_vec());
@@ -1669,18 +2063,48 @@ impl<'c> TowerCard<'c> {
                         }
                     }
                 }
+                if let Some(first) = heading_from {
+                    for (l, tr) in state.traces.iter_mut().enumerate().skip(first) {
+                        let at = (s * hd + l - first) * d.width;
+                        tr.copy_from_slice(&trace_ends[at..at + d.width]);
+                    }
+                }
                 state
             })
             .collect();
+        // Each stream's closure faces a clocked level, `(e_jj, Σ_i e_ji)` tick by tick, as the
+        // host's `Tower::closure_faces` reads them (empty below the first clocked level).
+        let closures: Vec<Vec<Vec<(u128, u128)>>> = match heading_from.filter(|_| read_closure) {
+            None => Vec::new(),
+            Some(first) => (0..streams)
+                .map(|s| {
+                    (0..d.levels)
+                        .map(|l| {
+                            if l < first {
+                                return Vec::new();
+                            }
+                            let i = s * hd + l - first;
+                            (0..counts[i] as usize)
+                                .map(|j| {
+                                    let row = &closed[(i * cells + j) * 4..(i * cells + j) * 4 + 4];
+                                    (row[0] as u128, row[1] as u128 | (row[2] as u128) << 64)
+                                })
+                                .collect()
+                        })
+                        .collect()
+                })
+                .collect(),
+        };
         self.ends[slot_index(slot)] = Some(ends);
         if keep {
             self.opened = Some((words, levels));
             self.opened_current = true;
+            self.ticks_kept = law.news.is_some();
         } else {
             self.opened_current = false;
         }
         let swell = swell.chunks_exact(4).map(|c| [c[0], c[1], c[2], c[3]]).collect();
-        Ok(PassRead { faces, swell })
+        Ok(PassRead { faces, swell, closures })
     }
 
     /// The streams' covector summed (`tower_reverse_*`, `tower_outer_*`, `tower_encoding`,
@@ -1692,7 +2116,11 @@ impl<'c> TowerCard<'c> {
         words.split = u32::from(split);
         let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
         let shape = frame.shape;
-        let fw = Self::frame_words(frame);
+        let mut fw = Self::frame_words(frame);
+        if words.credit > 0 {
+            let credit = self.credit.as_ref().ok_or(TowerError::Refused("a credited reverse reads the resident credit"))?;
+            fw.cr_open = credit.open.device_ptr();
+        }
         let (s, t, l) = (shape.streams, shape.cells, shape.levels);
         let q = (s * t) as u32;
         let card = self.card;
@@ -1702,16 +2130,27 @@ impl<'c> TowerCard<'c> {
             card.zero_octets(&frame.pa_gfric, 0, 16 * s * l * shape.heads).map_err(device)?;
         }
         self.law_launch("tower_reverse_top", Dim3::x(q), THREADS, Self::top_shared(&shape) as u32, &words, &fw, None).map_err(device)?;
+        // The face's read of the heading after each cell takes the top's covector before any
+        // level's reverse moves it (`tower_reverse_ahead`).
+        if shape.heading > 0 {
+            self.law_launch("tower_reverse_ahead", Dim3::x(q), THREADS, Self::ahead_shared(&shape) as u32, &words, &fw, None).map_err(device)?;
+        }
         let mode_threads = (shape.modes as u32).next_multiple_of(32).min(THREADS);
         // Under a rotor the modes' scan exchanges each step's covector between the modes of a ring
         // (`Rotor::back`), so each mode holds one thread of the block and the block holds no other.
         let (scan_threads, scan_shared) = if shape.moving > 0 { (shape.modes as u32, 32 * shape.modes as u32) } else { (mode_threads, 0) };
         for level in (0..l).rev() {
             self.law_launch("tower_reverse_contacts", Dim3::x(q), THREADS, Self::contacts_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
+            // A level that carries a heading returns the face's covector of the heading after each
+            // cell to the read covector the contacts wrote, before the level's scan reads it
+            // (`tower_reverse_heading`).
+            if shape.heading > 0 && level as u32 >= words.news_first {
+                self.law_launch("tower_reverse_heading", Dim3::x(s as u32), THREADS, 0, &words, &fw, Some(level as u32)).map_err(device)?;
+            }
             // Participation's return reads the current's covector the contacts wrote and writes the
             // chart covectors the level's `tower_reverse_dx` returns to the input, and the transport's
             // sums the modes' scan adds to each cell's turn and gate.
-            if shape.heads > 0 {
+            if shape.heads > 0 && level as u32 >= words.pa_from {
                 self.law_launch("tower_reverse_participation", Dim3::x(s as u32), THREADS, Self::participation_shared(&shape) as u32, &words, &fw, Some(level as u32)).map_err(device)?;
             }
             // The ring's reverse reads the level's read covector and returns its own to it and to
@@ -1735,6 +2174,12 @@ impl<'c> TowerCard<'c> {
         }
         for outer in self.outer_families(&words, &levels, &fw) {
             self.launch_outer(&outer.0, outer.1).map_err(device)?;
+        }
+        // The opening's credit meets the material moments, added to the outer sums' covector
+        // (`tower_credit_meet`; the moves' meeting is the modes' scan's).
+        if words.credit > 0 {
+            let items = (shape.modes * shape.width + shape.modes) as u32;
+            self.law_launch("tower_credit_meet", Dim3 { x: items.div_ceil(THREADS), y: words.credit, z: 1 }, THREADS, 0, &words, &fw, None).map_err(device)?;
         }
         // The foil's biases each take a covector of their own, summed over every cell.
         if shape.foil > 0 {
@@ -1810,18 +2255,25 @@ impl<'c> TowerCard<'c> {
             // A level that hears a packet: its push, gate and turn read the packet's read (zero where
             // the level is still, as are their covectors), and the read's covector against the
             // packet's face is added onto the fine level's read, whose own family was pushed above.
+            // The packets' buffers hold the levels that hear one (`[S][T][PK]…`, from the clock's
+            // first clocked level), their reaches every level (`[S][T][L]`).
             let hears = law.packets != 0 && level as u32 >= law.news_first;
-            let (input, r_input) = if hears { (at32(fw.pk_read, lu * w), at64(fw.r_pk_read, lu)) } else { (at32(fw.input, lu * w), at64(fw.r_input, lu)) };
+            let pk = law.packets as u64;
+            let (input, input_stride, r_input) = if hears {
+                (at32(fw.pk_read, (lu - law.news_first as u64) * w), pk * w, at64(fw.r_pk_read, lu))
+            } else {
+                (at32(fw.input, lu * w), l * w, at64(fw.r_input, lu))
+            };
             if hears {
-                let fine = &levels[level - 1];
-                out.push(added((family(at64(fw.pk_dread, lu * w), l * w, at64(fw.pk_face, lu * 2 * n), l * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_re, lu), l, w, n, false, gradient(fine.read_re), None), true)));
-                out.push(added((family(at64(fw.pk_dread, lu * w), l * w, at64(fw.pk_face, lu * 2 * n + n), l * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_im, lu), l, w, n, true, gradient(fine.read_im), None), true)));
+                let (fine, p) = (&levels[level - 1], lu - law.news_first as u64);
+                out.push(added((family(at64(fw.pk_dread, p * w), pk * w, at64(fw.pk_face, p * 2 * n), pk * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_re, lu), l, w, n, false, gradient(fine.read_re), None), true)));
+                out.push(added((family(at64(fw.pk_dread, p * w), pk * w, at64(fw.pk_face, p * 2 * n + n), pk * 2 * n, at64(fw.r_pk_dread, lu), at64(fw.r_pk_face_im, lu), l, w, n, true, gradient(fine.read_im), None), true)));
             }
-            out.push((family(at64(fw.gre, lu * n), l * n, input, l * w, at64(fw.r_gre, lu), r_input, l, n, w, false, gradient(lv.push_re), None), false));
-            out.push((family(at64(fw.gim, lu * n), l * n, input, l * w, at64(fw.r_gim, lu), r_input, l, n, w, false, gradient(lv.push_im), None), false));
-            out.push((family(at64(fw.dq, lu * n), l * n, input, l * w, at64(fw.r_dq, lu), r_input, l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
+            out.push((family(at64(fw.gre, lu * n), l * n, input, input_stride, at64(fw.r_gre, lu), r_input, l, n, w, false, gradient(lv.push_re), None), false));
+            out.push((family(at64(fw.gim, lu * n), l * n, input, input_stride, at64(fw.r_gim, lu), r_input, l, n, w, false, gradient(lv.push_im), None), false));
+            out.push((family(at64(fw.dq, lu * n), l * n, input, input_stride, at64(fw.r_dq, lu), r_input, l, n, w, false, gradient(lv.gate), Some(gradient(lv.gate_bias))), false));
             if law.turned != 0 {
-                out.push((family(at64(fw.ds, lu * n), l * n, input, l * w, at64(fw.r_ds, lu), r_input, l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
+                out.push((family(at64(fw.ds, lu * n), l * n, input, input_stride, at64(fw.r_ds, lu), r_input, l, n, w, false, gradient(lv.turn), Some(gradient(lv.turn_bias))), false));
             }
             if law.pumped != 0 {
                 out.push((family(at64(fw.dk, lu * n), l * n, at32(fw.input, lu * w), l * w, at64(fw.r_dk, lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pump), Some(gradient(lv.pump_bias))), false));
@@ -1829,19 +2281,32 @@ impl<'c> TowerCard<'c> {
             }
             // Participation: each chart takes its turned covector against the level's input, W₁ᵃ the
             // drives' covector against the ratio read, and the current's read ∂r̂ᵃ against y.
-            if law.participation != 0 {
+            if law.participation != 0 && level as u32 >= law.pa_from {
                 let ql = s as u64 * t as u64 * l;
+                // The sites' buffers hold the participating levels alone (`pa_at`); their reaches
+                // every level's.
+                let (pl, pu) = (l - law.pa_from as u64, lu - law.pa_from as u64);
                 for f_ in 0..6u64 {
-                    out.push((family(at64(fw.pa_gchart, (lu * 6 + f_) * n), l * 6 * n, at32(fw.input, lu * w), l * w, at64(fw.r_pa_g, f_ * ql + lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pa[f_ as usize]), None), false));
+                    out.push((family(at64(fw.pa_gchart, (pu * 6 + f_) * n), pl * 6 * n, at32(fw.input, lu * w), l * w, at64(fw.r_pa_g, f_ * ql + lu), at64(fw.r_input, lu), l, n, w, false, gradient(lv.pa[f_ as usize]), None), false));
                 }
-                out.push((family(at64(fw.da, lu * f), l * f, at32(fw.pa_read, lu * w), l * w, at64(fw.r_da, lu), at64(fw.r_pa_read, lu), l, f, w, false, gradient(lv.pa[8]), None), false));
-                out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yre, lu), l, w, n, false, gradient(lv.pa[6]), None), true));
-                out.push((family(at64(fw.pa_dra, lu * w), l * w, at64(fw.pa_current, lu * 2 * n + n), l * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yim, lu), l, w, n, true, gradient(lv.pa[7]), None), true));
+                out.push((family(at64(fw.da, lu * f), l * f, at32(fw.pa_read, pu * w), pl * w, at64(fw.r_da, lu), at64(fw.r_pa_read, lu), l, f, w, false, gradient(lv.pa[8]), None), false));
+                out.push((family(at64(fw.pa_dra, pu * w), pl * w, at64(fw.pa_current, pu * 2 * n), pl * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yre, lu), l, w, n, false, gradient(lv.pa[6]), None), true));
+                out.push((family(at64(fw.pa_dra, pu * w), pl * w, at64(fw.pa_current, pu * 2 * n + n), pl * 2 * n, at64(fw.r_pa_dra, lu), at64(fw.r_pa_yim, lu), l, w, n, true, gradient(lv.pa[7]), None), true));
             }
             // The passage: `W₁ˣ` takes the drives' covector against the level's input, on the levels
             // the clock holds.
             if law.passage != 0 && level as u32 >= law.news_first {
                 out.push((family(at64(fw.da, lu * f), l * f, at32(fw.input, lu * w), l * w, at64(fw.r_da, lu), at64(fw.r_input, lu), l, f, w, false, gradient(lv.passage), None), false));
+            }
+            // The heading (its buffers `[S][T][HD]…` and reaches `[HD][S][T]`, from the clock's
+            // first clocked level): the descent takes the top's covector against the heading after
+            // the cell that the face read, `Σ δx ĥ⁺ᵀ`, and the heading's read the covector of its
+            // raw read against the face it read after each cell (the closure is read, not learned).
+            if law.heading != 0 && level as u32 >= law.news_first {
+                let (hd, i, q) = (law.heading as u64, lu - law.news_first as u64, s as u64 * t as u64);
+                out.push((family(fw.ah_top, w, at32(fw.ah_read, i * w), hd * w, fw.r_ah_top, at64(fw.r_ah_read, i * q), 1, w, w, false, gradient(lv.descent), None), false));
+                out.push((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_re, i * q), 1, w, n, false, gradient(lv.heading_re), None), true));
+                out.push((family(at64(fw.ah_dread, i * w), hd * w, at64(fw.ah_face, i * 2 * n + n), hd * 2 * n, at64(fw.r_ah_dread, i * q), at64(fw.r_ah_face_im, i * q), 1, w, n, true, gradient(lv.heading_im), None), true));
             }
         }
         // The strands' materials take their level's drives' covectors against the faces,
@@ -1940,7 +2405,7 @@ impl<'c> TowerCard<'c> {
 }
 
 fn entry_takes_extra(entry: &str) -> bool {
-    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx" | "tower_reverse_participation" | "tower_reverse_packet")
+    matches!(entry, "tower_forward" | "tower_reverse_contacts" | "tower_reverse_modes" | "tower_reverse_dx" | "tower_reverse_participation" | "tower_reverse_packet" | "tower_reverse_heading")
 }
 
 impl PassRealization for TowerCard<'_> {
@@ -1973,12 +2438,20 @@ impl PassRealization for TowerCard<'_> {
     fn reverse_split(&mut self, tower: &Tower, _opening: &[TowerState], _classes: &[&[usize]], _compared: Option<&[&[Option<usize>]]>, paired: &PairedContacts) -> Result<(Vec<i128>, SplitRead)> {
         paired.admits(tower)?;
         let started = Instant::now();
-        let frame = self.frame.as_ref().ok_or(TowerError::Refused("a card pass needs its frame"))?;
+        let card = self.card;
+        let frame = self.frame.as_mut().ok_or(TowerError::Refused("a card pass needs its frame"))?;
         let shape = frame.shape;
         if shape.split == 0 || shape.contacts != tower.declaration.contacts || shape.levels != paired.levels.len() {
             return Err(TowerError::Refused("a split read of the tower the opening read carried"));
         }
         let (w, h) = (shape.width, shape.contacts / 2);
+        if frame.split_dv.is_empty() {
+            let (ql, l, f) = (shape.streams * shape.cells * shape.levels, shape.levels, shape.contacts);
+            frame.split_dv = card.alloc(ql * f).map_err(device)?;
+            frame.split_dir = card.alloc(l * h * w).map_err(device)?;
+            frame.split_out = card.alloc(l * h * (2 + w)).map_err(device)?;
+        }
+        let frame = self.frame.as_ref().expect("checked above");
         // Each pair's direction, zero where it is founded (its read is not read back).
         let directions: Vec<i32> = paired.levels.iter().flat_map(|pairs| pairs.iter().flat_map(|v| v.as_ref().map_or_else(|| vec![0; w], Clone::clone))).collect();
         self.card.write(&frame.split_dir, 0, &directions).map_err(device)?;
@@ -2008,6 +2481,10 @@ impl PassRealization for TowerCard<'_> {
         Ok((g, SplitRead { levels }))
     }
 
+    fn reread_closures(&mut self, on: bool) {
+        self.reread_closures = on;
+    }
+
     fn forms_split(&self) -> bool {
         true
     }
@@ -2029,13 +2506,54 @@ impl PassRealization for TowerCard<'_> {
             .collect()
     }
 
-    fn carry(&mut self, _tower: &Tower, states: &mut [TowerState], _opening: &[TowerState], slot: Slot) -> Result<()> {
-        let ends = self.ends[slot_index(slot)].take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
+    fn carry(&mut self, tower: &Tower, states: &mut [TowerState], opening: &[TowerState], slot: Slot) -> Result<()> {
+        let i = slot_index(slot);
+        let credited = self.ends[i].as_ref().is_some_and(|ends| ends.iter().any(|e| e.credit.is_some()));
+        // The carried read's credit advance: a reread's waits here; an opening read advanced none,
+        // so it is read again advancing it (the same faces and ends, bit for bit).
+        if credited && self.credit_pending.as_ref().map(|p| p.0) != Some(i) {
+            if i != 0 {
+                return Err(TowerError::Refused("a credited carry of a reread that a later read replaced"));
+            }
+            let (classes, targets) = self.opened_reads.clone().ok_or(TowerError::Refused("a credited carry of an opening read keeps its classes"))?;
+            let parts: Vec<&[usize]> = classes.iter().map(Vec::as_slice).collect();
+            self.force_advance = true;
+            let read = self.read_forward(tower, opening, &parts, &targets, Slot::Opened);
+            self.force_advance = false;
+            read?;
+        }
+        if credited {
+            let (_, words) = self.credit_pending.take().ok_or(TowerError::Refused("a credited carry reads its read's advance"))?;
+            let frame = self.frame.as_ref().ok_or(TowerError::Refused("a credited carry needs its frame"))?;
+            let mut fw = Self::frame_words(frame);
+            let credit = self.credit.as_ref().ok_or(TowerError::Refused("a credited carry reads the resident credit"))?;
+            fw.cr_open = credit.open.device_ptr();
+            fw.cr_next = credit.next.device_ptr();
+            // The per-mode moments over the read's cells, one thread a mode, then the material
+            // moments' closed form (record §27).
+            let mode_threads = words.modes.next_multiple_of(32).min(THREADS);
+            self.law_launch("tower_credit_moments", Dim3 { x: words.streams, y: words.credit, z: 1 }, mode_threads, 0, &words, &fw, None).map_err(device)?;
+            self.law_launch("tower_credit", Dim3 { x: words.streams, y: words.credit, z: 1 }, THREADS, credit_shared(&words), &words, &fw, None).map_err(device)?;
+            self.status()?;
+        }
+        let ends = self.ends[i].take().ok_or(TowerError::Refused("a carry reads a kept forward"))?;
         if ends.len() != states.len() {
             return Err(TowerError::Refused("a carry continues every stream"));
         }
         for (state, end) in states.iter_mut().zip(ends) {
             *state = end;
+        }
+        // The carried credit is the kept read's advance: it becomes the opening's, and the streams
+        // hold its mark.
+        if credited {
+            let generation = self.generations;
+            let credit = self.credit.as_mut().ok_or(TowerError::Refused("a credited carry reads the resident credit"))?;
+            std::mem::swap(&mut credit.open, &mut credit.next);
+            credit.generation = generation;
+            self.generations += 1;
+            for (s, state) in states.iter_mut().enumerate() {
+                state.credit = Some(LevelCredit::resident_mark(generation, s));
+            }
         }
         Ok(())
     }
@@ -2050,7 +2568,7 @@ mod tests {
     /// zero and refused every pairless frame before its first section).
     #[test]
     fn a_family_with_no_outputs_takes_no_group_sums() {
-        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0, packets: 0, split: 0 };
+        let plain = Shape { alphabet: 11, width: 8, modes: 8, contacts: 16, levels: 2, len: 0, streams: 3, cells: 9, forms: 0, ranks: 0, harmonics: 0, ring_moves: 0, turned: 0, news: 0, pumped: 0, moving: 0, paired: 0, foil: 0, strand_rings: 0, strand_table: 0, heads: 0, section: 0, carried: 0, mutual: 0, passage: 0, packets: 0, split: 0, heading: 0, credit: 0, credit_packets: 0, face_global: 0, pa_levels: 0 };
         // One empty tile, four deep over 80 multiprocessors, at most one group a stream: its group
         // sums' extent is `11 · 0 · 3 = 0`.
         assert_eq!(TowerCard::groups(11, 0, 3, 80), 3);

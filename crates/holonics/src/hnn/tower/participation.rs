@@ -59,6 +59,10 @@ pub struct ParticipationDeclaration {
     pub heads: Vec<usize>,
     pub section: usize,
     pub beta_shift: u32,
+    /// The first level that participates (0: every level). [agent-inferred, October 31] The race's
+    /// working declaration reads back at its clocked levels alone, whose sites are their own ticks
+    /// (record `2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_THE_TRACE_OF_WHAT_COMES_NEXT…`, §35).
+    pub from: usize,
 }
 
 impl ParticipationDeclaration {
@@ -66,7 +70,12 @@ impl ParticipationDeclaration {
         if heads.is_empty() || heads.contains(&0) || section == 0 {
             return refuse("a participation of nonempty heads over a nonempty section");
         }
-        Ok(Self { heads, section, beta_shift })
+        Ok(Self { heads, section, beta_shift, from: 0 })
+    }
+
+    /// The same participation read from level `from` up.
+    pub fn from_level(self, from: usize) -> Self {
+        Self { from, ..self }
     }
     /// The heads founded on a bank: one head a run of modes that share a founded memory, read off
     /// each mode's memory at the grain the bank declares (the tower's is the octave,
@@ -103,16 +112,24 @@ impl ParticipationDeclaration {
     }
     pub(super) fn to_text(&self) -> String {
         let heads: Vec<String> = self.heads.iter().map(usize::to_string).collect();
-        format!("participation {} {} {}", self.section, self.beta_shift, heads.join(","))
+        if self.from == 0 {
+            format!("participation {} {} {}", self.section, self.beta_shift, heads.join(","))
+        } else {
+            format!("participation {} {} {} {}", self.section, self.beta_shift, heads.join(","), self.from)
+        }
     }
     pub(super) fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
         let count = |w: &str| w.parse::<usize>().map_err(|_| super::TowerError::Refused("a participation that is not the tower's"));
-        if words.len() != 4 || words[0] != "participation" {
+        if !(words.len() == 4 || words.len() == 5) || words[0] != "participation" {
             return refuse("a participation that is not the tower's");
         }
         let heads = words[3].split(',').map(count).collect::<Result<Vec<_>>>()?;
-        Self::new(heads, count(words[1])?, count(words[2])? as u32)
+        let from = match words.get(4) {
+            Some(w) => count(w)?,
+            None => 0,
+        };
+        Ok(Self::new(heads, count(words[1])?, count(words[2])? as u32)?.from_level(from))
     }
 }
 

@@ -35,7 +35,7 @@ use std::process::Command;
 /// lowers its PTX for any newer card.
 const UNATTENDED_FLOOR: &str = "compute_75";
 
-const SOURCES: [&str; 8] = [
+const SOURCES: [&str; 10] = [
     "kernels/hnn.cu",
     "kernels/exact_integer.cuh",
     "kernels/hnn_word.cuh",
@@ -44,6 +44,8 @@ const SOURCES: [&str; 8] = [
     "kernels/hnn_inverse_exact.cuh",
     "kernels/hnn_word_exact.cuh",
     "kernels/tower.cu",
+    "kernels/field.cu",
+    "kernels/field_moment.cuh",
 ];
 
 /// Ask the mounted device what it is: `nvidia-smi` reports `8.9`, `nvcc` wants `compute_89`.
@@ -191,11 +193,15 @@ fn main() {
     // The gated tower's pass is its own translation unit (`src/hnn/tower.rs` loads it).
     let tower_output =
         PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR")).join("tower.ptx");
+    // The field's realization is its own translation unit (`src/hnn/field.rs` loads it).
+    let field_output =
+        PathBuf::from(env::var_os("OUT_DIR").expect("Cargo supplies OUT_DIR")).join("field.ptx");
     let absent = |reason: &str| {
         let _ = std::fs::remove_file(out_dir.join("kernels.sha256"));
         std::fs::write(&output, b"").expect("OUT_DIR is writable");
         std::fs::write(&tree_output, b"").expect("OUT_DIR is writable");
         std::fs::write(&tower_output, b"").expect("OUT_DIR is writable");
+        std::fs::write(&field_output, b"").expect("OUT_DIR is writable");
         println!("cargo:warning=the HNN kernels are not built: {reason}");
         println!("cargo:rustc-env=HOLONICS_CUDA_KERNELS=absent: {reason}");
     };
@@ -234,7 +240,8 @@ fn main() {
     let fresh = std::fs::read_to_string(&stamp).is_ok_and(|stamped| stamped.trim() == digest)
         && std::fs::metadata(&output).is_ok_and(|m| m.len() > 0)
         && std::fs::metadata(&tree_output).is_ok_and(|m| m.len() > 0)
-        && std::fs::metadata(&tower_output).is_ok_and(|m| m.len() > 0);
+        && std::fs::metadata(&tower_output).is_ok_and(|m| m.len() > 0)
+        && std::fs::metadata(&field_output).is_ok_and(|m| m.len() > 0);
     if fresh {
         println!("cargo:rustc-env=HOLONICS_CUDA_KERNELS={architecture}");
         return;
@@ -281,6 +288,19 @@ fn main() {
         .status()
         .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
     assert!(status.success(), "nvcc refused kernels/tower.cu");
+    let status = Command::new(&nvcc)
+        .args([
+            "--ptx",
+            "-O3",
+            "--std=c++20",
+            &format!("--gpu-architecture={architecture}"),
+            "kernels/field.cu",
+            "-o",
+        ])
+        .arg(&field_output)
+        .status()
+        .unwrap_or_else(|error| panic!("{} could not run: {error}", nvcc.display()));
+    assert!(status.success(), "nvcc refused kernels/field.cu");
     std::fs::write(&stamp, &digest).expect("OUT_DIR is writable");
     println!("cargo:warning=compiled the HNN kernels, sources {digest}");
     println!("cargo:rustc-env=HOLONICS_CUDA_KERNELS={architecture}");

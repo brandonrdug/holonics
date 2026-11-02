@@ -1,0 +1,9 @@
+    Finished `release` profile [optimized] target(s) in 52.37s
+PATH=/opt/cuda/bin:$PATH timeout 900 cargo build --release -p holonics-cuda    155.86s user 4.90s system 306% cpu 52.450 total
+rc=0
+test hnn::tower::field::tests::regions_sum_in_any_order ... ok
+test hnn::tower::field::tests::the_closure_locates_a_number_told_by_order ... ignored
+test hnn::tower::field::tests::the_closure_compares_only_where_a_class_is_held ... ok
+test hnn::tower::field::tests::covector_matches_the_codes_difference ... ok
+test hnn::tower::field::tests::the_contact_finds_a_cue_s_successor ... ok
+test result: ok. 31 passed; 0 failed; 2 ignored; 0 measured; 1980 filtered out; finished in 1.84s

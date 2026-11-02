@@ -1,0 +1,64 @@
+FIELD_COMMAND release-field-text $ROOT/.local/wt/field-card/.local/run/crib-closure/train/STATE.10 a16f20c14c165e1beca3ad05fe0b424286681dc28e58213def04f38722702e9b $ROOT/.local/wt/field-card/.local/run/crib-closure/train/CODEC 0a26b3281ea9122b4325faa976006aa43011836f064dbaef389e0df32fe8789d $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab 3 53 30000
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=14077788160 total=16802250752 batch_budget=9086697472
+FIELD_RELEASE_SWEEP set=text done=0 live=3 open=3 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=7
+FIELD_RELEASE_SWEEP set=text done=1 live=3 open=3 resolved=18 by_news=0 revised=0 unsettled=0 cut=3 cut_sites=151 ms=11
+FIELD_RELEASE_SWEEP set=text done=2 live=3 open=3 resolved=38 by_news=0 revised=1 unsettled=0 cut=3 cut_sites=151 ms=16
+FIELD_RELEASE_SWEEP set=text done=3 live=3 open=3 resolved=56 by_news=0 revised=3 unsettled=0 cut=3 cut_sites=151 ms=20
+FIELD_RELEASE_SWEEP set=text done=4 live=3 open=3 resolved=61 by_news=0 revised=3 unsettled=0 cut=3 cut_sites=151 ms=24
+FIELD_RELEASE_SWEEP set=text done=5 live=3 open=3 resolved=61 by_news=3 revised=3 unsettled=0 cut=3 cut_sites=151 ms=30
+FIELD_RELEASE_SWEEP set=text done=6 live=3 open=3 resolved=61 by_news=6 revised=3 unsettled=0 cut=3 cut_sites=151 ms=36
+FIELD_RELEASE_SWEEP set=text done=7 live=3 open=3 resolved=61 by_news=9 revised=3 unsettled=0 cut=3 cut_sites=151 ms=41
+FIELD_RELEASE_SWEEP set=text done=8 live=3 open=3 resolved=61 by_news=12 revised=5 unsettled=0 cut=3 cut_sites=151 ms=47
+FIELD_RELEASE_SWEEP set=text done=9 live=3 open=3 resolved=62 by_news=14 revised=6 unsettled=0 cut=3 cut_sites=151 ms=53
+FIELD_RELEASE_SWEEP set=text done=10 live=3 open=3 resolved=62 by_news=17 revised=6 unsettled=0 cut=3 cut_sites=151 ms=58
+FIELD_RELEASE_SWEEP set=text done=11 live=3 open=3 resolved=62 by_news=20 revised=6 unsettled=0 cut=3 cut_sites=151 ms=64
+FIELD_RELEASE_SWEEP set=text done=12 live=3 open=3 resolved=62 by_news=23 revised=6 unsettled=0 cut=3 cut_sites=151 ms=69
+FIELD_RELEASE_SWEEP set=text done=13 live=3 open=3 resolved=63 by_news=25 revised=6 unsettled=0 cut=3 cut_sites=151 ms=75
+FIELD_RELEASE_SWEEP set=text done=14 live=3 open=3 resolved=63 by_news=28 revised=6 unsettled=0 cut=3 cut_sites=151 ms=81
+FIELD_RELEASE_SWEEP set=text done=15 live=3 open=3 resolved=63 by_news=31 revised=6 unsettled=0 cut=3 cut_sites=151 ms=87
+FIELD_RELEASE_SWEEP set=text done=16 live=3 open=3 resolved=63 by_news=34 revised=6 unsettled=0 cut=3 cut_sites=151 ms=92
+FIELD_RELEASE_SWEEP set=text done=17 live=3 open=3 resolved=63 by_news=37 revised=6 unsettled=0 cut=3 cut_sites=151 ms=99
+FIELD_RELEASE_SWEEP set=text done=18 live=3 open=3 resolved=64 by_news=39 revised=6 unsettled=0 cut=3 cut_sites=151 ms=103
+FIELD_RELEASE_SWEEP set=text done=19 live=3 open=3 resolved=64 by_news=42 revised=7 unsettled=0 cut=3 cut_sites=151 ms=108
+FIELD_RELEASE_SWEEP set=text done=20 live=3 open=3 resolved=64 by_news=45 revised=7 unsettled=0 cut=3 cut_sites=151 ms=115
+FIELD_RELEASE_SWEEP set=text done=21 live=3 open=3 resolved=64 by_news=48 revised=7 unsettled=0 cut=3 cut_sites=151 ms=121
+FIELD_RELEASE_SWEEP set=text done=22 live=3 open=3 resolved=64 by_news=51 revised=7 unsettled=0 cut=3 cut_sites=151 ms=126
+FIELD_RELEASE_SWEEP set=text done=23 live=3 open=3 resolved=64 by_news=54 revised=7 unsettled=0 cut=3 cut_sites=151 ms=131
+FIELD_RELEASE_SWEEP set=text done=24 live=3 open=3 resolved=64 by_news=57 revised=7 unsettled=0 cut=3 cut_sites=151 ms=137
+FIELD_RELEASE_SWEEP set=text done=25 live=3 open=3 resolved=64 by_news=60 revised=7 unsettled=0 cut=3 cut_sites=151 ms=143
+FIELD_RELEASE_SWEEP set=text done=26 live=3 open=3 resolved=64 by_news=63 revised=7 unsettled=0 cut=3 cut_sites=151 ms=149
+FIELD_RELEASE_SWEEP set=text done=27 live=3 open=1 resolved=65 by_news=65 revised=7 unsettled=0 cut=3 cut_sites=151 ms=155
+FIELD_RELEASE_SWEEP set=text done=28 live=3 open=1 resolved=65 by_news=66 revised=8 unsettled=0 cut=3 cut_sites=151 ms=159
+FIELD_RELEASE_SWEEP set=text done=29 live=3 open=1 resolved=65 by_news=67 revised=8 unsettled=0 cut=3 cut_sites=151 ms=162
+FIELD_RELEASE_SWEEP set=text done=30 live=2 open=1 resolved=65 by_news=68 revised=8 unsettled=0 cut=3 cut_sites=151 ms=166
+FIELD_RELEASE_SWEEP set=text done=31 live=2 open=1 resolved=66 by_news=68 revised=8 unsettled=0 cut=3 cut_sites=151 ms=170
+FIELD_RELEASE_SWEEP set=text done=32 live=2 open=1 resolved=66 by_news=69 revised=8 unsettled=0 cut=3 cut_sites=151 ms=173
+FIELD_RELEASE_SWEEP set=text done=33 live=2 open=1 resolved=66 by_news=70 revised=8 unsettled=0 cut=3 cut_sites=151 ms=176
+FIELD_RELEASE_SWEEP set=text done=34 live=1 open=1 resolved=66 by_news=71 revised=8 unsettled=0 cut=3 cut_sites=151 ms=179
+FIELD_RELEASE_SWEEP set=text done=35 live=1 open=0 resolved=66 by_news=72 revised=8 unsettled=0 cut=3 cut_sites=151 ms=182
+FIELD_RELEASE_SWEEP set=text done=36 live=1 open=0 resolved=66 by_news=72 revised=8 unsettled=0 cut=3 cut_sites=151 ms=183
+FIELD_RELEASE_SWEEP set=text done=37 live=1 open=0 resolved=66 by_news=72 revised=8 unsettled=0 cut=3 cut_sites=151 ms=184
+FIELD_RELEASE_SWEEP set=text done=38 live=0 open=0 resolved=66 by_news=72 revised=8 unsettled=0 cut=3 cut_sites=151 ms=186
+FIELD_PROMPT 0
+hamu lova rixogi hapepe 171 muvamu haxo xoyi pewe hahaza ha rideki ri yiloki mu tuza zacu cuso baba ri mutu na mu ricumu 367 muzaza yi bagipe we cuweso lohade fedegi xotucu loba vamu felova ha 304 lona fegijo ba pe vava cusotu ki murimu ri sogi pepe joyi tuki ki nasocu tuvaza kiyi kitutu giwe wesoza xoxo xoki cuweyi va loxo kiba na vakimu ki ri na vawena?
+FIELD_ANSWER 0
+<<5+10=1=19>>>10
+<<185+105=1=110>>111
+##### 10
+
+FIELD_PROMPT 1
+mu vawepe debacu ritu haza dexojo xogi gi zaweso muha pexo fegi deyi 379 jobaba dekiza ba sojo tujo ki ki gibaki tubari xoxo deba cu kigixo navaso weba riso so kigi xolo xojoba ba yihana cuki curi ha hazagi jorimu tuki halo deyiyi ri va gibayi deso kiyiza valotu cu gitumu vava na navava tu vadeva va tude tu hapewe ripe 665 we sogi hahalo baha yilofe tuvalo vababa jori ri sogi mu ha so xo jo?
+FIELD_ANSWER 1
+<<15+5=112>>>1?
+<<<5+5=1=100>>>111
+##### 12
+
+FIELD_PROMPT 2
+ha cude va va zava 55 gi wemu lonayi sonagi tu za xozafe kiba lo mumu gituna rijo yiriri va ba femu gisona fe ri vadede yiyi tuna tuha va mu weyicu yiri de fe so yi bacuba lonacu cude culo so gigipe we va hahaha bafe riso tu 1 riki we badeba peperi 29 deba mu bamu ba zaxoba logi tu ba jo vajoza tuba baha jo za kisoyi gi cuvaba peba turife?
+FIELD_ANSWER 2
+<<45+1=122>>>>8?
+<<5+1+1=1=19>>>12
+##### 10
+
+FIELD_RELEASE_TEXT problems=3 sweeps=38 open=0 stopped=false ms=186
+FIELD_CARD reads=103 read_ms=173 returns=0 return_ms=0 pairs=363203168 batches=103 peak_store=7444412 elapsed_ms=186

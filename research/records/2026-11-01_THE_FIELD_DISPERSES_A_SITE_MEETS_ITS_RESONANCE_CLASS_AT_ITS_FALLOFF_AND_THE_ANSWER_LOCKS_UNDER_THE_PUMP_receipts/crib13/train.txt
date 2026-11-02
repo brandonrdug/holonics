@@ -1,0 +1,239 @@
+FIELD_COMMAND train-field $G/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $W/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $W/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $W/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 5 8 2 32 2 16 27 8 32111 128444 867000 $O/train
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15258091520 total=16802250752 batch_budget=10267000832
+FIELD_DECLARATION alphabet=44 width=32 heads=5 modes=8 still=2 contacts=32 ticks=2 frames=5 reach=484 section=16 rate=8 answer=53 train=3968 withheld=128 dev=128 sections=248 laps_read=0 material=22342
+FIELD_HELD lap=-1 answer=5.459432 digits=5.459432 text=5.459432 classes=4470 context=5.459432 context_digits=5.459432 context_text=5.459432 context_classes=4470 foil=5.459432 foil_digits=5.459432 foil_text=5.459432 question=0.000000 question_digits=0.000000 question_text=0.000000 ms=398
+FIELD_ROWS_HELD lap=-1 head=0 tick=0 rows=4470 question_share=306700 soft_near_share=44792 other_share=648506 question_current=253279
+FIELD_ROWS_HELD lap=-1 head=1 tick=0 rows=4470 question_share=299866 soft_near_share=53439 other_share=646693 question_current=256590
+FIELD_ROWS_HELD lap=-1 head=2 tick=0 rows=4470 question_share=467314 soft_near_share=37694 other_share=494990 question_current=34917
+FIELD_ROWS_HELD lap=-1 head=3 tick=0 rows=4470 question_share=468627 soft_near_share=36501 other_share=494871 question_current=36563
+FIELD_ROWS_HELD lap=-1 head=4 tick=0 rows=4470 question_share=267008 soft_near_share=48352 other_share=684638 question_current=212946
+FIELD_ROWS_HELD lap=-1 head=0 tick=1 rows=4470 question_share=306700 soft_near_share=44792 other_share=648506 question_current=253279
+FIELD_ROWS_HELD lap=-1 head=1 tick=1 rows=4470 question_share=299866 soft_near_share=53439 other_share=646693 question_current=256590
+FIELD_ROWS_HELD lap=-1 head=2 tick=1 rows=4470 question_share=467314 soft_near_share=37694 other_share=494990 question_current=34917
+FIELD_ROWS_HELD lap=-1 head=3 tick=1 rows=4470 question_share=468627 soft_near_share=36501 other_share=494871 question_current=36563
+FIELD_ROWS_HELD lap=-1 head=4 tick=1 rows=4470 question_share=267008 soft_near_share=48352 other_share=684638 question_current=212946
+FIELD_UNSEEN lap=-1 code=5.459 sites=4319 next=- ms=743
+FIELD_COVECTORS lap=0 dot=0 face_norm=130896302147402762680349052480 closure_norm=699124220797477503500700646484133 ms=40
+FIELD_LAP lap=0 read=1 sites=408396 before=4.533 after=4.529 deposited=49/248 halvings=210 next_halved=2 next_refused=6 ms=12175
+FIELD_UNSEEN lap=0 code=4.739 sites=4319 next=- ms=12918
+FIELD_HELD lap=0 answer=4.985472 digits=5.269607 text=4.683776 classes=4470 context=4.740047 context_digits=5.044414 context_text=4.416867 context_classes=4470 foil=4.739074 foil_digits=5.042832 foil_text=4.416541 question=-0.000973 question_digits=-0.001582 question_text=-0.000326 ms=13280
+FIELD_ROWS_HELD lap=0 head=0 tick=0 rows=4470 question_share=246145 soft_near_share=33421 other_share=720433 question_current=216576
+FIELD_ROWS_HELD lap=0 head=1 tick=0 rows=4470 question_share=251797 soft_near_share=37218 other_share=710983 question_current=225534
+FIELD_ROWS_HELD lap=0 head=2 tick=0 rows=4470 question_share=835393 soft_near_share=12525 other_share=152081 question_current=188765
+FIELD_ROWS_HELD lap=0 head=3 tick=0 rows=4470 question_share=930807 soft_near_share=3833 other_share=65358 question_current=326237
+FIELD_ROWS_HELD lap=0 head=4 tick=0 rows=4470 question_share=226720 soft_near_share=43197 other_share=730082 question_current=209896
+FIELD_ROWS_HELD lap=0 head=0 tick=1 rows=4470 question_share=263574 soft_near_share=5404 other_share=731021 question_current=230710
+FIELD_ROWS_HELD lap=0 head=1 tick=1 rows=4470 question_share=221935 soft_near_share=8072 other_share=769992 question_current=195612
+FIELD_ROWS_HELD lap=0 head=2 tick=1 rows=4470 question_share=773784 soft_near_share=1530 other_share=224685 question_current=141676
+FIELD_ROWS_HELD lap=0 head=3 tick=1 rows=4470 question_share=974595 soft_near_share=265 other_share=25139 question_current=336933
+FIELD_ROWS_HELD lap=0 head=4 tick=1 rows=4470 question_share=72952 soft_near_share=426266 other_share=500781 question_current=79583
+FIELD_COVECTORS lap=1 dot=-8884063749896531856106314968958 face_norm=4832379225399723821927752702955 closure_norm=182622442398643693620902891690044 ms=47
+FIELD_LAP lap=1 read=2 sites=394356 before=4.455 after=4.455 deposited=5/248 halvings=269 next_halved=0 next_refused=5 ms=11698
+FIELD_UNSEEN lap=1 code=4.739 sites=4319 next=- ms=25202
+FIELD_HELD lap=1 answer=4.985472 digits=5.269607 text=4.683776 classes=4470 context=4.740047 context_digits=5.044414 context_text=4.416867 context_classes=4470 foil=4.739074 foil_digits=5.042832 foil_text=4.416541 question=-0.000973 question_digits=-0.001582 question_text=-0.000326 ms=25582
+FIELD_ROWS_HELD lap=1 head=0 tick=0 rows=4470 question_share=246145 soft_near_share=33421 other_share=720433 question_current=216576
+FIELD_ROWS_HELD lap=1 head=1 tick=0 rows=4470 question_share=251797 soft_near_share=37218 other_share=710983 question_current=225534
+FIELD_ROWS_HELD lap=1 head=2 tick=0 rows=4470 question_share=835393 soft_near_share=12525 other_share=152081 question_current=188765
+FIELD_ROWS_HELD lap=1 head=3 tick=0 rows=4470 question_share=930807 soft_near_share=3833 other_share=65358 question_current=326237
+FIELD_ROWS_HELD lap=1 head=4 tick=0 rows=4470 question_share=226720 soft_near_share=43197 other_share=730082 question_current=209896
+FIELD_ROWS_HELD lap=1 head=0 tick=1 rows=4470 question_share=263574 soft_near_share=5404 other_share=731021 question_current=230710
+FIELD_ROWS_HELD lap=1 head=1 tick=1 rows=4470 question_share=221935 soft_near_share=8072 other_share=769992 question_current=195612
+FIELD_ROWS_HELD lap=1 head=2 tick=1 rows=4470 question_share=773784 soft_near_share=1530 other_share=224685 question_current=141676
+FIELD_ROWS_HELD lap=1 head=3 tick=1 rows=4470 question_share=974595 soft_near_share=265 other_share=25139 question_current=336933
+FIELD_ROWS_HELD lap=1 head=4 tick=1 rows=4470 question_share=72952 soft_near_share=426266 other_share=500781 question_current=79583
+FIELD_GROW lap=1 width=64 heads=10 contacts=64 rate=9 material=71264 ms=25801
+FIELD_COVECTORS lap=2 dot=-270759317297083395867405456203 face_norm=9976040952390488233158679494745 closure_norm=248180180900663275812657322208174 ms=75
+FIELD_LAP lap=2 read=3 sites=410155 before=4.457 after=4.457 deposited=5/248 halvings=265 next_halved=1 next_refused=4 ms=25780
+FIELD_UNSEEN lap=2 code=4.744 sites=4319 next=- ms=51581
+FIELD_HELD lap=2 answer=4.992241 digits=5.277435 text=4.689419 classes=4470 context=4.744684 context_digits=5.049943 context_text=4.420558 context_classes=4470 foil=4.743722 foil_digits=5.048379 foil_text=4.420235 question=-0.000963 question_digits=-0.001565 question_text=-0.000323 ms=52441
+FIELD_ROWS_HELD lap=2 head=0 tick=0 rows=4470 question_share=246209 soft_near_share=33420 other_share=720369 question_current=216697
+FIELD_ROWS_HELD lap=2 head=1 tick=0 rows=4470 question_share=251871 soft_near_share=37216 other_share=710912 question_current=225648
+FIELD_ROWS_HELD lap=2 head=2 tick=0 rows=4470 question_share=835457 soft_near_share=12515 other_share=152027 question_current=188736
+FIELD_ROWS_HELD lap=2 head=3 tick=0 rows=4470 question_share=930866 soft_near_share=3828 other_share=65305 question_current=326118
+FIELD_ROWS_HELD lap=2 head=4 tick=0 rows=4470 question_share=226673 soft_near_share=43193 other_share=730132 question_current=209927
+FIELD_ROWS_HELD lap=2 head=5 tick=0 rows=4470 question_share=246215 soft_near_share=33419 other_share=720365 question_current=216700
+FIELD_ROWS_HELD lap=2 head=6 tick=0 rows=4470 question_share=251874 soft_near_share=37214 other_share=710910 question_current=225654
+FIELD_ROWS_HELD lap=2 head=7 tick=0 rows=4470 question_share=835444 soft_near_share=12515 other_share=152039 question_current=188733
+FIELD_ROWS_HELD lap=2 head=8 tick=0 rows=4470 question_share=930863 soft_near_share=3828 other_share=65308 question_current=326118
+FIELD_ROWS_HELD lap=2 head=9 tick=0 rows=4470 question_share=226675 soft_near_share=43192 other_share=730131 question_current=209931
+FIELD_ROWS_HELD lap=2 head=0 tick=1 rows=4470 question_share=265034 soft_near_share=5148 other_share=729817 question_current=232301
+FIELD_ROWS_HELD lap=2 head=1 tick=1 rows=4470 question_share=223207 soft_near_share=7809 other_share=768982 question_current=196778
+FIELD_ROWS_HELD lap=2 head=2 tick=1 rows=4470 question_share=776528 soft_near_share=1454 other_share=222017 question_current=141473
+FIELD_ROWS_HELD lap=2 head=3 tick=1 rows=4470 question_share=975054 soft_near_share=246 other_share=24699 question_current=335750
+FIELD_ROWS_HELD lap=2 head=4 tick=1 rows=4470 question_share=73070 soft_near_share=424350 other_share=502578 question_current=79883
+FIELD_ROWS_HELD lap=2 head=5 tick=1 rows=4470 question_share=264940 soft_near_share=5158 other_share=729900 question_current=232175
+FIELD_ROWS_HELD lap=2 head=6 tick=1 rows=4470 question_share=223256 soft_near_share=7799 other_share=768943 question_current=196933
+FIELD_ROWS_HELD lap=2 head=7 tick=1 rows=4470 question_share=776185 soft_near_share=1457 other_share=222356 question_current=141411
+FIELD_ROWS_HELD lap=2 head=8 tick=1 rows=4470 question_share=975034 soft_near_share=246 other_share=24718 question_current=335913
+FIELD_ROWS_HELD lap=2 head=9 tick=1 rows=4470 question_share=73227 soft_near_share=423191 other_share=503581 question_current=80107
+FIELD_COVECTORS lap=3 dot=-5141965208708228131558394660545 face_norm=5350170556094693947246881009215 closure_norm=99187382585243109468388120119764 ms=85
+FIELD_LAP lap=3 read=4 sites=410105 before=3.633 after=3.623 deposited=231/248 halvings=243 next_halved=48 next_refused=42 ms=36239
+FIELD_UNSEEN lap=3 code=3.398 sites=4319 next_change=29201894 next_halvings=1 next_refused=true ms=89173
+FIELD_HELD lap=3 answer=4.036938 digits=4.417507 text=3.632847 classes=4470 context=3.463663 context_digits=4.296447 context_text=2.579406 context_classes=4470 foil=3.462425 foil_digits=4.295564 foil_text=2.577791 question=-0.001238 question_digits=-0.000883 question_text=-0.001616 ms=89900
+FIELD_ROWS_HELD lap=3 head=0 tick=0 rows=4470 question_share=188926 soft_near_share=17650 other_share=793423 question_current=165102
+FIELD_ROWS_HELD lap=3 head=1 tick=0 rows=4470 question_share=158879 soft_near_share=20759 other_share=820361 question_current=132260
+FIELD_ROWS_HELD lap=3 head=2 tick=0 rows=4470 question_share=863953 soft_near_share=4519 other_share=131527 question_current=100565
+FIELD_ROWS_HELD lap=3 head=3 tick=0 rows=4470 question_share=971553 soft_near_share=740 other_share=27705 question_current=228093
+FIELD_ROWS_HELD lap=3 head=4 tick=0 rows=4470 question_share=180705 soft_near_share=43920 other_share=775374 question_current=151020
+FIELD_ROWS_HELD lap=3 head=5 tick=0 rows=4470 question_share=174725 soft_near_share=19185 other_share=806089 question_current=148342
+FIELD_ROWS_HELD lap=3 head=6 tick=0 rows=4470 question_share=164227 soft_near_share=19180 other_share=816592 question_current=138052
+FIELD_ROWS_HELD lap=3 head=7 tick=0 rows=4470 question_share=734179 soft_near_share=14767 other_share=251052 question_current=98269
+FIELD_ROWS_HELD lap=3 head=8 tick=0 rows=4470 question_share=966472 soft_near_share=803 other_share=32723 question_current=212056
+FIELD_ROWS_HELD lap=3 head=9 tick=0 rows=4470 question_share=162501 soft_near_share=40723 other_share=796774 question_current=141525
+FIELD_ROWS_HELD lap=3 head=0 tick=1 rows=4470 question_share=63538 soft_near_share=1578 other_share=934883 question_current=51042
+FIELD_ROWS_HELD lap=3 head=1 tick=1 rows=4470 question_share=59249 soft_near_share=1585 other_share=939165 question_current=51233
+FIELD_ROWS_HELD lap=3 head=2 tick=1 rows=4470 question_share=297739 soft_near_share=7340 other_share=694919 question_current=67511
+FIELD_ROWS_HELD lap=3 head=3 tick=1 rows=4470 question_share=971841 soft_near_share=455 other_share=27703 question_current=351622
+FIELD_ROWS_HELD lap=3 head=4 tick=1 rows=4470 question_share=102354 soft_near_share=57833 other_share=839811 question_current=79975
+FIELD_ROWS_HELD lap=3 head=5 tick=1 rows=4470 question_share=65005 soft_near_share=1804 other_share=933189 question_current=50171
+FIELD_ROWS_HELD lap=3 head=6 tick=1 rows=4470 question_share=67976 soft_near_share=2101 other_share=929922 question_current=56328
+FIELD_ROWS_HELD lap=3 head=7 tick=1 rows=4470 question_share=325150 soft_near_share=17896 other_share=656952 question_current=74213
+FIELD_ROWS_HELD lap=3 head=8 tick=1 rows=4470 question_share=960223 soft_near_share=535 other_share=39241 question_current=336385
+FIELD_ROWS_HELD lap=3 head=9 tick=1 rows=4470 question_share=115365 soft_near_share=53044 other_share=831589 question_current=91959
+FIELD_COVECTORS lap=4 dot=9334031048413516959033929816881 face_norm=10553357400044075276162082266085 closure_norm=49589028201342796247065182205801 ms=70
+FIELD_LAP lap=4 read=5 sites=397634 before=3.304 after=3.301 deposited=115/248 halvings=396 next_halved=39 next_refused=27 ms=30965
+FIELD_UNSEEN lap=4 code=3.248 sites=4319 next=- ms=121294
+FIELD_HELD lap=4 answer=3.936338 digits=4.360742 text=3.485703 classes=4470 context=3.320847 context_digits=4.227655 context_text=2.357991 context_classes=4470 foil=3.319447 foil_digits=4.226867 foil_text=2.355941 question=-0.001400 question_digits=-0.000789 question_text=-0.002049 ms=122073
+FIELD_ROWS_HELD lap=4 head=0 tick=0 rows=4470 question_share=170052 soft_near_share=16088 other_share=813858 question_current=146386
+FIELD_ROWS_HELD lap=4 head=1 tick=0 rows=4470 question_share=143854 soft_near_share=18617 other_share=837527 question_current=118464
+FIELD_ROWS_HELD lap=4 head=2 tick=0 rows=4470 question_share=874568 soft_near_share=3597 other_share=121834 question_current=86683
+FIELD_ROWS_HELD lap=4 head=3 tick=0 rows=4470 question_share=974874 soft_near_share=703 other_share=24422 question_current=224928
+FIELD_ROWS_HELD lap=4 head=4 tick=0 rows=4470 question_share=181343 soft_near_share=44387 other_share=774268 question_current=150669
+FIELD_ROWS_HELD lap=4 head=5 tick=0 rows=4470 question_share=156799 soft_near_share=17589 other_share=825610 question_current=130892
+FIELD_ROWS_HELD lap=4 head=6 tick=0 rows=4470 question_share=149911 soft_near_share=17124 other_share=832963 question_current=125182
+FIELD_ROWS_HELD lap=4 head=7 tick=0 rows=4470 question_share=698029 soft_near_share=18390 other_share=283579 question_current=88828
+FIELD_ROWS_HELD lap=4 head=8 tick=0 rows=4470 question_share=967615 soft_near_share=822 other_share=31561 question_current=214189
+FIELD_ROWS_HELD lap=4 head=9 tick=0 rows=4470 question_share=169661 soft_near_share=41403 other_share=788934 question_current=146713
+FIELD_ROWS_HELD lap=4 head=0 tick=1 rows=4470 question_share=67939 soft_near_share=1480 other_share=930580 question_current=53084
+FIELD_ROWS_HELD lap=4 head=1 tick=1 rows=4470 question_share=62250 soft_near_share=1508 other_share=936240 question_current=53753
+FIELD_ROWS_HELD lap=4 head=2 tick=1 rows=4470 question_share=256408 soft_near_share=7168 other_share=736423 question_current=56513
+FIELD_ROWS_HELD lap=4 head=3 tick=1 rows=4470 question_share=969479 soft_near_share=631 other_share=29888 question_current=333588
+FIELD_ROWS_HELD lap=4 head=4 tick=1 rows=4470 question_share=109028 soft_near_share=48453 other_share=842518 question_current=87980
+FIELD_ROWS_HELD lap=4 head=5 tick=1 rows=4470 question_share=70473 soft_near_share=1787 other_share=927738 question_current=54016
+FIELD_ROWS_HELD lap=4 head=6 tick=1 rows=4470 question_share=72052 soft_near_share=1984 other_share=925962 question_current=60412
+FIELD_ROWS_HELD lap=4 head=7 tick=1 rows=4470 question_share=262001 soft_near_share=27980 other_share=710017 question_current=60976
+FIELD_ROWS_HELD lap=4 head=8 tick=1 rows=4470 question_share=953215 soft_near_share=995 other_share=45789 question_current=326721
+FIELD_ROWS_HELD lap=4 head=9 tick=1 rows=4470 question_share=149373 soft_near_share=46274 other_share=804352 question_current=117666
+FIELD_COVECTORS lap=5 dot=742779903184115832302124772155 face_norm=943688886878777513365760604547 closure_norm=9540540771642802130416372432623 ms=83
+FIELD_LAP lap=5 read=6 sites=406937 before=3.151 after=3.144 deposited=236/248 halvings=418 next_halved=78 next_refused=58 ms=38827
+FIELD_UNSEEN lap=5 code=2.936 sites=4319 next_change=-292940 next_halvings=0 next_refused=false ms=161305
+FIELD_HELD lap=5 answer=3.994118 digits=4.280024 text=3.690540 classes=4470 context=3.022698 context_digits=4.082266 context_text=1.897641 context_classes=4470 foil=3.021491 foil_digits=4.081452 foil_text=1.896016 question=-0.001207 question_digits=-0.000814 question_text=-0.001624 ms=162039
+FIELD_ROWS_HELD lap=5 head=0 tick=0 rows=4470 question_share=130452 soft_near_share=12734 other_share=856813 question_current=108730
+FIELD_ROWS_HELD lap=5 head=1 tick=0 rows=4470 question_share=113914 soft_near_share=14142 other_share=871942 question_current=91652
+FIELD_ROWS_HELD lap=5 head=2 tick=0 rows=4470 question_share=838088 soft_near_share=4814 other_share=157097 question_current=65992
+FIELD_ROWS_HELD lap=5 head=3 tick=0 rows=4470 question_share=979638 soft_near_share=919 other_share=19441 question_current=235917
+FIELD_ROWS_HELD lap=5 head=4 tick=0 rows=4470 question_share=201955 soft_near_share=41605 other_share=756438 question_current=166291
+FIELD_ROWS_HELD lap=5 head=5 tick=0 rows=4470 question_share=119039 soft_near_share=13746 other_share=867213 question_current=95892
+FIELD_ROWS_HELD lap=5 head=6 tick=0 rows=4470 question_share=118674 soft_near_share=12942 other_share=868382 question_current=98317
+FIELD_ROWS_HELD lap=5 head=7 tick=0 rows=4470 question_share=639916 soft_near_share=26438 other_share=333645 question_current=76124
+FIELD_ROWS_HELD lap=5 head=8 tick=0 rows=4470 question_share=968250 soft_near_share=1042 other_share=30706 question_current=215490
+FIELD_ROWS_HELD lap=5 head=9 tick=0 rows=4470 question_share=192160 soft_near_share=45338 other_share=762500 question_current=162572
+FIELD_ROWS_HELD lap=5 head=0 tick=1 rows=4470 question_share=75312 soft_near_share=1289 other_share=923397 question_current=61280
+FIELD_ROWS_HELD lap=5 head=1 tick=1 rows=4470 question_share=70027 soft_near_share=1215 other_share=928756 question_current=59210
+FIELD_ROWS_HELD lap=5 head=2 tick=1 rows=4470 question_share=129554 soft_near_share=4964 other_share=865480 question_current=27156
+FIELD_ROWS_HELD lap=5 head=3 tick=1 rows=4470 question_share=971492 soft_near_share=1139 other_share=27368 question_current=311751
+FIELD_ROWS_HELD lap=5 head=4 tick=1 rows=4470 question_share=89226 soft_near_share=56060 other_share=854713 question_current=74346
+FIELD_ROWS_HELD lap=5 head=5 tick=1 rows=4470 question_share=77633 soft_near_share=1658 other_share=920708 question_current=62276
+FIELD_ROWS_HELD lap=5 head=6 tick=1 rows=4470 question_share=76699 soft_near_share=1546 other_share=921753 question_current=61767
+FIELD_ROWS_HELD lap=5 head=7 tick=1 rows=4470 question_share=336010 soft_near_share=55725 other_share=608263 question_current=69713
+FIELD_ROWS_HELD lap=5 head=8 tick=1 rows=4470 question_share=930337 soft_near_share=6190 other_share=63472 question_current=296759
+FIELD_ROWS_HELD lap=5 head=9 tick=1 rows=4470 question_share=201540 soft_near_share=50194 other_share=748265 question_current=157649
+FIELD_COVECTORS lap=6 dot=3156725998955176488761536283681 face_norm=5197360712151917769417793262737 closure_norm=14460808589776459624293866650040 ms=106
+FIELD_LAP lap=6 read=7 sites=406984 before=3.073 after=3.070 deposited=129/248 halvings=388 next_halved=40 next_refused=28 ms=31197
+FIELD_UNSEEN lap=6 code=2.837 sites=4319 next=- ms=193695
+FIELD_HELD lap=6 answer=3.991309 digits=4.282251 text=3.682384 classes=4470 context=2.920152 context_digits=4.050959 context_text=1.719451 context_classes=4470 foil=2.918976 foil_digits=4.050088 foil_text=1.717952 question=-0.001176 question_digits=-0.000872 question_text=-0.001499 ms=194411
+FIELD_ROWS_HELD lap=6 head=0 tick=0 rows=4470 question_share=122113 soft_near_share=11631 other_share=866255 question_current=100398
+FIELD_ROWS_HELD lap=6 head=1 tick=0 rows=4470 question_share=107610 soft_near_share=12718 other_share=879670 question_current=85757
+FIELD_ROWS_HELD lap=6 head=2 tick=0 rows=4470 question_share=810433 soft_near_share=5529 other_share=184036 question_current=61428
+FIELD_ROWS_HELD lap=6 head=3 tick=0 rows=4470 question_share=980371 soft_near_share=863 other_share=18764 question_current=245216
+FIELD_ROWS_HELD lap=6 head=4 tick=0 rows=4470 question_share=211528 soft_near_share=40652 other_share=747818 question_current=173852
+FIELD_ROWS_HELD lap=6 head=5 tick=0 rows=4470 question_share=108782 soft_near_share=12606 other_share=878610 question_current=86737
+FIELD_ROWS_HELD lap=6 head=6 tick=0 rows=4470 question_share=112020 soft_near_share=11779 other_share=876200 question_current=92716
+FIELD_ROWS_HELD lap=6 head=7 tick=0 rows=4470 question_share=637359 soft_near_share=26943 other_share=335696 question_current=74363
+FIELD_ROWS_HELD lap=6 head=8 tick=0 rows=4470 question_share=964270 soft_near_share=1223 other_share=34505 question_current=215335
+FIELD_ROWS_HELD lap=6 head=9 tick=0 rows=4470 question_share=205364 soft_near_share=45813 other_share=748822 question_current=171978
+FIELD_ROWS_HELD lap=6 head=0 tick=1 rows=4470 question_share=82433 soft_near_share=1145 other_share=916421 question_current=68381
+FIELD_ROWS_HELD lap=6 head=1 tick=1 rows=4470 question_share=73932 soft_near_share=1048 other_share=925019 question_current=61961
+FIELD_ROWS_HELD lap=6 head=2 tick=1 rows=4470 question_share=100930 soft_near_share=5259 other_share=893809 question_current=21773
+FIELD_ROWS_HELD lap=6 head=3 tick=1 rows=4470 question_share=971222 soft_near_share=882 other_share=27894 question_current=304881
+FIELD_ROWS_HELD lap=6 head=4 tick=1 rows=4470 question_share=80369 soft_near_share=67039 other_share=852590 question_current=67548
+FIELD_ROWS_HELD lap=6 head=5 tick=1 rows=4470 question_share=83949 soft_near_share=1374 other_share=914675 question_current=68179
+FIELD_ROWS_HELD lap=6 head=6 tick=1 rows=4470 question_share=80623 soft_near_share=1371 other_share=918005 question_current=64220
+FIELD_ROWS_HELD lap=6 head=7 tick=1 rows=4470 question_share=389784 soft_near_share=65687 other_share=544528 question_current=74259
+FIELD_ROWS_HELD lap=6 head=8 tick=1 rows=4470 question_share=888158 soft_near_share=10440 other_share=101400 question_current=282317
+FIELD_ROWS_HELD lap=6 head=9 tick=1 rows=4470 question_share=246557 soft_near_share=45885 other_share=707556 question_current=189565
+FIELD_COVECTORS lap=7 dot=6754981917156816637286853368494 face_norm=4289121131319686417775680850385 closure_norm=49111636084425425912694608720589 ms=99
+FIELD_LAP lap=7 read=8 sites=402191 before=3.008 after=3.006 deposited=127/248 halvings=476 next_halved=41 next_refused=40 ms=31972
+FIELD_UNSEEN lap=7 code=2.786 sites=4319 next_change=-5777053 next_halvings=0 next_refused=false ms=226801
+FIELD_HELD lap=7 answer=3.999297 digits=4.367077 text=3.608786 classes=4470 context=2.868444 context_digits=4.017365 context_text=1.648510 context_classes=4470 foil=2.867208 foil_digits=4.016316 foil_text=1.647075 question=-0.001236 question_digits=-0.001048 question_text=-0.001436 ms=227587
+FIELD_ROWS_HELD lap=7 head=0 tick=0 rows=4470 question_share=115016 soft_near_share=11061 other_share=873921 question_current=93644
+FIELD_ROWS_HELD lap=7 head=1 tick=0 rows=4470 question_share=103837 soft_near_share=12165 other_share=883997 question_current=82265
+FIELD_ROWS_HELD lap=7 head=2 tick=0 rows=4470 question_share=795274 soft_near_share=6234 other_share=198490 question_current=59016
+FIELD_ROWS_HELD lap=7 head=3 tick=0 rows=4470 question_share=981399 soft_near_share=820 other_share=17779 question_current=242717
+FIELD_ROWS_HELD lap=7 head=4 tick=0 rows=4470 question_share=212729 soft_near_share=40495 other_share=746775 question_current=174279
+FIELD_ROWS_HELD lap=7 head=5 tick=0 rows=4470 question_share=102864 soft_near_share=12134 other_share=885000 question_current=81566
+FIELD_ROWS_HELD lap=7 head=6 tick=0 rows=4470 question_share=107109 soft_near_share=11197 other_share=881693 question_current=88335
+FIELD_ROWS_HELD lap=7 head=7 tick=0 rows=4470 question_share=642173 soft_near_share=25911 other_share=331915 question_current=72923
+FIELD_ROWS_HELD lap=7 head=8 tick=0 rows=4470 question_share=960553 soft_near_share=1449 other_share=37996 question_current=203132
+FIELD_ROWS_HELD lap=7 head=9 tick=0 rows=4470 question_share=215137 soft_near_share=46326 other_share=738536 question_current=179552
+FIELD_ROWS_HELD lap=7 head=0 tick=1 rows=4470 question_share=74548 soft_near_share=908 other_share=924542 question_current=62521
+FIELD_ROWS_HELD lap=7 head=1 tick=1 rows=4470 question_share=67604 soft_near_share=867 other_share=931527 question_current=56050
+FIELD_ROWS_HELD lap=7 head=2 tick=1 rows=4470 question_share=101704 soft_near_share=5182 other_share=893112 question_current=20444
+FIELD_ROWS_HELD lap=7 head=3 tick=1 rows=4470 question_share=971731 soft_near_share=958 other_share=27309 question_current=292652
+FIELD_ROWS_HELD lap=7 head=4 tick=1 rows=4470 question_share=81054 soft_near_share=71297 other_share=847647 question_current=68197
+FIELD_ROWS_HELD lap=7 head=5 tick=1 rows=4470 question_share=76846 soft_near_share=1093 other_share=922059 question_current=62872
+FIELD_ROWS_HELD lap=7 head=6 tick=1 rows=4470 question_share=75310 soft_near_share=1128 other_share=923560 question_current=59318
+FIELD_ROWS_HELD lap=7 head=7 tick=1 rows=4470 question_share=434516 soft_near_share=65207 other_share=500275 question_current=83590
+FIELD_ROWS_HELD lap=7 head=8 tick=1 rows=4470 question_share=867640 soft_near_share=11517 other_share=120841 question_current=268629
+FIELD_ROWS_HELD lap=7 head=9 tick=1 rows=4470 question_share=270411 soft_near_share=47190 other_share=682398 question_current=209190
+FIELD_COVECTORS lap=8 dot=3107833012059530980471473133866 face_norm=3380841112551077542657785453815 closure_norm=15613343438540667314111820164154 ms=84
+FIELD_LAP lap=8 read=9 sites=391157 before=2.957 after=2.952 deposited=227/248 halvings=483 next_halved=85 next_refused=70 ms=38035
+FIELD_UNSEEN lap=8 code=2.668 sites=4319 next=- ms=266039
+FIELD_HELD lap=8 answer=4.064917 digits=4.272270 text=3.844749 classes=4470 context=2.750862 context_digits=3.932640 context_text=1.496041 context_classes=4470 foil=2.750017 foil_digits=3.931917 foil_text=1.495066 question=-0.000845 question_digits=-0.000723 question_text=-0.000974 ms=266761
+FIELD_ROWS_HELD lap=8 head=0 tick=0 rows=4470 question_share=103664 soft_near_share=9774 other_share=886560 question_current=83258
+FIELD_ROWS_HELD lap=8 head=1 tick=0 rows=4470 question_share=99144 soft_near_share=10667 other_share=890188 question_current=77152
+FIELD_ROWS_HELD lap=8 head=2 tick=0 rows=4470 question_share=775195 soft_near_share=6941 other_share=217862 question_current=60126
+FIELD_ROWS_HELD lap=8 head=3 tick=0 rows=4470 question_share=983039 soft_near_share=765 other_share=16194 question_current=242387
+FIELD_ROWS_HELD lap=8 head=4 tick=0 rows=4470 question_share=231064 soft_near_share=40815 other_share=728119 question_current=189146
+FIELD_ROWS_HELD lap=8 head=5 tick=0 rows=4470 question_share=92431 soft_near_share=11028 other_share=896539 question_current=72774
+FIELD_ROWS_HELD lap=8 head=6 tick=0 rows=4470 question_share=98952 soft_near_share=9914 other_share=891132 question_current=80914
+FIELD_ROWS_HELD lap=8 head=7 tick=0 rows=4470 question_share=615537 soft_near_share=28797 other_share=355665 question_current=72391
+FIELD_ROWS_HELD lap=8 head=8 tick=0 rows=4470 question_share=952948 soft_near_share=1999 other_share=45051 question_current=186314
+FIELD_ROWS_HELD lap=8 head=9 tick=0 rows=4470 question_share=225731 soft_near_share=45277 other_share=728991 question_current=187521
+FIELD_ROWS_HELD lap=8 head=0 tick=1 rows=4470 question_share=81118 soft_near_share=719 other_share=918162 question_current=69878
+FIELD_ROWS_HELD lap=8 head=1 tick=1 rows=4470 question_share=72303 soft_near_share=842 other_share=926854 question_current=59500
+FIELD_ROWS_HELD lap=8 head=2 tick=1 rows=4470 question_share=89018 soft_near_share=6524 other_share=904457 question_current=17505
+FIELD_ROWS_HELD lap=8 head=3 tick=1 rows=4470 question_share=966597 soft_near_share=1236 other_share=32165 question_current=280219
+FIELD_ROWS_HELD lap=8 head=4 tick=1 rows=4470 question_share=71767 soft_near_share=79205 other_share=849026 question_current=60535
+FIELD_ROWS_HELD lap=8 head=5 tick=1 rows=4470 question_share=87138 soft_near_share=935 other_share=911926 question_current=72385
+FIELD_ROWS_HELD lap=8 head=6 tick=1 rows=4470 question_share=80065 soft_near_share=1148 other_share=918786 question_current=62638
+FIELD_ROWS_HELD lap=8 head=7 tick=1 rows=4470 question_share=446149 soft_near_share=68165 other_share=485684 question_current=85514
+FIELD_ROWS_HELD lap=8 head=8 tick=1 rows=4470 question_share=818604 soft_near_share=15313 other_share=166082 question_current=249929
+FIELD_ROWS_HELD lap=8 head=9 tick=1 rows=4470 question_share=334218 soft_near_share=45820 other_share=619960 question_current=253564
+FIELD_COVECTORS lap=9 dot=2519335822023013307271988397386 face_norm=5611799268353655442453283766885 closure_norm=49398066195752435702521432015193 ms=82
+FIELD_LAP lap=9 read=10 sites=399997 before=2.947 after=2.947 deposited=17/248 halvings=303 next_halved=2 next_refused=7 ms=24223
+FIELD_UNSEEN lap=9 code=2.668 sites=4319 next=- ms=291402
+FIELD_HELD lap=9 answer=3.953269 digits=4.458338 text=3.416983 classes=4470 context=2.747380 context_digits=3.954590 context_text=1.465555 context_classes=4470 foil=2.746530 foil_digits=3.953806 foil_text=1.464634 question=-0.000850 question_digits=-0.000783 question_text=-0.000920 ms=292112
+FIELD_ROWS_HELD lap=9 head=0 tick=0 rows=4470 question_share=104880 soft_near_share=9751 other_share=885367 question_current=84245
+FIELD_ROWS_HELD lap=9 head=1 tick=0 rows=4470 question_share=100454 soft_near_share=10636 other_share=888908 question_current=78153
+FIELD_ROWS_HELD lap=9 head=2 tick=0 rows=4470 question_share=776497 soft_near_share=7039 other_share=216462 question_current=59489
+FIELD_ROWS_HELD lap=9 head=3 tick=0 rows=4470 question_share=983216 soft_near_share=741 other_share=16042 question_current=240733
+FIELD_ROWS_HELD lap=9 head=4 tick=0 rows=4470 question_share=233223 soft_near_share=40836 other_share=725940 question_current=190673
+FIELD_ROWS_HELD lap=9 head=5 tick=0 rows=4470 question_share=93366 soft_near_share=11014 other_share=895619 question_current=73592
+FIELD_ROWS_HELD lap=9 head=6 tick=0 rows=4470 question_share=99941 soft_near_share=9830 other_share=890227 question_current=81539
+FIELD_ROWS_HELD lap=9 head=7 tick=0 rows=4470 question_share=612922 soft_near_share=29205 other_share=357871 question_current=70867
+FIELD_ROWS_HELD lap=9 head=8 tick=0 rows=4470 question_share=952286 soft_near_share=2049 other_share=45663 question_current=185107
+FIELD_ROWS_HELD lap=9 head=9 tick=0 rows=4470 question_share=230381 soft_near_share=45197 other_share=724420 question_current=191230
+FIELD_ROWS_HELD lap=9 head=0 tick=1 rows=4470 question_share=79156 soft_near_share=743 other_share=920099 question_current=67943
+FIELD_ROWS_HELD lap=9 head=1 tick=1 rows=4470 question_share=70220 soft_near_share=819 other_share=928959 question_current=57793
+FIELD_ROWS_HELD lap=9 head=2 tick=1 rows=4470 question_share=91770 soft_near_share=6567 other_share=901661 question_current=16951
+FIELD_ROWS_HELD lap=9 head=3 tick=1 rows=4470 question_share=964171 soft_near_share=1399 other_share=34429 question_current=278755
+FIELD_ROWS_HELD lap=9 head=4 tick=1 rows=4470 question_share=71077 soft_near_share=82262 other_share=846660 question_current=59928
+FIELD_ROWS_HELD lap=9 head=5 tick=1 rows=4470 question_share=83812 soft_near_share=944 other_share=915243 question_current=69308
+FIELD_ROWS_HELD lap=9 head=6 tick=1 rows=4470 question_share=76486 soft_near_share=1079 other_share=922433 question_current=60310
+FIELD_ROWS_HELD lap=9 head=7 tick=1 rows=4470 question_share=443439 soft_near_share=69644 other_share=486916 question_current=82552
+FIELD_ROWS_HELD lap=9 head=8 tick=1 rows=4470 question_share=811324 soft_near_share=16292 other_share=172382 question_current=244036
+FIELD_ROWS_HELD lap=9 head=9 tick=1 rows=4470 question_share=332267 soft_near_share=46540 other_share=621191 question_current=254629
+FIELD_GROW_HELD lap=9 reason=a second growth has no projection ms=292529
+FIELD_CARD reads=10841 read_ms=171854 returns=2500 return_ms=108967 pairs=162378950924 batches=13353 peak_store=8199038728 landmarks=0 landmark_ms=0 elapsed_ms=292530
+MEASURE lap=crib13 rc=0 wall_s=292.9 peak_rss_kib=347480

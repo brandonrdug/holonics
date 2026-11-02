@@ -1,0 +1,646 @@
+BIN=2e6af90e7614ec281f75a1a1080cba75e8dae8dc7ec519693b42a8428afd0d58 args=20
+FIELD_COMMAND peaks-field $O/train/CODEC 0a26b3281ea9122b4325faa976006aa43011836f064dbaef389e0df32fe8789d $G/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $W/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $O/train/STATE.0 862c6491e9244a73c5c2ccebe97da6599d930471f8a0e3cddde376c5727c3659 $O/train/STATE.1 3bcd56ed298dcc967fa0aef5e64022e5d95ee90f962569e4afcafadb39936c21 $O/train/STATE.2 a15325deb3fbd229f47f94b948051cdc903deb309cc35fdb677b8c94e54ab2ef $O/train/STATE.3 7dd2734d8045a19cdc1ee8b837c687beb9c5273d28eb796aa3f551d2a17c180e $O/train/STATE.4 ce636b85a29f475a514f33819d8a3d3f45858c92fc1a9d1e3e8762a29dccdd43 $O/train/STATE.5 2e5c25c6764dcabe264fd369edf96fd6262c56ab4e91ffcfe85877bd49fb84af $O/train/STATE.6 47f6dc923fb08094c989dba2ed06fbea71ddf909d0969fb132b70f0da0bc85a4 $O/train/STATE.7 6d84546fd8a7200e7df5932d16de2d2b754a70903b60798ebdd3f15108db928e $O/train/STATE.8 1b7803d151e01062e047232a8e8fc8744146a0f3e741e98751c49262b930e24a $O/train/STATE.9 50208ba0c5320bfbd79b0b844be9b82a2bf2da899ad4ce7ac83bb04170d00b8f
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15242100736 total=16802250752 batch_budget=10251010048
+FIELD_PEAKS_READ problems=128 regions=512 operand_sites=258
+FIELD_PEAKS lap=0 tick=0 head=0 rows=4470 top_share=142733 spread_bits=4.795 flat_bits=8.282 top_digit=63758 digit_share=36841 digit_flat=17724 top_class_right=47427 right_share=22593 right_flat=7389 top_site_right=2237
+FIELD_PEAKS lap=0 tick=0 head=1 rows=4470 top_share=137630 spread_bits=4.841 flat_bits=8.282 top_digit=74273 digit_share=42050 digit_flat=17724 top_class_right=43400 right_share=24575 right_flat=7389 top_site_right=3132
+FIELD_PEAKS lap=0 tick=0 head=2 rows=4470 top_share=42937 spread_bits=7.317 flat_bits=8.282 top_digit=10738 digit_share=17820 digit_flat=17724 top_class_right=26622 right_share=8174 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=0 head=3 rows=4470 top_share=28830 spread_bits=7.581 flat_bits=8.282 top_digit=2685 digit_share=15275 digit_flat=17724 top_class_right=5593 right_share=8185 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=0 head=4 rows=4470 top_share=260608 spread_bits=3.456 flat_bits=8.282 top_digit=116107 digit_share=70211 digit_flat=17724 top_class_right=49888 right_share=31549 right_flat=7389 top_site_right=6040
+FIELD_PEAKS lap=0 tick=1 head=0 rows=4470 top_share=108268 spread_bits=5.661 flat_bits=8.282 top_digit=17226 digit_share=27353 digit_flat=17724 top_class_right=35347 right_share=10938 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=1 head=1 rows=4470 top_share=127650 spread_bits=5.348 flat_bits=8.282 top_digit=23937 digit_share=34754 digit_flat=17724 top_class_right=39821 right_share=13187 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=1 head=2 rows=4470 top_share=23204 spread_bits=7.882 flat_bits=8.282 top_digit=6488 digit_share=17993 digit_flat=17724 top_class_right=29083 right_share=7739 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=1 head=3 rows=4470 top_share=10620 spread_bits=7.991 flat_bits=8.282 top_digit=895 digit_share=16325 digit_flat=17724 top_class_right=3356 right_share=7782 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=0 tick=1 head=4 rows=4470 top_share=561359 spread_bits=1.671 flat_bits=8.282 top_digit=22148 digit_share=31097 digit_flat=17724 top_class_right=36465 right_share=24842 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=0 tick=0 head=0 rows=2302 top_share=146139 spread_bits=4.764 flat_bits=8.285 top_digit=92094 digit_share=46561 digit_flat=18198 top_class_right=40400 right_share=16128 right_flat=2935 top_site_right=4344
+FIELD_PEAKS_DIGIT lap=0 tick=0 head=1 rows=2302 top_share=140871 spread_bits=4.747 flat_bits=8.285 top_digit=86447 digit_share=47605 digit_flat=18198 top_class_right=36056 right_share=16752 right_flat=2935 top_site_right=6082
+FIELD_PEAKS_DIGIT lap=0 tick=0 head=2 rows=2302 top_share=42486 spread_bits=7.313 flat_bits=8.285 top_digit=8254 digit_share=18210 digit_flat=18198 top_class_right=1303 right_share=2973 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=0 head=3 rows=2302 top_share=27604 spread_bits=7.597 flat_bits=8.285 top_digit=3910 digit_share=15832 digit_flat=18198 top_class_right=0 right_share=2478 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=0 head=4 rows=2302 top_share=273809 spread_bits=3.339 flat_bits=8.285 top_digit=169418 digit_share=97788 digit_flat=18198 top_class_right=80799 right_share=48194 right_flat=2935 top_site_right=11729
+FIELD_PEAKS_DIGIT lap=0 tick=1 head=0 rows=2302 top_share=104361 spread_bits=5.668 flat_bits=8.285 top_digit=17376 digit_share=28038 digit_flat=18198 top_class_right=3475 right_share=5259 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=1 head=1 rows=2302 top_share=129278 spread_bits=5.300 flat_bits=8.285 top_digit=22589 digit_share=35861 digit_flat=18198 top_class_right=6082 right_share=6971 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=1 head=2 rows=2302 top_share=22726 spread_bits=7.890 flat_bits=8.285 top_digit=5647 digit_share=18402 digit_flat=18198 top_class_right=1738 right_share=3001 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=1 head=3 rows=2302 top_share=10680 spread_bits=7.990 flat_bits=8.285 top_digit=434 digit_share=16826 digit_flat=18198 top_class_right=0 right_share=2753 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=0 tick=1 head=4 rows=2302 top_share=584133 spread_bits=1.576 flat_bits=8.285 top_digit=18245 digit_share=30634 digit_flat=18198 top_class_right=6516 right_share=8306 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=0 rows=258 top_share=172690 spread_bits=4.387 flat_bits=8.292 top_digit=69767 digit_share=48854 digit_flat=17618 top_class_right=38760 right_share=22394 right_flat=4771 top_site_right=38760
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=1 rows=258 top_share=190353 spread_bits=4.113 flat_bits=8.292 top_digit=104651 digit_share=56431 digit_flat=17618 top_class_right=62016 right_share=25197 right_flat=4771 top_site_right=54264
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=2 rows=258 top_share=35105 spread_bits=7.443 flat_bits=8.292 top_digit=7752 digit_share=17744 digit_flat=17618 top_class_right=0 right_share=4193 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=3 rows=258 top_share=30509 spread_bits=7.501 flat_bits=8.292 top_digit=7752 digit_share=15312 digit_flat=17618 top_class_right=0 right_share=4051 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=0 head=4 rows=258 top_share=356765 spread_bits=2.719 flat_bits=8.292 top_digit=162791 digit_share=110405 digit_flat=17618 top_class_right=112403 right_share=70210 right_flat=4771 top_site_right=104651
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=0 rows=258 top_share=226838 spread_bits=4.098 flat_bits=8.292 top_digit=0 digit_share=23687 digit_flat=17618 top_class_right=0 right_share=5527 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=1 rows=258 top_share=257847 spread_bits=3.727 flat_bits=8.292 top_digit=3876 digit_share=32037 digit_flat=17618 top_class_right=3876 right_share=7658 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=2 rows=258 top_share=21947 spread_bits=7.852 flat_bits=8.292 top_digit=7752 digit_share=17868 digit_flat=17618 top_class_right=0 right_share=4540 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=3 rows=258 top_share=10890 spread_bits=7.935 flat_bits=8.292 top_digit=0 digit_share=16669 digit_flat=17618 top_class_right=0 right_share=4319 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=0 tick=1 head=4 rows=258 top_share=705378 spread_bits=0.980 flat_bits=8.292 top_digit=19380 digit_share=26165 digit_flat=17618 top_class_right=15504 right_share=14978 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=0 head=0 class=65017299 listen=16053024 width=32 heads=5
+FIELD_TEMPER lap=0 head=1 class=65754141 listen=16062682 width=32 heads=5
+FIELD_TEMPER lap=0 head=2 class=68765654 listen=19005148 width=32 heads=5
+FIELD_TEMPER lap=0 head=3 class=69051175 listen=19017084 width=32 heads=5
+FIELD_TEMPER lap=0 head=4 class=66218991 listen=17435342 width=32 heads=5
+FIELD_PEAKS_LAP lap=0 read_ms=271 ms=283
+FIELD_PEAKS lap=1 tick=0 head=0 rows=4470 top_share=142733 spread_bits=4.795 flat_bits=8.282 top_digit=63758 digit_share=36841 digit_flat=17724 top_class_right=47427 right_share=22593 right_flat=7389 top_site_right=2237
+FIELD_PEAKS lap=1 tick=0 head=1 rows=4470 top_share=137630 spread_bits=4.841 flat_bits=8.282 top_digit=74273 digit_share=42050 digit_flat=17724 top_class_right=43400 right_share=24575 right_flat=7389 top_site_right=3132
+FIELD_PEAKS lap=1 tick=0 head=2 rows=4470 top_share=42937 spread_bits=7.317 flat_bits=8.282 top_digit=10738 digit_share=17820 digit_flat=17724 top_class_right=26622 right_share=8174 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=0 head=3 rows=4470 top_share=28830 spread_bits=7.581 flat_bits=8.282 top_digit=2685 digit_share=15275 digit_flat=17724 top_class_right=5593 right_share=8185 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=0 head=4 rows=4470 top_share=260608 spread_bits=3.456 flat_bits=8.282 top_digit=116107 digit_share=70211 digit_flat=17724 top_class_right=49888 right_share=31549 right_flat=7389 top_site_right=6040
+FIELD_PEAKS lap=1 tick=1 head=0 rows=4470 top_share=108268 spread_bits=5.661 flat_bits=8.282 top_digit=17226 digit_share=27353 digit_flat=17724 top_class_right=35347 right_share=10938 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=1 head=1 rows=4470 top_share=127650 spread_bits=5.348 flat_bits=8.282 top_digit=23937 digit_share=34754 digit_flat=17724 top_class_right=39821 right_share=13187 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=1 head=2 rows=4470 top_share=23204 spread_bits=7.882 flat_bits=8.282 top_digit=6488 digit_share=17993 digit_flat=17724 top_class_right=29083 right_share=7739 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=1 head=3 rows=4470 top_share=10620 spread_bits=7.991 flat_bits=8.282 top_digit=895 digit_share=16325 digit_flat=17724 top_class_right=3356 right_share=7782 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=1 tick=1 head=4 rows=4470 top_share=561359 spread_bits=1.671 flat_bits=8.282 top_digit=22148 digit_share=31097 digit_flat=17724 top_class_right=36465 right_share=24842 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=1 tick=0 head=0 rows=2302 top_share=146139 spread_bits=4.764 flat_bits=8.285 top_digit=92094 digit_share=46561 digit_flat=18198 top_class_right=40400 right_share=16128 right_flat=2935 top_site_right=4344
+FIELD_PEAKS_DIGIT lap=1 tick=0 head=1 rows=2302 top_share=140871 spread_bits=4.747 flat_bits=8.285 top_digit=86447 digit_share=47605 digit_flat=18198 top_class_right=36056 right_share=16752 right_flat=2935 top_site_right=6082
+FIELD_PEAKS_DIGIT lap=1 tick=0 head=2 rows=2302 top_share=42486 spread_bits=7.313 flat_bits=8.285 top_digit=8254 digit_share=18210 digit_flat=18198 top_class_right=1303 right_share=2973 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=0 head=3 rows=2302 top_share=27604 spread_bits=7.597 flat_bits=8.285 top_digit=3910 digit_share=15832 digit_flat=18198 top_class_right=0 right_share=2478 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=0 head=4 rows=2302 top_share=273809 spread_bits=3.339 flat_bits=8.285 top_digit=169418 digit_share=97788 digit_flat=18198 top_class_right=80799 right_share=48194 right_flat=2935 top_site_right=11729
+FIELD_PEAKS_DIGIT lap=1 tick=1 head=0 rows=2302 top_share=104361 spread_bits=5.668 flat_bits=8.285 top_digit=17376 digit_share=28038 digit_flat=18198 top_class_right=3475 right_share=5259 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=1 head=1 rows=2302 top_share=129278 spread_bits=5.300 flat_bits=8.285 top_digit=22589 digit_share=35861 digit_flat=18198 top_class_right=6082 right_share=6971 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=1 head=2 rows=2302 top_share=22726 spread_bits=7.890 flat_bits=8.285 top_digit=5647 digit_share=18402 digit_flat=18198 top_class_right=1738 right_share=3001 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=1 head=3 rows=2302 top_share=10680 spread_bits=7.990 flat_bits=8.285 top_digit=434 digit_share=16826 digit_flat=18198 top_class_right=0 right_share=2753 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=1 tick=1 head=4 rows=2302 top_share=584133 spread_bits=1.576 flat_bits=8.285 top_digit=18245 digit_share=30634 digit_flat=18198 top_class_right=6516 right_share=8306 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=0 rows=258 top_share=172690 spread_bits=4.387 flat_bits=8.292 top_digit=69767 digit_share=48854 digit_flat=17618 top_class_right=38760 right_share=22394 right_flat=4771 top_site_right=38760
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=1 rows=258 top_share=190353 spread_bits=4.113 flat_bits=8.292 top_digit=104651 digit_share=56431 digit_flat=17618 top_class_right=62016 right_share=25197 right_flat=4771 top_site_right=54264
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=2 rows=258 top_share=35105 spread_bits=7.443 flat_bits=8.292 top_digit=7752 digit_share=17744 digit_flat=17618 top_class_right=0 right_share=4193 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=3 rows=258 top_share=30509 spread_bits=7.501 flat_bits=8.292 top_digit=7752 digit_share=15312 digit_flat=17618 top_class_right=0 right_share=4051 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=0 head=4 rows=258 top_share=356765 spread_bits=2.719 flat_bits=8.292 top_digit=162791 digit_share=110405 digit_flat=17618 top_class_right=112403 right_share=70210 right_flat=4771 top_site_right=104651
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=0 rows=258 top_share=226838 spread_bits=4.098 flat_bits=8.292 top_digit=0 digit_share=23687 digit_flat=17618 top_class_right=0 right_share=5527 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=1 rows=258 top_share=257847 spread_bits=3.727 flat_bits=8.292 top_digit=3876 digit_share=32037 digit_flat=17618 top_class_right=3876 right_share=7658 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=2 rows=258 top_share=21947 spread_bits=7.852 flat_bits=8.292 top_digit=7752 digit_share=17868 digit_flat=17618 top_class_right=0 right_share=4540 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=3 rows=258 top_share=10890 spread_bits=7.935 flat_bits=8.292 top_digit=0 digit_share=16669 digit_flat=17618 top_class_right=0 right_share=4319 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=1 tick=1 head=4 rows=258 top_share=705378 spread_bits=0.980 flat_bits=8.292 top_digit=19380 digit_share=26165 digit_flat=17618 top_class_right=15504 right_share=14978 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=1 head=0 class=65017299 listen=16053024 width=32 heads=5
+FIELD_TEMPER lap=1 head=1 class=65754141 listen=16062682 width=32 heads=5
+FIELD_TEMPER lap=1 head=2 class=68765654 listen=19005148 width=32 heads=5
+FIELD_TEMPER lap=1 head=3 class=69051175 listen=19017084 width=32 heads=5
+FIELD_TEMPER lap=1 head=4 class=66218991 listen=17435342 width=32 heads=5
+FIELD_PEAKS_LAP lap=1 read_ms=247 ms=536
+FIELD_PEAKS lap=2 tick=0 head=0 rows=4470 top_share=142688 spread_bits=4.796 flat_bits=8.282 top_digit=63758 digit_share=36830 digit_flat=17724 top_class_right=47427 right_share=22613 right_flat=7389 top_site_right=2237
+FIELD_PEAKS lap=2 tick=0 head=1 rows=4470 top_share=137599 spread_bits=4.841 flat_bits=8.282 top_digit=74049 digit_share=42035 digit_flat=17724 top_class_right=43400 right_share=24578 right_flat=7389 top_site_right=3132
+FIELD_PEAKS lap=2 tick=0 head=2 rows=4470 top_share=42939 spread_bits=7.317 flat_bits=8.282 top_digit=10738 digit_share=17819 digit_flat=17724 top_class_right=26622 right_share=8174 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=0 head=3 rows=4470 top_share=28819 spread_bits=7.582 flat_bits=8.282 top_digit=2685 digit_share=15274 digit_flat=17724 top_class_right=5593 right_share=8185 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=0 head=4 rows=4470 top_share=260601 spread_bits=3.456 flat_bits=8.282 top_digit=116107 digit_share=70222 digit_flat=17724 top_class_right=49888 right_share=31541 right_flat=7389 top_site_right=6040
+FIELD_PEAKS lap=2 tick=0 head=5 rows=4470 top_share=142688 spread_bits=4.796 flat_bits=8.282 top_digit=63758 digit_share=36829 digit_flat=17724 top_class_right=47427 right_share=22613 right_flat=7389 top_site_right=2237
+FIELD_PEAKS lap=2 tick=0 head=6 rows=4470 top_share=137597 spread_bits=4.841 flat_bits=8.282 top_digit=74049 digit_share=42035 digit_flat=17724 top_class_right=43400 right_share=24579 right_flat=7389 top_site_right=3132
+FIELD_PEAKS lap=2 tick=0 head=7 rows=4470 top_share=42938 spread_bits=7.317 flat_bits=8.282 top_digit=10738 digit_share=17819 digit_flat=17724 top_class_right=26622 right_share=8174 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=0 head=8 rows=4470 top_share=28819 spread_bits=7.582 flat_bits=8.282 top_digit=2685 digit_share=15274 digit_flat=17724 top_class_right=5593 right_share=8185 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=0 head=9 rows=4470 top_share=260603 spread_bits=3.456 flat_bits=8.282 top_digit=116107 digit_share=70223 digit_flat=17724 top_class_right=49888 right_share=31541 right_flat=7389 top_site_right=6040
+FIELD_PEAKS lap=2 tick=1 head=0 rows=4470 top_share=107280 spread_bits=5.678 flat_bits=8.282 top_digit=17226 digit_share=27338 digit_flat=17724 top_class_right=35570 right_share=10918 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=1 rows=4470 top_share=126339 spread_bits=5.366 flat_bits=8.282 top_digit=23937 digit_share=34667 digit_flat=17724 top_class_right=39821 right_share=13125 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=2 rows=4470 top_share=22880 spread_bits=7.889 flat_bits=8.282 top_digit=6711 digit_share=18006 digit_flat=17724 top_class_right=28859 right_share=7729 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=3 rows=4470 top_share=10562 spread_bits=7.992 flat_bits=8.282 top_digit=895 digit_share=16339 digit_flat=17724 top_class_right=3356 right_share=7782 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=4 rows=4470 top_share=559961 spread_bits=1.678 flat_bits=8.282 top_digit=22148 digit_share=31122 digit_flat=17724 top_class_right=36465 right_share=24809 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=2 tick=1 head=5 rows=4470 top_share=107308 spread_bits=5.678 flat_bits=8.282 top_digit=17226 digit_share=27355 digit_flat=17724 top_class_right=35570 right_share=10923 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=6 rows=4470 top_share=126536 spread_bits=5.364 flat_bits=8.282 top_digit=23937 digit_share=34673 digit_flat=17724 top_class_right=39821 right_share=13135 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=7 rows=4470 top_share=22931 spread_bits=7.888 flat_bits=8.282 top_digit=6711 digit_share=18006 digit_flat=17724 top_class_right=28859 right_share=7732 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=8 rows=4470 top_share=10566 spread_bits=7.992 flat_bits=8.282 top_digit=895 digit_share=16338 digit_flat=17724 top_class_right=3356 right_share=7781 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=2 tick=1 head=9 rows=4470 top_share=559392 spread_bits=1.681 flat_bits=8.282 top_digit=22595 digit_share=31153 digit_flat=17724 top_class_right=36242 right_share=24786 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=0 rows=2302 top_share=146091 spread_bits=4.764 flat_bits=8.285 top_digit=92094 digit_share=46548 digit_flat=18198 top_class_right=40400 right_share=16122 right_flat=2935 top_site_right=4344
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=1 rows=2302 top_share=140845 spread_bits=4.748 flat_bits=8.285 top_digit=86447 digit_share=47587 digit_flat=18198 top_class_right=36056 right_share=16747 right_flat=2935 top_site_right=6082
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=2 rows=2302 top_share=42489 spread_bits=7.312 flat_bits=8.285 top_digit=8254 digit_share=18209 digit_flat=18198 top_class_right=1303 right_share=2973 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=3 rows=2302 top_share=27595 spread_bits=7.597 flat_bits=8.285 top_digit=3910 digit_share=15831 digit_flat=18198 top_class_right=0 right_share=2477 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=4 rows=2302 top_share=273805 spread_bits=3.339 flat_bits=8.285 top_digit=169418 digit_share=97796 digit_flat=18198 top_class_right=80799 right_share=48188 right_flat=2935 top_site_right=11729
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=5 rows=2302 top_share=146091 spread_bits=4.764 flat_bits=8.285 top_digit=92094 digit_share=46546 digit_flat=18198 top_class_right=40400 right_share=16122 right_flat=2935 top_site_right=4344
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=6 rows=2302 top_share=140843 spread_bits=4.748 flat_bits=8.285 top_digit=86447 digit_share=47588 digit_flat=18198 top_class_right=36056 right_share=16747 right_flat=2935 top_site_right=6082
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=7 rows=2302 top_share=42488 spread_bits=7.312 flat_bits=8.285 top_digit=8254 digit_share=18209 digit_flat=18198 top_class_right=1303 right_share=2973 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=8 rows=2302 top_share=27595 spread_bits=7.597 flat_bits=8.285 top_digit=3910 digit_share=15831 digit_flat=18198 top_class_right=0 right_share=2477 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=0 head=9 rows=2302 top_share=273804 spread_bits=3.339 flat_bits=8.285 top_digit=169418 digit_share=97796 digit_flat=18198 top_class_right=80799 right_share=48188 right_flat=2935 top_site_right=11729
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=0 rows=2302 top_share=103496 spread_bits=5.683 flat_bits=8.285 top_digit=17376 digit_share=28022 digit_flat=18198 top_class_right=3475 right_share=5252 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=1 rows=2302 top_share=127955 spread_bits=5.319 flat_bits=8.285 top_digit=22589 digit_share=35773 digit_flat=18198 top_class_right=6082 right_share=6948 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=2 rows=2302 top_share=22420 spread_bits=7.897 flat_bits=8.285 top_digit=6082 digit_share=18418 digit_flat=18198 top_class_right=1738 right_share=3003 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=3 rows=2302 top_share=10621 spread_bits=7.992 flat_bits=8.285 top_digit=434 digit_share=16841 digit_flat=18198 top_class_right=0 right_share=2754 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=4 rows=2302 top_share=582824 spread_bits=1.583 flat_bits=8.285 top_digit=18679 digit_share=30653 digit_flat=18198 top_class_right=6516 right_share=8299 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=5 rows=2302 top_share=103521 spread_bits=5.683 flat_bits=8.285 top_digit=17376 digit_share=28038 digit_flat=18198 top_class_right=3475 right_share=5255 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=6 rows=2302 top_share=128158 spread_bits=5.316 flat_bits=8.285 top_digit=22589 digit_share=35781 digit_flat=18198 top_class_right=6082 right_share=6949 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=7 rows=2302 top_share=22469 spread_bits=7.896 flat_bits=8.285 top_digit=6082 digit_share=18418 digit_flat=18198 top_class_right=1738 right_share=3003 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=8 rows=2302 top_share=10626 spread_bits=7.991 flat_bits=8.285 top_digit=434 digit_share=16840 digit_flat=18198 top_class_right=0 right_share=2754 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=2 tick=1 head=9 rows=2302 top_share=582239 spread_bits=1.585 flat_bits=8.285 top_digit=18679 digit_share=30673 digit_flat=18198 top_class_right=6516 right_share=8298 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=0 rows=258 top_share=172637 spread_bits=4.388 flat_bits=8.292 top_digit=69767 digit_share=48840 digit_flat=17618 top_class_right=38760 right_share=22384 right_flat=4771 top_site_right=38760
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=1 rows=258 top_share=190296 spread_bits=4.113 flat_bits=8.292 top_digit=104651 digit_share=56416 digit_flat=17618 top_class_right=62016 right_share=25192 right_flat=4771 top_site_right=54264
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=2 rows=258 top_share=35122 spread_bits=7.443 flat_bits=8.292 top_digit=7752 digit_share=17743 digit_flat=17618 top_class_right=0 right_share=4193 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=3 rows=258 top_share=30493 spread_bits=7.501 flat_bits=8.292 top_digit=7752 digit_share=15312 digit_flat=17618 top_class_right=0 right_share=4051 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=4 rows=258 top_share=356758 spread_bits=2.719 flat_bits=8.292 top_digit=162791 digit_share=110405 digit_flat=17618 top_class_right=112403 right_share=70201 right_flat=4771 top_site_right=104651
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=5 rows=258 top_share=172634 spread_bits=4.388 flat_bits=8.292 top_digit=69767 digit_share=48839 digit_flat=17618 top_class_right=38760 right_share=22383 right_flat=4771 top_site_right=38760
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=6 rows=258 top_share=190292 spread_bits=4.113 flat_bits=8.292 top_digit=104651 digit_share=56417 digit_flat=17618 top_class_right=62016 right_share=25193 right_flat=4771 top_site_right=54264
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=7 rows=258 top_share=35121 spread_bits=7.443 flat_bits=8.292 top_digit=7752 digit_share=17743 digit_flat=17618 top_class_right=0 right_share=4193 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=8 rows=258 top_share=30493 spread_bits=7.501 flat_bits=8.292 top_digit=7752 digit_share=15312 digit_flat=17618 top_class_right=0 right_share=4051 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=0 head=9 rows=258 top_share=356768 spread_bits=2.719 flat_bits=8.292 top_digit=162791 digit_share=110406 digit_flat=17618 top_class_right=112403 right_share=70201 right_flat=4771 top_site_right=104651
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=0 rows=258 top_share=225629 spread_bits=4.111 flat_bits=8.292 top_digit=0 digit_share=23707 digit_flat=17618 top_class_right=0 right_share=5525 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=1 rows=258 top_share=255779 spread_bits=3.746 flat_bits=8.292 top_digit=3876 digit_share=31995 digit_flat=17618 top_class_right=3876 right_share=7640 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=2 rows=258 top_share=21611 spread_bits=7.860 flat_bits=8.292 top_digit=7752 digit_share=17896 digit_flat=17618 top_class_right=0 right_share=4553 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=3 rows=258 top_share=10830 spread_bits=7.936 flat_bits=8.292 top_digit=0 digit_share=16690 digit_flat=17618 top_class_right=0 right_share=4331 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=4 rows=258 top_share=704338 spread_bits=0.984 flat_bits=8.292 top_digit=19380 digit_share=26111 digit_flat=17618 top_class_right=15504 right_share=14898 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=5 rows=258 top_share=225726 spread_bits=4.111 flat_bits=8.292 top_digit=0 digit_share=23722 digit_flat=17618 top_class_right=0 right_share=5529 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=6 rows=258 top_share=256188 spread_bits=3.743 flat_bits=8.292 top_digit=3876 digit_share=31997 digit_flat=17618 top_class_right=3876 right_share=7642 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=7 rows=258 top_share=21649 spread_bits=7.859 flat_bits=8.292 top_digit=7752 digit_share=17896 digit_flat=17618 top_class_right=0 right_share=4554 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=8 rows=258 top_share=10833 spread_bits=7.936 flat_bits=8.292 top_digit=0 digit_share=16688 digit_flat=17618 top_class_right=0 right_share=4330 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=2 tick=1 head=9 rows=258 top_share=703808 spread_bits=0.986 flat_bits=8.292 top_digit=19380 digit_share=26081 digit_flat=17618 top_class_right=15504 right_share=14842 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=2 head=0 class=65017037 listen=16053041 width=64 heads=10
+FIELD_TEMPER lap=2 head=1 class=65753871 listen=16062703 width=64 heads=10
+FIELD_TEMPER lap=2 head=2 class=68765086 listen=19005114 width=64 heads=10
+FIELD_TEMPER lap=2 head=3 class=69050725 listen=19017655 width=64 heads=10
+FIELD_TEMPER lap=2 head=4 class=66218851 listen=17435802 width=64 heads=10
+FIELD_TEMPER lap=2 head=5 class=65017037 listen=16053041 width=64 heads=10
+FIELD_TEMPER lap=2 head=6 class=65753871 listen=16062703 width=64 heads=10
+FIELD_TEMPER lap=2 head=7 class=68765086 listen=19005114 width=64 heads=10
+FIELD_TEMPER lap=2 head=8 class=69050725 listen=19017655 width=64 heads=10
+FIELD_TEMPER lap=2 head=9 class=66218851 listen=17435802 width=64 heads=10
+FIELD_PEAKS_LAP lap=2 read_ms=538 ms=1084
+FIELD_PEAKS lap=3 tick=0 head=0 rows=4470 top_share=156594 spread_bits=4.654 flat_bits=8.282 top_digit=91723 digit_share=71247 digit_flat=17724 top_class_right=75615 right_share=35797 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=3 tick=0 head=1 rows=4470 top_share=184489 spread_bits=4.366 flat_bits=8.282 top_digit=87919 digit_share=84892 digit_flat=17724 top_class_right=73602 right_share=37494 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=3 tick=0 head=2 rows=4470 top_share=32208 spread_bits=7.601 flat_bits=8.282 top_digit=2013 digit_share=17109 digit_flat=17724 top_class_right=17226 right_share=7563 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=0 head=3 rows=4470 top_share=109140 spread_bits=6.407 flat_bits=8.282 top_digit=0 digit_share=14393 digit_flat=17724 top_class_right=0 right_share=7759 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=0 head=4 rows=4470 top_share=277883 spread_bits=3.309 flat_bits=8.282 top_digit=126398 digit_share=79215 digit_flat=17724 top_class_right=51454 right_share=32299 right_flat=7389 top_site_right=4474
+FIELD_PEAKS lap=3 tick=0 head=5 rows=4470 top_share=159710 spread_bits=4.641 flat_bits=8.282 top_digit=84340 digit_share=72260 digit_flat=17724 top_class_right=77405 right_share=37151 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=3 tick=0 head=6 rows=4470 top_share=150592 spread_bits=4.680 flat_bits=8.282 top_digit=101342 digit_share=78305 digit_flat=17724 top_class_right=73602 right_share=34637 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=3 tick=0 head=7 rows=4470 top_share=36313 spread_bits=7.512 flat_bits=8.282 top_digit=3132 digit_share=17296 digit_flat=17724 top_class_right=16555 right_share=7871 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=0 head=8 rows=4470 top_share=99898 spread_bits=6.514 flat_bits=8.282 top_digit=0 digit_share=14945 digit_flat=17724 top_class_right=0 right_share=7503 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=0 head=9 rows=4470 top_share=280678 spread_bits=3.354 flat_bits=8.282 top_digit=129306 digit_share=76284 digit_flat=17724 top_class_right=48322 right_share=27228 right_flat=7389 top_site_right=4474
+FIELD_PEAKS lap=3 tick=1 head=0 rows=4470 top_share=316806 spread_bits=2.882 flat_bits=8.282 top_digit=179418 digit_share=332431 digit_flat=17724 top_class_right=81208 right_share=71509 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=3 tick=1 head=1 rows=4470 top_share=315438 spread_bits=2.877 flat_bits=8.282 top_digit=270694 digit_share=385280 digit_flat=17724 top_class_right=82327 right_share=73796 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=1 head=2 rows=4470 top_share=83149 spread_bits=6.355 flat_bits=8.282 top_digit=25280 digit_share=19800 digit_flat=17724 top_class_right=7606 right_share=6944 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=1 head=3 rows=4470 top_share=162186 spread_bits=5.187 flat_bits=8.282 top_digit=0 digit_share=11658 digit_flat=17724 top_class_right=671 right_share=6176 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=1 head=4 rows=4470 top_share=499704 spread_bits=2.114 flat_bits=8.282 top_digit=83221 digit_share=107416 digit_flat=17724 top_class_right=50112 right_share=44223 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=3 tick=1 head=5 rows=4470 top_share=328637 spread_bits=2.840 flat_bits=8.282 top_digit=171588 digit_share=347009 digit_flat=17724 top_class_right=84116 right_share=72510 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=3 tick=1 head=6 rows=4470 top_share=270009 spread_bits=3.275 flat_bits=8.282 top_digit=236242 digit_share=320670 digit_flat=17724 top_class_right=83893 right_share=68136 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=3 tick=1 head=7 rows=4470 top_share=64462 spread_bits=6.839 flat_bits=8.282 top_digit=12975 digit_share=18416 digit_flat=17724 top_class_right=9172 right_share=7940 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=1 head=8 rows=4470 top_share=171208 spread_bits=5.198 flat_bits=8.282 top_digit=0 digit_share=10510 digit_flat=17724 top_class_right=0 right_share=4927 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=3 tick=1 head=9 rows=4470 top_share=346244 spread_bits=3.061 flat_bits=8.282 top_digit=90828 digit_share=100979 digit_flat=17724 top_class_right=72707 right_share=52758 right_flat=7389 top_site_right=671
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=0 rows=2302 top_share=148519 spread_bits=4.688 flat_bits=8.285 top_digit=134666 digit_share=91536 digit_flat=18198 top_class_right=38662 right_share=21197 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=1 rows=2302 top_share=173769 spread_bits=4.429 flat_bits=8.285 top_digit=119027 digit_share=94964 digit_flat=18198 top_class_right=37793 right_share=22503 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=2 rows=2302 top_share=30583 spread_bits=7.622 flat_bits=8.285 top_digit=1303 digit_share=17560 digit_flat=18198 top_class_right=0 right_share=2846 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=3 rows=2302 top_share=105101 spread_bits=6.441 flat_bits=8.285 top_digit=0 digit_share=14934 digit_flat=18198 top_class_right=0 right_share=2315 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=4 rows=2302 top_share=293179 spread_bits=3.169 flat_bits=8.285 top_digit=161599 digit_share=103032 digit_flat=18198 top_class_right=76890 right_share=45065 right_flat=2935 top_site_right=8688
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=5 rows=2302 top_share=141921 spread_bits=4.748 flat_bits=8.285 top_digit=127281 digit_share=92417 digit_flat=18198 top_class_right=38662 right_share=21306 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=6 rows=2302 top_share=138242 spread_bits=4.744 flat_bits=8.285 top_digit=137706 digit_share=89010 digit_flat=18198 top_class_right=36056 right_share=20884 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=7 rows=2302 top_share=35981 spread_bits=7.517 flat_bits=8.285 top_digit=2606 digit_share=17650 digit_flat=18198 top_class_right=869 right_share=2873 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=8 rows=2302 top_share=98109 spread_bits=6.533 flat_bits=8.285 top_digit=0 digit_share=15462 digit_flat=18198 top_class_right=0 right_share=2410 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=0 head=9 rows=2302 top_share=281303 spread_bits=3.296 flat_bits=8.285 top_digit=167680 digit_share=97798 digit_flat=18198 top_class_right=76021 right_share=40423 right_flat=2935 top_site_right=8688
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=0 rows=2302 top_share=317734 spread_bits=2.808 flat_bits=8.285 top_digit=215899 digit_share=386257 digit_flat=18198 top_class_right=44744 right_share=68814 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=1 rows=2302 top_share=323892 spread_bits=2.767 flat_bits=8.285 top_digit=268462 digit_share=421297 digit_flat=18198 top_class_right=60817 right_share=76670 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=2 rows=2302 top_share=78409 spread_bits=6.439 flat_bits=8.285 top_digit=23023 digit_share=19484 digit_flat=18198 top_class_right=5213 right_share=3173 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=3 rows=2302 top_share=154957 spread_bits=5.233 flat_bits=8.285 top_digit=0 digit_share=12201 digit_flat=18198 top_class_right=0 right_share=1867 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=4 rows=2302 top_share=540944 spread_bits=1.858 flat_bits=8.285 top_digit=58210 digit_share=112222 digit_flat=18198 top_class_right=10426 right_share=20958 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=5 rows=2302 top_share=331581 spread_bits=2.762 flat_bits=8.285 top_digit=196785 digit_share=389262 digit_flat=18198 top_class_right=47785 right_share=69865 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=6 rows=2302 top_share=286892 spread_bits=3.069 flat_bits=8.285 top_digit=257602 digit_share=368425 digit_flat=18198 top_class_right=58210 right_share=66754 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=7 rows=2302 top_share=62210 spread_bits=6.883 flat_bits=8.285 top_digit=9557 digit_share=18095 digit_flat=18198 top_class_right=1738 right_share=2935 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=8 rows=2302 top_share=165647 spread_bits=5.195 flat_bits=8.285 top_digit=0 digit_share=10923 digit_flat=18198 top_class_right=0 right_share=1656 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=3 tick=1 head=9 rows=2302 top_share=366594 spread_bits=2.882 flat_bits=8.285 top_digit=90791 digit_share=105718 digit_flat=18198 top_class_right=19548 right_share=20899 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=0 rows=258 top_share=253461 spread_bits=3.635 flat_bits=8.292 top_digit=46512 digit_share=101196 digit_flat=17618 top_class_right=23256 right_share=28042 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=1 rows=258 top_share=337216 spread_bits=3.004 flat_bits=8.292 top_digit=46512 digit_share=86850 digit_flat=17618 top_class_right=23256 right_share=27566 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=2 rows=258 top_share=40213 spread_bits=7.436 flat_bits=8.292 top_digit=0 digit_share=16598 digit_flat=17618 top_class_right=0 right_share=4152 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=3 rows=258 top_share=144051 spread_bits=5.782 flat_bits=8.292 top_digit=0 digit_share=13928 digit_flat=17618 top_class_right=0 right_share=3877 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=4 rows=258 top_share=397202 spread_bits=2.486 flat_bits=8.292 top_digit=147287 digit_share=105722 digit_flat=17618 top_class_right=85271 right_share=58828 right_flat=4771 top_site_right=77519
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=5 rows=258 top_share=222698 spread_bits=3.851 flat_bits=8.292 top_digit=50388 digit_share=100499 digit_flat=17618 top_class_right=19380 right_share=27183 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=6 rows=258 top_share=254873 spread_bits=3.563 flat_bits=8.292 top_digit=65891 digit_share=87705 digit_flat=17618 top_class_right=23256 right_share=26800 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=7 rows=258 top_share=43495 spread_bits=7.362 flat_bits=8.292 top_digit=0 digit_share=16470 digit_flat=17618 top_class_right=0 right_share=4005 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=8 rows=258 top_share=133856 spread_bits=5.881 flat_bits=8.292 top_digit=0 digit_share=14507 digit_flat=17618 top_class_right=0 right_share=4031 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=0 head=9 rows=258 top_share=403726 spread_bits=2.475 flat_bits=8.292 top_digit=131783 digit_share=102401 digit_flat=17618 top_class_right=89147 right_share=60041 right_flat=4771 top_site_right=77519
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=0 rows=258 top_share=521860 spread_bits=1.777 flat_bits=8.292 top_digit=93023 digit_share=275544 digit_flat=17618 top_class_right=19380 right_share=66717 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=1 rows=258 top_share=547230 spread_bits=1.630 flat_bits=8.292 top_digit=100775 digit_share=304530 digit_flat=17618 top_class_right=15504 right_share=74314 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=2 rows=258 top_share=233654 spread_bits=3.866 flat_bits=8.292 top_digit=23256 digit_share=17914 digit_flat=17618 top_class_right=3876 right_share=2958 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=3 rows=258 top_share=315964 spread_bits=3.116 flat_bits=8.292 top_digit=0 digit_share=6769 digit_flat=17618 top_class_right=0 right_share=1655 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=4 rows=258 top_share=677942 spread_bits=1.127 flat_bits=8.292 top_digit=27132 digit_share=73950 digit_flat=17618 top_class_right=7752 right_share=20513 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=5 rows=258 top_share=559273 spread_bits=1.615 flat_bits=8.292 top_digit=38760 digit_share=271528 digit_flat=17618 top_class_right=11628 right_share=66386 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=6 rows=258 top_share=488569 spread_bits=1.936 flat_bits=8.292 top_digit=89147 digit_share=270096 digit_flat=17618 top_class_right=19380 right_share=65086 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=7 rows=258 top_share=204539 spread_bits=4.369 flat_bits=8.292 top_digit=3876 digit_share=15373 digit_flat=17618 top_class_right=0 right_share=3089 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=8 rows=258 top_share=335296 spread_bits=3.023 flat_bits=8.292 top_digit=0 digit_share=6234 digit_flat=17618 top_class_right=0 right_share=1699 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=3 tick=1 head=9 rows=258 top_share=539022 spread_bits=1.801 flat_bits=8.292 top_digit=62016 digit_share=92640 digit_flat=17618 top_class_right=23256 right_share=26253 right_flat=4771 top_site_right=11628
+FIELD_TEMPER lap=3 head=0 class=61866702 listen=16457375 width=64 heads=10
+FIELD_TEMPER lap=3 head=1 class=63075272 listen=16435661 width=64 heads=10
+FIELD_TEMPER lap=3 head=2 class=66731897 listen=19563955 width=64 heads=10
+FIELD_TEMPER lap=3 head=3 class=67057801 listen=19604435 width=64 heads=10
+FIELD_TEMPER lap=3 head=4 class=63886594 listen=19210447 width=64 heads=10
+FIELD_TEMPER lap=3 head=5 class=61952644 listen=16445684 width=64 heads=10
+FIELD_TEMPER lap=3 head=6 class=63083043 listen=16444186 width=64 heads=10
+FIELD_TEMPER lap=3 head=7 class=66807739 listen=19051098 width=64 heads=10
+FIELD_TEMPER lap=3 head=8 class=67079925 listen=19513581 width=64 heads=10
+FIELD_TEMPER lap=3 head=9 class=64130416 listen=17830259 width=64 heads=10
+FIELD_PEAKS_LAP lap=3 read_ms=489 ms=1585
+FIELD_PEAKS lap=4 tick=0 head=0 rows=4470 top_share=171601 spread_bits=4.512 flat_bits=8.282 top_digit=103132 digit_share=86423 digit_flat=17724 top_class_right=77629 right_share=39457 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=4 tick=0 head=1 rows=4470 top_share=197726 spread_bits=4.232 flat_bits=8.282 top_digit=102237 digit_share=100125 digit_flat=17724 top_class_right=77852 right_share=42103 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=4 tick=0 head=2 rows=4470 top_share=28939 spread_bits=7.674 flat_bits=8.282 top_digit=1790 digit_share=17098 digit_flat=17724 top_class_right=9620 right_share=7361 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=0 head=3 rows=4470 top_share=136452 spread_bits=6.046 flat_bits=8.282 top_digit=0 digit_share=13863 digit_flat=17724 top_class_right=0 right_share=7610 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=0 head=4 rows=4470 top_share=279379 spread_bits=3.296 flat_bits=8.282 top_digit=121924 digit_share=77354 digit_flat=17724 top_class_right=51007 right_share=31754 right_flat=7389 top_site_right=4251
+FIELD_PEAKS lap=4 tick=0 head=5 rows=4470 top_share=176338 spread_bits=4.483 flat_bits=8.282 top_digit=101119 digit_share=87196 digit_flat=17724 top_class_right=78971 right_share=41078 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=4 tick=0 head=6 rows=4470 top_share=161783 spread_bits=4.562 flat_bits=8.282 top_digit=120582 digit_share=93657 digit_flat=17724 top_class_right=80089 right_share=38887 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=4 tick=0 head=7 rows=4470 top_share=35955 spread_bits=7.510 flat_bits=8.282 top_digit=2685 digit_share=17175 digit_flat=17724 top_class_right=14765 right_share=7899 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=0 head=8 rows=4470 top_share=129826 spread_bits=6.115 flat_bits=8.282 top_digit=0 digit_share=14348 digit_flat=17724 top_class_right=0 right_share=7216 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=0 head=9 rows=4470 top_share=279639 spread_bits=3.376 flat_bits=8.282 top_digit=112752 digit_share=67257 digit_flat=17724 top_class_right=41834 right_share=24543 right_flat=7389 top_site_right=4027
+FIELD_PEAKS lap=4 tick=1 head=0 rows=4470 top_share=337724 spread_bits=2.725 flat_bits=8.282 top_digit=176510 digit_share=344766 digit_flat=17724 top_class_right=88143 right_share=76700 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=4 tick=1 head=1 rows=4470 top_share=341881 spread_bits=2.707 flat_bits=8.282 top_digit=223937 digit_share=383158 digit_flat=17724 top_class_right=84116 right_share=77826 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=1 head=2 rows=4470 top_share=87906 spread_bits=6.289 flat_bits=8.282 top_digit=26174 digit_share=20975 digit_flat=17724 top_class_right=11186 right_share=7415 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=1 head=3 rows=4470 top_share=174653 spread_bits=5.039 flat_bits=8.282 top_digit=0 digit_share=11316 digit_flat=17724 top_class_right=671 right_share=6116 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=1 head=4 rows=4470 top_share=430812 spread_bits=2.485 flat_bits=8.282 top_digit=101119 digit_share=121494 digit_flat=17724 top_class_right=48770 right_share=39685 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=4 tick=1 head=5 rows=4470 top_share=349504 spread_bits=2.701 flat_bits=8.282 top_digit=147651 digit_share=349299 digit_flat=17724 top_class_right=85682 right_share=76409 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=4 tick=1 head=6 rows=4470 top_share=285706 spread_bits=3.169 flat_bits=8.282 top_digit=205593 digit_share=327439 digit_flat=17724 top_class_right=87472 right_share=72864 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=4 tick=1 head=7 rows=4470 top_share=65114 spread_bits=6.834 flat_bits=8.282 top_digit=12304 digit_share=19019 digit_flat=17724 top_class_right=14765 right_share=8570 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=1 head=8 rows=4470 top_share=199951 spread_bits=4.891 flat_bits=8.282 top_digit=0 digit_share=9744 digit_flat=17724 top_class_right=0 right_share=4745 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=4 tick=1 head=9 rows=4470 top_share=277732 spread_bits=3.524 flat_bits=8.282 top_digit=90604 digit_share=91577 digit_flat=17724 top_class_right=61521 right_share=42379 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=0 rows=2302 top_share=162826 spread_bits=4.537 flat_bits=8.285 top_digit=151173 digit_share=110668 digit_flat=18198 top_class_right=42572 right_share=25152 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=1 rows=2302 top_share=185529 spread_bits=4.308 flat_bits=8.285 top_digit=141182 digit_share=113588 digit_flat=18198 top_class_right=41268 right_share=26389 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=2 rows=2302 top_share=27178 spread_bits=7.696 flat_bits=8.285 top_digit=869 digit_share=17567 digit_flat=18198 top_class_right=0 right_share=2853 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=3 rows=2302 top_share=134179 spread_bits=6.054 flat_bits=8.285 top_digit=0 digit_share=14354 digit_flat=18198 top_class_right=0 right_share=2205 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=4 rows=2302 top_share=290789 spread_bits=3.185 flat_bits=8.285 top_digit=152911 digit_share=98989 digit_flat=18198 top_class_right=72980 right_share=43002 right_flat=2935 top_site_right=8254
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=5 rows=2302 top_share=156012 spread_bits=4.598 flat_bits=8.285 top_digit=148566 digit_share=111732 digit_flat=18198 top_class_right=40834 right_share=25289 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=6 rows=2302 top_share=144552 spread_bits=4.667 flat_bits=8.285 top_digit=164205 digit_share=107888 digit_flat=18198 top_class_right=41268 right_share=24853 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=7 rows=2302 top_share=36172 spread_bits=7.505 flat_bits=8.285 top_digit=869 digit_share=17502 digit_flat=18198 top_class_right=869 right_share=2858 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=8 rows=2302 top_share=131262 spread_bits=6.091 flat_bits=8.285 top_digit=0 digit_share=14781 digit_flat=18198 top_class_right=0 right_share=2277 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=0 head=9 rows=2302 top_share=278500 spread_bits=3.322 flat_bits=8.285 top_digit=147698 digit_share=87158 digit_flat=18198 top_class_right=63423 right_share=35190 right_flat=2935 top_site_right=7819
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=0 rows=2302 top_share=334910 spread_bits=2.660 flat_bits=8.285 top_digit=235447 digit_share=410620 digit_flat=18198 top_class_right=49957 right_share=73064 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=1 rows=2302 top_share=352464 spread_bits=2.573 flat_bits=8.285 top_digit=239357 digit_share=427820 digit_flat=18198 top_class_right=54735 right_share=77352 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=2 rows=2302 top_share=83166 spread_bits=6.375 flat_bits=8.285 top_digit=25630 digit_share=20546 digit_flat=18198 top_class_right=4344 right_share=3379 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=3 rows=2302 top_share=168481 spread_bits=5.055 flat_bits=8.285 top_digit=0 digit_share=11800 digit_flat=18198 top_class_right=0 right_share=1783 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=4 rows=2302 top_share=469808 spread_bits=2.218 flat_bits=8.285 top_digit=95569 digit_share=134180 digit_flat=18198 top_class_right=17811 right_share=24285 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=5 rows=2302 top_share=349965 spread_bits=2.622 flat_bits=8.285 top_digit=189835 digit_share=401449 digit_flat=18198 top_class_right=45178 right_share=72550 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=6 rows=2302 top_share=304807 spread_bits=2.929 flat_bits=8.285 top_digit=247176 digit_share=386172 digit_flat=18198 top_class_right=53866 right_share=69871 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=7 rows=2302 top_share=63245 spread_bits=6.878 flat_bits=8.285 top_digit=9123 digit_share=18469 digit_flat=18198 top_class_right=869 right_share=3010 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=8 rows=2302 top_share=196988 spread_bits=4.841 flat_bits=8.285 top_digit=0 digit_share=10024 digit_flat=18198 top_class_right=0 right_share=1488 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=4 tick=1 head=9 rows=2302 top_share=299018 spread_bits=3.324 flat_bits=8.285 top_digit=96003 digit_share=97475 digit_flat=18198 top_class_right=21286 right_share=19137 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=0 rows=258 top_share=278826 spread_bits=3.429 flat_bits=8.292 top_digit=65891 digit_share=124581 digit_flat=17618 top_class_right=23256 right_share=33939 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=1 rows=258 top_share=362696 spread_bits=2.833 flat_bits=8.292 top_digit=54264 digit_share=105542 digit_flat=17618 top_class_right=27132 right_share=32722 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=2 rows=258 top_share=38444 spread_bits=7.487 flat_bits=8.292 top_digit=0 digit_share=16663 digit_flat=17618 top_class_right=0 right_share=4230 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=3 rows=258 top_share=184755 spread_bits=5.272 flat_bits=8.292 top_digit=0 digit_share=13138 digit_flat=17618 top_class_right=0 right_share=3690 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=4 rows=258 top_share=387754 spread_bits=2.542 flat_bits=8.292 top_digit=143411 digit_share=101384 digit_flat=17618 top_class_right=81395 right_share=55865 right_flat=4771 top_site_right=73643
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=5 rows=258 top_share=246153 spread_bits=3.655 flat_bits=8.292 top_digit=54264 digit_share=122988 digit_flat=17618 top_class_right=19380 right_share=32863 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=6 rows=258 top_share=268192 spread_bits=3.461 flat_bits=8.292 top_digit=77519 digit_share=110544 digit_flat=17618 top_class_right=31008 right_share=32801 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=7 rows=258 top_share=43283 spread_bits=7.334 flat_bits=8.292 top_digit=0 digit_share=16205 digit_flat=17618 top_class_right=0 right_share=3949 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=8 rows=258 top_share=185896 spread_bits=5.234 flat_bits=8.292 top_digit=0 digit_share=13451 digit_flat=17618 top_class_right=0 right_share=3759 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=0 head=9 rows=258 top_share=410681 spread_bits=2.446 flat_bits=8.292 top_digit=120155 digit_share=94040 digit_flat=17618 top_class_right=81395 right_share=55254 right_flat=4771 top_site_right=69767
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=0 rows=258 top_share=537868 spread_bits=1.665 flat_bits=8.292 top_digit=81395 digit_share=306525 digit_flat=17618 top_class_right=23256 right_share=75434 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=1 rows=258 top_share=590741 spread_bits=1.420 flat_bits=8.292 top_digit=73643 digit_share=305383 digit_flat=17618 top_class_right=7752 right_share=75329 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=2 rows=258 top_share=250373 spread_bits=3.698 flat_bits=8.292 top_digit=31008 digit_share=20895 digit_flat=17618 top_class_right=0 right_share=3320 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=3 rows=258 top_share=329679 spread_bits=3.009 flat_bits=8.292 top_digit=0 digit_share=6667 digit_flat=17618 top_class_right=0 right_share=1670 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=4 rows=258 top_share=628680 spread_bits=1.318 flat_bits=8.292 top_digit=34884 digit_share=81486 digit_flat=17618 top_class_right=11628 right_share=21755 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=5 rows=258 top_share=571953 spread_bits=1.513 flat_bits=8.292 top_digit=50388 digit_share=298594 digit_flat=17618 top_class_right=15504 right_share=74452 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=6 rows=258 top_share=521276 spread_bits=1.759 flat_bits=8.292 top_digit=89147 digit_share=289864 digit_flat=17618 top_class_right=19380 right_share=70240 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=7 rows=258 top_share=201310 spread_bits=4.416 flat_bits=8.292 top_digit=15504 digit_share=16546 digit_flat=17618 top_class_right=0 right_share=3188 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=8 rows=258 top_share=384212 spread_bits=2.687 flat_bits=8.292 top_digit=0 digit_share=5356 digit_flat=17618 top_class_right=0 right_share=1487 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=4 tick=1 head=9 rows=258 top_share=498187 spread_bits=2.046 flat_bits=8.292 top_digit=65891 digit_share=90799 digit_flat=17618 top_class_right=23256 right_share=26720 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=4 head=0 class=61368431 listen=16593711 width=64 heads=10
+FIELD_TEMPER lap=4 head=1 class=62609753 listen=16560411 width=64 heads=10
+FIELD_TEMPER lap=4 head=2 class=66444267 listen=19791491 width=64 heads=10
+FIELD_TEMPER lap=4 head=3 class=66818578 listen=19801276 width=64 heads=10
+FIELD_TEMPER lap=4 head=4 class=63692889 listen=19286054 width=64 heads=10
+FIELD_TEMPER lap=4 head=5 class=61464959 listen=16581616 width=64 heads=10
+FIELD_TEMPER lap=4 head=6 class=62625959 listen=16571976 width=64 heads=10
+FIELD_TEMPER lap=4 head=7 class=66304631 listen=19248590 width=64 heads=10
+FIELD_TEMPER lap=4 head=8 class=66771174 listen=19589330 width=64 heads=10
+FIELD_TEMPER lap=4 head=9 class=63778001 listen=17708736 width=64 heads=10
+FIELD_PEAKS_LAP lap=4 read_ms=490 ms=2084
+FIELD_PEAKS lap=5 tick=0 head=0 rows=4470 top_share=213972 spread_bits=4.127 flat_bits=8.282 top_digit=132215 digit_share=126068 digit_flat=17724 top_class_right=87472 right_share=50094 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=5 tick=0 head=1 rows=4470 top_share=256650 spread_bits=3.704 flat_bits=8.282 top_digit=114765 digit_share=138754 digit_flat=17724 top_class_right=85011 right_share=56633 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=5 tick=0 head=2 rows=4470 top_share=25203 spread_bits=7.765 flat_bits=8.282 top_digit=3132 digit_share=17235 digit_flat=17724 top_class_right=895 right_share=7100 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=0 head=3 rows=4470 top_share=213796 spread_bits=5.145 flat_bits=8.282 top_digit=0 digit_share=12617 digit_flat=17724 top_class_right=0 right_share=7439 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=0 head=4 rows=4470 top_share=273527 spread_bits=3.347 flat_bits=8.282 top_digit=106264 digit_share=64392 digit_flat=17724 top_class_right=46756 right_share=28573 right_flat=7389 top_site_right=3356
+FIELD_PEAKS lap=5 tick=0 head=5 rows=4470 top_share=226258 spread_bits=4.024 flat_bits=8.282 top_digit=124385 digit_share=127010 digit_flat=17724 top_class_right=82998 right_share=54093 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=5 tick=0 head=6 rows=4470 top_share=207631 spread_bits=4.122 flat_bits=8.282 top_digit=146980 digit_share=131290 digit_flat=17724 top_class_right=93736 right_share=53275 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=5 tick=0 head=7 rows=4470 top_share=40459 spread_bits=7.358 flat_bits=8.282 top_digit=895 digit_share=16164 digit_flat=17724 top_class_right=10962 right_share=8327 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=0 head=8 rows=4470 top_share=143305 spread_bits=5.945 flat_bits=8.282 top_digit=0 digit_share=13733 digit_flat=17724 top_class_right=0 right_share=7149 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=0 head=9 rows=4470 top_share=272191 spread_bits=3.469 flat_bits=8.282 top_digit=95526 digit_share=58898 digit_flat=17724 top_class_right=36242 right_share=21489 right_flat=7389 top_site_right=2908
+FIELD_PEAKS lap=5 tick=1 head=0 rows=4470 top_share=306010 spread_bits=2.860 flat_bits=8.282 top_digit=262416 digit_share=399663 digit_flat=17724 top_class_right=105817 right_share=96214 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=5 tick=1 head=1 rows=4470 top_share=331619 spread_bits=2.738 flat_bits=8.282 top_digit=209396 digit_share=398044 digit_flat=17724 top_class_right=100000 right_share=93980 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=5 tick=1 head=2 rows=4470 top_share=92473 spread_bits=6.267 flat_bits=8.282 top_digit=48322 digit_share=26885 digit_flat=17724 top_class_right=25727 right_share=8946 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=1 head=3 rows=4470 top_share=217581 spread_bits=4.525 flat_bits=8.282 top_digit=0 digit_share=9261 digit_flat=17724 top_class_right=447 right_share=5851 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=1 head=4 rows=4470 top_share=357202 spread_bits=2.878 flat_bits=8.282 top_digit=181432 digit_share=167612 digit_flat=17724 top_class_right=55257 right_share=39137 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=5 tick=1 head=5 rows=4470 top_share=301663 spread_bits=2.882 flat_bits=8.282 top_digit=289038 digit_share=429162 digit_flat=17724 top_class_right=114318 right_share=98748 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=5 tick=1 head=6 rows=4470 top_share=271350 spread_bits=3.181 flat_bits=8.282 top_digit=256600 digit_share=376115 digit_flat=17724 top_class_right=112528 right_share=91874 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=5 tick=1 head=7 rows=4470 top_share=60781 spread_bits=6.812 flat_bits=8.282 top_digit=895 digit_share=16503 digit_flat=17724 top_class_right=12081 right_share=9370 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=1 head=8 rows=4470 top_share=221592 spread_bits=4.886 flat_bits=8.282 top_digit=0 digit_share=9448 digit_flat=17724 top_class_right=0 right_share=5072 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=5 tick=1 head=9 rows=4470 top_share=193387 spread_bits=4.184 flat_bits=8.282 top_digit=109396 digit_share=82534 digit_flat=17724 top_class_right=40940 right_share=30561 right_flat=7389 top_site_right=1342
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=0 rows=2302 top_share=205190 spread_bits=4.117 flat_bits=8.285 top_digit=196785 digit_share=163508 digit_flat=18198 top_class_right=52129 right_share=35502 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=1 rows=2302 top_share=239346 spread_bits=3.806 flat_bits=8.285 top_digit=164639 digit_share=167907 digit_flat=18198 top_class_right=44744 right_share=37176 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=2 rows=2302 top_share=23211 spread_bits=7.793 flat_bits=8.285 top_digit=1738 digit_share=17715 digit_flat=18198 top_class_right=0 right_share=2885 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=3 rows=2302 top_share=210057 spread_bits=5.132 flat_bits=8.285 top_digit=0 digit_share=13074 digit_flat=18198 top_class_right=0 right_share=1956 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=4 rows=2302 top_share=281042 spread_bits=3.240 flat_bits=8.285 top_digit=119896 digit_share=79404 digit_flat=18198 top_class_right=59513 right_share=35890 right_flat=2935 top_site_right=6516
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=5 rows=2302 top_share=201055 spread_bits=4.145 flat_bits=8.285 top_digit=185056 digit_share=165214 digit_flat=18198 top_class_right=49088 right_share=35810 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=6 rows=2302 top_share=177114 spread_bits=4.318 flat_bits=8.285 top_digit=207646 digit_share=160756 digit_flat=18198 top_class_right=55604 right_share=35626 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=7 rows=2302 top_share=41579 spread_bits=7.342 flat_bits=8.285 top_digit=869 digit_share=16513 digit_flat=18198 top_class_right=434 right_share=2699 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=8 rows=2302 top_share=143096 spread_bits=5.898 flat_bits=8.285 top_digit=0 digit_share=14161 digit_flat=18198 top_class_right=0 right_share=2177 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=0 head=9 rows=2302 top_share=266702 spread_bits=3.436 flat_bits=8.285 top_digit=125977 digit_share=77230 digit_flat=18198 top_class_right=50825 right_share=28315 right_flat=2935 top_site_right=5647
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=0 rows=2302 top_share=300788 spread_bits=2.727 flat_bits=8.285 top_digit=374457 digit_share=525896 digit_flat=18198 top_class_right=76455 right_share=95304 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=1 rows=2302 top_share=336450 spread_bits=2.566 flat_bits=8.285 top_digit=297567 digit_share=501334 digit_flat=18198 top_class_right=63858 right_share=92211 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=2 rows=2302 top_share=87758 spread_bits=6.331 flat_bits=8.285 top_digit=46916 digit_share=26427 digit_flat=18198 top_class_right=12163 right_share=4583 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=3 rows=2302 top_share=218244 spread_bits=4.466 flat_bits=8.285 top_digit=0 digit_share=9480 digit_flat=18198 top_class_right=0 right_share=1367 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=4 rows=2302 top_share=371514 spread_bits=2.695 flat_bits=8.285 top_digit=223719 digit_share=201374 digit_flat=18198 top_class_right=47350 right_share=38785 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=5 rows=2302 top_share=285049 spread_bits=2.813 flat_bits=8.285 top_digit=413553 digit_share=551226 digit_flat=18198 top_class_right=89053 right_share=102016 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=6 rows=2302 top_share=279616 spread_bits=2.943 flat_bits=8.285 top_digit=370547 digit_share=492230 digit_flat=18198 top_class_right=81234 right_share=90446 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=7 rows=2302 top_share=61568 spread_bits=6.799 flat_bits=8.285 top_digit=434 digit_share=16423 digit_flat=18198 top_class_right=0 right_share=2628 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=8 rows=2302 top_share=228696 spread_bits=4.701 flat_bits=8.285 top_digit=0 digit_share=9510 digit_flat=18198 top_class_right=0 right_share=1390 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=5 tick=1 head=9 rows=2302 top_share=200834 spread_bits=4.057 flat_bits=8.285 top_digit=133362 digit_share=96684 digit_flat=18198 top_class_right=25195 right_share=17818 right_flat=2935 top_site_right=2606
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=0 rows=258 top_share=372153 spread_bits=2.764 flat_bits=8.292 top_digit=81395 digit_share=171708 digit_flat=17618 top_class_right=27132 right_share=46699 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=1 rows=258 top_share=444601 spread_bits=2.316 flat_bits=8.292 top_digit=54264 digit_share=148155 digit_flat=17618 top_class_right=27132 right_share=44179 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=2 rows=258 top_share=42081 spread_bits=7.439 flat_bits=8.292 top_digit=0 digit_share=16787 digit_flat=17618 top_class_right=0 right_share=4306 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=3 rows=258 top_share=343705 spread_bits=3.536 flat_bits=8.292 top_digit=0 digit_share=10439 digit_flat=17618 top_class_right=0 right_share=2985 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=4 rows=258 top_share=360324 spread_bits=2.666 flat_bits=8.292 top_digit=112403 digit_share=73055 digit_flat=17618 top_class_right=62016 right_share=40721 right_flat=4771 top_site_right=58140
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=5 rows=258 top_share=325562 spread_bits=3.062 flat_bits=8.292 top_digit=62016 digit_share=168672 digit_flat=17618 top_class_right=23256 right_share=44929 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=6 rows=258 top_share=329480 spread_bits=3.020 flat_bits=8.292 top_digit=89147 digit_share=166690 digit_flat=17618 top_class_right=31008 right_share=47160 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=7 rows=258 top_share=62853 spread_bits=6.782 flat_bits=8.292 top_digit=0 digit_share=14533 digit_flat=17618 top_class_right=0 right_share=3634 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=8 rows=258 top_share=282814 spread_bits=3.952 flat_bits=8.292 top_digit=0 digit_share=11447 digit_flat=17618 top_class_right=0 right_share=3191 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=0 head=9 rows=258 top_share=406040 spread_bits=2.497 flat_bits=8.292 top_digit=96899 digit_share=82027 digit_flat=17618 top_class_right=58140 right_share=45746 right_flat=4771 top_site_right=50388
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=0 rows=258 top_share=401133 spread_bits=2.192 flat_bits=8.292 top_digit=166667 digit_share=482306 digit_flat=17618 top_class_right=31008 right_share=127548 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=1 rows=258 top_share=505080 spread_bits=1.716 flat_bits=8.292 top_digit=108527 digit_share=428323 digit_flat=17618 top_class_right=19380 right_share=113780 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=2 rows=258 top_share=261709 spread_bits=3.495 flat_bits=8.292 top_digit=54264 digit_share=34517 digit_flat=17618 top_class_right=7752 right_share=5899 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=3 rows=258 top_share=416725 spread_bits=2.336 flat_bits=8.292 top_digit=0 digit_share=4319 digit_flat=17618 top_class_right=0 right_share=1122 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=4 rows=258 top_share=489914 spread_bits=1.895 flat_bits=8.292 top_digit=104651 digit_share=150141 digit_flat=17618 top_class_right=23256 right_share=41152 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=5 rows=258 top_share=375124 spread_bits=2.253 flat_bits=8.292 top_digit=205426 digit_share=538903 digit_flat=17618 top_class_right=38760 right_share=145230 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=6 rows=258 top_share=423661 spread_bits=2.126 flat_bits=8.292 top_digit=155039 digit_share=448799 digit_flat=17618 top_class_right=27132 right_share=117496 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=7 rows=258 top_share=165886 spread_bits=4.730 flat_bits=8.292 top_digit=0 digit_share=13324 digit_flat=17618 top_class_right=0 right_share=2633 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=8 rows=258 top_share=501877 spread_bits=2.053 flat_bits=8.292 top_digit=0 digit_share=4469 digit_flat=17618 top_class_right=0 right_share=1270 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=5 tick=1 head=9 rows=258 top_share=345639 spread_bits=2.875 flat_bits=8.292 top_digit=96899 digit_share=120351 digit_flat=17618 top_class_right=34884 right_share=34876 right_flat=4771 top_site_right=23256
+FIELD_TEMPER lap=5 head=0 class=59955504 listen=17044767 width=64 heads=10
+FIELD_TEMPER lap=5 head=1 class=61300439 listen=17006109 width=64 heads=10
+FIELD_TEMPER lap=5 head=2 class=65871327 listen=20122516 width=64 heads=10
+FIELD_TEMPER lap=5 head=3 class=66287809 listen=20240229 width=64 heads=10
+FIELD_TEMPER lap=5 head=4 class=63080215 listen=18984770 width=64 heads=10
+FIELD_TEMPER lap=5 head=5 class=60030573 listen=17047288 width=64 heads=10
+FIELD_TEMPER lap=5 head=6 class=61234532 listen=17041750 width=64 heads=10
+FIELD_TEMPER lap=5 head=7 class=65405915 listen=20304408 width=64 heads=10
+FIELD_TEMPER lap=5 head=8 class=66366226 listen=19796528 width=64 heads=10
+FIELD_TEMPER lap=5 head=9 class=62939909 listen=17381757 width=64 heads=10
+FIELD_PEAKS_LAP lap=5 read_ms=490 ms=2585
+FIELD_PEAKS lap=6 tick=0 head=0 rows=4470 top_share=234856 spread_bits=3.943 flat_bits=8.282 top_digit=128188 digit_share=140088 digit_flat=17724 top_class_right=91051 right_share=54966 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=6 tick=0 head=1 rows=4470 top_share=282298 spread_bits=3.494 flat_bits=8.282 top_digit=125951 digit_share=154833 digit_flat=17724 top_class_right=89262 right_share=63996 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=6 tick=0 head=2 rows=4470 top_share=24911 spread_bits=7.772 flat_bits=8.282 top_digit=2013 digit_share=17246 digit_flat=17724 top_class_right=671 right_share=7067 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=0 head=3 rows=4470 top_share=232733 spread_bits=4.957 flat_bits=8.282 top_digit=0 digit_share=12423 digit_flat=17724 top_class_right=0 right_share=7184 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=0 head=4 rows=4470 top_share=264170 spread_bits=3.415 flat_bits=8.282 top_digit=95526 digit_share=57753 digit_flat=17724 top_class_right=43400 right_share=25281 right_flat=7389 top_site_right=2685
+FIELD_PEAKS lap=6 tick=0 head=5 rows=4470 top_share=242624 spread_bits=3.874 flat_bits=8.282 top_digit=132886 digit_share=143593 digit_flat=17724 top_class_right=89262 right_share=59764 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=6 tick=0 head=6 rows=4470 top_share=228768 spread_bits=3.931 flat_bits=8.282 top_digit=158166 digit_share=147920 digit_flat=17724 top_class_right=99105 right_share=61496 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=6 tick=0 head=7 rows=4470 top_share=47300 spread_bits=7.203 flat_bits=8.282 top_digit=224 digit_share=15505 digit_flat=17724 top_class_right=11857 right_share=8472 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=0 head=8 rows=4470 top_share=138513 spread_bits=6.022 flat_bits=8.282 top_digit=0 digit_share=13731 digit_flat=17724 top_class_right=0 right_share=7082 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=0 head=9 rows=4470 top_share=262390 spread_bits=3.543 flat_bits=8.282 top_digit=84564 digit_share=55143 digit_flat=17724 top_class_right=31767 right_share=19633 right_flat=7389 top_site_right=2461
+FIELD_PEAKS lap=6 tick=1 head=0 rows=4470 top_share=324137 spread_bits=2.732 flat_bits=8.282 top_digit=293960 digit_share=414213 digit_flat=17724 top_class_right=114541 right_share=104282 right_flat=7389 top_site_right=2013
+FIELD_PEAKS lap=6 tick=1 head=1 rows=4470 top_share=351253 spread_bits=2.597 flat_bits=8.282 top_digit=232438 digit_share=406102 digit_flat=17724 top_class_right=106264 right_share=102495 right_flat=7389 top_site_right=224
+FIELD_PEAKS lap=6 tick=1 head=2 rows=4470 top_share=108902 spread_bits=6.037 flat_bits=8.282 top_digit=50783 digit_share=29784 digit_flat=17724 top_class_right=31991 right_share=9925 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=1 head=3 rows=4470 top_share=225774 spread_bits=4.527 flat_bits=8.282 top_digit=0 digit_share=9790 digit_flat=17724 top_class_right=224 right_share=5767 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=1 head=4 rows=4470 top_share=347132 spread_bits=2.909 flat_bits=8.282 top_digit=219687 digit_share=187207 digit_flat=17724 top_class_right=54810 right_share=40773 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=6 tick=1 head=5 rows=4470 top_share=313990 spread_bits=2.775 flat_bits=8.282 top_digit=351678 digit_share=449948 digit_flat=17724 top_class_right=128635 right_share=107542 right_flat=7389 top_site_right=4251
+FIELD_PEAKS lap=6 tick=1 head=6 rows=4470 top_share=278447 spread_bits=3.100 flat_bits=8.282 top_digit=300895 digit_share=392677 digit_flat=17724 top_class_right=123043 right_share=101218 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=6 tick=1 head=7 rows=4470 top_share=62658 spread_bits=6.735 flat_bits=8.282 top_digit=224 digit_share=15865 digit_flat=17724 top_class_right=15660 right_share=9535 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=1 head=8 rows=4470 top_share=217476 spread_bits=5.009 flat_bits=8.282 top_digit=0 digit_share=9728 digit_flat=17724 top_class_right=0 right_share=5228 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=6 tick=1 head=9 rows=4470 top_share=173695 spread_bits=4.376 flat_bits=8.282 top_digit=107383 digit_share=76135 digit_flat=17724 top_class_right=36465 right_share=28558 right_flat=7389 top_site_right=1342
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=0 rows=2302 top_share=226492 spread_bits=3.912 flat_bits=8.285 top_digit=193310 digit_share=184870 digit_flat=18198 top_class_right=50825 right_share=40051 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=1 rows=2302 top_share=263801 spread_bits=3.590 flat_bits=8.285 top_digit=182016 digit_share=193086 digit_flat=18198 top_class_right=45178 right_share=42595 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=2 rows=2302 top_share=22986 spread_bits=7.801 flat_bits=8.285 top_digit=1303 digit_share=17730 digit_flat=18198 top_class_right=0 right_share=2881 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=3 rows=2302 top_share=230375 spread_bits=4.921 flat_bits=8.285 top_digit=0 digit_share=12844 digit_flat=18198 top_class_right=0 right_share=1905 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=4 rows=2302 top_share=270602 spread_bits=3.313 flat_bits=8.285 top_digit=108167 digit_share=70230 digit_flat=18198 top_class_right=52997 right_share=31126 right_flat=2935 top_site_right=5213
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=5 rows=2302 top_share=217227 spread_bits=3.978 flat_bits=8.285 top_digit=203736 digit_share=190181 digit_flat=18198 top_class_right=52997 right_share=41452 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=6 rows=2302 top_share=193543 spread_bits=4.148 flat_bits=8.285 top_digit=229800 digit_share=186839 digit_flat=18198 top_class_right=60382 right_share=41563 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=7 rows=2302 top_share=48807 spread_bits=7.184 flat_bits=8.285 top_digit=0 digit_share=15890 digit_flat=18198 top_class_right=0 right_share=2572 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=8 rows=2302 top_share=137882 spread_bits=5.974 flat_bits=8.285 top_digit=0 digit_share=14170 digit_flat=18198 top_class_right=0 right_share=2177 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=0 head=9 rows=2302 top_share=254869 spread_bits=3.526 flat_bits=8.285 top_digit=112511 digit_share=72690 digit_flat=18198 top_class_right=43006 right_share=25519 right_flat=2935 top_site_right=4778
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=0 rows=2302 top_share=302724 spread_bits=2.681 flat_bits=8.285 top_digit=433102 digit_share=562215 digit_flat=18198 top_class_right=92963 right_share=103719 right_flat=2935 top_site_right=3910
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=1 rows=2302 top_share=340932 spread_bits=2.505 flat_bits=8.285 top_digit=352302 digit_share=532465 digit_flat=18198 top_class_right=75152 right_share=99285 right_flat=2935 top_site_right=434
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=2 rows=2302 top_share=103728 spread_bits=6.085 flat_bits=8.285 top_digit=51694 digit_share=29244 digit_flat=18198 top_class_right=13032 right_share=5104 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=3 rows=2302 top_share=229612 spread_bits=4.442 flat_bits=8.285 top_digit=0 digit_share=9985 digit_flat=18198 top_class_right=0 right_share=1444 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=4 rows=2302 top_share=370535 spread_bits=2.654 flat_bits=8.285 top_digit=263249 digit_share=230088 digit_flat=18198 top_class_right=56038 right_share=45756 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=5 rows=2302 top_share=277829 spread_bits=2.805 flat_bits=8.285 top_digit=520417 digit_share=600674 digit_flat=18198 top_class_right=117289 right_share=113009 right_flat=2935 top_site_right=8254
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=6 rows=2302 top_share=273288 spread_bits=2.935 flat_bits=8.285 top_digit=447437 digit_share=534216 digit_flat=18198 top_class_right=100782 right_share=100113 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=7 rows=2302 top_share=63718 spread_bits=6.717 flat_bits=8.285 top_digit=0 digit_share=15947 digit_flat=18198 top_class_right=0 right_share=2535 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=8 rows=2302 top_share=229504 spread_bits=4.790 flat_bits=8.285 top_digit=0 digit_share=9787 digit_flat=18198 top_class_right=0 right_share=1437 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=6 tick=1 head=9 rows=2302 top_share=180335 spread_bits=4.261 flat_bits=8.285 top_digit=131625 digit_share=91398 digit_flat=18198 top_class_right=24327 right_share=17134 right_flat=2935 top_site_right=2606
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=0 rows=258 top_share=420449 spread_bits=2.447 flat_bits=8.292 top_digit=73643 digit_share=188036 digit_flat=17618 top_class_right=23256 right_share=51627 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=1 rows=258 top_share=466912 spread_bits=2.180 flat_bits=8.292 top_digit=62016 digit_share=170206 digit_flat=17618 top_class_right=23256 right_share=50604 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=2 rows=258 top_share=44508 spread_bits=7.399 flat_bits=8.292 top_digit=0 digit_share=16802 digit_flat=17618 top_class_right=0 right_share=4324 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=3 rows=258 top_share=387878 spread_bits=3.173 flat_bits=8.292 top_digit=0 digit_share=9750 digit_flat=17618 top_class_right=0 right_share=2790 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=4 rows=258 top_share=341049 spread_bits=2.759 flat_bits=8.292 top_digit=81395 digit_share=64178 digit_flat=17618 top_class_right=50388 right_share=35254 right_flat=4771 top_site_right=46512
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=5 rows=258 top_share=354601 spread_bits=2.853 flat_bits=8.292 top_digit=85271 digit_share=190007 digit_flat=17618 top_class_right=19380 right_share=51466 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=6 rows=258 top_share=352788 spread_bits=2.852 flat_bits=8.292 top_digit=104651 digit_share=195033 digit_flat=17618 top_class_right=27132 right_share=55020 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=7 rows=258 top_share=79581 spread_bits=6.388 flat_bits=8.292 top_digit=0 digit_share=13492 digit_flat=17618 top_class_right=0 right_share=3452 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=8 rows=258 top_share=290195 spread_bits=3.853 flat_bits=8.292 top_digit=0 digit_share=11293 digit_flat=17618 top_class_right=0 right_share=3159 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=0 head=9 rows=258 top_share=386800 spread_bits=2.614 flat_bits=8.292 top_digit=89147 digit_share=75800 digit_flat=17618 top_class_right=50388 right_share=40004 right_flat=4771 top_site_right=42636
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=0 rows=258 top_share=366695 spread_bits=2.282 flat_bits=8.292 top_digit=259690 digit_share=555855 digit_flat=17618 top_class_right=65891 right_share=150624 right_flat=4771 top_site_right=34884
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=1 rows=258 top_share=470828 spread_bits=1.830 flat_bits=8.292 top_digit=143411 digit_share=483675 digit_flat=17618 top_class_right=23256 right_share=129207 right_flat=4771 top_site_right=3876
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=2 rows=258 top_share=303812 spread_bits=3.065 flat_bits=8.292 top_digit=58140 digit_share=39503 digit_flat=17618 top_class_right=11628 right_share=6759 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=3 rows=258 top_share=443223 spread_bits=2.238 flat_bits=8.292 top_digit=0 digit_share=4598 digit_flat=17618 top_class_right=0 right_share=1174 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=4 rows=258 top_share=498072 spread_bits=1.856 flat_bits=8.292 top_digit=120155 digit_share=163861 digit_flat=17618 top_class_right=23256 right_share=42527 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=5 rows=258 top_share=323697 spread_bits=2.419 flat_bits=8.292 top_digit=406977 digit_share=629046 digit_flat=17618 top_class_right=104651 right_share=174283 right_flat=4771 top_site_right=73643
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=6 rows=258 top_share=376522 spread_bits=2.285 flat_bits=8.292 top_digit=224806 digit_share=527615 digit_flat=17618 top_class_right=38760 right_share=140707 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=7 rows=258 top_share=164572 spread_bits=4.671 flat_bits=8.292 top_digit=0 digit_share=12031 digit_flat=17618 top_class_right=0 right_share=2461 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=8 rows=258 top_share=508351 spread_bits=2.104 flat_bits=8.292 top_digit=0 digit_share=4854 digit_flat=17618 top_class_right=0 right_share=1395 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=6 tick=1 head=9 rows=258 top_share=314357 spread_bits=3.082 flat_bits=8.292 top_digit=112403 digit_share=127286 digit_flat=17618 top_class_right=34884 right_share=36574 right_flat=4771 top_site_right=23256
+FIELD_TEMPER lap=6 head=0 class=59321959 listen=17351548 width=64 heads=10
+FIELD_TEMPER lap=6 head=1 class=60691640 listen=17308221 width=64 heads=10
+FIELD_TEMPER lap=6 head=2 class=65641206 listen=20370276 width=64 heads=10
+FIELD_TEMPER lap=6 head=3 class=66024956 listen=20491528 width=64 heads=10
+FIELD_TEMPER lap=6 head=4 class=62890224 listen=18749577 width=64 heads=10
+FIELD_TEMPER lap=6 head=5 class=59410580 listen=17357497 width=64 heads=10
+FIELD_TEMPER lap=6 head=6 class=60630723 listen=17358082 width=64 heads=10
+FIELD_TEMPER lap=6 head=7 class=64924304 listen=20849378 width=64 heads=10
+FIELD_TEMPER lap=6 head=8 class=65915707 listen=19926234 width=64 heads=10
+FIELD_TEMPER lap=6 head=9 class=62496363 listen=17169205 width=64 heads=10
+FIELD_PEAKS_LAP lap=6 read_ms=491 ms=3087
+FIELD_PEAKS lap=7 tick=0 head=0 rows=4470 top_share=239477 spread_bits=3.886 flat_bits=8.282 top_digit=129083 digit_share=149537 digit_flat=17724 top_class_right=92394 right_share=56570 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=7 tick=0 head=1 rows=4470 top_share=290717 spread_bits=3.416 flat_bits=8.282 top_digit=132662 digit_share=164047 digit_flat=17724 top_class_right=91723 right_share=67274 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=7 tick=0 head=2 rows=4470 top_share=25749 spread_bits=7.762 flat_bits=8.282 top_digit=2013 digit_share=17230 digit_flat=17724 top_class_right=671 right_share=7041 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=0 head=3 rows=4470 top_share=245579 spread_bits=4.829 flat_bits=8.282 top_digit=0 digit_share=12186 digit_flat=17724 top_class_right=0 right_share=7141 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=0 head=4 rows=4470 top_share=261258 spread_bits=3.437 flat_bits=8.282 top_digit=91723 digit_share=55250 digit_flat=17724 top_class_right=42953 right_share=25209 right_flat=7389 top_site_right=2685
+FIELD_PEAKS lap=7 tick=0 head=5 rows=4470 top_share=246452 spread_bits=3.823 flat_bits=8.282 top_digit=137808 digit_share=152427 digit_flat=17724 top_class_right=92841 right_share=61893 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=7 tick=0 head=6 rows=4470 top_share=236805 spread_bits=3.849 flat_bits=8.282 top_digit=170246 digit_share=157362 digit_flat=17724 top_class_right=103579 right_share=64892 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=7 tick=0 head=7 rows=4470 top_share=47842 spread_bits=7.188 flat_bits=8.282 top_digit=224 digit_share=15324 digit_flat=17724 top_class_right=12304 right_share=8483 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=0 head=8 rows=4470 top_share=132461 spread_bits=6.103 flat_bits=8.282 top_digit=0 digit_share=13792 digit_flat=17724 top_class_right=0 right_share=7084 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=0 head=9 rows=4470 top_share=256854 spread_bits=3.591 flat_bits=8.282 top_digit=76286 digit_share=51493 digit_flat=17724 top_class_right=30649 right_share=18555 right_flat=7389 top_site_right=2461
+FIELD_PEAKS lap=7 tick=1 head=0 rows=4470 top_share=330299 spread_bits=2.661 flat_bits=8.282 top_digit=307383 digit_share=433820 digit_flat=17724 top_class_right=117897 right_share=109161 right_flat=7389 top_site_right=2461
+FIELD_PEAKS lap=7 tick=1 head=1 rows=4470 top_share=356462 spread_bits=2.515 flat_bits=8.282 top_digit=272931 digit_share=439394 digit_flat=17724 top_class_right=113870 right_share=109494 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=7 tick=1 head=2 rows=4470 top_share=103252 spread_bits=6.126 flat_bits=8.282 top_digit=53020 digit_share=28864 digit_flat=17724 top_class_right=27517 right_share=9432 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=1 head=3 rows=4470 top_share=232144 spread_bits=4.464 flat_bits=8.282 top_digit=0 digit_share=8921 digit_flat=17724 top_class_right=0 right_share=5754 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=1 head=4 rows=4470 top_share=342996 spread_bits=2.926 flat_bits=8.282 top_digit=212528 digit_share=182621 digit_flat=17724 top_class_right=58613 right_share=41813 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=7 tick=1 head=5 rows=4470 top_share=314016 spread_bits=2.728 flat_bits=8.282 top_digit=388143 digit_share=476613 digit_flat=17724 top_class_right=135123 right_share=112721 right_flat=7389 top_site_right=4251
+FIELD_PEAKS lap=7 tick=1 head=6 rows=4470 top_share=287335 spread_bits=2.978 flat_bits=8.282 top_digit=337136 digit_share=426527 digit_flat=17724 top_class_right=127069 right_share=108495 right_flat=7389 top_site_right=1566
+FIELD_PEAKS lap=7 tick=1 head=7 rows=4470 top_share=64413 spread_bits=6.659 flat_bits=8.282 top_digit=224 digit_share=14676 digit_flat=17724 top_class_right=14765 right_share=9398 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=1 head=8 rows=4470 top_share=206655 spread_bits=5.100 flat_bits=8.282 top_digit=0 digit_share=9203 digit_flat=17724 top_class_right=0 right_share=5119 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=7 tick=1 head=9 rows=4470 top_share=166298 spread_bits=4.445 flat_bits=8.282 top_digit=105817 digit_share=72489 digit_flat=17724 top_class_right=35570 right_share=27770 right_flat=7389 top_site_right=1342
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=0 rows=2302 top_share=231516 spread_bits=3.845 flat_bits=8.285 top_digit=195917 digit_share=198671 digit_flat=18198 top_class_right=50825 right_share=42855 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=1 rows=2302 top_share=271142 spread_bits=3.515 flat_bits=8.285 top_digit=192876 digit_share=207536 digit_flat=18198 top_class_right=47350 right_share=45722 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=2 rows=2302 top_share=23611 spread_bits=7.793 flat_bits=8.285 top_digit=1303 digit_share=17714 digit_flat=18198 top_class_right=434 right_share=2877 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=3 rows=2302 top_share=244016 spread_bits=4.780 flat_bits=8.285 top_digit=0 digit_share=12588 digit_flat=18198 top_class_right=0 right_share=1856 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=4 rows=2302 top_share=267702 spread_bits=3.334 flat_bits=8.285 top_digit=101651 digit_share=66998 digit_flat=18198 top_class_right=49957 right_share=29438 right_flat=2935 top_site_right=5213
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=5 rows=2302 top_share=220632 spread_bits=3.924 flat_bits=8.285 top_digit=214596 digit_share=203529 digit_flat=18198 top_class_right=56473 right_share=44303 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=6 rows=2302 top_share=199701 spread_bits=4.072 flat_bits=8.285 top_digit=251955 digit_share=201430 digit_flat=18198 top_class_right=66898 right_share=44637 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=7 rows=2302 top_share=49449 spread_bits=7.167 flat_bits=8.285 top_digit=0 digit_share=15717 digit_flat=18198 top_class_right=0 right_share=2539 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=8 rows=2302 top_share=131857 spread_bits=6.056 flat_bits=8.285 top_digit=0 digit_share=14233 digit_flat=18198 top_class_right=0 right_share=2191 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=0 head=9 rows=2302 top_share=249975 spread_bits=3.570 flat_bits=8.285 top_digit=104692 digit_share=67781 digit_flat=18198 top_class_right=40400 right_share=23306 right_flat=2935 top_site_right=4778
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=0 rows=2302 top_share=308772 spread_bits=2.596 flat_bits=8.285 top_digit=457428 digit_share=593027 digit_flat=18198 top_class_right=98175 right_share=109619 right_flat=2935 top_site_right=4778
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=1 rows=2302 top_share=338591 spread_bits=2.452 flat_bits=8.285 top_digit=407906 digit_share=580410 digit_flat=18198 top_class_right=89053 right_share=108781 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=2 rows=2302 top_share=97216 spread_bits=6.162 flat_bits=8.285 top_digit=52129 digit_share=28354 digit_flat=18198 top_class_right=11729 right_share=4948 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=3 rows=2302 top_share=236149 spread_bits=4.368 flat_bits=8.285 top_digit=0 digit_share=9063 digit_flat=18198 top_class_right=0 right_share=1295 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=4 rows=2302 top_share=366620 spread_bits=2.672 flat_bits=8.285 top_digit=255430 digit_share=226403 digit_flat=18198 top_class_right=58210 right_share=45515 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=5 rows=2302 top_share=280686 spread_bits=2.724 flat_bits=8.285 top_digit=574718 digit_share=641404 digit_flat=18198 top_class_right=127281 right_share=120339 right_flat=2935 top_site_right=8254
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=6 rows=2302 top_share=276505 spread_bits=2.833 flat_bits=8.285 top_digit=499566 digit_share=581677 digit_flat=18198 top_class_right=108601 right_share=109240 right_flat=2935 top_site_right=3041
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=7 rows=2302 top_share=65213 spread_bits=6.635 flat_bits=8.285 top_digit=0 digit_share=14751 digit_flat=18198 top_class_right=0 right_share=2326 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=8 rows=2302 top_share=216387 spread_bits=4.894 flat_bits=8.285 top_digit=0 digit_share=9243 digit_flat=18198 top_class_right=0 right_share=1355 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=7 tick=1 head=9 rows=2302 top_share=171884 spread_bits=4.336 flat_bits=8.285 top_digit=130756 digit_share=87259 digit_flat=18198 top_class_right=23458 right_share=16295 right_flat=2935 top_site_right=2606
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=0 rows=258 top_share=429675 spread_bits=2.374 flat_bits=8.292 top_digit=73643 digit_share=198959 digit_flat=17618 top_class_right=19380 right_share=54819 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=1 rows=258 top_share=472289 spread_bits=2.144 flat_bits=8.292 top_digit=69767 digit_share=181342 digit_flat=17618 top_class_right=23256 right_share=54128 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=2 rows=258 top_share=48862 spread_bits=7.322 flat_bits=8.292 top_digit=0 digit_share=16715 digit_flat=17618 top_class_right=0 right_share=4307 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=3 rows=258 top_share=424668 spread_bits=2.874 flat_bits=8.292 top_digit=0 digit_share=9110 digit_flat=17618 top_class_right=0 right_share=2618 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=4 rows=258 top_share=337339 spread_bits=2.778 flat_bits=8.292 top_digit=81395 digit_share=61955 digit_flat=17618 top_class_right=50388 right_share=33957 right_flat=4771 top_site_right=46512
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=5 rows=258 top_share=360325 spread_bits=2.798 flat_bits=8.292 top_digit=89147 digit_share=199960 digit_flat=17618 top_class_right=23256 right_share=54346 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=6 rows=258 top_share=360912 spread_bits=2.786 flat_bits=8.292 top_digit=108527 digit_share=209063 digit_flat=17618 top_class_right=31008 right_share=59196 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=7 rows=258 top_share=82469 spread_bits=6.315 flat_bits=8.292 top_digit=0 digit_share=13184 digit_flat=17618 top_class_right=0 right_share=3393 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=8 rows=258 top_share=282794 spread_bits=3.920 flat_bits=8.292 top_digit=0 digit_share=11388 digit_flat=17618 top_class_right=0 right_share=3182 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=0 head=9 rows=258 top_share=380903 spread_bits=2.653 flat_bits=8.292 top_digit=89147 digit_share=72505 digit_flat=17618 top_class_right=50388 right_share=37359 right_flat=4771 top_site_right=42636
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=0 rows=258 top_share=360697 spread_bits=2.261 flat_bits=8.292 top_digit=286822 digit_share=591172 digit_flat=17618 top_class_right=69767 right_share=161594 right_flat=4771 top_site_right=42636
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=1 rows=258 top_share=438961 spread_bits=1.921 flat_bits=8.292 top_digit=209302 digit_share=543405 digit_flat=17618 top_class_right=31008 right_share=146504 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=2 rows=258 top_share=295093 spread_bits=3.143 flat_bits=8.292 top_digit=62016 digit_share=38675 digit_flat=17618 top_class_right=7752 right_share=6607 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=3 rows=258 top_share=465350 spread_bits=2.074 flat_bits=8.292 top_digit=0 digit_share=3799 digit_flat=17618 top_class_right=0 right_share=989 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=4 rows=258 top_share=485686 spread_bits=1.909 flat_bits=8.292 top_digit=131783 digit_share=166495 digit_flat=17618 top_class_right=34884 right_share=42834 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=5 rows=258 top_share=312818 spread_bits=2.418 flat_bits=8.292 top_digit=488372 digit_share=672819 digit_flat=17618 top_class_right=116279 right_share=188273 right_flat=4771 top_site_right=73643
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=6 rows=258 top_share=354865 spread_bits=2.312 flat_bits=8.292 top_digit=290698 digit_share=588073 digit_flat=17618 top_class_right=50388 right_share=159902 right_flat=4771 top_site_right=27132
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=7 rows=258 top_share=161965 spread_bits=4.635 flat_bits=8.292 top_digit=0 digit_share=10418 digit_flat=17618 top_class_right=0 right_share=2200 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=8 rows=258 top_share=497507 spread_bits=2.143 flat_bits=8.292 top_digit=0 digit_share=4465 digit_flat=17618 top_class_right=0 right_share=1299 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=7 tick=1 head=9 rows=258 top_share=298146 spread_bits=3.191 flat_bits=8.292 top_digit=116279 digit_share=130739 digit_flat=17618 top_class_right=34884 right_share=37166 right_flat=4771 top_site_right=23256
+FIELD_TEMPER lap=7 head=0 class=58985099 listen=17561510 width=64 heads=10
+FIELD_TEMPER lap=7 head=1 class=60371314 listen=17513487 width=64 heads=10
+FIELD_TEMPER lap=7 head=2 class=65532832 listen=20430571 width=64 heads=10
+FIELD_TEMPER lap=7 head=3 class=65900161 listen=20607916 width=64 heads=10
+FIELD_TEMPER lap=7 head=4 class=62718836 listen=18620765 width=64 heads=10
+FIELD_TEMPER lap=7 head=5 class=59075825 listen=17567511 width=64 heads=10
+FIELD_TEMPER lap=7 head=6 class=60304834 listen=17567418 width=64 heads=10
+FIELD_TEMPER lap=7 head=7 class=64777605 listen=21013127 width=64 heads=10
+FIELD_TEMPER lap=7 head=8 class=65730198 listen=19971472 width=64 heads=10
+FIELD_TEMPER lap=7 head=9 class=62340351 listen=17037357 width=64 heads=10
+FIELD_PEAKS_LAP lap=7 read_ms=489 ms=3587
+FIELD_PEAKS lap=8 tick=0 head=0 rows=4470 top_share=262634 spread_bits=3.650 flat_bits=8.282 top_digit=155257 digit_share=177024 digit_flat=17724 top_class_right=99329 right_share=66032 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=8 tick=0 head=1 rows=4470 top_share=320369 spread_bits=3.171 flat_bits=8.282 top_digit=157942 digit_share=186877 digit_flat=17724 top_class_right=102013 right_share=76785 right_flat=7389 top_site_right=1119
+FIELD_PEAKS lap=8 tick=0 head=2 rows=4470 top_share=25833 spread_bits=7.765 flat_bits=8.282 top_digit=1342 digit_share=17098 digit_flat=17724 top_class_right=0 right_share=6989 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=0 head=3 rows=4470 top_share=254824 spread_bits=4.753 flat_bits=8.282 top_digit=0 digit_share=12133 digit_flat=17724 top_class_right=0 right_share=7080 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=0 head=4 rows=4470 top_share=248627 spread_bits=3.529 flat_bits=8.282 top_digit=83445 digit_share=48531 digit_flat=17724 top_class_right=40268 right_share=22258 right_flat=7389 top_site_right=2237
+FIELD_PEAKS lap=8 tick=0 head=5 rows=4470 top_share=268985 spread_bits=3.596 flat_bits=8.282 top_digit=170022 digit_share=182094 digit_flat=17724 top_class_right=101790 right_share=72432 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=8 tick=0 head=6 rows=4470 top_share=254898 spread_bits=3.665 flat_bits=8.282 top_digit=201790 digit_share=184589 digit_flat=17724 top_class_right=110962 right_share=73869 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=8 tick=0 head=7 rows=4470 top_share=49203 spread_bits=7.154 flat_bits=8.282 top_digit=224 digit_share=14950 digit_flat=17724 top_class_right=12528 right_share=8551 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=0 head=8 rows=4470 top_share=112215 spread_bits=6.378 flat_bits=8.282 top_digit=0 digit_share=13979 digit_flat=17724 top_class_right=0 right_share=7086 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=0 head=9 rows=4470 top_share=230954 spread_bits=3.785 flat_bits=8.282 top_digit=78971 digit_share=51417 digit_flat=17724 top_class_right=30201 right_share=17614 right_flat=7389 top_site_right=2685
+FIELD_PEAKS lap=8 tick=1 head=0 rows=4470 top_share=352367 spread_bits=2.489 flat_bits=8.282 top_digit=375615 digit_share=463534 digit_flat=17724 top_class_right=136465 right_share=120668 right_flat=7389 top_site_right=7606
+FIELD_PEAKS lap=8 tick=1 head=1 rows=4470 top_share=373545 spread_bits=2.391 flat_bits=8.282 top_digit=355481 digit_share=469959 digit_flat=17724 top_class_right=129978 right_share=122736 right_flat=7389 top_site_right=2908
+FIELD_PEAKS lap=8 tick=1 head=2 rows=4470 top_share=104794 spread_bits=6.093 flat_bits=8.282 top_digit=58613 digit_share=30172 digit_flat=17724 top_class_right=27964 right_share=9524 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=1 head=3 rows=4470 top_share=240761 spread_bits=4.475 flat_bits=8.282 top_digit=0 digit_share=9457 digit_flat=17724 top_class_right=224 right_share=5823 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=1 head=4 rows=4470 top_share=329970 spread_bits=3.005 flat_bits=8.282 top_digit=198210 digit_share=171059 digit_flat=17724 top_class_right=61745 right_share=42504 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=8 tick=1 head=5 rows=4470 top_share=332837 spread_bits=2.587 flat_bits=8.282 top_digit=474273 digit_share=507988 digit_flat=17724 top_class_right=156152 right_share=123253 right_flat=7389 top_site_right=11633
+FIELD_PEAKS lap=8 tick=1 head=6 rows=4470 top_share=304562 spread_bits=2.808 flat_bits=8.282 top_digit=417450 digit_share=466607 digit_flat=17724 top_class_right=144966 right_share=121246 right_flat=7389 top_site_right=5817
+FIELD_PEAKS lap=8 tick=1 head=7 rows=4470 top_share=63574 spread_bits=6.665 flat_bits=8.282 top_digit=0 digit_share=14337 digit_flat=17724 top_class_right=17897 right_share=9466 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=1 head=8 rows=4470 top_share=198363 spread_bits=5.199 flat_bits=8.282 top_digit=0 digit_share=9421 digit_flat=17724 top_class_right=0 right_share=5278 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=8 tick=1 head=9 rows=4470 top_share=137947 spread_bits=4.772 flat_bits=8.282 top_digit=115660 digit_share=67712 digit_flat=17724 top_class_right=33557 right_share=25636 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=0 rows=2302 top_share=252073 spread_bits=3.612 flat_bits=8.285 top_digit=242398 digit_share=240703 digit_flat=18198 top_class_right=58645 right_share=52058 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=1 rows=2302 top_share=295882 spread_bits=3.284 flat_bits=8.285 top_digit=238054 digit_share=245732 digit_flat=18198 top_class_right=62120 right_share=53960 right_flat=2935 top_site_right=2172
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=2 rows=2302 top_share=24086 spread_bits=7.789 flat_bits=8.285 top_digit=434 digit_share=17572 digit_flat=18198 top_class_right=0 right_share=2851 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=3 rows=2302 top_share=253941 spread_bits=4.690 flat_bits=8.285 top_digit=0 digit_share=12521 digit_flat=18198 top_class_right=0 right_share=1831 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=4 rows=2302 top_share=253986 spread_bits=3.430 flat_bits=8.285 top_digit=90356 digit_share=55661 digit_flat=18198 top_class_right=43875 right_share=23624 right_flat=2935 top_site_right=4344
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=5 rows=2302 top_share=237765 spread_bits=3.713 flat_bits=8.285 top_digit=271503 digit_share=249179 digit_flat=18198 top_class_right=68202 right_share=54529 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=6 rows=2302 top_share=212553 spread_bits=3.903 flat_bits=8.285 top_digit=308862 digit_share=244266 digit_flat=18198 top_class_right=77758 right_share=54203 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=7 rows=2302 top_share=51268 spread_bits=7.125 flat_bits=8.285 top_digit=0 digit_share=15338 digit_flat=18198 top_class_right=0 right_share=2473 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=8 rows=2302 top_share=110991 spread_bits=6.353 flat_bits=8.285 top_digit=0 digit_share=14435 digit_flat=18198 top_class_right=0 right_share=2235 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=0 head=9 rows=2302 top_share=231440 spread_bits=3.725 flat_bits=8.285 top_digit=110773 digit_share=67062 digit_flat=18198 top_class_right=38228 right_share=21589 right_flat=2935 top_site_right=5213
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=0 rows=2302 top_share=309415 spread_bits=2.532 flat_bits=8.285 top_digit=576021 digit_share=652552 digit_flat=18198 top_class_right=130321 right_share=122258 right_flat=2935 top_site_right=14770
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=1 rows=2302 top_share=324951 spread_bits=2.468 flat_bits=8.285 top_digit=543006 digit_share=646284 digit_flat=18198 top_class_right=117724 right_share=122670 right_flat=2935 top_site_right=5647
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=2 rows=2302 top_share=99847 spread_bits=6.095 flat_bits=8.285 top_digit=57776 digit_share=29574 digit_flat=18198 top_class_right=13467 right_share=5183 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=3 rows=2302 top_share=247406 spread_bits=4.354 flat_bits=8.285 top_digit=0 digit_share=9581 digit_flat=18198 top_class_right=0 right_share=1364 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=4 rows=2302 top_share=352840 spread_bits=2.751 flat_bits=8.285 top_digit=242398 digit_share=214492 digit_flat=18198 top_class_right=56038 right_share=41683 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=5 rows=2302 top_share=278448 spread_bits=2.679 flat_bits=8.285 top_digit=710686 digit_share=704356 digit_flat=18198 top_class_right=165508 right_share=132956 right_flat=2935 top_site_right=22589
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=6 rows=2302 top_share=268052 spread_bits=2.794 flat_bits=8.285 top_digit=639878 digit_share=655377 digit_flat=18198 top_class_right=142050 right_share=123811 right_flat=2935 top_site_right=11295
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=7 rows=2302 top_share=64214 spread_bits=6.641 flat_bits=8.285 top_digit=0 digit_share=14473 digit_flat=18198 top_class_right=0 right_share=2280 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=8 rows=2302 top_share=208944 spread_bits=4.988 flat_bits=8.285 top_digit=0 digit_share=9465 digit_flat=18198 top_class_right=0 right_share=1393 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=8 tick=1 head=9 rows=2302 top_share=143931 spread_bits=4.656 flat_bits=8.285 top_digit=149870 digit_share=87089 digit_flat=18198 top_class_right=26064 right_share=15534 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=0 rows=258 top_share=448964 spread_bits=2.225 flat_bits=8.292 top_digit=77519 digit_share=234061 digit_flat=17618 top_class_right=19380 right_share=65741 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=1 rows=258 top_share=486537 spread_bits=2.050 flat_bits=8.292 top_digit=81395 digit_share=212936 digit_flat=17618 top_class_right=27132 right_share=63565 right_flat=4771 top_site_right=19380
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=2 rows=258 top_share=50302 spread_bits=7.298 flat_bits=8.292 top_digit=0 digit_share=16609 digit_flat=17618 top_class_right=0 right_share=4306 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=3 rows=258 top_share=457143 spread_bits=2.618 flat_bits=8.292 top_digit=0 digit_share=8647 digit_flat=17618 top_class_right=0 right_share=2490 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=4 rows=258 top_share=314798 spread_bits=2.909 flat_bits=8.292 top_digit=69767 digit_share=49044 digit_flat=17618 top_class_right=42636 right_share=28005 right_flat=4771 top_site_right=38760
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=5 rows=258 top_share=369065 spread_bits=2.698 flat_bits=8.292 top_digit=124031 digit_share=239580 digit_flat=17618 top_class_right=27132 right_share=66473 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=6 rows=258 top_share=378254 spread_bits=2.642 flat_bits=8.292 top_digit=127907 digit_share=248372 digit_flat=17618 top_class_right=31008 right_share=70430 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=7 rows=258 top_share=85166 spread_bits=6.236 flat_bits=8.292 top_digit=0 digit_share=12647 digit_flat=17618 top_class_right=0 right_share=3272 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=8 rows=258 top_share=233070 spread_bits=4.472 flat_bits=8.292 top_digit=0 digit_share=12084 digit_flat=17618 top_class_right=0 right_share=3374 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=0 head=9 rows=258 top_share=342959 spread_bits=2.882 flat_bits=8.292 top_digit=89147 digit_share=71422 digit_flat=17618 top_class_right=46512 right_share=34300 right_flat=4771 top_site_right=46512
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=0 rows=258 top_share=322701 spread_bits=2.364 flat_bits=8.292 top_digit=558140 digit_share=688986 digit_flat=17618 top_class_right=182171 right_share=195061 right_flat=4771 top_site_right=131783
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=1 rows=258 top_share=361075 spread_bits=2.187 flat_bits=8.292 top_digit=453488 digit_share=665083 digit_flat=17618 top_class_right=81395 right_share=182361 right_flat=4771 top_site_right=50388
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=2 rows=258 top_share=299473 spread_bits=3.057 flat_bits=8.292 top_digit=58140 digit_share=41174 digit_flat=17618 top_class_right=7752 right_share=6937 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=3 rows=258 top_share=498494 spread_bits=1.906 flat_bits=8.292 top_digit=0 digit_share=3826 digit_flat=17618 top_class_right=0 right_share=993 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=4 rows=258 top_share=477051 spread_bits=1.994 flat_bits=8.292 top_digit=100775 digit_share=135665 digit_flat=17618 top_class_right=23256 right_share=31974 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=5 rows=258 top_share=289557 spread_bits=2.497 flat_bits=8.292 top_digit=790698 digit_share=766080 digit_flat=17618 top_class_right=255814 right_share=226127 right_flat=4771 top_site_right=201550
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=6 rows=258 top_share=302014 spread_bits=2.482 flat_bits=8.292 top_digit=596899 digit_share=702791 digit_flat=17618 top_class_right=151163 right_share=198650 right_flat=4771 top_site_right=100775
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=7 rows=258 top_share=158246 spread_bits=4.714 flat_bits=8.292 top_digit=0 digit_share=10226 digit_flat=17618 top_class_right=0 right_share=2211 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=8 rows=258 top_share=480053 spread_bits=2.290 flat_bits=8.292 top_digit=0 digit_share=4820 digit_flat=17618 top_class_right=0 right_share=1414 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=8 tick=1 head=9 rows=258 top_share=241798 spread_bits=3.623 flat_bits=8.292 top_digit=124031 digit_share=139873 digit_flat=17618 top_class_right=31008 right_share=40346 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=8 head=0 class=58230854 listen=18193614 width=64 heads=10
+FIELD_TEMPER lap=8 head=1 class=59539465 listen=18151137 width=64 heads=10
+FIELD_TEMPER lap=8 head=2 class=65187306 listen=20580647 width=64 heads=10
+FIELD_TEMPER lap=8 head=3 class=65570941 listen=20851546 width=64 heads=10
+FIELD_TEMPER lap=8 head=4 class=62598859 listen=18421712 width=64 heads=10
+FIELD_TEMPER lap=8 head=5 class=58312750 listen=18203336 width=64 heads=10
+FIELD_TEMPER lap=8 head=6 class=59452174 listen=18227781 width=64 heads=10
+FIELD_TEMPER lap=8 head=7 class=64324004 listen=21419616 width=64 heads=10
+FIELD_TEMPER lap=8 head=8 class=65347963 listen=20148515 width=64 heads=10
+FIELD_TEMPER lap=8 head=9 class=61900077 listen=16756289 width=64 heads=10
+FIELD_PEAKS_LAP lap=8 read_ms=489 ms=4086
+FIELD_PEAKS lap=9 tick=0 head=0 rows=4470 top_share=257651 spread_bits=3.689 flat_bits=8.282 top_digit=157047 digit_share=174865 digit_flat=17724 top_class_right=99776 right_share=65727 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=9 tick=0 head=1 rows=4470 top_share=313862 spread_bits=3.214 flat_bits=8.282 top_digit=158389 digit_share=183974 digit_flat=17724 top_class_right=102013 right_share=76295 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=9 tick=0 head=2 rows=4470 top_share=25670 spread_bits=7.767 flat_bits=8.282 top_digit=1119 digit_share=17096 digit_flat=17724 top_class_right=0 right_share=6993 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=0 head=3 rows=4470 top_share=249546 spread_bits=4.808 flat_bits=8.282 top_digit=0 digit_share=12208 digit_flat=17724 top_class_right=0 right_share=7108 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=0 head=4 rows=4470 top_share=248887 spread_bits=3.525 flat_bits=8.282 top_digit=81879 digit_share=47804 digit_flat=17724 top_class_right=39597 right_share=21780 right_flat=7389 top_site_right=2013
+FIELD_PEAKS lap=9 tick=0 head=5 rows=4470 top_share=264879 spread_bits=3.628 flat_bits=8.282 top_digit=169575 digit_share=180489 digit_flat=17724 top_class_right=103356 right_share=72384 right_flat=7389 top_site_right=671
+FIELD_PEAKS lap=9 tick=0 head=6 rows=4470 top_share=250381 spread_bits=3.700 flat_bits=8.282 top_digit=205593 digit_share=183480 digit_flat=17724 top_class_right=112975 right_share=73368 right_flat=7389 top_site_right=895
+FIELD_PEAKS lap=9 tick=0 head=7 rows=4470 top_share=48611 spread_bits=7.163 flat_bits=8.282 top_digit=224 digit_share=14949 digit_flat=17724 top_class_right=12304 right_share=8564 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=0 head=8 rows=4470 top_share=112158 spread_bits=6.380 flat_bits=8.282 top_digit=0 digit_share=13973 digit_flat=17724 top_class_right=0 right_share=7089 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=0 head=9 rows=4470 top_share=230534 spread_bits=3.788 flat_bits=8.282 top_digit=77181 digit_share=50531 digit_flat=17724 top_class_right=29083 right_share=17184 right_flat=7389 top_site_right=2685
+FIELD_PEAKS lap=9 tick=1 head=0 rows=4470 top_share=354888 spread_bits=2.484 flat_bits=8.282 top_digit=359508 digit_share=459518 digit_flat=17724 top_class_right=132438 right_share=120247 right_flat=7389 top_site_right=6488
+FIELD_PEAKS lap=9 tick=1 head=1 rows=4470 top_share=372928 spread_bits=2.399 flat_bits=8.282 top_digit=353244 digit_share=470239 digit_flat=17724 top_class_right=128859 right_share=122829 right_flat=7389 top_site_right=3132
+FIELD_PEAKS lap=9 tick=1 head=2 rows=4470 top_share=103618 spread_bits=6.125 flat_bits=8.282 top_digit=59732 digit_share=30104 digit_flat=17724 top_class_right=28188 right_share=9508 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=1 head=3 rows=4470 top_share=239593 spread_bits=4.504 flat_bits=8.282 top_digit=0 digit_share=9459 digit_flat=17724 top_class_right=447 right_share=5924 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=1 head=4 rows=4470 top_share=327796 spread_bits=3.023 flat_bits=8.282 top_digit=202013 digit_share=169778 digit_flat=17724 top_class_right=59060 right_share=42074 right_flat=7389 top_site_right=447
+FIELD_PEAKS lap=9 tick=1 head=5 rows=4470 top_share=336852 spread_bits=2.564 flat_bits=8.282 top_digit=467785 digit_share=510602 digit_flat=17724 top_class_right=153020 right_share=124358 right_flat=7389 top_site_right=11857
+FIELD_PEAKS lap=9 tick=1 head=6 rows=4470 top_share=310450 spread_bits=2.763 flat_bits=8.282 top_digit=419239 digit_share=475376 digit_flat=17724 top_class_right=143400 right_share=122593 right_flat=7389 top_site_right=6264
+FIELD_PEAKS lap=9 tick=1 head=7 rows=4470 top_share=63634 spread_bits=6.676 flat_bits=8.282 top_digit=0 digit_share=14379 digit_flat=17724 top_class_right=17897 right_share=9471 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=1 head=8 rows=4470 top_share=195430 spread_bits=5.228 flat_bits=8.282 top_digit=0 digit_share=9407 digit_flat=17724 top_class_right=0 right_share=5301 right_flat=7389 top_site_right=0
+FIELD_PEAKS lap=9 tick=1 head=9 rows=4470 top_share=137957 spread_bits=4.775 flat_bits=8.282 top_digit=120582 digit_share=69267 digit_flat=17724 top_class_right=31767 right_share=24590 right_flat=7389 top_site_right=895
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=0 rows=2302 top_share=246664 spread_bits=3.655 flat_bits=8.285 top_digit=245439 digit_share=238188 digit_flat=18198 top_class_right=60382 right_share=51673 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=1 rows=2302 top_share=289717 spread_bits=3.329 flat_bits=8.285 top_digit=238923 digit_share=242734 digit_flat=18198 top_class_right=62120 right_share=53396 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=2 rows=2302 top_share=23978 spread_bits=7.790 flat_bits=8.285 top_digit=434 digit_share=17571 digit_flat=18198 top_class_right=0 right_share=2851 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=3 rows=2302 top_share=248335 spread_bits=4.746 flat_bits=8.285 top_digit=0 digit_share=12605 digit_flat=18198 top_class_right=0 right_share=1847 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=4 rows=2302 top_share=253983 spread_bits=3.428 flat_bits=8.285 top_digit=88619 digit_share=54745 digit_flat=18198 top_class_right=43006 right_share=23238 right_flat=2935 top_site_right=3910
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=5 rows=2302 top_share=233555 spread_bits=3.747 flat_bits=8.285 top_digit=269765 digit_share=247416 digit_flat=18198 top_class_right=68202 right_share=54265 right_flat=2935 top_site_right=1303
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=6 rows=2302 top_share=209201 spread_bits=3.931 flat_bits=8.285 top_digit=314944 digit_share=243270 digit_flat=18198 top_class_right=80365 right_share=54014 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=7 rows=2302 top_share=50663 spread_bits=7.134 flat_bits=8.285 top_digit=0 digit_share=15341 digit_flat=18198 top_class_right=0 right_share=2475 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=8 rows=2302 top_share=110880 spread_bits=6.355 flat_bits=8.285 top_digit=0 digit_share=14429 digit_flat=18198 top_class_right=0 right_share=2234 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=0 head=9 rows=2302 top_share=230379 spread_bits=3.735 flat_bits=8.285 top_digit=108167 digit_share=66073 digit_flat=18198 top_class_right=36924 right_share=21131 right_flat=2935 top_site_right=5213
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=0 rows=2302 top_share=314102 spread_bits=2.514 flat_bits=8.285 top_digit=553432 digit_share=646687 digit_flat=18198 top_class_right=124674 right_share=120899 right_flat=2935 top_site_right=12598
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=1 rows=2302 top_share=325886 spread_bits=2.467 flat_bits=8.285 top_digit=539096 digit_share=646051 digit_flat=18198 top_class_right=116855 right_share=122515 right_flat=2935 top_site_right=6082
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=2 rows=2302 top_share=99196 spread_bits=6.120 flat_bits=8.285 top_digit=59513 digit_share=29527 digit_flat=18198 top_class_right=13467 right_share=5192 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=3 rows=2302 top_share=246629 spread_bits=4.376 flat_bits=8.285 top_digit=0 digit_share=9581 digit_flat=18198 top_class_right=0 right_share=1362 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=4 rows=2302 top_share=350658 spread_bits=2.770 flat_bits=8.285 top_digit=241529 digit_share=212008 digit_flat=18198 top_class_right=53432 right_share=41483 right_flat=2935 top_site_right=869
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=5 rows=2302 top_share=281929 spread_bits=2.657 flat_bits=8.285 top_digit=701564 digit_share=706471 digit_flat=18198 top_class_right=161164 right_share=133204 right_flat=2935 top_site_right=23023
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=6 rows=2302 top_share=272845 spread_bits=2.753 flat_bits=8.285 top_digit=638575 digit_share=664590 digit_flat=18198 top_class_right=139010 right_share=125112 right_flat=2935 top_site_right=12163
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=7 rows=2302 top_share=64237 spread_bits=6.652 flat_bits=8.285 top_digit=0 digit_share=14518 digit_flat=18198 top_class_right=0 right_share=2290 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=8 rows=2302 top_share=206982 spread_bits=5.011 flat_bits=8.285 top_digit=0 digit_share=9446 digit_flat=18198 top_class_right=0 right_share=1393 right_flat=2935 top_site_right=0
+FIELD_PEAKS_DIGIT lap=9 tick=1 head=9 rows=2302 top_share=143283 spread_bits=4.667 flat_bits=8.285 top_digit=155083 digit_share=89364 digit_flat=18198 top_class_right=26064 right_share=15978 right_flat=2935 top_site_right=1738
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=0 rows=258 top_share=441464 spread_bits=2.267 flat_bits=8.292 top_digit=81395 digit_share=234850 digit_flat=17618 top_class_right=19380 right_share=65867 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=1 rows=258 top_share=478204 spread_bits=2.094 flat_bits=8.292 top_digit=77519 digit_share=213132 digit_flat=17618 top_class_right=23256 right_share=63533 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=2 rows=258 top_share=49712 spread_bits=7.308 flat_bits=8.292 top_digit=0 digit_share=16627 digit_flat=17618 top_class_right=0 right_share=4316 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=3 rows=258 top_share=451535 spread_bits=2.652 flat_bits=8.292 top_digit=0 digit_share=8735 digit_flat=17618 top_class_right=0 right_share=2513 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=4 rows=258 top_share=314855 spread_bits=2.905 flat_bits=8.292 top_digit=65891 digit_share=48292 digit_flat=17618 top_class_right=38760 right_share=27768 right_flat=4771 top_site_right=34884
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=5 rows=258 top_share=363497 spread_bits=2.731 flat_bits=8.292 top_digit=127907 digit_share=240271 digit_flat=17618 top_class_right=27132 right_share=66489 right_flat=4771 top_site_right=11628
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=6 rows=258 top_share=371551 spread_bits=2.682 flat_bits=8.292 top_digit=127907 digit_share=249571 digit_flat=17618 top_class_right=31008 right_share=70799 right_flat=4771 top_site_right=15504
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=7 rows=258 top_share=83717 spread_bits=6.260 flat_bits=8.292 top_digit=0 digit_share=12661 digit_flat=17618 top_class_right=0 right_share=3274 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=8 rows=258 top_share=233211 spread_bits=4.470 flat_bits=8.292 top_digit=0 digit_share=12075 digit_flat=17618 top_class_right=0 right_share=3371 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=0 head=9 rows=258 top_share=342515 spread_bits=2.889 flat_bits=8.292 top_digit=89147 digit_share=71411 digit_flat=17618 top_class_right=50388 right_share=33955 right_flat=4771 top_site_right=46512
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=0 rows=258 top_share=326533 spread_bits=2.341 flat_bits=8.292 top_digit=534884 digit_share=689114 digit_flat=17618 top_class_right=158915 right_share=194818 right_flat=4771 top_site_right=112403
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=1 rows=258 top_share=359757 spread_bits=2.186 flat_bits=8.292 top_digit=472868 digit_share=673775 digit_flat=17618 top_class_right=85271 right_share=184917 right_flat=4771 top_site_right=54264
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=2 rows=258 top_share=301866 spread_bits=3.030 flat_bits=8.292 top_digit=58140 digit_share=41221 digit_flat=17618 top_class_right=7752 right_share=6996 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=3 rows=258 top_share=502792 spread_bits=1.877 flat_bits=8.292 top_digit=0 digit_share=3761 digit_flat=17618 top_class_right=0 right_share=979 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=4 rows=258 top_share=476198 spread_bits=2.004 flat_bits=8.292 top_digit=112403 digit_share=135692 digit_flat=17618 top_class_right=23256 right_share=31947 right_flat=4771 top_site_right=7752
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=5 rows=258 top_share=292721 spread_bits=2.468 flat_bits=8.292 top_digit=790698 digit_share=775704 digit_flat=17618 top_class_right=255814 right_share=228758 right_flat=4771 top_site_right=205426
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=6 rows=258 top_share=304391 spread_bits=2.451 flat_bits=8.292 top_digit=596899 digit_share=715840 digit_flat=17618 top_class_right=158915 right_share=202230 right_flat=4771 top_site_right=108527
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=7 rows=258 top_share=160606 spread_bits=4.697 flat_bits=8.292 top_digit=0 digit_share=10308 digit_flat=17618 top_class_right=0 right_share=2232 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=8 rows=258 top_share=478883 spread_bits=2.302 flat_bits=8.292 top_digit=0 digit_share=4836 digit_flat=17618 top_class_right=0 right_share=1417 right_flat=4771 top_site_right=0
+FIELD_PEAKS_OPERAND lap=9 tick=1 head=9 rows=258 top_share=240390 spread_bits=3.633 flat_bits=8.292 top_digit=131783 digit_share=148845 digit_flat=17618 top_class_right=34884 right_share=42546 right_flat=4771 top_site_right=15504
+FIELD_TEMPER lap=9 head=0 class=58185602 listen=18225451 width=64 heads=10
+FIELD_TEMPER lap=9 head=1 class=59488083 listen=18184658 width=64 heads=10
+FIELD_TEMPER lap=9 head=2 class=65167903 listen=20595961 width=64 heads=10
+FIELD_TEMPER lap=9 head=3 class=65551662 listen=20860853 width=64 heads=10
+FIELD_TEMPER lap=9 head=4 class=62571819 listen=18440480 width=64 heads=10
+FIELD_TEMPER lap=9 head=5 class=58268411 listen=18237179 width=64 heads=10
+FIELD_TEMPER lap=9 head=6 class=59405377 listen=18263352 width=64 heads=10
+FIELD_TEMPER lap=9 head=7 class=64295606 listen=21451398 width=64 heads=10
+FIELD_TEMPER lap=9 head=8 class=65320385 listen=20159339 width=64 heads=10
+FIELD_TEMPER lap=9 head=9 class=61871305 listen=16740739 width=64 heads=10
+FIELD_PEAKS_LAP lap=9 read_ms=488 ms=4585
+FIELD_CARD reads=80 read_ms=4382 returns=0 return_ms=0 pairs=2512055938 batches=80 peak_store=2533392672 landmarks=0 landmark_ms=0 elapsed_ms=4585
+MEASURE lap=peaks rc=0 wall_s=5.0 peak_rss_kib=286236

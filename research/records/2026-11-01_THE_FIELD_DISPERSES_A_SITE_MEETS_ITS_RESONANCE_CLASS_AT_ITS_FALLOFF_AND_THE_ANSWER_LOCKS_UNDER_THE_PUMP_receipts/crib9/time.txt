@@ -1,0 +1,27 @@
+FIELD_COMMAND time-field $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $ROOT/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $ROOT/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 4 8 2 32 2 16 16 8 4 64
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15279456256 total=16802250752 batch_budget=10288365568
+FIELD_PASSAGE train=3968 withheld=128 held=128 held_read=128 alphabet=44 answer=53 reach=484
+FIELD_TIME_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 reach=484 material=15244
+FIELD_TIME section=1 length=372 rows=46352 met_pairs=1310210 reads=2 halvings=0 deposited=true next=- ms=24 ns_a_row=522 read_ms=4
+FIELD_TIME section=2 length=391 rows=48720 met_pairs=1681342 reads=4 halvings=0 deposited=true next=0/false ms=33 ns_a_row=697 read_ms=4
+FIELD_TIME section=3 length=303 rows=38152 met_pairs=1121184 reads=4 halvings=0 deposited=true next=0/false ms=25 ns_a_row=681 read_ms=3
+FIELD_TIME section=4 length=429 rows=54624 met_pairs=2394880 reads=4 halvings=0 deposited=true next=0/false ms=38 ns_a_row=698 read_ms=5
+FIELD_TIME section=5 length=365 rows=44872 met_pairs=2052738 reads=4 halvings=0 deposited=true next=0/false ms=32 ns_a_row=721 read_ms=4
+FIELD_TIME section=6 length=358 rows=42528 met_pairs=2320382 reads=4 halvings=0 deposited=true next=0/false ms=31 ns_a_row=729 read_ms=4
+FIELD_TIME section=7 length=330 rows=39856 met_pairs=2695772 reads=4 halvings=0 deposited=true next=0/false ms=28 ns_a_row=704 read_ms=3
+FIELD_TIME section=8 length=302 rows=35872 met_pairs=2456066 reads=4 halvings=0 deposited=true next=0/false ms=26 ns_a_row=741 read_ms=3
+FIELD_TIME section=9 length=358 rows=44128 met_pairs=4193738 reads=4 halvings=0 deposited=true next=0/false ms=32 ns_a_row=739 read_ms=4
+FIELD_TIME section=10 length=343 rows=40800 met_pairs=3574756 reads=4 halvings=0 deposited=true next=0/false ms=30 ns_a_row=750 read_ms=4
+FIELD_TIME section=11 length=378 rows=45680 met_pairs=5405846 reads=4 halvings=0 deposited=true next=0/false ms=33 ns_a_row=732 read_ms=5
+FIELD_TIME section=12 length=350 rows=41696 met_pairs=4398702 reads=7 halvings=1 deposited=true next=3/false ms=49 ns_a_row=1197 read_ms=4
+FIELD_TIME section=13 length=320 rows=37856 met_pairs=3984954 reads=4 halvings=0 deposited=true next=0/false ms=30 ns_a_row=815 read_ms=4
+FIELD_TIME section=14 length=332 rows=41216 met_pairs=4490864 reads=7 halvings=1 deposited=true next=5/false ms=49 ns_a_row=1191 read_ms=4
+FIELD_TIME section=15 length=402 rows=49112 met_pairs=6498536 reads=4 halvings=0 deposited=true next=0/false ms=39 ns_a_row=796 read_ms=5
+FIELD_TIME section=16 length=328 rows=40088 met_pairs=4562996 reads=6 halvings=0 deposited=true next=4/false ms=41 ns_a_row=1041 read_ms=4
+FIELD_TIME_LAP sections=248 sites=1401454 rows=11211632 end_rows=10449504 worst_ps_a_section_row=1197566 worst_ps_a_read_row=119670 at_size_ms=13426 projection_ms=20043 (every section's reads and return at the worst measured time a site row, four more reads of it, and the lap's end)
+FIELD_TIME_PAIRS lap_met_pairs=1483531401 met_pairs_a_row_millis=132320 all_pairs=4035915568
+FIELD_TIME_RELEASE problems=4 released=212 open=0 rows_at_most=843776 rows_read=79104 ms=19
+FIELD_TIME_RELEASES problems=128 releases=328 sweeps=64 rows_at_most=61623296 ps_a_row=240329 free_sweep_ms=90 marks_sweep_ms=141 projection_ms=14809
+FIELD_TIME_DONE elapsed_ms=726
+FIELD_CARD reads=92 read_ms=368 returns=16 return_ms=199 pairs=323528860 batches=108 peak_store=328321328 landmarks=0 landmark_ms=0 elapsed_ms=727
+MEASURE lap=crib9 rc=0 wall_s=0.9 peak_rss_kib=243208

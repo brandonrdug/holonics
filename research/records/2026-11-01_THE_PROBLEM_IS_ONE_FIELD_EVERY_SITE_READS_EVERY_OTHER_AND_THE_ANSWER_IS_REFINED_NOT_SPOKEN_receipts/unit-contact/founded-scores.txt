@@ -1,0 +1,4 @@
+SCORES keys=fixture sites=48 met=5/32 rank=4 match=73 top=87@2,86@13,80@8,75@30 | rank=3 match=72 top=86@2,74@13,73@30,72@10 | rank=4 match=101 top=111@37,109@32,107@25,104@17 | rank=3 match=89 top=97@32,95@37,95@25,89@10
+SCORES keys=fixture sites=450 met=4/32 rank=30 match=72 top=91@215,91@62,88@280,87@439 | rank=49 match=51 top=68@439,68@215,68@62,67@280 | rank=27 match=70 top=89@25,86@403,84@65,83@408 | rank=57 match=62 top=87@25,86@403,82@65,81@426
+SCORES keys=mixed sites=48 met=25/32 rank=0 match=16 top=16@10,9@42,9@2,7@28 | rank=0 match=17 top=17@10,16@42,13@28,9@17 | rank=0 match=15 top=15@10,13@14,13@5,11@37 | rank=0 match=15 top=15@10,11@44,10@14,10@5
+SCORES keys=mixed sites=450 met=20/32 rank=0 match=19 top=19@10,14@340,12@422,12@389 | rank=0 match=30 top=30@10,22@224,18@61,17@340 | rank=0 match=31 top=31@10,22@147,18@204,18@106 | rank=0 match=12 top=12@10,9@404,9@332,9@245

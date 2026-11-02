@@ -1,0 +1,18 @@
+FIELD_COMMAND train-field $G/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $W/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 $W/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab $W/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 32 5 8 2 32 2 16 27 8 28561 114244 772000 $O/train
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15379267584 total=16802250752 batch_budget=10388176896
+FIELD_DECLARATION alphabet=44 width=32 heads=5 modes=8 still=2 contacts=32 ticks=2 frames=5 reach=484 section=16 rate=8 answer=53 train=3968 withheld=128 dev=128 sections=248 laps_read=0 material=19692
+FIELD_HELD lap=-1 answer=5.459432 digits=5.459432 text=5.459432 classes=4470 context=5.459432 context_digits=5.459432 context_text=5.459432 context_classes=4470 foil=5.459432 foil_digits=5.459432 foil_text=5.459432 question=0.000000 question_digits=0.000000 question_text=0.000000 ms=397
+FIELD_UNSEEN lap=-1 code=5.459 sites=4319 next=- ms=532
+FIELD_LAP lap=0 read=1 sites=408396 before=4.908 after=4.903 deposited=238/248 halvings=31 next_halved=13 next_refused=90 ms=13991
+FIELD_UNSEEN lap=0 code=5.912 sites=4319 next_change=-5205906 next_halvings=0 next_refused=false ms=14523
+FIELD_HELD lap=0 answer=5.993307 digits=6.305274 text=5.662058 classes=4470 context=5.910174 context_digits=6.243360 context_text=5.556394 context_classes=4470 foil=5.910443 foil_digits=6.243817 foil_text=5.556464 question=0.000269 question_digits=0.000457 question_text=0.000070 ms=14942
+FIELD_GROW lap=0 width=64 heads=10 contacts=64 rate=9 material=60844 ms=14943
+FIELD_LAP lap=1 read=2 sites=394356 before=4.313 after=4.308 deposited=122/248 halvings=129 next_halved=0 next_refused=11 ms=24272
+FIELD_UNSEEN lap=1 code=4.180 sites=4319 next=- ms=39216
+FIELD_HELD lap=1 answer=4.263565 digits=4.346840 text=4.175143 classes=4470 context=4.159988 context_digits=4.434387 context_text=3.868629 context_classes=4470 foil=4.159839 foil_digits=4.435300 foil_text=3.867353 question=-0.000149 question_digits=0.000913 question_text=-0.001277 ms=40085
+FIELD_LAP lap=2 read=3 sites=410155 before=4.030 after=4.030 deposited=8/248 halvings=288 next_halved=0 next_refused=8 ms=22561
+FIELD_UNSEEN lap=2 code=4.180 sites=4319 next=- ms=62647
+FIELD_HELD lap=2 answer=4.263565 digits=4.346840 text=4.175143 classes=4470 context=4.159988 context_digits=4.434387 context_text=3.868629 context_classes=4470 foil=4.159839 foil_digits=4.435300 foil_text=3.867353 question=-0.000149 question_digits=0.000913 question_text=-0.001277 ms=63513
+FIELD_GROW_HELD lap=2 reason=a second growth has no projection ms=63513
+FIELD_CARD reads=2830 read_ms=32233 returns=744 return_ms=28338 pairs=55030357614 batches=3576 peak_store=8303901860 landmarks=0 landmark_ms=0 elapsed_ms=63514
+MEASURE lap=crib12 rc=0 wall_s=63.9 peak_rss_kib=350184

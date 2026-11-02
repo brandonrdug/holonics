@@ -1,0 +1,13 @@
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+TOWER_TRAIN material=553473 streams=320 section=128 sections_a_pass=64 train_bytes=29744156 dev_bytes=913986
+TOWER_SECTION pass=0 section=32 bits_a_byte=5.103 deposits=32 halvings=53 elapsed_ms=21482
+TOWER_CLOSURE pass=0 section=32 level=4 ticks=819467 code_bits_a_tick=6.659 flat_bits_a_tick=6.348 level=5 ticks=417647 code_bits_a_tick=5.595 flat_bits_a_tick=5.375
+TOWER_REFUSALS pass=0 section=32 refused=53 arrivals_rose=53 closure_rose=47 arrivals_change_bits=3270495.352 closure_change_bits=2060094.774
+TOWER_SECTION pass=0 section=64 bits_a_byte=3.901 deposits=64 halvings=73 elapsed_ms=36735
+TOWER_CLOSURE pass=0 section=64 level=4 ticks=627620 code_bits_a_tick=6.251 flat_bits_a_tick=5.949 level=5 ticks=319560 code_bits_a_tick=5.176 flat_bits_a_tick=4.976
+TOWER_REFUSALS pass=0 section=64 refused=20 arrivals_rose=20 closure_rose=18 arrivals_change_bits=18481.848 closure_change_bits=22743.469
+TOWER_REALIZATION pass=0 card NVIDIA GeForce RTX 4080 SUPER (80 multiprocessors): forward 320 blocks (one a stream, its 128 cells in order) x 256 threads; reverse 40960 blocks (one a cell) x 256 threads, the modes' scan 320 blocks x 128 threads (one a mode); outer sums in tiles of 16x64 outputs, 4 a thread
+TOWER_STATE STATE.0 state_bytes=21345792 state_sha256=a854dab5c2613b361e115b234ee1d45cdbdc05b75ca2db8edbf8dd6ef63d20b7
+TOWER_PASS pass=0 train_bits_a_byte=4.502 dev_bits_a_byte=3.589 dev_regions gsm8k=3.604 strokes=0.000 cycles=0.000 words=3.578 deposits=64/64 pass_ms=39990 elapsed_ms=40001 train_code=12375500071130 dev_code=3438498913901 grain_bits=20
+TOWER_CARD forwards=224 forward_ms=32575 reverses=64 reverse_ms=5651 elapsed_ms=40227
+MEASURE lap=heading rc=0 wall_s=40.5 peak_rss_kib=677272

@@ -1,0 +1,8 @@
+TOWER_SUITE rc=0 test result: ok. 47 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 33.66s MEASURE lap=tower-suite rc=0 wall_s=35.4 peak_rss_kib=1249940 
+BIN=93f0a1523d8dd68e98d47d23a096f69e6c4d275ffe239bd93af9f6509533444b HEAD=ea425f15c deadlines every=281s motive=608s at=2026-10-31T15:09:59Z
+NVIDIA_SMI before every: 28 %, 2580 MHz, 11501 MHz, 44, 49.03 W, P0, 1068 MiB at=2026-10-31T15:09:59Z
+RUN_END every deadline_s=281 rc=0 TOWER_PASS pass=0 train_bits_a_byte=2.627 dev_bits_a_byte=2.270 dev_regions gsm8k=2.310 strokes=0.000 cycles=0.000 words=2.239 deposits=726/726 pass_ms=196177 elapsed_ms=196186 train_code=81899910046052 dev_code=2174947220225 grain_bits=20 TOWER_CARD forwards=1522 forward_ms=112406 reverses=726 reverse_ms=53536 terms=726 elapsed_ms=196365 MEASURE lap=every rc=0 wall_s=196.7 peak_rss_kib=3213444 
+NVIDIA_SMI before motive: 29 %, 2805 MHz, 11501 MHz, 57, 185.61 W, P2, 1061 MiB at=2026-10-31T15:13:15Z
+RUN_END motive deadline_s=608 rc=124 MEASURE lap=motive rc=124 wall_s=608.2 peak_rss_kib=3214468 
+RELEASE_END every rc=0 CLASSES_RELEASE_DONE prompts=6 agree=1 elapsed_ms=7247 MEASURE lap=release-every rc=0 wall_s=7.5 peak_rss_kib=253192 
+VRAM_PEAK_MIB=10886

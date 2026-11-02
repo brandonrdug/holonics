@@ -1,0 +1,666 @@
+   Compiling holonics-cuda v0.1.0 ($ROOT/.local/wt/section-edge/crates/holonics-cuda)
+   Compiling holonics v0.1.0 ($ROOT/.local/wt/section-edge/crates/holonics)
+warning: unused import: `NativeReceivingSourceReading`
+  --> crates/holonics/src/hnn/constitution/epoch.rs:19:84
+   |
+19 | pub use retained_receiving::{EpochReceivingRayPacket, EpochReceivingStationReading,NativeReceivingSourceReading};
+   |                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::ratio::linear::vector::combination`
+ --> crates/holonics/src/hnn/moment/resident_pair_face.rs:3:5
+  |
+3 | use crate::ratio::linear::vector::combination;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Signed`
+ --> crates/holonics/src/hnn/physical/action/contextual.rs:8:18
+  |
+8 | use num_traits::{Signed, Zero};
+  |                  ^^^^^^
+
+warning: unused imports: `prepare_native_retained_section` and `prepare_retained_section`
+   --> crates/holonics/src/hnn/receiving.rs:159:27
+    |
+159 | pub(crate) use selected::{prepare_retained_section, prepare_native_retained_section, prepare_native_retained_section_with_policy};
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Reach`
+   --> crates/holonics/src/hnn/word/native_prediction.rs:793:72
+    |
+793 |         use crate::hnn::constitution::{LinearLocus, LinearStep, Locus, Reach};
+    |                                                                        ^^^^^
+
+warning: variable does not need to be mutable
+    --> crates/holonics/src/hnn/tower.rs:4815:25
+     |
+4815 |                     let mut turned = |cov: &[(i128, i128)]| -> Result<(Vec<i64>, Vec<i64>)> {
+     |                         ----^^^^^^
+     |                         |
+     |                         help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/action.rs:359:5
+    |
+359 |     mut producer: ActionProducer,
+    |     ----^^^^^^^^
+    |     |
+    |     help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:331:9
+    |
+331 |         mut self,
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> crates/holonics/src/hnn/word/native_prediction.rs:359:43
+    |
+359 |     fn native_current_prediction_declared(mut self,cap:NativePredictionDeclaration,bits:u32)->Result<NativePredictionWord<'a>,HnnError>{
+    |                                           ----^^^^
+    |                                           |
+    |                                           help: remove this `mut`
+
+warning: function `flatten_checked` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:172:4
+    |
+172 | fn flatten_checked(
+    |    ^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `build` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:275:15
+    |
+275 | pub(super) fn build(
+    |               ^^^^^
+
+warning: function `path_level_for_segment` is never used
+   --> crates/holonics/src/compression/landmark/context/arrivals.rs:711:4
+    |
+711 | fn path_level_for_segment(path: &BranchPath, segment: SegmentId) -> Option<usize> {
+    |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NativeRoundingFoundingSeal` is never constructed
+    --> crates/holonics/src/hnn/constitution.rs:4030:19
+     |
+4030 | pub(crate) struct NativeRoundingFoundingSeal(());
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `initial_with_joint_rounding_history` and `native_rounding_carry_at` are never used
+    --> crates/holonics/src/hnn/constitution.rs:5299:19
+     |
+5296 | impl Constitution {
+     | ----------------- associated items in this implementation
+...
+5299 |     pub(crate) fn initial_with_joint_rounding_history(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+5804 |     pub(crate) fn native_rounding_carry_at(&self,contact:usize,family:usize,entry:usize)->Option<&Rat>{
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `lifetime_release_bound` is never used
+   --> crates/holonics/src/hnn/constitution/epoch.rs:420:15
+    |
+420 | pub(crate) fn lifetime_release_bound(
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `partition` is never used
+   --> crates/holonics/src/hnn/constitution/epoch.rs:833:19
+    |
+832 | impl EpochSeries {
+    | ---------------- method in this implementation
+833 |     pub(crate) fn partition(&self, exponent: u32) -> Result<EpochPartition, HnnError> {
+    |                   ^^^^^^^^^
+
+warning: field `halvings` is never read
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1074:16
+     |
+1067 | pub(crate) struct EpochDeposit {
+     |                   ------------ field in this struct
+...
+1074 |     pub(crate) halvings: u64,
+     |                ^^^^^^^^
+     |
+     = note: `EpochDeposit` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: field `shares` is never read
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1098:16
+     |
+1094 | pub(crate) struct EpochFresh {
+     |                   ---------- field in this struct
+...
+1098 |     pub(crate) shares: Vec<i64>,
+     |                ^^^^^^
+     |
+     = note: `EpochFresh` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: associated items `founded`, `founded_paired`, and `refresh_spectral` are never used
+    --> crates/holonics/src/hnn/constitution/epoch.rs:1254:19
+     |
+1199 | impl EpochLaw {
+     | ------------- associated items in this implementation
+...
+1254 |     pub(crate) fn founded(
+     |                   ^^^^^^^
+...
+1345 |     pub(crate) fn founded_paired(
+     |                   ^^^^^^^^^^^^^^
+...
+2249 |     pub(crate) fn refresh_spectral(&mut self) -> Result<(), HnnError> {
+     |                   ^^^^^^^^^^^^^^^^
+
+warning: method `native_rounding_attainable_lattice` is never used
+    --> crates/holonics/src/hnn/constitution/epoch.rs:3496:19
+     |
+3495 | impl Constitution {
+     | ----------------- method in this implementation
+3496 |     pub(crate) fn native_rounding_attainable_lattice(&self,contact:usize,target:Lattice)
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `observed_epoch_index`, `deposit_observed_epoch`, and `deposit_observed_epoch_with_execution` are never used
+    --> crates/holonics/src/hnn/constitution/epoch/deposit.rs:1868:19
+     |
+1811 | impl Constitution {
+     | ----------------- methods in this implementation
+...
+1868 |     pub(crate) fn observed_epoch_index(&self, receiver: usize) -> u64 {
+     |                   ^^^^^^^^^^^^^^^^^^^^
+...
+1911 |     pub(crate) fn deposit_observed_epoch(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^
+...
+1949 |     pub(crate) fn deposit_observed_epoch_with_execution(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `retained_origin` is never used
+  --> crates/holonics/src/hnn/constitution/epoch/retained_receiving.rs:78:19
+   |
+36 | impl EpochReceivingLaw {
+   | ---------------------- method in this implementation
+...
+78 |     pub(super) fn retained_origin(&self) -> Option<&Arc<RetainedSectionOrigin>> {
+   |                   ^^^^^^^^^^^^^^^
+
+warning: function `prepared_ln_two` is never used
+  --> crates/holonics/src/hnn/executed.rs:66:15
+   |
+66 | pub(crate) fn prepared_ln_two() -> Option<&'static ExactInterval> { LN_TWO.get() }
+   |               ^^^^^^^^^^^^^^^
+
+warning: field `combined` is never read
+   --> crates/holonics/src/hnn/receiving/selected.rs:381:5
+    |
+378 | pub(super) struct ProducedRetainedSection {
+    |                   ----------------------- field in this struct
+...
+381 |     combined: Option<Faces>,
+    |     ^^^^^^^^
+
+warning: associated items `at` and `validate` are never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:390:19
+    |
+389 | impl ProducedRetainedSection {
+    | ---------------------------- associated items in this implementation
+390 |     pub(super) fn at(
+    |                   ^^
+...
+463 |     pub(super) fn validate(
+    |                   ^^^^^^^^
+
+warning: function `prepare_retained_section` is never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:510:15
+    |
+510 | pub(crate) fn prepare_retained_section(
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `prepare_native_retained_section` is never used
+   --> crates/holonics/src/hnn/receiving/selected.rs:526:15
+    |
+526 | pub(crate) fn prepare_native_retained_section(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usi...
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `certificate_origin`, `at_produced`, and `at_native_produced` are never used
+   --> crates/holonics/src/hnn/receiving/aligned_return.rs:206:19
+    |
+203 | impl RetainedSectionReturn {
+    | -------------------------- associated items in this implementation
+...
+206 |     pub(crate) fn certificate_origin(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+243 |     pub(super) fn at_produced(
+    |                   ^^^^^^^^^^^
+...
+261 |     pub(super) fn at_native_produced(population:&PortPopulation,ring:usize,waves:&[Vec<Rat>],trees:&[LandmarkFace],targets:&[usize],produ...
+    |                   ^^^^^^^^^^^^^^^^^^
+
+warning: function `compose_pair_return` is never used
+    --> crates/holonics/src/hnn/reference.rs:3386:15
+     |
+3386 | pub(crate) fn compose_pair_return(
+     |               ^^^^^^^^^^^^^^^^^^^
+
+warning: field `commit` is never read
+  --> crates/holonics/src/hnn/reference/epoch.rs:20:16
+   |
+14 | pub(crate) struct EpochRead {
+   |                   --------- field in this struct
+...
+20 |     pub(crate) commit: u64,
+   |                ^^^^^^
+   |
+   = note: `EpochRead` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `read_epoch` is never used
+   --> crates/holonics/src/hnn/reference/epoch.rs:136:19
+    |
+131 | impl Reference {
+    | -------------- method in this implementation
+...
+136 |     pub(crate) fn read_epoch(
+    |                   ^^^^^^^^^^
+
+warning: associated function `fresh` is never used
+   --> crates/holonics/src/hnn/reference/prepared_input.rs:156:19
+    |
+155 | impl PreparedInputState {
+    | ----------------------- associated function in this implementation
+156 |     pub(crate) fn fresh(
+    |                   ^^^^^
+
+warning: field `scale` is never read
+    --> crates/holonics/src/hnn/tower.rs:2613:5
+     |
+2611 | struct TraceCell {
+     |        --------- field in this struct
+2612 |     read: Vec<i32>,
+2613 |     scale: i128,
+     |     ^^^^^
+     |
+     = note: `TraceCell` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: methods `native_history_field` and `joint_rounding_modulus` are never used
+   --> crates/holonics/src/hnn/word/continuation.rs:617:19
+    |
+615 | impl ContactCut {
+    | --------------- methods in this implementation
+616 |     /// Source-owned field borrow for the unwired atomic history adapter.
+617 |     pub(super) fn native_history_field(&self)->&Field{&self.field}
+    |                   ^^^^^^^^^^^^^^^^^^^^
+618 |     /// Optional calculation only. Live publication selects no resolution policy.
+619 |     pub(super) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `contact_envelope` is never used
+   --> crates/holonics/src/hnn/word/material_ray.rs:466:15
+    |
+466 | pub(super) fn contact_envelope(
+    |               ^^^^^^^^^^^^^^^^
+
+warning: function `bounded_joint_box_envelope` is never used
+   --> crates/holonics/src/hnn/word/material_ray.rs:528:4
+    |
+528 | fn bounded_joint_box_envelope<A:BoxArithmetic>(forms:&[Rat;3],h:&Rat,g:&Rat,w:&mut A)
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MODULUS` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:18:18
+   |
+18 | pub(crate) const MODULUS: &str = "native-joint-rounding-read-modulus-v1";
+   |                  ^^^^^^^
+
+warning: enum `ReadUnits` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:20:17
+   |
+20 | pub(crate) enum ReadUnits { InterleavedWaveCoordinates, NativeProbabilityMass }
+   |                 ^^^^^^^^^
+
+warning: enum `ReadNorm` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:22:17
+   |
+22 | pub(crate) enum ReadNorm { ComponentwiseAbsolute, WholeBlockEuclidean }
+   |                 ^^^^^^^^
+
+warning: enum `ComparisonGrade` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:24:17
+   |
+24 | pub(crate) enum ComparisonGrade {
+   |                 ^^^^^^^^^^^^^^^
+
+warning: enum `ReleaseAccounting` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:30:17
+   |
+30 | pub(crate) enum ReleaseAccounting {
+   |                 ^^^^^^^^^^^^^^^^^
+
+warning: enum `OpeningScope` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:35:17
+   |
+35 | pub(crate) enum OpeningScope { SameActualPreparedOpening, UncertainPastPhysicalOpening }
+   |                 ^^^^^^^^^^^^
+
+warning: enum `RequestedGuarantee` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:37:17
+   |
+37 | pub(crate) enum RequestedGuarantee {
+   |                 ^^^^^^^^^^^^^^^^^^
+
+warning: struct `ModulusResources` is never constructed
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:45:19
+   |
+45 | pub(crate) struct ModulusResources {
+   |                   ^^^^^^^^^^^^^^^^
+
+warning: struct `ModulusRequest` is never constructed
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:58:19
+   |
+58 | pub(crate) struct ModulusRequest {
+   |                   ^^^^^^^^^^^^^^
+
+warning: enum `ModulusObstruction` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:72:17
+   |
+72 | pub(crate) enum ModulusObstruction {
+   |                 ^^^^^^^^^^^^^^^^^^
+
+warning: type alias `Result` is never used
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:96:6
+   |
+96 | type Result<T> = std::result::Result<T, ModulusObstruction>;
+   |      ^^^^^^
+
+warning: struct `Arithmetic` is never constructed
+  --> crates/holonics/src/hnn/word/material_ray/rounding.rs:98:8
+   |
+98 | struct Arithmetic { limits: ModulusResources, spent: u64, admitted_payload:u64 }
+   |        ^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:100:8
+    |
+ 99 | impl Arithmetic {
+    | --------------- associated items in this implementation
+100 |     fn new(limits: &ModulusResources) -> Result<Self> {
+    |        ^^^
+...
+108 |     fn reserve(&mut self, bits: u64) -> Result<()> {
+    |        ^^^^^^^
+...
+115 |     fn retain(&mut self,bits:u64)->Result<()> {
+    |        ^^^^^^
+...
+122 |     fn values<'a>(&mut self, values:impl IntoIterator<Item=&'a Rat>)->Result<()> {
+    |        ^^^^^^
+...
+134 |     fn operation(&mut self,n:u64,d:u64)->Result<()> {
+    |        ^^^^^^^^^
+...
+148 |     fn add(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
+    |        ^^^
+...
+153 |     fn mul(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
+    |        ^^^
+...
+156 |     fn div(&mut self,a:&Rat,b:&Rat)->Result<Rat> {
+    |        ^^^
+...
+160 |     fn sqrt(&mut self,a:&Rat)->Result<Rat> {
+    |        ^^^^
+...
+165 |     fn norm(&mut self,m:&ExactRatMatrix)->Result<Rat> {
+    |        ^^^^
+...
+170 |     fn dyadic(&mut self,exponent:u32)->Result<Rat>{
+    |        ^^^^^^
+
+warning: struct `ChannelSnapshot` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:185:8
+    |
+185 | struct ChannelSnapshot {
+    |        ^^^^^^^^^^^^^^^
+
+warning: associated items `take`, `values`, `admit_lossless_rebase`, and `matches` are never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:189:8
+    |
+188 | impl ChannelSnapshot {
+    | -------------------- associated items in this implementation
+189 |     fn take(theta:&Constitution,contact:usize,work:&mut Arithmetic)->Result<Self>{
+    |        ^^^^
+...
+206 |     fn values(&self)->impl Iterator<Item=&Rat>{
+    |        ^^^^^^
+...
+211 |     fn admit_lossless_rebase(&self,next:&Self,work:&mut Arithmetic)->Result<()> {
+    |        ^^^^^^^^^^^^^^^^^^^^^
+...
+225 |     fn matches(&self,theta:&Constitution,contact:usize)->bool{
+    |        ^^^^^^^
+
+warning: struct `NativeReleaseHistory` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:239:19
+    |
+239 | pub(crate) struct NativeReleaseHistory {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `newly_founded`, `admit`, `record_native_publication`, and `record_rebase` are never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:243:27
+    |
+242 | impl NativeReleaseHistory {
+    | ------------------------- associated items in this implementation
+243 |     pub(in crate::hnn) fn newly_founded(field:&Field,theta:&Constitution,limits:&ModulusResources,_origin:&NativeRoundingFoundingSeal)->R...
+    |                           ^^^^^^^^^^^^^
+...
+262 |     fn admit(&self,field:&Field,theta:&Constitution)->Result<()> {
+    |        ^^^^^
+...
+271 |     pub(in crate::hnn::word) fn record_native_publication(&mut self,proof:&NativeCompletedPublication<'_>,
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+308 |     pub(crate) fn record_rebase(&mut self,original:&Constitution,next:&Constitution,limits:&ModulusResources)->Result<()> {
+    |                   ^^^^^^^^^^^^^
+
+warning: struct `DeclaredJointModulus` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:323:19
+    |
+323 | pub(crate) struct DeclaredJointModulus {
+    |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: associated items `selection_id`, `admits_selection`, and `seal` are never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:328:33
+    |
+327 | impl DeclaredJointModulus {
+    | ------------------------- associated items in this implementation
+328 |     pub(in crate::hnn::word) fn selection_id(&self)->&Arc<()>{&self.selection}
+    |                                 ^^^^^^^^^^^^
+329 |     pub(in crate::hnn::word) fn admits_selection(&self,id:&Arc<()>)->bool{Arc::ptr_eq(&self.selection,id)}
+    |                                 ^^^^^^^^^^^^^^^^
+330 |     #[allow(clippy::too_many_arguments)]
+331 |     pub(in crate::hnn::word) fn seal(id:&Arc<()>,field:&Field,current:&Current,source:&Arc<SourceMoment>,theta:&Constitution,
+    |                                 ^^^^
+
+warning: struct `RadiusReading` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:355:19
+    |
+355 | pub(crate) struct RadiusReading {
+    |                   ^^^^^^^^^^^^^
+
+warning: struct `ReadPolynomial` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:361:19
+    |
+361 | pub(crate) struct ReadPolynomial {
+    |                   ^^^^^^^^^^^^^^
+
+warning: enum `TargetResult` is never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:366:17
+    |
+366 | pub(crate) enum TargetResult {
+    |                 ^^^^^^^^^^^^
+
+warning: struct `AttainmentReading` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:374:19
+    |
+374 | pub(crate) struct AttainmentReading {
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: struct `JointModulusReading` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:379:19
+    |
+379 | pub(crate) struct JointModulusReading {
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `Polynomial` is never constructed
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:412:8
+    |
+412 | struct Polynomial { c:Rat,a:Rat,b:Rat }
+    |        ^^^^^^^^^^
+
+warning: associated items `zero`, `scale`, and `add` are never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:414:8
+    |
+413 | impl Polynomial {
+    | --------------- associated items in this implementation
+414 |     fn zero()->Self{Self{c:Rat::zero(),a:Rat::zero(),b:Rat::zero()}}
+    |        ^^^^
+415 |     fn scale(&self,s:&Rat,w:&mut Arithmetic)->Result<Self>{Ok(Self{c:w.mul(&self.c,s)?,a:w.mul(&self.a,s)?,b:w.mul(&self.b,s)?})}
+    |        ^^^^^
+416 |     fn add(&self,p:&Self,w:&mut Arithmetic)->Result<Self>{Ok(Self{c:w.add(&self.c,&p.c)?,a:w.add(&self.a,&p.a)?,b:w.add(&self.b,&p.b)?})}
+    |        ^^^
+
+warning: function `evaluated` is never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:418:4
+    |
+418 | fn evaluated(p:&ReadPolynomial,s:u32,w:&mut Arithmetic)->Result<Rat>{
+    |    ^^^^^^^^^
+
+warning: function `row_norm` is never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:422:4
+    |
+422 | fn row_norm(m:&ExactRatMatrix,row:usize,work:&mut Arithmetic)->Result<Rat>{
+    |    ^^^^^^^^
+
+warning: function `issue` is never used
+   --> crates/holonics/src/hnn/word/material_ray/rounding.rs:429:29
+    |
+429 | pub(in crate::hnn::word) fn issue(plan:&DeclaredJointModulus,id:&Arc<()>,field:&Field,current:&Current,source:&Arc<SourceMoment>,
+    |                             ^^^^^
+
+warning: fields `modulus_selection`, `producer`, `anchor`, and `reach` are never read
+  --> crates/holonics/src/hnn/word/native_prediction.rs:45:5
+   |
+44 | pub struct NativePredictionReturn {
+   |            ---------------------- fields in this struct
+45 |     modulus_selection:Option<ExecutedModulusSelection>,
+   |     ^^^^^^^^^^^^^^^^^
+...
+54 |     producer: crate::hnn::constitution::Constitution,
+   |     ^^^^^^^^
+55 |     anchor: Vec<BigInt>,
+   |     ^^^^^^
+56 |     reach: crate::hnn::constitution::Reach,
+   |     ^^^^^
+
+warning: methods `joint_rounding_modulus` and `publish_contact_carry_with_history` are never used
+  --> crates/holonics/src/hnn/word/native_prediction.rs:60:19
+   |
+58 | impl NativePredictionReturn {
+   | --------------------------- methods in this implementation
+59 |     /// Pure opt-in certificate calculation. No material/carry/frontier publication.
+60 |     pub(crate) fn joint_rounding_modulus(&self,plan:&super::material_ray::rounding::DeclaredJointModulus,
+   |                   ^^^^^^^^^^^^^^^^^^^^^^
+...
+81 |     pub(crate) fn publish_contact_carry_with_history(self,charts:&mut Charts,
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `NativeCompletedPublication` is never constructed
+   --> crates/holonics/src/hnn/word/native_prediction.rs:136:33
+    |
+136 | pub(in crate::hnn::word) struct NativeCompletedPublication<'a> {
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `field`, `original`, and `published` are never used
+   --> crates/holonics/src/hnn/word/native_prediction.rs:140:33
+    |
+139 | impl NativeCompletedPublication<'_> {
+    | ----------------------------------- methods in this implementation
+140 |     pub(in crate::hnn::word) fn field(&self)->&Field{self.field}
+    |                                 ^^^^^
+141 |     pub(in crate::hnn::word) fn original(&self)->&crate::hnn::constitution::Constitution{self.original}
+    |                                 ^^^^^^^^
+142 |     pub(in crate::hnn::word) fn published(&self)->&NativeContactPublication{self.published}
+    |                                 ^^^^^^^^^
+
+warning: method `select_joint_rounding_modulus` is never used
+   --> crates/holonics/src/hnn/word/native_prediction.rs:255:19
+    |
+251 | impl NativePredictionDeclaration{
+    | -------------------------------- method in this implementation
+...
+255 |     pub(crate) fn select_joint_rounding_modulus<'a>(self,word:Word<'a>,
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: field `id` is never read
+   --> crates/holonics/src/hnn/word/native_prediction.rs:294:60
+    |
+294 | pub(in crate::hnn::word) struct ExecutedModulusSelection { id:std::sync::Arc<()> }
+    |                                 ------------------------   ^^
+    |                                 |
+    |                                 field in this struct
+
+warning: method `admits` is never used
+   --> crates/holonics/src/hnn/word/native_prediction.rs:296:33
+    |
+295 | impl ExecutedModulusSelection {
+    | ----------------------------- method in this implementation
+296 |     pub(in crate::hnn::word) fn admits(&self,plan:&super::material_ray::rounding::DeclaredJointModulus)->bool{
+    |                                 ^^^^^^
+
+warning: struct `SelectedModulusProducer` is never constructed
+   --> crates/holonics/src/hnn/word/native_prediction.rs:304:19
+    |
+304 | pub(crate) struct SelectedModulusProducer<'a> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `run_and_read` and `execute_and_read` are never used
+   --> crates/holonics/src/hnn/word/native_prediction.rs:309:19
+    |
+308 | impl<'a> SelectedModulusProducer<'a> {
+    | ------------------------------------ methods in this implementation
+309 |     pub(crate) fn run_and_read(self,bits:u32)
+    |                   ^^^^^^^^^^^^
+...
+316 |     pub(crate) fn execute_and_read(self,execution:&dyn NativePredictionExecution,
+    |                   ^^^^^^^^^^^^^^^^
+
+warning: method `into_receiving_packet` is never used
+   --> crates/holonics/src/hnn/word/native_prediction.rs:719:19
+    |
+718 | impl NativePredictionReturn {
+    | --------------------------- method in this implementation
+719 |     pub(crate) fn into_receiving_packet(self) -> Result<NativeRPacket, HnnError> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `num_traits::Zero`
+  --> crates/holonics-cuda/src/hnn/observed.rs:14:5
+   |
+14 | use num_traits::Zero;
+   |     ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics-cuda` (lib) generated 1 warning (run `cargo fix --lib -p holonics-cuda` to apply 1 suggestion)
+warning: `holonics` (lib) generated 75 warnings (run `cargo fix --lib -p holonics` to apply 9 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.72s
+     Running tests/tower_pass.rs (target/debug/deps/tower_pass-920638f32b663ba1)
+
+running 1 test
+test the_cards_motive_is_the_hosts_for_thirty_two_sections ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 46 filtered out; finished in 17.62s
+
+MEASURE lap=motive-test rc=0 wall_s=33.5 peak_rss_kib=2822864

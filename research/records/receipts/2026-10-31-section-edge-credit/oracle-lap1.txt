@@ -1,0 +1,170 @@
+OPENING_RETURN_OPEN material=553473 levels=6 news_first=4 streams=320 section=128 B=16 handful=16 chosen=[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300] lengths=[1, 2, 4] card=NVIDIA GeForce RTX 4080 SUPER
+OPENING_RETURN_CARRIED sections=16 ms=519
+OPENING_RETURN_CHECK compared_every_equals_none=true
+OPENING_RETURN_SPAN level=0 slowest_span_ticks=197
+OPENING_RETURN_SPAN level=1 slowest_span_ticks=238
+OPENING_RETURN_SPAN level=2 slowest_span_ticks=224
+OPENING_RETURN_SPAN level=3 slowest_span_ticks=285
+OPENING_RETURN_SPAN level=4 slowest_span_ticks=301
+OPENING_RETURN_SPAN level=5 slowest_span_ticks=302
+OPENING_RETURN_A sections=1 faces_of_B_equal=true credited_faces_of_B_equal=true ms=267
+OPENING_RETURN A=1 level=none family=encoding entries=16448 gB_octave=31 omitted_over_gB_thousandths=263 cosine_thousandths=971 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=665 cosine_thousandths=884 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=push entries=16384 gB_octave=48 omitted_over_gB_thousandths=341 cosine_thousandths=954 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=read entries=16384 gB_octave=49 omitted_over_gB_thousandths=171 cosine_thousandths=986 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=contacts entries=16640 gB_octave=49 omitted_over_gB_thousandths=150 cosine_thousandths=988 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=return entries=16448 gB_octave=49 omitted_over_gB_thousandths=180 cosine_thousandths=984 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=0 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=193 cosine_thousandths=982 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=moves entries=256 gB_octave=57 omitted_over_gB_thousandths=768 cosine_thousandths=943 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=313 cosine_thousandths=959 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=read entries=16384 gB_octave=48 omitted_over_gB_thousandths=80 cosine_thousandths=996 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=95 cosine_thousandths=995 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=143 cosine_thousandths=990 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=1 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=111 cosine_thousandths=993 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=1485 cosine_thousandths=861 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=433 cosine_thousandths=938 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=read entries=16384 gB_octave=47 omitted_over_gB_thousandths=43 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=47 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=80 cosine_thousandths=996 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=2 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=170 cosine_thousandths=986 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=moves entries=256 gB_octave=55 omitted_over_gB_thousandths=1075 cosine_thousandths=867 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=715 cosine_thousandths=930 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=read entries=16384 gB_octave=45 omitted_over_gB_thousandths=537 cosine_thousandths=930 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=contacts entries=16640 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=return entries=16448 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=3 family=gate entries=8320 gB_octave=44 omitted_over_gB_thousandths=773 cosine_thousandths=870 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=moves entries=256 gB_octave=56 omitted_over_gB_thousandths=900 cosine_thousandths=957 credit_left_over_omitted_thousandths=2 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=4 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=704 cosine_thousandths=896 credit_left_over_omitted_thousandths=35 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=4 family=read entries=16384 gB_octave=44 omitted_over_gB_thousandths=20 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=contacts entries=16640 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=return entries=16448 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=gate entries=8320 gB_octave=43 omitted_over_gB_thousandths=875 cosine_thousandths=912 credit_left_over_omitted_thousandths=10 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=5 family=moves entries=256 gB_octave=51 omitted_over_gB_thousandths=1445 cosine_thousandths=897 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=5 family=push entries=16384 gB_octave=39 omitted_over_gB_thousandths=858 cosine_thousandths=845 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=5 family=read entries=16384 gB_octave=41 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=contacts entries=16640 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=return entries=16448 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=gate entries=8320 gB_octave=38 omitted_over_gB_thousandths=715 cosine_thousandths=882 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=1 level=none family=readout entries=16705 gB_octave=50 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=heading entries=16384 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=4 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=heading entries=16384 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=1 level=5 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=none slowest_span_ticks=none omitted_over_gB_thousandths=0 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=0 slowest_span_ticks=197 omitted_over_gB_thousandths=665 cosine_thousandths=884 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=1 slowest_span_ticks=238 omitted_over_gB_thousandths=768 cosine_thousandths=943 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=2 slowest_span_ticks=224 omitted_over_gB_thousandths=1485 cosine_thousandths=861 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=3 slowest_span_ticks=285 omitted_over_gB_thousandths=1075 cosine_thousandths=867 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=1 level=4 slowest_span_ticks=301 omitted_over_gB_thousandths=900 cosine_thousandths=957 credit_left_over_omitted_thousandths=2 credit_cosine_thousandths=999
+OPENING_RETURN_LEVEL A=1 level=5 slowest_span_ticks=302 omitted_over_gB_thousandths=1438 cosine_thousandths=896 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN_WHOLE A=1 omitted_over_gB_thousandths=1013 cosine_thousandths=859 credit_left_over_omitted_thousandths=990 credit_cosine_thousandths=135
+OPENING_RETURN_A sections=2 faces_of_B_equal=true credited_faces_of_B_equal=true ms=335
+OPENING_RETURN A=2 level=none family=encoding entries=16448 gB_octave=31 omitted_over_gB_thousandths=341 cosine_thousandths=955 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=1102 cosine_thousandths=774 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=push entries=16384 gB_octave=48 omitted_over_gB_thousandths=474 cosine_thousandths=920 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=read entries=16384 gB_octave=49 omitted_over_gB_thousandths=188 cosine_thousandths=983 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=contacts entries=16640 gB_octave=49 omitted_over_gB_thousandths=170 cosine_thousandths=985 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=return entries=16448 gB_octave=49 omitted_over_gB_thousandths=222 cosine_thousandths=977 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=0 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=262 cosine_thousandths=969 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=moves entries=256 gB_octave=57 omitted_over_gB_thousandths=1294 cosine_thousandths=896 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=403 cosine_thousandths=938 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=read entries=16384 gB_octave=48 omitted_over_gB_thousandths=93 cosine_thousandths=995 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=116 cosine_thousandths=993 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=176 cosine_thousandths=985 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=1 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=119 cosine_thousandths=992 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=2588 cosine_thousandths=802 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=578 cosine_thousandths=903 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=read entries=16384 gB_octave=47 omitted_over_gB_thousandths=50 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=55 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=89 cosine_thousandths=996 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=2 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=205 cosine_thousandths=981 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=moves entries=256 gB_octave=55 omitted_over_gB_thousandths=1205 cosine_thousandths=845 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=735 cosine_thousandths=923 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=read entries=16384 gB_octave=45 omitted_over_gB_thousandths=572 cosine_thousandths=922 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=contacts entries=16640 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=return entries=16448 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=3 family=gate entries=8320 gB_octave=44 omitted_over_gB_thousandths=786 cosine_thousandths=863 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=moves entries=256 gB_octave=56 omitted_over_gB_thousandths=1324 cosine_thousandths=925 credit_left_over_omitted_thousandths=3 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=4 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=1036 cosine_thousandths=828 credit_left_over_omitted_thousandths=39 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=4 family=read entries=16384 gB_octave=44 omitted_over_gB_thousandths=33 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=contacts entries=16640 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=return entries=16448 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=gate entries=8320 gB_octave=43 omitted_over_gB_thousandths=917 cosine_thousandths=899 credit_left_over_omitted_thousandths=19 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=5 family=moves entries=256 gB_octave=51 omitted_over_gB_thousandths=2404 cosine_thousandths=854 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=5 family=push entries=16384 gB_octave=39 omitted_over_gB_thousandths=1231 cosine_thousandths=764 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=5 family=read entries=16384 gB_octave=41 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=contacts entries=16640 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=return entries=16448 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=gate entries=8320 gB_octave=38 omitted_over_gB_thousandths=1692 cosine_thousandths=778 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=2 level=none family=readout entries=16705 gB_octave=50 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=heading entries=16384 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=4 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=heading entries=16384 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=2 level=5 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=none slowest_span_ticks=none omitted_over_gB_thousandths=0 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=0 slowest_span_ticks=197 omitted_over_gB_thousandths=1102 cosine_thousandths=774 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=1 slowest_span_ticks=238 omitted_over_gB_thousandths=1294 cosine_thousandths=896 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=2 slowest_span_ticks=224 omitted_over_gB_thousandths=2588 cosine_thousandths=802 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=3 slowest_span_ticks=285 omitted_over_gB_thousandths=1205 cosine_thousandths=845 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=2 level=4 slowest_span_ticks=301 omitted_over_gB_thousandths=1324 cosine_thousandths=925 credit_left_over_omitted_thousandths=3 credit_cosine_thousandths=999
+OPENING_RETURN_LEVEL A=2 level=5 slowest_span_ticks=302 omitted_over_gB_thousandths=2393 cosine_thousandths=852 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN_WHOLE A=2 omitted_over_gB_thousandths=1733 cosine_thousandths=765 credit_left_over_omitted_thousandths=993 credit_cosine_thousandths=116
+OPENING_RETURN_A sections=4 faces_of_B_equal=true credited_faces_of_B_equal=true ms=479
+OPENING_RETURN A=4 level=none family=encoding entries=16448 gB_octave=31 omitted_over_gB_thousandths=396 cosine_thousandths=942 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=1429 cosine_thousandths=701 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=push entries=16384 gB_octave=48 omitted_over_gB_thousandths=585 cosine_thousandths=888 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=read entries=16384 gB_octave=49 omitted_over_gB_thousandths=197 cosine_thousandths=981 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=contacts entries=16640 gB_octave=49 omitted_over_gB_thousandths=184 cosine_thousandths=983 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=return entries=16448 gB_octave=49 omitted_over_gB_thousandths=252 cosine_thousandths=971 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=0 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=308 cosine_thousandths=959 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=moves entries=256 gB_octave=57 omitted_over_gB_thousandths=2089 cosine_thousandths=821 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=487 cosine_thousandths=914 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=read entries=16384 gB_octave=48 omitted_over_gB_thousandths=107 cosine_thousandths=994 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=134 cosine_thousandths=991 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=202 cosine_thousandths=981 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=1 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=129 cosine_thousandths=991 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=moves entries=256 gB_octave=58 omitted_over_gB_thousandths=3759 cosine_thousandths=770 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=push entries=16384 gB_octave=47 omitted_over_gB_thousandths=682 cosine_thousandths=876 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=read entries=16384 gB_octave=47 omitted_over_gB_thousandths=51 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=contacts entries=16640 gB_octave=47 omitted_over_gB_thousandths=57 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=return entries=16448 gB_octave=47 omitted_over_gB_thousandths=94 cosine_thousandths=995 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=2 family=gate entries=8320 gB_octave=47 omitted_over_gB_thousandths=227 cosine_thousandths=976 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=moves entries=256 gB_octave=55 omitted_over_gB_thousandths=1343 cosine_thousandths=815 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=771 cosine_thousandths=914 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=read entries=16384 gB_octave=45 omitted_over_gB_thousandths=633 cosine_thousandths=905 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=contacts entries=16640 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=return entries=16448 gB_octave=44 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=3 family=gate entries=8320 gB_octave=44 omitted_over_gB_thousandths=814 cosine_thousandths=853 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=moves entries=256 gB_octave=56 omitted_over_gB_thousandths=1959 cosine_thousandths=868 credit_left_over_omitted_thousandths=3 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=4 family=push entries=16384 gB_octave=44 omitted_over_gB_thousandths=1462 cosine_thousandths=745 credit_left_over_omitted_thousandths=40 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=4 family=read entries=16384 gB_octave=44 omitted_over_gB_thousandths=46 cosine_thousandths=998 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=contacts entries=16640 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=return entries=16448 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=gate entries=8320 gB_octave=43 omitted_over_gB_thousandths=961 cosine_thousandths=881 credit_left_over_omitted_thousandths=28 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=5 family=moves entries=256 gB_octave=51 omitted_over_gB_thousandths=3429 cosine_thousandths=787 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=5 family=push entries=16384 gB_octave=39 omitted_over_gB_thousandths=1776 cosine_thousandths=639 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=5 family=read entries=16384 gB_octave=41 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=contacts entries=16640 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=return entries=16448 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=gate entries=8320 gB_octave=38 omitted_over_gB_thousandths=2553 cosine_thousandths=698 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN A=4 level=none family=readout entries=16705 gB_octave=50 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=passage entries=16384 gB_octave=46 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=heading entries=16384 gB_octave=45 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=4 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=heading entries=16384 gB_octave=43 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN A=4 level=5 family=descent entries=4096 gB_octave=48 omitted_over_gB_thousandths=0 cosine_thousandths=1000 credit_left_over_omitted_thousandths=none credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=none slowest_span_ticks=none omitted_over_gB_thousandths=0 cosine_thousandths=999 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=0 slowest_span_ticks=197 omitted_over_gB_thousandths=1429 cosine_thousandths=701 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=1 slowest_span_ticks=238 omitted_over_gB_thousandths=2089 cosine_thousandths=821 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=2 slowest_span_ticks=224 omitted_over_gB_thousandths=3759 cosine_thousandths=770 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=3 slowest_span_ticks=285 omitted_over_gB_thousandths=1343 cosine_thousandths=815 credit_left_over_omitted_thousandths=1000 credit_cosine_thousandths=none
+OPENING_RETURN_LEVEL A=4 level=4 slowest_span_ticks=301 omitted_over_gB_thousandths=1959 cosine_thousandths=868 credit_left_over_omitted_thousandths=3 credit_cosine_thousandths=999
+OPENING_RETURN_LEVEL A=4 level=5 slowest_span_ticks=302 omitted_over_gB_thousandths=3412 cosine_thousandths=785 credit_left_over_omitted_thousandths=0 credit_cosine_thousandths=999
+OPENING_RETURN_WHOLE A=4 omitted_over_gB_thousandths=2480 cosine_thousandths=701 credit_left_over_omitted_thousandths=992 credit_cosine_thousandths=120
+OPENING_RETURN_DONE card_forwards=20 card_forward_ms=904 card_reverses=5 card_reverse_ms=114 elapsed_ms=2007
+MEASURE lap=lap1 rc=0 wall_s=2.1 peak_rss_kib=569544

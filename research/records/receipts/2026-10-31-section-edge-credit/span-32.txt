@@ -1,0 +1,11 @@
+TOWER_COMMAND release-span-tower-classes race/cont2/every/lap0/STATE.2 803e432db844c2e581c280391c7e090805181894851a4eb25f95d6d6635f6eb1 $ROOT/.local/wt/race/.local/race/passage/PROMPTS.classes b45cf44ee3a5dd6b84e4b76c23cbab77e1816b1a903b4e7d394c445f9b6b7e3b race/span/KEYS_SPAN dc62532add8ad474bae69f088d8335b5d5314eb2ee5a92d9724e343d97d8703e 32 2 320 race/span/m32
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+CLASSES_SPAN_RELEASE prompt=0 released=32 ended=false unfinished=false spans=4 rounds=12 keys=21459 release_bits_a_class=0.731
+CLASSES_SPAN_RELEASE prompt=1 released=32 ended=false unfinished=false spans=4 rounds=4 keys=7006 release_bits_a_class=0.889
+CLASSES_SPAN_RELEASE prompt=2 released=32 ended=false unfinished=false spans=5 rounds=17 keys=26671 release_bits_a_class=1.089
+CLASSES_SPAN_RELEASE prompt=3 released=32 ended=false unfinished=false spans=7 rounds=14 keys=20402 release_bits_a_class=1.578
+CLASSES_SPAN_RELEASE prompt=4 released=32 ended=false unfinished=false spans=10 rounds=26 keys=34896 release_bits_a_class=2.197
+CLASSES_SPAN_RELEASE prompt=5 released=32 ended=false unfinished=false spans=7 rounds=33 keys=54106 release_bits_a_class=1.439
+CLASSES_SPAN_RELEASE_DONE prompts=6 agree=2 candidates=320 elapsed_ms=37757
+TOWER_CARD forwards=395 forward_ms=25854 reverses=0 reverse_ms=0 elapsed_ms=37781
+MEASURE lap=span32 rc=0 wall_s=38.0 peak_rss_kib=671364

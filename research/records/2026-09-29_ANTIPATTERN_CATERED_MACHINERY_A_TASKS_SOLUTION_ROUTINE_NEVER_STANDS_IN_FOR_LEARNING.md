@@ -50,6 +50,21 @@ from its passage. Tokenizing, encoding and recursive refinement ("thinking") are
    Its catered layers are retired once `hnn::encoding` and `hnn::prediction` land, since those
    loops are running on the same passage and must not lose their data plumbing mid-run.
 
+4. **The crib line, November 2: the third recurrence of the copier** (after the October 23 copier and the October 26
+   copy pointer of `hnn::tower::clock`). The dispersing field was handed a numeral matcher under another name: the
+   closure's copy face (§19: an unresolved site's row compared with where its own class stands among the definite
+   sites, which pulls every masked byte toward an equal byte); the clock "located" from the crib's alignment (maximal
+   equal-byte runs between an answer and its question, paired into loops, `locate_class_clock`), which hands the
+   machine the copy relation itself; the hand-set digit-clock witnesses and their readers (an anchor window, a comb
+   tuned to copy distances, a readout of the copied digit's identity), the held peaks' right-source read, and an
+   acceptance that counts first calculations copied from the question. The word **crib** laundered it, as **key**
+   laundered the store on October 26: a Bombe crib is a known plaintext, so naming the training answers a crib made
+   reading them as copies sound like inference. Retired November 2 (the dispersing field's record, §16.19). What
+   stays is the field's own kind: the per-class pace `κ = 1 + c[class]`, opening at `κ ≡ 1` and deposited by the
+   covector like every other parameter, and the release whose lock reads the field's own face. The guard this adds:
+   a word that names an inference procedure (crib, key, menu, witness) does not make a matcher an inference; any
+   part that pairs answer sites with question sites by their bytes is a copier, whatever it is called.
+
 ## What is archived
 
 Git history is the archive: the calculator at `1b374d46`, the arithmetic eggs before their

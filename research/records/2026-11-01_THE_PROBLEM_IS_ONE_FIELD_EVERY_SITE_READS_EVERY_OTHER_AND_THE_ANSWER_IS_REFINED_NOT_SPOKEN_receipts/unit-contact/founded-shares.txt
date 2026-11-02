@@ -1,0 +1,8 @@
+# the fixtures' former key stream, charts at their own scale
+FOUNDED_SHARE case=whole word sites=450 peaks=1/16 shares_on_2^-20=[0, 1, 11, 25, 1048, 2170, 2311, 3651, 4233, 4420, 8521, 16674, 25110, 52727, 358201, 579778]
+FOUNDED_SHARE case=both neighbours sites=450 peaks=0/16 shares_on_2^-20=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 30, 1417, 1518]
+FOUNDED_SHARE case=left neighbour sites=450 peaks=0/16 shares_on_2^-20=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 72, 92, 237, 324, 597]
+# a mixed key stream, probe and key at unit power
+FOUNDED_SHARE case=whole word sites=450 peaks=16/16 shares_on_2^-20=[552819, 557390, 607683, 622005, 664439, 688725, 695111, 699022, 727074, 736472, 753755, 785512, 792952, 798650, 827945, 905784]
+FOUNDED_SHARE case=both neighbours sites=450 peaks=10/16 shares_on_2^-20=[268, 10756, 51404, 121364, 154624, 167380, 204041, 205616, 210917, 255318, 262337, 293462, 379433, 467416, 578070, 690353]
+FOUNDED_SHARE case=left neighbour sites=450 peaks=3/16 shares_on_2^-20=[0, 159, 463, 1250, 1439, 2082, 8139, 10323, 10671, 11372, 17279, 85745, 131318, 150283, 211832, 297434]

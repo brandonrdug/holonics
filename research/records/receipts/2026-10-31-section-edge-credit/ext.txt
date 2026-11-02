@@ -1,0 +1,6 @@
+BIN=c39155f2afab744ad32ba64b476dd5fd4d60c3e7a12c1c943a654294cf9a8c27
+NVIDIA_SMI before credited: 23 %, 210 MHz, 405 MHz, 43, 20.57 W, P8, 1023 MiB at=2026-10-31T02:55:56Z
+RUN_END credited passes=3 deadline_s=840 rc=0 MEASURE lap=credited rc=0 wall_s=723.0 peak_rss_kib=1907388
+NVIDIA_SMI before cprime: 73 %, 2805 MHz, 11501 MHz, 56, 138.16 W, P2, 1129 MiB at=2026-10-31T03:07:59Z
+RUN_END cprime passes=3 deadline_s=760 rc=0 MEASURE lap=cprime rc=0 wall_s=641.4 peak_rss_kib=675192
+VRAM_PEAK_MIB=9511

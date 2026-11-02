@@ -1,0 +1,840 @@
+FIELD_COMMAND release-field $ROOT/.local/wt/field-card/.local/run/reading-7/train/STATE.10 6a4aca0b332983cb4a9ae9f274798fae67ce88d4c252c7edeacccb6693384c6c $ROOT/.local/wt/field-card/.local/run/reading-7/train/CODEC 3bc3d17cb3be5989e79c88960c2c00e594f4c0372d1408963ab532953a8186e1 $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/section-edge/.local/run/gsm8k/HELD128.txt 8336ed7a67a2d6d430be236ab6c50095ba86b77ece6b0ef11e921563a56edbfa 128 1229 240000 $ROOT/.local/wt/field-card/.local/run/reading-7/release
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15327952896 total=16802250752 batch_budget=10336862208
+FIELD_RELEASE_SWEEP set=free done=0 live=128 resolved=0 by_news=0 cut=0 cut_sites=0 ms=10
+FIELD_RELEASE_SWEEP set=free done=1 live=128 resolved=128 by_news=0 cut=128 cut_sites=40102 ms=336
+FIELD_RELEASE_SWEEP set=free done=2 live=128 resolved=129 by_news=127 cut=128 cut_sites=40102 ms=517
+FIELD_RELEASE_SWEEP set=free done=3 live=128 resolved=193 by_news=224 cut=128 cut_sites=40102 ms=670
+FIELD_RELEASE_SWEEP set=free done=4 live=128 resolved=255 by_news=297 cut=128 cut_sites=40102 ms=804
+FIELD_RELEASE_SWEEP set=free done=5 live=128 resolved=270 by_news=410 cut=128 cut_sites=40102 ms=968
+FIELD_RELEASE_SWEEP set=free done=6 live=128 resolved=341 by_news=501 cut=128 cut_sites=40102 ms=1118
+FIELD_RELEASE_SWEEP set=free done=7 live=128 resolved=456 by_news=580 cut=128 cut_sites=40102 ms=1259
+FIELD_RELEASE_SWEEP set=free done=8 live=128 resolved=581 by_news=643 cut=128 cut_sites=40102 ms=1389
+FIELD_RELEASE_SWEEP set=free done=9 live=128 resolved=705 by_news=699 cut=128 cut_sites=40102 ms=1515
+FIELD_RELEASE_SWEEP set=free done=10 live=128 resolved=808 by_news=764 cut=128 cut_sites=40102 ms=1648
+FIELD_RELEASE_SWEEP set=free done=11 live=128 resolved=894 by_news=838 cut=128 cut_sites=40102 ms=1785
+FIELD_RELEASE_SWEEP set=free done=12 live=128 resolved=994 by_news=900 cut=128 cut_sites=40102 ms=1912
+FIELD_RELEASE_SWEEP set=free done=13 live=128 resolved=1123 by_news=963 cut=128 cut_sites=40102 ms=2041
+FIELD_RELEASE_SWEEP set=free done=14 live=128 resolved=1255 by_news=1017 cut=128 cut_sites=40102 ms=2161
+FIELD_RELEASE_SWEEP set=free done=15 live=128 resolved=1382 by_news=1078 cut=128 cut_sites=40102 ms=2283
+FIELD_RELEASE_SWEEP set=free done=16 live=128 resolved=1481 by_news=1145 cut=128 cut_sites=40102 ms=2409
+FIELD_RELEASE_SWEEP set=free done=17 live=128 resolved=1566 by_news=1221 cut=128 cut_sites=40102 ms=2544
+FIELD_RELEASE_SWEEP set=free done=18 live=128 resolved=1657 by_news=1305 cut=128 cut_sites=40102 ms=2686
+FIELD_RELEASE_SWEEP set=free done=19 live=128 resolved=1738 by_news=1391 cut=128 cut_sites=40102 ms=2832
+FIELD_RELEASE_SWEEP set=free done=20 live=128 resolved=1817 by_news=1478 cut=128 cut_sites=40102 ms=2976
+FIELD_RELEASE_SWEEP set=free done=21 live=128 resolved=1882 by_news=1567 cut=128 cut_sites=40102 ms=3124
+FIELD_RELEASE_SWEEP set=free done=22 live=128 resolved=1943 by_news=1659 cut=128 cut_sites=40102 ms=3272
+FIELD_RELEASE_SWEEP set=free done=23 live=128 resolved=2011 by_news=1748 cut=128 cut_sites=40102 ms=3416
+FIELD_RELEASE_SWEEP set=free done=24 live=128 resolved=2091 by_news=1840 cut=128 cut_sites=40102 ms=3561
+FIELD_RELEASE_SWEEP set=free done=25 live=128 resolved=2162 by_news=1931 cut=128 cut_sites=40102 ms=3707
+FIELD_RELEASE_SWEEP set=free done=26 live=128 resolved=2246 by_news=2014 cut=128 cut_sites=40102 ms=3845
+FIELD_RELEASE_SWEEP set=free done=27 live=128 resolved=2344 by_news=2099 cut=128 cut_sites=40102 ms=3984
+FIELD_RELEASE_SWEEP set=free done=28 live=128 resolved=2447 by_news=2185 cut=128 cut_sites=40102 ms=4125
+FIELD_RELEASE_SWEEP set=free done=29 live=128 resolved=2565 by_news=2268 cut=128 cut_sites=40102 ms=4264
+FIELD_RELEASE_SWEEP set=free done=30 live=128 resolved=2670 by_news=2348 cut=128 cut_sites=40102 ms=4400
+FIELD_RELEASE_SWEEP set=free done=31 live=128 resolved=2784 by_news=2434 cut=128 cut_sites=40102 ms=4538
+FIELD_RELEASE_SWEEP set=free done=32 live=128 resolved=2892 by_news=2514 cut=128 cut_sites=40102 ms=4676
+FIELD_RELEASE_SWEEP set=free done=33 live=128 resolved=3001 by_news=2596 cut=128 cut_sites=40102 ms=4815
+FIELD_RELEASE_SWEEP set=free done=34 live=128 resolved=3101 by_news=2679 cut=128 cut_sites=40102 ms=4953
+FIELD_RELEASE_SWEEP set=free done=35 live=128 resolved=3198 by_news=2759 cut=128 cut_sites=40102 ms=5088
+FIELD_RELEASE_SWEEP set=free done=36 live=128 resolved=3285 by_news=2842 cut=128 cut_sites=40102 ms=5226
+FIELD_RELEASE_SWEEP set=free done=37 live=128 resolved=3379 by_news=2917 cut=128 cut_sites=40102 ms=5359
+FIELD_RELEASE_SWEEP set=free done=38 live=128 resolved=3475 by_news=3000 cut=128 cut_sites=40102 ms=5500
+FIELD_RELEASE_SWEEP set=free done=39 live=128 resolved=3572 by_news=3080 cut=128 cut_sites=40102 ms=5636
+FIELD_RELEASE_SWEEP set=free done=40 live=128 resolved=3686 by_news=3158 cut=128 cut_sites=40102 ms=5771
+FIELD_RELEASE_SWEEP set=free done=41 live=128 resolved=3799 by_news=3238 cut=128 cut_sites=40102 ms=5906
+FIELD_RELEASE_SWEEP set=free done=42 live=128 resolved=3908 by_news=3320 cut=128 cut_sites=40102 ms=6044
+FIELD_RELEASE_SWEEP set=free done=43 live=128 resolved=4013 by_news=3401 cut=128 cut_sites=40102 ms=6180
+FIELD_RELEASE_SWEEP set=free done=44 live=128 resolved=4153 by_news=3486 cut=128 cut_sites=40102 ms=6320
+FIELD_RELEASE_SWEEP set=free done=45 live=128 resolved=4269 by_news=3567 cut=128 cut_sites=40102 ms=6456
+FIELD_RELEASE_SWEEP set=free done=46 live=128 resolved=4393 by_news=3650 cut=128 cut_sites=40102 ms=6594
+FIELD_RELEASE_SWEEP set=free done=47 live=128 resolved=4520 by_news=3728 cut=128 cut_sites=40102 ms=6729
+FIELD_RELEASE_SWEEP set=free done=48 live=128 resolved=4652 by_news=3806 cut=128 cut_sites=40102 ms=6864
+FIELD_RELEASE_SWEEP set=free done=49 live=128 resolved=4774 by_news=3885 cut=128 cut_sites=40102 ms=6998
+FIELD_RELEASE_SWEEP set=free done=50 live=128 resolved=4898 by_news=3965 cut=128 cut_sites=40102 ms=7134
+FIELD_RELEASE_SWEEP set=free done=51 live=128 resolved=5020 by_news=4046 cut=128 cut_sites=40102 ms=7270
+FIELD_RELEASE_SWEEP set=free done=52 live=128 resolved=5156 by_news=4121 cut=128 cut_sites=40102 ms=7401
+FIELD_RELEASE_SWEEP set=free done=53 live=127 resolved=5291 by_news=4194 cut=128 cut_sites=40102 ms=7531
+FIELD_RELEASE_SWEEP set=free done=54 live=127 resolved=5448 by_news=4265 cut=128 cut_sites=40102 ms=7660
+FIELD_RELEASE_SWEEP set=free done=55 live=127 resolved=5603 by_news=4338 cut=128 cut_sites=40102 ms=7790
+FIELD_RELEASE_SWEEP set=free done=56 live=127 resolved=5728 by_news=4414 cut=128 cut_sites=40102 ms=7922
+FIELD_RELEASE_SWEEP set=free done=57 live=127 resolved=5867 by_news=4488 cut=128 cut_sites=40102 ms=8053
+FIELD_RELEASE_SWEEP set=free done=58 live=127 resolved=6009 by_news=4560 cut=128 cut_sites=40102 ms=8181
+FIELD_RELEASE_SWEEP set=free done=59 live=127 resolved=6163 by_news=4636 cut=128 cut_sites=40102 ms=8310
+FIELD_RELEASE_SWEEP set=free done=60 live=126 resolved=6320 by_news=4713 cut=128 cut_sites=40102 ms=8424
+FIELD_RELEASE_SWEEP set=free done=61 live=126 resolved=6522 by_news=4781 cut=128 cut_sites=40102 ms=8530
+FIELD_RELEASE_SWEEP set=free done=62 live=126 resolved=6699 by_news=4849 cut=128 cut_sites=40102 ms=8636
+FIELD_RELEASE_SWEEP set=free done=63 live=126 resolved=6881 by_news=4918 cut=128 cut_sites=40102 ms=8744
+FIELD_RELEASE_SWEEP set=free done=64 live=126 resolved=7027 by_news=4994 cut=128 cut_sites=40102 ms=8857
+FIELD_RELEASE_SWEEP set=free done=65 live=126 resolved=7142 by_news=5070 cut=128 cut_sites=40102 ms=8968
+FIELD_RELEASE_SWEEP set=free done=66 live=126 resolved=7282 by_news=5145 cut=128 cut_sites=40102 ms=9080
+FIELD_RELEASE_SWEEP set=free done=67 live=126 resolved=7411 by_news=5222 cut=128 cut_sites=40102 ms=9192
+FIELD_RELEASE_SWEEP set=free done=68 live=126 resolved=7535 by_news=5300 cut=128 cut_sites=40102 ms=9305
+FIELD_RELEASE_SWEEP set=free done=69 live=126 resolved=7658 by_news=5381 cut=128 cut_sites=40102 ms=9422
+FIELD_RELEASE_SWEEP set=free done=70 live=126 resolved=7772 by_news=5461 cut=128 cut_sites=40102 ms=9537
+FIELD_RELEASE_SWEEP set=free done=71 live=126 resolved=7876 by_news=5537 cut=128 cut_sites=40102 ms=9647
+FIELD_RELEASE_SWEEP set=free done=72 live=126 resolved=8006 by_news=5613 cut=128 cut_sites=40102 ms=9757
+FIELD_RELEASE_SWEEP set=free done=73 live=126 resolved=8126 by_news=5689 cut=128 cut_sites=40102 ms=9868
+FIELD_RELEASE_SWEEP set=free done=74 live=126 resolved=8232 by_news=5766 cut=128 cut_sites=40102 ms=9982
+FIELD_RELEASE_SWEEP set=free done=75 live=125 resolved=8334 by_news=5851 cut=128 cut_sites=40102 ms=10099
+FIELD_RELEASE_SWEEP set=free done=76 live=124 resolved=8440 by_news=5932 cut=128 cut_sites=40102 ms=10211
+FIELD_RELEASE_SWEEP set=free done=77 live=121 resolved=8590 by_news=6013 cut=128 cut_sites=40102 ms=10324
+FIELD_RELEASE_SWEEP set=free done=78 live=121 resolved=8748 by_news=6089 cut=128 cut_sites=40102 ms=10431
+FIELD_RELEASE_SWEEP set=free done=79 live=121 resolved=8942 by_news=6162 cut=128 cut_sites=40102 ms=10539
+FIELD_RELEASE_SWEEP set=free done=80 live=120 resolved=9113 by_news=6242 cut=128 cut_sites=40102 ms=10649
+FIELD_RELEASE_SWEEP set=free done=81 live=120 resolved=9282 by_news=6315 cut=128 cut_sites=40102 ms=10755
+FIELD_RELEASE_SWEEP set=free done=82 live=120 resolved=9489 by_news=6382 cut=128 cut_sites=40102 ms=10856
+FIELD_RELEASE_SWEEP set=free done=83 live=120 resolved=9678 by_news=6452 cut=128 cut_sites=40102 ms=10960
+FIELD_RELEASE_SWEEP set=free done=84 live=119 resolved=9863 by_news=6526 cut=128 cut_sites=40102 ms=11066
+FIELD_RELEASE_SWEEP set=free done=85 live=118 resolved=10046 by_news=6597 cut=128 cut_sites=40102 ms=11171
+FIELD_RELEASE_SWEEP set=free done=86 live=118 resolved=10255 by_news=6664 cut=128 cut_sites=40102 ms=11274
+FIELD_RELEASE_SWEEP set=free done=87 live=118 resolved=10424 by_news=6735 cut=128 cut_sites=40102 ms=11391
+FIELD_RELEASE_SWEEP set=free done=88 live=118 resolved=10593 by_news=6803 cut=128 cut_sites=40102 ms=11497
+FIELD_RELEASE_SWEEP set=free done=89 live=118 resolved=10762 by_news=6875 cut=128 cut_sites=40102 ms=11602
+FIELD_RELEASE_SWEEP set=free done=90 live=118 resolved=10940 by_news=6941 cut=128 cut_sites=40102 ms=11706
+FIELD_RELEASE_SWEEP set=free done=91 live=117 resolved=11119 by_news=7012 cut=128 cut_sites=40102 ms=11820
+FIELD_RELEASE_SWEEP set=free done=92 live=117 resolved=11298 by_news=7076 cut=128 cut_sites=40102 ms=11918
+FIELD_RELEASE_SWEEP set=free done=93 live=117 resolved=11460 by_news=7149 cut=128 cut_sites=40102 ms=12030
+FIELD_RELEASE_SWEEP set=free done=94 live=117 resolved=11657 by_news=7220 cut=128 cut_sites=40102 ms=12132
+FIELD_RELEASE_SWEEP set=free done=95 live=116 resolved=11845 by_news=7292 cut=128 cut_sites=40102 ms=12234
+FIELD_RELEASE_SWEEP set=free done=96 live=115 resolved=12015 by_news=7363 cut=128 cut_sites=40102 ms=12334
+FIELD_RELEASE_SWEEP set=free done=97 live=114 resolved=12174 by_news=7438 cut=128 cut_sites=40102 ms=12438
+FIELD_RELEASE_SWEEP set=free done=98 live=114 resolved=12330 by_news=7510 cut=128 cut_sites=40102 ms=12539
+FIELD_RELEASE_SWEEP set=free done=99 live=114 resolved=12491 by_news=7579 cut=128 cut_sites=40102 ms=12640
+FIELD_RELEASE_SWEEP set=free done=100 live=114 resolved=12636 by_news=7650 cut=128 cut_sites=40102 ms=12751
+FIELD_RELEASE_SWEEP set=free done=101 live=114 resolved=12783 by_news=7723 cut=128 cut_sites=40102 ms=12855
+FIELD_RELEASE_SWEEP set=free done=102 live=113 resolved=12920 by_news=7796 cut=128 cut_sites=40102 ms=12955
+FIELD_RELEASE_SWEEP set=free done=103 live=113 resolved=13089 by_news=7864 cut=128 cut_sites=40102 ms=13054
+FIELD_RELEASE_SWEEP set=free done=104 live=112 resolved=13235 by_news=7937 cut=128 cut_sites=40102 ms=13163
+FIELD_RELEASE_SWEEP set=free done=105 live=112 resolved=13371 by_news=8005 cut=128 cut_sites=40102 ms=13262
+FIELD_RELEASE_SWEEP set=free done=106 live=112 resolved=13512 by_news=8075 cut=128 cut_sites=40102 ms=13371
+FIELD_RELEASE_SWEEP set=free done=107 live=110 resolved=13665 by_news=8140 cut=128 cut_sites=40102 ms=13479
+FIELD_RELEASE_SWEEP set=free done=108 live=110 resolved=13817 by_news=8206 cut=128 cut_sites=40102 ms=13588
+FIELD_RELEASE_SWEEP set=free done=109 live=110 resolved=13956 by_news=8278 cut=128 cut_sites=40102 ms=13696
+FIELD_RELEASE_SWEEP set=free done=110 live=110 resolved=14082 by_news=8343 cut=128 cut_sites=40102 ms=13795
+FIELD_RELEASE_SWEEP set=free done=111 live=110 resolved=14201 by_news=8404 cut=128 cut_sites=40102 ms=13898
+FIELD_RELEASE_SWEEP set=free done=112 live=109 resolved=14322 by_news=8470 cut=128 cut_sites=40102 ms=14004
+FIELD_RELEASE_SWEEP set=free done=113 live=109 resolved=14454 by_news=8533 cut=128 cut_sites=40102 ms=14107
+FIELD_RELEASE_SWEEP set=free done=114 live=109 resolved=14564 by_news=8600 cut=128 cut_sites=40102 ms=14214
+FIELD_RELEASE_SWEEP set=free done=115 live=108 resolved=14667 by_news=8670 cut=128 cut_sites=40102 ms=14321
+FIELD_RELEASE_SWEEP set=free done=116 live=107 resolved=14797 by_news=8738 cut=128 cut_sites=40102 ms=14426
+FIELD_RELEASE_SWEEP set=free done=117 live=107 resolved=14921 by_news=8803 cut=128 cut_sites=40102 ms=14529
+FIELD_RELEASE_SWEEP set=free done=118 live=106 resolved=15013 by_news=8876 cut=128 cut_sites=40102 ms=14637
+FIELD_RELEASE_SWEEP set=free done=119 live=105 resolved=15116 by_news=8953 cut=128 cut_sites=40102 ms=14746
+FIELD_RELEASE_SWEEP set=free done=120 live=104 resolved=15210 by_news=9029 cut=128 cut_sites=40102 ms=14845
+FIELD_RELEASE_SWEEP set=free done=121 live=104 resolved=15312 by_news=9100 cut=128 cut_sites=40102 ms=14942
+FIELD_RELEASE_SWEEP set=free done=122 live=104 resolved=15414 by_news=9166 cut=128 cut_sites=40102 ms=15044
+FIELD_RELEASE_SWEEP set=free done=123 live=103 resolved=15505 by_news=9239 cut=128 cut_sites=40102 ms=15148
+FIELD_RELEASE_SWEEP set=free done=124 live=103 resolved=15591 by_news=9310 cut=128 cut_sites=40102 ms=15254
+FIELD_RELEASE_SWEEP set=free done=125 live=103 resolved=15681 by_news=9378 cut=128 cut_sites=40102 ms=15357
+FIELD_RELEASE_SWEEP set=free done=126 live=102 resolved=15760 by_news=9452 cut=128 cut_sites=40102 ms=15463
+FIELD_RELEASE_SWEEP set=free done=127 live=101 resolved=15833 by_news=9524 cut=128 cut_sites=40102 ms=15567
+FIELD_RELEASE_SWEEP set=free done=128 live=101 resolved=15891 by_news=9592 cut=128 cut_sites=40102 ms=15668
+FIELD_RELEASE_SWEEP set=free done=129 live=100 resolved=15957 by_news=9667 cut=128 cut_sites=40102 ms=15773
+FIELD_RELEASE_SWEEP set=free done=130 live=99 resolved=16030 by_news=9733 cut=128 cut_sites=40102 ms=15872
+FIELD_RELEASE_SWEEP set=free done=131 live=99 resolved=16080 by_news=9803 cut=128 cut_sites=40102 ms=15973
+FIELD_RELEASE_SWEEP set=free done=132 live=99 resolved=16133 by_news=9875 cut=128 cut_sites=40102 ms=16075
+FIELD_RELEASE_SWEEP set=free done=133 live=99 resolved=16178 by_news=9955 cut=128 cut_sites=40102 ms=16181
+FIELD_RELEASE_SWEEP set=free done=134 live=98 resolved=16236 by_news=10023 cut=128 cut_sites=40102 ms=16274
+FIELD_RELEASE_SWEEP set=free done=135 live=98 resolved=16301 by_news=10096 cut=128 cut_sites=40102 ms=16376
+FIELD_RELEASE_SWEEP set=free done=136 live=97 resolved=16358 by_news=10167 cut=128 cut_sites=40102 ms=16478
+FIELD_RELEASE_SWEEP set=free done=137 live=95 resolved=16424 by_news=10238 cut=128 cut_sites=40102 ms=16579
+FIELD_RELEASE_SWEEP set=free done=138 live=95 resolved=16455 by_news=10313 cut=128 cut_sites=40102 ms=16680
+FIELD_RELEASE_SWEEP set=free done=139 live=95 resolved=16484 by_news=10392 cut=128 cut_sites=40102 ms=16784
+FIELD_RELEASE_SWEEP set=free done=140 live=95 resolved=16530 by_news=10464 cut=128 cut_sites=40102 ms=16876
+FIELD_RELEASE_SWEEP set=free done=141 live=92 resolved=16560 by_news=10542 cut=128 cut_sites=40102 ms=16978
+FIELD_RELEASE_SWEEP set=free done=142 live=92 resolved=16611 by_news=10611 cut=128 cut_sites=40102 ms=17074
+FIELD_RELEASE_SWEEP set=free done=143 live=92 resolved=16657 by_news=10677 cut=128 cut_sites=40102 ms=17169
+FIELD_RELEASE_SWEEP set=free done=144 live=92 resolved=16695 by_news=10751 cut=128 cut_sites=40102 ms=17268
+FIELD_RELEASE_SWEEP set=free done=145 live=92 resolved=16744 by_news=10818 cut=128 cut_sites=40102 ms=17369
+FIELD_RELEASE_SWEEP set=free done=146 live=92 resolved=16780 by_news=10885 cut=128 cut_sites=40102 ms=17466
+FIELD_RELEASE_SWEEP set=free done=147 live=90 resolved=16814 by_news=10957 cut=128 cut_sites=40102 ms=17566
+FIELD_RELEASE_SWEEP set=free done=148 live=88 resolved=16850 by_news=11027 cut=128 cut_sites=40102 ms=17664
+FIELD_RELEASE_SWEEP set=free done=149 live=88 resolved=16885 by_news=11095 cut=128 cut_sites=40102 ms=17760
+FIELD_RELEASE_SWEEP set=free done=150 live=88 resolved=16911 by_news=11166 cut=128 cut_sites=40102 ms=17856
+FIELD_RELEASE_SWEEP set=free done=151 live=88 resolved=16955 by_news=11233 cut=128 cut_sites=40102 ms=17949
+FIELD_RELEASE_SWEEP set=free done=152 live=87 resolved=16997 by_news=11303 cut=128 cut_sites=40102 ms=18045
+FIELD_RELEASE_SWEEP set=free done=153 live=85 resolved=17027 by_news=11374 cut=128 cut_sites=40102 ms=18140
+FIELD_RELEASE_SWEEP set=free done=154 live=85 resolved=17064 by_news=11441 cut=128 cut_sites=40102 ms=18231
+FIELD_RELEASE_SWEEP set=free done=155 live=85 resolved=17085 by_news=11513 cut=128 cut_sites=40102 ms=18326
+FIELD_RELEASE_SWEEP set=free done=156 live=85 resolved=17125 by_news=11578 cut=128 cut_sites=40102 ms=18419
+FIELD_RELEASE_SWEEP set=free done=157 live=85 resolved=17161 by_news=11642 cut=128 cut_sites=40102 ms=18508
+FIELD_RELEASE_SWEEP set=free done=158 live=85 resolved=17187 by_news=11710 cut=128 cut_sites=40102 ms=18600
+FIELD_RELEASE_SWEEP set=free done=159 live=85 resolved=17223 by_news=11775 cut=128 cut_sites=40102 ms=18691
+FIELD_RELEASE_SWEEP set=free done=160 live=85 resolved=17253 by_news=11843 cut=128 cut_sites=40102 ms=18780
+FIELD_RELEASE_SWEEP set=free done=161 live=85 resolved=17283 by_news=11912 cut=128 cut_sites=40102 ms=18872
+FIELD_RELEASE_SWEEP set=free done=162 live=85 resolved=17316 by_news=11977 cut=128 cut_sites=40102 ms=18961
+FIELD_RELEASE_SWEEP set=free done=163 live=85 resolved=17346 by_news=12039 cut=128 cut_sites=40102 ms=19049
+FIELD_RELEASE_SWEEP set=free done=164 live=85 resolved=17378 by_news=12099 cut=128 cut_sites=40102 ms=19135
+FIELD_RELEASE_SWEEP set=free done=165 live=84 resolved=17403 by_news=12166 cut=128 cut_sites=40102 ms=19227
+FIELD_RELEASE_SWEEP set=free done=166 live=83 resolved=17421 by_news=12236 cut=128 cut_sites=40102 ms=19318
+FIELD_RELEASE_SWEEP set=free done=167 live=83 resolved=17448 by_news=12297 cut=128 cut_sites=40102 ms=19403
+FIELD_RELEASE_SWEEP set=free done=168 live=83 resolved=17472 by_news=12363 cut=128 cut_sites=40102 ms=19493
+FIELD_RELEASE_SWEEP set=free done=169 live=83 resolved=17496 by_news=12430 cut=128 cut_sites=40102 ms=19581
+FIELD_RELEASE_SWEEP set=free done=170 live=83 resolved=17523 by_news=12493 cut=128 cut_sites=40102 ms=19666
+FIELD_RELEASE_SWEEP set=free done=171 live=83 resolved=17556 by_news=12553 cut=128 cut_sites=40102 ms=19749
+FIELD_RELEASE_SWEEP set=free done=172 live=83 resolved=17582 by_news=12616 cut=128 cut_sites=40102 ms=19835
+FIELD_RELEASE_SWEEP set=free done=173 live=83 resolved=17596 by_news=12686 cut=128 cut_sites=40102 ms=19924
+FIELD_RELEASE_SWEEP set=free done=174 live=82 resolved=17622 by_news=12748 cut=128 cut_sites=40102 ms=20010
+FIELD_RELEASE_SWEEP set=free done=175 live=82 resolved=17649 by_news=12807 cut=128 cut_sites=40102 ms=20094
+FIELD_RELEASE_SWEEP set=free done=176 live=82 resolved=17671 by_news=12872 cut=128 cut_sites=40102 ms=20180
+FIELD_RELEASE_SWEEP set=free done=177 live=82 resolved=17687 by_news=12942 cut=128 cut_sites=40102 ms=20270
+FIELD_RELEASE_SWEEP set=free done=178 live=82 resolved=17709 by_news=13008 cut=128 cut_sites=40102 ms=20358
+FIELD_RELEASE_SWEEP set=free done=179 live=82 resolved=17737 by_news=13073 cut=128 cut_sites=40102 ms=20447
+FIELD_RELEASE_SWEEP set=free done=180 live=82 resolved=17745 by_news=13147 cut=128 cut_sites=40102 ms=20540
+FIELD_RELEASE_SWEEP set=free done=181 live=82 resolved=17771 by_news=13210 cut=128 cut_sites=40102 ms=20625
+FIELD_RELEASE_SWEEP set=free done=182 live=82 resolved=17797 by_news=13274 cut=128 cut_sites=40102 ms=20709
+FIELD_RELEASE_SWEEP set=free done=183 live=82 resolved=17816 by_news=13341 cut=128 cut_sites=40102 ms=20795
+FIELD_RELEASE_SWEEP set=free done=184 live=82 resolved=17835 by_news=13409 cut=128 cut_sites=40102 ms=20883
+FIELD_RELEASE_SWEEP set=free done=185 live=82 resolved=17856 by_news=13475 cut=128 cut_sites=40102 ms=20969
+FIELD_RELEASE_SWEEP set=free done=186 live=82 resolved=17883 by_news=13539 cut=128 cut_sites=40102 ms=21054
+FIELD_RELEASE_SWEEP set=free done=187 live=82 resolved=17899 by_news=13608 cut=128 cut_sites=40102 ms=21141
+FIELD_RELEASE_SWEEP set=free done=188 live=82 resolved=17928 by_news=13666 cut=128 cut_sites=40102 ms=21221
+FIELD_RELEASE_SWEEP set=free done=189 live=82 resolved=17948 by_news=13732 cut=128 cut_sites=40102 ms=21304
+FIELD_RELEASE_SWEEP set=free done=190 live=80 resolved=17974 by_news=13792 cut=128 cut_sites=40102 ms=21388
+FIELD_RELEASE_SWEEP set=free done=191 live=79 resolved=17992 by_news=13857 cut=128 cut_sites=40102 ms=21474
+FIELD_RELEASE_SWEEP set=free done=192 live=79 resolved=18020 by_news=13914 cut=128 cut_sites=40102 ms=21555
+FIELD_RELEASE_SWEEP set=free done=193 live=79 resolved=18046 by_news=13971 cut=128 cut_sites=40102 ms=21630
+FIELD_RELEASE_SWEEP set=free done=194 live=79 resolved=18068 by_news=14030 cut=128 cut_sites=40102 ms=21705
+FIELD_RELEASE_SWEEP set=free done=195 live=78 resolved=18086 by_news=14093 cut=128 cut_sites=40102 ms=21781
+FIELD_RELEASE_SWEEP set=free done=196 live=78 resolved=18103 by_news=14155 cut=128 cut_sites=40102 ms=21860
+FIELD_RELEASE_SWEEP set=free done=197 live=78 resolved=18119 by_news=14222 cut=128 cut_sites=40102 ms=21939
+FIELD_RELEASE_SWEEP set=free done=198 live=78 resolved=18140 by_news=14285 cut=128 cut_sites=40102 ms=22018
+FIELD_RELEASE_SWEEP set=free done=199 live=78 resolved=18164 by_news=14345 cut=128 cut_sites=40102 ms=22090
+FIELD_RELEASE_SWEEP set=free done=200 live=78 resolved=18191 by_news=14406 cut=128 cut_sites=40102 ms=22168
+FIELD_RELEASE_SWEEP set=free done=201 live=78 resolved=18228 by_news=14462 cut=128 cut_sites=40102 ms=22239
+FIELD_RELEASE_SWEEP set=free done=202 live=78 resolved=18259 by_news=14524 cut=128 cut_sites=40102 ms=22317
+FIELD_RELEASE_SWEEP set=free done=203 live=78 resolved=18287 by_news=14588 cut=128 cut_sites=40102 ms=22391
+FIELD_RELEASE_SWEEP set=free done=204 live=78 resolved=18306 by_news=14651 cut=128 cut_sites=40102 ms=22471
+FIELD_RELEASE_SWEEP set=free done=205 live=78 resolved=18329 by_news=14714 cut=128 cut_sites=40102 ms=22546
+FIELD_RELEASE_SWEEP set=free done=206 live=78 resolved=18345 by_news=14779 cut=128 cut_sites=40102 ms=22628
+FIELD_RELEASE_SWEEP set=free done=207 live=78 resolved=18356 by_news=14846 cut=128 cut_sites=40102 ms=22705
+FIELD_RELEASE_SWEEP set=free done=208 live=78 resolved=18374 by_news=14910 cut=128 cut_sites=40102 ms=22782
+FIELD_RELEASE_SWEEP set=free done=209 live=78 resolved=18389 by_news=14976 cut=128 cut_sites=40102 ms=22858
+FIELD_RELEASE_SWEEP set=free done=210 live=77 resolved=18402 by_news=15042 cut=128 cut_sites=40102 ms=22938
+FIELD_RELEASE_SWEEP set=free done=211 live=77 resolved=18421 by_news=15103 cut=128 cut_sites=40102 ms=23010
+FIELD_RELEASE_SWEEP set=free done=212 live=77 resolved=18429 by_news=15173 cut=128 cut_sites=40102 ms=23092
+FIELD_RELEASE_SWEEP set=free done=213 live=77 resolved=18441 by_news=15239 cut=128 cut_sites=40102 ms=23166
+FIELD_RELEASE_SWEEP set=free done=214 live=77 resolved=18453 by_news=15308 cut=128 cut_sites=40102 ms=23248
+FIELD_RELEASE_SWEEP set=free done=215 live=77 resolved=18464 by_news=15376 cut=128 cut_sites=40102 ms=23324
+FIELD_RELEASE_SWEEP set=free done=216 live=77 resolved=18471 by_news=15446 cut=128 cut_sites=40102 ms=23405
+FIELD_RELEASE_SWEEP set=free done=217 live=77 resolved=18483 by_news=15513 cut=128 cut_sites=40102 ms=23480
+FIELD_RELEASE_SWEEP set=free done=218 live=77 resolved=18497 by_news=15578 cut=128 cut_sites=40102 ms=23559
+FIELD_RELEASE_SWEEP set=free done=219 live=77 resolved=18504 by_news=15648 cut=128 cut_sites=40102 ms=23636
+FIELD_RELEASE_SWEEP set=free done=220 live=77 resolved=18518 by_news=15715 cut=128 cut_sites=40102 ms=23714
+FIELD_RELEASE_SWEEP set=free done=221 live=77 resolved=18526 by_news=15789 cut=128 cut_sites=40102 ms=23795
+FIELD_RELEASE_SWEEP set=free done=222 live=77 resolved=18535 by_news=15859 cut=128 cut_sites=40102 ms=23876
+FIELD_RELEASE_SWEEP set=free done=223 live=77 resolved=18548 by_news=15925 cut=128 cut_sites=40102 ms=23950
+FIELD_RELEASE_SWEEP set=free done=224 live=76 resolved=18559 by_news=15992 cut=128 cut_sites=40102 ms=24029
+FIELD_RELEASE_SWEEP set=free done=225 live=76 resolved=18568 by_news=16060 cut=128 cut_sites=40102 ms=24104
+FIELD_RELEASE_SWEEP set=free done=226 live=76 resolved=18577 by_news=16128 cut=128 cut_sites=40102 ms=24182
+FIELD_RELEASE_SWEEP set=free done=227 live=76 resolved=18591 by_news=16190 cut=128 cut_sites=40102 ms=24253
+FIELD_RELEASE_SWEEP set=free done=228 live=76 resolved=18599 by_news=16259 cut=128 cut_sites=40102 ms=24332
+FIELD_RELEASE_SWEEP set=free done=229 live=76 resolved=18607 by_news=16328 cut=128 cut_sites=40102 ms=24407
+FIELD_RELEASE_SWEEP set=free done=230 live=75 resolved=18620 by_news=16394 cut=128 cut_sites=40102 ms=24484
+FIELD_RELEASE_SWEEP set=free done=231 live=74 resolved=18625 by_news=16464 cut=128 cut_sites=40102 ms=24560
+FIELD_RELEASE_SWEEP set=free done=232 live=74 resolved=18630 by_news=16534 cut=128 cut_sites=40102 ms=24638
+FIELD_RELEASE_SWEEP set=free done=233 live=74 resolved=18637 by_news=16603 cut=128 cut_sites=40102 ms=24712
+FIELD_RELEASE_SWEEP set=free done=234 live=74 resolved=18650 by_news=16666 cut=128 cut_sites=40102 ms=24786
+FIELD_RELEASE_SWEEP set=free done=235 live=73 resolved=18657 by_news=16734 cut=128 cut_sites=40102 ms=24860
+FIELD_RELEASE_SWEEP set=free done=236 live=72 resolved=18661 by_news=16803 cut=128 cut_sites=40102 ms=24937
+FIELD_RELEASE_SWEEP set=free done=237 live=72 resolved=18664 by_news=16872 cut=128 cut_sites=40102 ms=25011
+FIELD_RELEASE_SWEEP set=free done=238 live=72 resolved=18670 by_news=16938 cut=128 cut_sites=40102 ms=25087
+FIELD_RELEASE_SWEEP set=free done=239 live=72 resolved=18683 by_news=17000 cut=128 cut_sites=40102 ms=25155
+FIELD_RELEASE_SWEEP set=free done=240 live=72 resolved=18692 by_news=17065 cut=128 cut_sites=40102 ms=25229
+FIELD_RELEASE_SWEEP set=free done=241 live=72 resolved=18702 by_news=17128 cut=128 cut_sites=40102 ms=25298
+FIELD_RELEASE_SWEEP set=free done=242 live=72 resolved=18708 by_news=17196 cut=128 cut_sites=40102 ms=25373
+FIELD_RELEASE_SWEEP set=free done=243 live=72 resolved=18717 by_news=17261 cut=128 cut_sites=40102 ms=25445
+FIELD_RELEASE_SWEEP set=free done=244 live=72 resolved=18721 by_news=17329 cut=128 cut_sites=40102 ms=25520
+FIELD_RELEASE_SWEEP set=free done=245 live=71 resolved=18726 by_news=17396 cut=128 cut_sites=40102 ms=25593
+FIELD_RELEASE_SWEEP set=free done=246 live=71 resolved=18734 by_news=17461 cut=128 cut_sites=40102 ms=25666
+FIELD_RELEASE_SWEEP set=free done=247 live=71 resolved=18744 by_news=17524 cut=128 cut_sites=40102 ms=25737
+FIELD_RELEASE_SWEEP set=free done=248 live=71 resolved=18751 by_news=17588 cut=128 cut_sites=40102 ms=25809
+FIELD_RELEASE_SWEEP set=free done=249 live=71 resolved=18756 by_news=17655 cut=128 cut_sites=40102 ms=25882
+FIELD_RELEASE_SWEEP set=free done=250 live=70 resolved=18764 by_news=17719 cut=128 cut_sites=40102 ms=25953
+FIELD_RELEASE_SWEEP set=free done=251 live=70 resolved=18769 by_news=17784 cut=128 cut_sites=40102 ms=26024
+FIELD_RELEASE_SWEEP set=free done=252 live=70 resolved=18772 by_news=17851 cut=128 cut_sites=40102 ms=26099
+FIELD_RELEASE_SWEEP set=free done=253 live=70 resolved=18779 by_news=17915 cut=128 cut_sites=40102 ms=26167
+FIELD_RELEASE_SWEEP set=free done=254 live=70 resolved=18781 by_news=17983 cut=128 cut_sites=40102 ms=26242
+FIELD_RELEASE_SWEEP set=free done=255 live=70 resolved=18782 by_news=18052 cut=128 cut_sites=40102 ms=26316
+FIELD_RELEASE_SWEEP set=free done=256 live=69 resolved=18789 by_news=18116 cut=128 cut_sites=40102 ms=26388
+FIELD_RELEASE_SWEEP set=free done=257 live=69 resolved=18794 by_news=18181 cut=128 cut_sites=40102 ms=26462
+FIELD_RELEASE_SWEEP set=free done=258 live=69 resolved=18797 by_news=18247 cut=128 cut_sites=40102 ms=26538
+FIELD_RELEASE_SWEEP set=free done=259 live=69 resolved=18802 by_news=18311 cut=128 cut_sites=40102 ms=26610
+FIELD_RELEASE_SWEEP set=free done=260 live=69 resolved=18805 by_news=18377 cut=128 cut_sites=40102 ms=26685
+FIELD_RELEASE_SWEEP set=free done=261 live=68 resolved=18807 by_news=18444 cut=128 cut_sites=40102 ms=26757
+FIELD_RELEASE_SWEEP set=free done=262 live=68 resolved=18808 by_news=18511 cut=128 cut_sites=40102 ms=26832
+FIELD_RELEASE_SWEEP set=free done=263 live=67 resolved=18814 by_news=18575 cut=128 cut_sites=40102 ms=26900
+FIELD_RELEASE_SWEEP set=free done=264 live=67 resolved=18820 by_news=18637 cut=128 cut_sites=40102 ms=26971
+FIELD_RELEASE_SWEEP set=free done=265 live=67 resolved=18824 by_news=18700 cut=128 cut_sites=40102 ms=27040
+FIELD_RELEASE_SWEEP set=free done=266 live=66 resolved=18833 by_news=18759 cut=128 cut_sites=40102 ms=27109
+FIELD_RELEASE_SWEEP set=free done=267 live=64 resolved=18841 by_news=18818 cut=128 cut_sites=40102 ms=27177
+FIELD_RELEASE_SWEEP set=free done=268 live=64 resolved=18845 by_news=18878 cut=128 cut_sites=40102 ms=27245
+FIELD_RELEASE_SWEEP set=free done=269 live=64 resolved=18846 by_news=18941 cut=128 cut_sites=40102 ms=27312
+FIELD_RELEASE_SWEEP set=free done=270 live=60 resolved=18850 by_news=19001 cut=128 cut_sites=40102 ms=27369
+FIELD_RELEASE_SWEEP set=free done=271 live=60 resolved=18852 by_news=19059 cut=128 cut_sites=40102 ms=27429
+FIELD_RELEASE_SWEEP set=free done=272 live=60 resolved=18856 by_news=19115 cut=128 cut_sites=40102 ms=27497
+FIELD_RELEASE_SWEEP set=free done=273 live=60 resolved=18859 by_news=19172 cut=128 cut_sites=40102 ms=27562
+FIELD_RELEASE_SWEEP set=free done=274 live=59 resolved=18862 by_news=19229 cut=128 cut_sites=40102 ms=27628
+FIELD_RELEASE_SWEEP set=free done=275 live=58 resolved=18863 by_news=19287 cut=128 cut_sites=40102 ms=27694
+FIELD_RELEASE_SWEEP set=free done=276 live=58 resolved=18868 by_news=19341 cut=128 cut_sites=40102 ms=27761
+FIELD_RELEASE_SWEEP set=free done=277 live=58 resolved=18869 by_news=19398 cut=128 cut_sites=40102 ms=27829
+FIELD_RELEASE_SWEEP set=free done=278 live=57 resolved=18869 by_news=19456 cut=128 cut_sites=40102 ms=27894
+FIELD_RELEASE_SWEEP set=free done=279 live=56 resolved=18870 by_news=19512 cut=128 cut_sites=40102 ms=27961
+FIELD_RELEASE_SWEEP set=free done=280 live=56 resolved=18870 by_news=19568 cut=128 cut_sites=40102 ms=28025
+FIELD_RELEASE_SWEEP set=free done=281 live=54 resolved=18870 by_news=19624 cut=128 cut_sites=40102 ms=28090
+FIELD_RELEASE_SWEEP set=free done=282 live=53 resolved=18872 by_news=19676 cut=128 cut_sites=40102 ms=28151
+FIELD_RELEASE_SWEEP set=free done=283 live=53 resolved=18872 by_news=19729 cut=128 cut_sites=40102 ms=28214
+FIELD_RELEASE_SWEEP set=free done=284 live=53 resolved=18873 by_news=19781 cut=128 cut_sites=40102 ms=28276
+FIELD_RELEASE_SWEEP set=free done=285 live=53 resolved=18874 by_news=19833 cut=128 cut_sites=40102 ms=28337
+FIELD_RELEASE_SWEEP set=free done=286 live=52 resolved=18876 by_news=19884 cut=128 cut_sites=40102 ms=28397
+FIELD_RELEASE_SWEEP set=free done=287 live=51 resolved=18878 by_news=19934 cut=128 cut_sites=40102 ms=28456
+FIELD_RELEASE_SWEEP set=free done=288 live=50 resolved=18879 by_news=19984 cut=128 cut_sites=40102 ms=28515
+FIELD_RELEASE_SWEEP set=free done=289 live=49 resolved=18881 by_news=20032 cut=128 cut_sites=40102 ms=28573
+FIELD_RELEASE_SWEEP set=free done=290 live=49 resolved=18883 by_news=20079 cut=128 cut_sites=40102 ms=28622
+FIELD_RELEASE_SWEEP set=free done=291 live=48 resolved=18885 by_news=20126 cut=128 cut_sites=40102 ms=28677
+FIELD_RELEASE_SWEEP set=free done=292 live=48 resolved=18887 by_news=20172 cut=128 cut_sites=40102 ms=28724
+FIELD_RELEASE_SWEEP set=free done=293 live=48 resolved=18889 by_news=20218 cut=128 cut_sites=40102 ms=28771
+FIELD_RELEASE_SWEEP set=free done=294 live=47 resolved=18889 by_news=20266 cut=128 cut_sites=40102 ms=28821
+FIELD_RELEASE_SWEEP set=free done=295 live=45 resolved=18890 by_news=20312 cut=128 cut_sites=40102 ms=28877
+FIELD_RELEASE_SWEEP set=free done=296 live=44 resolved=18890 by_news=20357 cut=128 cut_sites=40102 ms=28924
+FIELD_RELEASE_SWEEP set=free done=297 live=41 resolved=18891 by_news=20400 cut=128 cut_sites=40102 ms=28970
+FIELD_RELEASE_SWEEP set=free done=298 live=41 resolved=18892 by_news=20440 cut=128 cut_sites=40102 ms=29013
+FIELD_RELEASE_SWEEP set=free done=299 live=39 resolved=18893 by_news=20480 cut=128 cut_sites=40102 ms=29055
+FIELD_RELEASE_SWEEP set=free done=300 live=38 resolved=18893 by_news=20519 cut=128 cut_sites=40102 ms=29097
+FIELD_RELEASE_SWEEP set=free done=301 live=37 resolved=18893 by_news=20557 cut=128 cut_sites=40102 ms=29138
+FIELD_RELEASE_SWEEP set=free done=302 live=36 resolved=18893 by_news=20594 cut=128 cut_sites=40102 ms=29178
+FIELD_RELEASE_SWEEP set=free done=303 live=35 resolved=18893 by_news=20630 cut=128 cut_sites=40102 ms=29217
+FIELD_RELEASE_SWEEP set=free done=304 live=33 resolved=18895 by_news=20663 cut=128 cut_sites=40102 ms=29254
+FIELD_RELEASE_SWEEP set=free done=305 live=32 resolved=18896 by_news=20695 cut=128 cut_sites=40102 ms=29290
+FIELD_RELEASE_SWEEP set=free done=306 live=32 resolved=18896 by_news=20727 cut=128 cut_sites=40102 ms=29326
+FIELD_RELEASE_SWEEP set=free done=307 live=30 resolved=18896 by_news=20759 cut=128 cut_sites=40102 ms=29362
+FIELD_RELEASE_SWEEP set=free done=308 live=27 resolved=18899 by_news=20786 cut=128 cut_sites=40102 ms=29394
+FIELD_RELEASE_SWEEP set=free done=309 live=26 resolved=18899 by_news=20813 cut=128 cut_sites=40102 ms=29425
+FIELD_RELEASE_SWEEP set=free done=310 live=24 resolved=18900 by_news=20838 cut=128 cut_sites=40102 ms=29454
+FIELD_RELEASE_SWEEP set=free done=311 live=24 resolved=18900 by_news=20862 cut=128 cut_sites=40102 ms=29483
+FIELD_RELEASE_SWEEP set=free done=312 live=24 resolved=18900 by_news=20886 cut=128 cut_sites=40102 ms=29512
+FIELD_RELEASE_SWEEP set=free done=313 live=24 resolved=18900 by_news=20910 cut=128 cut_sites=40102 ms=29541
+FIELD_RELEASE_SWEEP set=free done=314 live=23 resolved=18901 by_news=20933 cut=128 cut_sites=40102 ms=29569
+FIELD_RELEASE_SWEEP set=free done=315 live=21 resolved=18902 by_news=20955 cut=128 cut_sites=40102 ms=29596
+FIELD_RELEASE_SWEEP set=free done=316 live=20 resolved=18903 by_news=20975 cut=128 cut_sites=40102 ms=29622
+FIELD_RELEASE_SWEEP set=free done=317 live=18 resolved=18903 by_news=20995 cut=128 cut_sites=40102 ms=29646
+FIELD_RELEASE_SWEEP set=free done=318 live=18 resolved=18905 by_news=21011 cut=128 cut_sites=40102 ms=29669
+FIELD_RELEASE_SWEEP set=free done=319 live=18 resolved=18905 by_news=21029 cut=128 cut_sites=40102 ms=29692
+FIELD_RELEASE_SWEEP set=free done=320 live=16 resolved=18907 by_news=21045 cut=128 cut_sites=40102 ms=29714
+FIELD_RELEASE_SWEEP set=free done=321 live=16 resolved=18907 by_news=21061 cut=128 cut_sites=40102 ms=29735
+FIELD_RELEASE_SWEEP set=free done=322 live=16 resolved=18907 by_news=21077 cut=128 cut_sites=40102 ms=29756
+FIELD_RELEASE_SWEEP set=free done=323 live=15 resolved=18908 by_news=21092 cut=128 cut_sites=40102 ms=29777
+FIELD_RELEASE_SWEEP set=free done=324 live=13 resolved=18908 by_news=21107 cut=128 cut_sites=40102 ms=29797
+FIELD_RELEASE_SWEEP set=free done=325 live=12 resolved=18909 by_news=21119 cut=128 cut_sites=40102 ms=29814
+FIELD_RELEASE_SWEEP set=free done=326 live=12 resolved=18909 by_news=21131 cut=128 cut_sites=40102 ms=29832
+FIELD_RELEASE_SWEEP set=free done=327 live=10 resolved=18911 by_news=21141 cut=128 cut_sites=40102 ms=29848
+FIELD_RELEASE_SWEEP set=free done=328 live=10 resolved=18911 by_news=21151 cut=128 cut_sites=40102 ms=29862
+FIELD_RELEASE_SWEEP set=free done=329 live=10 resolved=18911 by_news=21161 cut=128 cut_sites=40102 ms=29877
+FIELD_RELEASE_SWEEP set=free done=330 live=9 resolved=18911 by_news=21171 cut=128 cut_sites=40102 ms=29891
+FIELD_RELEASE_SWEEP set=free done=331 live=8 resolved=18912 by_news=21179 cut=128 cut_sites=40102 ms=29904
+FIELD_RELEASE_SWEEP set=free done=332 live=6 resolved=18914 by_news=21185 cut=128 cut_sites=40102 ms=29916
+FIELD_RELEASE_SWEEP set=free done=333 live=6 resolved=18914 by_news=21191 cut=128 cut_sites=40102 ms=29927
+FIELD_RELEASE_SWEEP set=free done=334 live=5 resolved=18914 by_news=21197 cut=128 cut_sites=40102 ms=29937
+FIELD_RELEASE_SWEEP set=free done=335 live=5 resolved=18914 by_news=21202 cut=128 cut_sites=40102 ms=29947
+FIELD_RELEASE_SWEEP set=free done=336 live=5 resolved=18915 by_news=21206 cut=128 cut_sites=40102 ms=29956
+FIELD_RELEASE_SWEEP set=free done=337 live=5 resolved=18915 by_news=21211 cut=128 cut_sites=40102 ms=29965
+FIELD_RELEASE_SWEEP set=free done=338 live=5 resolved=18915 by_news=21216 cut=128 cut_sites=40102 ms=29975
+FIELD_RELEASE_SWEEP set=free done=339 live=5 resolved=18915 by_news=21221 cut=128 cut_sites=40102 ms=29984
+FIELD_RELEASE_SWEEP set=free done=340 live=5 resolved=18915 by_news=21226 cut=128 cut_sites=40102 ms=29994
+FIELD_RELEASE_SWEEP set=free done=341 live=5 resolved=18915 by_news=21231 cut=128 cut_sites=40102 ms=30003
+FIELD_RELEASE_SWEEP set=free done=342 live=5 resolved=18915 by_news=21236 cut=128 cut_sites=40102 ms=30013
+FIELD_RELEASE_SWEEP set=free done=343 live=5 resolved=18915 by_news=21241 cut=128 cut_sites=40102 ms=30022
+FIELD_RELEASE_SWEEP set=free done=344 live=5 resolved=18915 by_news=21246 cut=128 cut_sites=40102 ms=30032
+FIELD_RELEASE_SWEEP set=free done=345 live=5 resolved=18915 by_news=21251 cut=128 cut_sites=40102 ms=30041
+FIELD_RELEASE_SWEEP set=free done=346 live=5 resolved=18915 by_news=21256 cut=128 cut_sites=40102 ms=30051
+FIELD_RELEASE_SWEEP set=free done=347 live=5 resolved=18915 by_news=21261 cut=128 cut_sites=40102 ms=30060
+FIELD_RELEASE_SWEEP set=free done=348 live=5 resolved=18915 by_news=21266 cut=128 cut_sites=40102 ms=30070
+FIELD_RELEASE_SWEEP set=free done=349 live=5 resolved=18915 by_news=21271 cut=128 cut_sites=40102 ms=30079
+FIELD_RELEASE_SWEEP set=free done=350 live=4 resolved=18916 by_news=21275 cut=128 cut_sites=40102 ms=30088
+FIELD_RELEASE_SWEEP set=free done=351 live=4 resolved=18916 by_news=21279 cut=128 cut_sites=40102 ms=30096
+FIELD_RELEASE_SWEEP set=free done=352 live=4 resolved=18916 by_news=21283 cut=128 cut_sites=40102 ms=30104
+FIELD_RELEASE_SWEEP set=free done=353 live=3 resolved=18917 by_news=21286 cut=128 cut_sites=40102 ms=30111
+FIELD_RELEASE_SWEEP set=free done=354 live=2 resolved=18918 by_news=21288 cut=128 cut_sites=40102 ms=30115
+FIELD_RELEASE_SWEEP set=free done=355 live=2 resolved=18918 by_news=21290 cut=128 cut_sites=40102 ms=30119
+FIELD_RELEASE_SWEEP set=free done=356 live=1 resolved=18919 by_news=21291 cut=128 cut_sites=40102 ms=30123
+FIELD_RELEASE_SWEEP set=free done=357 live=1 resolved=18919 by_news=21292 cut=128 cut_sites=40102 ms=30125
+FIELD_RELEASE_SWEEP set=free done=358 live=1 resolved=18919 by_news=21293 cut=128 cut_sites=40102 ms=30128
+FIELD_RELEASE_SWEEP set=free done=359 live=1 resolved=18919 by_news=21294 cut=128 cut_sites=40102 ms=30131
+FIELD_RELEASE_SWEEP set=free done=360 live=1 resolved=18919 by_news=21295 cut=128 cut_sites=40102 ms=30133
+FIELD_RELEASE_SWEEP set=free done=361 live=1 resolved=18919 by_news=21296 cut=128 cut_sites=40102 ms=30136
+FIELD_RELEASE_SWEEP set=free done=362 live=1 resolved=18919 by_news=21297 cut=128 cut_sites=40102 ms=30138
+FIELD_RELEASE_SWEEP set=free done=363 live=0 resolved=18920 by_news=21297 cut=128 cut_sites=40102 ms=30140
+FIELD_RELEASE_ONE problem=0 released=307 held=379 lambda=45 friction=596 total_ms=30140
+FIELD_RELEASE_ONE problem=1 released=331 held=179 lambda=85 friction=340 total_ms=30140
+FIELD_RELEASE_ONE problem=2 released=310 held=192 lambda=43 friction=416 total_ms=30141
+FIELD_RELEASE_ONE problem=3 released=283 held=90 lambda=37 friction=299 total_ms=30141
+FIELD_RELEASE_ONE problem=4 released=322 held=295 lambda=121 friction=375 total_ms=30141
+FIELD_RELEASE_ONE problem=5 released=342 held=465 lambda=120 friction=567 total_ms=30141
+FIELD_RELEASE_ONE problem=6 released=335 held=381 lambda=138 friction=440 total_ms=30142
+FIELD_RELEASE_ONE problem=7 released=333 held=237 lambda=105 friction=360 total_ms=30142
+FIELD_RELEASE_ONE problem=8 released=305 held=231 lambda=40 friction=456 total_ms=30142
+FIELD_RELEASE_ONE problem=9 released=329 held=400 lambda=148 friction=433 total_ms=30142
+FIELD_RELEASE_ONE problem=10 released=304 held=405 lambda=153 friction=403 total_ms=30143
+FIELD_RELEASE_ONE problem=11 released=332 held=265 lambda=33 friction=531 total_ms=30143
+FIELD_RELEASE_ONE problem=12 released=338 held=290 lambda=136 friction=356 total_ms=30143
+FIELD_RELEASE_ONE problem=13 released=299 held=188 lambda=27 friction=433 total_ms=30143
+FIELD_RELEASE_ONE problem=14 released=315 held=305 lambda=107 friction=406 total_ms=30144
+FIELD_RELEASE_ONE problem=15 released=318 held=518 lambda=172 friction=492 total_ms=30144
+FIELD_RELEASE_ONE problem=16 released=313 held=87 lambda=23 friction=354 total_ms=30144
+FIELD_RELEASE_ONE problem=17 released=295 held=186 lambda=84 friction=313 total_ms=30144
+FIELD_RELEASE_ONE problem=18 released=297 held=112 lambda=61 friction=287 total_ms=30144
+FIELD_RELEASE_ONE problem=19 released=317 held=472 lambda=175 friction=439 total_ms=30145
+FIELD_RELEASE_ONE problem=20 released=317 held=428 lambda=155 friction=435 total_ms=30145
+FIELD_RELEASE_ONE problem=21 released=324 held=262 lambda=110 friction=366 total_ms=30145
+FIELD_RELEASE_ONE problem=22 released=280 held=99 lambda=58 friction=263 total_ms=30145
+FIELD_RELEASE_ONE problem=23 released=339 held=405 lambda=146 friction=452 total_ms=30146
+FIELD_RELEASE_ONE problem=24 released=277 held=263 lambda=118 friction=304 total_ms=30146
+FIELD_RELEASE_ONE problem=25 released=297 held=402 lambda=146 friction=407 total_ms=30146
+FIELD_RELEASE_ONE problem=26 released=326 held=165 lambda=83 friction=325 total_ms=30146
+FIELD_RELEASE_ONE problem=27 released=313 held=310 lambda=128 friction=367 total_ms=30147
+FIELD_RELEASE_ONE problem=28 released=328 held=192 lambda=98 friction=324 total_ms=30147
+FIELD_RELEASE_ONE problem=29 released=320 held=288 lambda=128 friction=352 total_ms=30147
+FIELD_RELEASE_ONE problem=30 released=323 held=384 lambda=136 friction=435 total_ms=30147
+FIELD_RELEASE_ONE problem=31 released=323 held=101 lambda=44 friction=336 total_ms=30147
+FIELD_RELEASE_ONE problem=32 released=316 held=307 lambda=126 friction=371 total_ms=30148
+FIELD_RELEASE_ONE problem=33 released=327 held=196 lambda=89 friction=345 total_ms=30148
+FIELD_RELEASE_ONE problem=34 released=330 held=258 lambda=100 friction=388 total_ms=30148
+FIELD_RELEASE_ONE problem=35 released=367 held=346 lambda=139 friction=435 total_ms=30148
+FIELD_RELEASE_ONE problem=36 released=273 held=204 lambda=41 friction=395 total_ms=30149
+FIELD_RELEASE_ONE problem=37 released=283 held=308 lambda=32 friction=527 total_ms=30149
+FIELD_RELEASE_ONE problem=38 released=280 held=378 lambda=95 friction=468 total_ms=30149
+FIELD_RELEASE_ONE problem=39 released=326 held=701 lambda=206 friction=615 total_ms=30150
+FIELD_RELEASE_ONE problem=40 released=342 held=546 lambda=186 friction=516 total_ms=30150
+FIELD_RELEASE_ONE problem=41 released=327 held=271 lambda=74 friction=450 total_ms=30150
+FIELD_RELEASE_ONE problem=42 released=311 held=236 lambda=49 friction=449 total_ms=30150
+FIELD_RELEASE_ONE problem=43 released=305 held=121 lambda=54 friction=318 total_ms=30151
+FIELD_RELEASE_ONE problem=44 released=288 held=157 lambda=22 friction=401 total_ms=30151
+FIELD_RELEASE_ONE problem=45 released=295 held=115 lambda=35 friction=340 total_ms=30151
+FIELD_RELEASE_ONE problem=46 released=315 held=209 lambda=90 friction=344 total_ms=30151
+FIELD_RELEASE_ONE problem=47 released=325 held=254 lambda=88 friction=403 total_ms=30151
+FIELD_RELEASE_ONE problem=48 released=324 held=105 lambda=44 friction=341 total_ms=30151
+FIELD_RELEASE_ONE problem=49 released=314 held=435 lambda=143 friction=463 total_ms=30152
+FIELD_RELEASE_ONE problem=50 released=280 held=115 lambda=64 friction=267 total_ms=30152
+FIELD_RELEASE_ONE problem=51 released=306 held=270 lambda=115 friction=346 total_ms=30152
+FIELD_RELEASE_ONE problem=52 released=305 held=300 lambda=134 friction=337 total_ms=30152
+FIELD_RELEASE_ONE problem=53 released=330 held=172 lambda=37 friction=428 total_ms=30152
+FIELD_RELEASE_ONE problem=54 released=313 held=91 lambda=43 friction=318 total_ms=30152
+FIELD_RELEASE_ONE problem=55 released=284 held=259 lambda=74 friction=395 total_ms=30153
+FIELD_RELEASE_ONE problem=56 released=281 held=503 lambda=174 friction=436 total_ms=30153
+FIELD_RELEASE_ONE problem=57 released=282 held=148 lambda=84 friction=262 total_ms=30153
+FIELD_RELEASE_ONE problem=58 released=358 held=559 lambda=192 friction=533 total_ms=30154
+FIELD_RELEASE_ONE problem=59 released=320 held=172 lambda=36 friction=420 total_ms=30154
+FIELD_RELEASE_ONE problem=60 released=297 held=311 lambda=104 friction=400 total_ms=30154
+FIELD_RELEASE_ONE problem=61 released=325 held=171 lambda=44 friction=408 total_ms=30154
+FIELD_RELEASE_ONE problem=62 released=298 held=211 lambda=28 friction=453 total_ms=30154
+FIELD_RELEASE_ONE problem=63 released=336 held=517 lambda=51 friction=751 total_ms=30155
+FIELD_RELEASE_ONE problem=64 released=316 held=231 lambda=114 friction=319 total_ms=30155
+FIELD_RELEASE_ONE problem=65 released=306 held=356 lambda=72 friction=518 total_ms=30155
+FIELD_RELEASE_ONE problem=66 released=330 held=329 lambda=65 friction=529 total_ms=30155
+FIELD_RELEASE_ONE problem=67 released=280 held=397 lambda=48 friction=581 total_ms=30156
+FIELD_RELEASE_ONE problem=68 released=289 held=217 lambda=36 friction=434 total_ms=30156
+FIELD_RELEASE_ONE problem=69 released=341 held=410 lambda=158 friction=435 total_ms=30156
+FIELD_RELEASE_ONE problem=70 released=271 held=145 lambda=18 friction=380 total_ms=30156
+FIELD_RELEASE_ONE problem=71 released=305 held=237 lambda=114 friction=314 total_ms=30157
+FIELD_RELEASE_ONE problem=72 released=325 held=244 lambda=45 friction=479 total_ms=30157
+FIELD_RELEASE_ONE problem=73 released=314 held=252 lambda=52 friction=462 total_ms=30157
+FIELD_RELEASE_ONE problem=74 released=277 held=122 lambda=65 friction=269 total_ms=30157
+FIELD_RELEASE_ONE problem=75 released=328 held=94 lambda=37 friction=348 total_ms=30157
+FIELD_RELEASE_ONE problem=76 released=310 held=165 lambda=72 friction=331 total_ms=30157
+FIELD_RELEASE_ONE problem=77 released=281 held=203 lambda=99 friction=286 total_ms=30157
+FIELD_RELEASE_ONE problem=78 released=354 held=564 lambda=82 friction=754 total_ms=30158
+FIELD_RELEASE_ONE problem=79 released=309 held=246 lambda=116 friction=323 total_ms=30158
+FIELD_RELEASE_ONE problem=80 released=334 held=302 lambda=59 friction=518 total_ms=30158
+FIELD_RELEASE_ONE problem=81 released=285 held=204 lambda=85 friction=319 total_ms=30159
+FIELD_RELEASE_ONE problem=82 released=311 held=452 lambda=150 friction=463 total_ms=30159
+FIELD_RELEASE_ONE problem=83 released=316 held=195 lambda=97 friction=317 total_ms=30159
+FIELD_RELEASE_ONE problem=84 released=328 held=299 lambda=46 friction=535 total_ms=30159
+FIELD_RELEASE_ONE problem=85 released=317 held=321 lambda=130 friction=378 total_ms=30160
+FIELD_RELEASE_ONE problem=86 released=337 held=241 lambda=102 friction=374 total_ms=30160
+FIELD_RELEASE_ONE problem=87 released=300 held=174 lambda=37 friction=400 total_ms=30160
+FIELD_RELEASE_ONE problem=88 released=279 held=282 lambda=61 friction=439 total_ms=30160
+FIELD_RELEASE_ONE problem=89 released=297 held=501 lambda=152 friction=494 total_ms=30161
+FIELD_RELEASE_ONE problem=90 released=343 held=394 lambda=175 friction=387 total_ms=30161
+FIELD_RELEASE_ONE problem=91 released=338 held=229 lambda=102 friction=363 total_ms=30161
+FIELD_RELEASE_ONE problem=92 released=319 held=384 lambda=42 friction=619 total_ms=30161
+FIELD_RELEASE_ONE problem=93 released=361 held=320 lambda=119 friction=443 total_ms=30162
+FIELD_RELEASE_ONE problem=94 released=299 held=279 lambda=58 friction=462 total_ms=30162
+FIELD_RELEASE_ONE problem=95 released=290 held=195 lambda=97 friction=291 total_ms=30162
+FIELD_RELEASE_ONE problem=96 released=312 held=584 lambda=173 friction=550 total_ms=30163
+FIELD_RELEASE_ONE problem=97 released=332 held=415 lambda=65 friction=617 total_ms=30163
+FIELD_RELEASE_ONE problem=98 released=331 held=463 lambda=83 friction=628 total_ms=30163
+FIELD_RELEASE_ONE problem=99 released=334 held=308 lambda=58 friction=526 total_ms=30164
+FIELD_RELEASE_ONE problem=100 released=288 held=292 lambda=26 friction=528 total_ms=30164
+FIELD_RELEASE_ONE problem=101 released=289 held=223 lambda=110 friction=292 total_ms=30164
+FIELD_RELEASE_ONE problem=102 released=296 held=227 lambda=105 friction=313 total_ms=30164
+FIELD_RELEASE_ONE problem=103 released=305 held=136 lambda=74 friction=293 total_ms=30164
+FIELD_RELEASE_ONE problem=104 released=315 held=217 lambda=110 friction=312 total_ms=30164
+FIELD_RELEASE_ONE problem=105 released=316 held=165 lambda=31 friction=419 total_ms=30165
+FIELD_RELEASE_ONE problem=106 released=273 held=67 lambda=40 friction=260 total_ms=30165
+FIELD_RELEASE_ONE problem=107 released=300 held=191 lambda=72 friction=347 total_ms=30165
+FIELD_RELEASE_ONE problem=108 released=325 held=279 lambda=80 friction=444 total_ms=30165
+FIELD_RELEASE_ONE problem=109 released=322 held=134 lambda=69 friction=318 total_ms=30165
+FIELD_RELEASE_ONE problem=110 released=360 held=486 lambda=164 friction=518 total_ms=30166
+FIELD_RELEASE_ONE problem=111 released=329 held=329 lambda=50 friction=558 total_ms=30166
+FIELD_RELEASE_ONE problem=112 released=279 held=81 lambda=28 friction=304 total_ms=30166
+FIELD_RELEASE_ONE problem=113 released=335 held=135 lambda=33 friction=404 total_ms=30166
+FIELD_RELEASE_ONE problem=114 released=301 held=242 lambda=34 friction=475 total_ms=30166
+FIELD_RELEASE_ONE problem=115 released=318 held=191 lambda=50 friction=409 total_ms=30166
+FIELD_RELEASE_ONE problem=116 released=334 held=524 lambda=67 friction=724 total_ms=30167
+FIELD_RELEASE_ONE problem=117 released=271 held=249 lambda=28 friction=464 total_ms=30167
+FIELD_RELEASE_ONE problem=118 released=275 held=159 lambda=75 friction=284 total_ms=30167
+FIELD_RELEASE_ONE problem=119 released=359 held=475 lambda=170 friction=494 total_ms=30168
+FIELD_RELEASE_ONE problem=120 released=319 held=250 lambda=67 friction=435 total_ms=30168
+FIELD_RELEASE_ONE problem=121 released=359 held=418 lambda=45 friction=687 total_ms=30168
+FIELD_RELEASE_ONE problem=122 released=289 held=82 lambda=43 friction=285 total_ms=30168
+FIELD_RELEASE_ONE problem=123 released=299 held=214 lambda=56 friction=401 total_ms=30168
+FIELD_RELEASE_ONE problem=124 released=325 held=439 lambda=59 friction=646 total_ms=30169
+FIELD_RELEASE_ONE problem=125 released=314 held=284 lambda=126 friction=346 total_ms=30169
+FIELD_RELEASE_ONE problem=126 released=319 held=203 lambda=90 friction=342 total_ms=30169
+FIELD_RELEASE_ONE problem=127 released=280 held=95 lambda=51 friction=273 total_ms=30169
+FIELD_RELEASE_SWEEP set=marks done=0 live=399 resolved=0 by_news=0 cut=0 cut_sites=0 ms=30177
+FIELD_RELEASE_SWEEP set=marks done=1 live=399 resolved=888 by_news=0 cut=399 cut_sites=105659 ms=31103
+FIELD_RELEASE_SWEEP set=marks done=2 live=399 resolved=1066 by_news=257 cut=399 cut_sites=105659 ms=31648
+FIELD_RELEASE_SWEEP set=marks done=3 live=399 resolved=1352 by_news=496 cut=399 cut_sites=105659 ms=32156
+FIELD_RELEASE_SWEEP set=marks done=4 live=399 resolved=1544 by_news=752 cut=399 cut_sites=105659 ms=32680
+FIELD_RELEASE_SWEEP set=marks done=5 live=399 resolved=1685 by_news=1048 cut=399 cut_sites=105659 ms=33238
+FIELD_RELEASE_SWEEP set=marks done=6 live=399 resolved=1812 by_news=1345 cut=399 cut_sites=105659 ms=33793
+FIELD_RELEASE_SWEEP set=marks done=7 live=399 resolved=1951 by_news=1638 cut=399 cut_sites=105659 ms=34348
+FIELD_RELEASE_SWEEP set=marks done=8 live=399 resolved=2148 by_news=1915 cut=399 cut_sites=105659 ms=34890
+FIELD_RELEASE_SWEEP set=marks done=9 live=399 resolved=2372 by_news=2183 cut=399 cut_sites=105659 ms=35421
+FIELD_RELEASE_SWEEP set=marks done=10 live=399 resolved=2615 by_news=2433 cut=399 cut_sites=105659 ms=35934
+FIELD_RELEASE_SWEEP set=marks done=11 live=399 resolved=2853 by_news=2678 cut=399 cut_sites=105659 ms=36447
+FIELD_RELEASE_SWEEP set=marks done=12 live=399 resolved=3124 by_news=2909 cut=399 cut_sites=105659 ms=36949
+FIELD_RELEASE_SWEEP set=marks done=13 live=399 resolved=3425 by_news=3132 cut=399 cut_sites=105659 ms=37443
+FIELD_RELEASE_SWEEP set=marks done=14 live=399 resolved=3694 by_news=3351 cut=399 cut_sites=105659 ms=37931
+FIELD_RELEASE_SWEEP set=marks done=15 live=399 resolved=3968 by_news=3583 cut=399 cut_sites=105659 ms=38432
+FIELD_RELEASE_SWEEP set=marks done=16 live=399 resolved=4226 by_news=3816 cut=399 cut_sites=105659 ms=38929
+FIELD_RELEASE_SWEEP set=marks done=17 live=399 resolved=4472 by_news=4055 cut=399 cut_sites=105659 ms=39426
+FIELD_RELEASE_SWEEP set=marks done=18 live=399 resolved=4715 by_news=4291 cut=399 cut_sites=105659 ms=39919
+FIELD_RELEASE_SWEEP set=marks done=19 live=399 resolved=4972 by_news=4524 cut=399 cut_sites=105659 ms=40414
+FIELD_RELEASE_SWEEP set=marks done=20 live=398 resolved=5242 by_news=4762 cut=399 cut_sites=105659 ms=40915
+FIELD_RELEASE_SWEEP set=marks done=21 live=398 resolved=5485 by_news=5005 cut=399 cut_sites=105659 ms=41421
+FIELD_RELEASE_SWEEP set=marks done=22 live=397 resolved=5705 by_news=5246 cut=399 cut_sites=105659 ms=41926
+FIELD_RELEASE_SWEEP set=marks done=23 live=394 resolved=5924 by_news=5494 cut=399 cut_sites=105659 ms=42433
+FIELD_RELEASE_SWEEP set=marks done=24 live=394 resolved=6135 by_news=5748 cut=399 cut_sites=105659 ms=42951
+FIELD_RELEASE_SWEEP set=marks done=25 live=394 resolved=6399 by_news=5985 cut=399 cut_sites=105659 ms=43450
+FIELD_RELEASE_SWEEP set=marks done=26 live=394 resolved=6631 by_news=6229 cut=399 cut_sites=105659 ms=43955
+FIELD_RELEASE_SWEEP set=marks done=27 live=394 resolved=6865 by_news=6465 cut=399 cut_sites=105659 ms=44453
+FIELD_RELEASE_SWEEP set=marks done=28 live=394 resolved=7115 by_news=6687 cut=399 cut_sites=105659 ms=44936
+FIELD_RELEASE_SWEEP set=marks done=29 live=394 resolved=7348 by_news=6925 cut=399 cut_sites=105659 ms=45432
+FIELD_RELEASE_SWEEP set=marks done=30 live=394 resolved=7568 by_news=7172 cut=399 cut_sites=105659 ms=45936
+FIELD_RELEASE_SWEEP set=marks done=31 live=394 resolved=7816 by_news=7415 cut=399 cut_sites=105659 ms=46437
+FIELD_RELEASE_SWEEP set=marks done=32 live=394 resolved=8073 by_news=7661 cut=399 cut_sites=105659 ms=46941
+FIELD_RELEASE_SWEEP set=marks done=33 live=394 resolved=8320 by_news=7916 cut=399 cut_sites=105659 ms=47451
+FIELD_RELEASE_SWEEP set=marks done=34 live=394 resolved=8577 by_news=8167 cut=399 cut_sites=105659 ms=47956
+FIELD_RELEASE_SWEEP set=marks done=35 live=394 resolved=8839 by_news=8407 cut=399 cut_sites=105659 ms=48455
+FIELD_RELEASE_SWEEP set=marks done=36 live=393 resolved=9102 by_news=8655 cut=399 cut_sites=105659 ms=48960
+FIELD_RELEASE_SWEEP set=marks done=37 live=393 resolved=9353 by_news=8906 cut=399 cut_sites=105659 ms=49460
+FIELD_RELEASE_SWEEP set=marks done=38 live=393 resolved=9619 by_news=9152 cut=399 cut_sites=105659 ms=49959
+FIELD_RELEASE_SWEEP set=marks done=39 live=393 resolved=9891 by_news=9406 cut=399 cut_sites=105659 ms=50465
+FIELD_RELEASE_SWEEP set=marks done=40 live=393 resolved=10182 by_news=9660 cut=399 cut_sites=105659 ms=50972
+FIELD_RELEASE_SWEEP set=marks done=41 live=393 resolved=10497 by_news=9908 cut=399 cut_sites=105659 ms=51473
+FIELD_RELEASE_SWEEP set=marks done=42 live=393 resolved=10827 by_news=10150 cut=399 cut_sites=105659 ms=51967
+FIELD_RELEASE_SWEEP set=marks done=43 live=393 resolved=11173 by_news=10389 cut=399 cut_sites=105659 ms=52456
+FIELD_RELEASE_SWEEP set=marks done=44 live=393 resolved=11530 by_news=10631 cut=399 cut_sites=105659 ms=52951
+FIELD_RELEASE_SWEEP set=marks done=45 live=393 resolved=11933 by_news=10867 cut=399 cut_sites=105659 ms=53437
+FIELD_RELEASE_SWEEP set=marks done=46 live=393 resolved=12315 by_news=11113 cut=399 cut_sites=105659 ms=53927
+FIELD_RELEASE_SWEEP set=marks done=47 live=393 resolved=12724 by_news=11355 cut=399 cut_sites=105659 ms=54416
+FIELD_RELEASE_SWEEP set=marks done=48 live=393 resolved=13134 by_news=11605 cut=399 cut_sites=105659 ms=54915
+FIELD_RELEASE_SWEEP set=marks done=49 live=393 resolved=13578 by_news=11856 cut=399 cut_sites=105659 ms=55407
+FIELD_RELEASE_SWEEP set=marks done=50 live=393 resolved=14038 by_news=12091 cut=399 cut_sites=105659 ms=55881
+FIELD_RELEASE_SWEEP set=marks done=51 live=393 resolved=14485 by_news=12345 cut=399 cut_sites=105659 ms=56379
+FIELD_RELEASE_SWEEP set=marks done=52 live=393 resolved=14944 by_news=12588 cut=399 cut_sites=105659 ms=56864
+FIELD_RELEASE_SWEEP set=marks done=53 live=393 resolved=15427 by_news=12827 cut=399 cut_sites=105659 ms=57351
+FIELD_RELEASE_SWEEP set=marks done=54 live=393 resolved=15905 by_news=13071 cut=399 cut_sites=105659 ms=57838
+FIELD_RELEASE_SWEEP set=marks done=55 live=393 resolved=16441 by_news=13313 cut=399 cut_sites=105659 ms=58325
+FIELD_RELEASE_SWEEP set=marks done=56 live=393 resolved=16957 by_news=13560 cut=399 cut_sites=105659 ms=58812
+FIELD_RELEASE_SWEEP set=marks done=57 live=393 resolved=17519 by_news=13797 cut=399 cut_sites=105659 ms=59291
+FIELD_RELEASE_SWEEP set=marks done=58 live=393 resolved=18009 by_news=14042 cut=399 cut_sites=105659 ms=59772
+FIELD_RELEASE_SWEEP set=marks done=59 live=393 resolved=18511 by_news=14285 cut=399 cut_sites=105659 ms=60252
+FIELD_RELEASE_SWEEP set=marks done=60 live=393 resolved=19027 by_news=14523 cut=399 cut_sites=105659 ms=60726
+FIELD_RELEASE_SWEEP set=marks done=61 live=393 resolved=19564 by_news=14759 cut=399 cut_sites=105659 ms=61200
+FIELD_RELEASE_SWEEP set=marks done=62 live=392 resolved=20108 by_news=14976 cut=399 cut_sites=105659 ms=61660
+FIELD_RELEASE_SWEEP set=marks done=63 live=391 resolved=20605 by_news=15206 cut=399 cut_sites=105659 ms=62130
+FIELD_RELEASE_SWEEP set=marks done=64 live=391 resolved=21110 by_news=15445 cut=399 cut_sites=105659 ms=62609
+FIELD_RELEASE_SWEEP set=marks done=65 live=391 resolved=21593 by_news=15691 cut=399 cut_sites=105659 ms=63086
+FIELD_RELEASE_SWEEP set=marks done=66 live=391 resolved=22090 by_news=15924 cut=399 cut_sites=105659 ms=63554
+FIELD_RELEASE_SWEEP set=marks done=67 live=389 resolved=22589 by_news=16166 cut=399 cut_sites=105659 ms=64029
+FIELD_RELEASE_SWEEP set=marks done=68 live=387 resolved=23063 by_news=16406 cut=399 cut_sites=105659 ms=64501
+FIELD_RELEASE_SWEEP set=marks done=69 live=386 resolved=23555 by_news=16641 cut=399 cut_sites=105659 ms=64968
+FIELD_RELEASE_SWEEP set=marks done=70 live=385 resolved=24030 by_news=16885 cut=399 cut_sites=105659 ms=65441
+FIELD_RELEASE_SWEEP set=marks done=71 live=382 resolved=24474 by_news=17118 cut=399 cut_sites=105659 ms=65902
+FIELD_RELEASE_SWEEP set=marks done=72 live=382 resolved=24967 by_news=17352 cut=399 cut_sites=105659 ms=66364
+FIELD_RELEASE_SWEEP set=marks done=73 live=381 resolved=25456 by_news=17597 cut=399 cut_sites=105659 ms=66835
+FIELD_RELEASE_SWEEP set=marks done=74 live=380 resolved=26004 by_news=17826 cut=399 cut_sites=105659 ms=67292
+FIELD_RELEASE_SWEEP set=marks done=75 live=378 resolved=26480 by_news=18060 cut=399 cut_sites=105659 ms=67754
+FIELD_RELEASE_SWEEP set=marks done=76 live=378 resolved=26964 by_news=18298 cut=399 cut_sites=105659 ms=68214
+FIELD_RELEASE_SWEEP set=marks done=77 live=376 resolved=27467 by_news=18541 cut=399 cut_sites=105659 ms=68686
+FIELD_RELEASE_SWEEP set=marks done=78 live=375 resolved=27983 by_news=18775 cut=399 cut_sites=105659 ms=69148
+FIELD_RELEASE_SWEEP set=marks done=79 live=375 resolved=28425 by_news=18998 cut=399 cut_sites=105659 ms=69597
+FIELD_RELEASE_SWEEP set=marks done=80 live=373 resolved=28897 by_news=19224 cut=399 cut_sites=105659 ms=70046
+FIELD_RELEASE_SWEEP set=marks done=81 live=371 resolved=29417 by_news=19450 cut=399 cut_sites=105659 ms=70492
+FIELD_RELEASE_SWEEP set=marks done=82 live=370 resolved=29872 by_news=19691 cut=399 cut_sites=105659 ms=70945
+FIELD_RELEASE_SWEEP set=marks done=83 live=369 resolved=30333 by_news=19934 cut=399 cut_sites=105659 ms=71398
+FIELD_RELEASE_SWEEP set=marks done=84 live=365 resolved=30790 by_news=20181 cut=399 cut_sites=105659 ms=71853
+FIELD_RELEASE_SWEEP set=marks done=85 live=362 resolved=31215 by_news=20420 cut=399 cut_sites=105659 ms=72306
+FIELD_RELEASE_SWEEP set=marks done=86 live=358 resolved=31601 by_news=20654 cut=399 cut_sites=105659 ms=72742
+FIELD_RELEASE_SWEEP set=marks done=87 live=354 resolved=32033 by_news=20898 cut=399 cut_sites=105659 ms=73187
+FIELD_RELEASE_SWEEP set=marks done=88 live=353 resolved=32392 by_news=21143 cut=399 cut_sites=105659 ms=73635
+FIELD_RELEASE_SWEEP set=marks done=89 live=352 resolved=32727 by_news=21386 cut=399 cut_sites=105659 ms=74074
+FIELD_RELEASE_SWEEP set=marks done=90 live=349 resolved=33039 by_news=21624 cut=399 cut_sites=105659 ms=74510
+FIELD_RELEASE_SWEEP set=marks done=91 live=343 resolved=33335 by_news=21862 cut=399 cut_sites=105659 ms=74941
+FIELD_RELEASE_SWEEP set=marks done=92 live=341 resolved=33594 by_news=22093 cut=399 cut_sites=105659 ms=75367
+FIELD_RELEASE_SWEEP set=marks done=93 live=340 resolved=33884 by_news=22319 cut=399 cut_sites=105659 ms=75789
+FIELD_RELEASE_SWEEP set=marks done=94 live=338 resolved=34119 by_news=22553 cut=399 cut_sites=105659 ms=76217
+FIELD_RELEASE_SWEEP set=marks done=95 live=338 resolved=34386 by_news=22787 cut=399 cut_sites=105659 ms=76645
+FIELD_RELEASE_SWEEP set=marks done=96 live=337 resolved=34608 by_news=23017 cut=399 cut_sites=105659 ms=77062
+FIELD_RELEASE_SWEEP set=marks done=97 live=336 resolved=34819 by_news=23249 cut=399 cut_sites=105659 ms=77483
+FIELD_RELEASE_SWEEP set=marks done=98 live=334 resolved=35031 by_news=23489 cut=399 cut_sites=105659 ms=77914
+FIELD_RELEASE_SWEEP set=marks done=99 live=330 resolved=35214 by_news=23733 cut=399 cut_sites=105659 ms=78346
+FIELD_RELEASE_SWEEP set=marks done=100 live=328 resolved=35400 by_news=23981 cut=399 cut_sites=105659 ms=78783
+FIELD_RELEASE_SWEEP set=marks done=101 live=326 resolved=35594 by_news=24209 cut=399 cut_sites=105659 ms=79203
+FIELD_RELEASE_SWEEP set=marks done=102 live=324 resolved=35786 by_news=24436 cut=399 cut_sites=105659 ms=79617
+FIELD_RELEASE_SWEEP set=marks done=103 live=323 resolved=35955 by_news=24666 cut=399 cut_sites=105659 ms=80034
+FIELD_RELEASE_SWEEP set=marks done=104 live=320 resolved=36109 by_news=24900 cut=399 cut_sites=105659 ms=80447
+FIELD_RELEASE_SWEEP set=marks done=105 live=320 resolved=36274 by_news=25125 cut=399 cut_sites=105659 ms=80849
+FIELD_RELEASE_SWEEP set=marks done=106 live=318 resolved=36436 by_news=25348 cut=399 cut_sites=105659 ms=81250
+FIELD_RELEASE_SWEEP set=marks done=107 live=318 resolved=36574 by_news=25578 cut=399 cut_sites=105659 ms=81655
+FIELD_RELEASE_SWEEP set=marks done=108 live=315 resolved=36713 by_news=25812 cut=399 cut_sites=105659 ms=82069
+FIELD_RELEASE_SWEEP set=marks done=109 live=313 resolved=36895 by_news=26029 cut=399 cut_sites=105659 ms=82468
+FIELD_RELEASE_SWEEP set=marks done=110 live=313 resolved=37071 by_news=26253 cut=399 cut_sites=105659 ms=82866
+FIELD_RELEASE_SWEEP set=marks done=111 live=311 resolved=37214 by_news=26487 cut=399 cut_sites=105659 ms=83284
+FIELD_RELEASE_SWEEP set=marks done=112 live=311 resolved=37367 by_news=26719 cut=399 cut_sites=105659 ms=83692
+FIELD_RELEASE_SWEEP set=marks done=113 live=311 resolved=37506 by_news=26956 cut=399 cut_sites=105659 ms=84099
+FIELD_RELEASE_SWEEP set=marks done=114 live=310 resolved=37636 by_news=27179 cut=399 cut_sites=105659 ms=84497
+FIELD_RELEASE_SWEEP set=marks done=115 live=309 resolved=37745 by_news=27413 cut=399 cut_sites=105659 ms=84900
+FIELD_RELEASE_SWEEP set=marks done=116 live=308 resolved=37890 by_news=27633 cut=399 cut_sites=105659 ms=85287
+FIELD_RELEASE_SWEEP set=marks done=117 live=306 resolved=38037 by_news=27850 cut=399 cut_sites=105659 ms=85678
+FIELD_RELEASE_SWEEP set=marks done=118 live=306 resolved=38171 by_news=28067 cut=399 cut_sites=105659 ms=86065
+FIELD_RELEASE_SWEEP set=marks done=119 live=305 resolved=38314 by_news=28287 cut=399 cut_sites=105659 ms=86459
+FIELD_RELEASE_SWEEP set=marks done=120 live=304 resolved=38439 by_news=28519 cut=399 cut_sites=105659 ms=86854
+FIELD_RELEASE_SWEEP set=marks done=121 live=304 resolved=38562 by_news=28743 cut=399 cut_sites=105659 ms=87237
+FIELD_RELEASE_SWEEP set=marks done=122 live=303 resolved=38684 by_news=28970 cut=399 cut_sites=105659 ms=87627
+FIELD_RELEASE_SWEEP set=marks done=123 live=303 resolved=38812 by_news=29195 cut=399 cut_sites=105659 ms=88020
+FIELD_RELEASE_SWEEP set=marks done=124 live=302 resolved=38945 by_news=29422 cut=399 cut_sites=105659 ms=88411
+FIELD_RELEASE_SWEEP set=marks done=125 live=302 resolved=39082 by_news=29648 cut=399 cut_sites=105659 ms=88799
+FIELD_RELEASE_SWEEP set=marks done=126 live=301 resolved=39214 by_news=29872 cut=399 cut_sites=105659 ms=89194
+FIELD_RELEASE_SWEEP set=marks done=127 live=301 resolved=39359 by_news=30082 cut=399 cut_sites=105659 ms=89572
+FIELD_RELEASE_SWEEP set=marks done=128 live=301 resolved=39470 by_news=30310 cut=399 cut_sites=105659 ms=89961
+FIELD_RELEASE_SWEEP set=marks done=129 live=300 resolved=39572 by_news=30539 cut=399 cut_sites=105659 ms=90354
+FIELD_RELEASE_SWEEP set=marks done=130 live=298 resolved=39679 by_news=30762 cut=399 cut_sites=105659 ms=90739
+FIELD_RELEASE_SWEEP set=marks done=131 live=298 resolved=39781 by_news=30976 cut=399 cut_sites=105659 ms=91120
+FIELD_RELEASE_SWEEP set=marks done=132 live=296 resolved=39866 by_news=31205 cut=399 cut_sites=105659 ms=91510
+FIELD_RELEASE_SWEEP set=marks done=133 live=296 resolved=39953 by_news=31429 cut=399 cut_sites=105659 ms=91889
+FIELD_RELEASE_SWEEP set=marks done=134 live=296 resolved=40064 by_news=31648 cut=399 cut_sites=105659 ms=92265
+FIELD_RELEASE_SWEEP set=marks done=135 live=295 resolved=40157 by_news=31879 cut=399 cut_sites=105659 ms=92651
+FIELD_RELEASE_SWEEP set=marks done=136 live=295 resolved=40262 by_news=32106 cut=399 cut_sites=105659 ms=93033
+FIELD_RELEASE_SWEEP set=marks done=137 live=293 resolved=40361 by_news=32330 cut=399 cut_sites=105659 ms=93417
+FIELD_RELEASE_SWEEP set=marks done=138 live=292 resolved=40457 by_news=32556 cut=399 cut_sites=105659 ms=93806
+FIELD_RELEASE_SWEEP set=marks done=139 live=292 resolved=40558 by_news=32768 cut=399 cut_sites=105659 ms=94174
+FIELD_RELEASE_SWEEP set=marks done=140 live=292 resolved=40645 by_news=32992 cut=399 cut_sites=105659 ms=94556
+FIELD_RELEASE_SWEEP set=marks done=141 live=291 resolved=40750 by_news=33212 cut=399 cut_sites=105659 ms=94929
+FIELD_RELEASE_SWEEP set=marks done=142 live=290 resolved=40847 by_news=33440 cut=399 cut_sites=105659 ms=95314
+FIELD_RELEASE_SWEEP set=marks done=143 live=290 resolved=40964 by_news=33660 cut=399 cut_sites=105659 ms=95693
+FIELD_RELEASE_SWEEP set=marks done=144 live=289 resolved=41087 by_news=33875 cut=399 cut_sites=105659 ms=96059
+FIELD_RELEASE_SWEEP set=marks done=145 live=289 resolved=41175 by_news=34100 cut=399 cut_sites=105659 ms=96431
+FIELD_RELEASE_SWEEP set=marks done=146 live=288 resolved=41252 by_news=34333 cut=399 cut_sites=105659 ms=96815
+FIELD_RELEASE_SWEEP set=marks done=147 live=288 resolved=41343 by_news=34556 cut=399 cut_sites=105659 ms=97172
+FIELD_RELEASE_SWEEP set=marks done=148 live=286 resolved=41439 by_news=34777 cut=399 cut_sites=105659 ms=97533
+FIELD_RELEASE_SWEEP set=marks done=149 live=286 resolved=41528 by_news=34994 cut=399 cut_sites=105659 ms=97895
+FIELD_RELEASE_SWEEP set=marks done=150 live=283 resolved=41616 by_news=35222 cut=399 cut_sites=105659 ms=98279
+FIELD_RELEASE_SWEEP set=marks done=151 live=282 resolved=41704 by_news=35442 cut=399 cut_sites=105659 ms=98637
+FIELD_RELEASE_SWEEP set=marks done=152 live=281 resolved=41781 by_news=35664 cut=399 cut_sites=105659 ms=98995
+FIELD_RELEASE_SWEEP set=marks done=153 live=281 resolved=41859 by_news=35885 cut=399 cut_sites=105659 ms=99355
+FIELD_RELEASE_SWEEP set=marks done=154 live=280 resolved=41935 by_news=36103 cut=399 cut_sites=105659 ms=99712
+FIELD_RELEASE_SWEEP set=marks done=155 live=280 resolved=42005 by_news=36331 cut=399 cut_sites=105659 ms=100075
+FIELD_RELEASE_SWEEP set=marks done=156 live=280 resolved=42072 by_news=36558 cut=399 cut_sites=105659 ms=100438
+FIELD_RELEASE_SWEEP set=marks done=157 live=280 resolved=42137 by_news=36794 cut=399 cut_sites=105659 ms=100808
+FIELD_RELEASE_SWEEP set=marks done=158 live=280 resolved=42190 by_news=37027 cut=399 cut_sites=105659 ms=101180
+FIELD_RELEASE_SWEEP set=marks done=159 live=280 resolved=42249 by_news=37259 cut=399 cut_sites=105659 ms=101553
+FIELD_RELEASE_SWEEP set=marks done=160 live=277 resolved=42306 by_news=37490 cut=399 cut_sites=105659 ms=101919
+FIELD_RELEASE_SWEEP set=marks done=161 live=277 resolved=42363 by_news=37719 cut=399 cut_sites=105659 ms=102281
+FIELD_RELEASE_SWEEP set=marks done=162 live=277 resolved=42431 by_news=37940 cut=399 cut_sites=105659 ms=102636
+FIELD_RELEASE_SWEEP set=marks done=163 live=277 resolved=42490 by_news=38177 cut=399 cut_sites=105659 ms=103009
+FIELD_RELEASE_SWEEP set=marks done=164 live=277 resolved=42565 by_news=38403 cut=399 cut_sites=105659 ms=103370
+FIELD_RELEASE_SWEEP set=marks done=165 live=275 resolved=42637 by_news=38626 cut=399 cut_sites=105659 ms=103722
+FIELD_RELEASE_SWEEP set=marks done=166 live=274 resolved=42707 by_news=38854 cut=399 cut_sites=105659 ms=104079
+FIELD_RELEASE_SWEEP set=marks done=167 live=274 resolved=42750 by_news=39095 cut=399 cut_sites=105659 ms=104448
+FIELD_RELEASE_SWEEP set=marks done=168 live=274 resolved=42813 by_news=39320 cut=399 cut_sites=105659 ms=104801
+FIELD_RELEASE_SWEEP set=marks done=169 live=271 resolved=42865 by_news=39552 cut=399 cut_sites=105659 ms=105164
+FIELD_RELEASE_SWEEP set=marks done=170 live=271 resolved=42913 by_news=39785 cut=399 cut_sites=105659 ms=105531
+FIELD_RELEASE_SWEEP set=marks done=171 live=270 resolved=42959 by_news=40020 cut=399 cut_sites=105659 ms=105900
+FIELD_RELEASE_SWEEP set=marks done=172 live=270 resolved=43017 by_news=40244 cut=399 cut_sites=105659 ms=106255
+FIELD_RELEASE_SWEEP set=marks done=173 live=269 resolved=43078 by_news=40467 cut=399 cut_sites=105659 ms=106610
+FIELD_RELEASE_SWEEP set=marks done=174 live=269 resolved=43136 by_news=40689 cut=399 cut_sites=105659 ms=106960
+FIELD_RELEASE_SWEEP set=marks done=175 live=269 resolved=43189 by_news=40916 cut=399 cut_sites=105659 ms=107311
+FIELD_RELEASE_SWEEP set=marks done=176 live=268 resolved=43235 by_news=41146 cut=399 cut_sites=105659 ms=107665
+FIELD_RELEASE_SWEEP set=marks done=177 live=267 resolved=43267 by_news=41387 cut=399 cut_sites=105659 ms=108030
+FIELD_RELEASE_SWEEP set=marks done=178 live=267 resolved=43311 by_news=41618 cut=399 cut_sites=105659 ms=108386
+FIELD_RELEASE_SWEEP set=marks done=179 live=263 resolved=43348 by_news=41854 cut=399 cut_sites=105659 ms=108750
+FIELD_RELEASE_SWEEP set=marks done=180 live=262 resolved=43401 by_news=42075 cut=399 cut_sites=105659 ms=109101
+FIELD_RELEASE_SWEEP set=marks done=181 live=261 resolved=43451 by_news=42297 cut=399 cut_sites=105659 ms=109448
+FIELD_RELEASE_SWEEP set=marks done=182 live=261 resolved=43505 by_news=42510 cut=399 cut_sites=105659 ms=109789
+FIELD_RELEASE_SWEEP set=marks done=183 live=261 resolved=43545 by_news=42739 cut=399 cut_sites=105659 ms=110143
+FIELD_RELEASE_SWEEP set=marks done=184 live=260 resolved=43584 by_news=42968 cut=399 cut_sites=105659 ms=110497
+FIELD_RELEASE_SWEEP set=marks done=185 live=260 resolved=43639 by_news=43184 cut=399 cut_sites=105659 ms=110834
+FIELD_RELEASE_SWEEP set=marks done=186 live=259 resolved=43688 by_news=43410 cut=399 cut_sites=105659 ms=111185
+FIELD_RELEASE_SWEEP set=marks done=187 live=259 resolved=43729 by_news=43634 cut=399 cut_sites=105659 ms=111536
+FIELD_RELEASE_SWEEP set=marks done=188 live=258 resolved=43776 by_news=43856 cut=399 cut_sites=105659 ms=111880
+FIELD_RELEASE_SWEEP set=marks done=189 live=257 resolved=43811 by_news=44084 cut=399 cut_sites=105659 ms=112229
+FIELD_RELEASE_SWEEP set=marks done=190 live=257 resolved=43844 by_news=44311 cut=399 cut_sites=105659 ms=112575
+FIELD_RELEASE_SWEEP set=marks done=191 live=257 resolved=43879 by_news=44540 cut=399 cut_sites=105659 ms=112920
+FIELD_RELEASE_SWEEP set=marks done=192 live=257 resolved=43920 by_news=44761 cut=399 cut_sites=105659 ms=113255
+FIELD_RELEASE_SWEEP set=marks done=193 live=257 resolved=43963 by_news=44984 cut=399 cut_sites=105659 ms=113595
+FIELD_RELEASE_SWEEP set=marks done=194 live=255 resolved=43997 by_news=45212 cut=399 cut_sites=105659 ms=113936
+FIELD_RELEASE_SWEEP set=marks done=195 live=255 resolved=44027 by_news=45443 cut=399 cut_sites=105659 ms=114285
+FIELD_RELEASE_SWEEP set=marks done=196 live=255 resolved=44064 by_news=45665 cut=399 cut_sites=105659 ms=114619
+FIELD_RELEASE_SWEEP set=marks done=197 live=253 resolved=44105 by_news=45886 cut=399 cut_sites=105659 ms=114956
+FIELD_RELEASE_SWEEP set=marks done=198 live=252 resolved=44136 by_news=46113 cut=399 cut_sites=105659 ms=115296
+FIELD_RELEASE_SWEEP set=marks done=199 live=251 resolved=44168 by_news=46339 cut=399 cut_sites=105659 ms=115631
+FIELD_RELEASE_SWEEP set=marks done=200 live=250 resolved=44194 by_news=46566 cut=399 cut_sites=105659 ms=115966
+FIELD_RELEASE_SWEEP set=marks done=201 live=250 resolved=44221 by_news=46791 cut=399 cut_sites=105659 ms=116297
+FIELD_RELEASE_SWEEP set=marks done=202 live=249 resolved=44256 by_news=47011 cut=399 cut_sites=105659 ms=116626
+FIELD_RELEASE_SWEEP set=marks done=203 live=247 resolved=44295 by_news=47225 cut=399 cut_sites=105659 ms=116950
+FIELD_RELEASE_SWEEP set=marks done=204 live=244 resolved=44330 by_news=47443 cut=399 cut_sites=105659 ms=117271
+FIELD_RELEASE_SWEEP set=marks done=205 live=241 resolved=44357 by_news=47664 cut=399 cut_sites=105659 ms=117593
+FIELD_RELEASE_SWEEP set=marks done=206 live=237 resolved=44384 by_news=47884 cut=399 cut_sites=105659 ms=117912
+FIELD_RELEASE_SWEEP set=marks done=207 live=235 resolved=44407 by_news=48105 cut=399 cut_sites=105659 ms=118228
+FIELD_RELEASE_SWEEP set=marks done=208 live=233 resolved=44433 by_news=48315 cut=399 cut_sites=105659 ms=118525
+FIELD_RELEASE_SWEEP set=marks done=209 live=232 resolved=44458 by_news=48526 cut=399 cut_sites=105659 ms=118826
+FIELD_RELEASE_SWEEP set=marks done=210 live=229 resolved=44487 by_news=48732 cut=399 cut_sites=105659 ms=119120
+FIELD_RELEASE_SWEEP set=marks done=211 live=228 resolved=44513 by_news=48935 cut=399 cut_sites=105659 ms=119413
+FIELD_RELEASE_SWEEP set=marks done=212 live=227 resolved=44545 by_news=49134 cut=399 cut_sites=105659 ms=119701
+FIELD_RELEASE_SWEEP set=marks done=213 live=224 resolved=44572 by_news=49337 cut=399 cut_sites=105659 ms=119986
+FIELD_RELEASE_SWEEP set=marks done=214 live=220 resolved=44605 by_news=49530 cut=399 cut_sites=105659 ms=120268
+FIELD_RELEASE_SWEEP set=marks done=215 live=219 resolved=44626 by_news=49731 cut=399 cut_sites=105659 ms=120555
+FIELD_RELEASE_SWEEP set=marks done=216 live=216 resolved=44642 by_news=49935 cut=399 cut_sites=105659 ms=120837
+FIELD_RELEASE_SWEEP set=marks done=217 live=213 resolved=44660 by_news=50134 cut=399 cut_sites=105659 ms=121116
+FIELD_RELEASE_SWEEP set=marks done=218 live=205 resolved=44681 by_news=50328 cut=399 cut_sites=105659 ms=121394
+FIELD_RELEASE_SWEEP set=marks done=219 live=201 resolved=44696 by_news=50519 cut=399 cut_sites=105659 ms=121662
+FIELD_RELEASE_SWEEP set=marks done=220 live=201 resolved=44718 by_news=50699 cut=399 cut_sites=105659 ms=121912
+FIELD_RELEASE_SWEEP set=marks done=221 live=196 resolved=44734 by_news=50886 cut=399 cut_sites=105659 ms=122168
+FIELD_RELEASE_SWEEP set=marks done=222 live=191 resolved=44758 by_news=51058 cut=399 cut_sites=105659 ms=122409
+FIELD_RELEASE_SWEEP set=marks done=223 live=186 resolved=44770 by_news=51237 cut=399 cut_sites=105659 ms=122648
+FIELD_RELEASE_SWEEP set=marks done=224 live=183 resolved=44789 by_news=51406 cut=399 cut_sites=105659 ms=122873
+FIELD_RELEASE_SWEEP set=marks done=225 live=179 resolved=44810 by_news=51572 cut=399 cut_sites=105659 ms=123102
+FIELD_RELEASE_SWEEP set=marks done=226 live=178 resolved=44823 by_news=51739 cut=399 cut_sites=105659 ms=123326
+FIELD_RELEASE_SWEEP set=marks done=227 live=178 resolved=44836 by_news=51905 cut=399 cut_sites=105659 ms=123550
+FIELD_RELEASE_SWEEP set=marks done=228 live=177 resolved=44856 by_news=52064 cut=399 cut_sites=105659 ms=123766
+FIELD_RELEASE_SWEEP set=marks done=229 live=177 resolved=44873 by_news=52226 cut=399 cut_sites=105659 ms=123988
+FIELD_RELEASE_SWEEP set=marks done=230 live=177 resolved=44887 by_news=52392 cut=399 cut_sites=105659 ms=124214
+FIELD_RELEASE_SWEEP set=marks done=231 live=176 resolved=44893 by_news=52563 cut=399 cut_sites=105659 ms=124439
+FIELD_RELEASE_SWEEP set=marks done=232 live=176 resolved=44905 by_news=52728 cut=399 cut_sites=105659 ms=124660
+FIELD_RELEASE_SWEEP set=marks done=233 live=172 resolved=44912 by_news=52897 cut=399 cut_sites=105659 ms=124883
+FIELD_RELEASE_SWEEP set=marks done=234 live=171 resolved=44930 by_news=53054 cut=399 cut_sites=105659 ms=125096
+FIELD_RELEASE_SWEEP set=marks done=235 live=171 resolved=44944 by_news=53212 cut=399 cut_sites=105659 ms=125310
+FIELD_RELEASE_SWEEP set=marks done=236 live=169 resolved=44956 by_news=53372 cut=399 cut_sites=105659 ms=125526
+FIELD_RELEASE_SWEEP set=marks done=237 live=168 resolved=44960 by_news=53537 cut=399 cut_sites=105659 ms=125747
+FIELD_RELEASE_SWEEP set=marks done=238 live=166 resolved=44972 by_news=53694 cut=399 cut_sites=105659 ms=125958
+FIELD_RELEASE_SWEEP set=marks done=239 live=163 resolved=44982 by_news=53850 cut=399 cut_sites=105659 ms=126167
+FIELD_RELEASE_SWEEP set=marks done=240 live=161 resolved=44995 by_news=54001 cut=399 cut_sites=105659 ms=126372
+FIELD_RELEASE_SWEEP set=marks done=241 live=159 resolved=45008 by_news=54149 cut=399 cut_sites=105659 ms=126575
+FIELD_RELEASE_SWEEP set=marks done=242 live=157 resolved=45017 by_news=54300 cut=399 cut_sites=105659 ms=126779
+FIELD_RELEASE_SWEEP set=marks done=243 live=155 resolved=45023 by_news=54451 cut=399 cut_sites=105659 ms=126976
+FIELD_RELEASE_SWEEP set=marks done=244 live=153 resolved=45034 by_news=54596 cut=399 cut_sites=105659 ms=127170
+FIELD_RELEASE_SWEEP set=marks done=245 live=152 resolved=45042 by_news=54742 cut=399 cut_sites=105659 ms=127364
+FIELD_RELEASE_SWEEP set=marks done=246 live=148 resolved=45050 by_news=54886 cut=399 cut_sites=105659 ms=127555
+FIELD_RELEASE_SWEEP set=marks done=247 live=147 resolved=45057 by_news=55028 cut=399 cut_sites=105659 ms=127739
+FIELD_RELEASE_SWEEP set=marks done=248 live=145 resolved=45059 by_news=55173 cut=399 cut_sites=105659 ms=127926
+FIELD_RELEASE_SWEEP set=marks done=249 live=140 resolved=45064 by_news=55313 cut=399 cut_sites=105659 ms=128108
+FIELD_RELEASE_SWEEP set=marks done=250 live=138 resolved=45071 by_news=55446 cut=399 cut_sites=105659 ms=128282
+FIELD_RELEASE_SWEEP set=marks done=251 live=134 resolved=45082 by_news=55574 cut=399 cut_sites=105659 ms=128447
+FIELD_RELEASE_SWEEP set=marks done=252 live=132 resolved=45087 by_news=55703 cut=399 cut_sites=105659 ms=128611
+FIELD_RELEASE_SWEEP set=marks done=253 live=131 resolved=45096 by_news=55827 cut=399 cut_sites=105659 ms=128766
+FIELD_RELEASE_SWEEP set=marks done=254 live=128 resolved=45100 by_news=55954 cut=399 cut_sites=105659 ms=128928
+FIELD_RELEASE_SWEEP set=marks done=255 live=127 resolved=45105 by_news=56078 cut=399 cut_sites=105659 ms=129087
+FIELD_RELEASE_SWEEP set=marks done=256 live=125 resolved=45112 by_news=56198 cut=399 cut_sites=105659 ms=129239
+FIELD_RELEASE_SWEEP set=marks done=257 live=123 resolved=45117 by_news=56318 cut=399 cut_sites=105659 ms=129393
+FIELD_RELEASE_SWEEP set=marks done=258 live=122 resolved=45123 by_news=56435 cut=399 cut_sites=105659 ms=129542
+FIELD_RELEASE_SWEEP set=marks done=259 live=118 resolved=45128 by_news=56552 cut=399 cut_sites=105659 ms=129691
+FIELD_RELEASE_SWEEP set=marks done=260 live=118 resolved=45130 by_news=56668 cut=399 cut_sites=105659 ms=129837
+FIELD_RELEASE_SWEEP set=marks done=261 live=117 resolved=45134 by_news=56782 cut=399 cut_sites=105659 ms=129982
+FIELD_RELEASE_SWEEP set=marks done=262 live=114 resolved=45143 by_news=56890 cut=399 cut_sites=105659 ms=130120
+FIELD_RELEASE_SWEEP set=marks done=263 live=111 resolved=45148 by_news=56999 cut=399 cut_sites=105659 ms=130260
+FIELD_RELEASE_SWEEP set=marks done=264 live=110 resolved=45151 by_news=57107 cut=399 cut_sites=105659 ms=130398
+FIELD_RELEASE_SWEEP set=marks done=265 live=106 resolved=45155 by_news=57213 cut=399 cut_sites=105659 ms=130534
+FIELD_RELEASE_SWEEP set=marks done=266 live=101 resolved=45163 by_news=57312 cut=399 cut_sites=105659 ms=130665
+FIELD_RELEASE_SWEEP set=marks done=267 live=96 resolved=45170 by_news=57406 cut=399 cut_sites=105659 ms=130787
+FIELD_RELEASE_SWEEP set=marks done=268 live=93 resolved=45177 by_news=57495 cut=399 cut_sites=105659 ms=130904
+FIELD_RELEASE_SWEEP set=marks done=269 live=88 resolved=45182 by_news=57583 cut=399 cut_sites=105659 ms=131019
+FIELD_RELEASE_SWEEP set=marks done=270 live=86 resolved=45186 by_news=57667 cut=399 cut_sites=105659 ms=131131
+FIELD_RELEASE_SWEEP set=marks done=271 live=81 resolved=45190 by_news=57749 cut=399 cut_sites=105659 ms=131238
+FIELD_RELEASE_SWEEP set=marks done=272 live=77 resolved=45193 by_news=57827 cut=399 cut_sites=105659 ms=131342
+FIELD_RELEASE_SWEEP set=marks done=273 live=73 resolved=45196 by_news=57901 cut=399 cut_sites=105659 ms=131441
+FIELD_RELEASE_SWEEP set=marks done=274 live=66 resolved=45198 by_news=57972 cut=399 cut_sites=105659 ms=131538
+FIELD_RELEASE_SWEEP set=marks done=275 live=63 resolved=45200 by_news=58036 cut=399 cut_sites=105659 ms=131625
+FIELD_RELEASE_SWEEP set=marks done=276 live=58 resolved=45201 by_news=58098 cut=399 cut_sites=105659 ms=131711
+FIELD_RELEASE_SWEEP set=marks done=277 live=56 resolved=45205 by_news=58152 cut=399 cut_sites=105659 ms=131785
+FIELD_RELEASE_SWEEP set=marks done=278 live=55 resolved=45207 by_news=58206 cut=399 cut_sites=105659 ms=131861
+FIELD_RELEASE_SWEEP set=marks done=279 live=55 resolved=45210 by_news=58258 cut=399 cut_sites=105659 ms=131933
+FIELD_RELEASE_SWEEP set=marks done=280 live=51 resolved=45215 by_news=58308 cut=399 cut_sites=105659 ms=132006
+FIELD_RELEASE_SWEEP set=marks done=281 live=50 resolved=45218 by_news=58356 cut=399 cut_sites=105659 ms=132073
+FIELD_RELEASE_SWEEP set=marks done=282 live=49 resolved=45218 by_news=58406 cut=399 cut_sites=105659 ms=132145
+FIELD_RELEASE_SWEEP set=marks done=283 live=48 resolved=45218 by_news=58455 cut=399 cut_sites=105659 ms=132213
+FIELD_RELEASE_SWEEP set=marks done=284 live=48 resolved=45221 by_news=58500 cut=399 cut_sites=105659 ms=132278
+FIELD_RELEASE_SWEEP set=marks done=285 live=46 resolved=45223 by_news=58546 cut=399 cut_sites=105659 ms=132345
+FIELD_RELEASE_SWEEP set=marks done=286 live=46 resolved=45224 by_news=58591 cut=399 cut_sites=105659 ms=132409
+FIELD_RELEASE_SWEEP set=marks done=287 live=45 resolved=45226 by_news=58635 cut=399 cut_sites=105659 ms=132471
+FIELD_RELEASE_SWEEP set=marks done=288 live=43 resolved=45229 by_news=58677 cut=399 cut_sites=105659 ms=132523
+FIELD_RELEASE_SWEEP set=marks done=289 live=42 resolved=45230 by_news=58719 cut=399 cut_sites=105659 ms=132574
+FIELD_RELEASE_SWEEP set=marks done=290 live=42 resolved=45234 by_news=58757 cut=399 cut_sites=105659 ms=132623
+FIELD_RELEASE_SWEEP set=marks done=291 live=41 resolved=45235 by_news=58798 cut=399 cut_sites=105659 ms=132674
+FIELD_RELEASE_SWEEP set=marks done=292 live=40 resolved=45236 by_news=58838 cut=399 cut_sites=105659 ms=132723
+FIELD_RELEASE_SWEEP set=marks done=293 live=39 resolved=45237 by_news=58877 cut=399 cut_sites=105659 ms=132772
+FIELD_RELEASE_SWEEP set=marks done=294 live=38 resolved=45239 by_news=58914 cut=399 cut_sites=105659 ms=132819
+FIELD_RELEASE_SWEEP set=marks done=295 live=35 resolved=45241 by_news=58950 cut=399 cut_sites=105659 ms=132865
+FIELD_RELEASE_SWEEP set=marks done=296 live=34 resolved=45244 by_news=58982 cut=399 cut_sites=105659 ms=132908
+FIELD_RELEASE_SWEEP set=marks done=297 live=31 resolved=45246 by_news=59014 cut=399 cut_sites=105659 ms=132949
+FIELD_RELEASE_SWEEP set=marks done=298 live=28 resolved=45249 by_news=59042 cut=399 cut_sites=105659 ms=132987
+FIELD_RELEASE_SWEEP set=marks done=299 live=22 resolved=45252 by_news=59067 cut=399 cut_sites=105659 ms=133022
+FIELD_RELEASE_SWEEP set=marks done=300 live=22 resolved=45252 by_news=59089 cut=399 cut_sites=105659 ms=133053
+FIELD_RELEASE_SWEEP set=marks done=301 live=22 resolved=45252 by_news=59111 cut=399 cut_sites=105659 ms=133084
+FIELD_RELEASE_SWEEP set=marks done=302 live=20 resolved=45253 by_news=59132 cut=399 cut_sites=105659 ms=133113
+FIELD_RELEASE_SWEEP set=marks done=303 live=16 resolved=45254 by_news=59151 cut=399 cut_sites=105659 ms=133139
+FIELD_RELEASE_SWEEP set=marks done=304 live=15 resolved=45255 by_news=59166 cut=399 cut_sites=105659 ms=133161
+FIELD_RELEASE_SWEEP set=marks done=305 live=13 resolved=45255 by_news=59181 cut=399 cut_sites=105659 ms=133181
+FIELD_RELEASE_SWEEP set=marks done=306 live=12 resolved=45256 by_news=59193 cut=399 cut_sites=105659 ms=133200
+FIELD_RELEASE_SWEEP set=marks done=307 live=12 resolved=45256 by_news=59205 cut=399 cut_sites=105659 ms=133217
+FIELD_RELEASE_SWEEP set=marks done=308 live=11 resolved=45257 by_news=59216 cut=399 cut_sites=105659 ms=133235
+FIELD_RELEASE_SWEEP set=marks done=309 live=11 resolved=45258 by_news=59226 cut=399 cut_sites=105659 ms=133250
+FIELD_RELEASE_SWEEP set=marks done=310 live=10 resolved=45259 by_news=59236 cut=399 cut_sites=105659 ms=133266
+FIELD_RELEASE_SWEEP set=marks done=311 live=8 resolved=45262 by_news=59243 cut=399 cut_sites=105659 ms=133278
+FIELD_RELEASE_SWEEP set=marks done=312 live=6 resolved=45264 by_news=59249 cut=399 cut_sites=105659 ms=133289
+FIELD_RELEASE_SWEEP set=marks done=313 live=5 resolved=45265 by_news=59254 cut=399 cut_sites=105659 ms=133299
+FIELD_RELEASE_SWEEP set=marks done=314 live=5 resolved=45265 by_news=59259 cut=399 cut_sites=105659 ms=133307
+FIELD_RELEASE_SWEEP set=marks done=315 live=5 resolved=45265 by_news=59264 cut=399 cut_sites=105659 ms=133315
+FIELD_RELEASE_SWEEP set=marks done=316 live=5 resolved=45265 by_news=59269 cut=399 cut_sites=105659 ms=133323
+FIELD_RELEASE_SWEEP set=marks done=317 live=5 resolved=45265 by_news=59274 cut=399 cut_sites=105659 ms=133332
+FIELD_RELEASE_SWEEP set=marks done=318 live=5 resolved=45265 by_news=59279 cut=399 cut_sites=105659 ms=133340
+FIELD_RELEASE_SWEEP set=marks done=319 live=5 resolved=45265 by_news=59284 cut=399 cut_sites=105659 ms=133348
+FIELD_RELEASE_SWEEP set=marks done=320 live=5 resolved=45266 by_news=59288 cut=399 cut_sites=105659 ms=133356
+FIELD_RELEASE_SWEEP set=marks done=321 live=4 resolved=45266 by_news=59293 cut=399 cut_sites=105659 ms=133365
+FIELD_RELEASE_SWEEP set=marks done=322 live=3 resolved=45267 by_news=59296 cut=399 cut_sites=105659 ms=133371
+FIELD_RELEASE_SWEEP set=marks done=323 live=3 resolved=45267 by_news=59299 cut=399 cut_sites=105659 ms=133377
+FIELD_RELEASE_SWEEP set=marks done=324 live=3 resolved=45267 by_news=59302 cut=399 cut_sites=105659 ms=133382
+FIELD_RELEASE_SWEEP set=marks done=325 live=3 resolved=45267 by_news=59305 cut=399 cut_sites=105659 ms=133388
+FIELD_RELEASE_SWEEP set=marks done=326 live=3 resolved=45267 by_news=59308 cut=399 cut_sites=105659 ms=133394
+FIELD_RELEASE_SWEEP set=marks done=327 live=3 resolved=45267 by_news=59311 cut=399 cut_sites=105659 ms=133399
+FIELD_RELEASE_SWEEP set=marks done=328 live=3 resolved=45267 by_news=59314 cut=399 cut_sites=105659 ms=133405
+FIELD_RELEASE_SWEEP set=marks done=329 live=3 resolved=45267 by_news=59317 cut=399 cut_sites=105659 ms=133411
+FIELD_RELEASE_SWEEP set=marks done=330 live=3 resolved=45267 by_news=59320 cut=399 cut_sites=105659 ms=133417
+FIELD_RELEASE_SWEEP set=marks done=331 live=3 resolved=45267 by_news=59323 cut=399 cut_sites=105659 ms=133423
+FIELD_RELEASE_SWEEP set=marks done=332 live=3 resolved=45267 by_news=59326 cut=399 cut_sites=105659 ms=133428
+FIELD_RELEASE_SWEEP set=marks done=333 live=3 resolved=45267 by_news=59329 cut=399 cut_sites=105659 ms=133434
+FIELD_RELEASE_SWEEP set=marks done=334 live=3 resolved=45267 by_news=59332 cut=399 cut_sites=105659 ms=133440
+FIELD_RELEASE_SWEEP set=marks done=335 live=3 resolved=45267 by_news=59335 cut=399 cut_sites=105659 ms=133445
+FIELD_RELEASE_SWEEP set=marks done=336 live=3 resolved=45267 by_news=59338 cut=399 cut_sites=105659 ms=133451
+FIELD_RELEASE_SWEEP set=marks done=337 live=3 resolved=45267 by_news=59341 cut=399 cut_sites=105659 ms=133457
+FIELD_RELEASE_SWEEP set=marks done=338 live=1 resolved=45269 by_news=59342 cut=399 cut_sites=105659 ms=133461
+FIELD_RELEASE_SWEEP set=marks done=339 live=1 resolved=45269 by_news=59343 cut=399 cut_sites=105659 ms=133464
+FIELD_RELEASE_SWEEP set=marks done=340 live=1 resolved=45269 by_news=59344 cut=399 cut_sites=105659 ms=133467
+FIELD_RELEASE_SWEEP set=marks done=341 live=1 resolved=45269 by_news=59345 cut=399 cut_sites=105659 ms=133469
+FIELD_RELEASE_SWEEP set=marks done=342 live=1 resolved=45269 by_news=59346 cut=399 cut_sites=105659 ms=133472
+FIELD_RELEASE_SWEEP set=marks done=343 live=0 resolved=45270 by_news=59346 cut=399 cut_sites=105659 ms=133474
+FIELD_RELEASE free=128 marks=399 withheld=0 refused=0 sweeps=1229 stop_ms=240000 free_sweeps=363 free_open=0 free_stopped=false marks_sweeps=343 marks_open=0 marks_stopped=false released=40048 held=35463 lambda=11033 friction=53445 ms=133475
+FIELD_CARD reads=1408 read_ms=124741 returns=0 return_ms=0 pairs=722403535728 batches=1408 peak_store=4172471596 elapsed_ms=133475

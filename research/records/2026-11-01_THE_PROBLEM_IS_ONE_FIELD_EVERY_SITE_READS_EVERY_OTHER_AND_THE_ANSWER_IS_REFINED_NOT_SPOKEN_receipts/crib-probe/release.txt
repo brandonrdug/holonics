@@ -1,0 +1,202 @@
+FIELD_COMMAND release-field $ROOT/.local/wt/field-card/.local/run/crib/train/STATE.13 b44f322bf31192ac1fb49376765daa09062e167232d610e30c14cb3c8c5c4888 $ROOT/.local/wt/field-card/.local/run/crib/train/CODEC 0a26b3281ea9122b4325faa976006aa43011836f064dbaef389e0df32fe8789d $ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 $ROOT/.local/wt/field-card/.local/run/crib/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab 128 53 150000 $ROOT/.local/wt/field-card/.local/run/crib/release
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15326576640 total=16802250752 batch_budget=10335485952
+FIELD_RELEASE_SWEEP set=free done=0 live=128 open=128 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=8
+FIELD_RELEASE_SWEEP set=free done=1 live=128 open=128 resolved=467 by_news=0 revised=0 unsettled=0 cut=128 cut_sites=5244 ms=69
+FIELD_RELEASE_SWEEP set=free done=2 live=128 open=128 resolved=1038 by_news=4 revised=2 unsettled=0 cut=128 cut_sites=5244 ms=126
+FIELD_RELEASE_SWEEP set=free done=3 live=128 open=128 resolved=1875 by_news=6 revised=12 unsettled=0 cut=128 cut_sites=5244 ms=182
+FIELD_RELEASE_SWEEP set=free done=4 live=128 open=128 resolved=2396 by_news=40 revised=33 unsettled=0 cut=128 cut_sites=5244 ms=245
+FIELD_RELEASE_SWEEP set=free done=5 live=128 open=128 resolved=2492 by_news=117 revised=57 unsettled=0 cut=128 cut_sites=5244 ms=321
+FIELD_RELEASE_SWEEP set=free done=6 live=128 open=128 resolved=2507 by_news=230 revised=98 unsettled=0 cut=128 cut_sites=5244 ms=413
+FIELD_RELEASE_SWEEP set=free done=7 live=128 open=128 resolved=2520 by_news=346 revised=106 unsettled=0 cut=128 cut_sites=5244 ms=496
+FIELD_RELEASE_SWEEP set=free done=8 live=128 open=128 resolved=2525 by_news=469 revised=123 unsettled=0 cut=128 cut_sites=5244 ms=582
+FIELD_RELEASE_SWEEP set=free done=9 live=128 open=128 resolved=2533 by_news=589 revised=139 unsettled=0 cut=128 cut_sites=5244 ms=674
+FIELD_RELEASE_SWEEP set=free done=10 live=128 open=128 resolved=2543 by_news=707 revised=140 unsettled=0 cut=128 cut_sites=5244 ms=757
+FIELD_RELEASE_SWEEP set=free done=11 live=128 open=122 resolved=2550 by_news=828 revised=142 unsettled=0 cut=128 cut_sites=5244 ms=841
+FIELD_RELEASE_SWEEP set=free done=12 live=128 open=112 resolved=2559 by_news=941 revised=148 unsettled=0 cut=128 cut_sites=5244 ms=922
+FIELD_RELEASE_SWEEP set=free done=13 live=128 open=110 resolved=2563 by_news=1049 revised=154 unsettled=0 cut=128 cut_sites=5244 ms=1000
+FIELD_RELEASE_SWEEP set=free done=14 live=122 open=104 resolved=2565 by_news=1157 revised=157 unsettled=0 cut=128 cut_sites=5244 ms=1078
+FIELD_RELEASE_SWEEP set=free done=15 live=113 open=102 resolved=2565 by_news=1261 revised=157 unsettled=0 cut=128 cut_sites=5244 ms=1154
+FIELD_RELEASE_SWEEP set=free done=16 live=111 open=100 resolved=2567 by_news=1361 revised=159 unsettled=0 cut=128 cut_sites=5244 ms=1226
+FIELD_RELEASE_SWEEP set=free done=17 live=105 open=100 resolved=2570 by_news=1458 revised=160 unsettled=0 cut=128 cut_sites=5244 ms=1296
+FIELD_RELEASE_SWEEP set=free done=18 live=103 open=100 resolved=2572 by_news=1556 revised=161 unsettled=0 cut=128 cut_sites=5244 ms=1365
+FIELD_RELEASE_SWEEP set=free done=19 live=100 open=100 resolved=2573 by_news=1655 revised=161 unsettled=0 cut=128 cut_sites=5244 ms=1435
+FIELD_RELEASE_SWEEP set=free done=20 live=100 open=100 resolved=2574 by_news=1754 revised=161 unsettled=0 cut=128 cut_sites=5244 ms=1504
+FIELD_RELEASE_SWEEP set=free done=21 live=100 open=100 resolved=2574 by_news=1854 revised=161 unsettled=0 cut=128 cut_sites=5244 ms=1573
+FIELD_RELEASE_SWEEP set=free done=22 live=100 open=99 resolved=2575 by_news=1953 revised=163 unsettled=0 cut=128 cut_sites=5244 ms=1641
+FIELD_RELEASE_SWEEP set=free done=23 live=100 open=98 resolved=2576 by_news=2051 revised=163 unsettled=0 cut=128 cut_sites=5244 ms=1708
+FIELD_RELEASE_SWEEP set=free done=24 live=100 open=94 resolved=2580 by_news=2145 revised=163 unsettled=0 cut=128 cut_sites=5244 ms=1775
+FIELD_RELEASE_SWEEP set=free done=25 live=99 open=86 resolved=2587 by_news=2232 revised=163 unsettled=0 cut=128 cut_sites=5244 ms=1838
+FIELD_RELEASE_SWEEP set=free done=26 live=98 open=68 resolved=2604 by_news=2301 revised=166 unsettled=0 cut=128 cut_sites=5244 ms=1896
+FIELD_RELEASE_SWEEP set=free done=27 live=94 open=50 resolved=2621 by_news=2352 revised=166 unsettled=0 cut=128 cut_sites=5244 ms=1946
+FIELD_RELEASE_SWEEP set=free done=28 live=86 open=28 resolved=2642 by_news=2381 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=1986
+FIELD_RELEASE_SWEEP set=free done=29 live=68 open=16 resolved=2652 by_news=2399 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2017
+FIELD_RELEASE_SWEEP set=free done=30 live=50 open=5 resolved=2660 by_news=2407 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2040
+FIELD_RELEASE_SWEEP set=free done=31 live=29 open=2 resolved=2663 by_news=2409 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2054
+FIELD_RELEASE_SWEEP set=free done=32 live=17 open=1 resolved=2664 by_news=2410 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2063
+FIELD_RELEASE_SWEEP set=free done=33 live=6 open=0 resolved=2665 by_news=2410 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2069
+FIELD_RELEASE_SWEEP set=free done=34 live=3 open=0 resolved=2665 by_news=2410 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2071
+FIELD_RELEASE_SWEEP set=free done=35 live=1 open=0 resolved=2665 by_news=2410 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2072
+FIELD_RELEASE_SWEEP set=free done=36 live=0 open=0 resolved=2665 by_news=2410 revised=167 unsettled=0 cut=128 cut_sites=5244 ms=2073
+FIELD_RELEASE_ONE problem=0 released=43 held=46 lambda=20 friction=49 total_ms=2073
+FIELD_RELEASE_ONE problem=1 released=42 held=30 lambda=18 friction=36 total_ms=2073
+FIELD_RELEASE_ONE problem=2 released=40 held=36 lambda=23 friction=30 total_ms=2073
+FIELD_RELEASE_ONE problem=3 released=41 held=40 lambda=22 friction=37 total_ms=2073
+FIELD_RELEASE_ONE problem=4 released=42 held=40 lambda=21 friction=40 total_ms=2073
+FIELD_RELEASE_ONE problem=5 released=43 held=40 lambda=21 friction=41 total_ms=2073
+FIELD_RELEASE_ONE problem=6 released=43 held=44 lambda=22 friction=43 total_ms=2073
+FIELD_RELEASE_ONE problem=7 released=43 held=39 lambda=27 friction=28 total_ms=2073
+FIELD_RELEASE_ONE problem=8 released=24 held=21 lambda=12 friction=21 total_ms=2073
+FIELD_RELEASE_ONE problem=9 released=41 held=43 lambda=21 friction=42 total_ms=2073
+FIELD_RELEASE_ONE problem=10 released=41 held=43 lambda=20 friction=44 total_ms=2073
+FIELD_RELEASE_ONE problem=11 released=41 held=44 lambda=23 friction=39 total_ms=2073
+FIELD_RELEASE_ONE problem=12 released=42 held=42 lambda=20 friction=44 total_ms=2073
+FIELD_RELEASE_ONE problem=13 released=24 held=21 lambda=13 friction=19 total_ms=2073
+FIELD_RELEASE_ONE problem=14 released=40 held=26 lambda=13 friction=40 total_ms=2074
+FIELD_RELEASE_ONE problem=15 released=43 held=26 lambda=14 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=16 released=23 held=35 lambda=16 friction=26 total_ms=2074
+FIELD_RELEASE_ONE problem=17 released=22 held=36 lambda=13 friction=32 total_ms=2074
+FIELD_RELEASE_ONE problem=18 released=21 held=35 lambda=14 friction=28 total_ms=2074
+FIELD_RELEASE_ONE problem=19 released=45 held=43 lambda=26 friction=36 total_ms=2074
+FIELD_RELEASE_ONE problem=20 released=41 held=21 lambda=14 friction=34 total_ms=2074
+FIELD_RELEASE_ONE problem=21 released=22 held=21 lambda=12 friction=19 total_ms=2074
+FIELD_RELEASE_ONE problem=22 released=43 held=45 lambda=20 friction=48 total_ms=2074
+FIELD_RELEASE_ONE problem=23 released=40 held=25 lambda=18 friction=29 total_ms=2074
+FIELD_RELEASE_ONE problem=24 released=43 held=27 lambda=17 friction=36 total_ms=2074
+FIELD_RELEASE_ONE problem=25 released=40 held=44 lambda=26 friction=32 total_ms=2074
+FIELD_RELEASE_ONE problem=26 released=42 held=21 lambda=13 friction=37 total_ms=2074
+FIELD_RELEASE_ONE problem=27 released=23 held=25 lambda=16 friction=16 total_ms=2074
+FIELD_RELEASE_ONE problem=28 released=19 held=17 lambda=13 friction=10 total_ms=2074
+FIELD_RELEASE_ONE problem=29 released=41 held=26 lambda=17 friction=33 total_ms=2074
+FIELD_RELEASE_ONE problem=30 released=41 held=25 lambda=12 friction=42 total_ms=2074
+FIELD_RELEASE_ONE problem=31 released=43 held=26 lambda=16 friction=37 total_ms=2074
+FIELD_RELEASE_ONE problem=32 released=44 held=44 lambda=22 friction=44 total_ms=2074
+FIELD_RELEASE_ONE problem=33 released=41 held=42 lambda=29 friction=25 total_ms=2074
+FIELD_RELEASE_ONE problem=34 released=45 held=30 lambda=18 friction=39 total_ms=2074
+FIELD_RELEASE_ONE problem=35 released=23 held=21 lambda=12 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=36 released=23 held=35 lambda=14 friction=30 total_ms=2074
+FIELD_RELEASE_ONE problem=37 released=44 held=30 lambda=17 friction=40 total_ms=2074
+FIELD_RELEASE_ONE problem=38 released=41 held=25 lambda=17 friction=32 total_ms=2074
+FIELD_RELEASE_ONE problem=39 released=44 held=45 lambda=29 friction=31 total_ms=2074
+FIELD_RELEASE_ONE problem=40 released=22 held=20 lambda=16 friction=10 total_ms=2074
+FIELD_RELEASE_ONE problem=41 released=40 held=43 lambda=23 friction=37 total_ms=2074
+FIELD_RELEASE_ONE problem=42 released=43 held=50 lambda=26 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=43 released=43 held=26 lambda=16 friction=37 total_ms=2074
+FIELD_RELEASE_ONE problem=44 released=21 held=20 lambda=15 friction=11 total_ms=2074
+FIELD_RELEASE_ONE problem=45 released=42 held=25 lambda=15 friction=37 total_ms=2074
+FIELD_RELEASE_ONE problem=46 released=39 held=36 lambda=22 friction=31 total_ms=2074
+FIELD_RELEASE_ONE problem=47 released=21 held=21 lambda=11 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=48 released=21 held=21 lambda=11 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=49 released=44 held=25 lambda=14 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=50 released=43 held=30 lambda=19 friction=35 total_ms=2074
+FIELD_RELEASE_ONE problem=51 released=22 held=21 lambda=13 friction=17 total_ms=2074
+FIELD_RELEASE_ONE problem=52 released=22 held=21 lambda=12 friction=19 total_ms=2074
+FIELD_RELEASE_ONE problem=53 released=40 held=40 lambda=19 friction=42 total_ms=2074
+FIELD_RELEASE_ONE problem=54 released=42 held=42 lambda=19 friction=46 total_ms=2074
+FIELD_RELEASE_ONE problem=55 released=43 held=44 lambda=26 friction=35 total_ms=2074
+FIELD_RELEASE_ONE problem=56 released=40 held=43 lambda=24 friction=35 total_ms=2074
+FIELD_RELEASE_ONE problem=57 released=43 held=40 lambda=22 friction=39 total_ms=2074
+FIELD_RELEASE_ONE problem=58 released=41 held=25 lambda=14 friction=38 total_ms=2074
+FIELD_RELEASE_ONE problem=59 released=42 held=42 lambda=27 friction=30 total_ms=2074
+FIELD_RELEASE_ONE problem=60 released=43 held=47 lambda=27 friction=36 total_ms=2074
+FIELD_RELEASE_ONE problem=61 released=23 held=25 lambda=14 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=62 released=42 held=42 lambda=23 friction=38 total_ms=2074
+FIELD_RELEASE_ONE problem=63 released=21 held=21 lambda=11 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=64 released=39 held=41 lambda=31 friction=18 total_ms=2074
+FIELD_RELEASE_ONE problem=65 released=39 held=35 lambda=26 friction=22 total_ms=2074
+FIELD_RELEASE_ONE problem=66 released=43 held=25 lambda=17 friction=34 total_ms=2074
+FIELD_RELEASE_ONE problem=67 released=42 held=36 lambda=20 friction=38 total_ms=2074
+FIELD_RELEASE_ONE problem=68 released=22 held=20 lambda=16 friction=10 total_ms=2074
+FIELD_RELEASE_ONE problem=69 released=21 held=35 lambda=14 friction=28 total_ms=2074
+FIELD_RELEASE_ONE problem=70 released=41 held=40 lambda=25 friction=31 total_ms=2074
+FIELD_RELEASE_ONE problem=71 released=24 held=35 lambda=13 friction=33 total_ms=2074
+FIELD_RELEASE_ONE problem=72 released=42 held=44 lambda=21 friction=44 total_ms=2074
+FIELD_RELEASE_ONE problem=73 released=43 held=44 lambda=23 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=74 released=42 held=40 lambda=21 friction=40 total_ms=2074
+FIELD_RELEASE_ONE problem=75 released=40 held=25 lambda=16 friction=33 total_ms=2074
+FIELD_RELEASE_ONE problem=76 released=40 held=42 lambda=26 friction=30 total_ms=2074
+FIELD_RELEASE_ONE problem=77 released=40 held=36 lambda=20 friction=36 total_ms=2074
+FIELD_RELEASE_ONE problem=78 released=44 held=30 lambda=16 friction=42 total_ms=2074
+FIELD_RELEASE_ONE problem=79 released=42 held=44 lambda=20 friction=46 total_ms=2074
+FIELD_RELEASE_ONE problem=80 released=21 held=31 lambda=17 friction=18 total_ms=2074
+FIELD_RELEASE_ONE problem=81 released=44 held=30 lambda=17 friction=40 total_ms=2074
+FIELD_RELEASE_ONE problem=82 released=21 held=21 lambda=14 friction=14 total_ms=2074
+FIELD_RELEASE_ONE problem=83 released=24 held=22 lambda=13 friction=20 total_ms=2074
+FIELD_RELEASE_ONE problem=84 released=40 held=25 lambda=12 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=85 released=40 held=21 lambda=13 friction=35 total_ms=2074
+FIELD_RELEASE_ONE problem=86 released=43 held=43 lambda=19 friction=48 total_ms=2074
+FIELD_RELEASE_ONE problem=87 released=21 held=21 lambda=12 friction=18 total_ms=2074
+FIELD_RELEASE_ONE problem=88 released=41 held=26 lambda=20 friction=27 total_ms=2074
+FIELD_RELEASE_ONE problem=89 released=42 held=26 lambda=15 friction=38 total_ms=2074
+FIELD_RELEASE_ONE problem=90 released=21 held=35 lambda=13 friction=30 total_ms=2074
+FIELD_RELEASE_ONE problem=91 released=43 held=25 lambda=13 friction=42 total_ms=2074
+FIELD_RELEASE_ONE problem=92 released=40 held=43 lambda=21 friction=41 total_ms=2074
+FIELD_RELEASE_ONE problem=93 released=44 held=52 lambda=30 friction=36 total_ms=2075
+FIELD_RELEASE_ONE problem=94 released=40 held=36 lambda=20 friction=36 total_ms=2075
+FIELD_RELEASE_ONE problem=95 released=43 held=26 lambda=16 friction=37 total_ms=2075
+FIELD_RELEASE_ONE problem=96 released=41 held=40 lambda=26 friction=29 total_ms=2075
+FIELD_RELEASE_ONE problem=97 released=41 held=25 lambda=15 friction=36 total_ms=2075
+FIELD_RELEASE_ONE problem=98 released=41 held=26 lambda=13 friction=41 total_ms=2075
+FIELD_RELEASE_ONE problem=99 released=41 held=25 lambda=13 friction=40 total_ms=2075
+FIELD_RELEASE_ONE problem=100 released=41 held=44 lambda=23 friction=39 total_ms=2075
+FIELD_RELEASE_ONE problem=101 released=44 held=48 lambda=27 friction=38 total_ms=2075
+FIELD_RELEASE_ONE problem=102 released=41 held=43 lambda=20 friction=44 total_ms=2075
+FIELD_RELEASE_ONE problem=103 released=24 held=35 lambda=13 friction=33 total_ms=2075
+FIELD_RELEASE_ONE problem=104 released=42 held=30 lambda=18 friction=36 total_ms=2075
+FIELD_RELEASE_ONE problem=105 released=42 held=25 lambda=14 friction=39 total_ms=2075
+FIELD_RELEASE_ONE problem=106 released=43 held=27 lambda=16 friction=38 total_ms=2075
+FIELD_RELEASE_ONE problem=107 released=42 held=22 lambda=15 friction=34 total_ms=2075
+FIELD_RELEASE_ONE problem=108 released=43 held=30 lambda=17 friction=39 total_ms=2075
+FIELD_RELEASE_ONE problem=109 released=43 held=43 lambda=26 friction=34 total_ms=2075
+FIELD_RELEASE_ONE problem=110 released=42 held=40 lambda=24 friction=34 total_ms=2075
+FIELD_RELEASE_ONE problem=111 released=42 held=40 lambda=24 friction=34 total_ms=2075
+FIELD_RELEASE_ONE problem=112 released=21 held=34 lambda=17 friction=21 total_ms=2075
+FIELD_RELEASE_ONE problem=113 released=41 held=25 lambda=17 friction=32 total_ms=2075
+FIELD_RELEASE_ONE problem=114 released=44 held=44 lambda=26 friction=36 total_ms=2075
+FIELD_RELEASE_ONE problem=115 released=43 held=43 lambda=20 friction=46 total_ms=2075
+FIELD_RELEASE_ONE problem=116 released=43 held=48 lambda=27 friction=37 total_ms=2075
+FIELD_RELEASE_ONE problem=117 released=42 held=25 lambda=16 friction=35 total_ms=2075
+FIELD_RELEASE_ONE problem=118 released=43 held=50 lambda=25 friction=43 total_ms=2075
+FIELD_RELEASE_ONE problem=119 released=43 held=51 lambda=32 friction=30 total_ms=2075
+FIELD_RELEASE_ONE problem=120 released=42 held=36 lambda=20 friction=38 total_ms=2075
+FIELD_RELEASE_ONE problem=121 released=43 held=43 lambda=26 friction=34 total_ms=2075
+FIELD_RELEASE_ONE problem=122 released=43 held=32 lambda=20 friction=35 total_ms=2075
+FIELD_RELEASE_ONE problem=123 released=43 held=39 lambda=25 friction=32 total_ms=2075
+FIELD_RELEASE_ONE problem=124 released=43 held=44 lambda=28 friction=31 total_ms=2075
+FIELD_RELEASE_ONE problem=125 released=43 held=45 lambda=24 friction=40 total_ms=2075
+FIELD_RELEASE_ONE problem=126 released=45 held=41 lambda=22 friction=42 total_ms=2075
+FIELD_RELEASE_ONE problem=127 released=43 held=49 lambda=26 friction=40 total_ms=2075
+FIELD_RELEASE_SWEEP set=marks done=0 live=200 open=200 resolved=0 by_news=0 revised=0 unsettled=0 cut=0 cut_sites=0 ms=2078
+FIELD_RELEASE_SWEEP set=marks done=1 live=200 open=200 resolved=732 by_news=0 revised=6 unsettled=0 cut=200 cut_sites=5971 ms=2162
+FIELD_RELEASE_SWEEP set=marks done=2 live=200 open=200 resolved=1895 by_news=3 revised=54 unsettled=0 cut=200 cut_sites=5971 ms=2247
+FIELD_RELEASE_SWEEP set=marks done=3 live=200 open=200 resolved=2604 by_news=73 revised=73 unsettled=0 cut=200 cut_sites=5971 ms=2348
+FIELD_RELEASE_SWEEP set=marks done=4 live=200 open=200 resolved=2692 by_news=243 revised=101 unsettled=0 cut=200 cut_sites=5971 ms=2480
+FIELD_RELEASE_SWEEP set=marks done=5 live=200 open=200 resolved=2711 by_news=431 revised=107 unsettled=0 cut=200 cut_sites=5971 ms=2621
+FIELD_RELEASE_SWEEP set=marks done=6 live=200 open=200 resolved=2718 by_news=627 revised=114 unsettled=0 cut=200 cut_sites=5971 ms=2762
+FIELD_RELEASE_SWEEP set=marks done=7 live=200 open=200 resolved=2720 by_news=825 revised=117 unsettled=0 cut=200 cut_sites=5971 ms=2905
+FIELD_RELEASE_SWEEP set=marks done=8 live=200 open=200 resolved=2722 by_news=1023 revised=124 unsettled=0 cut=200 cut_sites=5971 ms=3047
+FIELD_RELEASE_SWEEP set=marks done=9 live=200 open=200 resolved=2731 by_news=1216 revised=125 unsettled=0 cut=200 cut_sites=5971 ms=3187
+FIELD_RELEASE_SWEEP set=marks done=10 live=200 open=196 resolved=2733 by_news=1414 revised=130 unsettled=0 cut=200 cut_sites=5971 ms=3329
+FIELD_RELEASE_SWEEP set=marks done=11 live=200 open=185 resolved=2739 by_news=1604 revised=134 unsettled=0 cut=200 cut_sites=5971 ms=3467
+FIELD_RELEASE_SWEEP set=marks done=12 live=200 open=131 resolved=2783 by_news=1745 revised=138 unsettled=0 cut=200 cut_sites=5971 ms=3586
+FIELD_RELEASE_SWEEP set=marks done=13 live=196 open=119 resolved=2792 by_news=1867 revised=140 unsettled=0 cut=200 cut_sites=5971 ms=3684
+FIELD_RELEASE_SWEEP set=marks done=14 live=185 open=117 resolved=2795 by_news=1983 revised=143 unsettled=0 cut=200 cut_sites=5971 ms=3779
+FIELD_RELEASE_SWEEP set=marks done=15 live=132 open=117 resolved=2795 by_news=2100 revised=143 unsettled=0 cut=200 cut_sites=5971 ms=3872
+FIELD_RELEASE_SWEEP set=marks done=16 live=120 open=117 resolved=2796 by_news=2216 revised=143 unsettled=0 cut=200 cut_sites=5971 ms=3955
+FIELD_RELEASE_SWEEP set=marks done=17 live=118 open=117 resolved=2796 by_news=2333 revised=145 unsettled=0 cut=200 cut_sites=5971 ms=4038
+FIELD_RELEASE_SWEEP set=marks done=18 live=118 open=117 resolved=2796 by_news=2450 revised=146 unsettled=0 cut=200 cut_sites=5971 ms=4117
+FIELD_RELEASE_SWEEP set=marks done=19 live=117 open=117 resolved=2796 by_news=2567 revised=150 unsettled=0 cut=200 cut_sites=5971 ms=4197
+FIELD_RELEASE_SWEEP set=marks done=20 live=117 open=116 resolved=2796 by_news=2684 revised=151 unsettled=0 cut=200 cut_sites=5971 ms=4276
+FIELD_RELEASE_SWEEP set=marks done=21 live=117 open=113 resolved=2796 by_news=2800 revised=153 unsettled=0 cut=200 cut_sites=5971 ms=4354
+FIELD_RELEASE_SWEEP set=marks done=22 live=117 open=102 resolved=2802 by_news=2907 revised=153 unsettled=0 cut=200 cut_sites=5971 ms=4429
+FIELD_RELEASE_SWEEP set=marks done=23 live=116 open=63 resolved=2838 by_news=2973 revised=155 unsettled=0 cut=200 cut_sites=5971 ms=4494
+FIELD_RELEASE_SWEEP set=marks done=24 live=113 open=13 resolved=2888 by_news=2986 revised=155 unsettled=0 cut=200 cut_sites=5971 ms=4538
+FIELD_RELEASE_SWEEP set=marks done=25 live=102 open=5 resolved=2894 by_news=2993 revised=155 unsettled=0 cut=200 cut_sites=5971 ms=4568
+FIELD_RELEASE_SWEEP set=marks done=26 live=64 open=3 resolved=2895 by_news=2997 revised=156 unsettled=0 cut=200 cut_sites=5971 ms=4594
+FIELD_RELEASE_SWEEP set=marks done=27 live=14 open=3 resolved=2895 by_news=3000 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4611
+FIELD_RELEASE_SWEEP set=marks done=28 live=7 open=1 resolved=2896 by_news=3002 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4617
+FIELD_RELEASE_SWEEP set=marks done=29 live=5 open=0 resolved=2897 by_news=3002 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4621
+FIELD_RELEASE_SWEEP set=marks done=30 live=4 open=0 resolved=2897 by_news=3002 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4623
+FIELD_RELEASE_SWEEP set=marks done=31 live=2 open=0 resolved=2897 by_news=3002 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4624
+FIELD_RELEASE_SWEEP set=marks done=32 live=0 open=0 resolved=2897 by_news=3002 revised=157 unsettled=0 cut=200 cut_sites=5971 ms=4625
+FIELD_RELEASE free=128 marks=200 withheld=0 refused=0 sweeps=53 stop_ms=150000 free_sweeps=36 free_open=0 free_stopped=false marks_sweeps=32 marks_open=0 marks_stopped=false released=4820 held=4342 lambda=2435 friction=4292 ms=4626
+FIELD_CARD reads=188 read_ms=4498 returns=0 return_ms=0 pairs=21184970104 batches=188 peak_store=435373824 elapsed_ms=4626

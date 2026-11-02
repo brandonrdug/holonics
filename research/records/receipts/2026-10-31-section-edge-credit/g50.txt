@@ -1,0 +1,6 @@
+BIN=dd87fde31cc8e39933740982057ccbcf6fc6470eb06e43a1db920215fad3cbe8 FROM=b53d8c65aa5e0482aa9b261779567421c18e77058b8b6f0b9df0cb20ea66ac03 at=2026-10-31T23:09:10Z
+RUN_END pair8-80 rc=0 TOWER_CARD forwards=5520 forward_ms=263127 reverses=2600 reverse_ms=143307 elapsed_ms=513760 MEASURE lap=pair8-80 rc=0 wall_s=514.2 peak_rss_kib=1653436 
+RECEIPT lap 50 done
+RECEIPT lap 60 done
+RECEIPT lap 70 done
+RECEIPT lap 80 done

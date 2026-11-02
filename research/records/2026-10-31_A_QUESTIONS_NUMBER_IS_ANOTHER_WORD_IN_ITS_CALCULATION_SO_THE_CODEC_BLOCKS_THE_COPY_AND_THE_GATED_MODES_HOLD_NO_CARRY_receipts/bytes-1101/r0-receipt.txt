@@ -1,0 +1,112 @@
+TOWER_PASS pass=0 train_bits_a_byte=2.814 dev_bits_a_byte=2.223 dev_regions Q=2.285 P=2.045 N=2.871 M=2.554 deposits=65/65 pass_ms=14862 elapsed_ms=14887
+TOWER_PASS pass=1 train_bits_a_byte=2.065 dev_bits_a_byte=1.971 dev_regions Q=2.049 P=1.787 N=2.633 M=2.227 deposits=65/65 pass_ms=13214 elapsed_ms=28103
+TOWER_PASS pass=2 train_bits_a_byte=1.875 dev_bits_a_byte=1.850 dev_regions Q=1.942 P=1.661 N=2.498 M=2.061 deposits=65/65 pass_ms=13310 elapsed_ms=41413
+TOWER_PASS pass=3 train_bits_a_byte=1.759 dev_bits_a_byte=1.773 dev_regions Q=1.872 P=1.586 N=2.395 M=1.933 deposits=65/65 pass_ms=13369 elapsed_ms=54782
+TOWER_PASS pass=4 train_bits_a_byte=1.675 dev_bits_a_byte=1.712 dev_regions Q=1.825 P=1.531 N=2.267 M=1.798 deposits=65/65 pass_ms=13346 elapsed_ms=68129
+TOWER_PASS pass=5 train_bits_a_byte=1.609 dev_bits_a_byte=1.668 dev_regions Q=1.791 P=1.491 N=2.176 M=1.691 deposits=65/65 pass_ms=13287 elapsed_ms=81416
+TOWER_PASS pass=6 train_bits_a_byte=1.556 dev_bits_a_byte=1.638 dev_regions Q=1.768 P=1.459 N=2.150 M=1.635 deposits=65/65 pass_ms=13124 elapsed_ms=94541
+TOWER_PASS pass=7 train_bits_a_byte=1.512 dev_bits_a_byte=1.615 dev_regions Q=1.749 P=1.437 N=2.112 M=1.594 deposits=65/65 pass_ms=13475 elapsed_ms=108016
+TOWER_PASS pass=8 train_bits_a_byte=1.475 dev_bits_a_byte=1.596 dev_regions Q=1.732 P=1.423 N=2.057 M=1.541 deposits=65/65 pass_ms=13405 elapsed_ms=121422
+TOWER_PASS pass=9 train_bits_a_byte=1.444 dev_bits_a_byte=1.582 dev_regions Q=1.720 P=1.414 N=2.052 M=1.488 deposits=65/65 pass_ms=13330 elapsed_ms=134752
+TOWER_PASS pass=10 train_bits_a_byte=1.416 dev_bits_a_byte=1.572 dev_regions Q=1.711 P=1.405 N=2.030 M=1.465 deposits=65/65 pass_ms=13282 elapsed_ms=148035
+TOWER_PASS pass=11 train_bits_a_byte=1.391 dev_bits_a_byte=1.569 dev_regions Q=1.710 P=1.402 N=2.004 M=1.460 deposits=65/65 pass_ms=13281 elapsed_ms=161317
+TOWER_PASS pass=12 train_bits_a_byte=1.370 dev_bits_a_byte=1.560 dev_regions Q=1.702 P=1.396 N=1.979 M=1.439 deposits=65/65 pass_ms=13227 elapsed_ms=174545
+TOWER_PASS pass=13 train_bits_a_byte=1.351 dev_bits_a_byte=1.552 dev_regions Q=1.695 P=1.390 N=1.960 M=1.423 deposits=65/65 pass_ms=13240 elapsed_ms=187785
+TOWER_PASS pass=14 train_bits_a_byte=1.333 dev_bits_a_byte=1.546 dev_regions Q=1.688 P=1.384 N=1.970 M=1.423 deposits=65/65 pass_ms=13273 elapsed_ms=201059
+TOWER_PASS pass=15 train_bits_a_byte=1.318 dev_bits_a_byte=1.546 dev_regions Q=1.686 P=1.389 N=1.964 M=1.409 deposits=65/65 pass_ms=13215 elapsed_ms=214275
+TOWER_PASS pass=16 train_bits_a_byte=1.303 dev_bits_a_byte=1.541 dev_regions Q=1.679 P=1.382 N=1.957 M=1.418 deposits=65/65 pass_ms=13210 elapsed_ms=227485
+TOWER_PASS pass=17 train_bits_a_byte=1.293 dev_bits_a_byte=1.542 dev_regions Q=1.679 P=1.380 N=1.977 M=1.430 deposits=65/65 pass_ms=13217 elapsed_ms=240703
+TOWER_PASS pass=18 train_bits_a_byte=1.282 dev_bits_a_byte=1.543 dev_regions Q=1.680 P=1.385 N=1.956 M=1.425 deposits=65/65 pass_ms=13262 elapsed_ms=253966
+TOWER_PASS pass=19 train_bits_a_byte=1.270 dev_bits_a_byte=1.543 dev_regions Q=1.680 P=1.389 N=1.941 M=1.400 deposits=65/65 pass_ms=13177 elapsed_ms=267143
+TOWER_PASS pass=20 train_bits_a_byte=1.260 dev_bits_a_byte=1.545 dev_regions Q=1.681 P=1.396 N=1.931 M=1.386 deposits=65/65 pass_ms=13148 elapsed_ms=280291
+TOWER_PASS pass=21 train_bits_a_byte=1.251 dev_bits_a_byte=1.545 dev_regions Q=1.680 P=1.399 N=1.925 M=1.386 deposits=65/65 pass_ms=13170 elapsed_ms=293462
+TOWER_PASS pass=22 train_bits_a_byte=1.244 dev_bits_a_byte=1.541 dev_regions Q=1.677 P=1.387 N=1.938 M=1.411 deposits=65/65 pass_ms=13195 elapsed_ms=306658
+TOWER_PASS pass=23 train_bits_a_byte=1.235 dev_bits_a_byte=1.540 dev_regions Q=1.676 P=1.383 N=1.945 M=1.424 deposits=65/65 pass_ms=13176 elapsed_ms=319835
+TOWER_PASS pass=24 train_bits_a_byte=1.226 dev_bits_a_byte=1.538 dev_regions Q=1.674 P=1.381 N=1.940 M=1.428 deposits=65/65 pass_ms=13186 elapsed_ms=333022
+TOWER_PASS pass=25 train_bits_a_byte=1.216 dev_bits_a_byte=1.539 dev_regions Q=1.676 P=1.385 N=1.926 M=1.409 deposits=65/65 pass_ms=13172 elapsed_ms=346195
+TOWER_PASS pass=26 train_bits_a_byte=1.209 dev_bits_a_byte=1.548 dev_regions Q=1.685 P=1.396 N=1.933 M=1.410 deposits=65/65 pass_ms=13190 elapsed_ms=359386
+TOWER_PASS pass=27 train_bits_a_byte=1.204 dev_bits_a_byte=1.553 dev_regions Q=1.690 P=1.401 N=1.942 M=1.406 deposits=65/65 pass_ms=13200 elapsed_ms=372587
+TOWER_PASS pass=28 train_bits_a_byte=1.199 dev_bits_a_byte=1.553 dev_regions Q=1.689 P=1.398 N=1.956 M=1.428 deposits=65/65 pass_ms=13204 elapsed_ms=385792
+TOWER_PASS pass=29 train_bits_a_byte=1.194 dev_bits_a_byte=1.549 dev_regions Q=1.688 P=1.393 N=1.938 M=1.423 deposits=65/65 pass_ms=13197 elapsed_ms=398990
+TOWER_PASS pass=30 train_bits_a_byte=1.190 dev_bits_a_byte=1.550 dev_regions Q=1.691 P=1.393 N=1.948 M=1.409 deposits=65/65 pass_ms=13269 elapsed_ms=412259
+TOWER_PASS pass=31 train_bits_a_byte=1.188 dev_bits_a_byte=1.549 dev_regions Q=1.691 P=1.399 N=1.931 M=1.376 deposits=65/65 pass_ms=13183 elapsed_ms=425443
+TOWER_PASS pass=32 train_bits_a_byte=1.183 dev_bits_a_byte=1.546 dev_regions Q=1.690 P=1.400 N=1.896 M=1.353 deposits=65/65 pass_ms=13269 elapsed_ms=438712
+TOWER_PASS pass=33 train_bits_a_byte=1.174 dev_bits_a_byte=1.554 dev_regions Q=1.694 P=1.411 N=1.911 M=1.355 deposits=65/65 pass_ms=13173 elapsed_ms=451886
+TOWER_PASS pass=34 train_bits_a_byte=1.166 dev_bits_a_byte=1.556 dev_regions Q=1.695 P=1.417 N=1.913 M=1.351 deposits=65/65 pass_ms=13084 elapsed_ms=464971
+TOWER_PASS pass=35 train_bits_a_byte=1.159 dev_bits_a_byte=1.553 dev_regions Q=1.692 P=1.413 N=1.905 M=1.352 deposits=65/65 pass_ms=13121 elapsed_ms=478093
+TOWER_PASS pass=36 train_bits_a_byte=1.154 dev_bits_a_byte=1.551 dev_regions Q=1.689 P=1.411 N=1.894 M=1.353 deposits=65/65 pass_ms=13914 elapsed_ms=492008
+TOWER_PASS pass=37 train_bits_a_byte=1.149 dev_bits_a_byte=1.558 dev_regions Q=1.698 P=1.418 N=1.906 M=1.352 deposits=65/65 pass_ms=13355 elapsed_ms=505363
+TOWER_PASS pass=38 train_bits_a_byte=1.146 dev_bits_a_byte=1.558 dev_regions Q=1.698 P=1.419 N=1.887 M=1.356 deposits=65/65 pass_ms=13420 elapsed_ms=518784
+TOWER_PASS pass=39 train_bits_a_byte=1.143 dev_bits_a_byte=1.556 dev_regions Q=1.697 P=1.415 N=1.888 M=1.355 deposits=65/65 pass_ms=13149 elapsed_ms=531933
+== lap 10
+FLUX six questions whole answers summed = 529.3 bits
+WRITTEN dir=r0-written-10-GKEYS problems=128 a_on_problem=19 b_free_calculations=416 b_free_right=29 c_first_calculations=120 c_from_question=6 b_equals=44/399 met=43/260 never_met=1/139 binary +=3/74 -=1/74 *=28/149 /=10/46
+CARRY dir=r0-written-10-GKEYS never_met=1/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=1 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=49858 lambda=15157 friction=55007 plateaus=24050 longest=22 question_own=13273 question_next=12765
+GKEYS WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3513 lambda=358 friction=5768 plateaus=958 longest=4 question_own=135 question_next=120
+WRITTEN dir=r0-written-10-GKEYS_b problems=128 a_on_problem=22 b_free_calculations=425 b_free_right=29 c_first_calculations=119 c_from_question=3 b_equals=53/399 met=50/260 never_met=3/139 binary +=5/74 -=2/74 *=31/149 /=12/46
+CARRY dir=r0-written-10-GKEYS_b never_met=3/139 never_by_op +=1/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_b WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=55179 lambda=15471 friction=59700 plateaus=25030 longest=23 question_own=13872 question_next=13287
+GKEYS_b WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3512 lambda=398 friction=5687 plateaus=968 longest=5 question_own=130 question_next=120
+WRITTEN dir=r0-written-10-GKEYS_c problems=128 a_on_problem=16 b_free_calculations=443 b_free_right=27 c_first_calculations=125 c_from_question=4 b_equals=38/399 met=37/260 never_met=1/139 binary +=0/74 -=0/74 *=27/149 /=7/46
+CARRY dir=r0-written-10-GKEYS_c never_met=1/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=2 wrong_tens_without_carry=1 wrong_tens_neither=1 wrong_not_whole=0
+GKEYS_c WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=52305 lambda=15414 friction=56940 plateaus=24235 longest=22 question_own=13507 question_next=13077
+GKEYS_c WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3568 lambda=375 friction=5789 plateaus=934 longest=3 question_own=119 question_next=125
+WRITTEN dir=r0-written-10-GKEYS_d problems=128 a_on_problem=24 b_free_calculations=427 b_free_right=35 c_first_calculations=124 c_from_question=4 b_equals=51/399 met=46/260 never_met=5/139 binary +=1/74 -=2/74 *=34/149 /=9/46
+CARRY dir=r0-written-10-GKEYS_d never_met=5/139 never_by_op +=0/35 -=1/32 *=1/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=0 wrong_tens_neither=3 wrong_not_whole=1
+GKEYS_d WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=49963 lambda=15426 friction=54574 plateaus=23563 longest=26 question_own=13426 question_next=13055
+GKEYS_d WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3510 lambda=365 friction=5751 plateaus=951 longest=4 question_own=126 question_next=109
+== lap 20
+FLUX six questions whole answers summed = 808.3 bits
+WRITTEN dir=r0-written-20-GKEYS problems=128 a_on_problem=26 b_free_calculations=310 b_free_right=35 c_first_calculations=121 c_from_question=5 b_equals=66/399 met=62/260 never_met=4/139 binary +=2/74 -=5/74 *=44/149 /=12/46
+CARRY dir=r0-written-20-GKEYS never_met=4/139 never_by_op +=0/35 -=1/32 *=2/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=37042 lambda=13197 friction=46111 plateaus=19308 longest=28 question_own=11549 question_next=11018
+GKEYS WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2531 lambda=355 friction=4792 plateaus=796 longest=6 question_own=117 question_next=105
+WRITTEN dir=r0-written-20-GKEYS_b problems=128 a_on_problem=28 b_free_calculations=302 b_free_right=33 c_first_calculations=116 c_from_question=2 b_equals=64/399 met=60/260 never_met=4/139 binary +=3/74 -=5/74 *=35/149 /=18/46
+CARRY dir=r0-written-20-GKEYS_b never_met=4/139 never_by_op +=1/35 -=0/32 *=1/28 /=1/6 carrying_sums=4 right=1 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS_b WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=36948 lambda=13318 friction=45775 plateaus=20098 longest=26 question_own=11633 question_next=10981
+GKEYS_b WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2582 lambda=322 friction=4909 plateaus=788 longest=3 question_own=117 question_next=107
+WRITTEN dir=r0-written-20-GKEYS_c problems=128 a_on_problem=26 b_free_calculations=294 b_free_right=32 c_first_calculations=120 c_from_question=8 b_equals=65/399 met=62/260 never_met=3/139 binary +=2/74 -=6/74 *=41/149 /=12/46
+CARRY dir=r0-written-20-GKEYS_c never_met=3/139 never_by_op +=0/35 -=0/32 *=2/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=1
+GKEYS_c WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=36162 lambda=12912 friction=45801 plateaus=18423 longest=28 question_own=11125 question_next=10897
+GKEYS_c WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2497 lambda=342 friction=4784 plateaus=846 longest=4 question_own=104 question_next=88
+WRITTEN dir=r0-written-20-GKEYS_d problems=128 a_on_problem=26 b_free_calculations=294 b_free_right=33 c_first_calculations=120 c_from_question=5 b_equals=64/399 met=62/260 never_met=2/139 binary +=2/74 -=4/74 *=44/149 /=9/46
+CARRY dir=r0-written-20-GKEYS_d never_met=2/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_d WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=38332 lambda=12963 friction=47869 plateaus=20882 longest=24 question_own=11544 question_next=11192
+GKEYS_d WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2579 lambda=340 friction=4870 plateaus=827 longest=4 question_own=115 question_next=98
+== lap 30
+FLUX six questions whole answers summed = 845.5 bits
+WRITTEN dir=r0-written-30-GKEYS problems=128 a_on_problem=38 b_free_calculations=439 b_free_right=72 c_first_calculations=115 c_from_question=4 b_equals=82/399 met=80/260 never_met=2/139 binary +=6/74 -=5/74 *=52/149 /=16/46
+CARRY dir=r0-written-30-GKEYS never_met=2/139 never_by_op +=0/35 -=1/32 *=1/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=1 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=52842 lambda=15535 friction=57235 plateaus=23689 longest=23 question_own=13885 question_next=13153
+GKEYS WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3681 lambda=455 friction=5742 plateaus=1130 longest=6 question_own=131 question_next=123
+WRITTEN dir=r0-written-30-GKEYS_b problems=128 a_on_problem=36 b_free_calculations=436 b_free_right=92 c_first_calculations=116 c_from_question=6 b_equals=80/399 met=76/260 never_met=4/139 binary +=3/74 -=4/74 *=50/149 /=19/46
+CARRY dir=r0-written-30-GKEYS_b never_met=4/139 never_by_op +=1/35 -=0/32 *=0/28 /=1/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_b WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=55781 lambda=15695 friction=59854 plateaus=25833 longest=19 question_own=14154 question_next=13385
+GKEYS_b WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3667 lambda=463 friction=5712 plateaus=1243 longest=6 question_own=143 question_next=119
+WRITTEN dir=r0-written-30-GKEYS_c problems=128 a_on_problem=41 b_free_calculations=464 b_free_right=108 c_first_calculations=114 c_from_question=13 b_equals=79/399 met=74/260 never_met=5/139 binary +=5/74 -=3/74 *=50/149 /=16/46
+CARRY dir=r0-written-30-GKEYS_c never_met=5/139 never_by_op +=1/35 -=0/32 *=2/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_c WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=54598 lambda=15384 friction=59293 plateaus=25856 longest=21 question_own=13744 question_next=13395
+GKEYS_c WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3823 lambda=505 friction=5784 plateaus=1428 longest=4 question_own=155 question_next=131
+WRITTEN dir=r0-written-30-GKEYS_d problems=128 a_on_problem=35 b_free_calculations=421 b_free_right=82 c_first_calculations=115 c_from_question=7 b_equals=79/399 met=78/260 never_met=1/139 binary +=3/74 -=2/74 *=57/149 /=15/46
+CARRY dir=r0-written-30-GKEYS_d never_met=1/139 never_by_op +=0/35 -=0/32 *=0/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_d WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=51149 lambda=15346 friction=55920 plateaus=24745 longest=19 question_own=13760 question_next=12804
+GKEYS_d WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3557 lambda=465 friction=5598 plateaus=1176 longest=6 question_own=143 question_next=121
+== lap 40
+FLUX six questions whole answers summed = 967.0 bits
+WRITTEN dir=r0-written-40-GKEYS problems=128 a_on_problem=35 b_free_calculations=410 b_free_right=54 c_first_calculations=115 c_from_question=11 b_equals=87/399 met=85/260 never_met=2/139 binary +=5/74 -=10/74 *=56/149 /=12/46
+CARRY dir=r0-written-40-GKEYS never_met=2/139 never_by_op +=1/35 -=0/32 *=1/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=44161 lambda=14562 friction=50500 plateaus=21660 longest=22 question_own=12692 question_next=12027
+GKEYS WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3137 lambda=414 friction=5280 plateaus=970 longest=5 question_own=131 question_next=113
+WRITTEN dir=r0-written-40-GKEYS_b problems=128 a_on_problem=37 b_free_calculations=431 b_free_right=65 c_first_calculations=124 c_from_question=10 b_equals=86/399 met=80/260 never_met=6/139 binary +=5/74 -=10/74 *=53/149 /=13/46
+CARRY dir=r0-written-40-GKEYS_b never_met=6/139 never_by_op +=1/35 -=1/32 *=2/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=1 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS_b WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=46414 lambda=15024 friction=51829 plateaus=22003 longest=25 question_own=12835 question_next=12183
+GKEYS_b WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3388 lambda=424 friction=5511 plateaus=1110 longest=4 question_own=134 question_next=116
+WRITTEN dir=r0-written-40-GKEYS_c problems=128 a_on_problem=30 b_free_calculations=394 b_free_right=57 c_first_calculations=125 c_from_question=9 b_equals=83/399 met=82/260 never_met=1/139 binary +=7/74 -=6/74 *=52/149 /=17/46
+CARRY dir=r0-written-40-GKEYS_c never_met=1/139 never_by_op +=0/35 -=0/32 *=0/28 /=1/6 carrying_sums=4 right=0 wrong_tens_right=0 wrong_tens_without_carry=1 wrong_tens_neither=3 wrong_not_whole=0
+GKEYS_c WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=39933 lambda=13841 friction=47714 plateaus=20828 longest=20 question_own=11860 question_next=11476
+GKEYS_c WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=2967 lambda=383 friction=5172 plateaus=1060 longest=5 question_own=116 question_next=107
+WRITTEN dir=r0-written-40-GKEYS_d problems=128 a_on_problem=35 b_free_calculations=387 b_free_right=58 c_first_calculations=125 c_from_question=9 b_equals=87/399 met=84/260 never_met=3/139 binary +=5/74 -=6/74 *=60/149 /=15/46
+CARRY dir=r0-written-40-GKEYS_d never_met=3/139 never_by_op +=0/35 -=0/32 *=2/28 /=0/6 carrying_sums=4 right=0 wrong_tens_right=1 wrong_tens_without_carry=1 wrong_tens_neither=2 wrong_not_whole=0
+GKEYS_d WRITTEN_COUPLING chart=bytes problems=128 held=35463 written=42751 lambda=14378 friction=49458 plateaus=21226 longest=19 question_own=12596 question_next=11754
+GKEYS_d WRITTEN_COUPLING chart=numerals problems=128 held=2971 written=3001 lambda=372 friction=5228 plateaus=859 longest=4 question_own=116 question_next=104

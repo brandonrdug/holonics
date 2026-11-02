@@ -1,0 +1,32 @@
+TOWER_COMMAND read-tower-race $ROOT/.local/wt/section-edge/.local/run/race/bytes-1101/r1/STATE.39 00a53643e10bcbcd7f45145b4227b475088662630be97baac53248e4c0956692 $ROOT/.local/wt/section-edge/.local/run/gsm8k/DEV.units.u0 a2a61ee7451b2d8c1f59640244f2d8059e8c874e876f3311aaaa6e5d833dd050 $ROOT/.local/wt/section-edge/.local/run/gsm8k/PROMPTS6.units.u0 c54b2a088062e7f8f6ece592139218d4f154a0952eb534b5f9f13be173051200 24 128 $ROOT/.local/wt/section-edge/.local/run/race/bytes-1101/r1-flux-40
+TOWER_REALIZATION card NVIDIA GeForce RTX 4080 SUPER: no section read yet
+TOWER_RACE_FRICTIONS level=0 memory_classes:modes 2^7:2 2^6:11 2^5:3 2^4:7 2^3:13 2^2:26 2^1:43 2^0:23
+TOWER_RACE_FRICTIONS level=1 memory_classes:modes 2^6:6 2^5:10 2^4:8 2^3:15 2^2:40 2^1:39 2^0:10
+TOWER_RACE_FRICTIONS level=2 memory_classes:modes 2^7:1 2^6:12 2^5:6 2^4:7 2^3:11 2^2:40 2^1:40 2^0:11
+TOWER_RACE_FRICTIONS level=3 memory_classes:modes 2^7:1 2^6:11 2^5:9 2^4:10 2^3:22 2^2:26 2^1:37 2^0:12
+TOWER_RACE_FRICTIONS level=4 memory_classes:modes 2^8:1 2^7:3 2^6:7 2^5:17 2^4:20 2^3:21 2^2:23 2^1:24 2^0:12
+TOWER_RACE_FRICTIONS level=5 memory_classes:modes 2^9:2 2^8:16 2^7:13 2^6:19 2^5:13 2^4:16 2^3:15 2^2:19 2^1:12 2^0:3
+TOWER_RACE_FLUX prompt=0 follows_classes=380 own_bits=384.401 flux_bits_after_prompt 1:28.285 2:15.400 3:34.453 4:27.367 5:14.645
+TOWER_RACE_FLUX prompt=1 follows_classes=180 own_bits=180.005 flux_bits_after_prompt 0:22.924 2:21.494 3:28.815 4:21.037 5:16.558
+TOWER_RACE_FLUX prompt=2 follows_classes=193 own_bits=311.024 flux_bits_after_prompt 0:10.804 1:22.129 3:26.151 4:12.679 5:18.380
+TOWER_RACE_FLUX prompt=3 follows_classes=91 own_bits=241.861 flux_bits_after_prompt 0:23.730 1:1.271 2:21.065 4:9.877 5:13.044
+TOWER_RACE_FLUX prompt=4 follows_classes=296 own_bits=378.615 flux_bits_after_prompt 0:31.698 1:12.128 2:44.625 3:39.186 5:9.890
+TOWER_RACE_FLUX prompt=5 follows_classes=466 own_bits=466.194 flux_bits_after_prompt 0:17.960 1:22.548 2:25.555 3:28.813 4:6.327
+TOWER_RACE_FLUX_HEAD prompt=0 head=16 own_bits=13.981 flux_bits_after_prompt 1:5.843 2:1.562 3:7.640 4:9.115 5:3.902
+TOWER_RACE_FLUX_HEAD prompt=1 head=16 own_bits=30.966 flux_bits_after_prompt 0:4.539 2:6.686 3:6.943 4:6.306 5:3.633
+TOWER_RACE_FLUX_HEAD prompt=2 head=16 own_bits=22.860 flux_bits_after_prompt 0:-0.977 1:5.053 3:6.332 4:2.449 5:-0.376
+TOWER_RACE_FLUX_HEAD prompt=3 head=16 own_bits=45.768 flux_bits_after_prompt 0:1.383 1:-2.188 2:0.454 4:-0.207 5:-4.024
+TOWER_RACE_FLUX_HEAD prompt=4 head=16 own_bits=29.789 flux_bits_after_prompt 0:9.153 1:4.612 2:9.533 3:4.769 5:7.239
+TOWER_RACE_FLUX_HEAD prompt=5 head=16 own_bits=19.642 flux_bits_after_prompt 0:3.948 1:4.270 2:5.928 3:6.908 4:1.182
+TOWER_RACE_FLUX_HEAD prompt=0 head=64 own_bits=50.405 flux_bits_after_prompt 1:18.540 2:12.911 3:19.965 4:17.628 5:8.354
+TOWER_RACE_FLUX_HEAD prompt=1 head=64 own_bits=75.780 flux_bits_after_prompt 0:18.621 2:20.134 3:22.016 4:13.956 5:7.588
+TOWER_RACE_FLUX_HEAD prompt=2 head=64 own_bits=100.137 flux_bits_after_prompt 0:5.481 1:12.523 3:15.358 4:7.043 5:7.324
+TOWER_RACE_FLUX_HEAD prompt=3 head=64 own_bits=163.542 flux_bits_after_prompt 0:21.501 1:3.132 2:18.498 4:7.977 5:14.931
+TOWER_RACE_FLUX_HEAD prompt=4 head=64 own_bits=93.956 flux_bits_after_prompt 0:22.684 1:8.430 2:24.913 3:19.914 5:10.982
+TOWER_RACE_FLUX_HEAD prompt=5 head=64 own_bits=78.308 flux_bits_after_prompt 0:10.453 1:16.636 2:15.594 3:25.377 4:7.911
+TOWER_RACE_FLUX_HEAD prompt=0 head=256 own_bits=265.886 flux_bits_after_prompt 1:27.241 2:16.670 3:30.055 4:23.845 5:15.620
+TOWER_RACE_FLUX_HEAD prompt=4 head=256 own_bits=347.777 flux_bits_after_prompt 0:30.730 1:12.171 2:42.472 3:37.760 5:10.101
+TOWER_RACE_FLUX_HEAD prompt=5 head=256 own_bits=263.498 flux_bits_after_prompt 0:18.402 1:23.772 2:20.653 3:30.654 4:6.604
+TOWER_RACE_DONE prompts=6 streams=24 section=128 elapsed_ms=11291
+TOWER_CARD forwards=252 forward_ms=11209 reverses=0 reverse_ms=0 elapsed_ms=11291
+MEASURE lap=flux-40 rc=0 wall_s=11.5 peak_rss_kib=251024
