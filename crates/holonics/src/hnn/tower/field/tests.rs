@@ -1503,8 +1503,8 @@ fn the_cue_over_foundings() {
 /// receiver's row puts more of its mass on its near field than on its loudest far source, on the mean
 /// over its rows, at the listener's own temperature. [measurement] It holds at the class receiver's
 /// temperature too (`−2`: the near field 0.836 of a row, the loudest far source 0.018, against 0.818 and
-/// 0.005 at the listener's): the founding does not drown the near field, so the crib run's first-lap
-/// rise is not the founding's (the record's §15.10).
+/// 0.005 at the listener's): on this fixture the founding does not drown the near field (the record's
+/// §15.10).
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
     let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, clocks: 1 };

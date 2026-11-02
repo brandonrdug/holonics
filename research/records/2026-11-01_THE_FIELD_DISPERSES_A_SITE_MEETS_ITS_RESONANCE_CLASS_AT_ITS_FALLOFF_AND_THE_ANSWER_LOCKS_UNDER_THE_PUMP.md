@@ -1054,15 +1054,19 @@ opens at its equal-word guarantee (`2^(−β)`, `β = −2`); the listener's at 
 unrelated words at unit power) stays within the falloff's own span over the support's octaves while an
 equal word still leads (its lock `2n g` above the mean, the random maximum over `N` about `σ √(2 ln N)`,
 below it while `N < e^n`): `g = 1` at the crib's reach of 484 with `n = 8` (`σ = 4` bits against a span of 7;
-an equal word's lead over the maximum of 400 about 2 bits). The listener's opening at the all-pairs
-field's flat gain (`+2`) was built first and refuted: the cue coded 2.018 bits.
+an equal word's lead over the maximum of 400 about 2 bits). A listener opening at `+2` was built first and
+refuted: the cue coded 2.018 bits. [correction, November 2, from the review of 04:23] `+2` was taken for the
+gain of the field whose every site read every other, which passed the crib; that field (`0bf600eaa`) used a
+gain shift of `0` at this declaration, held its probe and key at unit power within a head, and kept separate
+learned probe and key charts, where this field ties them into one word. The `+2` run was an experiment, not
+that control.
 
 [measurement, November 2] The hypothesis this answered, that a listener's founding row peaks on the
 loudest of four hundred unrelated far words and drowns its near field, is refuted by its own fixture
 (`a_listener_s_founding_row_keeps_its_near_field`, 420 sites, no recurring word, 40 open): at the founding
 the near field holds 0.818 of an open listener's row and the loudest far source 0.005 at the listener's
-temperature, and 0.836 and 0.018 at the class receiver's. The crib run's first-lap rise is therefore not
-the founding's; its cause is open. The fixtures with the temperatures: the cue 0.007 bits, the recall
+temperature, and 0.836 and 0.018 at the class receiver's. That refutes the story on this fixture; it does
+not read the crib's own masks and fronts or the state after lap 0, so the first-lap rise's cause is open. The fixtures with the temperatures: the cue 0.007 bits, the recall
 0.001.
 
 [definition; agent-inferred, November 2] **Growth waits until the withheld code has fallen at its width.**
