@@ -832,14 +832,27 @@ key's recall at 1,000, bar 0.25 bits; one founding, the same keys):
 | §14: one row a head, least hold over the class's modes | 2.124 | 0.916 |
 | rows by mode, the pairing `D Re(conj a b)`, memberships | 3.236 | 1.423 |
 | rows by mode, the lock (below), memberships | 3.134 | 1.050 |
-| rows by mode, the lock, sharp classes | 0.265 | passes |
+| rows by mode, the lock, sharp classes | 0.265 | under 0.697 * |
 | one row a head, the lock, memberships, band `2^(−3)` | 3.307 | 2.461 |
 | the same, band `2^(−5)` | 2.935 | 1.679 |
 | the same, band `2^(−8)` | 3.224 | 0.862 |
-| the same, band `2^(−12)` | 0.599 | passes |
-| **one row a head, the lock, sharp classes, no hold** | **passes** | **passes** |
+| the same, band `2^(−12)` | 0.599 | under 0.697 * |
+| one row a head, the lock, sharp classes, no hold, the real merge `a ⊙ b` | 0.142 | 0.039 |
+| the same, the complex merge (§15.1) | 0.177 | 0.053 |
+| **the same, each receiver probing across its seams (below)** | **0.022** | **0.014** |
 
-The last row is the law, and it stands with §15.1's moments in the values (52 of 52 field tests).
+\* The recall test then asserted §10's withdrawn restatement (0.697 bits), and the cue test 0.25 bits, so
+those cells and the first account of this table, which wrote "passes" for the sharp address, were read
+against the wrong bars; the review of November 1 found it, and the tests now assert the record's. The cue's
+miss at 0.177 bits was located before any run: 80 % of its code sat in 5 of its 64 held problems, where
+the successor's earlier site shared the reader's class in at most one of its four head and tick rows and
+was heard only blurred, through its octave's crowd (the other 59 coded 0.039 bits). One founding's
+reading is not the law's: over six further foundings the sharp address coded the cue at 0.034, 0.021,
+0.212, 0.060, 0.107 and 0.050 bits, and with the probes at 0.043, 0.031, 0.043, 0.060, 0.026 and 0.046,
+every one inside the bar. Near-equal laws read on one founding (the narrowest band against the sharp
+address) differ within that spread.
+
+The last row is the law, with §15.1's moments in the values.
 
 ```text
 contact  z_ij = 2^(−β) Σ_m [ D_m Re(conj(ŵ_im) ŵ_jm) − D_m² |ŵ_jm|²/2 ] − ⌊log₂ |i − j|⌋        the head's lock
@@ -859,15 +872,19 @@ gain     β the largest shift with 2^(−β) n ≥ 2⌈log₂ reach⌉ (an equal
   unit power had repaired, §2.5), and it would return wherever the powers of the modes differ; the lock
   is that repair stated as the contact's law. Summed over a still head at unit power it is the head's
   pairing less a constant.
-- **The address is sharp.** A membership that is a partition of unity across the cone (amplitudes
-  `r_across = (1 − φ)/√2`, `r_own = √(1 − r_across²)`, `φ = λ/ε` within a band `ε`, the far weight their
-  overlap `Σ_c a_i(c) a_j(c)`) kept the code continuous across every seam and its covector agreed with
-  the code's difference across the far support, yet it failed both fixtures at every band but the
-  narrowest, where it failed the cue. `½(1 ± λ)` everywhere is dense: the bridge borders both plates, so
-  every site holds a share of the all-bridge class and every far row would meet every definite site;
-  and `√μ` has an unbounded slope where a membership reaches zero. §14.2's least hold coded the cue at
-  2.12 bits. A seam is crossed at a jump; the held step's certificate compares the codes exactly, so a
-  step across one is certified or refused on what it does.
+- **The address is sharp, and a receiver probes across its seams.** A membership that is a partition
+  of unity across the cone (amplitudes `r_across = (1 − φ)/√2`, `r_own = √(1 − r_across²)`, `φ = λ/ε`
+  within a band `ε`, the far weight their overlap `Σ_c a_i(c) a_j(c)`) kept the code continuous across
+  every seam, yet faded the weights it should have carried, and failed both fixtures at every band but
+  the narrowest. `½(1 ± λ)` everywhere is dense: the bridge borders both plates, so every site holds a
+  share of the all-bridge class; and `√μ` has an unbounded slope where a membership reaches zero. §14.2's
+  least hold coded the cue at 2.12 bits. The repair reads across the seam without fading: a receiver
+  reads its own class and, for each address mode whose word lies within the band `ε = 2^(−⌈log₂ b⌉)` of
+  its cone (`|re² − im²| 2^k < re² + im²`, exact), the class across it, every combination of those
+  crossings; a source stays in its own class alone and enters a probed run at its full score, and the
+  lock decides. The probes are bounded by the modes near a seam, so the rows stay sparse. A seam or a
+  band edge is crossed at a jump; the held step's certificate compares the codes exactly, and the
+  covector's tests read every probe at a step that crosses none.
 - **The row's carrier is the row's own.** On the card a launch's limbs follow the widest exponent spread
   its rows actually hold (about 107 to 122 bits at reading 8's declaration with `β = −2`), refused only
   past the declaration's bound ([`FieldDeclaration::row_bits`]).
@@ -924,8 +941,8 @@ The reading's claim becomes the one Brandon asked for: the output reconfigures w
 
 ### 15.7 Built
 
-[measurement, November 1] On the host (`hnn::tower::field`, its tests 52 of 52) and on the card
-(`field.cu`, `field_moment.cuh`; parity below):
+[measurement, November 1] On the host (`hnn::tower::field`: 56 of its 61 tests run and pass, 5 are
+measurements run apart) and on the card (`field.cu`, `field_moment.cuh`; parity below):
 
 - **§15.1 moments** (`field::moment`): both strands' moments of zero-founded encodings `E⁺`, `E⁻`
   (families `moment_before`, `moment_after`, `(A+1) × 2T` over the turned modes that are not clocks),
@@ -945,9 +962,42 @@ The reading's claim becomes the one Brandon asked for: the output reconfigures w
   reached (the question by the sweeps since the release began), with no skin. The command founds one
   where at least two turned sets stay on the place (`heads − still ≥ 3`). Training's read 2: the prefix
   at its rung `r`, the question at `r + 1`, the band and past it at zero.
-- **§15.5 the variants** (`tools/gsm8k_variants.py`, 26 tests): on the held 128, two variants each for 89
+- **§15.5 the variants** (`tools/gsm8k_variants.py`, 34 tests): on the held 128, two variants each for 89
   problems and one for 10; 29 have none (no annotated calculation, a number word, results that would turn
-  fractional, or roles that collide).
+  fractional, or roles that collide). Its `claim` reads the claim at a variant's calculation `i` by
+  operand value, and `show` writes the three problems beside their variants under `.local/` only. What the
+  claim does not witness (the lesson of October 9, 12): a release that copies the variant's question
+  number into calculation `i` takes it whatever the arithmetic, so a release that copies without
+  computing passes; the claim reads reconfiguration with the problem, never a calculation's value, which
+  the written rules read beside it.
+- **The review's repairs.** The key's bracket `D ŵ_i − D² ŵ_j` is released by the skin's bits before it
+  meets its covector, and its products are checked against the carrier and refused (it had stood 30 bits
+  above the guard, and host and card wrapped alike); growth lifts the moment encodings' step state divided,
+  as their covector arrives divided over the copies; the echo reads the direct pairs' round trips and
+  leaves out the crowds' (a locked site is also a crowd member of the sites it reads), as its formula
+  states.
+
+### 15.8 The fixed widths, read against the precision law (§14.11's review)
+
+[definition; agent-inferred, November 1] Each fixed width in the field, with its reason:
+- **Faces, charts, currents on `2^(−16)`**: a declared crossing at every tick's state, released to the
+  nearest numerator; the state is a face of the field's continuing motion, read by the next tick only,
+  and its remainder is the attained face's error, which the next tick's own release bounds. It stands.
+- **Material on `2^(−24)`**: the deposit's grain, the step's crossing into the constitution, certified by
+  the exact comparison of the codes it moves. It stands.
+- **Frames and skins on `2^(−30)`**: resident navigator faces (`ring_phasor`, `skin_decay`) attained once
+  at a declared grain, never a store of values; a skin below its grain is zero, which is the skin's own
+  reading past `D(d) < 2^(−30)` (the ring's place no longer heard), not a term cut from a sum. It stands.
+- **The contact's covector on `2^(−40)`**: the return's grain, a declared crossing of `δz` into `δs`,
+  with its carrier guarded and refused past it. It stands.
+- **The rows' shares on `2^(−63)`**: formed once by one division of the exact series, for the return. It
+  stands.
+- **The pump's top `2^22`**: one numerator of logit then weighs 64 bits of the face, past the masses'
+  `2^(−62)`; a site there is decided. It stands.
+- **The moments' return**: the turned covector released once at its own grain before its prefix (§15.7),
+  replacing the exact transpose's `2^(−114)` that refused real covectors.
+None releases a term from a sum before the sum is formed; the series row is the one place that did, and
+§14.11 repaired it.
 
 Owners `hnn::tower::field`, `field.cu`, `examples/solenoidal_alpha/complete_language/field_train.rs`
 and `tools/gsm8k_variants.py`, with their atlas rows. Owed to #410: the span's face as the difference of
