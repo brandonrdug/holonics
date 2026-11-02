@@ -2177,4 +2177,33 @@ fn the_clock_is_located_by_loop_closure_on_the_crib() {
     let published: Vec<i32> = particular.iter().map(|v| i32::try_from((v.clone() * Rat::from_integer(BigInt::from(1i64 << MATERIAL_BITS))).to_integer()).unwrap()).collect();
     let l = field.layout.clone();
     assert_eq!(published, field.theta[l.pace + dw..l.pace + 2 * dw].to_vec(), "the located pace is the witness's clock, bit for bit");
+    // [measurement] The same menu read on the class sheet, `κ = 1 + c[class]`: a loop's row is its gaps' class counts.
+    // Regions holding a loop that closes under the digit clock and whose row has no digit class (every digit cancels):
+    // each such region's candidates hold the whole family of digit rates, so the intersection does too.
+    let digit = |c: usize| c < WITNESS_BYTES.len() && WITNESS_BYTES[c].is_ascii_digit();
+    let mut free_regions = 0usize;
+    let mut tying = 0usize;
+    for (r, (classes, _)) in reads.iter().zip(&regions) {
+        let mut free = false;
+        for (e1, e2) in loops(r) {
+            // The row: class counts over (j₁, i₁] less those over (j₂, i₂].
+            let mut row = vec![0i64; WITNESS_BYTES.len()];
+            for t in e1.1 + 1..=e1.0 {
+                row[classes[t]] += 1;
+            }
+            for t in e2.1 + 1..=e2.0 {
+                row[classes[t]] -= 1;
+            }
+            let closes = (0..row.len()).filter(|&c| digit(c)).map(|c| row[c]).sum::<i64>() == 0;
+            if closes {
+                if (0..row.len()).filter(|&c| digit(c)).all(|c| row[c] == 0) {
+                    free = true;
+                } else {
+                    tying += 1;
+                }
+            }
+        }
+        free_regions += usize::from(free);
+    }
+    eprintln!("LOCATE class_sheet regions_with_a_closing_loop_free_of_every_digit={free_regions}/{} closing_loops_that_tie_digit_rates={tying}", reads.len());
 }

@@ -1532,7 +1532,35 @@ to restrict to; the run's location needs the loops' intersection over the full r
 sheet its encoding carries.
 
 
-### 16.16 The diff read against itself
+### 16.16 On the class sheet the copies cannot separate the digit bytes' rates
+
+[decision; the coordinator's, November 2] The clock is read on the class sheet, hnn::keys's port convention: a
+crib's cells are the codec's classes, each its own port, known before any key, so `κ(t) = 1 + c[class(u_t)]`, one
+located rate per class, a resident face beside `E(u)`. The class is the codec's own cell (here the byte) or one the
+field derived, never an authored grouping: no digit list enters the pace or its locator. The neighbours' terms `E±`
+of the opening leave the rate (a copy's turn is the sum of its span's rates, and the loop law reads only the span's
+classes). Depositing the encodings first would couple the key to descent again (§16.14).
+
+[measurement, November 2] On the same 256 training regions and menu (§16.15), read on per-byte ports: **every region
+(256 of 256) holds a loop that closes under the digit clock and whose row has no digit byte at all**; 5,636 further
+closing loops would tie digit rates, all coincidences (equal digit counts of different digits).
+
+[derivation; agent-inferred, November 2] **Why, and what it costs.** A closing loop pairs two copy edges of one
+calculation; its gaps are the rest of `a`, the text between the numbers and the head of `b` in the question, and the
+rest of `a`, `+` and the head of `b` in the answer. A copy preserves its digits, so every digit byte cancels from
+every true loop, and the loop reads only `κ(text between) = κ(+)`. Under the key law, a region's candidates are the
+union of its loops' hyperplanes; each region's union holds its digit-free true loop, so each holds the whole family
+of digit rates, and so does their intersection. The fibre is plural in the ten digit bytes' rates, nine directions
+beyond the clock's scale: **the per-byte location cannot publish them**, and by hnn::keys's semantics a plural fibre
+is not published. The coincidental closures would tie the rates only if they were hypothesized true together, and they
+are not copies. Physically the copies are indifferent: a clock ticking 1 at `3` and 2 at `7` closes every copy loop.
+What the rates change is the readers' discrimination (§16.12: a neighbour one digit away stands one of its rates away).
+
+[correction, November 2] §16.15's location reached the digit clock on the witness's encodings, whose first two
+dimensions are a digit sheet set by hand: the grouping came from those encodings, not from the data. On per-byte ports
+it does not come out.
+
+### 16.17 The diff read against itself
 
 [agent-inferred, November 2] Read adversarially before the run:
 - **The card's row carrier.** A contact row is carried on at most twenty limbs (1,280 bits); at the witness's
@@ -1548,7 +1576,7 @@ sheet its encoding carries.
 - **The readings on context parts** are mis-clocked under a digit clock; `FIELD_HELD` keeps them, labelled, and the
   operand rows are read at fronts (`FIELD_PEAKS_OPERAND`).
 
-### 16.17 Failures this could repeat
+### 16.18 Failures this could repeat
 
 - An authored routine standing in for learning: the witness is set by hand in tests.rs only; the field names no
   digit, and the digit clock is a material row the deposition moves.
