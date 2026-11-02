@@ -1930,3 +1930,14 @@ regions) and 2 releases of 40 sweeps in 355 s (projected at most 455 s, 0.78 of 
 rate drawn far (`FIELD_PARITY_PACE=8`) 3 sections, the withheld read and 2 releases in 337 s (projected at most 425 s,
 0.79; host 265 s, card 2.7 s); peak resident set 3.5 GB, the card's largest batch store 8.3 GB under its 12 GB. A GSM8K
 section costs the host about 110 times the card's time (8,874 ms against 88). Receipt: `_receipts/law16/parity_verdicts.txt`.
+
+[decision; November 2, Brandon's question and the coordinator's rule] **The card check reads a sample of the withheld
+problems.** The parity reads the card's bits against the host's region by region through the same kernels, so the
+withheld read's 512 regions check no path that a few of them do not, while the host replays a GSM8K region at about 110
+times the card's time: the two checks above took 355 s and 337 s, 284 s and 265 s of it the host. The standard check is
+now the training sections whole, a declared sample of the withheld problems (`parity-field … WITHHELD`, the first
+`WITHHELD` in their keyed order) and one release, timed and stated in its receipt. The whole 128-problem withheld read
+runs only when a kernel changes, and then once. [measurement] At 3 sections, 8 withheld problems (32 regions) and one
+release of 40 sweeps, every read, face, covector, learner and release equal in 139 s (projected at most 155 s, 0.90 of
+it; host 90 s, of it the withheld sample 14.5 s against the whole read's 156 s; card 0.5 s). Receipt:
+`_receipts/law16/parity_sample.txt`.

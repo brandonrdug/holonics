@@ -63,10 +63,10 @@ fn passage(args: &[String], section: usize) -> Result<Passage> {
 impl Passage {
     /// A section's regions as `train-field` forms them from `draw` on, read through `realization`
     /// after `learner`'s held step is read on them (its read returned); with `withheld`, the withheld
-    /// problems' read with their neighbours (the held step then read by the caller).
+    /// problems `members` read with their neighbours (the held step then read by the caller).
     fn regions(&self, members: &[usize], draw: &mut u64, withheld: bool, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
         if withheld {
-            return Ok((unseen_regions(&self.codec, &self.train, &self.unseen, self.seed).into_iter().map(|(c, u)| TrainRegion::plain(c, u)).collect(), None));
+            return Ok((unseen_regions(&self.codec, &self.train, members, self.seed).into_iter().map(|(c, u)| TrainRegion::plain(c, u)).collect(), None));
         }
         section_regions(&self.codec, &self.train, members, self.seed, draw, learner, realization)
     }
@@ -210,14 +210,20 @@ fn ms(ns: u128) -> u128 {
 }
 
 /// `parity-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION
-/// SECTIONS RATE GROW RELEASES SWEEPS`.
+/// SECTIONS RATE GROW RELEASES SWEEPS WITHHELD`: the withheld read on its first `WITHHELD` problems in their
+/// keyed order (all of them past their count).
+/// [agent-inferred, November 2] Why a sample (Brandon, November 2: two checks of 8 minutes each, every time): the
+/// parity reads the card's bits against the host's region by region through the same kernels, so the withheld read's
+/// 512 regions check no path that a few of them do not, while the host replays each at about 110 times the card's
+/// time (a GSM8K section 8,541 ms against 77); the whole withheld read is each lap's own receipt on the card.
 pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 21 {
-        return Err("parity-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION SECTIONS RATE GROW RELEASES SWEEPS".into());
+    if args.len() != 22 {
+        return Err("parity-field UNITS UNITS_SHA TRAIN TRAIN_SHA HELD HELD_SHA KEYS KEYS_SHA D H n STILL f K SECTION SECTIONS RATE GROW RELEASES SWEEPS WITHHELD".into());
     }
     let started = std::time::Instant::now();
     let p = passage(&args[1..9], positive(&args[15])?)?;
     let (sections, rate, grow, releases, sweeps) = (positive(&args[16])?, count(&args[17])? as u32, positive(&args[18])?, count(&args[19])?, positive(&args[20])?);
+    let withheld = &p.unseen[..positive(&args[21])?.min(p.unseen.len())];
     let mut founded = p.learner(&args[9..15], rate)?;
     if grow > 1 {
         founded = founded.widened(grow, &p.keys).map_err(|e| e.to_string())?;
@@ -235,7 +241,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         println!("FIELD_PARITY_PACE shift={shift} entries={len}");
     }
     let d = founded.field.declaration;
-    println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len());
+    println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow} withheld_read={}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len(), withheld.len());
     let mut host_learner = founded.clone();
     let mut card_learner = founded;
     let order = walk(p.seed, host_learner.laps, p.sections.len());
@@ -245,7 +251,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     // The sections, then the withheld problems as a lap's end reads them.
     let steps: Vec<(usize, bool)> = order.iter().take(sections).map(|&s| (s, false)).chain(std::iter::once((usize::MAX, true))).collect();
     for (k, &(s, end)) in steps.iter().enumerate() {
-        let members = if end { &p.unseen } else { &p.sections[s] };
+        let members = if end { withheld } else { &p.sections[s] };
         let mut host = HostField;
         let mut host_rec = Recorder { inner: &mut host, reads: Vec::new(), logits: Vec::new() };
         let (mut host_draw, mut card_draw) = (draw, draw);
