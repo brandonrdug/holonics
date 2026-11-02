@@ -1,0 +1,1 @@
+WRITTEN dir=$O/release problems=128 a_on_problem=0 b_free_calculations=96 b_free_right=0 c_first_calculations=94 c_from_question=14 b_equals=0/200 met=0/39 never_met=0/161 binary +=0/200 -=0/0 *=0/0 /=0/0 c_foil=13
