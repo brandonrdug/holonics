@@ -820,6 +820,19 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
+            // [measurement; agent-inferred, November 2] **The far pairs' share of the contact covector** (§16.20): on the
+            // section's own regions before its step, at the run's sections 1, 2, 4, 8 and 16 and at each lap's first,
+            // `Σ |δs|` near and far per head (`Field::covector_shares`, through the realization). Zero at the founding,
+            // where the readout and the current's return stand at zero.
+            let run_section = lap * sections.len() + n + 1;
+            if n == 0 || (run_section <= 16 && run_section.is_power_of_two()) {
+                let read_start = std::time::Instant::now();
+                let shares = realization.read_covector_shares(&learner.field, &views).map_err(|e| e.to_string())?;
+                for (head, [near, far]) in shares.iter().enumerate() {
+                    let far_share = if near + far == 0 { 0 } else { far * 1_000_000 / (near + far) };
+                    println!("FIELD_COVECTOR_SHARE lap={lap} section={run_section} head={head} near={near} far={far} far_share={far_share} ms={}", read_start.elapsed().as_millis());
+                }
+            }
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;

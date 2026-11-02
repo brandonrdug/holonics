@@ -406,6 +406,10 @@ struct FieldWords {
     wide *gsig;
     // The crowds' contact covectors `[h][t][slots]` the reverse keeps for the clock's skin return (§16).
     int64_t *cds;
+    // [measurement, §16.20] Where set, the contact covector's magnitude by where its pairs lie, `[h][2]`: `Σ |δs|` over
+    // the near pairs (`|i − j| < NEAR`) and over the far ones (the far pairs and the crowds), the host's
+    // `Field::covector_shares`.
+    wide *dsshare;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -2742,6 +2746,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // The temperature's covector (§15.10): `δT[h][kind] += release(δz S, 16)` over the row's sources and crowds,
         // each released alone and summed (an exact integer sum, the lanes' partials added over the warp).
         wide tacc = 0;
+        // The covector's magnitude near and far (§16.20), where read.
+        wide near_ds = 0, far_ds = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
             const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
@@ -2755,6 +2761,12 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
                 }
                 dsv = (int64_t)dz;
                 dsr[j] = dsv;
+                const wide mag = dz < 0 ? -dz : dz;
+                if ((j > i ? j - i : i - j) < NEAR) {
+                    near_ds += mag;
+                } else {
+                    far_ds += mag;
+                }
             }
             dss[warp][lane] = dsv;
             stj[warp][lane] = j;
@@ -2783,6 +2795,15 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
             dsks[warp][lane] = (int64_t)dz;
             if (w.cds != nullptr) {
                 w.cds[hg * w.slots + lane] = (int64_t)dz;
+            }
+            far_ds += dz < 0 ? -dz : dz;
+        }
+        if (w.dsshare != nullptr) {
+            near_ds = warp_sum(near_ds);
+            far_ds = warp_sum(far_ds);
+            if (lane == 0) {
+                add_wide(w.dsshare + 2 * h, near_ds);
+                add_wide(w.dsshare + 2 * h + 1, far_ds);
             }
         }
         tacc = warp_sum(tacc);

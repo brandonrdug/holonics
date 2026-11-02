@@ -112,6 +112,9 @@ impl FieldRealization for Recorder<'_> {
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.inner.read_row_shares(field, regions, questions)
     }
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<[u128; 2]>, TowerError> {
+        self.inner.read_covector_shares(field, regions)
+    }
 }
 
 /// A realization that counts the site rows it reads: a region's sites, times the heads and the
@@ -151,6 +154,10 @@ impl FieldRealization for Counted<'_> {
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> std::result::Result<Vec<HeldRows>, TowerError> {
         self.count(field, regions);
         self.inner.read_row_shares(field, regions, questions)
+    }
+    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> std::result::Result<Vec<[u128; 2]>, TowerError> {
+        self.count(field, regions);
+        self.inner.read_covector_shares(field, regions)
     }
 }
 
@@ -328,12 +335,17 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             let questions: Vec<usize> = some.iter().map(|r| r.unresolved.iter().position(|&u| u).unwrap_or(r.classes.len())).collect();
             some.is_empty() || host_learner.field.held_rows_all(some, &questions).map_err(|e| e.to_string())? == card.read_row_shares(&card_learner.field, some, &questions).map_err(|e| e.to_string())?
         };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal;
+        // The contact covector by where its pairs lie on the same regions (§16.20), host against card.
+        let shares_equal = {
+            let some = &host_views[..host_views.len().min(6)];
+            some.is_empty() || host_learner.field.covector_shares(some).map_err(|e| e.to_string())? == card.read_covector_shares(&card_learner.field, some).map_err(|e| e.to_string())?
+        };
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && rows_equal && shares_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} rows_equal={rows_equal} shares_equal={shares_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,
