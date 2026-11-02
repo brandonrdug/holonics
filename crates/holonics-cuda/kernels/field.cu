@@ -3247,26 +3247,36 @@ __device__ __forceinline__ wide skin_back_dev(const FieldWords &w, wide b, wide 
     return rel(rel(y, MOVE_BITS), 16);
 }
 
+// A site's rate on paced head `p`'s class sheet (§16.16, the host's `Field::paces`): its own class's entry (the
+// unresolved row's at an open site), or its carried shares' mixture `release(Σ_a w_a c_p[a], 16)`.
+__device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint64_t s) {
+    const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+    const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
+    if (from == to) {
+        return (wide)w.theta[base + row_of(w, s)];
+    }
+    wide sum = 0;
+    for (uint32_t k = from; k < to; k++) {
+        sum += (wide)w.mix_share[k] * (wide)w.theta[base + w.mix_class[k]];
+    }
+    return rel(sum, FACE_BITS);
+}
+
 // [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
-// one thread a paced head and a region over its sites in order: `κ = 2^24 + release(⟨c_p, x⁰_t⟩, 16)`, `τ`, `σ` the
-// exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`).
-extern "C" __global__ void field_paces(FieldWords w, const int64_t *x0) {
+// one thread a paced head and a region over its sites in order: on the class sheet `κ = 2^24 + c_p[u_t]` (§16.16),
+// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`).
+extern "C" __global__ void field_paces(FieldWords w) {
     const uint64_t cells = (uint64_t)w.paced * w.R;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const int32_t *row = w.theta + w.pace_at + (uint64_t)p * w.D;
         const wide one = (wide)1 << PACE_BITS;
         wide clock = 0, variation = 0;
         bool plain = true;
         for (uint32_t t = 0; t < sites; t++) {
             const uint64_t g = first + t;
-            wide dot = 0;
-            for (uint32_t d = 0; d < w.D; d++) {
-                dot += (wide)row[d] * (wide)x0[g * w.D + d];
-            }
-            const wide k = one + rel(dot, FACE_BITS);
+            const wide k = one + pace_rate(w, p, g);
             if (t > 0) {
                 clock += k;
                 variation += k < 0 ? -k : k;
@@ -3867,32 +3877,25 @@ extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
     }
 }
 
-// `δc_p[d] += Σ_t x⁰_t[d] δκ_p(t)` (the material's covector grain), one thread a paced head and a dimension.
-extern "C" __global__ void field_pace_c_back(FieldWords w, const int64_t *x0, const wide *dkappa, wide *g) {
-    const uint64_t cells = (uint64_t)w.paced * w.D;
+// `δc_p[u] += Σ_(t: u_t = u) δκ_p(t)` on the class sheet (§16.16; the material's covector grain, a whole class's share
+// `2^16`, a carried face's classes by their shares), one thread a paced head and a site, the sums exact in any order.
+extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, wide *g) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t p = c / w.D, d = c % w.D;
-        wide acc = 0;
-        for (uint64_t t = 0; t < w.T; t++) {
-            const wide dk = dkappa[(uint64_t)p * w.T + t];
-            if (dk != 0) {
-                acc += (wide)x0[t * w.D + d] * dk;
+        const uint32_t p = c / w.T;
+        const uint64_t t = c % w.T;
+        const wide dk = dkappa[(uint64_t)p * w.T + t];
+        if (dk == 0) {
+            continue;
+        }
+        const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+        const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+        if (from == to) {
+            add_wide(g + base + row_of(w, t), dk << FACE_BITS);
+        } else {
+            for (uint32_t k = from; k < to; k++) {
+                add_wide(g + base + w.mix_class[k], dk * (wide)w.mix_share[k]);
             }
         }
-        add_wide(g + w.pace_at + (uint64_t)p * w.D + d, acc);
-    }
-}
-
-// `δx⁰_t[d] += Σ_p release(c_p[d] δκ_p(t), 24)` (the opening face's covector), one thread a site and a dimension.
-extern "C" __global__ void field_pace_x_back(FieldWords w, const wide *dkappa, int64_t *dx) {
-    const uint64_t cells = (uint64_t)w.T * w.D;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / w.D;
-        const uint32_t d = c % w.D;
-        wide acc = (wide)dx[c];
-        for (uint32_t p = 0; p < w.paced; p++) {
-            acc = (wide)fit64(acc + rel((wide)w.theta[w.pace_at + (uint64_t)p * w.D + d] * dkappa[(uint64_t)p * w.T + t], PACE_BITS), w.status);
-        }
-        dx[c] = (int64_t)acc;
     }
 }

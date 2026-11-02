@@ -1660,6 +1660,14 @@ fn witness_field(reach: usize, ticks: usize, paced: bool) -> Field {
 /// carries the source digit's identity `e^(2πi d/10)` on head 3's period-729 mode, written to dimensions 20 and 21, and
 /// a digit class reads its own turn there, a non-digit held down.
 fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>) -> Field {
+    witness_field_readers(reach, ticks, paced, hot, (0, 0))
+}
+
+/// [`witness_field_read`] with its readers transported by `(anchor, comb)` clock ticks (§16.16): the anchor's window
+/// moved back by `anchor` ticks of its period-81 mode (`ψ − anchor/81` of a turn), and the comb's two channels turned
+/// on by `comb` ticks of their periods (`2/25 + comb/16`, `−2/25 + comb/32` of a turn), the same construction read at a
+/// clock whose copy and anchor distances stand that many ticks from the digit clock's.
+fn witness_field_readers(reach: usize, ticks: usize, paced: bool, hot: Option<i64>, (anchor_ticks, comb_ticks): (i128, i128)) -> Field {
     let alphabet = WITNESS_BYTES.len() + 1;
     let d = FieldDeclaration { alphabet, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: 1 };
     let mut field = Field::found(d, &keys(1 << 17)).unwrap();
@@ -1706,7 +1714,7 @@ fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>)
         set(field, chart + (m + c) * dw + from.1, gc);
     };
     // The anchor's window `ψ = −27/100` of a turn (`−1.696` rad) and its strength `A = 64`.
-    let (psi, anchor) = (face(-27, 100), 64 * one);
+    let (psi, anchor) = (face(-27 * 81 - 100 * anchor_ticks, 8100), 64 * one);
     let (c16, c32, c81, c0, c1) = (3 * n + 3, 3 * n + 4, 3 * n + 5, 0usize, 1usize);
     // Head 3's word: a digit's key on the copy's comb (period 16 power 3, period 32 power 12) and the anchor's
     // mode (period 81, power 1); on mode 5 the anchor's term `A e^(iψ) (read₃/2 − read₀)`: `A/2 e^(iψ)` at a digit
@@ -1725,8 +1733,8 @@ fn witness_field_read(reach: usize, ticks: usize, paced: bool, hot: Option<i64>)
     // of a tenth).
     set(&mut field, l.probe + c81 * dw + 3, times(anchor, psi.0));
     set(&mut field, l.probe + (m + c81) * dw + 3, times(anchor, psi.1));
-    turned(&mut field, l.probe, c16, (12, 13), one, face(2, 25));
-    turned(&mut field, l.probe, c32, (16, 17), one, face(-2, 25));
+    turned(&mut field, l.probe, c16, (12, 13), one, face(32 + 25 * comb_ticks, 400));
+    turned(&mut field, l.probe, c32, (16, 17), one, face(-64 + 25 * comb_ticks, 800));
     // Head 3's value: a digit's `1` on the comb; the anchor's current to dimensions 10–11 (period 16) and 14–15
     // (period 32), the second at half the gain.
     set(&mut field, l.v + c16 * dw + 1, one);
@@ -2344,6 +2352,8 @@ struct DefiniteMenu {
     runs: usize,
     admitted: Vec<(usize, usize, usize)>,
     rows: Vec<Vec<i64>>,
+    /// Each loop's two runs' first edges `(i, j)`, the earlier receiver first.
+    edges: Vec<((usize, usize), (usize, usize))>,
 }
 
 fn definite_menu(classes: &[usize], ql: usize, band: Option<usize>) -> DefiniteMenu {
@@ -2367,7 +2377,7 @@ fn definite_menu(classes: &[usize], ql: usize, band: Option<usize>) -> DefiniteM
             }
         }
     }
-    let mut rows = Vec::new();
+    let (mut rows, mut edges) = (Vec::new(), Vec::new());
     for (k, &(i1, j1, l1)) in admitted.iter().enumerate() {
         for &(i2, j2, l2) in &admitted[k + 1..] {
             // One front band holds both answer targets (§14.6's band `[f, f + 5)`): their nearest edges stand fewer
@@ -2378,6 +2388,7 @@ fn definite_menu(classes: &[usize], ql: usize, band: Option<usize>) -> DefiniteM
             }
             if (i1 < i2) == (j1 < j2) && i1 != i2 && j1 != j2 {
                 let ((i1, j1), (i2, j2)) = if i1 < i2 { ((i1, j1), (i2, j2)) } else { ((i2, j2), (i1, j1)) };
+                edges.push(((i1, j1), (i2, j2)));
                 let mut row = vec![0i64; WITNESS_BYTES.len()];
                 for t in j1 + 1..=i1 {
                     row[classes[t]] += 1;
@@ -2389,7 +2400,7 @@ fn definite_menu(classes: &[usize], ql: usize, band: Option<usize>) -> DefiniteM
             }
         }
     }
-    DefiniteMenu { runs, admitted, rows }
+    DefiniteMenu { runs, admitted, rows, edges }
 }
 
 /// [agent-inferred, November 2] **The byte clock located by propagation over the definite menu** (§16.16): as
@@ -2407,10 +2418,12 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
     let bytes = WITNESS_BYTES.len();
     let mut menus = Vec::new();
     let (mut holds_both, mut forcing_true, mut forcing_regions) = (0usize, 0usize, 0usize);
+    let mut training: Vec<Vec<usize>> = Vec::new();
     for _ in 0..256 {
         let (q, a) = crib_like(&mut next);
         let classes: Vec<usize> = q.iter().chain(&a).map(|&b| to_class(b)).collect();
         let menu = definite_menu(&classes, q.len(), std::env::var_os("DEFINITE_BAND").map(|_| NEAR - 1));
+        training.push(classes.clone());
         // The listener check: the first calculation's operands, `<<a+b=`, against the question's first two numbers.
         let first: Vec<usize> = (0..q.len()).filter(|&t| q[t].is_ascii_digit() && (t == 0 || !q[t - 1].is_ascii_digit())).collect();
         let la = a[2..].iter().take_while(|b| b.is_ascii_digit()).count();
@@ -2525,6 +2538,92 @@ fn the_byte_clock_is_located_over_the_definite_menu() {
         let kappa: Vec<Rat> = (0..bytes).map(|c| (0..m).map(|x| w[x].clone() * b[x][c].clone()).sum()).collect();
         let shown: Vec<String> = (0..bytes).map(|c| format!("{:?}:{}", WITNESS_BYTES[c] as char, kappa[c])).collect();
         eprintln!("DEFINITE published {}", shown.join(" "));
+        if std::env::var_os("DEFINITE_READERS").is_some() {
+            // The published clock's own distances, read on the training regions' located copies (each forced loop's
+            // two runs, the earlier receiver the anchor): the anchor's `τ(i₁) − τ(j₁)` at its own front (`i₁` open),
+            // and the copy's offset from the channel, `(τ(i₂) − τ(j₂)) − (τ(i₁) − τ(j₁))` at the later front
+            // (`i₂` open), under the digit clock and the published one; the readers move by their differences.
+            let grain = Rat::from_integer(BigInt::from(1i64 << MATERIAL_BITS));
+            let rates: Vec<i32> = kappa.iter().map(|k| i32::try_from(((k.clone() - rat(1)) * grain.clone()).round().to_integer()).unwrap()).collect();
+            let reach = training.iter().map(|c| c.len()).max().unwrap() + 1;
+            let digit_clock = witness_field_read(reach, 3, true, Some(128));
+            let mut located = digit_clock.clone();
+            let base = located.layout.pace + (located.declaration.alphabet + 1);
+            for (c, &r) in rates.iter().enumerate() {
+                located.theta[base + c] = r;
+            }
+            located.theta[base + located.declaration.alphabet] = 0;
+            let tau = |field: &Field, classes: &[usize], at: usize| -> Vec<i64> {
+                let mut open = vec![false; at + 1];
+                open[at] = true;
+                let pass = field.pass(&Region { classes: &classes[..=at], unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] }, false).unwrap();
+                pass.paces.tau[pass.paces.row[3].unwrap()].clone()
+            };
+            let started = std::time::Instant::now();
+            let shifts: Vec<(i64, i64)> = if let Some(given) = std::env::var("DEFINITE_SHIFTS").ok().and_then(|v| { let p: Vec<i64> = v.split(',').filter_map(|x| x.parse().ok()).collect(); (p.len() == 2).then(|| (p[0], p[1])) }) { vec![given] } else { menus
+                .par_iter()
+                .zip(training.par_iter())
+                .filter(|(m, _)| m.edges.len() == 1)
+                .map(|(m, classes)| {
+                    let ((i1, j1), (i2, j2)) = m.edges[0];
+                    let reads = |field: &Field| {
+                        let (t1, t2) = (tau(field, classes, i1), tau(field, classes, i2));
+                        (t1[i1] - t1[j1], (t2[i2] - t2[j2]) - (t2[i1] - t2[j1]))
+                    };
+                    let ((a0, c0), (a1, c1)) = (reads(&digit_clock), reads(&located));
+                    ((a1 - a0) >> MATERIAL_BITS, (c1 - c0) >> MATERIAL_BITS)
+                })
+                .collect() };
+            let (mut anchor_shift, mut comb_shift) = (std::collections::BTreeMap::new(), std::collections::BTreeMap::new());
+            for (a, c) in shifts {
+                *anchor_shift.entry(a).or_insert(0usize) += 1;
+                *comb_shift.entry(c).or_insert(0usize) += 1;
+            }
+            eprintln!("DEFINITE readers measured_ms={}", started.elapsed().as_millis());
+            eprintln!("DEFINITE readers anchor_shift_ticks={anchor_shift:?} comb_shift_ticks={comb_shift:?}");
+            let mode = |m: &std::collections::BTreeMap<i64, usize>| *m.iter().max_by_key(|e| *e.1).unwrap().0 as i128;
+            let (sa, sc) = (mode(&anchor_shift), mode(&comb_shift));
+            // The comb's sense, read on the training fronts (the forced loops' later receivers), never the held ones.
+            let fronts: Vec<(Vec<usize>, usize, usize)> = menus.iter().zip(&training).filter(|(m, _)| m.edges.len() == 1).map(|(m, c)| (c.clone(), m.edges[0].1 .0, m.edges[0].1 .1)).take(64).collect();
+            let training_right = |field: &Field| fronts.par_iter().filter(|(classes, i, j)| {
+                let mut open = vec![false; i + 1];
+                open[*i] = true;
+                let pass = field.pass(&Region { classes: &classes[..=*i], unresolved: &open, faces: &[], locked: &[], clock: &[], echo: &[] }, true).unwrap();
+                let row = &pass.ticks.last().unwrap().rows[3 * (i + 1) + i];
+                row.iter().max_by_key(|s| (s.p, std::cmp::Reverse(s.j))).unwrap().j as usize == *j
+            }).count();
+            let mut senses = Vec::new();
+            for sense in [1i128, -1] {
+                let mut f = witness_field_readers(reach, 3, true, Some(128), (sa, sense * sc));
+                for (c, &r) in rates.iter().enumerate() {
+                    f.theta[base + c] = r;
+                }
+                f.theta[base + f.declaration.alphabet] = 0;
+                senses.push((training_right(&f), sense));
+            }
+            let sense = senses.iter().max().unwrap().1;
+            eprintln!("DEFINITE readers training_copies_right_by_comb_sense={senses:?} of {} chosen={sense}", fronts.len());
+            let (problems, reach) = witness_fronts();
+            for hot in [16i64, 128] {
+                let reference = completed_read(&witness_field_read(reach, 3, true, Some(hot)), &problems);
+                let mut f = witness_field_readers(reach, 3, true, Some(hot), (sa, sense * sc));
+                let base = f.layout.pace + (f.declaration.alphabet + 1);
+                for (c, &r) in rates.iter().enumerate() {
+                    f.theta[base + c] = r;
+                }
+                f.theta[base + f.declaration.alphabet] = 0;
+                let read = completed_read(&f, &problems);
+                let faces = |out: &[(usize, bool, bool, i64, i64)]| out.iter().filter(|r| r.2).count();
+                let whole = (0..problems.len()).filter(|&p| read.iter().filter(|r| r.0 == p).all(|r| r.2)).count();
+                let mut by: std::collections::BTreeMap<i64, (usize, usize)> = std::collections::BTreeMap::new();
+                for r in &read {
+                    let e = by.entry(r.4 >> MATERIAL_BITS).or_insert((0, 0));
+                    e.0 += 1;
+                    e.1 += usize::from(r.2);
+                }
+                eprintln!("DEFINITE readers_witness hot={hot} faces={}/{} rows={} code_millibits={} whole={whole}/64 digit_clock_faces={} faces_by_skin_distance={:?}", faces(&read), read.len(), read.iter().filter(|r| r.1).count(), read.iter().map(|r| r.3).sum::<i64>() * 1000 / read.len() as i64 >> 20, faces(&reference), by);
+            }
+        }
         if std::env::var_os("DEFINITE_WITNESS").is_some() {
             // The witness under the published clock: head 3's rates `c[b] = κ_pub[b] − 1` on `2^(−24)` (a fraction's
             // face at the material's grain, to the nearest), the unresolved row unreached, at its current `κ = 1`.

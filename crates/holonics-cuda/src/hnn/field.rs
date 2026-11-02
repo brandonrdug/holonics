@@ -1105,8 +1105,7 @@ impl<'c> CardField<'c> {
         let buckets = 4 * 3 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         if paced > 0 {
-            let mut x0 = words.x;
-            self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words), arg(&mut x0)])?;
+            self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
         self.moments(field, words, regions.len(), sites)?;
@@ -1536,18 +1535,13 @@ impl<'c> CardField<'c> {
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks, through the
         // strands to the families (the host's `moments_return`).
         self.moments_return(field, words, g, &dm, regions, sites)?;
-        // The clocks return to their paces (§16): `δκ` by suffix sums, `δc += Σ x⁰ δκ`, `δx⁰ += release(c δκ, 24)`, the
-        // opening read again into scratch.
+        // The clocks return to their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the
+        // class sheet; the opening takes nothing.
         if paced > 0 {
-            let x0 = alloc64(sites * dw)?;
-            let mut w0 = *words;
-            w0.x = x0.device_ptr();
-            self.launch("field_open", Self::cells((sites * dw) as u64), THREADS, &mut [arg(&mut w0)])?;
             let dkappa = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
-            let (mut dkp, mut x0p, mut gp, mut dxp) = (dkappa.device_ptr(), x0.device_ptr(), g.device_ptr(), dx.device_ptr());
+            let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
             self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
-            self.launch("field_pace_c_back", Self::cells((paced * dw) as u64), THREADS, &mut [arg(words), arg(&mut x0p), arg(&mut dkp), arg(&mut gp)])?;
-            self.launch("field_pace_x_back", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dxp)])?;
+            self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
         }
         // The opening: each site's row of the encoding and its strand neighbours' rows of theirs (a
         // carried site's mixture by its shares), the entries partitioned by row once for each encoding

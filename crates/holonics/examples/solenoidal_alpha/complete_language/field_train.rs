@@ -1792,6 +1792,16 @@ pub(super) fn align(args: &[String], realization: &mut dyn FieldRealization) -> 
 /// code at an operand digit falls when the copy holds. Returns the field and the witness's parts: the clock's entries
 /// (the pace rows) and the readers' (the word and probe charts and their biases).
 fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) -> Result<Field> {
+    witness_on_readers(codec, declaration, keys, None, (0, 0))
+}
+
+/// The published clock's pinned bytes (§16.16's receipt: the letters the between-texts hold, the space, `+`).
+const PUBLISHED_PINNED: &[u8] = b"abcdefghijklmnoprstuvwxyz +";
+
+/// [`witness_on`] under a given clock and with its readers transported by `(anchor, comb)` ticks (tests.rs's
+/// `witness_field_readers`): `clock` `Some` sets head 3's rates on the class sheet to the published clock (0 at each
+/// class whose one byte the located menu pinned, 1 elsewhere, the unresolved row unreached at 1).
+fn witness_on_readers(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8], clock: Option<&[u8]>, (anchor_ticks, comb_ticks): (i128, i128)) -> Result<Field> {
     let mut field = Field::found(declaration, keys).map_err(|e| e.to_string())?;
     field.theta.iter_mut().for_each(|v| *v = 0);
     let d = declaration;
@@ -1829,7 +1839,11 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
     // row's 0 (the hand-set witness; the codec names its digits here and nowhere in the field).
     let rates = alphabet + 1;
     for c in 0..=alphabet {
-        if c == alphabet || !codec.is_digit(c) {
+        let zero = match clock {
+            None => c == alphabet || !codec.is_digit(c),
+            Some(pinned) => c < alphabet && { let b = codec.decode(&[c]); b.len() == 1 && pinned.contains(&b[0]) },
+        };
+        if zero {
             set(&mut field, l.pace + rates + c, -one)?;
         }
     }
@@ -1840,7 +1854,7 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
         set(field, chart + (m + c) * dw + from.0, gs)?;
         set(field, chart + (m + c) * dw + from.1, gc)
     };
-    let psi = face(&field, -27, 100);
+    let psi = face(&field, -27 * 81 - 100 * anchor_ticks, 8100);
     let anchor = 64 * one;
     let (c16, c32, c81, c729, c0, c1) = (3 * n + 3, 3 * n + 4, 3 * n + 5, 3 * n + 7, 0usize, 1usize);
     set(&mut field, l.q + c16 * dw + 1, root(3))?;
@@ -1852,7 +1866,7 @@ fn witness_on(codec: &FieldCodec, declaration: FieldDeclaration, keys: &[u8]) ->
     set(&mut field, l.q + (m + c81) * dw, times(-anchor, psi.1))?;
     set(&mut field, l.probe + c81 * dw + 3, times(anchor, psi.0))?;
     set(&mut field, l.probe + (m + c81) * dw + 3, times(anchor, psi.1))?;
-    let (f2, fm2) = (face(&field, 2, 25), face(&field, -2, 25));
+    let (f2, fm2) = (face(&field, 32 + 25 * comb_ticks, 400), face(&field, -64 + 25 * comb_ticks, 800));
     turned(&mut field, l.probe, c16, (12, 13), one, f2)?;
     turned(&mut field, l.probe, c32, (16, 17), one, fm2)?;
     set(&mut field, l.v + c16 * dw + 1, one)?;
@@ -1947,7 +1961,34 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let dev_set: Problems = encode(&problems_of(&dev_text))?.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
     let reach = train_set.iter().chain(&dev_set).map(|(q, _, _)| q.len() + codec.answer).max().unwrap_or(codec.answer);
     let declaration = FieldDeclaration { alphabet: codec.alphabet(), width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks, frames: 5, reach, clocks: clocks_of(5, 2) };
-    let witness = witness_on(&codec, declaration, &keys)?;
+    // [agent-inferred, November 2] Under the published clock (`FIELD_WITNESS_CLOCK=published`, §16.16) the readers move by
+    // the clock's own distances, read on the training problems: the anchor's distance from the question's first
+    // digit stands past the digit clock's by the sites between that the published clock ticks and the digit clock
+    // does not (and the open receiver's row, unreached at 1); the comb by the receiver's own rate, one tick, in the
+    // sense the host's training fronts read (−1).
+    let published = std::env::var("FIELD_WITNESS_CLOCK").is_ok_and(|v| v == "published");
+    let witness = if published {
+        let mut shifts: std::collections::BTreeMap<i128, usize> = std::collections::BTreeMap::new();
+        for (q, a, _) in &train_set {
+            let (qb, ab) = (codec.decode(q), codec.decode(a));
+            let Some(open) = ab.windows(2).position(|w| w == b"<<") else { continue };
+            let Some(first) = (0..qb.len()).find(|&t| qb[t].is_ascii_digit()) else { continue };
+            let ticks = |c: usize| -> (i128, i128) {
+                let b = codec.decode(&[c]);
+                let digit = i128::from(codec.is_digit(c));
+                let pub_rate = i128::from(!(b.len() == 1 && PUBLISHED_PINNED.contains(&b[0])));
+                (digit, pub_rate)
+            };
+            let span = q[first + 1..].iter().chain(&a[..open + 2]);
+            let shift: i128 = span.map(|&c| { let (d, p) = ticks(c); p - d }).sum::<i128>() + 1;
+            *shifts.entry(shift).or_insert(0) += 1;
+        }
+        let anchor = *shifts.iter().max_by_key(|e| *e.1).map(|e| e.0).unwrap_or(&0);
+        println!("FIELD_WITNESS_CLOCK published anchor_shift_ticks={shifts:?} chosen={anchor} comb_ticks=-1");
+        witness_on_readers(&codec, declaration, &keys, Some(PUBLISHED_PINNED), (anchor, -1))?
+    } else {
+        witness_on(&codec, declaration, &keys)?
+    };
     let founding = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
     // The reads: each operand digit's front cut at the digit.
     let mut reads: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
@@ -1999,33 +2040,38 @@ pub(super) fn witness_field_cmd(args: &[String], realization: &mut dyn FieldReal
     let sites = views.len().max(1) as i128;
     let bits = |c: i64| { let x = c as i128 * 1000 / sites >> 20; format!("{}.{:03}", x / 1000, x.abs() % 1000) };
     println!("FIELD_WITNESS_READ operand_digits={} witness_faces_right={right_w} witness_code_bits={} founding_faces_right={right_f} founding_code_bits={} ms={}", views.len(), bits(code_w), bits(code_f), started.elapsed().as_millis());
+    // (i) the readers kept, the clock zeroed (not read under the published clock: the clock is located, §16.15).
+    if published {
+        println!("FIELD_WITNESS_CLOCK not_read under=published (the clock is located by loop closure, not descended)");
+    } else {
     // (i) the readers kept, the clock zeroed.
-    let mut no_clock = witness.clone();
-    no_clock.theta[l.pace..].iter_mut().for_each(|v| *v = 0);
-    let (_, _, g1) = covector(&no_clock, realization)?;
-    let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
-    let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
-    // The rate's route: digits' and inside words' sums and counts, and the squares' sum (exact, unbounded).
-    let mut route: (i128, u64, i128, u64, BigInt) = (0, 0, 0, 0, BigInt::from(0));
-    for region in &views {
-        let bytes = codec.decode(region.classes);
-        for t in 0..region.classes.len() - 1 {
-            // A definite site's rate moves by its class's entry (the class sheet, §16.16).
-            let dk: i128 = descent1[region.classes[t]];
-            route.4 += BigInt::from(dk) * BigInt::from(dk);
-            let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
-            if codec.is_digit(region.classes[t]) {
-                route.0 += dk;
-                route.1 += 1;
-            } else if t > 0 && letter(t) && letter(t - 1) {
-                route.2 += dk;
-                route.3 += 1;
+        let mut no_clock = witness.clone();
+        no_clock.theta[l.pace..].iter_mut().for_each(|v| *v = 0);
+        let (_, _, g1) = covector(&no_clock, realization)?;
+        let descent1: Vec<i128> = g1[pace3.clone()].iter().map(|&v| -v).collect();
+        let toward1: Vec<i128> = theta(&witness)[pace3.clone()].to_vec();
+        // The rate's route: digits' and inside words' sums and counts, and the squares' sum (exact, unbounded).
+        let mut route: (i128, u64, i128, u64, BigInt) = (0, 0, 0, 0, BigInt::from(0));
+        for region in &views {
+            let bytes = codec.decode(region.classes);
+            for t in 0..region.classes.len() - 1 {
+                // A definite site's rate moves by its class's entry (the class sheet, §16.16).
+                let dk: i128 = descent1[region.classes[t]];
+                route.4 += BigInt::from(dk) * BigInt::from(dk);
+                let letter = |u: usize| bytes.get(u).is_some_and(|b| b.is_ascii_alphabetic());
+                if codec.is_digit(region.classes[t]) {
+                    route.0 += dk;
+                    route.1 += 1;
+                } else if t > 0 && letter(t) && letter(t - 1) {
+                    route.2 += dk;
+                    route.3 += 1;
+                }
             }
         }
+        let rms = (&route.4 / BigInt::from((route.1 + route.3).max(1))).sqrt().max(BigInt::from(1));
+        let gap = (BigInt::from(route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * BigInt::from(1_000_000)) / rms;
+        println!("FIELD_WITNESS_CLOCK head=3 cosine_to_witness={} gap_digits_less_inside_words_of_rms={gap}", cosine(&descent1, &toward1));
     }
-    let rms = (&route.4 / BigInt::from((route.1 + route.3).max(1))).sqrt().max(BigInt::from(1));
-    let gap = (BigInt::from(route.0 / route.1.max(1) as i128 - route.2 / route.3.max(1) as i128) * BigInt::from(1_000_000)) / rms;
-    println!("FIELD_WITNESS_CLOCK head=3 cosine_to_witness={} gap_digits_less_inside_words_of_rms={gap}", cosine(&descent1, &toward1));
     // (ii) the clock kept, the readers the founding's.
     let mut no_readers = witness.clone();
     for r in &readers {

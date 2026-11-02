@@ -248,6 +248,25 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         }
         println!("FIELD_PARITY_PACE shift={shift} entries={len}");
     }
+    // [agent-inferred, November 2] The published clock (§16.16's receipt, `FIELD_PARITY_CLOCK=1`): every paced head's rate
+    // 0 at the bytes the located menu pinned (the letters but `q`, the space, `+`) and 1 at every other class, each
+    // codec class read by its byte; a class of more than one byte, or of none, is unreached and keeps 1.
+    if std::env::var_os("FIELD_PARITY_CLOCK").is_some() {
+        const PINNED: &[u8] = b"abcdefghijklmnoprstuvwxyz +";
+        let (start, a) = (founded.field.layout().pace, founded.field.declaration.alphabet);
+        let paced = founded.field.declaration.paced_heads();
+        let mut zero = 0usize;
+        for c in 0..a {
+            let bytes = p.codec.decode(&[c]);
+            if bytes.len() == 1 && PINNED.contains(&bytes[0]) {
+                zero += 1;
+                for h in 0..paced {
+                    founded.field.theta[start + h * (a + 1) + c] = -(1i32 << 24);
+                }
+            }
+        }
+        println!("FIELD_PARITY_CLOCK classes_at_zero={zero} of {a} paced_heads={paced}");
+    }
     let d = founded.field.declaration;
     println!("FIELD_PARITY_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} frames={} reach={} rate={} material={} grow={grow}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.frames, d.reach, founded.rate_bits, founded.field.theta.len());
     let mut host_learner = founded.clone();

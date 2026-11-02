@@ -1623,7 +1623,9 @@ syllable's sum, not its letters, and five vowel directions stay in the fibre.
 layout's pace family is one rate a class and the unresolved row a paced head; `κ_t = 1 + c_h[u_t]` (a carried face's
 mixture by its shares); the return `δc[u] += Σ_(k: u_k = u) δκ_k`, the opening taking nothing; growth copies a turned
 head's rates whole; the text head is `hnn-field-v8`. The card still realizes the previous chart's pace (`x⁰`'s rows):
-its port and parity follow the coordinator's next go.
+its port and parity follow the coordinator's next go. [November 2] Ported: `pace_rate` (a site's own class's rate or
+its carried shares' mixture), `field_paces` without `x⁰`, `field_pace_c_back` one thread a head and a site with exact
+adds, the opening's term retired.
 
 [measurement, November 2] **The witness under the published clock fails** (the 252 fronts, the witness's readers, head
 3's rates the published `κ − 1` at the material's grain, the unresolved row unreached at 1): faces **35 of 252 at `T =
@@ -1654,6 +1656,55 @@ bytes ticking in its copy's span (`\n`, `<`, `?`), no letter; the copy's skin di
 the answer's `<<` and a line break to every copy's span: each copy of one calculation is shifted alike, so the loops
 still close, but the witness's readers (the anchor's window, the comb's offset and the rest) were set at the digit
 clock's absolute turns and skins, and read the shifted ones wrong. Not patched.
+
+[decision; the coordinator's, November 2] The location is what the data supplies, and the unreached bytes keep their
+current rate under the declared convention (no closing row reaches them; a rate set by hand would be authored). A
+located clock is tested with readers built for it, by the digit-clock witness's own construction set from the
+published clock's turns and skins read on the training regions; the bar is unchanged.
+
+[measurement, November 2] The published clock's distances on the menu's 188 located copies (training regions only):
+the anchor's distance stands **5 ticks** past the digit clock's on all 188 (the question's `?` and line break, the
+answer's `<<`, and the open receiver's unresolved row, each unreached at 1), and the copy's offset from its channel
+**1 tick** on all 188 (the open receiver's own rate): constant, since every crib question ends in one `?\n` and every
+first calculation opens `<<`. The readers move by them (`witness_field_readers`: the anchor's window back 5/81 of a
+turn, the comb's channels by one tick of each period), the comb's sense read on 64 training fronts (64 of 64 copies
+right at one sense, 13 at the other). The 252 held fronts under the published clock and those readers:
+
+| T | faces | rows on the source | code (bits) | whole | faces by skin distance 6, 7, …, 13 |
+|---|---|---|---|---|---|
+| 128 | **252 of 252** | 252 | 0.130 | 64 of 64 | every distance whole |
+| 16 | **118 of 252** | 182 | 2.818 | 8 of 64 | 11/14, 18/26, 23/42, 24/44, 25/60, 10/32, 3/22, 4/12 |
+
+The bar holds at 128 and not at 16 (the digit clock's 213). The cause is §16.12's bound, not the readers: every copy
+stands 5 ticks further from its source (skin distances 6 to 13 against 1 to 8), and a copy's lead over its neighbour
+falls as `T/u²`, so at the temperature the card holds the copy softens at every distance. The unreached bytes cost the
+copy its sharpness, not its closure.
+
+[measurement, November 2] **The card realizes the class sheet's pace bit for bit** (`parity-field`, crib13's declaration
+at width 32, `K = 2`): under the published clock on the codec's classes (`FIELD_PARITY_CLOCK`, 27 of 44 classes at 0,
+each read by its byte), 5 sections equal (faces, covector, learner, held rows, peaks, open return; the rates moving
+from the first deposit, `κ` from 0 to 1.010; the withheld section not reached inside the 180 s guard); at the founding,
+5 sections and the withheld section equal; with every rate drawn far (`FIELD_PARITY_PACE=8`, `κ` 0.51 to 1.49), 3
+sections and the withheld section equal, the run whole. Receipt: `_receipts/law16/parity_class.txt`.
+
+[measurement, November 2] **The coupling reads on the card under the published clock** (`witness-field`, the crib codec
+and declaration at `K = 3`, the 515 held operand-digit fronts; the readers transported by the clock's own distances
+read on the crib's 4,096 training problems: the anchor's shift is 5 ticks on all 4,096; the comb's one tick in the
+host's sense; `FIELD_WITNESS_CLOCK=published`, 8.8 s):
+
+| read | result |
+|---|---|
+| the witness at `T = 16` | faces 277 of 515, code 2.826 bits (the digit clock's witness: 447, 0.742) |
+| (i) the clock's descent | not read: the clock is located by loop closure, not descended |
+| (ii) the clock kept, the founding's readers: the readers' descent | head 3 **+0.043**, head 0 +0.008 (under the digit clock: +0.160, −0.0001) |
+| (iii) a keyed `2^(−10)` step on the clock and readers | code 36.3 bits; the descent's cosine with the way back +0.034 |
+| (iv) `log₂ T`'s descent at the witness with `T = 4` | head 3 raises both (class +1.6·10^14, listener +2.7·10^15); head 0's class lowers (−3.9·10^11), its listener raises (+1.5·10^11) |
+| (iv) at the founding | zero at every head and kind |
+
+Under the located clock the readers' descent still points toward the copy on both heads, weaker on head 3 than under
+the digit clock (the copy stands 5 ticks further, so its readers' covector is softer, §16.12); the temperature rises
+at the copy's head and is silent at the founding, coupled to the rows as before; the basin is still narrow. Receipt:
+`_receipts/law16/witness_card_published.txt`.
 
 ### 16.17 The diff read against itself
 

@@ -1,0 +1,9 @@
+DEFINITE readers measured_ms=145128
+DEFINITE readers anchor_shift_ticks={5: 188} comb_shift_ticks={1: 188}
+DEFINITE readers measured_ms=0
+DEFINITE readers anchor_shift_ticks={5: 1} comb_shift_ticks={1: 1}
+DEFINITE readers training_copies_right_by_comb_sense=[(13, 1), (64, -1)] of 64 chosen=-1
+DEFINITE readers_witness hot=16 faces=118/252 rows=182 code_millibits=2818 whole=8/64 digit_clock_faces=213 faces_by_skin_distance={6: (14, 11), 7: (26, 18), 8: (42, 23), 9: (44, 24), 10: (60, 25), 11: (32, 10), 12: (22, 3), 13: (12, 4)}
+DEFINITE readers_witness hot=128 faces=252/252 rows=252 code_millibits=130 whole=64/64 digit_clock_faces=252 faces_by_skin_distance={6: (14, 14), 7: (26, 26), 8: (42, 42), 9: (44, 44), 10: (60, 60), 11: (32, 32), 12: (22, 22), 13: (12, 12)}
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2049 filtered out; finished in 229.05s
+MEASURE wall_s=466.961

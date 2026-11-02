@@ -1,0 +1,15 @@
+BIN=f49fef883d17a3abf18fbbefbd180110c2631fa4b95906e377888b3e8413de99
+FIELD_COMMAND witness-field <root>/.local/wt/section-edge/.local/run/gsm8k/UNITS0 b438ff77a9eb70d7c5a1aafad3463b99ef2b5c8e36d4ca5eca49abb23873b333 <root>/.local/wt/field-card/.local/run/crib-closure/TRAIN.txt fb64b102a92c5a905e5ca9dd3817afdc0814eb0cf55e5d505287d68bd1426792 <root>/.local/wt/field-card/.local/run/crib-closure/HELD.txt 8d083bbfb62093b5351bf37fb7187dd15e303bc9e80004b02a2e2af949fb86ab <root>/.local/wt/field-card/.local/run/KEYS8 633ddcd64a096e33024e9b2ac17eaad30af9d27c484109705f36fd5be208811c 3
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15271067648 total=16802250752 batch_budget=10279976960
+FIELD_WITNESS_CLOCK published anchor_shift_ticks={5: 4096} chosen=5 comb_ticks=-1
+FIELD_WITNESS_READ operand_digits=515 witness_faces_right=277 witness_code_bits=2.826 founding_faces_right=0 founding_code_bits=5.459 ms=2398
+FIELD_WITNESS_CLOCK not_read under=published (the clock is located by loop closure, not descended)
+FIELD_WITNESS_READERS head=0 cosine_to_witness=7611
+FIELD_WITNESS_READERS head=3 cosine_to_witness=43368
+FIELD_WITNESS_ANCHOR head=3 opposing=50717 near_silent=48060 aligned=62765 silent_driven_to_oppose=8652 silent_driven_to_align=39408 digit_sources=3294
+FIELD_WITNESS_BASIN moved_code_bits=36.271 cosine_back=34481
+FIELD_WITNESS_TEMPER at=witness_t4 faces_right=126 code_bits=8.701 descent_on_log_t_class/listen=0:-393894890652/152197286124,1:0/0,2:0/0,3:159800618596415/2737484438056983,4:0/0
+FIELD_WITNESS_TEMPER at=founding faces_right=0 code_bits=5.459 descent_on_log_t_class/listen=0:0/0,1:0/0,2:0/0,3:0/0,4:0/0
+FIELD_WITNESS_DONE ms=8308
+FIELD_CARD reads=0 read_ms=0 returns=54 return_ms=8023 pairs=3391200338 batches=54 peak_store=2981287224 landmarks=0 landmark_ms=0 elapsed_ms=8309
+MEASURE lap=witness rc=0 wall_s=8.8 peak_rss_kib=257428
