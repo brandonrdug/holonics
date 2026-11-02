@@ -370,6 +370,12 @@ struct FieldWords {
     const uint32_t *dstart;
     const uint32_t *olist;
     const uint32_t *ostart;
+    // The locks' temperatures (§15.10): the material's `temper` family (`theta[temper_at + 2 h + kind]`, kind 0 a
+    // class receiver, 1 a listener, on `2^(−24)`), the covector buffer the reverse adds their covectors to, and,
+    // on a return, the pairs' locks at unit gain `S` (`sb`, at the dense address, a tick's).
+    uint64_t temper_at;
+    wide *gcov;
+    int64_t *sb;
 };
 
 // The frame of local mode `l` of head `h` at the batch's site `g`: the identity in a head of a still ring
@@ -1343,10 +1349,21 @@ __device__ __forceinline__ wide lock_pair(int64_t a0, int64_t a1, int64_t b0, in
     return ((pairing * (wide)(2 * decay)) << grain) - power * (wide)(decay * decay);
 }
 
-// The head's score of the word `wi` (at unit power, its `span` reals) against site `j`'s across `gap`
-// sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
-// `score_bits + 2g + 1` bits, less the falloff `⌊log₂ gap⌋` bits on `2^(−16)` (§2.5, §12, §15.2).
-__device__ __forceinline__ int64_t pair_score(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint32_t gap) {
+// [definition; agent-inferred, November 2] **The temperature of a head's locks** (§15.10): the receiver's head
+// and kind entry of the material (`temper`, on `2^(−24)`), and a score `z = release(T S, 24) − falloff` from the
+// lock at unit gain `S` (on `2^(−16)`).
+__device__ __forceinline__ wide temper_of(const FieldWords &w, uint32_t h, bool listens) {
+    return (wide)w.theta[w.temper_at + 2 * h + (listens ? 1 : 0)];
+}
+
+__device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int64_t base, uint32_t octave_of) {
+    return fit64(rel(temper * (wide)base, MATERIAL_BITS) - ((wide)octave_of << FACE_BITS), w.status);
+}
+
+// The head's lock at unit gain `S` of the word `wi` (at unit power, its `span` reals) against site `j`'s across
+// `gap` sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
+// `16 + 2g + 1` bits (§2.5, §12, §15.2, §15.10); its score is `scored`.
+__device__ __forceinline__ int64_t pair_base(const FieldWords &w, uint32_t h, const int64_t *wi, const int64_t *wj, uint32_t gap) {
     const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
@@ -1355,14 +1372,14 @@ __device__ __forceinline__ int64_t pair_score(const FieldWords &w, uint32_t h, c
             atomicOr(w.status, REFUSED_CARRIER);
         }
     }
-    return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1) - ((wide)octave(gap) << FACE_BITS), w.status);
+    return fit64(rel(s, FACE_BITS + 2 * g + 1), w.status);
 }
 
-// [agent-inferred, November 1] **The pair score of a head of eight modes, from the vector rows** (`pair_score`
+// [agent-inferred, November 1] **The pair lock of a head of eight modes, from the vector rows** (`pair_score`
 // for `n = 8`, the same integers): the source's row of sixteen 32-bit words as four `int4` loads (the lanes of
 // a warp read different rows, so each load is a gather of one line a lane: sixteen 8-octet loads were
 // sixteen such gathers, and the skins another eight), its skins `[h][gap][8]` as two `uint4`.
-__device__ __forceinline__ int64_t pair_score8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t site, uint32_t gap) {
+__device__ __forceinline__ int64_t pair_base8(const FieldWords &w, uint32_t h, const int32_t (&a)[16], const int4 *row, uint64_t site, uint32_t gap) {
     const bool still = still_head(w, h);
     const uint32_t g = still ? 0 : MOVE_BITS;
     int32_t b[16];
@@ -1395,13 +1412,12 @@ __device__ __forceinline__ int64_t pair_score8(const FieldWords &w, uint32_t h, 
         }
     }
     (void)site;
-    return fit64(rel(s, (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1) - ((wide)octave(gap) << FACE_BITS), w.status);
+    return fit64(rel(s, FACE_BITS + 2 * g + 1), w.status);
 }
 
-// A crowd's score (§14.10, §15.2): the head's locks against its summed word `W` over its `count`,
-// `div_nearest(Σ_l lock_l, count² 2^(score_bits + 2g + 1)) − level 2^16`, the words' sum two reads of the
-// prefix sums.
-__device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level) {
+// A crowd's lock at unit gain (§14.10, §15.2, §15.10): the head's locks against its summed word `W` over its
+// `count`, `div_nearest(Σ_l lock_l, count² 2^(16 + 2g + 1))`, the words' sum two reads of the prefix sums.
+__device__ __forceinline__ int64_t crowd_base(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level) {
     const uint32_t g = still_head(w, h) ? 0 : MOVE_BITS;
     wide s = 0;
     for (uint32_t l = 0; l < w.n; l++) {
@@ -1410,8 +1426,13 @@ __device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, 
             atomicOr(w.status, REFUSED_CARRIER);
         }
     }
-    const uint32_t bits = (uint32_t)((int32_t)FACE_BITS + w.beta) + 2 * g + 1;
-    return fit64(div_nearest(s, (wide)(count * count) << bits) - ((wide)level << FACE_BITS), w.status);
+    const uint32_t bits = FACE_BITS + 2 * g + 1;
+    return fit64(div_nearest(s, (wide)(count * count) << bits), w.status);
+}
+
+// A crowd's score: `z = release(T S, 24) − level 2^16`.
+__device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level, wide temper) {
+    return scored(w, temper, crowd_base(w, h, wi, swlo, swhi, count, level), level);
 }
 
 // The lanes that carry one entry of the span, and the parts of a chunk each lane takes: a lane an
@@ -1460,9 +1481,12 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
         const wide *swp = w.sw + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const wide temper = temper_of(w, h, rcs[warp].open != 0);
         // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
-        // them there (a score is computed once; the entries outside the support are never read).
+        // them there (a score is computed once; the entries outside the support are never read). On a return
+        // the locks at unit gain are kept beside them, for the temperatures' covector.
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
+        int64_t *sbrow = w.sb ? w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites : nullptr;
         int64_t amin = INT64_MAX, amax = INT64_MIN;
         const bool eight = w.n == 8;
         int32_t ai[16];
@@ -1481,8 +1505,12 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
-                const int64_t z = eight ? pair_score8(w, h, ai, rows32 + (uint64_t)j * 4, j, gap) : pair_score(w, h, wi, words + (uint64_t)j * S, gap);
+                const int64_t base = eight ? pair_base8(w, h, ai, rows32 + (uint64_t)j * 4, j, gap) : pair_base(w, h, wi, words + (uint64_t)j * S, gap);
+                const int64_t z = scored(w, temper, base, octave(gap));
                 erow[j] = (uint64_t)z;
+                if (sbrow) {
+                    sbrow[j] = base;
+                }
                 const int64_t a = z >> FACE_BITS;
                 amin = a < amin ? a : amin;
                 amax = a > amax ? a : amax;
@@ -1492,7 +1520,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
         if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
             const uint64_t count = scp[hi_ + 1] - scp[lo];
             if (count != 0) {
-                const int64_t a = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv) >> FACE_BITS;
+                const int64_t a = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper) >> FACE_BITS;
                 amin = a < amin ? a : amin;
                 amax = a > amax ? a : amax;
             }
@@ -1602,6 +1630,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t amin = w.amin[hg];
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         Big<L> M = big_zero<L>();
@@ -1768,7 +1797,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 const uint64_t count = scp[hi_ + 1] - scp[lo];
                 if (count != 0) {
                     slot = lane;
-                    const int64_t z = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv);
+                    const int64_t z = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper);
                     int64_t a;
                     uint64_t face;
                     term_of(w, z, &a, &face);
@@ -1859,7 +1888,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     if (count != 0) {
                         int64_t a;
                         uint64_t face;
-                        term_of(w, crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv), &a, &face);
+                        term_of(w, crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper), &a, &face);
                         const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)count << WEIGHT_BITS)), (uint32_t)(a - amin) + SHARE_BITS);
                         if (!rowdiv_nearest(x, rd, &p)) {
                             p = UINT64_MAX;
@@ -2335,6 +2364,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const wide temper = temper_of(w, h, rcs[warp].open != 0);
+        const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         // The closure (§19), over the support's pairs: on a still head at a closing tick, an unresolved
         // site's row is also compared with where its class stands among the sites it meets (`closes` is the
         // ring set's head count, zero where the head does not close). A carried site holds nothing.
@@ -2437,13 +2468,17 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the word is
         // read with the lanes over the span's entries (the probe role: `δs D ŵ_j`).
         wide sum = 0;
+        // The temperature's covector (§15.10): `δT[h][kind] += release(δz S, 16)` over the row's sources and crowds,
+        // each released alone and summed (an exact integer sum, the lanes' partials added over the warp).
+        wide tacc = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
             const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
-                const uint32_t gap = j > i ? j - i : i - j;
-                wide dz = gained(compare((wide)e[j], dpr[j], holds(j)), w.beta, w.status);
+                const wide dzj = compare((wide)e[j], dpr[j], holds(j));
+                tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
+                const wide dz = rel(temper * dzj, MATERIAL_BITS);
                 if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
@@ -2466,11 +2501,19 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_row
         // The crowds' δs, then their share of the row's return and of the values' and the word's member
         // returns through the difference arrays.
         if (cnts[warp][lane] != 0) {
-            const wide dz = gained(compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane], false), w.beta, w.status);
+            const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane], false);
+            const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
+            const int64_t cs = crowd_base(w, h, words + (uint64_t)i * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv);
+            tacc += rel(dzc * (wide)cs, FACE_BITS);
+            const wide dz = rel(temper * dzc, MATERIAL_BITS);
             if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                 atomicOr(w.status, REFUSED_CARRIER);
             }
             dsks[warp][lane] = (int64_t)dz;
+        }
+        tacc = warp_sum(tacc);
+        if (lane == 0 && tacc != 0) {
+            add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), tacc);
         }
         __syncwarp();
         if (active) {

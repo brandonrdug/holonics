@@ -31,7 +31,7 @@ use core::ffi::c_void;
 use std::time::Instant;
 
 use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, Region, SHARE_BITS, STATE_BITS};
-use holonics::hnn::tower::{TowerError, TowerFace};
+use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer};
@@ -177,6 +177,9 @@ struct Words {
     dstart: u64,
     olist: u64,
     ostart: u64,
+    temper_at: u64,
+    gcov: u64,
+    sb: u64,
 }
 
 /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
@@ -214,17 +217,19 @@ pub fn crowd_slots(sites: usize) -> usize {
 /// dynamic, never arbitrary): a row's carrier is as wide as the exponents its rows hold, `62` bits of face,
 /// `WEIGHT_BITS` of weight, `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
 /// row of the launch holds, the bits of the terms a row sums, `64 + ⌈log₂ reach⌉` of a value summed over the
-/// reach and the sign: [`FieldDeclaration::row_bits`] with the declaration's spread bound
-/// (`4n 2^(−β) + ⌊log₂ reach⌋ + 2`) replaced by the spread read. A spread past that bound is refused (the
-/// declaration's bound is where a row ends), and so is a carrier past the twenty limbs the card keeps.
-pub fn row_limbs(d: &FieldDeclaration, spread: u64) -> Result<usize> {
-    let beta = d.score_shift();
-    let gain = if beta >= 0 { (4 * d.modes as u64) >> beta } else { (4 * d.modes as u64) << -beta };
+/// reach and the sign: [`Field::row_bits`] (its gain read from the largest temperature the material holds,
+/// §15.10) with its spread bound (`4n |T| 2^(−24) + 1 + ⌊log₂ reach⌋ + 2`) replaced by the spread read. A spread
+/// past that bound is refused (the bound is where a row ends), and so is a carrier past the twenty limbs the
+/// card keeps.
+pub fn row_limbs(field: &Field, spread: u64) -> Result<usize> {
+    let d = &field.declaration;
+    let top = field.theta[field.layout().temper..field.layout().temper + 2 * d.heads].iter().map(|v| v.unsigned_abs() as u128).max().unwrap_or(0);
+    let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u64 + 1;
     let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
     if spread > bound {
         return Err(TowerError::Refused("a contact row holds exponents past the declaration's bound (`row_bits`)"));
     }
-    let need = d.row_bits() as u64 - bound + spread;
+    let need = field.row_bits() as u64 - bound + spread;
     let limbs = (need.div_ceil(64) as usize).max(MIN_LIMBS);
     if limbs > MAX_LIMBS {
         return Err(TowerError::Refused("a contact row needs a carrier past the card's twenty limbs (1,280 bits)"));
@@ -276,6 +281,8 @@ struct Tick<'c> {
     poff: Pooled<'c, u32>,
     pmem: Pooled<'c, u32>,
     e: Pooled<'c, u64>,
+    /// The pairs' locks at unit gain `S` (the temperatures' covector, §15.10), kept on a return.
+    sb: Pooled<'c, i64>,
     /// The row's least whole bit `[h][t]` (`field_exposure`), each head's prefix sums of the definite
     /// sites' unit words and values `[h][row][span]` and their counts `[h][row]`, and each receiver's
     /// crowd shares `[h][t][slots]` (`row = site + region`, a region's `S + 1` rows).
@@ -407,6 +414,7 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
             pools.live = pools.live.saturating_sub(octets);
             pools.retained += octets;
             T::list(&mut pools).push((cap, buf));
+
         }
     }
 }
@@ -753,6 +761,7 @@ impl<'c> CardField<'c> {
             dreach: d.reach as u64,
             roots: run_base + roots_at,
             met: met.device_ptr(),
+            temper_at: l.temper as u64,
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card.
@@ -760,6 +769,7 @@ impl<'c> CardField<'c> {
         self.launch("field_exponential", Self::cells(1u64 << roots.len()), THREADS, &mut [arg(&mut words), arg(&mut face_ptr)])?;
         words.face = face_ptr;
         let g = if returning { Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(l.len)).map_err(device)?) } else { None };
+        words.gcov = g.as_ref().map_or(0, |g| g.device_ptr());
         // The batches: whole regions in order, each batch's every allocation within the budget.
         // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
         // and its shares (the echo's round trips, §15.3).
@@ -812,7 +822,7 @@ impl<'c> CardField<'c> {
         Ok((faces, read_logits, g, rows, echoes))
     }
 
-    fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool) -> Result<Tick<'c>> {
+    fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool, returning: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
         let rows = sites + regions;
         let slots = crowd_slots(d.reach);
@@ -840,6 +850,7 @@ impl<'c> CardField<'c> {
             // The shares are zeroed where the echo reads another tick's (a pair absent from a row reads zero).
             // The pairs' scores, then their shares, a word a pair; zeroed where the echo reads another tick's (a
             // pair absent from a row reads zero), else only the support's entries are ever written and read.
+            sb: self.take::<i64>(if returning { (heads * pairs).max(1) } else { 1 }).map_err(device)?,
             e: if stored { self.timed(Kind::Alloc, || self.take_zeroed::<u64>((heads * pairs).max(1))).map_err(device)? } else { self.timed(Kind::Alloc, || self.take::<u64>((heads * pairs).max(1))).map_err(device)? },
             amin: alloc64(heads * sites)?,
             sw: self.timed(Kind::Alloc, || self.take::<i128>((heads * rows * span).max(1))).map_err(device)?,
@@ -989,7 +1000,7 @@ impl<'c> CardField<'c> {
         // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
         let stored = returning || keep.is_some() || logits;
         let kept = returning || logits;
-        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored)).collect::<Result<_>>()?;
+        let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored, returning)).collect::<Result<_>>()?;
         // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         words.trips = trips.device_ptr();
@@ -1010,6 +1021,7 @@ impl<'c> CardField<'c> {
             w.poff = tick.poff.device_ptr();
             w.pmem = tick.pmem.device_ptr();
             w.e = tick.e.device_ptr();
+            w.sb = if returning { tick.sb.device_ptr() } else { 0 };
             w.amin = tick.amin.device_ptr();
             w.sw = tick.sw.device_ptr();
             w.sv = tick.sv.device_ptr();
@@ -1058,10 +1070,10 @@ impl<'c> CardField<'c> {
             self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
             let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
             if std::env::var_os("FIELD_SPREAD").is_some() {
-                eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(&d, spread).map_or(0, |l| l));
+                eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(field, spread).map_or(0, |l| l));
             }
             self.mark("tick_exposure_wait");
-            let limbs = row_limbs(&d, spread)?;
+            let limbs = row_limbs(field, spread)?;
             let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
             self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
             // The echo's round trips of this tick against the last (§15.3).
@@ -1300,6 +1312,7 @@ impl<'c> CardField<'c> {
             words.poff = tick.poff.device_ptr();
             words.pmem = tick.pmem.device_ptr();
             words.e = tick.e.device_ptr();
+            words.sb = tick.sb.device_ptr();
             words.qkv = tick.qkv.device_ptr();
             words.amin = tick.amin.device_ptr();
             words.sw = tick.sw.device_ptr();
@@ -1473,7 +1486,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
-    let weights = h * 8 * pairs;
+    let weights = h * 8 * pairs * if returning { 2 } else { 1 };
     ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site) + if returning { 24 * pairs } else { 0 }
 }
 
@@ -1606,20 +1619,24 @@ mod tests {
     #[test]
     fn the_carrier_follows_the_spread_and_ends_at_the_declarations_bound() {
         let d = declaration(32, 4, 32);
-        let beta = d.score_shift();
-        let gain = if beta >= 0 { (4 * d.modes as u64) >> beta } else { (4 * d.modes as u64) << -beta };
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let field = Field::found(d, &keys).unwrap();
+        // The gain is read from the largest temperature the material holds (§15.10).
+        let l = field.layout();
+        let top = field.theta[l.temper..l.temper + 2 * d.heads].iter().map(|v| v.unsigned_abs() as u128).max().unwrap();
+        let gain = ((4 * d.modes as u128 * top) >> MATERIAL_BITS) as u64 + 1;
         let bound = gain + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
-        assert_eq!(row_limbs(&d, bound).ok(), Some((d.row_bits() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
-        assert!(row_limbs(&d, bound + 1).is_err());
+        assert_eq!(row_limbs(&field, bound).ok(), Some((field.row_bits() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
+        assert!(row_limbs(&field, bound + 1).is_err());
         // A narrow row needs five limbs at least, and the carrier never narrows as the spread widens.
         let mut last = 0;
         for spread in (0..=bound).step_by(7) {
-            if let Ok(limbs) = row_limbs(&d, spread) {
+            if let Ok(limbs) = row_limbs(&field, spread) {
                 assert!(limbs >= last.max(MIN_LIMBS));
                 last = limbs;
             }
         }
-        assert_eq!(row_limbs(&d, 0).unwrap(), MIN_LIMBS);
+        assert_eq!(row_limbs(&field, 0).unwrap(), MIN_LIMBS);
     }
 
     /// A region's allocations count its weights, its contact's return on a return, and every site's
@@ -1642,7 +1659,7 @@ mod tests {
             let n = 1504u64;
             // The scores and shares (a word a pair) are kept a tick for a return, with the reverse's covector a
             // pair on 64 bits, and one tick's otherwise; each kept tick adds its carrier widths and class offsets.
-            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 24 * n * n } else { d.heads as u64 * 8 * n * n };
+            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 16 * n * n + 24 * n * n } else { d.heads as u64 * 8 * n * n };
             let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);

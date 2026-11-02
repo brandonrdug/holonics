@@ -434,13 +434,18 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     // The upper bound of a lap: every section at the worst measured section time a pair, four more
     // reads of it at the worst measured read time a pair (the most the held step's read and the
     // certificate add to a section whose steps stand at their size; the second reading's projection
-    // lacked them), and the lap's end at the same read time a pair.
+    // lacked them), the held step's read of each section problem as one context region (§15.11: one region a
+    // problem, of the problem's own length, read once a section, `section_regions`), and the lap's end at the same
+    // read time a pair. [agent-inferred, November 2] The measured sections run `section_regions`, so their time
+    // already holds that read once; it is counted again here at the worst read time a pair, an upper bound.
+    let context_rows = lap_pairs;
     println!(
-        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} rows={lap_pairs} end_rows={end_pairs} worst_ps_a_section_row={} worst_ps_a_read_row={} at_size_ms={} projection_ms={} (every section's reads and return at the worst measured time a site row, four more reads of it, and the lap's end)",
+        "FIELD_TIME_LAP sections={sections_lap} sites={lap_sites} rows={lap_pairs} end_rows={end_pairs} context_rows={context_rows} worst_ps_a_section_row={} worst_ps_a_read_row={} at_size_ms={} context_ms={} projection_ms={} (every section's reads and return at the worst measured time a site row, four more reads of it, the held step's context read, and the lap's end)",
         1000 * worst.0 / worst.1.max(1),
         1000 * read_worst.0 / read_worst.1.max(1),
         ms(lap_pairs * worst.0 / worst.1.max(1)),
-        ms(lap_pairs * worst.0 / worst.1.max(1) + (4 * lap_pairs + end_pairs) * read_worst.0 / read_worst.1.max(1))
+        ms(context_rows * read_worst.0 / read_worst.1.max(1)),
+        ms(lap_pairs * worst.0 / worst.1.max(1) + (4 * lap_pairs + context_rows + end_pairs) * read_worst.0 / read_worst.1.max(1))
     );
     // The pairs a lap's one read of every section meets, projected from the most met a row at the
     // opening sections, beside the pairs every site reading every other would read (reading 8's
