@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, Region, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, Region, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace};
 
 use crate::cuda::{Dim3, Module};
@@ -91,6 +91,7 @@ struct Words {
     r: u32,
     slots: u32,
     clocks: u32,
+    band: u32,
     pairs: u64,
     ln2_lo: u64,
     ln2_hi: u64,
@@ -144,6 +145,10 @@ struct Words {
     cls: u64,
     class_off: u64,
     members: u64,
+    pn: u64,
+    pcls: u64,
+    poff: u64,
+    pmem: u64,
     e: u64,
     e_prev: u64,
     y: u64,
@@ -242,36 +247,42 @@ pub struct FieldTimes {
 
 /// One tick's carriers on the card.
 struct Tick<'c> {
-    read: CardBuffer<'c, i32>,
-    scale: CardBuffer<'c, i128>,
+    read: Pooled<'c, i32>,
+    scale: Pooled<'c, i128>,
     /// The word and the value, `[t][2·2M]`.
-    qkv: CardBuffer<'c, i64>,
-    qf: CardBuffer<'c, i64>,
-    vf: CardBuffer<'c, i64>,
+    qkv: Pooled<'c, i64>,
+    qf: Pooled<'c, i64>,
+    vf: Pooled<'c, i64>,
     /// The framed word's powers `[h][t]`, the ratios `field_unit` reads it as.
-    qscale: CardBuffer<'c, i128>,
+    qscale: Pooled<'c, i128>,
     /// The resonance classes `[h][t]`, each region's class offsets `[h][r][2·3^b + 1]` and members
     /// `[h][t]` (`field_classes`).
-    cls: CardBuffer<'c, u32>,
-    class_off: CardBuffer<'c, u32>,
-    members: CardBuffer<'c, u32>,
-    e: CardBuffer<'c, u64>,
+    cls: Pooled<'c, u32>,
+    class_off: Pooled<'c, u32>,
+    members: Pooled<'c, u32>,
+    /// Each receiver's probed classes: their number `[h][t]`, the classes `[h][t][2^b − 1]`, and the
+    /// receivers that probe each class, offsets `[h][r][3^b + 1]` and members `[h][t][2^b − 1]`.
+    pn: Pooled<'c, u32>,
+    pcls: Pooled<'c, u32>,
+    poff: Pooled<'c, u32>,
+    pmem: Pooled<'c, u32>,
+    e: Pooled<'c, u64>,
     /// The row's least whole bit `[h][t]` (`field_exposure`), each head's prefix sums of the definite
     /// sites' unit words and values `[h][row][span]` and their counts `[h][row]`, and each receiver's
     /// crowd shares `[h][t][slots]` (`row = site + region`, a region's `S + 1` rows).
-    amin: CardBuffer<'c, i64>,
-    sw: CardBuffer<'c, i128>,
-    sv: CardBuffer<'c, i128>,
-    sc: CardBuffer<'c, u64>,
-    ce: CardBuffer<'c, u64>,
-    y: CardBuffer<'c, i64>,
-    read2: CardBuffer<'c, i32>,
-    scale2: CardBuffer<'c, i128>,
-    pa: CardBuffer<'c, i64>,
-    pb: CardBuffer<'c, i64>,
-    pc: CardBuffer<'c, i64>,
+    amin: Pooled<'c, i64>,
+    sw: Pooled<'c, i128>,
+    sv: Pooled<'c, i128>,
+    sc: Pooled<'c, u64>,
+    ce: Pooled<'c, u64>,
+    y: Pooled<'c, i64>,
+    read2: Pooled<'c, i32>,
+    scale2: Pooled<'c, i128>,
+    pa: Pooled<'c, i64>,
+    pb: Pooled<'c, i64>,
+    pc: Pooled<'c, i64>,
     /// The tick's carrier width: the binary length of its largest unit word.
-    bits: CardBuffer<'c, u32>,
+    bits: Pooled<'c, u32>,
 }
 
 /// What a profiled call's time is charged to.
@@ -279,6 +290,96 @@ struct Tick<'c> {
 enum Kind {
     Copy,
     Alloc,
+}
+
+/// [definition; agent-inferred, November 1] **The card's buffers are kept and reused, not freed with each
+/// batch** (measured November 1, 153 calls of a lap's opening: a batch's ~60 allocations and frees took 42 %
+/// of the card's wall time, `cuMemAlloc` and `cuMemFree` each tens of microseconds and a free draining the
+/// stream). A buffer a batch is done with returns to its size class; the next batch takes one of its class
+/// (a class is a multiple of an eighth of the power of two above, so a buffer is at most a quarter too long).
+/// What a class cannot supply is allocated; when the live buffers, the kept ones and the new one pass the
+/// batch budget, the kept ones are freed first. The contents of a taken buffer are undefined, zeroed where
+/// the call says so; the work of the stream is ordered, so a buffer a queued kernel still reads is never
+/// overwritten before it has.
+trait Poolable: Copy + Sized + 'static {
+    fn list<'a, 'c>(pools: &'a mut Pools<'c>) -> &'a mut Vec<(usize, CardBuffer<'c, Self>)>;
+}
+
+#[derive(Default)]
+struct Pools<'c> {
+    u8s: Vec<(usize, CardBuffer<'c, u8>)>,
+    u32s: Vec<(usize, CardBuffer<'c, u32>)>,
+    i32s: Vec<(usize, CardBuffer<'c, i32>)>,
+    u64s: Vec<(usize, CardBuffer<'c, u64>)>,
+    i64s: Vec<(usize, CardBuffer<'c, i64>)>,
+    i128s: Vec<(usize, CardBuffer<'c, i128>)>,
+    /// The octets of the buffers taken and not yet returned, and of those kept.
+    live: u64,
+    retained: u64,
+}
+
+macro_rules! poolable {
+    ($t:ty, $f:ident) => {
+        impl Poolable for $t {
+            fn list<'a, 'c>(pools: &'a mut Pools<'c>) -> &'a mut Vec<(usize, CardBuffer<'c, Self>)> {
+                &mut pools.$f
+            }
+        }
+    };
+}
+poolable!(u8, u8s);
+poolable!(u32, u32s);
+poolable!(i32, i32s);
+poolable!(u64, u64s);
+poolable!(i64, i64s);
+poolable!(i128, i128s);
+
+impl Pools<'_> {
+    /// Free every kept buffer.
+    fn trim(&mut self) {
+        self.u8s.clear();
+        self.u32s.clear();
+        self.i32s.clear();
+        self.u64s.clear();
+        self.i64s.clear();
+        self.i128s.clear();
+        self.retained = 0;
+    }
+}
+
+/// The elements of the size class holding `len`: a multiple of an eighth of the power of two above it
+/// (and of four, the memset's word).
+fn size_class(len: usize) -> usize {
+    let len = len.max(4);
+    let top = len.next_power_of_two();
+    let step = (top / 8).max(4);
+    len.div_ceil(step) * step
+}
+
+/// A buffer taken from the card's pool; it returns there when dropped. It stands for a `CardBuffer`
+/// (dereferences to it) whose length is its class, at least what was asked.
+struct Pooled<'c, T: Poolable> {
+    buf: Option<(usize, CardBuffer<'c, T>)>,
+    pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
+}
+
+impl<'c, T: Poolable> std::ops::Deref for Pooled<'c, T> {
+    type Target = CardBuffer<'c, T>;
+    fn deref(&self) -> &Self::Target {
+        &self.buf.as_ref().expect("a pooled buffer holds its card buffer until it is dropped").1
+    }
+}
+
+impl<T: Poolable> Drop for Pooled<'_, T> {
+    fn drop(&mut self) {
+        if let Some((cap, buf)) = self.buf.take() {
+            let octets = (cap * core::mem::size_of::<T>()) as u64;
+            let mut pools = self.pools.borrow_mut();
+            pools.live = pools.live.saturating_sub(octets);
+            pools.retained += octets;
+            T::list(&mut pools).push((cap, buf));
+        }
+    }
 }
 
 /// [agent-inferred, November 1] A declared reading (`CardField::profile`): every launch timed alone,
@@ -299,6 +400,9 @@ pub struct CardField<'c> {
     budget: u64,
     times: FieldTimes,
     profile: Option<std::cell::RefCell<FieldProfile>>,
+    pools: std::rc::Rc<std::cell::RefCell<Pools<'c>>>,
+    /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
+    phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
 
 impl<'c> CardField<'c> {
@@ -311,7 +415,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -323,9 +427,70 @@ impl<'c> CardField<'c> {
         self.times
     }
 
+    /// A buffer of at least `len` elements, contents undefined (`Pooled`).
+    fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+        let cap = size_class(len.max(1));
+        let octets = (cap * core::mem::size_of::<T>()) as u64;
+        let mut pools = self.pools.borrow_mut();
+        let hit = {
+            let list = T::list(&mut pools);
+            list.iter().position(|(c, _)| *c == cap).map(|i| list.swap_remove(i))
+        };
+        let entry = match hit {
+            Some(entry) => {
+                pools.retained = pools.retained.saturating_sub(octets);
+                entry
+            }
+            None => {
+                if pools.live + pools.retained + octets > self.budget {
+                    pools.trim();
+                }
+                (cap, self.card.alloc::<T>(cap)?)
+            }
+        };
+        pools.live += octets;
+        Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
+    }
+
+    /// [`take`](Self::take) with every element zero.
+    fn take_zeroed<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+        let buffer = self.take::<T>(len)?;
+        self.card.zero_octets(&*buffer, 0, buffer.len() * core::mem::size_of::<T>())?;
+        Ok(buffer)
+    }
+
+    /// [`take`](Self::take) holding `values` (a synchronous transfer: complete when this returns).
+    fn take_up<T: Poolable>(&self, values: &[T]) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+        let buffer = self.take::<T>(values.len())?;
+        self.card.write(&*buffer, 0, values)?;
+        Ok(buffer)
+    }
+
     /// Time every launch, transfer and allocation from here on ([`FieldProfile`]).
     pub fn profile(&mut self) {
         self.profile = Some(Default::default());
+    }
+
+    /// Time the host between the marks of a batch (`mark`), without synchronizing: where the wall time of a
+    /// pass goes between the host's work and its waits on the card.
+    pub fn trace_phases(&mut self) {
+        self.phases = Some(std::cell::RefCell::new((Instant::now(), Default::default())));
+    }
+
+    /// The phases read so far, when traced: name, marks and wall ns.
+    pub fn phased(&self) -> Option<Vec<(&'static str, u64, u128)>> {
+        self.phases.as_ref().map(|p| p.borrow().1.iter().map(|(k, v)| (*k, v.0, v.1)).collect())
+    }
+
+    fn mark(&self, name: &'static str) {
+        if let Some(p) = &self.phases {
+            let mut p = p.borrow_mut();
+            let ns = p.0.elapsed().as_nanos();
+            p.0 = Instant::now();
+            let slot = p.1.entry(name).or_insert((0, 0));
+            slot.0 += 1;
+            slot.1 += ns;
+        }
     }
 
     /// The profile read so far, when profiled.
@@ -429,10 +594,11 @@ impl<'c> CardField<'c> {
                 return Err(TowerError::Refused("an echo whose logits are not one a class"));
             }
         }
+        self.mark("outside_the_card");
         let card = self.card;
         let started = Instant::now();
         let l = field.layout();
-        let theta = self.timed(Kind::Copy, || card.upload(&field.theta)).map_err(device)?;
+        let theta = self.timed(Kind::Copy, || self.take_up(&field.theta)).map_err(device)?;
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();
         let mut phasor = Vec::new();
@@ -454,12 +620,12 @@ impl<'c> CardField<'c> {
         if decay.is_empty() {
             decay.push(0);
         }
-        let decay_card = self.timed(Kind::Copy, || card.upload(&decay)).map_err(device)?;
+        let decay_card = self.timed(Kind::Copy, || self.take_up(&decay)).map_err(device)?;
         let roots: Vec<u64> = field.exponential().roots().iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
-        let phasor = self.timed(Kind::Copy, || card.upload(&phasor)).map_err(device)?;
-        let ring_off = self.timed(Kind::Copy, || card.upload(&ring_off)).map_err(device)?;
-        let ring_n = self.timed(Kind::Copy, || card.upload(&ring_n)).map_err(device)?;
-        let roots_card = self.timed(Kind::Copy, || card.upload(&roots)).map_err(device)?;
+        let phasor = self.timed(Kind::Copy, || self.take_up(&phasor)).map_err(device)?;
+        let ring_off = self.timed(Kind::Copy, || self.take_up(&ring_off)).map_err(device)?;
+        let ring_n = self.timed(Kind::Copy, || self.take_up(&ring_n)).map_err(device)?;
+        let roots_card = self.timed(Kind::Copy, || self.take_up(&roots)).map_err(device)?;
         if d.contacts % 2 != 0 {
             return Err(TowerError::Refused("a field's contacts are complex pairs (an even count)"));
         }
@@ -477,8 +643,8 @@ impl<'c> CardField<'c> {
         // The exponential's resident face: `2^digits` words, held beside the batches and counted
         // against the same budget.
         let face_octets = Some(roots.len()).filter(|&digits| digits < 61).map(|digits| 8u64 << digits).filter(|&o| o < self.budget).ok_or(TowerError::Refused("the exponential's resident face passes the card's batch budget"))?;
-        let face = self.timed(Kind::Alloc, || card.alloc::<u64>(1usize << roots.len())).map_err(device)?;
-        let met = self.timed(Kind::Alloc, || card.zeroed::<u64>(1)).map_err(device)?;
+        let face = self.timed(Kind::Alloc, || self.take::<u64>(1usize << roots.len())).map_err(device)?;
+        let met = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(1)).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let m2 = 2 * m;
@@ -501,6 +667,7 @@ impl<'c> CardField<'c> {
             digits: roots.len() as u32,
             slots: slots as u32,
             clocks: d.clocks as u32,
+            band: band_bits(d.class_trits()),
             ln2_lo: ln2 as u64,
             ln2_hi: (ln2 >> 64) as u64,
             theta: theta.device_ptr(),
@@ -541,13 +708,15 @@ impl<'c> CardField<'c> {
         let mut face_ptr = face.device_ptr();
         self.launch("field_exponential", Self::cells(1u64 << roots.len()), THREADS, &mut [arg(&mut words), arg(&mut face_ptr)])?;
         words.face = face_ptr;
-        let g = if returning { Some(self.timed(Kind::Alloc, || card.zeroed::<i128>(l.len)).map_err(device)?) } else { None };
+        let g = if returning { Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         // The batches: whole regions in order, each batch's every allocation within the budget.
         // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
         // and its shares (the echo's round trips, §15.3).
         let octets = |sites: usize| read_octets(&d, returning, logits, sites) + if keep.is_some() { 8 * (heads * sites * sites) as u64 } else { 0 };
         let lengths: Vec<usize> = regions.iter().map(|r| r.classes.len()).collect();
-        let batches = batches(&lengths, &octets, self.budget - face_octets)?;
+        // A pooled buffer is at most a quarter longer than asked (its size class), so the batches are cut at four
+        // fifths of the budget.
+        let batches = batches(&lengths, &octets, (self.budget - face_octets) / 5 * 4)?;
         if keep.is_some() && (regions.len() != 1 || returning) {
             return Err(TowerError::Refused("the weight rows are read from one region's forward"));
         }
@@ -562,14 +731,16 @@ impl<'c> CardField<'c> {
             let peak = lengths[batch.clone()].iter().map(|&n| octets(n)).sum::<u64>();
             self.times.peak_store = self.times.peak_store.max(peak);
             self.times.batches += 1;
-            let (f, z, r, e) = self.batch(field, &regions[batch], &mut words, g.as_ref(), logits, keep)?;
+            self.mark("run_setup");
+            let (f, z, r, e) = self.batch(field, &regions[batch], &mut words, g.as_deref(), logits, keep)?;
+            self.mark("batch_drop_and_collect");
             faces.extend(f);
             read_logits.extend(z);
             rows.extend(r);
             echoes.extend(e);
         }
         let g = match g {
-            Some(g) => self.timed(Kind::Copy, || card.fetch(&g)).map_err(device)?,
+            Some(g) => self.timed(Kind::Copy, || card.fetch_range(&g, 0, l.len)).map_err(device)?,
             None => Vec::new(),
         };
         let met = self.timed(Kind::Copy, || card.fetch(&met)).map_err(device)?[0] as u128;
@@ -596,34 +767,40 @@ impl<'c> CardField<'c> {
         let slots = crowd_slots(d.reach);
         let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
         let classes = d.classes();
+        let probe_stride = (1usize << d.class_trits()) - 1;
         let card = self.card;
-        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
-        let alloc32 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<u32>(len.max(1))).map_err(device);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
         Ok(Tick {
-            read: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
-            scale: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
+            read: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
+            scale: self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?,
             qkv: alloc64(sites * 2 * m2)?,
             qf: alloc64(heads * sites * span)?,
             vf: alloc64(heads * sites * span)?,
-            qscale: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * sites).max(1))).map_err(device)?,
+            qscale: self.timed(Kind::Alloc, || self.take::<i128>((heads * sites).max(1))).map_err(device)?,
             cls: alloc32(heads * sites)?,
             class_off: alloc32(heads * regions * (2 * classes + 1))?,
             members: alloc32(heads * sites)?,
-            // The weights are kept only for a return's reverse or the rows a landmark reads.
+            pn: alloc32(heads * sites)?,
+            pcls: alloc32(heads * sites * probe_stride)?,
+            poff: alloc32(heads * regions * (classes + 1))?,
+            pmem: alloc32(heads * sites * probe_stride)?,
             // The shares are zeroed where the echo reads another tick's (a pair absent from a row reads zero).
-            e: self.timed(Kind::Alloc, || card.zeroed::<u64>(if stored { (heads * pairs).max(1) } else { 1 })).map_err(device)?,
+            // The pairs' scores, then their shares, a word a pair; zeroed where the echo reads another tick's (a
+            // pair absent from a row reads zero), else only the support's entries are ever written and read.
+            e: if stored { self.timed(Kind::Alloc, || self.take_zeroed::<u64>((heads * pairs).max(1))).map_err(device)? } else { self.timed(Kind::Alloc, || self.take::<u64>((heads * pairs).max(1))).map_err(device)? },
             amin: alloc64(heads * sites)?,
-            sw: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
-            sv: self.timed(Kind::Alloc, || card.alloc::<i128>((heads * rows * span).max(1))).map_err(device)?,
-            sc: self.timed(Kind::Alloc, || card.alloc::<u64>((heads * rows).max(1))).map_err(device)?,
-            ce: self.timed(Kind::Alloc, || card.alloc::<u64>(if stored { (heads * sites * slots).max(1) } else { 1 })).map_err(device)?,
+            sw: self.timed(Kind::Alloc, || self.take::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sv: self.timed(Kind::Alloc, || self.take::<i128>((heads * rows * span).max(1))).map_err(device)?,
+            sc: self.timed(Kind::Alloc, || self.take::<u64>((heads * rows).max(1))).map_err(device)?,
+            ce: self.timed(Kind::Alloc, || self.take::<u64>(if stored { (heads * sites * slots).max(1) } else { 1 })).map_err(device)?,
             y: alloc64(sites * m2)?,
-            read2: self.timed(Kind::Alloc, || card.alloc::<i32>((sites * dw).max(1))).map_err(device)?,
-            scale2: self.timed(Kind::Alloc, || card.alloc::<i128>(sites.max(1))).map_err(device)?,
+            read2: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
+            scale2: self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
-            bits: self.timed(Kind::Alloc, || card.zeroed::<u32>(4)).map_err(device)?,
+            bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
         })
     }
 
@@ -685,22 +862,22 @@ impl<'c> CardField<'c> {
         let sites = site_region.len();
         // A batch with no carried site still uploads one word, so every buffer has an address.
         let (mix_class_up, mix_share_up) = if mix_class.is_empty() { (vec![0u32], vec![0u32]) } else { (mix_class.clone(), mix_share.clone()) };
-        let site_region_c = self.timed(Kind::Copy, || card.upload(&site_region)).map_err(device)?;
-        let site_pos_c = self.timed(Kind::Copy, || card.upload(&site_pos)).map_err(device)?;
-        let region_off_c = self.timed(Kind::Copy, || card.upload(&region_off)).map_err(device)?;
-        let region_eoff_c = self.timed(Kind::Copy, || card.upload(&region_eoff)).map_err(device)?;
-        let classes_c = self.timed(Kind::Copy, || card.upload(&classes)).map_err(device)?;
-        let unresolved_c = self.timed(Kind::Copy, || card.upload(&unresolved)).map_err(device)?;
-        let definite_c = self.timed(Kind::Copy, || card.upload(&definite)).map_err(device)?;
-        let clock_c = self.timed(Kind::Copy, || card.upload(&clock)).map_err(device)?;
-        let echo_has_c = self.timed(Kind::Copy, || card.upload(&echo_has)).map_err(device)?;
-        let echo_b_c = self.timed(Kind::Copy, || card.upload(&echo_b)).map_err(device)?;
-        let echo_logits_c = self.timed(Kind::Copy, || card.upload(&echo_logits)).map_err(device)?;
-        let mix_off_c = self.timed(Kind::Copy, || card.upload(&mix_off)).map_err(device)?;
-        let mix_class_c = self.timed(Kind::Copy, || card.upload(&mix_class_up)).map_err(device)?;
-        let mix_share_c = self.timed(Kind::Copy, || card.upload(&mix_share_up)).map_err(device)?;
-        let status = self.timed(Kind::Alloc, || card.zeroed::<u32>(1)).map_err(device)?;
-        let x = self.timed(Kind::Alloc, || card.alloc::<i64>(sites * dw)).map_err(device)?;
+        let site_region_c = self.timed(Kind::Copy, || self.take_up(&site_region)).map_err(device)?;
+        let site_pos_c = self.timed(Kind::Copy, || self.take_up(&site_pos)).map_err(device)?;
+        let region_off_c = self.timed(Kind::Copy, || self.take_up(&region_off)).map_err(device)?;
+        let region_eoff_c = self.timed(Kind::Copy, || self.take_up(&region_eoff)).map_err(device)?;
+        let classes_c = self.timed(Kind::Copy, || self.take_up(&classes)).map_err(device)?;
+        let unresolved_c = self.timed(Kind::Copy, || self.take_up(&unresolved)).map_err(device)?;
+        let definite_c = self.timed(Kind::Copy, || self.take_up(&definite)).map_err(device)?;
+        let clock_c = self.timed(Kind::Copy, || self.take_up(&clock)).map_err(device)?;
+        let echo_has_c = self.timed(Kind::Copy, || self.take_up(&echo_has)).map_err(device)?;
+        let echo_b_c = self.timed(Kind::Copy, || self.take_up(&echo_b)).map_err(device)?;
+        let echo_logits_c = self.timed(Kind::Copy, || self.take_up(&echo_logits)).map_err(device)?;
+        let mix_off_c = self.timed(Kind::Copy, || self.take_up(&mix_off)).map_err(device)?;
+        let mix_class_c = self.timed(Kind::Copy, || self.take_up(&mix_class_up)).map_err(device)?;
+        let mix_share_c = self.timed(Kind::Copy, || self.take_up(&mix_share_up)).map_err(device)?;
+        let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
+        let x = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
         words.t = sites as u32;
         words.r = regions.len() as u32;
         words.pairs = pairs as u64;
@@ -727,10 +904,10 @@ impl<'c> CardField<'c> {
         let kept = returning || logits;
         let ticks: Vec<Tick> = (0..if kept { d.ticks } else { 1 }).map(|_| self.tick(sites, pairs, regions.len(), field, stored)).collect::<Result<_>>()?;
         // The round trips a site's echo sums (128 bits a site), over the heads and the ticks.
-        let trips = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites.max(1))).map_err(device)?;
+        let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;
         words.trips = trips.device_ptr();
         // The site moments (§15.1), once for the pass, added into every tick's values.
-        let moment = self.timed(Kind::Alloc, || card.zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
+        let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         words.moment = moment.device_ptr();
         self.moments(field, words, regions.len(), sites)?;
         let set = |w: &mut Words, tick: &Tick| {
@@ -740,6 +917,10 @@ impl<'c> CardField<'c> {
             w.cls = tick.cls.device_ptr();
             w.class_off = tick.class_off.device_ptr();
             w.members = tick.members.device_ptr();
+            w.pn = tick.pn.device_ptr();
+            w.pcls = tick.pcls.device_ptr();
+            w.poff = tick.poff.device_ptr();
+            w.pmem = tick.pmem.device_ptr();
             w.e = tick.e.device_ptr();
             w.amin = tick.amin.device_ptr();
             w.sw = tick.sw.device_ptr();
@@ -754,8 +935,9 @@ impl<'c> CardField<'c> {
         };
         let t64 = sites as u64;
         // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
-        let buckets = 4 * (2 * d.classes() as u32 + 32 * (1u32 << d.class_trits()) + 32);
+        let buckets = 4 * 3 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
+        self.mark("batch_setup");
         for k in 0..d.ticks {
             let tick = &ticks[if kept { k } else { 0 }];
             set(words, tick);
@@ -784,11 +966,13 @@ impl<'c> CardField<'c> {
             // with the limbs that spread needs, never past the declaration's bound (`row_bits`), where a row
             // is refused.
             let rows_per_block = CONTACT_ROWS;
+            self.mark("tick_launch_pre");
             self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
             let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
             if std::env::var_os("FIELD_SPREAD").is_some() {
                 eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(&d, spread).map_or(0, |l| l));
             }
+            self.mark("tick_exposure_wait");
             let limbs = row_limbs(&d, spread)?;
             let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
             self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
@@ -803,13 +987,14 @@ impl<'c> CardField<'c> {
             self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
             self.launch("field_pair", Self::cells((sites * f / 2) as u64), THREADS, &mut [arg(words)])?;
             self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
+            self.mark("tick_launch_post");
         }
         // The faces at the unresolved sites.
-        let fread = self.timed(Kind::Alloc, || card.alloc::<i32>(sites * dw)).map_err(device)?;
-        let fscale = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites)).map_err(device)?;
-        let z = self.timed(Kind::Alloc, || card.alloc::<i64>(sites * a)).map_err(device)?;
-        let masses = self.timed(Kind::Alloc, || card.alloc::<u64>(sites * a)).map_err(device)?;
-        let totals = self.timed(Kind::Alloc, || card.zeroed::<i128>(sites)).map_err(device)?;
+        let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
+        let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
+        let z = self.timed(Kind::Alloc, || self.take::<i64>(sites * a)).map_err(device)?;
+        let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
+        let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
         self.affine("field_affine_x32", words, words.read, words.read_bias, words.rread, a, dw, fread.device_ptr(), dw, z.device_ptr(), a, 0, true)?;
         // The cavity field (§15.3): a carried site's read less its own echo.
@@ -819,13 +1004,16 @@ impl<'c> CardField<'c> {
         }
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
+        self.mark("face_launch");
         if let Some(g) = g {
             self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, sites, pairs)?;
         }
+        self.mark("reverse_launch");
         self.status(&status)?;
-        let masses = self.timed(Kind::Copy, || card.fetch(&masses)).map_err(device)?;
-        let totals = self.timed(Kind::Copy, || card.fetch(&totals)).map_err(device)?;
-        let zs = if logits { self.timed(Kind::Copy, || card.fetch(&z)).map_err(device)? } else { Vec::new() };
+        self.mark("status_wait");
+        let masses = self.timed(Kind::Copy, || card.fetch_range(&masses, 0, sites * a)).map_err(device)?;
+        let totals = self.timed(Kind::Copy, || card.fetch_range(&totals, 0, sites)).map_err(device)?;
+        let zs = if logits { self.timed(Kind::Copy, || card.fetch_range(&z, 0, sites * a)).map_err(device)? } else { Vec::new() };
         // The kept rows: each named site's row of each still head at the last tick, with its shares.
         let mut rows = Rows::new();
         if let Some(keep) = keep {
@@ -847,7 +1035,7 @@ impl<'c> CardField<'c> {
         // numerator (the host's `pass`).
         let mut out_echo = Vec::new();
         if logits {
-            let trips = self.timed(Kind::Copy, || card.fetch(&trips)).map_err(device)?;
+            let trips = self.timed(Kind::Copy, || card.fetch_range(&trips, 0, sites)).map_err(device)?;
             let read = ((d.ticks.saturating_sub(1) * d.heads).max(1)) as u128;
             for r in 0..regions.len() {
                 out_echo.push((region_off[r] as usize..region_off[r + 1] as usize).map(|t| ((trips[t] as u128 + read / 2) / read) as u64).collect());
@@ -878,10 +1066,10 @@ impl<'c> CardField<'c> {
         }
         let (n, l, card) = (d.modes, field.layout(), self.card);
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
-        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let (before, after, s) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
-        let (up, down) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
-        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let (up, down) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || self.take_up(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
         let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
         let (mut wsp, mut cmp) = (ws.device_ptr(), cmap.device_ptr());
         let (mut bp, mut ap, mut sp, mut upp, mut dnp, mut none) = (before.device_ptr(), after.device_ptr(), s.device_ptr(), up.device_ptr(), down.device_ptr(), 0u64);
@@ -902,7 +1090,7 @@ impl<'c> CardField<'c> {
     /// The moment kernels' words for every moment mode, in the order of the moment index (`MomentWords` in
     /// `kernels/field_moment.cuh`, an array of them), each mode's ring slot's resident phasors and skin and
     /// its admission flags `ok[u][r]`; and the map from a moment mode to the unframed value's mode `h n + l`.
-    fn moment_modes(&self, field: &Field, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(CardBuffer<'c, u64>, CardBuffer<'c, u32>)> {
+    fn moment_modes(&self, field: &Field, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(Pooled<'c, u64>, Pooled<'c, u32>)> {
         let d = field.declaration;
         let (mut packed, mut cmap) = (Vec::new(), Vec::new());
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
@@ -929,7 +1117,7 @@ impl<'c> CardField<'c> {
             }
         }
         let card = self.card;
-        Ok((self.timed(Kind::Copy, || card.upload(&packed)).map_err(device)?, self.timed(Kind::Copy, || card.upload(&cmap)).map_err(device)?))
+        Ok((self.timed(Kind::Copy, || self.take_up(&packed)).map_err(device)?, self.timed(Kind::Copy, || self.take_up(&cmap)).map_err(device)?))
     }
 
     fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
@@ -976,7 +1164,7 @@ impl<'c> CardField<'c> {
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
         let (m2, span) = (2 * m, 2 * n);
-        let alloc64 = |len: usize| self.timed(Kind::Alloc, || card.alloc::<i64>(len.max(1))).map_err(device);
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let dz = alloc64(sites * a)?;
         let dx = alloc64(sites * dw)?;
         let dr = alloc64(sites * dw)?;
@@ -990,18 +1178,18 @@ impl<'c> CardField<'c> {
         let dyh = alloc64(heads * sites * span)?;
         let dq = alloc64(sites * m2)?;
         let dv = alloc64(sites * m2)?;
-        // The contact's covector a pair, `|δs| < 2^dsbits` with `dsbits ≤ 53` (refused past it).
-        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>(pairs.max(1))).map_err(device)?;
+        // The contact's covector a pair, `|δs| < 2^dsbits` with `dsbits ≤ 63` (refused past it).
+        let ds = self.timed(Kind::Alloc, || self.take::<i64>(pairs.max(1))).map_err(device)?;
         // The crowds' difference arrays over the places `[site + region][span]`, for the values and for
         // the word (§14.10).
         let regions = words.r as usize;
         let rows = sites + regions;
-        let cv = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
-        let cw = self.timed(Kind::Alloc, || card.zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cv = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
+        let cw = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((rows * span).max(1))).map_err(device)?;
         words.cv = cv.device_ptr();
         words.cw = cw.device_ptr();
         // The values' covector at the moment modes, summed over the ticks (§15.1).
-        let dm = self.timed(Kind::Alloc, || card.zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+        let dm = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
@@ -1015,6 +1203,10 @@ impl<'c> CardField<'c> {
             words.cls = tick.cls.device_ptr();
             words.class_off = tick.class_off.device_ptr();
             words.members = tick.members.device_ptr();
+            words.pn = tick.pn.device_ptr();
+            words.pcls = tick.pcls.device_ptr();
+            words.poff = tick.poff.device_ptr();
+            words.pmem = tick.pmem.device_ptr();
             words.e = tick.e.device_ptr();
             words.qkv = tick.qkv.device_ptr();
             words.amin = tick.amin.device_ptr();
@@ -1099,9 +1291,9 @@ impl<'c> CardField<'c> {
             if count == 0 {
                 continue;
             }
-            let rows_sites_c = self.timed(Kind::Copy, || card.upload(&rows_sites)).map_err(device)?;
-            let rows_shares_c = self.timed(Kind::Copy, || card.upload(&rows_shares)).map_err(device)?;
-            let segments_c = self.timed(Kind::Copy, || card.upload(&segments)).map_err(device)?;
+            let rows_sites_c = self.timed(Kind::Copy, || self.take_up(&rows_sites)).map_err(device)?;
+            let rows_shares_c = self.timed(Kind::Copy, || self.take_up(&rows_shares)).map_err(device)?;
+            let segments_c = self.timed(Kind::Copy, || self.take_up(&segments)).map_err(device)?;
             let (mut gp, mut dxp, mut rsp, mut rwp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), rows_shares_c.device_ptr(), segments_c.device_ptr(), count, base);
             self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut rwp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
         }
@@ -1121,10 +1313,10 @@ impl<'c> CardField<'c> {
         }
         let (l, card) = (field.layout(), self.card);
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
-        let ds = self.timed(Kind::Alloc, || card.alloc::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
-        let q = self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
-        let (d_before, d_after) = (self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || card.alloc::<i128>((tm * 2 * sites).max(1))).map_err(device)?);
-        let ok = self.timed(Kind::Alloc, || card.upload(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
+        let ds = self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
+        let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
+        let (d_before, d_after) = (self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * sites).max(1))).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * sites).max(1))).map_err(device)?);
+        let ok = self.timed(Kind::Alloc, || self.take_up(&vec![0u8; (tm * regions).max(1)])).map_err(device)?;
         let (ws, cmap) = self.moment_modes(field, words, regions, sites, &ok)?;
         let (mut wsp, mut cmp, mut dmp) = (ws.device_ptr(), cmap.device_ptr(), dm.device_ptr());
         let (mut dsp, mut qp, mut dbp, mut dap, mut gp, mut none) = (ds.device_ptr(), q.device_ptr(), d_before.device_ptr(), d_after.device_ptr(), g.device_ptr(), 0u64);
@@ -1173,7 +1365,9 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // Per site a kept tick adds the row's least bit, its class and its place in the lists, its prefix sums'
     // row (words and values on 128 bits, a count) and its crowd shares (`crowd_slots` words a head).
     let slots = crowd_slots(d.reach) as u64;
-    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots;
+    // A receiver's probes: their number, their classes, and its place among the probers of each (`2^b − 1`).
+    let probe_site = 4 * h * (1 + 2 * ((1u64 << d.class_trits()) - 1));
+    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site;
     let tick_fixed = tick_fixed_octets(d);
     let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
     // A site's carried mixture, definite bit, clock, echo (a flag, `B` and logits) and the round trips.
@@ -1187,7 +1381,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let reverse_site = if returning { 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
-    let weights = if kept { h * 8 * pairs } else { 0 };
+    let weights = h * 8 * pairs;
     ticks_kept * (weights + s * tick_site + tick_fixed) + s * (face_site + mixture_site + moment_site + reverse_site) + if returning { 8 * pairs } else { 0 }
 }
 
@@ -1195,7 +1389,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
 /// offsets `H (2·3^b + 1)` words (each class's definite members and the rest) and the prefix sums'
 /// extra row (a region's `S + 1` rows, §14.10), which the reverse's difference arrays share.
 fn tick_fixed_octets(d: &FieldDeclaration) -> u64 {
-    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1) + (2 * 16 * 2 * d.modes as u64 + 8) * d.heads as u64 + 2 * 16 * 2 * d.modes as u64
+    4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1) + 4 * d.heads as u64 * (d.classes() as u64 + 1) + (2 * 16 * 2 * d.modes as u64 + 8) * d.heads as u64 + 2 * 16 * 2 * d.modes as u64
 }
 
 /// An encoding's entries sorted by the row they opened on (`rows` holds each entry's row, site and
@@ -1340,12 +1534,23 @@ mod tests {
     /// carriers beside them: a release batch of 128 regions at the reach carries some 3 GB of them at
     /// the grown declaration, which the weights alone never counted.
     #[test]
+    fn a_size_class_holds_its_length_within_a_quarter_in_whole_memset_words() {
+        for len in (1..5000usize).chain([1 << 20, (1 << 20) + 1, 3_000_001]) {
+            let class = size_class(len);
+            assert!(class >= len && class % 4 == 0, "{len} {class}");
+            // (below 17 elements the memset's four-word step is the whole class)
+            assert!(len < 17 || class * 4 <= len * 5, "{len} {class}");
+            assert_eq!(size_class(class), class, "{len}");
+        }
+    }
+
+    #[test]
     fn a_regions_octets_count_its_carriers_beside_its_weights() {
         for d in [declaration(32, 4, 32), declaration(64, 8, 64)] {
             let n = 1504u64;
-            // The shares (a word a pair) are kept only for a return, with the reverse's covector a pair on 64
-            // bits; each kept tick adds its carrier widths and class offsets.
-            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 8 * n * n } else { 0 };
+            // The scores and shares (a word a pair) are kept a tick for a return, with the reverse's covector a
+            // pair on 64 bits, and one tick's otherwise; each kept tick adds its carrier widths and class offsets.
+            let weights = |returning: bool| if returning { d.ticks as u64 * d.heads as u64 * 8 * n * n + 8 * n * n } else { d.heads as u64 * 8 * n * n };
             let fixed = |returning: bool| tick_fixed_octets(&d) * if returning { d.ticks as u64 } else { 1 };
             for returning in [false, true] {
                 let all = region_octets(&d, returning, n as usize);

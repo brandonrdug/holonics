@@ -36,6 +36,9 @@ fn run(args: &[String]) -> Result<()> {
     if std::env::var_os("FIELD_PROFILE").is_some() {
         card.profile();
     }
+    if std::env::var_os("FIELD_PHASES").is_some() {
+        card.trace_phases();
+    }
     let memory = opened.census().memory;
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
     let started = Instant::now();
@@ -58,6 +61,11 @@ fn run(args: &[String]) -> Result<()> {
         t.landmark_ns / 1_000_000,
         started.elapsed().as_millis()
     );
+    if let Some(phases) = card.phased() {
+        for (name, marks, ns) in phases {
+            println!("FIELD_PHASE name={name} marks={marks} ms={} us_a_mark={}", ns / 1_000_000, ns / 1_000 / (marks as u128).max(1));
+        }
+    }
     if let Some(p) = card.profiled() {
         let kernels: u128 = p.kernels.values().map(|v| v.1).sum();
         for (entry, (calls, ns)) in &p.kernels {
