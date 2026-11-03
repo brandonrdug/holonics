@@ -2433,8 +2433,11 @@ one write of 8 sweeps (12 reads, 0 faces, covector entries or learners unequal, 
 against a 330 s projection and a 400 s deadline). Receipts: `_receipts/law27/check.txt`, `_receipts/law27/parity.txt`.
 
 **Depth on the card** (cause 2; `_receipts/law27/time_*.txt`, the opening 48 sections of a founded field's first lap and
-4 writes of 64 sweeps, RTX 4080 SUPER): with one region a member, a section of D 64, H 8, K 4 reads in 0.5 s mean (lap
-projection 476 s at its upper bound); D 64, K 8 and D 128, H 16, K 4 in about 1.0 s (840 s); D 128, H 16, K 6 in 1.5 s
-(1,421 s, material 310,770, three times §16.25's grown field and three times its ticks). The run's declaration is the last:
-the ticks are the one constitution iterated, so a change reaches a site three times farther hop by hop and composes three
-times more often, and the width carries three times the material, inside a lap the card reads in about ten minutes.
+4 writes of 64 sweeps, RTX 4080 SUPER): with one region a member, a section of D 32, H 4, K 6 reads in 0.69 s mean (lap
+projection 731 s at its upper bound) and of D 64, H 8, K 6 in 0.80 s (708 s); the card is bound by the launches, not the
+width (D 128, H 16, K 6 reads in 1.5 s). The run's declaration deepens the constitution's iteration to six ticks, so a
+change reaches a site three times farther hop by hop and composes three times more often, and founds the width at reading
+9's 32: **the width is never a declared dial** (Brandon, October 31, on a comparison written at 128 against 64 as if
+either were a fixed width). It grows from the trained body by copies when the withheld code stops falling
+(`FieldLearner::widened`, atlas `tower.field-growth-by-copies`); the time reads at 64 and 128 are reads of where that
+growth leads on the card, not declarations.
