@@ -2528,3 +2528,27 @@ Failures this could repeat, checked: **bits read as progress** (the reads are cu
 reported with their projections and stops); **a refusal answered with a larger limit** (the widened read stopped at its bound
 and was reported incomplete; the next read changed the law, keeping the heads); **catered machinery** (the byte table is a
 reading of the held answers, never a part of the field).
+
+### 16.30 A step stands at the size its own section certified
+
+[measurement; agent-inferred, November 3] With the step's size and the width ruled out (§16.29), the learner was read. Under
+the tower's acceptance 77 each certified step was held and read on the next section, standing at its size, at half, at the
+parabola's halving or not at all; at lap 2 it refused 30% of the steps and halved 55% (`_receipts/law29/rate28_train8.txt`).
+From §16.28's lap-2 state, two laps with each step standing unread at the size its own section certified (strictly fewer
+bits there, `scaled`) read the held answers' joint code at 3.200 and 3.160 bits a byte, the context read at 2.045 and 1.980,
+in 171 s a lap (`_receipts/law30/held30_train.txt`); under the read, 3.204 and 3.174, 2.056 and 2.023, in 280 s. The read
+cost two fifths of every lap and left the field a little behind: a step that lowers its own section's code raises another's
+about as often as the gradient's noise across 16 problems says it will, so the read mostly refused and shrank good steps.
+
+The law (`FieldLearner::read_held`, `false`): a deposited step stands at the size its own section certified, and the next
+regions are read under it as they come. The certificate on the section's own regions is unchanged, so no step stands that
+did not code its own section strictly fewer bits. The next-section read is kept as a declared comparison (`read_held =
+true`, the trainer's `FIELD_HELD_READ`), not carried in the learner's text. Why the read's reason no longer holds:
+it was installed when the held-out answer code rose for two laps while the passage's own code fell, on the front regions and
+the lock writer, both retired (§16.27); on the masks the held code falls faster without it.
+
+Failures this could repeat, checked: **an uncertified deposition step** (every step is still certified on its own regions,
+strictly); **seen material graded as unseen** (the held and withheld reads are unchanged, and no decision reads them but
+growth); **a located cause carried unrepaired** (the read's cost was measured and the law changed at its owner). Verification:
+the field library tests (56, `a_step_stands_unread_at_its_certified_size` among them), the example's field tests (13), the
+gate (0 failed) and the card parity at the founding (7 reads and one write equal; `_receipts/law30/`).

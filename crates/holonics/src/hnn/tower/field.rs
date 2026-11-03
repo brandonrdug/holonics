@@ -3498,6 +3498,15 @@ pub struct FieldLearner {
     /// keyed masks and order moving rather than replaying the first lap's).
     pub laps: u64,
     held: Option<HeldStep>,
+    /// [definition; agent-inferred, November 3, §16.30] Whether a deposited step is held and read on the next regions
+    /// before it stands (the tower's acceptance 77). The field's law is `false`: a step stands at the size its own
+    /// section certified (strictly fewer bits there, [`scaled`]), and the next regions are read under it as they come.
+    /// Why: from the same trained state, two laps read the held answers' joint code at 3.200 and 3.160 bits a byte with
+    /// the steps standing unread against 3.204 and 3.174 with the next-section read, in 171 s a lap against 280 s (the
+    /// read refused 30% of the steps and halved 55%: a step that lowers its own section's code raises another
+    /// section's about as often as gradient noise says, so the read mostly threw away and shrank good steps). `true`
+    /// keeps the read as a declared comparison. Not carried in the learner's text.
+    pub read_held: bool,
 }
 
 impl FieldLearner {
@@ -3506,7 +3515,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.theta.len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -3533,7 +3542,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -3639,7 +3648,9 @@ impl FieldLearner {
         };
         let code_after = code_of(&compared(&faces_new, regions)?, &spans);
         self.field = candidate;
-        self.held = Some(HeldStep { step, halvings });
+        if self.read_held {
+            self.held = Some(HeldStep { step, halvings });
+        }
         Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
     }
 
@@ -3681,7 +3692,7 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, drawn, laps, held })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held })
     }
 }
 
