@@ -732,10 +732,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.laps,
         learner.field.theta.len()
     );
-    // [measurement; agent-inferred, November 3, §16.28] `FIELD_WIDEN_FIRST`: a continued learner widened by copies before
-    // its first lap (the growth law's operation, read here without its trigger), so a run reads whether the trained
-    // body's width bounds its fall; the run then makes no further growth.
-    let widened_first = std::env::var_os("FIELD_WIDEN_FIRST").is_some() && args.len() == 24;
+    // [measurement; agent-inferred, November 3, §16.28] `FIELD_WIDEN_FIRST` (a factor past one, two where none is given): a
+    // continued learner widened by copies before its first lap (the growth law's operation, read here without its trigger),
+    // so a run reads whether the trained body's width bounds its fall; the run then makes no further growth.
+    let widen_factor = std::env::var("FIELD_WIDEN_FIRST").ok().map(|v| v.parse::<usize>().ok().filter(|&f| f > 1).unwrap_or(2));
+    let widened_first = widen_factor.is_some() && args.len() == 24;
     // [measurement; agent-inferred, November 3, §16.28] `FIELD_RATE_BITS`: a continued learner's step rate `2^(−k)` read at
     // `k` for this run, so a run reads whether the step's size bounds the trained field's fall.
     if let Some(k) = std::env::var("FIELD_RATE_BITS").ok().and_then(|v| v.parse::<u32>().ok()).filter(|_| args.len() == 24) {
@@ -748,8 +749,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.read_held = true;
         println!("FIELD_HELD_READ");
     }
-    if widened_first {
-        learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
+    if let Some(factor) = widen_factor.filter(|_| widened_first) {
+        learner = learner.widened(factor, &keys).map_err(|e| e.to_string())?;
         let d = learner.field.declaration;
         println!("FIELD_GROW lap=-1 width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
     }
