@@ -774,9 +774,16 @@ mod tests {
         faces.iter().map(|(m, t)| (m.as_slice(), *t)).collect()
     }
 
-    /// `−log₂(m/t)` on 2^(−20) (a reading to compare against).
+    /// `−log₂(m/t)` on 2^(−20), the field's own reading of a face's code.
     fn bits(m: u128, t: u128) -> i64 {
-        (-(m as f64 / t as f64).log2() * (1u64 << 20) as f64).round() as i64
+        crate::hnn::tower::face_code(m, t)
+    }
+
+    /// `log₂ v` on 2^(−20) for a whole `v ≥ 1`: its width, and its leading 63 bits read by [`log2_ratio`].
+    fn log2_whole(v: &BigUint) -> i128 {
+        let width = v.bits();
+        let top: u128 = if width > 63 { (v >> (width - 63)).try_into().unwrap() } else { u128::try_from(v.clone()).unwrap() << (63 - width) };
+        ((width as i128 - 1) << CODE_BITS) + log2_ratio(top)
     }
 
     /// The place-wise code: each cell at its own place, every later place the void.
@@ -801,12 +808,29 @@ mod tests {
         assert!(read.lag.iter().all(|&(mass, lag)| mass == 1 << 24 && lag == 0));
     }
 
-    /// A code: every target the places can write (each place a class or the void) has its coupling, and the codes'
-    /// probabilities sum to one (each writing maps to exactly one target once its voids are dropped).
+    /// A code: every target the places can write (each place a class or the void) has its coupling `Z(T | H)`, read
+    /// here by enumerating every writing in exact rationals; the `Z` of every target sum to one exactly (each writing maps
+    /// to one target once its voids are dropped), and each coupling's code is `−log₂ Z` to a few grains of its reading.
     #[test]
     fn the_coupling_is_a_code() {
-        let faces: Vec<_> = [[2u128, 1, 3], [1, 1, 1], [4, 1, 2]].iter().map(|w| face(w)).collect();
-        let mut sum = 0f64;
+        use num_rational::BigRational;
+        let weights: [[u128; 3]; 3] = [[2, 1, 3], [1, 1, 1], [4, 1, 2]];
+        let faces: Vec<_> = weights.iter().map(|w| face(w)).collect();
+        // Z(T | H) by enumeration: every writing of the three places, its voids dropped.
+        let mut z: std::collections::BTreeMap<Vec<usize>, BigRational> = std::collections::BTreeMap::new();
+        for writing in 0..27usize {
+            let classes: Vec<usize> = (0..3).map(|i| writing / 3usize.pow(i as u32) % 3).collect();
+            let p = classes.iter().enumerate().fold(BigRational::from_integer(1.into()), |acc, (i, &c)| acc * BigRational::new((weights[i][c]).into(), weights[i].iter().sum::<u128>().into()));
+            let target: Vec<usize> = classes.into_iter().filter(|&c| c != 0).collect();
+            *z.entry(target).or_insert_with(|| BigRational::from_integer(0.into())) += p;
+        }
+        assert_eq!(z.values().fold(BigRational::from_integer(0.into()), |a, b| a + b), BigRational::from_integer(1.into()));
+        for (target, zt) in &z {
+            let read = coupling_code(&view(&faces), 0, target, None).unwrap();
+            let (num, den) = (zt.numer().to_biguint().unwrap(), zt.denom().to_biguint().unwrap());
+            let exact = log2_whole(&den) - log2_whole(&num);
+            assert!((read.code as i128 - exact).abs() <= 16, "{target:?}: {} against {exact}", read.code);
+        }
         let mut targets: Vec<Vec<usize>> = vec![vec![]];
         for len in 1..=3usize {
             let mut next = Vec::new();
@@ -819,11 +843,7 @@ mod tests {
             }
             targets.extend(next);
         }
-        for t in &targets {
-            let read = coupling_code(&view(&faces), 0, t, None).unwrap();
-            sum += (-(read.code as f64) / (1u64 << 20) as f64).exp2();
-        }
-        assert!((sum - 1.0).abs() < 1e-5, "{sum}");
+        assert_eq!(targets.iter().filter(|t| z.contains_key(*t)).count(), z.len(), "every target the places write is read");
     }
 
     #[test]
