@@ -2605,3 +2605,36 @@ places are fresh draws whose comparison `p̂ − e_u` carries no rule, and their
 rule's small consistent part moves each coordinate a small fraction of its step. That is a property of the comparison's
 covector against the terrain's own entropy, which every learner meets; what the field lacks beside it is a reading in which
 the rule's part is large, a site meeting its two neighbours jointly rather than as a superposition.
+
+### 16.32 The states are drawn where a site's neighbours are known, and weighed back to the joint code
+
+[measurement; agent-inferred, November 3] §16.31 read every family's step at the noise level and named the reading in which
+a rule's part is large as the missing term. The masks' density is that reading's other side: at `τ ~ U(0, 1]` a place whose
+two neighbours are known is open with probability `E[τ(1 − τ)²] = 1/12`, so most of what a lap compares is a place among
+open neighbours, where no two-neighbour rule can be read. On the triple terrain (receipts `_receipts/law32/`, 20 laps each,
+the base's context code 1.945 and joint 2.473 at lap 19):
+
+- the density read at `τ/2` and `τ/4` without weighing (`toy_t_1.txt`, `toy_t_2.txt`): the context code 1.538 and 1.581, the
+  joint 2.623 and 2.611. The rule is learned far faster where neighbours are known, and the joint code, whose high
+  densities the draw now meets rarely, gets worse: the comparison is no longer the joint code.
+- the density drawn at `τ = u²` and each state weighed back by its importance ratio `2√τ` read at `τ ≈ K/m`
+  (`toy_t_sq.txt`): the context code 1.697 and the joint 2.410, both better than the base. At `τ = u³` with its ratio
+  (`toy_t3_sq.txt`): 1.828 and 2.445, better than the base and worse than `u²`.
+
+On GSM8K (`gsm8k_tau31.txt`, a fresh founding, four laps of 165 to 171 s): the joint code 3.481, 3.253, 3.210, 3.100 bits a
+byte against 3.531, 3.309, 3.271, 3.121 at uniform `τ` (check30), the context read 2.458, 2.087, 1.968, 1.838 against 2.586,
+2.224, 2.127, 1.942. The writer's opening read (every answer place open) is noisier, 5.35, 8.20, 7.01, 5.10, since its state
+is drawn less often and weighed more.
+
+The law (`field_train::shape`, `field_train::weighed_domain`, atlas `tower.field-joint-code`): `τ = u²`, and a state's
+domain is read as `⌊2√(mK)⌋`, so its weight `domain/K` is `2√(m/K)`, the joint code's `m/K` times the importance ratio. The
+comparison is still the order-averaged joint code (unbiased to `τ`'s reading through `K`); only where its variance is spent
+changes. Why `u²` and not further: `u³` read worse on the toy, and the writer's first sweeps read the states it draws least.
+
+Failures this could repeat, checked: **bits read as progress** (the joint code is the comparison itself and the context
+read is reported beside it, with the opening's noise); **seen material graded as unseen** (the held and joint reads are of
+the withheld problems, unchanged); **an authored routine standing in for learning** (the draw changes which states are
+compared, never what the field computes). Verification: the example's field tests (14, `a_state_is_weighed_back_to_the_joint_code`
+among them).
+
+The gate (0 failed) and the card parity on the new draw (7 reads and one write equal, `parity.txt`).
