@@ -1,0 +1,11 @@
+ubase: L4 ctx 2.467532 L9 ctx 2.191215 L14 ctx 1.908103 L19 ctx 1.666692  joint19 2.383875 laps 20 lap_ms 3261 grow 1
+urate7: L4 ctx 2.542166 L9 ctx 2.391152 L14 ctx 2.171882 L19 ctx 1.974237  joint19 2.481037 laps 20 lap_ms 3212 grow 1
+usec32: L4 ctx 2.423552 L9 ctx 2.123310 L14 ctx 1.940299 L19 ctx 1.763946  joint19 2.433986 laps 20 lap_ms 2563 grow 1
+usec8: L4 ctx 2.483551 L9 ctx 2.109088 L14 ctx 1.915863 L19 ctx 1.726702  joint19 2.413230 laps 20 lap_ms 4778 grow 1
+
+[exited with code 0]
+uf128r9: L4 ctx 2.455583 L9 ctx 2.195554 L14 ctx 1.970113 L19 ctx 1.799486  joint19 2.435543 laps 20 lap_ms 3056 grow 0
+uf128r10: L4 ctx 2.396593 L9 ctx 2.026738 L14 ctx 1.755646 L19 ctx 1.600614  joint19 2.384901 laps 20 lap_ms 2870 grow 0
+uf64r9: L4 ctx 2.432942 L9 ctx 2.136490 L14 ctx 1.845689 L19 ctx 1.677363  joint19 2.392656 laps 20 lap_ms 2912 grow 0
+
+[exited with code 0]

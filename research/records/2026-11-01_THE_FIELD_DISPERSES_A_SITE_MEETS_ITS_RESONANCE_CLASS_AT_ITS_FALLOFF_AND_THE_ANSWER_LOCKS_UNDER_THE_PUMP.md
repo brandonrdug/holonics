@@ -2638,3 +2638,21 @@ compared, never what the field computes). Verification: the example's field test
 among them).
 
 The gate (0 failed) and the card parity on the new draw (7 reads and one write equal, `parity.txt`).
+
+### 16.33 A rule over a site's two strand contacts is learned in four laps; over its second neighbour, five times slower
+
+[measurement; agent-inferred, November 3] Under §16.32's draw, on the triple terrain (`_receipts/law33/`, 20 laps each, the
+base's context code 1.667 and joint 2.384 at lap 19): the step at `2^(−7)` reads 1.974; sections of 32 and 8 read 1.764 and
+1.727; the merge at 64 complex contacts with the step at `2^(−10)` reads 1.601 (joint 2.385), at 32 with `2^(−9)` 1.677
+(`sweep_draw.txt`); the first moment averaged at `2^(−5)` and `2^(−6)` for `2^(−3)` reads 2.037 and 2.238
+(`sweep_moment.txt`, a scratch read, not kept). None is the lever.
+
+The terrain was then turned around (`make_adjacent_toy.py`): triples `(a, c, b)` with `c = T[a][b]` standing between its two
+fresh neighbours, so the rule joins a site's two strand contacts, the left one's `E₋` and the right one's `E₊` rows in its
+own opening (the two-sided table codes it at 2.283 bits a byte from one neighbour a side, 1.317 from two). The field reads
+the context code 2.279 at lap 4, the one-neighbour table's whole rule, and 1.585 at lap 19 (`adjacent.txt`). The same 64-entry
+rule over the second neighbour (§16.31's `(a, b, c)`) had not reached the one-neighbour table's level of its terrain until
+lap 2 and needed about twenty laps to approach its two-neighbour level. A site meets its adjacent strand contacts in its
+own opening, where the merge's first product can join them; it meets its second neighbour only as one term of its moment's
+superposition (`ζ^(−2) D(2) E⁺(a)` among every other source) or through a second hop of the contact, and a rule there is
+located about five times more slowly. Text's rules reach two to four bytes back (a word's letters, a number's digits).
