@@ -2688,3 +2688,13 @@ tick (an end site lacks a mate, and a second tick's contact carries that by its 
 guards the probes' class seams as the covector's own test does (a probe seam inside its window read a jump; at the base step
 the slope agreed within 3%); `a_held_step_is_read_on_the_next_section` holds its fixture at `2^(−3)`. Verification: the field
 library tests (56), the card parity (7 reads and one write equal, `parity.txt`).
+
+**Under the strand pair contact** (`toy_sweep.txt`, 20 laps each, the strand base's context 1.667 and joint 2.366 at lap 19):
+the merge at 64 complex contacts (f 128) with the step at `2^(−10)` reads the context 1.947, 1.592, 1.473, 1.352 at laps 4, 9,
+14, 19 and the joint 2.257, below the two-neighbour table's 1.436; at f 64 with `2^(−9)` 1.431 and 2.292; four ticks for six
+1.629 and 2.356; eight 1.685 and 2.366. A wider merge now holds the pair rules, its step lowered a bit a doubling as a growth
+lowers it. On GSM8K, f 128 at `2^(−10)` reads 3.635, 3.243, 3.108, 3.024 over four laps (`gsm8k_merge128.txt`), slower to start
+and level with f 32 by lap 2: not taken. Four ticks read 3.417, 3.149, 3.123, 3.003, 2.967 over five laps of 109 to 113 s
+(`gsm8k_k4.txt`) against six ticks' 3.533, 3.200, 3.107, 3.025 in 165 to 171 s: as good a lap at two thirds of its time. The
+runs' declaration is four ticks (the ticks are the one constitution's iteration; with the strand pair contact four reach the
+four sites a word of text spans).
