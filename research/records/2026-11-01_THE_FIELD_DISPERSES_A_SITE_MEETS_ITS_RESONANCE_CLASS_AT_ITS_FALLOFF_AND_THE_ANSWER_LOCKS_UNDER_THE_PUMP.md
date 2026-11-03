@@ -2299,3 +2299,51 @@ bit); `a_long_port_carries_its_mass` reads ports of 1,000 places and 300 cells, 
 port: every read, face, covector, learner, row, share, current and release equal, in 330.0 s against 330 s projected
 (1.00; host 134.0 s, card 1.8 s), peak resident set 3.4 GB; a section's card time rose about threefold with the longer
 front regions (187, 596 and 951 ms against 84, 108 and 251). Receipt: `_receipts/law24/parity.txt`.
+
+### 16.25 The run under §16.22–§16.24: the question's information rises, and the releases do not depend on their question
+
+[measurement, November 3] GSM8K on the card (the binary built at `62f099693`, reading 9's declaration, UNITS0, TRAIN.txt,
+HELD128.txt, KEYS8; 27 laps declared, training's STOP_MS 160 minutes inside Brandon's three-hour hard stop; RTX 4080 SUPER
+under the lock, 24 host threads). The acceptance, fixed before launch, is the comparison record's §5: A1 the releases' `λ`
+against their own targets above `λ` against a foil target, summed; A2 the joint read's information rising across laps;
+A3 every release shown whole.
+
+**Training was held at its deadline after 20 of the 27 laps** (incomplete): a lap ran 297 to 355 s against the 619 s bound
+(the projection's 4.5 minutes was the mean section's, about 0.5 to 0.6 of the lap measured), the body grew to width 64 at
+lap 16 and the grown laps ran about 470 s against their 2,476 s bound; the next lap's bound passed the time left. Device
+line: host peak resident set 0.76 GB (training), 1.48 GB (release); the board at 1.1 to 1.3 GB between steps.
+
+By lap, the joint read (bits a byte over the 35,591 held answer sites, beside the own question and the next problem's),
+the context read (one answer site in four open) and the opening's coupling code (every answer place open, a byte of
+answer):
+
+| lap | joint, own | joint, foil | information | context | opening |
+|---|---|---|---|---|---|
+| founding | 6.931 | 6.931 | 0 | 6.931 | 27.553 |
+| 0 | 4.447 | 4.445 | −0.0025 | 4.209 | 5.316 |
+| 1 | 3.921 | 3.919 | −0.0016 | 3.327 | 5.281 |
+| 2 | 3.609 | 3.610 | +0.0018 | 2.780 | 5.246 |
+| 3 | 3.439 | 3.445 | +0.0055 | 2.531 | 5.212 |
+| 5 | 3.299 | 3.304 | +0.0051 | 2.298 | 5.204 |
+| 8 | 3.171 | 3.179 | +0.0075 | 2.108 | 5.204 |
+| 11 | 3.120 | 3.129 | +0.0093 | 2.000 | 5.336 |
+| 15 | 3.045 | 3.058 | +0.0137 | | |
+| 19 | 2.982 | 2.998 | +0.0164 | | |
+
+- **A2 holds:** the question's information by the joint code rises across the laps, from −0.0025 to +0.0164 bits a byte,
+  spread over the answer's quarters (lap 11: 0.009, 0.011, 0.009, 0.008), the problems' quartiles −0.004, 0.008 and 0.023.
+- **A1 fails:** over the 148 releases (the 128 held and 20 training mates), `λ` is 4,321 against the own targets and 4,313
+  against the foils (`F*` 77,821 and 77,837); the own target leads in 69 problems, the foil in 71, 8 tie.
+- **A3, the releases** (private, shown to Brandon whole): the release ran 254 sweeps in its 15 minutes (its deadline, stopped),
+  reached 176,258 of the 181,892 places and locked 147,034, none of the 148 whole, writing 47,273 places with the void
+  dropped. They are the answers' calculation skeleton: `= <<…>>`, `.`, `###`/`####` and the newline at varied places, `0`
+  where digits stand, a few letters, and most content open; similar problems release similar skeletons. The place-wise
+  marginal's `The t` and spaces of §16.20 are gone.
+
+What it says: the coupling moved the face off the place-wise marginal onto the answers' in-order structure, and the joint
+code reads the question's information rising; but the opening (every answer place open, the release's first state)
+coded 5.2 to 6.0 bits a byte all run while the context read fell from 4.2 to 2.0. The field completes around known
+answer text and has not learned to begin an answer from its question; the release, which begins there, locks only the
+glue every answer shares. That is the next loop's subject. Receipts: `_receipts/law24/run/receipts.txt` (the run's
+numeric lines) and `_receipts/law24/run/coupling.tsv` (each release's lengths, `λ` and `F*` against its own and its foil
+target); the releases are private.
