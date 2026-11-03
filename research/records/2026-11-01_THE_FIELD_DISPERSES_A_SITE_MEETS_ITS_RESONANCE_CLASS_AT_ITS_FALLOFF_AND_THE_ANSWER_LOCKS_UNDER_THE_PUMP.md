@@ -2441,3 +2441,38 @@ change reaches a site three times farther hop by hop and composes three times mo
 either were a fixed width). It grows from the trained body by copies when the withheld code stops falling
 (`FieldLearner::widened`, atlas `tower.field-growth-by-copies`); the time reads at 64 and 128 are reads of where that
 growth leads on the card, not declarations.
+
+### 16.28 An open site is silent on the strand
+
+[measurement; agent-inferred, November 3] §16.27's check (D 32, H 4, K 6, one region a member, the card) read the held
+answers' order-averaged joint code at 3.726, 3.453 and 3.444 bits a byte after laps 0 to 2, and the writer's opening (the
+question known, all 1,229 answer places open, the answer's cells and first void read at their places) at 5.24, 5.29 and
+then 9.33 bits a byte: the joint stalled while the writer's first state ran away. The learned material after lap 2 read
+the cause: the unresolved rows had learned (the moment encodings' at a fifth of a class row's ℓ1, the contact rows' at a
+seventh, the clocks' unresolved rates at `κ = 1.18` and `1.09`). An open site was not inert: each one added its learned row
+to every turned mode's moment (a coarse ring carries about `n/2π` sites of them) and advanced its head's clock off the byte
+place. Training reads regions whose open stretch ends at the region's tail (octave-uniform, a few hundred sites); the
+writer opens 1,229, so every site's moment and clock in the writer's first sweeps stood where training never read them.
+
+The law (`Field::silent`): a site unresolved and carrying no face has had nothing arrive, so it adds nothing to the
+strand's moment, its clock runs at the strand's own place (`κ = 1`), and no covector returns to its rows of the moment
+encodings or the paces (those rows stay at their founding's zero). Its own opening, `E(∗)` with its neighbours' contact
+rows, is its own and stays. So an open stretch past a region leaves every other site's face as it was (the test
+`an_open_stretch_leaves_the_other_sites_faces_as_they_were`), and the writer's long extent reads its answer places as a
+short training region does. On the card: `moment_strand`, `field_moment_strand_return_all`, `pace_rate` and
+`field_pace_c_back` read a silent site as zero.
+
+Failures this could repeat, checked: **a located cause carried unrepaired** (§16.27's check found it; it is repaired at
+its owner before the next run); **a test bound loosened to pass**: `a_region_s_covector_is_weighed_by_its_domain` now
+reads the moment chart's covector to sixteen units of the opening covector times `Σ_t |s_t|`, the outer product's own
+rounding (its entry 887 read 4.6% off where its seven terms cancel to a sixth of their sum, against 0.3% for every other
+entry); the weighing law is unchanged and every other entry keeps its bound.
+
+**Measured** (the card, D 32, H 4, K 6, fresh founding, three laps of 246 to 269 s; `_receipts/law28/check28.txt` beside
+`check27.txt`): the held answers' joint code 3.619, 3.385, 3.282 bits a byte after laps 0 to 2 (3.726, 3.453, 3.444 before
+the law; §16.25's two-tick field 4.447, 3.921, 3.609), the context read 2.704, 2.335, 2.163, and the writer's opening 5.78,
+5.71, 6.07 (no longer running away; the first sweep's state is the place-wise marginal given the question). The stall
+lifted: lap 2 fell 0.10 bits where it had fallen 0.008. After three laps (13.5 minutes) the field codes where §16.25's
+needed about eight. Verification: the field library tests (55), the example's field tests (13), the gate (0 failed), and
+the card parity, at the founding and with every clock entry drawn from the keys (`FIELD_PARITY_PACE=8`, the unresolved
+rates among them), 12 reads and one write equal each.

@@ -1,0 +1,24 @@
+train.log:FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=6 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=34776
+train.log:FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=2400
+train.log:FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=6.930737 foil_bits_a_byte=6.930737 information_bits_a_byte=0.000000 ms=1613
+train.log:FIELD_UNSEEN lap=-1 code=6.931 sites=36763 next=- ms=8339
+413 halvings=265 next_halved=163 next_refused=71 ms=270556
+train.log:FIELD_UNSEEN lap=0 code=2.950 sites=36763 next_change=230412928 next_halvings=1 next_refused=true ms=278896
+train.log:FIELD_HELD lap=0 answer=5.241076 classes=35591 context=2.933429 context_classes=35591 foil=2.933825 question=0.000396 ms=282453
+train.log:FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=3.726036 foil_bits_a_byte=3.728075 information_bits_a_byte=0.002039 ms=2586
+train.log:FIELD_CARD reads=1796 read_ms=145693 returns=418 return_ms=139676 pairs=109492561827 batches=2262 peak_store=8064567272 landmarks=0 landmark_ms=0 elapsed_ms=289414
+train.log:MEASURE lap=train rc=0 wall_s=289.8 peak_rss_kib=748588
+train2.log:FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=6 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=1 material=34776
+train2.log:FIELD_HELD lap=-1 answer=5.241076 classes=35591 context=2.933429 context_classes=35591 foil=2.933825 question=0.000396 ms=4159
+train2.log:FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=3.726036 foil_bits_a_byte=3.728075 information_bits_a_byte=0.002039 ms=2866
+train2.log:FIELD_UNSEEN lap=-1 code=2.950 sites=36763 next=- ms=14079
+413 halvings=195 next_halved=213 next_refused=120 ms=279967
+train2.log:FIELD_UNSEEN lap=0 code=2.512 sites=36763 next_change=-219939978 next_halvings=0 next_refused=false ms=294047
+train2.log:FIELD_HELD lap=0 answer=5.293631 classes=35591 context=2.486054 context_classes=35591 foil=2.487618 question=0.001565 ms=297712
+train2.log:FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=3.452777 foil_bits_a_byte=3.456353 information_bits_a_byte=0.003576 ms=2633
+413 halvings=228 next_halved=228 next_refused=125 ms=277990
+train2.log:FIELD_UNSEEN lap=1 code=2.343 sites=36763 next_change=-25751850 next_halvings=0 next_refused=false ms=582819
+train2.log:FIELD_HELD lap=1 answer=9.325223 classes=35591 context=2.313530 context_classes=35591 foil=2.315541 question=0.002010 ms=586444
+train2.log:FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=3.444319 foil_bits_a_byte=3.448027 information_bits_a_byte=0.003708 ms=2610
+train2.log:FIELD_CARD reads=3862 read_ms=304700 returns=832 return_ms=280359 pairs=226318879006 batches=4784 peak_store=8115892168 landmarks=0 landmark_ms=0 elapsed_ms=593446
+train2.log:MEASURE lap=train rc=0 wall_s=593.8 peak_rss_kib=667488
