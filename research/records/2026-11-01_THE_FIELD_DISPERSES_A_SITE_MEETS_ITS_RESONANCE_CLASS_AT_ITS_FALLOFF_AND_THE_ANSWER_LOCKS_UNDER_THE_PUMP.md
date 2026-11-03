@@ -2563,3 +2563,34 @@ section in 0.53 s against 0.40 s (the first launch's 200 s lap bound, set from D
 joint code in two laps, at 1.3 times the card's time: memory added to a trained field is taken up at about the rate the
 field already learns, so neither its size nor its step's rate nor the held read sets that rate. What sets it is the next
 subject: the field holds a one-neighbour table's worth with twice that table's numbers.
+
+### 16.31 The field is slow to join two neighbours: a probe on a terrain whose rule is a 64-entry table
+
+[measurement; agent-inferred, November 3] §16.29 found the field holding about a one-neighbour byte table's worth of
+GSM8K, and §16.30 found neither its step, its held read nor its width (×2, ×4, the heads kept) moving that. Two reads
+separate memory from learning (receipts `_receipts/law31/`).
+
+**Where an open answer place puts its mass** (`rows.txt`, the 7-lap GSM8K field, the context read; the held rows now split
+the answer's own near neighbours out of the rest, host and card equal, `parity.txt`): 29 to 49% of a row's mass on its
+definite near neighbours (`|i − j| < 6`, a tenth at one head), 10 to 33% on the question, the rest on the answer's far
+sites. The near field is heard; it is not drowned.
+
+**The probe** (`make_toy.py`): an answer of triples `(a, b, c)`, `a` and `b` drawn fresh and `c = T[a][b]` for one 8 × 8 table
+`T` drawn once, eight letters, 2,000 training problems in GSM8K's layout. The two-sided byte table (§16.29's reading) codes the
+held answers at 2.456 bits a byte from one neighbour a side, 1.436 from two, 1.277 from three; the rule is 64 entries. The
+field (D 32, H 4, K 6, every law of November 3, the card, 3 s a lap of 117 sections) reads the context code at 2.691 after
+lap 0, 2.380 after lap 9 (grown to D 64 at lap 8), 1.945 after lap 19 and 1.611 after lap 39, 4,680 steps (`toy40.txt`): it
+passes the one-neighbour table in its first lap and has not reached the two-neighbour table after forty. The field can join
+two neighbours; it is slow to.
+
+**What does not speed it** (`sweep.txt`, 20 laps each from one founding): two ticks for six (1.891 at lap 19, at half the
+card's time), sections of 4 for 16 (four times the steps a lap: 1.981), the rate `2^(−7)` (2.340), 64 merge contacts (2.116),
+16 modes a head (1.997), no still heads (2.061), against the base's 1.945. On the toy the certificate halves almost nothing
+(0 to 8 steps a lap) and each step lowers its own section's code by 0.03 to 0.05 bits while the next section opens barely
+lower: a step fits its 16 problems and carries little of the rule to the next, and four times the steps a lap carry no more
+of it. What a lap of the terrain teaches, not the steps' number, size or the body's size, sets the fall.
+
+The next subject is therefore the route by which the comparison's covector at a masked `c` reaches a joint reading of `a`
+and `b`: the founding holds the current's return and the merge's return at zero (each tick opens on the identity), so the
+products that would join two neighbours start with no covector through them, and every masked site's covector is averaged
+over the whole region's states.

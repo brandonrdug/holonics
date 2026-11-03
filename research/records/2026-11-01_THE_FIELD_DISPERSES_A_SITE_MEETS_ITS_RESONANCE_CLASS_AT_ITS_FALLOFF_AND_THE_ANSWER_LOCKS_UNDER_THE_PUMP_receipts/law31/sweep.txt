@@ -1,0 +1,9 @@
+base: L4 ctx 2.515539 L9 ctx 2.380275 L14 ctx 2.141837 L19 ctx 1.945193  joint19 2.472554 laps 20 lap_ms 3295 grow 1
+k2: L4 ctx 2.433611 L9 ctx 2.303406 L14 ctx 2.053204 L19 ctx 1.890901  joint19 2.463804 laps 20 lap_ms 1605 grow 1
+sec4: L4 ctx 2.591905 L9 ctx 2.426345 L14 ctx 2.187815 L19 ctx 1.980571  joint19 2.482115 laps 20 lap_ms 7610 grow 1
+rate7: L4 ctx 2.616696 L9 ctx 2.569994 L14 ctx 2.440932 L19 ctx 2.340011  joint19 2.593940 laps 20 lap_ms 3305 grow 1
+f128: L4 ctx 2.604951 L9 ctx 2.499310 L14 ctx 2.344866 L19 ctx 2.116205  joint19 2.520858 laps 20 lap_ms 3990 grow 1
+n16: L4 ctx 2.550596 L9 ctx 2.450503 L14 ctx 2.179300 L19 ctx 1.996830  joint19 2.481872 laps 20 lap_ms 4718 grow 1
+still0: L4 ctx 2.504471 L9 ctx 2.427697 L14 ctx 2.270237 L19 ctx 2.061331  joint19 2.498895 laps 20 lap_ms 4261 grow 1
+
+[exited with code 0]
