@@ -2410,17 +2410,421 @@ impl Field {
         self.returned_with(region, pass, g, None, None)
     }
 
-    /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
-    /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    /// [agent-inferred, November 3, §16.39] **One tick's return**: the covector `dx` of a tick's output faces carried back
+    /// through its pair contact, its current and contact and its charts to the covector of its input faces, the material's
+    /// covector added into `g`, the moments' into `dm` and the clocks' into `gtau` and `gsig` (with the contact covector's
+    /// shares and the currents' covectors where read). A region's reverse reads its ticks through it in reverse order; a
+    /// tower of scales reads each level's ticks through it.
+    #[allow(clippy::too_many_arguments)]
+    fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
-        let sites = region.classes.len();
+        let sites = definite.len();
         let l = &self.layout;
         let reaches = self.reaches();
         let ln2 = ln2_face();
+        // The pair contact: x_out = x_mid + W_c c + b_c.
+        let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
+        for dxt in &dxs {
+            for (i, &v) in dxt.iter().enumerate() {
+                g[l.w_bias + i] += v as i128;
+            }
+        }
+        let cs: Vec<&[i64]> = cell.c.chunks_exact(f).collect();
+        outer_sum(&mut g[l.w..l.w + dw * f], f, &dxs, &cs)?;
+        let mut da = vec![0i64; sites * f];
+        let mut db = vec![0i64; sites * f];
+        let mut dc = vec![0i64; sites * f];
+        for t in 0..sites {
+            transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
+        }
+        // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
+        // (§16.34); each site's `b` is one mate's, so each `δb_s` is one term.
+        let half = f / 2;
+        for t in 0..sites {
+            for e in 0..half {
+                let Some(s) = strand_mate(t, e, sites) else { continue };
+                let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
+                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
+                da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
+                db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
+                db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
+            }
+        }
+        let das: Vec<&[i64]> = da.chunks_exact(f).collect();
+        let dbs: Vec<&[i64]> = db.chunks_exact(f).collect();
+        let r2s: Vec<&[i32]> = cell.read2.chunks_exact(dw).collect();
+        outer_sum(&mut g[l.a..l.a + f * dw], dw, &das, &r2s)?;
+        outer_sum(&mut g[l.b..l.b + f * dw], dw, &dbs, &r2s)?;
+        for t in 0..sites {
+            for e in 0..f {
+                g[l.a_bias + e] += das[t][e] as i128;
+                g[l.b_bias + e] += dbs[t][e] as i128;
+            }
+        }
+        let mut dmid = vec![0i64; sites * dw];
+        let mut ra = vec![0i64; dw];
+        let mut rb = vec![0i64; dw];
+        for t in 0..sites {
+            transposed(&self.theta[l.a..l.a + f * dw], reaches.a, dw, das[t], MATERIAL_BITS, &mut ra)?;
+            transposed(&self.theta[l.b..l.b + f * dw], reaches.b, dw, dbs[t], MATERIAL_BITS, &mut rb)?;
+            let dr: Vec<i64> = ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect();
+            let back = ratio_adjoint(r2s[t], cell.scale2[t], &dr)?;
+            for i in 0..dw {
+                dmid[t * dw + i] = fit64(dx[t * dw + i] as i128 + back[i] as i128)?;
+            }
+        }
+        // The current: x_mid = x_in + O y + b_o.
+        let dms: Vec<&[i64]> = dmid.chunks_exact(dw).collect();
+        for dmt in &dms {
+            for (i, &v) in dmt.iter().enumerate() {
+                g[l.out_bias + i] += v as i128;
+            }
+        }
+        let ys: Vec<&[i64]> = cell.y.chunks_exact(m2).collect();
+        outer_sum(&mut g[l.out..l.out + dw * m2], m2, &dms, &ys)?;
+        let mut dy = vec![0i64; sites * m2];
+        for t in 0..sites {
+            transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, dms[t], MATERIAL_BITS, &mut dy[t * m2..(t + 1) * m2])?;
+        }
+        // The weights and the contact over each site's support, head by head.
+        let mut dq = vec![0i64; sites * m2];
+        let mut dv = vec![0i64; sites * m2];
+        let mut dp = vec![0i64; sites * m2];
+        let mut dyh = vec![0i64; sites * span];
+        // The current's covectors of this tick `[h][t][2n]`, where read ([`Field::row_currents`]).
+        if let Some(c) = currents.as_deref_mut() {
+            c.push(vec![0i64; heads * sites * span]);
+        }
+        for h in 0..heads {
+            // A paced head's current returns to the receiver's frame `y = conj(U) ỹ`, turned by `τ_i`:
+            // `δτ_i −= b Re(conj(δy_i) i y_i)` (§16).
+            if let Some(p) = paces.row[h] {
+                for t in 0..sites {
+                    for li in 0..n {
+                        let c = h * n + li;
+                        let a = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
+                        let z = (cell.y[t * m2 + c] as i128, cell.y[t * m2 + m + c] as i128);
+                        gtau[p][t] -= turned_back(self.turn_rate(self.slot(h, li)), a, z)?;
+                    }
+                }
+            }
+            // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
+            for t in 0..sites {
+                for li in 0..n {
+                    let c = h * n + li;
+                    let (ur, ui) = self.frame(paces, t, h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
+                    dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
+                    dyh[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
+                }
+            }
+            if let Some(c) = currents.as_deref_mut() {
+                let last = c.last_mut().expect("pushed above");
+                last[h * sites * span..(h + 1) * sites * span].copy_from_slice(&dyh);
+            }
+            let rows = &cell.rows[h * sites..(h + 1) * sites];
+            let crowds = &cell.crowds[h * sites..(h + 1) * sites];
+            let sums = &cell.sums[h];
+            let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
+            let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
+            let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
+            // A receiver's probe word (§16.19).
+            let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
+            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
+            // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
+            // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
+            // its members, `p_C/|C|` each, through a difference array over the places.
+            let mut sv = vec![0i128; sites * span];
+            let mut crowd_v = vec![0i128; (sites + 1) * span];
+            for i in 0..sites {
+                for src in &rows[i] {
+                    let j = src.j as usize;
+                    for r in 0..span {
+                        sv[j * span + r] += src.p as i128 * decayed(self.pair_decay(paces, h, r % n, i, j), dyh[i * span + r]);
+                    }
+                }
+                for c in &crowds[i] {
+                    for r in 0..span {
+                        let part = div_nearest(c.e as i128 * decayed(self.octave_decay(paces, h, r % n, i, c.level, c.lo > i), dyh[i * span + r]), c.count as i128);
+                        crowd_v[c.lo * span + r] += part;
+                        crowd_v[(c.hi + 1) * span + r] -= part;
+                    }
+                }
+            }
+            // A difference array's running prefix over the places (`[t][r]`).
+            let prefixed = |diff: &[i128]| -> Vec<i128> {
+                let mut out = diff[..sites * span].to_vec();
+                for t in 1..sites {
+                    for r in 0..span {
+                        out[t * span + r] += out[(t - 1) * span + r];
+                    }
+                }
+                out
+            };
+            let spread_v = prefixed(&crowd_v);
+            for j in 0..sites {
+                for r in 0..span {
+                    // Held in the framed chart until the frame is undone below.
+                    let c = h * n + r % n;
+                    let slot = j * m2 + if r < n { c } else { m + c };
+                    dv[slot] = fit64(release(sv[j * span + r], SHARE_BITS))?;
+                    if definite[j] {
+                        dv[slot] = fit64(dv[slot] as i128 + release(spread_v[j * span + r], SHARE_BITS))?;
+                    }
+                }
+            }
+            // `δz_k = ln 2 · p_k (δp_k − μ)`, `δp_k = ⟨δỹ_i, D ṽ_k⟩` on 2^(−40) (a crowd's value its decayed
+            // mean), `μ = Σ_k p_k δp_k`; the falloff is the medium's constant and returns nothing. Then
+            // `δs = 2^(−β) δz`.
+            let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
+            let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
+            for i in 0..sites {
+                let (row, crowd) = (&rows[i], &crowds[i]);
+                let dyi = &dyh[i * span..(i + 1) * span];
+                let kind = usize::from(cell.classes[h].listens(i));
+                let temper = self.temper(h, kind == 1)?;
+                let dp: Vec<i128> = row
+                    .iter()
+                    .map(|src| {
+                        let j = src.j as usize;
+                        (0..n).map(|l| { let decay = self.pair_decay(paces, h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
+                    })
+                    .collect();
+                let dpc: Vec<i128> = crowd
+                    .iter()
+                    .map(|c| {
+                        let pairs: i128 = (0..n).map(|l| { let decay = self.octave_decay(paces, h, l, i, c.level, c.lo > i); dyi[l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, l)) + dyi[n + l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, n + l)) }).sum();
+                        div_nearest(pairs, c.count as i128)
+                    })
+                    .collect();
+                let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e as i128 * dpj).sum::<i128>(), SHARE_BITS);
+                let compare = |p: i128, dpk: i128| -> i128 { release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS) };
+                let mut out = Vec::with_capacity(row.len());
+                let mut dt = 0i128;
+                for (src, &dpj) in row.iter().zip(&dp) {
+                    let dz = compare(src.p as i128, dpj);
+                    dt += release(dz * src.s as i128, FACE_BITS);
+                    let dsij = release(temper * dz, MATERIAL_BITS);
+                    if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
+                        return refuse("a contact's covector past its return's carrier");
+                    }
+                    out.push(dsij);
+                }
+                let mut outc = Vec::with_capacity(crowd.len());
+                for (c, &dpj) in crowd.iter().zip(&dpc) {
+                    let dz = compare(c.e as i128, dpj);
+                    dt += release(dz * c.s as i128, FACE_BITS);
+                    let dsij = release(temper * dz, MATERIAL_BITS);
+                    if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
+                        return refuse("a contact's covector past its return's carrier");
+                    }
+                    outc.push(dsij);
+                }
+                // Into the temperature's own chart (§16.12), the row's.
+                g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
+                if let Some(sh) = shares.as_deref_mut() {
+                    for (src, &v) in row.iter().zip(&out) {
+                        sh[2 * h + usize::from(i.abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();
+                    }
+                    sh[2 * h + 1] += outc.iter().map(|v| v.unsigned_abs()).sum::<u128>();
+                }
+                ds.push(out);
+                dsc.push(outc);
+            }
+            // A paced head's skins follow its turn (§16): each pair's and crowd's `D(σ_i − σ_j)` returns to the
+            // two ends of its variation, `E = 2^40 ∂/∂D` from the value (`p Re(conj(δỹ_i) D ṽ_j)/D`) and the
+            // lock (`δs (2 P 2^30 − 2 D Q)` over the lock's grains), then `δσ_i −= sgn b D E`, `δσ_j += sgn b D E`.
+            if let Some(p) = paces.row[h] {
+                let sigma = &paces.sigma[p];
+                for i in 0..sites {
+                    for (k, src) in rows[i].iter().enumerate() {
+                        let j = src.j as usize;
+                        let sgn = (sigma[i] - sigma[j]).signum() as i128;
+                        if sgn == 0 {
+                            continue;
+                        }
+                        for l in 0..n {
+                            let (dec, g_) = self.pair_decay(paces, h, l, i, j);
+                            let inner = dyh[i * span + l] as i128 * vh[j * span + l] as i128 + dyh[i * span + n + l] as i128 * vh[j * span + n + l] as i128;
+                            let value = release(src.p as i128 * inner, SHARE_BITS);
+                            let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
+                            let bracket = (2 * (wr * kr + wi * ki) << g_) - 2 * dec * (kr * kr + ki * ki);
+                            let lock = release(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
+                            gsig[p][i] -= sgn * at;
+                            gsig[p][j] += sgn * at;
+                        }
+                    }
+                    for (k, c) in crowds[i].iter().enumerate() {
+                        let right = c.lo > i;
+                        let e = if right { i + (1 << c.level) } else { i - (1 << c.level) };
+                        let sgn = (sigma[i] - sigma[e]).signum() as i128;
+                        if sgn == 0 {
+                            continue;
+                        }
+                        let count = c.count as i128;
+                        for l in 0..n {
+                            let (dec, g_) = self.octave_decay(paces, h, l, i, c.level, right);
+                            let (vr, vi) = (sums.value(c.lo, c.hi, l), sums.value(c.lo, c.hi, n + l));
+                            let inner = dyh[i * span + l] as i128 * vr + dyh[i * span + n + l] as i128 * vi;
+                            let value = div_nearest(release(c.e as i128 * inner, SHARE_BITS), count);
+                            let (wr, wi) = (ph[i * span + l] as i128, ph[i * span + n + l] as i128);
+                            let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
+                            let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
+                            let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
+                            let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
+                            gsig[p][i] -= sgn * at;
+                            gsig[p][e] += sgn * at;
+                        }
+                    }
+                }
+            }
+            // Each mode's lock ([`lock`]) returns to its two words: to the receiver's probe
+            // `δp̃_i += Σ_(j∈S_i) δs_ij D(|i − j|) k̃_j`, to each source's key `δk̃_j += Σ_(i: j∈S_i) δs_ij (D p̃_i − D² k̃_j)`,
+            // and a crowd's `δs_C D k̄/|C|` to its receiver's probe and `δs_C (D p̃_i/|C| − D² k̄/|C|²)` to each
+            // member's key; each sum released to 2^(−24).
+            let mut col = vec![0i128; sites * span];
+            let mut crowd_w = vec![0i128; (sites + 1) * span];
+            for i in 0..sites {
+                for (k, src) in rows[i].iter().enumerate() {
+                    let j = src.j as usize;
+                    for r in 0..span {
+                        let (dec, g) = self.pair_decay(paces, h, r % n, i, j);
+                        // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
+                        // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
+                        let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
+                        col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
+                    }
+                }
+                for (k, c) in crowds[i].iter().enumerate() {
+                    for r in 0..span {
+                        let (dec, g) = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
+                        let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
+                        let bracket = release(((dec * ph[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
+                        let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
+                        crowd_w[c.lo * span + r] += part;
+                        crowd_w[(c.hi + 1) * span + r] -= part;
+                    }
+                }
+            }
+            let spread_w = prefixed(&crowd_w);
+            for i in 0..sites {
+                for r in 0..span {
+                    let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * self.pair_decay(paces, h, r % n, i, src.j as usize).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
+                        + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k] * self.octave_decay(paces, h, r % n, i, c.level, c.lo > i).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
+                    // Held in the framed chart until the frame is undone below.
+                    let c = h * n + r % n;
+                    let slot = if r < n { c } else { m + c };
+                    dp[i * m2 + slot] = fit64(release(sq, back))?;
+                    dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
+                    if definite[i] {
+                        dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
+                    }
+                }
+            }
+        }
+        // The word's return through its ratio to its own power, head by head:
+        // `δw̃ = (δŵ − ŵ ⟨ŵ, δŵ⟩/2n) / ‖w̃‖_rms` (`ratio_adjoint`), still in the framed chart.
+        for h in 0..heads {
+            for t in 0..sites {
+                let at = (h * sites + t) * span;
+                let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
+                let unit: Vec<i32> = cell.q[at..at + span].iter().map(|&v| v as i32).collect();
+                let cov: Vec<i64> = (0..span).map(|r| dq[slot(r)]).collect();
+                let back = ratio_adjoint(&unit, cell.qscale[h * sites + t], &cov)?;
+                for (r, b) in back.into_iter().enumerate() {
+                    dq[slot(r)] = b;
+                }
+            }
+        }
+        // The probe's return through its own power, alike (§16.19).
+        for h in 0..heads {
+            for t in 0..sites {
+                let at = (h * sites + t) * span;
+                let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
+                let unit: Vec<i32> = cell.pq[at..at + span].iter().map(|&v| v as i32).collect();
+                let cov: Vec<i64> = (0..span).map(|r| dp[slot(r)]).collect();
+                if cov.iter().all(|&c| c == 0) {
+                    continue;
+                }
+                let back = ratio_adjoint(&unit, cell.pscale[h * sites + t], &cov)?;
+                for (r, b) in back.into_iter().enumerate() {
+                    dp[slot(r)] = b;
+                }
+            }
+        }
+        // Undo the frame: δw = conj(U) δw̃, and so for the values.
+        for t in 0..sites {
+            for c in 0..m {
+                let (ur, ui) = self.frame(paces, t, c / n, c % n);
+                let (ur, ui) = (ur as i128, ui as i128);
+                for chart in [&mut dq, &mut dv, &mut dp] {
+                    let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
+                    chart[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
+                    chart[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
+                }
+            }
+        }
+        // A paced head's frames turn its word, value and probe by `τ_t` (§16): `δτ_t += b Re(conj(δw) i w)` on
+        // each, read in the unframed chart (the frame is a turn, so the pairing is the framed one's).
+        for h in 0..heads {
+            let Some(p) = paces.row[h] else { continue };
+            for t in 0..sites {
+                for li in 0..n {
+                    let c = h * n + li;
+                    let b = self.turn_rate(self.slot(h, li));
+                    for (chart, word) in [(&dq, &cell.word), (&dv, &cell.vword), (&dp, &cell.probe)] {
+                        let a = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
+                        let z = (word[t * m2 + c] as i128, word[t * m2 + m + c] as i128);
+                        gtau[p][t] += turned_back(b, a, z)?;
+                    }
+                }
+            }
+        }
+        // The values' and the probes' covectors at the moment modes, summed over the ticks (§15.1, §16.20).
+        for ((slot, &v), &p) in dm.iter_mut().zip(&dv).zip(&dp) {
+            *slot += v as i128 + p as i128;
+        }
+        let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
+        let mut dr_all = vec![0i64; sites * dw];
+        for (w, bias, reach_w, dfam) in [(l.q, l.q_bias, reaches.q, &dq), (l.v, l.v_bias, reaches.v, &dv), (l.probe, l.probe_bias, reaches.probe, &dp)] {
+            let rows: Vec<&[i64]> = dfam.chunks_exact(m2).collect();
+            outer_sum(&mut g[w..w + m2 * dw], dw, &rows, &reads)?;
+            let mut back = vec![0i64; dw];
+            for t in 0..sites {
+                for (e, &v) in rows[t].iter().enumerate() {
+                    g[bias + e] += v as i128;
+                }
+                transposed(&self.theta[w..w + m2 * dw], reach_w, dw, rows[t], MATERIAL_BITS, &mut back)?;
+                for i in 0..dw {
+                    dr_all[t * dw + i] = fit64(dr_all[t * dw + i] as i128 + back[i] as i128)?;
+                }
+            }
+        }
+        for t in 0..sites {
+            let back = ratio_adjoint(reads[t], cell.scale[t], &dr_all[t * dw..(t + 1) * dw])?;
+            for i in 0..dw {
+                dx[t * dw + i] = fit64(dmid[t * dw + i] as i128 + back[i] as i128)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
+    /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
+    fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m, n) = (d.width, d.complex(), d.modes);
+        let m2 = 2 * m;
+        let sites = region.classes.len();
+        let l = &self.layout;
+        let reaches = self.reaches();
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
@@ -2485,394 +2889,7 @@ impl Field {
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
         for cell in pass.ticks.iter().rev() {
-            // The pair contact: x_out = x_mid + W_c c + b_c.
-            let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
-            for dxt in &dxs {
-                for (i, &v) in dxt.iter().enumerate() {
-                    g[l.w_bias + i] += v as i128;
-                }
-            }
-            let cs: Vec<&[i64]> = cell.c.chunks_exact(f).collect();
-            outer_sum(&mut g[l.w..l.w + dw * f], f, &dxs, &cs)?;
-            let mut da = vec![0i64; sites * f];
-            let mut db = vec![0i64; sites * f];
-            let mut dc = vec![0i64; sites * f];
-            for t in 0..sites {
-                transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
-            }
-            // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
-            // (§16.34); each site's `b` is one mate's, so each `δb_s` is one term.
-            let half = f / 2;
-            for t in 0..sites {
-                for e in 0..half {
-                    let Some(s) = strand_mate(t, e, sites) else { continue };
-                    let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
-                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                    let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
-                    da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
-                    da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
-                    db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
-                    db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
-                }
-            }
-            let das: Vec<&[i64]> = da.chunks_exact(f).collect();
-            let dbs: Vec<&[i64]> = db.chunks_exact(f).collect();
-            let r2s: Vec<&[i32]> = cell.read2.chunks_exact(dw).collect();
-            outer_sum(&mut g[l.a..l.a + f * dw], dw, &das, &r2s)?;
-            outer_sum(&mut g[l.b..l.b + f * dw], dw, &dbs, &r2s)?;
-            for t in 0..sites {
-                for e in 0..f {
-                    g[l.a_bias + e] += das[t][e] as i128;
-                    g[l.b_bias + e] += dbs[t][e] as i128;
-                }
-            }
-            let mut dmid = vec![0i64; sites * dw];
-            let mut ra = vec![0i64; dw];
-            let mut rb = vec![0i64; dw];
-            for t in 0..sites {
-                transposed(&self.theta[l.a..l.a + f * dw], reaches.a, dw, das[t], MATERIAL_BITS, &mut ra)?;
-                transposed(&self.theta[l.b..l.b + f * dw], reaches.b, dw, dbs[t], MATERIAL_BITS, &mut rb)?;
-                let dr: Vec<i64> = ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect();
-                let back = ratio_adjoint(r2s[t], cell.scale2[t], &dr)?;
-                for i in 0..dw {
-                    dmid[t * dw + i] = fit64(dx[t * dw + i] as i128 + back[i] as i128)?;
-                }
-            }
-            // The current: x_mid = x_in + O y + b_o.
-            let dms: Vec<&[i64]> = dmid.chunks_exact(dw).collect();
-            for dmt in &dms {
-                for (i, &v) in dmt.iter().enumerate() {
-                    g[l.out_bias + i] += v as i128;
-                }
-            }
-            let ys: Vec<&[i64]> = cell.y.chunks_exact(m2).collect();
-            outer_sum(&mut g[l.out..l.out + dw * m2], m2, &dms, &ys)?;
-            let mut dy = vec![0i64; sites * m2];
-            for t in 0..sites {
-                transposed(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, dms[t], MATERIAL_BITS, &mut dy[t * m2..(t + 1) * m2])?;
-            }
-            // The weights and the contact over each site's support, head by head.
-            let mut dq = vec![0i64; sites * m2];
-            let mut dv = vec![0i64; sites * m2];
-            let mut dp = vec![0i64; sites * m2];
-            let mut dyh = vec![0i64; sites * span];
-            // The current's covectors of this tick `[h][t][2n]`, where read ([`Field::row_currents`]).
-            if let Some(c) = currents.as_deref_mut() {
-                c.push(vec![0i64; heads * sites * span]);
-            }
-            for h in 0..heads {
-                // A paced head's current returns to the receiver's frame `y = conj(U) ỹ`, turned by `τ_i`:
-                // `δτ_i −= b Re(conj(δy_i) i y_i)` (§16).
-                if let Some(p) = paces.row[h] {
-                    for t in 0..sites {
-                        for li in 0..n {
-                            let c = h * n + li;
-                            let a = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
-                            let z = (cell.y[t * m2 + c] as i128, cell.y[t * m2 + m + c] as i128);
-                            gtau[p][t] -= turned_back(self.turn_rate(self.slot(h, li)), a, z)?;
-                        }
-                    }
-                }
-                // δỹ_i = U_i δy_i, the adjoint of the return to the receiver's frame.
-                for t in 0..sites {
-                    for li in 0..n {
-                        let c = h * n + li;
-                        let (ur, ui) = self.frame(paces, t, h, li);
-                        let (ur, ui) = (ur as i128, ui as i128);
-                        let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
-                        dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
-                        dyh[t * span + n + li] = fit64(release(ui * gr + ur * gi, MOVE_BITS))?;
-                    }
-                }
-                if let Some(c) = currents.as_deref_mut() {
-                    let last = c.last_mut().expect("pushed above");
-                    last[h * sites * span..(h + 1) * sites * span].copy_from_slice(&dyh);
-                }
-                let rows = &cell.rows[h * sites..(h + 1) * sites];
-                let crowds = &cell.crowds[h * sites..(h + 1) * sites];
-                let sums = &cell.sums[h];
-                let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
-                let qh = &cell.q[h * sites * span..(h + 1) * sites * span];
-                let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
-                // A receiver's probe word (§16.19).
-                let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
-                let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
-                // The values' return: `δṽ_jm = Σ_(i: j∈S_i) p_ij,m D_m(|i − j|) δỹ_im` with each term's
-                // share `p` on `2^(−63)` (one integer sum, released once); a crowd's share is spread over
-                // its members, `p_C/|C|` each, through a difference array over the places.
-                let mut sv = vec![0i128; sites * span];
-                let mut crowd_v = vec![0i128; (sites + 1) * span];
-                for i in 0..sites {
-                    for src in &rows[i] {
-                        let j = src.j as usize;
-                        for r in 0..span {
-                            sv[j * span + r] += src.p as i128 * decayed(self.pair_decay(paces, h, r % n, i, j), dyh[i * span + r]);
-                        }
-                    }
-                    for c in &crowds[i] {
-                        for r in 0..span {
-                            let part = div_nearest(c.e as i128 * decayed(self.octave_decay(paces, h, r % n, i, c.level, c.lo > i), dyh[i * span + r]), c.count as i128);
-                            crowd_v[c.lo * span + r] += part;
-                            crowd_v[(c.hi + 1) * span + r] -= part;
-                        }
-                    }
-                }
-                // A difference array's running prefix over the places (`[t][r]`).
-                let prefixed = |diff: &[i128]| -> Vec<i128> {
-                    let mut out = diff[..sites * span].to_vec();
-                    for t in 1..sites {
-                        for r in 0..span {
-                            out[t * span + r] += out[(t - 1) * span + r];
-                        }
-                    }
-                    out
-                };
-                let spread_v = prefixed(&crowd_v);
-                for j in 0..sites {
-                    for r in 0..span {
-                        // Held in the framed chart until the frame is undone below.
-                        let c = h * n + r % n;
-                        let slot = j * m2 + if r < n { c } else { m + c };
-                        dv[slot] = fit64(release(sv[j * span + r], SHARE_BITS))?;
-                        if definite[j] {
-                            dv[slot] = fit64(dv[slot] as i128 + release(spread_v[j * span + r], SHARE_BITS))?;
-                        }
-                    }
-                }
-                // `δz_k = ln 2 · p_k (δp_k − μ)`, `δp_k = ⟨δỹ_i, D ṽ_k⟩` on 2^(−40) (a crowd's value its decayed
-                // mean), `μ = Σ_k p_k δp_k`; the falloff is the medium's constant and returns nothing. Then
-                // `δs = 2^(−β) δz`.
-                let mut ds: Vec<Vec<i128>> = Vec::with_capacity(sites);
-                let mut dsc: Vec<Vec<i128>> = Vec::with_capacity(sites);
-                for i in 0..sites {
-                    let (row, crowd) = (&rows[i], &crowds[i]);
-                    let dyi = &dyh[i * span..(i + 1) * span];
-                    let kind = usize::from(cell.classes[h].listens(i));
-                    let temper = self.temper(h, kind == 1)?;
-                    let dp: Vec<i128> = row
-                        .iter()
-                        .map(|src| {
-                            let j = src.j as usize;
-                            (0..n).map(|l| { let decay = self.pair_decay(paces, h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
-                        })
-                        .collect();
-                    let dpc: Vec<i128> = crowd
-                        .iter()
-                        .map(|c| {
-                            let pairs: i128 = (0..n).map(|l| { let decay = self.octave_decay(paces, h, l, i, c.level, c.lo > i); dyi[l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, l)) + dyi[n + l] as i128 * decayed_wide(decay, sums.value(c.lo, c.hi, n + l)) }).sum();
-                            div_nearest(pairs, c.count as i128)
-                        })
-                        .collect();
-                    let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p as i128 * dpj).sum::<i128>() + crowd.iter().zip(&dpc).map(|(c, &dpj)| c.e as i128 * dpj).sum::<i128>(), SHARE_BITS);
-                    let compare = |p: i128, dpk: i128| -> i128 { release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS) };
-                    let mut out = Vec::with_capacity(row.len());
-                    let mut dt = 0i128;
-                    for (src, &dpj) in row.iter().zip(&dp) {
-                        let dz = compare(src.p as i128, dpj);
-                        dt += release(dz * src.s as i128, FACE_BITS);
-                        let dsij = release(temper * dz, MATERIAL_BITS);
-                        if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
-                            return refuse("a contact's covector past its return's carrier");
-                        }
-                        out.push(dsij);
-                    }
-                    let mut outc = Vec::with_capacity(crowd.len());
-                    for (c, &dpj) in crowd.iter().zip(&dpc) {
-                        let dz = compare(c.e as i128, dpj);
-                        dt += release(dz * c.s as i128, FACE_BITS);
-                        let dsij = release(temper * dz, MATERIAL_BITS);
-                        if dsij.unsigned_abs() >> d.contact_return_bits() != 0 {
-                            return refuse("a contact's covector past its return's carrier");
-                        }
-                        outc.push(dsij);
-                    }
-                    // Into the temperature's own chart (§16.12), the row's.
-                    g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
-                    if let Some(sh) = shares.as_deref_mut() {
-                        for (src, &v) in row.iter().zip(&out) {
-                            sh[2 * h + usize::from(i.abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();
-                        }
-                        sh[2 * h + 1] += outc.iter().map(|v| v.unsigned_abs()).sum::<u128>();
-                    }
-                    ds.push(out);
-                    dsc.push(outc);
-                }
-                // A paced head's skins follow its turn (§16): each pair's and crowd's `D(σ_i − σ_j)` returns to the
-                // two ends of its variation, `E = 2^40 ∂/∂D` from the value (`p Re(conj(δỹ_i) D ṽ_j)/D`) and the
-                // lock (`δs (2 P 2^30 − 2 D Q)` over the lock's grains), then `δσ_i −= sgn b D E`, `δσ_j += sgn b D E`.
-                if let Some(p) = paces.row[h] {
-                    let sigma = &paces.sigma[p];
-                    for i in 0..sites {
-                        for (k, src) in rows[i].iter().enumerate() {
-                            let j = src.j as usize;
-                            let sgn = (sigma[i] - sigma[j]).signum() as i128;
-                            if sgn == 0 {
-                                continue;
-                            }
-                            for l in 0..n {
-                                let (dec, g_) = self.pair_decay(paces, h, l, i, j);
-                                let inner = dyh[i * span + l] as i128 * vh[j * span + l] as i128 + dyh[i * span + n + l] as i128 * vh[j * span + n + l] as i128;
-                                let value = release(src.p as i128 * inner, SHARE_BITS);
-                                let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
-                                let bracket = (2 * (wr * kr + wi * ki) << g_) - 2 * dec * (kr * kr + ki * ki);
-                                let lock = release(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
-                                let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
-                                gsig[p][i] -= sgn * at;
-                                gsig[p][j] += sgn * at;
-                            }
-                        }
-                        for (k, c) in crowds[i].iter().enumerate() {
-                            let right = c.lo > i;
-                            let e = if right { i + (1 << c.level) } else { i - (1 << c.level) };
-                            let sgn = (sigma[i] - sigma[e]).signum() as i128;
-                            if sgn == 0 {
-                                continue;
-                            }
-                            let count = c.count as i128;
-                            for l in 0..n {
-                                let (dec, g_) = self.octave_decay(paces, h, l, i, c.level, right);
-                                let (vr, vi) = (sums.value(c.lo, c.hi, l), sums.value(c.lo, c.hi, n + l));
-                                let inner = dyh[i * span + l] as i128 * vr + dyh[i * span + n + l] as i128 * vi;
-                                let value = div_nearest(release(c.e as i128 * inner, SHARE_BITS), count);
-                                let (wr, wi) = (ph[i * span + l] as i128, ph[i * span + n + l] as i128);
-                                let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
-                                let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
-                                let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
-                                let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
-                                gsig[p][i] -= sgn * at;
-                                gsig[p][e] += sgn * at;
-                            }
-                        }
-                    }
-                }
-                // Each mode's lock ([`lock`]) returns to its two words: to the receiver's probe
-                // `δp̃_i += Σ_(j∈S_i) δs_ij D(|i − j|) k̃_j`, to each source's key `δk̃_j += Σ_(i: j∈S_i) δs_ij (D p̃_i − D² k̃_j)`,
-                // and a crowd's `δs_C D k̄/|C|` to its receiver's probe and `δs_C (D p̃_i/|C| − D² k̄/|C|²)` to each
-                // member's key; each sum released to 2^(−24).
-                let mut col = vec![0i128; sites * span];
-                let mut crowd_w = vec![0i128; (sites + 1) * span];
-                for i in 0..sites {
-                    for (k, src) in rows[i].iter().enumerate() {
-                        let j = src.j as usize;
-                        for r in 0..span {
-                            let (dec, g) = self.pair_decay(paces, h, r % n, i, j);
-                            // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
-                            // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
-                            let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
-                            col[j * span + r] = col[j * span + r].checked_add(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?).ok_or(TowerError::Refused(KEY_RETURN))?;
-                        }
-                    }
-                    for (k, c) in crowds[i].iter().enumerate() {
-                        for r in 0..span {
-                            let (dec, g) = self.octave_decay(paces, h, r % n, i, c.level, c.lo > i);
-                            let mean = sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r];
-                            let bracket = release(((dec * ph[i * span + r] as i128 * c.count as i128) << g) - dec * dec * mean, g);
-                            let part = div_nearest(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(KEY_RETURN))?, (c.count * c.count) as i128);
-                            crowd_w[c.lo * span + r] += part;
-                            crowd_w[(c.hi + 1) * span + r] -= part;
-                        }
-                    }
-                }
-                let spread_w = prefixed(&crowd_w);
-                for i in 0..sites {
-                    for r in 0..span {
-                        let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * self.pair_decay(paces, h, r % n, i, src.j as usize).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
-                            + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k] * self.octave_decay(paces, h, r % n, i, c.level, c.lo > i).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
-                        // Held in the framed chart until the frame is undone below.
-                        let c = h * n + r % n;
-                        let slot = if r < n { c } else { m + c };
-                        dp[i * m2 + slot] = fit64(release(sq, back))?;
-                        dq[i * m2 + slot] = fit64(release(col[i * span + r], back))?;
-                        if definite[i] {
-                            dq[i * m2 + slot] = fit64(dq[i * m2 + slot] as i128 + release(spread_w[i * span + r], back))?;
-                        }
-                    }
-                }
-            }
-            // The word's return through its ratio to its own power, head by head:
-            // `δw̃ = (δŵ − ŵ ⟨ŵ, δŵ⟩/2n) / ‖w̃‖_rms` (`ratio_adjoint`), still in the framed chart.
-            for h in 0..heads {
-                for t in 0..sites {
-                    let at = (h * sites + t) * span;
-                    let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
-                    let unit: Vec<i32> = cell.q[at..at + span].iter().map(|&v| v as i32).collect();
-                    let cov: Vec<i64> = (0..span).map(|r| dq[slot(r)]).collect();
-                    let back = ratio_adjoint(&unit, cell.qscale[h * sites + t], &cov)?;
-                    for (r, b) in back.into_iter().enumerate() {
-                        dq[slot(r)] = b;
-                    }
-                }
-            }
-            // The probe's return through its own power, alike (§16.19).
-            for h in 0..heads {
-                for t in 0..sites {
-                    let at = (h * sites + t) * span;
-                    let slot = |r: usize| t * m2 + if r < n { h * n + r } else { m + h * n + r - n };
-                    let unit: Vec<i32> = cell.pq[at..at + span].iter().map(|&v| v as i32).collect();
-                    let cov: Vec<i64> = (0..span).map(|r| dp[slot(r)]).collect();
-                    if cov.iter().all(|&c| c == 0) {
-                        continue;
-                    }
-                    let back = ratio_adjoint(&unit, cell.pscale[h * sites + t], &cov)?;
-                    for (r, b) in back.into_iter().enumerate() {
-                        dp[slot(r)] = b;
-                    }
-                }
-            }
-            // Undo the frame: δw = conj(U) δw̃, and so for the values.
-            for t in 0..sites {
-                for c in 0..m {
-                    let (ur, ui) = self.frame(paces, t, c / n, c % n);
-                    let (ur, ui) = (ur as i128, ui as i128);
-                    for chart in [&mut dq, &mut dv, &mut dp] {
-                        let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
-                        chart[t * m2 + c] = fit64(release(ur * gr + ui * gi, MOVE_BITS))?;
-                        chart[t * m2 + m + c] = fit64(release(ur * gi - ui * gr, MOVE_BITS))?;
-                    }
-                }
-            }
-            // A paced head's frames turn its word, value and probe by `τ_t` (§16): `δτ_t += b Re(conj(δw) i w)` on
-            // each, read in the unframed chart (the frame is a turn, so the pairing is the framed one's).
-            for h in 0..heads {
-                let Some(p) = paces.row[h] else { continue };
-                for t in 0..sites {
-                    for li in 0..n {
-                        let c = h * n + li;
-                        let b = self.turn_rate(self.slot(h, li));
-                        for (chart, word) in [(&dq, &cell.word), (&dv, &cell.vword), (&dp, &cell.probe)] {
-                            let a = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
-                            let z = (word[t * m2 + c] as i128, word[t * m2 + m + c] as i128);
-                            gtau[p][t] += turned_back(b, a, z)?;
-                        }
-                    }
-                }
-            }
-            // The values' and the probes' covectors at the moment modes, summed over the ticks (§15.1, §16.20).
-            for ((slot, &v), &p) in dm.iter_mut().zip(&dv).zip(&dp) {
-                *slot += v as i128 + p as i128;
-            }
-            let reads: Vec<&[i32]> = cell.read.chunks_exact(dw).collect();
-            let mut dr_all = vec![0i64; sites * dw];
-            for (w, bias, reach_w, dfam) in [(l.q, l.q_bias, reaches.q, &dq), (l.v, l.v_bias, reaches.v, &dv), (l.probe, l.probe_bias, reaches.probe, &dp)] {
-                let rows: Vec<&[i64]> = dfam.chunks_exact(m2).collect();
-                outer_sum(&mut g[w..w + m2 * dw], dw, &rows, &reads)?;
-                let mut back = vec![0i64; dw];
-                for t in 0..sites {
-                    for (e, &v) in rows[t].iter().enumerate() {
-                        g[bias + e] += v as i128;
-                    }
-                    transposed(&self.theta[w..w + m2 * dw], reach_w, dw, rows[t], MATERIAL_BITS, &mut back)?;
-                    for i in 0..dw {
-                        dr_all[t * dw + i] = fit64(dr_all[t * dw + i] as i128 + back[i] as i128)?;
-                    }
-                }
-            }
-            for t in 0..sites {
-                let back = ratio_adjoint(reads[t], cell.scale[t], &dr_all[t * dw..(t + 1) * dw])?;
-                for i in 0..dw {
-                    dx[t * dw + i] = fit64(dmid[t * dw + i] as i128 + back[i] as i128)?;
-                }
-            }
+            self.tick_return(cell, &mut dx, g, paces, &definite, &mut dm, &mut gtau, &mut gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
         }
         // The moment's chart into the face (§16.22): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`, and the moments'
         // covector `δs_t += Cᵀ δx⁰_t`, joined to the values' and the probes' before the strands' return.
