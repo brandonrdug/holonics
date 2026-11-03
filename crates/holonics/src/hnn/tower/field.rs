@@ -175,7 +175,7 @@
 //! the release's sweeps); the **cell holonomy** (the release's circulation receipt) and the **tower
 //! thread** (the octave falloff) stay attached.
 
-use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+use super::{affine, covector, deposit_step, div_nearest, exp_series, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
 use crate::hnn::keyed_modes::{ln2_face, Exponential};
 use rayon::prelude::*;
 
@@ -716,6 +716,24 @@ pub struct Region<'a> {
     pub locked: &'a [bool],
     /// Each carried site's echo (§15.3, [`Echo`]); empty where no site carries one.
     pub echo: &'a [Option<Echo>],
+    /// [definition; agent-inferred, November 2, §16.23] **The sites the open ones were drawn from**: `m` where the
+    /// region's `K` unresolved sites are a state of a reading order of `m` sites, so its code is weighed `m/K`
+    /// ([`Region::weight`]); `None` where the open sites are the whole of what is read (weight one).
+    pub domain: Option<usize>,
+}
+
+impl Region<'_> {
+    /// [definition; agent-inferred, November 2, §16.23] **A state's weight in the joint code**, `(m, K)`: of the `m`
+    /// sites of its domain `K` are open, so the region's code `Σ_open −log₂ p̂` read at `m/K` is an unbiased reading of
+    /// the order-averaged joint code `E_σ L_σ` when `K` is uniform on `1..m` and the open set uniform given `K` (the
+    /// order-agnostic bound). `(K, K)` where no domain is declared, and `(1, 1)` with nothing open.
+    pub fn weight(&self) -> (u64, u64) {
+        let open = self.unresolved.iter().filter(|&&u| u).count() as u64;
+        if open == 0 {
+            return (1, 1);
+        }
+        (self.domain.map_or(open, |m| m as u64), open)
+    }
 }
 
 /// [definition; agent-inferred, November 1] **A read leaves its own echo out** (the dispersing field's
@@ -2312,14 +2330,21 @@ impl Field {
         let paced = paces.kappa.len();
         let (mut gtau, mut gsig) = (vec![vec![0i128; sites]; paced], vec![vec![0i128; sites]; paced]);
         let mut dm = vec![0i128; sites * m2];
-        // The face.
+        // The face, its covector weighed as the region's state in the joint code (§16.23): `release(δz · m/K)` on the
+        // covector's grain, to the nearest, half away from zero.
         let mut dx = vec![0i64; sites * dw];
         {
+            let (wm, wk) = region.weight();
             let mut ys: Vec<Vec<i64>> = Vec::new();
             let mut xs: Vec<&[i32]> = Vec::new();
             for t in 0..sites {
                 let Some(face) = &pass.faces[t] else { continue };
-                let dz = covector(face, region.classes[t]);
+                let mut dz = covector(face, region.classes[t]);
+                if wm != wk {
+                    for v in dz.iter_mut() {
+                        *v = fit64(div_nearest(*v as i128 * wm as i128, wk as i128))?;
+                    }
+                }
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }
@@ -2919,7 +2944,7 @@ impl Field {
             // The views: the question, the reached sites and the five past the front.
             let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void))).collect();
             let reads = {
-                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, echo: &v.echo }).collect();
+                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, echo: &v.echo, domain: None }).collect();
                 read(&regions)?
             };
             let logits: Vec<&Vec<Option<Vec<i64>>>> = reads.iter().map(|r| &r.logits).collect();
@@ -3544,6 +3569,7 @@ pub struct FieldNext {
 /// section before deposited on this section's regions.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FieldReceipt {
+    /// The sites the codes are of: each region's domain where it read an open site (§16.23).
     pub sites: usize,
     pub code_before: i64,
     pub code_after: i64,
@@ -3566,8 +3592,15 @@ fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Vec<(u128, 
     faces.iter().zip(regions).flat_map(|(f, r)| f.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total)))).collect()
 }
 
-fn code_of(pairs: &[(u128, u128)]) -> i64 {
-    pairs.par_iter().map(|&(m, t)| face_code(m, t)).sum()
+/// Each region's run of compared sites and its weight in the joint code, `(K, m, K)` ([`Region::weight`], §16.23), in
+/// the order [`compared`] reads them.
+fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
+    regions.iter().map(|r| { let (m, k) = r.weight(); (r.unresolved.iter().filter(|&&u| u).count(), m, k) }).collect()
+}
+
+/// The regions' weighed code on `2^(−20)` bits (§16.23, [`super::weighed_code`]).
+fn code_of(pairs: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> i64 {
+    weighed_code(pairs, spans)
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
@@ -3613,15 +3646,16 @@ struct Scaled {
 /// reached 9 to 18 on 14 sections; their direction, not their size, raised the code, which the
 /// parabola reads from two reads where the halvings read it from a dozen.
 fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
-    let stands = |new: &[(u128, u128)]| if strict { fewer_bits(old, new) } else { !fewer_bits(new, old) };
-    let code_old = code_of(old);
+    let spans = spans_of(regions);
+    let stands = |new: &[(u128, u128)]| if strict { fewer_bits_weighed(old, new, &spans) } else { !fewer_bits_weighed(new, old, &spans) };
+    let code_old = code_of(old, &spans);
     let (full, moved) = stepped(base, step, h0)?;
     if !moved {
         return Ok(Scaled { change: 0, halvings: 0, standing: None });
     }
     let full_faces = realization.read_faces(&full, regions)?;
     let at_full = compared(&full_faces, regions);
-    let change = code_of(&at_full) - code_old;
+    let change = code_of(&at_full, &spans) - code_old;
     if stands(&at_full) {
         return Ok(Scaled { change, halvings: 0, standing: Some((full, full_faces)) });
     }
@@ -3636,7 +3670,7 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bo
         return Ok(Scaled { change, halvings: 1, standing: Some((half, half_faces)) });
     }
     // The parabola through the two excesses (on the codes' `2^(−20)` bits).
-    let (e1, e2) = (i128::from(change), i128::from(code_of(&at_half) - code_old));
+    let (e1, e2) = (i128::from(change), i128::from(code_of(&at_half, &spans) - code_old));
     let a = 4 * e2 - e1;
     if e1 <= 0 || e2 <= 0 || a >= 0 {
         return Ok(nowhere(1));
@@ -3794,11 +3828,13 @@ impl FieldLearner {
         let (faces, g, next) = self.open(regions, realization, true)?;
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let faces_old = compared(&faces, regions);
-        let code_before = code_of(&faces_old);
-        let sites = faces_old.len();
-        if sites == 0 {
+        let spans = spans_of(regions);
+        let code_before = code_of(&faces_old, &spans);
+        if faces_old.is_empty() {
             return refuse("a section with no unresolved site");
         }
+        // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum();
         for &(start, len, grain) in self.field.families() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -3825,7 +3861,7 @@ impl FieldLearner {
         let Some((candidate, faces_new)) = scale.standing else {
             return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
         };
-        let code_after = code_of(&compared(&faces_new, regions));
+        let code_after = code_of(&compared(&faces_new, regions), &spans);
         self.field = candidate;
         self.held = Some(HeldStep { step, halvings });
         Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })

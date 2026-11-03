@@ -2199,3 +2199,52 @@ share, current and release equal, in 195.9 s against 210 s projected (0.93; host
 counted the material from the paces to its end, so it took in the moment's chart and its bias appended after them
 (1,024 drawn entries, then 32 once the bias moved: 1,024, 1,056 and 1,302 against 0, 0 and 246 before); the paces
 themselves moved as before, and the count now reads the pace family alone. Receipt: `_receipts/law22/parity.txt`.
+
+### 16.23 Every code is the joint code, and the question is read by it (#602)
+
+[decision; November 2, the comparison record's §2.2, §2.3 and §3.2, which Brandon gave authority over Athena's
+architecture] Two of the field's readings were not what they were named.
+- **Training's code was a pseudo-likelihood.** A mask opens each site at the density `τ`, `τ` uniform on `(0, 1]`, so
+  the open count `K` among the `m` sites of its domain is uniform and the open set uniform given `K`: the masks already
+  draw the states of a random reading order. The weight was missing. The order-averaged joint code is
+  `E_σ L_σ = E_(K~U{1..m}) (m/K) Σ_(open) −log₂ p̂`, and the unweighed sum's minimum is no description length.
+- **The context read saw the question only where the answer does not restate itself.** By the chain rule it reads
+  `I(Q; A_open | A_res)`, whose ceiling on GSM8K is about 0.18 bits a byte, nearly all of it names: the 0.1 mark read
+  the copier's channel. It stays as a reading of completion; its question effect and the early stop on it are retired.
+
+[definition; agent-inferred, November 2] **A state is weighed `m/K`.** A region declares the domain its open sites
+were drawn from (`Region::domain`); its weight is `(m, K)` ([`Region::weight`]), one where none is declared.
+- **Training.** A mask's domain is its whole region (the question is masked as the answer is), a front region's the
+  answer's sites before its cut (the question is never open there), and read 2 keeps read 1's. The held fronts of the
+  step's read declare none: every site from the front on is open, so the read is the whole of what is open.
+- **The covector.** The face's covector at each open site is `release(δz · m/K)` on its grain, to the nearest, half away
+  from zero, on the host (`returned_with`) and on the card (`field_face_weigh`, after `field_face_covector`); the rest of
+  the reverse is linear in it.
+- **The certificate.** A section's code is each region's code at its weight (`weighed_code`, released once a region).
+  The products cannot be formed under a rational weight, so the step is decided by partition alone
+  (`fewer_bits_weighed`): each region's readings are summed, the weighed difference and its weighed slack are exact
+  rationals of them, the readings are read at 32 digits and, inside the slack, at 60 (the readings' own floor); a
+  difference still inside the slack there is a tie, and a tie codes no fewer bits. With every weight one it is the
+  products' comparison as before. A section's receipt counts the sites of its regions' domains.
+- **The joint read** (`joint_read`, every lap and at the founding): each held answer and its first void (`m` sites),
+  the question resolved, at one state for each of `D = 4` strata of `1..m` (`K_s` keyed uniform in its stratum, the
+  open sites keyed uniform among the `m`), each state's code weighed `|S_s|/K_s`: the stratified reading of
+  `E_σ L_σ(A | Q)`. The same states are read beside the next problem's question. The question's information is the
+  foil's code less the own, printed over every held answer site (`FIELD_JOINT`), by the answer's quarters and as the
+  quartiles of the problems' (`FIELD_JOINT_SERIES`), and each problem's series by site in the run's private
+  `JOINT.tsv`. It is not screened by the answer's restatements, so it holds the question's information about a
+  solution's plan as well as its names.
+
+Failures this could repeat, checked: **bits read as progress** (7) and **a sum replaced its series** (18): the joint read
+is a reading beside the releases, reported as its series, and the run's acceptance is the comparison record's §5 (the
+lock test, the joint read's information, the releases shown whole), never a code alone. **Seen material graded as
+unseen** (6): the joint read is the held problems', which no step is fit on. Owed to #410: the comparison record's
+§8 (d) and (e), the order-agnostic bound and the screening identity.
+
+[measurement, November 2] After the change: the gate clean (278 s); the tower's and the field's tests 251 of 251, with
+`a_region_s_covector_is_weighed_by_its_domain` (the weighed covector is the unweighed one times `m/K` to the releases'
+rounding) and `the_weighed_certificate_reads_each_region_at_its_weight` (unit weights are the products' comparison; a
+region at weight three turns a decision the products make the other way; a tie codes no fewer bits); the run example's
+field tests 19 of 19, with `the_joint_states_stratify_the_reading_orders`. The sampled card parity, every training
+region weighed: every read, face, covector, learner, row, share, current and release equal, in 183.3 s against 210 s
+projected (0.87; host 75.0 s, card 0.50 s), peak resident set 2.3 GB. Receipt: `_receipts/law23/parity.txt`.
