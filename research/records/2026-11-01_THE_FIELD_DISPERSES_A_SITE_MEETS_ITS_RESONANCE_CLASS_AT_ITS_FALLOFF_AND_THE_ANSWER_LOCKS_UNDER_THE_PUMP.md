@@ -2347,3 +2347,36 @@ answer text and has not learned to begin an answer from its question; the releas
 glue every answer shares. That is the next loop's subject. Receipts: `_receipts/law24/run/receipts.txt` (the run's
 numeric lines) and `_receipts/law24/run/coupling.tsv` (each release's lengths, `λ` and `F*` against its own and its foil
 target); the releases are private.
+
+### 16.26 The face reads a class through the encoding that encodes it (#601)
+
+[definition; agent-inferred, November 3, the loss law and the comparison record's §3.1] The loss law compares the produced
+`|H⟩` with the target `|T⟩` "encoded through the same `E` and phase transport". The face read a class through its own
+readout `R` (`A × D`), so the comparison's covector reached the readout alone and never the encoding of the class it
+compared with: one strand moved. The face now reads each class through its row of the encoding:
+
+```text
+face     y_t = R r̂(x^K_t) + b_R          the lift, R of D × D on 2^(−24), b_R on 2^(−16)
+         z_t(a) = release(⟨E(a), y_t⟩, 16) + c_a      E(a) the encoding's row of class a, c the class bias
+return   δE(a)_i += release(δz_a y_i, 16) a term,   δy_i = release(Σ_a δz_a E(a)_i, 16),   then the lift's own return
+```
+
+- **Both strands move.** The covector at a class reaches its encoding at the face as well as at the opening, where the
+  same row encodes the site that holds the class. A current that carries a source's encoding is read by the face as
+  that class without a separate map learned for it.
+- **Founding.** `R` and `b_R` open at zero, so the face opens flat, as before.
+- **Growth.** The lift reads every face copy and writes the first copy of each coordinate only (each entry split evenly
+  over its column's copies, the bias the first copy's); the encoding's rows are repeated over the copies, so the grown
+  face is the old one exactly, and the copies part under learning.
+- **The card.** `field_affine_x32` forms the lift; `field_tied_face` reads the classes through the encoding;
+  `field_tied_back_e` returns the encoding's covector (each term released to its grain before the integer sum) and
+  `field_tied_back_y` the lift's. The state's head line is `hnn-field-v11`.
+
+Failures this could repeat, checked: **catered machinery** (1): the encoding is the field's own; the face names no class and
+no operation. **The native readout at the byte marginal** (4): the class bias `c` still carries the marginal; the face's
+dependence on the site is `⟨E(a), y⟩`, learned. **A located cause carried unrepaired** (§16.25): the opening's flat code is
+the subject; this change is the comparison law's own owed term and is read against it before any run.
+
+Verification (November 3): the tower and coupling library tests (252 and 14), the field example tests (18), the card build, the
+card parity on four GSM8K sections and one release (15 reads, 0 faces, covector entries or learners unequal; 358 s against a
+360 s deadline) and the gate (0 failed). Receipts: `_receipts/law26/check.txt`, `_receipts/law26/parity.txt`.
