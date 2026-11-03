@@ -141,7 +141,8 @@
 //! ([`Field::sample_realized`]): training reads a region whose open sites are a uniform state of a random reading
 //! order; the writer opens every answer place beside the known question and resolves them in one keyed random order,
 //! each drawn from its own face at temperature one on the read of the region as it stands, every place resolved before it
-//! known. Every place is written, a place drawn as the void writing nothing. Why (the field's code read end to end,
+//! known. Every place is written; a place drawn as the void is the answer's boundary, and every place past it is the void
+//! (§16.35: the void is the class past an answer's end, as training's states and the codec read it). Why (the field's code read end to end,
 //! November 3): the release before it locked a place only where one class held a majority of its face and moved its front
 //! only past locked places; text is uncertain at most places under any model, so it wrote the classes it was surest of
 //! (runs of `0`, `<<`, `=`, `####`), each lock making its neighbour's lock likelier, and left the rest open.
@@ -2975,8 +2976,10 @@ impl Field {
     /// sweeps the open places are resolved in one keyed random order, about `n/sweeps` a sweep, each drawn from its own
     /// face at temperature one (the field's own probabilities, an exact integer draw against the face's masses) on the read
     /// of the region as it stands, with every place resolved before it known. No place is chosen by its certainty, nothing
-    /// is left open, and a place drawn as the void writes nothing. Returns each problem's answer places' classes, in place
-    /// order, and stops early (every place it did not reach drawn on its last read) where `sweep` says to.
+    /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
+    /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
+    /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
+    /// `sweep` says to.
     pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
@@ -3006,7 +3009,7 @@ impl Field {
             let mut draws: Vec<(usize, usize, usize)> = Vec::new();
             for (k, &(q, n)) in problems.iter().enumerate() {
                 let (from, to) = if last { (done * n / sweeps, n) } else { (done * n / sweeps, (done + 1) * n / sweeps) };
-                for &t in &orders[k][from..to] {
+                for &t in orders[k][from..to].iter().filter(|&&t| open[k][t]) {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % face.total;
                     let mut acc = 0u128;
@@ -3021,6 +3024,17 @@ impl Field {
             for (k, t, c) in draws {
                 classes[k][t] = c;
                 open[k][t] = false;
+            }
+            // [definition; agent-inferred, November 3, §16.35] The void is the class past an answer's end, so a place drawn
+            // as the void is the answer's boundary: every place past it is the void, resolved, as in every state training
+            // reads (an answer, then its void tail). The boundary only moves in; a letter drawn past it is past the end.
+            for (k, &(q, _)) in problems.iter().enumerate() {
+                if let Some(end) = (q.len()..classes[k].len()).find(|&t| !open[k][t] && classes[k][t] == void) {
+                    for t in end + 1..classes[k].len() {
+                        classes[k][t] = void;
+                        open[k][t] = false;
+                    }
+                }
             }
             if last {
                 break;

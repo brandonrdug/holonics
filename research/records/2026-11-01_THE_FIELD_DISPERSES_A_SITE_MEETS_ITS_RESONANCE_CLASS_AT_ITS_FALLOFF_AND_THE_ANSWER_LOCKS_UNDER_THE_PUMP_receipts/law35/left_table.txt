@@ -1,0 +1,6 @@
+order=1 answer_bytes=35719 bits_a_byte=3.497
+order=2 answer_bytes=35719 bits_a_byte=2.724
+order=3 answer_bytes=35719 bits_a_byte=2.277
+order=4 answer_bytes=35719 bits_a_byte=2.041
+order=5 answer_bytes=35719 bits_a_byte=1.989
+order=6 answer_bytes=35719 bits_a_byte=2.011

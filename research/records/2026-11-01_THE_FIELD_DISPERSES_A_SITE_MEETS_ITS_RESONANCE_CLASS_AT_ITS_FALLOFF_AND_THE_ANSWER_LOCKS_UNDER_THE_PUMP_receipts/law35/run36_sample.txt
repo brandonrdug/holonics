@@ -1,0 +1,2 @@
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=6036 held=1600 lambda=957 friction=5722 foil_lambda=909 foil_friction=5818 own_wins=3 foil_wins=3 ms=75311
+MEASURE lap=sample rc=0 wall_s=75.6 peak_rss_kib=234044

@@ -1,0 +1,85 @@
+FIELD_HELD lap=-1 answer=5.519420 classes=35591 context=1.115694 context_classes=35591 foil=1.122779 question=0.007085 ms=3244
+FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=2.597647 foil_bits_a_byte=2.609737 information_bits_a_byte=0.012091 ms=2206
+FIELD_UNSEEN lap=-1 code=1.140 sites=36763 next=- ms=10981
+FIELD_LAP lap=0 read=22 sites=3876068 before=1.905 after=1.877 deposited=413/413 halvings=1 next_halved=0 next_refused=0 ms=119457
+FIELD_UNSEEN lap=0 code=1.106 sites=36763 next=- ms=130439
+FIELD_HELD lap=0 answer=5.344412 classes=35591 context=1.091629 context_classes=35591 foil=1.099523 question=0.007894 ms=133376
+FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=2.569099 foil_bits_a_byte=2.581769 information_bits_a_byte=0.012670 ms=2165
+FIELD_LAP lap=1 read=23 sites=3879627 before=1.861 after=1.834 deposited=412/413 halvings=6 next_halved=0 next_refused=0 ms=126809
+FIELD_UNSEEN lap=1 code=1.079 sites=36763 next=- ms=266064
+FIELD_HELD lap=1 answer=5.145240 classes=35591 context=1.060237 context_classes=35591 foil=1.066345 question=0.006108 ms=268992
+FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=2.547100 foil_bits_a_byte=2.561139 information_bits_a_byte=0.014040 ms=2163
+FIELD_LAP lap=2 read=24 sites=3833083 before=1.874 after=1.847 deposited=412/413 halvings=2 next_halved=0 next_refused=0 ms=124041
+FIELD_UNSEEN lap=2 code=1.074 sites=36763 next=- ms=398954
+FIELD_HELD lap=2 answer=7.173258 classes=35591 context=1.064445 context_classes=35591 foil=1.070550 question=0.006105 ms=401949
+FIELD_JOINT lap=2 answers=128 sites=35591 own_bits_a_byte=2.602198 foil_bits_a_byte=2.608112 information_bits_a_byte=0.005914 ms=2164
+FIELD_LAP lap=3 read=25 sites=3786284 before=1.838 after=1.811 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=124994
+FIELD_UNSEEN lap=3 code=1.033 sites=36763 next=- ms=532893
+FIELD_HELD lap=3 answer=5.505185 classes=35591 context=1.031817 context_classes=35591 foil=1.038594 question=0.006777 ms=535906
+FIELD_JOINT lap=3 answers=128 sites=35591 own_bits_a_byte=2.516048 foil_bits_a_byte=2.532022 information_bits_a_byte=0.015974 ms=2149
+FIELD_LAP lap=4 read=26 sites=3735368 before=1.845 after=1.817 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=122842
+FIELD_UNSEEN lap=4 code=1.023 sites=36763 next=- ms=664670
+FIELD_HELD lap=4 answer=5.360472 classes=35591 context=1.011109 context_classes=35591 foil=1.018583 question=0.007474 ms=667456
+FIELD_JOINT lap=4 answers=128 sites=35591 own_bits_a_byte=2.510332 foil_bits_a_byte=2.524997 information_bits_a_byte=0.014665 ms=2052
+FIELD_LAP lap=5 read=27 sites=3888998 before=1.827 after=1.799 deposited=413/413 halvings=4 next_halved=0 next_refused=0 ms=119741
+FIELD_UNSEEN lap=5 code=0.992 sites=36763 next=- ms=792859
+FIELD_HELD lap=5 answer=5.219647 classes=35591 context=0.986524 context_classes=35591 foil=0.994940 question=0.008415 ms=795894
+FIELD_JOINT lap=5 answers=128 sites=35591 own_bits_a_byte=2.487912 foil_bits_a_byte=2.505881 information_bits_a_byte=0.017969 ms=2111
+FIELD_LAP lap=6 read=28 sites=3810086 before=1.867 after=1.838 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=124736
+FIELD_UNSEEN lap=6 code=0.991 sites=36763 next=- ms=926455
+FIELD_HELD lap=6 answer=5.518902 classes=35591 context=0.981392 context_classes=35591 foil=0.991371 question=0.009979 ms=929396
+FIELD_JOINT lap=6 answers=128 sites=35591 own_bits_a_byte=2.491537 foil_bits_a_byte=2.509716 information_bits_a_byte=0.018179 ms=2189
+FIELD_LAP lap=7 read=29 sites=3830564 before=1.857 after=1.831 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=127547
+FIELD_UNSEEN lap=7 code=0.980 sites=36763 next=- ms=1063002
+FIELD_HELD lap=7 answer=5.303320 classes=35591 context=0.963572 context_classes=35591 foil=0.975359 question=0.011787 ms=1065935
+FIELD_JOINT lap=7 answers=128 sites=35591 own_bits_a_byte=2.481458 foil_bits_a_byte=2.499594 information_bits_a_byte=0.018136 ms=2178
+FIELD_LAP lap=8 read=30 sites=3803384 before=1.833 after=1.805 deposited=412/413 halvings=2 next_halved=0 next_refused=0 ms=121127
+FIELD_UNSEEN lap=8 code=0.973 sites=36763 next=- ms=1193052
+FIELD_HELD lap=8 answer=5.276750 classes=35591 context=0.976628 context_classes=35591 foil=0.993380 question=0.016752 ms=1195675
+FIELD_JOINT lap=8 answers=128 sites=35591 own_bits_a_byte=2.478139 foil_bits_a_byte=2.502648 information_bits_a_byte=0.024509 ms=1962
+FIELD_LAP lap=9 read=31 sites=3829828 before=1.840 after=1.813 deposited=412/413 halvings=5 next_halved=0 next_refused=0 ms=114860
+FIELD_UNSEEN lap=9 code=0.960 sites=36763 next=- ms=1315967
+FIELD_HELD lap=9 answer=5.300841 classes=35591 context=0.948253 context_classes=35591 foil=0.970672 question=0.022419 ms=1318594
+FIELD_JOINT lap=9 answers=128 sites=35591 own_bits_a_byte=2.471727 foil_bits_a_byte=2.500065 information_bits_a_byte=0.028338 ms=2006
+FIELD_LAP lap=10 read=32 sites=3795476 before=1.816 after=1.789 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=113370
+FIELD_UNSEEN lap=10 code=0.949 sites=36763 next=- ms=1437428
+FIELD_HELD lap=10 answer=5.356854 classes=35591 context=0.941855 context_classes=35591 foil=0.975866 question=0.034011 ms=1440093
+FIELD_JOINT lap=10 answers=128 sites=35591 own_bits_a_byte=2.467379 foil_bits_a_byte=2.501811 information_bits_a_byte=0.034432 ms=1952
+FIELD_LAP lap=11 read=33 sites=3778996 before=1.795 after=1.766 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=112820
+FIELD_UNSEEN lap=11 code=0.891 sites=36763 next=- ms=1558338
+FIELD_HELD lap=11 answer=5.222000 classes=35591 context=0.888771 context_classes=35591 foil=0.950651 question=0.061880 ms=1561125
+FIELD_JOINT lap=11 answers=128 sites=35591 own_bits_a_byte=2.429272 foil_bits_a_byte=2.477447 information_bits_a_byte=0.048175 ms=1936
+FIELD_LAP lap=12 read=34 sites=3832122 before=1.785 after=1.756 deposited=413/413 halvings=4 next_halved=0 next_refused=0 ms=113720
+FIELD_UNSEEN lap=12 code=0.783 sites=36763 next=- ms=1680306
+FIELD_HELD lap=12 answer=5.366238 classes=35591 context=0.793414 context_classes=35591 foil=0.928420 question=0.135006 ms=1682995
+FIELD_JOINT lap=12 answers=128 sites=35591 own_bits_a_byte=2.383705 foil_bits_a_byte=2.470289 information_bits_a_byte=0.086584 ms=1945
+FIELD_LAP lap=13 read=35 sites=3886349 before=1.711 after=1.683 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=116353
+FIELD_UNSEEN lap=13 code=0.699 sites=36763 next=- ms=1804782
+FIELD_HELD lap=13 answer=5.142799 classes=35591 context=0.729321 context_classes=35591 foil=0.928400 question=0.199079 ms=1807489
+FIELD_JOINT lap=13 answers=128 sites=35591 own_bits_a_byte=2.331495 foil_bits_a_byte=2.467460 information_bits_a_byte=0.135965 ms=1948
+FIELD_LAP lap=14 read=36 sites=3876046 before=1.752 after=1.723 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=114071
+FIELD_UNSEEN lap=14 code=0.612 sites=36763 next=- ms=1926998
+FIELD_HELD lap=14 answer=5.395833 classes=35591 context=0.647130 context_classes=35591 foil=0.894788 question=0.247658 ms=1929692
+FIELD_JOINT lap=14 answers=128 sites=35591 own_bits_a_byte=2.279187 foil_bits_a_byte=2.442194 information_bits_a_byte=0.163007 ms=1948
+FIELD_LAP lap=15 read=37 sites=3852707 before=1.741 after=1.712 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=114086
+FIELD_UNSEEN lap=15 code=0.576 sites=36763 next=- ms=2049179
+FIELD_HELD lap=15 answer=5.149811 classes=35591 context=0.610005 context_classes=35591 foil=0.884861 question=0.274856 ms=2051886
+FIELD_JOINT lap=15 answers=128 sites=35591 own_bits_a_byte=2.236656 foil_bits_a_byte=2.430912 information_bits_a_byte=0.194256 ms=1954
+FIELD_LAP lap=16 read=38 sites=3754365 before=1.704 after=1.674 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=114819
+FIELD_UNSEEN lap=16 code=0.554 sites=36763 next=- ms=2172161
+FIELD_HELD lap=16 answer=5.225690 classes=35591 context=0.585741 context_classes=35591 foil=0.874933 question=0.289192 ms=2174870
+FIELD_JOINT lap=16 answers=128 sites=35591 own_bits_a_byte=2.224125 foil_bits_a_byte=2.431478 information_bits_a_byte=0.207353 ms=1964
+FIELD_LAP lap=17 read=39 sites=3827238 before=1.691 after=1.664 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=115101
+FIELD_UNSEEN lap=17 code=0.534 sites=36763 next=- ms=2295426
+FIELD_HELD lap=17 answer=5.398551 classes=35591 context=0.568827 context_classes=35591 foil=0.862078 question=0.293251 ms=2298102
+FIELD_JOINT lap=17 answers=128 sites=35591 own_bits_a_byte=2.198836 foil_bits_a_byte=2.414337 information_bits_a_byte=0.215501 ms=1972
+FIELD_LAP lap=18 read=40 sites=3844643 before=1.673 after=1.645 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=115672
+FIELD_UNSEEN lap=18 code=0.519 sites=36763 next=- ms=2419225
+FIELD_HELD lap=18 answer=5.508103 classes=35591 context=0.559163 context_classes=35591 foil=0.883694 question=0.324531 ms=2421864
+FIELD_JOINT lap=18 answers=128 sites=35591 own_bits_a_byte=2.181843 foil_bits_a_byte=2.428955 information_bits_a_byte=0.247112 ms=1968
+FIELD_LAP lap=19 read=41 sites=3803749 before=1.672 after=1.642 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=121390
+FIELD_UNSEEN lap=19 code=0.503 sites=36763 next=- ms=2548676
+FIELD_HELD lap=19 answer=5.250586 classes=35591 context=0.525836 context_classes=35591 foil=0.863587 question=0.337751 ms=2551544
+FIELD_JOINT lap=19 answers=128 sites=35591 own_bits_a_byte=2.164101 foil_bits_a_byte=2.428809 information_bits_a_byte=0.264708 ms=2120
+FIELD_LAPS_HELD lap=20 reason=time left=142663 bound=160000 ms=2557337
+MEASURE lap=train rc=0 wall_s=2557.8 peak_rss_kib=702664
