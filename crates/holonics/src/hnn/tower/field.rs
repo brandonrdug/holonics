@@ -121,15 +121,6 @@
 //! its score 12 to 31 against the region's next 9 to 22: a probe's power varies with its word (a sum of
 //! `2n` squares), so a louder key outscored the equal one.
 //!
-//! [retired, November 2, §16.19] **The concentration from the founding**, one word a head (the probe and
-//! the key at once, `q = k`), founded as the pair's likeness so that `Re(conj(w_i) w_j)` peaked where two
-//! sites' words agreed and a site met the sites whose word was its own from the first section. Why it went
-//! (the seventh reading had chosen it after the independent charts gathered the region's average: 2.009
-//! bits a byte beside the neighbours after eleven laps, the question telling the digits 0.021 bits): a
-//! contact concentrated on a site's counterpart wherever it stands is the crib handed to the field, the
-//! copier's third recurrence (the antipattern record's instance 4), and not a contact the field located.
-//! What the field meets is now what its learning makes its probes and keys agree on.
-//!
 //! The pairing `Re(conj(p̃_i) k̃_j) = Re(conj(p_i) U_i^* U_j k_j)` turns mode `m` by
 //! `2π (j − i)/n_m`: a turned mode reads the relative place modulo its ring, a still mode reads the
 //! contents alone, at any distance its class reaches. The current is the phase-carried moment
@@ -138,31 +129,25 @@
 //! the region is the whole terrain the constitution meets, so the transferred response a scan's
 //! carried state would owe is absent by construction.
 //!
-//! **Learning.** The comparison is completion: any subset of the region is unresolved, its targets
-//! the classes that arrived there, and the code is `Σ −log₂ p̂_t(u_t)` over the unresolved sites.
-//! The covector `p̂ − q` returns exactly through the `K` ticks (the operands that produced each
-//! carrier, held from the forward). The deposit is the tower's: the covector's two moments, the
-//! step `m/(√v + 2^(−32))` at `2^(−k)`, certified on the section's own regions by an exact
-//! comparison of the products of their faces, halved until it is certified or moves nothing; then
-//! held and read on the next section's regions, which it was not fit on, and halved again or
-//! refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
-//!
-//! [retired, November 2, §16.19] The closure (§19), a copy face read at a still ring set on the class an unresolved site
-//! must receive among the sites that hold it, was a matcher handed to the machine and is retired: the reverse reads the
-//! face alone.
+//! **Learning.** The comparison is completion, read as the joint code: any subset of the region is unresolved, its
+//! targets the classes that arrived there, and a region drawn as a state of `K` open sites among `m` codes
+//! `(m/K) Σ −log₂ p̂_t(u_t)` (§16.23, [`Region::weight`]); an answer port is compared through its coupling (§16.24,
+//! [`Region::port`]). The covector (`p̂ − q` weighed, or `p̂ − r` at a port) returns exactly through the `K` ticks (the
+//! operands that produced each carrier, held from the forward). The deposit is the tower's: the covector's two moments,
+//! the step `m/(√v + 2^(−32))` at `2^(−k)`, certified on the section's own regions (by the products of their faces where
+//! every weight is one, by partition of their readings where one is not, on the codes' grain where a port is read),
+//! halved until it is certified or moves nothing; then held and read on the next section's regions, which it was not fit
+//! on, and halved again or refused where it codes them higher (the tower's acceptance 77, [`FieldLearner`]).
 //!
 //! **Release: the answer grows from what has settled** ([`Field::release`], the dispersing field's
 //! §14): a site is reached once a definite site stands in its near field, then carries a soft face,
 //! logits with a momentum `μ = ½`, read every sweep at its own pump `β_t` and its cavity field (§15.3: the
 //! read less its own echo); it locks where its top class holds a majority of the field's own face (`β = 1`)
-//! through the sweep (§16.19), and the extent is read where the front first
-//! locks the void. The answer is released whole: locked sites at their classes, unlocked ones shown
-//! open, with its receipts ([`Released`]).
+//! through the sweep (§16.19). The void is a class like any other at every answer place (§16.24): the release runs to
+//! its bound, and writes its places in order with a void place writing nothing and an unlocked one shown open
+//! ([`Released::written`]), with its receipts ([`Released`]).
 //! **Training meets the release's own states**: beside the completion masks, front regions (§14.6), whose
 //! read 2 carries read 1's faces at a rung with their echoes.
-//!
-//! [retired, November 2, §16.19] The clock ring sets (§15.4), turned by each site's sweep count since it was
-//! reached (in training, the rung): the release's writing order fed into the law as phase.
 //!
 //! **Exact integers, grains declared.** Faces, charts, framed charts and currents on `2^(−16)`;
 //! material on `2^(−24)`; frames and skins on `2^(−30)`; each row an exact series of its terms'
