@@ -1998,6 +1998,19 @@ impl Field {
         for h in 0..heads {
             let lists = &cell.classes[h];
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
+            // [definition; agent-inferred, November 3, §16.38] **Conservation of faces**: a still head reads content
+            // alone, so the definite sources of one resonance class are one face to it, and that face's mass is shared
+            // among them: each source's score is lowered by the octave of its class's definite count, `⌊log₂ c⌋`, as
+            // the falloff lowers it by the octave of its distance. A turned head reads place as well, and to it every
+            // place is its own face.
+            let shared = !d.carries_moment(h);
+            let multiplicity = |j: usize| -> i128 {
+                if !shared {
+                    return 0;
+                }
+                let c = lists.class[j] as usize;
+                octave(((lists.off[2 * c + 1] - lists.off[2 * c]) as usize).max(1)) as i128
+            };
             for i in 0..sites {
                 // Every receiver probes with its own probe word (§16.19), against each source's key.
                 let wi = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
@@ -2019,7 +2032,7 @@ impl Field {
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
                     }
                     let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, d).1 + 1))?;
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((octave(d) as i128) << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((octave(d) as i128 + multiplicity(j)) << FACE_BITS))?;
                     series.push(self.face(z), one, one, &value);
                     row.push(Source { j: j as u32, p: 0, s: base });
                 }

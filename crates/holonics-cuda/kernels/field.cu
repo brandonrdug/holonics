@@ -1780,7 +1780,15 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 8) field_exposur
             if (j != UINT32_MAX) {
                 const uint32_t gap = j > i ? j - i : i - j;
                 const int64_t base = eight ? pair_base8(w, h, ai, rows32 + (uint64_t)j * 4, g, first + j, gap) : pair_base(w, h, wi, words + (uint64_t)j * S, g, first + j, gap);
-                const int64_t z = scored(w, temper, base, octave(gap));
+                // Conservation of faces (§16.38): a still head's source shares its face's mass with its resonance class's
+                // definite sources, its score lowered by the octave of their count, as the falloff lowers it by its distance's.
+                uint32_t shared = 0;
+                if (still_head(w, h)) {
+                    const uint32_t cj = w.cls[(uint64_t)h * w.T + first + j];
+                    const uint32_t count = off[2 * cj + 1] - off[2 * cj];
+                    shared = (uint32_t)octave(count > 1 ? count : 1);
+                }
+                const int64_t z = scored(w, temper, base, (uint32_t)octave(gap) + shared);
                 erow[j] = (uint64_t)z;
                 if (sbrow) {
                     sbrow[j] = base;
