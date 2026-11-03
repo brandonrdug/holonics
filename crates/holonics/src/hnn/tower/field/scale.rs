@@ -7,7 +7,7 @@
 //! ```text
 //! restrict s_j = A [r̂(x_(Pj)), …, r̂(x_(Pj+P−1))] + b_A            one chart of the packet's reads in place order
 //! level 1  x¹_j ← s_j, then the packets' field's own ticks        plain clocks on the packet strand, no moments
-//! prolong  [x_(Pj)…x_(Pj+P−1)] += B r̂(x¹_j), each + b_B            one chart back, a place's part its own rows
+//! prolong  [x_(Pj)…x_(Pj+P−1)] += B r̂(x¹_j) + b_B                one chart back, each place its own rows and bias
 //! ```
 //!
 //! A packet is definite where every one of its sites is, and keyed where any is; a packet past its region's last site reads
@@ -27,8 +27,8 @@ pub struct Scale {
     pub split: usize,
     /// The packets' field.
     pub coarse: Field,
-    /// `A` (`D₁ × P D₀`, a packet's reads in place order) and `b_A` (`D₁`), then `B` (`P D₀ × D₁`) and `b_B` (`D₀`); matrices
-    /// on `2^(−24)`, biases on the faces' `2^(−16)`.
+    /// `A` (`D₁ × P D₀`, a packet's reads in place order) and `b_A` (`D₁`), then `B` (`P D₀ × D₁`) and `b_B` (`P D₀`, a bias
+    /// each place); matrices on `2^(−24)`, biases on the faces' `2^(−16)`.
     pub glue: Vec<i32>,
 }
 
@@ -42,7 +42,7 @@ fn glue_layout(period: usize, fine: usize, coarse: usize) -> (usize, usize, usiz
     let ab = a + period * coarse * fine;
     let b = ab + coarse;
     let bb = b + period * fine * coarse;
-    (a, ab, b, bb, bb + fine)
+    (a, ab, b, bb, bb + period * fine)
 }
 
 /// Packet `j`'s rows of `rows` (`[t][width]`) in place order, `period` of them, zero past `sites`.
@@ -106,7 +106,7 @@ impl Field {
             let at = base + s.coarse.theta.len();
             let (d0, d1) = (self.declaration.width, s.coarse.declaration.width);
             let (a, ab, b, bb, _) = glue_layout(s.period, d0, d1);
-            out.extend([(at + a, ab - a, MATERIAL_BITS), (at + ab, d1, FACE_BITS), (at + b, bb - b, MATERIAL_BITS), (at + bb, d0, FACE_BITS)]);
+            out.extend([(at + a, ab - a, MATERIAL_BITS), (at + ab, d1, FACE_BITS), (at + b, bb - b, MATERIAL_BITS), (at + bb, s.period * d0, FACE_BITS)]);
         }
         out
     }
@@ -184,15 +184,15 @@ impl Field {
             out.coarse_read.extend_from_slice(&r);
             out.coarse_scale.push(sc);
         }
-        // The prolongation: one chart back, each place's part its own rows, the bias the same at every place.
+        // The prolongation: one chart back, each place its own rows and bias.
         let reach_b = reach(&g[b..bb]);
         let mut back = vec![0i64; period * d0];
         for j in 0..packets {
-            affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], None, MATERIAL_BITS, MATERIAL_BITS, &mut back)?;
+            affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], Some(&g[bb..bb + period * d0]), MATERIAL_BITS, MATERIAL_BITS, &mut back)?;
             for t in period * j..(period * (j + 1)).min(sites) {
                 let k = t - period * j;
-                for ((xv, &v), &bias) in x[t * d0..(t + 1) * d0].iter_mut().zip(&back[k * d0..(k + 1) * d0]).zip(&g[bb..bb + d0]) {
-                    *xv = fit64(*xv as i128 + v as i128 + bias as i128)?;
+                for (xv, &v) in x[t * d0..(t + 1) * d0].iter_mut().zip(&back[k * d0..(k + 1) * d0]) {
+                    *xv = fit64(*xv as i128 + v as i128)?;
                 }
             }
         }
@@ -213,15 +213,15 @@ impl Field {
         let _ = g0;
         let (gc, gg) = rest.split_at_mut(len1);
         let gl = &s.glue;
-        // The prolongation: `δb_B += Σ_t δx_t`, `δB += δx_j r̂¹_jᵀ` and `δr̂¹_j = Bᵀ δx_j` with `δx_j` the packet's places'
+        // The prolongation: `δb_B += Σ_j δx_j`, `δB += δx_j r̂¹_jᵀ` and `δr̂¹_j = Bᵀ δx_j` with `δx_j` the packet's places'
         // covectors in place order (zero past the region's last site).
         let reach_b = reach(&gl[b..bb]);
-        for t in 0..sites {
-            for (i, &v) in dx[t * d0..(t + 1) * d0].iter().enumerate() {
+        let douts: Vec<Vec<i64>> = (0..packets).map(|j| padded(dx, j, period, d0, sites)).collect();
+        for dout in &douts {
+            for (i, &v) in dout.iter().enumerate() {
                 gg[bb + i] += v as i128;
             }
         }
-        let douts: Vec<Vec<i64>> = (0..packets).map(|j| padded(dx, j, period, d0, sites)).collect();
         let reads1: Vec<&[i32]> = (0..packets).map(|j| &pass.coarse_read[j * d1..(j + 1) * d1]).collect();
         outer_sum(&mut gg[b..bb], d1, &douts, &reads1)?;
         let mut dr1 = vec![0i64; packets * d1];
