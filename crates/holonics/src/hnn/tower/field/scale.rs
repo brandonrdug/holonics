@@ -5,12 +5,13 @@
 //! packet back through the prolongation, and the fine field's remaining ticks and its face follow:
 //!
 //! ```text
-//! restrict s_j = Σ_(k<P) A_k r̂(x_(Pj+k)) + b_A                    each place of a packet its own map
+//! restrict s_j = A [r̂(x_(Pj)), …, r̂(x_(Pj+P−1))] + b_A            one chart of the packet's reads in place order
 //! level 1  x¹_j ← s_j, then the packets' field's own ticks        plain clocks on the packet strand, no moments
-//! prolong  x_(Pj+k) += B_k r̂(x¹_j) + b_B                          each place its own map back from its packet
+//! prolong  [x_(Pj)…x_(Pj+P−1)] += B r̂(x¹_j), each + b_B            one chart back, a place's part its own rows
 //! ```
 //!
-//! A packet is definite where every one of its sites is, and keyed where any is. The material is the fine field's, the
+//! A packet is definite where every one of its sites is, and keyed where any is; a packet past its region's last site reads
+//! zero there and writes nothing there. The material is the fine field's, the
 //! packets' field's and the glue (`A`, `b_A`, `B`, `b_B`), in that order, one covector over all three
 //! ([`Field::material_len`], [`Field::families_all`]). Founded as a growth in scale ([`Field::scaled_up`]): `B` and `b_B`
 //! open at zero, so the tower reads every face of the field it was founded on exactly.
@@ -26,8 +27,8 @@ pub struct Scale {
     pub split: usize,
     /// The packets' field.
     pub coarse: Field,
-    /// `A_k` (`[k][D₁][D₀]`) and `b_A` (`D₁`), then `B_k` (`[k][D₀][D₁]`) and `b_B` (`D₀`); matrices on `2^(−24)`, biases on
-    /// the faces' `2^(−16)`.
+    /// `A` (`D₁ × P D₀`, a packet's reads in place order) and `b_A` (`D₁`), then `B` (`P D₀ × D₁`) and `b_B` (`D₀`); matrices
+    /// on `2^(−24)`, biases on the faces' `2^(−16)`.
     pub glue: Vec<i32>,
 }
 
@@ -42,6 +43,16 @@ fn glue_layout(period: usize, fine: usize, coarse: usize) -> (usize, usize, usiz
     let b = ab + coarse;
     let bb = b + period * fine * coarse;
     (a, ab, b, bb, bb + fine)
+}
+
+/// Packet `j`'s rows of `rows` (`[t][width]`) in place order, `period` of them, zero past `sites`.
+fn padded<V: Copy + Default>(rows: &[V], j: usize, period: usize, width: usize, sites: usize) -> Vec<V> {
+    let mut out = vec![V::default(); period * width];
+    for t in period * j..(period * (j + 1)).min(sites) {
+        let k = t - period * j;
+        out[k * width..(k + 1) * width].copy_from_slice(&rows[t * width..(t + 1) * width]);
+    }
+    out
 }
 
 /// What a tower's forward keeps for its reverse.
@@ -148,25 +159,12 @@ impl Field {
             out.read.extend_from_slice(&r);
             out.scale.push(sc);
         }
-        // The restriction.
+        // The restriction: one chart of each packet's reads in place order, zero past the region's last site.
         let reach_a = reach(&g[a..ab]);
         let mut x1 = vec![0i64; packets * d1];
-        let mut term = vec![0i64; d1];
         for j in 0..packets {
-            let mut acc: Vec<i128> = g[ab..ab + d1].iter().map(|&v| v as i128).collect();
-            for k in 0..period {
-                let t = period * j + k;
-                if t >= sites {
-                    break;
-                }
-                affine(&g[a + k * d1 * d0..a + (k + 1) * d1 * d0], reach_a, d0, &out.read[t * d0..(t + 1) * d0], None, MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
-                for (c, &v) in acc.iter_mut().zip(&term) {
-                    *c += v as i128;
-                }
-            }
-            for (slot, c) in x1[j * d1..(j + 1) * d1].iter_mut().zip(acc) {
-                *slot = fit64(c)?;
-            }
+            let reads = padded(&out.read, j, period, d0, sites);
+            affine(&g[a..ab], reach_a, period * d0, &reads, Some(&g[ab..ab + d1]), MATERIAL_BITS, MATERIAL_BITS, &mut x1[j * d1..(j + 1) * d1])?;
         }
         // The packets' field.
         out.definite = (0..packets).map(|j| (period * j..(period * (j + 1)).min(sites)).all(|t| definite[t])).collect();
@@ -186,14 +184,16 @@ impl Field {
             out.coarse_read.extend_from_slice(&r);
             out.coarse_scale.push(sc);
         }
-        // The prolongation.
+        // The prolongation: one chart back, each place's part its own rows, the bias the same at every place.
         let reach_b = reach(&g[b..bb]);
-        let mut back = vec![0i64; d0];
-        for t in 0..sites {
-            let (j, k) = (t / period, t % period);
-            affine(&g[b + k * d0 * d1..b + (k + 1) * d0 * d1], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], None, MATERIAL_BITS, MATERIAL_BITS, &mut back)?;
-            for ((xv, &v), &bias) in x[t * d0..(t + 1) * d0].iter_mut().zip(&back).zip(&g[bb..bb + d0]) {
-                *xv = fit64(*xv as i128 + v as i128 + bias as i128)?;
+        let mut back = vec![0i64; period * d0];
+        for j in 0..packets {
+            affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], None, MATERIAL_BITS, MATERIAL_BITS, &mut back)?;
+            for t in period * j..(period * (j + 1)).min(sites) {
+                let k = t - period * j;
+                for ((xv, &v), &bias) in x[t * d0..(t + 1) * d0].iter_mut().zip(&back[k * d0..(k + 1) * d0]).zip(&g[bb..bb + d0]) {
+                    *xv = fit64(*xv as i128 + v as i128 + bias as i128)?;
+                }
             }
         }
         Ok(out)
@@ -213,24 +213,20 @@ impl Field {
         let _ = g0;
         let (gc, gg) = rest.split_at_mut(len1);
         let gl = &s.glue;
-        // The prolongation: `δb_B += δx_t`, `δB_k += δx_t r̂¹_jᵀ`, `δr̂¹_j += B_kᵀ δx_t`.
+        // The prolongation: `δb_B += Σ_t δx_t`, `δB += δx_j r̂¹_jᵀ` and `δr̂¹_j = Bᵀ δx_j` with `δx_j` the packet's places'
+        // covectors in place order (zero past the region's last site).
         let reach_b = reach(&gl[b..bb]);
-        let mut dr1 = vec![0i64; packets * d1];
-        let mut back = vec![0i64; d1];
         for t in 0..sites {
-            let (j, k) = (t / period, t % period);
             for (i, &v) in dx[t * d0..(t + 1) * d0].iter().enumerate() {
                 gg[bb + i] += v as i128;
             }
-            transposed(&gl[b + k * d0 * d1..b + (k + 1) * d0 * d1], reach_b, d1, &dx[t * d0..(t + 1) * d0], MATERIAL_BITS, &mut back)?;
-            for (slot, &v) in dr1[j * d1..(j + 1) * d1].iter_mut().zip(&back) {
-                *slot = fit64(*slot as i128 + v as i128)?;
-            }
         }
-        for k in 0..period {
-            let ys: Vec<&[i64]> = (k..sites).step_by(period).map(|t| &dx[t * d0..(t + 1) * d0]).collect();
-            let xs: Vec<&[i32]> = (k..sites).step_by(period).map(|t| &pass.coarse_read[(t / period) * d1..(t / period + 1) * d1]).collect();
-            outer_sum(&mut gg[b + k * d0 * d1..b + (k + 1) * d0 * d1], d1, &ys, &xs)?;
+        let douts: Vec<Vec<i64>> = (0..packets).map(|j| padded(dx, j, period, d0, sites)).collect();
+        let reads1: Vec<&[i32]> = (0..packets).map(|j| &pass.coarse_read[j * d1..(j + 1) * d1]).collect();
+        outer_sum(&mut gg[b..bb], d1, &douts, &reads1)?;
+        let mut dr1 = vec![0i64; packets * d1];
+        for (j, dout) in douts.iter().enumerate() {
+            transposed(&gl[b..bb], reach_b, d1, dout, MATERIAL_BITS, &mut dr1[j * d1..(j + 1) * d1])?;
         }
         let mut dx1 = vec![0i64; packets * d1];
         for j in 0..packets {
@@ -244,26 +240,27 @@ impl Field {
         for cell in pass.ticks.iter().rev() {
             s.coarse.tick_return(cell, &mut dx1, gc, &pass.paces, &pass.definite, &mut dm, &mut gtau, &mut gsig, None, None)?;
         }
-        // The restriction: `δb_A += δs_j`, `δA_k += δs_j r̂_tᵀ`, `δx_t += adj(r̂_t)(A_kᵀ δs_j)`.
+        // The restriction: `δb_A += Σ_j δs_j`, `δA += δs_j [r̂]_jᵀ` and `δ[r̂]_j = Aᵀ δs_j`, each place's part through its
+        // read's adjoint into `δx_t`.
         let reach_a = reach(&gl[a..ab]);
         for j in 0..packets {
             for (i, &v) in dx1[j * d1..(j + 1) * d1].iter().enumerate() {
                 gg[ab + i] += v as i128;
             }
         }
-        let mut dr = vec![0i64; d0];
-        for t in 0..sites {
-            let (j, k) = (t / period, t % period);
-            transposed(&gl[a + k * d1 * d0..a + (k + 1) * d1 * d0], reach_a, d0, &dx1[j * d1..(j + 1) * d1], MATERIAL_BITS, &mut dr)?;
-            let back = ratio_adjoint(&pass.read[t * d0..(t + 1) * d0], pass.scale[t], &dr)?;
-            for (slot, &v) in dx[t * d0..(t + 1) * d0].iter_mut().zip(&back) {
-                *slot = fit64(*slot as i128 + v as i128)?;
+        let ds: Vec<&[i64]> = (0..packets).map(|j| &dx1[j * d1..(j + 1) * d1]).collect();
+        let reads: Vec<Vec<i32>> = (0..packets).map(|j| padded(&pass.read, j, period, d0, sites)).collect();
+        outer_sum(&mut gg[a..ab], period * d0, &ds, &reads)?;
+        let mut dpad = vec![0i64; period * d0];
+        for j in 0..packets {
+            transposed(&gl[a..ab], reach_a, period * d0, ds[j], MATERIAL_BITS, &mut dpad)?;
+            for t in period * j..(period * (j + 1)).min(sites) {
+                let k = t - period * j;
+                let back = ratio_adjoint(&pass.read[t * d0..(t + 1) * d0], pass.scale[t], &dpad[k * d0..(k + 1) * d0])?;
+                for (slot, &v) in dx[t * d0..(t + 1) * d0].iter_mut().zip(&back) {
+                    *slot = fit64(*slot as i128 + v as i128)?;
+                }
             }
-        }
-        for k in 0..period {
-            let ys: Vec<&[i64]> = (k..sites).step_by(period).map(|t| &dx1[(t / period) * d1..(t / period + 1) * d1]).collect();
-            let xs: Vec<&[i32]> = (k..sites).step_by(period).map(|t| &pass.read[t * d0..(t + 1) * d0]).collect();
-            outer_sum(&mut gg[a + k * d1 * d0..a + (k + 1) * d1 * d0], d0, &ys, &xs)?;
         }
         Ok(())
     }
