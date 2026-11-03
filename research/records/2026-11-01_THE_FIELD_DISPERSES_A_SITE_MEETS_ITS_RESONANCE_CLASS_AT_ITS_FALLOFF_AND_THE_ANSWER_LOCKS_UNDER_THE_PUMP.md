@@ -2476,3 +2476,55 @@ lifted: lap 2 fell 0.10 bits where it had fallen 0.008. After three laps (13.5 m
 needed about eight. Verification: the field library tests (55), the example's field tests (13), the gate (0 failed), and
 the card parity, at the founding and with every clock entry drawn from the keys (`FIELD_PARITY_PACE=8`, the unresolved
 rates among them), 12 reads and one write equal each.
+
+### 16.29 What bounds the field's fall, and growth that keeps the heads
+
+[measurement; agent-inferred, November 3] Brandon asked whether a long run was a genuine demand or the cost of an
+implementation left unoptimized, and for the system's working to be understood rather than its output eyeballed. Each read
+below is under fifteen minutes on the card (receipts `_receipts/law29/`).
+
+**Where the card's time goes** (`profile.txt`, 16 opening sections of D 32, H 4, K 6): kernels 10.2 s of 12.4 s; the contact
+about 70% (scoring the support 1.7 s, the exact series sums 3.6 s, their return 2.1 s); a plain read 74 ms and a read with
+its return 340 ms a section, a section reading its regions four to seven times (the held step's read, the read and return,
+the certificate's rereads). The card is busy with the law's exact arithmetic, not idle on launches; sharing one read would
+save about a tenth of a section and is not built.
+
+**The curve.** From §16.28's lap-2 state (joint 3.282 bits a byte), two more laps read 3.204 and 3.174 at the step's rate
+`2^(−8)` and 3.211 and 3.187 at `2^(−9)` (`rate28_train8.txt`, `rate28_train9.txt`): the step's size does not bound it, and
+the fall a lap (413 steps) is 0.03 bits at lap 4. Fitted to laps 0 to 2, `L(n) = L∞ + A n^(−½)` gives `L∞ ≈ 2.82` and
+predicts 3.22 and 3.18 at laps 3 and 4; the reads land on it.
+
+**The reference.** A two-sided byte table (`two_sided_table.py`, a reading only, never a part of the field) codes the held
+answers' bytes from one neighbour a side at 2.09 bits a byte with 20,656 entries, from two at 1.10 bits with 252,608, from
+three at 0.92. The field's context read (each answer site with three neighbours a side resolved) is 2.02 bits after five laps
+with 34,776 numbers: the field holds about what the one-neighbour table holds, which is what its size allows. Writing text
+needs the two-neighbour table's memory or more.
+
+**Width, merge and heads.** Growth by copies doubled the heads with the width (the law until November 3), and the trained, widened field
+(D 64, H 8) read a section in 1.55 s against 0.65 s: its stop at the lap bound is in `widen28_train.txt` (incomplete; its
+projection was read on a founded field, which meets fewer pairs). A founding with 64 complex contacts in the merge (f 128)
+learned slower, its certificate halving 473 steps in lap 0 against 78 (`merge28_train.txt`, incomplete at its bound). A founded
+field of width 128 with four heads reads a section in 0.41 s against 0.69 s at width 32 (`time_128_4_8_2_128_6.txt`): the
+card's time follows the heads, through the contact's site pairs, and the field's memory lies in its width and merge.
+
+**The law** (`FieldDeclaration::grown`, `Field::grown`, atlas `tower.field-growth-by-copies`): growth by copies grows the
+width and the merge's contacts and keeps the heads, whose charts' rows, biases, moments, clocks and temperatures stay the
+old ones; the current's return and the moment's chart repeat their rows over the face copies. The grown field reads the old
+faces exactly (`the_grown_field_reads_the_old_faces`, factors 2 and 3, every ring set) and the card agrees with the host on
+it (`parity_grow.txt`, GROW 2, 0 unequal). From the lap-2 state, grown once (D 64, H 4, f 64, material 69,304), two laps
+read 3.200 and 3.169 (`grow29_train.txt`) in 288 and 289 s, at the unwidened field's time and within 0.005 bits of its code:
+the copies part slowly, and in two laps the new width is not yet used. So width with the heads kept costs the card nothing,
+and what it buys needs laps to show.
+
+**The encounter note's joins** (the unified-theory thread, November 3: an encounter is one pole in complex time, a pass
+keeps its faces and closeness sets only when they arrive). [reading] A growth by copies is a pass that keeps every face: the
+grown field reads the old faces exactly and only the timing of learning moves, as the copies part. The merge's complex
+product `a · b` adds two received lines' phases, the beat of `pair.beat-is-slip`, and the conjunctions the two-neighbour
+table holds (this byte two back and that one one back) are beats between two received lines: growing the merge's contacts
+grows exactly that capacity while the receivers (the heads) stay. §16.28's silence is the note's advective Doppler: an open
+stretch with its own clock rate `1 + ε` was a medium moving under the sites, and an open site at rest is the medium at rest.
+
+Failures this could repeat, checked: **bits read as progress** (the reads are curves against a fitted law and a reference,
+reported with their projections and stops); **a refusal answered with a larger limit** (the widened read stopped at its bound
+and was reported incomplete; the next read changed the law, keeping the heads); **catered machinery** (the byte table is a
+reading of the held answers, never a part of the field).

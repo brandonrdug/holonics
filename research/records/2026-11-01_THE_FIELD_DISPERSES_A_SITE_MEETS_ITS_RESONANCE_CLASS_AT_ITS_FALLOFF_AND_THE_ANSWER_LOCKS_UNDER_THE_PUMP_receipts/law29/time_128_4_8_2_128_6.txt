@@ -1,0 +1,4 @@
+# binary sha 3547b9109a7841044e30f7c99e1b9e6a273f2ec033908cc60f8101d5b5aa0106, commit dccc917d2, declaration 128 4 8 2 128 6
+FIELD_TIME_DECLARATION width=128 heads=4 modes=8 still=2 contacts=128 ticks=6 reach=2221 material=162936
+FIELD_TIME_LAP sections=413 sites=4600652 rows=110415648 end_rows=62082360 context_rows=110415648 worst_ps_a_section_row=1973996 worst_ps_a_read_row=284254 at_size_ms=217960 context_ms=31386 projection_ms=392537 (every section's reads and return at the worst measured time a site row, four more reads of it, the held step's context read, and the lap's end)
+MEASURE lap=time rc=0 wall_s=26.6 peak_rss_kib=419808
