@@ -953,8 +953,12 @@ impl<'c> CardField<'c> {
         // Each region's definite sites and its open ones, by place (§15.9: an open receiver hears every definite
         // site, and a definite source is heard by every open one).
         let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
+        // Each site's region's weight in the joint code (§16.23, `Region::weight`), for the reverse.
+        let mut site_weight: Vec<(u64, u64)> = Vec::new();
         for (r, region) in regions.iter().enumerate() {
             let s = region.classes.len();
+            let weight = region.weight();
+            site_weight.extend(std::iter::repeat_n(weight, s));
             region_eoff.push(pairs as u64);
             pairs += s * s;
             dstart.push(dlist.len() as u32);
@@ -1252,7 +1256,7 @@ impl<'c> CardField<'c> {
             if self.row_questions.borrow().is_some() {
                 *self.row_cov.borrow_mut() = Some(vec![Vec::new(); ticks.len()]);
             }
-            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, sites, pairs)?;
+            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, sites, pairs)?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -1428,7 +1432,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], sites: usize, pairs: usize) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], sites: usize, pairs: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -1478,6 +1482,14 @@ impl<'c> CardField<'c> {
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
         self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
+        // The covector weighed as each region's state in the joint code (§16.23, the host's `returned_with`).
+        if site_weight.iter().any(|&(m, k)| m != k) {
+            let (wm, wk): (Vec<u64>, Vec<u64>) = site_weight.iter().copied().unzip();
+            let wm_c = self.timed(Kind::Copy, || self.take_up(&wm)).map_err(device)?;
+            let wk_c = self.timed(Kind::Copy, || self.take_up(&wk)).map_err(device)?;
+            let (mut wmp, mut wkp) = (wm_c.device_ptr(), wk_c.device_ptr());
+            self.launch("field_face_weigh", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut wmp), arg(&mut wkp), arg(&mut dzp)])?;
+        }
         self.outer(words, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
         self.outer(words, g, words.read, a, dw, dz.device_ptr(), a, fread.device_ptr(), dw, false, true)?;
         self.transposed(words, words.read, a, dw, dz.device_ptr(), a, dr.device_ptr(), false, true)?;

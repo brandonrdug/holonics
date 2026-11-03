@@ -6038,6 +6038,63 @@ fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
     fewer_bits_exact(old, new)
 }
 
+/// [definition; agent-inferred, November 2, the field's §16.23] **The certificate on a weighed code**: does `new` code
+/// strictly fewer bits than `old` when each region's code is weighed by its state's `m/K` (the order-averaged joint
+/// code)? `spans` gives each region's open sites (its run of consecutive pairs) and its `(m, K)`. Where every weight is
+/// one it is [`fewer_bits`], the products. Otherwise the products cannot be formed (a rational power of a product), so
+/// it is decided by partition alone: each region's readings are summed exactly, the difference
+/// `ΔW = Σ_r (m_r/K_r) Σ_(i∈r) (log₂ p_new − log₂ p_old)` and its slack `Σ_r (m_r/K_r) · CERTIFICATE_SLACK · 2 · 2|r|`
+/// are exact rationals of the readings, and the sign of `ΔW` decides once it passes the slack. The readings are read
+/// at `CERTIFICATE_DIGITS` and, where the slack holds the difference, again at [`WEIGHED_DIGITS`], the readings' own
+/// floor (their mantissa is released at `2^(−62)`); a difference still inside the slack there is a tie at that floor,
+/// and a tie codes no fewer bits.
+fn fewer_bits_weighed(old: &[(u128, u128)], new: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> bool {
+    use num_bigint::BigInt;
+    use num_rational::BigRational;
+    if spans.iter().all(|&(_, m, k)| m == k) {
+        return fewer_bits(old, new);
+    }
+    if old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
+        return false;
+    }
+    for digits in [CERTIFICATE_DIGITS, WEIGHED_DIGITS] {
+        let (mut difference, mut slack) = (BigRational::from_integer(BigInt::from(0)), BigRational::from_integer(BigInt::from(0)));
+        let mut at = 0usize;
+        for &(count, m, k) in spans {
+            let range = at..at + count;
+            at += count;
+            let side = |faces: &[(u128, u128)]| -> i128 { faces[range.clone()].par_iter().map(|&(mm, t)| log2_reading_at(mm, digits) - log2_reading_at(t, digits)).sum() };
+            let w = BigRational::new(BigInt::from(m), BigInt::from(k));
+            difference += &w * &BigRational::from_integer(BigInt::from(side(new) - side(old)));
+            slack += &w * &BigRational::from_integer(BigInt::from(CERTIFICATE_SLACK * 2 * 2 * count as i128));
+        }
+        if difference > slack {
+            return true;
+        }
+        if difference < -slack {
+            return false;
+        }
+    }
+    false
+}
+
+/// The weighed certificate's finer readings: the readings' own floor (a mantissa released at `2^(−62)` holds a
+/// reading within one grain and `2^(−60)` of `log₂ v`, so three grains at `2^(−60)`).
+const WEIGHED_DIGITS: u32 = 60;
+
+/// [definition; agent-inferred, November 2, the field's §16.23] **A weighed code** on `2^(−20)` bits: each region's
+/// code `Σ_(i∈r) −log₂ p_i` read at `m_r/K_r`, released once a region to the nearest (half away from zero), summed.
+fn weighed_code(pairs: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> i64 {
+    let mut at = 0usize;
+    let mut sum = 0i64;
+    for &(count, m, k) in spans {
+        let code: i64 = pairs[at..at + count].par_iter().map(|&(mm, t)| face_code(mm, t)).sum();
+        at += count;
+        sum += if m == k { code } else { div_nearest(code as i128 * m as i128, k as i128) as i64 };
+    }
+    sum
+}
+
 /// A decision the readings made. Built with the `certificate-check` feature, it is compared with the
 /// products and a disagreement stops the run: the acceptance read that the partition decides as the
 /// products do on every call of a whole pass. Without the feature it is the decision.
@@ -6063,11 +6120,16 @@ const CERTIFICATE_SLACK: i128 = 3;
 /// mantissa's binary digits by squaring (released at `2^(−62)`), halving it when it passes two.
 /// A `v` wider than 63 bits enters through its leading 63 (a relative release below `2^(−62)`).
 fn log2_reading(v: u128) -> i128 {
+    log2_reading_at(v, CERTIFICATE_DIGITS)
+}
+
+/// `log₂ v` on `2^(−digits)`, `digits ≤ 60` ([`log2_reading`]).
+fn log2_reading_at(v: u128, digits: u32) -> i128 {
     let v = v.max(1);
     let width = 128 - v.leading_zeros();
     let mut mantissa = if width > 63 { v >> (width - 63) } else { v << (63 - width) }; // in [2^62, 2^63)
     let mut fraction = 0i128;
-    for _ in 0..CERTIFICATE_DIGITS {
+    for _ in 0..digits {
         mantissa = (mantissa * mantissa) >> 62;
         fraction <<= 1;
         if mantissa >= 1u128 << 63 {
@@ -6075,7 +6137,7 @@ fn log2_reading(v: u128) -> i128 {
             mantissa >>= 1;
         }
     }
-    ((width as i128 - 1) << CERTIFICATE_DIGITS) + fraction
+    ((width as i128 - 1) << digits) + fraction
 }
 
 /// The products themselves: `Π m_new · Π t_old > Π m_old · Π t_new`.
@@ -7319,6 +7381,28 @@ pub fn code_of(m: u128, t: u128) -> i64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// [§16.23 of the field's record] The weighed certificate: with every weight one it is the products' comparison;
+    /// a region weighed above another can turn the decision (one region gaining a bit at weight three outweighs another
+    /// losing one and a half at weight one, where the products say the section codes more); a tie codes no fewer bits;
+    /// and the weighed code is each region's code at its weight, released once a region.
+    #[test]
+    fn the_weighed_certificate_reads_each_region_at_its_weight() {
+        let unit = [(2usize, 4u64, 4u64), (1, 7, 7)];
+        let old = [(3u128, 8u128), (5, 9), (1, 4)];
+        let new = [(4u128, 8u128), (5, 9), (1, 5)];
+        assert_eq!(fewer_bits_weighed(&old, &new, &unit), fewer_bits(&old, &new));
+        assert_eq!(fewer_bits_weighed(&new, &old, &unit), fewer_bits(&new, &old));
+        // Region A: 1/8 → 1/4, one bit fewer; region B: 1/4 → 1/12, log₂ 3 ≈ 1.585 bits more.
+        let old = [(1u128, 8u128), (4, 16)];
+        let new = [(1u128, 4u128), (1, 12)];
+        assert!(!fewer_bits(&old, &new), "unweighed, the section codes more bits");
+        assert!(fewer_bits_weighed(&old, &new, &[(1, 3, 1), (1, 1, 1)]), "region A at weight three outweighs B");
+        assert!(!fewer_bits_weighed(&old, &new, &[(1, 1, 3), (1, 1, 1)]), "region A at a third does not");
+        assert!(!fewer_bits_weighed(&old, &old, &[(1, 3, 1), (1, 1, 1)]), "a tie codes no fewer bits");
+        let pairs = [(1u128, 8u128), (1, 2), (1, 4)];
+        assert_eq!(weighed_code(&pairs, &[(2, 3, 2), (1, 1, 1)]), div_nearest(((3 + 1) << 20) as i128 * 3, 2) as i64 + (2 << 20));
+    }
 
     #[test]
     fn the_certificates_reading_lies_within_one_grain_below_the_logarithm() {

@@ -335,18 +335,20 @@ pub(super) struct TrainRegion {
     pub locked: Vec<bool>,
     /// Each carried site's echo (§15.3), empty where none.
     pub echo: Vec<Option<Echo>>,
+    /// The sites its open ones were drawn from (§16.23, [`Region::domain`]).
+    pub domain: Option<usize>,
 }
 
 impl TrainRegion {
     /// A region carrying no face and no lock.
     pub(super) fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new() }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None }
     }
 }
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain }
 }
 
 /// The regions as the field reads them.
@@ -393,14 +395,17 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         let cu: Vec<bool> = (0..cc.len()).map(|t| t >= q.len() + front).collect();
         held_fronts.push(TrainRegion::plain(cc, cu));
         let mut classes = region_classes(codec, q, a, length);
+        // [agent-inferred, November 2, §16.23] Each region is read as its state in the joint code: a mask's open sites
+        // are drawn from the whole region, a front region's from the answer's sites before its cut (the question is
+        // never open), so each is weighed `m/K` over that domain ([`Region::weight`]).
         match shape(seed, *draw, q.len(), length, a.len() + 1) {
             Shape::Masked(mask) => {
-                firsts.push(TrainRegion::plain(classes, mask));
+                firsts.push(TrainRegion { domain: Some(length), ..TrainRegion::plain(classes, mask) });
                 fronts.push(None);
             }
             Shape::Front(front) => {
                 classes.truncate(front.cut);
-                firsts.push(TrainRegion::plain(classes, front.open.clone()));
+                firsts.push(TrainRegion { domain: Some(front.cut - q.len()), ..TrainRegion::plain(classes, front.open.clone()) });
                 fronts.push(Some(front));
             }
         }
@@ -440,7 +445,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         // [agent-inferred, November 1] Read 2's echoes (§15.3): each carried site's read-1 logits and the echo
         // read 1 returned there, so read 2 meets its cavity field as the release does.
         let echo: Vec<Option<Echo>> = (0..front.cut).map(|t| faces[t].as_ref().and(read.logits.get(t).cloned().flatten()).map(|z| Echo { b: read.echo[t], logits: z })).collect();
-        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked, echo };
+        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked, echo, domain: first.domain };
         regions.push(first);
         regions.push(second);
     }
@@ -480,12 +485,12 @@ pub(super) const UNSEEN_DRAW: u64 = 1 << 61;
 /// ([`context_regions`], the region the question, the answer and its first void), and the same
 /// beside another problem's question (the foil, [`held_regions`]), the field's code over the
 /// answer's classes and its first void, on `2^(−20)` bits, beside each one's count: `[opening,
-/// context, foil]`. The early stop reads its question effect; no other decision of the run reads it.
+/// context, foil]`. A reading of completion only (§16.23): no decision of the run reads it.
 /// [retired, November 2, §16.19] The split of each into its digits and its text: a class sorted by
 /// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
 fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None }).collect();
     let mut out = [(0i64, 0usize); 3];
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
@@ -520,7 +525,7 @@ fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realiz
     let sets: [(&str, usize, usize, usize); 2] = [("opening", 0, n, 1), ("context", n, n * CONTEXT, CONTEXT)];
     for (set, skip, take, parts) in sets {
         let started = std::time::Instant::now();
-        let views: Vec<Region> = regions.iter().skip(skip).take(take).map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[] }).collect();
+        let views: Vec<Region> = regions.iter().skip(skip).take(take).map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None }).collect();
         let questions: Vec<usize> = problems.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), parts)).collect();
         let mut total = vec![HeldRows::default(); d.ticks * d.heads];
         for (chunk, asks) in views.chunks(64).zip(questions.chunks(64)) {
@@ -607,6 +612,116 @@ pub(super) fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<
     regions
 }
 
+/// [definition; agent-inferred, November 2, §16.23] **One held problem's states for the joint read**: its answer (and
+/// its first void, `m = |A| + 1` sites) read beside a question, the question resolved, at one state a stratum: `K_s`
+/// uniform in the stratum `S_s = [1 + ⌊s m/D⌋, 1 + ⌊(s+1) m/D⌋)` of `1..m` (`D` = [`CONTEXT`] strata, empty strata
+/// skipped), and `K_s` open sites uniform among the `m` (the keyed `K_s` least of a keyed rank). The weight of stratum
+/// `s` is `|S_s|/K_s`, so `Σ_s (|S_s|/K_s) Σ_(open) −log₂ p̂` is the stratified reading of
+/// `E_(K~U{1..m}) (m/K) Σ_(open) −log₂ p̂ = E_σ L_σ(A | Q)`, the order-averaged joint code (the comparison record, §3.2).
+/// Returns each state's classes, open sites and `(|S_s|, K_s)`; the foil's states are the same draws beside the next
+/// problem's question.
+pub(super) fn joint_states(void: usize, q: &[usize], a: &[usize], seed: u64, key: u64) -> Vec<(Vec<usize>, Vec<bool>, (u64, u64))> {
+    let mut classes: Vec<usize> = q.iter().chain(a).copied().collect();
+    classes.push(void);
+    let m = a.len() + 1;
+    let mut rank: Vec<usize> = (0..m).collect();
+    rank.sort_by_key(|&j| (mix(seed, JOINT_KEY ^ key ^ ((j as u64 + 1) << 20)), j));
+    (0..CONTEXT)
+        .filter_map(|s| {
+            let (lo, hi) = (1 + s * m / CONTEXT, 1 + (s + 1) * m / CONTEXT);
+            (hi > lo).then(|| {
+                let k = lo + (mix(seed, JOINT_KEY ^ key ^ (s as u64 + 1)) % (hi - lo) as u64) as usize;
+                let mut open = vec![false; classes.len()];
+                for &j in &rank[..k] {
+                    open[q.len() + j] = true;
+                }
+                (classes.clone(), open, ((hi - lo) as u64, k as u64))
+            })
+        })
+        .collect()
+}
+
+/// The joint read's key space (§16.23), apart from every other draw of the run.
+const JOINT_KEY: u64 = 9 << 58;
+
+/// [measurement; agent-inferred, November 2, §16.23] **The question's information, read by the joint code** (#602): for
+/// each held problem, its answer's order-averaged joint code beside its own question and beside the next problem's
+/// (the same states, [`joint_states`]), each state's code weighed `|S_s|/K_s`, every term released at the code's grain
+/// `2^(−20)` (to the nearest, half away from zero) a site; the information is the foil's code less the own. Printed as
+/// bits a byte over every held answer site (`FIELD_JOINT`), its series by the answer's quarters (`FIELD_JOINT_SERIES`,
+/// a site in the quarter its place falls in), and the quartiles over the problems of each one's information a byte;
+/// each problem's series by site, in millibits, goes to `rows` (the run's private `JOINT.tsv`). A reading only: no
+/// decision of the run reads it. It is not screened by the answer's own restatements, so it contains the question's
+/// information about the plan of a solution as well as about its names.
+fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64, realization: &mut dyn FieldRealization, lap: i64, rows: &mut std::fs::File) -> Result<()> {
+    let started = std::time::Instant::now();
+    let n = problems.len();
+    // (problem, foil, weight, classes, open)
+    let mut states: Vec<(usize, bool, (u64, u64), Vec<usize>, Vec<bool>)> = Vec::new();
+    for i in 0..n {
+        let ((q, a, _), (fq, _, _)) = (&problems[i], &problems[(i + 1) % n]);
+        for (foil, question) in [(false, q), (true, fq)] {
+            for (c, u, w) in joint_states(codec.void(), question, a, seed, i as u64) {
+                states.push((i, foil, w, c, u));
+            }
+        }
+    }
+    // Each held problem's per-site terms, own and foil, on 2^(−20) bits.
+    let mut own: Vec<Vec<i64>> = problems.iter().map(|(_, a, _)| vec![0i64; a.len() + 1]).collect();
+    let mut foil: Vec<Vec<i64>> = own.clone();
+    for chunk in states.chunks(64) {
+        let views: Vec<Region> = chunk.iter().map(|(_, _, _, c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None }).collect();
+        let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+        for ((i, is_foil, (size, k), c, _), faces) in chunk.iter().zip(faces) {
+            let q_len = c.len() - problems[*i].1.len() - 1;
+            let terms = if *is_foil { &mut foil[*i] } else { &mut own[*i] };
+            for (t, face) in faces.iter().enumerate() {
+                if let Some(face) = face {
+                    let x = face.code(c[t]) as i128 * *size as i128;
+                    let k = *k as i128;
+                    terms[t - q_len] += (if x >= 0 { (x + k / 2) / k } else { -((-x + k / 2) / k) }) as i64;
+                }
+            }
+        }
+    }
+    let (mut own_sum, mut foil_sum, mut sites) = (0i128, 0i128, 0i128);
+    let mut quarters = [(0i128, 0i128); 4];
+    let mut per: Vec<i64> = Vec::with_capacity(n);
+    for i in 0..n {
+        let m = own[i].len();
+        let (o, f): (i64, i64) = (own[i].iter().sum(), foil[i].iter().sum());
+        own_sum += o as i128;
+        foil_sum += f as i128;
+        sites += m as i128;
+        for j in 0..m {
+            let quarter = &mut quarters[4 * j / m];
+            quarter.0 += (foil[i][j] - own[i][j]) as i128;
+            quarter.1 += 1;
+        }
+        // The problem's information a byte, on 2^(−20) bits.
+        per.push(((f - o) as i128 / m as i128) as i64);
+        let series: Vec<String> = (0..m).map(|j| ((foil[i][j] - own[i][j]) as i128 * 1000 / (1 << 20)).to_string()).collect();
+        row(rows, &format!("{lap}\t{i}\t{m}\t{}\t{}\t{}\t{}\n", micro_bits(o as i128, 1), micro_bits(f as i128, 1), micro_bits((f - o) as i128, 1), series.join(",")))?;
+    }
+    println!(
+        "FIELD_JOINT lap={lap} answers={n} sites={sites} own_bits_a_byte={} foil_bits_a_byte={} information_bits_a_byte={} ms={}",
+        micro_bits(own_sum, sites),
+        micro_bits(foil_sum, sites),
+        micro_bits(foil_sum - own_sum, sites),
+        started.elapsed().as_millis()
+    );
+    per.sort_unstable();
+    let q = |f: usize| per.get((f * per.len()) / 4).copied().unwrap_or(0) as i128;
+    println!(
+        "FIELD_JOINT_SERIES lap={lap} by_quarter_bits_a_byte={} problems_quartiles_bits_a_byte={}/{}/{}",
+        quarters.iter().map(|&(s, c)| micro_bits(s, c)).collect::<Vec<_>>().join("/"),
+        micro_bits(q(1), 1),
+        micro_bits(q(2), 1),
+        micro_bits(q(3), 1)
+    );
+    Ok(())
+}
+
 /// The parts of [`context_regions`]: a site read with the `CONTEXT − 1` sites on each side of it
 /// resolved (agent-inferred: the reach the bytes' own table needs to code a site at its
 /// four-byte-context rate, from either side).
@@ -642,7 +757,7 @@ fn unseen_regions_with(answer: usize, void: usize, problems: &Problems, unseen: 
 /// sites and the step's read.
 fn unseen_read(learner: &mut FieldLearner, codec: &FieldCodec, problems: &Problems, unseen: &[usize], seed: u64, realization: &mut dyn FieldRealization) -> Result<(i64, usize, Option<FieldNext>)> {
     let regions = unseen_regions(codec, problems, unseen, seed);
-    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[] }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None }).collect();
     let (faces, next) = learner.read_step_on(&views, realization).map_err(|e| e.to_string())?;
     let (mut code, mut sites) = (0i64, 0usize);
     for (faces, region) in faces.iter().zip(&views) {
@@ -795,6 +910,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
     held_rows_text(&learner.field, &codec, &dev_set, realization, -1)?;
+    let mut joint_rows = rows_file(&out.join("JOINT.tsv"), "lap\tproblem\tanswer_sites\town_bits\tfoil_bits\tinformation_bits\tinformation_millibits_by_site\n")?;
+    joint_read(&learner.field, &codec, &dev_set, seed, realization, -1, &mut joint_rows)?;
     // The withheld problems' code after the lap before (at the opening, before any lap).
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
@@ -890,17 +1007,11 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
         held_rows_text(&learner.field, &codec, &dev_set, realization, lap as i64)?;
-        // [agent-inferred, November 2; fixed with the run's declaration] **The early stop** (§16, §16.20): from the third
-        // lap on, a run whose held question effect is at or below the foil's stops, and is reported incomplete. Why: the
-        // §16.20 run's claim is the question's effect, and three laps that leave the answer told no more by its own
-        // question than by another's read the obstacle (§16.19 declared nine before the far contact was repaired).
-        // [retired, November 2, §16.19] Its second condition, no paced head's clock moved toward a digit clock: a clock
-        // read at the codec's digits was the numeral matcher's target.
-        let effect = (held[2].0 as i128 * held[1].1 as i128) - (held[1].0 as i128 * held[2].1 as i128);
-        if lap + 1 >= EARLY_STOP_LAPS && effect <= 0 {
-            println!("FIELD_STOPPED_EARLY lap={lap} reason=the question tells the answer no more than the foil ms={}", started.elapsed().as_millis());
-            break;
-        }
+        joint_read(&learner.field, &codec, &dev_set, seed, realization, lap as i64, &mut joint_rows)?;
+        // [retired, November 2, §16.23] The early stop on the context read's question effect: that read sees the question
+        // only where the answer does not restate itself (a ceiling near 0.18 bits a byte on GSM8K, nearly all of it
+        // names), so it read the copier's channel (the comparison record, §2.2). The context read stays as a reading of
+        // completion; the question's information is the joint read's.
         // [agent-inferred, November 1] The width is the trained body's (growth by copies, the
         // tower's law): when a lap leaves the withheld problems coding no fewer bits a site than
         // the lap before left them, the body has spent its width and grows by two before the next.
@@ -926,8 +1037,6 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     Ok(())
 }
 
-/// The laps after which the early stop reads the question's effect (§16).
-const EARLY_STOP_LAPS: usize = 3;
 
 /// What a lap's withheld read decides of the body's width ([`growth`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1293,7 +1402,7 @@ impl LandmarkCount {
         let started = std::time::Instant::now();
         let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
         let locked = locks_of(r);
-        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked, echo: &[] };
+        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked, echo: &[], domain: None };
         let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
         self.ns += started.elapsed().as_nanos();
         self.problems += 1;
@@ -1431,7 +1540,7 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
     for (name, set) in [("withheld", &withheld), ("masked", &masked), ("front_read1", &fronts)] {
         let mut total = holonics::hnn::tower::field::RowShares::default();
         for (classes, open) in set.iter() {
-            let r = field.row_shares(&Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[] }).map_err(|e| e.to_string())?;
+            let r = field.row_shares(&Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None }).map_err(|e| e.to_string())?;
             for k in 0..2 {
                 total.rows[k] += r.rows[k];
                 total.far_sources[k] += r.far_sources[k];
@@ -1502,7 +1611,7 @@ pub(super) fn currents_field(args: &[String], realization: &mut dyn FieldRealiza
         }
     }
     let regions = held_regions(&codec, &held);
-    let view = |k: usize| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[], locked: &[], echo: &[] };
+    let view = |k: usize| Region { classes: &regions[k].0, unresolved: &regions[k].1, faces: &[], locked: &[], echo: &[], domain: None };
     let own: Vec<Region> = (n..n + n * CONTEXT).map(view).collect();
     let foil: Vec<Region> = (n + n * CONTEXT..n + 2 * n * CONTEXT).map(view).collect();
     let q_own: Vec<usize> = held.iter().flat_map(|(q, _, _)| std::iter::repeat_n(q.len(), CONTEXT)).collect();
@@ -1695,6 +1804,30 @@ mod tests {
         assert_eq!(growth(false, false, false, 0, 27), Growth::None);
         assert_eq!(growth(false, true, false, 26, 27), Growth::None);
         assert_eq!(growth(false, true, true, 26, 27), Growth::None);
+    }
+
+    /// [§16.23] The joint read's states: one a stratum of `1..m`, each `K_s` inside its stratum, the strata covering
+    /// `1..m` once, `K_s` answer sites open and nothing else, keyed alike for the own question and the foil.
+    #[test]
+    fn the_joint_states_stratify_the_reading_orders() {
+        let (q, a) = (vec![1usize, 2, 3, 4, 5], vec![2usize; 11]);
+        let states = joint_states(0, &q, &a, 7, 3);
+        let m = a.len() + 1;
+        assert_eq!(states.len(), CONTEXT);
+        assert_eq!(states.iter().map(|s| s.2 .0).sum::<u64>(), m as u64);
+        let mut lo = 1u64;
+        for (classes, open, (size, k)) in &states {
+            assert_eq!(classes.len(), q.len() + m);
+            assert!(*k >= lo && *k < lo + size, "K {k} in [{lo}, {})", lo + size);
+            lo += size;
+            assert_eq!(open.iter().filter(|&&u| u).count() as u64, *k);
+            assert!(open[..q.len()].iter().all(|&u| !u), "the question is resolved");
+        }
+        let foil = joint_states(0, &[9, 9], &a, 7, 3);
+        for (own, foil) in states.iter().zip(&foil) {
+            assert_eq!(own.1[q.len()..], foil.1[2..], "the foil reads the same states");
+        }
+        assert_eq!(joint_states(0, &q, &[], 7, 3).len(), 1, "a one-site answer has one stratum");
     }
 
     #[test]
@@ -1915,15 +2048,15 @@ mod tests {
             let truth = region_classes(codec, q, a, length);
             match shape(seed, draw, q.len(), length, a.len() + 1) {
                 Shape::Masked(mask) => {
-                    assert_eq!(regions[k], TrainRegion::plain(truth, mask));
+                    assert_eq!(regions[k], TrainRegion { domain: Some(length), ..TrainRegion::plain(truth, mask) }, "a mask is a state of the whole region (§16.23)");
                     k += 1;
                 }
                 Shape::Front(f) => {
                     let (one, two) = (&regions[k], &regions[k + 1]);
                     k += 2;
                     fronts += 1;
-                    assert_eq!(one, &TrainRegion::plain(truth[..f.cut].to_vec(), f.open.clone()), "read 1: the truth cut at the band, the open sites unresolved");
-                    assert_eq!((&two.classes, &two.unresolved), (&one.classes, &one.unresolved), "read 2 is read 1's region");
+                    assert_eq!(one, &TrainRegion { domain: Some(f.cut - q.len()), ..TrainRegion::plain(truth[..f.cut].to_vec(), f.open.clone()) }, "read 1: the truth cut at the band, the open sites unresolved, a state of the answer before the cut");
+                    assert_eq!((&two.classes, &two.unresolved, two.domain), (&one.classes, &one.unresolved, one.domain), "read 2 is read 1's region");
                     let z = field.logits(&view_of(one)).unwrap();
                     assert_eq!(two.faces.len(), f.cut);
                     assert_eq!(two.locked.len(), f.cut);

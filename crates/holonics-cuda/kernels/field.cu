@@ -2500,6 +2500,20 @@ extern "C" __global__ void field_face_covector(FieldWords w, const uint64_t *mas
     }
 }
 
+// [definition; agent-inferred, November 2, §16.23] The face covector weighed as its region's state in the joint code:
+// `δz ← div_nearest(δz · m, K)` at an unresolved site whose region declares `m ≠ K` (the host's `returned_with`),
+// checked as the host's `fit64`.
+extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, const uint64_t *wk, int64_t *dz) {
+    const uint64_t cells = (uint64_t)w.T * w.A;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.A;
+        if (!w.unresolved[t] || wm[t] == wk[t]) {
+            continue;
+        }
+        dz[c] = fit64(div_nearest((wide)dz[c] * (wide)wm[t], (wide)wk[t]), w.status);
+    }
+}
+
 // `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with
 // `accumulate` it is added to `out[t][i]` (each addition checked as the host's `fit64`).
 extern "C" __global__ void field_transposed(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved) {
