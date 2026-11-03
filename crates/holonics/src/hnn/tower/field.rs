@@ -334,16 +334,20 @@ impl FieldDeclaration {
         3 * self.alphabet * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width + 2 * self.moment_modes() * self.width
     }
 
-    /// The key draws a growth by `factor` reads ([`Field::growth_draws`]).
+    /// The key draws a growth by `factor` reads ([`Field::growth_draws`]): `f − 1` parts of each chart entry and of
+    /// each copied pair drive's entry.
     pub fn growth_draws(&self, factor: usize) -> usize {
-        factor * factor.saturating_sub(1) * self.width * (3 * 2 * self.complex() + 2 * self.contacts)
+        factor.saturating_sub(1) * self.width * (3 * 2 * self.complex() + 2 * self.contacts * factor)
     }
 
-    /// The declaration grown by `factor`: width, heads and contacts (a head's modes, its ring set,
-    /// the ring sets and the reach are kept).
+    /// [definition; agent-inferred, November 3, §16.29] The declaration grown by `factor`: the width and the merge's
+    /// contacts; the heads (their modes, ring sets and clocks) and the reach are kept. Why the heads are kept: the
+    /// card's time follows the contact's site pairs, which follow the heads, while the field's memory lies in its
+    /// width and its merge (a trained field widened with its heads read a section in 2.4 times the time; a founded
+    /// field of width 128 with four heads reads one in 0.41 s against 0.69 s at width 32).
     pub fn grown(&self, factor: usize) -> Result<Self> {
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
-        Ok(Self { width: grow(self.width)?, heads: grow(self.heads)?, contacts: grow(self.contacts)?, ..*self })
+        Ok(Self { width: grow(self.width)?, contacts: grow(self.contacts)?, ..*self })
     }
 
     /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
@@ -3075,16 +3079,16 @@ impl Field {
         self.declaration.growth_draws(factor)
     }
 
-    /// [definition; agent-inferred, November 1] **The field widened by `factor`**, by the tower's
-    /// growth law (`hnn::tower::growth`): every face coordinate gets `f` equal copies (the encoding
-    /// and every bias repeated), every head is repeated (one head a copy, its modes and frames
-    /// kept, so `M' = fM` with copy `b` of mode `c` at `bM + c`), every contact repeated, and every
-    /// matrix entry split over its `f` column copies into parts that sum to it, its rows repeated
-    /// (the readout's kept). A part's zero-sum difference is the grown founding's draw at its
-    /// scale (`√(3/fD)` for the charts and pair drives, read from `keys` four bytes a draw); the
-    /// families founded at zero (the returns and the readout) split evenly. Every sum the forward
-    /// forms is then the old sum, so the grown field reads the old faces exactly, and the copies
-    /// part under learning.
+    /// [definition; agent-inferred, November 1; November 3, §16.29] **The field widened by `factor`**, by the tower's
+    /// growth law (`hnn::tower::growth`): every face coordinate gets `f` equal copies (the encoding and every face bias
+    /// repeated), every contact repeated, and every matrix entry that reads the face split over its `f` column copies
+    /// into parts that sum to it; a matrix that writes the face (the current's return, the moment's chart, the pair's
+    /// return) has its rows repeated over the face copies, the current's and the moment's columns whole. The heads
+    /// are kept: their charts' rows, biases, moments, clocks and temperatures are the old ones. A part's zero-sum
+    /// difference is the grown founding's draw at its scale (`√(3/fD)` for the charts and pair drives, read from
+    /// `keys` four bytes a draw); the families founded at zero (the returns and the readout) split evenly. Every sum
+    /// the forward forms is then the old sum, so the grown field reads the old faces exactly, and the copies part
+    /// under learning.
     ///
     /// Returns the grown field and, for each grown entry, the old entry it carries and whether its
     /// covector is divided among the copies (every family but the readout's).
@@ -3097,7 +3101,7 @@ impl Field {
         let layout = FieldLayout::new(&d);
         let (ol, f) = (&self.layout, factor);
         let (dw, m, fc, a) = (old.width, old.complex(), old.contacts, old.alphabet);
-        let (dw2, m2g) = (d.width, d.complex());
+        let dw2 = d.width;
         let mut new = vec![0i32; layout.len];
         let mut from = vec![(0usize, true); layout.len];
         let mut cursor = 0usize;
@@ -3131,25 +3135,34 @@ impl Field {
             Ok(())
         };
         let scale = Some(chart_scale(dw2));
-        // Index maps: a face coordinate's copy `c` at `cD + j`; a complex chart row's (real or
-        // imaginary part, copy `b`, mode `c`) at `part·M' + bM + c`; a contact's at `bf + e`.
+        // Index maps: a face coordinate's copy `c` at `cD + j`; a contact's at `bf + e`.
         let face = |c: usize, j: usize| c * dw + j;
-        let chart_row = |b: usize, r: usize| (r / m) * m2g + b * m + r % m;
         // A contact is a complex pair (`e`, `f/2 + e`, §15.1): copy `c` of its real part at `c f/2 + e`,
         // of its imaginary part at `f'/2 + c f/2 + e`, so every copy keeps its pair.
         let contact = |c: usize, e: usize| if e < fc / 2 { c * (fc / 2) + e } else { f * fc / 2 + c * (fc / 2) + e - fc / 2 };
         let kept = |_: usize, r: usize| r;
-        split(ol.q, layout.q, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
-        split(ol.v, layout.v, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
-        split(ol.probe, layout.probe, 2 * m, dw, f, &chart_row, dw2, &face, scale, true)?;
-        split(ol.out, layout.out, dw, 2 * m, f, &face, 2 * m2g, &chart_row, None, true)?;
+        // [§16.29] A head's chart reads every face copy (its row kept, each entry split over its column's copies), and the
+        // current returns whole to every face copy (each row repeated, below): every copy of a coordinate stays its source.
+        split(ol.q, layout.q, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
+        split(ol.v, layout.v, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
+        split(ol.probe, layout.probe, 2 * m, dw, 1, &kept, dw2, &face, scale, false)?;
         split(ol.a, layout.a, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.w, layout.w, dw, fc, f, &face, f * fc, &contact, None, true)?;
-        // The moment's chart into the face (§16.22) reads the moments as the current's return reads the current: every
-        // copy of a head carries its source's moment whole (below), so each entry is split evenly over its column's
-        // copies and its rows repeated, and the grown opening is the old one exactly.
-        split(ol.moment_face, layout.moment_face, dw, 2 * m, f, &face, 2 * m2g, &chart_row, None, true)?;
+        // The current's return and the moment's chart into the face (§16.22) write the face: each row repeated over the
+        // face copies, its columns (the heads' modes, kept) whole, so the grown current and opening are the old ones on
+        // every copy; a copy's covector arrives divided, as the face's does.
+        for (old_at, new_at) in [(ol.out, layout.out), (ol.moment_face, layout.moment_face)] {
+            for b in 0..f {
+                for r in 0..dw {
+                    for k in 0..2 * m {
+                        let at = new_at + face(b, r) * 2 * m + k;
+                        new[at] = self.theta[old_at + r * 2 * m + k];
+                        from[at] = (old_at + r * 2 * m + k, true);
+                    }
+                }
+            }
+        }
         // [§16.26] The readout's lift reads every face copy and writes the first copy of each coordinate only, each entry split
         // evenly over its column's copies, its bias the first copy's; the encoding's rows are repeated over the copies, so the
         // grown face `⟨E′(a), y′⟩ = ⟨E(a), y⟩` exactly, and the copies part under learning.
@@ -3172,18 +3185,20 @@ impl Field {
                 from[at] = (ol.lift_bias + j, true);
             }
         }
-        // The paces (§16.16): each copy of a turned head reads its source's rates whole, a class's rate being no
-        // face coordinate, so every copy's clock is its source's exactly.
-        let paced: Vec<usize> = (0..old.heads).filter(|&h| old.carries_moment(h)).collect();
-        let pace_row = |b: usize, r: usize| d.moment_index(b * old.heads + paced[r]) / d.modes;
-        let rates = old.alphabet + 1;
-        for b in 0..f {
-            for r in 0..paced.len() {
-                for u in 0..rates {
-                    let (from_at, to_at) = (ol.pace + r * rates + u, layout.pace + pace_row(b, r) * rates + u);
-                    new[to_at] = self.theta[from_at];
-                    from[to_at] = (from_at, false);
-                }
+        // The heads' own families (§16.29: kept, no face coordinate among them): the paces (§16.16), the moment encodings
+        // (§15.1), the temperatures (§15.10) and the charts' biases, each its source's, its covector its source's whole.
+        for (old_at, new_at, len) in [
+            (ol.pace, layout.pace, layout.moment_face - layout.pace),
+            (ol.moment_before, layout.moment_before, layout.moment_after - layout.moment_before),
+            (ol.moment_after, layout.moment_after, layout.temper - layout.moment_after),
+            (ol.temper, layout.temper, 2 * old.heads),
+            (ol.q_bias, layout.q_bias, 2 * m),
+            (ol.v_bias, layout.v_bias, 2 * m),
+            (ol.probe_bias, layout.probe_bias, 2 * m),
+        ] {
+            for i in 0..len {
+                new[new_at + i] = self.theta[old_at + i];
+                from[new_at + i] = (old_at + i, false);
             }
         }
         // Vector families: each entry's copies.
@@ -3200,46 +3215,12 @@ impl Field {
             repeat(ol.before + row * dw, layout.before + row * dw2, dw, f, &face, true);
             repeat(ol.after + row * dw, layout.after + row * dw2, dw, f, &face, true);
         }
-        repeat(ol.q_bias, layout.q_bias, 2 * m, f, &chart_row, true);
-        repeat(ol.v_bias, layout.v_bias, 2 * m, f, &chart_row, true);
-        repeat(ol.probe_bias, layout.probe_bias, 2 * m, f, &chart_row, true);
         repeat(ol.out_bias, layout.out_bias, dw, f, &face, true);
         repeat(ol.a_bias, layout.a_bias, fc, f, &contact, true);
         repeat(ol.b_bias, layout.b_bias, fc, f, &contact, true);
         repeat(ol.w_bias, layout.w_bias, dw, f, &face, true);
         repeat(ol.read_bias, layout.read_bias, a, 1, &kept, false);
         repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
-        // The moment encodings (§15.1): every copy of a head carries its source's moment whole, as it
-        // carries its value (each copy's value is its source's); the current's return is parted, so
-        // a copy's covector arrives divided and its step's moments are lifted divided, as `v_bias`'s.
-        let (t_old, t_new, n) = (old.moment_modes(), d.moment_modes(), old.modes);
-        for (old_base, new_base) in [(ol.moment_before, layout.moment_before), (ol.moment_after, layout.moment_after)] {
-            for row in 0..=a {
-                for b in 0..f {
-                    for h in (0..old.heads).filter(|&h| old.carries_moment(h)) {
-                        for l in 0..n {
-                            let (oi, ni) = (old.moment_index(h) + l, d.moment_index(b * old.heads + h) + l);
-                            for part in 0..2 {
-                                let (from_at, to_at) = (old_base + row * 2 * t_old + part * t_old + oi, new_base + row * 2 * t_new + part * t_new + ni);
-                                new[to_at] = self.theta[from_at];
-                                from[to_at] = (from_at, true);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // The temperatures (§15.10): every copy of a head keeps its source's, its step state divided as
-        // its covector arrives over the parted return.
-        for b in 0..f {
-            for h in 0..old.heads {
-                for kind in 0..2 {
-                    let (from_at, to_at) = (ol.temper + 2 * h + kind, layout.temper + 2 * (b * old.heads + h) + kind);
-                    new[to_at] = self.theta[from_at];
-                    from[to_at] = (from_at, true);
-                }
-            }
-        }
         Ok((Self::with_theta(d, new), from))
     }
 }

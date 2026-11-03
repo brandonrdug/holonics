@@ -1,0 +1,4 @@
+K=1 held answer sites=35591 bits_a_byte=2.092 contexts=4728 entries=20656
+K=2 held answer sites=35591 bits_a_byte=1.101 contexts=150595 entries=252608
+K=3 held answer sites=35591 bits_a_byte=0.915
+train_bytes=3521438
