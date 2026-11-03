@@ -37,7 +37,8 @@
 //! contact    z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² |k̃_jm|²/2] − ⌊log₂ |i − j|⌋   the head's lock, j ∈ S_i^h
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
-//! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
+//! pair       r̂'_t = x_t / ‖x_t‖_rms,   a_t = W_a r̂'_t + b_a,   b_t = W_b r̂'_t + b_b,   x_t ← x_t + W_c (a_t · b_(s(t))) + b_c
+//!            s(t) the site's strand mate, t − 1 at an even contact and t + 1 at an odd (§16.34)   complex pairs along the strand
 //! face       z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)   at the unresolved sites; read through the encoding (§16.26)
 //! ```
 //!
@@ -157,7 +158,8 @@
 //! through its framed modes' lock at its falloff, the ring
 //! phasors carry the helix (a tower's residues are each finer ring's residue with its whole winding),
 //! and the pair contact `a · b` (complex, so two ring faces compose by adding their phases) is the
-//! bilinear contact between two reads of one site (the merge).
+//! bilinear contact between a site's read and its strand mate's (the merge, §16.34): the strand's own pair contact, so a
+//! rule over a site's neighbours forms in the first tick and its reach grows a site a tick.
 //! Of the winding guide's six general objects it touches the **helix** (the ring phasors, the
 //! carry), the **pair** (site contacts as locks and the bilinear merge), **faces and placement**
 //! (the shells as addresses, the Gibbs face, the release's lock) and the **tube** (the `K` ticks and
@@ -379,8 +381,10 @@ impl FieldDeclaration {
     }
 
     fn admit(&self) -> Result<()> {
-        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.contacts % 2 != 0 || self.ticks == 0 {
-            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts in complex pairs and ticks");
+        // [§16.34] The contacts come in complex pairs, as many complex contacts toward each strand mate (`f/2` even), so a
+        // growth's copies keep their side.
+        if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.contacts % 4 != 0 || self.ticks == 0 {
+            return refuse("a field needs two classes, a nonempty width, heads, modes, contacts in complex pairs even at each strand side, and ticks");
         }
         if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
             return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
@@ -394,13 +398,13 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v11 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v12 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v11" {
-            return refuse("a field's head line that is not hnn-field-v11");
+        if words.len() != 10 || words[0] != "hnn-field-v12" {
+            return refuse("a field's head line that is not hnn-field-v12");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
@@ -2083,11 +2087,19 @@ impl Field {
             let rt = &cell.read2[t * dw..(t + 1) * dw];
             affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, rt, Some(&self.theta[l.a_bias..l.a_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.a[t * f..(t + 1) * f])?;
             affine(&self.theta[l.b..l.b + f * dw], reaches.b, dw, rt, Some(&self.theta[l.b_bias..l.b_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.b[t * f..(t + 1) * f])?;
-            // The complex product a contact (§15.1): contact `e < f/2` is `a_e + i a_(f/2+e)`, so two ring
-            // faces compose by adding their phases, `q(x + y) = q(x) q(y)`.
-            let (ac, bc, half) = (&cell.a[t * f..(t + 1) * f], &cell.b[t * f..(t + 1) * f], f / 2);
+        }
+        for t in 0..sites {
+            // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along
+            // the strand: contact `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one
+            // before it at an even `e` and the one after at an odd ([`strand_mate`]), so two ring faces compose by adding
+            // their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none past the region's ends.
+            let half = f / 2;
             for e in 0..half {
-                let (ar, ai, br, bi) = (ac[e] as i128, ac[half + e] as i128, bc[e] as i128, bc[half + e] as i128);
+                let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                let (br, bi) = match strand_mate(t, e, sites) {
+                    Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
+                    None => (0, 0),
+                };
                 cell.c[t * f + e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
                 cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
             }
@@ -2470,19 +2482,23 @@ impl Field {
             outer_sum(&mut g[l.w..l.w + dw * f], f, &dxs, &cs)?;
             let mut da = vec![0i64; sites * f];
             let mut db = vec![0i64; sites * f];
-            let mut dc = vec![0i64; f];
+            let mut dc = vec![0i64; sites * f];
             for t in 0..sites {
-                transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc)?;
-                // `δa = conj(b) δc`, `δb = conj(a) δc` for the complex product.
-                let half = f / 2;
+                transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
+            }
+            // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s`
+            // (§16.34); each site's `b` is one mate's, so each `δb_s` is one term.
+            let half = f / 2;
+            for t in 0..sites {
                 for e in 0..half {
-                    let (re, im) = (t * f + e, t * f + half + e);
-                    let (gr, gi) = (dc[e] as i128, dc[half + e] as i128);
-                    let (ar, ai, br, bi) = (cell.a[re] as i128, cell.a[im] as i128, cell.b[re] as i128, cell.b[im] as i128);
-                    da[re] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
-                    da[im] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
-                    db[re] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
-                    db[im] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
+                    let Some(s) = strand_mate(t, e, sites) else { continue };
+                    let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
+                    da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
+                    da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
+                    db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
+                    db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
                 }
             }
             let das: Vec<&[i64]> = da.chunks_exact(f).collect();
@@ -3069,6 +3085,17 @@ pub fn landmarks_of(rows: &[Vec<(Vec<(u32, u64)>, u64)>], question: usize, count
             ranked
         })
         .collect()
+}
+
+/// [definition; agent-inferred, November 3, §16.34] **A site's strand mate for pair contact `e`**: the site before it at an
+/// even `e`, the one after at an odd, `None` past the region's ends. The parity survives growth by copies (a contact's copy
+/// stands at `c · f/2 + e`, `f/2` even), so a grown merge reads the old one exactly.
+pub fn strand_mate(t: usize, e: usize, sites: usize) -> Option<usize> {
+    if e % 2 == 0 {
+        t.checked_sub(1)
+    } else {
+        (t + 1 < sites).then_some(t + 1)
+    }
 }
 
 /// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square

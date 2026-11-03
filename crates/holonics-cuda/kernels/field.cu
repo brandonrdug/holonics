@@ -2444,13 +2444,27 @@ extern "C" __global__ void field_echo_apply(FieldWords w, int64_t *z) {
 // `2^(−16)`: `c_re = release(ar br − ai bi, 16)`, `c_im = release(ar bi + ai br, 16)`. Two ring faces then
 // compose by adding their phases. One thread a site and a pair of contacts; `f` is even (the host admits no
 // other declaration).
+// [§16.34] Site `g`'s strand mate for pair contact `e` (the host's `strand_mate`): the site before it at an even `e`, the
+// one after at an odd, within its region; `UINT64_MAX` past the region's ends.
+__device__ __forceinline__ uint64_t strand_mate(const FieldWords &w, uint64_t g, uint64_t e) {
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    if (e % 2 == 0) {
+        return i > 0 ? g - 1 : UINT64_MAX;
+    }
+    return i + 1 < sites ? g + 1 : UINT64_MAX;
+}
+
+// The pair contact along the strand (§16.34, the host's tick): `c_g = a_g · b_mate`, zero without a mate.
 extern "C" __global__ void field_pair(FieldWords w) {
     const uint32_t half = w.f / 2;
     const uint64_t cells = (uint64_t)w.T * half;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / half, e = c % half;
         const uint64_t re = t * w.f + e, im = re + half;
-        const wide ar = w.pa[re], ai = w.pa[im], br = w.pb[re], bi = w.pb[im];
+        const uint64_t s = strand_mate(w, t, e);
+        const wide ar = w.pa[re], ai = w.pa[im];
+        const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
         w.pc[im] = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
     }
@@ -2637,18 +2651,36 @@ extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read
 // The complex product's return (the host's `returned`): `δa = conj(b) δc`, `δb = conj(a) δc`, each part
 // released to `2^(−16)`: `δa_re = release(br gr + bi gi, 16)`, `δa_im = release(br gi − bi gr, 16)`, and so
 // for `δb` against `a`.
+// [§16.34] Along the strand: `δa_g = conj(b_mate) δc_g`, and `δb_g = conj(a_p) δc_p` from the one site `p` whose mate `g` is
+// (the site after it at an even `e`, before it at an odd), each zero where there is none.
 extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db) {
     const uint32_t half = w.f / 2;
     const uint64_t cells = (uint64_t)w.T * half;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / half, e = c % half;
         const uint64_t re = t * w.f + e, im = re + half;
-        const wide gr = dc[re], gi = dc[im];
-        const wide ar = w.pa[re], ai = w.pa[im], br = w.pb[re], bi = w.pb[im];
-        da[re] = fit64(rel(br * gr + bi * gi, FACE_BITS), w.status);
-        da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
-        db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
-        db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
+        const uint64_t s = strand_mate(w, t, e);
+        if (s == UINT64_MAX) {
+            da[re] = 0;
+            da[im] = 0;
+        } else {
+            const wide gr = dc[re], gi = dc[im];
+            const wide br = w.pb[s * w.f + e], bi = w.pb[s * w.f + half + e];
+            da[re] = fit64(rel(br * gr + bi * gi, FACE_BITS), w.status);
+            da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
+        }
+        // The site whose mate `t` is: its mate on the other side of `t`, read from `t` itself.
+        const uint64_t p = strand_mate(w, t, e ^ 1);
+        if (p == UINT64_MAX) {
+            db[re] = 0;
+            db[im] = 0;
+        } else {
+            const uint64_t pre = p * w.f + e, pim = pre + half;
+            const wide gr = dc[pre], gi = dc[pim];
+            const wide ar = w.pa[pre], ai = w.pa[pim];
+            db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
+            db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
+        }
     }
 }
 
