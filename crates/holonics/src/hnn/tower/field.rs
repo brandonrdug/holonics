@@ -1464,8 +1464,8 @@ impl Field {
     }
 
     /// [definition; agent-inferred, November 2] **The turned heads' clocks over a region** ([`Paces`]), read on the
-    /// class sheet (§16.16): a site's rate is its own class's, `κ = 1 + c_h[u_t]` on `2^(−24)` (the unresolved row's
-    /// at an open site, a carried face's mixture `release(Σ_a w_a c_h[a], 16)`), one rate a codec cell, a navigator's
+    /// class sheet (§16.16): a site's rate is its own class's, `κ = 1 + c_h[u_t]` on `2^(−24)` (one at a silent open
+    /// site, §16.28; a carried face's mixture `release(Σ_a w_a c_h[a], 16)`), one rate a codec cell, a navigator's
     /// resident face beside `E(u)`, opening at `κ ≡ 1` and deposited by the covector like every other parameter
     /// (§16.19). The neighbours' rows of the opening do not enter: a copy's turn is
     /// the sum of its span's rates, and the loop law reads only the span's classes.
@@ -1695,9 +1695,19 @@ impl Field {
         if region.unresolved[t] { self.declaration.alphabet } else { region.classes[t] }
     }
 
-    /// Site `s`'s row of a family at `base` of `width` a class (its class's row, the unresolved row, or
-    /// its carried face's mixture `release(Σ_a w_a E(a), 16)`).
+    /// [definition; agent-inferred, November 3, §16.28] **An open site is silent on the strand**: unresolved and carrying
+    /// no face, nothing has arrived there, so it adds nothing to any site's moment and its clock runs at the strand's own
+    /// place (`κ = 1`). Its own opening (`E(∗)` with its neighbours' contact rows) is its own and stays.
+    fn silent(region: &Region, t: usize) -> bool {
+        region.unresolved[t] && Self::carried(region, t).is_none()
+    }
+
+    /// Site `s`'s row of a family at `base` of `width` a class (its class's row, or its carried face's mixture
+    /// `release(Σ_a w_a E(a), 16)`; zero at a silent site, [`Field::silent`]).
     fn strand_row(&self, region: &Region, base: usize, width: usize, s: usize) -> Vec<i64> {
+        if Self::silent(region, s) {
+            return vec![0; width];
+        }
         match Self::carried(region, s) {
             None => self.theta[base + self.row(region, s) * width..base + (self.row(region, s) + 1) * width].iter().map(|&e| e as i64).collect(),
             Some(face) => (0..width).map(|i| release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * width + i] as i128).sum(), STATE_BITS) as i64).collect(),
@@ -1705,8 +1715,11 @@ impl Field {
     }
 
     /// A strand row's return: `d` (on `2^(−24)`) into site `s`'s row, or each carried class's row by
-    /// its share.
+    /// its share; nothing at a silent site.
     fn strand_return(&self, region: &Region, base: usize, width: usize, s: usize, d: &[i128], g: &mut [i128]) {
+        if Self::silent(region, s) {
+            return;
+        }
         match Self::carried(region, s) {
             None => {
                 let start = base + self.row(region, s) * width;
@@ -1743,8 +1756,8 @@ impl Field {
 
     /// [definition; agent-inferred, November 1] **Each site's moments** (§15.1, [`moment::moments`]),
     /// `[t][2M]` on `2^(−16)`, nonzero only at the modes that carry one: mode `l` of a turned head reads
-    /// the strands' moment encodings `E⁺`, `E⁻` (a site's class row, the unresolved row, or its carried
-    /// mixture) on its own ring and skin.
+    /// the strands' moment encodings `E⁺`, `E⁻` (a site's class row or its carried mixture; nothing from a silent
+    /// open site, §16.28) on its own ring and skin.
     fn moments_of(&self, region: &Region, paces: &Paces) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
@@ -2860,7 +2873,7 @@ impl Field {
                     tail_tau += gtau[p][k];
                     tail_sig += gsig[p][k];
                     let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
-                    if dk == 0 {
+                    if dk == 0 || Self::silent(region, k) {
                         continue;
                     }
                     match Self::carried(region, k) {

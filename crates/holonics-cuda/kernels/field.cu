@@ -2217,13 +2217,14 @@ CONTACT_ENTRY(20)
 // grow with its moment modes).
 
 // Site `t`'s strand encoding of the moment mode `idx` (the real part, then the imaginary `T` on): its
-// class's row of the family at `base` (`2T` wide), the unresolved row, or its carried mixture `release(
+// class's row of the family at `base` (`2T` wide), zero at a silent open site, or its carried mixture `release(
 // Σ_a w_a E(a), 16)` (the host's `strand_row`).
 __device__ __forceinline__ int64_t moment_strand(const FieldWords &w, uint64_t base, uint32_t tm, uint32_t idx, uint64_t t, uint32_t part) {
     const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
     const uint32_t col = part == 0 ? idx : tm + idx;
     if (from == to) {
-        return w.theta[base + row_of(w, t) * 2 * tm + col];
+        // A silent open site adds nothing to the strand (§16.28, the host's `Field::silent`).
+        return w.unresolved[t] ? 0 : w.theta[base + row_of(w, t) * 2 * tm + col];
     }
     wide sum = 0;
     for (uint32_t k = from; k < to; k++) {
@@ -2376,7 +2377,9 @@ extern "C" __global__ void field_moment_strand_return_all(FieldWords w, uint64_t
                     continue;
                 }
                 if (from == to) {
-                    add_wide(g + base + row_of(w, t) * 2 * tm + col, v);
+                    if (!w.unresolved[t]) {
+                        add_wide(g + base + row_of(w, t) * 2 * tm + col, v);
+                    }
                 } else {
                     for (uint32_t k = from; k < to; k++) {
                         add_wide(g + base + (uint64_t)w.mix_class[k] * 2 * tm + col, rel((wide)w.mix_share[k] * v, FACE_BITS));
@@ -3369,13 +3372,13 @@ __device__ __forceinline__ wide skin_back_dev(const FieldWords &w, wide b, wide 
     return rel(rel(y, MOVE_BITS), 16);
 }
 
-// A site's rate on paced head `p`'s class sheet (§16.16, the host's `Field::paces`): its own class's entry (the
-// unresolved row's at an open site), or its carried shares' mixture `release(Σ_a w_a c_p[a], 16)`.
+// A site's rate on paced head `p`'s class sheet (§16.16, the host's `Field::paces`): its own class's entry (zero at a
+// silent open site, §16.28), or its carried shares' mixture `release(Σ_a w_a c_p[a], 16)`.
 __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint64_t s) {
     const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
     const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
     if (from == to) {
-        return (wide)w.theta[base + row_of(w, s)];
+        return w.unresolved[s] ? 0 : (wide)w.theta[base + row_of(w, s)];
     }
     wide sum = 0;
     for (uint32_t k = from; k < to; k++) {
@@ -4013,7 +4016,9 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
         const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
         if (from == to) {
-            add_wide(g + base + row_of(w, t), dk << FACE_BITS);
+            if (!w.unresolved[t]) {
+                add_wide(g + base + row_of(w, t), dk << FACE_BITS);
+            }
         } else {
             for (uint32_t k = from; k < to; k++) {
                 add_wide(g + base + w.mix_class[k], dk * (wide)w.mix_share[k]);

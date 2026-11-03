@@ -1101,7 +1101,11 @@ fn a_site_opens_on_its_moment() {
 
 /// [§16.23] **A region's covector is its state's in the joint code**: a region whose `K` open sites were drawn from a
 /// domain of `m` returns the covector of its code read at `m/K`, the unweighed covector times `m/K` to the releases'
-/// rounding, and its weight is `(m, K)`, `(K, K)` with no domain declared.
+/// rounding, and its weight is `(m, K)`, `(K, K)` with no domain declared. [§16.28] The moment chart's covector is the
+/// outer product `Σ_t δx⁰_t s_tᵀ`, so the opening covector's rounding at each site enters it times that site's moment:
+/// its entries are read to sixteen of the opening covector's units times `Σ_t |s_t|` beside the relative bound (on this
+/// fixture the moments reach about `2^16`, and an entry whose terms cancel to a sixth of their sum is otherwise read
+/// past it).
 #[test]
 fn a_region_s_covector_is_weighed_by_its_domain() {
     let field = shaped(1);
@@ -1111,6 +1115,16 @@ fn a_region_s_covector_is_weighed_by_its_domain() {
     let weighed = Region { domain: Some(7), ..region() };
     assert_eq!(weighed.weight(), (7, open));
     let (g1, g7) = (covector_of(&field, &plain), covector_of(&field, &weighed));
+    let m2 = 2 * field.declaration.complex();
+    let moment = field.pass(&plain, false).unwrap().moment;
+    let mf = field.layout.moment_face;
+    let rounding = |i: usize| -> i128 {
+        if !(mf..mf + field.declaration.width * m2).contains(&i) {
+            return 0;
+        }
+        let col = (i - mf) % m2;
+        16 * (0..CLASSES.len()).map(|t| moment[t * m2 + col].unsigned_abs() as i128).sum::<i128>()
+    };
     let mut read = 0usize;
     for (i, (&a, &b)) in g1.iter().zip(&g7).enumerate() {
         let scaled = a * 7 / open as i128;
@@ -1118,7 +1132,7 @@ fn a_region_s_covector_is_weighed_by_its_domain() {
             continue;
         }
         read += 1;
-        assert!((b - scaled).abs() <= scaled.abs() / 64 + 4096, "entry {i}: weighed {b}, plain times m/K {scaled}");
+        assert!((b - scaled).abs() <= scaled.abs() / 64 + 4096 + rounding(i), "entry {i}: weighed {b}, plain times m/K {scaled}");
     }
     assert!(read > 32, "{read} entries read");
 }
@@ -1139,3 +1153,25 @@ fn a_port_is_read_through_its_coupling() {
     let unported = Region { port: None, ..r };
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
 }
+
+/// [definition; §16.28] **An open site is silent on the strand**: on a field whose every family is drawn (the
+/// unresolved rows of the moment encodings and the paces among them), a run of open sites appended past a region leaves
+/// every earlier site's face as it was, except the last original site's, whose after-neighbour's contact row is now the
+/// open one; so the writer's long open extent reads its answer places as a short training region does.
+#[test]
+fn an_open_stretch_leaves_the_other_sites_faces_as_they_were() {
+    for still in [0usize, 1] {
+        let field = shaped(still);
+        let short = field.faces(&region()).unwrap();
+        let mut classes = CLASSES.to_vec();
+        let mut open = OPEN.to_vec();
+        classes.extend([0usize; 6]);
+        open.extend([true; 6]);
+        let long = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let faces = field.faces(&long).unwrap();
+        for t in 0..CLASSES.len() - 1 {
+            assert_eq!(faces[t], short[t], "still {still} site {t}");
+        }
+    }
+}
+
