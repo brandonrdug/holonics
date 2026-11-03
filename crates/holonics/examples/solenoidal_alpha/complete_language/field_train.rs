@@ -1095,51 +1095,6 @@ fn escaped(bytes: &[u8]) -> String {
     out
 }
 
-/// [definition; agent-inferred, November 1] **The coupling read** (the micro-control record's
-/// §7): the release `H` and the held answer `T` are two strands on their own clocks, read at the
-/// codec's class face. `λ` is the longest order-keeping coupling of equal classes and
-/// `F* = |H| + |T| − 2λ` the cells that slip; a contact lies on some least-friction coupling
-/// exactly when `P(i−1, j−1) + 1 + S(i+1, j+1) = λ`, and a maximal run of such contacts at one lag
-/// `j − i` is a plateau. Exchanging the strands leaves `λ`, `F*` and the plateaus unchanged. An
-/// exterior read: nothing of it enters the field.
-struct Coupling {
-    lambda: usize,
-    friction: usize,
-    plateaus: Vec<(usize, i64)>,
-}
-
-fn coupling(h: &[usize], t: &[usize]) -> Coupling {
-    let (n, m) = (h.len(), t.len());
-    // P(i, j): the coupling of H[..i] and T[..j]; S(i, j): of H[i..] and T[j..].
-    let mut p = vec![0usize; (n + 1) * (m + 1)];
-    for i in 1..=n {
-        for j in 1..=m {
-            p[i * (m + 1) + j] = if h[i - 1] == t[j - 1] { p[(i - 1) * (m + 1) + j - 1] + 1 } else { p[(i - 1) * (m + 1) + j].max(p[i * (m + 1) + j - 1]) };
-        }
-    }
-    let mut s = vec![0usize; (n + 1) * (m + 1)];
-    for i in (0..n).rev() {
-        for j in (0..m).rev() {
-            s[i * (m + 1) + j] = if h[i] == t[j] { s[(i + 1) * (m + 1) + j + 1] + 1 } else { s[(i + 1) * (m + 1) + j].max(s[i * (m + 1) + j + 1]) };
-        }
-    }
-    let lambda = p[n * (m + 1) + m];
-    let locked = |i: usize, j: usize| h[i] == t[j] && p[i * (m + 1) + j] + 1 + s[(i + 1) * (m + 1) + j + 1] == lambda;
-    let mut plateaus = Vec::new();
-    for i in 0..n {
-        for j in 0..m {
-            if locked(i, j) && !(i > 0 && j > 0 && locked(i - 1, j - 1)) {
-                let mut run = 1;
-                while i + run < n && j + run < m && locked(i + run, j + run) {
-                    run += 1;
-                }
-                plateaus.push((run, j as i64 - i as i64));
-            }
-        }
-    }
-    Coupling { lambda, friction: n + m - 2 * lambda, plateaus }
-}
-
 /// A file opened create-new, written a row at a time so a stopped run keeps what it read.
 fn rows_file(path: &Path, head: &str) -> Result<std::fs::File> {
     use std::io::Write;
@@ -1864,21 +1819,6 @@ mod tests {
         assert_eq!(problems[1].1, b"A two #### 2".to_vec());
     }
 
-    #[test]
-    fn coupling_reads_both_strands_alike() {
-        let h = [1usize, 2, 3, 9, 4, 5];
-        let t = [7usize, 1, 2, 3, 4, 5];
-        let c = coupling(&h, &t);
-        assert_eq!((c.lambda, c.friction), (5, 2));
-        assert_eq!(c.plateaus, vec![(3, 1), (2, 0)]);
-        let back = coupling(&t, &h);
-        assert_eq!((back.lambda, back.friction), (5, 2));
-        let mut lags: Vec<(usize, i64)> = back.plateaus.iter().map(|&(r, l)| (r, -l)).collect();
-        lags.sort();
-        let mut forward = c.plateaus.clone();
-        forward.sort();
-        assert_eq!(lags, forward);
-    }
 
     /// The commands end to end on the host: a toy passage trains two laps, rests, continues from
     /// its rested learner, refuses to write over a run, and releases its held problems with their
