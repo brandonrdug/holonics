@@ -3660,6 +3660,21 @@ impl FieldLearner {
         Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
     }
 
+    /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
+    /// and `Σ √v` of the covector's two moments, so `Σ|m| / Σ√v` is near one where the family's covector keeps its sign
+    /// from section to section (its step is driven) and near zero where its signs cancel (its step is noise). A reading only.
+    pub fn step_coherence(&self) -> Vec<(usize, u128, u128)> {
+        self.field
+            .families()
+            .iter()
+            .map(|&(start, len, _)| {
+                let m: u128 = self.first[start..start + len].iter().map(|v| v.unsigned_abs()).sum();
+                let v: u128 = self.second[start..start + len].iter().map(|v| v.unsigned_abs().isqrt()).sum();
+                (len, m, v)
+            })
+            .collect()
+    }
+
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
     /// moment on one line, then the held step on one line when one is held.
     pub fn to_text(&self) -> String {
