@@ -464,102 +464,30 @@ fn regions_sum_in_any_order() {
     assert_eq!(reversed, g);
 }
 
-/// A logits read for a fixture: each unresolved site's face from `face(t, region)`.
-fn read_with(face: &dyn Fn(usize, &Region) -> Vec<i64>) -> impl Fn(&[Region]) -> Result<Vec<FieldRead>> + '_ {
-    move |rs: &[Region]| Ok(rs.iter().map(|r| FieldRead { logits: (0..r.classes.len()).map(|t| r.unresolved[t].then(|| face(t, r))).collect(), echo: vec![0; r.classes.len()] }).collect())
-}
-
-/// [definition; agent-inferred, November 1] **The front** (§14.3–§14.5) on a fixture whose sites read
-/// class 2 before the answer's eighth site and the void from it: the answer's first five sites are
-/// reached at the opening, beside the question, ride their momentum from rest on that face and lock at
-/// their own rungs; each lock reaches the sites within its near field at the next sweep. [§16.24] The void is
-/// a class like any other: the front runs to the answer's bound, the places past the seventh lock on the void and
-/// write nothing, so the release writes seven 2s. Reached is distance from a definite surface, never sureness.
+/// [definition; §16.27] **The writer draws every place from its own face**: every answer place is written with a class
+/// of the alphabet, the same seed draws the same answer and another seed another, a write stopped after its first sweep
+/// still draws every place (on its last read), and a face that is a point mass at one class writes that class at every
+/// place.
 #[test]
-fn the_answer_grows_from_the_question_and_a_void_place_writes_nothing() {
-    let field = shaped(1);
-    let (void, question) = (0usize, [3usize, 1]);
-    let start = question.len();
-    let face = |t: usize, _: &Region| if t >= start + 7 { vec![3 << 16, 0, 0, 0, 0] } else { vec![0, 1 << 16, 3 << 16, 0, 0] };
-    let mut seen = Vec::new();
-    let released = field.release_with(&[(&question, 20)], 64, void, &mut read_with(&face), &mut |s| {
-        seen.push(*s);
-        true
-    }).unwrap().remove(0);
-    assert_eq!(released.sites[..7], vec![Some(2); 7], "{released:?}");
-    assert!(released.sites[7..].iter().all(|&s| s == Some(void)), "{released:?}");
-    assert_eq!(released.written(void, 9), vec![2; 7]);
-    assert_eq!(released.extent.map(|(site, _, bound)| (site, bound)), Some((20, true)), "the release runs to its bound");
-    assert!(released.reached[..5].iter().all(|&r| r == Some(0)), "the first five beside the question: {:?}", released.reached);
-    assert!(released.reached.windows(2).all(|w| w[0] <= w[1]), "the front only grows outward");
-    assert!(released.reached[5..].iter().all(|&r| r > Some(0)), "the rest only once a lock reaches them");
-    assert!(released.lock_sweeps.iter().zip(&released.reached).all(|(l, r)| l > r), "a site moves only after it is reached");
-    assert!(seen.iter().all(|s| s.front <= 20) && seen.last().unwrap().live == 0);
-    // Determinism, and the release of k sweeps is the release stopped after k.
-    assert_eq!(field.release_with(&[(&question, 20)], 64, void, &mut read_with(&face), &mut |_| true).unwrap().remove(0), released);
-}
-
-/// No void locks: the front reaches the answer's bound, and the extent is the bound, said so.
-#[test]
-fn an_extent_with_no_void_is_the_bound() {
-    let field = shaped(1);
-    let (void, question) = (0usize, [3usize, 1]);
-    let face = |_: usize, _: &Region| vec![0, 1 << 16, 3 << 16, 0, 0];
-    let released = field.release_with(&[(&question, 12)], 64, void, &mut read_with(&face), &mut |_| true).unwrap().remove(0);
-    assert_eq!(released.extent.map(|(site, _, bound)| (site, bound)), Some((12, true)));
-    assert_eq!(released.sites, vec![Some(2); 12]);
-}
-
-/// [definition; agent-inferred, November 1] **Each site keeps its own clock** (§14.4): a site whose
-/// read flips with its neighbour's top never holds a majority through a sweep, so it never locks, its
-/// own pump holds where its change does not fall, its overturns are the free circulation, the front
-/// holds where nothing locks, and it is released open; read as its own copy, it locks.
-#[test]
-fn a_frustrated_site_holds_the_front_and_is_released_open() {
-    let field = shaped(1);
-    let (void, question) = (0usize, [3usize, 1]);
-    let start = question.len();
-    // The answer's first two sites each read the other's top and answer the other class of {1, 2}
-    // (on the unresolved row, the other reads as 1); every other site reads 2.
-    let flip = |t: usize, r: &Region| {
-        if t != start && t != start + 1 {
-            return vec![0, 0, 6 << 16, 0, 0];
-        }
-        let other = if t == start { start + 1 } else { start };
-        match r.faces.get(other).and_then(Option::as_ref).map(|f| f.iter().max_by_key(|&&(_, w)| w).unwrap().0) {
-            Some(1) => vec![0, 0, 6 << 16, 0, 0],
-            _ => vec![0, 6 << 16, 0, 0, 0],
-        }
-    };
-    let mut last = ReleaseSweep::default();
-    let released = field.release_with(&[(&question, 8)], 40, void, &mut read_with(&flip), &mut |s| {
-        last = *s;
-        true
-    }).unwrap().remove(0);
-    assert_eq!(released.sites[..2], [None, None], "never forced into a class: {released:?}");
-    assert!(released.free >= 10, "{released:?}");
-    assert_eq!(last.done, 40);
-    assert_eq!(released.trits[0].iter().filter(|&&t| t < 0).count() + released.trits[1..].iter().map(|t| t.iter().filter(|&&x| x < 0).count()).sum::<usize>(), released.free);
-}
-
-/// The release of `k` sweeps is the release its exterior stops after `k`.
-#[test]
-fn a_release_stopped_by_its_exterior_is_the_release_of_the_sweeps_it_ran() {
-    let field = shaped(1);
-    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
-    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
-    for k in 1..=4 {
-        let mut asked = Vec::new();
-        let stopped = field.release_realized(&problems, 9, 0, &mut HostField, &mut |s| {
-            asked.push(*s);
-            s.done < k
-        }).unwrap();
-        let ran = asked.last().unwrap().done;
-        assert!(ran <= k);
-        for (&(q, a), released) in problems.iter().zip(&stopped) {
-            assert_eq!(&field.release(q, a, ran, 0).unwrap(), released, "stopped after {ran} sweeps");
-        }
-    }
+fn the_writer_draws_every_place_from_its_own_face() {
+    let mut field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([6usize, 5]).map(|(q, a)| (*q, a)).collect();
+    let once = field.sample_realized(&problems, 3, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    assert_eq!(once.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5]);
+    assert!(once.iter().flatten().all(|&c| c < field.declaration.alphabet));
+    assert_eq!(field.sample_realized(&problems, 3, 0, 11, &mut HostField, &mut |_, _| true).unwrap(), once, "the same draws");
+    assert!((12..20).any(|seed| field.sample_realized(&problems, 3, 0, seed, &mut HostField, &mut |_, _| true).unwrap() != once), "another seed draws another answer");
+    let mut asked = 0;
+    let stopped = field.sample_realized(&problems, 3, 0, 11, &mut HostField, &mut |_, _| {
+        asked += 1;
+        asked < 2
+    }).unwrap();
+    assert_eq!(stopped.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5], "a stopped write draws every place");
+    let l = field.layout.clone();
+    field.theta[l.read_bias + 2] = 40 << 16;
+    let pointed = field.sample_realized(&problems, 3, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
 /// A site carried as a mixture of one class and locked opens and radiates exactly as the site resolved
@@ -595,15 +523,6 @@ fn a_carried_face_of_one_class_opens_as_that_class() {
         }
         assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried[..3], locked: &[], echo: &[], domain: None, port: None }).is_err(), "one carried face a site or none");
     }
-}
-
-/// A face resolves its top class only when the class outweighs every other together.
-#[test]
-fn a_face_resolves_only_a_majority() {
-    assert_eq!(resolved(&TowerFace { masses: vec![6, 3, 2], total: 11 }), Some(0));
-    assert_eq!(resolved(&TowerFace { masses: vec![5, 3, 2], total: 10 }), None, "half is not more than half");
-    assert_eq!(resolved(&TowerFace { masses: vec![1, 4, 4], total: 9 }), None);
-    assert_eq!(resolved(&TowerFace { masses: vec![1, 9, 1], total: 11 }), Some(1));
 }
 
 /// The grown field reads the old faces exactly, on the framed and the still field, by two and
@@ -652,18 +571,6 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
     let w = next.field.declaration.width / 2;
     let parted = (0..=next.field.declaration.alphabet).any(|row| (0..w).any(|j| next.field.theta[l.enc + row * 2 * w + j] != next.field.theta[l.enc + row * 2 * w + w + j]));
     assert!(parted, "the copies part under learning");
-}
-
-/// Problems released together are each problem's own release.
-#[test]
-fn releases_read_together_are_each_problem_s_own() {
-    let field = shaped(1);
-    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2, 1, 1, 4, 0]];
-    let problems: Vec<(&[usize], usize)> = questions.iter().zip([5usize, 7, 3]).map(|(q, a)| (*q, a)).collect();
-    let together = field.release_realized(&problems, 3, 0, &mut HostField, &mut |_| true).unwrap();
-    for (&(q, a), released) in problems.iter().zip(&together) {
-        assert_eq!(&field.release(q, a, 3, 0).unwrap(), released);
-    }
 }
 
 /// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
@@ -1217,7 +1124,7 @@ fn a_region_s_covector_is_weighed_by_its_domain() {
 }
 
 /// [§16.24] **A port's code is its coupling's**: the region's code is its place-wise code before the port and the
-/// coupling code over the port's places, and a release writes its places in order with a void place writing nothing.
+/// coupling code over the port's places.
 #[test]
 fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
@@ -1231,6 +1138,4 @@ fn a_port_is_read_through_its_coupling() {
     assert_eq!(field.code(&r).unwrap(), (place + coupled, 1 + 3));
     let unported = Region { port: None, ..r };
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
-    let released = Released { sites: vec![Some(2), Some(0), None, Some(3), Some(0)], ..Released::default() };
-    assert_eq!(released.written(0, 9), vec![2, 9, 3]);
 }

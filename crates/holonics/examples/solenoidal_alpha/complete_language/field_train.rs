@@ -24,8 +24,7 @@
 
 use super::tower_train::{count, positive, STATE_BUDGET};
 use super::*;
-use holonics::hnn::tower::field::{port_reading, shares, Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, Port, Region, Released, ReleaseSweep, Shares, NEAR, PUMP_TOP};
-use holonics::hnn::tower::TowerFace;
+use holonics::hnn::tower::field::{Echo, Field, FieldDeclaration, FieldLearner, FieldNext, FieldRealization, FieldReceipt, HeldRows, HostField, Port, Region, Shares};
 use holonics::hnn::units::Units;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -91,23 +90,6 @@ impl FieldCodec {
         out
     }
 
-    /// [agent-inferred, November 1] A released answer's bytes, each open site written as `open`
-    /// (the release never forces an open site into a class), each site's first byte offset beside
-    /// it.
-    pub(super) fn decode_open(&self, sites: &[Option<usize>], open: &[u8]) -> (Vec<u8>, Vec<usize>) {
-        let (mut out, mut at) = (Vec::new(), Vec::with_capacity(sites.len()));
-        for site in sites {
-            at.push(out.len());
-            // [§16.24] A place locked on the void writes nothing wherever it stands; the release is read to its bound.
-            match site {
-                Some(c) if *c < self.void() => out.extend_from_slice(self.units.piece(self.used[*c] as usize)),
-                Some(_) => {}
-                None => out.extend_from_slice(open),
-            }
-        }
-        (out, at)
-    }
-
     /// The codec as text: its head line, then the used units on one line.
     pub(super) fn to_text(&self) -> String {
         let used: Vec<String> = self.used.iter().map(u32::to_string).collect();
@@ -160,128 +142,40 @@ pub(super) fn mix(seed: u64, counter: u64) -> u64 {
 /// The encoded problems: each question's classes, its answer's and the answer's bytes.
 pub(super) type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
 
-/// A region's shape: a keyed completion mask over the whole region, or a front region ([`Front`],
-/// [`front_faces`], [`section_regions`]).
+/// [definition; agent-inferred, November 3, §16.27] **A region's shape**: a keyed completion mask over the whole region
+/// (`Masked`), or over the answer and its void tail with the question known (`Answer`), the state the writer meets
+/// ([`Field::sample_realized`]: the question known, a uniform state of a random reading order of the answer's places).
 pub(super) enum Shape {
     Masked(Vec<bool>),
-    Front(Front),
+    Answer(Vec<bool>),
 }
 
-/// [agent-inferred, November 2] The key of a held read's front (`draw | 7·2^59`, §16.4).
-const HELD_FRONT_KEY: u64 = 7 << 59;
-
-/// [agent-inferred, November 1] The key of a front region's front `f` (`draw | 2^62`).
-const FRONT_KEY: u64 = 1 << 62;
-
-/// [agent-inferred, November 1] The key of a front region's rung `r` (`draw | 3·2^61`).
-const RUNG_KEY: u64 = 3 << 61;
-
-/// [agent-inferred, November 1] The key of the site a front region opens when its keyed subset is
-/// empty (`draw | 5·2^60`). Why three keys of their own: the masks read `mix(seed, draw)`, the
-/// sites' draws at `draw ^ ((t + 1) << 32)`, the forced site at `draw + 1`, and the tail's octave and
-/// length at `draw | 2^63` and `draw | 3·2^62`; a training draw is below `2^40`, so none of these
-/// counters meets another, and a front's draws leave the masks' and the tails' untouched.
-const FORCE_KEY: u64 = 5 << 60;
-
-/// The pump's rungs, `β = 2^r` for `r` from 0 to `log₂` [`PUMP_TOP`]: 23 of them.
-const RUNGS: u64 = PUMP_TOP.trailing_zeros() as u64 + 1;
-
-/// [definition; agent-inferred, November 1] **A front region's draws** (the dispersing field's §14.6):
-/// the region of a release whose front stands at `front` (the place of the first site no lock has yet
-/// reached) with a rung `rung` of the pump. [§16.24] `cut` is the region's length: every site from the front is
-/// the answer port, compared through its coupling (it was five sites past the front, the band, until November 3).
-/// `open` is read 1's unresolved sites: a keyed subset of the answer's sites before the front, every site from the
-/// front, and nothing else (the question is known).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub(super) struct Front {
-    pub front: usize,
-    pub rung: u32,
-    pub cut: usize,
-    pub open: Vec<bool>,
-}
-
-/// [agent-inferred, November 1] A region's shape: with even odds the whole region's sites, each
-/// unresolved with probability `τ` (`τ` uniform on `(0, 1]` on `2^(−16)`, at least one site
-/// unresolved), or a front region. A front region of a training answer of `answer` sites (the answer's
-/// classes and its one true void, `A`) is drawn as the dispersing field's §14.6 leaves it open:
-/// - **The front** `f` is uniform on `[0, A]`, `A + 1` places counted from the question's last site, so
-///   the front stands before the first answer site, between any two, beyond the true void (the band
-///   then reads the void tail) and at the void. Why inclusive: the release's front reaches any of these
-///   places, and a front that could not stand at the end would leave the void's own place unlearned.
-/// - **The rung** `r` is uniform on the pump's 23 rungs (`0` to `log₂ PUMP_TOP`), counted from
-///   [`PUMP_TOP`] and not written again, so the rungs the pump can reach are all met alike.
-/// - **The prefix's open sites** are the masks' own: the answer's sites before the front whose keyed
-///   draw falls below `τ`, the draw and the density the masked shape of the same `draw` reads, so
-///   that a front region opens where a mask would have, at the masks' density. The question is never
-///   open: a release's question is known.
-/// - **The band** is the five sites from the front on, open on the unresolved row, and the region is
-///   cut at its end or at the region's length.
-/// - **An empty region is refused as the masks refuse it**: when no site is open (an empty band,
-///   `f = A` with a one-site tail, and no prefix site drawn), one keyed prefix site is opened.
+/// [definition; agent-inferred, November 3, §16.27] **A region's shape**, drawn: `τ` uniform on `(0, 1]` on `2^(−16)`
+/// and each site open where its keyed draw falls below `τ`; with even odds over the whole region (the question's and the
+/// answer's language alike) or over the answer's sites and its void tail alone, the question known, so the field meets
+/// the writer's every state (`K` of the answer's places open, uniform given `K`); at least one site open in the domain.
 ///
-/// Why the front regions replace the second sweep (§14.6): the second sweep was the first state a
-/// release met after its opening, every answer site open, a state no release meets once the front
-/// moves; a front region is the release's state at any sweep of its advance, and the masks remain for
-/// the completion that the field also learns.
-pub(super) fn shape(seed: u64, draw: u64, question: usize, sites: usize, answer: usize) -> Shape {
+/// Why the front regions are retired (the field's code read end to end, November 3): they were the states of the release
+/// that locked a place where one class held a majority and moved its front only past locked places; that writer could
+/// not write text, whose places are uncertain even under a perfect model, so it committed the bytes it was surest of
+/// (runs of `0`, `<<`, `=`, `####`) and left the rest open. The writer now draws every place from its own face in the
+/// training clock run backwards, whose states are these masks; the fronts' two reads (read 2 carrying faces at a pump
+/// rung) and their ports took half of every lap for states no writer meets.
+pub(super) fn shape(seed: u64, draw: u64, question: usize, sites: usize) -> Shape {
     let head = mix(seed, draw);
     let low = (head >> 1) & 0xFFFF;
     let tau = low + 1;
-    let mut out: Vec<bool> = (0..sites).map(|t| (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
-    if head & 1 == 1 {
-        if !out.iter().any(|&u| u) {
-            out[mix(seed, draw.wrapping_add(1)) as usize % sites] = true;
-        }
-        return Shape::Masked(out);
+    let whole = head & 1 == 1;
+    let from = if whole { 0 } else { question };
+    let mut out: Vec<bool> = (0..sites).map(|t| t >= from && (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
+    if !out.iter().any(|&u| u) {
+        out[from + mix(seed, draw.wrapping_add(1)) as usize % (sites - from)] = true;
     }
-    let front = question + (mix(seed, draw | FRONT_KEY) % (answer as u64 + 1)) as usize;
-    let rung = (mix(seed, draw | RUNG_KEY) % RUNGS) as u32;
-    // [agent-inferred, November 3, §16.24] The region is not cut past a band: every site from the front is the answer
-    // port, compared through its coupling, so the strand runs to the region's end (its void tail included).
-    let cut = sites;
-    let mut open: Vec<bool> = (0..cut).map(|t| t >= question && (t >= front || out[t])).collect();
-    if !open.iter().any(|&u| u) {
-        open[question + mix(seed, draw | FORCE_KEY) as usize % (cut - question)] = true;
+    if whole {
+        Shape::Masked(out)
+    } else {
+        Shape::Answer(out)
     }
-    Shape::Front(Front { front, rung, cut, open })
-}
-
-/// Whether a face's top class outweighs every other together (`2 m_top > Σ m`): the release's
-/// majority, at which a site locks.
-fn majority(face: &TowerFace) -> bool {
-    face.masses.iter().max().is_some_and(|&m| m.checked_mul(2).is_some_and(|twice| twice > face.total))
-}
-
-/// [definition; agent-inferred, November 1] **Read 2 of a front region** (the dispersing field's
-/// §14.6): from read 1's logits (`logits`, every open site's, read through the realization), each
-/// open site carries its read-1 face as the release carries it, as shares ([`shares`]) of
-/// [`Field::tempered`]:
-/// - the prefix's open sites (before the front) at `β = 2^r`, the rung's pump, **locked** where the
-///   untempered face (`β = 1`) resolves a majority (`2 m_top > Σ m`, the release's own rule, §16.19), so
-///   a locked site is definite and radiates past the near field (§14.1);
-/// - the band at `β = 1`, soft and never locked, heard in the near field only.
-///
-/// The faces are tempered over every class, the void's among them: the extent is read at the front,
-/// so a training region has not read it, and a release carries every class at a reached site until
-/// its extent is read ([`Field::content_face`] is the release's after). The mixtures are data with no
-/// covector through them; read 2's covector reaches the encodings through them as every carried
-/// mixture's does. Why the logits and not the faces (§14.6): the pump is a temperature over the
-/// logits, which are exact on `2^(−16)` bits, while a face keeps its masses on `2^(−62)` with the
-/// small ones released, so a face sharpened at a rung of `2^22` would sharpen what the first rounding
-/// kept; the release tempers its logits alike. Returns the carried faces and the locks, one a site of
-/// `[0, cut)`.
-pub(super) fn front_faces(field: &Field, front: &Front, logits: &[Option<Vec<i64>>]) -> Result<(Vec<Option<Shares>>, Vec<bool>)> {
-    let mut faces: Vec<Option<Shares>> = vec![None; front.cut];
-    let mut locked = vec![false; front.cut];
-    for t in (0..front.cut).filter(|&t| front.open[t]) {
-        let z = logits.get(t).and_then(Option::as_ref).ok_or("a front region's first read has no face at an open site")?;
-        let prefix = t < front.front;
-        // [agent-inferred, November 2, §16.19] The lock reads the field's own face, as the release's does: a face
-        // annealed at `2^r` resolves a majority wherever its top leads at all, which locked a crown the field did not hold.
-        locked[t] = prefix && majority(&field.tempered(z, 1));
-        faces[t] = Some(shares(&field.tempered(z, if prefix { 1u64 << front.rung } else { 1 })));
-    }
-    Ok((faces, locked))
 }
 
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
@@ -307,19 +201,14 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
-/// [`section_regions`] counts it): a masked member's one region, a front member's two (read 1 and
-/// read 2, each cut at the front's band).
+/// [`section_regions`] counts it): one region a member.
 pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
     members
         .iter()
-        .flat_map(|&i| {
+        .map(|&i| {
             let (q, a, _) = &problems[i];
             *draw += 1;
-            let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
-            match shape(seed, *draw, q.len(), length, a.len() + 1) {
-                Shape::Masked(_) => vec![length],
-                Shape::Front(front) => vec![front.cut; 2],
-            }
+            q.len() + a.len() + tail(seed, *draw, codec.answer - a.len())
         })
         .collect()
 }
@@ -357,104 +246,23 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
     regions.iter().map(view_of).collect()
 }
 
-/// **A section's regions as `train-field` forms them**: each member's classes (its question, its
-/// answer and a keyed void tail) and its shape ([`shape`]). A masked member is one region. A front
-/// member is two, both compared (the dispersing field's §14.6): **read 1**, the question known, the
-/// answer's sites before the front open on the unresolved row where the keyed subset falls and the
-/// truth elsewhere, the band open, the region cut at the band's end; and **read 2**, the same region
-/// with each open site carrying its read-1 face at its rung, the prefix's locked where it resolves a
-/// majority ([`front_faces`]). The step the learner holds is read first, on every region of read 1 and
-/// of the masks (the regions as training compares them, which the step was not fit on), so read 2's
-/// mixtures are read from the material that stands after it (one more read of the front regions'
-/// read 1, through `realization`); the held step's read is returned. Why that order (the build's
-/// review, November 1): read under the stepped material before its read, a refused step left read 2
-/// carrying mixtures of a material that no longer stood, and the step was read on regions it had
-/// partly formed. Why every region of read 1 and not the release's opening (the crib probe of
-/// November 1, §13 cause 1): read on the release's opening, every answer site on the unresolved row, a
-/// state training never compares, 205 of 248 held steps were refused in the second lap while the
-/// withheld problems' code stood still at 4.55 bits. [agent-inferred] Why read 1 beside the masks and
-/// not read 2: read 2's mixtures do not exist until the step is read, and read 1 is the state they
-/// are read from.
+/// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
+/// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
+/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail). The step the learner holds is read
+/// first on these regions, which it was not fit on, and the held step's read is returned.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
-    let mut firsts: Vec<TrainRegion> = Vec::with_capacity(members.len());
-    let mut fronts: Vec<Option<Front>> = Vec::with_capacity(members.len());
-    let mut held_fronts: Vec<TrainRegion> = Vec::with_capacity(members.len());
+    let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
-        // [agent-inferred, November 2] The held read meets the admitted future (§15.11, §16.4): each problem
-        // also as the release reads it, the question and the answer before a keyed front definite and every
-        // site from the front through the answer's first void open, one front a problem keyed by its draw.
-        // Read for the held step only, never fit. Why not the context parts (one answer site in four open,
-        // the November 2 choice): an open site ticks by the face it carries (§16.2), so a paced head reads a
-        // part's earlier open sites by their soft faces, while at the release's front every earlier site is
-        // definite.
-        let front = (mix(seed, *draw | HELD_FRONT_KEY) % (a.len() as u64 + 1)) as usize;
-        let mut cc: Vec<usize> = q.iter().chain(a).copied().collect();
-        cc.push(codec.void());
-        let cu: Vec<bool> = (0..cc.len()).map(|t| t >= q.len() + front).collect();
-        // [agent-inferred, November 3, §16.24] Read as the release reads it: the open strand from the front is its port,
-        // compared through its coupling with the answer's cells after the front.
-        held_fronts.push(TrainRegion { port: Some((q.len() + front, codec.void(), a[front..].to_vec())), ..TrainRegion::plain(cc, cu) });
-        let mut classes = region_classes(codec, q, a, length);
-        // [agent-inferred, November 2, §16.23] Each region is read as its state in the joint code: a mask's open sites
-        // are drawn from the whole region, a front region's from the answer's sites before its cut (the question is
-        // never open), so each is weighed `m/K` over that domain ([`Region::weight`]).
-        match shape(seed, *draw, q.len(), length, a.len() + 1) {
-            Shape::Masked(mask) => {
-                firsts.push(TrainRegion { domain: Some(length), ..TrainRegion::plain(classes, mask) });
-                fronts.push(None);
-            }
-            Shape::Front(front) => {
-                classes.truncate(front.cut);
-                // [agent-inferred, November 3, §16.24] The prefix's open sites are a state of the answer before the front;
-                // every site from the front is the port, compared through its coupling with the answer's cells after it.
-                let target = a[(front.front - q.len()).min(a.len())..].to_vec();
-                firsts.push(TrainRegion { domain: Some(front.front - q.len()), port: Some((front.front, codec.void(), target)), ..TrainRegion::plain(classes, front.open.clone()) });
-                fronts.push(Some(front));
-            }
-        }
+        let classes = region_classes(codec, q, a, length);
+        regions.push(match shape(seed, *draw, q.len(), length) {
+            Shape::Masked(mask) => TrainRegion { domain: Some(length), ..TrainRegion::plain(classes, mask) },
+            Shape::Answer(mask) => TrainRegion { domain: Some(length - q.len()), ..TrainRegion::plain(classes, mask) },
+        });
     }
-    let next = if learner.holds_step() {
-        // [measurement; agent-inferred, November 2] With `FIELD_HELD_KINDS`, the held step is also read on each kind of
-        // region alone, on clones (the training-shaped and the front-shaped), so a refusal is read by the kind that
-        // refused it (`FIELD_HELD_KINDS change=…/…`); the step that stands is the joint read's, as without it.
-        if std::env::var_os("FIELD_HELD_KINDS").is_some() {
-            let mut by = |regions: &[TrainRegion]| -> Result<String> {
-                let mut probe = learner.clone();
-                Ok(probe.read_step_on(&views_of(regions), realization).map_err(|e| e.to_string())?.1.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused)))
-            };
-            println!("FIELD_HELD_KINDS training={} fronts={}", by(&firsts)?, by(&held_fronts)?);
-        }
-        let held: Vec<TrainRegion> = firsts.iter().cloned().chain(held_fronts).collect();
-        learner.read_step_on(&views_of(&held), realization).map_err(|e| e.to_string())?.1
-    } else {
-        None
-    };
-    let at: Vec<usize> = (0..firsts.len()).filter(|&k| fronts[k].is_some()).collect();
-    let mut logits = if at.is_empty() {
-        Vec::new()
-    } else {
-        let views: Vec<Region> = at.iter().map(|&k| view_of(&firsts[k])).collect();
-        realization.read_logits(&learner.field, &views).map_err(|e| e.to_string())?
-    }
-    .into_iter();
-    let mut regions = Vec::with_capacity(firsts.len() + at.len());
-    for (first, front) in firsts.into_iter().zip(fronts) {
-        let Some(front) = front else {
-            regions.push(first);
-            continue;
-        };
-        let read = logits.next().ok_or("a front region's first read was not returned")?;
-        let (faces, locked) = front_faces(&learner.field, &front, &read.logits)?;
-        // [agent-inferred, November 1] Read 2's echoes (§15.3): each carried site's read-1 logits and the echo
-        // read 1 returned there, so read 2 meets its cavity field as the release does.
-        let echo: Vec<Option<Echo>> = (0..front.cut).map(|t| faces[t].as_ref().and(read.logits.get(t).cloned().flatten()).map(|z| Echo { b: read.echo[t], logits: z })).collect();
-        let second = TrainRegion { classes: first.classes.clone(), unresolved: first.unresolved.clone(), faces, locked, echo, domain: first.domain, port: first.port.clone() };
-        regions.push(first);
-        regions.push(second);
-    }
+    let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
 
@@ -503,14 +311,15 @@ fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization:
         let faces = realization.read_faces(field, chunk).map_err(|e| e.to_string())?;
         for ((region, faces), &(_, _, base)) in chunk.iter().zip(faces).zip(parts) {
             if base == 0 {
-                // [agent-inferred, November 3, §16.24] The opening is read as the release is compared: every answer place
-                // its port, coupled with the answer's cells (a void place writing nothing), counted over the answer's bytes.
+                // [agent-inferred, November 3, §16.27] The opening is read at its places, as the writer meets it: the answer's
+                // cells and its first void, each at its own place, every answer place open.
                 let (q, a, _) = &problems[opening];
                 opening += 1;
-                let at: Vec<(&[u128], u128)> = faces[q.len()..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or("an opening place without a face")).collect::<std::result::Result<_, _>>()?;
-                let port = Port { start: q.len(), void: codec.void(), target: a };
-                out[0].0 += port_reading(&at, &port).map_err(|e| e.to_string())?.1;
-                out[0].1 += a.len();
+                for (t, face) in faces.iter().enumerate().skip(q.len()).take(a.len() + 1) {
+                    let face = face.as_ref().ok_or("an opening place without a face")?;
+                    out[0].0 += face.code(region.classes[t]);
+                }
+                out[0].1 += a.len() + 1;
                 continue;
             }
             for (face, &class) in faces.iter().zip(region.classes) {
@@ -1109,312 +918,7 @@ fn row(file: &mut std::fs::File, text: &str) -> Result<()> {
     Ok(())
 }
 
-/// `release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS
-/// OUT`: for each of the first `COUNT` held problems the field releases the answer from the question
-/// alone (the codec's answer sites, refined over at most `SWEEPS` sweeps), each sweep only while the
-/// command is inside `STOP_MS` ([`within`], a line a sweep with the sites reached and the front): a set stopped there is
-/// returned as released and counted open. Each free release's receipt (`FIELD_RELEASE_ONE_RECEIPT`) and
-/// the free set's (`FIELD_RELEASE_RECEIPTS`) carry the front's counts (the dispersing field's §14.9):
-/// the sites reached and locked, the least, quartiles and most of the sweeps they were reached and
-/// locked, each lock's own rung, and the extent's reading ([`extent_text`]). It writes
-/// `OUT/FREE.tsv` (each problem's index and its release's bytes, [`escaped`], tab-separated) and
-/// `OUT/COUPLING.tsv`, each free release's coupling read against the held answer at the class face.
-/// The free releases are read together, a sweep of every problem in one read; the rows are written
-/// when the set ends, with one line of progress a problem. A problem the field cannot read (a unit
-/// the codec never met, a region past the reach) is written empty and counted, never skipped.
-/// [retired, November 2, §16.19] The marks, each calculation's continuation past the answer written
-/// through its `=` (`OUT/MARKS.tsv`): their reader was the written rules' exactness read of each
-/// calculation, retired with the numeral matcher's exterior.
-pub(super) fn release(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 13 {
-        return Err("release-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS OUT".into());
-    }
-    let started = std::time::Instant::now();
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
-    let units = units_of(&args[5], &args[6])?;
-    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
-    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, stop_ms) = (count(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
-    let out = Path::new(&args[12]);
-    std::fs::create_dir(out)?;
-    let field = &learner.field;
-    let held = &held[..limit.min(held.len())];
-    // The free releases: each question alone, the codec's answer sites open.
-    let free_requests: Vec<std::result::Result<(Vec<usize>, usize), String>> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect();
-    let mut free_last = ReleaseSweep::default();
-    let free = release_requests(field, &free_requests, sweeps, codec.void(), realization, &mut within("free", started, stop_ms, &mut free_last))?;
-    let mut free_file = rows_file(&out.join("FREE.tsv"), "")?;
-    let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\treleased\theld\tlambda\tfriction\tplateaus\tlongest\tlag\tfoil_lambda\tfoil_friction\n")?;
-    let mut landmarks_file = rows_file(&out.join("LANDMARKS.tsv"), "problem\tsite\tbyte\tlandmark\tlandmark_byte\tshare\n")?;
-    let (mut sum_h, mut sum_t, mut sum_lambda, mut sum_friction, mut refused) = (0usize, 0usize, 0usize, 0usize, 0usize);
-    let (mut sum_foil_lambda, mut sum_foil_friction) = (0usize, 0usize);
-    let (mut open_sites, mut free_circulation, mut bound, mut locked_whole) = (0usize, 0usize, 0usize, 0usize);
-    let mut margins: Vec<i64> = Vec::new();
-    // [agent-inferred, November 1] The front's receipts over the free releases (§14.9), count only:
-    // the sites reached and locked, the sweep each was reached and each locked, and the extent's
-    // reading (its site and sweep, and whether the front reached the bound with no void locked).
-    let mut front_receipt = FrontReceipt::default();
-    let mut rungs: std::collections::BTreeMap<u64, usize> = std::collections::BTreeMap::new();
-    let mut landmark = LandmarkCount::default();
-    for (i, (((_, answer), released), request)) in held.iter().zip(&free).zip(&free_requests).enumerate() {
-        let (h, text) = match released {
-            Ok(r) => {
-                open_sites += r.open;
-                free_circulation += r.free;
-                bound += r.bound;
-                margins.extend(r.counters.iter().flatten().map(|&(_, margin)| margin));
-                front_receipt.add(r);
-                locked_whole += usize::from(r.open == 0);
-                for &rung in r.rungs.iter().filter(|&&b| b > 0) {
-                    *rungs.entry(rung).or_insert(0) += 1;
-                }
-                let (text, _) = codec.decode_open(&r.sites, OPEN_SITE);
-                if let Ok((q, _)) = request {
-                    landmark.read(field, &codec, r, q.len(), i, &mut landmarks_file, realization)?;
-                }
-                println!("FIELD_RELEASE_ONE_RECEIPT problem={i} {}", receipt_text(r));
-                // [§16.24] What the release writes: its places in order, a void place writing nothing, an open one never
-                // coupled (it equals no cell).
-                (r.written(codec.void(), usize::MAX), text)
-            }
-            Err(why) => {
-                println!("FIELD_RELEASE_REFUSED problem={i} why={why}");
-                refused += 1;
-                (Vec::new(), Vec::new())
-            }
-        };
-        row(&mut free_file, &format!("{i}\t{}\n", escaped(&text)))?;
-        // The lock test of record (the comparison record's A1), on the coupling's owner: the release against its own target
-        // and against the next held problem's (the foil).
-        let t = codec.encode(answer).unwrap_or_default();
-        let foil = codec.encode(&held[(i + 1) % held.len()].1).unwrap_or_default();
-        let c = holonics::receiver::coupling::coupling(&h, &t).map_err(|e| e.to_string())?;
-        let f = holonics::receiver::coupling::coupling(&h, &foil).map_err(|e| e.to_string())?;
-        let longest = c.maximal_contiguous_plateaus.iter().map(|p| (p.length, p.t_start as i64 - p.h_start as i64)).max_by_key(|&(run, lag)| (run, std::cmp::Reverse(lag.unsigned_abs()))).unwrap_or((0, 0));
-        row(&mut couplings, &format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n", h.len(), t.len(), c.lambda, c.least_friction, c.maximal_contiguous_plateaus.len(), longest.0, longest.1, f.lambda, f.least_friction))?;
-        sum_h += h.len();
-        sum_t += t.len();
-        sum_lambda += c.lambda;
-        sum_friction += c.least_friction;
-        sum_foil_lambda += f.lambda;
-        sum_foil_friction += f.least_friction;
-        println!("FIELD_RELEASE_ONE problem={i} released={} held={} lambda={} friction={} foil_lambda={} foil_friction={} total_ms={}", h.len(), t.len(), c.lambda, c.least_friction, f.lambda, f.least_friction, started.elapsed().as_millis());
-    }
-    let lock_rungs: Vec<String> = rungs.iter().map(|(b, n)| format!("{b}:{n}")).collect();
-    println!(
-        "FIELD_RELEASE_RECEIPTS problems={} locked_whole={locked_whole} open_sites={open_sites} free_circulation={free_circulation} bound_circulation={bound} {} lock_margin_bits_quartiles={} lock_rungs={} landmark_problems={} landmark_sites={} landmark_same_class={} landmark_ms={}",
-        held.len(),
-        {
-            let extents = front_receipt.extents();
-            front_receipt.text(extents)
-        },
-        quartiles(&mut margins),
-        if lock_rungs.is_empty() { "-".to_string() } else { lock_rungs.join(",") },
-        landmark.problems,
-        landmark.sites,
-        landmark.same,
-        landmark.ns / 1_000_000
-    );
-    println!(
-        "FIELD_RELEASE free={} refused={refused} sweeps={sweeps} stop_ms={stop_ms} free_sweeps={} free_live={} free_reached={} free_front={} free_open={} free_rung={} free_stopped={} released={sum_h} held={sum_t} lambda={sum_lambda} friction={sum_friction} foil_lambda={sum_foil_lambda} foil_friction={sum_foil_friction} ms={}",
-        held.len(),
-        free_last.done,
-        free_last.live,
-        free_last.reached,
-        free_last.front,
-        free_last.open,
-        free_last.rung,
-        free_last.live > 0 && free_last.done < sweeps,
-        started.elapsed().as_millis()
-    );
-    Ok(())
-}
-
-/// [agent-inferred, November 1] An open site as a release writes it: one byte no codec class
-/// writes (a NUL), so a calculation through an open site is never read as written.
-const OPEN_SITE: &[u8] = b"\0";
-
-/// The lock rungs of a release's sites as `β:count`, ascending (`-` where none locked).
-fn rung_text(rungs: &[u64]) -> String {
-    let mut count: std::collections::BTreeMap<u64, usize> = std::collections::BTreeMap::new();
-    for &r in rungs.iter().filter(|&&r| r > 0) {
-        *count.entry(r).or_insert(0) += 1;
-    }
-    if count.is_empty() {
-        return "-".into();
-    }
-    count.iter().map(|(b, n)| format!("{b}:{n}")).collect::<Vec<_>>().join(",")
-}
-
-/// [definition; agent-inferred, November 1] **A release's receipt as one line** (the dispersing
-/// field's §14.9): its sites, the sites reached and locked (the rest unreached or open), the sweeps
-/// each site was reached and each locked as their least, quartiles and most, the extent's reading
-/// (`site@sweep:void` where a reached site locked on the void, `site@sweep:bound` where the front
-/// reached the answer's bound with no void locked, `-` where neither came in the sweeps run), its free
-/// and bound circulation, the quartiles of its locks' margins over their counters (in bits), its lock
-/// rungs (each site's own `β_t` at its lock) and the sweeps ridden at each rung. Count only: no site's
-/// class enters it.
-fn receipt_text(r: &Released) -> String {
-    let mut margins: Vec<i64> = r.counters.iter().flatten().map(|&(_, m)| m).collect();
-    let mut front = FrontReceipt::default();
-    front.add(r);
-    format!(
-        "sites={} open={} {} free_circulation={} bound_circulation={} lock_margin_bits_quartiles={} rungs={} ridden={}",
-        r.sites.len(),
-        r.open,
-        front.text(format!("extent={}", extent_text(r.extent))),
-        r.free,
-        r.bound,
-        quartiles(&mut margins),
-        rung_text(&r.rungs),
-        ridden_text(&r.ridden)
-    )
-}
-
-/// [definition; agent-inferred, November 1] **The front's receipts, summed over releases** (§14.9):
-/// the sites reached and locked and the sweep each was reached and each locked, and the extents: how
-/// many were read at a locked void and how many at the bound, how many were not read in the sweeps run,
-/// and the quartiles of the extents' sites and sweeps. One release's is a sum over one.
-#[derive(Default)]
-struct FrontReceipt {
-    reached: Vec<i64>,
-    locked: Vec<i64>,
-    void: usize,
-    bound: usize,
-    unread: usize,
-    extent_site: Vec<i64>,
-    extent_sweep: Vec<i64>,
-}
-
-impl FrontReceipt {
-    fn add(&mut self, r: &Released) {
-        self.reached.extend(r.reached.iter().flatten().map(|&s| s as i64));
-        self.locked.extend(r.lock_sweeps.iter().flatten().map(|&s| s as i64));
-        match r.extent {
-            Some((site, sweep, bound)) => {
-                self.extent_site.push(site as i64);
-                self.extent_sweep.push(sweep as i64);
-                if bound {
-                    self.bound += 1;
-                } else {
-                    self.void += 1;
-                }
-            }
-            None => self.unread += 1,
-        }
-    }
-
-    /// The receipt as `key=value` words, the extents' reading as `extents` gives it.
-    fn text(&mut self, extents: String) -> String {
-        format!("reached={} locked={} reach_sweep_quartiles={} lock_sweep_quartiles={} {extents}", self.reached.len(), self.locked.len(), five(&mut self.reached, 0), five(&mut self.locked, 0))
-    }
-
-    /// The extents of the releases summed: how many were read at a locked void, at the bound, and not
-    /// read, and the quartiles of their sites and sweeps.
-    fn extents(&mut self) -> String {
-        format!("extents_void={} extents_bound={} extents_unread={} extent_site_quartiles={} extent_sweep_quartiles={}", self.void, self.bound, self.unread, five(&mut self.extent_site, 0), five(&mut self.extent_sweep, 0))
-    }
-}
-
-/// A release's extent as `site@sweep:void` (a reached site locked on the void), `site@sweep:bound`
-/// (the front reached the answer's bound with no void locked) or `-` (neither, in the sweeps run).
-pub(super) fn extent_text(extent: Option<(usize, usize, bool)>) -> String {
-    match extent {
-        Some((site, sweep, bound)) => format!("{site}@{sweep}:{}", if bound { "bound" } else { "void" }),
-        None => "-".into(),
-    }
-}
-
-/// The least, the quartiles and the most of margins on `2^(−16)` bits, each in whole bits (`-` where
-/// none).
-fn quartiles(margins: &mut [i64]) -> String {
-    five(margins, 16)
-}
-
-/// The least, the quartiles and the most of `values`, each shifted right by `shift` (`-` where none).
-fn five(values: &mut [i64], shift: u32) -> String {
-    if values.is_empty() {
-        return "-".into();
-    }
-    values.sort_unstable();
-    let at = |q: usize| values[(q * (values.len() - 1)) / 4] >> shift;
-    format!("{}/{}/{}/{}/{}", at(0), at(1), at(2), at(3), at(4))
-}
-
-/// Which sites of a release's last state are locked, one a site of its region (the question's and the
-/// unreached open sites' not): the locks its last sweep read, which the landmarks and the parity read
-/// the last state with.
-pub(super) fn locks_of(r: &Released) -> Vec<bool> {
-    (0..r.classes.len()).map(|t| t >= r.start && r.sites.get(t - r.start).is_some_and(Option::is_some)).collect()
-}
-
-/// The sweeps ridden at each rung as `β:sweeps`.
-fn ridden_text(ridden: &[(u64, usize)]) -> String {
-    ridden.iter().map(|(b, n)| format!("{b}:{n}")).collect::<Vec<_>>().join(",")
-}
-
-/// [definition; agent-inferred, November 1] **The landmarks' counts** (the dispersing field's §3
-/// receipt): over the free releases, each answer site a release wrote and the question site carrying the
-/// most weight in its still heads' currents ([`Field::landmarks`]); counted are those sites and those
-/// whose landmark holds the site's own class. Each row goes to `LANDMARKS.tsv` (private: it
-/// carries the problem's bytes). Read through the realization (on the card, its rows), timed.
-/// [agent-inferred] The last state is read with its locks ([`locks_of`]): the release's last sweep
-/// read the locked sites as definite sources, heard past the near field (§14.1), and a reading of its
-/// last tick without them would be of a state the release never read.
-/// [retired, November 2, §16.19] The sites read only at the first calculation's digits, and the count of
-/// landmarks on a question digit: a reading sorted by the codec's byte kind at the answer's `<<` was the
-/// numeral matcher's.
-#[derive(Default)]
-struct LandmarkCount {
-    problems: usize,
-    sites: usize,
-    same: usize,
-    ns: u128,
-}
-
-impl LandmarkCount {
-    #[allow(clippy::too_many_arguments)]
-    fn read(&mut self, field: &Field, codec: &FieldCodec, r: &Released, question: usize, problem: usize, file: &mut std::fs::File, realization: &mut dyn FieldRealization) -> Result<()> {
-        let sites: Vec<usize> = (0..r.sites.len()).filter(|&s| r.sites[s].is_some()).collect();
-        if sites.is_empty() {
-            return Ok(());
-        }
-        let started = std::time::Instant::now();
-        let unresolved: Vec<bool> = (0..r.classes.len()).map(|t| r.faces[t].is_some()).collect();
-        let locked = locks_of(r);
-        let region = Region { classes: &r.classes, unresolved: &unresolved, faces: &r.faces, locked: &locked, echo: &[], domain: None, port: None };
-        let marks = realization.read_landmarks(field, &region, question, &sites.iter().map(|&s| r.start + s).collect::<Vec<_>>(), 1).map_err(|e| e.to_string())?;
-        self.ns += started.elapsed().as_nanos();
-        self.problems += 1;
-        for (&s, mark) in sites.iter().zip(&marks) {
-            self.sites += 1;
-            let class = r.sites[s].unwrap_or(usize::MAX);
-            let Some(&(j, share)) = mark.first() else { continue };
-            self.same += usize::from(r.classes[j] == class);
-            let byte = |c: usize| escaped(&codec.decode(&[c]));
-            row(file, &format!("{problem}\t{s}\t{}\t{j}\t{}\t{share}\n", byte(class), byte(r.classes[j])))?;
-        }
-        Ok(())
-    }
-}
-
-/// [agent-inferred, November 1] **A release's exterior**: one line a sweep, the sweep run while the
-/// command is inside `stop_ms` (fixed before launch from the run's projection, never raised), and the
-/// last report kept in `last`. A set that ends with problems open after fewer sweeps than its bound
-/// was stopped here (the release ends no other way with problems open).
-fn within<'a>(set: &'a str, started: std::time::Instant, stop_ms: u128, last: &'a mut ReleaseSweep) -> impl FnMut(&ReleaseSweep) -> bool + 'a {
-    move |sweep| {
-        let ms = started.elapsed().as_millis();
-        println!(
-            "FIELD_RELEASE_SWEEP set={set} done={} live={} reached={} front={} locked={} open={} rung={} change={} holding={} soft={} overturned={} free={} ms={ms}",
-            sweep.done, sweep.live, sweep.reached, sweep.front, sweep.locked, sweep.open, sweep.rung, sweep.change, sweep.holding, sweep.soft, sweep.overturned, sweep.free
-        );
-        *last = *sweep;
-        ms < stop_ms
-    }
-}
-
-/// A release's opening: the question's classes and its written prefix, and the answer sites left
+/// A writer's opening: the question's classes and its written prefix, and the answer sites left
 /// open (the codec's extent less the prefix, at least one); refused where a unit is not the codec's
 /// or the region passes the field's reach.
 fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) -> std::result::Result<(Vec<usize>, usize), String> {
@@ -1428,36 +932,14 @@ fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) ->
     Ok((q, open))
 }
 
-/// The releases of every admitted opening read together; a refused opening keeps its refusal. A
-/// refused batch is released again one problem at a time (each release is its own region's, so
-/// each is the batch's own), and a problem's refusal is that problem's alone.
-fn release_requests(field: &Field, requests: &[std::result::Result<(Vec<usize>, usize), String>], sweeps: usize, void: usize, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(&ReleaseSweep) -> bool) -> Result<Vec<std::result::Result<Released, String>>> {
-    let admitted: Vec<(&[usize], usize)> = requests.iter().filter_map(|r| r.as_ref().ok().map(|(q, open)| (q.as_slice(), *open))).collect();
-    let released: Vec<std::result::Result<Released, String>> = if admitted.is_empty() {
-        Vec::new()
-    } else {
-        match field.release_realized(&admitted, sweeps, void, realization, &mut *sweep) {
-            Ok(all) => all.into_iter().map(Ok).collect(),
-            Err(why) => {
-                println!("FIELD_RELEASE_BATCH_REFUSED problems={} why={why}", admitted.len());
-                admitted.iter().map(|&one| field.release_realized(&[one], sweeps, void, realization, &mut *sweep).map(|mut r| r.remove(0)).map_err(|e| e.to_string())).collect()
-            }
-        }
-    };
-    let mut released = released.into_iter();
-    Ok(requests.iter().map(|r| match r {
-        Ok(_) => released.next().unwrap_or_else(|| Err("a release the batch did not return".to_string())),
-        Err(why) => Err(why.clone()),
-    }).collect())
-}
-
-/// `release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS
-/// STOP_MS`: each of the first `COUNT` held questions and the answer the field releases for it,
-/// whole, its sweeps inside `STOP_MS` (a private read: never committed; the held answer is not
-/// printed beside it).
-pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 12 {
-        return Err("release-field-text STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS".into());
+/// [measurement; agent-inferred, November 3, §16.27] **`sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT SWEEPS STOP_MS OUT`**: the first `COUNT` held questions, each answer released by the training clock run
+/// backwards ([`Field::sample_realized`]): every answer place drawn from its own face in a keyed random order over `SWEEPS`
+/// sweeps, the draws keyed by the state's own hash. Writes `SAMPLE.tsv` (each answer's places in order, the void writing
+/// nothing; private) and `COUPLING.tsv` (each answer's `λ` and `F*` against its own and the next problem's target).
+pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -1465,24 +947,54 @@ pub(super) fn release_text(args: &[String], realization: &mut dyn FieldRealizati
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
     let (limit, sweeps, stop_ms) = (count(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
+    let out = Path::new(&args[12]);
+    std::fs::create_dir(out)?;
+    let field = &learner.field;
     let held = &held[..limit.min(held.len())];
-    let requests: Vec<_> = held.iter().map(|(question, _)| opening(&codec, &learner.field, question, b"")).collect();
-    let mut last = ReleaseSweep::default();
-    let released = release_requests(&learner.field, &requests, sweeps, codec.void(), realization, &mut within("text", started, stop_ms, &mut last))?;
-    for (i, ((question, _), released)) in held.iter().zip(released).enumerate() {
-        let (answer, receipt) = match released {
-            Ok(r) => (String::from_utf8_lossy(&codec.decode_open(&r.sites, "\u{2591}".as_bytes()).0).into_owned(), receipt_text(&r)),
-            Err(why) => (format!("(refused: {why})"), "refused".into()),
-        };
-        println!("FIELD_PROMPT {i}\n{}\nFIELD_ANSWER {i} {receipt}\n{answer}\n", String::from_utf8_lossy(question));
+    let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let mut stopped = None;
+    let answers = field
+        .sample_realized(&problems, sweeps, codec.void(), seed, realization, &mut |done, all| {
+            if done % 16 == 0 {
+                println!("FIELD_SAMPLE_SWEEP done={done} of={all} ms={}", started.elapsed().as_millis());
+            }
+            if started.elapsed().as_millis() > stop_ms {
+                stopped = Some(done);
+                return false;
+            }
+            true
+        })
+        .map_err(|e| e.to_string())?;
+    let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
+    let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\twritten\theld\tlambda\tfriction\tfoil_lambda\tfoil_friction\n")?;
+    let (mut sum_h, mut sum_t, mut sum_l, mut sum_f, mut sum_fl, mut sum_ff, mut wins, mut losses) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
+    for (i, places) in answers.iter().enumerate() {
+        let h: Vec<usize> = places.iter().copied().filter(|&c| c != codec.void()).collect();
+        let text: Vec<u8> = h.iter().flat_map(|&c| codec.decode(&[c])).collect();
+        row(&mut file, &format!("{i}\t{}\n", escaped(&text)))?;
+        let t = codec.encode(&held[i].1).unwrap_or_default();
+        let foil = codec.encode(&held[(i + 1) % held.len()].1).unwrap_or_default();
+        let c = holonics::receiver::coupling::coupling(&h, &t).map_err(|e| e.to_string())?;
+        let f = holonics::receiver::coupling::coupling(&h, &foil).map_err(|e| e.to_string())?;
+        row(&mut couplings, &format!("{i}\t{}\t{}\t{}\t{}\t{}\t{}\n", h.len(), t.len(), c.lambda, c.least_friction, f.lambda, f.least_friction))?;
+        (sum_h, sum_t, sum_l, sum_f, sum_fl, sum_ff) = (sum_h + h.len(), sum_t + t.len(), sum_l + c.lambda, sum_f + c.least_friction, sum_fl + f.lambda, sum_ff + f.least_friction);
+        wins += usize::from(c.lambda > f.lambda);
+        losses += usize::from(c.lambda < f.lambda);
     }
-    println!("FIELD_RELEASE_TEXT problems={} sweeps={} live={} reached={} front={} open={} rung={} stopped={} ms={}", held.len(), last.done, last.live, last.reached, last.front, last.open, last.rung, last.live > 0 && last.done < sweeps, started.elapsed().as_millis());
+    println!(
+        "FIELD_SAMPLE problems={} sweeps={sweeps} stopped={} written={sum_h} held={sum_t} lambda={sum_l} friction={sum_f} foil_lambda={sum_fl} foil_friction={sum_ff} own_wins={wins} foil_wins={losses} ms={}",
+        held.len(),
+        stopped.map_or("-".to_string(), |s| s.to_string()),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
-/// neighbours (`unseen_regions`), training's masked regions and front regions' read 1 (`shape`), each
+/// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each
 /// set over the first `COUNT` training problems. With `KEYS`, the field is founded from the state's
 /// declaration on those keys (the founding); else the state is read as it stands.
 pub(super) fn rows_field(args: &[String]) -> Result<()> {
@@ -1503,21 +1015,18 @@ pub(super) fn rows_field(args: &[String]) -> Result<()> {
     let encoded: Problems = encoded.into_iter().filter(|(_, a, _)| a.len() < codec.answer).collect();
     let all: Vec<usize> = (0..encoded.len()).collect();
     let withheld: Vec<(Vec<usize>, Vec<bool>)> = unseen_regions(&codec, &encoded, &all, seed);
-    let (mut masked, mut fronts) = (Vec::new(), Vec::new());
+    let (mut masked, mut answers) = (Vec::new(), Vec::new());
     let mut draw = 0u64;
     for (q, a, _) in &encoded {
         draw += 1;
         let length = q.len() + a.len() + tail(seed, draw, codec.answer - a.len());
-        let mut classes = region_classes(&codec, q, a, length);
-        match shape(seed, draw, q.len(), length, a.len() + 1) {
+        let classes = region_classes(&codec, q, a, length);
+        match shape(seed, draw, q.len(), length) {
             Shape::Masked(mask) => masked.push((classes, mask)),
-            Shape::Front(front) => {
-                classes.truncate(front.cut);
-                fronts.push((classes, front.open.clone()));
-            }
+            Shape::Answer(mask) => answers.push((classes, mask)),
         }
     }
-    for (name, set) in [("withheld", &withheld), ("masked", &masked), ("front_read1", &fronts)] {
+    for (name, set) in [("withheld", &withheld), ("masked", &masked), ("answer", &answers)] {
         let mut total = holonics::hnn::tower::field::RowShares::default();
         for (classes, open) in set.iter() {
             let r = field.row_shares(&Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).map_err(|e| e.to_string())?;
@@ -1821,10 +1330,10 @@ mod tests {
 
 
     /// The commands end to end on the host: a toy passage trains two laps, rests, continues from
-    /// its rested learner, refuses to write over a run, and releases its held problems with their
+    /// its rested learner, refuses to write over a run, and writes its held problems' answers with their
     /// coupling reads.
     #[test]
-    fn the_field_trains_rests_continues_and_releases() {
+    fn the_field_trains_rests_continues_and_writes() {
         let dir = std::env::temp_dir().join(format!("holonics-field-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("dir");
@@ -1862,27 +1371,23 @@ mod tests {
         assert!(dir.join("B/STATE.1").exists());
         let state_sha = sha256(&rested).unwrap();
         let codec_sha = sha256(&codec).unwrap();
-        let args: Vec<String> = ["release-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", "600000", &at("R")].iter().map(|s| s.to_string()).collect();
-        release(&args, &mut host()).expect("release");
+        let args: Vec<String> = ["sample-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", "600000", &at("R")].iter().map(|s| s.to_string()).collect();
+        sample(&args, &mut host()).expect("sample");
         let read_in = |run: &str, name: &str| String::from_utf8(std::fs::read(dir.join(run).join(name)).expect("read")).unwrap();
-        let read = |name: &str| read_in("R", name);
-        assert_eq!(read("FREE.tsv").lines().count(), 2);
-        assert!(!dir.join("R/MARKS.tsv").exists(), "the marks are retired");
-        let coupling = read("COUPLING.tsv");
+        assert_eq!(read_in("R", "SAMPLE.tsv").lines().count(), 2);
+        let coupling = read_in("R", "COUPLING.tsv");
         assert_eq!(coupling.lines().count(), 3);
         for row in coupling.lines().skip(1) {
             let cells: Vec<usize> = row.split('\t').take(5).map(|c| c.parse().unwrap()).collect();
             assert_eq!(cells[1] + cells[2], 2 * cells[3] + cells[4], "F* = |H| + |T| - 2 lambda");
         }
-        assert!(release(&args, &mut host()).is_err(), "a release's directory is never written over");
-        // A release stopped at its deadline still writes a row a problem.
+        assert!(sample(&args, &mut host()).is_err(), "a writer's directory is never written over");
+        // A write stopped at its deadline still writes a row a problem, every place drawn on its last read.
         let mut stopped = args.clone();
         stopped[11] = "1".to_string();
         stopped[12] = at("Q");
-        release(&stopped, &mut host()).expect("stopped release");
-        assert_eq!(read_in("Q", "FREE.tsv").lines().count(), 2);
-        let text: Vec<String> = ["release-field-text", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "1", "2", "600000"].iter().map(|s| s.to_string()).collect();
-        release_text(&text, &mut host()).expect("release text");
+        sample(&stopped, &mut host()).expect("stopped sample");
+        assert_eq!(read_in("Q", "SAMPLE.tsv").lines().count(), 2);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -1899,88 +1404,36 @@ mod tests {
         assert_eq!(tail(9, 3, 1), 1);
     }
 
+    /// Both shapes open a site; a whole-region mask may open the question, an answer mask never does, and each opens
+    /// its domain's sites exactly where the draw's keyed site falls below its density `τ`.
     #[test]
     fn shapes_open_a_site_and_meet_both_halves() {
-        let (question, sites, answer) = (3usize, 12usize, 6usize);
-        let (mut masked, mut fronts) = (0, 0);
-        let (mut places, mut rungs) = (std::collections::BTreeSet::new(), std::collections::BTreeSet::new());
-        for draw in 0..2048 {
-            match shape(7, draw, question, sites, answer) {
+        let (question, sites) = (3usize, 40usize);
+        let (mut masked, mut answers, mut asked) = (0, 0, 0);
+        for draw in 0..2048u64 {
+            let tau = ((mix(7, draw) >> 1) & 0xFFFF) + 1;
+            let keyed = |t: usize| (mix(7, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau;
+            let (open, from) = match shape(7, draw, question, sites) {
                 Shape::Masked(m) => {
-                    assert!(m.iter().any(|&u| u));
-                    assert_eq!(m.len(), sites);
                     masked += 1;
+                    asked += usize::from(m[..question].iter().any(|&u| u));
+                    (m, 0)
                 }
-                Shape::Front(f) => {
-                    assert!(f.front >= question && f.front - question <= answer && f.rung <= 22);
-                    assert_eq!(f.cut, sites, "the port runs to the region's end (§16.24)");
-                    assert_eq!(f.open.len(), f.cut);
-                    assert!(f.open[..question].iter().all(|&u| !u), "the question is known");
-                    assert!(f.open[f.front..].iter().all(|&u| u), "the port is open");
-                    assert!(f.open.iter().any(|&u| u));
-                    places.insert(f.front - question);
-                    rungs.insert(f.rung);
-                    fronts += 1;
+                Shape::Answer(m) => {
+                    answers += 1;
+                    assert!(m[..question].iter().all(|&u| !u), "the question is known");
+                    (m, question)
+                }
+            };
+            assert_eq!(open.len(), sites);
+            assert!(open.iter().any(|&u| u));
+            if (from..sites).any(keyed) {
+                for t in from..sites {
+                    assert_eq!(open[t], keyed(t), "site {t} of draw {draw}");
                 }
             }
         }
-        assert!(masked > 512 && fronts > 512, "{masked} {fronts}");
-        assert_eq!(places.len(), answer + 1, "every place of the front, the answer's end among them");
-        assert_eq!(rungs.len(), 23, "every rung of the pump");
-        // A region that ends at the front has no band; one prefix site is opened.
-        for draw in 0..512 {
-            if let Shape::Front(f) = shape(7, draw, question, question + answer, answer) {
-                assert!(f.open.iter().any(|&u| u) && f.cut <= question + answer);
-            }
-        }
-    }
-
-    /// A front region's prefix is opened by the masks' own draws: the site `t` is open exactly where
-    /// the keyed draw of that site, `mix(seed, draw ^ ((t + 1) << 32))`, falls below the density `τ`
-    /// the draw's head gives, as the masked shape of the same draw opens it.
-    #[test]
-    fn a_front_opens_the_prefix_where_a_mask_would() {
-        let (question, sites, answer) = (3usize, 40usize, 20usize);
-        let (mut checked, mut dense) = (0, 0);
-        for draw in 0..512u64 {
-            let head = mix(7, draw);
-            let tau = ((head >> 1) & 0xFFFF) + 1;
-            let Shape::Front(f) = shape(7, draw, question, sites, answer) else { continue };
-            for t in question..f.front {
-                assert_eq!(f.open[t], (mix(7, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau, "site {t} of draw {draw}");
-            }
-            checked += 1;
-            dense += usize::from((question..f.front).any(|t| f.open[t]));
-        }
-        assert!(checked > 128 && dense > 32, "{checked} {dense}");
-    }
-
-    /// Read 2 of a front region on a face the logits give: the prefix's open site carried at `β = 2^r`,
-    /// locked where its `β = 1` face holds a majority (a tie, or a half, is not one, at any rung: §16.19),
-    /// the band at `β = 1` and never locked however sharp, the known site carrying nothing.
-    #[test]
-    fn read_2_carries_the_prefix_at_its_rung_locked_and_the_band_soft() {
-        let d = FieldDeclaration { alphabet: 3, width: 4, heads: 1, modes: 1, still: 1, contacts: 2, ticks: 1, frames: 1, reach: 8 };
-        let field = Field::found(d, &(0..1u64 << 10).flat_map(|i| mix(3, i).to_be_bytes()).collect::<Vec<_>>()).unwrap();
-        let z = |l: [i64; 3]| Some(l.iter().map(|&v| v << 16).collect::<Vec<i64>>());
-        let logits = vec![None, None, z([0, 1, 0]), z([0, 2, 0]), z([0, 5, 0]), z([1, 1, 0]), z([0, 0, 0])];
-        for rung in [0u32, 3, 22] {
-            let front = Front { front: 4, rung, cut: 7, open: vec![false, false, true, true, true, true, true] };
-            let (faces, locked) = front_faces(&field, &front, &logits).unwrap();
-            assert_eq!(faces.len(), 7);
-            assert!(faces[0].is_none() && faces[1].is_none(), "the question carries nothing");
-            for t in 2..4 {
-                assert_eq!(faces[t], Some(shares(&field.tempered(logits[t].as_ref().unwrap(), 1 << rung))), "prefix site {t} at 2^{rung}");
-            }
-            for t in 4..7 {
-                assert_eq!(faces[t], Some(shares(&field.tempered(logits[t].as_ref().unwrap(), 1))), "band site {t} at 1");
-            }
-            // Site 2: exactly half at β = 1, so never locked, though its face at rung 1 on holds a majority (the
-            // annealed crown, retired). Site 3: a majority at β = 1 (4 of 6), locked at every rung. The band: never.
-            assert_eq!(locked, vec![false, false, false, true, false, false, false], "rung {rung}");
-        }
-        let missing = Front { front: 4, rung: 1, cut: 7, open: vec![false, false, true, true, true, true, true] };
-        assert!(front_faces(&field, &missing, &logits[..5]).is_err(), "an open site the first read did not return");
+        assert!(masked > 512 && answers > 512 && asked > 256, "{masked} {answers} {asked}");
     }
 
     const TOY: &[u8] = b"Tom has 3 apples and buys 2 more. How many apples does he have?\nHe has <<3+2=5>>5 apples.\n#### 5\n\nTom has 7 apples and buys 1 more. How many apples does he have?\nHe has <<7+1=8>>8 apples.\n#### 8\n\nTom has 4 apples and buys 6 more. How many apples does he have?\nHe has <<4+6=10>>10 apples.\n#### 10\n\nTom has 9 apples and buys 0 more. How many apples does he have?\nHe has <<9+0=9>>9 apples.\n#### 9\n";
@@ -1999,110 +1452,51 @@ mod tests {
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
 
-    /// The regions `section_regions` formed for `members` from `first` on, against the draws they
-    /// stand on: a masked member one region, a front member two. Read 1 is the truth cut at the band
-    /// with the keyed open sites unresolved and nothing carried; read 2 is the same region with each
-    /// open site carrying its read-1 face (read now under `field`) at its rung, the prefix's locked
-    /// where its `β = 1` face holds a majority, and the band's soft. Returns the front members met and the locks.
-    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, first: u64, regions: &[TrainRegion], field: &Field) -> (usize, usize) {
-        let (mut k, mut fronts, mut locks) = (0, 0, 0);
+    /// The regions `section_regions` formed for `members` from `first` on, against the draws they stand on: one region a
+    /// member, the truth with the keyed open sites unresolved and nothing carried, weighed over the whole region or over
+    /// the answer and its tail.
+    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
+        assert_eq!(regions.len(), members.len());
+        let mut answers = 0;
         for (n, &i) in members.iter().enumerate() {
             let (q, a, _) = &problems[i];
             let draw = first + n as u64 + 1;
             let length = q.len() + a.len() + tail(seed, draw, codec.answer - a.len());
             let truth = region_classes(codec, q, a, length);
-            match shape(seed, draw, q.len(), length, a.len() + 1) {
-                Shape::Masked(mask) => {
-                    assert_eq!(regions[k], TrainRegion { domain: Some(length), ..TrainRegion::plain(truth, mask) }, "a mask is a state of the whole region (§16.23)");
-                    k += 1;
+            let expected = match shape(seed, draw, q.len(), length) {
+                Shape::Masked(mask) => TrainRegion { domain: Some(length), ..TrainRegion::plain(truth, mask) },
+                Shape::Answer(mask) => {
+                    answers += 1;
+                    TrainRegion { domain: Some(length - q.len()), ..TrainRegion::plain(truth, mask) }
                 }
-                Shape::Front(f) => {
-                    let (one, two) = (&regions[k], &regions[k + 1]);
-                    k += 2;
-                    fronts += 1;
-                    let target = a[(f.front - q.len()).min(a.len())..].to_vec();
-                    assert_eq!(one, &TrainRegion { domain: Some(f.front - q.len()), port: Some((f.front, codec.void(), target)), ..TrainRegion::plain(truth[..f.cut].to_vec(), f.open.clone()) }, "read 1: the truth, the prefix's open sites a state of the answer before the front, the port from the front");
-                    assert_eq!((&two.classes, &two.unresolved, two.domain, &two.port), (&one.classes, &one.unresolved, one.domain, &one.port), "read 2 is read 1's region");
-                    let z = field.logits(&view_of(one)).unwrap();
-                    assert_eq!(two.faces.len(), f.cut);
-                    assert_eq!(two.locked.len(), f.cut);
-                    for t in 0..f.cut {
-                        if !f.open[t] {
-                            assert!(two.faces[t].is_none() && !two.locked[t]);
-                            continue;
-                        }
-                        let prefix = t < f.front;
-                        let face = field.tempered(z[t].as_ref().unwrap(), if prefix { 1 << f.rung } else { 1 });
-                        assert_eq!(two.faces[t], Some(shares(&face)), "site {t} carries its read-1 face at {}", if prefix { f.rung } else { 0 });
-                        let own = field.tempered(z[t].as_ref().unwrap(), 1);
-                        let majority = own.masses.iter().max().unwrap() * 2 > own.total;
-                        assert_eq!(two.locked[t], prefix && majority, "site {t}");
-                        locks += usize::from(two.locked[t]);
-                    }
-                    field.faces(&view_of(two)).unwrap();
-                }
-            }
+            };
+            assert_eq!(regions[n], expected, "member {n}");
         }
-        assert_eq!(k, regions.len());
-        (fronts, locks)
+        answers
     }
 
-    /// The regions of a section on the toy passage are the draws' (a masked member one region, a front
-    /// member read 1 and read 2, each lock where the prefix's `β = 1` face holds a majority), and the field
-    /// accepts them. The learner has read six sections first: a founded field's readout is dormant and its
-    /// faces flat. [measurement, November 2] Under the lock on the field's own face (§16.19) no prefix site
-    /// of the 49 fronts here holds a majority after six sections, so none locks; the lock itself is read by
-    /// `read_2_carries_the_prefix_at_its_rung_locked_and_the_band_soft`.
+    /// A section's regions on the toy passage are the draws' (one a member), their lengths the projection's, and the
+    /// held step is read on them before they are returned (a step held is a step read).
     #[test]
-    fn a_front_member_is_two_regions_read_1_and_read_2() {
-        let (codec, problems) = toy();
-        let members = [0usize, 1, 2, 3];
-        let mut trained = toy_learner(&codec, &problems);
-        let mut draw = 1000u64;
-        for _ in 0..6 {
-            let (regions, _) = section_regions(&codec, &problems, &members, 11, &mut draw, &mut trained, &mut host()).unwrap();
-            trained.section_realized(&views_of(&regions), &mut host()).unwrap();
-        }
-        let (mut fronts, mut locks) = (0, 0);
-        for base in 0..24u64 {
-            let mut learner = trained.clone();
-            let held = learner.holds_step();
-            let first = 100 * base;
-            let mut draw = first;
-            let (regions, next) = section_regions(&codec, &problems, &members, 11, &mut draw, &mut learner, &mut host()).unwrap();
-            assert!(next.is_some() == held && draw == first + 4);
-            let lengths = region_lengths(&codec, &problems, &members, 11, &mut { first });
-            assert_eq!(lengths, regions.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), "the projection's lengths are the regions'");
-            let (f, l) = check_regions(&codec, &problems, &members, 11, first, &regions, &learner.field);
-            fronts += f;
-            locks += l;
-            for r in &regions {
-                learner.field.logits(&view_of(r)).unwrap();
-            }
-        }
-        eprintln!("FRONTS fronts={fronts} locks={locks}");
-        assert!(fronts > 16, "{fronts} {locks}");
-    }
-
-    /// The held step is read on the regions training compares (the masks and read 1) before read 2's
-    /// mixtures are read, so a front member's read 2 carries the faces of the material that stands.
-    #[test]
-    fn the_held_step_is_read_before_read_2_carries_its_mixtures() {
+    fn a_section_is_its_draws_and_its_held_step_is_read_on_them() {
         let (codec, problems) = toy();
         let members = [0usize, 1, 2, 3];
         let mut learner = toy_learner(&codec, &problems);
-        let (mut draw, mut held, mut read) = (0u64, false, 0usize);
+        let (mut draw, mut held, mut read, mut answers) = (0u64, false, 0usize, 0usize);
         for section in 0..8 {
             let first = draw;
+            let lengths = region_lengths(&codec, &problems, &members, 5, &mut { first });
             let (regions, next) = section_regions(&codec, &problems, &members, 5, &mut draw, &mut learner, &mut host()).unwrap();
+            assert_eq!(draw, first + 4);
+            assert_eq!(lengths, regions.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), "the projection's lengths are the regions'");
             assert_eq!(next.is_some(), held, "section {section}: a step held is a step read");
             assert!(!learner.holds_step(), "the held step is read before the regions are formed");
             read += usize::from(next.is_some());
-            check_regions(&codec, &problems, &members, 5, first, &regions, &learner.field);
+            answers += check_regions(&codec, &problems, &members, 5, first, &regions);
             learner.section_realized(&views_of(&regions), &mut host()).unwrap();
             held = learner.holds_step();
         }
-        assert!(read > 0, "a step was held and read");
+        assert!(read > 0 && answers > 0, "{read} {answers}");
     }
 
     #[test]
@@ -2119,47 +1513,6 @@ mod tests {
         assert!(text.contains("context=5.000000 ") && text.contains("foil=5.000001 ") && text.ends_with("question=0.000001"), "{text}");
         assert!(text.contains("answer=- "), "{text}");
         assert_eq!(bits(held[1].0, 4), bits(held[2].0, 4), "the three-decimal reading cannot tell them apart");
-    }
-
-    /// A release's receipt names the sites reached and locked, the sweeps each was reached and
-    /// locked, and the extent's reading; the locks of its last state are its locked sites'.
-    #[test]
-    fn a_receipt_names_the_front() {
-        let r = Released {
-            sites: vec![Some(1), None, Some(2)],
-            reached: vec![Some(0), Some(0), Some(1)],
-            lock_sweeps: vec![Some(2), None, Some(3)],
-            rungs: vec![4, 0, 1],
-            counters: vec![Some((2, 3 << 16)), None, Some((1, 5 << 16))],
-            open: 1,
-            extent: Some((3, 4, false)),
-            classes: vec![0; 6],
-            start: 2,
-            ..Released::default()
-        };
-        let text = receipt_text(&r);
-        assert!(text.contains("sites=3 open=1 reached=3 locked=2 reach_sweep_quartiles=0/0/0/0/1 lock_sweep_quartiles=2/2/2/2/3 extent=3@4:void "), "{text}");
-        assert_eq!(locks_of(&r), vec![false, false, true, false, true, false]);
-        assert_eq!(extent_text(Some((7, 2, true))), "7@2:bound");
-        assert_eq!(extent_text(None), "-");
-        let mut sum = FrontReceipt::default();
-        sum.add(&r);
-        sum.add(&Released { extent: Some((5, 6, true)), ..r.clone() });
-        sum.add(&Released { extent: None, ..r });
-        assert_eq!(sum.extents(), "extents_void=1 extents_bound=1 extents_unread=1 extent_site_quartiles=3/3/3/3/5 extent_sweep_quartiles=4/4/4/4/6");
-    }
-
-    /// An open site is written as the one byte no class writes, and the answer ends at its first
-    /// locked void.
-    #[test]
-    fn a_release_writes_its_open_sites_open() {
-        let problems = vec![(b"Q?".to_vec(), b"ab".to_vec())];
-        let codec = FieldCodec::found(Units::bytes(), &problems).unwrap();
-        let [a, b] = [codec.encode(b"a").unwrap()[0], codec.encode(b"b").unwrap()[0]];
-        // [§16.24] A void place writes nothing wherever it stands, and the release is read to its bound.
-        let (text, at) = codec.decode_open(&[Some(a), None, Some(b), Some(codec.void()), Some(a)], OPEN_SITE);
-        assert_eq!(text, b"a\0ba");
-        assert_eq!(at, vec![0, 1, 2, 3, 3]);
     }
 
     /// The withheld problems are never in a section, and every other problem is in one.

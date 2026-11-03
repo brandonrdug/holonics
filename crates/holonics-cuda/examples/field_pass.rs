@@ -2,11 +2,11 @@
 //! record `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`).
 //!
 //! - `field_pass parity complete-language parity-field ARGS…`: the host's field against the card's on
-//!   `train-field`'s sections, read for read (faces, covectors, learners) and release for release.
+//!   `train-field`'s sections, read for read (faces, covectors, learners) and write for write.
 //! - `field_pass time complete-language time-field ARGS…`: the card alone on the opening sections and
-//!   releases, and a lap and the held problems' releases projected from them.
-//! - `field_pass train complete-language train-field ARGS…`, `release-field ARGS…` and
-//!   `release-field-text ARGS…`: the commands with every read and return on the card.
+//!   writes, and a lap and the held problems' writes projected from them.
+//! - `field_pass train complete-language train-field ARGS…` and `sample-field ARGS…`: the commands with every read and
+//!   return on the card.
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs met, the landmark reads and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with
