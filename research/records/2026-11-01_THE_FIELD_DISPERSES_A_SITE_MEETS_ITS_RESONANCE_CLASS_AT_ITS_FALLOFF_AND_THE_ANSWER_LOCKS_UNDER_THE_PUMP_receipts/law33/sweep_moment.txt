@@ -1,0 +1,2 @@
+um5 (first moment at 2^-5): L4 ctx 2.623027 L9 ctx 2.420175 L14 ctx 2.309698 L19 ctx 2.037154 joint19 2.491244
+um6 (first moment at 2^-6): L4 ctx 2.635076 L9 ctx 2.535004 L14 ctx 2.396198 L19 ctx 2.237813 joint19 2.566788
