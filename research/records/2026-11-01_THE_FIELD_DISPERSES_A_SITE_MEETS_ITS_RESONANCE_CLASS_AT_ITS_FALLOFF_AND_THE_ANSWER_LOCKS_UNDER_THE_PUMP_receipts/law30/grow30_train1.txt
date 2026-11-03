@@ -1,0 +1,17 @@
+FIELD_HELD lap=-1 answer=5.595449 classes=35591 context=1.942177 context_classes=35591 foil=1.944695 question=0.002518 ms=3960
+FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=3.121306 foil_bits_a_byte=3.127330 information_bits_a_byte=0.006024 ms=2747
+FIELD_UNSEEN lap=-1 code=1.965 sites=36763 next=- ms=13406
+FIELD_LAP lap=0 read=5 sites=3816321 before=2.255 after=2.222 deposited=410/413 halvings=22 next_halved=0 next_refused=0 ms=169637
+FIELD_UNSEEN lap=0 code=1.903 sites=36763 next=- ms=183044
+FIELD_HELD lap=0 answer=5.448445 classes=35591 context=1.886883 context_classes=35591 foil=1.889827 question=0.002943 ms=186468
+FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=3.088733 foil_bits_a_byte=3.093827 information_bits_a_byte=0.005094 ms=2488
+FIELD_LAP lap=1 read=6 sites=3778715 before=2.223 after=2.196 deposited=412/413 halvings=5 next_halved=0 next_refused=0 ms=164071
+FIELD_UNSEEN lap=1 code=1.811 sites=36763 next=- ms=357222
+FIELD_HELD lap=1 answer=5.360399 classes=35591 context=1.798263 context_classes=35591 foil=1.800548 question=0.002285 ms=360628
+FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=3.035286 foil_bits_a_byte=3.039698 information_bits_a_byte=0.004412 ms=2777
+FIELD_LAP lap=2 read=7 sites=3814638 before=2.208 after=2.177 deposited=412/413 halvings=6 next_halved=0 next_refused=0 ms=176498
+FIELD_UNSEEN lap=2 code=1.861 sites=36763 next=- ms=544149
+FIELD_HELD lap=2 answer=5.472050 classes=35591 context=1.852032 context_classes=35591 foil=1.852588 question=0.000557 ms=547768
+FIELD_JOINT lap=2 answers=128 sites=35591 own_bits_a_byte=3.058285 foil_bits_a_byte=3.060736 information_bits_a_byte=0.002452 ms=2638
+FIELD_CARD reads=1446 read_ms=133471 returns=1246 return_ms=415572 pairs=138982876035 batches=2804 peak_store=8108294952 landmarks=0 landmark_ms=0 elapsed_ms=554872
+MEASURE lap=train rc=0 wall_s=555.3 peak_rss_kib=677632

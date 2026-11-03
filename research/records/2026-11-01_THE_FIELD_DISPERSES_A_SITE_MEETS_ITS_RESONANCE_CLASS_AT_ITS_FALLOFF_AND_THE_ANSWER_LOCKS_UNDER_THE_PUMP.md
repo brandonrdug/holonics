@@ -2552,3 +2552,14 @@ strictly); **seen material graded as unseen** (the held and withheld reads are u
 growth); **a located cause carried unrepaired** (the read's cost was measured and the law changed at its owner). Verification:
 the field library tests (56, `a_step_stands_unread_at_its_certified_size` among them), the example's field tests (13), the
 gate (0 failed) and the card parity at the founding (7 reads and one write equal; `_receipts/law30/`).
+
+**Under every law of November 3** (`check30_train.txt`: a fresh founding, D 32, H 4, K 6, four laps of 165 to 168 s): the
+held answers' joint code 3.531, 3.309, 3.271, 3.121 bits a byte, the context read 2.586, 2.224, 2.127, 1.942; three more laps
+from there 3.089, 3.035, 3.058 and 1.887, 1.798, 1.852 (`grow30_train1.txt`): the joint moves about 0.03 a lap either way
+between laps. Widened four times by copies with the heads kept (D 128, f 128, material 162,936), the trained field reads a
+section in 0.53 s against 0.40 s (the first launch's 200 s lap bound, set from D 32's lap, stopped it at 382 of 413 sections,
+`grow30_train4.txt`, incomplete); relaunched from that measured rate, two laps read 3.084 and 3.027, context 1.875 and 1.768
+(`grow30_train4b.txt`), against the unwidened 3.089 and 3.035, 1.887 and 1.798. Four times the material bought 0.01 bits of
+joint code in two laps, at 1.3 times the card's time: memory added to a trained field is taken up at about the rate the
+field already learns, so neither its size nor its step's rate nor the held read sets that rate. What sets it is the next
+subject: the field holds a one-neighbour table's worth with twice that table's numbers.

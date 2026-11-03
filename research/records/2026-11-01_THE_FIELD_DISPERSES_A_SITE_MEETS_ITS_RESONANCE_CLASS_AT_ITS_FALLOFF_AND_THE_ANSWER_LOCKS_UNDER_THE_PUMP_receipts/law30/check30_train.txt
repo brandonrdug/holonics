@@ -1,0 +1,22 @@
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=6 frames=4 reach=2221 section=16 rate=8 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=34776
+FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=2260
+FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=6.930737 foil_bits_a_byte=6.930737 information_bits_a_byte=0.000000 ms=1522
+FIELD_UNSEEN lap=-1 code=6.931 sites=36763 next=- ms=7924
+FIELD_LAP lap=0 read=1 sites=3833285 before=2.994 after=2.954 deposited=407/413 halvings=44 next_halved=0 next_refused=0 ms=168405
+FIELD_UNSEEN lap=0 code=2.608 sites=36763 next=- ms=176329
+FIELD_HELD lap=0 answer=5.285916 classes=35591 context=2.586037 context_classes=35591 foil=2.586020 question=-0.000018 ms=179753
+FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=3.531459 foil_bits_a_byte=3.531553 information_bits_a_byte=0.000094 ms=2481
+FIELD_LAP lap=1 read=2 sites=3876990 before=2.438 after=2.410 deposited=409/413 halvings=21 next_halved=0 next_refused=0 ms=167763
+FIELD_UNSEEN lap=1 code=2.252 sites=36763 next=- ms=354191
+FIELD_HELD lap=1 answer=5.988051 classes=35591 context=2.224462 context_classes=35591 foil=2.224419 question=-0.000043 ms=357627
+FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=3.308680 foil_bits_a_byte=3.310302 information_bits_a_byte=0.001622 ms=2520
+FIELD_LAP lap=2 read=3 sites=3802020 before=2.366 after=2.335 deposited=410/413 halvings=20 next_halved=0 next_refused=0 ms=165232
+FIELD_UNSEEN lap=2 code=2.150 sites=36763 next=- ms=529602
+FIELD_HELD lap=2 answer=6.971617 classes=35591 context=2.127052 context_classes=35591 foil=2.127996 question=0.000944 ms=533023
+FIELD_JOINT lap=2 answers=128 sites=35591 own_bits_a_byte=3.270603 foil_bits_a_byte=3.270649 information_bits_a_byte=0.000045 ms=2488
+FIELD_LAP lap=3 read=4 sites=3829769 before=2.310 after=2.282 deposited=412/413 halvings=7 next_halved=0 next_refused=0 ms=165869
+FIELD_UNSEEN lap=3 code=1.965 sites=36763 next=- ms=705586
+FIELD_HELD lap=3 answer=5.595449 classes=35591 context=1.942177 context_classes=35591 foil=1.944695 question=0.002518 ms=709258
+FIELD_JOINT lap=3 answers=128 sites=35591 own_bits_a_byte=3.121306 foil_bits_a_byte=3.127330 information_bits_a_byte=0.006024 ms=2506
+FIELD_CARD reads=1947 read_ms=167995 returns=1660 return_ms=540512 pairs=182358402095 batches=3763 peak_store=8104612334 landmarks=0 landmark_ms=0 elapsed_ms=715986
+MEASURE lap=train rc=0 wall_s=716.4 peak_rss_kib=620976
