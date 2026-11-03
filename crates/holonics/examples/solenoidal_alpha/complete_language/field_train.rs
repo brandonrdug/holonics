@@ -732,6 +732,21 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.laps,
         learner.field.theta.len()
     );
+    // [measurement; agent-inferred, November 3, §16.28] `FIELD_WIDEN_FIRST`: a continued learner widened by copies before
+    // its first lap (the growth law's operation, read here without its trigger), so a run reads whether the trained
+    // body's width bounds its fall; the run then makes no further growth.
+    let widened_first = std::env::var_os("FIELD_WIDEN_FIRST").is_some() && args.len() == 24;
+    // [measurement; agent-inferred, November 3, §16.28] `FIELD_RATE_BITS`: a continued learner's step rate `2^(−k)` read at
+    // `k` for this run, so a run reads whether the step's size bounds the trained field's fall.
+    if let Some(k) = std::env::var("FIELD_RATE_BITS").ok().and_then(|v| v.parse::<u32>().ok()).filter(|_| args.len() == 24) {
+        learner.rate_bits = k;
+        println!("FIELD_RATE rate={k}");
+    }
+    if widened_first {
+        learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
+        let d = learner.field.declaration;
+        println!("FIELD_GROW lap=-1 width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
+    }
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
     held_rows_text(&learner.field, &codec, &dev_set, realization, -1)?;
@@ -741,7 +756,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
     let mut previous = (code, sites);
-    let mut grown = false;
+    let mut grown = widened_first;
     let mut fallen = false;
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
