@@ -742,6 +742,12 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.rate_bits = k;
         println!("FIELD_RATE rate={k}");
     }
+    // [measurement; agent-inferred, November 3, §16.30] `FIELD_HELD_READ`: each step held and read on the next section before
+    // it stands (the tower's acceptance 77, [`FieldLearner::read_held`]), a declared comparison with the field's law.
+    if std::env::var_os("FIELD_HELD_READ").is_some() {
+        learner.read_held = true;
+        println!("FIELD_HELD_READ");
+    }
     if widened_first {
         learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
         let d = learner.field.declaration;
@@ -1497,6 +1503,8 @@ mod tests {
         let (codec, problems) = toy();
         let members = [0usize, 1, 2, 3];
         let mut learner = toy_learner(&codec, &problems);
+        // The held read is the declared comparison (§16.30); the field's law lets a step stand unread.
+        learner.read_held = true;
         let (mut draw, mut held, mut read, mut answers) = (0u64, false, 0usize, 0usize);
         for section in 0..8 {
             let first = draw;

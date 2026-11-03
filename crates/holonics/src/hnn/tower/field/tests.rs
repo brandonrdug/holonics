@@ -549,6 +549,7 @@ fn the_grown_field_reads_the_old_faces() {
 fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let mut learner = FieldLearner::new(field, 4);
+    learner.read_held = true;
     for _ in 0..3 {
         learner.section(&[region()]).unwrap();
     }
@@ -563,7 +564,8 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
     assert_eq!(grown.first[l.read_bias], learner.first[old.read_bias]);
     assert_eq!(grown.first[l.enc], div_nearest(learner.first[old.enc], 2));
     assert_eq!(grown.second[l.enc], div_nearest(learner.second[old.enc], 4));
-    let back = FieldLearner::from_text(&grown.to_text()).unwrap();
+    // Whether a step is read on the next regions is the run's declaration, not the learner's text (§16.30).
+    let back = FieldLearner { read_held: grown.read_held, ..FieldLearner::from_text(&grown.to_text()).unwrap() };
     assert_eq!(back, grown);
     // One learned section on the grown learner parts some pair of encoding copies.
     let mut next = grown.clone();
@@ -612,7 +614,7 @@ fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32,
     (halvings, !stands)
 }
 
-/// A deposited step is held and read on the next section: the material that stands is the law's
+/// [§16.30, the declared comparison] A deposited step is held and read on the next section: the material that stands is the law's
 /// (the step at its size or half of it, or at the parabola's halving, or refused), it never codes
 /// the next regions higher than the material before the step, and the section's opening read is
 /// the standing material's; the held step crosses the learner's text.
@@ -620,6 +622,8 @@ fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32,
 fn a_held_step_is_read_on_the_next_section() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let mut learner = FieldLearner::new(field, 2);
+    // The read is the declared comparison (§16.30); the field's law lets a step stand unread.
+    learner.read_held = true;
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
     let second = Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -1175,3 +1179,25 @@ fn an_open_stretch_leaves_the_other_sites_faces_as_they_were() {
     }
 }
 
+
+/// [§16.30] **A step stands at the size its own section certified**: under the field's law no step is held, the next
+/// section opens on the stepped material, and its receipt reads no held step.
+#[test]
+fn a_step_stands_unread_at_its_certified_size() {
+    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = FieldLearner::new(field, 2);
+    assert!(!learner.read_held);
+    let mut deposited = 0;
+    for _ in 0..6 {
+        let before = learner.field.clone();
+        let receipt = learner.section(&[region()]).unwrap();
+        assert!(receipt.next.is_none() && !learner.holds_step());
+        if receipt.deposited {
+            deposited += 1;
+            assert_ne!(learner.field, before);
+            let next = learner.section(&[region()]).unwrap();
+            assert_eq!(next.code_before, learner.field.code(&region()).unwrap().0.min(next.code_before), "the next section opens on the stepped material");
+        }
+    }
+    assert!(deposited > 0);
+}
