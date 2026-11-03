@@ -931,6 +931,11 @@ impl<'c> CardField<'c> {
     /// last-tick weight rows of those sites (the batch's one region).
     #[allow(clippy::type_complexity)]
     fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+        // [agent-inferred, November 3] A tower of scales is read on the card only once its packets' level is realized
+        // there with its parity; until then a tower is refused, never read without its packets.
+        if field.scale.is_some() {
+            return Err(TowerError::Refused("a tower of scales has no card realization yet"));
+        }
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);

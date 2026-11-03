@@ -697,6 +697,8 @@ pub struct Field {
     fine: Exponential,
     /// The half turn on `2^(−46)`, the turn's faces' navigator.
     pi: i128,
+    /// The packets' level of a tower of scales ([`Field::scaled_up`]), none for a field on one scale.
+    pub scale: Option<Box<Scale>>,
 }
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -1262,6 +1264,8 @@ struct FieldPass {
     paces: Paces,
     /// The region's moments `[t][2M]` (§15.1), which the opening reads (§16.22).
     moment: Vec<i64>,
+    /// A tower's forward at its split, for the reverse.
+    tower: Option<scale::ScalePass>,
 }
 
 /// The round trips `Σ_j p_ji^(t) p_ij^(t+1)` of each site over consecutive ticks' rows (`[h][i]`), each
@@ -1406,7 +1410,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -2141,7 +2145,10 @@ impl Field {
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
         let mut before: Option<Vec<Vec<Source>>> = None;
-        for _ in 0..d.ticks {
+        for k in 0..d.ticks {
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+                out.tower = Some(self.scale_forward(s, &mut x, &definite, &keyed, keep)?);
+            }
             let mut cell = TickCell::default();
             self.tick(&mut x, &definite, &keyed, &paces, &moment, &reaches, &mut cell)?;
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
@@ -2278,7 +2285,7 @@ impl Field {
         let mut out = vec![0u128; 2 * heads];
         for region in regions {
             let pass = self.pass(region, true)?;
-            let mut g = vec![0i128; self.theta.len()];
+            let mut g = vec![0i128; self.material_len()];
             self.returned_with(region, &pass, &mut g, Some(&mut out), None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
@@ -2294,7 +2301,7 @@ impl Field {
         let (heads, n, span) = (d.heads, d.modes, 2 * d.modes);
         let mut covectors: Vec<Vec<i64>> = Vec::new();
         if returning {
-            let mut g = vec![0i128; self.theta.len()];
+            let mut g = vec![0i128; self.material_len()];
             self.returned_with(region, &pass, &mut g, None, Some(&mut covectors))?;
             covectors.reverse();
         }
@@ -2888,8 +2895,12 @@ impl Field {
             }
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
-        for cell in pass.ticks.iter().rev() {
+        for (k, cell) in pass.ticks.iter().enumerate().rev() {
             self.tick_return(cell, &mut dx, g, paces, &definite, &mut dm, &mut gtau, &mut gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+                let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
+                self.scale_return(s, sp, &mut dx, g)?;
+            }
         }
         // The moment's chart into the face (§16.22): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`, and the moments'
         // covector `δs_t += Cᵀ δx⁰_t`, joined to the values' and the probes' before the strands' return.
@@ -2961,7 +2972,7 @@ impl Field {
 
     /// Each region's faces and the covector over the regions, summed in any order to the same bits.
     pub fn read_and_return(&self, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
-        let len = self.layout.len;
+        let len = self.material_len();
         let (mut faces, g) = regions
             .par_iter()
             .enumerate()
@@ -3157,19 +3168,43 @@ impl Field {
     }
 
     /// The field as text: its head line, then its material on one line.
+    /// The field as text: its declaration and its material, each on one line; a tower adds a line `scale P split`, the
+    /// packets' field's two lines and the glue's one.
     pub fn to_text(&self) -> String {
         let theta: Vec<String> = self.theta.iter().map(i32::to_string).collect();
-        format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "))
+        let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
+        if let Some(s) = &self.scale {
+            let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
+            out.push_str(&format!("scale {} {}\n{}{}\n", s.period, s.split, s.coarse.to_text(), glue.join(" ")));
+        }
+        out
     }
 
     pub fn from_text(text: &str) -> Result<Self> {
-        let mut lines = text.lines();
+        Self::from_lines(&mut text.lines().peekable())
+    }
+
+    /// A field read from its text's lines ([`Field::to_text`]), the lines after it left unread.
+    pub fn from_lines<'a>(lines: &mut std::iter::Peekable<impl Iterator<Item = &'a str>>) -> Result<Self> {
         let d = FieldDeclaration::from_text(lines.next().unwrap_or(""))?;
         let theta = read_numbers::<i32>(lines.next())?;
         if theta.len() != FieldLayout::new(&d).len {
             return refuse("a field's material that is not its declaration's length");
         }
-        Ok(Self::with_theta(d, theta))
+        let mut field = Self::with_theta(d, theta);
+        if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("scale ")) {
+            lines.next();
+            let words: Vec<usize> = head.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a scale's line that is not two counts"))).collect::<Result<_>>()?;
+            let [period, split] = words[..] else { return refuse("a scale's line that is not two counts") };
+            let coarse = Self::from_lines(lines)?;
+            let glue = read_numbers::<i32>(lines.next())?;
+            let (.., len) = scale::glue_len(period, field.declaration.width, coarse.declaration.width);
+            if glue.len() != len || split == 0 || split >= field.declaration.ticks {
+                return refuse("a scale's glue that is not its declaration's length, or a split outside the ticks");
+            }
+            field.scale = Some(Box::new(Scale { period, split, coarse, glue }));
+        }
+        Ok(field)
     }
 }
 
@@ -3235,6 +3270,9 @@ impl Field {
     pub fn grown(&self, factor: usize, keys: &[u8]) -> Result<(Self, Vec<(usize, bool)>)> {
         if factor < 2 {
             return refuse("a growth makes at least two copies");
+        }
+        if self.scale.is_some() {
+            return refuse("a tower grows by its levels' lanes, not by copies (the tower record, D2)");
         }
         let old = self.declaration;
         let d = old.grown(factor)?;
@@ -3523,7 +3561,7 @@ fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
 fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> {
     let mut candidate = base.clone();
     let mut moved = false;
-    for (slot, &q) in candidate.theta.iter_mut().zip(step) {
+    for (slot, &q) in candidate.material_mut().zip(step) {
         let s = release(q, halvings);
         if s != 0 {
             moved = true;
@@ -3653,7 +3691,7 @@ impl FieldLearner {
     /// The learner of a field founded on its declared key stream (the founding read
     /// [`FieldDeclaration::founding_draws`] draws).
     pub fn new(field: Field, rate_bits: u32) -> Self {
-        let len = field.theta.len();
+        let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
         Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false }
     }
@@ -3706,7 +3744,7 @@ impl FieldLearner {
             };
         };
         let mut before = self.field.clone();
-        for (slot, &q) in before.theta.iter_mut().zip(&held.step) {
+        for (slot, &q) in before.material_mut().zip(&held.step) {
             *slot = fit32(*slot as i128 + release(q, held.halvings), "a held step's material outgrew its 32-bit carrier")?;
         }
         let (standing, faces, next) = Self::next_scale(&before, &held, regions, realization)?;
@@ -3760,7 +3798,7 @@ impl FieldLearner {
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
-        for &(start, len, grain) in self.field.families() {
+        for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
             }
@@ -3776,7 +3814,7 @@ impl FieldLearner {
             }
         }
         let mut step = vec![0i128; g.len()];
-        for &(start, len, grain) in self.field.families() {
+        for &(start, len, grain) in &self.field.families_all() {
             for i in start..start + len {
                 step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
             }
@@ -3799,7 +3837,7 @@ impl FieldLearner {
     /// from section to section (its step is driven) and near zero where its signs cancel (its step is noise). A reading only.
     pub fn step_coherence(&self) -> Vec<(usize, u128, u128)> {
         self.field
-            .families()
+            .families_all()
             .iter()
             .map(|&(start, len, _)| {
                 let m: u128 = self.first[start..start + len].iter().map(|v| v.unsigned_abs()).sum();
@@ -3829,11 +3867,11 @@ impl FieldLearner {
         let rate_bits = head[1].parse::<u32>().map_err(|_| TowerError::Refused("a learner's rate that is not a count"))?;
         let drawn = head[2].parse::<usize>().map_err(|_| TowerError::Refused("a learner's drawn keys that are not a count"))?;
         let laps = head[3].parse::<u64>().map_err(|_| TowerError::Refused("a learner's laps that are not a count"))?;
-        let field_text = format!("{}\n{}\n", lines.next().unwrap_or(""), lines.next().unwrap_or(""));
-        let field = Field::from_text(&field_text)?;
+        let mut lines = lines.peekable();
+        let field = Field::from_lines(&mut lines)?;
         let first = read_numbers::<i128>(lines.next())?;
         let second = read_numbers::<i128>(lines.next())?;
-        if first.len() != field.theta.len() || second.len() != field.theta.len() {
+        if first.len() != field.material_len() || second.len() != field.material_len() {
             return refuse("a learner's moments that are not its field's length");
         }
         let held = match head[4] {
@@ -3841,7 +3879,7 @@ impl FieldLearner {
             h => {
                 let halvings = h.parse::<u32>().map_err(|_| TowerError::Refused("a learner's held halvings that are not a count"))?;
                 let step = read_numbers::<i128>(lines.next())?;
-                if step.len() != field.theta.len() {
+                if step.len() != field.material_len() {
                     return refuse("a learner's held step that is not its field's length");
                 }
                 Some(HeldStep { step, halvings })
@@ -3852,6 +3890,8 @@ impl FieldLearner {
 }
 
 pub mod moment;
+mod scale;
+pub use scale::Scale;
 
 #[cfg(test)]
 mod tests;

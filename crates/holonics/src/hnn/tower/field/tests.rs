@@ -1264,3 +1264,106 @@ fn refinement_revisits_the_written_answer() {
     let pointed = field.sample_realized(&problems, 3, 2, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
+
+/// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
+fn coarse_declaration() -> FieldDeclaration {
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6 }
+}
+
+/// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
+/// fixtures' keys past the fine field's founding.
+fn towered(still: usize) -> Field {
+    let field = shaped(still);
+    let offset = 4 * field.declaration.founding_draws();
+    field.scaled_up(3, 1, coarse_declaration(), &keys(1 << 15), offset).unwrap().0
+}
+
+/// [`towered`] with its prolongation and every family of its packets' field drawn, so every path of the tower carries a
+/// covector.
+fn towered_live(still: usize) -> Field {
+    let mut field = towered(still);
+    let stream = keys(1 << 16);
+    let families = field.families_all();
+    let base = field.theta.len();
+    for (n, v) in field.material_mut().enumerate().skip(base) {
+        let word = &stream[4 * n..4 * n + 4];
+        let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64;
+        let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+        *v = ((k << grain) >> 32) as i32;
+    }
+    field
+}
+
+/// The tower's covector over its whole material.
+fn tower_covector(field: &Field, region: &Region) -> Vec<i128> {
+    let pass = field.pass(region, true).unwrap();
+    let mut g = vec![0i128; field.material_len()];
+    field.returned(region, &pass, &mut g).unwrap();
+    g
+}
+
+/// [definition; the tower record, D1] **Growth in scale keeps every face**: a tower founded on a field (its prolongation
+/// at zero) reads every face the field read, its families tile its material, and its text restores it exactly.
+#[test]
+fn a_tower_founded_on_a_field_reads_its_faces() {
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        let tower = towered(still);
+        assert_eq!(tower.faces(&region()).unwrap(), field.faces(&region()).unwrap(), "still {still}");
+        let mut at = 0;
+        for (start, len, _) in tower.families_all() {
+            assert_eq!(start, at);
+            at += len;
+        }
+        assert_eq!(at, tower.material_len());
+        assert_eq!(Field::from_text(&tower.to_text()).unwrap(), tower);
+    }
+    let mut learner = FieldLearner::new(towered_live(1), 6);
+    learner.section(&[region()]).unwrap();
+    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
+}
+
+/// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'
+/// field's families and the glue's: each family's three entries with the largest covectors, moved by `±δ` (the probe law of
+/// [`covector_matches_the_codes_difference`], a probe whose step moves a site or a packet across a sheet left out and
+/// counted), and the live prolongation reaching the code at the bytes.
+#[test]
+fn the_towers_covector_matches_its_codes_difference() {
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+        let pass = field.pass(r, true).unwrap();
+        let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
+        pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+    };
+    let (mut read, mut seams) = (0usize, 0usize);
+    for still in [0usize, 1, 2] {
+        let field = towered_live(still);
+        let r = region();
+        let g = tower_covector(&field, &r);
+        let base = field.theta.len();
+        for (start, len, grain) in field.families_all().into_iter().filter(|&(s, _, _)| s >= base) {
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    *f.material_mut().nth(i).unwrap() += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta), &r) != sheets(&field, &r) || sheets(&moved(-delta), &r) != sheets(&field, &r);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("TOWER_COVECTOR_PROBES read={read} on_a_seam={seams}");
+    assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
+}
