@@ -499,6 +499,26 @@ fn the_writer_draws_every_place_from_its_own_face() {
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
+/// [definition; §16.35] **A drawn void closes the answer**: in every write, every place past an answer's first void is the
+/// void (the region stays an answer and its void tail), and some write ends early.
+#[test]
+fn a_drawn_void_closes_the_answer() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let mut closed_early = false;
+    for seed in 11..27 {
+        for (places, n) in field.sample_realized(&problems, 4, 0, seed, &mut HostField, &mut |_, _| true).unwrap().into_iter().zip([9usize, 8]) {
+            assert_eq!(places.len(), n);
+            if let Some(end) = places.iter().position(|&c| c == 0) {
+                assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}: {places:?}");
+                closed_early |= end + 1 < n;
+            }
+        }
+    }
+    assert!(closed_early, "no write ended before its last place");
+}
+
 /// A site carried as a mixture of one class and locked opens and radiates exactly as the site resolved
 /// to that class: the mixture of one row at the whole share is the row, and a lock is definite. A
 /// carried site holds nothing for the closure, and an unresolved site carried so is read beside the

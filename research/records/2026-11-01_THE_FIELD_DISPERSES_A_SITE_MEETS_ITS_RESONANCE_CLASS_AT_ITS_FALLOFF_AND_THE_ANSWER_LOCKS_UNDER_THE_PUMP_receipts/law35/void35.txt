@@ -1,0 +1,26 @@
+FIELD_SAMPLE_PLACES problem=0 first_void=209 past_first_void=578 places=1229
+FIELD_SAMPLE_PLACES problem=1 first_void=418 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=2 first_void=104 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=3 first_void=571 past_first_void=61 places=1229
+FIELD_SAMPLE_PLACES problem=4 first_void=315 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=5 first_void=419 past_first_void=376 places=1229
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2036 held=1600 lambda=583 friction=2470 foil_lambda=649 foil_friction=2338 own_wins=4 foil_wins=2 ms=71555
+MEASURE lap=open35 rc=0 wall_s=71.8 peak_rss_kib=232460
+FIELD_SAMPLE_PLACES problem=0 first_void=13 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=1 first_void=505 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=2 first_void=71 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=3 first_void=22 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=4 first_void=507 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=5 first_void=263 past_first_void=0 places=1229
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=1381 held=1600 lambda=428 friction=2125 foil_lambda=447 foil_friction=2087 own_wins=3 foil_wins=2 ms=49638
+MEASURE lap=close35 rc=0 wall_s=49.9 peak_rss_kib=232304
+FIELD_SAMPLE_PLACES problem=0 first_void=438 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=1 first_void=680 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=2 first_void=1109 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=3 first_void=653 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=4 first_void=58 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=5 first_void=272 past_first_void=0 places=1229
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3210 held=1600 lambda=626 friction=3558 foil_lambda=599 foil_friction=3612 own_wins=3 foil_wins=3 ms=64131
+MEASURE lap=close36 rc=0 wall_s=64.4 peak_rss_kib=235124
+FIELD_RUN state36=STATE.19
+FIELD_RUN exit at_s=186

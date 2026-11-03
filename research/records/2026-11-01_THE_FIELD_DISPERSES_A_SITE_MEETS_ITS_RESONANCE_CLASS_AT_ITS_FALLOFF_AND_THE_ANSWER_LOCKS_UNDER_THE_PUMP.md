@@ -2698,3 +2698,72 @@ and level with f 32 by lap 2: not taken. Four ticks read 3.417, 3.149, 3.123, 3.
 (`gsm8k_k4.txt`) against six ticks' 3.533, 3.200, 3.107, 3.025 in 165 to 171 s: as good a lap at two thirds of its time. The
 runs' declaration is four ticks (the ticks are the one constitution's iteration; with the strand pair contact four reach the
 four sites a word of text spans).
+
+### 16.35 Forty laps: the answer begins reading its question at lap 31, and a drawn void ends the answer
+
+[measurement; agent-inferred, November 3] Two 45-minute runs on the card under every law of §16.34 (D 32, H 4, n 8, still 2,
+f 32, K 4, section 16, rate 8; RTX 4080 SUPER under the lock, 24 host threads; receipts `_receipts/law35/`). `run35` founds
+the field fresh with growth allowed; `run36` continues its lap-20 state with one more growth allowed. By lap, the held
+answers' joint code (bits a byte), the question's information by it (the foil's code less the own), the context read and
+the withheld problems' code:
+
+| run, lap | joint | information | context | withheld | lap s |
+|---|---|---|---|---|---|
+| run35, 0 | 3.416 | −0.005 | 2.392 | 2.406 | 116 |
+| run35, 4 | 2.966 | 0.004 | 1.722 | 1.732 | 108 |
+| run35, 8 | 2.840 | 0.010 | 1.539 | 1.571 | 112 |
+| run35, 11 (grown to D 64, f 64, rate 9) | 2.890 | 0.008 | 1.528 | 1.551 | 109 |
+| run35, 12 | 2.793 | 0.012 | 1.455 | 1.476 | 120 |
+| run35, 20 | 2.597 | 0.012 | 1.115 | 1.140 | 122 |
+| run36, 7 | 2.481 | 0.018 | 0.963 | 0.980 | 128 |
+| run36, 10 | 2.467 | 0.034 | 0.941 | 0.949 | 113 |
+| run36, 12 | 2.383 | 0.087 | 0.793 | 0.783 | 114 |
+| run36, 14 | 2.279 | 0.163 | 0.647 | 0.612 | 114 |
+| run36, 19 | 2.164 | 0.265 | 0.525 | 0.503 | 121 |
+
+- **The fall did not flatten near 2.6** (§16.29's fit): laps 8 to 11 stalled near 2.85, the body grew at lap 11 when the
+  withheld code rose, and the joint fell steadily after it. Growth bought what §16.29 and §16.30 could not read in two
+  laps: a stall ended by a growth is the width spent, and the copies parted over the next laps.
+- **The answer began reading its question at about lap 31** (run36's lap 10), with no growth: the question's information
+  was 0.004 to 0.018 bits a byte for 28 laps (§16.25 read 0.016 at its lap 19) and rose to 0.265 over the next nine, while
+  the context read fell from 0.94 to 0.53, below every two-sided byte table's (0.92 at three neighbours a side): the near
+  reads now take names and numbers from the question. The onset is abrupt, as a copy path's formation is in other learners
+  (the induction heads of Olsson et al., 2022); it waited on laps, not on width.
+- **References** (readings only, never parts of the field): a left-to-right byte table with interpolated discounting
+  (`left_table.py`, fitted on the training passage) codes the held answers at 3.497, 2.724, 2.277, 2.041, 1.989 and 2.011
+  bits a byte from 1 to 6 bytes back; at 2.16 the field codes between the two- and three-byte tables, and unlike them it
+  reads its question.
+- Lap time 105 to 129 s at D 32 and D 64 alike (the heads hold the card's time, §16.29); run35 2,669 s and run36 2,633 s
+  against 2,940 s projected (0.91, 0.90); host peak resident set 0.65 GB; the writes 50 to 75 s.
+
+**The copy lab** (`make_copy_toy.py`, `copy_sweep.txt`): an answer that copies its question's eight letters in order,
+drawn without repeats from sixteen, with the letters ending the question line (`near`, about 10 places back) or 288 dots
+before its end (`far`, about 300 places back, GSM8K's median 306). Twenty laps from a fresh founding (125 sections a lap,
+1.5 s and 7.6 s a lap): the joint code 2.302 and 2.317 bits a byte at lap 19, the question's information 0.0001 and
+−0.0001, against about 2.25 for letters coded uniformly with nothing read from the question. In 2,500 steps the field
+learned no copy at either distance, a fixed offset of ten places included. On GSM8K the question's information rose only
+after about 12,800 steps (31 laps of 413 sections), so the lab's next read is its own onset over a hundred laps and more,
+then what moves it.
+
+**The writer glued letters drawn past the answer's end.** §16.24 made the void "a class like any other at every answer
+place" for the port's coupling, under which a void is a place the coupling does not use, and the sample's text dropped
+every void and joined the rest. §16.27 retired the port: training reads an answer and its void tail, and the codec reads
+classes up to the first void (`FieldCodec::decode`), so the void is again the class past an answer's end. The writer did
+not follow: on run35's lap-20 state (`void35.txt`, every place listed), three of the six answers had 578, 61 and 376 letters
+drawn past their first void (at places 209, 571 and 419), each one a state training never reads (a letter after a void),
+and the text joined them on.
+
+The law (`Field::sample_realized`, the module doc's writer paragraph, atlas `tower.field-write-by-the-training-clock`): **a
+place drawn as the void is the answer's boundary, and every place past it is resolved as the void**, so the region stays an
+answer and its void tail; the boundary only moves in, and a letter drawn past it is past the end. No place is chosen by its
+certainty: the boundary is wherever the field's own draw puts a void. The sample's text is the places before the first void,
+the codec's reading, and `PLACES.tsv` lists every place (the void as `|`). Test: `a_drawn_void_closes_the_answer` (16 seeds,
+every place past a first void is the void, and some write ends early). On run35's state the closing writer ended the six
+answers at places 13, 505, 71, 22, 507 and 263; on run36's lap-19 state at 438, 680, 1,109, 653, 58 and 272 (those six
+held answers run 267 bytes on average): the field has not learned where an answer ends. The writes are private.
+
+Failures this could repeat, checked: **a writer chosen by certainty** (the boundary is a draw, never a threshold);
+**catered machinery** (the void's meaning is the codec's and training's, no routine of the task); **a located cause carried
+unrepaired** (§16.24's reason was retired with the port in §16.27 and its consumer, the sample, kept it; repaired at the
+writer); **bits read as progress** (the information and the written answers are reported beside the code, and the writes
+were shown whole). Verification: the field library tests (57) and the gate (`gate35.txt`).

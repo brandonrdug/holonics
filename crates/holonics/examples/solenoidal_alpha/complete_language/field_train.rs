@@ -1036,12 +1036,20 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
         })
         .map_err(|e| e.to_string())?;
     let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
+    let mut place_rows = rows_file(&out.join("PLACES.tsv"), "")?;
     let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\twritten\theld\tlambda\tfriction\tfoil_lambda\tfoil_friction\n")?;
     let (mut sum_h, mut sum_t, mut sum_l, mut sum_f, mut sum_fl, mut sum_ff, mut wins, mut losses) = (0usize, 0usize, 0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
     for (i, places) in answers.iter().enumerate() {
-        let h: Vec<usize> = places.iter().copied().filter(|&c| c != codec.void()).collect();
-        let text: Vec<u8> = h.iter().flat_map(|&c| codec.decode(&[c])).collect();
+        // [agent-inferred, November 3, §16.35] The written answer is its places before the first void, as the codec reads
+        // classes (`FieldCodec::decode`): the void is the class past an answer's end, so a place past it is past the end.
+        let h: Vec<usize> = places.iter().copied().take_while(|&c| c != codec.void()).collect();
+        let past = places.iter().skip(h.len()).filter(|&&c| c != codec.void()).count();
+        println!("FIELD_SAMPLE_PLACES problem={i} first_void={} past_first_void={past} places={}", h.len(), places.len());
+        let text = codec.decode(&h);
         row(&mut file, &format!("{i}\t{}\n", escaped(&text)))?;
+        // Every place in order, the void as `|` (an escaped text writes a `|` byte as `\x7c`).
+        let marked: String = places.iter().map(|&c| if c == codec.void() { "|".to_string() } else { escaped(&codec.decode(&[c])) }).collect();
+        row(&mut place_rows, &format!("{i}\t{marked}\n"))?;
         let t = codec.encode(&held[i].1).unwrap_or_default();
         let foil = codec.encode(&held[(i + 1) % held.len()].1).unwrap_or_default();
         let c = holonics::receiver::coupling::coupling(&h, &t).map_err(|e| e.to_string())?;
