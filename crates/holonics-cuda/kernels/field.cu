@@ -2514,6 +2514,15 @@ extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, co
     }
 }
 
+// [definition; agent-inferred, November 3, §16.24] A port's places take their coupling's covector, read on the host
+// (`port_reading`): row `k` of `rows` written over the face covector of site `at[k]`.
+extern "C" __global__ void field_face_set(FieldWords w, const uint32_t *at, const int64_t *rows, uint64_t count, int64_t *dz) {
+    const uint64_t cells = count * w.A;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        dz[(uint64_t)at[c / w.A] * w.A + c % w.A] = rows[c];
+    }
+}
+
 // `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with
 // `accumulate` it is added to `out[t][i]` (each addition checked as the host's `fit64`).
 extern "C" __global__ void field_transposed(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved) {
