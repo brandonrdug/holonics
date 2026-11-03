@@ -1,0 +1,82 @@
+FIELD_HELD lap=-1 answer=5.250586 classes=35591 context=0.525836 context_classes=35591 foil=0.863587 question=0.337751 ms=2962
+FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=2.164101 foil_bits_a_byte=2.428809 information_bits_a_byte=0.264708 ms=2003
+FIELD_UNSEEN lap=-1 code=0.503 sites=36763 next=- ms=10272
+FIELD_LAP lap=0 read=42 sites=3761212 before=1.646 after=1.618 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=117535
+FIELD_UNSEEN lap=0 code=0.499 sites=36763 next=- ms=127807
+FIELD_HELD lap=0 answer=5.567844 classes=35591 context=0.530291 context_classes=35591 foil=0.873297 question=0.343007 ms=130662
+FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=2.159727 foil_bits_a_byte=2.443320 information_bits_a_byte=0.283593 ms=2023
+FIELD_LAP lap=1 read=43 sites=3833532 before=1.618 after=1.590 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=117535
+FIELD_UNSEEN lap=1 code=0.468 sites=36763 next=- ms=253767
+FIELD_HELD lap=1 answer=5.190773 classes=35591 context=0.498664 context_classes=35591 foil=0.852484 question=0.353820 ms=256724
+FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=2.121425 foil_bits_a_byte=2.402024 information_bits_a_byte=0.280599 ms=2194
+FIELD_LAP lap=2 read=44 sites=3761048 before=1.633 after=1.603 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=122722
+FIELD_UNSEEN lap=2 code=0.462 sites=36763 next=- ms=385392
+FIELD_HELD lap=2 answer=5.175811 classes=35591 context=0.495410 context_classes=35591 foil=0.837000 question=0.341591 ms=388250
+FIELD_JOINT lap=2 answers=128 sites=35591 own_bits_a_byte=2.102266 foil_bits_a_byte=2.379700 information_bits_a_byte=0.277434 ms=2238
+FIELD_LAP lap=3 read=45 sites=3740765 before=1.658 after=1.630 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=119153
+FIELD_UNSEEN lap=3 code=0.476 sites=36763 next=- ms=513429
+FIELD_HELD lap=3 answer=5.750587 classes=35591 context=0.511379 context_classes=35591 foil=0.874019 question=0.362640 ms=516293
+FIELD_JOINT lap=3 answers=128 sites=35591 own_bits_a_byte=2.139065 foil_bits_a_byte=2.434350 information_bits_a_byte=0.295285 ms=2072
+FIELD_GROW lap=3 width=128 heads=4 contacts=128 rate=10 material=162936 ms=522020
+FIELD_LAP lap=4 read=46 sites=3828911 before=1.616 after=1.585 deposited=411/413 halvings=2 next_halved=0 next_refused=0 ms=140656
+FIELD_UNSEEN lap=4 code=0.470 sites=36763 next=- ms=662677
+FIELD_HELD lap=4 answer=5.188315 classes=35591 context=0.503222 context_classes=35591 foil=0.849758 question=0.346536 ms=666416
+FIELD_JOINT lap=4 answers=128 sites=35591 own_bits_a_byte=2.107846 foil_bits_a_byte=2.407851 information_bits_a_byte=0.300005 ms=2758
+FIELD_LAP lap=5 read=47 sites=3877885 before=1.627 after=1.598 deposited=412/413 halvings=5 next_halved=0 next_refused=0 ms=140765
+FIELD_UNSEEN lap=5 code=0.436 sites=36763 next=- ms=813732
+FIELD_HELD lap=5 answer=5.601147 classes=35591 context=0.478741 context_classes=35591 foil=0.839705 question=0.360965 ms=817538
+FIELD_JOINT lap=5 answers=128 sites=35591 own_bits_a_byte=2.074719 foil_bits_a_byte=2.388203 information_bits_a_byte=0.313484 ms=2779
+FIELD_LAP lap=6 read=48 sites=3833096 before=1.626 after=1.598 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=138408
+FIELD_UNSEEN lap=6 code=0.434 sites=36763 next=- ms=962593
+FIELD_HELD lap=6 answer=5.709632 classes=35591 context=0.470801 context_classes=35591 foil=0.837512 question=0.366711 ms=966384
+FIELD_JOINT lap=6 answers=128 sites=35591 own_bits_a_byte=2.069097 foil_bits_a_byte=2.407964 information_bits_a_byte=0.338867 ms=2789
+FIELD_LAP lap=7 read=49 sites=3761827 before=1.623 after=1.595 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=137355
+FIELD_UNSEEN lap=7 code=0.435 sites=36763 next=- ms=1110385
+FIELD_HELD lap=7 answer=6.252250 classes=35591 context=0.468524 context_classes=35591 foil=0.821348 question=0.352824 ms=1114172
+FIELD_JOINT lap=7 answers=128 sites=35591 own_bits_a_byte=2.055469 foil_bits_a_byte=2.377643 information_bits_a_byte=0.322174 ms=2790
+FIELD_GROW_HELD lap=7 reason=a second growth has no projection; the laps go on at this width ms=1120873
+FIELD_LAP lap=8 read=50 sites=3828100 before=1.588 after=1.559 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=138503
+FIELD_UNSEEN lap=8 code=0.451 sites=36763 next=- ms=1259377
+FIELD_HELD lap=8 answer=5.147008 classes=35591 context=0.478034 context_classes=35591 foil=0.831372 question=0.353338 ms=1263081
+FIELD_JOINT lap=8 answers=128 sites=35591 own_bits_a_byte=2.086937 foil_bits_a_byte=2.409115 information_bits_a_byte=0.322178 ms=2626
+FIELD_GROW_HELD lap=8 reason=a second growth has no projection; the laps go on at this width ms=1269393
+FIELD_LAP lap=9 read=51 sites=3864033 before=1.575 after=1.547 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=132333
+FIELD_UNSEEN lap=9 code=0.414 sites=36763 next=- ms=1401727
+FIELD_HELD lap=9 answer=5.145930 classes=35591 context=0.448554 context_classes=35591 foil=0.809743 question=0.361189 ms=1405150
+FIELD_JOINT lap=9 answers=128 sites=35591 own_bits_a_byte=2.010376 foil_bits_a_byte=2.356312 information_bits_a_byte=0.345936 ms=2582
+FIELD_LAP lap=10 read=52 sites=3780901 before=1.583 after=1.555 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=130938
+FIELD_UNSEEN lap=10 code=0.405 sites=36763 next=- ms=1542248
+FIELD_HELD lap=10 answer=5.149154 classes=35591 context=0.436264 context_classes=35591 foil=0.796914 question=0.360650 ms=1545723
+FIELD_JOINT lap=10 answers=128 sites=35591 own_bits_a_byte=1.997224 foil_bits_a_byte=2.346684 information_bits_a_byte=0.349459 ms=2578
+FIELD_LAP lap=11 read=53 sites=3857340 before=1.587 after=1.559 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=132330
+FIELD_UNSEEN lap=11 code=0.396 sites=36763 next=- ms=1684211
+FIELD_HELD lap=11 answer=5.492018 classes=35591 context=0.425668 context_classes=35591 foil=0.796970 question=0.371302 ms=1687700
+FIELD_JOINT lap=11 answers=128 sites=35591 own_bits_a_byte=2.001691 foil_bits_a_byte=2.358839 information_bits_a_byte=0.357148 ms=2597
+FIELD_LAP lap=12 read=54 sites=3862526 before=1.570 after=1.542 deposited=413/413 halvings=2 next_halved=0 next_refused=0 ms=133563
+FIELD_UNSEEN lap=12 code=0.383 sites=36763 next=- ms=1827466
+FIELD_HELD lap=12 answer=5.413426 classes=35591 context=0.414991 context_classes=35591 foil=0.777051 question=0.362060 ms=1830895
+FIELD_JOINT lap=12 answers=128 sites=35591 own_bits_a_byte=1.978158 foil_bits_a_byte=2.352823 information_bits_a_byte=0.374665 ms=2576
+FIELD_LAP lap=13 read=55 sites=3863327 before=1.565 after=1.538 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=133616
+FIELD_UNSEEN lap=13 code=0.383 sites=36763 next=- ms=1970666
+FIELD_HELD lap=13 answer=5.508682 classes=35591 context=0.410431 context_classes=35591 foil=0.783619 question=0.373188 ms=1974100
+FIELD_JOINT lap=13 answers=128 sites=35591 own_bits_a_byte=1.957269 foil_bits_a_byte=2.346905 information_bits_a_byte=0.389637 ms=2588
+FIELD_GROW_HELD lap=13 reason=a second growth has no projection; the laps go on at this width ms=1980274
+FIELD_LAP lap=14 read=56 sites=3813327 before=1.547 after=1.518 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=131451
+FIELD_UNSEEN lap=14 code=0.370 sites=36763 next=- ms=2111725
+FIELD_HELD lap=14 answer=5.829161 classes=35591 context=0.408450 context_classes=35591 foil=0.761947 question=0.353498 ms=2115156
+FIELD_JOINT lap=14 answers=128 sites=35591 own_bits_a_byte=1.968969 foil_bits_a_byte=2.354084 information_bits_a_byte=0.385115 ms=2580
+FIELD_LAP lap=15 read=57 sites=3876404 before=1.531 after=1.503 deposited=413/413 halvings=1 next_halved=0 next_refused=0 ms=134356
+FIELD_UNSEEN lap=15 code=0.378 sites=36763 next=- ms=2255669
+FIELD_HELD lap=15 answer=5.632932 classes=35591 context=0.417774 context_classes=35591 foil=0.761371 question=0.343597 ms=2259167
+FIELD_JOINT lap=15 answers=128 sites=35591 own_bits_a_byte=1.950915 foil_bits_a_byte=2.312971 information_bits_a_byte=0.362056 ms=2595
+FIELD_GROW_HELD lap=15 reason=a second growth has no projection; the laps go on at this width ms=2265344
+FIELD_LAP lap=16 read=58 sites=3770004 before=1.530 after=1.502 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=131873
+FIELD_UNSEEN lap=16 code=0.355 sites=36763 next=- ms=2397217
+FIELD_HELD lap=16 answer=5.490848 classes=35591 context=0.395928 context_classes=35591 foil=0.763472 question=0.367544 ms=2400650
+FIELD_JOINT lap=16 answers=128 sites=35591 own_bits_a_byte=1.933414 foil_bits_a_byte=2.339338 information_bits_a_byte=0.405924 ms=2593
+FIELD_LAP lap=17 read=59 sites=3727073 before=1.512 after=1.483 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=139972
+FIELD_UNSEEN lap=17 code=0.354 sites=36763 next=- ms=2546801
+FIELD_HELD lap=17 answer=5.558272 classes=35591 context=0.390584 context_classes=35591 foil=0.750534 question=0.359950 ms=2550729
+FIELD_JOINT lap=17 answers=128 sites=35591 own_bits_a_byte=1.924180 foil_bits_a_byte=2.333641 information_bits_a_byte=0.409461 ms=2788
+FIELD_LAPS_HELD lap=18 reason=time left=142506 bound=220000 ms=2557494
+MEASURE lap=train rc=0 wall_s=2558.0 peak_rss_kib=602464

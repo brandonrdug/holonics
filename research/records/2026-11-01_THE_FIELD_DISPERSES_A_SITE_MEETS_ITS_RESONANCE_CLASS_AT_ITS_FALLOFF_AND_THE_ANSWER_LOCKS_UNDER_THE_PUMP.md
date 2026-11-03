@@ -2767,3 +2767,34 @@ Failures this could repeat, checked: **a writer chosen by certainty** (the bound
 unrepaired** (§16.24's reason was retired with the port in §16.27 and its consumer, the sample, kept it; repaired at the
 writer); **bits read as progress** (the information and the written answers are reported beside the code, and the writes
 were shown whole). Verification: the field library tests (57) and the gate (`gate35.txt`).
+
+### 16.36 The places keep moving: a written answer is revisited until its words can align
+
+[definition; agent-inferred, November 3] §16.35's writes broke their words where they were drawn. GSM8K's English (the lens
+record of November 3, §5) puts a word's information in its first letters (4.10, 2.32 and 1.88 bits for the first three
+given the word's letters before them, under 0.9 from the fourth): a letter drawn before its word is chosen is a near-marginal
+draw, its neighbours are then held to agree with it, and the writer never revisited a place. The lens of November 1 (an
+answer is one field whose parts move together until its faces align, never committed surest-first) asks for the writer's
+places to keep moving.
+
+The law (`Field::sample_realized`, its `refine` passes; the sample's `REFINE` argument; atlas
+`tower.field-write-by-the-training-clock`): after every place is written, each pass revisits the places up to the boundary
+(the first void) in its own keyed order, one place of each problem a read; a revisited place is opened again, read beside
+every other place as it now stands and drawn from its face at temperature one, as the first pass draws it, and the closing
+law (§16.35) holds after each draw, so the boundary moves in where a void is drawn and out by one where it is drawn as a
+letter. It is the Gibbs sweep of the field's own conditionals; no place is chosen by its certainty. Test:
+`refinement_revisits_the_written_answer`.
+
+**Measured** (`_receipts/law36/`): `run37` continued run36's lap-19 state for 45 minutes (the binary of §16.35; it grew to D
+128, f 128, rate 10 at its lap 3, and laps ran 118 to 141 s against the 185 s projected for a grown lap): the joint code
+2.164 at the start, 2.010 at lap 9 and 1.924 at lap 17, below the five-byte left table's 1.989; the question's information
+0.265, 0.346 and 0.409 bits a byte; the context read 0.391; 2,634 s against 2,940 s projected (0.90). On its lap-17 state the
+six held answers written once and with three passes (`refine.txt`): 45.1 % of the written letter words are words of the
+training passage (120 of 266) once and 65.2 % (189 of 290) refined, at 75 s and 248 s; the boundaries moved by at most three
+places; the first answer still runs to the extent's end. The writes are private and were shown to Brandon whole.
+
+Failures this could repeat, checked: **a writer chosen by certainty** (each revisit is a keyed order and a draw at
+temperature one); **recitation counted as generation** (the written words are drawn from the field's own faces on held
+questions, and the reading counts words of the training passage, which recited question words also are: it is reported
+beside the writes, never as the acceptance); **bits read as progress** (the writes are shown whole). Verification: the field
+library tests (58), the example's field tests (14).
