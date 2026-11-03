@@ -1,0 +1,8 @@
+# binary sha f198c637b8732070c5722fa3467086366c026e81087d97e22ffbbb783ea4ae77, commit 7fcae71ae, declaration 64 8 8 4 64 8
+FIELD_TIME_DECLARATION width=64 heads=8 modes=8 still=4 contacts=64 ticks=8 reach=2221 material=98102
+FIELD_TIME_LAP sections=413 sites=4600652 rows=294441728 end_rows=165552960 context_rows=294441728 worst_ps_a_section_row=1899210 worst_ps_a_read_row=168771 at_size_ms=559206 context_ms=49693 projection_ms=835614 (every section's reads and return at the worst measured time a site row, four more reads of it, the held step's context read, and the lap's end)
+FIELD_TIME_PAIRS lap_met_pairs=87572397584 met_pairs_a_row_millis=297418 all_pairs=248110471040
+FIELD_TIME_WRITE problems=4 places=4916 written=2158 sweeps=64 rows_read=23949312 ms=4475
+FIELD_TIME_WRITES problems=128 sweeps=64 rows_at_most=770854912 ps_a_row=186874 projection_ms=144053
+FIELD_TIME_DONE elapsed_ms=57209
+MEASURE lap=time rc=0 wall_s=57.8 peak_rss_kib=374752

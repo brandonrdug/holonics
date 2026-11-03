@@ -797,8 +797,7 @@ pub(super) fn run_with_execution(
         Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, true, holonics::hnn::tower::ContactLaw::Rectifying),
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
-        Some("release-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::release(args, &mut field_train::host()),
-        Some("release-field-text") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::release_text(args, &mut field_train::host()),
+        Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
@@ -883,10 +882,9 @@ pub(super) fn run_with_execution(
 pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("train-field") => field_train::train(args, realization),
-        Some("release-field") => field_train::release(args, realization),
-        Some("release-field-text") => field_train::release_text(args, realization),
+        Some("sample-field") => field_train::sample(args, realization),
         Some("currents-field") => field_train::currents_field(args, realization),
-        _ => Err("a realized field command is train-field, release-field, release-field-text or currents-field".into()),
+        _ => Err("a realized field command is train-field, sample-field or currents-field".into()),
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field

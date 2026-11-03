@@ -1,0 +1,4 @@
+gate rc=0 0 failed
+field library tests: 54 passed
+example field tests: 13 passed
+card build: ok

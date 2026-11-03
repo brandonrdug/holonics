@@ -2380,3 +2380,61 @@ the subject; this change is the comparison law's own owed term and is read again
 Verification (November 3): the tower and coupling library tests (252 and 14), the field example tests (18), the card build, the
 card parity on four GSM8K sections and one release (15 reads, 0 faces, covector entries or learners unequal; 358 s against a
 360 s deadline) and the gate (0 failed). Receipts: `_receipts/law26/check.txt`, `_receipts/law26/parity.txt`.
+
+### 16.27 Why the field could not write text, read from its code; the writer is the training clock run backwards
+
+[measurement; agent-inferred, November 3] Brandon, November 3, on §16.25's releases: the output was broken, most of it not
+characters at all, and the statistics did not matter. The field was read end to end (the opening, the charts, the contact,
+the current, the merge, the face, the learner, the training shapes and the release) against §16.25's run, and four causes
+were found, in order of weight.
+
+1. **The release could not write text by construction.** It locked a place only where one class held a majority of the
+   field's own face (`2 m_top > Σ m` at `β = 1`, §16.19) at a sweep's start and end, and it moved its front only past
+   locked places. Text is uncertain at most places under any model (a word's first byte, a number's digits), so a place
+   locks only where the field is sure; on GSM8K that is the glue every answer shares (`<<`, `>>`, `=`, `####`) and the
+   digit `0`, and each locked `0` makes its neighbour's `0` surer. §16.25's releases were those bytes, runs of `0` and
+   open places (34,858 of 176,258 reached places never locked). No model the field could learn would have changed this:
+   the writer committed only certainty.
+2. **The field is shallow.** Two ticks of one constitution: an answer place's face is formed from two hops of contact,
+   each one current and one complex merge, at width 32 (grown to 64 at lap 16; 101,750 material). Its order-averaged
+   joint code on the 128 held answers fell from 6.93 to 2.98 bits a byte over 20 laps (§16.25's `FIELD_JOINT`), about a
+   bytes' trigram's, still falling 0.02 to 0.03 bits a lap: the writer at temperature one draws from that joint.
+3. **Half of every lap trained states only that release met.** A front member was two regions (read 1 with its port and
+   read 2 carrying read 1's faces at a pump rung) and a third read for read 2's mixtures, against a mask member's one.
+4. **About 45% of held steps were refused** on the next section (170 to 208 of 413 a lap), so a lap deposited roughly
+   half of what its sections returned.
+
+What changes here (causes 1 and 3; cause 2 is the run's declaration, below; cause 4 is the deposition law's and is left):
+
+- **The writer** ([`Field::sample_realized`], atlas `tower.field-write-by-the-training-clock`). Training reads a region
+  whose open sites are a uniform state of a random reading order (§16.23); the writer opens every answer place beside the
+  known question and resolves them in one keyed random order over `S` sweeps, each place drawn from its own face at
+  temperature one (an exact integer draw against the face's masses) on the read of the region as it stands, every place
+  resolved before it known. Every place is written; a place drawn as the void writes nothing. Places resolved in one
+  sweep are drawn independently given the read, so `S = n` draws the exact order-`σ` joint.
+- **The training shapes** (`field_train::shape`). A member is one region, with even odds a mask over the whole region (the
+  question's and the answer's language) or a mask over the answer and its void tail with the question known (the
+  writer's states), each weighed over its domain (`Region::weight`). The front regions, read 2, the held fronts and the
+  pump's rungs are retired; no training region declares a port.
+- **Retired with the release**: `Field::release`, `release_realized`, `release_with`, `content_face`, `extent`,
+  `Released`, `ReleaseSweep`, `PUMP_TOP`, the release's commands (`release-field`, `release-field-text`) and receipts.
+  The parity and timing commands read the writer instead (`FIELD_PARITY_WRITE`, `FIELD_TIME_WRITE`). Left in place and
+  now unconsumed by any command, owed to #603's cleanup with their card paths: the carried mixtures and locks of a region
+  (`Region::faces`, `locked`), the echo (`Echo`, the card's `field_echo_trips`), the port (`Region::port`, `port_reading`,
+  `field_face_set`) and the landmarks (`Field::landmarks`, `read_landmarks`).
+
+Failures this could repeat, checked: **recitation counted as generation** (2): the writer draws from the field's own faces
+and is read on held questions; **a writer chosen by certainty** (§16.19's crown): no place is chosen by its certainty;
+**a located cause carried unrepaired** (§16.25): cause 1 is repaired at its owner, and cause 2 is the next run's subject.
+
+Verification (November 3): the field library tests (54, the writer's own among them) and the example's field tests (13),
+the card build, the gate (0 failed), and the card parity on three sections of the new shapes, eight withheld problems and
+one write of 8 sweeps (12 reads, 0 faces, covector entries or learners unequal, the write's 1,229 places equal; 317 s
+against a 330 s projection and a 400 s deadline). Receipts: `_receipts/law27/check.txt`, `_receipts/law27/parity.txt`.
+
+**Depth on the card** (cause 2; `_receipts/law27/time_*.txt`, the opening 48 sections of a founded field's first lap and
+4 writes of 64 sweeps, RTX 4080 SUPER): with one region a member, a section of D 64, H 8, K 4 reads in 0.5 s mean (lap
+projection 476 s at its upper bound); D 64, K 8 and D 128, H 16, K 4 in about 1.0 s (840 s); D 128, H 16, K 6 in 1.5 s
+(1,421 s, material 310,770, three times §16.25's grown field and three times its ticks). The run's declaration is the last:
+the ticks are the one constitution iterated, so a change reaches a site three times farther hop by hop and composes three
+times more often, and the width carries three times the material, inside a lap the card reads in about ten minutes.
