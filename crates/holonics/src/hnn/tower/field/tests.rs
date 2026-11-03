@@ -283,40 +283,42 @@ fn covector_matches_the_codes_difference() {
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
 }
 
-/// [definition; agent-inferred, November 1] **The falloff is the medium's distance** (the
-/// dispersing field's §2.3): with every key and probe zero (so every site shares one class and meets every
-/// other, every source known) a row's terms differ by the octave of their distance and nothing else,
-/// `p_j 2^⌊log₂ |i − j|⌋` one value across the row's sources to the shares' rounding (§14.11: each term
-/// keeps its own exponent); so even a still field with its strand contacts silent reads the order of
-/// its classes.
+/// [definition; agent-inferred, November 1; November 3, §16.38] **A still head weighs its faces, not its distances** (the
+/// dispersing field's §2.3, and conservation of faces): with every key and probe zero (so every site shares one class and
+/// meets every other, every source known), a still field's sources are one face and share its mass alike at every distance,
+/// to the shares' rounding (§14.11: each term keeps its own exponent); with its strand contacts silent it still reads the
+/// order of its classes, through the strand's pair contact. (A turned head's falloff, the octave of its distance, is read
+/// through the covector's checks; its probes carry the moments, so its classes differ by site.)
 #[test]
 fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
-    let mut field = silent_contacts(shaped(2));
-    let l = field.layout.clone();
-    let (m2, dw) = (2 * field.declaration.complex(), field.declaration.width);
-    for (chart, bias) in [(l.q, l.q_bias), (l.probe, l.probe_bias)] {
-        field.theta[chart..chart + m2 * dw].iter_mut().for_each(|v| *v = 0);
-        field.theta[bias..bias + m2].iter_mut().for_each(|v| *v = 0);
-    }
-    let classes = [1usize, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2];
-    let open = [false; 12];
-    let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
-    for cell in &pass.ticks {
-        for (hi, row) in cell.rows.iter().enumerate() {
-            let i = hi % classes.len();
-            assert_eq!(row.len(), classes.len() - 1, "every site meets every other where the words are one class");
-            let scaled: Vec<u128> = row.iter().map(|src| (src.p as u128) << octave(i.abs_diff(src.j as usize))).collect();
-            let (low, high) = (*scaled.iter().min().unwrap(), *scaled.iter().max().unwrap());
-            assert!(high - low <= 1 << 10, "site {i}: the terms differ by their octaves alone: {scaled:?}");
+    for still in [2usize] {
+        let mut field = silent_contacts(shaped(still));
+        let l = field.layout.clone();
+        let (m2, dw) = (2 * field.declaration.complex(), field.declaration.width);
+        for (chart, bias) in [(l.q, l.q_bias), (l.probe, l.probe_bias)] {
+            field.theta[chart..chart + m2 * dw].iter_mut().for_each(|v| *v = 0);
+            field.theta[bias..bias + m2].iter_mut().for_each(|v| *v = 0);
         }
+        let classes = [1usize, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2];
+        let open = [false; 12];
+        let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
+        for cell in &pass.ticks {
+            for (hi, row) in cell.rows.iter().enumerate() {
+                let i = hi % classes.len();
+                assert_eq!(row.len(), classes.len() - 1, "every site meets every other where the words are one class");
+                let scaled: Vec<u128> = row.iter().map(|src| src.p as u128).collect();
+                let (low, high) = (*scaled.iter().min().unwrap(), *scaled.iter().max().unwrap());
+                assert!(high - low <= 1 << 10, "still {still} site {i}: one face shares its mass alike: {scaled:?}");
+            }
+        }
+        let faces = field.faces(&region()).unwrap();
+        let order = [3usize, 0, 6, 1, 5, 2, 4];
+        let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
+        let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
+        let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+        assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]), "still {still}: the field reads order");
     }
     assert_eq!([1usize, 2, 3, 4, 5, 7, 8, 1000].map(octave), [0, 1, 1, 2, 2, 2, 3, 9]);
-    let faces = field.faces(&region()).unwrap();
-    let order = [3usize, 0, 6, 1, 5, 2, 4];
-    let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
-    let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
-    let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
-    assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]), "a still field reads distance");
 }
 
 /// [definition; agent-inferred, November 1] **The class lists and the support** (§2.5, §12): each
@@ -1228,8 +1230,9 @@ fn a_step_stands_unread_at_its_certified_size() {
         if receipt.deposited {
             deposited += 1;
             assert_ne!(learner.field, before);
+            let stepped = learner.field.code(&region()).unwrap().0;
             let next = learner.section(&[region()]).unwrap();
-            assert_eq!(next.code_before, learner.field.code(&region()).unwrap().0.min(next.code_before), "the next section opens on the stepped material");
+            assert_eq!(next.code_before, stepped, "the next section opens on the stepped material");
         }
     }
     assert!(deposited > 0);
@@ -1367,3 +1370,4 @@ fn the_towers_covector_matches_its_codes_difference() {
     eprintln!("TOWER_COVECTOR_PROBES read={read} on_a_seam={seams}");
     assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
 }
+

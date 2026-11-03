@@ -287,6 +287,13 @@ pub struct FieldTimes {
 }
 
 /// One tick's carriers on the card.
+/// A field's uploaded run buffers ([`CardField::upload`]), held while its words are read.
+struct Upload<'c> {
+    _pack: Pooled<'c, u8>,
+    _face: Option<Pooled<'c, u64>>,
+    met: Pooled<'c, u64>,
+}
+
 struct Tick<'c> {
     read: Pooled<'c, i32>,
     scale: Pooled<'c, i128>,
@@ -644,41 +651,11 @@ impl<'c> CardField<'c> {
     }
 
 
-    /// Each region's faces (and their logits when `logits`) and, when `returning`, the covector
-    /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
-    /// region read ([`FieldRealization::read_landmarks`]).
-    #[allow(clippy::type_complexity)]
-    fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+    /// A field's material, rings, skins and exponential uploaded once a run, and the words that read them; a tower's packets'
+    /// field reads the fine field's resident exponential (`shared_face`). Returns the words, the buffers they point into and
+    /// the octets of the resident face this upload holds.
+    fn upload(&self, field: &Field, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
         let d = field.declaration;
-        for region in regions {
-            if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
-                return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
-            }
-            if region.classes.len() > d.reach {
-                return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
-            }
-            if region.classes.iter().any(|&c| c >= d.alphabet) {
-                return Err(TowerError::Refused("a region's class outside the field's alphabet"));
-            }
-            if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
-                return Err(TowerError::Refused("a region's carried faces that are not one a site"));
-            }
-            if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
-                return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
-            }
-            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
-                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
-            }
-            if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
-                return Err(TowerError::Refused("a region's echoes that are not one a site"));
-            }
-            if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
-                return Err(TowerError::Refused("an echo whose logits are not one a class"));
-            }
-        }
-        self.mark("outside_the_card");
-        let card = self.card;
-        let started = Instant::now();
         let l = field.layout();
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();
@@ -749,7 +726,11 @@ impl<'c> CardField<'c> {
         // The exponential's resident face: `2^digits` words, held beside the batches and counted
         // against the same budget.
         let face_octets = Some(roots.len()).filter(|&digits| digits < 61).map(|digits| 8u64 << digits).filter(|&o| o < self.budget).ok_or(TowerError::Refused("the exponential's resident face passes the card's batch budget"))?;
-        let face = self.timed(Kind::Alloc, || self.take::<u64>(1usize << roots.len())).map_err(device)?;
+        let face_octets = if shared_face.is_some() { 0 } else { face_octets };
+        let face = match shared_face {
+            Some(_) => None,
+            None => Some(self.timed(Kind::Alloc, || self.take::<u64>(1usize << roots.len())).map_err(device)?),
+        };
         let met = self.timed(Kind::Alloc, || self.take_zeroed::<u64>(1)).map_err(device)?;
         let reach = |start: usize, len: usize| field.theta[start..start + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -819,10 +800,58 @@ impl<'c> CardField<'c> {
             pi_hi: (field.half_turn() >> 64) as u64,
             ..Words::default()
         };
-        // The exponential's resident face, read once by its own loop on the card.
-        let mut face_ptr = face.device_ptr();
-        self.launch("field_exponential", Self::cells(1u64 << roots.len()), THREADS, &mut [arg(&mut words), arg(&mut face_ptr)])?;
-        words.face = face_ptr;
+        // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
+        match (&face, shared_face) {
+            (Some(face), _) => {
+                let mut face_ptr = face.device_ptr();
+                self.launch("field_exponential", Self::cells(1u64 << roots.len()), THREADS, &mut [arg(&mut words), arg(&mut face_ptr)])?;
+                words.face = face_ptr;
+            }
+            (None, Some(shared)) => words.face = shared,
+            (None, None) => unreachable!("a face is made where none is shared"),
+        }
+        Ok((words, Upload { _pack: run_pack, _face: face, met }, face_octets))
+    }
+
+    /// Each region's faces (and their logits when `logits`) and, when `returning`, the covector
+    /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
+    /// region read ([`FieldRealization::read_landmarks`]).
+    #[allow(clippy::type_complexity)]
+    fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+        let d = field.declaration;
+        for region in regions {
+            if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
+                return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
+            }
+            if region.classes.len() > d.reach {
+                return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
+            }
+            if region.classes.iter().any(|&c| c >= d.alphabet) {
+                return Err(TowerError::Refused("a region's class outside the field's alphabet"));
+            }
+            if !region.faces.is_empty() && region.faces.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's carried faces that are not one a site"));
+            }
+            if region.faces.iter().flatten().any(|face| face.is_empty() || face.iter().any(|&(c, w)| c as usize >= d.alphabet || w > 1 << STATE_BITS)) {
+                return Err(TowerError::Refused("a carried face that is empty, or whose class is outside the alphabet or share past one"));
+            }
+            if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && region.faces.get(t).and_then(Option::as_ref).is_none())) {
+                return Err(TowerError::Refused("a region's locks that are not one a site, or a lock on a site that carries no face"));
+            }
+            if !region.echo.is_empty() && region.echo.len() != region.classes.len() {
+                return Err(TowerError::Refused("a region's echoes that are not one a site"));
+            }
+            if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
+                return Err(TowerError::Refused("an echo whose logits are not one a class"));
+            }
+        }
+        self.mark("outside_the_card");
+        let card = self.card;
+        let started = Instant::now();
+        let l = field.layout();
+        let (mut words, upload, face_octets) = self.upload(field, None)?;
+        let met = &upload.met;
+        let heads = d.heads;
         let g = if returning { Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         words.gcov = g.as_ref().map_or(0, |g| g.device_ptr());
         // The batches: whole regions in order, each batch's every allocation within the budget.
@@ -859,7 +888,7 @@ impl<'c> CardField<'c> {
             Some(g) => self.timed(Kind::Copy, || card.fetch_range(&g, 0, l.len)).map_err(device)?,
             None => Vec::new(),
         };
-        let met = self.timed(Kind::Copy, || card.fetch(&met)).map_err(device)?[0] as u128;
+        let met = self.timed(Kind::Copy, || card.fetch(met)).map_err(device)?[0] as u128;
         if keep.is_some() {
             // A landmark read is a reading of a release's last state, counted apart.
             self.times.landmarks += 1;

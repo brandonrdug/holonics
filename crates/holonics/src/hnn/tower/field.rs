@@ -2007,10 +2007,13 @@ impl Field {
             // among them: each source's score is lowered by the octave of its class's definite count, `⌊log₂ c⌋`, as
             // the falloff lowers it by the octave of its distance. A turned head reads place as well, and to it every
             // place is its own face.
+            // [definition; agent-inferred, November 3, §16.38] A still head reads content at any distance, so its source is
+            // weighed by its face's multiplicity and not by its distance; the octave of distance is a turned head's, which
+            // reads place.
             let shared = !d.carries_moment(h);
-            let multiplicity = |j: usize| -> i128 {
+            let falloff = |gap: usize, j: usize| -> i128 {
                 if !shared {
-                    return 0;
+                    return octave(gap) as i128;
                 }
                 let c = lists.class[j] as usize;
                 octave(((lists.off[2 * c + 1] - lists.off[2 * c]) as usize).max(1)) as i128
@@ -2036,7 +2039,7 @@ impl Field {
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
                     }
                     let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, d).1 + 1))?;
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((octave(d) as i128 + multiplicity(j)) << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j) << FACE_BITS))?;
                     series.push(self.face(z), one, one, &value);
                     row.push(Source { j: j as u32, p: 0, s: base });
                 }
