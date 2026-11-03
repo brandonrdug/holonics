@@ -699,7 +699,32 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
             let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach };
-            FieldLearner::new(Field::found(declaration, &keys).map_err(|e| e.to_string())?, rate)
+            let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
+            // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
+            // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
+            // file before its last word, a declared read of whether their zero founding slows the field's first laps.
+            if let Ok(which) = std::env::var("FIELD_FOUND_RETURNS") {
+                let l = field.layout().clone();
+                let (dw, m2, f) = (declaration.width, 2 * declaration.complex(), declaration.contacts);
+                let mut families = vec![(l.out, dw * m2, m2), (l.w, dw * f, f)];
+                if which == "lift" {
+                    families.push((l.read, dw * dw, dw));
+                }
+                let total: usize = families.iter().map(|&(_, len, _)| len).sum();
+                let block = keys.len().checked_sub(8 + 4 * total).ok_or("a key file too short for the returns' draws")?;
+                let mut cursor = block;
+                for (start, len, fan) in families {
+                    let (num, den) = (((3u128) << 32).isqrt(), ((fan as u128) << 32).isqrt());
+                    for k in 0..len {
+                        let word = &keys[cursor..cursor + 4];
+                        cursor += 4;
+                        let draw = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+                        field.theta[start + k] = ((draw * ((num << holonics::hnn::tower::MATERIAL_BITS) / den) as i128) >> 31) as i32;
+                    }
+                }
+                println!("FIELD_FOUND_RETURNS which={which} entries={total}");
+            }
+            FieldLearner::new(field, rate)
         }
     };
     if learner.field.declaration.alphabet != codec.alphabet() {
@@ -853,6 +878,13 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             lap_start.elapsed().as_millis()
         );
         println!("FIELD_UNSEEN lap={lap} code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
+        // [measurement; agent-inferred, November 3, §16.31] `FIELD_STEP_COHERENCE`: each family's `Σ|m| / Σ√v` in millionths
+        // ([`FieldLearner::step_coherence`]) after the lap, which families' steps are driven and which are noise.
+        if std::env::var_os("FIELD_STEP_COHERENCE").is_some() {
+            const NAMES: [&str; 26] = ["enc", "before", "after", "q", "q_bias", "v", "v_bias", "out", "out_bias", "a", "a_bias", "b", "b_bias", "w", "w_bias", "read", "read_bias", "moment_before", "moment_after", "temper", "probe", "probe_bias", "pace", "moment_face", "moment_face_bias", "lift_bias"];
+            let text: Vec<String> = learner.step_coherence().iter().enumerate().map(|(k, &(_, m, v))| format!("{}={}", NAMES.get(k).copied().unwrap_or("?"), if v == 0 { 0 } else { m * 1_000_000 / v })).collect();
+            println!("FIELD_STEP_COHERENCE lap={lap} {}", text.join(" "));
+        }
         let held = held_out(&learner.field, &codec, &dev_set, realization)?;
         println!("FIELD_HELD lap={lap} {} ms={}", held_text(&held), started.elapsed().as_millis());
         held_rows_text(&learner.field, &codec, &dev_set, realization, lap as i64)?;

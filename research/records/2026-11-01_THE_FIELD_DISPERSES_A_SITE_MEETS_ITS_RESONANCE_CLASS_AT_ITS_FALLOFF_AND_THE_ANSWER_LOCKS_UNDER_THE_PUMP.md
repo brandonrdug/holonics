@@ -2594,3 +2594,14 @@ The next subject is therefore the route by which the comparison's covector at a 
 and `b`: the founding holds the current's return and the merge's return at zero (each tick opens on the identity), so the
 products that would join two neighbours start with no covector through them, and every masked site's covector is averaged
 over the whole region's states.
+
+**Two more reads on the toy.** Founding the current's and the merge's returns drawn at `±√(3/fan-in)` instead of zero
+(`FIELD_FOUND_RETURNS=returns`, and `=lift` with the readout's lift as well) reads 2.066 and 2.002 at lap 19 against the
+base's 1.945 (`found_returns.txt`, `found_lift.txt`): the zero founding is not what slows it. Each family's step coherence
+`Σ|m| / Σ√v` (`FieldLearner::step_coherence`, `FIELD_STEP_COHERENCE`; `coherence.txt`) reads 0.07 to 0.29 for every family
+at laps 0, 4 and 9 (the temperatures 0.31 to 0.47), the merge's drives among the rest: about the `√((1 − β₁)/(1 + β₁))` of a
+covector whose sign is noise from section to section. Every family's step is mostly noise: two thirds of the toy's answer
+places are fresh draws whose comparison `p̂ − e_u` carries no rule, and their covectors set `v` for every coordinate, so the
+rule's small consistent part moves each coordinate a small fraction of its step. That is a property of the comparison's
+covector against the terrain's own entropy, which every learner meets; what the field lacks beside it is a reading in which
+the rule's part is large, a site meeting its two neighbours jointly rather than as a superposition.
