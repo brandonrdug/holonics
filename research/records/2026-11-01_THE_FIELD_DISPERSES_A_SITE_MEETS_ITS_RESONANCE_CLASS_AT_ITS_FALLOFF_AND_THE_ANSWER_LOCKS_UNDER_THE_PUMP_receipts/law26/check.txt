@@ -1,0 +1,6 @@
+lib_tower rc=0 s=287 test result: ok. 252 passed; 0 failed; 0 ignored; 0 measured; 1794 filtered out; finished in 22.28s
+lib_coupling rc=0 s=0 test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 2032 filtered out; finished in 0.04s
+example rc=0 s=110 test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 6.34s
+build rc=0 s=22
+parity FIELD_PARITY_DONE sections=4 reads=15 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=114 host_ms=152166 card_ms=1945 elapsed_ms=345614 MEASURE lap=parity rc=0 wall_s=357.9 peak_rss_kib=3678192 
+gate rc=0 s=221 0 failed

@@ -2514,6 +2514,67 @@ extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, co
     }
 }
 
+// [definition; agent-inferred, November 3, §16.26] The face read through the encoding (the host's `Field::tied`): at an
+// unresolved site, `z[t][a] = rel(Σ_i E[a][i] y[t][i], 16) + c[a]`, `E` the encoding's rows at `enc`, `y` the lift on
+// 2^(−16), `c` the class bias at `bias`. One thread a (site, class).
+extern "C" __global__ void field_tied_face(FieldWords w, uint64_t enc, uint64_t bias, const int64_t *y, int64_t *z) {
+    const uint64_t cells = (uint64_t)w.T * w.A;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.A, a = c % w.A;
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        const int32_t *row = w.theta + enc + a * w.D;
+        const int64_t *yt = y + t * w.D;
+        wide sum = 0;
+        for (uint32_t i = 0; i < w.D; i++) {
+            sum += (wide)row[i] * (wide)yt[i];
+        }
+        z[c] = fit64(rel(sum, 16) + (wide)w.theta[bias + a], w.status);
+    }
+}
+
+// The lift's covector (§16.26): `dy[t][i] = rel(Σ_a dz[t][a] E[a][i], 16)` at an unresolved site (zero elsewhere).
+extern "C" __global__ void field_tied_back_y(FieldWords w, uint64_t enc, const int64_t *dz, int64_t *dy) {
+    const uint64_t cells = (uint64_t)w.T * w.D;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.D, i = c % w.D;
+        if (!w.unresolved[t]) {
+            dy[c] = 0;
+            continue;
+        }
+        wide sum = 0;
+        for (uint32_t a = 0; a < w.A; a++) {
+            sum += (wide)dz[t * w.A + a] * (wide)w.theta[enc + (uint64_t)a * w.D + i];
+        }
+        dy[c] = fit64(rel(sum, 16), w.status);
+    }
+}
+
+// The encoding's covector from the face (§16.26): `g[enc + a D + i] += Σ_t rel(dz[t][a] y[t][i], 16)` over the
+// unresolved sites, each term released to the encoding's covector grain before the integer sum (any order, the same
+// bits). One thread an entry and a tile of `OUTER_TILE` sites, as `outer`.
+extern "C" __global__ void field_tied_back_e(FieldWords w, wide *g, uint64_t enc, const int64_t *dz, const int64_t *y) {
+    const uint64_t entries = (uint64_t)w.A * w.D;
+    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, tile = c / entries;
+        const uint64_t a = entry / w.D, i = entry % w.D;
+        const uint64_t from = tile * 64;
+        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        wide sum = 0;
+        for (uint64_t t = from; t < to; t++) {
+            if (!w.unresolved[t]) {
+                continue;
+            }
+            sum += rel((wide)dz[t * w.A + a] * (wide)y[t * w.D + i], 16);
+        }
+        if (sum != 0) {
+            add_wide(g + enc + entry, sum);
+        }
+    }
+}
+
 // [definition; agent-inferred, November 3, §16.24] A port's places take their coupling's covector, read on the host
 // (`port_reading`): row `k` of `rows` written over the face covector of site `at[k]`.
 extern "C" __global__ void field_face_set(FieldWords w, const uint32_t *at, const int64_t *rows, uint64_t count, int64_t *dz) {

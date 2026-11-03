@@ -38,7 +38,7 @@
 //! weights    e_ij = 2^(z_ij), each term keeping its own exponent, zero outside S_i^h   the Gibbs face, in bits
 //! current    y_i = conj(U_i) ⊙ Σ_(j∈S_i) e_ij D(|i−j|) ṽ_j / Σ_(j∈S_i) e_ij (one exact series, released once),   x ← x + O y + b_o
 //! pair       r̂'_t = x_t / ‖x_t‖_rms,   a = W_a r̂' + b_a,   b = W_b r̂' + b_b,   x ← x + W_c (a · b) + b_c   complex pairs
-//! face       z_t = R r̂(x^K_t) + c,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)        at the unresolved sites
+//! face       z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a,   p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)   at the unresolved sites; read through the encoding (§16.26)
 //! ```
 //!
 //! [definition; agent-inferred, November 1] **The field disperses** (the dispersing field's record,
@@ -396,13 +396,13 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v10 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v11 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v10" {
-            return refuse("a field's head line that is not hnn-field-v10");
+        if words.len() != 10 || words[0] != "hnn-field-v11" {
+            return refuse("a field's head line that is not hnn-field-v11");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
@@ -430,6 +430,8 @@ pub struct FieldLayout {
     pub b_bias: usize,
     pub w: usize,
     pub w_bias: usize,
+    /// The readout's lift `R` (`D × D`, §16.26) and the class bias `c` (`A`): a site's face reads each class through the
+    /// encoding that encodes it, `z(a) = release(⟨E(a), R r̂ + b_R⟩, 16) + c_a`.
     pub read: usize,
     pub read_bias: usize,
     /// The strands' moment encodings (§15.1), `(A + 1) × 2T` each over the turned modes that carry a
@@ -452,6 +454,8 @@ pub struct FieldLayout {
     /// covector is zero, and it is founded at zero and stays there.
     pub moment_face: usize,
     pub moment_face_bias: usize,
+    /// The lift's bias `b_R` (`D`, §16.26).
+    pub lift_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -481,7 +485,7 @@ impl FieldLayout {
         let b_bias = push(f, FACE_BITS);
         let w = push(dw * f, MATERIAL_BITS);
         let w_bias = push(dw, FACE_BITS);
-        let read = push(a * dw, MATERIAL_BITS);
+        let read = push(dw * dw, MATERIAL_BITS);
         let read_bias = push(a, FACE_BITS);
         let moment_before = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
         let moment_after = push((a + 1) * 2 * d.moment_modes(), FACE_BITS);
@@ -492,7 +496,8 @@ impl FieldLayout {
         let pace = push(d.paced_heads() * (a + 1), MATERIAL_BITS);
         let moment_face = push(dw * m2, MATERIAL_BITS);
         let moment_face_bias = push(dw, FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, len: at, families }
+        let lift_bias = push(dw, FACE_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, len: at, families }
     }
 }
 
@@ -1238,6 +1243,8 @@ struct FieldPass {
     ticks: Vec<TickCell>,
     read: Vec<i32>,
     scale: Vec<i128>,
+    /// Each unresolved site's lift `R r̂ + b_R` on `2^(−16)` (§16.26), which its face reads through the encoding.
+    lift: Vec<i64>,
     faces: Vec<Option<TowerFace>>,
     /// Each unresolved site's readout logits `z_t` on `2^(−16)` bits (the face is `2^(z − peak)`).
     logits: Vec<Option<Vec<i64>>>,
@@ -1590,10 +1597,10 @@ impl Field {
     }
 
     fn reaches(&self) -> Reaches {
-        let (dw, m2, f, a) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts, self.declaration.alphabet);
+        let (dw, m2, f) = (self.declaration.width, 2 * self.declaration.complex(), self.declaration.contacts);
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, a * dw), moment_face: r(l.moment_face, dw * m2) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2) }
     }
 
     fn admit_region(&self, region: &Region) -> Result<()> {
@@ -2111,6 +2118,7 @@ impl Field {
         out.paces = paces;
         out.moment = moment;
         out.read = vec![0i32; sites * dw];
+        out.lift = vec![0i64; sites * dw];
         out.scale = vec![0i128; sites];
         out.faces = vec![None; sites];
         out.logits = vec![None; sites];
@@ -2121,7 +2129,11 @@ impl Field {
                 continue;
             }
             let (r, s) = ratio_to_power(&x[t * dw..(t + 1) * dw])?;
-            affine(&self.theta[l.read..l.read + d.alphabet * dw], reaches.read, dw, &r, Some(&self.theta[l.read_bias..l.read_bias + d.alphabet]), MATERIAL_BITS, MATERIAL_BITS, &mut z)?;
+            // The face reads each class through its encoding (§16.26): the lift `y = R r̂ + b_R`, then `z(a) = ⟨E(a), y⟩ + c_a`.
+            let mut y = vec![0i64; dw];
+            affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &r, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
+            self.tied(&y, &mut z)?;
+            out.lift[t * dw..(t + 1) * dw].copy_from_slice(&y);
             // The cavity field (§15.3): the read less its own echo, data from the read that formed it.
             if let Some(Some(echo)) = region.echo.get(t) {
                 for (zc, &lc) in z.iter_mut().zip(&echo.logits) {
@@ -2352,6 +2364,18 @@ impl Field {
         Ok((code, count))
     }
 
+    /// [definition; agent-inferred, November 3, §16.26] **The face read through the encoding**: `z(a) = release(Σ_i E(a)_i
+    /// y_i, 16) + c_a` for every class `a`, `E(a)` its row of the encoding on `2^(−16)` and `y` the lift on `2^(−16)`.
+    fn tied(&self, y: &[i64], z: &mut [i64]) -> Result<()> {
+        let (dw, l) = (self.declaration.width, &self.layout);
+        for (a, slot) in z.iter_mut().enumerate() {
+            let row = &self.theta[l.enc + a * dw..l.enc + (a + 1) * dw];
+            let sum: i128 = row.iter().zip(y).map(|(&e, &v)| e as i128 * v as i128).sum();
+            *slot = fit64(release(sum, STATE_BITS) as i128 + self.theta[l.read_bias + a] as i128)?;
+        }
+        Ok(())
+    }
+
     /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
     fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
         let faces: Vec<(&[u128], u128)> = pass.faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
@@ -2369,7 +2393,7 @@ impl Field {
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
     fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
-        let (dw, m, n, f, heads, a) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.alphabet);
+        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
         let span = 2 * n;
         let sites = region.classes.len();
@@ -2414,15 +2438,30 @@ impl Field {
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }
+                // Through the encoding (§16.26): `δE(a)_i += release(δz_a y_i, 16)` a term, `δy_i = release(Σ_a δz_a E(a)_i, 16)`.
+                let y = &pass.lift[t * dw..(t + 1) * dw];
+                let mut dy = vec![0i64; dw];
+                for (i, slot) in dy.iter_mut().enumerate() {
+                    let sum: i128 = dz.iter().enumerate().map(|(c, &dzc)| dzc as i128 * self.theta[l.enc + c * dw + i] as i128).sum();
+                    *slot = fit64(release(sum, STATE_BITS))?;
+                }
+                for (c, &dzc) in dz.iter().enumerate() {
+                    for (i, &yi) in y.iter().enumerate() {
+                        g[l.enc + c * dw + i] += release(dzc as i128 * yi as i128, STATE_BITS);
+                    }
+                }
+                for (i, &dyi) in dy.iter().enumerate() {
+                    g[l.lift_bias + i] += dyi as i128;
+                }
                 let rt = &pass.read[t * dw..(t + 1) * dw];
                 let mut dr = vec![0i64; dw];
-                transposed(&self.theta[l.read..l.read + a * dw], reaches.read, dw, &dz, MATERIAL_BITS, &mut dr)?;
+                transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
                 let back = ratio_adjoint(rt, pass.scale[t], &dr)?;
                 dx[t * dw..(t + 1) * dw].copy_from_slice(&back);
-                ys.push(dz);
+                ys.push(dy);
                 xs.push(rt);
             }
-            outer_sum(&mut g[l.read..l.read + a * dw], dw, &ys, &xs)?;
+            outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
         for cell in pass.ticks.iter().rev() {
             // The pair contact: x_out = x_mid + W_c c + b_c.
@@ -3472,11 +3511,32 @@ impl Field {
         split(ol.a, layout.a, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.b, layout.b, fc, dw, f, &contact, dw2, &face, scale, true)?;
         split(ol.w, layout.w, dw, fc, f, &face, f * fc, &contact, None, true)?;
-        split(ol.read, layout.read, a, dw, 1, &kept, dw2, &face, None, false)?;
         // The moment's chart into the face (§16.22) reads the moments as the current's return reads the current: every
         // copy of a head carries its source's moment whole (below), so each entry is split evenly over its column's
         // copies and its rows repeated, and the grown opening is the old one exactly.
         split(ol.moment_face, layout.moment_face, dw, 2 * m, f, &face, 2 * m2g, &chart_row, None, true)?;
+        // [§16.26] The readout's lift reads every face copy and writes the first copy of each coordinate only, each entry split
+        // evenly over its column's copies, its bias the first copy's; the encoding's rows are repeated over the copies, so the
+        // grown face `⟨E′(a), y′⟩ = ⟨E(a), y⟩` exactly, and the copies part under learning.
+        for j in 0..dw {
+            for k in 0..dw {
+                let old_at = ol.read + j * dw + k;
+                let v = self.theta[old_at] as i128;
+                let (q, rem) = (v.div_euclid(f as i128), v.rem_euclid(f as i128));
+                for b in 0..f {
+                    for c in 0..f {
+                        let at = layout.read + face(b, j) * dw2 + face(c, k);
+                        new[at] = if b == 0 { fit32(q + i128::from((c as i128) < rem), "a grown part outgrew its 32-bit carrier")? } else { 0 };
+                        from[at] = (old_at, true);
+                    }
+                }
+            }
+            for b in 0..f {
+                let at = layout.lift_bias + face(b, j);
+                new[at] = if b == 0 { self.theta[ol.lift_bias + j] } else { 0 };
+                from[at] = (ol.lift_bias + j, true);
+            }
+        }
         // The paces (§16.16): each copy of a turned head reads its source's rates whole, a class's rate being no
         // face coordinate, so every copy's clock is its source's exactly.
         let paced: Vec<usize> = (0..old.heads).filter(|&h| old.carries_moment(h)).collect();

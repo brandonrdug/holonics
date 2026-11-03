@@ -799,7 +799,7 @@ impl<'c> CardField<'c> {
             ra: reach(l.a, f * dw),
             rb: reach(l.b, f * dw),
             rw: reach(l.w, dw * f),
-            rread: reach(l.read, a * dw),
+            rread: reach(l.read, dw * dw),
             phasor: run_base + phasor_at,
             ring_off: run_base + ring_off_at,
             ring_n: run_base + ring_n_at,
@@ -1236,7 +1236,15 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
-        self.affine("field_affine_x32", words, words.read, words.read_bias, words.rread, a, dw, fread.device_ptr(), dw, z.device_ptr(), a, 0, true)?;
+        // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
+        // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`.
+        let lift = self.timed(Kind::Alloc, || self.take_zeroed::<i64>(sites * dw)).map_err(device)?;
+        let lift_bias = field.layout().lift_bias as u64;
+        self.affine("field_affine_x32", words, words.read, lift_bias, words.rread, dw, dw, fread.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
+        {
+            let (mut enc, mut cb, mut yp, mut zp) = (words.enc, words.read_bias, lift.device_ptr(), z.device_ptr());
+            self.launch("field_tied_face", Self::cells(t64 * a as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+        }
         // The cavity field (§15.3): a carried site's read less its own echo.
         if echo_has.iter().any(|&h| h != 0) {
             let mut zp = z.device_ptr();
@@ -1274,7 +1282,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs)?;
+            self.reverse(field, words, &ticks, g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs)?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -1450,7 +1458,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -1516,8 +1524,20 @@ impl<'c> CardField<'c> {
             self.launch("field_face_set", Self::cells(count * a as u64), THREADS, &mut [arg(words), arg(&mut atp), arg(&mut rp), arg(&mut count), arg(&mut dzp)])?;
         }
         self.outer(words, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
-        self.outer(words, g, words.read, a, dw, dz.device_ptr(), a, fread.device_ptr(), dw, false, true)?;
-        self.transposed(words, words.read, a, dw, dz.device_ptr(), a, dr.device_ptr(), false, true)?;
+        // Through the encoding (§16.26, the host's `returned_with`): `δE(a)_i += Σ_t rel(δz_a y_i, 16)`, `δy = rel(Σ_a δz_a E(a), 16)`,
+        // then the lift's own return.
+        let dyl = alloc64(sites * dw)?;
+        {
+            let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), words.enc, dz.device_ptr(), lift.device_ptr(), dyl.device_ptr());
+            let tiles = (sites as u64).div_ceil(64);
+            self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
+            let mut enc = words.enc;
+            self.launch("field_tied_back_y", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+        }
+        let lift_bias = field.layout().lift_bias as u64;
+        self.outer(words, g, lift_bias, dw, 0, dyl.device_ptr(), dw, 0, 0, false, true)?;
+        self.outer(words, g, words.read, dw, dw, dyl.device_ptr(), dw, fread.device_ptr(), dw, false, true)?;
+        self.transposed(words, words.read, dw, dw, dyl.device_ptr(), dw, dr.device_ptr(), false, true)?;
         self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
         for (at, tick) in ticks.iter().enumerate().rev() {
             words.qf = tick.qf.device_ptr();
@@ -1757,7 +1777,8 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
-    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16;
+    // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
+    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;
     // A site's carried mixture, definite bit, echo (a flag, `B` and logits) and the round trips.
     let mixture_site = 5 + 2 * 4 * a + 9 + 8 * a + 16;
     // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
