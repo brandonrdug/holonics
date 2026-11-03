@@ -503,10 +503,380 @@ pub fn annotate_lock_phases(
     })
 }
 
+/// [definition; agent-inferred, November 3, the comparison record §3.1 (#601)] **The coupling at temperature one**: the
+/// comparison of a released strand `H` (its faces at `n` places, a class `void` among their classes) with a target
+/// strand `T` of `m` cells, as the free energy of every order-keeping coupling. A coupling `c` places each of `T`'s cells
+/// at one place, in order; a place it does not use writes the void. Optionally (`omit`) a cell may be left unplaced at
+/// the declared cost `2^(−ℓ)` (the second slip, read by the lock face; the learning comparison omits nothing, so its
+/// sum over every `T` of `2^(−L)` is one: a code).
+///
+/// ```text
+/// Z(T | H) = Σ_c Π_((i,j)∈c) p̂_i(t_j) · Π_(i∉c) p̂_i(void) · Π_(j omitted) 2^(−ℓ),      L = −log₂ Z
+/// α(i, j) = α(i−1, j) p̂_i(void) + α(i−1, j−1) p̂_i(t_j) + α(i, j−1) 2^(−ℓ)               (prefix sweep)
+/// β(i, j) = β(i+1, j) p̂_(i+1)(void) + β(i+1, j+1) p̂_(i+1)(t_(j+1)) + β(i, j+1) 2^(−ℓ)     (suffix sweep)
+/// γ_ij = α(i−1, j−1) p̂_i(t_j) β(i, j) / Σ_(paths through place i)                       (posterior contact)
+/// r_i = Σ_j γ_ij e_(t_j) + (1 − Σ_j γ_ij) e_void,   ∂L/∂(logits at i) = p̂_i − r_i
+/// ```
+///
+/// Every path passes each place once, by a contact or by the void, so the posterior is normalized place by place. The
+/// diagonal coupling is one term, so `L ≤` the place-wise code; with `n = m` and nothing omitted it is the place-wise
+/// code and `r_i = e_(t_i)`.
+///
+/// **Exact arithmetic.** A face enters as its masses and total; `p̂_i(c) = release(m_c 2^62 / total)` on `2^(−62)`.
+/// Each row of a sweep is formed from the row before (each term a product released to `2^(−62)`), summed as integers,
+/// and divided by its own sum (released to the nearest): the rows are the posterior's own normalization, and the code
+/// is `L = −Σ_i log₂ c_i − log₂ α̂(n, m)`, read on `2^(−20)` bits from the integer row sums. Every operation is an integer
+/// with a declared release, so any realization that forms the same rows gives the same bits. A row whose mass releases
+/// to zero is refused, never repaired.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct CouplingCode {
+    /// The coupling's code `L(T | H)` on `2^(−20)` bits.
+    pub code: i64,
+    /// Each place's placed target `r_i` on `2^(−24)`: its cells' classes with their shares (each class once, ascending),
+    /// the void's share last, the remainder of `2^24` (zero where the contacts' rounding passes it).
+    pub placed: Vec<Vec<(usize, u64)>>,
+    /// Each place's contact mass `Σ_j γ_ij` and expected lag `Σ_j γ_ij (i − j)` (places and cells counted from one), on
+    /// `2^(−24)`: the lag field, the coupling's phase part.
+    pub lag: Vec<(u64, i64)>,
+}
+
+/// Why a temperature-one coupling is refused.
+#[derive(Clone, Debug, Eq, PartialEq, Error)]
+pub enum TemperatureRefusal {
+    #[error("the target has more cells ({cells}) than the release has places ({places}) and nothing may be omitted")]
+    Short { cells: usize, places: usize },
+    #[error("a target cell is the void class, which a coupling writes only by not placing a cell")]
+    VoidCell,
+    #[error("a face is empty, or a class lies outside it")]
+    Face,
+    #[error("the coupling's mass released to zero at row {row}")]
+    Released { row: usize },
+}
+
+/// The grain of a sweep's probabilities and rows.
+const SWEEP_BITS: u32 = 62;
+/// The grain of a placed share and a lag (the learner's covector grain, `hnn::tower::COVECTOR_BITS`).
+const SHARE_BITS_T: u32 = 24;
+/// The grain of a code (`hnn::tower::READ_BITS`).
+const CODE_BITS: u32 = 20;
+
+fn nearest(x: u128, k: u128) -> u128 {
+    (x + k / 2) / k
+}
+
+fn released(x: u128) -> u128 {
+    (x + (1u128 << (SWEEP_BITS - 1))) >> SWEEP_BITS
+}
+
+/// `log₂(v / 2^62)` on `2^(−20)` for `v > 0`: the whole part from `v`'s width, then the mantissa's digits by squaring
+/// (released at `2^(−62)`), as `hnn::keyed_modes::log2_face` reads them, without its bound on `v`.
+fn log2_ratio(v: u128) -> i128 {
+    let width = 128 - v.leading_zeros();
+    let whole = width as i128 - 1 - SWEEP_BITS as i128;
+    let mut mantissa = if width > 63 { v >> (width - 63) } else { v << (63 - width) };
+    let mut fraction = 0i128;
+    for _ in 0..CODE_BITS {
+        mantissa = (mantissa * mantissa) >> SWEEP_BITS;
+        fraction <<= 1;
+        if mantissa >= 1u128 << 63 {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    (whole << CODE_BITS) + fraction
+}
+
+/// [`CouplingCode`] of `target` given the release's faces (each `(masses, total)`), the void class, and an omission
+/// cost `ℓ` on `2^(−20)` bits where a cell may be left unplaced (the lock face's second slip).
+pub fn coupling_code(faces: &[(&[u128], u128)], void: usize, target: &[usize], omit: Option<i64>) -> Result<CouplingCode, TemperatureRefusal> {
+    let (n, m) = (faces.len(), target.len());
+    if omit.is_none() && m > n {
+        return Err(TemperatureRefusal::Short { cells: m, places: n });
+    }
+    if target.contains(&void) {
+        return Err(TemperatureRefusal::VoidCell);
+    }
+    for (masses, total) in faces {
+        if *total == 0 || void >= masses.len() || target.iter().any(|&c| c >= masses.len()) {
+            return Err(TemperatureRefusal::Face);
+        }
+    }
+    let p = |i: usize, c: usize| -> u128 { nearest(faces[i].0[c] << SWEEP_BITS, faces[i].1) };
+    // The omission's weight 2^(−ℓ) on 2^(−62): the whole bits as a shift, the fraction's binary digits as the square
+    // roots 2^(−2^(−k)), each the square root of the one before, released at 2^(−62).
+    let w: u128 = match omit {
+        None => 0,
+        Some(l) => {
+            let l = l.max(0) as u128;
+            let (whole, frac) = (l >> CODE_BITS, l & ((1 << CODE_BITS) - 1));
+            if whole >= SWEEP_BITS as u128 {
+                0
+            } else {
+                let (mut v, mut root) = (1u128 << SWEEP_BITS, (1u128 << SWEEP_BITS) / 2);
+                for k in 1..=CODE_BITS {
+                    root = (root << SWEEP_BITS).isqrt();
+                    if frac >> (CODE_BITS - k) & 1 == 1 {
+                        v = released(v * root);
+                    }
+                }
+                v >> whole
+            }
+        }
+    };
+    // The feasible cells of row i: with nothing omitted, m − j ≤ n − i and j ≤ i.
+    let lo = |i: usize| if omit.is_some() { 0 } else { m.saturating_sub(n - i) };
+    let hi = |i: usize| if omit.is_some() { m } else { i.min(m) };
+    let one = 1u128 << SWEEP_BITS;
+    // The prefix sweep: rows 0..=n, each over cells 0..=m, normalized; the sums kept for the code.
+    let mut alpha = vec![vec![0u128; m + 1]; n + 1];
+    let mut sums = Vec::with_capacity(n + 1);
+    {
+        let row = &mut alpha[0];
+        row[0] = one;
+        for j in 1..=hi(0) {
+            row[j] = released(row[j - 1] * w);
+        }
+        let c: u128 = row.iter().sum();
+        if c == 0 {
+            return Err(TemperatureRefusal::Released { row: 0 });
+        }
+        for v in row.iter_mut() {
+            *v = nearest(*v << SWEEP_BITS, c);
+        }
+        sums.push(c);
+    }
+    for i in 1..=n {
+        let mut row = vec![0u128; m + 1];
+        let pv = p(i - 1, void);
+        for j in lo(i)..=hi(i) {
+            let mut a = released(alpha[i - 1][j] * pv);
+            if j > 0 {
+                a += released(alpha[i - 1][j - 1] * p(i - 1, target[j - 1]));
+                if omit.is_some() {
+                    a += released(row[j - 1] * w);
+                }
+            }
+            row[j] = a;
+        }
+        let c: u128 = row.iter().sum();
+        if c == 0 {
+            return Err(TemperatureRefusal::Released { row: i });
+        }
+        for v in row.iter_mut() {
+            *v = nearest(*v << SWEEP_BITS, c);
+        }
+        sums.push(c);
+        alpha[i] = row;
+    }
+    let end = alpha[n][m];
+    if end == 0 {
+        return Err(TemperatureRefusal::Released { row: n });
+    }
+    let code = -(sums.iter().map(|&c| log2_ratio(c)).sum::<i128>() + log2_ratio(end));
+    // The suffix sweep: rows n..=0, normalized alike.
+    let mut beta = vec![vec![0u128; m + 1]; n + 1];
+    {
+        let row = &mut beta[n];
+        row[m] = one;
+        if omit.is_some() {
+            for j in (0..m).rev() {
+                row[j] = released(row[j + 1] * w);
+            }
+        }
+        let c: u128 = row.iter().sum();
+        for v in row.iter_mut() {
+            *v = nearest(*v << SWEEP_BITS, c);
+        }
+    }
+    for i in (0..n).rev() {
+        let mut row = vec![0u128; m + 1];
+        let pv = p(i, void);
+        for j in (lo(i)..=hi(i)).rev() {
+            let mut b = released(beta[i + 1][j] * pv);
+            if j < m {
+                b += released(beta[i + 1][j + 1] * p(i, target[j]));
+                if omit.is_some() {
+                    b += released(row[j + 1] * w);
+                }
+            }
+            row[j] = b;
+        }
+        let c: u128 = row.iter().sum();
+        if c == 0 {
+            return Err(TemperatureRefusal::Released { row: i });
+        }
+        for v in row.iter_mut() {
+            *v = nearest(*v << SWEEP_BITS, c);
+        }
+        beta[i] = row;
+    }
+    // The posterior, place by place: contact (i, j) is α(i−1, j−1) p̂_i(t_j) β(i, j), the void α(i−1, j) p̂_i(void) β(i, j).
+    let share = 1u128 << SHARE_BITS_T;
+    let mut placed = Vec::with_capacity(n);
+    let mut lag = Vec::with_capacity(n);
+    for i in 1..=n {
+        let pv = p(i - 1, void);
+        let mut contact = vec![0u128; m + 1];
+        let mut total = 0u128;
+        for j in 0..=m {
+            let v = released(released(alpha[i - 1][j] * pv) * beta[i][j]);
+            total += v;
+            if j > 0 {
+                let c = released(released(alpha[i - 1][j - 1] * p(i - 1, target[j - 1])) * beta[i][j]);
+                contact[j] = c;
+                total += c;
+            }
+        }
+        if total == 0 {
+            return Err(TemperatureRefusal::Released { row: i });
+        }
+        let mut by_class: Vec<(usize, u64)> = Vec::new();
+        let (mut mass, mut moment) = (0u64, 0i64);
+        for j in 1..=m {
+            if contact[j] == 0 {
+                continue;
+            }
+            let g = nearest(contact[j] * share, total) as u64;
+            if g == 0 {
+                continue;
+            }
+            mass += g;
+            moment += g as i64 * (i as i64 - j as i64);
+            match by_class.iter_mut().find(|(c, _)| *c == target[j - 1]) {
+                Some(entry) => entry.1 += g,
+                None => by_class.push((target[j - 1], g)),
+            }
+        }
+        by_class.sort_unstable();
+        let rest = (share as u64).saturating_sub(mass);
+        by_class.push((void, rest));
+        placed.push(by_class);
+        lag.push((mass, moment));
+    }
+    Ok(CouplingCode { code: code as i64, placed, lag })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::BTreeSet;
+
+    // ---- The coupling at temperature one (#601) ----
+
+    /// A face from weights over the classes (masses at 2^40 each unit), its total their sum.
+    fn face(weights: &[u128]) -> (Vec<u128>, u128) {
+        let masses: Vec<u128> = weights.iter().map(|&w| w << 40).collect();
+        let total = masses.iter().sum();
+        (masses, total)
+    }
+
+    fn view(faces: &[(Vec<u128>, u128)]) -> Vec<(&[u128], u128)> {
+        faces.iter().map(|(m, t)| (m.as_slice(), *t)).collect()
+    }
+
+    /// `−log₂(m/t)` on 2^(−20) (a reading to compare against).
+    fn bits(m: u128, t: u128) -> i64 {
+        (-(m as f64 / t as f64).log2() * (1u64 << 20) as f64).round() as i64
+    }
+
+    /// The place-wise code: each cell at its own place, every later place the void.
+    fn place_wise(faces: &[(Vec<u128>, u128)], void: usize, target: &[usize]) -> i64 {
+        faces.iter().enumerate().map(|(i, (m, t))| bits(m[target.get(i).copied().unwrap_or(void)], *t)).sum()
+    }
+
+    /// A sharp face on `class` among `classes` (one part in 2^20 spread over the rest).
+    fn sharp(class: usize, classes: usize) -> (Vec<u128>, u128) {
+        face(&(0..classes).map(|c| if c == class { 1u128 << 20 } else { 1 }).collect::<Vec<_>>())
+    }
+
+    #[test]
+    fn with_as_many_places_as_cells_the_coupling_is_the_place_wise_code() {
+        let faces: Vec<_> = [[3u128, 1, 2, 5], [1, 4, 1, 1], [2, 2, 7, 1]].iter().map(|w| face(w)).collect();
+        let target = [1usize, 1, 2];
+        let read = coupling_code(&view(&faces), 0, &target, None).unwrap();
+        assert!((read.code - place_wise(&faces, 0, &target)).abs() <= 8, "{} against {}", read.code, place_wise(&faces, 0, &target));
+        for (i, placed) in read.placed.iter().enumerate() {
+            assert_eq!(placed, &vec![(target[i], 1u64 << 24), (0, 0)], "place {i}");
+        }
+        assert!(read.lag.iter().all(|&(mass, lag)| mass == 1 << 24 && lag == 0));
+    }
+
+    /// A code: every target the places can write (each place a class or the void) has its coupling, and the codes'
+    /// probabilities sum to one (each writing maps to exactly one target once its voids are dropped).
+    #[test]
+    fn the_coupling_is_a_code() {
+        let faces: Vec<_> = [[2u128, 1, 3], [1, 1, 1], [4, 1, 2]].iter().map(|w| face(w)).collect();
+        let mut sum = 0f64;
+        let mut targets: Vec<Vec<usize>> = vec![vec![]];
+        for len in 1..=3usize {
+            let mut next = Vec::new();
+            for t in targets.iter().filter(|t| t.len() == len - 1) {
+                for c in 1..3 {
+                    let mut u = t.clone();
+                    u.push(c);
+                    next.push(u);
+                }
+            }
+            targets.extend(next);
+        }
+        for t in &targets {
+            let read = coupling_code(&view(&faces), 0, t, None).unwrap();
+            sum += (-(read.code as f64) / (1u64 << 20) as f64).exp2();
+        }
+        assert!((sum - 1.0).abs() < 1e-5, "{sum}");
+    }
+
+    #[test]
+    fn the_coupling_is_never_worse_than_the_place() {
+        let faces: Vec<_> = [[3u128, 1, 2, 5], [1, 4, 1, 1], [2, 2, 7, 1], [5, 1, 1, 1], [1, 1, 1, 9]].iter().map(|w| face(w)).collect();
+        for target in [vec![1usize, 2], vec![3, 3, 3], vec![2, 1, 3, 1], vec![1, 1, 2, 2, 3]] {
+            let read = coupling_code(&view(&faces), 0, &target, None).unwrap();
+            assert!(read.code <= place_wise(&faces, 0, &target) + 8, "{target:?}");
+        }
+    }
+
+    /// [the comparison record §3.5] **The witness**: a release equal to its target one place late, and one with a byte
+    /// inserted, are charged their slip alone by the coupling where the place-wise code charges every byte after it,
+    /// and the lag field reads `+1` after the slip; one with a byte deleted is charged its slip alone where a cell may be
+    /// omitted (the lock face), and reads `−1` after it. The place-wise code charges each.
+    #[test]
+    fn the_witness_one_late_one_inserted_one_deleted() {
+        let (classes, void) = (6usize, 0usize);
+        let target = [1usize, 2, 3, 4, 5, 1, 2, 3];
+        let slip = 8 * (1i64 << 20); // eight bits: a slip costs about log₂ of the face's sharpness (20 bits), well under it
+        // One place late: a leading void, then the target.
+        let late: Vec<_> = std::iter::once(void).chain(target.iter().copied()).map(|c| sharp(c, classes)).collect();
+        let read = coupling_code(&view(&late), void, &target, None).unwrap();
+        assert!(read.code < 4 * (1i64 << 20), "late: {}", read.code);
+        assert!(place_wise(&late, void, &target) > (target.len() as i64 - 1) * slip, "the place charges every byte after the slip");
+        assert!(read.lag[2..].iter().all(|&(mass, lag)| mass > (1 << 24) - 64 && (lag - (1 << 24)).abs() < 64), "lag +1 after the slip");
+        // One byte inserted (a 9 after the third cell): n = m + 1.
+        let mut inserted: Vec<usize> = target.to_vec();
+        inserted.insert(3, 5);
+        let faces: Vec<_> = inserted.iter().map(|&c| sharp(c, classes)).collect();
+        let read = coupling_code(&view(&faces), void, &target, None).unwrap();
+        assert!(read.code < 24 * (1i64 << 20), "inserted: the slip alone, {}", read.code);
+        assert!(place_wise(&faces, void, &target) > 4 * slip);
+        assert!(read.lag[4..].iter().all(|&(_, lag)| (lag - (1 << 24)).abs() < 1 << 12), "lag +1 after the insertion");
+        // One byte deleted (the fourth cell), the release padded with a void place: omissions at a declared cost.
+        let mut deleted: Vec<usize> = target.to_vec();
+        deleted.remove(3);
+        deleted.push(void);
+        let faces: Vec<_> = deleted.iter().map(|&c| sharp(c, classes)).collect();
+        let omit = 3 * (1i64 << 20);
+        let read = coupling_code(&view(&faces), void, &target, Some(omit)).unwrap();
+        assert!(read.code < omit + 4 * (1i64 << 20), "deleted: the slip alone, {}", read.code);
+        assert!(place_wise(&faces, void, &target) > 4 * slip);
+        assert!(read.lag[3..7].iter().all(|&(_, lag)| (lag + (1 << 24)).abs() < 1 << 12), "lag −1 after the deletion: {:?}", read.lag);
+    }
+
+    #[test]
+    fn the_coupling_refuses_what_it_cannot_read() {
+        let faces: Vec<_> = [[1u128, 1], [1, 1]].iter().map(|w| face(w)).collect();
+        assert_eq!(coupling_code(&view(&faces), 0, &[1, 1, 1], None), Err(TemperatureRefusal::Short { cells: 3, places: 2 }));
+        assert_eq!(coupling_code(&view(&faces), 0, &[0], None), Err(TemperatureRefusal::VoidCell));
+        assert_eq!(coupling_code(&view(&faces), 0, &[2], None), Err(TemperatureRefusal::Face));
+    }
 
     type Choice = Vec<(usize, usize)>;
 
