@@ -1,0 +1,6 @@
+sf64r9: L4 ctx 2.028755 L9 ctx 1.667493 L14 ctx 1.530060 L19 ctx 1.430574  joint19 2.291762 laps 20 lap_ms 2963 grow 0
+sf128r10: L4 ctx 1.946501 L9 ctx 1.592125 L14 ctx 1.473257 L19 ctx 1.352010  joint19 2.257454 laps 20 lap_ms 4071 grow 1
+sk4: L4 ctx 2.234669 L9 ctx 1.874324 L14 ctx 1.746487 L19 ctx 1.628838  joint19 2.356424 laps 20 lap_ms 2445 grow 1
+sk8: L4 ctx 2.390371 L9 ctx 2.018426 L14 ctx 1.782687 L19 ctx 1.685434  joint19 2.366401 laps 20 lap_ms 4063 grow 1
+
+[exited with code 0]

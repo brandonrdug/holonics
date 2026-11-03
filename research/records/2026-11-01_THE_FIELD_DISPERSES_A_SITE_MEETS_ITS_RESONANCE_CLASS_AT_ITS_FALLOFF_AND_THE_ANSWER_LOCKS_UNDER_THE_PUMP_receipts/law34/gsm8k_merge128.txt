@@ -1,0 +1,17 @@
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=128 ticks=6 frames=4 reach=2221 section=16 rate=10 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=0 material=44184
+FIELD_HELD lap=-1 answer=6.930737 classes=35591 context=6.930737 context_classes=35591 foil=6.930737 question=0.000000 ms=2575
+FIELD_JOINT lap=-1 answers=128 sites=35591 own_bits_a_byte=6.930737 foil_bits_a_byte=6.930737 information_bits_a_byte=0.000000 ms=1733
+FIELD_LAP lap=0 read=1 sites=3805398 before=3.136 after=3.106 deposited=410/413 halvings=29 next_halved=0 next_refused=0 ms=175602
+FIELD_HELD lap=0 answer=5.745948 classes=35591 context=2.803571 context_classes=35591 foil=2.804441 question=0.000870 ms=188224
+FIELD_JOINT lap=0 answers=128 sites=35591 own_bits_a_byte=3.634723 foil_bits_a_byte=3.629818 information_bits_a_byte=-0.004904 ms=2771
+FIELD_LAP lap=1 read=2 sites=3920481 before=2.436 after=2.414 deposited=410/413 halvings=15 next_halved=0 next_refused=0 ms=175056
+FIELD_HELD lap=1 answer=5.896181 classes=35591 context=2.196198 context_classes=35591 foil=2.197315 question=0.001117 ms=374454
+FIELD_JOINT lap=1 answers=128 sites=35591 own_bits_a_byte=3.242975 foil_bits_a_byte=3.245114 information_bits_a_byte=0.002140 ms=2811
+FIELD_LAP lap=2 read=3 sites=3785427 before=2.328 after=2.309 deposited=409/413 halvings=7 next_halved=0 next_refused=0 ms=170585
+FIELD_HELD lap=2 answer=6.604594 classes=35591 context=1.950309 context_classes=35591 foil=1.950809 question=0.000499 ms=556232
+FIELD_JOINT lap=2 answers=128 sites=35591 own_bits_a_byte=3.107543 foil_bits_a_byte=3.110032 information_bits_a_byte=0.002488 ms=2777
+FIELD_LAP lap=3 read=4 sites=3831598 before=2.243 after=2.224 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=171599
+FIELD_HELD lap=3 answer=5.120954 classes=35591 context=1.823728 context_classes=35591 foil=1.824581 question=0.000853 ms=739083
+FIELD_JOINT lap=3 answers=128 sites=35591 own_bits_a_byte=3.024064 foil_bits_a_byte=3.029077 information_bits_a_byte=0.005013 ms=2728
+FIELD_CARD reads=1923 read_ms=180859 returns=1660 return_ms=557869 pairs=153332157234 batches=3750 peak_store=8165850448 landmarks=0 landmark_ms=0 elapsed_ms=746374
+MEASURE lap=train rc=0 wall_s=746.8 peak_rss_kib=664832
