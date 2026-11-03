@@ -150,8 +150,8 @@ pub(super) enum Shape {
     Answer(Vec<bool>),
 }
 
-/// [definition; agent-inferred, November 3, §16.27] **A region's shape**, drawn: `τ` uniform on `(0, 1]` on `2^(−16)`
-/// and each site open where its keyed draw falls below `τ`; with even odds over the whole region (the question's and the
+/// [definition; agent-inferred, November 3, §16.27; §16.32] **A region's shape**, drawn: `τ = u²`, `u` uniform on `(0, 1]` on
+/// `2^(−16)`, and each site open where its keyed draw falls below `τ`; with even odds over the whole region (the question's and the
 /// answer's language alike) or over the answer's sites and its void tail alone, the question known, so the field meets
 /// the writer's every state (`K` of the answer's places open, uniform given `K`); at least one site open in the domain.
 ///
@@ -163,8 +163,10 @@ pub(super) enum Shape {
 /// rung) and their ports took half of every lap for states no writer meets.
 pub(super) fn shape(seed: u64, draw: u64, question: usize, sites: usize) -> Shape {
     let head = mix(seed, draw);
-    let low = (head >> 1) & 0xFFFF;
-    let tau = low + 1;
+    let u = ((head >> 1) & 0xFFFF) + 1;
+    // [definition; agent-inferred, November 3, §16.32] The density is drawn at `τ = u²`, so the states where most of a site's
+    // neighbours are known come more often; each region is weighed back by its importance ratio ([`weighed_domain`]).
+    let tau = ((u * u) >> 16).max(1);
     let whole = head & 1 == 1;
     let from = if whole { 0 } else { question };
     let mut out: Vec<bool> = (0..sites).map(|t| t >= from && (mix(seed, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau).collect();
@@ -176,6 +178,16 @@ pub(super) fn shape(seed: u64, draw: u64, question: usize, sites: usize) -> Shap
     } else {
         Shape::Answer(out)
     }
+}
+
+/// [definition; agent-inferred, November 3, §16.32] **A state's domain weighed back to the joint code**: a region whose `K`
+/// open sites among `m` were drawn at `τ = u²` (density `q(τ) = 1/(2√τ)`) against the joint code's uniform `τ`, so its
+/// importance ratio `p/q = 2√τ`, read at `τ ≈ K/m`, multiplies its weight `m/K` ([`Region::weight`]): the domain is read as
+/// `⌊2√(mK)⌋`, its weight `2√(m/K)`. The estimate of the order-averaged joint code stays unbiased (to `τ`'s reading
+/// through `K`), and its variance is spent where a site's neighbours are known.
+pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
+    let k = mask.iter().filter(|&&u| u).count().max(1) as u128;
+    (4 * m as u128 * k).isqrt() as usize
 }
 
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
@@ -258,8 +270,8 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
         let classes = region_classes(codec, q, a, length);
         regions.push(match shape(seed, *draw, q.len(), length) {
-            Shape::Masked(mask) => TrainRegion { domain: Some(length), ..TrainRegion::plain(classes, mask) },
-            Shape::Answer(mask) => TrainRegion { domain: Some(length - q.len()), ..TrainRegion::plain(classes, mask) },
+            Shape::Masked(mask) => TrainRegion { domain: Some(weighed_domain(length, &mask)), ..TrainRegion::plain(classes, mask) },
+            Shape::Answer(mask) => TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(classes, mask) },
         });
     }
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
@@ -1460,6 +1472,17 @@ mod tests {
         assert_eq!(tail(9, 3, 1), 1);
     }
 
+    /// [§16.32] A state's weighed domain is `⌊2√(mK)⌋`: its weight `domain/K` is `2√(m/K)`, the importance ratio `2√τ` of
+    /// the density `τ = u²` read at `τ = K/m` times the joint code's `m/K`.
+    #[test]
+    fn a_state_is_weighed_back_to_the_joint_code() {
+        let mask = |k: usize, m: usize| (0..m).map(|t| t < k).collect::<Vec<bool>>();
+        assert_eq!(weighed_domain(100, &mask(25, 100)), 100, "2√(100·25) = 100: a quarter open weighs 4 = 2√4");
+        assert_eq!(weighed_domain(100, &mask(100, 100)), 200, "every site open weighs 2, the ratio 2√1");
+        assert_eq!(weighed_domain(64, &mask(1, 64)), 16, "one of 64 open weighs 16 = 2√64");
+        assert_eq!(weighed_domain(10, &mask(0, 10)), 6, "an empty mask is read as one open");
+    }
+
     /// Both shapes open a site; a whole-region mask may open the question, an answer mask never does, and each opens
     /// its domain's sites exactly where the draw's keyed site falls below its density `τ`.
     #[test]
@@ -1467,7 +1490,8 @@ mod tests {
         let (question, sites) = (3usize, 40usize);
         let (mut masked, mut answers, mut asked) = (0, 0, 0);
         for draw in 0..2048u64 {
-            let tau = ((mix(7, draw) >> 1) & 0xFFFF) + 1;
+            let u = ((mix(7, draw) >> 1) & 0xFFFF) + 1;
+            let tau = ((u * u) >> 16).max(1);
             let keyed = |t: usize| (mix(7, draw ^ ((t as u64 + 1) << 32)) & 0xFFFF) < tau;
             let (open, from) = match shape(7, draw, question, sites) {
                 Shape::Masked(m) => {
@@ -1520,10 +1544,10 @@ mod tests {
             let length = q.len() + a.len() + tail(seed, draw, codec.answer - a.len());
             let truth = region_classes(codec, q, a, length);
             let expected = match shape(seed, draw, q.len(), length) {
-                Shape::Masked(mask) => TrainRegion { domain: Some(length), ..TrainRegion::plain(truth, mask) },
+                Shape::Masked(mask) => TrainRegion { domain: Some(weighed_domain(length, &mask)), ..TrainRegion::plain(truth, mask) },
                 Shape::Answer(mask) => {
                     answers += 1;
-                    TrainRegion { domain: Some(length - q.len()), ..TrainRegion::plain(truth, mask) }
+                    TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(truth, mask) }
                 }
             };
             assert_eq!(regions[n], expected, "member {n}");
