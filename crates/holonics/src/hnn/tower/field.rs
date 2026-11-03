@@ -2979,8 +2979,8 @@ impl Field {
     /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
     /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
-    /// `sweep` says to.
-    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
+    /// `sweep` says to. `refine` passes then revisit the written answer (§16.36); zero writes it once.
+    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3037,7 +3037,70 @@ impl Field {
                 }
             }
             if last {
+                if done + 1 < sweeps {
+                    return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
+                }
                 break;
+            }
+        }
+        // [definition; agent-inferred, November 3, §16.36] **The places keep moving** (the lens of November 1: an answer is a
+        // joint field whose parts move together until its faces align, never committed surest-first): after every place is
+        // written, `refine` passes revisit the answer, each in its own keyed order over the places up to the boundary (the
+        // first void), one place of each problem a read. A revisited place is opened again, read beside every other place as
+        // it now stands, and drawn from its face at temperature one, as the first pass draws it; the closing law holds after
+        // every draw, so the boundary moves in where a void is drawn and out by one where the boundary itself is drawn as a
+        // letter. No place is chosen by its certainty.
+        let mut read = sweeps;
+        let total = sweeps + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
+        for pass in 1..=refine as u64 {
+            let ends: Vec<usize> = problems.iter().enumerate().map(|(k, &(q, _))| (q.len()..classes[k].len()).find(|&t| classes[k][t] == void).unwrap_or(classes[k].len() - 1)).collect();
+            let orders: Vec<Vec<usize>> = problems
+                .iter()
+                .enumerate()
+                .map(|(k, &(q, _))| {
+                    let mut order: Vec<usize> = (q.len()..=ends[k]).collect();
+                    order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t));
+                    order
+                })
+                .collect();
+            let reads = orders.iter().map(Vec::len).max().unwrap_or(0);
+            for step in 0..reads {
+                if !sweep(read, total) {
+                    return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
+                }
+                read += 1;
+                // Each problem's place this read, if it still stands at or before the boundary.
+                let places: Vec<Option<usize>> = (0..problems.len())
+                    .map(|k| {
+                        let end = (problems[k].0.len()..classes[k].len()).find(|&t| classes[k][t] == void).unwrap_or(classes[k].len() - 1);
+                        orders[k].get(step).copied().filter(|&t| t <= end)
+                    })
+                    .collect();
+                for (k, place) in places.iter().enumerate() {
+                    if let Some(t) = *place {
+                        open[k][t] = true;
+                        classes[k][t] = void;
+                    }
+                }
+                let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+                let faces = realization.read_faces(self, &regions)?;
+                for (k, place) in places.into_iter().enumerate() {
+                    let Some(t) = place else { continue };
+                    let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
+                    let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128) % face.total;
+                    let mut acc = 0u128;
+                    let c = face.masses.iter().position(|&m| {
+                        acc += m;
+                        acc > u
+                    });
+                    classes[k][t] = c.unwrap_or(face.masses.len() - 1);
+                    open[k][t] = false;
+                    if classes[k][t] == void {
+                        for s in t + 1..classes[k].len() {
+                            classes[k][s] = void;
+                        }
+                    }
+                }
             }
         }
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())

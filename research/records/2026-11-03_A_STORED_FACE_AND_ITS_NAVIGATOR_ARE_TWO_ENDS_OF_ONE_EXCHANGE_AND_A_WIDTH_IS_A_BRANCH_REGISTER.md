@@ -68,3 +68,60 @@ Failures this could repeat, checked: **catered machinery** (no calculator: the c
 field's deposition); **a design thought in the programming language** (a width is stated as parts and lanes, never as an
 array size picked by hand); **a lens resetting the work** (it changes item 2's law and adds item 3, and the order keeps the
 failed gate, the question's coherence, first).
+
+## 5. The elementary statistics of the passage (Brandon's second message)
+
+[lens] Brandon, November 3, later: the exchange is about addressing and statistical distributions in general, pattern
+matching and fitting everywhere, not about the machine parsing arithmetic out of text; text carries physical patterns, the
+distributions of how people place characters and grammar, and knowing the most basic flexible elements first (as valid UTF-8
+is known before a tokenizer's units) is where the rest follows from. The inputs stay raw bytes (no stores): whatever units a
+word becomes must emerge from the field's own geometry and contacts.
+
+[measurement] A reading of GSM8K's training passage (3,528,168 bytes; `_receipts/dissect.py`, `dissect.txt`; a reading only,
+never part of the field):
+- **The alphabet.** 121 bytes used, 4.924 bits a byte unconditioned; spaces 17.5 %, lower-case letters 60.6 %, digits 10.1 %.
+- **Where the information sits in a word.** The `k`-th letter given the word's letters before it: 4.099, 2.323, 1.879,
+  0.868, 0.366, 0.210 and 0.154 bits for `k = 0 … 6`. The information is the choice of a word; its spelling, once begun, is
+  nearly a stored face. 13,464 word types; the top 100 cover 56.5 % of the tokens, the top 1,000 83.9 %, the top 5,000
+  96.4 % (Zipf exponent 1.12 over ranks 10 to 1,000; Heaps' `β = 0.59`); hapaxes are 27 % of types and 0.7 % of tokens.
+- **The falloff.** The mutual information of two bytes `d` apart: 1.413 bits at `d = 1`, 0.809, 0.503, 0.371 at 2 to 4,
+  0.198 at 8, 0.057 at 16, 0.017 at 32, 0.005 at 128, and nothing above the counts' floor past about 250; over 8 to 256 it
+  falls about as `d^(−1.6)`, faster than the field's participation prior `2^(−⌊log₂ d⌋)`.
+- **The question is read by content.** 54.4 % of an answer's words and numbers, and 37.7 % of its numbers, stand in its own
+  question, a median 300 bytes back, where the fixed-distance information is nil: the relation exists only through
+  matching (the field's still heads and its listeners), never through place.
+- **The clocks.** A token and its space about 5.4 bytes (the space indicator's spectrum peaks at 4.72 bytes), a line 72
+  (quartiles 43 and 115), a question 216 and an answer 256 at the median.
+
+[definition; agent-inferred] What it says for the writer: §16.35's written words break where letters are drawn before
+their word is chosen, each at about four bits with its neighbours then held to agree with it; a word clicks only if its
+places keep moving together until they align (the field record's §16.36, the refining writer). The falloff and the clocks
+are the terrain's own periods, read against the rings' (`2ᵃ`, `3ᵇ`) when the founding's periods are next derived.
+
+## 6. Language is composed geometrically; a symbol is what its modes do (Brandon's third message)
+
+[lens] Brandon, November 3, evening: a player who wins at Scrabble in languages he does not speak reads words by their
+composition, not their meaning; language is composed geometrically (cryptanalysis, tropical geometry). Strokes cross into a
+character, characters cross into a word at coordinates of the word's parametric orientation, and words meet in a paragraph
+by friction-like intersections from which their meaning follows; the resolution changes as attention moves from the
+character to the word, the packet becoming the word. Loud partials carry the inference and the rest is dark information,
+curvature for navigation and compression. A symbol is irrelevant: relabel the digits and a learner gives `9` the magnitude
+of `1` if and only if `9` behaves as counting; it is the phases and modes that say what an object is. Mutual loss is
+respected, with no privileged perspective.
+
+[source-inspected; definition; agent-inferred] Its joins in the field:
+- **A symbol is a pointer.** A byte enters only as a class index into the encoding `E`, founded from keys and learned, and
+  the face reads a class through the same row (§16.26), so a relabeled alphabet is the same learner up to its founding
+  draws: what a class becomes is what its modes do.
+- **Loud partials and dark information.** A contact row is the series `Σ 2^z μ` (`SeriesRow`), a log-sum-exp in base two;
+  its tropical limit (`max z`, as the temperature grows) keeps the loudest term, so the lens's loud partials are the terms
+  that win a row's tropical sum and its dark information the rest, which bends the row's current without winning it.
+- **The packet moves from character to word.** The fine rings carry the word a site stands in (§16.22); the writer fixed a
+  character once and never revisited it, so the word's packet could not form while writing. The refining writer (§16.36)
+  keeps a word's places moving until they align.
+- **Meaning from intersections.** The contact field across a passage, the participation of its sites through the field's
+  own transport (the October 28 record), is the only route by which an answer reads its question (§16.35's information).
+- **Mutual loss.** The comparison is the ratio of two Holons and its covector reaches both strands (§16.26); no receiver is
+  privileged (the receiver law).
+The general-English terrain is on the host (TinyStories, 24 MB of training stories in the laboratory's corpora), for the
+read against GSM8K's English when the writer is next measured.

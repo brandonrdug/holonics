@@ -1,0 +1,19 @@
+FIELD_RUN state=.local/run/2026-11-03-run37/train/STATE.17
+FIELD_SAMPLE_PLACES problem=0 first_void=1229 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=1 first_void=127 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=2 first_void=216 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=3 first_void=36 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=4 first_void=60 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=5 first_void=27 past_first_void=0 places=1229
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=1695 held=1600 lambda=428 friction=2439 foil_lambda=307 foil_friction=2681 own_wins=3 foil_wins=3 ms=75094
+MEASURE lap=once rc=0 wall_s=75.4 peak_rss_kib=236076
+WORDS written=266 in_training_vocabulary=120 share=0.451
+FIELD_SAMPLE_PLACES problem=0 first_void=1229 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=1 first_void=127 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=2 first_void=217 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=3 first_void=36 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=4 first_void=63 past_first_void=0 places=1229
+FIELD_SAMPLE_PLACES problem=5 first_void=27 past_first_void=0 places=1229
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=1699 held=1600 lambda=423 friction=2453 foil_lambda=314 foil_friction=2671 own_wins=3 foil_wins=3 ms=247976
+MEASURE lap=refined rc=0 wall_s=248.2 peak_rss_kib=238996
+WORDS written=290 in_training_vocabulary=189 share=0.652

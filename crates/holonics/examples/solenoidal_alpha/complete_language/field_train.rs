@@ -1000,22 +1000,22 @@ fn opening(codec: &FieldCodec, field: &Field, question: &[u8], prefix: &[u8]) ->
     Ok((q, open))
 }
 
-/// [measurement; agent-inferred, November 3, §16.27] **`sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
-/// HELD_SHA COUNT SWEEPS STOP_MS OUT`**: the first `COUNT` held questions, each answer released by the training clock run
-/// backwards ([`Field::sample_realized`]): every answer place drawn from its own face in a keyed random order over `SWEEPS`
-/// sweeps, the draws keyed by the state's own hash. Writes `SAMPLE.tsv` (each answer's places in order, the void writing
-/// nothing; private) and `COUPLING.tsv` (each answer's `λ` and `F*` against its own and the next problem's target).
+/// [measurement; agent-inferred, November 3, §16.27, §16.36] **`sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA
+/// HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT`**: the first `COUNT` held questions, each answer released by the training
+/// clock run backwards ([`Field::sample_realized`]): every answer place drawn from its own face in a keyed random order over
+/// `SWEEPS` sweeps, then `REFINE` passes revisiting the written answer, the draws keyed by the state's own hash. Writes `SAMPLE.tsv` (each answer's places before its first void,
+/// private), `PLACES.tsv` (every place, the void as `|`; private) and `COUPLING.tsv` (each answer's `λ` and `F*` against its own and the next problem's target).
 pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 13 {
-        return Err("sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS STOP_MS OUT".into());
+    if args.len() != 14 {
+        return Err("sample-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
     }
     let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, stop_ms) = (count(&args[9])?, positive(&args[10])?, positive(&args[11])? as u128);
-    let out = Path::new(&args[12]);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
+    let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
     let held = &held[..limit.min(held.len())];
@@ -1024,7 +1024,7 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
     let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
     let mut stopped = None;
     let answers = field
-        .sample_realized(&problems, sweeps, codec.void(), seed, realization, &mut |done, all| {
+        .sample_realized(&problems, sweeps, refine, codec.void(), seed, realization, &mut |done, all| {
             if done % 16 == 0 {
                 println!("FIELD_SAMPLE_SWEEP done={done} of={all} ms={}", started.elapsed().as_millis());
             }
@@ -1447,7 +1447,7 @@ mod tests {
         assert!(dir.join("B/STATE.1").exists());
         let state_sha = sha256(&rested).unwrap();
         let codec_sha = sha256(&codec).unwrap();
-        let args: Vec<String> = ["sample-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", "600000", &at("R")].iter().map(|s| s.to_string()).collect();
+        let args: Vec<String> = ["sample-field", &at("A/STATE.1"), &state_sha, &at("A/CODEC"), &codec_sha, &units, &units_sha, &held, &held_sha, "2", "3", "1", "600000", &at("R")].iter().map(|s| s.to_string()).collect();
         sample(&args, &mut host()).expect("sample");
         let read_in = |run: &str, name: &str| String::from_utf8(std::fs::read(dir.join(run).join(name)).expect("read")).unwrap();
         assert_eq!(read_in("R", "SAMPLE.tsv").lines().count(), 2);
@@ -1460,8 +1460,8 @@ mod tests {
         assert!(sample(&args, &mut host()).is_err(), "a writer's directory is never written over");
         // A write stopped at its deadline still writes a row a problem, every place drawn on its last read.
         let mut stopped = args.clone();
-        stopped[11] = "1".to_string();
-        stopped[12] = at("Q");
+        stopped[12] = "1".to_string();
+        stopped[13] = at("Q");
         sample(&stopped, &mut host()).expect("stopped sample");
         assert_eq!(read_in("Q", "SAMPLE.tsv").lines().count(), 2);
         let _ = std::fs::remove_dir_all(&dir);
