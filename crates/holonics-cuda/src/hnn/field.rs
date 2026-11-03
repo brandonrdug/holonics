@@ -1186,13 +1186,13 @@ impl<'c> CardField<'c> {
         if let Some(questions) = self.held_questions.borrow().as_ref() {
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
             let starts_c = self.timed(Kind::Copy, || self.take_up(&starts)).map_err(device)?;
-            let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 8)).map_err(device)?;
+            let acc = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(d.ticks * heads * 9)).map_err(device)?;
             for (k, tick) in ticks.iter().enumerate() {
                 set(words, tick);
                 let (mut sp, mut tk, mut ap) = (starts_c.device_ptr(), k as u32, acc.device_ptr());
                 self.launch("field_held_rows", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut tk), arg(&mut ap)])?;
             }
-            let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*acc, 0, d.ticks * heads * 8)).map_err(device)?;
+            let cells = self.timed(Kind::Copy, || self.card.fetch_range(&*acc, 0, d.ticks * heads * 9)).map_err(device)?;
             let mut total = self.held_cells.borrow_mut();
             if total.is_empty() {
                 total.resize(cells.len(), 0);
@@ -1916,10 +1916,10 @@ impl FieldRealization for CardField<'_> {
         read?;
         let cells = std::mem::take(&mut *self.held_cells.borrow_mut());
         let (heads, ticks) = (field.declaration.heads, field.declaration.ticks);
-        let cells = if cells.is_empty() { vec![0i128; ticks * heads * 8] } else { cells };
+        let cells = if cells.is_empty() { vec![0i128; ticks * heads * 9] } else { cells };
         Ok(cells
-            .chunks_exact(8)
-            .map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4], question_far: c[5] as u128, far_effective: c[6] as u128, far_rows: c[7] as u64 })
+            .chunks_exact(9)
+            .map(|c| HeldRows { rows: c[0] as u64, question: c[1] as u128, soft_near: c[2] as u128, other: c[3] as u128, question_current: c[4], question_far: c[5] as u128, far_effective: c[6] as u128, far_rows: c[7] as u64, near_definite: c[8] as u128 })
             .collect())
     }
 

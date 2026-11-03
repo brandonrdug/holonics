@@ -363,6 +363,7 @@ fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realiz
                 acc.question_far += one.question_far;
                 acc.far_effective += one.far_effective;
                 acc.far_rows += one.far_rows;
+                acc.near_definite += one.near_definite;
             }
         }
         let share = |v: u128, rows: u64| (v * 1_000_000 >> 63) / rows.max(1) as u128;
@@ -373,11 +374,12 @@ fn held_rows_text(field: &Field, codec: &FieldCodec, problems: &Problems, realiz
                 // The mean effective count on 2^(−8), to hundredths.
                 let effective = (r.far_effective * 100 / 256) / r.far_rows.max(1) as u128;
                 println!(
-                    "FIELD_ROWS_HELD lap={lap} set={set} head={head} tick={tick} rows={} question_far_share={} question_near_share={} soft_near_share={} other_share={} question_current={} far_rows={} far_effective_sources={}.{:02}",
+                    "FIELD_ROWS_HELD lap={lap} set={set} head={head} tick={tick} rows={} question_far_share={} question_near_share={} soft_near_share={} near_definite_share={} other_share={} question_current={} far_rows={} far_effective_sources={}.{:02}",
                     r.rows,
                     share(r.question_far, r.rows),
                     share(r.question - r.question_far, r.rows),
                     share(r.soft_near, r.rows),
+                    share(r.near_definite, r.rows),
                     share(r.other, r.rows),
                     r.question_current / r.rows.max(1) as i128,
                     r.far_rows,

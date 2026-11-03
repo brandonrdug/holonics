@@ -1133,6 +1133,9 @@ pub struct HeldRows {
     pub question_far: u128,
     pub far_effective: u128,
     pub far_rows: u64,
+    /// [measurement; agent-inferred, November 3, §16.31] The shares of the near field's definite sources at or past the
+    /// answer start (the answer's own resolved neighbours, `|i − j| < NEAR`), taken out of `other`.
+    pub near_definite: u128,
 }
 
 /// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (§16.21,
@@ -2222,6 +2225,8 @@ impl Field {
                             acc.question_current += release(src.p as i128 * current, SHARE_BITS);
                         } else if i.abs_diff(j) < NEAR && !definite {
                             acc.soft_near += src.p as u128;
+                        } else if i.abs_diff(j) < NEAR {
+                            acc.near_definite += src.p as u128;
                         } else {
                             acc.other += src.p as u128;
                         }
@@ -2307,6 +2312,7 @@ impl Field {
                 acc.question_far += one.question_far;
                 acc.far_effective += one.far_effective;
                 acc.far_rows += one.far_rows;
+                acc.near_definite += one.near_definite;
             }
         }
         Ok(out)

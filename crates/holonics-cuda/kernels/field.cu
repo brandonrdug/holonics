@@ -3055,7 +3055,8 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
 // the near field's sources that are not definite, and of the rest (with the crowds'), and the question group's
 // current `Σ release(p Σ_x |D ṽ_x|, 63)`; the question's far part (past the near field), and where its collision
 // `C = Σ release(p², 63)` is positive the row's effective count `((Σ p)² >> 55) / C` on `2^(−8)` and the row counted.
-// The eight sums of a cell `[tick · H + h]` are added to `acc` (exact integers).
+// The nine sums of a cell `[tick · H + h]` are added to `acc` (exact integers), the ninth the near field's definite
+// sources at or past the answer start (§16.31).
 extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart, uint32_t tick, wide *acc) {
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n;
@@ -3072,7 +3073,7 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
         const uint32_t question = qstart[r];
         const uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         const int64_t *values = w.vf + ((uint64_t)h * w.T + first) * S;
-        wide q = 0, soft = 0, other = 0, cur = 0, far = 0, coll = 0;
+        wide q = 0, soft = 0, other = 0, cur = 0, far = 0, coll = 0, neard = 0;
         for (uint32_t j = lane; j < sites; j += 32) {
             const wide p = (wide)erow[j];
             if (p == 0) {
@@ -3094,6 +3095,8 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
                 cur += rel(p * current, SHARE_BITS);
             } else if (gap < NEAR && !definite) {
                 soft += p;
+            } else if (gap < NEAR) {
+                neard += p;
             } else {
                 other += p;
             }
@@ -3109,8 +3112,9 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
         cur = warp_sum(cur);
         far = warp_sum(far);
         coll = warp_sum(coll);
+        neard = warp_sum(neard);
         if (lane == 0) {
-            wide *cell = acc + ((uint64_t)tick * w.H + h) * 8;
+            wide *cell = acc + ((uint64_t)tick * w.H + h) * 9;
             add_wide(cell, 1);
             add_wide(cell + 1, q);
             add_wide(cell + 2, soft);
@@ -3122,6 +3126,7 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
                 add_wide(cell + 6, (wide)(((f * f) >> (SHARE_BITS - 8)) / (uwide)coll));
                 add_wide(cell + 7, 1);
             }
+            add_wide(cell + 8, neard);
         }
     }
 }
