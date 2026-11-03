@@ -2656,3 +2656,35 @@ lap 2 and needed about twenty laps to approach its two-neighbour level. A site m
 own opening, where the merge's first product can join them; it meets its second neighbour only as one term of its moment's
 superposition (`ζ^(−2) D(2) E⁺(a)` among every other source) or through a second hop of the contact, and a rule there is
 located about five times more slowly. Text's rules reach two to four bytes back (a word's letters, a number's digits).
+
+### 16.34 The merge is the strand's own pair contact
+
+[definition; agent-inferred, November 3] §16.33 found a rule over a site's two strand contacts learned in four laps and one
+over its second neighbour five times more slowly: the merge `a · b` joined two reads of one site, so a site's second
+neighbour reached it only inside its moment's superposition or through a second contact hop. The merge is now the pair
+contact between a site and its strand mate (`strand_mate`):
+
+```text
+c_t = a_t · b_(s(t)),   s(t) = t − 1 at an even contact, t + 1 at an odd, none past the region's ends (c_t = 0)
+δa_t = conj(b_(s(t))) δc_t,   δb_(s(t)) = conj(a_t) δc_t        each site's b the mate of one site a side, one term each
+```
+
+A site's read holds its own word and its strand contacts' rows (`E₋(u_(t−1))`, `E₊(u_(t+1))`), its mate's read holds the mate's
+word and the mate's own contacts, so their product joins a site with the sites two away in the first tick, and the reach
+grows a site a tick. It is the strand's own contact, the helical pair interaction between adjacent rings, not a chosen
+window: no site is read past its mate, and what a contact carries is learned. The parity of a contact's index survives
+growth by copies (a copy stands at `c · f/2 + e`, `f/2` even; `FieldDeclaration::admit` asks `f ≡ 0 (mod 4)`), so a grown
+merge reads the old one exactly. The state's head line is `hnn-field-v12`.
+
+**Measured** (`_receipts/law34/`): on the triple terrain the context code reads 2.327, 1.957, 1.759, 1.667 at laps 4, 9, 14
+and 19 against §16.32's 2.468, 2.191, 1.908, 1.667, the joint 2.366 against 2.384 at lap 19 (`toy_strand.txt`); on GSM8K four
+fresh laps read the joint code 3.533, 3.200, 3.107, 3.025 bits a byte against §16.32's 3.481, 3.253, 3.210, 3.100, the context
+read 2.529, 2.113, 1.927, 1.817 against 2.458, 2.087, 1.968, 1.838 (`gsm8k_strand34.txt`), at the same 165 to 171 s a lap.
+
+Tests changed with the law, each for its stated reason: `the_current_carries_place_when_the_weights_are_flat` reads one
+tick (an end site lacks a mate, and a second tick's contact carries that by its falloff to every site);
+`an_open_stretch_leaves_the_other_sites_faces_as_they_were` reads an open stretch past the ticks' reach against a longer one
+(an open site's own opening now reaches its neighbours, one site a tick); `the_pace_covector_matches_the_code_at_two_steps`
+guards the probes' class seams as the covector's own test does (a probe seam inside its window read a jump; at the base step
+the slope agreed within 3%); `a_held_step_is_read_on_the_next_section` holds its fixture at `2^(−3)`. Verification: the field
+library tests (56), the card parity (7 reads and one write equal, `parity.txt`).

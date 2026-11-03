@@ -29,7 +29,11 @@ fn tiny_declaration(still: usize) -> FieldDeclaration {
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
 /// readout at zero, where no covector reaches the charts).
 fn shaped(still: usize) -> Field {
-    let d = tiny_declaration(still);
+    shaped_with(tiny_declaration(still))
+}
+
+/// [`shaped`] on a declaration of the caller's.
+fn shaped_with(d: FieldDeclaration) -> Field {
     let mut field = Field::found(d, &keys(1 << 14)).unwrap();
     let stream = keys(1 << 15);
     for (n, v) in field.theta.iter_mut().enumerate() {
@@ -127,12 +131,17 @@ fn a_region_past_the_reach_is_refused() {
 }
 
 /// With flat weights (no chart reads) and silent strand contacts, a still field's current is the
-/// same at every site, and a framed field's carries each site's place: the moment is phase-carried. Every
+/// same at every interior site (an end site lacks a strand mate, §16.34), and a framed field's carries each site's place:
+/// the moment is phase-carried. Every
 /// site carries the same face, so each is keyed and every site a source (§16.20).
 #[test]
 fn the_current_carries_place_when_the_weights_are_flat() {
     for (still, framed) in [(2usize, false), (1, true)] {
-        let mut field = silent_contacts(shaped(still));
+        // [§16.34] One tick: an end site lacks a strand mate on one side, so its merge differs by construction, and a
+        // second tick's contact carries that difference to every site by its falloff.
+        let mut d = tiny_declaration(still);
+        d.ticks = 1;
+        let mut field = silent_contacts(shaped_with(d));
         let l = field.layout.clone();
         let m2 = 2 * field.declaration.complex();
         let dw = field.declaration.width;
@@ -142,7 +151,7 @@ fn the_current_carries_place_when_the_weights_are_flat() {
         let open = [true; 6];
         let carried: Vec<Option<Shares>> = vec![Some(vec![(2, 1 << STATE_BITS)]); 6];
         let faces = field.faces(&Region { classes: &classes, unresolved: &open, faces: &carried, locked: &[], echo: &[], domain: None, port: None }).unwrap();
-        let alike = faces.iter().all(|f| f == &faces[0]);
+        let alike = faces[1..5].iter().all(|f| f == &faces[1]);
         assert_eq!(alike, !framed, "still {still}");
     }
 }
@@ -621,7 +630,8 @@ fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32,
 #[test]
 fn a_held_step_is_read_on_the_next_section() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 2);
+    // [§16.34] At `2^(−3)`: under the strand's pair contact the fixture certifies too few steps at `2^(−2)` to hold one.
+    let mut learner = FieldLearner::new(field, 3);
     // The read is the declared comparison (§16.30); the field's law lets a step stand unread.
     learner.read_held = true;
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
@@ -1000,7 +1010,9 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
 /// prediction within the far-support test's tolerance. A window that crosses a sheet is halved as there.
 #[test]
 fn the_pace_covector_matches_the_code_at_two_steps() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().collect())).collect() };
+    // [§16.34] The sheets read with the probes' classes as the covector's own test reads them: a receiver whose probed
+    // classes change crosses a seam its covector does not read.
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let long: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let long_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let (mut read, mut seams) = (0usize, 0usize);
@@ -1158,24 +1170,25 @@ fn a_port_is_read_through_its_coupling() {
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
 }
 
-/// [definition; §16.28] **An open site is silent on the strand**: on a field whose every family is drawn (the
-/// unresolved rows of the moment encodings and the paces among them), a run of open sites appended past a region leaves
-/// every earlier site's face as it was, except the last original site's, whose after-neighbour's contact row is now the
-/// open one; so the writer's long open extent reads its answer places as a short training region does.
+/// [definition; §16.28, §16.34] **An open site is silent on the strand**: on a field whose every family is drawn (the
+/// unresolved rows of the moment encodings and the paces among them), an open stretch appended past a region adds nothing
+/// to any moment or clock; its own openings reach the region only through the strand's pair contacts, one site a tick, so
+/// a stretch longer than the ticks reach leaves every original site's face as a longer one does: the writer's long open
+/// extent reads its answer places as a short training region does.
 #[test]
 fn an_open_stretch_leaves_the_other_sites_faces_as_they_were() {
     for still in [0usize, 1] {
         let field = shaped(still);
-        let short = field.faces(&region()).unwrap();
-        let mut classes = CLASSES.to_vec();
-        let mut open = OPEN.to_vec();
-        classes.extend([0usize; 6]);
-        open.extend([true; 6]);
-        let long = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-        let faces = field.faces(&long).unwrap();
-        for t in 0..CLASSES.len() - 1 {
-            assert_eq!(faces[t], short[t], "still {still} site {t}");
-        }
+        let ticks = field.declaration.ticks;
+        let stretched = |extra: usize| {
+            let mut classes = CLASSES.to_vec();
+            let mut open = OPEN.to_vec();
+            classes.extend(std::iter::repeat_n(0usize, extra));
+            open.extend(std::iter::repeat_n(true, extra));
+            let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            field.faces(&r).unwrap()[..CLASSES.len()].to_vec()
+        };
+        assert_eq!(stretched(ticks + 2), stretched(ticks + 5), "still {still}");
     }
 }
 
@@ -1201,3 +1214,5 @@ fn a_step_stands_unread_at_its_certified_size() {
     }
     assert!(deposited > 0);
 }
+
+
