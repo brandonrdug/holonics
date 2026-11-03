@@ -522,12 +522,12 @@ pub fn annotate_lock_phases(
 /// diagonal coupling is one term, so `L ≤` the place-wise code; with `n = m` and nothing omitted it is the place-wise
 /// code and `r_i = e_(t_i)`.
 ///
-/// **Exact arithmetic.** A face enters as its masses and total; `p̂_i(c) = release(m_c 2^62 / total)` on `2^(−62)`.
-/// Each row of a sweep is formed from the row before (each term a product released to `2^(−62)`), summed as integers,
-/// and divided by its own sum (released to the nearest): the rows are the posterior's own normalization, and the code
-/// is `L = −Σ_i log₂ c_i − log₂ α̂(n, m)`, read on `2^(−20)` bits from the integer row sums. Every operation is an integer
-/// with a declared release, so any realization that forms the same rows gives the same bits. A row whose mass releases
-/// to zero is refused, never repaired.
+/// **Exact arithmetic.** A face enters as its masses and total; each `p̂_i(c)`, each cell of the sweeps and each
+/// contact is a mass carried with its own exponent (a 63-bit mantissa, each product and sum released to the nearest at
+/// its last bit), so a product of hundreds of probabilities keeps its scale. The code is `L = −log₂ α(n, m)`, read on
+/// `2^(−20)` bits; a contact's share is its mass over its place's whole, on `2^(−24)`. Every operation is an integer with a
+/// declared release, in the sweeps' fixed order, so any realization that forms the same cells gives the same bits. A
+/// coupling whose whole releases to zero is refused, never repaired.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct CouplingCode {
     /// The coupling's code `L(T | H)` on `2^(−20)` bits.
@@ -553,37 +553,109 @@ pub enum TemperatureRefusal {
     Released { row: usize },
 }
 
-/// The grain of a sweep's probabilities and rows.
-const SWEEP_BITS: u32 = 62;
 /// The grain of a placed share and a lag (the learner's covector grain, `hnn::tower::COVECTOR_BITS`).
 const SHARE_BITS_T: u32 = 24;
 /// The grain of a code (`hnn::tower::READ_BITS`).
 const CODE_BITS: u32 = 20;
+/// A mass's mantissa lies in `[2^62, 2^63)`.
+const MANTISSA_BITS: u32 = 62;
 
-fn nearest(x: u128, k: u128) -> u128 {
-    (x + k / 2) / k
+/// [definition; agent-inferred, November 3] **A mass carried with its own exponent**: `m · 2^e` with the mantissa `m` in
+/// `[2^62, 2^63)` (zero is `m = 0`), each product and sum released to the nearest at the mantissa's last bit. The
+/// sweeps' products of hundreds of probabilities keep their scale in the exponent, so no cell releases to zero beside
+/// a larger one, the way a row normalized as a whole on one grain did (§16.24's first build refused a GSM8K port so).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct Mass {
+    m: u128,
+    e: i64,
 }
 
-fn released(x: u128) -> u128 {
-    (x + (1u128 << (SWEEP_BITS - 1))) >> SWEEP_BITS
-}
+impl Mass {
+    const ZERO: Mass = Mass { m: 0, e: 0 };
+    const ONE: Mass = Mass { m: 1 << MANTISSA_BITS, e: -(MANTISSA_BITS as i64) };
 
-/// `log₂(v / 2^62)` on `2^(−20)` for `v > 0`: the whole part from `v`'s width, then the mantissa's digits by squaring
-/// (released at `2^(−62)`), as `hnn::keyed_modes::log2_face` reads them, without its bound on `v`.
-fn log2_ratio(v: u128) -> i128 {
-    let width = 128 - v.leading_zeros();
-    let whole = width as i128 - 1 - SWEEP_BITS as i128;
-    let mut mantissa = if width > 63 { v >> (width - 63) } else { v << (63 - width) };
-    let mut fraction = 0i128;
-    for _ in 0..CODE_BITS {
-        mantissa = (mantissa * mantissa) >> SWEEP_BITS;
-        fraction <<= 1;
-        if mantissa >= 1u128 << 63 {
-            fraction |= 1;
-            mantissa >>= 1;
+    /// `x · 2^e` for a whole `x`, its mantissa released to the nearest.
+    fn of(x: u128, e: i64) -> Mass {
+        if x == 0 {
+            return Mass::ZERO;
         }
+        let width = 128 - x.leading_zeros() as i64;
+        let shift = width - 1 - MANTISSA_BITS as i64;
+        let (mut m, mut e) = if shift > 0 {
+            let half = 1u128 << (shift - 1);
+            ((x >> shift) + u128::from(x & ((1u128 << shift) - 1) >= half), e + shift)
+        } else {
+            (x << (-shift), e + shift)
+        };
+        if m >> (MANTISSA_BITS + 1) != 0 {
+            m >>= 1;
+            e += 1;
+        }
+        Mass { m, e }
     }
-    (whole << CODE_BITS) + fraction
+
+    /// `mass / total`.
+    fn ratio(mass: u128, total: u128) -> Mass {
+        let (a, b) = (Mass::of(mass, 0), Mass::of(total, 0));
+        if a.m == 0 {
+            return Mass::ZERO;
+        }
+        // a.m / b.m in [2^(−1), 2), read on 2^(−63) to the nearest.
+        let q = ((a.m << 63) + b.m / 2) / b.m;
+        Mass::of(q, a.e - b.e - 63)
+    }
+
+    fn mul(self, other: Mass) -> Mass {
+        if self.m == 0 || other.m == 0 {
+            return Mass::ZERO;
+        }
+        Mass::of(self.m * other.m, self.e + other.e)
+    }
+
+    fn add(self, other: Mass) -> Mass {
+        if self.m == 0 {
+            return other;
+        }
+        if other.m == 0 {
+            return self;
+        }
+        let (hi, lo) = if self.e >= other.e { (self, other) } else { (other, self) };
+        let d = hi.e - lo.e;
+        // Both mantissas on the larger's exponent less one bit of room; a term past 2^(−64) of the other releases to
+        // zero, as its own release would.
+        let lo_m = if d >= 64 { 0 } else if d == 0 { lo.m } else { (lo.m >> d) + u128::from(lo.m >> (d - 1) & 1 == 1) };
+        Mass::of(hi.m + lo_m, hi.e)
+    }
+
+    /// `self / other` on `2^(−bits)`, to the nearest (`other` nonzero, the quotient at most one).
+    fn share(self, other: Mass, bits: u32) -> u64 {
+        if self.m == 0 {
+            return 0;
+        }
+        let shift = self.e - other.e + bits as i64;
+        // (self.m / other.m) · 2^shift: self.m · 2^shift / other.m.
+        if shift <= -64 {
+            return 0;
+        }
+        let num = if shift >= 0 { self.m << shift.min(64) } else { self.m >> (-shift) };
+        ((num + other.m / 2) / other.m) as u64
+    }
+
+    /// `log₂` of the mass on `2^(−20)`: the exponent and the mantissa's digits read by squaring, as
+    /// `hnn::keyed_modes::log2_face` reads them.
+    fn log2(self) -> i128 {
+        let mut mantissa = self.m;
+        let mut fraction = 0i128;
+        for _ in 0..CODE_BITS {
+            mantissa = (mantissa * mantissa) >> MANTISSA_BITS;
+            fraction <<= 1;
+            if mantissa >= 2u128 << MANTISSA_BITS {
+                fraction |= 1;
+                mantissa >>= 1;
+            }
+        }
+        ((self.e as i128 + MANTISSA_BITS as i128) << CODE_BITS) + fraction
+    }
 }
 
 /// [`CouplingCode`] of `target` given the release's faces (each `(masses, total)`), the void class, and an omission
@@ -601,142 +673,95 @@ pub fn coupling_code(faces: &[(&[u128], u128)], void: usize, target: &[usize], o
             return Err(TemperatureRefusal::Face);
         }
     }
-    let p = |i: usize, c: usize| -> u128 { nearest(faces[i].0[c] << SWEEP_BITS, faces[i].1) };
-    // The omission's weight 2^(−ℓ) on 2^(−62): the whole bits as a shift, the fraction's binary digits as the square
-    // roots 2^(−2^(−k)), each the square root of the one before, released at 2^(−62).
-    let w: u128 = match omit {
-        None => 0,
+    let p = |i: usize, c: usize| -> Mass { Mass::ratio(faces[i].0[c], faces[i].1) };
+    // The omission's weight 2^(−ℓ): the whole bits in the exponent, the fraction's binary digits as the square roots
+    // 2^(−2^(−k)), each the square root of the one before (on 2^(−62), released).
+    let w: Mass = match omit {
+        None => Mass::ZERO,
         Some(l) => {
             let l = l.max(0) as u128;
-            let (whole, frac) = (l >> CODE_BITS, l & ((1 << CODE_BITS) - 1));
-            if whole >= SWEEP_BITS as u128 {
-                0
-            } else {
-                let (mut v, mut root) = (1u128 << SWEEP_BITS, (1u128 << SWEEP_BITS) / 2);
-                for k in 1..=CODE_BITS {
-                    root = (root << SWEEP_BITS).isqrt();
-                    if frac >> (CODE_BITS - k) & 1 == 1 {
-                        v = released(v * root);
-                    }
+            let (whole, frac) = ((l >> CODE_BITS) as i64, l & ((1 << CODE_BITS) - 1));
+            let (mut v, mut root) = (1u128 << MANTISSA_BITS, 1u128 << (MANTISSA_BITS - 1));
+            for k in 1..=CODE_BITS {
+                root = (root << MANTISSA_BITS).isqrt();
+                if frac >> (CODE_BITS - k) & 1 == 1 {
+                    v = (v * root + (1u128 << (MANTISSA_BITS - 1))) >> MANTISSA_BITS;
                 }
-                v >> whole
             }
+            Mass::of(v, -(MANTISSA_BITS as i64) - whole)
         }
     };
     // The feasible cells of row i: with nothing omitted, m − j ≤ n − i and j ≤ i.
     let lo = |i: usize| if omit.is_some() { 0 } else { m.saturating_sub(n - i) };
     let hi = |i: usize| if omit.is_some() { m } else { i.min(m) };
-    let one = 1u128 << SWEEP_BITS;
-    // The prefix sweep: rows 0..=n, each over cells 0..=m, normalized; the sums kept for the code.
-    let mut alpha = vec![vec![0u128; m + 1]; n + 1];
-    let mut sums = Vec::with_capacity(n + 1);
-    {
-        let row = &mut alpha[0];
-        row[0] = one;
-        for j in 1..=hi(0) {
-            row[j] = released(row[j - 1] * w);
-        }
-        let c: u128 = row.iter().sum();
-        if c == 0 {
-            return Err(TemperatureRefusal::Released { row: 0 });
-        }
-        for v in row.iter_mut() {
-            *v = nearest(*v << SWEEP_BITS, c);
-        }
-        sums.push(c);
+    // The prefix sweep.
+    let mut alpha = vec![vec![Mass::ZERO; m + 1]; n + 1];
+    alpha[0][0] = Mass::ONE;
+    for j in 1..=hi(0) {
+        alpha[0][j] = alpha[0][j - 1].mul(w);
     }
     for i in 1..=n {
-        let mut row = vec![0u128; m + 1];
         let pv = p(i - 1, void);
         for j in lo(i)..=hi(i) {
-            let mut a = released(alpha[i - 1][j] * pv);
+            let mut a = alpha[i - 1][j].mul(pv);
             if j > 0 {
-                a += released(alpha[i - 1][j - 1] * p(i - 1, target[j - 1]));
+                a = a.add(alpha[i - 1][j - 1].mul(p(i - 1, target[j - 1])));
                 if omit.is_some() {
-                    a += released(row[j - 1] * w);
+                    a = a.add(alpha[i][j - 1].mul(w));
                 }
             }
-            row[j] = a;
+            alpha[i][j] = a;
         }
-        let c: u128 = row.iter().sum();
-        if c == 0 {
-            return Err(TemperatureRefusal::Released { row: i });
-        }
-        for v in row.iter_mut() {
-            *v = nearest(*v << SWEEP_BITS, c);
-        }
-        sums.push(c);
-        alpha[i] = row;
     }
-    let end = alpha[n][m];
-    if end == 0 {
+    let z = alpha[n][m];
+    if z.m == 0 {
         return Err(TemperatureRefusal::Released { row: n });
     }
-    let code = -(sums.iter().map(|&c| log2_ratio(c)).sum::<i128>() + log2_ratio(end));
-    // The suffix sweep: rows n..=0, normalized alike.
-    let mut beta = vec![vec![0u128; m + 1]; n + 1];
-    {
-        let row = &mut beta[n];
-        row[m] = one;
-        if omit.is_some() {
-            for j in (0..m).rev() {
-                row[j] = released(row[j + 1] * w);
-            }
-        }
-        let c: u128 = row.iter().sum();
-        for v in row.iter_mut() {
-            *v = nearest(*v << SWEEP_BITS, c);
+    let code = -z.log2();
+    // The suffix sweep.
+    let mut beta = vec![vec![Mass::ZERO; m + 1]; n + 1];
+    beta[n][m] = Mass::ONE;
+    if omit.is_some() {
+        for j in (0..m).rev() {
+            beta[n][j] = beta[n][j + 1].mul(w);
         }
     }
     for i in (0..n).rev() {
-        let mut row = vec![0u128; m + 1];
         let pv = p(i, void);
         for j in (lo(i)..=hi(i)).rev() {
-            let mut b = released(beta[i + 1][j] * pv);
+            let mut b = beta[i + 1][j].mul(pv);
             if j < m {
-                b += released(beta[i + 1][j + 1] * p(i, target[j]));
+                b = b.add(beta[i + 1][j + 1].mul(p(i, target[j])));
                 if omit.is_some() {
-                    b += released(row[j + 1] * w);
+                    b = b.add(beta[i][j + 1].mul(w));
                 }
             }
-            row[j] = b;
+            beta[i][j] = b;
         }
-        let c: u128 = row.iter().sum();
-        if c == 0 {
-            return Err(TemperatureRefusal::Released { row: i });
-        }
-        for v in row.iter_mut() {
-            *v = nearest(*v << SWEEP_BITS, c);
-        }
-        beta[i] = row;
     }
-    // The posterior, place by place: contact (i, j) is α(i−1, j−1) p̂_i(t_j) β(i, j), the void α(i−1, j) p̂_i(void) β(i, j).
-    let share = 1u128 << SHARE_BITS_T;
+    // The posterior, place by place: contact (i, j) is α(i−1, j−1) p̂_i(t_j) β(i, j), the void α(i−1, j) p̂_i(void) β(i, j);
+    // every path passes the place by one of them, so their sum is the place's whole.
     let mut placed = Vec::with_capacity(n);
     let mut lag = Vec::with_capacity(n);
     for i in 1..=n {
         let pv = p(i - 1, void);
-        let mut contact = vec![0u128; m + 1];
-        let mut total = 0u128;
+        let mut contact = vec![Mass::ZERO; m + 1];
+        let mut total = Mass::ZERO;
         for j in 0..=m {
-            let v = released(released(alpha[i - 1][j] * pv) * beta[i][j]);
-            total += v;
+            total = total.add(alpha[i - 1][j].mul(pv).mul(beta[i][j]));
             if j > 0 {
-                let c = released(released(alpha[i - 1][j - 1] * p(i - 1, target[j - 1])) * beta[i][j]);
+                let c = alpha[i - 1][j - 1].mul(p(i - 1, target[j - 1])).mul(beta[i][j]);
                 contact[j] = c;
-                total += c;
+                total = total.add(c);
             }
         }
-        if total == 0 {
+        if total.m == 0 {
             return Err(TemperatureRefusal::Released { row: i });
         }
         let mut by_class: Vec<(usize, u64)> = Vec::new();
         let (mut mass, mut moment) = (0u64, 0i64);
         for j in 1..=m {
-            if contact[j] == 0 {
-                continue;
-            }
-            let g = nearest(contact[j] * share, total) as u64;
+            let g = contact[j].share(total, SHARE_BITS_T);
             if g == 0 {
                 continue;
             }
@@ -748,12 +773,18 @@ pub fn coupling_code(faces: &[(&[u128], u128)], void: usize, target: &[usize], o
             }
         }
         by_class.sort_unstable();
-        let rest = (share as u64).saturating_sub(mass);
-        by_class.push((void, rest));
+        by_class.push((void, (1u64 << SHARE_BITS_T).saturating_sub(mass)));
         placed.push(by_class);
         lag.push((mass, moment));
     }
     Ok(CouplingCode { code: code as i64, placed, lag })
+}
+
+/// `log₂(v / 2^62)` on `2^(−20)` for `v > 0` (the tests' exact reading of a whole number's logarithm).
+#[cfg(test)]
+fn log2_ratio(v: u128) -> i128 {
+    let x = Mass::of(v, -(MANTISSA_BITS as i64));
+    x.log2()
 }
 
 #[cfg(test)]
@@ -888,6 +919,19 @@ mod tests {
         assert!(read.code < omit + 4 * (1i64 << 20), "deleted: the slip alone, {}", read.code);
         assert!(place_wise(&faces, void, &target) > 4 * slip);
         assert!(read.lag[3..7].iter().all(|&(_, lag)| (lag + (1 << 24)).abs() < 1 << 12), "lag −1 after the deletion: {:?}", read.lag);
+    }
+
+    /// Long strands on wide faces (a GSM8K port: 122 classes, hundreds of places) carry their mass to the end, with many
+    /// spare places and with one.
+    #[test]
+    fn a_long_port_carries_its_mass() {
+        let flat = face(&[1u128; 122]);
+        for (n, m) in [(1000usize, 300usize), (301, 300), (300, 300), (5, 0), (1229, 40)] {
+            let faces = vec![flat.clone(); n];
+            let target: Vec<usize> = (0..m).map(|j| 1 + j % 120).collect();
+            let read = coupling_code(&view(&faces), 0, &target, None);
+            assert!(read.is_ok(), "n {n} m {m}: {read:?}");
+        }
     }
 
     #[test]

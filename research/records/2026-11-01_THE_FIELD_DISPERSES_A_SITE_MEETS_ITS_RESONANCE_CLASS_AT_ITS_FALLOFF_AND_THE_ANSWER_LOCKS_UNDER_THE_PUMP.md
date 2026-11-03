@@ -2248,3 +2248,54 @@ region at weight three turns a decision the products make the other way; a tie c
 field tests 19 of 19, with `the_joint_states_stratify_the_reading_orders`. The sampled card parity, every training
 region weighed: every read, face, covector, learner, row, share, current and release equal, in 183.3 s against 210 s
 projected (0.87; host 75.0 s, card 0.50 s), peak resident set 2.3 GB. Receipt: `_receipts/law23/parity.txt`.
+
+### 16.24 The answer port is compared through its coupling, and a void place writes nothing (#601)
+
+[decision; November 3, the comparison record's §2.1, §3.1 and §3.3] The field compared each open site's face with the
+target's class at the same place, so where content does not sit at fixed places it learned the average over phrasings
+at each place: in GSM8K's training answers the commonest bytes spell `The t` and then a space at 60 of the first 64
+places, and §16.20's release locked exactly the spaces and a starting `T`. The comparison of record is the coupling
+between the release and its target (the lock test, the October 19 design); at temperature one it is a code whose
+covector is the posterior contact ([`crate::receiver::coupling::coupling_code`], #606).
+
+[definition; agent-inferred, November 3] **The answer port.** A region may declare its port (`Region::port`): every site
+from its start to the region's end is open, and their faces are compared with the answer's cells after it (never the
+void) by the coupling at temperature one, an unused place writing the void.
+- **The covector** at a port's places is `p̂_i − r_i` on `2^(−24)` (`port_reading`): the face's own shares less the
+  target the coupling places there. The sites before the port are compared at their own places, weighed as §16.23.
+- **The card.** The faces at a port's places are fetched after `field_face`, the coupling is read on the host from the
+  same masses and totals (`port_reading`), and its rows are written over the face covector at those places
+  (`field_face_set`) before the reverse. The coupling's sweeps run on the host: a row of `m + 1` cells a place, every
+  term an integer with a declared release; their card realization (anti-diagonal sweeps) is owed.
+- **The certificate.** A coupling code has no product form, so a section with a port is decided on its codes read on
+  `2^(−20)` bits (strictly fewer to deposit, no more to hold); a section without one is decided as before.
+- **Training's release states.** A front region is no longer cut five sites past its front: its prefix's open sites are a
+  state of the answer before the front (weighed `m/K` over that domain), and every site from the front to the region's
+  end (the answer and its void tail) is its port, compared with the answer's cells after the front. The held step's
+  front regions are read alike. Masks are compared at their places, as the completion they are.
+- **The opening read** (the held read's base 0) is the coupling code of every held answer given its question, every
+  answer place its port, counted over the answer's bytes.
+
+[definition; agent-inferred, November 3] **A void place writes nothing wherever it stands.** The release's extent was
+read at the earliest site locked on the void and cut the answer there; with the coupling, a void is the place a
+coupling does not use. The void is now a class like any other at every answer place, the release runs to its bound,
+and what it writes is its places in order with a void place writing nothing and an open place shown open
+(`Released::written`; the codec's `decode_open` alike).
+
+Failures this could repeat, checked: **an authored routine** (1): the coupling computes no answer, it is the comparison;
+the release still comes from the field. **Recitation counted as generation** (2): a release that recites the question's
+names raises the lock test and the joint read without solving anything, so every report shows the releases whole
+(the comparison record's A3). **A known-truth fixture as the goal** (11): the witness (#606) is evidence of the law
+only. **Text as the exception** (3): ports and couplings are strands of classes on clocks, for any codec.
+
+[measurement, November 3] The first build refused a GSM8K port before any card read: the sweeps carried each row on one
+grain, normalized by its sum, and a long port's prefix and suffix rows put their mass at opposite ends of a row (a
+cell needed by one strand was below `2^(−62)` of its row in the other), so every contact released to zero. The sweeps
+now carry each cell as a mass with its own exponent (a 63-bit mantissa, each product and sum released at its last
+bit); `a_long_port_carries_its_mass` reads ports of 1,000 places and 300 cells, 301 and 300, and 1,229 and 40 on flat
+122-class faces. After it: the gate clean (247 s); the tower's and the field's tests 252 of 252, with
+`a_port_is_read_through_its_coupling` and the port added to `covector_matches_the_codes_difference`; the coupling's 14 of
+14; the run example's field tests 19 of 19. The sampled card parity, every front region read to its end through its
+port: every read, face, covector, learner, row, share, current and release equal, in 330.0 s against 330 s projected
+(1.00; host 134.0 s, card 1.8 s), peak resident set 3.4 GB; a section's card time rose about threefold with the longer
+front regions (187, 596 and 951 ms against 84, 108 and 251). Receipt: `_receipts/law24/parity.txt`.

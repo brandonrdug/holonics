@@ -1256,7 +1256,25 @@ impl<'c> CardField<'c> {
             if self.row_questions.borrow().is_some() {
                 *self.row_cov.borrow_mut() = Some(vec![Vec::new(); ticks.len()]);
             }
-            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, sites, pairs)?;
+            // The ports' covectors (§16.24, the host's `port_reading`): their places' faces fetched, each port's coupling read on
+            // the host from the same masses and totals, its rows written over the face covector at its places.
+            let mut ported: (Vec<u32>, Vec<i64>) = (Vec::new(), Vec::new());
+            if regions.iter().any(|r| r.port.is_some()) {
+                let ms = self.timed(Kind::Copy, || card.fetch_range(&masses, 0, sites * a)).map_err(device)?;
+                let ts = self.timed(Kind::Copy, || card.fetch_range(&totals, 0, sites)).map_err(device)?;
+                for (r, region) in regions.iter().enumerate() {
+                    let Some(port) = region.port else { continue };
+                    let first = region_off[r] as usize;
+                    let wide: Vec<Vec<u128>> = (first + port.start..region_off[r + 1] as usize).map(|t| ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect()).collect();
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| (m.as_slice(), ts[t] as u128)).collect();
+                    let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
+                    for (k, row) in rows.into_iter().enumerate() {
+                        ported.0.push((first + port.start + k) as u32);
+                        ported.1.extend(row);
+                    }
+                }
+            }
+            self.reverse(field, words, &ticks, g, &fread, &fscale, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs)?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -1432,7 +1450,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], sites: usize, pairs: usize) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -1489,6 +1507,13 @@ impl<'c> CardField<'c> {
             let wk_c = self.timed(Kind::Copy, || self.take_up(&wk)).map_err(device)?;
             let (mut wmp, mut wkp) = (wm_c.device_ptr(), wk_c.device_ptr());
             self.launch("field_face_weigh", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut wmp), arg(&mut wkp), arg(&mut dzp)])?;
+        }
+        // A port's places take their coupling's covector (§16.24), read on the host.
+        if !ported.0.is_empty() {
+            let at_c = self.timed(Kind::Copy, || self.take_up(&ported.0)).map_err(device)?;
+            let rows_c = self.timed(Kind::Copy, || self.take_up(&ported.1)).map_err(device)?;
+            let (mut atp, mut rp, mut count) = (at_c.device_ptr(), rows_c.device_ptr(), ported.0.len() as u64);
+            self.launch("field_face_set", Self::cells(count * a as u64), THREADS, &mut [arg(words), arg(&mut atp), arg(&mut rp), arg(&mut count), arg(&mut dzp)])?;
         }
         self.outer(words, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
         self.outer(words, g, words.read, a, dw, dz.device_ptr(), a, fread.device_ptr(), dw, false, true)?;

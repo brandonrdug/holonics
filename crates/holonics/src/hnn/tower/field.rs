@@ -75,6 +75,14 @@
 //! through a first tick's contact with its neighbours, and finding a site by its word is then a
 //! composition of two learned contacts, which thirteen laps did not form.
 //!
+//! [definition; agent-inferred, November 3, §16.24] **The answer port is compared through its coupling, and a void
+//! place writes nothing.** Where a region declares its port ([`Region::port`]), every site from its start is compared
+//! with the answer's cells by the coupling at temperature one ([`crate::receiver::coupling::coupling_code`]): an
+//! unused place writes the void, the covector is the face less the target the coupling places there
+//! ([`port_reading`]), and the place-wise marginal (`The t` and spaces at GSM8K's first places) is no longer what the
+//! face is pulled to. The release runs to its bound and writes its places in order, a void place writing nothing
+//! ([`Released::written`]).
+//!
 //! [definition; agent-inferred, November 2, §16.22] **A site opens on its moment.** The source enters as phase-carried
 //! moments (the retention law), and the opening's three rows are only the moment's three nearest terms: a site
 //! whose face held its own byte and its two neighbours' could be found by its key, at any head, only as that
@@ -720,15 +728,55 @@ pub struct Region<'a> {
     /// region's `K` unresolved sites are a state of a reading order of `m` sites, so its code is weighed `m/K`
     /// ([`Region::weight`]); `None` where the open sites are the whole of what is read (weight one).
     pub domain: Option<usize>,
+    /// [definition; agent-inferred, November 3, §16.24] **The answer port**, where one is compared through its coupling:
+    /// every site from `start` to the region's end is open, and their faces are compared with `target` (the answer's
+    /// cells, never the void) by the coupling at temperature one ([`crate::receiver::coupling::coupling_code`]), an
+    /// unused place writing `void`. `None` where every open site is compared at its own place.
+    pub port: Option<Port<'a>>,
+}
+
+/// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
+/// starts, the void class an unused place writes, and the cells it is compared with.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Port<'a> {
+    pub start: usize,
+    pub void: usize,
+    pub target: &'a [usize],
+}
+
+/// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
+/// place's covector `p̂_i − r_i` on the face covector's `2^(−24)` (the face's own shares less the target the coupling
+/// places there), from the faces at its places (each `(masses, total)`). The host's return and the card's read the same
+/// rows from the same faces.
+pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    use crate::receiver::coupling::TemperatureRefusal as Why;
+    let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
+        TowerError::Refused(match why {
+            Why::Short { .. } => "a port with more target cells than places",
+            Why::VoidCell => "a port whose target holds the void",
+            Why::Face => "a port's face that is empty or misses a class",
+            Why::Released { .. } => "a port whose coupling's mass released to zero",
+        })
+    })?;
+    let mut rows = Vec::with_capacity(faces.len());
+    for ((masses, total), placed) in faces.iter().zip(&read.placed) {
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        for &(c, share) in placed {
+            row[c] -= share as i64;
+        }
+        rows.push(row);
+    }
+    Ok((rows, read.code))
 }
 
 impl Region<'_> {
     /// [definition; agent-inferred, November 2, §16.23] **A state's weight in the joint code**, `(m, K)`: of the `m`
     /// sites of its domain `K` are open, so the region's code `Σ_open −log₂ p̂` read at `m/K` is an unbiased reading of
     /// the order-averaged joint code `E_σ L_σ` when `K` is uniform on `1..m` and the open set uniform given `K` (the
-    /// order-agnostic bound). `(K, K)` where no domain is declared, and `(1, 1)` with nothing open.
+    /// order-agnostic bound). `(K, K)` where no domain is declared, and `(1, 1)` with nothing open. A port's sites are
+    /// compared by its coupling and are not among the `K` (§16.24).
     pub fn weight(&self) -> (u64, u64) {
-        let open = self.unresolved.iter().filter(|&&u| u).count() as u64;
+        let open = self.unresolved[..self.port.map_or(self.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count() as u64;
         if open == 0 {
             return (1, 1);
         }
@@ -1590,6 +1638,17 @@ impl Field {
         if !region.locked.is_empty() && (region.locked.len() != region.classes.len() || (0..region.classes.len()).any(|t| region.locked[t] && Self::carried(region, t).is_none())) {
             return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
         }
+        if let Some(port) = region.port {
+            if port.start > region.classes.len() || region.unresolved[port.start..].iter().any(|&u| !u) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+                return refuse("a port whose places are not every open, unlocked site to the region's end");
+            }
+            if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
+                return refuse("a port's void or target outside the alphabet, or a target cell that is the void");
+            }
+            if port.target.len() > region.classes.len() - port.start {
+                return refuse("a port with more target cells than places");
+            }
+        }
         Ok(())
     }
 
@@ -2288,19 +2347,30 @@ impl Field {
         TowerFace { masses, total }
     }
 
-    /// The region's code, `Σ −log₂ p̂_t(u_t)` over its unresolved sites, on `2^(−20)` bits, and
-    /// the number of sites it read.
+    /// The region's code on `2^(−20)` bits, and the number of sites it read: `Σ −log₂ p̂_t(u_t)` over its unresolved
+    /// sites before its port, and its port's coupling code (§16.24) over the port's places.
     pub fn code(&self, region: &Region) -> Result<(i64, usize)> {
         let faces = self.faces(region)?;
+        let end = region.port.map_or(region.classes.len(), |p| p.start);
         let mut code = 0i64;
         let mut count = 0usize;
-        for (face, &class) in faces.iter().zip(region.classes) {
+        for (face, &class) in faces.iter().zip(region.classes).take(end) {
             if let Some(face) = face {
                 code += face.code(class);
                 count += 1;
             }
         }
+        if let Some(port) = region.port {
+            code += port_code(&faces, &port)?;
+            count += region.classes.len() - port.start;
+        }
         Ok((code, count))
+    }
+
+    /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
+    fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+        let faces: Vec<(&[u128], u128)> = pass.faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
+        port_reading(&faces, port)
     }
 
     /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
@@ -2335,16 +2405,27 @@ impl Field {
         let mut dx = vec![0i64; sites * dw];
         {
             let (wm, wk) = region.weight();
+            // A port's places take their coupling's covector (§16.24), every other open site its own place's.
+            let ported = match region.port {
+                Some(port) => Some((port.start, self.port_of(pass, &port)?.0)),
+                None => None,
+            };
             let mut ys: Vec<Vec<i64>> = Vec::new();
             let mut xs: Vec<&[i32]> = Vec::new();
             for t in 0..sites {
                 let Some(face) = &pass.faces[t] else { continue };
-                let mut dz = covector(face, region.classes[t]);
-                if wm != wk {
-                    for v in dz.iter_mut() {
-                        *v = fit64(div_nearest(*v as i128 * wm as i128, wk as i128))?;
+                let dz = match &ported {
+                    Some((start, rows)) if t >= *start => rows[t - start].clone(),
+                    _ => {
+                        let mut dz = covector(face, region.classes[t]);
+                        if wm != wk {
+                            for v in dz.iter_mut() {
+                                *v = fit64(div_nearest(*v as i128 * wm as i128, wk as i128))?;
+                            }
+                        }
+                        dz
                     }
-                }
+                };
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }
@@ -2944,14 +3025,15 @@ impl Field {
             // The views: the question, the reached sites and the five past the front.
             let views: Vec<(usize, View)> = live.iter().map(|&k| (k, joint[k].view(self, void))).collect();
             let reads = {
-                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, echo: &v.echo, domain: None }).collect();
+                let regions: Vec<Region> = views.iter().map(|(k, v)| Region { classes: &joint[*k].classes[..v.end], unresolved: &v.unresolved, faces: &v.faces, locked: &v.locked, echo: &v.echo, domain: None, port: None }).collect();
                 read(&regions)?
             };
             let logits: Vec<&Vec<Option<Vec<i64>>>> = reads.iter().map(|r| &r.logits).collect();
             (progress.change, progress.holding, progress.soft, progress.overturned) = (0, 0, 0, 0);
             for (((k, _), z), fresh) in views.iter().zip(&logits).zip(&reads) {
                 let p = &mut joint[*k];
-                let content_void = p.extent.is_some().then_some(void);
+                // [§16.24] The void is a class like any other at every answer place: a place locked on it writes nothing.
+                let content_void: Option<usize> = None;
                 // Every site reached before this sweep moves at its own pump.
                 for s in 0..p.content - p.start {
                     if !p.sites[s].reached.is_some_and(|r| r < done) {
@@ -3002,16 +3084,9 @@ impl Field {
                         site.change_before = Some(change);
                     }
                 }
-                // The extent: the earliest reached site locked on the void, read once.
-                if p.extent.is_none() {
-                    let at = (0..p.content - p.start).find(|&s| p.sites[s].locked.is_some() && top(&self.tempered(&p.sites[s].logits, 1)) == void);
-                    if let Some(s) = at {
-                        p.extent = Some((s, done, false));
-                        p.content = p.start + s;
-                        p.classes.truncate(p.content + 1);
-                        p.sites.truncate(s);
-                    }
-                }
+                // [retired, November 3, §16.24] The extent read at the earliest site locked on the void: a void place now
+                // writes nothing wherever it stands (the comparison is the coupling's), so the release runs to its bound and is
+                // read as its non-void places in order.
                 // The front: an unreached site with a definite site in its near field is reached, and
                 // opens at rest on the face it read on the unresolved row.
                 loop {
@@ -3045,7 +3120,7 @@ impl Field {
         progress.rung = joint.iter().flat_map(|p| p.sites.iter().map(|s| s.beta)).max().unwrap_or(0);
         progress.free = joint.iter().map(|p| p.overturns).sum();
         sweep(&progress);
-        Ok(joint.into_iter().map(|p| p.released(self, void)).collect())
+        Ok(joint.into_iter().map(|p| p.released(self)).collect())
     }
 
     /// [definition; agent-inferred, November 1] **The landmarks** (the dispersing field's §3
@@ -3170,6 +3245,12 @@ impl Released {
     pub fn classes_or(&self, open: usize) -> Vec<usize> {
         self.sites.iter().map(|s| s.unwrap_or(open)).collect()
     }
+
+    /// [definition; agent-inferred, November 3, §16.24] **What the release writes**: its places in order, a place locked on
+    /// the void writing nothing and an open place written as `open`.
+    pub fn written(&self, void: usize, open: usize) -> Vec<usize> {
+        self.sites.iter().filter(|s| **s != Some(void)).map(|s| s.unwrap_or(open)).collect()
+    }
 }
 
 /// An answer site's state in a release: the sweep it was reached (`None` while it is not), its
@@ -3255,10 +3336,9 @@ impl Joint {
         View { end, unresolved, faces, locked, echo }
     }
 
-    fn released(self, field: &Field, void: usize) -> Released {
-        // The top and the runner-up among the content classes (the lower class on a tie).
-        let skip_void = self.extent.is_some();
-        let best = |l: &[i64], skip: Option<usize>| l.iter().enumerate().filter(|&(c, _)| !(skip_void && c == void) && Some(c) != skip).fold((0usize, i64::MIN), |b, (c, &v)| if v > b.1 { (c, v) } else { b });
+    fn released(self, field: &Field) -> Released {
+        // The top and the runner-up among every class, the void's among them (§16.24; the lower class on a tie).
+        let best = |l: &[i64], skip: Option<usize>| l.iter().enumerate().filter(|&(c, _)| Some(c) != skip).fold((0usize, i64::MIN), |b, (c, &v)| if v > b.1 { (c, v) } else { b });
         Released {
             sites: self.sites.iter().map(|s| s.locked.map(|_| best(&s.logits, None).0)).collect(),
             reached: self.sites.iter().map(|s| s.reached).collect(),
@@ -3282,7 +3362,7 @@ impl Joint {
             open: self.sites.iter().filter(|s| s.locked.is_none()).count(),
             extent: self.extent,
             faces: {
-                let content_void = skip_void.then_some(void);
+                let content_void: Option<usize> = None;
                 let mut faces = vec![None; self.classes.len()];
                 for (t, face) in faces.iter_mut().enumerate().take(self.content).skip(self.start) {
                     let s = &self.sites[t - self.start];
@@ -3588,19 +3668,54 @@ struct HeldStep {
 }
 
 /// Each unresolved site's face read at its class, the faces the certificates compare.
-fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Vec<(u128, u128)> {
-    faces.iter().zip(regions).flat_map(|(f, r)| f.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total)))).collect()
+/// [definition; agent-inferred, November 3, §16.24] **A section's compared reading**: each open site's face at its
+/// class before its region's port (`(mass, total)`), and the ports' coupling codes summed on `2^(−20)` bits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct Compared {
+    pairs: Vec<(u128, u128)>,
+    coupled: i64,
+    ported: bool,
 }
 
-/// Each region's run of compared sites and its weight in the joint code, `(K, m, K)` ([`Region::weight`], §16.23), in
-/// the order [`compared`] reads them.
+fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Compared> {
+    let mut out = Compared { pairs: Vec::new(), coupled: 0, ported: false };
+    for (f, r) in faces.iter().zip(regions) {
+        let end = r.port.map_or(r.classes.len(), |p| p.start);
+        out.pairs.extend(f.iter().zip(r.classes).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
+        if let Some(port) = r.port {
+            out.coupled += port_code(f, &port)?;
+            out.ported = true;
+        }
+    }
+    Ok(out)
+}
+
+/// A port's coupling code on `2^(−20)` bits from a region's faces (§16.24).
+fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
+    let at: Vec<(&[u128], u128)> = faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
+    Ok(port_reading(&at, port)?.1)
+}
+
+/// Each region's run of compared sites before its port and its weight in the joint code, `(K, m, K)`
+/// ([`Region::weight`], §16.23), in the order [`compared`] reads them.
 fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
-    regions.iter().map(|r| { let (m, k) = r.weight(); (r.unresolved.iter().filter(|&&u| u).count(), m, k) }).collect()
+    regions.iter().map(|r| { let (m, k) = r.weight(); (r.unresolved[..r.port.map_or(r.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count(), m, k) }).collect()
 }
 
-/// The regions' weighed code on `2^(−20)` bits (§16.23, [`super::weighed_code`]).
-fn code_of(pairs: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> i64 {
-    weighed_code(pairs, spans)
+/// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`super::weighed_code`])
+/// and the ports' coupling codes (§16.24).
+fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
+    weighed_code(&c.pairs, spans) + c.coupled
+}
+
+/// Whether `new` codes strictly fewer bits than `old`. Where a port is read, its coupling code has no product form, so
+/// the decision is the codes' on their grain (`2^(−20)` bits, §16.24); otherwise it is the weighed certificate's.
+fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
+    if old.ported || new.ported {
+        code_of(new, spans) < code_of(old, spans)
+    } else {
+        fewer_bits_weighed(&old.pairs, &new.pairs, spans)
+    }
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
@@ -3645,16 +3760,16 @@ struct Scaled {
 /// steps standing only at `2^(−12)` of their size or less, and the certificate's own halvings
 /// reached 9 to 18 on 14 sections; their direction, not their size, raised the code, which the
 /// parabola reads from two reads where the halvings read it from a dozen.
-fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
+fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
     let spans = spans_of(regions);
-    let stands = |new: &[(u128, u128)]| if strict { fewer_bits_weighed(old, new, &spans) } else { !fewer_bits_weighed(new, old, &spans) };
+    let stands = |new: &Compared| if strict { fewer(old, new, &spans) } else { !fewer(new, old, &spans) };
     let code_old = code_of(old, &spans);
     let (full, moved) = stepped(base, step, h0)?;
     if !moved {
         return Ok(Scaled { change: 0, halvings: 0, standing: None });
     }
     let full_faces = realization.read_faces(&full, regions)?;
-    let at_full = compared(&full_faces, regions);
+    let at_full = compared(&full_faces, regions)?;
     let change = code_of(&at_full, &spans) - code_old;
     if stands(&at_full) {
         return Ok(Scaled { change, halvings: 0, standing: Some((full, full_faces)) });
@@ -3665,7 +3780,7 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bo
         return Ok(nowhere(1));
     }
     let half_faces = realization.read_faces(&half, regions)?;
-    let at_half = compared(&half_faces, regions);
+    let at_half = compared(&half_faces, regions)?;
     if stands(&at_half) {
         return Ok(Scaled { change, halvings: 1, standing: Some((half, half_faces)) });
     }
@@ -3686,7 +3801,7 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &[(u128, u128)], strict: bo
         return Ok(nowhere(h));
     }
     let candidate_faces = realization.read_faces(&candidate, regions)?;
-    if stands(&compared(&candidate_faces, regions)) {
+    if stands(&compared(&candidate_faces, regions)?) {
         return Ok(Scaled { change, halvings: h, standing: Some((candidate, candidate_faces)) });
     }
     Ok(nowhere(h))
@@ -3804,7 +3919,7 @@ impl FieldLearner {
     #[allow(clippy::type_complexity)]
     fn next_scale(before: &Field, held: &HeldStep, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<(Field, Vec<Vec<Option<TowerFace>>>, FieldNext)> {
         let before_faces = realization.read_faces(before, regions)?;
-        let old = compared(&before_faces, regions);
+        let old = compared(&before_faces, regions)?;
         let scale = scaled(before, &held.step, held.halvings, &old, false, regions, realization)?;
         let next = FieldNext { change: scale.change, halvings: scale.halvings, refused: scale.standing.is_none() };
         Ok(match scale.standing {
@@ -3827,14 +3942,14 @@ impl FieldLearner {
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
         let (faces, g, next) = self.open(regions, realization, true)?;
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
-        let faces_old = compared(&faces, regions);
+        let faces_old = compared(&faces, regions)?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
-        if faces_old.is_empty() {
+        if faces_old.pairs.is_empty() && !faces_old.ported {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
         for &(start, len, grain) in self.field.families() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -3861,7 +3976,7 @@ impl FieldLearner {
         let Some((candidate, faces_new)) = scale.standing else {
             return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
         };
-        let code_after = code_of(&compared(&faces_new, regions), &spans);
+        let code_after = code_of(&compared(&faces_new, regions)?, &spans);
         self.field = candidate;
         self.held = Some(HeldStep { step, halvings });
         Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
