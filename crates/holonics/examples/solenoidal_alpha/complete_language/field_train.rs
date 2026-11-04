@@ -733,7 +733,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         Some([path, sha]) => FieldLearner::from_text(std::str::from_utf8(&pinned_read(path, sha, STATE_BUDGET)?)?).map_err(|e| e.to_string())?,
         _ => {
             // The founding's heads are its ring sets; the reach is the passages'.
-            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach };
+            let declaration = FieldDeclaration { alphabet: codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach, lanes: 1 };
             let mut field = Field::found(declaration, &keys).map_err(|e| e.to_string())?;
             // [measurement; agent-inferred, November 3, §16.31] `FIELD_FOUND_RETURNS` (`returns`, or `lift` for the readout's
             // lift as well): the founding's zero families drawn instead, uniform on `±√(3/fan-in)` from a block of the key
@@ -826,6 +826,15 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let d = learner.field.declaration;
         println!("FIELD_GROW lap=-1 width={} heads={} contacts={} rate={} material={} ms={}", d.width, d.heads, d.contacts, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
     }
+    // [agent-inferred, November 4, §16.40] `FIELD_LANE_FIRST`: a continued learner grown by one fresh lane before its first
+    // lap ([`FieldLearner::laned`]), so a run reads a lane against the same state continued alone; the run then makes no
+    // growth by copies.
+    let laned_first = std::env::var_os("FIELD_LANE_FIRST").is_some() && args.len() == 24;
+    if laned_first {
+        learner = learner.laned(&keys).map_err(|e| e.to_string())?;
+        let d = learner.field.declaration;
+        println!("FIELD_LANE lap=-1 width={} lanes={} rate={} material={} ms={}", d.width, d.lanes, learner.rate_bits, learner.field.theta.len(), started.elapsed().as_millis());
+    }
     let held = held_out(&learner.field, &codec, &dev_set, realization)?;
     println!("FIELD_HELD lap=-1 {} ms={}", held_text(&held), started.elapsed().as_millis());
     held_rows_text(&learner.field, &codec, &dev_set, realization, -1)?;
@@ -835,7 +844,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let (code, sites, next) = unseen_read(&mut learner, &codec, &train_set, &unseen, seed, realization)?;
     println!("FIELD_UNSEEN lap=-1 code={} sites={sites} {} ms={}", bits(code, sites), next_text(next), started.elapsed().as_millis());
     let mut previous = (code, sites);
-    let mut grown = widened_first;
+    let mut grown = widened_first || laned_first;
     let mut fallen = false;
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
@@ -1571,7 +1580,7 @@ mod tests {
 
     fn toy_learner(codec: &FieldCodec, problems: &Problems) -> FieldLearner {
         let reach = problems.iter().map(|(q, _, _)| q.len() + codec.answer).max().unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1 };
         let keys: Vec<u8> = (0..1u64 << 13).flat_map(|i| mix(0x5EED, i).to_be_bytes()).collect();
         FieldLearner::new(Field::found(d, &keys).unwrap(), 4)
     }
@@ -1706,7 +1715,8 @@ mod tests {
 /// COUNT`**: the expansion and the volume of the field's state across its ticks (the lens record, §7: information expands
 /// and contracts in the geometry), on the first `COUNT` held problems read with their neighbours (the context read's first
 /// part). The **volume** of tick `k` is the participation ratio `(tr C)² / tr C²` of the sites' charts `r̂` (`C` their
-/// covariance over a region's sites, its effective number of directions out of `D`), averaged over the regions. The
+/// covariance over a region's sites, its effective number of directions out of `D`, every lane's chart together), averaged
+/// over the regions. The
 /// **expansion** is read against the same regions with every row of the encoding moved by a keyed `±2^(−10)` of its unit:
 /// `Δ_k = Σ_t ‖x′_t − x_t‖²` of the faces `x = r̂ · scale` at tick `k`'s opening, and its growth from tick to tick, `½ log₂
 /// (Δ_(k+1)/Δ_k)` bits a tick (a finite-time Lyapunov reading: above zero the ticks pull nearby states apart and make
@@ -1740,7 +1750,7 @@ pub(super) fn expansion_field(args: &[String], realization: &mut dyn FieldRealiz
         }
     }
     let perturbed = realization.read_ticks(&moved, &regions)?;
-    let dw = field.declaration.width;
+    let (dw, lanes) = (field.declaration.width, field.declaration.lanes);
     let ticks = base.first().map_or(0, Vec::len);
     let mut deltas: Vec<i128> = vec![0; ticks];
     for k in 0..ticks {
@@ -1751,8 +1761,9 @@ pub(super) fn expansion_field(args: &[String], realization: &mut dyn FieldRealiz
             // The faces' difference, `x = r̂ · scale` on `2^(−32)`, released to `2^(−16)` before it is squared.
             for t in 0..sites {
                 for i in 0..dw {
-                    let xb = (rb.read[t * dw + i] as i128 * rb.scale[t]) >> 16;
-                    let xp = (rp.read[t * dw + i] as i128 * rp.scale[t]) >> 16;
+                    let lane = t * lanes + i / (dw / lanes);
+                    let xb = (rb.read[t * dw + i] as i128 * rb.scale[lane]) >> 16;
+                    let xp = (rp.read[t * dw + i] as i128 * rp.scale[lane]) >> 16;
                     let d = (xp - xb) >> 8;
                     deltas[k] += d * d;
                 }

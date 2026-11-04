@@ -274,6 +274,8 @@ __device__ __forceinline__ uint64_t warp_max_u64(uint64_t v) {
 // value; a tick's launches set its carriers.
 struct FieldWords {
     uint32_t D, H, n, still, f, A, frames;
+    // The lanes the face is charted in (§16.40), `D / lanes` coordinates each.
+    uint32_t lanes;
     // The gain's shift, negative where it amplifies (`FieldDeclaration::score_shift`), the classes'
     // shells `b` (`class_trits`) and their count `3^b`.
     int32_t beta;
@@ -679,26 +681,30 @@ extern "C" __global__ void field_open(FieldWords w) {
     }
 }
 
-// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` (`ratio_to_power`): one warp a site.
+// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` (`ratio_to_power`), lane by lane (§16.40, the host's `lane_chart`): each
+// lane's `W = D / L` coordinates a ratio to their own power, its scale at `[t][lane]`; one warp a site.
 extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *read, wide *scale, uint32_t only_unresolved) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint32_t lw = w.D / w.lanes;
     for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
         if (only_unresolved && !w.unresolved[t]) {
             continue;
         }
-        const int64_t *xt = x + t * w.D;
-        wide power = 0;
-        for (uint32_t i = lane; i < w.D; i += 32) {
-            power += (wide)xt[i] * (wide)xt[i];
-        }
-        power = warp_sum(power);
-        const wide s = (wide)isqrt128((uwide)(power / (wide)w.D));
-        for (uint32_t i = lane; i < w.D; i += 32) {
-            read[t * w.D + i] = s == 0 ? 0 : fit32(div_nearest((wide)xt[i] << FACE_BITS, s), w.status);
-        }
-        if (lane == 0) {
-            scale[t] = s;
+        for (uint32_t k = 0; k < w.lanes; ++k) {
+            const int64_t *xt = x + t * w.D + k * lw;
+            wide power = 0;
+            for (uint32_t i = lane; i < lw; i += 32) {
+                power += (wide)xt[i] * (wide)xt[i];
+            }
+            power = warp_sum(power);
+            const wide s = (wide)isqrt128((uwide)(power / (wide)lw));
+            for (uint32_t i = lane; i < lw; i += 32) {
+                read[t * w.D + k * lw + i] = s == 0 ? 0 : fit32(div_nearest((wide)xt[i] << FACE_BITS, s), w.status);
+            }
+            if (lane == 0) {
+                scale[t * w.lanes + k] = s;
+            }
         }
     }
 }
@@ -2629,11 +2635,12 @@ extern "C" __global__ void field_transposed(FieldWords w, uint64_t weight, uint3
     }
 }
 
-// The adjoint of the chart (`ratio_adjoint`) of each site's covector `cov`, added to `base`:
-// `dst = base + (cov − r̂ ⟨r̂, cov⟩/D) / ‖r‖_rms`, one warp a site.
+// The adjoint of the chart (`ratio_adjoint`) of each site's covector `cov`, added to `base`, lane by lane (§16.40, the host's
+// `lane_adjoint`): `dst = base + (cov − r̂ ⟨r̂, cov⟩/W) / ‖r‖_rms` over each lane's `W` coordinates, one warp a site.
 extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read, const wide *scale, const int64_t *cov, const int64_t *base, int64_t *dst, uint32_t only_unresolved) {
     const uint32_t lane = threadIdx.x & 31;
     const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    const uint32_t lw = w.D / w.lanes;
     for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
         if (only_unresolved && !w.unresolved[t]) {
             for (uint32_t i = lane; i < w.D; i += 32) {
@@ -2641,18 +2648,21 @@ extern "C" __global__ void field_ratio_adjoint(FieldWords w, const int32_t *read
             }
             continue;
         }
-        const int32_t *rt = read + t * w.D;
-        const int64_t *ct = cov + t * w.D;
-        const wide s = scale[t];
-        wide dot = 0;
-        for (uint32_t i = lane; i < w.D; i += 32) {
-            dot += (wide)rt[i] * (wide)ct[i];
-        }
-        dot = warp_sum(dot);
-        const wide mean = div_nearest(dot, (wide)w.D);
-        for (uint32_t i = lane; i < w.D; i += 32) {
-            const int64_t back = s == 0 ? 0 : fit64(div_nearest(((wide)ct[i] - rel(mean * (wide)rt[i], 2 * FACE_BITS)) << FACE_BITS, s), w.status);
-            dst[t * w.D + i] = base ? fit64((wide)base[t * w.D + i] + (wide)back, w.status) : back;
+        for (uint32_t k = 0; k < w.lanes; ++k) {
+            const uint64_t at = t * w.D + k * lw;
+            const int32_t *rt = read + at;
+            const int64_t *ct = cov + at;
+            const wide s = scale[t * w.lanes + k];
+            wide dot = 0;
+            for (uint32_t i = lane; i < lw; i += 32) {
+                dot += (wide)rt[i] * (wide)ct[i];
+            }
+            dot = warp_sum(dot);
+            const wide mean = div_nearest(dot, (wide)lw);
+            for (uint32_t i = lane; i < lw; i += 32) {
+                const int64_t back = s == 0 ? 0 : fit64(div_nearest(((wide)ct[i] - rel(mean * (wide)rt[i], 2 * FACE_BITS)) << FACE_BITS, s), w.status);
+                dst[at + i] = base ? fit64((wide)base[at + i] + (wide)back, w.status) : back;
+            }
         }
     }
 }

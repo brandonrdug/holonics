@@ -79,6 +79,7 @@ struct Words {
     f: u32,
     a: u32,
     frames: u32,
+    lanes: u32,
     beta: i32,
     ctrits: u32,
     nclasses: u32,
@@ -860,6 +861,7 @@ impl<'c> CardField<'c> {
             f: f as u32,
             a: a as u32,
             frames: d.frames as u32,
+            lanes: d.lanes as u32,
             beta: d.score_shift(),
             ctrits: d.class_trits() as u32,
             nclasses: d.classes() as u32,
@@ -1043,7 +1045,7 @@ impl<'c> CardField<'c> {
         let d = field.declaration;
         let rows = sites + regions;
         let slots = crowd_slots(d.reach);
-        let (dw, m2, f, heads, span) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes);
+        let (dw, m2, f, heads, span, lanes) = (d.width, 2 * d.complex(), d.contacts, d.heads, 2 * d.modes, d.lanes);
         let classes = d.classes();
         // A receiver's probed classes: its probe's own and the `2^b − 1` across its seams (§16.19).
         let probe_stride = 1usize << d.class_trits();
@@ -1052,7 +1054,7 @@ impl<'c> CardField<'c> {
         let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
         Ok(Tick {
             read: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
-            scale: self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?,
+            scale: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             qkv: alloc64(sites * 2 * m2)?,
             qf: alloc64(heads * sites * span)?,
             qf32: self.take::<i32>(heads * sites * span).map_err(device)?,
@@ -1080,7 +1082,7 @@ impl<'c> CardField<'c> {
             ce: self.timed(Kind::Alloc, || self.take::<u64>(if stored { (heads * sites * slots).max(1) } else { 1 })).map_err(device)?,
             y: alloc64(sites * m2)?,
             read2: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
-            scale2: self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?,
+            scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
@@ -1349,10 +1351,10 @@ impl<'c> CardField<'c> {
         }
         let d0 = field.declaration.width;
         let split_read = self.timed(Kind::Alloc, || self.take::<i32>((fine.sites * d0).max(1))).map_err(device)?;
-        let split_scale = self.timed(Kind::Alloc, || self.take::<i128>(fine.sites.max(1))).map_err(device)?;
+        let split_scale = self.timed(Kind::Alloc, || self.take::<i128>((fine.sites * field.declaration.lanes).max(1))).map_err(device)?;
         let pad_read = self.timed(Kind::Alloc, || self.take::<i32>((sites * period * d0).max(1))).map_err(device)?;
         let read1 = self.timed(Kind::Alloc, || self.take::<i32>((sites * cd.width).max(1))).map_err(device)?;
-        let scale1 = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+        let scale1 = self.timed(Kind::Alloc, || self.take::<i128>((sites * cd.lanes).max(1))).map_err(device)?;
         let pad = alloc64(sites * period * d0)?;
         Ok(TowerBatch { st, ticks, _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, pad_read, read1, scale1, pad })
     }
@@ -1495,10 +1497,11 @@ impl<'c> CardField<'c> {
             let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
             for tick in &ticks {
                 let read = self.timed(Kind::Copy, || card.fetch_range(&tick.read, 0, sites * dw)).map_err(device)?;
-                let scale = self.timed(Kind::Copy, || card.fetch_range(&tick.scale, 0, sites)).map_err(device)?;
+                let lanes = field.declaration.lanes;
+                let scale = self.timed(Kind::Copy, || card.fetch_range(&tick.scale, 0, sites * lanes)).map_err(device)?;
                 for (r, slot) in per.iter_mut().enumerate() {
                     let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                    slot.push(TickRead { read: read[a0 * dw..a1 * dw].to_vec(), scale: scale[a0..a1].to_vec() });
+                    slot.push(TickRead { read: read[a0 * dw..a1 * dw].to_vec(), scale: scale[a0 * lanes..a1 * lanes].to_vec() });
                 }
             }
             out.extend(per);
@@ -1552,7 +1555,7 @@ impl<'c> CardField<'c> {
         }
         // The faces at the unresolved sites.
         let fread = self.timed(Kind::Alloc, || self.take::<i32>(sites * dw)).map_err(device)?;
-        let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
+        let fscale = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites * field.declaration.lanes)).map_err(device)?;
         let z = self.timed(Kind::Alloc, || self.take::<i64>(sites * a)).map_err(device)?;
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)).map_err(device)?;
@@ -2136,10 +2139,12 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     let slots = crowd_slots(d.reach) as u64;
     // A receiver's probes: their number, their classes, and its place among the probers of each (`2^b − 1`).
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
-    let tick_site = 4 * dw + 16 + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
+    // The chart's and the pair contact's scales are one a lane (§16.40).
+    let lanes = d.lanes as u64;
+    let tick_site = 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
     let tick_fixed = tick_fixed_octets(d);
     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
-    let face_site = 8 * dw + 4 * dw + 16 + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;
+    let face_site = 8 * dw + 4 * dw + 16 * lanes + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;
     // A site's carried mixture, definite bit, echo (a flag, `B` and logits) and the round trips.
     let mixture_site = 5 + 2 * 4 * a + 9 + 8 * a + 16;
     // The moments: the pass's values `[t][2M]`, and a mode's strands, moments, prefix sums and admission
@@ -2303,7 +2308,7 @@ mod tests {
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
-        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221 }
+        FieldDeclaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1 }
     }
 
     /// Every region is in one batch, in order, each batch within the budget; a region past the budget

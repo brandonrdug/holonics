@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16 }
+    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -838,7 +838,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach }.score_shift();
+    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1 }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -847,7 +847,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1 };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -902,7 +902,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32 };
+    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -990,7 +990,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484 };
+    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1 };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1270,7 +1270,7 @@ fn refinement_revisits_the_written_answer() {
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6 }
+    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1 }
 }
 
 /// A tower of scales on [`shaped`]`(still)`: packets of three sites after the first of its two ticks, founded from the
@@ -1371,3 +1371,92 @@ fn the_towers_covector_matches_its_codes_difference() {
     assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
 }
 
+
+/// [definition; §16.40] **A lane founded beside a field keeps every face**: the laned field (one lane, then two, past the
+/// first) reads every face the field read, its draws counted are the draws read, its families tile its material and its
+/// text restores it; the laned learner keeps every old moment, opens the lane's at zero and keeps its rate; and every read
+/// from the lane has a covector at once (the key chart's columns over the lane among them).
+#[test]
+fn a_lane_founded_beside_a_field_reads_its_faces() {
+    for still in [0usize, 1, 2] {
+        let field = shaped(still);
+        let faces = field.faces(&region()).unwrap();
+        let mut laned = field.clone();
+        for lanes in [2usize, 3] {
+            let draws = laned.declaration.lane_draws();
+            assert!(laned.laned(&keys(draws).as_slice()[..4 * draws - 1]).is_err(), "the draws counted are the draws read");
+            let (next, from) = laned.laned(&keys(draws)).unwrap();
+            assert_eq!(from.len(), next.theta.len());
+            assert_eq!((next.declaration.width, next.declaration.lanes), (lanes * 8, lanes));
+            assert_eq!(next.faces(&region()).unwrap(), faces, "still {still}, {lanes} lanes");
+            let mut at = 0;
+            for (start, len, _) in next.families_all() {
+                assert_eq!(start, at);
+                at += len;
+            }
+            assert_eq!(at, next.material_len());
+            assert_eq!(Field::from_text(&next.to_text()).unwrap(), next);
+            laned = next;
+        }
+        let g = covector_of(&laned, &region());
+        let (l, dw, m2) = (laned.layout.clone(), laned.declaration.width, 2 * laned.declaration.complex());
+        assert!((0..m2).any(|row| (8..dw).any(|j| g[l.q + row * dw + j] != 0)), "still {still}: the key chart's reads from the lanes carry a covector");
+    }
+    let mut learner = FieldLearner::new(Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 4);
+    for _ in 0..2 {
+        learner.section(&[region()]).unwrap();
+    }
+    let stream = keys(1 << 16);
+    let laned = learner.laned(&stream).unwrap();
+    assert_eq!((laned.drawn, laned.rate_bits), (learner.drawn + 4 * learner.field.declaration.lane_draws(), learner.rate_bits));
+    let (l, old) = (laned.field.layout().clone(), learner.field.layout().clone());
+    assert_eq!(laned.first[l.read_bias], learner.first[old.read_bias]);
+    assert_eq!(laned.first[l.enc + 16 + 3], learner.first[old.enc + 8 + 3], "an encoding row's old entries keep their moments");
+    assert_eq!((laned.first[l.enc + 16 + 8], laned.second[l.enc + 16 + 8]), (0, 0), "the lane's entries open at zero");
+    let back = FieldLearner { read_held: laned.read_held, ..FieldLearner::from_text(&laned.to_text()).unwrap() };
+    assert_eq!(back, laned);
+}
+
+/// [definition; §16.40] **A laned field's covector agrees with its code's central difference**: on a field of two lanes
+/// with every family shaped, each family's three entries with the largest covectors (the probe law of
+/// [`covector_matches_the_codes_difference`], a probe whose step moves a site across a sheet left out and counted), so each
+/// lane's chart and its adjoint are read on their own.
+#[test]
+fn the_laned_fields_covector_matches_its_codes_difference() {
+    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let (mut read, mut seams) = (0usize, 0usize);
+    for still in [0usize, 1, 2] {
+        let field = shaped_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
+        let r = region();
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        for &(start, len, grain) in field.families() {
+            if start == l.temper {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta), &r) != sheets(&field, &r) || sheets(&moved(-delta), &r) != sheets(&field, &r);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("LANE_COVECTOR_PROBES read={read} on_a_seam={seams}");
+    assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
+}

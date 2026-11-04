@@ -163,9 +163,7 @@ impl Field {
         let g = &s.glue;
         let mut out = ScalePass::default();
         for xt in x.chunks_exact(d0) {
-            let (r, sc) = ratio_to_power(xt)?;
-            out.read.extend_from_slice(&r);
-            out.scale.push(sc);
+            lane_chart(xt, self.declaration.lanes, &mut out.read, &mut out.scale)?;
         }
         // The restriction: one chart of each packet's reads in place order, zero past the region's last site.
         let reach_a = reach(&g[a..ab]);
@@ -188,9 +186,7 @@ impl Field {
             }
         }
         for xj in x1.chunks_exact(d1) {
-            let (r, sc) = ratio_to_power(xj)?;
-            out.coarse_read.extend_from_slice(&r);
-            out.coarse_scale.push(sc);
+            lane_chart(xj, s.coarse.declaration.lanes, &mut out.coarse_read, &mut out.coarse_scale)?;
         }
         // The prolongation: one chart back, each place its own rows and bias.
         let reach_b = reach(&g[b..bb]);
@@ -238,7 +234,8 @@ impl Field {
         }
         let mut dx1 = vec![0i64; packets * d1];
         for j in 0..packets {
-            let back = ratio_adjoint(&pass.coarse_read[j * d1..(j + 1) * d1], pass.coarse_scale[j], &dr1[j * d1..(j + 1) * d1])?;
+            let l1 = s.coarse.declaration.lanes;
+            let back = lane_adjoint(&pass.coarse_read[j * d1..(j + 1) * d1], &pass.coarse_scale[j * l1..(j + 1) * l1], &dr1[j * d1..(j + 1) * d1])?;
             dx1[j * d1..(j + 1) * d1].copy_from_slice(&back);
         }
         // The packets' ticks, in reverse; their clocks are plain and carry no covector, nor their absent moments.
@@ -264,7 +261,8 @@ impl Field {
             transposed(&gl[a..ab], reach_a, period * d0, ds[j], MATERIAL_BITS, &mut dpad)?;
             for t in period * j..(period * (j + 1)).min(sites) {
                 let k = t - period * j;
-                let back = ratio_adjoint(&pass.read[t * d0..(t + 1) * d0], pass.scale[t], &dpad[k * d0..(k + 1) * d0])?;
+                let l0 = self.declaration.lanes;
+                let back = lane_adjoint(&pass.read[t * d0..(t + 1) * d0], &pass.scale[t * l0..(t + 1) * l0], &dpad[k * d0..(k + 1) * d0])?;
                 for (slot, &v) in dx[t * d0..(t + 1) * d0].iter_mut().zip(&back) {
                     *slot = fit64(*slot as i128 + v as i128)?;
                 }

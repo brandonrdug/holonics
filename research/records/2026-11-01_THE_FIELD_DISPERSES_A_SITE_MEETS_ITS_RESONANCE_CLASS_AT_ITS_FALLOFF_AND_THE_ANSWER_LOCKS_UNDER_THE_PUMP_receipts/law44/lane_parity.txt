@@ -1,0 +1,13 @@
+# binary sha f4475a212efb499691e84d6cd9e2ea46a391a82e4ad2c7f3e39b10d827750912 started 04:14:43
+FIELD_PARITY_LANE lanes=2 width=64 material=63096
+FIELD_PARITY section=1 withheld=false regions=16 length=1408 sites=7620 rows=72224 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kap
+FIELD_PARITY section=2 withheld=false regions=16 length=1365 sites=8244 rows=83344 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kap
+FIELD_PARITY section=3 withheld=false regions=16 length=1469 sites=9815 rows=116480 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 ka
+FIELD_PARITY section=4 withheld=true regions=32 length=1431 sites=0 rows=163744 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=1229 equal=true
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=81 host_ms=70587 card_ms=555 elapsed_ms=332926
+MEASURE lap=laned rc=0 wall_s=345.3 peak_rss_kib=1972948
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=12 equal=true
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=66 host_ms=61551 card_ms=454 elapsed_ms=272968
+MEASURE lap=alone rc=0 wall_s=273.7 peak_rss_kib=2440100
+PARITY exit 04:25:02
