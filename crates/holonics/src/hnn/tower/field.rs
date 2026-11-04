@@ -3835,6 +3835,19 @@ impl FieldLearner {
         Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
     }
 
+    /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
+    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
+    /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
+    /// nonzero covector.
+    pub fn scaled_up(&self, period: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
+        let (field, drawn) = self.field.scaled_up(period, split, declaration, keys, self.drawn)?;
+        let len = field.material_len();
+        let (mut first, mut second) = (self.first.clone(), self.second.clone());
+        first.resize(len, 0);
+        second.resize(len, 0);
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
+    }
+
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
     /// and `Σ √v` of the covector's two moments, so `Σ|m| / Σ√v` is near one where the family's covector keeps its sign
     /// from section to section (its step is driven) and near zero where its signs cancel (its step is noise). A reading only.

@@ -776,6 +776,16 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     // so a run reads whether the trained body's width bounds its fall; the run then makes no further growth.
     let widen_factor = std::env::var("FIELD_WIDEN_FIRST").ok().map(|v| v.parse::<usize>().ok().filter(|&f| f > 1).unwrap_or(2));
     let widened_first = widen_factor.is_some() && args.len() == 24;
+    // [agent-inferred, November 3, the tower record, D3] `FIELD_SCALE_FIRST=P`: a continued learner grown in scale before its
+    // first lap (packets of `P` sites after half its ticks; the packets' field as wide as the fine one, twice its heads, half
+    // of them still, as many contacts and ticks, on the packets' reach), so a run reads the tower against the field alone.
+    let scaled_first = std::env::var("FIELD_SCALE_FIRST").ok().and_then(|v| v.parse::<usize>().ok()).filter(|&p| p > 1 && args.len() == 24);
+    if let Some(period) = scaled_first {
+        let d = learner.field.declaration;
+        let coarse = FieldDeclaration { alphabet: 2, heads: 2 * d.heads, frames: 2 * d.heads, still: d.heads, reach: d.reach.div_ceil(period), ..d };
+        learner = learner.scaled_up(period, (d.ticks / 2).max(1), coarse, &keys).map_err(|e| e.to_string())?;
+        println!("FIELD_SCALE lap=-1 period={period} split={} coarse_width={} coarse_heads={} material={} ms={}", (d.ticks / 2).max(1), coarse.width, coarse.heads, learner.field.material_len(), started.elapsed().as_millis());
+    }
     // [measurement; agent-inferred, November 3, §16.28] `FIELD_RATE_BITS`: a continued learner's step rate `2^(−k)` read at
     // `k` for this run, so a run reads whether the step's size bounds the trained field's fall.
     if let Some(k) = std::env::var("FIELD_RATE_BITS").ok().and_then(|v| v.parse::<u32>().ok()).filter(|_| args.len() == 24) {
@@ -914,7 +924,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // raised the code from 5.459 to 5.912 bits, and its grown body refused 240 of 248 steps).
         let fell = (code as i128) * (previous.1 as i128) < (previous.0 as i128) * (unseen_sites as i128);
         fallen |= fell;
-        match growth(fell, fallen, grown, lap, laps) {
+        match growth(fell, fallen, grown || learner.field.scale.is_some(), lap, laps) {
             Growth::Widen => {
                 learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
                 grown = true;

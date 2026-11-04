@@ -4072,3 +4072,49 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the tower of scales (the host's `field::scale`)
+
+// [definition; agent-inferred, November 3] A packet's rows in place order (the host's `padded`): `dst[p][k][i]` is fine site
+// `P jl + k` of packet `p`'s region, row `i`, zero past the region's last site. `cw` are the packets' words (their region
+// and place within it), `fine_off` the fine sites' region offsets.
+extern "C" __global__ void field_scale_gather32(FieldWords cw, const int32_t *src, int32_t *dst, const uint32_t *fine_off, uint32_t width, uint32_t period) {
+    const uint64_t per = (uint64_t)period * width;
+    const uint64_t cells = (uint64_t)cw.T * per;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t p = c / per, e = c % per;
+        const uint32_t k = e / width, i = e % width;
+        const uint32_t r = cw.site_region[p];
+        const uint64_t local = (uint64_t)period * cw.site_pos[p] + k;
+        const uint64_t len = fine_off[r + 1] - fine_off[r];
+        dst[c] = local < len ? src[(fine_off[r] + local) * width + i] : 0;
+    }
+}
+
+extern "C" __global__ void field_scale_gather64(FieldWords cw, const int64_t *src, int64_t *dst, const uint32_t *fine_off, uint32_t width, uint32_t period) {
+    const uint64_t per = (uint64_t)period * width;
+    const uint64_t cells = (uint64_t)cw.T * per;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t p = c / per, e = c % per;
+        const uint32_t k = e / width, i = e % width;
+        const uint32_t r = cw.site_region[p];
+        const uint64_t local = (uint64_t)period * cw.site_pos[p] + k;
+        const uint64_t len = fine_off[r + 1] - fine_off[r];
+        dst[c] = local < len ? src[(fine_off[r] + local) * width + i] : 0;
+    }
+}
+
+// Each fine site's part of its packet's rows (`src[p][k][i]`, `k` its place in the packet), added into `dst[t][i]` (`add`)
+// or written there. `w` are the fine sites' words, `packet_off` the packets' region offsets.
+extern "C" __global__ void field_scale_scatter(FieldWords w, const int64_t *src, int64_t *dst, const uint32_t *packet_off, uint32_t width, uint32_t period, uint32_t add) {
+    const uint64_t cells = (uint64_t)w.T * width;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / width;
+        const uint32_t i = c % width;
+        const uint32_t r = w.site_region[t], local = w.site_pos[t];
+        const uint64_t p = packet_off[r] + local / period;
+        const int64_t v = src[(p * period + local % period) * width + i];
+        dst[c] = add ? fit64((wide)dst[c] + (wide)v, w.status) : v;
+    }
+}

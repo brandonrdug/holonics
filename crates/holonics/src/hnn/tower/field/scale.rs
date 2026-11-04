@@ -32,6 +32,14 @@ pub struct Scale {
     pub glue: Vec<i32>,
 }
 
+impl Scale {
+    /// The glue's offsets of `A`, `b_A`, `B` and `b_B`, and its length, over a fine field of `fine_width` (a realization's
+    /// read of [`Scale::glue`]).
+    pub fn glue_offsets(&self, fine_width: usize) -> (usize, usize, usize, usize, usize) {
+        glue_layout(self.period, fine_width, self.coarse.declaration.width)
+    }
+}
+
 /// The glue's offsets: `A`, `b_A`, `B`, `b_B` and the length.
 pub(super) fn glue_len(period: usize, fine: usize, coarse: usize) -> (usize, usize, usize, usize, usize) {
     glue_layout(period, fine, coarse)
