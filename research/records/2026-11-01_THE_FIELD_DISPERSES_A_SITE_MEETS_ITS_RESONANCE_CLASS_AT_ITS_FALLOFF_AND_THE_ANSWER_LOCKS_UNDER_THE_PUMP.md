@@ -2972,3 +2972,14 @@ code, the written words and the volume); **a located cause carried unrepaired in
 site count read from the scales, which are now one a lane, panicked on the laned state; repaired, `sites = read.len() / D`, and
 reread); **a refusal answered with a larger limit** (the arms ran at the fixed 45 minutes and their writes at their projected
 bound).
+
+[measurement] **Read longer** (run48, `_receipts/law48/run48.txt`; both arms continued 45 more card-minutes from their last
+states, the same law and binary family): at 90 card-minutes from run41's alone state the laned arm (15 laps in all) codes
+1.148 nats a place, the question 0.325, the withheld code 0.219 bits a site, its written words 442 of 640 (69.1 %), its volume
+23.4 of 512; the alone arm (24 laps) codes 1.127, the question 0.331, the withheld code 0.217, its written words 167 of 248
+(67.3 %), its volume 23.4 of 256. Over the second 45 minutes the laned arm fell 0.010 nats a place in 7 laps and the alone arm
+0.037 in 12: the alone arm's flat stretch (§16.40 above) was the joint read's lap-to-lap spread (about ±0.01), not a plateau,
+and the lane's steeper fall did not persist. **At this width and this declaration a lane does not pay for its card time**:
+its laps cost 1.45 times and fall about as fast a lap. Growth by copies stays retired at 256 (§16.39); lanes stay built as the
+width's law (each lane its own chart), with no growth in the main line until a reading says the width binds. The main line
+continues alone (run49) while the next law is built.
