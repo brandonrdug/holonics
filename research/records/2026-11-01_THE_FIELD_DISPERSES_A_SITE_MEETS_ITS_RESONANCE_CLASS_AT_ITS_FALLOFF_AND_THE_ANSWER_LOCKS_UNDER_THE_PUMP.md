@@ -2980,6 +2980,6 @@ states, the same law and binary family): at 90 card-minutes from run41's alone s
 (67.3 %), its volume 23.4 of 256. Over the second 45 minutes the laned arm fell 0.010 nats a place in 7 laps and the alone arm
 0.037 in 12: the alone arm's flat stretch (§16.40 above) was the joint read's lap-to-lap spread (about ±0.01), not a plateau,
 and the lane's steeper fall did not persist. **At this width and this declaration a lane does not pay for its card time**:
-its laps cost 1.45 times and fall about as fast a lap. Growth by copies stays retired at 256 (§16.39); lanes stay built as the
+its laps cost 1.45 times and fall about as fast a lap. No growth enters the main line at 256; lanes stay built as the
 width's law (each lane its own chart), with no growth in the main line until a reading says the width binds. The main line
 continues alone (run49) while the next law is built.
