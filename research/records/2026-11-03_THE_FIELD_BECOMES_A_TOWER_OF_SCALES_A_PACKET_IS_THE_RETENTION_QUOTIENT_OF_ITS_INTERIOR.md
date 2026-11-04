@@ -115,3 +115,17 @@ tower run precedes it (GPU first).
 - **A design in the programming language:** a packet is the scale square's restriction and its place a residue on both
   towers, not a window chosen for its size.
 - **Most certain first:** no level and no place is written first; the writer's draws stay keyed.
+
+## 7. Built and verified (November 4)
+
+[measurement] D1 is built on the host (`hnn::tower::field::scale`: `Scale`, `Field::scaled_up`, `FieldLearner::scaled_up`, the
+tower's forward between the fine ticks and its reverse through `Field::tick_return`) and on the card (the driver's level as one
+unit, `upload`, `stage`, `tick_forward`, `tick_back`, and the packets' level `tower_run`, `tower_batch`, `tower_forward`,
+`tower_back`; the kernels `field_scale_gather32`, `field_scale_gather64`, `field_scale_scatter`). The restriction and the
+prolongation are one chart each over a packet's places in order, each place with its own prolongation bias. Tests:
+`a_tower_founded_on_a_field_reads_its_faces` (faces kept at the founding, families tiling the material, the text restored) and
+`the_towers_covector_matches_its_codes_difference` (the packets' field's and the glue's covectors against the code's central
+difference). The card parity on GSM8K (the field record's `_receipts/law39/tower_parity.txt`: the founding grown in scale with
+packets of 6 after one of two ticks, the prolongation drawn): three sections and eight withheld problems with every face,
+covector entry, learner, row, share and current equal, and one write equal, in 289 s; the field alone read equal through the
+restructured driver (`alone_parity.txt`). The first reading (§4's acceptance) is the field record's §16.39.
