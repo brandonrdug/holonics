@@ -3902,7 +3902,9 @@ impl FieldLearner {
     /// halvings over 212 sections against the alone arm's one, 166 of 212 deposited, the sections' code before their step
     /// 1.628 bits a byte against 1.470, and the withheld code 0.268 to 0.294 bits a site in half a lap. Opened on its
     /// family's second moment, a lane entry's first step is an eighth of its covector over the family's own scale, the
-    /// step the trained entries beside it take.
+    /// step the trained entries beside it take; on the same state (`probe_family.txt`): 169 halvings over 219 sections,
+    /// 211 deposited, the withheld code 0.268 to 0.286. Smaller, not gone: the lane's covectors stay coherent, so its steps
+    /// grow toward the full normalized size as its first moments fill.
     pub fn laned(&self, keys: &[u8]) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner grows a lane after its held step is read");

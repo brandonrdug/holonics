@@ -1757,7 +1757,8 @@ pub(super) fn expansion_field(args: &[String], realization: &mut dyn FieldRealiz
         let (mut volume_num, mut volume_den) = (0i128, 0i128);
         for (b, p) in base.iter().zip(&perturbed) {
             let (rb, rp) = (&b[k], &p[k]);
-            let sites = rb.scale.len();
+            // A site's scales are one a lane, so its count is the read's.
+            let sites = rb.read.len() / dw;
             // The faces' difference, `x = r̂ · scale` on `2^(−32)`, released to `2^(−16)` before it is squared.
             for t in 0..sites {
                 for i in 0..dw {

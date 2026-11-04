@@ -2906,3 +2906,52 @@ Failures this could repeat, checked: **bits read as progress** (the code is read
 the written words beside it); **a refusal answered with a larger limit** (the tower arm was continued to the same wall time,
 not lengthened; its write's stop at 450 s is reported as incomplete); **a design in the programming language** (a lane is a
 register with its own normalization and clock, the branch registers' law, not a block of array slots).
+
+### 16.40 Width is lanes; a lane beside a trained field reads its faces, learns faster a lap, and leaves the volume at 24
+
+[definition; agent-inferred, November 4] The tower record's D2, built (`lane_chart`, `lane_adjoint`, `Field::laned`,
+`FieldLearner::laned`; the card's `field_chart` and `field_ratio_adjoint` lane by lane): a face of `L` lanes is charted lane by
+lane, each lane's `W = D/L` coordinates a ratio to their own power. A lane is founded after the others as a founding founds
+those rows (the encodings and the moment's chart into it drawn), with every read from it and every other write into it at
+zero, so every face is kept and every read from it has a covector at once. Growth by copies multiplies the lanes, so a copy of a
+lane reads the old lane's chart. The declaration carries its lanes (`hnn-field-v13`; run41's state was rewritten at its head
+line, its body byte-equal). Host tests (`a_lane_founded_beside_a_field_reads_its_faces`,
+`the_laned_fields_covector_matches_its_codes_difference`; field tests 62 pass); the card parity of a laned field (`D 64` in two
+lanes) and of the field alone read every face, covector entry, learner, row, share, current and write equal
+(`_receipts/law44/lane_parity.txt`).
+
+[measurement] **The lane's opening.** From run41's alone state grown to `D 512`, read for 200 s (`law44/probe_founding.txt`):
+the laned field reads the alone state's joint code exactly (1.208031 nats a place); its entries opened as a founding's (each at
+its first covector, the largest normalized step) halved 208 times over 212 sections, against the alone arm's once, and raised
+the withheld code from 0.268 to 0.294 bits a site. Every read from a fresh lane opens at once and in agreement, so the lane moved
+the trained keys, values and drives together. Opened on its families' statistics (first moment zero, second the mean of the
+family's old second moments; `law44/probe_family.txt`): 169 halvings over 219 sections, the withheld code to 0.286. Smaller,
+not gone.
+
+[measurement] **The acceptance** (§16.39, fixed before the build; `_receipts/law46/run46.txt`; the card, 45 card-minutes each
+from run41's alone state):
+
+| | width | laps | joint code, nats a place | question, nats a place | withheld code, bits a site | written words in the vocabulary | volume at the last tick |
+|---|---|---|---|---|---|---|---|
+| with a lane | 512 in 2 | 8 (277 to 307 s) | 1.158 | 0.334 | 0.239 | 332 of 484 (68.6 %) | 24.0 of 512 |
+| alone | 256 | 12 (195 to 219 s) | 1.164 | 0.302 | 0.236 | 291 of 379 (76.8 %) | 24.6 of 256 |
+
+Measured to projected: the laned arm 2,546 s against 2,700 (laps 277 to 307 s against 370), its write 590 s against 620; the
+alone arm 2,646 s, its write 340 s. The laned arm's lap 0 halved 180 times and stood 0.028 nats a place above its opening; from
+lap 3 it fell faster a lap than the alone arm (lap 3 to 7: 1.208 to 1.158 against 1.190 to 1.165) and passed it at lap 7, at
+equal laps 0.007 lower. **At equal card time it is 0.006 nats a place lower, where the acceptance asked 0.035, and its volume
+is 24, where it asked 32: the acceptance fails.**
+
+[definition; agent-inferred] What the volume says. The laned field opens at 27.3 directions (the fresh lane's encoding spreads
+the opening) and its ticks pull the cloud to 24.0; the alone field opens at 12.5 and its ticks push it to 24.6. The tick map
+carries the sites' states to about two dozen directions from either side, whatever the room: the field's capacity is set by its
+constitution's ticks, not by its width. The narrowest channel into the face is the current's return `O`, `D × 2M` with
+`2M = 64` reals over the four heads' eight modes; the pair contact's return is wider (`D × f`, `f = 256`). The next loop
+reads which half of the tick contracts the cloud: the volume after each tick's current (the pair chart's read) and after its
+pair contact (the next tick's read), on the card.
+
+Failures this could repeat, checked: **bits read as progress** (the code is read with the question's information, the withheld
+code, the written words and the volume); **a located cause carried unrepaired into a new consumer** (the expansion reader's
+site count read from the scales, which are now one a lane, panicked on the laned state; repaired, `sites = read.len() / D`, and
+reread); **a refusal answered with a larger limit** (the arms ran at the fixed 45 minutes and their writes at their projected
+bound).
