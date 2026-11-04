@@ -412,6 +412,11 @@ struct FieldWords {
     // the near pairs (`|i − j| < NEAR`) and over the far ones (the far pairs and the crowds), the host's
     // `Field::covector_shares`.
     wide *dsshare;
+    // [§16.44] Where set, a tick's blanks' rates `[p][t]` (`field_blank_rates`), which its clocks run each silent open
+    // site at, and the face they were read from (masses `[t][A]` and totals), whose shares the clocks' return reads.
+    const int64_t *blank_rate;
+    const uint64_t *blank_masses;
+    const uwide *blank_totals;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -3434,13 +3439,44 @@ __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint6
     const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
     const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
     if (from == to) {
-        return w.unresolved[s] ? 0 : (wide)w.theta[base + row_of(w, s)];
+        if (w.unresolved[s]) {
+            return w.blank_rate ? (wide)w.blank_rate[(uint64_t)p * w.T + s] : 0;
+        }
+        return (wide)w.theta[base + row_of(w, s)];
     }
     wide sum = 0;
     for (uint32_t k = from; k < to; k++) {
         sum += (wide)w.mix_share[k] * (wide)w.theta[base + w.mix_class[k]];
     }
     return rel(sum, FACE_BITS);
+}
+
+// A blank's share of class `a` in the face it was read from (the host's `shares`): `⌊(m_a 2^16 + T/2) / T⌋`, zero where
+// the face has no mass.
+__device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, uint32_t a) {
+    const uwide total = w.blank_totals[s];
+    return total == 0 ? 0 : (((uwide)w.blank_masses[s * w.A + a] << FACE_BITS) + total / 2) / total;
+}
+
+// [definition; agent-inferred, November 4, §16.44] **A blank place's expected duration** (the host's `Field::paces_with`),
+// one thread a paced head and a site: at a silent open site (unresolved, no carried mixture) `rel(Σ_a w_a c_p[a], 16)` with
+// `w_a` the shares of the face the tick before read there, the rate its clock runs it at less one; zero elsewhere.
+extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t p = c / w.T;
+        const uint64_t s = c % w.T;
+        if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1]) {
+            rates[c] = 0;
+            continue;
+        }
+        const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+        wide sum = 0;
+        for (uint32_t a = 0; a < w.A; a++) {
+            sum += (wide)blank_share(w, s, a) * (wide)w.theta[base + a];
+        }
+        rates[c] = fit64(rel(sum, FACE_BITS), w.status);
+    }
 }
 
 // [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
@@ -4074,6 +4110,14 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         if (from == to) {
             if (!w.unresolved[t]) {
                 add_wide(g + base + row_of(w, t), dk << FACE_BITS);
+            } else if (w.blank_rate) {
+                // [§16.44] A blank's rate by the shares of the face its clock read, an operand of that clock.
+                for (uint32_t a = 0; a < w.A; a++) {
+                    const uwide share = blank_share(w, t, a);
+                    if (share != 0) {
+                        add_wide(g + base + a, dk * (wide)share);
+                    }
+                }
             }
         } else {
             for (uint32_t k = from; k < to; k++) {

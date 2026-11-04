@@ -1202,7 +1202,8 @@ pub(super) fn restatements_of(pieces: &[Vec<u8>]) -> Vec<(usize, usize)> {
 /// paces, so an open site between a source and its receiver changes the gap they meet across. Each read is the realization's near field by offset
 /// ([`FieldRealization::read_near_offsets`]): every tick and head's shares of the sources 1 to 5 sites before, and the
 /// face at the site, whose share of the answer's class is the code the place costs. Writes `RESTATEMENTS.tsv` (each read;
-/// private, of the held answers) and prints the counts. A reading only.
+/// private, of the held answers) and prints the counts, and (§16.44) the writer's first state's code: every answer place
+/// and the first void open beside the question, the truth's code a class. A reading only.
 pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     use holonics::hnn::tower::field::NEAR;
     if args.len() != 11 {
@@ -1223,6 +1224,8 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
     let cells: Vec<String> = (0..d.ticks).flat_map(|k| (0..d.heads).flat_map(move |h| (1..NEAR).map(move |o| format!("t{k}h{h}d{o}")))).collect();
     let mut rows = rows_file(&out.join("RESTATEMENTS.tsv"), &format!("problem\trestatement\tstate\tat\tlength\toffset\tp_true\tp_total\t{}\n", cells.join("\t")))?;
     let (mut restatements, mut reads) = (0usize, 0usize);
+    // [§16.44] The writer's first state: every answer place and the first void open beside the question, the truth's code.
+    let (mut first_code, mut first_places) = (0i64, 0usize);
     let problems = limit.min(held.len());
     for (k, (question, answer)) in held.iter().take(limit).enumerate() {
         let (q, a) = (codec.encode(&question_text(question))?, codec.encode(answer)?);
@@ -1230,6 +1233,14 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
         classes.push(codec.void());
         if classes.len() > d.reach {
             continue;
+        }
+        let first: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+        let region = Region { classes: &classes, unresolved: &first, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let faces = realization.read_faces(field, std::slice::from_ref(&region)).map_err(|e| e.to_string())?.remove(0);
+        for (t, face) in faces.iter().enumerate().filter(|&(t, _)| first[t]) {
+            let face = face.as_ref().ok_or("an open place with no face")?;
+            first_code += holonics::hnn::tower::face_code(face.masses[classes[t]], face.total);
+            first_places += 1;
         }
         let pieces: Vec<Vec<u8>> = a.iter().map(|&c| codec.decode(&[c])).collect();
         for (c, (s, length)) in restatements_of(&pieces).into_iter().enumerate() {
@@ -1267,6 +1278,7 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
         }
     }
     println!("FIELD_RESTATE problems={problems} restatements={restatements} reads={reads} ms={}", started.elapsed().as_millis());
+    println!("FIELD_RESTATE_FIRST places={first_places} code_bits_a_class={}", bits(first_code, first_places));
     Ok(())
 }
 
