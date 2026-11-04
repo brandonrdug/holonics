@@ -411,10 +411,10 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     // each answer's places agree class for class.
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
     let t0 = std::time::Instant::now();
-    let carded = card_learner.field.sample_realized(&questions, sweeps, 0, p.codec.void(), p.seed, card, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let carded = card_learner.field.sample_realized(&questions, sweeps, 0, None, p.codec.void(), p.seed, card, &mut |_, _| true).map_err(|e| e.to_string())?;
     let card_release_ms = ms(t0.elapsed().as_nanos());
     let t0 = std::time::Instant::now();
-    let hosted = host_learner.field.sample_realized(&questions, sweeps, 0, p.codec.void(), p.seed, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let hosted = host_learner.field.sample_realized(&questions, sweeps, 0, None, p.codec.void(), p.seed, &mut HostField, &mut |_, _| true).map_err(|e| e.to_string())?;
     let mut releases_unequal = 0usize;
     for (i, (h, c)) in hosted.iter().zip(&carded).enumerate() {
         let equal = h == c;
@@ -528,7 +528,7 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     let questions: Vec<(&[usize], usize)> = p.held.iter().take(releases).map(|(q, _, _)| (q.as_slice(), p.codec.answer)).collect();
     let mut counted = Counted { inner: &mut *card, rows: 0 };
     let t0 = std::time::Instant::now();
-    let written = learner.field.sample_realized(&questions, sweeps, 0, p.codec.void(), p.seed, &mut counted, &mut |_, _| true).map_err(|e| e.to_string())?;
+    let written = learner.field.sample_realized(&questions, sweeps, 0, None, p.codec.void(), p.seed, &mut counted, &mut |_, _| true).map_err(|e| e.to_string())?;
     let ns = t0.elapsed().as_nanos();
     let release_worst = (ns, counted.rows.max(1));
     println!(

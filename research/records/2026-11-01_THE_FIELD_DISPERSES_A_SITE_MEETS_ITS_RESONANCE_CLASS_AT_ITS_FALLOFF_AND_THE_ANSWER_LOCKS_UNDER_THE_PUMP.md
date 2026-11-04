@@ -3158,3 +3158,43 @@ standing at a fixed step, not as learning); **an authored routine standing in fo
 restatements only to choose which places to read; nothing in the field reads it); **a located cause carried unrepaired into a new consumer** (the misread
 coherence is withdrawn at its reading, not carried into the flock or the Gram reading); **a refusal answered with a larger
 limit** (every run ended at its fixed bound).
+
+### 16.43 The written restatements miss by their count, and a slip priced on its near field does not repair it
+
+[measurement; agent-inferred, November 4] (`_receipts/law56/`: `written_restatements.py`, `writes.txt`, the launch scripts.)
+Main52's three writes restate 62 results after `>>` (`=C>>D`, C and D runs of digits, `.`, `,` and `$`): 40 are exact
+(5 of 13, 12 of 18 and 23 of 31 by segment), and every one of the 22 others differs from its result by dropped or added
+characters (15 by one, 4 by two, 3 by three or four), none by a substituted digit in its place. The writer's revisits
+(§16.36) change a place's class and never a count, so a passage whose count is off at a place cannot be repaired by them.
+
+[definition; agent-inferred; retired below] **The slip** (`FIELD_SLIP`, `Field::sample_realized`'s `slip_places`, the
+strand's shear beside the substitution's turn): at a revisited place the strand may also drop the place or open one
+before it, every later place moving with it, the three configurations priced by the field's own code over the places
+around it, each read alone open (`F_c = Σ_(s ∈ W_c) −log₂ p̂_s(x_s)`), one drawn from `2^(−F_c)` at temperature one. From
+main52 segment 3's last state, the six held problems, 64 sweeps (the same first pass, its draws not reading the slip) and
+one refine pass, without and with the slip, the same keyed draws:
+
+| pass | restatements exact | moves drawn: stay / delete / insert | written places | wall time |
+|---|---|---|---|---|
+| without the slip | 9 of 15 | | 2,009 | 45 s |
+| the slip, windows by position | 8 of 16 | not read | 2,213 | 977 s |
+| with importance weights (a stay and an insert stand for every class their drawn place could have taken) | 4 of 15 | 1,454 / 142 / 417 | 2,282 | 954 s |
+| and the same places in each configuration | 7 of 15 | 1,507 / 206 / 295 | 2,096 | 982 s |
+
+The development read put a slip's revisit step at 2.85 s (45 steps in 128 s) against 0.09 s without it; each pass ran
+within its 1,800 s deadline. The first pricing compared shifted places (a fixed window of positions holds different
+places in each configuration), the second charged a stay and an insert for the surprise of a class the move did not
+choose; with both repaired the slip still draws a delete or an insert on a quarter of the revisits (501 of 2,008), and
+restates fewer results exactly than the substitution alone. [agent-inferred] Why: in the writer's state each place costs
+bits (§16.42: 3 to 5 with the answer around it blank), and a shift changes every window term by amounts of that order, so
+the window's price of a slip is mostly the passage's own noise; a count cannot be priced locally while the passage around
+it is still unwritten. The slip is retired (its code with these readings at the commit that built it); the cause lies
+upstream of the writer, in what a blank place carries while the places around it are written: the unified-theory reading
+of November 4 (`a_blank_place_is_a_potential`) measures that a blank runs the turned clocks at the bare rate while a
+written answer byte runs at 1.62 and 1.91, so a blank gap reads contracted, and derives the law that a blank carries its
+expected duration `κ_h(t) = Σ_a p_t(a) κ_h(a)` in every read, training and writing alike. That is the next law.
+
+Failures this could repeat, checked: **bits read as progress** (the slip is judged by the restatements written, not by
+its prices); **a located cause carried unrepaired into a new consumer** (the writer's repair is retired once its cause
+is located upstream, not tuned further); **an authored routine standing in for learning** (the slip read no text rule;
+the restatements only choose what is counted).

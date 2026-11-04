@@ -1,0 +1,44 @@
+main52/seg1_write restatements 13 1 dropped or added=5 2 dropped or added=2 3 dropped or added=1 equal=5
+main52/seg2_write restatements 18 1 dropped or added=5 2 dropped or added=1 equal=12
+main52/seg3_write restatements 31 1 dropped or added=5 2 dropped or added=1 3 dropped or added=1 4 dropped or added=1 equal=23
+slip56/plain restatements 15 1 dropped or added=6 equal=9
+slip56/slip restatements 16 1 dropped or added=3 1 substituted=2 2 dropped or added=1 3 dropped or added=2 equal=8
+slip57/slip restatements 15 1 dropped or added=8 2 dropped or added=1 4 dropped or added=2 equal=4
+slip58/slip restatements 15 1 dropped or added=4 2 dropped or added=2 4 dropped or added=2 equal=7
+slip56/dev.log: FIELD_SAMPLE_SWEEP done=0 of=64 ms=49
+slip56/dev.log: FIELD_SAMPLE_SWEEP done=64 of=1293 ms=6634
+slip56/dev.log: FIELD_SAMPLE_SWEEP done=80 of=1293 ms=52650
+slip56/dev.log: FIELD_SAMPLE_SWEEP done=96 of=1293 ms=98264
+slip56/dev.log: FIELD_SAMPLE_SWEEP done=112 of=1293 ms=143610
+slip56/dev.log: FIELD_SAMPLE problems=6 sweeps=64 stopped=115 written=2057 held=1600 lambda=651 friction=2355 foil_lambda=645 foil_friction=2367 own_wins=4 foil_wins=2 ms=151960
+slip56/dev.log: MEASURE lap=dev rc=0 wall_s=152.4 peak_rss_kib=353112
+slip56/plain.log: FIELD_SAMPLE_SWEEP done=0 of=64 ms=49
+slip56/plain.log: FIELD_SAMPLE_SWEEP done=64 of=1293 ms=6390
+slip56/plain.log: FIELD_SAMPLE_SWEEP done=80 of=1293 ms=7926
+slip56/plain.log: FIELD_SAMPLE_SWEEP done=96 of=1293 ms=9456
+slip56/plain.log: FIELD_SAMPLE_SWEEP done=112 of=1293 ms=10894
+slip56/plain.log: FIELD_SAMPLE problems=6 sweeps=64 stopped=- written=2009 held=1600 lambda=646 friction=2317 foil_lambda=639 foil_friction=2331 own_wins=4 foil_wins=2 ms=45042
+slip56/plain.log: MEASURE lap=plain rc=0 wall_s=45.4 peak_rss_kib=244296
+slip56/slip.log: FIELD_SAMPLE_SWEEP done=0 of=64 ms=64
+slip56/slip.log: FIELD_SAMPLE_SWEEP done=64 of=1293 ms=6551
+slip56/slip.log: FIELD_SAMPLE_SWEEP done=80 of=1293 ms=52783
+slip56/slip.log: FIELD_SAMPLE_SWEEP done=96 of=1293 ms=98208
+slip56/slip.log: FIELD_SAMPLE_SWEEP done=112 of=1293 ms=144665
+slip56/slip.log: FIELD_SAMPLE problems=6 sweeps=64 stopped=- written=2213 held=1600 lambda=666 friction=2481 foil_lambda=661 foil_friction=2491 own_wins=4 foil_wins=2 ms=976952
+slip56/slip.log: MEASURE lap=slip rc=0 wall_s=977.4 peak_rss_kib=345808
+slip57/slip.log: FIELD_SAMPLE_SWEEP done=0 of=64 ms=47
+slip57/slip.log: FIELD_SAMPLE_SWEEP done=64 of=1293 ms=7452
+slip57/slip.log: FIELD_SAMPLE_SWEEP done=80 of=1293 ms=54896
+slip57/slip.log: FIELD_SAMPLE_SWEEP done=96 of=1293 ms=101433
+slip57/slip.log: FIELD_SAMPLE_SWEEP done=112 of=1293 ms=148526
+slip57/slip.log: FIELD_SAMPLE_SLIP_MOVES stay=1454 delete=142 insert=417 delete_price_millibits=32305074 insert_price_millibits=15115259 delete_cheaper=164 insert_cheaper=440
+slip57/slip.log: FIELD_SAMPLE problems=6 sweeps=64 stopped=- written=2282 held=1600 lambda=676 friction=2530 foil_lambda=665 foil_friction=2552 own_wins=4 foil_wins=2 ms=953461
+slip57/slip.log: MEASURE lap=slip rc=0 wall_s=953.9 peak_rss_kib=349804
+slip58/slip.log: FIELD_SAMPLE_SWEEP done=0 of=64 ms=48
+slip58/slip.log: FIELD_SAMPLE_SWEEP done=64 of=1293 ms=7664
+slip58/slip.log: FIELD_SAMPLE_SWEEP done=80 of=1293 ms=57246
+slip58/slip.log: FIELD_SAMPLE_SWEEP done=96 of=1293 ms=104791
+slip58/slip.log: FIELD_SAMPLE_SWEEP done=112 of=1293 ms=150798
+slip58/slip.log: FIELD_SAMPLE_SLIP_MOVES stay=1507 delete=206 insert=295 delete_price_millibits=28948807 insert_price_millibits=17850754 delete_cheaper=212 insert_cheaper=315
+slip58/slip.log: FIELD_SAMPLE problems=6 sweeps=64 stopped=- written=2096 held=1600 lambda=647 friction=2402 foil_lambda=652 foil_friction=2392 own_wins=4 foil_wins=2 ms=981482
+slip58/slip.log: MEASURE lap=slip rc=0 wall_s=981.9 peak_rss_kib=354372
