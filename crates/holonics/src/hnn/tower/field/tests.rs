@@ -1464,3 +1464,19 @@ fn the_laned_fields_covector_matches_its_codes_difference() {
     eprintln!("LANE_COVECTOR_PROBES read={read} on_a_seam={seams}");
     assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
 }
+
+/// [measurement; §16.41] **A step's first-order change is its code's change in the small**: on the tiny field with every
+/// family shaped, a section's step taken at a small rate changes the section's code by what [`predicted_change`] reads,
+/// within a fifth (the second-order term falls with the step's square), and both are falls.
+#[test]
+fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
+    for still in [0usize, 1, 2] {
+        let mut learner = FieldLearner::new(shaped(still), 14);
+        let receipt = learner.section(&[region()]).unwrap();
+        let predicted = receipt.predicted.expect("a predicted change within its carrier") as i128;
+        let change = receipt.change as i128;
+        eprintln!("STEP_PARABOLA still={still} predicted={predicted} change={change}");
+        assert!(predicted < 0 && change < 0, "still {still}: predicted {predicted}, change {change}");
+        assert!((change - predicted).abs() * 5 <= predicted.abs(), "still {still}: predicted {predicted}, change {change}");
+    }
+}

@@ -817,6 +817,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     }
     // [measurement; agent-inferred, November 3, §16.30] `FIELD_HELD_READ`: each step held and read on the next section before
     // it stands (the tower's acceptance 77, [`FieldLearner::read_held`]), a declared comparison with the field's law.
+    let parabola = std::env::var_os("FIELD_STEP_PARABOLA").is_some();
+    if parabola {
+        println!("FIELD_STEP_PARABOLA rate={}", learner.rate_bits);
+    }
     if std::env::var_os("FIELD_HELD_READ").is_some() {
         learner.read_held = true;
         println!("FIELD_HELD_READ");
@@ -889,16 +893,39 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 held_down += usize::from(next.halvings > 0 && !next.refused);
                 refused += usize::from(next.refused);
             }
+            // [measurement; §16.41] The step's parabola: its first-order change and the change read at its full size, in
+            // millionths of a bit a site (signed), and the rate it was taken at.
+            let micro = |c: i64| if receipt.sites == 0 { 0 } else { (c as i128 * 1_000_000) / ((receipt.sites as i128) << 20) };
+            let rate_taken = learner.rate_bits;
             println!(
-                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} length={length} ms={}",
+                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} rate={rate_taken} length={length} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
                 bits(receipt.code_after, receipt.sites),
                 receipt.halvings,
                 receipt.deposited,
                 next_text(receipt.next),
+                receipt.predicted.map_or("-".to_string(), |p| micro(p).to_string()),
+                micro(receipt.change),
                 section_start.elapsed().as_millis()
             );
+            // [agent-inferred, November 4, §16.41] `FIELD_STEP_PARABOLA`: the step's size follows its section's own parabola
+            // `e(μ) = aμ + bμ²` (`a` the first-order change, `a + b` the change read at the full step), one octave a section
+            // toward its least `μ* = −a/2b`: the rate falls a bit (the step doubles) where the full step stood and `μ* ≥ 2` or
+            // no curvature is read (`b ≤ 0`), and rises a bit where the step was halved, stood nowhere, or `μ* < ½`; a declared
+            // comparison with the fixed rate.
+            if parabola {
+                if let Some(a) = receipt.predicted.filter(|&a| a < 0) {
+                    let (a, b) = (a as i128, receipt.change as i128 - a as i128);
+                    let grow = receipt.deposited && receipt.halvings == 0 && (b <= 0 || -a >= 4 * b);
+                    let shrink = !receipt.deposited || receipt.halvings > 0 || (b > 0 && -a < b);
+                    if grow && learner.rate_bits > 1 {
+                        learner.rate_bits -= 1;
+                    } else if shrink && !grow {
+                        learner.rate_bits += 1;
+                    }
+                }
+            }
             let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
             if over_lap || over_run {
                 // The pending step is judged on the withheld problems as a lap's last step is, so

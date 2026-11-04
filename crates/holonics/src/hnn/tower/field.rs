@@ -3664,6 +3664,11 @@ pub struct FieldReceipt {
     pub halvings: u32,
     pub deposited: bool,
     pub next: Option<FieldNext>,
+    /// [measurement; §16.41] The step's first-order change of the section's code at its full size, `Σ_i g_i Δθ_i` on the
+    /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change the certificate read there: the
+    /// section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
+    pub predicted: Option<i64>,
+    pub change: i64,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -3724,6 +3729,24 @@ fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
     } else {
         fewer_bits_weighed(&old.pairs, &new.pairs, spans)
     }
+}
+
+/// [measurement; agent-inferred, November 4, §16.41] **A step's first-order change of the code it was fit on**: `Σ_i g_i Δθ_i`
+/// with `Δθ = −step` at its full size and `g` the section's covector as its return gives it, on the codes' `2^(−20)` bits, a
+/// unit of `g Δθ` standing at `2^(−(40 + grain − 20))` bits on the material's families and `2^(−(24 + grain − 20))` on the
+/// faces' (the covector's grains, as `covector_matches_the_codes_difference` reads them); `None` where a product or the sum
+/// passes its carrier. With the change the certificate reads at the full step it is the section's own parabola.
+fn predicted_change(field: &Field, g: &[i128], step: &[i128]) -> Option<i64> {
+    let mut total = 0i128;
+    for &(start, len, grain) in &field.families_all() {
+        let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+        let mut family = 0i128;
+        for i in start..start + len {
+            family = family.checked_add(g[i].checked_mul(-release(step[i], 0))?)?;
+        }
+        total = total.checked_add(family >> shift)?;
+    }
+    i64::try_from(total).ok()
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
@@ -4007,6 +4030,7 @@ impl FieldLearner {
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
+        let raw = g.clone();
         for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -4028,17 +4052,18 @@ impl FieldLearner {
                 step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
             }
         }
+        let predicted = predicted_change(&self.field, &raw, &step);
         let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
-        let halvings = scale.halvings;
+        let (halvings, change) = (scale.halvings, scale.change);
         let Some((candidate, faces_new)) = scale.standing else {
-            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next });
+            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change });
         };
         let code_after = code_of(&compared(&faces_new, regions)?, &spans);
         self.field = candidate;
         if self.read_held {
             self.held = Some(HeldStep { step, halvings });
         }
-        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next })
+        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next, predicted, change })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
