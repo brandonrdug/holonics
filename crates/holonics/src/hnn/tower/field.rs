@@ -3890,9 +3890,19 @@ impl FieldLearner {
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
-    /// draws read from the founding key stream past every draw read before. Every old entry keeps its moments; the lane's
-    /// entries open at zero, each at its own first nonzero covector, as a founding's do. The rate is kept: no coordinate
-    /// is shared among copies, so each steps as it did.
+    /// draws read from the founding key stream past every draw read before. Every old entry keeps its moments; each of the
+    /// lane's entries opens on its family's statistics, its first moment at zero and its second at the mean of its
+    /// family's old second moments (a family no covector has reached opens at zero, at its own first covector, as a
+    /// founding's entries do). The rate is kept: no coordinate is shared among copies, so each steps as it did.
+    ///
+    /// Why the family's statistics and not the founding's opening: an entry opened at its first covector takes the
+    /// largest normalized step, `2^(grain − rate)` with the covector's sign, and every read from a fresh lane opens at
+    /// once and in agreement, so the lane moved the trained keys, values and drives together by about a tenth of their
+    /// unit a section. Measured from run41's alone state grown to `D 512` (`_receipts/law44/probe_founding.txt`): 208
+    /// halvings over 212 sections against the alone arm's one, 166 of 212 deposited, the sections' code before their step
+    /// 1.628 bits a byte against 1.470, and the withheld code 0.268 to 0.294 bits a site in half a lap. Opened on its
+    /// family's second moment, a lane entry's first step is an eighth of its covector over the family's own scale, the
+    /// step the trained entries beside it take.
     pub fn laned(&self, keys: &[u8]) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner grows a lane after its held step is read");
@@ -3900,7 +3910,19 @@ impl FieldLearner {
         let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the lane's draws"))?;
         let (field, from) = self.field.laned(rest)?;
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
-        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
     }

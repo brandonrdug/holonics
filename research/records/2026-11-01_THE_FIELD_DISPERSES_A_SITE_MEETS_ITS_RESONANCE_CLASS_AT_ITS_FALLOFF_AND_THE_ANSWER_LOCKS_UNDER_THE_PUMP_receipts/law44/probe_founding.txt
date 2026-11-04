@@ -1,0 +1,18 @@
+# lane45 first read: the lane's moments opened as a founding's (at each entry's first covector)
+# binary sha f4475a212efb499691e84d6cd9e2ea46a391a82e4ad2c7f3e39b10d827750912 from b81f793d97b5eed97fa1cf607fe808f54171c72873663f8b3185c274af53e703 started 04:25:07
+FIELD_LANE lap=-1 width=512 lanes=2 rate=11 material=1019128 ms=323
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.208031 foil_nats_a_place=1.530005 information_nats_a_place=0.321975 own_nats_a_word=6.721122 information_nats_a_word=1.791372
+FIELD_UNSEEN lap=-1 code=0.268 sites=36763 next=- ms=35027
+FIELD_STOPPED lap=0 sections=212/413 reason=run sites=1979192 before=1.628 after=1.582 deposited=166 halvings=208 next_halved=0 next_refused=0 lap_ms=170930 ms=205958
+FIELD_UNSEEN lap=0 stopped code=0.294 sites=36763 next=- ms=205958
+MEASURE lap=probe rc=0 wall_s=206.4 peak_rss_kib=605928
+LANE_PROBE sections=212 median_ms=727 max_ms=1898
+LANE_PROBE exit 04:28:34
+halvings 0 sections 119
+halvings 1 sections 60
+halvings 3 sections 13
+halvings 4 sections 6
+halvings 5 sections 6
+halvings 6 sections 4
+halvings 7 sections 3
+halvings 10 sections 1

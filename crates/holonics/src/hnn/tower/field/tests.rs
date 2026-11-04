@@ -1374,7 +1374,8 @@ fn the_towers_covector_matches_its_codes_difference() {
 
 /// [definition; §16.40] **A lane founded beside a field keeps every face**: the laned field (one lane, then two, past the
 /// first) reads every face the field read, its draws counted are the draws read, its families tile its material and its
-/// text restores it; the laned learner keeps every old moment, opens the lane's at zero and keeps its rate; and every read
+/// text restores it; the laned learner keeps every old moment, opens the lane's on its family's second moment and keeps its
+/// rate; and every read
 /// from the lane has a covector at once (the key chart's columns over the lane among them).
 #[test]
 fn a_lane_founded_beside_a_field_reads_its_faces() {
@@ -1412,7 +1413,10 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
     let (l, old) = (laned.field.layout().clone(), learner.field.layout().clone());
     assert_eq!(laned.first[l.read_bias], learner.first[old.read_bias]);
     assert_eq!(laned.first[l.enc + 16 + 3], learner.first[old.enc + 8 + 3], "an encoding row's old entries keep their moments");
-    assert_eq!((laned.first[l.enc + 16 + 8], laned.second[l.enc + 16 + 8]), (0, 0), "the lane's entries open at zero");
+    let enc_old = &learner.second[old.enc..old.enc + (learner.field.declaration.alphabet + 1) * 8];
+    let mean = enc_old.iter().map(|v| v / enc_old.len() as i128).sum::<i128>() + enc_old.iter().map(|v| v % enc_old.len() as i128).sum::<i128>() / enc_old.len() as i128;
+    assert!(mean > 0);
+    assert_eq!((laned.first[l.enc + 16 + 8], laned.second[l.enc + 16 + 8]), (0, mean), "the lane's entries open on their family's statistics");
     let back = FieldLearner { read_held: laned.read_held, ..FieldLearner::from_text(&laned.to_text()).unwrap() };
     assert_eq!(back, laned);
 }
