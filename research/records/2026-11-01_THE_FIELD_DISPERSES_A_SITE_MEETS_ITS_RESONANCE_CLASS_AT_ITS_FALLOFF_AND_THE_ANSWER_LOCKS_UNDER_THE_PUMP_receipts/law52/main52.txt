@@ -29,3 +29,23 @@ MEASURE lap=seg1_write rc=0 wall_s=238.7 peak_rss_kib=246652
 WORDS written=286 in_training_vocabulary=211 share=0.738
 SEGMENT 1 done 19:50:21
 # seg2 from 8c9bb41a3bcf2c08d3879c4a99892d31a3474cb0afefe6966b2475146e01460c started 19:50:21 FIELD_STEP_TRANSFER=1
+FIELD_STEP_TRANSFER rate=16
+FIELD_LAPS_HELD lap=11 reason=time left=223904 bound=260000 ms=2476096
+MEASURE lap=seg2 rc=0 wall_s=2476.5 peak_rss_kib=614612
+-1 1.011638 0.342814;0 1.012102 0.343519;1 1.012367 0.341610;2 1.011306 0.342637;3 1.012556 0.348357;4 1.011746 0.342893;5 1.012169 0.343520;6 1.012641 0.342154;7 1.012605 0.344748;8 1.014880 0.342297;9 1.011701 0.340856;10 1.012816 0.342055;
+0:0:-1:16 1:0:1:17 2:0:1:16 3:-28:-1:15 4:0:1:16 5:882:0:15 6:1135:0:15 7:916:0:15 8:951:0:15 9:733:0:15 10:441:-1:15 
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3290 held=1600 lambda=839 friction=3212 foil_lambda=770 foil_friction=3350 own_wins=4 foil_wins=2 ms=367889
+MEASURE lap=seg2_write rc=0 wall_s=368.2 peak_rss_kib=243936
+WORDS written=498 in_training_vocabulary=355 share=0.713
+SEGMENT 2 done 20:42:49
+# seg3 from f2e71c9b8a64704545a3dbf40450525a2a3f2f950792ccab91b0f417001cf6c8 started 20:42:49 FIELD_STEP_TRANSFER=1
+FIELD_STEP_TRANSFER rate=15
+FIELD_LAPS_HELD lap=11 reason=time left=238071 bound=260000 ms=2461929
+MEASURE lap=seg3 rc=0 wall_s=2462.3 peak_rss_kib=620212
+-1 1.012816 0.342055;0 1.013605 0.340750;1 1.012119 0.347685;2 1.012273 0.342220;3 1.010963 0.343046;4 1.011057 0.342374;5 1.009629 0.341349;6 1.010348 0.343423;7 1.009878 0.338392;8 1.011275 0.345474;9 1.009583 0.342680;10 1.010166 0.339800;
+0:0:-1:15 1:0:1:16 2:701:-1:15 3:0:-1:16 4:0:1:17 5:481:-1:16 6:0:1:17 7:0:1:16 8:871:0:15 9:1634:1:15 10:761:0:14 
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=4447 held=1600 lambda=931 friction=4185 foil_lambda=795 foil_friction=4457 own_wins=3 foil_wins=3 ms=432183
+MEASURE lap=seg3_write rc=0 wall_s=432.5 peak_rss_kib=242932
+WORDS written=672 in_training_vocabulary=524 share=0.780
+SEGMENT 3 done 21:31:40
+MAIN exit 21:31:40

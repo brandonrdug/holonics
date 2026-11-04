@@ -3114,7 +3114,8 @@ timing (copies fail at their ends, at offsets 4 and 5), read on segment 1's stat
 
 Segments 2 and 3 read the floor as said: 1.012 to 1.013 over segment 2's eleven laps and 1.013 to 1.010 to 1.011 over
 segment 3's (2,477 and 2,462 s against 2,760 s; peak resident 600 and 606 MiB), the step walking between `2^(−15)` and
-`2^(−17)`.
+`2^(−17)`. Their writes: words in the training vocabulary 355 of 498 (71.3%) and 524 of 672 (78.0%), the own question's
+release beating its foil's on 4 and 3 of the six held problems, 368 and 433 s against 720 s.
 
 **The restated result is placed at its exact offset; its ends fail where the writer has not yet written its source.** In
 GSM8K's `<<E=C>>D` the result C is written again as D after `>>`, so D's `k`-th site must read C's `k`-th `|C| + 2` sites
