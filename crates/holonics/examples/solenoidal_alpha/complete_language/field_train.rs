@@ -1194,9 +1194,12 @@ pub(super) fn restatements_of(pieces: &[Vec<u8>]) -> Vec<(usize, usize)> {
 /// inside the near field for `|C| ≤ 3`, where the fine rings' skin leaves almost nothing; the written answers miss
 /// mostly at D's ends). For each restatement in the first `COUNT` held answers, three sites are read: D's first place,
 /// its last, and the place after it (where the source at the restatement's offset is the `>` that ends it). Each is
-/// read in three of the writer's states, beside its question and the rest of its answer: alone open (`alone`); with D
+/// read in five of the writer's states, beside its question and the rest of its answer: alone open (`alone`); with D
 /// and the place after it open (`restated_open`: the result written, its restatement not); with C, D and the place
-/// after it open (`both_open`; the `>>` between them written). Each read is the realization's near field by offset
+/// after it open (`both_open`; the `>>` between them written); with the `>>`, D and the place after it open
+/// (`between_open`: the result written, the places between it and its restatement not); and with every answer site but
+/// C's open (`answer_open`). The turned heads read a source across their learned clock, whose gaps are the sites'
+/// paces, so an open site between a source and its receiver changes the gap they meet across. Each read is the realization's near field by offset
 /// ([`FieldRealization::read_near_offsets`]): every tick and head's shares of the sources 1 to 5 sites before, and the
 /// face at the site, whose share of the answer's class is the code the place costs. Writes `RESTATEMENTS.tsv` (each read;
 /// private, of the held answers) and prints the counts. A reading only.
@@ -1233,7 +1236,15 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
             restatements += 1;
             // The answer's sites: C before the close at `s`, the `>>` at `s` and `s + 1`, then D and the place after it.
             let (result, restated) = (q.len() + s - length..q.len() + s, q.len() + s + 2..q.len() + s + 3 + length);
-            let states: [(&str, Vec<usize>); 3] = [("alone", Vec::new()), ("restated_open", restated.clone().collect()), ("both_open", result.clone().chain(restated.clone()).collect())];
+            let between = q.len() + s..q.len() + s + 2;
+            let answer_rest: Vec<usize> = (q.len()..classes.len()).filter(|t| !result.contains(t)).collect();
+            let states: [(&str, Vec<usize>); 5] = [
+                ("alone", Vec::new()),
+                ("restated_open", restated.clone().collect()),
+                ("both_open", result.clone().chain(restated.clone()).collect()),
+                ("between_open", between.chain(restated.clone()).collect()),
+                ("answer_open", answer_rest),
+            ];
             for (state, open) in &states {
                 for (at, place) in [("first", s + 2), ("last", s + 1 + length), ("stop", s + 2 + length)] {
                     let i = q.len() + place;

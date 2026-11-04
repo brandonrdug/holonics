@@ -3133,16 +3133,25 @@ its last and the place after it, in three of the writer's states (`restatements.
 | D and the place after it open, C written | 0.001 to 0.016 | 0.003 to 0.397 | 0.053 to 0.130 | 0.35 to 0.44 |
 | C and D open, `>>` written | 0.93 to 1.33 | 0.78 to 1.33 | 0.04 to 0.09 | 0 (the source is open) |
 
-(each range over `|C|` = 1, 2, 3 and 4 or more.) The turned heads put 37 to 45% of their rows on exactly the offset
+| the `>>`, D and the place after it open, C written | 0.16 to 1.85 | 0.16 to 0.83 | 0.10 to 0.27 | 0.33 to 0.44 at D's places |
+| every answer site but C open | 2.6 to 5.0 | 2.4 to 5.0 | 4.0 to 4.6 | 0.15 to 0.30, and 0.26 to 0.30 one place further back |
+
+(each range over `|C|` = 1, 2, 3 and 4 or more; the last two states from a second read, `restatements55.txt`, 5,895 reads
+in 59.9 s against a projection of 60 s.) The turned heads put 37 to 45% of their rows on exactly the offset
 `|C| + 2` and almost nothing on its neighbours: the field tells offsets 3, 4 and 5 apart sharply where it reads, through
 its learned clocks (the paces; the skin is read across the clock's variation, not the raw distance). The skin's premise does
 not hold on this state, and the near-field edge is not built (also because its `max(0, d − 5)` is a hard edge, which
 Brandon's November 4 lens bars from a law). Where C is written, D's places cost under a fortieth of a bit; where C and D are
 both open, each of D's places costs about a bit, the price of the result itself (the field cannot yet compute `E`), and the
-first of the two drawn is a guess the second must then follow. The writer draws its places in one keyed random order
-(§16.27), so C and D are often both open when one of them is drawn. [agent-inferred] The misses at D's ends are the writer's
-timing, not the field's reach: the next law is when a place is drawn relative to its sources, read with the writer's own
-states.
+first of the two drawn is a guess the second must then follow. With only the `>>` between them blank the
+turned heads still meet the exact offset; with the whole answer blank around a written result, a restatement's place costs
+3 to 5 bits and its weight splits between the right digit and the one a place further back: a place drawn where nothing
+around it is written does not know where in the restatement it stands, since only what is written around a place tells it
+its place (no gap is measured without a comparison). These are the written answers' misses, "right digits, one place off".
+The writer draws its places in one keyed random order (§16.27), and in its first sweep nearly every place is drawn into a
+blank surround, each open site silent (no face carried, a unit gap in the turned heads' clocks). [agent-inferred] The misses
+at D's ends are the writer's timing, not the field's reach: the next law is what an open place carries while the places
+around it are still being written.
 
 Failures this could repeat, checked: **bits read as progress** (the main line's fall is read as released temperature, by its
 standing at a fixed step, not as learning); **an authored routine standing in for learning** (the read names the
