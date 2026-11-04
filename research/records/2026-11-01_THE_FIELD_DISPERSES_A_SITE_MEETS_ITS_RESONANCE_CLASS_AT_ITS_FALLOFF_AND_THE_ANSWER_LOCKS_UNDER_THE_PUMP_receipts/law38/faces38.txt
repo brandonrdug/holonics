@@ -1,0 +1,14 @@
+# binary sha 195b9cc6257f8e0240b693782dde373014b712b727583733a6602e2124d30a4f
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=121 equal=true
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=67 host_ms=69543 card_ms=674 elapsed_ms=294244
+MEASURE lap=parity rc=0 wall_s=307.3 peak_rss_kib=1615828
+near: laps 130 onset 73 joint_below_1 87 joint_last 0.119093 | 9:2.319/-0.001 19:2.303/0.000 29:2.293/-0.000 39:2.299/-0.000 49:2.292/0.000 59:2.304/0.001 69:2.285/0.006 79:2.001/0.532 89:0.714/7.256 99:0.084/13.850 109:0.040/13.877 119:0.057/10.200 129:0.119/9.826
+far: laps 84 onset None joint_below_1 None joint_last 2.272012 | 9:2.353/-0.000 19:2.339/0.000 29:2.313/-0.000 39:2.302/0.000 49:2.300/-0.000 59:2.312/-0.000 69:2.288/-0.000 79:2.276/0.000
+  gsm8k lap -1 joint 6.930737 information 0.000000
+  gsm8k lap 0 joint 3.409721 information -0.000253
+  gsm8k lap 1 joint 3.140944 information 0.005217
+  gsm8k lap 2 joint 3.099834 information 0.002710
+  gsm8k lap 3 joint 2.986386 information 0.009211
+  gsm8k lap 4 joint 2.949926 information 0.009559
+  lap 0 ms 121148   lap 1 ms 125616   lap 2 ms 124360   lap 3 ms 125715   lap 4 ms 120098 
+FACES exit

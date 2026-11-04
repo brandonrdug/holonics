@@ -1,0 +1,14 @@
+# binary sha 498c1b706c0f912faed6df5ad76a277657c0b2e232ada399619855257e961b37
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=12 equal=true
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=81 host_ms=63720 card_ms=522 elapsed_ms=283476
+MEASURE lap=parity rc=0 wall_s=296.2 peak_rss_kib=1972080
+far: laps 100 onset 79 joint_below_1 94 joint_last 0.267934 | 9:2.372/0.000 19:2.330/0.000 29:2.308/0.000 39:2.307/0.000 49:2.300/0.000 59:2.314/0.000 69:2.274/0.002 79:2.226/0.114 89:1.983/0.611 99:0.268/7.421
+near: laps 130 onset 78 joint_below_1 93 joint_last 0.050581 | 9:2.313/0.000 19:2.299/0.001 29:2.299/0.000 39:2.305/0.000 49:2.294/-0.000 59:2.301/0.001 69:2.294/0.001 79:2.199/0.229 89:1.611/1.827 99:0.157/9.842 109:0.097/11.504 119:0.037/12.563 129:0.051/12.798
+  gsm8k lap -1 joint 6.930737 information 0.000000
+  gsm8k lap 0 joint 3.478642 information -0.005065
+  gsm8k lap 1 joint 3.220853 information 0.001709
+  gsm8k lap 2 joint 3.151823 information 0.000283
+  gsm8k lap 3 joint 3.040223 information 0.011906
+  gsm8k lap 4 joint 2.997839 information 0.013702
+  lap 0 ms 112718   lap 1 ms 108920   lap 2 ms 105820   lap 3 ms 106310   lap 4 ms 106768 
+FACES exit

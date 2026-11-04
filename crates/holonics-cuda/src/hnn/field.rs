@@ -1423,8 +1423,8 @@ impl<'c> CardField<'c> {
     #[allow(clippy::type_complexity)]
     #[allow(clippy::too_many_arguments)]
     fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
-        if field.scale.is_some() != tower.is_some() || (keep.is_some() && tower.is_some()) {
-            return Err(TowerError::Refused("a tower is read with its packets' level, and its weight rows are not read"));
+        if field.scale.is_some() != tower.is_some() {
+            return Err(TowerError::Refused("a tower is read with its packets' level"));
         }
         let card = self.card;
         let d = field.declaration;

@@ -549,6 +549,19 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         micro_bits(foil_sum - own_sum, sites),
         started.elapsed().as_millis()
     );
+    // [measurement; agent-inferred, November 4, the tower record's D5] The same code in nats (the comparison's natural unit,
+    // `ln 2` its navigator's face on `2^(−30)`), as a density on two partitions: a place, and a word crossing (a word's first
+    // byte, the receiver's packet of content: a word's first letter carries most of its information and its spelling little).
+    let words: i128 = problems.iter().map(|(_, a, _)| word_crossings(&codec.decode(a)) as i128).sum();
+    let ln2 = field.ln2();
+    println!(
+        "FIELD_JOINT_NATS lap={lap} places={sites} words={words} own_nats_a_place={} foil_nats_a_place={} information_nats_a_place={} own_nats_a_word={} information_nats_a_word={}",
+        micro_nats(own_sum * ln2, sites),
+        micro_nats(foil_sum * ln2, sites),
+        micro_nats((foil_sum - own_sum) * ln2, sites),
+        micro_nats(own_sum * ln2, words),
+        micro_nats((foil_sum - own_sum) * ln2, words)
+    );
     per.sort_unstable();
     let q = |f: usize| per.get((f * per.len()) / 4).copied().unwrap_or(0) as i128;
     println!(
@@ -637,6 +650,16 @@ fn bits(code: i64, n: usize) -> String {
 
 /// A rate `num / (sites · 2^20)` bits as a signed decimal to six places, to the nearest millionth
 /// (`-` where no site).
+/// A count of nats on `2^(−50)` (a code on `2^(−20)` bits times `ln 2` on `2^(−30)`) over `n`, as a decimal to six places.
+fn micro_nats(num: i128, n: i128) -> String {
+    micro_bits(num >> 30, n)
+}
+
+/// The word crossings of a text: its bytes that begin a word (a byte past a space or a line's end, or the first).
+fn word_crossings(text: &[u8]) -> usize {
+    (0..text.len()).filter(|&i| !text[i].is_ascii_whitespace() && (i == 0 || text[i - 1].is_ascii_whitespace())).count()
+}
+
 fn micro_bits(num: i128, sites: i128) -> String {
     if sites == 0 {
         return "-".into();
@@ -924,7 +947,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // raised the code from 5.459 to 5.912 bits, and its grown body refused 240 of 248 steps).
         let fell = (code as i128) * (previous.1 as i128) < (previous.0 as i128) * (unseen_sites as i128);
         fallen |= fell;
-        match growth(fell, fallen, grown || learner.field.scale.is_some(), lap, laps) {
+        // [measurement; agent-inferred, November 3] `FIELD_GROWTH_HELD`: every growth held, a declared comparison at one width
+        // (a tower's growth by copies is always held: it grows by its levels' lanes).
+        let held = std::env::var_os("FIELD_GROWTH_HELD").is_some() || learner.field.scale.is_some();
+        match growth(fell, fallen, grown || held, lap, laps) {
             Growth::Widen => {
                 learner = learner.widened(2, &keys).map_err(|e| e.to_string())?;
                 grown = true;
