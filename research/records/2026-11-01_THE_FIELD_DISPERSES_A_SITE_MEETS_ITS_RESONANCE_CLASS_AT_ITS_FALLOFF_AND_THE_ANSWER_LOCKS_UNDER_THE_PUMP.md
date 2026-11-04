@@ -2950,6 +2950,23 @@ constitution's ticks, not by its width. The narrowest channel into the face is t
 reads which half of the tick contracts the cloud: the volume after each tick's current (the pair chart's read) and after its
 pair contact (the next tick's read), on the card.
 
+[measurement] **The half-tick reading** (`_receipts/law47/halves.txt`; `TickRead`'s pair chart, the state after a tick's current
+and before its pair contact, on the card; nine states): at the first tick the current contracts the cloud (the laned arm 27.3
+to 22.4, run46's alone arm 12.5 to 11.3, run38 11.6 to 10.2, run37 11.1 to 9.8) and the pair contact spreads it (the alone arm
+11.3 to 23.0, the laned 22.4 to 26.7); past the first tick neither half moves it more than about two directions either way.
+Both halves expand a perturbation at every tick, the current by 0.1 to 2.0 bits, the pair contact by 0.1 to 0.5.
+
+[definition; agent-inferred; a correction of §16.39 and of the paragraph above] What the volume can say. The participation ratio
+is a Rényi-2 count over the covariance's eigenvalues: it weighs directions by their variance, so a few strong ones (the space
+against the rest, digits against letters) set it, and 24 of 512 does not say the other directions are empty. The lane's own
+reading says they carry learning: over laps 3 to 7 the laned arm's joint code fell 0.050 nats a place against the alone arm's
+0.025 over its laps 3 to 7, the alone arm stood flat over its last five laps (1.165, 1.172, 1.173, 1.163, 1.164) while the
+laned arm still fell, and its withheld code fell 0.024 bits a site over its last four laps against the alone arm's 0.004. So
+§16.39's inference, that copies left the width unspent because the volume stood near 24, does not follow from the volume; the
+lane's steeper fall is the evidence for the width, and its acceptance failed on its opening (three laps of halvings) and on its
+lap's cost (1.45 times), not on an unused width. The next loop continues both arms another 45 card-minutes each from their last
+states (run48), to read whether the laned field's fall persists past the alone arm's plateau.
+
 Failures this could repeat, checked: **bits read as progress** (the code is read with the question's information, the withheld
 code, the written words and the volume); **a located cause carried unrepaired into a new consumer** (the expansion reader's
 site count read from the scales, which are now one a lane, panicked on the laned state; repaired, `sites = read.len() / D`, and

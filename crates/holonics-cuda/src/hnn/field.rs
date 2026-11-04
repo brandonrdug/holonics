@@ -1499,9 +1499,16 @@ impl<'c> CardField<'c> {
                 let read = self.timed(Kind::Copy, || card.fetch_range(&tick.read, 0, sites * dw)).map_err(device)?;
                 let lanes = field.declaration.lanes;
                 let scale = self.timed(Kind::Copy, || card.fetch_range(&tick.scale, 0, sites * lanes)).map_err(device)?;
+                let read2 = self.timed(Kind::Copy, || card.fetch_range(&tick.read2, 0, sites * dw)).map_err(device)?;
+                let scale2 = self.timed(Kind::Copy, || card.fetch_range(&tick.scale2, 0, sites * lanes)).map_err(device)?;
                 for (r, slot) in per.iter_mut().enumerate() {
                     let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
-                    slot.push(TickRead { read: read[a0 * dw..a1 * dw].to_vec(), scale: scale[a0 * lanes..a1 * lanes].to_vec() });
+                    slot.push(TickRead {
+                        read: read[a0 * dw..a1 * dw].to_vec(),
+                        scale: scale[a0 * lanes..a1 * lanes].to_vec(),
+                        pair_read: read2[a0 * dw..a1 * dw].to_vec(),
+                        pair_scale: scale2[a0 * lanes..a1 * lanes].to_vec(),
+                    });
                 }
             }
             out.extend(per);

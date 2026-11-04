@@ -3554,19 +3554,22 @@ fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
     line.split(' ').map(|w| w.parse::<T>().map_err(|_| TowerError::Refused("a field's material that is not a number"))).collect()
 }
 
-/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scale (the
-/// faces' power) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and volume).
+/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scales (the
+/// faces' power, one a lane) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and
+/// volume); and (§16.40) the pair contact's chart and scales, the state after the tick's current and before its pair contact.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TickRead {
     pub read: Vec<i32>,
     pub scale: Vec<i128>,
+    pub pair_read: Vec<i32>,
+    pub pair_scale: Vec<i128>,
 }
 
 impl Field {
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;
-        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone() }).collect())
+        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone(), pair_read: c.read2.clone(), pair_scale: c.scale2.clone() }).collect())
     }
 }
 
