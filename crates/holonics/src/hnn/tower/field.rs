@@ -1171,16 +1171,6 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
-/// [measurement; agent-inferred, November 4, §16.43] **The slip's proposals as the writer meets them**
-/// ([`Field::sample_realized`]'s slip): the moves drawn (`[stay, delete, insert]`), and for the delete and the insert the
-/// sum of their window codes less the stay's (`2^(−20)` bits) and how many were cheaper than it.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct SlipReading {
-    pub chosen: [u64; 3],
-    pub price: [i128; 2],
-    pub cheaper: [u64; 2],
-}
-
 /// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
 /// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
 /// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
@@ -3071,8 +3061,7 @@ impl Field {
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
     /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
     /// `sweep` says to. `refine` passes then revisit the written answer (§16.36); zero writes it once.
-    #[allow(clippy::too_many_arguments)]
-    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, mut slip: Option<&mut SlipReading>, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
+    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3176,8 +3165,8 @@ impl Field {
                 }
                 let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let faces = realization.read_faces(self, &regions)?;
-                for (k, place) in places.iter().enumerate() {
-                    let Some(t) = *place else { continue };
+                for (k, place) in places.into_iter().enumerate() {
+                    let Some(t) = place else { continue };
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128) % face.total;
                     let mut acc = 0u128;
@@ -3193,112 +3182,9 @@ impl Field {
                         }
                     }
                 }
-                if let Some(reading) = slip.as_deref_mut() {
-                    let draw = |k: usize, t: usize, salt: u64| ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ salt) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ (salt + 1)) as u128;
-                    self.slip_places(problems, &places, &mut classes, void, realization, &draw, reading)?;
-                }
             }
         }
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
-    }
-
-    /// [definition; agent-inferred, November 4, §16.43] **The slip**: at a revisited place `t`, the strand may also slip by
-    /// one place, every later place moving with it: the place dropped (`delete`, the tail one place back and a void at the
-    /// region's end) or a place opened before it (`insert`, the tail one place on, the new place drawn from its own face at
-    /// temperature one, the region's last place falling off its end). A revisit's substitution changes a place's class and
-    /// never a count, so a passage whose count is off by one at a place (a digit dropped or added, the written answers' every
-    /// miss in a restatement, §16.42) could not be repaired; the slip is the strand's shear (free fall: the passage translates
-    /// by one cell, the Swing's parabolic move) beside the substitution's turn. The three configurations (stay, delete,
-    /// insert) are priced by the field's own code over the places whose near field the slip changes, `F_c = Σ_(s ∈ W_c) −log₂
-    /// p̂_s(x_s)` with each `s` read alone open beside every other place as it stands; `W_c` holds the same places in each
-    /// configuration (the stay's `t − (NEAR − 1), …, t + NEAR − 1`, the delete's one shorter at its far end, the insert's one
-    /// longer), so no configuration is priced on places another is not. One is drawn from `2^(−F_c)` at temperature one: the sigmoid face over the moves, no move
-    /// chosen by its certainty. The stay and the insert each carry a place whose class was drawn from its own face `q` (the
-    /// substitution's and the new place's), so each stands for every class it could have drawn: its weight is
-    /// `Σ_c 2^(−F(c)) ≈ 2^(−F)/q(c) = 2^(−(F − e_t))`, the window's code less that place's own (an importance weight; without
-    /// it a configuration is charged for the surprise of a draw the move did not choose). The delete draws nothing, and its
-    /// place `t` is priced in full. Each proposal is read into `reading`.
-    #[allow(clippy::too_many_arguments)]
-    fn slip_places(&self, problems: &[(&[usize], usize)], places: &[Option<usize>], classes: &mut [Vec<usize>], void: usize, realization: &mut dyn FieldRealization, draw: &dyn Fn(usize, usize, u64) -> u128, reading: &mut SlipReading) -> Result<()> {
-        let pick = |face: &TowerFace, u: u128| {
-            let (mut acc, u) = (0u128, u % face.total);
-            face.masses.iter().position(|&m| {
-                acc += m;
-                acc > u
-            })
-        };
-        let close = |c: &mut Vec<usize>, start: usize| {
-            if let Some(end) = (start..c.len()).find(|&t| c[t] == void) {
-                for x in &mut c[end + 1..] {
-                    *x = void;
-                }
-            }
-        };
-        // The insert's new place, drawn from its face with every other place as it stands.
-        let mut configs: Vec<(usize, usize, [Vec<usize>; 3])> = Vec::new();
-        let mut opened: Vec<Vec<bool>> = Vec::new();
-        for (k, &place) in places.iter().enumerate() {
-            let Some(t) = place else { continue };
-            let stay = classes[k].clone();
-            let mut delete = stay.clone();
-            delete.remove(t);
-            delete.push(void);
-            let mut insert = stay.clone();
-            insert.insert(t, void);
-            insert.pop();
-            let mut open = vec![false; stay.len()];
-            open[t] = true;
-            opened.push(open);
-            configs.push((k, t, [stay, delete, insert]));
-        }
-        if configs.is_empty() {
-            return Ok(());
-        }
-        let regions: Vec<Region> = configs.iter().zip(&opened).map(|((_, _, c), open)| Region { classes: &c[2], unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-        let faces = realization.read_faces(self, &regions)?;
-        for ((k, t, c), face) in configs.iter_mut().zip(&faces) {
-            let face = face[*t].as_ref().ok_or(TowerError::Refused("a slip's new place without a face"))?;
-            c[2][*t] = pick(face, draw(*k, *t, 0x21)).unwrap_or(face.masses.len() - 1);
-        }
-        // Each configuration's code over the window, every window place read alone open.
-        let mut reads: Vec<(usize, usize, usize)> = Vec::new();
-        let mut masks: Vec<Vec<bool>> = Vec::new();
-        for (n, (k, t, c)) in configs.iter().enumerate() {
-            let q = problems[*k].0.len();
-            for (m, config) in c.iter().enumerate() {
-                // The same places in every configuration: the stay's window `t ± (NEAR − 1)`, the delete's one place shorter at
-                // its far end (its place `t` gone), the insert's one longer (its new place at `t`).
-                let span = [2 * NEAR - 1, 2 * NEAR - 2, 2 * NEAR][m];
-                for s in (0..span).filter_map(|d| (t + d).checked_sub(NEAR - 1)).filter(|&s| s >= q && s < config.len() && (s != *t || m == 1)) {
-                    let mut open = vec![false; config.len()];
-                    open[s] = true;
-                    masks.push(open);
-                    reads.push((n, m, s));
-                }
-            }
-        }
-        let regions: Vec<Region> = reads.iter().zip(&masks).map(|(&(n, m, _), open)| Region { classes: &configs[n].2[m], unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-        let faces = realization.read_faces(self, &regions)?;
-        let mut codes = vec![[0i64; 3]; configs.len()];
-        for (&(n, m, s), face) in reads.iter().zip(&faces) {
-            let face = face[s].as_ref().ok_or(TowerError::Refused("a slip's window place without a face"))?;
-            codes[n][m] += super::face_code(face.masses[configs[n].2[m][s]], face.total);
-        }
-        for ((k, t, c), code) in configs.into_iter().zip(codes) {
-            // The moves' face at temperature one: `z_c = −F_c` on `2^(−16)` bits.
-            let logits: Vec<i64> = code.iter().map(|&f| -(release(f as i128, super::READ_BITS - 16) as i64)).collect();
-            let face = self.tempered(&logits, 1);
-            let m = pick(&face, draw(k, t, 0x23)).unwrap_or(0);
-            reading.chosen[m] += 1;
-            for (n, &f) in code.iter().enumerate().skip(1) {
-                reading.price[n - 1] += (f - code[0]) as i128;
-                reading.cheaper[n - 1] += u64::from(f < code[0]);
-            }
-            let [stay, delete, insert] = c;
-            classes[k] = [stay, delete, insert].into_iter().nth(m).unwrap_or_default();
-            close(&mut classes[k], problems[k].0.len());
-        }
-        Ok(())
     }
 
     /// [definition; agent-inferred, November 1] **The landmarks** (the dispersing field's §3

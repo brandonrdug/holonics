@@ -1121,14 +1121,10 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
     let held = &held[..limit.min(held.len())];
     let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
     let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
-    // [agent-inferred, November 4, §16.43] `FIELD_SLIP`: the refine passes' revisits may also slip the strand by one place
-    // ([`Field::sample_realized`]'s slip), a declared comparison with the substitution alone.
-    let mut slip = std::env::var_os("FIELD_SLIP").is_some().then(holonics::hnn::tower::field::SlipReading::default);
-    println!("FIELD_SAMPLE_SLIP slip={}", slip.is_some());
     let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
     let mut stopped = None;
     let answers = field
-        .sample_realized(&problems, sweeps, refine, slip.as_mut(), codec.void(), seed, realization, &mut |done, all| {
+        .sample_realized(&problems, sweeps, refine, codec.void(), seed, realization, &mut |done, all| {
             if done % 16 == 0 {
                 println!("FIELD_SAMPLE_SWEEP done={done} of={all} ms={}", started.elapsed().as_millis());
             }
@@ -1139,12 +1135,6 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
             true
         })
         .map_err(|e| e.to_string())?;
-    if let Some(r) = &slip {
-        println!(
-            "FIELD_SAMPLE_SLIP_MOVES stay={} delete={} insert={} delete_price_millibits={} insert_price_millibits={} delete_cheaper={} insert_cheaper={}",
-            r.chosen[0], r.chosen[1], r.chosen[2], (r.price[0] * 1000) >> 20, (r.price[1] * 1000) >> 20, r.cheaper[0], r.cheaper[1]
-        );
-    }
     let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
     let mut place_rows = rows_file(&out.join("PLACES.tsv"), "")?;
     let mut couplings = rows_file(&out.join("COUPLING.tsv"), "problem\twritten\theld\tlambda\tfriction\tfoil_lambda\tfoil_friction\n")?;

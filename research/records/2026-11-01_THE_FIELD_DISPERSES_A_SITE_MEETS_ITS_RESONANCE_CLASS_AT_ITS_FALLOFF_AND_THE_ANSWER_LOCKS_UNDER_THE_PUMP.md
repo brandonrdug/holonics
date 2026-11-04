@@ -3188,7 +3188,7 @@ choose; with both repaired the slip still draws a delete or an insert on a quart
 restates fewer results exactly than the substitution alone. [agent-inferred] Why: in the writer's state each place costs
 bits (§16.42: 3 to 5 with the answer around it blank), and a shift changes every window term by amounts of that order, so
 the window's price of a slip is mostly the passage's own noise; a count cannot be priced locally while the passage around
-it is still unwritten. The slip is retired (its code with these readings at the commit that built it); the cause lies
+it is still unwritten. The slip is retired (its code stands at commit `91a796940`, with these readings); the cause lies
 upstream of the writer, in what a blank place carries while the places around it are written: the unified-theory reading
 of November 4 (`a_blank_place_is_a_potential`) measures that a blank runs the turned clocks at the bare rate while a
 written answer byte runs at 1.62 and 1.91, so a blank gap reads contracted, and derives the law that a blank carries its

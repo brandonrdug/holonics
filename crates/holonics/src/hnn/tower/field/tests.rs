@@ -485,20 +485,20 @@ fn the_writer_draws_every_place_from_its_own_face() {
     let mut field = shaped(1);
     let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([6usize, 5]).map(|(q, a)| (*q, a)).collect();
-    let once = field.sample_realized(&problems, 3, 0, None, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let once = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
     assert_eq!(once.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5]);
     assert!(once.iter().flatten().all(|&c| c < field.declaration.alphabet));
-    assert_eq!(field.sample_realized(&problems, 3, 0, None, 0, 11, &mut HostField, &mut |_, _| true).unwrap(), once, "the same draws");
-    assert!((12..20).any(|seed| field.sample_realized(&problems, 3, 0, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap() != once), "another seed draws another answer");
+    assert_eq!(field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap(), once, "the same draws");
+    assert!((12..20).any(|seed| field.sample_realized(&problems, 3, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap() != once), "another seed draws another answer");
     let mut asked = 0;
-    let stopped = field.sample_realized(&problems, 3, 0, None, 0, 11, &mut HostField, &mut |_, _| {
+    let stopped = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| {
         asked += 1;
         asked < 2
     }).unwrap();
     assert_eq!(stopped.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5], "a stopped write draws every place");
     let l = field.layout.clone();
     field.theta[l.read_bias + 2] = 40 << 16;
-    let pointed = field.sample_realized(&problems, 3, 0, None, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let pointed = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
@@ -511,7 +511,7 @@ fn a_drawn_void_closes_the_answer() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut closed_early = false;
     for seed in 11..27 {
-        for (places, n) in field.sample_realized(&problems, 4, 0, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap().into_iter().zip([9usize, 8]) {
+        for (places, n) in field.sample_realized(&problems, 4, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap().into_iter().zip([9usize, 8]) {
             assert_eq!(places.len(), n);
             if let Some(end) = places.iter().position(|&c| c == 0) {
                 assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}: {places:?}");
@@ -1251,9 +1251,9 @@ fn refinement_revisits_the_written_answer() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut moved = false;
     for seed in 11..19 {
-        let once = field.sample_realized(&problems, 4, 0, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        let refined = field.sample_realized(&problems, 4, 2, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        assert_eq!(field.sample_realized(&problems, 4, 2, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap(), refined, "the same draws");
+        let once = field.sample_realized(&problems, 4, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
+        let refined = field.sample_realized(&problems, 4, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
+        assert_eq!(field.sample_realized(&problems, 4, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap(), refined, "the same draws");
         for places in &refined {
             assert!(places.iter().all(|&c| c < field.declaration.alphabet));
             if let Some(end) = places.iter().position(|&c| c == 0) {
@@ -1265,33 +1265,8 @@ fn refinement_revisits_the_written_answer() {
     assert!(moved, "no refinement moved a place");
     let l = field.layout.clone();
     field.theta[l.read_bias + 2] = 40 << 16;
-    let pointed = field.sample_realized(&problems, 3, 2, None, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let pointed = field.sample_realized(&problems, 3, 2, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
-}
-
-/// [definition; §16.43] **The slip**: with the refine passes' revisits free to drop a place or open one, every place stays a
-/// class of the alphabet, the closing law holds, the same seed draws the same answer, and some seed's answer differs from
-/// the substitution alone's.
-#[test]
-fn a_revisit_may_slip_the_strand_by_one_place() {
-    let field = shaped(1);
-    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
-    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
-    let mut moved = false;
-    for seed in 11..19 {
-        let substituted = field.sample_realized(&problems, 4, 2, None, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        let slipped = field.sample_realized(&problems, 4, 2, Some(&mut SlipReading::default()), 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        assert_eq!(field.sample_realized(&problems, 4, 2, Some(&mut SlipReading::default()), 0, seed, &mut HostField, &mut |_, _| true).unwrap(), slipped, "the same draws");
-        for (places, n) in slipped.iter().zip([9usize, 8]) {
-            assert_eq!(places.len(), n, "a slip keeps the region's extent");
-            assert!(places.iter().all(|&c| c < field.declaration.alphabet));
-            if let Some(end) = places.iter().position(|&c| c == 0) {
-                assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}: {places:?}");
-            }
-        }
-        moved |= slipped != substituted;
-    }
-    assert!(moved, "no slip moved a place");
 }
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
