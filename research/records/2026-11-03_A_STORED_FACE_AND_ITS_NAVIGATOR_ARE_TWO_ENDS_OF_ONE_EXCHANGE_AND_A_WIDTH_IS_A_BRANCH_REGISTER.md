@@ -125,3 +125,42 @@ respected, with no privileged perspective.
   privileged (the receiver law).
 The general-English terrain is on the host (TinyStories, 24 MB of training stories in the laboratory's corpora), for the
 read against GSM8K's English when the writer is next measured.
+
+## 7. Nats per code length, densities, and expansion (Brandon's fourth message)
+
+[lens] Brandon, November 3, evening: prefer nats, read per code length, and read per area or volume as well, coupled to
+winding and friction, since the cross-entropy's diffusion exchanges action along junctions as it propagates; information
+expansion is to be read as cosmological expansion is, `length_a / (time × length_b)`, whose lengths do not cancel, with a
+non-commutative order of the operations, the rate a velocity of separation per gap between locales (closest point of
+approach, Doppler curves), and the dynamics swinging between which gap is held as the constraint while the others vary.
+Sources he named: Bais and Farmer, *The Physics of Information* (arXiv 0708.2837); Su and Liu, *Geometric Capacity of
+Transformers: A Tropical Geometry Perspective* (arXiv 2604.14727); Beck and Ramstead, *Dynamic Markov Blanket Detection for
+Macroscopic Physics Discovery* (arXiv 2502.21217); Marcolli's course *Geometry of Information* (Caltech, Winter 2025).
+
+[source-inspected; definition; agent-inferred] The joins, each to an owner that already states it or to the term it lacks:
+- **The expansion rate is a ratio's logarithmic derivative.** `H = a⁻¹ da/dt` is the ratio calculus `R⁻¹ dR` (the loss
+  law); `km s⁻¹ Mpc⁻¹` refusing to cancel is the ratio's undivided pair (the velocity of a separation and the separation,
+  typed), never a bare `1/time`. A reading keeps both terms and its clock.
+- **Densities.** Nats per volume is an entropy density `s`, nats per time and volume its production `σ`, balanced under the
+  material derivative, `∂s/∂t + ∇·J_s = σ ≥ 0` (the cross-entropy law's flux across sections). Expansion of information is
+  Liouville's `d ln V/dt = ∇·v` for a flow's phase volume and Pesin's `h = Σ λᵢ⁺` for the rate new information appears;
+  packing at a resolution `ε` counts about `ε^(−D)` distinguishable cells, `D` the information dimension (Bais and Farmer
+  give the horizon of prediction `τ = (D/h) log s` at signal-to-noise `s`).
+- **The denominator.** The field reads bare nats per place, and a place is not a unit of content (a word's first letter
+  4.1 bits, its seventh 0.15, §5). The density belongs on the receiver's own partition: per crossing of a section (a word's
+  boundary, an epoch), per region and tick (the receipt law), and per 2-cell of the complex, where winding per area is a
+  curvature, the Stokes face of a declared loop (holonomy only on declared circuits).
+- **The contact row is a thermodynamic semiring.** The row `Σ 2^z μ` at the head's temperature is Maslov's deformed sum
+  `h log(e^(a/h) + e^(b/h))`; its tropical limit (`max`, Maslov dequantization) is the loudest partial, and the entropy is
+  the deformation between the two (Marcolli's thermodynamic and tropical semirings). Su and Liu's zero-temperature limit:
+  keys at equal norm, as the contact holds them (`ratio_to_power`), route by a Voronoi diagram of cosine, and a row whose
+  loudest term leads by `δ` errs from its tropical limit by at most `τ log(1 + (N − 1) e^(−δ/τ))`. The held rows' Rényi-2
+  effective count (`HeldRows`, §16.20) is already the reading of how tropical a row is; the copy onset (§16.37) is where it
+  falls.
+- **Markov blankets.** Beck and Ramstead's partition (internal `z`, boundary `b`, external `s`, `p(s, z | b) = p(s | b)
+  p(z | b)`) is the probabilistic face of the relatively complete region: the boundary bounds the interior for its
+  receivers, and the interior is coupled to the exterior, never determined by it (#410 owes the full theorem).
+
+What a run would need before it honours the lens: the readings above as typed densities on the receiver's partition (not a
+scalar per byte), and a per-tick reading of the constitution's expansion (the tick map's growth of a perturbation, the
+discrete Lyapunov reading), each with its own clock. None changes a law of the field; they change what a receipt states.

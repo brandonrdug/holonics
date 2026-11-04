@@ -1,0 +1,7 @@
+base: laps 130 onset 70 joint_below_1 97 joint_last 0.01222
+returns: laps 130 onset 70 joint_below_1 117 joint_last 0.683761
+lift: laps 130 onset 33 joint_below_1 63 joint_last 0.012195
+rate7: laps 130 onset 101 joint_below_1 None joint_last 1.699829
+section8: laps 130 onset 55 joint_below_1 69 joint_last 0.007133
+ticks2: laps 130 onset 34 joint_below_1 40 joint_last 0.002746
+still4: laps 130 onset 42 joint_below_1 71 joint_last 0.587524

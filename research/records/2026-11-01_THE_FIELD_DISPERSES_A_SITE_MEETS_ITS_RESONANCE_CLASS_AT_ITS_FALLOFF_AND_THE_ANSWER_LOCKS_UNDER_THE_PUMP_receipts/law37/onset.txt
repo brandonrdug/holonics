@@ -1,0 +1,59 @@
+near: laps 300 lap_ms 1459 grow lap 3 to 64 
+  lap -1 own 4.459431 information 0.000000
+  lap 0 own 2.455672 information 0.005731
+  lap 1 own 2.489021 information 0.003060
+  lap 9 own 2.307595 information -0.001116
+  lap 19 own 2.301728 information 0.000070
+  lap 29 own 2.292434 information 0.000338
+  lap 39 own 2.299479 information 0.000403
+  lap 49 own 2.292473 information 0.000070
+  lap 59 own 2.299484 information 0.000856
+  lap 69 own 2.226127 information 0.091792
+  lap 79 own 1.937440 information 0.984140
+  lap 89 own 1.598656 information 2.944205
+  lap 99 own 0.852327 information 6.203659
+  lap 109 own 0.232287 information 12.727710
+  lap 119 own 0.028677 information 14.725001
+  lap 129 own 0.012220 information 14.729674
+  lap 139 own 0.008284 information 15.320433
+  lap 149 own 0.019994 information 13.861079
+  lap 159 own 0.006650 information 15.188330
+  lap 169 own 0.004534 information 15.035307
+  lap 179 own 0.004821 information 15.040807
+  lap 189 own 0.003078 information 15.387370
+  lap 199 own 0.004875 information 15.357687
+  lap 209 own 0.007329 information 15.123489
+  lap 219 own 0.004203 information 15.579775
+  lap 229 own 0.002633 information 16.387310
+  lap 239 own 0.002687 information 15.377596
+  lap 249 own 0.004491 information 16.625545
+  lap 259 own 0.002491 information 16.254409
+  lap 269 own 0.007967 information 14.227549
+  lap 279 own 0.006571 information 15.318614
+  lap 289 own 0.014559 information 16.530084
+  lap 299 own 0.002859 information 17.726000
+far: laps 100 lap_ms 8450 grow lap 5 to 64 
+  lap -1 own 4.523563 information 0.000000
+  lap 0 own 2.620008 information 0.000348
+  lap 1 own 2.416295 information 0.000084
+  lap 9 own 2.366641 information 0.000118
+  lap 19 own 2.316953 information -0.000085
+  lap 29 own 2.312361 information 0.000027
+  lap 39 own 2.305546 information 0.000059
+  lap 49 own 2.297391 information -0.000006
+  lap 59 own 2.308086 information -0.000105
+  lap 69 own 2.305136 information -0.000145
+  lap 79 own 2.298261 information 0.000073
+  lap 89 own 2.283941 information 0.001030
+  lap 99 own 2.263984 information -0.000147
+# parity binary sha 487878148a820d7c5f1c182373f64c29f05be9921c2b087c7493aa975e77f10f
+FIELD_PARITY_PACE shift=8 entries=246
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=34776 grow=1 withheld_read=8
+FIELD_PARITY section=1 withheld=false regions=16 length=1408 sites=7620 rows=72224 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=20476 card_ms=121
+FIELD_PARITY section=2 withheld=false regions=16 length=1365 sites=8244 rows=83344 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=16417 card_ms=106
+FIELD_PARITY section=3 withheld=false regions=16 length=1469 sites=9815 rows=116480 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1482 host_ms=21863 card_ms=179
+FIELD_PARITY section=4 withheld=true regions=32 length=1431 sites=0 rows=163744 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=512..1482 host_ms=14955 card_ms=41
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=105 equal=true
+FIELD_PARITY_WRITES problems=1 sweeps=8 host_ms=35710
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=67 host_ms=73711 card_ms=448 elapsed_ms=299959
+MEASURE lap=parity rc=0 wall_s=300.7 peak_rss_kib=2583660

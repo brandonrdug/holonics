@@ -884,6 +884,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("train-field") => field_train::train(args, realization),
         Some("sample-field") => field_train::sample(args, realization),
         Some("currents-field") => field_train::currents_field(args, realization),
+        Some("expansion-field") => field_train::expansion_field(args, realization),
         _ => Err("a realized field command is train-field, sample-field or currents-field".into()),
     }
 }

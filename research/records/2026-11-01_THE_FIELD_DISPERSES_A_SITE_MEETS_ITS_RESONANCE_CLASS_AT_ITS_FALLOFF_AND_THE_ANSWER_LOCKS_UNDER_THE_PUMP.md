@@ -2798,3 +2798,54 @@ temperature one); **recitation counted as generation** (the written words are dr
 questions, and the reading counts words of the training passage, which recited question words also are: it is reported
 beside the writes, never as the acceptance); **bits read as progress** (the writes are shown whole). Verification: the field
 library tests (58), the example's field tests (14).
+
+### 16.37 The copy forms after a plateau, and the plateau sits on the learner's singular locus
+
+[measurement; agent-inferred, November 3] The copy lab of §16.35, read long (`_receipts/law37/`, `onset.txt`; the card, today's
+declaration, a fresh founding each): on the near terrain (the eight letters about ten places back) the question's information
+stays below 0.001 bits a byte for sixty laps (about 7,500 steps), rises past 0.1 at lap 70, and the joint code falls from 2.29
+to 0.85 at lap 99 and 0.03 at lap 119: the field copies its question exactly. On GSM8K the onset came at about 12,800 steps
+(§16.35), the same shape. On the far terrain (288 dots between, about 300 places back) none formed in 100 laps (12,500 steps).
+The writer's card parity on the closing writer: 7 reads and one write equal (`parity.txt`).
+
+**What shortens the plateau** (`plateau.txt`, the near terrain, 130 laps each; onset the first lap whose information passes
+0.1, then the first whose joint falls below 1.0): the base 70 and 97; the returns founded drawn (`FIELD_FOUND_RETURNS=returns`)
+70 and 117; the readout's lift founded drawn as well (`=lift`) **33 and 63**; the step at `2^(−7)` 101 and never; sections of
+8, 55 and 69 (twice the steps a lap, 2.37 s a lap against 1.46, slower in steps and in card time); **two ticks, 34 and 40**,
+at 1.00 s a lap (a third of the base's card time to the onset); every head still, 42 and 71 with the joint ending at 0.59.
+
+[definition; agent-inferred] What it says: the plateau is a singular locus of the learner, the place where the product the copy
+needs has a zero factor and so a zero covector (Amari's plateaus, Watanabe's singular learning). The face's lift `R`, founded at
+zero so that the founding reads the flat face (§16.20, N2), is such a factor: every covector into the field passes through it,
+and founded off zero the plateau halves. Two ticks put fewer factors on the copy's path. The returns founded alone do not
+help, since the lift still gates them. Whether the lift's drawn founding and two ticks enter a run's declaration is decided
+against GSM8K's joint code first; growth by copies sits on the same locus (copies are
+symmetric, and their difference has a zero covector), which is why copies part slowly (§16.29) and why a tower grows by fresh
+lanes and fresh levels (the tower record, D2, D3).
+
+### 16.38 Conservation of faces: a still head weighs its faces, never its repetitions or its distances
+
+[definition; agent-inferred, November 3] Brandon's lens of the evening (the lens record, §7: a face's mass as a typed density,
+the radix of a head, a horizon where a cluster's mass outruns it): a row's terms are summed over sources, so `N` sources with one
+key carry `log₂ N` bits more mass in the row's tropical sum than one, and a cluster of repeated glue (spaces, a filler, the
+answer's common bytes) outweighs any match a head's temperature can lift. The law (`Field::tick`, the card's `field_exposure`):
+**a still head's source is lowered by the octave of its resonance class's definite count, `⌊log₂ c⌋`, so a face's mass is
+shared among the sources that make it; a still head reads content, so it is not weighed by its distance; a turned head reads
+place, so every place is its own face and the octave of its distance lowers its score** (§2.3's falloff, kept there). The
+covector is unchanged in form (the octaves are the medium's constants); the card realizes it in the score it stores.
+
+**Measured** (`_receipts/law38/`): the multiplicity alone, with the still heads' falloff kept (`faces38.txt`): the card parity
+equal (7 reads, one write); the near copy's onset at lap 73 (base 70), its joint below 1.0 at lap 87 (base 97); the far copy none
+in 84 laps; GSM8K five fresh laps 3.410, 3.141, 3.100, 2.986, 2.950 bits a byte against 3.417, 3.149, 3.123, 3.003, 2.967, the
+question's information 0.0096 at lap 4 against 0.0044, laps 120 to 126 s against 108 to 113 s. With the still heads read at
+any distance as well, the law (`still39.txt`): the card parity equal; **the far copy forms**, its information past 0.1 at lap
+79, its joint below 1.0 at lap 94 and 0.268 at lap 99 (none in 100 laps under the falloff, none in 84 under the multiplicity
+alone); the near copy's onset at lap 78, its joint below 1.0 at lap 93; GSM8K five fresh laps 3.479, 3.221, 3.152, 3.040,
+2.998 bits a byte, the question's information 0.0137 at lap 4 (three times the base's 0.0044), laps 106 to 113 s. The code of
+the first laps stands 0.03 to 0.05 above the base, where the falloff's nearness helped a still head before it located its
+content; the question is read three times as strongly and from any distance, which is what the answers lacked.
+
+Failures this could repeat, checked: **catered machinery** (no class is named and no count is authored: the resonance classes are
+the head's own shells and their counts the region's); **a design in the programming language** (the multiplicity is a face's
+mass, the octave the same grain the falloff reads); **bits read as progress** (each read is reported with its copy lab and its
+question's information beside the code).
