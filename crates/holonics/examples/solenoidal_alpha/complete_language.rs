@@ -799,6 +799,7 @@ pub(super) fn run_with_execution(
         Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
         Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
         Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
+        Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, &mut holonics::hnn::tower::realization::HostPass::default()),
@@ -885,7 +886,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("sample-field") => field_train::sample(args, realization),
         Some("currents-field") => field_train::currents_field(args, realization),
         Some("expansion-field") => field_train::expansion_field(args, realization),
-        _ => Err("a realized field command is train-field, sample-field or currents-field".into()),
+        Some("restate-field") => field_train::restate_field(args, realization),
+        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field or restate-field".into()),
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field

@@ -1171,6 +1171,18 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
+/// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
+/// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
+/// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
+/// receiver's readout logits on `2^(−16)` bits where it is unresolved. Two shares of one row compare as their locks do:
+/// `log₂(e_ij / e_ik) = z_ij − z_ik` bits.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct NearOffsets {
+    pub before: Vec<[u64; NEAR - 1]>,
+    pub after: Vec<[u64; NEAR - 1]>,
+    pub logits: Option<Vec<i64>>,
+}
+
 /// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (§16.21,
 /// [`Field::row_currents`]): one row (a tick, a head and an unresolved site), its framed current's part from the
 /// question past the near field (`far`, the definite sites before the answer start at `|i − j| ≥ NEAR`) and its part
@@ -3195,6 +3207,41 @@ impl Field {
         Ok(landmarks_of(&rows, question, count))
     }
 
+    /// [measurement; agent-inferred, November 4, §16.42] **Each of `sites`' near field by offset** ([`NearOffsets`]): whether
+    /// a receiver tells its neighbouring offsets apart where their faces are equal, as a restated result needs (in
+    /// `<<E=C>>D` the result C is written again as D, and D's `k`-th site reads C's `k`-th at offset `|C| + 2`). A reading
+    /// only: nothing in the law reads it.
+    pub fn near_offsets(&self, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        let pass = self.pass(region, true)?;
+        let n = region.classes.len();
+        if sites.iter().any(|&i| i >= n) {
+            return refuse("a near-field site outside its region");
+        }
+        let heads = self.declaration.heads;
+        Ok(sites
+            .iter()
+            .map(|&i| {
+                let mut out = NearOffsets { logits: pass.logits[i].clone(), ..NearOffsets::default() };
+                for cell in &pass.ticks {
+                    for h in 0..heads {
+                        let (mut before, mut after) = ([0u64; NEAR - 1], [0u64; NEAR - 1]);
+                        for src in &cell.rows[h * n + i] {
+                            let j = src.j as usize;
+                            if j < i && i - j < NEAR {
+                                before[i - j - 1] = src.p;
+                            } else if j > i && j - i < NEAR {
+                                after[j - i - 1] = src.p;
+                            }
+                        }
+                        out.before.push(before);
+                        out.after.push(after);
+                    }
+                }
+                out
+            })
+            .collect())
+    }
+
     /// The field as text: its head line, then its material on one line.
     /// The field as text: its declaration and its material, each on one line; a tower adds a line `scale P split`, the
     /// packets' field's two lines and the glue's one.
@@ -3606,6 +3653,10 @@ pub trait FieldRealization {
     fn read_ticks(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         refuse("a realization that cannot read its ticks")
     }
+    /// Each of `sites`' near field by offset in `region` ([`Field::near_offsets`]), a reading.
+    fn read_near_offsets(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        refuse("a realization that cannot read its near fields")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3637,6 +3688,10 @@ impl FieldRealization for HostField {
     }
     fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         regions.par_iter().map(|r| field.tick_reads(r)).collect()
+    }
+
+    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        field.near_offsets(region, sites)
     }
 }
 
