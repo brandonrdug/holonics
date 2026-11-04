@@ -1,0 +1,62 @@
+# run41 (run38/STATE.13 continued 45 card-minutes alone; its tower arm stopped after lap 3 when the session ended at 01:51 UTC)
+FIELD_JOINT lap=-1 own_bits_a_byte=1.863004 information_bits_a_byte=0.482226 ms=4939
+FIELD_JOINT lap=0 own_bits_a_byte=1.822171 information_bits_a_byte=0.452308 ms=4605
+FIELD_JOINT lap=1 own_bits_a_byte=1.811889 information_bits_a_byte=0.438606 ms=4606
+FIELD_JOINT lap=2 own_bits_a_byte=1.808738 information_bits_a_byte=0.464236 ms=5218
+FIELD_JOINT lap=3 own_bits_a_byte=1.799463 information_bits_a_byte=0.444156 ms=5126
+FIELD_JOINT lap=4 own_bits_a_byte=1.801788 information_bits_a_byte=0.471802 ms=4585
+FIELD_JOINT lap=5 own_bits_a_byte=1.802140 information_bits_a_byte=0.437254 ms=4827
+FIELD_JOINT lap=6 own_bits_a_byte=1.791059 information_bits_a_byte=0.431940 ms=4709
+FIELD_JOINT lap=7 own_bits_a_byte=1.770331 information_bits_a_byte=0.450119 ms=4571
+FIELD_JOINT lap=8 own_bits_a_byte=1.757807 information_bits_a_byte=0.438749 ms=4585
+FIELD_JOINT lap=9 own_bits_a_byte=1.765096 information_bits_a_byte=0.447372 ms=4568
+FIELD_JOINT lap=10 own_bits_a_byte=1.761963 information_bits_a_byte=0.447267 ms=4577
+FIELD_JOINT lap=11 own_bits_a_byte=1.742820 information_bits_a_byte=0.464511 ms=4567
+FIELD_LAPS_HELD lap=12 reason=time left=158689 bound=260000 ms=2541311
+MEASURE lap=alone rc=0 wall_s=2541.9 peak_rss_kib=630388
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3661 held=1600 lambda=764 friction=3733 foil_lambda=686 foil_friction=3889 own_wins=3 foil_wins=3 ms=364262
+MEASURE lap=alone_write rc=0 wall_s=364.6 peak_rss_kib=242676
+WORDS written=617 in_training_vocabulary=413 share=0.669
+
+# the tower arm's laps 0-3 (run41/tower.log)
+FIELD_SCALE lap=-1 period=6 split=2 coarse_width=256 coarse_heads=8 material=1667350 ms=319
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.291336 foil_nats_a_place=1.625590 information_nats_a_place=0.334254 own_nats_a_word=7.184607 information_nats_a_word=1.859689
+FIELD_UNSEEN lap=-1 code=0.323 sites=36763 next=- ms=27463
+FIELD_LAP lap=0 read=74 sites=3790580 before=1.471 after=1.441 deposited=413/413 halvings=2 next_halved=0 next_refused=0 ms=250133
+FIELD_UNSEEN lap=0 code=0.309 sites=36763 next=- ms=277597
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.265307 foil_nats_a_place=1.572564 information_nats_a_place=0.307256 own_nats_a_word=7.039794 information_nats_a_word=1.709481
+FIELD_LAP lap=1 read=75 sites=3877179 before=1.493 after=1.463 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=245907
+FIELD_UNSEEN lap=1 code=0.306 sites=36763 next=- ms=544881
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.255637 foil_nats_a_place=1.561086 information_nats_a_place=0.305450 own_nats_a_word=6.985988 information_nats_a_word=1.699431
+FIELD_LAP lap=2 read=76 sites=3810288 before=1.430 after=1.401 deposited=412/413 halvings=3 next_halved=0 next_refused=0 ms=248141
+FIELD_UNSEEN lap=2 code=0.301 sites=36763 next=- ms=814281
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.252540 foil_nats_a_place=1.575750 information_nats_a_place=0.323209 own_nats_a_word=6.968760 information_nats_a_word=1.798241
+FIELD_LAP lap=3 read=77 sites=3885283 before=1.474 after=1.445 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=249581
+FIELD_UNSEEN lap=3 code=0.296 sites=36763 next=- ms=1085095
+
+# the alone arm's joint code in nats (run41/alone.log)
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.291336 foil_nats_a_place=1.625590 information_nats_a_place=0.334254 own_nats_a_word=7.184607 information_nats_a_word=1.859689
+FIELD_LAP lap=0 read=74 sites=3790580 before=1.470 after=1.441 deposited=413/413 halvings=4 next_halved=0 next_refused=0 ms=193603
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.263033 foil_nats_a_place=1.576549 information_nats_a_place=0.313516 own_nats_a_word=7.027139 information_nats_a_word=1.744309
+FIELD_LAP lap=1 read=75 sites=3877179 before=1.493 after=1.463 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=195579
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.255906 foil_nats_a_place=1.559924 information_nats_a_place=0.304019 own_nats_a_word=6.987485 information_nats_a_word=1.691469
+FIELD_LAP lap=2 read=76 sites=3810288 before=1.430 after=1.402 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=191581
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.253722 foil_nats_a_place=1.575506 information_nats_a_place=0.321784 own_nats_a_word=6.975334 information_nats_a_word=1.790311
+FIELD_LAP lap=3 read=77 sites=3885283 before=1.475 after=1.447 deposited=413/413 halvings=2 next_halved=0 next_refused=0 ms=204689
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.247292 foil_nats_a_place=1.555158 information_nats_a_place=0.307866 own_nats_a_word=6.939563 information_nats_a_word=1.712873
+FIELD_LAP lap=4 read=78 sites=3792895 before=1.420 after=1.392 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=198858
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.248904 foil_nats_a_place=1.575933 information_nats_a_place=0.327029 own_nats_a_word=6.948531 information_nats_a_word=1.819489
+FIELD_LAP lap=5 read=79 sites=3793475 before=1.419 after=1.391 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=204201
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.249148 foil_nats_a_place=1.552230 information_nats_a_place=0.303082 own_nats_a_word=6.949889 information_nats_a_word=1.686256
+FIELD_LAP lap=6 read=80 sites=3777809 before=1.441 after=1.414 deposited=413/413 halvings=1 next_halved=0 next_refused=0 ms=192982
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.241467 foil_nats_a_place=1.540865 information_nats_a_place=0.299398 own_nats_a_word=6.907154 information_nats_a_word=1.665759
+FIELD_LAP lap=7 read=81 sites=3871418 before=1.432 after=1.403 deposited=413/413 halvings=2 next_halved=0 next_refused=0 ms=193441
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.227100 foil_nats_a_place=1.539099 information_nats_a_place=0.311999 own_nats_a_word=6.827219 information_nats_a_word=1.735869
+FIELD_LAP lap=8 read=82 sites=3842018 before=1.408 after=1.381 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=187627
+FIELD_JOINT_NATS lap=8 places=35591 words=6397 own_nats_a_place=1.218419 foil_nats_a_place=1.522537 information_nats_a_place=0.304118 own_nats_a_word=6.778920 information_nats_a_word=1.692021
+FIELD_LAP lap=9 read=83 sites=3776661 before=1.401 after=1.374 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=186661
+FIELD_JOINT_NATS lap=9 places=35591 words=6397 own_nats_a_place=1.223471 foil_nats_a_place=1.533566 information_nats_a_place=0.310095 own_nats_a_word=6.807030 information_nats_a_word=1.725275
+FIELD_LAP lap=10 read=84 sites=3812168 before=1.398 after=1.370 deposited=412/413 halvings=1 next_halved=0 next_refused=0 ms=188200
+FIELD_JOINT_NATS lap=10 places=35591 words=6397 own_nats_a_place=1.221300 foil_nats_a_place=1.531321 information_nats_a_place=0.310022 own_nats_a_word=6.794948 information_nats_a_word=1.724868
+FIELD_LAP lap=11 read=85 sites=3807277 before=1.427 after=1.400 deposited=413/413 halvings=1 next_halved=0 next_refused=0 ms=186849
+FIELD_JOINT_NATS lap=11 places=35591 words=6397 own_nats_a_place=1.208031 foil_nats_a_place=1.530005 information_nats_a_place=0.321975 own_nats_a_word=6.721122 information_nats_a_word=1.791372

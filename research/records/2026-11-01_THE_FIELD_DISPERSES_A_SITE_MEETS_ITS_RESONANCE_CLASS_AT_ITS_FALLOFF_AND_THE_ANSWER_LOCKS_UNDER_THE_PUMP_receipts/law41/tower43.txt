@@ -1,0 +1,72 @@
+# tower43: run41's tower arm continued from its STATE.3 (bit-identical reload: the opening held read equals lap 3's), STOP_MS 1,628,000 (the same wall time as the alone arm), then its write and the expansion reads
+# binary sha 972cff0a3025534778a5fd4fc4f62d0131bce131af1840f42a84274710099162 from d6f590fb208491c7b3c91281a7e9acd56c48ffa4d269baad451798ea4ccdf848 started 03:26:26
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.248021 foil_nats_a_place=1.556795 information_nats_a_place=0.308773 own_nats_a_word=6.943619 information_nats_a_word=1.717923
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.244302 foil_nats_a_place=1.567870 information_nats_a_place=0.323569 own_nats_a_word=6.922923 information_nats_a_word=1.800241
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.245692 foil_nats_a_place=1.550686 information_nats_a_place=0.304994 own_nats_a_word=6.930661 information_nats_a_word=1.696894
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.229040 foil_nats_a_place=1.528630 information_nats_a_place=0.299590 own_nats_a_word=6.838011 information_nats_a_word=1.666832
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.206719 foil_nats_a_place=1.525029 information_nats_a_place=0.318310 own_nats_a_word=6.713824 information_nats_a_word=1.770982
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.193922 foil_nats_a_place=1.505651 information_nats_a_place=0.311729 own_nats_a_word=6.642623 information_nats_a_word=1.734369
+FIELD_LAPS_HELD lap=5 reason=time left=225694 bound=320000 ms=1402306
+MEASURE lap=tower rc=0 wall_s=1402.9 peak_rss_kib=630312
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=4213 written=3015 held=1600 lambda=752 friction=3111 foil_lambda=732 foil_friction=3151 own_wins=3 foil_wins=2 ms=450039
+MEASURE lap=tower_write rc=0 wall_s=450.3 peak_rss_kib=336552
+WORDS written=469 in_training_vocabulary=298 share=0.635
+TOWER_RUN arm done 03:57:20
+== run35_lap0
+FIELD_EXPANSION tick=0 regions=8 volume=7.076 of 32 delta=77683 growth_millibits_a_tick=- ms=63
+FIELD_EXPANSION tick=1 regions=8 volume=7.095 of 32 delta=200352 growth_millibits_a_tick=683 ms=66
+FIELD_EXPANSION tick=2 regions=8 volume=7.443 of 32 delta=478936 growth_millibits_a_tick=629 ms=69
+FIELD_EXPANSION tick=3 regions=8 volume=7.815 of 32 delta=810033 growth_millibits_a_tick=378 ms=72
+== run35_lap4
+FIELD_EXPANSION tick=0 regions=8 volume=9.309 of 32 delta=77683 growth_millibits_a_tick=- ms=65
+FIELD_EXPANSION tick=1 regions=8 volume=10.666 of 32 delta=179800 growth_millibits_a_tick=605 ms=68
+FIELD_EXPANSION tick=2 regions=8 volume=11.131 of 32 delta=539540 growth_millibits_a_tick=793 ms=71
+FIELD_EXPANSION tick=3 regions=8 volume=11.271 of 32 delta=1320649 growth_millibits_a_tick=645 ms=73
+== run35_lap20
+FIELD_EXPANSION tick=0 regions=8 volume=10.368 of 64 delta=149609 growth_millibits_a_tick=- ms=77
+FIELD_EXPANSION tick=1 regions=8 volume=14.015 of 64 delta=676222 growth_millibits_a_tick=1088 ms=87
+FIELD_EXPANSION tick=2 regions=8 volume=14.879 of 64 delta=3638826 growth_millibits_a_tick=1214 ms=96
+FIELD_EXPANSION tick=3 regions=8 volume=15.399 of 64 delta=7532934 growth_millibits_a_tick=525 ms=105
+== run36_lap9
+FIELD_EXPANSION tick=0 regions=8 volume=10.679 of 64 delta=149609 growth_millibits_a_tick=- ms=78
+FIELD_EXPANSION tick=1 regions=8 volume=14.820 of 64 delta=2635336 growth_millibits_a_tick=2069 ms=87
+FIELD_EXPANSION tick=2 regions=8 volume=16.031 of 64 delta=11779806 growth_millibits_a_tick=1080 ms=96
+FIELD_EXPANSION tick=3 regions=8 volume=16.752 of 64 delta=43037128 growth_millibits_a_tick=934 ms=106
+== run36_lap19
+FIELD_EXPANSION tick=0 regions=8 volume=10.776 of 64 delta=149609 growth_millibits_a_tick=- ms=77
+FIELD_EXPANSION tick=1 regions=8 volume=15.161 of 64 delta=3918432 growth_millibits_a_tick=2355 ms=86
+FIELD_EXPANSION tick=2 regions=8 volume=16.407 of 64 delta=12440517 growth_millibits_a_tick=833 ms=95
+FIELD_EXPANSION tick=3 regions=8 volume=17.405 of 64 delta=28646899 growth_millibits_a_tick=601 ms=104
+== run37_lap17
+FIELD_EXPANSION tick=0 regions=8 volume=11.108 of 128 delta=290885 growth_millibits_a_tick=- ms=129
+FIELD_EXPANSION tick=1 regions=8 volume=17.031 of 128 delta=2632744 growth_millibits_a_tick=1589 ms=166
+FIELD_EXPANSION tick=2 regions=8 volume=19.218 of 128 delta=12644340 growth_millibits_a_tick=1131 ms=201
+FIELD_EXPANSION tick=3 regions=8 volume=21.424 of 128 delta=27717055 growth_millibits_a_tick=566 ms=240
+== run38_lap13
+FIELD_EXPANSION tick=0 regions=8 volume=11.598 of 256 delta=568020 growth_millibits_a_tick=- ms=338
+FIELD_EXPANSION tick=1 regions=8 volume=18.881 of 256 delta=824068 growth_millibits_a_tick=268 ms=509
+FIELD_EXPANSION tick=2 regions=8 volume=20.895 of 256 delta=21370908 growth_millibits_a_tick=2348 ms=680
+FIELD_EXPANSION tick=3 regions=8 volume=23.836 of 256 delta=68688049 growth_millibits_a_tick=842 ms=851
+== run41_alone
+FIELD_EXPANSION tick=0 regions=8 volume=12.068 of 256 delta=568020 growth_millibits_a_tick=- ms=339
+FIELD_EXPANSION tick=1 regions=8 volume=21.101 of 256 delta=2253243 growth_millibits_a_tick=994 ms=513
+FIELD_EXPANSION tick=2 regions=8 volume=21.161 of 256 delta=8505339 growth_millibits_a_tick=958 ms=689
+FIELD_EXPANSION tick=3 regions=8 volume=23.861 of 256 delta=37582408 growth_millibits_a_tick=1072 ms=863
+== run43_tower
+FIELD_EXPANSION tick=0 regions=8 volume=11.891 of 256 delta=568020 growth_millibits_a_tick=- ms=430
+FIELD_EXPANSION tick=1 regions=8 volume=20.139 of 256 delta=3276137 growth_millibits_a_tick=1264 ms=590
+FIELD_EXPANSION tick=2 regions=8 volume=20.240 of 256 delta=15154972 growth_millibits_a_tick=1104 ms=761
+FIELD_EXPANSION tick=3 regions=8 volume=22.926 of 256 delta=67356172 growth_millibits_a_tick=1076 ms=933
+TOWER_RUN exit 03:57:25
+
+FIELD_DECLARATION alphabet=122 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=2221 section=16 rate=11 answer=1229 train=6602 withheld=128 dev=128 sections=413 laps_read=77 material=448504
+FIELD_HELD lap=-1 answer=5.636696 classes=35591 context=0.339077 context_classes=35591 foil=0.667335 question=0.328258 ms=9459
+FIELD_LAP lap=0 read=78 sites=3792895 before=1.418 after=1.388 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=258169
+FIELD_LAP lap=1 read=79 sites=3793475 before=1.412 after=1.382 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=255003
+FIELD_LAP lap=2 read=80 sites=3777809 before=1.432 after=1.401 deposited=413/413 halvings=3 next_halved=0 next_refused=0 ms=244950
+FIELD_LAP lap=3 read=81 sites=3871418 before=1.418 after=1.386 deposited=413/413 halvings=2 next_halved=0 next_refused=0 ms=260453
+FIELD_LAP lap=4 read=82 sites=3842018 before=1.390 after=1.358 deposited=413/413 halvings=0 next_halved=0 next_refused=0 ms=245903
+FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15122628608 total=16802250752 batch_budget=10131537920
+FIELD_CARD reads=4213 read_ms=449779 returns=0 return_ms=0 pairs=84101414374 batches=4213 peak_store=821918584 landmarks=0 landmark_ms=0 elapsed_ms=450039
+alone_write FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15342501888 total=16802250752 batch_budget=10351411200
+alone_write FIELD_CARD reads=4473 read_ms=364107 returns=0 return_ms=0 pairs=71700228131 batches=4473 peak_store=675477096 landmarks=0 landmark_ms=0 elapsed_ms=364262

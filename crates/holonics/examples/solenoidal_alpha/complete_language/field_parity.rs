@@ -71,7 +71,7 @@ impl Passage {
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
     fn learner(&self, args: &[String], rate: u32) -> Result<FieldLearner> {
         let (width, heads, modes, still, contacts, ticks) = (positive(&args[0])?, positive(&args[1])?, positive(&args[2])?, count(&args[3])?, positive(&args[4])?, positive(&args[5])?);
-        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach };
+        let declaration = FieldDeclaration { alphabet: self.codec.alphabet(), width, heads, modes, still, contacts, ticks, frames: heads, reach: self.reach, lanes: 1 };
         Ok(FieldLearner::new(Field::found(declaration, &self.keys).map_err(|e| e.to_string())?, rate))
     }
 }
@@ -238,6 +238,15 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let mut founded = p.learner(&args[9..15], rate)?;
     if grow > 1 {
         founded = founded.widened(grow, &p.keys).map_err(|e| e.to_string())?;
+    }
+    // [agent-inferred, November 4, §16.40] Lanes (`FIELD_PARITY_LANE=k`): the founded field grown by `k` fresh lanes
+    // ([`FieldLearner::laned`]), so the parity reads every lane's own chart and its adjoint on both realizations (the
+    // lanes' reads open at zero and carry their covector from the first section, so every later read meets them).
+    if let Some(k) = std::env::var("FIELD_PARITY_LANE").ok().and_then(|v| v.parse::<usize>().ok()) {
+        for _ in 0..k {
+            founded = founded.laned(&p.keys).map_err(|e| e.to_string())?;
+        }
+        println!("FIELD_PARITY_LANE lanes={} width={} material={}", founded.field.declaration.lanes, founded.field.declaration.width, founded.field.material_len());
     }
     // [agent-inferred, November 2] A pace far from the founding (`FIELD_PARITY_PACE=s`, §16): every pace entry drawn from
     // the key file's tail, a 32-bit word shifted down `s` bits, so the clocks run off the byte place (fractional,

@@ -2849,3 +2849,137 @@ Failures this could repeat, checked: **catered machinery** (no class is named an
 the head's own shells and their counts the region's); **a design in the programming language** (the multiplicity is a face's
 mass, the octave the same grain the falloff reads); **bits read as progress** (each read is reported with its copy lab and its
 question's information beside the code).
+
+### 16.39 The tower's first reading misses its acceptance, and the state cloud fills a tenth of its width
+
+[measurement; November 4] The tower record's acceptance (§4 there), on the card (RTX 4080 SUPER under `.local/gpu.lock`, 24
+host threads; `_receipts/law41/`): run38's lap-13 state (`D 256`, `H 4`, the day's laws) continued 45 card-minutes alone
+(`run41.txt`: 12 laps of 186 to 208 s, 2,542 s, peak 630 MB) and grown in scale (packets of 6 after two of four ticks, the
+packets' field `D 256`, `H 8` with 4 still). The tower arm stopped after its lap 3 at 01:51 UTC, when the session that held it
+ended and took its process group with it; it was continued from its `STATE.3` in a detached process (`tower43.txt`; the reload is
+bit-identical, its opening held read equal to lap 3's), with the stop set so laps 4 to 8 begin, as the uninterrupted arm's
+would (laps 246 to 250 s, 270 s with their reads; 9 laps in the same wall time). Measured to projected: the alone arm 2,542 s
+against 2,700; the continuation 1,403 s against 1,628; the tower's write stopped at its 450 s bound in the third pass.
+
+| | laps | joint code, nats a place | the question's information, nats a place | written words in the training vocabulary |
+|---|---|---|---|---|
+| the field alone | 12 | 1.208 | 0.322 | 413 of 617 (66.9 %) |
+| the tower | 9 | 1.194 | 0.312 | 298 of 469 (63.5 %) |
+
+At equal laps (lap 8) the tower codes 1.194 against 1.218, 0.025 nats a place lower; at equal card time 0.014 lower, where the
+acceptance asked 0.035 (0.05 bits a byte), and its question carries less. **The acceptance fails on both counts.** Both arms
+write the terrain's surface (the `<<a*b=c>>` forms, `####`, the question's nouns), not its reasoning; the answers were shown to
+Brandon whole and are not kept here.
+
+**The expansion and the volume across the states** (the tower record's D5, `expansion-field` on the first 8 held problems;
+the volume the participation ratio `(tr C)²/tr C²` of the sites' charts at the last tick, the expansion `½ log₂(Δ_(k+1)/Δ_k)`
+summed over the three tick crossings):
+
+| state | width | volume | expansion, bits over three ticks |
+|---|---|---|---|
+| run35 lap 0 | 32 | 7.8 | 1.69 |
+| run35 lap 4 | 32 | 11.3 | 2.04 |
+| run35 lap 20 (grown at 11) | 64 | 15.4 | 2.83 |
+| run36 lap 9 | 64 | 16.8 | 4.08 |
+| run36 lap 19 | 64 | 17.4 | 3.79 |
+| run37 lap 17 | 128 | 21.4 | 3.29 |
+| run38 lap 13 | 256 | 23.8 | 3.46 |
+| run41, the field alone | 256 | 23.9 | 3.02 |
+| run41, the tower (lap 8) | 256 | 22.9 | 3.44 |
+
+[definition; agent-inferred] What it says. Every tick expands (each crossing pulls nearby states apart, 0.27 to 2.36 bits), and
+the expansion is largest across run36's laps 0 to 19, where still head 1 contracted from 38 effective sources to 2 and the
+question's information rose from 0.02 to 0.26: the field makes the question's information by expanding in its tick map and
+settles it by contracting one head onto the question's sites. The volume grows far slower than the width: the doublings
+from 32 to 256 added 6, 4 and 2.4 directions, so at `D 256` the sites' states span 24 of 256. Growth by copies widens the room
+without moving the states into it: a copy's coordinates repeat the occupied directions, their differences sit on the singular
+locus (§16.37), and they part only as fast as noise breaks the symmetry. The tower added a level beside a level that had not
+spent its width, so it bought little.
+
+**The decision** (the tower record's D2, now first): width is lanes. A growth adds a fresh lane, normalized on its own
+coordinates, its opening rows drawn and every read from it founded at zero, so every face is kept and the lane's readers have
+a covector at once (a first-order escape, where copies need the symmetry broken). Its acceptance, fixed before the build: on the
+card from run41's alone state, a lane grown to `D 512` reads, after 45 card-minutes, a joint code at least 0.035 nats a place
+below the same state continued 45 minutes alone, and a volume at least 32; the written answers are shown whole.
+
+Failures this could repeat, checked: **bits read as progress** (the code is read with the volume, the question's information and
+the written words beside it); **a refusal answered with a larger limit** (the tower arm was continued to the same wall time,
+not lengthened; its write's stop at 450 s is reported as incomplete); **a design in the programming language** (a lane is a
+register with its own normalization and clock, the branch registers' law, not a block of array slots).
+
+### 16.40 Width is lanes; a lane beside a trained field reads its faces, learns faster a lap, and leaves the volume at 24
+
+[definition; agent-inferred, November 4] The tower record's D2, built (`lane_chart`, `lane_adjoint`, `Field::laned`,
+`FieldLearner::laned`; the card's `field_chart` and `field_ratio_adjoint` lane by lane): a face of `L` lanes is charted lane by
+lane, each lane's `W = D/L` coordinates a ratio to their own power. A lane is founded after the others as a founding founds
+those rows (the encodings and the moment's chart into it drawn), with every read from it and every other write into it at
+zero, so every face is kept and every read from it has a covector at once. Growth by copies multiplies the lanes, so a copy of a
+lane reads the old lane's chart. The declaration carries its lanes (`hnn-field-v13`; run41's state was rewritten at its head
+line, its body byte-equal). Host tests (`a_lane_founded_beside_a_field_reads_its_faces`,
+`the_laned_fields_covector_matches_its_codes_difference`; field tests 62 pass); the card parity of a laned field (`D 64` in two
+lanes) and of the field alone read every face, covector entry, learner, row, share, current and write equal
+(`_receipts/law44/lane_parity.txt`).
+
+[measurement] **The lane's opening.** From run41's alone state grown to `D 512`, read for 200 s (`law44/probe_founding.txt`):
+the laned field reads the alone state's joint code exactly (1.208031 nats a place); its entries opened as a founding's (each at
+its first covector, the largest normalized step) halved 208 times over 212 sections, against the alone arm's once, and raised
+the withheld code from 0.268 to 0.294 bits a site. Every read from a fresh lane opens at once and in agreement, so the lane moved
+the trained keys, values and drives together. Opened on its families' statistics (first moment zero, second the mean of the
+family's old second moments; `law44/probe_family.txt`): 169 halvings over 219 sections, the withheld code to 0.286. Smaller,
+not gone.
+
+[measurement] **The acceptance** (§16.39, fixed before the build; `_receipts/law46/run46.txt`; the card, 45 card-minutes each
+from run41's alone state):
+
+| | width | laps | joint code, nats a place | question, nats a place | withheld code, bits a site | written words in the vocabulary | volume at the last tick |
+|---|---|---|---|---|---|---|---|
+| with a lane | 512 in 2 | 8 (277 to 307 s) | 1.158 | 0.334 | 0.239 | 332 of 484 (68.6 %) | 24.0 of 512 |
+| alone | 256 | 12 (195 to 219 s) | 1.164 | 0.302 | 0.236 | 291 of 379 (76.8 %) | 24.6 of 256 |
+
+Measured to projected: the laned arm 2,546 s against 2,700 (laps 277 to 307 s against 370), its write 590 s against 620; the
+alone arm 2,646 s, its write 340 s. The laned arm's lap 0 halved 180 times and stood 0.028 nats a place above its opening; from
+lap 3 it fell faster a lap than the alone arm (lap 3 to 7: 1.208 to 1.158 against 1.190 to 1.165) and passed it at lap 7, at
+equal laps 0.007 lower. **At equal card time it is 0.006 nats a place lower, where the acceptance asked 0.035, and its volume
+is 24, where it asked 32: the acceptance fails.**
+
+[definition; agent-inferred] What the volume says. The laned field opens at 27.3 directions (the fresh lane's encoding spreads
+the opening) and its ticks pull the cloud to 24.0; the alone field opens at 12.5 and its ticks push it to 24.6. The tick map
+carries the sites' states to about two dozen directions from either side, whatever the room: the field's capacity is set by its
+constitution's ticks, not by its width. The narrowest channel into the face is the current's return `O`, `D × 2M` with
+`2M = 64` reals over the four heads' eight modes; the pair contact's return is wider (`D × f`, `f = 256`). The next loop
+reads which half of the tick contracts the cloud: the volume after each tick's current (the pair chart's read) and after its
+pair contact (the next tick's read), on the card.
+
+[measurement] **The half-tick reading** (`_receipts/law47/halves.txt`; `TickRead`'s pair chart, the state after a tick's current
+and before its pair contact, on the card; nine states): at the first tick the current contracts the cloud (the laned arm 27.3
+to 22.4, run46's alone arm 12.5 to 11.3, run38 11.6 to 10.2, run37 11.1 to 9.8) and the pair contact spreads it (the alone arm
+11.3 to 23.0, the laned 22.4 to 26.7); past the first tick neither half moves it more than about two directions either way.
+Both halves expand a perturbation at every tick, the current by 0.1 to 2.0 bits, the pair contact by 0.1 to 0.5.
+
+[definition; agent-inferred; a correction of §16.39 and of the paragraph above] What the volume can say. The participation ratio
+is a Rényi-2 count over the covariance's eigenvalues: it weighs directions by their variance, so a few strong ones (the space
+against the rest, digits against letters) set it, and 24 of 512 does not say the other directions are empty. The lane's own
+reading says they carry learning: over laps 3 to 7 the laned arm's joint code fell 0.050 nats a place against the alone arm's
+0.025 over its laps 3 to 7, the alone arm stood flat over its last five laps (1.165, 1.172, 1.173, 1.163, 1.164) while the
+laned arm still fell, and its withheld code fell 0.024 bits a site over its last four laps against the alone arm's 0.004. So
+§16.39's inference, that copies left the width unspent because the volume stood near 24, does not follow from the volume; the
+lane's steeper fall is the evidence for the width, and its acceptance failed on its opening (three laps of halvings) and on its
+lap's cost (1.45 times), not on an unused width. The next loop continues both arms another 45 card-minutes each from their last
+states (run48), to read whether the laned field's fall persists past the alone arm's plateau.
+
+Failures this could repeat, checked: **bits read as progress** (the code is read with the question's information, the withheld
+code, the written words and the volume); **a located cause carried unrepaired into a new consumer** (the expansion reader's
+site count read from the scales, which are now one a lane, panicked on the laned state; repaired, `sites = read.len() / D`, and
+reread); **a refusal answered with a larger limit** (the arms ran at the fixed 45 minutes and their writes at their projected
+bound).
+
+[measurement] **Read longer** (run48, `_receipts/law48/run48.txt`; both arms continued 45 more card-minutes from their last
+states, the same law and binary family): at 90 card-minutes from run41's alone state the laned arm (15 laps in all) codes
+1.148 nats a place, the question 0.325, the withheld code 0.219 bits a site, its written words 442 of 640 (69.1 %), its volume
+23.4 of 512; the alone arm (24 laps) codes 1.127, the question 0.331, the withheld code 0.217, its written words 167 of 248
+(67.3 %), its volume 23.4 of 256. Over the second 45 minutes the laned arm fell 0.010 nats a place in 7 laps and the alone arm
+0.037 in 12: the alone arm's flat stretch (§16.40 above) was the joint read's lap-to-lap spread (about ±0.01), not a plateau,
+and the lane's steeper fall did not persist. **At this width and this declaration a lane does not pay for its card time**:
+its laps cost 1.45 times and fall about as fast a lap. No growth enters the main line at 256; lanes stay built as the
+width's law (each lane its own chart), with no growth in the main line until a reading says the width binds. The main line
+continues alone (run49) while the next law is built.

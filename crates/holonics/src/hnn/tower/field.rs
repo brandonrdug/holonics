@@ -199,7 +199,9 @@ pub const MAX_CLASS_TRITS: usize = 7;
 /// is of set `h mod frames`), the first `still` of them still (every mode unframed, reading the
 /// word) and the rest turned (every mode on the solenoid's rings, [`ring_periods`]); and `reach`,
 /// the most sites a region may span (the terrain's extent, read from the passages the field will
-/// meet), which the rings' coarsest closures cover.
+/// meet), which the rings' coarsest closures cover; and `lanes`, the registers the width is read in
+/// (§16.40, the tower record's D2: each lane of `D/lanes` coordinates a ratio to its own power,
+/// [`lane_chart`]; one lane is the chart over the whole width).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct FieldDeclaration {
     pub alphabet: usize,
@@ -211,9 +213,15 @@ pub struct FieldDeclaration {
     pub ticks: usize,
     pub frames: usize,
     pub reach: usize,
+    pub lanes: usize,
 }
 
 impl FieldDeclaration {
+    /// A lane's coordinates, `W = D / lanes`.
+    pub fn lane_width(&self) -> usize {
+        self.width / self.lanes
+    }
+
     /// `M = H n`, the complex modes over every head.
     pub fn complex(&self) -> usize {
         self.heads * self.modes
@@ -348,9 +356,24 @@ impl FieldDeclaration {
     /// card's time follows the contact's site pairs, which follow the heads, while the field's memory lies in its
     /// width and its merge (a trained field widened with its heads read a section in 2.4 times the time; a founded
     /// field of width 128 with four heads reads one in 0.41 s against 0.69 s at width 32).
+    /// The lanes multiply with the width, so each copy of a lane is a lane of the old width and reads the old lane's chart.
     pub fn grown(&self, factor: usize) -> Result<Self> {
         let grow = |v: usize| v.checked_mul(factor).ok_or(TowerError::Refused("a grown extent outgrew its carrier"));
-        Ok(Self { width: grow(self.width)?, contacts: grow(self.contacts)?, ..*self })
+        Ok(Self { width: grow(self.width)?, contacts: grow(self.contacts)?, lanes: grow(self.lanes)?, ..*self })
+    }
+
+    /// [definition; agent-inferred, November 4, §16.40] The declaration with one more lane ([`Field::laned`]): the width
+    /// grows by a lane's coordinates; the heads, contacts and reach are kept.
+    pub fn laned(&self) -> Result<Self> {
+        let width = self.width.checked_add(self.lane_width()).ok_or(TowerError::Refused("a laned width outgrew its carrier"))?;
+        Ok(Self { width, lanes: self.lanes + 1, ..*self })
+    }
+
+    /// The key draws a lane's founding reads ([`Field::laned`]): the encoding's and the strand contacts' rows of every
+    /// class over the lane, and the moment's chart into the lane at the modes that carry a moment.
+    pub fn lane_draws(&self) -> usize {
+        let w = self.lane_width();
+        3 * self.alphabet * w + 2 * self.moment_modes() * w
     }
 
     /// The turned slots: `(frames − still) · n`, slot `l · (frames − still) + (g − still)` the ring
@@ -387,6 +410,9 @@ impl FieldDeclaration {
         if self.alphabet < 2 || self.width == 0 || self.heads == 0 || self.modes == 0 || self.contacts == 0 || self.contacts % 4 != 0 || self.ticks == 0 {
             return refuse("a field needs two classes, a nonempty width, heads, modes, contacts in complex pairs even at each strand side, and ticks");
         }
+        if self.lanes == 0 || self.width % self.lanes != 0 {
+            return refuse("a field's lanes divide its width");
+        }
         if self.frames == 0 || self.heads % self.frames != 0 || self.still > self.frames || self.reach < 2 {
             return refuse("a field's ring sets divide its heads, no more of them are still than there are, and its reach spans two sites");
         }
@@ -399,16 +425,16 @@ impl FieldDeclaration {
     }
 
     fn to_text(self) -> String {
-        format!("hnn-field-v12 {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach)
+        format!("hnn-field-v13 {} {} {} {} {} {} {} {} {} {}", self.alphabet, self.width, self.heads, self.modes, self.still, self.contacts, self.ticks, self.frames, self.reach, self.lanes)
     }
 
     fn from_text(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() != 10 || words[0] != "hnn-field-v12" {
-            return refuse("a field's head line that is not hnn-field-v12");
+        if words.len() != 11 || words[0] != "hnn-field-v13" {
+            return refuse("a field's head line that is not hnn-field-v13");
         }
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])? };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])? };
         d.admit()?;
         Ok(d)
     }
@@ -1885,13 +1911,11 @@ impl Field {
         let sites = x.len() / dw;
         let l = &self.layout;
         let (trits, buckets) = (d.class_trits(), d.classes());
-        // The chart.
+        // The chart, lane by lane.
         cell.read = Vec::with_capacity(sites * dw);
-        cell.scale = Vec::with_capacity(sites);
+        cell.scale = Vec::with_capacity(sites * d.lanes);
         for xt in x.chunks_exact(dw) {
-            let (r, s) = ratio_to_power(xt)?;
-            cell.read.extend_from_slice(&r);
-            cell.scale.push(s);
+            lane_chart(xt, d.lanes, &mut cell.read, &mut cell.scale)?;
         }
         // The key word a head, and the value.
         let mut q = vec![0i64; sites * m2];
@@ -2095,11 +2119,9 @@ impl Field {
         }
         // The pair contact.
         cell.read2 = Vec::with_capacity(sites * dw);
-        cell.scale2 = Vec::with_capacity(sites);
+        cell.scale2 = Vec::with_capacity(sites * d.lanes);
         for xt in x.chunks_exact(dw) {
-            let (r, s) = ratio_to_power(xt)?;
-            cell.read2.extend_from_slice(&r);
-            cell.scale2.push(s);
+            lane_chart(xt, d.lanes, &mut cell.read2, &mut cell.scale2)?;
         }
         cell.a = vec![0i64; sites * f];
         cell.b = vec![0i64; sites * f];
@@ -2169,16 +2191,19 @@ impl Field {
         out.moment = moment;
         out.read = vec![0i32; sites * dw];
         out.lift = vec![0i64; sites * dw];
-        out.scale = vec![0i128; sites];
+        out.scale = vec![0i128; sites * d.lanes];
         out.faces = vec![None; sites];
         out.logits = vec![None; sites];
         let l = &self.layout;
         let mut z = vec![0i64; d.alphabet];
+        let (mut r, mut s) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
         for t in 0..sites {
             if !region.unresolved[t] {
                 continue;
             }
-            let (r, s) = ratio_to_power(&x[t * dw..(t + 1) * dw])?;
+            r.clear();
+            s.clear();
+            lane_chart(&x[t * dw..(t + 1) * dw], d.lanes, &mut r, &mut s)?;
             // The face reads each class through its encoding (§16.26): the lift `y = R r̂ + b_R`, then `z(a) = ⟨E(a), y⟩ + c_a`.
             let mut y = vec![0i64; dw];
             affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &r, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
@@ -2193,7 +2218,7 @@ impl Field {
             out.faces[t] = Some(self.tempered(&z, 1));
             out.logits[t] = Some(z.clone());
             out.read[t * dw..(t + 1) * dw].copy_from_slice(&r);
-            out.scale[t] = s;
+            out.scale[t * d.lanes..(t + 1) * d.lanes].copy_from_slice(&s);
         }
         Ok(out)
     }
@@ -2428,7 +2453,7 @@ impl Field {
     #[allow(clippy::too_many_arguments)]
     fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
-        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let (dw, m, n, f, heads, lanes) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.lanes);
         let m2 = 2 * m;
         let span = 2 * n;
         let sites = definite.len();
@@ -2483,7 +2508,7 @@ impl Field {
             transposed(&self.theta[l.a..l.a + f * dw], reaches.a, dw, das[t], MATERIAL_BITS, &mut ra)?;
             transposed(&self.theta[l.b..l.b + f * dw], reaches.b, dw, dbs[t], MATERIAL_BITS, &mut rb)?;
             let dr: Vec<i64> = ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect();
-            let back = ratio_adjoint(r2s[t], cell.scale2[t], &dr)?;
+            let back = lane_adjoint(r2s[t], &cell.scale2[t * lanes..(t + 1) * lanes], &dr)?;
             for i in 0..dw {
                 dmid[t * dw + i] = fit64(dx[t * dw + i] as i128 + back[i] as i128)?;
             }
@@ -2818,7 +2843,7 @@ impl Field {
             }
         }
         for t in 0..sites {
-            let back = ratio_adjoint(reads[t], cell.scale[t], &dr_all[t * dw..(t + 1) * dw])?;
+            let back = lane_adjoint(reads[t], &cell.scale[t * lanes..(t + 1) * lanes], &dr_all[t * dw..(t + 1) * dw])?;
             for i in 0..dw {
                 dx[t * dw + i] = fit64(dmid[t * dw + i] as i128 + back[i] as i128)?;
             }
@@ -2830,7 +2855,7 @@ impl Field {
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
     fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
-        let (dw, m, n) = (d.width, d.complex(), d.modes);
+        let (dw, m, n, lanes) = (d.width, d.complex(), d.modes, d.lanes);
         let m2 = 2 * m;
         let sites = region.classes.len();
         let l = &self.layout;
@@ -2891,7 +2916,7 @@ impl Field {
                 let rt = &pass.read[t * dw..(t + 1) * dw];
                 let mut dr = vec![0i64; dw];
                 transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
-                let back = ratio_adjoint(rt, pass.scale[t], &dr)?;
+                let back = lane_adjoint(rt, &pass.scale[t * lanes..(t + 1) * lanes], &dr)?;
                 dx[t * dw..(t + 1) * dw].copy_from_slice(&back);
                 ys.push(dy);
                 xs.push(rt);
@@ -3243,6 +3268,31 @@ pub fn strand_mate(t: usize, e: usize, sites: usize) -> Option<usize> {
     }
 }
 
+/// [definition; agent-inferred, November 4, §16.40] **The chart by lanes** (the tower record, D2): a site's face of `L`
+/// lanes is read lane by lane, each lane's `W = D/L` coordinates a ratio to its own power, `r̂_ℓ = r_ℓ / ‖r_ℓ‖_rms`, its
+/// scale `‖r_ℓ‖_rms` pushed after the lanes before it; one lane is the chart over the whole width. Why lanes: a lane
+/// founded beside trained ones with every read from it at zero ([`Field::laned`]) leaves each other lane's chart, and so
+/// every face, exactly as it was, which a chart over the whole width would not (the new coordinates would join the power
+/// every coordinate is divided by), and the reads from it carry a covector at once.
+fn lane_chart(xt: &[i64], lanes: usize, read: &mut Vec<i32>, scale: &mut Vec<i128>) -> Result<()> {
+    for lane in xt.chunks_exact(xt.len() / lanes) {
+        let (r, s) = ratio_to_power(lane)?;
+        read.extend_from_slice(&r);
+        scale.push(s);
+    }
+    Ok(())
+}
+
+/// The adjoint of [`lane_chart`] at one site: each lane's covector through its own chart ([`ratio_adjoint`]).
+fn lane_adjoint(read: &[i32], scales: &[i128], cov: &[i64]) -> Result<Vec<i64>> {
+    let w = read.len() / scales.len();
+    let mut out = Vec::with_capacity(read.len());
+    for (k, &s) in scales.iter().enumerate() {
+        out.extend(ratio_adjoint(&read[k * w..(k + 1) * w], s, &cov[k * w..(k + 1) * w])?);
+    }
+    Ok(out)
+}
+
 /// The founding's scale of the charts and pair drives at width `D`, `√(3/D)` as a ratio of square
 /// roots on `2^(−16)`.
 fn chart_scale(width: usize) -> (u128, u128) {
@@ -3404,6 +3454,96 @@ impl Field {
         repeat(ol.moment_face_bias, layout.moment_face_bias, dw, f, &face, true);
         Ok((Self::with_theta(d, new), from))
     }
+
+    /// [definition; agent-inferred, November 4, §16.40] **The field with one more lane** (the tower record, D2): a lane of
+    /// `W` coordinates founded after the others as a founding founds them, the encoding's and the strand contacts' rows of
+    /// every class uniform on `±1` (the unresolved row at zero) and the moment's chart into the lane uniform on `±√(3/2T)`
+    /// at the turned modes, read from `keys` four bytes a draw in that order; every read from the lane (the key, value and
+    /// probe charts' columns, both pair drives' columns, the readout's lift, its rows and its columns) and every other
+    /// write into it (the current's return, the pair contact's return, the biases) at zero. Every old entry keeps its row
+    /// and column in its family. Each old lane's chart is its own ([`lane_chart`]), nothing reads the new lane and nothing
+    /// it is written by reaches a read, so the laned field reads every face exactly as the old one did; and every read
+    /// from the lane has a covector from the first section on (the lane's chart times the read's covector), so the lane
+    /// opens with no copy's symmetry to break (§16.37).
+    ///
+    /// Returns the laned field and, for each entry, the old entry it carries (`None` for the lane's own).
+    pub fn laned(&self, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.scale.is_some() {
+            return refuse("a tower's levels grow their lanes level by level, not through the fine field alone");
+        }
+        let old = self.declaration;
+        let d = old.laned()?;
+        let layout = FieldLayout::new(&d);
+        let ol = &self.layout;
+        let (dw, dw2, m2, fc, a) = (old.width, d.width, 2 * old.complex(), old.contacts, old.alphabet);
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // A block of `rows × cols` (old) placed at the same rows and columns of a block `new_cols` wide.
+        let mut place = |old_at: usize, new_at: usize, rows: usize, cols: usize, new_cols: usize| {
+            for r in 0..rows {
+                for c in 0..cols {
+                    new[new_at + r * new_cols + c] = self.theta[old_at + r * cols + c];
+                    from[new_at + r * new_cols + c] = Some(old_at + r * cols + c);
+                }
+            }
+        };
+        // The reads of the face (its coordinates the columns) and the encodings (a class a row).
+        for (o, n, rows) in [(ol.q, layout.q, m2), (ol.v, layout.v, m2), (ol.probe, layout.probe, m2), (ol.a, layout.a, fc), (ol.b, layout.b, fc), (ol.enc, layout.enc, a + 1), (ol.before, layout.before, a + 1), (ol.after, layout.after, a + 1)] {
+            place(o, n, rows, dw, dw2);
+        }
+        // The writes into the face (its coordinates the rows), and the face's own vectors.
+        for (o, n, cols) in [(ol.out, layout.out, m2), (ol.w, layout.w, fc), (ol.moment_face, layout.moment_face, m2)] {
+            place(o, n, dw, cols, cols);
+        }
+        for (o, n) in [(ol.out_bias, layout.out_bias), (ol.w_bias, layout.w_bias), (ol.moment_face_bias, layout.moment_face_bias), (ol.lift_bias, layout.lift_bias)] {
+            place(o, n, 1, dw, dw);
+        }
+        place(ol.read, layout.read, dw, dw, dw2);
+        // The families with no face coordinate: as they were.
+        for (o, n, len) in [
+            (ol.q_bias, layout.q_bias, m2),
+            (ol.v_bias, layout.v_bias, m2),
+            (ol.probe_bias, layout.probe_bias, m2),
+            (ol.a_bias, layout.a_bias, fc),
+            (ol.b_bias, layout.b_bias, fc),
+            (ol.read_bias, layout.read_bias, a),
+            (ol.moment_before, layout.moment_before, ol.moment_after - ol.moment_before),
+            (ol.moment_after, layout.moment_after, ol.temper - ol.moment_after),
+            (ol.temper, layout.temper, 2 * old.heads),
+            (ol.pace, layout.pace, ol.moment_face - ol.pace),
+        ] {
+            place(o, n, 1, len, len);
+        }
+        // The lane's founding draws.
+        let mut cursor = 0usize;
+        let mut draw = |num: u128, den: u128, bits: u32| -> Result<i32> {
+            let word = keys.get(cursor..cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the lane's founding reads"))?;
+            cursor += 4;
+            let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            fit32((k * ((num << bits) / den) as i128) >> 31, "a lane's founded value outgrew its 32-bit carrier")
+        };
+        for start in [layout.enc, layout.before, layout.after] {
+            for row in 0..a {
+                for j in dw..dw2 {
+                    new[start + row * dw2 + j] = draw(1, 1, FACE_BITS)?;
+                }
+            }
+        }
+        let tm = old.moment_modes();
+        if tm > 0 {
+            let (three_m, dd_m) = chart_scale(2 * tm);
+            let carries: Vec<bool> = (0..m2).map(|k| old.carries_moment((k % old.complex()) / old.modes)).collect();
+            for o in dw..dw2 {
+                for (k, &on) in carries.iter().enumerate() {
+                    if on {
+                        new[layout.moment_face + o * m2 + k] = draw(three_m, dd_m, MATERIAL_BITS)?;
+                    }
+                }
+            }
+        }
+        debug_assert_eq!(cursor, 4 * old.lane_draws());
+        Ok((Self::with_theta(d, new), from))
+    }
 }
 
 fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
@@ -3414,19 +3554,22 @@ fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
     line.split(' ').map(|w| w.parse::<T>().map_err(|_| TowerError::Refused("a field's material that is not a number"))).collect()
 }
 
-/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scale (the
-/// faces' power) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and volume).
+/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scales (the
+/// faces' power, one a lane) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and
+/// volume); and (§16.40) the pair contact's chart and scales, the state after the tick's current and before its pair contact.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TickRead {
     pub read: Vec<i32>,
     pub scale: Vec<i128>,
+    pub pair_read: Vec<i32>,
+    pub pair_scale: Vec<i128>,
 }
 
 impl Field {
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;
-        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone() }).collect())
+        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone(), pair_read: c.read2.clone(), pair_scale: c.scale2.clone() }).collect())
     }
 }
 
@@ -3747,6 +3890,46 @@ impl FieldLearner {
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
         Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
+    }
+
+    /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
+    /// draws read from the founding key stream past every draw read before. Every old entry keeps its moments; each of the
+    /// lane's entries opens on its family's statistics, its first moment at zero and its second at the mean of its
+    /// family's old second moments (a family no covector has reached opens at zero, at its own first covector, as a
+    /// founding's entries do). The rate is kept: no coordinate is shared among copies, so each steps as it did.
+    ///
+    /// Why the family's statistics and not the founding's opening: an entry opened at its first covector takes the
+    /// largest normalized step, `2^(grain − rate)` with the covector's sign, and every read from a fresh lane opens at
+    /// once and in agreement, so the lane moved the trained keys, values and drives together by about a tenth of their
+    /// unit a section. Measured from run41's alone state grown to `D 512` (`_receipts/law44/probe_founding.txt`): 208
+    /// halvings over 212 sections against the alone arm's one, 166 of 212 deposited, the sections' code before their step
+    /// 1.628 bits a byte against 1.470, and the withheld code 0.268 to 0.294 bits a site in half a lap. Opened on its
+    /// family's second moment, a lane entry's first step is an eighth of its covector over the family's own scale, the
+    /// step the trained entries beside it take; on the same state (`probe_family.txt`): 169 halvings over 219 sections,
+    /// 211 deposited, the withheld code 0.268 to 0.286. Smaller, not gone: the lane's covectors stay coherent, so its steps
+    /// grow toward the full normalized size as its first moments fill.
+    pub fn laned(&self, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows a lane after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the lane's draws"))?;
+        let (field, from) = self.field.laned(rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the

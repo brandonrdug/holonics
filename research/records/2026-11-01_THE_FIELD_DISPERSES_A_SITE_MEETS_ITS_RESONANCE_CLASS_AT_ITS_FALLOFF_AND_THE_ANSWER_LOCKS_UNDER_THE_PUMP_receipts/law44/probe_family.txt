@@ -1,0 +1,20 @@
+# lane45 second read: the lane's moments opened on their families' second moments (FieldLearner::laned)
+# binary sha 3d9f6418f5f59211dccf3eb8e5583ba841d57a56fc0698ecea2cfc9b8ca8fbf7 from b81f793d97b5eed97fa1cf607fe808f54171c72873663f8b3185c274af53e703 started 04:36:21
+FIELD_LANE lap=-1 width=512 lanes=2 rate=11 material=1019128 ms=321
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.208031 foil_nats_a_place=1.530005 information_nats_a_place=0.321975 own_nats_a_word=6.721122 information_nats_a_word=1.791372
+FIELD_UNSEEN lap=-1 code=0.268 sites=36763 next=- ms=33492
+FIELD_STOPPED lap=0 sections=219/413 reason=run sites=2041064 before=1.500 after=1.448 deposited=211 halvings=169 next_halved=0 next_refused=0 lap_ms=172556 ms=206049
+FIELD_UNSEEN lap=0 stopped code=0.286 sites=36763 next=- ms=206049
+MEASURE lap=probe rc=0 wall_s=206.5 peak_rss_kib=647232
+LANE_PROBE sections=219 median_ms=695 max_ms=1755
+LANE_PROBE exit 04:39:48
+halvings 0 sections 153
+halvings 1 sections 33
+halvings 3 sections 12
+halvings 4 sections 11
+halvings 5 sections 6
+halvings 6 sections 3
+halvings 8 sections 1
+# the alone arm's first 212 sections (run41/alone.log)
+halvings 0 sections 211
+halvings 1 sections 1

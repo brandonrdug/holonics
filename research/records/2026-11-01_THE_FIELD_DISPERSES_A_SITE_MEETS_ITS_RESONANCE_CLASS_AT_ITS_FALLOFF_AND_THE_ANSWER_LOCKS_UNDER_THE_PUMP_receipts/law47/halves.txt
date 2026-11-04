@@ -1,0 +1,46 @@
+== run35_lap0
+FIELD_EXPANSION tick=0 volume=7.076 of 32 after_current=6.995 growth_millibits_a_tick=- current_millibits=727 pair_millibits=-44
+FIELD_EXPANSION tick=1 volume=7.095 of 32 after_current=7.178 growth_millibits_a_tick=683 current_millibits=573 pair_millibits=56
+FIELD_EXPANSION tick=2 volume=7.443 of 32 after_current=7.510 growth_millibits_a_tick=629 current_millibits=275 pair_millibits=103
+FIELD_EXPANSION tick=3 volume=7.815 of 32 after_current=7.877 growth_millibits_a_tick=378 current_millibits=580 pair_millibits=-
+== run35_lap20
+FIELD_EXPANSION tick=0 volume=10.368 of 64 after_current=10.067 growth_millibits_a_tick=- current_millibits=727 pair_millibits=361
+FIELD_EXPANSION tick=1 volume=14.015 of 64 after_current=14.035 growth_millibits_a_tick=1088 current_millibits=972 pair_millibits=241
+FIELD_EXPANSION tick=2 volume=14.879 of 64 after_current=15.104 growth_millibits_a_tick=1214 current_millibits=258 pair_millibits=267
+FIELD_EXPANSION tick=3 volume=15.399 of 64 after_current=15.595 growth_millibits_a_tick=525 current_millibits=129 pair_millibits=-
+== run36_lap9
+FIELD_EXPANSION tick=0 volume=10.679 of 64 after_current=10.255 growth_millibits_a_tick=- current_millibits=1455 pair_millibits=614
+FIELD_EXPANSION tick=1 volume=14.820 of 64 after_current=14.792 growth_millibits_a_tick=2069 current_millibits=653 pair_millibits=426
+FIELD_EXPANSION tick=2 volume=16.031 of 64 after_current=16.295 growth_millibits_a_tick=1080 current_millibits=696 pair_millibits=238
+FIELD_EXPANSION tick=3 volume=16.752 of 64 after_current=16.957 growth_millibits_a_tick=934 current_millibits=162 pair_millibits=-
+== run36_lap19
+FIELD_EXPANSION tick=0 volume=10.776 of 64 after_current=9.669 growth_millibits_a_tick=- current_millibits=1990 pair_millibits=365
+FIELD_EXPANSION tick=1 volume=15.161 of 64 after_current=14.972 growth_millibits_a_tick=2355 current_millibits=445 pair_millibits=388
+FIELD_EXPANSION tick=2 volume=16.407 of 64 after_current=16.599 growth_millibits_a_tick=833 current_millibits=294 pair_millibits=307
+FIELD_EXPANSION tick=3 volume=17.405 of 64 after_current=17.607 growth_millibits_a_tick=601 current_millibits=99 pair_millibits=-
+== run37_lap17
+FIELD_EXPANSION tick=0 volume=11.108 of 128 after_current=9.789 growth_millibits_a_tick=- current_millibits=1268 pair_millibits=321
+FIELD_EXPANSION tick=1 volume=17.031 of 128 after_current=16.937 growth_millibits_a_tick=1589 current_millibits=731 pair_millibits=400
+FIELD_EXPANSION tick=2 volume=19.218 of 128 after_current=19.815 growth_millibits_a_tick=1131 current_millibits=249 pair_millibits=317
+FIELD_EXPANSION tick=3 volume=21.424 of 128 after_current=21.655 growth_millibits_a_tick=566 current_millibits=271 pair_millibits=-
+== run38_lap13
+FIELD_EXPANSION tick=0 volume=11.598 of 256 after_current=10.189 growth_millibits_a_tick=- current_millibits=169 pair_millibits=99
+FIELD_EXPANSION tick=1 volume=18.881 of 256 after_current=18.477 growth_millibits_a_tick=268 current_millibits=2043 pair_millibits=304
+FIELD_EXPANSION tick=2 volume=20.895 of 256 after_current=21.752 growth_millibits_a_tick=2348 current_millibits=483 pair_millibits=359
+FIELD_EXPANSION tick=3 volume=23.836 of 256 after_current=24.263 growth_millibits_a_tick=842 current_millibits=207 pair_millibits=-
+== run41_alone
+FIELD_EXPANSION tick=0 volume=12.068 of 256 after_current=10.703 growth_millibits_a_tick=- current_millibits=778 pair_millibits=215
+FIELD_EXPANSION tick=1 volume=21.101 of 256 after_current=20.550 growth_millibits_a_tick=994 current_millibits=523 pair_millibits=434
+FIELD_EXPANSION tick=2 volume=21.161 of 256 after_current=22.100 growth_millibits_a_tick=958 current_millibits=671 pair_millibits=401
+FIELD_EXPANSION tick=3 volume=23.861 of 256 after_current=24.548 growth_millibits_a_tick=1072 current_millibits=263 pair_millibits=-
+== run46_alone
+FIELD_EXPANSION tick=0 volume=12.493 of 256 after_current=11.271 growth_millibits_a_tick=- current_millibits=724 pair_millibits=365
+FIELD_EXPANSION tick=1 volume=22.989 of 256 after_current=22.427 growth_millibits_a_tick=1089 current_millibits=341 pair_millibits=488
+FIELD_EXPANSION tick=2 volume=22.078 of 256 after_current=23.016 growth_millibits_a_tick=830 current_millibits=368 pair_millibits=494
+FIELD_EXPANSION tick=3 volume=24.637 of 256 after_current=25.516 growth_millibits_a_tick=862 current_millibits=506 pair_millibits=-
+== run46_laned
+FIELD_EXPANSION tick=0 volume=27.291 of 512 after_current=22.443 growth_millibits_a_tick=- current_millibits=764 pair_millibits=390
+FIELD_EXPANSION tick=1 volume=26.696 of 512 after_current=25.559 growth_millibits_a_tick=1155 current_millibits=124 pair_millibits=515
+FIELD_EXPANSION tick=2 volume=22.741 of 512 after_current=23.709 growth_millibits_a_tick=640 current_millibits=395 pair_millibits=537
+FIELD_EXPANSION tick=3 volume=24.022 of 512 after_current=25.210 growth_millibits_a_tick=932 current_millibits=229 pair_millibits=-
+HALVES exit 07:48:26
