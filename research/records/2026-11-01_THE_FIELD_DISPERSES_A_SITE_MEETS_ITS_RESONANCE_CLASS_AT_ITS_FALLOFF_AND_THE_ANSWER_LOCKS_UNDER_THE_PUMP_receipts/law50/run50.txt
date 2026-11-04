@@ -1,0 +1,112 @@
+# main50: the section-parabola law for 30 card-minutes from the same state, then the main line from the lowest arm in three 45-minute segments with a write after each (binary sha ead4be60031aa37738a196234173237e2a836bdc23853732fce1096db2680436)
+# main49 stopped after its arms 13:27:57: RATE last3 rate11=1.120301 rate10=1.152366
+# parabola from 54564320d2526b799211eead1560f5b29ca86fefb5cdc5c69ceefe078c2dfa15 started 13:27:57 FIELD_STEP_PARABOLA=1
+FIELD_STEP_PARABOLA rate=11
+FIELD_LAPS_HELD lap=8 reason=time left=101007 bound=260000 ms=1698993
+MEASURE lap=parabola rc=0 wall_s=1699.4 peak_rss_kib=661380
+-1 1.127169 0.331399;0 1.571012 0.267729;1 1.778108 0.239058;2 1.607467 0.267937;3 1.586763 0.264980;4 1.516947 0.257084;5 1.673260 0.266612;6 1.530378 0.280619;7 1.573442 0.267917;
+      1 11       1 10       3 9       8 8       2 9       6 10      16 9       1 10       7 9      17 8       4 9       6 10      10 9      12 8       1 9      22 8       7 9       4 8       1 9       2 8      10 9      47 8       1 9       2 8       4 9       3 8       8 9      12 8       9 7      12 8       5 7       9 8       6 7      18 8       1 9       8 8      13 7      10 8       2 9      
+
+STEP last3 rate11=1.120301 rate10=1.152366 parabola=1.592360
+STEP continuing rate11 from STATE.7 under FIELD_NONE=1
+# seg1 from 3afc2aca400ef970cdc11bf869a45206007314390322c48e617316bb149a826b started 13:56:17 FIELD_NONE=1
+FIELD_LAPS_HELD lap=12 reason=time left=206864 bound=260000 ms=2493136
+MEASURE lap=seg1 rc=0 wall_s=2493.5 peak_rss_kib=707916
+-1 1.113838 0.345975;0 1.112449 0.328936;1 1.127945 0.343305;2 1.107347 0.346429;3 1.103723 0.334034;4 1.107399 0.319144;5 1.101343 0.340940;6 1.098785 0.352913;7 1.109472 0.327660;8 1.092742 0.334997;9 1.096386 0.335433;10 1.104893 0.331102;11 1.090882 0.343883;
+   4956 11 
+
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=4318 held=1600 lambda=833 friction=4252 foil_lambda=772 foil_friction=4374 own_wins=3 foil_wins=3 ms=401520
+MEASURE lap=seg1_write rc=0 wall_s=401.8 peak_rss_kib=243460
+WORDS written=624 in_training_vocabulary=395 share=0.633
+SEGMENT 1 done 14:44:32
+# seg2 from 38c2010816efdfed88c51f7488a05eca628b3e4ceeee55f9c8cca6d48e7b4953 started 14:44:32 FIELD_NONE=1
+FIELD_LAPS_HELD lap=12 reason=time left=202147 bound=260000 ms=2497853
+MEASURE lap=seg2 rc=0 wall_s=2498.2 peak_rss_kib=681364
+-1 1.090882 0.343883;0 1.094533 0.346159;1 1.091252 0.333646;2 1.093243 0.342415;3 1.087658 0.324028;4 1.089988 0.342719;5 1.083245 0.341277;6 1.092434 0.327040;7 1.080352 0.339454;8 1.090965 0.334487;9 1.084442 0.324248;10 1.079784 0.327983;11 1.082148 0.331938;
+   4956 11 
+
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=1041 held=1600 lambda=505 friction=1631 foil_lambda=393 foil_friction=1855 own_wins=4 foil_wins=1 ms=228068
+MEASURE lap=seg2_write rc=0 wall_s=228.3 peak_rss_kib=243792
+WORDS written=130 in_training_vocabulary=103 share=0.792
+SEGMENT 2 done 15:29:59
+# seg3 from 3ed138a80437ceef8d42204ef7ed224c8a0f1bf3c62db72c43be2967f4dc1363 started 15:29:59 FIELD_NONE=1
+FIELD_LAPS_HELD lap=12 reason=time left=205863 bound=260000 ms=2494137
+MEASURE lap=seg3 rc=0 wall_s=2494.5 peak_rss_kib=665880
+-1 1.082148 0.331938;0 1.085638 0.331469;1 1.080200 0.345928;2 1.071251 0.328206;3 1.077671 0.336989;4 1.083790 0.331871;5 1.072767 0.336701;6 1.075913 0.321983;7 1.066301 0.340825;8 1.098430 0.332938;9 1.075499 0.354822;10 1.062863 0.329349;11 1.070690 0.360736;
+   4956 11 
+
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2403 held=1600 lambda=726 friction=2551 foil_lambda=684 foil_friction=2635 own_wins=4 foil_wins=2 ms=239420
+MEASURE lap=seg3_write rc=0 wall_s=239.7 peak_rss_kib=243240
+WORDS written=378 in_training_vocabulary=269 share=0.712
+SEGMENT 3 done 16:15:34
+MAIN exit 16:15:34
+== parabola
+FIELD_STEP_PARABOLA rate=11
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.127169 foil_nats_a_place=1.458567 information_nats_a_place=0.331399 own_nats_a_word=6.271231 information_nats_a_word=1.843803
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.571012 foil_nats_a_place=1.838741 information_nats_a_place=0.267729 own_nats_a_word=8.740640 information_nats_a_word=1.489566
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.778108 foil_nats_a_place=2.017166 information_nats_a_place=0.239058 own_nats_a_word=9.892860 information_nats_a_word=1.330050
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.607467 foil_nats_a_place=1.875404 information_nats_a_place=0.267937 own_nats_a_word=8.943467 information_nats_a_word=1.490723
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.586763 foil_nats_a_place=1.851743 information_nats_a_place=0.264980 own_nats_a_word=8.828278 information_nats_a_word=1.474268
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.516947 foil_nats_a_place=1.774031 information_nats_a_place=0.257084 own_nats_a_word=8.439842 information_nats_a_word=1.430339
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.673260 foil_nats_a_place=1.939872 information_nats_a_place=0.266612 own_nats_a_word=9.309520 information_nats_a_word=1.483350
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.530378 foil_nats_a_place=1.810997 information_nats_a_place=0.280619 own_nats_a_word=8.514569 information_nats_a_word=1.561278
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.573442 foil_nats_a_place=1.841358 information_nats_a_place=0.267917 own_nats_a_word=8.754160 information_nats_a_word=1.490608
+FIELD_LAPS_HELD lap=8 reason=time left=101007 bound=260000 ms=1698993
+MEASURE lap=parabola rc=0 wall_s=1699.4 peak_rss_kib=661380
+== seg1
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.113838 foil_nats_a_place=1.459812 information_nats_a_place=0.345975 own_nats_a_word=6.197061 information_nats_a_word=1.924900
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.112449 foil_nats_a_place=1.441385 information_nats_a_place=0.328936 own_nats_a_word=6.189334 information_nats_a_word=1.830103
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.127945 foil_nats_a_place=1.471249 information_nats_a_place=0.343305 own_nats_a_word=6.275548 information_nats_a_word=1.910045
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.107347 foil_nats_a_place=1.453776 information_nats_a_place=0.346429 own_nats_a_word=6.160948 information_nats_a_word=1.927426
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.103723 foil_nats_a_place=1.437756 information_nats_a_place=0.334034 own_nats_a_word=6.140784 information_nats_a_word=1.858463
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.107399 foil_nats_a_place=1.426542 information_nats_a_place=0.319144 own_nats_a_word=6.161235 information_nats_a_word=1.775622
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.101343 foil_nats_a_place=1.442283 information_nats_a_place=0.340940 own_nats_a_word=6.127543 information_nats_a_word=1.896891
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.098785 foil_nats_a_place=1.451698 information_nats_a_place=0.352913 own_nats_a_word=6.113311 information_nats_a_word=1.963503
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.109472 foil_nats_a_place=1.437132 information_nats_a_place=0.327660 own_nats_a_word=6.172773 information_nats_a_word=1.823001
+FIELD_JOINT_NATS lap=8 places=35591 words=6397 own_nats_a_place=1.092742 foil_nats_a_place=1.427739 information_nats_a_place=0.334997 own_nats_a_word=6.079693 information_nats_a_word=1.863823
+FIELD_JOINT_NATS lap=9 places=35591 words=6397 own_nats_a_place=1.096386 foil_nats_a_place=1.431819 information_nats_a_place=0.335433 own_nats_a_word=6.099962 information_nats_a_word=1.866249
+FIELD_JOINT_NATS lap=10 places=35591 words=6397 own_nats_a_place=1.104893 foil_nats_a_place=1.435996 information_nats_a_place=0.331102 own_nats_a_word=6.147296 information_nats_a_word=1.842155
+FIELD_JOINT_NATS lap=11 places=35591 words=6397 own_nats_a_place=1.090882 foil_nats_a_place=1.434765 information_nats_a_place=0.343883 own_nats_a_word=6.069339 information_nats_a_word=1.913263
+FIELD_LAPS_HELD lap=12 reason=time left=206864 bound=260000 ms=2493136
+MEASURE lap=seg1 rc=0 wall_s=2493.5 peak_rss_kib=707916
+== seg2
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.090882 foil_nats_a_place=1.434765 information_nats_a_place=0.343883 own_nats_a_word=6.069339 information_nats_a_word=1.913263
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.094533 foil_nats_a_place=1.440691 information_nats_a_place=0.346159 own_nats_a_word=6.089654 information_nats_a_word=1.925923
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.091252 foil_nats_a_place=1.424898 information_nats_a_place=0.333646 own_nats_a_word=6.071401 information_nats_a_word=1.856305
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.093243 foil_nats_a_place=1.435657 information_nats_a_place=0.342415 own_nats_a_word=6.082476 information_nats_a_word=1.905093
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.087658 foil_nats_a_place=1.411685 information_nats_a_place=0.324028 own_nats_a_word=6.051402 information_nats_a_word=1.802793
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.089988 foil_nats_a_place=1.432708 information_nats_a_place=0.342719 own_nats_a_word=6.064369 information_nats_a_word=1.906788
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.083245 foil_nats_a_place=1.424522 information_nats_a_place=0.341277 own_nats_a_word=6.026853 information_nats_a_word=1.898764
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.092434 foil_nats_a_place=1.419474 information_nats_a_place=0.327040 own_nats_a_word=6.077976 information_nats_a_word=1.819554
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.080352 foil_nats_a_place=1.419806 information_nats_a_place=0.339454 own_nats_a_word=6.010758 information_nats_a_word=1.888621
+FIELD_JOINT_NATS lap=8 places=35591 words=6397 own_nats_a_place=1.090965 foil_nats_a_place=1.425452 information_nats_a_place=0.334487 own_nats_a_word=6.069802 information_nats_a_word=1.860987
+FIELD_JOINT_NATS lap=9 places=35591 words=6397 own_nats_a_place=1.084442 foil_nats_a_place=1.408691 information_nats_a_place=0.324248 own_nats_a_word=6.033514 information_nats_a_word=1.804021
+FIELD_JOINT_NATS lap=10 places=35591 words=6397 own_nats_a_place=1.079784 foil_nats_a_place=1.407767 information_nats_a_place=0.327983 own_nats_a_word=6.007596 information_nats_a_word=1.824799
+FIELD_JOINT_NATS lap=11 places=35591 words=6397 own_nats_a_place=1.082148 foil_nats_a_place=1.414086 information_nats_a_place=0.331938 own_nats_a_word=6.020750 information_nats_a_word=1.846803
+FIELD_LAPS_HELD lap=12 reason=time left=202147 bound=260000 ms=2497853
+MEASURE lap=seg2 rc=0 wall_s=2498.2 peak_rss_kib=681364
+== seg3
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.082148 foil_nats_a_place=1.414086 information_nats_a_place=0.331938 own_nats_a_word=6.020750 information_nats_a_word=1.846803
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.085638 foil_nats_a_place=1.417107 information_nats_a_place=0.331469 own_nats_a_word=6.040169 information_nats_a_word=1.844194
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.080200 foil_nats_a_place=1.426128 information_nats_a_place=0.345928 own_nats_a_word=6.009913 information_nats_a_word=1.924641
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.071251 foil_nats_a_place=1.399456 information_nats_a_place=0.328206 own_nats_a_word=5.960119 information_nats_a_word=1.826040
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.077671 foil_nats_a_place=1.414660 information_nats_a_place=0.336989 own_nats_a_word=5.995837 information_nats_a_word=1.874906
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.083790 foil_nats_a_place=1.415661 information_nats_a_place=0.331871 own_nats_a_word=6.029884 information_nats_a_word=1.846430
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.072767 foil_nats_a_place=1.409468 information_nats_a_place=0.336701 own_nats_a_word=5.968553 information_nats_a_word=1.873305
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.075913 foil_nats_a_place=1.397896 information_nats_a_place=0.321983 own_nats_a_word=5.986057 information_nats_a_word=1.791418
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.066301 foil_nats_a_place=1.407126 information_nats_a_place=0.340825 own_nats_a_word=5.932582 information_nats_a_word=1.896248
+FIELD_JOINT_NATS lap=8 places=35591 words=6397 own_nats_a_place=1.098430 foil_nats_a_place=1.431368 information_nats_a_place=0.332938 own_nats_a_word=6.111338 information_nats_a_word=1.852368
+FIELD_JOINT_NATS lap=9 places=35591 words=6397 own_nats_a_place=1.075499 foil_nats_a_place=1.430322 information_nats_a_place=0.354822 own_nats_a_word=5.983757 information_nats_a_word=1.974126
+FIELD_JOINT_NATS lap=10 places=35591 words=6397 own_nats_a_place=1.062863 foil_nats_a_place=1.392212 information_nats_a_place=0.329349 own_nats_a_word=5.913455 information_nats_a_word=1.832397
+FIELD_JOINT_NATS lap=11 places=35591 words=6397 own_nats_a_place=1.070690 foil_nats_a_place=1.431426 information_nats_a_place=0.360736 own_nats_a_word=5.957002 information_nats_a_word=2.007025
+FIELD_LAPS_HELD lap=12 reason=time left=205863 bound=260000 ms=2494137
+MEASURE lap=seg3 rc=0 wall_s=2494.5 peak_rss_kib=665880
+== seg1_write
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=4318 held=1600 lambda=833 friction=4252 foil_lambda=772 foil_friction=4374 own_wins=3 foil_wins=3 ms=401520
+MEASURE lap=seg1_write rc=0 wall_s=401.8 peak_rss_kib=243460
+== seg2_write
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=1041 held=1600 lambda=505 friction=1631 foil_lambda=393 foil_friction=1855 own_wins=4 foil_wins=1 ms=228068
+MEASURE lap=seg2_write rc=0 wall_s=228.3 peak_rss_kib=243792
+== seg3_write
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2403 held=1600 lambda=726 friction=2551 foil_lambda=684 foil_friction=2635 own_wins=4 foil_wins=2 ms=239420
+MEASURE lap=seg3_write rc=0 wall_s=239.7 peak_rss_kib=243240

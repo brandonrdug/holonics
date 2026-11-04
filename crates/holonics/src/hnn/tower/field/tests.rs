@@ -193,7 +193,8 @@ fn text_restores_exactly() {
     let mut learner = FieldLearner::new(field, 6);
     learner.section(&[region()]).unwrap();
     let back = FieldLearner::from_text(&learner.to_text()).unwrap();
-    assert_eq!(back, learner);
+    // The transfer's operand is a reading's, not retained (§16.41).
+    assert_eq!(back, FieldLearner { last: None, ..learner });
 }
 
 /// The covector agrees with the code's central difference on every family: the three entries of
@@ -1323,7 +1324,7 @@ fn a_tower_founded_on_a_field_reads_its_faces() {
     }
     let mut learner = FieldLearner::new(towered_live(1), 6);
     learner.section(&[region()]).unwrap();
-    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
+    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), FieldLearner { last: None, ..learner });
 }
 
 /// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'
@@ -1479,4 +1480,35 @@ fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
         assert!(predicted < 0 && change < 0, "still {still}: predicted {predicted}, change {change}");
         assert!((change - predicted).abs() * 5 <= predicted.abs(), "still {still}: predicted {predicted}, change {change}");
     }
+}
+
+/// [measurement; §16.41] **A step's transfer is the next section's change in the small**: on the tiny field, after a section
+/// on one region deposits its step, the next section on another region prices that step at the material that stands, and
+/// the price is the second region's code change were the step taken once more, within a fifth at a small rate. The first
+/// section prices nothing, and a growth clears the operand.
+#[test]
+fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
+    let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
+    let second_open = [true, false, false, true, true, false, false];
+    let second = [Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let code_on = |field: &Field| code_of(&compared(&[field.faces(&second[0]).unwrap()], &second).unwrap(), &spans_of(&second));
+    let mut read = 0;
+    for still in [0usize, 1, 2] {
+        let mut learner = FieldLearner::new(shaped(still), 14);
+        let first = learner.section(&[region()]).unwrap();
+        assert_eq!(first.transfer, None, "still {still}: the first section prices no step");
+        if !first.deposited {
+            continue;
+        }
+        let last = learner.last.clone().expect("a deposited step is kept for the next section's price");
+        let once_more = stepped(&learner.field, &last.step, last.halvings).unwrap().0;
+        let change = (code_on(&once_more) - code_on(&learner.field)) as i128;
+        let receipt = learner.section(&second).unwrap();
+        let transfer = receipt.transfer.expect("a transfer within its carrier") as i128;
+        eprintln!("STEP_TRANSFER still={still} transfer={transfer} change={change} own={:?}", first.predicted);
+        assert!((change - transfer).abs() * 5 <= transfer.abs().max(change.abs()), "still {still}: transfer {transfer}, change {change}");
+        read += 1;
+        assert_eq!(learner.widened(2, &keys(1 << 16)).unwrap().last, None, "still {still}: a growth clears the operand");
+    }
+    assert!(read >= 2, "read {read}");
 }

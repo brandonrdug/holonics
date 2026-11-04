@@ -2983,3 +2983,62 @@ and the lane's steeper fall did not persist. **At this width and this declaratio
 its laps cost 1.45 times and fall about as fast a lap. No growth enters the main line at 256; lanes stay built as the
 width's law (each lane its own chart), with no growth in the main line until a reading says the width binds. The main line
 continues alone (run49) while the next law is built.
+
+### 16.41 A step's own parabola misprices it; the step is priced on the sections it was not fit on
+
+[measurement; agent-inferred, November 4] With growth held (§16.40), the step's size was read three ways, 30 card-minutes each
+from run48's alone state (1.127 nats a place, `D 256`, rate `2^(−11)`, every step standing at full size), then the main line
+from the lowest (`_receipts/law50/`: `run49.txt`, `run50.txt`, their launch scripts, and the parabola arm's sections):
+
+| arm | laps | joint code at lap 0, nats a place | at lap 7 | fall a lap, laps 0 to 7 (least squares) | mean of the last three |
+|---|---|---|---|---|---|
+| rate `2^(−11)` | 8 | 1.135 | 1.114 | 0.0019 | **1.120** |
+| rate `2^(−10)` | 8 | 1.180 | 1.139 | 0.0059 | 1.152 |
+| the section's own parabola | 8 | 1.571 | 1.573 | — | 1.592 |
+
+Measured to projected: each arm 1,661 to 1,701 s against its outer 1,860 s; the GPU field suite before them, 4 passed, 0
+failed. **The own parabola.** The receipt carries each step's first-order change `a` and the change read at its full size `a + b`
+(`predicted_change`; `a_steps_predicted_change_is_its_codes_change_in_the_small` holds them within a fifth at a small step). Over the main line's 4,956 sections at `2^(−11)` the mean `a`
+is −0.0252 bits a site and the mean `b` +0.0025 (92% of sections curve upward), so each section's own least stands near
+`μ* = −a/2b ≈ 5` times the step. The law that moved the step one octave a section toward that least drove it to `2^(−6)` (1,425
+of its 3,304 sections; `2^(−5)` to `2^(−7)` for 2,905) and the joint code rose 0.44 nats a place in one lap and stayed there.
+Meanwhile the sections' code before their steps, weighed by sites over each lap, stands where it stood (1.270 to 1.268 bits a
+site over seg1's twelve laps, 1.254 to 1.255 over seg3's, ±0.03 between laps from the keyed masks), while each step lowers its
+own section 0.024: over a lap the 413 steps lower their own sections about ten bits a site in all and the sections met next
+almost none of it. Nearly all of a step's own fall is the fit to its own section. A section's own parabola prices the
+fit, not what generalizes. The parabola law is retired (the trainer's `FIELD_STEP_PARABOLA`); its receipt fields stay as the
+readings below consume them.
+
+**The doubled step pays at once and falls faster.** At `2^(−10)` the joint code rose 0.053 at the first lap (1.127 to 1.180) and
+then fell three times faster a lap than at `2^(−11)` (0.0059 against 0.0019), as the lane did (§16.40). The arm read's last
+three laps chose `2^(−11)`, but the read is short: each arm opens on a state its rate's moments were adapted to. The jump is
+the step's noise floor read directly (a constant step leaves the code above its least by about what its own noise costs, so
+doubling the step raises it at once), so the floor at `2^(−11)` is about 0.05 nats a place above where the step's noise would
+let it rest.
+
+**The main line** (seg1 to seg3, 45 card-minutes each at `2^(−11)` from the rate arm's last state; 12 laps a segment of 195 to
+219 s, each segment 2,494 to 2,498 s against its outer 2,760 s, peak resident 666 to 708 MiB): the joint code 1.114, 1.091,
+1.082, 1.071 nats a place at each segment's end (0.0012 a lap over 37 laps, the question's information 0.331 to 0.361), the
+writes' words in the training vocabulary 395 of 624 (63.3 %), 103 of 130 (79.2 %), 269 of 378 (71.2 %), and the own question's
+release beating its foil's on 3, 4 and 4 of the six held problems. The line continues (main51) while the step's price is read.
+
+[definition; agent-inferred] **The step's price on the next section** (`FieldReceipt::transfer`; `FieldLearner`'s `last`, a
+reading's operand not carried in the text): at each section, `t = Σ_i g_i Δθ_i` with `g` the section's covector at the material
+that stands and `Δθ` the step the section before stood at, the first-order change of this section's code were that step taken
+once more. Along a lap's steps the joint code is `F(μ) = cμ + b′μ²` with `F′(1) = Σ t`, and the trainer reads the joint
+parabola's least `μ* = 1 − Σt / 2Σb` with `b′` from the own curvatures of the steps priced (`FIELD_STEP_PRICE` each lap; a
+section that is not fit on is the comparison the step's size needs, and it costs no read: the covector is the section's own).
+`FIELD_STEP_TRANSFER` moves the rate to the octave nearest `μ*` once a lap (`step_transfer`, compared exactly), a declared
+comparison with the fixed rate. On the tiny field the transfer reads the next region's code change were the step taken once
+more within 1.9% (−4,045 against −3,998, −1,634 against −1,614, −1,909 against −1,874 on the codes' grain, at still 0, 1 and 2;
+`a_steps_transfer_is_the_next_sections_change_in_the_small`), and there the step's own first-order fall is 2.3 to 4.1 times
+its transfer. Verification: the field library tests (64), the trainer's tests (15, `the_step_moves_to_the_octave_nearest_its_joint_least`
+among them), the gate; the card's kernels are unchanged (the price is a host sum of the covector the card returns), so the card
+parity of `law44` stands. Next (main52, queued behind main51's fourth segment): from one state, 30 card-minutes each at
+`2^(−11)`, at `2^(−12)` and under the transfer law, every arm printing its laps' prices; the halved step should fall at once if
+the noise floor binds, and the prices say whether the step overshoots the sections it was not fit on.
+
+Failures this could repeat, checked: **bits read as progress** (the arms are read with their falls a lap and their opening
+jumps, not only their last reads; the main line with its writes); **a refusal answered with a larger limit** (every arm and
+segment ran at its fixed bound); **a located cause carried unrepaired into a new consumer** (the parabola law's cause, a
+step's own fit read as its generalization, is repaired at the price's owner, not carried into the next law).

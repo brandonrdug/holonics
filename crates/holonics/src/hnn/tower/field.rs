@@ -3669,6 +3669,12 @@ pub struct FieldReceipt {
     /// section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
     pub predicted: Option<i64>,
     pub change: i64,
+    /// [measurement; agent-inferred, November 4, §16.41] **The step before, priced on this section**: `Σ_i g_i Δθ_i` with `g`
+    /// this section's covector at the material that stands and `Δθ` the step the section before stood at (its halvings
+    /// released), on the codes' grain: the first-order change of this section's code were that step taken once more. Negative
+    /// where the step before was short of what this section, which it was not fit on, would take; positive where it went
+    /// past. `None` at a learner's first section, after a section that deposited nothing, or past its carrier.
+    pub transfer: Option<i64>,
 }
 
 /// A deposited step held for the next regions' read: the proposed step on each family's grain and
@@ -3735,14 +3741,15 @@ fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
 /// with `Δθ = −step` at its full size and `g` the section's covector as its return gives it, on the codes' `2^(−20)` bits, a
 /// unit of `g Δθ` standing at `2^(−(40 + grain − 20))` bits on the material's families and `2^(−(24 + grain − 20))` on the
 /// faces' (the covector's grains, as `covector_matches_the_codes_difference` reads them); `None` where a product or the sum
-/// passes its carrier. With the change the certificate reads at the full step it is the section's own parabola.
-fn predicted_change(field: &Field, g: &[i128], step: &[i128]) -> Option<i64> {
+/// passes its carrier. With the change the certificate reads at the full step it is the section's own parabola; with the next
+/// section's covector and the step at the halvings it stood at, the step's transfer ([`FieldReceipt::transfer`]).
+fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> Option<i64> {
     let mut total = 0i128;
     for &(start, len, grain) in &field.families_all() {
         let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
         let mut family = 0i128;
         for i in start..start + len {
-            family = family.checked_add(g[i].checked_mul(-release(step[i], 0))?)?;
+            family = family.checked_add(g[i].checked_mul(-release(step[i], halvings))?)?;
         }
         total = total.checked_add(family >> shift)?;
     }
@@ -3877,6 +3884,10 @@ pub struct FieldLearner {
     /// section's about as often as gradient noise says, so the read mostly threw away and shrank good steps). `true`
     /// keeps the read as a declared comparison. Not carried in the learner's text.
     pub read_held: bool,
+    /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
+    /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
+    /// kept under the held read (whose next section moves the step before pricing it).
+    last: Option<HeldStep>,
 }
 
 impl FieldLearner {
@@ -3885,7 +3896,7 @@ impl FieldLearner {
     pub fn new(field: Field, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, last: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -3912,7 +3923,7 @@ impl FieldLearner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
+        Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
@@ -3952,7 +3963,7 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
     }
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
@@ -4031,6 +4042,7 @@ impl FieldLearner {
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
         let raw = g.clone();
+        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         for &(start, len, grain) in &self.field.families_all() {
             for v in &mut g[start..start + len] {
                 *v = on_step_grain(grain, *v);
@@ -4052,18 +4064,20 @@ impl FieldLearner {
                 step[i] = deposit_step(self.first[i], self.second[i], grain, self.rate_bits);
             }
         }
-        let predicted = predicted_change(&self.field, &raw, &step);
+        let predicted = predicted_change(&self.field, &raw, &step, 0);
         let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
         let (halvings, change) = (scale.halvings, scale.change);
         let Some((candidate, faces_new)) = scale.standing else {
-            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change });
+            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change, transfer });
         };
         let code_after = code_of(&compared(&faces_new, regions)?, &spans);
         self.field = candidate;
         if self.read_held {
             self.held = Some(HeldStep { step, halvings });
+        } else {
+            self.last = Some(HeldStep { step, halvings });
         }
-        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next, predicted, change })
+        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next, predicted, change, transfer })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -4076,7 +4090,7 @@ impl FieldLearner {
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
         first.resize(len, 0);
         second.resize(len, 0);
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held })
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, last: None })
     }
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
@@ -4132,7 +4146,7 @@ impl FieldLearner {
                 Some(HeldStep { step, halvings })
             }
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, last: None })
     }
 }
 
