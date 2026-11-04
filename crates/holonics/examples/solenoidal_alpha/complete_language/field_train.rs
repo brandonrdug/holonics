@@ -821,6 +821,12 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         learner.read_held = true;
         println!("FIELD_HELD_READ");
     }
+    // [agent-inferred, November 4, §16.41] `FIELD_STEP_TRANSFER`: the step's size follows its price on the sections it was not
+    // fit on ([`step_transfer`]), one octave a lap at most; a declared comparison with the fixed rate.
+    let transfer_law = std::env::var_os("FIELD_STEP_TRANSFER").is_some();
+    if transfer_law {
+        println!("FIELD_STEP_TRANSFER rate={}", learner.rate_bits);
+    }
     if let Some(factor) = widen_factor.filter(|_| widened_first) {
         learner = learner.widened(factor, &keys).map_err(|e| e.to_string())?;
         let d = learner.field.declaration;
@@ -846,6 +852,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     let mut previous = (code, sites);
     let mut grown = widened_first || laned_first;
     let mut fallen = false;
+    // The own curvature `b` of the step the last section stood at full size, which the next section's transfer prices.
+    let mut prior: Option<i128> = None;
     for lap in 0..laps {
         // A lap starts only where the time left holds its bound: no lap is begun that its own
         // projection says could pass the run's deadline.
@@ -859,6 +867,8 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         let read = learner.laps;
         let mut draw = read * train_set.len() as u64;
         let (mut code_before, mut code_after, mut sites, mut deposited, mut halvings, mut held_down, mut refused) = (0i64, 0i64, 0usize, 0usize, 0u64, 0usize, 0usize);
+        // The lap's transfers `Σ t` and the own curvatures `Σ b` of the steps they price, over the steps that stood at full size.
+        let (mut transfers, mut curvatures, mut priced) = (0i128, 0i128, 0usize);
         let lap_start = std::time::Instant::now();
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
@@ -889,16 +899,28 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 held_down += usize::from(next.halvings > 0 && !next.refused);
                 refused += usize::from(next.refused);
             }
+            // [measurement; §16.41] The step's parabola: its first-order change and the change read at its full size; the step
+            // before priced on this section ([`FieldReceipt::transfer`]); in millionths of a bit a site (signed), and the rate
+            // the step was taken at.
+            let micro = |c: i64| if receipt.sites == 0 { 0 } else { (c as i128 * 1_000_000) / ((receipt.sites as i128) << 20) };
+            let rate_taken = learner.rate_bits;
             println!(
-                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} length={length} ms={}",
+                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
                 bits(receipt.code_after, receipt.sites),
                 receipt.halvings,
                 receipt.deposited,
                 next_text(receipt.next),
+                receipt.predicted.map_or("-".to_string(), |p| micro(p).to_string()),
+                micro(receipt.change),
+                receipt.transfer.map_or("-".to_string(), |t| micro(t).to_string()),
                 section_start.elapsed().as_millis()
             );
+            if let (Some(t), Some(b)) = (receipt.transfer, prior) {
+                (transfers, curvatures, priced) = (transfers + t as i128, curvatures + b, priced + 1);
+            }
+            prior = receipt.predicted.filter(|_| receipt.deposited && receipt.halvings == 0).map(|a| receipt.change as i128 - a as i128);
             let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
             if over_lap || over_run {
                 // The pending step is judged on the withheld problems as a lap's last step is, so
@@ -932,6 +954,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             lap_start.elapsed().as_millis()
         );
         println!("FIELD_UNSEEN lap={lap} code={} sites={unseen_sites} {} ms={}", bits(code, unseen_sites), next_text(next), started.elapsed().as_millis());
+        // [measurement; §16.41] The lap's steps priced on the sections after them: `Σ t`, `Σ b` (on the codes' `2^(−20)` bits),
+        // the joint parabola's least `μ* = 1 − Σt / 2Σb` in thousandths of the step (where `Σ b > 0`), and the octave it reads.
+        let octave = step_transfer(transfers, curvatures);
+        let least = if curvatures > 0 { (2 * curvatures - transfers) * 1000 / (2 * curvatures) } else { 0 };
+        println!("FIELD_STEP_PRICE lap={lap} priced={priced} transfer={transfers} curvature={curvatures} least_milli={least} octave={octave} rate={}", learner.rate_bits);
+        if transfer_law && priced > 0 {
+            learner.rate_bits = learner.rate_bits.saturating_add_signed(-octave).max(1);
+        }
         // [measurement; agent-inferred, November 3, §16.31] `FIELD_STEP_COHERENCE`: each family's `Σ|m| / Σ√v` in millionths
         // ([`FieldLearner::step_coherence`]) after the lap, which families' steps are driven and which are noise.
         if std::env::var_os("FIELD_STEP_COHERENCE").is_some() {
@@ -975,6 +1005,31 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
     Ok(())
 }
 
+
+/// [agent-inferred, November 4, §16.41] **The octave a lap's transfers read**: `+1` (the step doubles), `−1` (it halves) or
+/// `0`. Each step's transfer `t` is the first-order change of the next section's code were the step taken once more, so along
+/// the lap's steps the joint code is `F(μ) = cμ + b′μ²` with `F′(1) = Σ t`; `b′` is read from the own curvatures `Σ b` of the
+/// steps priced (a section's own parabola, the receipt's `change − predicted`), so the joint parabola's least is
+/// `μ* = 1 − Σt / 2Σb`. The step halves where `μ* < 1/√2` and doubles where `μ* > √2`, the octave nearest `μ*` on the rate's
+/// own carrier, compared exactly (`u = 2Σb − Σt = 2Σb μ*`: halve where `u < 0` or `u² < 2(Σb)²`, double where `u² > 8(Σb)²`).
+/// Where no curvature is read (`Σ b ≤ 0`) the transfer's sign alone moves it. Why the next sections and not the step's own:
+/// a step's own parabola read its least near five times the step at rate `2^(−11)` and its law drove the step to `2^(−7)`,
+/// where the joint code rose from 1.127 to 1.59 nats a place (`_receipts/law50/`): a step's own fall is mostly the fit to its
+/// own section, and only the next sections price what it generalizes.
+pub(super) fn step_transfer(transfers: i128, curvatures: i128) -> i32 {
+    if curvatures <= 0 {
+        return -(transfers.signum() as i32);
+    }
+    let u = 2 * curvatures - transfers;
+    let b2 = curvatures * curvatures;
+    if u < 0 || u.saturating_mul(u) < 2 * b2 {
+        -1
+    } else if u.saturating_mul(u) > 8 * b2 {
+        1
+    } else {
+        0
+    }
+}
 
 /// What a lap's withheld read decides of the body's width ([`growth`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -1414,6 +1469,22 @@ mod tests {
         assert_eq!(growth(false, false, false, 0, 27), Growth::None);
         assert_eq!(growth(false, true, false, 26, 27), Growth::None);
         assert_eq!(growth(false, true, true, 26, 27), Growth::None);
+    }
+
+    /// [§16.41] The octave nearest the joint parabola's least `μ* = 1 − Σt / 2Σb`: no transfer keeps the step; a transfer
+    /// that says the next sections would take more (`Σ t < 0`) doubles it only past `μ* > √2`, one that says they took too
+    /// much halves it below `μ* < 1/√2`; with no curvature read the sign of `Σ t` alone moves it.
+    #[test]
+    fn the_step_moves_to_the_octave_nearest_its_joint_least() {
+        assert_eq!(step_transfer(0, 100), 0);
+        assert_eq!(step_transfer(-50, 100), 0); // μ* = 1.25
+        assert_eq!(step_transfer(-100, 100), 1); // μ* = 1.5 > √2
+        assert_eq!(step_transfer(50, 100), 0); // μ* = 0.75 > 1/√2
+        assert_eq!(step_transfer(60, 100), -1); // μ* = 0.7 < 1/√2
+        assert_eq!(step_transfer(300, 100), -1); // μ* < 0
+        assert_eq!(step_transfer(5, 0), -1);
+        assert_eq!(step_transfer(-5, -3), 1);
+        assert_eq!(step_transfer(0, 0), 0);
     }
 
     /// [§16.23] The joint read's states: one a stratum of `1..m`, each `K_s` inside its stratum, the strata covering

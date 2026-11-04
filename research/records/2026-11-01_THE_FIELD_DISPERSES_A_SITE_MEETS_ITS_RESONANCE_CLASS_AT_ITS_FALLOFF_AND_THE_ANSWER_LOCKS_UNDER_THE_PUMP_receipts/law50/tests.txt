@@ -1,0 +1,8 @@
+STEP_PARABOLA still=0 predicted=-9177 change=-9222
+STEP_PARABOLA still=1 predicted=-6630 change=-6606
+STEP_PARABOLA still=2 predicted=-test hnn::tower::field::tests::regions_sum_in_any_order ... 7742ok change=
+STEP_TRANSFER still=0 transfer=-4045 change=-3998 own=Some(-9177)
+STEP_TRANSFER still=1 transfer=-1634 change=-1614 own=Some(-6630)
+STEP_TRANSFER still=2 transfer=-1909 change=-1874 own=Some(-7742)
+field_tests.txt:test result: ok. 64 passed; 0 failed; 0 ignored; 0 measured; 1987 filtered out; finished in 22.43s
+example_tests.txt:test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 2.33s

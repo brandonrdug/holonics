@@ -1,0 +1,41 @@
+# main49: the GPU field suite, then rate 2^-11 and 2^-10 for 30 card-minutes each from run48's alone STATE.11 (binary sha 88761144bf826f619dbd5120f4ebccd65515181ba0866b2ceda3e76a31be9a98)
+# suite build 12:27:58
+SUITE build rc=0
+SUITE rc=0 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s 
+# rate11 from 54564320d2526b799211eead1560f5b29ca86fefb5cdc5c69ceefe078c2dfa15 started 12:31:50
+FIELD_LAPS_HELD lap=8 reason=time left=99672 bound=260000 ms=1700328
+MEASURE lap=rate11 rc=0 wall_s=1700.8 peak_rss_kib=648636
+-1 1.127169 0.331399;0 1.134879 0.313548;1 1.122005 0.337866;2 1.123178 0.337527;3 1.122158 0.327573;4 1.119218 0.342792;5 1.132714 0.330476;6 1.114352 0.331958;7 1.113838 0.345975;
+# rate10 from 54564320d2526b799211eead1560f5b29ca86fefb5cdc5c69ceefe078c2dfa15 started 13:00:11
+FIELD_RATE rate=10
+FIELD_LAPS_HELD lap=8 reason=time left=139707 bound=260000 ms=1660293
+MEASURE lap=rate10 rc=0 wall_s=1660.7 peak_rss_kib=672168
+-1 1.127169 0.331399;0 1.179956 0.315415;1 1.173432 0.329429;2 1.196844 0.337102;3 1.167811 0.308408;4 1.159979 0.315711;5 1.166062 0.353348;6 1.152293 0.321322;7 1.138743 0.337246;
+RATE last3 rate11=1.120301 rate10=1.152366
+RATE continuing rate11 from STATE.7
+# seg1 from 3afc2aca400ef970cdc11bf869a45206007314390322c48e617316bb149a826b started 13:27:52
+== rate11
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.127169 foil_nats_a_place=1.458567 information_nats_a_place=0.331399 own_nats_a_word=6.271231 information_nats_a_word=1.843803
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.134879 foil_nats_a_place=1.448427 information_nats_a_place=0.313548 own_nats_a_word=6.314130 information_nats_a_word=1.744488
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.122005 foil_nats_a_place=1.459871 information_nats_a_place=0.337866 own_nats_a_word=6.242501 information_nats_a_word=1.879784
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.123178 foil_nats_a_place=1.460705 information_nats_a_place=0.337527 own_nats_a_word=6.249026 information_nats_a_word=1.877899
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.122158 foil_nats_a_place=1.449730 information_nats_a_place=0.327573 own_nats_a_word=6.243350 information_nats_a_word=1.822517
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.119218 foil_nats_a_place=1.462010 information_nats_a_place=0.342792 own_nats_a_word=6.226996 information_nats_a_word=1.907190
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.132714 foil_nats_a_place=1.463190 information_nats_a_place=0.330476 own_nats_a_word=6.302083 information_nats_a_word=1.838672
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.114352 foil_nats_a_place=1.446310 information_nats_a_place=0.331958 own_nats_a_word=6.199924 information_nats_a_word=1.846913
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.113838 foil_nats_a_place=1.459812 information_nats_a_place=0.345975 own_nats_a_word=6.197061 information_nats_a_word=1.924900
+FIELD_LAPS_HELD lap=8 reason=time left=99672 bound=260000 ms=1700328
+MEASURE lap=rate11 rc=0 wall_s=1700.8 peak_rss_kib=648636
+== rate10
+FIELD_RATE rate=10
+FIELD_JOINT_NATS lap=-1 places=35591 words=6397 own_nats_a_place=1.127169 foil_nats_a_place=1.458567 information_nats_a_place=0.331399 own_nats_a_word=6.271231 information_nats_a_word=1.843803
+FIELD_JOINT_NATS lap=0 places=35591 words=6397 own_nats_a_place=1.179956 foil_nats_a_place=1.495371 information_nats_a_place=0.315415 own_nats_a_word=6.564921 information_nats_a_word=1.754876
+FIELD_JOINT_NATS lap=1 places=35591 words=6397 own_nats_a_place=1.173432 foil_nats_a_place=1.502861 information_nats_a_place=0.329429 own_nats_a_word=6.528628 information_nats_a_word=1.832843
+FIELD_JOINT_NATS lap=2 places=35591 words=6397 own_nats_a_place=1.196844 foil_nats_a_place=1.533946 information_nats_a_place=0.337102 own_nats_a_word=6.658883 information_nats_a_word=1.875534
+FIELD_JOINT_NATS lap=3 places=35591 words=6397 own_nats_a_place=1.167811 foil_nats_a_place=1.476219 information_nats_a_place=0.308408 own_nats_a_word=6.497352 information_nats_a_word=1.715888
+FIELD_JOINT_NATS lap=4 places=35591 words=6397 own_nats_a_place=1.159979 foil_nats_a_place=1.475690 information_nats_a_place=0.315711 own_nats_a_word=6.453779 information_nats_a_word=1.756520
+FIELD_JOINT_NATS lap=5 places=35591 words=6397 own_nats_a_place=1.166062 foil_nats_a_place=1.519410 information_nats_a_place=0.353348 own_nats_a_word=6.487620 information_nats_a_word=1.965925
+FIELD_JOINT_NATS lap=6 places=35591 words=6397 own_nats_a_place=1.152293 foil_nats_a_place=1.473615 information_nats_a_place=0.321322 own_nats_a_word=6.411017 information_nats_a_word=1.787739
+FIELD_JOINT_NATS lap=7 places=35591 words=6397 own_nats_a_place=1.138743 foil_nats_a_place=1.475989 information_nats_a_place=0.337246 own_nats_a_word=6.335628 information_nats_a_word=1.876335
+FIELD_LAPS_HELD lap=8 reason=time left=139707 bound=260000 ms=1660293
+MEASURE lap=rate10 rc=0 wall_s=1660.7 peak_rss_kib=672168
