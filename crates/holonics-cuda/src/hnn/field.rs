@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, RowCurrent, Region, Scale, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, RowCurrent, Region, Scale, TickRead, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -604,6 +604,8 @@ pub struct CardField<'c> {
     row_out: std::cell::RefCell<Vec<Vec<RowCurrent>>>,
     row_cov: std::cell::RefCell<Option<Vec<Vec<i64>>>>,
     held_cells: std::cell::RefCell<Vec<i128>>,
+    /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
+    tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -618,7 +620,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1488,6 +1490,19 @@ impl<'c> CardField<'c> {
             }
             self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
         }
+        // Each tick's reads, where the ticks are read (a reading of expansion and volume).
+        if let Some(out) = self.tick_reads.borrow_mut().as_mut() {
+            let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
+            for tick in &ticks {
+                let read = self.timed(Kind::Copy, || card.fetch_range(&tick.read, 0, sites * dw)).map_err(device)?;
+                let scale = self.timed(Kind::Copy, || card.fetch_range(&tick.scale, 0, sites)).map_err(device)?;
+                for (r, slot) in per.iter_mut().enumerate() {
+                    let (a0, a1) = (region_off[r] as usize, region_off[r + 1] as usize);
+                    slot.push(TickRead { read: read[a0 * dw..a1 * dw].to_vec(), scale: scale[a0..a1].to_vec() });
+                }
+            }
+            out.extend(per);
+        }
         // A held read's rows by where their mass lies (a reading for the receipts): each kept tick's shares.
         if let Some(questions) = self.held_questions.borrow().as_ref() {
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
@@ -2248,6 +2263,15 @@ impl FieldRealization for CardField<'_> {
         let total = self.covector_shares.borrow_mut().take().unwrap_or_default();
         read?;
         Ok(total.chunks_exact(2).map(|c| [c[0] as u128, c[1] as u128]).collect())
+    }
+
+    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+        // Every tick is kept where a logits read keeps them; its reads are fetched after the forward.
+        *self.tick_reads.borrow_mut() = Some(Vec::new());
+        let read = self.run(field, regions, false, true, None);
+        let out = self.tick_reads.borrow_mut().take().unwrap_or_default();
+        read?;
+        Ok(out)
     }
 
     fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {

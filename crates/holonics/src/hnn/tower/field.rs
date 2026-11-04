@@ -3414,6 +3414,22 @@ fn read_numbers<T: std::str::FromStr>(line: Option<&str>) -> Result<Vec<T>> {
     line.split(' ').map(|w| w.parse::<T>().map_err(|_| TowerError::Refused("a field's material that is not a number"))).collect()
 }
 
+/// [measurement; agent-inferred, November 4] **A tick's read of a region**: each site's chart `r̂` on `2^(−16)` and its scale (the
+/// faces' power) at the opening of each tick, the field's state as its ticks meet it (a reading of expansion and volume).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct TickRead {
+    pub read: Vec<i32>,
+    pub scale: Vec<i128>,
+}
+
+impl Field {
+    /// Each tick's read of `region` ([`TickRead`]), in tick order.
+    pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
+        let pass = self.pass(region, true)?;
+        Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone() }).collect())
+    }
+}
+
 /// [definition; agent-inferred, November 1] **A realization of the field's read and return**: a
 /// region's faces and the covector over a section's regions, bit for bit the host's
 /// ([`HostField`]). The card's realization is one such; a realization that cannot read a region
@@ -3443,6 +3459,10 @@ pub trait FieldRealization {
     fn read_row_currents(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize], _returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         refuse("a realization that cannot read its rows' currents")
     }
+    /// Each region's tick reads ([`Field::tick_reads`]), a reading.
+    fn read_ticks(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+        refuse("a realization that cannot read its ticks")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3471,6 +3491,9 @@ impl FieldRealization for HostField {
     }
     fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         regions.iter().zip(questions).map(|(r, &q)| field.row_currents(r, q, returning)).collect()
+    }
+    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+        regions.par_iter().map(|r| field.tick_reads(r)).collect()
     }
 }
 

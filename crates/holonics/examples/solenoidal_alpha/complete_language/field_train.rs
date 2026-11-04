@@ -1701,3 +1701,106 @@ mod tests {
     }
 }
 
+
+/// [measurement; agent-inferred, November 4] **`expansion-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA
+/// COUNT`**: the expansion and the volume of the field's state across its ticks (the lens record, §7: information expands
+/// and contracts in the geometry), on the first `COUNT` held problems read with their neighbours (the context read's first
+/// part). The **volume** of tick `k` is the participation ratio `(tr C)² / tr C²` of the sites' charts `r̂` (`C` their
+/// covariance over a region's sites, its effective number of directions out of `D`), averaged over the regions. The
+/// **expansion** is read against the same regions with every row of the encoding moved by a keyed `±2^(−10)` of its unit:
+/// `Δ_k = Σ_t ‖x′_t − x_t‖²` of the faces `x = r̂ · scale` at tick `k`'s opening, and its growth from tick to tick, `½ log₂
+/// (Δ_(k+1)/Δ_k)` bits a tick (a finite-time Lyapunov reading: above zero the ticks pull nearby states apart and make
+/// information, below zero they bring them together and forget it). A reading only.
+pub(super) fn expansion_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 10 {
+        return Err("expansion-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let count = positive(&args[9])?;
+    let mut owned: Vec<(Vec<usize>, Vec<bool>)> = Vec::new();
+    for (q, a) in held.iter().take(count) {
+        let (q, a) = (codec.encode(&question_text(q)).map_err(|e| e.to_string())?, codec.encode(a).map_err(|e| e.to_string())?);
+        owned.extend(context_regions(codec.void(), &q, &a, q.len() + a.len() + 1).into_iter().take(1));
+    }
+    let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let base = realization.read_ticks(field, &regions)?;
+    let mut moved = field.clone();
+    {
+        let l = moved.layout().clone();
+        let rows = (moved.declaration.alphabet + 1) * moved.declaration.width;
+        let mut z = 0x9E37_79B9_7F4A_7C15u64;
+        for v in &mut moved.theta[l.enc..l.enc + rows] {
+            z = z.wrapping_mul(0x5851_F42D_4C95_7F2D).wrapping_add(0x1405_7B7E_F767_814F);
+            *v += if z >> 63 == 0 { 1 << 6 } else { -(1 << 6) };
+        }
+    }
+    let perturbed = realization.read_ticks(&moved, &regions)?;
+    let dw = field.declaration.width;
+    let ticks = base.first().map_or(0, Vec::len);
+    let mut deltas: Vec<i128> = vec![0; ticks];
+    for k in 0..ticks {
+        let (mut volume_num, mut volume_den) = (0i128, 0i128);
+        for (b, p) in base.iter().zip(&perturbed) {
+            let (rb, rp) = (&b[k], &p[k]);
+            let sites = rb.scale.len();
+            // The faces' difference, `x = r̂ · scale` on `2^(−32)`, released to `2^(−16)` before it is squared.
+            for t in 0..sites {
+                for i in 0..dw {
+                    let xb = (rb.read[t * dw + i] as i128 * rb.scale[t]) >> 16;
+                    let xp = (rp.read[t * dw + i] as i128 * rp.scale[t]) >> 16;
+                    let d = (xp - xb) >> 8;
+                    deltas[k] += d * d;
+                }
+            }
+            // The volume: integer sums of the charts (each read at `2^(−8)` of its unit), `n² C = n S_ij − S_i S_j`.
+            let n = sites as i128;
+            let r = |t: usize, i: usize| (rb.read[t * dw + i] >> 8) as i128;
+            let si: Vec<i128> = (0..dw).map(|i| (0..sites).map(|t| r(t, i)).sum()).collect();
+            let mut trace = 0i128;
+            let mut frob = 0i128;
+            for i in 0..dw {
+                for j in i..dw {
+                    let sij: i128 = (0..sites).map(|t| r(t, i) * r(t, j)).sum();
+                    let c = (n * sij - si[i] * si[j]) >> 16;
+                    if i == j {
+                        trace += c;
+                        frob += c * c;
+                    } else {
+                        frob += 2 * c * c;
+                    }
+                }
+            }
+            if frob > 0 {
+                volume_num += (trace * trace * 1000) / frob;
+                volume_den += 1;
+            }
+        }
+        let volume = if volume_den > 0 { volume_num / volume_den } else { 0 };
+        let growth = if k > 0 && deltas[k - 1] > 0 && deltas[k] > 0 { Some(log2_milli(deltas[k]) - log2_milli(deltas[k - 1])) .map(|g| g / 2) } else { None };
+        println!(
+            "FIELD_EXPANSION tick={k} regions={} volume={}.{:03} of {dw} delta={} growth_millibits_a_tick={} ms={}",
+            regions.len(),
+            volume / 1000,
+            volume % 1000,
+            deltas[k],
+            growth.map_or("-".to_string(), |g| g.to_string()),
+            started.elapsed().as_millis()
+        );
+    }
+    Ok(())
+}
+
+/// `log₂ v` in thousandths for `v > 0`: the whole part from the width, the mantissa's through the `ln 2`/exponential
+/// navigator's inverse face ([`holonics::hnn::keyed_modes::log2_face`]) on `2^(−10)`.
+fn log2_milli(v: i128) -> i128 {
+    let v = v.unsigned_abs().max(1);
+    let width = 128 - v.leading_zeros() as i128;
+    let p = if width > 62 { v >> (width - 62) } else { v << (62 - width) };
+    let frac = holonics::hnn::keyed_modes::log2_face(p, 10);
+    ((width << 10) + frac) * 1000 >> 10
+}
