@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, RowCurrent, Region, Scale, TickRead, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -607,6 +607,10 @@ pub struct CardField<'c> {
     held_cells: std::cell::RefCell<Vec<i128>>,
     /// [measurement, November 4] While the ticks are read: each region's tick reads, region by region.
     tick_reads: std::cell::RefCell<Option<Vec<Vec<TickRead>>>>,
+    /// [measurement, §16.42] While a near field is read: the named sites of the batch's one region, and each one's near field
+    /// by offset at every kept tick and head.
+    near_sites: std::cell::RefCell<Option<Vec<usize>>>,
+    near_out: std::cell::RefCell<Vec<NearOffsets>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -621,7 +625,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1513,6 +1517,34 @@ impl<'c> CardField<'c> {
             }
             out.extend(per);
         }
+        // Each named site's near field by offset (a reading, §16.42): every kept tick's shares of each head, the batch's one
+        // region.
+        if let Some(named) = self.near_sites.borrow().as_ref() {
+            let mut out = self.near_out.borrow_mut();
+            for &i in named {
+                if regions.len() != 1 || i >= sites {
+                    return Err(TowerError::Refused("a near-field site outside its region"));
+                }
+                let mut near = NearOffsets::default();
+                for tick in &ticks {
+                    for h in 0..heads {
+                        let row = self.timed(Kind::Copy, || card.fetch_range(&tick.e, h * pairs + i * sites, sites)).map_err(device)?;
+                        let (mut before, mut after) = ([0u64; NEAR - 1], [0u64; NEAR - 1]);
+                        for (d, (b, a)) in before.iter_mut().zip(after.iter_mut()).enumerate() {
+                            if let Some(&e) = i.checked_sub(d + 1).and_then(|j| row.get(j)) {
+                                *b = e;
+                            }
+                            if let Some(&e) = row.get(i + d + 1) {
+                                *a = e;
+                            }
+                        }
+                        near.before.push(before);
+                        near.after.push(after);
+                    }
+                }
+                out.push(near);
+            }
+        }
         // A held read's rows by where their mass lies (a reading for the receipts): each kept tick's shares.
         if let Some(questions) = self.held_questions.borrow().as_ref() {
             let starts: Vec<u32> = (0..regions.len()).map(|r| questions[at_region + r] as u32).collect();
@@ -2283,6 +2315,20 @@ impl FieldRealization for CardField<'_> {
         let read = self.run(field, regions, false, true, None);
         let out = self.tick_reads.borrow_mut().take().unwrap_or_default();
         read?;
+        Ok(out)
+    }
+
+    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+        // Every tick is kept where a logits read keeps them, and the named rows are fetched after the forward.
+        *self.near_sites.borrow_mut() = Some(sites.to_vec());
+        self.near_out.borrow_mut().clear();
+        let read = self.run(field, std::slice::from_ref(region), false, true, None);
+        *self.near_sites.borrow_mut() = None;
+        let logits = read?.1;
+        let mut out = std::mem::take(&mut *self.near_out.borrow_mut());
+        for (near, &i) in out.iter_mut().zip(sites) {
+            near.logits = logits.first().and_then(|r| r.get(i).cloned()).flatten();
+        }
         Ok(out)
     }
 

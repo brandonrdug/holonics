@@ -1168,6 +1168,97 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
     Ok(())
 }
 
+/// The restated results of a held answer, `<<E=C>>D` with `D = C` (the boundary codec's bytes, every site one byte): each
+/// one's answer site of its first `>` and its length `|C|`. D's `k`-th site reads C's `k`-th at offset `|C| + 2`.
+pub(super) fn restatements_of(pieces: &[Vec<u8>]) -> Vec<(usize, usize)> {
+    let byte = |t: usize| pieces.get(t).filter(|p| p.len() == 1).map(|p| p[0]);
+    let mut out = Vec::new();
+    for s in 1..pieces.len() {
+        if byte(s) != Some(b'>') || byte(s + 1) != Some(b'>') {
+            continue;
+        }
+        let Some(c0) = (0..s).rev().find(|&t| byte(t) == Some(b'=')).map(|t| t + 1) else { continue };
+        let length = s - c0;
+        let inside = (c0..s).all(|t| byte(t).is_some_and(|b| b != b'<' && b != b'>' && b != b'='));
+        let opened = (0..c0).rev().take_while(|&t| byte(t) != Some(b'>')).any(|t| t > 0 && byte(t) == Some(b'<') && byte(t - 1) == Some(b'<'));
+        if length > 0 && inside && opened && (0..length).all(|k| byte(s + 2 + k).is_some() && byte(s + 2 + k) == byte(c0 + k)) {
+            out.push((s, length));
+        }
+    }
+    out
+}
+
+/// [measurement; agent-inferred, November 4, §16.42] **`restate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT OUT`**: whether the field writes a restated result's ends (the unified-theory reading of November 4,
+/// §5: in `<<E=C>>D` the result C is written again as D, and D's `k`-th site must read C's `k`-th at offset `|C| + 2`,
+/// inside the near field for `|C| ≤ 3`, where the fine rings' skin leaves almost nothing; the written answers miss
+/// mostly at D's ends). For each restatement in the first `COUNT` held answers, three sites are read: D's first place,
+/// its last, and the place after it (where the source at the restatement's offset is the `>` that ends it). Each is
+/// read in three of the writer's states, beside its question and the rest of its answer: alone open (`alone`); with D
+/// and the place after it open (`restated_open`: the result written, its restatement not); with C, D and the place
+/// after it open (`both_open`; the `>>` between them written). Each read is the realization's near field by offset
+/// ([`FieldRealization::read_near_offsets`]): every tick and head's shares of the sources 1 to 5 sites before, and the
+/// face at the site, whose share of the answer's class is the code the place costs. Writes `RESTATEMENTS.tsv` (each read;
+/// private, of the held answers) and prints the counts. A reading only.
+pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    use holonics::hnn::tower::field::NEAR;
+    if args.len() != 11 {
+        return Err("restate-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let d = field.declaration;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let limit = count(&args[9])?;
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let kinds: Vec<&str> = (0..d.heads).map(|h| if h % d.frames < d.still { "still" } else { "turned" }).collect();
+    println!("FIELD_RESTATE_DECLARATION heads={} ticks={} still={} frames={} kinds={}", d.heads, d.ticks, d.still, d.frames, kinds.join(","));
+    let cells: Vec<String> = (0..d.ticks).flat_map(|k| (0..d.heads).flat_map(move |h| (1..NEAR).map(move |o| format!("t{k}h{h}d{o}")))).collect();
+    let mut rows = rows_file(&out.join("RESTATEMENTS.tsv"), &format!("problem\trestatement\tstate\tat\tlength\toffset\tp_true\tp_total\t{}\n", cells.join("\t")))?;
+    let (mut restatements, mut reads) = (0usize, 0usize);
+    let problems = limit.min(held.len());
+    for (k, (question, answer)) in held.iter().take(limit).enumerate() {
+        let (q, a) = (codec.encode(&question_text(question))?, codec.encode(answer)?);
+        let mut classes: Vec<usize> = q.iter().chain(&a).copied().collect();
+        classes.push(codec.void());
+        if classes.len() > d.reach {
+            continue;
+        }
+        let pieces: Vec<Vec<u8>> = a.iter().map(|&c| codec.decode(&[c])).collect();
+        for (c, (s, length)) in restatements_of(&pieces).into_iter().enumerate() {
+            restatements += 1;
+            // The answer's sites: C before the close at `s`, the `>>` at `s` and `s + 1`, then D and the place after it.
+            let (result, restated) = (q.len() + s - length..q.len() + s, q.len() + s + 2..q.len() + s + 3 + length);
+            let states: [(&str, Vec<usize>); 3] = [("alone", Vec::new()), ("restated_open", restated.clone().collect()), ("both_open", result.clone().chain(restated.clone()).collect())];
+            for (state, open) in &states {
+                for (at, place) in [("first", s + 2), ("last", s + 1 + length), ("stop", s + 2 + length)] {
+                    let i = q.len() + place;
+                    let mut unresolved = vec![false; classes.len()];
+                    for &t in open.iter().chain(std::iter::once(&i)) {
+                        unresolved[t] = true;
+                    }
+                    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+                    let near = realization.read_near_offsets(field, &region, &[i]).map_err(|e| e.to_string())?.remove(0);
+                    let logits = near.logits.as_ref().ok_or("a near-field read with no face at its open site")?;
+                    let face = field.tempered(logits, 1);
+                    reads += 1;
+                    let shares: Vec<String> = near.before.iter().flat_map(|b| b.iter().map(u64::to_string)).collect();
+                    row(&mut rows, &format!("{k}\t{c}\t{state}\t{at}\t{length}\t{}\t{}\t{}\t{}\n", length + 2, face.masses[classes[i]], face.total, shares.join("\t")))?;
+                }
+            }
+        }
+        if (k + 1) % 16 == 0 {
+            println!("FIELD_RESTATE_PROGRESS problems={} restatements={restatements} reads={reads} ms={}", k + 1, started.elapsed().as_millis());
+        }
+    }
+    println!("FIELD_RESTATE problems={problems} restatements={restatements} reads={reads} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each
@@ -1485,6 +1576,18 @@ mod tests {
         assert_eq!(step_transfer(5, 0), -1);
         assert_eq!(step_transfer(-5, -3), 1);
         assert_eq!(step_transfer(0, 0), 0);
+    }
+
+    /// [§16.42] A restated result is named by its close and its length where `D = C` inside an opened `<<…>>`; an inexact
+    /// restatement, an unopened one and a multi-byte piece are not.
+    #[test]
+    fn a_restatement_is_named_by_its_close_and_its_length() {
+        let pieces = |t: &str| -> Vec<Vec<u8>> { t.bytes().map(|b| vec![b]).collect() };
+        assert_eq!(restatements_of(&pieces("He has 2*3=<<2*3=6>>6 and <<6+40=46>>46.")), vec![(18, 1), (35, 2)]);
+        assert_eq!(restatements_of(&pieces("<<50*10=500>>50 then 3=4>>4")), vec![]);
+        let mut welded = pieces("<<1+1=2>>2");
+        welded[6] = b"2>".to_vec();
+        assert_eq!(restatements_of(&welded), vec![]);
     }
 
     /// [§16.23] The joint read's states: one a stratum of `1..m`, each `K_s` inside its stratum, the strata covering

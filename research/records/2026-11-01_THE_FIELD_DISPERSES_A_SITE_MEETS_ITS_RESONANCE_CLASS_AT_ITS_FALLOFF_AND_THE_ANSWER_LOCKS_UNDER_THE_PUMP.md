@@ -3042,3 +3042,110 @@ Failures this could repeat, checked: **bits read as progress** (the arms are rea
 jumps, not only their last reads; the main line with its writes); **a refusal answered with a larger limit** (every arm and
 segment ran at its fixed bound); **a located cause carried unrepaired into a new consumer** (the parabola law's cause, a
 step's own fit read as its generalization, is repaired at the price's owner, not carried into the next law).
+
+### 16.42 A step's help to the next section is nil at first order, so the fall is the temperature released
+
+[measurement; agent-inferred, November 4] main52 (`_receipts/law52/`: `main52.txt` and `main52_launch.sh`; `sections.tsv`,
+every section's own first-order change `a`, own curvature `b` and transfer `t` over the four runs; `price_read.py` and its
+`prices.txt`): from main51's state after its fourth segment (1.054 nats a place at `2^(−11)`), three arms of 30 card-minutes,
+then the main line from the lowest under its own law, 45 card-minutes a segment with a write after each:
+
+| run | laps | rate | joint code at lap 0, nats a place | at its last lap | mean of the last three |
+|---|---|---|---|---|---|
+| rate `2^(−11)` | 8 | `2^(−11)` | 1.054 | 1.054 | 1.054 |
+| rate `2^(−12)` | 8 | `2^(−12)` | 1.039 | 1.031 | 1.032 |
+| the transfer law | 7 | `2^(−11)` to `2^(−14)` | 1.054 | 1.020 | **1.027** |
+| main line, segment 1, the transfer law | 11 | `2^(−14)` to `2^(−17)` | 1.019 | 1.012 | 1.012 |
+
+Measured to projected: the arms 1,685, 1,684 and 1,601 s against their outer 1,860 s; segment 1 2,471 s against 2,760 s; its
+write 239 s against 720 s; peak resident 632 to 710 MiB a run, 241 MiB the write. RTX 4080 SUPER under `.local/gpu.lock`, 24
+host threads. The write's words in the training vocabulary 211 of 286 (73.8%), the own question's release beating its foil's
+on 4 of the six held problems. The unified-theory reading of November 4 (§6) predicted, before main52 was read, that `2^(−12)`
+ends about 0.02 below `2^(−11)`: it ended 0.022 below.
+
+**The prices**, by octave over the four runs (millionths of a bit a site, each section's mean ± its standard error; the
+spread is the per-section standard deviation of `b`, a lap's mean over the laps at that octave):
+
+| rate | sections priced | own `a` | transfer `t` | own curvature `b` | spread of `b` |
+|---|---|---|---|---|---|
+| `2^(−11)` | 3,303 | −24,160 | 1,246 ± 51 | 2,183 ± 43 | 2,402 |
+| `2^(−12)` | 4,955 | −12,154 | 353 ± 20 | 619 ± 16 | 1,148 |
+| `2^(−13)` | 413 | −6,048 | 75 ± 27 | 124 ± 40 | 808 |
+| `2^(−14)` | 1,238 | −3,017 | 3 ± 9 | 40 ± 17 | 595 |
+| `2^(−15)` | 1,638 | −1,477 | 3 ± 3 | 19 ± 11 | 436 |
+| `2^(−16)` | 1,215 | −710 | 3.1 ± 1.8 | −12 ± 8 | 275 |
+| `2^(−17)` | 781 | −363 | −1.1 ± 1.5 | −37 ± 7 | 201 |
+
+**The own parabola scales as it should, and its curvature sinks under a noise ∝ √step.** The own first-order fall halves
+with the step to within 1%, and the own curvature is the step's square through `2^(−15)` (2,183 at `2^(−11)` gives 546, 136,
+34 and 8.5; measured 619, 124, 40 and 19, each within its error). Its per-section spread falls only about `2^(−0.6)` an
+octave (2,402 to 201 over six octaves), so below `2^(−14)` a lap's `Σb` is under its own noise. [agent-inferred] The spread
+is the read's quantization: a forward of exact integers at fixed grains changes by rounding flips whose count grows with
+the move, so its variance grows as the step and its spread as √step. At `2^(−17)` the mean `b` is −37 ± 7, which is
+selection: only the steps that stood at full size are priced, and 26 and 19 of 413 sections failed strict decrease there,
+so the priced set is conditioned on a fall.
+
+**The transfer is the second-order part.** From one state, `t` reads 1,246 at `2^(−11)` and 353 at `2^(−12)`, a ratio of
+0.28: nearly all of it scales as the step's square. With `t = s(g_n · d) + s² h_n` the two arms give the first-order part
+at `2^(−11)` as `4 t₁₂ − t₁₁ = +168 ± 94` against the own −24,160, a ratio of −0.007 ± 0.004 (harmful, the momentum's
+overshoot); at `2^(−16)` and `2^(−17)`, where the second-order part is about 1 and 0.3, the first-order part is −0.003 ±
+0.003 and +0.004 ± 0.004 of the own fall. A step helps the section after it by nothing measurable at first order.
+[derived] The first moment `toward(m, g, 3)` weighs a section `1/8` and its forerunners `7/8`, so for independent sections
+the ratio is `8c/(1 + 7c)` and the coherence `c = |E g|²/E|g|²` stands under about `5 · 10⁻⁴` at two standard errors: the
+critical flock `(1 − c)/c` is past 2,000 sections, five laps. The unified-theory reading's `c ≈ 1/9` (its §6 and §7) read
+`Σt` against the own fall, where `t` is the curvature's part; it is withdrawn, and with it the predicted Gram outlier at fifty
+times the bulk.
+
+**So the joint least is not a price of the step.** `μ* = 1 − Σt/2Σb` reads `1 − h_n/h_o`, the next section's curvature
+along the step over the own section's: 0.715 at `2^(−11)` and 0.714 at `2^(−12)`, independent of the step. It stands on the
+halving edge `1/√2`, so the law halves on about every other lap at any step until the price sinks under its noise; from
+segment 1's lap 5 on, `Σb < 0` on every lap and the law walked between `2^(−16)` and `2^(−17)` on the sign of `Σt`. With no
+first-order help the next section's own least is `μ_n* = −s g_n · d / s² h_n ≈ 0`. The law's direction (cool) is right and
+its price is empty.
+
+**The fall is the temperature released.** At a fixed step the joint code stood: the `2^(−11)` arm 1.0544 to 1.0536 over
+eight laps, segment 1's laps 6 to 10 at `2^(−16)` and `2^(−17)` 1.0120 to 1.0116. Each cooling released at once: the
+halved arm fell 0.016 in its first lap. A floor `κη` at `2^(−11)` between 0.032 (that first lap read as `κη/2`) and 0.053
+(the doubling's jump, §16.41) releases 0.031 to 0.051 nats a place on cooling to `2^(−16)`; the transfer arm and segment 1
+fell 0.043 from the same state. [agent-inferred] The main line stands at the least its constitution reaches, and what
+cooling leaves is about `κ · 2^(−16) ≈ 0.001` nats a place. The step is retired as the next law's subject: segments 2 and 3
+read the floor, and the next law changes what a section's covector can share with the next. It starts at the near field's
+timing (copies fail at their ends, at offsets 4 and 5), read on segment 1's state before anything changes (below).
+
+Segments 2 and 3 read the floor as said: 1.012 to 1.013 over segment 2's eleven laps and 1.013 to 1.010 to 1.011 over
+segment 3's (2,477 and 2,462 s against 2,760 s; peak resident 600 and 606 MiB), the step walking between `2^(−15)` and
+`2^(−17)`. Their writes: words in the training vocabulary 355 of 498 (71.3%) and 524 of 672 (78.0%), the own question's
+release beating its foil's on 4 and 3 of the six held problems, 368 and 433 s against 720 s.
+
+**The restated result is placed at its exact offset; its ends fail where the writer has not yet written its source.** In
+GSM8K's `<<E=C>>D` the result C is written again as D after `>>`, so D's `k`-th site must read C's `k`-th `|C| + 2` sites
+back. The unified-theory reading of November 4 (§5) read the written answers' misses at D's ends as the skin's: rings 2 and 3
+keep `3.5 × 10⁻⁶` and `2.3 × 10⁻⁴` of a source four sites away, so offsets 4 and 5 would be told apart by under 0.15 bits,
+and it proposed starting the skin at the near field's edge. Before any change, the field's near field by offset was read on
+segment 1's last state (`restate-field`, [`Field::near_offsets`] through the card's `read_near_offsets`; the sampled parity's
+`near_equal` held on all four sections, `parity.txt`): every restatement in the 128 held answers (393), at D's first place,
+its last and the place after it, in three of the writer's states (`restatements.txt`, from the private `RESTATEMENTS.tsv`;
+3,537 reads in 36.1 s on the card against a projection of 47 s and a deadline of 180 s):
+
+| state | D's first place, bits | D's last place, bits | the place after D, bits | turned heads' share at the offset, last tick |
+|---|---|---|---|---|
+| D alone open | 0.000 to 0.028 | 0.005 to 0.028 | 0.003 to 0.138 | 0.37 to 0.45 (neighbours 0.000 to 0.034) |
+| D and the place after it open, C written | 0.001 to 0.016 | 0.003 to 0.397 | 0.053 to 0.130 | 0.35 to 0.44 |
+| C and D open, `>>` written | 0.93 to 1.33 | 0.78 to 1.33 | 0.04 to 0.09 | 0 (the source is open) |
+
+(each range over `|C|` = 1, 2, 3 and 4 or more.) The turned heads put 37 to 45% of their rows on exactly the offset
+`|C| + 2` and almost nothing on its neighbours: the field tells offsets 3, 4 and 5 apart sharply where it reads, through
+its learned clocks (the paces; the skin is read across the clock's variation, not the raw distance). The skin's premise does
+not hold on this state, and the near-field edge is not built (also because its `max(0, d − 5)` is a hard edge, which
+Brandon's November 4 lens bars from a law). Where C is written, D's places cost under a fortieth of a bit; where C and D are
+both open, each of D's places costs about a bit, the price of the result itself (the field cannot yet compute `E`), and the
+first of the two drawn is a guess the second must then follow. The writer draws its places in one keyed random order
+(§16.27), so C and D are often both open when one of them is drawn. [agent-inferred] The misses at D's ends are the writer's
+timing, not the field's reach: the next law is when a place is drawn relative to its sources, read with the writer's own
+states.
+
+Failures this could repeat, checked: **bits read as progress** (the main line's fall is read as released temperature, by its
+standing at a fixed step, not as learning); **an authored routine standing in for learning** (the read names the
+restatements only to choose which places to read; nothing in the field reads it); **a located cause carried unrepaired into a new consumer** (the misread
+coherence is withdrawn at its reading, not carried into the flock or the Gram reading); **a refusal answered with a larger
+limit** (every run ended at its fixed bound).
