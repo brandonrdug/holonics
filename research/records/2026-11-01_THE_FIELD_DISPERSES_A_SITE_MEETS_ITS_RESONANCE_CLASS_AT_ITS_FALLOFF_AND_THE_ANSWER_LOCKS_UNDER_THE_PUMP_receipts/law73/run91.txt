@@ -1,0 +1,19 @@
+# run91 binary 1e9c883e6cd95863081e2b4045725e1696af909b5085f138c3b06b0ba02c97ba lock taken 18:41:08
+== one FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- run_bits=0 reads=4916 certified_bits=0.000 passed=0 ms=1015646 FIELD_CARD reads=4916 read_ms=1012900 returns=0 return_ms=0 pairs=225456911104 batches=4916 peak_store=3665426706 landmarks=0 landmark_ms=0 elapsed_ms=1015647 MEASURE lap=one rc=0 wall_s=1016.1 peak_rss_kib=349628 
+== run FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- run_bits=1 reads=3282 certified_bits=10219.156 passed=3333 ms=626232 FIELD_CARD reads=3282 read_ms=623833 returns=0 return_ms=0 pairs=153020873841 batches=3282 peak_store=3665426706 landmarks=0 landmark_ms=0 elapsed_ms=626232 MEASURE lap=run rc=0 wall_s=626.7 peak_rss_kib=349132 
+== one
+end (4916)	-	+230.1	+125.0
+opening L less held: mean +7.9
+drift from the opening to the end: mean +222.2 a problem
+written: numbers 1277: in the question 0.18, carried from an earlier line 0.37, in neither 0.45; annotations 81, arithmetic 64, closed 1; final lines 23, their number written earlier 21
+answers 32; written ending with a final line at the boundary 23 (a '####' line 23); a final line before the end 0
+WORDS written=2332 in_training_vocabulary=1762 share=0.756
+== run
+end (3282)	-	+282.5	+86.0
+opening L less held: mean +7.9
+drift from the opening to the end: mean +274.7 a problem
+written: numbers 1181: in the question 0.17, carried from an earlier line 0.34, in neither 0.50; annotations 66, arithmetic 56, closed 1; final lines 23, their number written earlier 17
+answers 32; written ending with a final line at the boundary 23 (a '####' line 24); a final line before the end 0
+WORDS written=2840 in_training_vocabulary=2097 share=0.738
+answers equal under both laws: 0 of 32
+RUN91 exit 19:08:32

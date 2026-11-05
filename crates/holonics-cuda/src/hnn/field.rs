@@ -41,6 +41,14 @@ const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
 /// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
 const AFFINE_SHARED: usize = 48 * 1024;
+
+/// [agent-inferred, November 5] A tiled affine map's sites a block pass and its dynamic shared octets (`W` at the stride
+/// `cols + 1` and the bias in 32-bit words, each site's carrier bound, then a pass's site rows), where they fit a block.
+fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> {
+    let per = (THREADS as usize).checked_div(rows).filter(|&p| p > 0)?;
+    let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
+    (shared <= AFFINE_SHARED).then_some((per, shared))
+}
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
@@ -1974,11 +1982,11 @@ impl<'c> CardField<'c> {
         let cells = words.t as u64 * rows as u64;
         // [agent-inferred, November 5] The tiled map where its weights, bias and a pass's site rows fit a block's shared memory
         // (every map of the field's declaration does), the cell map otherwise: the same integers either way.
-        let x_octets = if entry.ends_with("x64") { 8 } else { 4 };
-        let per = (THREADS as usize).checked_div(rows).unwrap_or(0);
-        let shared = ((rows * cols + rows) * 4).div_ceil(16) * 16 + per * cols * x_octets;
-        if per > 0 && shared <= AFFINE_SHARED {
-            let tiled = if x_octets == 8 { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
+        if std::env::var_os("FIELD_AFFINE_TRACE").is_some() {
+            eprintln!("FIELD_AFFINE_TRACE entry={entry} rows={rows} cols={cols} tiling={:?}", affine_tiling(rows, cols, entry.ends_with("x64")));
+        }
+        if let Some((per, shared)) = affine_tiling(rows, cols, entry.ends_with("x64")) {
+            let tiled = if entry.ends_with("x64") { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
             let grid = (words.t as u64).div_ceil(per as u64).clamp(1, 65_535) as u32;
             return self.launch_shared(tiled, grid, THREADS, shared as u32, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)]);
         }
@@ -2601,6 +2609,19 @@ type Rows = Vec<Vec<(Vec<(u32, u64)>, u64)>>;
 
 #[cfg(test)]
 mod tests {
+    /// Every affine map of the field's declaration is tiled: the weights at their padded stride, the bias, the bounds and a
+    /// pass's site rows fit a block's shared memory, and a block passes `256/rows` sites.
+    #[test]
+    fn every_affine_map_of_the_declaration_is_tiled() {
+        let (dw, m2, f) = (32usize, 64usize, 32usize);
+        for (rows, cols, x64) in [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)] {
+            let (per, shared) = super::affine_tiling(rows, cols, x64).unwrap_or_else(|| panic!("{rows} × {cols} not tiled"));
+            assert_eq!(per, 256 / rows);
+            assert!(shared <= super::AFFINE_SHARED);
+        }
+        assert!(super::affine_tiling(512, 32, false).is_none(), "more rows than a block's threads");
+    }
+
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {

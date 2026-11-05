@@ -1355,6 +1355,40 @@ fn a_finished_problem_leaves_the_reads() {
     }
 }
 
+/// [measurement; the unified-theory reading of November 5, 18:53, its check 1] **The room past the front is heard only
+/// through the near field**: a writer's state (its question resolved, the places of its first octaves resolved from a truth,
+/// the rest open and silent) read over the whole room and over the room cut past the front octave's end; at and before the
+/// front, cut at the end itself, some of the front's open faces differ, and cut `NEAR − 1` places past it every face is the
+/// whole room's, bit for bit, at two and four ticks.
+#[test]
+fn the_room_past_the_front_is_heard_only_through_the_near_field() {
+    for still in [0usize, 1, 2] {
+        for ticks in [2usize, 4] {
+        let field = shaped_with(FieldDeclaration { reach: 96, ticks, ..tiny_declaration(still) });
+        let reach = field.declaration.reach;
+        let q = [1usize, 4, 0, 2];
+        let truth = [3usize, 1, 2, 4, 1, 3, 2, 1];
+        for (front, margin) in [(0u32, 0usize), (0, 4), (0, 5), (1, 5), (2, 4), (2, 5), (3, 5), (4, 5), (5, 5)] {
+            // Resolved: every place of the octaves before `front` (distances below 2^front); open: the rest of the room.
+            let room = reach - q.len();
+            let cut = q.len() + (1usize << (front + 1)) - 1;
+            let kept_faces = cut;
+            let cut = (cut + margin).min(reach);
+            let mut classes: Vec<usize> = q.to_vec();
+            classes.extend((0..room).map(|d| if d + 1 < (1 << front) { truth[d % truth.len()] } else { 0 }));
+            let open: Vec<bool> = (0..classes.len()).map(|t| t >= q.len() && t + 1 - q.len() >= (1 << front)).collect();
+            let full = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+            let short = field.faces(&Region { classes: &classes[..cut], unresolved: &open[..cut], faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+            let unequal = (0..kept_faces).filter(|&t| full[t] != short[t]).count();
+            eprintln!("ROOM_CUT still={still} front={front} margin={margin} kept={kept_faces} read={cut} room={} unequal={unequal}", classes.len());
+            if margin == NEAR - 1 {
+                assert_eq!(unequal, 0, "still {still} front {front}: a face before the front heard the room past its near field");
+            }
+        }
+        }
+    }
+}
+
 /// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
 /// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
 /// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.

@@ -3716,3 +3716,29 @@ the largest kept buffers one at a time instead of every kept buffer at once. pro
 a 94 s training read: a batch's buffers of varied classes missed an exact class, and a trim freed every kept buffer that the
 next batch then allocated again. The bits are unchanged (a buffer's contents are undefined until written, zeroed where a call
 says so); the allocations are read again in the next profile.
+
+[measurement; agent-inferred] **The run law stands** (run91; `run91.txt`). On path75's segment 2 state, the same 32 and keys,
+1,229 sweeps and three refine passes, one binary: one place a read made 4,916 reads in 1,016 card-seconds, runs below a bit
+3,282 in 626 (1.50 times fewer reads, 1.62 times less time). Written less held +230.1 against +282.5 (medians +125.0 and
++86.0), final lines at the boundary 23 and 23, calculations closing 1 of 64 and 1 of 56, words in the training vocabulary
+0.756 and 0.738. The closures are equal and the length's difference is about one standard error of a 32-answer mean at these
+spreads, so by the rule the law stands, at the predicted 1.5 times. Both writes overrun: this is the octave writer on a state
+whose path was trained in one keyed order (octave82's finding). The runs certified 10,219 bits over the write, and 3,333
+problem-reads of the refine passes passed the bound on their own faces: a refine run chosen on its places' last draws often
+holds more than a bit when reread.
+
+[measurement; agent-inferred] **The tiled map does not fit a grown field** (tile90, check94; `tile90.txt`, `check94.txt`). The
+tiled map's parity passed on the code passage's founding (every read equal), but its profile on path75's state timed the cell
+map as before: traced, that grown field's maps are 256 × 256 and 64 × 256 (its lanes), whose weights (256 KB) pass a block's
+shared memory, so the tiled map is refused and the cell map runs; the code passage's founding (width 32, `2M` 64) tiles. Its
+rows now lie at the stride `cols + 1` (the unified-theory reading of 18:53: shared memory is a circle of 32 banks, and a stride
+of a multiple of 32 put every lane's term on one bank) and each site's bound is read once a pass. A product tiled over outputs
+and terms, its bounds read first, is owed for grown fields.
+
+[measurement; agent-inferred, the unified-theory reading of 18:53, its check 1] **The room past the front is heard only
+through the near field** (the field tests' `the_room_past_the_front_is_heard_only_through_the_near_field`). A writer's state
+(its first octaves resolved, the rest open and silent) read over the whole room and cut past the front octave's end: cut at
+the end itself, one to three of the front's open faces differ from the whole room's; cut `NEAR − 1 = 5` places past it,
+every face at and before the front is the whole room's bit for bit, at two and four ticks and every front read (octaves 0 to
+5). A silent open place is no one's far source, but the near field meets every place within five, open or not; that one hop
+does not travel further over the ticks. The exact cut is the front's end and five places.
