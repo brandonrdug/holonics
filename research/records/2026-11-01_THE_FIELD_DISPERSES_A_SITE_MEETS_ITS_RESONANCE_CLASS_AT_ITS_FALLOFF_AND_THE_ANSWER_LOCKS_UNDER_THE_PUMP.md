@@ -3577,3 +3577,11 @@ problems reproduce length76's reads exactly (its key is that state's hash), so t
 those 32 drift +55.9 to read 64 and the other 96 +10.6, so segment 2's +51 was mostly its 32. At three laps from the same
 state path75's joint code is 1.0193 against the control's 1.0230, context 0.1846 against 0.1868, foil 0.4283 against
 0.4298, all lower.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 14:20] **The drift is bounded on both sides.**
+Under the opening's comparison alone the drift rose with the swing (from segment 2 to 3, `L(0)` moved +33.6 and `L(64)`
++73.1), so its sparse states doubled whatever lean the opening carried; along the path those states are trained, so
+`L(64)` should follow `L(0)` one for one whatever the swing, and a martingale's drift is zero, not merely small. **Bound,
+fixed before the later reads**: at every later path75 segment and every keyed79 segment, `L(64) − L(0)` on this measure
+(the 128 held, read 64, the shared key) lies between −20 and +20 places; below −20 the path law overcorrects and pushes the
+writer short (`drift80_follow.sh` reads each segment once its chain has written it).
