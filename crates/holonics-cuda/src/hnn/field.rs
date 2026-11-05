@@ -1714,9 +1714,10 @@ impl<'c> CardField<'c> {
                     let Some(port) = region.port else { continue };
                     let first = region_off[r] as usize;
                     let wide: Vec<Vec<u128>> = (first + port.start..region_off[r + 1] as usize).map(|t| ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect()).collect();
-                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| (m.as_slice(), ts[t] as u128)).collect();
+                    // [§16.47] A resolved place of a port at its boundary carries no face (the host's `port_faces`).
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
                     let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
-                    for (k, row) in rows.into_iter().enumerate() {
+                    for (k, row) in rows.into_iter().enumerate().filter(|(_, row)| !row.is_empty()) {
                         ported.0.push((first + port.start + k) as u32);
                         ported.1.extend(row);
                     }

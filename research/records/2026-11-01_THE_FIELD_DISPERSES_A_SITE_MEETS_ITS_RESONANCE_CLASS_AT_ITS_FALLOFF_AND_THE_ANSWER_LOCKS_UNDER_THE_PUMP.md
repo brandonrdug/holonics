@@ -3451,3 +3451,43 @@ spread; written places within 25% of held; under 20 of 32 written longer. **Rule
 boundary was the cause and the law stands; `B` falls but the writing still overruns, the overrun is made after the opening
 and is the next subject; `B` stays over 80, the question is not heard 500 places out at this reach, and the reach is the
 subject.
+
+**Segment 1 of the opening comparison** (boundary73, 3 laps; `_receipts/law73/`). At its last state the opening's void
+mass past the end meets the length law at every distance (0.571 at +32, 0.812 at +128, 0.995 at +512 against 0.564, 0.754
+and 0.988), `B` falls from 222 to 63 places, and the void mass before the end reads 55 (the prediction's at most 52
+misses). At the same lap count as exact63, context 0.1904 against 0.1909 and foil 0.4358 against 0.4354. Its write of the
+32: 12,241 places against 8,976 held (1.36 times; exact63's last state 1.79), 21 longer and 11 shorter, 63 of 93
+restatements exact. By the rule, `B` fell but the writing still overran: the overrun is made after the opening.
+
+[measurement; agent-inferred] **Where the length is decided** (`length-field` on that state: the writer draw for draw, its
+written lengths equal to the write's, and at every read the expected length `L` = letters resolved + `Σ (1 − p̂_∅)` over the
+open places; `length74.txt`). The mean of `L` less the held length is +18.8 at the opening, +40.6 after one read, +62.0
+after four, +84.2 after eight, +98.9 after 64, and holds at +101.6 to +102.0 from read 256 through the three refine
+passes to the written length. The first void is drawn at read 1 or 2 for every problem, far out (median place about 600);
+the refine passes move `L` by +0.3 and do not make the short answers. So 95% of the drift is made in reads 1 to 64, while
+each problem has resolved at most a few dozen of its 1,229 places, and after read 64 the expected length is a martingale
+to within 0.2 places: the length is decided in the sparse states, which training meets about as rarely as it met the
+opening (the unified-theory reading of 09:45 predicted half before the first void; 26% was).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 10:51] **The comparison follows the writer's path**
+(`opening_region`, path75). In place of the opening alone, each training problem's room region a lap is one state of the
+writer's own reading order run on the truth: a keyed order of the extent's places, fresh each lap, its first `k` places
+resolved from the truth and every place past the lowest resolved void resolved as the void, `k`'s octave uniform over the
+twelve octaves of the extent (`k = 0`, the opening, the first), and every open place compared at its boundary at weight
+one. A boundary port may hold resolved places, which carry no face and are not compared, on the host and the card alike;
+the field tests' covector check now includes such a port, and the trainer's check reproduces each path state from its
+draw. Started from boundary73's segment 2 state (where the opening already stands at its law), so that the comparison
+along the path is the one difference, with boundary73's own following segments its control at equal laps. The sampled
+parity read its first two sections, path states included, equal in every read, and ran to its 600 s deadline before the
+rest (`path75_parity.txt`: the path states' definite sources took the host's sections to 132 and 160 s); it is reported
+incomplete and not relaunched with a larger deadline. **Prediction, fixed before launch** (that reading), at each segment's
+last state: the mean drift of `L` from read 0 to the written length under +20 places a problem; written places within a
+quarter of held; under 20 of 32 written longer; the opening's `B` at most 80; context and foil within boundary73's at equal
+laps from that state. **Rule**: drift under +20 and the write within a quarter, the law stands; drift under +20 with the
+write outside, the opening's own law is the error left; drift over +20, the writer's own letters move its end where the
+truth's do not, and its own draws are the subject.
+
+**Segment 2 of the opening comparison** (boundary73, 6 laps). `B` 45 places (median 33), the void share 0.870 at +128 and
+0.999 at +512, the void mass before the end 69 (the share at the end 0.562 against the law's 0.491: the opening now leans
+short). The write: 10,098 places against 8,976 held (1.125 times), 18 longer and 14 shorter, 62 of 77 restatements exact.
+At 6 laps, joint code 1.0269 against exact63's 1.0176, context 0.1898 against 0.1888, foil 0.4330 against 0.4353.

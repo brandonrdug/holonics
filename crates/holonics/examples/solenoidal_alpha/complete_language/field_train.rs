@@ -213,7 +213,7 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
-/// [`section_regions`] counts it): one region a member, then each member's opening ([`opening_region`]).
+/// [`section_regions`] counts it): one region a member, then each member's path state ([`opening_region`]).
 pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
     let mut out: Vec<usize> = members
         .iter()
@@ -227,18 +227,43 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
     out
 }
 
-/// [definition; agent-inferred, November 5, §16.47] **A problem's writer's opening, compared at its boundary**: the
-/// question resolved and the codec's whole extent open past it, as the writer opens ([`opening`]), its every place an
-/// answer port compared at its boundary ([`holonics::hnn::tower::field::Port::boundary`]) at weight one: the answer's
-/// places with whether a letter stands there, never which, and the places past it with the void. Why (the
-/// unified-theory reading of November 5, 08:09; §16.46's reading): the writer fixes its length in its first reads and
-/// never undoes a letter past the true end, while training meets the opening's far places about once in 7,000 regions,
-/// so the opening's void mass past the end stood under the question-blind length law at every distance (222 places of
-/// byte mass past the end against the law's 80) and the writer overran 27 of 32 answers; the boundary's minimizer is the
-/// answer's length given the question.
-pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize]) -> TrainRegion {
-    let classes = region_classes(codec, q, a, q.len() + codec.answer);
-    let unresolved = (0..classes.len()).map(|t| t >= q.len()).collect();
+/// [definition; agent-inferred, November 5, §16.47] **A problem's writer's path, compared at its boundary**: the question
+/// resolved and the codec's whole extent past it, as the writer opens ([`opening`]), then one state of the writer's own
+/// reading order run on the truth: a keyed order of the extent's places, fresh each draw, its first `k` places resolved
+/// from the truth and every place past the lowest resolved void resolved as the void (the writer's closing law), `k`
+/// drawn so every octave of reads is met alike (`k = 0`, the opening, the first; then `[2^(o−1), 2^o)` within the extent,
+/// uniform). Every open place is an answer port compared at its boundary
+/// ([`holonics::hnn::tower::field::Port::boundary`]) at weight one: the answer's places with whether a letter stands
+/// there, never which, the places past it with the void. Why (the unified-theory readings of November 5, 08:09 and
+/// 10:51; §16.46 and §16.47): the writer fixes its length in its first reads and never undoes a letter past the true
+/// end; compared at the opening alone, the opening met the length law (byte mass past the end 63 places against 222) but
+/// the writer still overran, 95% of the drift of its expected length made in its reads 1 to 64, the sparse states
+/// training meets about as rarely as it met the opening; each octave of reads carries an equal share of where the
+/// length is decided. The boundary's minimizer is the answer's length given the question and what the path has resolved.
+pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> TrainRegion {
+    let room = codec.answer;
+    let classes = region_classes(codec, q, a, q.len() + room);
+    let mut unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+    let key = mix(seed, draw | 5 << 61);
+    let octaves = u64::from(usize::BITS - room.leading_zeros()) + 1;
+    let o = (key % octaves) as u32;
+    let k = if o == 0 {
+        0
+    } else {
+        let low = 1usize << (o - 1);
+        let high = ((1usize << o) - 1).min(room);
+        low + (mix(seed, draw | 6 << 61) as usize) % (high - low + 1)
+    };
+    let mut order: Vec<usize> = (q.len()..classes.len()).collect();
+    order.sort_by_key(|&t| (mix(key, t as u64), t));
+    for &t in &order[..k] {
+        unresolved[t] = false;
+    }
+    if let Some(end) = (q.len()..classes.len()).find(|&t| !unresolved[t] && classes[t] == codec.void()) {
+        for slot in &mut unresolved[end + 1..] {
+            *slot = false;
+        }
+    }
     TrainRegion { port: Some((q.len(), codec.void(), a.to_vec(), true)), ..TrainRegion::plain(classes, unresolved) }
 }
 
@@ -278,13 +303,15 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
 /// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
-/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then each member's writer's opening,
-/// compared at its boundary ([`opening_region`], §16.47). The step the learner holds is read first on these regions, which it was not fit on, and the held step's read is returned.
+/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then a state of each member's writer's
+/// path, compared at its boundary ([`opening_region`], §16.47). The step the learner holds is read first on these regions, which it was not fit on, and the held step's read is returned.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
-    let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
+    let mut regions: Vec<TrainRegion> = Vec::with_capacity(2 * members.len());
+    let mut draws = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
+        draws.push(*draw);
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
         let classes = region_classes(codec, q, a, length);
         regions.push(match shape(seed, *draw, q.len(), length) {
@@ -292,8 +319,8 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Answer(mask) => TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(classes, mask) },
         });
     }
-    // [§16.47] Beside each member's region, its writer's opening, compared at its boundary.
-    regions.extend(members.iter().map(|&i| opening_region(codec, &problems[i].0, &problems[i].1)));
+    // [§16.47] Beside each member's region, a state of its writer's path, compared at its boundary.
+    regions.extend(members.iter().zip(&draws).map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -1468,8 +1495,9 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
 /// writer's path). The writer of `sample-field`, draw for draw ([`Field::sample_observed`]), and at every read each
 /// problem's expected length `L` = the answer places resolved as letters + `Σ (1 − p̂_∅)` over its open places, on `2^(−20)`
 /// places; at the release's end its written length. Writes `LENGTH.tsv` (problem, read, pass, `L`, letters, open; one row
-/// a problem a read) and `ENDS.tsv` (each problem's held and written length, the read and place of its first void, and the
-/// place of its last letter and the read that last drew it), private, of the held answers. A reading only.
+/// a problem a read), `ENDS.tsv` (each problem's held and written length, the read and place of its first void, and the
+/// place of its last letter and the read that last drew it) and `SAMPLE.tsv` (each answer as `sample-field` writes it),
+/// private, of the held answers. A reading only.
 pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 14 {
         return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
@@ -1553,9 +1581,11 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         return Err(why.into());
     }
     let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
+    let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
     for (k, places) in answers.iter().enumerate() {
         let q = problems[k].0.len();
         let written = places.iter().take_while(|&&c| c != void).count();
+        row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written]))))?;
         let held_length = codec.encode(&held[k].1)?.len();
         let (fv_read, fv_place) = first_void[k].map_or(("-".to_string(), "-".to_string()), |(r, t)| (r.to_string(), t.to_string()));
         let last = if written == 0 { "-".to_string() } else { (written - 1).to_string() };
@@ -2074,9 +2104,13 @@ mod tests {
         for (n, &i) in members.iter().enumerate() {
             let (q, a, _) = &problems[i];
             let opening = &regions[members.len() + n];
-            assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}'s opening is the writer's");
-            assert!(opening.unresolved.iter().enumerate().all(|(t, &u)| u == (t >= q.len())), "member {n}'s opening opens every room place");
-            assert_eq!(opening.port, Some((q.len(), codec.void(), a.clone(), true)), "member {n}'s opening is compared at its boundary");
+            assert_eq!(*opening, opening_region(codec, q, a, seed, first + n as u64 + 1), "member {n}'s path state is its draw's");
+            assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}'s path runs the writer's extent");
+            assert!(opening.unresolved[..q.len()].iter().all(|&u| !u), "member {n}'s question is resolved");
+            if let Some(end) = (q.len()..opening.classes.len()).find(|&t| !opening.unresolved[t] && opening.classes[t] == codec.void()) {
+                assert!(opening.unresolved[end + 1..].iter().all(|&u| !u), "member {n}: every place past the lowest resolved void is resolved");
+            }
+            assert_eq!(opening.port, Some((q.len(), codec.void(), a.clone(), true)), "member {n}'s path is compared at its boundary");
         }
         let mut answers = 0;
         for (n, &i) in members.iter().enumerate() {

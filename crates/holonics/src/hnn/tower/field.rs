@@ -808,12 +808,18 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// is the answer's length law given what the face reads, the writer's opening's own boundary (the unified-theory reading
 /// of November 5, 08:09: the writer fixes its length in its first reads and never undoes a letter past the true end, so
 /// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
-/// `2^(−20)` bits, read alike by the host's return and the card's.
+/// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
+/// path) is not compared: its row is empty and it adds no code.
 fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     let one = 1i128 << super::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
     let mut code = 0i64;
     for (i, &(masses, total)) in faces.iter().enumerate() {
+        // A resolved place (a state of the writer's path, §16.47) carries no face and is not compared.
+        if total == 0 && masses.is_empty() {
+            rows.push(Vec::new());
+            continue;
+        }
         if total == 0 || port.void >= masses.len() {
             return refuse("a port's face that is empty or misses a class");
         }
@@ -1803,7 +1809,8 @@ impl Field {
             return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
         }
         if let Some(port) = region.port {
-            if port.start > region.classes.len() || region.unresolved[port.start..].iter().any(|&u| !u) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
+            if port.start > region.classes.len() || (!port.boundary && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
@@ -2633,7 +2640,7 @@ impl Field {
         }
         if let Some(port) = region.port {
             code += port_code(&faces, &port)?;
-            count += region.classes.len() - port.start;
+            count += region.unresolved[port.start..].iter().filter(|&&u| u).count();
         }
         Ok((code, count))
     }
@@ -2652,8 +2659,7 @@ impl Field {
 
     /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
     fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-        let faces: Vec<(&[u128], u128)> = pass.faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
-        port_reading(&faces, port)
+        port_reading(&port_faces(&pass.faces, port)?, port)
     }
 
     /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
@@ -4059,8 +4065,20 @@ fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Comp
 
 /// A port's coupling code on `2^(−20)` bits from a region's faces (§16.24).
 fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
-    let at: Vec<(&[u128], u128)> = faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
-    Ok(port_reading(&at, port)?.1)
+    Ok(port_reading(&port_faces(faces, port)?, port)?.1)
+}
+
+/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary may hold
+/// resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`]).
+fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'f [u128], u128)>> {
+    faces[port.start..]
+        .iter()
+        .map(|f| match f {
+            Some(f) => Ok((f.masses.as_slice(), f.total)),
+            None if port.boundary => Ok((&[][..], 0)),
+            None => refuse("a port's place without a face"),
+        })
+        .collect()
 }
 
 /// Each region's run of compared sites before its port and its weight in the joint code, `(K, m, K)`

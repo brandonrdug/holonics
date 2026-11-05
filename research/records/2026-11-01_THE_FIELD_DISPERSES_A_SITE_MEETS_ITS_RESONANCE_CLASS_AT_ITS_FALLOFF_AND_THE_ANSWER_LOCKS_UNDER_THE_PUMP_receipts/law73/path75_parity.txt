@@ -1,0 +1,5 @@
+# path75 binary 9d99ac9e91af5c23e44c2b2ded25f8bc66fddd2b0d8e33c36b5b0455aa590c7f parity lock taken 11:08:42
+FIELD_PARITY section=1 withheld=false regions=32 length=1481 sites=27284 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=131689 card_ms=540
+FIELD_PARITY section=2 withheld=false regions=32 length=1533 sites=27908 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=160194 card_ms=652
+MEASURE lap=parity rc=124 wall_s=600.5 peak_rss_kib=7235480
+PARITY FAILED: the chain stops 11:18:43
