@@ -3512,3 +3512,41 @@ on the problems it trains on and 33.8 on the held: the same shortfall on both. I
 +0.663 with held on the training problems and +0.548 on the held; by thirds of the held length its lead is +56, −18 and
 −150 where the law's is +138, +14 and −178). By that reading's rule the lean is not how the question carries to held
 problems: something besides the opening's comparison holds it short on the problems the comparison is fit on.
+
+[measurement; agent-inferred] **The lean swings with the last sections walked** (the unified-theory reading of 12:31;
+`walked.py`). Segment 3's own opening read (128 held problems) sits back on the law: the opening's expected length less
+held +10.0 (median +19.7) against the law's +10.2, `B` 64 places, the void mass before the end 55. So along the boundary
+line the lean on the held problems reads about +10, −23.6 and +10.0 at the three segments' last states, a common shift of
+the void's logit with the opening's shape kept (at −32, the end and +128 places it moved +0.48, +0.50 and +0.63 bits from
+segment 1 to 2 and −0.47, −0.51 and −0.74 from 2 to 3; the mixed band about the end holds some 90 places of `p(1 − p)`, so
+the length moves about 64 places a bit). Segment 2's shortness on both sets was one state of a swing, not a standing lean,
+and the branch of the rule it took is withdrawn. The cause read from the code: `sections_of` sorts the training problems by
+question and answer length and cuts sections of 16, and `section_regions` formed a section's path states from its own
+members, so each step's boundary covector was of one length class, its void entries summing to the members' answer length
+less the opening's expected length, all of one sign (about +150 places a problem in the longest sections, −56 in the
+shortest). `walked.py` reproduces the trainer's sections and walk (every section's longest question plus the extent
+equals the logged section length in all 3,717 sections of the three segments) and reads the mean answer length of the
+last `k` sections each segment's last lap walked, less the passage's 287.3 bytes:
+
+| last lap (read) | k = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
+|---|---|---|---|---|---|---|---|---|
+| segment 1 (207) | +161.8 | +104.7 | +56.3 | +9.8 | −11.2 | +1.1 | −1.3 | +2.8 |
+| segment 2 (210) | +53.7 | −15.4 | −39.8 | −56.6 | −22.5 | −16.2 | −17.4 | −17.0 |
+| segment 3 (213) | −33.9 | −69.3 | +57.1 | +36.6 | −0.0 | +8.3 | −1.1 | +13.0 |
+
+Segment 2's last lap walked shorter sections than the passage at every depth from 2 to 128, and segments 1 and 3's did
+not; the single last section does not carry the lean.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 12:31] **A lap's path problems are a keyed order
+of the whole passage** (`paths_of`, keyed79). Each section's path states, compared at their boundary, are of problems cut
+from one keyed order of the whole passage, fresh each lap, in the sizes of the sections in the lap's walk, so each
+problem's path is still met once a lap and a step's boundary covector is of every length class at once; the masked regions
+stay with their sections (sorted by length, as their packing needs), and a path state's extent is its question and the
+whole room, so the packing changes only by the questions' spread. The `n`th path state stands on the `n`th member's draw,
+as before. The trainer's tests pass with a section's path problems apart from its members, and a lap's path problems are
+checked to be every trained problem once, in the sections' sizes, keyed afresh each lap. Trained as path75 with this one
+difference, path75 its control lap for lap (from boundary73's segment 2 state, its laps walk the same sections with the
+same draws). **Prediction, fixed before launch** (that reading): at every segment's last state the opening's expected
+length less held is within 10 places of the question-blind law's on the same problems (the 128 held, +10.2; the first
+128 training problems, −9.5), and the drift of `L` from read 0 to the written length is path75's at equal laps. **Rule**:
+the lean still swings by 30 places, the swing is not the sections', and the step is the subject.

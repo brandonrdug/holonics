@@ -213,8 +213,8 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
-/// [`section_regions`] counts it): one region a member, then each member's path state ([`opening_region`]).
-pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
+/// [`section_regions`] counts it): one region a member, then each of `paths`' path states ([`opening_region`]).
+pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
     let mut out: Vec<usize> = members
         .iter()
         .map(|&i| {
@@ -223,7 +223,7 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
             q.len() + a.len() + tail(seed, *draw, codec.answer - a.len())
         })
         .collect();
-    out.extend(members.iter().map(|&i| problems[i].0.len() + codec.answer));
+    out.extend(paths.iter().map(|&i| problems[i].0.len() + codec.answer));
     out
 }
 
@@ -303,9 +303,14 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
 /// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
-/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then a state of each member's writer's
-/// path, compared at its boundary ([`opening_region`], §16.47). The step the learner holds is read first on these regions, which it was not fit on, and the held step's read is returned.
-pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
+/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then a state of the writer's path of
+/// each of `paths`, the section's share of the lap's keyed passage ([`paths_of`]), compared at its boundary
+/// ([`opening_region`], §16.47), the `n`th on the `n`th member's draw. The step the learner holds is read first on these
+/// regions, which it was not fit on, and the held step's read is returned.
+pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
+    if paths.len() != members.len() {
+        return Err(format!("a section of {} members and {} paths", members.len(), paths.len()).into());
+    }
     let mut regions: Vec<TrainRegion> = Vec::with_capacity(2 * members.len());
     let mut draws = Vec::with_capacity(members.len());
     for &i in members {
@@ -319,8 +324,8 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Answer(mask) => TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(classes, mask) },
         });
     }
-    // [§16.47] Beside each member's region, a state of its writer's path, compared at its boundary.
-    regions.extend(members.iter().zip(&draws).map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
+    // [§16.47] Beside the members' regions, a state of each path problem's writer's path, compared at its boundary.
+    regions.extend(paths.iter().zip(&draws).map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -347,6 +352,28 @@ pub(super) fn walk(seed: u64, read: u64, sections: usize) -> Vec<usize> {
     let mut walk: Vec<usize> = (0..sections).collect();
     walk.sort_by_key(|&s| (mix(seed, (read << 40) ^ s as u64), s));
     walk
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A lap's path problems, by section**: the problems whose writer's
+/// path a section compares at its boundary ([`section_regions`]), cut from one keyed order of the whole passage, fresh
+/// each lap, in the sizes of the sections in the lap's walk, so each problem's path is met once a lap. Why (the
+/// unified-theory reading of November 5, 12:31): the sections are cut from problems sorted by length, so a section's own
+/// members' boundary covectors were of one length class and one sign (their void entries sum to the members' answer
+/// length less the opening's expected length), and the opening's void bias followed the last sections walked: segment 2's
+/// last lap walked sections 15 to 57 bytes shorter than the passage at every depth from 2 to 128 sections and its opening
+/// sat 34 places short of the length law, where segments 1 and 3, whose last laps did not, sat on it. The masked regions
+/// stay with their sections, so a section's packing changes only by its path problems' questions.
+pub(super) fn paths_of(seed: u64, read: u64, sections: &[Vec<usize>]) -> Vec<Vec<usize>> {
+    let mut keyed: Vec<usize> = sections.iter().flatten().copied().collect();
+    keyed.sort_by_key(|&i| (mix(seed, 7 << 60 | read << 40 | i as u64), i));
+    let mut out = vec![Vec::new(); sections.len()];
+    let mut rest = keyed.as_slice();
+    for s in walk(seed, read, sections.len()) {
+        let (now, later) = rest.split_at(sections[s].len());
+        out[s] = now.to_vec();
+        rest = later;
+    }
+    out
 }
 
 /// The first draw of the withheld problems' regions, the same every lap (apart from every
@@ -917,9 +944,10 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // The lap's transfers `Σ t` and the own curvatures `Σ b` of the steps they price, over the steps that stood at full size.
         let (mut transfers, mut curvatures, mut priced) = (0i128, 0i128, 0usize);
         let lap_start = std::time::Instant::now();
+        let paths = paths_of(seed, read, &sections);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
-            let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
+            let (regions, next) = section_regions(&codec, &train_set, &sections[s], &paths[s], seed, &mut draw, &mut learner, realization)?;
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
             // [measurement; agent-inferred, November 2] **The far pairs' share of the contact covector** (§16.20): on the
@@ -2099,9 +2127,9 @@ mod tests {
     /// The regions `section_regions` formed for `members` from `first` on, against the draws they stand on: one region a
     /// member, the truth with the keyed open sites unresolved and nothing carried, weighed over the whole region or over
     /// the answer and its tail.
-    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
+    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
         assert_eq!(regions.len(), 2 * members.len());
-        for (n, &i) in members.iter().enumerate() {
+        for (n, &i) in paths.iter().enumerate() {
             let (q, a, _) = &problems[i];
             let opening = &regions[members.len() + n];
             assert_eq!(*opening, opening_region(codec, q, a, seed, first + n as u64 + 1), "member {n}'s path state is its draw's");
@@ -2136,20 +2164,21 @@ mod tests {
     fn a_section_is_its_draws_and_its_held_step_is_read_on_them() {
         let (codec, problems) = toy();
         let members = [0usize, 1, 2, 3];
+        let paths = [3usize, 0, 2, 1];
         let mut learner = toy_learner(&codec, &problems);
         // The held read is the declared comparison (§16.30); the field's law lets a step stand unread.
         learner.read_held = true;
         let (mut draw, mut held, mut read, mut answers) = (0u64, false, 0usize, 0usize);
         for section in 0..8 {
             let first = draw;
-            let lengths = region_lengths(&codec, &problems, &members, 5, &mut { first });
-            let (regions, next) = section_regions(&codec, &problems, &members, 5, &mut draw, &mut learner, &mut host()).unwrap();
+            let lengths = region_lengths(&codec, &problems, &members, &paths, 5, &mut { first });
+            let (regions, next) = section_regions(&codec, &problems, &members, &paths, 5, &mut draw, &mut learner, &mut host()).unwrap();
             assert_eq!(draw, first + 4);
             assert_eq!(lengths, regions.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), "the projection's lengths are the regions'");
             assert_eq!(next.is_some(), held, "section {section}: a step held is a step read");
             assert!(!learner.holds_step(), "the held step is read before the regions are formed");
             read += usize::from(next.is_some());
-            answers += check_regions(&codec, &problems, &members, 5, first, &regions);
+            answers += check_regions(&codec, &problems, &members, &paths, 5, first, &regions);
             learner.section_realized(&views_of(&regions), &mut host()).unwrap();
             held = learner.holds_step();
         }
@@ -2184,6 +2213,26 @@ mod tests {
         trained.sort_unstable();
         assert_eq!(trained, (0..40).collect::<Vec<_>>());
         assert_eq!(sections_of(&problems, 6, 9, 11).1, unseen, "keyed, not drawn afresh");
+    }
+
+    /// A lap's path problems are every trained problem once, in the sections' sizes, keyed afresh each lap and not by
+    /// length: a section's paths are not its own members.
+    #[test]
+    fn a_laps_paths_meet_every_problem_once_across_the_lengths() {
+        let problems: Problems = (0..40).map(|i| (vec![1; 3 + i % 7], vec![2; 5 + i % 3], 5)).collect();
+        let (sections, _) = sections_of(&problems, 6, 9, 11);
+        let (a, b) = (paths_of(11, 4, &sections), paths_of(11, 5, &sections));
+        for paths in [&a, &b] {
+            assert_eq!(paths.iter().map(Vec::len).collect::<Vec<_>>(), sections.iter().map(Vec::len).collect::<Vec<_>>());
+            let mut met = paths.concat();
+            met.sort_unstable();
+            let mut trained = sections.concat();
+            trained.sort_unstable();
+            assert_eq!(met, trained, "each trained problem's path once a lap");
+        }
+        assert_eq!(paths_of(11, 4, &sections), a, "keyed by the lap");
+        assert_ne!(a, b, "fresh each lap");
+        assert!(a.iter().zip(&sections).any(|(p, s)| p != s), "not the sections' own members");
     }
 
     /// The withheld problems are read with their neighbours, over the same sites every lap: each
