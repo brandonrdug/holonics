@@ -232,15 +232,17 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
 /// [`section_regions`] counts it): one region a member, then each of `paths`' path states ([`opening_region`]).
 pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
+    let mut draws = Vec::with_capacity(members.len());
     let mut out: Vec<usize> = members
         .iter()
         .map(|&i| {
             let (q, a, _) = &problems[i];
             *draw += 1;
+            draws.push(*draw);
             q.len() + a.len() + tail(seed, *draw, codec.answer - a.len())
         })
         .collect();
-    out.extend(paths.iter().map(|&i| problems[i].0.len() + codec.answer));
+    out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
     out
 }
 
@@ -260,7 +262,16 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 /// the writer still overran, 95% of the drift of its expected length made in its reads 1 to 64, the sparse states
 /// training meets about as rarely as it met the opening; each octave of reads carries an equal share of where the
 /// length is decided. The boundary's minimizer is the answer's length given the question and what the path has resolved.
-pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> TrainRegion {
+///
+/// [definition; agent-inferred, November 5, the unified-theory reading of 18:53 and its check 1] **A path state ends five
+/// places past its front**: before a void is resolved, every place past the front octave (the octave of the order's next
+/// place) is open and silent, and it is heard by the front only through the near field, so the region is cut `NEAR − 1`
+/// places past the front octave's end, the faces at and before it the whole room's bit for bit, and the margin is read and
+/// not compared (the port's stop at the front octave's end). Once a void is resolved the places past it are definite and
+/// heard, and the region keeps the room. A state with nothing open is no state (none). Why: on the code passage a path
+/// state read the question and all 2,062 places of the room, 2,188 of the 2,911 sites a problem's lap read, where the
+/// writer at that state draws only from its front octave.
+pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
     let room = codec.answer;
     let classes = region_classes(codec, q, a, q.len() + room);
     let mut unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
@@ -279,12 +290,27 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
     for &t in &order[..k] {
         unresolved[t] = false;
     }
-    if let Some(end) = (q.len()..classes.len()).find(|&t| !unresolved[t] && classes[t] == codec.void()) {
+    let voided = (q.len()..classes.len()).find(|&t| !unresolved[t] && classes[t] == codec.void());
+    if let Some(end) = voided {
         for slot in &mut unresolved[end + 1..] {
             *slot = false;
         }
     }
-    TrainRegion { port: Some((q.len(), codec.void(), a.to_vec(), true)), ..TrainRegion::plain(classes, unresolved) }
+    if !unresolved.iter().any(|&u| u) {
+        return None;
+    }
+    let (mut classes, mut unresolved, mut stop) = (classes, unresolved, None);
+    if voided.is_none() {
+        let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
+        let front_end = (q.len() + (1usize << (front + 1)) - 1).min(classes.len());
+        let cut = (front_end + holonics::hnn::tower::field::NEAR - 1).min(classes.len());
+        classes.truncate(cut);
+        unresolved.truncate(cut);
+        stop = Some(front_end).filter(|&e| e < cut);
+    }
+    // The answer's cells the region holds: past a cut region the answer goes on, so every place it holds is a letter's.
+    let target = a[..a.len().min(classes.len() - q.len())].to_vec();
+    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop)), ..TrainRegion::plain(classes, unresolved) })
 }
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
@@ -301,7 +327,7 @@ pub(super) struct TrainRegion {
     pub domain: Option<usize>,
     /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
     /// its boundary (§16.47) rather than through its coupling.
-    pub port: Option<(usize, usize, Vec<usize>, bool)>,
+    pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>)>,
 }
 
 impl TrainRegion {
@@ -313,7 +339,7 @@ impl TrainRegion {
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary)| Port { start: *start, void: *void, target, boundary: *boundary }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop }) }
 }
 
 /// The regions as the field reads them.
@@ -345,7 +371,7 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
         });
     }
     // [§16.47] Beside the members' regions, a state of each path problem's writer's path, compared at its boundary.
-    regions.extend(paths.iter().zip(&draws).map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
+    regions.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -2177,18 +2203,30 @@ mod tests {
     /// member, the truth with the keyed open sites unresolved and nothing carried, weighed over the whole region or over
     /// the answer and its tail.
     fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
-        assert_eq!(regions.len(), 2 * members.len());
+        let mut states = regions[members.len()..].iter();
         for (n, &i) in paths.iter().enumerate() {
             let (q, a, _) = &problems[i];
-            let opening = &regions[members.len() + n];
-            assert_eq!(*opening, opening_region(codec, q, a, seed, first + n as u64 + 1), "member {n}'s path state is its draw's");
-            assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}'s path runs the writer's extent");
+            // A state with nothing open is no state; every other stands in the paths' order on its member's draw.
+            let Some(expected) = opening_region(codec, q, a, seed, first + n as u64 + 1) else { continue };
+            let opening = states.next().expect("a path state for each path with a place open");
+            assert_eq!(*opening, expected, "member {n}'s path state is its draw's");
+            assert!(opening.unresolved.iter().any(|&u| u), "member {n}'s path state has a place open");
             assert!(opening.unresolved[..q.len()].iter().all(|&u| !u), "member {n}'s question is resolved");
-            if let Some(end) = (q.len()..opening.classes.len()).find(|&t| !opening.unresolved[t] && opening.classes[t] == codec.void()) {
+            let voided = (q.len()..opening.classes.len()).find(|&t| !opening.unresolved[t] && opening.classes[t] == codec.void());
+            if let Some(end) = voided {
                 assert!(opening.unresolved[end + 1..].iter().all(|&u| !u), "member {n}: every place past the lowest resolved void is resolved");
+                assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}: past a resolved void the path keeps the room");
+            } else {
+                assert!(opening.classes.len() <= q.len() + codec.answer, "member {n}'s path within the room");
             }
-            assert_eq!(opening.port, Some((q.len(), codec.void(), a.clone(), true)), "member {n}'s path is compared at its boundary");
+            let Some((start, void, target, true, stop)) = opening.port.clone() else { panic!("member {n}'s path is compared at its boundary") };
+            assert_eq!((start, void, target), (q.len(), codec.void(), a[..a.len().min(opening.classes.len() - q.len())].to_vec()));
+            if let Some(stop) = stop {
+                assert_eq!(opening.classes.len() - stop, holonics::hnn::tower::field::NEAR - 1, "member {n}: the margin is the near field's");
+            }
         }
+        assert!(states.next().is_none(), "no path state past the paths'");
+        assert!(regions.len() >= members.len());
         let mut answers = 0;
         for (n, &i) in members.iter().enumerate() {
             let (q, a, _) = &problems[i];

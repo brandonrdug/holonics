@@ -1741,11 +1741,20 @@ impl<'c> CardField<'c> {
                     let first = region_off[r] as usize;
                     let wide: Vec<Vec<u128>> = (first + port.start..region_off[r + 1] as usize).map(|t| ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect()).collect();
                     // [§16.47] A resolved place of a port at its boundary carries no face (the host's `port_faces`).
-                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
+                    // [§16.47] A place past the port's stop is read and not compared: it carries no face to the reading, and its
+                    // covector is zero, written as a zero row (an unported open place would take its own place's).
+                    let stop = first + port.stop.unwrap_or(region_off[r + 1] as usize - first).min(region_off[r + 1] as usize - first);
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && t < stop { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
                     let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
-                    for (k, row) in rows.into_iter().enumerate().filter(|(_, row)| !row.is_empty()) {
-                        ported.0.push((first + port.start + k) as u32);
-                        ported.1.extend(row);
+                    for (k, row) in rows.into_iter().enumerate() {
+                        let t = first + port.start + k;
+                        if !row.is_empty() {
+                            ported.0.push(t as u32);
+                            ported.1.extend(row);
+                        } else if t >= stop && unresolved[t] != 0 {
+                            ported.0.push(t as u32);
+                            ported.1.extend(std::iter::repeat_n(0i64, a));
+                        }
                     }
                 }
             }

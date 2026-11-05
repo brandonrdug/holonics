@@ -57,3 +57,21 @@ dyadic and triadic rings carry); if none is, the names (an identifier used where
 reads) and the identifiers' share standing in the question and in the held answer. Read against the held answers
 themselves, both readers return the held figures (closure ratio 1.00 in every family and span; 26 of the first 32 held
 answers parse).
+
+## The first lap
+
+[measurement] code84's segment 1 (from the founding, on the fluxing step, the tiled affine map at the founding's width and
+the card pool by best fit; path states over the whole room): lap 0 read the 1,535 sections in 1,688 card-seconds (1.10 s a
+section; the cost read had bounded a lap at 2,320 s), every step deposited. The withheld problems' code fell from 6.644 to
+3.029 bits a byte; on the 128 held, the context read from 6.644 to 3.065 and the foil to 3.069 (the question's effect 0.004
+bits a byte), the opening (every answer place open) to 6.337. The segment was stopped after lap 0 and its held read, and the
+run continues from that state under the cut path states (`code84_cont_launch.sh`).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 18:53, parts 1 and 3] **A path state ends five
+places past its front, and a state with nothing open is none** (`opening_region`, `Port::stop`): before a void is resolved
+the region is cut `NEAR − 1` places past the front octave's end, the faces at and before it the whole room's bit for bit (the
+field tests' near-field cut), and the margin is read and not compared (the port's stop; on the card a zero covector row);
+past a resolved void the region keeps the room. The trainer's tests pass with the cut states (the margin is the near
+field's, a state past a void keeps the room, a state with nothing open is skipped and the next takes its place on its own
+draw). Part 2 (regions end five places past their lowest void, the members' keyed tail retiring) is declared after these
+have run, at the same seed, with this run as its foil.

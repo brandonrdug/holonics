@@ -769,6 +769,10 @@ pub struct Port<'a> {
     pub void: usize,
     pub target: &'a [usize],
     pub boundary: bool,
+    /// [§16.47] Where its comparison stops (none: the region's end): a place from here on is read and not compared, and
+    /// takes no covector (the near field's margin a writer's state keeps past its front, so the faces before it are the
+    /// whole room's).
+    pub stop: Option<usize>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -2646,7 +2650,7 @@ impl Field {
         }
         if let Some(port) = region.port {
             code += port_code(&faces, &port)?;
-            count += region.unresolved[port.start..].iter().filter(|&&u| u).count();
+            count += region.unresolved[port.start..port.stop.unwrap_or(region.classes.len()).min(region.classes.len())].iter().filter(|&&u| u).count();
         }
         Ok((code, count))
     }
@@ -4239,9 +4243,12 @@ fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
 /// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary may hold
 /// resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`]).
 fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'f [u128], u128)>> {
+    let stop = port.stop.unwrap_or(faces.len()).min(faces.len());
     faces[port.start..]
         .iter()
-        .map(|f| match f {
+        .enumerate()
+        .map(|(k, f)| match f {
+            _ if port.start + k >= stop => Ok((&[][..], 0)),
             Some(f) => Ok((f.masses.as_slice(), f.total)),
             None if port.boundary => Ok((&[][..], 0)),
             None => refuse("a port's place without a face"),
@@ -4574,7 +4581,7 @@ impl FieldLearner {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| p.stop.unwrap_or(r.classes.len()).min(r.classes.len()) - p.start)).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         for &(start, len, grain) in &self.field.families_all() {
