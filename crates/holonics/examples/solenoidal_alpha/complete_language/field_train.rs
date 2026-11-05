@@ -1551,7 +1551,9 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
 /// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
 /// first `COUNT` held problems, the region is the writer's own opening ([`opening`]: the question resolved and the codec's
 /// whole extent open), and each open place's face is read through the realization: its void mass on `2^(−20)` beside the
-/// held answer's length in places. Writes `OPENING.tsv` (problem, held length, place, void mass; private, of the held
+/// held answer's length in places, and the face's leading class (its bytes in hex, `void` for the void; the lowest class on a
+/// tie) with its mass, which dates a write's seed (the unified-theory reading of November 5, 22:02: a sweep's first draws all
+/// come from this opening). Writes `OPENING.tsv` (problem, held length, place, void mass, lead, lead mass; private, of the held
 /// answers) and `LENGTHS.tsv` (the training answers' lengths in places, as training draws them, under the extent). A
 /// reading only.
 pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
@@ -1580,7 +1582,7 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
         row(&mut lengths, &format!("{length}\t{answers}\n"))?;
     }
     let void = codec.void();
-    let mut rows = rows_file(&out.join("OPENING.tsv"), "problem\theld\tplace\tvoid\n")?;
+    let mut rows = rows_file(&out.join("OPENING.tsv"), "problem\theld\tplace\tvoid\tlead\tlead_mass\n")?;
     let mut places = 0usize;
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
         let (q, open) = opening(&codec, field, question, b"")?;
@@ -1593,7 +1595,10 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
         for j in 0..open {
             let face = faces[q.len() + j].as_ref().ok_or("an open place with no face")?;
             let mass = ((face.masses[void] << 20) + face.total / 2) / face.total;
-            row(&mut rows, &format!("{k}\t{held_length}\t{j}\t{mass}\n"))?;
+            let lead = (0..face.masses.len()).rev().max_by_key(|&c| face.masses[c]).ok_or("a face with no class")?;
+            let lead_mass = ((face.masses[lead] << 20) + face.total / 2) / face.total;
+            let name = if lead == void { "void".to_string() } else { codec.decode(&[lead]).iter().map(|b| format!("{b:02x}")).collect() };
+            row(&mut rows, &format!("{k}\t{held_length}\t{j}\t{mass}\t{name}\t{lead_mass}\n"))?;
             places += 1;
         }
     }

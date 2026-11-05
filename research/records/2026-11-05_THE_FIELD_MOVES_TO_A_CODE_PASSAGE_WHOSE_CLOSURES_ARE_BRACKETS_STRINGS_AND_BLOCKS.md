@@ -150,3 +150,33 @@ sampled parity under the one-rate stretch and the whole-room path states passed,
 fraction trains fewer path states so that a lap fits a clock, which the card law refuses (the design fixes the workload, and
 a run that does not fit gets the card or a stated long run), and the reading preferred the whole room where its cost allows;
 so b1 runs whole, two laps of about 16 card-minutes each, its lap bound the cost read's (`code87_launch2.sh`).
+
+[measurement; agent-inferred] **The collapse is made by the refine passes** (collapse88, lead89; `collapse88.txt`, `lead89.txt`,
+`collapse.py`, `lead.py`). The unified-theory reading of 21:54 fixed a no-run read of code86's write: at least 24 of 32 opening
+with ```` ```python ````, the first `y` outside it more than five places past its front in at least 28, `y` above 90% past it,
+the commonest byte's share across writes at places 10 to 255 above 0.7; stray `y`s starting inside the region in more than four
+writes put the cause in the writer's own loop. Read: none opens with ```` ```python ```` (held 28), the first `y` stands at
+places 0 to 5 in 30 (median 0), `y` 0.773 past it, the shared byte 0.764; so the loop. On the same state, the same 32 and
+keys: the held opening's faces as the writer meets them lead with the backtick at place 0 in all 32 (lead mass 0.976) and
+never with `y` at places 10 to 255 (space 0.84, the void 0.105), so the opening seeds no `y`. The sweeps alone write it well:
+in runs with no refine pass 19 of 32 open with ```` ```python ````, `y` 4.0%, the top byte the space at 24%, the byte entropy
+4.65 bits (held 4.96), the shared byte 0.272; one place a read with no refine pass 23, 5.1%, 4.68 bits, 0.256. One place a
+read with three refine passes: none, `y` 66%, 1.65 bits. The one-place resampling (each place redrawn with every other
+resolved, restricted to letters before the last letter) walks the field to a one-byte fixed point and overwrites the
+opening the sweeps wrote; code84's segment-2 field did not under the same law (`y` 1.7%). It is a failure of the refine law,
+apart from the length laws.
+
+[measurement; agent-inferred] **b1 restores the opening's length and fails at the writer** (code87; `code87_seg2.txt`,
+`b1norefine90.txt`). Two whole-room laps from code84's lap-0 state (916 and 897 card-seconds, 589 ms a section). The opening:
+void mass 0.374, 0.523, 0.588, 0.657, 0.799 and 0.966 at −128, −32, held, +32, +128 and +512 on the held (the length law's
+0.405 to 0.924), its expected length less held −38.0 (median −0.7), `B` past the end 79 against the law's 132 (the training
+problems alike, −8.6); the drift to read 64 −45.2 ± 11.8. Against the acceptance fixed at 21:19: the void mass passes at held
+and at +128. The write in runs with three refine passes: hazard past held over the hazard at or under it 0.87 (28 end at or
+under held, one in 107 places, 4 past it, one in 122), the correlation with held +0.125, written over held 0.397; the held
+context 2.690 and 2.420 at laps 0 and 1 against code85's 2.404 and 2.124. Every write item and the held context fail, and by
+the rule (a hazard ratio under 1.5 after two laps) one rate past the last arrival does not carry length at the writer, b2
+waits, and (c) is next. With no refine pass the same state's write reads the same length (0.87, +0.127, 0.414), so the
+failure is the sweeps', and its content is near held's statistics (14 of 32 open with ```` ```python ````, top byte the space at
+12.9%, `y` 2.1%, entropy 4.92 bits, shared byte 0.188), while the refined write collapsed to `%` (32.7%, entropy 3.60 bits).
+The opening now knows the length, but the writer's states do not, ending at a steady one in about 110 places at or under
+held and past it alike. Two more b1 laps run for the design of (c), not to decide b1 (`code87_launch3.sh`).
