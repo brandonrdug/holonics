@@ -1,0 +1,62 @@
+# seg1 from 7949c565cdd6d6130e0adb5c6cd4594b133a47b85945c9fa867619be7ce49f29 started 16:47:34 
+FIELD_STEP_TRANSFER rate=13
+FIELD_LAPS_HELD lap=3 reason=time left=354871 bound=992482 ms=2345129
+MEASURE lap=seg1 rc=0 wall_s=2345.6 peak_rss_kib=626288
+-1 1.026946 0.342693;0 1.024065 0.352236;1 1.024096 0.352818;2 1.018896 0.346911;
+-1:5.717976:0.189810:0.433005 0:5.521684:0.188770:0.437332 1:5.632025:0.187762:0.436209 2:5.604324:0.185514:0.430246 
+0:787:0:13 1:685:-1:13 2:-405:-1:14 
+== HELD128
+FIELD_OPENING problems=128 places=157312 training_answers=6730 ms=3344
+MEASURE lap=seg1_opening_HELD128 rc=0 wall_s=3.7 peak_rss_kib=236424
+distance	problems	void_mass	length_law
+-128	112	0.207	0.260
+-32	128	0.402	0.418
++0	128	0.494	0.491
++32	128	0.589	0.564
++128	128	0.819	0.754
++512	128	0.996	0.988
+places 900 to 1199	38400	1.000	0.999
+B past the end: mean 60 places, median 46, range 0 to 253; the length law 80
+void mass before the end: mean 57 places
+the opening's expected length less held: mean +3.2 places, median +19.3
+law E[L] 287.3; mean held 277.1; law lead +10.2; opening lead +3.2
+short third: held 67-203 mean 145; opening lead +93.0; law lead +142.4; opening length 238
+middle third: held 204-307 mean 255; opening lead +11.6; law lead +32.5; opening length 266
+long third: held 308-701 mean 428; opening lead -92.9; law lead -141.1; opening length 336
+correlation of opening length with held: +0.543
+== TRAIN
+FIELD_OPENING problems=128 places=157312 training_answers=6730 ms=3346
+MEASURE lap=seg1_opening_TRAIN rc=0 wall_s=3.6 peak_rss_kib=235892
+distance	problems	void_mass	length_law
+-128	113	0.208	0.301
+-32	128	0.404	0.449
++0	128	0.502	0.519
++32	128	0.610	0.590
++128	128	0.844	0.771
++512	126	0.998	0.989
+places 900 to 1199	38400	1.000	0.999
+B past the end: mean 54 places, median 45, range 0 to 191; the length law 75
+void mass before the end: mean 62 places
+the opening's expected length less held: mean -8.2 places, median +11.8
+law E[L] 287.3; mean held 296.8; law lead -9.5; opening lead -8.2
+short third: held 85-210 mean 149; opening lead +72.9; law lead +138.4; opening length 222
+middle third: held 212-340 mean 273; opening lead +14.8; law lead +14.2; opening length 288
+long third: held 340-841 mean 465; opening lead -110.3; law lead -177.8; opening length 355
+correlation of opening length with held: +0.663
+FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- ms=1373500
+MEASURE lap=seg1_write rc=0 wall_s=1374.0 peak_rss_kib=346376
+written: 32 problems, 14 written longer than held, 18 shorter
+correlation of B with the overrun over the written: +0.660
+read	pass	mean L less held	median
+end (2889)	-	-30.4	-10.5
+opening L less held: mean +13.5
+drift from the opening to the end: mean -43.9 a problem
+  to the first void: mean -5.0 (11% of it); after it: -38.8 (89%)
+  in the refine passes: mean +0.4
+short answers (18): after the sweeps L less held -144.1, the refine passes moved them +0.7
+first void read: median 1 of 1228 sweeps; last letter's read: median 2424
+RULE: pre-void at least half True; post-void under a quarter False
+WORDS written=1066 in_training_vocabulary=783 share=0.735
+seg1_write/SAMPLE.tsv restatements 65 1 dropped or added=17 1 substituted=1 2 dropped or added=1 3 dropped or added=4 equal=42
+SEGMENT 1 done 18:29:09
+# stopped 18:29:12 after segment 1: the passage moves to python-codes-25k (Brandon, November 5 16:29)

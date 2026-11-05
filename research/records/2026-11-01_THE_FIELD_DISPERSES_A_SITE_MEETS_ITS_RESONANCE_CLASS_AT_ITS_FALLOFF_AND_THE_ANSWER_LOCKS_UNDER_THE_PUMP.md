@@ -3742,3 +3742,11 @@ the end itself, one to three of the front's open faces differ from the whole roo
 every face at and before the front is the whole room's bit for bit, at two and four ticks and every front read (octaves 0 to
 5). A silent open place is no one's far source, but the near field meets every place within five, open or not; that one hop
 does not travel further over the ticks. The exact cut is the front's end and five places.
+
+[measurement; agent-inferred] **The GSM8K line's last reads** (`keyed79_seg1.txt`, `drift80_follow.txt`). keyed79's segment 1
+(three laps from boundary73's segment 2 state, lap for lap with path75's segment 1): the opening's lean against the law
+−7.0 places on the held and +1.3 on the training problems, within the prediction's 10; its drift on the 128 −14.5 ± 8.3 and
+path75's segment 2's −7.0 ± 10.0, both within the two-sided bound; keyed79's write −30.4 written less held (14 longer, 18
+shorter), 42 of 65 restatements exact; context 0.1855 and foil 0.4302 at its third lap against path75's 0.1846 and 0.4283.
+The keyed passage's rule reads a swing across segments, and the line stopped after one by Brandon's move to the code passage
+(November 5, 16:29), so it stands untested there; it costs nothing and is carried into the code passage's laws.
