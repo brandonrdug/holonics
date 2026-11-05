@@ -1304,6 +1304,89 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 5, §16.45] **`reach-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT OUT`**: how far the question reaches into a blank answer (the unified-theory reading of November 5: a
+/// turned head's skin is `e^(−2π|σ_i − σ_j|/n)`, `σ` its clock's variation, so a blank run at its expected duration
+/// stretches the answer away from its question, and the writer's first state, every answer place blank, pays it most). In
+/// that state (every answer place and the first void open beside the question), for each of the first `COUNT` held
+/// problems and each open place: its duration on each paced head at the last tick (the clock that tick ran), its variation
+/// from the question's last site (those durations summed up to it), and its truth's code beside its own question and
+/// beside the next problem's (the foil, whose difference is the question's reach). Writes `REACH.tsv` (private, of the
+/// held answers) and prints the codes by place. A reading only.
+pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("reach-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let d = field.declaration;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let n = count(&args[9])?.min(held.len());
+    let out = Path::new(&args[10]);
+    std::fs::create_dir(out)?;
+    let paced = d.paced_heads();
+    let one = 1i64 << holonics::hnn::tower::field::PACE_BITS;
+    let heads: Vec<String> = (0..paced).flat_map(|p| [format!("kappa{p}"), format!("variation{p}")]).collect();
+    let mut rows = rows_file(&out.join("REACH.tsv"), &format!("problem\tplace\tplaces\tcode_own\tcode_foil\t{}\n", heads.join("\t")))?;
+    let questions: Vec<Vec<usize>> = held.iter().take(n).map(|(q, _)| codec.encode(&question_text(q))).collect::<std::result::Result<_, _>>()?;
+    // By place from the question, on doubling spans `[0, 1), [1, 2), [2, 4), …`: places, own code, foil code.
+    let mut spans = vec![(0usize, 0i64, 0i64); (usize::BITS - d.reach.leading_zeros()) as usize + 1];
+    for k in 0..n {
+        let a = codec.encode(&held[k].1)?;
+        let (q, fq) = (&questions[k], &questions[(k + 1) % n]);
+        let region_of = |q: &[usize]| -> (Vec<usize>, Vec<bool>) {
+            let mut classes: Vec<usize> = q.iter().chain(&a).copied().collect();
+            classes.push(codec.void());
+            let open = (0..classes.len()).map(|t| t >= q.len()).collect();
+            (classes, open)
+        };
+        let ((own, own_open), (foil, foil_open)) = (region_of(q), region_of(fq));
+        if own.len() > d.reach || foil.len() > d.reach {
+            continue;
+        }
+        let own_region = Region { classes: &own, unresolved: &own_open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let foil_region = Region { classes: &foil, unresolved: &foil_open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let faces_own = realization.read_faces(field, std::slice::from_ref(&own_region)).map_err(|e| e.to_string())?.remove(0);
+        let faces_foil = realization.read_faces(field, std::slice::from_ref(&foil_region)).map_err(|e| e.to_string())?.remove(0);
+        let places = a.len() + 1;
+        let sites: Vec<usize> = (q.len()..own.len()).collect();
+        let clocks = realization.read_blank_clocks(field, &own_region, &sites).map_err(|e| e.to_string())?;
+        let mut variation = vec![0i64; paced];
+        for j in 0..places {
+            let code = |faces: &[Option<holonics::hnn::tower::TowerFace>], at: usize| -> std::result::Result<i64, String> {
+                let face = faces[at].as_ref().ok_or("an open place with no face")?;
+                Ok(holonics::hnn::tower::face_code(face.masses[own[q.len() + j]], face.total))
+            };
+            let (c_own, c_foil) = (code(&faces_own, q.len() + j)?, code(&faces_foil, fq.len() + j)?);
+            // The clock the last tick ran at this place; one on a head whose last tick reads no blank clock there.
+            let kappa: Vec<i64> = match clocks[j].ticks.last().and_then(Option::as_ref) {
+                Some((rates, _)) => rates.clone(),
+                None => vec![one; paced],
+            };
+            let mut cells = Vec::with_capacity(2 * paced);
+            for (p, &rate) in kappa.iter().enumerate() {
+                variation[p] += rate;
+                cells.push(format!("{rate}\t{}", variation[p]));
+            }
+            row(&mut rows, &format!("{k}\t{j}\t{places}\t{c_own}\t{c_foil}\t{}\n", cells.join("\t")))?;
+            let s = &mut spans[(usize::BITS - j.leading_zeros()) as usize];
+            s.0 += 1;
+            s.1 += c_own;
+            s.2 += c_foil;
+        }
+    }
+    for (span, &(count, own, foil)) in spans.iter().enumerate().filter(|(_, s)| s.0 > 0) {
+        let from = if span == 0 { 0 } else { 1usize << (span - 1) };
+        println!("FIELD_REACH from={from} places={count} own_bits_a_class={} foil_bits_a_class={} question_bits_a_class={}", bits(own, count), bits(foil, count), bits(foil - own, count));
+    }
+    let (count, own, foil) = spans.iter().fold((0, 0, 0), |t, s| (t.0 + s.0, t.1 + s.1, t.2 + s.2));
+    println!("FIELD_REACH_DONE problems={n} places={count} own_bits_a_class={} foil_bits_a_class={} ms={}", bits(own, count), bits(foil, count), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each

@@ -1,0 +1,69 @@
+diff --git a/crates/holonics-cuda/kernels/field.cu b/crates/holonics-cuda/kernels/field.cu
+index 925ba50a1..1544bea46 100644
+--- a/crates/holonics-cuda/kernels/field.cu
++++ b/crates/holonics-cuda/kernels/field.cu
+@@ -3613,9 +3613,11 @@ extern "C" __global__ void field_paces(FieldWords w) {
+         for (uint32_t t = 0; t < sites; t++) {
+             const uint64_t g = first + t;
+             const wide k = one + pace_rate(w, p, g);
++            // A blank turns its rings by its expected duration but keeps its skin at the strand's own place (σ at κ = 1).
++            const bool bare = w.blank_rate && w.unresolved[g] && w.mix_off[g] == w.mix_off[g + 1];
+             if (t > 0) {
+                 clock += k;
+-                variation += k < 0 ? -k : k;
++                variation += bare ? one : k < 0 ? -k : k;
+             }
+             plain = plain && k == one;
+             const uint64_t at = (uint64_t)p * w.T + g;
+@@ -4208,7 +4210,9 @@ extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
+             tau += w.gtau[at];
+             sig += w.gsig[at];
+             const int64_t k = w.kappa[at];
+-            dkappa[at] = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
++            const uint64_t g = first + t;
++            const bool bare = w.blank_rate && w.unresolved[g] && w.mix_off[g] == w.mix_off[g + 1];
++            dkappa[at] = tau + (bare ? 0 : k > 0 ? sig : k < 0 ? -sig : 0);
+         }
+     }
+ }
+diff --git a/crates/holonics/src/hnn/tower/field.rs b/crates/holonics/src/hnn/tower/field.rs
+index 5920829e7..7edf6a64c 100644
+--- a/crates/holonics/src/hnn/tower/field.rs
++++ b/crates/holonics/src/hnn/tower/field.rs
+@@ -1603,14 +1603,16 @@ impl Field {
+             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
+             let (mut clock, mut variation) = (0i128, 0i128);
+             for t in 0..sites {
+-                let rate = match blank.get(t).and_then(Option::as_ref).filter(|_| Self::silent(region, t)) {
+-                    Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
+-                    None => self.strand_row(region, base, 1, t)[0] as i128,
++                // A blank turns its rings by its expected duration but keeps its skin at the strand's own place (σ at
++                // κ = 1); a written place keeps its skin with its turn.
++                let (rate, bare) = match blank.get(t).and_then(Option::as_ref).filter(|_| Self::silent(region, t)) {
++                    Some(face) => (release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS), true),
++                    None => (self.strand_row(region, base, 1, t)[0] as i128, false),
+                 };
+                 let k = one + rate;
+                 if t > 0 {
+                     clock += k;
+-                    variation += k.abs();
++                    variation += if bare { one } else { k.abs() };
+                 }
+                 kappa.push(fit64(k)?);
+                 tau.push(fit64(clock)?);
+@@ -3178,11 +3180,13 @@ impl Field {
+             for k in (1..sites).rev() {
+                 tail_tau += r.gtau[p][k];
+                 tail_sig += r.gsig[p][k];
+-                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
++                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref) } else { Self::carried(region, k) };
++                // A blank's skin stands at one ([`Field::paces_with`]): its rate returns through its turn alone.
++                let bare = Self::silent(region, k) && face.is_some();
++                let dk = if bare { tail_tau } else { tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig };
+                 if dk == 0 {
+                     continue;
+                 }
+-                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref) } else { Self::carried(region, k) };
+                 match face {
+                     None if Self::silent(region, k) => {}
+                     None => g[base + self.row(region, k)] += dk << STATE_BITS,

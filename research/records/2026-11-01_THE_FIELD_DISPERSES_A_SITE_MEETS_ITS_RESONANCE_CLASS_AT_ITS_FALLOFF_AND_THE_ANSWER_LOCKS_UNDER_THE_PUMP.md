@@ -3282,3 +3282,85 @@ Failures this could repeat, checked: **bits read as progress** (the law is judge
 states where one swings); **a located cause carried unrepaired into a new consumer** (the operand covector's miss is
 repaired at its owner, the reverse, before the law is judged); **an uncertified deposition step** (the covector is checked
 against the code's difference before it trains).
+
+**The free clock passes on context and foil and fails (b)** (exact63, five segments of 45 card-minutes from main52 segment
+3's last state; `_receipts/law60/exact63.txt`). Each segment's end:
+
+| segment | step | joint code, nats a place | context | foil | writer's first state | head 3 at the offset; D's code | write: restatements exact |
+|---|---|---|---|---|---|---|---|
+| 1 | `2^(−12)` to `2^(−14)` | 1.0122 | 0.1825 | 0.4221 | 5.457 | 0.386; 3.873 | 10 of 17 |
+| 2 | `2^(−14)` | 1.0088 | 0.1818 | 0.4197 | 5.365 | 0.356; 3.936 | 18 of 26 |
+| 3 | `2^(−14)` to `2^(−16)` | 1.0045 | 0.1793 | 0.4155 | 5.266 | 0.346; 3.887 | 19 of 26 |
+| 4 | `2^(−16)` to `2^(−19)` | 1.0026 | 0.1782 | 0.4163 | 5.278 | 0.346; 3.863 | 15 of 20 |
+| 5 | `2^(−19)` to `2^(−23)` | 1.0028 | 0.1781 | 0.4164 | 5.302 | 0.343; 3.871 | 16 of 21 |
+
+Over the last three laps context reads 0.17810 and foil 0.41632, under 0.18265 and 0.42164: **it passes**. The writer's
+first state over the last three states reads 5.303, 5.303 and 5.302 (§16.45's reach read), above 5.08: **it fails (b)**.
+From segment 4 the step's price reads zero at every rate and the rate walks down, so segment 5 is the law's floor at this
+schedule. The field learns past the old law's floor (1.0028 against 1.010 to 1.013) and the held reads follow it; the one
+state it serves worse is the all-blank answer.
+
+### 16.45 Every face a clock reads compared costs the field within one segment; the free clock's excess at the all-blank answer sits at the answer's end, not in the question's reach
+
+[agent-inferred, November 5] **The compared faces** (the unified-theory reading of November 5, 03:29): every face a later
+tick's clock reads off a blank is compared at the same open places with the same weight as the released one, `m/(K F)`
+with `F` the faces read (the released face and each clocked face once), the code reported as the released face's alone,
+and the exact return kept as this comparison's adjoint (`Field::read_and_return`, `Field::compared`; the card's
+`clocked_weight`, `field_blank_dz`'s code term). Host and card agree bit for bit on the sampled parity
+(`_receipts/law60/faces65_parity.txt`). Trained from the same start on the same schedule as exact63, its control
+(faces66; `_receipts/law67/faces66.txt`), it was worse at every matched lap of segment 1:
+
+| lap | joint code: compared, free | context: compared, free | foil: compared, free |
+|---|---|---|---|
+| read time | 1.0349, 1.0349 | 0.1854, 0.1854 | 0.4278, 0.4278 |
+| 0 | 1.0878, 1.0314 | 0.2170, 0.1934 | 0.4822, 0.4491 |
+| 4 | 1.0712, 1.0162 | 0.2137, 0.1870 | 0.4742, 0.4281 |
+| 8 | 1.0683, 1.0163 | 0.2092, 0.1829 | 0.4678, 0.4219 |
+
+At the segment's end the writer's first state read 5.781 (the free clock 5.457), head 3 at the offset 0.316 and D's code
+3.558 (0.386 and 3.873). The loss came on the first lap, at the same step `2^(−12)`: the joint code went from 1.035 to
+1.088 where the free clock's went to 1.031, and the eight laps after it recovered 0.020 of that 0.053. [agent-inferred, a guess]
+Comparing the middle ticks' faces pulls them toward predicting the byte while they also set the clocks, and the released
+face pays for the clock they lose. By the
+rule fixed before it ran (a lower held read keeps it, else the free clock is the law), **the compared faces are
+withdrawn**; the run was stopped after segment 1's acceptance read (06:43 UTC), its code stays at `3b444266b`, and the free
+clock stands as the law.
+
+[agent-inferred, November 5] **The question's reach into a blank answer** (the unified-theory reading of November 5,
+06:10: a turned head's skin is `e^(−2π|σ_i − σ_j|/n)`, a blank at its expected duration stretches `σ`, and the all-blank
+state pays it most). `reach-field` reads, at the writer's first state, each open place's duration on each paced head at
+the last tick, its variation from the question, and its truth's code beside its own question and beside the next
+problem's (the foil); on main52 segment 3's states 8 to 10 under the old law (the binary at `321540750` with the
+first-state read; a blank at one) and exact63 segment 5's states 6 to 8, 128 held problems, 35,591 places a state
+(`_receipts/law67/`: `reach67.txt`, `rule.out`). The rule, fixed before the read (06:21): reach only if (1) the free clock's
+mean duration is above one on a paced head, (2) its code excess over the old law is larger on the far half of the places
+(split at the median place, 144) than on the near half, and (3) on the far half the question's information (foil less
+own) is below the old law's, each by more than the larger of the two laws' spreads over their three states. (1) holds
+(1.676 and 2.160 on the two paced heads, spread under 0.001). (2) fails (excess +0.036 near, +0.257 far; the difference
++0.221 against a spread of 0.345). (3) fails the other way: on the far half the free clock keeps more of the question,
+0.123 bits a class against 0.107. **Not reach**, so the τ-only law (a blank turns by its expected duration and keeps its
+skin at the strand's own place) does not run; it is written on host and card and passes the field tests and the gate
+(`bare_skin.patch`, `bare_skin_checks.txt`), and retired unrun.
+
+The excess follows the answer's end. By places before the void that closes the region, the free clock less the old law,
+in bits a class, with the free clock's duration on the second paced head:
+
+| places before the void | 0 (the void) | 1 | 2–3 | 4–7 | 8–15 | 16–31 | 32–63 | 64–127 | 128–255 | 256–511 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| excess | −0.513 | +0.264 | +0.267 | −0.050 | +0.261 | +0.218 | +0.227 | +0.180 | +0.130 | +0.085 |
+| duration | 5.04 | 3.38 | 2.89 | 2.69 | 2.65 | 2.57 | 2.44 | 2.25 | 2.03 | 1.84 |
+
+By answer length the excess is −0.042 (64 to 127 places), +0.056, +0.173 and +0.301 (512 and more). Near the end the faces
+split between the void, whose learned duration is about five (the written padding tails training sees), and a byte (about
+1.6), and the blank runs at their mean, a duration no outcome has: the void place itself gains half a bit and the bytes
+before it pay. [agent-inferred] The expected duration is the first cumulant of a blank's transport. A ring of period `n`
+turns across a blank of face `p` by `Σ_a p_a e^(2πiκ_a/n)` in expectation, and across a run of independent blanks by the
+product of these: the rhythm law's `Φ` (§16.44's note of November 4, 23:50), whose second cumulant is the skin
+`e^(−2π²T₂/n²)`. Where the face is one-sided the mean is right; where it is bimodal, as at the answer's end, the mean
+misplaces the phase and the modulus says the ring loses coherence there. That law needs its exact return through each
+blank's face before it trains (§16.44's covector checks); it is the next law's subject.
+
+Failures this could repeat, checked: **bits read as progress** (both laws were judged by rules fixed before their reads,
+on three states where one swings); **a refusal answered with a larger limit** (the compared faces stopped at the first
+read that decided them, not run out); **a located cause carried unrepaired into a new consumer** (the τ-only law was not
+run once its premise failed its read).

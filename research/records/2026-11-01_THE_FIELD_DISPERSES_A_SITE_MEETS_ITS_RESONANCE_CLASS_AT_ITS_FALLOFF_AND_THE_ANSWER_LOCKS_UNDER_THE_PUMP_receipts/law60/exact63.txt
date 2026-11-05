@@ -10,7 +10,7 @@ MEASURE lap=seg1 rc=0 wall_s=2442.4 peak_rss_kib=614660
 FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=74470
 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.457
 MEASURE lap=seg1_read rc=0 wall_s=74.8 peak_rss_kib=237740
-/home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg1_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.386; D's code 3.873 bits
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg1_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.386; D's code 3.873 bits
 FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2530 held=1600 lambda=713 friction=2704 foil_lambda=627 foil_friction=2876 own_wins=3 foil_wins=3 ms=355132
 MEASURE lap=seg1_write rc=0 wall_s=355.4 peak_rss_kib=244160
 WORDS written=380 in_training_vocabulary=280 share=0.737
@@ -26,10 +26,58 @@ MEASURE lap=seg2 rc=0 wall_s=2559.0 peak_rss_kib=636788
 FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=85601
 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.365
 MEASURE lap=seg2_read rc=0 wall_s=85.9 peak_rss_kib=240416
-/home/b/Workspaces/holonics/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg2_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.356; D's code 3.936 bits
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg2_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.356; D's code 3.936 bits
 FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3206 held=1600 lambda=821 friction=3164 foil_lambda=763 foil_friction=3280 own_wins=4 foil_wins=2 ms=438242
 MEASURE lap=seg2_write rc=0 wall_s=438.5 peak_rss_kib=246540
 WORDS written=445 in_training_vocabulary=333 share=0.748
 seg2_write/SAMPLE.tsv restatements 26 1 dropped or added=5 2 dropped or added=2 3 dropped or added=1 equal=18
 SEGMENT 2 done 03:18:47
 # seg3 from cd2cf49265f414a3d832adac43eeaee418addcd599590f6ff0955676b9d96769 started 03:20:06 
+FIELD_STEP_TRANSFER rate=14
+FIELD_LAPS_HELD lap=10 reason=time left=161135 bound=300000 ms=2538865
+MEASURE lap=seg3 rc=0 wall_s=2539.5 peak_rss_kib=634652
+-1 1.008822 0.339923;0 1.007200 0.347957;1 1.008756 0.340945;2 1.008864 0.348053;3 1.006662 0.340888;4 1.009226 0.342588;5 1.004254 0.346670;6 1.007099 0.339337;7 1.005789 0.346354;8 1.005264 0.339854;9 1.004500 0.341451;
+-1:5.370010:0.181846:0.419709 0:5.250769:0.180064:0.421787 1:5.377532:0.181667:0.424186 2:5.319034:0.180622:0.425079 3:5.311881:0.181960:0.419281 4:5.300533:0.180504:0.419633 5:5.259121:0.179727:0.418236 6:5.222258:0.180481:0.415043 7:5.314737:0.179937:0.419234 8:5.288371:0.179230:0.416060 9:5.271832:0.179273:0.415526 
+0:717:0:14 1:971:0:14 2:741:0:14 3:866:0:14 4:525:-1:14 5:0:1:15 6:567:-1:14 7:1024:0:15 8:498:-1:15 9:1230:0:16 
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=76652
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.266
+MEASURE lap=seg3_read rc=0 wall_s=77.0 peak_rss_kib=240768
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg3_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.346; D's code 3.887 bits
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3565 held=1600 lambda=805 friction=3555 foil_lambda=777 foil_friction=3611 own_wins=3 foil_wins=3 ms=444110
+MEASURE lap=seg3_write rc=0 wall_s=444.5 peak_rss_kib=242668
+WORDS written=502 in_training_vocabulary=375 share=0.747
+seg3_write/SAMPLE.tsv restatements 26 1 dropped or added=5 3 dropped or added=1 4 dropped or added=1 equal=19
+SEGMENT 3 done 04:11:08
+# seg4 from 6f8ef4e186196736c64ed63af715fe62aee5faea38f5b6e75c5abdc25a830b4b started 04:11:08 
+FIELD_STEP_TRANSFER rate=16
+FIELD_LAPS_HELD lap=10 reason=time left=140369 bound=300000 ms=2559631
+MEASURE lap=seg4 rc=0 wall_s=2560.1 peak_rss_kib=637624
+-1 1.004500 0.341451;0 1.004931 0.339212;1 1.003649 0.341748;2 1.003643 0.342725;3 1.003450 0.342606;4 1.003218 0.343022;5 1.003378 0.342275;6 1.003126 0.343113;7 1.002979 0.343471;8 1.002701 0.343878;9 1.002618 0.344331;
+-1:5.271832:0.179273:0.415526 0:5.341753:0.178582:0.414961 1:5.322250:0.178318:0.415868 2:5.320385:0.178085:0.416051 3:5.309235:0.178290:0.416029 4:5.309714:0.178396:0.416251 5:5.303497:0.178223:0.415851 6:5.298259:0.178314:0.416195 7:5.300126:0.178395:0.416196 8:5.293031:0.178370:0.416055 9:5.283416:0.178162:0.416339 
+0:0:-1:16 1:0:-1:17 2:0:-1:18 3:0:-1:19 4:0:1:20 5:0:-1:19 6:0:1:20 7:0:-1:19 8:0:1:20 9:0:-1:19 
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=92604
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.278
+MEASURE lap=seg4_read rc=0 wall_s=92.9 peak_rss_kib=239840
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg4_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.346; D's code 3.863 bits
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2923 held=1600 lambda=791 friction=2941 foil_lambda=743 foil_friction=3037 own_wins=4 foil_wins=2 ms=380618
+MEASURE lap=seg4_write rc=0 wall_s=380.9 peak_rss_kib=246500
+WORDS written=435 in_training_vocabulary=329 share=0.756
+seg4_write/SAMPLE.tsv restatements 20 1 dropped or added=4 2 dropped or added=1 equal=15
+SEGMENT 4 done 05:06:58
+# seg5 from b45f8f7e3013d919dc4db9a8798641c15658837b549cd7d4776c6e9d52ba27ef started 05:06:58 
+FIELD_STEP_TRANSFER rate=19
+FIELD_LAPS_HELD lap=9 reason=time left=157710 bound=300000 ms=2542290
+MEASURE lap=seg5 rc=0 wall_s=2542.7 peak_rss_kib=641756
+-1 1.002618 0.344331;0 1.002781 0.343710;1 1.002645 0.343909;2 1.002987 0.343997;3 1.002947 0.344223;4 1.002942 0.344000;5 1.002966 0.343949;6 1.002782 0.344363;7 1.002840 0.344250;8 1.002841 0.344306;
+-1:5.283416:0.178162:0.416339 0:5.287975:0.178114:0.416156 1:5.285042:0.178167:0.416193 2:5.307680:0.178159:0.416368 3:5.309687:0.178106:0.416472 4:5.307624:0.178069:0.416201 5:5.309473:0.178098:0.416259 6:5.308625:0.178064:0.416265 7:5.308397:0.178114:0.416335 8:5.307685:0.178125:0.416373 
+0:0:-1:19 1:0:1:20 2:0:-1:19 3:0:-1:20 4:0:-1:21 5:0:1:22 6:0:-1:21 7:0:-1:22 8:0:-1:23 
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=86375
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.302
+MEASURE lap=seg5_read rc=0 wall_s=86.7 peak_rss_kib=238812
+$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-exact63/seg5_read/RESTATEMENTS.tsv: D places read 707 (within the near field 631); head 3 at the offset 0.343; D's code 3.871 bits
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2478 held=1600 lambda=756 friction=2566 foil_lambda=650 foil_friction=2778 own_wins=4 foil_wins=2 ms=334924
+MEASURE lap=seg5_write rc=0 wall_s=335.2 peak_rss_kib=245092
+WORDS written=364 in_training_vocabulary=282 share=0.775
+seg5_write/SAMPLE.tsv restatements 21 1 dropped or added=4 3 dropped or added=1 equal=16
+SEGMENT 5 done 05:56:23
+MAIN exit 05:56:23
