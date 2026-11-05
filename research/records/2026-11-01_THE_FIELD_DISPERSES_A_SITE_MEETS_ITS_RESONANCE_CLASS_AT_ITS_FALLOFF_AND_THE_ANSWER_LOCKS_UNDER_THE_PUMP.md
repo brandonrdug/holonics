@@ -3585,3 +3585,11 @@ Under the opening's comparison alone the drift rose with the swing (from segment
 fixed before the later reads**: at every later path75 segment and every keyed79 segment, `L(64) − L(0)` on this measure
 (the 128 held, read 64, the shared key) lies between −20 and +20 places; below −20 the path law overcorrects and pushes the
 writer short (`drift80_follow.sh` reads each segment once its chain has written it).
+
+**Segment 1 along the path** (path75, 3 laps from boundary73's segment 2 state; `path75_seg1.txt`). The opening: `B` 61
+places, the void mass before the end 55, its expected length less held +6.7 against the law's +10.2. The write of the 32:
+8,864 places against 8,976 held (0.988 times), 17 longer and 15 shorter, the correlation of `B` with the overrun +0.722,
+59 of 77 restatements exact, 0.760 of its words in the training vocabulary; on these 32 the drift from the opening to the
+written length is −18.6 a problem (one draw each), on the 128 −7.1 ± 9.3. Against the prediction: drift under +20,
+written within a quarter, under 20 of 32 longer, `B` at most 80, context and foil at or under the control's at equal laps;
+each holds, and by the rule the comparison along the writer's path stands.
