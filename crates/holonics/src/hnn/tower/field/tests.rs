@@ -1083,6 +1083,49 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
 
 
 
+/// [definition; §16.44] **A blank place runs at its expected duration**: on the shaped field (its paces drawn), every tick
+/// after the first runs each silent open site at `1 + Σ_a w_a c_h[a]` for the face the tick before gave it, while every
+/// written site keeps its own class's rate; the first tick runs the blanks at the bare rate; a region with no blank, and a
+/// founded field (every rate one), read the pass's clocks in every tick.
+#[test]
+fn a_blank_place_runs_at_its_expected_duration() {
+    let mut field = shaped(1);
+    let r = region();
+    let pass = field.pass(&r, true).unwrap();
+    assert!(pass.ticks[0].clock.is_none(), "the first tick runs the blanks at the bare rate");
+    let d = field.declaration;
+    let width = d.alphabet + 1;
+    let mut moved = false;
+    for cell in &pass.ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            let base = field.layout.pace + p * width;
+            for (t, &k) in kappa.iter().enumerate() {
+                if Field::silent(&r, t) {
+                    let face = clock.blank[t].as_ref().expect("a blank's face");
+                    let rate = release(face.iter().map(|&(c, w)| w as i128 * field.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                    assert_eq!(k as i128, (1i128 << PACE_BITS) + rate, "site {t}");
+                    moved |= k != 1 << PACE_BITS;
+                } else {
+                    assert_eq!(k, pass.paces.kappa[p][t], "a written site keeps its rate, site {t}");
+                }
+            }
+        }
+    }
+    assert!(moved, "no blank ran off the bare rate");
+    let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
+    let full = Region { unresolved: &written, ..r };
+    assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");
+    let l = field.layout.clone();
+    for v in &mut field.theta[l.pace..l.pace + d.paced_heads() * width] {
+        *v = 0;
+    }
+    let plain = field.pass(&r, true).unwrap();
+    for cell in &plain.ticks[1..] {
+        assert_eq!(cell.clock.as_ref().map(|c| &c.paces), Some(&plain.paces), "at the bare rate the blanks' clocks are the pass's");
+    }
+}
+
 /// [measurement] **The contact covector by where its pairs lie** (§16.20): at the founding it is zero (the readout
 /// and the current's return stand at zero, so no covector reaches a contact); on the shaped field every family is
 /// drawn, so a head's near and far pairs carry covector, and the reading sums each pair's `|δs|` once.

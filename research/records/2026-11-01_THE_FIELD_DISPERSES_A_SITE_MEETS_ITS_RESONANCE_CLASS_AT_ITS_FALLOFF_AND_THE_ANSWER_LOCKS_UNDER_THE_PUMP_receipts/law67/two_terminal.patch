@@ -1,0 +1,210 @@
+diff --git a/crates/holonics-cuda/kernels/field.cu b/crates/holonics-cuda/kernels/field.cu
+index 925ba50a1..a597f7586 100644
+--- a/crates/holonics-cuda/kernels/field.cu
++++ b/crates/holonics-cuda/kernels/field.cu
+@@ -417,6 +417,9 @@ struct FieldWords {
+     const int64_t *blank_rate;
+     const uint64_t *blank_masses;
+     const uwide *blank_totals;
++    // [§16.46] Whether each site is a blank between two arrivals of its region (the host's `Field::held`): only those hold
++    // their expected duration; an open stretch past the last arrival runs at one and returns nothing.
++    const uint8_t *blank_held;
+ };
+ 
+ // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
+@@ -3585,7 +3588,7 @@ extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
+     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+         const uint32_t p = c / w.T;
+         const uint64_t s = c % w.T;
+-        if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1]) {
++        if (!w.blank_held[s]) {
+             rates[c] = 0;
+             continue;
+         }
+@@ -4208,7 +4211,10 @@ extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
+             tau += w.gtau[at];
+             sig += w.gsig[at];
+             const int64_t k = w.kappa[at];
+-            dkappa[at] = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
++            const uint64_t g = first + t;
++            // [§16.46] A blank past the last arrival runs at one under a blank clock and returns nothing.
++            const bool unheld = w.blank_rate && w.unresolved[g] && w.mix_off[g] == w.mix_off[g + 1] && !w.blank_held[g];
++            dkappa[at] = unheld ? 0 : tau + (k > 0 ? sig : k < 0 ? -sig : 0);
+         }
+     }
+ }
+diff --git a/crates/holonics-cuda/src/hnn/field.rs b/crates/holonics-cuda/src/hnn/field.rs
+index fe363010c..a1cce5b62 100644
+--- a/crates/holonics-cuda/src/hnn/field.rs
++++ b/crates/holonics-cuda/src/hnn/field.rs
+@@ -206,6 +206,8 @@ struct Words {
+     blank_rate: u64,
+     blank_masses: u64,
+     blank_totals: u64,
++    // [§16.46] Each site's whether it is a blank between two arrivals of its region (the host's `Field::held`).
++    blank_held: u64,
+ }
+ 
+ /// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
+@@ -434,6 +436,7 @@ struct Staged<'c> {
+     classes: Vec<u32>,
+     unresolved: Vec<u8>,
+     definite: Vec<u8>,
++    held: Vec<u8>,
+     echo_has: Vec<u8>,
+     mix_off: Vec<u32>,
+     mix_class: Vec<u32>,
+@@ -1145,6 +1148,7 @@ impl<'c> CardField<'c> {
+         let mut region_eoff = Vec::new();
+         let mut classes = Vec::new();
+         let mut unresolved = Vec::new();
++        let mut held = Vec::new();
+         // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
+         let mut definite = Vec::new();
+         // Each site's echo (§15.3): its `B`, and its logits a class (zero where none).
+@@ -1200,6 +1204,12 @@ impl<'c> CardField<'c> {
+                 mix_off.push(mix_class.len() as u32);
+             }
+             region_off.push(site_region.len() as u32);
++            // [§16.46] A silent site between two arrived sites of its region holds its expected duration.
++            let from = site_region.len() - s;
++            let silent = |t: usize| unresolved[from + t] != 0 && mix_off[from + t] == mix_off[from + t + 1];
++            let first = (0..s).find(|&t| !silent(t));
++            let last = (0..s).rev().find(|&t| !silent(t));
++            held.extend((0..s).map(|t| u8::from(silent(t) && first.is_some_and(|a| a < t) && last.is_some_and(|b| t < b))));
+         }
+         let sites = site_region.len();
+         dstart.push(dlist.len() as u32);
+@@ -1224,6 +1234,7 @@ impl<'c> CardField<'c> {
+         let classes_at = pack.put(&classes);
+         let unresolved_at = pack.put(&unresolved);
+         let definite_at = pack.put(&definite);
++        let held_at = pack.put(&held);
+         let echo_has_at = pack.put(&echo_has);
+         let echo_b_at = pack.put(&echo_b);
+         let echo_logits_at = pack.put(&echo_logits);
+@@ -1245,6 +1256,7 @@ impl<'c> CardField<'c> {
+         words.classes = base + classes_at;
+         words.unresolved = base + unresolved_at;
+         words.definite = base + definite_at;
++        words.blank_held = base + held_at;
+         words.echo_has = base + echo_has_at;
+         words.echo_b = base + echo_b_at;
+         words.echo_logits = base + echo_logits_at;
+@@ -1257,7 +1269,7 @@ impl<'c> CardField<'c> {
+         words.ostart = base + ostart_at;
+         words.status = status.device_ptr();
+         words.x = x.device_ptr();
+-        Ok(Staged { site_region, site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, sites, _tables: tables, status, x })
++        Ok(Staged { site_region, site_pos, region_off, classes, unresolved, definite, held, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, sites, _tables: tables, status, x })
+     }
+ 
+     /// One tick of the constitution on the card over the staged sites of `words` (the host's `Field::tick`), its temporaries in
+@@ -1532,7 +1544,7 @@ impl<'c> CardField<'c> {
+         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
+         // gave them (the host's `pass`).
+         let base_clock = [words.kappa, words.tau, words.sigma, words.plain, words.pframe, words.moment];
+-        let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
++        let blanks = paced > 0 && st.held.iter().any(|&h| h != 0);
+         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
+         for k in 0..d.ticks {
+             set_clock(words, clocks[k].as_ref(), base_clock);
+@@ -1558,7 +1570,8 @@ impl<'c> CardField<'c> {
+                 let mut read = BlankClocks::default();
+                 for clock in &clocks {
+                     read.ticks.push(match clock {
+-                        Some(c) if unresolved[i] != 0 && st.mix_off[i] == st.mix_off[i + 1] => {
++                        // [§16.46] Only a blank between two arrivals reads a clock off its face (the host's `Field::blank_clocks`).
++                        Some(c) if st.held[i] != 0 => {
+                             let kappa = self.timed(Kind::Copy, || card.fetch_range(&c.kappa, 0, paced * sites)).map_err(device)?;
+                             let masses = self.timed(Kind::Copy, || card.fetch_range(&c.masses, i * a, a)).map_err(device)?;
+                             let total = self.timed(Kind::Copy, || card.fetch_range(&c.totals, i, 1)).map_err(device)?;
+diff --git a/crates/holonics/src/hnn/tower/field.rs b/crates/holonics/src/hnn/tower/field.rs
+index 5920829e7..7507a8f8f 100644
+--- a/crates/holonics/src/hnn/tower/field.rs
++++ b/crates/holonics/src/hnn/tower/field.rs
+@@ -1827,6 +1827,20 @@ impl Field {
+         region.unresolved[t] && Self::carried(region, t).is_none()
+     }
+ 
++    /// [definition; agent-inferred, November 5, §16.46] **A potential has two terminals**: a silent site holds its
++    /// expected duration ([`Field::paces_with`], §16.44) only between two arrived sites of its region, a written or carried
++    /// site before it and one after it. An open stretch past the last arrival (or before the first) is silent on the strand
++    /// at `κ = 1` (§16.28), and its faces return nothing. Why (the unified-theory reading of November 5, from §16.45's reach
++    /// read): the free clock's excess at the writer's first state follows the answer's end, where a face past the last
++    /// arrival mixes the void's long duration with a byte's and races the clock across the stretch, while every blank of
++    /// a context read, between arrivals, is where it gained.
++    fn held(region: &Region) -> Vec<bool> {
++        let sites = region.classes.len();
++        let first = (0..sites).find(|&t| !Self::silent(region, t));
++        let last = (0..sites).rev().find(|&t| !Self::silent(region, t));
++        (0..sites).map(|t| Self::silent(region, t) && first.is_some_and(|a| a < t) && last.is_some_and(|b| t < b)).collect()
++    }
++
+     /// Site `s`'s row of a family at `base` of `width` a class (its class's row, or its carried face's mixture
+     /// `release(Σ_a w_a E(a), 16)`; zero at a silent site, [`Field::silent`]).
+     fn strand_row(&self, region: &Region, base: usize, width: usize, s: usize) -> Vec<i64> {
+@@ -2254,8 +2268,9 @@ impl Field {
+         let mut trips = vec![0u128; sites];
+         let mut before: Option<Vec<Vec<Source>>> = None;
+         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
+-        // gave them, its clocks and moments read again.
+-        let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
++        // gave them, its clocks and moments read again; [§16.46] only the blanks between two arrivals.
++        let held = Self::held(region);
++        let blanks = !paces.kappa.is_empty() && held.iter().any(|&h| h);
+         let mut clock: Option<Box<TickClock>> = None;
+         for k in 0..d.ticks {
+             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+@@ -2267,7 +2282,7 @@ impl Field {
+             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, &mut cell)?;
+             cell.clock = own;
+             if blanks && k + 1 < d.ticks {
+-                let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
++                let reads = (0..sites).map(|t| held[t].then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
+                 let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
+                 let next = self.paces_with(region, &blank)?;
+                 let moment = self.moments_of(region, &next)?;
+diff --git a/crates/holonics/src/hnn/tower/field/tests.rs b/crates/holonics/src/hnn/tower/field/tests.rs
+index 95270baa3..1de20b6ec 100644
+--- a/crates/holonics/src/hnn/tower/field/tests.rs
++++ b/crates/holonics/src/hnn/tower/field/tests.rs
+@@ -1083,10 +1083,12 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
+ 
+ 
+ 
+-/// [definition; §16.44] **A blank place runs at its expected duration**: on the shaped field (its paces drawn), every tick
+-/// after the first runs each silent open site at `1 + Σ_a w_a c_h[a]` for the face the tick before gave it, while every
+-/// written site keeps its own class's rate; the first tick runs the blanks at the bare rate; a region with no blank, and a
+-/// founded field (every rate one), read the pass's clocks in every tick.
++/// [definition; §16.44, §16.46] **A blank place between two arrivals runs at its expected duration**: on the shaped field
++/// (its paces drawn), every tick after the first runs each silent open site between two written sites at `1 + Σ_a w_a
++/// c_h[a]` for the face the tick before gave it, the open site past the last arrival (the region's last) at one with no
++/// face, while every written site keeps its own class's rate; the first tick runs the blanks at the bare rate; a region
++/// with no blank, a region whose only blanks lie past its last arrival, and a founded field (every rate one), read the
++/// pass's clocks in every tick.
+ #[test]
+ fn a_blank_place_runs_at_its_expected_duration() {
+     let mut field = shaped(1);
+@@ -1101,7 +1103,10 @@ fn a_blank_place_runs_at_its_expected_duration() {
+         for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+             let base = field.layout.pace + p * width;
+             for (t, &k) in kappa.iter().enumerate() {
+-                if Field::silent(&r, t) {
++                if Field::silent(&r, t) && t + 1 == r.classes.len() {
++                    assert!(clock.blank[t].is_none() && clock.reads[t].is_none(), "past the last arrival a blank reads no face");
++                    assert_eq!(k, 1 << PACE_BITS, "past the last arrival a blank runs at one");
++                } else if Field::silent(&r, t) {
+                     let face = clock.blank[t].as_ref().expect("a blank's face");
+                     let rate = release(face.iter().map(|&(c, w)| w as i128 * field.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                     assert_eq!(k as i128, (1i128 << PACE_BITS) + rate, "site {t}");
+@@ -1116,6 +1121,9 @@ fn a_blank_place_runs_at_its_expected_duration() {
+     let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
+     let full = Region { unresolved: &written, ..r };
+     assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");
++    let tail: Vec<bool> = (0..r.classes.len()).map(|t| t >= 4).collect();
++    let open_tail = Region { unresolved: &tail, ..r };
++    assert!(field.pass(&open_tail, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "an open stretch past the last arrival reads one clock");
+     let l = field.layout.clone();
+     for v in &mut field.theta[l.pace..l.pace + d.paced_heads() * width] {
+         *v = 0;

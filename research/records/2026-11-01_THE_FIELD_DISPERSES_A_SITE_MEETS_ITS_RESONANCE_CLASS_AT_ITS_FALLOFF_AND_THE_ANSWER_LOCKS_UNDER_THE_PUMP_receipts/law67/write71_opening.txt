@@ -1,0 +1,22 @@
+# write71 binary 6d438e24c630e6a32f59b3896c7003010806cba2f91d6d0d9389ddd347d29f9a state c6762f6803a3b48fd7fe730e3f18d85b7349527f3883efce052bd98ada4c0781 lock taken 07:12:44
+FIELD_SAMPLE problems=32 sweeps=1229 stopped=- written=16057 held=8976 lambda=4418 friction=16197 foil_lambda=4132 foil_friction=16769 own_wins=19 foil_wins=13 ms=2292290
+MEASURE lap=write rc=0 wall_s=2292.7 peak_rss_kib=347280
+WORDS written=2436 in_training_vocabulary=1847 share=0.758
+WRITE exit 07:50:57
+write/SAMPLE.tsv restatements 107 1 dropped or added=28 2 dropped or added=3 3 dropped or added=5 equal=71
+# opening binary fe7d58a3bee1b973c4a1669604391eff6aa3bdca985e3971710b4effbc0240e0 state c6762f6803a3b48fd7fe730e3f18d85b7349527f3883efce052bd98ada4c0781 lock taken 07:50:57
+FIELD_OPENING problems=128 places=157312 training_answers=6730 ms=3266
+MEASURE lap=opening rc=0 wall_s=3.6 peak_rss_kib=238916
+problems 128, room 1229 places, training answers 6730
+distance	problems	void_mass	length_law
+-128	112	0.192	0.260
+-32	128	0.304	0.418
++0	128	0.360	0.491
++32	128	0.416	0.564
++128	128	0.575	0.754
++512	128	0.851	0.988
+places 900 to 1199	38400	0.860	0.999
+B past the end: mean 222 places, median 225, range 38 to 416; the length law 80
+void mass before the end: mean 52 places
+written: 32 problems, 27 written longer than held, 5 shorter
+correlation of B with the overrun over the written: +0.524

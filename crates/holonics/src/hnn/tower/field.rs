@@ -596,6 +596,10 @@ pub(crate) fn skin_of(s: i128, n: usize, pi: i128, exponential: &Exponential) ->
 /// The grain of `ln 2`'s face ([`ln2_face`]), `2^(−30)`.
 const LN2_FACE_BITS: u32 = 30;
 
+/// [§16.44] The bits a blank's return through its face is held finer than the readout's, from its lift's covector to
+/// the state's (`2^16`, the face's own grain), so a small covector reaches the state rather than rounding away.
+const BLANK_HELD: u32 = STATE_BITS;
+
 /// The temperature's carrier in its chart: `⌈log₂ T⌉ ≤ 7`, the reach its additive chart held on 32 bits, and
 /// `T ≥ 2^(−23)`, above the material's grain.
 const TEMPER_TOP: i128 = 7;
@@ -849,9 +853,44 @@ pub fn shares(face: &TowerFace) -> Shares {
         .collect()
 }
 
+/// [§16.44] One clock's covectors in the reverse: `δτ`, `δσ` `[pace index][t]` and the moments' `[t][2M]`.
+struct ClockReturn {
+    gtau: Vec<Vec<i128>>,
+    gsig: Vec<Vec<i128>>,
+    dm: Vec<i128>,
+}
+
+impl ClockReturn {
+    fn new(paced: usize, sites: usize, m2: usize) -> Self {
+        Self { gtau: vec![vec![0i128; sites]; paced], gsig: vec![vec![0i128; sites]; paced], dm: vec![0i128; sites * m2] }
+    }
+}
+
+/// [definition; §16.44] A tick's own clocks where they are not the pass's: the clocks with its blanks at the faces the tick
+/// before gave them, the moments read on those clocks, those faces' shares, and each blank's read (the return runs
+/// through it).
+#[derive(Clone, Debug, Default)]
+struct TickClock {
+    paces: Paces,
+    moment: Vec<i64>,
+    blank: Vec<Option<Shares>>,
+    reads: Vec<Option<BlankRead>>,
+}
+
+/// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
+#[derive(Clone, Debug, Default)]
+struct BlankRead {
+    read: Vec<i32>,
+    scale: Vec<i128>,
+    lift: Vec<i64>,
+    face: TowerFace,
+}
+
 /// One tick's forward temporaries over a region.
 #[derive(Clone, Debug, Default)]
 struct TickCell {
+    /// The tick's own clocks (§16.44), `None` where they are the pass's (the first tick, or a region with no blank).
+    clock: Option<Box<TickClock>>,
     read: Vec<i32>,
     scale: Vec<i128>,
     /// The unframed key word `[t][2M]`, and the unframed value and probe (the clock's covector reads them, §16).
@@ -1171,6 +1210,14 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
+/// [measurement; agent-inferred, November 5, §16.44] **A blank's clocks by tick** ([`Field::blank_clocks`]): at each tick
+/// whose clocks the blanks set (`None` at a tick that reads the pass's), each paced head's rate `κ` at the site on
+/// `2^(−24)` and the face the clock read there.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BlankClocks {
+    pub ticks: Vec<Option<(Vec<i64>, TowerFace)>>,
+}
+
 /// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
 /// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
 /// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
@@ -1281,6 +1328,13 @@ pub fn octave(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }
 
+
+impl FieldPass {
+    /// The clocks a tick read (§16.44): its own, or the pass's.
+    fn paces_at<'a>(&'a self, cell: &'a TickCell) -> &'a Paces {
+        cell.clock.as_ref().map_or(&self.paces, |c| &c.paces)
+    }
+}
 
 /// A region's forward: each tick's temporaries (held when the reverse will read them), the last
 /// read, and each unresolved site's face.
@@ -1524,6 +1578,19 @@ impl Field {
     /// (§16.19). The neighbours' rows of the opening do not enter: a copy's turn is
     /// the sum of its span's rates, and the loop law reads only the span's classes.
     fn paces(&self, region: &Region) -> Result<Paces> {
+        self.paces_with(region, &[])
+    }
+
+    /// [definition; agent-inferred, November 4, §16.44] **A blank place runs at its expected duration**: the clocks
+    /// ([`Field::paces`]) with each silent open site `t` that `blank` gives a face `p_t` running at
+    /// `κ_h(t) = 1 + Σ_a p_t(a) c_h[a]`, the duration a written byte there would take in expectation, `release(Σ_a w_a c_h[a],
+    /// 24)` as a carried face's mixture; every other site as in [`Field::paces`]. Why (the unified-theory reading of
+    /// November 4, `a_blank_place_is_a_potential` §4, and §16.42): a turned head reads a source across `τ_t − τ_s = Σ_(u∈(s,t])
+    /// κ_u`, and a blank at the bare rate makes a gap read `1/1.62` and `1/1.91` of its written length on the two clocks, so a
+    /// restated result drawn into a blank surround lands one place off; at its expected duration the gap's clock has the
+    /// expectation it will have once written, and only its spread remains. The blank carries nothing else: its rows at its
+    /// own place would be a self-energy, and as a source it costs the trained field 0.87 bits a class (that reading, §5).
+    fn paces_with(&self, region: &Region, blank: &[Option<Shares>]) -> Result<Paces> {
         let d = &self.declaration;
         let sites = region.classes.len();
         let width = d.alphabet + 1;
@@ -1536,7 +1603,11 @@ impl Field {
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                let k = one + self.strand_row(region, base, 1, t)[0] as i128;
+                let rate = match blank.get(t).and_then(Option::as_ref).filter(|_| Self::silent(region, t)) {
+                    Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
+                    None => self.strand_row(region, base, 1, t)[0] as i128,
+                };
+                let k = one + rate;
                 if t > 0 {
                     clock += k;
                     variation += k.abs();
@@ -2182,12 +2253,26 @@ impl Field {
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
         let mut before: Option<Vec<Vec<Source>>> = None;
+        // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
+        // gave them, its clocks and moments read again.
+        let blanks = !paces.kappa.is_empty() && (0..sites).any(|t| Self::silent(region, t));
+        let mut clock: Option<Box<TickClock>> = None;
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &definite, &keyed, keep)?);
             }
+            let own = clock.take();
+            let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
-            self.tick(&mut x, &definite, &keyed, &paces, &moment, &reaches, &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, &mut cell)?;
+            cell.clock = own;
+            if blanks && k + 1 < d.ticks {
+                let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
+                let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
+                let next = self.paces_with(region, &blank)?;
+                let moment = self.moments_of(region, &next)?;
+                clock = Some(Box::new(TickClock { paces: next, moment, blank, reads }));
+            }
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
             if let Some(prev) = &before {
                 round_trips(prev, &cell.rows, sites, &mut trips);
@@ -2233,6 +2318,74 @@ impl Field {
             out.scale[t * d.lanes..(t + 1) * d.lanes].copy_from_slice(&s);
         }
         Ok(out)
+    }
+
+    /// [§16.44] The face a site's state `x_t` reads through the readout (the chart, the lift `R r̂ + b_R`, the encoding), at
+    /// temperature one: what a blank's clock reads its expected duration from.
+    fn face_of(&self, x: &[i64], reaches: &Reaches) -> Result<BlankRead> {
+        let (d, l) = (&self.declaration, &self.layout);
+        let dw = d.width;
+        let (mut r, mut s) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
+        lane_chart(x, d.lanes, &mut r, &mut s)?;
+        let mut y = vec![0i64; dw];
+        affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &r, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
+        let mut z = vec![0i64; d.alphabet];
+        self.tied(&y, &mut z)?;
+        Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
+    }
+
+    /// [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face**: its rate
+    /// `κ = 1 + Σ_a p_a c[a]` on each paced head moves with the face, so its covector `δκ` (the clocks' suffix sums at the
+    /// blank) reaches the face's logits as `δz_b = Σ_h ln 2 · p_b (c_h[b] − Σ_a p_a c_h[a]) δκ_h` (the face's own Jacobian,
+    /// `z` in bits), and then the readout's reverse at the state the face was read off: the encoding's bias and rows, the
+    /// lift, the chart and the lane adjoint into that state's covector `dx`. Why: the code is read at the last tick and each
+    /// blank's face sets a later tick's clocks, so the face is no operand there; without this return the covector missed how
+    /// a blank's clock moves with its face (the unified-theory reading of November 5).
+    fn blank_return(&self, read: &BlankRead, rates: &[(usize, i128)], reaches: &Reaches, g: &mut [i128], dx: &mut [i64]) -> Result<()> {
+        let (d, l) = (&self.declaration, &self.layout);
+        let (dw, a) = (d.width, d.alphabet);
+        let (masses, total) = (&read.face.masses, read.face.total as i128);
+        if total == 0 {
+            return Ok(());
+        }
+        // The logits' covector held `LN2_FACE_BITS` finer than the face's (`δz 2^30`), each product released once from it.
+        let mut dz = vec![0i128; a];
+        for &(base, dk) in rates {
+            let mean = div_nearest(masses.iter().enumerate().map(|(c, &m)| m as i128 * self.theta[base + c] as i128).sum(), total);
+            for (b, slot) in dz.iter_mut().enumerate() {
+                let u = div_nearest(masses[b] as i128 * (self.theta[base + b] as i128 - mean), total);
+                let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).ok_or(TowerError::Refused(PACE_RETURN))?;
+                *slot += release(at, PACE_BITS);
+            }
+        }
+        for (o, &dzo) in dz.iter().enumerate() {
+            g[l.read_bias + o] += release(dzo, LN2_FACE_BITS);
+        }
+        // The lift's covector and everything after it held `BLANK_HELD` bits finer than the readout's (`δy 2^16`), so a
+        // blank's small covector is not lost to the grain before it reaches the state; each entry released once from it.
+        let mut dy = vec![0i64; dw];
+        for (i, slot) in dy.iter_mut().enumerate() {
+            let sum = dz.iter().enumerate().try_fold(0i128, |acc, (c, &dzc)| dzc.checked_mul(self.theta[l.enc + c * dw + i] as i128).and_then(|x| acc.checked_add(x))).ok_or(TowerError::Refused(PACE_RETURN))?;
+            *slot = fit64(release(sum, STATE_BITS + LN2_FACE_BITS - BLANK_HELD))?;
+        }
+        for (c, &dzc) in dz.iter().enumerate() {
+            for (i, &yi) in read.lift.iter().enumerate() {
+                g[l.enc + c * dw + i] += release(dzc.checked_mul(yi as i128).ok_or(TowerError::Refused(PACE_RETURN))?, STATE_BITS + LN2_FACE_BITS);
+            }
+        }
+        for (i, &dyi) in dy.iter().enumerate() {
+            g[l.lift_bias + i] += release(dyi as i128, BLANK_HELD);
+            for (j, &rj) in read.read.iter().enumerate() {
+                g[l.read + i * dw + j] += release(dyi as i128 * rj as i128, BLANK_HELD);
+            }
+        }
+        let mut dr = vec![0i64; dw];
+        transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
+        let back = lane_adjoint(&read.read, &read.scale, &dr)?;
+        for (slot, &b) in dx.iter_mut().zip(&back) {
+            *slot = fit64(*slot as i128 + release(b as i128, BLANK_HELD))?;
+        }
+        Ok(())
     }
 
     /// Each unresolved site's face over the region (`None` at a resolved site).
@@ -2294,7 +2447,7 @@ impl Field {
                                 collision += release(src.p as i128 * src.p as i128, SHARE_BITS) as u128;
                             }
                             let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
-                            let current: i128 = (0..span).map(|x| decayed(self.pair_decay(&pass.paces, h, x % n, i, j), vj[x]).abs()).sum();
+                            let current: i128 = (0..span).map(|x| decayed(self.pair_decay(pass.paces_at(cell), h, x % n, i, j), vj[x]).abs()).sum();
                             acc.question_current += release(src.p as i128 * current, SHARE_BITS);
                         } else if i.abs_diff(j) < NEAR && !definite {
                             acc.soft_near += src.p as u128;
@@ -2358,7 +2511,7 @@ impl Field {
                         let into = if gap < NEAR { &mut near } else if Self::definite(region, j) && j < question { &mut far } else { &mut rest };
                         let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
                         for (x, slot) in into.iter_mut().enumerate() {
-                            *slot += release(src.p as i128 * decayed(self.pair_decay(&pass.paces, h, x % n, i, j), vj[x]), SHARE_BITS);
+                            *slot += release(src.p as i128 * decayed(self.pair_decay(pass.paces_at(cell), h, x % n, i, j), vj[x]), SHARE_BITS);
                         }
                     }
                     let covector = covectors.get(tick).map(|c| c[(h * sites + i) * span..(h * sites + i + 1) * span].to_vec()).unwrap_or_default();
@@ -2867,7 +3020,7 @@ impl Field {
     /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
     fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
-        let (dw, m, n, lanes) = (d.width, d.complex(), d.modes, d.lanes);
+        let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
         let sites = region.classes.len();
         let l = &self.layout;
@@ -2876,11 +3029,13 @@ impl Field {
             return refuse("a reverse reads a forward that held every tick");
         }
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
-        let paces = &pass.paces;
-        // The clocks' covectors (§16, Law 1): `[pace index][t]`, `2^24 ∂/∂τ_t` and `2^24 ∂/∂σ_t` on `2^(−24)`.
-        let paced = paces.kappa.len();
-        let (mut gtau, mut gsig) = (vec![vec![0i128; sites]; paced], vec![vec![0i128; sites]; paced]);
-        let mut dm = vec![0i128; sites * m2];
+        // The clocks' covectors (§16, Law 1): `[pace index][t]`, `2^24 ∂/∂τ_t` and `2^24 ∂/∂σ_t` on `2^(−24)`, and the
+        // moments' `[t][2M]`, one set a clock (§16.44): the pass's, which the first tick and the opening read, and each
+        // tick's own where its blanks ran at the faces the tick before gave them.
+        let paced = pass.paces.kappa.len();
+        let clocks: Vec<Option<&TickClock>> = std::iter::once(None).chain(pass.ticks.iter().map(|c| c.clock.as_deref())).collect();
+        let mut returns: Vec<Option<ClockReturn>> = clocks.iter().map(|_| None).collect();
+        returns[0] = Some(ClockReturn::new(paced, sites, m2));
         // The face, its covector weighed as the region's state in the joint code (§16.23): `release(δz · m/K)` on the
         // covector's grain, to the nearest, half away from zero.
         let mut dx = vec![0i64; sites * dw];
@@ -2936,10 +3091,19 @@ impl Field {
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
-            self.tick_return(cell, &mut dx, g, paces, &definite, &mut dm, &mut gtau, &mut gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
+            let at = if cell.clock.is_some() { k + 1 } else { 0 };
+            let r = returns[at].get_or_insert_with(|| ClockReturn::new(paced, sites, m2));
+            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut())?;
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 self.scale_return(s, sp, &mut dx, g)?;
+            }
+            // [§16.44] A tick's own clock was read off the state this tick began from: its moments and rates return now,
+            // and each blank's clock returns through its face into that state's covector.
+            if let Some(c) = cell.clock.as_deref() {
+                if let Some(mut r) = returns[at].take() {
+                    self.clock_return(region, &c.paces, &c.blank, Some((&c.reads, &mut dx)), &mut r, g)?;
+                }
             }
         }
         // The moment's chart into the face (§16.22): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`, and the moments'
@@ -2950,6 +3114,7 @@ impl Field {
             let ss: Vec<&[i64]> = pass.moment.chunks_exact(m2).collect();
             outer_sum(&mut g[mf..mf + dw * m2], m2, &dxs, &ss)?;
             let mut back = vec![0i64; m2];
+            let dm = &mut returns[0].as_mut().ok_or(TowerError::Refused("a reverse without the pass's clock"))?.dm;
             for t in 0..sites {
                 for (o, &v) in dxs[t].iter().enumerate() {
                     g[mfb + o] += v as i128;
@@ -2960,40 +3125,9 @@ impl Field {
                 }
             }
         }
-        // The moments: each value's covector at a moment mode returns through the strands (§15.1).
-        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n)).collect();
-        for (k, slot) in dm.iter_mut().enumerate() {
-            if !moment_modes[(k % m2) % m] {
-                *slot = 0;
-            }
-        }
-        self.moments_return(region, paces, &dm, g, &mut gtau, &mut gsig)?;
-        // The clocks return to their paces (§16): `τ_t = Σ_(0<k≤t) κ_k`, `σ_t = Σ_(0<k≤t) |κ_k|`, so
-        // `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t`; on the class sheet (§16.16) `κ_k = 1 + c[u_k]` gives
-        // `δc[u] += Σ_(k: u_k = u) δκ_k`, a carried face's classes by their shares, on the material's covector grain
-        // (`2^(−24)` times the opening's `2^(−16)`, a whole class's share `2^16`). The opening takes nothing.
-        if paced > 0 {
-            let width = d.alphabet + 1;
-            for p in 0..paced {
-                let base = l.pace + p * width;
-                let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
-                for k in (1..sites).rev() {
-                    tail_tau += gtau[p][k];
-                    tail_sig += gsig[p][k];
-                    let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
-                    if dk == 0 || Self::silent(region, k) {
-                        continue;
-                    }
-                    match Self::carried(region, k) {
-                        None => g[base + self.row(region, k)] += dk << STATE_BITS,
-                        Some(face) => {
-                            for &(c, w) in face {
-                                g[base + c as usize] += dk * w as i128;
-                            }
-                        }
-                    }
-                }
-            }
+        // The pass's own clock (the first tick's and the opening's) returns last.
+        if let Some(mut r) = returns[0].take() {
+            self.clock_return(region, &pass.paces, &[], None, &mut r, g)?;
         }
         // The opening: each site's row of the encoding and its neighbours' rows of theirs (a carried
         // face's rows by their shares).
@@ -3005,6 +3139,70 @@ impl Field {
             }
             if t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g);
+            }
+        }
+        Ok(())
+    }
+
+    /// [§16, §16.44] **One clock's return**: the moments' covector at each moment mode through the strands, on the clock
+    /// it was read on; then the clocks return to their paces: `τ_t = Σ_(0<k≤t) κ_k`, `σ_t = Σ_(0<k≤t) |κ_k|`, so `δκ_k =
+    /// Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t`; on the class sheet (§16.16) `κ_k = 1 + c[u_k]` gives `δc[u] += Σ_(k: u_k = u)
+    /// δκ_k`, a carried face's classes by their shares, and a blank's by the shares of the face its clock read, on the
+    /// material's covector grain (`2^(−24)` times the opening's `2^(−16)`, a whole class's share `2^16`); where the clock's
+    /// blank reads are given, each blank's `δκ` also returns through its face into the state's covector
+    /// ([`Field::blank_return`]). The opening takes nothing.
+    #[allow(clippy::type_complexity)]
+    fn clock_return(&self, region: &Region, paces: &Paces, blank: &[Option<Shares>], faces: Option<(&[Option<BlankRead>], &mut Vec<i64>)>, r: &mut ClockReturn, g: &mut [i128]) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m, n) = (d.width, d.complex(), d.modes);
+        let m2 = 2 * m;
+        let sites = region.classes.len();
+        let paced = paces.kappa.len();
+        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / n)).collect();
+        for (k, slot) in r.dm.iter_mut().enumerate() {
+            if !moment_modes[(k % m2) % m] {
+                *slot = 0;
+            }
+        }
+        self.moments_return(region, paces, &r.dm, g, &mut r.gtau, &mut r.gsig)?;
+        if paced == 0 {
+            return Ok(());
+        }
+        let l = &self.layout;
+        let width = d.alphabet + 1;
+        // Each blank's rates' covectors `(base, δκ)` a paced head, for its face's return.
+        let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if faces.is_some() { sites } else { 0 }];
+        for p in 0..paced {
+            let base = l.pace + p * width;
+            let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
+            for k in (1..sites).rev() {
+                tail_tau += r.gtau[p][k];
+                tail_sig += r.gsig[p][k];
+                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                if dk == 0 {
+                    continue;
+                }
+                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref) } else { Self::carried(region, k) };
+                match face {
+                    None if Self::silent(region, k) => {}
+                    None => g[base + self.row(region, k)] += dk << STATE_BITS,
+                    Some(face) => {
+                        for &(c, w) in face {
+                            g[base + c as usize] += dk * w as i128;
+                        }
+                        if Self::silent(region, k) && !rates.is_empty() {
+                            rates[k].push((base, dk));
+                        }
+                    }
+                }
+            }
+        }
+        if let Some((reads, dx)) = faces {
+            let reaches = self.reaches();
+            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty()) {
+                if let Some(Some(read)) = reads.get(t) {
+                    self.blank_return(read, rt, &reaches, g, &mut dx[t * dw..(t + 1) * dw])?;
+                }
             }
         }
         Ok(())
@@ -3205,6 +3403,26 @@ impl Field {
             .map(|&i| (0..d.heads).filter(|h| h % d.frames < d.still).map(|h| (cell.rows[h * n + i].iter().map(|src| (src.j, src.p)).collect(), 1u64 << SHARE_BITS)).collect())
             .collect::<Vec<Vec<_>>>();
         Ok(landmarks_of(&rows, question, count))
+    }
+
+    /// [measurement; agent-inferred, November 5, §16.44] **Each of `sites`' clocks by tick** ([`BlankClocks`]): whether a
+    /// blank gap's expected duration holds its written length, and whether the faces the clocks read still predict the
+    /// byte. A reading only: nothing in the law reads it.
+    pub fn blank_clocks(&self, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        let pass = self.pass(region, true)?;
+        if sites.iter().any(|&i| i >= region.classes.len()) {
+            return refuse("a clock's site outside its region");
+        }
+        Ok(sites
+            .iter()
+            .map(|&i| BlankClocks {
+                ticks: pass
+                    .ticks
+                    .iter()
+                    .map(|cell| cell.clock.as_deref().and_then(|c| c.reads.get(i).and_then(Option::as_ref).map(|r| (c.paces.kappa.iter().map(|k| k[i]).collect(), r.face.clone()))))
+                    .collect(),
+            })
+            .collect())
     }
 
     /// [measurement; agent-inferred, November 4, §16.42] **Each of `sites`' near field by offset** ([`NearOffsets`]): whether
@@ -3657,6 +3875,10 @@ pub trait FieldRealization {
     fn read_near_offsets(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {
         refuse("a realization that cannot read its near fields")
     }
+    /// Each of `sites`' clocks by tick in `region` ([`Field::blank_clocks`]), a reading.
+    fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        refuse("a realization that cannot read its blanks' clocks")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3692,6 +3914,10 @@ impl FieldRealization for HostField {
 
     fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
         field.near_offsets(region, sites)
+    }
+
+    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        field.blank_clocks(region, sites)
     }
 }
 

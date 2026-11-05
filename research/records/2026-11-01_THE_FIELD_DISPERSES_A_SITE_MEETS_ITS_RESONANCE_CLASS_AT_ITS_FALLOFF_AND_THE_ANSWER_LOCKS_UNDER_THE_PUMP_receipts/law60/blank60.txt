@@ -1,0 +1,107 @@
+# blank60 binary 67732aaf20c79e05abcb60b51b07efb46bbc766ba9839ec487d7e438959234a1 from 991049e91da15059781df904535fbc6e6b9467831beda1f7d04042d95b2d711c 23:33:50
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=97160
+MEASURE lap=pre_read rc=0 wall_s=97.6 peak_rss_kib=234716
+state	at	length	reads	code_bits	half_or_more	still_at(d*-1,d*,d*+1)	turned_at(d*-1,d*,d*+1)
+alone	first	1	79	0.021	78	(0.0, 0.044, 0.002)	(0.0, 0.447, 0.0)
+alone	first	2	200	0.000	200	(0.019, 0.069, 0.001)	(0.003, 0.422, 0.001)
+alone	first	3	76	0.000	76	(0.024, 0.106, nan)	(0.001, 0.454, nan)
+alone	first	4+	38	0.004	38	(0.018, nan, nan)	(0.001, nan, nan)
+alone	last	1	79	0.021	78	(0.0, 0.044, 0.002)	(0.0, 0.447, 0.0)
+alone	last	2	200	0.004	200	(0.0, 0.194, 0.003)	(0.008, 0.376, 0.001)
+alone	last	3	76	0.007	76	(0.0, 0.179, nan)	(0.014, 0.375, nan)
+alone	last	4+	38	0.004	38	(0.003, nan, nan)	(0.03, nan, nan)
+alone	stop	1	79	0.146	78	(0.001, 0.044, 0.016)	(0.016, 0.393, 0.004)
+alone	stop	2	200	0.032	199	(0.0, 0.051, 0.002)	(0.011, 0.232, 0.001)
+alone	stop	3	76	0.004	76	(0.001, 0.056, nan)	(0.009, 0.18, nan)
+alone	stop	4+	38	0.004	38	(0.0, nan, nan)	(0.015, nan, nan)
+answer_open	first	1	79	4.037	0	(0.0, 0.03, 0.0)	(0.0, 0.437, 0.0)
+answer_open	first	2	200	3.736	0	(0.028, 0.024, 0.0)	(0.337, 0.227, 0.0)
+answer_open	first	3	76	2.992	0	(0.035, 0.028, nan)	(0.176, 0.312, nan)
+answer_open	first	4+	38	2.531	3	(0.032, nan, nan)	(0.124, nan, nan)
+answer_open	last	1	79	4.037	0	(0.0, 0.03, 0.0)	(0.0, 0.437, 0.0)
+answer_open	last	2	200	3.518	0	(0.0, 0.021, 0.02)	(0.0, 0.331, 0.234)
+answer_open	last	3	76	2.817	0	(0.0, 0.068, nan)	(0.0, 0.087, nan)
+answer_open	last	4+	38	2.358	1	(0.0, nan, nan)	(0.0, nan, nan)
+answer_open	stop	1	79	3.886	0	(0.0, 0.0, 0.018)	(0.0, 0.0, 0.429)
+answer_open	stop	2	200	4.113	0	(0.0, 0.0, 0.016)	(0.0, 0.0, 0.327)
+answer_open	stop	3	76	4.727	0	(0.0, 0.0, nan)	(0.0, 0.0, nan)
+answer_open	stop	4+	38	4.458	0	(0.0, nan, nan)	(0.0, nan, nan)
+# seg1 from 991049e91da15059781df904535fbc6e6b9467831beda1f7d04042d95b2d711c started 23:35:28 FIELD_RATE_BITS=12
+FIELD_RATE rate=12
+FIELD_STEP_TRANSFER rate=12
+FIELD_LAPS_HELD lap=9 reason=time left=240086 bound=300000 ms=2459914
+MEASURE lap=seg1 rc=0 wall_s=2460.4 peak_rss_kib=677516
+-1 1.034918 0.336991;0 1.034771 0.353732;1 1.023552 0.340308;2 1.020912 0.337634;3 1.019012 0.344452;4 1.015456 0.340583;5 1.017764 0.342059;6 1.014437 0.345024;7 1.013749 0.342367;8 1.013779 0.340480;
+-1:5.102184:0.185433:0.427799 0:5.384505:0.194455:0.449958 1:5.254567:0.188430:0.431082 2:5.159031:0.186796:0.427637 3:5.175474:0.187881:0.430968 4:5.310516:0.184818:0.425232 5:5.344426:0.185464:0.427651 6:5.304868:0.183954:0.425336 7:5.393642:0.183269:0.423511 8:5.441620:0.182648:0.422340 
+0:689:-1:12 1:739:0:13 2:719:0:13 3:674:-1:13 4:811:0:14 5:668:-1:14 6:0:-1:15 7:0:-1:16 8:0:1:17 
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=71485
+MEASURE lap=seg1_read rc=0 wall_s=71.8 peak_rss_kib=237904
+state	at	length	reads	code_bits	half_or_more	still_at(d*-1,d*,d*+1)	turned_at(d*-1,d*,d*+1)
+alone	first	1	79	0.014	79	(0.0, 0.057, 0.003)	(0.0, 0.453, 0.0)
+alone	first	2	200	0.000	200	(0.024, 0.054, 0.002)	(0.002, 0.432, 0.001)
+alone	first	3	76	0.000	76	(0.023, 0.1, nan)	(0.001, 0.449, nan)
+alone	first	4+	38	0.002	38	(0.025, nan, nan)	(0.001, nan, nan)
+alone	last	1	79	0.014	79	(0.0, 0.057, 0.003)	(0.0, 0.453, 0.0)
+alone	last	2	200	0.002	200	(0.0, 0.186, 0.002)	(0.007, 0.416, 0.001)
+alone	last	3	76	0.013	76	(0.0, 0.188, nan)	(0.015, 0.39, nan)
+alone	last	4+	38	0.003	38	(0.001, nan, nan)	(0.028, nan, nan)
+alone	stop	1	79	0.172	78	(0.001, 0.034, 0.014)	(0.012, 0.412, 0.021)
+alone	stop	2	200	0.032	199	(0.0, 0.047, 0.001)	(0.008, 0.279, 0.004)
+alone	stop	3	76	0.004	76	(0.001, 0.052, nan)	(0.008, 0.199, nan)
+alone	stop	4+	38	0.006	38	(0.0, nan, nan)	(0.011, nan, nan)
+answer_open	first	1	79	4.539	0	(0.0, 0.028, 0.0)	(0.0, 0.309, 0.0)
+answer_open	first	2	200	4.274	0	(0.024, 0.015, 0.0)	(0.215, 0.18, 0.0)
+answer_open	first	3	76	3.595	0	(0.027, 0.015, nan)	(0.1, 0.205, nan)
+answer_open	first	4+	38	2.670	2	(0.017, nan, nan)	(0.041, nan, nan)
+answer_open	last	1	79	4.539	0	(0.0, 0.028, 0.0)	(0.0, 0.309, 0.0)
+answer_open	last	2	200	3.925	0	(0.0, 0.019, 0.015)	(0.0, 0.249, 0.212)
+answer_open	last	3	76	3.246	0	(0.0, 0.043, nan)	(0.0, 0.055, nan)
+answer_open	last	4+	38	2.456	0	(0.0, nan, nan)	(0.0, nan, nan)
+answer_open	stop	1	79	4.208	0	(0.0, 0.0, 0.018)	(0.0, 0.0, 0.334)
+answer_open	stop	2	200	4.332	0	(0.0, 0.0, 0.014)	(0.0, 0.0, 0.254)
+answer_open	stop	3	76	4.795	0	(0.0, 0.0, nan)	(0.0, 0.0, nan)
+answer_open	stop	4+	38	4.430	0	(0.0, nan, nan)	(0.0, nan, nan)
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=2613 held=1600 lambda=723 friction=2767 foil_lambda=741 foil_friction=2731 own_wins=4 foil_wins=2 ms=336719
+MEASURE lap=seg1_write rc=0 wall_s=337.0 peak_rss_kib=243792
+WORDS written=370 in_training_vocabulary=273 share=0.738
+seg1_write/SAMPLE.tsv restatements 18 1 dropped or added=4 2 dropped or added=1 equal=13
+SEGMENT 1 done 00:26:41
+# seg2 from b6f23468a75748b1b5694601234e364764c3e9db7dab5e1d0cc420d3a26940cb started 00:29:38 
+FIELD_STEP_TRANSFER rate=17
+FIELD_LAPS_HELD lap=10 reason=time left=293931 bound=300000 ms=2406069
+MEASURE lap=seg2 rc=0 wall_s=2406.6 peak_rss_kib=762056
+-1 1.013779 0.340480;0 1.013043 0.340233;1 1.013474 0.342868;2 1.012063 0.340455;3 1.011942 0.343315;4 1.011648 0.340757;5 1.010288 0.344619;6 1.010457 0.341750;7 1.011165 0.340189;8 1.010694 0.339460;9 1.011989 0.338856;
+-1:5.441620:0.182648:0.422340 0:5.384566:0.182479:0.421497 1:5.401575:0.182616:0.423776 2:5.350001:0.182145:0.421176 3:5.292825:0.181563:0.422714 4:5.298574:0.181456:0.421310 5:5.258654:0.181482:0.422712 6:5.254500:0.181247:0.420575 7:5.288251:0.181406:0.419655 8:5.313466:0.181333:0.419387 9:5.353095:0.182481:0.421038 
+0:0:1:17 1:0:-1:16 2:0:1:17 3:0:-1:16 4:0:1:17 5:0:-1:16 6:0:1:17 7:1092:0:16 8:0:1:16 9:0:-1:15 
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=71748
+MEASURE lap=seg2_read rc=0 wall_s=72.1 peak_rss_kib=237760
+state	at	length	reads	code_bits	half_or_more	still_at(d*-1,d*,d*+1)	turned_at(d*-1,d*,d*+1)
+alone	first	1	79	0.020	78	(0.0, 0.056, 0.002)	(0.0, 0.45, 0.0)
+alone	first	2	200	0.000	200	(0.022, 0.056, 0.002)	(0.002, 0.425, 0.001)
+alone	first	3	76	0.000	76	(0.026, 0.096, nan)	(0.001, 0.444, nan)
+alone	first	4+	38	0.001	38	(0.026, nan, nan)	(0.001, nan, nan)
+alone	last	1	79	0.020	78	(0.0, 0.056, 0.002)	(0.0, 0.45, 0.0)
+alone	last	2	200	0.002	200	(0.0, 0.198, 0.002)	(0.008, 0.4, 0.001)
+alone	last	3	76	0.010	76	(0.0, 0.194, nan)	(0.016, 0.372, nan)
+alone	last	4+	38	0.004	38	(0.003, nan, nan)	(0.029, nan, nan)
+alone	stop	1	79	0.164	78	(0.001, 0.032, 0.016)	(0.014, 0.413, 0.017)
+alone	stop	2	200	0.032	199	(0.0, 0.046, 0.002)	(0.009, 0.275, 0.004)
+alone	stop	3	76	0.004	76	(0.001, 0.057, nan)	(0.008, 0.196, nan)
+alone	stop	4+	38	0.006	38	(0.001, nan, nan)	(0.01, nan, nan)
+answer_open	first	1	79	4.404	0	(0.0, 0.036, 0.0)	(0.0, 0.313, 0.0)
+answer_open	first	2	200	4.191	0	(0.027, 0.017, 0.0)	(0.205, 0.186, 0.0)
+answer_open	first	3	76	3.667	0	(0.027, 0.015, nan)	(0.101, 0.199, nan)
+answer_open	first	4+	38	2.883	0	(0.017, nan, nan)	(0.038, nan, nan)
+answer_open	last	1	79	4.404	0	(0.0, 0.036, 0.0)	(0.0, 0.313, 0.0)
+answer_open	last	2	200	4.016	0	(0.0, 0.019, 0.016)	(0.0, 0.232, 0.224)
+answer_open	last	3	76	3.417	0	(0.0, 0.039, nan)	(0.0, 0.048, nan)
+answer_open	last	4+	38	2.680	0	(0.0, nan, nan)	(0.0, nan, nan)
+answer_open	stop	1	79	4.144	0	(0.0, 0.0, 0.02)	(0.0, 0.0, 0.332)
+answer_open	stop	2	200	4.269	0	(0.0, 0.0, 0.015)	(0.0, 0.0, 0.236)
+answer_open	stop	3	76	4.760	0	(0.0, 0.0, nan)	(0.0, 0.0, nan)
+answer_open	stop	4+	38	4.342	0	(0.0, nan, nan)	(0.0, nan, nan)
+FIELD_SAMPLE problems=6 sweeps=1229 stopped=- written=3109 held=1600 lambda=653 friction=3403 foil_lambda=662 foil_friction=3385 own_wins=4 foil_wins=2 ms=445542
+MEASURE lap=seg2_write rc=0 wall_s=445.9 peak_rss_kib=242228
+WORDS written=463 in_training_vocabulary=346 share=0.747
+seg2_write/SAMPLE.tsv restatements 22 1 dropped or added=7 2 dropped or added=1 3 dropped or added=1 equal=13
+SEGMENT 2 done 01:22:06

@@ -1,0 +1,49 @@
+# lock taken 06:40:52 old b09f002c1e0089f1a5ddfec2f8477c57cf7b7ee54109d189549098a90461552f law dd9bfc701a3d1ab5a37118e46ce67b48de5a5f004f42fd0c4412abe03628ca18
+old-2026-11-04-main52-seg3-STATE.10 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.042 foil_bits_a_class=5.187 ms=2677 wall_s=3.0 peak_rss_kib=238492
+old-2026-11-04-main52-seg3-STATE.9 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.177 foil_bits_a_class=5.314 ms=2674 wall_s=2.9 peak_rss_kib=240344
+old-2026-11-04-main52-seg3-STATE.8 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.248 foil_bits_a_class=5.382 ms=2663 wall_s=2.9 peak_rss_kib=238844
+law-2026-11-05-exact63-seg5-STATE.8 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.302 foil_bits_a_class=5.452 ms=8160 wall_s=8.4 peak_rss_kib=250956
+law-2026-11-05-exact63-seg5-STATE.7 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.303 foil_bits_a_class=5.453 ms=8114 wall_s=8.4 peak_rss_kib=250896
+law-2026-11-05-exact63-seg5-STATE.6 FIELD_REACH_DONE problems=128 places=35591 own_bits_a_class=5.303 foil_bits_a_class=5.453 ms=8412 wall_s=8.7 peak_rss_kib=251040
+== main52
+from	places	own_bits	question_bits	kappa0	var0	kappa1	var1
+0	384	3.477	1.127	1.000	1.0	1.000	1.0
+1	384	3.108	0.886	1.000	2.0	1.000	2.0
+2	768	3.531	0.768	1.000	3.5	1.000	3.5
+4	1536	4.404	0.111	1.000	6.5	1.000	6.5
+8	3072	4.604	0.127	1.000	12.5	1.000	12.5
+16	6144	4.865	0.182	1.000	24.5	1.000	24.5
+32	12288	4.936	0.158	1.000	48.5	1.000	48.5
+64	23211	5.073	0.150	1.000	95.7	1.000	95.7
+128	34965	5.110	0.134	1.000	186.5	1.000	186.5
+256	22746	5.670	0.076	1.000	346.9	1.000	346.9
+512	1275	6.563	-0.051	1.000	569.0	1.000	569.0
+all	106773	5.155	0.139
+== exact63
+from	places	own_bits	question_bits	kappa0	var0	kappa1	var1
+0	384	3.427	1.215	3.471	3.5	2.323	2.3
+1	384	3.115	0.898	1.108	4.6	1.869	4.2
+2	768	3.517	0.795	1.136	6.3	1.520	6.4
+4	1536	4.396	0.119	1.222	9.9	1.641	11.3
+8	3072	4.596	0.144	1.292	17.4	1.643	21.2
+16	6144	4.887	0.195	1.527	35.0	1.696	41.3
+32	12288	4.957	0.165	1.526	71.3	1.710	82.1
+64	23211	5.123	0.153	1.641	147.2	1.790	165.1
+128	34965	5.252	0.145	1.603	291.5	1.923	330.5
+256	22746	6.046	0.091	1.969	579.6	3.203	741.2
+512	1275	7.124	0.039	2.684	1107.9	5.649	1711.5
+all	106773	5.303	0.150
+== exact63 less main52
+from	excess_bits	question_less_bits
+0	-0.050	+0.087
+1	+0.007	+0.012
+2	-0.013	+0.027
+4	-0.008	+0.009
+8	-0.008	+0.017
+16	+0.022	+0.013
+32	+0.021	+0.007
+64	+0.050	+0.003
+128	+0.142	+0.012
+256	+0.376	+0.015
+512	+0.561	+0.089
+REACH exit 06:41:27

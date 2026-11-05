@@ -1,0 +1,10 @@
+FIELD_PARITY_PACE shift=8 entries=246
+FIELD_PARITY_DECLARATION width=32 heads=4 modes=8 still=2 contacts=32 ticks=2 frames=4 reach=2221 rate=8 material=34776 grow=1 withheld_read=8
+FIELD_PARITY section=1 withheld=false regions=16 length=1408 sites=7620 rows=72224 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=504..1478 host_ms=20267 card_ms=140
+FIELD_PARITY section=2 withheld=false regions=16 length=1365 sites=8244 rows=83344 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=524..1478 host_ms=16177 card_ms=146
+FIELD_PARITY section=3 withheld=false regions=16 length=1469 sites=9815 rows=116480 reads=2 faces_unequal=0 covector_unequal=0 first=- deposited=true halvings=0 next=- learner_equal=true near_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=508..1482 host_ms=22218 card_ms=217
+FIELD_PARITY section=4 withheld=true regions=32 length=1431 sites=0 rows=163744 reads=1 faces_unequal=0 covector_unequal=0 first=- deposited=false halvings=0 next=- learner_equal=true near_equal=true rows_equal=true shares_equal=true currents_equal=true pace_nonzero=246 kappa=512..1482 host_ms=8577 card_ms=54
+FIELD_PARITY_WRITE problem=0 question=278 places=1229 written=72 equal=true
+FIELD_PARITY_WRITES problems=1 sweeps=8 host_ms=23248
+FIELD_PARITY_DONE sections=4 reads=7 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=91 host_ms=67241 card_ms=559 elapsed_ms=288400
+MEASURE lap=parity rc=0 wall_s=300.7 peak_rss_kib=2661024

@@ -369,6 +369,15 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             }
             _ => true,
         };
+        // The blanks' clocks by tick of the same region's last four sites (§16.44), host against card.
+        let clocks_equal = match host_views.iter().find(|r| r.locked.iter().any(|&l| l)).or(host_views.first()) {
+            Some(r) if !end => {
+                let n = r.classes.len();
+                let sites: Vec<usize> = (n.saturating_sub(4)..n).collect();
+                host_learner.field.blank_clocks(r, &sites).map_err(|e| e.to_string())? == card.read_blank_clocks(&card_learner.field, r, &sites).map_err(|e| e.to_string())?
+            }
+            _ => true,
+        };
         // The rows by where their mass lies (a reading for the receipts), the section's first regions read on both
         // with the answer start at each region's first open site: bit for bit.
         let rows_equal = {
@@ -389,12 +398,12 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
             let host: Vec<Vec<RowCurrent>> = some.iter().zip(&questions).map(|(r, &q)| host_learner.field.row_currents(r, q, true)).collect::<std::result::Result<_, _>>().map_err(|e| e.to_string())?;
             some.is_empty() || host == card.read_row_currents(&card_learner.field, some, &questions, true).map_err(|e| e.to_string())?
         };
-        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && near_equal && rows_equal && shares_equal && currents_equal;
+        let learner_equal = host_regions == card_regions && receipt_h == receipt_c && host_learner.to_text() == card_learner.to_text() && marks_equal && near_equal && clocks_equal && rows_equal && shares_equal && currents_equal;
         learners_unequal += usize::from(!learner_equal);
         let length = views.iter().map(|r| r.classes.len()).max().unwrap_or(0);
         let next = receipt_h.next.map_or("-".to_string(), |n| format!("{}/{}/{}", n.change, n.halvings, n.refused));
         println!(
-            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} near_equal={near_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
+            "FIELD_PARITY section={} withheld={end} regions={} length={length} sites={} rows={rows} reads={calls} faces_unequal={faces} covector_unequal={entries} first={} deposited={} halvings={} next={next} learner_equal={learner_equal} near_equal={near_equal} clocks_equal={clocks_equal} rows_equal={rows_equal} shares_equal={shares_equal} currents_equal={currents_equal} pace_nonzero={} kappa={} host_ms={} card_ms={}",
             k + 1,
             views.len(),
             receipt_h.sites,

@@ -1,0 +1,34 @@
+.local/run/2026-11-05-accept61/clocksun-seg3-STATE.10/CLOCKS.tsv
+  tick 1 head 0: restatements 393; the gap's expected over its written duration 0.578; the >'s code 7.213 bits against the faces' entropy 1.879
+  tick 1 head 1: restatements 393; the gap's expected over its written duration 0.649; the >'s code 7.213 bits against the faces' entropy 1.879
+  tick 2 head 0: restatements 393; the gap's expected over its written duration 0.580; the >'s code 6.818 bits against the faces' entropy 1.864
+  tick 2 head 1: restatements 393; the gap's expected over its written duration 0.678; the >'s code 6.818 bits against the faces' entropy 1.864
+  tick 3 head 0: restatements 393; the gap's expected over its written duration 0.575; the >'s code 2.852 bits against the faces' entropy 2.673
+  tick 3 head 1: restatements 393; the gap's expected over its written duration 0.801; the >'s code 2.852 bits against the faces' entropy 2.673
+.local/run/2026-11-05-accept61/clocksop-seg1-STATE.8/CLOCKS.tsv
+  tick 1 head 0: restatements 393; the gap's expected over its written duration 0.547; the >'s code 8.890 bits against the faces' entropy 1.751
+  tick 1 head 1: restatements 393; the gap's expected over its written duration 0.623; the >'s code 8.890 bits against the faces' entropy 1.751
+  tick 2 head 0: restatements 393; the gap's expected over its written duration 0.602; the >'s code 7.742 bits against the faces' entropy 1.749
+  tick 2 head 1: restatements 393; the gap's expected over its written duration 0.683; the >'s code 7.742 bits against the faces' entropy 1.749
+  tick 3 head 0: restatements 393; the gap's expected over its written duration 0.606; the >'s code 2.852 bits against the faces' entropy 2.573
+  tick 3 head 1: restatements 393; the gap's expected over its written duration 0.830; the >'s code 2.852 bits against the faces' entropy 2.573
+.local/run/2026-11-05-accept61/clocksex-seg1-STATE.9/CLOCKS.tsv
+  tick 1 head 0: restatements 393; the gap's expected over its written duration 0.294; the >'s code 24.317 bits against the faces' entropy 0.265
+  tick 1 head 1: restatements 393; the gap's expected over its written duration 0.270; the >'s code 24.317 bits against the faces' entropy 0.265
+  tick 2 head 0: restatements 393; the gap's expected over its written duration 0.357; the >'s code 17.721 bits against the faces' entropy 1.195
+  tick 2 head 1: restatements 393; the gap's expected over its written duration 0.327; the >'s code 17.721 bits against the faces' entropy 1.195
+  tick 3 head 0: restatements 393; the gap's expected over its written duration 0.502; the >'s code 4.345 bits against the faces' entropy 3.042
+  tick 3 head 1: restatements 393; the gap's expected over its written duration 0.699; the >'s code 4.345 bits against the faces' entropy 3.042
+# clocksun binary c44e0e66652f121bec16b1c190812013337a07e61e14b30690e80f2783015b32 lock taken 03:06:51
+clocksun-seg3-STATE.10 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.094 wall_s=103.4 peak_rss_kib=238760
+D places read 707 (within the near field 631); head 3 at the offset 0.448; D's code 3.390 bits
+TRIO exit 03:08:35
+# clocksop binary c44e0e66652f121bec16b1c190812013337a07e61e14b30690e80f2783015b32 lock taken 03:10:01
+clocksop-seg1-STATE.8 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.437 wall_s=87.3 peak_rss_kib=238824
+D places read 707 (within the near field 631); head 3 at the offset 0.328; D's code 3.838 bits
+TRIO exit 03:11:28
+# clocksex binary c44e0e66652f121bec16b1c190812013337a07e61e14b30690e80f2783015b32 lock taken 03:18:47
+clocksex-seg1-STATE.9 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.457 wall_s=79.6 peak_rss_kib=239560
+D places read 707 (within the near field 631); head 3 at the offset 0.386; D's code 3.873 bits
+TRIO exit 03:20:06
+READS exit 03:20:06

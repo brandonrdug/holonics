@@ -412,6 +412,11 @@ struct FieldWords {
     // the near pairs (`|i − j| < NEAR`) and over the far ones (the far pairs and the crowds), the host's
     // `Field::covector_shares`.
     wide *dsshare;
+    // [§16.44] Where set, a tick's blanks' rates `[p][t]` (`field_blank_rates`), which its clocks run each silent open
+    // site at, and the face they were read from (masses `[t][A]` and totals), whose shares the clocks' return reads.
+    const int64_t *blank_rate;
+    const uint64_t *blank_masses;
+    const uwide *blank_totals;
 };
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
@@ -3434,13 +3439,163 @@ __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint6
     const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
     const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
     if (from == to) {
-        return w.unresolved[s] ? 0 : (wide)w.theta[base + row_of(w, s)];
+        if (w.unresolved[s]) {
+            return w.blank_rate ? (wide)w.blank_rate[(uint64_t)p * w.T + s] : 0;
+        }
+        return (wide)w.theta[base + row_of(w, s)];
     }
     wide sum = 0;
     for (uint32_t k = from; k < to; k++) {
         sum += (wide)w.mix_share[k] * (wide)w.theta[base + w.mix_class[k]];
     }
     return rel(sum, FACE_BITS);
+}
+
+// A blank's share of class `a` in the face it was read from (the host's `shares`): `⌊(m_a 2^16 + T/2) / T⌋`, zero where
+// the face has no mass.
+__device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, uint32_t a) {
+    const uwide total = w.blank_totals[s];
+    return total == 0 ? 0 : (((uwide)w.blank_masses[s * w.A + a] << FACE_BITS) + total / 2) / total;
+}
+
+// [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face** (the host's
+// `Field::blank_return`), one thread a site and a class: at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2,
+// 24)` with `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read;
+// zero elsewhere.
+extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
+    const uint64_t cells = (uint64_t)w.T * w.A;
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t s = c / w.A;
+        const uint32_t b = c % w.A;
+        dz[c] = 0;
+        if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1] || w.blank_totals[s] == 0) {
+            continue;
+        }
+        const wide total = (wide)w.blank_totals[s];
+        wide out = 0;
+        for (uint32_t p = 0; p < w.paced; p++) {
+            const wide dk = dkappa[(uint64_t)p * w.T + s];
+            if (dk == 0) {
+                continue;
+            }
+            const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+            wide sum = 0;
+            for (uint32_t a = 0; a < w.A; a++) {
+                sum += (wide)w.blank_masses[s * w.A + a] * (wide)w.theta[base + a];
+            }
+            const wide mean = div_nearest(sum, total);
+            const wide u = div_nearest((wide)w.blank_masses[s * w.A + b] * ((wide)w.theta[base + b] - mean), total);
+            wide x = 0, y = 0;
+            if (!mul_fits(dk, u, &x) || !mul_fits(x, ln2, &y)) {
+                atomicOr(w.status, REFUSED_CARRIER);
+            }
+            out += rel(y, PACE_BITS);
+        }
+        dz[c] = out;
+    }
+}
+
+// The encoding's bias and rows from a blank's face covector (held `2^30` finer): `δc_b += Σ_t rel(δz_b, 30)`,
+// `δE(b)_i += Σ_t rel(δz_b y_i, 46)` over the silent sites, one thread an entry and a tile of 64 sites.
+extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t enc, uint64_t bias, const wide *dz, const int64_t *y) {
+    const uint64_t entries = (uint64_t)w.A * (w.D + 1);
+    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, tile = c / entries;
+        const uint64_t b = entry / (w.D + 1), i = entry % (w.D + 1);
+        const uint64_t from = tile * 64;
+        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        wide sum = 0;
+        for (uint64_t t = from; t < to; t++) {
+            const wide d = dz[t * w.A + b];
+            if (d == 0) {
+                continue;
+            }
+            sum += i == w.D ? rel(d, 30) : rel(d * (wide)y[t * w.D + i], FACE_BITS + 30);
+        }
+        if (sum != 0) {
+            add_wide(g + (i == w.D ? bias + b : enc + b * w.D + i), sum);
+        }
+    }
+}
+
+// The lift's covector from a blank's face covector, held `2^16` finer: `δy_i = rel(Σ_b δz_b E(b)_i, 30)` at a silent
+// site, zero elsewhere.
+extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide *dz, int64_t *dy) {
+    const uint64_t cells = (uint64_t)w.T * w.D;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.D, i = c % w.D;
+        wide sum = 0;
+        for (uint32_t b = 0; b < w.A; b++) {
+            const wide d = dz[t * w.A + b];
+            if (d != 0) {
+                wide x = 0;
+                if (!mul_fits(d, (wide)w.theta[enc + (uint64_t)b * w.D + i], &x)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                }
+                sum += x;
+            }
+        }
+        dy[c] = fit64(rel(sum, 30), w.status);
+    }
+}
+
+// The lift's bias and the read matrix from a blank's lift covector (held `2^16` finer): `δb_i += Σ_t rel(δy_i, 16)`,
+// `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)`, one thread an entry and a tile of 64 sites.
+extern "C" __global__ void field_blank_lift_read(FieldWords w, wide *g, uint64_t read, uint64_t bias, const int64_t *dy, const int32_t *r) {
+    const uint64_t entries = (uint64_t)w.D * (w.D + 1);
+    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t entry = c % entries, tile = c / entries;
+        const uint64_t i = entry / (w.D + 1), j = entry % (w.D + 1);
+        const uint64_t from = tile * 64;
+        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        wide sum = 0;
+        for (uint64_t t = from; t < to; t++) {
+            const int64_t d = dy[t * w.D + i];
+            if (d == 0) {
+                continue;
+            }
+            sum += j == w.D ? rel((wide)d, FACE_BITS) : rel((wide)d * (wide)r[t * w.D + j], FACE_BITS);
+        }
+        if (sum != 0) {
+            add_wide(g + (j == w.D ? bias + i : read + i * w.D + j), sum);
+        }
+    }
+}
+
+// The state's covector at a silent site takes the blank's return, released from its `2^16` finer hold: `dx += rel(back, 16)`.
+extern "C" __global__ void field_blank_dx(FieldWords w, const int64_t *back, int64_t *dx) {
+    const uint64_t cells = (uint64_t)w.T * w.D;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.D;
+        if (!w.unresolved[t] || w.mix_off[t] != w.mix_off[t + 1]) {
+            continue;
+        }
+        dx[c] = fit64((wide)dx[c] + rel((wide)back[c], FACE_BITS), w.status);
+    }
+}
+
+// [definition; agent-inferred, November 4, §16.44] **A blank place's expected duration** (the host's `Field::paces_with`),
+// one thread a paced head and a site: at a silent open site (unresolved, no carried mixture) `rel(Σ_a w_a c_p[a], 16)` with
+// `w_a` the shares of the face the tick before read there, the rate its clock runs it at less one; zero elsewhere.
+extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t p = c / w.T;
+        const uint64_t s = c % w.T;
+        if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1]) {
+            rates[c] = 0;
+            continue;
+        }
+        const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+        wide sum = 0;
+        for (uint32_t a = 0; a < w.A; a++) {
+            sum += (wide)blank_share(w, s, a) * (wide)w.theta[base + a];
+        }
+        rates[c] = fit64(rel(sum, FACE_BITS), w.status);
+    }
 }
 
 // [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
@@ -4074,6 +4229,14 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         if (from == to) {
             if (!w.unresolved[t]) {
                 add_wide(g + base + row_of(w, t), dk << FACE_BITS);
+            } else if (w.blank_rate) {
+                // [§16.44] A blank's rate by the shares of the face its clock read, an operand of that clock.
+                for (uint32_t a = 0; a < w.A; a++) {
+                    const uwide share = blank_share(w, t, a);
+                    if (share != 0) {
+                        add_wide(g + base + a, dk * (wide)share);
+                    }
+                }
             }
         } else {
             for (uint32_t k = from; k < to; k++) {
