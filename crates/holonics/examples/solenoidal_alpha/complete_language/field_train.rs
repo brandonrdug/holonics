@@ -117,8 +117,25 @@ pub(super) fn question_text(q: &[u8]) -> Vec<u8> {
     out
 }
 
-/// The problems of a passage: `question \n answer` blocks separated by a blank line.
+/// The record separator and the unit separator of a passage of records (ASCII `RS` and `US`).
+pub(super) const RECORD: u8 = 0x1E;
+pub(super) const UNIT: u8 = 0x1F;
+
+/// The problems of a passage: `question \n answer` blocks separated by a blank line; or, where the passage carries the
+/// record separator, records `question US answer` separated by it, each part's bytes exact. [agent-inferred, November 5]
+/// Why the records: the code passage (Brandon, November 5: python-codes-25k in place of GSM8K) has answers that hold
+/// blank lines and questions of several lines, which the blank-line blocks would cut; neither separator stands in it.
 pub(super) fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
+    if text.contains(&RECORD) {
+        return text
+            .split(|&b| b == RECORD)
+            .filter_map(|record| {
+                let cut = record.iter().position(|&b| b == UNIT)?;
+                let (q, a) = (&record[..cut], &record[cut + 1..]);
+                (!q.is_empty() && !a.is_empty()).then(|| (q.to_vec(), a.to_vec()))
+            })
+            .collect();
+    }
     let mut out = Vec::new();
     for block in text.split(|&b| b == b'\n').collect::<Vec<_>>().split(|line| line.is_empty()) {
         if block.len() < 2 {
@@ -2206,6 +2223,17 @@ mod tests {
         assert!(text.contains("context=5.000000 ") && text.contains("foil=5.000001 ") && text.ends_with("question=0.000001"), "{text}");
         assert!(text.contains("answer=- "), "{text}");
         assert_eq!(bits(held[1].0, 4), bits(held[2].0, 4), "the three-decimal reading cannot tell them apart");
+    }
+
+    /// A passage of records keeps each question's and answer's bytes exact, blank lines and several lines included.
+    #[test]
+    fn a_passage_of_records_keeps_its_blank_lines() {
+        let text = b"Add two numbers\nin Python\x1f```python\ndef add(a, b):\n\n    return a + b\n```\x1eSay hi\x1fprint('hi')\x1e";
+        let problems = problems_of(text);
+        assert_eq!(problems.len(), 2);
+        assert_eq!(problems[0], (b"Add two numbers\nin Python".to_vec(), b"```python\ndef add(a, b):\n\n    return a + b\n```".to_vec()));
+        assert_eq!(problems[1], (b"Say hi".to_vec(), b"print('hi')".to_vec()));
+        assert_eq!(problems_of(b"Q one\nA one\n\nQ two\nA two\nmore\n"), vec![(b"Q one".to_vec(), b"A one".to_vec()), (b"Q two".to_vec(), b"A two\nmore".to_vec())], "the blank-line blocks as before");
     }
 
     /// The withheld problems are never in a section, and every other problem is in one.
