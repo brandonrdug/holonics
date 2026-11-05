@@ -207,6 +207,17 @@ pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
     (4 * m as u128 * k).isqrt() as usize
 }
 
+/// [definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] `FIELD_TAIL_NEAR`: **a region
+/// ends five places past its lowest void**, a declared comparison with the keyed tail over the room. A training region's tail
+/// is the void and the five places past it (`NEAR` places), a path state past a resolved void ends five places past it, and
+/// the withheld read's tail is cut the same way, so every place before the end keeps its near field and the problem never
+/// hears the codec's room (its longest answer and one). Why: the room's voids are no problem's; the content heard its length
+/// through them, in void crowds and the backward strand's void sum, over as many as 1,700 places.
+pub(super) fn near_tail() -> bool {
+    static NEAR_TAIL: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *NEAR_TAIL.get_or_init(|| std::env::var_os("FIELD_TAIL_NEAR").is_some())
+}
+
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
 /// codec's answer extent less the answer's: an octave `k` of the room drawn uniform, then a length
 /// uniform in `[2^k, min(2^(k+1) − 1, room)]`. Every octave of tail is met alike, so the field
@@ -215,6 +226,9 @@ pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
 /// would read 3.42 times).
 pub(super) fn tail(seed: u64, draw: u64, room: usize) -> usize {
     let room = room.max(1);
+    if near_tail() {
+        return holonics::hnn::tower::field::NEAR.min(room);
+    }
     let octaves = u64::from(usize::BITS - room.leading_zeros());
     let k = (mix(seed, draw | 1 << 63) % octaves) as u32;
     let low = 1usize << k;
@@ -300,6 +314,11 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
         return None;
     }
     let (mut classes, mut unresolved, mut stop) = (classes, unresolved, None);
+    if let Some(end) = voided.filter(|_| near_tail()) {
+        let cut = (end + holonics::hnn::tower::field::NEAR).min(classes.len());
+        classes.truncate(cut);
+        unresolved.truncate(cut);
+    }
     if voided.is_none() {
         let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
         let front_end = (q.len() + (1usize << (front + 1)) - 1).min(classes.len());
@@ -2126,8 +2145,13 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// The keyed tail meets every octave of its room (under `FIELD_TAIL_NEAR` the tail is the near field's, and this reads
+    /// the keyed law it is declared against).
     #[test]
     fn tails_meet_every_octave_within_their_room() {
+        if near_tail() {
+            return;
+        }
         let room = 100usize;
         let mut octaves = [false; 7];
         for draw in 0..512 {

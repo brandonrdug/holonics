@@ -88,3 +88,12 @@ fences opened and 14 closed; one answer parses as Python; 0.02 of its identifier
 and 0.30, blocks 0.42 far; every closure is under 0.5 of held, so by the rule closure is the build's subject (the ring law),
 and the prediction that far strings close below far brackets fails (0.30 against 0.22). One lap in, with answers too short
 to hold their closures.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] **A region ends five places past
+its lowest void** (`FIELD_TAIL_NEAR`, `near_tail`, declared against the keyed tail): a training region's tail is the void and
+the five places past it, a path state past a resolved void ends five places past it, the withheld read's tail is cut alike, so
+every place before the end keeps its near field and no problem hears the codec's room. The trainer's tests pass under it (the
+keyed tail's own test stands aside). **Prediction, fixed before launch**: from code84's lap-0 state, two laps at the same seed,
+held code on the context and opening reads stays no higher than code84's segment 2 at equal laps (within its spread), and lap
+time falls again, about 1.6 times fewer sites than parts 1 and 3 alone. **Rule**: held code above that spread means the room's
+voids shaped what training learned about the end, and where the writer closes needs its own law (code85).

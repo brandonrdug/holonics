@@ -1334,7 +1334,8 @@ impl<'c> CardField<'c> {
         self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
         let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
         if std::env::var_os("FIELD_SPREAD").is_some() {
-            eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(field, spread).map_or(0, |l| l));
+            let need = field.row_bits().ok().zip(field.row_gain().ok()).map(|(bits, gain)| bits as i64 - (gain as i64 + (usize::BITS - 1 - d.reach.leading_zeros()) as i64 + 2) + spread as i64);
+            eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} need_bits={} bound_limbs={}", need.map_or("-".to_string(), |n| n.to_string()), row_limbs(field, spread).map_or(0, |l| l));
         }
         self.mark("tick_exposure_wait");
         let limbs = row_limbs(field, spread)?;
