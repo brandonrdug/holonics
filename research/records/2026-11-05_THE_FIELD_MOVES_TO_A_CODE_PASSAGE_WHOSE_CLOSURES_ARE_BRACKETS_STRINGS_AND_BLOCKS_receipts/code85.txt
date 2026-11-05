@@ -1,0 +1,42 @@
+# code85 binary 73782dd106575fdeed108ae378119a3196a16dbae26eadc4661657e9bba1e303 parity lock taken 20:14:26
+FIELD_PARITY section=1 withheld=false regions=26 length=1541 sites=21394 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=35372 card_ms=315
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=1557 card_ms=17
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=12 host_ms=36929 card_ms=332 elapsed_ms=297263
+MEASURE lap=parity rc=0 wall_s=297.9 peak_rss_kib=3438852
+# seg2 from e87c522094abb7686e6536620a563fe424b152d5c217ea91ccfac5339e6ff250 started 20:20:25
+FIELD_LAP lap=0 read=2 before=3.055 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=243329
+FIELD_LAP lap=1 read=3 before=2.874 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=261796
+FIELD_LAP lap=2 read=4 before=2.778 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=267333
+FIELD_LAP lap=3 read=5 before=2.634 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=255681
+FIELD_LAPS_HELD lap=4 reason=time left=585268 bound=678865 ms=1072462
+MEASURE lap=seg2 rc=0 wall_s=1073.0 peak_rss_kib=961724
+== HELD128
+distance	problems	void_mass	length_law
+-128	104	0.054	0.405
+-32	124	0.061	0.476
++0	128	0.061	0.512
++32	128	0.062	0.562
++128	128	0.058	0.695
++512	128	0.042	0.924
+places 900 to 1199	38400	0.034	0.971
+B past the end: mean 1658 places, median 1744, range 903 to 2029; the length law 132
+void mass before the end: mean 17 places
+the opening's expected length less held: mean +1641.9 places, median +1729.8
+== TRAIN
+distance	problems	void_mass	length_law
+-128	109	0.047	0.200
+-32	128	0.057	0.362
++0	128	0.058	0.429
++32	128	0.058	0.494
++128	128	0.054	0.654
++512	128	0.042	0.911
+places 900 to 1199	38400	0.032	0.971
+B past the end: mean 1768 places, median 1776, range 978 to 1974; the length law 152
+void mass before the end: mean 11 places
+the opening's expected length less held: mean +1758.1 places, median +1766.8
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	+1641.9	+955.3	-686.7	81.3
+== against code84 at equal laps (FIELD_HELD: lap answer context foil; FIELD_UNSEEN; section ms)
+2026-11-05-code84/seg2.log: -1:6.336806:3.065177:3.068981 0:6.688118:2.467307:2.467276 1:4.988273:2.180622:2.191646  | unseen -1:3.029 0:2.440 1:2.165  | sections mean ms 382 over 3070
+2026-11-05-code85/seg2.log: -1:6.336806:3.065177:3.068981 0:5.027880:2.403701:2.407339 1:4.963255:2.123680:2.130184 2:4.990882:1.914003:1.973490 3:4.997809:1.578877:1.749697  | unseen -1:3.033 0:2.379 1:2.119 2:1.887 3:1.527  | sections mean ms 166 over 6140
+CODE85 exit 20:50:40

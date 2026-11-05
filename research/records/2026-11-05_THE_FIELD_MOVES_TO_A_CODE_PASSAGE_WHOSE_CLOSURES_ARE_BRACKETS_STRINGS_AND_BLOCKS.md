@@ -112,3 +112,21 @@ training vocabulary; the closures against held 0.53 and 0.50 (brackets, near and
 (blocks, far). Its ends: three of 32 within two places after a closing fence (seven written), 29 elsewhere at a steady one in
 528 places, about one in two held lengths: the writer ends in unclosed content at a steady rate, a sense of length kept at
 about half its hazard.
+
+[measurement; agent-inferred] **A region ending five places past its lowest void stands** (code85; `code85.txt`). Its sampled
+parity passed under the law (every read equal). From code84's lap-0 state at the same seed, against code84's segment 2 at
+equal laps: held context 2.4037 and 2.1237 at laps 0 and 1 against 2.4673 and 2.1806, foils 2.4073 and 2.1302 against 2.4673
+and 2.1916, the withheld code 2.379 and 2.119 against 2.440 and 2.165: lower, as predicted. Its sections took 166 ms against
+382 (2.3 times; predicted about 1.6), a lap about 255 s, so in the same segment it read four laps: held context 1.914 and
+1.579 at laps 2 and 3 (foils 1.973 and 1.750), the withheld code 1.887 and 1.527, and the question's information 0.010, 0.013,
+0.015, 0.029 and 0.068 nats a place over the five reads (0.51 nats a word at lap 3). The opening read stays collapsed (void
+mass 0.04 to 0.06 at every distance). By the rule the law stands; code84 was stopped in its segment 3 and the passage
+continues from code85's fourth-lap state under it (code86).
+
+[measurement; agent-inferred] **The writer's end is memoryless** (no-run reads of segment 2's write against the 32 held). Of
+the held answers, 29 of 32 end within two places after a closing fence; of the writes, 16 end at or under held over 5,198
+places written there (one in 325) and 16 past it over 10,127 (one in 633), a hazard past held half the hazard before it, where
+a sense of length would make it several times higher. The far comparisons the cut dropped carried the length; the
+restoration the unified-theory reading of 21:07 derives (a silent stretch past the last arrival is one passage, its clock one
+rate, so a far place stands with the front and nothing between) needs regions with explicit positions, every distance, ring,
+skin, moment and clock of the field read from them; it is built in two steps.
