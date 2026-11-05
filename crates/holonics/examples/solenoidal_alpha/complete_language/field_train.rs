@@ -220,6 +220,16 @@ pub(super) fn near_tail() -> bool {
     *NEAR_TAIL.get_or_init(|| std::env::var_os("FIELD_TAIL_KEYED").is_none())
 }
 
+/// [definition; agent-inferred, November 5, the unified-theory reading of 21:19] **A path state with no resolved void keeps
+/// the whole room**: its far open places are compared at the boundary again, the comparisons that taught the opening its
+/// length (code84's segment 2: with them cut the opening's void mass fell to 0.02–0.04 at every distance), now on the clock
+/// that runs a silent stretch past the last arrival at one rate (`Field::silent_stretch`). `FIELD_PATH_FRONT_CUT` declares
+/// the cut it replaced (`NEAR − 1` places past the front octave's end, the margin read and not compared), for comparison.
+pub(super) fn path_front_cut() -> bool {
+    static CUT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *CUT.get_or_init(|| std::env::var_os("FIELD_PATH_FRONT_CUT").is_some())
+}
+
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
 /// codec's answer extent less the answer's: an octave `k` of the room drawn uniform, then a length
 /// uniform in `[2^k, min(2^(k+1) − 1, room)]`. Every octave of tail is met alike, so the field
@@ -279,14 +289,13 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 /// training meets about as rarely as it met the opening; each octave of reads carries an equal share of where the
 /// length is decided. The boundary's minimizer is the answer's length given the question and what the path has resolved.
 ///
-/// [definition; agent-inferred, November 5, the unified-theory reading of 18:53 and its check 1] **A path state ends five
-/// places past its front**: before a void is resolved, every place past the front octave (the octave of the order's next
-/// place) is open and silent, and it is heard by the front only through the near field, so the region is cut `NEAR − 1`
-/// places past the front octave's end, the faces at and before it the whole room's bit for bit, and the margin is read and
-/// not compared (the port's stop at the front octave's end). Once a void is resolved the places past it are definite and
-/// heard, and the region keeps the room. A state with nothing open is no state (none). Why: on the code passage a path
-/// state read the question and all 2,062 places of the room, 2,188 of the 2,911 sites a problem's lap read, where the
-/// writer at that state draws only from its front octave.
+/// [definition; agent-inferred, November 5, the unified-theory readings of 18:53 and 21:19] Before a void is resolved the
+/// path state keeps the whole room, its far open places compared at the boundary (`path_front_cut`); under
+/// `FIELD_PATH_FRONT_CUT` it ends five places past its front, the cut of 18:53 (every place past the front octave is open
+/// and silent and heard by the front only through the near field, so the region is cut `NEAR − 1` places past the front
+/// octave's end, the faces at and before it the whole room's bit for bit, the margin read and not compared at the port's
+/// stop), which kept the faces and dropped the far comparisons that taught the length. Past a resolved void the region ends
+/// `NEAR` places past it (`near_tail`). A state with nothing open is no state (none).
 pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
     let room = codec.answer;
     let classes = region_classes(codec, q, a, q.len() + room);
@@ -321,7 +330,7 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
         classes.truncate(cut);
         unresolved.truncate(cut);
     }
-    if voided.is_none() {
+    if voided.is_none() && path_front_cut() {
         let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
         let front_end = (q.len() + (1usize << (front + 1)) - 1).min(classes.len());
         let cut = (front_end + holonics::hnn::tower::field::NEAR - 1).min(classes.len());

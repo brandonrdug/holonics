@@ -3684,21 +3684,39 @@ extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
     }
 }
 
+// A silent open site (§16.28, the host's `Field::silent`): unresolved, with no carried mixture.
+__device__ __forceinline__ bool silent_at(const FieldWords &w, uint64_t s) {
+    return w.unresolved[s] && w.mix_off[s] == w.mix_off[s + 1];
+}
+
+// [§16.47] A region's silent stretch past its last arrival (the host's `Field::silent_stretch`): the first silent place
+// past its last site that is not silent, zero where every site is silent, the region's length where the last is not.
+__device__ __forceinline__ uint32_t silent_stretch(const FieldWords &w, uint64_t first, uint32_t sites) {
+    for (uint32_t t = sites; t-- > 0;) {
+        if (!silent_at(w, first + t)) {
+            return t + 1;
+        }
+    }
+    return 0;
+}
+
 // [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
 // one thread a paced head and a region over its sites in order: on the class sheet `κ = 2^24 + c_p[u_t]` (§16.16),
-// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`).
+// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`). Past the
+// region's last arrival every place runs at the first silent place's rate (§16.47, one passage).
 extern "C" __global__ void field_paces(FieldWords w) {
     const uint64_t cells = (uint64_t)w.paced * w.R;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t stretch = silent_stretch(w, first, sites);
         const wide one = (wide)1 << PACE_BITS;
         wide clock = 0, variation = 0;
         bool plain = true;
         for (uint32_t t = 0; t < sites; t++) {
             const uint64_t g = first + t;
-            const wide k = one + pace_rate(w, p, g);
+            const wide k = one + pace_rate(w, p, first + (t > stretch ? stretch : t));
             if (t > 0) {
                 clock += k;
                 variation += k < 0 ? -k : k;
@@ -4277,24 +4295,31 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
 
 // [definition; agent-inferred, November 2] **The clocks return to their paces** (the host's tail of `returned`): one
 // thread a paced head and a region, over its sites from the last: `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t` (zero at
-// the region's first site, whose rate ticks no step), into `dkappa[p][t]`.
+// the region's first site, whose rate ticks no step), into `dkappa[p][t]`; past the last arrival the places' covectors
+// return to the first silent place, whose rate they ran at (§16.47).
 extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
     const uint64_t cells = (uint64_t)w.paced * w.R;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        wide tau = 0, sig = 0;
+        const uint32_t stretch = silent_stretch(w, first, sites);
+        wide tau = 0, sig = 0, folded = 0;
         for (uint32_t t = sites; t-- > 0;) {
             const uint64_t at = (uint64_t)p * w.T + first + t;
-            if (t == 0) {
-                dkappa[at] = 0;
-                break;
+            wide own = 0;
+            if (t > 0) {
+                tau += w.gtau[at];
+                sig += w.gsig[at];
+                const int64_t k = w.kappa[at];
+                own = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
             }
-            tau += w.gtau[at];
-            sig += w.gsig[at];
-            const int64_t k = w.kappa[at];
-            dkappa[at] = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
+            if (t > stretch) {
+                folded += own;
+                dkappa[at] = 0;
+            } else {
+                dkappa[at] = own + (t == stretch ? folded : 0);
+            }
         }
     }
 }

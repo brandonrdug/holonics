@@ -130,3 +130,15 @@ a sense of length would make it several times higher. The far comparisons the cu
 restoration the unified-theory reading of 21:07 derives (a silent stretch past the last arrival is one passage, its clock one
 rate, so a far place stands with the front and nothing between) needs regions with explicit positions, every distance, ring,
 skin, moment and clock of the field read from them; it is built in two steps.
+
+[measurement; agent-inferred] **The near tail's field codes lower and its writer collapses** (code86; `code86_seg3.txt`). From
+code85's fourth-lap state under its laws, five laps of one segment (about 250 card-seconds a lap): held context 1.507, 1.453,
+1.406, 1.372 and 1.364 bits a byte, foils 1.700 to 1.574 (the question's effect 0.19 to 0.21 bits a byte, the largest of the
+code line), the joint information 0.075 to 0.088 nats a place. The opening read stays collapsed (void mass 0.08 to 0.09 at
+every distance, its expected length +1,580 past held), and the drift to read 64 is −1,039 ± 79. Its write of the 32 in runs
+(559 reads, 49 card-seconds): 0.253 of the held bytes, 28 of 32 shorter, two empty, 77% of the written bytes the letter `y`
+(then the backtick 10% and `[` 7%), no bracket, string or block closed, the correlation with held −0.008. The held code read
+on the context improved while the release at the opening fell apart: under the near tail and the front cut no training
+region holds an open place more than five past its front or its end, and the writer's states hold the whole room open, so the
+release reads faces training never reached (agent-inferred, not yet located). b1 restores the far comparisons; the chain was
+stopped after this segment for its read (code87).

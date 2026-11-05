@@ -1664,6 +1664,7 @@ impl Field {
         let sites = region.classes.len();
         let width = d.alphabet + 1;
         let one = 1i128 << PACE_BITS;
+        let stretch = Self::silent_stretch(region);
         let mut out = Paces { row: vec![None; d.heads], ..Default::default() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
             let p = out.kappa.len();
@@ -1672,9 +1673,11 @@ impl Field {
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                let rate = match blank.get(t).and_then(Option::as_ref).filter(|_| Self::silent(region, t)) {
+                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage).
+                let at = if t > stretch { stretch } else { t };
+                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
-                    None => self.strand_row(region, base, 1, t)[0] as i128,
+                    None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
                 let k = one + rate;
                 if t > 0 {
@@ -1895,6 +1898,18 @@ impl Field {
     /// place (`κ = 1`). Its own opening (`E(∗)` with its neighbours' contact rows) is its own and stays.
     fn silent(region: &Region, t: usize) -> bool {
         region.unresolved[t] && Self::carried(region, t).is_none()
+    }
+
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 21:07] **A silent stretch past the last arrival
+    /// is one passage**: the first silent place past a region's last arrival (its last site that is not silent), or the
+    /// region's length where none is. Past it every place runs the free clock at that place's rate (its expected duration
+    /// from the tick before's face there, bare at the first tick), so a place `D` past the last arrival reads the clock
+    /// `c_f + D κ₁`: nothing arrives there, and a per-blank rate would be the field's guesses about the stretch driving its
+    /// own clock (near an uncertain end the faces split between the void and a byte and the clock races, §16.28). Stretches
+    /// between two arrivals keep their per-blank rates.
+    fn silent_stretch(region: &Region) -> usize {
+        let sites = region.classes.len();
+        (0..sites).rev().find(|&t| !Self::silent(region, t)).map_or(0, |last| last + 1)
     }
 
     /// Site `s`'s row of a family at `base` of `width` a class (its class's row, or its carried face's mixture
@@ -3241,13 +3256,26 @@ impl Field {
         let width = d.alphabet + 1;
         // Each blank's rates' covectors `(base, δκ)` a paced head, for its face's return.
         let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if faces.is_some() { sites } else { 0 }];
+        let stretch = Self::silent_stretch(region);
         for p in 0..paced {
             let base = l.pace + p * width;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
+            let mut dks = vec![0i128; sites];
             for k in (1..sites).rev() {
                 tail_tau += r.gtau[p][k];
                 tail_sig += r.gsig[p][k];
-                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                dks[k] = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+            }
+            // [§16.47] The silent stretch past the last arrival runs at its first place's rate, so their covectors return there.
+            if stretch < sites {
+                let folded: i128 = dks[stretch + 1..].iter().sum();
+                dks[stretch] += folded;
+                for slot in &mut dks[stretch + 1..] {
+                    *slot = 0;
+                }
+            }
+            for k in (0..sites).rev() {
+                let dk = dks[k];
                 if dk == 0 {
                     continue;
                 }

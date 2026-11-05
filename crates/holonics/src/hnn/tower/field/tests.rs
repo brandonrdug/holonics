@@ -1000,6 +1000,8 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
     let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let long: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let long_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
+    // [§16.47] A silent stretch of six places past the last arrival, whose rates return to its first place.
+    let stretch_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t >= 20).collect();
     let (mut read, mut seams) = (0usize, 0usize);
     for still in [0usize, 1] {
         let mut d = tiny_declaration(still);
@@ -1011,7 +1013,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
             let grain = field.layout.families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&k)).unwrap().2;
             *v = (((i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64) << grain) >> 32) as i32;
         }
-        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
+        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, Region { classes: &long, unresolved: &stretch_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
             let pass = field.pass(&r, true).unwrap();
             assert!(pass.paces.plain.iter().all(|&p| !p), "the shaped clocks are no byte place");
             let g = covector_of(&field, &r);
@@ -1075,6 +1077,29 @@ fn a_blank_place_runs_at_its_expected_duration() {
         }
     }
     assert!(moved, "no blank ran off the bare rate");
+    // [§16.47] Past the last arrival the silent stretch is one passage: every place there runs at its first place's rate,
+    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate.
+    let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
+    let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    assert_eq!(Field::silent_stretch(&stretch), 7);
+    let (mut between, mut past) = (false, 0usize);
+    for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            let base = field.layout.pace + p * width;
+            let own = |t: usize| (1i128 << PACE_BITS) + release(clock.blank[t].as_ref().unwrap().iter().map(|&(c, w)| w as i128 * field.theta[base + c as usize] as i128).sum(), STATE_BITS);
+            assert_eq!(kappa[2] as i128, own(2), "a silent place between arrivals keeps its rate");
+            between |= own(2) != 1 << PACE_BITS;
+            assert_eq!(kappa[7] as i128, own(7));
+            for t in 8..14 {
+                assert_eq!(kappa[t], kappa[7], "place {t} runs at the stretch's first rate");
+                assert_eq!(clock.paces.tau[p][t] as i128, clock.paces.tau[p][7] as i128 + (t - 7) as i128 * kappa[7] as i128, "the clock at {t} is c_f + D κ₁");
+                past += (own(t) != own(7)) as usize;
+            }
+        }
+    }
+    assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
     let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
     let full = Region { unresolved: &written, ..r };
     assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");

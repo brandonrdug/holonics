@@ -8,7 +8,7 @@
 # to 7,200 s), 24 host threads.
 set -u
 export FIELD_TAIL_NEAR=1
-ROOT=/home/b/Workspaces/holonics; W=$ROOT/.local/wt/qgchgu-sampler; P=$ROOT/.local/data/python-codes-25k/passage
+ROOT=${HOLONICS_ROOT:?the main checkout}; W=$ROOT/.local/wt/qgchgu-sampler; P=$ROOT/.local/data/python-codes-25k/passage
 K=$ROOT/.local/wt/field-card/.local/run/KEYS8; R=$W/.local/run; O=$R/2026-11-05-code86; BIN=$O/field_pass; F84=$R/2026-11-05-code84
 U0=$ROOT/.local/wt/section-edge/.local/run/gsm8k/UNITS0
 M="python3 -I $ROOT/.local/wt/field-card/.local/run/dispersing/measure.py"

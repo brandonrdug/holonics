@@ -3750,3 +3750,24 @@ path75's segment 2's −7.0 ± 10.0, both within the two-sided bound; keyed79's 
 shorter), 42 of 65 restatements exact; context 0.1855 and foil 0.4302 at its third lap against path75's 0.1846 and 0.4283.
 The keyed passage's rule reads a swing across segments, and the line stopped after one by Brandon's move to the code passage
 (November 5, 16:29), so it stands untested there; it costs nothing and is carried into the code passage's laws.
+
+[definition; agent-inferred, November 5, the unified-theory readings of 21:07 and 21:19] **A silent stretch past the last
+arrival is one passage** (`Field::silent_stretch`, the card's `silent_stretch` in `field_paces` and `field_pace_kappa_back`).
+Past a region's last arrival (its last site that is not silent) every open place runs the free clock at one rate, the
+expected duration at the first silent place there (`1 + Σ_a p(a) c_h[a]` from the tick before's face, bare at the first
+tick), so a place `D` past it reads `τ_f + D κ₁`; the stretch's covectors `δκ` return to that place, through its face's
+shares and its blank's return. A stretch between two arrivals keeps its per-blank rates. Why: nothing arrives in the
+stretch, and a per-blank rate there is the field's guesses about the stretch driving its own clock (near an uncertain end the
+faces split between the void and a byte, and the far places' clocks race by the sum of those guesses); one rate makes the
+far place's clock the front's plus its distance, the half of the law that should carry length. The other half (regions with
+explicit positions, a far boundary place standing with the front and nothing between) is b2, built after b1's read. The
+host's tests: on a region of fourteen places silent from the eighth, every place past it runs at its first place's rate and
+reads `τ_f + D κ₁` at every later tick while a silent place between arrivals keeps its own face's rate
+(`a_blank_place_runs_at_its_expected_duration`), and the pace covector matches the code's slope over two windows on a region
+with a six-place stretch (`the_pace_covector_matches_the_code_at_two_steps`). With it the path states with no resolved void
+keep the whole room again (`path_front_cut`; the cut of 18:53 declared as `FIELD_PATH_FRONT_CUT`), so their far places are
+compared at the boundary. **Fixed before the read** (21:19), b1 from code84's lap-0 state against code85 at equal laps: the
+hazard past held at least three times the hazard at or under it (code84's segment 2: 0.51); the correlation with held above
++0.3 and written over held 0.7 to 1.4; the opening's void mass at held above 0.3 and at +128 above 0.5; the held context within
+0.02 bits a byte of code85's. **Rule**: a hazard ratio under 1.5 after two laps on the whole room means one rate does not
+carry length, and b2 waits for (c); between 1.5 and 3, two more laps before deciding (code87).
