@@ -1484,20 +1484,6 @@ impl<'c> CardField<'c> {
         let (sites, pairs) = (st.sites, st.pairs);
         let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
-        // [§16.45] Each region's faces read (the released face and one a tick whose clocks its blanks set, where no port is
-        // read; the host's `FieldPass::faces_read`), the released face's weight `m/(K F)`, and the silent sites before a
-        // port whose clocked faces the comparison reads.
-        let silent_at = |t: usize| unresolved[t] != 0 && mix_off[t] == mix_off[t + 1];
-        let reads_of: Vec<u64> = (0..regions.len())
-            .map(|r| {
-                let span = region_off[r] as usize..region_off[r + 1] as usize;
-                let blanks = d.paced_heads() > 0 && span.clone().any(silent_at);
-                if blanks && regions[r].port.is_none() { d.ticks as u64 } else { 1 }
-            })
-            .collect();
-        let site_weight: Vec<(u64, u64)> = site_weight.iter().zip(site_region).map(|(&(m, k), &r)| (m, k * reads_of[r as usize])).collect();
-        let clocked_weight: Vec<(u64, u64)> = (0..sites).map(|t| if silent_at(t) && reads_of[site_region[t] as usize] > 1 { site_weight[t] } else { (0, 1) }).collect();
-        let site_weight = &site_weight;
         let (status, x) = (&st.status, &st.x);
         let returning = g.is_some();
         // The shares are stored for a return's reverse, for the rows `keep` reads, and for a logits read's
@@ -1736,7 +1722,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, (&clocks, base_clock, &clocked_weight), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()))?;
+            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb.as_ref()))?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();
@@ -1791,23 +1777,10 @@ impl<'c> CardField<'c> {
                 out_echo.push((region_off[r] as usize..region_off[r + 1] as usize).map(|t| ((trips[t] as u128 + read / 2) / read) as u64).collect());
             }
         }
-        // [§16.45] Each clock's faces at the silent sites, which the comparison reads beside the released ones.
-        let mut clocked: Vec<(Vec<u64>, Vec<i128>)> = Vec::new();
-        if reads_of.iter().any(|&f| f > 1) {
-            for c in clocks.iter().flatten() {
-                clocked.push((self.timed(Kind::Copy, || card.fetch_range(&c.masses, 0, sites * a)).map_err(device)?, self.timed(Kind::Copy, || card.fetch_range(&c.totals, 0, sites)).map_err(device)?));
-            }
-        }
         let (mut out, mut out_z) = (Vec::with_capacity(regions.len()), Vec::new());
         for r in 0..regions.len() {
             let span = region_off[r] as usize..region_off[r + 1] as usize;
-            let mut faces: Vec<Option<TowerFace>> = span.clone().map(|t| (unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 })).collect();
-            if reads_of[r] > 1 {
-                for (cm, ct) in &clocked {
-                    faces.extend(span.clone().filter(|&t| silent_at(t)).map(|t| Some(TowerFace { masses: cm[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: ct[t] as u128 })));
-                }
-            }
-            out.push(faces);
+            out.push(span.clone().map(|t| (unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 })).collect());
             if logits {
                 out_z.push(span.map(|t| (unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
             }
@@ -1891,13 +1864,13 @@ impl<'c> CardField<'c> {
     /// lift's covector (held `2^16` finer), the lift's bias and the read matrix, the chart's return and the lane adjoint, and
     /// the state's covector `dx` takes it.
     #[allow(clippy::too_many_arguments)]
-    fn blank_back(&self, field: &Field, words: &mut Words, clock: &CardClock<'c>, dkappa: &CardBuffer<'c, i128>, (wm, wk): (&CardBuffer<'c, u64>, &CardBuffer<'c, u64>), g: &CardBuffer<'c, i128>, dx: &CardBuffer<'c, i64>, sites: usize) -> Result<()> {
+    fn blank_back(&self, field: &Field, words: &mut Words, clock: &CardClock<'c>, dkappa: &CardBuffer<'c, i128>, g: &CardBuffer<'c, i128>, dx: &CardBuffer<'c, i64>, sites: usize) -> Result<()> {
         let d = field.declaration;
         let (dw, a) = (d.width, d.alphabet);
         let l = field.layout();
         let dz = self.timed(Kind::Alloc, || self.take::<i128>((sites * a).max(1))).map_err(device)?;
-        let (mut dkp, mut dzp, mut wmp, mut wkp) = (dkappa.device_ptr(), dz.device_ptr(), wm.device_ptr(), wk.device_ptr());
-        self.launch("field_blank_dz", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut wmp), arg(&mut wkp), arg(&mut dzp)])?;
+        let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
+        self.launch("field_blank_dz", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
         let tiles = (sites as u64).div_ceil(64);
         {
             let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
@@ -2175,7 +2148,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock, clocked_weight): (&[Option<CardClock<'c>>], [u64; 6], &[(u64, u64)]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
+    fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 6]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -2239,10 +2212,6 @@ impl<'c> CardField<'c> {
                     .transpose()
             })
             .collect::<Result<_>>()?;
-        // [§16.45] The clocked faces' weights `(m, K F)` a site, `m = 0` where no clocked face is compared.
-        let (cwm, cwk): (Vec<u64>, Vec<u64>) = clocked_weight.iter().copied().unzip();
-        let cwm_c = self.timed(Kind::Copy, || self.take_up(&cwm)).map_err(device)?;
-        let cwk_c = self.timed(Kind::Copy, || self.take_up(&cwk)).map_err(device)?;
         let covectors = |at: usize| -> [u64; 3] { own.get(at).and_then(Option::as_ref).map_or([dm.device_ptr(), gtau.device_ptr(), gsig.device_ptr()], |b| [b[0].device_ptr(), b[1].device_ptr(), b[2].device_ptr()]) };
         for (at, tick) in ticks.iter().enumerate().rev() {
             set_clock(words, clocks.get(at).and_then(Option::as_ref), base_clock);
@@ -2263,7 +2232,7 @@ impl<'c> CardField<'c> {
                     let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
                     self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
                     self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
-                    self.blank_back(field, words, clock, &dkappa, (&cwm_c, &cwk_c), g, dx, sites)?;
+                    self.blank_back(field, words, clock, &dkappa, g, dx, sites)?;
                 }
             }
         }

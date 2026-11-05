@@ -610,8 +610,9 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
 /// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
 /// step): the further halvings of the last size read and whether the step stands there.
 fn law_scale(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region]) -> (u32, bool) {
-    let on = |field: &Field| compared(&regions.iter().map(|r| field.read_faces(std::slice::from_ref(r)).unwrap().remove(0)).collect::<Vec<_>>(), regions).unwrap();
-    let stands = |new: &Compared| if strict { fewer(old, new) } else { !fewer(new, old) };
+    let on = |field: &Field| compared(&regions.iter().map(|r| field.faces(r).unwrap()).collect::<Vec<_>>(), regions).unwrap();
+    let spans = spans_of(regions);
+    let stands = |new: &Compared| if strict { fewer(old, new, &spans) } else { !fewer(new, old, &spans) };
     let at = |h: u32| stepped(base, step, h0 + h).unwrap();
     let (full, moved) = at(0);
     if !moved {
@@ -627,7 +628,7 @@ fn law_scale(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool,
     if stands(&on(&half)) {
         return (1, true);
     }
-    let (e1, e2) = ((code_of(&on(&full)) - code_of(old)) as i128, (code_of(&on(&half)) - code_of(old)) as i128);
+    let (e1, e2) = ((code_of(&on(&full), &spans) - code_of(old, &spans)) as i128, (code_of(&on(&half), &spans) - code_of(old, &spans)) as i128);
     if e1 <= 0 || e2 <= 0 || 4 * e2 - e1 >= 0 {
         return (1, false);
     }
@@ -640,7 +641,7 @@ fn law_scale(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool,
 /// The read the law makes of a held step on `regions`, from the material before it
 /// ([`FieldLearner::next_scale`]): the further halvings and whether it is refused.
 fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32, bool) {
-    let old = compared(&regions.iter().map(|r| before.read_faces(std::slice::from_ref(r)).unwrap().remove(0)).collect::<Vec<_>>(), regions).unwrap();
+    let old = compared(&regions.iter().map(|r| before.faces(r).unwrap()).collect::<Vec<_>>(), regions).unwrap();
     let (halvings, stands) = law_scale(before, step, h0, &old, false, regions);
     (halvings, !stands)
 }
@@ -672,18 +673,18 @@ fn a_held_step_is_read_on_the_next_section() {
             for (slot, &q) in material.theta.iter_mut().zip(&held.step) {
                 *slot += release(q, held.halvings) as i32;
             }
-            let compared_on = |field: &Field| compared(&[field.read_faces(std::slice::from_ref(&regions[0])).unwrap().remove(0)], &regions).unwrap();
+            let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
             let old = compared_on(&material);
-            assert_eq!(next.change, code_of(&compared_on(&before.field)) - code_of(&old));
+            assert_eq!(next.change, code_of(&compared_on(&before.field), &spans_of(&regions)) - code_of(&old, &spans_of(&regions)));
             assert_eq!((next.halvings, next.refused), law_next(&material, &held.step, held.halvings, &regions));
             let standing = if next.refused { material.clone() } else { stepped(&material, &held.step, held.halvings + next.halvings).unwrap().0 };
-            assert!(!fewer(&compared_on(&standing), &old), "the standing material codes the next regions no higher");
+            assert!(!fewer(&compared_on(&standing), &old, &spans_of(&regions)), "the standing material codes the next regions no higher");
             if next.halvings > 0 || next.refused {
                 halved += 1;
-                assert!(fewer(&compared_on(&before.field), &old), "the step at its size coded them higher");
+                assert!(fewer(&compared_on(&before.field), &old, &spans_of(&regions)), "the step at its size coded them higher");
             }
             // The section's opening read is the standing material's.
-            assert_eq!(receipt.code_before, code_of(&compared_on(&standing)));
+            assert_eq!(receipt.code_before, code_of(&compared_on(&standing), &spans_of(&regions)));
         }
         if learner.holds_step() {
             assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
@@ -701,7 +702,7 @@ fn a_held_step_is_read_on_the_next_section() {
 fn a_step_that_codes_the_next_regions_higher_is_refused() {
     let material = shaped(1);
     let regions = [region()];
-    let compared_on = |field: &Field| compared(&[field.read_faces(std::slice::from_ref(&regions[0])).unwrap().remove(0)], &regions).unwrap();
+    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
     let old = compared_on(&material);
     // The covector is the code's gradient (a deposit subtracts the step), so the step that moved
     // the material to `material + sign(g) 2^k` climbed it; held, it is the negated sign.
@@ -720,8 +721,8 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         assert!(counted.reads <= 4, "k {k}: {} reads", counted.reads);
         assert!(!learner.holds_step());
         assert_eq!(learner.field, material, "the material before the step stands");
-        assert_eq!(faces, material.read_faces(&regions).unwrap());
-        assert_eq!(next.change, code_of(&climbed) - code_of(&old));
+        assert_eq!(faces, vec![material.faces(&regions[0]).unwrap()]);
+        assert_eq!(next.change, code_of(&climbed, &spans_of(&regions)) - code_of(&old, &spans_of(&regions)));
         assert!(next.change > 0);
     }
 }
@@ -734,7 +735,7 @@ fn the_certificate_reads_the_step_s_size_by_the_bounded_law() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let mut learner = FieldLearner::new(field, 2);
     let regions = [region()];
-    let compared_on = |field: &Field| compared(&[field.read_faces(std::slice::from_ref(&regions[0])).unwrap().remove(0)], &regions).unwrap();
+    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
     let (mut deposited, mut withheld) = (0, 0);
     for k in 0..12 {
         // The held step is read first; the certificate reads from the material that stands.
@@ -754,7 +755,7 @@ fn the_certificate_reads_the_step_s_size_by_the_bounded_law() {
         if receipt.deposited {
             deposited += 1;
             assert_eq!(learner.field, stepped(&opening, &step, receipt.halvings).unwrap().0);
-            assert!(fewer(&old, &compared_on(&learner.field)), "the deposit codes its section strictly fewer bits");
+            assert!(fewer(&old, &compared_on(&learner.field), &spans_of(&regions)), "the deposit codes its section strictly fewer bits");
         } else {
             withheld += 1;
             assert_eq!(learner.field, opening);
@@ -1499,10 +1500,7 @@ fn the_laned_fields_covector_matches_its_codes_difference() {
                 read += 1;
                 let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
                 let predicted = (g[i] * 2 * delta as i128) >> shift;
-                // [§16.45] The comparison also reads the faces the clocks read off the blanks, each a code of rounded shares,
-                // so its rounding floor is doubled (read November 5: the laned field's first pace entry codes −8,270 against
-                // −8,334 at `2^20` and −4,146 against −4,167 at `2^19`, and swings ±60 below `2^15`).
-                let tolerance = predicted.abs() / 8 + (128 << h);
+                let tolerance = predicted.abs() / 8 + (64 << h);
                 assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
             }
         }
@@ -1536,7 +1534,7 @@ fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
     let second = [Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
-    let code_on = |field: &Field| code_of(&compared(&field.read_faces(&second).unwrap(), &second).unwrap());
+    let code_on = |field: &Field| code_of(&compared(&[field.faces(&second[0]).unwrap()], &second).unwrap(), &spans_of(&second));
     let mut read = 0;
     for still in [0usize, 1, 2] {
         let mut learner = FieldLearner::new(shaped(still), 14);

@@ -1340,11 +1340,6 @@ impl FieldPass {
 /// read, and each unresolved site's face.
 #[derive(Clone, Debug, Default)]
 struct FieldPass {
-    /// [§16.45] The faces the comparison reads a site at: the released face, and each face a later tick's clock read off a
-    /// blank (one a tick whose clocks the blanks set), all weighed alike; one where nothing clocks a blank or a port is read.
-    faces_read: u64,
-    /// [§16.45] Those clocked faces, tick by tick, at the silent sites in place order.
-    clocked: Vec<Option<TowerFace>>,
     ticks: Vec<TickCell>,
     read: Vec<i32>,
     scale: Vec<i128>,
@@ -2270,10 +2265,6 @@ impl Field {
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, &mut cell)?;
-            if let Some(c) = own.as_deref().filter(|_| region.port.is_none()) {
-                out.faces_read += 1;
-                out.clocked.extend(c.reads.iter().filter(|r| r.is_some()).map(|r| r.as_ref().map(|r| r.face.clone())));
-            }
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
                 let reads = (0..sites).map(|t| Self::silent(region, t).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
@@ -2291,7 +2282,6 @@ impl Field {
                 out.ticks.push(cell);
             }
         }
-        out.faces_read += 1;
         let read = (d.ticks.saturating_sub(1) * d.heads).max(1) as u128;
         out.echo = trips.iter().map(|&t| ((t + read / 2) / read) as u64).collect();
         out.paces = paces;
@@ -2351,7 +2341,7 @@ impl Field {
     /// lift, the chart and the lane adjoint into that state's covector `dx`. Why: the code is read at the last tick and each
     /// blank's face sets a later tick's clocks, so the face is no operand there; without this return the covector missed how
     /// a blank's clock moves with its face (the unified-theory reading of November 5).
-    fn blank_return(&self, read: &BlankRead, rates: &[(usize, i128)], code: Option<(usize, u64, u64)>, reaches: &Reaches, g: &mut [i128], dx: &mut [i64]) -> Result<()> {
+    fn blank_return(&self, read: &BlankRead, rates: &[(usize, i128)], reaches: &Reaches, g: &mut [i128], dx: &mut [i64]) -> Result<()> {
         let (d, l) = (&self.declaration, &self.layout);
         let (dw, a) = (d.width, d.alphabet);
         let (masses, total) = (&read.face.masses, read.face.total as i128);
@@ -2366,12 +2356,6 @@ impl Field {
                 let u = div_nearest(masses[b] as i128 * (self.theta[base + b] as i128 - mean), total);
                 let at = dk.checked_mul(u).and_then(|x| x.checked_mul(ln2_face())).ok_or(TowerError::Refused(PACE_RETURN))?;
                 *slot += release(at, PACE_BITS);
-            }
-        }
-        // [§16.45] The face is compared as the released one is: its covector `p̂ − q` at the site's class, weighed `m/(K F)`.
-        if let Some((target, wm, wk)) = code {
-            for (slot, &v) in dz.iter_mut().zip(&covector(&read.face, target)) {
-                *slot += div_nearest(((v as i128) << LN2_FACE_BITS) * wm as i128, wk as i128);
             }
         }
         for (o, &dzo) in dz.iter().enumerate() {
@@ -2584,8 +2568,7 @@ impl Field {
     /// The region's code on `2^(−20)` bits, and the number of sites it read: `Σ −log₂ p̂_t(u_t)` over its unresolved
     /// sites before its port, and its port's coupling code (§16.24) over the port's places.
     pub fn code(&self, region: &Region) -> Result<(i64, usize)> {
-        let pass = self.pass(region, true)?;
-        let faces = &pass.faces;
+        let faces = self.faces(region)?;
         let end = region.port.map_or(region.classes.len(), |p| p.start);
         let mut code = 0i64;
         let mut count = 0usize;
@@ -2595,21 +2578,8 @@ impl Field {
                 count += 1;
             }
         }
-        // [§16.45] Each face a later tick's clock read off a blank is compared as the released one, the sum over the
-        // faces read averaged so the code stays a code of the sites.
-        if pass.faces_read > 1 {
-            for cell in &pass.ticks {
-                let Some(clock) = cell.clock.as_deref() else { continue };
-                for (read, &class) in clock.reads.iter().zip(region.classes).take(end) {
-                    if let Some(read) = read {
-                        code += read.face.code(class);
-                    }
-                }
-            }
-            code = fit64(div_nearest(code as i128, pass.faces_read as i128))?;
-        }
         if let Some(port) = region.port {
-            code += port_code(faces, &port)?;
+            code += port_code(&faces, &port)?;
             count += region.classes.len() - port.start;
         }
         Ok((code, count))
@@ -3071,8 +3041,6 @@ impl Field {
         let mut dx = vec![0i64; sites * dw];
         {
             let (wm, wk) = region.weight();
-            // [§16.45] Every face the comparison reads is weighed alike, so the released face takes `m/(K F)`.
-            let wk = wk * pass.faces_read;
             // A port's places take their coupling's covector (§16.24), every other open site its own place's.
             let ported = match region.port {
                 Some(port) => Some((port.start, self.port_of(pass, &port)?.0)),
@@ -3134,9 +3102,7 @@ impl Field {
             // and each blank's clock returns through its face into that state's covector.
             if let Some(c) = cell.clock.as_deref() {
                 if let Some(mut r) = returns[at].take() {
-                    let (wm, wk) = region.weight();
-                    let compared = region.port.is_none().then_some((wm, wk * pass.faces_read));
-                    self.clock_return(region, &c.paces, &c.blank, Some((&c.reads, &mut dx, compared)), &mut r, g)?;
+                    self.clock_return(region, &c.paces, &c.blank, Some((&c.reads, &mut dx)), &mut r, g)?;
                 }
             }
         }
@@ -3186,7 +3152,7 @@ impl Field {
     /// blank reads are given, each blank's `δκ` also returns through its face into the state's covector
     /// ([`Field::blank_return`]). The opening takes nothing.
     #[allow(clippy::type_complexity)]
-    fn clock_return(&self, region: &Region, paces: &Paces, blank: &[Option<Shares>], faces: Option<(&[Option<BlankRead>], &mut Vec<i64>, Option<(u64, u64)>)>, r: &mut ClockReturn, g: &mut [i128]) -> Result<()> {
+    fn clock_return(&self, region: &Region, paces: &Paces, blank: &[Option<Shares>], faces: Option<(&[Option<BlankRead>], &mut Vec<i64>)>, r: &mut ClockReturn, g: &mut [i128]) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n) = (d.width, d.complex(), d.modes);
         let m2 = 2 * m;
@@ -3231,12 +3197,11 @@ impl Field {
                 }
             }
         }
-        if let Some((reads, dx, compared)) = faces {
+        if let Some((reads, dx)) = faces {
             let reaches = self.reaches();
-            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty() || compared.is_some()) {
+            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty()) {
                 if let Some(Some(read)) = reads.get(t) {
-                    let code = compared.map(|(wm, wk)| (region.classes[t], wm, wk));
-                    self.blank_return(read, rt, code, &reaches, g, &mut dx[t * dw..(t + 1) * dw])?;
+                    self.blank_return(read, rt, &reaches, g, &mut dx[t * dw..(t + 1) * dw])?;
                 }
             }
         }
@@ -3254,7 +3219,7 @@ impl Field {
                 |(mut faces, mut g), (n, region)| -> Result<_> {
                     let pass = self.pass(region, true)?;
                     self.returned(region, &pass, &mut g)?;
-                    faces.push((n, pass.faces.iter().chain(&pass.clocked).cloned().collect()));
+                    faces.push((n, pass.faces));
                     Ok((faces, g))
                 },
             )
@@ -3272,10 +3237,9 @@ impl Field {
         Ok((faces.into_iter().map(|(_, f)| f).collect(), g))
     }
 
-    /// Each region's faces, read in parallel: its sites' faces, then (§16.45) the faces its clocks read off its blanks, tick
-    /// by tick at the silent sites in place order, which the comparison reads beside them.
+    /// Each region's faces, read in parallel.
     pub fn read_faces(&self, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
-        regions.par_iter().map(|r| self.pass(r, false).map(|p| p.faces.into_iter().chain(p.clocked).collect())).collect()
+        regions.par_iter().map(|r| self.faces(r)).collect()
     }
 
     /// Each region's unresolved sites' logits, read in parallel.
@@ -4006,38 +3970,20 @@ struct HeldStep {
 /// Each unresolved site's face read at its class, the faces the certificates compare.
 /// [definition; agent-inferred, November 3, §16.24] **A section's compared reading**: each open site's face at its
 /// class before its region's port (`(mass, total)`), and the ports' coupling codes summed on `2^(−20)` bits.
-/// [§16.45] Each region's span of pairs and its weight, `(count, m, K F)`: its open sites' faces and the faces its clocks read
-/// off its blanks, `F` the faces read a site, every face weighed alike.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Compared {
     pairs: Vec<(u128, u128)>,
     coupled: i64,
     ported: bool,
-    spans: Vec<(usize, u64, u64)>,
 }
 
 fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Compared> {
-    let mut out = Compared { pairs: Vec::new(), coupled: 0, ported: false, spans: Vec::new() };
+    let mut out = Compared { pairs: Vec::new(), coupled: 0, ported: false };
     for (f, r) in faces.iter().zip(regions) {
-        let sites = r.classes.len();
-        let end = r.port.map_or(sites, |p| p.start);
-        let before = out.pairs.len();
-        out.pairs.extend(f[..sites].iter().zip(r.classes).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
-        // [§16.45] The clocked faces, tick by tick at the silent sites in place order.
-        let silent: Vec<usize> = (0..end).filter(|&t| Field::silent(r, t)).collect();
-        let clocked = &f[sites..];
-        if !clocked.is_empty() && (silent.is_empty() || clocked.len() % silent.len() != 0) {
-            return refuse("clocked faces that are not one a silent site a tick");
-        }
-        for (face, &t) in clocked.iter().zip(silent.iter().cycle()) {
-            let face = face.as_ref().ok_or(TowerError::Refused("a clocked face missing"))?;
-            out.pairs.push((face.masses[r.classes[t]], face.total));
-        }
-        let reads = 1 + if silent.is_empty() { 0 } else { clocked.len() / silent.len() } as u64;
-        let (m, k) = r.weight();
-        out.spans.push((out.pairs.len() - before, m, k * reads));
+        let end = r.port.map_or(r.classes.len(), |p| p.start);
+        out.pairs.extend(f.iter().zip(r.classes).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
         if let Some(port) = r.port {
-            out.coupled += port_code(&f[..sites], &port)?;
+            out.coupled += port_code(f, &port)?;
             out.ported = true;
         }
     }
@@ -4050,19 +3996,25 @@ fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
     Ok(port_reading(&at, port)?.1)
 }
 
+/// Each region's run of compared sites before its port and its weight in the joint code, `(K, m, K)`
+/// ([`Region::weight`], §16.23), in the order [`compared`] reads them.
+fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
+    regions.iter().map(|r| { let (m, k) = r.weight(); (r.unresolved[..r.port.map_or(r.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count(), m, k) }).collect()
+}
+
 /// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`super::weighed_code`])
 /// and the ports' coupling codes (§16.24).
-fn code_of(c: &Compared) -> i64 {
-    weighed_code(&c.pairs, &c.spans) + c.coupled
+fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
+    weighed_code(&c.pairs, spans) + c.coupled
 }
 
 /// Whether `new` codes strictly fewer bits than `old`. Where a port is read, its coupling code has no product form, so
 /// the decision is the codes' on their grain (`2^(−20)` bits, §16.24); otherwise it is the weighed certificate's.
-fn fewer(old: &Compared, new: &Compared) -> bool {
-    if old.ported || new.ported || old.spans != new.spans {
-        code_of(new) < code_of(old)
+fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)]) -> bool {
+    if old.ported || new.ported {
+        code_of(new, spans) < code_of(old, spans)
     } else {
-        fewer_bits_weighed(&old.pairs, &new.pairs, &old.spans)
+        fewer_bits_weighed(&old.pairs, &new.pairs, spans)
     }
 }
 
@@ -4128,15 +4080,16 @@ struct Scaled {
 /// reached 9 to 18 on 14 sections; their direction, not their size, raised the code, which the
 /// parabola reads from two reads where the halvings read it from a dozen.
 fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
-    let stands = |new: &Compared| if strict { fewer(old, new) } else { !fewer(new, old) };
-    let code_old = code_of(old);
+    let spans = spans_of(regions);
+    let stands = |new: &Compared| if strict { fewer(old, new, &spans) } else { !fewer(new, old, &spans) };
+    let code_old = code_of(old, &spans);
     let (full, moved) = stepped(base, step, h0)?;
     if !moved {
         return Ok(Scaled { change: 0, halvings: 0, standing: None });
     }
     let full_faces = realization.read_faces(&full, regions)?;
     let at_full = compared(&full_faces, regions)?;
-    let change = code_of(&at_full) - code_old;
+    let change = code_of(&at_full, &spans) - code_old;
     if stands(&at_full) {
         return Ok(Scaled { change, halvings: 0, standing: Some((full, full_faces)) });
     }
@@ -4151,7 +4104,7 @@ fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, re
         return Ok(Scaled { change, halvings: 1, standing: Some((half, half_faces)) });
     }
     // The parabola through the two excesses (on the codes' `2^(−20)` bits).
-    let (e1, e2) = (i128::from(change), i128::from(code_of(&at_half) - code_old));
+    let (e1, e2) = (i128::from(change), i128::from(code_of(&at_half, &spans) - code_old));
     let a = 4 * e2 - e1;
     if e1 <= 0 || e2 <= 0 || a >= 0 {
         return Ok(nowhere(1));
@@ -4362,12 +4315,13 @@ impl FieldLearner {
         let (faces, g, next) = self.open(regions, realization, true)?;
         let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let faces_old = compared(&faces, regions)?;
-        let code_before = code_of(&faces_old);
+        let spans = spans_of(regions);
+        let code_before = code_of(&faces_old, &spans);
         if faces_old.pairs.is_empty() && !faces_old.ported {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = faces_old.spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         for &(start, len, grain) in &self.field.families_all() {
@@ -4397,7 +4351,7 @@ impl FieldLearner {
         let Some((candidate, faces_new)) = scale.standing else {
             return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change, transfer });
         };
-        let code_after = code_of(&compared(&faces_new, regions)?);
+        let code_after = code_of(&compared(&faces_new, regions)?, &spans);
         self.field = candidate;
         if self.read_held {
             self.held = Some(HeldStep { step, halvings });
