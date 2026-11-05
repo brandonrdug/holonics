@@ -317,6 +317,10 @@ struct CardClock<'c> {
     rates: Pooled<'c, i64>,
     masses: Pooled<'c, u64>,
     totals: Pooled<'c, i128>,
+    /// The blanks' reads the return runs through: the chart and its scales, and the lift.
+    fread: Pooled<'c, i32>,
+    fscale: Pooled<'c, i128>,
+    lift: Pooled<'c, i64>,
 }
 
 /// The words a tick reads its clocks through (§16.44): its own, or the pass's `base` (`kappa`, `tau`, `sigma`, `plain`,
@@ -1829,6 +1833,40 @@ impl<'c> CardField<'c> {
         Ok((self.timed(Kind::Copy, || self.take_up(&packed)).map_err(device)?, self.timed(Kind::Copy, || self.take_up(&cmap)).map_err(device)?))
     }
 
+    /// [definition; §16.44] **A blank's clock returns through its face** (the host's `Field::blank_return`): from each
+    /// silent site's rates' covector `δκ` the face's logits' covector (held `2^30` finer), the encoding's bias and rows, the
+    /// lift's covector (held `2^16` finer), the lift's bias and the read matrix, the chart's return and the lane adjoint, and
+    /// the state's covector `dx` takes it.
+    #[allow(clippy::too_many_arguments)]
+    fn blank_back(&self, field: &Field, words: &mut Words, clock: &CardClock<'c>, dkappa: &CardBuffer<'c, i128>, g: &CardBuffer<'c, i128>, dx: &CardBuffer<'c, i64>, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let (dw, a) = (d.width, d.alphabet);
+        let l = field.layout();
+        let dz = self.timed(Kind::Alloc, || self.take::<i128>((sites * a).max(1))).map_err(device)?;
+        let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
+        self.launch("field_blank_dz", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
+        let tiles = (sites as u64).div_ceil(64);
+        {
+            let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
+            self.launch("field_blank_bias_enc", Self::cells(a as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut bias), arg(&mut dzp), arg(&mut yp)])?;
+        }
+        let dy = self.timed(Kind::Alloc, || self.take::<i64>((sites * dw).max(1))).map_err(device)?;
+        {
+            let (mut enc, mut dzp, mut dyp) = (words.enc, dz.device_ptr(), dy.device_ptr());
+            self.launch("field_blank_dy", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+        }
+        {
+            let (mut gp, mut read, mut bias, mut dyp, mut rp) = (g.device_ptr(), words.read, l.lift_bias as u64, dy.device_ptr(), clock.fread.device_ptr());
+            self.launch("field_blank_lift_read", Self::cells(dw as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut read), arg(&mut bias), arg(&mut dyp), arg(&mut rp)])?;
+        }
+        let dr = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * dw).max(1))).map_err(device)?;
+        self.transposed(words, words.read, dw, dw, dy.device_ptr(), dw, dr.device_ptr(), false, true)?;
+        let back = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * dw).max(1))).map_err(device)?;
+        self.ratio_adjoint(words, clock.fread.device_ptr(), clock.fscale.device_ptr(), dr.device_ptr(), 0, back.device_ptr(), true)?;
+        let (mut bp, mut dxp) = (back.device_ptr(), dx.device_ptr());
+        self.launch("field_blank_dx", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut bp), arg(&mut dxp)])
+    }
+
     /// [definition; §16.44] **The clocks a tick's blanks run at** (the host's `pass`): the face each unresolved site's state
     /// reads now (the chart, the lift, the encoding, at temperature one), each silent site's rate from its shares
     /// (`field_blank_rates`), and the clocks, frames and moments read again on those rates, into a tick's own buffers; the
@@ -1865,6 +1903,9 @@ impl<'c> CardField<'c> {
             rates,
             masses,
             totals,
+            fread,
+            fscale,
+            lift,
         };
         (words.blank_masses, words.blank_totals) = (clock.masses.device_ptr(), clock.totals.device_ptr());
         let mut rp = clock.rates.device_ptr();
@@ -2156,6 +2197,18 @@ impl<'c> CardField<'c> {
                     self.tower_back(field, words, tr, tb, &back, cb)?;
                 }
             }
+            // [§16.44] A tick's own clock was read off the state this tick began from: its moments and rates return now,
+            // and each blank's clock returns through its face into that state's covector (the host's `clock_return`).
+            if let Some(clock) = clocks.get(at).and_then(Option::as_ref) {
+                self.moments_return_at(field, words, g, dmp, regions, sites)?;
+                if paced > 0 {
+                    let dkappa = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
+                    let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
+                    self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
+                    self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
+                    self.blank_back(field, words, clock, &dkappa, g, dx, sites)?;
+                }
+            }
         }
         set_clock(words, None, base_clock);
         (words.gtau, words.gsig) = (gtau.device_ptr(), gsig.device_ptr());
@@ -2171,9 +2224,9 @@ impl<'c> CardField<'c> {
         // through the strands to the families on that clock (the host's `moments_return`); then the clocks return to
         // their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the class sheet, a blank's by
         // the shares of the face its clock read (§16.44); the opening takes nothing.
-        for at in std::iter::once(None).chain((0..clocks.len()).filter(|&k| clocks[k].is_some()).map(Some)) {
-            let [dmp, gtp, gsp] = at.map_or([dm.device_ptr(), gtau.device_ptr(), gsig.device_ptr()], covectors);
-            set_clock(words, at.and_then(|k| clocks[k].as_ref()), base_clock);
+        {
+            let [dmp, gtp, gsp] = [dm.device_ptr(), gtau.device_ptr(), gsig.device_ptr()];
+            set_clock(words, None, base_clock);
             (words.gtau, words.gsig) = (gtp, gsp);
             self.moments_return_at(field, words, g, dmp, regions, sites)?;
             if paced > 0 {
