@@ -802,6 +802,7 @@ pub(super) fn run_with_execution(
         Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
         Some("reach-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::reach_field(args, &mut field_train::host()),
         Some("opening-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::opening_field(args, &mut field_train::host()),
+        Some("length-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::length_field(args, &mut field_train::host()),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, &mut holonics::hnn::tower::realization::HostPass::default()),
@@ -891,7 +892,8 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("restate-field") => field_train::restate_field(args, realization),
         Some("reach-field") => field_train::reach_field(args, realization),
         Some("opening-field") => field_train::opening_field(args, realization),
-        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field or opening-field".into()),
+        Some("length-field") => field_train::length_field(args, realization),
+        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field or length-field".into()),
     }
 }
 /// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field

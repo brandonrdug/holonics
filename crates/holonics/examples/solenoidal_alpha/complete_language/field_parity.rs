@@ -14,7 +14,7 @@
 //! `time-field` reads the card alone over the opening sections and the opening writes and projects a lap from the
 //! measured upper time a site pair, and the held problems' writes from the measured time a sweep.
 
-use super::field_train::{held_regions, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
+use super::field_train::{held_regions, paths_of, problems_of, question_text, region_lengths, section_regions, sections_of, unseen_regions, units_of, views_of, walk, FieldCodec, Problems, TrainRegion};
 use super::tower_train::{count, positive};
 use super::*;
 use holonics::hnn::tower::field::{Field, FieldDeclaration, FieldLearner, FieldNext, FieldRead, FieldRealization, FieldReceipt, HeldRows, HostField, Region, RowCurrent};
@@ -58,14 +58,14 @@ fn passage(args: &[String], section: usize) -> Result<Passage> {
 }
 
 impl Passage {
-    /// A section's regions as `train-field` forms them from `draw` on, read through `realization`
-    /// after `learner`'s held step is read on them (its read returned); with `withheld`, the withheld
+    /// A section's regions as `train-field` forms them from `draw` on, its path states those of `paths`, read through
+    /// `realization` after `learner`'s held step is read on them (its read returned); with `withheld`, the withheld
     /// problems `members` read with their neighbours (the held step then read by the caller).
-    fn regions(&self, members: &[usize], draw: &mut u64, withheld: bool, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
+    fn regions(&self, members: &[usize], paths: &[usize], draw: &mut u64, withheld: bool, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
         if withheld {
             return Ok((unseen_regions(&self.codec, &self.train, members, self.seed).into_iter().map(|(c, u)| TrainRegion::plain(c, u)).collect(), None));
         }
-        section_regions(&self.codec, &self.train, members, self.seed, draw, learner, realization)
+        section_regions(&self.codec, &self.train, members, paths, self.seed, draw, learner, realization)
     }
 
     /// The founded learner of the declaration `D H n STILL f K` at `RATE`.
@@ -284,18 +284,19 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
     let mut host_learner = founded.clone();
     let mut card_learner = founded;
     let order = walk(p.seed, host_learner.laps, p.sections.len());
+    let paths = paths_of(p.seed, host_learner.laps, &p.sections);
     let mut draw = host_learner.laps * p.train.len() as u64;
     let (mut reads_unequal, mut faces_unequal, mut entries_unequal, mut learners_unequal, mut reads_all) = (0usize, 0usize, 0usize, 0usize, 0usize);
     let (mut host_ns, mut card_ns) = (0u128, 0u128);
     // The sections, then the withheld problems as a lap's end reads them.
     let steps: Vec<(usize, bool)> = order.iter().take(sections).map(|&s| (s, false)).chain(std::iter::once((usize::MAX, true))).collect();
     for (k, &(s, end)) in steps.iter().enumerate() {
-        let members = if end { withheld } else { &p.sections[s] };
+        let (members, along): (&[usize], &[usize]) = if end { (withheld, &[]) } else { (&p.sections[s], &paths[s]) };
         let mut host = HostField;
         let mut host_rec = Recorder { inner: &mut host, reads: Vec::new(), logits: Vec::new() };
         let (mut host_draw, mut card_draw) = (draw, draw);
         let t0 = std::time::Instant::now();
-        let (host_regions, host_next) = p.regions(members, &mut host_draw, end, &mut host_learner, &mut host_rec)?;
+        let (host_regions, host_next) = p.regions(members, along, &mut host_draw, end, &mut host_learner, &mut host_rec)?;
         let host_views = views_of(&host_regions);
         let receipt_h = if end {
             let (_, next) = host_learner.read_step_on(&host_views, &mut host_rec).map_err(|e| e.to_string())?;
@@ -306,7 +307,7 @@ pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result
         };
         let t1 = std::time::Instant::now();
         let mut card_rec = Recorder { inner: &mut *card, reads: Vec::new(), logits: Vec::new() };
-        let (card_regions, card_next) = p.regions(members, &mut card_draw, end, &mut card_learner, &mut card_rec)?;
+        let (card_regions, card_next) = p.regions(members, along, &mut card_draw, end, &mut card_learner, &mut card_rec)?;
         let card_views = views_of(&card_regions);
         let receipt_c = if end {
             let (_, next) = card_learner.read_step_on(&card_views, &mut card_rec).map_err(|e| e.to_string())?;
@@ -466,8 +467,9 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     println!("FIELD_TIME_DECLARATION width={} heads={} modes={} still={} contacts={} ticks={} reach={} material={}", d.width, d.heads, d.modes, d.still, d.contacts, d.ticks, d.reach, learner.field.theta.len());
     // The whole lap's site pairs (one read and return a section), from the regions' lengths.
     let order = walk(p.seed, learner.laps, p.sections.len());
+    let paths = paths_of(p.seed, learner.laps, &p.sections);
     let mut lengths_draw = learner.laps * p.train.len() as u64;
-    let lengths: Vec<usize> = order.iter().flat_map(|&s| region_lengths(&p.codec, &p.train, &p.sections[s], p.seed, &mut lengths_draw)).collect();
+    let lengths: Vec<usize> = order.iter().flat_map(|&s| region_lengths(&p.codec, &p.train, &p.sections[s], &paths[s], p.seed, &mut lengths_draw)).collect();
     let lap_pairs: u128 = lengths.iter().map(|&l| (d.heads * l) as u128).sum::<u128>() * d.ticks as u128;
     let lap_sites: usize = lengths.iter().sum();
     let mut worst = (0u128, 1u128); // the largest ns a row as (ns, rows) of a section's reads and return
@@ -478,7 +480,7 @@ pub(super) fn time(args: &[String], card: &mut dyn FieldRealization) -> Result<(
     for (k, &s) in order.iter().take(sections).enumerate() {
         let mut rec = Recorder { inner: &mut *card, reads: Vec::new(), logits: Vec::new() };
         let t0 = std::time::Instant::now();
-        let (regions, next) = p.regions(&p.sections[s], &mut draw, false, &mut learner, &mut rec)?;
+        let (regions, next) = p.regions(&p.sections[s], &paths[s], &mut draw, false, &mut learner, &mut rec)?;
         let views = views_of(&regions);
         let pairs: u128 = views.iter().map(|r| (d.heads * r.classes.len()) as u128).sum::<u128>() * d.ticks as u128;
         let receipt = learner.section_realized(&views, &mut rec).map_err(|e| e.to_string())?;

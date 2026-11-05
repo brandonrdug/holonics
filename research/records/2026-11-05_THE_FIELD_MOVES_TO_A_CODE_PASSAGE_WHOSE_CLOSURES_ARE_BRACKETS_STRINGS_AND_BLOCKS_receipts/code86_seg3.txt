@@ -1,0 +1,69 @@
+FIELD_DECLARATION alphabet=100 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=3771 section=16 rate=8 answer=2062 train=24557 withheld=128 dev=128 sections=1535 laps_read=5 material=31190
+dev sections 841 mean_ms 165 max_ms 1309
+MEASURE lap=dev2 rc=0 wall_s=152.1 peak_rss_kib=874260
+# lap bound 304236 ms (1.2 times the cost read's lap over 1535 sections); a segment 1516944 ms, outer 1576 s
+# seg3 from a40d607004137c2906e760057898adaf8380c8b03f000d6d185862461b0de453.local/run/2026-11-05-code85/seg2/STATE.3 started 21:11:21
+FIELD_STEP_TRANSFER rate=8
+FIELD_LAP lap=0 read=6 before=2.565 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=261540
+FIELD_LAP lap=1 read=7 before=2.519 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=258315
+FIELD_LAP lap=2 read=8 before=2.512 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=255310
+FIELD_LAP lap=3 read=9 before=2.481 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=246223
+FIELD_LAP lap=4 read=10 before=2.476 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=243951
+FIELD_LAPS_HELD lap=5 reason=time left=195112 bound=304236 ms=1321832
+MEASURE lap=seg3 rc=0 wall_s=1322.6 peak_rss_kib=858600
+-1 2.106210 0.068310;0 2.068360 0.074545;1 2.053274 0.077418;2 2.020500 0.085239;3 2.010573 0.086992;4 2.003553 0.088062;
+-1:4.997809:1.578877:1.749697 0:4.980806:1.506879:1.699800 1:4.957662:1.453415:1.666097 2:5.154520:1.405526:1.616228 3:4.966921:1.371656:1.581017 4:5.073155:1.363589:1.574047 
+== HELD128
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=3049
+MEASURE lap=seg3_opening_HELD128 rc=0 wall_s=3.4 peak_rss_kib=228972
+distance	problems	void_mass	length_law
+-128	104	0.076	0.405
+-32	124	0.082	0.476
++0	128	0.085	0.512
++32	128	0.089	0.562
++128	128	0.090	0.695
++512	128	0.076	0.924
+places 900 to 1199	38400	0.068	0.971
+B past the end: mean 1608 places, median 1677, range 784 to 2004; the length law 132
+void mass before the end: mean 29 places
+the opening's expected length less held: mean +1579.9 places, median +1662.3
+== TRAIN
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2836
+MEASURE lap=seg3_opening_TRAIN rc=0 wall_s=3.2 peak_rss_kib=239368
+distance	problems	void_mass	length_law
+-128	109	0.075	0.200
+-32	128	0.085	0.362
++0	128	0.090	0.429
++32	128	0.093	0.494
++128	128	0.092	0.654
++512	128	0.075	0.911
+places 900 to 1199	38400	0.063	0.971
+B past the end: mean 1715 places, median 1731, range 990 to 1956; the length law 152
+void mass before the end: mean 16 places
+the opening's expected length less held: mean +1699.8 places, median +1718.2
+== drift FIELD_LENGTH problems=128 sweeps=2062 refine=0 stopped=64 run_bits=0 reads=65 certified_bits=0.000 passed=0 ms=50736 MEASURE lap=seg3_opening_drift rc=0 wall_s=51.3 peak_rss_kib=725680 
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	+1579.9	+540.6	-1039.2	78.7
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=559 certified_bits=822.465 passed=242 ms=48411
+MEASURE lap=seg3_write rc=0 wall_s=48.8 peak_rss_kib=375876
+opening L less held: mean +1670.0
+drift from the opening to the end: mean -1874.5 a problem
+  to the first void: mean -1858.5 (99% of it); after it: -16.0 (1%)
+  in the refine passes: mean -3.0
+short answers (28): after the sweeps L less held -243.2, the refine passes moved them -3.2
+first void read: median 52 of 240 sweeps; last letter's read: median 517
+RULE: pre-void at least half False; post-void under a quarter True
+bytes written/held 0.253, correlation -0.008, 4 longer, 28 shorter
+written: 32 answers: a fence opened 8, closed 7; parses as Python 6; code lines mean 1.0; identifiers 297, in the question 0.00, in the held answer 0.00
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	156	0.000	178	0.393	0.00
+bracket	far	156	0.000	178	0.607	0.00
+string	near	0	0.000	60	0.400	0.00
+string	far	0	0.000	60	0.583	0.00
+block	near	0	0.000	75	0.000	nan
+block	far	0	0.000	75	0.947	0.00
+RULE: the lowest closure against held is bracket near at 0.00 (under 0.5)
+WORDS written=298 in_training_vocabulary=86 share=0.289
+SEGMENT 3 done 21:35:12
+# seg4 from 955b3cf3862bf76987abb9fdc3000e5cba280138390c72f4a2782ab1a2636689.local/run/2026-11-05-code86/seg3/STATE.4 started 21:35:12

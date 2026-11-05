@@ -3418,3 +3418,356 @@ Failures this could repeat, checked: **bits read as progress** ((b) was a readin
 replaced by the opening read where it writes, with its rule fixed first); **an authored routine standing in for learning**
 (a terminal rule is a law of the clock, not of the task, and is withdrawn on the evidence of the training weight it would
 contradict).
+
+### 16.47 The opening is compared at its boundary
+
+[definition; agent-inferred, November 5, the unified-theory reading of 08:09 UTC] **The law** (`Port::boundary`,
+`boundary_reading`; `opening_region` in the trainer). Beside each training problem's region, its writer's opening is read
+once a lap (the question resolved, the codec's whole extent of 1,229 places open past it) and every place is compared at
+weight one with whether the answer has ended there, never with which letter stands. At a place where the answer holds a
+letter the code is `−log₂(1 − p̂_∅)` and the covector `p̂ − r` takes `r_∅ = 0` and `r_a = p̂_a/(1 − p̂_∅)`, the face's own
+letter shares renormalized off the void: the void's entry is `p̂_∅` and each letter's `−p̂_a p̂_∅/(1 − p̂_∅)`, the exact
+gradient of that code. Past the answer the place is compared with the void. The minimizer is the answer's length law given
+what the face reads. Why (that reading): the writer fixes its length in its first reads and never undoes a letter past the
+true end, so `B` is the expected overrun of a length drawn from the opening's law; the forward code charges the boundary
+only `−log P(length | question)`, a few bits, while the release pays in places; and training meets the opening's far places
+about once in 7,000 regions (cutting main52's opening at +32, +128 and +512 left every void share the same to three
+decimals). The port is the coupling port's (§16.24) with its reading at the boundary, so the card writes the rows the host
+reads from the fetched faces, as it does for the coupling. The field tests pass (66: the covector checks now include a
+port at its boundary against its code's difference, and the boundary's rows and code are read against their definition);
+the trainer's tests pass (a section's regions are its members' and then their openings). The sampled parity ran to its
+400 s deadline, copied from the free clock's parity before the openings tripled its host sections (51 to 93 s against 16 to
+22 s): its three training sections, each read with its openings, are equal on the card and the host in every face,
+covector entry, learner, near field, clock, row, share and current; the withheld section and the write, whose code the
+boundary does not touch, were not reached (`_receipts/law73/boundary73_parity.txt`). It is reported incomplete and was not
+relaunched with a larger deadline.
+
+Trained as exact63 with this one difference, exact63 its control at equal card time (boundary73: the sampled parity, a
+150 s cost read that sets the lap bound, then five segments of 45 card-minutes from main52 segment 3's last state at
+`2^(−12)` under the transfer law, each followed by the opening read and a write of 32 held problems). **Prediction, fixed
+before launch** (that reading), at every segment's last state: `B` at most 80 places; the void share at least 0.754 at 128
+places past the end and 0.988 at 512; the void mass before the end at most 52 places; context and foil within exact63's
+spread; written places within 25% of held; under 20 of 32 written longer. **Rule**: `B` at most 80 with no overrun, the
+boundary was the cause and the law stands; `B` falls but the writing still overruns, the overrun is made after the opening
+and is the next subject; `B` stays over 80, the question is not heard 500 places out at this reach, and the reach is the
+subject.
+
+**Segment 1 of the opening comparison** (boundary73, 3 laps; `_receipts/law73/`). At its last state the opening's void
+mass past the end meets the length law at every distance (0.571 at +32, 0.812 at +128, 0.995 at +512 against 0.564, 0.754
+and 0.988), `B` falls from 222 to 63 places, and the void mass before the end reads 55 (the prediction's at most 52
+misses). At the same lap count as exact63, context 0.1904 against 0.1909 and foil 0.4358 against 0.4354. Its write of the
+32: 12,241 places against 8,976 held (1.36 times; exact63's last state 1.79), 21 longer and 11 shorter, 63 of 93
+restatements exact. By the rule, `B` fell but the writing still overran: the overrun is made after the opening.
+
+[measurement; agent-inferred] **Where the length is decided** (`length-field` on that state: the writer draw for draw, its
+written lengths equal to the write's, and at every read the expected length `L` = letters resolved + `Σ (1 − p̂_∅)` over the
+open places; `length74.txt`). The mean of `L` less the held length is +18.8 at the opening, +40.6 after one read, +62.0
+after four, +84.2 after eight, +98.9 after 64, and holds at +101.6 to +102.0 from read 256 through the three refine
+passes to the written length. The first void is drawn at read 1 or 2 for every problem, far out (median place about 600);
+the refine passes move `L` by +0.3 and do not make the short answers. So 95% of the drift is made in reads 1 to 64, while
+each problem has resolved at most a few dozen of its 1,229 places, and after read 64 the expected length is a martingale
+to within 0.2 places: the length is decided in the sparse states, which training meets about as rarely as it met the
+opening (the unified-theory reading of 09:45 predicted half before the first void; 26% was).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 10:51] **The comparison follows the writer's path**
+(`opening_region`, path75). In place of the opening alone, each training problem's room region a lap is one state of the
+writer's own reading order run on the truth: a keyed order of the extent's places, fresh each lap, its first `k` places
+resolved from the truth and every place past the lowest resolved void resolved as the void, `k`'s octave uniform over the
+twelve octaves of the extent (`k = 0`, the opening, the first), and every open place compared at its boundary at weight
+one. A boundary port may hold resolved places, which carry no face and are not compared, on the host and the card alike;
+the field tests' covector check now includes such a port, and the trainer's check reproduces each path state from its
+draw. Started from boundary73's segment 2 state (where the opening already stands at its law), so that the comparison
+along the path is the one difference, with boundary73's own following segments its control at equal laps. The sampled
+parity read its first two sections, path states included, equal in every read, and ran to its 600 s deadline before the
+rest (`path75_parity.txt`: the path states' definite sources took the host's sections to 132 and 160 s); it is reported
+incomplete and not relaunched with a larger deadline. **Prediction, fixed before launch** (that reading), at each segment's
+last state: the mean drift of `L` from read 0 to the written length under +20 places a problem; written places within a
+quarter of held; under 20 of 32 written longer; the opening's `B` at most 80; context and foil within boundary73's at equal
+laps from that state. **Rule**: drift under +20 and the write within a quarter, the law stands; drift under +20 with the
+write outside, the opening's own law is the error left; drift over +20, the writer's own letters move its end where the
+truth's do not, and its own draws are the subject.
+
+**Segment 2 of the opening comparison** (boundary73, 6 laps). `B` 45 places (median 33), the void share 0.870 at +128 and
+0.999 at +512, the void mass before the end 69 (the share at the end 0.562 against the law's 0.491: the opening now leans
+short). The write: 10,098 places against 8,976 held (1.125 times), 18 longer and 14 shorter, 62 of 77 restatements exact.
+At 6 laps, joint code 1.0269 against exact63's 1.0176, context 0.1898 against 0.1888, foil 0.4330 against 0.4353.
+
+[measurement; agent-inferred] **The 1.125 times is a short opening hiding the drift** (length76: `length-field` on segment
+2's last state, its written lengths equal to segment 2's write, 1,462 card-seconds; `length76.txt`). The mean of `L` less
+held is −15.8 at the opening, +14.4 after one read, +23.6 after four, +35.2 after 16, +40.1 after 64, and +39.7 to +40.0
+from there through the sweeps and the first two refine passes; the last refine pass takes it to the written +35.1 (median
++41.5), all of that from the 14 short answers. The drift from the opening to the written length is +50.9 a problem, and
+reads 1 to 64 carry +55.9 of it. The first void is met at read 1 (median), and that one read carries +30.2: a single
+resolved void far past the end, with the closure past it, raises the expected length by thirty places. The unified-theory
+reading of 11:13 predicted a drift of +40 to +65, at least 80% of it in reads 1 to 64, and `L` within a place after read 64;
+the first two hold and the third holds until the last refine pass. By its rule (drift at least +40) the segment's 1.125
+times is the opening's −16 lean offsetting a drift of +51, and the drift is what the path law must remove.
+
+[measurement; agent-inferred] **The opening is short on its own training problems** (train77: `opening-field` on the same
+state over the first 128 training problems beside the 128 held; `train77.txt`, `lean.py`). The opening's expected length
+less held is −38.3 on the training problems (median −13.8) and −23.6 on the held (median −12.9); `B` 38 and 45 places
+against the length law's 75 and 80, the void mass before the end 77 and 69. The question-blind length law (mean 287.3
+places) leads by −9.5 on these training problems and +10.2 on the held, so the opening falls short of the law by 28.8 places
+on the problems it trains on and 33.8 on the held: the same shortfall on both. It reads the question (its length correlates
++0.663 with held on the training problems and +0.548 on the held; by thirds of the held length its lead is +56, −18 and
+−150 where the law's is +138, +14 and −178). By that reading's rule the lean is not how the question carries to held
+problems: something besides the opening's comparison holds it short on the problems the comparison is fit on.
+
+[measurement; agent-inferred] **The lean swings with the last sections walked** (the unified-theory reading of 12:31;
+`walked.py`). Segment 3's own opening read (128 held problems) sits back on the law: the opening's expected length less
+held +10.0 (median +19.7) against the law's +10.2, `B` 64 places, the void mass before the end 55. So along the boundary
+line the lean on the held problems reads about +10, −23.6 and +10.0 at the three segments' last states, a common shift of
+the void's logit with the opening's shape kept (at −32, the end and +128 places it moved +0.48, +0.50 and +0.63 bits from
+segment 1 to 2 and −0.47, −0.51 and −0.74 from 2 to 3; the mixed band about the end holds some 90 places of `p(1 − p)`, so
+the length moves about 64 places a bit). Segment 2's shortness on both sets was one state of a swing, not a standing lean,
+and the branch of the rule it took is withdrawn. The cause read from the code: `sections_of` sorts the training problems by
+question and answer length and cuts sections of 16, and `section_regions` formed a section's path states from its own
+members, so each step's boundary covector was of one length class, its void entries summing to the members' answer length
+less the opening's expected length, all of one sign (about +150 places a problem in the longest sections, −56 in the
+shortest). `walked.py` reproduces the trainer's sections and walk (every section's longest question plus the extent
+equals the logged section length in all 3,717 sections of the three segments) and reads the mean answer length of the
+last `k` sections each segment's last lap walked, less the passage's 287.3 bytes:
+
+| last lap (read) | k = 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128 |
+|---|---|---|---|---|---|---|---|---|
+| segment 1 (207) | +161.8 | +104.7 | +56.3 | +9.8 | −11.2 | +1.1 | −1.3 | +2.8 |
+| segment 2 (210) | +53.7 | −15.4 | −39.8 | −56.6 | −22.5 | −16.2 | −17.4 | −17.0 |
+| segment 3 (213) | −33.9 | −69.3 | +57.1 | +36.6 | −0.0 | +8.3 | −1.1 | +13.0 |
+
+Segment 2's last lap walked shorter sections than the passage at every depth from 2 to 128, and segments 1 and 3's did
+not; the single last section does not carry the lean.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 12:31] **A lap's path problems are a keyed order
+of the whole passage** (`paths_of`, keyed79). Each section's path states, compared at their boundary, are of problems cut
+from one keyed order of the whole passage, fresh each lap, in the sizes of the sections in the lap's walk, so each
+problem's path is still met once a lap and a step's boundary covector is of every length class at once; the masked regions
+stay with their sections (sorted by length, as their packing needs), and a path state's extent is its question and the
+whole room, so the packing changes only by the questions' spread. The `n`th path state stands on the `n`th member's draw,
+as before. The trainer's tests pass with a section's path problems apart from its members, and a lap's path problems are
+checked to be every trained problem once, in the sections' sizes, keyed afresh each lap. Trained as path75 with this one
+difference, path75 its control lap for lap (from boundary73's segment 2 state, its laps walk the same sections with the
+same draws). **Prediction, fixed before launch** (that reading): at every segment's last state the opening's expected
+length less held is within 10 places of the question-blind law's on the same problems (the 128 held, +10.2; the first
+128 training problems, −9.5), and the drift of `L` from read 0 to the written length is path75's at equal laps. **Rule**:
+the lean still swings by 30 places, the swing is not the sections', and the step is the subject.
+
+**Segment 3 of the opening comparison** (boundary73, 9 laps). The opening on the first 128 training problems (train78)
+sits with the held ones: its expected length less held −0.8 against the law's −9.5 there, +10.0 against +10.2 on the held,
+so the training problems swung with the held (−28.8 and −33.8 against the law at segment 2, +8.7 and −0.2 at segment 3).
+The write: 9,269 places against 8,976 held (1.033 times; 1.36 and 1.125 at segments 1 and 2), 16 longer and 16 shorter,
+60 of 75 restatements exact, the correlation of `B` with the overrun +0.477. At 9 laps, joint code 1.0230, context 0.1868,
+foil 0.4298.
+
+[measurement; agent-inferred] **Along the path the drift is gone** (drift80, the unified-theory reading of 13:26:
+`length-field` on all 128 held problems with `READS 64 KEY`, no refine pass, every state keyed by the shared start's hash
+`7949c565cdd6d613`, so the drifts are paired problem by problem; one draw a problem leaves about ±27 places of noise on a
+32-problem write's mean, and read 64 carries 95 to 110% of the drift; `drift80.txt`, `drift64.py`). About 150 card-seconds
+a state:
+
+| state | `L(0)` less held | `L(64)` less held | drift ± se |
+|---|---|---|---|
+| boundary73 segment 2 (the start) | −23.6 | −1.7 | +21.9 ± 10.0 |
+| boundary73 segment 3 (the control) | +10.0 | +71.4 | +61.5 ± 11.9 |
+| path75 segment 1 (laps matched to the control) | +6.7 | −0.3 | −7.1 ± 9.3 |
+
+Paired, path75 less the control −68.5 ± 15.0, path75 less the start −29.0 ± 12.9, the control less the start +39.5 ±
+15.8. By the rule (drift under +20 on this measure) the comparison along the writer's path removes the drift: its
+expected length after 64 reads stands within a place of held where the opening's alone has risen 61. The start's first 32
+problems reproduce length76's reads exactly (its key is that state's hash), so the bounded read is the whole writer's;
+those 32 drift +55.9 to read 64 and the other 96 +10.6, so segment 2's +51 was mostly its 32. At three laps from the same
+state path75's joint code is 1.0193 against the control's 1.0230, context 0.1846 against 0.1868, foil 0.4283 against
+0.4298, all lower.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 14:20] **The drift is bounded on both sides.**
+Under the opening's comparison alone the drift rose with the swing (from segment 2 to 3, `L(0)` moved +33.6 and `L(64)`
++73.1), so its sparse states doubled whatever lean the opening carried; along the path those states are trained, so
+`L(64)` should follow `L(0)` one for one whatever the swing, and a martingale's drift is zero, not merely small. **Bound,
+fixed before the later reads**: at every later path75 segment and every keyed79 segment, `L(64) − L(0)` on this measure
+(the 128 held, read 64, the shared key) lies between −20 and +20 places; below −20 the path law overcorrects and pushes the
+writer short (`drift80_follow.sh` reads each segment once its chain has written it).
+
+**Segment 1 along the path** (path75, 3 laps from boundary73's segment 2 state; `path75_seg1.txt`). The opening: `B` 61
+places, the void mass before the end 55, its expected length less held +6.7 against the law's +10.2. The write of the 32:
+8,864 places against 8,976 held (0.988 times), 17 longer and 15 shorter, the correlation of `B` with the overrun +0.722,
+59 of 77 restatements exact, 0.760 of its words in the training vocabulary; on these 32 the drift from the opening to the
+written length is −18.6 a problem (one draw each), on the 128 −7.1 ± 9.3. Against the prediction: drift under +20,
+written within a quarter, under 20 of 32 longer, `B` at most 80, context and foil at or under the control's at equal laps;
+each holds, and by the rule the comparison along the writer's path stands.
+
+[measurement; agent-inferred] **How the answers end** (the unified-theory reading of 14:47; `endings.py`, `endings.txt`,
+aggregates over the 32 written beside their held answers). Along the path 30 of 32 end with a final line (`#### ` and a
+number) at their boundary and none carries one earlier (23 at boundary73's segment 2, 28 at its segment 3). By length:
+
+| path75 segment 1 | answers | ending final | bytes written/held | lines | steps (`<<…>>`) | bytes a line |
+|---|---|---|---|---|---|---|
+| shorter by over a quarter | 8 | 7 | 192/377 | 3.9/5.9 | 1.9/3.8 | 68/81 |
+| within a quarter | 13 | 13 | 297/309 | 5.0/4.7 | 2.5/3.5 | 81/83 |
+| longer by over a quarter | 11 | 10 | 315/177 | 4.6/3.7 | 2.1/2.5 | 87/61 |
+
+The short answers close on a final line but carry half the held steps on two fewer lines (they miss steps, not keep
+them tersely), and the long ones' excess is longer lines and about one more line, not more steps; the written steps
+correlate +0.31 with the held. By that reading's rule the content hears its boundary, and the next law decides the
+boundary against the written content.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 14:47] **Refinement is the field's own one-place
+resampling** (`Field::sample_observed`, refine81). Drawn from the whole face, a void inside erased every later letter while
+a boundary drawn as a letter moved out one place and the new boundary waited for the next pass, so the refine passes cut
+deep and grew by one (segment 2's −4.8 places came all in the third pass, from its 14 short answers). Now each pass walks
+each problem's keyed order of all its answer places, passing over a place past the boundary when its turn comes (so an end
+that has moved is met again); a place before the last letter draws from its face restricted to the letters (the void's
+mass removed, an exact integer draw against the rest; a face with no letter mass keeps the letter), and the last letter and
+the boundary place draw from their whole faces, so the end moves one place in or out a draw. The field tests pass (67;
+a new one reads every refine read and finds the boundary moved at most one place between reads and no letter past it).
+**Prediction, fixed before launch** (that reading): on path75's segment 1 state with the same 32 and keys (the sweeps
+identical), the refine passes move the mean written length under 3 places (−2.0 under the old law) and the share of written
+words in the training vocabulary stays at least 0.73 (0.760). **Rule**: if so the law stands and more passes can go to the
+words without cutting answers (main52: 64 of 96 restatements at 3 passes, 81 at 20); a share under 0.73 withdraws it.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 15:04] **The answer is released by octaves of its
+distance from the question** (`Field::sample_observed`, octave82). The endings read says the content hears its boundary
+(30 of 32 close on a final line there), but the boundary barely hears the problem (the written bytes correlate +0.18 with
+the held, the steps +0.31), because the first reads fix the end while nearly every place is open. With exact faces every
+order draws the same joint; with the field's the order decides what the end reads, so the end is drawn after the content it
+depends on. Octave `j` holds the places at distance `[2^j, 2^(j+1))` past the question (the first place at distance one),
+and its places open to the keyed draws only once every place of the earlier octaves is resolved; within an octave the keyed
+order, one place a read, each drawn from its face and closed as before, so the end is drawn reading at least half its answer
+as written. A sweep draws each problem's next open places in that order (a place the closing law has resolved costs no
+read), and the sweeps end once every place is resolved. The field tests pass (68; a new one reads every sweep and finds no
+letter at a later octave while a place of an earlier one is open). Refinement follows as refine81 leaves it; the path law
+in training would follow this order (its states the first `k` places of it run on the truth), but the first read needs no
+training. **Prediction, fixed before launch** (that reading), on path75's segment 1 state, the 128 held, the sweeps only,
+keyed as drift80: the written length's correlation with held at least +0.45; the mean written within a quarter of held;
+the first 32's written/held steps from 0.67 to at least 0.80; at least 28 of the 32 ending on the final line at the
+boundary. **Rule**: if so the law stands and the path law follows it next segment; the mean outside a quarter, the end's
+faces have not met these states, and the path law follows the order for one segment before the law is judged; the mean
+within but the correlation under +0.30, the content does not judge its own completion, and the content's faces are the
+subject.
+
+[measurement; agent-inferred] **The one-place resampling stands** (refine81; `refine81.txt`). On path75's segment 1 state
+with the same 32 and keys, the sweeps equal to that segment's write: the three refine passes moved the written length +0.2
+places a problem (range −2 to +5; the old law −2.0, range −66 to +2), the written less held −1.3 (16 longer, 15 shorter),
+0.747 of the written words in the training vocabulary (0.760), 59 of 75 restatements exact (59 of 77), 30 answers ending on
+a final line at their boundary, the written steps correlating +0.368 with the held (+0.308), one calculation closing in 60.
+By the rule (the move under 3 places, the share at least 0.73) the law stands, and more passes can go to the words without
+cutting answers.
+
+[measurement; agent-inferred] **The octave writer's end has not met its states** (octave82; `octave82.txt`). On path75's
+segment 1 state, untrained for the order, the 128 held keyed as drift80, the sweeps only: 1.494 times held (mean +136.8
+places, median +16.0; 67 longer, 61 shorter), the written length correlating +0.187 with held (drift80's `L(64)` in the
+present order on the same 128: +0.275); on the first 32, 1.907 times held, 10 ending on a final line at the boundary
+(30 under the present order), the steps written over held 0.91, the words in the training vocabulary 0.635 (0.760). Against
+the prediction: correlation at least +0.45 fails, the mean within a quarter fails, the steps at least 0.80 holds (the long
+answers carry more of them), 28 final lines fails. By the rule (the mean outside a quarter) the end's faces have not met the
+states of this order, and **the path law follows the octave order** before the writer is judged: a path state is now the
+first `k` places of the extent by octaves of distance, keyed within an octave (`opening_region`), the states the writer
+meets; the GSM8K line ends here, and the code passage's run trains under it from its founding.
+
+[definition; Brandon, November 5 17:29 and 17:32] **The step fluxes** (`FieldLearner::section_realized`). The certificate
+reread a section under its step and kept the step only where the regions coded strictly fewer bits, halving it or refusing
+it otherwise: a selection on the code, a maximum in effect, which discarded what an expansion measures and cost a full read
+of every section (on path75's second segment the card's 1,483 reads, mostly these rereads, took 645 of its 2,355 s, the
+1,246 reads with their returns 1,668 s). Brandon: "You can't discard failure or mistakes, knowing what causes contraction
+in contrast to expansion is equally important", and the reread "was redundant and harmful in its entirety". The step now
+deposits at its size with no reread; the next section's own covector prices it at first order (the transfer, contraction
+and expansion alike), and the moments carry every covector. A section's code after its step and the change a reread measured
+are no longer read (`FieldReceipt::code_after` and `change` are none), so the lap's rate law reads the transfers alone
+(`step_transfer` with no curvature: the octave against the sign of their sum). The field tests restate the deposit (every
+section deposits, the regions' code falls over twelve) and the first-order change against the code read directly; the
+certificate's own test is retired with it. The held step's read on the next regions (`FIELD_HELD_READ`, a declared
+comparison no run declares) still rereads and is the next to retire.
+
+[agent-inferred, November 5, the unified-theory reading of 17:41] **A finished problem leaves the release's reads**
+(`Field::read_active`): a read meets only the problems with a place to draw, their faces returned at their own places, and
+since each region is read alone the answers are the same bits (the test writes three problems together and each alone, the
+batch padded so its keys are the batch's). About 60% of a 32-answer write's region reads were of finished problems.
+
+[measurement; agent-inferred, November 5] **Where the card's time goes** (prof87: `FIELD_PROFILE`, every launch timed alone
+with the card synchronized around it, and `FIELD_PHASES`, on path75's segment 2 state; `prof87.txt`). A 94 s training read:
+kernels 74.8 s, the card's allocations 12.2 s (33,780 of them), copies 1.2 s; of the kernels the dense affine maps (keys,
+probes, values, the face's lift) 31.3 s (`field_affine_x32` 4,460 launches at 4.9 ms, `x64` 1,548 at 6.1 ms), the contact
+8.9 s and its two backward passes 8.9 s, the exposure 4.3 s. A 33-read write: kernels 17.9 s, the affine maps 10.8 s, the
+contact 3.0 s. During a training section the card's multiprocessors read 96 to 100% busy and the trainer's host process 0.24
+of a core: the card is busy on slow kernels. The affine map was one thread a cell, each cell rescanning its site's whole row
+for the carrier bound and reading its weight row from the card's memory.
+
+[agent-inferred, November 5] **The affine map by tiles** (`affine_tiled`, `field_affine_tiled_x32`/`x64`): a block holds the
+weights and bias in shared memory and walks `256/rows` sites a pass, each site's row loaded once, the same integers (the
+carrier bound per site, the 64- or 128-bit sum, the release, the residual); every map of the declaration fits. Its parity and
+profile against prof87 are tile90.
+
+[definition; agent-inferred, November 5, the unified-theory readings of 17:41 and 18:14] **A read releases a run**
+(`Field::sample_runs`; `sample_observed` is its bound zero, bit for bit). Past each read's free place the walk releases each
+next open place of its order (within the octave in the sweeps) while the entropies of the places it adds, on this read's
+faces, sum strictly below one bit; a refine run takes the next places at or before the boundary whose entropies at their last
+draw sum so, reopens them together, reads once and draws them in order under the boundary rules read before it opened, then
+the closing law. Drawing a run from one read loses at most its total correlation, `ΣH − H_joint ≤ ΣH − H_first`, so the bound
+certifies the loss with no place chosen by its certainty and no maximum in the law (the first place is the walk's own free
+choice); strictly below a bit the added places hold one configuration with more than half their mass. Each read reports its
+certificate on its own faces (`ReleaseRead::bound`, `passed`; `length-field` prints the write's sum), and a refine run passes
+its bound where a redraw moved a context. The field tests pass (69; the runs keep the octave gate, the one-place move of the
+end and the closing law). **Prediction, fixed before launch** (the reading of 17:41 as amended at 18:14): on path75's segment
+2 state, the same 32 and keys, reads per write fall at least 1.5 times. **Rule**: the law stands if the closures (calculations
+that close, final lines at the boundary) and the length stay within their binomial spread at 32; one past it means released
+faces heard each other beyond the bound, and the blank's face is next (run91).
+
+[agent-inferred, November 5] **The card's pool reuses by best fit** (`CardField::take`, `Pools::free_largest`): a kept buffer of
+the requested class or of a class up to twice it serves a request (the least such), and the batch budget is kept by freeing
+the largest kept buffers one at a time instead of every kept buffer at once. prof87 read 33,780 allocations taking 12.2 s of
+a 94 s training read: a batch's buffers of varied classes missed an exact class, and a trim freed every kept buffer that the
+next batch then allocated again. The bits are unchanged (a buffer's contents are undefined until written, zeroed where a call
+says so); the allocations are read again in the next profile.
+
+[measurement; agent-inferred] **The run law stands** (run91; `run91.txt`). On path75's segment 2 state, the same 32 and keys,
+1,229 sweeps and three refine passes, one binary: one place a read made 4,916 reads in 1,016 card-seconds, runs below a bit
+3,282 in 626 (1.50 times fewer reads, 1.62 times less time). Written less held +230.1 against +282.5 (medians +125.0 and
++86.0), final lines at the boundary 23 and 23, calculations closing 1 of 64 and 1 of 56, words in the training vocabulary
+0.756 and 0.738. The closures are equal and the length's difference is about one standard error of a 32-answer mean at these
+spreads, so by the rule the law stands, at the predicted 1.5 times. Both writes overrun: this is the octave writer on a state
+whose path was trained in one keyed order (octave82's finding). The runs certified 10,219 bits over the write, and 3,333
+problem-reads of the refine passes passed the bound on their own faces: a refine run chosen on its places' last draws often
+holds more than a bit when reread.
+
+[measurement; agent-inferred] **The tiled map does not fit a grown field** (tile90, check94; `tile90.txt`, `check94.txt`). The
+tiled map's parity passed on the code passage's founding (every read equal), but its profile on path75's state timed the cell
+map as before: traced, that grown field's maps are 256 × 256 and 64 × 256 (its lanes), whose weights (256 KB) pass a block's
+shared memory, so the tiled map is refused and the cell map runs; the code passage's founding (width 32, `2M` 64) tiles. Its
+rows now lie at the stride `cols + 1` (the unified-theory reading of 18:53: shared memory is a circle of 32 banks, and a stride
+of a multiple of 32 put every lane's term on one bank) and each site's bound is read once a pass. A product tiled over outputs
+and terms, its bounds read first, is owed for grown fields.
+
+[measurement; agent-inferred, the unified-theory reading of 18:53, its check 1] **The room past the front is heard only
+through the near field** (the field tests' `the_room_past_the_front_is_heard_only_through_the_near_field`). A writer's state
+(its first octaves resolved, the rest open and silent) read over the whole room and cut past the front octave's end: cut at
+the end itself, one to three of the front's open faces differ from the whole room's; cut `NEAR − 1 = 5` places past it,
+every face at and before the front is the whole room's bit for bit, at two and four ticks and every front read (octaves 0 to
+5). A silent open place is no one's far source, but the near field meets every place within five, open or not; that one hop
+does not travel further over the ticks. The exact cut is the front's end and five places.
+
+[measurement; agent-inferred] **The GSM8K line's last reads** (`keyed79_seg1.txt`, `drift80_follow.txt`). keyed79's segment 1
+(three laps from boundary73's segment 2 state, lap for lap with path75's segment 1): the opening's lean against the law
+−7.0 places on the held and +1.3 on the training problems, within the prediction's 10; its drift on the 128 −14.5 ± 8.3 and
+path75's segment 2's −7.0 ± 10.0, both within the two-sided bound; keyed79's write −30.4 written less held (14 longer, 18
+shorter), 42 of 65 restatements exact; context 0.1855 and foil 0.4302 at its third lap against path75's 0.1846 and 0.4283.
+The keyed passage's rule reads a swing across segments, and the line stopped after one by Brandon's move to the code passage
+(November 5, 16:29), so it stands untested there; it costs nothing and is carried into the code passage's laws.
+
+[definition; agent-inferred, November 5, the unified-theory readings of 21:07 and 21:19] **A silent stretch past the last
+arrival is one passage** (`Field::silent_stretch`, the card's `silent_stretch` in `field_paces` and `field_pace_kappa_back`).
+Past a region's last arrival (its last site that is not silent) every open place runs the free clock at one rate, the
+expected duration at the first silent place there (`1 + Σ_a p(a) c_h[a]` from the tick before's face, bare at the first
+tick), so a place `D` past it reads `τ_f + D κ₁`; the stretch's covectors `δκ` return to that place, through its face's
+shares and its blank's return. A stretch between two arrivals keeps its per-blank rates. Why: nothing arrives in the
+stretch, and a per-blank rate there is the field's guesses about the stretch driving its own clock (near an uncertain end the
+faces split between the void and a byte, and the far places' clocks race by the sum of those guesses); one rate makes the
+far place's clock the front's plus its distance, the half of the law that should carry length. The other half (regions with
+explicit positions, a far boundary place standing with the front and nothing between) is b2, built after b1's read. The
+host's tests: on a region of fourteen places silent from the eighth, every place past it runs at its first place's rate and
+reads `τ_f + D κ₁` at every later tick while a silent place between arrivals keeps its own face's rate
+(`a_blank_place_runs_at_its_expected_duration`), and the pace covector matches the code's slope over two windows on a region
+with a six-place stretch (`the_pace_covector_matches_the_code_at_two_steps`). With it the path states with no resolved void
+keep the whole room again (`path_front_cut`; the cut of 18:53 declared as `FIELD_PATH_FRONT_CUT`), so their far places are
+compared at the boundary. **Fixed before the read** (21:19), b1 from code84's lap-0 state against code85 at equal laps: the
+hazard past held at least three times the hazard at or under it (code84's segment 2: 0.51); the correlation with held above
++0.3 and written over held 0.7 to 1.4; the opening's void mass at held above 0.3 and at +128 above 0.5; the held context within
+0.02 bits a byte of code85's. **Rule**: a hazard ratio under 1.5 after two laps on the whole room means one rate does not
+carry length, and b2 waits for (c); between 1.5 and 3, two more laps before deciding (code87).

@@ -1,0 +1,9 @@
+== path75_seg2 STATE.2 1a91502c10c029ca 18:03:41 FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=64 ms=161674 MEASURE lap=path75_seg2 rc=0 wall_s=162.1 peak_rss_kib=615708 
+start	128	-23.6	-1.7	+21.9	10.0
+path75_seg2	128	+3.7	-3.3	-7.0	10.0
+path75_seg2 less start: drift -28.9, se 15.6 (paired, 128 problems)
+== keyed79_seg1 STATE.2 815de92c53516ab0 18:41:08 FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=64 ms=166411 MEASURE lap=keyed79_seg1 rc=0 wall_s=166.9 peak_rss_kib=617676 
+start	128	-23.6	-1.7	+21.9	10.0
+keyed79_seg1	128	+3.2	-11.3	-14.5	8.3
+keyed79_seg1 less start: drift -36.4, se 13.4 (paired, 128 problems)
+# follower stopped 19:46:15: the GSM8K chains ended (path75 after segment 2, keyed79 after segment 1)

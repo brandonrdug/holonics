@@ -1,0 +1,6 @@
+# boundary73 binary c21668675d3e99081e053bafbb23d27c084debc1ae9ae63fe40bac10d2847134 parity lock taken 08:23:50
+FIELD_PARITY section=1 withheld=false regions=32 length=1481 sites=27284 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=54684 card_ms=657
+FIELD_PARITY section=2 withheld=false regions=32 length=1533 sites=27908 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=51015 card_ms=819
+FIELD_PARITY section=3 withheld=false regions=32 length=1765 sites=29479 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=92520 card_ms=1231
+MEASURE lap=parity rc=124 wall_s=400.4 peak_rss_kib=5025772
+PARITY FAILED: the chain stops 08:30:31

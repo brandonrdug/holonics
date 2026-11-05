@@ -1,0 +1,41 @@
+# path75 binary 9d99ac9e91af5c23e44c2b2ded25f8bc66fddd2b0d8e33c36b5b0455aa590c7f lock taken 12:21:09
+dev sections 66 mean_ms 1935 max_ms 3868 lap_projection_s 799
+MEASURE lap=dev rc=0 wall_s=154.6 peak_rss_kib=754316
+# lap bound 958970 ms (1.2 times the cost read's lap)
+# path75 from 7949c565cdd6d6130e0adb5c6cd4594b133a47b85945c9fa867619be7ce49f29 12:23:44
+# seg1 from 7949c565cdd6d6130e0adb5c6cd4594b133a47b85945c9fa867619be7ce49f29 started 12:23:48 
+FIELD_STEP_TRANSFER rate=13
+FIELD_LAPS_HELD lap=3 reason=time left=368425 bound=958970 ms=2331575
+MEASURE lap=seg1 rc=0 wall_s=2332.0 peak_rss_kib=615208
+-1 1.026946 0.342693;0 1.025227 0.353871;1 1.020967 0.349674;2 1.019343 0.344442;
+-1:5.717976:0.189810:0.433005 0:5.610063:0.188766:0.437548 1:5.575925:0.186004:0.431824 2:5.570417:0.184636:0.428332 
+0:63:-1:13 1:975:0:14 2:2824:1:14 
+FIELD_OPENING problems=128 places=157312 training_answers=6730 ms=3292
+MEASURE lap=seg1_opening rc=0 wall_s=3.6 peak_rss_kib=236648
+distance	problems	void_mass	length_law
+-128	112	0.199	0.260
+-32	128	0.386	0.418
++0	128	0.475	0.491
++32	128	0.569	0.564
++128	128	0.810	0.754
++512	128	0.998	0.988
+places 900 to 1199	38400	1.000	0.999
+B past the end: mean 61 places, median 49, range 0 to 237; the length law 80
+void mass before the end: mean 55 places
+the opening's expected length less held: mean +6.7 places, median +21.3
+FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- ms=1281444
+MEASURE lap=seg1_write rc=0 wall_s=1281.8 peak_rss_kib=349792
+written: 32 problems, 17 written longer than held, 15 shorter
+correlation of B with the overrun over the written: +0.722
+read	pass	mean L less held	median
+end (3027)	-	-3.5	+9.0
+opening L less held: mean +15.1
+drift from the opening to the end: mean -18.6 a problem
+  to the first void: mean -6.7 (36% of it); after it: -11.9 (64%)
+  in the refine passes: mean -2.0
+short answers (15): after the sweeps L less held -122.4, the refine passes moved them +0.1
+first void read: median 1 of 1228 sweeps; last letter's read: median 2580
+RULE: pre-void at least half True; post-void under a quarter False
+WORDS written=1240 in_training_vocabulary=943 share=0.760
+seg1_write/SAMPLE.tsv restatements 77 1 dropped or added=12 2 dropped or added=2 3 dropped or added=4 equal=59
+SEGMENT 1 done 14:38:00

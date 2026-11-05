@@ -1,0 +1,61 @@
+# seg2 from e87c522094abb7686e6536620a563fe424b152d5c217ea91ccfac5339e6ff250$ROOT/.local/wt/qgchgu-sampler/.local/run/2026-11-05-code84/seg1/STATE.0 started 19:54:16
+FIELD_STEP_TRANSFER rate=8
+FIELD_LAP lap=0 read=2 before=1.695 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=600485
+FIELD_LAP lap=1 read=3 before=1.586 after=- deposited=1535/1535 halvings=0 next_halved=0 next_refused=0 ms=579792
+FIELD_LAPS_HELD lap=2 reason=time left=448932 bound=678865 ms=1208798
+MEASURE lap=seg2 rc=0 wall_s=1209.4 peak_rss_kib=814576
+-1 2.684760 0.010336;0 2.460742 0.010311;1 2.342555 0.015086;
+-1:6.336806:3.065177:3.068981 0:6.688118:2.467307:2.467276 1:4.988273:2.180622:2.191646 
+== HELD128
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2364
+MEASURE lap=seg2_opening_HELD128 rc=0 wall_s=2.7 peak_rss_kib=230760
+distance	problems	void_mass	length_law
+-128	104	0.017	0.405
+-32	124	0.020	0.476
++0	128	0.022	0.512
++32	128	0.023	0.562
++128	128	0.028	0.695
++512	128	0.042	0.924
+places 900 to 1199	38400	0.045	0.971
+B past the end: mean 1653 places, median 1747, range 880 to 2012; the length law 132
+void mass before the end: mean 6 places
+the opening's expected length less held: mean +1648.9 places, median +1745.0
+== TRAIN
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2344
+MEASURE lap=seg2_opening_TRAIN rc=0 wall_s=2.6 peak_rss_kib=239216
+distance	problems	void_mass	length_law
+-128	109	0.009	0.200
+-32	128	0.012	0.362
++0	128	0.013	0.429
++32	128	0.015	0.494
++128	128	0.018	0.654
++512	128	0.033	0.911
+places 900 to 1199	38400	0.036	0.971
+B past the end: mean 1774 places, median 1787, range 992 to 1962; the length law 152
+void mass before the end: mean 2 places
+the opening's expected length less held: mean +1773.0 places, median +1785.9
+== drift FIELD_LENGTH problems=128 sweeps=2062 refine=0 stopped=64 run_bits=0 reads=65 certified_bits=0.000 passed=0 ms=54906 MEASURE lap=seg2_opening_drift rc=0 wall_s=55.3 peak_rss_kib=724996 
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	+1648.9	+1173.8	-475.1	75.7
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=7407 certified_bits=5274.498 passed=1911 ms=674217
+MEASURE lap=seg2_write rc=0 wall_s=674.7 peak_rss_kib=375020
+opening L less held: mean +1711.7
+drift from the opening to the end: mean -1506.5 a problem
+  to the first void: mean -1478.2 (98% of it); after it: -28.3 (2%)
+  in the refine passes: mean -0.2
+short answers (16): after the sweeps L less held -222.8, the refine passes moved them +0.2
+first void read: median 262 of 1951 sweeps; last letter's read: median 5759
+RULE: pre-void at least half False; post-void under a quarter True
+bytes written/held 1.749, correlation -0.139, 16 longer, 16 shorter
+written: 32 answers: a fence opened 24, closed 7; parses as Python 1; code lines mean 8.2; identifiers 1981, in the question 0.06, in the held answer 0.06
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	111	0.207	178	0.393	0.53
+bracket	far	111	0.306	178	0.607	0.50
+string	near	83	0.265	60	0.400	0.66
+string	far	83	0.313	60	0.583	0.54
+block	near	11	0.000	75	0.000	nan
+block	far	11	0.455	75	0.947	0.48
+RULE: the lowest closure against held is block far at 0.48 (under 0.5)
+WORDS written=2351 in_training_vocabulary=871 share=0.370
+SEGMENT 2 done 20:49:33

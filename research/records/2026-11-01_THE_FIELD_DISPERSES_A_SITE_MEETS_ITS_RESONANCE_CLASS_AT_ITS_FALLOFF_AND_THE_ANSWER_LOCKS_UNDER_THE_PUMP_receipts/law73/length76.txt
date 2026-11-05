@@ -1,0 +1,30 @@
+# length74 binary 9d99ac9e91af5c23e44c2b2ded25f8bc66fddd2b0d8e33c36b5b0455aa590c7f state STATE.2 7949c565cdd6d6130e0adb5c6cd4594b133a47b85945c9fa867619be7ce49f29 lock taken 11:56:40
+FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- ms=1461654
+MEASURE lap=length rc=0 wall_s=1462.0 peak_rss_kib=349320
+written lengths equal to segment 2's write: True
+read	pass	mean L less held	median
+0	0	-15.8	-6.5
+1	0	+14.4	+12.8
+2	0	+16.7	+9.4
+4	0	+23.6	+11.1
+8	0	+25.3	+1.1
+16	0	+35.2	+32.7
+32	0	+39.7	+34.5
+64	0	+40.1	+41.1
+128	0	+39.7	+41.7
+256	0	+39.9	+40.8
+512	0	+39.8	+41.2
+1024	0	+39.9	+41.0
+1228	0	+39.9	+41.0
+1229	1	+39.9	+41.0
+1989	2	+40.0	+41.5
+2749	3	+40.0	+41.5
+3509	4	+35.1	+41.5
+end (3509)	-	+35.1	+41.5
+opening L less held: mean -15.8
+drift from the opening to the end: mean +50.9 a problem
+  to the first void: mean +35.3 (69% of it); after it: +15.6 (31%)
+  in the refine passes: mean -4.8
+short answers (14): after the sweeps L less held -95.1, the refine passes moved them -11.4
+first void read: median 1 of 1228 sweeps; last letter's read: median 2884
+RULE: pre-void at least half True; post-void under a quarter False

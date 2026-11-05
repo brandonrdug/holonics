@@ -1,0 +1,8 @@
+# keyed79 binary a524db8efb37911322a74b9e8b03e58a9333aafef66d392f5bea0f91a57b013e parity lock taken 13:23:02
+FIELD_PARITY section=1 withheld=false regions=32 length=1576 sites=27284 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=133219 card_ms=494
+FIELD_PARITY section=2 withheld=false regions=32 length=1653 sites=27908 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=165023 card_ms=848
+FIELD_PARITY section=3 withheld=true regions=32 length=1431 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=10722 card_ms=257
+FIELD_PARITY_WRITES problems=1 sweeps=8 host_ms=66251
+FIELD_PARITY_DONE sections=3 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=78 host_ms=308965 card_ms=1600 elapsed_ms=500677
+MEASURE lap=parity rc=0 wall_s=501.8 peak_rss_kib=6089984
+PARITY FAILED on a reading: the chain stops

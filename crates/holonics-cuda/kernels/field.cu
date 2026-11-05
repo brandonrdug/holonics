@@ -760,6 +760,92 @@ __device__ void affine(const FieldWords &w, uint64_t weight, uint64_t bias, uint
     }
 }
 
+// [agent-inferred, November 5] **The affine map by tiles** (Brandon, November 5: where the time goes; the profile read the
+// one-thread-a-cell `affine` at 42% of a training read's kernel time and 61% of a write's, every cell rereading its site's
+// whole row for the carrier bound and its weight row from the card's memory): a block holds `W` and the bias in shared
+// memory and walks `per = blockDim / rows` sites a pass, each site's row loaded once into shared memory, each thread one
+// `(site, output)` cell. The same integers as `affine`: the carrier bound `wmax · xmax · (cols + 1)` per site, the sum in 64
+// bits below `2^62` and in 128 otherwise, the bias at the material's grain, the release and the residual.
+template <typename X>
+__device__ void affine_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    extern __shared__ __align__(16) unsigned char affine_shared[];
+    // [agent-inferred, November 5, the unified-theory reading of 18:53] Shared memory is a circle of 32 banks: `W`'s rows lie
+    // at the stride `cols + 1`, coprime to the banks wherever `cols` is a multiple of 32 (every map of the declaration), so a
+    // warp's lanes, one output row each, read one term each from 32 banks at once and not 32 times from one.
+    const uint32_t stride = cols + 1;
+    int32_t *ws = (int32_t *)affine_shared;
+    int32_t *bs = ws + (uint64_t)rows * stride;
+    uint64_t *xmaxs = (uint64_t *)(affine_shared + ((((uint64_t)rows * stride + rows) * sizeof(int32_t) + 15) & ~(uint64_t)15));
+    const uint32_t per = blockDim.x / rows;
+    X *xs = (X *)(xmaxs + per);
+    for (uint32_t i = threadIdx.x; i < rows * cols; i += blockDim.x) {
+        ws[(i / cols) * stride + i % cols] = w.theta[weight + i];
+    }
+    for (uint32_t i = threadIdx.x; i < rows; i += blockDim.x) {
+        bs[i] = w.theta[bias + i];
+    }
+    const uint32_t p = threadIdx.x / rows, o = threadIdx.x % rows;
+    for (uint64_t t0 = (uint64_t)blockIdx.x * per; t0 < w.T; t0 += (uint64_t)gridDim.x * per) {
+        __syncthreads();
+        for (uint32_t i = threadIdx.x; i < per * cols; i += blockDim.x) {
+            const uint64_t t = t0 + i / cols;
+            xs[i] = t < w.T ? x[t * x_stride + i % cols] : (X)0;
+        }
+        __syncthreads();
+        // Each site's carrier bound read once, by its first output's thread.
+        if (o == 0 && p < per) {
+            const X *xt = xs + (uint64_t)p * cols;
+            uint64_t xmax = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                const uint64_t m = mag64((int64_t)xt[i]);
+                xmax = m > xmax ? m : xmax;
+            }
+            xmaxs[p] = xmax;
+        }
+        __syncthreads();
+        const uint64_t t = t0 + p;
+        if (p >= per || t >= w.T || (only_unresolved && !w.unresolved[t])) {
+            continue;
+        }
+        const X *xt = xs + (uint64_t)p * cols;
+        const uint64_t xmax = xmaxs[p];
+        const uwide terms = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1);
+        if (terms >= ((uwide)1 << 126)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const int32_t *row = ws + (uint64_t)o * stride;
+        wide sum;
+        if (terms < ((uwide)1 << 62)) {
+            int64_t s = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                s += (int64_t)row[i] * (int64_t)xt[i];
+            }
+            sum = s;
+        } else {
+            sum = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                sum += (wide)row[i] * (wide)xt[i];
+            }
+        }
+        sum += (wide)bs[o] << MATERIAL_BITS;
+        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+        if (add) {
+            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+        } else {
+            out[t * out_stride + o] = v;
+        }
+    }
+}
+
+extern "C" __global__ void field_affine_tiled_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    affine_tiled<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+}
+
+extern "C" __global__ void field_affine_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    affine_tiled<int64_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+}
+
 extern "C" __global__ void field_affine_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
     affine<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
 }
@@ -3598,21 +3684,39 @@ extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
     }
 }
 
+// A silent open site (§16.28, the host's `Field::silent`): unresolved, with no carried mixture.
+__device__ __forceinline__ bool silent_at(const FieldWords &w, uint64_t s) {
+    return w.unresolved[s] && w.mix_off[s] == w.mix_off[s + 1];
+}
+
+// [§16.47] A region's silent stretch past its last arrival (the host's `Field::silent_stretch`): the first silent place
+// past its last site that is not silent, zero where every site is silent, the region's length where the last is not.
+__device__ __forceinline__ uint32_t silent_stretch(const FieldWords &w, uint64_t first, uint32_t sites) {
+    for (uint32_t t = sites; t-- > 0;) {
+        if (!silent_at(w, first + t)) {
+            return t + 1;
+        }
+    }
+    return 0;
+}
+
 // [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
 // one thread a paced head and a region over its sites in order: on the class sheet `κ = 2^24 + c_p[u_t]` (§16.16),
-// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`).
+// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`). Past the
+// region's last arrival every place runs at the first silent place's rate (§16.47, one passage).
 extern "C" __global__ void field_paces(FieldWords w) {
     const uint64_t cells = (uint64_t)w.paced * w.R;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t stretch = silent_stretch(w, first, sites);
         const wide one = (wide)1 << PACE_BITS;
         wide clock = 0, variation = 0;
         bool plain = true;
         for (uint32_t t = 0; t < sites; t++) {
             const uint64_t g = first + t;
-            const wide k = one + pace_rate(w, p, g);
+            const wide k = one + pace_rate(w, p, first + (t > stretch ? stretch : t));
             if (t > 0) {
                 clock += k;
                 variation += k < 0 ? -k : k;
@@ -4191,24 +4295,31 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
 
 // [definition; agent-inferred, November 2] **The clocks return to their paces** (the host's tail of `returned`): one
 // thread a paced head and a region, over its sites from the last: `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t` (zero at
-// the region's first site, whose rate ticks no step), into `dkappa[p][t]`.
+// the region's first site, whose rate ticks no step), into `dkappa[p][t]`; past the last arrival the places' covectors
+// return to the first silent place, whose rate they ran at (§16.47).
 extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
     const uint64_t cells = (uint64_t)w.paced * w.R;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        wide tau = 0, sig = 0;
+        const uint32_t stretch = silent_stretch(w, first, sites);
+        wide tau = 0, sig = 0, folded = 0;
         for (uint32_t t = sites; t-- > 0;) {
             const uint64_t at = (uint64_t)p * w.T + first + t;
-            if (t == 0) {
-                dkappa[at] = 0;
-                break;
+            wide own = 0;
+            if (t > 0) {
+                tau += w.gtau[at];
+                sig += w.gsig[at];
+                const int64_t k = w.kappa[at];
+                own = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
             }
-            tau += w.gtau[at];
-            sig += w.gsig[at];
-            const int64_t k = w.kappa[at];
-            dkappa[at] = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
+            if (t > stretch) {
+                folded += own;
+                dkappa[at] = 0;
+            } else {
+                dkappa[at] = own + (t == stretch ? folded : 0);
+            }
         }
     }
 }

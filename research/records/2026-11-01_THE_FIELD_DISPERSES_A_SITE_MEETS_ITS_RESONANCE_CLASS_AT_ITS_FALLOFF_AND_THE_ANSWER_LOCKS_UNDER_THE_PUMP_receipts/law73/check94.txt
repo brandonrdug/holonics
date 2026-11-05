@@ -1,0 +1,9 @@
+# check94 binary 8837fa7fbf4d55ad3d6b2ab2e2658a15f1b07e87814c7550e99b826e2aff0fa2 lock taken 19:11:27
+     60 FIELD_AFFINE_TRACE entry=field_affine_x32 rows=256 cols=256 tiling=None
+     60 FIELD_AFFINE_TRACE entry=field_affine_x32 rows=64 cols=256 tiling=None
+     20 FIELD_AFFINE_TRACE entry=field_affine_x64 rows=256 cols=256 tiling=None
+     25 FIELD_AFFINE_TRACE entry=field_affine_x64 rows=256 cols=64 tiling=None
+      1 FIELD_PROFILE entry=field_affine_x32 launches=120 ms=79 us_a_launch=663
+      1 FIELD_PROFILE entry=field_affine_x64 launches=45 ms=30 us_a_launch=686
+      1 FIELD_PROFILE_SPLIT kernels_ms=214 copies=90 copies_ms=4 allocations=540 allocations_ms=2 elapsed_ms=297
+CHECK94 exit 19:11:28

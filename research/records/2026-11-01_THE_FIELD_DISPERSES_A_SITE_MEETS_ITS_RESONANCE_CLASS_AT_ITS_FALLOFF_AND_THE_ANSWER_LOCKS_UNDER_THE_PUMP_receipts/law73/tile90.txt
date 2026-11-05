@@ -1,0 +1,59 @@
+# tile90 binary a0d9686927feffeef7899943cb64f3a7d23670635dcdda710ec5218a8e752bd9 lock taken 18:29:08
+FIELD_PARITY section=1 withheld=false regions=32 length=2304 sites=55891 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=48153 card_ms=845
+FIELD_PARITY section=2 withheld=true regions=32 length=856 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=4498 card_ms=40
+FIELD_PARITY_WRITES problems=1 sweeps=8 host_ms=25892
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=52 host_ms=52652 card_ms=886 elapsed_ms=420761
+MEASURE lap=parity rc=0 wall_s=434.9 peak_rss_kib=5324032
+== train
+FIELD_CARD reads=46 read_ms=27660 returns=50 return_ms=65356 pairs=9824293490 batches=162 peak_store=8511213610 landmarks=0 landmark_ms=0 elapsed_ms=95037
+FIELD_PROFILE_SPLIT kernels_ms=74632 copies=5263 copies_ms=1080 allocations=36933 allocations_ms=10673 elapsed_ms=95037
+MEASURE lap=train rc=0 wall_s=95.5 peak_rss_kib=609076
+FIELD_PROFILE entry=field_affine_x32 launches=4320 ms=18682 us_a_launch=4324
+FIELD_PROFILE entry=field_affine_x64 launches=1458 ms=7967 us_a_launch=5464
+FIELD_PROFILE entry=field_contact_l5 launches=648 ms=7881 us_a_launch=12163
+FIELD_PROFILE entry=field_contact_columns launches=1728 ms=6086 us_a_launch=3522
+FIELD_PROFILE entry=field_contact_rows launches=1728 ms=5702 us_a_launch=3299
+FIELD_PROFILE entry=field_transposed launches=3564 ms=3741 us_a_launch=1049
+FIELD_PROFILE entry=field_pace_skin_back launches=864 ms=3670 us_a_launch=4248
+FIELD_PROFILE entry=field_exposure launches=648 ms=3629 us_a_launch=5600
+FIELD_PROFILE entry=field_outer_x32 launches=5616 ms=2769 us_a_launch=493
+FIELD_PROFILE entry=field_moment_paced_all launches=648 ms=1624 us_a_launch=2506
+FIELD_PROFILE entry=field_outer_x64 launches=972 ms=1133 us_a_launch=1166
+FIELD_PROFILE entry=field_moment_skinned_all launches=432 ms=1064 us_a_launch=2463
+FIELD_PHASE name=batch_drop_and_collect marks=162 ms=1189 us_a_mark=7341
+FIELD_PHASE name=batch_setup marks=162 ms=15383 us_a_mark=94961
+FIELD_PHASE name=face_launch marks=162 ms=1404 us_a_mark=8668
+FIELD_PHASE name=outside_the_card marks=96 ms=1970 us_a_mark=20521
+FIELD_PHASE name=reverse_launch marks=162 ms=32206 us_a_mark=198802
+FIELD_PHASE name=run_setup marks=162 ms=64 us_a_mark=400
+FIELD_PHASE name=status_wait marks=162 ms=4 us_a_mark=27
+FIELD_PHASE name=tick_exposure_wait marks=648 ms=3652 us_a_mark=5635
+FIELD_PHASE name=tick_launch_post marks=648 ms=27538 us_a_mark=42498
+FIELD_PHASE name=tick_launch_pre marks=648 ms=11536 us_a_mark=17802
+== write
+FIELD_CARD reads=33 read_ms=21349 returns=0 return_ms=0 pairs=5743882255 batches=33 peak_store=3665426706 landmarks=0 landmark_ms=0 elapsed_ms=21568
+FIELD_PROFILE_SPLIT kernels_ms=19669 copies=594 copies_ms=550 allocations=3564 allocations_ms=25 elapsed_ms=21568
+MEASURE lap=write rc=0 wall_s=21.9 peak_rss_kib=347016
+FIELD_PROFILE entry=field_affine_x32 launches=792 ms=8556 us_a_launch=10804
+FIELD_PROFILE entry=field_contact_l5 launches=132 ms=3371 us_a_launch=25542
+FIELD_PROFILE entry=field_affine_x64 launches=297 ms=3274 us_a_launch=11026
+FIELD_PROFILE entry=field_exposure launches=132 ms=1733 us_a_launch=13130
+FIELD_PROFILE entry=field_tied_face launches=132 ms=909 us_a_launch=6892
+FIELD_PROFILE entry=field_moment_paced_all launches=132 ms=540 us_a_launch=4096
+FIELD_PROFILE entry=field_chart launches=396 ms=248 us_a_launch=627
+FIELD_PROFILE entry=field_paces launches=132 ms=152 us_a_launch=1154
+FIELD_PROFILE entry=field_unit_probe launches=132 ms=126 us_a_launch=961
+FIELD_PROFILE entry=field_unit launches=132 ms=123 us_a_launch=938
+FIELD_PROFILE entry=field_pframes launches=132 ms=100 us_a_launch=761
+FIELD_PROFILE entry=field_pair launches=132 ms=91 us_a_launch=693
+FIELD_PHASE name=batch_drop_and_collect marks=33 ms=1437 us_a_mark=43571
+FIELD_PHASE name=batch_setup marks=33 ms=322 us_a_mark=9763
+FIELD_PHASE name=face_launch marks=33 ms=753 us_a_mark=22841
+FIELD_PHASE name=outside_the_card marks=33 ms=206 us_a_mark=6247
+FIELD_PHASE name=reverse_launch marks=33 ms=0 us_a_mark=0
+FIELD_PHASE name=run_setup marks=33 ms=39 us_a_mark=1204
+FIELD_PHASE name=status_wait marks=33 ms=1 us_a_mark=37
+FIELD_PHASE name=tick_exposure_wait marks=132 ms=1738 us_a_mark=13170
+FIELD_PHASE name=tick_launch_post marks=132 ms=11518 us_a_mark=87260
+FIELD_PHASE name=tick_launch_pre marks=132 ms=5536 us_a_mark=41941
+TILE90 exit 18:38:21

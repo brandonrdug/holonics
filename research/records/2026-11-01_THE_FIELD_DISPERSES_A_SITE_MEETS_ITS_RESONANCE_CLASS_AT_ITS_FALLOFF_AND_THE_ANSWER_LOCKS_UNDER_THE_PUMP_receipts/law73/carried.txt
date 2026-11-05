@@ -1,0 +1,9 @@
+== 2026-11-05-path75/seg1_write
+written: numbers 768: in the question 0.24, carried from an earlier line 0.25, in neither 0.51; annotations 69, arithmetic 64, closed 1; final lines 30, their number written earlier 29
+held:    numbers 753: in the question 0.35, carried from an earlier line 0.29, in neither 0.36; annotations 104, arithmetic 104, closed 100; final lines 32, their number written earlier 32
+== 2026-11-05-boundary73/seg3_write
+written: numbers 804: in the question 0.25, carried from an earlier line 0.28, in neither 0.48; annotations 64, arithmetic 58, closed 1; final lines 28, their number written earlier 24
+held:    numbers 753: in the question 0.35, carried from an earlier line 0.29, in neither 0.36; annotations 104, arithmetic 104, closed 100; final lines 32, their number written earlier 32
+== 2026-11-05-boundary73/seg1_write
+written: numbers 851: in the question 0.21, carried from an earlier line 0.28, in neither 0.51; annotations 84, arithmetic 81, closed 1; final lines 28, their number written earlier 22
+held:    numbers 753: in the question 0.35, carried from an earlier line 0.29, in neither 0.36; annotations 104, arithmetic 104, closed 100; final lines 32, their number written earlier 32

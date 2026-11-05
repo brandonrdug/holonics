@@ -117,8 +117,25 @@ pub(super) fn question_text(q: &[u8]) -> Vec<u8> {
     out
 }
 
-/// The problems of a passage: `question \n answer` blocks separated by a blank line.
+/// The record separator and the unit separator of a passage of records (ASCII `RS` and `US`).
+pub(super) const RECORD: u8 = 0x1E;
+pub(super) const UNIT: u8 = 0x1F;
+
+/// The problems of a passage: `question \n answer` blocks separated by a blank line; or, where the passage carries the
+/// record separator, records `question US answer` separated by it, each part's bytes exact. [agent-inferred, November 5]
+/// Why the records: the code passage (Brandon, November 5: python-codes-25k in place of GSM8K) has answers that hold
+/// blank lines and questions of several lines, which the blank-line blocks would cut; neither separator stands in it.
 pub(super) fn problems_of(text: &[u8]) -> Vec<(Vec<u8>, Vec<u8>)> {
+    if text.contains(&RECORD) {
+        return text
+            .split(|&b| b == RECORD)
+            .filter_map(|record| {
+                let cut = record.iter().position(|&b| b == UNIT)?;
+                let (q, a) = (&record[..cut], &record[cut + 1..]);
+                (!q.is_empty() && !a.is_empty()).then(|| (q.to_vec(), a.to_vec()))
+            })
+            .collect();
+    }
     let mut out = Vec::new();
     for block in text.split(|&b| b == b'\n').collect::<Vec<_>>().split(|line| line.is_empty()) {
         if block.len() < 2 {
@@ -190,6 +207,29 @@ pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
     (4 * m as u128 * k).isqrt() as usize
 }
 
+/// [definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] **A region ends five places
+/// past its lowest void**, the law since code85 stood against the keyed tail at equal laps (held context 2.124 against 2.181
+/// at lap 1, sections 166 ms against 382); `FIELD_TAIL_KEYED` declares the keyed tail over the room it replaced, for
+/// comparison. A training region's tail
+/// is the void and the five places past it (`NEAR` places), a path state past a resolved void ends five places past it, and
+/// the withheld read's tail is cut the same way, so every place before the end keeps its near field and the problem never
+/// hears the codec's room (its longest answer and one). Why: the room's voids are no problem's; the content heard its length
+/// through them, in void crowds and the backward strand's void sum, over as many as 1,700 places.
+pub(super) fn near_tail() -> bool {
+    static NEAR_TAIL: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *NEAR_TAIL.get_or_init(|| std::env::var_os("FIELD_TAIL_KEYED").is_none())
+}
+
+/// [definition; agent-inferred, November 5, the unified-theory reading of 21:19] **A path state with no resolved void keeps
+/// the whole room**: its far open places are compared at the boundary again, the comparisons that taught the opening its
+/// length (code84's segment 2: with them cut the opening's void mass fell to 0.02–0.04 at every distance), now on the clock
+/// that runs a silent stretch past the last arrival at one rate (`Field::silent_stretch`). `FIELD_PATH_FRONT_CUT` declares
+/// the cut it replaced (`NEAR − 1` places past the front octave's end, the margin read and not compared), for comparison.
+pub(super) fn path_front_cut() -> bool {
+    static CUT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *CUT.get_or_init(|| std::env::var_os("FIELD_PATH_FRONT_CUT").is_some())
+}
+
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
 /// codec's answer extent less the answer's: an octave `k` of the room drawn uniform, then a length
 /// uniform in `[2^k, min(2^(k+1) − 1, room)]`. Every octave of tail is met alike, so the field
@@ -198,6 +238,9 @@ pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
 /// would read 3.42 times).
 pub(super) fn tail(seed: u64, draw: u64, room: usize) -> usize {
     let room = room.max(1);
+    if near_tail() {
+        return holonics::hnn::tower::field::NEAR.min(room);
+    }
     let octaves = u64::from(usize::BITS - room.leading_zeros());
     let k = (mix(seed, draw | 1 << 63) % octaves) as u32;
     let low = 1usize << k;
@@ -213,16 +256,91 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
-/// [`section_regions`] counts it): one region a member.
-pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
-    members
+/// [`section_regions`] counts it): one region a member, then each of `paths`' path states ([`opening_region`]).
+pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
+    let mut draws = Vec::with_capacity(members.len());
+    let mut out: Vec<usize> = members
         .iter()
         .map(|&i| {
             let (q, a, _) = &problems[i];
             *draw += 1;
+            draws.push(*draw);
             q.len() + a.len() + tail(seed, *draw, codec.answer - a.len())
         })
-        .collect()
+        .collect();
+    out.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d).map(|r| r.classes.len())));
+    out
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A problem's writer's path, compared at its boundary**: the question
+/// resolved and the codec's whole extent past it, as the writer opens ([`opening`]), then one state of the writer's own
+/// reading order run on the truth: the extent's places by octaves of their distance from the question, keyed within an
+/// octave and fresh each draw, as the writer releases them ([`holonics::hnn::tower::field::Field::sample_realized`];
+/// the unified-theory reading of November 5, 15:04: read on a state the path trained in one keyed order, the octave
+/// writer wrote 1.49 times held, its end's faces never having met these states), its first `k` places resolved
+/// from the truth and every place past the lowest resolved void resolved as the void (the writer's closing law), `k`
+/// drawn so every octave of reads is met alike (`k = 0`, the opening, the first; then `[2^(o−1), 2^o)` within the extent,
+/// uniform). Every open place is an answer port compared at its boundary
+/// ([`holonics::hnn::tower::field::Port::boundary`]) at weight one: the answer's places with whether a letter stands
+/// there, never which, the places past it with the void. Why (the unified-theory readings of November 5, 08:09 and
+/// 10:51; §16.46 and §16.47): the writer fixes its length in its first reads and never undoes a letter past the true
+/// end; compared at the opening alone, the opening met the length law (byte mass past the end 63 places against 222) but
+/// the writer still overran, 95% of the drift of its expected length made in its reads 1 to 64, the sparse states
+/// training meets about as rarely as it met the opening; each octave of reads carries an equal share of where the
+/// length is decided. The boundary's minimizer is the answer's length given the question and what the path has resolved.
+///
+/// [definition; agent-inferred, November 5, the unified-theory readings of 18:53 and 21:19] Before a void is resolved the
+/// path state keeps the whole room, its far open places compared at the boundary (`path_front_cut`); under
+/// `FIELD_PATH_FRONT_CUT` it ends five places past its front, the cut of 18:53 (every place past the front octave is open
+/// and silent and heard by the front only through the near field, so the region is cut `NEAR − 1` places past the front
+/// octave's end, the faces at and before it the whole room's bit for bit, the margin read and not compared at the port's
+/// stop), which kept the faces and dropped the far comparisons that taught the length. Past a resolved void the region ends
+/// `NEAR` places past it (`near_tail`). A state with nothing open is no state (none).
+pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed: u64, draw: u64) -> Option<TrainRegion> {
+    let room = codec.answer;
+    let classes = region_classes(codec, q, a, q.len() + room);
+    let mut unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+    let key = mix(seed, draw | 5 << 61);
+    let octaves = u64::from(usize::BITS - room.leading_zeros()) + 1;
+    let o = (key % octaves) as u32;
+    let k = if o == 0 {
+        0
+    } else {
+        let low = 1usize << (o - 1);
+        let high = ((1usize << o) - 1).min(room);
+        low + (mix(seed, draw | 6 << 61) as usize) % (high - low + 1)
+    };
+    let mut order: Vec<usize> = (q.len()..classes.len()).collect();
+    order.sort_by_key(|&t| (holonics::hnn::tower::field::octave_of(t + 1 - q.len()), mix(key, t as u64), t));
+    for &t in &order[..k] {
+        unresolved[t] = false;
+    }
+    let voided = (q.len()..classes.len()).find(|&t| !unresolved[t] && classes[t] == codec.void());
+    if let Some(end) = voided {
+        for slot in &mut unresolved[end + 1..] {
+            *slot = false;
+        }
+    }
+    if !unresolved.iter().any(|&u| u) {
+        return None;
+    }
+    let (mut classes, mut unresolved, mut stop) = (classes, unresolved, None);
+    if let Some(end) = voided.filter(|_| near_tail()) {
+        let cut = (end + holonics::hnn::tower::field::NEAR).min(classes.len());
+        classes.truncate(cut);
+        unresolved.truncate(cut);
+    }
+    if voided.is_none() && path_front_cut() {
+        let front = holonics::hnn::tower::field::octave_of(order[k] + 1 - q.len());
+        let front_end = (q.len() + (1usize << (front + 1)) - 1).min(classes.len());
+        let cut = (front_end + holonics::hnn::tower::field::NEAR - 1).min(classes.len());
+        classes.truncate(cut);
+        unresolved.truncate(cut);
+        stop = Some(front_end).filter(|&e| e < cut);
+    }
+    // The answer's cells the region holds: past a cut region the answer goes on, so every place it holds is a letter's.
+    let target = a[..a.len().min(classes.len() - q.len())].to_vec();
+    Some(TrainRegion { port: Some((q.len(), codec.void(), target, true, stop)), ..TrainRegion::plain(classes, unresolved) })
 }
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
@@ -237,8 +355,9 @@ pub(super) struct TrainRegion {
     pub echo: Vec<Option<Echo>>,
     /// The sites its open ones were drawn from (§16.23, [`Region::domain`]).
     pub domain: Option<usize>,
-    /// Its answer port, compared through its coupling (§16.24, [`Region::port`]): the first place, the void, the cells.
-    pub port: Option<(usize, usize, Vec<usize>)>,
+    /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
+    /// its boundary (§16.47) rather than through its coupling.
+    pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>)>,
 }
 
 impl TrainRegion {
@@ -250,7 +369,7 @@ impl TrainRegion {
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target)| Port { start: *start, void: *void, target }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop }) }
 }
 
 /// The regions as the field reads them.
@@ -260,13 +379,20 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
 /// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
-/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail). The step the learner holds is read
-/// first on these regions, which it was not fit on, and the held step's read is returned.
-pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
-    let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
+/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then a state of the writer's path of
+/// each of `paths`, the section's share of the lap's keyed passage ([`paths_of`]), compared at its boundary
+/// ([`opening_region`], §16.47), the `n`th on the `n`th member's draw. The step the learner holds is read first on these
+/// regions, which it was not fit on, and the held step's read is returned.
+pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
+    if paths.len() != members.len() {
+        return Err(format!("a section of {} members and {} paths", members.len(), paths.len()).into());
+    }
+    let mut regions: Vec<TrainRegion> = Vec::with_capacity(2 * members.len());
+    let mut draws = Vec::with_capacity(members.len());
     for &i in members {
         let (q, a, _) = &problems[i];
         *draw += 1;
+        draws.push(*draw);
         let length = q.len() + a.len() + tail(seed, *draw, codec.answer - a.len());
         let classes = region_classes(codec, q, a, length);
         regions.push(match shape(seed, *draw, q.len(), length) {
@@ -274,6 +400,8 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Answer(mask) => TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(classes, mask) },
         });
     }
+    // [§16.47] Beside the members' regions, a state of each path problem's writer's path, compared at its boundary.
+    regions.extend(paths.iter().zip(&draws).filter_map(|(&i, &d)| opening_region(codec, &problems[i].0, &problems[i].1, seed, d)));
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -300,6 +428,28 @@ pub(super) fn walk(seed: u64, read: u64, sections: usize) -> Vec<usize> {
     let mut walk: Vec<usize> = (0..sections).collect();
     walk.sort_by_key(|&s| (mix(seed, (read << 40) ^ s as u64), s));
     walk
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A lap's path problems, by section**: the problems whose writer's
+/// path a section compares at its boundary ([`section_regions`]), cut from one keyed order of the whole passage, fresh
+/// each lap, in the sizes of the sections in the lap's walk, so each problem's path is met once a lap. Why (the
+/// unified-theory reading of November 5, 12:31): the sections are cut from problems sorted by length, so a section's own
+/// members' boundary covectors were of one length class and one sign (their void entries sum to the members' answer
+/// length less the opening's expected length), and the opening's void bias followed the last sections walked: segment 2's
+/// last lap walked sections 15 to 57 bytes shorter than the passage at every depth from 2 to 128 sections and its opening
+/// sat 34 places short of the length law, where segments 1 and 3, whose last laps did not, sat on it. The masked regions
+/// stay with their sections, so a section's packing changes only by its path problems' questions.
+pub(super) fn paths_of(seed: u64, read: u64, sections: &[Vec<usize>]) -> Vec<Vec<usize>> {
+    let mut keyed: Vec<usize> = sections.iter().flatten().copied().collect();
+    keyed.sort_by_key(|&i| (mix(seed, 7 << 60 | read << 40 | i as u64), i));
+    let mut out = vec![Vec::new(); sections.len()];
+    let mut rest = keyed.as_slice();
+    for s in walk(seed, read, sections.len()) {
+        let (now, later) = rest.split_at(sections[s].len());
+        out[s] = now.to_vec();
+        rest = later;
+    }
+    out
 }
 
 /// The first draw of the withheld problems' regions, the same every lap (apart from every
@@ -866,13 +1016,18 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // The learner's own lap count keys the walk and the draws: a continued run moves on.
         let read = learner.laps;
         let mut draw = read * train_set.len() as u64;
+        let mut read_after = 0usize;
         let (mut code_before, mut code_after, mut sites, mut deposited, mut halvings, mut held_down, mut refused) = (0i64, 0i64, 0usize, 0usize, 0u64, 0usize, 0usize);
         // The lap's transfers `Σ t` and the own curvatures `Σ b` of the steps they price, over the steps that stood at full size.
         let (mut transfers, mut curvatures, mut priced) = (0i128, 0i128, 0usize);
         let lap_start = std::time::Instant::now();
+        let paths = paths_of(seed, read, &sections);
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
-            let (regions, next) = section_regions(&codec, &train_set, &sections[s], seed, &mut draw, &mut learner, realization)?;
+            let (regions, next) = section_regions(&codec, &train_set, &sections[s], &paths[s], seed, &mut draw, &mut learner, realization)?;
+            // [measurement; agent-inferred, November 5] The section's time by phase (Brandon, November 5: where the time goes):
+            // its regions formed with the held step read on them, then its deposit (with any halving's rereads).
+            let regions_ms = section_start.elapsed().as_millis();
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
             // [measurement; agent-inferred, November 2] **The far pairs' share of the contact covector** (§16.20): on the
@@ -888,10 +1043,14 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                     println!("FIELD_COVECTOR_SHARE lap={lap} section={run_section} head={head} near={near} far={far} far_share={far_share} ms={}", read_start.elapsed().as_millis());
                 }
             }
+            let deposit_start = std::time::Instant::now();
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+            let deposit_ms = deposit_start.elapsed().as_millis();
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
-            code_after += receipt.code_after;
+            if let Some(after) = receipt.code_after {
+                (code_after, read_after) = (code_after + after, read_after + receipt.sites);
+            }
             sites += receipt.sites;
             deposited += usize::from(receipt.deposited);
             halvings += receipt.halvings as u64;
@@ -905,22 +1064,22 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let micro = |c: i64| if receipt.sites == 0 { 0 } else { (c as i128 * 1_000_000) / ((receipt.sites as i128) << 20) };
             let rate_taken = learner.rate_bits;
             println!(
-                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} ms={}",
+                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
-                bits(receipt.code_after, receipt.sites),
+                receipt.code_after.map_or("-".to_string(), |a| bits(a, receipt.sites)),
                 receipt.halvings,
                 receipt.deposited,
                 next_text(receipt.next),
                 receipt.predicted.map_or("-".to_string(), |p| micro(p).to_string()),
-                micro(receipt.change),
+                receipt.change.map_or("-".to_string(), |c| micro(c).to_string()),
                 receipt.transfer.map_or("-".to_string(), |t| micro(t).to_string()),
                 section_start.elapsed().as_millis()
             );
             if let (Some(t), Some(b)) = (receipt.transfer, prior) {
                 (transfers, curvatures, priced) = (transfers + t as i128, curvatures + b, priced + 1);
             }
-            prior = receipt.predicted.filter(|_| receipt.deposited && receipt.halvings == 0).map(|a| receipt.change as i128 - a as i128);
+            prior = receipt.predicted.zip(receipt.change).filter(|_| receipt.deposited && receipt.halvings == 0).map(|(a, c)| c as i128 - a as i128);
             let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
             if over_lap || over_run {
                 // The pending step is judged on the withheld problems as a lap's last step is, so
@@ -933,7 +1092,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                     sections.len(),
                     if over_lap { "lap" } else { "run" },
                     bits(code_before, sites),
-                    bits(code_after, sites),
+                    if read_after == 0 { "-".to_string() } else { bits(code_after, read_after) },
                     lap_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
@@ -949,7 +1108,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             "FIELD_LAP lap={lap} read={} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} next_halved={held_down} next_refused={refused} ms={}",
             learner.laps,
             bits(code_before, sites),
-            bits(code_after, sites),
+            if read_after == 0 { "-".to_string() } else { bits(code_after, read_after) },
             sections.len(),
             lap_start.elapsed().as_millis()
         );
@@ -1442,6 +1601,134 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 5, §16.47] **`length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT [READS KEY]`**: the answer's length as the writer writes it (the unified-theory reading of
+/// November 5, 09:45: if the field's conditionals were one joint law, its expected length would be a martingale along the
+/// writer's path). The writer of `sample-field`, draw for draw ([`Field::sample_observed`]), and at every read each
+/// problem's expected length `L` = the answer places resolved as letters + `Σ (1 − p̂_∅)` over its open places, on `2^(−20)`
+/// places; at the release's end its written length. Writes `LENGTH.tsv` (problem, read, pass, `L`, letters, open; one row
+/// a problem a read), `ENDS.tsv` (each problem's held and written length, the read and place of its first void, and the
+/// place of its last letter and the read that last drew it) and `SAMPLE.tsv` (each answer as `sample-field` writes it),
+/// private, of the held answers. With `READS` and `KEY` (the unified-theory reading of November 5, 13:26): the writer is
+/// keyed by `KEY` (sixteen hex digits) in place of the state's hash, so two states are read on the same keys and their
+/// drifts are paired, and it stops at its sweep `READS` (`0`, never), so reads `0` to `READS` are the whole writer's, its
+/// last sweep then drawing every place left and its ends not the written answer's. A reading only.
+pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 && args.len() != 16 {
+        return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT [READS KEY]".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let field = &learner.field;
+    let held = &held[..limit.min(held.len())];
+    let (reads, key) = match args.get(14..16) {
+        Some([reads, key]) => (count(reads)?, key.as_str()),
+        _ => (0, &args[2][..]),
+    };
+    let seed = u64::from_str_radix(key.get(..16).ok_or("a writer's key of fewer than sixteen hex digits")?, 16).map_err(|_| "a writer's key that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let mut rows = rows_file(&out.join("LENGTH.tsv"), "problem\tread\tpass\tlength\tletters\topen\n")?;
+    // Each problem's first void (read, place) and each place's last letter draw (the read whose draws set it).
+    let mut first_void: Vec<Option<(usize, usize)>> = vec![None; problems.len()];
+    let mut drawn: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
+    let mut before: Option<(Vec<Vec<usize>>, Vec<Vec<bool>>, usize)> = None;
+    let mut failed: Option<String> = None;
+    let mut stopped = None;
+    // [measurement; agent-inferred, November 5, §16.47] `FIELD_WRITER_RUN_BITS`: the writer releases runs bounded by that many
+    // bits past each run's first place ([`Field::sample_runs`]), a declared comparison with one place a read on the same keys.
+    let run_bits: i128 = std::env::var("FIELD_WRITER_RUN_BITS").ok().and_then(|v| v.parse::<i128>().ok()).unwrap_or(0);
+    let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
+    let answers = field
+        .sample_runs(
+            &problems,
+            sweeps,
+            refine,
+            void,
+            seed,
+            run_bits << 20,
+            realization,
+            &mut |done, _| {
+                if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
+                    stopped = Some(done);
+                    return false;
+                }
+                true
+            },
+            &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    if let Some((classes, open, read)) = &before {
+                        for t in q.len()..r.classes[k].len() {
+                            let changed = open[k][t] != r.open[k][t] || classes[k][t] != r.classes[k][t];
+                            if changed && !r.open[k][t] && r.classes[k][t] != void {
+                                drawn[k][t] = Some(*read);
+                            }
+                        }
+                    }
+                    if first_void[k].is_none() {
+                        if let Some(t) = (q.len()..r.classes[k].len()).find(|&t| !r.open[k][t] && r.classes[k][t] == void) {
+                            first_void[k] = Some((r.read, t - q.len()));
+                        }
+                    }
+                    let (mut length, mut letters, mut opened) = (0i128, 0usize, 0usize);
+                    for t in q.len()..r.classes[k].len() {
+                        if !r.open[k][t] {
+                            if r.classes[k][t] != void {
+                                letters += 1;
+                                length += 1 << 20;
+                            }
+                        } else {
+                            opened += 1;
+                            match r.faces.map(|f| f[k][t].as_ref()) {
+                                Some(Some(face)) => length += (((face.total - face.masses[void]) << 20) / face.total) as i128,
+                                Some(None) => failed = Some("an open place with no face".into()),
+                                None => {}
+                            }
+                        }
+                    }
+                    if row(&mut rows, &format!("{k}\t{}\t{}\t{length}\t{letters}\t{opened}\n", r.read, r.pass)).is_err() {
+                        failed = Some("LENGTH.tsv could not be written".into());
+                    }
+                }
+                before = Some((r.classes.to_vec(), r.open.to_vec(), r.read));
+                if r.faces.is_some() {
+                    (reads_made, bound_sum, passed_sum) = (reads_made + 1, bound_sum + r.bound, passed_sum + r.passed);
+                }
+            },
+        )
+        .map_err(|e| e.to_string())?;
+    if let Some(why) = failed {
+        return Err(why.into());
+    }
+    let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
+    let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
+    for (k, places) in answers.iter().enumerate() {
+        let q = problems[k].0.len();
+        let written = places.iter().take_while(|&&c| c != void).count();
+        row(&mut file, &format!("{k}\t{}\n", escaped(&codec.decode(&places[..written]))))?;
+        let held_length = codec.encode(&held[k].1)?.len();
+        let (fv_read, fv_place) = first_void[k].map_or(("-".to_string(), "-".to_string()), |(r, t)| (r.to_string(), t.to_string()));
+        let last = if written == 0 { "-".to_string() } else { (written - 1).to_string() };
+        let last_read = if written == 0 { "-".to_string() } else { drawn[k][q + written - 1].map_or("-".to_string(), |r| r.to_string()) };
+        row(&mut ends, &format!("{k}\t{held_length}\t{written}\t{fv_read}\t{fv_place}\t{last}\t{last_read}\n"))?;
+    }
+    println!(
+        "FIELD_LENGTH problems={} sweeps={sweeps} refine={refine} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
+        problems.len(),
+        stopped.map_or("-".to_string(), |s| s.to_string()),
+        bits(bound_sum as i64, 1),
+        started.elapsed().as_millis()
+    );
+    Ok(())
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each
@@ -1869,8 +2156,12 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
+    /// The keyed tail meets every octave of its room (`FIELD_TAIL_KEYED`; under the law the tail is the near field's).
     #[test]
     fn tails_meet_every_octave_within_their_room() {
+        if near_tail() {
+            return;
+        }
         let room = 100usize;
         let mut octaves = [false; 7];
         for draw in 0..512 {
@@ -1945,8 +2236,31 @@ mod tests {
     /// The regions `section_regions` formed for `members` from `first` on, against the draws they stand on: one region a
     /// member, the truth with the keyed open sites unresolved and nothing carried, weighed over the whole region or over
     /// the answer and its tail.
-    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
-        assert_eq!(regions.len(), members.len());
+    fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], paths: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
+        let mut states = regions[members.len()..].iter();
+        for (n, &i) in paths.iter().enumerate() {
+            let (q, a, _) = &problems[i];
+            // A state with nothing open is no state; every other stands in the paths' order on its member's draw.
+            let Some(expected) = opening_region(codec, q, a, seed, first + n as u64 + 1) else { continue };
+            let opening = states.next().expect("a path state for each path with a place open");
+            assert_eq!(*opening, expected, "member {n}'s path state is its draw's");
+            assert!(opening.unresolved.iter().any(|&u| u), "member {n}'s path state has a place open");
+            assert!(opening.unresolved[..q.len()].iter().all(|&u| !u), "member {n}'s question is resolved");
+            let voided = (q.len()..opening.classes.len()).find(|&t| !opening.unresolved[t] && opening.classes[t] == codec.void());
+            if let Some(end) = voided {
+                assert!(opening.unresolved[end + 1..].iter().all(|&u| !u), "member {n}: every place past the lowest resolved void is resolved");
+                assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}: past a resolved void the path keeps the room");
+            } else {
+                assert!(opening.classes.len() <= q.len() + codec.answer, "member {n}'s path within the room");
+            }
+            let Some((start, void, target, true, stop)) = opening.port.clone() else { panic!("member {n}'s path is compared at its boundary") };
+            assert_eq!((start, void, target), (q.len(), codec.void(), a[..a.len().min(opening.classes.len() - q.len())].to_vec()));
+            if let Some(stop) = stop {
+                assert_eq!(opening.classes.len() - stop, holonics::hnn::tower::field::NEAR - 1, "member {n}: the margin is the near field's");
+            }
+        }
+        assert!(states.next().is_none(), "no path state past the paths'");
+        assert!(regions.len() >= members.len());
         let mut answers = 0;
         for (n, &i) in members.iter().enumerate() {
             let (q, a, _) = &problems[i];
@@ -1971,20 +2285,21 @@ mod tests {
     fn a_section_is_its_draws_and_its_held_step_is_read_on_them() {
         let (codec, problems) = toy();
         let members = [0usize, 1, 2, 3];
+        let paths = [3usize, 0, 2, 1];
         let mut learner = toy_learner(&codec, &problems);
         // The held read is the declared comparison (§16.30); the field's law lets a step stand unread.
         learner.read_held = true;
         let (mut draw, mut held, mut read, mut answers) = (0u64, false, 0usize, 0usize);
         for section in 0..8 {
             let first = draw;
-            let lengths = region_lengths(&codec, &problems, &members, 5, &mut { first });
-            let (regions, next) = section_regions(&codec, &problems, &members, 5, &mut draw, &mut learner, &mut host()).unwrap();
+            let lengths = region_lengths(&codec, &problems, &members, &paths, 5, &mut { first });
+            let (regions, next) = section_regions(&codec, &problems, &members, &paths, 5, &mut draw, &mut learner, &mut host()).unwrap();
             assert_eq!(draw, first + 4);
             assert_eq!(lengths, regions.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), "the projection's lengths are the regions'");
             assert_eq!(next.is_some(), held, "section {section}: a step held is a step read");
             assert!(!learner.holds_step(), "the held step is read before the regions are formed");
             read += usize::from(next.is_some());
-            answers += check_regions(&codec, &problems, &members, 5, first, &regions);
+            answers += check_regions(&codec, &problems, &members, &paths, 5, first, &regions);
             learner.section_realized(&views_of(&regions), &mut host()).unwrap();
             held = learner.holds_step();
         }
@@ -2007,6 +2322,17 @@ mod tests {
         assert_eq!(bits(held[1].0, 4), bits(held[2].0, 4), "the three-decimal reading cannot tell them apart");
     }
 
+    /// A passage of records keeps each question's and answer's bytes exact, blank lines and several lines included.
+    #[test]
+    fn a_passage_of_records_keeps_its_blank_lines() {
+        let text = b"Add two numbers\nin Python\x1f```python\ndef add(a, b):\n\n    return a + b\n```\x1eSay hi\x1fprint('hi')\x1e";
+        let problems = problems_of(text);
+        assert_eq!(problems.len(), 2);
+        assert_eq!(problems[0], (b"Add two numbers\nin Python".to_vec(), b"```python\ndef add(a, b):\n\n    return a + b\n```".to_vec()));
+        assert_eq!(problems[1], (b"Say hi".to_vec(), b"print('hi')".to_vec()));
+        assert_eq!(problems_of(b"Q one\nA one\n\nQ two\nA two\nmore\n"), vec![(b"Q one".to_vec(), b"A one".to_vec()), (b"Q two".to_vec(), b"A two\nmore".to_vec())], "the blank-line blocks as before");
+    }
+
     /// The withheld problems are never in a section, and every other problem is in one.
     #[test]
     fn sections_withhold_their_unseen_problems() {
@@ -2019,6 +2345,26 @@ mod tests {
         trained.sort_unstable();
         assert_eq!(trained, (0..40).collect::<Vec<_>>());
         assert_eq!(sections_of(&problems, 6, 9, 11).1, unseen, "keyed, not drawn afresh");
+    }
+
+    /// A lap's path problems are every trained problem once, in the sections' sizes, keyed afresh each lap and not by
+    /// length: a section's paths are not its own members.
+    #[test]
+    fn a_laps_paths_meet_every_problem_once_across_the_lengths() {
+        let problems: Problems = (0..40).map(|i| (vec![1; 3 + i % 7], vec![2; 5 + i % 3], 5)).collect();
+        let (sections, _) = sections_of(&problems, 6, 9, 11);
+        let (a, b) = (paths_of(11, 4, &sections), paths_of(11, 5, &sections));
+        for paths in [&a, &b] {
+            assert_eq!(paths.iter().map(Vec::len).collect::<Vec<_>>(), sections.iter().map(Vec::len).collect::<Vec<_>>());
+            let mut met = paths.concat();
+            met.sort_unstable();
+            let mut trained = sections.concat();
+            trained.sort_unstable();
+            assert_eq!(met, trained, "each trained problem's path once a lap");
+        }
+        assert_eq!(paths_of(11, 4, &sections), a, "keyed by the lap");
+        assert_ne!(a, b, "fresh each lap");
+        assert!(a.iter().zip(&sections).any(|(p, s)| p != s), "not the sections' own members");
     }
 
     /// The withheld problems are read with their neighbours, over the same sites every lap: each

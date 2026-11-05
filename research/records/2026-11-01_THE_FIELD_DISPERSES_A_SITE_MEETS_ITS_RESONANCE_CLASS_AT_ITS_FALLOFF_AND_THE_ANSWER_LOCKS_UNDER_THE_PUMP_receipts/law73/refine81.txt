@@ -1,0 +1,16 @@
+# refine81 binary 986ac66ff6ef48480713e44b8bdcec46a6f6b1f79ecab0567ab3aa5fb4e95e61 state ae5a24afbd7b3942 lock taken 15:42:23
+FIELD_LENGTH problems=32 sweeps=1229 refine=3 stopped=- ms=1314575
+MEASURE lap=write rc=0 wall_s=1315.0 peak_rss_kib=348328
+sweeps equal to the segment's write: True
+new: written less held -1.3, the refine passes moved the length +0.2 (range -2 to +5), 16 longer and 15 shorter, reads 3033
+old: written less held -3.5, the refine passes moved the length -2.0 (range -66 to +2), 17 longer and 15 shorter, reads 3027
+WORDS written=1219 in_training_vocabulary=911 share=0.747
+write/SAMPLE.tsv restatements 75 1 dropped or added=14 2 dropped or added=1 3 dropped or added=1 equal=59
+answers 32; written ending with a final line at the boundary 30 (a '####' line 31); a final line before the end 0
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	8	7	192/377	3.5/5.9	1.6/3.8	77/81
+within 25%	13	13	297/309	4.8/4.7	2.3/3.5	83/83
+longer by over 25%	11	10	322/177	4.3/3.7	2.1/2.5	109/61
+not ending on a '####' line: 1; their last line's bytes mean 49
+steps against held: correlation +0.368; lines +0.118; bytes +0.149
+REFINE81 exit 16:04:18

@@ -215,10 +215,14 @@ fn covector_matches_the_codes_difference() {
     carried[0] = Some(vec![(1, 40_000), (3, 25_536)]);
     carried[3] = Some(vec![(2, 50_000), (0, 15_536)]);
     carried[4] = Some(vec![(2, 30_000), (4, 20_000), (0, 15_536)]);
-    // [§16.24] And a region whose last three sites are an answer port, compared through its coupling with two cells.
+    // [§16.24] And a region whose last three sites are an answer port, compared through its coupling with two cells;
+    // [§16.47] and the same port compared at its boundary (two letters, then the void), open and with its middle place
+    // resolved (a state of the writer's path).
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
-    let port = Port { start: 4, void: 0, target: &[2, 3] };
-    for (still, r) in [0usize, 1, 2].into_iter().flat_map(|still| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) })]) {
+    const PATH: [bool; 7] = [false, true, false, false, true, false, true];
+    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false, stop: None };
+    let bounded = Port { boundary: true, ..port };
+    for (still, r) in [0usize, 1, 2].into_iter().flat_map(|still| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) })]) {
         let field = shaped(still);
         let g = covector_of(&field, &r);
         let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
@@ -433,13 +437,10 @@ fn framed_field_reads_place() {
     assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]));
 }
 
-/// The learner's deposits are certified: each deposited section codes its own regions in fewer
-/// bits, and over a few sections the regions' code falls from the founding's. (At the rate `2^(−4)`
-/// the opening's three encodings step together and, from the second section, both the full and the
-/// half step raise the code, so every later step is refused; at `2^(−5)` to `2^(−8)` all twelve
-/// deposit, measured November 1.)
+/// [definition; §16.47, Brandon, November 5 17:32] **The step fluxes**: every section deposits its step at its size with no
+/// reread (none is read after it), and over a few sections the regions' code falls from the founding's.
 #[test]
-fn certified_deposits_lower_the_code() {
+fn fluxing_deposits_lower_the_code() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let mut learner = FieldLearner::new(field, 6);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
@@ -450,13 +451,11 @@ fn certified_deposits_lower_the_code() {
     for _ in 0..12 {
         let receipt = learner.section(&regions).unwrap();
         assert_eq!(receipt.sites, 6);
-        if receipt.deposited {
-            assert!(receipt.code_after < receipt.code_before);
-            deposited += 1;
-        }
+        assert!(receipt.code_after.is_none() && receipt.change.is_none() && receipt.halvings == 0, "no reread");
+        deposited += usize::from(receipt.deposited);
     }
     let after: i64 = regions.iter().map(|r| learner.field.code(r).unwrap().0).sum();
-    assert!(deposited >= 6, "deposited {deposited}");
+    assert_eq!(deposited, 12);
     assert!(after < opening, "{after} against {opening}");
 }
 
@@ -725,43 +724,6 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         assert_eq!(next.change, code_of(&climbed, &spans_of(&regions)) - code_of(&old, &spans_of(&regions)));
         assert!(next.change > 0);
     }
-}
-
-/// The certificate reads its step's size by the same bounded law: a section deposits the step
-/// at the size the law stands it at on the section's own regions, strictly fewer bits, or none,
-/// and reads the regions at most three times for it after its opening read.
-#[test]
-fn the_certificate_reads_the_step_s_size_by_the_bounded_law() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 2);
-    let regions = [region()];
-    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
-    let (mut deposited, mut withheld) = (0, 0);
-    for k in 0..12 {
-        // The held step is read first; the certificate reads from the material that stands.
-        learner.held = None;
-        let opening = learner.field.clone();
-        let mut counted = Counted { reads: 0 };
-        let receipt = learner.section_realized(&regions, &mut counted).unwrap();
-        assert!(counted.reads <= 4, "section {k}: {} reads", counted.reads);
-        let mut step = vec![0i128; opening.theta.len()];
-        for &(start, len, grain) in opening.families() {
-            for i in start..start + len {
-                step[i] = deposit_step(learner.first[i], learner.second[i], grain, learner.rate_bits);
-            }
-        }
-        let old = compared_on(&opening);
-        assert_eq!((receipt.halvings, receipt.deposited), law_scale(&opening, &step, 0, &old, true, &regions), "section {k}");
-        if receipt.deposited {
-            deposited += 1;
-            assert_eq!(learner.field, stepped(&opening, &step, receipt.halvings).unwrap().0);
-            assert!(fewer(&old, &compared_on(&learner.field), &spans_of(&regions)), "the deposit codes its section strictly fewer bits");
-        } else {
-            withheld += 1;
-            assert_eq!(learner.field, opening);
-        }
-    }
-    assert!(deposited >= 1, "deposited {deposited} withheld {withheld}");
 }
 
 /// The host realization, its reads counted.
@@ -1038,6 +1000,8 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
     let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let long: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let long_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
+    // [§16.47] A silent stretch of six places past the last arrival, whose rates return to its first place.
+    let stretch_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t >= 20).collect();
     let (mut read, mut seams) = (0usize, 0usize);
     for still in [0usize, 1] {
         let mut d = tiny_declaration(still);
@@ -1049,7 +1013,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
             let grain = field.layout.families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&k)).unwrap().2;
             *v = (((i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64) << grain) >> 32) as i32;
         }
-        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
+        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, Region { classes: &long, unresolved: &stretch_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
             let pass = field.pass(&r, true).unwrap();
             assert!(pass.paces.plain.iter().all(|&p| !p), "the shaped clocks are no byte place");
             let g = covector_of(&field, &r);
@@ -1113,6 +1077,29 @@ fn a_blank_place_runs_at_its_expected_duration() {
         }
     }
     assert!(moved, "no blank ran off the bare rate");
+    // [§16.47] Past the last arrival the silent stretch is one passage: every place there runs at its first place's rate,
+    // so a place `D` past it reads `τ_f + D κ₁`, while a silent place between two arrivals keeps its own face's rate.
+    let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
+    let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
+    let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    assert_eq!(Field::silent_stretch(&stretch), 7);
+    let (mut between, mut past) = (false, 0usize);
+    for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
+        let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
+        for (p, kappa) in clock.paces.kappa.iter().enumerate() {
+            let base = field.layout.pace + p * width;
+            let own = |t: usize| (1i128 << PACE_BITS) + release(clock.blank[t].as_ref().unwrap().iter().map(|&(c, w)| w as i128 * field.theta[base + c as usize] as i128).sum(), STATE_BITS);
+            assert_eq!(kappa[2] as i128, own(2), "a silent place between arrivals keeps its rate");
+            between |= own(2) != 1 << PACE_BITS;
+            assert_eq!(kappa[7] as i128, own(7));
+            for t in 8..14 {
+                assert_eq!(kappa[t], kappa[7], "place {t} runs at the stretch's first rate");
+                assert_eq!(clock.paces.tau[p][t] as i128, clock.paces.tau[p][7] as i128 + (t - 7) as i128 * kappa[7] as i128, "the clock at {t} is c_f + D κ₁");
+                past += (own(t) != own(7)) as usize;
+            }
+        }
+    }
+    assert!(between && past > 0, "the stretch's own faces never differed from its first place's: {between} {past}");
     let written: Vec<bool> = r.unresolved.iter().map(|_| false).collect();
     let full = Region { unresolved: &written, ..r };
     assert!(field.pass(&full, true).unwrap().ticks.iter().all(|c| c.clock.is_none()), "a region with no blank reads one clock");
@@ -1226,7 +1213,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None }) };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1234,6 +1221,43 @@ fn a_port_is_read_through_its_coupling() {
     assert_eq!(field.code(&r).unwrap(), (place + coupled, 1 + 3));
     let unported = Region { port: None, ..r };
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
+}
+
+/// [§16.47] **A port compared at its boundary codes only whether the answer has ended**: before the target's end a place
+/// codes `−log₂(1 − p̂_void)` and its covector moves the void alone against the letters by their own shares (each row sums
+/// to zero within its rounding, and a letter's entry is its share times the void's over the letters'), past it a place
+/// codes the void; the region's code is its place-wise code before the port and that boundary code over the port.
+#[test]
+fn a_port_at_its_boundary_codes_only_the_end() {
+    use crate::hnn::tower::face_code;
+    let field = shaped(1);
+    const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
+    let target = [2usize, 3];
+    let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
+    let faces = field.faces(&r).unwrap();
+    let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
+    let (rows, code) = port_reading(&at, &port).unwrap();
+    let mut expected = 0i64;
+    let one = 1i64 << crate::hnn::tower::COVECTOR_BITS;
+    for (i, ((masses, total), row)) in at.iter().zip(&rows).enumerate() {
+        let share = |a: usize| (((masses[a] << crate::hnn::tower::COVECTOR_BITS) + total / 2) / total) as i64;
+        if i < target.len() {
+            expected += face_code(total - masses[0], *total);
+            assert_eq!(row[0], share(0), "the void's entry is its share, place {i}");
+            assert!(row.iter().sum::<i64>().abs() <= row.len() as i64, "a letter place's row sums to zero, place {i}: {row:?}");
+            for a in 1..row.len() {
+                let predicted = -(share(a) as i128 * share(0) as i128 / (one - share(0)) as i128) as i64;
+                assert!((row[a] - predicted).abs() <= 1, "letter {a} at place {i}: {} against {predicted}", row[a]);
+            }
+        } else {
+            expected += face_code(masses[0], *total);
+            assert_eq!(row[0], share(0) - one, "past the end the void is the target, place {i}");
+        }
+    }
+    assert_eq!(code, expected);
+    let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
+    assert_eq!(field.code(&r).unwrap(), (place + expected, 1 + 3));
 }
 
 /// [definition; §16.28, §16.34] **An open site is silent on the strand**: on a field whose every family is drawn (the
@@ -1310,6 +1334,199 @@ fn refinement_revisits_the_written_answer() {
     field.theta[l.read_bias + 2] = 40 << 16;
     let pointed = field.sample_realized(&problems, 3, 2, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
+}
+
+/// The host realization, the regions each read meets counted.
+struct RegionsCounted {
+    regions: Vec<usize>,
+}
+
+impl FieldRealization for RegionsCounted {
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        field.read_and_return(regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        self.regions.push(regions.len());
+        field.read_faces(regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        field.read_logits(regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+        field.landmarks(region, question, sites, count)
+    }
+}
+
+/// [agent-inferred, November 5] **A finished problem leaves the release's reads**: written together, each problem is written
+/// as it is alone, the same bits, and a read meets only the problems that still have a place to draw.
+#[test]
+fn a_finished_problem_leaves_the_reads() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8, 6]).map(|(q, a)| (*q, a)).collect();
+    for seed in 11..15 {
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        let together = field.sample_realized(&problems, 9, 2, 0, seed, &mut counted, &mut |_, _| true).unwrap();
+        assert!(counted.regions.iter().all(|&n| n <= problems.len()));
+        assert!(counted.regions.iter().sum::<usize>() < counted.regions.len() * problems.len() || counted.regions.iter().all(|&n| n == problems.len()));
+        let mut alone = Vec::new();
+        for (k, problem) in problems.iter().enumerate() {
+            // A problem's keys are its index's, so alone it is written as the batch's `k`th: pad the batch before it.
+            let mut padded: Vec<(&[usize], usize)> = problems[..k].to_vec();
+            padded.push(*problem);
+            alone.push(field.sample_realized(&padded, 9, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap().pop().unwrap());
+        }
+        assert_eq!(together, alone, "seed {seed}");
+    }
+}
+
+/// [measurement; the unified-theory reading of November 5, 18:53, its check 1] **The room past the front is heard only
+/// through the near field**: a writer's state (its question resolved, the places of its first octaves resolved from a truth,
+/// the rest open and silent) read over the whole room and over the room cut past the front octave's end; at and before the
+/// front, cut at the end itself, some of the front's open faces differ, and cut `NEAR − 1` places past it every face is the
+/// whole room's, bit for bit, at two and four ticks.
+#[test]
+fn the_room_past_the_front_is_heard_only_through_the_near_field() {
+    for still in [0usize, 1, 2] {
+        for ticks in [2usize, 4] {
+        let field = shaped_with(FieldDeclaration { reach: 96, ticks, ..tiny_declaration(still) });
+        let reach = field.declaration.reach;
+        let q = [1usize, 4, 0, 2];
+        let truth = [3usize, 1, 2, 4, 1, 3, 2, 1];
+        for (front, margin) in [(0u32, 0usize), (0, 4), (0, 5), (1, 5), (2, 4), (2, 5), (3, 5), (4, 5), (5, 5)] {
+            // Resolved: every place of the octaves before `front` (distances below 2^front); open: the rest of the room.
+            let room = reach - q.len();
+            let cut = q.len() + (1usize << (front + 1)) - 1;
+            let kept_faces = cut;
+            let cut = (cut + margin).min(reach);
+            let mut classes: Vec<usize> = q.to_vec();
+            classes.extend((0..room).map(|d| if d + 1 < (1 << front) { truth[d % truth.len()] } else { 0 }));
+            let open: Vec<bool> = (0..classes.len()).map(|t| t >= q.len() && t + 1 - q.len() >= (1 << front)).collect();
+            let full = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+            let short = field.faces(&Region { classes: &classes[..cut], unresolved: &open[..cut], faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+            let unequal = (0..kept_faces).filter(|&t| full[t] != short[t]).count();
+            eprintln!("ROOM_CUT still={still} front={front} margin={margin} kept={kept_faces} read={cut} room={} unequal={unequal}", classes.len());
+            if margin == NEAR - 1 {
+                assert_eq!(unequal, 0, "still {still} front {front}: a face before the front heard the room past its near field");
+            }
+        }
+        }
+    }
+}
+
+/// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
+/// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
+/// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.
+#[test]
+fn a_read_releases_a_run() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let octave = |d: usize| usize::BITS - 1 - d.leading_zeros();
+    let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
+    for seed in 11..19 {
+        let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        reads_one += counted.regions.len();
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        let mut last: Option<Vec<usize>> = None;
+        let run = field
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, &mut counted, &mut |_, _| true, &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
+                    if let (0, Some(j)) = (r.pass, earliest) {
+                        assert!((q.len()..r.classes[k].len()).all(|t| r.open[k][t] || r.classes[k][t] == 0 || octave(t + 1 - q.len()) <= j), "a letter past octave {j}, seed {seed}");
+                    }
+                }
+                if r.pass > 0 {
+                    let ends: Vec<usize> = problems.iter().enumerate().map(|(k, &(q, _))| (q.len()..r.classes[k].len()).find(|&t| r.classes[k][t] == 0 && !r.open[k][t]).unwrap_or(r.classes[k].len())).collect();
+                    if let Some(before) = &last {
+                        assert!(before.iter().zip(&ends).all(|(a, b)| a.abs_diff(*b) <= 1), "the end moved more than one place a read, seed {seed}");
+                    }
+                    last = Some(ends);
+                }
+            })
+            .unwrap();
+        reads_run += counted.regions.len();
+        for places in &run {
+            if let Some(end) = places.iter().position(|&c| c == 0) {
+                assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}");
+            }
+        }
+        fewer |= counted.regions.len() < reads_one;
+    }
+    assert!(reads_run <= reads_one, "{reads_run} reads in runs against {reads_one}");
+    let _ = fewer;
+}
+
+/// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
+/// distance `d` from the question stands open, no letter stands at a place of a later octave (`⌊log₂ d⌋`); a void's
+/// closing law may resolve later places, as the void tail.
+#[test]
+fn the_answer_is_released_by_octaves_of_distance() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let octave = |d: usize| usize::BITS - 1 - d.leading_zeros();
+    let mut reads = 0;
+    for seed in 11..19 {
+        field
+            .sample_observed(&problems, 9, 0, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
+                    if let Some(j) = earliest {
+                        for t in q.len()..r.classes[k].len() {
+                            if !r.open[k][t] && r.classes[k][t] != 0 {
+                                assert!(octave(t + 1 - q.len()) <= j, "a letter at distance {} while octave {j} is open, seed {seed}", t + 1 - q.len());
+                            }
+                        }
+                    }
+                }
+                reads += 1;
+            })
+            .unwrap();
+    }
+    assert!(reads > 0);
+}
+
+/// [definition; §16.47] **Refinement moves the end one place a read**: between any two reads of the refine passes each
+/// problem's boundary (its first resolved void) moves at most one place, in or out, so no void is drawn before the last
+/// letter and a boundary drawn as a letter moves out by one; the closing law holds at every read.
+#[test]
+fn refinement_moves_the_end_one_place_a_read() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let mut reads = 0;
+    for seed in 11..19 {
+        let mut last: Option<Vec<usize>> = None;
+        field
+            .sample_observed(&problems, 4, 3, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+                if r.pass == 0 {
+                    return;
+                }
+                let ends: Vec<usize> = problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, _))| {
+                        let end = (q.len()..r.classes[k].len()).find(|&t| r.classes[k][t] == 0 && !r.open[k][t]).unwrap_or(r.classes[k].len());
+                        assert!((end..r.classes[k].len()).all(|t| r.classes[k][t] == 0 && !r.open[k][t]), "a letter past the boundary, seed {seed}");
+                        end
+                    })
+                    .collect();
+                if let Some(before) = &last {
+                    for (a, b) in before.iter().zip(&ends) {
+                        assert!(a.abs_diff(*b) <= 1, "the end moved {a} to {b} in one read, seed {seed}");
+                    }
+                }
+                last = Some(ends);
+                reads += 1;
+            })
+            .unwrap();
+    }
+    assert!(reads > 0);
 }
 
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
@@ -1518,7 +1735,8 @@ fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
         let mut learner = FieldLearner::new(shaped(still), 14);
         let receipt = learner.section(&[region()]).unwrap();
         let predicted = receipt.predicted.expect("a predicted change within its carrier") as i128;
-        let change = receipt.change as i128;
+        let r = [region()];
+        let change = (code_of(&compared(&[learner.field.faces(&r[0]).unwrap()], &r).unwrap(), &spans_of(&r)) - receipt.code_before) as i128;
         eprintln!("STEP_PARABOLA still={still} predicted={predicted} change={change}");
         assert!(predicted < 0 && change < 0, "still {still}: predicted {predicted}, change {change}");
         assert!((change - predicted).abs() * 5 <= predicted.abs(), "still {still}: predicted {predicted}, change {change}");

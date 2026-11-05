@@ -761,12 +761,18 @@ pub struct Region<'a> {
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
-/// starts, the void class an unused place writes, and the cells it is compared with.
+/// starts, the void class an unused place writes, and the cells it is compared with; [§16.47] compared through the
+/// coupling, or at its boundary (`boundary`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Port<'a> {
     pub start: usize,
     pub void: usize,
     pub target: &'a [usize],
+    pub boundary: bool,
+    /// [§16.47] Where its comparison stops (none: the region's end): a place from here on is read and not compared, and
+    /// takes no covector (the near field's margin a writer's state keeps past its front, so the faces before it are the
+    /// whole room's).
+    pub stop: Option<usize>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -775,6 +781,9 @@ pub struct Port<'a> {
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     use crate::receiver::coupling::TemperatureRefusal as Why;
+    if port.boundary {
+        return boundary_reading(faces, port);
+    }
     let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
             Why::Short { .. } => "a port with more target cells than places",
@@ -792,6 +801,49 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
         rows.push(row);
     }
     Ok((rows, read.code))
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A port compared at its boundary**: each place is compared with
+/// whether the answer has ended there, never with which letter it holds. Where the target holds a letter (a place before
+/// `target.len()`) the event is a letter, coded `−log₂(1 − p̂_void)`, and its covector `p̂ − r` takes `r` as the face's
+/// own letter shares renormalized off the void, `r_void = 0` and `r_a = p̂_a / (1 − p̂_void)`: the void's entry is
+/// `p̂_void` and each letter's `−p̂_a p̂_void / (1 − p̂_void)`, so no letter's content is compared. Where it holds the
+/// void (a place past the target), the place is compared with the void, `p̂ − e_void` and `−log₂ p̂_void`. Its minimizer
+/// is the answer's length law given what the face reads, the writer's opening's own boundary (the unified-theory reading
+/// of November 5, 08:09: the writer fixes its length in its first reads and never undoes a letter past the true end, so
+/// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
+/// `2^(−20)` bits, read alike by the host's return and the card's. A resolved place (`(∅, 0)`, a state of the writer's
+/// path) is not compared: its row is empty and it adds no code.
+fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i128 << super::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        // A resolved place (a state of the writer's path, §16.47) carries no face and is not compared.
+        if total == 0 && masses.is_empty() {
+            rows.push(Vec::new());
+            continue;
+        }
+        if total == 0 || port.void >= masses.len() {
+            return refuse("a port's face that is empty or misses a class");
+        }
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let void = row[port.void] as i128;
+        if i < port.target.len() {
+            let rest = one - void;
+            for (a, slot) in row.iter_mut().enumerate() {
+                if a != port.void {
+                    *slot = if rest == 0 { 0 } else { fit64(-div_nearest(*slot as i128 * void, rest))? };
+                }
+            }
+            code += crate::hnn::tower::face_code(total - masses[port.void], total);
+        } else {
+            row[port.void] -= one as i64;
+            code += crate::hnn::tower::face_code(masses[port.void], total);
+        }
+        rows.push(row);
+    }
+    Ok((rows, code))
 }
 
 impl Region<'_> {
@@ -875,6 +927,23 @@ struct TickClock {
     moment: Vec<i64>,
     blank: Vec<Option<Shares>>,
     reads: Vec<Option<BlankRead>>,
+}
+
+/// [measurement; agent-inferred, November 5, §16.47] **One read of the release** ([`Field::sample_observed`]): its index
+/// (sweeps first, then the refine steps), its pass (zero for the sweeps, `p` for the `p`-th refine pass), and every
+/// problem's classes, open places and faces as the read meets them (no faces at the release's end).
+pub struct ReleaseRead<'a> {
+    pub read: usize,
+    pub pass: usize,
+    pub classes: &'a [Vec<usize>],
+    pub open: &'a [Vec<bool>],
+    pub faces: Option<&'a [Vec<Option<TowerFace>>]>,
+    /// [measurement; §16.47] The read's runs' certificate ([`Field::sample_runs`]): the entropies past each run's first place
+    /// summed over the problems, read on this read's own faces, on the codes' `2^(−20)` bits (zero, one place a read), and
+    /// the problems whose sum reached the run's bound (a refine run is chosen on its places' last draws, and passes the bound
+    /// where a redraw moved a context).
+    pub bound: i128,
+    pub passed: usize,
 }
 
 /// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
@@ -1595,6 +1664,7 @@ impl Field {
         let sites = region.classes.len();
         let width = d.alphabet + 1;
         let one = 1i128 << PACE_BITS;
+        let stretch = Self::silent_stretch(region);
         let mut out = Paces { row: vec![None; d.heads], ..Default::default() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
             let p = out.kappa.len();
@@ -1603,9 +1673,11 @@ impl Field {
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
-                let rate = match blank.get(t).and_then(Option::as_ref).filter(|_| Self::silent(region, t)) {
+                // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage).
+                let at = if t > stretch { stretch } else { t };
+                let rate = match blank.get(at).and_then(Option::as_ref).filter(|_| Self::silent(region, at)) {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
-                    None => self.strand_row(region, base, 1, t)[0] as i128,
+                    None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
                 let k = one + rate;
                 if t > 0 {
@@ -1750,7 +1822,8 @@ impl Field {
             return refuse("a region's locks that are not one a site, or a lock on a site that carries no face");
         }
         if let Some(port) = region.port {
-            if port.start > region.classes.len() || region.unresolved[port.start..].iter().any(|&u| !u) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
+            // [§16.47] A port at its boundary may hold resolved places (a state of the writer's path); it compares its open ones.
+            if port.start > region.classes.len() || (!port.boundary && region.unresolved[port.start..].iter().any(|&u| !u)) || (port.start..region.classes.len()).any(|t| region.locked.get(t).copied().unwrap_or(false)) {
                 return refuse("a port whose places are not every open, unlocked site to the region's end");
             }
             if port.void >= self.declaration.alphabet || port.target.iter().any(|&c| c == port.void || c >= self.declaration.alphabet) {
@@ -1825,6 +1898,18 @@ impl Field {
     /// place (`κ = 1`). Its own opening (`E(∗)` with its neighbours' contact rows) is its own and stays.
     fn silent(region: &Region, t: usize) -> bool {
         region.unresolved[t] && Self::carried(region, t).is_none()
+    }
+
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 21:07] **A silent stretch past the last arrival
+    /// is one passage**: the first silent place past a region's last arrival (its last site that is not silent), or the
+    /// region's length where none is. Past it every place runs the free clock at that place's rate (its expected duration
+    /// from the tick before's face there, bare at the first tick), so a place `D` past the last arrival reads the clock
+    /// `c_f + D κ₁`: nothing arrives there, and a per-blank rate would be the field's guesses about the stretch driving its
+    /// own clock (near an uncertain end the faces split between the void and a byte and the clock races, §16.28). Stretches
+    /// between two arrivals keep their per-blank rates.
+    fn silent_stretch(region: &Region) -> usize {
+        let sites = region.classes.len();
+        (0..sites).rev().find(|&t| !Self::silent(region, t)).map_or(0, |last| last + 1)
     }
 
     /// Site `s`'s row of a family at `base` of `width` a class (its class's row, or its carried face's mixture
@@ -2580,7 +2665,7 @@ impl Field {
         }
         if let Some(port) = region.port {
             code += port_code(&faces, &port)?;
-            count += region.classes.len() - port.start;
+            count += region.unresolved[port.start..port.stop.unwrap_or(region.classes.len()).min(region.classes.len())].iter().filter(|&&u| u).count();
         }
         Ok((code, count))
     }
@@ -2599,8 +2684,7 @@ impl Field {
 
     /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
     fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-        let faces: Vec<(&[u128], u128)> = pass.faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
-        port_reading(&faces, port)
+        port_reading(&port_faces(&pass.faces, port)?, port)
     }
 
     /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
@@ -3172,13 +3256,26 @@ impl Field {
         let width = d.alphabet + 1;
         // Each blank's rates' covectors `(base, δκ)` a paced head, for its face's return.
         let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if faces.is_some() { sites } else { 0 }];
+        let stretch = Self::silent_stretch(region);
         for p in 0..paced {
             let base = l.pace + p * width;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
+            let mut dks = vec![0i128; sites];
             for k in (1..sites).rev() {
                 tail_tau += r.gtau[p][k];
                 tail_sig += r.gsig[p][k];
-                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                dks[k] = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+            }
+            // [§16.47] The silent stretch past the last arrival runs at its first place's rate, so their covectors return there.
+            if stretch < sites {
+                let folded: i128 = dks[stretch + 1..].iter().sum();
+                dks[stretch] += folded;
+                for slot in &mut dks[stretch + 1..] {
+                    *slot = 0;
+                }
+            }
+            for k in (0..sites).rev() {
+                let dk = dks[k];
                 if dk == 0 {
                     continue;
                 }
@@ -3252,14 +3349,61 @@ impl Field {
     /// [definition; agent-inferred, November 3, §16.27, the comparison record's §3.3] **The release by the training clock run
     /// backwards**: training reads a region whose open sites are a uniform state of a random reading order (§16.23); the
     /// release runs that clock backwards. Every answer place opens unresolved beside its known question; over `sweeps`
-    /// sweeps the open places are resolved in one keyed random order, about `n/sweeps` a sweep, each drawn from its own
+    /// sweeps the open places are resolved by octaves of their distance from the question, each octave in its keyed order
+    /// once the earlier octaves are resolved (§16.47), about `n/sweeps` a sweep, each drawn from its own
     /// face at temperature one (the field's own probabilities, an exact integer draw against the face's masses) on the read
     /// of the region as it stands, with every place resolved before it known. No place is chosen by its certainty, nothing
     /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
     /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
-    /// `sweep` says to. `refine` passes then revisit the written answer (§16.36); zero writes it once.
+    /// `sweep` says to. `refine` passes then revisit the written answer, one place at a time (§16.36, §16.47); zero writes it once.
     pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
+        self.sample_observed(problems, sweeps, refine, void, seed, realization, sweep, &mut |_| {})
+    }
+
+    /// [agent-inferred, November 5] **A release's read of the problems it still writes**: only the `active` problems' regions
+    /// are read (a problem with no place this read is left out), and their faces are returned at their own problems'
+    /// places, every other problem's empty. A region's faces are its own (each region is read alone), so the answers are the
+    /// same bits; a finished problem no longer takes a region's read (the unified-theory reading of November 5, 17:41: about
+    /// 60% of a 32-answer write's region reads were of finished problems).
+    fn read_active(&self, classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], realization: &mut dyn FieldRealization) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); classes.len()];
+        if regions.is_empty() {
+            return Ok(faces);
+        }
+        for (read, &k) in realization.read_faces(self, &regions)?.into_iter().zip(active) {
+            faces[k] = read;
+        }
+        Ok(faces)
+    }
+
+    /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
+    /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
+    /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no
+    /// faces. A reading only: nothing in the release reads it.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, 0, realization, sweep, observe)
+    }
+
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
+    /// **A read releases a run** ([`Field::sample_observed`] with `run_bound` on the codes' `2^(−20)` bits; zero, one place a
+    /// read): past each read's free places, the walk releases each next open place of its order (within the octave in the
+    /// sweeps) while the entropies of the places it adds, read on this read's faces, sum within `run_bound`; a refine pass's
+    /// run reopens the next places of its order whose entropies at their last draw sum so, and draws them all from one
+    /// read. Drawing a run from one read loses at most `ΣH − H_joint` of its joint, its total correlation, and since the
+    /// joint holds at least the first place's entropy that is at most the added places' sum, so `run_bound` bounds the
+    /// loss with no place chosen by its certainty: certainty sets only how long the run is. Why: one place a read made a
+    /// write of 32 answers about 3,000 full reads; a place whose face is nearly settled adds almost nothing to the joint's
+    /// loss when it is drawn beside the run's first.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, realization, sweep, observe)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3271,25 +3415,78 @@ impl Field {
         };
         let mut classes: Vec<Vec<usize>> = problems.iter().map(|&(q, n)| q.iter().copied().chain(std::iter::repeat_n(void, n)).collect()).collect();
         let mut open: Vec<Vec<bool>> = problems.iter().map(|&(q, n)| (0..q.len() + n).map(|t| t >= q.len()).collect()).collect();
-        // Each problem's keyed order of its answer places.
+        // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
+        // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
+        // the question (the first place at distance one), and its places open to the draws only once every place of the
+        // earlier octaves is resolved; within an octave the keyed order. Why: with exact faces every order draws the same
+        // joint, but with the field's the order decides what the end reads, and drawn in one keyed order of the whole
+        // extent the end was fixed in the first reads while nearly every place was open (95% of the length's drift in
+        // reads 1 to 64), so the written length barely heard the problem (its bytes correlated +0.18 with the held); by
+        // octaves the end is drawn reading at least half its answer as written.
         let orders: Vec<Vec<usize>> = problems
             .iter()
             .enumerate()
             .map(|(k, &(q, n))| {
                 let mut order: Vec<usize> = (q.len()..q.len() + n).collect();
-                order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
                 order
             })
             .collect();
+        // Each problem's place in its order: a sweep draws its next open places, never past its octave (the last sweep
+        // draws every place left), so a place the closing law has resolved costs no read.
+        let mut cursors = vec![0usize; problems.len()];
+        // Each place's entropy at its last draw, for a refine pass's runs (none where the closing law resolved it).
+        let mut drawn_entropy: Vec<Vec<Option<i128>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
+        let mut swept = sweeps;
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
-            let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-            let faces = realization.read_faces(self, &regions)?;
-            let mut draws: Vec<(usize, usize, usize)> = Vec::new();
+            let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
+            let faces = self.read_active(&classes, &open, &active, realization)?;
+            let (mut bound, mut passed) = (0i128, 0usize);
+            let mut runs: Vec<Vec<usize>> = Vec::with_capacity(problems.len());
             for (k, &(q, n)) in problems.iter().enumerate() {
-                let (from, to) = if last { (done * n / sweeps, n) } else { (done * n / sweeps, (done + 1) * n / sweeps) };
-                for &t in orders[k][from..to].iter().filter(|&&t| open[k][t]) {
+                let count = if last { n } else { (done + 1) * n / sweeps - done * n / sweeps };
+                let mut picked: Vec<usize> = Vec::new();
+                while let Some(&t) = orders[k].get(cursors[k]) {
+                    if picked.len() == count || (!last && picked.first().is_some_and(|&p| octave_of(p + 1 - q.len()) != octave_of(t + 1 - q.len()))) {
+                        break;
+                    }
+                    cursors[k] += 1;
+                    if open[k][t] {
+                        picked.push(t);
+                    }
+                }
+                // The run past the free places: the next open places of the octave while their entropies sum within the bound.
+                if run_bound > 0 && !last && !picked.is_empty() {
+                    let mut held = 0i128;
+                    while let Some(&t) = orders[k].get(cursors[k]) {
+                        if octave_of(picked[0] + 1 - q.len()) != octave_of(t + 1 - q.len()) {
+                            break;
+                        }
+                        if !open[k][t] {
+                            cursors[k] += 1;
+                            continue;
+                        }
+                        let h = entropy(faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?);
+                        // Strictly within the bound: below one bit the places past the first hold one configuration with more
+                        // than half their mass, so the read makes one choice (at one bit a fair coin can stand there).
+                        if held + h >= run_bound {
+                            break;
+                        }
+                        held += h;
+                        cursors[k] += 1;
+                        picked.push(t);
+                    }
+                    bound += held;
+                }
+                runs.push(picked);
+            }
+            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+            let mut draws: Vec<(usize, usize, usize)> = Vec::new();
+            for (k, picked) in runs.iter().enumerate() {
+                for &t in picked {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
+                    drawn_entropy[k][t] = Some(entropy(face));
                     let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % face.total;
                     let mut acc = 0u128;
                     let c = face.masses.iter().position(|&m| {
@@ -3298,7 +3495,6 @@ impl Field {
                     });
                     draws.push((k, t, c.unwrap_or(face.masses.len() - 1)));
                 }
-                let _ = q;
             }
             for (k, t, c) in draws {
                 classes[k][t] = c;
@@ -3317,71 +3513,147 @@ impl Field {
             }
             if last {
                 if done + 1 < sweeps {
+                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 break;
             }
+            // Every place resolved: the sweeps are done.
+            if open.iter().all(|o| o.iter().all(|&u| !u)) {
+                swept = done + 1;
+                break;
+            }
         }
-        // [definition; agent-inferred, November 3, §16.36] **The places keep moving** (the lens of November 1: an answer is a
-        // joint field whose parts move together until its faces align, never committed surest-first): after every place is
-        // written, `refine` passes revisit the answer, each in its own keyed order over the places up to the boundary (the
-        // first void), one place of each problem a read. A revisited place is opened again, read beside every other place as
-        // it now stands, and drawn from its face at temperature one, as the first pass draws it; the closing law holds after
-        // every draw, so the boundary moves in where a void is drawn and out by one where the boundary itself is drawn as a
-        // letter. No place is chosen by its certainty.
-        let mut read = sweeps;
-        let total = sweeps + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
+        // [definition; agent-inferred, November 3, §16.36; November 5, §16.47] **The places keep moving** (the lens of
+        // November 1: an answer is a joint field whose parts move together until its faces align, never committed
+        // surest-first): after every place is written, `refine` passes revisit the answer, the field's own one-place
+        // resampling. Each pass walks each problem's keyed order of all its answer places, one place of each problem a
+        // read, passing over a place that stands past the boundary (the first void) when its turn comes, so an end that has
+        // moved is met again. A revisited place is opened again, read beside every other place as it now stands, and drawn
+        // at temperature one: a place before the last letter from its face restricted to the letters (the void's mass
+        // removed, an exact integer draw against the rest), the last letter and the boundary place from their whole faces,
+        // so the end moves one place in or out a draw and the closing law holds after every draw. Why (the unified-theory
+        // reading of November 5, 14:47): drawn from the whole face, a void inside erased every later letter while a
+        // boundary drawn as a letter moved out one place, the new boundary waiting for the next pass, so the passes cut
+        // deep and grew by one (segment 2's −4.8 places came all in its third pass, from its 14 short answers). A place
+        // before the last letter whose face holds no letter mass keeps the letter it had. No place is chosen by its
+        // certainty.
+        let mut read = swept;
+        let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
+        let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
         for pass in 1..=refine as u64 {
-            let ends: Vec<usize> = problems.iter().enumerate().map(|(k, &(q, _))| (q.len()..classes[k].len()).find(|&t| classes[k][t] == void).unwrap_or(classes[k].len() - 1)).collect();
             let orders: Vec<Vec<usize>> = problems
                 .iter()
                 .enumerate()
                 .map(|(k, &(q, _))| {
-                    let mut order: Vec<usize> = (q.len()..=ends[k]).collect();
+                    let mut order: Vec<usize> = (q.len()..classes[k].len()).collect();
                     order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (pass << 48) ^ (1 << 62)), t));
                     order
                 })
                 .collect();
-            let reads = orders.iter().map(Vec::len).max().unwrap_or(0);
-            for step in 0..reads {
+            let mut cursors = vec![0usize; problems.len()];
+            loop {
+                // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
+                // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
+                let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let end = boundary(&classes[k], &open[k], q.len());
+                    while let Some(&t) = orders[k].get(cursors[k]) {
+                        cursors[k] += 1;
+                        if t <= end {
+                            places[k] = Some((vec![t], end));
+                            break;
+                        }
+                    }
+                    if let (true, Some((run, _))) = (run_bound > 0, places[k].as_mut()) {
+                        let mut held = 0i128;
+                        while let Some(&t) = orders[k].get(cursors[k]) {
+                            if t > end {
+                                cursors[k] += 1;
+                                continue;
+                            }
+                            let Some(h) = drawn_entropy[k][t] else { break };
+                            if held + h >= run_bound {
+                                break;
+                            }
+                            held += h;
+                            cursors[k] += 1;
+                            run.push(t);
+                        }
+                    }
+                }
+                if places.iter().all(Option::is_none) {
+                    break;
+                }
                 if !sweep(read, total) {
+                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 read += 1;
-                // Each problem's place this read, if it still stands at or before the boundary.
-                let places: Vec<Option<usize>> = (0..problems.len())
-                    .map(|k| {
-                        let end = (problems[k].0.len()..classes[k].len()).find(|&t| classes[k][t] == void).unwrap_or(classes[k].len() - 1);
-                        orders[k].get(step).copied().filter(|&t| t <= end)
-                    })
-                    .collect();
+                let mut kept: Vec<Vec<usize>> = vec![Vec::new(); problems.len()];
                 for (k, place) in places.iter().enumerate() {
-                    if let Some(t) = *place {
-                        open[k][t] = true;
-                        classes[k][t] = void;
+                    if let Some((run, _)) = place {
+                        for &t in run {
+                            kept[k].push(classes[k][t]);
+                            open[k][t] = true;
+                            classes[k][t] = void;
+                        }
                     }
                 }
-                let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-                let faces = realization.read_faces(self, &regions)?;
+                let active: Vec<usize> = (0..problems.len()).filter(|&k| places[k].is_some()).collect();
+                let faces = self.read_active(&classes, &open, &active, realization)?;
+                // What the read certifies is its own faces' sum past each run's first place.
+                let (mut bound, mut passed) = (0i128, 0usize);
+                for (k, place) in places.iter().enumerate() {
+                    if let Some((run, _)) = place {
+                        let mut held = 0i128;
+                        for &t in &run[1..] {
+                            held += entropy(faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?);
+                        }
+                        bound += held;
+                        passed += usize::from(run_bound > 0 && held >= run_bound);
+                    }
+                }
+                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
                 for (k, place) in places.into_iter().enumerate() {
-                    let Some(t) = place else { continue };
+                    let Some((run, end)) = place else { continue };
+                    for (&t, &was) in run.iter().zip(&kept[k]) {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
-                    let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128) % face.total;
-                    let mut acc = 0u128;
-                    let c = face.masses.iter().position(|&m| {
-                        acc += m;
-                        acc > u
-                    });
-                    classes[k][t] = c.unwrap_or(face.masses.len() - 1);
+                    drawn_entropy[k][t] = Some(entropy(face));
+                    let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
+                    let whole = t + 1 >= end;
+                    let letters = face.total - face.masses[void];
+                    classes[k][t] = if whole {
+                        let u = u % face.total;
+                        let mut acc = 0u128;
+                        face.masses.iter().position(|&m| {
+                            acc += m;
+                            acc > u
+                        }).unwrap_or(face.masses.len() - 1)
+                    } else if letters == 0 {
+                        was
+                    } else {
+                        let u = u % letters;
+                        let mut acc = 0u128;
+                        (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
+                            acc += face.masses[c];
+                            acc > u
+                        }).unwrap_or(was)
+                    };
                     open[k][t] = false;
-                    if classes[k][t] == void {
-                        for s in t + 1..classes[k].len() {
-                            classes[k][s] = void;
+                    }
+                    // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
+                    // place past it, a boundary drawn as a letter there among them.
+                    let q = problems[k].0.len();
+                    if let Some(first) = (q..classes[k].len()).find(|&t| classes[k][t] == void && !open[k][t]) {
+                        for t in first + 1..classes[k].len() {
+                            classes[k][t] = void;
                         }
                     }
                 }
             }
         }
+        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
@@ -3941,15 +4213,16 @@ pub struct FieldReceipt {
     /// The sites the codes are of: each region's domain where it read an open site (§16.23).
     pub sites: usize,
     pub code_before: i64,
-    pub code_after: i64,
+    /// The section's code reread under its step; none since the step fluxes (§16.47, Brandon, November 5 17:32).
+    pub code_after: Option<i64>,
     pub halvings: u32,
     pub deposited: bool,
     pub next: Option<FieldNext>,
     /// [measurement; §16.41] The step's first-order change of the section's code at its full size, `Σ_i g_i Δθ_i` on the
-    /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change the certificate read there: the
-    /// section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
+    /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change a reread measured there (none since
+    /// the step fluxes): the section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
     pub predicted: Option<i64>,
-    pub change: i64,
+    pub change: Option<i64>,
     /// [measurement; agent-inferred, November 4, §16.41] **The step before, priced on this section**: `Σ_i g_i Δθ_i` with `g`
     /// this section's covector at the material that stands and `Δθ` the step the section before stood at (its halvings
     /// released), on the codes' grain: the first-order change of this section's code were that step taken once more. Negative
@@ -3992,8 +4265,23 @@ fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Comp
 
 /// A port's coupling code on `2^(−20)` bits from a region's faces (§16.24).
 fn port_code(faces: &[Option<TowerFace>], port: &Port) -> Result<i64> {
-    let at: Vec<(&[u128], u128)> = faces[port.start..].iter().map(|f| f.as_ref().map(|f| (f.masses.as_slice(), f.total)).ok_or(TowerError::Refused("a port's place without a face"))).collect::<Result<_>>()?;
-    Ok(port_reading(&at, port)?.1)
+    Ok(port_reading(&port_faces(faces, port)?, port)?.1)
+}
+
+/// A port's places' faces, each `(masses, total)`: every place must carry one, but a port at its boundary may hold
+/// resolved places, which carry none and are read as `(∅, 0)` (§16.47, [`boundary_reading`]).
+fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Result<Vec<(&'f [u128], u128)>> {
+    let stop = port.stop.unwrap_or(faces.len()).min(faces.len());
+    faces[port.start..]
+        .iter()
+        .enumerate()
+        .map(|(k, f)| match f {
+            _ if port.start + k >= stop => Ok((&[][..], 0)),
+            Some(f) => Ok((f.masses.as_slice(), f.total)),
+            None if port.boundary => Ok((&[][..], 0)),
+            None => refuse("a port's place without a face"),
+        })
+        .collect()
 }
 
 /// Each region's run of compared sites before its port and its weight in the joint code, `(K, m, K)`
@@ -4321,7 +4609,7 @@ impl FieldLearner {
             return refuse("a section with no unresolved site");
         }
         // The sites the weighed code is a code of (§16.23): each region's domain where it reads an open site.
-        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| r.classes.len() - p.start)).sum::<usize>();
+        let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>() + regions.iter().filter_map(|r| r.port.map(|p| p.stop.unwrap_or(r.classes.len()).min(r.classes.len()) - p.start)).sum::<usize>();
         let raw = g.clone();
         let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
         for &(start, len, grain) in &self.field.families_all() {
@@ -4346,19 +4634,24 @@ impl FieldLearner {
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
-        let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
-        let (halvings, change) = (scale.halvings, scale.change);
-        let Some((candidate, faces_new)) = scale.standing else {
-            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change, transfer });
-        };
-        let code_after = code_of(&compared(&faces_new, regions)?, &spans);
+        // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
+        // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
+        // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
+        // or mistakes, knowing what causes contraction in contrast to expansion is equally important") and cost a full read
+        // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
+        // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
+        // alike, and the moments carry every covector.
+        let (candidate, moved) = stepped(&self.field, &step, 0)?;
+        if !moved {
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer });
+        }
         self.field = candidate;
         if self.read_held {
-            self.held = Some(HeldStep { step, halvings });
+            self.held = Some(HeldStep { step, halvings: 0 });
         } else {
-            self.last = Some(HeldStep { step, halvings });
+            self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next, predicted, change, transfer })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -4437,3 +4730,15 @@ pub use scale::Scale;
 
 #[cfg(test)]
 mod tests;
+
+/// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
+pub fn octave_of(d: usize) -> u32 {
+    usize::BITS - 1 - d.leading_zeros()
+}
+
+/// [definition; §16.47] A face's entropy `Σ_a p(a) (−log₂ p(a))` on the codes' `2^(−20)` bits, each class's code
+/// ([`TowerFace::code`]) weighed by its mass over the total and the sum released once at its nearest.
+fn entropy(face: &TowerFace) -> i128 {
+    let sum: i128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m as i128 * face.code(a) as i128).sum();
+    div_nearest(sum, face.total as i128)
+}

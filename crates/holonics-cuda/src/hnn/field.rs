@@ -39,6 +39,16 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
+/// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
+const AFFINE_SHARED: usize = 48 * 1024;
+
+/// [agent-inferred, November 5] A tiled affine map's sites a block pass and its dynamic shared octets (`W` at the stride
+/// `cols + 1` and the bias in 32-bit words, each site's carrier bound, then a pass's site rows), where they fit a block.
+fn affine_tiling(rows: usize, cols: usize, x64: bool) -> Option<(usize, usize)> {
+    let per = (THREADS as usize).checked_div(rows).filter(|&p| p > 0)?;
+    let shared = ((rows * (cols + 1) + rows) * 4).div_ceil(16) * 16 + per * 8 + per * cols * if x64 { 8 } else { 4 };
+    (shared <= AFFINE_SHARED).then_some((per, shared))
+}
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
@@ -506,8 +516,8 @@ enum Kind {
 /// of the card's wall time, `cuMemAlloc` and `cuMemFree` each tens of microseconds and a free draining the
 /// stream). A buffer a batch is done with returns to its size class; the next batch takes one of its class
 /// (a class is a multiple of an eighth of the power of two above, so a buffer is at most a quarter too long).
-/// What a class cannot supply is allocated; when the live buffers, the kept ones and the new one pass the
-/// batch budget, the kept ones are freed first. The contents of a taken buffer are undefined, zeroed where
+/// What the kept buffers cannot supply (a class up to twice the request's) is allocated; when the live buffers, the kept
+/// ones and the new one pass the batch budget, the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
 /// the call says so; the work of the stream is ordered, so a buffer a queued kernel still reads is never
 /// overwritten before it has.
 trait Poolable: Copy + Sized + 'static {
@@ -544,16 +554,27 @@ poolable!(i64, i64s);
 poolable!(i128, i128s);
 
 impl Pools<'_> {
-    /// Free every kept buffer.
-    fn trim(&mut self) {
-        self.u8s.clear();
-        self.u32s.clear();
-        self.i32s.clear();
-        self.u64s.clear();
-        self.i64s.clear();
-        self.i128s.clear();
-        self.retained = 0;
+    /// Free the kept buffer of the most octets, of any element type.
+    fn free_largest(&mut self) {
+        fn largest<T>(list: &[(usize, CardBuffer<'_, T>)]) -> Option<(usize, u64)> {
+            list.iter().enumerate().map(|(i, (c, _))| (i, (*c * core::mem::size_of::<T>()) as u64)).max_by_key(|&(_, o)| o)
+        }
+        let candidates = [largest(&self.u8s), largest(&self.u32s), largest(&self.i32s), largest(&self.u64s), largest(&self.i64s), largest(&self.i128s)];
+        let Some((which, (i, octets))) = candidates.iter().enumerate().filter_map(|(w, c)| c.map(|c| (w, c))).max_by_key(|&(_, (_, o))| o) else {
+            self.retained = 0;
+            return;
+        };
+        match which {
+            0 => drop(self.u8s.swap_remove(i)),
+            1 => drop(self.u32s.swap_remove(i)),
+            2 => drop(self.i32s.swap_remove(i)),
+            3 => drop(self.u64s.swap_remove(i)),
+            4 => drop(self.i64s.swap_remove(i)),
+            _ => drop(self.i128s.swap_remove(i)),
+        }
+        self.retained = self.retained.saturating_sub(octets);
     }
+
 }
 
 /// The elements of the size class holding `len`: a multiple of an eighth of the power of two above it
@@ -681,25 +702,30 @@ impl<'c> CardField<'c> {
     /// A buffer of at least `len` elements, contents undefined (`Pooled`).
     fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
         let cap = size_class(len.max(1));
-        let octets = (cap * core::mem::size_of::<T>()) as u64;
+        let size = core::mem::size_of::<T>();
         let mut pools = self.pools.borrow_mut();
+        // [agent-inferred, November 5] A kept buffer of the class or the next ones up to twice it serves the request (the
+        // least such), and the budget is kept by freeing the largest kept buffers one at a time, not every kept buffer at
+        // once: the profile read 33,780 allocations taking 12.2 s of a 94 s training read, a batch's buffers of varied
+        // classes missing an exact class and a trim freeing every kept buffer the next batch then allocated again.
         let hit = {
             let list = T::list(&mut pools);
-            list.iter().position(|(c, _)| *c == cap).map(|i| list.swap_remove(i))
+            list.iter().enumerate().filter(|(_, (c, _))| *c >= cap && *c <= 2 * cap).min_by_key(|(_, (c, _))| *c).map(|(i, _)| i).map(|i| list.swap_remove(i))
         };
         let entry = match hit {
             Some(entry) => {
-                pools.retained = pools.retained.saturating_sub(octets);
+                pools.retained = pools.retained.saturating_sub((entry.0 * size) as u64);
                 entry
             }
             None => {
-                if pools.live + pools.retained + octets > self.budget {
-                    pools.trim();
+                let octets = (cap * size) as u64;
+                while pools.live + pools.retained + octets > self.budget && pools.retained > 0 {
+                    pools.free_largest();
                 }
                 (cap, self.card.alloc::<T>(cap)?)
             }
         };
-        pools.live += octets;
+        pools.live += (entry.0 * size) as u64;
         Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
     }
 
@@ -1308,7 +1334,8 @@ impl<'c> CardField<'c> {
         self.launch("field_exposure", Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words)])?;
         let spread = self.timed(Kind::Copy, || card.fetch(&tick.bits)).map_err(device)?[1] as u64;
         if std::env::var_os("FIELD_SPREAD").is_some() {
-            eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} bound_limbs={}", row_limbs(field, spread).map_or(0, |l| l));
+            let need = field.row_bits().ok().zip(field.row_gain().ok()).map(|(bits, gain)| bits as i64 - (gain as i64 + (usize::BITS - 1 - d.reach.leading_zeros()) as i64 + 2) + spread as i64);
+            eprintln!("FIELD_SPREAD tick={k} sites={sites} spread={spread} need_bits={} bound_limbs={}", need.map_or("-".to_string(), |n| n.to_string()), row_limbs(field, spread).map_or(0, |l| l));
         }
         self.mark("tick_exposure_wait");
         let limbs = row_limbs(field, spread)?;
@@ -1714,11 +1741,21 @@ impl<'c> CardField<'c> {
                     let Some(port) = region.port else { continue };
                     let first = region_off[r] as usize;
                     let wide: Vec<Vec<u128>> = (first + port.start..region_off[r + 1] as usize).map(|t| ms[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect()).collect();
-                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| (m.as_slice(), ts[t] as u128)).collect();
+                    // [§16.47] A resolved place of a port at its boundary carries no face (the host's `port_faces`).
+                    // [§16.47] A place past the port's stop is read and not compared: it carries no face to the reading, and its
+                    // covector is zero, written as a zero row (an unported open place would take its own place's).
+                    let stop = first + port.stop.unwrap_or(region_off[r + 1] as usize - first).min(region_off[r + 1] as usize - first);
+                    let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && t < stop { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
                     let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
                     for (k, row) in rows.into_iter().enumerate() {
-                        ported.0.push((first + port.start + k) as u32);
-                        ported.1.extend(row);
+                        let t = first + port.start + k;
+                        if !row.is_empty() {
+                            ported.0.push(t as u32);
+                            ported.1.extend(row);
+                        } else if t >= stop && unresolved[t] != 0 {
+                            ported.0.push(t as u32);
+                            ported.1.extend(std::iter::repeat_n(0i64, a));
+                        }
                     }
                 }
             }
@@ -1953,6 +1990,16 @@ impl<'c> CardField<'c> {
         let (mut weight, mut bias, mut wmax, mut rows32, mut cols32) = (weight, bias, wmax, rows as u32, cols as u32);
         let (mut x, mut xs, mut out, mut os, mut add, mut u) = (x, x_stride as u64, out, out_stride as u64, add, u32::from(only_unresolved));
         let cells = words.t as u64 * rows as u64;
+        // [agent-inferred, November 5] The tiled map where its weights, bias and a pass's site rows fit a block's shared memory
+        // (every map of the field's declaration does), the cell map otherwise: the same integers either way.
+        if std::env::var_os("FIELD_AFFINE_TRACE").is_some() {
+            eprintln!("FIELD_AFFINE_TRACE entry={entry} rows={rows} cols={cols} tiling={:?}", affine_tiling(rows, cols, entry.ends_with("x64")));
+        }
+        if let Some((per, shared)) = affine_tiling(rows, cols, entry.ends_with("x64")) {
+            let tiled = if entry.ends_with("x64") { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
+            let grid = (words.t as u64).div_ceil(per as u64).clamp(1, 65_535) as u32;
+            return self.launch_shared(tiled, grid, THREADS, shared as u32, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)]);
+        }
         self.launch(entry, Self::cells(cells), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])
     }
 
@@ -2572,6 +2619,19 @@ type Rows = Vec<Vec<(Vec<(u32, u64)>, u64)>>;
 
 #[cfg(test)]
 mod tests {
+    /// Every affine map of the field's declaration is tiled: the weights at their padded stride, the bias, the bounds and a
+    /// pass's site rows fit a block's shared memory, and a block passes `256/rows` sites.
+    #[test]
+    fn every_affine_map_of_the_declaration_is_tiled() {
+        let (dw, m2, f) = (32usize, 64usize, 32usize);
+        for (rows, cols, x64) in [(m2, dw, false), (dw, m2, true), (f, dw, false), (dw, f, true), (dw, dw, false)] {
+            let (per, shared) = super::affine_tiling(rows, cols, x64).unwrap_or_else(|| panic!("{rows} × {cols} not tiled"));
+            assert_eq!(per, 256 / rows);
+            assert!(shared <= super::AFFINE_SHARED);
+        }
+        assert!(super::affine_tiling(512, 32, false).is_none(), "more rows than a block's threads");
+    }
+
     use super::*;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> FieldDeclaration {
