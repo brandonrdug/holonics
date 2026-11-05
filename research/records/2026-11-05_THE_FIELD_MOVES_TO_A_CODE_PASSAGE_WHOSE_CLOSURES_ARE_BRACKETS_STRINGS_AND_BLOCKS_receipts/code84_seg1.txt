@@ -1,0 +1,65 @@
+# code84 continued: binary 9360f8804ac85ac8938b10dce7d8fea796a59e454e9e85e3990f0412df16c95b (path states cut five places past their front; empty states skipped) parity lock taken 19:41:41
+FIELD_PASSAGE train=24557 withheld=128 held=128 held_read=128 alphabet=100 answer=2062 reach=3771
+FIELD_PARITY section=1 withheld=false regions=26 length=2048 sites=23133 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=39605 card_ms=401
+FIELD_PARITY section=2 withheld=true regions=32 length=856 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=2853 card_ms=31
+FIELD_PARITY_WRITES problems=1 sweeps=8 host_ms=11274
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=25 host_ms=42458 card_ms=433 elapsed_ms=398800
+MEASURE lap=parity rc=0 wall_s=400.0 peak_rss_kib=3515032
+# code84 cost read from segment 1's lap-0 state, lock taken 19:48:21
+FIELD_DECLARATION alphabet=100 width=32 heads=4 modes=8 still=2 contacts=32 ticks=4 frames=4 reach=3771 section=16 rate=8 answer=2062 train=24557 withheld=128 dev=128 sections=1535 laps_read=1 material=31190
+dev sections 376 mean_ms 369 max_ms 1388
+MEASURE lap=dev2 rc=0 wall_s=152.8 peak_rss_kib=785532
+# lap bound 678865 ms (1.2 times the cost read's lap over 1535 sections); a segment 1657730 ms, outer 1717 s
+== HELD128
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2327
+MEASURE lap=seg1_opening_HELD128 rc=0 wall_s=2.6 peak_rss_kib=230476
+distance	problems	void_mass	length_law
+-128	104	0.377	0.405
+-32	124	0.478	0.476
++0	128	0.530	0.512
++32	128	0.596	0.562
++128	128	0.757	0.695
++512	128	0.966	0.924
+places 900 to 1199	38400	0.982	0.971
+B past the end: mean 93 places, median 72, range 0 to 378; the length law 132
+void mass before the end: mean 121 places
+the opening's expected length less held: mean -28.1 places, median +34.5
+== TRAIN
+FIELD_OPENING problems=128 places=263936 training_answers=24685 ms=2127
+MEASURE lap=seg1_opening_TRAIN rc=0 wall_s=2.4 peak_rss_kib=242060
+distance	problems	void_mass	length_law
+-128	109	0.242	0.200
+-32	128	0.456	0.362
++0	128	0.537	0.429
++32	128	0.615	0.494
++128	128	0.792	0.654
++512	128	0.975	0.911
+places 900 to 1199	38400	0.992	0.971
+B past the end: mean 81 places, median 47, range 2 to 385; the length law 152
+void mass before the end: mean 66 places
+the opening's expected length less held: mean +15.3 places, median +5.0
+== drift FIELD_LENGTH problems=128 sweeps=2062 refine=0 stopped=64 run_bits=0 reads=65 certified_bits=0.000 passed=0 ms=54910 MEASURE lap=seg1_opening_drift rc=0 wall_s=55.4 peak_rss_kib=722852 
+state	problems	L(0) less held	L(64) less held	drift	se
+state	128	-28.1	-157.7	-129.6	11.6
+FIELD_LENGTH problems=32 sweeps=2062 refine=3 stopped=- run_bits=1 reads=1203 certified_bits=731.174 passed=236 ms=107978
+MEASURE lap=seg1_write rc=0 wall_s=108.4 peak_rss_kib=375184
+opening L less held: mean +20.2
+drift from the opening to the end: mean -180.3 a problem
+  to the first void: mean -173.9 (96% of it); after it: -6.3 (4%)
+  in the refine passes: mean +1.6
+short answers (27): after the sweeps L less held -204.3, the refine passes moved them +1.5
+first void read: median 72 of 304 sweeps; last letter's read: median 966
+RULE: pre-void at least half False; post-void under a quarter True
+bytes written/held 0.415, correlation +0.154, 5 longer, 27 shorter
+written: 32 answers: a fence opened 26, closed 14; parses as Python 1; code lines mean 5.8; identifiers 553, in the question 0.02, in the held answer 0.03
+held:    32 answers: a fence opened 29, closed 29; parses as Python 26; code lines mean 10.9; identifiers 1117, in the question 0.26, in the held answer 1.00
+family	span	written opened	written closed share	held opened	held closed share	ratio
+bracket	near	38	0.105	178	0.393	0.27
+bracket	far	38	0.132	178	0.607	0.22
+string	near	46	0.087	60	0.400	0.22
+string	far	46	0.174	60	0.583	0.30
+block	near	15	0.000	75	0.000	nan
+block	far	15	0.400	75	0.947	0.42
+RULE: the lowest closure against held is bracket far at 0.22 (under 0.5)
+WORDS written=583 in_training_vocabulary=262 share=0.449
+SEGMENT 1 done 19:54:16

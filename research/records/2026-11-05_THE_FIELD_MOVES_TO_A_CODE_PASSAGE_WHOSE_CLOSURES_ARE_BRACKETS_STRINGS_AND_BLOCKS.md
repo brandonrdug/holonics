@@ -75,3 +75,16 @@ past a resolved void the region keeps the room. The trainer's tests pass with th
 field's, a state past a void keeps the room, a state with nothing open is skipped and the next takes its place on its own
 draw). Part 2 (regions end five places past their lowest void, the members' keyed tail retiring) is declared after these
 have run, at the same seed, with this run as its foil.
+
+[measurement; agent-inferred] **The cut path states, read** (`code84_seg1.txt`). Their sampled parity on this passage passed,
+every read equal (a section's 26 regions read 23,133 sites against 55,891 over the whole room). The cost read from lap 0's
+state: 376 sections at 369 ms (at most 1,388) against 1,259 ms over the whole room, 3.4 times, a lap bounded at 679 s, so a
+pass over the 11.2 MB is about nine and a half minutes. Lap 0's state read: the opening's expected length less held −28.1
+on the held (+15.3 on the training problems; `B` 93 and 81 against the law's 132 and 152); the drift to read 64 on the 128
+−129.6 ± 11.6, far past the two-sided bound's −20 (one lap under the octave path, read to be followed, not yet judged). Its
+write of the 32, in runs below a bit: 108 card-seconds and 1,203 reads; 0.415 of the held bytes, 27 of 32 shorter; 26
+fences opened and 14 closed; one answer parses as Python; 0.02 of its identifiers stand in the question (0.26 held).
+**Against the closure reading fixed before this write**: written over held, brackets 0.27 near and 0.22 far, strings 0.22
+and 0.30, blocks 0.42 far; every closure is under 0.5 of held, so by the rule closure is the build's subject (the ring law),
+and the prediction that far strings close below far brackets fails (0.30 against 0.22). One lap in, with answers too short
+to hold their closures.
