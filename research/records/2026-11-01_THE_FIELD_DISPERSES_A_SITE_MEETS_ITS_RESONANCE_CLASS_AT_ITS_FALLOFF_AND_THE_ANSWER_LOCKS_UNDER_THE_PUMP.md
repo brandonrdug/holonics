@@ -3364,3 +3364,35 @@ Failures this could repeat, checked: **bits read as progress** (both laws were j
 on three states where one swings); **a refusal answered with a larger limit** (the compared faces stopped at the first
 read that decided them, not run out); **a located cause carried unrepaired into a new consumer** (the τ-only law was not
 run once its premise failed its read).
+
+### 16.46 The two-terminal law is withdrawn before it runs; the writer's opening is read where the writer writes
+
+[definition; agent-inferred, November 5, the unified-theory reading of 06:52 UTC] **The law as built** (`Field::held`, the
+card's `blank_held` staged with each batch; `_receipts/law67/two_terminal.patch`). A silent site holds its expected duration
+(§16.44) only if its region has an arrived site, written or carried, both before it and after it; any other blank, an open
+stretch past the last arrival, runs at `κ = 1` under every tick's clock as §16.28 has it, reads no face and returns nothing.
+Why it was proposed: §16.45 finds the free clock's excess at the writer's first state where the open stretch runs past its
+last arrival, whose faces mix the void's duration with a byte's. The host's field tests pass (65, the blank law's test
+reading the open site past the last arrival at one with no face) and the gate passes. The first sampled parity read every
+face and covector entry equal but not the clocks' reading: the card read a clock at blanks past the last arrival, which the
+host does not; repaired (`two_terminal_checks.txt`), its second parity was stopped with the law.
+
+**Withdrawn before it trained** (the unified-theory reading of 07:11, from three reads of the code at `3b444266b`):
+1. 98.3% of training's open weight lies between two arrived sites and 1.1% trails, while the writer's first state is all
+   trailing, so the law would read that state at the bare rate on a field trained almost wholly at expected durations; on
+   main52, timing open places off the trained clock cost 0.19 bits on restated digits.
+2. (b) is not read in the writer's region: its region ends at the answer's first void, while the writer's runs the codec's
+   full extent, which is where the held opening (`FIELD_HELD answer=`) is read. Rule, fixed before the comparison: if the
+   free clock's opening over its last three laps is at or under the old law's mean plus its spread over its last three, the
+   free clock stands for the writer's opening; above it, the opening is the subject. The old law (main52 segment 3, laps 8
+   to 10) reads 5.254, 5.184 and 5.051 bits a class, mean 5.163 and spread 0.203, so the bound is 5.366; the free clock
+   (exact63 segment 5, laps 6 to 8) reads 5.309, 5.308 and 5.308, mean 5.308. **The free clock stands for the writer's
+   opening**; the excess (b) found is a reading of a region the writer does not write.
+3. The writer's length is the open subject: the void closure erases past the lowest void, and training never puts a void
+   before a byte, so a byte drawn far out pins the answer at least that long (that reading, agent-inferred); main52's
+   samples wrote 275 to 989 bytes where the answers run 90 to 465.
+
+Failures this could repeat, checked: **bits read as progress** ((b) was a reading of a region the writer does not write,
+replaced by the opening read where it writes, with its rule fixed first); **an authored routine standing in for learning**
+(a terminal rule is a law of the clock, not of the task, and is withdrawn on the evidence of the training weight it would
+contradict).
