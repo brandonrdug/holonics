@@ -1,0 +1,12 @@
+# drift80 binary 029a82e08c14e775af03276cdf715e0c38980f8d12a4de57185b67a6f0165474 lock taken 14:09:03
+== start 7949c565cdd6d613 FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=64 ms=149455 MEASURE lap=start rc=0 wall_s=149.8 peak_rss_kib=619048 
+== control 51c34f4fa7263416 FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=64 ms=153649 MEASURE lap=control rc=0 wall_s=154.1 peak_rss_kib=615196 
+== path75 ae5a24afbd7b3942 FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=64 ms=150369 MEASURE lap=path75 rc=0 wall_s=150.8 peak_rss_kib=616480 
+state	problems	L(0) less held	L(64) less held	drift	se
+start	128	-23.6	-1.7	+21.9	10.0
+control	128	+10.0	+71.4	+61.5	11.9
+path75	128	+6.7	-0.3	-7.1	9.3
+control less start: drift +39.5, se 15.8 (paired, 128 problems)
+path75 less start: drift -29.0, se 12.9 (paired, 128 problems)
+path75 less control: drift -68.5, se 15.0 (paired, 128 problems)
+DRIFT80 exit 14:16:38

@@ -3557,3 +3557,23 @@ so the training problems swung with the held (−28.8 and −33.8 against the la
 The write: 9,269 places against 8,976 held (1.033 times; 1.36 and 1.125 at segments 1 and 2), 16 longer and 16 shorter,
 60 of 75 restatements exact, the correlation of `B` with the overrun +0.477. At 9 laps, joint code 1.0230, context 0.1868,
 foil 0.4298.
+
+[measurement; agent-inferred] **Along the path the drift is gone** (drift80, the unified-theory reading of 13:26:
+`length-field` on all 128 held problems with `READS 64 KEY`, no refine pass, every state keyed by the shared start's hash
+`7949c565cdd6d613`, so the drifts are paired problem by problem; one draw a problem leaves about ±27 places of noise on a
+32-problem write's mean, and read 64 carries 95 to 110% of the drift; `drift80.txt`, `drift64.py`). About 150 card-seconds
+a state:
+
+| state | `L(0)` less held | `L(64)` less held | drift ± se |
+|---|---|---|---|
+| boundary73 segment 2 (the start) | −23.6 | −1.7 | +21.9 ± 10.0 |
+| boundary73 segment 3 (the control) | +10.0 | +71.4 | +61.5 ± 11.9 |
+| path75 segment 1 (laps matched to the control) | +6.7 | −0.3 | −7.1 ± 9.3 |
+
+Paired, path75 less the control −68.5 ± 15.0, path75 less the start −29.0 ± 12.9, the control less the start +39.5 ±
+15.8. By the rule (drift under +20 on this measure) the comparison along the writer's path removes the drift: its
+expected length after 64 reads stands within a place of held where the opening's alone has risen 61. The start's first 32
+problems reproduce length76's reads exactly (its key is that state's hash), so the bounded read is the whole writer's;
+those 32 drift +55.9 to read 64 and the other 96 +10.6, so segment 2's +51 was mostly its 32. At three laps from the same
+state path75's joint code is 1.0193 against the control's 1.0230, context 0.1846 against 0.1868, foil 0.4283 against
+0.4298, all lower.
