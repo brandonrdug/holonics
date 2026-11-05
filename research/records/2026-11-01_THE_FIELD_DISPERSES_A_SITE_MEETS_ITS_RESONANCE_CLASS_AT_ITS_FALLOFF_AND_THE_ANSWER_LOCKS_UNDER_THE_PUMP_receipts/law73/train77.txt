@@ -1,0 +1,30 @@
+# train77 state STATE.2 lock taken 12:21:02
+== TRAIN wall_s=3.5 peak_rss_kib=238064
+-32	128	0.481	0.449
++0	128	0.587	0.519
++128	128	0.896	0.771
++512	126	0.999	0.989
+B past the end: mean 38 places, median 29, range 0 to 171; the length law 75
+void mass before the end: mean 77 places
+the opening's expected length less held: mean -38.3 places, median -13.8
+== HELD128 wall_s=3.5 peak_rss_kib=240520
+-32	128	0.464	0.418
++0	128	0.562	0.491
++128	128	0.870	0.754
++512	128	0.999	0.988
+B past the end: mean 45 places, median 33, range 0 to 221; the length law 80
+void mass before the end: mean 69 places
+the opening's expected length less held: mean -23.6 places, median -12.9
+TRAIN77 exit 12:21:09
+== lean.py TRAIN
+law E[L] 287.3; mean held 296.8; law lead -9.5; opening lead -38.3
+short third: held 85-210 mean 149; opening lead +56.1; law lead +138.4; opening length 205
+middle third: held 212-340 mean 273; opening lead -18.4; law lead +14.2; opening length 255
+long third: held 340-841 mean 465; opening lead -150.4; law lead -177.8; opening length 315
+correlation of opening length with held: +0.663
+== lean.py HELD128
+law E[L] 287.3; mean held 277.1; law lead +10.2; opening lead -23.6
+short third: held 67-203 mean 145; opening lead +72.3; law lead +142.4; opening length 217
+middle third: held 204-307 mean 255; opening lead -13.4; law lead +32.5; opening length 241
+long third: held 308-701 mean 428; opening lead -127.4; law lead -141.1; opening length 301
+correlation of opening length with held: +0.548

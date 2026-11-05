@@ -3491,3 +3491,24 @@ truth's do not, and its own draws are the subject.
 0.999 at +512, the void mass before the end 69 (the share at the end 0.562 against the law's 0.491: the opening now leans
 short). The write: 10,098 places against 8,976 held (1.125 times), 18 longer and 14 shorter, 62 of 77 restatements exact.
 At 6 laps, joint code 1.0269 against exact63's 1.0176, context 0.1898 against 0.1888, foil 0.4330 against 0.4353.
+
+[measurement; agent-inferred] **The 1.125 times is a short opening hiding the drift** (length76: `length-field` on segment
+2's last state, its written lengths equal to segment 2's write, 1,462 card-seconds; `length76.txt`). The mean of `L` less
+held is −15.8 at the opening, +14.4 after one read, +23.6 after four, +35.2 after 16, +40.1 after 64, and +39.7 to +40.0
+from there through the sweeps and the first two refine passes; the last refine pass takes it to the written +35.1 (median
++41.5), all of that from the 14 short answers. The drift from the opening to the written length is +50.9 a problem, and
+reads 1 to 64 carry +55.9 of it. The first void is met at read 1 (median), and that one read carries +30.2: a single
+resolved void far past the end, with the closure past it, raises the expected length by thirty places. The unified-theory
+reading of 11:13 predicted a drift of +40 to +65, at least 80% of it in reads 1 to 64, and `L` within a place after read 64;
+the first two hold and the third holds until the last refine pass. By its rule (drift at least +40) the segment's 1.125
+times is the opening's −16 lean offsetting a drift of +51, and the drift is what the path law must remove.
+
+[measurement; agent-inferred] **The opening is short on its own training problems** (train77: `opening-field` on the same
+state over the first 128 training problems beside the 128 held; `train77.txt`, `lean.py`). The opening's expected length
+less held is −38.3 on the training problems (median −13.8) and −23.6 on the held (median −12.9); `B` 38 and 45 places
+against the length law's 75 and 80, the void mass before the end 77 and 69. The question-blind length law (mean 287.3
+places) leads by −9.5 on these training problems and +10.2 on the held, so the opening falls short of the law by 28.8 places
+on the problems it trains on and 33.8 on the held: the same shortfall on both. It reads the question (its length correlates
++0.663 with held on the training problems and +0.548 on the held; by thirds of the held length its lead is +56, −18 and
+−150 where the law's is +138, +14 and −178). By that reading's rule the lean is not how the question carries to held
+problems: something besides the opening's comparison holds it short on the problems the comparison is fit on.
