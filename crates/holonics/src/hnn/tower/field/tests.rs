@@ -1426,14 +1426,14 @@ fn a_read_releases_a_run() {
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
         let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
-        field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, true, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
         let mut counted = RegionsCounted { regions: Vec::new() };
         let mut last: Option<Vec<usize>> = None;
         let run = field
-            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, &mut counted, &mut |_, _| true, &mut |r| {
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, true, &mut counted, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let (0, Some(j)) = (r.pass, earliest) {
@@ -1459,6 +1459,78 @@ fn a_read_releases_a_run() {
     }
     assert!(reads_run <= reads_one, "{reads_run} reads in runs against {reads_one}");
     let _ = fewer;
+}
+
+/// [definition; the unified-theory reading of November 5, 22:38] **A void never unwrites a letter**: at every read of the
+/// sweeps every place written as a letter stays that letter (a place before the last letter draws from its letters, only a
+/// place past every letter from its whole face), the closing law still holds, and some write still ends before its last
+/// place, in one place a read and in runs.
+#[test]
+fn a_void_never_unwrites_a_letter() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let mut closed_early = false;
+    for run_bound in [0i128, 1 << 20] {
+        for seed in 11..27 {
+            let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
+            let places = field
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, &mut HostField, &mut |_, _| true, &mut |r| {
+                    if r.pass != 0 {
+                        return;
+                    }
+                    for (k, &(q, _)) in problems.iter().enumerate() {
+                        for t in q.len()..r.classes[k].len() {
+                            if let Some(c) = letters[k][t] {
+                                assert_eq!((r.open[k][t], r.classes[k][t]), (false, c), "a written letter unwritten at place {t}, seed {seed}");
+                            } else if !r.open[k][t] && r.classes[k][t] != 0 {
+                                letters[k][t] = Some(r.classes[k][t]);
+                            }
+                        }
+                    }
+                })
+                .unwrap();
+            for (places, n) in places.into_iter().zip([9usize, 8]) {
+                if let Some(end) = places.iter().position(|&c| c == 0) {
+                    assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}");
+                    closed_early |= end + 1 < n;
+                }
+            }
+        }
+    }
+    assert!(closed_early, "no write ended before its last place");
+}
+
+/// [definition; the unified-theory reading of November 5, 22:38] **The writer's region ends `NEAR` places past its lowest
+/// void**: past a resolved void the read's faces are the region's cut there, every open place's face that of the cut region,
+/// none past the cut; before any void, and under the whole room, the region is read whole.
+#[test]
+fn the_writer_reads_its_region_to_the_near_field_past_its_void() {
+    let field = shaped(1);
+    let q = [1usize, 4, 0, 2];
+    let n = 12;
+    let mut classes: Vec<usize> = q.iter().copied().chain(std::iter::repeat_n(0, n)).collect();
+    let mut open: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+    for (t, c) in [(4usize, 3usize), (5, 1), (7, 2)] {
+        classes[t] = c;
+        open[t] = false;
+    }
+    let whole = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    assert_eq!(read, field.faces(&whole).unwrap(), "before any void the region is read whole");
+    let end = 8;
+    for t in end..classes.len() {
+        classes[t] = 0;
+        open[t] = false;
+    }
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    let cut = Region { classes: &classes[..end + NEAR], unresolved: &open[..end + NEAR], faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let short = field.faces(&cut).unwrap();
+    assert_eq!(read.len(), classes.len());
+    assert_eq!(&read[..end + NEAR], &short[..], "the faces are the cut region's");
+    assert!(read[end + NEAR..].iter().all(Option::is_none), "no face past the cut");
+    let room = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, false, &mut HostField).unwrap().remove(0);
+    assert_eq!(room, field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap(), "the whole room, declared");
 }
 
 /// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at

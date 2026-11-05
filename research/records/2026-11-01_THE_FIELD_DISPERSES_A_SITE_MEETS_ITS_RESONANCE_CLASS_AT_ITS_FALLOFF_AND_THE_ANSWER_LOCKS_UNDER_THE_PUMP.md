@@ -3771,3 +3771,23 @@ hazard past held at least three times the hazard at or under it (code84's segmen
 +0.3 and written over held 0.7 to 1.4; the opening's void mass at held above 0.3 and at +128 above 0.5; the held context within
 0.02 bits a byte of code85's. **Rule**: a hazard ratio under 1.5 after two laps on the whole room means one rate does not
 carry length, and b2 waits for (c); between 1.5 and 3, two more laps before deciding (code87).
+
+[definition; agent-inferred, November 5, the unified-theory reading of 22:38] **A void never unwrites a letter, and the
+writer's region ends at its near field past its void** (`Field::release`, `Field::read_active`). b1's opening held the length
+(void mass 0.59 at held, 0.80 at +128) while its writes, with and without refinement, ended at a flat one in about 110 places
+(hazard past held over at or under it 0.87): the length is in the field and lost in the writing. Within an octave the keyed
+order puts most draws before a written letter (93% in octave 6, 96% in octave 7), where the truth's void has no mass and the
+field's is a residue of about 1% that costs training 0.014 bits a place, so nothing teaches it away; each such draw ended the
+answer there and unwrote every letter past it (23 of b1's 28 short writes, 324 letters; `unwrote.py`). The law: in the sweeps
+as in refine, a place before the last written letter draws from its face restricted to the letters, and only a place past
+every letter draws from its whole face; a read's places are drawn from the farthest in, so a void is drawn only past every
+letter, this read's among them. Exact faces are unchanged. And the writer's region ends `NEAR` places past its lowest
+resolved void, as every training region and the withheld read do (`near_tail`; the whole room declared by
+`FIELD_WRITER_ROOM`), since a refine pass redrew each place beside up to 2,000 resolved voids no near-tail field met. The
+host's tests: `a_void_never_unwrites_a_letter` (every written letter stays written at every sweep's read, in one place a read
+and in runs, and some write still ends early) and `the_writer_reads_its_region_to_the_near_field_past_its_void`. The release
+is the host's over the card's faces, so the card reads the cut regions with its own kernels. **Fixed before the read**, on
+b1's segment-2 state and keys (closing91): the closing law with no refine pass, written over held 0.7 to 1.4, hazard ratio at
+least 1.5 and correlation above +0.3 (written over held alone passing: the front hears only the prior); both laws with three
+refine passes, the top byte under 20%, the byte entropy within 0.5 bits of held's and at least 10 of 32 opening with
+```` ```python ```` (a collapse with the cut puts the fault in refine's two-sided states).

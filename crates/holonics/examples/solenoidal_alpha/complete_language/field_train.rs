@@ -1650,6 +1650,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // [measurement; agent-inferred, November 5, §16.47] `FIELD_WRITER_RUN_BITS`: the writer releases runs bounded by that many
     // bits past each run's first place ([`Field::sample_runs`]), a declared comparison with one place a read on the same keys.
     let run_bits: i128 = std::env::var("FIELD_WRITER_RUN_BITS").ok().and_then(|v| v.parse::<i128>().ok()).unwrap_or(0);
+    // [measurement; agent-inferred, November 5] `FIELD_WRITER_ROOM`: the writer reads the whole room past its lowest void,
+    // the region law it replaced ([`Field::sample_runs`]'s `near_tail`), a declared comparison.
+    let near_tail = std::env::var_os("FIELD_WRITER_ROOM").is_none();
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     let answers = field
         .sample_runs(
@@ -1659,6 +1662,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             void,
             seed,
             run_bits << 20,
+            near_tail,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
