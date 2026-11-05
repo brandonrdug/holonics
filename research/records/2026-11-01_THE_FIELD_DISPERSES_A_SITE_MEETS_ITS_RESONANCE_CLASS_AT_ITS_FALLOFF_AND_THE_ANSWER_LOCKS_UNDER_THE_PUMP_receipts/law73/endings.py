@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How the written answers end and what fills their length (§16.47, the unified-theory reading of November 5, 14:47).
 
-Usage: endings.py HELD.txt SAMPLE.tsv
+Usage: endings.py HELD.txt SAMPLE.tsv [COUNT]
 
 For each written answer beside its held answer: whether it ends with a final line (`#### ` and a number) at its boundary,
 whether a final line stands earlier, its lines, its steps (`<<...>>`), and its bytes; summarized over the shorter, the
@@ -50,7 +50,7 @@ def main():
     rows = []
     for line in open(sys.argv[2], "rb"):
         k, _, text = line.rstrip(b"\n").partition(b"\t")
-        if not k.isdigit():
+        if not k.isdigit() or (len(sys.argv) > 3 and int(k) >= int(sys.argv[3])):
             continue
         w = text.decode("latin-1").encode("latin-1").decode("unicode_escape").encode("latin-1", "replace")
         rows.append((int(k), shape(w), shape(held[int(k)][1])))
@@ -68,6 +68,7 @@ def main():
     cut = [w for _, w, _ in rows if not w["ends_hash"]]
     print(f"not ending on a '####' line: {len(cut)}; their last line's bytes mean {statistics.mean(w['last_line_bytes'] for w in cut):.0f}" if cut else "every answer ends on a '####' line")
     ws = [w['steps'] for _, w, _ in rows]; hs = [h['steps'] for _, _, h in rows]
+    print(f"steps written/held over all: {sum(w['steps'] for _, w, _ in rows) / sum(h['steps'] for _, _, h in rows):.2f}; bytes written/held {sum(w['bytes'] for _, w, _ in rows) / sum(h['bytes'] for _, _, h in rows):.3f}")
     print(f"steps against held: correlation {statistics.correlation(ws, hs):+.3f}; lines {statistics.correlation([w['lines'] for _, w, _ in rows], [h['lines'] for _, _, h in rows]):+.3f}; bytes {statistics.correlation([w['bytes'] for _, w, _ in rows], [h['bytes'] for _, _, h in rows]):+.3f}")
 
 

@@ -3622,3 +3622,23 @@ a new one reads every refine read and finds the boundary moved at most one place
 identical), the refine passes move the mean written length under 3 places (−2.0 under the old law) and the share of written
 words in the training vocabulary stays at least 0.73 (0.760). **Rule**: if so the law stands and more passes can go to the
 words without cutting answers (main52: 64 of 96 restatements at 3 passes, 81 at 20); a share under 0.73 withdraws it.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 15:04] **The answer is released by octaves of its
+distance from the question** (`Field::sample_observed`, octave82). The endings read says the content hears its boundary
+(30 of 32 close on a final line there), but the boundary barely hears the problem (the written bytes correlate +0.18 with
+the held, the steps +0.31), because the first reads fix the end while nearly every place is open. With exact faces every
+order draws the same joint; with the field's the order decides what the end reads, so the end is drawn after the content it
+depends on. Octave `j` holds the places at distance `[2^j, 2^(j+1))` past the question (the first place at distance one),
+and its places open to the keyed draws only once every place of the earlier octaves is resolved; within an octave the keyed
+order, one place a read, each drawn from its face and closed as before, so the end is drawn reading at least half its answer
+as written. A sweep draws each problem's next open places in that order (a place the closing law has resolved costs no
+read), and the sweeps end once every place is resolved. The field tests pass (68; a new one reads every sweep and finds no
+letter at a later octave while a place of an earlier one is open). Refinement follows as refine81 leaves it; the path law
+in training would follow this order (its states the first `k` places of it run on the truth), but the first read needs no
+training. **Prediction, fixed before launch** (that reading), on path75's segment 1 state, the 128 held, the sweeps only,
+keyed as drift80: the written length's correlation with held at least +0.45; the mean written within a quarter of held;
+the first 32's written/held steps from 0.67 to at least 0.80; at least 28 of the 32 ending on the final line at the
+boundary. **Rule**: if so the law stands and the path law follows it next segment; the mean outside a quarter, the end's
+faces have not met these states, and the path law follows the order for one segment before the law is judged; the mean
+within but the correlation under +0.30, the content does not judge its own completion, and the content's faces are the
+subject.

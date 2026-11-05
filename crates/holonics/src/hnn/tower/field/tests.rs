@@ -1353,6 +1353,36 @@ fn refinement_revisits_the_written_answer() {
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
+/// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
+/// distance `d` from the question stands open, no letter stands at a place of a later octave (`⌊log₂ d⌋`); a void's
+/// closing law may resolve later places, as the void tail.
+#[test]
+fn the_answer_is_released_by_octaves_of_distance() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let octave = |d: usize| usize::BITS - 1 - d.leading_zeros();
+    let mut reads = 0;
+    for seed in 11..19 {
+        field
+            .sample_observed(&problems, 9, 0, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
+                    if let Some(j) = earliest {
+                        for t in q.len()..r.classes[k].len() {
+                            if !r.open[k][t] && r.classes[k][t] != 0 {
+                                assert!(octave(t + 1 - q.len()) <= j, "a letter at distance {} while octave {j} is open, seed {seed}", t + 1 - q.len());
+                            }
+                        }
+                    }
+                }
+                reads += 1;
+            })
+            .unwrap();
+    }
+    assert!(reads > 0);
+}
+
 /// [definition; §16.47] **Refinement moves the end one place a read**: between any two reads of the refine passes each
 /// problem's boundary (its first resolved void) moves at most one place, in or out, so no void is drawn before the last
 /// letter and a boundary drawn as a letter moves out by one; the closing law holds at every read.

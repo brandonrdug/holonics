@@ -3311,7 +3311,8 @@ impl Field {
     /// [definition; agent-inferred, November 3, §16.27, the comparison record's §3.3] **The release by the training clock run
     /// backwards**: training reads a region whose open sites are a uniform state of a random reading order (§16.23); the
     /// release runs that clock backwards. Every answer place opens unresolved beside its known question; over `sweeps`
-    /// sweeps the open places are resolved in one keyed random order, about `n/sweeps` a sweep, each drawn from its own
+    /// sweeps the open places are resolved by octaves of their distance from the question, each octave in its keyed order
+    /// once the earlier octaves are resolved (§16.47), about `n/sweeps` a sweep, each drawn from its own
     /// face at temperature one (the field's own probabilities, an exact integer draw against the face's masses) on the read
     /// of the region as it stands, with every place resolved before it known. No place is chosen by its certainty, nothing
     /// is left open, and a place drawn as the void closes the answer there: every place past it is resolved as the void,
@@ -3339,16 +3340,27 @@ impl Field {
         };
         let mut classes: Vec<Vec<usize>> = problems.iter().map(|&(q, n)| q.iter().copied().chain(std::iter::repeat_n(void, n)).collect()).collect();
         let mut open: Vec<Vec<bool>> = problems.iter().map(|&(q, n)| (0..q.len() + n).map(|t| t >= q.len()).collect()).collect();
-        // Each problem's keyed order of its answer places.
+        // [definition; agent-inferred, November 5, §16.47] **The answer is released by octaves of its distance from the
+        // question** (the unified-theory reading of 15:04): octave `j` holds the places at distance `[2^j, 2^(j+1))` past
+        // the question (the first place at distance one), and its places open to the draws only once every place of the
+        // earlier octaves is resolved; within an octave the keyed order. Why: with exact faces every order draws the same
+        // joint, but with the field's the order decides what the end reads, and drawn in one keyed order of the whole
+        // extent the end was fixed in the first reads while nearly every place was open (95% of the length's drift in
+        // reads 1 to 64), so the written length barely heard the problem (its bytes correlated +0.18 with the held); by
+        // octaves the end is drawn reading at least half its answer as written.
         let orders: Vec<Vec<usize>> = problems
             .iter()
             .enumerate()
             .map(|(k, &(q, n))| {
                 let mut order: Vec<usize> = (q.len()..q.len() + n).collect();
-                order.sort_by_key(|&t| (mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+                order.sort_by_key(|&t| (octave_of(t + 1 - q.len()), mix(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
                 order
             })
             .collect();
+        // Each problem's place in its order: a sweep draws its next open places, never past its octave (the last sweep
+        // draws every place left), so a place the closing law has resolved costs no read.
+        let mut cursors = vec![0usize; problems.len()];
+        let mut swept = sweeps;
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
@@ -3356,8 +3368,18 @@ impl Field {
             observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces) });
             let mut draws: Vec<(usize, usize, usize)> = Vec::new();
             for (k, &(q, n)) in problems.iter().enumerate() {
-                let (from, to) = if last { (done * n / sweeps, n) } else { (done * n / sweeps, (done + 1) * n / sweeps) };
-                for &t in orders[k][from..to].iter().filter(|&&t| open[k][t]) {
+                let count = if last { n } else { (done + 1) * n / sweeps - done * n / sweeps };
+                let mut picked: Vec<usize> = Vec::new();
+                while let Some(&t) = orders[k].get(cursors[k]) {
+                    if picked.len() == count || (!last && picked.first().is_some_and(|&p| octave_of(p + 1 - q.len()) != octave_of(t + 1 - q.len()))) {
+                        break;
+                    }
+                    cursors[k] += 1;
+                    if open[k][t] {
+                        picked.push(t);
+                    }
+                }
+                for &t in &picked {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
                     let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % face.total;
                     let mut acc = 0u128;
@@ -3367,7 +3389,6 @@ impl Field {
                     });
                     draws.push((k, t, c.unwrap_or(face.masses.len() - 1)));
                 }
-                let _ = q;
             }
             for (k, t, c) in draws {
                 classes[k][t] = c;
@@ -3391,6 +3412,11 @@ impl Field {
                 }
                 break;
             }
+            // Every place resolved: the sweeps are done.
+            if open.iter().all(|o| o.iter().all(|&u| !u)) {
+                swept = done + 1;
+                break;
+            }
         }
         // [definition; agent-inferred, November 3, §16.36; November 5, §16.47] **The places keep moving** (the lens of
         // November 1: an answer is a joint field whose parts move together until its faces align, never committed
@@ -3406,8 +3432,8 @@ impl Field {
         // deep and grew by one (segment 2's −4.8 places came all in its third pass, from its 14 short answers). A place
         // before the last letter whose face holds no letter mass keeps the letter it had. No place is chosen by its
         // certainty.
-        let mut read = sweeps;
-        let total = sweeps + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
+        let mut read = swept;
+        let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
         for pass in 1..=refine as u64 {
             let orders: Vec<Vec<usize>> = problems
@@ -4547,3 +4573,8 @@ pub use scale::Scale;
 
 #[cfg(test)]
 mod tests;
+
+/// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
+fn octave_of(d: usize) -> u32 {
+    usize::BITS - 1 - d.leading_zeros()
+}
