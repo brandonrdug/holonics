@@ -180,3 +180,17 @@ failure is the sweeps', and its content is near held's statistics (14 of 32 open
 12.9%, `y` 2.1%, entropy 4.92 bits, shared byte 0.188), while the refined write collapsed to `%` (32.7%, entropy 3.60 bits).
 The opening now knows the length, but the writer's states do not, ending at a steady one in about 110 places at or under
 held and past it alike. Two more b1 laps run for the design of (c), not to decide b1 (`code87_launch3.sh`).
+
+[measurement; agent-inferred] **The writer's laws clear the collapse and lift the hazard, and the answers stay short** (closing91;
+`closing91.txt`, `unwrote.py`). On b1's segment-2 state, the same 32 and keys, in runs. The no-run read fixed at 22:38: in 23 of
+the 28 short writes of b1's own write a void unwrote letters (324 letters over 34 reads), at least the 20 the reading named,
+so the void drawn before a written letter was where the length was lost; under the closing law no write unwrites a letter.
+The closing law with the whole room and no refine pass: hazard past held over at or under it 2.13 (one in 64 places past held,
+one in 136 at or under it; 0.87 before), passing; written over held 0.464 and the correlation +0.262, failing. Both laws with
+no refine pass: 0.98, 0.579, +0.234; with three: 1.20, 0.582, +0.236. The content with both laws and three refine passes: the
+top byte the space at 13.1%, the byte entropy 4.82 bits against held's 4.96, 13 of 32 opening with ```` ```python ```` and 15
+of 31 fences closed, all within the reading's bounds, so with the writer's region cut at its near field refine's two-sided
+states no longer collapse. The writer's cut lowers the hazard ratio (the whole room's far voids closed answers past held at one
+in 64 places, the cut's at one in 160) while it raises written over held. b1's segment 3 (laps 2 and 3, 929 and 974
+card-seconds): held context 2.358 and 2.272 against code85's 1.914 and 1.579, the opening's code 5.78 and 5.75 against 4.99 and
+5.00: the whole room slows what the field learns of content, not only its cost.
