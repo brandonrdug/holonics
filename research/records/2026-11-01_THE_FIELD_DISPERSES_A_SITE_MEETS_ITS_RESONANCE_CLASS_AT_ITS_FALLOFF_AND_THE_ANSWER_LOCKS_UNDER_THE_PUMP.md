@@ -3269,6 +3269,15 @@ contracts to under a third. **The blank law fails its acceptance under both cove
 is read, since a clock that runs on an expectation needs the face it reads to be compared too: the faces the clocks read
 are the subject.
 
+[agent-inferred, November 5, fixed at 04:30 UTC before exact63's segments 4 and 5 are read] **The free clock's
+acceptance.** Through segment 3, exact63 (the clocked faces uncompared, the exact return) took the whole field below the
+old law: the joint code 1.0053 nats a place against the old law's flat 1.010 to 1.013, context 0.1793 and foil 0.4155. An
+uncompared face's expectation is a mixture of real bytes' durations, so its clock is a learned control held inside the span
+the bytes give it (the unified-theory reading of November 5). As a law it stands on: (b) the writer's first state under
+5.08 bits a class over the run's last three states; context and foil below the old law's last three states (0.18310 and
+0.42340 bits a class) by more than their spread there (0.00045 and 0.00176), so under 0.18265 and 0.42164, over the run's
+last three laps; (a) reported, not a bar, since no clock passes it.
+
 Failures this could repeat, checked: **bits read as progress** (the law is judged by its fixed acceptance, read on three
 states where one swings); **a located cause carried unrepaired into a new consumer** (the operand covector's miss is
 repaired at its owner, the reverse, before the law is judged); **an uncertified deposition step** (the covector is checked
