@@ -1355,6 +1355,53 @@ fn a_finished_problem_leaves_the_reads() {
     }
 }
 
+/// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
+/// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
+/// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.
+#[test]
+fn a_read_releases_a_run() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let octave = |d: usize| usize::BITS - 1 - d.leading_zeros();
+    let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
+    for seed in 11..19 {
+        let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        field.sample_runs(&problems, 9, 2, 0, seed, 0, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
+        reads_one += counted.regions.len();
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        let mut last: Option<Vec<usize>> = None;
+        let run = field
+            .sample_runs(&problems, 9, 2, 0, seed, 1 << 20, &mut counted, &mut |_, _| true, &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
+                    if let (0, Some(j)) = (r.pass, earliest) {
+                        assert!((q.len()..r.classes[k].len()).all(|t| r.open[k][t] || r.classes[k][t] == 0 || octave(t + 1 - q.len()) <= j), "a letter past octave {j}, seed {seed}");
+                    }
+                }
+                if r.pass > 0 {
+                    let ends: Vec<usize> = problems.iter().enumerate().map(|(k, &(q, _))| (q.len()..r.classes[k].len()).find(|&t| r.classes[k][t] == 0 && !r.open[k][t]).unwrap_or(r.classes[k].len())).collect();
+                    if let Some(before) = &last {
+                        assert!(before.iter().zip(&ends).all(|(a, b)| a.abs_diff(*b) <= 1), "the end moved more than one place a read, seed {seed}");
+                    }
+                    last = Some(ends);
+                }
+            })
+            .unwrap();
+        reads_run += counted.regions.len();
+        for places in &run {
+            if let Some(end) = places.iter().position(|&c| c == 0) {
+                assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}");
+            }
+        }
+        fewer |= counted.regions.len() < reads_one;
+    }
+    assert!(reads_run <= reads_one, "{reads_run} reads in runs against {reads_one}");
+    let _ = fewer;
+}
+
 /// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
 /// distance `d` from the question stands open, no letter stands at a place of a later octave (`⌊log₂ d⌋`); a void's
 /// closing law may resolve later places, as the void tail.

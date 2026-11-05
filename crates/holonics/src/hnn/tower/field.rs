@@ -934,6 +934,12 @@ pub struct ReleaseRead<'a> {
     pub classes: &'a [Vec<usize>],
     pub open: &'a [Vec<bool>],
     pub faces: Option<&'a [Vec<Option<TowerFace>>]>,
+    /// [measurement; §16.47] The read's runs' certificate ([`Field::sample_runs`]): the entropies past each run's first place
+    /// summed over the problems, read on this read's own faces, on the codes' `2^(−20)` bits (zero, one place a read), and
+    /// the problems whose sum reached the run's bound (a refine run is chosen on its places' last draws, and passes the bound
+    /// where a redraw moved a context).
+    pub bound: i128,
+    pub passed: usize,
 }
 
 /// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
@@ -3346,6 +3352,26 @@ impl Field {
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
     pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, 0, realization, sweep, observe)
+    }
+
+    /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
+    /// **A read releases a run** ([`Field::sample_observed`] with `run_bound` on the codes' `2^(−20)` bits; zero, one place a
+    /// read): past each read's free places, the walk releases each next open place of its order (within the octave in the
+    /// sweeps) while the entropies of the places it adds, read on this read's faces, sum within `run_bound`; a refine pass's
+    /// run reopens the next places of its order whose entropies at their last draw sum so, and draws them all from one
+    /// read. Drawing a run from one read loses at most `ΣH − H_joint` of its joint, its total correlation, and since the
+    /// joint holds at least the first place's entropy that is at most the added places' sum, so `run_bound` bounds the
+    /// loss with no place chosen by its certainty: certainty sets only how long the run is. Why: one place a read made a
+    /// write of 32 answers about 3,000 full reads; a place whose face is nearly settled adds almost nothing to the joint's
+    /// loss when it is drawn beside the run's first.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+        self.release(problems, sweeps, refine, void, seed, run_bound, realization, sweep, observe)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3377,13 +3403,15 @@ impl Field {
         // Each problem's place in its order: a sweep draws its next open places, never past its octave (the last sweep
         // draws every place left), so a place the closing law has resolved costs no read.
         let mut cursors = vec![0usize; problems.len()];
+        // Each place's entropy at its last draw, for a refine pass's runs (none where the closing law resolved it).
+        let mut drawn_entropy: Vec<Vec<Option<i128>>> = classes.iter().map(|c| vec![None; c.len()]).collect();
         let mut swept = sweeps;
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
             let faces = self.read_active(&classes, &open, &active, realization)?;
-            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces) });
-            let mut draws: Vec<(usize, usize, usize)> = Vec::new();
+            let (mut bound, mut passed) = (0i128, 0usize);
+            let mut runs: Vec<Vec<usize>> = Vec::with_capacity(problems.len());
             for (k, &(q, n)) in problems.iter().enumerate() {
                 let count = if last { n } else { (done + 1) * n / sweeps - done * n / sweeps };
                 let mut picked: Vec<usize> = Vec::new();
@@ -3396,8 +3424,37 @@ impl Field {
                         picked.push(t);
                     }
                 }
-                for &t in &picked {
+                // The run past the free places: the next open places of the octave while their entropies sum within the bound.
+                if run_bound > 0 && !last && !picked.is_empty() {
+                    let mut held = 0i128;
+                    while let Some(&t) = orders[k].get(cursors[k]) {
+                        if octave_of(picked[0] + 1 - q.len()) != octave_of(t + 1 - q.len()) {
+                            break;
+                        }
+                        if !open[k][t] {
+                            cursors[k] += 1;
+                            continue;
+                        }
+                        let h = entropy(faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?);
+                        // Strictly within the bound: below one bit the places past the first hold one configuration with more
+                        // than half their mass, so the read makes one choice (at one bit a fair coin can stand there).
+                        if held + h >= run_bound {
+                            break;
+                        }
+                        held += h;
+                        cursors[k] += 1;
+                        picked.push(t);
+                    }
+                    bound += held;
+                }
+                runs.push(picked);
+            }
+            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
+            let mut draws: Vec<(usize, usize, usize)> = Vec::new();
+            for (k, picked) in runs.iter().enumerate() {
+                for &t in picked {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
+                    drawn_entropy[k][t] = Some(entropy(face));
                     let u = (((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ 0xE) as u128) % face.total;
                     let mut acc = 0u128;
                     let c = face.masses.iter().position(|&m| {
@@ -3424,7 +3481,7 @@ impl Field {
             }
             if last {
                 if done + 1 < sweeps {
-                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None });
+                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 break;
@@ -3464,15 +3521,32 @@ impl Field {
                 .collect();
             let mut cursors = vec![0usize; problems.len()];
             loop {
-                // Each problem's next place in its order standing at or before its boundary, beside that boundary.
-                let mut places: Vec<Option<(usize, usize)>> = vec![None; problems.len()];
+                // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
+                // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
+                let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
                         if t <= end {
-                            places[k] = Some((t, end));
+                            places[k] = Some((vec![t], end));
                             break;
+                        }
+                    }
+                    if let (true, Some((run, _))) = (run_bound > 0, places[k].as_mut()) {
+                        let mut held = 0i128;
+                        while let Some(&t) = orders[k].get(cursors[k]) {
+                            if t > end {
+                                cursors[k] += 1;
+                                continue;
+                            }
+                            let Some(h) = drawn_entropy[k][t] else { break };
+                            if held + h >= run_bound {
+                                break;
+                            }
+                            held += h;
+                            cursors[k] += 1;
+                            run.push(t);
                         }
                     }
                 }
@@ -3480,24 +3554,40 @@ impl Field {
                     break;
                 }
                 if !sweep(read, total) {
-                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None });
+                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 read += 1;
-                let mut kept = vec![void; problems.len()];
+                let mut kept: Vec<Vec<usize>> = vec![Vec::new(); problems.len()];
                 for (k, place) in places.iter().enumerate() {
-                    if let Some((t, _)) = *place {
-                        kept[k] = classes[k][t];
-                        open[k][t] = true;
-                        classes[k][t] = void;
+                    if let Some((run, _)) = place {
+                        for &t in run {
+                            kept[k].push(classes[k][t]);
+                            open[k][t] = true;
+                            classes[k][t] = void;
+                        }
                     }
                 }
                 let active: Vec<usize> = (0..problems.len()).filter(|&k| places[k].is_some()).collect();
                 let faces = self.read_active(&classes, &open, &active, realization)?;
-                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces) });
+                // What the read certifies is its own faces' sum past each run's first place.
+                let (mut bound, mut passed) = (0i128, 0usize);
+                for (k, place) in places.iter().enumerate() {
+                    if let Some((run, _)) = place {
+                        let mut held = 0i128;
+                        for &t in &run[1..] {
+                            held += entropy(faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?);
+                        }
+                        bound += held;
+                        passed += usize::from(run_bound > 0 && held >= run_bound);
+                    }
+                }
+                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces), bound, passed });
                 for (k, place) in places.into_iter().enumerate() {
-                    let Some((t, end)) = place else { continue };
+                    let Some((run, end)) = place else { continue };
+                    for (&t, &was) in run.iter().zip(&kept[k]) {
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
+                    drawn_entropy[k][t] = Some(entropy(face));
                     let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xD) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (pass << 56) ^ 0xE) as u128;
                     let whole = t + 1 >= end;
                     let letters = face.total - face.masses[void];
@@ -3509,20 +3599,29 @@ impl Field {
                             acc > u
                         }).unwrap_or(face.masses.len() - 1)
                     } else if letters == 0 {
-                        kept[k]
+                        was
                     } else {
                         let u = u % letters;
                         let mut acc = 0u128;
                         (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
                             acc += face.masses[c];
                             acc > u
-                        }).unwrap_or(kept[k])
+                        }).unwrap_or(was)
                     };
                     open[k][t] = false;
+                    }
+                    // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
+                    // place past it, a boundary drawn as a letter there among them.
+                    let q = problems[k].0.len();
+                    if let Some(first) = (q..classes[k].len()).find(|&t| classes[k][t] == void && !open[k][t]) {
+                        for t in first + 1..classes[k].len() {
+                            classes[k][t] = void;
+                        }
+                    }
                 }
             }
         }
-        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None });
+        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
@@ -4600,4 +4699,11 @@ mod tests;
 /// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
 pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
+}
+
+/// [definition; §16.47] A face's entropy `Σ_a p(a) (−log₂ p(a))` on the codes' `2^(−20)` bits, each class's code
+/// ([`TowerFace::code`]) weighed by its mass over the total and the sum released once at its nearest.
+fn entropy(face: &TowerFace) -> i128 {
+    let sum: i128 = face.masses.iter().enumerate().filter(|&(_, &m)| m > 0).map(|(a, &m)| m as i128 * face.code(a) as i128).sum();
+    div_nearest(sum, face.total as i128)
 }

@@ -3680,3 +3680,32 @@ comparison no run declares) still rereads and is the next to retire.
 (`Field::read_active`): a read meets only the problems with a place to draw, their faces returned at their own places, and
 since each region is read alone the answers are the same bits (the test writes three problems together and each alone, the
 batch padded so its keys are the batch's). About 60% of a 32-answer write's region reads were of finished problems.
+
+[measurement; agent-inferred, November 5] **Where the card's time goes** (prof87: `FIELD_PROFILE`, every launch timed alone
+with the card synchronized around it, and `FIELD_PHASES`, on path75's segment 2 state; `prof87.txt`). A 94 s training read:
+kernels 74.8 s, the card's allocations 12.2 s (33,780 of them), copies 1.2 s; of the kernels the dense affine maps (keys,
+probes, values, the face's lift) 31.3 s (`field_affine_x32` 4,460 launches at 4.9 ms, `x64` 1,548 at 6.1 ms), the contact
+8.9 s and its two backward passes 8.9 s, the exposure 4.3 s. A 33-read write: kernels 17.9 s, the affine maps 10.8 s, the
+contact 3.0 s. During a training section the card's multiprocessors read 96 to 100% busy and the trainer's host process 0.24
+of a core: the card is busy on slow kernels. The affine map was one thread a cell, each cell rescanning its site's whole row
+for the carrier bound and reading its weight row from the card's memory.
+
+[agent-inferred, November 5] **The affine map by tiles** (`affine_tiled`, `field_affine_tiled_x32`/`x64`): a block holds the
+weights and bias in shared memory and walks `256/rows` sites a pass, each site's row loaded once, the same integers (the
+carrier bound per site, the 64- or 128-bit sum, the release, the residual); every map of the declaration fits. Its parity and
+profile against prof87 are tile90.
+
+[definition; agent-inferred, November 5, the unified-theory readings of 17:41 and 18:14] **A read releases a run**
+(`Field::sample_runs`; `sample_observed` is its bound zero, bit for bit). Past each read's free place the walk releases each
+next open place of its order (within the octave in the sweeps) while the entropies of the places it adds, on this read's
+faces, sum strictly below one bit; a refine run takes the next places at or before the boundary whose entropies at their last
+draw sum so, reopens them together, reads once and draws them in order under the boundary rules read before it opened, then
+the closing law. Drawing a run from one read loses at most its total correlation, `ΣH − H_joint ≤ ΣH − H_first`, so the bound
+certifies the loss with no place chosen by its certainty and no maximum in the law (the first place is the walk's own free
+choice); strictly below a bit the added places hold one configuration with more than half their mass. Each read reports its
+certificate on its own faces (`ReleaseRead::bound`, `passed`; `length-field` prints the write's sum), and a refine run passes
+its bound where a redraw moved a context. The field tests pass (69; the runs keep the octave gate, the one-place move of the
+end and the closing law). **Prediction, fixed before launch** (the reading of 17:41 as amended at 18:14): on path75's segment
+2 state, the same 32 and keys, reads per write fall at least 1.5 times. **Rule**: the law stands if the closures (calculations
+that close, final lines at the boundary) and the length stay within their binomial spread at 32; one past it means released
+faces heard each other beyond the bound, and the blank's face is next (run91).

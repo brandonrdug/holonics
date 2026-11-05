@@ -760,6 +760,81 @@ __device__ void affine(const FieldWords &w, uint64_t weight, uint64_t bias, uint
     }
 }
 
+// [agent-inferred, November 5] **The affine map by tiles** (Brandon, November 5: where the time goes; the profile read the
+// one-thread-a-cell `affine` at 42% of a training read's kernel time and 61% of a write's, every cell rereading its site's
+// whole row for the carrier bound and its weight row from the card's memory): a block holds `W` and the bias in shared
+// memory and walks `per = blockDim / rows` sites a pass, each site's row loaded once into shared memory, each thread one
+// `(site, output)` cell. The same integers as `affine`: the carrier bound `wmax · xmax · (cols + 1)` per site, the sum in 64
+// bits below `2^62` and in 128 otherwise, the bias at the material's grain, the release and the residual.
+template <typename X>
+__device__ void affine_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    extern __shared__ __align__(16) unsigned char affine_shared[];
+    int32_t *ws = (int32_t *)affine_shared;
+    int32_t *bs = ws + (uint64_t)rows * cols;
+    const uint64_t head = ((uint64_t)rows * cols + rows) * sizeof(int32_t);
+    X *xs = (X *)(affine_shared + ((head + 15) & ~(uint64_t)15));
+    const uint32_t per = blockDim.x / rows;
+    for (uint32_t i = threadIdx.x; i < rows * cols; i += blockDim.x) {
+        ws[i] = w.theta[weight + i];
+    }
+    for (uint32_t i = threadIdx.x; i < rows; i += blockDim.x) {
+        bs[i] = w.theta[bias + i];
+    }
+    const uint32_t p = threadIdx.x / rows, o = threadIdx.x % rows;
+    for (uint64_t t0 = (uint64_t)blockIdx.x * per; t0 < w.T; t0 += (uint64_t)gridDim.x * per) {
+        __syncthreads();
+        for (uint32_t i = threadIdx.x; i < per * cols; i += blockDim.x) {
+            const uint64_t t = t0 + i / cols;
+            xs[i] = t < w.T ? x[t * x_stride + i % cols] : (X)0;
+        }
+        __syncthreads();
+        const uint64_t t = t0 + p;
+        if (p >= per || t >= w.T || (only_unresolved && !w.unresolved[t])) {
+            continue;
+        }
+        const X *xt = xs + (uint64_t)p * cols;
+        uint64_t xmax = 0;
+        for (uint32_t i = 0; i < cols; i++) {
+            const uint64_t m = mag64((int64_t)xt[i]);
+            xmax = m > xmax ? m : xmax;
+        }
+        const uwide terms = (uwide)wmax * (uwide)xmax * (uwide)(cols + 1);
+        if (terms >= ((uwide)1 << 126)) {
+            atomicOr(w.status, REFUSED_CARRIER);
+            continue;
+        }
+        const int32_t *row = ws + (uint64_t)o * cols;
+        wide sum;
+        if (terms < ((uwide)1 << 62)) {
+            int64_t s = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                s += (int64_t)row[i] * (int64_t)xt[i];
+            }
+            sum = s;
+        } else {
+            sum = 0;
+            for (uint32_t i = 0; i < cols; i++) {
+                sum += (wide)row[i] * (wide)xt[i];
+            }
+        }
+        sum += (wide)bs[o] << MATERIAL_BITS;
+        const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+        if (add) {
+            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+        } else {
+            out[t * out_stride + o] = v;
+        }
+    }
+}
+
+extern "C" __global__ void field_affine_tiled_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    affine_tiled<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+}
+
+extern "C" __global__ void field_affine_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
+    affine_tiled<int64_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
+}
+
 extern "C" __global__ void field_affine_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved) {
     affine<int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, only_unresolved);
 }

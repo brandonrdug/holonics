@@ -1586,13 +1586,18 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     let mut before: Option<(Vec<Vec<usize>>, Vec<Vec<bool>>, usize)> = None;
     let mut failed: Option<String> = None;
     let mut stopped = None;
+    // [measurement; agent-inferred, November 5, §16.47] `FIELD_WRITER_RUN_BITS`: the writer releases runs bounded by that many
+    // bits past each run's first place ([`Field::sample_runs`]), a declared comparison with one place a read on the same keys.
+    let run_bits: i128 = std::env::var("FIELD_WRITER_RUN_BITS").ok().and_then(|v| v.parse::<i128>().ok()).unwrap_or(0);
+    let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
     let answers = field
-        .sample_observed(
+        .sample_runs(
             &problems,
             sweeps,
             refine,
             void,
             seed,
+            run_bits << 20,
             realization,
             &mut |done, _| {
                 if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
@@ -1637,6 +1642,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
                     }
                 }
                 before = Some((r.classes.to_vec(), r.open.to_vec(), r.read));
+                if r.faces.is_some() {
+                    (reads_made, bound_sum, passed_sum) = (reads_made + 1, bound_sum + r.bound, passed_sum + r.passed);
+                }
             },
         )
         .map_err(|e| e.to_string())?;
@@ -1655,7 +1663,13 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         let last_read = if written == 0 { "-".to_string() } else { drawn[k][q + written - 1].map_or("-".to_string(), |r| r.to_string()) };
         row(&mut ends, &format!("{k}\t{held_length}\t{written}\t{fv_read}\t{fv_place}\t{last}\t{last_read}\n"))?;
     }
-    println!("FIELD_LENGTH problems={} sweeps={sweeps} refine={refine} stopped={} ms={}", problems.len(), stopped.map_or("-".to_string(), |s| s.to_string()), started.elapsed().as_millis());
+    println!(
+        "FIELD_LENGTH problems={} sweeps={sweeps} refine={refine} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
+        problems.len(),
+        stopped.map_or("-".to_string(), |s| s.to_string()),
+        bits(bound_sum as i64, 1),
+        started.elapsed().as_millis()
+    );
     Ok(())
 }
 

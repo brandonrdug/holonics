@@ -39,6 +39,8 @@ use crate::hnn::DeviceError;
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
+/// The dynamic shared memory a tiled affine map may take in a block, the default 48 KiB.
+const AFFINE_SHARED: usize = 48 * 1024;
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 const CONTACT_SPAN: u32 = 32;
 /// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
@@ -1954,6 +1956,16 @@ impl<'c> CardField<'c> {
         let (mut weight, mut bias, mut wmax, mut rows32, mut cols32) = (weight, bias, wmax, rows as u32, cols as u32);
         let (mut x, mut xs, mut out, mut os, mut add, mut u) = (x, x_stride as u64, out, out_stride as u64, add, u32::from(only_unresolved));
         let cells = words.t as u64 * rows as u64;
+        // [agent-inferred, November 5] The tiled map where its weights, bias and a pass's site rows fit a block's shared memory
+        // (every map of the field's declaration does), the cell map otherwise: the same integers either way.
+        let x_octets = if entry.ends_with("x64") { 8 } else { 4 };
+        let per = (THREADS as usize).checked_div(rows).unwrap_or(0);
+        let shared = ((rows * cols + rows) * 4).div_ceil(16) * 16 + per * cols * x_octets;
+        if per > 0 && shared <= AFFINE_SHARED {
+            let tiled = if x_octets == 8 { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
+            let grid = (words.t as u64).div_ceil(per as u64).clamp(1, 65_535) as u32;
+            return self.launch_shared(tiled, grid, THREADS, shared as u32, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)]);
+        }
         self.launch(entry, Self::cells(cells), THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])
     }
 
