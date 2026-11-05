@@ -514,7 +514,7 @@ fn joint_read(field: &Field, codec: &FieldCodec, problems: &Problems, seed: u64,
         for ((i, is_foil, (size, k), c, _), faces) in chunk.iter().zip(faces) {
             let q_len = c.len() - problems[*i].1.len() - 1;
             let terms = if *is_foil { &mut foil[*i] } else { &mut own[*i] };
-            for (t, face) in faces.iter().enumerate() {
+            for (t, face) in faces.iter().enumerate().take(c.len()) {
                 if let Some(face) = face {
                     let x = face.code(c[t]) as i128 * *size as i128;
                     let k = *k as i128;
@@ -1241,7 +1241,7 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
         let first: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
         let region = Region { classes: &classes, unresolved: &first, faces: &[], locked: &[], echo: &[], domain: None, port: None };
         let faces = realization.read_faces(field, std::slice::from_ref(&region)).map_err(|e| e.to_string())?.remove(0);
-        for (t, face) in faces.iter().enumerate().filter(|&(t, _)| first[t]) {
+        for (t, face) in faces.iter().enumerate().take(first.len()).filter(|&(t, _)| first[t]) {
             let face = face.as_ref().ok_or("an open place with no face")?;
             first_code += holonics::hnn::tower::face_code(face.masses[classes[t]], face.total);
             first_places += 1;

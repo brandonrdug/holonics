@@ -3458,11 +3458,11 @@ __device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, ui
     return total == 0 ? 0 : (((uwide)w.blank_masses[s * w.A + a] << FACE_BITS) + total / 2) / total;
 }
 
-// [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face** (the host's
+// [definition; agent-inferred, November 5, §16.44, §16.45] **A blank's clock returns through its face** (the host's
 // `Field::blank_return`), one thread a site and a class: at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2,
-// 24)` with `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read;
-// zero elsewhere.
-extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
+// 24)` with `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read, plus
+// the face's own comparison where it is compared (`wm ≠ 0`); zero elsewhere.
+extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, const uint64_t *wm, const uint64_t *wk, wide *dz) {
     const uint64_t cells = (uint64_t)w.T * w.A;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
@@ -3491,6 +3491,13 @@ extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide
                 atomicOr(w.status, REFUSED_CARRIER);
             }
             out += rel(y, PACE_BITS);
+        }
+        // [§16.45] The face compared as the released one is: `p̂ − q` at the site's class on `2^(−24)`, weighed `m/(K F)`,
+        // held `2^30` finer (the host's `blank_return`).
+        if (wm[s] != 0) {
+            const uwide p = (((uwide)w.blank_masses[c] << COVECTOR_BITS) + (uwide)total / 2) / (uwide)total;
+            const wide v = (wide)p - (b == w.classes[s] ? ((wide)1 << COVECTOR_BITS) : 0);
+            out += div_nearest((v << 30) * (wide)wm[s], (wide)wk[s]);
         }
         dz[c] = out;
     }
