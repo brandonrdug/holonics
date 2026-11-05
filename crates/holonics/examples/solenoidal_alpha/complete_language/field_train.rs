@@ -1462,6 +1462,110 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 5, §16.47] **`length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT`**: the answer's length as the writer writes it (the unified-theory reading of
+/// November 5, 09:45: if the field's conditionals were one joint law, its expected length would be a martingale along the
+/// writer's path). The writer of `sample-field`, draw for draw ([`Field::sample_observed`]), and at every read each
+/// problem's expected length `L` = the answer places resolved as letters + `Σ (1 − p̂_∅)` over its open places, on `2^(−20)`
+/// places; at the release's end its written length. Writes `LENGTH.tsv` (problem, read, pass, `L`, letters, open; one row
+/// a problem a read) and `ENDS.tsv` (each problem's held and written length, the read and place of its first void, and the
+/// place of its last letter and the read that last drew it), private, of the held answers. A reading only.
+pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
+    let out = Path::new(&args[13]);
+    std::fs::create_dir(out)?;
+    let field = &learner.field;
+    let held = &held[..limit.min(held.len())];
+    let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
+    let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
+    let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
+    let void = codec.void();
+    let mut rows = rows_file(&out.join("LENGTH.tsv"), "problem\tread\tpass\tlength\tletters\topen\n")?;
+    // Each problem's first void (read, place) and each place's last letter draw (the read whose draws set it).
+    let mut first_void: Vec<Option<(usize, usize)>> = vec![None; problems.len()];
+    let mut drawn: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
+    let mut before: Option<(Vec<Vec<usize>>, Vec<Vec<bool>>, usize)> = None;
+    let mut failed: Option<String> = None;
+    let mut stopped = None;
+    let answers = field
+        .sample_observed(
+            &problems,
+            sweeps,
+            refine,
+            void,
+            seed,
+            realization,
+            &mut |done, _| {
+                if started.elapsed().as_millis() > stop_ms {
+                    stopped = Some(done);
+                    return false;
+                }
+                true
+            },
+            &mut |r| {
+                for (k, &(q, _)) in problems.iter().enumerate() {
+                    if let Some((classes, open, read)) = &before {
+                        for t in q.len()..r.classes[k].len() {
+                            let changed = open[k][t] != r.open[k][t] || classes[k][t] != r.classes[k][t];
+                            if changed && !r.open[k][t] && r.classes[k][t] != void {
+                                drawn[k][t] = Some(*read);
+                            }
+                        }
+                    }
+                    if first_void[k].is_none() {
+                        if let Some(t) = (q.len()..r.classes[k].len()).find(|&t| !r.open[k][t] && r.classes[k][t] == void) {
+                            first_void[k] = Some((r.read, t - q.len()));
+                        }
+                    }
+                    let (mut length, mut letters, mut opened) = (0i128, 0usize, 0usize);
+                    for t in q.len()..r.classes[k].len() {
+                        if !r.open[k][t] {
+                            if r.classes[k][t] != void {
+                                letters += 1;
+                                length += 1 << 20;
+                            }
+                        } else {
+                            opened += 1;
+                            match r.faces.map(|f| f[k][t].as_ref()) {
+                                Some(Some(face)) => length += (((face.total - face.masses[void]) << 20) / face.total) as i128,
+                                Some(None) => failed = Some("an open place with no face".into()),
+                                None => {}
+                            }
+                        }
+                    }
+                    if row(&mut rows, &format!("{k}\t{}\t{}\t{length}\t{letters}\t{opened}\n", r.read, r.pass)).is_err() {
+                        failed = Some("LENGTH.tsv could not be written".into());
+                    }
+                }
+                before = Some((r.classes.to_vec(), r.open.to_vec(), r.read));
+            },
+        )
+        .map_err(|e| e.to_string())?;
+    if let Some(why) = failed {
+        return Err(why.into());
+    }
+    let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
+    for (k, places) in answers.iter().enumerate() {
+        let q = problems[k].0.len();
+        let written = places.iter().take_while(|&&c| c != void).count();
+        let held_length = codec.encode(&held[k].1)?.len();
+        let (fv_read, fv_place) = first_void[k].map_or(("-".to_string(), "-".to_string()), |(r, t)| (r.to_string(), t.to_string()));
+        let last = if written == 0 { "-".to_string() } else { (written - 1).to_string() };
+        let last_read = if written == 0 { "-".to_string() } else { drawn[k][q + written - 1].map_or("-".to_string(), |r| r.to_string()) };
+        row(&mut ends, &format!("{k}\t{held_length}\t{written}\t{fv_read}\t{fv_place}\t{last}\t{last_read}\n"))?;
+    }
+    println!("FIELD_LENGTH problems={} sweeps={sweeps} refine={refine} stopped={} ms={}", problems.len(), stopped.map_or("-".to_string(), |s| s.to_string()), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each

@@ -919,6 +919,17 @@ struct TickClock {
     reads: Vec<Option<BlankRead>>,
 }
 
+/// [measurement; agent-inferred, November 5, §16.47] **One read of the release** ([`Field::sample_observed`]): its index
+/// (sweeps first, then the refine steps), its pass (zero for the sweeps, `p` for the `p`-th refine pass), and every
+/// problem's classes, open places and faces as the read meets them (no faces at the release's end).
+pub struct ReleaseRead<'a> {
+    pub read: usize,
+    pub pass: usize,
+    pub classes: &'a [Vec<usize>],
+    pub open: &'a [Vec<bool>],
+    pub faces: Option<&'a [Vec<Option<TowerFace>>]>,
+}
+
 /// [§16.44] A blank's read of its face off a state: the chart `r̂` and its scales, the lift `R r̂ + b_R`, and the face.
 #[derive(Clone, Debug, Default)]
 struct BlankRead {
@@ -3302,6 +3313,15 @@ impl Field {
     /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
     /// `sweep` says to. `refine` passes then revisit the written answer (§16.36); zero writes it once.
     pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
+        self.sample_observed(problems, sweeps, refine, void, seed, realization, sweep, &mut |_| {})
+    }
+
+    /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
+    /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
+    /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no
+    /// faces. A reading only: nothing in the release reads it.
+    #[allow(clippy::too_many_arguments)]
+    pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -3327,6 +3347,7 @@ impl Field {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = realization.read_faces(self, &regions)?;
+            observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces) });
             let mut draws: Vec<(usize, usize, usize)> = Vec::new();
             for (k, &(q, n)) in problems.iter().enumerate() {
                 let (from, to) = if last { (done * n / sweeps, n) } else { (done * n / sweeps, (done + 1) * n / sweeps) };
@@ -3359,6 +3380,7 @@ impl Field {
             }
             if last {
                 if done + 1 < sweeps {
+                    observe(ReleaseRead { read: done + 1, pass: 0, classes: &classes, open: &open, faces: None });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 break;
@@ -3387,6 +3409,7 @@ impl Field {
             let reads = orders.iter().map(Vec::len).max().unwrap_or(0);
             for step in 0..reads {
                 if !sweep(read, total) {
+                    observe(ReleaseRead { read, pass: pass as usize, classes: &classes, open: &open, faces: None });
                     return Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect());
                 }
                 read += 1;
@@ -3405,6 +3428,7 @@ impl Field {
                 }
                 let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
                 let faces = realization.read_faces(self, &regions)?;
+                observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces) });
                 for (k, place) in places.into_iter().enumerate() {
                     let Some(t) = place else { continue };
                     let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a sample's open place without a face"))?;
@@ -3424,6 +3448,7 @@ impl Field {
                 }
             }
         }
+        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 
