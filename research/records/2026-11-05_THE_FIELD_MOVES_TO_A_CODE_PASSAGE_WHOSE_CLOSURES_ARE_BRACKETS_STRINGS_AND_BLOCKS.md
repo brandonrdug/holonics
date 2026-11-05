@@ -97,3 +97,18 @@ keyed tail's own test stands aside). **Prediction, fixed before launch**: from c
 held code on the context and opening reads stays no higher than code84's segment 2 at equal laps (within its spread), and lap
 time falls again, about 1.6 times fewer sites than parts 1 and 3 alone. **Rule**: held code above that spread means the room's
 voids shaped what training learned about the end, and where the writer closes needs its own law (code85).
+
+[measurement; agent-inferred] **Segment 2: the cut was not cost-only** (`code84_seg2.txt`). Two laps on the cut path states,
+600 and 580 card-seconds a lap (3.4 times lap 0's). The held context code 3.065 → 2.467 → 2.181, the foil 2.192 (the
+question's effect 0.011 bits a byte), the joint code 2.68 → 2.34. But the opening's length law collapsed: its void mass 0.02
+to 0.04 at every distance (the law's 0.41 to 0.92), its expected length less held +1,649 (`B` 1,653 against the law's 132),
+and the L-based drift +1,649 → +1,174 by read 64. The cut dropped the far open places' boundary comparisons, which carried
+covector (the sampled parity compares card and host under one law, both cut, and so never compared the cut learner with the
+whole room's; the near-field test compared the kept faces, not the covector), and those comparisons taught the opening its
+length. The opening and the L-based drift now read states the field no longer trains. The write of the 32 (runs, 7,407
+reads, 674 s): 1.749 of the held bytes (16 longer, 16 shorter; the correlation with held −0.139), 7 of 24 opened fences
+closed, one answer parsing, 0.18 of its lines parsing alone (0.14 at held length, two answers), 0.37 of its words in the
+training vocabulary; the closures against held 0.53 and 0.50 (brackets, near and far), 0.66 and 0.54 (strings), 0.48
+(blocks, far). Its ends: three of 32 within two places after a closing fence (seven written), 29 elsewhere at a steady one in
+528 places, about one in two held lengths: the writer ends in unclosed content at a steady rate, a sense of length kept at
+about half its hazard.
