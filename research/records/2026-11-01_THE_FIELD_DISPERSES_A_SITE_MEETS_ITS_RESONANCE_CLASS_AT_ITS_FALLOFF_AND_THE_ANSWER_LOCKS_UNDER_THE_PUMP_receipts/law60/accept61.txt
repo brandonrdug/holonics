@@ -1,0 +1,34 @@
+# state 991049e91da15059781df904535fbc6e6b9467831beda1f7d04042d95b2d711c lock taken 00:16:28
+# old binary b65b76e37feca26cb518a23150072c30a94a322006821137bd2528745c013cf3
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=57616
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.042
+MEASURE lap=old rc=0 wall_s=60.1 peak_rss_kib=301376
+# law binary e02936012f7cf7a6f0ae87113a40db47fff057d759df40bb2f0c046e7d5475a7
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=70097
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.094
+MEASURE lap=law rc=0 wall_s=70.4 peak_rss_kib=238376
+ACCEPT exit 00:18:39
+# state STATE.8 b6f23468a75748b1b5694601234e364764c3e9db7dab5e1d0cc420d3a26940cb lock taken 00:19:51
+FIELD_RESTATE problems=128 restatements=393 reads=5895 ms=72931
+FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.437
+MEASURE lap=seg1 rc=0 wall_s=73.2 peak_rss_kib=238152
+ACCEPT exit 00:21:04
+# old binary b65b76e37feca26cb518a23150072c30a94a322006821137bd2528745c013cf3 lock taken 00:26:41
+old-seg3-STATE.8 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.248 wall_s=60.0 peak_rss_kib=238260
+D places read 707 (within the near field 631); head 3 at the offset 0.318; D's code 3.732 bits
+old-seg3-STATE.9 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.177 wall_s=58.9 peak_rss_kib=240612
+D places read 707 (within the near field 631); head 3 at the offset 0.307; D's code 3.760 bits
+old-seg3-STATE.10 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.042 wall_s=57.6 peak_rss_kib=238444
+D places read 707 (within the near field 631); head 3 at the offset 0.272; D's code 3.738 bits
+TRIO exit 00:29:38
+# law1 binary e02936012f7cf7a6f0ae87113a40db47fff057d759df40bb2f0c046e7d5475a7 lock taken 01:09:45
+law1-seg1-STATE.6 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.299 wall_s=75.0 peak_rss_kib=234580
+D places read 707 (within the near field 631); head 3 at the offset 0.300; D's code 3.900 bits
+law1-seg1-STATE.7 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.389 wall_s=74.6 peak_rss_kib=235800
+D places read 707 (within the near field 631); head 3 at the offset 0.318; D's code 3.749 bits
+law1-seg1-STATE.8 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.437 wall_s=73.4 peak_rss_kib=238388
+D places read 707 (within the near field 631); head 3 at the offset 0.328; D's code 3.838 bits
+TRIO exit 01:13:28
+# oldat8 binary b65b76e37feca26cb518a23150072c30a94a322006821137bd2528745c013cf3 lock taken 01:27:19
+oldat8-seg1-STATE.8 FIELD_RESTATE_FIRST places=35591 code_bits_a_class=5.291 wall_s=63.7 peak_rss_kib=236004
+D places read 707 (within the near field 631); head 3 at the offset 0.103; D's code 4.285 bits

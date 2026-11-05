@@ -1210,6 +1210,14 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
+/// [measurement; agent-inferred, November 5, §16.44] **A blank's clocks by tick** ([`Field::blank_clocks`]): at each tick
+/// whose clocks the blanks set (`None` at a tick that reads the pass's), each paced head's rate `κ` at the site on
+/// `2^(−24)` and the face the clock read there.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BlankClocks {
+    pub ticks: Vec<Option<(Vec<i64>, TowerFace)>>,
+}
+
 /// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
 /// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
 /// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
@@ -3397,6 +3405,26 @@ impl Field {
         Ok(landmarks_of(&rows, question, count))
     }
 
+    /// [measurement; agent-inferred, November 5, §16.44] **Each of `sites`' clocks by tick** ([`BlankClocks`]): whether a
+    /// blank gap's expected duration holds its written length, and whether the faces the clocks read still predict the
+    /// byte. A reading only: nothing in the law reads it.
+    pub fn blank_clocks(&self, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        let pass = self.pass(region, true)?;
+        if sites.iter().any(|&i| i >= region.classes.len()) {
+            return refuse("a clock's site outside its region");
+        }
+        Ok(sites
+            .iter()
+            .map(|&i| BlankClocks {
+                ticks: pass
+                    .ticks
+                    .iter()
+                    .map(|cell| cell.clock.as_deref().and_then(|c| c.reads.get(i).and_then(Option::as_ref).map(|r| (c.paces.kappa.iter().map(|k| k[i]).collect(), r.face.clone()))))
+                    .collect(),
+            })
+            .collect())
+    }
+
     /// [measurement; agent-inferred, November 4, §16.42] **Each of `sites`' near field by offset** ([`NearOffsets`]): whether
     /// a receiver tells its neighbouring offsets apart where their faces are equal, as a restated result needs (in
     /// `<<E=C>>D` the result C is written again as D, and D's `k`-th site reads C's `k`-th at offset `|C| + 2`). A reading
@@ -3847,6 +3875,10 @@ pub trait FieldRealization {
     fn read_near_offsets(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {
         refuse("a realization that cannot read its near fields")
     }
+    /// Each of `sites`' clocks by tick in `region` ([`Field::blank_clocks`]), a reading.
+    fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        refuse("a realization that cannot read its blanks' clocks")
+    }
 }
 
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
@@ -3882,6 +3914,10 @@ impl FieldRealization for HostField {
 
     fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
         field.near_offsets(region, sites)
+    }
+
+    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        field.blank_clocks(region, sites)
     }
 }
 

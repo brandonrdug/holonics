@@ -3198,3 +3198,55 @@ Failures this could repeat, checked: **bits read as progress** (the slip is judg
 its prices); **a located cause carried unrepaired into a new consumer** (the writer's repair is retired once its cause
 is located upstream, not tuned further); **an authored routine standing in for learning** (the slip read no text rule;
 the restatements only choose what is counted).
+
+### 16.44 A blank place runs the clocks at its expected duration; trained with its face as an operand, the read-time gain goes back
+
+[definition; agent-inferred, November 4 and 5] **The law** (`Field::paces_with`, the card's `field_blank_rates`, from the
+unified-theory reading of November 4, `a_blank_place_is_a_potential`): a turned head reads a source across
+`τ_t − τ_s = Σ_(u∈(s,t]) κ_u`, and a silent open place ran at the bare rate `κ = 1` while a written answer byte runs at
+1.62 and 1.91 on the two clocks, so a blank gap read contracted and a restated place drawn into a blank surround read one
+place off (§16.42). Now each tick after the first runs each blank at `κ_h(t) = 1 + Σ_a w_a c_h[a]`, the shares of the face
+the tick before read off it, its clocks, frames and moments read again; the blank carries nothing else (its rows at its
+own place would be a self-energy, and as a source it cost the trained field 0.87 bits a class, that reading's §5). The
+reverse returns each tick's own clock on its own clocks. The sampled parity holds bit for bit on all four sections and
+its write (`_receipts/law60/`: `blank59_parity.txt`), and the law changes that write (12 places to 72 written). A section
+costs 633 ms on the card against main52's 486 (the faces read a tick and the moments read again).
+
+**At read time it places the restated digits.** On main52 segment 3's last state, untrained for it (`acceptance.py` over
+D's first and last places, every answer place but C open, head 3's share of its row at the exact offset at the last tick,
+and D's code): the old law 0.272 and 3.738 bits (over that run's last three states 0.30 and 3.74), the blank law 0.448
+and 3.390. The writer's first state reads 5.042 and 5.094 bits a class (5.16 over the three states; the trainer's all-open
+read swings 5.05 to 6.15 between laps under the old law, so a single state is no reading).
+
+**Trained with the face as an operand of its clock, the gain goes back** (blank60: from that state at `2^(−12)` under the
+transfer law, which cooled it to `2^(−17)`; two segments of 45 card-minutes before it was stopped for the exact return):
+
+| state | head 3 at the offset | D's code, bits | writer's first state, bits | context | foil |
+|---|---|---|---|---|---|
+| old law, main52 seg3 states 8, 9, 10 | 0.318, 0.307, 0.272 | 3.732, 3.760, 3.738 | 5.248, 5.177, 5.042 | 0.183 | 0.424 |
+| blank law, untrained (seg3 state 10) | 0.448 | 3.390 | 5.094 | 0.185 | 0.428 |
+| blank law, segment 1 states 6, 7, 8 | 0.300, 0.318, 0.328 | 3.900, 3.749, 3.838 | 5.299, 5.389, 5.437 | 0.183 | 0.425 |
+| blank law, segment 2 state 10 | 0.326 | 3.874 | | 0.181 | 0.420 |
+
+The joint code went 1.035 (the law at read time) to 1.0138 and 1.0120, the old law's floor 1.011; the writes restate 13 of
+18 and 13 of 22 results exactly. By tick, head 3's share at the offset on that read: the old law 0.131, 0.046, 0.142, 0.272;
+the blank law untrained 0.131, 0.135, 0.221, 0.448; after segment 1 0.127, 0.021, 0.079, 0.328, and the old law reads that
+state 0.127, 0.003, 0.014, 0.103 (D's code 4.285). So the field trained under the blank law leans on its clock (the old
+law reads its state far worse), and the clock still lifts head 3, but the trained reading is back at the old law's.
+[agent-inferred] The covector held each blank's face as an operand of the clock it set, and missed how the clock moves
+with the face (its `g₁` term); a face is an operand only where the descended comparison is stationary in it, and here the
+code is read at the last tick while each face sets a later tick's clocks.
+
+[definition; agent-inferred, November 5] **The return through a blank's face** (`Field::blank_return`, the card's
+`field_blank_dz` to `field_blank_dx`): each blank's `δκ_h` reaches the face's logits as `δz_b = Σ_h ln 2 · p_b (c_h[b] −
+Σ_a p_a c_h[a]) δκ_h`, then the readout's reverse at the state the face was read off, into that state's covector; the
+logits' covector is held `2^30` finer and the lift's onward `2^16` finer, each product released once, since a blank's
+covector is small and its terms otherwise rounded away (the domain-weighting check caught it at 1.9%). With it every
+field test passes (65), the covector checks among them, and the card's parity holds bit for bit on every section and its
+write (`exact62_parity.txt`). The run with it (exact63) starts from blank60's own opening state on its schedule, so
+blank60's segments are its control.
+
+Failures this could repeat, checked: **bits read as progress** (the law is judged by its fixed acceptance, read on three
+states where one swings); **a located cause carried unrepaired into a new consumer** (the operand covector's miss is
+repaired at its owner, the reverse, before the law is judged); **an uncertified deposition step** (the covector is checked
+against the code's difference before it trains).

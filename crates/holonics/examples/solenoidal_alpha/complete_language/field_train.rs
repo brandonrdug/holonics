@@ -1223,6 +1223,10 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
     println!("FIELD_RESTATE_DECLARATION heads={} ticks={} still={} frames={} kinds={}", d.heads, d.ticks, d.still, d.frames, kinds.join(","));
     let cells: Vec<String> = (0..d.ticks).flat_map(|k| (0..d.heads).flat_map(move |h| (1..NEAR).map(move |o| format!("t{k}h{h}d{o}")))).collect();
     let mut rows = rows_file(&out.join("RESTATEMENTS.tsv"), &format!("problem\trestatement\tstate\tat\tlength\toffset\tp_true\tp_total\t{}\n", cells.join("\t")))?;
+    // [§16.44] The `>>` places' clocks by tick with every answer place but C open: each paced head's rate there, its written
+    // rate, and the face's code of the `>` against its entropy (on `2^(−20)` bits).
+    let mut clocks = rows_file(&out.join("CLOCKS.tsv"), "problem\trestatement\tlength\ttick\thead\tkappa_first\tkappa_second\tkappa_written\tcode_first\tentropy_first\tcode_second\tentropy_second\n")?;
+    let entropy = |f: &holonics::hnn::tower::TowerFace| -> i64 { if f.total == 0 { 0 } else { (f.masses.iter().map(|&m| (m as i128) * holonics::hnn::tower::face_code(m.max(1), f.total) as i128).sum::<i128>() / f.total as i128) as i64 } };
     let (mut restatements, mut reads) = (0usize, 0usize);
     // [§16.44] The writer's first state: every answer place and the first void open beside the question, the truth's code.
     let (mut first_code, mut first_places) = (0i64, 0usize);
@@ -1256,6 +1260,24 @@ pub(super) fn restate_field(args: &[String], realization: &mut dyn FieldRealizat
                 ("between_open", between.chain(restated.clone()).collect()),
                 ("answer_open", answer_rest),
             ];
+            {
+                let (gt, open) = (q.len() + s, &states[4].1);
+                let mut unresolved = vec![false; classes.len()];
+                for &t in open {
+                    unresolved[t] = true;
+                }
+                let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+                let read = realization.read_blank_clocks(field, &region, &[gt, gt + 1]).map_err(|e| e.to_string())?;
+                let width = d.alphabet + 1;
+                for tick in 0..d.ticks {
+                    let (Some((k1, f1)), Some((k2, f2))) = (&read[0].ticks[tick], &read[1].ticks[tick]) else { continue };
+                    for (p, (&a, &b)) in k1.iter().zip(k2).enumerate() {
+                        let written = (1i64 << holonics::hnn::tower::field::PACE_BITS) + field.theta[field.layout().pace + p * width + classes[gt]] as i64;
+                        let (c1, c2) = (holonics::hnn::tower::face_code(f1.masses[classes[gt]], f1.total), holonics::hnn::tower::face_code(f2.masses[classes[gt + 1]], f2.total));
+                        row(&mut clocks, &format!("{k}\t{c}\t{length}\t{tick}\t{p}\t{a}\t{b}\t{written}\t{c1}\t{}\t{c2}\t{}\n", entropy(f1), entropy(f2)))?;
+                    }
+                }
+            }
             for (state, open) in &states {
                 for (at, place) in [("first", s + 2), ("last", s + 1 + length), ("stop", s + 2 + length)] {
                     let i = q.len() + place;

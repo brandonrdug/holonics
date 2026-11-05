@@ -30,7 +30,7 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
@@ -648,6 +648,10 @@ pub struct CardField<'c> {
     /// by offset at every kept tick and head.
     near_sites: std::cell::RefCell<Option<Vec<usize>>>,
     near_out: std::cell::RefCell<Vec<NearOffsets>>,
+    /// [measurement, §16.44] While the blanks' clocks are read: the named sites of the batch's one region, and each one's
+    /// clocks by tick.
+    clock_sites: std::cell::RefCell<Option<Vec<usize>>>,
+    clock_out: std::cell::RefCell<Vec<BlankClocks>>,
     /// The host's wall time between marks, by name (`FIELD_PHASES`), no stream synchronized.
     phases: Option<std::cell::RefCell<(Instant, std::collections::BTreeMap<&'static str, (u64, u128)>)>>,
 }
@@ -662,7 +666,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), phases: None })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1544,6 +1548,28 @@ impl<'c> CardField<'c> {
             }
         }
         set_clock(words, None, base_clock);
+        // Each named site's clocks by tick (a reading, §16.44), the batch's one region.
+        if let Some(named) = self.clock_sites.borrow().as_ref() {
+            let mut out = self.clock_out.borrow_mut();
+            for &i in named {
+                if regions.len() != 1 || i >= sites {
+                    return Err(TowerError::Refused("a clock's site outside its region"));
+                }
+                let mut read = BlankClocks::default();
+                for clock in &clocks {
+                    read.ticks.push(match clock {
+                        Some(c) if unresolved[i] != 0 && st.mix_off[i] == st.mix_off[i + 1] => {
+                            let kappa = self.timed(Kind::Copy, || card.fetch_range(&c.kappa, 0, paced * sites)).map_err(device)?;
+                            let masses = self.timed(Kind::Copy, || card.fetch_range(&c.masses, i * a, a)).map_err(device)?;
+                            let total = self.timed(Kind::Copy, || card.fetch_range(&c.totals, i, 1)).map_err(device)?;
+                            Some(((0..paced).map(|p| kappa[p * sites + i]).collect(), TowerFace { masses: masses.into_iter().map(|m| m as u128).collect(), total: total[0] as u128 }))
+                        }
+                        _ => None,
+                    });
+                }
+                out.push(read);
+            }
+        }
         // Each tick's reads, where the ticks are read (a reading of expansion and volume).
         if let Some(out) = self.tick_reads.borrow_mut().as_mut() {
             let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
@@ -2495,6 +2521,15 @@ impl FieldRealization for CardField<'_> {
         let out = self.tick_reads.borrow_mut().take().unwrap_or_default();
         read?;
         Ok(out)
+    }
+
+    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+        *self.clock_sites.borrow_mut() = Some(sites.to_vec());
+        self.clock_out.borrow_mut().clear();
+        let read = self.run(field, std::slice::from_ref(region), false, true, None);
+        *self.clock_sites.borrow_mut() = None;
+        read?;
+        Ok(std::mem::take(&mut *self.clock_out.borrow_mut()))
     }
 
     fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
