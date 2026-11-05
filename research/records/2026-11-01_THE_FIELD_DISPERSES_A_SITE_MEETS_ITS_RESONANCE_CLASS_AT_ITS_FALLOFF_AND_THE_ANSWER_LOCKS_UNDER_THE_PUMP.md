@@ -3791,3 +3791,22 @@ b1's segment-2 state and keys (closing91): the closing law with no refine pass, 
 least 1.5 and correlation above +0.3 (written over held alone passing: the front hears only the prior); both laws with three
 refine passes, the top byte under 20%, the byte entropy within 0.5 bits of held's and at least 10 of 32 opening with
 ```` ```python ```` (a collapse with the cut puts the fault in refine's two-sided states).
+
+[definition; agent-inferred, November 5, Brandon's lens of 23:12 and the unified-theory reading of 23:26] **Refinement runs
+until the answer is typical of its faces** (`Field::release` with `SETTLE`; `length-field ... settle`). Brandon read the writes
+under the writer's laws: they hook onto common tokens, keep a register for comments apart from code, and hold the code's
+shape, but they do not take time to converge on words, mangle the fence (```` ```` ````python ````, `pytython`) and close
+brackets only sometimes; the cause is in the architecture and training dynamics, not the data. A byte drawn in the sweeps
+reads a face with most of its neighbours blank (the opening codes about 5 bits a byte, the context about 1.4); the refine
+passes are where a place is redrawn with both sides written, and three of them gave a word no time to converge. The law:
+each problem's passes go on until the first pass whose held letters are at least as likely as its draws, on that pass's own
+faces: at each place the pass redraws, the masses of the class it held and of the class it drew, both on the one face read
+there, and the problem settles when `Π m_held ≥ Π m_drawn` (each face's total cancels, one exact integer comparison) and
+leaves the reads; no pass count is set, only the time guard. The walk is at temperature one, so an answer settles in its
+distribution and never in its letters; the stop overshoots by about a pass. A stop on the slope of the drawn code (a pass
+that fails to lower it) was built first and replaced before any read: it stops wherever one pass's noise outweighs its
+mending. `PASSES.tsv` keeps each pass's redraws and their code, a problem a pass. **Fixed before the read** (settle93, on
+code86's and b1's states against their three-pass writes, the same 32 and keys): fences, brackets and strings within half of
+held's closure near and far, and the code per byte falling then flat; the median stop past pass 3 (else the law is three
+passes); of code86's openings not exactly ```` ```python ````, those a byte off stay so at the stop, at most one mending (more
+mending puts shifts in refine's walk; if they stay, shifts are the sweeps' to prevent, read apart from the stop).

@@ -1574,8 +1574,10 @@ fn refinement_moves_the_end_one_place_a_read() {
     let mut reads = 0;
     for seed in 11..19 {
         let mut last: Option<Vec<usize>> = None;
+        for refine in [3, SETTLE] {
+        last = None;
         field
-            .sample_observed(&problems, 4, 3, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+            .sample_observed(&problems, 4, refine, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
                 if r.pass == 0 {
                     return;
                 }
@@ -1597,6 +1599,7 @@ fn refinement_moves_the_end_one_place_a_read() {
                 reads += 1;
             })
             .unwrap();
+        }
     }
     assert!(reads > 0);
 }

@@ -188,6 +188,10 @@ pub const STATE_BITS: u32 = 16;
 /// place without winding, and four bytes before a site code it at 1.98 bits, so a byte's own
 /// spelling context lies inside it).
 pub const NEAR: usize = 6;
+
+/// [definition; agent-inferred, November 5] The release's `refine` that runs each answer's passes until it settles
+/// ([`Field::sample_runs`]): no pass count is set.
+pub const SETTLE: usize = usize::MAX;
 /// The most shells a head's classes may carry (`3^7 = 2,187` classes, within the card's `2^12`
 /// buckets a head and region).
 pub const MAX_CLASS_TRITS: usize = 7;
@@ -3582,10 +3586,28 @@ impl Field {
         // deep and grew by one (segment 2's −4.8 places came all in its third pass, from its 14 short answers). A place
         // before the last letter whose face holds no letter mass keeps the letter it had. No place is chosen by its
         // certainty.
+        //
+        // [definition; agent-inferred, November 5, Brandon's lens of 23:12 and the unified-theory reading of 23:26] With
+        // `refine` [`SETTLE`], **refinement runs until the answer is typical of its faces**: each problem's passes go on until
+        // the first pass whose held letters are at least as likely as its draws, on that pass's own faces: at each place the
+        // pass redraws, the mass of the class the place held and the mass of the class drawn, both on the one face that read
+        // read there, and the problem settles when `Π m_held ≥ Π m_drawn` (each face's total cancels: one exact integer
+        // comparison, no logarithm, no count, no tolerance); it then leaves the reads. No pass count is set and only the time
+        // guard bounds it. Why: the walk is at temperature one, so an answer settles in its distribution, never in its
+        // letters; letters the sweeps left, drawn on wide faces, are less likely than fresh draws on the faces the written
+        // answer reads, and once the answer is typical held and drawn are two draws of one face, a fair coin, so the stop
+        // overshoots by about a pass. A word decided byte by byte from wide faces meets its neighbours written on both sides
+        // only here, and three passes gave it no time to converge (Brandon: "it's clearly not taking time to converge on
+        // real massive words"). A stop read on the slope of the drawn code instead stopped wherever one pass's noise
+        // outweighed its mending.
+        let settle = refine == SETTLE;
+        let mut settled = vec![false; problems.len()];
         let mut read = swept;
-        let total = swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0);
+        let total = if settle { usize::MAX } else { swept + refine * problems.iter().map(|&(_, n)| n).max().unwrap_or(0) };
         let boundary = |classes: &[usize], open: &[bool], q: usize| (q..classes.len()).find(|&t| classes[t] == void && !open[t]).unwrap_or(classes.len());
-        for pass in 1..=refine as u64 {
+        let mut pass = 0u64;
+        while (settle || (pass as usize) < refine) && settled.iter().any(|&s| !s) {
+            pass += 1;
             let orders: Vec<Vec<usize>> = problems
                 .iter()
                 .enumerate()
@@ -3596,11 +3618,13 @@ impl Field {
                 })
                 .collect();
             let mut cursors = vec![0usize; problems.len()];
+            // The pass's held and drawn masses, each problem's product over its redraws.
+            let (mut held_mass, mut drawn_mass): (Vec<num_bigint::BigUint>, Vec<num_bigint::BigUint>) = (vec![1u32.into(); problems.len()], vec![1u32.into(); problems.len()]);
             loop {
                 // Each problem's next place in its order standing at or before its boundary, beside that boundary, and the run
                 // past it: the next places at or before the boundary whose entropies at their last draw sum within the bound.
                 let mut places: Vec<Option<(Vec<usize>, usize)>> = vec![None; problems.len()];
-                for (k, &(q, _)) in problems.iter().enumerate() {
+                for (k, &(q, _)) in problems.iter().enumerate().filter(|&(k, _)| !settled[k]) {
                     let end = boundary(&classes[k], &open[k], q.len());
                     while let Some(&t) = orders[k].get(cursors[k]) {
                         cursors[k] += 1;
@@ -3684,6 +3708,10 @@ impl Field {
                             acc > u
                         }).unwrap_or(was)
                     };
+                    if settle {
+                        held_mass[k] *= num_bigint::BigUint::from(face.masses[was]);
+                        drawn_mass[k] *= num_bigint::BigUint::from(face.masses[classes[k][t]]);
+                    }
                     open[k][t] = false;
                     }
                     // A run's draws read one boundary: where its last letter was drawn the void, the closing law resolves every
@@ -3696,8 +3724,13 @@ impl Field {
                     }
                 }
             }
+            if settle {
+                for k in 0..problems.len() {
+                    settled[k] = settled[k] || held_mass[k] >= drawn_mass[k];
+                }
+            }
         }
-        observe(ReleaseRead { read, pass: refine + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
+        observe(ReleaseRead { read, pass: pass as usize + 1, classes: &classes, open: &open, faces: None, bound: 0, passed: 0 });
         Ok(problems.iter().enumerate().map(|(k, &(q, _))| classes[k][q.len()..].to_vec()).collect())
     }
 

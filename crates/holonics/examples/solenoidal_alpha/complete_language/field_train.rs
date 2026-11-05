@@ -1273,7 +1273,7 @@ pub(super) fn sample(args: &[String], realization: &mut dyn FieldRealization) ->
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, refine_of(&args[11])?, positive(&args[12])? as u128);
     let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
@@ -1546,6 +1546,12 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// A release's `REFINE`: a count of passes, or `settle` ([`holonics::hnn::tower::field::SETTLE`]: each answer's passes run
+/// until a pass does not lower its own code per place).
+fn refine_of(arg: &str) -> Result<usize> {
+    if arg == "settle" { Ok(holonics::hnn::tower::field::SETTLE) } else { count(arg) }
+}
+
 /// [measurement; agent-inferred, November 5, §16.46] **`opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
 /// HELD_SHA TRAIN TRAIN_SHA COUNT OUT`**: the void's mass across the writer's opening (the unified-theory reading of November
 /// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
@@ -1627,7 +1633,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     let units = units_of(&args[5], &args[6])?;
     let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
     let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
-    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, count(&args[11])?, positive(&args[12])? as u128);
+    let (limit, sweeps, refine, stop_ms) = (count(&args[9])?, positive(&args[10])?, refine_of(&args[11])?, positive(&args[12])? as u128);
     let out = Path::new(&args[13]);
     std::fs::create_dir(out)?;
     let field = &learner.field;
@@ -1654,6 +1660,10 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     // the region law it replaced ([`Field::sample_runs`]'s `near_tail`), a declared comparison.
     let near_tail = std::env::var_os("FIELD_WRITER_ROOM").is_none();
     let (mut reads_made, mut bound_sum, mut passed_sum) = (0usize, 0i128, 0usize);
+    // [measurement; agent-inferred, November 5] Each refine pass's redraws and their code, `Σ −log₂ p(c)` of the class each
+    // drew on the face it was drawn from, a problem a pass (`PASSES.tsv`): whether the answer's own code falls, then holds.
+    let mut pending: Option<(usize, Vec<Vec<(usize, holonics::hnn::tower::TowerFace)>>)> = None;
+    let mut passes: std::collections::BTreeMap<(usize, usize), (usize, i64)> = std::collections::BTreeMap::new();
     let answers = field
         .sample_runs(
             &problems,
@@ -1672,6 +1682,17 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
                 true
             },
             &mut |r| {
+                if let Some((pass, drawn)) = pending.take() {
+                    for (k, list) in drawn.iter().enumerate() {
+                        for (t, face) in list.iter().filter(|(t, _)| !r.open[k][*t]) {
+                            let slot = passes.entry((k, pass)).or_default();
+                            *slot = (slot.0 + 1, slot.1 + face.code(r.classes[k][*t]));
+                        }
+                    }
+                }
+                if let (true, Some(faces)) = (r.pass >= 1, r.faces) {
+                    pending = Some((r.pass, (0..problems.len()).map(|k| (0..r.classes[k].len()).filter(|&t| r.open[k][t]).filter_map(|t| faces[k][t].clone().map(|f| (t, f))).collect()).collect()));
+                }
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     if let Some((classes, open, read)) = &before {
                         for t in q.len()..r.classes[k].len() {
@@ -1716,6 +1737,10 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     if let Some(why) = failed {
         return Err(why.into());
     }
+    let mut pass_rows = rows_file(&out.join("PASSES.tsv"), "problem\tpass\tredrawn\tcode\n")?;
+    for ((k, pass), (redrawn, code)) in &passes {
+        row(&mut pass_rows, &format!("{k}\t{pass}\t{redrawn}\t{code}\n"))?;
+    }
     let mut ends = rows_file(&out.join("ENDS.tsv"), "problem\theld\twritten\tfirst_void_read\tfirst_void_place\tlast_letter_place\tlast_letter_read\n")?;
     let mut file = rows_file(&out.join("SAMPLE.tsv"), "")?;
     for (k, places) in answers.iter().enumerate() {
@@ -1729,8 +1754,9 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
         row(&mut ends, &format!("{k}\t{held_length}\t{written}\t{fv_read}\t{fv_place}\t{last}\t{last_read}\n"))?;
     }
     println!(
-        "FIELD_LENGTH problems={} sweeps={sweeps} refine={refine} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
+        "FIELD_LENGTH problems={} sweeps={sweeps} refine={} stopped={} run_bits={run_bits} reads={reads_made} certified_bits={} passed={passed_sum} ms={}",
         problems.len(),
+        if refine == holonics::hnn::tower::field::SETTLE { "settle".to_string() } else { refine.to_string() },
         stopped.map_or("-".to_string(), |s| s.to_string()),
         bits(bound_sum as i64, 1),
         started.elapsed().as_millis()
