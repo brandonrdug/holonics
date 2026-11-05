@@ -1387,6 +1387,61 @@ pub(super) fn reach_field(args: &[String], realization: &mut dyn FieldRealizatio
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 5, §16.46] **`opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
+/// HELD_SHA TRAIN TRAIN_SHA COUNT OUT`**: the void's mass across the writer's opening (the unified-theory reading of November
+/// 5, 07:16: the writer overruns its answers, and a byte drawn far out pins the answer at least that long). For each of the
+/// first `COUNT` held problems, the region is the writer's own opening ([`opening`]: the question resolved and the codec's
+/// whole extent open), and each open place's face is read through the realization: its void mass on `2^(−20)` beside the
+/// held answer's length in places. Writes `OPENING.tsv` (problem, held length, place, void mass; private, of the held
+/// answers) and `LENGTHS.tsv` (the training answers' lengths in places, as training draws them, under the extent). A
+/// reading only.
+pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    if args.len() != 13 {
+        return Err("opening-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA TRAIN TRAIN_SHA COUNT OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let field = &learner.field;
+    let units = units_of(&args[5], &args[6])?;
+    let codec = FieldCodec::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], CODEC_BUDGET)?)?, units)?;
+    let held = problems_of(&pinned_read(&args[7], &args[8], READ_BUDGET as usize)?);
+    let train = problems_of(&pinned_read(&args[9], &args[10], READ_BUDGET as usize)?);
+    let n = count(&args[11])?.min(held.len());
+    let out = Path::new(&args[12]);
+    std::fs::create_dir(out)?;
+    let mut lengths = rows_file(&out.join("LENGTHS.tsv"), "length\tanswers\n")?;
+    let mut by_length: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
+    for (_, a) in &train {
+        let a = codec.encode(a)?;
+        if a.len() < codec.answer {
+            *by_length.entry(a.len()).or_default() += 1;
+        }
+    }
+    for (length, answers) in &by_length {
+        row(&mut lengths, &format!("{length}\t{answers}\n"))?;
+    }
+    let void = codec.void();
+    let mut rows = rows_file(&out.join("OPENING.tsv"), "problem\theld\tplace\tvoid\n")?;
+    let mut places = 0usize;
+    for (k, (question, answer)) in held.iter().take(n).enumerate() {
+        let (q, open) = opening(&codec, field, question, b"")?;
+        let held_length = codec.encode(answer)?.len();
+        let mut classes = q.clone();
+        classes.extend(std::iter::repeat_n(void, open));
+        let unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q.len()).collect();
+        let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let faces = realization.read_faces(field, std::slice::from_ref(&region)).map_err(|e| e.to_string())?.remove(0);
+        for j in 0..open {
+            let face = faces[q.len() + j].as_ref().ok_or("an open place with no face")?;
+            let mass = ((face.masses[void] << 20) + face.total / 2) / face.total;
+            row(&mut rows, &format!("{k}\t{held_length}\t{j}\t{mass}\n"))?;
+            places += 1;
+        }
+    }
+    println!("FIELD_OPENING problems={n} places={places} training_answers={} ms={}", by_length.values().sum::<usize>(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [measurement] **`rows-field`**: where an open and a definite receiver's rows put their mass (§15.9's
 /// reading, `Field::row_shares`) on three sets of crib regions: the withheld problems read with their
 /// neighbours (`unseen_regions`), training's masked regions over the whole region and over the answer (`shape`), each

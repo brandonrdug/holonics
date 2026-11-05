@@ -3392,6 +3392,28 @@ host does not; repaired (`two_terminal_checks.txt`), its second parity was stopp
    before a byte, so a byte drawn far out pins the answer at least that long (that reading, agent-inferred); main52's
    samples wrote 275 to 989 bytes where the answers run 90 to 465.
 
+[measurement; agent-inferred, November 5] **The writer overruns, and its opening says why.** The standing law's writer on
+32 held problems (exact63 segment 5's last state, the writer as every write; `_receipts/law67/write71_opening.txt`, 2,293 s
+against 1,790 projected) wrote 16,057 places where the held answers hold 8,976: 27 of the 32 longer, 5 shorter; 71 of its
+107 restated results exact. The opening read (`opening-field`: each held problem's writer's opening, the question resolved
+and the codec's whole extent of 1,229 places open, every place's void mass through the card) on all 128, against the
+question-blind length law (the share of 6,730 training answers no longer than the place), with the rule fixed before the
+read (the unified-theory reading of 07:16: under the law at 128 and 512 past the end with the answers overrunning makes the
+opening's void mass past the end the subject; at or over it, the overrun is made in the later sweeps):
+
+| place from the held end | −128 | −32 | 0 | +32 | +128 | +512 | 900 to 1199 |
+|---|---|---|---|---|---|---|---|
+| void mass, free clock | 0.192 | 0.304 | 0.360 | 0.416 | 0.575 | 0.851 | 0.860 |
+| void mass, old law (main52 segment 2 state 10, that reading) | 0.187 | 0.294 | 0.348 | 0.402 | 0.557 | 0.852 | 0.880 |
+| the length law | 0.260 | 0.418 | 0.491 | 0.564 | 0.754 | 0.988 | 0.999 |
+
+The opening's byte mass past the end, `B = Σ (1 − p_v)` over the places past it, is 222 places (median 225, 38 to 416), the
+old law's 222, against the length law's 80; a problem's `B` and its overrun correlate +0.52 over the 32. Both laws open
+under the question-blind floor at every distance, the same to a hundredth: the clock is not where the length is lost. **By
+the rule, the opening's void mass past the end is the subject.** [agent-inferred, that reading] Training lets the field
+learn the tail from resolved voids near it, so it never learns the void from the question and the distance alone, which
+is all the opening has.
+
 Failures this could repeat, checked: **bits read as progress** ((b) was a reading of a region the writer does not write,
 replaced by the opening read where it writes, with its rule fixed first); **an authored routine standing in for learning**
 (a terminal rule is a law of the clock, not of the task, and is withdrawn on the evidence of the training weight it would
