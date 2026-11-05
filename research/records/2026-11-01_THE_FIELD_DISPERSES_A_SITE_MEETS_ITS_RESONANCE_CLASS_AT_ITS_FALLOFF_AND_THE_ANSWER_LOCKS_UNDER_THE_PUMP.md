@@ -3593,3 +3593,32 @@ places, the void mass before the end 55, its expected length less held +6.7 agai
 written length is −18.6 a problem (one draw each), on the 128 −7.1 ± 9.3. Against the prediction: drift under +20,
 written within a quarter, under 20 of 32 longer, `B` at most 80, context and foil at or under the control's at equal laps;
 each holds, and by the rule the comparison along the writer's path stands.
+
+[measurement; agent-inferred] **How the answers end** (the unified-theory reading of 14:47; `endings.py`, `endings.txt`,
+aggregates over the 32 written beside their held answers). Along the path 30 of 32 end with a final line (`#### ` and a
+number) at their boundary and none carries one earlier (23 at boundary73's segment 2, 28 at its segment 3). By length:
+
+| path75 segment 1 | answers | ending final | bytes written/held | lines | steps (`<<…>>`) | bytes a line |
+|---|---|---|---|---|---|---|
+| shorter by over a quarter | 8 | 7 | 192/377 | 3.9/5.9 | 1.9/3.8 | 68/81 |
+| within a quarter | 13 | 13 | 297/309 | 5.0/4.7 | 2.5/3.5 | 81/83 |
+| longer by over a quarter | 11 | 10 | 315/177 | 4.6/3.7 | 2.1/2.5 | 87/61 |
+
+The short answers close on a final line but carry half the held steps on two fewer lines (they miss steps, not keep
+them tersely), and the long ones' excess is longer lines and about one more line, not more steps; the written steps
+correlate +0.31 with the held. By that reading's rule the content hears its boundary, and the next law decides the
+boundary against the written content.
+
+[definition; agent-inferred, November 5, the unified-theory reading of 14:47] **Refinement is the field's own one-place
+resampling** (`Field::sample_observed`, refine81). Drawn from the whole face, a void inside erased every later letter while
+a boundary drawn as a letter moved out one place and the new boundary waited for the next pass, so the refine passes cut
+deep and grew by one (segment 2's −4.8 places came all in the third pass, from its 14 short answers). Now each pass walks
+each problem's keyed order of all its answer places, passing over a place past the boundary when its turn comes (so an end
+that has moved is met again); a place before the last letter draws from its face restricted to the letters (the void's
+mass removed, an exact integer draw against the rest; a face with no letter mass keeps the letter), and the last letter and
+the boundary place draw from their whole faces, so the end moves one place in or out a draw. The field tests pass (67;
+a new one reads every refine read and finds the boundary moved at most one place between reads and no letter past it).
+**Prediction, fixed before launch** (that reading): on path75's segment 1 state with the same 32 and keys (the sweeps
+identical), the refine passes move the mean written length under 3 places (−2.0 under the old law) and the share of written
+words in the training vocabulary stays at least 0.73 (0.760). **Rule**: if so the law stands and more passes can go to the
+words without cutting answers (main52: 64 of 96 restatements at 3 passes, 81 at 20); a share under 0.73 withdraws it.

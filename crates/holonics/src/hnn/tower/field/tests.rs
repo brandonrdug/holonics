@@ -1353,6 +1353,44 @@ fn refinement_revisits_the_written_answer() {
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
+/// [definition; §16.47] **Refinement moves the end one place a read**: between any two reads of the refine passes each
+/// problem's boundary (its first resolved void) moves at most one place, in or out, so no void is drawn before the last
+/// letter and a boundary drawn as a letter moves out by one; the closing law holds at every read.
+#[test]
+fn refinement_moves_the_end_one_place_a_read() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let mut reads = 0;
+    for seed in 11..19 {
+        let mut last: Option<Vec<usize>> = None;
+        field
+            .sample_observed(&problems, 4, 3, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+                if r.pass == 0 {
+                    return;
+                }
+                let ends: Vec<usize> = problems
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &(q, _))| {
+                        let end = (q.len()..r.classes[k].len()).find(|&t| r.classes[k][t] == 0 && !r.open[k][t]).unwrap_or(r.classes[k].len());
+                        assert!((end..r.classes[k].len()).all(|t| r.classes[k][t] == 0 && !r.open[k][t]), "a letter past the boundary, seed {seed}");
+                        end
+                    })
+                    .collect();
+                if let Some(before) = &last {
+                    for (a, b) in before.iter().zip(&ends) {
+                        assert!(a.abs_diff(*b) <= 1, "the end moved {a} to {b} in one read, seed {seed}");
+                    }
+                }
+                last = Some(ends);
+                reads += 1;
+            })
+            .unwrap();
+    }
+    assert!(reads > 0);
+}
+
 /// The packets' field of the tower fixtures: packets of three sites of the tiny field's reach of 16.
 fn coarse_declaration() -> FieldDeclaration {
     FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1 }

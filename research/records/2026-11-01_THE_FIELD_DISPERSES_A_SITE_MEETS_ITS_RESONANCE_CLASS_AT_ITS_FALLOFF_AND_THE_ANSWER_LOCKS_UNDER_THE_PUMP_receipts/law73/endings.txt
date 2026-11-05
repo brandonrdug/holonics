@@ -1,0 +1,24 @@
+== 2026-11-05-boundary73/seg2_write
+answers 32; written ending with a final line at the boundary 23 (a '####' line 24); a final line before the end 0
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	8	6	231/391	4.2/6.1	2.4/5.1	65/74
+within 25%	12	9	297/289	4.2/4.8	2.0/3.0	114/77
+longer by over 25%	12	8	390/199	5.2/3.5	2.2/2.2	82/75
+not ending on a '####' line: 8; their last line's bytes mean 91
+steps against held: correlation +0.114; lines -0.113; bytes +0.296
+== 2026-11-05-boundary73/seg3_write
+answers 32; written ending with a final line at the boundary 28 (a '####' line 28); a final line before the end 0
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	8	7	187/376	3.9/5.9	1.2/4.9	66/75
+within 25%	11	9	283/289	5.4/4.7	2.2/2.8	60/79
+longer by over 25%	13	12	359/215	5.8/3.8	2.5/2.6	76/72
+not ending on a '####' line: 4; their last line's bytes mean 9
+steps against held: correlation -0.156; lines +0.008; bytes +0.309
+== 2026-11-05-path75/seg1_write
+answers 32; written ending with a final line at the boundary 30 (a '####' line 30); a final line before the end 0
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	8	7	192/377	3.9/5.9	1.9/3.8	68/81
+within 25%	13	13	297/309	5.0/4.7	2.5/3.5	81/83
+longer by over 25%	11	10	315/177	4.6/3.7	2.1/2.5	87/61
+not ending on a '####' line: 2; their last line's bytes mean 86
+steps against held: correlation +0.308; lines +0.139; bytes +0.180
