@@ -3642,3 +3642,11 @@ boundary. **Rule**: if so the law stands and the path law follows it next segmen
 faces have not met these states, and the path law follows the order for one segment before the law is judged; the mean
 within but the correlation under +0.30, the content does not judge its own completion, and the content's faces are the
 subject.
+
+[measurement; agent-inferred] **The one-place resampling stands** (refine81; `refine81.txt`). On path75's segment 1 state
+with the same 32 and keys, the sweeps equal to that segment's write: the three refine passes moved the written length +0.2
+places a problem (range −2 to +5; the old law −2.0, range −66 to +2), the written less held −1.3 (16 longer, 15 shorter),
+0.747 of the written words in the training vocabulary (0.760), 59 of 75 restatements exact (59 of 77), 30 answers ending on
+a final line at their boundary, the written steps correlating +0.368 with the held (+0.308), one calculation closing in 60.
+By the rule (the move under 3 places, the share at least 0.73) the law stands, and more passes can go to the words without
+cutting answers.
