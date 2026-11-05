@@ -2,7 +2,7 @@
 # A read releases a run (§16.47, the unified-theory readings of November 5, 17:41 and 18:14): the same 32 held GSM8K problems
 # on path75's segment 2 state, the same keys (the state's hash), 1,229 sweeps and three refine passes, written once a place a
 # read and once in runs bounded strictly below one bit past each run's first place (FIELD_WRITER_RUN_BITS=1), on the tiled
-# affine map. Prediction (that reading): reads per write fall at least 1.5 times. Rule: the writes coincide until a run's
+# affine map and the card pool that reuses its kept buffers by best fit. Prediction (that reading): reads per write fall at least 1.5 times. Rule: the writes coincide until a run's
 # loss first moves a draw; the law stands if the closures (written calculations that close, final lines at the boundary)
 # and the length stay within their binomial spread at 32; one past it means the released faces heard each other beyond the
 # bound, the open faces are not the marginals training should make, and the blank's face is next.

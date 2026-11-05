@@ -508,8 +508,8 @@ enum Kind {
 /// of the card's wall time, `cuMemAlloc` and `cuMemFree` each tens of microseconds and a free draining the
 /// stream). A buffer a batch is done with returns to its size class; the next batch takes one of its class
 /// (a class is a multiple of an eighth of the power of two above, so a buffer is at most a quarter too long).
-/// What a class cannot supply is allocated; when the live buffers, the kept ones and the new one pass the
-/// batch budget, the kept ones are freed first. The contents of a taken buffer are undefined, zeroed where
+/// What the kept buffers cannot supply (a class up to twice the request's) is allocated; when the live buffers, the kept
+/// ones and the new one pass the batch budget, the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
 /// the call says so; the work of the stream is ordered, so a buffer a queued kernel still reads is never
 /// overwritten before it has.
 trait Poolable: Copy + Sized + 'static {
@@ -546,16 +546,27 @@ poolable!(i64, i64s);
 poolable!(i128, i128s);
 
 impl Pools<'_> {
-    /// Free every kept buffer.
-    fn trim(&mut self) {
-        self.u8s.clear();
-        self.u32s.clear();
-        self.i32s.clear();
-        self.u64s.clear();
-        self.i64s.clear();
-        self.i128s.clear();
-        self.retained = 0;
+    /// Free the kept buffer of the most octets, of any element type.
+    fn free_largest(&mut self) {
+        fn largest<T>(list: &[(usize, CardBuffer<'_, T>)]) -> Option<(usize, u64)> {
+            list.iter().enumerate().map(|(i, (c, _))| (i, (*c * core::mem::size_of::<T>()) as u64)).max_by_key(|&(_, o)| o)
+        }
+        let candidates = [largest(&self.u8s), largest(&self.u32s), largest(&self.i32s), largest(&self.u64s), largest(&self.i64s), largest(&self.i128s)];
+        let Some((which, (i, octets))) = candidates.iter().enumerate().filter_map(|(w, c)| c.map(|c| (w, c))).max_by_key(|&(_, (_, o))| o) else {
+            self.retained = 0;
+            return;
+        };
+        match which {
+            0 => drop(self.u8s.swap_remove(i)),
+            1 => drop(self.u32s.swap_remove(i)),
+            2 => drop(self.i32s.swap_remove(i)),
+            3 => drop(self.u64s.swap_remove(i)),
+            4 => drop(self.i64s.swap_remove(i)),
+            _ => drop(self.i128s.swap_remove(i)),
+        }
+        self.retained = self.retained.saturating_sub(octets);
     }
+
 }
 
 /// The elements of the size class holding `len`: a multiple of an eighth of the power of two above it
@@ -683,25 +694,30 @@ impl<'c> CardField<'c> {
     /// A buffer of at least `len` elements, contents undefined (`Pooled`).
     fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
         let cap = size_class(len.max(1));
-        let octets = (cap * core::mem::size_of::<T>()) as u64;
+        let size = core::mem::size_of::<T>();
         let mut pools = self.pools.borrow_mut();
+        // [agent-inferred, November 5] A kept buffer of the class or the next ones up to twice it serves the request (the
+        // least such), and the budget is kept by freeing the largest kept buffers one at a time, not every kept buffer at
+        // once: the profile read 33,780 allocations taking 12.2 s of a 94 s training read, a batch's buffers of varied
+        // classes missing an exact class and a trim freeing every kept buffer the next batch then allocated again.
         let hit = {
             let list = T::list(&mut pools);
-            list.iter().position(|(c, _)| *c == cap).map(|i| list.swap_remove(i))
+            list.iter().enumerate().filter(|(_, (c, _))| *c >= cap && *c <= 2 * cap).min_by_key(|(_, (c, _))| *c).map(|(i, _)| i).map(|i| list.swap_remove(i))
         };
         let entry = match hit {
             Some(entry) => {
-                pools.retained = pools.retained.saturating_sub(octets);
+                pools.retained = pools.retained.saturating_sub((entry.0 * size) as u64);
                 entry
             }
             None => {
-                if pools.live + pools.retained + octets > self.budget {
-                    pools.trim();
+                let octets = (cap * size) as u64;
+                while pools.live + pools.retained + octets > self.budget && pools.retained > 0 {
+                    pools.free_largest();
                 }
                 (cap, self.card.alloc::<T>(cap)?)
             }
         };
-        pools.live += octets;
+        pools.live += (entry.0 * size) as u64;
         Ok(Pooled { buf: Some(entry), pools: self.pools.clone() })
     }
 

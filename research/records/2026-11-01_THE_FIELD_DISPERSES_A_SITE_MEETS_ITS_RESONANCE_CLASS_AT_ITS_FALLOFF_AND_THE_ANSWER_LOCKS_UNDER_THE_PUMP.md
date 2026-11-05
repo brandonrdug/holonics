@@ -3709,3 +3709,10 @@ end and the closing law). **Prediction, fixed before launch** (the reading of 17
 2 state, the same 32 and keys, reads per write fall at least 1.5 times. **Rule**: the law stands if the closures (calculations
 that close, final lines at the boundary) and the length stay within their binomial spread at 32; one past it means released
 faces heard each other beyond the bound, and the blank's face is next (run91).
+
+[agent-inferred, November 5] **The card's pool reuses by best fit** (`CardField::take`, `Pools::free_largest`): a kept buffer of
+the requested class or of a class up to twice it serves a request (the least such), and the batch budget is kept by freeing
+the largest kept buffers one at a time instead of every kept buffer at once. prof87 read 33,780 allocations taking 12.2 s of
+a 94 s training read: a batch's buffers of varied classes missed an exact class, and a trim freed every kept buffer that the
+next batch then allocated again. The bits are unchanged (a buffer's contents are undefined until written, zeroed where a call
+says so); the allocations are read again in the next profile.
