@@ -437,13 +437,10 @@ fn framed_field_reads_place() {
     assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]));
 }
 
-/// The learner's deposits are certified: each deposited section codes its own regions in fewer
-/// bits, and over a few sections the regions' code falls from the founding's. (At the rate `2^(−4)`
-/// the opening's three encodings step together and, from the second section, both the full and the
-/// half step raise the code, so every later step is refused; at `2^(−5)` to `2^(−8)` all twelve
-/// deposit, measured November 1.)
+/// [definition; §16.47, Brandon, November 5 17:32] **The step fluxes**: every section deposits its step at its size with no
+/// reread (none is read after it), and over a few sections the regions' code falls from the founding's.
 #[test]
-fn certified_deposits_lower_the_code() {
+fn fluxing_deposits_lower_the_code() {
     let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let mut learner = FieldLearner::new(field, 6);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
@@ -454,13 +451,11 @@ fn certified_deposits_lower_the_code() {
     for _ in 0..12 {
         let receipt = learner.section(&regions).unwrap();
         assert_eq!(receipt.sites, 6);
-        if receipt.deposited {
-            assert!(receipt.code_after < receipt.code_before);
-            deposited += 1;
-        }
+        assert!(receipt.code_after.is_none() && receipt.change.is_none() && receipt.halvings == 0, "no reread");
+        deposited += usize::from(receipt.deposited);
     }
     let after: i64 = regions.iter().map(|r| learner.field.code(r).unwrap().0).sum();
-    assert!(deposited >= 6, "deposited {deposited}");
+    assert_eq!(deposited, 12);
     assert!(after < opening, "{after} against {opening}");
 }
 
@@ -729,43 +724,6 @@ fn a_step_that_codes_the_next_regions_higher_is_refused() {
         assert_eq!(next.change, code_of(&climbed, &spans_of(&regions)) - code_of(&old, &spans_of(&regions)));
         assert!(next.change > 0);
     }
-}
-
-/// The certificate reads its step's size by the same bounded law: a section deposits the step
-/// at the size the law stands it at on the section's own regions, strictly fewer bits, or none,
-/// and reads the regions at most three times for it after its opening read.
-#[test]
-fn the_certificate_reads_the_step_s_size_by_the_bounded_law() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 2);
-    let regions = [region()];
-    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
-    let (mut deposited, mut withheld) = (0, 0);
-    for k in 0..12 {
-        // The held step is read first; the certificate reads from the material that stands.
-        learner.held = None;
-        let opening = learner.field.clone();
-        let mut counted = Counted { reads: 0 };
-        let receipt = learner.section_realized(&regions, &mut counted).unwrap();
-        assert!(counted.reads <= 4, "section {k}: {} reads", counted.reads);
-        let mut step = vec![0i128; opening.theta.len()];
-        for &(start, len, grain) in opening.families() {
-            for i in start..start + len {
-                step[i] = deposit_step(learner.first[i], learner.second[i], grain, learner.rate_bits);
-            }
-        }
-        let old = compared_on(&opening);
-        assert_eq!((receipt.halvings, receipt.deposited), law_scale(&opening, &step, 0, &old, true, &regions), "section {k}");
-        if receipt.deposited {
-            deposited += 1;
-            assert_eq!(learner.field, stepped(&opening, &step, receipt.halvings).unwrap().0);
-            assert!(fewer(&old, &compared_on(&learner.field), &spans_of(&regions)), "the deposit codes its section strictly fewer bits");
-        } else {
-            withheld += 1;
-            assert_eq!(learner.field, opening);
-        }
-    }
-    assert!(deposited >= 1, "deposited {deposited} withheld {withheld}");
 }
 
 /// The host realization, its reads counted.
@@ -1353,6 +1311,50 @@ fn refinement_revisits_the_written_answer() {
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
+/// The host realization, the regions each read meets counted.
+struct RegionsCounted {
+    regions: Vec<usize>,
+}
+
+impl FieldRealization for RegionsCounted {
+    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+        field.read_and_return(regions)
+    }
+    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        self.regions.push(regions.len());
+        field.read_faces(regions)
+    }
+    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+        field.read_logits(regions)
+    }
+    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+        field.landmarks(region, question, sites, count)
+    }
+}
+
+/// [agent-inferred, November 5] **A finished problem leaves the release's reads**: written together, each problem is written
+/// as it is alone, the same bits, and a read meets only the problems that still have a place to draw.
+#[test]
+fn a_finished_problem_leaves_the_reads() {
+    let field = shaped(1);
+    let questions: [&[usize]; 3] = [&[1, 4, 0, 2], &[3, 3], &[2]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8, 6]).map(|(q, a)| (*q, a)).collect();
+    for seed in 11..15 {
+        let mut counted = RegionsCounted { regions: Vec::new() };
+        let together = field.sample_realized(&problems, 9, 2, 0, seed, &mut counted, &mut |_, _| true).unwrap();
+        assert!(counted.regions.iter().all(|&n| n <= problems.len()));
+        assert!(counted.regions.iter().sum::<usize>() < counted.regions.len() * problems.len() || counted.regions.iter().all(|&n| n == problems.len()));
+        let mut alone = Vec::new();
+        for (k, problem) in problems.iter().enumerate() {
+            // A problem's keys are its index's, so alone it is written as the batch's `k`th: pad the batch before it.
+            let mut padded: Vec<(&[usize], usize)> = problems[..k].to_vec();
+            padded.push(*problem);
+            alone.push(field.sample_realized(&padded, 9, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap().pop().unwrap());
+        }
+        assert_eq!(together, alone, "seed {seed}");
+    }
+}
+
 /// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
 /// distance `d` from the question stands open, no letter stands at a place of a later octave (`⌊log₂ d⌋`); a void's
 /// closing law may resolve later places, as the void tail.
@@ -1627,7 +1629,8 @@ fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
         let mut learner = FieldLearner::new(shaped(still), 14);
         let receipt = learner.section(&[region()]).unwrap();
         let predicted = receipt.predicted.expect("a predicted change within its carrier") as i128;
-        let change = receipt.change as i128;
+        let r = [region()];
+        let change = (code_of(&compared(&[learner.field.faces(&r[0]).unwrap()], &r).unwrap(), &spans_of(&r)) - receipt.code_before) as i128;
         eprintln!("STEP_PARABOLA still={still} predicted={predicted} change={change}");
         assert!(predicted < 0 && change < 0, "still {still}: predicted {predicted}, change {change}");
         assert!((change - predicted).abs() * 5 <= predicted.abs(), "still {still}: predicted {predicted}, change {change}");

@@ -3323,6 +3323,23 @@ impl Field {
         self.sample_observed(problems, sweeps, refine, void, seed, realization, sweep, &mut |_| {})
     }
 
+    /// [agent-inferred, November 5] **A release's read of the problems it still writes**: only the `active` problems' regions
+    /// are read (a problem with no place this read is left out), and their faces are returned at their own problems'
+    /// places, every other problem's empty. A region's faces are its own (each region is read alone), so the answers are the
+    /// same bits; a finished problem no longer takes a region's read (the unified-theory reading of November 5, 17:41: about
+    /// 60% of a 32-answer write's region reads were of finished problems).
+    fn read_active(&self, classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], realization: &mut dyn FieldRealization) -> Result<Vec<Vec<Option<TowerFace>>>> {
+        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); classes.len()];
+        if regions.is_empty() {
+            return Ok(faces);
+        }
+        for (read, &k) in realization.read_faces(self, &regions)?.into_iter().zip(active) {
+            faces[k] = read;
+        }
+        Ok(faces)
+    }
+
     /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
     /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
     /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no
@@ -3363,8 +3380,8 @@ impl Field {
         let mut swept = sweeps;
         for done in 0..sweeps {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
-            let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-            let faces = realization.read_faces(self, &regions)?;
+            let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
+            let faces = self.read_active(&classes, &open, &active, realization)?;
             observe(ReleaseRead { read: done, pass: 0, classes: &classes, open: &open, faces: Some(&faces) });
             let mut draws: Vec<(usize, usize, usize)> = Vec::new();
             for (k, &(q, n)) in problems.iter().enumerate() {
@@ -3475,8 +3492,8 @@ impl Field {
                         classes[k][t] = void;
                     }
                 }
-                let regions: Vec<Region> = (0..problems.len()).map(|k| Region { classes: &classes[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-                let faces = realization.read_faces(self, &regions)?;
+                let active: Vec<usize> = (0..problems.len()).filter(|&k| places[k].is_some()).collect();
+                let faces = self.read_active(&classes, &open, &active, realization)?;
                 observe(ReleaseRead { read: read - 1, pass: pass as usize, classes: &classes, open: &open, faces: Some(&faces) });
                 for (k, place) in places.into_iter().enumerate() {
                     let Some((t, end)) = place else { continue };
@@ -4065,15 +4082,16 @@ pub struct FieldReceipt {
     /// The sites the codes are of: each region's domain where it read an open site (§16.23).
     pub sites: usize,
     pub code_before: i64,
-    pub code_after: i64,
+    /// The section's code reread under its step; none since the step fluxes (§16.47, Brandon, November 5 17:32).
+    pub code_after: Option<i64>,
     pub halvings: u32,
     pub deposited: bool,
     pub next: Option<FieldNext>,
     /// [measurement; §16.41] The step's first-order change of the section's code at its full size, `Σ_i g_i Δθ_i` on the
-    /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change the certificate read there: the
-    /// section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
+    /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change a reread measured there (none since
+    /// the step fluxes): the section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.
     pub predicted: Option<i64>,
-    pub change: i64,
+    pub change: Option<i64>,
     /// [measurement; agent-inferred, November 4, §16.41] **The step before, priced on this section**: `Σ_i g_i Δθ_i` with `g`
     /// this section's covector at the material that stands and `Δθ` the step the section before stood at (its halvings
     /// released), on the codes' grain: the first-order change of this section's code were that step taken once more. Negative
@@ -4482,19 +4500,24 @@ impl FieldLearner {
             }
         }
         let predicted = predicted_change(&self.field, &raw, &step, 0);
-        let scale = scaled(&self.field, &step, 0, &faces_old, true, regions, realization)?;
-        let (halvings, change) = (scale.halvings, scale.change);
-        let Some((candidate, faces_new)) = scale.standing else {
-            return Ok(FieldReceipt { sites, code_before, code_after: code_before, halvings, deposited: false, next, predicted, change, transfer });
-        };
-        let code_after = code_of(&compared(&faces_new, regions)?, &spans);
+        // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
+        // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
+        // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
+        // or mistakes, knowing what causes contraction in contrast to expansion is equally important") and cost a full read
+        // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
+        // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
+        // alike, and the moments carry every covector.
+        let (candidate, moved) = stepped(&self.field, &step, 0)?;
+        if !moved {
+            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer });
+        }
         self.field = candidate;
         if self.read_held {
-            self.held = Some(HeldStep { step, halvings });
+            self.held = Some(HeldStep { step, halvings: 0 });
         } else {
-            self.last = Some(HeldStep { step, halvings });
+            self.last = Some(HeldStep { step, halvings: 0 });
         }
-        Ok(FieldReceipt { sites, code_before, code_after, halvings, deposited: true, next, predicted, change, transfer })
+        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale

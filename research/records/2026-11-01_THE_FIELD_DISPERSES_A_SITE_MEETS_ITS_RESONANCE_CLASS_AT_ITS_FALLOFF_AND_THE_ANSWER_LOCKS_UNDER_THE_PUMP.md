@@ -3661,3 +3661,22 @@ answers carry more of them), 28 final lines fails. By the rule (the mean outside
 states of this order, and **the path law follows the octave order** before the writer is judged: a path state is now the
 first `k` places of the extent by octaves of distance, keyed within an octave (`opening_region`), the states the writer
 meets; the GSM8K line ends here, and the code passage's run trains under it from its founding.
+
+[definition; Brandon, November 5 17:29 and 17:32] **The step fluxes** (`FieldLearner::section_realized`). The certificate
+reread a section under its step and kept the step only where the regions coded strictly fewer bits, halving it or refusing
+it otherwise: a selection on the code, a maximum in effect, which discarded what an expansion measures and cost a full read
+of every section (on path75's second segment the card's 1,483 reads, mostly these rereads, took 645 of its 2,355 s, the
+1,246 reads with their returns 1,668 s). Brandon: "You can't discard failure or mistakes, knowing what causes contraction
+in contrast to expansion is equally important", and the reread "was redundant and harmful in its entirety". The step now
+deposits at its size with no reread; the next section's own covector prices it at first order (the transfer, contraction
+and expansion alike), and the moments carry every covector. A section's code after its step and the change a reread measured
+are no longer read (`FieldReceipt::code_after` and `change` are none), so the lap's rate law reads the transfers alone
+(`step_transfer` with no curvature: the octave against the sign of their sum). The field tests restate the deposit (every
+section deposits, the regions' code falls over twelve) and the first-order change against the code read directly; the
+certificate's own test is retired with it. The held step's read on the next regions (`FIELD_HELD_READ`, a declared
+comparison no run declares) still rereads and is the next to retire.
+
+[agent-inferred, November 5, the unified-theory reading of 17:41] **A finished problem leaves the release's reads**
+(`Field::read_active`): a read meets only the problems with a place to draw, their faces returned at their own places, and
+since each region is read alone the answers are the same bits (the test writes three problems together and each alone, the
+batch padded so its keys are the batch's). About 60% of a 32-answer write's region reads were of finished problems.

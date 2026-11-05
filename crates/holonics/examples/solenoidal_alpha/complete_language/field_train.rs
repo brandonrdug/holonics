@@ -960,6 +960,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         // The learner's own lap count keys the walk and the draws: a continued run moves on.
         let read = learner.laps;
         let mut draw = read * train_set.len() as u64;
+        let mut read_after = 0usize;
         let (mut code_before, mut code_after, mut sites, mut deposited, mut halvings, mut held_down, mut refused) = (0i64, 0i64, 0usize, 0usize, 0u64, 0usize, 0usize);
         // The lap's transfers `Σ t` and the own curvatures `Σ b` of the steps they price, over the steps that stood at full size.
         let (mut transfers, mut curvatures, mut priced) = (0i128, 0i128, 0usize);
@@ -991,7 +992,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let deposit_ms = deposit_start.elapsed().as_millis();
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
-            code_after += receipt.code_after;
+            if let Some(after) = receipt.code_after {
+                (code_after, read_after) = (code_after + after, read_after + receipt.sites);
+            }
             sites += receipt.sites;
             deposited += usize::from(receipt.deposited);
             halvings += receipt.halvings as u64;
@@ -1008,19 +1011,19 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                 "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
-                bits(receipt.code_after, receipt.sites),
+                receipt.code_after.map_or("-".to_string(), |a| bits(a, receipt.sites)),
                 receipt.halvings,
                 receipt.deposited,
                 next_text(receipt.next),
                 receipt.predicted.map_or("-".to_string(), |p| micro(p).to_string()),
-                micro(receipt.change),
+                receipt.change.map_or("-".to_string(), |c| micro(c).to_string()),
                 receipt.transfer.map_or("-".to_string(), |t| micro(t).to_string()),
                 section_start.elapsed().as_millis()
             );
             if let (Some(t), Some(b)) = (receipt.transfer, prior) {
                 (transfers, curvatures, priced) = (transfers + t as i128, curvatures + b, priced + 1);
             }
-            prior = receipt.predicted.filter(|_| receipt.deposited && receipt.halvings == 0).map(|a| receipt.change as i128 - a as i128);
+            prior = receipt.predicted.zip(receipt.change).filter(|_| receipt.deposited && receipt.halvings == 0).map(|(a, c)| c as i128 - a as i128);
             let (over_lap, over_run) = (lap_start.elapsed().as_millis() > if grown { grown_lap_ms } else { lap_ms }, started.elapsed().as_millis() > stop_ms);
             if over_lap || over_run {
                 // The pending step is judged on the withheld problems as a lap's last step is, so
@@ -1033,7 +1036,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                     sections.len(),
                     if over_lap { "lap" } else { "run" },
                     bits(code_before, sites),
-                    bits(code_after, sites),
+                    if read_after == 0 { "-".to_string() } else { bits(code_after, read_after) },
                     lap_start.elapsed().as_millis(),
                     started.elapsed().as_millis()
                 );
@@ -1049,7 +1052,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             "FIELD_LAP lap={lap} read={} sites={sites} before={} after={} deposited={deposited}/{} halvings={halvings} next_halved={held_down} next_refused={refused} ms={}",
             learner.laps,
             bits(code_before, sites),
-            bits(code_after, sites),
+            if read_after == 0 { "-".to_string() } else { bits(code_after, read_after) },
             sections.len(),
             lap_start.elapsed().as_millis()
         );
