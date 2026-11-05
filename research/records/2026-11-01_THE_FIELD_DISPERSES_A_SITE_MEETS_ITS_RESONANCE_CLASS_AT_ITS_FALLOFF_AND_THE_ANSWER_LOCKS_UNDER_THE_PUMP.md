@@ -3243,8 +3243,31 @@ code is read at the last tick while each face sets a later tick's clocks.
 logits' covector is held `2^30` finer and the lift's onward `2^16` finer, each product released once, since a blank's
 covector is small and its terms otherwise rounded away (the domain-weighting check caught it at 1.9%). With it every
 field test passes (65), the covector checks among them, and the card's parity holds bit for bit on every section and its
-write (`exact62_parity.txt`). The run with it (exact63) starts from blank60's own opening state on its schedule, so
-blank60's segments are its control.
+write (`exact62_parity.txt`). The run with it (exact63, `exact63_launch.sh`, `exact63.txt`) starts from blank60's own
+opening state on its schedule, so blank60's segments are its control. Its segment 1: the joint code 1.035 to 1.0122 (the
+transfer law cooled it only to `2^(−14)`, against blank60's `2^(−17)`), context 0.1836, foil 0.4265; head 3 at the offset
+0.386, D's code 3.873 bits, the writer's first state 5.457; its write restates 10 of 17 results exactly. It tracks
+blank60.
+
+**The faces the clocks read do not carry the `>`** (`clocks.txt`, `Field::blank_clocks` and the card's
+`read_blank_clocks`, bit for bit in the sampled parity's `clocks_equal`, `clocks64_parity.txt`): with every answer place but
+C open, at the restatement's two `>` places, the gap's expected duration over its written `2κ(>)` on lens 2 and lens 3, and
+the faces' code of `>` against their entropy, by the tick whose clock the face set:
+
+| state | tick 1 | tick 2 | tick 3 |
+|---|---|---|---|
+| untrained | 0.578, 0.649; 7.21 against 1.88 | 0.580, 0.678; 6.82 against 1.86 | 0.575, 0.801; 2.85 against 2.67 |
+| operand-trained, blank60 segment 1 | 0.547, 0.623; 8.89 against 1.75 | 0.602, 0.683; 7.74 against 1.75 | 0.606, 0.830; 2.85 against 2.57 |
+| exact-return-trained, exact63 segment 1 | 0.294, 0.270; 24.3 against 0.27 | 0.357, 0.327; 17.7 against 1.20 | 0.502, 0.699; 4.35 against 3.04 |
+
+(The bare rate reads the gap at 1/4.12 and 1/3.00 of its length, 0.24 and 0.33.) At the middle ticks the faces are
+confident and wrong about the `>` (7 to 9 bits on the true byte against an entropy under 2), so even untrained the gap
+reads about 60% of its length; only the last tick's face, the one the code compares, is calibrated. Under the exact
+return the middle faces stop predicting the byte altogether (24 bits against 0.27) and serve the clock, and the gap
+contracts to under a third. **The blank law fails its acceptance under both covectors** ((a) at 3.84 to 3.87 bits against
+3.60, (b) at 5.44 to 5.46 against 5.08) **and is withdrawn as it stands**; its code stays on its branch while the next law
+is read, since a clock that runs on an expectation needs the face it reads to be compared too: the faces the clocks read
+are the subject.
 
 Failures this could repeat, checked: **bits read as progress** (the law is judged by its fixed acceptance, read on three
 states where one swings); **a located cause carried unrepaired into a new consumer** (the operand covector's miss is
