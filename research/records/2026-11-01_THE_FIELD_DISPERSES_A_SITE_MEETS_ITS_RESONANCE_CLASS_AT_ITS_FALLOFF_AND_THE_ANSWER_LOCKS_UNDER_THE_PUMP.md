@@ -3650,3 +3650,14 @@ places a problem (range −2 to +5; the old law −2.0, range −66 to +2), the 
 a final line at their boundary, the written steps correlating +0.368 with the held (+0.308), one calculation closing in 60.
 By the rule (the move under 3 places, the share at least 0.73) the law stands, and more passes can go to the words without
 cutting answers.
+
+[measurement; agent-inferred] **The octave writer's end has not met its states** (octave82; `octave82.txt`). On path75's
+segment 1 state, untrained for the order, the 128 held keyed as drift80, the sweeps only: 1.494 times held (mean +136.8
+places, median +16.0; 67 longer, 61 shorter), the written length correlating +0.187 with held (drift80's `L(64)` in the
+present order on the same 128: +0.275); on the first 32, 1.907 times held, 10 ending on a final line at the boundary
+(30 under the present order), the steps written over held 0.91, the words in the training vocabulary 0.635 (0.760). Against
+the prediction: correlation at least +0.45 fails, the mean within a quarter fails, the steps at least 0.80 holds (the long
+answers carry more of them), 28 final lines fails. By the rule (the mean outside a quarter) the end's faces have not met the
+states of this order, and **the path law follows the octave order** before the writer is judged: a path state is now the
+first `k` places of the extent by octaves of distance, keyed within an octave (`opening_region`), the states the writer
+meets; the GSM8K line ends here, and the code passage's run trains under it from its founding.

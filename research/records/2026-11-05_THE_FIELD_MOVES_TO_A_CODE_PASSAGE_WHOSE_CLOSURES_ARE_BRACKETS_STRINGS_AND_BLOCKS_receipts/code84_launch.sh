@@ -2,8 +2,9 @@
 # The code passage (Brandon, November 5 16:29: python-codes-25k in place of GSM8K): a fresh field founded on the same
 # declaration (the byte alphabet changes, so no GSM8K state carries over), trained on the 24,685 training problems of
 # tools/code_passage.py's records (question = the instruction and its input, answer = the code, every byte exact), with the
-# laws that stand: the boundary port along the writer's path, the keyed passage of path problems, the octave writer and
-# the one-place refine. First the sampled parity on one section of this passage (it stops unless every read is equal),
+# laws that stand: the boundary port along the writer's path (its states the first k places of the writer's octave order,
+# octave82's rule: the end's faces must meet the octave order's states before that writer is judged), the keyed passage of
+# path problems, the octave writer and the one-place refine. First the sampled parity on one section of this passage (it stops unless every read is equal),
 # then a 150 s cost read that sets the lap bound, then three segments of two laps each, each followed by the opening read
 # on the 128 held problems and the first 128 training problems, the drift read (the 128 held, read 64, one key), and the
 # length reading's write of 32 held problems with the code reading (fences, Python parse, identifiers) and the closure

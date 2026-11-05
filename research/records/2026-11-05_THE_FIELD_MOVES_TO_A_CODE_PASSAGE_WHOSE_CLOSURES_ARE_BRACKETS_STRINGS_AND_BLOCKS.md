@@ -30,7 +30,10 @@ codec information; the passages stay under `.local/` and are never published.
 [agent-inferred] A fresh field founded on the GSM8K line's declaration (width 32, four heads of eight modes, two still,
 32 contacts, four ticks, sections of 16; the byte alphabet changes, so no GSM8K state carries over), on the card, under the
 laws that stand along the GSM8K line: the boundary port along the writer's path and its keyed passage of path problems in
-training, the octave writer and the one-place refine at release (the field record's §16.47). First the sampled parity on
+training, the octave writer and the one-place refine at release (the field record's §16.47). The path's states follow the
+writer's octave order (the octave writer's read on a state trained in one keyed order wrote 1.49 times held, its end's faces
+not having met those states; §16.47), so the founding trains on the states its writer meets; the run was relaunched with
+that law before its parity began. First the sampled parity on
 one section of this passage, then a cost read that sets the lap bound, then three segments of two laps each (about 1,543
 sections a lap against GSM8K's 413, so a lap is about an hour by projection: a stated long run of about eight card-hours),
 each followed by the opening read on the held and the first 128 training problems, the drift read (the 128 held, read 64,

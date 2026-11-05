@@ -4575,6 +4575,6 @@ pub use scale::Scale;
 mod tests;
 
 /// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
-fn octave_of(d: usize) -> u32 {
+pub fn octave_of(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
 }

@@ -246,7 +246,10 @@ pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &
 
 /// [definition; agent-inferred, November 5, §16.47] **A problem's writer's path, compared at its boundary**: the question
 /// resolved and the codec's whole extent past it, as the writer opens ([`opening`]), then one state of the writer's own
-/// reading order run on the truth: a keyed order of the extent's places, fresh each draw, its first `k` places resolved
+/// reading order run on the truth: the extent's places by octaves of their distance from the question, keyed within an
+/// octave and fresh each draw, as the writer releases them ([`holonics::hnn::tower::field::Field::sample_realized`];
+/// the unified-theory reading of November 5, 15:04: read on a state the path trained in one keyed order, the octave
+/// writer wrote 1.49 times held, its end's faces never having met these states), its first `k` places resolved
 /// from the truth and every place past the lowest resolved void resolved as the void (the writer's closing law), `k`
 /// drawn so every octave of reads is met alike (`k = 0`, the opening, the first; then `[2^(o−1), 2^o)` within the extent,
 /// uniform). Every open place is an answer port compared at its boundary
@@ -272,7 +275,7 @@ pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize], seed:
         low + (mix(seed, draw | 6 << 61) as usize) % (high - low + 1)
     };
     let mut order: Vec<usize> = (q.len()..classes.len()).collect();
-    order.sort_by_key(|&t| (mix(key, t as u64), t));
+    order.sort_by_key(|&t| (holonics::hnn::tower::field::octave_of(t + 1 - q.len()), mix(key, t as u64), t));
     for &t in &order[..k] {
         unresolved[t] = false;
     }

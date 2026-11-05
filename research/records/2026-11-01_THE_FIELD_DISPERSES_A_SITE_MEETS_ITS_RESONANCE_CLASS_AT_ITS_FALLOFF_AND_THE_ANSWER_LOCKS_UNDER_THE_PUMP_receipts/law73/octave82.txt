@@ -1,0 +1,26 @@
+# octave82 binary 1c1a2af1da950baaee17b958be648a25d5689f2d2344564560efe25b8e8a121b state ae5a24afbd7b3942 lock taken 16:04:18
+FIELD_LENGTH problems=128 sweeps=1229 refine=0 stopped=- ms=2591957
+MEASURE lap=write rc=0 wall_s=2592.4 peak_rss_kib=619236
+octave writer, 128 held: written less held mean +136.8 (median +16.0), written/held 1.494, correlation with held +0.187; 67 longer, 61 shorter; reads 1229
+present order, drift80's L(64) on the same 128: less held mean -0.3, correlation with held +0.275
+the first 32: written/held 1.907, correlation +0.073
+== the first 32
+answers 32; written ending with a final line at the boundary 10 (a '####' line 17); a final line before the end 0
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	10	5	127/307	3.0/4.5	0.9/3.0	58/88
+within 25%	4	0	394/371	4.0/6.2	2.2/3.8	80/76
+longer by over 25%	18	5	792/245	8.6/4.4	4.3/3.3	107/68
+not ending on a '####' line: 15; their last line's bytes mean 80
+steps written/held over all: 0.91; bytes written/held 1.907
+steps against held: correlation +0.327; lines +0.262; bytes +0.073
+== all 128
+answers 128; written ending with a final line at the boundary 70 (a '####' line 86); a final line before the end 2
+group	n	ends final	bytes w/h	lines w/h	steps w/h	bytes a line w/h
+shorter by over 25%	50	31	105/273	2.5/4.7	0.8/3.1	58/75
+within 25%	25	13	347/338	5.1/5.0	2.3/3.6	75/85
+longer by over 25%	53	26	737/252	8.7/4.3	4.2/3.0	100/75
+not ending on a '####' line: 42; their last line's bytes mean 57
+steps written/held over all: 0.81; bytes written/held 1.494
+steps against held: correlation +0.138; lines +0.080; bytes +0.187
+WORDS written=7140 in_training_vocabulary=4531 share=0.635
+OCTAVE82 exit 16:47:31
