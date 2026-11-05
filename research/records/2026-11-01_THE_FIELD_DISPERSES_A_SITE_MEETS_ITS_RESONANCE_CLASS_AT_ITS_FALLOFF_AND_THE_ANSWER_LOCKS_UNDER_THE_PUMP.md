@@ -3550,3 +3550,10 @@ same draws). **Prediction, fixed before launch** (that reading): at every segmen
 length less held is within 10 places of the question-blind law's on the same problems (the 128 held, +10.2; the first
 128 training problems, −9.5), and the drift of `L` from read 0 to the written length is path75's at equal laps. **Rule**:
 the lean still swings by 30 places, the swing is not the sections', and the step is the subject.
+
+**Segment 3 of the opening comparison** (boundary73, 9 laps). The opening on the first 128 training problems (train78)
+sits with the held ones: its expected length less held −0.8 against the law's −9.5 there, +10.0 against +10.2 on the held,
+so the training problems swung with the held (−28.8 and −33.8 against the law at segment 2, +8.7 and −0.2 at segment 3).
+The write: 9,269 places against 8,976 held (1.033 times; 1.36 and 1.125 at segments 1 and 2), 16 longer and 16 shorter,
+60 of 75 restatements exact, the correlation of `B` with the overrun +0.477. At 9 laps, joint code 1.0230, context 0.1868,
+foil 0.4298.

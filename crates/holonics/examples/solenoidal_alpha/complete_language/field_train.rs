@@ -1518,17 +1518,20 @@ pub(super) fn opening_field(args: &[String], realization: &mut dyn FieldRealizat
 }
 
 /// [measurement; agent-inferred, November 5, §16.47] **`length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD
-/// HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT`**: the answer's length as the writer writes it (the unified-theory reading of
+/// HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT [READS KEY]`**: the answer's length as the writer writes it (the unified-theory reading of
 /// November 5, 09:45: if the field's conditionals were one joint law, its expected length would be a martingale along the
 /// writer's path). The writer of `sample-field`, draw for draw ([`Field::sample_observed`]), and at every read each
 /// problem's expected length `L` = the answer places resolved as letters + `Σ (1 − p̂_∅)` over its open places, on `2^(−20)`
 /// places; at the release's end its written length. Writes `LENGTH.tsv` (problem, read, pass, `L`, letters, open; one row
 /// a problem a read), `ENDS.tsv` (each problem's held and written length, the read and place of its first void, and the
 /// place of its last letter and the read that last drew it) and `SAMPLE.tsv` (each answer as `sample-field` writes it),
-/// private, of the held answers. A reading only.
+/// private, of the held answers. With `READS` and `KEY` (the unified-theory reading of November 5, 13:26): the writer is
+/// keyed by `KEY` (sixteen hex digits) in place of the state's hash, so two states are read on the same keys and their
+/// drifts are paired, and it stops at its sweep `READS` (`0`, never), so reads `0` to `READS` are the whole writer's, its
+/// last sweep then drawing every place left and its ends not the written answer's. A reading only.
 pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 14 {
-        return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT".into());
+    if args.len() != 14 && args.len() != 16 {
+        return Err("length-field STATE STATE_SHA CODEC CODEC_SHA UNITS UNITS_SHA HELD HELD_SHA COUNT SWEEPS REFINE STOP_MS OUT [READS KEY]".into());
     }
     let started = std::time::Instant::now();
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
@@ -1540,7 +1543,11 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
     std::fs::create_dir(out)?;
     let field = &learner.field;
     let held = &held[..limit.min(held.len())];
-    let seed = u64::from_str_radix(&args[2][..16], 16).map_err(|_| "a state hash that is not hexadecimal")?;
+    let (reads, key) = match args.get(14..16) {
+        Some([reads, key]) => (count(reads)?, key.as_str()),
+        _ => (0, &args[2][..]),
+    };
+    let seed = u64::from_str_radix(key.get(..16).ok_or("a writer's key of fewer than sixteen hex digits")?, 16).map_err(|_| "a writer's key that is not hexadecimal")?;
     let requests: Vec<(Vec<usize>, usize)> = held.iter().map(|(question, _)| opening(&codec, field, question, b"")).collect::<std::result::Result<_, String>>()?;
     let problems: Vec<(&[usize], usize)> = requests.iter().map(|(q, n)| (q.as_slice(), *n)).collect();
     let void = codec.void();
@@ -1560,7 +1567,7 @@ pub(super) fn length_field(args: &[String], realization: &mut dyn FieldRealizati
             seed,
             realization,
             &mut |done, _| {
-                if started.elapsed().as_millis() > stop_ms {
+                if started.elapsed().as_millis() > stop_ms || (reads > 0 && done == reads) {
                     stopped = Some(done);
                     return false;
                 }

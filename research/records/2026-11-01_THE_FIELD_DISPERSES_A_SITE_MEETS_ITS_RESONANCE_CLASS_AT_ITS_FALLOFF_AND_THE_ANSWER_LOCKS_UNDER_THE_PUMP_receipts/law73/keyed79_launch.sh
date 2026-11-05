@@ -28,13 +28,11 @@ T="$G/UNITS0 $(sha $G/UNITS0) $G/TRAIN.txt $(sha $G/TRAIN.txt) $G/HELD128.txt $(
 U="$G/UNITS0 $(sha $G/UNITS0)"
 CODEC=$R/2026-11-04-lane45/CODEC
 lock() { exec 9>$ROOT/.local/gpu.lock; flock -w 7200 9 || { echo "MAIN LOCK_BUSY"; exit 75; }; }
-lock
-echo "# keyed79 binary $(sha $BIN) parity lock taken $(date -u +%H:%M:%S)"
-FIELD_PARITY_PACE=8 $M parity timeout 600 $BIN parity complete-language parity-field $T 32 4 8 2 32 2 16 2 8 1 1 8 8 > $O/parity.log 2>&1
-exec 9>&-
-grep -E 'FIELD_PARITY_DONE|FIELD_PARITY_WRITES|FIELD_PARITY section|MEASURE|refused|rror|panic' $O/parity.log | sed -E 's/ (rows|reads|first|deposited|halvings|next|pace_nonzero|kappa)=[^ ]*//g' | cut -c1-300
-grep -qE 'FIELD_PARITY_DONE .*reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 .*releases_unequal=0' $O/parity.log || { echo "PARITY FAILED: the chain stops $(date -u +%H:%M:%S)"; exit 1; }
-grep -E 'FIELD_PARITY section' $O/parity.log | grep -qvE 'near_equal=true rows_equal=true shares_equal=true currents_equal=true' && { echo "PARITY FAILED on a reading: the chain stops"; exit 1; }
+# The sampled parity passed (launch_parity.out, 501.8 s against a 360 s projection, its write 66 s on the host against the
+# 20 s assumed): two sections with their keyed path states, the withheld section and the write, every face, covector entry,
+# learner, near field, clock, row, share and current equal. The chain stopped on its own check, copied from a chain whose
+# section lines carried no clocks field, so its pattern could not match a line with clocks_equal between near_equal and
+# rows_equal; relaunched past the parity with that check's defect named here, nothing about the run changed.
 # The training waits for path75's segment 1 to be read (the unified-theory reading of 12:31: the run after path75 reads).
 timeout 14000 bash -c "until grep -qE '^SEGMENT 1 done|no state|LOCK_BUSY|chain stops' $R/2026-11-05-path75/launch.out; do sleep 30; done" || { echo "MAIN path75's segment 1 not read in 14,000 s: the chain stops"; exit 1; }
 lock
