@@ -761,12 +761,14 @@ pub struct Region<'a> {
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
-/// starts, the void class an unused place writes, and the cells it is compared with.
+/// starts, the void class an unused place writes, and the cells it is compared with; [§16.47] compared through the
+/// coupling, or at its boundary (`boundary`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Port<'a> {
     pub start: usize,
     pub void: usize,
     pub target: &'a [usize],
+    pub boundary: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **A port's reading**: its coupling code on `2^(−20)` bits and each
@@ -775,6 +777,9 @@ pub struct Port<'a> {
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
     use crate::receiver::coupling::TemperatureRefusal as Why;
+    if port.boundary {
+        return boundary_reading(faces, port);
+    }
     let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
             Why::Short { .. } => "a port with more target cells than places",
@@ -792,6 +797,43 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
         rows.push(row);
     }
     Ok((rows, read.code))
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A port compared at its boundary**: each place is compared with
+/// whether the answer has ended there, never with which letter it holds. Where the target holds a letter (a place before
+/// `target.len()`) the event is a letter, coded `−log₂(1 − p̂_void)`, and its covector `p̂ − r` takes `r` as the face's
+/// own letter shares renormalized off the void, `r_void = 0` and `r_a = p̂_a / (1 − p̂_void)`: the void's entry is
+/// `p̂_void` and each letter's `−p̂_a p̂_void / (1 − p̂_void)`, so no letter's content is compared. Where it holds the
+/// void (a place past the target), the place is compared with the void, `p̂ − e_void` and `−log₂ p̂_void`. Its minimizer
+/// is the answer's length law given what the face reads, the writer's opening's own boundary (the unified-theory reading
+/// of November 5, 08:09: the writer fixes its length in its first reads and never undoes a letter past the true end, so
+/// the opening's void mass past the end is what a release pays in places). On the face covector's `2^(−24)` and the codes'
+/// `2^(−20)` bits, read alike by the host's return and the card's.
+fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    let one = 1i128 << super::COVECTOR_BITS;
+    let mut rows = Vec::with_capacity(faces.len());
+    let mut code = 0i64;
+    for (i, &(masses, total)) in faces.iter().enumerate() {
+        if total == 0 || port.void >= masses.len() {
+            return refuse("a port's face that is empty or misses a class");
+        }
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let void = row[port.void] as i128;
+        if i < port.target.len() {
+            let rest = one - void;
+            for (a, slot) in row.iter_mut().enumerate() {
+                if a != port.void {
+                    *slot = if rest == 0 { 0 } else { fit64(-div_nearest(*slot as i128 * void, rest))? };
+                }
+            }
+            code += crate::hnn::tower::face_code(total - masses[port.void], total);
+        } else {
+            row[port.void] -= one as i64;
+            code += crate::hnn::tower::face_code(masses[port.void], total);
+        }
+        rows.push(row);
+    }
+    Ok((rows, code))
 }
 
 impl Region<'_> {

@@ -215,10 +215,12 @@ fn covector_matches_the_codes_difference() {
     carried[0] = Some(vec![(1, 40_000), (3, 25_536)]);
     carried[3] = Some(vec![(2, 50_000), (0, 15_536)]);
     carried[4] = Some(vec![(2, 30_000), (4, 20_000), (0, 15_536)]);
-    // [§16.24] And a region whose last three sites are an answer port, compared through its coupling with two cells.
+    // [§16.24] And a region whose last three sites are an answer port, compared through its coupling with two cells;
+    // [§16.47] and the same port compared at its boundary (two letters, then the void).
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
-    let port = Port { start: 4, void: 0, target: &[2, 3] };
-    for (still, r) in [0usize, 1, 2].into_iter().flat_map(|still| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) })]) {
+    let port = Port { start: 4, void: 0, target: &[2, 3], boundary: false };
+    let bounded = Port { boundary: true, ..port };
+    for (still, r) in [0usize, 1, 2].into_iter().flat_map(|still| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) })]) {
         let field = shaped(still);
         let g = covector_of(&field, &r);
         let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
@@ -1226,7 +1228,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false }) };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1234,6 +1236,43 @@ fn a_port_is_read_through_its_coupling() {
     assert_eq!(field.code(&r).unwrap(), (place + coupled, 1 + 3));
     let unported = Region { port: None, ..r };
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
+}
+
+/// [§16.47] **A port compared at its boundary codes only whether the answer has ended**: before the target's end a place
+/// codes `−log₂(1 − p̂_void)` and its covector moves the void alone against the letters by their own shares (each row sums
+/// to zero within its rounding, and a letter's entry is its share times the void's over the letters'), past it a place
+/// codes the void; the region's code is its place-wise code before the port and that boundary code over the port.
+#[test]
+fn a_port_at_its_boundary_codes_only_the_end() {
+    use crate::hnn::tower::face_code;
+    let field = shaped(1);
+    const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
+    let target = [2usize, 3];
+    let port = Port { start: 4, void: 0, target: &target, boundary: true };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
+    let faces = field.faces(&r).unwrap();
+    let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
+    let (rows, code) = port_reading(&at, &port).unwrap();
+    let mut expected = 0i64;
+    let one = 1i64 << crate::hnn::tower::COVECTOR_BITS;
+    for (i, ((masses, total), row)) in at.iter().zip(&rows).enumerate() {
+        let share = |a: usize| (((masses[a] << crate::hnn::tower::COVECTOR_BITS) + total / 2) / total) as i64;
+        if i < target.len() {
+            expected += face_code(total - masses[0], *total);
+            assert_eq!(row[0], share(0), "the void's entry is its share, place {i}");
+            assert!(row.iter().sum::<i64>().abs() <= row.len() as i64, "a letter place's row sums to zero, place {i}: {row:?}");
+            for a in 1..row.len() {
+                let predicted = -(share(a) as i128 * share(0) as i128 / (one - share(0)) as i128) as i64;
+                assert!((row[a] - predicted).abs() <= 1, "letter {a} at place {i}: {} against {predicted}", row[a]);
+            }
+        } else {
+            expected += face_code(masses[0], *total);
+            assert_eq!(row[0], share(0) - one, "past the end the void is the target, place {i}");
+        }
+    }
+    assert_eq!(code, expected);
+    let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
+    assert_eq!(field.code(&r).unwrap(), (place + expected, 1 + 3));
 }
 
 /// [definition; §16.28, §16.34] **An open site is silent on the strand**: on a field whose every family is drawn (the

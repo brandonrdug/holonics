@@ -3418,3 +3418,36 @@ Failures this could repeat, checked: **bits read as progress** ((b) was a readin
 replaced by the opening read where it writes, with its rule fixed first); **an authored routine standing in for learning**
 (a terminal rule is a law of the clock, not of the task, and is withdrawn on the evidence of the training weight it would
 contradict).
+
+### 16.47 The opening is compared at its boundary
+
+[definition; agent-inferred, November 5, the unified-theory reading of 08:09 UTC] **The law** (`Port::boundary`,
+`boundary_reading`; `opening_region` in the trainer). Beside each training problem's region, its writer's opening is read
+once a lap (the question resolved, the codec's whole extent of 1,229 places open past it) and every place is compared at
+weight one with whether the answer has ended there, never with which letter stands. At a place where the answer holds a
+letter the code is `−log₂(1 − p̂_∅)` and the covector `p̂ − r` takes `r_∅ = 0` and `r_a = p̂_a/(1 − p̂_∅)`, the face's own
+letter shares renormalized off the void: the void's entry is `p̂_∅` and each letter's `−p̂_a p̂_∅/(1 − p̂_∅)`, the exact
+gradient of that code. Past the answer the place is compared with the void. The minimizer is the answer's length law given
+what the face reads. Why (that reading): the writer fixes its length in its first reads and never undoes a letter past the
+true end, so `B` is the expected overrun of a length drawn from the opening's law; the forward code charges the boundary
+only `−log P(length | question)`, a few bits, while the release pays in places; and training meets the opening's far places
+about once in 7,000 regions (cutting main52's opening at +32, +128 and +512 left every void share the same to three
+decimals). The port is the coupling port's (§16.24) with its reading at the boundary, so the card writes the rows the host
+reads from the fetched faces, as it does for the coupling. The field tests pass (66: the covector checks now include a
+port at its boundary against its code's difference, and the boundary's rows and code are read against their definition);
+the trainer's tests pass (a section's regions are its members' and then their openings). The sampled parity ran to its
+400 s deadline, copied from the free clock's parity before the openings tripled its host sections (51 to 93 s against 16 to
+22 s): its three training sections, each read with its openings, are equal on the card and the host in every face,
+covector entry, learner, near field, clock, row, share and current; the withheld section and the write, whose code the
+boundary does not touch, were not reached (`_receipts/law73/boundary73_parity.txt`). It is reported incomplete and was not
+relaunched with a larger deadline.
+
+Trained as exact63 with this one difference, exact63 its control at equal card time (boundary73: the sampled parity, a
+150 s cost read that sets the lap bound, then five segments of 45 card-minutes from main52 segment 3's last state at
+`2^(−12)` under the transfer law, each followed by the opening read and a write of 32 held problems). **Prediction, fixed
+before launch** (that reading), at every segment's last state: `B` at most 80 places; the void share at least 0.754 at 128
+places past the end and 0.988 at 512; the void mass before the end at most 52 places; context and foil within exact63's
+spread; written places within 25% of held; under 20 of 32 written longer. **Rule**: `B` at most 80 with no overrun, the
+boundary was the cause and the law stands; `B` falls but the writing still overruns, the overrun is made after the opening
+and is the next subject; `B` stays over 80, the question is not heard 500 places out at this reach, and the reach is the
+subject.

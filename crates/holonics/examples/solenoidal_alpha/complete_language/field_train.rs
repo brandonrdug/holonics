@@ -213,16 +213,33 @@ pub(super) fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], lengt
 }
 
 /// The lengths of the regions `members` would form from `draw` on (each draw counted as
-/// [`section_regions`] counts it): one region a member.
+/// [`section_regions`] counts it): one region a member, then each member's opening ([`opening_region`]).
 pub(super) fn region_lengths(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64) -> Vec<usize> {
-    members
+    let mut out: Vec<usize> = members
         .iter()
         .map(|&i| {
             let (q, a, _) = &problems[i];
             *draw += 1;
             q.len() + a.len() + tail(seed, *draw, codec.answer - a.len())
         })
-        .collect()
+        .collect();
+    out.extend(members.iter().map(|&i| problems[i].0.len() + codec.answer));
+    out
+}
+
+/// [definition; agent-inferred, November 5, §16.47] **A problem's writer's opening, compared at its boundary**: the
+/// question resolved and the codec's whole extent open past it, as the writer opens ([`opening`]), its every place an
+/// answer port compared at its boundary ([`holonics::hnn::tower::field::Port::boundary`]) at weight one: the answer's
+/// places with whether a letter stands there, never which, and the places past it with the void. Why (the
+/// unified-theory reading of November 5, 08:09; §16.46's reading): the writer fixes its length in its first reads and
+/// never undoes a letter past the true end, while training meets the opening's far places about once in 7,000 regions,
+/// so the opening's void mass past the end stood under the question-blind length law at every distance (222 places of
+/// byte mass past the end against the law's 80) and the writer overran 27 of 32 answers; the boundary's minimizer is the
+/// answer's length given the question.
+pub(super) fn opening_region(codec: &FieldCodec, q: &[usize], a: &[usize]) -> TrainRegion {
+    let classes = region_classes(codec, q, a, q.len() + codec.answer);
+    let unresolved = (0..classes.len()).map(|t| t >= q.len()).collect();
+    TrainRegion { port: Some((q.len(), codec.void(), a.to_vec(), true)), ..TrainRegion::plain(classes, unresolved) }
 }
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
@@ -237,8 +254,9 @@ pub(super) struct TrainRegion {
     pub echo: Vec<Option<Echo>>,
     /// The sites its open ones were drawn from (§16.23, [`Region::domain`]).
     pub domain: Option<usize>,
-    /// Its answer port, compared through its coupling (§16.24, [`Region::port`]): the first place, the void, the cells.
-    pub port: Option<(usize, usize, Vec<usize>)>,
+    /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
+    /// its boundary (§16.47) rather than through its coupling.
+    pub port: Option<(usize, usize, Vec<usize>, bool)>,
 }
 
 impl TrainRegion {
@@ -250,7 +268,7 @@ impl TrainRegion {
 
 /// A region as the field reads it.
 fn view_of(region: &TrainRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target)| Port { start: *start, void: *void, target }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary)| Port { start: *start, void: *void, target, boundary: *boundary }) }
 }
 
 /// The regions as the field reads them.
@@ -260,8 +278,8 @@ pub(super) fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
 
 /// **A section's regions as `train-field` forms them**: each member's classes (its question, its answer and a keyed
 /// void tail) and its shape ([`shape`]), one region a member, weighed in the joint code over the sites its open ones were
-/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail). The step the learner holds is read
-/// first on these regions, which it was not fit on, and the held step's read is returned.
+/// drawn from ([`Region::weight`]: the whole region, or the answer and its tail); then each member's writer's opening,
+/// compared at its boundary ([`opening_region`], §16.47). The step the learner holds is read first on these regions, which it was not fit on, and the held step's read is returned.
 pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, draw: &mut u64, learner: &mut FieldLearner, realization: &mut dyn FieldRealization) -> Result<(Vec<TrainRegion>, Option<FieldNext>)> {
     let mut regions: Vec<TrainRegion> = Vec::with_capacity(members.len());
     for &i in members {
@@ -274,6 +292,8 @@ pub(super) fn section_regions(codec: &FieldCodec, problems: &Problems, members: 
             Shape::Answer(mask) => TrainRegion { domain: Some(weighed_domain(length - q.len(), &mask)), ..TrainRegion::plain(classes, mask) },
         });
     }
+    // [§16.47] Beside each member's region, its writer's opening, compared at its boundary.
+    regions.extend(members.iter().map(|&i| opening_region(codec, &problems[i].0, &problems[i].1)));
     let next = if learner.holds_step() { learner.read_step_on(&views_of(&regions), realization).map_err(|e| e.to_string())?.1 } else { None };
     Ok((regions, next))
 }
@@ -1946,7 +1966,14 @@ mod tests {
     /// member, the truth with the keyed open sites unresolved and nothing carried, weighed over the whole region or over
     /// the answer and its tail.
     fn check_regions(codec: &FieldCodec, problems: &Problems, members: &[usize], seed: u64, first: u64, regions: &[TrainRegion]) -> usize {
-        assert_eq!(regions.len(), members.len());
+        assert_eq!(regions.len(), 2 * members.len());
+        for (n, &i) in members.iter().enumerate() {
+            let (q, a, _) = &problems[i];
+            let opening = &regions[members.len() + n];
+            assert_eq!(opening.classes.len(), q.len() + codec.answer, "member {n}'s opening is the writer's");
+            assert!(opening.unresolved.iter().enumerate().all(|(t, &u)| u == (t >= q.len())), "member {n}'s opening opens every room place");
+            assert_eq!(opening.port, Some((q.len(), codec.void(), a.clone(), true)), "member {n}'s opening is compared at its boundary");
+        }
         let mut answers = 0;
         for (n, &i) in members.iter().enumerate() {
             let (q, a, _) = &problems[i];
