@@ -968,6 +968,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
         for (n, &s) in walk(seed, read, sections.len()).iter().enumerate() {
             let section_start = std::time::Instant::now();
             let (regions, next) = section_regions(&codec, &train_set, &sections[s], &paths[s], seed, &mut draw, &mut learner, realization)?;
+            // [measurement; agent-inferred, November 5] The section's time by phase (Brandon, November 5: where the time goes):
+            // its regions formed with the held step read on them, then its deposit (with any halving's rereads).
+            let regions_ms = section_start.elapsed().as_millis();
             let length = regions.iter().map(|r| r.classes.len()).max().unwrap_or(0);
             let views = views_of(&regions);
             // [measurement; agent-inferred, November 2] **The far pairs' share of the contact covector** (§16.20): on the
@@ -983,7 +986,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
                     println!("FIELD_COVECTOR_SHARE lap={lap} section={run_section} head={head} near={near} far={far} far_share={far_share} ms={}", read_start.elapsed().as_millis());
                 }
             }
+            let deposit_start = std::time::Instant::now();
             let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+            let deposit_ms = deposit_start.elapsed().as_millis();
             let receipt = FieldReceipt { next: next.or(receipt.next), ..receipt };
             code_before += receipt.code_before;
             code_after += receipt.code_after;
@@ -1000,7 +1005,7 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             let micro = |c: i64| if receipt.sites == 0 { 0 } else { (c as i128 * 1_000_000) / ((receipt.sites as i128) << 20) };
             let rate_taken = learner.rate_bits;
             println!(
-                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} ms={}",
+                "FIELD_SECTION lap={lap} n={n} sites={} before={} after={} halvings={} deposited={} {} predicted_micro={} change_micro={} transfer_micro={} rate={rate_taken} length={length} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
                 receipt.sites,
                 bits(receipt.code_before, receipt.sites),
                 bits(receipt.code_after, receipt.sites),
