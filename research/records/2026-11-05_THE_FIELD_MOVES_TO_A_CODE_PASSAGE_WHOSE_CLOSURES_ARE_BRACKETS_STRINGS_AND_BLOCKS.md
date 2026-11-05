@@ -142,3 +142,11 @@ on the context improved while the release at the opening fell apart: under the n
 region holds an open place more than five past its front or its end, and the writer's states hold the whole room open, so the
 release reads faces training never reached (agent-inferred, not yet located). b1 restores the far comparisons; the chain was
 stopped after this segment for its read (code87).
+
+[measurement; agent-inferred] **b1's parity is equal and the whole room costs 1.61 times** (code87; `code87_parity_cost.txt`). The
+sampled parity under the one-rate stretch and the whole-room path states passed, every read equal (a section's 26 regions,
+41,780 sites, host 36 s against the card's 0.64 s). The cost read from code84's lap-0 state: 227 sections at 616 ms (at most
+1,444) against code84's 382, past the 573 at which its first launch stopped for the reading's keyed fraction. A keyed
+fraction trains fewer path states so that a lap fits a clock, which the card law refuses (the design fixes the workload, and
+a run that does not fit gets the card or a stated long run), and the reading preferred the whole room where its cost allows;
+so b1 runs whole, two laps of about 16 card-minutes each, its lap bound the cost read's (`code87_launch2.sh`).

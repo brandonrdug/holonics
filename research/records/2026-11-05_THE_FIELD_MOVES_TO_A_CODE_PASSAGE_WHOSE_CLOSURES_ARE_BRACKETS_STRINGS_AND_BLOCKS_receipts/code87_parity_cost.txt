@@ -1,0 +1,11 @@
+# code87 waits for code86's segment 3 21:32:46
+# code86 stopped after its segment 3 21:35:26
+# code87 binary e4c20b899ccdfe94d957af6845370b228fd507a6e8265da7b435bd23dd177aa8 parity lock taken 21:35:26
+FIELD_PARITY section=1 withheld=false regions=26 length=2304 sites=41780 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=36243 card_ms=639
+FIELD_PARITY section=2 withheld=true regions=32 length=555 sites=0 faces_unequal=0 covector_unequal=0 learner_equal=true near_equal=true clocks_equal=true rows_equal=true shares_equal=true currents_equal=true host_ms=2490 card_ms=20
+FIELD_PARITY_DONE sections=2 reads_unequal=0 faces_unequal=0 covector_unequal=0 learners_unequal=0 releases=1 releases_unequal=0 card_release_ms=40 host_ms=38733 card_ms=659 elapsed_ms=320920
+MEASURE lap=parity rc=0 wall_s=336.4 peak_rss_kib=4887796
+# cost read from e87c522094abb7686e6536620a563fe424b152d5c217ea91ccfac5339e6ff250 21:41:03
+dev sections 227 mean_ms 616 max_ms 1444
+MEASURE lap=dev rc=0 wall_s=152.1 peak_rss_kib=855580
+COST the whole room's section mean 615 ms is past 573: the chain stops for the keyed fraction 21:43:35
