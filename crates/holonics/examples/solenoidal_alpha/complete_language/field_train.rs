@@ -207,15 +207,17 @@ pub(super) fn weighed_domain(m: usize, mask: &[bool]) -> usize {
     (4 * m as u128 * k).isqrt() as usize
 }
 
-/// [definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] `FIELD_TAIL_NEAR`: **a region
-/// ends five places past its lowest void**, a declared comparison with the keyed tail over the room. A training region's tail
+/// [definition; agent-inferred, November 5, the unified-theory reading of 19:32, part 2 of 18:53] **A region ends five places
+/// past its lowest void**, the law since code85 stood against the keyed tail at equal laps (held context 2.124 against 2.181
+/// at lap 1, sections 166 ms against 382); `FIELD_TAIL_KEYED` declares the keyed tail over the room it replaced, for
+/// comparison. A training region's tail
 /// is the void and the five places past it (`NEAR` places), a path state past a resolved void ends five places past it, and
 /// the withheld read's tail is cut the same way, so every place before the end keeps its near field and the problem never
 /// hears the codec's room (its longest answer and one). Why: the room's voids are no problem's; the content heard its length
 /// through them, in void crowds and the backward strand's void sum, over as many as 1,700 places.
 pub(super) fn near_tail() -> bool {
     static NEAR_TAIL: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *NEAR_TAIL.get_or_init(|| std::env::var_os("FIELD_TAIL_NEAR").is_some())
+    *NEAR_TAIL.get_or_init(|| std::env::var_os("FIELD_TAIL_KEYED").is_none())
 }
 
 /// [agent-inferred, November 1] A region's void tail past its answer, in `[1, room]`, `room` the
@@ -2145,8 +2147,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    /// The keyed tail meets every octave of its room (under `FIELD_TAIL_NEAR` the tail is the near field's, and this reads
-    /// the keyed law it is declared against).
+    /// The keyed tail meets every octave of its room (`FIELD_TAIL_KEYED`; under the law the tail is the near field's).
     #[test]
     fn tails_meet_every_octave_within_their_room() {
         if near_tail() {
