@@ -194,3 +194,14 @@ states no longer collapse. The writer's cut lowers the hazard ratio (the whole r
 in 64 places, the cut's at one in 160) while it raises written over held. b1's segment 3 (laps 2 and 3, 929 and 974
 card-seconds): held context 2.358 and 2.272 against code85's 1.914 and 1.579, the opening's code 5.78 and 5.75 against 4.99 and
 5.00: the whole room slows what the field learns of content, not only its cost.
+
+[measurement; agent-inferred] **With training b1's writer finds its length, and the writer's laws give the near tail's field
+its content** (`code87_seg3.txt`, `closing92.txt`). b1's segment 3 under the old writer, at four laps: hazard ratio 2.35 with
+three refine passes and 2.25 on the sweeps alone (0.87 at two laps), the correlation with held +0.357 and +0.354, written over
+held 0.562 and 0.579; the opening's void mass 0.489 at held and 0.703 at +128, its expected length +30 past held, the drift to
+read 64 −36.3 ± 12.9; its refined write collapsed to `%` (87.5% of its bytes). code86's segment-3 state under both writer laws
+(closing92), with three refine passes: written over held 0.740, hazard ratio 1.41, the correlation −0.004; 25 of 32 opening
+with ```` ```python ````, 22 fences closed, three answers parsing, a tenth of its identifiers standing in the question (held 0.26),
+byte entropy 4.71 bits; with no refine pass the same length and 22 openings. So the collapse was the writer's for both fields;
+the near tail's field holds content and no length (its opening's void mass 0.09 at every distance, never compared far out),
+and b1's holds length and less content. b1 continues two laps with its writes under the writer's laws (`code87_launch4.sh`).
