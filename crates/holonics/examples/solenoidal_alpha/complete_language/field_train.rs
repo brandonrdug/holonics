@@ -1770,6 +1770,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
     let near = holonics::hnn::tower::field::NEAR;
     let mut rows = rows_file(&out.join("ORDER.tsv"), "problem\tplaces\tplace_code\tplace_length\tkeyed_code\tmasks_code\tlength_code\n")?;
     let mut place_length_total = 0i64;
+    let (mut keyed_length_total, mut given_total, mut letters_total) = (0i64, 0i64, 0usize);
     let (mut place_total, mut keyed_total, mut places_total) = (0i64, 0i64, 0usize);
     let (mut masks_total, mut length_total, mut lengths_unread) = (0i64, 0i64, 0usize);
     for (k, (question, answer)) in held.iter().take(n).enumerate() {
@@ -1808,6 +1809,21 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
             }
         }
         let keyed_states = states.len();
+        // [measurement; the unified-theory reading of November 6, 11:07] **The keyed order given its end**, the one-end writer's
+        // own states: the answer's places in the same octave order, its end's `NEAR` voids given and the region cut there, each
+        // place read on its own class (a letter).
+        let len = a.len().min(room);
+        let given_cut = (q.len() + len + near).min(q.len() + room);
+        let mut given_order: Vec<usize> = (q.len()..q.len() + len).collect();
+        given_order.sort_by_key(|&t| (holonics::hnn::tower::field::octave_of(t + 1 - q.len()), mix_key(((k as u64) << 32) ^ t as u64 ^ (1 << 62)), t));
+        let mut given_known = vec![false; given_cut];
+        for &t in &given_order {
+            let classes: Vec<usize> = (0..given_cut).map(|s| if s < q.len() { q[s] } else if given_known[s] { truth(s) } else { void }).collect();
+            let open: Vec<bool> = (0..given_cut).map(|s| s >= q.len() && s < q.len() + len && !given_known[s]).collect();
+            states.push((classes, open, t, truth(t)));
+            given_known[t] = true;
+        }
+        let given_states = states.len();
         // The masks' order: the answer and its near tail in a keyed uniform order.
         let span = (a.len() + near).min(room);
         let mut masks: Vec<usize> = (q.len()..q.len() + span).collect();
@@ -1820,7 +1836,7 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
             known[t] = true;
         }
         let mut codes = (0i64, 0i64, 0i64);
-        let mut place_length = 0i64;
+        let (mut place_length, mut keyed_length, mut given) = (0i64, 0i64, 0i64);
         for (c, chunk) in states.chunks(256).enumerate() {
             let regions: Vec<Region> = chunk.iter().map(|(classes, open, _, _)| Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
             let faces = realization.read_faces(field, &regions).map_err(|e| e.to_string())?;
@@ -1832,7 +1848,12 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
                         codes.0 += code;
                         place_length += if *class == void { code } else { holonics::hnn::tower::face_code(face.total - face.masses[void], face.total) };
                     }
-                    s if s < keyed_states => codes.1 += code,
+                    s if s < keyed_states => {
+                        codes.1 += code;
+                        // [the unified-theory reading of 11:07] The keyed order's length part: void or letter at each read.
+                        keyed_length += if *class == void { code } else { holonics::hnn::tower::face_code(face.total - face.masses[void], face.total) };
+                    }
+                    s if s < given_states => given += code,
                     _ => codes.2 += code,
                 }
             }
@@ -1857,15 +1878,19 @@ pub(super) fn order_field(args: &[String], realization: &mut dyn FieldRealizatio
         }
         masks_total += codes.2;
         place_length_total += place_length;
+        (keyed_length_total, given_total, letters_total) = (keyed_length_total + keyed_length, given_total + given, letters_total + len);
         row(&mut rows, &format!("{k}\t{}\t{}\t{place_length}\t{}\t{}\t{}\n", end + 1, codes.0, codes.1, codes.2, length.map_or("-".to_string(), |l| l.to_string())))?;
         (place_total, keyed_total, places_total) = (place_total + codes.0, keyed_total + codes.1, places_total + end + 1);
     }
     println!(
-        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} place_length_bits_a_place={} place_content_bits_a_place={} keyed_bits_a_place={} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
+        "FIELD_ORDER problems={n} places={places_total} place_bits_a_place={} place_length_bits_a_place={} place_content_bits_a_place={} keyed_bits_a_place={} keyed_length_bits_a_place={} keyed_content_bits_a_place={} keyed_given_bits_a_letter={} letters={letters_total} masks_bits_a_place={} masks_length_bits_a_place={} lengths_unread={lengths_unread} ms={}",
         bits(place_total, places_total),
         bits(place_length_total, places_total),
         bits(place_total - place_length_total, places_total),
         bits(keyed_total, places_total),
+        bits(keyed_length_total, places_total),
+        bits(keyed_total - keyed_length_total, places_total),
+        bits(given_total, letters_total),
         bits(masks_total, places_total),
         bits(length_total, places_total),
         started.elapsed().as_millis()
